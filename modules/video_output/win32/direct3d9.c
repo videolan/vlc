@@ -160,7 +160,6 @@ struct vout_display_sys_t
 
     const d3d9_format_t     *sw_texture_fmt;  /* Rendering texture(s) format */
     IDirect3DSurface9       *dx_render;
-    picture_pool_t          *pool; /* hardware decoding pool */
 
     /* */
     bool                    reset_device;
@@ -278,16 +277,6 @@ error:
     }
     free(pictures);
     return pool;
-}
-
-static picture_pool_t *DisplayPool(vout_display_t *vd, unsigned count)
-{
-    if ( vd->sys->pool == NULL )
-    {
-        vd->sys->pool = Direct3D9CreatePicturePool(VLC_OBJECT(vd), &vd->sys->d3d9_device->d3ddev,
-                                                   &vd->fmt, count);
-    }
-    return vd->sys->pool;
 }
 
 /**
@@ -548,11 +537,6 @@ static void Direct3D9DestroyResources(vout_display_t *vd)
     {
         IDirect3DSurface9_Release(vd->sys->dx_render);
         vd->sys->dx_render = NULL;
-    }
-    if (vd->sys->pool)
-    {
-        picture_pool_Release(vd->sys->pool);
-        vd->sys->pool = NULL;
     }
     Direct3D9DestroyShaders(vd);
 }
@@ -1727,8 +1711,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     video_format_Clean(fmtp);
     video_format_Copy(fmtp, &fmt);
 
-    if ( is_d3d9_opaque(vd->fmt.i_chroma) )
-        vd->pool = DisplayPool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
