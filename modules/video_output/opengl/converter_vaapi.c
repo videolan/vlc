@@ -227,66 +227,6 @@ error:
     return VLC_EGENERIC;
 }
 
-static picture_pool_t *
-tc_vaegl_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
-{
-    vlc_object_t *o = VLC_OBJECT(tc->gl);
-    struct priv *priv = tc->priv;
-
-    picture_pool_t *pool =
-        vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), tc->vctx, priv->vadpy,
-                          requested_count, &priv->va_surface_ids, &tc->fmt);
-    if (!pool)
-        return NULL;
-
-    /* Check if a surface from the pool can be derived and displayed via dmabuf
-     * */
-    bool success = false;
-    VAImage va_image = { .image_id = VA_INVALID_ID };
-    if (vlc_vaapi_DeriveImage(o, priv->vadpy, priv->va_surface_ids[0],
-                              &va_image))
-        goto error;
-
-    assert(va_image.format.fourcc == priv->fourcc);
-
-    VABufferInfo va_buffer_info = (VABufferInfo) {
-        .mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME
-    };
-    if (vlc_vaapi_AcquireBufferHandle(o ,priv->vadpy, va_image.buf,
-                                      &va_buffer_info))
-        goto error;
-
-    for (unsigned i = 0; i < va_image.num_planes; ++i)
-    {
-        EGLint w = (va_image.width * tc->texs[i].w.num) / tc->texs[i].w.den;
-        EGLint h = (va_image.height * tc->texs[i].h.num) / tc->texs[i].h.den;
-        EGLImageKHR egl_image =
-            vaegl_image_create(tc, w, h, priv->drm_fourccs[i], va_buffer_info.handle,
-                               va_image.offsets[i], va_image.pitches[i]);
-        if (egl_image == NULL)
-        {
-            msg_Warn(o, "Can't create Image KHR: kernel too old ?");
-            goto error;
-        }
-        vaegl_image_destroy(tc, egl_image);
-    }
-
-    success = true;
-error:
-    if (va_image.image_id != VA_INVALID_ID)
-    {
-        if (va_image.buf != VA_INVALID_ID)
-            vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, va_image.buf);
-        vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
-    }
-    if (!success)
-    {
-        picture_pool_Release(pool);
-        pool = NULL;
-    }
-    return pool;
-}
-
 static void
 Close(vlc_object_t *obj)
 {
@@ -472,7 +412,6 @@ Open(vlc_object_t *obj)
         goto error;
 
     tc->pf_update  = tc_vaegl_update;
-    tc->pf_get_pool = tc_vaegl_get_pool;
 
     vlc_decoder_device_Release(dec_device);
 
