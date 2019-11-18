@@ -26,6 +26,8 @@ namespace vlc {
 
 void SelectableListModel::setSelected(int row, bool selected)
 {
+    assert( row >= 0 && row < rowCount() );
+
     setRowSelected(row, selected);
 
     QModelIndex modelIndex = index(row);
@@ -35,11 +37,15 @@ void SelectableListModel::setSelected(int row, bool selected)
 
 bool SelectableListModel::isSelected(int row) const
 {
+    assert( row >= 0 && row < rowCount() );
+
     return isRowSelected(row);
 }
 
 void SelectableListModel::toggleSelected(int row)
 {
+    assert( row >= 0 && row < rowCount() );
+
     setRowSelected(row, !isRowSelected(row));
 
     QModelIndex modelIndex = index(row);
