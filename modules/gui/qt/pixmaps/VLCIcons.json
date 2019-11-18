@@ -84,6 +84,7 @@
 		{"key":"capture", "path": "./playlist/sidebar-icons/capture.svg"},
 		{"key":"podcast", "path": "./playlist/sidebar-icons/podcast.svg"},
 		{"key":"playlist", "path": "./playlist/playlist.svg"},
+		{"key":"playlist_clear", "path": "./playlist/playlist_clear.svg"},
 		{"key":"repeat_all", "path": "./playlist/repeat_all.svg"},
 		{"key":"active_indicator", "path": "./playlist/active_indicator.svg"},
 		{"key":"lock", "path": "./lock.svg"},
