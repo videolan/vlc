@@ -82,7 +82,6 @@ struct vout_display_sys_t {
 
     uint32_t        fb[MAXHWBUF];
     picture_t       *picture;
-    picture_pool_t  *pool;
 
     unsigned int    front_buf;
 
@@ -613,13 +612,6 @@ static int OpenDisplay(vout_display_t *vd)
         goto err_out;
     }
 
-    sys->pool = picture_pool_New(1, &sys->picture);
-    if (!sys->pool) {
-        picture_Release(sys->picture);
-        free(psys);
-        goto error;
-    }
-
     return VLC_SUCCESS;
 err_out:
     drmDropMaster(sys->drm_fd);
@@ -645,11 +637,12 @@ static int Control(vout_display_t *vd, int query, va_list args)
 }
 
 
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
+static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
+                    vlc_tick_t date)
 {
-    VLC_UNUSED(count);
+    VLC_UNUSED(subpic); VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
-    return sys->pool;
+    picture_Copy( sys->picture, pic );
 }
 
 
@@ -684,8 +677,8 @@ static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
+    if (sys->picture)
+        picture_Release(sys->picture);
 
     if (sys->drm_fd)
         drmDropMaster(sys->drm_fd);
@@ -761,8 +754,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     fmt.i_chroma = sys->vlc_fourcc;
     *fmtp = fmt;
 
-    vd->pool    = Pool;
-    vd->prepare = NULL;
+    vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
     vd->close = Close;
