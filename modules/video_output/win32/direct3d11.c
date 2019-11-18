@@ -103,7 +103,6 @@ struct vout_display_sys_t
 
     picture_sys_d3d11_t      stagingSys;
     plane_t                  stagingPlanes[PICTURE_PLANE_MAX];
-    picture_pool_t           *pool; /* hardware decoding pool */
 
     d3d_vshader_t            projectionVShader;
     d3d_vshader_t            flatVShader;
@@ -126,8 +125,6 @@ struct vout_display_sys_t
     libvlc_video_direct3d_select_plane_cb    selectPlaneCb;
 };
 
-static picture_pool_t *Pool(vout_display_t *, unsigned);
-
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture, vlc_tick_t);
 static void Display(vout_display_t *, picture_t *);
 
@@ -141,9 +138,6 @@ static int  Direct3D11CreateFormatResources (vout_display_t *, const video_forma
 static int  Direct3D11CreateGenericResources(vout_display_t *);
 static void Direct3D11DestroyResources(vout_display_t *);
 
-static void Direct3D11DestroyPool(vout_display_t *);
-
-static void DestroyDisplayPoolPicture(picture_t *);
 static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
@@ -382,8 +376,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     else
         vd->info.subpicture_chromas = NULL;
 
-    if (is_d3d11_opaque(vd->fmt.i_chroma))
-        vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
@@ -406,102 +398,6 @@ static void Close(vout_display_t *vd)
     CommonWindowClean(VLC_OBJECT(vd), &vd->sys->sys);
 #endif
     Direct3D11Destroy(vd);
-}
-
-static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
-{
-    /* compensate for extra hardware decoding pulling extra pictures from our pool */
-    pool_size += 2;
-
-    vout_display_sys_t *sys = vd->sys;
-    picture_t **pictures = NULL;
-    picture_t *picture;
-    unsigned  picture_count = 0;
-
-    if (sys->pool)
-        return sys->pool;
-
-    ID3D11Texture2D  *textures[pool_size * D3D11_MAX_SHADER_VIEW];
-    memset(textures, 0, sizeof(textures));
-    unsigned slices = pool_size;
-    /* only provide enough for the filters, we can still do direct rendering */
-    slices = __MIN(slices, 6);
-
-    if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &sys->area.texture_source, slices, textures, NULL))
-        goto error;
-
-    pictures = calloc(pool_size, sizeof(*pictures));
-    if (!pictures)
-        goto error;
-
-    for (picture_count = 0; picture_count < pool_size; picture_count++) {
-        picture_sys_d3d11_t *picsys = calloc(1, sizeof(*picsys));
-        if (unlikely(picsys == NULL))
-            goto error;
-
-        for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
-            picsys->texture[plane] = textures[picture_count * D3D11_MAX_SHADER_VIEW + plane];
-
-        picture_resource_t resource = {
-            .p_sys = picsys,
-            .pf_destroy = DestroyDisplayPoolPicture,
-        };
-
-        picture = picture_NewFromResource(&sys->area.texture_source, &resource);
-        if (unlikely(picture == NULL)) {
-            free(picsys);
-            msg_Err( vd, "Failed to create picture %d in the pool.", picture_count );
-            goto error;
-        }
-
-        pictures[picture_count] = picture;
-        picsys->slice_index = picture_count;
-        picsys->formatTexture = sys->picQuad.textureFormat->formatTexture;
-        /* each picture_t holds a ref to the context and release it on Destroy */
-        picsys->context = sys->d3d_dev.d3dcontext;
-        ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
-    }
-
-#ifdef HAVE_ID3D11VIDEODECODER
-    if (!sys->legacy_shader)
-#endif
-    {
-        for (picture_count = 0; picture_count < pool_size; picture_count++) {
-            picture_sys_d3d11_t *p_sys = pictures[picture_count]->p_sys;
-            if (!p_sys->texture[0])
-                continue;
-            if (D3D11_AllocateResourceView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.textureFormat,
-                                         p_sys->texture, picture_count,
-                                         p_sys->renderSrc))
-                goto error;
-        }
-    }
-
-    sys->pool = picture_pool_New( pool_size, pictures );
-
-error:
-    if (sys->pool == NULL) {
-        if (pictures) {
-            msg_Dbg(vd, "Failed to create the picture d3d11 pool");
-            for (unsigned i=0;i<picture_count; ++i)
-                picture_Release(pictures[i]);
-            free(pictures);
-        }
-
-        /* create an empty pool to avoid crashing */
-        sys->pool = picture_pool_New( 0, NULL );
-    } else {
-        msg_Dbg(vd, "D3D11 pool succeed with %d surfaces (%dx%d) context 0x%p",
-                pool_size, sys->area.texture_source.i_width, sys->area.texture_source.i_height, sys->d3d_dev.d3dcontext);
-    }
-    return sys->pool;
-}
-
-static void DestroyDisplayPoolPicture(picture_t *picture)
-{
-    picture_sys_d3d11_t *p_sys = picture->p_sys;
-    ReleaseD3D11PictureSys( p_sys );
-    free(p_sys);
 }
 
 static void getZoomMatrix(float zoom, FLOAT matrix[static 16]) {
@@ -1296,22 +1192,9 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     return VLC_SUCCESS;
 }
 
-static void Direct3D11DestroyPool(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->pool)
-    {
-        picture_pool_Release(sys->pool);
-        sys->pool = NULL;
-    }
-}
-
 static void Direct3D11DestroyResources(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-
-    Direct3D11DestroyPool(vd);
 
     D3D11_ReleaseQuad(&sys->picQuad);
     Direct3D11DeleteRegions(sys->d3dregion_count, sys->d3dregions);
