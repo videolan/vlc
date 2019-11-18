@@ -9,7 +9,7 @@ default:
         - if ! extras/ci/check-url.sh "$VLC_PREBUILT_CONTRIBS_URL"; then unset VLC_PREBUILT_CONTRIBS_URL; fi
     after_script:
         - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
-        - mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 >/dev/null || true
+        - mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 2>/dev/null || true
 
 variables:
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20190416165205
