@@ -675,6 +675,12 @@ libqt_plugin_la_SOURCES += $(libqt_plugin_la_QML)
 .qml.cpp:
 	$(AM_V_GEN)$(QMLCACHE) --resource=$(srcdir)/gui/qt/vlc.qrc -o $@ $<
 
+.js.cpp:
+	$(AM_V_GEN)$(QMLCACHE) --resource=$(srcdir)/gui/qt/vlc.qrc -o $@ $<
+
+.mjs.cpp:
+	$(AM_V_GEN)$(QMLCACHE) --resource=$(srcdir)/gui/qt/vlc.qrc -o $@ $<
+
 qml_cache.qrc: gui/qt/vlc.qrc
 	$(AM_V_GEN)$(QMLCACHE) --filter-resource-file -o $@ $<
 
