@@ -1826,6 +1826,7 @@ ctx_init(struct ctx *ctx, bool use_outputs)
         "--ignore-config",
         "-Idummy",
         "--no-media-library",
+        "--no-drop-late-frames",
         /* Avoid leaks from various dlopen... */
         "--codec=araw,rawvideo,subsdec,none",
         "--dec-dev=none",
