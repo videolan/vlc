@@ -165,8 +165,6 @@ Utils.NavigableFocusScope {
 
             header: root.header
 
-            interactive: root.interactive
-
             spacing: VLCStyle.margin_xxxsmall
 
             model: delegateModel.parts.list
