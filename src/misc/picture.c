@@ -194,7 +194,8 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
  *****************************************************************************/
 
 static bool picture_InitPrivate(const video_format_t *restrict p_fmt,
-                                picture_priv_t *priv)
+                                picture_priv_t *priv,
+                                const picture_resource_t *p_resource)
 {
     picture_t *p_picture = &priv->picture;
 
@@ -211,6 +212,13 @@ static bool picture_InitPrivate(const video_format_t *restrict p_fmt,
     atomic_init(&p_picture->refs, 1);
     priv->gc.opaque = NULL;
 
+    p_picture->p_sys = p_resource->p_sys;
+
+    if( p_resource->pf_destroy != NULL )
+        priv->gc.destroy = p_resource->pf_destroy;
+    else
+        priv->gc.destroy = picture_DestroyDummy;
+
     return true;
 }
 
@@ -222,20 +230,13 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     if (unlikely(priv == NULL))
         return NULL;
 
-    if (!picture_InitPrivate(p_fmt, priv))
+    if (!picture_InitPrivate(p_fmt, priv, p_resource))
     {
         free(priv);
         return NULL;
     }
 
     picture_t *p_picture = &priv->picture;
-
-    p_picture->p_sys = p_resource->p_sys;
-
-    if( p_resource->pf_destroy != NULL )
-        priv->gc.destroy = p_resource->pf_destroy;
-    else
-        priv->gc.destroy = picture_DestroyDummy;
 
     for( int i = 0; i < p_picture->i_planes; i++ )
     {
@@ -263,15 +264,20 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
     if (unlikely(privbuf == NULL))
         return NULL;
 
-    picture_priv_t *priv = &privbuf->priv;
-    if (!picture_InitPrivate(fmt, priv))
-        goto error;
+    picture_buffer_t *res = &privbuf->res;
 
-    priv->gc.destroy = picture_DestroyFromFormat;
+    picture_resource_t pic_res = {
+        .p_sys = res,
+        .pf_destroy = picture_DestroyFromFormat,
+    };
+
+    picture_priv_t *priv = &privbuf->priv;
+    if (!picture_InitPrivate(fmt, priv, &pic_res))
+        goto error;
 
     picture_t *pic = &priv->picture;
     if (pic->i_planes == 0) {
-        pic->p_sys = NULL;
+        pic->p_sys = NULL; // not compatible with picture_DestroyFromFormat
         return pic;
     }
 
@@ -292,8 +298,6 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
     if (unlikely(pic_size >= PICTURE_SW_SIZE_MAX))
         goto error;
 
-    picture_buffer_t *res = &privbuf->res;
-
     unsigned char *buf = picture_Allocate(&res->fd, pic_size);
     if (unlikely(buf == NULL))
         goto error;
@@ -301,7 +305,6 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
     res->base = buf;
     res->size = pic_size;
     res->offset = 0;
-    pic->p_sys = res;
 
     /* Fill the p_pixels field for each plane */
     for (int i = 0; i < pic->i_planes; i++)
