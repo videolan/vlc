@@ -180,6 +180,7 @@ void PlaylistListModelPrivate::onItemsReset(const QVector<PlaylistItem>& newCont
     q->endResetModel();
 
     emit q->countChanged(m_items.size());
+    emit q->selectedCountChanged();
 }
 
 void PlaylistListModelPrivate::onItemsAdded(const QVector<PlaylistItem>& added, size_t index)
@@ -224,6 +225,7 @@ void PlaylistListModelPrivate::onItemsRemoved(size_t index, size_t count)
     q->endRemoveRows();
 
     emit q->countChanged(m_items.size());
+    emit q->selectedCountChanged();
 }
 
 

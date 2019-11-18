@@ -26,6 +26,8 @@ namespace vlc {
 class SelectableListModel : public QAbstractListModel
 {
     Q_OBJECT
+
+    Q_PROPERTY(int selectedCount READ getSelectedCount NOTIFY selectedCountChanged)
 public:
     SelectableListModel(QObject *parent = nullptr) :
         QAbstractListModel(parent) {}
@@ -38,6 +40,11 @@ public:
     Q_INVOKABLE void setRangeSelected(int first, int count, bool selected);
     Q_INVOKABLE void selectAll();
     Q_INVOKABLE void deselectAll();
+
+    virtual int getSelectedCount() const;
+
+signals:
+    void selectedCountChanged();
 
 protected:
     virtual bool isRowSelected(int row) const = 0;

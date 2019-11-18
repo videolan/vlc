@@ -30,6 +30,7 @@ void SelectableListModel::setSelected(int row, bool selected)
 
     QModelIndex modelIndex = index(row);
     emit dataChanged(modelIndex, modelIndex, { getSelectedRole() });
+    emit selectedCountChanged();
 }
 
 bool SelectableListModel::isSelected(int row) const
@@ -43,6 +44,7 @@ void SelectableListModel::toggleSelected(int row)
 
     QModelIndex modelIndex = index(row);
     emit dataChanged(modelIndex, modelIndex, { getSelectedRole() });
+    emit selectedCountChanged();
 }
 
 void SelectableListModel::setSelection(const QList<int> &sortedIndexes)
@@ -71,6 +73,7 @@ void SelectableListModel::setSelection(const QList<int> &sortedIndexes)
     QModelIndex first = index(0);
     QModelIndex last = index(itemsCount - 1);
     emit dataChanged(first, last, { getSelectedRole() });
+    emit selectedCountChanged();
 }
 
 QList<int> SelectableListModel::getSelection() const
@@ -94,6 +97,7 @@ void SelectableListModel::setRangeSelected(int start, int count, bool selected)
     QModelIndex first = index(start);
     QModelIndex last = index(start + count - 1);
     emit dataChanged(first, last, { getSelectedRole() });
+    emit selectedCountChanged();
 }
 
 void SelectableListModel::selectAll()
@@ -114,6 +118,17 @@ void SelectableListModel::deselectAll()
         return;
 
     setRangeSelected(0, count, false);
+}
+
+int SelectableListModel::getSelectedCount() const
+{
+    int itemsCount = rowCount();
+    int count = 0;
+    for (int i = 0 ; i < itemsCount; i++) {
+        if (isRowSelected(i))
+            count++;
+    }
+    return count;
 }
 
 } // namespace vlc
