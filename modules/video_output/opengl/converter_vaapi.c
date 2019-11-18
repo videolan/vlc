@@ -236,8 +236,7 @@ tc_vaegl_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
     vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
     picture_pool_t *pool =
         vlc_vaapi_PoolNew(VLC_OBJECT(tc->gl), dec_device, priv->vadpy,
-                          requested_count, &priv->va_surface_ids, &tc->fmt,
-                          true);
+                          requested_count, &priv->va_surface_ids, &tc->fmt);
     vlc_decoder_device_Release(dec_device);
     if (!pool)
         return NULL;
@@ -345,7 +344,7 @@ tc_va_check_derive_image(opengl_tex_converter_t *tc,
     VASurfaceID *va_surface_ids;
 
     picture_pool_t *pool = vlc_vaapi_PoolNew(o, dec_device, priv->vadpy, 1,
-                                             &va_surface_ids, &tc->fmt, true);
+                                             &va_surface_ids, &tc->fmt);
     if (!pool)
         return VLC_EGENERIC;
 

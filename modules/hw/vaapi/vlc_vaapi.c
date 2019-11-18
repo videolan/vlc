@@ -469,7 +469,7 @@ pic_sys_ctx_destroy_cb(struct picture_context_t *opaque)
 picture_pool_t *
 vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
                   VADisplay dpy, unsigned count, VASurfaceID **render_targets,
-                  const video_format_t *restrict fmt, bool b_force_fourcc)
+                  const video_format_t *restrict fmt)
 {
     unsigned va_rt_format;
     int va_fourcc;
@@ -489,14 +489,11 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
             .type = VASurfaceAttribPixelFormat,
             .flags = VA_SURFACE_ATTRIB_SETTABLE,
             .value.type    = VAGenericValueTypeInteger,
-            .value.value.i = b_force_fourcc ? va_fourcc : 0,
+            .value.value.i = va_fourcc,
         }
     };
-    if (b_force_fourcc)
-    {
         attribs = fourcc_attribs;
         num_attribs = 1;
-    }
 
     picture_t *pics[count];
 

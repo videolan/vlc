@@ -383,8 +383,7 @@ Open(filter_t * filter,
     filter_sys->dest_pics =
         vlc_vaapi_PoolNew(VLC_OBJECT(filter), filter_sys->va.dec_device,
                           filter_sys->va.dpy, DEST_PICS_POOL_SZ,
-                          &filter_sys->va.surface_ids, &filter->fmt_out.video,
-                          true);
+                          &filter_sys->va.surface_ids, &filter->fmt_out.video);
     if (!filter_sys->dest_pics)
         goto error;
 

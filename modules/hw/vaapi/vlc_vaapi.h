@@ -171,7 +171,7 @@ vlc_vaapi_CreateConfigChecked(vlc_object_t *o, VADisplay dpy,
 picture_pool_t *
 vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
                   VADisplay dpy, unsigned count, VASurfaceID **render_targets,
-                  const video_format_t *restrict fmt, bool b_force_fourcc);
+                  const video_format_t *restrict fmt);
 
 /* Get and hold the VADisplay instance attached to the picture sys */
 vlc_decoder_device *

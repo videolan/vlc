@@ -357,7 +357,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
         filter_sys->dest_pics =
             vlc_vaapi_PoolNew(obj, filter_sys->dec_device, filter_sys->dpy,
                               DEST_PICS_POOL_SZ, &filter_sys->va_surface_ids,
-                              &filter->fmt_out.video, true);
+                              &filter->fmt_out.video);
         if (!filter_sys->dest_pics)
         {
             vlc_vaapi_FilterReleaseInstance(filter, filter_sys->dec_device);
