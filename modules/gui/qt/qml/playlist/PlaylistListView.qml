@@ -108,6 +108,8 @@ Utils.NavigableFocusScope {
                 view.forceActiveFocus()
                 if (view.mode == "move") {
                     var selectedIndexes = root.plmodel.getSelection()
+                    if (selectedIndexes.length === 0)
+                        return
                     var preTarget = index
                     /* move to _above_ the clicked item if move up, but
                      * _below_ the clicked item if move down */
@@ -146,7 +148,8 @@ Utils.NavigableFocusScope {
                 console.log("update selection select")
             } else if (mode == "move") {
                 var selectedIndexes = root.plmodel.getSelection()
-
+                if (selectedIndexes.length === 0)
+                    return
                 /* always move relative to the first item of the selection */
                 var target = selectedIndexes[0];
                 if (newIndex > oldIndex) {
@@ -190,6 +193,9 @@ Utils.NavigableFocusScope {
         }
 
         onActionAtIndex: {
+            if (index < 0)
+                return
+
             if (mode === "select")
                 root.plmodel.toggleSelected(index)
             else //normal
@@ -199,12 +205,16 @@ Utils.NavigableFocusScope {
 
         function onPlay() {
             let selection = root.plmodel.getSelection()
-            if (selection.length > 0)
-                mainPlaylistController.goTo(selection[0], true)
+            if (selection.length === 0)
+                return
+            mainPlaylistController.goTo(selection[0], true)
         }
 
         function onDelete() {
-            root.plmodel.removeItems(root.plmodel.getSelection())
+            let selection = root.plmodel.getSelection()
+            if (selection.length === 0)
+                return
+            root.plmodel.removeItems(selection)
         }
 
         function _addRange(from, to) {
