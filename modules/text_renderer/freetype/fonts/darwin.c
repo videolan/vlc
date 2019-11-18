@@ -39,10 +39,6 @@
 
 #include "../platform_fonts.h"
 
-char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor);
-void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *family);
-
-
 char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
 {
     CFURLRef url = CTFontDescriptorCopyAttribute(fontDescriptor, kCTFontURLAttribute);
