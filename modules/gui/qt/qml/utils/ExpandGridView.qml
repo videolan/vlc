@@ -66,6 +66,9 @@ NavigableFocusScope {
     }
 
     function switchExpandItem(index) {
+        if (modelCount === 0)
+            return
+
         if (index === _expandIndex)
             _newExpandIndex = -1
         else
