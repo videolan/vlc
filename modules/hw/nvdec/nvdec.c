@@ -326,12 +326,7 @@ static struct picture_context_t *NVDecCtxClone(struct picture_context_t *srcctx)
         return NULL;
     pic_context_nvdec_t *srcpic = container_of(srcctx, pic_context_nvdec_t, ctx);
 
-    clonectx->ctx.destroy = NVDecCtxDestroy;
-    clonectx->ctx.copy = NVDecCtxClone;
-    clonectx->devidePtr = srcpic->devidePtr;
-    clonectx->bufferPitch = srcpic->bufferPitch;
-    clonectx->bufferHeight = srcpic->bufferHeight;
-    clonectx->nvdecDevice = srcpic->nvdecDevice;
+    *clonectx = *srcpic;
     return &clonectx->ctx;
 }
 
