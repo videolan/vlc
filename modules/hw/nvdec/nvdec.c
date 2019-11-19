@@ -327,6 +327,7 @@ static struct picture_context_t *NVDecCtxClone(struct picture_context_t *srcctx)
     pic_context_nvdec_t *srcpic = container_of(srcctx, pic_context_nvdec_t, ctx);
 
     *clonectx = *srcpic;
+    vlc_video_context_Hold(clonectx->ctx.vctx);
     return &clonectx->ctx;
 }
 
@@ -372,7 +373,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
             goto error;
         picctx->ctx = (picture_context_t) {
             NVDecCtxDestroy, NVDecCtxClone,
-            NULL /*TODO*/
+            p_sys->vctx_out,
         };
         uintptr_t pool_idx = (uintptr_t)p_pic->p_sys;
         picctx->devidePtr = p_sys->outputDevicePtr[pool_idx];
@@ -408,6 +409,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
             dstY += p_sys->decoderHeight;
         }
         p_pic->context = &picctx->ctx;
+        vlc_video_context_Hold(picctx->ctx.vctx);
     }
     else
     {
