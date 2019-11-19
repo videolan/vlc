@@ -754,9 +754,16 @@ static int OutputOpen(vlc_object_t *obj)
     assert(filter->fmt_out.video.orientation == ORIENT_TOP_LEFT
         || filter->fmt_in.video.orientation == filter->fmt_out.video.orientation);
 
+    vlc_decoder_device *dec_device = filter_HoldDecoderDeviceType(filter, VLC_DECODER_DEVICE_VDPAU);
+    if (dec_device == NULL)
+        return VLC_EGENERIC;
+
     vlc_vdp_mixer_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
+    {
+        vlc_decoder_device_Release(dec_device);
         return VLC_ENOMEM;
+    }
 
     filter->p_sys = sys;
 
@@ -785,21 +792,22 @@ static int OutputOpen(vlc_object_t *obj)
                               &sys->chroma, &sys->format))
         video_filter = YCbCrRender;
     else
+    {
+        vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
+    }
 
-    VdpStatus err = vdp_get_x11(NULL, -1, &sys->vdp, &sys->device);
-    if (err != VDP_STATUS_OK)
-        return VLC_EGENERIC;
+    vdpau_decoder_device_t *vdpau_decoder = GetVDPAUOpaqueDevice(dec_device);
+    sys->vdp = vdpau_decoder->vdp;
+    sys->device = vdpau_decoder->device;
+
+    vlc_decoder_device_Release(dec_device);
 
     /* Allocate the output surface picture pool */
-    vdpau_decoder_device_t vdpau_dev = {
-        .vdp = sys->vdp,
-        .device = sys->device,
-    };
-    sys->pool = OutputPoolAlloc(obj, &vdpau_dev, &filter->fmt_out.video);
+    sys->pool = OutputPoolAlloc(obj, vdpau_decoder,
+                                &filter->fmt_out.video);
     if (sys->pool == NULL)
     {
-        vdp_release_x11(sys->vdp);
         return VLC_EGENERIC;
     }
 
@@ -808,7 +816,6 @@ static int OutputOpen(vlc_object_t *obj)
     if (sys->mixer == VDP_INVALID_HANDLE)
     {
         picture_pool_Release(sys->pool);
-        vdp_release_x11(sys->vdp);
         return VLC_EGENERIC;
     }
 
@@ -833,7 +840,6 @@ static void OutputClose(vlc_object_t *obj)
     Flush(filter);
     vdp_video_mixer_destroy(sys->vdp, sys->mixer);
     picture_pool_Release(sys->pool);
-    vdp_release_x11(sys->vdp);
 }
 
 typedef struct
