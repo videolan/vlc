@@ -26,7 +26,6 @@ OPTIONS="
       --enable-x264
       --enable-libass
       --disable-xcb
-      --disable-xvideo
       --enable-freetype
       --enable-fribidi
       --enable-fontconfig
