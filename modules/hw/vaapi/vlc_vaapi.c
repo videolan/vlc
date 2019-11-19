@@ -454,11 +454,9 @@ pic_ctx_copy_cb(struct picture_context_t *opaque)
     if (dst_ctx == NULL)
         return NULL;
 
+    *dst_ctx = *src_ctx;
     dst_ctx->ctx.s.destroy = pic_ctx_destroy_cb;
-    dst_ctx->ctx.s.copy = pic_ctx_copy_cb;
-    dst_ctx->ctx.surface = src_ctx->ctx.surface;
-    dst_ctx->ctx.va_dpy = src_ctx->ctx.va_dpy;
-    dst_ctx->picref = picture_Hold(src_ctx->picref);
+    picture_Hold(dst_ctx->picref);
     return &dst_ctx->ctx.s;
 }
 
@@ -516,8 +514,9 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
             goto error_pic;
         }
         p_sys->instance = instance;
-        p_sys->ctx.ctx.s.destroy = pic_sys_ctx_destroy_cb;
-        p_sys->ctx.ctx.s.copy = pic_ctx_copy_cb;
+        p_sys->ctx.ctx.s = (picture_context_t) {
+            pic_sys_ctx_destroy_cb, pic_ctx_copy_cb,
+        };
         p_sys->ctx.ctx.surface = instance->render_targets[i];
         p_sys->ctx.ctx.va_dpy = dpy;
         p_sys->ctx.picref = NULL;
