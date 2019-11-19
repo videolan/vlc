@@ -318,6 +318,8 @@ case "${host_os}" in
     AC_LIBOBJ([freeaddrinfo])
     AC_LIBOBJ([gai_strerror])
     AC_CHECK_FUNCS([if_nametoindex])
+    X86ASMFLAGS="-f aout"
+    X86ASMDEFS="-DARCH_X86_32=1 -DARCH_X86_64=0 -DPREFIX"
     ;;
   *nacl*)
     SYS=nacl
