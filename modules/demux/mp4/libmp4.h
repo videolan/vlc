@@ -1336,14 +1336,14 @@ typedef struct
 {
     WAVEFORMATEX Format;
     uint32_t i_extra;
-    char    *p_extra;
+    uint8_t *p_extra;
 } MP4_Box_data_WMA2_t;
 
 typedef struct
 {
     VLC_BITMAPINFOHEADER bmiHeader;
     uint32_t i_extra;
-    char    *p_extra;
+    uint8_t *p_extra;
 } MP4_Box_data_strf_t;
 
 typedef struct
