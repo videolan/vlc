@@ -1047,7 +1047,7 @@ static void ModuleThread_QueueCc( decoder_t *p_videodec, block_t *p_cc,
 static int ModuleThread_PlayVideo( struct decoder_owner *p_owner, picture_t *p_picture )
 {
     decoder_t *p_dec = &p_owner->dec;
-    vout_thread_t  *p_vout = p_owner->p_vout;
+    vout_thread_t  *p_vout = p_owner->vout_thread_started ? p_owner->p_vout : NULL;
 
     if( p_picture->date == VLC_TICK_INVALID )
         /* FIXME: VLC_TICK_INVALID -- verify video_output */
@@ -1508,12 +1508,12 @@ static void DecoderThread_Flush( struct decoder_owner *p_owner )
     }
     else if( p_dec->fmt_out.i_cat == VIDEO_ES )
     {
-        if( p_owner->p_vout )
+        if( p_owner->p_vout && p_owner->vout_thread_started )
             vout_FlushAll( p_owner->p_vout );
     }
     else if( p_dec->fmt_out.i_cat == SPU_ES )
     {
-        if( p_owner->p_vout )
+        if( p_owner->p_vout && p_owner->vout_thread_started )
         {
             assert( p_owner->i_spu_channel != VOUT_SPU_CHANNEL_INVALID );
             vout_FlushSubpictureChannel( p_owner->p_vout, p_owner->i_spu_channel );
