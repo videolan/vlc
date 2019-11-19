@@ -92,17 +92,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_viewpoint_t *viewpoint,
                                                vlc_video_context *context);
 void vout_display_opengl_Delete(vout_display_opengl_t *vgl);
-static inline bool vout_display_opengl_HasPool(const vout_display_opengl_t *gl)
-{
-    (void) gl;
-    return false;
-}
-
-static inline picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned count)
-{
-    (void) vgl; (void) count;
-    return NULL;
-}
 
 int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl, const vlc_viewpoint_t*);
 
