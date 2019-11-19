@@ -375,8 +375,9 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
         pic_context_nvdec_t *picctx = malloc(sizeof(*picctx));
         if (unlikely(picctx == NULL))
             goto error;
-        picctx->ctx.destroy = NVDecCtxDestroy;
-        picctx->ctx.copy = NVDecCtxClone;
+        picctx->ctx = (picture_context_t) {
+            NVDecCtxDestroy, NVDecCtxClone,
+        };
         uintptr_t pool_idx = (uintptr_t)p_pic->p_sys;
         picctx->devidePtr = p_sys->outputDevicePtr[pool_idx];
         picctx->bufferPitch = p_sys->outputPitch;
