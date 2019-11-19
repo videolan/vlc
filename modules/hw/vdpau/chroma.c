@@ -744,6 +744,10 @@ static picture_pool_t *OutputPoolAlloc(vlc_object_t *obj,
     return vlc_vdp_output_pool_create(vdpau_dev, rgb_fmt, fmt, 3);
 }
 
+const struct vlc_video_context_operations vdpau_vctx_ops = {
+    NULL,
+};
+
 static int OutputOpen(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -801,13 +805,19 @@ static int OutputOpen(vlc_object_t *obj)
     sys->vdp = vdpau_decoder->vdp;
     sys->device = vdpau_decoder->device;
 
+    filter->vctx_out = vlc_video_context_Create(dec_device, VLC_VIDEO_CONTEXT_VDPAU,
+                                                0, &vdpau_vctx_ops);
     vlc_decoder_device_Release(dec_device);
+    if (unlikely(filter->vctx_out == NULL))
+        return VLC_EGENERIC;
 
     /* Allocate the output surface picture pool */
     sys->pool = OutputPoolAlloc(obj, vdpau_decoder,
                                 &filter->fmt_out.video);
     if (sys->pool == NULL)
     {
+        vlc_video_context_Release(filter->vctx_out);
+        filter->vctx_out = NULL;
         return VLC_EGENERIC;
     }
 
@@ -816,6 +826,8 @@ static int OutputOpen(vlc_object_t *obj)
     if (sys->mixer == VDP_INVALID_HANDLE)
     {
         picture_pool_Release(sys->pool);
+        vlc_video_context_Release(filter->vctx_out);
+        filter->vctx_out = NULL;
         return VLC_EGENERIC;
     }
 
@@ -840,6 +852,7 @@ static void OutputClose(vlc_object_t *obj)
     Flush(filter);
     vdp_video_mixer_destroy(sys->vdp, sys->mixer);
     picture_pool_Release(sys->pool);
+    vlc_video_context_Release(filter->vctx_out);
 }
 
 typedef struct
