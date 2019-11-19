@@ -1024,33 +1024,6 @@ void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
     vgl->vt.Viewport(x, y, width, height);
 }
 
-bool vout_display_opengl_HasPool(const vout_display_opengl_t *vgl)
-{
-    opengl_tex_converter_t *tc = vgl->prgm->tc;
-    return tc->pf_get_pool != NULL;
-}
-
-picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl, unsigned requested_count)
-{
-    GL_ASSERT_NOERROR();
-
-    if (vgl->pool)
-        return vgl->pool;
-
-    opengl_tex_converter_t *tc = vgl->prgm->tc;
-    requested_count = __MIN(VLCGL_PICTURE_MAX, requested_count);
-    /* Allocate with tex converter pool callback if it exists */
-    assert(tc->pf_get_pool != NULL);
-    vgl->pool = tc->pf_get_pool(tc, requested_count);
-    if (!vgl->pool)
-        goto error;
-    return vgl->pool;
-
-error:
-    DelTextures(tc, vgl->texture);
-    return NULL;
-}
-
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                                 picture_t *picture, subpicture_t *subpicture)
 {

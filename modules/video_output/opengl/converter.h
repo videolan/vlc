@@ -139,19 +139,6 @@ struct opengl_tex_converter_t
                                 const GLsizei *tex_width, const GLsizei *tex_height);
 
     /**
-     * Callback to allocate a picture pool
-     *
-     * This function pointer *can* be NULL. If NULL, A generic pool with
-     * pictures allocated from the video_format_t will be used.
-     *
-     * \param tc OpenGL tex converter
-     * \param requested_count number of pictures to allocate
-     * \return the picture pool or NULL in case of error
-     */
-    picture_pool_t *(*pf_get_pool)(const opengl_tex_converter_t *tc,
-                                   unsigned requested_count);
-
-    /**
      * Callback to update a picture
      *
      * This function pointer cannot be NULL. The implementation should upload
@@ -205,7 +192,7 @@ struct opengl_tex_converter_t
  * generic fragment shader. It will compile a fragment shader generated from
  * the chroma and the tex target. This will initialize all elements of the
  * opengl_tex_converter_t struct except for priv, pf_allocate_texture,
- * pf_get_pool, pf_update
+ * pf_update
  *
  * \param tc OpenGL tex converter
  * \param tex_target GL_TEXTURE_2D or GL_TEXTURE_RECTANGLE
