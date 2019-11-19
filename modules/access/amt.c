@@ -1258,6 +1258,7 @@ static bool amt_rcv_relay_mem_query( stream_t *p_access )
  * */
 static int amt_joinSSM_group( stream_t *p_access )
 {
+#ifdef IP_ADD_SOURCE_MEMBERSHIP
     struct ip_mreq_source imr;
     access_sys_t *sys = p_access->p_sys;
 
@@ -1266,6 +1267,10 @@ static int amt_joinSSM_group( stream_t *p_access )
     imr.imr_interface.s_addr = INADDR_ANY;
 
     return setsockopt( sys->sAMT, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP, (char *)&imr, sizeof(imr) );
+#else
+    errno = EINVAL;
+    return -1;
+#endif
 }
 
 static int amt_joinASM_group( stream_t *p_access )
@@ -1284,6 +1289,7 @@ static int amt_joinASM_group( stream_t *p_access )
  * */
 static int amt_leaveSSM_group( stream_t *p_access )
 {
+#ifdef IP_DROP_SOURCE_MEMBERSHIP
     struct ip_mreq_source imr;
     access_sys_t *sys = p_access->p_sys;
 
@@ -1292,6 +1298,10 @@ static int amt_leaveSSM_group( stream_t *p_access )
     imr.imr_interface.s_addr = INADDR_ANY;
 
     return setsockopt( sys->sAMT, IPPROTO_IP, IP_DROP_SOURCE_MEMBERSHIP, (char *)&imr, sizeof(imr) );
+#else
+    errno = EINVAL;
+    return -1;
+#endif
 }
 
 /**
