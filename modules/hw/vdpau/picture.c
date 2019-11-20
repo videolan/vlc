@@ -62,19 +62,13 @@ static picture_context_t *VideoSurfaceCopy(picture_context_t *ctx)
 {
     vlc_vdp_video_field_t *fold = container_of(ctx, vlc_vdp_video_field_t,
                                                context);
-    vlc_vdp_video_frame_t *frame = fold->frame;
     vlc_vdp_video_field_t *fnew = malloc(sizeof (*fnew));
     if (unlikely(fnew == NULL))
         return NULL;
 
-    fnew->context.destroy = VideoSurfaceDestroy;
-    fnew->context.copy = VideoSurfaceCopy;
-    fnew->frame = frame;
-    fnew->structure = fold->structure;
-    fnew->procamp = fold->procamp;
-    fnew->sharpen = fold->sharpen;
+    *fnew = *fold;
 
-    atomic_fetch_add(&frame->refs, 1);
+    atomic_fetch_add(&fold->frame->refs, 1);
     return &fnew->context;
 }
 
@@ -100,8 +94,9 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
         return NULL;
     }
 
-    field->context.destroy = VideoSurfaceDestroy;
-    field->context.copy = VideoSurfaceCopy;
+    field->context = (picture_context_t) {
+        VideoSurfaceDestroy, VideoSurfaceCopy,
+    };
     field->frame = frame;
     field->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
     field->procamp = procamp_default;
