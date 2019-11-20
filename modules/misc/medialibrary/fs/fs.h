@@ -90,13 +90,13 @@ public:
 private:
     vlc_object_t *const m_parent;
     const std::string m_scheme;
-    using SdPtr = std::unique_ptr<services_discovery_t, decltype(&vlc_sd_Destroy)>;
-    std::vector<SdPtr> m_sds;
     IFileSystemFactoryCb *m_callbacks;
 
     vlc::threads::mutex m_mutex;
     vlc::threads::condition_variable m_itemAddedCond;
     std::vector<std::shared_ptr<IDevice>> m_devices;
+    using SdPtr = std::unique_ptr<services_discovery_t, decltype(&vlc_sd_Destroy)>;
+    std::vector<SdPtr> m_sds;
 };
 
   } /* namespace medialibrary */
