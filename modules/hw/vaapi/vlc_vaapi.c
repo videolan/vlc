@@ -482,8 +482,6 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
     instance->num_render_targets = count;
     atomic_init(&instance->pic_refcount, 0);
 
-    VASurfaceAttrib *attribs = NULL;
-    unsigned num_attribs = 0;
     VASurfaceAttrib fourcc_attribs[1] = {
         {
             .type = VASurfaceAttribPixelFormat,
@@ -492,15 +490,13 @@ vlc_vaapi_PoolNew(vlc_object_t *o, vlc_decoder_device *dec_device,
             .value.value.i = va_fourcc,
         }
     };
-        attribs = fourcc_attribs;
-        num_attribs = 1;
 
     picture_t *pics[count];
 
     VA_CALL(o, vaCreateSurfaces, dpy, va_rt_format,
             fmt->i_visible_width, fmt->i_visible_height,
             instance->render_targets, instance->num_render_targets,
-            attribs, num_attribs);
+            fourcc_attribs, 1);
 
     for (unsigned i = 0; i < count; i++)
     {
