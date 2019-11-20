@@ -26,7 +26,7 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-%define api.pure
+%define api.pure full
 
 %parse-param { yyscan_t scanner }
 %parse-param { vlc_css_parser_t *css_parser }
