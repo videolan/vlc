@@ -33,6 +33,7 @@
 #import <AudioUnit/AudioUnit.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <os/lock.h>
+#import <mach/mach_time.h>
 
 #define STREAM_FORMAT_MSG(pre, sfm) \
     pre "[%f][%4.4s][%u][%u][%u][%u][%u][%u]", \
@@ -46,8 +47,10 @@
 
 struct aout_sys_common
 {
-    /* The following is owned by common.c (initialized from ca_Init, cleaned
-     * from ca_Clean) */
+    /* The following is owned by common.c (initialized from ca_Open, cleaned
+     * from ca_Close) */
+
+    mach_timebase_info_data_t tinfo;
 
     size_t              i_underrun_size;
     bool                b_paused;

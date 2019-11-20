@@ -25,11 +25,6 @@
 #import "coreaudio_common.h"
 #import <CoreAudio/CoreAudioTypes.h>
 
-#import <dlfcn.h>
-#import <mach/mach_time.h>
-
-static mach_timebase_info_data_t tinfo;
-
 static inline uint64_t
 BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
 {
@@ -55,17 +50,15 @@ UsToFrames(struct aout_sys_common *p_sys, vlc_tick_t i_us)
 }
 
 static inline vlc_tick_t
-HostTimeToTick(uint64_t i_host_time)
+HostTimeToTick(struct aout_sys_common *p_sys, uint64_t i_host_time)
 {
-    assert(tinfo.denom != 0);
-    return VLC_TICK_FROM_NS(i_host_time * tinfo.numer / tinfo.denom);
+    return VLC_TICK_FROM_NS(i_host_time * p_sys->tinfo.numer / p_sys->tinfo.denom);
 }
 
 static inline uint64_t
-TickToHostTime(vlc_tick_t i_us)
+TickToHostTime(struct aout_sys_common *p_sys, vlc_tick_t i_us)
 {
-    assert(tinfo.denom != 0);
-    return NS_FROM_VLC_TICK(i_us * tinfo.denom / tinfo.numer);
+    return NS_FROM_VLC_TICK(i_us * p_sys->tinfo.denom / p_sys->tinfo.numer);
 }
 
 static void
@@ -119,11 +112,10 @@ ca_Open(audio_output_t *p_aout)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    if (mach_timebase_info(&tinfo) != KERN_SUCCESS)
-    {
-        tinfo.numer = tinfo.denom = 0;
+    if (mach_timebase_info(&p_sys->tinfo) != KERN_SUCCESS)
         return VLC_EGENERIC;
-    }
+
+    assert(p_sys->tinfo.denom != 0 && p_sys->tinfo.numer != 0);
 
     vlc_sem_init(&p_sys->flush_sem, 0);
     lock_init(p_sys);
@@ -175,7 +167,8 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
          * */
         const size_t i_requested_us =
             FramesToUs(p_sys, BytesToFrames(p_sys, i_requested));
-        const uint64_t i_requested_host_time = TickToHostTime(i_requested_us);
+        const uint64_t i_requested_host_time =
+            TickToHostTime(p_sys, i_requested_us);
         if (p_sys->i_first_render_host_time >= i_host_time + i_requested_host_time)
         {
             /* Fill the buffer with silence */
@@ -184,7 +177,7 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
 
         /* Write silence to reach the first_render host time */
         const vlc_tick_t i_silence_us =
-            HostTimeToTick(p_sys->i_first_render_host_time - i_host_time);
+            HostTimeToTick(p_sys, p_sys->i_first_render_host_time - i_host_time);
 
         const uint64_t i_silence_bytes =
             FramesToBytes(p_sys, UsToFrames(p_sys, i_silence_us));
@@ -266,7 +259,8 @@ ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
         return -1;
     }
 
-    const vlc_tick_t i_render_time_us = HostTimeToTick(p_sys->i_render_host_time);
+    const vlc_tick_t i_render_time_us =
+        HostTimeToTick(p_sys, p_sys->i_render_host_time);
     const vlc_tick_t i_render_delay = i_render_time_us - vlc_tick_now();
 
     *delay = ca_GetLatencyLocked(p_aout) + i_render_delay;
@@ -330,7 +324,8 @@ ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
          * Once the rendering is truly started, the date can be ignored. */
 
         const vlc_tick_t first_render_time = date - ca_GetLatencyLocked(p_aout);
-        p_sys->i_first_render_host_time = TickToHostTime(first_render_time);
+        p_sys->i_first_render_host_time =
+            TickToHostTime(p_sys, first_render_time);
     }
 
     do
