@@ -617,6 +617,8 @@ WindowHandler_NewSurfaceEnv(AWindowHandler *p_awh, JNIEnv *p_env,
         case AWindow_SurfaceTexture:
             jsurface = JNI_STEXCALL(CallObjectMethod, getSurface);
             break;
+        default:
+            vlc_assert_unreachable();
     }
     if (!jsurface)
         return VLC_EGENERIC;
