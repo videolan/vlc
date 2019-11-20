@@ -59,6 +59,13 @@ static void SetupGlobalExtensions( mp4_track_t *p_track, MP4_Box_t *p_sample )
             p_track->fmt.i_bitrate = BOXDATA(p_btrt)->i_avg_bitrate;
         }
     }
+
+    const MP4_Box_t *p_glbl = MP4_BoxGet( p_sample, "glbl" );
+    if( p_glbl && p_glbl->data.p_binary && p_glbl->data.p_binary->p_blob )
+    {
+        CopyExtradata( p_glbl->data.p_binary->p_blob,
+                       p_glbl->data.p_binary->i_blob, &p_track->fmt );
+    }
 }
 
 static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descriptor_decoder_config_t *p_decconfig )
