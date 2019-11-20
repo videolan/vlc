@@ -87,8 +87,9 @@ cvpxpic_attach_common(picture_t *p_pic, CVPixelBufferRef cvpx,
         picture_Release(p_pic);
         return VLC_ENOMEM;
     }
-    ctx->s.destroy = pf_destroy;
-    ctx->s.copy = cvpxpic_copy_cb;
+    ctx->s = (picture_context_t) {
+        pf_destroy, cvpxpic_copy_cb,
+    };
     ctx->cvpx = CVPixelBufferRetain(cvpx);
     ctx->nb_fields = p_pic->i_nb_fields;
     vlc_atomic_rc_init(&ctx->rc);
