@@ -403,6 +403,18 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         case VLC_FOURCC('y','u','v','2'):
             p_track->fmt.i_codec = VLC_CODEC_YUYV;
             break;
+        case VLC_FOURCC('A','B','G','R'):
+            p_track->fmt.i_codec = VLC_CODEC_ARGB;
+            p_track->fmt.video.i_rmask = 0x0000FF;
+            p_track->fmt.video.i_gmask = 0x00FF00;
+            p_track->fmt.video.i_bmask = 0xFF0000;
+            break;
+        case VLC_FOURCC('2','4','B','G'):
+            p_track->fmt.i_codec = VLC_CODEC_RGB24;
+            p_track->fmt.video.i_rmask = 0x0000FF;
+            p_track->fmt.video.i_gmask = 0x00FF00;
+            p_track->fmt.video.i_bmask = 0xFF0000;
+            break;
         case VLC_FOURCC('r','a','w',' '):
             switch( p_vide->i_depth ) {
                 case 16:
