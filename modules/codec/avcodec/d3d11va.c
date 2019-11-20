@@ -360,7 +360,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
     priv->format = sys->render;
     priv->device = sys->d3d_dev.d3dcontext;
-    ID3D11DeviceContext_Release(priv->device);
+    ID3D11DeviceContext_AddRef(priv->device);
 
     va->ops = &ops;
     *fmt_out = final_fmt;
