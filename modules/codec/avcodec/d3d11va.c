@@ -388,8 +388,6 @@ static int D3dCreateDevice(vlc_va_t *va)
     hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
     if (FAILED(hr)) {
        msg_Err(va, "Could not Query ID3D11VideoContext Interface. (hr=0x%lX)", hr);
-       ID3D11DeviceContext_Release(sys->d3d_dev.d3dcontext);
-       ID3D11Device_Release(sys->d3d_dev.d3ddevice);
        return VLC_EGENERIC;
     }
     sys->hw.video_context = d3dvidctx;
@@ -398,8 +396,6 @@ static int D3dCreateDevice(vlc_va_t *va)
     hr = ID3D11Device_QueryInterface(sys->d3d_dev.d3ddevice, &IID_ID3D11VideoDevice, &d3dviddev);
     if (FAILED(hr)) {
        msg_Err(va, "Could not Query ID3D11VideoDevice Interface. (hr=0x%lX)", hr);
-       ID3D11DeviceContext_Release(sys->d3d_dev.d3dcontext);
-       ID3D11Device_Release(sys->d3d_dev.d3ddevice);
        ID3D11VideoContext_Release(sys->hw.video_context);
        return VLC_EGENERIC;
     }
