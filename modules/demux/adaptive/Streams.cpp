@@ -671,11 +671,36 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
     }
 }
 
+static void add_codec_string_from_fourcc(vlc_fourcc_t fourcc,
+                                         std::list<std::string> &codecs)
+{
+    std::string codec;
+    codec.insert(0, reinterpret_cast<const char *>(&fourcc), 4);
+    codecs.push_back(codec);
+}
+
 void AbstractStream::declaredCodecs()
 {
     const std::string & streamDesc = segmentTracker->getStreamDescription();
     const std::string & streamLang = segmentTracker->getStreamLanguage();
     std::list<std::string> codecs =  segmentTracker->getCurrentCodecs();
+
+    if(codecs.empty())
+    {
+        const StreamFormat format = segmentTracker->getCurrentFormat();
+        switch(format)
+        {
+            case StreamFormat::TTML:
+                add_codec_string_from_fourcc(VLC_CODEC_TTML, codecs);
+                break;
+            case StreamFormat::WEBVTT:
+                add_codec_string_from_fourcc(VLC_CODEC_WEBVTT, codecs);
+                break;
+            default:
+                break;
+        }
+    }
+
     for(std::list<std::string>::const_iterator it = codecs.begin();
                                                it != codecs.end(); ++it)
     {
