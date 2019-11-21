@@ -44,10 +44,10 @@ public:
 
     QVariant data( QModelIndex const &index , const int role = Qt::DisplayRole ) const  override;
 
-    Qt::ItemFlags flags ( const QModelIndex & index ) const ;
+    Qt::ItemFlags flags ( const QModelIndex & index ) const override;
 
     bool setData( const QModelIndex &index , const QVariant &value ,
-                 int role );
+                 int role ) override;
 
     static void onMlEvent( void* data , const vlc_ml_event_t* event );
     QVariant headerData( int section , Qt::Orientation orientation , int role ) const override;
