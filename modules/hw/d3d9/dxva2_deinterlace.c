@@ -43,9 +43,6 @@
 typedef struct
 {
     HINSTANCE                      hdecoder_dll;
-    /* keep a reference in case the vout is released first */
-    d3d9_handle_t                  hd3d;
-    d3d9_device_t                  d3d_dev;
     IDirectXVideoProcessor         *processor;
     IDirect3DSurface9              *hw_surface;
 
@@ -248,7 +245,9 @@ static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
     if (FAILED(hr))
         return VLC_EGENERIC;
 
-    hr = IDirect3DDevice9_StretchRect( sys->d3d_dev.dev,
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(filter->vctx_out);
+
+    hr = IDirect3DDevice9_StretchRect( d3d9_decoder->d3ddev.dev,
                                        sys->hw_surface, NULL,
                                        p_out_sys->surface, NULL,
                                        D3DTEXF_NONE);
@@ -304,7 +303,9 @@ picture_t *AllocPicture( filter_t *p_filter )
                 return NULL;
             pic->p_sys = pic_sys;
 
-            HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_sys->d3d_dev.dev,
+            d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(p_filter->vctx_out);
+
+            HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(d3d9_decoder->d3ddev.dev,
                                                               p_filter->fmt_out.video.i_width,
                                                               p_filter->fmt_out.video.i_height,
                                                               dstDesc.Format,
@@ -358,12 +359,6 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    if (unlikely(D3D9_Create( filter, &sys->hd3d ) != VLC_SUCCESS)) {
-        msg_Warn(filter, "cannot load d3d9.dll, aborting");
-        free(sys);
-        return VLC_EGENERIC;
-    }
-
     hdecoder_dll = LoadLibrary(TEXT("DXVA2.DLL"));
     if (!hdecoder_dll)
         goto error;
@@ -375,11 +370,7 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
         goto error;
     }
 
-    if (FAILED(D3D9_CreateDeviceExternal( vtcx_sys->dev, &sys->hd3d, &sys->d3d_dev )))
-    {
-        msg_Dbg(filter, "Failed to use the given video context");
-        goto error;
-    }
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext( filter->vctx_in );
 
     HRESULT (WINAPI *CreateVideoService)(IDirect3DDevice9 *,
                                          REFIID riid,
@@ -388,7 +379,7 @@ int D3D9OpenDeinterlace(vlc_object_t *obj)
       (void *)GetProcAddress(hdecoder_dll, "DXVA2CreateVideoService");
     if (CreateVideoService == NULL)
         goto error;
-    hr = CreateVideoService( sys->d3d_dev.dev, &IID_IDirectXVideoProcessorService,
+    hr = CreateVideoService( d3d9_decoder->d3ddev.dev, &IID_IDirectXVideoProcessorService,
                             (void**)&processor);
     if (FAILED(hr))
         goto error;
@@ -543,10 +534,8 @@ error:
         IDirectXVideoProcessor_Release( sys->processor );
     if (processor)
         IDirectXVideoProcessorService_Release(processor);
-    D3D9_ReleaseDevice( &sys->d3d_dev );
     if (hdecoder_dll)
         FreeLibrary(hdecoder_dll);
-    D3D9_Destroy( &sys->hd3d );
     free(sys);
 
     return VLC_EGENERIC;
@@ -559,10 +548,8 @@ void D3D9CloseDeinterlace(vlc_object_t *obj)
 
     IDirect3DSurface9_Release( sys->hw_surface );
     IDirectXVideoProcessor_Release( sys->processor );
-    D3D9_ReleaseDevice( &sys->d3d_dev );
     FreeLibrary( sys->hdecoder_dll );
     vlc_video_context_Release(filter->vctx_out);
-    D3D9_Destroy( &sys->hd3d );
 
     free(sys);
 }
