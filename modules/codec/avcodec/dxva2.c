@@ -113,7 +113,6 @@ static const d3d9_format_t *D3dFindFormat(D3DFORMAT format)
 struct vlc_va_sys_t
 {
     /* Direct3D */
-    d3d9_handle_t          hd3d;
     d3d9_device_t          d3d_dev;
 
     vlc_video_context      *vctx;
@@ -267,11 +266,9 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    D3D9_CloneExternal(&sys->hd3d, d3d9_decoder->device);
-    HRESULT hr = D3D9_CreateDevice(va, &sys->hd3d, d3d9_decoder->adapter, &sys->d3d_dev);
+    HRESULT hr = D3D9_CreateDevice(va, &d3d9_decoder->hd3d, d3d9_decoder->adapter, &sys->d3d_dev);
     if ( FAILED(hr) )
     {
-        D3D9_Destroy(&sys->hd3d);
         free( sys );
         return VLC_EGENERIC;
     }
@@ -281,7 +278,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     if (likely(sys->vctx == NULL))
     {
         D3D9_ReleaseDevice(&sys->d3d_dev);
-        D3D9_Destroy(&sys->hd3d);
         free( sys );
         return VLC_EGENERIC;
     }
@@ -309,7 +305,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         msg_Warn(va, "cannot load DXVA2 decoder DLL");
         if (sys->vctx)
             vlc_video_context_Release(sys->vctx);
-        D3D9_Destroy( &sys->hd3d );
         free( sys );
         return VLC_EGENERIC;
     }
@@ -344,7 +339,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         goto error;
 
     D3DADAPTER_IDENTIFIER9 d3dai;
-    if (SUCCEEDED(IDirect3D9_GetAdapterIdentifier(sys->hd3d.obj,
+    if (SUCCEEDED(IDirect3D9_GetAdapterIdentifier(d3d9_decoder->hd3d.obj,
                                                sys->d3d_dev.adapterId, 0, &d3dai))) {
         msg_Info(va, "Using DXVA2 (%.*s, vendor %s(%lx), device %lx, revision %lx)",
                     (int)sizeof(d3dai.Description), d3dai.Description,
@@ -448,8 +443,10 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     VLC_UNUSED(fmt);
     vlc_va_sys_t *sys = va->sys;
 
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(sys->vctx);
+
     D3DADAPTER_IDENTIFIER9 identifier;
-    HRESULT hr = IDirect3D9_GetAdapterIdentifier(sys->hd3d.obj, sys->d3d_dev.adapterId, 0, &identifier);
+    HRESULT hr = IDirect3D9_GetAdapterIdentifier(d3d9_decoder->hd3d.obj, sys->d3d_dev.adapterId, 0, &identifier);
     if (FAILED(hr))
         return VLC_EGENERIC;
 
@@ -666,7 +663,6 @@ static void DxDestroyVideoDecoder(void *opaque)
     IDirectXVideoDecoderService_Release(sys->d3ddec);
     IDirect3DDeviceManager9_Release(sys->devmng);
     D3D9_ReleaseDevice(&sys->d3d_dev);
-    D3D9_Destroy( &sys->hd3d );
     if (sys->dxva2_dll)
         FreeLibrary(sys->dxva2_dll);
 

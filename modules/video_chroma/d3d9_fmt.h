@@ -72,7 +72,7 @@ typedef struct
 
 typedef struct
 {
-    IDirect3D9    *device;
+    d3d9_handle_t  hd3d;
     int            adapter;
 } d3d9_decoder_device_t;
 

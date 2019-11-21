@@ -145,7 +145,9 @@ struct vout_display_sys_t
     bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
 
     // core objects
-    d3d9_handle_t           hd3d;
+    d3d9_decoder_device_t  *d3d9_device;
+    vlc_decoder_device     *dec_device; // if d3d9_decoder comes from a decoder device
+
     HINSTANCE               hxdll;      /* handle of the opened d3d9x dll */
     IDirect3DPixelShader9*  d3dx_shader;
     d3d9_device_t           d3d_dev;
@@ -896,7 +898,7 @@ static int Direct3D9CreateResources(vout_display_t *vd, const video_format_t *fm
     sys->d3dregion_format = D3DFMT_UNKNOWN;
     for (int i = 0; i < 2; i++) {
         D3DFORMAT dfmt = i == 0 ? D3DFMT_A8B8G8R8 : D3DFMT_A8R8G8B8;
-        if (SUCCEEDED(IDirect3D9_CheckDeviceFormat(sys->hd3d.obj,
+        if (SUCCEEDED(IDirect3D9_CheckDeviceFormat(sys->d3d9_device->hd3d.obj,
                                                    D3DADAPTER_DEFAULT,
                                                    D3DDEVTYPE_HAL,
                                                    sys->d3d_dev.BufferFormat,
@@ -935,7 +937,7 @@ static int Direct3D9Reset(vout_display_t *vd, const video_format_t *fmtp)
     d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
 
     D3DPRESENT_PARAMETERS d3dpp;
-    if (D3D9_FillPresentationParameters(&sys->hd3d, p_d3d9_dev, &d3dpp))
+    if (D3D9_FillPresentationParameters(&sys->d3d9_device->hd3d, p_d3d9_dev, &d3dpp))
     {
         msg_Err(vd, "Could not presentation parameters to reset device");
         return VLC_EGENERIC;
@@ -946,7 +948,7 @@ static int Direct3D9Reset(vout_display_t *vd, const video_format_t *fmtp)
 
     /* */
     HRESULT hr;
-    if (sys->hd3d.use_ex){
+    if (sys->d3d9_device->hd3d.use_ex){
         hr = IDirect3DDevice9Ex_ResetEx(p_d3d9_dev->devex, &d3dpp, NULL);
     } else {
         hr = IDirect3DDevice9_Reset(p_d3d9_dev->dev, &d3dpp);
@@ -1348,7 +1350,7 @@ static void Swap(vout_display_t *vd)
     };
 
     HRESULT hr;
-    if (sys->hd3d.use_ex) {
+    if (sys->d3d9_device->hd3d.use_ex) {
         hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &src, sys->sys.hvideownd, NULL, 0);
     } else {
         hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &src, sys->sys.hvideownd, NULL);
@@ -1373,8 +1375,10 @@ static void Display(vout_display_t *vd, picture_t *picture)
  */
 static void Direct3D9Destroy(vout_display_sys_t *sys)
 {
-    D3D9_Destroy( &sys->hd3d );
-
+    if (sys->dec_device)
+        vlc_decoder_device_Release(sys->dec_device);
+    else if (sys->d3d9_device)
+        free(sys->d3d9_device);
     if (sys->hxdll)
     {
         FreeLibrary(sys->hxdll);
@@ -1389,7 +1393,7 @@ static int Direct3D9CheckConversion(vout_display_t *vd,
                                    D3DFORMAT src, D3DFORMAT dst)
 {
     vout_display_sys_t *sys = vd->sys;
-    IDirect3D9 *d3dobj = sys->hd3d.obj;
+    IDirect3D9 *d3dobj = sys->d3d9_device->hd3d.obj;
     HRESULT hr;
 
     /* test whether device can create a surface of that format */
@@ -1651,28 +1655,38 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->startEndRenderingCb = NULL;
     }
 
-    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(context);
-    if ( d3d9_decoder == NULL )
+    sys->dec_device = context ? vlc_video_context_HoldDevice(context) : NULL;
+    sys->d3d9_device = GetD3D9OpaqueDevice(sys->dec_device);
+    if ( sys->d3d9_device == NULL )
     {
-        // No d3d9 device, we create one
-        if (D3D9_Create(vd, &sys->hd3d) != VLC_SUCCESS)
+        if (sys->dec_device)
+        {
+            vlc_decoder_device_Release(sys->dec_device);
+            sys->dec_device = NULL;
+        }
+        // No d3d9_decoder_device_t, create one
+        sys->d3d9_device = calloc(1, sizeof(*sys->d3d9_device));
+        if (unlikely(sys->d3d9_device == NULL))
             goto error;
+        if (D3D9_Create(vd, &sys->d3d9_device->hd3d) != VLC_SUCCESS)
+        {
+            free(sys->d3d9_device);
+            sys->d3d9_device = NULL;
+            goto error;
+        }
+        sys->d3d9_device->adapter = -1;
     }
-    if (d3d9_decoder != NULL && d3d9_decoder->device != NULL)
-        D3D9_CloneExternal( &sys->hd3d, d3d9_decoder->device );
 
     d3d9_video_context_t *octx = GetD3D9ContextPrivate(context);
     HRESULT hr;
     if (octx != NULL)
-        hr = D3D9_CreateDeviceExternal(octx->dev, &sys->hd3d, &sys->d3d_dev);
+        hr = D3D9_CreateDeviceExternal(octx->dev, &sys->d3d9_device->hd3d, &sys->d3d_dev);
     else
-        hr = D3D9_CreateDevice(vd, &sys->hd3d, d3d9_decoder ? d3d9_decoder->adapter : -1, &sys->d3d_dev);
+        hr = D3D9_CreateDevice(vd, &sys->d3d9_device->hd3d, sys->d3d9_device->adapter, &sys->d3d_dev);
 
     if (FAILED(hr)) {
         msg_Err( vd, "D3D9 Creation failed! (hr=0x%lX)", hr);
-        D3D9_Destroy(&sys->hd3d);
-        free(sys);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     if ( vd->source.i_visible_width  > sys->d3d_dev.caps.MaxTextureWidth ||
@@ -1765,7 +1779,6 @@ struct wgl_vt {
 struct glpriv
 {
     struct wgl_vt vt;
-    d3d9_handle_t hd3d;
     d3d9_device_t d3d_dev;
     HANDLE gl_handle_d3d;
     HANDLE gl_render;
@@ -1872,7 +1885,6 @@ GLConvClose(vlc_object_t *obj)
         IDirect3DSurface9_Release(priv->dx_render);
 
     D3D9_ReleaseDevice(&priv->d3d_dev);
-    D3D9_Destroy(&priv->hd3d);
     free(tc->priv);
 }
 
@@ -1886,7 +1898,8 @@ GLConvOpen(vlc_object_t *obj)
         return VLC_EGENERIC;
 
     d3d9_video_context_t *vctx_sys = GetD3D9ContextPrivate( tc->vctx );
-    if ( vctx_sys == NULL )
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(tc->vctx);
+    if ( vctx_sys == NULL || d3d9_decoder == NULL )
         return VLC_EGENERIC;
 
     if (tc->gl->ext != VLC_GL_EXT_WGL || !tc->gl->wgl.getExtensionsString)
@@ -1920,16 +1933,14 @@ GLConvOpen(vlc_object_t *obj)
     tc->priv = priv;
     priv->vt = vt;
 
-    if (D3D9_Create(obj, &priv->hd3d) != VLC_SUCCESS)
-        goto error;
-    if (!priv->hd3d.use_ex)
+    if (!d3d9_decoder->hd3d.use_ex)
     {
         msg_Warn(obj, "DX/GL interrop only working on d3d9x");
         goto error;
     }
 
     HRESULT hr;
-    hr = D3D9_CreateDeviceExternal(vctx_sys->dev, &priv->hd3d, &priv->d3d_dev );
+    hr = D3D9_CreateDeviceExternal(vctx_sys->dev, &d3d9_decoder->hd3d, &priv->d3d_dev );
     if (FAILED(hr))
         goto error;
 
