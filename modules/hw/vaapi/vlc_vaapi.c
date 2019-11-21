@@ -449,7 +449,7 @@ pic_ctx_destroy_cb(struct picture_context_t *opaque)
 static struct picture_context_t *
 pic_ctx_copy_cb(struct picture_context_t *opaque)
 {
-    struct vaapi_pic_ctx *src_ctx = (struct vaapi_pic_ctx *) opaque;
+    struct vaapi_pic_ctx *src_ctx = container_of(opaque, struct vaapi_pic_ctx, ctx.s);
     struct vaapi_pic_ctx *dst_ctx = malloc(sizeof *dst_ctx);
     if (dst_ctx == NULL)
         return NULL;
