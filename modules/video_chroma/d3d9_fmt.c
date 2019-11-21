@@ -286,14 +286,8 @@ void D3D9_CloneExternal(d3d9_handle_t *hd3d, IDirect3D9 *dev)
         IDirect3D9Ex_Release((IDirect3D9Ex*) pv);
 }
 
-static void ReleaseD3D9ContextPrivate(void *private)
-{
-    d3d9_video_context_t *octx = private;
-    IDirect3DDevice9_Release(octx->dev);
-}
-
 const struct vlc_video_context_operations d3d9_vctx_ops = {
-    ReleaseD3D9ContextPrivate,
+    NULL,
 };
 
 void d3d9_pic_context_destroy(picture_context_t *ctx)

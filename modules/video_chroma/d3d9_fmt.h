@@ -78,7 +78,6 @@ typedef struct
 
 typedef struct
 {
-    IDirect3DDevice9 *dev;
     D3DFORMAT        format;
 } d3d9_video_context_t;
 

@@ -272,9 +272,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
         free( sys );
         return VLC_EGENERIC;
     }
-    d3d9_video_context_t *octx = GetD3D9ContextPrivate(sys->vctx);
-    octx->dev = d3d9_decoder->d3ddev.dev;
-    IDirect3DDevice9_AddRef(octx->dev);
 
     va->sys = sys;
 
@@ -337,6 +334,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
                     DxgiVendorStr(d3dai.VendorId), d3dai.VendorId, d3dai.DeviceId, d3dai.Revision);
     }
 
+    d3d9_video_context_t *octx = GetD3D9ContextPrivate(sys->vctx);
     octx->format = sys->render;
 
     va->ops = &ops;
