@@ -113,8 +113,6 @@ static const d3d9_format_t *D3dFindFormat(D3DFORMAT format)
 struct vlc_va_sys_t
 {
     /* Direct3D */
-    d3d9_device_t          d3d_dev;
-
     vlc_video_context      *vctx;
 
     /* DLL */
@@ -259,6 +257,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueDevice( dec_device );
     if ( d3d9_decoder == NULL )
         return VLC_EGENERIC;
+    assert(d3d9_decoder->d3ddev.dev != NULL); // coming from the decoder device
 
     ctx->hwaccel_context = NULL;
 
@@ -266,23 +265,15 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    HRESULT hr = D3D9_CreateDevice(va, &d3d9_decoder->hd3d, d3d9_decoder->d3ddev.adapterId, &sys->d3d_dev);
-    if ( FAILED(hr) )
-    {
-        free( sys );
-        return VLC_EGENERIC;
-    }
-
     sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_DXVA2,
                                           sizeof(d3d9_video_context_t), &d3d9_vctx_ops );
     if (likely(sys->vctx == NULL))
     {
-        D3D9_ReleaseDevice(&sys->d3d_dev);
         free( sys );
         return VLC_EGENERIC;
     }
     d3d9_video_context_t *octx = GetD3D9ContextPrivate(sys->vctx);
-    octx->dev = sys->d3d_dev.dev;
+    octx->dev = d3d9_decoder->d3ddev.dev;
     IDirect3DDevice9_AddRef(octx->dev);
 
     va->sys = sys;
@@ -340,7 +331,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
 
     D3DADAPTER_IDENTIFIER9 d3dai;
     if (SUCCEEDED(IDirect3D9_GetAdapterIdentifier(d3d9_decoder->hd3d.obj,
-                                               sys->d3d_dev.adapterId, 0, &d3dai))) {
+                                               d3d9_decoder->d3ddev.adapterId, 0, &d3dai))) {
         msg_Info(va, "Using DXVA2 (%.*s, vendor %s(%lx), device %lx, revision %lx)",
                     (int)sizeof(d3dai.Description), d3dai.Description,
                     DxgiVendorStr(d3dai.VendorId), d3dai.VendorId, d3dai.DeviceId, d3dai.Revision);
@@ -366,7 +357,7 @@ static int D3dCreateDevice(vlc_va_t *va)
 {
     vlc_va_sys_t *sys = va->sys;
 
-    assert(sys->d3d_dev.dev); // coming from the decoder device
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(sys->vctx);
 
     HRESULT (WINAPI *CreateDeviceManager9)(UINT *pResetToken,
                                            IDirect3DDeviceManager9 **);
@@ -387,7 +378,7 @@ static int D3dCreateDevice(vlc_va_t *va)
     }
     msg_Dbg(va, "obtained IDirect3DDeviceManager9");
 
-    HRESULT hr = IDirect3DDeviceManager9_ResetDevice(sys->devmng, sys->d3d_dev.dev, token);
+    HRESULT hr = IDirect3DDeviceManager9_ResetDevice(sys->devmng, d3d9_decoder->d3ddev.dev, token);
     if (FAILED(hr)) {
         msg_Err(va, "IDirect3DDeviceManager9_ResetDevice failed: 0x%lX)", hr);
         IDirect3DDeviceManager9_Release(sys->devmng);
@@ -446,7 +437,7 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(sys->vctx);
 
     D3DADAPTER_IDENTIFIER9 identifier;
-    HRESULT hr = IDirect3D9_GetAdapterIdentifier(d3d9_decoder->hd3d.obj, sys->d3d_dev.adapterId, 0, &identifier);
+    HRESULT hr = IDirect3D9_GetAdapterIdentifier(d3d9_decoder->hd3d.obj, d3d9_decoder->d3ddev.adapterId, 0, &identifier);
     if (FAILED(hr))
         return VLC_EGENERIC;
 
@@ -662,7 +653,6 @@ static void DxDestroyVideoDecoder(void *opaque)
     IDirect3DDeviceManager9_CloseDeviceHandle(sys->devmng, sys->device);
     IDirectXVideoDecoderService_Release(sys->d3ddec);
     IDirect3DDeviceManager9_Release(sys->devmng);
-    D3D9_ReleaseDevice(&sys->d3d_dev);
     if (sys->dxva2_dll)
         FreeLibrary(sys->dxva2_dll);
 
