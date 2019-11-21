@@ -266,7 +266,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    HRESULT hr = D3D9_CreateDevice(va, &d3d9_decoder->hd3d, d3d9_decoder->adapter, &sys->d3d_dev);
+    HRESULT hr = D3D9_CreateDevice(va, &d3d9_decoder->hd3d, d3d9_decoder->d3ddev.adapterId, &sys->d3d_dev);
     if ( FAILED(hr) )
     {
         free( sys );

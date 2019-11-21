@@ -74,7 +74,6 @@ typedef struct
 {
     d3d9_handle_t  hd3d;
     d3d9_device_t  d3ddev;
-    int            adapter;
 } d3d9_decoder_device_t;
 
 typedef struct

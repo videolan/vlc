@@ -110,7 +110,6 @@ int D3D9OpenDecoderDevice(vlc_decoder_device *device, vout_window_t *wnd)
         D3D9_Destroy( &sys->dec_device.hd3d );
         goto error;
     }
-    sys->dec_device.adapter = sys->dec_device.d3ddev.adapterId;
 
     device->ops = &d3d9_dev_ops;
     device->opaque = &sys->dec_device;
