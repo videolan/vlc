@@ -108,7 +108,7 @@ void FormatNamespace::Parse(vlc_fourcc_t fcc, const std::vector<std::string> &el
         case MP4RA("svc1"):
         case MP4RA("mvc1"):
         case MP4RA("mvc2"):
-            es_format_Change(&fmt, VIDEO_ES, VLC_CODEC_H264);
+            es_format_Change(&fmt, VIDEO_ES, VLC_FOURCC('a','v','c','1'));
             if(elements.size() > 0 && elements.at(0).size() == 6)
             {
                 const std::string &sixbytes = elements.at(0);
@@ -146,8 +146,7 @@ void FormatNamespace::Parse(vlc_fourcc_t fcc, const std::vector<std::string> &el
         case MSFCC("AVC1"):
         case MSFCC("AVCB"):
         case MSFCC("H264"):
-            es_format_Change(&fmt, VIDEO_ES, VLC_CODEC_H264);
-            fmt.i_original_fourcc = VLC_FOURCC( 'a', 'v', 'c', '1' );
+            es_format_Change(&fmt, VIDEO_ES, VLC_FOURCC('a','v','c','1'));
             break;
         case MSFCC("WVC1"):
             es_format_Change(&fmt, VIDEO_ES, VLC_CODEC_VC1);
