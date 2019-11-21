@@ -537,13 +537,13 @@ void PlaylistControllerModel::toggleRepeatMode()
     vlc_playlist_playback_repeat new_repeat;
     /* Toggle Normal -> Loop -> Repeat -> Normal ... */
     switch ( d->m_repeat ) {
-    case VLC_PLAYLIST_PLAYBACK_REPEAT_NONE:
+    case PlaybackRepeat::PLAYBACK_REPEAT_NONE:
         new_repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
         break;
-    case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+    case PlaybackRepeat::PLAYBACK_REPEAT_ALL:
         new_repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
         break;
-    case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+    case PlaybackRepeat::PLAYBACK_REPEAT_CURRENT:
     default:
         new_repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
         break;
