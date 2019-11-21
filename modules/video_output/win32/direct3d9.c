@@ -1774,7 +1774,6 @@ struct wgl_vt {
 struct glpriv
 {
     struct wgl_vt vt;
-    d3d9_device_t d3d_dev;
     HANDLE gl_handle_d3d;
     HANDLE gl_render;
     IDirect3DSurface9 *dx_render;
@@ -1799,13 +1798,15 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
         return VLC_EGENERIC;
     }
 
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(tc->vctx);
+
     const RECT rect = {
         .left = 0,
         .top = 0,
         .right = pic->format.i_visible_width,
         .bottom = pic->format.i_visible_height
     };
-    hr = IDirect3DDevice9Ex_StretchRect(priv->d3d_dev.devex, picsys->surface,
+    hr = IDirect3DDevice9Ex_StretchRect(d3d9_decoder->d3ddev.devex, picsys->surface,
                                         &rect, priv->dx_render, NULL, D3DTEXF_NONE);
     if (FAILED(hr))
     {
@@ -1827,8 +1828,8 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
 static picture_pool_t *
 GLConvGetPool(const opengl_tex_converter_t *tc, unsigned requested_count)
 {
-    struct glpriv *priv = tc->priv;
-    return Direct3D9CreatePicturePool(VLC_OBJECT(tc->gl), &priv->d3d_dev,
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(tc->vctx);
+    return Direct3D9CreatePicturePool(VLC_OBJECT(tc->gl), &d3d9_decoder->d3ddev,
                                       &tc->fmt, requested_count);
 }
 
@@ -1879,7 +1880,6 @@ GLConvClose(vlc_object_t *obj)
     if (priv->dx_render)
         IDirect3DSurface9_Release(priv->dx_render);
 
-    D3D9_ReleaseDevice(&priv->d3d_dev);
     free(tc->priv);
 }
 
@@ -1935,12 +1935,8 @@ GLConvOpen(vlc_object_t *obj)
     }
 
     HRESULT hr;
-    hr = D3D9_CreateDeviceExternal(vctx_sys->dev, &d3d9_decoder->hd3d, &priv->d3d_dev );
-    if (FAILED(hr))
-        goto error;
-
     HANDLE shared_handle = NULL;
-    hr = IDirect3DDevice9Ex_CreateRenderTarget(priv->d3d_dev.devex,
+    hr = IDirect3DDevice9Ex_CreateRenderTarget(d3d9_decoder->d3ddev.devex,
                                                tc->fmt.i_visible_width,
                                                tc->fmt.i_visible_height,
                                                D3DFMT_X8R8G8B8,
@@ -1955,7 +1951,7 @@ GLConvOpen(vlc_object_t *obj)
    if (shared_handle)
         priv->vt.DXSetResourceShareHandleNV(priv->dx_render, shared_handle);
 
-    priv->gl_handle_d3d = priv->vt.DXOpenDeviceNV(priv->d3d_dev.dev);
+    priv->gl_handle_d3d = priv->vt.DXOpenDeviceNV(d3d9_decoder->d3ddev.dev);
     if (!priv->gl_handle_d3d)
     {
         msg_Warn(obj, "DXOpenDeviceNV failed: %lu", GetLastError());
