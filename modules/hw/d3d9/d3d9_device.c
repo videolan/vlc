@@ -50,6 +50,7 @@ static void D3D9CloseDecoderDevice(vlc_decoder_device *device)
 {
     d3d9_decoder_device *sys = device->sys;
 
+    D3D9_ReleaseDevice( &sys->dec_device.d3ddev );
     D3D9_Destroy( &sys->dec_device.hd3d );
 
     if ( sys->cleanupDeviceCb )
@@ -67,6 +68,7 @@ int D3D9OpenDecoderDevice(vlc_decoder_device *device, vout_window_t *wnd)
     if (unlikely(sys==NULL))
         return VLC_ENOMEM;
 
+    int adapter;
     sys->cleanupDeviceCb = NULL;
     libvlc_video_direct3d_device_setup_cb setupDeviceCb = var_InheritAddress( device, "vout-cb-setup" );
     if ( setupDeviceCb )
@@ -86,7 +88,7 @@ int D3D9OpenDecoderDevice(vlc_decoder_device *device, vout_window_t *wnd)
         }
 
         D3D9_CloneExternal( &sys->dec_device.hd3d, (IDirect3D9*) out.device_context );
-        sys->dec_device.adapter = out.adapter;
+        adapter = out.adapter;
     }
     else
     {
@@ -96,20 +98,19 @@ int D3D9OpenDecoderDevice(vlc_decoder_device *device, vout_window_t *wnd)
             msg_Err( device, "Direct3D9 could not be initialized" );
             goto error;
         }
-
-        d3d9_device_t tmp_d3ddev;
         /* find the best adapter to use, not based on the HWND used */
-        HRESULT hr = D3D9_CreateDevice( device, &sys->dec_device.hd3d, -1, &tmp_d3ddev );
-        if ( FAILED(hr) )
-        {
-            D3D9_Destroy( &sys->dec_device.hd3d );
-            goto error;
-        }
-
-        sys->dec_device.adapter = tmp_d3ddev.adapterId;
-
-        D3D9_ReleaseDevice(&tmp_d3ddev);
+        adapter = -1;
     }
+
+    HRESULT hr = D3D9_CreateDevice( device, &sys->dec_device.hd3d, adapter, &sys->dec_device.d3ddev );
+    if ( FAILED(hr) )
+    {
+        if ( sys->cleanupDeviceCb )
+            sys->cleanupDeviceCb( sys->opaque );
+        D3D9_Destroy( &sys->dec_device.hd3d );
+        goto error;
+    }
+    sys->dec_device.adapter = sys->dec_device.d3ddev.adapterId;
 
     device->ops = &d3d9_dev_ops;
     device->opaque = &sys->dec_device;
