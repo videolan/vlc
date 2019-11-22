@@ -195,6 +195,7 @@ vlc_decoder_device_Create(vout_window_t *window)
     free(name);
     if (module == NULL)
     {
+        vlc_objres_clear(VLC_OBJECT(&priv->device));
         vlc_object_delete(&priv->device);
         return NULL;
     }
