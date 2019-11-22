@@ -275,11 +275,30 @@ typedef struct vlc_vdp_video_field
     float sharpen;
 } vlc_vdp_video_field_t;
 
-static inline vdp_t *GetVDPAUOpaqueDevice(vlc_decoder_device *device)
+typedef struct {
+    vdp_t              *vdp;
+} vdpau_decoder_device_t;
+
+static inline vdpau_decoder_device_t *GetVDPAUOpaqueDevice(vlc_decoder_device *device)
 {
     if (device == NULL || device->type != VLC_DECODER_DEVICE_VDPAU)
         return NULL;
     return device->opaque;
+}
+
+static inline vdpau_decoder_device_t *GetVDPAUOpaqueContext(vlc_video_context *vctx)
+{
+    vlc_decoder_device *device = vctx ? vlc_video_context_HoldDevice(vctx) : NULL;
+    if (unlikely(device == NULL))
+        return NULL;
+    vdpau_decoder_device_t *res = NULL;
+    if (device->type == VLC_DECODER_DEVICE_VDPAU)
+    {
+        assert(device->opaque != NULL);
+        res = GetVDPAUOpaqueDevice(device);
+    }
+    vlc_decoder_device_Release(device);
+    return res;
 }
 
 /**

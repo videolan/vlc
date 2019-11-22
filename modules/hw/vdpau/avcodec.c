@@ -228,7 +228,8 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     sys->width = width;
     sys->height = height;
     sys->hwaccel_context = NULL;
-    vctx_priv->vdp = GetVDPAUOpaqueDevice(dec_device);
+    vdpau_decoder_device_t *vdpau_decoder = GetVDPAUOpaqueDevice(dec_device);
+    vctx_priv->vdp = vdpau_decoder->vdp;
     vdp_hold_x11(vctx_priv->vdp, &sys->device);
 
     unsigned flags = AV_HWACCEL_FLAG_ALLOW_HIGH_DEPTH;

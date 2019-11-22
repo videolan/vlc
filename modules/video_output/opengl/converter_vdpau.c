@@ -68,7 +68,7 @@ tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
 {
     converter_sys_t *sys = tc->priv;
     vlc_decoder_device *dec_device = sys->dec_device;
-    return vlc_vdp_output_pool_create(GetVDPAUOpaqueDevice(dec_device),
+    return vlc_vdp_output_pool_create(GetVDPAUOpaqueDevice(dec_device)->vdp,
                                       VDP_RGBA_FORMAT_B8G8R8A8,
                                       &tc->fmt, requested_count);
 }
@@ -120,7 +120,7 @@ Close(vlc_object_t *obj)
     _glVDPAUFiniNV(); assert(tc->vt->GetError() == GL_NO_ERROR);
     converter_sys_t *sys = tc->priv;
     vlc_decoder_device *dec_device = sys->dec_device;
-    vdp_release_x11(GetVDPAUOpaqueDevice(dec_device));
+    vdp_release_x11(GetVDPAUOpaqueDevice(dec_device)->vdp);
     vlc_decoder_device_Release(dec_device);
 }
 
@@ -153,7 +153,7 @@ Open(vlc_object_t *obj)
     tc->fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
 
     VdpDevice device;
-    vdp_t *vdp = GetVDPAUOpaqueDevice(dec_device);
+    vdp_t *vdp = GetVDPAUOpaqueDevice(dec_device)->vdp;
     vdp_hold_x11(vdp, &device);
 
     void *vdp_gpa;
@@ -206,7 +206,8 @@ Open(vlc_object_t *obj)
 static void
 DecoderDeviceClose(vlc_decoder_device *device)
 {
-    vdp_release_x11(GetVDPAUOpaqueDevice(device));
+    vdpau_decoder_device_t *vdpau_dev = GetVDPAUOpaqueDevice(device);
+    vdp_release_x11(vdpau_dev->vdp);
 }
 
 static const struct vlc_decoder_device_operations dev_ops = {
@@ -219,15 +220,21 @@ DecoderDeviceOpen(vlc_decoder_device *device, vout_window_t *window)
     if (!window || !vlc_xlib_init(VLC_OBJECT(window)))
         return VLC_EGENERIC;
 
-    vdp_t *vdp;
+    vdpau_decoder_device_t *sys = vlc_obj_malloc(VLC_OBJECT(device), sizeof(*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
     VdpDevice vdpdevice;
 
-    if (vdp_get_x11(window->display.x11, -1, &vdp, &vdpdevice) != VDP_STATUS_OK)
+    if (vdp_get_x11(window->display.x11, -1, &sys->vdp, &vdpdevice) != VDP_STATUS_OK)
+    {
+        vlc_obj_free(VLC_OBJECT(device), sys);
         return VLC_EGENERIC;
+    }
 
     device->ops = &dev_ops;
     device->type = VLC_DECODER_DEVICE_VDPAU;
-    device->opaque = vdp;
+    device->opaque = sys;
     return VLC_SUCCESS;
 }
 
