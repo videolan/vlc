@@ -1355,6 +1355,12 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     input_clock_SetJitter( p_pgrm->p_input_clock, pts_delay, p_sys->i_cr_average );
     vlc_clock_main_SetInputDejitter( p_pgrm->p_main_clock, pts_delay );
 
+    /* In case of low delay: don't use any output dejitter. This may result on
+     * some audio/video glitches when starting, but low-delay is more important
+     * than the visual quality if the user chose this option. */
+    if (input_priv(p_input)->b_low_delay)
+        vlc_clock_main_SetDejitter(p_pgrm->p_main_clock, 0);
+
     /* Append it */
     vlc_list_append(&p_pgrm->node, &p_sys->programs);
 
