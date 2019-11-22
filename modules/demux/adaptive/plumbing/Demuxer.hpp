@@ -114,6 +114,7 @@ namespace adaptive
         public:
             virtual AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
                                                es_out_t *, AbstractSourceStream *) const = 0;
+            virtual ~DemuxerFactoryInterface() = default;
     };
 }
 
