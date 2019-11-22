@@ -75,6 +75,7 @@ ifeq ($(ARCH),$(filter $(ARCH), arm aarch64))
 VPX_OS := darwin
 else
 VPX_OS := darwin11
+VPX_CROSS :=
 endif
 else ifdef HAVE_SOLARIS
 VPX_OS := solaris
