@@ -3859,15 +3859,7 @@ AM_CONDITIONAL([HAVE_KAI], [test "${have_kai}" = "yes"])
 dnl
 dnl  chromaprint audio track fingerprinter
 dnl
-m4_pushdef([libchromaprint_version], 0.6.0)
-PKG_WITH_MODULES([CHROMAPRINT],[libchromaprint >= libchromaprint_version],
-    VLC_ADD_PLUGIN([stream_out_chromaprint]),
-    AS_IF([test "${enable_chromaprint}" = "yes"],
-        [AC_MSG_ERROR(Library [libchromaprint >= libchromaprint_version] needed for [chromaprint] was not found)],
-        [AC_MSG_WARN(Library [libchromaprint >= libchromaprint_version] needed for [chromaprint] was not found)]
-         ),
-    [(Chromaprint based audio fingerprinter)],[auto])
-m4_popdef([libchromaprint_version])
+PKG_ENABLE_MODULES_VLC([CHROMAPRINT], [stream_out_chromaprint], [libchromaprint >= 0.6.0], [Chromaprint audio fingeprinter], [auto])
 
 dnl
 dnl  Chromecast streaming support
