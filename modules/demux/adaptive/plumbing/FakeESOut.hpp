@@ -29,6 +29,7 @@ namespace adaptive
     {
         public:
             virtual void fillExtraFMTInfo( es_format_t * ) const = 0;
+            virtual ~ExtraFMTInfoInterface() = default;
     };
 
     class CommandsQueue;

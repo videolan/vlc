@@ -109,6 +109,7 @@ namespace adaptive
     {
         public:
             virtual void trackerEvent(const SegmentTrackerEvent &) = 0;
+            virtual ~SegmentTrackerListenerInterface() = default;
     };
 
     class SegmentTracker
