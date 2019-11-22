@@ -563,7 +563,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     xcb_connection_t *conn;
     const xcb_screen_t *screen;
 
-    if (vlc_xcb_parent_Create(vd, cfg, &conn, &screen) == NULL)
+    if (vlc_xcb_parent_Create(vd, cfg->window, &conn, &screen) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
     sys->conn = conn;

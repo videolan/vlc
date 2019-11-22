@@ -265,7 +265,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
     /* Get window, connect to X server */
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
-    if (vlc_xcb_parent_Create(vd, cfg, &conn, &scr) == NULL)
+    if (vlc_xcb_parent_Create(vd, cfg->window, &conn, &scr) != VLC_SUCCESS)
     {
         free (sys);
         return VLC_EGENERIC;

@@ -311,7 +311,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     const xcb_screen_t *screen;
-    if (vlc_xcb_parent_Create(vd, cfg, &sys->conn, &screen) == NULL)
+    if (vlc_xcb_parent_Create(vd, cfg->window, &sys->conn, &screen) != VLC_SUCCESS)
     {
         free(sys);
         return VLC_EGENERIC;

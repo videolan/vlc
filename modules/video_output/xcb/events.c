@@ -101,17 +101,15 @@ static const xcb_screen_t *FindScreen (vlc_object_t *obj,
     return NULL;
 }
 
-vout_window_t *vlc_xcb_parent_Create(vout_display_t *vd,
-                                     const vout_display_cfg_t *cfg,
-                                     xcb_connection_t **restrict pconn,
-                                     const xcb_screen_t **restrict pscreen)
+int vlc_xcb_parent_Create(vout_display_t *vd, const vout_window_t *wnd,
+                          xcb_connection_t **restrict pconn,
+                          const xcb_screen_t **restrict pscreen)
 {
-    if (cfg->window->type != VOUT_WINDOW_TYPE_XID)
+    if (wnd->type != VOUT_WINDOW_TYPE_XID)
     {
         msg_Err (vd, "window not available");
-        return NULL;
+        return VLC_EBADVAR;
     }
-    vout_window_t *wnd = cfg->window;
 
     xcb_connection_t *conn = Connect (VLC_OBJECT(vd), wnd->display.x11);
     if (conn == NULL)
@@ -132,12 +130,12 @@ vout_window_t *vlc_xcb_parent_Create(vout_display_t *vd,
     if (screen == NULL)
         goto error;
     *pscreen = screen;
-    return wnd;
+    return VLC_SUCCESS;
 
 error:
     if (conn != NULL)
         xcb_disconnect (conn);
-    return NULL;
+    return VLC_EGENERIC;
 }
 
 /**
