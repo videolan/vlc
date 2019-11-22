@@ -149,7 +149,6 @@ static void DestroyVDPAUVideoContext(void *private)
     struct video_context_private *vctx_priv = private;
     for (unsigned i = 0; vctx_priv->pool[i] != NULL; i++)
         vlc_vdp_video_destroy(vctx_priv->pool[i]);
-    vdp_release_x11(vctx_priv->vdp);
 }
 
 const struct vlc_video_context_operations vdpau_vctx_ops = {
@@ -230,7 +229,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     sys->hwaccel_context = NULL;
     vdpau_decoder_device_t *vdpau_decoder = GetVDPAUOpaqueDevice(dec_device);
     vctx_priv->vdp = vdpau_decoder->vdp;
-    vdp_hold_x11(vctx_priv->vdp, &sys->device);
+    sys->device = vdpau_decoder->device;
 
     unsigned flags = AV_HWACCEL_FLAG_ALLOW_HIGH_DEPTH;
 
