@@ -430,6 +430,21 @@ drop:
     return NULL;
 }
 
+static void OutputSurfaceDestroy(struct picture_context_t *ctx)
+{
+    free(ctx);
+}
+
+static picture_context_t *OutputSurfaceClone(picture_context_t *ctx)
+{
+    picture_context_t *dts_ctx = malloc(sizeof(*dts_ctx));
+    if (unlikely(dts_ctx == NULL))
+        return NULL;
+    *dts_ctx = *ctx;
+    vlc_video_context_Hold(dts_ctx->vctx);
+    return dts_ctx;
+}
+
 static picture_t *Render(filter_t *filter, picture_t *src, bool import)
 {
     vlc_vdp_mixer_t *sys = filter->p_sys;
@@ -473,6 +488,14 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     dst = picture_pool_Get(sys->pool);
     if (dst == NULL)
         goto skip;
+    dst->context = malloc(sizeof(*dst->context));
+    if (unlikely(dst->context == NULL))
+        goto error;
+
+    *dst->context = (picture_context_t) {
+        OutputSurfaceDestroy, OutputSurfaceClone,
+        vlc_video_context_Hold(filter->vctx_out)
+    };
 
     vlc_vdp_output_surface_t *p_sys = dst->p_sys;
     assert(p_sys != NULL && p_sys->vdp == sys->vdp);
