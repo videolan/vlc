@@ -297,12 +297,13 @@ static picture_t *VideoExport(filter_t *filter, picture_t *src, picture_t *dst,
                               VdpYCbCrFormat format)
 {
     vlc_vdp_video_field_t *field = VDPAU_FIELD_FROM_PICCTX(src->context);
-    vlc_vdp_video_frame_t *psys = field->frame;
     VdpStatus err;
-    VdpVideoSurface surface = psys->surface;
+    VdpVideoSurface surface = field->frame->surface;
     void *planes[3];
     uint32_t pitches[3];
 
+    vdpau_decoder_device_t *vdpau_decoder =
+        GetVDPAUOpaqueContext(picture_GetVideoContext(src));
     picture_CopyProperties(dst, src);
 
     for (int i = 0; i < dst->i_planes; i++)
@@ -319,12 +320,12 @@ static picture_t *VideoExport(filter_t *filter, picture_t *src, picture_t *dst,
         pitches[1] = dst->p[2].i_pitch;
         pitches[2] = dst->p[1].i_pitch;
     }
-    err = vdp_video_surface_get_bits_y_cb_cr(psys->vdp, surface, format,
+    err = vdp_video_surface_get_bits_y_cb_cr(vdpau_decoder->vdp, surface, format,
                                              planes, pitches);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(filter, "video %s %s failure: %s", "surface", "export",
-                vdp_get_error_string(psys->vdp, err));
+                vdp_get_error_string(vdpau_decoder->vdp, err));
         picture_Release(dst);
         dst = NULL;
     }
@@ -440,35 +441,6 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
         msg_Err(filter, "corrupt VDPAU video surface %p", (void *)src);
         picture_Release(src);
         return NULL;
-    }
-
-    /* Corner case: different VDPAU instances decoding and rendering */
-    vlc_vdp_video_field_t *field = VDPAU_FIELD_FROM_PICCTX(src->context);
-    if (field->frame->vdp != sys->vdp)
-    {
-        video_format_t fmt = src->format;
-        switch (sys->chroma)
-        {
-             case VDP_CHROMA_TYPE_420: fmt.i_chroma = VLC_CODEC_NV12; break;
-             case VDP_CHROMA_TYPE_422: fmt.i_chroma = VLC_CODEC_UYVY; break;
-             case VDP_CHROMA_TYPE_444: fmt.i_chroma = VLC_CODEC_NV24; break;
-             default: vlc_assert_unreachable();
-        }
-
-        picture_t *pic = picture_NewFromFormat(&fmt);
-        if (likely(pic != NULL))
-        {
-            pic = VideoExport(filter, src, pic, sys->format);
-            if (pic != NULL)
-                src = VideoImport(filter, pic);
-            else
-                src = NULL;
-        }
-        else
-        {
-            picture_Release(src);
-            src = NULL;
-        }
     }
 
     /* Update history and take "present" picture field */
