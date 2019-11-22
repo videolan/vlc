@@ -3,7 +3,7 @@
 @@ -70,6 +70,7 @@
  #endif
  
- #define FAAD2_VERSION "2.7"
+ #define FAAD2_VERSION "unknown"
 +#define FAAD2_VIDEOLAN_PATCHED
  
  /* object types for AAC */
