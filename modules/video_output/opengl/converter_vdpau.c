@@ -120,7 +120,6 @@ Close(vlc_object_t *obj)
     _glVDPAUFiniNV(); assert(tc->vt->GetError() == GL_NO_ERROR);
     converter_sys_t *sys = tc->priv;
     vlc_decoder_device *dec_device = sys->dec_device;
-    vdp_release_x11(GetVDPAUOpaqueDevice(dec_device)->vdp);
     vlc_decoder_device_Release(dec_device);
 }
 
@@ -153,8 +152,9 @@ Open(vlc_object_t *obj)
     tc->fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
 
     VdpDevice device;
-    vdp_t *vdp = GetVDPAUOpaqueDevice(dec_device)->vdp;
-    vdp_hold_x11(vdp, &device);
+    vdpau_decoder_device_t *vdpau_dev = GetVDPAUOpaqueDevice(dec_device);
+    vdp_t *vdp = vdpau_dev->vdp;
+    device = vdpau_dev->device;
 
     void *vdp_gpa;
     if (vdp_get_proc_address(vdp, device,
@@ -162,7 +162,6 @@ Open(vlc_object_t *obj)
         != VDP_STATUS_OK)
     {
         vlc_decoder_device_Release(dec_device);
-        vdp_release_x11(vdp);
         return VLC_EGENERIC;
     }
 
@@ -171,7 +170,6 @@ Open(vlc_object_t *obj)
     if (!_##fct) \
     { \
         vlc_decoder_device_Release(dec_device); \
-        vdp_release_x11(vdp); \
         return VLC_EGENERIC; \
     }
     SAFE_GPA(glVDPAUInitNV);
