@@ -80,6 +80,14 @@ void vlc_clock_main_SetInputDejitter(vlc_clock_main_t *main_clock,
                                      vlc_tick_t delay);
 
 /**
+ * This function sets the dejitter delay to absorb the clock jitter
+ *
+ * Also used as the maximum delay before the synchro is considered to kick in.
+ */
+void vlc_clock_main_SetDejitter(vlc_clock_main_t *main_clock, vlc_tick_t dejitter);
+
+
+/**
  * This function allows changing the pause status.
  */
 void vlc_clock_main_ChangePause(vlc_clock_main_t *clock, vlc_tick_t system_now,
@@ -175,12 +183,5 @@ vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
 void vlc_clock_ConvertArrayToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
                                     vlc_tick_t *ts_array, size_t ts_count,
                                     double rate);
-
-/**
- * This function sets the dejitter delay to absorb the clock jitter
- *
- * Also used as the maximum delay before the synchro is considered to kick in.
- */
-void vlc_clock_SetDejitter(vlc_clock_t *clock, vlc_tick_t delay);
 
 #endif /*VLC_CLOCK_H*/

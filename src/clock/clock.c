@@ -65,7 +65,6 @@ struct vlc_clock_t
                          unsigned frame_rate, unsigned frame_rate_base);
     void (*reset)(vlc_clock_t *clock);
     vlc_tick_t (*set_delay)(vlc_clock_t *clock, vlc_tick_t delay);
-    void (*set_dejitter)(vlc_clock_t *clock, vlc_tick_t delay);
     vlc_tick_t (*to_system_locked)(vlc_clock_t *clock, vlc_tick_t system_now,
                                    vlc_tick_t ts, double rate);
 
@@ -222,15 +221,6 @@ static vlc_tick_t vlc_clock_master_set_delay(vlc_clock_t *clock, vlc_tick_t dela
     return delta;
 }
 
-static void vlc_clock_master_set_dejitter(vlc_clock_t *clock, vlc_tick_t delay)
-{
-    vlc_clock_main_t *main_clock = clock->owner;
-
-    vlc_mutex_lock(&main_clock->lock);
-    main_clock->output_dejitter = delay;
-    vlc_mutex_unlock(&main_clock->lock);
-}
-
 static vlc_tick_t
 vlc_clock_monotonic_to_system_locked(vlc_clock_t *clock, vlc_tick_t now,
                                      vlc_tick_t ts, double rate)
@@ -366,12 +356,6 @@ int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
     return -1;
 }
 
-static void vlc_clock_slave_set_dejitter(vlc_clock_t *clock, vlc_tick_t delay)
-{
-    VLC_UNUSED(clock);
-    VLC_UNUSED(delay);
-}
-
 vlc_clock_main_t *vlc_clock_main_New(void)
 {
     vlc_clock_main_t *main_clock = malloc(sizeof(vlc_clock_main_t));
@@ -442,6 +426,14 @@ void vlc_clock_main_SetInputDejitter(vlc_clock_main_t *main_clock,
 {
     vlc_mutex_lock(&main_clock->lock);
     main_clock->input_dejitter = delay;
+    vlc_mutex_unlock(&main_clock->lock);
+}
+
+void vlc_clock_main_SetDejitter(vlc_clock_main_t *main_clock,
+                                vlc_tick_t dejitter)
+{
+    vlc_mutex_lock(&main_clock->lock);
+    main_clock->output_dejitter = dejitter;
     vlc_mutex_unlock(&main_clock->lock);
 }
 
@@ -528,17 +520,11 @@ void vlc_clock_ConvertArrayToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
     vlc_mutex_unlock(&main_clock->lock);
 }
 
-void vlc_clock_SetDejitter(vlc_clock_t *clock, vlc_tick_t delay)
-{
-    clock->set_dejitter(clock, delay);
-}
-
 static void vlc_clock_set_master_callbacks(vlc_clock_t *clock)
 {
     clock->update = vlc_clock_master_update;
     clock->reset = vlc_clock_master_reset;
     clock->set_delay = vlc_clock_master_set_delay;
-    clock->set_dejitter = vlc_clock_master_set_dejitter;
     clock->to_system_locked = vlc_clock_master_to_system_locked;
 }
 
@@ -547,7 +533,6 @@ static void vlc_clock_set_slave_callbacks(vlc_clock_t *clock)
     clock->update = vlc_clock_slave_update;
     clock->reset = vlc_clock_slave_reset;
     clock->set_delay = vlc_clock_slave_set_delay;
-    clock->set_dejitter = vlc_clock_slave_set_dejitter;
     clock->to_system_locked = vlc_clock_slave_to_system_locked;
 }
 
