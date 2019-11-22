@@ -224,9 +224,8 @@ DecoderDeviceOpen(vlc_decoder_device *device, vout_window_t *window)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    VdpDevice vdpdevice;
-
-    if (vdp_get_x11(window->display.x11, -1, &sys->vdp, &vdpdevice) != VDP_STATUS_OK)
+    if (vdp_get_x11(window->display.x11, -1,
+                    &sys->vdp, &sys->device) != VDP_STATUS_OK)
     {
         vlc_obj_free(VLC_OBJECT(device), sys);
         return VLC_EGENERIC;

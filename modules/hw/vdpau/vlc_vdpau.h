@@ -277,6 +277,7 @@ typedef struct vlc_vdp_video_field
 
 typedef struct {
     vdp_t              *vdp;
+    VdpDevice          device;
 } vdpau_decoder_device_t;
 
 static inline vdpau_decoder_device_t *GetVDPAUOpaqueDevice(vlc_decoder_device *device)
