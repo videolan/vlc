@@ -167,7 +167,8 @@ error:
     return pic;
 }
 
-picture_pool_t *vlc_vdp_output_pool_create(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
+picture_pool_t *vlc_vdp_output_pool_create(vdpau_decoder_device_t *vdpau_dev,
+                                           VdpRGBAFormat rgb_fmt,
                                            const video_format_t *restrict fmt,
                                            unsigned requested_count)
 {
@@ -176,7 +177,7 @@ picture_pool_t *vlc_vdp_output_pool_create(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
 
     while (count < requested_count)
     {
-        pics[count] = vlc_vdp_output_surface_create(vdp, rgb_fmt, fmt);
+        pics[count] = vlc_vdp_output_surface_create(vdpau_dev->vdp, rgb_fmt, fmt);
         if (pics[count] == NULL)
             break;
         count++;

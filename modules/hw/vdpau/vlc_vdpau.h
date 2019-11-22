@@ -337,7 +337,8 @@ typedef struct vlc_vdp_output_surface
 
 struct picture_pool_t;
 
-struct picture_pool_t *vlc_vdp_output_pool_create(vdp_t *, VdpRGBAFormat,
+struct picture_pool_t *vlc_vdp_output_pool_create(vdpau_decoder_device_t *,
+                                                  VdpRGBAFormat,
                                                   const video_format_t *,
                                                   unsigned count);
 

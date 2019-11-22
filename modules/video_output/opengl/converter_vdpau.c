@@ -68,7 +68,7 @@ tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
 {
     converter_sys_t *sys = tc->priv;
     vlc_decoder_device *dec_device = sys->dec_device;
-    return vlc_vdp_output_pool_create(GetVDPAUOpaqueDevice(dec_device)->vdp,
+    return vlc_vdp_output_pool_create(GetVDPAUOpaqueDevice(dec_device),
                                       VDP_RGBA_FORMAT_B8G8R8A8,
                                       &tc->fmt, requested_count);
 }
