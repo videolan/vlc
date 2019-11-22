@@ -118,6 +118,9 @@ Attribute Attribute::unescapeQuotes() const
 
 std::string Attribute::quotedString() const
 {
+    if(!value.empty() && value.at(0) != '"')
+        return value;
+
     if(value.length() < 2)
         return "";
 
