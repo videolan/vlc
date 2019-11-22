@@ -1,0 +1,14 @@
+--- sidplay-libs/libsidplay/src/sidtune/SidTune.cpp.old	2019-11-22 14:24:46.584743428 +0100
++++ sidplay-libs/libsidplay/src/sidtune/SidTune.cpp	2019-11-22 14:24:52.620740613 +0100
+@@ -554,6 +554,11 @@
+ bool SidTune::acceptSidTune(const char* dataFileName, const char* infoFileName,
+                             Buffer_sidtt<const uint_least8_t>& buf)
+ {
++    if( buf.len() < fileOffset)
++    {
++        info.statusString = SidTune::txt_corrupt;
++        return false;
++    }
+     // @FIXME@ - MUS
+     if ( info.numberOfInfoStrings == 3 )
+     {   // Add <?> (HVSC standard) to missing title, author, release fields
