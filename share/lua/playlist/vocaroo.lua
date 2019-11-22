@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2016 the VideoLAN team
+ Copyright © 2016, 2019 the VideoLAN team
 
  Authors: Pierre Ynard
 
@@ -26,14 +26,28 @@ local fmt = "mp3"
 -- Probe function.
 function probe()
     return ( vlc.access == "http" or vlc.access == "https" )
-        and string.match( vlc.path, "^vocaroo%.com/i/" )
+        and ( string.match( vlc.path, "^old%.vocaroo%.com/i/" )
+            or string.match( vlc.path, "^beta%.vocaroo%.com/." )
+            or string.match( vlc.path, "^vocaroo%.com/." ) )
 end
 
 -- Parse function.
 function parse()
-    -- The HTML page contains no metadata and is not worth parsing
-    local id = string.match( vlc.path, "vocaroo%.com/i/([^?]*)" )
-    local path = vlc.access.."://vocaroo.com/media_command.php?media="..id.."&command=download_"..fmt
-    return { { path = path } }
+    -- At the moment, a new/beta platform coexists with the old one:
+    -- classic URLs for old media are redirected to the old platform,
+    -- while new media seems accessible only through the new platform.
+
+    -- With either platform, HTML pages contain no metadata and are not
+    -- worth parsing.
+
+    if string.match( vlc.path, "^old%.vocaroo%.com/" ) then -- Old platform
+        local id = string.match( vlc.path, "vocaroo%.com/i/([^?]*)" )
+        local path = vlc.access.."://old.vocaroo.com/media_command.php?media="..id.."&command=download_"..fmt
+        return { { path = path } }
+    else -- New/beta platform
+        local id = string.match( vlc.path, "vocaroo%.com/([^?]+)" )
+        local path = vlc.access.."://media.vocaroo.com/mp3/"..id
+        return { { path = path } }
+    end
 end
 
