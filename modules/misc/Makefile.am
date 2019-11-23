@@ -54,7 +54,9 @@ endif
 
 libxdg_screensaver_plugin_la_SOURCES = misc/inhibit/xdg.c
 if HAVE_XCB
+if !HAVE_WIN32
 misc_LTLIBRARIES += libxdg_screensaver_plugin.la
+endif
 endif
 
 libdbus_screensaver_plugin_la_SOURCES = misc/inhibit/dbus.c
