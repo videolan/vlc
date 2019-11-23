@@ -15,6 +15,8 @@ xproto: xproto-$(XPROTO_VERSION).tar.bz2 .sum-xproto
 	$(UNPACK)
 	$(MOVE)
 
+DEPS_xproto = xorg-macros $(DEPS_xorg-macros)
+
 .xproto: xproto
 	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --enable-xthreads
