@@ -26,9 +26,14 @@
 
 #include <stdarg.h>
 #include <assert.h>
-#include <poll.h>
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
 #include <unistd.h> /* gethostname() and sysconf() */
 #include <limits.h> /* _POSIX_HOST_NAME_MAX */
+#ifdef _WIN32
+# include <winsock2.h>
+#endif
 
 #include <xcb/xcb.h>
 #ifdef HAVE_XKBCOMMON
@@ -473,11 +478,18 @@ void set_wm_hints (xcb_connection_t *conn, xcb_window_t window)
 static inline
 void set_hostname_prop (xcb_connection_t *conn, xcb_window_t window)
 {
-    char* hostname;
+    char *hostname;
+#ifndef _WIN32
     long host_name_max = sysconf (_SC_HOST_NAME_MAX);
-    if (host_name_max <= 0) host_name_max = _POSIX_HOST_NAME_MAX;
+
+    if (host_name_max <= 0)
+        host_name_max = _POSIX_HOST_NAME_MAX;
+#else
+    size_t host_name_max = 256;
+#endif
     hostname = malloc (host_name_max);
-    if(!hostname) return;
+    if (hostname == NULL)
+        return;
 
     if (gethostname (hostname, host_name_max) == 0)
     {
