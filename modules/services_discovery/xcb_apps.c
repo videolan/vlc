@@ -35,7 +35,12 @@ typedef xcb_atom_t Atom;
 #ifdef HAVE_SEARCH_H
 # include <search.h>
 #endif
-#include <poll.h>
+#ifdef HAVE_POLL
+# include <poll.h>
+#endif
+#ifdef _WIN32
+# include <winsock2.h>
+#endif
 
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
