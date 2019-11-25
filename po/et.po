@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-23 14:55+0200\n"
+"PO-Revision-Date: 2019-11-25 07:00+0100\n"
 "Last-Translator: Mattias Põldaru <mahfiaz@gmail.com>, 2019\n"
 "Language-Team: Estonian (https://www.transifex.com/yaron/teams/16553/et/)\n"
 "Language: et\n"
@@ -170,7 +170,7 @@ msgstr "Üldised videosätted"
 
 #: include/vlc_config_cat.h:79
 msgid "General settings for video output modules."
-msgstr ""
+msgstr "Video väljundmoodulite üldsätted."
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
@@ -187,11 +187,11 @@ msgstr "Seaded OSD, subtiitrite ja \"pildipealdiste ülekatetele\""
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
-msgstr ""
+msgstr "Eraldajad"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr ""
+msgstr "Videoeraldajad jaotavad voo mitmeks videoks."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
@@ -211,7 +211,7 @@ msgid ""
 "to alter are HTTP proxy or caching settings."
 msgstr ""
 "Seaded, mis on seotud erinevate ligipääsu meetoditega. Seaded, mida "
-"tavaliselt soovitakse muuta on HTTP proksi ja puhver."
+"tavaliselt soovitakse muuta, on HTTP proksi ja puhver."
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
@@ -317,8 +317,8 @@ msgid ""
 "You can also set default parameters for each access output."
 msgstr ""
 "Juurdepääsu väljundi moodulid kontrollivad viise, kuidas liidetud voogusid "
-"saadetakse. Need sätted lubavad sul jõuga määrata üht spetsiifilist "
-"meetodit. Tõenäoliselt ei peaks sa seda tegema.\n"
+"saadetakse. Need sätted lubavad sul jõuga määrata ühe spetsiifilise meetodi. "
+"Tõenäoliselt ei peaks seda tegema.\n"
 "Sa saad määrata vaikimisi parameetreid igale juurdepääsu väljundile."
 
 #: include/vlc_config_cat.h:154
@@ -538,7 +538,7 @@ msgstr "Juhuesitus"
 
 #: include/vlc_intf_strings.h:82 modules/gui/macosx/VLCCoreInteraction.m:425
 msgid "Random Off"
-msgstr "Juhuslik välja"
+msgstr "Juhuesitus välja"
 
 #: include/vlc_intf_strings.h:83
 msgid "Add to Playlist"
@@ -654,7 +654,7 @@ msgstr "Spekter"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "VU-meeter"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -676,7 +676,7 @@ msgstr "Mono"
 
 #: src/audio_output/output.c:425
 msgid "Original"
-msgstr ""
+msgstr "Originaal"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -704,7 +704,7 @@ msgstr "Stereo"
 #: modules/gui/qt/ui/video_effects.h:1270
 #: modules/gui/qt/ui/video_effects.h:1280
 msgid "Left"
-msgstr "Vasakult"
+msgstr "Vasak"
 
 #: src/audio_output/output.c:448 src/libvlc-module.c:197
 #: src/libvlc-module.c:295 src/libvlc-module.c:368 src/misc/actions.c:109
@@ -719,7 +719,7 @@ msgstr "Vasakult"
 #: modules/spu/marq.c:129 modules/spu/mosaic.c:170 modules/spu/rss.c:171
 #: modules/gui/qt/ui/video_effects.h:1229
 msgid "Right"
-msgstr "Paremalt"
+msgstr "Parem"
 
 #: src/audio_output/output.c:452 src/libvlc-module.c:196
 msgid "Reverse stereo"
@@ -745,7 +745,7 @@ msgstr "tõeväärtus"
 
 #: src/config/file.c:452 src/config/help.c:426
 msgid "integer"
-msgstr "Täisarv"
+msgstr "täisarv"
 
 #: src/config/file.c:460 src/config/help.c:476
 msgid "float"
@@ -831,11 +831,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr "(vaikimisi sees)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr "(vaikimisi väljas)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -981,12 +981,12 @@ msgstr "Jah"
 #: src/input/es_out.c:2141
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr ""
+msgstr "DTVCC subtiitrid%u"
 
 #: src/input/es_out.c:2143
 #, c-format
 msgid "Closed captions %u"
-msgstr "Suletud pealdised %u"
+msgstr "Subtiitrid %u"
 
 #: src/input/es_out.c:3096
 msgid "Original ID"
@@ -1039,7 +1039,7 @@ msgstr "%u Hz"
 
 #: src/input/es_out.c:3138
 msgid "Bits per sample"
-msgstr "Bitte diskreetide kohta"
+msgstr "Bitte diskreedi kohta"
 
 #: src/input/es_out.c:3143 modules/access_output/shout.c:92
 #: modules/demux/playlist/shoutcast.c:327
@@ -1069,11 +1069,11 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "Video lahutus"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "Puhvri mõõtmed"
 
 #: src/input/es_out.c:3183 src/input/es_out.c:3186 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
