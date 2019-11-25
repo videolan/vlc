@@ -55,7 +55,7 @@ vlc_player_PrepareNextMedia(vlc_player_t *player)
     vlc_player_assert_locked(player);
 
     if (!player->media_provider
-     || player->media_stopped_action != VLC_PLAYER_MEDIA_STOPPED_CONTINUE
+     || player->media_stopped_action == VLC_PLAYER_MEDIA_STOPPED_STOP
      || player->next_media_requested)
         return;
 
