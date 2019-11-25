@@ -27,6 +27,7 @@
 
 #include <vlc_es.h>
 #include <vlc_picture.h>
+#include <vlc_codec.h>
 
 /**
  * \defgroup filter Filters
@@ -199,6 +200,23 @@ static inline vlc_decoder_device * filter_HoldDecoderDevice( filter_t *p_filter 
         return NULL;
 
     return p_filter->owner.video->hold_device( VLC_OBJECT(p_filter), p_filter->owner.sys );
+}
+
+static inline vlc_decoder_device * filter_HoldDecoderDeviceType( filter_t *p_filter,
+                                                                 enum vlc_decoder_device_type type )
+{
+    if ( !p_filter->owner.video || !p_filter->owner.video->hold_device )
+        return NULL;
+
+    vlc_decoder_device *dec_dev = p_filter->owner.video->hold_device( VLC_OBJECT(p_filter),
+                                                                      p_filter->owner.sys );
+    if ( dec_dev != NULL )
+    {
+        if ( dec_dev->type == type )
+            return dec_dev;
+        vlc_decoder_device_Release(dec_dev);
+    }
+    return NULL;
 }
 
 /**
