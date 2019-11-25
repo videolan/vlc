@@ -42,13 +42,12 @@
 
 struct video_context_private
 {
-    vdp_t *vdp;
+    char dummy;
     vlc_vdp_video_field_t *pool[];
 };
 
 struct vlc_va_sys_t
 {
-    VdpDevice device;
     VdpChromaType type;
     void *hwaccel_context;
     uint32_t width;
@@ -62,25 +61,24 @@ static inline struct video_context_private *GetVDPAUContextPrivate(vlc_video_con
         vlc_video_context_GetPrivate( vctx, VLC_VIDEO_CONTEXT_VDPAU );
 }
 
-static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va)
+static vlc_vdp_video_field_t *CreateSurface(vlc_va_t *va, vdpau_decoder_device_t *vdpau_decoder)
 {
     vlc_va_sys_t *sys = va->sys;
-    struct video_context_private *vctx_priv = GetVDPAUContextPrivate(sys->vctx);
     VdpVideoSurface surface;
     VdpStatus err;
 
-    err = vdp_video_surface_create(vctx_priv->vdp, sys->device, sys->type,
+    err = vdp_video_surface_create(vdpau_decoder->vdp, vdpau_decoder->device, sys->type,
                                    sys->width, sys->height, &surface);
     if (err != VDP_STATUS_OK)
     {
         msg_Err(va, "%s creation failure: %s", "video surface",
-                vdp_get_error_string(vctx_priv->vdp, err));
+                vdp_get_error_string(vdpau_decoder->vdp, err));
         return NULL;
     }
 
-    vlc_vdp_video_field_t *field = vlc_vdp_video_create(vctx_priv->vdp, surface);
+    vlc_vdp_video_field_t *field = vlc_vdp_video_create(vdpau_decoder->vdp, surface);
     if (unlikely(field == NULL))
-        vdp_video_surface_destroy(vctx_priv->vdp, surface);
+        vdp_video_surface_destroy(vdpau_decoder->vdp, surface);
     return field;
 }
 
@@ -228,17 +226,15 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     sys->height = height;
     sys->hwaccel_context = NULL;
     vdpau_decoder_device_t *vdpau_decoder = GetVDPAUOpaqueDevice(dec_device);
-    vctx_priv->vdp = vdpau_decoder->vdp;
-    sys->device = vdpau_decoder->device;
 
     unsigned flags = AV_HWACCEL_FLAG_ALLOW_HIGH_DEPTH;
 
-    err = vdp_get_proc_address(vctx_priv->vdp, sys->device,
+    err = vdp_get_proc_address(vdpau_decoder->vdp, vdpau_decoder->device,
                                VDP_FUNC_ID_GET_PROC_ADDRESS, &func);
     if (err != VDP_STATUS_OK)
         goto error;
 
-    if (av_vdpau_bind_context(avctx, sys->device, func, flags))
+    if (av_vdpau_bind_context(avctx, vdpau_decoder->device, func, flags))
         goto error;
     sys->hwaccel_context = avctx->hwaccel_context;
     va->sys = sys;
@@ -246,7 +242,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     unsigned i = 0;
     while (i < refs)
     {
-        vctx_priv->pool[i] = CreateSurface(va);
+        vctx_priv->pool[i] = CreateSurface(va, vdpau_decoder);
         if (vctx_priv->pool[i] == NULL)
             break;
         i++;
@@ -260,7 +256,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     }
 
     const char *infos;
-    if (vdp_get_information_string(vctx_priv->vdp, &infos) == VDP_STATUS_OK)
+    if (vdp_get_information_string(vdpau_decoder->vdp, &infos) == VDP_STATUS_OK)
         msg_Info(va, "Using %s", infos);
 
     *vtcx_out = sys->vctx;
