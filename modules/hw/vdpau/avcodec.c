@@ -256,8 +256,6 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, const AVPixFmtDescriptor *d
     if (i < refs)
     {
         msg_Err(va, "not enough video RAM");
-        while (i > 0)
-            vlc_vdp_video_destroy(vctx_priv->pool[--i]);
         goto error;
     }
 
