@@ -466,6 +466,7 @@ static void SSE_CopyPlane(uint8_t *dst, size_t dst_pitch,
                           unsigned height, int bitshift)
 {
     const size_t copy_pitch = __MIN(src_pitch, dst_pitch);
+    assert(copy_pitch > 0);
     const unsigned w16 = (copy_pitch+15) & ~15;
     const unsigned hstep = cache_size / w16;
     const unsigned cache_width = __MIN(src_pitch, cache_size);
