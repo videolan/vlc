@@ -288,9 +288,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
 {
-    if (!vlc_xlib_init(VLC_OBJECT(vd)))
-        return VLC_EGENERIC;
-
     vout_display_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
