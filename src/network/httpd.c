@@ -751,21 +751,29 @@ httpd_stream_t *httpd_StreamNew(httpd_host_t *host,
     if (!stream)
         return NULL;
 
+    stream->psz_mime = NULL;
+    stream->p_buffer = NULL;
+
     stream->url = httpd_UrlNew(host, psz_url, psz_user, psz_password);
-    if (!stream->url) {
-        free(stream);
-        return NULL;
-    }
+    if (!stream->url)
+        goto error;
 
     vlc_mutex_init(&stream->lock);
     if (psz_mime == NULL || psz_mime[0] == '\0')
         psz_mime = vlc_mime_Ext2Mime(psz_url);
-    stream->psz_mime = xstrdup(psz_mime);
+
+    stream->psz_mime = strdup(psz_mime);
+    if (stream->psz_mime == NULL)
+        goto error;
 
     stream->i_header = 0;
     stream->p_header = NULL;
     stream->i_buffer_size = 5000000;    /* 5 Mo per stream */
-    stream->p_buffer = xmalloc(stream->i_buffer_size);
+
+    stream->p_buffer = malloc(stream->i_buffer_size);
+    if (stream->p_buffer == NULL)
+        goto error;
+
     /* We set to 1 to make life simpler
      * (this way i_body_offset can never be 0) */
     stream->i_buffer_pos = 1;
@@ -783,6 +791,16 @@ httpd_stream_t *httpd_StreamNew(httpd_host_t *host,
                     (httpd_callback_sys_t*)stream);
 
     return stream;
+
+error:
+    free(stream->psz_mime);
+
+    if (stream->url)
+        httpd_UrlDelete(stream->url);
+
+    free(stream);
+
+    return NULL;
 }
 
 int httpd_StreamHeader(httpd_stream_t *stream, uint8_t *p_data, int i_data)
