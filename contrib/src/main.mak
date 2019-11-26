@@ -634,9 +634,15 @@ else
 ifdef HAVE_DARWIN_OS
 	MESON_SYSTEM_NAME = darwin
 else
+ifdef HAVE_ANDROID
+	MESON_SYSTEM_NAME = android
+else
 ifdef HAVE_LINUX
 	# android has also system = linux and defines HAVE_LINUX
 	MESON_SYSTEM_NAME = linux
+else
+	$(error "No meson system name known for this target")
+endif
 endif
 endif
 endif
