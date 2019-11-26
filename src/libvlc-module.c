@@ -1861,7 +1861,7 @@ vlc_module_begin ()
 
     set_section( N_( "Advanced" ), NULL )
 
-    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000,
+    add_integer( "file-caching", CLOCK_FREQ / 1000,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
