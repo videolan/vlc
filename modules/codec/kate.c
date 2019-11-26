@@ -52,10 +52,11 @@
 #define CHECK_TIGER_RET( statement )                                   \
     do                                                                 \
     {                                                                  \
-        int i_ret = (statement);                                       \
-        if( i_ret < 0 )                                                \
+        int i_ret_check = (statement);                                 \
+        if( i_ret_check < 0 )                                          \
         {                                                              \
-            msg_Dbg( p_dec, "Error in " #statement ": %d", i_ret );    \
+            msg_Dbg( p_dec, "Error in " #statement ": %d",             \
+                     i_ret_check );                                    \
         }                                                              \
     } while( 0 )
 
@@ -1322,4 +1323,3 @@ static void DecSysRelease( decoder_sys_t *p_sys )
 
     free( p_sys );
 }
-
