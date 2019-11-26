@@ -24,9 +24,12 @@ soxr: soxr-$(SOXR_VERSION)-Source.tar.xz .sum-soxr
 	$(call pkg_static,"src/soxr.pc.in")
 	$(MOVE)
 
+# CMAKE_SYSTEM_NAME is inferred from the toolchain in Android builds
+ifndef HAVE_ANDROID
 # Force CMAKE_CROSSCOMPILING to True
 ifdef HAVE_CROSS_COMPILE
 SOXR_EXTRA_CONF=-DCMAKE_SYSTEM_NAME=Generic
+endif
 endif
 
 .soxr: soxr toolchain.cmake
