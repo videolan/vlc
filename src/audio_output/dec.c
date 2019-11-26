@@ -89,7 +89,8 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
     aout_owner_t *owner = aout_owner(p_aout);
 
     /* Create the audio output stream */
-    owner->volume = aout_volume_New (p_aout, p_replay_gain);
+    if (!owner->bitexact)
+        owner->volume = aout_volume_New (p_aout, p_replay_gain);
 
     atomic_store_explicit(&owner->restart, 0, memory_order_relaxed);
     owner->input_profile = profile;
@@ -97,23 +98,27 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
 
     owner->sync.clock = clock;
 
+    owner->filters = NULL;
     owner->filters_cfg = AOUT_FILTERS_CFG_INIT;
     if (aout_OutputNew (p_aout))
         goto error;
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
-    /* Create the audio filtering "input" pipeline */
-    owner->filters = aout_FiltersNewWithClock(VLC_OBJECT(p_aout), clock,
-                                              &owner->filter_format,
-                                              &owner->mixer_format,
-                                              &owner->filters_cfg);
-    if (owner->filters == NULL)
+    if (!owner->bitexact)
     {
-        aout_OutputDelete (p_aout);
+        /* Create the audio filtering "input" pipeline */
+        owner->filters = aout_FiltersNewWithClock(VLC_OBJECT(p_aout), clock,
+                                                  &owner->filter_format,
+                                                  &owner->mixer_format,
+                                                  &owner->filters_cfg);
+        if (owner->filters == NULL)
+        {
+            aout_OutputDelete (p_aout);
 error:
-        aout_volume_Delete (owner->volume);
-        owner->volume = NULL;
-        return -1;
+            aout_volume_Delete (owner->volume);
+            owner->volume = NULL;
+            return -1;
+        }
     }
 
     owner->sync.rate = 1.f;
@@ -138,7 +143,8 @@ void aout_DecDelete (audio_output_t *aout)
     if (owner->mixer_format.i_format)
     {
         aout_DecFlush(aout);
-        aout_FiltersDelete (aout, owner->filters);
+        if (owner->filters)
+            aout_FiltersDelete (aout, owner->filters);
         aout_OutputDelete (aout);
     }
     aout_volume_Delete (owner->volume);
@@ -154,8 +160,11 @@ static int aout_CheckReady (audio_output_t *aout)
                                            memory_order_acquire);
     if (unlikely(restart))
     {
-        if (owner->mixer_format.i_format)
+        if (owner->filters)
+        {
             aout_FiltersDelete (aout, owner->filters);
+            owner->filters = NULL;
+        }
 
         if (restart & AOUT_RESTART_OUTPUT)
         {   /* Reinitializes the output */
@@ -180,7 +189,7 @@ static int aout_CheckReady (audio_output_t *aout)
         msg_Dbg (aout, "restarting filters...");
         owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
 
-        if (owner->mixer_format.i_format)
+        if (owner->mixer_format.i_format && !owner->bitexact)
         {
             owner->filters = aout_FiltersNewWithClock(VLC_OBJECT(aout),
                                                       owner->sync.clock,
@@ -219,6 +228,7 @@ void aout_RequestRestart (audio_output_t *aout, unsigned mode)
 static void aout_StopResampling (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
+    assert(owner->filters);
 
     owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
     aout_FiltersAdjustResampling (owner->filters, 0);
@@ -310,7 +320,7 @@ void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
     vlc_tick_t drift =
         -vlc_clock_Update(owner->sync.clock, system_ts, audio_ts, rate);
 
-    if (unlikely(drift == INT64_MAX))
+    if (unlikely(drift == INT64_MAX) || owner->bitexact)
         return; /* cf. INT64_MAX comment in aout_DecPlay() */
 
     /* Late audio output.
@@ -421,14 +431,6 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
         owner->original_pts = VLC_TICK_INVALID;
     }
 
-    if (atomic_load_explicit(&owner->vp.update, memory_order_relaxed))
-    {
-        vlc_mutex_lock (&owner->vp.lock);
-        aout_FiltersChangeViewpoint (owner->filters, &owner->vp.value);
-        atomic_store_explicit(&owner->vp.update, false, memory_order_relaxed);
-        vlc_mutex_unlock (&owner->vp.lock);
-    }
-
     if (owner->original_pts == VLC_TICK_INVALID)
     {
         /* Use the original PTS for synchronization and as a play date of the
@@ -438,9 +440,20 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
         owner->original_pts = block->i_pts;
     }
 
-    block = aout_FiltersPlay(owner->filters, block, owner->sync.rate);
-    if (block == NULL)
-        return ret;
+    if (owner->filters)
+    {
+        if (atomic_load_explicit(&owner->vp.update, memory_order_relaxed))
+        {
+            vlc_mutex_lock (&owner->vp.lock);
+            aout_FiltersChangeViewpoint (owner->filters, &owner->vp.value);
+            atomic_store_explicit(&owner->vp.update, false, memory_order_relaxed);
+            vlc_mutex_unlock (&owner->vp.lock);
+        }
+
+        block = aout_FiltersPlay(owner->filters, block, owner->sync.rate);
+        if (block == NULL)
+            return ret;
+    }
 
     const vlc_tick_t original_pts = owner->original_pts;
     owner->original_pts = VLC_TICK_INVALID;
@@ -453,7 +466,8 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     {
         owner->sync.delay = owner->sync.request_delay;
         vlc_tick_t delta = vlc_clock_SetDelay(owner->sync.clock, owner->sync.delay);
-        aout_FiltersSetClockDelay(owner->filters, owner->sync.delay);
+        if (owner->filters)
+            aout_FiltersSetClockDelay(owner->filters, owner->sync.delay);
         if (delta > 0)
             aout_DecSilence (aout, delta, block->i_pts);
     }
@@ -530,11 +544,13 @@ void aout_DecFlush(audio_output_t *aout)
 
     if (owner->mixer_format.i_format)
     {
-        aout_FiltersFlush (owner->filters);
+        if (owner->filters)
+            aout_FiltersFlush (owner->filters);
 
         aout->flush(aout);
         vlc_clock_Reset(owner->sync.clock);
-        aout_FiltersResetClock(owner->filters);
+        if (owner->filters)
+            aout_FiltersResetClock(owner->filters);
 
         if (owner->sync.delay > 0)
         {
@@ -545,7 +561,8 @@ void aout_DecFlush(audio_output_t *aout)
              * sooner.
              */
             vlc_clock_SetDelay(owner->sync.clock, 0);
-            aout_FiltersSetClockDelay(owner->filters, 0);
+            if (owner->filters)
+                aout_FiltersSetClockDelay(owner->filters, 0);
             owner->sync.request_delay = owner->sync.delay;
             owner->sync.delay = 0;
         }
@@ -561,14 +578,18 @@ void aout_DecDrain(audio_output_t *aout)
     if (!owner->mixer_format.i_format)
         return;
 
-    block_t *block = aout_FiltersDrain (owner->filters);
-    if (block)
-        aout->play(aout, block, vlc_tick_now());
+    if (owner->filters)
+    {
+        block_t *block = aout_FiltersDrain (owner->filters);
+        if (block)
+            aout->play(aout, block, vlc_tick_now());
+    }
 
     aout_Drain(aout);
 
     vlc_clock_Reset(owner->sync.clock);
-    aout_FiltersResetClock(owner->filters);
+    if (owner->filters)
+        aout_FiltersResetClock(owner->filters);
 
     owner->sync.discontinuity = true;
     owner->original_pts = VLC_TICK_INVALID;

@@ -46,6 +46,7 @@ typedef struct
     module_t *module; /**< Output plugin (or NULL if inactive) */
     aout_filters_t *filters;
     aout_volume_t *volume;
+    bool bitexact;
 
     struct
     {

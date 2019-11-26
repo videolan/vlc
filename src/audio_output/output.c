@@ -338,6 +338,8 @@ audio_output_t *aout_New (vlc_object_t *parent)
     var_Create (aout, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_Create (aout, "equalizer-preset", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
+    owner->bitexact = var_InheritBool (aout, "audio-bitexact");
+
     return aout;
 }
 

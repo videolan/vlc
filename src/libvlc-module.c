@@ -124,6 +124,12 @@ static const char *const ppsz_snap_formats[] =
 #define ROLE_TEXT N_("Media role")
 #define ROLE_LONGTEXT N_("Media (player) role for operating system policy.")
 
+#define AUDIO_BITEXACT_TEXT N_("Enable bit-exact mode (pure mode)")
+#define AUDIO_BITEXACT_LONGTEXT N_( \
+    "This will disable all audio filters, even audio converters. " \
+    "This may result on audio not working if the output can't adapt to the " \
+    "input format.")
+
 #define AUDIO_TEXT N_("Enable audio")
 #define AUDIO_LONGTEXT N_( \
     "You can completely disable the audio output. The audio " \
@@ -1619,6 +1625,8 @@ vlc_module_begin ()
         change_string_list( ppsz_roles, ppsz_roles_text )
 
     set_subcategory( SUBCAT_AUDIO_AFILTER )
+        add_bool( "audio-bitexact", false, AUDIO_BITEXACT_TEXT,
+                   AUDIO_BITEXACT_LONGTEXT, false )
     add_module_list("audio-filter", "audio filter", NULL,
                     AUDIO_FILTER_TEXT, AUDIO_FILTER_LONGTEXT)
     set_subcategory( SUBCAT_AUDIO_VISUAL )
