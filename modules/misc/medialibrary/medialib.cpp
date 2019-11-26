@@ -564,6 +564,7 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_MEDIA_SET_THUMBNAIL:
         case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
         case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:
+        case VLC_ML_MEDIA_SET_TYPE:
             return controlMedia( query, args );
         default:
             return VLC_EGENERIC;
@@ -1211,6 +1212,13 @@ int MediaLibrary::controlMedia( int query, va_list args )
                     vlc_assert_unreachable();
             }
             if ( m->addExternalMrl( mrl, mlType ) == nullptr )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_MEDIA_SET_TYPE:
+        {
+            auto type = va_arg( args, int );
+            if ( m->setType( static_cast<medialibrary::IMedia::Type>( type ) ) == false )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
