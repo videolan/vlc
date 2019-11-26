@@ -321,14 +321,19 @@ static int AllocatePluginFile (module_bank_t *bank, const char *abspath,
 
     if (plugin == NULL)
     {
+        char *path = strdup(relpath);
+        if (path == NULL)
+            return -1;
+
         plugin = module_InitDynamic(bank->obj, abspath, true);
 
         if (plugin != NULL)
         {
-            plugin->path = xstrdup(relpath);
+            plugin->path = path;
             plugin->mtime = st->st_mtime;
             plugin->size = st->st_size;
         }
+        else free(path);
     }
 
     if (plugin == NULL)
