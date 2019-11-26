@@ -378,5 +378,5 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
 
 bool NetworkMediaModel::canBeIndexed(const QUrl& url , ItemType itemType )
 {
-    return static_cast<input_item_type_e>(itemType) != ITEM_TYPE_FILE && (url.scheme() == "smb" || url.scheme() == "ftp");
+    return static_cast<input_item_type_e>(itemType) != ITEM_TYPE_FILE && (url.scheme() == "smb" || url.scheme() == "ftp" || url.scheme() == "file");
 }
