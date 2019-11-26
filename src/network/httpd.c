@@ -1056,13 +1056,26 @@ httpd_url_t *httpd_UrlNew(httpd_host_t *host, const char *psz_url,
         vlc_mutex_unlock(&host->lock);
         return NULL;
     }
+    url->psz_url = NULL;
+    url->psz_user = NULL;
+    url->psz_password = NULL;
 
     url->host = host;
 
     vlc_mutex_init(&url->lock);
-    url->psz_url = xstrdup(psz_url);
-    url->psz_user = xstrdup(psz_user ? psz_user : "");
-    url->psz_password = xstrdup(psz_password ? psz_password : "");
+
+    url->psz_url = strdup(psz_url);
+    if (url->psz_url == NULL)
+        goto error;
+
+    url->psz_user = strdup(psz_user ? psz_user : "");
+    if (url->psz_user == NULL)
+        goto error;
+
+    url->psz_password = strdup(psz_password ? psz_password : "");
+    if (url->psz_password == NULL)
+        goto error;
+
     for (int i = 0; i < HTTPD_MSG_MAX; i++) {
         url->catch[i].cb = NULL;
         url->catch[i].p_sys = NULL;
@@ -1073,6 +1086,14 @@ httpd_url_t *httpd_UrlNew(httpd_host_t *host, const char *psz_url,
     vlc_mutex_unlock(&host->lock);
 
     return url;
+
+error:
+    free(url->psz_password);
+    free(url->psz_user);
+    free(url->psz_url);
+
+    free(url);
+    return NULL;
 }
 
 /* register callback on a url */
