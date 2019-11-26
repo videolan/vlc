@@ -37,7 +37,7 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input,
     if (!ml)
         return;
     vlc_ml_media_t* media = vlc_ml_get_media_by_mrl( ml, item->psz_uri);
-    if (!media)
+    if (!media || media->i_type != VLC_ML_MEDIA_TYPE_VIDEO)
         return;
     if (vlc_ml_media_get_all_playback_pref(ml, media->i_id, &input->ml.states) != VLC_SUCCESS)
         return;
