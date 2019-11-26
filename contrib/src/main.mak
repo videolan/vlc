@@ -543,6 +543,9 @@ endif
 ifdef HAVE_DARWIN_OS
 CMAKE_SYSTEM_NAME = Darwin
 endif
+ifdef HAVE_ANDROID
+CMAKE_SYSTEM_NAME = Android
+endif
 
 ifdef HAVE_ANDROID
 CFLAGS += -DANDROID_NATIVE_API_LEVEL=$(ANDROID_API)
@@ -556,7 +559,30 @@ ifndef WITH_OPTIMIZATION
 else
 	echo "set(CMAKE_BUILD_TYPE Release)" >> $@
 endif
+
+ifdef HAVE_ANDROID
+# Android has special rules for detecting the architecture
+# and CMAKE_SYSTEM_PROCESSOR should match them.
+	echo "set(CMAKE_SYSTEM_VERSION ${ANDROID_API})" >> $@
+	echo "set(CMAKE_ANDROID_ARCH_ABI ${ANDROID_ABI})" >> $@
+
+# From CMake manual:
+# When Cross Compiling for Android and CMAKE_ANDROID_ARCH_ABI is set to
+# armeabi-v7a set CMAKE_ANDROID_ARM_NEON to ON to target ARM NEON devices.
+ifeq ($(ANDROID_ABI),armeabi-v7a)
+ifdef HAVE_NEON
+	echo "set(CMAKE_ANDROID_ARM_NEON ON)" >> $@
+else
+	echo "set(CMAKE_ANDROID_ARM_NEON OFF)" >> $@
+endif
+endif
+
+# Else use the default expected behaviour for other platforms
+else
 	echo "set(CMAKE_SYSTEM_PROCESSOR $(ARCH))" >> $@
+endif
+
+
 	if test -n "$(CMAKE_SYSTEM_NAME)"; then \
 		echo "set(CMAKE_SYSTEM_NAME $(CMAKE_SYSTEM_NAME))" >> $@; \
 	fi;
