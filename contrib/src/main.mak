@@ -544,6 +544,10 @@ ifdef HAVE_DARWIN_OS
 CMAKE_SYSTEM_NAME = Darwin
 endif
 
+ifdef HAVE_ANDROID
+CFLAGS += -DANDROID_NATIVE_API_LEVEL=$(ANDROID_API)
+endif
+
 # CMake toolchain
 toolchain.cmake:
 	$(RM) $@
