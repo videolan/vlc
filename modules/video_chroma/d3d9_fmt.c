@@ -136,29 +136,6 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, int AdapterToUse
     return hr;
 }
 
-HRESULT D3D9_CreateDeviceExternal(IDirect3DDevice9 *dev, d3d9_handle_t *hd3d,
-                                  d3d9_device_t *out)
-{
-    D3DDEVICE_CREATION_PARAMETERS params;
-    HRESULT hr = IDirect3DDevice9_GetCreationParameters(dev, &params);
-    if (FAILED(hr))
-       return hr;
-    out->dev   = dev;
-    out->owner = false;
-    out->adapterId = params.AdapterOrdinal;
-    ZeroMemory(&out->caps, sizeof(out->caps));
-    hr = IDirect3D9_GetDeviceCaps(hd3d->obj, out->adapterId, params.DeviceType, &out->caps);
-    if (FAILED(hr))
-       return hr;
-    D3DDISPLAYMODE d3ddm;
-    hr = IDirect3D9_GetAdapterDisplayMode(hd3d->obj, out->adapterId, &d3ddm);
-    if (FAILED(hr))
-        return hr;
-    IDirect3DDevice9_AddRef(out->dev);
-    out->BufferFormat = d3ddm.Format;
-    return S_OK;
-}
-
 void D3D9_ReleaseDevice(d3d9_device_t *d3d_dev)
 {
     if (d3d_dev->dev)
@@ -262,16 +239,6 @@ int D3D9_Create(vlc_object_t *o, d3d9_handle_t *hd3d)
 error:
     D3D9_Destroy( hd3d );
     return VLC_EGENERIC;
-}
-
-int D3D9_CreateExternal(d3d9_handle_t *hd3d, IDirect3DDevice9 *d3d9dev)
-{
-    HRESULT hr = IDirect3DDevice9_GetDirect3D(d3d9dev, &hd3d->obj);
-    if (unlikely(FAILED(hr)))
-        return VLC_EGENERIC;
-    hd3d->hdll = NULL;
-    hd3d->use_ex = false; /* we don't care */
-    return VLC_SUCCESS;
 }
 
 void D3D9_CloneExternal(d3d9_handle_t *hd3d, IDirect3D9 *dev)
