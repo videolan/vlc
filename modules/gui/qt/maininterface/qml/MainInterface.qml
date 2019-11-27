@@ -33,6 +33,8 @@ import QtQuick.Window 2.11
 Rectangle {
     id: root
     color: "transparent"
+    property bool _interfaceReady: false
+    property bool _playlistReady: false
 
     Loader {
         id: playlistWindowLoader
@@ -53,6 +55,12 @@ Rectangle {
     PlaylistControllerModel {
         id: mainPlaylistController
         playlistPtr: mainctx.playlist
+
+        onPlaylistInitialized: {
+            root._playlistReady = true
+            if (root._interfaceReady)
+                setInitialView()
+        }
     }
 
     Component {
@@ -94,12 +102,24 @@ Rectangle {
         onCurrentChanged: loadCurrentHistoryView()
     }
 
-    Component.onCompleted: {
+    function setInitialView() {
         //set the initial view
-        if (medialib)
-            history.push(["mc", "video"], History.Go)
+        if (!mainPlaylistController.empty)
+            history.push(["player"], History.Go)
         else
-            history.push(["playlist"], History.Go)
+        {
+            if (medialib)
+                history.push(["mc", "video"], History.Go)
+            else
+                history.push(["playlist"], History.Go)
+        }
+    }
+
+
+    Component.onCompleted: {
+        root._interfaceReady = true;
+        if (root._playlistReady)
+            setInitialView()
     }
 
 
@@ -128,7 +148,15 @@ Rectangle {
                 onPlayingStateChanged: {
                     if (player.playingState === PlayerController.PLAYING_STATE_STOPPED
                             && history.current.view === "player") {
-                        history.previous(History.Go)
+                        if (history.previousEmpty)
+                        {
+                            if (medialib)
+                                history.push(["mc", "video"], History.Go)
+                            else
+                                history.push(["playlist"], History.Go)
+                        }
+                        else
+                            history.previous(History.Go)
                     }
                 }
             }
