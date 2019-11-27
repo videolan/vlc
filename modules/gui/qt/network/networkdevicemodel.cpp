@@ -239,7 +239,7 @@ void NetworkDeviceModel::onItemRemoved( MediaSourcePtr,
             }
             auto mrlIt = std::find_if( begin( (*it).mrls ), end( (*it).mrls),
                                        [itemUri]( const QUrl& mrl ) {
-                return mrl == itemUri;
+                return mrl.matches(itemUri, QUrl::StripTrailingSlash);
             });
             input_item_Release( p_item );
             if ( mrlIt == end( (*it).mrls ) )
@@ -270,7 +270,7 @@ void NetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_it
     for ( auto i = 0u; i < count; ++i )
     {
         Item item;
-        item.mainMrl = QUrl::fromEncoded( QByteArray{ children[i]->p_item->psz_uri }.append( '/' ) );
+        item.mainMrl = QUrl::fromEncoded( children[i]->p_item->psz_uri );
         item.name = qfu(children[i]->p_item->psz_name);
         item.mrls.push_back( item.mainMrl );
         item.type = static_cast<ItemType>( children[i]->p_item->i_type );
