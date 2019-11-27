@@ -57,6 +57,8 @@ public:
     Q_INVOKABLE void addAndPlay(const QUrl& mrl);
     Q_INVOKABLE void addAndPlay(const QVariantList&itemIdList);
 
+    Q_INVOKABLE void reload();
+
     inline bool idle() const { return m_idle; }
     inline int discoveryPending() const { return m_discoveryPending; }
     inline QString discoveryEntryPoint() const { return m_discoveryEntryPoint; }

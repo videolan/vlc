@@ -211,6 +211,11 @@ void MediaLib::addAndPlay(const QVariantList& itemIdList)
     }
 }
 
+void MediaLib::reload()
+{
+    vlc_ml_reload_folder( vlcMl(), nullptr );
+}
+
 vlc_medialibrary_t* MediaLib::vlcMl()
 {
     return vlc_ml_instance_get( m_intf );
