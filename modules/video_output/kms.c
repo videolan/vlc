@@ -619,26 +619,24 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
     VLC_UNUSED(count);
     vout_display_sys_t *sys = vd->sys;
-    picture_sys_t *psys;
-    picture_resource_t rsc;
-    int i;
 
     if (!sys->pool && !sys->picture) {
-        memset(&rsc, 0, sizeof(rsc));
+        picture_sys_t *psys = malloc(sizeof(*psys));
+        if (psys == NULL)
+            return NULL;
 
-        for (i = 0; i < PICTURE_PLANE_MAX; i++) {
+        picture_resource_t rsc = {
+            .p_sys = psys,
+            .pf_destroy = CustomDestroyPicture,
+        };
+
+        for (size_t i = 0; i < PICTURE_PLANE_MAX; i++) {
             rsc.p[i].p_pixels = sys->map[0]+sys->offsets[i];
             rsc.p[i].i_lines  = sys->height;
             rsc.p[i].i_pitch  = sys->stride;
         }
 
-        psys = calloc(1, sizeof(*psys));
-        if (psys == NULL)
-            return NULL;
-
         psys->p_voutsys = sys;
-        rsc.p_sys = psys;
-        rsc.pf_destroy = CustomDestroyPicture;
 
         sys->picture = picture_NewFromResource(&vd->fmt, &rsc);
 
