@@ -89,6 +89,11 @@ VLC_USE_PREBUILT_CONTRIBS=0
 # User-provided URL from where to fetch contribs, empty
 # for the default chosen by contrib system
 VLC_PREBUILT_CONTRIBS_URL=${VLC_PREBUILT_CONTRIBS_URL:-""}
+# The number of cores to compile on
+CORE_COUNT=$(sysctl -n machdep.cpu.core_count)
+let VLC_USE_NUMBER_OF_CORES=$CORE_COUNT+1
+# whether to disable debug mode (the default) or not
+VLC_DISABLE_DEBUG=0
 
 ##########################################################
 #                    Helper functions                    #
@@ -98,10 +103,12 @@ VLC_PREBUILT_CONTRIBS_URL=${VLC_PREBUILT_CONTRIBS_URL:-""}
 usage()
 {
     echo "Usage: $VLC_SCRIPT_NAME [options]"
-    echo " --arch=ARCH    Architecture to build for"
-    echo "                  (i386|x86_64|armv7|armv7s|arm64)"
-    echo " --sdk=SDK      Name of the SDK to build with (see 'xcodebuild -showsdks')"
-    echo " --help         Print this help"
+    echo " --arch=ARCH     Architecture to build for"
+    echo "                   (i386|x86_64|armv7|armv7s|arm64)"
+    echo " --sdk=SDK       Name of the SDK to build with (see 'xcodebuild -showsdks')"
+    echo " --disable-debug Disable libvlc debug mode (for release)"
+    echo " --verbose       Print verbose output and disable multi-core use"
+    echo " --help          Print this help"
     echo ""
     echo "Advanced options:"
     echo " --package-contribs        Create a prebuilt contrib package"
@@ -362,6 +369,10 @@ do
             ;;
         --verbose)
             VLC_SCRIPT_VERBOSE=1
+            VLC_USE_NUMBER_OF_CORES=1
+            ;;
+        --disable-debug)
+            VLC_DISABLE_DEBUG=1
             ;;
         --arch=*)
             VLC_HOST_ARCH="${1#--arch=}"
@@ -420,12 +431,13 @@ readonly VLC_PSEUDO_TRIPLET="${VLC_HOST_ARCH}-apple-${VLC_HOST_PLATFORM}_${VLC_D
 # Contrib install dir
 readonly VLC_CONTRIB_INSTALL_DIR="$VLC_BUILD_DIR/contrib/$VLC_PSEUDO_TRIPLET"
 # VLC install dir
-readonly VLC_INSTALL_DIR="$VLC_BUILD_DIR/vlc-$VLC_PSEUDO_TRIPLET"
+readonly VLC_INSTALL_DIR="$VLC_BUILD_DIR/vlc-${VLC_APPLE_SDK_NAME}-${VLC_HOST_ARCH}"
 
 echo "Build configuration"
-echo "  Platform:     $VLC_HOST_PLATFORM"
-echo "  Architecture: $VLC_HOST_ARCH"
-echo "  SDK Version:  $VLC_APPLE_SDK_VERSION"
+echo "  Platform:         $VLC_HOST_PLATFORM"
+echo "  Architecture:     $VLC_HOST_ARCH"
+echo "  SDK Version:      $VLC_APPLE_SDK_VERSION"
+echo "  Number of Cores:  $VLC_USE_NUMBER_OF_CORES"
 echo ""
 
 ##########################################################
@@ -475,7 +487,7 @@ echo "Building needed tools (if missing)"
 
 cd "$VLC_SRC_DIR/extras/tools" || abort_err "Failed cd to tools dir"
 ./bootstrap || abort_err "Bootstrapping tools failed"
-$MAKE || abort_err "Building tools failed"
+$MAKE -j$VLC_USE_NUMBER_OF_CORES || abort_err "Building tools failed"
 
 echo ""
 
@@ -533,8 +545,11 @@ else
     # Print list of contribs that will be built
     $MAKE list
 
+    # Download source packages
+    $MAKE fetch -j$VLC_USE_NUMBER_OF_CORES
+
     # Build contribs
-    $MAKE || abort_err "Building contribs failed"
+    $MAKE -j$VLC_USE_NUMBER_OF_CORES || abort_err "Building contribs failed"
 
     # Make prebuilt contribs package
     if [ "$VLC_MAKE_PREBUILT_CONTRIBS" -gt "0" ]; then
@@ -564,6 +579,10 @@ elif [ "$VLC_HOST_OS" = "tvos" ]; then
     VLC_CONFIG_OPTIONS+=( "${VLC_CONFIG_OPTIONS_TVOS[@]}" )
 fi
 
+if [ "$VLC_DISABLE_DEBUG" -gt "0" ]; then
+    VLC_CONFIG_OPTIONS+=( "--disable-debug" )
+fi
+
 # Bootstrap VLC
 cd "$VLC_SRC_DIR" || abort_err "Failed cd to VLC source dir"
 ./bootstrap
@@ -582,7 +601,7 @@ mkdir -p "$VLC_INSTALL_DIR"
     "${VLC_CONFIG_OPTIONS[@]}" \
  || abort_err "Configuring VLC failed"
 
-$MAKE || abort_err "Building VLC failed"
+$MAKE -j$VLC_USE_NUMBER_OF_CORES || abort_err "Building VLC failed"
 
 $MAKE install || abort_err "Installing VLC failed"
 
