@@ -39,10 +39,10 @@ typedef struct vdp_instance
     VdpDevice device;
 
     int num; /**< X11 screen number */
-    char *name; /**< X11 display name */
 
     uintptr_t refs; /**< Reference count */
     struct vdp_instance *next;
+    char name[]; /**< X11 display name */
 } vdp_instance_t;
 
 static VdpStatus vdp_instance_create(const char *name, int num,
@@ -62,7 +62,6 @@ static VdpStatus vdp_instance_create(const char *name, int num,
     }
 
     vi->next = NULL;
-    vi->name = (void *)(vi + 1);
     memcpy(vi->name, name, namelen);
     if (num >= 0)
         vi->num = num;
