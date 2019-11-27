@@ -585,7 +585,10 @@ fi
 
 # Bootstrap VLC
 cd "$VLC_SRC_DIR" || abort_err "Failed cd to VLC source dir"
-./bootstrap
+if ! [ -e configure ]; then
+    echo "Bootstraping vlc"
+    ./bootstrap
+fi
 
 # Build
 mkdir -p "${VLC_BUILD_DIR}/build/${VLC_PSEUDO_TRIPLET}"
