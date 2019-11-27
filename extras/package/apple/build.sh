@@ -407,11 +407,14 @@ check_tool xcrun
 # Validate given SDK name
 validate_sdk_name "$VLC_APPLE_SDK_NAME"
 
+# Set triplet (query the compiler for this)
+# FIXME: we hard-code the version number here so HOST and BUILD will not be same
+# which fixes cross-compilation for x86_64
+# note that for 'aarch64', we need to specify it like this here and sanity to 'arm64' afterwards
+readonly VLC_HOST_TRIPLET="${VLC_HOST_ARCH}-apple-darwin18"
+
 # Validate architecture argument
 validate_architecture "$VLC_HOST_ARCH"
-
-# Set triplet (query the compiler for this)
-readonly VLC_HOST_TRIPLET="$(${CC:-cc} -arch "$VLC_HOST_ARCH" -dumpmachine)"
 # Set pseudo-triplet
 readonly VLC_PSEUDO_TRIPLET="${VLC_HOST_ARCH}-apple-${VLC_HOST_PLATFORM}_${VLC_DEPLOYMENT_TARGET}"
 # Contrib install dir
