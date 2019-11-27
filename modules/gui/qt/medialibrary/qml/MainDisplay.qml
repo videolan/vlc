@@ -38,7 +38,10 @@ Widgets.NavigableFocusScope {
 
     onViewChanged: loadView()
     onViewPropertiesChanged: loadView()
-    Component.onCompleted: loadView()
+    Component.onCompleted: {
+        loadView()
+        medialib.reload()
+    }
 
     function loadView() {
         var found = stackView.loadView(root.pageModel, root.view, root.viewProperties)
