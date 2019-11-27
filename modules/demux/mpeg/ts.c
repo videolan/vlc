@@ -502,6 +502,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_canseek = false;
     p_sys->b_canfastseek = false;
+    p_sys->b_lowdelay = var_InheritBool( p_demux, "low-delay" );
     p_sys->b_ignore_time_for_positions = var_InheritBool( p_demux, "ts-seek-percent" );
     p_sys->b_cc_check = var_InheritBool( p_demux, "ts-cc-check" );
 
@@ -1460,7 +1461,8 @@ static block_t * ConvertPESBlock( demux_t *p_demux, ts_es_t *p_es,
  ****************************************************************************/
 static void SendDataChain( demux_t *p_demux, ts_es_t *p_es, block_t *p_chain )
 {
-    bool b_lowdelay = var_InheritBool(p_demux, "low-delay");
+    demux_sys_t *p_sys = p_demux->p_sys;
+
     while( p_chain )
     {
         block_t *p_block = p_chain;
@@ -1470,7 +1472,7 @@ static void SendDataChain( demux_t *p_demux, ts_es_t *p_es, block_t *p_chain )
         /* clean up any private flag */
         p_block->i_flags &= ~BLOCK_FLAG_PRIVATE_MASK;
 
-        if( b_lowdelay )
+        if( p_sys->b_lowdelay )
             p_block->i_flags |= BLOCK_FLAG_AU_END;
 
         ts_es_t *p_es_send = p_es;
