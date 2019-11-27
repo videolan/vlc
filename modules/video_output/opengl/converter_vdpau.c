@@ -40,10 +40,10 @@
 #define INTEROP_CALL(fct, ...) \
     _##fct(__VA_ARGS__); \
     { \
-        GLenum ret = tc->vt->GetError(); \
+        GLenum ret = interop->vt->GetError(); \
         if (ret != GL_NO_ERROR) \
         { \
-            msg_Err(tc->gl, #fct " failed: 0x%x", ret); \
+            msg_Err(interop->gl, #fct " failed: 0x%x", ret); \
             return VLC_EGENERIC; \
         } \
     }
@@ -63,7 +63,7 @@ typedef struct {
 } converter_sys_t;
 
 static int
-tc_vdpau_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
+tc_vdpau_gl_update(const struct vlc_gl_interop *interop, GLuint textures[],
                    GLsizei const tex_widths[], GLsizei const tex_heights[],
                    picture_t *pic, size_t const plane_offsets[])
 {
@@ -94,7 +94,7 @@ tc_vdpau_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
     gl_nv_surface =
         INTEROP_CALL(glVDPAURegisterOutputSurfaceNV,
                      (void *)(size_t)p_sys->surface,
-                     GL_TEXTURE_2D, tc->tex_count, textures);
+                     GL_TEXTURE_2D, interop->tex_count, textures);
     INTEROP_CALL(glVDPAUSurfaceAccessNV, gl_nv_surface, GL_READ_ONLY);
     INTEROP_CALL(glVDPAUMapSurfacesNV, 1, &gl_nv_surface);
 
@@ -107,7 +107,7 @@ Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
     _glVDPAUFiniNV(); assert(tc->vt->GetError() == GL_NO_ERROR);
-    converter_sys_t *sys = tc->priv;
+    converter_sys_t *sys = tc->interop.priv;
     vlc_decoder_device *dec_device = sys->dec_device;
     vlc_decoder_device_Release(dec_device);
 }
@@ -116,14 +116,16 @@ static int
 Open(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
-    if (tc->vctx == NULL)
+    struct vlc_gl_interop *interop = &tc->interop;
+
+    if (interop->vctx == NULL)
         return VLC_EGENERIC;
-    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
+    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(interop->vctx);
     if (GetVDPAUOpaqueDevice(dec_device) == NULL
-     || (tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
-      && tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
-      && tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
-     || !vlc_gl_StrHasToken(tc->glexts, "GL_NV_vdpau_interop")
+     || (interop->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
+      && interop->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
+      && interop->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
+     || !vlc_gl_StrHasToken(interop->glexts, "GL_NV_vdpau_interop")
      || tc->gl->surface->type != VOUT_WINDOW_TYPE_XID)
     {
         vlc_decoder_device_Release(dec_device);
@@ -138,7 +140,7 @@ Open(vlc_object_t *obj)
     }
     sys->dec_device = dec_device;
 
-    tc->fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
+    interop->fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
 
     VdpDevice device;
     vdpau_decoder_device_t *vdpau_dev = GetVDPAUOpaqueDevice(dec_device);
@@ -183,8 +185,11 @@ Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    tc->pf_update = tc_vdpau_gl_update;
-    tc->priv = sys;
+    static const struct vlc_gl_interop_ops ops = {
+        .update_textures = tc_vdpau_gl_update,
+    };
+    interop->ops = &ops;
+    interop->priv = sys;
 
     return VLC_SUCCESS;
 }

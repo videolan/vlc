@@ -1687,12 +1687,12 @@ struct glpriv
 };
 
 static int
-GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
+GLConvUpdate(const struct vlc_gl_interop *interop, GLuint *textures,
              const GLsizei *tex_width, const GLsizei *tex_height,
              picture_t *pic, const size_t *plane_offset)
 {
     VLC_UNUSED(textures); VLC_UNUSED(tex_width); VLC_UNUSED(tex_height); VLC_UNUSED(plane_offset);
-    struct glpriv *priv = tc->priv;
+    struct glpriv *priv = interop->priv;
     HRESULT hr;
 
     picture_sys_d3d9_t *picsys = ActiveD3D9PictureSys(pic);
@@ -1701,11 +1701,11 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
 
     if (!priv->vt.DXUnlockObjectsNV(priv->gl_handle_d3d, 1, &priv->gl_render))
     {
-        msg_Warn(tc->gl, "DXUnlockObjectsNV failed");
+        msg_Warn(interop->gl, "DXUnlockObjectsNV failed");
         return VLC_EGENERIC;
     }
 
-    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(tc->vctx);
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(interop->vctx);
 
     const RECT rect = {
         .left = 0,
@@ -1717,13 +1717,13 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
                                         &rect, priv->dx_render, NULL, D3DTEXF_NONE);
     if (FAILED(hr))
     {
-        msg_Warn(tc->gl, "IDirect3DDevice9Ex_StretchRect failed. (0x%lX)", hr);
+        msg_Warn(interop->gl, "IDirect3DDevice9Ex_StretchRect failed. (0x%lX)", hr);
         return VLC_EGENERIC;
     }
 
     if (!priv->vt.DXLockObjectsNV(priv->gl_handle_d3d, 1, &priv->gl_render))
     {
-        msg_Warn(tc->gl, "DXLockObjectsNV failed");
+        msg_Warn(interop->gl, "DXLockObjectsNV failed");
         priv->vt.DXUnregisterObjectNV(priv->gl_handle_d3d, priv->gl_render);
         priv->gl_render = NULL;
         return VLC_EGENERIC;
@@ -1733,24 +1733,24 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
 }
 
 static int
-GLConvAllocateTextures(const opengl_tex_converter_t *tc, GLuint *textures,
+GLConvAllocateTextures(const struct vlc_gl_interop *interop, GLuint *textures,
                        const GLsizei *tex_width, const GLsizei *tex_height)
 {
     VLC_UNUSED(tex_width); VLC_UNUSED(tex_height);
-    struct glpriv *priv = tc->priv;
+    struct glpriv *priv = interop->priv;
 
     priv->gl_render =
         priv->vt.DXRegisterObjectNV(priv->gl_handle_d3d, priv->dx_render,
                                     textures[0], GL_TEXTURE_2D, WGL_ACCESS_WRITE_DISCARD_NV);
     if (!priv->gl_render)
     {
-        msg_Warn(tc->gl, "DXRegisterObjectNV failed: %lu", GetLastError());
+        msg_Warn(interop->gl, "DXRegisterObjectNV failed: %lu", GetLastError());
         return VLC_EGENERIC;
     }
 
     if (!priv->vt.DXLockObjectsNV(priv->gl_handle_d3d, 1, &priv->gl_render))
     {
-        msg_Warn(tc->gl, "DXLockObjectsNV failed");
+        msg_Warn(interop->gl, "DXLockObjectsNV failed");
         priv->vt.DXUnregisterObjectNV(priv->gl_handle_d3d, priv->gl_render);
         priv->gl_render = NULL;
         return VLC_EGENERIC;
@@ -1763,7 +1763,7 @@ static void
 GLConvClose(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
-    struct glpriv *priv = tc->priv;
+    struct glpriv *priv = tc->interop.priv;
 
     if (priv->gl_handle_d3d)
     {
@@ -1779,34 +1779,35 @@ GLConvClose(vlc_object_t *obj)
     if (priv->dx_render)
         IDirect3DSurface9_Release(priv->dx_render);
 
-    free(tc->priv);
+    free(priv);
 }
 
 static int
 GLConvOpen(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
+    struct vlc_gl_interop *interop = &tc->interop;
 
-    if (tc->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE
-     && tc->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)
+    if (interop->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE
+     && interop->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)
         return VLC_EGENERIC;
 
-    d3d9_video_context_t *vctx_sys = GetD3D9ContextPrivate( tc->vctx );
-    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(tc->vctx);
+    d3d9_video_context_t *vctx_sys = GetD3D9ContextPrivate( interop->vctx );
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(interop->vctx);
     if ( vctx_sys == NULL || d3d9_decoder == NULL )
         return VLC_EGENERIC;
 
-    if (tc->gl->ext != VLC_GL_EXT_WGL || !tc->gl->wgl.getExtensionsString)
+    if (interop->gl->ext != VLC_GL_EXT_WGL || !interop->gl->wgl.getExtensionsString)
         return VLC_EGENERIC;
 
-    const char *wglExt = tc->gl->wgl.getExtensionsString(tc->gl);
+    const char *wglExt = interop->gl->wgl.getExtensionsString(interop->gl);
 
     if (wglExt == NULL || !vlc_gl_StrHasToken(wglExt, "WGL_NV_DX_interop"))
         return VLC_EGENERIC;
 
     struct wgl_vt vt;
 #define LOAD_EXT(name, type) do { \
-    vt.name = (type) vlc_gl_GetProcAddress(tc->gl, "wgl" #name); \
+    vt.name = (type) vlc_gl_GetProcAddress(interop->gl, "wgl" #name); \
     if (!vt.name) { \
         msg_Warn(obj, "'wgl " #name "' could not be loaded"); \
         return VLC_EGENERIC; \
@@ -1824,7 +1825,7 @@ GLConvOpen(vlc_object_t *obj)
     struct glpriv *priv = calloc(1, sizeof(struct glpriv));
     if (!priv)
         return VLC_ENOMEM;
-    tc->priv = priv;
+    interop->priv = priv;
     priv->vt = vt;
 
     if (!d3d9_decoder->hd3d.use_ex)
@@ -1836,8 +1837,8 @@ GLConvOpen(vlc_object_t *obj)
     HRESULT hr;
     HANDLE shared_handle = NULL;
     hr = IDirect3DDevice9Ex_CreateRenderTarget(d3d9_decoder->d3ddev.devex,
-                                               tc->fmt.i_visible_width,
-                                               tc->fmt.i_visible_height,
+                                               interop->fmt.i_visible_width,
+                                               interop->fmt.i_visible_height,
                                                D3DFMT_X8R8G8B8,
                                                D3DMULTISAMPLE_NONE, 0, FALSE,
                                                &priv->dx_render, &shared_handle);
@@ -1857,8 +1858,11 @@ GLConvOpen(vlc_object_t *obj)
         goto error;
     }
 
-    tc->pf_update  = GLConvUpdate;
-    tc->pf_allocate_textures = GLConvAllocateTextures;
+    static const struct vlc_gl_interop_ops ops = {
+        .allocate_textures = GLConvAllocateTextures,
+        .update_textures = GLConvUpdate,
+    };
+    interop->ops = &ops;
 
     tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, VLC_CODEC_RGB32,
                                               COLOR_SPACE_UNDEF);

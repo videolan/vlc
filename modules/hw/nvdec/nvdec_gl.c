@@ -60,12 +60,12 @@ typedef struct {
     CUarray mappedArray[PICTURE_PLANE_MAX];
 } converter_sys_t;
 
-#define CALL_CUDA(func, ...) CudaCheckErr((vlc_object_t*)&tc->obj, devsys->cudaFunctions, devsys->cudaFunctions->func(__VA_ARGS__), #func)
+#define CALL_CUDA(func, ...) CudaCheckErr(VLC_OBJECT(interop->gl), devsys->cudaFunctions, devsys->cudaFunctions->func(__VA_ARGS__), #func)
 
-static int tc_nvdec_gl_allocate_texture(const opengl_tex_converter_t *tc, GLuint *textures,
+static int tc_nvdec_gl_allocate_texture(const struct vlc_gl_interop *interop, GLuint *textures,
                                 const GLsizei *tex_width, const GLsizei *tex_height)
 {
-    converter_sys_t *p_sys = tc->priv;
+    converter_sys_t *p_sys = interop->priv;
     vlc_decoder_device *device = p_sys->device;
     decoder_device_nvdec_t *devsys = GetNVDECOpaqueDevice(device);
 
@@ -74,25 +74,25 @@ static int tc_nvdec_gl_allocate_texture(const opengl_tex_converter_t *tc, GLuint
     if (result != VLC_SUCCESS)
         return result;
 
-    for (unsigned i = 0; i < tc->tex_count; i++)
+    for (unsigned i = 0; i < interop->tex_count; i++)
     {
-        tc->vt->BindTexture(tc->tex_target, textures[i]);
-        tc->vt->TexImage2D(tc->tex_target, 0, tc->texs[i].internal,
-                           tex_width[i], tex_height[i], 0, tc->texs[i].format,
-                           tc->texs[i].type, NULL);
-        if (tc->vt->GetError() != GL_NO_ERROR)
+        interop->vt->BindTexture(interop->tex_target, textures[i]);
+        interop->vt->TexImage2D(interop->tex_target, 0, interop->texs[i].internal,
+                           tex_width[i], tex_height[i], 0, interop->texs[i].format,
+                           interop->texs[i].type, NULL);
+        if (interop->vt->GetError() != GL_NO_ERROR)
         {
-            msg_Err(tc->gl, "could not alloc PBO buffers");
+            msg_Err(interop->gl, "could not alloc PBO buffers");
             return VLC_EGENERIC;
         }
 
-        result = CALL_CUDA(cuGraphicsGLRegisterImage, &p_sys->cu_res[i], textures[i], tc->tex_target, CU_GRAPHICS_REGISTER_FLAGS_WRITE_DISCARD);
+        result = CALL_CUDA(cuGraphicsGLRegisterImage, &p_sys->cu_res[i], textures[i], interop->tex_target, CU_GRAPHICS_REGISTER_FLAGS_WRITE_DISCARD);
 
         result = CALL_CUDA(cuGraphicsMapResources, 1, &p_sys->cu_res[i], 0);
         result = CALL_CUDA(cuGraphicsSubResourceGetMappedArray, &p_sys->mappedArray[i], p_sys->cu_res[i], 0, 0);
         result = CALL_CUDA(cuGraphicsUnmapResources, 1, &p_sys->cu_res[i], 0);
 
-        tc->vt->BindTexture(tc->tex_target, 0);
+        interop->vt->BindTexture(interop->tex_target, 0);
     }
 
     CALL_CUDA(cuCtxPopCurrent, NULL);
@@ -100,14 +100,14 @@ static int tc_nvdec_gl_allocate_texture(const opengl_tex_converter_t *tc, GLuint
 }
 
 static int
-tc_nvdec_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
+tc_nvdec_gl_update(const struct vlc_gl_interop *interop, GLuint textures[],
                    GLsizei const tex_widths[], GLsizei const tex_heights[],
                    picture_t *pic, size_t const plane_offsets[])
 {
     VLC_UNUSED(plane_offsets);
     VLC_UNUSED(textures);
 
-    converter_sys_t *p_sys = tc->priv;
+    converter_sys_t *p_sys = interop->priv;
     vlc_decoder_device *device = p_sys->device;
     decoder_device_nvdec_t *devsys = GetNVDECOpaqueDevice(device);
     pic_context_nvdec_t *srcpic = container_of(pic->context, pic_context_nvdec_t, ctx);
@@ -119,7 +119,7 @@ tc_nvdec_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
 
     // copy the planes from the pic context to mappedArray
     size_t srcY = 0;
-    for (unsigned i = 0; i < tc->tex_count; i++)
+    for (unsigned i = 0; i < interop->tex_count; i++)
     {
         CUDA_MEMCPY2D cu_cpy = {
             .srcMemoryType  = CU_MEMORYTYPE_DEVICE,
@@ -131,7 +131,7 @@ tc_nvdec_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
             .WidthInBytes = tex_widths[0],
             .Height = tex_heights[i],
         };
-        if (tc->fmt.i_chroma != VLC_CODEC_NVDEC_OPAQUE && tc->fmt.i_chroma != VLC_CODEC_NVDEC_OPAQUE_444)
+        if (interop->fmt.i_chroma != VLC_CODEC_NVDEC_OPAQUE && interop->fmt.i_chroma != VLC_CODEC_NVDEC_OPAQUE_444)
             cu_cpy.WidthInBytes *= 2;
         result = CALL_CUDA(cuMemcpy2DAsync, &cu_cpy, 0);
         if (result != VLC_SUCCESS)
@@ -147,17 +147,18 @@ error:
 static void Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
-    converter_sys_t *p_sys = tc->priv;
+    converter_sys_t *p_sys = tc->interop.priv;
     vlc_decoder_device_Release(p_sys->device);
 }
 
 static int Open(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
-    if (!is_nvdec_opaque(tc->fmt.i_chroma))
+    struct vlc_gl_interop *interop = &tc->interop;
+    if (!is_nvdec_opaque(interop->fmt.i_chroma))
         return VLC_EGENERIC;
 
-    vlc_decoder_device *device = vlc_video_context_HoldDevice(tc->vctx);
+    vlc_decoder_device *device = vlc_video_context_HoldDevice(interop->vctx);
     if (device == NULL || device->type != VLC_DECODER_DEVICE_NVDEC)
         return VLC_EGENERIC;
 
@@ -197,7 +198,7 @@ static int Open(vlc_object_t *obj)
     }
 
     vlc_fourcc_t render_chroma;
-    switch (tc->fmt.i_chroma)
+    switch (interop->fmt.i_chroma)
     {
         case VLC_CODEC_NVDEC_OPAQUE_10B: render_chroma = VLC_CODEC_P010; break;
         case VLC_CODEC_NVDEC_OPAQUE_16B: render_chroma = VLC_CODEC_P016; break;
@@ -207,16 +208,19 @@ static int Open(vlc_object_t *obj)
         default:                         render_chroma = VLC_CODEC_NV12; break;
     }
 
-    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, render_chroma, tc->fmt.space);
+    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, render_chroma, interop->fmt.space);
     if (!tc->fshader)
     {
         Close(obj);
         return VLC_EGENERIC;
     }
 
-    tc->pf_allocate_textures = tc_nvdec_gl_allocate_texture;
-    tc->pf_update = tc_nvdec_gl_update;
-    tc->priv = p_sys;
+    static const struct vlc_gl_interop_ops ops = {
+        .allocate_textures = tc_nvdec_gl_allocate_texture,
+        .update_textures = tc_nvdec_gl_update,
+    };
+    interop->ops = &ops;
+    interop->priv = p_sys;
 
     return VLC_SUCCESS;
 }

@@ -38,15 +38,15 @@ struct priv
 };
 
 static int
-tc_anop_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
+tc_anop_allocate_textures(const struct vlc_gl_interop *interop, GLuint *textures,
                           const GLsizei *tex_width, const GLsizei *tex_height)
 {
     (void) tex_width; (void) tex_height;
-    struct priv *priv = tc->priv;
+    struct priv *priv = interop->priv;
     assert(textures[0] != 0);
     if (SurfaceTexture_attachToGLContext(priv->awh, textures[0]) != 0)
     {
-        msg_Err(tc->gl, "SurfaceTexture_attachToGLContext failed");
+        msg_Err(interop->gl, "SurfaceTexture_attachToGLContext failed");
         return VLC_EGENERIC;
     }
     priv->stex_attached = true;
@@ -54,7 +54,7 @@ tc_anop_allocate_textures(const opengl_tex_converter_t *tc, GLuint *textures,
 }
 
 static int
-tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
+tc_anop_update(const struct vlc_gl_interop *interop, GLuint *textures,
                const GLsizei *tex_width, const GLsizei *tex_height,
                picture_t *pic, const size_t *plane_offset)
 {
@@ -65,7 +65,7 @@ tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
     if (plane_offset != NULL)
         return VLC_EGENERIC;
 
-    struct priv *priv = tc->priv;
+    struct priv *priv = interop->priv;
 
     if (!priv->avctx->render(pic->context))
         return VLC_SUCCESS; /* already rendered */
@@ -77,16 +77,16 @@ tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
         return VLC_EGENERIC;
     }
 
-    tc->vt->ActiveTexture(GL_TEXTURE0);
-    tc->vt->BindTexture(tc->tex_target, textures[0]);
+    interop->vt->ActiveTexture(GL_TEXTURE0);
+    interop->vt->BindTexture(interop->tex_target, textures[0]);
 
     return VLC_SUCCESS;
 }
 
 static const float *
-tc_get_transform_matrix(const opengl_tex_converter_t *tc)
+tc_get_transform_matrix(const struct vlc_gl_interop *interop)
 {
-    struct priv *priv = tc->priv;
+    struct priv *priv = interop->priv;
     return priv->transform_mtx;
 }
 
@@ -94,7 +94,7 @@ static void
 Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
-    struct priv *priv = tc->priv;
+    struct priv *priv = tc->interop.priv;
 
     if (priv->stex_attached)
         SurfaceTexture_detachFromGLContext(priv->awh);
@@ -106,60 +106,64 @@ static int
 Open(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
+    struct vlc_gl_interop *interop = &tc->interop;
 
-    if (tc->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
-     || !tc->gl->surface->handle.anativewindow
-     || !tc->vctx)
+    if (interop->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
+     || !interop->gl->surface->handle.anativewindow
+     || !interop->vctx)
         return VLC_EGENERIC;
 
     android_video_context_t *avctx =
-        vlc_video_context_GetPrivate(tc->vctx, VLC_VIDEO_CONTEXT_AWINDOW);
+        vlc_video_context_GetPrivate(interop->vctx, VLC_VIDEO_CONTEXT_AWINDOW);
 
     if (avctx->id != AWindow_SurfaceTexture)
         return VLC_EGENERIC;
 
-    tc->priv = malloc(sizeof(struct priv));
-    if (unlikely(tc->priv == NULL))
+    interop->priv = malloc(sizeof(struct priv));
+    if (unlikely(interop->priv == NULL))
         return VLC_ENOMEM;
 
-    struct priv *priv = tc->priv;
+    struct priv *priv = interop->priv;
     priv->avctx = avctx;
-    priv->awh = tc->gl->surface->handle.anativewindow;
+    priv->awh = interop->gl->surface->handle.anativewindow;
     priv->transform_mtx = NULL;
     priv->stex_attached = false;
 
-    tc->pf_allocate_textures = tc_anop_allocate_textures;
-    tc->pf_update         = tc_anop_update;
-    tc->pf_get_transform_matrix = tc_get_transform_matrix;
+    static const struct vlc_gl_interop_ops ops = {
+        .allocate_textures = tc_anop_allocate_textures,
+        .update_textures = tc_anop_update,
+        .get_transform_matrix = tc_get_transform_matrix,
+    };
+    interop->ops = &ops;
 
     /* The transform Matrix (uSTMatrix) given by the SurfaceTexture is not
      * using the same origin than us. Ask the caller to rotate textures
      * coordinates, via the vertex shader, by forcing an orientation. */
-    switch (tc->fmt.orientation)
+    switch (interop->fmt.orientation)
     {
         case ORIENT_TOP_LEFT:
-            tc->fmt.orientation = ORIENT_BOTTOM_LEFT;
+            interop->fmt.orientation = ORIENT_BOTTOM_LEFT;
             break;
         case ORIENT_TOP_RIGHT:
-            tc->fmt.orientation = ORIENT_BOTTOM_RIGHT;
+            interop->fmt.orientation = ORIENT_BOTTOM_RIGHT;
             break;
         case ORIENT_BOTTOM_LEFT:
-            tc->fmt.orientation = ORIENT_TOP_LEFT;
+            interop->fmt.orientation = ORIENT_TOP_LEFT;
             break;
         case ORIENT_BOTTOM_RIGHT:
-            tc->fmt.orientation = ORIENT_TOP_RIGHT;
+            interop->fmt.orientation = ORIENT_TOP_RIGHT;
             break;
         case ORIENT_LEFT_TOP:
-            tc->fmt.orientation = ORIENT_RIGHT_TOP;
+            interop->fmt.orientation = ORIENT_RIGHT_TOP;
             break;
         case ORIENT_LEFT_BOTTOM:
-            tc->fmt.orientation = ORIENT_RIGHT_BOTTOM;
+            interop->fmt.orientation = ORIENT_RIGHT_BOTTOM;
             break;
         case ORIENT_RIGHT_TOP:
-            tc->fmt.orientation = ORIENT_LEFT_TOP;
+            interop->fmt.orientation = ORIENT_LEFT_TOP;
             break;
         case ORIENT_RIGHT_BOTTOM:
-            tc->fmt.orientation = ORIENT_LEFT_BOTTOM;
+            interop->fmt.orientation = ORIENT_LEFT_BOTTOM;
             break;
     }
 
@@ -168,7 +172,7 @@ Open(vlc_object_t *obj)
                                               COLOR_SPACE_UNDEF);
     if (!tc->fshader)
     {
-        free(tc->priv);
+        free(priv);
         return VLC_EGENERIC;
     }
 

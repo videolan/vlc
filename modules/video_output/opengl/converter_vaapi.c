@@ -62,7 +62,7 @@ struct priv
 };
 
 static EGLImageKHR
-vaegl_image_create(const opengl_tex_converter_t *tc, EGLint w, EGLint h,
+vaegl_image_create(const struct vlc_gl_interop *interop, EGLint w, EGLint h,
                    EGLint fourcc, EGLint fd, EGLint offset, EGLint pitch)
 {
     EGLint attribs[] = {
@@ -75,23 +75,23 @@ vaegl_image_create(const opengl_tex_converter_t *tc, EGLint w, EGLint h,
         EGL_NONE
     };
 
-    return tc->gl->egl.createImageKHR(tc->gl, EGL_LINUX_DMA_BUF_EXT, NULL,
-                                      attribs);
+    return interop->gl->egl.createImageKHR(interop->gl, EGL_LINUX_DMA_BUF_EXT,
+                                           NULL, attribs);
 }
 
 static void
-vaegl_image_destroy(const opengl_tex_converter_t *tc, EGLImageKHR image)
+vaegl_image_destroy(const struct vlc_gl_interop *interop, EGLImageKHR image)
 {
-    tc->gl->egl.destroyImageKHR(tc->gl, image);
+    interop->gl->egl.destroyImageKHR(interop->gl, image);
 }
 
 static void
-vaegl_release_last_pic(const opengl_tex_converter_t *tc, struct priv *priv)
+vaegl_release_last_pic(const struct vlc_gl_interop *interop, struct priv *priv)
 {
-    vlc_object_t *o = VLC_OBJECT(tc->gl);
+    vlc_object_t *o = VLC_OBJECT(interop->gl);
 
     for (unsigned i = 0; i < priv->last.va_image.num_planes; ++i)
-        vaegl_image_destroy(tc, priv->last.egl_images[i]);
+        vaegl_image_destroy(interop, priv->last.egl_images[i]);
 
     vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, priv->last.va_image.buf);
 
@@ -149,13 +149,13 @@ vaegl_init_fourcc(const opengl_tex_converter_t *tc, struct priv *priv,
 }
 
 static int
-tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
+tc_vaegl_update(const struct vlc_gl_interop *interop, GLuint *textures,
                 const GLsizei *tex_width, const GLsizei *tex_height,
                 picture_t *pic, const size_t *plane_offset)
 {
     (void) plane_offset;
-    struct priv *priv = tc->priv;
-    vlc_object_t *o = VLC_OBJECT(tc->gl);
+    struct priv *priv = interop->priv;
+    vlc_object_t *o = VLC_OBJECT(interop->gl);
     VAImage va_image;
     VABufferInfo va_buffer_info;
     EGLImageKHR egl_images[3] = { };
@@ -189,21 +189,21 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
     for (unsigned i = 0; i < va_image.num_planes; ++i)
     {
         egl_images[i] =
-            vaegl_image_create(tc, tex_width[i], tex_height[i],
+            vaegl_image_create(interop, tex_width[i], tex_height[i],
                                priv->drm_fourccs[i], va_buffer_info.handle,
                                va_image.offsets[i], va_image.pitches[i]);
         if (egl_images[i] == NULL)
             goto error;
 
-        tc->vt->BindTexture(tc->tex_target, textures[i]);
+        interop->vt->BindTexture(interop->tex_target, textures[i]);
 
-        priv->glEGLImageTargetTexture2DOES(tc->tex_target, egl_images[i]);
+        priv->glEGLImageTargetTexture2DOES(interop->tex_target, egl_images[i]);
     }
 
     if (pic != priv->last.pic)
     {
         if (priv->last.pic != NULL)
-            vaegl_release_last_pic(tc, priv);
+            vaegl_release_last_pic(interop, priv);
         priv->last.pic = picture_Hold(pic);
         priv->last.va_image = va_image;
         priv->last.va_buffer_info = va_buffer_info;
@@ -220,7 +220,7 @@ error:
             vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, va_image.buf);
 
         for (unsigned i = 0; i < 3 && egl_images[i] != NULL; ++i)
-            vaegl_image_destroy(tc, egl_images[i]);
+            vaegl_image_destroy(interop, egl_images[i]);
 
         vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
     }
@@ -231,12 +231,12 @@ static void
 Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
-    struct priv *priv = tc->priv;
+    struct priv *priv = tc->interop.priv;
 
     if (priv->last.pic != NULL)
-        vaegl_release_last_pic(tc, priv);
+        vaegl_release_last_pic(&tc->interop, priv);
 
-    free(tc->priv);
+    free(priv);
 }
 
 static int strcasecmp_void(const void *a, const void *b)
@@ -274,14 +274,14 @@ tc_va_check_interop_blacklist(opengl_tex_converter_t *tc, VADisplay *vadpy)
 }
 
 static int
-tc_va_check_derive_image(opengl_tex_converter_t *tc)
+tc_va_check_derive_image(const struct vlc_gl_interop *interop)
 {
-    vlc_object_t *o = VLC_OBJECT(tc->gl);
-    struct priv *priv = tc->priv;
+    vlc_object_t *o = VLC_OBJECT(interop->gl);
+    struct priv *priv = interop->priv;
     VASurfaceID *va_surface_ids;
 
-    picture_pool_t *pool = vlc_vaapi_PoolNew(o, tc->vctx, priv->vadpy, 1,
-                                             &va_surface_ids, &tc->fmt);
+    picture_pool_t *pool = vlc_vaapi_PoolNew(o, interop->vctx, priv->vadpy, 1,
+                                             &va_surface_ids, &interop->fmt);
     if (!pool)
         return VLC_EGENERIC;
 
@@ -313,7 +313,7 @@ tc_va_check_derive_image(opengl_tex_converter_t *tc)
         EGLint w = (va_image.width * w_num) / image_desc->p[i].w.den;
         EGLint h = (va_image.height * image_desc->p[i].h.num) / image_desc->p[i].h.den;
         EGLImageKHR egl_image =
-            vaegl_image_create(tc, w, h, priv->drm_fourccs[i], va_buffer_info.handle,
+            vaegl_image_create(interop, w, h, priv->drm_fourccs[i], va_buffer_info.handle,
                                va_image.offsets[i], va_image.pitches[i]);
         if (egl_image == NULL)
         {
@@ -321,7 +321,7 @@ tc_va_check_derive_image(opengl_tex_converter_t *tc)
             ret = VLC_EGENERIC;
             goto done;
         }
-        vaegl_image_destroy(tc, egl_image);
+        vaegl_image_destroy(interop, egl_image);
     }
 
 done:
@@ -341,12 +341,13 @@ static int
 Open(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
+    struct vlc_gl_interop *interop = &tc->interop;
 
-    if (tc->vctx == NULL)
+    if (interop->vctx == NULL)
         return VLC_EGENERIC;
-    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(tc->vctx);
+    vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(interop->vctx);
     if (dec_device->type != VLC_DECODER_DEVICE_VAAPI
-     || !vlc_vaapi_IsChromaOpaque(tc->fmt.i_chroma)
+     || !vlc_vaapi_IsChromaOpaque(interop->fmt.i_chroma)
      || tc->gl->ext != VLC_GL_EXT_EGL
      || tc->gl->egl.createImageKHR == NULL
      || tc->gl->egl.destroyImageKHR == NULL)
@@ -355,7 +356,7 @@ Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    if (!vlc_gl_StrHasToken(tc->glexts, "GL_OES_EGL_image"))
+    if (!vlc_gl_StrHasToken(interop->glexts, "GL_OES_EGL_image"))
     {
         vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
@@ -368,14 +369,14 @@ Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));
-    if (unlikely(tc->priv == NULL))
+    struct priv *priv = interop->priv = calloc(1, sizeof(struct priv));
+    if (unlikely(priv == NULL))
         goto error;
     priv->fourcc = 0;
 
     int va_fourcc;
     int vlc_sw_chroma;
-    switch (tc->fmt.i_chroma)
+    switch (interop->fmt.i_chroma)
     {
         case VLC_CODEC_VAAPI_420:
             va_fourcc = VA_FOURCC_NV12;
@@ -403,15 +404,18 @@ Open(vlc_object_t *obj)
     if (tc_va_check_interop_blacklist(tc, priv->vadpy))
         goto error;
 
-    if (tc_va_check_derive_image(tc))
+    if (tc_va_check_derive_image(interop))
         goto error;
 
     tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, vlc_sw_chroma,
-                                              tc->fmt.space);
+                                              interop->fmt.space);
     if (tc->fshader == 0)
         goto error;
 
-    tc->pf_update  = tc_vaegl_update;
+    static const struct vlc_gl_interop_ops ops = {
+        .update_textures = tc_vaegl_update,
+    };
+    interop->ops = &ops;
 
     vlc_decoder_device_Release(dec_device);
 

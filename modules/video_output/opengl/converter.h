@@ -27,6 +27,7 @@
 #include <vlc_picture_pool.h>
 #include <vlc_plugin.h>
 #include "gl_common.h"
+#include "interop.h"
 
 struct pl_context;
 struct pl_shader;
@@ -47,9 +48,6 @@ struct opengl_tex_converter_t
     /* Pointer to object gl, set by the caller */
     vlc_gl_t *gl;
 
-    /* Pointer to decoder video context, set by the caller (can be NULL) */
-    vlc_video_context *vctx;
-
     /* libplacebo context, created by the caller (optional) */
     struct pl_context *pl_ctx;
 
@@ -64,44 +62,15 @@ struct opengl_tex_converter_t
     GLuint (*pf_fragment_shader_init)(opengl_tex_converter_t *, GLenum,
                                       vlc_fourcc_t, video_color_space_t);
 
-    /* Available gl extensions (from GL_EXTENSIONS) */
-    const char *glexts;
-
-    /* True if the current API is OpenGL ES, set by the caller */
-    bool is_gles;
     /* GLSL version, set by the caller. 100 for GLSL ES, 120 for desktop GLSL */
     unsigned glsl_version;
     /* Precision header, set by the caller. In OpenGLES, the fragment language
      * has no default precision qualifier for floating point types. */
     const char *glsl_precision_header;
 
-    /* Can only be changed from the module open function */
-    video_format_t fmt;
-
     /* Fragment shader, must be set from the module open function. It will be
      * deleted by the caller. */
     GLuint fshader;
-
-    /* Number of textures, cannot be 0 */
-    unsigned tex_count;
-
-    /* Texture mapping (usually: GL_TEXTURE_2D), cannot be 0 */
-    GLenum tex_target;
-
-    /* Set to true if textures are generated from pf_update() */
-    bool handle_texs_gen;
-
-    struct opengl_tex_cfg {
-        /* Texture scale factor, cannot be 0 */
-        vlc_rational_t w;
-        vlc_rational_t h;
-
-        /* The following is used and filled by the opengl_fragment_shader_init
-         * function. */
-        GLint  internal;
-        GLenum format;
-        GLenum type;
-    } texs[PICTURE_PLANE_MAX];
 
     /* The following is used and filled by the opengl_fragment_shader_init
      * function. */
@@ -118,44 +87,7 @@ struct opengl_tex_converter_t
     struct pl_shader *pl_sh;
     const struct pl_shader_res *pl_sh_res;
 
-    /* Private context */
-    void *priv;
-
-    /**
-     * Callback to allocate data for bound textures
-     *
-     * This function pointer can be NULL. Software converters should call
-     * glTexImage2D() to allocate textures data (it will be deallocated by the
-     * caller when calling glDeleteTextures()). Won't be called if
-     * handle_texs_gen is true.
-     *
-     * \param tc OpenGL tex converter
-     * \param textures array of textures to bind (one per plane)
-     * \param tex_width array of tex width (one per plane)
-     * \param tex_height array of tex height (one per plane)
-     * \return VLC_SUCCESS or a VLC error
-     */
-    int (*pf_allocate_textures)(const opengl_tex_converter_t *tc, GLuint *textures,
-                                const GLsizei *tex_width, const GLsizei *tex_height);
-
-    /**
-     * Callback to update a picture
-     *
-     * This function pointer cannot be NULL. The implementation should upload
-     * every planes of the picture.
-     *
-     * \param tc OpenGL tex converter
-     * \param textures array of textures to bind (one per plane)
-     * \param tex_width array of tex width (one per plane)
-     * \param tex_height array of tex height (one per plane)
-     * \param pic picture to update
-     * \param plane_offset offsets of each picture planes to read data from
-     * (one per plane, can be NULL)
-     * \return VLC_SUCCESS or a VLC error
-     */
-    int (*pf_update)(const opengl_tex_converter_t *tc, GLuint *textures,
-                     const GLsizei *tex_width, const GLsizei *tex_height,
-                     picture_t *pic, const size_t *plane_offset);
+    struct vlc_gl_interop interop;
 
     /**
      * Callback to fetch locations of uniform or attributes variables
@@ -183,26 +115,6 @@ struct opengl_tex_converter_t
     void (*pf_prepare_shader)(const opengl_tex_converter_t *tc,
                               const GLsizei *tex_width, const GLsizei *tex_height,
                               float alpha);
-
-    /**
-     * Callback to retrieve the transform matrix to apply to texture coordinates
-     *
-     * This function pointer can be NULL. If it is set, it may return NULL.
-     *
-     * Otherwise, it must return a 4x4 matrix, as an array of 16 floats in
-     * column-major order.
-     *
-     * This transform matrix maps 2D homogeneous texture coordinates of the
-     * form (s, t, 0, 1) with s and t in the inclusive range [0, 1] to the
-     * texture coordinate that should be used to sample that location from the
-     * texture.
-     *
-     * The returned pointer is owned by the converter module, and must not be
-     * freed before the module is closed.
-     *
-     * \param tc OpenGL tex converter
-     */
-    const float *(*pf_get_transform_matrix)(const opengl_tex_converter_t *tc);
 };
 
 /**

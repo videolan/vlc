@@ -33,6 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_memstream.h>
+#include "interop.h"
 #include "internal.h"
 #include "vout_helper.h"
 
@@ -102,10 +103,12 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
                  video_color_space_t yuv_space,
                  bool *swap_uv, const char *swizzle_per_tex[])
 {
+    struct vlc_gl_interop *interop = &tc->interop;
+
     GLint oneplane_texfmt, oneplane16_texfmt,
           twoplanes_texfmt, twoplanes16_texfmt;
 
-    if (vlc_gl_StrHasToken(tc->glexts, "GL_ARB_texture_rg"))
+    if (vlc_gl_StrHasToken(interop->glexts, "GL_ARB_texture_rg"))
     {
         oneplane_texfmt = GL_RED;
         oneplane16_texfmt = GL_R16;
@@ -153,10 +156,10 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
 
         assert(internal != 0 && type != 0);
 
-        tc->tex_count = 3;
-        for (unsigned i = 0; i < tc->tex_count; ++i )
+        interop->tex_count = 3;
+        for (unsigned i = 0; i < interop->tex_count; ++i )
         {
-            tc->texs[i] = (struct opengl_tex_cfg) {
+            interop->texs[i] = (struct vlc_gl_tex_cfg) {
                 { desc->p[i].w.num, desc->p[i].w.den },
                 { desc->p[i].h.num, desc->p[i].h.den },
                 internal, oneplane_texfmt, type
@@ -168,15 +171,15 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
     }
     else if (desc->plane_count == 2)
     {
-        tc->tex_count = 2;
+        interop->tex_count = 2;
 
         if (desc->pixel_size == 1)
         {
-            tc->texs[0] = (struct opengl_tex_cfg) {
+            interop->texs[0] = (struct vlc_gl_tex_cfg) {
                 { 1, 1 }, { 1, 1 }, oneplane_texfmt, oneplane_texfmt,
                 GL_UNSIGNED_BYTE
             };
-            tc->texs[1] = (struct opengl_tex_cfg) {
+            interop->texs[1] = (struct vlc_gl_tex_cfg) {
                 { 1, 2 }, { 1, 2 }, twoplanes_texfmt, twoplanes_texfmt,
                 GL_UNSIGNED_BYTE
             };
@@ -187,11 +190,11 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
              || GetTexFormatSize(tc, tex_target, twoplanes_texfmt,
                                  twoplanes16_texfmt, GL_UNSIGNED_SHORT) != 16)
                 return VLC_EGENERIC;
-            tc->texs[0] = (struct opengl_tex_cfg) {
+            interop->texs[0] = (struct vlc_gl_tex_cfg) {
                 { 1, 1 }, { 1, 1 }, oneplane16_texfmt, oneplane_texfmt,
                 GL_UNSIGNED_SHORT
             };
-            tc->texs[1] = (struct opengl_tex_cfg) {
+            interop->texs[1] = (struct vlc_gl_tex_cfg) {
                 { 1, 2 }, { 1, 2 }, twoplanes16_texfmt, twoplanes_texfmt,
                 GL_UNSIGNED_SHORT
             };
@@ -213,8 +216,8 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
     else if (desc->plane_count == 1)
     {
         /* Y1 U Y2 V fits in R G B A */
-        tc->tex_count = 1;
-        tc->texs[0] = (struct opengl_tex_cfg) {
+        interop->tex_count = 1;
+        interop->texs[0] = (struct vlc_gl_tex_cfg) {
             { 1, 2 }, { 1, 1 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
         };
 
@@ -302,12 +305,13 @@ tc_rgb_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
                  vlc_fourcc_t chroma)
 {
     (void) tex_target;
+    struct vlc_gl_interop *interop = &tc->interop;
 
     switch (chroma)
     {
         case VLC_CODEC_RGB32:
         case VLC_CODEC_RGBA:
-            tc->texs[0] = (struct opengl_tex_cfg) {
+            interop->texs[0] = (struct vlc_gl_tex_cfg) {
                 { 1, 1 }, { 1, 1 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
             };
             break;
@@ -315,7 +319,7 @@ tc_rgb_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
             if (GetTexFormatSize(tc, tex_target, GL_BGRA, GL_RGBA,
                                  GL_UNSIGNED_BYTE) != 32)
                 return VLC_EGENERIC;
-            tc->texs[0] = (struct opengl_tex_cfg) {
+            interop->texs[0] = (struct vlc_gl_tex_cfg) {
                 { 1, 1 }, { 1, 1 }, GL_RGBA, GL_BGRA, GL_UNSIGNED_BYTE
             };
             break;
@@ -323,13 +327,15 @@ tc_rgb_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         default:
             return VLC_EGENERIC;
     }
-    tc->tex_count = 1;
+    interop->tex_count = 1;
     return VLC_SUCCESS;
 }
 
 static int
 tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
 {
+    struct vlc_gl_interop *interop = &tc->interop;
+
     if (tc->yuv_color)
     {
         tc->uloc.Coefficients = tc->vt->GetUniformLocation(program,
@@ -338,14 +344,14 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
             return VLC_EGENERIC;
     }
 
-    for (unsigned int i = 0; i < tc->tex_count; ++i)
+    for (unsigned int i = 0; i < interop->tex_count; ++i)
     {
         char name[sizeof("TextureX")];
         snprintf(name, sizeof(name), "Texture%1u", i);
         tc->uloc.Texture[i] = tc->vt->GetUniformLocation(program, name);
         if (tc->uloc.Texture[i] == -1)
             return VLC_EGENERIC;
-        if (tc->tex_target == GL_TEXTURE_RECTANGLE)
+        if (interop->tex_target == GL_TEXTURE_RECTANGLE)
         {
             snprintf(name, sizeof(name), "TexSize%1u", i);
             tc->uloc.TexSize[i] = tc->vt->GetUniformLocation(program, name);
@@ -375,18 +381,19 @@ tc_base_prepare_shader(const opengl_tex_converter_t *tc,
                        float alpha)
 {
     (void) tex_width; (void) tex_height;
+    const struct vlc_gl_interop *interop = &tc->interop;
 
     if (tc->yuv_color)
         tc->vt->Uniform4fv(tc->uloc.Coefficients, 4, tc->yuv_coefficients);
 
-    for (unsigned i = 0; i < tc->tex_count; ++i)
+    for (unsigned i = 0; i < interop->tex_count; ++i)
         tc->vt->Uniform1i(tc->uloc.Texture[i], i);
 
     tc->vt->Uniform4f(tc->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
 
-    if (tc->tex_target == GL_TEXTURE_RECTANGLE)
+    if (interop->tex_target == GL_TEXTURE_RECTANGLE)
     {
-        for (unsigned i = 0; i < tc->tex_count; ++i)
+        for (unsigned i = 0; i < interop->tex_count; ++i)
             tc->vt->Uniform2f(tc->uloc.TexSize[i], tex_width[i],
                                tex_height[i]);
     }
@@ -444,9 +451,11 @@ tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc,
 static GLuint
 xyz12_shader_init(opengl_tex_converter_t *tc)
 {
-    tc->tex_count = 1;
-    tc->tex_target = GL_TEXTURE_2D;
-    tc->texs[0] = (struct opengl_tex_cfg) {
+    struct vlc_gl_interop *interop = &tc->interop;
+
+    interop->tex_count = 1;
+    interop->tex_target = GL_TEXTURE_2D;
+    interop->texs[0] = (struct vlc_gl_tex_cfg) {
         { 1, 1 }, { 1, 1 }, GL_RGB, GL_RGB, GL_UNSIGNED_SHORT
     };
 
@@ -500,6 +509,8 @@ GLuint
 opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
                                  vlc_fourcc_t chroma, video_color_space_t yuv_space)
 {
+    struct vlc_gl_interop *interop = &tc->interop;
+
     const char *swizzle_per_tex[PICTURE_PLANE_MAX] = { NULL, };
     const bool is_yuv = vlc_fourcc_IsYUV(chroma);
     bool yuv_swap_uv = false;
@@ -557,7 +568,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
     ADDF("%s", tc->glsl_precision_header);
 
-    for (unsigned i = 0; i < tc->tex_count; ++i)
+    for (unsigned i = 0; i < interop->tex_count; ++i)
         ADDF("uniform %s Texture%u;\n"
              "varying vec2 TexCoord%u;\n", sampler, i, i);
 
@@ -582,7 +593,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         dst_space.transfer = var_InheritInteger(tc->gl, "target-trc");
 
         pl_shader_color_map(sh, &color_params,
-                vlc_placebo_ColorSpace(&tc->fmt),
+                vlc_placebo_ColorSpace(&interop->fmt),
                 dst_space, NULL, false);
 
         struct pl_shader_obj *dither_state = NULL;
@@ -632,8 +643,8 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         ADD(res->glsl);
     }
 #else
-    if (tc->fmt.transfer == TRANSFER_FUNC_SMPTE_ST2084 ||
-        tc->fmt.primaries == COLOR_PRIMARIES_BT2020)
+    if (interop->fmt.transfer == TRANSFER_FUNC_SMPTE_ST2084 ||
+        interop->fmt.primaries == COLOR_PRIMARIES_BT2020)
     {
         // no warning for HLG because it's more or less backwards-compatible
         msg_Warn(tc->gl, "VLC needs to be built with support for libplacebo "
@@ -643,7 +654,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
-        for (unsigned i = 0; i < tc->tex_count; ++i)
+        for (unsigned i = 0; i < interop->tex_count; ++i)
             ADDF("uniform vec2 TexSize%u;\n", i);
     }
 
@@ -656,13 +667,13 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
-        for (unsigned i = 0; i < tc->tex_count; ++i)
+        for (unsigned i = 0; i < interop->tex_count; ++i)
             ADDF(" vec2 TexCoordRect%u = vec2(TexCoord%u.x * TexSize%u.x, "
                  "TexCoord%u.y * TexSize%u.y);\n", i, i, i, i, i);
     }
 
     unsigned color_idx = 0;
-    for (unsigned i = 0; i < tc->tex_count; ++i)
+    for (unsigned i = 0; i < interop->tex_count; ++i)
     {
         const char *swizzle = swizzle_per_tex[i];
         if (swizzle)
@@ -743,7 +754,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
                 (const char *)&chroma, yuv_space, ms.ptr);
     free(ms.ptr);
 
-    tc->tex_target = tex_target;
+    interop->tex_target = tex_target;
 
     tc->pf_fetch_locations = tc_base_fetch_locations;
     tc->pf_prepare_shader = tc_base_prepare_shader;

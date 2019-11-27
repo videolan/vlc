@@ -47,16 +47,16 @@ struct priv
 #if TARGET_OS_IPHONE
 /* CVOpenGLESTextureCache version (ios) */
 static int
-tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
+tc_cvpx_update(const struct vlc_gl_interop *interop, GLuint *textures,
                const GLsizei *tex_width, const GLsizei *tex_height,
                picture_t *pic, const size_t *plane_offset)
 {
     (void) plane_offset;
-    struct priv *priv = tc->priv;
+    struct priv *priv = interop->priv;
 
     CVPixelBufferRef pixelBuffer = cvpxpic_get_ref(pic);
 
-    for (unsigned i = 0; i < tc->tex_count; ++i)
+    for (unsigned i = 0; i < interop->tex_count; ++i)
     {
         if (likely(priv->last_cvtexs[i]))
         {
@@ -67,28 +67,28 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
     CVOpenGLESTextureCacheFlush(priv->cache, 0);
 
-    for (unsigned i = 0; i < tc->tex_count; ++i)
+    for (unsigned i = 0; i < interop->tex_count; ++i)
     {
         CVOpenGLESTextureRef cvtex;
         CVReturn err = CVOpenGLESTextureCacheCreateTextureFromImage(
             kCFAllocatorDefault, priv->cache, pixelBuffer, NULL,
-            tc->tex_target, tc->texs[i].internal, tex_width[i], tex_height[i],
-            tc->texs[i].format, tc->texs[i].type, i, &cvtex);
+            interop->tex_target, interop->texs[i].internal, tex_width[i], tex_height[i],
+            interop->texs[i].format, interop->texs[i].type, i, &cvtex);
         if (err != noErr)
         {
-            msg_Err(tc->gl,
+            msg_Err(interop->gl,
                     "CVOpenGLESTextureCacheCreateTextureFromImage failed: %d",
                     err);
             return VLC_EGENERIC;
         }
 
         textures[i] = CVOpenGLESTextureGetName(cvtex);
-        tc->vt->BindTexture(tc->tex_target, textures[i]);
-        tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        tc->vt->TexParameteri(tc->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        tc->vt->TexParameterf(tc->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        tc->vt->BindTexture(tc->tex_target, 0);
+        interop->vt->BindTexture(interop->tex_target, textures[i]);
+        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        interop->vt->TexParameterf(interop->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        interop->vt->TexParameterf(interop->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        interop->vt->BindTexture(interop->tex_target, 0);
         priv->last_cvtexs[i] = cvtex;
     }
 
@@ -98,32 +98,32 @@ tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
 #else
 /* IOSurface version (macos) */
 static int
-tc_cvpx_update(const opengl_tex_converter_t *tc, GLuint *textures,
+tc_cvpx_update(const struct vlc_gl_interop *interop, GLuint *textures,
                const GLsizei *tex_width, const GLsizei *tex_height,
                picture_t *pic, const size_t *plane_offset)
 {
     (void) plane_offset;
-    struct priv *priv = tc->priv;
+    struct priv *priv = interop->priv;
 
     CVPixelBufferRef pixelBuffer = cvpxpic_get_ref(pic);
 
     IOSurfaceRef surface = CVPixelBufferGetIOSurface(pixelBuffer);
 
-    for (unsigned i = 0; i < tc->tex_count; ++i)
+    for (unsigned i = 0; i < interop->tex_count; ++i)
     {
-        tc->vt->ActiveTexture(GL_TEXTURE0 + i);
-        tc->vt->BindTexture(tc->tex_target, textures[i]);
+        interop->vt->ActiveTexture(GL_TEXTURE0 + i);
+        interop->vt->BindTexture(interop->tex_target, textures[i]);
 
         CGLError err =
-            CGLTexImageIOSurface2D(priv->gl_ctx, tc->tex_target,
-                                   tc->texs[i].internal,
+            CGLTexImageIOSurface2D(priv->gl_ctx, interop->tex_target,
+                                   interop->texs[i].internal,
                                    tex_width[i], tex_height[i],
-                                   tc->texs[i].format,
-                                   tc->texs[i].type,
+                                   interop->texs[i].format,
+                                   interop->texs[i].type,
                                    surface, i);
         if (err != kCGLNoError)
         {
-            msg_Err(tc->gl, "CGLTexImageIOSurface2D error: %u: %s", i,
+            msg_Err(interop->gl, "CGLTexImageIOSurface2D error: %u: %s", i,
                     CGLErrorString(err));
             return VLC_EGENERIC;
         }
@@ -144,10 +144,11 @@ static void
 Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
-    struct priv *priv = tc->priv;
+    struct vlc_gl_interop *interop = &tc->interop;
+    struct priv *priv = interop->priv;
 
 #if TARGET_OS_IPHONE
-    for (unsigned i = 0; i < tc->tex_count; ++i)
+    for (unsigned i = 0; i < interop->tex_count; ++i)
     {
         if (likely(priv->last_cvtexs[i]))
             CFRelease(priv->last_cvtexs[i]);
@@ -157,18 +158,20 @@ Close(vlc_object_t *obj)
     if (priv->last_pic != NULL)
         picture_Release(priv->last_pic);
 #endif
-    free(tc->priv);
+    free(priv);
 }
 
 static int
 Open(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
-    if (tc->fmt.i_chroma != VLC_CODEC_CVPX_UYVY
-     && tc->fmt.i_chroma != VLC_CODEC_CVPX_NV12
-     && tc->fmt.i_chroma != VLC_CODEC_CVPX_I420
-     && tc->fmt.i_chroma != VLC_CODEC_CVPX_BGRA
-     && tc->fmt.i_chroma != VLC_CODEC_CVPX_P010)
+    struct vlc_gl_interop *interop = &tc->interop;
+
+    if (interop->fmt.i_chroma != VLC_CODEC_CVPX_UYVY
+     && interop->fmt.i_chroma != VLC_CODEC_CVPX_NV12
+     && interop->fmt.i_chroma != VLC_CODEC_CVPX_I420
+     && interop->fmt.i_chroma != VLC_CODEC_CVPX_BGRA
+     && interop->fmt.i_chroma != VLC_CODEC_CVPX_P010)
         return VLC_EGENERIC;
 
     struct priv *priv = calloc(1, sizeof(struct priv));
@@ -179,10 +182,10 @@ Open(vlc_object_t *obj)
     const GLenum tex_target = GL_TEXTURE_2D;
 
     {
-        CVEAGLContext eagl_ctx = var_InheritAddress(tc->gl, "ios-eaglcontext");
+        CVEAGLContext eagl_ctx = var_InheritAddress(interop->gl, "ios-eaglcontext");
         if (!eagl_ctx)
         {
-            msg_Err(tc->gl, "can't find ios-eaglcontext");
+            msg_Err(interop->gl, "can't find ios-eaglcontext");
             free(priv);
             return VLC_EGENERIC;
         }
@@ -191,7 +194,7 @@ Open(vlc_object_t *obj)
                                          eagl_ctx, NULL, &priv->cache);
         if (err != noErr)
         {
-            msg_Err(tc->gl, "CVOpenGLESTextureCacheCreate failed: %d", err);
+            msg_Err(interop->gl, "CVOpenGLESTextureCacheCreate failed: %d", err);
             free(priv);
             return VLC_EGENERIC;
         }
@@ -199,10 +202,10 @@ Open(vlc_object_t *obj)
 #else
     const GLenum tex_target = GL_TEXTURE_RECTANGLE;
     {
-        priv->gl_ctx = var_InheritAddress(tc->gl, "macosx-glcontext");
+        priv->gl_ctx = var_InheritAddress(interop->gl, "macosx-glcontext");
         if (!priv->gl_ctx)
         {
-            msg_Err(tc->gl, "can't find macosx-glcontext");
+            msg_Err(interop->gl, "can't find macosx-glcontext");
             free(priv);
             return VLC_EGENERIC;
         }
@@ -210,7 +213,7 @@ Open(vlc_object_t *obj)
 #endif
 
     GLuint fragment_shader;
-    switch (tc->fmt.i_chroma)
+    switch (interop->fmt.i_chroma)
     {
         case VLC_CODEC_CVPX_UYVY:
             /* Generate a VLC_CODEC_VYUY shader in order to use the "gbr"
@@ -221,41 +224,41 @@ Open(vlc_object_t *obj)
 
             fragment_shader =
                 opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_VYUY,
-                                            tc->fmt.space);
-            tc->texs[0].internal = GL_RGB;
-            tc->texs[0].format = GL_RGB_422_APPLE;
-            tc->texs[0].type = GL_UNSIGNED_SHORT_8_8_APPLE;
-            tc->texs[0].w = tc->texs[0].h = (vlc_rational_t) { 1, 1 };
+                                            interop->fmt.space);
+            interop->texs[0].internal = GL_RGB;
+            interop->texs[0].format = GL_RGB_422_APPLE;
+            interop->texs[0].type = GL_UNSIGNED_SHORT_8_8_APPLE;
+            interop->texs[0].w = interop->texs[0].h = (vlc_rational_t) { 1, 1 };
             break;
         case VLC_CODEC_CVPX_NV12:
         {
             fragment_shader =
                 opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_NV12,
-                                            tc->fmt.space);
+                                            interop->fmt.space);
             break;
         }
         case VLC_CODEC_CVPX_P010:
         {
             fragment_shader =
                 opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_P010,
-                                            tc->fmt.space);
+                                            interop->fmt.space);
             break;
         }
         case VLC_CODEC_CVPX_I420:
             fragment_shader =
                 opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_I420,
-                                            tc->fmt.space);
+                                            interop->fmt.space);
             break;
         case VLC_CODEC_CVPX_BGRA:
             fragment_shader =
                 opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_RGB32,
                                             COLOR_SPACE_UNDEF);
-            tc->texs[0].internal = GL_RGBA;
-            tc->texs[0].format = GL_BGRA;
+            interop->texs[0].internal = GL_RGBA;
+            interop->texs[0].format = GL_BGRA;
 #if TARGET_OS_IPHONE
-            tc->texs[0].type = GL_UNSIGNED_BYTE;
+            interop->texs[0].type = GL_UNSIGNED_BYTE;
 #else
-            tc->texs[0].type = GL_UNSIGNED_INT_8_8_8_8_REV;
+            interop->texs[0].type = GL_UNSIGNED_INT_8_8_8_8_REV;
 #endif
             break;
         default:
@@ -269,10 +272,14 @@ Open(vlc_object_t *obj)
     }
 
 #if TARGET_OS_IPHONE
-    tc->handle_texs_gen = true;
+    interop->handle_texs_gen = true;
 #endif
-    tc->priv              = priv;
-    tc->pf_update         = tc_cvpx_update;
+    interop->priv = priv;
+    static const struct vlc_gl_interop_ops ops = {
+        .update_textures = tc_cvpx_update,
+    };
+    interop->ops = &ops;
+
     tc->fshader           = fragment_shader;
 
     return VLC_SUCCESS;
