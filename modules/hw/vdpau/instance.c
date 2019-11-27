@@ -48,7 +48,7 @@ typedef struct vdp_instance
 static VdpStatus vdp_instance_create(const char *name, int num,
                                      vdp_instance_t **pp)
 {
-    size_t namelen = (name != NULL) ? (strlen(name) + 1) : 0;
+    size_t namelen = strlen(name) + 1;
     vdp_instance_t *vi = malloc(sizeof (*vi) + namelen);
 
     if (unlikely(vi == NULL))
@@ -62,13 +62,8 @@ static VdpStatus vdp_instance_create(const char *name, int num,
     }
 
     vi->next = NULL;
-    if (name != NULL)
-    {
-        vi->name = (void *)(vi + 1);
-        memcpy(vi->name, name, namelen);
-    }
-    else
-        vi->name = NULL;
+    vi->name = (void *)(vi + 1);
+    memcpy(vi->name, name, namelen);
     if (num >= 0)
         vi->num = num;
     else
@@ -95,19 +90,9 @@ static void vdp_instance_destroy(vdp_instance_t *vi)
     free(vi);
 }
 
-/** Compares two string pointers that might be NULL */
-static int strnullcmp(const char *a, const char *b)
-{
-    if (b == NULL)
-        return a != NULL;
-    if (a == NULL)
-        return -1;
-    return strcmp(a, b);
-}
-
 static int vicmp(const char *name, int num, const vdp_instance_t *vi)
 {
-    int val = strnullcmp(name, vi->name);
+    int val = strcmp(name, vi->name);
     if (val)
         return val;
 
