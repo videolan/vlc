@@ -94,7 +94,7 @@ check automake 1.15
 check m4 1.4.16
 check libtool 2.4
 check pkg-config
-check cmake 3.8.2
+check cmake 3.13.4
 check yasm
 check_tar
 check ragel
