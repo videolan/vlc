@@ -1997,7 +1997,7 @@ vlc_player_HasTeletextMenu(vlc_player_t *player);
  *
  * @note A successful call will trigger the
  * vlc_player_cbs.on_teletext_enabled_changed event.
- * 
+ *
  * @param player locked player instance
  * @param enabled true to enable
  */
