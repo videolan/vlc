@@ -296,7 +296,7 @@ static void Flush(filter_t *filter)
 static picture_t *VideoExport(filter_t *filter, picture_t *src, picture_t *dst,
                               VdpYCbCrFormat format)
 {
-    vlc_vdp_video_field_t *field = (vlc_vdp_video_field_t *)src->context;
+    vlc_vdp_video_field_t *field = VDPAU_FIELD_FROM_PICCTX(src->context);
     vlc_vdp_video_frame_t *psys = field->frame;
     VdpStatus err;
     VdpVideoSurface surface = psys->surface;
@@ -443,7 +443,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     }
 
     /* Corner case: different VDPAU instances decoding and rendering */
-    vlc_vdp_video_field_t *field = (vlc_vdp_video_field_t *)src->context;
+    vlc_vdp_video_field_t *field = VDPAU_FIELD_FROM_PICCTX(src->context);
     if (field->frame->vdp != sys->vdp)
     {
         video_format_t fmt = src->format;
@@ -508,7 +508,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     dst->b_force = pic_f->b_force;
 
     /* Enable/Disable features */
-    vlc_vdp_video_field_t *f = (vlc_vdp_video_field_t *)(pic_f->context);
+    vlc_vdp_video_field_t *f = VDPAU_FIELD_FROM_PICCTX(pic_f->context);
     const VdpVideoMixerFeature features[] = {
         VDP_VIDEO_MIXER_FEATURE_SHARPNESS,
     };
@@ -635,12 +635,12 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     for (unsigned i = 0; i < MAX_PAST; i++)
     {
         pic_f = sys->history[(MAX_PAST - 1) - i];
-        past[i] = (pic_f != NULL) ? ((vlc_vdp_video_field_t *)(pic_f->context))->frame->surface : VDP_INVALID_HANDLE;
+        past[i] = (pic_f != NULL) ? VDPAU_FIELD_FROM_PICCTX(pic_f->context)->frame->surface : VDP_INVALID_HANDLE;
     }
     for (unsigned i = 0; i < MAX_FUTURE; i++)
     {
         pic_f = sys->history[(MAX_PAST + 1) + i];
-        future[i] = (pic_f != NULL) ? ((vlc_vdp_video_field_t *)(pic_f->context))->frame->surface : VDP_INVALID_HANDLE;
+        future[i] = (pic_f != NULL) ? VDPAU_FIELD_FROM_PICCTX(pic_f->context)->frame->surface : VDP_INVALID_HANDLE;
     }
 
     err = vdp_video_mixer_render(sys->vdp, sys->mixer, VDP_INVALID_HANDLE,

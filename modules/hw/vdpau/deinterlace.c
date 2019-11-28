@@ -43,7 +43,7 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
 
     sys->last_pts = src->date;
 
-    vlc_vdp_video_field_t *f1 = (vlc_vdp_video_field_t *)src->context;
+    vlc_vdp_video_field_t *f1 = VDPAU_FIELD_FROM_PICCTX(src->context);
     if (unlikely(f1 == NULL))
         return src;
     if (f1->structure != VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME)

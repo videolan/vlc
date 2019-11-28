@@ -275,6 +275,9 @@ typedef struct vlc_vdp_video_field
     float sharpen;
 } vlc_vdp_video_field_t;
 
+#define VDPAU_FIELD_FROM_PICCTX(pic_ctx)  \
+    container_of((pic_ctx), vlc_vdp_video_field_t, context)
+
 typedef struct {
     vdp_t              *vdp;
     VdpDevice          device;
@@ -324,7 +327,7 @@ static inline void vlc_vdp_video_destroy(vlc_vdp_video_field_t *f)
 static inline vlc_vdp_video_field_t *vlc_vdp_video_copy(
     vlc_vdp_video_field_t *fold)
 {
-    return (vlc_vdp_video_field_t *)fold->context.copy(&fold->context);
+    return VDPAU_FIELD_FROM_PICCTX(fold->context.copy(&fold->context));
 }
 
 typedef struct vlc_vdp_output_surface
