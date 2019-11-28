@@ -588,6 +588,38 @@ static int OpenDisplay(vout_display_t *vd)
     if (!found_connector)
         goto err_out;
 
+    picture_sys_t *psys = calloc(1, sizeof(*psys));
+    if (psys == NULL)
+        goto err_out;
+
+    picture_resource_t rsc = {
+        .p_sys = psys,
+        .pf_destroy = CustomDestroyPicture,
+    };
+
+    for (size_t i = 0; i < PICTURE_PLANE_MAX; i++) {
+        rsc.p[i].p_pixels = sys->map[0] + sys->offsets[i];
+        rsc.p[i].i_lines  = sys->height;
+        rsc.p[i].i_pitch  = sys->stride;
+    }
+
+    psys->p_voutsys = sys;
+
+    sys->picture = picture_NewFromResource(&vd->fmt, &rsc);
+
+    if (!sys->picture)
+    {
+        free(psys);
+        goto err_out;
+    }
+
+    sys->pool = picture_pool_New(1, &sys->picture);
+    if (!sys->pool) {
+        picture_Release(sys->picture);
+        free(psys);
+        goto error;
+    }
+
     return VLC_SUCCESS;
 err_out:
     drmDropMaster(sys->drm_fd);
@@ -617,37 +649,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
     VLC_UNUSED(count);
     vout_display_sys_t *sys = vd->sys;
-
-    if (!sys->pool && !sys->picture) {
-        picture_sys_t *psys = malloc(sizeof(*psys));
-        if (psys == NULL)
-            return NULL;
-
-        picture_resource_t rsc = {
-            .p_sys = psys,
-            .pf_destroy = CustomDestroyPicture,
-        };
-
-        for (size_t i = 0; i < PICTURE_PLANE_MAX; i++) {
-            rsc.p[i].p_pixels = sys->map[0]+sys->offsets[i];
-            rsc.p[i].i_lines  = sys->height;
-            rsc.p[i].i_pitch  = sys->stride;
-        }
-
-        psys->p_voutsys = sys;
-
-        sys->picture = picture_NewFromResource(&vd->fmt, &rsc);
-
-        if (!sys->picture) {
-            free((void*)psys);
-            return NULL;
-        }
-
-        sys->pool = picture_pool_New(1, &sys->picture);
-        if (!sys->pool)
-            picture_Release(sys->picture);
-    }
-
     return sys->pool;
 }
 
