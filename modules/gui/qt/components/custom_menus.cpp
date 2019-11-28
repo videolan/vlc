@@ -297,18 +297,14 @@ BooleanPropertyAction::BooleanPropertyAction(QString title, QObject *model, QStr
     QMetaProperty property = meta->property(propertyId);
     assert(property.type() ==  QVariant::Bool);
     const QMetaObject* selfMeta = this->metaObject();
-    if (property.hasNotifySignal())
-    {
-        QMetaMethod checkedSlot = selfMeta->method(selfMeta->indexOfSlot( "setChecked(bool)" ));
-        connect( model, property.notifySignal(), this, checkedSlot );
-        connect( this, &BooleanPropertyAction::toggled, this, &BooleanPropertyAction::setModelChecked );
-        setCheckable(true);
-    }
-    else
-    {
-        connect( this, &BooleanPropertyAction::triggered, this, &BooleanPropertyAction::setModelChecked );
-        setCheckable(true);
-    }
+
+    assert(property.hasNotifySignal());
+    QMetaMethod checkedSlot = selfMeta->method(selfMeta->indexOfSlot( "setChecked(bool)" ));
+    connect( model, property.notifySignal(), this, checkedSlot );
+    connect( this, &BooleanPropertyAction::triggered, this, &BooleanPropertyAction::setModelChecked );
+
+    setCheckable(true);
+    setChecked(property.read(model).toBool());
 }
 
 void BooleanPropertyAction::setModelChecked(bool checked)
