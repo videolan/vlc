@@ -27,8 +27,7 @@
 #include "misc/variables.h"
 
 void
-vlc_player_input_RestoreMlStates(struct vlc_player_input* input,
-                                 const input_item_t* item)
+vlc_player_input_RestoreMlStates(struct vlc_player_input* input)
 {
     vlc_player_t* player = input->player;
     vlc_player_assert_locked(player);
@@ -36,6 +35,7 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input,
     vlc_medialibrary_t* ml = vlc_ml_instance_get(input->player);
     if (!ml)
         return;
+    input_item_t* item = input_GetItem(input->thread);
     vlc_ml_media_t* media = vlc_ml_get_media_by_mrl( ml, item->psz_uri);
     if (!media || media->i_type != VLC_ML_MEDIA_TYPE_VIDEO)
         return;

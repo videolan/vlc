@@ -889,7 +889,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
         return NULL;
     }
 
-    vlc_player_input_RestoreMlStates(input, item);
+    vlc_player_input_RestoreMlStates(input);
 
     /* Initial sub/audio delay */
     const vlc_tick_t cat_delays[DATA_ES] = {
