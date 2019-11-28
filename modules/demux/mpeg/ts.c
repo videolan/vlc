@@ -117,6 +117,7 @@ static void Close ( vlc_object_t * );
 #define TS_PATFIX_TEXT      "Try to generate PAT/PMT if missing"
 #define TS_SKIP_GHOST_PROGRAM_TEXT "Only create ES on program sending data"
 #define TS_OFFSETFIX_TEXT   "Try to fix too early PCR (or late DTS)"
+#define TS_GENERATED_PCR_OFFSET_TEXT "Offset in ms for generated PCR"
 
 #define PCR_TEXT N_("Trust in-stream PCR")
 #define PCR_LONGTEXT N_("Use the stream PCR as a reference.")
@@ -159,6 +160,8 @@ vlc_module_begin ()
     add_bool( "ts-pmtfix-waitdata", true, TS_SKIP_GHOST_PROGRAM_TEXT, NULL, true )
     add_bool( "ts-patfix", true, TS_PATFIX_TEXT, NULL, true )
     add_bool( "ts-pcr-offsetfix", true, TS_OFFSETFIX_TEXT, NULL, true )
+    add_integer_with_range( "ts-generated-pcr-offset", 120, 0, 500,
+                            TS_GENERATED_PCR_OFFSET_TEXT, NULL, true )
 
     add_obsolete_bool( "ts-silent" );
 
@@ -207,7 +210,6 @@ static void PCRFixHandle( demux_t *, ts_pmt_t *, block_t * );
 #define PROBE_MAX         (PROBE_CHUNK_COUNT * 10)
 
 #define BLOCK_FLAG_SOURCE_RANDOM_ACCESS (1 << BLOCK_FLAG_PRIVATE_SHIFT)
-#define GENERATED_PCR_DPB_OFFSET VLC_TICK_FROM_MS(120)
 
 static int DetectPacketSize( demux_t *p_demux, unsigned *pi_header_size, int i_offset )
 {
@@ -440,6 +442,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_trust_pcr = var_CreateGetBool( p_demux, "ts-trust-pcr" );
     p_sys->b_check_pcr_offset = p_sys->b_trust_pcr && var_CreateGetBool(p_demux, "ts-pcr-offsetfix" );
+    p_sys->i_generated_pcr_dpb_offset = VLC_TICK_FROM_MS(var_CreateGetInteger( p_demux, "ts-generated-pcr-offset" ));
 
     /* We handle description of an extra PMT */
     char* psz_string = var_CreateGetString( p_demux, "ts-extra-pmt" );
@@ -1534,6 +1537,7 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     uint8_t i_stream_id;
     bool b_pes_scrambling = false;
     const es_mpeg4_descriptor_t *p_mpeg4desc = NULL;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     assert(pid->type == TYPE_STREAM);
 
@@ -1681,8 +1685,8 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
                 if ( p_pmt->pcr.b_disable && p_block->i_dts != VLC_TICK_INVALID &&
                      ( p_pmt->i_pid_pcr == pid->i_pid || p_pmt->i_pid_pcr == 0x1FFF ) )
                 {
-                    stime_t i_pcr = ( p_block->i_dts > GENERATED_PCR_DPB_OFFSET )
-                                  ? TO_SCALE(p_block->i_dts - GENERATED_PCR_DPB_OFFSET)
+                    stime_t i_pcr = ( p_block->i_dts > p_sys->i_generated_pcr_dpb_offset )
+                                  ? TO_SCALE(p_block->i_dts - p_sys->i_generated_pcr_dpb_offset)
                                   : TO_SCALE(p_block->i_dts);
                     ProgramSetPCR( p_demux, p_pmt, i_pcr );
                 }
