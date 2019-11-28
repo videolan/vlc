@@ -98,13 +98,11 @@ static int GetTexFormatSize(const opengl_vtable_t *vt, int target,
 }
 
 static int
-tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
-                 vlc_fourcc_t chroma, const vlc_chroma_description_t *desc,
-                 video_color_space_t yuv_space,
-                 bool *swap_uv, const char *swizzle_per_tex[])
+interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
+                      vlc_fourcc_t chroma,
+                      const vlc_chroma_description_t *desc,
+                      const char *swizzle_per_tex[])
 {
-    struct vlc_gl_interop *interop = &tc->interop;
-
     GLint oneplane_texfmt, oneplane16_texfmt,
           twoplanes_texfmt, twoplanes16_texfmt;
 
@@ -123,17 +121,11 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         twoplanes16_texfmt = 0;
     }
 
-    float yuv_range_correction = 1.0;
     if (desc->pixel_size == 2)
     {
-        if (GetTexFormatSize(tc->vt, tex_target, oneplane_texfmt,
+        if (GetTexFormatSize(interop->vt, tex_target, oneplane_texfmt,
                              oneplane16_texfmt, GL_UNSIGNED_SHORT) != 16)
             return VLC_EGENERIC;
-
-        /* Do a bit shift if samples are stored on LSB */
-        if (chroma != VLC_CODEC_P010 && chroma != VLC_CODEC_P016)
-            yuv_range_correction = (float)((1 << 16) - 1)
-                                 / ((1 << desc->pixel_bits) - 1);
     }
 
     if (desc->plane_count == 3)
@@ -187,7 +179,7 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         else if (desc->pixel_size == 2)
         {
             if (twoplanes16_texfmt == 0
-             || GetTexFormatSize(tc->vt, tex_target, twoplanes_texfmt,
+             || GetTexFormatSize(interop->vt, tex_target, twoplanes_texfmt,
                                  twoplanes16_texfmt, GL_UNSIGNED_SHORT) != 16)
                 return VLC_EGENERIC;
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
@@ -250,6 +242,24 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
     }
     else
         return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
+}
+
+static int
+tc_yuv_base_init(opengl_tex_converter_t *tc, vlc_fourcc_t chroma,
+                 const vlc_chroma_description_t *desc,
+                 video_color_space_t yuv_space,
+                 bool *swap_uv)
+{
+    float yuv_range_correction = 1.0;
+    if (desc->pixel_size == 2)
+    {
+        /* Do a bit shift if samples are stored on LSB */
+        if (chroma != VLC_CODEC_P010 && chroma != VLC_CODEC_P016)
+            yuv_range_correction = (float)((1 << 16) - 1)
+                                 / ((1 << desc->pixel_bits) - 1);
+    }
 
     /* [R/G/B][Y U V O] from TV range to full range
      * XXX we could also do hue/brightness/constrast/gamma
@@ -529,8 +539,12 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         return xyz12_shader_init(tc);
 
     if (is_yuv)
-        ret = tc_yuv_base_init(tc, tex_target, chroma, desc, yuv_space,
-                               &yuv_swap_uv, swizzle_per_tex);
+    {
+        ret = interop_yuv_base_init(&tc->interop, tex_target, chroma, desc,
+                                    swizzle_per_tex);
+        if (ret == VLC_SUCCESS)
+            ret = tc_yuv_base_init(tc, chroma, desc, yuv_space, &yuv_swap_uv);
+    }
     else
         ret = tc_rgb_base_init(tc, tex_target, chroma);
 
