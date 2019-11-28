@@ -27,10 +27,17 @@
 #include "misc/variables.h"
 
 void
-vlc_player_input_RestoreMlStates(struct vlc_player_input* input)
+vlc_player_input_RestoreMlStates(struct vlc_player_input* input, bool force_pos)
 {
     vlc_player_t* player = input->player;
     vlc_player_assert_locked(player);
+
+    int restore_pos;
+    if (force_pos)
+        restore_pos = VLC_PLAYER_RESTORE_PLAYBACK_POS_ALWAYS;
+    else
+        restore_pos = var_InheritInteger(player, "restore-playback-pos");
+    bool restore_states = var_InheritBool(player, "restore-playback-states");
 
     vlc_medialibrary_t* ml = vlc_ml_instance_get(input->player);
     if (!ml)
@@ -41,12 +48,20 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input)
         return;
     if (vlc_ml_media_get_all_playback_pref(ml, media->i_id, &input->ml.states) != VLC_SUCCESS)
         return;
+    input->ml.restore = (restore_pos == VLC_PLAYER_RESTORE_PLAYBACK_POS_ALWAYS) ?
+                            VLC_RESTOREPOINT_TITLE : VLC_RESTOREPOINT_NONE;
+    input->ml.restore_states = restore_states;
     /* If we are aiming at a specific title, wait for it to be added, and
      * only then select it & set the position.
      * If we're not aiming at a specific title, just set the position now.
      */
-    if (input->ml.states.current_title == -1 && input->ml.states.progress > .0f)
+    if (restore_pos == VLC_PLAYER_RESTORE_PLAYBACK_POS_ALWAYS &&
+            input->ml.states.current_title == -1 &&
+            input->ml.states.progress > .0f)
         input_SetPosition(input->thread, input->ml.states.progress, false);
+
+    if (!restore_states)
+        return;
     if (input->ml.states.rate != .0f)
         vlc_player_ChangeRate(player, input->ml.states.rate);
 

@@ -373,6 +373,13 @@ enum vlc_player_abloop
 /** Player teletext key: Index */
 #define VLC_PLAYER_TELETEXT_KEY_INDEX ('i' << 16)
 
+enum vlc_player_restore_playback_pos
+{
+    VLC_PLAYER_RESTORE_PLAYBACK_POS_NEVER,
+    VLC_PLAYER_RESTORE_PLAYBACK_POS_ASK,
+    VLC_PLAYER_RESTORE_PLAYBACK_POS_ALWAYS,
+};
+
 /**
  * Set the current media
  *

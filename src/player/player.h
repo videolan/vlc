@@ -115,6 +115,8 @@ struct vlc_player_input
             VLC_RESTOREPOINT_POSITION,
             VLC_RESTOREPOINT_NONE,
         } restore;
+        bool restore_states;
+        bool delay_restore;
     } ml;
 };
 
@@ -491,7 +493,7 @@ vlc_player_osd_Program(vlc_player_t *player, const char *name);
  */
 
 void
-vlc_player_input_RestoreMlStates(struct vlc_player_input* input);
+vlc_player_input_RestoreMlStates(struct vlc_player_input* input, bool force_pos);
 
 void
 vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input);

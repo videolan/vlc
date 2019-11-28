@@ -43,6 +43,7 @@
 #include "vlc_meta.h"
 #include <vlc_aout.h>
 #include <vlc_vout.h>
+#include <vlc_player.h>
 
 #include "clock/clock.h"
 
@@ -706,6 +707,12 @@ static const char *const ppsz_prefres[] = {
     "You can manually give a list of bookmarks for a stream in " \
     "the form \"{name=bookmark-name,time=optional-time-offset," \
     "bytes=optional-byte-offset},{...}\"")
+
+#define RESTORE_PLAYBACK_POS_TEXT N_("Continue playback?")
+
+#define RESTORE_PLAYBACK_STATE_TEXT N_("Resume last playback states")
+#define RESTORE_PLAYBACK_STATE_LONGTEXT N_("This will resume the last playback " \
+    "state, such as the selected tracks, rate, aspect-ratio, ..." )
 
 #define INPUT_RECORD_PATH_TEXT N_("Record directory")
 #define INPUT_RECORD_PATH_LONGTEXT N_( \
@@ -1890,6 +1897,11 @@ vlc_module_begin ()
     add_string( "bookmarks", NULL,
                  BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, true )
         change_safe ()
+
+    add_integer( "restore-playback-pos", VLC_PLAYER_RESTORE_PLAYBACK_POS_ASK,
+                 RESTORE_PLAYBACK_POS_TEXT, RESTORE_PLAYBACK_POS_TEXT, false )
+    add_bool( "restore-playback-states", false,
+                 RESTORE_PLAYBACK_STATE_TEXT, RESTORE_PLAYBACK_STATE_LONGTEXT, false )
 
     set_section( N_( "Default devices") , NULL )
 

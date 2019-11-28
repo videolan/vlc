@@ -444,19 +444,22 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
                      * insertion. The initialization of the default track when
                      * we don't have a value will be done when the first track
                      * gets selected */
-                    if (input->ml.states.current_video_track != -2 &&
+                    if (input->ml.restore_states &&
+                        input->ml.states.current_video_track != -2 &&
                         input->ml.states.current_video_track == ev->fmt->i_id)
                         vlc_player_SelectTrack(input->player, &trackpriv->t,
                                                VLC_PLAYER_SELECT_EXCLUSIVE);
                     break;
                 case AUDIO_ES:
-                    if (input->ml.states.current_audio_track != -2 &&
+                    if (input->ml.restore_states &&
+                        input->ml.states.current_audio_track != -2 &&
                         input->ml.states.current_audio_track == ev->fmt->i_id)
                         vlc_player_SelectTrack(input->player, &trackpriv->t,
                                                VLC_PLAYER_SELECT_EXCLUSIVE);
                     break;
                 case SPU_ES:
-                    if (input->ml.states.current_subtitle_track != -2 &&
+                    if (input->ml.restore_states &&
+                        input->ml.states.current_subtitle_track != -2 &&
                         input->ml.states.current_subtitle_track == ev->fmt->i_id)
                         vlc_player_SelectTrack(input->player, &trackpriv->t,
                                                VLC_PLAYER_SELECT_EXCLUSIVE);
@@ -879,7 +882,8 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
         input->ml.default_video_track = input->ml.default_audio_track =
         input->ml.default_subtitle_track = -2;
     input->ml.states.progress = -1.f;
-    input->ml.restore = VLC_RESTOREPOINT_TITLE;
+    input->ml.restore = VLC_RESTOREPOINT_NONE;
+    input->ml.restore_states = false;
 
     input->thread = input_Create(player, input_thread_Events, input, item,
                                  player->resource, player->renderer);
@@ -888,8 +892,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
         free(input);
         return NULL;
     }
-
-    vlc_player_input_RestoreMlStates(input);
+    vlc_player_input_RestoreMlStates(input, false);
 
     /* Initial sub/audio delay */
     const vlc_tick_t cat_delays[DATA_ES] = {
