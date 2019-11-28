@@ -415,7 +415,7 @@ static picture_t *VideoImport(filter_t *filter, picture_t *src)
     picture_CopyProperties(dst, src);
     picture_Release(src);
 
-    err = vlc_vdp_video_attach(sys->vdp, surface, dst);
+    err = vlc_vdp_video_attach(sys->vdp, surface, filter->vctx_out, dst);
     if (unlikely(err != VDP_STATUS_OK))
     {
         picture_Release(dst);

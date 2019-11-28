@@ -119,6 +119,9 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
     if (field == NULL)
         return VLC_ENOMEM;
 
+    field->context.copy = VideoSurfaceCloneWithContext;
+    field->context.vctx = vlc_video_context_Hold(sys->vctx);
+
     pic->context = &field->context;
     *data = (void *)(uintptr_t)field->frame->surface;
     return VLC_SUCCESS;

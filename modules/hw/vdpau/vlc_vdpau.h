@@ -308,7 +308,7 @@ static inline vdpau_decoder_device_t *GetVDPAUOpaqueContext(vlc_video_context *v
 /**
  * Attaches a VDPAU video surface as context of a VLC picture.
  */
-VdpStatus vlc_vdp_video_attach(vdp_t *, VdpVideoSurface, picture_t *);
+VdpStatus vlc_vdp_video_attach(vdp_t *, VdpVideoSurface, vlc_video_context *, picture_t *);
 
 /**
  * Wraps a VDPAU video surface into a VLC picture context.
@@ -329,6 +329,11 @@ static inline vlc_vdp_video_field_t *vlc_vdp_video_copy(
 {
     return VDPAU_FIELD_FROM_PICCTX(fold->context.copy(&fold->context));
 }
+
+/**
+ * Clone a VPD field based picture context that contains a video context
+ */
+picture_context_t *VideoSurfaceCloneWithContext(picture_context_t *);
 
 typedef struct vlc_vdp_output_surface
 {

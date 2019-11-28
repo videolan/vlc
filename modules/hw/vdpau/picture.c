@@ -109,12 +109,25 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
     return field;
 }
 
+picture_context_t *VideoSurfaceCloneWithContext(picture_context_t *src_ctx)
+{
+    picture_context_t *dst_ctx = VideoSurfaceCopy(src_ctx);
+    if (unlikely(dst_ctx == NULL))
+        return NULL;
+    vlc_video_context_Hold(dst_ctx->vctx);
+    return dst_ctx;
+}
+
 VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
-                               picture_t *pic)
+                               vlc_video_context *vctx, picture_t *pic)
 {
     vlc_vdp_video_field_t *field = vlc_vdp_video_create(vdp, surface);
     if (unlikely(field == NULL))
         return VDP_STATUS_RESOURCES;
+
+    field->context.destroy = VideoSurfaceDestroy;
+    field->context.copy = VideoSurfaceCloneWithContext;
+    field->context.vctx = vlc_video_context_Hold(vctx);
 
     assert(pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
         || pic->format.i_chroma == VLC_CODEC_VDPAU_VIDEO_422
