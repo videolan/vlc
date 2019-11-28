@@ -1001,6 +1001,9 @@ PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontrol
 
     m_time_timer.setSingleShot( true );
     m_time_timer.setTimerType( Qt::PreciseTimer );
+
+    // Initialise fullscreen to match the player state
+    m_fullscreen = vlc_player_vout_IsFullscreen( m_player );
 }
 
 PlayerController::PlayerController( intf_thread_t *_p_intf )
