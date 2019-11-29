@@ -120,6 +120,7 @@ bool NetworkDeviceModel::addToPlaylist(int index)
         return false;
     auto item =  m_items[index];
     vlc::playlist::Media media{ item.inputItem.get() };
+    m_ctx->getIntf()->p_sys->p_mainPlaylistController->append( { media }, false);
     return true;
 }
 
