@@ -26,6 +26,7 @@
 
 	.text
 function merge8_arm_sve
+	bti	c
 	mov	x4, #0
 	b	2f
 1:	ld1b	{z0.h}, p0/z, [x1, x4]
@@ -39,6 +40,7 @@ function merge8_arm_sve
 	ret
 
 function merge16_arm_sve
+	bti	c
 	mov	x4, #0
 	b	2f
 1:	ld1h	{z0.s}, p0/z, [x1, x4, lsl #1]
