@@ -91,7 +91,10 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, AVCodecContext *avctx
     msg_Dbg(va, "va_pool_SetupDecoder id %d %dx%d count: %zu", avctx->codec_id, avctx->coded_width, avctx->coded_height, count);
 
     if (count > MAX_SURFACE_COUNT)
+    {
+        msg_Err(va, "too many surfaces requested %zu (max %d)", count, MAX_SURFACE_COUNT);
         return VLC_EGENERIC;
+    }
 
     int err = va_pool->callbacks.pf_create_decoder_surfaces(va, avctx->codec_id, fmt, count);
     if (err != VLC_SUCCESS)
