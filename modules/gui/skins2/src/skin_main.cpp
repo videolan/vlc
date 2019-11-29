@@ -143,6 +143,12 @@ static void Close( vlc_object_t *p_this )
 
     msg_Dbg( p_intf, "closing skins2 module" );
 
+    // ensure the playlist is stopped
+    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist( p_intf );
+    vlc_playlist_Lock( playlist );
+    vlc_playlist_Stop ( playlist );
+    vlc_playlist_Unlock( playlist );
+
     vlc_mutex_lock( &skin_load.mutex );
     skin_load.intf = NULL;
     vlc_mutex_unlock( &skin_load.mutex);
