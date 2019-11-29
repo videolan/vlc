@@ -104,6 +104,16 @@ NavigableFocusScope {
     }
 
 
+    function _defineObjProperty( obj, prop, value )
+    {
+        Object.defineProperty(obj, prop, {
+            "enumerable": true,
+            "configurable": false,
+            "value": value,
+            "writable": true,
+        })
+    }
+
     //Gridview visible above the expanded item
     Flickable {
         id: flickable
@@ -236,9 +246,11 @@ NavigableFocusScope {
             for (i = firstId; i < topGridEndId; ++i) {
                 var pos = root.getItemPos(i)
                 var item = getChild(i, _unusedItemList)
-                item.model = model.items.get(i).model
-                item.index = i
+                _defineObjProperty(item, "index", i)
+                //theses needs an actual binding
                 item.selected = model.items.get(i).inSelected
+                item.model = model.items.get(i).model
+                //theses properties are always defined in Item
                 item.focus = false
                 item.x = pos[0]
                 item.y = pos[1]
@@ -252,10 +264,12 @@ NavigableFocusScope {
             for (i = topGridEndId; i < lastId; ++i) {
                 pos = root.getItemPos(i)
                 item = getChild(i, _unusedItemList)
-                item.model = model.items.get(i).model
-                item.focus = false
-                item.index = i
+                _defineObjProperty(item, "index", i)
+                //theses needs an actual binding
                 item.selected = model.items.get(i).inSelected
+                item.model = model.items.get(i).model
+                //theses properties are always defined in Item
+                item.focus = false
                 item.x = pos[0]
                 item.y = pos[1] + expandItem.height
                 item.visible = true
