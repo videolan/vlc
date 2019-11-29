@@ -109,6 +109,12 @@ struct vlc_player_input
         int default_video_track;
         int default_audio_track;
         int default_subtitle_track;
+        enum
+        {
+            VLC_RESTOREPOINT_TITLE,
+            VLC_RESTOREPOINT_POSITION,
+            VLC_RESTOREPOINT_NONE,
+        } restore;
     } ml;
 };
 

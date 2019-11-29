@@ -554,12 +554,14 @@ vlc_player_input_HandleTitleEvent(struct vlc_player_input *input,
             {
                 vlc_player_SendEvent(player, on_title_selection_changed,
                                      &input->titles->array[0], 0);
-                if (input->ml.states.current_title >= 0 &&
+                if (input->ml.restore == VLC_RESTOREPOINT_TITLE &&
                     (size_t)input->ml.states.current_title < ev->list.count)
                 {
                     vlc_player_SelectTitleIdx(player, input->ml.states.current_title);
                 }
+                input->ml.restore = VLC_RESTOREPOINT_POSITION;
             }
+            else input->ml.restore = VLC_RESTOREPOINT_NONE;
             break;
         }
         case VLC_INPUT_TITLE_SELECTED:
@@ -570,16 +572,17 @@ vlc_player_input_HandleTitleEvent(struct vlc_player_input *input,
             vlc_player_SendEvent(player, on_title_selection_changed,
                                  &input->titles->array[input->title_selected],
                                  input->title_selected);
-            if (input->ml.states.current_title >= 0 &&
+            if (input->ml.restore == VLC_RESTOREPOINT_POSITION &&
+                input->ml.states.current_title >= 0 &&
                 (size_t)input->ml.states.current_title == ev->selected_idx &&
                 input->ml.states.progress > .0f)
             {
                 input_SetPosition(input->thread, input->ml.states.progress, false);
-                /* Reset the wanted title to avoid forcing it or the position
-                 * again during the next title change
-                 */
-                input->ml.states.current_title = 0;
             }
+            /* Reset the wanted title to avoid forcing it or the position
+             * again during the next title change
+             */
+            input->ml.restore = VLC_RESTOREPOINT_NONE;
             break;
         default:
             vlc_assert_unreachable();
@@ -876,6 +879,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
         input->ml.default_video_track = input->ml.default_audio_track =
         input->ml.default_subtitle_track = -2;
     input->ml.states.progress = -1.f;
+    input->ml.restore = VLC_RESTOREPOINT_TITLE;
 
     input->thread = input_Create(player, input_thread_Events, input, item,
                                  player->resource, player->renderer);
