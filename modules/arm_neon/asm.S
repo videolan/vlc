@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2018 Janne Grunau <janne-libav@jannau.net>
+ * Copyright (c) 2019 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,4 +37,24 @@
 	.type   EXTERN_ASM\name, %function
 #endif
 EXTERN_ASM\name:
+.endm
+
+.macro	bti	targets=
+.ifb	\targets
+	hint	#32
+.else
+.ifc	\targets, c
+	hint	#34
+.else
+.ifc	\targets, j
+	hint	#36
+.else
+.ifc	\targets, jc
+	hint	#38
+.else
+.error	"invalid BTI target"
+.endif
+.endif
+.endif
+.endif
 .endm
