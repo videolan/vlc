@@ -54,8 +54,6 @@ Rectangle {
     signal itemDoubleClicked(Item menuParent, int keys, int modifier)
     signal contextMenuButtonClicked(Item menuParent)
 
-    property int index: 0
-
     Keys.onMenuPressed: root.contextMenuButtonClicked(cover_bg)
 
     Accessible.role: Accessible.Cell
