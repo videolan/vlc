@@ -46,12 +46,7 @@ typedef struct
     VdpYCbCrFormat format;
     picture_pool_t *pool;
 
-    struct
-    {
-        vlc_vdp_video_field_t *field;
-        vlc_tick_t date;
-        bool force;
-    } history[MAX_PAST + 1 + MAX_FUTURE];
+    picture_t *history[MAX_PAST + 1 + MAX_FUTURE];
 
     struct
     {
@@ -290,10 +285,10 @@ static void Flush(filter_t *filter)
     vlc_vdp_mixer_t *sys = filter->p_sys;
 
     for (unsigned i = 0; i < MAX_PAST + MAX_FUTURE; i++)
-        if (sys->history[i].field != NULL)
+        if (sys->history[i] != NULL)
         {
-            vlc_vdp_video_destroy(sys->history[i].field);
-            sys->history[i].field = NULL;
+            picture_Release(sys->history[i]);
+            sys->history[i] = NULL;
         }
 }
 
@@ -477,40 +472,29 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     }
 
     /* Update history and take "present" picture field */
-    if (likely(src != NULL))
-    {
-        sys->history[MAX_PAST + MAX_FUTURE].field =
-            vlc_vdp_video_copy((vlc_vdp_video_field_t *)src->context);
-        sys->history[MAX_PAST + MAX_FUTURE].date = src->date;
-        sys->history[MAX_PAST + MAX_FUTURE].force = src->b_force;
-        picture_Release(src);
-    }
-    else
-    {
-        sys->history[MAX_PAST + MAX_FUTURE].field = NULL;
-        sys->history[MAX_PAST + MAX_FUTURE].force = false;
-    }
+    sys->history[MAX_PAST + MAX_FUTURE] = src;
 
-    vlc_vdp_video_field_t *f = sys->history[MAX_PAST].field;
-    if (f == NULL)
+    picture_t *pic_f = sys->history[MAX_PAST];
+    if (pic_f == NULL)
     {   /* There is no present field, probably just starting playback. */
-        if (!sys->history[MAX_PAST + MAX_FUTURE].force)
+        if (!sys->history[MAX_PAST + MAX_FUTURE] ||
+            !sys->history[MAX_PAST + MAX_FUTURE]->b_force)
             goto skip;
 
         /* If the picture is forced, ignore deinterlacing and fast forward. */
         /* FIXME: Remove the forced hack pictures in video output core and
          * allow the last field of a video to be rendered properly. */
-        while (sys->history[MAX_PAST].field == NULL)
+        while (sys->history[MAX_PAST] == NULL)
         {
-            f = sys->history[0].field;
-            if (f != NULL)
-                vlc_vdp_video_destroy(f);
+            pic_f = sys->history[0];
+            if (pic_f != NULL)
+                picture_Release(pic_f);
 
             memmove(sys->history, sys->history + 1,
                     sizeof (sys->history[0]) * (MAX_PAST + MAX_FUTURE));
-            sys->history[MAX_PAST + MAX_FUTURE].field = NULL;
+            sys->history[MAX_PAST + MAX_FUTURE] = NULL;
         }
-        f = sys->history[MAX_PAST].field;
+        pic_f = sys->history[MAX_PAST];
     }
 
     /* Get a VLC picture for a VDPAU output surface */
@@ -520,10 +504,11 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
 
     vlc_vdp_output_surface_t *p_sys = dst->p_sys;
     assert(p_sys != NULL && p_sys->vdp == sys->vdp);
-    dst->date = sys->history[MAX_PAST].date;
-    dst->b_force = sys->history[MAX_PAST].force;
+    dst->date = pic_f->date;
+    dst->b_force = pic_f->b_force;
 
     /* Enable/Disable features */
+    vlc_vdp_video_field_t *f = (vlc_vdp_video_field_t *)(pic_f->context);
     const VdpVideoMixerFeature features[] = {
         VDP_VIDEO_MIXER_FEATURE_SHARPNESS,
     };
@@ -649,13 +634,13 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
 
     for (unsigned i = 0; i < MAX_PAST; i++)
     {
-        f = sys->history[(MAX_PAST - 1) - i].field;
-        past[i] = (f != NULL) ? f->frame->surface : VDP_INVALID_HANDLE;
+        pic_f = sys->history[(MAX_PAST - 1) - i];
+        past[i] = (pic_f != NULL) ? ((vlc_vdp_video_field_t *)(pic_f->context))->frame->surface : VDP_INVALID_HANDLE;
     }
     for (unsigned i = 0; i < MAX_FUTURE; i++)
     {
-        f = sys->history[(MAX_PAST + 1) + i].field;
-        future[i] = (f != NULL) ? f->frame->surface : VDP_INVALID_HANDLE;
+        pic_f = sys->history[(MAX_PAST + 1) + i];
+        future[i] = (pic_f != NULL) ? ((vlc_vdp_video_field_t *)(pic_f->context))->frame->surface : VDP_INVALID_HANDLE;
     }
 
     err = vdp_video_mixer_render(sys->vdp, sys->mixer, VDP_INVALID_HANDLE,
@@ -685,9 +670,9 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     }
 
 skip:
-    f = sys->history[0].field;
-    if (f != NULL)
-        vlc_vdp_video_destroy(f); /* Release oldest field */
+    pic_f = sys->history[0];
+    if (pic_f != NULL)
+        picture_Release(pic_f); /* Release oldest field */
     memmove(sys->history, sys->history + 1, /* Advance history */
             sizeof (sys->history[0]) * (MAX_PAST + MAX_FUTURE));
 
@@ -828,7 +813,7 @@ static int OutputOpen(vlc_object_t *obj)
     }
 
     for (unsigned i = 0; i < MAX_PAST + MAX_FUTURE; i++)
-        sys->history[i].field = NULL;
+        sys->history[i] = NULL;
 
     sys->procamp.brightness = 0.f;
     sys->procamp.contrast = 1.f;
