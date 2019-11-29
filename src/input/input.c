@@ -2679,22 +2679,22 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
             in->b_title_demux = true;
         }
 
-        int i_attachment;
-        input_attachment_t **attachment;
-        if( !demux_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
-                             &attachment, &i_attachment ) )
-        {
-            vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
-            AppendAttachment( &input_priv(p_input)->i_attachment, &input_priv(p_input)->attachment, &input_priv(p_input)->attachment_demux,
-                              i_attachment, attachment, in->p_demux );
-            vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
-        }
-
         demux_Control( in->p_demux, DEMUX_GET_PTS_DELAY, &in->i_pts_delay );
         if( in->i_pts_delay > INPUT_PTS_DELAY_MAX )
             in->i_pts_delay = INPUT_PTS_DELAY_MAX;
         else if( in->i_pts_delay < 0 )
             in->i_pts_delay = 0;
+    }
+
+    int i_attachment;
+    input_attachment_t **attachment;
+    if( !demux_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
+                         &attachment, &i_attachment ) )
+    {
+        vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
+        AppendAttachment( &input_priv(p_input)->i_attachment, &input_priv(p_input)->attachment, &input_priv(p_input)->attachment_demux,
+                          i_attachment, attachment, in->p_demux );
+        vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
     }
 
     if( demux_Control( in->p_demux, DEMUX_GET_FPS, &in->f_fps ) )
