@@ -34,7 +34,7 @@
 #include <vlc_codec.h>
 #include <vlc_picture.h>
 
-#include "va_surface_internal.h"
+#include "va_surface.h"
 
 #include "avcodec.h"
 

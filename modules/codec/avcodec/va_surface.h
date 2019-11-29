@@ -1,5 +1,5 @@
 /*****************************************************************************
- * va_surface_internal.h: libavcodec Generic Video Acceleration helpers
+ * va_surface.h: libavcodec Generic Video Acceleration helpers
  *****************************************************************************
  * Copyright (C) 2009 Geoffroy Couprie
  * Copyright (C) 2009 Laurent Aimar

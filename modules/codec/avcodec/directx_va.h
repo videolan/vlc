@@ -41,7 +41,7 @@
 #include <unknwn.h>
 #include <stdatomic.h>
 
-#include "va_surface_internal.h"
+#include "va_surface.h"
 
 typedef struct input_list_t {
     void (*pf_release)(struct input_list_t *);

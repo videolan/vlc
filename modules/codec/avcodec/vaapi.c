@@ -47,7 +47,7 @@
 #include "avcodec.h"
 #include "va.h"
 #include "../../hw/vaapi/vlc_vaapi.h"
-#include "va_surface_internal.h"
+#include "va_surface.h"
 
 struct vlc_va_sys_t
 {
