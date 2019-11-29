@@ -1694,15 +1694,15 @@ asm volatile("ptrue p0.s" ::: "p0");
 ])
 AM_CONDITIONAL([HAVE_SVE], [test "${ac_cv_arm_sve}" = "yes"])
 
-AC_ARG_ENABLE([pointer-auth],
-  AS_HELP_STRING([--disable-pointer-auth],
-    [disable ARMv8.3 Pointer Authentication (default auto)]),, [
-  AS_IF([test "${host_cpu}" = "aarch64"], [enable_ptrauth="yes"] ,[enable_ptrauth="no"])
+AC_ARG_ENABLE([branch-protection],
+  AS_HELP_STRING([--disable-branch-protection],
+    [disable AArch64 branch protection (default auto)]),, [
+  AS_IF([test "${host_cpu}" = "aarch64"], [enable_brprot="yes"] ,[enable_brprot="no"])
 ])
-AS_IF([test "${enable_ptrauth}" != "no"], [
-  AX_CHECK_COMPILE_FLAG([-msign-return-address=non-leaf], [
-    AX_APPEND_FLAG([-msign-return-address=non-leaf], [CFLAGS])
-    AX_APPEND_FLAG([-msign-return-address=non-leaf], [CXXFLAGS])
+AS_IF([test "${enable_brprot}" != "no"], [
+  AX_CHECK_COMPILE_FLAG([-mbranch-protection=standard], [
+    AX_APPEND_FLAG([-mbranch-protection=standard], [CFLAGS])
+    AX_APPEND_FLAG([-mbranch-protection=standard], [CXXFLAGS])
   ])
 ])
 
