@@ -207,7 +207,6 @@ CheckableListMenu::CheckableListMenu(QString title, QAbstractListModel* model , 
     , m_model(model)
 {
     this->setTitle(title);
-    m_actionGroup = new QActionGroup( this );
 
     connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this, &CheckableListMenu::onRowsAboutToBeRemoved);
     connect(m_model, &QAbstractListModel::rowsInserted, this, &CheckableListMenu::onRowInserted);
@@ -237,7 +236,6 @@ void CheckableListMenu::onRowInserted(const QModelIndex &, int first, int last)
         bool checked = m_model->data(index, Qt::CheckStateRole).toBool();
 
         QAction *choiceAction = new QAction(title, this);
-        m_actionGroup->addAction(choiceAction);
         addAction(choiceAction);
         connect(choiceAction, &QAction::triggered, [this, i](bool checked){
             QModelIndex dataIndex = m_model->index(i);

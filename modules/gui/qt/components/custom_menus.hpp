@@ -90,8 +90,6 @@ private slots:
 private:
     QAbstractListModel* m_model;
     QMenu * m_submenu;
-
-    QActionGroup* m_actionGroup;
 };
 
 
