@@ -401,9 +401,9 @@ function parse()
             if video_id then
                 -- Passing no "el" parameter to /get_video_info seems to
                 -- let it default to "embedded", and both known values
-                -- of "embedded" and "detailpage" are wrong and fail for
-                -- various restricted videos, so we pass a different value
-                path = vlc.access.."://www.youtube.com/get_video_info?video_id="..video_id.."&el=detail"..copy_url_param( vlc.path, "fmt" )
+                -- of "embedded" and "detailpage" have historically been
+                -- wrong and failed for various restricted videos.
+                path = vlc.access.."://www.youtube.com/get_video_info?video_id="..video_id..copy_url_param( vlc.path, "fmt" )
                 vlc.msg.warn( "Couldn't extract video URL, falling back to alternate youtube API" )
             end
         end
