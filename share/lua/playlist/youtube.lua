@@ -466,17 +466,17 @@ function parse()
             return { }
         end
 
-        local title = string.match( line, "&title=([^&]*)" )
+        local title = string.match( line, "%%22title%%22%%3A%%22(.-)%%22" )
         if title then
             title = string.gsub( title, "+", " " )
             title = vlc.strings.decode_uri( title )
         end
-        local artist = string.match( line, "&author=([^&]*)" )
+        local artist = string.match( line, "%%22author%%22%%3A%%22(.-)%%22" )
         if artist then
             artist = string.gsub( artist, "+", " " )
             artist = vlc.strings.decode_uri( artist )
         end
-        local arturl = string.match( line, "&thumbnail_url=([^&]*)" )
+        local arturl = string.match( line, "%%22playerMicroformatRenderer%%22%%3A%%7B%%22thumbnail%%22%%3A%%7B%%22thumbnails%%22%%3A%%5B%%7B%%22url%%22%%3A%%22(.-)%%22" )
         if arturl then
             arturl = vlc.strings.decode_uri( arturl )
         end
