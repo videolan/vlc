@@ -219,7 +219,7 @@ function stream_url( params, js_url )
     return url
 end
 
--- Parse and pick our video URL
+-- Parse and pick our video stream URL (classic parameters)
 function pick_url( url_map, fmt, js_url )
     for stream in string.gmatch( url_map, "[^,]+" ) do
         local itag = string.match( stream, "itag=(%d+)" )
@@ -228,6 +228,60 @@ function pick_url( url_map, fmt, js_url )
         end
     end
     return nil
+end
+
+-- Parse and pick our video stream URL (new-style parameters)
+function pick_stream( stream_map, js_url )
+    local pick = nil
+
+    local fmt = tonumber( get_url_param( vlc.path, "fmt" ) )
+    if fmt then
+        -- Legacy match from URL parameter
+        for stream in string.gmatch( stream_map, '{(.-)}' ) do
+            local itag = tonumber( string.match( stream, '"itag":(%d+)' ) )
+            if fmt == itag then
+                pick = stream
+                break
+            end
+        end
+    else
+        -- Compare the different available formats listed with our
+        -- quality targets
+        local prefres = vlc.var.inherit( nil, "preferred-resolution" )
+        local bestres = nil
+
+        for stream in string.gmatch( stream_map, '{(.-)}' ) do
+            local height = tonumber( string.match( stream, '"height":(%d+)' ) )
+
+            -- Better than nothing
+            if not pick or ( height and ( not bestres
+                -- Better quality within limits
+                or ( ( prefres < 0 or height <= prefres ) and height > bestres )
+                -- Lower quality more suited to limits
+                or ( prefres > -1 and bestres > prefres and height < bestres )
+            ) ) then
+                bestres = height
+                pick = stream
+            end
+        end
+    end
+
+    if not pick then
+        return nil
+    end
+
+    -- Either the "url" or the "cipher" parameter is present,
+    -- depending on whether the URL signature is scrambled.
+    local cipher = string.match( pick, '"cipher":"(.-)"' )
+    if cipher then
+        -- Scrambled signature: some assembly required
+        local url = stream_url( cipher, js_url )
+        if url then
+            return url
+        end
+    end
+    -- Unscrambled signature, already included in ready-to-use URL
+    return string.match( pick, '"url":"(.-)"' )
 end
 
 -- Probe function.
@@ -301,6 +355,7 @@ function parse()
                     js_url = string.gsub( js_url, "^//", vlc.access.."://" )
                 end
 
+                -- Classic parameters
                 if not fmt then
                     fmt_list = string.match( line, "\"fmt_list\": *\"(.-)\"" )
                     if fmt_list then
@@ -311,9 +366,22 @@ function parse()
 
                 url_map = string.match( line, "\"url_encoded_fmt_stream_map\": *\"(.-)\"" )
                 if url_map then
+                    vlc.msg.dbg( "Found classic parameters for youtube video stream, parsing..." )
                     -- FIXME: do this properly
                     url_map = string.gsub( url_map, "\\u0026", "&" )
                     path = pick_url( url_map, fmt, js_url )
+                end
+
+                -- New-style parameters
+                if not path then
+                    local stream_map = string.match( line, '\\"formats\\":%[(.-)%]' )
+                    if stream_map then
+                        vlc.msg.dbg( "Found new-style parameters for youtube video stream, parsing..." )
+                        stream_map = string.gsub( stream_map, '\\(["\\/])', '%1' )
+                        -- FIXME: do this properly
+                        stream_map = string.gsub( stream_map, "\\u0026", "&" )
+                        path = pick_stream( stream_map, js_url )
+                    end
                 end
 
                 if not path then
@@ -354,6 +422,7 @@ function parse()
     elseif string.match( vlc.path, "/get_video_info%?" ) then -- video info API
         local line = vlc.readline() -- data is on one line only
 
+        -- Classic parameters
         local fmt = get_url_param( vlc.path, "fmt" )
         if not fmt then
             local fmt_list = string.match( line, "&fmt_list=([^&]*)" )
@@ -365,8 +434,21 @@ function parse()
 
         local url_map = string.match( line, "&url_encoded_fmt_stream_map=([^&]*)" )
         if url_map then
+            vlc.msg.dbg( "Found classic parameters for youtube video stream, parsing..." )
             url_map = vlc.strings.decode_uri( url_map )
             path = pick_url( url_map, fmt )
+        end
+
+        -- New-style parameters
+        if not path then
+            local stream_map = string.match( line, '%%22formats%%22%%3A%%5B(.-)%%5D' )
+            if stream_map then
+                vlc.msg.dbg( "Found new-style parameters for youtube video stream, parsing..." )
+                stream_map = vlc.strings.decode_uri( stream_map )
+                -- FIXME: do this properly
+                stream_map = string.gsub( stream_map, "\\u0026", "&" )
+                path = pick_stream( stream_map )
+            end
         end
 
         if not path then
