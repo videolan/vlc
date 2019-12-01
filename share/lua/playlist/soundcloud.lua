@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2012, 2015 the VideoLAN team
+ Copyright © 2012, 2015, 2019 the VideoLAN team
 
  Authors: Cheng Sun <chengsun9atgmail.com>
           Pierre Ynard
@@ -44,14 +44,12 @@ function parse()
         line = vlc.readline()
         if not line then break end
 
-        -- Parameters for API call
-        if not track then
-            track = string.match( line, "soundcloud:tracks:(%d+)" )
-        end
-
-        -- For private tracks
-        if not secret then
-            secret = string.match( line, "[\"']secret_token[\"'] *: *[\"'](.-)[\"']" )
+        -- API endpoint for audio stream URL
+        if not stream then
+            -- The URL may feature an optional query string: for private
+            -- tracks in particular it contains a secret token, e.g.
+            -- https://api-v2.soundcloud.com/media/soundcloud:tracks:123456789/986421ee-f9ba-42b2-a642-df8e9761a49b/stream/progressive?secret_token=s-ABCDE
+            stream = string.match( line, '"url":"([^"]-/stream/progressive[^"]-)"' )
         end
 
         -- Metadata
@@ -81,23 +79,16 @@ function parse()
         end
     end
 
-    if track then
+    if stream then
         -- API magic
-        local client_id = "NxDq1GKZ5tLDRohQGfJ7lYVKiephsF3G"
-        -- app_version is not required by the API but we send it anyway
-        -- to remain unconspicuous
-        local app_version = "1553518929"
+        local client_id = "1XduoqV99lROqCMpijtDo5WnJmpaLuYm"
 
-        local api = vlc.stream( vlc.access.."://api.soundcloud.com/i1/tracks/"..track.."/streams?client_id="..client_id.."&app_version="..app_version..( secret and "&secret_token="..secret or "" ) )
+        local api = vlc.stream( stream..( string.match( stream, "?" ) and "&" or "?" ).."client_id="..client_id )
 
         if api then
             local streams = api:readline() -- data is on one line only
-            -- For now only quality available is 128 kbps (http_mp3_128_url)
-            path = string.match( streams, "[\"']http_mp3_%d+_url[\"'] *: *[\"'](.-)[\"']" )
-            if path then
-                -- FIXME: do this properly
-                path = string.gsub( path, "\\u0026", "&" )
-            end
+            -- This API seems to return a single JSON field
+            path = string.match( streams, '"url":"(.-)"' )
         end
     end
 
