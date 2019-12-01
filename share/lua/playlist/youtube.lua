@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2007-2018 the VideoLAN team
+ Copyright © 2007-2019 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -189,41 +189,45 @@ function js_descramble( sig, js_url )
     return sig
 end
 
+-- Parse and assemble video stream URL
+function stream_url( params, js_url )
+    local url = string.match( params, "url=([^&]+)" )
+    if not url then
+        return nil
+    end
+    url = vlc.strings.decode_uri( url )
+
+    -- Descramble any scrambled signature and append it to URL
+    local s = string.match( params, "s=([^&]+)" )
+    if s then
+        s = vlc.strings.decode_uri( s )
+        vlc.msg.dbg( "Found "..string.len( s ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
+        if js_url then
+            s = js_descramble( s, js_url )
+        else
+            vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
+        end
+
+        local sp = string.match( params, "sp=([^&]+)" )
+        if not sp then
+            vlc.msg.warn( "Couldn't extract signature parameters for youtube video URL, guessing" )
+            sp = "signature"
+        end
+        url = url.."&"..sp.."="..vlc.strings.encode_uri_component( s )
+    end
+
+    return url
+end
+
 -- Parse and pick our video URL
 function pick_url( url_map, fmt, js_url )
-    local path = nil
     for stream in string.gmatch( url_map, "[^,]+" ) do
         local itag = string.match( stream, "itag=(%d+)" )
         if not fmt or not itag or tonumber( itag ) == tonumber( fmt ) then
-            local url = string.match( stream, "url=([^&,]+)" )
-            if url then
-                url = vlc.strings.decode_uri( url )
-
-                -- Descramble any scrambled signature and append it to URL
-                local s = string.match( stream, "s=([^&,]+)" )
-                if s then
-                    s = vlc.strings.decode_uri( s )
-                    vlc.msg.dbg( "Found "..string.len( s ).."-character scrambled signature for youtube video URL, attempting to descramble... " )
-                    if js_url then
-                        s = js_descramble( s, js_url )
-                    else
-                        vlc.msg.err( "Couldn't process youtube video URL, please check for updates to this script" )
-                    end
-
-                    local sp = string.match( stream, "sp=([^&,]+)" )
-                    if not sp then
-                        vlc.msg.warn( "Couldn't extract signature parameters for youtube video URL, guessing" )
-                        sp = "signature"
-                    end
-                    url = url.."&"..sp.."="..vlc.strings.encode_uri_component( s )
-                end
-
-                path = url
-                break
-            end
+            return stream_url( stream, js_url )
         end
     end
-    return path
+    return nil
 end
 
 -- Probe function.
