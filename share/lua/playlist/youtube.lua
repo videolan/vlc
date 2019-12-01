@@ -193,8 +193,6 @@ end
 function pick_url( url_map, fmt, js_url )
     local path = nil
     for stream in string.gmatch( url_map, "[^,]+" ) do
-        -- Apparently formats are listed in quality order,
-        -- so we can afford to simply take the first one
         local itag = string.match( stream, "itag=(%d+)" )
         if not fmt or not itag or tonumber( itag ) == tonumber( fmt ) then
             local url = string.match( stream, "url=([^&,]+)" )
@@ -323,9 +321,6 @@ function parse()
                         path = hlsvp
                     end
                 end
-            -- There is also another version of the parameters, encoded
-            -- differently, as an HTML attribute of an <object> or <embed>
-            -- tag; but we don't need it now
             end
         end
 
