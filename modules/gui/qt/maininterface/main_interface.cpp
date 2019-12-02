@@ -68,6 +68,7 @@
 #include "util/qml_main_context.hpp"
 
 #include "util/qmleventfilter.hpp"
+#include "util/i18n.hpp"
 
 #include "menus/menus.hpp"                            // Menu creation
 
@@ -386,6 +387,7 @@ void MainInterface::createMainWidget( QSettings * )
     mediacenterView = new QQuickWidget(this);
     mediacenterView->setClearColor(Qt::transparent);
 
+    I18n* i18n = new I18n(this);
     NavigationHistory* navigation_history = new NavigationHistory(mediacenterView);
 
     QmlMainContext* mainCtx = new QmlMainContext(p_intf, this, mediacenterView);
@@ -395,6 +397,7 @@ void MainInterface::createMainWidget( QSettings * )
 
     rootCtx->setContextProperty( "history", navigation_history );
     rootCtx->setContextProperty( "player", p_intf->p_sys->p_mainPlayerController );
+    rootCtx->setContextProperty( "i18n", i18n );
     rootCtx->setContextProperty( "mainctx", mainCtx);
     rootCtx->setContextProperty( "rootQMLView", mediacenterView);
     rootCtx->setContextProperty( "rootWindow", this);
