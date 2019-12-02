@@ -253,10 +253,15 @@ if [ "$PACKAGETYPE" = "u" ]; then
 
     info "Building VLC release archive"
     make package-macosx-release
+    make package-macosx-sdk
+
     shasum -a 512 vlc-*-release.zip
+    shasum -a 512 vlc-macos-sdk-*.tar.gz
+
 elif [ "$PACKAGETYPE" = "n" -o "$PACKAGE" = "yes" ]; then
     info "Building VLC dmg package"
     make package-macosx
+    make package-macosx-sdk
 fi
 
 if [ ! -z "$VLCBUILDDIR" ]; then
