@@ -507,7 +507,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
     const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(chroma);
     if (desc == NULL)
-        return VLC_EGENERIC;
+        return 0;
 
     if (chroma == VLC_CODEC_XYZ12)
         return xyz12_shader_init(tc);
