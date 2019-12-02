@@ -513,7 +513,7 @@ static void SetupID3v2Meta( vlc_meta_t *p_meta, MP4_Box_t *p_box )
                   ID3TAG_Parse_Handler, p_meta );
 }
 
-void SetupMeta( vlc_meta_t *p_meta, MP4_Box_t *p_udta )
+void SetupMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_udta )
 {
     uint32_t i_handler = 0;
     if ( p_udta->p_father )

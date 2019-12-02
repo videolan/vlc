@@ -37,8 +37,9 @@
 #include <vlc_url.h>
 #include <assert.h>
 #include <limits.h>
-#include "../../codec/cc.h"
+#include "attachments.h"
 #include "heif.h"
+#include "../../codec/cc.h"
 #include "../av1_unpack.h"
 
 /*****************************************************************************
@@ -148,15 +149,6 @@ typedef struct
 
 #define VLC_DEMUXER_EOS (VLC_DEMUXER_EGENERIC - 1)
 #define VLC_DEMUXER_FATAL (VLC_DEMUXER_EGENERIC - 2)
-
-const uint32_t rgi_pict_atoms[2] = { ATOM_PICT, ATOM_pict };
-const char *psz_meta_roots[] = { "/moov/udta/meta/ilst",
-                                 "/moov/meta/ilst",
-                                 "/moov/udta/meta",
-                                 "/moov/udta",
-                                 "/meta/ilst",
-                                 "/udta",
-                                 NULL };
 
 /*****************************************************************************
  * Declaration of local function
@@ -1932,65 +1924,18 @@ static int FragSeekToPos( demux_t *p_demux, double f, bool b_accurate )
                            MP4_rescale_mtime( i_duration, p_sys->i_timescale ) ), b_accurate );
 }
 
-static bool imageTypeCompatible( const MP4_Box_data_data_t *p_data )
-{
-    return p_data && (
-    p_data->e_wellknowntype == DATA_WKT_PNG ||
-    p_data->e_wellknowntype == DATA_WKT_JPEG ||
-    p_data->e_wellknowntype == DATA_WKT_BMP );
-}
-
 static int MP4_LoadMeta( demux_sys_t *p_sys, vlc_meta_t *p_meta )
 {
-    MP4_Box_t *p_data = NULL;
-    MP4_Box_t *p_udta = NULL;
-    bool b_attachment_set = false;
-
     if( !p_meta )
         return VLC_EGENERIC;
 
-    for( int i_index = 0; psz_meta_roots[i_index] && !p_udta; i_index++ )
-    {
-        p_udta = MP4_BoxGet( p_sys->p_root, psz_meta_roots[i_index] );
-        if ( p_udta )
-        {
-            p_data = MP4_BoxGet( p_udta, "covr/data" );
-            if ( p_data && imageTypeCompatible( BOXDATA(p_data) ) )
-            {
-                char *psz_attachment;
-                if ( -1 != asprintf( &psz_attachment, "attachment://%s/covr/data[0]",
-                                     psz_meta_roots[i_index] ) )
-                {
-                    vlc_meta_SetArtURL( p_meta, psz_attachment );
-                    b_attachment_set = true;
-                    free( psz_attachment );
-                }
-            }
-        }
-    }
+    const char *psz_metapath;
+    const MP4_Box_t *p_metaroot = MP4_GetMetaRoot( p_sys->p_root, &psz_metapath );
 
-    const MP4_Box_t *p_pnot;
-    if ( !b_attachment_set && (p_pnot = MP4_BoxGet( p_sys->p_root, "pnot" )) )
-    {
-        for ( size_t i=0; i< ARRAY_SIZE(rgi_pict_atoms) && !b_attachment_set; i++ )
-        {
-            if ( rgi_pict_atoms[i] == BOXDATA(p_pnot)->i_type )
-            {
-                char rgsz_path[26];
-                snprintf( rgsz_path, 26, "attachment://%4.4s[%"PRIu16"]",
-                          (char*)&rgi_pict_atoms[i], BOXDATA(p_pnot)->i_index - 1 );
-                vlc_meta_SetArtURL( p_meta, rgsz_path );
-                b_attachment_set = true;
-            }
-        }
-    }
+    MP4_GetCoverMetaURI( p_sys->p_root, p_metaroot, psz_metapath, p_meta );
 
-    if( p_udta == NULL )
-    {
-        if( !b_attachment_set )
-            return VLC_EGENERIC;
-    }
-    else SetupMeta( p_meta, p_udta );
+    if( p_metaroot )
+        SetupMeta( p_meta, p_metaroot );
 
     return VLC_SUCCESS;
 }
@@ -2075,111 +2020,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             input_attachment_t ***ppp_attach = va_arg( args, input_attachment_t*** );
             int *pi_int = va_arg( args, int * );
 
-            MP4_Box_t *p_udta = NULL;
-            size_t i_count = 0;
-            int i_index = 0;
-
-            /* Count number of total attachments */
-            for( ; psz_meta_roots[i_index] && !p_udta; i_index++ )
-            {
-                p_udta = MP4_BoxGet( p_sys->p_root, psz_meta_roots[i_index] );
-                if ( p_udta )
-                    i_count += MP4_BoxCount( p_udta, "covr/data" );
-            }
-
-            for ( size_t i=0; i< ARRAY_SIZE(rgi_pict_atoms); i++ )
-            {
-                char rgsz_path[5];
-                snprintf( rgsz_path, 5, "%4.4s", (char*)&rgi_pict_atoms[i] );
-                i_count += MP4_BoxCount( p_sys->p_root, rgsz_path );
-            }
-
-            if ( i_count == 0 )
-                return VLC_EGENERIC;
-
-            *ppp_attach = (input_attachment_t**)
-                    vlc_alloc( i_count, sizeof(input_attachment_t*) );
-            if( !(*ppp_attach) ) return VLC_ENOMEM;
-
-            /* First add cover attachments */
-            i_count = 0;
-            size_t i_box_count = 0;
-            if ( p_udta )
-            {
-                const MP4_Box_t *p_data = MP4_BoxGet( p_udta, "covr/data" );
-                for( ; p_data; p_data = p_data->p_next )
-                {
-                    char *psz_mime;
-                    char *psz_filename;
-                    i_box_count++;
-
-                    if ( p_data->i_type != ATOM_data || !imageTypeCompatible( BOXDATA(p_data) ) )
-                        continue;
-
-                    switch( BOXDATA(p_data)->e_wellknowntype )
-                    {
-                    case DATA_WKT_PNG:
-                        psz_mime = strdup( "image/png" );
-                        break;
-                    case DATA_WKT_JPEG:
-                        psz_mime = strdup( "image/jpeg" );
-                        break;
-                    case DATA_WKT_BMP:
-                        psz_mime = strdup( "image/bmp" );
-                        break;
-                    default:
-                        continue;
-                    }
-
-                    if ( asprintf( &psz_filename, "%s/covr/data[%"PRIu64"]", psz_meta_roots[i_index - 1],
-                                   (uint64_t) i_box_count - 1 ) >= 0 )
-                    {
-                        (*ppp_attach)[i_count++] =
-                            vlc_input_attachment_New( psz_filename, psz_mime, "Cover picture",
-                                BOXDATA(p_data)->p_blob, BOXDATA(p_data)->i_blob );
-                        msg_Dbg( p_demux, "adding attachment %s", psz_filename );
-                        free( psz_filename );
-                    }
-
-                    free( psz_mime );
-                }
-            }
-
-            /* Then quickdraw pict ones */
-            for ( size_t i=0; i< ARRAY_SIZE(rgi_pict_atoms); i++ )
-            {
-                char rgsz_path[5];
-                snprintf( rgsz_path, 5, "%4.4s", (char*)&rgi_pict_atoms[i] );
-                const MP4_Box_t *p_pict = MP4_BoxGet( p_sys->p_root, rgsz_path );
-                i_box_count = 0;
-                for( ; p_pict; p_pict = p_pict->p_next )
-                {
-                    if ( i_box_count++ == UINT16_MAX ) /* pnot only handles 2^16 */
-                        break;
-                    if ( p_pict->i_type != rgi_pict_atoms[i] )
-                        continue;
-                    char rgsz_location[12];
-                    snprintf( rgsz_location, 12, "%4.4s[%"PRIu16"]", (char*)&rgi_pict_atoms[i],
-                              (uint16_t) i_box_count - 1 );
-                    (*ppp_attach)[i_count] = vlc_input_attachment_New( rgsz_location, "image/x-pict",
-                        "Quickdraw image", p_pict->data.p_binary->p_blob, p_pict->data.p_binary->i_blob );
-                    if ( !(*ppp_attach)[i_count] )
-                    {
-                        i_count = 0;
-                        break;
-                    }
-                    i_count++;
-                    msg_Dbg( p_demux, "adding attachment %s", rgsz_location );
-                }
-            }
-
-            if ( i_count == 0 )
-            {
-                free( *ppp_attach );
-                return VLC_EGENERIC;
-            }
-
-            *pi_int = i_count;
+            *pi_int = MP4_GetAttachments( p_sys->p_root, ppp_attach );
+            for( int i=0; i<*pi_int; i++ )
+                msg_Dbg( p_demux, "adding attachment %s", (*ppp_attach)[i]->psz_name );
 
             return VLC_SUCCESS;
         }
