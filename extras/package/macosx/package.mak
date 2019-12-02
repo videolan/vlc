@@ -65,6 +65,10 @@ endif
 	find $@ -type d -exec chmod ugo+rx '{}' \;
 	find $@ -type f -exec chmod ugo+r '{}' \;
 
+package-macosx-sdk: macos-install
+	rm -f "$(top_builddir)/vlc-macos-sdk-$(VERSION).tar.gz"
+	tar -cf - --exclude "share/macosx" -C "$(macos_destdir)" . \
+		| gzip -c > "$(top_builddir)/vlc-macos-sdk-$(VERSION).tar.gz"
 
 package-macosx: VLC.app
 	rm -f "$(top_builddir)/vlc-$(VERSION).dmg"
@@ -126,7 +130,7 @@ package-translations:
 	$(AMTAR) chof - $(srcdir)/vlc-translations-$(VERSION) \
 	  | GZIP=$(GZIP_ENV) gzip -c >$(srcdir)/vlc-translations-$(VERSION).tar.gz
 
-.PHONY: package-macosx package-macosx-zip package-macosx-release package-translations pseudo-bundle macos-install
+.PHONY: package-macosx package-macosx-zip package-macosx-release package-translations pseudo-bundle macos-install package-macosx-sdk
 
 ###############################################################################
 # Mac OS X project
