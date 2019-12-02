@@ -93,6 +93,23 @@ static const MP4_Box_t * GetValidPnotMeta( const MP4_Box_t *p_pnot,
     return NULL;
 }
 
+static const MP4_Box_t * GetValidThumMeta( const MP4_Box_t *p_thum,
+                                           unsigned *pi_index,
+                                           const void **ctx )
+{
+    for( ; p_thum; p_thum = p_thum->p_next )
+    {
+        if( p_thum->i_type != ATOM_thum || p_thum == *ctx )
+            continue;
+        (*pi_index)++;
+        if ( !p_thum->data.p_binary )
+            continue;
+        *ctx = p_thum;
+        return p_thum;
+    }
+    return NULL;
+}
+
 int MP4_GetCoverMetaURI( const MP4_Box_t *p_root,
                          const MP4_Box_t *p_metaroot,
                          const char *psz_metapath,
@@ -132,6 +149,26 @@ int MP4_GetCoverMetaURI( const MP4_Box_t *p_root,
             char *psz_attachment;
             if ( -1 != asprintf( &psz_attachment,
                                  "attachment://pnot[%u]", i_index - 1 ) )
+            {
+                vlc_meta_SetArtURL( p_meta, psz_attachment );
+                b_attachment_set = true;
+                free( psz_attachment );
+            }
+        }
+    }
+
+
+    const MP4_Box_t *p_thum;
+    if( !b_attachment_set && (p_thum = MP4_BoxGet( p_root, "thum" )) )
+    {
+        unsigned i_index = 0;
+        const void *ctx = NULL;
+        if( (p_thum = GetValidThumMeta( p_thum, &i_index, &ctx )) )
+        {
+            char *psz_attachment;
+            if ( -1 != asprintf( &psz_attachment,
+                                 "attachment://thum[%u]",
+                                 i_index - 1 ) )
             {
                 vlc_meta_SetArtURL( p_meta, psz_attachment );
                 b_attachment_set = true;
@@ -249,6 +286,32 @@ int MP4_GetAttachments( const MP4_Box_t *p_root, input_attachment_t ***ppp_attac
                             "Quickdraw image",
                             p_pnot->data.p_binary->p_blob,
                             p_pnot->data.p_binary->i_blob );
+                free( psz_location );
+                if( p_attach )
+                    pp_attach[i_count++] = p_attach;
+            }
+        }
+    }
+
+
+    /* Then other thumbnails */
+    const MP4_Box_t *p_thum = MP4_BoxGet( p_root, "thum" );
+    if( p_thum )
+    {
+        unsigned i_index = 0;
+        const void *ctx = NULL;
+        while( (p_thum = GetValidThumMeta( p_thum, &i_index, &ctx )) )
+        {
+            char *psz_location;
+            if ( asprintf( &psz_location, "thum[%u]", i_index - 1 ) > -1 )
+            {
+                input_attachment_t *p_attach =
+                        vlc_input_attachment_New(
+                            psz_location,
+                            NULL,
+                            "Cover picture",
+                            p_thum->data.p_binary->p_blob,
+                            p_thum->data.p_binary->i_blob );
                 free( psz_location );
                 if( p_attach )
                     pp_attach[i_count++] = p_attach;
