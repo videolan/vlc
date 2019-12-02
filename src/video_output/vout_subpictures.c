@@ -1684,6 +1684,16 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
     sys->source_chain = filter_chain_NewSPU(spu, "sub source");
     sys->filter_chain = filter_chain_NewSPU(spu, "sub filter");
 
+    vlc_mutex_init(&sys->prerender.lock);
+    vlc_cond_init(&sys->prerender.cond);
+    vlc_cond_init(&sys->prerender.output_cond);
+    vlc_vector_init(&sys->prerender.vector);
+    video_format_Init(&sys->prerender.fmtdst, 0);
+    video_format_Init(&sys->prerender.fmtsrc, 0);
+    sys->prerender.p_processed = NULL;
+    sys->prerender.chroma_list[0] = 0;
+    sys->prerender.chroma_list[SPU_CHROMALIST_COUNT] = 0;
+
     /* Load text and scale module */
     sys->text = SpuRenderCreateAndLoadText(spu);
     vlc_mutex_init(&sys->textlock);
@@ -1711,15 +1721,6 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
     sys->last_sort_date = -1;
     sys->vout = vout;
 
-    vlc_mutex_init(&sys->prerender.lock);
-    vlc_cond_init(&sys->prerender.cond);
-    vlc_cond_init(&sys->prerender.output_cond);
-    vlc_vector_init(&sys->prerender.vector);
-    video_format_Init(&sys->prerender.fmtdst, 0);
-    video_format_Init(&sys->prerender.fmtsrc, 0);
-    sys->prerender.p_processed = NULL;
-    sys->prerender.chroma_list[0] = 0;
-    sys->prerender.chroma_list[SPU_CHROMALIST_COUNT] = 0;
     if(vlc_clone(&sys->prerender.thread, spu_PrerenderThread, spu, VLC_THREAD_PRIORITY_VIDEO))
     {
         spu_Cleanup(spu);
