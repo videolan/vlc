@@ -4,7 +4,7 @@
 #
 # Translators:
 # Alex Kalfas <kalfas.alex@gmail.com>, 2014
-# firespin <dartworldgr@hotmail.com>, 2014,2018
+# firespin <dartworldgr@hotmail.com>, 2014,2018-2019
 # Pontikis Ioannis <johnpontikis@yahoo.gr>, 2013
 # melmel <p_mel@windowslive.com>, 2014
 # Savvas Nesseris <nesseris@yahoo.com>, 2014-2015
@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-12-02 05:51+0100\n"
+"Last-Translator: firespin <dartworldgr@hotmail.com>, 2019\n"
 "Language-Team: Greek (https://www.transifex.com/yaron/teams/16553/el/)\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -17266,7 +17266,7 @@ msgstr "Εκκαθάριση"
 
 #: modules/gui/macosx/VLCFSPanelController.m:110
 msgid "Play/Pause the current media"
-msgstr ""
+msgstr "Αναπαραγωγή/Παύση του τρέχοντος μέσου"
 
 #: modules/gui/macosx/VLCFSPanelController.m:116
 msgid "Go to the previous item"
@@ -18469,7 +18469,7 @@ msgstr "Συνέχεια"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
 msgid "Always continue media playback"
-msgstr ""
+msgstr "Πάντα συνέχιση της αναπαραγωγής μέσων"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
@@ -21435,7 +21435,7 @@ msgstr "Υπότι&τλος"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr "Εργαλείο&α"
+msgstr "Εργαλεία"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
