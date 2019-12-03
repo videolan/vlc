@@ -21,14 +21,14 @@ import QtQuick.Controls 2.4
 import "qrc:///widgets/" as Widgets
 
 Widgets.MenuExt {
-    Action { text: qsTr("&Effects and Filters");    onTriggered: dialogProvider.extendedDialog();   icon.source: "qrc:/menu/settings.svg";    shortcut: "Ctrl+E" }
-    Action { text: qsTr("&Track Synchronization");  onTriggered: dialogProvider.synchroDialog();    icon.source: "qrc:/menu/settings.svg";                       }
-    Action { text: qsTr("Media &Information") ;     onTriggered: dialogProvider.mediaInfoDialog();  icon.source: "qrc:/menu/info.svg";        shortcut: "Ctrl+I" }
-    Action { text: qsTr("&Codec Information") ;     onTriggered: dialogProvider.mediaCodecDialog(); icon.source: "qrc:/menu/info.svg";        shortcut: "Ctrl+J" }
-    Action { text: qsTr("Program Guide");           onTriggered: dialogProvider.epgDialog();                                                                     }
-    Action { text: qsTr("&Messages");               onTriggered: dialogProvider.messagesDialog();   icon.source: "qrc:/menu/messages.svg";    shortcut: "Ctrl+M" }
-    Action { text: qsTr("Plu&gins and extensions"); onTriggered: dialogProvider.pluginDialog();                                                                  }
+    Action { text: i18n.qtr("&Effects and Filters");    onTriggered: dialogProvider.extendedDialog();   icon.source: "qrc:/menu/settings.svg";    shortcut: "Ctrl+E" }
+    Action { text: i18n.qtr("&Track Synchronization");  onTriggered: dialogProvider.synchroDialog();    icon.source: "qrc:/menu/settings.svg";                       }
+    Action { text: i18n.qtr("Media &Information") ;     onTriggered: dialogProvider.mediaInfoDialog();  icon.source: "qrc:/menu/info.svg";        shortcut: "Ctrl+I" }
+    Action { text: i18n.qtr("&Codec Information") ;     onTriggered: dialogProvider.mediaCodecDialog(); icon.source: "qrc:/menu/info.svg";        shortcut: "Ctrl+J" }
+    Action { text: i18n.qtr("Program Guide");           onTriggered: dialogProvider.epgDialog();                                                                     }
+    Action { text: i18n.qtr("&Messages");               onTriggered: dialogProvider.messagesDialog();   icon.source: "qrc:/menu/messages.svg";    shortcut: "Ctrl+M" }
+    Action { text: i18n.qtr("Plu&gins and extensions"); onTriggered: dialogProvider.pluginDialog();                                                                  }
     MenuSeparator {}
-    Action { text: qsTr("Customise Interface");     onTriggered: dialogProvider.toolbarDialog();    icon.source: "qrc:/menu/preferences.svg";}
-    Action { text: qsTr("&Preferences");            onTriggered: dialogProvider.prefsDialog();      icon.source: "qrc:/menu/preferences.svg"; shortcut: "Ctrl+P" }
+    Action { text: i18n.qtr("Customise Interface");     onTriggered: dialogProvider.toolbarDialog();    icon.source: "qrc:/menu/preferences.svg";}
+    Action { text: i18n.qtr("&Preferences");            onTriggered: dialogProvider.prefsDialog();      icon.source: "qrc:/menu/preferences.svg"; shortcut: "Ctrl+P" }
 }

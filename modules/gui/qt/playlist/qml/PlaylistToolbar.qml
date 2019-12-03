@@ -73,10 +73,10 @@ Widgets.NavigableFocusScope {
                 Layout.alignment: Qt.AlignHCenter
                 horizontalAlignment: Text.AlignHCenter
                 text: (view.mode === "select")
-                        ? qsTr("Select tracks (%1)").arg(plmodel.selectedCount)
+                        ? i18n.qtr("Select tracks (%1)").arg(plmodel.selectedCount)
                     : (view.mode === "move")
-                        ? qsTr("Move tracks (%1)").arg(plmodel.selectedCount)
-                    : qsTr("%1 tracks").arg(plmodel.count)
+                        ? i18n.qtr("Move tracks (%1)").arg(plmodel.selectedCount)
+                    : i18n.qtr("%1 tracks").arg(plmodel.count)
                 font.pixelSize: VLCStyle.fontSize_normal
                 color: VLCStyle.colors.text
                 elide: Text.ElideRight

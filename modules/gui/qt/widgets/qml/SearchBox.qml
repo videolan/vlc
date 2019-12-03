@@ -59,7 +59,7 @@ Widgets.NavigableFocusScope {
         duration: 200
         to: VLCStyle.widthSearchInput
         onStopped: {
-            searchBox.placeholderText = qsTr("filter")
+            searchBox.placeholderText = i18n.qtr("filter")
         }
     }
 
@@ -98,7 +98,7 @@ Widgets.NavigableFocusScope {
 
                 size: VLCStyle.icon_normal
                 iconText: VLCIcons.topbar_filter
-                text: qsTr("Filter")
+                text: i18n.qtr("Filter")
 
                 focus: true
 

@@ -24,24 +24,24 @@ import "qrc:///widgets/" as Widgets
 Widgets.MenuExt {
     id: viewMenu
     Action {
-        text: qsTr("Play&list")
+        text: i18n.qtr("Play&list")
         onTriggered: rootWindow.playlistVisible = !rootWindow.playlistVisible
     }
     Action {
-        text: qsTr("Docked Playlist")
+        text: i18n.qtr("Docked Playlist")
         checkable: true
         checked: rootWindow.playlistDocked
         onTriggered: rootWindow.playlistDocked = !rootWindow.playlistDocked
     }
     Action {
-        text: qsTr("&Always on Top")
+        text: i18n.qtr("&Always on Top")
         checkable: true
         checked: rootWindow.interfaceAlwaysOnTop
         onTriggered: rootWindow.interfaceAlwaysOnTop = !rootWindow.interfaceAlwaysOnTop
     }
 
     Action {
-        text: qsTr("&Fullscreen Interface")
+        text: i18n.qtr("&Fullscreen Interface")
         checkable: true
         checked: rootWindow.interfaceFullScreen
         onTriggered: rootWindow.interfaceFullScreen = !rootWindow.interfaceFullScreen
@@ -50,7 +50,7 @@ Widgets.MenuExt {
     Loader {
         active: medialib !== null
         sourceComponent:  Widgets.MenuItemExt {
-            text: qsTr("&View Items as Grid")
+            text: i18n.qtr("&View Items as Grid")
             checkable: true
             checked: medialib.gridView
             onTriggered: medialib.gridView = !medialib.gridView
@@ -58,7 +58,7 @@ Widgets.MenuExt {
     }
 
     Widgets.MenuExt {
-        title: qsTr("Color Scheme")
+        title: i18n.qtr("Color Scheme")
         Repeater {
             model: VLCStyle.colors.colorSchemes
             Widgets.MenuItemExt {
@@ -73,7 +73,7 @@ Widgets.MenuExt {
     MenuSeparator {}
 
     CheckableModelSubMenu{
-        title: qsTr("Add Interface")
+        title: i18n.qtr("Add Interface")
         model: rootWindow.extraInterfaces
     }
 

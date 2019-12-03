@@ -98,7 +98,7 @@ Widgets.NavigableFocusScope {
                             id: history_back
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.topbar_previous
-                            text: qsTr("Previous")
+                            text: i18n.qtr("Previous")
                             onClicked: history.previous(History.Go)
                             enabled: !history.previousEmpty
                         }
@@ -107,7 +107,7 @@ Widgets.NavigableFocusScope {
                             id: history_next
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.topbar_next
-                            text: qsTr("Next")
+                            text: i18n.qtr("Next")
                             onClicked: history.next(History.Go)
                             enabled: !history.nextEmpty
                         }
@@ -164,7 +164,7 @@ Widgets.NavigableFocusScope {
 
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.menu
-                            text: qsTr("Menu")
+                            text: i18n.qtr("Menu")
 
                             onClicked: mainMenu.openBelow(this)
 
@@ -206,7 +206,7 @@ Widgets.NavigableFocusScope {
                             id: list_grid_btn
                             size: VLCStyle.icon_normal
                             iconText: medialib.gridView ? VLCIcons.list : VLCIcons.grid
-                            text: qsTr("List/Grid")
+                            text: i18n.qtr("List/Grid")
                             onClicked: medialib.gridView = !medialib.gridView
                         }
 
@@ -288,7 +288,7 @@ Widgets.NavigableFocusScope {
 
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.playlist
-                            text: qsTr("Playlist")
+                            text: i18n.qtr("Playlist")
 
                             onClicked:  rootWindow.playlistVisible = !rootWindow.playlistVisible
                         }

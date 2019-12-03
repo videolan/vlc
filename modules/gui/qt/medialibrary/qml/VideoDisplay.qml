@@ -34,7 +34,7 @@ Widgets.NavigableFocusScope {
     DG.ModalDialog {
         id: deleteDialog
         rootWindow: root
-        title: qsTr("Are you sure you want to delete?")
+        title: i18n.qtr("Are you sure you want to delete?")
         standardButtons: Dialog.Yes | Dialog.No
 
         onAccepted: console.log("Ok clicked")
@@ -118,7 +118,7 @@ Widgets.NavigableFocusScope {
             headerDelegate: Widgets.LabelSeparator {
                 id: videosSeparator
                 width: videosGV.width
-                text: qsTr("Videos")
+                text: i18n.qtr("Videos")
             }
 
 
@@ -218,6 +218,6 @@ Widgets.NavigableFocusScope {
         visible: videosDelegate.items.count === 0
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        text: qsTr("No tracks found")
+        text: i18n.qtr("No tracks found")
     }
 }

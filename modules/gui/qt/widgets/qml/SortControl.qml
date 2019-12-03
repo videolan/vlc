@@ -53,7 +53,7 @@ Widgets.NavigableFocusScope {
 
         size: VLCStyle.icon_normal
         iconText: VLCIcons.topbar_sort
-        text: qsTr("Sort")
+        text: i18n.qtr("Sort")
 
         focus: true
 

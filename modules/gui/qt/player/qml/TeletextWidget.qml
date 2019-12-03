@@ -50,7 +50,7 @@ FocusScope{
             id: teleActivateBtn
             paintOnly: widgetfscope.paintOnly
             iconText: VLCIcons.tv
-            text: qsTr("Teletext activate")
+            text: i18n.qtr("Teletext activate")
             size: VLCStyle.icon_normal
             onClicked: player.teletextEnabled = !player.teletextEnabled
             color: widgetfscope.color
@@ -64,7 +64,7 @@ FocusScope{
             id: teleTransparencyBtn
             paintOnly: widgetfscope.paintOnly
             iconText: VLCIcons.tvtelx
-            text: qsTr("Teletext transparency")
+            text: i18n.qtr("Teletext transparency")
             size: VLCStyle.icon_normal
             opacity: 0.5
             enabled: player.teletextEnabled
@@ -91,7 +91,7 @@ FocusScope{
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
             iconText: VLCIcons.record
-            text: qsTr("Index key")
+            text: i18n.qtr("Index key")
             onClicked: player.teletextPage = PlayerController.TELE_INDEX
             color: "grey"
             colorDisabled: "grey"
@@ -103,7 +103,7 @@ FocusScope{
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
             iconText: VLCIcons.record
-            text: qsTr("Red key")
+            text: i18n.qtr("Red key")
             onClicked: player.teletextPage = PlayerController.TELE_RED
             color: "red"
             colorDisabled: "grey"
@@ -115,7 +115,7 @@ FocusScope{
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
             iconText: VLCIcons.record
-            text: qsTr("Green key")
+            text: i18n.qtr("Green key")
             onClicked: player.teletextPage = PlayerController.TELE_GREEN
             color: "green"
             colorDisabled: "grey"
@@ -127,7 +127,7 @@ FocusScope{
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
             iconText: VLCIcons.record
-            text: qsTr("Yellow key")
+            text: i18n.qtr("Yellow key")
             onClicked: player.teletextPage = PlayerController.TELE_YELLOW
             color: "yellow"
             colorDisabled: "grey"
@@ -139,7 +139,7 @@ FocusScope{
             enabled: player.teletextEnabled
             size: VLCStyle.icon_normal
             iconText: VLCIcons.record
-            text: qsTr("Blue key")
+            text: i18n.qtr("Blue key")
             onClicked: player.teletextPage = PlayerController.TELE_BLUE
             color: "blue"
             colorDisabled: "grey"

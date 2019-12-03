@@ -55,7 +55,7 @@ Widgets.ListItem {
             }
         }
     }
-    line1: model.name || qsTr("Unknown share")
+    line1: model.name || i18n.qtr("Unknown share")
     line2: model.mrl
     imageText: (model.type !== NetworkMediaModel.TYPE_DIRECTORY && model.type !== NetworkMediaModel.TYPE_NODE) ? model.protocol : ""
 

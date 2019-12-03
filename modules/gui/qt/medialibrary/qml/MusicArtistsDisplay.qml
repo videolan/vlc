@@ -63,7 +63,7 @@ Widgets.NavigableFocusScope {
                     source: model.cover || VLCStyle.noArtArtistSmall
                 }
             }
-            line1: model.name || qsTr("Unknown artist")
+            line1: model.name || i18n.qtr("Unknown artist")
 
             onItemClicked: {
                 artistId = model.id
@@ -169,6 +169,6 @@ Widgets.NavigableFocusScope {
         visible: delegateModel.items.count === 0
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        text: qsTr("No artists found")
+        text: i18n.qtr("No artists found")
     }
 }

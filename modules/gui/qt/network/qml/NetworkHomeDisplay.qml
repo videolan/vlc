@@ -34,7 +34,7 @@ Widgets.NavigableFocusScope {
         visible: (machineDM.items.count === 0 && lanDM.items.count === 0 )
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: topFocusScope.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        text: qsTr("No network shares found")
+        text: i18n.qtr("No network shares found")
     }
 
     NetworksSectionSelectableDM{
@@ -68,7 +68,7 @@ Widgets.NavigableFocusScope {
             spacing: VLCStyle.margin_normal
 
             Widgets.LabelSeparator {
-                text: qsTr("Devices")
+                text: i18n.qtr("Devices")
                 width: flickable.width
                 visible: machineDM.items.count !== 0
             }
@@ -96,7 +96,7 @@ Widgets.NavigableFocusScope {
             }
 
             Widgets.LabelSeparator {
-                text: qsTr("LAN")
+                text: i18n.qtr("LAN")
                 width: flickable.width
                 visible: lanDM.items.count !== 0
             }

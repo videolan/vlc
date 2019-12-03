@@ -25,8 +25,8 @@ import "qrc:///style/"
 Widgets.GridItem {
     property var model: ({})
     image: model.cover || VLCStyle.noArtAlbum
-    title: model.title || qsTr("Unknown title")
-    subtitle: model.main_artist || qsTr("Unknown artist")
+    title: model.title || i18n.qtr("Unknown title")
+    subtitle: model.main_artist || i18n.qtr("Unknown artist")
     isVideo: false
     pictureWidth: VLCStyle.cover_normal
     pictureHeight: VLCStyle.cover_normal

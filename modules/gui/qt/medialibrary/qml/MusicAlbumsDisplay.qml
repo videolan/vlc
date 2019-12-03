@@ -67,8 +67,8 @@ Widgets.NavigableFocusScope {
                     source: model.cover || VLCStyle.noArtAlbum
                     sourceSize: Qt.size(width, height)
                 }
-                line1: (model.title || qsTr("Unknown title"))+" ["+model.duration+"]"
-                line2: model.main_artist || qsTr("Unknown artist")
+                line1: (model.title || i18n.qtr("Unknown title"))+" ["+model.duration+"]"
+                line2: model.main_artist || i18n.qtr("Unknown artist")
 
                 onItemClicked : {
                     delegateModel.updateSelection( modifier, view.currentItem.currentIndex, index )
@@ -212,6 +212,6 @@ Widgets.NavigableFocusScope {
         visible: delegateModel.items.count === 0
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        text: qsTr("No albums found")
+        text: i18n.qtr("No albums found")
     }
 }

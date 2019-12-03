@@ -41,7 +41,7 @@ Rectangle {
         active: !rootWindow.playlistDocked && rootWindow.playlistVisible
         sourceComponent: Window {
             visible: true
-            title: qsTr("Playlist")
+            title: i18n.qtr("Playlist")
             color: VLCStyle.colors.bg
             onClosing: rootWindow.playlistVisible = false
             PL.PlaylistListView {

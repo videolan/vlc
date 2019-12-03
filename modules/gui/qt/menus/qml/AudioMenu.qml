@@ -22,18 +22,18 @@ import "qrc:///widgets/" as Widgets
 
 Widgets.MenuExt {
     CheckableModelSubMenu {
-        title: qsTr("Audio &Track");
+        title: i18n.qtr("Audio &Track");
         enabled: player.isPlaying
         model: player.audioTracks
     }
 
     CheckableModelSubMenu {
-        title: qsTr("Audio &Device")
+        title: i18n.qtr("Audio &Device")
         model: player.audioDevices
     }
 
     CheckableModelSubMenu {
-        title: qsTr("&Stereo Mode");
+        title: i18n.qtr("&Stereo Mode");
         enabled: player.isPlaying
         model: player.audioStereoMode
     }
@@ -41,14 +41,14 @@ Widgets.MenuExt {
     MenuSeparator { }
 
     CheckableModelSubMenu {
-        title: qsTr("&Visualizations");
+        title: i18n.qtr("&Visualizations");
         enabled: player.isPlaying
         model: player.audioVisualization
     }
 
     MenuSeparator { }
 
-    Action { text: qsTr("Increase Volume"); enabled: player.isPlaying; onTriggered: player.setVolumeUp();   icon.source: "qrc:/toolbar/volume-high.svg";  }
-    Action { text: qsTr("Decrease Volume"); enabled: player.isPlaying; onTriggered: player.setVolumeDown(); icon.source: "qrc:/toolbar/volume-low.svg";   }
-    Action { text: qsTr("Mute");            enabled: player.isPlaying; onTriggered: player.toggleMuted();   icon.source: "qrc:/toolbar/volume-muted.svg"; }
+    Action { text: i18n.qtr("Increase Volume"); enabled: player.isPlaying; onTriggered: player.setVolumeUp();   icon.source: "qrc:/toolbar/volume-high.svg";  }
+    Action { text: i18n.qtr("Decrease Volume"); enabled: player.isPlaying; onTriggered: player.setVolumeDown(); icon.source: "qrc:/toolbar/volume-low.svg";   }
+    Action { text: i18n.qtr("Mute");            enabled: player.isPlaying; onTriggered: player.toggleMuted();   icon.source: "qrc:/toolbar/volume-muted.svg"; }
 }

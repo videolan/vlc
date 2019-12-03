@@ -25,7 +25,7 @@ import "qrc:///style/"
 Widgets.GridItem {
     property var model: ({})
     image: model.thumbnail || VLCStyle.noArtCover
-    title: model.title || qsTr("Unknown title")
+    title: model.title || i18n.qtr("Unknown title")
     infoLeft: model.duration || ""
     resolution: model.resolution_name || ""
     channel: model.channel || ""

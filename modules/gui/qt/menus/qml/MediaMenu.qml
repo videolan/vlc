@@ -23,19 +23,19 @@ import "qrc:///widgets/" as Widgets
 Widgets.MenuExt {
     id: mediaMenu
 
-    Action { text: qsTr("Open &File..." ) ;               onTriggered: dialogProvider.simpleOpenDialog();          icon.source:"qrc:/type/file-asym.svg"                        }
-    Action { text: qsTr( "&Open Multiple Files..." );     onTriggered: dialogProvider.openFileDialog();            icon.source:"qrc:/type/file-asym.svg";                       }
-    Action { text: qsTr( "Open D&irectory" );             onTriggered: dialogProvider.PLOpenDir();                 icon.source:"qrc:/type/folder-grey.svg";  shortcut: "Ctrl+F" }
+    Action { text: i18n.qtr("Open &File..." ) ;               onTriggered: dialogProvider.simpleOpenDialog();          icon.source:"qrc:/type/file-asym.svg"                        }
+    Action { text: i18n.qtr( "&Open Multiple Files..." );     onTriggered: dialogProvider.openFileDialog();            icon.source:"qrc:/type/file-asym.svg";                       }
+    Action { text: i18n.qtr( "Open D&irectory" );             onTriggered: dialogProvider.PLOpenDir();                 icon.source:"qrc:/type/folder-grey.svg";  shortcut: "Ctrl+F" }
 
-    Action { text: qsTr("Open &Disc...");                 onTriggered: dialogProvider.openDiscDialog();            icon.source:"qrc:/type/disc.svg";         shortcut: "Ctrl+D" }
-    Action { text: qsTr("Open &Network Stream...");       onTriggered: dialogProvider.openNetDialog();             icon.source:"qrc:/type/network.svg";      shortcut: "Ctrl+N" }
-    Action { text: qsTr("Open &Capture Device...");       onTriggered: dialogProvider.openCaptureDialog();         icon.source:"qrc:/type/capture-card.svg"; shortcut: "Ctrl+C" }
-    Action { text: qsTr("Open &Location from clipboard"); onTriggered: dialogProvider.openUrlDialog();                                                       shortcut: "Ctrl+V" }
+    Action { text: i18n.qtr("Open &Disc...");                 onTriggered: dialogProvider.openDiscDialog();            icon.source:"qrc:/type/disc.svg";         shortcut: "Ctrl+D" }
+    Action { text: i18n.qtr("Open &Network Stream...");       onTriggered: dialogProvider.openNetDialog();             icon.source:"qrc:/type/network.svg";      shortcut: "Ctrl+N" }
+    Action { text: i18n.qtr("Open &Capture Device...");       onTriggered: dialogProvider.openCaptureDialog();         icon.source:"qrc:/type/capture-card.svg"; shortcut: "Ctrl+C" }
+    Action { text: i18n.qtr("Open &Location from clipboard"); onTriggered: dialogProvider.openUrlDialog();                                                       shortcut: "Ctrl+V" }
 
 
     Widgets.MenuExt {
         id: recentsMenu
-        title: qsTr("Open &Recent Media")
+        title: i18n.qtr("Open &Recent Media")
         property bool hasData: true
         onAboutToShow:{
             recentsMenu.hasData = Boolean(recentsMedias.rowCount())
@@ -86,17 +86,17 @@ Widgets.MenuExt {
 
         Widgets.MenuItemExt {
             id: clearAction
-            text: qsTr("Clear")
+            text: i18n.qtr("Clear")
             enabled: recentsMenu.hasData
             onTriggered:recentsMedias.clear()
         }
     }
 
-    Action { text: qsTr("Save Playlist to &File...");     onTriggered: dialogProvider.savePlayingToPlaylist();     icon.source: "";                      shortcut: "Ctrl+Y" }
-    Action { text: qsTr("Conve&rt / Save..." );           onTriggered: dialogProvider.openAndTranscodingDialogs(); icon.source: "";                      shortcut: "Ctrl+R" }
-    Action { text: qsTr("&Stream..." );                   onTriggered: dialogProvider.openAndStreamingDialogs();   icon.source: "qrc:/menu/stream.svg";  shortcut: "Ctrl+S" }
+    Action { text: i18n.qtr("Save Playlist to &File...");     onTriggered: dialogProvider.savePlayingToPlaylist();     icon.source: "";                      shortcut: "Ctrl+Y" }
+    Action { text: i18n.qtr("Conve&rt / Save..." );           onTriggered: dialogProvider.openAndTranscodingDialogs(); icon.source: "";                      shortcut: "Ctrl+R" }
+    Action { text: i18n.qtr("&Stream..." );                   onTriggered: dialogProvider.openAndStreamingDialogs();   icon.source: "qrc:/menu/stream.svg";  shortcut: "Ctrl+S" }
 
-    //Action { text: qsTr( "&close to systray" );           onTriggered: dialogprovider.closeToSystray();                                                                     }
-    Action { text: qsTr( "Quit at the end of playlist" ); onTriggered: console.warn("FIXME");                                                            shortcut: "Ctrl+Q"; checkable: true; checked: true; }
-    Action { text: qsTr( "&Quit" );                       onTriggered: dialogProvider.quit();                      icon.source:"qrc:/menu/exit.svg";     shortcut: "Ctrl+Q" }
+    //Action { text: i18n.qtr( "&close to systray" );           onTriggered: dialogprovider.closeToSystray();                                                                     }
+    Action { text: i18n.qtr( "Quit at the end of playlist" ); onTriggered: console.warn("FIXME");                                                            shortcut: "Ctrl+Q"; checkable: true; checked: true; }
+    Action { text: i18n.qtr( "&Quit" );                       onTriggered: dialogProvider.quit();                      icon.source:"qrc:/menu/exit.svg";     shortcut: "Ctrl+Q" }
 }

@@ -96,17 +96,17 @@ Widgets.NavigableFocusScope {
 
     readonly property var pageModel: [
         {
-            displayText: qsTr("Video"),
+            displayText: i18n.qtr("Video"),
             icon: VLCIcons.topbar_video,
             name: "video",
             component: videoComp
         }, {
-            displayText: qsTr("Music"),
+            displayText: i18n.qtr("Music"),
             icon: VLCIcons.topbar_music,
             name: "music",
             component: musicComp
         }, {
-            displayText: qsTr("Network"),
+            displayText: i18n.qtr("Network"),
             icon: VLCIcons.topbar_network,
             name: "network",
             component: networkComp

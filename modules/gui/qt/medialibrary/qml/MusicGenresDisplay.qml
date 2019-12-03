@@ -190,6 +190,6 @@ Widgets.NavigableFocusScope {
         visible: delegateModel.items.count === 0
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        text: qsTr("No genres found")
+        text: i18n.qtr("No genres found")
     }
 }

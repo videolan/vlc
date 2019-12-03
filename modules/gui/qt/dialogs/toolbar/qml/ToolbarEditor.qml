@@ -40,13 +40,13 @@ Rectangle{
             EditorTabButton {
                 id: mainPlayerTab
                 index: 0
-                text: qsTr("Mainplayer")
+                text: i18n.qtr("Mainplayer")
             }
 
             EditorTabButton {
                 id: miniPlayerTab
                 index: 1
-                text: qsTr("Miniplayer")
+                text: i18n.qtr("Miniplayer")
             }
         }
         Rectangle{
@@ -88,7 +88,7 @@ Rectangle{
 
                 Text {
                     Layout.margins: VLCStyle.margin_xxsmall
-                    text: qsTr("Drag items below to add them above: ")
+                    text: i18n.qtr("Drag items below to add them above: ")
                     font.pointSize: VLCStyle.fontHeight_xsmall
                     color: VLCStyle.colors.buttonText
                 }

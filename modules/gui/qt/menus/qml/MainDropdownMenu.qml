@@ -28,14 +28,14 @@ Widgets.MenuExt {
     closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
 
 
-    MediaMenu { title: qsTr("&Media") }
-    PlaybackMenu { title: qsTr("&Playback") }
-    AudioMenu { title: qsTr("&Audio") }
-    VideoMenu { title: qsTr("&Video") }
-    SubtitleMenu { title: qsTr("&Subtitle") }
-    ToolsMenu { title: qsTr("&Tools") }
-    ViewMenu { title: qsTr("V&iew") }
-    HelpMenu { title: qsTr("&Help") }
+    MediaMenu { title: i18n.qtr("&Media") }
+    PlaybackMenu { title: i18n.qtr("&Playback") }
+    AudioMenu { title: i18n.qtr("&Audio") }
+    VideoMenu { title: i18n.qtr("&Video") }
+    SubtitleMenu { title: i18n.qtr("&Subtitle") }
+    ToolsMenu { title: i18n.qtr("&Tools") }
+    ViewMenu { title: i18n.qtr("V&iew") }
+    HelpMenu { title: i18n.qtr("&Help") }
 
     function openBelow(obj) {
         this.x = (obj.x + obj.width / 2) - this.width / 2

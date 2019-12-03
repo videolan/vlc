@@ -42,6 +42,6 @@ Rectangle {
         id: label
         font.pixelSize: VLCStyle.fontSize_normal
         color: VLCStyle.colors.text
-        text: qsTr("%1 tracks selected").arg(count)
+        text: i18n.qtr("%1 tracks selected").arg(count)
     }
 }

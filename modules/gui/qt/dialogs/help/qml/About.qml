@@ -53,7 +53,7 @@ Widgets.NavigableFocusScope {
 
                 Widgets.TextToolButton {
                     id: authorsBtn
-                    text: qsTr("Authors")
+                    text: i18n.qtr("Authors")
                     Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                     onClicked: {
                         checked = true
@@ -66,7 +66,7 @@ Widgets.NavigableFocusScope {
 
                 Widgets.TextToolButton {
                     id: licenseBtn
-                    text: qsTr("License")
+                    text: i18n.qtr("License")
                     Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                     onClicked: textArea.text = about.license
                     KeyNavigation.down: creditBtn
@@ -75,7 +75,7 @@ Widgets.NavigableFocusScope {
 
                 Widgets.TextToolButton {
                     id: creditBtn
-                    text: qsTr("Credit")
+                    text: i18n.qtr("Credit")
                     Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                     KeyNavigation.down: backBtn
                     KeyNavigation.right: textScroll
@@ -94,7 +94,7 @@ Widgets.NavigableFocusScope {
                     id: backBtn
                     size: VLCStyle.icon_large
                     iconText: VLCIcons.exit
-                    text: qsTr("Back")
+                    text: i18n.qtr("Back")
                     Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
                     KeyNavigation.right: textScroll
 
@@ -121,7 +121,7 @@ Widgets.NavigableFocusScope {
 
                 Text {
                     id: text1
-                    text: qsTr("VLC Media Player")
+                    text: i18n.qtr("VLC Media Player")
                     color: VLCStyle.colors.text
                     font.pixelSize: VLCStyle.fontSize_xxxlarge
                 }

@@ -28,27 +28,27 @@ Widgets.MenuExt {
     modal: true
     closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
 
-    Action { text: qsTr("Play");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.play();     icon.source: "qrc:/toolbar/play_b.svg";     }
-    Action { text: qsTr("Pause");    enabled: player.isPlaying ; onTriggered: mainPlaylistController.pause();    icon.source: "qrc:/toolbar/pause_b.svg";    }
-    Action { text: qsTr("Stop");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.stop();     icon.source: "qrc:/toolbar/stop_b.svg";     }
-    Action { text: qsTr("Previous"); enabled: player.isPlaying ; onTriggered: mainPlaylistController.previous(); icon.source: "qrc:/toolbar/previous_b.svg"; }
-    Action { text: qsTr("Next");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.next();     icon.source: "qrc:/toolbar/next_b.svg";     }
-    Action { text: qsTr("Record");   enabled: player.isPlaying ; onTriggered: player.toggleRecord();         icon.source: "qrc:/toolbar/record.svg";     }
+    Action { text: i18n.qtr("Play");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.play();     icon.source: "qrc:/toolbar/play_b.svg";     }
+    Action { text: i18n.qtr("Pause");    enabled: player.isPlaying ; onTriggered: mainPlaylistController.pause();    icon.source: "qrc:/toolbar/pause_b.svg";    }
+    Action { text: i18n.qtr("Stop");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.stop();     icon.source: "qrc:/toolbar/stop_b.svg";     }
+    Action { text: i18n.qtr("Previous"); enabled: player.isPlaying ; onTriggered: mainPlaylistController.previous(); icon.source: "qrc:/toolbar/previous_b.svg"; }
+    Action { text: i18n.qtr("Next");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.next();     icon.source: "qrc:/toolbar/next_b.svg";     }
+    Action { text: i18n.qtr("Record");   enabled: player.isPlaying ; onTriggered: player.toggleRecord();         icon.source: "qrc:/toolbar/record.svg";     }
 
     MenuSeparator {}
-    Action { text: qsTr("&Fullscreen Interface"); checkable: true; checked: rootWindow.interfaceFullScreen;  onTriggered: rootWindow.interfaceFullScreen = !rootWindow.interfaceFullScreen }
+    Action { text: i18n.qtr("&Fullscreen Interface"); checkable: true; checked: rootWindow.interfaceFullScreen;  onTriggered: rootWindow.interfaceFullScreen = !rootWindow.interfaceFullScreen }
 
     MenuSeparator {}
-    AudioMenu { title: qsTr("&Audio") }
-    VideoMenu { title: qsTr("&Video") }
-    SubtitleMenu { title: qsTr("&Subtitle") }
-    PlaybackMenu { title: qsTr("&Playback") }
+    AudioMenu { title: i18n.qtr("&Audio") }
+    VideoMenu { title: i18n.qtr("&Video") }
+    SubtitleMenu { title: i18n.qtr("&Subtitle") }
+    PlaybackMenu { title: i18n.qtr("&Playback") }
 
     MenuSeparator {}
 
-    ViewMenu { title: qsTr("V&iew") }
-    ToolsMenu { title: qsTr("&Tools") }
-    MediaMenu { title: qsTr("&Media") }
+    ViewMenu { title: i18n.qtr("V&iew") }
+    ToolsMenu { title: i18n.qtr("&Tools") }
+    MediaMenu { title: i18n.qtr("&Media") }
 
     function openBelow(obj) {
         this.x = (obj.x + obj.width / 2) - this.width / 2

@@ -22,7 +22,7 @@ import "qrc:///widgets/" as Widgets
 
 Widgets.MenuExt {
     CheckableModelSubMenu {
-        title: qsTr("Video Track");
+        title: i18n.qtr("Video Track");
         enabled: player.isPlaying
         model: player.videoTracks
     }
@@ -30,7 +30,7 @@ Widgets.MenuExt {
     MenuSeparator { }
 
     Action {
-        text: qsTr("Fullscreen")
+        text: i18n.qtr("Fullscreen")
         enabled: player.isPlaying
         checkable: true
         checked: player.fullscreen
@@ -38,7 +38,7 @@ Widgets.MenuExt {
     }
 
     Action {
-        text: qsTr("Always Fit Window")
+        text: i18n.qtr("Always Fit Window")
         enabled: player.isPlaying
         checkable: true
         checked: player.autoscale
@@ -46,7 +46,7 @@ Widgets.MenuExt {
     }
 
     Action {
-        text: qsTr("Set as Wallpaper")
+        text: i18n.qtr("Set as Wallpaper")
         enabled: player.isPlaying
         checkable: true
         checked: player.wallpaperMode
@@ -56,19 +56,19 @@ Widgets.MenuExt {
     MenuSeparator { }
 
     CheckableModelSubMenu {
-        title: qsTr("Zoom")
+        title: i18n.qtr("Zoom")
         enabled: player.isPlaying
         model: player.zoom
     }
 
     CheckableModelSubMenu {
-        title: qsTr("Aspect Ratio")
+        title: i18n.qtr("Aspect Ratio")
         enabled: player.isPlaying
         model: player.aspectRatio
     }
 
     CheckableModelSubMenu {
-        title: qsTr("Crop")
+        title: i18n.qtr("Crop")
         enabled: player.isPlaying
         model: player.crop
     }
@@ -76,13 +76,13 @@ Widgets.MenuExt {
     MenuSeparator { }
 
     CheckableModelSubMenu {
-        title: qsTr("Deinterlace")
+        title: i18n.qtr("Deinterlace")
         enabled: player.isPlaying
         model: player.deinterlace
     }
 
     CheckableModelSubMenu {
-        title: qsTr("Deinterlace Mode");
+        title: i18n.qtr("Deinterlace Mode");
         enabled: player.isPlaying
         model: player.deinterlaceMode
     }
@@ -90,7 +90,7 @@ Widgets.MenuExt {
     MenuSeparator { }
 
     Action {
-        text: qsTr("Take snapshot");
+        text: i18n.qtr("Take snapshot");
         enabled: player.isPlaying
         onTriggered: player.snapshot();
     }

@@ -145,13 +145,13 @@ Widgets.NavigableFocusScope {
                         id: infoInnerCol
                         spacing: VLCStyle.margin_xsmall
                         model: [
-                            {text: qsTr("File Name"),    data: expandRect.model.title, bold: true},
-                            {text: qsTr("Path"),         data: expandRect.model.mrl},
-                            {text: qsTr("Length"),       data: expandRect.model.duration},
-                            {text: qsTr("File size"),    data: ""},
-                            {text: qsTr("Times played"), data: expandRect.model.playcount},
-                            {text: qsTr("Video track"),  data: expandRect.model.videoDesc},
-                            {text: qsTr("Audio track"),  data: expandRect.model.audioDesc},
+                            {text: i18n.qtr("File Name"),    data: expandRect.model.title, bold: true},
+                            {text: i18n.qtr("Path"),         data: expandRect.model.mrl},
+                            {text: i18n.qtr("Length"),       data: expandRect.model.duration},
+                            {text: i18n.qtr("File size"),    data: ""},
+                            {text: i18n.qtr("Times played"), data: expandRect.model.playcount},
+                            {text: i18n.qtr("Video track"),  data: expandRect.model.videoDesc},
+                            {text: i18n.qtr("Audio track"),  data: expandRect.model.audioDesc},
                         ]
                         delegate: Label {
                             font.bold: Boolean(modelData.bold)
@@ -230,14 +230,14 @@ Widgets.NavigableFocusScope {
                     Widgets.TabButtonExt {
                         id: playActionBtn
                         iconTxt: VLCIcons.play
-                        text: qsTr("Play")
+                        text: i18n.qtr("Play")
                         onClicked: medialib.addAndPlay( expandRect.model.id )
                     }
 
                     Widgets.TabButtonExt {
                         id: enqueueActionBtn
                         iconTxt: VLCIcons.add
-                        text: qsTr("Enqueue")
+                        text: i18n.qtr("Enqueue")
                         onClicked: medialib.addToPlaylist( expandRect.model.id )
                     }
                 }
@@ -260,7 +260,7 @@ Widgets.NavigableFocusScope {
 
                     size: VLCStyle.icon_normal
                     iconText: VLCIcons.close
-                    text: qsTr("Close")
+                    text: i18n.qtr("Close")
                     color: VLCStyle.colors.lightText
 
                     focus: true

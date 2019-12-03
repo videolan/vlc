@@ -27,20 +27,20 @@ Widgets.MenuExt {
 
 
     CheckableModelSubMenu {
-        title: qsTr("Title")
+        title: i18n.qtr("Title")
         enabled: player.isPlaying
         model: player.titles
     }
 
 
     CheckableModelSubMenu {
-        title: qsTr("Chapters");
+        title: i18n.qtr("Chapters");
         enabled: player.isPlaying
         model: player.chapters
     }
 
     CheckableModelSubMenu {
-        title: qsTr("Program");
+        title: i18n.qtr("Program");
         enabled: player.isPlaying
         model: player.programs
     }
@@ -48,7 +48,7 @@ Widgets.MenuExt {
     /*
     //FIXME unimplemented
     Menu {
-        title: qsTr("Custom Bookmarks");
+        title: i18n.qtr("Custom Bookmarks");
         enabled: isPlaying
     }
     */
@@ -56,33 +56,33 @@ Widgets.MenuExt {
     MenuSeparator { }
 
     Widgets.MenuExt {
-        title: qsTr("Renderer");
+        title: i18n.qtr("Renderer");
     }
 
     MenuSeparator { }
 
     Widgets.MenuExt {
-        title: qsTr("Speed");
+        title: i18n.qtr("Speed");
         enabled: isPlaying
-        Action { text: qsTr("&Faster");         onTriggered: player.faster();       icon.source: "qrc:/toolbar/faster2.svg";    }
-        Action { text: qsTr("&Faster (fine)");  onTriggered: player.littlefaster(); icon.source: "qrc:/toolbar/faster2.svg";    }
-        Action { text: qsTr("N&ormal Speed");   onTriggered: player.normalRate();                                               }
-        Action { text: qsTr("Slo&wer");         onTriggered: player.slower();       icon.source: "qrc:/toolbar/slower2.svg";    }
-        Action { text: qsTr("Slo&wer (fine)");  onTriggered: player.littleslower(); icon.source: "qrc:/toolbar/slower2.svg";    }
+        Action { text: i18n.qtr("&Faster");         onTriggered: player.faster();       icon.source: "qrc:/toolbar/faster2.svg";    }
+        Action { text: i18n.qtr("&Faster (fine)");  onTriggered: player.littlefaster(); icon.source: "qrc:/toolbar/faster2.svg";    }
+        Action { text: i18n.qtr("N&ormal Speed");   onTriggered: player.normalRate();                                               }
+        Action { text: i18n.qtr("Slo&wer");         onTriggered: player.slower();       icon.source: "qrc:/toolbar/slower2.svg";    }
+        Action { text: i18n.qtr("Slo&wer (fine)");  onTriggered: player.littleslower(); icon.source: "qrc:/toolbar/slower2.svg";    }
     }
 
     MenuSeparator { }
 
-    Action { text: qsTr("&Jump Forward");          enabled: player.isPlaying; onTriggered: player.jumpFwd();                icon.source: "qrc:/toolbar/skip_fw.svg";   }
-    Action { text: qsTr("Jump Bac&kward");         enabled: player.isPlaying; onTriggered: player.jumpBwd();                icon.source: "qrc:/toolbar/skip_back.svg"; }
-    Action { text: qsTr("Jump to Specific &Time"); enabled: player.isPlaying; onTriggered: dialogProvider.gotoTimeDialog();                                    }
+    Action { text: i18n.qtr("&Jump Forward");          enabled: player.isPlaying; onTriggered: player.jumpFwd();                icon.source: "qrc:/toolbar/skip_fw.svg";   }
+    Action { text: i18n.qtr("Jump Bac&kward");         enabled: player.isPlaying; onTriggered: player.jumpBwd();                icon.source: "qrc:/toolbar/skip_back.svg"; }
+    Action { text: i18n.qtr("Jump to Specific &Time"); enabled: player.isPlaying; onTriggered: dialogProvider.gotoTimeDialog();                                    }
 
     MenuSeparator { }
 
-    Action { text: qsTr("Play");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.play();     icon.source: "qrc:/toolbar/play_b.svg";     }
-    Action { text: qsTr("Pause");    enabled: player.isPlaying ; onTriggered: mainPlaylistController.pause();    icon.source: "qrc:/toolbar/pause_b.svg";    }
-    Action { text: qsTr("Stop");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.stop();     icon.source: "qrc:/toolbar/stop_b.svg";     }
-    Action { text: qsTr("Previous"); enabled: player.isPlaying ; onTriggered: mainPlaylistController.previous(); icon.source: "qrc:/toolbar/previous_b.svg"; }
-    Action { text: qsTr("Next");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.next();     icon.source: "qrc:/toolbar/next_b.svg";     }
-    Action { text: qsTr("Record");   enabled: player.isPlaying ; onTriggered: player.toggleRecord();         icon.source: "qrc:/toolbar/record.svg";     }
+    Action { text: i18n.qtr("Play");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.play();     icon.source: "qrc:/toolbar/play_b.svg";     }
+    Action { text: i18n.qtr("Pause");    enabled: player.isPlaying ; onTriggered: mainPlaylistController.pause();    icon.source: "qrc:/toolbar/pause_b.svg";    }
+    Action { text: i18n.qtr("Stop");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.stop();     icon.source: "qrc:/toolbar/stop_b.svg";     }
+    Action { text: i18n.qtr("Previous"); enabled: player.isPlaying ; onTriggered: mainPlaylistController.previous(); icon.source: "qrc:/toolbar/previous_b.svg"; }
+    Action { text: i18n.qtr("Next");     enabled: player.isPlaying ; onTriggered: mainPlaylistController.next();     icon.source: "qrc:/toolbar/next_b.svg";     }
+    Action { text: i18n.qtr("Record");   enabled: player.isPlaying ; onTriggered: player.toggleRecord();         icon.source: "qrc:/toolbar/record.svg";     }
 }

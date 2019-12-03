@@ -33,7 +33,7 @@ Widgets.NavigableFocusScope {
 
     property var extraLocalActions: ObjectModel {
         Widgets.TabButtonExt {
-            text:  providerModel.indexed ?  qsTr("Remove from medialibrary") : qsTr("Add to medialibrary")
+            text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
             visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
             onClicked: providerModel.indexed = !providerModel.indexed
         }
@@ -94,15 +94,15 @@ Widgets.NavigableFocusScope {
 
             model: [{
                     active: true,
-                    text: qsTr("Play"),
+                    text: i18n.qtr("Play"),
                     action: "play"
                 }, {
                     active: true,
-                    text: qsTr("Enqueue"),
+                    text: i18n.qtr("Enqueue"),
                     action: "enqueue"
                 }, {
                     active:  contextMenu.model && !!contextMenu.model.can_index,
-                    text: contextMenu.model && contextMenu.model.indexed ? qsTr("Remove from Media Library") : qsTr("Add to Media Library") ,
+                    text: contextMenu.model && contextMenu.model.indexed ? i18n.qtr("Remove from Media Library") : i18n.qtr("Add to Media Library") ,
                     action: "index"
                 }
             ]
@@ -163,7 +163,7 @@ Widgets.NavigableFocusScope {
                     }
                 }
                 subtitle: model.mrl || ""
-                title: model.name || qsTr("Unknown share")
+                title: model.name || i18n.qtr("Unknown share")
                 showContextButton: true
 
                 onItemClicked : {

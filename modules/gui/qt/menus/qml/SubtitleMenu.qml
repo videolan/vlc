@@ -22,13 +22,13 @@ import "qrc:///widgets/" as Widgets
 
 Widgets.MenuExt {
     Action {
-        text: qsTr("Add Subtitle File...")
+        text: i18n.qtr("Add Subtitle File...")
         enabled: player.isPlaying
         onTriggered: dialogProvider.loadSubtitlesFile();
     }
 
     CheckableModelSubMenu {
-        title: qsTr("Sub Track");
+        title: i18n.qtr("Sub Track");
         enabled: player.isPlaying
         model: player.subtitleTracks
     }

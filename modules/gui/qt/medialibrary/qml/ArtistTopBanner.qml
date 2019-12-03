@@ -66,7 +66,7 @@ Rectangle {
 
     Text {
         id: artistName
-        text: artist.name || qsTr("No artist")
+        text: artist.name || i18n.qtr("No artist")
 
         anchors {
             verticalCenter: parent.verticalCenter

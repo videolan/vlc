@@ -28,36 +28,36 @@ import "qrc:///style/"
 
 Item{
     property var buttonL: [
-        { id:  PlayerControlBarModel.PLAY_BUTTON, label: VLCIcons.play, text: qsTr("Play")},
-        { id:  PlayerControlBarModel.STOP_BUTTON, label: VLCIcons.stop, text: qsTr("Stop")},
-        { id:  PlayerControlBarModel.OPEN_BUTTON, label: VLCIcons.eject, text: qsTr("Open")},
-        { id:  PlayerControlBarModel.PREVIOUS_BUTTON, label: VLCIcons.previous, text: qsTr("Previous")},
-        { id:  PlayerControlBarModel.NEXT_BUTTON, label: VLCIcons.next, text: qsTr("Next")},
-        { id:  PlayerControlBarModel.SLOWER_BUTTON, label: VLCIcons.slower, text: qsTr("Slower")},
-        { id:  PlayerControlBarModel.FASTER_BUTTON, label: VLCIcons.faster, text: qsTr("Faster")},
-        { id:  PlayerControlBarModel.FULLSCREEN_BUTTON, label: VLCIcons.fullscreen, text: qsTr("Fullscreen")},
-        { id:  PlayerControlBarModel.EXTENDED_BUTTON, label: VLCIcons.extended, text: qsTr("Extended panel")},
-        { id:  PlayerControlBarModel.PLAYLIST_BUTTON, label: VLCIcons.playlist, text: qsTr("Playlist")},
-        { id:  PlayerControlBarModel.SNAPSHOT_BUTTON, label: VLCIcons.snapshot, text: qsTr("Snapshot")},
-        { id:  PlayerControlBarModel.RECORD_BUTTON, label: VLCIcons.record, text: qsTr("Record")},
-        { id:  PlayerControlBarModel.ATOB_BUTTON, label: VLCIcons.atob, text: qsTr("A-B Loop")},
-        { id:  PlayerControlBarModel.FRAME_BUTTON, label: VLCIcons.frame_by_frame, text: qsTr("Frame By Frame")},
-        { id:  PlayerControlBarModel.SKIP_BACK_BUTTON, label: VLCIcons.skip_back, text: qsTr("Step backward")},
-        { id:  PlayerControlBarModel.SKIP_FW_BUTTON, label: VLCIcons.skip_for, text: qsTr("Step forward")},
-        { id:  PlayerControlBarModel.QUIT_BUTTON, label: VLCIcons.clear, text: qsTr("Quit")},
-        { id:  PlayerControlBarModel.RANDOM_BUTTON, label: VLCIcons.shuffle_on, text: qsTr("Random")},
-        { id:  PlayerControlBarModel.LOOP_BUTTON, label: VLCIcons.repeat_all, text: qsTr("Loop")},
-        { id:  PlayerControlBarModel.INFO_BUTTON, label: VLCIcons.info, text: qsTr("Information")},
-        { id:  PlayerControlBarModel.LANG_BUTTON, label: VLCIcons.audiosub, text: qsTr("Open subtitles")},
-        { id:  PlayerControlBarModel.MENU_BUTTON, label: VLCIcons.menu, text: qsTr("Menu Button")},
-        { id:  PlayerControlBarModel.BACK_BUTTON, label: VLCIcons.exit, text: qsTr("Back Button")},
-        { id:  PlayerControlBarModel.CHAPTER_PREVIOUS_BUTTON, label: VLCIcons.dvd_prev, text: qsTr("Previous chapter")},
-        { id:  PlayerControlBarModel.CHAPTER_NEXT_BUTTON, label: VLCIcons.dvd_next, text: qsTr("Next chapter")},
-        { id:  PlayerControlBarModel.VOLUME, label: VLCIcons.volume_high, text: qsTr("Volume Widget")},
-        { id:  PlayerControlBarModel.TELETEXT_BUTTONS, label: VLCIcons.tvtelx, text: qsTr("Teletext")},
-        { id:  PlayerControlBarModel.ASPECT_RATIO_COMBOBOX, label: VLCIcons.aspect_ratio, text: qsTr("Aspect Ratio")},
-        { id:  PlayerControlBarModel.WIDGET_SPACER, label: VLCIcons.space, text: qsTr("Spacer")},
-        { id:  PlayerControlBarModel.WIDGET_SPACER_EXTEND, label: VLCIcons.space, text: qsTr("Expanding Spacer")}
+        { id:  PlayerControlBarModel.PLAY_BUTTON, label: VLCIcons.play, text: i18n.qtr("Play")},
+        { id:  PlayerControlBarModel.STOP_BUTTON, label: VLCIcons.stop, text: i18n.qtr("Stop")},
+        { id:  PlayerControlBarModel.OPEN_BUTTON, label: VLCIcons.eject, text: i18n.qtr("Open")},
+        { id:  PlayerControlBarModel.PREVIOUS_BUTTON, label: VLCIcons.previous, text: i18n.qtr("Previous")},
+        { id:  PlayerControlBarModel.NEXT_BUTTON, label: VLCIcons.next, text: i18n.qtr("Next")},
+        { id:  PlayerControlBarModel.SLOWER_BUTTON, label: VLCIcons.slower, text: i18n.qtr("Slower")},
+        { id:  PlayerControlBarModel.FASTER_BUTTON, label: VLCIcons.faster, text: i18n.qtr("Faster")},
+        { id:  PlayerControlBarModel.FULLSCREEN_BUTTON, label: VLCIcons.fullscreen, text: i18n.qtr("Fullscreen")},
+        { id:  PlayerControlBarModel.EXTENDED_BUTTON, label: VLCIcons.extended, text: i18n.qtr("Extended panel")},
+        { id:  PlayerControlBarModel.PLAYLIST_BUTTON, label: VLCIcons.playlist, text: i18n.qtr("Playlist")},
+        { id:  PlayerControlBarModel.SNAPSHOT_BUTTON, label: VLCIcons.snapshot, text: i18n.qtr("Snapshot")},
+        { id:  PlayerControlBarModel.RECORD_BUTTON, label: VLCIcons.record, text: i18n.qtr("Record")},
+        { id:  PlayerControlBarModel.ATOB_BUTTON, label: VLCIcons.atob, text: i18n.qtr("A-B Loop")},
+        { id:  PlayerControlBarModel.FRAME_BUTTON, label: VLCIcons.frame_by_frame, text: i18n.qtr("Frame By Frame")},
+        { id:  PlayerControlBarModel.SKIP_BACK_BUTTON, label: VLCIcons.skip_back, text: i18n.qtr("Step backward")},
+        { id:  PlayerControlBarModel.SKIP_FW_BUTTON, label: VLCIcons.skip_for, text: i18n.qtr("Step forward")},
+        { id:  PlayerControlBarModel.QUIT_BUTTON, label: VLCIcons.clear, text: i18n.qtr("Quit")},
+        { id:  PlayerControlBarModel.RANDOM_BUTTON, label: VLCIcons.shuffle_on, text: i18n.qtr("Random")},
+        { id:  PlayerControlBarModel.LOOP_BUTTON, label: VLCIcons.repeat_all, text: i18n.qtr("Loop")},
+        { id:  PlayerControlBarModel.INFO_BUTTON, label: VLCIcons.info, text: i18n.qtr("Information")},
+        { id:  PlayerControlBarModel.LANG_BUTTON, label: VLCIcons.audiosub, text: i18n.qtr("Open subtitles")},
+        { id:  PlayerControlBarModel.MENU_BUTTON, label: VLCIcons.menu, text: i18n.qtr("Menu Button")},
+        { id:  PlayerControlBarModel.BACK_BUTTON, label: VLCIcons.exit, text: i18n.qtr("Back Button")},
+        { id:  PlayerControlBarModel.CHAPTER_PREVIOUS_BUTTON, label: VLCIcons.dvd_prev, text: i18n.qtr("Previous chapter")},
+        { id:  PlayerControlBarModel.CHAPTER_NEXT_BUTTON, label: VLCIcons.dvd_next, text: i18n.qtr("Next chapter")},
+        { id:  PlayerControlBarModel.VOLUME, label: VLCIcons.volume_high, text: i18n.qtr("Volume Widget")},
+        { id:  PlayerControlBarModel.TELETEXT_BUTTONS, label: VLCIcons.tvtelx, text: i18n.qtr("Teletext")},
+        { id:  PlayerControlBarModel.ASPECT_RATIO_COMBOBOX, label: VLCIcons.aspect_ratio, text: i18n.qtr("Aspect Ratio")},
+        { id:  PlayerControlBarModel.WIDGET_SPACER, label: VLCIcons.space, text: i18n.qtr("Spacer")},
+        { id:  PlayerControlBarModel.WIDGET_SPACER_EXTEND, label: VLCIcons.space, text: i18n.qtr("Expanding Spacer")}
     ]
 
     function returnbuttondelegate(inpID){
@@ -103,7 +103,7 @@ Item{
             id: backBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.exit
-            text: qsTr("Back")
+            text: i18n.qtr("Back")
             onClicked: history.previous(History.Go)
             property bool acceptFocus: true
         }
@@ -118,7 +118,7 @@ Item{
             iconText: VLCIcons.shuffle_on
             onClicked: mainPlaylistController.toggleRandom()
             property bool acceptFocus: true
-            text: qsTr("Random")
+            text: i18n.qtr("Random")
         }
     }
 
@@ -130,7 +130,7 @@ Item{
             iconText: VLCIcons.previous
             onClicked: mainPlaylistController.prev()
             property bool acceptFocus: true
-            text: qsTr("Previous")
+            text: i18n.qtr("Previous")
         }
     }
 
@@ -147,8 +147,8 @@ Item{
             property bool acceptFocus: true
             text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
                    && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
-                  ? qsTr("Pause")
-                  : qsTr("Play")
+                  ? i18n.qtr("Pause")
+                  : i18n.qtr("Play")
         }
     }
 
@@ -160,7 +160,7 @@ Item{
             iconText: VLCIcons.next
             onClicked: mainPlaylistController.next()
             property bool acceptFocus: true
-            text: qsTr("Next")
+            text: i18n.qtr("Next")
         }
     }
 
@@ -175,7 +175,7 @@ Item{
             visible: player.hasChapters
             enabled: visible
             property bool acceptFocus: visible
-            text: qsTr("Previous chapter")
+            text: i18n.qtr("Previous chapter")
         }
     }
 
@@ -191,7 +191,7 @@ Item{
             visible: player.hasChapters
             enabled: visible
             property bool acceptFocus: visible
-            text: qsTr("Next chapter")
+            text: i18n.qtr("Next chapter")
         }
     }
 
@@ -207,7 +207,7 @@ Item{
                   : VLCIcons.repeat_all
             onClicked: mainPlaylistController.toggleRepeatMode()
             property bool acceptFocus: true
-            text: qsTr("Repeat")
+            text: i18n.qtr("Repeat")
         }
     }
 
@@ -223,7 +223,7 @@ Item{
                 langMenu.open()
             }
 
-            text: qsTr("Languages and tracks")
+            text: i18n.qtr("Languages and tracks")
 
             PlayerMenu {
                 id: langMenu
@@ -236,7 +236,7 @@ Item{
                 }
                 focus: true
 
-                title: qsTr("Languages and Tracks")
+                title: i18n.qtr("Languages and Tracks")
 
 
                 Connections {
@@ -253,7 +253,7 @@ Item{
                     id: subtrackMenu
                     onOpened: rootPlayer._menu = subtrackMenu
                     parentMenu: langMenu
-                    title: qsTr("Subtitle Track")
+                    title: i18n.qtr("Subtitle Track")
                     enabled: player.isPlaying && player.subtitleTracks.count > 0
                     Repeater {
                         model: player.subtitleTracks
@@ -270,7 +270,7 @@ Item{
 
                 PlayerMenu {
                     id: audiotrackMenu
-                    title: qsTr("Audio Track")
+                    title: i18n.qtr("Audio Track")
 
                     parentMenu: langMenu
                     onOpened: rootPlayer._menu = audiotrackMenu
@@ -292,7 +292,7 @@ Item{
 
                 PlayerMenu {
                     id: videotrackMenu
-                    title: qsTr("Video Track")
+                    title: i18n.qtr("Video Track")
                     parentMenu: langMenu
                     onOpened: rootPlayer._menu = videotrackMenu
                     enabled: player.isPlaying && player.videoTracks.count > 0
@@ -327,7 +327,7 @@ Item{
                 }
             }
             property bool acceptFocus: true
-            text: qsTr("Playlist")
+            text: i18n.qtr("Playlist")
         }
 
     }
@@ -351,7 +351,7 @@ Item{
                 }
             }
             property bool acceptFocus: true
-            text: qsTr("Menu")
+            text: i18n.qtr("Menu")
         }
     }
 
@@ -420,7 +420,7 @@ Item{
             iconText: rootWindow.interfaceFullScreen ?VLCIcons.defullscreen :VLCIcons.fullscreen
             onClicked: rootWindow.interfaceFullScreen = !rootWindow.interfaceFullScreen
             property bool acceptFocus: true
-            text: qsTr("fullscreen")
+            text: i18n.qtr("fullscreen")
         }
     }
 
@@ -434,7 +434,7 @@ Item{
             checked: player.isRecording
             onClicked: player.toggleRecord()
             property bool acceptFocus: true
-            text: qsTr("record")
+            text: i18n.qtr("record")
         }
     }
 
@@ -458,7 +458,7 @@ Item{
             color: VLCStyle.colors.buttonText
             colorOverlay: VLCStyle.colors.banner
             property bool acceptFocus: true
-            text: qsTr("A to B")
+            text: i18n.qtr("A to B")
         }
     }
 
@@ -471,7 +471,7 @@ Item{
             iconText: VLCIcons.snapshot
             onClicked: player.snapshot()
             property bool acceptFocus: true
-            text: qsTr("Snapshot")
+            text: i18n.qtr("Snapshot")
         }
     }
 
@@ -485,7 +485,7 @@ Item{
             iconText: VLCIcons.stop
             onClicked: mainPlaylistController.stop()
             property bool acceptFocus: true
-            text: qsTr("Stop")
+            text: i18n.qtr("Stop")
         }
     }
 
@@ -498,7 +498,7 @@ Item{
             iconText: VLCIcons.info
             onClicked: dialogProvider.mediaInfoDialog()
             property bool acceptFocus: true
-            text: qsTr("Informations")
+            text: i18n.qtr("Informations")
         }
     }
 
@@ -512,7 +512,7 @@ Item{
             iconText: VLCIcons.frame_by_frame
             onClicked: player.frameNext()
             property bool acceptFocus: true
-            text: qsTr("Next frame")
+            text: i18n.qtr("Next frame")
         }
     }
 
@@ -525,7 +525,7 @@ Item{
             iconText: VLCIcons.faster
             onClicked: player.faster()
             property bool acceptFocus: true
-            text: qsTr("Faster")
+            text: i18n.qtr("Faster")
         }
     }
 
@@ -538,7 +538,7 @@ Item{
             iconText: VLCIcons.slower
             onClicked: player.slower()
             property bool acceptFocus: true
-            text: qsTr("Slower")
+            text: i18n.qtr("Slower")
         }
     }
 
@@ -550,7 +550,7 @@ Item{
             iconText: VLCIcons.eject
             onClicked: dialogProvider.openDialog()
             property bool acceptFocus: true
-            text: qsTr("Open media")
+            text: i18n.qtr("Open media")
         }
     }
 
@@ -562,7 +562,7 @@ Item{
             text: VLCIcons.extended
             onClicked: dialogProvider.extendedDialog()
             property bool acceptFocus: true
-            Accessible.name: qsTr("Extended settings")
+            Accessible.name: i18n.qtr("Extended settings")
         }
     }
 
@@ -574,7 +574,7 @@ Item{
             iconText: VLCIcons.skip_for
             onClicked: player.jumpFwd()
             property bool acceptFocus: true
-            text: qsTr("Step forward")
+            text: i18n.qtr("Step forward")
         }
     }
 
@@ -586,7 +586,7 @@ Item{
             iconText: VLCIcons.skip_back
             onClicked: player.jumpBwd()
             property bool acceptFocus: true
-            text: qsTr("Step back")
+            text: i18n.qtr("Step back")
         }
     }
 
@@ -598,7 +598,7 @@ Item{
             iconText: VLCIcons.clear
             onClicked: rootWindow.close()
             property bool acceptFocus: true
-            text: qsTr("Quit")
+            text: i18n.qtr("Quit")
         }
     }
 
@@ -615,7 +615,7 @@ Item{
             currentIndex: -1
             onCurrentIndexChanged: model.toggleIndex(currentIndex)
             property bool acceptFocus: true
-            Accessible.name: qsTr("Aspect ratio")
+            Accessible.name: i18n.qtr("Aspect ratio")
         }
     }
 

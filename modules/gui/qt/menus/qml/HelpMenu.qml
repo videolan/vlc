@@ -22,7 +22,7 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 
 Widgets.MenuExt {
-    Action { text: qsTr("&Help");                 onTriggered: dialogProvider.helpDialog();   icon.source: "qrc:/menu/help.svg"; shortcut: "F1"              }
-    Action { text: qsTr("Check for &Updates..."); onTriggered: dialogProvider.updateDialog();                                                                }
-    Action { text: qsTr("&About");                onTriggered: history.push(["about"], History.Go);  icon.source: "qrc:/menu/info.svg"; shortcut: "Shift+F1" }
+    Action { text: i18n.qtr("&Help");                 onTriggered: dialogProvider.helpDialog();   icon.source: "qrc:/menu/help.svg"; shortcut: "F1"              }
+    Action { text: i18n.qtr("Check for &Updates..."); onTriggered: dialogProvider.updateDialog();                                                                }
+    Action { text: i18n.qtr("&About");                onTriggered: history.push(["about"], History.Go);  icon.source: "qrc:/menu/info.svg"; shortcut: "Shift+F1" }
 }

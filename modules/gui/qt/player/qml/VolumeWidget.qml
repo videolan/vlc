@@ -53,7 +53,7 @@ FocusScope{
                     VLCIcons.volume_medium
                 else
                     VLCIcons.volume_high
-            text: qsTr("Mute")
+            text: i18n.qtr("Mute")
             color: widgetfscope.color
             onClicked: player.muted = !player.muted
             KeyNavigation.right: volControl
@@ -73,7 +73,7 @@ FocusScope{
             opacity: player.muted ? 0.5 : 1
             focus: true
 
-            Accessible.name: qsTr("Volume")
+            Accessible.name: i18n.qtr("Volume")
 
             Keys.onReleased: {
                 if (event.accepted)

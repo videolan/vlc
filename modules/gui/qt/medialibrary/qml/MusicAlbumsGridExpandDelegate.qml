@@ -85,7 +85,7 @@ Widgets.NavigableFocusScope {
                         Layout.alignment: Qt.AlignHCenter
 
                         iconText: VLCIcons.add
-                        text: qsTr("Enqueue")
+                        text: i18n.qtr("Enqueue")
 
                         onClicked: medialib.addToPlaylist(model.id)
 
@@ -100,7 +100,7 @@ Widgets.NavigableFocusScope {
                         size: VLCStyle.icon_normal
 
                         iconText: VLCIcons.play
-                        text: qsTr("Play")
+                        text: i18n.qtr("Play")
 
                         onClicked: medialib.addAndPlay(model.id)
 
@@ -141,7 +141,7 @@ Widgets.NavigableFocusScope {
                 color: "transparent"
                 Text {
                     id: expand_infos_title_id
-                    text: "<b>"+(model.title || qsTr("Unknown title") )+"</b>"
+                    text: "<b>"+(model.title || i18n.qtr("Unknown title") )+"</b>"
                     font.pixelSize: VLCStyle.fontSize_xxlarge
                     color: VLCStyle.colors.text
                 }
@@ -161,8 +161,8 @@ Widgets.NavigableFocusScope {
                 color: "transparent"
                 Text {
                     id: expand_infos_subtitle_id
-                    text: qsTr("By %1 - %2 - %3")
-                    .arg(model.main_artist || qsTr("Unknown title"))
+                    text: i18n.qtr("By %1 - %2 - %3")
+                    .arg(model.main_artist || i18n.qtr("Unknown title"))
                     .arg(model.release_year || "")
                     .arg(model.duration || "")
                     font.pixelSize: VLCStyle.fontSize_large

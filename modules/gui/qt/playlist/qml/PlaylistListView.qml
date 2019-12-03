@@ -53,38 +53,38 @@ Widgets.NavigableFocusScope {
         rightPadding: root.rightPadding
 
         //rootmenu
-        Action { id:playAction;         text: qsTr("Play");             onTriggered: view.onPlay(); icon.source: "qrc:///toolbar/play_b.svg" }
-        Action { id:deleteAction;       text: qsTr("Delete");           onTriggered: view.onDelete() }
-        Action { id:clearAllAction;     text: qsTr("Clear Playlist");   onTriggered: mainPlaylistController.clear() }
-        Action { id:selectAllAction;    text: qsTr("Select All");       onTriggered: root.plmodel.selectAll() }
-        Action { id:shuffleAction;      text: qsTr("Suffle playlist");  onTriggered: mainPlaylistController.shuffle(); icon.source: "qrc:///buttons/playlist/shuffle_on.svg" }
-        Action { id:sortAction;         text: qsTr("Sort");             property string subMenu: "sortmenu"}
-        Action { id:selectTracksAction; text: qsTr("Select Tracks");    onTriggered: view.mode = "select" }
-        Action { id:moveTracksAction;   text: qsTr("Move Selection");   onTriggered: view.mode = "move" }
+        Action { id:playAction;         text: i18n.qtr("Play");             onTriggered: view.onPlay(); icon.source: "qrc:///toolbar/play_b.svg" }
+        Action { id:deleteAction;       text: i18n.qtr("Delete");           onTriggered: view.onDelete() }
+        Action { id:clearAllAction;     text: i18n.qtr("Clear Playlist");   onTriggered: mainPlaylistController.clear() }
+        Action { id:selectAllAction;    text: i18n.qtr("Select All");       onTriggered: root.plmodel.selectAll() }
+        Action { id:shuffleAction;      text: i18n.qtr("Shuffle Playlist");  onTriggered: mainPlaylistController.shuffle(); icon.source: "qrc:///buttons/playlist/shuffle_on.svg" }
+        Action { id:sortAction;         text: i18n.qtr("Sort");             property string subMenu: "sortmenu"}
+        Action { id:selectTracksAction; text: i18n.qtr("Select Tracks");    onTriggered: view.mode = "select" }
+        Action { id:moveTracksAction;   text: i18n.qtr("Move Selection");   onTriggered: view.mode = "move" }
 
         //sortmenu
-        Action { id: sortTitleAction;   text: qsTr("Tile");
+        Action { id: sortTitleAction;   text: i18n.qtr("Tile");
             onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_TITLE, PlaylistControllerModel.SORT_ORDER_ASC)}
-        Action { id: sortDurationAction;text: qsTr("Duration");
+        Action { id: sortDurationAction;text: i18n.qtr("Duration");
             onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_DURATION, PlaylistControllerModel.SORT_ORDER_ASC)}
-        Action { id: sortArtistAction;  text: qsTr("Artist");
+        Action { id: sortArtistAction;  text: i18n.qtr("Artist");
             onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_ARTIST, PlaylistControllerModel.SORT_ORDER_ASC)}
-        Action { id: sortAlbumAction;   text: qsTr("Album");
+        Action { id: sortAlbumAction;   text: i18n.qtr("Album");
             onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_ALBUM, PlaylistControllerModel.SORT_ORDER_ASC)}
-        Action { id: sortGenreAction;   text: qsTr("Genre");
+        Action { id: sortGenreAction;   text: i18n.qtr("Genre");
             onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_GENRE, PlaylistControllerModel.SORT_ORDER_ASC)}
-        Action { id: sortDateAction;    text: qsTr("Date");
+        Action { id: sortDateAction;    text: i18n.qtr("Date");
             onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_DATE, PlaylistControllerModel.SORT_ORDER_ASC)}
-        Action { id: sortTrackAction;   text: qsTr("Track number");
+        Action { id: sortTrackAction;   text: i18n.qtr("Track Number");
             onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_TRACK_NUMBER, PlaylistControllerModel.SORT_ORDER_ASC)}
-        Action { id: sortURLAction;     text: qsTr("URL");
+        Action { id: sortURLAction;     text: i18n.qtr("URL");
             onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_URL, PlaylistControllerModel.SORT_ORDER_ASC)}
-        Action { id: sortRatingAction;  text: qsTr("Rating");
+        Action { id: sortRatingAction;  text: i18n.qtr("Rating");
             onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_RATIN, PlaylistControllerModel.SORT_ORDER_ASC)}
 
         models: {
             "rootmenu" : {
-                title: qsTr("Playlist"),
+                title: i18n.qtr("Playlist"),
                 entries: [
                     playAction,
                     deleteAction,
@@ -97,7 +97,7 @@ Widgets.NavigableFocusScope {
                 ]
             },
             "sortmenu" :{
-                title: qsTr("Sort Playlist"),
+                title: i18n.qtr("Sort Playlist"),
                 entries:  [
                     sortTitleAction,
                     sortDurationAction,
@@ -323,7 +323,7 @@ Widgets.NavigableFocusScope {
             visible: plmodel.count === 0
             font.pixelSize: VLCStyle.fontHeight_xxlarge
             color: view.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-            text: qsTr("playlist is empty")
+            text: i18n.qtr("playlist is empty")
         }
     }
 
