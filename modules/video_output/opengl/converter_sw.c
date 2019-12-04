@@ -238,6 +238,8 @@ tc_pbo_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
         tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
                               tc->texs[i].format, tc->texs[i].type, NULL);
+
+        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     }
 
     /* turn off pbo */
@@ -496,6 +498,7 @@ upload_plane(const opengl_tex_converter_t *tc, unsigned tex_idx,
         tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pitch * width / (visible_pitch ?: 1));
         tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, width, height,
                               tex_format, tex_type, pixels);
+        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     }
     return VLC_SUCCESS;
 }
