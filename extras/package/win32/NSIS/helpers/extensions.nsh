@@ -192,6 +192,7 @@ FunctionEnd
   !insertmacro ${_action} Video ".asf"
   !insertmacro ${_action} Video ".avi"
   !insertmacro ${_action} Video ".bik"
+  !insertmacro ${_action} Video ".dav"
   !insertmacro ${_action} Video ".divx"
   !insertmacro ${_action} Video ".drc"
   !insertmacro ${_action} Video ".dv"
