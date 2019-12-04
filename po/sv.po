@@ -39,8 +39,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-08-08 12:34+0200\n"
-"Last-Translator: Sebastian Rasmussen <sebras@gmail.com>, 2019\n"
+"PO-Revision-Date: 2019-12-04 09:29+0100\n"
+"Last-Translator: Anton Regnander <anton_r_3@hotmail.com>, 2019\n"
 "Language-Team: Swedish (https://www.transifex.com/yaron/teams/16553/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -1180,11 +1180,11 @@ msgstr "Linjär"
 
 #: src/input/es_out.c:3236
 msgid "Hybrid Log-Gamma"
-msgstr ""
+msgstr "Hybrid Logg-Gamma"
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
-msgstr ""
+msgstr "Färgöverföring funktion"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
@@ -3505,6 +3505,8 @@ msgid ""
 "If this option is enabled, the flow on the SAP multicast address will be "
 "controlled. This is needed if you want to make announcements on the MBone."
 msgstr ""
+"Om detta alternativ aktiveras, flödet på SAP-multicast-adressen kommer att "
+"kontrolleras. Detta krävs om du vill göra meddelanden på MBone."
 
 #: src/libvlc-module.c:987
 msgid "SAP announcement interval"
@@ -3643,7 +3645,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1058
 msgid "Preferred keystore list"
-msgstr ""
+msgstr "Lista på föredragna keystore"
 
 #: src/libvlc-module.c:1060
 msgid "List of keystores that VLC will use in priority."
@@ -7171,7 +7173,7 @@ msgstr "Stor kanal"
 
 #: modules/access/dtv/access.c:237
 msgid "ATSC minor channel"
-msgstr ""
+msgstr "ATSC mindre kanal"
 
 #: modules/access/dtv/access.c:238
 msgid "Physical channel"
@@ -7239,7 +7241,7 @@ msgstr "DV"
 
 #: modules/access/dvb/access.c:66
 msgid "Probe DVB card for capabilities"
-msgstr ""
+msgstr "Sond DVB-kort för förmågor"
 
 #: modules/access/dvb/access.c:67
 msgid ""
@@ -7702,7 +7704,7 @@ msgstr "Minnesström"
 
 #: modules/access/imem-access.c:160
 msgid "In-memory stream input"
-msgstr ""
+msgstr "In-minne ströminmatning"
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -8027,7 +8029,7 @@ msgstr "QTSound"
 
 #: modules/access/qtsound.m:70
 msgid "QuickTime Sound Capture"
-msgstr ""
+msgstr "QuickTime Ljudfångst"
 
 #: modules/access/qtsound.m:272
 msgid "No Audio Input device found"
@@ -12368,11 +12370,11 @@ msgstr "Även kända som DWT-nivåer"
 
 #: modules/codec/schroedinger.c:250
 msgid "Enable multiple quantizers"
-msgstr ""
+msgstr "Aktivera flera quantizers"
 
 #: modules/codec/schroedinger.c:251
 msgid "Enable multiple quantizers per subband (one per codeblock)"
-msgstr ""
+msgstr "Aktivera flera quantizers per underband (ett per kodblock)"
 
 #: modules/codec/schroedinger.c:255
 msgid "Disable arithmetic coding"
@@ -12428,7 +12430,7 @@ msgstr "stor - använd stora kodblock"
 
 #: modules/codec/schroedinger.c:301
 msgid "full - One code block per subband"
-msgstr "full - ett kodblock per underband"
+msgstr "full - Ett kodblock per underband"
 
 #: modules/codec/schroedinger.c:306
 msgid "Enable hierarchical Motion Estimation"
@@ -27458,6 +27460,8 @@ msgid ""
 "Video will be rendered with this X11 display. If empty, the default display "
 "will be used."
 msgstr ""
+"Videon kommer att renderas med denna X11 display. Om den förblir tom, kommer "
+"standarddisplayen att användas."
 
 #: modules/video_output/xcb/window.c:705
 msgid "X11 window ID"
@@ -27481,7 +27485,7 @@ msgstr "X11-videoutmatning (XCB)"
 
 #: modules/video_output/xcb/xvideo.c:44
 msgid "XVideo adaptor number"
-msgstr ""
+msgstr "XVideo-adapternummer"
 
 #: modules/video_output/xcb/xvideo.c:46
 msgid ""
@@ -28067,7 +28071,7 @@ msgstr "Spektrumanalysator"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Hann"
-msgstr ""
+msgstr "Hann"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Flat Top"
@@ -28075,7 +28079,7 @@ msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
-msgstr ""
+msgstr "Blackman-Harris"
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Kaiser"
@@ -28113,7 +28117,7 @@ msgstr "Utmatning\tmetod"
 
 #: share/lua/http/dialogs/create_stream.html:249
 msgid "Multiplexer"
-msgstr ""
+msgstr "Multiplexer"
 
 #: share/lua/http/dialogs/create_stream.html:266
 msgid "Video FPS"
@@ -28212,7 +28216,7 @@ msgstr "Spårsynkronisering"
 
 #: share/lua/http/index.html:220
 msgid "VLM Batch Commands"
-msgstr ""
+msgstr "VLM kommandon"
 
 #: share/lua/http/index.html:240 modules/gui/qt/ui/vlm.h:295
 msgid "Loop"
