@@ -17,6 +17,9 @@ Packetizers:
 Decoder:
  * avcodec: revector video decoder to fix incomplete drain
 
+Text renderer:
+ * Fix crashes on macOS with SSA/ASS subtitles containing emoji
+
 macOS:
  * Fix Apple Remote support on macOS Catalina
  * Add support for pausing Apple Music on macOS Catalina
