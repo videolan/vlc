@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-07-02 04:09+0200\n"
+"PO-Revision-Date: 2019-12-04 10:56+0100\n"
 "Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2019\n"
 "Language-Team: Icelandic (https://www.transifex.com/yaron/teams/16553/is/)\n"
 "Language: is\n"
@@ -6926,7 +6926,7 @@ msgstr ""
 
 #: modules/access/dvb/access.c:76
 msgid "Use NIT for scanning services"
-msgstr ""
+msgstr "Nota NIT til að skanna þjónustur"
 
 #: modules/access/dvb/access.c:79
 msgid "DVB"
@@ -8952,7 +8952,7 @@ msgstr "Lýsing á stíltegund"
 
 #: modules/access_output/shout.c:83
 msgid "Genre of the content."
-msgstr ""
+msgstr "Stíltegund efnisins. "
 
 #: modules/access_output/shout.c:85
 msgid "URL description"
@@ -9557,7 +9557,7 @@ msgstr "Teknó"
 
 #: modules/audio_filter/gain.c:58
 msgid "Gain multiplier"
-msgstr ""
+msgstr "Margföldun mögnunar"
 
 #: modules/audio_filter/gain.c:59
 msgid "Increase or decrease the gain (default 1.0)"
@@ -9754,7 +9754,7 @@ msgstr ""
 
 #: modules/audio_filter/scaletempo.c:69
 msgid "Overlap Length"
-msgstr ""
+msgstr "Lengd skörunar"
 
 #: modules/audio_filter/scaletempo.c:69
 msgid "Percentage of stride to overlap"
@@ -10327,7 +10327,7 @@ msgstr "Bein myndgerð"
 
 #: modules/codec/avcodec/avcodec.h:59
 msgid "Show corrupted frames"
-msgstr ""
+msgstr "Sýna skemmda ramma"
 
 #: modules/codec/avcodec/avcodec.h:60
 msgid "Prefer visual artifacts instead of missing frames"
@@ -19370,7 +19370,7 @@ msgstr "Stillingar og áhrif"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
 msgid "Stereo Widener"
-msgstr ""
+msgstr "Víðómsbreikkari"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -20975,7 +20975,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
-msgstr ""
+msgstr "Þegar ólæst"
 
 #: modules/keystore/keychain.m:54
 msgid "When unlocked, on this device only"
@@ -21004,7 +21004,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:109
 msgid "Keychain keystore"
-msgstr ""
+msgstr "Keychain-lyklageymsla"
 
 #: modules/keystore/keychain.m:110
 msgid "Keystore for iOS, Mac OS X and tvOS"
@@ -21012,7 +21012,7 @@ msgstr ""
 
 #: modules/keystore/kwallet.c:48
 msgid "KWallet keystore"
-msgstr ""
+msgstr "KWallet-lyklageymsla"
 
 #: modules/keystore/kwallet.c:49
 msgid "Secrets are stored via KWallet"
@@ -21020,7 +21020,7 @@ msgstr ""
 
 #: modules/keystore/memory.c:41
 msgid "Memory keystore"
-msgstr ""
+msgstr "Lyklageymsla í minni"
 
 #: modules/keystore/memory.c:42
 msgid "Secrets are stored in memory"
@@ -21028,7 +21028,7 @@ msgstr ""
 
 #: modules/keystore/secret.c:39
 msgid "libsecret keystore"
-msgstr ""
+msgstr "libsecret-lyklageymsla"
 
 #: modules/keystore/secret.c:40
 msgid "Secrets are stored via libsecret"
@@ -21604,7 +21604,7 @@ msgstr "Þjóðlagarokk"
 
 #: modules/meta_engine/ID3Genres.h:115
 msgid "National Folk"
-msgstr ""
+msgstr "Þjóðleg tónlist"
 
 #: modules/meta_engine/ID3Genres.h:116
 msgid "Swing"
@@ -21696,7 +21696,7 @@ msgstr "Sinfónískt"
 
 #: modules/meta_engine/ID3Genres.h:140
 msgid "Booty Bass"
-msgstr ""
+msgstr "Booty Bass"
 
 #: modules/meta_engine/ID3Genres.h:141
 msgid "Primus"
@@ -21732,7 +21732,7 @@ msgstr "Ballöður"
 
 #: modules/meta_engine/ID3Genres.h:150
 msgid "Power Ballad"
-msgstr ""
+msgstr "Kraftballöður"
 
 #: modules/meta_engine/ID3Genres.h:151
 msgid "Rhythmic Soul"
@@ -21760,7 +21760,7 @@ msgstr "Acapella"
 
 #: modules/meta_engine/ID3Genres.h:157
 msgid "Euro-House"
-msgstr ""
+msgstr "Evró-hústónlist"
 
 #: modules/meta_engine/ID3Genres.h:158
 msgid "Dance Hall"
@@ -21776,7 +21776,7 @@ msgstr "Trommu & Bassa"
 
 #: modules/meta_engine/ID3Genres.h:161
 msgid "Club - House"
-msgstr ""
+msgstr "Klúbba-hústónlist"
 
 #: modules/meta_engine/ID3Genres.h:162
 msgid "Hardcore"
@@ -26475,7 +26475,7 @@ msgstr "Videominni"
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
 msgid "Wayland display"
-msgstr ""
+msgstr "Wayland-skjár"
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
@@ -26670,7 +26670,7 @@ msgstr ""
 
 #: modules/video_splitter/panoramix.c:82
 msgid "Panoramix"
-msgstr ""
+msgstr "Panoramix"
 
 #: modules/video_splitter/panoramix.c:94
 msgid "length of the overlapping area (in %)"
