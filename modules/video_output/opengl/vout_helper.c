@@ -550,6 +550,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
     tc->glsl_precision_header = "";
 #endif
 
+    interop->init = opengl_interop_init_impl;
     interop->ops = NULL;
     interop->glexts = glexts;
     interop->fmt = *fmt;
