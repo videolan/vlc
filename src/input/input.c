@@ -2383,6 +2383,12 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
 
     /* Delete the preexisting titles */
     bool had_titles = in->i_title > 0;
+    if( had_titles )
+    {
+        for( int i = 0; i < in->i_title; i++ )
+            vlc_input_title_Delete( in->title[i] );
+        TAB_CLEAN( in->i_title, in->title );
+    }
 
     /* Get the new title list */
     if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
