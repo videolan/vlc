@@ -296,10 +296,8 @@ tc_common_update(const struct vlc_gl_interop *interop, GLuint *textures,
 }
 
 int
-opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
+opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
 {
-    struct vlc_gl_interop *interop = &tc->interop;
-
     video_color_space_t space;
     const vlc_fourcc_t *list;
 
@@ -394,9 +392,9 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
 }
 
 void
-opengl_tex_converter_generic_deinit(opengl_tex_converter_t *tc)
+opengl_interop_generic_deinit(struct vlc_gl_interop *interop)
 {
-    struct priv *priv = tc->interop.priv;
+    struct priv *priv = interop->priv;
     for (size_t i = 0; i < PBO_DISPLAY_COUNT && priv->pbo.display_pics[i]; ++i)
         picture_Release(priv->pbo.display_pics[i]);
     free(priv->texture_temp_buf);
