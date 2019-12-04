@@ -343,6 +343,8 @@ tc_persistent_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
         tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
                               tc->texs[i].format, tc->texs[i].type, NULL);
+
+        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     }
 
     bool hold;
