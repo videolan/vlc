@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-07-02 11:38+0200\n"
+"PO-Revision-Date: 2019-12-04 23:04+0100\n"
 "Last-Translator: picodotdev <pico.dev@gmail.com>, 2019\n"
 "Language-Team: Spanish (https://www.transifex.com/yaron/teams/16553/es/)\n"
 "Language: es\n"
@@ -15433,7 +15433,7 @@ msgstr "Construir índice luego reproducir"
 
 #: modules/demux/avi/avi.c:851
 msgid "Play as is"
-msgstr "Reproducir como"
+msgstr "Reproducir así"
 
 #: modules/demux/avi/avi.c:852 modules/demux/mp4/mp4.c:4262
 msgid "Broken or missing Index"
@@ -21480,11 +21480,11 @@ msgstr "&Subir volumen"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
-msgstr "Bajar volum&en"
+msgstr "&Bajar volumen"
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
-msgstr "&Silenciar"
+msgstr "Si&lenciar"
 
 #: modules/gui/qt/menus.cpp:618
 msgid "Audio &Device"
@@ -25112,7 +25112,7 @@ msgstr "Autoborrar"
 
 #: modules/stream_out/autodel.c:47
 msgid "Automatically add/delete input streams"
-msgstr "Añade y borrar automáticamente emisiones de entrada"
+msgstr "Añade/elimina automáticamente emisiones de entrada"
 
 #: modules/stream_out/bridge.c:43
 msgid ""
