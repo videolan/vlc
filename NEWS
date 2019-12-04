@@ -37,6 +37,7 @@ Demuxer:
  * Support for HEIF image and grid image formats
  * Support for DASH WebM
  * Support for DVBSUB in mkv
+ * Support for DAV video files
  * Improved Bluray menus, clips and stream selection
  * Support chapters in mp3 files
 
