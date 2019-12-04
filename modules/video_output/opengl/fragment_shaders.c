@@ -100,9 +100,10 @@ static int GetTexFormatSize(const opengl_vtable_t *vt, int target,
 static int
 interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
                       vlc_fourcc_t chroma,
-                      const vlc_chroma_description_t *desc,
-                      const char *swizzle_per_tex[])
+                      const vlc_chroma_description_t *desc)
 {
+    (void) chroma;
+
     GLint oneplane_texfmt, oneplane16_texfmt,
           twoplanes_texfmt, twoplanes16_texfmt;
 
@@ -157,9 +158,6 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
                 internal, oneplane_texfmt, type
             };
         }
-
-        if (oneplane_texfmt == GL_RED)
-            swizzle_per_tex[0] = swizzle_per_tex[1] = swizzle_per_tex[2] = "r";
     }
     else if (desc->plane_count == 2)
     {
@@ -193,17 +191,6 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
         }
         else
             return VLC_EGENERIC;
-
-        if (oneplane_texfmt == GL_RED)
-        {
-            swizzle_per_tex[0] = "r";
-            swizzle_per_tex[1] = "rg";
-        }
-        else
-        {
-            swizzle_per_tex[0] = NULL;
-            swizzle_per_tex[1] = "xa";
-        }
     }
     else if (desc->plane_count == 1)
     {
@@ -212,33 +199,6 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
         interop->texs[0] = (struct vlc_gl_tex_cfg) {
             { 1, 2 }, { 1, 1 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
         };
-
-        /*
-         * Set swizzling in Y1 U V order
-         * R  G  B  A
-         * U  Y1 V  Y2 => GRB
-         * Y1 U  Y2 V  => RGA
-         * V  Y1 U  Y2 => GBR
-         * Y1 V  Y2 U  => RAG
-         */
-        switch (chroma)
-        {
-            case VLC_CODEC_UYVY:
-                swizzle_per_tex[0] = "grb";
-                break;
-            case VLC_CODEC_YUYV:
-                swizzle_per_tex[0] = "rga";
-                break;
-            case VLC_CODEC_VYUY:
-                swizzle_per_tex[0] = "gbr";
-                break;
-            case VLC_CODEC_YVYU:
-                swizzle_per_tex[0] = "rag";
-                break;
-            default:
-                assert(!"missing chroma");
-                return VLC_EGENERIC;
-        }
     }
     else
         return VLC_EGENERIC;
@@ -517,11 +477,69 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
 }
 
 static int
+opengl_init_swizzle(const struct vlc_gl_interop *interop,
+                    const char *swizzle_per_tex[],
+                    vlc_fourcc_t chroma,
+                    const vlc_chroma_description_t *desc)
+{
+    GLint oneplane_texfmt;
+    if (vlc_gl_StrHasToken(interop->glexts, "GL_ARB_texture_rg"))
+        oneplane_texfmt = GL_RED;
+    else
+        oneplane_texfmt = GL_LUMINANCE;
+
+    if (desc->plane_count == 3)
+        swizzle_per_tex[0] = swizzle_per_tex[1] = swizzle_per_tex[2] = "r";
+    else if (desc->plane_count == 2)
+    {
+        if (oneplane_texfmt == GL_RED)
+        {
+            swizzle_per_tex[0] = "r";
+            swizzle_per_tex[1] = "rg";
+        }
+        else
+        {
+            swizzle_per_tex[0] = NULL;
+            swizzle_per_tex[1] = "xa";
+        }
+    }
+    else if (desc->plane_count == 1)
+    {
+        /*
+         * Set swizzling in Y1 U V order
+         * R  G  B  A
+         * U  Y1 V  Y2 => GRB
+         * Y1 U  Y2 V  => RGA
+         * V  Y1 U  Y2 => GBR
+         * Y1 V  Y2 U  => RAG
+         */
+        switch (chroma)
+        {
+            case VLC_CODEC_UYVY:
+                swizzle_per_tex[0] = "grb";
+                break;
+            case VLC_CODEC_YUYV:
+                swizzle_per_tex[0] = "rga";
+                break;
+            case VLC_CODEC_VYUY:
+                swizzle_per_tex[0] = "gbr";
+                break;
+            case VLC_CODEC_YVYU:
+                swizzle_per_tex[0] = "rag";
+                break;
+            default:
+                assert(!"missing chroma");
+                return VLC_EGENERIC;
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+static int
 opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
                     vlc_fourcc_t chroma, bool is_yuv,
                     const vlc_chroma_description_t *desc,
-                    video_color_space_t yuv_space,
-                    const char *swizzle_per_tex[])
+                    video_color_space_t yuv_space)
 {
     assert(!interop->fmt.p_palette);
     interop->sw_fmt = interop->fmt;
@@ -536,8 +554,7 @@ opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
     }
 
     if (is_yuv)
-        return interop_yuv_base_init(interop, tex_target, chroma, desc,
-                                      swizzle_per_tex);
+        return interop_yuv_base_init(interop, tex_target, chroma, desc);
 
     return interop_rgb_base_init(interop, tex_target, chroma);
 }
@@ -558,7 +575,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         return 0;
 
     ret = opengl_interop_init(&tc->interop, tex_target, chroma, is_yuv,
-                              desc, yuv_space, swizzle_per_tex);
+                              desc, yuv_space);
     if (ret != VLC_SUCCESS)
         return 0;
 
@@ -568,6 +585,9 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     if (is_yuv)
     {
         ret = tc_yuv_base_init(tc, chroma, desc, yuv_space, &yuv_swap_uv);
+        if (ret != VLC_SUCCESS)
+            return 0;
+        ret = opengl_init_swizzle(&tc->interop, swizzle_per_tex, chroma, desc);
         if (ret != VLC_SUCCESS)
             return 0;
     }
