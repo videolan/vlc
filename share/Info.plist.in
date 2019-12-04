@@ -429,6 +429,17 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeIconFile</key>
+			<string>movie.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>DAV Video File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.videolan.dav</string>
+			</array>
+		<dict>
+			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>DSD Interchange File</string>
@@ -2377,6 +2388,23 @@
 				<key>public.filename-extension</key>
 				<array>
 					<string>nuv</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.video</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>DAV Video File</string>
+			<key>UTTypeIdentifier</key>
+			<string>org.videolan.dav</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>dav</string>
 				</array>
 			</dict>
 		</dict>
