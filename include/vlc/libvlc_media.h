@@ -659,7 +659,6 @@ LIBVLC_API libvlc_time_t
  * Parse the media asynchronously with options.
  *
  * This fetches (local or network) art, meta data and/or tracks information.
- * This method is the extended version of libvlc_media_parse_with_options().
  *
  * To track when this is over you can listen to libvlc_MediaParsedChanged
  * event. However if this functions returns an error, you will not receive any
