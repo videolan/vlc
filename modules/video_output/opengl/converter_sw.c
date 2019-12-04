@@ -300,7 +300,6 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
 {
     struct vlc_gl_interop *interop = &tc->interop;
 
-    GLuint fragment_shader = 0;
     video_color_space_t space;
     const vlc_fourcc_t *list;
 
@@ -326,11 +325,11 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
         space = COLOR_SPACE_UNDEF;
     }
 
+    int ret = VLC_EGENERIC;
     while (*list)
     {
-        fragment_shader =
-            opengl_fragment_shader_init(tc, GL_TEXTURE_2D, *list, space);
-        if (fragment_shader != 0)
+        ret = opengl_interop_init(interop, GL_TEXTURE_2D, *list, space);
+        if (ret == VLC_SUCCESS)
         {
             interop->fmt.i_chroma = *list;
 
@@ -351,15 +350,12 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
         }
         list++;
     }
-    if (fragment_shader == 0)
-        return VLC_EGENERIC;
+    if (ret != VLC_SUCCESS)
+        return ret;
 
     struct priv *priv = interop->priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
-    {
-        interop->vt->DeleteShader(fragment_shader);
         return VLC_ENOMEM;
-    }
 
     static const struct vlc_gl_interop_ops ops = {
         .allocate_textures = tc_common_allocate_textures,
@@ -393,8 +389,6 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
             msg_Dbg(interop->gl, "PBO support enabled");
         }
     }
-
-    tc->fshader = fragment_shader;
 
     return VLC_SUCCESS;
 }

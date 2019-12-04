@@ -578,10 +578,6 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     if (desc == NULL)
         return 0;
 
-    ret = opengl_interop_init_impl(&tc->interop, tex_target, chroma, yuv_space);
-    if (ret != VLC_SUCCESS)
-        return 0;
-
     if (chroma == VLC_CODEC_XYZ12)
         return xyz12_shader_init(tc);
 
