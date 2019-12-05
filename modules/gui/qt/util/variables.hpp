@@ -30,7 +30,7 @@
 #include <QObject>
 
 #include "qt.hpp"
-#include "var_common_p.hpp"
+#include "varcommon_p.hpp"
 
 /*
  * type traits to convert VLC_VAR to C++types

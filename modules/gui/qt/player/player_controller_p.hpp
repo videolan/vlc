@@ -20,9 +20,9 @@
 #define QVLC_INPUT_MANAGER_P_H_
 
 #include "player_controller.hpp"
-#include "adapters/variables.hpp"
+#include "util/variables.hpp"
 #include "input_models.hpp"
-#include "adapters/var_choice_model.hpp"
+#include "util/varchoicemodel.hpp"
 
 #include <QTimer>
 

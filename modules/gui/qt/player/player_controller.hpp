@@ -31,7 +31,7 @@
 #include <vlc_cxx_helpers.hpp>
 #include "player/input_models.hpp"
 #include "components/audio_device_model.hpp"
-#include "adapters/var_choice_model.hpp"
+#include "util/varchoicemodel.hpp"
 #include "util/vlctick.hpp"
 
 class QSignalMapper;

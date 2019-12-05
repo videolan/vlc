@@ -27,7 +27,7 @@
 #include <QAbstractListModel>
 #include <QMutex>
 #include <vlc_cxx_helpers.hpp>
-#include "var_common_p.hpp"
+#include "varcommon_p.hpp"
 
 extern "C" {
 int VLCVarChoiceModel_on_variable_callback( vlc_object_t * object, char const * , vlc_value_t oldvalue, vlc_value_t newvalue, void * data);

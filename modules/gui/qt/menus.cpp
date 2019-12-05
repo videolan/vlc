@@ -44,7 +44,7 @@
 #include "recents.hpp"                            /* Recent Items */
 #include "dialogs/extensions/extensions_manager.hpp"                 /* Extensions menu */
 #include "dialogs/extended/extended_panels.hpp"
-#include "adapters/var_choice_model.hpp"
+#include "util/varchoicemodel.hpp"
 
 #include <QMenu>
 #include <QMenuBar>

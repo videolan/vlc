@@ -51,9 +51,9 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/dialogs_provider.cpp gui/qt/dialogs/dialogs_provider.hpp \
 	gui/qt/managers/renderer_manager.cpp gui/qt/managers/renderer_manager.hpp \
 	gui/qt/recents.cpp gui/qt/recents.hpp \
-	gui/qt/adapters/var_common_p.hpp \
-	gui/qt/adapters/variables.cpp gui/qt/adapters/variables.hpp \
-	gui/qt/adapters/var_choice_model.cpp  gui/qt/adapters/var_choice_model.hpp \
+	gui/qt/util/var_common_p.hpp \
+	gui/qt/util/variables.cpp gui/qt/util/variables.hpp \
+	gui/qt/util/varchoicemodel.cpp  gui/qt/util/varchoicemodel.hpp \
 	gui/qt/dialogs/bookmarks/bookmarks.cpp gui/qt/dialogs/bookmarks/bookmarks.hpp \
 	gui/qt/dialogs/mediainfo/mediainfo.cpp gui/qt/dialogs/mediainfo/mediainfo.hpp \
 	gui/qt/dialogs/mediainfo/info_panels.cpp gui/qt/dialogs/mediainfo/info_panels.hpp \
@@ -234,8 +234,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/dialogs_provider.moc.cpp \
 	gui/qt/managers/renderer_manager.moc.cpp \
 	gui/qt/recents.moc.cpp \
-	gui/qt/adapters/variables.moc.cpp \
-	gui/qt/adapters/var_choice_model.moc.cpp \
+	gui/qt/util/variables.moc.cpp \
+	gui/qt/util/varchoicemodel.moc.cpp \
 	gui/qt/dialogs/bookmarks/bookmarks.moc.cpp \
 	gui/qt/dialogs/mediainfo/mediainfo.moc.cpp \
 	gui/qt/dialogs/mediainfo/info_panels.moc.cpp \

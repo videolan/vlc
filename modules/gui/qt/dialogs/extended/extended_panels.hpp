@@ -33,7 +33,7 @@
 #include "qt.hpp"
 #include "dialogs/extended/ui_equalizer.h"
 #include "dialogs/extended/ui_video_effects.h"
-#include "adapters/variables.hpp"
+#include "util/variables.hpp"
 
 #include <QTabWidget>
 
