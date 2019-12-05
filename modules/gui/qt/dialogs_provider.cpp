@@ -43,7 +43,7 @@
 #include "dialogs/mediainfo/mediainfo.hpp"
 #include "dialogs/messages/messages.hpp"
 #include "dialogs/extended/extended.hpp"
-#include "dialogs/vlm.hpp"
+#include "dialogs/vlm/vlm.hpp"
 #include "dialogs/sout/sout.hpp"
 #include "dialogs/sout/convert.hpp"
 #include "dialogs/open/open.hpp"

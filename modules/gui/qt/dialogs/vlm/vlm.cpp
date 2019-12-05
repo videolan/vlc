@@ -27,7 +27,7 @@
 #endif
 
 #ifdef ENABLE_VLM
-#include "dialogs/vlm.hpp"
+#include "dialogs/vlm/vlm.hpp"
 #include "dialogs/open/open.hpp"
 #include "dialogs/sout/sout.hpp"
 #include "util/qt_dirs.hpp"

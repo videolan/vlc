@@ -749,8 +749,8 @@ modules/gui/qt/dialogs/sout/sout.cpp
 modules/gui/qt/dialogs/sout/sout.hpp
 modules/gui/qt/dialogs/toolbar.cpp
 modules/gui/qt/dialogs/toolbar.hpp
-modules/gui/qt/dialogs/vlm.cpp
-modules/gui/qt/dialogs/vlm.hpp
+modules/gui/qt/dialogs/vlm/vlm.cpp
+modules/gui/qt/dialogs/vlm/vlm.hpp
 modules/gui/qt/dialogs_provider.cpp
 modules/gui/qt/dialogs_provider.hpp
 modules/gui/qt/dialogs/extensions/extensions_manager.cpp
@@ -1294,4 +1294,4 @@ share/lua/http/mobile_view.html
 #modules/gui/qt/ui/ui_streampanel.h
 #modules/gui/qt/dialogs/help/ui_update.h
 #modules/gui/qt/dialogs/extended/ui_video_effects.h
-#modules/gui/qt/ui/ui_vlm.h
+#modules/gui/qt/dialogs/vlm/ui_vlm.h

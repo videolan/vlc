@@ -69,7 +69,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/toolbareditor.cpp gui/qt/dialogs/toolbareditor.hpp \
 	gui/qt/dialogs/open/open.cpp gui/qt/dialogs/open/open.hpp \
 	gui/qt/dialogs/open/openurl.cpp gui/qt/dialogs/open/openurl.hpp \
-	gui/qt/dialogs/vlm.cpp gui/qt/dialogs/vlm.hpp \
+	gui/qt/dialogs/vlm/vlm.cpp gui/qt/dialogs/vlm/vlm.hpp \
 	gui/qt/dialogs/firstrun/firstrun.cpp gui/qt/dialogs/firstrun/firstrun.hpp \
 	gui/qt/dialogs/podcast/podcast_configuration.cpp \
 	gui/qt/dialogs/podcast/podcast_configuration.hpp \
@@ -226,7 +226,7 @@ moc_verbose__0 = $(moc_verbose_0)
 	$(moc_verbose)$(MOC) $(MOC_CPPFLAGS) -o $@ $<
 
 # These MOC files depend on the configure settings:
-dialogs_provider.moc.cpp dialogs/vlm.moc.cpp: $(top_builddir)/config.h
+dialogs_provider.moc.cpp dialogs/vlm/vlm.moc.cpp: $(top_builddir)/config.h
 
 nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/main_interface.moc.cpp \
@@ -339,7 +339,7 @@ nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/dialogs/open/ui_open_net.h \
 	gui/qt/dialogs/open/ui_open_capture.h \
 	gui/qt/dialogs/open/ui_open.h \
-	gui/qt/ui/ui_vlm.h \
+	gui/qt/dialogs/vlm/ui_vlm.h \
 	gui/qt/dialogs/podcast/ui_podcast_configuration.h \
 	gui/qt/dialogs/sout/ui_profiles.h \
 	gui/qt/dialogs/preferences/ui_sprefs_audio.h \
@@ -391,7 +391,7 @@ libqt_plugin_la_UI = \
 	gui/qt/dialogs/help/about.ui \
 	gui/qt/dialogs/help/update.ui \
 	gui/qt/dialogs/sout/sout.ui \
-	gui/qt/ui/vlm.ui \
+	gui/qt/dialogs/vlm/vlm.ui \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.ui
 EXTRA_DIST += $(libqt_plugin_la_UI)
 
@@ -666,7 +666,7 @@ EXTRA_DIST += gui/qt/vlc.qrc $(libqt_plugin_la_RES)
 nodist_libqt_plugin_la_SOURCES += gui/qt/resources.cpp
 
 if ENABLE_VLM
-nodist_libqt_plugin_la_SOURCES += gui/qt/dialogs/vlm.moc.cpp
+nodist_libqt_plugin_la_SOURCES += gui/qt/dialogs/vlm/vlm.moc.cpp
 endif
 
 if HAVE_QMLCACHE
