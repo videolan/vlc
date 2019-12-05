@@ -1,0 +1,24 @@
+From 24b3e8384e93f3e73b6aa14ea00a30574112f9ba Mon Sep 17 00:00:00 2001
+From: Reid Kleckner <rnk@google.com>
+Date: Wed, 4 Dec 2019 14:09:03 -0800
+Subject: [PATCH] Remove glslang::pool_allocator::setAllocator
+
+TPoolAllocator is not copy assignable, so this setter could never have
+been used. After a recent change (878a24ee2), new versions of Clang
+reject this code outright.
+---
+ glslang/Include/PoolAlloc.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/glslang/Include/PoolAlloc.h b/glslang/Include/PoolAlloc.h
+index 0e237a6a2..b8eccb883 100644
+--- a/glslang/Include/PoolAlloc.h
++++ b/glslang/Include/PoolAlloc.h
+@@ -304,7 +304,6 @@ class pool_allocator {
+     size_type max_size() const { return static_cast<size_type>(-1) / sizeof(T); }
+     size_type max_size(int size) const { return static_cast<size_type>(-1) / size; }
+ 
+-    void setAllocator(TPoolAllocator* a) { allocator = *a; }
+     TPoolAllocator& getAllocator() const { return allocator; }
+ 
+ protected:

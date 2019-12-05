@@ -21,6 +21,7 @@ glslang: glslang-$(GLSLANG_BASENAME).tar.xz .sum-glslang
 	mkdir -p $@-$(GLSLANG_BASENAME)
 	tar xvJf "$<" --strip-components=1 -C $@-$(GLSLANG_BASENAME)
 	$(APPLY) $(SRC)/glslang/glslang-win32.patch
+	$(APPLY) $(SRC)/glslang/remove-broken-code.patch
 	$(MOVE)
 
 .glslang: glslang toolchain.cmake
