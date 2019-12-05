@@ -53,11 +53,6 @@ struct opengl_tex_converter_t
     /* True to dump shaders, set by the caller */
     bool b_dump_shaders;
 
-    /* Function pointer to the shader init command, set by the caller, see
-     * opengl_fragment_shader_init() documentation. */
-    GLuint (*pf_fragment_shader_init)(opengl_tex_converter_t *, GLenum,
-                                      vlc_fourcc_t, video_color_space_t);
-
     /* GLSL version, set by the caller. 100 for GLSL ES, 120 for desktop GLSL */
     unsigned glsl_version;
     /* Precision header, set by the caller. In OpenGLES, the fragment language
@@ -112,28 +107,5 @@ struct opengl_tex_converter_t
                               const GLsizei *tex_width, const GLsizei *tex_height,
                               float alpha);
 };
-
-/**
- * Generate a fragment shader
- *
- * This utility function can be used by hw opengl tex converters that need a
- * generic fragment shader. It will compile a fragment shader generated from
- * the chroma and the tex target. This will initialize all elements of the
- * opengl_tex_converter_t struct except for priv, pf_allocate_texture,
- * pf_update
- *
- * \param tc OpenGL tex converter
- * \param tex_target GL_TEXTURE_2D or GL_TEXTURE_RECTANGLE
- * \param chroma chroma used to generate the fragment shader
- * \param yuv_space if not COLOR_SPACE_UNDEF, YUV planes will be converted to
- * RGB according to the color space
- * \return the compiled fragment shader or 0 in case of error
- */
-static inline GLuint
-opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
-                            vlc_fourcc_t chroma, video_color_space_t yuv_space)
-{
-    return tc->pf_fragment_shader_init(tc, tex_target, chroma, yuv_space);
-}
 
 #endif /* include-guard */
