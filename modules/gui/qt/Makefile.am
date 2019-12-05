@@ -54,7 +54,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/adapters/var_common_p.hpp \
 	gui/qt/adapters/variables.cpp gui/qt/adapters/variables.hpp \
 	gui/qt/adapters/var_choice_model.cpp  gui/qt/adapters/var_choice_model.hpp \
-	gui/qt/dialogs/bookmarks.cpp gui/qt/dialogs/bookmarks.hpp \
+	gui/qt/dialogs/bookmarks/bookmarks.cpp gui/qt/dialogs/bookmarks/bookmarks.hpp \
 	gui/qt/dialogs/mediainfo/mediainfo.cpp gui/qt/dialogs/mediainfo/mediainfo.hpp \
 	gui/qt/dialogs/mediainfo/info_panels.cpp gui/qt/dialogs/mediainfo/info_panels.hpp \
 	gui/qt/dialogs/mediainfo/info_widgets.cpp gui/qt/dialogs/mediainfo/info_widgets.hpp \
@@ -236,7 +236,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/recents.moc.cpp \
 	gui/qt/adapters/variables.moc.cpp \
 	gui/qt/adapters/var_choice_model.moc.cpp \
-	gui/qt/dialogs/bookmarks.moc.cpp \
+	gui/qt/dialogs/bookmarks/bookmarks.moc.cpp \
 	gui/qt/dialogs/mediainfo/mediainfo.moc.cpp \
 	gui/qt/dialogs/mediainfo/info_panels.moc.cpp \
 	gui/qt/dialogs/mediainfo/info_widgets.moc.cpp \

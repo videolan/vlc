@@ -24,7 +24,7 @@
 # include "config.h"
 #endif
 
-#include "dialogs/bookmarks.hpp"
+#include "bookmarks.hpp"
 #include "player/player_controller.hpp"
 
 #include <QHBoxLayout>

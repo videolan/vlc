@@ -711,8 +711,8 @@ modules/gui/qt/dialogs/sout/profile_selector.hpp
 modules/gui/qt/dialogs/sout/profiles.hpp
 modules/gui/qt/dialogs/sout/sout_widgets.cpp
 modules/gui/qt/dialogs/sout/sout_widgets.hpp
-modules/gui/qt/dialogs/bookmarks.cpp
-modules/gui/qt/dialogs/bookmarks.hpp
+modules/gui/qt/dialogs/bookmarks/bookmarks.cpp
+modules/gui/qt/dialogs/bookmarks/bookmarks.hpp
 modules/gui/qt/dialogs/sout/convert.cpp
 modules/gui/qt/dialogs/sout/convert.hpp
 modules/gui/qt/dialogs/epg/epg.cpp

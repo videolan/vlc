@@ -38,7 +38,7 @@
 #include "main_interface.hpp"
 
 /* The dialogs */
-#include "dialogs/bookmarks.hpp"
+#include "dialogs/bookmarks/bookmarks.hpp"
 #include "dialogs/preferences/preferences.hpp"
 #include "dialogs/mediainfo/mediainfo.hpp"
 #include "dialogs/messages/messages.hpp"
