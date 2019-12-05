@@ -1291,7 +1291,6 @@ share/lua/http/mobile_view.html
 #modules/gui/qt/dialogs/preferences/ui_sprefs_interface.h
 #modules/gui/qt/dialogs/preferences/ui_sprefs_subtitles.h
 #modules/gui/qt/dialogs/preferences/ui_sprefs_video.h
-#modules/gui/qt/ui/ui_streampanel.h
 #modules/gui/qt/dialogs/help/ui_update.h
 #modules/gui/qt/dialogs/extended/ui_video_effects.h
 #modules/gui/qt/dialogs/vlm/ui_vlm.h

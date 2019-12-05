@@ -347,7 +347,6 @@ nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/dialogs/preferences/ui_sprefs_interface.h \
 	gui/qt/dialogs/preferences/ui_sprefs_subtitles.h \
 	gui/qt/dialogs/preferences/ui_sprefs_video.h \
-	gui/qt/ui/ui_streampanel.h \
 	gui/qt/dialogs/messages/ui_messages_panel.h \
 	gui/qt/dialogs/help/ui_about.h \
 	gui/qt/dialogs/help/ui_update.h \
@@ -386,7 +385,6 @@ libqt_plugin_la_UI = \
 	gui/qt/dialogs/preferences/sprefs_interface.ui \
 	gui/qt/dialogs/preferences/sprefs_subtitles.ui \
 	gui/qt/dialogs/preferences/sprefs_video.ui \
-	gui/qt/ui/streampanel.ui \
 	gui/qt/dialogs/messages/messages_panel.ui \
 	gui/qt/dialogs/help/about.ui \
 	gui/qt/dialogs/help/update.ui \
