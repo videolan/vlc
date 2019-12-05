@@ -741,8 +741,8 @@ modules/gui/qt/dialogs/open/openurl.cpp
 modules/gui/qt/dialogs/open/openurl.hpp
 modules/gui/qt/dialogs/plugins/plugins.cpp
 modules/gui/qt/dialogs/plugins/plugins.hpp
-modules/gui/qt/dialogs/podcast_configuration.cpp
-modules/gui/qt/dialogs/podcast_configuration.hpp
+modules/gui/qt/dialogs/podcast/podcast_configuration.cpp
+modules/gui/qt/dialogs/podcast/podcast_configuration.hpp
 modules/gui/qt/dialogs/preferences/preferences.cpp
 modules/gui/qt/dialogs/preferences/preferences.hpp
 modules/gui/qt/dialogs/sout/sout.cpp
@@ -1283,7 +1283,7 @@ share/lua/http/mobile_view.html
 #modules/gui/qt/dialogs/open/ui_open_disk.h
 #modules/gui/qt/dialogs/open/ui_open_file.h
 #modules/gui/qt/dialogs/open/ui_open_net.h
-#modules/gui/qt/ui/ui_podcast_configuration.h
+#modules/gui/qt/dialogs/podcast/ui_podcast_configuration.h
 #modules/gui/qt/dialogs/sout/ui_profiles.h
 #modules/gui/qt/dialogs/sout/ui_sout.h
 #modules/gui/qt/dialogs/preferences/ui_sprefs_audio.h

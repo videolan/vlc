@@ -50,7 +50,7 @@
 #include "dialogs/open/openurl.hpp"
 #include "dialogs/help/help.hpp"
 #include "dialogs/gototime.hpp"
-#include "dialogs/podcast_configuration.hpp"
+#include "dialogs/podcast/podcast_configuration.hpp"
 #include "dialogs/toolbar.hpp"
 #include "dialogs/toolbareditor.hpp"
 #include "dialogs/plugins/plugins.hpp"

@@ -24,7 +24,7 @@
 #define QVLC_PODCAST_CONFIGURATION_DIALOG_H_ 1
 
 #include "util/qvlcframe.hpp"
-#include "ui_podcast_configuration.h"
+#include "dialogs/podcast/ui_podcast_configuration.h"
 #include "util/singleton.hpp"
 
 class PodcastConfigDialog : public QVLCDialog, public Singleton<PodcastConfigDialog>

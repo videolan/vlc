@@ -71,8 +71,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/open/openurl.cpp gui/qt/dialogs/open/openurl.hpp \
 	gui/qt/dialogs/vlm.cpp gui/qt/dialogs/vlm.hpp \
 	gui/qt/dialogs/firstrun/firstrun.cpp gui/qt/dialogs/firstrun/firstrun.hpp \
-	gui/qt/dialogs/podcast_configuration.cpp \
-	gui/qt/dialogs/podcast_configuration.hpp \
+	gui/qt/dialogs/podcast/podcast_configuration.cpp \
+	gui/qt/dialogs/podcast/podcast_configuration.hpp \
 	gui/qt/dialogs/extensions/extensions.cpp gui/qt/dialogs/extensions/extensions.hpp \
 	gui/qt/dialogs/extensions/extensions_manager.cpp gui/qt/dialogs/extensions/extensions_manager.hpp \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.cpp \
@@ -251,7 +251,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/toolbareditor.moc.cpp \
 	gui/qt/dialogs/open/open.moc.cpp \
 	gui/qt/dialogs/open/openurl.moc.cpp \
-	gui/qt/dialogs/podcast_configuration.moc.cpp \
+	gui/qt/dialogs/podcast/podcast_configuration.moc.cpp \
 	gui/qt/dialogs/firstrun/firstrun.moc.cpp \
 	gui/qt/dialogs/extensions/extensions_manager.moc.cpp \
 	gui/qt/dialogs/extensions/extensions.moc.cpp \
@@ -340,7 +340,7 @@ nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/dialogs/open/ui_open_capture.h \
 	gui/qt/dialogs/open/ui_open.h \
 	gui/qt/ui/ui_vlm.h \
-	gui/qt/ui/ui_podcast_configuration.h \
+	gui/qt/dialogs/podcast/ui_podcast_configuration.h \
 	gui/qt/dialogs/sout/ui_profiles.h \
 	gui/qt/dialogs/preferences/ui_sprefs_audio.h \
 	gui/qt/dialogs/preferences/ui_sprefs_input.h \
@@ -379,7 +379,7 @@ libqt_plugin_la_UI = \
 	gui/qt/dialogs/open/open_net.ui \
 	gui/qt/dialogs/open/open_capture.ui \
 	gui/qt/dialogs/open/open.ui \
-	gui/qt/ui/podcast_configuration.ui \
+	gui/qt/dialogs/podcast/podcast_configuration.ui \
 	gui/qt/dialogs/sout/profiles.ui \
 	gui/qt/dialogs/preferences/sprefs_audio.ui \
 	gui/qt/dialogs/preferences/sprefs_input.ui \
