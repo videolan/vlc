@@ -725,16 +725,16 @@ modules/gui/qt/dialogs/extensions/extensions.cpp
 modules/gui/qt/dialogs/extensions/extensions.hpp
 modules/gui/qt/dialogs/fingerprint/fingerprintdialog.cpp
 modules/gui/qt/dialogs/fingerprint/fingerprintdialog.hpp
-modules/gui/qt/dialogs/firstrun.cpp
-modules/gui/qt/dialogs/firstrun.hpp
+modules/gui/qt/dialogs/firstrun/firstrun.cpp
+modules/gui/qt/dialogs/firstrun/firstrun.hpp
 modules/gui/qt/dialogs/gototime.cpp
 modules/gui/qt/dialogs/gototime.hpp
 modules/gui/qt/dialogs/help/help.cpp
 modules/gui/qt/dialogs/help/help.hpp
 modules/gui/qt/dialogs/mediainfo/mediainfo.cpp
 modules/gui/qt/dialogs/mediainfo/mediainfo.hpp
-modules/gui/qt/dialogs/messages.cpp
-modules/gui/qt/dialogs/messages.hpp
+modules/gui/qt/dialogs/messages/messages.cpp
+modules/gui/qt/dialogs/messages/messages.hpp
 modules/gui/qt/dialogs/open/open.cpp
 modules/gui/qt/dialogs/open/open.hpp
 modules/gui/qt/dialogs/open/openurl.cpp
@@ -1277,7 +1277,7 @@ share/lua/http/mobile_view.html
 
 #modules/gui/qt/dialogs/help/ui_about.h
 #modules/gui/qt/dialogs/extended/ui_equalizer.h
-#modules/gui/qt/ui/ui_messages_panel.h
+#modules/gui/qt/dialogs/messages/ui_messages_panel.h
 #modules/gui/qt/dialogs/open/ui_open.h
 #modules/gui/qt/dialogs/open/ui_open_capture.h
 #modules/gui/qt/dialogs/open/ui_open_disk.h

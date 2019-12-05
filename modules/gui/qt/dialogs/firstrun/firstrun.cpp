@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "dialogs/firstrun.hpp"
+#include "firstrun.hpp"
 
 #include <QGridLayout>
 #include <QGroupBox>

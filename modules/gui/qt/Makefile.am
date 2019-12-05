@@ -59,7 +59,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/mediainfo/info_panels.cpp gui/qt/dialogs/mediainfo/info_panels.hpp \
 	gui/qt/dialogs/mediainfo/info_widgets.cpp gui/qt/dialogs/mediainfo/info_widgets.hpp \
 	gui/qt/dialogs/extended/extended.cpp gui/qt/dialogs/extended/extended.hpp \
-	gui/qt/dialogs/messages.cpp gui/qt/dialogs/messages.hpp \
+	gui/qt/dialogs/messages/messages.cpp gui/qt/dialogs/messages/messages.hpp \
 	gui/qt/dialogs/errors.cpp gui/qt/dialogs/errors.hpp \
 	gui/qt/dialogs/plugins/plugins.cpp gui/qt/dialogs/plugins/plugins.hpp \
 	gui/qt/dialogs/plugins/addons_manager.cpp gui/qt/dialogs/plugins/addons_manager.hpp \
@@ -70,7 +70,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/open/open.cpp gui/qt/dialogs/open/open.hpp \
 	gui/qt/dialogs/open/openurl.cpp gui/qt/dialogs/open/openurl.hpp \
 	gui/qt/dialogs/vlm.cpp gui/qt/dialogs/vlm.hpp \
-	gui/qt/dialogs/firstrun.cpp gui/qt/dialogs/firstrun.hpp \
+	gui/qt/dialogs/firstrun/firstrun.cpp gui/qt/dialogs/firstrun/firstrun.hpp \
 	gui/qt/dialogs/podcast_configuration.cpp \
 	gui/qt/dialogs/podcast_configuration.hpp \
 	gui/qt/dialogs/extensions/extensions.cpp gui/qt/dialogs/extensions/extensions.hpp \
@@ -241,7 +241,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/mediainfo/info_panels.moc.cpp \
 	gui/qt/dialogs/mediainfo/info_widgets.moc.cpp \
 	gui/qt/dialogs/extended/extended.moc.cpp \
-	gui/qt/dialogs/messages.moc.cpp \
+	gui/qt/dialogs/messages/messages.moc.cpp \
 	gui/qt/dialogs/errors.moc.cpp \
 	gui/qt/dialogs/plugins/addons_manager.moc.cpp \
 	gui/qt/dialogs/plugins/plugins.moc.cpp \
@@ -252,7 +252,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/open/open.moc.cpp \
 	gui/qt/dialogs/open/openurl.moc.cpp \
 	gui/qt/dialogs/podcast_configuration.moc.cpp \
-	gui/qt/dialogs/firstrun.moc.cpp \
+	gui/qt/dialogs/firstrun/firstrun.moc.cpp \
 	gui/qt/dialogs/extensions/extensions_manager.moc.cpp \
 	gui/qt/dialogs/extensions/extensions.moc.cpp \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.moc.cpp \
@@ -348,7 +348,7 @@ nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/dialogs/preferences/ui_sprefs_subtitles.h \
 	gui/qt/dialogs/preferences/ui_sprefs_video.h \
 	gui/qt/ui/ui_streampanel.h \
-	gui/qt/ui/ui_messages_panel.h \
+	gui/qt/dialogs/messages/ui_messages_panel.h \
 	gui/qt/dialogs/help/ui_about.h \
 	gui/qt/dialogs/help/ui_update.h \
 	gui/qt/dialogs/fingerprint/ui_fingerprintdialog.h \
@@ -387,7 +387,7 @@ libqt_plugin_la_UI = \
 	gui/qt/dialogs/preferences/sprefs_subtitles.ui \
 	gui/qt/dialogs/preferences/sprefs_video.ui \
 	gui/qt/ui/streampanel.ui \
-	gui/qt/ui/messages_panel.ui \
+	gui/qt/dialogs/messages/messages_panel.ui \
 	gui/qt/dialogs/help/about.ui \
 	gui/qt/dialogs/help/update.ui \
 	gui/qt/dialogs/sout/sout.ui \

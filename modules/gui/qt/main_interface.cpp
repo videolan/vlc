@@ -38,7 +38,7 @@
 
 #include "components/interface_widgets.hpp"     // bgWidget, videoWidget
 #include "components/controller.hpp"            // controllers
-#include "dialogs/firstrun.hpp"                 // First Run
+#include "dialogs/firstrun/firstrun.hpp"                 // First Run
 
 #include "playlist/playlist_model.hpp"
 #include <vlc_playlist.h>

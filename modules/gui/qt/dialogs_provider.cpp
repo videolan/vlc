@@ -41,7 +41,7 @@
 #include "dialogs/bookmarks.hpp"
 #include "dialogs/preferences/preferences.hpp"
 #include "dialogs/mediainfo/mediainfo.hpp"
-#include "dialogs/messages.hpp"
+#include "dialogs/messages/messages.hpp"
 #include "dialogs/extended/extended.hpp"
 #include "dialogs/vlm.hpp"
 #include "dialogs/sout/sout.hpp"

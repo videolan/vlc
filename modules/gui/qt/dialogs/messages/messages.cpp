@@ -43,7 +43,7 @@
 #include <vlc_common.h>
 #include <vlc_input_item.h>
 
-#include "dialogs/messages.hpp"
+#include "dialogs/messages/messages.hpp"
 
 enum {
     MsgEvent_Type = QEvent::User + MsgEventTypeOffset + 1,
