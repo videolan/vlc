@@ -1763,7 +1763,7 @@ static void
 GLConvClose(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
-    struct glpriv *priv = tc->interop.priv;
+    struct glpriv *priv = tc->interop->priv;
 
     if (priv->gl_handle_d3d)
     {
@@ -1786,7 +1786,7 @@ static int
 GLConvOpen(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
-    struct vlc_gl_interop *interop = &tc->interop;
+    struct vlc_gl_interop *interop = tc->interop;
 
     if (interop->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE
      && interop->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)

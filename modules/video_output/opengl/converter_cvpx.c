@@ -144,7 +144,7 @@ static void
 Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
-    struct vlc_gl_interop *interop = &tc->interop;
+    struct vlc_gl_interop *interop = tc->interop;
     struct priv *priv = interop->priv;
 
 #if TARGET_OS_IPHONE
@@ -165,7 +165,7 @@ static int
 Open(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
-    struct vlc_gl_interop *interop = &tc->interop;
+    struct vlc_gl_interop *interop = tc->interop;
 
     if (interop->fmt.i_chroma != VLC_CODEC_CVPX_UYVY
      && interop->fmt.i_chroma != VLC_CODEC_CVPX_NV12

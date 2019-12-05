@@ -147,14 +147,14 @@ error:
 static void Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
-    converter_sys_t *p_sys = tc->interop.priv;
+    converter_sys_t *p_sys = tc->interop->priv;
     vlc_decoder_device_Release(p_sys->device);
 }
 
 static int Open(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
-    struct vlc_gl_interop *interop = &tc->interop;
+    struct vlc_gl_interop *interop = tc->interop;
     if (!is_nvdec_opaque(interop->fmt.i_chroma))
         return VLC_EGENERIC;
 

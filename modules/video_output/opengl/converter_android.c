@@ -94,7 +94,7 @@ static void
 Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
-    struct priv *priv = tc->interop.priv;
+    struct priv *priv = tc->interop->priv;
 
     if (priv->stex_attached)
         SurfaceTexture_detachFromGLContext(priv->awh);
@@ -106,7 +106,7 @@ static int
 Open(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *) obj;
-    struct vlc_gl_interop *interop = &tc->interop;
+    struct vlc_gl_interop *interop = tc->interop;
 
     if (interop->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
      || !interop->gl->surface->handle.anativewindow

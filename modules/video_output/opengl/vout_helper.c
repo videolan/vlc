@@ -346,7 +346,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
     tc->vt->ShaderSource(shader, 1, (const char **) &code, NULL);
     if (tc->b_dump_shaders)
         msg_Dbg(tc->gl, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
-                (const char *)&tc->interop.fmt.i_chroma, code);
+                (const char *)&tc->interop->fmt.i_chroma, code);
     tc->vt->CompileShader(shader);
     free(code);
     return shader;
@@ -399,7 +399,7 @@ static int
 opengl_link_program(struct prgm *prgm)
 {
     opengl_tex_converter_t *tc = prgm->tc;
-    struct vlc_gl_interop *interop = &tc->interop;
+    struct vlc_gl_interop *interop = tc->interop;
 
     GLuint vertex_shader = BuildVertexShader(tc, interop->tex_count);
     GLuint shaders[] = { tc->fshader, vertex_shader };
@@ -506,11 +506,12 @@ static void
 opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
 {
     opengl_tex_converter_t *tc = prgm->tc;
-    struct vlc_gl_interop *interop = &tc->interop;
+    struct vlc_gl_interop *interop = tc->interop;
     if (tc->p_module != NULL)
         module_unneed(tc, tc->p_module);
     else if (interop->priv != NULL)
         opengl_interop_generic_deinit(interop);
+    vlc_object_delete(tc->interop);
     if (prgm->id != 0)
         vgl->vt.DeleteProgram(prgm->id);
 
@@ -534,7 +535,14 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
     if (tc == NULL)
         return VLC_ENOMEM;
 
-    struct vlc_gl_interop *interop = &tc->interop;
+    struct vlc_gl_interop *interop = vlc_object_create(tc, sizeof(*interop));
+    if (!interop)
+    {
+        vlc_object_delete(tc);
+        return VLC_ENOMEM;
+    }
+
+    tc->interop = interop;
 
     tc->gl = vgl->gl;
     tc->vt = &vgl->vt;
@@ -597,6 +605,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
 
         if (desc == NULL)
         {
+            vlc_object_delete(interop);
             vlc_object_delete(tc);
             return VLC_EGENERIC;
         }
@@ -619,6 +628,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
 
     if (ret != VLC_SUCCESS)
     {
+        vlc_object_delete(interop);
         vlc_object_delete(tc);
         return VLC_EGENERIC;
     }
@@ -629,6 +639,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
                                          interop->sw_fmt.space);
     if (!fragment_shader)
     {
+        vlc_object_delete(interop);
         vlc_object_delete(tc);
         return VLC_EGENERIC;
     }
@@ -865,7 +876,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
     GL_ASSERT_NOERROR();
 
-    const struct vlc_gl_interop *interop = &vgl->prgm->tc->interop;
+    const struct vlc_gl_interop *interop = vgl->prgm->tc->interop;
     /* Update the fmt to main program one */
     vgl->fmt = interop->fmt;
     /* The orientation is handled by the orientation matrix */
@@ -887,11 +898,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     /* Allocates our textures */
-    assert(!vgl->sub_prgm->tc->interop.handle_texs_gen);
+    assert(!vgl->sub_prgm->tc->interop->handle_texs_gen);
 
     if (!interop->handle_texs_gen)
     {
-        ret = GenTextures(&vgl->prgm->tc->interop, vgl->tex_width, vgl->tex_height,
+        ret = GenTextures(vgl->prgm->tc->interop, vgl->tex_width, vgl->tex_height,
                           vgl->texture);
         if (ret != VLC_SUCCESS)
         {
@@ -951,7 +962,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vgl->vt.Finish();
     vgl->vt.Flush();
 
-    const struct vlc_gl_interop *interop = &vgl->prgm->tc->interop;
+    const struct vlc_gl_interop *interop = vgl->prgm->tc->interop;
     const size_t main_tex_count = interop->tex_count;
     const bool main_del_texs = !interop->handle_texs_gen;
 
@@ -1062,7 +1073,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     GL_ASSERT_NOERROR();
 
     opengl_tex_converter_t *tc = vgl->prgm->tc;
-    const struct vlc_gl_interop *interop = &tc->interop;
+    const struct vlc_gl_interop *interop = tc->interop;
 
     /* Update the texture */
     int ret = interop->ops->update_textures(interop, vgl->texture, vgl->tex_width, vgl->tex_height,
@@ -1077,7 +1088,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     vgl->region       = NULL;
 
     tc = vgl->sub_prgm->tc;
-    interop = &tc->interop;
+    interop = tc->interop;
     if (subpicture) {
 
         int count = 0;
@@ -1424,7 +1435,7 @@ static int SetupCoords(vout_display_opengl_t *vgl,
                        const float *left, const float *top,
                        const float *right, const float *bottom)
 {
-    const struct vlc_gl_interop *interop = &vgl->prgm->tc->interop;
+    const struct vlc_gl_interop *interop = vgl->prgm->tc->interop;
 
     GLfloat *vertexCoord, *textureCoord;
     GLushort *indices;
@@ -1488,7 +1499,7 @@ static int SetupCoords(vout_display_opengl_t *vgl,
 static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
 {
     opengl_tex_converter_t *tc = prgm->tc;
-    const struct vlc_gl_interop *interop = &tc->interop;
+    const struct vlc_gl_interop *interop = tc->interop;
     tc->pf_prepare_shader(tc, vgl->tex_width, vgl->tex_height, 1.0f);
 
     for (unsigned j = 0; j < interop->tex_count; j++) {
@@ -1552,7 +1563,7 @@ static void TextureCropForStereo(vout_display_opengl_t *vgl,
                                  float *left, float *top,
                                  float *right, float *bottom)
 {
-    const struct vlc_gl_interop *interop = &vgl->prgm->tc->interop;
+    const struct vlc_gl_interop *interop = vgl->prgm->tc->interop;
 
     float stereoCoefs[2];
     float stereoOffsets[2];
@@ -1602,8 +1613,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         float right[PICTURE_PLANE_MAX];
         float bottom[PICTURE_PLANE_MAX];
         const opengl_tex_converter_t *tc = vgl->prgm->tc;
-        const struct vlc_gl_interop *interop = &tc->interop;
-        for (unsigned j = 0; j < tc->interop.tex_count; j++)
+        const struct vlc_gl_interop *interop = tc->interop;
+        for (unsigned j = 0; j < interop->tex_count; j++)
         {
             float scale_w = (float)interop->texs[j].w.num / interop->texs[j].w.den
                           / vgl->tex_width[j];
@@ -1644,7 +1655,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     struct prgm *prgm = vgl->sub_prgm;
     GLuint program = prgm->id;
     opengl_tex_converter_t *tc = prgm->tc;
-    const struct vlc_gl_interop *interop = &tc->interop;
+    const struct vlc_gl_interop *interop = tc->interop;
     vgl->vt.UseProgram(program);
 
     vgl->vt.Enable(GL_BLEND);

@@ -87,7 +87,7 @@ struct opengl_tex_converter_t
     struct pl_shader *pl_sh;
     const struct pl_shader_res *pl_sh_res;
 
-    struct vlc_gl_interop interop;
+    struct vlc_gl_interop *interop;
 
     /**
      * Callback to fetch locations of uniform or attributes variables
