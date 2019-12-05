@@ -33,9 +33,11 @@
 #include <vlc_vout_window.h>
 #include <vlc_xlib.h>
 #include <vlc_codec.h>
+#include <vlc_plugin.h>
 
 #include "../../hw/vdpau/vlc_vdpau.h"
 #include "internal.h"
+#include "interop.h"
 
 #define INTEROP_CALL(fct, ...) \
     _##fct(__VA_ARGS__); \
@@ -105,9 +107,9 @@ tc_vdpau_gl_update(const struct vlc_gl_interop *interop, GLuint textures[],
 static void
 Close(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *)obj;
-    _glVDPAUFiniNV(); assert(tc->vt->GetError() == GL_NO_ERROR);
-    converter_sys_t *sys = tc->interop->priv;
+    struct vlc_gl_interop *interop = (void *)obj;
+    _glVDPAUFiniNV(); assert(interop->vt->GetError() == GL_NO_ERROR);
+    converter_sys_t *sys = interop->priv;
     vlc_decoder_device *dec_device = sys->dec_device;
     vlc_decoder_device_Release(dec_device);
 }
@@ -115,9 +117,7 @@ Close(vlc_object_t *obj)
 static int
 Open(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *) obj;
-    struct vlc_gl_interop *interop = tc->interop;
-
+    struct vlc_gl_interop *interop = (void *) obj;
     if (interop->vctx == NULL)
         return VLC_EGENERIC;
     vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(interop->vctx);
@@ -126,13 +126,13 @@ Open(vlc_object_t *obj)
       && interop->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
       && interop->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
      || !vlc_gl_StrHasToken(interop->glexts, "GL_NV_vdpau_interop")
-     || tc->gl->surface->type != VOUT_WINDOW_TYPE_XID)
+     || interop->gl->surface->type != VOUT_WINDOW_TYPE_XID)
     {
         vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
     }
 
-    converter_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(tc), sizeof(*sys));
+    converter_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(interop), sizeof(*sys));
     if (unlikely(sys == NULL))
     {
         vlc_decoder_device_Release(dec_device);
@@ -157,7 +157,7 @@ Open(vlc_object_t *obj)
     }
 
 #define SAFE_GPA(fct) \
-    _##fct = vlc_gl_GetProcAddress(tc->gl, #fct); \
+    _##fct = vlc_gl_GetProcAddress(interop->gl, #fct); \
     if (!_##fct) \
     { \
         vlc_decoder_device_Release(dec_device); \
@@ -176,10 +176,9 @@ Open(vlc_object_t *obj)
 
     INTEROP_CALL(glVDPAUInitNV, (void *)(uintptr_t)device, vdp_gpa);
 
-    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D,
-                                              VLC_CODEC_RGB32,
-                                              COLOR_SPACE_UNDEF);
-    if (!tc->fshader)
+    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, VLC_CODEC_RGB32,
+                                  COLOR_SPACE_UNDEF);
+    if (ret != VLC_SUCCESS)
     {
         Close(obj);
         return VLC_EGENERIC;

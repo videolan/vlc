@@ -96,6 +96,8 @@ struct vlc_gl_interop_ops {
 
 struct vlc_gl_interop {
     vlc_object_t obj;
+    module_t *module;
+
     vlc_gl_t *gl;
     const opengl_vtable_t *vt;
     GLenum tex_target;

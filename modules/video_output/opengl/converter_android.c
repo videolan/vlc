@@ -26,7 +26,8 @@
 # error this file must be built from android
 #endif
 
-#include "converter.h"
+#include <vlc_plugin.h>
+#include "interop.h"
 #include "../android/utils.h"
 
 struct priv
@@ -93,8 +94,8 @@ tc_get_transform_matrix(const struct vlc_gl_interop *interop)
 static void
 Close(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *)obj;
-    struct priv *priv = tc->interop->priv;
+    struct vlc_gl_interop *interop = (void *)obj;
+    struct priv *priv = interop->priv;
 
     if (priv->stex_attached)
         SurfaceTexture_detachFromGLContext(priv->awh);
@@ -105,8 +106,7 @@ Close(vlc_object_t *obj)
 static int
 Open(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *) obj;
-    struct vlc_gl_interop *interop = tc->interop;
+    struct vlc_gl_interop *interop = (void *) obj;
 
     if (interop->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
      || !interop->gl->surface->handle.anativewindow
@@ -167,10 +167,11 @@ Open(vlc_object_t *obj)
             break;
     }
 
-    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_EXTERNAL_OES,
-                                              VLC_CODEC_RGB32,
-                                              COLOR_SPACE_UNDEF);
-    if (!tc->fshader)
+    int ret = opengl_interop_init(interop, GL_TEXTURE_EXTERNAL_OES,
+                                  VLC_CODEC_RGB32,
+                                  COLOR_SPACE_UNDEF);
+
+    if (ret != VLC_SUCCESS)
     {
         free(priv);
         return VLC_EGENERIC;

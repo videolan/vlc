@@ -43,8 +43,6 @@ struct opengl_tex_converter_t
 {
     struct vlc_object_t obj;
 
-    module_t *p_module;
-
     /* Pointer to object gl, set by the caller */
     vlc_gl_t *gl;
 

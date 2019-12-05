@@ -60,6 +60,7 @@
 #include "common.h"
 #include "builtin_shaders.h"
 #include "../../video_chroma/copy.h"
+#include "../opengl/interop.h"
 
 #include <assert.h>
 
@@ -1762,8 +1763,8 @@ GLConvAllocateTextures(const struct vlc_gl_interop *interop, GLuint *textures,
 static void
 GLConvClose(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *)obj;
-    struct glpriv *priv = tc->interop->priv;
+    struct vlc_gl_interop *interop = (void *)obj;
+    struct glpriv *priv = interop->priv;
 
     if (priv->gl_handle_d3d)
     {
@@ -1785,8 +1786,7 @@ GLConvClose(vlc_object_t *obj)
 static int
 GLConvOpen(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *) obj;
-    struct vlc_gl_interop *interop = tc->interop;
+    struct vlc_gl_interop *interop = (void *) obj;
 
     if (interop->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE
      && interop->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)
@@ -1864,9 +1864,9 @@ GLConvOpen(vlc_object_t *obj)
     };
     interop->ops = &ops;
 
-    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, VLC_CODEC_RGB32,
-                                              COLOR_SPACE_UNDEF);
-    if (tc->fshader == 0)
+    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, VLC_CODEC_RGB32,
+                                  COLOR_SPACE_UNDEF);
+    if (ret != VLC_SUCCESS)
         goto error;
 
     return VLC_SUCCESS;

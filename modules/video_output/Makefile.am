@@ -4,7 +4,7 @@ vout_LTLIBRARIES =
 EXTRA_DIST += video_output/README
 
 OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
-	video_output/opengl/gl_common.h \
+	video_output/opengl/gl_common.h video_output/opengl/interop.h \
 	video_output/opengl/vout_helper.h video_output/opengl/converter.h \
 	video_output/opengl/internal.h video_output/opengl/fragment_shaders.c \
 	video_output/opengl/converter_sw.c
@@ -31,7 +31,7 @@ vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
 
 libglconv_cvpx_plugin_la_SOURCES = video_output/opengl/converter_cvpx.c \
-	video_output/opengl/converter.h
+	video_output/opengl/interop.h
 libglconv_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 if HAVE_OSX
@@ -87,13 +87,13 @@ libgl_plugin_la_LIBADD += $(GL_LIBS)
 endif
 
 libglconv_vaapi_plugin_la_SOURCES = video_output/opengl/converter_vaapi.c \
-	video_output/opengl/converter.h \
+	video_output/opengl/interop.h \
 	hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h
 libglconv_vaapi_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
 libglconv_vaapi_plugin_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_EGL_LIBS)
 
 libglconv_vdpau_plugin_la_SOURCES = video_output/opengl/converter_vdpau.c \
-	video_output/opengl/converter.h hw/vdpau/picture.c hw/vdpau/vlc_vdpau.h
+	video_output/opengl/interop.h hw/vdpau/picture.c hw/vdpau/vlc_vdpau.h
 libglconv_vdpau_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS)
 libglconv_vdpau_plugin_la_LIBADD = $(LIBDL) libvlc_vdpau.la $(X_LIBS) $(X_PRE_LIBS) -lX11
 
@@ -280,7 +280,7 @@ libandroid_display_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_display_plugin_la_LIBADD = $(LIBDL)
 
 libglconv_android_plugin_la_SOURCES = video_output/opengl/converter_android.c \
-	video_output/opengl/converter.h
+	video_output/opengl/interop.h
 libglconv_android_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
 
 if HAVE_ANDROID

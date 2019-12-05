@@ -18,7 +18,7 @@ nvdec_LTLIBRARIES = libnvdec_chroma_plugin.la
 endif
 
 libglconv_nvdec_plugin_la_SOURCES = hw/nvdec/nvdec_gl.c \
-	video_output/opengl/converter.h hw/nvdec/nvdec_fmt.h
+	video_output/opengl/interop.h hw/nvdec/nvdec_fmt.h
 libglconv_nvdec_plugin_la_LIBADD = $(LIBDL)
 if HAVE_GL
 if HAVE_NVDEC

@@ -29,12 +29,14 @@
 #include <vlc_common.h>
 #include <vlc_vout_window.h>
 #include <vlc_codec.h>
+#include <vlc_plugin.h>
 
 #include <ffnvcodec/dynlink_loader.h>
 
 #include "nvdec_fmt.h"
 
 #include "../../video_output/opengl/internal.h"
+#include "../../video_output/opengl/interop.h"
 
 // glew.h conflicts with glext.h, but also makes glext.h unnecessary.
 #ifndef __GLEW_H__
@@ -146,15 +148,14 @@ error:
 
 static void Close(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *)obj;
-    converter_sys_t *p_sys = tc->interop->priv;
+    struct vlc_gl_interop *interop = (void *)obj;
+    converter_sys_t *p_sys = interop->priv;
     vlc_decoder_device_Release(p_sys->device);
 }
 
 static int Open(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *) obj;
-    struct vlc_gl_interop *interop = tc->interop;
+    struct vlc_gl_interop *interop = (void *) obj;
     if (!is_nvdec_opaque(interop->fmt.i_chroma))
         return VLC_EGENERIC;
 
@@ -162,7 +163,7 @@ static int Open(vlc_object_t *obj)
     if (device == NULL || device->type != VLC_DECODER_DEVICE_NVDEC)
         return VLC_EGENERIC;
 
-    converter_sys_t *p_sys = vlc_obj_malloc(VLC_OBJECT(tc), sizeof(*p_sys));
+    converter_sys_t *p_sys = vlc_obj_malloc(VLC_OBJECT(interop), sizeof(*p_sys));
     if (unlikely(p_sys == NULL))
     {
         vlc_decoder_device_Release(device);
@@ -208,11 +209,11 @@ static int Open(vlc_object_t *obj)
         default:                         render_chroma = VLC_CODEC_NV12; break;
     }
 
-    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, render_chroma, interop->fmt.space);
-    if (!tc->fshader)
+    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, render_chroma, interop->fmt.space);
+    if (ret != VLC_SUCCESS)
     {
         Close(obj);
-        return VLC_EGENERIC;
+        return ret;
     }
 
     static const struct vlc_gl_interop_ops ops = {

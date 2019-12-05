@@ -31,8 +31,9 @@
 #include <vlc_common.h>
 #include <vlc_vout_window.h>
 #include <vlc_codec.h>
+#include <vlc_plugin.h>
 
-#include "converter.h"
+#include "interop.h"
 #include "../../hw/vaapi/vlc_vaapi.h"
 
 /* From https://www.khronos.org/registry/OpenGL/extensions/OES/OES_EGL_image.txt
@@ -228,11 +229,11 @@ error:
 static void
 Close(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *)obj;
-    struct priv *priv = tc->interop->priv;
+    struct vlc_gl_interop *interop = (void *)obj;
+    struct priv *priv = interop->priv;
 
     if (priv->last.pic != NULL)
-        vaegl_release_last_pic(tc->interop, priv);
+        vaegl_release_last_pic(interop, priv);
 
     free(priv);
 }
@@ -338,17 +339,16 @@ done:
 static int
 Open(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *) obj;
-    struct vlc_gl_interop *interop = tc->interop;
+    struct vlc_gl_interop *interop = (void *) obj;
 
     if (interop->vctx == NULL)
         return VLC_EGENERIC;
     vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(interop->vctx);
     if (dec_device->type != VLC_DECODER_DEVICE_VAAPI
      || !vlc_vaapi_IsChromaOpaque(interop->fmt.i_chroma)
-     || tc->gl->ext != VLC_GL_EXT_EGL
-     || tc->gl->egl.createImageKHR == NULL
-     || tc->gl->egl.destroyImageKHR == NULL)
+     || interop->gl->ext != VLC_GL_EXT_EGL
+     || interop->gl->egl.createImageKHR == NULL
+     || interop->gl->egl.destroyImageKHR == NULL)
     {
         vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;
@@ -360,7 +360,7 @@ Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    const char *eglexts = tc->gl->egl.queryString(tc->gl, EGL_EXTENSIONS);
+    const char *eglexts = interop->gl->egl.queryString(interop->gl, EGL_EXTENSIONS);
     if (eglexts == NULL || !vlc_gl_StrHasToken(eglexts, "EGL_EXT_image_dma_buf_import"))
     {
         vlc_decoder_device_Release(dec_device);
@@ -392,7 +392,7 @@ Open(vlc_object_t *obj)
         goto error;
 
     priv->glEGLImageTargetTexture2DOES =
-        vlc_gl_GetProcAddress(tc->gl, "glEGLImageTargetTexture2DOES");
+        vlc_gl_GetProcAddress(interop->gl, "glEGLImageTargetTexture2DOES");
     if (priv->glEGLImageTargetTexture2DOES == NULL)
         goto error;
 
@@ -405,9 +405,9 @@ Open(vlc_object_t *obj)
     if (tc_va_check_derive_image(interop))
         goto error;
 
-    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D, vlc_sw_chroma,
-                                              interop->fmt.space);
-    if (tc->fshader == 0)
+    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, vlc_sw_chroma,
+                                  interop->fmt.space);
+    if (ret != VLC_SUCCESS)
         goto error;
 
     static const struct vlc_gl_interop_ops ops = {

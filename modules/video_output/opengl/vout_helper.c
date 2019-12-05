@@ -507,11 +507,11 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
 {
     opengl_tex_converter_t *tc = prgm->tc;
     struct vlc_gl_interop *interop = tc->interop;
-    if (tc->p_module != NULL)
-        module_unneed(tc, tc->p_module);
+    if (interop->module != NULL)
+        module_unneed(interop, interop->module);
     else if (interop->priv != NULL)
         opengl_interop_generic_deinit(interop);
-    vlc_object_delete(tc->interop);
+    vlc_object_delete(interop);
     if (prgm->id != 0)
         vgl->vt.DeleteProgram(prgm->id);
 
@@ -613,10 +613,10 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
         {
             /* Opaque chroma: load a module to handle it */
             interop->vctx = context;
-            tc->p_module = module_need_var(tc, "glconv", "glconv");
+            interop->module = module_need_var(interop, "glconv", "glconv");
         }
 
-        if (tc->p_module != NULL)
+        if (interop->module != NULL)
             ret = VLC_SUCCESS;
         else
         {

@@ -22,7 +22,8 @@
 # include "config.h"
 #endif
 
-#include "converter.h"
+#include <vlc_plugin.h>
+#include "interop.h"
 #include "../../codec/vt_utils.h"
 
 #if TARGET_OS_IPHONE
@@ -143,8 +144,7 @@ tc_cvpx_update(const struct vlc_gl_interop *interop, GLuint *textures,
 static void
 Close(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *)obj;
-    struct vlc_gl_interop *interop = tc->interop;
+    struct vlc_gl_interop *interop = (void *) obj;
     struct priv *priv = interop->priv;
 
 #if TARGET_OS_IPHONE
@@ -164,8 +164,7 @@ Close(vlc_object_t *obj)
 static int
 Open(vlc_object_t *obj)
 {
-    opengl_tex_converter_t *tc = (void *) obj;
-    struct vlc_gl_interop *interop = tc->interop;
+    struct vlc_gl_interop *interop = (void *) obj;
 
     if (interop->fmt.i_chroma != VLC_CODEC_CVPX_UYVY
      && interop->fmt.i_chroma != VLC_CODEC_CVPX_NV12
@@ -212,7 +211,7 @@ Open(vlc_object_t *obj)
     }
 #endif
 
-    GLuint fragment_shader;
+    int ret;
     switch (interop->fmt.i_chroma)
     {
         case VLC_CODEC_CVPX_UYVY:
@@ -222,9 +221,11 @@ Open(vlc_object_t *obj)
              * and red color channels, respectively. cf. APPLE_rgb_422 khronos
              * extenstion. */
 
-            fragment_shader =
-                opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_VYUY,
-                                            interop->fmt.space);
+            ret = opengl_interop_init(interop, tex_target, VLC_CODEC_VYUY,
+                                      interop->fmt.space);
+            if (ret != VLC_SUCCESS)
+                goto error;
+
             interop->texs[0].internal = GL_RGB;
             interop->texs[0].format = GL_RGB_422_APPLE;
             interop->texs[0].type = GL_UNSIGNED_SHORT_8_8_APPLE;
@@ -232,27 +233,34 @@ Open(vlc_object_t *obj)
             break;
         case VLC_CODEC_CVPX_NV12:
         {
-            fragment_shader =
-                opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_NV12,
-                                            interop->fmt.space);
+            ret = opengl_interop_init(interop, tex_target, VLC_CODEC_NV12,
+                                      interop->fmt.space);
+            if (ret != VLC_SUCCESS)
+                goto error;
             break;
         }
         case VLC_CODEC_CVPX_P010:
         {
-            fragment_shader =
-                opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_P010,
-                                            interop->fmt.space);
+            ret = opengl_interop_init(interop, tex_target, VLC_CODEC_P010,
+                                      interop->fmt.space);
+            if (ret != VLC_SUCCESS)
+                goto error;
+
             break;
         }
         case VLC_CODEC_CVPX_I420:
-            fragment_shader =
-                opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_I420,
-                                            interop->fmt.space);
+            ret = opengl_interop_init(interop, tex_target, VLC_CODEC_I420,
+                                      interop->fmt.space);
+            if (ret != VLC_SUCCESS)
+                goto error;
+
             break;
         case VLC_CODEC_CVPX_BGRA:
-            fragment_shader =
-                opengl_fragment_shader_init(tc, tex_target, VLC_CODEC_RGB32,
-                                            COLOR_SPACE_UNDEF);
+            ret = opengl_interop_init(interop, tex_target, VLC_CODEC_RGB32,
+                                      COLOR_SPACE_UNDEF);
+            if (ret != VLC_SUCCESS)
+                goto error;
+
             interop->texs[0].internal = GL_RGBA;
             interop->texs[0].format = GL_BGRA;
 #if TARGET_OS_IPHONE
@@ -265,12 +273,6 @@ Open(vlc_object_t *obj)
             vlc_assert_unreachable();
     }
 
-    if (fragment_shader == 0)
-    {
-        free(priv);
-        return VLC_EGENERIC;
-    }
-
 #if TARGET_OS_IPHONE
     interop->handle_texs_gen = true;
 #endif
@@ -280,9 +282,11 @@ Open(vlc_object_t *obj)
     };
     interop->ops = &ops;
 
-    tc->fshader           = fragment_shader;
-
     return VLC_SUCCESS;
+
+error:
+    free(priv);
+    return VLC_EGENERIC;
 }
 
 vlc_module_begin ()
