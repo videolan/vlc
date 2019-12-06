@@ -32,8 +32,6 @@
 #include "main_interface.hpp" /* Interface integration */
 #include "player/player_controller.hpp"  /* Speed control */
 
-#include "components/controller.hpp"
-#include "components/controller_widget.hpp"
 #include "dialogs/dialogs_provider.hpp"
 #include "dialogs/mediainfo/info_panels.hpp"
 
@@ -160,108 +158,6 @@ private:
     int i_speed;
     bool b_enabled;
     static const int MAX_FLAKES = 1000;
-};
-
-class ClickableQLabel : public QLabel
-{
-    Q_OBJECT
-public:
-    void mouseDoubleClickEvent( QMouseEvent *event ) Q_DECL_OVERRIDE
-    {
-        Q_UNUSED( event );
-        emit doubleClicked();
-    }
-signals:
-    void doubleClicked();
-};
-
-class TimeLabel : public ClickableQLabel
-{
-    Q_OBJECT
-public:
-    enum Display
-    {
-        Elapsed,
-        Remaining,
-        Both
-    };
-
-    TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType = TimeLabel::Both );
-protected:
-    void mousePressEvent( QMouseEvent *event ) Q_DECL_OVERRIDE
-    {
-        if( displayType == TimeLabel::Elapsed ) return;
-        toggleTimeDisplay();
-        event->accept();
-    }
-    void mouseDoubleClickEvent( QMouseEvent *event ) Q_DECL_OVERRIDE
-    {
-        if( displayType != TimeLabel::Both ) return;
-        event->accept();
-        toggleTimeDisplay();
-        ClickableQLabel::mouseDoubleClickEvent( event );
-    }
-private:
-    intf_thread_t *p_intf;
-    bool b_remainingTime;
-    float cachedPos;
-    vlc_tick_t cachedTime;
-    int cachedLength;
-    TimeLabel::Display displayType;
-
-    char psz_length[MSTRTIME_MAX_SIZE];
-    char psz_time[MSTRTIME_MAX_SIZE];
-    void toggleTimeDisplay();
-    void refresh();
-private slots:
-    void setRemainingTime( bool );
-    void setDisplayPosition( float pos, vlc_tick_t time, int length );
-    void setDisplayPosition( float pos );
-};
-
-class SpeedLabel : public QLabel
-{
-    Q_OBJECT
-public:
-    SpeedLabel( intf_thread_t *, QWidget * );
-    virtual ~SpeedLabel();
-
-protected:
-    void mousePressEvent ( QMouseEvent * event ) Q_DECL_OVERRIDE
-    {
-        showSpeedMenu( event->pos() );
-    }
-private slots:
-    void showSpeedMenu( QPoint );
-    void setRate( float );
-private:
-    intf_thread_t *p_intf;
-    QMenu *speedControlMenu;
-    QString tooltipStringPattern;
-    SpeedControlWidget *speedControl;
-    QWidgetAction *widgetAction;
-};
-
-/******************** Speed Control Widgets ****************/
-class SpeedControlWidget : public QFrame
-{
-    Q_OBJECT
-public:
-    SpeedControlWidget( intf_thread_t *, QWidget * );
-    void updateControls( float );
-private:
-    intf_thread_t* p_intf;
-    QSlider* speedSlider;
-    QDoubleSpinBox* spinBox;
-    int lastValue;
-
-public slots:
-    void activateOnState(PlayerController::PlayingState state);
-
-private slots:
-    void updateRate( int );
-    void updateSpinBoxRate( double );
-    void resetRate();
 };
 
 class CoverArtLabel : public QLabel

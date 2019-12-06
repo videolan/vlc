@@ -51,7 +51,6 @@
 #include "dialogs/help/help.hpp"
 #include "dialogs/gototime/gototime.hpp"
 #include "dialogs/podcast/podcast_configuration.hpp"
-#include "dialogs/toolbar/toolbar.hpp"
 #include "dialogs/toolbar/toolbareditor.hpp"
 #include "dialogs/plugins/plugins.hpp"
 #include "dialogs/epg/epg.hpp"

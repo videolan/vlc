@@ -65,7 +65,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/plugins/addons_manager.cpp gui/qt/dialogs/plugins/addons_manager.hpp \
 	gui/qt/dialogs/help/help.cpp gui/qt/dialogs/help/help.hpp \
 	gui/qt/dialogs/gototime/gototime.cpp gui/qt/dialogs/gototime/gototime.hpp \
-	gui/qt/dialogs/toolbar/toolbar.cpp gui/qt/dialogs/toolbar/toolbar.hpp \
 	gui/qt/dialogs/toolbar/toolbareditor.cpp gui/qt/dialogs/toolbar/toolbareditor.hpp \
 	gui/qt/dialogs/open/open.cpp gui/qt/dialogs/open/open.hpp \
 	gui/qt/dialogs/open/openurl.cpp gui/qt/dialogs/open/openurl.hpp \
@@ -102,9 +101,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/open/open_panels.cpp gui/qt/dialogs/open/open_panels.hpp \
 	gui/qt/components/interface_widgets.cpp \
 	gui/qt/components/interface_widgets.hpp \
-	gui/qt/components/controller.cpp gui/qt/components/controller.hpp \
-	gui/qt/components/controller_widget.cpp \
-	gui/qt/components/controller_widget.hpp \
 	gui/qt/components/recent_media_model.cpp  \
 	gui/qt/components/recent_media_model.hpp \
 	gui/qt/components/settings.cpp \
@@ -247,7 +243,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/plugins/plugins.moc.cpp \
 	gui/qt/dialogs/help/help.moc.cpp \
 	gui/qt/dialogs/gototime/gototime.moc.cpp \
-	gui/qt/dialogs/toolbar/toolbar.moc.cpp \
 	gui/qt/dialogs/toolbar/toolbareditor.moc.cpp \
 	gui/qt/dialogs/open/open.moc.cpp \
 	gui/qt/dialogs/open/openurl.moc.cpp \
@@ -270,8 +265,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/open/open_panels.moc.cpp \
 	gui/qt/components/interface_widgets.moc.cpp \
 	gui/qt/components/navigation_history.moc.cpp \
-	gui/qt/components/controller.moc.cpp \
-	gui/qt/components/controller_widget.moc.cpp \
 	gui/qt/menus/custom_menus.moc.cpp \
 	gui/qt/components/recent_media_model.moc.cpp \
 	gui/qt/components/selectable_list_model.moc.cpp \
