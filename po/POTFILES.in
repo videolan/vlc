@@ -717,8 +717,8 @@ modules/gui/qt/dialogs/sout/convert.cpp
 modules/gui/qt/dialogs/sout/convert.hpp
 modules/gui/qt/dialogs/epg/epg.cpp
 modules/gui/qt/dialogs/epg/epg.hpp
-modules/gui/qt/dialogs/errors.cpp
-modules/gui/qt/dialogs/errors.hpp
+modules/gui/qt/dialogs/errors/errors.cpp
+modules/gui/qt/dialogs/errors/errors.hpp
 modules/gui/qt/dialogs/extended/extended.cpp
 modules/gui/qt/dialogs/extended/extended.hpp
 modules/gui/qt/dialogs/extensions/extensions.cpp

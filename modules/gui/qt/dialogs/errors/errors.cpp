@@ -24,7 +24,7 @@
 # include "config.h"
 #endif
 
-#include "dialogs/errors.hpp"
+#include "errors.hpp"
 
 #include <QTextCursor>
 #include <QTextEdit>

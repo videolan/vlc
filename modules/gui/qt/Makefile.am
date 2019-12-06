@@ -60,7 +60,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/mediainfo/info_widgets.cpp gui/qt/dialogs/mediainfo/info_widgets.hpp \
 	gui/qt/dialogs/extended/extended.cpp gui/qt/dialogs/extended/extended.hpp \
 	gui/qt/dialogs/messages/messages.cpp gui/qt/dialogs/messages/messages.hpp \
-	gui/qt/dialogs/errors.cpp gui/qt/dialogs/errors.hpp \
+	gui/qt/dialogs/errors/errors.cpp gui/qt/dialogs/errors/errors.hpp \
 	gui/qt/dialogs/plugins/plugins.cpp gui/qt/dialogs/plugins/plugins.hpp \
 	gui/qt/dialogs/plugins/addons_manager.cpp gui/qt/dialogs/plugins/addons_manager.hpp \
 	gui/qt/dialogs/help/help.cpp gui/qt/dialogs/help/help.hpp \
@@ -242,7 +242,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/mediainfo/info_widgets.moc.cpp \
 	gui/qt/dialogs/extended/extended.moc.cpp \
 	gui/qt/dialogs/messages/messages.moc.cpp \
-	gui/qt/dialogs/errors.moc.cpp \
+	gui/qt/dialogs/errors/errors.moc.cpp \
 	gui/qt/dialogs/plugins/addons_manager.moc.cpp \
 	gui/qt/dialogs/plugins/plugins.moc.cpp \
 	gui/qt/dialogs/help/help.moc.cpp \
