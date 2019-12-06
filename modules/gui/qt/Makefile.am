@@ -64,7 +64,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/plugins/plugins.cpp gui/qt/dialogs/plugins/plugins.hpp \
 	gui/qt/dialogs/plugins/addons_manager.cpp gui/qt/dialogs/plugins/addons_manager.hpp \
 	gui/qt/dialogs/help/help.cpp gui/qt/dialogs/help/help.hpp \
-	gui/qt/dialogs/gototime.cpp gui/qt/dialogs/gototime.hpp \
+	gui/qt/dialogs/gototime/gototime.cpp gui/qt/dialogs/gototime/gototime.hpp \
 	gui/qt/dialogs/toolbar/toolbar.cpp gui/qt/dialogs/toolbar/toolbar.hpp \
 	gui/qt/dialogs/toolbar/toolbareditor.cpp gui/qt/dialogs/toolbar/toolbareditor.hpp \
 	gui/qt/dialogs/open/open.cpp gui/qt/dialogs/open/open.hpp \
@@ -246,7 +246,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/plugins/addons_manager.moc.cpp \
 	gui/qt/dialogs/plugins/plugins.moc.cpp \
 	gui/qt/dialogs/help/help.moc.cpp \
-	gui/qt/dialogs/gototime.moc.cpp \
+	gui/qt/dialogs/gototime/gototime.moc.cpp \
 	gui/qt/dialogs/toolbar/toolbar.moc.cpp \
 	gui/qt/dialogs/toolbar/toolbareditor.moc.cpp \
 	gui/qt/dialogs/open/open.moc.cpp \

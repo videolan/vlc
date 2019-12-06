@@ -727,8 +727,8 @@ modules/gui/qt/dialogs/fingerprint/fingerprintdialog.cpp
 modules/gui/qt/dialogs/fingerprint/fingerprintdialog.hpp
 modules/gui/qt/dialogs/firstrun/firstrun.cpp
 modules/gui/qt/dialogs/firstrun/firstrun.hpp
-modules/gui/qt/dialogs/gototime.cpp
-modules/gui/qt/dialogs/gototime.hpp
+modules/gui/qt/dialogs/gototime/gototime.cpp
+modules/gui/qt/dialogs/gototime/gototime.hpp
 modules/gui/qt/dialogs/help/help.cpp
 modules/gui/qt/dialogs/help/help.hpp
 modules/gui/qt/dialogs/mediainfo/mediainfo.cpp

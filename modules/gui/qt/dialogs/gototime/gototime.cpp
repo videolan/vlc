@@ -23,7 +23,7 @@
 # include "config.h"
 #endif
 
-#include "dialogs/gototime.hpp"
+#include "gototime.hpp"
 
 #include "player/player_controller.hpp"
 

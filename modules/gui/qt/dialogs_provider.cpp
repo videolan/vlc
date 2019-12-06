@@ -49,7 +49,7 @@
 #include "dialogs/open/open.hpp"
 #include "dialogs/open/openurl.hpp"
 #include "dialogs/help/help.hpp"
-#include "dialogs/gototime.hpp"
+#include "dialogs/gototime/gototime.hpp"
 #include "dialogs/podcast/podcast_configuration.hpp"
 #include "dialogs/toolbar/toolbar.hpp"
 #include "dialogs/toolbar/toolbareditor.hpp"
