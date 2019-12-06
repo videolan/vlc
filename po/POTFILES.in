@@ -747,8 +747,8 @@ modules/gui/qt/dialogs/preferences/preferences.cpp
 modules/gui/qt/dialogs/preferences/preferences.hpp
 modules/gui/qt/dialogs/sout/sout.cpp
 modules/gui/qt/dialogs/sout/sout.hpp
-modules/gui/qt/dialogs/toolbar.cpp
-modules/gui/qt/dialogs/toolbar.hpp
+modules/gui/qt/dialogs/toolbar/toolbar.cpp
+modules/gui/qt/dialogs/toolbar/toolbar.hpp
 modules/gui/qt/dialogs/vlm/vlm.cpp
 modules/gui/qt/dialogs/vlm/vlm.hpp
 modules/gui/qt/dialogs_provider.cpp

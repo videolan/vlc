@@ -24,7 +24,7 @@
 # include "config.h"
 #endif
 
-#include "dialogs/toolbar.hpp"
+#include "toolbar.hpp"
 
 /* Widgets */
 #include "util/input_slider.hpp"

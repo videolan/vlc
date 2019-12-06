@@ -20,7 +20,7 @@
 # include "config.h"
 #endif
 
-#include "dialogs/toolbareditor.hpp"
+#include "toolbareditor.hpp"
 #include "components/settings.hpp"
 #include "player/playercontrolbarmodel.hpp"
 #include "main_interface.hpp"

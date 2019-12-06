@@ -65,8 +65,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/plugins/addons_manager.cpp gui/qt/dialogs/plugins/addons_manager.hpp \
 	gui/qt/dialogs/help/help.cpp gui/qt/dialogs/help/help.hpp \
 	gui/qt/dialogs/gototime.cpp gui/qt/dialogs/gototime.hpp \
-	gui/qt/dialogs/toolbar.cpp gui/qt/dialogs/toolbar.hpp \
-	gui/qt/dialogs/toolbareditor.cpp gui/qt/dialogs/toolbareditor.hpp \
+	gui/qt/dialogs/toolbar/toolbar.cpp gui/qt/dialogs/toolbar/toolbar.hpp \
+	gui/qt/dialogs/toolbar/toolbareditor.cpp gui/qt/dialogs/toolbar/toolbareditor.hpp \
 	gui/qt/dialogs/open/open.cpp gui/qt/dialogs/open/open.hpp \
 	gui/qt/dialogs/open/openurl.cpp gui/qt/dialogs/open/openurl.hpp \
 	gui/qt/dialogs/vlm/vlm.cpp gui/qt/dialogs/vlm/vlm.hpp \
@@ -247,8 +247,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/plugins/plugins.moc.cpp \
 	gui/qt/dialogs/help/help.moc.cpp \
 	gui/qt/dialogs/gototime.moc.cpp \
-	gui/qt/dialogs/toolbar.moc.cpp \
-	gui/qt/dialogs/toolbareditor.moc.cpp \
+	gui/qt/dialogs/toolbar/toolbar.moc.cpp \
+	gui/qt/dialogs/toolbar/toolbareditor.moc.cpp \
 	gui/qt/dialogs/open/open.moc.cpp \
 	gui/qt/dialogs/open/openurl.moc.cpp \
 	gui/qt/dialogs/podcast/podcast_configuration.moc.cpp \
@@ -579,12 +579,12 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/TopBar.qml \
 	gui/qt/qml/dialogs/Dialogs.qml \
 	gui/qt/qml/dialogs/ModalDialog.qml \
-	gui/qt/qml/dialogs/EditorDummyButton.qml \
-	gui/qt/qml/dialogs/EditorDNDDelegate.qml \
-	gui/qt/qml/dialogs/EditorDNDView.qml\
-	gui/qt/qml/dialogs/EditorTabButton.qml \
-	gui/qt/qml/dialogs/ToolbarEditorButtonList.qml \
-	gui/qt/qml/dialogs/ToolbarEditor.qml \
+	gui/qt/dialogs/toolbar/qml/EditorDummyButton.qml \
+	gui/qt/dialogs/toolbar/qml/EditorDNDDelegate.qml \
+	gui/qt/dialogs/toolbar/qml/EditorDNDView.qml\
+	gui/qt/dialogs/toolbar/qml/EditorTabButton.qml \
+	gui/qt/dialogs/toolbar/qml/ToolbarEditorButtonList.qml \
+	gui/qt/dialogs/toolbar/qml/ToolbarEditor.qml \
 	gui/qt/qml/utils/KeyHelper.js \
 	gui/qt/qml/utils/BusyIndicatorExt.qml \
 	gui/qt/qml/utils/DNDLabel.qml \
