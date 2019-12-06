@@ -27,7 +27,7 @@
 
 #include <QObject>
 
-#include "qml_main_context.hpp"
+#include "components/qml_main_context.hpp"
 
 
 class DialogId {

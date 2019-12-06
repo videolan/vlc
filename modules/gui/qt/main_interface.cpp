@@ -60,7 +60,7 @@
 
 #include "components/navigation_history.hpp"
 #include "dialogs/help/aboutmodel.hpp"
-#include "components/dialogmodel.hpp"
+#include "dialogs/dialogs/dialogmodel.hpp"
 #include "player/playercontrolbarmodel.hpp"
 
 #include "components/voutwindow/qvoutwindowdummy.hpp"

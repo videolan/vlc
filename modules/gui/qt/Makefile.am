@@ -83,8 +83,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/qml_main_context.hpp \
 	gui/qt/dialogs/help/aboutmodel.cpp \
 	gui/qt/dialogs/help/aboutmodel.hpp \
-	gui/qt/components/dialogmodel.cpp \
-	gui/qt/components/dialogmodel.hpp \
+	gui/qt/dialogs/dialogs/dialogmodel.cpp \
+	gui/qt/dialogs/dialogs/dialogmodel.hpp \
 	gui/qt/dialogs/extended/extended_panels.cpp \
 	gui/qt/dialogs/extended/extended_panels.hpp \
 	gui/qt/components/navigation_history.cpp gui/qt/components/navigation_history.hpp \
@@ -259,7 +259,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/fingerprint/chromaprint.moc.cpp \
 	gui/qt/components/qml_main_context.moc.cpp \
 	gui/qt/dialogs/help/aboutmodel.moc.cpp \
-	gui/qt/components/dialogmodel.moc.cpp \
+	gui/qt/dialogs/dialogs/dialogmodel.moc.cpp \
 	gui/qt/dialogs/extended/extended_panels.moc.cpp \
 	gui/qt/player/player_controller.moc.cpp \
 	gui/qt/player/playercontrolbarmodel.moc.cpp \
@@ -577,8 +577,8 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/TeletextWidget.qml \
 	gui/qt/player/qml/MiniPlayer.qml \
 	gui/qt/player/qml/TopBar.qml \
-	gui/qt/qml/dialogs/Dialogs.qml \
-	gui/qt/qml/dialogs/ModalDialog.qml \
+	gui/qt/dialogs/dialogs/qml/Dialogs.qml \
+	gui/qt/dialogs/dialogs/qml/ModalDialog.qml \
 	gui/qt/dialogs/toolbar/qml/EditorDummyButton.qml \
 	gui/qt/dialogs/toolbar/qml/EditorDNDDelegate.qml \
 	gui/qt/dialogs/toolbar/qml/EditorDNDView.qml\

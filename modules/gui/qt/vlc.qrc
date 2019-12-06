@@ -280,8 +280,8 @@
         <file alias="About.qml">dialogs/help/qml/About.qml</file>
     </qresource>
     <qresource prefix="/dialogs">
-        <file alias="Dialogs.qml">qml/dialogs/Dialogs.qml</file>
-        <file alias="ModalDialog.qml">qml/dialogs/ModalDialog.qml</file>
+        <file alias="Dialogs.qml">dialogs/dialogs/qml/Dialogs.qml</file>
+        <file alias="ModalDialog.qml">dialogs/dialogs/qml/ModalDialog.qml</file>
         <file alias="EditorDummyButton.qml">dialogs/toolbar/qml/EditorDummyButton.qml</file>
         <file alias="EditorDNDDelegate.qml">dialogs/toolbar/qml/EditorDNDDelegate.qml</file>
         <file alias="ToolbarEditorButtonList.qml">dialogs/toolbar/qml/ToolbarEditorButtonList.qml</file>
