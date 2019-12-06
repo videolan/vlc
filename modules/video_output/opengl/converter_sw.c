@@ -70,10 +70,8 @@ pbo_picture_destroy(picture_t *pic)
 }
 
 static picture_t *
-pbo_picture_create(const opengl_tex_converter_t *tc)
+pbo_picture_create(const struct vlc_gl_interop *interop)
 {
-    const struct vlc_gl_interop *interop = &tc->interop;
-
     picture_sys_t *picsys = calloc(1, sizeof(*picsys));
     if (unlikely(picsys == NULL))
         return NULL;
@@ -89,8 +87,8 @@ pbo_picture_create(const opengl_tex_converter_t *tc)
         return NULL;
     }
 
-    tc->vt->GenBuffers(pic->i_planes, picsys->buffers);
-    picsys->DeleteBuffers = tc->vt->DeleteBuffers;
+    interop->vt->GenBuffers(pic->i_planes, picsys->buffers);
+    picsys->DeleteBuffers = interop->vt->DeleteBuffers;
 
     /* XXX: needed since picture_NewFromResource override pic planes */
     if (picture_Setup(pic, &interop->fmt))
@@ -118,22 +116,22 @@ pbo_picture_create(const opengl_tex_converter_t *tc)
 }
 
 static int
-pbo_data_alloc(const opengl_tex_converter_t *tc, picture_t *pic)
+pbo_data_alloc(const struct vlc_gl_interop *interop, picture_t *pic)
 {
     picture_sys_t *picsys = pic->p_sys;
 
-    tc->vt->GetError();
+    interop->vt->GetError();
 
     for (int i = 0; i < pic->i_planes; ++i)
     {
-        tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
-        tc->vt->BufferData(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
-                            GL_DYNAMIC_DRAW);
+        interop->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, picsys->buffers[i]);
+        interop->vt->BufferData(GL_PIXEL_UNPACK_BUFFER, picsys->bytes[i], NULL,
+                                GL_DYNAMIC_DRAW);
 
-        if (tc->vt->GetError() != GL_NO_ERROR)
+        if (interop->vt->GetError() != GL_NO_ERROR)
         {
-            msg_Err(tc->gl, "could not alloc PBO buffers");
-            tc->vt->DeleteBuffers(i, picsys->buffers);
+            msg_Err(interop->gl, "could not alloc PBO buffers");
+            interop->vt->DeleteBuffers(i, picsys->buffers);
             return VLC_EGENERIC;
         }
     }
@@ -141,21 +139,22 @@ pbo_data_alloc(const opengl_tex_converter_t *tc, picture_t *pic)
 }
 
 static int
-pbo_pics_alloc(const opengl_tex_converter_t *tc)
+pbo_pics_alloc(const struct vlc_gl_interop *interop)
 {
-    struct priv *priv = tc->interop.priv;
+    struct priv *priv = interop->priv;
     for (size_t i = 0; i < PBO_DISPLAY_COUNT; ++i)
     {
-        picture_t *pic = priv->pbo.display_pics[i] = pbo_picture_create(tc);
+        picture_t *pic = priv->pbo.display_pics[i] =
+            pbo_picture_create(interop);
         if (pic == NULL)
             goto error;
 
-        if (pbo_data_alloc(tc, pic) != VLC_SUCCESS)
+        if (pbo_data_alloc(interop, pic) != VLC_SUCCESS)
             goto error;
     }
 
     /* turn off pbo */
-    tc->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+    interop->vt->BindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
     return VLC_SUCCESS;
 error:
@@ -308,7 +307,7 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
     if (vlc_fourcc_IsYUV(interop->fmt.i_chroma))
     {
         GLint max_texture_units = 0;
-        tc->vt->GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
+        interop->vt->GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
         if (max_texture_units < 3)
             return VLC_EGENERIC;
 
@@ -358,7 +357,7 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
     struct priv *priv = interop->priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
     {
-        tc->vt->DeleteShader(fragment_shader);
+        interop->vt->DeleteShader(fragment_shader);
         return VLC_ENOMEM;
     }
 
@@ -375,16 +374,16 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
     if (allow_dr && priv->has_unpack_subimage)
     {
         /* Ensure we do direct rendering / PBO with OpenGL 3.0 or higher. */
-        const unsigned char *ogl_version = tc->vt->GetString(GL_VERSION);
+        const unsigned char *ogl_version = interop->vt->GetString(GL_VERSION);
         const bool glver_ok = strverscmp((const char *)ogl_version, "3.0") >= 0;
 
         const bool has_pbo = glver_ok &&
             (vlc_gl_StrHasToken(interop->glexts, "GL_ARB_pixel_buffer_object") ||
              vlc_gl_StrHasToken(interop->glexts, "GL_EXT_pixel_buffer_object"));
 
-        const bool supports_pbo = has_pbo && tc->vt->BufferData
-            && tc->vt->BufferSubData;
-        if (supports_pbo && pbo_pics_alloc(tc) == VLC_SUCCESS)
+        const bool supports_pbo = has_pbo && interop->vt->BufferData
+            && interop->vt->BufferSubData;
+        if (supports_pbo && pbo_pics_alloc(interop) == VLC_SUCCESS)
         {
             static const struct vlc_gl_interop_ops pbo_ops = {
                 .allocate_textures = tc_common_allocate_textures,

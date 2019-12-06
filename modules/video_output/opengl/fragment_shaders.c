@@ -62,10 +62,10 @@
 # define GL_TEXTURE_LUMINANCE_SIZE 0x8060
 #endif
 
-static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
+static int GetTexFormatSize(const opengl_vtable_t *vt, int target,
                             int tex_format, int tex_internal, int tex_type)
 {
-    if (!tc->vt->GetTexLevelParameteriv)
+    if (!vt->GetTexLevelParameteriv)
         return -1;
 
     GLint tex_param_size;
@@ -87,13 +87,13 @@ static int GetTexFormatSize(opengl_tex_converter_t *tc, int target,
     }
     GLuint texture;
 
-    tc->vt->GenTextures(1, &texture);
-    tc->vt->BindTexture(target, texture);
-    tc->vt->TexImage2D(target, 0, tex_internal, 64, 64, 0, tex_format, tex_type, NULL);
+    vt->GenTextures(1, &texture);
+    vt->BindTexture(target, texture);
+    vt->TexImage2D(target, 0, tex_internal, 64, 64, 0, tex_format, tex_type, NULL);
     GLint size = 0;
-    tc->vt->GetTexLevelParameteriv(target, 0, tex_param_size, &size);
+    vt->GetTexLevelParameteriv(target, 0, tex_param_size, &size);
 
-    tc->vt->DeleteTextures(1, &texture);
+    vt->DeleteTextures(1, &texture);
     return size > 0 ? size * mul : size;
 }
 
@@ -126,7 +126,7 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
     float yuv_range_correction = 1.0;
     if (desc->pixel_size == 2)
     {
-        if (GetTexFormatSize(tc, tex_target, oneplane_texfmt,
+        if (GetTexFormatSize(tc->vt, tex_target, oneplane_texfmt,
                              oneplane16_texfmt, GL_UNSIGNED_SHORT) != 16)
             return VLC_EGENERIC;
 
@@ -187,7 +187,7 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
         else if (desc->pixel_size == 2)
         {
             if (twoplanes16_texfmt == 0
-             || GetTexFormatSize(tc, tex_target, twoplanes_texfmt,
+             || GetTexFormatSize(tc->vt, tex_target, twoplanes_texfmt,
                                  twoplanes16_texfmt, GL_UNSIGNED_SHORT) != 16)
                 return VLC_EGENERIC;
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
@@ -316,7 +316,7 @@ tc_rgb_base_init(opengl_tex_converter_t *tc, GLenum tex_target,
             };
             break;
         case VLC_CODEC_BGRA: {
-            if (GetTexFormatSize(tc, tex_target, GL_BGRA, GL_RGBA,
+            if (GetTexFormatSize(tc->vt, tex_target, GL_BGRA, GL_RGBA,
                                  GL_UNSIGNED_BYTE) != 32)
                 return VLC_EGENERIC;
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
