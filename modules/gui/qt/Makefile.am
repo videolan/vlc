@@ -562,38 +562,38 @@ libqt_plugin_la_QML = \
 	gui/qt/dialogs/toolbar/qml/ToolbarEditorButtonList.qml \
 	gui/qt/dialogs/toolbar/qml/ToolbarEditor.qml \
 	gui/qt/qml/utils/KeyHelper.js \
-	gui/qt/qml/utils/BusyIndicatorExt.qml \
-	gui/qt/qml/utils/DNDLabel.qml \
-	gui/qt/qml/utils/ToolTipArea.qml \
-	gui/qt/qml/utils/DrawerExt.qml \
-	gui/qt/qml/utils/GridItem.qml \
-	gui/qt/qml/utils/ContextButton.qml \
-	gui/qt/qml/utils/IconToolButton.qml \
-	gui/qt/qml/utils/ImageToolButton.qml \
-	gui/qt/qml/utils/TextToolButton.qml \
-	gui/qt/qml/utils/MenuExt.qml \
-	gui/qt/qml/utils/MenuItemExt.qml \
-	gui/qt/qml/utils/ListItem.qml \
-	gui/qt/qml/utils/ExpandGridView.qml \
-	gui/qt/qml/utils/NavigableFocusScope.qml \
-	gui/qt/qml/utils/NavigableCol.qml \
-	gui/qt/qml/utils/NavigableRow.qml \
-	gui/qt/qml/utils/KeyNavigableGridView.qml \
-	gui/qt/qml/utils/KeyNavigableListView.qml \
-	gui/qt/qml/utils/KeyNavigableTableView.qml \
 	gui/qt/qml/utils/SelectableDelegateModel.qml \
-	gui/qt/qml/utils/ComboBoxExt.qml \
-	gui/qt/qml/utils/SpinBoxExt.qml \
-	gui/qt/qml/utils/StackViewExt.qml \
-	gui/qt/qml/utils/ScanProgressBar.qml \
-	gui/qt/qml/utils/TabButtonExt.qml \
-	gui/qt/qml/utils/LabelSeparator.qml \
-	gui/qt/qml/utils/RoundButton.qml \
-	gui/qt/qml/utils/RoundImage.qml \
-	gui/qt/qml/utils/VideoQualityLabel.qml \
-	gui/qt/qml/utils/VideoProgressBar.qml \
-        gui/qt/qml/utils/SearchBox.qml \
-        gui/qt/qml/utils/SortControl.qml \
+	gui/qt/widgets/qml/BusyIndicatorExt.qml \
+	gui/qt/widgets/qml/DNDLabel.qml \
+	gui/qt/widgets/qml/ToolTipArea.qml \
+	gui/qt/widgets/qml/DrawerExt.qml \
+	gui/qt/widgets/qml/GridItem.qml \
+	gui/qt/widgets/qml/ContextButton.qml \
+	gui/qt/widgets/qml/IconToolButton.qml \
+	gui/qt/widgets/qml/ImageToolButton.qml \
+	gui/qt/widgets/qml/TextToolButton.qml \
+	gui/qt/widgets/qml/MenuExt.qml \
+	gui/qt/widgets/qml/MenuItemExt.qml \
+	gui/qt/widgets/qml/ListItem.qml \
+	gui/qt/widgets/qml/ExpandGridView.qml \
+	gui/qt/widgets/qml/NavigableFocusScope.qml \
+	gui/qt/widgets/qml/NavigableCol.qml \
+	gui/qt/widgets/qml/NavigableRow.qml \
+	gui/qt/widgets/qml/KeyNavigableGridView.qml \
+	gui/qt/widgets/qml/KeyNavigableListView.qml \
+	gui/qt/widgets/qml/KeyNavigableTableView.qml \
+	gui/qt/widgets/qml/ComboBoxExt.qml \
+	gui/qt/widgets/qml/SpinBoxExt.qml \
+	gui/qt/widgets/qml/StackViewExt.qml \
+	gui/qt/widgets/qml/ScanProgressBar.qml \
+	gui/qt/widgets/qml/TabButtonExt.qml \
+	gui/qt/widgets/qml/LabelSeparator.qml \
+	gui/qt/widgets/qml/RoundButton.qml \
+	gui/qt/widgets/qml/RoundImage.qml \
+	gui/qt/widgets/qml/VideoQualityLabel.qml \
+	gui/qt/widgets/qml/VideoProgressBar.qml \
+	gui/qt/widgets/qml/SearchBox.qml \
+	gui/qt/widgets/qml/SortControl.qml \
 	gui/qt/menus/qml/CheckableModelSubMenu.qml \
 	gui/qt/menus/qml/AudioMenu.qml \
 	gui/qt/menus/qml/HelpMenu.qml \
