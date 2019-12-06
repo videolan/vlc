@@ -761,8 +761,6 @@ modules/gui/qt/qt.cpp
 modules/gui/qt/qt.hpp
 modules/gui/qt/recents.cpp
 modules/gui/qt/recents.hpp
-modules/gui/qt/styles/seekstyle.cpp
-modules/gui/qt/styles/seekstyle.hpp
 modules/gui/qt/util/animators.cpp
 modules/gui/qt/util/animators.hpp
 modules/gui/qt/util/buttons/BrowseButton.cpp
@@ -775,8 +773,6 @@ modules/gui/qt/util/customwidgets.cpp
 modules/gui/qt/util/customwidgets.hpp
 modules/gui/qt/util/imagehelper.cpp
 modules/gui/qt/util/imagehelper.hpp
-modules/gui/qt/util/input_slider.cpp
-modules/gui/qt/util/input_slider.hpp
 modules/gui/qt/util/qt_dirs.cpp
 modules/gui/qt/util/qt_dirs.hpp
 modules/gui/qt/util/qvlcapp.hpp
@@ -786,8 +782,6 @@ modules/gui/qt/util/registry.hpp
 modules/gui/qt/util/searchlineedit.cpp
 modules/gui/qt/util/searchlineedit.hpp
 modules/gui/qt/util/singleton.hpp
-modules/gui/qt/util/timetooltip.cpp
-modules/gui/qt/util/timetooltip.hpp
 modules/gui/qt/util/validators.cpp
 modules/gui/qt/util/validators.hpp
 modules/gui/skins2/commands/async_queue.cpp

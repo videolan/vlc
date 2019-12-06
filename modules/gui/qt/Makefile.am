@@ -181,9 +181,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/sout_widgets.hpp \
 	gui/qt/dialogs/sout/profiles.hpp \
 	gui/qt/util/animators.cpp gui/qt/util/animators.hpp \
-	gui/qt/util/input_slider.cpp gui/qt/util/input_slider.hpp \
 	gui/qt/player/input_models.cpp gui/qt/player/input_models.hpp \
-	gui/qt/util/timetooltip.cpp gui/qt/util/timetooltip.hpp \
 	gui/qt/util/customwidgets.cpp gui/qt/util/customwidgets.hpp \
 	gui/qt/util/searchlineedit.cpp gui/qt/util/searchlineedit.hpp \
 	gui/qt/util/registry.cpp gui/qt/util/registry.hpp \
@@ -204,8 +202,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/singleton.hpp \
 	gui/qt/util/vlctick.cpp \
 	gui/qt/util/vlctick.hpp \
-	gui/qt/util/imagehelper.cpp gui/qt/util/imagehelper.hpp \
-	gui/qt/styles/seekstyle.cpp gui/qt/styles/seekstyle.hpp
+	gui/qt/util/imagehelper.cpp gui/qt/util/imagehelper.hpp
 if HAVE_WIN32
 libqt_plugin_la_SOURCES += \
 	gui/qt/main_interface_win32.cpp gui/qt/main_interface_win32.hpp
@@ -306,9 +303,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/profile_selector.moc.cpp \
 	gui/qt/dialogs/sout/sout_widgets.moc.cpp \
 	gui/qt/util/animators.moc.cpp \
-	gui/qt/util/input_slider.moc.cpp \
 	gui/qt/player/input_models.moc.cpp \
-	gui/qt/util/timetooltip.moc.cpp \
 	gui/qt/util/customwidgets.moc.cpp \
 	gui/qt/util/qmleventfilter.moc.cpp \
 	gui/qt/util/searchlineedit.moc.cpp \
@@ -317,8 +312,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/validators.moc.cpp \
 	gui/qt/util/buttons/RoundButton.moc.cpp \
 	gui/qt/util/buttons/DeckButtonsLayout.moc.cpp \
-	gui/qt/util/buttons/BrowseButton.moc.cpp \
-	gui/qt/styles/seekstyle.moc.cpp
+	gui/qt/util/buttons/BrowseButton.moc.cpp
 
 if HAVE_WIN32
 nodist_libqt_plugin_la_SOURCES += gui/qt/main_interface_win32.moc.cpp
