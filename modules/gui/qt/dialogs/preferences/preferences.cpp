@@ -33,7 +33,7 @@
 #include "dialogs/preferences/simple_preferences.hpp"
 #include "widgets/native/searchlineedit.hpp"
 #include "widgets/native/qvlcframe.hpp"
-#include "main_interface.hpp"
+#include "maininterface/main_interface.hpp"
 
 #include <QHBoxLayout>
 #include <QGroupBox>

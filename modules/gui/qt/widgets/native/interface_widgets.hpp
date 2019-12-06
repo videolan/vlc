@@ -29,7 +29,7 @@
 # include "config.h"
 #endif
 
-#include "main_interface.hpp" /* Interface integration */
+#include "maininterface/main_interface.hpp" /* Interface integration */
 #include "player/player_controller.hpp"  /* Speed control */
 
 #include "dialogs/dialogs_provider.hpp"

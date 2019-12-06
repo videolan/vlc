@@ -22,7 +22,7 @@ import org.videolan.medialib 0.1
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
-import "qrc:///qml/"
+import "qrc:///main/" as Main
 import "qrc:///utils/" as Utils
 import "qrc:///utils/KeyHelper.js" as KeyHelper
 import "qrc:///playlist/" as PL
@@ -140,7 +140,7 @@ Utils.NavigableFocusScope {
                 spacing: 0
 
                 /* Source selection*/
-                BannerSources {
+                Main.BannerSources {
                     id: sourcesBanner
 
                     Layout.preferredHeight: height

@@ -50,9 +50,9 @@ extern "C" char **environ;
 #include "playlist/playlist_controller.hpp" /* THEMPL creation */
 #include "dialogs/dialogs_provider.hpp" /* THEDP creation */
 #ifdef _WIN32
-# include "main_interface_win32.hpp"
+# include "maininterface/main_interface_win32.hpp"
 #else
-# include "main_interface.hpp"   /* MainInterface creation */
+# include "maininterface/main_interface.hpp"   /* MainInterface creation */
 #endif
 #include "dialogs/extensions/extensions_manager.hpp" /* Extensions manager */
 #include "dialogs/plugins/addons_manager.hpp" /* Addons manager */

@@ -171,9 +171,9 @@
         <file alias="addon_red.svg">pixmaps/addons/addon_red.svg</file>
         <file alias="addon_yellow.svg">pixmaps/addons/addon_yellow.svg</file>
     </qresource>
-    <qresource prefix="/qml">
-        <file alias="BannerSources.qml">qml/BannerSources.qml</file>
-        <file alias="MainInterface.qml">qml/MainInterface.qml</file>
+    <qresource prefix="/main">
+        <file alias="BannerSources.qml">maininterface/qml/BannerSources.qml</file>
+        <file alias="MainInterface.qml">maininterface/qml/MainInterface.qml</file>
     </qresource>
     <qresource prefix="/utils">
         <file alias="BusyIndicatorExt.qml">widgets/qml/BusyIndicatorExt.qml</file>

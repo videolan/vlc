@@ -47,7 +47,7 @@ endif
 libqt_plugin_la_SOURCES = \
 	gui/qt/qt.cpp gui/qt/qt.hpp \
 	gui/qt/menus/menus.cpp gui/qt/menus/menus.hpp \
-	gui/qt/main_interface.cpp gui/qt/main_interface.hpp \
+	gui/qt/maininterface/main_interface.cpp gui/qt/maininterface/main_interface.hpp \
 	gui/qt/dialogs/dialogs_provider.cpp gui/qt/dialogs/dialogs_provider.hpp \
 	gui/qt/managers/renderer_manager.cpp gui/qt/managers/renderer_manager.hpp \
 	gui/qt/recents.cpp gui/qt/recents.hpp \
@@ -199,7 +199,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/imagehelper.cpp gui/qt/util/imagehelper.hpp
 if HAVE_WIN32
 libqt_plugin_la_SOURCES += \
-	gui/qt/main_interface_win32.cpp gui/qt/main_interface_win32.hpp
+	gui/qt/maininterface/main_interface_win32.cpp gui/qt/maininterface/main_interface_win32.hpp
 endif
 
 # Meta-object compilation
@@ -216,7 +216,7 @@ moc_verbose__0 = $(moc_verbose_0)
 dialogs/dialogs_provider.moc.cpp dialogs/vlm/vlm.moc.cpp: $(top_builddir)/config.h
 
 nodist_libqt_plugin_la_SOURCES = \
-	gui/qt/main_interface.moc.cpp \
+	gui/qt/maininterface/main_interface.moc.cpp \
 	gui/qt/menus/menus.moc.cpp \
 	gui/qt/dialogs/dialogs_provider.moc.cpp \
 	gui/qt/managers/renderer_manager.moc.cpp \
@@ -306,7 +306,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/validators.moc.cpp
 
 if HAVE_WIN32
-nodist_libqt_plugin_la_SOURCES += gui/qt/main_interface_win32.moc.cpp
+nodist_libqt_plugin_la_SOURCES += gui/qt/maininterface/main_interface_win32.moc.cpp
 endif
 
 nodist_libqt_plugin_la_SOURCES += \
@@ -538,8 +538,8 @@ libqt_plugin_la_RES = \
 
 #QML and JS resources
 libqt_plugin_la_QML = \
-	gui/qt/qml/MainInterface.qml \
-	gui/qt/qml/BannerSources.qml \
+	gui/qt/maininterface/qml/MainInterface.qml \
+	gui/qt/maininterface/qml/BannerSources.qml \
 	gui/qt/dialogs/help/qml/About.qml \
 	gui/qt/player/qml/Player.qml \
 	gui/qt/player/qml/TrackInfo.qml \

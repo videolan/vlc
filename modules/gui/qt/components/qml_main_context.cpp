@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "qml_main_context.hpp"
-#include "main_interface.hpp"
+#include "maininterface/main_interface.hpp"
 
 QmlMainContext::QmlMainContext(intf_thread_t* intf, MainInterface* mainInterface, QObject* parent)
     : QObject(parent)

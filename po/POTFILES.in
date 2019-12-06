@@ -749,10 +749,10 @@ modules/gui/qt/dialogs/dialogs_provider.cpp
 modules/gui/qt/dialogs/dialogs_provider.hpp
 modules/gui/qt/dialogs/extensions/extensions_manager.cpp
 modules/gui/qt/dialogs/extensions/extensions_manager.hpp
-modules/gui/qt/main_interface.cpp
-modules/gui/qt/main_interface.hpp
-modules/gui/qt/main_interface_win32.cpp
-modules/gui/qt/main_interface_win32.hpp
+modules/gui/qt/maininterface/main_interface.cpp
+modules/gui/qt/maininterface/main_interface.hpp
+modules/gui/qt/maininterface/main_interface_win32.cpp
+modules/gui/qt/maininterface/main_interface_win32.hpp
 modules/gui/qt/dialogs/plugins/addons_manager.cpp
 modules/gui/qt/dialogs/plugins/addons_manager.hpp
 modules/gui/qt/menus/menus.cpp

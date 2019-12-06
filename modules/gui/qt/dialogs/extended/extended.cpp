@@ -28,7 +28,7 @@
 
 #include "extended.hpp"
 
-#include "main_interface.hpp" /* Needed for external MI size */
+#include "maininterface/main_interface.hpp" /* Needed for external MI size */
 #include "player/player_controller.hpp"
 
 #include <QTabWidget>

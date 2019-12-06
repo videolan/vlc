@@ -23,7 +23,7 @@
 #include "toolbareditor.hpp"
 #include "components/settings.hpp"
 #include "player/playercontrolbarmodel.hpp"
-#include "main_interface.hpp"
+#include "maininterface/main_interface.hpp"
 
 #include <QInputDialog>
 #include <QtQml/QQmlContext>

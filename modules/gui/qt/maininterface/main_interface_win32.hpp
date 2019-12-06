@@ -24,7 +24,7 @@
 #ifndef MAIN_INTERFACE_WIN32_HPP
 #define MAIN_INTERFACE_WIN32_HPP
 
-#include "main_interface.hpp"
+#include "maininterface/main_interface.hpp"
 
 class MainInterfaceWin32 : public MainInterface
 {

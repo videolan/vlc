@@ -37,7 +37,7 @@
 
 #include "menus.hpp"
 
-#include "main_interface.hpp"                     /* View modifications */
+#include "maininterface/main_interface.hpp"                     /* View modifications */
 #include "dialogs/dialogs_provider.hpp"                   /* Dialogs display */
 #include "player/player_controller.hpp"                      /* Input Management */
 #include "playlist/playlist_controller.hpp"

@@ -28,7 +28,7 @@
 
 #include "qt.hpp"
 
-#include "main_interface.hpp"
+#include "maininterface/main_interface.hpp"
 #include "player/player_controller.hpp"                    // Creation
 #include "managers/renderer_manager.hpp"
 
@@ -412,7 +412,7 @@ void MainInterface::createMainWidget( QSettings * )
         rootCtx->setContextProperty( "medialib", nullptr );
     }
 
-    mediacenterView->setSource( QUrl ( QStringLiteral("qrc:/qml/MainInterface.qml") ) );
+    mediacenterView->setSource( QUrl ( QStringLiteral("qrc:/main/MainInterface.qml") ) );
     mediacenterView->setResizeMode( QQuickWidget::SizeRootObjectToView );
 
     setCentralWidget( mediacenterView );

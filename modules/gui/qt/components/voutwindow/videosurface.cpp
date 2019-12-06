@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "videosurface.hpp"
-#include "main_interface.hpp"
+#include "maininterface/main_interface.hpp"
 
 
 VideoSurfaceProvider::VideoSurfaceProvider(QObject* parent)
