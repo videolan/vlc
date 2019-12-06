@@ -23,7 +23,7 @@
 #ifndef QVLC_PLUGIN_DIALOG_H_
 #define QVLC_PLUGIN_DIALOG_H_ 1
 
-#include "util/qvlcframe.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include "util/singleton.hpp"
 
 #include <vlc_extensions.h>

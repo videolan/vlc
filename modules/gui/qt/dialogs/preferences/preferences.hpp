@@ -23,7 +23,7 @@
 #ifndef QVLC_PREFS_DIALOG_H_
 #define QVLC_PREFS_DIALOG_H_ 1
 
-#include "util/qvlcframe.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include "dialogs/preferences/simple_preferences.hpp"
 
 class PrefsTree;

@@ -30,7 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_url.h>
 
-#include "util/qvlcframe.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include "dialogs/open/ui_open.h"
 #include "dialogs/open/open_panels.hpp"
 

@@ -1,5 +1,5 @@
 #include "qvoutwindow.hpp"
-#include "util/customwidgets.hpp" //for qtEventToVLCKey
+#include "widgets/native/customwidgets.hpp" //for qtEventToVLCKey
 
 QVoutWindow::QVoutWindow(QObject* parent)
     : QObject(parent)

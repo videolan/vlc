@@ -829,7 +829,7 @@
   <customwidget>
    <class>YesNoCheckBox</class>
    <extends>QCheckBox</extends>
-   <header>util/customwidgets.hpp</header>
+   <header>widgets/native/customwidgets.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

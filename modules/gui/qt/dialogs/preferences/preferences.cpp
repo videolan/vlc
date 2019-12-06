@@ -26,13 +26,13 @@
 #endif
 
 #include "dialogs/preferences/preferences.hpp"
-#include "util/qvlcframe.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include "dialogs/errors/errors.hpp"
 
 #include "dialogs/preferences/complete_preferences.hpp"
 #include "dialogs/preferences/simple_preferences.hpp"
-#include "util/searchlineedit.hpp"
-#include "util/qvlcframe.hpp"
+#include "widgets/native/searchlineedit.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include "main_interface.hpp"
 
 #include <QHBoxLayout>

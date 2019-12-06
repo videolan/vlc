@@ -19,7 +19,7 @@
 #ifndef QVLC_TOOLBAREDITOR_DIALOG_H_
 #define QVLC_TOOLBAREDITOR_DIALOG_H_ 1
 
-#include "util/qvlcframe.hpp"                                 /* QVLCDialog */
+#include "widgets/native/qvlcframe.hpp"                                 /* QVLCDialog */
 #include "components/qml_main_context.hpp"
 #include "dialogs/sout/profile_selector.hpp"
 

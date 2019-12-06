@@ -38,7 +38,7 @@
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QKeyEvent>
-#include "util/customwidgets.hpp"
+#include "widgets/native/customwidgets.hpp"
 
 ExtensionsDialogProvider *ExtensionsDialogProvider::instance = NULL;
 

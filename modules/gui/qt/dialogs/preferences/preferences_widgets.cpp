@@ -31,8 +31,8 @@
 #endif
 
 #include "dialogs/preferences/preferences_widgets.hpp"
-#include "util/customwidgets.hpp"
-#include "util/searchlineedit.hpp"
+#include "widgets/native/customwidgets.hpp"
+#include "widgets/native/searchlineedit.hpp"
 #include "util/qt_dirs.hpp"
 #include <vlc_actions.h>
 #include <vlc_intf_strings.h>

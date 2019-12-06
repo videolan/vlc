@@ -120,7 +120,7 @@
   <customwidget>
    <class>QVLCDebugLevelSpinBox</class>
    <extends>QSpinBox</extends>
-   <header>util/customwidgets.hpp</header>
+   <header>widgets/native/customwidgets.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

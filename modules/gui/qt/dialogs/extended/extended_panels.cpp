@@ -49,7 +49,7 @@
 #include "qt.hpp"
 #include "player/player_controller.hpp"
 #include "util/qt_dirs.hpp"
-#include "util/customwidgets.hpp"
+#include "widgets/native/customwidgets.hpp"
 #include "dialogs/dialogs_provider.hpp"
 
 #include "../../../../audio_filter/equalizer_presets.h"

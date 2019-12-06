@@ -25,7 +25,7 @@
 #endif
 
 #include "dialogs/open/openurl.hpp"
-#include "util/searchlineedit.hpp"
+#include "widgets/native/searchlineedit.hpp"
 #include "util/validators.hpp"
 
 #include <QPushButton>

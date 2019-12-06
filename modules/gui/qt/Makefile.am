@@ -99,8 +99,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/preferences/simple_preferences.cpp \
 	gui/qt/dialogs/preferences/simple_preferences.hpp \
 	gui/qt/dialogs/open/open_panels.cpp gui/qt/dialogs/open/open_panels.hpp \
-	gui/qt/components/interface_widgets.cpp \
-	gui/qt/components/interface_widgets.hpp \
+	gui/qt/widgets/native/interface_widgets.cpp \
+	gui/qt/widgets/native/interface_widgets.hpp \
 	gui/qt/components/recent_media_model.cpp  \
 	gui/qt/components/recent_media_model.hpp \
 	gui/qt/components/settings.cpp \
@@ -180,16 +180,16 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/sout_widgets.cpp \
 	gui/qt/dialogs/sout/sout_widgets.hpp \
 	gui/qt/dialogs/sout/profiles.hpp \
-	gui/qt/util/animators.cpp gui/qt/util/animators.hpp \
+	gui/qt/widgets/native/animators.cpp gui/qt/widgets/animators.hpp \
 	gui/qt/player/input_models.cpp gui/qt/player/input_models.hpp \
-	gui/qt/util/customwidgets.cpp gui/qt/util/customwidgets.hpp \
-	gui/qt/util/searchlineedit.cpp gui/qt/util/searchlineedit.hpp \
+	gui/qt/widgets/native/customwidgets.cpp gui/qt/widgets/native/customwidgets.hpp \
+	gui/qt/widgets/native/searchlineedit.cpp gui/qt/widgets/native/searchlineedit.hpp \
 	gui/qt/util/registry.cpp gui/qt/util/registry.hpp \
 	gui/qt/util/soutchain.cpp gui/qt/util/soutchain.hpp \
 	gui/qt/util/qt_dirs.cpp gui/qt/util/qt_dirs.hpp \
 	gui/qt/util/validators.cpp gui/qt/util/validators.hpp \
-	gui/qt/util/qvlcframe.cpp \
-	gui/qt/util/qvlcframe.hpp \
+	gui/qt/widgets/native/qvlcframe.cpp \
+	gui/qt/widgets/native/qvlcframe.hpp \
 	gui/qt/util/qvlcapp.hpp \
 	gui/qt/util/qmleventfilter.cpp \
 	gui/qt/util/qmleventfilter.hpp \
@@ -254,7 +254,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/preferences/complete_preferences.moc.cpp \
 	gui/qt/dialogs/preferences/simple_preferences.moc.cpp \
 	gui/qt/dialogs/open/open_panels.moc.cpp \
-	gui/qt/components/interface_widgets.moc.cpp \
+	gui/qt/widgets/native/interface_widgets.moc.cpp \
 	gui/qt/components/navigation_history.moc.cpp \
 	gui/qt/menus/custom_menus.moc.cpp \
 	gui/qt/components/recent_media_model.moc.cpp \
@@ -296,11 +296,11 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/sout.moc.cpp \
 	gui/qt/dialogs/sout/profile_selector.moc.cpp \
 	gui/qt/dialogs/sout/sout_widgets.moc.cpp \
-	gui/qt/util/animators.moc.cpp \
+	gui/qt/widgets/native/animators.moc.cpp \
 	gui/qt/player/input_models.moc.cpp \
-	gui/qt/util/customwidgets.moc.cpp \
+	gui/qt/widgets/native/customwidgets.moc.cpp \
 	gui/qt/util/qmleventfilter.moc.cpp \
-	gui/qt/util/searchlineedit.moc.cpp \
+	gui/qt/widgets/native/searchlineedit.moc.cpp \
 	gui/qt/util/qvlcapp.moc.cpp \
 	gui/qt/util/vlctick.moc.cpp \
 	gui/qt/util/validators.moc.cpp

@@ -34,7 +34,7 @@
 #include "menus/menus.hpp"
 #include "recents.hpp"
 #include "util/qt_dirs.hpp"
-#include "util/customwidgets.hpp" /* VLCKeyToString() */
+#include "widgets/native/customwidgets.hpp" /* VLCKeyToString() */
 #include "main_interface.hpp"
 
 /* The dialogs */

@@ -30,7 +30,7 @@
 #include <vlc_common.h> /* Gettext functions */
 
 #include "dialogs/sout/ui_sout.h"
-#include "util/qvlcframe.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include "util/soutchain.hpp"
 
 #include <QWizard>

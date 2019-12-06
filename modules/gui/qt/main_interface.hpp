@@ -26,7 +26,7 @@
 
 #include "qt.hpp"
 
-#include "util/qvlcframe.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include "player/player_controller.hpp"
 #include "components/voutwindow/qvoutwindow.hpp"
 

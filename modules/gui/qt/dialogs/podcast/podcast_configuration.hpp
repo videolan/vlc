@@ -23,7 +23,7 @@
 #ifndef QVLC_PODCAST_CONFIGURATION_DIALOG_H_
 #define QVLC_PODCAST_CONFIGURATION_DIALOG_H_ 1
 
-#include "util/qvlcframe.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include "dialogs/podcast/ui_podcast_configuration.h"
 #include "util/singleton.hpp"
 

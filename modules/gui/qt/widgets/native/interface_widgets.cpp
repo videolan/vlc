@@ -28,9 +28,9 @@
 #endif
 
 #include "qt.hpp"
-#include "components/interface_widgets.hpp"
+#include "interface_widgets.hpp"
 #include "dialogs/dialogs_provider.hpp"
-#include "util/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
+#include "widgets/native/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 
 #include <QLabel>
 #include <QToolButton>

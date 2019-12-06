@@ -29,7 +29,7 @@
 
 #include "qt.hpp"
 
-#include "util/qvlcframe.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include "util/singleton.hpp"
 #include "dialogs/help/ui_about.h"
 #include "dialogs/help/ui_update.h"

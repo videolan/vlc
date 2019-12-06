@@ -23,7 +23,7 @@
 #ifndef QVLC_ERRORS_DIALOG_H_
 #define QVLC_ERRORS_DIALOG_H_ 1
 
-#include "util/qvlcframe.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include "util/singleton.hpp"
 
 class QCheckBox;

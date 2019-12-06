@@ -24,7 +24,7 @@
 #ifndef QVLC_BOOKMARKS_H_
 #define QVLC_BOOKMARKS_H_ 1
 
-#include "util/qvlcframe.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include <QStandardItemModel>
 #include <QTreeView>
 #include <QTreeWidget>

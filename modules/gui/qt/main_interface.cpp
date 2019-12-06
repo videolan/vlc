@@ -32,11 +32,11 @@
 #include "player/player_controller.hpp"                    // Creation
 #include "managers/renderer_manager.hpp"
 
-#include "util/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
+#include "widgets/native/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
 #include "util/imagehelper.hpp"
 
-#include "components/interface_widgets.hpp"     // bgWidget, videoWidget
+#include "widgets/native/interface_widgets.hpp"     // bgWidget, videoWidget
 #include "dialogs/firstrun/firstrun.hpp"                 // First Run
 
 #include "playlist/playlist_model.hpp"

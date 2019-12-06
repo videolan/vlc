@@ -28,7 +28,7 @@
 #endif
 
 #include <vlc_common.h>
-#include "util/qvlcframe.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include "util/singleton.hpp"
 
 class ClickLineEdit;
