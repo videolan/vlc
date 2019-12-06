@@ -23,7 +23,7 @@
 
 #include "qt.hpp"
 #include "recents.hpp"
-#include "dialogs_provider.hpp"
+#include "dialogs/dialogs_provider.hpp"
 #include "menus.hpp"
 #include "util/qt_dirs.hpp"
 #include <vlc_cxx_helpers.hpp>

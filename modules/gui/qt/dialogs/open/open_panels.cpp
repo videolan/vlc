@@ -32,7 +32,7 @@
 #include "qt.hpp"
 #include "open_panels.hpp"
 #include "dialogs/open/open.hpp"
-#include "dialogs_provider.hpp" /* Open Subtitle file */
+#include "dialogs/dialogs_provider.hpp" /* Open Subtitle file */
 #include "util/qt_dirs.hpp"
 #include "util/validators.hpp"
 #include <vlc_intf_strings.h>

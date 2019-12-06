@@ -48,7 +48,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/qt.cpp gui/qt/qt.hpp \
 	gui/qt/menus.cpp gui/qt/menus.hpp \
 	gui/qt/main_interface.cpp gui/qt/main_interface.hpp \
-	gui/qt/dialogs_provider.cpp gui/qt/dialogs_provider.hpp \
+	gui/qt/dialogs/dialogs_provider.cpp gui/qt/dialogs/dialogs_provider.hpp \
 	gui/qt/managers/renderer_manager.cpp gui/qt/managers/renderer_manager.hpp \
 	gui/qt/recents.cpp gui/qt/recents.hpp \
 	gui/qt/adapters/var_common_p.hpp \
@@ -226,12 +226,12 @@ moc_verbose__0 = $(moc_verbose_0)
 	$(moc_verbose)$(MOC) $(MOC_CPPFLAGS) -o $@ $<
 
 # These MOC files depend on the configure settings:
-dialogs_provider.moc.cpp dialogs/vlm/vlm.moc.cpp: $(top_builddir)/config.h
+dialogs/dialogs_provider.moc.cpp dialogs/vlm/vlm.moc.cpp: $(top_builddir)/config.h
 
 nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/main_interface.moc.cpp \
 	gui/qt/menus.moc.cpp \
-	gui/qt/dialogs_provider.moc.cpp \
+	gui/qt/dialogs/dialogs_provider.moc.cpp \
 	gui/qt/managers/renderer_manager.moc.cpp \
 	gui/qt/recents.moc.cpp \
 	gui/qt/adapters/variables.moc.cpp \

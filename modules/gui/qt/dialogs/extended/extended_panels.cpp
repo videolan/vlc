@@ -50,7 +50,7 @@
 #include "player/player_controller.hpp"
 #include "util/qt_dirs.hpp"
 #include "util/customwidgets.hpp"
-#include "dialogs_provider.hpp"
+#include "dialogs/dialogs_provider.hpp"
 
 #include "../../../../audio_filter/equalizer_presets.h"
 #include <vlc_modules.h>

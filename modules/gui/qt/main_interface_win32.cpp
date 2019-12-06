@@ -28,7 +28,7 @@
 #include "main_interface_win32.hpp"
 
 #include "player/player_controller.hpp"
-#include "dialogs_provider.hpp"
+#include "dialogs/dialogs_provider.hpp"
 #include "components/interface_widgets.hpp"
 
 #include <QBitmap>

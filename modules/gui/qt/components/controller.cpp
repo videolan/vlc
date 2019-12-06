@@ -33,7 +33,7 @@
 #include "util/buttons/BrowseButton.hpp"
 #include "util/buttons/RoundButton.hpp"
 
-#include "dialogs_provider.hpp"                     /* Opening Dialogs */
+#include "dialogs/dialogs_provider.hpp"                     /* Opening Dialogs */
 #include "playlist/playlist_controller.hpp"
 
 #include "util/input_slider.hpp"                         /* SeekSlider */
