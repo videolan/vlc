@@ -124,6 +124,8 @@ void FormatNamespace::Parse(vlc_fourcc_t fcc, const std::vector<std::string> &el
         case MP4RA("hvt1"):
         case MP4RA("lhv1"):
         case MP4RA("lhe1"):
+        case MP4RA("dvhe"): /* DolbyVision */
+        //case MP4RA("dvh1"): /* DolbyVision (Collides with DV) */
             es_format_Change(&fmt, VIDEO_ES, VLC_CODEC_HEVC);
             break;
         case MP4RA("av01"):
