@@ -235,10 +235,10 @@
         <file alias="AudioGridItem.qml">medialibrary/qml/AudioGridItem.qml</file>
     </qresource>
     <qresource prefix="/style">
-        <file alias="qmldir">qml/style/qmldir</file>
-        <file alias="VLCStyle.qml">qml/style/VLCStyle.qml</file>
-        <file alias="VLCColors.qml">qml/style/VLCColors.qml</file>
-        <file alias="VLCIcons.qml">qml/style/VLCIcons.qml</file>
+        <file alias="qmldir">style/qmldir</file>
+        <file alias="VLCStyle.qml">style/VLCStyle.qml</file>
+        <file alias="VLCColors.qml">style/VLCColors.qml</file>
+        <file alias="VLCIcons.qml">style/VLCIcons.qml</file>
     </qresource>
     <qresource prefix="/playlist">
         <file alias="PLItem.qml">playlist/qml/PLItem.qml</file>

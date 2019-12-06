@@ -632,10 +632,10 @@ libqt_plugin_la_QML = \
 	gui/qt/playlist/qml/PLItem.qml \
 	gui/qt/playlist/qml/PLItemFooter.qml \
 	gui/qt/playlist/qml/PlaylistMenu.qml \
-	gui/qt/qml/style/qmldir \
-	gui/qt/qml/style/VLCIcons.qml \
-	gui/qt/qml/style/VLCStyle.qml \
-	gui/qt/qml/style/VLCColors.qml
+	gui/qt/style/qmldir \
+	gui/qt/style/VLCIcons.qml \
+	gui/qt/style/VLCStyle.qml \
+	gui/qt/style/VLCColors.qml
 
 EXTRA_DIST += gui/qt/vlc.qrc $(libqt_plugin_la_RES)
 
