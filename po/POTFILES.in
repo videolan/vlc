@@ -763,12 +763,6 @@ modules/gui/qt/recents.cpp
 modules/gui/qt/recents.hpp
 modules/gui/qt/util/animators.cpp
 modules/gui/qt/util/animators.hpp
-modules/gui/qt/util/buttons/BrowseButton.cpp
-modules/gui/qt/util/buttons/BrowseButton.hpp
-modules/gui/qt/util/buttons/DeckButtonsLayout.cpp
-modules/gui/qt/util/buttons/DeckButtonsLayout.hpp
-modules/gui/qt/util/buttons/RoundButton.cpp
-modules/gui/qt/util/buttons/RoundButton.hpp
 modules/gui/qt/util/customwidgets.cpp
 modules/gui/qt/util/customwidgets.hpp
 modules/gui/qt/util/imagehelper.cpp

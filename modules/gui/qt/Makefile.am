@@ -188,12 +188,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/soutchain.cpp gui/qt/util/soutchain.hpp \
 	gui/qt/util/qt_dirs.cpp gui/qt/util/qt_dirs.hpp \
 	gui/qt/util/validators.cpp gui/qt/util/validators.hpp \
-	gui/qt/util/buttons/BrowseButton.cpp \
-	gui/qt/util/buttons/BrowseButton.hpp \
-	gui/qt/util/buttons/DeckButtonsLayout.cpp \
-	gui/qt/util/buttons/DeckButtonsLayout.hpp \
-	gui/qt/util/buttons/RoundButton.cpp \
-	gui/qt/util/buttons/RoundButton.hpp \
 	gui/qt/util/qvlcframe.cpp \
 	gui/qt/util/qvlcframe.hpp \
 	gui/qt/util/qvlcapp.hpp \
@@ -309,10 +303,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/searchlineedit.moc.cpp \
 	gui/qt/util/qvlcapp.moc.cpp \
 	gui/qt/util/vlctick.moc.cpp \
-	gui/qt/util/validators.moc.cpp \
-	gui/qt/util/buttons/RoundButton.moc.cpp \
-	gui/qt/util/buttons/DeckButtonsLayout.moc.cpp \
-	gui/qt/util/buttons/BrowseButton.moc.cpp
+	gui/qt/util/validators.moc.cpp
 
 if HAVE_WIN32
 nodist_libqt_plugin_la_SOURCES += gui/qt/main_interface_win32.moc.cpp
