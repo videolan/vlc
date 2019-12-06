@@ -561,8 +561,8 @@ libqt_plugin_la_QML = \
 	gui/qt/dialogs/toolbar/qml/EditorTabButton.qml \
 	gui/qt/dialogs/toolbar/qml/ToolbarEditorButtonList.qml \
 	gui/qt/dialogs/toolbar/qml/ToolbarEditor.qml \
-	gui/qt/qml/utils/KeyHelper.js \
-	gui/qt/qml/utils/SelectableDelegateModel.qml \
+	gui/qt/util/qml/KeyHelper.js \
+	gui/qt/util/qml/SelectableDelegateModel.qml \
 	gui/qt/widgets/qml/BusyIndicatorExt.qml \
 	gui/qt/widgets/qml/DNDLabel.qml \
 	gui/qt/widgets/qml/ToolTipArea.qml \

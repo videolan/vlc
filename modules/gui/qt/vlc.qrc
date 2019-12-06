@@ -207,8 +207,8 @@
         <file alias="NavigableCol.qml">widgets/qml/NavigableCol.qml</file>
         <file alias="NavigableRow.qml">widgets/qml/NavigableRow.qml</file>
         <file alias="TabButtonExt.qml">widgets/qml/TabButtonExt.qml</file>
-        <file alias="SelectableDelegateModel.qml">widgets/qml/SelectableDelegateModel.qml</file>
-        <file alias="KeyHelper.js">widgets/qml/KeyHelper.js</file>
+        <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>
+        <file alias="KeyHelper.js">util/qml/KeyHelper.js</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="NetworkDisplay.qml">network/qml/NetworkDisplay.qml</file>
