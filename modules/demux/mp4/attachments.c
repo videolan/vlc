@@ -50,12 +50,57 @@ const MP4_Box_t *MP4_GetMetaRoot( const MP4_Box_t *p_root, const char **ppsz_pat
     return NULL;
 }
 
-static bool imageTypeCompatible( const MP4_Box_data_data_t *p_data )
+enum detectedImageType
 {
-    return p_data && (
-    p_data->e_wellknowntype == DATA_WKT_PNG ||
-    p_data->e_wellknowntype == DATA_WKT_JPEG ||
-    p_data->e_wellknowntype == DATA_WKT_BMP );
+    IMAGE_TYPE_UNKNOWN = DATA_WKT_RESERVED,
+    IMAGE_TYPE_JPEG = DATA_WKT_JPEG,
+    IMAGE_TYPE_PNG = DATA_WKT_PNG,
+    IMAGE_TYPE_BMP = DATA_WKT_BMP,
+};
+
+static const struct
+{
+    enum detectedImageType type;
+    const char *mime;
+} rg_imageTypeToMime[] = {
+    { IMAGE_TYPE_JPEG,  "image/jpeg" },
+    { IMAGE_TYPE_PNG,   "image/png" },
+    { IMAGE_TYPE_BMP,   "image/bmp" },
+};
+
+static const char * getMimeType( enum detectedImageType type )
+{
+    for( size_t i=0; i<ARRAY_SIZE(rg_imageTypeToMime); i++ )
+    {
+        if( rg_imageTypeToMime[i].type == type )
+            return rg_imageTypeToMime[i].mime;
+    }
+    return NULL;
+}
+
+static enum detectedImageType wellKnownToimageType( int e_wellknowntype )
+{
+    switch( e_wellknowntype )
+    {
+        case DATA_WKT_PNG:
+        case DATA_WKT_JPEG:
+        case DATA_WKT_BMP:
+            return e_wellknowntype;
+        default:
+            return IMAGE_TYPE_UNKNOWN;
+    }
+}
+
+static enum detectedImageType probeImageType( const uint8_t *p_data, size_t i_data )
+{
+    if( i_data > 4 )
+    {
+        if( !memcmp( p_data, "\xFF\xD8\xFF", 3 ) )
+            return IMAGE_TYPE_JPEG;
+        else if( !memcmp( p_data, ".PNG", 4 ) )
+            return IMAGE_TYPE_PNG;
+    }
+    return IMAGE_TYPE_UNKNOWN;
 }
 
 static const MP4_Box_t * GetValidCovrMeta( const MP4_Box_t *p_data,
@@ -67,7 +112,9 @@ static const MP4_Box_t * GetValidCovrMeta( const MP4_Box_t *p_data,
         if( p_data->i_type != ATOM_data || p_data == *ctx )
             continue;
         (*pi_index)++;
-        if ( !imageTypeCompatible( BOXDATA(p_data) ) )
+        if ( !BOXDATA(p_data) ||
+             wellKnownToimageType(
+                 BOXDATA(p_data)->e_wellknowntype ) == IMAGE_TYPE_UNKNOWN )
             continue;
         *ctx = p_data;
         return p_data;
@@ -102,7 +149,10 @@ static const MP4_Box_t * GetValidThumMeta( const MP4_Box_t *p_thum,
         if( p_thum->i_type != ATOM_thum || p_thum == *ctx )
             continue;
         (*pi_index)++;
-        if ( !p_thum->data.p_binary )
+        if ( !p_thum->data.p_binary ||
+                probeImageType( p_thum->data.p_binary->p_blob,
+                                p_thum->data.p_binary->i_blob )
+                                        == IMAGE_TYPE_UNKNOWN )
             continue;
         *ctx = p_thum;
         return p_thum;
@@ -229,24 +279,11 @@ int MP4_GetAttachments( const MP4_Box_t *p_root, input_attachment_t ***ppp_attac
         const void *ctx = NULL;
         while( (p_data = GetValidCovrMeta( p_data, &i_index, &ctx )) )
         {
-            char *psz_mime;
             char *psz_filename;
 
-            switch( BOXDATA(p_data)->e_wellknowntype )
-            {
-            case DATA_WKT_PNG:
-                psz_mime = strdup( "image/png" );
-                break;
-            case DATA_WKT_JPEG:
-                psz_mime = strdup( "image/jpeg" );
-                break;
-            case DATA_WKT_BMP:
-                psz_mime = strdup( "image/bmp" );
-                break;
-            default:
-                psz_mime = NULL;
-                break;
-            }
+            enum detectedImageType type =
+                    wellKnownToimageType( BOXDATA(p_data)->e_wellknowntype );
+            const char *psz_mime = getMimeType( type );
 
             if ( asprintf( &psz_filename, "%s/covr/data[%u]",
                            psz_metarootpath,
@@ -263,8 +300,6 @@ int MP4_GetAttachments( const MP4_Box_t *p_root, input_attachment_t ***ppp_attac
                 if( p_attach )
                     pp_attach[i_count++] = p_attach;
             }
-
-            free( psz_mime );
         }
     }
 
@@ -312,12 +347,16 @@ int MP4_GetAttachments( const MP4_Box_t *p_root, input_attachment_t ***ppp_attac
         while( (p_thum = GetValidThumMeta( p_thum, &i_index, &ctx )) )
         {
             char *psz_location;
+            enum detectedImageType type =
+                    probeImageType( p_thum->data.p_binary->p_blob,
+                                    p_thum->data.p_binary->i_blob );
+            const char *psz_mime = getMimeType( type );
             if ( asprintf( &psz_location, "thum[%u]", i_index - 1 ) > -1 )
             {
                 input_attachment_t *p_attach =
                         vlc_input_attachment_New(
                             psz_location,
-                            NULL,
+                            psz_mime,
                             "Cover picture",
                             p_thum->data.p_binary->p_blob,
                             p_thum->data.p_binary->i_blob );
