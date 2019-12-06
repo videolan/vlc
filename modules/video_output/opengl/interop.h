@@ -108,6 +108,9 @@ struct vlc_gl_interop {
     /* Can only be changed from the module open function */
     video_format_t fmt;
 
+    /* Software format (useful if fmt only exposes opaque chroma) */
+    video_format_t sw_fmt;
+
     /* Pointer to decoder video context, set by the caller (can be NULL) */
     vlc_video_context *vctx;
 

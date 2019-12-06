@@ -556,6 +556,8 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
     interop->ops = NULL;
     interop->glexts = glexts;
     interop->fmt = *fmt;
+    /* this is the only allocated field, and we don't need it */
+    interop->fmt.p_palette = NULL;
 
     interop->gl = tc->gl;
     interop->vt = tc->vt;
