@@ -279,16 +279,25 @@ int MP4_GetAttachments( const MP4_Box_t *p_root, input_attachment_t ***ppp_attac
             char *psz_location;
             if ( asprintf( &psz_location, "pnot[%u]", i_index - 1 ) > -1 )
             {
-                input_attachment_t *p_attach =
-                        vlc_input_attachment_New(
-                            psz_location,
-                            "image/x-pict",
-                            "Quickdraw image",
-                            p_pnot->data.p_binary->p_blob,
-                            p_pnot->data.p_binary->i_blob );
-                free( psz_location );
-                if( p_attach )
-                    pp_attach[i_count++] = p_attach;
+                char rgz_path[14];
+                snprintf( rgz_path, 14,
+                         "/%4.4s[%"PRIu16"]",
+                         (const char *) &p_pnot->data.p_pnot->i_type,
+                         p_pnot->data.p_pnot->i_index - 1 );
+                const MP4_Box_t *p_pict = MP4_BoxGet( p_root, rgz_path );
+                if( p_pict )
+                {
+                    input_attachment_t *p_attach =
+                            vlc_input_attachment_New(
+                                psz_location,
+                                "image/x-pict",
+                                "Quickdraw image",
+                                p_pict->data.p_binary->p_blob,
+                                p_pict->data.p_binary->i_blob );
+                    free( psz_location );
+                    if( p_attach )
+                        pp_attach[i_count++] = p_attach;
+                }
             }
         }
     }
