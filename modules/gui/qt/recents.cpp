@@ -24,7 +24,7 @@
 #include "qt.hpp"
 #include "recents.hpp"
 #include "dialogs/dialogs_provider.hpp"
-#include "menus.hpp"
+#include "menus/menus.hpp"
 #include "util/qt_dirs.hpp"
 #include <vlc_cxx_helpers.hpp>
 #include "playlist/playlist_controller.hpp"

@@ -249,18 +249,18 @@
         <file alias="PlaylistToolbar.qml">playlist/qml/PlaylistToolbar.qml</file>
     </qresource>
     <qresource prefix="/menus">
-        <file alias="AudioMenu.qml">qml/menus/AudioMenu.qml</file>
-        <file alias="HelpMenu.qml">qml/menus/HelpMenu.qml</file>
-        <file alias="MainDropdownMenu.qml">qml/menus/MainDropdownMenu.qml</file>
-        <file alias="MainMenubar.qml">qml/menus/MainMenubar.qml</file>
-        <file alias="MediaMenu.qml">qml/menus/MediaMenu.qml</file>
-        <file alias="PlaybackMenu.qml">qml/menus/PlaybackMenu.qml</file>
-        <file alias="SubtitleMenu.qml">qml/menus/SubtitleMenu.qml</file>
-        <file alias="ToolsMenu.qml">qml/menus/ToolsMenu.qml</file>
-        <file alias="VideoMenu.qml">qml/menus/VideoMenu.qml</file>
-        <file alias="CheckableModelSubMenu.qml">qml/menus/CheckableModelSubMenu.qml</file>
-        <file alias="ViewMenu.qml">qml/menus/ViewMenu.qml</file>
-        <file alias="PopupMenu.qml">qml/menus/PopupMenu.qml</file>
+        <file alias="AudioMenu.qml">menus/qml/AudioMenu.qml</file>
+        <file alias="HelpMenu.qml">menus/qml/HelpMenu.qml</file>
+        <file alias="MainDropdownMenu.qml">menus/qml/MainDropdownMenu.qml</file>
+        <file alias="MainMenubar.qml">menus/qml/MainMenubar.qml</file>
+        <file alias="MediaMenu.qml">menus/qml/MediaMenu.qml</file>
+        <file alias="PlaybackMenu.qml">menus/qml/PlaybackMenu.qml</file>
+        <file alias="SubtitleMenu.qml">menus/qml/SubtitleMenu.qml</file>
+        <file alias="ToolsMenu.qml">menus/qml/ToolsMenu.qml</file>
+        <file alias="VideoMenu.qml">menus/qml/VideoMenu.qml</file>
+        <file alias="CheckableModelSubMenu.qml">menus/qml/CheckableModelSubMenu.qml</file>
+        <file alias="ViewMenu.qml">menus/qml/ViewMenu.qml</file>
+        <file alias="PopupMenu.qml">menus/qml/PopupMenu.qml</file>
     </qresource>
     <qresource prefix="/player">
         <file alias="Player.qml">player/qml/Player.qml</file>

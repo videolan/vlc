@@ -46,7 +46,7 @@ endif
 
 libqt_plugin_la_SOURCES = \
 	gui/qt/qt.cpp gui/qt/qt.hpp \
-	gui/qt/menus.cpp gui/qt/menus.hpp \
+	gui/qt/menus/menus.cpp gui/qt/menus/menus.hpp \
 	gui/qt/main_interface.cpp gui/qt/main_interface.hpp \
 	gui/qt/dialogs/dialogs_provider.cpp gui/qt/dialogs/dialogs_provider.hpp \
 	gui/qt/managers/renderer_manager.cpp gui/qt/managers/renderer_manager.hpp \
@@ -117,8 +117,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/voutwindow/qvoutwindow.hpp \
 	gui/qt/components/voutwindow/qvoutwindowdummy.cpp \
 	gui/qt/components/voutwindow/qvoutwindowdummy.hpp \
-	gui/qt/components/custom_menus.cpp \
-	gui/qt/components/custom_menus.hpp \
+	gui/qt/menus/custom_menus.cpp \
+	gui/qt/menus/custom_menus.hpp \
 	gui/qt/dialogs/epg/epg.cpp gui/qt/dialogs/epg/epg.hpp \
 	gui/qt/dialogs/epg/EPGChannels.cpp \
 	gui/qt/dialogs/epg/EPGChannels.hpp \
@@ -230,7 +230,7 @@ dialogs/dialogs_provider.moc.cpp dialogs/vlm/vlm.moc.cpp: $(top_builddir)/config
 
 nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/main_interface.moc.cpp \
-	gui/qt/menus.moc.cpp \
+	gui/qt/menus/menus.moc.cpp \
 	gui/qt/dialogs/dialogs_provider.moc.cpp \
 	gui/qt/managers/renderer_manager.moc.cpp \
 	gui/qt/recents.moc.cpp \
@@ -272,7 +272,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/navigation_history.moc.cpp \
 	gui/qt/components/controller.moc.cpp \
 	gui/qt/components/controller_widget.moc.cpp \
-	gui/qt/components/custom_menus.moc.cpp \
+	gui/qt/menus/custom_menus.moc.cpp \
 	gui/qt/components/recent_media_model.moc.cpp \
 	gui/qt/components/selectable_list_model.moc.cpp \
 	gui/qt/components/settings.moc.cpp \
@@ -616,18 +616,18 @@ libqt_plugin_la_QML = \
 	gui/qt/qml/utils/VideoProgressBar.qml \
         gui/qt/qml/utils/SearchBox.qml \
         gui/qt/qml/utils/SortControl.qml \
-	gui/qt/qml/menus/CheckableModelSubMenu.qml \
-	gui/qt/qml/menus/AudioMenu.qml \
-	gui/qt/qml/menus/HelpMenu.qml \
-	gui/qt/qml/menus/MainDropdownMenu.qml \
-	gui/qt/qml/menus/MainMenubar.qml \
-	gui/qt/qml/menus/MediaMenu.qml \
-	gui/qt/qml/menus/PlaybackMenu.qml \
-	gui/qt/qml/menus/PopupMenu.qml \
-	gui/qt/qml/menus/SubtitleMenu.qml \
-	gui/qt/qml/menus/ToolsMenu.qml \
-	gui/qt/qml/menus/ViewMenu.qml \
-	gui/qt/qml/menus/VideoMenu.qml \
+	gui/qt/menus/qml/CheckableModelSubMenu.qml \
+	gui/qt/menus/qml/AudioMenu.qml \
+	gui/qt/menus/qml/HelpMenu.qml \
+	gui/qt/menus/qml/MainDropdownMenu.qml \
+	gui/qt/menus/qml/MainMenubar.qml \
+	gui/qt/menus/qml/MediaMenu.qml \
+	gui/qt/menus/qml/PlaybackMenu.qml \
+	gui/qt/menus/qml/PopupMenu.qml \
+	gui/qt/menus/qml/SubtitleMenu.qml \
+	gui/qt/menus/qml/ToolsMenu.qml \
+	gui/qt/menus/qml/ViewMenu.qml \
+	gui/qt/menus/qml/VideoMenu.qml \
 	gui/qt/medialibrary/qml/ArtistTopBanner.qml \
 	gui/qt/medialibrary/qml/AudioGridItem.qml \
 	gui/qt/medialibrary/qml/MainDisplay.qml \

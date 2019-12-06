@@ -69,7 +69,7 @@
 
 #include "util/qmleventfilter.hpp"
 
-#include "menus.hpp"                            // Menu creation
+#include "menus/menus.hpp"                            // Menu creation
 
 #include <QCloseEvent>
 #include <QKeyEvent>

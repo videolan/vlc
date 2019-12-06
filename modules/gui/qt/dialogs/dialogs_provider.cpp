@@ -31,7 +31,7 @@
 #include "dialogs_provider.hpp"
 #include "player/player_controller.hpp" /* Load Subtitles */
 #include "playlist/playlist_controller.hpp"
-#include "menus.hpp"
+#include "menus/menus.hpp"
 #include "recents.hpp"
 #include "util/qt_dirs.hpp"
 #include "util/customwidgets.hpp" /* VLCKeyToString() */

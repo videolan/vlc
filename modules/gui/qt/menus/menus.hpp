@@ -26,7 +26,7 @@
 
 #include "qt.hpp"
 
-#include "components/custom_menus.hpp"
+#include "custom_menus.hpp"
 
 #include <QObject>
 #include <QMenu>

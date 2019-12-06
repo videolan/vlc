@@ -678,8 +678,8 @@ modules/gui/qt/components/controller.cpp
 modules/gui/qt/components/controller.hpp
 modules/gui/qt/components/controller_widget.cpp
 modules/gui/qt/components/controller_widget.hpp
-modules/gui/qt/components/custom_menus.cpp
-modules/gui/qt/components/custom_menus.hpp
+modules/gui/qt/menus/custom_menus.cpp
+modules/gui/qt/menus/custom_menus.hpp
 modules/gui/qt/dialogs/epg/EPGChannels.cpp
 modules/gui/qt/dialogs/epg/EPGChannels.hpp
 modules/gui/qt/dialogs/epg/EPGItem.cpp
@@ -761,8 +761,8 @@ modules/gui/qt/main_interface_win32.cpp
 modules/gui/qt/main_interface_win32.hpp
 modules/gui/qt/dialogs/plugins/addons_manager.cpp
 modules/gui/qt/dialogs/plugins/addons_manager.hpp
-modules/gui/qt/menus.cpp
-modules/gui/qt/menus.hpp
+modules/gui/qt/menus/menus.cpp
+modules/gui/qt/menus/menus.hpp
 modules/gui/qt/qt.cpp
 modules/gui/qt/qt.hpp
 modules/gui/qt/recents.cpp
