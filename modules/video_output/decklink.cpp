@@ -772,6 +772,7 @@ static int ControlVideo(vout_display_t *vd, int query, va_list args)
 static int OpenVideo(vout_display_t *vd, const vout_display_cfg_t *cfg,
                      video_format_t *fmtp, vlc_video_context *context)
 {
+    VLC_UNUSED(cfg); VLC_UNUSED(context);
     decklink_sys_t *sys = HoldDLSys(VLC_OBJECT(vd), VIDEO_ES);
     if(!sys)
         return VLC_ENOMEM;
