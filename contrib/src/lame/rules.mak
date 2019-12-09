@@ -2,11 +2,16 @@
 
 LAME_VERSION := 3.100
 LAME_URL := $(SF)/lame/lame-$(LAME_VERSION).tar.gz
+LAME_CFLAGS := $(CFLAGS)
 
 $(TARBALLS)/lame-$(LAME_VERSION).tar.gz:
 	$(call download_pkg,$(LAME_URL),lame)
 
 .sum-lame: lame-$(LAME_VERSION).tar.gz
+
+ifdef WITH_OPTIMIZATION
+LAME_CFLAGS += -DNDEBUG
+endif
 
 lame: lame-$(LAME_VERSION).tar.gz .sum-lame
 	$(UNPACK)
@@ -23,6 +28,6 @@ endif
 
 .lame: lame
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-analyzer-hooks --disable-decoder --disable-gtktest --disable-frontend
+	cd $< && $(HOSTVARS) CFLAGS="$(LAME_CFLAGS)" ./configure $(HOSTCONF) --disable-analyzer-hooks --disable-decoder --disable-gtktest --disable-frontend
 	cd $< && $(MAKE) install
 	touch $@
