@@ -107,12 +107,12 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/settings.hpp \
 	gui/qt/util/audio_device_model.cpp  \
 	gui/qt/util/audio_device_model.hpp \
-	gui/qt/components/voutwindow/videosurface.cpp \
-	gui/qt/components/voutwindow/videosurface.hpp \
-	gui/qt/components/voutwindow/qvoutwindow.cpp \
-	gui/qt/components/voutwindow/qvoutwindow.hpp \
-	gui/qt/components/voutwindow/qvoutwindowdummy.cpp \
-	gui/qt/components/voutwindow/qvoutwindowdummy.hpp \
+	gui/qt/voutwindow/videosurface.cpp \
+	gui/qt/voutwindow/videosurface.hpp \
+	gui/qt/voutwindow/qvoutwindow.cpp \
+	gui/qt/voutwindow/qvoutwindow.hpp \
+	gui/qt/voutwindow/qvoutwindowdummy.cpp \
+	gui/qt/voutwindow/qvoutwindowdummy.hpp \
 	gui/qt/menus/custom_menus.cpp \
 	gui/qt/menus/custom_menus.hpp \
 	gui/qt/dialogs/epg/epg.cpp gui/qt/dialogs/epg/epg.hpp \
@@ -261,9 +261,9 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/selectable_list_model.moc.cpp \
 	gui/qt/util/settings.moc.cpp \
 	gui/qt/util/audio_device_model.moc.cpp \
-	gui/qt/components/voutwindow/videosurface.moc.cpp \
-	gui/qt/components/voutwindow/qvoutwindow.moc.cpp \
-	gui/qt/components/voutwindow/qvoutwindowdummy.moc.cpp \
+	gui/qt/voutwindow/videosurface.moc.cpp \
+	gui/qt/voutwindow/qvoutwindow.moc.cpp \
+	gui/qt/voutwindow/qvoutwindowdummy.moc.cpp \
 	gui/qt/dialogs/epg/epg.moc.cpp \
 	gui/qt/dialogs/epg/EPGChannels.moc.cpp \
 	gui/qt/dialogs/epg/EPGProgram.moc.cpp \

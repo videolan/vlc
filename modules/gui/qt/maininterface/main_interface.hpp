@@ -28,7 +28,7 @@
 
 #include "widgets/native/qvlcframe.hpp"
 #include "player/player_controller.hpp"
-#include "components/voutwindow/qvoutwindow.hpp"
+#include "voutwindow/qvoutwindow.hpp"
 
 #include <QSystemTrayIcon>
 #include <QStackedWidget>

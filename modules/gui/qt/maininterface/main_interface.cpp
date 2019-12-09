@@ -63,7 +63,7 @@
 #include "dialogs/dialogs/dialogmodel.hpp"
 #include "player/playercontrolbarmodel.hpp"
 
-#include "components/voutwindow/qvoutwindowdummy.hpp"
+#include "voutwindow/qvoutwindowdummy.hpp"
 
 #include "util/qml_main_context.hpp"
 
