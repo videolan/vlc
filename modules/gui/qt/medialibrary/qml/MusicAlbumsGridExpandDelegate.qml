@@ -21,10 +21,10 @@ import QtQuick.Layouts 1.3
 
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
     property variant model: MLAlbumModel{}
     //color: VLCStyle.colors.bg
@@ -75,7 +75,7 @@ Utils.NavigableFocusScope {
                         right: parent.right
                     }
 
-                    Utils.IconToolButton {
+                    Widgets.IconToolButton {
                         id: addButton
                         focus: true
 
@@ -91,7 +91,7 @@ Utils.NavigableFocusScope {
 
                         KeyNavigation.right: playButton
                     }
-                    Utils.IconToolButton {
+                    Widgets.IconToolButton {
                         id: playButton
 
                         Layout.preferredWidth: VLCStyle.icon_normal

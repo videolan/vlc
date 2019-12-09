@@ -21,10 +21,10 @@ import QtQuick.Layouts 1.3
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
-import "qrc:///utils/" as Utils
-import "qrc:///utils/KeyHelper.js" as KeyHelper
+import "qrc:///widgets/" as Widgets
+import "qrc:///util/KeyHelper.js" as KeyHelper
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
     property alias columnLayout: columnLayout
 
@@ -51,7 +51,7 @@ Utils.NavigableFocusScope {
                 id: columnLayout
                 anchors.fill: parent
 
-                Utils.TextToolButton {
+                Widgets.TextToolButton {
                     id: authorsBtn
                     text: qsTr("Authors")
                     Layout.alignment: Qt.AlignLeft | Qt.AlignTop
@@ -64,7 +64,7 @@ Utils.NavigableFocusScope {
                     focus: true
                 }
 
-                Utils.TextToolButton {
+                Widgets.TextToolButton {
                     id: licenseBtn
                     text: qsTr("License")
                     Layout.alignment: Qt.AlignLeft | Qt.AlignTop
@@ -73,7 +73,7 @@ Utils.NavigableFocusScope {
                     KeyNavigation.right: textScroll
                 }
 
-                Utils.TextToolButton {
+                Widgets.TextToolButton {
                     id: creditBtn
                     text: qsTr("Credit")
                     Layout.alignment: Qt.AlignLeft | Qt.AlignTop
@@ -90,7 +90,7 @@ Utils.NavigableFocusScope {
                     Layout.fillHeight: true
                 }
 
-                Utils.IconToolButton {
+                Widgets.IconToolButton {
                     id: backBtn
                     size: VLCStyle.icon_large
                     iconText: VLCIcons.exit

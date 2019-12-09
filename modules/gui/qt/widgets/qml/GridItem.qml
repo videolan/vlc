@@ -22,7 +22,7 @@ import QtQml.Models 2.2
 import QtGraphicalEffects 1.0
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 Rectangle {

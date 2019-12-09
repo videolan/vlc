@@ -19,9 +19,9 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 import "qrc:///style/"
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
 
     width: childrenRect.width
@@ -48,7 +48,7 @@ Utils.NavigableFocusScope {
             popup.close()
     }
 
-    Utils.IconToolButton {
+    Widgets.IconToolButton {
         id: button
 
         size: VLCStyle.icon_normal

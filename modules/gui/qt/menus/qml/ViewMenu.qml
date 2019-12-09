@@ -19,9 +19,9 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 import "qrc:///style/"
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
-Utils.MenuExt {
+Widgets.MenuExt {
     id: viewMenu
     Action {
         text: qsTr("Play&list")
@@ -49,7 +49,7 @@ Utils.MenuExt {
 
     Loader {
         active: medialib !== null
-        sourceComponent:  Utils.MenuItemExt {
+        sourceComponent:  Widgets.MenuItemExt {
             text: qsTr("&View Items as Grid")
             checkable: true
             checked: medialib.gridView
@@ -57,11 +57,11 @@ Utils.MenuExt {
         }
     }
 
-    Utils.MenuExt {
+    Widgets.MenuExt {
         title: qsTr("Color Scheme")
         Repeater {
             model: VLCStyle.colors.colorSchemes
-            Utils.MenuItemExt {
+            Widgets.MenuItemExt {
                 text: modelData
                 checkable: true
                 checked: modelData === VLCStyle.colors.state

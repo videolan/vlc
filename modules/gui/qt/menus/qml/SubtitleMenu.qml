@@ -18,9 +18,9 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
-Utils.MenuExt {
+Widgets.MenuExt {
     Action {
         text: qsTr("Add Subtitle File...")
         enabled: player.isPlaying

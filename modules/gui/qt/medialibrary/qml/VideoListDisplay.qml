@@ -21,10 +21,10 @@ import QtQml.Models 2.2
 
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Utils.KeyNavigableTableView {
+Widgets.KeyNavigableTableView {
     id: listView_id
     model: MLVideoModel {
         ml: medialib
@@ -58,13 +58,13 @@ Utils.KeyNavigableTableView {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 active: model.type === "image"
-                sourceComponent: Utils.RoundImage{
+                sourceComponent: Widgets.RoundImage{
                     id: cover
                     height: VLCStyle.video_small_height
                     width: VLCStyle.video_small_width
                     source: !rowModel ? "" : rowModel[model.criteria]
 
-                    Utils.VideoQualityLabel {
+                    Widgets.VideoQualityLabel {
                         id: resolutionLabel
                         anchors {
                             top: cover.top
@@ -74,7 +74,7 @@ Utils.KeyNavigableTableView {
                         }
                         text: !rowModel ? "" : rowModel.resolution_name
                     }
-                    Utils.VideoQualityLabel {
+                    Widgets.VideoQualityLabel {
                         anchors {
                             top: cover.top
                             left: resolutionLabel.right
@@ -85,7 +85,7 @@ Utils.KeyNavigableTableView {
                         text: !rowModel ? "" : rowModel.channel
                         color: "limegreen"
                     }
-                    Utils.VideoProgressBar {
+                    Widgets.VideoProgressBar {
                         value: !rowModel ? 0 : rowModel.saved_position
                         visible: value > 0
                         anchors {
@@ -103,7 +103,7 @@ Utils.KeyNavigableTableView {
                 anchors.right: parent.right
                 anchors.rightMargin: VLCStyle.margin_xxsmall
                 active: model.type === "contextButton"
-                sourceComponent: Utils.ContextButton{
+                sourceComponent: Widgets.ContextButton{
                     backgroundColor: hovered || activeFocus ?
                                          VLCStyle.colors.getBgColor( root.isSelected, hovered,
                                                                     root.activeFocus) : "transparent"

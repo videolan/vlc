@@ -23,13 +23,13 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///main/" as Main
-import "qrc:///utils/" as Utils
-import "qrc:///utils/KeyHelper.js" as KeyHelper
+import "qrc:///widgets/" as Widgets
+import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///playlist/" as PL
 import "qrc:///player/" as Player
 import "qrc:///network/" as Network
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
 
     //name and properties of the tab to be initially loaded
@@ -127,7 +127,7 @@ Utils.NavigableFocusScope {
         color: VLCStyle.colors.bg
         anchors.fill: parent
 
-        Utils.NavigableFocusScope {
+        Widgets.NavigableFocusScope {
             focus: true
             id: medialibId
             anchors.fill: parent
@@ -174,7 +174,7 @@ Utils.NavigableFocusScope {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    Utils.NavigableFocusScope {
+                    Widgets.NavigableFocusScope {
                         id: stackViewZone
                         anchors.fill: parent
 
@@ -205,7 +205,7 @@ Utils.NavigableFocusScope {
                         border.color: VLCStyle.colors.accent
                     }
 
-                    Utils.StackViewExt {
+                    Widgets.StackViewExt {
                         id: stackView
                         anchors {
                             top: parent.top
@@ -218,7 +218,7 @@ Utils.NavigableFocusScope {
                             leftMargin: VLCStyle.applicationHorizontalMargin
                         }
 
-                        Utils.ScanProgressBar {
+                        Widgets.ScanProgressBar {
                             z: 1
                             anchors {
                                 left: parent.left

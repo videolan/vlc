@@ -21,7 +21,7 @@ import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.4
 import org.videolan.vlc 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 import "qrc:///player/" as Player
@@ -118,7 +118,7 @@ Rectangle {
             }
         }
 
-        Utils.StackViewExt {
+        Widgets.StackViewExt {
             id: stackView
             anchors.fill: parent
             focus: true

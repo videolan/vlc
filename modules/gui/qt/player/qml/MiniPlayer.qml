@@ -4,11 +4,11 @@ import QtQuick.Layouts 1.3
 
 import org.videolan.vlc 0.1
 
-import "qrc:///utils/" as Utils
-import "qrc:///utils/KeyHelper.js" as KeyHelper
+import "qrc:///widgets/" as Widgets
+import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
 
     id: root
 

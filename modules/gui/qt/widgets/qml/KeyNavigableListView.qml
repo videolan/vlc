@@ -19,7 +19,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 import "qrc:///style/"
-import "KeyHelper.js" as KeyHelper
+import "qrc:///util/KeyHelper.js" as KeyHelper
 
 NavigableFocusScope {
     id: listview_id
@@ -207,4 +207,3 @@ NavigableFocusScope {
         visible: view.orientation === ListView.Horizontal && (view.contentWidth - view.width - view.contentX) > 0
     }
 }
-

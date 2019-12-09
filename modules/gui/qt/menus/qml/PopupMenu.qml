@@ -20,10 +20,10 @@ import QtQuick.Controls 2.4
 
 import org.videolan.vlc 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
 //main menus, to be used as a dropdown menu
-Utils.MenuExt {
+Widgets.MenuExt {
     //make the menu modal, as we are not attached to a QQuickWindow
     modal: true
     closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape

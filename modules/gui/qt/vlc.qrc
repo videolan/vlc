@@ -175,7 +175,7 @@
         <file alias="BannerSources.qml">maininterface/qml/BannerSources.qml</file>
         <file alias="MainInterface.qml">maininterface/qml/MainInterface.qml</file>
     </qresource>
-    <qresource prefix="/utils">
+    <qresource prefix="/widgets">
         <file alias="BusyIndicatorExt.qml">widgets/qml/BusyIndicatorExt.qml</file>
         <file alias="GridItem.qml">widgets/qml/GridItem.qml</file>
         <file alias="ListItem.qml">widgets/qml/ListItem.qml</file>
@@ -207,6 +207,8 @@
         <file alias="NavigableCol.qml">widgets/qml/NavigableCol.qml</file>
         <file alias="NavigableRow.qml">widgets/qml/NavigableRow.qml</file>
         <file alias="TabButtonExt.qml">widgets/qml/TabButtonExt.qml</file>
+    </qresource>
+    <qresource prefix="/util">
         <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>
         <file alias="KeyHelper.js">util/qml/KeyHelper.js</file>
     </qresource>

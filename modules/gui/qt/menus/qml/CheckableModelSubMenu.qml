@@ -18,13 +18,13 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
-Utils.MenuExt {
+Widgets.MenuExt {
     property alias model: values.model
     Repeater {
         id: values
-        Utils.MenuItemExt {
+        Widgets.MenuItemExt {
             text: model.display
             checkable: true
             checked: model.checked

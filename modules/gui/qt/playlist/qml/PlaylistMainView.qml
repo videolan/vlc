@@ -20,7 +20,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///player/" as Player
 import "qrc:///style/"
 import "qrc:///menus/" as Menus
@@ -28,7 +28,7 @@ import "qrc:///menus/" as Menus
 /**
  * lightweight standalone playlist view, used when medialibrary is not loaded
  */
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
     Rectangle {
         anchors.fill: parent

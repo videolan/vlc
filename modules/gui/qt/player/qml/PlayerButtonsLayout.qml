@@ -24,9 +24,9 @@ import QtQml.Models 2.11
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: playerButtonsLayout
     property alias model: buttonsRepeater.model
     property var defaultSize: VLCStyle.icon_medium
@@ -67,7 +67,7 @@ RowLayout{
                 }
                 buttonloader.item.focus = true
 
-                if(buttonloader.item instanceof Utils.IconToolButton)
+                if(buttonloader.item instanceof Widgets.IconToolButton)
                     buttonloader.item.size = model.size === PlayerControlBarModel.WIDGET_BIG ?
                                 VLCStyle.icon_large : playerButtonsLayout.defaultSize
 

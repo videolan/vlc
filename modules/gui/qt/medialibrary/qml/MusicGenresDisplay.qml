@@ -21,10 +21,11 @@ import QtQml.Models 2.2
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///util/" as Util
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
     property alias model: delegateModel.model
     property var sortModel: ListModel {
@@ -35,14 +36,14 @@ Utils.NavigableFocusScope {
         history.push([ "mc", "music", "albums", { parentId: parent } ], History.Go)
     }
 
-    Utils.SelectableDelegateModel {
+    Util.SelectableDelegateModel {
         id: delegateModel
         model: MLGenreModel {
             ml: medialib
         }
 
         delegate: Package {
-            Utils.ListItem {
+            Widgets.ListItem {
                 Package.name: "list"
 
                 width: root.width
@@ -107,7 +108,7 @@ Utils.NavigableFocusScope {
     /* Grid View */
     Component {
         id: gridComponent
-        Utils.ExpandGridView {
+        Widgets.ExpandGridView {
             id: gridView_id
 
             model: delegateModel
@@ -147,7 +148,7 @@ Utils.NavigableFocusScope {
     Component {
         id: listComponent
         /* List View */
-        Utils.KeyNavigableListView {
+        Widgets.KeyNavigableListView {
             id: listView_id
 
             model: delegateModel.parts.list
@@ -165,7 +166,7 @@ Utils.NavigableFocusScope {
     }
 
 
-    Utils.StackViewExt {
+    Widgets.StackViewExt {
         id: view
 
         anchors.fill: parent

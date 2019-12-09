@@ -22,7 +22,7 @@ import QtGraphicalEffects 1.0
 import org.videolan.vlc 0.1
 
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 Item {
@@ -30,13 +30,13 @@ Item {
     signal restoreFocus();
     property var bgContent: undefined
 
-    Utils.DrawerExt {
+    Widgets.DrawerExt {
         id: errorPopup
         anchors {
             bottom: parent.bottom
             horizontalCenter: parent.horizontalCenter
         }
-        edge: Utils.DrawerExt.Edges.Bottom
+        edge: Widgets.DrawerExt.Edges.Bottom
         width: parent.width * 0.8
         z: 10
 
@@ -156,7 +156,7 @@ Item {
                 RowLayout {
                     anchors.fill: parent
 
-                    Utils.TextToolButton {
+                    Widgets.TextToolButton {
                         id: loginCancel
                         Layout.fillWidth: true
                         text: qsTr("cancel")
@@ -169,7 +169,7 @@ Item {
                         }
                     }
 
-                    Utils.TextToolButton {
+                    Widgets.TextToolButton {
                         id: loginOk
                         Layout.fillWidth: true
                         text: qsTr("Ok")
@@ -226,7 +226,7 @@ Item {
                 RowLayout {
                     anchors.fill: parent
 
-                    Utils.TextToolButton {
+                    Widgets.TextToolButton {
                         Layout.fillWidth: true
                         id: cancel
                         focus: true
@@ -239,7 +239,7 @@ Item {
                         }
                     }
 
-                    Utils.TextToolButton {
+                    Widgets.TextToolButton {
                         id: action1
                         Layout.fillWidth: true
                         visible: action1.text !== ""
@@ -251,7 +251,7 @@ Item {
                         }
                     }
 
-                    Utils.TextToolButton {
+                    Widgets.TextToolButton {
                         id: action2
                         Layout.fillWidth: true
                         visible: action2.text !== ""

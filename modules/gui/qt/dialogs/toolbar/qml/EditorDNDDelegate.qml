@@ -21,7 +21,7 @@ import QtQml.Models 2.11
 
 import org.videolan.vlc 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 MouseArea {

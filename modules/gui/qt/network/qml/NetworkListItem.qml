@@ -22,10 +22,10 @@ import QtQml.Models 2.2
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Utils.ListItem {
+Widgets.ListItem {
     id: item
 
     width: root.width

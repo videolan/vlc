@@ -19,9 +19,9 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 
 import "qrc:///style/"
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
 
     id: root
 
@@ -93,7 +93,7 @@ Utils.NavigableFocusScope {
         Row {
             id: content
 
-            Utils.IconToolButton {
+            Widgets.IconToolButton {
                 id: icon
 
                 size: VLCStyle.icon_normal

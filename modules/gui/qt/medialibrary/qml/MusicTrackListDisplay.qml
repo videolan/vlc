@@ -22,10 +22,10 @@ import QtQuick.Layouts 1.3
 
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Utils.KeyNavigableTableView {
+Widgets.KeyNavigableTableView {
     id: root
 
     sortModel: ListModel {

@@ -18,9 +18,9 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
-Utils.MenuExt {
+Widgets.MenuExt {
     Action { text: qsTr("&Effects and Filters");    onTriggered: dialogProvider.extendedDialog();   icon.source: "qrc:/menu/settings.svg";    shortcut: "Ctrl+E" }
     Action { text: qsTr("&Track Synchronization");  onTriggered: dialogProvider.synchroDialog();    icon.source: "qrc:/menu/settings.svg";                       }
     Action { text: qsTr("Media &Information") ;     onTriggered: dialogProvider.mediaInfoDialog();  icon.source: "qrc:/menu/info.svg";        shortcut: "Ctrl+I" }

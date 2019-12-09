@@ -22,11 +22,11 @@ import QtQml.Models 2.2
 
 import org.videolan.vlc 0.1
 
-import "qrc:///utils/" as Utils
-import "qrc:///utils/KeyHelper.js" as KeyHelper
+import "qrc:///widgets/" as Widgets
+import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
 
     property var plmodel: PlaylistListModel {
@@ -37,7 +37,7 @@ Utils.NavigableFocusScope {
     property int rightPadding: 0
 
     //label for DnD
-    Utils.DNDLabel {
+    Widgets.DNDLabel {
         id: dragItem
     }
 
@@ -117,7 +117,7 @@ Utils.NavigableFocusScope {
         anchors.fill: parent
 
 
-    Utils.KeyNavigableListView {
+    Widgets.KeyNavigableListView {
         id: view
 
         Layout.fillWidth: true

@@ -21,7 +21,8 @@ import QtQml.Models 2.2
 import QtQuick.Layouts 1.3
 import QtGraphicalEffects 1.0
 
-import "qrc:///utils/" as Utils
+import "qrc:///util/" as Util
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 NavigableFocusScope {
@@ -54,7 +55,7 @@ NavigableFocusScope {
 
     Accessible.role: Accessible.Table
 
-    Utils.SelectableDelegateModel {
+    Util.SelectableDelegateModel {
         id: delegateModel
 
         model: root.model

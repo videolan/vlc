@@ -22,7 +22,7 @@ import QtQuick.Layouts 1.3
 import QtGraphicalEffects 1.0
 
 import "qrc:///style/"
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
 NavigableFocusScope {
     id: root

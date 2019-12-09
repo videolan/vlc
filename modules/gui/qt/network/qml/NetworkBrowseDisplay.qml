@@ -23,16 +23,16 @@ import QtQml 2.11
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
 
     property alias tree: providerModel.tree
 
     property var extraLocalActions: ObjectModel {
-        Utils.TabButtonExt {
+        Widgets.TabButtonExt {
             text:  providerModel.indexed ?  qsTr("Remove from medialibrary") : qsTr("Add to medialibrary")
             visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
             onClicked: providerModel.indexed = !providerModel.indexed
@@ -65,7 +65,7 @@ Utils.NavigableFocusScope {
         }
     }
 
-    Utils.MenuExt {
+    Widgets.MenuExt {
         id: contextMenu
         property var delegateModel: undefined
         property var model: ({})
@@ -109,7 +109,7 @@ Utils.NavigableFocusScope {
 
             onObjectAdded: model[index].active && contextMenu.insertItem( index, object )
             onObjectRemoved: model[index].active && contextMenu.removeItem( object )
-            delegate: Utils.MenuItemExt {
+            delegate: Widgets.MenuItemExt {
                 focus: true
                 text: modelData.text
                 onTriggered: {
@@ -127,11 +127,11 @@ Utils.NavigableFocusScope {
     Component{
         id: gridComponent
 
-        Utils.ExpandGridView {
+        Widgets.ExpandGridView {
             model: delegateModel
             modelCount: delegateModel.items.count
 
-            headerDelegate: Utils.LabelSeparator {
+            headerDelegate: Widgets.LabelSeparator {
                 text: providerModel.name
                 width: view.width
             }
@@ -139,7 +139,7 @@ Utils.NavigableFocusScope {
             cellWidth: VLCStyle.network_normal + VLCStyle.margin_large
             cellHeight: VLCStyle.network_normal + VLCStyle.margin_xlarge
 
-            delegate: Utils.GridItem {
+            delegate: Widgets.GridItem {
                 id: delegateGrid
                 property var model: ({})
 
@@ -199,7 +199,7 @@ Utils.NavigableFocusScope {
 
     Component{
         id: listComponent
-        Utils.KeyNavigableListView {
+        Widgets.KeyNavigableListView {
             height: view.height
             width: view.width
             model: delegateModel.parts.list
@@ -218,14 +218,14 @@ Utils.NavigableFocusScope {
                 history.previous(History.Go)
             }
 
-            header:  Utils.LabelSeparator {
+            header:  Widgets.LabelSeparator {
                 text: providerModel.name
                 width: view.width
             }
         }
     }
 
-    Utils.StackViewExt {
+    Widgets.StackViewExt {
         id: view
         anchors.fill:parent
         clip: true
@@ -242,7 +242,7 @@ Utils.NavigableFocusScope {
             }
         }
 
-        Utils.BusyIndicatorExt {
+        Widgets.BusyIndicatorExt {
             runningDelayed: providerModel.parsingPending
             anchors.centerIn: parent
             z: 1

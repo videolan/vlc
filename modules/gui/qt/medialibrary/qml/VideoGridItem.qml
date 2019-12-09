@@ -19,10 +19,10 @@ import QtQuick 2.11
 
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Utils.GridItem {
+Widgets.GridItem {
     property var model: ({})
     image: model.thumbnail || VLCStyle.noArtCover
     title: model.title || qsTr("Unknown title")

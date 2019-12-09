@@ -22,10 +22,10 @@ import QtQuick.Layouts 1.3
 
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: expandRect
 
     property int currentId: -1
@@ -126,7 +126,7 @@ Utils.NavigableFocusScope {
             }
 
 
-            Utils.NavigableFocusScope {
+            Widgets.NavigableFocusScope {
                 id: infoPanel
 
                 Layout.fillHeight: true
@@ -218,7 +218,7 @@ Utils.NavigableFocusScope {
 
             }
 
-            Utils.NavigableCol {
+            Widgets.NavigableCol {
                 id: actionButtons
 
                 focus: true
@@ -227,14 +227,14 @@ Utils.NavigableFocusScope {
                 Layout.preferredWidth: childrenRect.width
 
                 model: ObjectModel {
-                    Utils.TabButtonExt {
+                    Widgets.TabButtonExt {
                         id: playActionBtn
                         iconTxt: VLCIcons.play
                         text: qsTr("Play")
                         onClicked: medialib.addAndPlay( expandRect.model.id )
                     }
 
-                    Utils.TabButtonExt {
+                    Widgets.TabButtonExt {
                         id: enqueueActionBtn
                         iconTxt: VLCIcons.add
                         text: qsTr("Enqueue")
@@ -248,14 +248,14 @@ Utils.NavigableFocusScope {
             }
 
 
-            Utils.NavigableFocusScope {
+            Widgets.NavigableFocusScope {
                 id: closeButton
 
                 Layout.alignment: Qt.AlignTop | Qt.AlignVCenter
                 Layout.preferredWidth: closeButtonId.size
                 Layout.preferredHeight: closeButtonId.size
 
-                Utils.IconToolButton {
+                Widgets.IconToolButton {
                     id: closeButtonId
 
                     size: VLCStyle.icon_normal

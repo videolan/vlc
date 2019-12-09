@@ -20,11 +20,11 @@ import QtQuick.Controls 2.4
 import QtQuick.Controls.impl 2.4
 import QtQuick.Layouts 1.3
 
-import "qrc:///utils/" as Utils
-import "qrc:///utils/KeyHelper.js" as KeyHelper
+import "qrc:///widgets/" as Widgets
+import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: overlayMenu
     visible: false
 
@@ -97,7 +97,7 @@ Utils.NavigableFocusScope {
         }
 
 
-        Utils.KeyNavigableListView {
+        Widgets.KeyNavigableListView {
             id: playlistMenu
             anchors.fill: parent
             focus: true

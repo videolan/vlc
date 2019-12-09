@@ -22,10 +22,10 @@ import QtQml 2.11
 
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: topFocusScope
     focus: true
 
@@ -67,13 +67,13 @@ Utils.NavigableFocusScope {
 
             spacing: VLCStyle.margin_normal
 
-            Utils.LabelSeparator {
+            Widgets.LabelSeparator {
                 text: qsTr("Devices")
                 width: flickable.width
                 visible: machineDM.items.count !== 0
             }
 
-            Utils.KeyNavigableListView {
+            Widgets.KeyNavigableListView {
                 id: deviceSection
 
                 focus: false
@@ -95,13 +95,13 @@ Utils.NavigableFocusScope {
                 navigationDownItem: lanSection.visible ?  lanSection : undefined
             }
 
-            Utils.LabelSeparator {
+            Widgets.LabelSeparator {
                 text: qsTr("LAN")
                 width: flickable.width
                 visible: lanDM.items.count !== 0
             }
 
-            Utils.KeyNavigableListView {
+            Widgets.KeyNavigableListView {
                 id: lanSection
 
                 visible: lanDM.items.count !== 0

@@ -22,7 +22,7 @@ import QtQuick.Controls 2.4
 
 import org.videolan.vlc 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///menus/" as Menus
 import "qrc:///style/"
 
@@ -99,7 +99,7 @@ Item{
 
     Component{
         id: backBtnDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: backBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.exit
@@ -111,7 +111,7 @@ Item{
 
     Component{
         id: randomBtnDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: randomBtn
             size: VLCStyle.icon_medium
             checked: mainPlaylistController.random
@@ -124,7 +124,7 @@ Item{
 
     Component{
         id: prevBtnDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: prevBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.previous
@@ -136,7 +136,7 @@ Item{
 
     Component{
         id:playBtnDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: playBtn
             size: VLCStyle.icon_medium
             iconText: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
@@ -154,7 +154,7 @@ Item{
 
     Component{
         id: nextBtnDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: nextBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.next
@@ -166,7 +166,7 @@ Item{
 
     Component{
         id: chapterPreviousBtnDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: chapterPreviousBtnDelegate
             size: VLCStyle.icon_medium
             width: visible? VLCStyle.icon_medium : 0
@@ -182,7 +182,7 @@ Item{
 
     Component{
         id: chapterNextBtnDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: chapterPreviousBtnDelegate
             size: VLCStyle.icon_medium
             width: visible? VLCStyle.icon_medium : 0
@@ -198,7 +198,7 @@ Item{
 
     Component{
         id: repeatBtnDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: repeatBtn
             size: VLCStyle.icon_medium
             checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
@@ -213,7 +213,7 @@ Item{
 
     Component{
         id: langBtnDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: langBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.audiosub
@@ -316,7 +316,7 @@ Item{
 
     Component{
         id:playlistBtnDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: playlistBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.playlist
@@ -334,7 +334,7 @@ Item{
 
     Component{
         id: menuBtnDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: menuBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.menu
@@ -414,7 +414,7 @@ Item{
 
     Component{
         id: fullScreenBtnDelegate
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: fullScreenBtn
             size: VLCStyle.icon_medium
             iconText: rootWindow.interfaceFullScreen ?VLCIcons.defullscreen :VLCIcons.fullscreen
@@ -426,7 +426,7 @@ Item{
 
     Component{
         id: recordBtnDelegate
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: recordBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.record
@@ -440,7 +440,7 @@ Item{
 
     Component{
         id: toggleABloopstateDelegate
-        Utils.IconToolButton {
+        Widgets.IconToolButton {
             id: abBtn
             size: VLCStyle.icon_medium
             checked: player.ABloopState !== PlayerController.ABLOOP_STATE_NONE
@@ -464,7 +464,7 @@ Item{
 
     Component{
         id: snapshotBtnDelegate
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: snapshotBtn
             size: VLCStyle.icon_medium
             enabled: !paintOnly && player.isPlaying
@@ -478,7 +478,7 @@ Item{
 
     Component{
         id: stopBtndelgate
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: stopBtn
             size: VLCStyle.icon_medium
             enabled: !paintOnly && player.isPlaying
@@ -491,7 +491,7 @@ Item{
 
     Component{
         id: mediainfoBtnDelegate
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: infoBtn
             size: VLCStyle.icon_medium
             enabled: !paintOnly && player.isPlaying
@@ -505,7 +505,7 @@ Item{
     Component{
         id: framebyframeDelegate
 
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: frameBtn
             size: VLCStyle.icon_medium
             enabled: !paintOnly && player.isPlaying
@@ -519,7 +519,7 @@ Item{
     Component{
         id: fasterBtnDelegate
 
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: fasterBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.faster
@@ -532,7 +532,7 @@ Item{
     Component{
         id: slowerBtnDelegate
 
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: slowerBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.slower
@@ -544,7 +544,7 @@ Item{
 
     Component{
         id: openmediaBtnDelegate
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: openMediaBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.eject
@@ -556,7 +556,7 @@ Item{
 
     Component{
         id: extdSettingsBtnDelegate
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: extdSettingsBtn
             size: VLCStyle.icon_medium
             text: VLCIcons.extended
@@ -568,7 +568,7 @@ Item{
 
     Component{
         id: stepFwdBtnDelegate
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: stepfwdBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.skip_for
@@ -580,7 +580,7 @@ Item{
 
     Component{
         id: stepBackBtnDelegate
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: stepBackBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.skip_back
@@ -592,7 +592,7 @@ Item{
 
     Component{
         id: quitBtnDelegate
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: quitBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.clear
@@ -604,7 +604,7 @@ Item{
 
     Component{
         id: aspectRatioDelegate
-        Utils.ComboBoxExt {
+        Widgets.ComboBoxExt {
             property bool paintOnly: false
             enabled: !paintOnly
             Layout.alignment: Qt.AlignVCenter

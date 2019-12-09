@@ -22,10 +22,11 @@ import QtQuick.Layouts 1.3
 
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///util/" as Util
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
     property alias model: delegateModel.model
     property var sortModel: ListModel {
@@ -34,7 +35,7 @@ Utils.NavigableFocusScope {
 
     property var artistId
 
-    Utils.SelectableDelegateModel {
+    Util.SelectableDelegateModel {
         id: delegateModel
         model: MLArtistModel {
             ml: medialib
@@ -44,7 +45,7 @@ Utils.NavigableFocusScope {
             artistId = items.get(0).model.id
         }
 
-        delegate: Utils.ListItem {
+        delegate: Widgets.ListItem {
             height: VLCStyle.icon_normal + VLCStyle.margin_small
             width: artistList.width
 
@@ -114,7 +115,7 @@ Utils.NavigableFocusScope {
         anchors.fill: parent
         visible: delegateModel.items.count > 0
 
-        Utils.KeyNavigableListView {
+        Widgets.KeyNavigableListView {
             width: parent.width * 0.25
             height: parent.height
 

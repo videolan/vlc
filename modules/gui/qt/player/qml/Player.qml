@@ -23,12 +23,12 @@ import QtGraphicalEffects 1.0
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
-import "qrc:///utils/" as Utils
-import "qrc:///utils/KeyHelper.js" as KeyHelper
+import "qrc:///widgets/" as Widgets
+import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///playlist/" as PL
 import "qrc:///menus/" as Menus
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: rootPlayer
 
     //menu/overlay to dismiss
@@ -166,14 +166,14 @@ Utils.NavigableFocusScope {
         }
     }
 
-    Utils.DrawerExt{
+    Widgets.DrawerExt{
         id: topcontrolView
         anchors{
             left: parent.left
             right: parent.right
             top: parent.top
         }
-        edge: Utils.DrawerExt.Edges.Top
+        edge: Widgets.DrawerExt.Edges.Top
         property var noAutoHide: topcontrolView.contentItem.noAutoHide
 
         state: "visible"
@@ -199,7 +199,7 @@ Utils.NavigableFocusScope {
         }
     }
 
-    Utils.DrawerExt {
+    Widgets.DrawerExt {
         id: playlistpopup
         anchors {
             top: topcontrolView.bottom
@@ -209,7 +209,7 @@ Utils.NavigableFocusScope {
         property bool showPlaylist: false
         property var previousFocus: undefined
         focus: false
-        edge: Utils.DrawerExt.Edges.Right
+        edge: Widgets.DrawerExt.Edges.Right
         state: showPlaylist && rootWindow.playlistDocked ? "visible" : "hidden"
         component: Rectangle {
             color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
@@ -240,7 +240,7 @@ Utils.NavigableFocusScope {
         }
     }
 
-    Utils.DrawerExt {
+    Widgets.DrawerExt {
         id: controlBarView
         focus: true
         anchors {
@@ -251,7 +251,7 @@ Utils.NavigableFocusScope {
         property var  noAutoHide: controlBarView.contentItem.noAutoHide
 
         state: "visible"
-        edge: Utils.DrawerExt.Edges.Bottom
+        edge: Widgets.DrawerExt.Edges.Bottom
 
         component: Rectangle {
             id: controllerBarId

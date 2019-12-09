@@ -21,7 +21,7 @@ import QtQuick.Layouts 1.3
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
 Item {
     id: root

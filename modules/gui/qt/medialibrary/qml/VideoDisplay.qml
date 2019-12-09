@@ -22,11 +22,12 @@ import QtQml.Models 2.2
 
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///util/" as Util
+import "qrc:///widgets/" as Widgets
 import "qrc:///dialogs/" as DG
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
     property var currentIndex: view.currentItem.currentIndex
 
@@ -40,44 +41,44 @@ Utils.NavigableFocusScope {
         onRejected: console.log("Cancel clicked")
     }
 
-    Utils.MenuExt {
+    Widgets.MenuExt {
         id: contextMenu
         property var model: ({})
         closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
 
-        Utils.MenuItemExt {
+        Widgets.MenuItemExt {
             id: playMenuItem
             text: "Play from start"
             onTriggered: medialib.addAndPlay( contextMenu.model.id )
         }
-        Utils.MenuItemExt {
+        Widgets.MenuItemExt {
             text: "Play all"
             onTriggered: console.log("not implemented")
         }
-        Utils.MenuItemExt {
+        Widgets.MenuItemExt {
             text: "Play as audio"
             onTriggered: console.log("not implemented")
         }
-        Utils.MenuItemExt {
+        Widgets.MenuItemExt {
             text: "Enqueue"
             onTriggered: medialib.addToPlaylist( contextMenu.model.id )
         }
-        Utils.MenuItemExt {
+        Widgets.MenuItemExt {
             enabled: medialib.gridView
             text: "Information"
             onTriggered: {
                 view.currentItem.switchExpandItem(contextMenu.model.index)
             }
         }
-        Utils.MenuItemExt {
+        Widgets.MenuItemExt {
             text: "Download subtitles"
             onTriggered: console.log("not implemented")
         }
-        Utils.MenuItemExt {
+        Widgets.MenuItemExt {
             text: "Add to playlist"
             onTriggered: console.log("not implemented")
         }
-        Utils.MenuItemExt {
+        Widgets.MenuItemExt {
             text: "Delete"
             onTriggered: deleteDialog.open()
         }
@@ -85,7 +86,7 @@ Utils.NavigableFocusScope {
         onClosed: contextMenu.parent.forceActiveFocus()
 
     }
-    Utils.SelectableDelegateModel {
+    Util.SelectableDelegateModel {
         id: videosDelegate
 
         model: MLVideoModel {
@@ -106,7 +107,7 @@ Utils.NavigableFocusScope {
     Component {
         id: gridComponent
 
-        Utils.ExpandGridView {
+        Widgets.ExpandGridView {
             id: videosGV
             property Item currentItem: Item{}
 
@@ -114,7 +115,7 @@ Utils.NavigableFocusScope {
             model: videosDelegate
             modelCount: videosDelegate.items.count
 
-            headerDelegate: Utils.LabelSeparator {
+            headerDelegate: Widgets.LabelSeparator {
                 id: videosSeparator
                 width: videosGV.width
                 text: qsTr("Videos")
@@ -195,7 +196,7 @@ Utils.NavigableFocusScope {
         }
     }
 
-    Utils.StackViewExt {
+    Widgets.StackViewExt {
         id: view
         anchors.fill:parent
         clip: true

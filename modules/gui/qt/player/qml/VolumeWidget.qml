@@ -20,9 +20,9 @@ import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.4
 import QtGraphicalEffects 1.0
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
-import "qrc:///utils/KeyHelper.js" as KeyHelper
+import "qrc:///util/KeyHelper.js" as KeyHelper
 
 FocusScope{
     id: widgetfscope
@@ -40,7 +40,7 @@ FocusScope{
 
     RowLayout{
         id: volumeWidget
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: volumeBtn
             paintOnly: widgetfscope.paintOnly
             size: VLCStyle.icon_normal

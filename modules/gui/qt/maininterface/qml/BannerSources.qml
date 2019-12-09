@@ -23,11 +23,11 @@ import org.videolan.vlc 0.1
 import QtQml.Models 2.11
 
 import "qrc:///style/"
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///menus/" as Menus
 
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
 
     height: (VLCStyle.icon_normal + VLCStyle.margin_xxsmall) * 2 + VLCStyle.applicationVerticalMargin
@@ -77,7 +77,7 @@ Utils.NavigableFocusScope {
                 width: parent.width
                 height: VLCStyle.icon_normal
 
-                Utils.NavigableRow {
+                Widgets.NavigableRow {
                     id: historyGroup
 
                     anchors {
@@ -94,7 +94,7 @@ Utils.NavigableFocusScope {
                             enabled: false
                         }
 
-                        Utils.IconToolButton {
+                        Widgets.IconToolButton {
                             id: history_back
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.topbar_previous
@@ -103,7 +103,7 @@ Utils.NavigableFocusScope {
                             enabled: !history.previousEmpty
                         }
 
-                        Utils.IconToolButton {
+                        Widgets.IconToolButton {
                             id: history_next
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.topbar_next
@@ -119,7 +119,7 @@ Utils.NavigableFocusScope {
                 }
 
                 /* Button for the sources */
-                Utils.NavigableRow {
+                Widgets.NavigableRow {
                     id: globalMenuGroup
 
                     anchors {
@@ -135,14 +135,14 @@ Utils.NavigableFocusScope {
                     navigationRightItem: globalCtxGroup
                     navigationDownItem: localMenuGroup.visible ?  localMenuGroup : playlistGroup
 
-                    delegate: Utils.TabButtonExt {
+                    delegate: Widgets.TabButtonExt {
                         iconTxt: model.icon
                         selected: model.index === selectedIndex
                         onClicked: root.itemClicked(model.index)
                     }
                 }
 
-                Utils.NavigableRow {
+                Widgets.NavigableRow {
                     id: globalCtxGroup
 
                     anchors {
@@ -152,14 +152,14 @@ Utils.NavigableFocusScope {
                     }
 
                     model: ObjectModel {
-                        Utils.SearchBox {
+                        Widgets.SearchBox {
                             id: searchBox
                             contentModel: root.contentModel
                             visible: root.contentModel !== undefined
                             enabled: visible
                         }
 
-                        Utils.IconToolButton {
+                        Widgets.IconToolButton {
                             id: menu_selector
 
                             size: VLCStyle.icon_normal
@@ -189,7 +189,7 @@ Utils.NavigableFocusScope {
                 width: parent.width
                 height: VLCStyle.icon_normal
 
-                Utils.NavigableRow {
+                Widgets.NavigableRow {
                     id: localContextGroup
                     anchors {
                         top: parent.top
@@ -202,7 +202,7 @@ Utils.NavigableFocusScope {
 
                         property int countExtra: 0
 
-                        Utils.IconToolButton {
+                        Widgets.IconToolButton {
                             id: list_grid_btn
                             size: VLCStyle.icon_normal
                             iconText: medialib.gridView ? VLCIcons.list : VLCIcons.grid
@@ -210,7 +210,7 @@ Utils.NavigableFocusScope {
                             onClicked: medialib.gridView = !medialib.gridView
                         }
 
-                        Utils.SortControl {
+                        Widgets.SortControl {
                             id: sortControl
 
                             textRole: "text"
@@ -251,7 +251,7 @@ Utils.NavigableFocusScope {
                     navigationUpItem: historyGroup.navigable ? historyGroup : globalMenuGroup
                 }
 
-                Utils.NavigableRow {
+                Widgets.NavigableRow {
                     id: localMenuGroup
                     anchors {
                         top: parent.top
@@ -262,7 +262,7 @@ Utils.NavigableFocusScope {
                     visible: !!model
                     enabled: !!model
 
-                    delegate: Utils.TabButtonExt {
+                    delegate: Widgets.TabButtonExt {
                         text: model.displayText
                         selected: model.index === subSelectedIndex
                         onClicked:  root.subItemClicked(model.index)
@@ -274,7 +274,7 @@ Utils.NavigableFocusScope {
                     navigationUpItem:  globalMenuGroup
                 }
 
-                Utils.NavigableRow {
+                Widgets.NavigableRow {
                     id: playlistGroup
                     anchors {
                         top: parent.top
@@ -283,7 +283,7 @@ Utils.NavigableFocusScope {
                     }
 
                     model: ObjectModel {
-                        Utils.IconToolButton {
+                        Widgets.IconToolButton {
                             id: playlist_btn
 
                             size: VLCStyle.icon_normal

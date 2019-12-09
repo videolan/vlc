@@ -19,7 +19,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 Loader {

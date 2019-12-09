@@ -18,10 +18,10 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
 //main menus, to be used as a dropdown menu
-Utils.MenuExt {    
+Widgets.MenuExt {    
     id: mainDropdownMenu
     //make the menu modal, as we are not attached to a QQuickWindow
     modal: true

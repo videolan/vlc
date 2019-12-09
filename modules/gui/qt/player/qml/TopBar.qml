@@ -22,9 +22,9 @@ import QtQuick.Layouts 1.3
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
-Utils.NavigableFocusScope{
+Widgets.NavigableFocusScope{
     id: topFocusScope
     height: topcontrolContent.implicitHeight
     property bool noAutoHide: false
@@ -64,7 +64,7 @@ Utils.NavigableFocusScope{
                 anchors.leftMargin:  VLCStyle.margin_xsmall
                 anchors.rightMargin: VLCStyle.margin_xsmall
 
-                Utils.IconToolButton {
+                Widgets.IconToolButton {
                     id: backBtn
                     objectName: "IconToolButton"
                     size: VLCStyle.icon_normal
@@ -85,7 +85,7 @@ Utils.NavigableFocusScope{
                     Layout.fillWidth: true
                 }
 
-                Utils.IconToolButton {
+                Widgets.IconToolButton {
                     id: playlistBtn
                     objectName: PlayerControlBarModel.PLAYLIST_BUTTON
                     size: VLCStyle.icon_normal

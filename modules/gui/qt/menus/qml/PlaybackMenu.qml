@@ -20,9 +20,9 @@ import QtQuick.Controls 2.4
 
 import org.videolan.vlc 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
-Utils.MenuExt {
+Widgets.MenuExt {
     property bool isPlaying: player.playingState != PlayerController.PLAYING_STATE_STOPPED
 
 
@@ -55,13 +55,13 @@ Utils.MenuExt {
 
     MenuSeparator { }
 
-    Utils.MenuExt {
+    Widgets.MenuExt {
         title: qsTr("Renderer");
     }
 
     MenuSeparator { }
 
-    Utils.MenuExt {
+    Widgets.MenuExt {
         title: qsTr("Speed");
         enabled: isPlaying
         Action { text: qsTr("&Faster");         onTriggered: player.faster();       icon.source: "qrc:/toolbar/faster2.svg";    }

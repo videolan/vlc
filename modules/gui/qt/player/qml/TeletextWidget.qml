@@ -22,7 +22,7 @@ import QtQuick.Controls 2.4
 
 import org.videolan.vlc 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 FocusScope{
@@ -46,7 +46,7 @@ FocusScope{
 
         spacing: 0
 
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: teleActivateBtn
             paintOnly: widgetfscope.paintOnly
             iconText: VLCIcons.tv
@@ -60,7 +60,7 @@ FocusScope{
                                      teleTransparencyBtn : blueKeyBtn.KeyNavigation.right
         }
 
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: teleTransparencyBtn
             paintOnly: widgetfscope.paintOnly
             iconText: VLCIcons.tvtelx
@@ -73,7 +73,7 @@ FocusScope{
             KeyNavigation.right: telePageNumber
         }
 
-        Utils.SpinBoxExt{
+        Widgets.SpinBoxExt{
             id: telePageNumber
             enabled: player.teletextEnabled
             from: 100
@@ -85,7 +85,7 @@ FocusScope{
             KeyNavigation.right: indexKeyBtn
         }
 
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: indexKeyBtn
             paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
@@ -97,7 +97,7 @@ FocusScope{
             colorDisabled: "grey"
             KeyNavigation.right: redKeyBtn
         }
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: redKeyBtn
             paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
@@ -109,7 +109,7 @@ FocusScope{
             colorDisabled: "grey"
             KeyNavigation.right: greenKeyBtn
         }
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: greenKeyBtn
             paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
@@ -121,7 +121,7 @@ FocusScope{
             colorDisabled: "grey"
             KeyNavigation.right: yellowKeyBtn
         }
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: yellowKeyBtn
             paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled
@@ -133,7 +133,7 @@ FocusScope{
             colorDisabled: "grey"
             KeyNavigation.right: blueKeyBtn
         }
-        Utils.IconToolButton{
+        Widgets.IconToolButton{
             id: blueKeyBtn
             paintOnly: widgetfscope.paintOnly
             enabled: player.teletextEnabled

@@ -22,12 +22,12 @@ import QtQuick.Layouts 1.3
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 import org.videolan.medialib 0.1
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
 
     //name and properties of the tab to be initially loaded
@@ -99,7 +99,7 @@ Utils.NavigableFocusScope {
         spacing: 0
 
         /* The data elements */
-        Utils.StackViewExt  {
+        Widgets.StackViewExt  {
             id: stackView
             Layout.fillWidth: true
             Layout.fillHeight: true

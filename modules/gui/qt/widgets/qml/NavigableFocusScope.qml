@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
-import "KeyHelper.js" as KeyHelper
+import "qrc:///util/KeyHelper.js" as KeyHelper
 
 /*
  * This class is designed to be inherited, It provide basic key handling to navigate between view

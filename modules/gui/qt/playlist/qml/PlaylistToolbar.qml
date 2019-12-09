@@ -21,11 +21,11 @@ import QtQuick.Layouts 1.3
 
 import org.videolan.vlc 0.1
 
-import "qrc:///utils/" as Utils
-import "qrc:///utils/KeyHelper.js" as KeyHelper
+import "qrc:///widgets/" as Widgets
+import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: playlistToolbar
 
     property int leftPadding: 0
@@ -45,7 +45,7 @@ Utils.NavigableFocusScope {
 
             spacing: VLCStyle.margin_normal
 
-            Utils.IconToolButton {
+            Widgets.IconToolButton {
                 id: loop
                 Layout.alignment: Qt.AlignHCenter
                 //Layout.minimumWidth: VLCStyle.icon_normal * 2
@@ -58,7 +58,7 @@ Utils.NavigableFocusScope {
                 focusPolicy: Qt.NoFocus
             }
 
-            Utils.IconToolButton {
+            Widgets.IconToolButton {
                 id: shuffle
                 Layout.alignment: Qt.AlignHCenter
                 //Layout.minimumWidth: VLCStyle.icon_normal * 2
@@ -82,7 +82,7 @@ Utils.NavigableFocusScope {
                 elide: Text.ElideRight
             }
 
-            Utils.SortControl {
+            Widgets.SortControl {
                 id: sort
                 Layout.alignment: Qt.AlignHCenter
                 //Layout.minimumWidth: VLCStyle.icon_normal * 2
@@ -111,7 +111,7 @@ Utils.NavigableFocusScope {
                 navigationParent: playlistToolbar
             }
 
-            Utils.IconToolButton {
+            Widgets.IconToolButton {
                 id: clear
                 Layout.alignment: Qt.AlignHCenter
                 //Layout.minimumWidth: VLCStyle.icon_normal * 2

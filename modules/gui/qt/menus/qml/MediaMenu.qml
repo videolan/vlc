@@ -18,9 +18,9 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 
-Utils.MenuExt {
+Widgets.MenuExt {
     id: mediaMenu
 
     Action { text: qsTr("Open &File..." ) ;               onTriggered: dialogProvider.simpleOpenDialog();          icon.source:"qrc:/type/file-asym.svg"                        }
@@ -33,7 +33,7 @@ Utils.MenuExt {
     Action { text: qsTr("Open &Location from clipboard"); onTriggered: dialogProvider.openUrlDialog();                                                       shortcut: "Ctrl+V" }
 
 
-    Utils.MenuExt {
+    Widgets.MenuExt {
         id: recentsMenu
         title: qsTr("Open &Recent Media")
         property bool hasData: true
@@ -53,7 +53,7 @@ Utils.MenuExt {
         Repeater {
             model: recentsMedias
 
-            Utils.MenuItemExt {
+            Widgets.MenuItemExt {
                 text: mrl
                 onTriggered:{
                     mediaMenu.close() //needed since menuItem isn't a direct child of a menu
@@ -84,7 +84,7 @@ Utils.MenuExt {
             id: clearSepId
         }
 
-        Utils.MenuItemExt {
+        Widgets.MenuItemExt {
             id: clearAction
             text: qsTr("Clear")
             enabled: recentsMenu.hasData

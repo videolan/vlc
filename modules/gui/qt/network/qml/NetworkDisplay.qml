@@ -23,10 +23,10 @@ import QtQml 2.11
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
-import "qrc:///utils/" as Utils
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Utils.NavigableFocusScope {
+Widgets.NavigableFocusScope {
     id: root
 
     property var extraLocalActions: undefined
@@ -52,7 +52,7 @@ Utils.NavigableFocusScope {
         }
     }
 
-    Utils.StackViewExt {
+    Widgets.StackViewExt {
         id: view
         anchors.fill:parent
         clip: true
