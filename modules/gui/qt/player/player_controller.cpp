@@ -22,7 +22,7 @@
 
 #include "player_controller.hpp"
 #include "player_controller_p.hpp"
-#include "recents.hpp"
+#include "util/recents.hpp"
 
 #include <vlc_actions.h>           /* ACTION_ID */
 #include <vlc_url.h>            /* vlc_uri_decode */

@@ -30,7 +30,7 @@
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 
-#include <components/qml_main_context.hpp>
+#include <util/qml_main_context.hpp>
 #include "networksourcelistener.hpp"
 
 #include <memory>

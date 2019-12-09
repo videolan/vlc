@@ -49,8 +49,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/menus/menus.cpp gui/qt/menus/menus.hpp \
 	gui/qt/maininterface/main_interface.cpp gui/qt/maininterface/main_interface.hpp \
 	gui/qt/dialogs/dialogs_provider.cpp gui/qt/dialogs/dialogs_provider.hpp \
-	gui/qt/managers/renderer_manager.cpp gui/qt/managers/renderer_manager.hpp \
-	gui/qt/recents.cpp gui/qt/recents.hpp \
+	gui/qt/util/renderer_manager.cpp gui/qt/util/renderer_manager.hpp \
+	gui/qt/util/recents.cpp gui/qt/util/recents.hpp \
 	gui/qt/util/var_common_p.hpp \
 	gui/qt/util/variables.cpp gui/qt/util/variables.hpp \
 	gui/qt/util/varchoicemodel.cpp  gui/qt/util/varchoicemodel.hpp \
@@ -78,19 +78,19 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.hpp \
 	gui/qt/dialogs/fingerprint/chromaprint.cpp \
 	gui/qt/dialogs/fingerprint/chromaprint.hpp \
-	gui/qt/components/qml_main_context.cpp \
-	gui/qt/components/qml_main_context.hpp \
+	gui/qt/util/qml_main_context.cpp \
+	gui/qt/util/qml_main_context.hpp \
 	gui/qt/dialogs/help/aboutmodel.cpp \
 	gui/qt/dialogs/help/aboutmodel.hpp \
 	gui/qt/dialogs/dialogs/dialogmodel.cpp \
 	gui/qt/dialogs/dialogs/dialogmodel.hpp \
 	gui/qt/dialogs/extended/extended_panels.cpp \
 	gui/qt/dialogs/extended/extended_panels.hpp \
-	gui/qt/components/navigation_history.cpp gui/qt/components/navigation_history.hpp \
+	gui/qt/util/navigation_history.cpp gui/qt/util/navigation_history.hpp \
 	gui/qt/player/player_controller.cpp gui/qt/player/player_controller.hpp gui/qt/player/player_controller_p.hpp \
 	gui/qt/player/playercontrolbarmodel.cpp gui/qt/player/playercontrolbarmodel.hpp \
-	gui/qt/components/selectable_list_model.hpp \
-	gui/qt/components/selectable_list_model.cpp \
+	gui/qt/util/selectable_list_model.hpp \
+	gui/qt/util/selectable_list_model.cpp \
 	gui/qt/dialogs/preferences/preferences.cpp gui/qt/preferences/preferences.hpp \
 	gui/qt/dialogs/preferences/preferences_widgets.cpp \
 	gui/qt/dialogs/preferences/preferences_widgets.hpp \
@@ -101,12 +101,12 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/open/open_panels.cpp gui/qt/dialogs/open/open_panels.hpp \
 	gui/qt/widgets/native/interface_widgets.cpp \
 	gui/qt/widgets/native/interface_widgets.hpp \
-	gui/qt/components/recent_media_model.cpp  \
-	gui/qt/components/recent_media_model.hpp \
-	gui/qt/components/settings.cpp \
-	gui/qt/components/settings.hpp \
-	gui/qt/components/audio_device_model.cpp  \
-	gui/qt/components/audio_device_model.hpp \
+	gui/qt/util/recent_media_model.cpp  \
+	gui/qt/util/recent_media_model.hpp \
+	gui/qt/util/settings.cpp \
+	gui/qt/util/settings.hpp \
+	gui/qt/util/audio_device_model.cpp  \
+	gui/qt/util/audio_device_model.hpp \
 	gui/qt/components/voutwindow/videosurface.cpp \
 	gui/qt/components/voutwindow/videosurface.hpp \
 	gui/qt/components/voutwindow/qvoutwindow.cpp \
@@ -219,8 +219,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/maininterface/main_interface.moc.cpp \
 	gui/qt/menus/menus.moc.cpp \
 	gui/qt/dialogs/dialogs_provider.moc.cpp \
-	gui/qt/managers/renderer_manager.moc.cpp \
-	gui/qt/recents.moc.cpp \
+	gui/qt/util/renderer_manager.moc.cpp \
+	gui/qt/util/recents.moc.cpp \
 	gui/qt/util/variables.moc.cpp \
 	gui/qt/util/varchoicemodel.moc.cpp \
 	gui/qt/dialogs/bookmarks/bookmarks.moc.cpp \
@@ -243,7 +243,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/extensions/extensions.moc.cpp \
 	gui/qt/dialogs/fingerprint/fingerprintdialog.moc.cpp \
 	gui/qt/dialogs/fingerprint/chromaprint.moc.cpp \
-	gui/qt/components/qml_main_context.moc.cpp \
+	gui/qt/util/qml_main_context.moc.cpp \
 	gui/qt/dialogs/help/aboutmodel.moc.cpp \
 	gui/qt/dialogs/dialogs/dialogmodel.moc.cpp \
 	gui/qt/dialogs/extended/extended_panels.moc.cpp \
@@ -255,12 +255,12 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/preferences/simple_preferences.moc.cpp \
 	gui/qt/dialogs/open/open_panels.moc.cpp \
 	gui/qt/widgets/native/interface_widgets.moc.cpp \
-	gui/qt/components/navigation_history.moc.cpp \
+	gui/qt/util/navigation_history.moc.cpp \
 	gui/qt/menus/custom_menus.moc.cpp \
-	gui/qt/components/recent_media_model.moc.cpp \
-	gui/qt/components/selectable_list_model.moc.cpp \
-	gui/qt/components/settings.moc.cpp \
-	gui/qt/components/audio_device_model.moc.cpp \
+	gui/qt/util/recent_media_model.moc.cpp \
+	gui/qt/util/selectable_list_model.moc.cpp \
+	gui/qt/util/settings.moc.cpp \
+	gui/qt/util/audio_device_model.moc.cpp \
 	gui/qt/components/voutwindow/videosurface.moc.cpp \
 	gui/qt/components/voutwindow/qvoutwindow.moc.cpp \
 	gui/qt/components/voutwindow/qvoutwindowdummy.moc.cpp \

@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #include "qt.hpp"
-#include "recents.hpp"
+#include "util/recents.hpp"
 #include "dialogs/dialogs_provider.hpp"
 #include "menus/menus.hpp"
 #include "util/qt_dirs.hpp"

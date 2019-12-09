@@ -30,7 +30,7 @@
 
 #include <QObject>
 #include <QStringList>
-#include "recents.hpp"
+#include "util/recents.hpp"
 
 class VLCRecentMediaModel : public QAbstractListModel
 {

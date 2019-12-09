@@ -20,7 +20,7 @@
 #define QVLC_TOOLBAREDITOR_DIALOG_H_ 1
 
 #include "widgets/native/qvlcframe.hpp"                                 /* QVLCDialog */
-#include "components/qml_main_context.hpp"
+#include "util/qml_main_context.hpp"
 #include "dialogs/sout/profile_selector.hpp"
 
 #include <QAbstractListModel>

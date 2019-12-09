@@ -41,7 +41,7 @@
 #include "dialogs/dialogs_provider.hpp"                   /* Dialogs display */
 #include "player/player_controller.hpp"                      /* Input Management */
 #include "playlist/playlist_controller.hpp"
-#include "recents.hpp"                            /* Recent Items */
+#include "util/recents.hpp"                            /* Recent Items */
 #include "dialogs/extensions/extensions_manager.hpp"                 /* Extensions menu */
 #include "dialogs/extended/extended_panels.hpp"
 #include "util/varchoicemodel.hpp"

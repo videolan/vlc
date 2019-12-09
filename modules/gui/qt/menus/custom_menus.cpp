@@ -26,7 +26,7 @@
 #include <vlc_renderer_discovery.h>
 
 #include "custom_menus.hpp"
-#include "../managers/renderer_manager.hpp"
+#include "util/renderer_manager.hpp"
 
 #include <QMenu>
 #include <QAction>

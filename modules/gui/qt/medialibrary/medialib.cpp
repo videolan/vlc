@@ -18,7 +18,7 @@
 
 #include "medialib.hpp"
 #include "mlhelper.hpp"
-#include "recents.hpp"
+#include "util/recents.hpp"
 
 #include <vlc_playlist.h>
 #include <vlc_input_item.h>

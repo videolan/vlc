@@ -32,7 +32,7 @@
 #include "player/player_controller.hpp" /* Load Subtitles */
 #include "playlist/playlist_controller.hpp"
 #include "menus/menus.hpp"
-#include "recents.hpp"
+#include "util/recents.hpp"
 #include "util/qt_dirs.hpp"
 #include "widgets/native/customwidgets.hpp" /* VLCKeyToString() */
 #include "maininterface/main_interface.hpp"

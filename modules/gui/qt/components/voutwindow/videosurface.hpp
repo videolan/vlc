@@ -20,7 +20,7 @@
 
 #include <QtQuick/QQuickItem>
 #include <QCursor>
-#include <components/qml_main_context.hpp>
+#include <util/qml_main_context.hpp>
 #include "qt.hpp"
 
 class VideoSurfaceProvider : public QObject

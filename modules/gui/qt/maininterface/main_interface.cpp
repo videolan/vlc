@@ -30,7 +30,7 @@
 
 #include "maininterface/main_interface.hpp"
 #include "player/player_controller.hpp"                    // Creation
-#include "managers/renderer_manager.hpp"
+#include "util/renderer_manager.hpp"
 
 #include "widgets/native/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
@@ -52,20 +52,20 @@
 #include "medialibrary/mlvideomodel.hpp"
 #include "medialibrary/mlrecentsvideomodel.hpp"
 
-#include "components/recent_media_model.hpp"
-#include "components/settings.hpp"
+#include "util/recent_media_model.hpp"
+#include "util/settings.hpp"
 
 #include "network/networkmediamodel.hpp"
 #include "network/networkdevicemodel.hpp"
 
-#include "components/navigation_history.hpp"
+#include "util/navigation_history.hpp"
 #include "dialogs/help/aboutmodel.hpp"
 #include "dialogs/dialogs/dialogmodel.hpp"
 #include "player/playercontrolbarmodel.hpp"
 
 #include "components/voutwindow/qvoutwindowdummy.hpp"
 
-#include "components/qml_main_context.hpp"
+#include "util/qml_main_context.hpp"
 
 #include "util/qmleventfilter.hpp"
 

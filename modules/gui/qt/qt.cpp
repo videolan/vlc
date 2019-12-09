@@ -57,7 +57,7 @@ extern "C" char **environ;
 #include "dialogs/extensions/extensions_manager.hpp" /* Extensions manager */
 #include "dialogs/plugins/addons_manager.hpp" /* Addons manager */
 #include "dialogs/help/help.hpp"     /* Launch Update */
-#include "recents.hpp"          /* Recents Item destruction */
+#include "util/recents.hpp"          /* Recents Item destruction */
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 
 #include <QVector>
