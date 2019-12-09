@@ -438,6 +438,7 @@
 			<array>
 				<string>org.videolan.dav</string>
 			</array>
+		</dict>
 		<dict>
 			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
