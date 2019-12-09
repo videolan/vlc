@@ -6,8 +6,8 @@
 # Get latest SHA that changed contribs (needed for CI)
 set -e
 
-# Array of paths that trigger contrib rebuilds in Gitlab CI
-VLC_CONTRIB_REBUILD_PATHS=("extras/tools" "contrib")
+# Array of paths that should trigger contrib rebuilds
+VLC_CONTRIB_REBUILD_PATHS=("extras/tools" "contrib" "extras/ci")
 # Revision from which to start look for changes (backwards in time)
 VLC_START_REVISION="HEAD"
 
