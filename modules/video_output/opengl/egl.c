@@ -238,6 +238,7 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     gl->sys = sys;
     sys->display = EGL_NO_DISPLAY;
     sys->surface = EGL_NO_SURFACE;
+    sys->context = EGL_NO_CONTEXT;
     sys->eglCreateImageKHR = NULL;
     sys->eglDestroyImageKHR = NULL;
 
