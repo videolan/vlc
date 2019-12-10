@@ -1583,6 +1583,9 @@ inline char *FromCFString(const CFStringRef cfString,
 inline char *getPreferedAdapter()
 {
     SCDynamicStoreRef session = SCDynamicStoreCreate(NULL, CFSTR("session"), NULL, NULL);
+    if (session == NULL)
+        return NULL;
+
     CFDictionaryRef q = (CFDictionaryRef) SCDynamicStoreCopyValue(session, CFSTR("State:/Network/Global/IPv4"));
     char *returnValue = NULL;
 
@@ -1591,8 +1594,8 @@ inline char *getPreferedAdapter()
         if (CFDictionaryGetValueIfPresent(q, CFSTR("PrimaryInterface"), &val)) {
             returnValue = FromCFString((CFStringRef)val, kCFStringEncodingUTF8);
         }
+        CFRelease(q);
     }
-    CFRelease(q);
     CFRelease(session);
 
     return returnValue;
