@@ -284,58 +284,42 @@ static const struct filter_mode_t *GetFilterMode(const char *mode)
 
 picture_t *AllocPicture( filter_t *p_filter )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
-    picture_t *pic = filter_NewPicture( p_filter );
-    picture_sys_d3d9_t *pic_sys = pic->p_sys;
-    if ( !pic->context )
+    struct d3d9_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    if (unlikely(pic_ctx == NULL))
+        return NULL;
+
+    picture_resource_t res = {};
+    picture_t *pic = picture_NewFromResource( &p_filter->fmt_out.video, &res );
+    if (unlikely(pic == NULL))
     {
-        bool b_local_texture = false;
-
-        if ( !pic_sys )
-        {
-            D3DSURFACE_DESC dstDesc;
-            if ( !p_sys->hw_surface ||
-                 FAILED(IDirect3DSurface9_GetDesc( p_sys->hw_surface, &dstDesc )) )
-                return NULL;
-
-            pic_sys = calloc(1, sizeof(*pic_sys));
-            if (unlikely(pic_sys == NULL))
-                return NULL;
-            pic->p_sys = pic_sys;
-
-            d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(p_filter->vctx_out);
-
-            HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(d3d9_decoder->d3ddev.dev,
-                                                              p_filter->fmt_out.video.i_width,
-                                                              p_filter->fmt_out.video.i_height,
-                                                              dstDesc.Format,
-                                                              D3DPOOL_DEFAULT,
-                                                              &pic_sys->surface,
-                                                              NULL);
-
-            if (FAILED(hr))
-            {
-                free(p_sys);
-                pic->p_sys = NULL;
-                return NULL;
-            }
-            b_local_texture = true;
-        }
-        /* the picture might be duplicated for snapshots so it needs a context */
-        struct d3d9_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
-        if (likely(pic_ctx!=NULL))
-        {
-            pic_ctx->s = (picture_context_t) {
-                d3d9_pic_context_destroy, d3d9_pic_context_copy,
-                vlc_video_context_Hold(p_filter->vctx_in),
-            };
-            pic_ctx->picsys = *pic_sys;
-            AcquireD3D9PictureSys( &pic_ctx->picsys );
-            pic->context = &pic_ctx->s;
-        }
-        if (b_local_texture)
-            IDirect3DSurface9_Release(pic_sys->surface);
+        free(pic_ctx);
+        return NULL;
     }
+
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(p_filter->vctx_out);
+    d3d9_video_context_t *vctx_sys = GetD3D9ContextPrivate( p_filter->vctx_out );
+
+    HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(d3d9_decoder->d3ddev.dev,
+                                                        p_filter->fmt_out.video.i_width,
+                                                        p_filter->fmt_out.video.i_height,
+                                                        vctx_sys->format,
+                                                        D3DPOOL_DEFAULT,
+                                                        &pic_ctx->picsys.surface,
+                                                        NULL);
+    if (FAILED(hr))
+    {
+        free(pic_ctx);
+        picture_Release(pic);
+        return NULL;
+    }
+    pic->p_sys = &pic_ctx->picsys;
+    AcquireD3D9PictureSys( &pic_ctx->picsys );
+    IDirect3DSurface9_Release(pic_ctx->picsys.surface);
+    pic_ctx->s = (picture_context_t) {
+        d3d9_pic_context_destroy, d3d9_pic_context_copy,
+        vlc_video_context_Hold(p_filter->vctx_out),
+    };
+    pic->context = &pic_ctx->s;
     return pic;
 }
 
