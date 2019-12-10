@@ -74,8 +74,6 @@ typedef struct
     /* CPU to GPU */
     filter_t   *filter;
     picture_t  *staging_pic;
-
-    d3d11_handle_t  hd3d;
 } filter_sys_t;
 
 #if CAN_PROCESSOR
@@ -658,13 +656,6 @@ int D3D11OpenConverter( vlc_object_t *obj )
     if (CopyInitCache(&p_sys->cache, p_filter->fmt_in.video.i_width * pixel_bytes))
         return VLC_ENOMEM;
 
-    if (D3D11_Create(p_filter, &p_sys->hd3d, false) != VLC_SUCCESS)
-    {
-        msg_Warn(p_filter, "cannot load d3d11.dll, aborting");
-        CopyCleanCache(&p_sys->cache);
-        return VLC_EGENERIC;
-    }
-
     vlc_mutex_init(&p_sys->staging_lock);
     p_filter->p_sys = p_sys;
     return VLC_SUCCESS;
@@ -811,12 +802,6 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
             goto done;
     }
 
-    if (D3D11_Create(p_filter, &p_sys->hd3d, false) != VLC_SUCCESS)
-    {
-        msg_Warn(p_filter, "cannot load d3d11.dll, aborting");
-        goto done;
-    }
-
     p_sys->filter = p_cpu_filter;
     p_sys->staging_pic = p_dst;
     p_filter->p_sys = p_sys;
@@ -849,7 +834,6 @@ void D3D11CloseConverter( vlc_object_t *obj )
     vlc_mutex_destroy(&p_sys->staging_lock);
     if (p_sys->staging)
         ID3D11Texture2D_Release(p_sys->staging);
-    D3D11_Destroy(&p_sys->hd3d);
 }
 
 void D3D11CloseCPUConverter( vlc_object_t *obj )
@@ -860,5 +844,4 @@ void D3D11CloseCPUConverter( vlc_object_t *obj )
     picture_Release(p_sys->staging_pic);
     vlc_video_context_Release(p_filter->vctx_out);
     D3D11_ReleaseDevice(&p_sys->d3d_dev);
-    D3D11_Destroy(&p_sys->hd3d);
 }
