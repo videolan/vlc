@@ -290,6 +290,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                 p_sys->track[i].p_es, &b_selected );
                 if( b_selected ) break;
             }
+            if (i >= p_sys->i_tracks) {
+                /* No selected ES found */
+                return VLC_EGENERIC;
+            }
             if( p_sys->track[i].i_current_subtitle >= p_sys->track[i].i_subtitles )
             {
                 *pf = 1.0;
