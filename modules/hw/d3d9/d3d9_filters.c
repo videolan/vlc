@@ -98,13 +98,54 @@ static void FillSample( DXVA2_VideoSample *p_sample,
     p_sample->PlanarAlpha    = DXVA2_Fixed32OpaqueAlpha();
 }
 
+static picture_t *AllocPicture( filter_t *p_filter )
+{
+    struct d3d9_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    if (unlikely(pic_ctx == NULL))
+        return NULL;
+
+    picture_resource_t res = {};
+    picture_t *pic = picture_NewFromResource( &p_filter->fmt_out.video, &res );
+    if (unlikely(pic == NULL))
+    {
+        free(pic_ctx);
+        return NULL;
+    }
+
+    d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(p_filter->vctx_out);
+    d3d9_video_context_t *vctx_sys = GetD3D9ContextPrivate( p_filter->vctx_out );
+
+    HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(d3d9_decoder->d3ddev.dev,
+                                                        p_filter->fmt_out.video.i_width,
+                                                        p_filter->fmt_out.video.i_height,
+                                                        vctx_sys->format,
+                                                        D3DPOOL_DEFAULT,
+                                                        &pic_ctx->picsys.surface,
+                                                        NULL);
+    if (FAILED(hr))
+    {
+        free(pic_ctx);
+        picture_Release(pic);
+        return NULL;
+    }
+    pic->p_sys = &pic_ctx->picsys;
+    AcquireD3D9PictureSys( &pic_ctx->picsys );
+    IDirect3DSurface9_Release(pic_ctx->picsys.surface);
+    pic_ctx->s = (picture_context_t) {
+        d3d9_pic_context_destroy, d3d9_pic_context_copy,
+        vlc_video_context_Hold(p_filter->vctx_out),
+    };
+    pic->context = &pic_ctx->s;
+    return pic;
+}
+
 static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     picture_sys_d3d9_t *p_src_sys = ActiveD3D9PictureSys(p_pic);
 
-    picture_t *p_outpic = filter_NewPicture( p_filter );
+    picture_t *p_outpic = AllocPicture( p_filter );
     if( !p_outpic )
         goto failed;
 
