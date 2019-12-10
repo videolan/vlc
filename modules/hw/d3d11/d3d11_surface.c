@@ -475,13 +475,6 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
     vlc_mutex_unlock(&sys->staging_lock);
 }
 
-static void DestroyPicture(picture_t *picture)
-{
-    picture_sys_d3d11_t *p_sys = picture->p_sys;
-    ReleaseD3D11PictureSys( p_sys );
-    free(p_sys);
-}
-
 static void DeleteFilter( filter_t * p_filter )
 {
     if( p_filter->p_module )
@@ -547,7 +540,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         return;
     }
 
-    picture_sys_d3d11_t *p_staging_sys = sys->staging_pic->p_sys;
+    picture_sys_d3d11_t *p_staging_sys = p_sys;
 
     D3D11_TEXTURE2D_DESC texDesc;
     ID3D11Texture2D_GetDesc( p_staging_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
@@ -576,6 +569,8 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
                                               0, 0, 0,
                                               p_staging_sys->resource[KNOWN_DXGI_INDEX], 0,
                                               &copyBox);
+    dst->i_planes = 0;
+
     if (dst->context == NULL)
     {
         struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
@@ -586,7 +581,6 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
                 vlc_video_context_Hold(p_filter->vctx_out),
             };
             pic_ctx->picsys = *p_sys;
-            AcquireD3D11PictureSys(&pic_ctx->picsys);
             dst->context = &pic_ctx->s;
         }
     }
@@ -596,6 +590,86 @@ VIDEO_FILTER_WRAPPER (D3D11_NV12)
 VIDEO_FILTER_WRAPPER (D3D11_YUY2)
 VIDEO_FILTER_WRAPPER (D3D11_RGBA)
 VIDEO_FILTER_WRAPPER (NV12_D3D11)
+
+static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
+{
+    video_format_t fmt_staging;
+    ID3D11Texture2D *texture = NULL;
+    HRESULT hr;
+
+    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate( p_filter->vctx_out );
+
+    const d3d_format_t *cfg = NULL;
+    for (const d3d_format_t *output_format = GetRenderFormatList();
+            output_format->name != NULL; ++output_format)
+    {
+        if (output_format->formatTexture == vctx_sys->format &&
+            !is_d3d11_opaque(output_format->fourcc))
+        {
+            cfg = output_format;
+            break;
+        }
+    }
+    if (unlikely(cfg == NULL))
+        return NULL;
+
+    struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    if (unlikely(pic_ctx == NULL))
+        goto done;
+
+    picture_resource_t res = {};
+    picture_sys_d3d11_t *res_sys = &pic_ctx->picsys;
+    res.p_sys = res_sys;
+    res_sys->context = vctx_sys->device;
+    res_sys->formatTexture = vctx_sys->format;
+
+    video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
+    fmt_staging.i_chroma = cfg->fourcc;
+
+    picture_t *p_dst = picture_NewFromResource(&fmt_staging, &res);
+    if (p_dst == NULL) {
+        msg_Err(p_filter, "Failed to map create the temporary picture.");
+        goto done;
+    }
+    picture_Setup(p_dst, &p_dst->format);
+
+    D3D11_TEXTURE2D_DESC texDesc;
+    texDesc.Format = vctx_sys->format;
+    texDesc.MipLevels = 1;
+    texDesc.SampleDesc.Count = 1;
+    texDesc.SampleDesc.Quality = 0;
+    texDesc.MiscFlags = 0;
+    texDesc.ArraySize = 1;
+    texDesc.Usage = D3D11_USAGE_STAGING;
+    texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    texDesc.BindFlags = 0;
+    texDesc.Width  = p_dst->format.i_width;
+    texDesc.Height = p_dst->format.i_height; /* make sure we match picture_Setup() */
+
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    hr = ID3D11Device_CreateTexture2D( p_sys->d3d_dev.d3ddevice, &texDesc, NULL, &texture);
+    if (FAILED(hr)) {
+        msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%lX)", DxgiFormatToStr(texDesc.Format), hr );
+        goto done;
+    }
+
+    res_sys->texture[KNOWN_DXGI_INDEX] = texture;
+
+    pic_ctx->s = (picture_context_t) {
+        d3d11_pic_context_destroy, d3d11_pic_context_copy,
+        vlc_video_context_Hold(p_filter->vctx_out),
+    };
+    AcquireD3D11PictureSys(res_sys);
+    ID3D11Texture2D_Release(res_sys->texture[KNOWN_DXGI_INDEX]);
+
+    p_dst->context = &pic_ctx->s;
+
+    return p_dst;
+done:
+    free(pic_ctx);
+    return NULL;
+}
 
 int D3D11OpenConverter( vlc_object_t *obj )
 {
@@ -665,9 +739,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
-    ID3D11Texture2D *texture = NULL;
     filter_t *p_cpu_filter = NULL;
-    video_format_t fmt_staging;
     filter_sys_t *p_sys = NULL;
 
     if ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_D3D11_OPAQUE
@@ -718,8 +790,6 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         return VLC_EGENERIC;
     }
 
-    video_format_Init(&fmt_staging, 0);
-
     p_filter->vctx_out = vlc_video_context_Create(dec_device, VLC_VIDEO_CONTEXT_D3D11VA,
                                           sizeof(d3d11_video_context_t), &d3d11_vctx_ops);
     vlc_decoder_device_Release(dec_device);
@@ -745,57 +815,11 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         vlc_assert_unreachable();
     }
     vctx_sys->device = p_sys->d3d_dev.d3dcontext;
+    p_filter->p_sys = p_sys;
 
-    vlc_fourcc_t d3d_fourcc = DxgiFormatFourcc(vctx_sys->format);
-    if (d3d_fourcc == 0)
-        goto done;
+    picture_t *p_dst = AllocateCPUtoGPUTexture(p_filter);
 
-    picture_resource_t res = {
-        .pf_destroy = DestroyPicture,
-    };
-    picture_sys_d3d11_t *res_sys = calloc(1, sizeof(picture_sys_d3d11_t));
-    if (res_sys == NULL) {
-        err = VLC_ENOMEM;
-        goto done;
-    }
-    res.p_sys = res_sys;
-    res_sys->context = p_sys->d3d_dev.d3dcontext;
-    res_sys->formatTexture = vctx_sys->format;
-
-    video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
-    fmt_staging.i_chroma = d3d_fourcc;
-
-    picture_t *p_dst = picture_NewFromResource(&fmt_staging, &res);
-    if (p_dst == NULL) {
-        msg_Err(p_filter, "Failed to map create the temporary picture.");
-        goto done;
-    }
-    picture_sys_d3d11_t *p_dst_sys = p_dst->p_sys;
-    picture_Setup(p_dst, &p_dst->format);
-
-    D3D11_TEXTURE2D_DESC texDesc;
-    texDesc.Format = vctx_sys->format;
-    texDesc.MipLevels = 1;
-    texDesc.SampleDesc.Count = 1;
-    texDesc.SampleDesc.Quality = 0;
-    texDesc.MiscFlags = 0;
-    texDesc.ArraySize = 1;
-    texDesc.Usage = D3D11_USAGE_STAGING;
-    texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    texDesc.BindFlags = 0;
-    texDesc.Width  = p_dst->format.i_width;
-    texDesc.Height = p_dst->format.i_height; /* make sure we match picture_Setup() */
-
-    hr = ID3D11Device_CreateTexture2D( p_sys->d3d_dev.d3ddevice, &texDesc, NULL, &texture);
-    if (FAILED(hr)) {
-        msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%lX)", DxgiFormatToStr(texDesc.Format), hr );
-        goto done;
-    }
-
-    res_sys->texture[KNOWN_DXGI_INDEX] = texture;
-    ID3D11DeviceContext_AddRef(p_dst_sys->context);
-
-    if ( p_filter->fmt_in.video.i_chroma != d3d_fourcc )
+    if ( p_filter->fmt_in.video.i_chroma != p_dst->format.i_chroma )
     {
         p_cpu_filter = CreateCPUtoGPUFilter(p_filter, &p_filter->fmt_in, p_dst->format.i_chroma);
         if (!p_cpu_filter)
@@ -804,17 +828,13 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
 
     p_sys->filter = p_cpu_filter;
     p_sys->staging_pic = p_dst;
-    p_filter->p_sys = p_sys;
     err = VLC_SUCCESS;
 
 done:
-    video_format_Clean(&fmt_staging);
     if (err != VLC_SUCCESS)
     {
         if (p_cpu_filter)
             DeleteFilter( p_cpu_filter );
-        if (texture)
-            ID3D11Texture2D_Release(texture);
         vlc_video_context_Release(p_filter->vctx_out);
         D3D11_ReleaseDevice(&p_sys->d3d_dev);
     }
