@@ -98,7 +98,6 @@ vlc_module_end ()
     BOOL _placeInvalidated;
 
     UIView *_viewContainer;
-    UITapGestureRecognizer *_tapRecognizer;
 
     /* Written from MT, read locked from vout */
     vout_display_place_t _place;
@@ -109,7 +108,7 @@ vlc_module_end ()
     vout_display_cfg_t _cfg;
 }
 
-- (id)initWithFrame:(CGRect)frame andVD:(vout_display_t*)vd;
+- (id)initWithFrame:(CGRect)frame andVD:(vout_display_t*)vd andWindow:(vout_window_t*)wnd;
 - (void)cleanAndRelease:(BOOL)flushed;
 - (BOOL)makeCurrent:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl;
 - (void)releaseCurrent:(EAGLContext *)previousEaglContext;
@@ -158,7 +157,8 @@ static const struct vlc_display_operations ops = {
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmt, vlc_video_context *context)
 {
-    if (vout_display_cfg_IsWindowed(cfg))
+    vout_window_t *wnd = cfg->window;
+    if (wnd->type != VOUT_WINDOW_TYPE_NSOBJECT)
         return VLC_EGENERIC;
 
     vout_display_sys_t *sys = vlc_obj_calloc(VLC_OBJECT(vd), 1, sizeof(*sys));
@@ -176,8 +176,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
         [VLCOpenGLES2VideoView performSelectorOnMainThread:@selector(getNewView:)
                                                 withObject:[NSArray arrayWithObjects:
-                                                           [NSValue valueWithPointer:&sys->glESView],
-                                                           [NSValue valueWithPointer:vd], nil]
+                                                           [NSValue valueWithPointer:vd],
+                                                           [NSValue valueWithPointer:wnd], nil]
                                              waitUntilDone:YES];
         if (!sys->glESView) {
             msg_Err(vd, "Creating OpenGL ES 2 view failed");
@@ -353,12 +353,14 @@ static void GLESSwap(vlc_gl_t *gl)
 
 + (void)getNewView:(NSArray *)value
 {
-    id *ret = [[value objectAtIndex:0] pointerValue];
-    vout_display_t *vd = [[value objectAtIndex:1] pointerValue];
-    *ret = [[self alloc] initWithFrame:CGRectMake(0.,0.,320.,240.) andVD:vd];
+    vout_display_t *vd = [[value objectAtIndex:0] pointerValue];
+    vout_window_t *wnd = [[value objectAtIndex:1] pointerValue];
+
+    struct vout_display_sys_t *sys = vd->sys;
+    sys->glESView = [[self alloc] initWithFrame:CGRectMake(0.,0.,320.,240.) andVD:vd andWindow:wnd];
 }
 
-- (id)initWithFrame:(CGRect)frame andVD:(vout_display_t*)vd
+- (id)initWithFrame:(CGRect)frame andVD:(vout_display_t*)vd andWindow:(vout_window_t*)wnd
 {
     _appActive = ([UIApplication sharedApplication].applicationState == UIApplicationStateActive);
     if (unlikely(!_appActive))
@@ -403,7 +405,7 @@ static void GLESSwap(vlc_gl_t *gl)
 
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
-    if (![self fetchViewContainer])
+    if (![self bindToWindow: wnd])
     {
         [_eaglContext release];
         [self release];
@@ -431,11 +433,11 @@ static void GLESSwap(vlc_gl_t *gl)
     return self;
 }
 
-- (BOOL)fetchViewContainer
+- (BOOL)bindToWindow:(vout_window_t*)wnd
 {
     @try {
+        UIView *viewContainer = wnd->handle.nsobject;
         /* get the object we will draw into */
-        UIView *viewContainer = var_InheritAddress (_voutDisplay, "drawable-nsobject");
         if (unlikely(viewContainer == nil)) {
             msg_Err(_voutDisplay, "provided view container is nil");
             return NO;
@@ -462,20 +464,10 @@ static void GLESSwap(vlc_gl_t *gl)
 
         [_viewContainer addSubview:self];
 
-        /* add tap gesture recognizer for DVD menus and stuff */
-        _tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                 action:@selector(tapRecognized:)];
-        if (_viewContainer.window
-         && _viewContainer.window.rootViewController
-         && _viewContainer.window.rootViewController.view)
-            [_viewContainer.superview addGestureRecognizer:_tapRecognizer];
-        _tapRecognizer.cancelsTouchesInView = NO;
         return YES;
     } @catch (NSException *exception) {
         msg_Err(_voutDisplay, "Handling the view container failed due to an Obj-C exception (%s, %s", [exception.name UTF8String], [exception.reason UTF8String]);
         vout_display_sys_t *sys = _voutDisplay->sys;
-        if (_tapRecognizer)
-            [_tapRecognizer release];
         return NO;
     }
 }
@@ -483,9 +475,6 @@ static void GLESSwap(vlc_gl_t *gl)
 - (void)cleanAndReleaseFromMainThread
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-
-    [_tapRecognizer.view removeGestureRecognizer:_tapRecognizer];
-    [_tapRecognizer release];
 
     [self removeFromSuperview];
     [_viewContainer release];
@@ -677,27 +666,6 @@ static void GLESSwap(vlc_gl_t *gl)
     vlc_mutex_unlock(&_mutex);
 }
 
-- (void)tapRecognized:(UITapGestureRecognizer *)tapRecognizer
-{
-    vlc_mutex_lock(&_mutex);
-    if (!_voutDisplay)
-    {
-        vlc_mutex_unlock(&_mutex);
-        return;
-    }
-
-    UIGestureRecognizerState state = [tapRecognizer state];
-    CGPoint touchPoint = [tapRecognizer locationInView:self];
-    CGFloat scaleFactor = self.contentScaleFactor;
-    vout_display_SendMouseMovedDisplayCoordinates(_voutDisplay,
-                                                  (int)touchPoint.x * scaleFactor, (int)touchPoint.y * scaleFactor);
-
-    vout_display_SendEventMousePressed(_voutDisplay, MOUSE_BUTTON_LEFT);
-    vout_display_SendEventMouseReleased(_voutDisplay, MOUSE_BUTTON_LEFT);
-
-    vlc_mutex_unlock(&_mutex);
-}
-
 - (void)updateVoutCfg:(const vout_display_cfg_t *)cfg withVGL:(vout_display_opengl_t *)vgl
 {
     if (memcmp(&_cfg, cfg, sizeof(vout_display_cfg_t)) == 0)
@@ -775,9 +743,11 @@ static void GLESSwap(vlc_gl_t *gl)
     return YES;
 }
 
-- (BOOL)acceptsFirstResponder
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
 {
-    return YES;
+    /* Disable events for this view, as the vout_window view will be the one
+     * handling them. */
+    return nil;
 }
 
 @end
