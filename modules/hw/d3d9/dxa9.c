@@ -228,11 +228,6 @@ static filter_t *CreateFilter( filter_t *p_this, const es_format_t *p_fmt_in,
     return p_filter;
 }
 
-struct d3d_pic_context
-{
-    picture_context_t s;
-};
-
 static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = p_filter->p_sys;
