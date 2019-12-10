@@ -205,7 +205,7 @@ validate_architecture()
 #   Architecture string
 set_host_triplet()
 {
-    local triplet_arch = $(${CC:-cc} -arch "$1" -dumpmachine | cut -d- -f 1)
+    local triplet_arch=$(${CC:-cc} -arch "$1" -dumpmachine | cut -d- -f 1)
     # We can not directly use the compiler value here as when building for
     # x86_64 iOS Simulator the triplet will match the build machine triplet
     # exactly, which will cause autoconf to assume we are not cross-compiling.
