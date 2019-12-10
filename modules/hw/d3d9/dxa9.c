@@ -167,13 +167,6 @@ static void DXA9_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     IDirect3DSurface9_UnlockRect(p_sys->surface);
 }
 
-static void DestroyPicture(picture_t *picture)
-{
-    picture_sys_d3d9_t *p_sys = picture->p_sys;
-    ReleaseD3D9PictureSys( p_sys );
-    free(p_sys);
-}
-
 static void DeleteFilter( filter_t * p_filter )
 {
     if( p_filter->p_module )
@@ -342,13 +335,17 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
         goto done;
     }
 
-    picture_resource_t res = {
-        .pf_destroy = DestroyPicture,
-    };
-    picture_sys_d3d9_t *res_sys = calloc(1, sizeof(picture_sys_d3d9_t));
-    if (res_sys == NULL) {
+    struct d3d9_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    if (unlikely(pic_ctx == NULL))
         goto done;
-    }
+
+    pic_ctx->s = (picture_context_t) {
+        d3d9_pic_context_destroy, d3d9_pic_context_copy,
+        vlc_video_context_Hold(p_filter->vctx_out),
+    };
+
+    picture_resource_t res = {};
+    picture_sys_d3d9_t *res_sys = &pic_ctx->picsys;
     res.p_sys = res_sys;
     res_sys->surface = texture;
 
@@ -361,6 +358,7 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
         goto done;
     }
     picture_Setup(p_dst, &p_dst->format);
+    p_dst->context = &pic_ctx->s;
     return p_dst;
 
 done:
@@ -369,7 +367,18 @@ done:
 
 VIDEO_FILTER_WRAPPER (DXA9_YV12)
 VIDEO_FILTER_WRAPPER (DXA9_NV12)
-VIDEO_FILTER_WRAPPER (YV12_D3D9)
+
+static picture_t *YV12_D3D9_Filter( filter_t *p_filter, picture_t *p_pic )
+{
+    picture_t *p_outpic = AllocateCPUtoGPUTexture( p_filter );
+    if( p_outpic )
+    {
+        YV12_D3D9( p_filter, p_pic, p_outpic );
+        picture_CopyProperties( p_outpic, p_pic );
+    }
+    picture_Release( p_pic );
+    return p_outpic;
+}
 
 int D3D9OpenConverter( vlc_object_t *obj )
 {
