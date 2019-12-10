@@ -276,6 +276,87 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 }
 
+static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
+{
+    IDirect3DSurface9 *texture = NULL;
+    video_format_t fmt_staging;
+    d3d9_decoder_device_t *devsys = GetD3D9OpaqueContext(p_filter->vctx_out);
+
+    static const D3DFORMAT outputFormats8[] = {
+        MAKEFOURCC('I','4','2','0'),
+        MAKEFOURCC('Y','V','1','2'),
+        MAKEFOURCC('N','V','1','2'),
+        D3DFMT_UNKNOWN
+    };
+    static const D3DFORMAT outputFormats10[] = {
+        MAKEFOURCC('P','0','1','0'),
+        MAKEFOURCC('I','4','2','0'),
+        MAKEFOURCC('Y','V','1','2'),
+        MAKEFOURCC('N','V','1','2'),
+        D3DFMT_UNKNOWN
+    };
+
+    D3DFORMAT format = D3DFMT_UNKNOWN;
+    const D3DFORMAT *list;
+    switch( p_filter->fmt_in.video.i_chroma ) {
+    case VLC_CODEC_I420:
+    case VLC_CODEC_YV12:
+        list = outputFormats8;
+        break;
+    case VLC_CODEC_I420_10L:
+    case VLC_CODEC_P010:
+        list = outputFormats10;
+        break;
+    default:
+        vlc_assert_unreachable();
+    }
+    while (*list != D3DFMT_UNKNOWN)
+    {
+        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(devsys->d3ddev.dev,
+                                                          p_filter->fmt_out.video.i_width,
+                                                          p_filter->fmt_out.video.i_height,
+                                                          *list,
+                                                          D3DPOOL_DEFAULT,
+                                                          &texture,
+                                                          NULL);
+        if (SUCCEEDED(hr)) {
+            format = *list;
+            msg_Dbg(p_filter, "using pixel format %4.4s", (char*)&format);
+            break;
+        }
+        list++;
+    }
+    if (format == D3DFMT_UNKNOWN)
+    {
+        msg_Err(p_filter, "Failed to find a usable pixel format");
+        goto done;
+    }
+
+    picture_resource_t res = {
+        .pf_destroy = DestroyPicture,
+    };
+    picture_sys_d3d9_t *res_sys = calloc(1, sizeof(picture_sys_d3d9_t));
+    if (res_sys == NULL) {
+        goto done;
+    }
+    res.p_sys = res_sys;
+    res_sys->surface = texture;
+
+    video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
+    fmt_staging.i_chroma = format;
+
+    picture_t *p_dst = picture_NewFromResource(&fmt_staging, &res);
+    if (p_dst == NULL) {
+        msg_Err(p_filter, "Failed to map create the temporary picture.");
+        goto done;
+    }
+    picture_Setup(p_dst, &p_dst->format);
+    return p_dst;
+
+done:
+    return NULL;
+}
+
 VIDEO_FILTER_WRAPPER (DXA9_YV12)
 VIDEO_FILTER_WRAPPER (DXA9_NV12)
 VIDEO_FILTER_WRAPPER (YV12_D3D9)
@@ -341,10 +422,8 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
-    IDirect3DSurface9 *texture = NULL;
     filter_t *p_cpu_filter = NULL;
     picture_t *p_dst = NULL;
-    video_format_t fmt_staging;
 
     if ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_D3D9_OPAQUE
       && p_filter->fmt_out.video.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B )
@@ -386,8 +465,6 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
         return VLC_ENOMEM;
     }
 
-    video_format_Init(&fmt_staging, 0);
-
     p_filter->vctx_out = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_DXVA2, sizeof(d3d9_video_context_t),
                                                    &d3d9_vctx_ops );
     vlc_decoder_device_Release(dec_device);
@@ -398,80 +475,13 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
         goto done;
     }
 
+    p_dst = AllocateCPUtoGPUTexture(p_filter);
+    if (p_dst == NULL)
+        goto done;
     d3d9_video_context_t *vctx_sys = GetD3D9ContextPrivate( p_filter->vctx_out );
+    vctx_sys->format = p_dst->format.i_chroma;
 
-    static const D3DFORMAT outputFormats8[] = {
-        MAKEFOURCC('I','4','2','0'),
-        MAKEFOURCC('Y','V','1','2'),
-        MAKEFOURCC('N','V','1','2'),
-        D3DFMT_UNKNOWN
-    };
-    static const D3DFORMAT outputFormats10[] = {
-        MAKEFOURCC('P','0','1','0'),
-        MAKEFOURCC('I','4','2','0'),
-        MAKEFOURCC('Y','V','1','2'),
-        MAKEFOURCC('N','V','1','2'),
-        D3DFMT_UNKNOWN
-    };
-
-    vctx_sys->format = D3DFMT_UNKNOWN;
-    const D3DFORMAT *list;
-    switch( p_filter->fmt_in.video.i_chroma ) {
-    case VLC_CODEC_I420:
-    case VLC_CODEC_YV12:
-        list = outputFormats8;
-        break;
-    case VLC_CODEC_I420_10L:
-    case VLC_CODEC_P010:
-        list = outputFormats10;
-        break;
-    default:
-        vlc_assert_unreachable();
-    }
-    while (*list != D3DFMT_UNKNOWN)
-    {
-        HRESULT hr = IDirect3DDevice9_CreateOffscreenPlainSurface(devsys->d3ddev.dev,
-                                                          p_filter->fmt_out.video.i_width,
-                                                          p_filter->fmt_out.video.i_height,
-                                                          *list,
-                                                          D3DPOOL_DEFAULT,
-                                                          &texture,
-                                                          NULL);
-        if (SUCCEEDED(hr)) {
-            vctx_sys->format = *list;
-            msg_Dbg(p_filter, "using pixel format %4.4s", (char*)&vctx_sys->format);
-            break;
-        }
-        list++;
-    }
-    if (vctx_sys->format == D3DFMT_UNKNOWN)
-    {
-        msg_Err(p_filter, "Failed to find a usable pixel format");
-        goto done;
-    }
-
-    picture_resource_t res = {
-        .pf_destroy = DestroyPicture,
-    };
-    picture_sys_d3d9_t *res_sys = calloc(1, sizeof(picture_sys_d3d9_t));
-    if (res_sys == NULL) {
-        err = VLC_ENOMEM;
-        goto done;
-    }
-    res.p_sys = res_sys;
-    res_sys->surface = texture;
-
-    video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
-    fmt_staging.i_chroma = vctx_sys->format;
-
-    p_dst = picture_NewFromResource(&fmt_staging, &res);
-    if (p_dst == NULL) {
-        msg_Err(p_filter, "Failed to map create the temporary picture.");
-        goto done;
-    }
-    picture_Setup(p_dst, &p_dst->format);
-
-    if ( p_filter->fmt_in.video.i_chroma != vctx_sys->format )
+    if ( p_filter->fmt_in.video.i_chroma != p_dst->format.i_chroma )
     {
         p_cpu_filter = CreateFilter(p_filter, &p_filter->fmt_in, p_dst->format.i_chroma);
         if (!p_cpu_filter)
@@ -484,11 +494,8 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
     err = VLC_SUCCESS;
 
 done:
-    video_format_Clean(&fmt_staging);
     if (err != VLC_SUCCESS)
     {
-        if (texture)
-            IDirect3DSurface9_Release(texture);
         vlc_video_context_Release(p_filter->vctx_out);
         free(p_sys);
     }
