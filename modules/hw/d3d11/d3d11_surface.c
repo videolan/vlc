@@ -540,6 +540,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         return;
     }
 
+    d3d11_device_lock( &sys->d3d_dev );
     if (sys->filter == NULL)
     {
         D3D11_MAPPED_SUBRESOURCE lock;
@@ -547,6 +548,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
                                             0, D3D11_MAP_WRITE_DISCARD, 0, &lock);
         if (FAILED(hr)) {
             msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
+            d3d11_device_unlock( &sys->d3d_dev );
             return;
         }
 
@@ -571,6 +573,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
                                             0, D3D11_MAP_WRITE_DISCARD, 0, &lock);
         if (FAILED(hr)) {
             msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
+            d3d11_device_unlock( &sys->d3d_dev );
             return;
         }
 
@@ -594,6 +597,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
                                                 p_staging_sys->resource[KNOWN_DXGI_INDEX], 0,
                                                 &copyBox);
     }
+    d3d11_device_unlock( &sys->d3d_dev );
     // stop pretending this is a CPU picture
     dst->format.i_chroma = p_filter->fmt_out.video.i_chroma;
     dst->i_planes = 0;
