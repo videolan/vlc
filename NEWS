@@ -23,6 +23,7 @@ Text renderer:
 macOS:
  * Fix Apple Remote support on macOS Catalina
  * Add support for pausing Apple Music on macOS Catalina
+ * Fix UPnP discovery crash without an active network interface
 
 Misc:
  * Add missing .wpl & .zpl file associations on Windows
