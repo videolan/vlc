@@ -554,10 +554,13 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 
     picture_UpdatePlanes(sys->staging_pic, lock.pData, lock.RowPitch);
+    picture_context_t *staging_pic_ctx = sys->staging_pic->context;
+    sys->staging_pic->context = NULL; // some CPU filters won't like the mix of CPU/GPU
 
     picture_Hold( src );
     sys->filter->pf_video_filter(sys->filter, src);
 
+    sys->staging_pic->context = staging_pic_ctx;
     ID3D11DeviceContext_Unmap(p_sys->context, p_staging_sys->resource[KNOWN_DXGI_INDEX], 0);
 
     D3D11_BOX copyBox = {
@@ -569,27 +572,14 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
                                               0, 0, 0,
                                               p_staging_sys->resource[KNOWN_DXGI_INDEX], 0,
                                               &copyBox);
+    // stop pretending this is a CPU picture
+    dst->format.i_chroma = p_filter->fmt_out.video.i_chroma;
     dst->i_planes = 0;
-
-    if (dst->context == NULL)
-    {
-        struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
-        if (likely(pic_ctx))
-        {
-            pic_ctx->s = (picture_context_t) {
-                d3d11_pic_context_destroy, d3d11_pic_context_copy,
-                vlc_video_context_Hold(p_filter->vctx_out),
-            };
-            pic_ctx->picsys = *p_sys;
-            dst->context = &pic_ctx->s;
-        }
-    }
 }
 
 VIDEO_FILTER_WRAPPER (D3D11_NV12)
 VIDEO_FILTER_WRAPPER (D3D11_YUY2)
 VIDEO_FILTER_WRAPPER (D3D11_RGBA)
-VIDEO_FILTER_WRAPPER (NV12_D3D11)
 
 static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
 {
@@ -652,6 +642,18 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
 done:
     free(pic_ctx);
     return NULL;
+}
+
+static picture_t *NV12_D3D11_Filter( filter_t *p_filter, picture_t *p_pic )
+{
+    picture_t *p_outpic = AllocateCPUtoGPUTexture( p_filter );
+    if( p_outpic )
+    {
+        NV12_D3D11( p_filter, p_pic, p_outpic );
+        picture_CopyProperties( p_outpic, p_pic );
+    }
+    picture_Release( p_pic );
+    return p_outpic;
 }
 
 int D3D11OpenConverter( vlc_object_t *obj )
