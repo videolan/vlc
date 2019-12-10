@@ -190,6 +190,59 @@ static void InitLevel(filter_t *filter, struct filter_level *range, const char *
     atomic_init( &range->level, range->Range.Default + level );
 }
 
+static picture_t *AllocPicture( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate( p_filter->vctx_out );
+
+    const d3d_format_t *cfg = NULL;
+    for (const d3d_format_t *output_format = GetRenderFormatList();
+            output_format->name != NULL; ++output_format)
+    {
+        if (output_format->formatTexture == vctx_sys->format &&
+            is_d3d11_opaque(output_format->fourcc))
+        {
+            cfg = output_format;
+            break;
+        }
+    }
+    if (unlikely(cfg == NULL))
+        return NULL;
+
+    struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    if (unlikely(pic_ctx == NULL))
+        return NULL;
+
+    picture_resource_t res = {};
+    picture_t *pic = picture_NewFromResource( &p_filter->fmt_out.video, &res );
+    if (unlikely(pic == NULL))
+    {
+        free(pic_ctx);
+        return NULL;
+    }
+
+    if (AllocateTextures(p_filter, &p_sys->d3d_dev, cfg,
+                         &p_filter->fmt_out.video, 1, pic_ctx->picsys.texture, NULL) != VLC_SUCCESS)
+    {
+        picture_Release(pic);
+        free(pic_ctx);
+        return NULL;
+    }
+
+    D3D11_AllocateResourceView(p_filter, p_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
+
+    pic->p_sys = &pic_ctx->picsys;
+    pic_ctx->picsys.context = vctx_sys->device;
+    pic_ctx->picsys.formatTexture = vctx_sys->format;
+    ID3D11DeviceContext_AddRef(pic_ctx->picsys.context);
+    pic_ctx->s = (picture_context_t) {
+        d3d11_pic_context_destroy, d3d11_pic_context_copy,
+        vlc_video_context_Hold(p_filter->vctx_out),
+    };
+    pic->context = &pic_ctx->s;
+    return pic;
+}
+
 static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -201,7 +254,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
         return NULL;
     }
 
-    picture_t *p_outpic = filter_NewPicture( p_filter );
+    picture_t *p_outpic = AllocPicture( p_filter );
     if( !p_outpic )
     {
         picture_Release( p_pic );
@@ -490,6 +543,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
 
     filter->pf_video_filter = Filter;
     filter->p_sys = sys;
+    filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
 
     return VLC_SUCCESS;
 error:
@@ -537,6 +591,7 @@ static void D3D11CloseAdjust(vlc_object_t *obj)
     ID3D11Texture2D_Release(sys->out[1].texture);
     D3D11_ReleaseProcessor( &sys->d3d_proc );
     D3D11_ReleaseDevice(&sys->d3d_dev);
+    vlc_video_context_Release(filter->vctx_out);
 
     free(sys);
 }
