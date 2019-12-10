@@ -173,6 +173,8 @@ set_deployment_target()
 }
 
 # Validates the architecture and sets VLC_HOST_ARCH
+# This MUST set the arch to what the compiler accepts
+# for the -arch argument!
 # Globals:
 #   VLC_HOST_ARCH
 # Arguments:
@@ -190,6 +192,26 @@ validate_architecture()
         abort_err "Invalid architecture '$1'"
         ;;
     esac
+}
+
+# Set the VLC_HOST_TRIPLET based on the architecture
+# by querying the compiler for it, as the VLC_HOST_ARCH
+# can not be used in the triplet directly, like in
+# case of arm64.
+# Globals:
+#   CC
+#   VLC_HOST_TRIPLET
+# Arguments:
+#   Architecture string
+set_host_triplet()
+{
+    local triplet_arch = $(${CC:-cc} -arch "$1" -dumpmachine | cut -d- -f 1)
+    # We can not directly use the compiler value here as when building for
+    # x86_64 iOS Simulator the triplet will match the build machine triplet
+    # exactly, which will cause autoconf to assume we are not cross-compiling.
+    # Therefore we construct a triplet here without a version number, which
+    # will not match the autoconf "guessed" host machine triplet.
+    VLC_HOST_TRIPLET="${triplet_arch}-apple-darwin"
 }
 
 # Take SDK name, verify it exists and populate
@@ -418,14 +440,12 @@ check_tool xcrun
 # Validate given SDK name
 validate_sdk_name "$VLC_APPLE_SDK_NAME"
 
-# Set triplet (query the compiler for this)
-# FIXME: we hard-code the version number here so HOST and BUILD will not be same
-# which fixes cross-compilation for x86_64
-# note that for 'aarch64', we need to specify it like this here and sanity to 'arm64' afterwards
-readonly VLC_HOST_TRIPLET="${VLC_HOST_ARCH}-apple-darwin18"
-
 # Validate architecture argument
 validate_architecture "$VLC_HOST_ARCH"
+
+# Set triplet (needs to be called after validating the arch)
+set_host_triplet "$VLC_HOST_ARCH"
+
 # Set pseudo-triplet
 readonly VLC_PSEUDO_TRIPLET="${VLC_HOST_ARCH}-apple-${VLC_HOST_PLATFORM}_${VLC_DEPLOYMENT_TARGET}"
 # Contrib install dir
