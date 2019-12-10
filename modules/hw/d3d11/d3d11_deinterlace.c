@@ -211,74 +211,53 @@ static const struct filter_mode_t *GetFilterMode(const char *mode)
 picture_t *AllocPicture( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    picture_t *pic = filter_NewPicture( p_filter );
-    picture_sys_d3d11_t *pic_sys = pic->p_sys;
-    if ( !pic->context )
+    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate( p_filter->vctx_out );
+
+    const d3d_format_t *cfg = NULL;
+    for (const d3d_format_t *output_format = GetRenderFormatList();
+            output_format->name != NULL; ++output_format)
     {
-        bool b_local_texture = false;
-
-        if ( !pic_sys )
+        if (output_format->formatTexture == vctx_sys->format &&
+            is_d3d11_opaque(output_format->fourcc))
         {
-            pic_sys = calloc(1, sizeof(*pic_sys));
-            if (unlikely(pic_sys == NULL))
-                return NULL;
-            pic->p_sys = pic_sys;
-
-            D3D11_TEXTURE2D_DESC dstDesc;
-            ID3D11Texture2D_GetDesc(p_sys->outTexture, &dstDesc);
-
-            const d3d_format_t *cfg = NULL;
-            for (const d3d_format_t *output_format = GetRenderFormatList();
-                 output_format->name != NULL; ++output_format)
-            {
-                if (output_format->formatTexture == dstDesc.Format &&
-                    is_d3d11_opaque(output_format->fourcc))
-                {
-                    cfg = output_format;
-                    break;
-                }
-            }
-            if (unlikely(cfg == NULL))
-            {
-                free(pic_sys);
-                return NULL;
-            }
-
-            /* create the texture that's missing */
-            video_format_t fmt = p_filter->fmt_out.video;
-            fmt.i_width  = dstDesc.Width;
-            fmt.i_height = dstDesc.Height;
-            if (AllocateTextures(p_filter, &p_sys->d3d_dev, cfg,
-                                 &fmt, 1, pic_sys->texture, NULL) != VLC_SUCCESS)
-            {
-                free(pic_sys);
-                return NULL;
-            }
-            b_local_texture = true;
-
-            pic_sys->context = p_sys->d3d_dev.d3dcontext;
-            pic_sys->formatTexture = dstDesc.Format;
-
-        }
-        /* the picture might be duplicated for snapshots so it needs a context */
-        struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
-        if (likely(pic_ctx!=NULL))
-        {
-            pic_ctx->s = (picture_context_t) {
-                d3d11_pic_context_destroy, d3d11_pic_context_copy,
-                vlc_video_context_Hold(p_filter->vctx_in),
-            };
-            pic_ctx->picsys = *pic_sys;
-            AcquireD3D11PictureSys( &pic_ctx->picsys );
-            pic->context = &pic_ctx->s;
-        }
-        if (b_local_texture) {
-            for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
-                if (pic_sys->texture[i])
-                    ID3D11Texture2D_Release(pic_sys->texture[i]);
-            }
+            cfg = output_format;
+            break;
         }
     }
+    if (unlikely(cfg == NULL))
+        return NULL;
+
+    struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    if (unlikely(pic_ctx == NULL))
+        return NULL;
+
+    picture_resource_t res = {};
+    picture_t *pic = picture_NewFromResource( &p_filter->fmt_out.video, &res );
+    if (unlikely(pic == NULL))
+    {
+        free(pic_ctx);
+        return NULL;
+    }
+
+    if (AllocateTextures(p_filter, &p_sys->d3d_dev, cfg,
+                         &p_filter->fmt_out.video, 1, pic_ctx->picsys.texture, NULL) != VLC_SUCCESS)
+    {
+        picture_Release(pic);
+        free(pic_ctx);
+        return NULL;
+    }
+
+    D3D11_AllocateResourceView(p_filter, p_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
+
+    pic->p_sys = &pic_ctx->picsys;
+    pic_ctx->picsys.context = vctx_sys->device;
+    pic_ctx->picsys.formatTexture = vctx_sys->format;
+    ID3D11DeviceContext_AddRef(pic_ctx->picsys.context);
+    pic_ctx->s = (picture_context_t) {
+        d3d11_pic_context_destroy, d3d11_pic_context_copy,
+        vlc_video_context_Hold(p_filter->vctx_out),
+    };
+    pic->context = &pic_ctx->s;
     return pic;
 }
 
