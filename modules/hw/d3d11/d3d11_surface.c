@@ -594,8 +594,6 @@ VIDEO_FILTER_WRAPPER (NV12_D3D11)
 static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
 {
     video_format_t fmt_staging;
-    ID3D11Texture2D *texture = NULL;
-    HRESULT hr;
 
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate( p_filter->vctx_out );
 
@@ -631,30 +629,15 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
         msg_Err(p_filter, "Failed to map create the temporary picture.");
         goto done;
     }
-    picture_Setup(p_dst, &p_dst->format);
-
-    D3D11_TEXTURE2D_DESC texDesc;
-    texDesc.Format = vctx_sys->format;
-    texDesc.MipLevels = 1;
-    texDesc.SampleDesc.Count = 1;
-    texDesc.SampleDesc.Quality = 0;
-    texDesc.MiscFlags = 0;
-    texDesc.ArraySize = 1;
-    texDesc.Usage = D3D11_USAGE_STAGING;
-    texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    texDesc.BindFlags = 0;
-    texDesc.Width  = p_dst->format.i_width;
-    texDesc.Height = p_dst->format.i_height; /* make sure we match picture_Setup() */
 
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    hr = ID3D11Device_CreateTexture2D( p_sys->d3d_dev.d3ddevice, &texDesc, NULL, &texture);
-    if (FAILED(hr)) {
-        msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%lX)", DxgiFormatToStr(texDesc.Format), hr );
+    if (AllocateTextures(p_filter, &p_sys->d3d_dev, cfg,
+                         &p_dst->format, 1, pic_ctx->picsys.texture, p_dst->p) != VLC_SUCCESS)
         goto done;
-    }
 
-    res_sys->texture[KNOWN_DXGI_INDEX] = texture;
+    if (unlikely(D3D11_AllocateResourceView(p_filter, p_sys->d3d_dev.d3ddevice, cfg,
+                                            pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc) != VLC_SUCCESS))
+        goto done;
 
     pic_ctx->s = (picture_context_t) {
         d3d11_pic_context_destroy, d3d11_pic_context_copy,
