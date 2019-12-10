@@ -540,38 +540,60 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         return;
     }
 
-    picture_sys_d3d11_t *p_staging_sys = p_sys;
+    if (sys->filter == NULL)
+    {
+        D3D11_MAPPED_SUBRESOURCE lock;
+        HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX],
+                                            0, D3D11_MAP_WRITE_DISCARD, 0, &lock);
+        if (FAILED(hr)) {
+            msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
+            return;
+        }
 
-    D3D11_TEXTURE2D_DESC texDesc;
-    ID3D11Texture2D_GetDesc( p_staging_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
+        picture_UpdatePlanes(dst, lock.pData, lock.RowPitch);
+        picture_context_t *dst_pic_ctx = dst->context;
+        dst->context = NULL; // some CPU filters won't like the mix of CPU/GPU
 
-    D3D11_MAPPED_SUBRESOURCE lock;
-    HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, p_staging_sys->resource[KNOWN_DXGI_INDEX],
-                                         0, D3D11_MAP_WRITE, 0, &lock);
-    if (FAILED(hr)) {
-        msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
-        return;
+        picture_CopyPixels(dst, src);
+
+        dst->context = dst_pic_ctx;
+        ID3D11DeviceContext_Unmap(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0);
     }
+    else
+    {
+        picture_sys_d3d11_t *p_staging_sys = p_sys;
 
-    picture_UpdatePlanes(sys->staging_pic, lock.pData, lock.RowPitch);
-    picture_context_t *staging_pic_ctx = sys->staging_pic->context;
-    sys->staging_pic->context = NULL; // some CPU filters won't like the mix of CPU/GPU
+        D3D11_TEXTURE2D_DESC texDesc;
+        ID3D11Texture2D_GetDesc( p_staging_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
 
-    picture_Hold( src );
-    sys->filter->pf_video_filter(sys->filter, src);
+        D3D11_MAPPED_SUBRESOURCE lock;
+        HRESULT hr = ID3D11DeviceContext_Map(p_sys->context, p_staging_sys->resource[KNOWN_DXGI_INDEX],
+                                            0, D3D11_MAP_WRITE_DISCARD, 0, &lock);
+        if (FAILED(hr)) {
+            msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
+            return;
+        }
 
-    sys->staging_pic->context = staging_pic_ctx;
-    ID3D11DeviceContext_Unmap(p_sys->context, p_staging_sys->resource[KNOWN_DXGI_INDEX], 0);
+        picture_UpdatePlanes(sys->staging_pic, lock.pData, lock.RowPitch);
+        picture_context_t *staging_pic_ctx = sys->staging_pic->context;
+        sys->staging_pic->context = NULL; // some CPU filters won't like the mix of CPU/GPU
 
-    D3D11_BOX copyBox = {
-        .right = dst->format.i_width, .bottom = dst->format.i_height, .back = 1,
-    };
-    ID3D11DeviceContext_CopySubresourceRegion(p_sys->context,
-                                              p_sys->resource[KNOWN_DXGI_INDEX],
-                                              p_sys->slice_index,
-                                              0, 0, 0,
-                                              p_staging_sys->resource[KNOWN_DXGI_INDEX], 0,
-                                              &copyBox);
+        picture_Hold( src );
+        sys->filter->pf_video_filter(sys->filter, src);
+
+        sys->staging_pic->context = staging_pic_ctx;
+        ID3D11DeviceContext_Unmap(p_sys->context, p_staging_sys->resource[KNOWN_DXGI_INDEX], 0);
+
+        D3D11_BOX copyBox = {
+            .right = dst->format.i_width, .bottom = dst->format.i_height, .back = 1,
+        };
+        ID3D11DeviceContext_CopySubresourceRegion(p_sys->context,
+                                                p_sys->resource[KNOWN_DXGI_INDEX],
+                                                p_sys->slice_index,
+                                                0, 0, 0,
+                                                p_staging_sys->resource[KNOWN_DXGI_INDEX], 0,
+                                                &copyBox);
+    }
     // stop pretending this is a CPU picture
     dst->format.i_chroma = p_filter->fmt_out.video.i_chroma;
     dst->i_planes = 0;
@@ -724,7 +746,6 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
-    filter_t *p_cpu_filter = NULL;
     filter_sys_t *p_sys = NULL;
 
     if ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_D3D11_OPAQUE
@@ -802,24 +823,27 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
     vctx_sys->device = p_sys->d3d_dev.d3dcontext;
     p_filter->p_sys = p_sys;
 
-    picture_t *p_dst = AllocateCPUtoGPUTexture(p_filter);
+    vlc_fourcc_t d3d_fourcc = DxgiFormatFourcc(vctx_sys->format);
 
-    if ( p_filter->fmt_in.video.i_chroma != p_dst->format.i_chroma )
+    if ( p_filter->fmt_in.video.i_chroma != d3d_fourcc )
     {
-        p_cpu_filter = CreateCPUtoGPUFilter(p_filter, &p_filter->fmt_in, p_dst->format.i_chroma);
-        if (!p_cpu_filter)
+        p_sys->staging_pic = AllocateCPUtoGPUTexture(p_filter);
+        if (p_sys->staging_pic == NULL)
             goto done;
+
+        p_sys->filter = CreateCPUtoGPUFilter(p_filter, &p_filter->fmt_in, d3d_fourcc);
+        if (!p_sys->filter)
+        {
+            picture_Release(p_sys->staging_pic);
+            goto done;
+        }
     }
 
-    p_sys->filter = p_cpu_filter;
-    p_sys->staging_pic = p_dst;
     err = VLC_SUCCESS;
 
 done:
     if (err != VLC_SUCCESS)
     {
-        if (p_cpu_filter)
-            DeleteFilter( p_cpu_filter );
         vlc_video_context_Release(p_filter->vctx_out);
         D3D11_ReleaseDevice(&p_sys->d3d_dev);
     }
@@ -845,8 +869,10 @@ void D3D11CloseCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     filter_sys_t *p_sys = p_filter->p_sys;
-    DeleteFilter(p_sys->filter);
-    picture_Release(p_sys->staging_pic);
+    if (p_sys->filter)
+        DeleteFilter(p_sys->filter);
+    if (p_sys->staging_pic)
+        picture_Release(p_sys->staging_pic);
     vlc_video_context_Release(p_filter->vctx_out);
     D3D11_ReleaseDevice(&p_sys->d3d_dev);
 }
