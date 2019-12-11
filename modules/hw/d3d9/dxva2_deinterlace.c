@@ -183,7 +183,7 @@ static int RenderPic( filter_t *filter, picture_t *p_outpic, picture_t *src,
                       int order, int i_field )
 {
     filter_sys_t *sys = filter->p_sys;
-    picture_sys_d3d9_t *p_out_sys = p_outpic->p_sys;
+    picture_sys_d3d9_t *p_out_sys = ActiveD3D9PictureSys(p_outpic);
     const int i_samples = sys->decoder_caps.NumBackwardRefSamples + 1 +
                           sys->decoder_caps.NumForwardRefSamples;
     HRESULT hr;
@@ -288,8 +288,7 @@ picture_t *AllocPicture( filter_t *p_filter )
     if (unlikely(pic_ctx == NULL))
         return NULL;
 
-    picture_resource_t res = {};
-    picture_t *pic = picture_NewFromResource( &p_filter->fmt_out.video, &res );
+    picture_t *pic = picture_NewFromFormat( &p_filter->fmt_out.video );
     if (unlikely(pic == NULL))
     {
         free(pic_ctx);

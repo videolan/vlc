@@ -104,8 +104,7 @@ static picture_t *AllocPicture( filter_t *p_filter )
     if (unlikely(pic_ctx == NULL))
         return NULL;
 
-    picture_resource_t res = {};
-    picture_t *pic = picture_NewFromResource( &p_filter->fmt_out.video, &res );
+    picture_t *pic = picture_NewFromFormat( &p_filter->fmt_out.video );
     if (unlikely(pic == NULL))
     {
         free(pic_ctx);
@@ -149,7 +148,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     if( !p_outpic )
         goto failed;
 
-    picture_sys_d3d9_t *p_out_sys = p_outpic->p_sys;
+    picture_sys_d3d9_t *p_out_sys = ActiveD3D9PictureSys(p_outpic);
     if( !p_out_sys || !p_out_sys->surface )
         goto failed;
 

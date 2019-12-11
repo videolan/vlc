@@ -344,20 +344,17 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
         vlc_video_context_Hold(p_filter->vctx_out),
     };
 
-    picture_resource_t res = {};
-    picture_sys_d3d9_t *res_sys = &pic_ctx->picsys;
-    res.p_sys = res_sys;
-    res_sys->surface = texture;
-
     video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
     fmt_staging.i_chroma = format;
 
-    picture_t *p_dst = picture_NewFromResource(&fmt_staging, &res);
+    picture_t *p_dst = picture_NewFromFormat(&fmt_staging);
     if (p_dst == NULL) {
         msg_Err(p_filter, "Failed to map create the temporary picture.");
         goto done;
     }
     picture_Setup(p_dst, &p_dst->format);
+    pic_ctx->picsys.surface = texture;
+    p_dst->p_sys = &pic_ctx->picsys;
     p_dst->context = &pic_ctx->s;
     return p_dst;
 
