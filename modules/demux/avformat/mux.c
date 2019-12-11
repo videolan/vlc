@@ -263,6 +263,18 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         }
         break;
 
+    case SPU_ES:
+        codecpar->codec_type = AVMEDIA_TYPE_SUBTITLE;
+        /* psz_description and psz_language are expected to be compliant with
+         * the muxing format. It should be the case when muxing a compliant
+         * source to the same muxing format, but we have no general guarantee
+         * at this point in the code. */
+        if (fmt->psz_description != NULL && *fmt->psz_description != '\0')
+            av_dict_set( &stream->metadata, "title", fmt->psz_description, 0 );
+        if (fmt->psz_language != NULL && *fmt->psz_language != '\0')
+            av_dict_set( &stream->metadata, "language", fmt->psz_language, 0 );
+        break;
+
     case VIDEO_ES:
         if( !fmt->video.i_frame_rate || !fmt->video.i_frame_rate_base ) {
             msg_Warn( p_mux, "Missing frame rate, assuming 25fps" );
