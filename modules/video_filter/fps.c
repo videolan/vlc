@@ -160,6 +160,12 @@ static int Open( vlc_object_t *p_this)
         p_filter->fmt_out.video.i_frame_rate_base = i_out_frame_rate_base;
     }
 
+    if( p_filter->fmt_out.video.i_frame_rate == 0 ) {
+        msg_Err( p_filter, "Invalid output frame rate" );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
     msg_Dbg( p_filter, "Converting fps from %d/%d -> %d/%d",
             p_filter->fmt_in.video.i_frame_rate, p_filter->fmt_in.video.i_frame_rate_base,
             p_filter->fmt_out.video.i_frame_rate, p_filter->fmt_out.video.i_frame_rate_base );
