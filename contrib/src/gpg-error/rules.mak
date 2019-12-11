@@ -33,7 +33,9 @@ ifdef HAVE_ARMV7A
 	cp $@/src/syscfg/lock-obj-pub.arm-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
 else
 ifeq ($(ARCH),aarch64)
+ifneq ($(HOST),aarch64-apple-darwin)
 	cp $@/src/syscfg/lock-obj-pub.aarch64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
+endif
 else
 	cp $@/src/syscfg/lock-obj-pub.x86_64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
 endif
