@@ -31,6 +31,8 @@ Widgets.NavigableFocusScope {
     id: root
     property var currentIndex: view.currentItem.currentIndex
 
+    property alias contentModel: videosDelegate.model;
+
     DG.ModalDialog {
         id: deleteDialog
         rootWindow: root
