@@ -220,10 +220,16 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         i_codec_id = AV_CODEC_ID_MP3;
     }
 
-    if( fmt->i_cat != VIDEO_ES && fmt->i_cat != AUDIO_ES)
+    /* Whitelist allowed ES categories */
+    switch( fmt->i_cat )
     {
-        msg_Warn( p_mux, "Unhandled ES category" );
-        return VLC_EGENERIC;
+        case VIDEO_ES:
+        case AUDIO_ES:
+        case SPU_ES:
+            break;
+        default:
+            msg_Warn( p_mux, "Unhandled ES category" );
+            return VLC_EGENERIC;
     }
 
     /* */
