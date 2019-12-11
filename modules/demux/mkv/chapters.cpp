@@ -146,13 +146,14 @@ bool chapter_item_c::EnterLeaveHelper_ ( bool do_subs,
     bool f_result = false;
 
     f_result |= std::count_if ( codecs.begin (), codecs.end (),
-      std::mem_fun (co_cb)
+      std::mem_fn (co_cb)
     );
 
     if ( do_subs )
     {
+        using std::placeholders::_1;
         f_result |= count_if ( sub_chapters.begin (), sub_chapters.end (),
-          std::bind2nd( std::mem_fun( ch_cb ), true )
+          std::bind( std::mem_fn( ch_cb ), _1, true )
         );
     }
 
