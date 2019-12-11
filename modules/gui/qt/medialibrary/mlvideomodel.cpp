@@ -123,7 +123,9 @@ std::vector<std::unique_ptr<MLVideo> > MLVideoModel::fetch()
 
 size_t MLVideoModel::countTotalElements() const
 {
-    vlc_ml_query_params_t params{};
+    vlc_ml_query_params_t params = m_query_param;
+    params.i_offset = 0;
+    params.i_nbResults = 0;
     return vlc_ml_count_video_media(m_ml, &params);
 }
 
