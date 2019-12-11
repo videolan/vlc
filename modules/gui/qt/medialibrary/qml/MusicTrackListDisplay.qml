@@ -28,14 +28,14 @@ import "qrc:///style/"
 Widgets.KeyNavigableTableView {
     id: root
 
-    sortModel: ListModel {
-        ListElement{ isPrimary: true; criteria: "title";       width:0.44; text: qsTr("Title");    showSection: "title" }
-        ListElement{ criteria: "album_title"; width:0.25; text: qsTr("Album");    showSection: "album_title" }
-        ListElement{ criteria: "main_artist"; width:0.15; text: qsTr("Artist");   showSection: "main_artist" }
-        ListElement{ criteria: "duration";    width:0.06; text: qsTr("Duration"); showSection: "" }
-        ListElement{ criteria: "track_number";width:0.05; text: qsTr("Track"); showSection: "" }
-        ListElement{ criteria: "disc_number"; width:0.05; text: qsTr("Disc");  showSection: "" }
-    }
+    sortModel: [
+        { isPrimary: true, criteria: "title",       width:0.44, text: i18n.qtr("Title"),    showSection: "title" },
+        { criteria: "album_title", width:0.25, text: i18n.qtr("Album"),    showSection: "album_title" },
+        { criteria: "main_artist", width:0.15, text: i18n.qtr("Artist"),   showSection: "main_artist" },
+        { criteria: "duration",    width:0.06, text: i18n.qtr("Duration"), showSection: "" },
+        { criteria: "track_number",width:0.05, text: i18n.qtr("Track"), showSection: "" },
+        { criteria: "disc_number", width:0.05, text: i18n.qtr("Disc"),  showSection: "" },
+    ]
 
     section.property: "title_first_symbol"
 

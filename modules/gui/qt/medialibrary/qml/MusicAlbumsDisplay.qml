@@ -29,12 +29,12 @@ import "qrc:///style/"
 Widgets.NavigableFocusScope {
     id: root
 
-    property var sortModel: ListModel {
-        ListElement { text: qsTr("Alphabetic");  criteria: "title";}
-        ListElement { text: qsTr("Duration");    criteria: "duration"; }
-        ListElement { text: qsTr("Date");        criteria: "release_year"; }
-        ListElement { text: qsTr("Artist");      criteria: "main_artist"; }
-    }
+    property var sortModel: [
+        { text: i18n.qtr("Alphabetic"),  criteria: "title"},
+        { text: i18n.qtr("Duration"),    criteria: "duration" },
+        { text: i18n.qtr("Date"),        criteria: "release_year" },
+        { text: i18n.qtr("Artist"),      criteria: "main_artist" },
+    ]
 
     property alias model: delegateModel.model
     property alias parentId: delegateModel.parentId

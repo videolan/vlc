@@ -88,17 +88,17 @@ Widgets.NavigableFocusScope {
                 //Layout.minimumWidth: VLCStyle.icon_normal * 2
                 popupAlignment: Qt.AlignRight | Qt.AlignTop
 
-                model: ListModel {
-                    ListElement { text: qsTr("Tile");             criteria: PlaylistControllerModel.SORT_KEY_TITLE}
-                    ListElement { text: qsTr("Duration");         criteria: PlaylistControllerModel.SORT_KEY_DURATION}
-                    ListElement { text: qsTr("Artist");           criteria: PlaylistControllerModel.SORT_KEY_ARTIST}
-                    ListElement { text: qsTr("Album");            criteria: PlaylistControllerModel.SORT_KEY_ALBUM}
-                    ListElement { text: qsTr("Genre");            criteria: PlaylistControllerModel.SORT_KEY_GENRE}
-                    ListElement { text: qsTr("Date");             criteria: PlaylistControllerModel.SORT_KEY_DATE}
-                    ListElement { text: qsTr("Track number");     criteria: PlaylistControllerModel.SORT_KEY_TRACK_NUMBER}
-                    ListElement { text: qsTr("URL");              criteria: PlaylistControllerModel.SORT_KEY_URL}
-                    ListElement { text: qsTr("Rating");           criteria: PlaylistControllerModel.SORT_KEY_RATIN}
-                }
+                model: [
+                    { text: i18n.qtr("Tile"),             criteria: PlaylistControllerModel.SORT_KEY_TITLE },
+                    { text: i18n.qtr("Duration"),         criteria: PlaylistControllerModel.SORT_KEY_DURATION },
+                    { text: i18n.qtr("Artist"),           criteria: PlaylistControllerModel.SORT_KEY_ARTIST },
+                    { text: i18n.qtr("Album"),            criteria: PlaylistControllerModel.SORT_KEY_ALBUM },
+                    { text: i18n.qtr("Genre"),            criteria: PlaylistControllerModel.SORT_KEY_GENRE },
+                    { text: i18n.qtr("Date"),             criteria: PlaylistControllerModel.SORT_KEY_DATE },
+                    { text: i18n.qtr("Track number"),     criteria: PlaylistControllerModel.SORT_KEY_TRACK_NUMBER },
+                    { text: i18n.qtr("URL"),              criteria: PlaylistControllerModel.SORT_KEY_URL },
+                    { text: i18n.qtr("Rating"),           criteria: PlaylistControllerModel.SORT_KEY_RATIN },
+                ]
                 textRole: "text"
 
                 listWidth: VLCStyle.widthSortBox

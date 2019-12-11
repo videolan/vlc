@@ -203,11 +203,11 @@ Widgets.NavigableFocusScope {
                     }
                 }
 
-                sortModel: ListModel {
-                    ListElement{ criteria: "track_number";  width:0.10; visible: true; text: qsTr("#"); showSection: "" }
-                    ListElement{isPrimary: true; criteria: "title";         width:0.70; visible: true; text: qsTr("Title"); showSection: "" }
-                    ListElement{ criteria: "duration";      width:0.20; visible: true; text: qsTr("Duration"); showSection: "" }
-                }
+                sortModel: [
+                    { criteria: "track_number",  width:0.10, visible: true, text: i18n.qtr("#"), showSection: "" },
+                    { isPrimary: true, criteria: "title",         width:0.70, visible: true, text: i18n.qtr("Title"), showSection: "" },
+                    { criteria: "duration",      width:0.20, visible: true, text: i18n.qtr("Duration"), showSection: "" },
+                ]
                 focus: true
 
                 navigationParent: root

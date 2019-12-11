@@ -33,7 +33,7 @@ NavigableFocusScope {
     signal contextMenuButtonClicked(Item menuParent, var menuModel)
     signal rightClick(Item menuParent, var menuModel)
 
-    property var sortModel: ListModel { }
+    property var sortModel: []
     property Component colDelegate: Item { }
     property var model: []
 
@@ -106,14 +106,14 @@ NavigableFocusScope {
 
                                 Item {
                                     height: parent.height
-                                    width: model.width * view.width
+                                    width: modelData.width * view.width
                                     Layout.alignment: Qt.AlignVCenter
                                     Loader{
                                         anchors.fill: parent
                                         sourceComponent: colDelegate
 
                                         property var rowModel: element.rowModel
-                                        property var colModel: model
+                                        property var colModel: modelData
 
                                     }
 
@@ -159,11 +159,11 @@ NavigableFocusScope {
                         model: sortModel
                         MouseArea {
                             height: VLCStyle.fontHeight_normal
-                            width: model.width * view.width
+                            width: modelData.width * view.width
                             //Layout.alignment: Qt.AlignVCenter
 
                             Text {
-                                text: model.text || ""
+                                text: modelData.text || ""
                                 elide: Text.ElideRight
                                 font {
                                     pixelSize: VLCStyle.fontSize_normal
@@ -180,7 +180,7 @@ NavigableFocusScope {
 
                             Text {
                                 text: (root.model.sortOrder === Qt.AscendingOrder) ? "▼" : "▲"
-                                visible: root.model.sortCriteria === model.criteria
+                                visible: root.model.sortCriteria === modelData.criteria
                                 font.pixelSize: VLCStyle.fontSize_normal
                                 color: VLCStyle.colors.accent
                                 anchors {
@@ -190,8 +190,8 @@ NavigableFocusScope {
                                 }
                             }
                             onClicked: {
-                                if (root.model.sortCriteria !== model.criteria)
-                                    root.model.sortCriteria = model.criteria
+                                if (root.model.sortCriteria !== modelData.criteria)
+                                    root.model.sortCriteria = modelData.criteria
                                 else
                                     root.model.sortOrder = (root.model.sortOrder === Qt.AscendingOrder) ? Qt.DescendingOrder : Qt.AscendingOrder
                             }

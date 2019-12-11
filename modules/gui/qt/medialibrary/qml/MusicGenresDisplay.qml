@@ -28,9 +28,9 @@ import "qrc:///style/"
 Widgets.NavigableFocusScope {
     id: root
     property alias model: delegateModel.model
-    property var sortModel: ListModel {
-        ListElement { text: qsTr("Alphabetic"); criteria: "title" }
-    }
+    property var sortModel: [
+        { text: i18n.qtr("Alphabetic"), criteria: "title" }
+    ]
 
     function goToView( parent ) {
         history.push([ "mc", "music", "albums", { parentId: parent } ], History.Go)

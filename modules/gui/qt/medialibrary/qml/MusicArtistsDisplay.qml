@@ -29,9 +29,9 @@ import "qrc:///style/"
 Widgets.NavigableFocusScope {
     id: root
     property alias model: delegateModel.model
-    property var sortModel: ListModel {
-        ListElement { text: qsTr("Alphabetic");  criteria: "title" }
-    }
+    property var sortModel: [
+        { text: i18n.qtr("Alphabetic"),  criteria: "title" }
+    ]
 
     property var artistId
 
