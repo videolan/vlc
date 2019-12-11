@@ -92,7 +92,6 @@ Widgets.NavigableFocusScope {
 
             clip: true
             implicitHeight: contentHeight
-            model: root.model
             spacing: 0
 
             highlight: Rectangle {
@@ -149,7 +148,7 @@ Widgets.NavigableFocusScope {
 
                 onClicked: {
                     root.currentIndex = index
-                    root.sortSelected(model)
+                    root.sortSelected(Array.isArray(root.model) ? modelData : model)
                     popup.close()
                 }
             }
