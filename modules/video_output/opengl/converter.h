@@ -183,6 +183,26 @@ struct opengl_tex_converter_t
     void (*pf_prepare_shader)(const opengl_tex_converter_t *tc,
                               const GLsizei *tex_width, const GLsizei *tex_height,
                               float alpha);
+
+    /**
+     * Callback to retrieve the transform matrix to apply to texture coordinates
+     *
+     * This function pointer can be NULL. If it is set, it may return NULL.
+     *
+     * Otherwise, it must return a 4x4 matrix, as an array of 16 floats in
+     * column-major order.
+     *
+     * This transform matrix maps 2D homogeneous texture coordinates of the
+     * form (s, t, 0, 1) with s and t in the inclusive range [0, 1] to the
+     * texture coordinate that should be used to sample that location from the
+     * texture.
+     *
+     * The returned pointer is owned by the converter module, and must not be
+     * freed before the module is closed.
+     *
+     * \param tc OpenGL tex converter
+     */
+    const float *(*pf_get_transform_matrix)(const opengl_tex_converter_t *tc);
 };
 
 /**

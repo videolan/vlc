@@ -524,6 +524,11 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     const char *sampler, *lookup, *coord_name;
     switch (tex_target)
     {
+        case GL_TEXTURE_EXTERNAL_OES:
+            sampler = "samplerExternalOES";
+            lookup = "texture2D";
+            coord_name = "TexCoord";
+            break;
         case GL_TEXTURE_2D:
             sampler = "sampler2D";
             lookup  = "texture2D";
@@ -545,7 +550,12 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 #define ADD(x) vlc_memstream_puts(&ms, x)
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
 
-    ADDF("#version %u\n%s", tc->glsl_version, tc->glsl_precision_header);
+    ADDF("#version %u\n", tc->glsl_version);
+
+    if (tex_target == GL_TEXTURE_EXTERNAL_OES)
+        ADDF("#extension GL_OES_EGL_image_external : require\n");
+
+    ADDF("%s", tc->glsl_precision_header);
 
     for (unsigned i = 0; i < tc->tex_count; ++i)
         ADDF("uniform %s Texture%u;\n"

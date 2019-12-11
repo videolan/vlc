@@ -105,6 +105,7 @@ struct prgm
     } var;
 
     struct { /* UniformLocation */
+        GLint TransformMatrix;
         GLint OrientationMatrix;
         GLint ProjectionMatrix;
         GLint ViewMatrix;
@@ -315,12 +316,13 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "attribute vec4 MultiTexCoord0;\n"
         "%s%s"
         "attribute vec3 VertexPosition;\n"
+        "uniform mat4 TransformMatrix;\n"
         "uniform mat4 OrientationMatrix;\n"
         "uniform mat4 ProjectionMatrix;\n"
         "uniform mat4 ZoomMatrix;\n"
         "uniform mat4 ViewMatrix;\n"
         "void main() {\n"
-        " TexCoord0 = vec4(OrientationMatrix * MultiTexCoord0).st;\n"
+        " TexCoord0 = vec4(OrientationMatrix * TransformMatrix * MultiTexCoord0).st;\n"
         "%s%s"
         " gl_Position = ProjectionMatrix * ZoomMatrix * ViewMatrix\n"
         "               * vec4(VertexPosition, 1.0);\n"
@@ -463,6 +465,7 @@ opengl_link_program(struct prgm *prgm)
 } while (0)
 #define GET_ULOC(x, str) GET_LOC(Uniform, prgm->uloc.x, str)
 #define GET_ALOC(x, str) GET_LOC(Attrib, prgm->aloc.x, str)
+    GET_ULOC(TransformMatrix, "TransformMatrix");
     GET_ULOC(OrientationMatrix, "OrientationMatrix");
     GET_ULOC(ProjectionMatrix, "ProjectionMatrix");
     GET_ULOC(ViewMatrix, "ViewMatrix");
@@ -533,6 +536,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
     tc->vt = &vgl->vt;
     tc->b_dump_shaders = b_dump_shaders;
     tc->pf_fragment_shader_init = opengl_fragment_shader_init_impl;
+    tc->pf_get_transform_matrix = NULL;
     tc->glexts = glexts;
 #if defined(USE_OPENGL_ES2)
     tc->is_gles = true;
@@ -1471,6 +1475,13 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
     vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
     vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
+    const GLfloat *tm = tc->pf_get_transform_matrix
+                      ? tc->pf_get_transform_matrix(tc) : NULL;
+    if (!tm)
+        tm = identity;
+
+    vgl->vt.UniformMatrix4fv(prgm->uloc.TransformMatrix, 1, GL_FALSE, tm);
+
     vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
                              prgm->var.OrientationMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ProjectionMatrix, 1, GL_FALSE,
@@ -1649,6 +1660,9 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
         vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 2, GL_FLOAT,
                                     0, 0, 0);
+
+        vgl->vt.UniformMatrix4fv(prgm->uloc.TransformMatrix, 1, GL_FALSE,
+                                 identity);
 
         vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
                                  prgm->var.OrientationMatrix);

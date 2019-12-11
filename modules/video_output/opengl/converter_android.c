@@ -35,10 +35,6 @@ struct priv
     AWindowHandler *awh;
     const float *transform_mtx;
     bool stex_attached;
-
-    struct {
-        GLint uSTMatrix;
-    } uloc;
 };
 
 static int
@@ -87,24 +83,11 @@ tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
     return VLC_SUCCESS;
 }
 
-static int
-tc_anop_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
+static const float *
+tc_get_transform_matrix(const opengl_tex_converter_t *tc)
 {
     struct priv *priv = tc->priv;
-    priv->uloc.uSTMatrix = tc->vt->GetUniformLocation(program, "uSTMatrix");
-    return priv->uloc.uSTMatrix != -1 ? VLC_SUCCESS : VLC_EGENERIC;
-}
-
-static void
-tc_anop_prepare_shader(const opengl_tex_converter_t *tc,
-                       const GLsizei *tex_width, const GLsizei *tex_height,
-                       float alpha)
-{
-    (void) tex_width; (void) tex_height; (void) alpha;
-    struct priv *priv = tc->priv;
-    if (priv->transform_mtx != NULL)
-        tc->vt->UniformMatrix4fv(priv->uloc.uSTMatrix, 1, GL_FALSE,
-                                  priv->transform_mtx);
+    return priv->transform_mtx;
 }
 
 static void
@@ -147,13 +130,7 @@ Open(vlc_object_t *obj)
 
     tc->pf_allocate_textures = tc_anop_allocate_textures;
     tc->pf_update         = tc_anop_update;
-    tc->pf_fetch_locations = tc_anop_fetch_locations;
-    tc->pf_prepare_shader = tc_anop_prepare_shader;
-
-    tc->tex_count = 1;
-    tc->texs[0] = (struct opengl_tex_cfg) { { 1, 1 }, { 1, 1 }, 0, 0, 0 };
-
-    tc->tex_target   = GL_TEXTURE_EXTERNAL_OES;
+    tc->pf_get_transform_matrix = tc_get_transform_matrix;
 
     /* The transform Matrix (uSTMatrix) given by the SurfaceTexture is not
      * using the same origin than us. Ask the caller to rotate textures
@@ -186,29 +163,14 @@ Open(vlc_object_t *obj)
             break;
     }
 
-    static const char *template =
-        "#version %u\n"
-        "#extension GL_OES_EGL_image_external : require\n"
-        "%s" /* precision */
-        "varying vec2 TexCoord0;"
-        "uniform samplerExternalOES sTexture;"
-        "uniform mat4 uSTMatrix;"
-        "void main()"
-        "{ "
-        "  gl_FragColor = texture2D(sTexture, (uSTMatrix * vec4(TexCoord0, 1, 1)).xy).rgba;"
-        "}";
-
-    char *code;
-    if (asprintf(&code, template, tc->glsl_version, tc->glsl_precision_header) < 0)
+    tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_EXTERNAL_OES,
+                                              VLC_CODEC_RGB32,
+                                              COLOR_SPACE_UNDEF);
+    if (!tc->fshader)
     {
         free(tc->priv);
         return VLC_EGENERIC;
     }
-    GLuint fragment_shader = tc->vt->CreateShader(GL_FRAGMENT_SHADER);
-    tc->vt->ShaderSource(fragment_shader, 1, (const char **) &code, NULL);
-    tc->vt->CompileShader(fragment_shader);
-    tc->fshader = fragment_shader;
-    free(code);
 
     return VLC_SUCCESS;
 }
