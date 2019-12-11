@@ -233,8 +233,7 @@ picture_t *AllocPicture( filter_t *p_filter )
     if (unlikely(pic_ctx == NULL))
         return NULL;
 
-    picture_resource_t res = {};
-    picture_t *pic = picture_NewFromResource( &p_filter->fmt_out.video, &res );
+    picture_t *pic = picture_NewFromFormat( &p_filter->fmt_out.video );
     if (unlikely(pic == NULL))
     {
         free(pic_ctx);

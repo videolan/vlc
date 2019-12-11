@@ -632,14 +632,10 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
     if (unlikely(pic_ctx == NULL))
         goto done;
 
-    picture_resource_t res = {};
-    picture_sys_d3d11_t *res_sys = &pic_ctx->picsys;
-    res.p_sys = res_sys;
-
     video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
     fmt_staging.i_chroma = cfg->fourcc;
 
-    picture_t *p_dst = picture_NewFromResource(&fmt_staging, &res);
+    picture_t *p_dst = picture_NewFromFormat(&fmt_staging);
     if (p_dst == NULL) {
         msg_Err(p_filter, "Failed to map create the temporary picture.");
         goto done;
@@ -658,8 +654,8 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
         d3d11_pic_context_destroy, d3d11_pic_context_copy,
         vlc_video_context_Hold(p_filter->vctx_out),
     };
-    AcquireD3D11PictureSys(res_sys);
-    ID3D11Texture2D_Release(res_sys->texture[KNOWN_DXGI_INDEX]);
+    AcquireD3D11PictureSys(&pic_ctx->picsys);
+    ID3D11Texture2D_Release(pic_ctx->picsys.texture[KNOWN_DXGI_INDEX]);
 
     p_dst->context = &pic_ctx->s;
 

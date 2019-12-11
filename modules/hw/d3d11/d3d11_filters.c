@@ -213,8 +213,7 @@ static picture_t *AllocPicture( filter_t *p_filter )
     if (unlikely(pic_ctx == NULL))
         return NULL;
 
-    picture_resource_t res = {};
-    picture_t *pic = picture_NewFromResource( &p_filter->fmt_out.video, &res );
+    picture_t *pic = picture_NewFromFormat( &p_filter->fmt_out.video );
     if (unlikely(pic == NULL))
     {
         free(pic_ctx);
@@ -257,7 +256,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
         picture_Release( p_pic );
         return NULL;
     }
-    picture_sys_d3d11_t *p_out_sys = p_outpic->p_sys;
+    picture_sys_d3d11_t *p_out_sys = ActiveD3D11PictureSys(p_outpic);
     if (unlikely(!p_out_sys))
     {
         /* the output filter configuration may have changed since the filter
