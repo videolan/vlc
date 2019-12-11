@@ -35,7 +35,6 @@
 typedef struct
 {
     IDirect3DSurface9    *surface;
-    HINSTANCE            dxva2_dll;
 } picture_sys_d3d9_t;
 
 struct d3d9_pic_context
@@ -127,13 +126,11 @@ static inline d3d9_video_context_t *GetD3D9ContextPrivate(vlc_video_context *vct
 static inline void AcquireD3D9PictureSys(picture_sys_d3d9_t *p_sys)
 {
     IDirect3DSurface9_AddRef(p_sys->surface);
-    p_sys->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
 }
 
 static inline void ReleaseD3D9PictureSys(picture_sys_d3d9_t *p_sys)
 {
     IDirect3DSurface9_Release(p_sys->surface);
-    FreeLibrary(p_sys->dxva2_dll);
 }
 
 HRESULT D3D9_CreateDevice(vlc_object_t *, d3d9_handle_t *, int,

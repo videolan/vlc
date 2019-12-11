@@ -41,6 +41,7 @@ struct dxva2_pic_context
 {
     struct d3d9_pic_context ctx;
     struct vlc_va_surface_t *va_surface;
+    HINSTANCE               dxva2_dll;
 };
 
 #define DXVA2_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
@@ -162,10 +163,12 @@ static void dxva2_pic_context_destroy(picture_context_t *ctx)
 {
     struct dxva2_pic_context *pic_ctx = DXVA2_PICCONTEXT_FROM_PICCTX(ctx);
     struct vlc_va_surface_t *va_surface = pic_ctx->va_surface;
+    HINSTANCE dxva2_dll = pic_ctx->dxva2_dll;
     static_assert(offsetof(struct dxva2_pic_context, ctx.s) == 0,
         "Cast assumption failure");
     d3d9_pic_context_destroy(ctx);
     va_surface_Release(va_surface);
+    FreeLibrary(dxva2_dll);
 }
 
 static picture_context_t *dxva2_pic_context_copy(picture_context_t *ctx)
@@ -202,6 +205,7 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *v
     if (unlikely(pic_ctx==NULL))
         return NULL;
     pic_ctx->va_surface = va_surface;
+    pic_ctx->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
     return &pic_ctx->ctx.s;
 }
 
