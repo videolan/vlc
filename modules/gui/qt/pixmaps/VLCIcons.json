@@ -41,6 +41,7 @@
 		{"key":"play_reverse", "path": "./toolbar/play_reverse.svg"},
 		{"key":"record", "path": "./toolbar/record_16px.svg"},
 		{"key":"snapshot", "path": "./toolbar/snapshot.svg"},
+		{"key":"search", "path": "./toolbar/search.svg"},
 		{"key":"volume_high", "path": "./toolbar/volume-high.svg"},
 		{"key":"volume_slider_inside", "path": "./toolbar/volume-slider-inside.svg"},
 		{"key":"volume_muted", "path": "./toolbar/volume-muted.svg"},
