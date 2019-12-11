@@ -354,7 +354,6 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
     }
     picture_Setup(p_dst, &p_dst->format);
     pic_ctx->picsys.surface = texture;
-    p_dst->p_sys = &pic_ctx->picsys;
     p_dst->context = &pic_ctx->s;
     return p_dst;
 

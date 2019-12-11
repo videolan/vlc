@@ -127,7 +127,6 @@ static picture_t *AllocPicture( filter_t *p_filter )
         picture_Release(pic);
         return NULL;
     }
-    pic->p_sys = &pic_ctx->picsys;
     AcquireD3D9PictureSys( &pic_ctx->picsys );
     IDirect3DSurface9_Release(pic_ctx->picsys.surface);
     pic_ctx->s = (picture_context_t) {
