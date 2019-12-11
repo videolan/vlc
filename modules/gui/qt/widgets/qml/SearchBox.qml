@@ -97,7 +97,7 @@ Widgets.NavigableFocusScope {
                 id: icon
 
                 size: VLCStyle.icon_normal
-                iconText: VLCIcons.topbar_filter
+                iconText: VLCIcons.search
                 text: i18n.qtr("Filter")
 
                 focus: true
