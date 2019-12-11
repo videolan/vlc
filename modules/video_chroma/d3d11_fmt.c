@@ -43,9 +43,8 @@
 
 picture_sys_d3d11_t *ActiveD3D11PictureSys(picture_t *pic)
 {
-    if (unlikely(pic->context == NULL))
-        return pic->p_sys;
-
+    assert(pic->context != NULL);
+    assert(pic->p_sys == NULL);
     struct d3d11_pic_context *pic_ctx = D3D11_PICCONTEXT_FROM_PICCTX(pic->context);
     return &pic_ctx->picsys;
 }

@@ -250,7 +250,6 @@ picture_t *AllocPicture( filter_t *p_filter )
 
     D3D11_AllocateResourceView(p_filter, p_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
 
-    pic->p_sys = &pic_ctx->picsys;
     pic_ctx->s = (picture_context_t) {
         d3d11_pic_context_destroy, d3d11_pic_context_copy,
         vlc_video_context_Hold(p_filter->vctx_out),
