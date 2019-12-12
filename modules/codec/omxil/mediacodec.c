@@ -658,6 +658,14 @@ CreateVideoContext(decoder_t *p_dec)
     else
         id = AWindow_Video;
 
+    p_sys->video.p_surface = AWindowHandler_getANativeWindow(awh, id);
+    p_sys->video.p_jsurface = AWindowHandler_getSurface(awh, id);
+    if (!p_sys->video.p_surface)
+    {
+        msg_Err(p_dec, "Could not find a valid ANativeWindow");
+        return VLC_EGENERIC;
+    }
+
     static const struct vlc_video_context_operations ops =
     {
         .destroy = CleanFromVideoContext,
@@ -669,16 +677,6 @@ CreateVideoContext(decoder_t *p_dec)
 
     if (!p_sys->video.ctx)
         return VLC_EGENERIC;
-
-    p_sys->video.p_surface = AWindowHandler_getANativeWindow(awh, id);
-    p_sys->video.p_jsurface = AWindowHandler_getSurface(awh, id);
-    if (!p_sys->video.p_surface)
-    {
-        msg_Err(p_dec, "Could not find a valid ANativeWindow");
-        vlc_video_context_Release(p_sys->video.ctx);
-        p_sys->video.ctx = NULL;
-        return VLC_EGENERIC;
-    }
 
     android_video_context_t *avctx =
         vlc_video_context_GetPrivate(p_sys->video.ctx, VLC_VIDEO_CONTEXT_AWINDOW);
