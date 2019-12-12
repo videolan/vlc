@@ -205,6 +205,7 @@ struct  demux_sys_t
     /* TS stream */
     es_out_t            *p_tf_out;
     es_out_t            *p_out;
+    es_out_t            *p_esc_out;
     bool                b_spu_enable;       /* enabled / disabled */
     vlc_demux_chained_t *p_parser;
     bool                b_flushed;
@@ -371,6 +372,7 @@ static const char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var )
  * Local prototypes
  *****************************************************************************/
 static es_out_t *esOutNew(vlc_object_t*, es_out_t *, void *);
+static es_out_t *escape_esOutNew(vlc_object_t *, es_out_t *);
 
 static int   blurayControl(demux_t *, int, va_list);
 static int   blurayDemux(demux_t *);
@@ -956,7 +958,17 @@ static int blurayOpen(vlc_object_t *object)
     if(unlikely(!p_sys->p_tf_out))
         goto error;
 
-    p_sys->p_out = esOutNew(VLC_OBJECT(p_demux), p_sys->p_tf_out, p_demux);
+    es_out_t *out_id = p_sys->p_tf_out;
+    if (unlikely(disc_info->udf_volume_id &&
+                 !strncmp(disc_info->udf_volume_id, "VLC Escape", strlen("VLC Escape"))))
+    {
+        p_sys->p_esc_out = escape_esOutNew(VLC_OBJECT(p_demux), p_sys->p_tf_out);
+        out_id = p_sys->p_esc_out;
+    }
+    else
+        p_sys->p_esc_out = NULL;
+
+    p_sys->p_out = esOutNew(VLC_OBJECT(p_demux), out_id, p_demux);
     if (unlikely(p_sys->p_out == NULL))
         goto error;
 
@@ -1017,6 +1029,8 @@ static void blurayClose(vlc_object_t *object)
 
     if (p_sys->p_out != NULL)
         es_out_Delete(p_sys->p_out);
+    if (p_sys->p_esc_out != NULL)
+        es_out_Delete(p_sys->p_esc_out);
     if(p_sys->p_tf_out)
         timestamps_filter_es_out_Delete(p_sys->p_tf_out);
 
@@ -3019,4 +3033,171 @@ static int blurayDemux(demux_t *p_demux)
     p_sys->b_flushed = false;
 
     return VLC_DEMUXER_SUCCESS;
+}
+
+/*****************************************************************************
+ * bluray Escape es_out
+ *****************************************************************************/
+struct escape_es_id
+{
+    es_out_id_t *es;
+    bool drop_first;
+    mtime_t first_dts;
+};
+
+struct escape_esout_sys
+{
+    es_out_t *dst_out;
+    mtime_t   offset_pcr;
+
+    vlc_array_t es_ids; /* escape_es_id */
+};
+
+static es_out_id_t *escape_esOutAdd(es_out_t *out, const es_format_t *fmt)
+{
+    struct escape_esout_sys *esout_sys = (struct escape_esout_sys *)out->p_sys;
+
+    struct escape_es_id *esc_id = malloc(sizeof(*esc_id));
+    if (!esc_id)
+        return NULL;
+    esc_id->es = es_out_Add(esout_sys->dst_out, fmt);
+    if (!esc_id->es)
+    {
+        free(esc_id);
+        return NULL;
+    }
+    esc_id->first_dts = -1;
+    esc_id->drop_first = fmt->i_cat == VIDEO_ES;
+    if (vlc_array_append(&esout_sys->es_ids, esc_id) != VLC_SUCCESS)
+    {
+        es_out_Del(esout_sys->dst_out, esc_id->es);
+        free(esc_id);
+        return NULL;
+    }
+    return esc_id->es;
+}
+
+static struct escape_es_id *escape_GetEscOutId(es_out_t *out, es_out_id_t *es,
+                                               size_t *out_idx)
+{
+    struct escape_esout_sys *esout_sys = (struct escape_esout_sys *)out->p_sys;
+
+    for (size_t i = 0; i < vlc_array_count(&esout_sys->es_ids); ++i)
+    {
+        struct escape_es_id *esc_id = vlc_array_item_at_index(&esout_sys->es_ids, i);
+        if (esc_id->es == es)
+        {
+            if (out_idx)
+                *out_idx = i;
+            return esc_id;
+        }
+    }
+    return NULL;
+}
+
+static int escape_esOutSend(es_out_t *out, es_out_id_t *es, block_t *block)
+{
+    struct escape_esout_sys *esout_sys = (struct escape_esout_sys *)out->p_sys;
+    struct escape_es_id *esc_id = escape_GetEscOutId(out, es, NULL);
+    if (esc_id == NULL)
+        return VLC_EGENERIC;
+
+    if (esout_sys->offset_pcr != -1)
+    {
+        if (esc_id->first_dts == -1)
+        {
+            esc_id->first_dts = block->i_dts;
+            if (esc_id->drop_first)
+                block->i_flags |= BLOCK_FLAG_PREROLL;
+        }
+        mtime_t offset = esout_sys->offset_pcr - esc_id->first_dts;
+        block->i_pts += offset;
+        block->i_dts += offset;
+    }
+
+    return es_out_Send(esout_sys->dst_out, es, block);
+}
+
+static void escape_esOutDel(es_out_t *out, es_out_id_t *es)
+{
+    struct escape_esout_sys *esout_sys = (struct escape_esout_sys *)out->p_sys;
+    size_t index;
+    struct escape_es_id *esc_id = escape_GetEscOutId(out, es, &index);
+    if (esc_id == NULL)
+        return;
+
+    vlc_array_remove(&esout_sys->es_ids, index);
+    es_out_Del(esout_sys->dst_out, es);
+    free(esc_id);
+}
+
+static int escape_esOutControl(es_out_t *p_out, int query, va_list args)
+{
+    struct escape_esout_sys *esout_sys = (struct escape_esout_sys *)p_out->p_sys;
+    int ret;
+
+    switch (query)
+    {
+        case ES_OUT_RESET_PCR:
+            for (size_t i = 0; i < vlc_array_count(&esout_sys->es_ids); ++i)
+            {
+                struct escape_es_id *esc_id = vlc_array_item_at_index(&esout_sys->es_ids, i);
+                esc_id->first_dts = -1;
+            }
+            esout_sys->offset_pcr = -1;
+
+            ret = es_out_vaControl(esout_sys->dst_out, query, args);
+            break;
+        case ES_OUT_SET_GROUP_PCR:
+        {
+            int group = va_arg( args, int );
+            mtime_t pcr = va_arg( args, int64_t );
+
+            if (esout_sys->offset_pcr == -1)
+                esout_sys->offset_pcr = pcr;
+            ret = es_out_Control(esout_sys->dst_out, query, group, pcr);
+            break;
+        }
+        default:
+            ret = es_out_vaControl(esout_sys->dst_out, query, args);
+            break;
+    }
+    return ret;
+}
+
+static void escape_esOutDestroy(es_out_t *p_out)
+{
+    struct escape_esout_sys *esout_sys = (struct escape_esout_sys *)p_out->p_sys;
+
+    vlc_array_clear(&esout_sys->es_ids);
+    free(p_out->p_sys);
+    free(p_out);
+}
+
+static es_out_t *escape_esOutNew(vlc_object_t *p_obj, es_out_t *dst_out)
+{
+    es_out_t *out = malloc(sizeof(*out));
+    if (unlikely(out == NULL))
+        return NULL;
+
+    out->pf_add       = escape_esOutAdd;
+    out->pf_control   = escape_esOutControl;
+    out->pf_del       = escape_esOutDel;
+    out->pf_destroy   = escape_esOutDestroy;
+    out->pf_send      = escape_esOutSend;
+
+    struct escape_esout_sys *esout_sys = malloc(sizeof(*esout_sys));
+    if (unlikely(esout_sys == NULL))
+    {
+        free(out);
+        return NULL;
+    }
+    out->p_sys = (es_out_sys_t *) esout_sys;
+    vlc_array_init(&esout_sys->es_ids);
+    esout_sys->offset_pcr = -1;
+    esout_sys->dst_out = dst_out;
+
+    var_Create( p_obj, "ts-trust-pcr", VLC_VAR_BOOL );
+    var_SetBool( p_obj, "ts-trust-pcr", false );
+    return out;
 }
