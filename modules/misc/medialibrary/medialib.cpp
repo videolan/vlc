@@ -708,7 +708,7 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
             medialibrary::Query<medialibrary::IArtist> query;
             bool includeAll = va_arg( args, int ) != 0;
             if ( psz_pattern != nullptr )
-                query = m_ml->searchArtists( psz_pattern, paramsPtr );
+                query = m_ml->searchArtists( psz_pattern, includeAll, paramsPtr );
             else
                 query = m_ml->artists( includeAll, paramsPtr );
             if ( query == nullptr )
@@ -723,7 +723,7 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
             medialibrary::Query<medialibrary::IArtist> query;
             bool includeAll = va_arg( args, int ) != 0;
             if ( psz_pattern != nullptr )
-                query = m_ml->searchArtists( psz_pattern, paramsPtr );
+                query = m_ml->searchArtists( psz_pattern, includeAll, paramsPtr );
             else
                 query = m_ml->artists( includeAll, paramsPtr );
             if ( query == nullptr )
