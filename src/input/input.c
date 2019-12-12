@@ -2920,6 +2920,10 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
     int i_attachment = *pi_attachment;
     int i;
 
+    if ( i_attachment + i_new == 0 )
+        /* nothing to do */
+        return;
+
     input_attachment_t **pp_att = realloc( *ppp_attachment,
                     sizeof(*pp_att) * ( i_attachment + i_new ) );
     if( likely(pp_att) )
