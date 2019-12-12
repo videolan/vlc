@@ -112,6 +112,18 @@ static void timestamps_filter_push(const char *s, struct timestamps_filter_s *tf
     mva_add(&tf->mva, i_dts, i_length);
 }
 
+static struct tf_es_out_id_s * timestamps_filter_es_out_getID(struct tf_es_out_s *p_sys, es_out_id_t *id)
+{
+    for(int i=0; i<p_sys->es_list.i_size; i++)
+    {
+        struct tf_es_out_id_s *cur = (struct tf_es_out_id_s *)p_sys->es_list.p_elems[i];
+        if(cur->id != id)
+            continue;
+        return cur;
+    }
+    return NULL;
+}
+
 static void timestamps_filter_es_out_Reset(struct tf_es_out_s *out)
 {
     for(int i=0; i<out->es_list.i_size; i++)
@@ -153,6 +165,15 @@ static int timestamps_filter_es_out_Control(es_out_t *out, int i_query, va_list 
             timestamps_filter_es_out_Reset(p_sys);
             break;
         }
+        case ES_OUT_SET_ES_FMT:
+        {
+            es_out_id_t *id = va_arg(va_list, es_out_id_t *);
+            const es_format_t *p_fmt = va_arg(va_list, es_format_t *);
+            struct tf_es_out_id_s *cur = timestamps_filter_es_out_getID(p_sys, id);
+            if(cur)
+                cur->fourcc = p_fmt->i_codec;
+            return es_out_Control(p_sys->original_es_out, ES_OUT_SET_ES_FMT, id, p_fmt);
+        }
         /* Private controls, never forwarded */
         case ES_OUT_TF_FILTER_GET_TIME:
         {
@@ -174,18 +195,6 @@ static int timestamps_filter_es_out_Control(es_out_t *out, int i_query, va_list 
             break;
     }
     return es_out_vaControl(p_sys->original_es_out, i_query, va_list);
-}
-
-static struct tf_es_out_id_s * timestamps_filter_es_out_getID(struct tf_es_out_s *p_sys, es_out_id_t *id)
-{
-    for(int i=0; i<p_sys->es_list.i_size; i++)
-    {
-        struct tf_es_out_id_s *cur = (struct tf_es_out_id_s *)p_sys->es_list.p_elems[i];
-        if(cur->id != id)
-            continue;
-        return cur;
-    }
-    return NULL;
 }
 
 static int timestamps_filter_es_out_Send(es_out_t *out, es_out_id_t *id, block_t *p_block)
