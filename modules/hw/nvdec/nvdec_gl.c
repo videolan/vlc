@@ -131,7 +131,7 @@ tc_nvdec_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
             .WidthInBytes = tex_widths[0],
             .Height = tex_heights[i],
         };
-        if (tc->fmt.i_chroma != VLC_CODEC_NVDEC_OPAQUE)
+        if (tc->fmt.i_chroma != VLC_CODEC_NVDEC_OPAQUE && tc->fmt.i_chroma != VLC_CODEC_NVDEC_OPAQUE_444)
             cu_cpy.WidthInBytes *= 2;
         result = CALL_CUDA(cuMemcpy2DAsync, &cu_cpy, 0);
         if (result != VLC_SUCCESS)
@@ -201,6 +201,8 @@ static int Open(vlc_object_t *obj)
     {
         case VLC_CODEC_NVDEC_OPAQUE_10B: render_chroma = VLC_CODEC_P010; break;
         case VLC_CODEC_NVDEC_OPAQUE_16B: render_chroma = VLC_CODEC_P016; break;
+        case VLC_CODEC_NVDEC_OPAQUE_444:     render_chroma = VLC_CODEC_I444; break;
+        case VLC_CODEC_NVDEC_OPAQUE_444_16B: render_chroma = VLC_CODEC_I444_16L; break;
         case VLC_CODEC_NVDEC_OPAQUE:
         default:                         render_chroma = VLC_CODEC_NV12; break;
     }
