@@ -79,8 +79,12 @@ static mtime_t mva_get(const struct moving_average_s *m)
         if(&m->packets[i % MVA_PACKETS] == min ||
             &m->packets[i % MVA_PACKETS] == max)
             continue;
-        avgdiff += m->packets[i % MVA_PACKETS].diff;
-        count++;
+        const mtime_t diff = m->packets[i % MVA_PACKETS].diff;
+        if(diff != 0 || (i+1) < m->i_packet) /* ignore last packet when we have no duration */
+        {
+            avgdiff += diff;
+            count++;
+        }
     }
 
     return count ? avgdiff / count : 0;
