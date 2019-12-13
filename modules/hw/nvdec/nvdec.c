@@ -749,6 +749,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     uint8_t i_depth_luma;
     cudaVideoChromaFormat cudaChroma;
 
+    int i_sar_num, i_sar_den = 0;
+
     // try different output
 #define ALIGN(v, mod) ((v + (mod - 1)) & ~(mod - 1))
     if (p_sys->b_is_hxxx)
@@ -796,12 +798,10 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_dec->fmt_out.video.i_visible_height = i_vh;
         }
 
-        int i_sar_num, i_sar_den;
-        if (VLC_SUCCESS ==
+        if (VLC_SUCCESS !=
             hxxx_helper_get_current_sar(&p_sys->hh, &i_sar_num, &i_sar_den))
         {
-            p_dec->fmt_out.video.i_sar_num = i_sar_num;
-            p_dec->fmt_out.video.i_sar_den = i_sar_den;
+            i_sar_den = 0;
         }
     }
     else
@@ -830,6 +830,19 @@ static int OpenDecoder(vlc_object_t *p_this)
             }
         }
     }
+    if (p_dec->fmt_in.video.i_sar_den != 0)
+    {
+        i_sar_num = p_dec->fmt_in.video.i_sar_num;
+        i_sar_den = p_dec->fmt_in.video.i_sar_den;
+    }
+    if (i_sar_den == 0)
+    {
+        i_sar_num = 1;
+        i_sar_den = 1;
+    }
+
+    p_dec->fmt_out.video.i_sar_num = i_sar_num;
+    p_dec->fmt_out.video.i_sar_den = i_sar_den;
 #undef ALIGN
     p_dec->fmt_out.video.i_bits_per_pixel = i_depth_luma;
     p_dec->fmt_out.video.i_frame_rate = p_dec->fmt_in.video.i_frame_rate;
