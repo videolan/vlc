@@ -87,6 +87,16 @@ NavigableFocusScope {
         }
     }
 
+
+    Connections {
+        target: view.headerItem
+        onFocusChanged: {
+            if (!headerItem.focus) {
+                view.currentItem.focus = true
+            }
+        }
+    }
+
     ListView {
         id: view
         anchors.fill: parent
