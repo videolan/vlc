@@ -563,6 +563,8 @@ static const vlc_fourcc_t p_list_YUV[] = {
     VLC_CODEC_NVDEC_OPAQUE,
     VLC_CODEC_NVDEC_OPAQUE_10B,
     VLC_CODEC_NVDEC_OPAQUE_16B,
+    VLC_CODEC_NVDEC_OPAQUE_444,
+    VLC_CODEC_NVDEC_OPAQUE_444_16B,
     0,
 };
 
@@ -819,6 +821,9 @@ static const struct
 
     { { VLC_CODEC_NVDEC_OPAQUE_16B,
         VLC_CODEC_NVDEC_OPAQUE_10B, VLC_CODEC_NVDEC_OPAQUE },
+                                               FAKE_FMT() },
+
+    { { VLC_CODEC_NVDEC_OPAQUE_444, VLC_CODEC_NVDEC_OPAQUE_444_16B },
                                                FAKE_FMT() },
 
     { { VLC_CODEC_CVPX_NV12, VLC_CODEC_CVPX_UYVY,

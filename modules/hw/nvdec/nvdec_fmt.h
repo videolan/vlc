@@ -55,7 +55,9 @@ static inline bool is_nvdec_opaque(vlc_fourcc_t fourcc)
 {
     return fourcc == VLC_CODEC_NVDEC_OPAQUE ||
            fourcc == VLC_CODEC_NVDEC_OPAQUE_10B ||
-           fourcc == VLC_CODEC_NVDEC_OPAQUE_16B;
+           fourcc == VLC_CODEC_NVDEC_OPAQUE_16B ||
+           fourcc == VLC_CODEC_NVDEC_OPAQUE_444 ||
+           fourcc == VLC_CODEC_NVDEC_OPAQUE_444_16B;
 }
 
 /* for VLC_CODEC_NVDEC_OPAQUE / VLC_CODEC_NVDEC_OPAQUE_16B */

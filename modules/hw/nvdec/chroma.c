@@ -71,6 +71,11 @@ static picture_t * FilterCUDAToCPU( filter_t *p_filter, picture_t *src )
     size_t srcY = 0;
     for (int i_plane = 0; i_plane < dst->i_planes; i_plane++) {
         plane_t plane = dst->p[i_plane];
+        if (dst->format.i_chroma == VLC_CODEC_YUVA && i_plane == 3)
+        {
+            memset(plane.p_pixels, 0xFF, plane.i_pitch * plane.i_visible_lines);
+            continue;
+        }
         CUDA_MEMCPY2D cu_cpy = {
             .srcMemoryType  = CU_MEMORYTYPE_DEVICE,
             .srcDevice      = srcpic->devidePtr,
@@ -112,7 +117,11 @@ static int OpenCUDAToCPU( vlc_object_t *p_this )
             ( p_filter->fmt_in.video.i_chroma  == VLC_CODEC_NVDEC_OPAQUE_10B &&
               p_filter->fmt_out.video.i_chroma == VLC_CODEC_P010 ) ||
             ( p_filter->fmt_in.video.i_chroma  == VLC_CODEC_NVDEC_OPAQUE_16B &&
-              p_filter->fmt_out.video.i_chroma == VLC_CODEC_P016 )
+              p_filter->fmt_out.video.i_chroma == VLC_CODEC_P016 ) ||
+            ( p_filter->fmt_in.video.i_chroma  == VLC_CODEC_NVDEC_OPAQUE_444 &&
+              (p_filter->fmt_out.video.i_chroma == VLC_CODEC_I444 || p_filter->fmt_out.video.i_chroma == VLC_CODEC_YUVA) ) ||
+            ( p_filter->fmt_in.video.i_chroma  == VLC_CODEC_NVDEC_OPAQUE_444_16B &&
+              p_filter->fmt_out.video.i_chroma == VLC_CODEC_I444_16L )
            ) )
         return VLC_EGENERIC;
 

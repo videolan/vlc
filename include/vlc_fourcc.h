@@ -413,6 +413,8 @@
 #define VLC_CODEC_NVDEC_OPAQUE          VLC_FOURCC('N','V','D','8') /* 4:2:0  8 bpc */
 #define VLC_CODEC_NVDEC_OPAQUE_10B      VLC_FOURCC('N','V','D','0') /* 4:2:0 10 bpc */
 #define VLC_CODEC_NVDEC_OPAQUE_16B      VLC_FOURCC('N','V','D','6') /* 4:2:0 16 bpc */
+#define VLC_CODEC_NVDEC_OPAQUE_444      VLC_FOURCC('N','V','4','8') /* 4:4:4  8 bpc */
+#define VLC_CODEC_NVDEC_OPAQUE_444_16B  VLC_FOURCC('N','V','4','6') /* 4:4:4 16 bpc */
 
 /* CVPixelBuffer opaque buffer type */
 #define VLC_CODEC_CVPX_NV12       VLC_FOURCC('C','V','P','N')

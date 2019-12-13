@@ -117,10 +117,10 @@ static vlc_fourcc_t MapSurfaceChroma(cudaVideoChromaFormat chroma, unsigned bitD
             if (bitDepth <= 10)
                 return VLC_CODEC_P010;
             return VLC_CODEC_P016;
-        // case cudaVideoChromaFormat_444:
-        //     if (bitDepth <= 8)
-        //         return VLC_CODEC_I444;
-        //     return VLC_CODEC_I444_16L;
+        case cudaVideoChromaFormat_444:
+            if (bitDepth <= 8)
+                return VLC_CODEC_I444;
+            return VLC_CODEC_I444_16L;
         default:
             return 0;
     }
@@ -137,10 +137,12 @@ static cudaVideoSurfaceFormat MapSurfaceFmt(int i_vlc_fourcc)
         case VLC_CODEC_NVDEC_OPAQUE:
         case VLC_CODEC_NV12:
             return cudaVideoSurfaceFormat_NV12;
-        // case VLC_CODEC_I444:
-        //     return cudaVideoSurfaceFormat_YUV444;
-        // case VLC_CODEC_I444_16L:
-        //      return cudaVideoSurfaceFormat_YUV444_16Bit;
+        case VLC_CODEC_NVDEC_OPAQUE_444:
+        case VLC_CODEC_I444:
+            return cudaVideoSurfaceFormat_YUV444;
+        case VLC_CODEC_NVDEC_OPAQUE_444_16B:
+        case VLC_CODEC_I444_16L:
+             return cudaVideoSurfaceFormat_YUV444_16Bit;
         default:             vlc_assert_unreachable();
     }
 }
@@ -244,7 +246,19 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
 
         unsigned int ByteWidth = p_sys->outputPitch;
         unsigned int Height = p_dec->fmt_out.video.i_height;
-        Height += Height / 2;
+        switch (dparams.OutputFormat)
+        {
+            case cudaVideoSurfaceFormat_YUV444:
+            case cudaVideoSurfaceFormat_YUV444_16Bit:
+                Height += 2 * Height; // 3 planes
+                break;
+            case cudaVideoSurfaceFormat_NV12:
+            case cudaVideoSurfaceFormat_P016:
+                Height += Height / 2; // U and V at quarter resolution
+                break;
+            default:
+                vlc_assert_unreachable();
+        }
 
         picture_t *pics[ARRAY_SIZE(p_sys->outputDevicePtr)];
         for (size_t i=0; i < ARRAY_SIZE(p_sys->outputDevicePtr); i++)
@@ -382,29 +396,57 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
 
         size_t srcY = 0;
         size_t dstY = 0;
-        for (int i_plane = 0; i_plane < 2; i_plane++) {
-            CUDA_MEMCPY2D cu_cpy = {
-                .srcMemoryType  = CU_MEMORYTYPE_DEVICE,
-                .srcDevice      = frameDevicePtr,
-                .srcY           = srcY,
-                .srcPitch       = i_pitch,
-                .dstMemoryType  = CU_MEMORYTYPE_DEVICE,
-                .dstDevice      = picctx->devidePtr,
-                .dstPitch       = picctx->bufferPitch,
-                .dstY           = dstY,
-                .WidthInBytes   = i_pitch,
-                .Height         = __MIN(picctx->bufferHeight, p_dec->fmt_out.video.i_y_offset + p_dec->fmt_out.video.i_visible_height),
-            };
-            if (i_plane == 1)
-                cu_cpy.Height >>= 1;
-            result = CALL_CUDA_DEC(cuMemcpy2DAsync, &cu_cpy, 0);
-            if (unlikely(result != VLC_SUCCESS))
-            {
-                free(picctx);
-                goto error;
+        if (p_pic->format.i_chroma == VLC_CODEC_NVDEC_OPAQUE_444 || p_pic->format.i_chroma == VLC_CODEC_NVDEC_OPAQUE_444_16B)
+        {
+            for (int i_plane = 0; i_plane < 3; i_plane++) {
+                CUDA_MEMCPY2D cu_cpy = {
+                    .srcMemoryType  = CU_MEMORYTYPE_DEVICE,
+                    .srcDevice      = frameDevicePtr,
+                    .srcY           = srcY,
+                    .srcPitch       = i_pitch,
+                    .dstMemoryType  = CU_MEMORYTYPE_DEVICE,
+                    .dstDevice      = picctx->devidePtr,
+                    .dstPitch       = picctx->bufferPitch,
+                    .dstY           = dstY,
+                    .WidthInBytes   = i_pitch,
+                    .Height         = __MIN(picctx->bufferHeight, p_dec->fmt_out.video.i_y_offset + p_dec->fmt_out.video.i_visible_height),
+                };
+                result = CALL_CUDA_DEC(cuMemcpy2DAsync, &cu_cpy, 0);
+                if (unlikely(result != VLC_SUCCESS))
+                {
+                    free(picctx);
+                    goto error;
+                }
+                srcY += picctx->bufferHeight;
+                dstY += p_sys->decoderHeight;
             }
-            srcY += picctx->bufferHeight;
-            dstY += p_sys->decoderHeight;
+        }
+        else
+        {
+            for (int i_plane = 0; i_plane < 2; i_plane++) {
+                CUDA_MEMCPY2D cu_cpy = {
+                    .srcMemoryType  = CU_MEMORYTYPE_DEVICE,
+                    .srcDevice      = frameDevicePtr,
+                    .srcY           = srcY,
+                    .srcPitch       = i_pitch,
+                    .dstMemoryType  = CU_MEMORYTYPE_DEVICE,
+                    .dstDevice      = picctx->devidePtr,
+                    .dstPitch       = picctx->bufferPitch,
+                    .dstY           = dstY,
+                    .WidthInBytes   = i_pitch,
+                    .Height         = __MIN(picctx->bufferHeight, p_dec->fmt_out.video.i_y_offset + p_dec->fmt_out.video.i_visible_height),
+                };
+                if (i_plane == 1)
+                    cu_cpy.Height >>= 1;
+                result = CALL_CUDA_DEC(cuMemcpy2DAsync, &cu_cpy, 0);
+                if (unlikely(result != VLC_SUCCESS))
+                {
+                    free(picctx);
+                    goto error;
+                }
+                srcY += picctx->bufferHeight;
+                dstY += p_sys->decoderHeight;
+            }
         }
         p_pic->context = &picctx->ctx;
         vlc_video_context_Hold(picctx->ctx.vctx);
@@ -890,10 +932,17 @@ static int OpenDecoder(vlc_object_t *p_this)
     {
         if (i_depth_luma >= 16)
             output_chromas[chroma_idx++] = VLC_CODEC_NVDEC_OPAQUE_16B;
-        else if (i_depth_luma >= 10)
+        else if (i_depth_luma > 8)
             output_chromas[chroma_idx++] = VLC_CODEC_NVDEC_OPAQUE_10B;
         else
             output_chromas[chroma_idx++] = VLC_CODEC_NVDEC_OPAQUE;
+    }
+    else if (cudaChroma == cudaVideoChromaFormat_444)
+    {
+        if (i_depth_luma > 8)
+            output_chromas[chroma_idx++] = VLC_CODEC_NVDEC_OPAQUE_444_16B;
+        else
+            output_chromas[chroma_idx++] = VLC_CODEC_NVDEC_OPAQUE_444;
     }
 
     output_chromas[chroma_idx++] = MapSurfaceChroma(cudaChroma, i_depth_luma);

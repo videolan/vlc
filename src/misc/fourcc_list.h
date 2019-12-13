@@ -1235,6 +1235,12 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_NVDEC_OPAQUE_16B, "4:2:0 16bits NVDEC opaque"),
         A("NVD6"),
 
+    B(VLC_CODEC_NVDEC_OPAQUE_444, "4:4:4 NVDEC opaque"),
+        A("NV48"),
+
+    B(VLC_CODEC_NVDEC_OPAQUE_444_16B, "4:4:4 16bits NVDEC opaque"),
+        A("NV46"),
+
     B(VLC_CODEC_AGM, "AmuseGraphics Movie"),
         A("AGM0"),
         A("AGM1"),
