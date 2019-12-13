@@ -23,6 +23,7 @@ import QtGraphicalEffects 1.0
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/KeyHelper.js" as KeyHelper
 
 NavigableFocusScope {
     id: root
@@ -177,6 +178,12 @@ NavigableFocusScope {
                         Keys.onLeftPressed: {
                             root.navigationLeft(0)
                         }
+
+                        Keys.onReleased: {
+                            if (KeyHelper.matchOk(event)) {
+                                itemDoubleClicked(event.key, event.modifiers)
+                            }
+                        }
                     }
 
                     FocusScope {
@@ -234,4 +241,3 @@ NavigableFocusScope {
         }
     }
 }
-
