@@ -49,6 +49,7 @@ struct tf_es_out_id_s
     struct timestamps_filter_s tf;
     mtime_t pcrdiff;
     unsigned pcrpacket;
+    unsigned sequence;
     bool contiguous;
 };
 
@@ -68,18 +69,19 @@ static void timestamps_filter_init(struct timestamps_filter_s *tf)
     tf->sequence = -1;
 }
 
-static void timestamps_filter_push(const char *s, struct timestamps_filter_s *tf,
+static bool timestamps_filter_push(const char *s, struct timestamps_filter_s *tf,
                                    mtime_t i_dts, mtime_t i_length,
                                    bool b_discontinuity, bool b_contiguous)
 {
+    bool b_desync = false;
     if(i_dts == 0 && i_length == 0)
-        return;
+        return false;
 
     struct mva_packet_s *prev = mva_getLastPacket(&tf->mva);
     if (prev)
     {
         if(prev->dts == i_dts)
-            return; /* duplicate packet */
+            return false; /* duplicate packet */
 
         if(b_contiguous)
         {
@@ -91,6 +93,7 @@ static void timestamps_filter_push(const char *s, struct timestamps_filter_s *tf
 #ifdef DEBUG_TIMESTAMPS_FILTER
                 printf("%4.4s found offset of %ld\n", s, (prev->dts - i_dts));
 #endif
+                b_desync = true;
             }
             else prev->diff = i_dts - prev->dts;
         }
@@ -109,6 +112,8 @@ static void timestamps_filter_push(const char *s, struct timestamps_filter_s *tf
     tf->contiguous_last = i_dts + tf->sequence_offset;
 
     mva_add(&tf->mva, i_dts, i_length);
+
+    return b_desync;
 }
 
 static struct tf_es_out_id_s * timestamps_filter_es_out_getID(struct tf_es_out_s *p_sys, es_out_id_t *id)
@@ -149,7 +154,8 @@ static int timestamps_filter_es_out_Control(es_out_t *out, int i_query, va_list 
                 i_group = 0;
             int64_t pcr = va_arg(va_list, int64_t);
 
-            timestamps_filter_push("PCR ", &p_sys->pcrtf, pcr, 0, p_sys->b_discontinuity, true);
+            if(timestamps_filter_push("PCR ", &p_sys->pcrtf, pcr, 0, p_sys->b_discontinuity, true))
+                p_sys->pcrtf.sequence++;
 
             pcr += p_sys->pcrtf.sequence_offset;
 
@@ -205,21 +211,30 @@ static int timestamps_filter_es_out_Send(es_out_t *out, es_out_id_t *id, block_t
                             p_block->i_dts, p_block->i_length,
                            p_sys->b_discontinuity, cur->contiguous);
 
-    /* Record diff with last PCR */
-    if(p_sys->pcrtf.mva.i_packet > 0 &&
-        p_sys->pcrtf.mva.i_packet != cur->pcrpacket)
+    if(cur->tf.sequence == p_sys->pcrtf.sequence) /* Still in the same timestamps segments as PCR */
     {
-        cur->pcrpacket = p_sys->pcrtf.mva.i_packet;
-        cur->pcrdiff = mva_getLastDTS(&cur->tf.mva) - mva_getLastDTS(&p_sys->pcrtf.mva);
-
-        mtime_t i_offsetdiff = cur->tf.sequence_offset - p_sys->pcrtf.sequence_offset;
-        if(i_offsetdiff != 0)
+        /* Record diff with last PCR */
+        if(p_sys->pcrtf.mva.i_packet > 0 &&
+           p_sys->pcrtf.mva.i_packet != cur->pcrpacket)
         {
-            cur->tf.sequence_offset -= i_offsetdiff;
+            cur->pcrdiff = mva_getLastDTS(&cur->tf.mva) - mva_getLastDTS(&p_sys->pcrtf.mva);
+
+            mtime_t i_offsetdiff = cur->tf.sequence_offset - p_sys->pcrtf.sequence_offset;
+            if(i_offsetdiff != 0)
+                cur->tf.sequence_offset -= i_offsetdiff;
 #ifdef DEBUG_TIMESTAMPS_FILTER
-            printf("PCR diff %ld %ld **********\n", cur->pcrdiff, i_offsetdiff);
+            printf("    ^ diff pcr %ld off %ld ********** pcrnum %ld seq %d/%d\n",
+                   cur->pcrdiff, i_offsetdiff, p_sys->pcrtf.mva.i_packet,
+                   cur->tf.sequence, p_sys->pcrtf.sequence);
 #endif
         }
+    }
+
+    /* Record our state */
+    if(p_sys->pcrtf.mva.i_packet > 0)
+    {
+        cur->pcrpacket = p_sys->pcrtf.mva.i_packet;
+        cur->tf.sequence = p_sys->pcrtf.sequence;
     }
 
     /* Fix timestamps */
@@ -252,6 +267,7 @@ static es_out_id_t *timestamps_filter_es_out_Add(es_out_t *out, const es_format_
     tf_es_sys->fourcc = fmt->i_codec;
     tf_es_sys->pcrdiff = 0;
     tf_es_sys->pcrpacket = -1;
+    tf_es_sys->sequence = -1;
     tf_es_sys->contiguous = (fmt->i_cat == VIDEO_ES || fmt->i_cat == AUDIO_ES);
 
     tf_es_sys->id = es_out_Add(p_sys->original_es_out, fmt);
