@@ -20,7 +20,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-08-08 04:09+0200\n"
+"PO-Revision-Date: 2019-12-13 10:51+0100\n"
 "Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2019\n"
 "Language-Team: Turkish (https://www.transifex.com/yaron/teams/16553/tr/)\n"
 "Language: tr\n"
@@ -1506,7 +1506,7 @@ msgstr "tr"
 #: src/libvlc.h:166 src/libvlc-module.c:1432 src/libvlc-module.c:1433
 #: src/video_output/vout_intf.c:176 modules/gui/macosx/VLCMainMenu.m:475
 msgid "Zoom"
-msgstr "Yaklaştırın"
+msgstr "Yaklaştır"
 
 #: src/libvlc.h:167 src/libvlc-module.c:1346 src/video_output/vout_intf.c:87
 msgid "1:4 Quarter"
@@ -3741,7 +3741,7 @@ msgstr "Dosya yöneticisinden başlatıldığında tek bir kopya çalışsın"
 
 #: src/libvlc-module.c:1089
 msgid "Increase the priority of the process"
-msgstr "İşlem önceliğini arttırın"
+msgstr "İşlem önceliğini arttır"
 
 #: src/libvlc-module.c:1091
 msgid ""
@@ -5270,7 +5270,7 @@ msgstr "Duraklat"
 
 #: src/misc/actions.c:108
 msgid "Print"
-msgstr "Yazdırın"
+msgstr "Yazdır"
 
 #: src/misc/actions.c:110 modules/meta_engine/ID3Genres.h:77
 msgid "Space"
@@ -14666,7 +14666,7 @@ msgstr "Büyütmeyi sıfırla"
 
 #: modules/control/hotkeys.c:1151
 msgid "Scaled to screen"
-msgstr "Ekrana sığdırın"
+msgstr "Ekrana sığdır"
 
 #: modules/control/hotkeys.c:1153
 msgid "Original Size"
@@ -17651,7 +17651,7 @@ msgstr "Kopyala"
 
 #: modules/gui/macosx/VLCMainMenu.m:369
 msgid "Paste"
-msgstr "Yapıştırın"
+msgstr "Yapıştır"
 
 #: modules/gui/macosx/VLCMainMenu.m:371 modules/gui/macosx/VLCPlaylist.m:232
 msgid "Select All"
@@ -17842,7 +17842,7 @@ msgstr "Hata ve Uyarılar..."
 
 #: modules/gui/macosx/VLCMainMenu.m:486
 msgid "Bring All to Front"
-msgstr "Tümünü Öne Getirin"
+msgstr "Tümünü Öne Getir"
 
 #: modules/gui/macosx/VLCMainMenu.m:488 modules/gui/qt/dialogs/help.cpp:54
 #: modules/gui/qt/menus.cpp:950 modules/gui/qt/menus.cpp:1137
@@ -18462,11 +18462,11 @@ msgstr "Ses Başlangıç Düzeyi Her Zaman Şuna Ayarlansın:"
 #: modules/gui/macosx/VLCSimplePrefsController.m:278
 #: modules/gui/qt/dialogs/vlm.cpp:492
 msgid "Change"
-msgstr "Değiştirin"
+msgstr "Değiştir"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:279
 msgid "Change Hotkey"
-msgstr "Kısayol Tuşunu Değiştirin"
+msgstr "Kısayol Tuşunu Değiştir"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:283
 msgid "Select an action to change the associated hotkey:"
@@ -19598,7 +19598,7 @@ msgstr "Tersten"
 
 #: modules/gui/qt/components/controller.hpp:124
 msgid "Change the loop and repeat modes"
-msgstr "Çevrim ve yineleme kiplerini değiştirin"
+msgstr "Çevrim ve yineleme kiplerini değiştir"
 
 #: modules/gui/qt/components/controller.hpp:125
 msgid "Previous media in the playlist"
@@ -19923,7 +19923,7 @@ msgstr "Normal oynatma hızına geri dönün"
 
 #: modules/gui/qt/components/interface_widgets.cpp:819
 msgid "Download cover art"
-msgstr "Kapak görselini indirin"
+msgstr "Kapak görselini indir"
 
 #: modules/gui/qt/components/interface_widgets.cpp:823
 msgid "Add cover art from file"
@@ -20140,7 +20140,7 @@ msgstr "Görüntü boyutu"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:274
 msgid "Increase"
-msgstr "Arttırın"
+msgstr "Arttır"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:275
 msgid "Decrease"
@@ -20226,7 +20226,7 @@ msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1414
 msgid "Hotkey change"
-msgstr "Kısayolu değiştirin"
+msgstr "Kısayolu değiştir"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1418
 msgid "Press the new key or combination for "
@@ -20499,7 +20499,7 @@ msgstr "Bayt"
 
 #: modules/gui/qt/dialogs/convert.cpp:48 modules/gui/qt/dialogs/convert.cpp:106
 msgid "Convert"
-msgstr "Dönüştürün"
+msgstr "Dönüştür"
 
 #: modules/gui/qt/dialogs/convert.cpp:61
 msgid "Multiple files selected."
@@ -20810,7 +20810,7 @@ msgstr "&Akıt"
 
 #: modules/gui/qt/dialogs/open.cpp:121
 msgid "C&onvert"
-msgstr "&Dönüştürün"
+msgstr "&Dönüştür"
 
 #: modules/gui/qt/dialogs/open.cpp:207
 msgid "C&onvert / Save"
@@ -25720,7 +25720,7 @@ msgstr "Temel akış kodunu ayarlayın"
 
 #: modules/stream_out/setid.c:63
 msgid "Change the id of an elementary stream"
-msgstr "Bir temel akışın kodunu değiştirin"
+msgstr "Bir temel akışın kodunu değiştir"
 
 #: modules/stream_out/setid.c:74
 msgid "Set ES Lang"
@@ -25732,7 +25732,7 @@ msgstr "Dili Ayarla"
 
 #: modules/stream_out/setid.c:76
 msgid "Change the language of an elementary stream"
-msgstr "Bir temel akışın dilini değiştirin"
+msgstr "Bir temel akışın dilini değiştir"
 
 #: modules/stream_out/smem.c:61
 msgid "Video prerender callback"
@@ -26417,7 +26417,7 @@ msgstr "Camın renk şemasını belirleyin"
 
 #: modules/video_filter/anaglyph.c:71
 msgid "Convert 3D picture to anaglyph image video filter"
-msgstr "3B fotoğrafı anaglif görüntü süzgeci ile dönüştürün"
+msgstr "3B fotoğrafı anaglif görüntü süzgeci ile dönüştür"
 
 #: modules/video_filter/antiflicker.c:51
 msgid "Window size"
@@ -29726,7 +29726,7 @@ msgstr "Denetim"
 
 #: modules/gui/qt/ui/streampanel.h:173
 msgid "Run manually"
-msgstr "El ile çalıştırın"
+msgstr "El ile çalıştır"
 
 #: modules/gui/qt/ui/streampanel.h:174
 msgid "Setup schedule"
