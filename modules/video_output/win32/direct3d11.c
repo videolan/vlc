@@ -873,6 +873,10 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
             bits_per_channel = 16;
             widthDenominator = heightDenominator = 2;
             break;
+        case VLC_CODEC_NVDEC_OPAQUE_444:
+            bits_per_channel = 8;
+            widthDenominator = heightDenominator = 1;
+            break;
         default:
             {
                 const vlc_chroma_description_t *p_format = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
