@@ -297,15 +297,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     if (sys->d3d_dev.context_mutex == INVALID_HANDLE_VALUE)
         msg_Warn(va, "No mutex found to lock the decoder");
 
-    sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_D3D11VA,
-                                          sizeof(d3d11_video_context_t), &d3d11_vctx_ops );
-    if (sys->vctx == NULL)
-    {
-        msg_Dbg(va, "no video context");
-        err = VLC_EGENERIC;
-        goto error;
-    }
-
     void *d3dvidctx = NULL;
     hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
     if (FAILED(hr)) {
@@ -354,6 +345,15 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
                         adapterDesc.VendorId, DxgiVendorStr(adapterDesc.VendorId), adapterDesc.DeviceId, adapterDesc.Revision);
         }
         IDXGIAdapter_Release(p_adapter);
+    }
+
+    sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_D3D11VA,
+                                          sizeof(d3d11_video_context_t), &d3d11_vctx_ops );
+    if (sys->vctx == NULL)
+    {
+        msg_Dbg(va, "no video context");
+        err = VLC_EGENERIC;
+        goto error;
     }
 
     d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
