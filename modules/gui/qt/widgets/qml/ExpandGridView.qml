@@ -51,6 +51,7 @@ NavigableFocusScope {
 
     property Component headerDelegate: Item{}
     property int headerHeight: headerItemLoader.implicitHeight
+    property alias headerItem: headerItemLoader.item
 
     //signals emitted when selected items is updated from keyboard
     signal selectionUpdated( int keyModifiers, int oldIndex,int newIndex )
@@ -124,8 +125,19 @@ NavigableFocusScope {
 
         Loader {
             id: headerItemLoader
-            visible: flickable.contentY < root.headerHeight
+            //load the header early (when the first row is visible)
+            visible: flickable.contentY < root.headerHeight + root.cellHeight
             sourceComponent: headerDelegate
+            focus: item.focus
+            onFocusChanged: {
+                if (focus) {
+                    //when we gain the focus ensure the widget is fully visible
+                    animateFlickableContentY(0)
+                } else {
+                    //when we lose the focus restore the focus on the current grid item
+                    flickable.setCurrentItemFocus()
+                }
+            }
             onLoaded: {
                 item.x = 0
                 item.y = 0
