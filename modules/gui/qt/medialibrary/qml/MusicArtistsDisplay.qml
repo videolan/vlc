@@ -65,6 +65,8 @@ Widgets.NavigableFocusScope {
             }
             line1: model.name || i18n.qtr("Unknown artist")
 
+            actionButtons: []
+
             onItemClicked: {
                 artistId = model.id
                 delegateModel.updateSelection( modifier , artistList.currentIndex, index)
@@ -73,26 +75,15 @@ Widgets.NavigableFocusScope {
             }
 
             onItemDoubleClicked: {
-                delegateModel.actionAtIndex(index)
-            }
-
-            onPlayClicked: {
-                medialib.addAndPlay( model.id )
-            }
-            onAddToPlaylistClicked: {
-                medialib.addToPlaylist( model.id );
+                if (keys === Qt.RightButton)
+                    medialib.addAndPlay( model.id )
+                else
+                    view.forceActiveFocus()
             }
         }
 
         function actionAtIndex(index) {
-            if (delegateModel.selectedGroup.count > 1) {
-                var list = []
-                for (var i = 0; i < delegateModel.selectedGroup.count; i++)
-                    list.push(delegateModel.selectedGroup.get(i).model.id)
-                medialib.addAndPlay( list )
-            } else if (delegateModel.selectedGroup.count === 1) {
-                root.artistId = delegateModel.items.get(artistList.currentIndex).model.id
-            }
+            view.forceActiveFocus()
         }
     }
 
@@ -128,10 +119,12 @@ Widgets.NavigableFocusScope {
 
             onSelectAll: delegateModel.selectAll()
             onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onCurrentIndexChanged: delegateModel.actionAtIndex(currentIndex)
+            onCurrentIndexChanged: {
+                root.artistId = delegateModel.items.get(artistList.currentIndex).model.id
+            }
 
             navigationParent: root
-            navigationRight: function () { view.focus = true }
+            navigationRightItem: view
         }
 
         FocusScope {
@@ -148,17 +141,23 @@ Widgets.NavigableFocusScope {
                 header: ArtistTopBanner {
                     id: artistBanner
                     width: albumSubView.width
-                    focus: false
                     artist: (artistList.currentIndex >= 0)
                             ? delegateModel.items.get(artistList.currentIndex).model
                             : ({})
+                    navigationParent: root
+                    navigationLeftItem: artistList
+                    navigationDown: function() {
+                        artistBanner.focus = false
+                        view.forceActiveFocus()
+                    }
                 }
 
                 focus: true
                 parentId: artistId
 
                 navigationParent: root
-                navigationLeft: function () { artistList.focus = true }
+                navigationUpItem: albumSubView.headerItem
+                navigationLeftItem: artistList
             }
 
         }

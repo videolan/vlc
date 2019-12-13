@@ -42,6 +42,7 @@ Widgets.NavigableFocusScope {
 
 
     property Component header: Item{}
+    readonly property var headerItem: view.currentItem ? view.currentItem.headerItem : undefined
 
     Util.SelectableDelegateModel {
         id: delegateModel
