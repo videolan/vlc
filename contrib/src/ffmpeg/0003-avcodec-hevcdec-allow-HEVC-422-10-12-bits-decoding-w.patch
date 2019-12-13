@@ -1,0 +1,34 @@
+From b95fd27cf95683b00d1612b62c0c5a5104a7ba01 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 4 Oct 2019 12:42:11 +0200
+Subject: [PATCH 3/3] avcodec/hevcdec: allow HEVC 422 10/12 bits decoding with
+ DXVA2/D3D11VA
+
+---
+ libavcodec/hevcdec.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/libavcodec/hevcdec.c b/libavcodec/hevcdec.c
+index 04496a002b..4c1650c416 100644
+--- a/libavcodec/hevcdec.c
++++ b/libavcodec/hevcdec.c
+@@ -432,6 +432,16 @@ static enum AVPixelFormat get_format(HEVCContext *s, const HEVCSPS *sps)
+ #endif
+ #if CONFIG_HEVC_NVDEC_HWACCEL
+         *fmt++ = AV_PIX_FMT_CUDA;
++#endif
++        break;
++    case AV_PIX_FMT_YUV422P10:
++    case AV_PIX_FMT_YUV422P12:
++#if CONFIG_HEVC_DXVA2_HWACCEL
++        *fmt++ = AV_PIX_FMT_DXVA2_VLD;
++#endif
++#if CONFIG_HEVC_D3D11VA_HWACCEL
++        *fmt++ = AV_PIX_FMT_D3D11VA_VLD;
++        *fmt++ = AV_PIX_FMT_D3D11;
+ #endif
+         break;
+     case AV_PIX_FMT_YUV420P12:
+-- 
+2.19.1.windows.1
+
