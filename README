@@ -24,6 +24,11 @@ VLC hacking guide . . . . . https://wiki.videolan.org/Hacker_Guide
 Bugtracker  . . . . . . . . https://trac.videolan.org/vlc/
 The VideoLAN web site . . . http://www.videolan.org/
 
+3D parties:
+===========
+
+The VLC web site  . . . . . https://github.com/ZeBobo5/Vlc.DotNet
+
 Source Code Content:
 ===================
 ABOUT-NLS          - Notes on the Free Translation Project.
