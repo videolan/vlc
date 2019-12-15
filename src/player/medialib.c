@@ -109,6 +109,26 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input,
     vlc_ml_release(media);
 }
 
+static const float beginning_of_media_percent = .5f;
+static const int64_t beginning_of_media_sec = 60;
+
+static int
+beginning_of_media(struct vlc_player_input *input)
+{
+    return input->position <= beginning_of_media_percent &&
+        input->time < VLC_TICK_FROM_SEC(beginning_of_media_sec);
+}
+
+static const float end_of_media_percent = .95f;
+static const int64_t end_of_media_sec = 60;
+
+static int
+end_of_media(struct vlc_player_input *input)
+{
+    return input->position >= end_of_media_percent &&
+        input->length - input->time < VLC_TICK_FROM_SEC(end_of_media_sec);
+}
+
 void
 vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
 {
@@ -134,12 +154,13 @@ vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
             return;
     }
 
-    /* If we reached 95% of the media or have less than 10s remaining, bump the
-     * play count & the media in the history */
-    if (input->position >= .95f ||
-        input->length - input->time < VLC_TICK_FROM_SEC(10))
-    {
+    /* If we reached end of the media, bump the play count & the media in the
+     * history */
+    if (end_of_media(input))
         vlc_ml_media_increase_playcount(ml, media->i_id);
+
+    if (beginning_of_media(input) || end_of_media(input))
+    {
         /* Ensure we remove any previously saved position to allow the playback
          * of this media to restart from the begining */
         if (input->ml.states.progress >= .0f )
