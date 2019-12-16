@@ -373,7 +373,7 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc
                                       0, 0,
                                       false, D3D11_FORMAT_SUPPORT_DISPLAY );
     if (unlikely(newPixelFormat == NULL))
-        newPixelFormat = FindD3D11Format( display->obj, &display->d3d_dev, 0, D3D11_YUV_FORMAT|D3D11_YUV_FORMAT,
+        newPixelFormat = FindD3D11Format( display->obj, &display->d3d_dev, 0, D3D11_YUV_FORMAT,
                                           cfg->bitdepth > 8 ? 10 : 8,
                                           0, 0,
                                           false, D3D11_FORMAT_SUPPORT_DISPLAY );
