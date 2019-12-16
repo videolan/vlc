@@ -64,7 +64,6 @@ TabButton {
                 font.pixelSize: VLCStyle.icon_topbar
                 font.family: VLCIcons.fontFamily
                 horizontalAlignment: Text.AlignHCenter
-                rightPadding: VLCStyle.margin_xsmall
 
                 visible: control.iconTxt !== ""
                 text: control.iconTxt
