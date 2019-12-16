@@ -130,10 +130,10 @@ static void Display(vout_display_t *, picture_t *);
 
 static void Direct3D11Destroy(vout_display_t *);
 
-static int  Direct3D11Open (vout_display_t *, video_format_t *);
+static int  Direct3D11Open (vout_display_t *, video_format_t *, vlc_video_context *);
 static void Direct3D11Close(vout_display_t *);
 
-static int SetupOutputFormat(vout_display_t *, video_format_t *);
+static int SetupOutputFormat(vout_display_t *, video_format_t *, vlc_video_context *);
 static int  Direct3D11CreateFormatResources (vout_display_t *, const video_format_t *);
 static int  Direct3D11CreateGenericResources(vout_display_t *);
 static void Direct3D11DestroyResources(vout_display_t *);
@@ -356,7 +356,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
 
-    if (Direct3D11Open(vd, fmtp)) {
+    if (Direct3D11Open(vd, fmtp, context)) {
         msg_Err(vd, "Direct3D11 could not be opened");
         goto error;
     }
@@ -765,12 +765,12 @@ static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i
     return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT, 0, 0, 0, false, supportFlags );
 }
 
-static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
+static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_context *vctx)
 {
     vout_display_sys_t *sys = vd->sys;
     video_format_t fmt;
     video_format_Copy(&fmt, &vd->source);
-    int err = SetupOutputFormat(vd, &fmt);
+    int err = SetupOutputFormat(vd, &fmt, vctx);
     if (err != VLC_SUCCESS)
     {
         if (!is_d3d11_opaque(vd->source.i_chroma)
@@ -786,7 +786,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
                 fmt.i_chroma = list[i];
                 if (fmt.i_chroma == vd->source.i_chroma)
                     continue;
-                err = SetupOutputFormat(vd, &fmt);
+                err = SetupOutputFormat(vd, &fmt, NULL);
                 if (err == VLC_SUCCESS)
                     break;
             }
@@ -839,12 +839,29 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
     return VLC_SUCCESS;
 }
 
-static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
+static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_context *vctx)
 {
     vout_display_sys_t *sys = vd->sys;
 
+    d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate(vctx);
+    if (vtcx_sys != NULL &&
+        DeviceSupportsFormat( vd->sys->d3d_dev.d3ddevice, vtcx_sys->format, D3D11_FORMAT_SUPPORT_SHADER_LOAD ))
+    {
+        for (const d3d_format_t *output_format = GetRenderFormatList();
+            output_format->name != NULL; ++output_format)
+        {
+            if (output_format->formatTexture == vtcx_sys->format &&
+                    is_d3d11_opaque(output_format->fourcc))
+            {
+                sys->picQuad.textureFormat = output_format;
+                break;
+            }
+        }
+    }
+
     // look for the requested pixel format first
-    sys->picQuad.textureFormat = GetDirectRenderingFormat(vd, fmt->i_chroma);
+    if ( !sys->picQuad.textureFormat )
+        sys->picQuad.textureFormat = GetDirectRenderingFormat(vd, fmt->i_chroma);
 
     // look for any pixel format that we can handle with enough pixels per channel
     const d3d_format_t *decoder_format = NULL;
