@@ -20,6 +20,7 @@ medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.xz .sum-medialibrary
 	rm -rf $@-$(MEDIALIBRARY_VERSION) $@
 	mkdir -p $@-$(MEDIALIBRARY_VERSION)
 	tar xvf "$<" --strip-components=1 -C $@-$(MEDIALIBRARY_VERSION)
+	$(APPLY) $(SRC)/medialibrary/fix-win-build.patch
 	$(call pkg_static, "medialibrary.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)

@@ -1,0 +1,24 @@
+From 52dbd4f4449876c4776a35a519970bf584b0d63f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Mon, 16 Dec 2019 13:21:51 +0100
+Subject: [PATCH] utils: Filename: Fix win32 build with GCC
+
+---
+ src/utils/Filename.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/utils/Filename.cpp b/src/utils/Filename.cpp
+index 737191cd..1216d12e 100644
+--- a/src/utils/Filename.cpp
++++ b/src/utils/Filename.cpp
+@@ -29,6 +29,7 @@
+ #include "medialibrary/filesystem/Errors.h"
+ 
+ #ifdef _WIN32
++# include <algorithm>
+ # define DIR_SEPARATOR "\\/"
+ # define DIR_SEPARATOR_CHAR '\\'
+ #else
+-- 
+2.20.1
+
