@@ -529,11 +529,10 @@ done:
     return result;
 }
 
-#undef FindD3D11Format
-const d3d_format_t *FindD3D11Format(vlc_object_t *o,
+const d3d_format_t *(FindD3D11Format)(vlc_object_t *o,
                                     d3d11_device_t *d3d_dev,
                                     vlc_fourcc_t i_src_chroma,
-                                    bool rgb_only,
+                                    int rgb_yuv,
                                     uint8_t bits_per_channel,
                                     uint8_t widthDenominator,
                                     uint8_t heightDenominator,
@@ -550,7 +549,8 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *o,
             continue;
         if (!allow_opaque && is_d3d11_opaque(output_format->fourcc))
             continue;
-        if (rgb_only && vlc_fourcc_IsYUV(output_format->fourcc))
+        int format = vlc_fourcc_IsYUV(output_format->fourcc) ? D3D11_YUV_FORMAT : D3D11_RGB_FORMAT;
+        if ((rgb_yuv & format)==0)
             continue;
         if (widthDenominator && widthDenominator < output_format->widthDenominator)
             continue;
