@@ -3032,6 +3032,22 @@ struct vlc_player_cbs
      */
     void (*on_cork_changed)(vlc_player_t *player, unsigned cork_count,
                             void *data);
+
+    /**
+     * Called to query the user about restoring the previous playback position
+     *
+     * If this callback isn't provided, the user won't be asked to restore
+     * the previous playback position, effectively causing
+     * VLC_PLAYER_RESTORE_PLAYBACK_POS_ASK to be handled as
+     * VLC_PLAYER_RESTORE_PLAYBACK_POS_NEVER
+     *
+     * The implementation can react to this callback by calling
+     * vlc_player_RestorePlaybackPos(), or by discarding the event.
+     *
+     * @param player locked player instance
+     * @param data opaque pointer set by vlc_player_AddListener()
+     */
+    void (*on_playback_restore_queried)(vlc_player_t *player, void *data);
 };
 
 /**

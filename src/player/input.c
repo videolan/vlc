@@ -884,6 +884,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     input->ml.states.progress = -1.f;
     input->ml.restore = VLC_RESTOREPOINT_NONE;
     input->ml.restore_states = false;
+    input->ml.delay_restore = false;
 
     input->thread = input_Create(player, input_thread_Events, input, item,
                                  player->resource, player->renderer);

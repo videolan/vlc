@@ -59,6 +59,9 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input, bool force_pos)
             input->ml.states.current_title == -1 &&
             input->ml.states.progress > .0f)
         input_SetPosition(input->thread, input->ml.states.progress, false);
+    else if (restore_pos == VLC_PLAYER_RESTORE_PLAYBACK_POS_ASK &&
+             input->ml.states.progress > .0f)
+        input->ml.delay_restore = true;
 
     if (!restore_states)
         return;

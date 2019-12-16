@@ -100,6 +100,11 @@ vlc_player_OpenNextMedia(vlc_player_t *player)
         }
     }
     vlc_player_SendEvent(player, on_current_media_changed, player->media);
+    if (player->input && player->input->ml.delay_restore)
+    {
+        vlc_player_SendEvent(player, on_playback_restore_queried);
+        player->input->ml.delay_restore = false;
+    }
     return ret;
 }
 

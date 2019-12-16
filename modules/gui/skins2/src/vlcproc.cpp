@@ -413,6 +413,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     NULL, //on_player_subitems_changed,
     on_player_vout_changed,
     NULL, //on_player_corks_changed
+    NULL, //on_playback_restore_queried
     };
 
     static const struct vlc_player_vout_cbs player_vout_cbs = {

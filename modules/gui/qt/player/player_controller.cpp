@@ -949,7 +949,8 @@ static const struct vlc_player_cbs player_cbs = {
     on_player_media_epg_changed,
     on_player_subitems_changed,
     on_player_vout_changed,
-    on_player_corks_changed
+    on_player_corks_changed,
+    nullptr
 };
 
 static const struct vlc_player_vout_cbs player_vout_cbs = {
