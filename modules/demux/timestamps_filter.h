@@ -39,6 +39,13 @@ struct timestamps_filter_s
     struct moving_average_s mva;
     mtime_t sequence_offset;
     mtime_t contiguous_last;
+    /**/
+    struct name
+    {
+        mtime_t stream;
+        mtime_t contiguous;
+    } sync;
+    /**/
     unsigned sequence;
 };
 
@@ -66,6 +73,8 @@ static void timestamps_filter_init(struct timestamps_filter_s *tf)
     mva_init(&tf->mva);
     tf->sequence_offset = 0;
     tf->contiguous_last = 0;
+    tf->sync.stream = 0;
+    tf->sync.contiguous = 0;
     tf->sequence = -1;
 }
 
@@ -89,7 +98,9 @@ static bool timestamps_filter_push(const char *s, struct timestamps_filter_s *tf
             if(llabs(i_dts - prev->dts) > i_maxdiff || b_discontinuity) /* Desync */
             {
                 prev->diff = mva_get(&tf->mva);
-                tf->sequence_offset = tf->contiguous_last - i_dts + prev->diff;
+                tf->sync.stream = i_dts;
+                tf->sync.contiguous = tf->contiguous_last + prev->diff;
+                tf->sequence_offset = tf->sync.contiguous - tf->sync.stream;
 #ifdef DEBUG_TIMESTAMPS_FILTER
                 printf("%4.4s found offset of %ld\n", s, (prev->dts - i_dts));
 #endif
@@ -155,7 +166,29 @@ static int timestamps_filter_es_out_Control(es_out_t *out, int i_query, va_list 
             int64_t pcr = va_arg(va_list, int64_t);
 
             if(timestamps_filter_push("PCR ", &p_sys->pcrtf, pcr, 0, p_sys->b_discontinuity, true))
+            {
                 p_sys->pcrtf.sequence++;
+                /* Handle special start case, there was 1 single PCR before */
+                if(p_sys->pcrtf.mva.i_packet == 2)
+                {
+                    mtime_t max = 0;
+                    for(int i=0; i<p_sys->es_list.i_size; i++)
+                    {
+                        struct tf_es_out_id_s *cur = (struct tf_es_out_id_s *)p_sys->es_list.p_elems[i];
+                        if(cur->contiguous && cur->tf.contiguous_last)
+                            max = __MAX(max, cur->tf.contiguous_last);
+                    }
+                    if(max)
+                    {
+#ifdef DEBUG_TIMESTAMPS_FILTER
+                    printf("PCR  no previous value, using %ld\n", max);
+#endif
+                    p_sys->pcrtf.sync.stream = pcr;
+                    p_sys->pcrtf.sync.contiguous = max;
+                    p_sys->pcrtf.sequence_offset = max - pcr;
+                    }
+                }
+            }
 
             pcr += p_sys->pcrtf.sequence_offset;
 
@@ -227,6 +260,15 @@ static int timestamps_filter_es_out_Send(es_out_t *out, es_out_id_t *id, block_t
                    cur->pcrdiff, i_offsetdiff, p_sys->pcrtf.mva.i_packet,
                    cur->tf.sequence, p_sys->pcrtf.sequence);
 #endif
+        }
+    }
+    else /* PCR had discontinuity, we're in a new segment */
+    {
+        if(cur->tf.mva.i_packet == 1)
+        {
+          cur->tf.sync.stream = p_sys->pcrtf.sync.stream;
+          cur->tf.sync.contiguous = p_sys->pcrtf.sync.contiguous;
+          cur->tf.sequence_offset = cur->tf.sync.contiguous - cur->tf.sync.stream;
         }
     }
 
