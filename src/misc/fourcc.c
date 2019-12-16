@@ -248,7 +248,9 @@ const char *vlc_fourcc_GetDescription(int cat, vlc_fourcc_t fourcc)
 
 #define VLC_CODEC_YUV_PACKED \
     VLC_CODEC_YUYV, VLC_CODEC_YVYU, \
-    VLC_CODEC_UYVY, VLC_CODEC_VYUY
+    VLC_CODEC_UYVY, VLC_CODEC_VYUY, \
+    VLC_CODEC_VUYA, VLC_CODEC_Y210, \
+    VLC_CODEC_Y410
 
 #define VLC_CODEC_FALLBACK_420 \
     VLC_CODEC_YUV_PLANAR_422, VLC_CODEC_YUV_PACKED, \
