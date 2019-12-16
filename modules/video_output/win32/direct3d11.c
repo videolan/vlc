@@ -916,12 +916,12 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
         sys->picQuad.textureFormat = GetDisplayFormatByDepth(vd, bits_per_channel,
                                                              widthDenominator, heightDenominator,
                                                              decoder_format!=NULL,
-                                                             is_rgb ? D3D11_RGB_FORMAT : (D3D11_YUV_FORMAT|D3D11_RGB_FORMAT));
-        if (!sys->picQuad.textureFormat && is_rgb)
+                                                             is_rgb ? D3D11_RGB_FORMAT : D3D11_YUV_FORMAT);
+        if (!sys->picQuad.textureFormat)
             sys->picQuad.textureFormat = GetDisplayFormatByDepth(vd, bits_per_channel,
                                                                  widthDenominator, heightDenominator,
                                                                  decoder_format!=NULL,
-                                                                 D3D11_YUV_FORMAT);
+                                                                 is_rgb ? D3D11_YUV_FORMAT : D3D11_RGB_FORMAT);
     }
 
     // look for any pixel format that we can handle
