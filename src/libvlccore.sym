@@ -833,6 +833,7 @@ vlc_player_program_Dup
 vlc_player_RemoveListener
 vlc_player_RemoveTimer
 vlc_player_RestartEsId
+vlc_player_RestorePlaybackPos
 vlc_player_Resume
 vlc_player_SeekByPos
 vlc_player_SeekByTime

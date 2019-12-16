@@ -913,6 +913,12 @@ VLC_API const struct input_stats_t *
 vlc_player_GetStatistics(vlc_player_t *player);
 
 /**
+ * Restore the previous playback position of the current media
+ */
+VLC_API void
+vlc_player_RestorePlaybackPos(vlc_player_t *player);
+
+/**
  * Get the V4L2 object used to do controls
  *
  * @param player locked player instance

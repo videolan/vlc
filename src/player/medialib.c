@@ -326,3 +326,9 @@ vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
     vlc_ml_release(&input->ml.states);
     vlc_ml_release(media);
 }
+
+void
+vlc_player_RestorePlaybackPos(vlc_player_t *player)
+{
+    vlc_player_input_RestoreMlStates(player->input, true);
+}
