@@ -202,7 +202,9 @@ bool IsRGBShader(const d3d_format_t *cfg)
 {
     return cfg->resourceFormat[0] != DXGI_FORMAT_R8_UNORM &&
            cfg->resourceFormat[0] != DXGI_FORMAT_R16_UNORM &&
-           cfg->formatTexture != DXGI_FORMAT_YUY2;
+           cfg->formatTexture != DXGI_FORMAT_YUY2 &&
+           cfg->formatTexture != DXGI_FORMAT_AYUV &&
+           cfg->formatTexture != DXGI_FORMAT_420_OPAQUE;
 }
 
 static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool legacy_shader,
