@@ -94,22 +94,15 @@ Widgets.NavigableFocusScope {
         }
     }
 
-    ColumnLayout {
-        anchors.fill : parent
-        spacing: 0
+    /* The data elements */
+    Widgets.StackViewExt  {
+        id: stackView
+        anchors.fill: parent
+        focus: true
 
-        /* The data elements */
-        Widgets.StackViewExt  {
-            id: stackView
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.margins: VLCStyle.margin_normal
-            focus: true
-
-            onCurrentItemChanged: {
-                sortModel = stackView.currentItem.sortModel
-                contentModel = stackView.currentItem.model
-            }
+        onCurrentItemChanged: {
+            sortModel = stackView.currentItem.sortModel
+            contentModel = stackView.currentItem.model
         }
     }
 }
