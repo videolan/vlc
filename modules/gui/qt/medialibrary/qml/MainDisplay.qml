@@ -64,6 +64,12 @@ Widgets.NavigableFocusScope {
         history.previous(History.Go)
     }
 
+    Keys.onPressed: {
+        //unhandled keys are forwarded as hotkeys
+        if (!event.accepted)
+            rootWindow.sendHotkey(event.key, event.modifiers);
+    }
+
     Component {
         id: musicComp
         MusicDisplay {
