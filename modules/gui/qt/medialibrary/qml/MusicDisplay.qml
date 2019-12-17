@@ -62,7 +62,7 @@ Widgets.NavigableFocusScope {
     Component { id: albumComp; MusicAlbumsDisplay{ navigationParent: root } }
     Component { id: artistComp; MusicArtistsDisplay{ navigationParent: root } }
     Component { id: genresComp; MusicGenresDisplay{ navigationParent: root } }
-    Component { id: tracksComp; MusicTrackListDisplay{  navigationParent: root } }
+    Component { id: tracksComp; MusicTracksDisplay{  navigationParent: root } }
 
     readonly property var pageModel: [{
             displayText: i18n.qtr("Albums"),

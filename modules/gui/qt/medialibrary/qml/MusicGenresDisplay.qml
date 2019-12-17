@@ -36,6 +36,13 @@ Widgets.NavigableFocusScope {
         history.push([ "mc", "music", "albums", { parentId: parent } ], History.Go)
     }
 
+    navigationCancel: function() {
+        if (view.currentItem.currentIndex <= 0)
+            defaultNavigationCancel()
+        else
+            view.currentItem.currentIndex = 0;
+    }
+
     Util.SelectableDelegateModel {
         id: delegateModel
         model: MLGenreModel {

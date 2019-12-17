@@ -19,21 +19,16 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import org.videolan.medialib 0.1
 
-import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Loader {
-    id: viewLoader
-    property var model: null
 
-    sourceComponent: listViewComponent_id
+MusicTrackListDisplay {
+    id: tracklistdisplay_id
 
-    /* List View */
-    Component {
-        id: listViewComponent_id
-        MusicTrackListDisplay {
-            id: tracklistdisplay_id
-            model: viewLoader.model
-        }
+    navigationCancel: function() {
+        if (tracklistdisplay_id.currentIndex <= 0)
+            defaultNavigationCancel()
+        else
+            tracklistdisplay_id.currentIndex = 0;
     }
 }

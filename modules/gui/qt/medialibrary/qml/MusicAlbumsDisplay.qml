@@ -41,6 +41,13 @@ Widgets.NavigableFocusScope {
     property var currentIndex: view.currentItem.currentIndex
 
 
+    navigationCancel: function() {
+        if (view.currentItem.currentIndex <= 0)
+            defaultNavigationCancel()
+        else
+            view.currentItem.currentIndex = 0;
+    }
+
     property Component header: Item{}
     readonly property var headerItem: view.currentItem ? view.currentItem.headerItem : undefined
 
@@ -177,6 +184,12 @@ Widgets.NavigableFocusScope {
             onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
 
             navigationParent: root
+            navigationCancel: function() {
+                if (listView_id.currentIndex <= 0)
+                    defaultNavigationCancel()
+                else
+                    listView_id.currentIndex = 0;
+            }
         }
     }
 

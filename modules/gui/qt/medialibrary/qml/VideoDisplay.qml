@@ -33,6 +33,13 @@ Widgets.NavigableFocusScope {
 
     property alias contentModel: videosDelegate.model;
 
+    navigationCancel: function() {
+        if (view.currentItem.currentIndex <= 0)
+            defaultNavigationCancel()
+        else
+            view.currentItem.currentIndex = 0;
+    }
+
     DG.ModalDialog {
         id: deleteDialog
         rootWindow: root

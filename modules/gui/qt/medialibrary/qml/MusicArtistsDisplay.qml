@@ -125,6 +125,13 @@ Widgets.NavigableFocusScope {
 
             navigationParent: root
             navigationRightItem: view
+            navigationCancel: function() {
+                if (artistList.currentIndex <= 0)
+                    defaultNavigationCancel()
+                else
+                    artistList.currentIndex = 0;
+            }
+
         }
 
         FocusScope {
