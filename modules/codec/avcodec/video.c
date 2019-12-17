@@ -107,6 +107,10 @@ typedef struct
     int profile;
     int level;
 
+    // decoder output seen by lavc, regardless of texture padding
+    unsigned decoder_width;
+    unsigned decoder_height;
+
     /* Protect dec->fmt_out, decoder_Update*() and decoder_NewPicture()
      * functions */
     vlc_mutex_t lock;
@@ -367,6 +371,8 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     if ( dec->fmt_in.video.mastering.max_luminance )
         dec->fmt_out.video.mastering = dec->fmt_in.video.mastering;
     dec->fmt_out.video.lighting = dec->fmt_in.video.lighting;
+    p_sys->decoder_width  = dec->fmt_out.video.i_width;
+    p_sys->decoder_height = dec->fmt_out.video.i_height;
 
     if (pp_dec_device)
     {
@@ -1665,11 +1671,11 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
          msg_Dbg(p_dec, "get format failed");
          goto no_reuse;
      }
-     if (fmt.i_width  != p_dec->fmt_out.video.i_width ||
-         fmt.i_height != p_dec->fmt_out.video.i_height)
+     if (fmt.i_width  != p_sys->decoder_width ||
+         fmt.i_height != p_sys->decoder_height)
      {
          msg_Dbg(p_dec, "mismatched dimensions %ux%u was %ux%u", fmt.i_width, fmt.i_height,
-                 p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height);
+                 p_sys->decoder_width, p_sys->decoder_height);
          goto no_reuse;
      }
      if (p_context->profile != p_sys->profile || p_context->level > p_sys->level)
