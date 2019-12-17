@@ -55,6 +55,12 @@ function matchOk( event ) {
         || event.matches(QtQuick.StandardKey.InsertParagraphSeparator)
 }
 
+function matchSearch( event ) {
+    return event.key === Qt.Key_Search
+        || event.key === Qt.Key_Slash
+        || ( (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_F )
+}
+
 function matchCancel(event) {
     return event.key === Qt.Key_Backspace
         || event.key === Qt.Key_Back

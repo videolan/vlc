@@ -65,6 +65,10 @@ Widgets.NavigableFocusScope {
     }
 
     Keys.onPressed: {
+        if (KeyHelper.matchSearch(event)) {
+            sourcesBanner.search()
+            event.accepted = true
+        }
         //unhandled keys are forwarded as hotkeys
         if (!event.accepted)
             rootWindow.sendHotkey(event.key, event.modifiers);

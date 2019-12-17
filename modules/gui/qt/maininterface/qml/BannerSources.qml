@@ -52,6 +52,11 @@ Widgets.NavigableFocusScope {
         medialib.gridView = !medialib.gridView
     }
 
+    function search() {
+        if (searchBox.visible)
+            searchBox.expanded = true
+    }
+
     Rectangle {
         id: pLBannerSources
 
