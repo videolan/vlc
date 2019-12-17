@@ -90,6 +90,9 @@ NavigableFocusScope {
                 }
             } else if (KeyHelper.matchPageUp(event)) {
                 newIndex = Math.max(0, currentIndex - _colCount * 5)
+            } else if (KeyHelper.matchOk(event) || event.matches(StandardKey.SelectAll) ) {
+                //these events are matched on release
+                event.accepted = true
             }
 
             if (newIndex >= 0 && newIndex < modelCount && newIndex != currentIndex) {

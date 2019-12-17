@@ -176,6 +176,11 @@ NavigableFocusScope {
                 }
             }
 
+            if (KeyHelper.matchOk(event) || event.matches(StandardKey.SelectAll) ) {
+                //these events are matched on release
+                event.accepted = true
+            }
+
             if (newIndex >= 0 && newIndex < modelCount) {
                 var oldIndex = currentIndex
                 currentIndex = newIndex
