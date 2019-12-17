@@ -60,6 +60,9 @@ Widgets.NavigableFocusScope {
             })
     }
 
+    navigationCancel: function() {
+        history.previous(History.Go)
+    }
 
     Component {
         id: musicComp
@@ -68,7 +71,6 @@ Widgets.NavigableFocusScope {
             navigationUpItem: sourcesBanner
             navigationRightItem: playlist
             navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
-            navigationCancelItem: stackViewZone
         }
     }
 
@@ -79,7 +81,6 @@ Widgets.NavigableFocusScope {
             navigationUpItem: sourcesBanner
             navigationRightItem: playlist
             navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
-            navigationCancelItem: stackViewZone
         }
     }
 
@@ -90,7 +91,6 @@ Widgets.NavigableFocusScope {
             navigationUpItem: sourcesBanner
             navigationRightItem: playlist
             navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
-            navigationCancelItem: stackViewZone
         }
     }
 
@@ -135,6 +135,8 @@ Widgets.NavigableFocusScope {
             id: medialibId
             anchors.fill: parent
 
+            navigationParent: root
+
             ColumnLayout {
                 id: column
                 anchors.fill: parent
@@ -169,44 +171,13 @@ Widgets.NavigableFocusScope {
                         extraLocalActions = stackView.currentItem.extraLocalActions
                     }
 
-                    navigationParent: root
+                    navigationParent: medialibId
                     navigationDownItem: stackView
                 }
 
                 Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-
-                    Widgets.NavigableFocusScope {
-                        id: stackViewZone
-                        anchors.fill: parent
-
-                        onActionUp: sourcesBanner.focus = true
-                        onActionDown: {
-                            if (miniPlayer.expanded)
-                                miniPlayer.focus = true
-                        }
-
-                        Keys.onPressed: {
-                            if (!event.accepted)
-                                defaultKeyAction(event, 0)
-                        }
-                        Keys.onReleased: {
-                            if (!event.accepted && KeyHelper.matchOk(event)) {
-                                event.accepted = true
-                                stackView.focus = true
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        visible: stackViewZone.focus
-                        anchors.fill: stackViewZone
-                        z: 42
-                        color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.accent, 0.08)
-                        border.width: VLCStyle.selectedBorder
-                        border.color: VLCStyle.colors.accent
-                    }
 
                     Widgets.StackViewExt {
                         id: stackView
@@ -251,7 +222,6 @@ Widgets.NavigableFocusScope {
                         navigationLeftItem: stackView
                         navigationUpItem: sourcesBanner
                         navigationDownItem: miniPlayer.expanded ? miniPlayer : undefined
-                        navigationCancelItem: stackViewZone
 
                         Rectangle {
                             anchors {
