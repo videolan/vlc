@@ -170,8 +170,13 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat hwfmt, con
     switch (type)
     {
         case VDP_CHROMA_TYPE_420:
+            fmt_out->i_chroma = VLC_CODEC_VDPAU_VIDEO_420;
+            break;
         case VDP_CHROMA_TYPE_422:
+            fmt_out->i_chroma = VLC_CODEC_VDPAU_VIDEO_422;
+            break;
         case VDP_CHROMA_TYPE_444:
+            fmt_out->i_chroma = VLC_CODEC_VDPAU_VIDEO_444;
             break;
         default:
             msg_Err(va, "unsupported chroma type %"PRIu32, type);
