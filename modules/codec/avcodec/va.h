@@ -65,6 +65,15 @@ typedef int (*vlc_va_open)(vlc_va_t *, AVCodecContext *, const AVPixFmtDescripto
 vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt);
 
 /**
+ * Determines whether the hardware acceleration PixelFormat can be used to
+ * decode pixels similar to the software PixelFormat.
+ * @param hwfmt the hardware acceleration pixel format
+ * @param swfmt the software pixel format
+ * @return true if the hardware acceleration should be supported
+ */
+bool vlc_va_MightDecode(enum PixelFormat hwfmt, enum PixelFormat swfmt);
+
+/**
  * Creates an accelerated video decoding back-end for libavcodec.
  * @param obj parent VLC object
  * @param fmt VLC format of the content to decode

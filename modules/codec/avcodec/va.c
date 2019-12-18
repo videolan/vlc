@@ -95,6 +95,63 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt)
     }
 }
 
+bool vlc_va_MightDecode(enum PixelFormat hwfmt, enum PixelFormat swfmt)
+{
+    switch (hwfmt)
+    {
+        case AV_PIX_FMT_VAAPI_VLD:
+            switch (swfmt)
+            {
+                case AV_PIX_FMT_YUVJ420P:
+                case AV_PIX_FMT_YUV420P:
+                case AV_PIX_FMT_YUV420P10LE:
+                    return true;
+                default:
+                    return false;
+            }
+        case AV_PIX_FMT_DXVA2_VLD:
+            switch (swfmt)
+            {
+                case AV_PIX_FMT_YUV420P10LE:
+                case AV_PIX_FMT_YUVJ420P:
+                case AV_PIX_FMT_YUV420P:
+                    return true;
+                default:
+                    return false;
+            }
+            break;
+
+        case AV_PIX_FMT_D3D11VA_VLD:
+            switch (swfmt)
+            {
+                case AV_PIX_FMT_YUV420P10LE:
+                case AV_PIX_FMT_YUVJ420P:
+                case AV_PIX_FMT_YUV420P:
+                    return true;
+                default:
+                    return false;
+            }
+        break;
+
+        case AV_PIX_FMT_VDPAU:
+            switch (swfmt)
+            {
+                case AV_PIX_FMT_YUVJ444P:
+                case AV_PIX_FMT_YUV444P:
+                case AV_PIX_FMT_YUVJ422P:
+                case AV_PIX_FMT_YUV422P:
+                case AV_PIX_FMT_YUVJ420P:
+                case AV_PIX_FMT_YUV420P:
+                    return true;
+                default:
+                    return false;
+            }
+            break;
+        default:
+            return false;
+    }
+}
+
 static int vlc_va_Start(void *func, bool forced, va_list ap)
 {
     vlc_va_t *va = va_arg(ap, vlc_va_t *);
