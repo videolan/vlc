@@ -269,9 +269,6 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, con
     sys->hw_ctx.context_id = VA_INVALID_ID;
     va->sys = sys;
 
-    video_format_t fmt_video = fmt_in->video;
-    fmt_video.i_chroma = i_vlc_chroma;
-
     struct va_pool_cfg pool_cfg = {
         VAAPICreateDevice,
         VAAPIDestroyDevice,
@@ -283,7 +280,8 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, con
     if (sys->va_pool == NULL)
         goto error;
 
-    int err = va_pool_SetupDecoder(va, sys->va_pool, ctx, &fmt_video, count);
+    fmt_out->i_chroma = i_vlc_chroma;
+    int err = va_pool_SetupDecoder(va, sys->va_pool, ctx, fmt_out, count);
     if (err != VLC_SUCCESS)
         goto error;
 
