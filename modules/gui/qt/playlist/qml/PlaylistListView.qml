@@ -319,11 +319,15 @@ Widgets.NavigableFocusScope {
         }
 
         Label {
-            anchors.centerIn: parent
+            anchors.fill: parent
             visible: plmodel.count === 0
             font.pixelSize: VLCStyle.fontHeight_xxlarge
             color: view.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
             text: i18n.qtr("playlist is empty")
+            wrapMode: Text.WordWrap
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            padding: VLCStyle.margin_small
         }
     }
 
