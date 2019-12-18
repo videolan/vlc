@@ -101,8 +101,7 @@ struct vlc_va_sys_t
 
     vlc_video_context            *vctx;
 
-    /* Video service */
-    DXGI_FORMAT                  render;
+    const d3d_format_t           *render_fmt;
 
     /* Video decoder */
     D3D11_VIDEO_DECODER_CONFIG   cfg;
@@ -290,7 +289,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     va->sys = sys;
 
     sys->d3d_dev.d3ddevice = NULL;
-    sys->render = DXGI_FORMAT_UNKNOWN;
+    sys->render_fmt = NULL;
     HRESULT hr = D3D11_CreateDeviceExternal(va, d3d11_device->device, true, &sys->d3d_dev);
     if (FAILED(hr))
     {
@@ -360,7 +359,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
     }
 
     d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
-    priv->format = sys->render;
+    priv->format = sys->render_fmt->formatTexture;
     priv->device = sys->d3d_dev.d3dcontext;
     ID3D11DeviceContext_AddRef(priv->device);
 
@@ -435,6 +434,20 @@ static int DxGetInputList(vlc_va_t *va, input_list_t *p_list)
     return VLC_SUCCESS;
 }
 
+static const d3d_format_t *D3D11_FindDXGIFormat(DXGI_FORMAT dxgi)
+{
+    for (const d3d_format_t *output_format = GetRenderFormatList();
+         output_format->name != NULL; ++output_format)
+    {
+        if (output_format->formatTexture == dxgi &&
+                is_d3d11_opaque(output_format->fourcc))
+        {
+            return output_format;
+        }
+    }
+    return NULL;
+}
+
 static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const video_format_t *fmt)
 {
     vlc_va_sys_t *sys = va->sys;
@@ -466,7 +479,7 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
         return VLC_EGENERIC;
     }
 
-    DXGI_FORMAT processorInput[6];
+    const d3d_format_t *processorInput[4];
     int idx = 0;
     const d3d_format_t *decoder_format = GetDirectRenderingFormat(va, mode);
     if (decoder_format == NULL)
@@ -474,44 +487,45 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     if (decoder_format != NULL)
     {
         msg_Dbg(va, "favor decoder format %s", decoder_format->name);
-        processorInput[idx++] = decoder_format->formatTexture;
+        processorInput[idx++] = decoder_format;
     }
 
-    if (mode->bit_depth > 10)
-        processorInput[idx++] = DXGI_FORMAT_P016;
-    if (mode->bit_depth == 10)
-        processorInput[idx++] = DXGI_FORMAT_P010;
-    processorInput[idx++] = DXGI_FORMAT_NV12;
-    processorInput[idx++] = DXGI_FORMAT_420_OPAQUE;
-    processorInput[idx++] = DXGI_FORMAT_UNKNOWN;
+    if (mode->bit_depth > 10 && (decoder_format == NULL || decoder_format->formatTexture != DXGI_FORMAT_P016))
+        processorInput[idx++] = D3D11_FindDXGIFormat(DXGI_FORMAT_P016);
+    if (mode->bit_depth > 8 && (decoder_format == NULL || decoder_format->formatTexture != DXGI_FORMAT_P010))
+        processorInput[idx++] = D3D11_FindDXGIFormat(DXGI_FORMAT_P010);
+    if (decoder_format == NULL || decoder_format->formatTexture != DXGI_FORMAT_NV12)
+        processorInput[idx++] = D3D11_FindDXGIFormat(DXGI_FORMAT_NV12);
+    processorInput[idx++] = D3D11_FindDXGIFormat(DXGI_FORMAT_420_OPAQUE);
+    processorInput[idx++] = NULL;
 
     /* */
-    for (idx = 0; processorInput[idx] != DXGI_FORMAT_UNKNOWN; ++idx)
+    for (idx = 0; processorInput[idx] != NULL; ++idx)
     {
         BOOL is_supported = false;
-        hr = ID3D11VideoDevice_CheckVideoDecoderFormat(sys->d3ddec, mode->guid, processorInput[idx], &is_supported);
+        hr = ID3D11VideoDevice_CheckVideoDecoderFormat(sys->d3ddec, mode->guid, processorInput[idx]->formatTexture, &is_supported);
         if (SUCCEEDED(hr) && is_supported)
-            msg_Dbg(va, "%s output is supported for decoder %s.", DxgiFormatToStr(processorInput[idx]), mode->name);
+            msg_Dbg(va, "%s output is supported for decoder %s.", DxgiFormatToStr(processorInput[idx]->formatTexture), mode->name);
         else
         {
-            msg_Dbg(va, "Can't get a decoder output format %s for decoder %s.", DxgiFormatToStr(processorInput[idx]), mode->name);
+            msg_Dbg(va, "Can't get a decoder output format %s for decoder %s.", DxgiFormatToStr(processorInput[idx]->formatTexture), mode->name);
             continue;
         }
 
        // check if we can create render texture of that format
        // check the decoder can output to that format
-       if ( !DeviceSupportsFormat(sys->d3d_dev.d3ddevice, processorInput[idx],
+       if ( !DeviceSupportsFormat(sys->d3d_dev.d3ddevice, processorInput[idx]->formatTexture,
                                   D3D11_FORMAT_SUPPORT_SHADER_LOAD) )
        {
 #ifndef ID3D11VideoContext_VideoProcessorBlt
            msg_Dbg(va, "Format %s needs a processor but is not supported",
-                   DxgiFormatToStr(processorInput[idx]));
+                   DxgiFormatToStr(processorInput[idx]->formatTexture));
 #else
-           if ( !DeviceSupportsFormat(sys->d3d_dev.d3ddevice, processorInput[idx],
+           if ( !DeviceSupportsFormat(sys->d3d_dev.d3ddevice, processorInput[idx]->formatTexture,
                                       D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT) )
            {
                msg_Dbg(va, "Format %s needs a processor but is not available",
-                       DxgiFormatToStr(processorInput[idx]));
+                       DxgiFormatToStr(processorInput[idx]->formatTexture));
                continue;
            }
 #endif
@@ -522,7 +536,7 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
         decoderDesc.Guid = *mode->guid;
         decoderDesc.SampleWidth = fmt->i_width;
         decoderDesc.SampleHeight = fmt->i_height;
-        decoderDesc.OutputFormat = processorInput[idx];
+        decoderDesc.OutputFormat = processorInput[idx]->formatTexture;
 
         UINT cfg_count = 0;
         hr = ID3D11VideoDevice_GetVideoDecoderConfigCount( sys->d3ddec, &decoderDesc, &cfg_count );
@@ -538,8 +552,8 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
             continue;
         }
 
-        msg_Dbg(va, "Using output format %s for decoder %s", DxgiFormatToStr(processorInput[idx]), mode->name);
-        sys->render = processorInput[idx];
+        msg_Dbg(va, "Using output format %s for decoder %s", DxgiFormatToStr(processorInput[idx]->formatTexture), mode->name);
+        sys->render_fmt = processorInput[idx];
         return VLC_SUCCESS;
     }
 
@@ -597,29 +611,12 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     viewDesc.DecodeProfile = *sys->selected_decoder->guid;
     viewDesc.ViewDimension = D3D11_VDOV_DIMENSION_TEXTURE2D;
 
-    const d3d_format_t *textureFmt = NULL;
-    for (const d3d_format_t *output_format = GetRenderFormatList();
-         output_format->name != NULL; ++output_format)
-    {
-        if (output_format->formatTexture == sys->render &&
-                is_d3d11_opaque(output_format->fourcc))
-        {
-            textureFmt = output_format;
-            break;
-        }
-    }
-    if (unlikely(textureFmt==NULL))
-    {
-        msg_Dbg(va, "no hardware decoder matching %s", DxgiFormatToStr(sys->render));
-        return VLC_EGENERIC;
-    }
-
     D3D11_TEXTURE2D_DESC texDesc;
     ZeroMemory(&texDesc, sizeof(texDesc));
     texDesc.Width = fmt->i_width;
     texDesc.Height = fmt->i_height;
     texDesc.MipLevels = 1;
-    texDesc.Format = sys->render;
+    texDesc.Format = sys->render_fmt->formatTexture;
     texDesc.SampleDesc.Count = 1;
     texDesc.MiscFlags = 0;
     texDesc.ArraySize = surface_count;
@@ -654,7 +651,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
         {
             ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {p_texture, p_texture, p_texture};
-            D3D11_AllocateResourceView(va, sys->d3d_dev.d3ddevice, textureFmt, textures, surface_idx,
+            D3D11_AllocateResourceView(va, sys->d3d_dev.d3ddevice, sys->render_fmt, textures, surface_idx,
                                 &sys->renderSrc[surface_idx * D3D11_MAX_SHADER_VIEW]);
         }
     }
@@ -666,7 +663,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     decoderDesc.Guid = *sys->selected_decoder->guid;
     decoderDesc.SampleWidth = fmt->i_width;
     decoderDesc.SampleHeight = fmt->i_height;
-    decoderDesc.OutputFormat = sys->render;
+    decoderDesc.OutputFormat = sys->render_fmt->formatTexture;
 
     UINT cfg_count;
     hr = ID3D11VideoDevice_GetVideoDecoderConfigCount( sys->d3ddec, &decoderDesc, &cfg_count );
