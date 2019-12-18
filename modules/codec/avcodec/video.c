@@ -364,7 +364,7 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     if (fmt == swfmt)
         i_chroma = fmt_out.i_chroma;
     else
-        i_chroma = vlc_va_GetChroma(fmt, swfmt);
+        i_chroma = 0;
     es_format_Change(&dec->fmt_out, VIDEO_ES, i_chroma);
     dec->fmt_out.video = fmt_out;
     dec->fmt_out.video.i_chroma = i_chroma;
@@ -1748,7 +1748,6 @@ no_reuse:
 
         if (!vlc_va_MightDecode(hwfmt, swfmt))
             continue; /* Unknown brand of hardware acceleration */
-        p_dec->fmt_out.video.i_chroma = vlc_va_GetChroma(hwfmt, swfmt);
         if (p_context->width == 0 || p_context->height == 0)
         {   /* should never happen */
             msg_Err(p_dec, "unspecified video dimensions");
@@ -1762,6 +1761,7 @@ no_reuse:
             continue; /* Unsupported brand of hardware acceleration */
         vlc_mutex_unlock(&p_sys->lock);
 
+        p_dec->fmt_out.video.i_chroma = 0; // make sure the va sets its output chroma
         vlc_video_context *vctx_out;
         vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, hwfmt, src_desc,
                                   &p_dec->fmt_in, init_device,
@@ -1771,7 +1771,9 @@ no_reuse:
         vlc_mutex_lock(&p_sys->lock);
         if (va == NULL)
             continue; /* Unsupported codec profile or such */
+        assert(p_dec->fmt_out.video.i_chroma != 0);
         assert(vctx_out != NULL);
+        p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
         if (decoder_UpdateVideoOutput(p_dec, vctx_out))
         {
