@@ -247,21 +247,6 @@ static void Close(vlc_va_t *va)
 
 static const struct vlc_va_operations ops = { Get, Close, };
 
-static const d3d_format_t *GetDirectRenderingFormat(vlc_va_t *vd, const directx_va_mode_t *mode)
-{
-    UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
-    return FindD3D11Format( vd, &vd->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
-                            mode->bit_depth, mode->log2_chroma_h+1, mode->log2_chroma_w+1,
-                            D3D11_CHROMA_GPU | D3D11_CHROMA_CPU, supportFlags );
-}
-
-static const d3d_format_t *GetDirectDecoderFormat(vlc_va_t *vd, vlc_fourcc_t i_src_chroma)
-{
-    UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-    return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT, 0, 0, 0,
-                            D3D11_CHROMA_GPU | D3D11_CHROMA_CPU, supportFlags );
-}
-
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
                 const es_format_t *fmt_in, vlc_decoder_device *dec_device,
                 video_format_t *fmt_out, vlc_video_context **vtcx_out)
@@ -481,19 +466,26 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
 
     const d3d_format_t *processorInput[4];
     int idx = 0;
-    const d3d_format_t *decoder_format = GetDirectRenderingFormat(va, mode);
+    const d3d_format_t *decoder_format;
+    UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
+    decoder_format = FindD3D11Format( va, &va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
+                                      mode->bit_depth, mode->log2_chroma_h+1, mode->log2_chroma_w+1,
+                                      D3D11_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL)
-        decoder_format = GetDirectDecoderFormat(va, fmt->i_chroma);
+        decoder_format = FindD3D11Format( va, &va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
+                                        mode->bit_depth, 0, 0, D3D11_CHROMA_GPU, supportFlags );
+    if (decoder_format == NULL && mode->bit_depth > 10)
+        decoder_format = FindD3D11Format( va, &va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
+                                        10, 0, 0, D3D11_CHROMA_GPU, supportFlags );
+    if (decoder_format == NULL)
+        decoder_format = FindD3D11Format( va, &va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
+                                        0, 0, 0, D3D11_CHROMA_GPU, supportFlags );
     if (decoder_format != NULL)
     {
         msg_Dbg(va, "favor decoder format %s", decoder_format->name);
         processorInput[idx++] = decoder_format;
     }
 
-    if (mode->bit_depth > 10 && (decoder_format == NULL || decoder_format->formatTexture != DXGI_FORMAT_P016))
-        processorInput[idx++] = D3D11_FindDXGIFormat(DXGI_FORMAT_P016);
-    if (mode->bit_depth > 8 && (decoder_format == NULL || decoder_format->formatTexture != DXGI_FORMAT_P010))
-        processorInput[idx++] = D3D11_FindDXGIFormat(DXGI_FORMAT_P010);
     if (decoder_format == NULL || decoder_format->formatTexture != DXGI_FORMAT_NV12)
         processorInput[idx++] = D3D11_FindDXGIFormat(DXGI_FORMAT_NV12);
     processorInput[idx++] = D3D11_FindDXGIFormat(DXGI_FORMAT_420_OPAQUE);
