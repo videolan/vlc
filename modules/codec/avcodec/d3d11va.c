@@ -316,6 +316,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
         goto error;
     }
 
+    final_fmt.i_chroma = sys->render_fmt->fourcc;
     err = va_pool_SetupDecoder(va, sys->va_pool, ctx, &final_fmt, sys->hw.surface_count);
     if (err != VLC_SUCCESS)
         goto error;
