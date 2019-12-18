@@ -55,6 +55,30 @@
 #ifndef GL_TEXTURE_EXTERNAL_OES
 # define GL_TEXTURE_EXTERNAL_OES 0x8D65
 #endif
+#ifndef GL_RED
+# define GL_RED 0x1903
+#endif
+#ifndef GL_RG
+# define GL_RG 0x8227
+#endif
+#ifndef GL_R16
+# define GL_R16 0x822A
+#endif
+#ifndef GL_BGRA
+# define GL_BGRA 0x80E1
+#endif
+#ifndef GL_RG16
+# define GL_RG16 0x822C
+#endif
+#ifndef GL_LUMINANCE16
+# define GL_LUMINANCE16 0x8042
+#endif
+#ifndef GL_TEXTURE_RED_SIZE
+# define GL_TEXTURE_RED_SIZE 0x805C
+#endif
+#ifndef GL_TEXTURE_LUMINANCE_SIZE
+# define GL_TEXTURE_LUMINANCE_SIZE 0x8060
+#endif
 
 #ifndef APIENTRY
 # define APIENTRY
