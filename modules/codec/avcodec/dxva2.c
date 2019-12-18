@@ -280,17 +280,10 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
 
     va->sys = sys;
 
-    switch (fmt_out->i_chroma)
-    {
-        case VLC_CODEC_D3D9_OPAQUE_10B:
-            sys->render = MAKEFOURCC('P','0','1','0');
-            break;
-        case VLC_CODEC_D3D9_OPAQUE:
-            sys->render =  MAKEFOURCC('N','V','1','2');
-            break;
-        default:
-            vlc_assert_unreachable();
-    }
+    if (desc->comp[0].depth > 8)
+        sys->render = MAKEFOURCC('P','0','1','0');
+    else
+        sys->render =  MAKEFOURCC('N','V','1','2');
 
     /* Load dll*/
     sys->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
@@ -327,6 +320,10 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
         goto error;
     }
 
+    if (sys->render == MAKEFOURCC('P','0','1','0'))
+        final_fmt.i_chroma = VLC_CODEC_D3D9_OPAQUE_10B;
+    else
+        final_fmt.i_chroma = VLC_CODEC_D3D9_OPAQUE;
     err = va_pool_SetupDecoder(va, sys->va_pool, ctx, &final_fmt, sys->hw.surface_count);
     if (err != VLC_SUCCESS)
         goto error;
