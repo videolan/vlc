@@ -207,10 +207,7 @@ static bool picture_InitPrivate(const video_format_t *restrict p_fmt,
     p_picture->format = *p_fmt;
     /* Make sure the real dimensions are a multiple of 16 */
     if( picture_Setup( p_picture, p_fmt ) )
-    {
-        free( p_picture );
         return false;
-    }
 
     atomic_init(&p_picture->refs, 1);
     priv->gc.opaque = NULL;
