@@ -1742,9 +1742,9 @@ no_reuse:
         if( hwfmt == AV_PIX_FMT_NONE )
             continue;
 
-        p_dec->fmt_out.video.i_chroma = vlc_va_GetChroma(hwfmt, swfmt);
-        if (p_dec->fmt_out.video.i_chroma == 0)
+        if (!vlc_va_MightDecode(hwfmt, swfmt))
             continue; /* Unknown brand of hardware acceleration */
+        p_dec->fmt_out.video.i_chroma = vlc_va_GetChroma(hwfmt, swfmt);
         if (p_context->width == 0 || p_context->height == 0)
         {   /* should never happen */
             msg_Err(p_dec, "unspecified video dimensions");
