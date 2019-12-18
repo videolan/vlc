@@ -57,15 +57,6 @@ typedef int (*vlc_va_open)(vlc_va_t *, AVCodecContext *,
     set_capability( "hw decoder", priority )
 
 /**
- * Determines the VLC video chroma value for a pair of hardware acceleration
- * PixelFormat and software PixelFormat.
- * @param hwfmt the hardware acceleration pixel format
- * @param swfmt the software pixel format
- * @return a VLC chroma value, or 0 on error.
- */
-vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt);
-
-/**
  * Determines whether the hardware acceleration PixelFormat can be used to
  * decode pixels similar to the software PixelFormat.
  * @param hwfmt the hardware acceleration pixel format
