@@ -164,8 +164,6 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
 
         avcodec_align_dimensions2(ctx, &width, &height, aligns);
     }
-    else /* hardware decoding */
-        fmt->i_chroma = vlc_va_GetChroma(pix_fmt, sw_pix_fmt);
 
     if( width == 0 || height == 0 || width > 8192 || height > 8192 ||
         width < ctx->width || height < ctx->height )
@@ -362,8 +360,14 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     fmt_out.p_palette = dec->fmt_out.video.p_palette;
     dec->fmt_out.video.p_palette = NULL;
 
-    es_format_Change(&dec->fmt_out, VIDEO_ES, fmt_out.i_chroma);
+    vlc_fourcc_t i_chroma;
+    if (fmt == swfmt)
+        i_chroma = fmt_out.i_chroma;
+    else
+        i_chroma = vlc_va_GetChroma(fmt, swfmt);
+    es_format_Change(&dec->fmt_out, VIDEO_ES, i_chroma);
     dec->fmt_out.video = fmt_out;
+    dec->fmt_out.video.i_chroma = i_chroma;
     dec->fmt_out.video.orientation = dec->fmt_in.video.orientation;
     dec->fmt_out.video.projection_mode = dec->fmt_in.video.projection_mode;
     dec->fmt_out.video.multiview_mode = dec->fmt_in.video.multiview_mode;
