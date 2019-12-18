@@ -156,6 +156,7 @@ static int vlc_va_Start(void *func, bool forced, va_list ap)
 {
     vlc_va_t *va = va_arg(ap, vlc_va_t *);
     AVCodecContext *ctx = va_arg(ap, AVCodecContext *);
+    enum PixelFormat hwfmt = va_arg(ap, enum PixelFormat);
     const AVPixFmtDescriptor *src_desc = va_arg(ap, const AVPixFmtDescriptor *);
     const es_format_t *fmt_in = va_arg(ap, const es_format_t *);
     vlc_decoder_device *device = va_arg(ap, vlc_decoder_device *);
@@ -164,11 +165,11 @@ static int vlc_va_Start(void *func, bool forced, va_list ap)
     vlc_va_open open = func;
 
     (void) forced;
-    return open(va, ctx, src_desc, fmt_in, device, fmt_out, vtcx_out);
+    return open(va, ctx, hwfmt, src_desc, fmt_in, device, fmt_out, vtcx_out);
 }
 
-vlc_va_t *vlc_va_New(vlc_object_t *obj,
-                     AVCodecContext *avctx, const AVPixFmtDescriptor *src_desc,
+vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
+                     enum PixelFormat hwfmt, const AVPixFmtDescriptor *src_desc,
                      const es_format_t *fmt_in, vlc_decoder_device *device,
                      video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {
@@ -178,7 +179,7 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj,
 
 
     if (vlc_module_load(va, "hw decoder", NULL, true,
-                        vlc_va_Start, va, avctx, src_desc, fmt_in, device,
+                        vlc_va_Start, va, avctx, hwfmt, src_desc, fmt_in, device,
                         fmt_out, vtcx_out) == NULL)
     {
         vlc_object_delete(va);

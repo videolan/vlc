@@ -43,7 +43,8 @@ struct vlc_va_t {
     const struct vlc_va_operations *ops;
 };
 
-typedef int (*vlc_va_open)(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *,
+typedef int (*vlc_va_open)(vlc_va_t *, AVCodecContext *,
+                           enum PixelFormat hwfmt, const AVPixFmtDescriptor *,
                            const es_format_t *, vlc_decoder_device *,
                            video_format_t *, vlc_video_context **);
 
@@ -79,7 +80,8 @@ bool vlc_va_MightDecode(enum PixelFormat hwfmt, enum PixelFormat swfmt);
  * @param fmt VLC format of the content to decode
  * @return a new VLC object on success, NULL on error.
  */
-vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *, const AVPixFmtDescriptor *,
+vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *,
+                     enum PixelFormat hwfmt, const AVPixFmtDescriptor *,
                      const es_format_t *fmt, vlc_decoder_device *device,
                      video_format_t *, vlc_video_context **vtcx_out);
 

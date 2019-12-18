@@ -61,7 +61,7 @@ struct d3d11va_pic_context
 
 #include "directx_va.h"
 
-static int Open(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *,
+static int Open(vlc_va_t *, AVCodecContext *, enum PixelFormat hwfmt, const AVPixFmtDescriptor *,
                 const es_format_t *, vlc_decoder_device *, video_format_t *, vlc_video_context **);
 
 vlc_module_begin()
@@ -245,7 +245,7 @@ static void Close(vlc_va_t *va)
 
 static const struct vlc_va_operations ops = { Get, Close, };
 
-static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,
+static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const AVPixFmtDescriptor *desc,
                 const es_format_t *fmt_in, vlc_decoder_device *dec_device,
                 video_format_t *fmt_out, vlc_video_context **vtcx_out)
 {
@@ -253,8 +253,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *des
 
     ctx->hwaccel_context = NULL;
 
-    if ( fmt_out->i_chroma != VLC_CODEC_D3D11_OPAQUE &&
-         fmt_out->i_chroma != VLC_CODEC_D3D11_OPAQUE_10B )
+    if ( hwfmt != AV_PIX_FMT_D3D11VA_VLD )
         return VLC_EGENERIC;
 
     d3d11_decoder_device_t *d3d11_device = GetD3D11OpaqueDevice( dec_device );
