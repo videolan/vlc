@@ -183,6 +183,9 @@ static inline bool DeviceSupportsFormat(ID3D11Device *d3ddevice,
 #define D3D11_RGB_FORMAT  1
 #define D3D11_YUV_FORMAT  2
 
+#define D3D11_CHROMA_CPU 1
+#define D3D11_CHROMA_GPU 2
+
 const d3d_format_t *FindD3D11Format(vlc_object_t *,
                                     d3d11_device_t*,
                                     vlc_fourcc_t i_src_chroma,
@@ -190,7 +193,7 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *,
                                     uint8_t bits_per_channel,
                                     uint8_t widthDenominator,
                                     uint8_t heightDenominator,
-                                    bool allow_opaque,
+                                    int cpu_gpu,
                                     UINT supportFlags);
 #define FindD3D11Format(a,b,c,d,e,f,g,h,i)  \
     FindD3D11Format(VLC_OBJECT(a),b,c,d,e,f,g,h,i)

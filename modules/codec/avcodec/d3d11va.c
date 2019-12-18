@@ -252,13 +252,15 @@ static const d3d_format_t *GetDirectRenderingFormat(vlc_va_t *vd, const directx_
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     return FindD3D11Format( vd, &vd->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
-                            mode->bit_depth, mode->log2_chroma_h+1, mode->log2_chroma_w+1, true, supportFlags );
+                            mode->bit_depth, mode->log2_chroma_h+1, mode->log2_chroma_w+1,
+                            D3D11_CHROMA_GPU | D3D11_CHROMA_CPU, supportFlags );
 }
 
 static const d3d_format_t *GetDirectDecoderFormat(vlc_va_t *vd, vlc_fourcc_t i_src_chroma)
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-    return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT, 0, 0, 0, true, supportFlags );
+    return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT, 0, 0, 0,
+                            D3D11_CHROMA_GPU | D3D11_CHROMA_CPU, supportFlags );
 }
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *desc,

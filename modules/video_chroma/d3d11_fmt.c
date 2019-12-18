@@ -536,7 +536,7 @@ const d3d_format_t *(FindD3D11Format)(vlc_object_t *o,
                                     uint8_t bits_per_channel,
                                     uint8_t widthDenominator,
                                     uint8_t heightDenominator,
-                                    bool allow_opaque,
+                                    int cpu_gpu,
                                     UINT supportFlags)
 {
     supportFlags |= D3D11_FORMAT_SUPPORT_TEXTURE2D;
@@ -547,7 +547,8 @@ const d3d_format_t *(FindD3D11Format)(vlc_object_t *o,
             continue;
         if (bits_per_channel && bits_per_channel > output_format->bitsPerChannel)
             continue;
-        if (!allow_opaque && is_d3d11_opaque(output_format->fourcc))
+        int cpu_gpu_fmt = is_d3d11_opaque(output_format->fourcc) ? D3D11_CHROMA_GPU : D3D11_CHROMA_CPU;
+        if ((cpu_gpu & cpu_gpu_fmt)==0)
             continue;
         int format = vlc_fourcc_IsYUV(output_format->fourcc) ? D3D11_YUV_FORMAT : D3D11_RGB_FORMAT;
         if ((rgb_yuv & format)==0)
