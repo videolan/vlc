@@ -37,150 +37,6 @@
 #include "internal.h"
 #include "vout_helper.h"
 
-static int GetTexFormatSize(const opengl_vtable_t *vt, int target,
-                            int tex_format, int tex_internal, int tex_type)
-{
-    if (!vt->GetTexLevelParameteriv)
-        return -1;
-
-    GLint tex_param_size;
-    int mul = 1;
-    switch (tex_format)
-    {
-        case GL_BGRA:
-            mul = 4;
-            /* fall through */
-        case GL_RED:
-        case GL_RG:
-            tex_param_size = GL_TEXTURE_RED_SIZE;
-            break;
-        case GL_LUMINANCE:
-            tex_param_size = GL_TEXTURE_LUMINANCE_SIZE;
-            break;
-        default:
-            return -1;
-    }
-    GLuint texture;
-
-    vt->GenTextures(1, &texture);
-    vt->BindTexture(target, texture);
-    vt->TexImage2D(target, 0, tex_internal, 64, 64, 0, tex_format, tex_type, NULL);
-    GLint size = 0;
-    vt->GetTexLevelParameteriv(target, 0, tex_param_size, &size);
-
-    vt->DeleteTextures(1, &texture);
-    return size > 0 ? size * mul : size;
-}
-
-static int
-interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
-                      vlc_fourcc_t chroma,
-                      const vlc_chroma_description_t *desc)
-{
-    (void) chroma;
-
-    GLint oneplane_texfmt, oneplane16_texfmt,
-          twoplanes_texfmt, twoplanes16_texfmt;
-
-    if (vlc_gl_StrHasToken(interop->glexts, "GL_ARB_texture_rg"))
-    {
-        oneplane_texfmt = GL_RED;
-        oneplane16_texfmt = GL_R16;
-        twoplanes_texfmt = GL_RG;
-        twoplanes16_texfmt = GL_RG16;
-    }
-    else
-    {
-        oneplane_texfmt = GL_LUMINANCE;
-        oneplane16_texfmt = GL_LUMINANCE16;
-        twoplanes_texfmt = GL_LUMINANCE_ALPHA;
-        twoplanes16_texfmt = 0;
-    }
-
-    if (desc->pixel_size == 2)
-    {
-        if (GetTexFormatSize(interop->vt, tex_target, oneplane_texfmt,
-                             oneplane16_texfmt, GL_UNSIGNED_SHORT) != 16)
-            return VLC_EGENERIC;
-    }
-
-    if (desc->plane_count == 3)
-    {
-        GLint internal = 0;
-        GLenum type = 0;
-
-        if (desc->pixel_size == 1)
-        {
-            internal = oneplane_texfmt;
-            type = GL_UNSIGNED_BYTE;
-        }
-        else if (desc->pixel_size == 2)
-        {
-            internal = oneplane16_texfmt;
-            type = GL_UNSIGNED_SHORT;
-        }
-        else
-            return VLC_EGENERIC;
-
-        assert(internal != 0 && type != 0);
-
-        interop->tex_count = 3;
-        for (unsigned i = 0; i < interop->tex_count; ++i )
-        {
-            interop->texs[i] = (struct vlc_gl_tex_cfg) {
-                { desc->p[i].w.num, desc->p[i].w.den },
-                { desc->p[i].h.num, desc->p[i].h.den },
-                internal, oneplane_texfmt, type
-            };
-        }
-    }
-    else if (desc->plane_count == 2)
-    {
-        interop->tex_count = 2;
-
-        if (desc->pixel_size == 1)
-        {
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                { 1, 1 }, { 1, 1 }, oneplane_texfmt, oneplane_texfmt,
-                GL_UNSIGNED_BYTE
-            };
-            interop->texs[1] = (struct vlc_gl_tex_cfg) {
-                { 1, 2 }, { 1, 2 }, twoplanes_texfmt, twoplanes_texfmt,
-                GL_UNSIGNED_BYTE
-            };
-        }
-        else if (desc->pixel_size == 2)
-        {
-            if (twoplanes16_texfmt == 0
-             || GetTexFormatSize(interop->vt, tex_target, twoplanes_texfmt,
-                                 twoplanes16_texfmt, GL_UNSIGNED_SHORT) != 16)
-                return VLC_EGENERIC;
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                { 1, 1 }, { 1, 1 }, oneplane16_texfmt, oneplane_texfmt,
-                GL_UNSIGNED_SHORT
-            };
-            interop->texs[1] = (struct vlc_gl_tex_cfg) {
-                { 1, 2 }, { 1, 2 }, twoplanes16_texfmt, twoplanes_texfmt,
-                GL_UNSIGNED_SHORT
-            };
-        }
-        else
-            return VLC_EGENERIC;
-    }
-    else if (desc->plane_count == 1)
-    {
-        /* Y1 U Y2 V fits in R G B A */
-        interop->tex_count = 1;
-        interop->texs[0] = (struct vlc_gl_tex_cfg) {
-            { 1, 2 }, { 1, 1 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
-        };
-    }
-    else
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
-}
-
 static int
 tc_yuv_base_init(opengl_tex_converter_t *tc, vlc_fourcc_t chroma,
                  const vlc_chroma_description_t *desc,
@@ -242,36 +98,6 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, vlc_fourcc_t chroma,
 
     *swap_uv = chroma == VLC_CODEC_YV12 || chroma == VLC_CODEC_YV9 ||
                chroma == VLC_CODEC_NV21;
-    return VLC_SUCCESS;
-}
-
-static int
-interop_rgb_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
-                      vlc_fourcc_t chroma)
-{
-    (void) tex_target;
-
-    switch (chroma)
-    {
-        case VLC_CODEC_RGB32:
-        case VLC_CODEC_RGBA:
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                { 1, 1 }, { 1, 1 }, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
-            };
-            break;
-        case VLC_CODEC_BGRA: {
-            if (GetTexFormatSize(interop->vt, tex_target, GL_BGRA, GL_RGBA,
-                                 GL_UNSIGNED_BYTE) != 32)
-                return VLC_EGENERIC;
-            interop->texs[0] = (struct vlc_gl_tex_cfg) {
-                { 1, 1 }, { 1, 1 }, GL_RGBA, GL_BGRA, GL_UNSIGNED_BYTE
-            };
-            break;
-        }
-        default:
-            return VLC_EGENERIC;
-    }
-    interop->tex_count = 1;
     return VLC_SUCCESS;
 }
 
@@ -392,16 +218,6 @@ tc_xyz12_prepare_shader(const opengl_tex_converter_t *tc,
     tc->vt->Uniform1i(tc->uloc.Texture[0], 0);
 }
 
-static void
-interop_xyz12_init(struct vlc_gl_interop *interop)
-{
-    interop->tex_count = 1;
-    interop->tex_target = GL_TEXTURE_2D;
-    interop->texs[0] = (struct vlc_gl_tex_cfg) {
-        { 1, 1 }, { 1, 1 }, GL_RGB, GL_RGB, GL_UNSIGNED_SHORT
-    };
-}
-
 static GLuint
 xyz12_shader_init(opengl_tex_converter_t *tc)
 {
@@ -508,34 +324,6 @@ opengl_init_swizzle(const struct vlc_gl_interop *interop,
         }
     }
     return VLC_SUCCESS;
-}
-
-int
-opengl_interop_init_impl(struct vlc_gl_interop *interop, GLenum tex_target,
-                         vlc_fourcc_t chroma, video_color_space_t yuv_space)
-{
-    bool is_yuv = vlc_fourcc_IsYUV(chroma);
-    const vlc_chroma_description_t *desc =
-        vlc_fourcc_GetChromaDescription(chroma);
-    if (!desc)
-        return VLC_EGENERIC;
-
-    assert(!interop->fmt.p_palette);
-    interop->sw_fmt = interop->fmt;
-    interop->sw_fmt.i_chroma = chroma;
-    interop->sw_fmt.space = yuv_space;
-    interop->tex_target = tex_target;
-
-    if (chroma == VLC_CODEC_XYZ12)
-    {
-        interop_xyz12_init(interop);
-        return VLC_SUCCESS;
-    }
-
-    if (is_yuv)
-        return interop_yuv_base_init(interop, tex_target, chroma, desc);
-
-    return interop_rgb_base_init(interop, tex_target, chroma);
 }
 
 GLuint
