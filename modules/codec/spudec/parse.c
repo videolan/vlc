@@ -93,7 +93,7 @@ static inline unsigned int AddNibble( unsigned int i_code,
  * This function parses the SPU packet and, if valid, sends it to the
  * video output.
  *****************************************************************************/
-subpicture_t * ParsePacket( decoder_t *p_dec )
+void ParsePacket( decoder_t *p_dec, void(*pf_queue)(decoder_t *, subpicture_t *) )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu;
@@ -102,7 +102,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
 
     /* Allocate the subpicture internal data. */
     p_spu = decoder_NewSubpicture( p_dec, NULL );
-    if( !p_spu ) return NULL;
+    if( !p_spu ) return;
 
     p_spu->i_original_picture_width =
         p_dec->fmt_in.subs.spu.i_original_frame_width;
@@ -114,7 +114,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     {
         /* There was a parse error, delete the subpicture */
         subpicture_Delete( p_spu );
-        return NULL;
+        return;
     }
 
     /* we are going to expand the RLE stuff so that we won't need to read
@@ -133,7 +133,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
         /* There was a parse error, delete the subpicture */
         subpicture_Delete( p_spu );
         free( spu_data.p_data );
-        return NULL;
+        return;
     }
 
 #ifdef DEBUG_SPUDEC
@@ -145,7 +145,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     Render( p_dec, p_spu, &spu_data, &spu_properties );
     free( spu_data.p_data );
 
-    return p_spu;
+    pf_queue( p_dec, p_spu );
 }
 
 /*****************************************************************************

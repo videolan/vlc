@@ -59,4 +59,4 @@ struct decoder_sys_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-subpicture_t * ParsePacket( decoder_t * );
+void ParsePacket( decoder_t *, void(*pf_queue)(decoder_t *, subpicture_t *) );
