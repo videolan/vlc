@@ -17,41 +17,70 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Layouts 1.3
 
 import "qrc:///style/"
+import "qrc:///widgets/" as Widgets
 
-Item{
+Widgets.NavigableFocusScope {
     id: control
-    height: childrenRect.height
+    height: implicitHeight
+    width: implicitWidth
+    implicitHeight: colLayout.implicitHeight + VLCStyle.margin_small * 2
+    implicitWidth: colLayout.implicitWidth + VLCStyle.margin_large
 
     property alias text: txt.text
+    property alias font: txt.font
+    property alias color: txt.color
 
-    Label {
-        id: txt
-        font.pixelSize: VLCStyle.fontSize_xxlarge
-        color: VLCStyle.colors.text
-        font.weight: Font.Bold
-        anchors{
-            left: control.left
-            right: control.right
-            topMargin: VLCStyle.margin_small
-            leftMargin: VLCStyle.margin_large
+    property Component inlineComponent: Item {}
 
+    ColumnLayout {
+        id: colLayout
+        anchors.fill: parent
+        anchors.leftMargin: VLCStyle.margin_large
+        anchors.topMargin: VLCStyle.margin_small
+        anchors.bottomMargin: VLCStyle.margin_small
+
+        RowLayout {
+            id: rowLayout
+
+            Layout.fillHeight: true
+            Layout.preferredHeight: rowLayout.implicitHeight
+            Layout.fillWidth: true
+
+            Label {
+                id: txt
+
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+
+                font.pixelSize: VLCStyle.fontSize_xxlarge
+                color: VLCStyle.colors.text
+                font.weight: Font.Bold
+                elide: Text.ElideRight
+            }
+
+            Loader {
+                id: inlineComponentLoader
+                Layout.preferredWidth: item.implicitWidth
+                active: !!inlineComponent
+                visible: active
+                focus: true
+                sourceComponent: inlineComponent
+            }
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: height
+            height: VLCStyle.heightBar_xxxsmall
+
+            radius: 2
+
+            color: VLCStyle.colors.bgAlt
         }
     }
 
-    Rectangle {
-        height: VLCStyle.heightBar_xxxsmall
-        radius: 2
 
-        anchors{
-            left: control.left
-            right: control.right
-            top: txt.bottom
-            topMargin: VLCStyle.margin_small
-            leftMargin: VLCStyle.margin_large
-
-        }
-        color: VLCStyle.colors.bgAlt
-    }
 }
