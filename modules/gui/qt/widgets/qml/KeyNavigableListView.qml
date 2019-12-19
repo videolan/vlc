@@ -58,6 +58,8 @@ NavigableFocusScope {
     property alias section: view.section
     property alias orientation: view.orientation
 
+    property int highlightMargin: VLCStyle.margin_large
+
     Accessible.role: Accessible.List
 
     function nextPage() {
@@ -104,6 +106,11 @@ NavigableFocusScope {
         keyNavigationEnabled: false
         contentWidth: contentItem.childrenRect.width
         contentHeight: contentItem.childrenRect.height
+
+
+        preferredHighlightBegin : highlightMargin + (headerItem ? headerItem.height : 0)
+        preferredHighlightEnd : height - highlightMargin
+        highlightRangeMode: ListView.ApplyRange
 
         focus: true
 
