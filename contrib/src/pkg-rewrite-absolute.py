@@ -25,12 +25,14 @@ class PkgConfigFile():
 
                 # Add expanded version of variable
                 self.pc_variables_expanded.update({ key : self.expand_pc_vars(val) })
+                break
             elif c is ':':
                 # This is a pkg-config keyword line
                 key = line[:i].strip()
                 val = line[(i + 1):].strip()
 
                 self.pc_keywords.update({ key : val })
+                break
 
     def expand_pc_vars(self, line):
         for key, val in self.pc_variables_expanded.items():
