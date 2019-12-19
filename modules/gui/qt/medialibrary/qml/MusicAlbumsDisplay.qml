@@ -222,10 +222,13 @@ Widgets.NavigableFocusScope {
     }
 
     Label {
-        anchors.centerIn: parent
+        anchors.fill: parent
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         visible: delegateModel.items.count === 0
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        text: i18n.qtr("No albums found")
+        wrapMode: Text.WordWrap
+        text: i18n.qtr("No albums found\nPlease try adding sources, by going to the Network tab")
     }
 }

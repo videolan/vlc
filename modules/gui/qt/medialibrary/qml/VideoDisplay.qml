@@ -223,10 +223,13 @@ Widgets.NavigableFocusScope {
 
     }
     Label {
-        anchors.centerIn: parent
+        anchors.fill: parent
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         visible: videosDelegate.items.count === 0
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        text: i18n.qtr("No tracks found")
+        wrapMode: Text.WordWrap
+        text: i18n.qtr("No video found\nPlease try adding sources, by going to the Network tab")
     }
 }
