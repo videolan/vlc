@@ -48,7 +48,6 @@ typedef struct
 typedef struct
 {
     int   pi_offset[2];                              /* byte offsets to data */
-    uint16_t *p_data;
 
     /* Color information */
     bool b_palette;
@@ -65,9 +64,9 @@ typedef struct
 static int  ParseControlSeq( decoder_t *, subpicture_t *, subpicture_data_t *,
                              spu_properties_t *, vlc_tick_t i_pts );
 static int  ParseRLE       ( decoder_t *, subpicture_data_t *,
-                             const spu_properties_t * );
-static void Render         ( decoder_t *, subpicture_t *, subpicture_data_t *,
-                             const spu_properties_t * );
+                             const spu_properties_t *, uint16_t * );
+static void Render         ( decoder_t *, subpicture_t *, const uint16_t *,
+                             const subpicture_data_t *, const spu_properties_t * );
 
 /*****************************************************************************
  * AddNibble: read a nibble from a source packet and add it to our integer.
@@ -97,6 +96,7 @@ void ParsePacket( decoder_t *p_dec, void(*pf_queue)(decoder_t *, subpicture_t *)
     subpicture_t *p_spu;
     subpicture_data_t spu_data;
     spu_properties_t spu_properties;
+    uint16_t *p_pixeldata;
 
     /* Allocate the subpicture internal data. */
     p_spu = decoder_NewSubpicture( p_dec, NULL );
@@ -123,14 +123,14 @@ void ParsePacket( decoder_t *p_dec, void(*pf_queue)(decoder_t *, subpicture_t *)
      *  one byte gaves two nibbles and may be used twice (once per field)
      * generating 4 codes.
      */
-    spu_data.p_data = vlc_alloc( p_sys->i_rle_size, sizeof(*spu_data.p_data) * 2 * 2 );
+    p_pixeldata = vlc_alloc( p_sys->i_rle_size, sizeof(*p_pixeldata) * 2 * 2 );
 
     /* We try to display it */
-    if( ParseRLE( p_dec, &spu_data, &spu_properties ) )
+    if( ParseRLE( p_dec, &spu_data, &spu_properties, p_pixeldata ) )
     {
         /* There was a parse error, delete the subpicture */
         subpicture_Delete( p_spu );
-        free( spu_data.p_data );
+        free( p_pixeldata );
         return;
     }
 
@@ -140,8 +140,8 @@ void ParsePacket( decoder_t *p_dec, void(*pf_queue)(decoder_t *, subpicture_t *)
              spu_data.pi_offset[0], spu_data.pi_offset[1] );
 #endif
 
-    Render( p_dec, p_spu, &spu_data, &spu_properties );
-    free( spu_data.p_data );
+    Render( p_dec, p_spu, p_pixeldata, &spu_data, &spu_properties );
+    free( p_pixeldata );
 
     pf_queue( p_dec, p_spu );
 }
@@ -178,7 +178,6 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
     memset( &spu_data_cmd, 0, sizeof(spu_data_cmd) );
     spu_data_cmd.pi_offset[0] = -1;
     spu_data_cmd.pi_offset[1] = -1;
-    spu_data_cmd.p_data = NULL;
     spu_data_cmd.b_palette = false;
     spu_data_cmd.b_auto_crop = false;
     spu_data_cmd.i_y_top_offset = 0;
@@ -465,7 +464,8 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
  *****************************************************************************/
 static int ParseRLE( decoder_t *p_dec,
                      subpicture_data_t *p_spu_data,
-                     const spu_properties_t *p_spu_properties )
+                     const spu_properties_t *p_spu_properties,
+                     uint16_t *p_pixeldata )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -473,7 +473,7 @@ static int ParseRLE( decoder_t *p_dec,
     const unsigned int i_height = p_spu_properties->i_height;
     unsigned int i_x, i_y;
 
-    uint16_t *p_dest = p_spu_data->p_data;
+    uint16_t *p_dest = p_pixeldata;
 
     /* The subtitles are interlaced, we need two offsets */
     unsigned int  i_id = 0;                   /* Start on the even SPU layer */
@@ -699,12 +699,13 @@ static int ParseRLE( decoder_t *p_dec,
 }
 
 static void Render( decoder_t *p_dec, subpicture_t *p_spu,
-                    subpicture_data_t *p_spu_data,
+                    const uint16_t *p_pixeldata,
+                    const subpicture_data_t *p_spu_data,
                     const spu_properties_t *p_spu_properties )
 {
     uint8_t *p_p;
     int i_x, i_y, i_len, i_color, i_pitch;
-    const uint16_t *p_source = p_spu_data->p_data;
+    const uint16_t *p_source = p_pixeldata;
     video_format_t fmt;
     video_palette_t palette;
 
