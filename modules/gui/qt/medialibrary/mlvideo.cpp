@@ -36,7 +36,7 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
         vlc_ml_event_unregister_callback( m_ml, cb );
     })
 {
-    assert( data->i_type == VLC_ML_MEDIA_TYPE_VIDEO );
+    assert( data->i_type == VLC_ML_MEDIA_TYPE_VIDEO || data->i_type == VLC_ML_MEDIA_TYPE_UNKNOWN );
 
     int t_sec = data->i_duration / 1000;
     int sec = t_sec % 60;
