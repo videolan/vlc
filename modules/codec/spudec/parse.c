@@ -351,6 +351,16 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
             i_index += 5;
             break;
 
+        case SPU_CMD_SET_COLCON:
+            if( i_index + 3 > p_sys->i_spu_size )
+            {
+                msg_Err( p_dec, "overflow in SPU command" );
+                return VLC_EGENERIC;
+            }
+
+            i_index += 1 + GetWBE(&p_sys->buffer[i_index+1]);
+            break;
+
         case SPU_CMD_END: /* ff (end) */
             if( b_cmd_offset )
             {

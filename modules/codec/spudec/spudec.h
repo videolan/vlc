@@ -54,6 +54,7 @@ struct decoder_sys_t
 #define SPU_CMD_SET_ALPHACHANNEL    0x04
 #define SPU_CMD_SET_COORDINATES     0x05
 #define SPU_CMD_SET_OFFSETS         0x06
+#define SPU_CMD_SET_COLCON          0x07
 #define SPU_CMD_END                 0xff
 
 /*****************************************************************************
