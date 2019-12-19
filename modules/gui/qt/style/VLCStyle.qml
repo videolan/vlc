@@ -118,6 +118,8 @@ Item {
 
     property int miniPlayerHeight: 60 * scale;
 
+    property int expandAlbumTracksHeight: 200 * scale;
+
     //combobox
     property int combobox_width_small: 64 * scale
     property int combobox_width_normal: 96 * scale

@@ -142,6 +142,8 @@ Widgets.NavigableFocusScope {
                 id: expandDelegateId
                 width: root.width
 
+                implicitHeight: gridView_id.height - gridView_id.cellHeight
+
                 navigationParent: root
                 navigationCancel:  function() {  gridView_id.retract() }
                 navigationUp: function() {  gridView_id.retract() }
