@@ -204,6 +204,18 @@ void MediaLibrary::onGenresDeleted( std::vector<int64_t> genreIds )
     wrapEntityDeletedEventCallback( m_vlc_ml, genreIds, VLC_ML_EVENT_GENRE_DELETED );
 }
 
+void MediaLibrary::onMediaGroupAdded( std::vector<medialibrary::MediaGroupPtr> )
+{
+}
+
+void MediaLibrary::onMediaGroupModified( std::vector<int64_t> )
+{
+}
+
+void MediaLibrary::onMediaGroupDeleted( std::vector<int64_t> )
+{
+}
+
 void MediaLibrary::onDiscoveryStarted( const std::string& entryPoint )
 {
     vlc_ml_event_t ev;
@@ -421,10 +433,16 @@ bool MediaLibrary::Start()
     if ( Init() == false )
         return false;
 
-    if ( m_ml->start() == false )
+    auto startRes = m_ml->start();
+    switch ( startRes )
     {
-        msg_Err( m_vlc_ml, "Failed to start the MediaLibrary" );
-        return false;
+        case medialibrary::StartResult::Failed:
+            msg_Err( m_vlc_ml, "Failed to start the MediaLibrary" );
+            return false;
+        case medialibrary::StartResult::AlreadyStarted:
+            return true;
+        case medialibrary::StartResult::Success:
+            break;
     }
 
     // Reload entry points we already know about, and then add potential new ones.

@@ -4362,7 +4362,7 @@ dnl Libnotify notification plugin
 dnl
 PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify gtk+-3.0], [libnotify notification], [auto])
 
-PKG_ENABLE_MODULES_VLC([MEDIALIBRARY], [medialibrary], [medialibrary], (medialibrary support), [auto])
+PKG_ENABLE_MODULES_VLC([MEDIALIBRARY], [medialibrary], [medialibrary >= 0.7.1], (medialibrary support), [auto])
 
 dnl
 dnl  Endianness check

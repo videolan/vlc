@@ -1,9 +1,9 @@
-MEDIALIBRARY_HASH := 3dddb7b13466930792bf10c27ece35943edefaaf
+MEDIALIBRARY_HASH := 16d4ad78bdbdb8122b57e48edd68279009f062c3
 MEDIALIBRARY_VERSION := git-$(MEDIALIBRARY_HASH)
 MEDIALIBRARY_GITURL := https://code.videolan.org/videolan/medialibrary.git
 
 PKGS += medialibrary
-ifeq ($(call need_pkg,"medialibrary"),)
+ifeq ($(call need_pkg,"medialibrary >= 0.7.1"),)
 PKGS_FOUND += medialibrary
 endif
 
@@ -20,7 +20,6 @@ medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.xz .sum-medialibrary
 	rm -rf $@-$(MEDIALIBRARY_VERSION) $@
 	mkdir -p $@-$(MEDIALIBRARY_VERSION)
 	tar xvf "$<" --strip-components=1 -C $@-$(MEDIALIBRARY_VERSION)
-	$(APPLY) $(SRC)/medialibrary/fix-win-build.patch
 	$(call pkg_static, "medialibrary.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)

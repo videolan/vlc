@@ -182,6 +182,9 @@ public:
     virtual void onGenresAdded(std::vector<medialibrary::GenrePtr> genres) override;
     virtual void onGenresModified(std::vector<int64_t> genres) override;
     virtual void onGenresDeleted(std::vector<int64_t> genreIds) override;
+    virtual void onMediaGroupAdded( std::vector<medialibrary::MediaGroupPtr> mediaGroups ) override;
+    virtual void onMediaGroupModified( std::vector<int64_t> mediaGroupsIds ) override;
+    virtual void onMediaGroupDeleted( std::vector<int64_t> mediaGroupsIds ) override;
     virtual void onDiscoveryStarted(const std::string& entryPoint) override;
     virtual void onDiscoveryProgress(const std::string& entryPoint) override;
     virtual void onDiscoveryCompleted(const std::string& entryPoint, bool success) override;
