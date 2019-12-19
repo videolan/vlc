@@ -156,6 +156,8 @@ signals:
     void itemsRemoved(size_t index, size_t count);
     void itemsUpdated(size_t index, QVector<PlaylistItem>);
 
+    void playlistInitialized();
+
 private:
     Q_DECLARE_PRIVATE(PlaylistControllerModel)
     QScopedPointer<PlaylistControllerModelPrivate> d_ptr;

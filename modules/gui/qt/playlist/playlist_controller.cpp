@@ -608,6 +608,15 @@ void PlaylistControllerModel::setPlaylistPtr(vlc_playlist_t* newPlaylist)
         PlaylistLocker locker(newPlaylist);
         d->m_playlist = newPlaylist;
         d->m_listener = vlc_playlist_AddListener(d->m_playlist, &playlist_callbacks, d, true);
+        /*
+         * Queue a playlistInitialized to be sent after the initial state callbacks
+         * vlc_playlist_AddListener will synchronously call each callback in
+         * playlist_callbacks, which will in turn queue an async call on the Qt
+         * main thread
+         */
+        d->callAsync([=](){
+            emit playlistInitialized();
+        });
     }
     emit playlistPtrChanged( PlaylistPtr(newPlaylist) );
 }
