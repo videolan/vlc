@@ -18,6 +18,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQml.Models 2.2
+import QtQuick.Layouts 1.3
 import QtQml 2.11
 
 import org.videolan.vlc 0.1
@@ -30,14 +31,6 @@ Widgets.NavigableFocusScope {
     id: root
 
     property alias tree: providerModel.tree
-
-    property var extraLocalActions: ObjectModel {
-        Widgets.TabButtonExt {
-            text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
-            visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
-            onClicked: providerModel.indexed = !providerModel.indexed
-        }
-    }
 
     NetworkMediaModel {
         id: providerModel
@@ -128,12 +121,29 @@ Widgets.NavigableFocusScope {
         id: gridComponent
 
         Widgets.ExpandGridView {
+            id: gridView
             model: delegateModel
             modelCount: delegateModel.items.count
 
             headerDelegate: Widgets.LabelSeparator {
-                text: providerModel.name
                 width: view.width
+                text: providerModel.name
+
+                inlineComponent: Widgets.TabButtonExt {
+                    focus: true
+                    iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
+                    text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
+                    visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
+                    onClicked: providerModel.indexed = !providerModel.indexed
+                }
+
+
+                Keys.onPressed: defaultKeyAction(event, 0)
+                navigationParent: root
+                navigationDown: function() {
+                    focus = false
+                    gridView.forceActiveFocus()
+                }
             }
 
             cellWidth: VLCStyle.network_normal + VLCStyle.margin_large
@@ -191,6 +201,7 @@ Widgets.NavigableFocusScope {
             onActionAtIndex: delegateModel.actionAtIndex(index)
 
             navigationParent: root
+            navigationUpItem: gridView.headerItem
             navigationCancel: function() {
                 history.previous(History.Go)
             }
@@ -200,6 +211,7 @@ Widgets.NavigableFocusScope {
     Component{
         id: listComponent
         Widgets.KeyNavigableListView {
+            id: listView
             height: view.height
             width: view.width
             model: delegateModel.parts.list
@@ -214,6 +226,7 @@ Widgets.NavigableFocusScope {
             onActionAtIndex: delegateModel.actionAtIndex(index)
 
             navigationParent: root
+            navigationUpItem: listView.headerItem
             navigationCancel: function() {
                 history.previous(History.Go)
             }
@@ -221,6 +234,21 @@ Widgets.NavigableFocusScope {
             header:  Widgets.LabelSeparator {
                 text: providerModel.name
                 width: view.width
+
+                inlineComponent: Widgets.TabButtonExt {
+                    focus: true
+                    iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
+                    text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
+                    visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
+                    onClicked: providerModel.indexed = !providerModel.indexed
+                }
+
+                Keys.onPressed: defaultKeyAction(event, 0)
+                navigationParent: root
+                navigationDown: function() {
+                    focus = false
+                    listView.forceActiveFocus()
+                }
             }
         }
     }
