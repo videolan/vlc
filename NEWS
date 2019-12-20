@@ -19,6 +19,7 @@ Decoders:
  * Disable decoding using libdca, libmpeg2 and liba52 by default in favor of libavcodec
 
 Demuxers:
+ * Support for DMX audio music (MUS) files
  * Handle mkv-use-chapter-codec option
  * Add A_ATRAC/AT1 support in matroska
  * Prevent FLAC seeking logic get stuck
