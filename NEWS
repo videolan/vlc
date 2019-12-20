@@ -40,6 +40,7 @@ Demuxer:
  * Support for DAV video files
  * Improved Bluray menus, clips and stream selection
  * Support chapters in mp3 files
+ * Support for DMX audio music (MUS) files
 
 Codecs:
  * Support for experimental AV1 video encoding
