@@ -18,16 +18,21 @@
 
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.3
 
 import "qrc:///style/"
 
-TabButton {
+T.TabButton {
     id: control
     text: model.displayText
 
     padding: 0
-    width: contentItem.implicitWidth
+
+    width: implicitWidth
+    height: implicitHeight
+    implicitWidth: contentItem.implicitWidth
+    implicitHeight: contentItem.implicitHeight
 
     property string iconTxt: ""
     property string bgColor: "transparent"
@@ -36,46 +41,52 @@ TabButton {
     font.pixelSize: VLCStyle.fontSize_normal
 
     background: Rectangle {
-        height: parent.height
-        width: parent.contentItem.width
-        color: control.bgColor
+        height: control.height
+        width: control.width
+        color: (control.activeFocus || control.hovered)
+               ? VLCStyle.colors.accent
+               : control.bgColor
     }
 
     contentItem: Item {
-        implicitWidth: tabRow.width
-        implicitHeight: tabRow.height
-
-        Rectangle {
-            anchors.fill: tabRow
-            visible: control.activeFocus || control.hovered
-            color: VLCStyle.colors.accent
-        }
+        implicitWidth: tabRow.implicitWidth
+        implicitHeight: tabRow.implicitHeight
 
         Row {
             id: tabRow
-            padding: VLCStyle.margin_xxsmall
-            spacing: VLCStyle.margin_xxsmall
 
-            Label {
-                id: icon
-                anchors.verticalCenter: parent.verticalCenter
-                color: VLCStyle.colors.buttonText
+            anchors.fill:  parent
 
-                font.pixelSize: VLCStyle.icon_topbar
-                font.family: VLCIcons.fontFamily
-                horizontalAlignment: Text.AlignHCenter
+            padding: VLCStyle.margin_xsmall
+            spacing: VLCStyle.margin_xsmall
 
+            Item {
+                width: implicitWidth
+                height: implicitHeight
+                implicitWidth: VLCStyle.fontHeight_normal
+                implicitHeight: VLCStyle.fontHeight_normal
                 visible: control.iconTxt !== ""
-                text: control.iconTxt
+
+                Text {
+                    id: icon
+
+                    anchors.fill: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    text: control.iconTxt
+                    color: VLCStyle.colors.buttonText
+
+                    font.pixelSize: VLCStyle.icon_topbar
+                    font.family: VLCIcons.fontFamily
+                }
             }
+
 
             Label {
                 text: control.text
                 font: control.font
                 color: VLCStyle.colors.text
-                padding: VLCStyle.margin_xxsmall
-
-                anchors.verticalCenter: parent.verticalCenter
             }
         }
 
