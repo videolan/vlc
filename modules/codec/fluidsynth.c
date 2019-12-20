@@ -267,7 +267,11 @@ static int DecodeBlock (decoder_t *p_dec, block_t *p_block)
         case 0x90:
             fluid_synth_noteon (p_sys->synth, channel, p1, p2);
             break;
-        /*case 0xA0: note aftertouch not implemented */
+#if (FLUIDSYNTH_VERSION_MAJOR >= 2)
+        case 0xA0:
+            fluid_synth_key_pressure (p_sys->synth, channel, p1, p2);
+            break;
+#endif
         case 0xB0:
             fluid_synth_cc (p_sys->synth, channel, p1, p2);
             break;
