@@ -2502,6 +2502,7 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
     input_thread_private_t *priv = input_priv(p_input);
     input_source_t *in = priv->master;
 
+    vlc_mutex_lock( &priv->p_item->lock );
     /* Delete the preexisting titles */
     if( in->i_title > 0 )
     {
@@ -2520,6 +2521,8 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
         TAB_INIT( in->i_title, in->title );
     else
         in->b_title_demux = true;
+
+    vlc_mutex_unlock( &priv->p_item->lock );
 
     InitTitle( p_input );
 }
