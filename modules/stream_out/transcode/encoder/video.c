@@ -289,7 +289,7 @@ int transcode_encoder_video_test( vlc_object_t *p_obj,
                                   vlc_fourcc_t i_codec_in,
                                   es_format_t *p_enc_wanted_in )
 {
-    encoder_t *p_encoder = sout_EncoderCreate( p_obj );
+    encoder_t *p_encoder = sout_EncoderCreate( p_obj, sizeof(encoder_t) );
     if( !p_encoder )
         return VLC_EGENERIC;
 

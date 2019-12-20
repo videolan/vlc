@@ -263,8 +263,8 @@ static inline int sout_StreamControl( sout_stream_t *s, int i_query, ... )
  * Encoder
  ****************************************************************************/
 
-VLC_API encoder_t * sout_EncoderCreate( vlc_object_t *obj );
-#define sout_EncoderCreate(o) sout_EncoderCreate(VLC_OBJECT(o))
+VLC_API encoder_t * sout_EncoderCreate( vlc_object_t *, size_t );
+#define sout_EncoderCreate(o,s) sout_EncoderCreate(VLC_OBJECT(o),s)
 
 /****************************************************************************
  * Announce handler

@@ -1003,7 +1003,8 @@ rtp:
 }
 
 #undef sout_EncoderCreate
-encoder_t *sout_EncoderCreate( vlc_object_t *p_this )
+encoder_t *sout_EncoderCreate( vlc_object_t *p_this, size_t owner_size )
 {
-    return vlc_custom_create( p_this, sizeof( encoder_t ), "encoder" );
+    assert( owner_size >= sizeof(encoder_t) );
+    return vlc_custom_create( p_this, owner_size, "encoder" );
 }

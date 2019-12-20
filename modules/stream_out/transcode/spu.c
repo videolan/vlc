@@ -115,7 +115,7 @@ int transcode_spu_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
         /* Open encoder */
         /* Initialization of encoder format structures */
         assert(!id->encoder);
-        id->encoder = transcode_encoder_new( sout_EncoderCreate(p_stream), &id->p_decoder->fmt_in );
+        id->encoder = transcode_encoder_new( sout_EncoderCreate(p_stream, sizeof(encoder_t)), &id->p_decoder->fmt_in );
         if( !id->encoder )
         {
             module_unneed( id->p_decoder, id->p_decoder->p_module );

@@ -705,7 +705,7 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, const video_format_t *fmt
 {
     encoder_t *p_enc;
 
-    p_enc = sout_EncoderCreate( p_this );
+    p_enc = sout_EncoderCreate( p_this, sizeof(encoder_t) );
     if( p_enc == NULL )
         return NULL;
 
