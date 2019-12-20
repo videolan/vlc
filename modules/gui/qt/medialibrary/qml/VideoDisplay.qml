@@ -150,7 +150,7 @@ Widgets.NavigableFocusScope {
             expandDelegate: VideoInfoExpandPanel {
                 visible: !videosGV.isAnimating
 
-                height: implicitHeight
+                implicitHeight: videosGV.height - videosGV.cellHeight
                 width: videosGV.width
 
                 onRetract: videosGV.retract()

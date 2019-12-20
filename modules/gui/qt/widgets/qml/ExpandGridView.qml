@@ -363,6 +363,7 @@ NavigableFocusScope {
 
             // Sliding animation
             var currentItemYPos = root.getItemPos(_expandIndex)[1]
+            currentItemYPos += root.cellHeight / 2
             animateFlickableContentY(currentItemYPos)
         }
 
