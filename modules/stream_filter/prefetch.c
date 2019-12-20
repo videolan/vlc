@@ -429,11 +429,13 @@ static int Open(vlc_object_t *obj)
     stream_t *stream = (stream_t *)obj;
 
     bool fast_seek;
+
+    if (vlc_stream_Control(stream->s, STREAM_CAN_FASTSEEK, &fast_seek))
+        return VLC_EGENERIC; /* not a byte stream */
     /* For local files, the operating system is likely to do a better work at
      * caching/prefetching. Also, prefetching with this module could cause
      * undesirable high load at start-up. Lastly, local files may require
      * support for title/seekpoint and meta control requests. */
-    vlc_stream_Control(stream->s, STREAM_CAN_FASTSEEK, &fast_seek);
     if (fast_seek)
         return VLC_EGENERIC;
 
