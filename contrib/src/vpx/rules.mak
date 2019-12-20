@@ -70,6 +70,7 @@ else ifdef HAVE_MACOSX
 VPX_OS := darwin10
 VPX_CROSS :=
 else ifdef HAVE_IOS
+VPX_CROSS :=
 ifeq ($(ARCH),$(filter $(ARCH), arm aarch64))
 VPX_OS := darwin
 else
