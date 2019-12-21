@@ -692,7 +692,7 @@ VLC_STATIC_MODULELIST_NAME="static-module-list"
 rm -f "${VLC_STATIC_MODULELIST_NAME}.c" "${VLC_STATIC_MODULELIST_NAME}.o"
 gen_vlc_static_module_list "${VLC_STATIC_MODULELIST_NAME}.c" "${VLC_PLUGINS_SYMBOL_LIST[@]}"
 
-${CC:-cc} -c "${VLC_STATIC_MODULELIST_NAME}.c" \
+${CC:-cc} -c  ${CFLAGS} "${VLC_STATIC_MODULELIST_NAME}.c" \
   || abort_err "Compiling module list file failed"
 
 echo "${VLC_BUILD_DIR}/build/${VLC_PSEUDO_TRIPLET}/build-sh/${VLC_STATIC_MODULELIST_NAME}.o" \
