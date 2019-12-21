@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_codec_synchro.h: frame-dropping structures
+ * synchro.h: frame-dropping structures
  *****************************************************************************
  * Copyright (C) 1999-2005 VLC authors and VideoLAN
  *
@@ -25,7 +25,7 @@
 /*****************************************************************************
  * decoder_synchro_t : timers for the video synchro
  *****************************************************************************/
-/* Read the discussion on top of decoder_synchro.c for more information. */
+/* Read the discussion on top of synchro.c for more information. */
 /* Pictures types */
 #define I_CODING_TYPE           1
 #define P_CODING_TYPE           2

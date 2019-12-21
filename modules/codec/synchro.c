@@ -1,5 +1,5 @@
 /*****************************************************************************
- * decoder_synchro.c : frame dropping routines
+ * synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2005 VLC authors and VideoLAN
  *
