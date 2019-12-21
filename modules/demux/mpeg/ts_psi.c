@@ -1273,7 +1273,8 @@ static bool PMTSetupEsHDMV( demux_t *p_demux, ts_es_t *p_es,
         es_format_Change( p_fmt, SPU_ES, VLC_CODEC_BD_PG );
         break;
     case 0x91: /* Interactive graphics */
-        return false;
+        es_format_Change( p_fmt, UNKNOWN_ES, 0 ); /* prevent regular ES handler */
+        break;
     case 0x92: /* Subtitle */
         es_format_Change( p_fmt, SPU_ES, VLC_CODEC_BD_TEXT );
         break;
