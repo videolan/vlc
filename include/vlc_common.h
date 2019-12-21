@@ -409,7 +409,6 @@ typedef struct session_descriptor_t session_descriptor_t;
 
 /* Decoders */
 typedef struct decoder_t         decoder_t;
-typedef struct decoder_synchro_t decoder_synchro_t;
 
 /* Encoders */
 typedef struct encoder_t      encoder_t;

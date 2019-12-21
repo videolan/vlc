@@ -25,6 +25,8 @@
 /*****************************************************************************
  * decoder_synchro_t : timers for the video synchro
  *****************************************************************************/
+typedef struct decoder_synchro_t decoder_synchro_t;
+
 /* Read the discussion on top of synchro.c for more information. */
 /* Pictures types */
 #define I_CODING_TYPE           1
