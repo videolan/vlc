@@ -36,11 +36,45 @@ typedef struct
     es_out_id_t *es;
     date_t pts; /*< Play timestamp */
     vlc_tick_t tick; /*< Last tick timestamp */
-    unsigned primaries:4;
-    unsigned secondaries:3;
-    unsigned end_offset:17;
-    unsigned char volume[16];
+    unsigned end_offset:17; /*< End byte offset of music events */
+    unsigned primaries:4; /*< Number of primary channels (0-9) */
+    unsigned secondaries:3; /*< Number of secondary channels (10-14) */
+    unsigned char volume[16]; /*< Volume of last note on each channel */
 } demux_sys_t;
+
+enum {
+    MUS_EV_RELEASE,
+    MUS_EV_PLAY,
+    MUS_EV_PITCH,
+    MUS_EV_CONTROL,
+    MUS_EV_CONTROL_VALUE,
+    MUS_EV_MEASURE_END,
+    MUS_EV_TRACK_END,
+    MUS_EV_DUMMY,
+};
+
+#define MUS_EV(byte) (((byte) >> 4) & 0x7)
+
+enum {
+    MUS_CTRL_PROGRAM_CHANGE,
+    MUS_CTRL_BANK_SELECT,
+    MUS_CTRL_MODULATION,
+    MUS_CTRL_VOLUME,
+    MUS_CTRL_PAN,
+    MUS_CTRL_EXPRESSION,
+    MUS_CTRL_REVERB,
+    MUS_CTRL_CHORUS,
+    MUS_CTRL_PEDAL_HOLD,
+    MUS_CTRL_PEDAL_SOFT,
+    MUS_CTRL_SOUND_OFF,
+    MUS_CTRL_NOTES_OFF,
+    MUS_CTRL_MONO,
+    MUS_CTRL_POLY,
+    MUS_CTRL_RESET,
+    MUS_CTRL_EVENT,
+};
+
+#define MUS_FREQ 140
 
 static int GetByte(demux_t *demux)
 {
@@ -59,11 +93,11 @@ static int ReadEvent(demux_t *demux, unsigned char *buf,
     if (byte < 0)
         return -1;
 
-    uint_fast8_t type = (byte >> 4) & 0x7;
+    uint_fast8_t type = MUS_EV(byte);
 
     buf[0] = byte;
 
-    if (likely(type != 5 && type != 6)) {
+    if (likely(type != MUS_EV_MEASURE_END && type != MUS_EV_TRACK_END)) {
         int c = GetByte(demux);
         if (c < 0)
             return -1;
@@ -71,9 +105,9 @@ static int ReadEvent(demux_t *demux, unsigned char *buf,
         buf[1] = c;
 
         switch (type) {
-            case 1:
+            case MUS_EV_PLAY:
                 if (c & 0x80) {
-            case 4:
+            case MUS_EV_CONTROL_VALUE:
                     c = GetByte(demux);
                     if (c < 0)
                         return -1;
@@ -127,20 +161,20 @@ static block_t *HandleControl(demux_t *demux, uint8_t channel, uint8_t num)
     block_t *ev = NULL;
 
     switch (num & 0x7f) {
-        case 10: /* sound off */
+        case MUS_CTRL_SOUND_OFF:
             return Event3(0xB0, channel, 120, 0);
 
-        case 11: /* notes off */
+        case MUS_CTRL_NOTES_OFF:
             return Event3(0xB0, channel, 123, 0);
 
-        case 12:
-        case 13:
+        case MUS_CTRL_MONO:
+        case MUS_CTRL_POLY:
             break; /* only meaningful for OPL3, not soft synth */
 
-        case 14: /* reset all */
+        case MUS_CTRL_RESET:
             return Event3(0xB0, channel, 121, 0);
 
-        case 15: /* dummy */
+        case MUS_CTRL_EVENT:
             break;
 
         default:
@@ -156,34 +190,36 @@ static block_t *HandleControlValue(demux_t *demux, uint8_t channel,
     val &= 0x7f;
 
     switch (num & 0x7f) {
-        case 0: /* change program */
+        case MUS_CTRL_PROGRAM_CHANGE:
             return Event2(0xC0, channel, val);
 
-        case 2: /* modulation */
+        case MUS_CTRL_BANK_SELECT:
+            return NULL;
+
+        case MUS_CTRL_MODULATION:
             return Event3(0xB0, channel, 1, val);
 
-        case 3: /* volume */
+        case MUS_CTRL_VOLUME:
             return Event3(0xB0, channel, 7, val);
 
-        case 4: /* pan */
+        case MUS_CTRL_PAN:
             return Event3(0xB0, channel, 10, val);
 
-        case 5: /* expression */
+        case MUS_CTRL_EXPRESSION:
             return Event3(0xB0, channel, 11, val);
 
-        case 6: /* reverberation */
+        case MUS_CTRL_REVERB:
             return Event3(0xB0, channel, 91, val);
 
-        case 7: /* chorus */
+        case MUS_CTRL_CHORUS:
             return Event3(0xB0, channel, 93, val);
 
-        case 8: /* pedal hold */
+        case MUS_CTRL_PEDAL_HOLD:
             return Event3(0xB0, channel, 64, val);
 
-        case 9: /* pedal soft */
+        case MUS_CTRL_PEDAL_SOFT:
             return Event3(0xB0, channel, 67, val);
 
-        case 1:
         default:
             return HandleControl(demux, channel, num);
     }
@@ -227,38 +263,38 @@ static int Demux(demux_t *demux)
     if (channel >= ((channel < 10) ? sys->primaries : (10 + sys->secondaries)))
         channel = 9;
 
-    switch ((buf[0] >> 4) & 0x7) {
-        case 0: /* release note */
+    switch (MUS_EV(buf[0])) {
+        case MUS_EV_RELEASE:
             ev = Event2(0x80, channel, buf[1] & 0x7f);
             break;
 
-        case 1: /* play note */
+        case MUS_EV_PLAY:
             if (buf[1] & 0x80)
                 sys->volume[channel] = buf[2] & 0x7f;
 
             ev = Event3(0x90, channel, buf[1] & 0x7f, sys->volume[channel]);
             break;
 
-        case 2: /* pitch bend */
+        case MUS_EV_PITCH:
             ev = Event3(0xE0, channel, (buf[1] << 6) & 0x7f,
                         (buf[1] >> 1) & 0x7f);
             break;
 
-        case 3: /* control w/o value */
+        case MUS_EV_CONTROL:
             ev = HandleControl(demux, channel, buf[1]);
             break;
 
-        case 4: /* control w/ value */
+        case MUS_EV_CONTROL_VALUE:
             ev = HandleControlValue(demux, channel, buf[1], buf[2]);
             break;
 
-        case 5: /* end of measure */
+        case MUS_EV_MEASURE_END:
             break;
 
-        case 6: /* end of track */
+        case MUS_EV_TRACK_END:
             return VLC_DEMUXER_EOF;
 
-        case 7: /* dummy */
+        case MUS_EV_DUMMY:
             break;
 
         default:
@@ -353,7 +389,7 @@ static int Open(vlc_object_t *obj)
     fmt.audio.i_rate = 44100;
     sys->es = es_out_Add(demux->out, &fmt);
 
-    date_Init(&sys->pts, 140, 1);
+    date_Init(&sys->pts, MUS_FREQ, 1);
     date_Set(&sys->pts, VLC_TICK_0);
     sys->tick = VLC_TICK_0;
 
