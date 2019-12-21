@@ -226,7 +226,6 @@ typedef struct
     es_out_id_t *p_es;
     int i_next_block_flags;
     bool b_recyling;
-    bool b_restart_decoders_on_reuse;
 } es_pair_t;
 
 static bool es_pair_Add(vlc_array_t *p_array, const es_format_t *p_fmt,
@@ -238,7 +237,6 @@ static bool es_pair_Add(vlc_array_t *p_array, const es_format_t *p_fmt,
         p_pair->p_es = p_es;
         p_pair->i_next_block_flags = 0;
         p_pair->b_recyling = false;
-        p_pair->b_restart_decoders_on_reuse = true;
         if(vlc_array_append(p_array, p_pair) != VLC_SUCCESS)
         {
             free(p_pair);
