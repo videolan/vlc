@@ -39,8 +39,66 @@ typedef struct
     unsigned primaries:4;
     unsigned secondaries:3;
     unsigned end_offset:17;
-    unsigned char last_volume[16];
+    unsigned char volume[16];
 } demux_sys_t;
+
+static int GetByte(demux_t *demux)
+{
+    unsigned char c;
+
+    return (vlc_stream_Read(demux->s, &c, 1) < 1) ? -1 : c;
+}
+
+/**
+ * Reads one event from the bit stream.
+ */
+static int ReadEvent(demux_t *demux, unsigned char *buf,
+                     unsigned *restrict delay)
+{
+    int byte = GetByte(demux);
+    if (byte < 0)
+        return -1;
+
+    uint_fast8_t type = (byte >> 4) & 0x7;
+
+    buf[0] = byte;
+
+    if (likely(type != 5 && type != 6)) {
+        int c = GetByte(demux);
+        if (c < 0)
+            return -1;
+
+        buf[1] = c;
+
+        switch (type) {
+            case 1:
+                if (c & 0x80) {
+            case 4:
+                    c = GetByte(demux);
+                    if (c < 0)
+                        return -1;
+
+                    buf[2] = c;
+                }
+                break;
+        }
+    }
+
+    /* Compute delay until next event */
+    *delay = 0;
+
+    while (byte & 0x80) {
+        byte = GetByte(demux);
+
+        if (byte < 0)
+            return -1;
+
+        *delay <<= 7;
+        *delay |= byte & 0x7f;
+    }
+
+    return 0;
+}
 
 static block_t *Event2(uint8_t type, uint8_t channel, uint8_t data)
 {
@@ -158,58 +216,41 @@ static int Demux(demux_t *demux)
 
     /* Read one MIDI event */
     block_t *ev = NULL;
-    unsigned char byte, data;
+    unsigned char buf[3];
+    unsigned delay;
 
-    if (vlc_stream_Read(stream, &byte, 1) < 1)
+    if (ReadEvent(demux, buf, &delay))
         return VLC_DEMUXER_EGENERIC;
 
-    uint_fast8_t type = (byte >> 4) & 0x7;
-    uint_fast8_t channel = byte & 0xf;
-
-    if (type != 5 && type != 6 && vlc_stream_Read(stream, &data, 1) < 1)
-        return VLC_DEMUXER_EGENERIC;
+    uint_fast8_t channel = buf[0] & 0xf;
 
     if (channel >= ((channel < 10) ? sys->primaries : (10 + sys->secondaries)))
         channel = 9;
 
-    switch (type) {
+    switch ((buf[0] >> 4) & 0x7) {
         case 0: /* release note */
-            ev = Event2(0x80, channel, data & 0x7f);
+            ev = Event2(0x80, channel, buf[1] & 0x7f);
             break;
 
-        case 1: { /* play note */
-            uint8_t vol;
+        case 1: /* play note */
+            if (buf[1] & 0x80)
+                sys->volume[channel] = buf[2] & 0x7f;
 
-            if (data & 0x80) {
-                if (vlc_stream_Read(stream, &vol, 1) < 1)
-                    return VLC_DEMUXER_EGENERIC;
-
-                vol &= 0x7f;
-                sys->last_volume[channel] = vol;
-            } else
-                vol = sys->last_volume[channel];
-
-            ev = Event3(0x90, channel, data & 0x7f, vol);
+            ev = Event3(0x90, channel, buf[1] & 0x7f, sys->volume[channel]);
             break;
-        }
 
         case 2: /* pitch bend */
-            ev = Event3(0xE0, channel, (data << 6) & 0x7f, (data >> 1) & 0x7f);
+            ev = Event3(0xE0, channel, (buf[1] << 6) & 0x7f,
+                        (buf[1] >> 1) & 0x7f);
             break;
 
         case 3: /* control w/o value */
-            ev = HandleControl(demux, channel, data);
+            ev = HandleControl(demux, channel, buf[1]);
             break;
 
-        case 4: { /* control w/ value */
-            uint8_t val;
-
-            if (vlc_stream_Read(stream, &val, 1) < 1)
-                return VLC_DEMUXER_EGENERIC;
-
-            ev = HandleControlValue(demux, channel, data, val);
+        case 4: /* control w/ value */
+            ev = HandleControlValue(demux, channel, buf[1], buf[2]);
             break;
-        }
 
         case 5: /* end of measure */
             break;
@@ -227,17 +268,6 @@ static int Demux(demux_t *demux)
     if (ev != NULL) {
         ev->i_pts = ev->i_dts = date_Get(&sys->pts);
         es_out_Send(demux->out, sys->es, ev);
-    }
-
-    /* Compute delay until next event */
-    uint32_t delay = 0;
-
-    while (byte & 0x80) {
-        if (vlc_stream_Read(stream, &byte, 1) < 1)
-            return VLC_DEMUXER_EGENERIC;
-
-        delay <<= 7;
-        delay |= byte & 0x7f;
     }
 
     date_Increment(&sys->pts, delay);
@@ -314,7 +344,7 @@ static int Open(vlc_object_t *obj)
     sys->end_offset = (uint_fast32_t)offset + (uint_fast32_t)length;
     sys->primaries = primaries;
     sys->secondaries = secondaries;
-    memset(sys->last_volume, 0, sizeof (sys->last_volume));
+    memset(sys->volume, 0, sizeof (sys->volume));
 
     es_format_t fmt;
 
