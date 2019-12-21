@@ -12,9 +12,6 @@ PKGS_FOUND += dav1d
 endif
 
 DAV1D_CONF = -D enable_tests=false -D enable_tools=false
-ifdef HAVE_WIN32
-DAV1D_CONF += -D win32_ver=false
-endif
 
 $(TARBALLS)/dav1d-$(DAV1D_VERSION).tar.xz:
 	$(call download_pkg,$(DAV1D_URL),dav1d)
