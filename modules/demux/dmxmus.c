@@ -36,6 +36,8 @@ typedef struct
     es_out_id_t *es;
     date_t pts; /*< Play timestamp */
     vlc_tick_t tick; /*< Last tick timestamp */
+    vlc_tick_t length; /*< Total length */
+    uint16_t start_offset; /*< Start byte offset of music events */
     unsigned end_offset:17; /*< End byte offset of music events */
     unsigned primaries:4; /*< Number of primary channels (0-9) */
     unsigned secondaries:3; /*< Number of secondary channels (10-14) */
@@ -310,6 +312,45 @@ static int Demux(demux_t *demux)
     return VLC_DEMUXER_SUCCESS;
 }
 
+static int SeekSet0(demux_t *demux)
+{
+    demux_sys_t *sys = demux->p_sys;
+
+    if (vlc_stream_Seek(demux->s, sys->start_offset))
+        return -1;
+
+    date_Set(&sys->pts, VLC_TICK_0);
+    return 0;
+}
+
+/**
+ * Gets the total length in ticks.
+ *
+ * @note This function clobbers the read offset of the byte stream.
+ */
+static vlc_tick_t GetLength(demux_t *demux)
+{
+    demux_sys_t *sys = demux->p_sys;
+    unsigned parts = 0;
+
+    if (SeekSet0(demux))
+        return VLC_TICK_INVALID;
+
+    for (;;) {
+        unsigned char buf[3];
+        unsigned delay;
+
+        if (ReadEvent(demux, buf, &delay)
+         || MUS_EV(buf[0]) == MUS_EV_TRACK_END
+         || vlc_stream_Tell(demux->s) >= sys->end_offset)
+            break;
+
+        parts += delay;
+    }
+
+    return vlc_tick_from_samples(parts, MUS_FREQ);
+}
+
 static int Control(demux_t *demux, int query, va_list args)
 {
     demux_sys_t *sys = demux->p_sys;
@@ -319,10 +360,25 @@ static int Control(demux_t *demux, int query, va_list args)
             *va_arg(args, bool *) = false; /* TODO */
             break;
 
-        case DEMUX_GET_POSITION:
+        case DEMUX_GET_POSITION: {
+            double pos = 0.;
+
+            static_assert(VLC_TICK_INVALID <= 0, "Oops");
+            if (sys->length > 0)
+                pos = (date_Get(&sys->pts) - VLC_TICK_0) * 1. / sys->length;
+
+            *va_arg(args, double *) = pos;
+            break;
+        }
+
         case DEMUX_SET_POSITION:
-        case DEMUX_GET_LENGTH:
             return VLC_EGENERIC;
+
+        case DEMUX_GET_LENGTH:
+            if (sys->length == VLC_TICK_INVALID)
+                return VLC_EGENERIC;
+            *va_arg(args, vlc_tick_t *) = sys->length;
+            break;
 
         case DEMUX_GET_TIME:
             *va_arg(args, vlc_tick_t *) = date_Get(&sys->pts) - VLC_TICK_0;
@@ -366,8 +422,7 @@ static int Open(vlc_object_t *obj)
     size_t instc = GetWLE(hdr + 12);
     size_t hdrlen = 16 + 2 * instc;
 
-    if (offset < hdrlen
-     || vlc_stream_Read(stream, NULL, offset) < (ssize_t)offset)
+    if (offset < hdrlen)
         return VLC_EGENERIC;
 
     msg_Dbg(demux, "MIDI channels: %u primary, %u secondary",
@@ -377,10 +432,27 @@ static int Open(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
+    demux->p_sys = sys;
+    sys->start_offset = offset;
     sys->end_offset = (uint_fast32_t)offset + (uint_fast32_t)length;
     sys->primaries = primaries;
     sys->secondaries = secondaries;
     memset(sys->volume, 0, sizeof (sys->volume));
+
+    bool can_seek;
+    vlc_stream_Control(demux->s, STREAM_CAN_SEEK, &can_seek);
+    if (can_seek) {
+        sys->length = GetLength(demux);
+
+        if (SeekSet0(demux))
+            return VLC_EGENERIC;
+    } else {
+        sys->length = VLC_TICK_INVALID;
+        offset -= hdrlen;
+
+        if (vlc_stream_Read(stream, NULL, offset) < (ssize_t)offset)
+            return VLC_EGENERIC;
+    }
 
     es_format_t fmt;
 
@@ -393,7 +465,6 @@ static int Open(vlc_object_t *obj)
     date_Set(&sys->pts, VLC_TICK_0);
     sys->tick = VLC_TICK_0;
 
-    demux->p_sys = sys;
     demux->pf_demux = Demux;
     demux->pf_control = Control;
     return VLC_SUCCESS;
