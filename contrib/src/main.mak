@@ -312,20 +312,21 @@ HOSTCONF += --with-pic
 PIC := -fPIC
 endif
 
-# For cross-compilation with meson, do not set compiler and flags
-# in HOSTVARS as meson will always use them for the BUILD machine compiler!
-MESON_HOST_FLAGS := \
+HOSTTOOLS := \
+	CC="$(CC)" CXX="$(CXX)" LD="$(LD)" \
+	AR="$(AR)" CCAS="$(CCAS)" RANLIB="$(RANLIB)" STRIP="$(STRIP)" \
+	PATH="$(PREFIX)/bin:$(PATH)"
+
+HOSTVARS_MESON := $(HOSTTOOLS) \
 	CPPFLAGS="$(CPPFLAGS)" \
 	CFLAGS="$(CFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS)" \
 	LDFLAGS="$(LDFLAGS)"
-ifdef HAVE_CROSS_COMPILE
-HOSTVARS_MESON := PATH="$(PREFIX)/bin:$(PATH)"
-else
-HOSTVARS_MESON := $(HOSTTOOLS) $(MESON_HOST_FLAGS)
-endif
 
 # Add these flags after Meson consumed the CFLAGS/CXXFLAGS
+# as when setting those for Meson, it would apply to tests
+# and cause the check if symbols have underscore prefix to
+# incorrectly report they have not, even if they have.
 ifndef WITH_OPTIMIZATION
 CFLAGS := $(CFLAGS) -g -O0
 CXXFLAGS := $(CXXFLAGS) -g -O0
@@ -334,10 +335,6 @@ CFLAGS := $(CFLAGS) -g -O2
 CXXFLAGS := $(CXXFLAGS) -g -O2
 endif
 
-HOSTTOOLS := \
-	CC="$(CC)" CXX="$(CXX)" LD="$(LD)" \
-	AR="$(AR)" CCAS="$(CCAS)" RANLIB="$(RANLIB)" STRIP="$(STRIP)" \
-	PATH="$(PREFIX)/bin:$(PATH)"
 HOSTVARS := $(HOSTTOOLS) \
 	CPPFLAGS="$(CPPFLAGS)" \
 	CFLAGS="$(CFLAGS)" \
@@ -410,16 +407,29 @@ ifeq ($(V),1)
 CMAKE += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 endif
 
-MESON = meson --default-library static --prefix "$(PREFIX)" --backend ninja \
+MESONFLAGS = --default-library static --prefix "$(PREFIX)" --backend ninja \
 	-Dlibdir=lib
 ifndef WITH_OPTIMIZATION
-MESON += --buildtype debug
+MESONFLAGS += --buildtype debug
 else
-MESON += --buildtype release
+MESONFLAGS += --buildtype release
 endif
 
 ifdef HAVE_CROSS_COMPILE
-MESON += --cross-file $(abspath crossfile.meson)
+# When cross-compiling meson uses the env vars like
+# CC, CXX, etc. and CFLAGS, CXXFLAGS, etc. for the
+# build machine compiler and not like most other
+# buildsystems for the host compilation. Therefore
+# we clear the enviornment variables using the env
+# command, except PATH, which is needed.
+# The values of the mentioned relevant env variables
+# are passed for the host compilation using the
+# generated crossfile, so everything should work as
+# expected.
+MESONFLAGS += --cross-file $(abspath crossfile.meson)
+MESON = env -i PATH="$(PREFIX)/bin:$(PATH)" meson $(MESONFLAGS)
+else
+MESON = meson $(MESONFLAGS)
 endif
 
 ifdef GPL
@@ -648,8 +658,7 @@ endif
 endif
 
 crossfile.meson: $(SRC)/gen-meson-crossfile.py
-	$(HOSTTOOLS) \
-	$(MESON_HOST_FLAGS) \
+	$(HOSTVARS_MESON) \
 	WINDRES="$(WINDRES)" \
 	PKG_CONFIG="$(PKG_CONFIG)" \
 	HOST_SYSTEM="$(MESON_SYSTEM_NAME)" \
