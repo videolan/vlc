@@ -701,6 +701,11 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
                     selected_max_order = current->i_order;
             }
 
+            /* An ephemer with stop time can be ephemer,
+               but a pic without stop time must be ephemer */
+            if(current->i_stop < current->i_start)
+                current->b_ephemer = true;
+
             /* If the spu is ephemer, the stop time is invalid, but it has been converted to
                system time and used in comparisons below */
             const bool is_stop_valid = !current->b_ephemer || render_entry->orgstop > render_entry->orgstart;
