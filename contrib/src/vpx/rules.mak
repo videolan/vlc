@@ -101,7 +101,8 @@ VPX_CONF := \
 	--disable-install-bins \
 	--disable-install-docs \
 	--disable-dependency-tracking \
-	--enable-vp9-highbitdepth
+	--enable-vp9-highbitdepth \
+	--disable-tools
 
 ifndef HAVE_WIN32
 ifndef HAVE_IOS
