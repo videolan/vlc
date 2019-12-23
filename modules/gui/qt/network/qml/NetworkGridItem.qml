@@ -48,5 +48,4 @@ Widgets.GridItem {
     }
     subtitle: model.mrl
     title: model.name || i18n.qtr("Unknown share")
-    showContextButton: true
 }

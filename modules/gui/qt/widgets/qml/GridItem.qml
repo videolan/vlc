@@ -33,7 +33,6 @@ Rectangle {
     property string title: ""
     property string subtitle: ""
     property bool selected: false
-    property bool showContextButton: isVideo
 
     property alias sourceSize: cover.sourceSize
     property string infoLeft: ""
@@ -44,7 +43,6 @@ Rectangle {
     property string channel: ""
     property real pictureWidth: isVideo ? VLCStyle.video_normal_width : VLCStyle.cover_small
     property real pictureHeight: isVideo ? VLCStyle.video_normal_height : VLCStyle.cover_small
-    property alias contextButtonDown: contextButton.down
     width: gridItem.width
     height: gridItem.height
 
@@ -120,16 +118,6 @@ Rectangle {
                                 right: parent.right
                             }
                         }
-                    }
-                    ContextButton {
-                        id: contextButton
-                        visible: root.showContextButton
-                        anchors {
-                            top: cover.top
-                            right: cover.right
-                        }
-                        color: "white"
-                        onClicked: root.contextMenuButtonClicked(cover_bg)
                     }
 
                     VideoQualityLabel {
@@ -218,8 +206,7 @@ Rectangle {
                         font.pixelSize: VLCStyle.fontSize_normal
                         property bool _needsToScroll: (textTitleRect.width < textTitle.width)
 
-                        state: ((mouseArea.containsMouse
-                                 || contextButton.activeFocus || picture.highlighted)
+                        state: ((mouseArea.containsMouse || picture.highlighted)
                                 && textTitle._needsToScroll) ? "HOVERED" : "RELEASED"
 
                         states: [

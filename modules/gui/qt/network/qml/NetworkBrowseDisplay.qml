@@ -174,7 +174,6 @@ Widgets.NavigableFocusScope {
                 }
                 subtitle: model.mrl || ""
                 title: model.name || i18n.qtr("Unknown share")
-                showContextButton: true
 
                 onItemClicked : {
                     delegateModel.updateSelection( modifier ,  delegateModel.currentIndex, index)
