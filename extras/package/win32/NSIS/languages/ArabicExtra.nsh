@@ -33,7 +33,7 @@ ${LangFileString} Desc_Section08 \
     "يحذف التفضيلات والخبيئة لمشغّل الوسائط VLC التي بقت من النسخ السابقة"
 
 ${LangFileString} Name_Section91 "أزِل التثبيت"
-${LangFileString} Name_Section92 "احذف التفضيلات والخبيئة"
+${LangFileString} Name_Section92 "احذف التفضيلات و ذاكرة تخزين مؤقت"
 
 ${LangFileString} Desc_Section91 \
 "أزِل تثبيت مشغّل الوسائط VLC وكلّ مكوّناته"
@@ -64,7 +64,7 @@ ${LangFileString} License_NextText "أصبحت على علم بحقوقك. ان�
 ${LangFileString} Detail_CheckProcesses "يتحقق من العمليات..."
 ${LangFileString} MessageBox_VLCRunning "يبدو أن VLC يعمل وسيُغلق الآن."
 ${LangFileString} MessageBox_VLCUnableToClose "تعذر على المثبّت إغلاق VLC، رجاءً أغلقه يدويا."
-${LangFileString} MessageBox_InstallAborted "أُجهض التثبيت!"
+${LangFileString} MessageBox_InstallAborted "تم الإحباط التثبيت"
 
 ${LangFileString} Reinstall_Headline "مثبًّت مسبقا"
 ${LangFileString} Reinstall_HeadlineInstall "اختر طريقة تثبيت VLC."
