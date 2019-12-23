@@ -148,17 +148,18 @@ static HRESULT can_map(filter_sys_t *sys, ID3D11DeviceContext *context)
     return hr;
 }
 
-static int assert_staging(filter_t *p_filter, picture_sys_d3d11_t *p_sys)
+static int assert_staging(filter_t *p_filter, filter_sys_t *sys, DXGI_FORMAT format)
 {
-    filter_sys_t *sys = p_filter->p_sys;
     HRESULT hr;
 
     if (sys->staging)
         goto ok;
 
     D3D11_TEXTURE2D_DESC texDesc;
-    ID3D11Texture2D_GetDesc( p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
-
+    ZeroMemory(&texDesc, sizeof(texDesc));
+    texDesc.Width  = p_filter->fmt_in.video.i_width;
+    texDesc.Height = p_filter->fmt_in.video.i_height;
+    texDesc.Format = format;
     texDesc.MipLevels = 1;
     texDesc.SampleDesc.Count = 1;
     texDesc.MiscFlags = 0;
@@ -237,12 +238,6 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
     D3D11_MAPPED_SUBRESOURCE lock;
 
     vlc_mutex_lock(&sys->staging_lock);
-    if (assert_staging(p_filter, p_sys) != VLC_SUCCESS)
-    {
-        vlc_mutex_unlock(&sys->staging_lock);
-        return;
-    }
-
     UINT srcSlice = p_sys->slice_index;
     ID3D11Resource *srcResource = p_sys->resource[KNOWN_DXGI_INDEX];
 
@@ -358,12 +353,6 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     D3D11_MAPPED_SUBRESOURCE lock;
 
     vlc_mutex_lock(&sys->staging_lock);
-    if (assert_staging(p_filter, p_sys) != VLC_SUCCESS)
-    {
-        vlc_mutex_unlock(&sys->staging_lock);
-        return;
-    }
-
     UINT srcSlice = p_sys->slice_index;
     ID3D11Resource *srcResource = p_sys->resource[KNOWN_DXGI_INDEX];
 
@@ -441,12 +430,6 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
     D3D11_MAPPED_SUBRESOURCE lock;
 
     vlc_mutex_lock(&sys->staging_lock);
-    if (assert_staging(p_filter, p_sys) != VLC_SUCCESS)
-    {
-        vlc_mutex_unlock(&sys->staging_lock);
-        return;
-    }
-
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(picture_GetVideoContext(src));
     ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->device, sys->staging_resource,
                                               0, 0, 0, 0,
@@ -733,6 +716,15 @@ int D3D11OpenConverter( vlc_object_t *obj )
     if (!p_sys)
         return VLC_ENOMEM;
 
+    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(p_filter->vctx_in);
+    D3D11_CreateDeviceExternal(obj, vctx_sys->device, false, &p_sys->d3d_dev);
+
+    if (assert_staging(p_filter, p_sys, vctx_sys->format) != VLC_SUCCESS)
+    {
+        D3D11_ReleaseDevice(&p_sys->d3d_dev);
+        return VLC_EGENERIC;
+    }
+
     if (CopyInitCache(&p_sys->cache, p_filter->fmt_in.video.i_width * pixel_bytes))
         return VLC_ENOMEM;
 
@@ -862,6 +854,7 @@ void D3D11CloseConverter( vlc_object_t *obj )
     vlc_mutex_destroy(&p_sys->staging_lock);
     if (p_sys->staging)
         ID3D11Texture2D_Release(p_sys->staging);
+    D3D11_ReleaseDevice(&p_sys->d3d_dev);
 }
 
 void D3D11CloseCPUConverter( vlc_object_t *obj )
