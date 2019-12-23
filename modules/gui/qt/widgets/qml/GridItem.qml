@@ -134,7 +134,7 @@ Rectangle {
 
                     VideoQualityLabel {
                         id: resolutionLabel
-                        visible: root.isVideo
+                        visible: root.resolution !== ""
                         anchors {
                             top: cover.top
                             left: cover.left
@@ -150,7 +150,7 @@ Rectangle {
                             topMargin: VLCStyle.margin_xxsmall
                             leftMargin: VLCStyle.margin_xxxsmall
                         }
-                        visible: channel.length > 0
+                        visible: root.channel !== ""
                         text: root.channel
                         color: "limegreen"
                     }

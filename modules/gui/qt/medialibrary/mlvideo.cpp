@@ -107,7 +107,7 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
     else if ( numChannel >= 6 )
         m_channel = "5.1";
 
-    m_resolution = "SD";
+    m_resolution = "";
     if ( maxWidth >= 7680 && maxHeight >= 4320 )
         m_resolution = "8K";
     else if ( maxWidth >= 3840 && maxHeight >= 2160 )
