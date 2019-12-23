@@ -606,6 +606,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             }
 
             video_format_Copy( &id->decoder_out.video, &p_pic->format );
+            transcode_video_framerate_apply( &p_pic->format, &id->decoder_out.video );
+            transcode_video_sar_apply( &p_pic->format, &id->decoder_out.video );
             id->decoder_vctx_out = picture_GetVideoContext(p_pic);
 
             if( !transcode_video_filters_configured( id ) )

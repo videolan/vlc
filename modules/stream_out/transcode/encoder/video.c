@@ -34,8 +34,8 @@
 #include "encoder.h"
 #include "encoder_priv.h"
 
-static void transcode_video_framerate_apply( const video_format_t *p_src,
-                                             video_format_t *p_dst )
+void transcode_video_framerate_apply( const video_format_t *p_src,
+                                            video_format_t *p_dst )
 {
     /* Handle frame rate conversion */
     if( !p_dst->i_frame_rate || !p_dst->i_frame_rate_base )
@@ -162,8 +162,8 @@ static void transcode_video_scale_apply( vlc_object_t *p_obj,
                      i_dst_visible_width, i_dst_visible_height );
 }
 
-static void transcode_video_sar_apply( const video_format_t *p_src,
-                                       video_format_t *p_dst )
+void transcode_video_sar_apply( const video_format_t *p_src,
+                                      video_format_t *p_dst )
 {
     /* Check whether a particular aspect ratio was requested */
     if( p_dst->i_sar_num <= 0 || p_dst->i_sar_den <= 0 )
