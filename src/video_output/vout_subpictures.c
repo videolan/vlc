@@ -687,7 +687,6 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         for (size_t index = 0; index < channel->entries.size; index++) {
             spu_render_entry_t *render_entry = &channel->entries.data[index];
             subpicture_t *current = render_entry->subpic;
-            bool is_stop_valid;
 
             if (!spu_render_entry_IsSelected(render_entry, channel->id,
                                              system_now, render_subtitle_date,
@@ -704,8 +703,9 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
                     *ephemer_order_ptr = current->i_order;
             }
 
-            is_stop_valid = !current->b_ephemer || render_entry->stop > render_entry->start;
-
+            /* If the spu is ephemer, the stop time is invalid, but it has been converted to
+               system time and used in comparisons below */
+            const bool is_stop_valid = !current->b_ephemer || render_entry->orgstop > render_entry->orgstart;
             render_entry->is_late = is_stop_valid && current->i_stop <= render_date;
 
             /* start_date will be used for correct automatic overlap support
