@@ -53,7 +53,7 @@ Widgets.NavigableFocusScope {
             toolbarAutoHide.toggleForceVisible()
         } else if (KeyHelper.matchCancel(event)) {
 
-            if (player.playingState === PlayerController.PLAYING_STATE_PAUSED) {
+            if (player.hasVideoOutput) {
                mainPlaylistController.stop()
             }
             history.previous(History.Go)

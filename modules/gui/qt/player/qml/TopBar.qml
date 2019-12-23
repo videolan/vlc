@@ -72,7 +72,7 @@ Widgets.NavigableFocusScope{
                     text: i18n.qtr("Back")
                     color: VLCStyle.colors.playerFg
                     onClicked: {
-                        if (player.playingState === PlayerController.PLAYING_STATE_PAUSED) {
+                        if (player.hasVideoOutput) {
                            mainPlaylistController.stop()
                         }
                         history.previous(History.Go)
