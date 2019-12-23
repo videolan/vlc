@@ -14,7 +14,7 @@
 # Abdulrahman Alothaim <ar.alothaim@gmail.com>, 2013
 # Islam Ouahouda <iouahouda@gmail.com>, 2014
 # Khaled Hosny <khaledhosny@eglug.org>, 2016
-# Mohammed bin Suleiman Alkindi <salkindi2009@hotmail.com>, 2015
+# Mohammed bin Suleiman Alkindi <salkindi2009@hotmail.com>, 2015, 2019
 # Mosaab Alzoubi <moceap@hotmail.com>, 2013
 # Muhammad EL-SEED <sa3paleasm@gmail.com>, 2016
 # Muhammed Abdulaziz <thenubianmuha_idrecy@yahoo.co.uk>, 2016-2017
@@ -29,8 +29,9 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-12-23 15:13+0100\n"
+"Last-Translator: Mohammed bin Suleiman Alkindi <salkindi2009@hotmail.com>, "
+"2019\n"
 "Language-Team: Arabic (https://www.transifex.com/yaron/teams/16553/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -80,7 +81,7 @@ msgstr "الواجهات الرئيسية"
 
 #: include/vlc_config_cat.h:44
 msgid "Settings for the main interface"
-msgstr "إعدادات للواجهة الرئيسية"
+msgstr "إعدادات الواجهة الرئيسية"
 
 #: include/vlc_config_cat.h:46 src/libvlc-module.c:81
 msgid "Control interfaces"
