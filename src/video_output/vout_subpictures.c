@@ -677,8 +677,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         vlc_tick_t   start_date = render_subtitle_date;
         vlc_tick_t   ephemer_subtitle_date = 0;
         vlc_tick_t   ephemer_osd_date = 0;
-        int64_t      ephemer_subtitle_order = INT64_MIN;
-        int64_t      ephemer_system_order = INT64_MIN;
+        int64_t      selected_max_order = INT64_MIN;
 
         if (spu_channel_UpdateDates(channel, system_now) == 0)
             continue;
@@ -696,11 +695,10 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             const vlc_tick_t render_date = current->b_subtitle ? render_subtitle_date : system_now;
 
             vlc_tick_t *date_ptr  = current->b_subtitle ? &ephemer_subtitle_date  : &ephemer_osd_date;
-            int64_t *ephemer_order_ptr = current->b_subtitle ? &ephemer_subtitle_order : &ephemer_system_order;
             if (current->i_start >= *date_ptr) {
                 *date_ptr = render_entry->start;
-                if (current->i_order > *ephemer_order_ptr)
-                    *ephemer_order_ptr = current->i_order;
+                if (current->i_order > selected_max_order)
+                    selected_max_order = current->i_order;
             }
 
             /* If the spu is ephemer, the stop time is invalid, but it has been converted to
@@ -737,7 +735,6 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 
             const vlc_tick_t stop_date = current->b_subtitle ? __MAX(start_date, sys->last_sort_date) : system_now;
             const vlc_tick_t ephemer_date  = current->b_subtitle ? ephemer_subtitle_date  : ephemer_osd_date;
-            const int64_t ephemer_order = current->b_subtitle ? ephemer_subtitle_order : ephemer_system_order;
 
             /* Destroy late and obsolete ephemer subpictures */
             bool is_rejeted = is_late && render_entry->stop  <= stop_date;
@@ -745,7 +742,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
                 if (render_entry->start < ephemer_date)
                     is_rejeted = true;
                 else if (render_entry->start == ephemer_date &&
-                         current->i_order < ephemer_order)
+                         current->i_order < selected_max_order)
                     is_rejeted = true;
             }
 
