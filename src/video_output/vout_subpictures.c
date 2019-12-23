@@ -697,10 +697,10 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 
             const vlc_tick_t render_date = current->b_subtitle ? render_subtitle_date : system_now;
 
-            vlc_tick_t *ephemer_date_ptr  = current->b_subtitle ? &ephemer_subtitle_date  : &ephemer_osd_date;
+            vlc_tick_t *date_ptr  = current->b_subtitle ? &ephemer_subtitle_date  : &ephemer_osd_date;
             int64_t *ephemer_order_ptr = current->b_subtitle ? &ephemer_subtitle_order : &ephemer_system_order;
-            if (current->i_start >= *ephemer_date_ptr) {
-                *ephemer_date_ptr = render_entry->start;
+            if (current->i_start >= *date_ptr) {
+                *date_ptr = render_entry->start;
                 if (current->i_order > *ephemer_order_ptr)
                     *ephemer_order_ptr = current->i_order;
             }
