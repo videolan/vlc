@@ -688,7 +688,6 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             spu_render_entry_t *render_entry = &channel->entries.data[index];
             subpicture_t *current = render_entry->subpic;
             bool is_stop_valid;
-            bool is_late;
 
             if (!spu_render_entry_IsSelected(render_entry, channel->id,
                                              system_now, render_subtitle_date,
@@ -707,16 +706,13 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
 
             is_stop_valid = !current->b_ephemer || render_entry->stop > render_entry->start;
 
-            is_late = is_stop_valid && render_entry->stop <= render_date;
+            render_entry->is_late = is_stop_valid && current->i_stop <= render_date;
 
             /* start_date will be used for correct automatic overlap support
              * in case picture that should not be displayed anymore (display_time)
              * overlap with a picture to be displayed (render_entry->start)  */
-            if (current->b_subtitle && !is_late && !current->b_ephemer)
+            if (current->b_subtitle && !render_entry->is_late && !current->b_ephemer)
                 start_date = render_entry->start;
-
-            /* */
-            render_entry->is_late = is_late;
         }
 
         /* Only forced old picture display at the transition */
