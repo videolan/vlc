@@ -229,32 +229,13 @@ picture_t *AllocPicture( filter_t *p_filter )
     if (unlikely(cfg == NULL))
         return NULL;
 
-    struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
-    if (unlikely(pic_ctx == NULL))
-        return NULL;
-
-    picture_t *pic = picture_NewFromFormat( &p_filter->fmt_out.video );
+    picture_t *pic = D3D11_AllocPicture(VLC_OBJECT(p_filter), &p_sys->d3d_dev, &p_filter->fmt_out.video, p_filter->vctx_out, cfg);
     if (unlikely(pic == NULL))
-    {
-        free(pic_ctx);
         return NULL;
-    }
 
-    if (AllocateTextures(p_filter, &p_sys->d3d_dev, cfg,
-                         &p_filter->fmt_out.video, 1, pic_ctx->picsys.texture, NULL) != VLC_SUCCESS)
-    {
-        picture_Release(pic);
-        free(pic_ctx);
-        return NULL;
-    }
-
+    struct d3d11_pic_context *pic_ctx = container_of(pic->context, struct d3d11_pic_context, s);
     D3D11_AllocateResourceView(p_filter, p_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
 
-    pic_ctx->s = (picture_context_t) {
-        d3d11_pic_context_destroy, d3d11_pic_context_copy,
-        vlc_video_context_Hold(p_filter->vctx_out),
-    };
-    pic->context = &pic_ctx->s;
     return pic;
 }
 
