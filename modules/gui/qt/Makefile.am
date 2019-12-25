@@ -89,7 +89,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/podcast/podcast_configuration.hpp \
 	gui/qt/dialogs/preferences/complete_preferences.cpp \
 	gui/qt/dialogs/preferences/complete_preferences.hpp \
-	gui/qt/dialogs/preferences/preferences.cpp gui/qt/preferences/preferences.hpp \
+	gui/qt/dialogs/preferences/preferences.cpp \
+	gui/qt/dialogs/preferences/preferences.hpp \
 	gui/qt/dialogs/preferences/preferences_widgets.cpp \
 	gui/qt/dialogs/preferences/preferences_widgets.hpp \
 	gui/qt/dialogs/preferences/simple_preferences.cpp \
@@ -179,7 +180,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/singleton.hpp \
 	gui/qt/util/soutchain.cpp gui/qt/util/soutchain.hpp \
 	gui/qt/util/validators.cpp gui/qt/util/validators.hpp \
-	gui/qt/util/var_common_p.hpp \
+	gui/qt/util/varcommon_p.hpp \
 	gui/qt/util/varchoicemodel.cpp  gui/qt/util/varchoicemodel.hpp \
 	gui/qt/util/variables.cpp gui/qt/util/variables.hpp \
 	gui/qt/util/vlctick.cpp \
@@ -190,7 +191,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/voutwindow/qvoutwindowdummy.hpp \
 	gui/qt/voutwindow/videosurface.cpp \
 	gui/qt/voutwindow/videosurface.hpp \
-	gui/qt/widgets/native/animators.cpp gui/qt/widgets/animators.hpp \
+	gui/qt/widgets/native/animators.cpp \
+	gui/qt/widgets/native/animators.hpp \
 	gui/qt/widgets/native/customwidgets.cpp gui/qt/widgets/native/customwidgets.hpp \
 	gui/qt/widgets/native/interface_widgets.cpp \
 	gui/qt/widgets/native/interface_widgets.hpp \
