@@ -162,6 +162,8 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
      * so the state is shared between those.
      */
     [_remainingOrTotalTime setRemainingIdentifier:VLCTimeFieldDisplayTimeAsRemaining];
+
+    [self inputItemChanged:nil];
 }
 
 #undef setupButton
@@ -282,7 +284,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
         title = _NS("VLC media player");
     }
 
-    if (nowPlaying) {
+    if (nowPlaying.length > 0) {
         [_mediaTitle setStringValue:nowPlaying];
     } else {
         [_mediaTitle setStringValue:title];
