@@ -65,6 +65,10 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
                                selector:@selector(mediaSourceChildrenRemoved:)
                                    name:VLCMediaSourceChildrenRemoved
                                  object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(mediaSourcePreparingEnded:)
+                                   name:VLCMediaSourcePreparsingEnded
+                                 object:nil];
     }
     return self;
 }
@@ -372,6 +376,12 @@ NSString *VLCMediaSourceTableViewCellIdentifier = @"VLCMediaSourceTableViewCellI
 - (void)mediaSourceChildrenRemoved:(NSNotification *)aNotification
 {
     msg_Dbg(getIntf(), "Removed nodes: %s", [[aNotification.object description] UTF8String]);
+    [self reloadDataForNotification:aNotification];
+}
+
+- (void)mediaSourcePreparingEnded:(NSNotification *)aNotification
+{
+    msg_Dbg(getIntf(), "Preparsing ended: %s", [[aNotification.object description] UTF8String]);
     [self reloadDataForNotification:aNotification];
 }
 

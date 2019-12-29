@@ -37,6 +37,7 @@
 NSString *VLCMediaSourceChildrenReset = @"VLCMediaSourceChildrenReset";
 NSString *VLCMediaSourceChildrenAdded = @"VLCMediaSourceChildrenAdded";
 NSString *VLCMediaSourceChildrenRemoved = @"VLCMediaSourceChildrenRemoved";
+NSString *VLCMediaSourcePreparsingEnded = @"VLCMediaSourcePreparsingEnded";
 
 static void cb_children_reset(vlc_media_tree_t *p_tree,
                               input_item_node_t *p_node,
@@ -75,10 +76,23 @@ static void cb_children_removed(vlc_media_tree_t *p_tree,
     });
 }
 
+static void cb_preparse_ended(vlc_media_tree_t *p_tree,
+                              input_item_node_t *p_node,
+                              enum input_item_preparse_status status,
+                              void *p_data)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCMediaSource *mediaSource = (__bridge VLCMediaSource *)p_data;
+        [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaSourcePreparsingEnded
+                                                            object:mediaSource];
+    });
+}
+
 static const struct vlc_media_tree_callbacks treeCallbacks = {
     cb_children_reset,
     cb_children_added,
     cb_children_removed,
+    cb_preparse_ended,
 };
 
 @implementation VLCMediaSource
