@@ -41,8 +41,6 @@ struct pl_shader_res;
 typedef struct opengl_tex_converter_t opengl_tex_converter_t;
 struct opengl_tex_converter_t
 {
-    struct vlc_object_t obj;
-
     /* Pointer to object gl, set by the caller */
     vlc_gl_t *gl;
 

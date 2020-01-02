@@ -521,7 +521,7 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
         pl_context_destroy(&tc->pl_ctx);
 #endif
 
-    vlc_object_delete(tc);
+    free(tc);
 }
 
 static int
@@ -530,15 +530,14 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
                     const video_format_t *fmt, bool subpics,
                     bool b_dump_shaders)
 {
-    opengl_tex_converter_t *tc =
-        vlc_object_create(vgl->gl, sizeof(opengl_tex_converter_t));
+    opengl_tex_converter_t *tc = calloc(1, sizeof(*tc));
     if (tc == NULL)
         return VLC_ENOMEM;
 
-    struct vlc_gl_interop *interop = vlc_object_create(tc, sizeof(*interop));
+    struct vlc_gl_interop *interop = vlc_object_create(vgl->gl, sizeof(*interop));
     if (!interop)
     {
-        vlc_object_delete(tc);
+        free(tc);
         return VLC_ENOMEM;
     }
 
@@ -572,7 +571,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
     // Create the main libplacebo context
     if (!subpics)
     {
-        tc->pl_ctx = vlc_placebo_Create(VLC_OBJECT(tc));
+        tc->pl_ctx = vlc_placebo_Create(VLC_OBJECT(vgl->gl));
         if (tc->pl_ctx) {
 #   if PL_API_VER >= 20
             tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL);
@@ -606,7 +605,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
         if (desc == NULL)
         {
             vlc_object_delete(interop);
-            vlc_object_delete(tc);
+            free(tc);
             return VLC_EGENERIC;
         }
         if (desc->plane_count == 0)
@@ -629,7 +628,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
     if (ret != VLC_SUCCESS)
     {
         vlc_object_delete(interop);
-        vlc_object_delete(tc);
+        free(tc);
         return VLC_EGENERIC;
     }
 
@@ -640,7 +639,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
     if (!fragment_shader)
     {
         vlc_object_delete(interop);
-        vlc_object_delete(tc);
+        free(tc);
         return VLC_EGENERIC;
     }
 
