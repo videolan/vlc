@@ -90,6 +90,19 @@ static inline unsigned int AddNibble( unsigned int i_code,
     }
 }
 
+static void CLUTIdxToYUV(const struct subs_format_t *subs,
+                         const uint8_t idx[4], uint8_t yuv[4][3])
+{
+    for( int i = 0; i < 4 ; i++ )
+    {
+        uint32_t i_ayvu = subs->spu.palette[1+idx[i]];
+        /* FIXME: this job should be done sooner */
+        yuv[3-i][0] = i_ayvu>>16;
+        yuv[3-i][1] = i_ayvu;
+        yuv[3-i][2] = i_ayvu>>8;
+    }
+}
+
 
 /*****************************************************************************
  * OutputPicture:
@@ -278,8 +291,7 @@ static int ParseControlSeq( decoder_t *p_dec, mtime_t i_pts,
 
             if( p_dec->fmt_in.subs.spu.palette[0] == SPU_PALETTE_DEFINED )
             {
-                unsigned int idx[4];
-                int i;
+                uint8_t idx[4];
 
                 spu_data_cmd.b_palette = true;
 
@@ -288,15 +300,7 @@ static int ParseControlSeq( decoder_t *p_dec, mtime_t i_pts,
                 idx[2] = (p_sys->buffer[i_index+2]>>4)&0x0f;
                 idx[3] = (p_sys->buffer[i_index+2])&0x0f;
 
-                for( i = 0; i < 4 ; i++ )
-                {
-                    uint32_t i_color = p_dec->fmt_in.subs.spu.palette[1+idx[i]];
-
-                    /* FIXME: this job should be done sooner */
-                    spu_data_cmd.pi_yuv[3-i][0] = (i_color>>16) & 0xff;
-                    spu_data_cmd.pi_yuv[3-i][1] = (i_color>>0) & 0xff;
-                    spu_data_cmd.pi_yuv[3-i][2] = (i_color>>8) & 0xff;
-                }
+                CLUTIdxToYUV( &p_dec->fmt_in.subs, idx, spu_data_cmd.pi_yuv );
             }
 
             i_index += 3;
