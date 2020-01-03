@@ -51,18 +51,13 @@ Widgets.NavigableFocusScope {
 
             color: VLCStyle.colors.getBgColor(delegateModel.inSelected, this.hovered, this.activeFocus)
 
-            cover: Rectangle {
-                color: VLCStyle.colors.banner
-                width: cover_obj.width
-
-                Image {
-                    id: cover_obj
-                    anchors.fill: parent
-
-                    fillMode: Image.PreserveAspectFit
-                    source: model.cover || VLCStyle.noArtArtistSmall
-                }
+            cover: Widgets.RoundImage {
+                source: model.cover || VLCStyle.noArtArtistSmall
+                height: VLCStyle.icon_normal
+                width: VLCStyle.icon_normal
+                radius: VLCStyle.icon_normal
             }
+
             line1: model.name || i18n.qtr("Unknown artist")
 
             actionButtons: []

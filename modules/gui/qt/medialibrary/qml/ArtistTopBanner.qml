@@ -67,35 +67,16 @@ Widgets.NavigableFocusScope {
             Layout.leftMargin: VLCStyle.margin_small
             Layout.rightMargin: VLCStyle.margin_small
 
-            Rectangle {
-                id: artistImageContainer
-                color: VLCStyle.colors.banner
-
+            Widgets.RoundImage {
+                source: artist.cover || VLCStyle.noArtArtist
                 height: VLCStyle.cover_xsmall
                 width: VLCStyle.cover_xsmall
+                radius: VLCStyle.cover_xsmall
 
                 Layout.alignment: Qt.AlignVCenter
                 Layout.preferredHeight: VLCStyle.cover_small
                 Layout.preferredWidth: VLCStyle.cover_small
-
-                Image {
-                    id: artistImage
-                    source: artist.cover || VLCStyle.noArtArtist
-                    fillMode: Image.PreserveAspectCrop
-                    anchors.fill: parent
-                }
-
-                layer.enabled: true
-                layer.effect: OpacityMask {
-                    maskSource: Rectangle {
-                        width: VLCStyle.cover_small
-                        height: VLCStyle.cover_small
-                        radius: VLCStyle.cover_small
-                    }
-                }
             }
-
-
 
             Text {
                 id: artistName
