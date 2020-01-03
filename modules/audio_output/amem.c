@@ -30,6 +30,8 @@
 static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
+#define AMEM_SAMPLE_RATE_MAX 384000
+
 vlc_module_begin ()
     set_shortname (N_("Audio memory"))
     set_description (N_("Audio memory output"))
@@ -43,7 +45,7 @@ vlc_module_begin ()
         change_private()
     add_integer ("amem-rate", 44100,
                  N_("Sample rate"), N_("Sample rate"), false)
-        change_integer_range (1, 384000)
+        change_integer_range (1, AMEM_SAMPLE_RATE_MAX)
         change_private()
     add_integer ("amem-channels", 2,
                  N_("Channels count"), N_("Channels count"), false)
@@ -186,7 +188,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
         sys->set_volume(sys->opaque, sys->volume, sys->mute);
 
     /* Ensure that format is supported */
-    if (fmt->i_rate == 0 || fmt->i_rate > 192000
+    if (fmt->i_rate == 0 || fmt->i_rate > AMEM_SAMPLE_RATE_MAX
      || channels == 0 || channels > AOUT_CHAN_MAX
      || strcmp(format, "S16N") /* TODO: amem-format */)
     {
