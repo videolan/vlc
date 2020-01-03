@@ -130,6 +130,13 @@ static void OutputPicture( decoder_t *p_dec,
     p_spu->b_ephemer = p_spu_properties->b_ephemer;
     p_spu->b_subtitle = p_spu_properties->b_subtitle;
 
+    if( p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
+    {
+        /* This subtitle will live for 5 seconds or until the next subtitle */
+        p_spu->i_stop = p_spu->i_start + (mtime_t)500 * 11000;
+        p_spu->b_ephemer = true;
+    }
+
     /* we are going to expand the RLE stuff so that we won't need to read
      * nibbles later on. This will speed things up a lot. Plus, we'll only
      * need to do this stupid interlacing stuff once.
@@ -160,6 +167,55 @@ static void OutputPicture( decoder_t *p_dec,
     free( p_pixeldata );
 
     pf_queue( p_dec, p_spu );
+}
+
+static int Validate( decoder_t *p_dec, unsigned i_index,
+                     unsigned i_cur_seq, unsigned i_next_seq,
+                     const subpicture_data_t *p_spu_data,
+                     const spu_properties_t *p_spu_properties )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* Check that the next sequence index matches the current one */
+    if( i_next_seq != i_cur_seq )
+    {
+        msg_Err( p_dec, "index mismatch (0x%.4x != 0x%.4x)",
+                 i_next_seq, i_cur_seq );
+        return VLC_EGENERIC;
+    }
+
+    if( i_index > p_sys->i_spu_size )
+    {
+        msg_Err( p_dec, "uh-oh, we went too far (0x%.4x > 0x%.4x)",
+                 i_index, p_sys->i_spu_size );
+        return VLC_EGENERIC;
+    }
+
+    const int i_spu_size = p_sys->i_spu - 4;
+    if( p_spu_data->pi_offset[0] < 0 || p_spu_data->pi_offset[0] >= i_spu_size ||
+        p_spu_data->pi_offset[1] < 0 || p_spu_data->pi_offset[1] >= i_spu_size )
+    {
+        msg_Err( p_dec, "invalid offset values" );
+        return VLC_EGENERIC;
+    }
+
+    if( p_spu_properties->i_start == VLC_TS_INVALID )
+    {
+        msg_Err( p_dec, "no `start display' command" );
+        return VLC_EGENERIC;
+    }
+
+    /* Get rid of padding bytes */
+    if( p_sys->i_spu_size > i_index + 1 )
+    {
+        /* Zero or one padding byte are quite usual
+         * More than one padding byte - this is very strange, but
+         * we can ignore them. */
+        msg_Warn( p_dec, "%i padding bytes, we usually get 0 or 1 of them",
+                  p_sys->i_spu_size - i_index );
+    }
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -424,54 +480,10 @@ static int ParseControlSeq( decoder_t *p_dec, mtime_t i_pts,
             break;
     }
 
-    /* Check that the next sequence index matches the current one */
-    if( i_next_seq != i_cur_seq )
-    {
-        msg_Err( p_dec, "index mismatch (0x%.4x != 0x%.4x)",
-                 i_next_seq, i_cur_seq );
-        return VLC_EGENERIC;
-    }
-
-    if( i_index > p_sys->i_spu_size )
-    {
-        msg_Err( p_dec, "uh-oh, we went too far (0x%.4x > 0x%.4x)",
-                 i_index, p_sys->i_spu_size );
-        return VLC_EGENERIC;
-    }
-
-    const int i_spu_size = p_sys->i_spu - 4;
-    if( spu_data.pi_offset[0] < 0 || spu_data.pi_offset[0] >= i_spu_size ||
-        spu_data.pi_offset[1] < 0 || spu_data.pi_offset[1] >= i_spu_size )
-    {
-        msg_Err( p_dec, "invalid offset values" );
-        return VLC_EGENERIC;
-    }
-
-    if( spu_properties.i_start == VLC_TS_INVALID )
-    {
-        msg_Err( p_dec, "no `start display' command" );
-        return VLC_EGENERIC;
-    }
-
-    if( spu_properties.i_stop <= spu_properties.i_start && !spu_properties.b_ephemer )
-    {
-        /* This subtitle will live for 5 seconds or until the next subtitle */
-        spu_properties.i_stop = spu_properties.i_start + (mtime_t)500 * 11000;
-        spu_properties.b_ephemer = true;
-    }
-
-    /* Get rid of padding bytes */
-    if( p_sys->i_spu_size > i_index + 1 )
-    {
-        /* Zero or one padding byte are quite usual
-         * More than one padding byte - this is very strange, but
-         * we can ignore them. */
-        msg_Warn( p_dec, "%i padding bytes, we usually get 0 or 1 of them",
-                  p_sys->i_spu_size - i_index );
-    }
-
     /* Successfully parsed ! */
-    OutputPicture( p_dec, &spu_data, &spu_properties, pf_queue );
+    if( Validate( p_dec, i_index, i_cur_seq, i_next_seq,
+                  &spu_data, &spu_properties ) == VLC_SUCCESS )
+        OutputPicture( p_dec, &spu_data, &spu_properties, pf_queue );
 
     return VLC_SUCCESS;
 }
