@@ -31,8 +31,7 @@ NavigableFocusScope {
     property int marginBottom: root.cellHeight / 2
     property int marginTop: root.cellHeight / 3
 
-    //model to be rendered, model has to be passed twice, as they cannot be shared between views
-    property alias model: flickable.model
+    property variant model
     property int modelCount: 0
 
     property int currentIndex: 0
@@ -58,13 +57,10 @@ NavigableFocusScope {
     signal selectAll()
     signal actionAtIndex(int index)
 
-    property double _expandRetractSpeed: 1.
+    property variant _idChildrenMap: ({})
+    property variant _unusedItemList: []
 
     Accessible.role: Accessible.Table
-
-    function renderLayout() {
-        flickable.layout()
-    }
 
     function switchExpandItem(index) {
         if (modelCount === 0)
@@ -115,9 +111,19 @@ NavigableFocusScope {
         })
     }
 
+    function _updateSelected() {
+        for (var id in _idChildrenMap) {
+            var item = _idChildrenMap[id]
+            item.selected = model.items.get(id).inSelected
+        }
+    }
+
     //Gridview visible above the expanded item
     Flickable {
         id: flickable
+
+        property alias expandItem: expandItemLoader.item
+
         clip: true
 
         flickableDirection: Flickable.VerticalFlick
@@ -145,9 +151,6 @@ NavigableFocusScope {
         }
 
 
-        property variant model
-        property alias expandItem: expandItemLoader.item
-        //root.expandDelegate.createObject(contentItem, {"height": 0})
         Loader {
             id: expandItemLoader
             sourceComponent: expandDelegate
@@ -158,9 +161,9 @@ NavigableFocusScope {
 
 
         anchors.fill: parent
-        onWidthChanged: { layout() }
-        onHeightChanged: { layout() }
-        onContentYChanged: { layout() }
+        onWidthChanged: { layout(true) }
+        onHeightChanged: { layout(false) }
+        onContentYChanged: { layout(false) }
 
         function getExpandItemGridId() {
             var ret
@@ -173,9 +176,6 @@ NavigableFocusScope {
             }
             return ret
         }
-
-        property variant idChildrenMap: ({})
-        property variant _unusedItemList: []
 
         function getFirstAndLastInstanciatedItemIds() {
             var myContentY = contentY - root.headerHeight
@@ -205,8 +205,8 @@ NavigableFocusScope {
 
         function getChild(id, toUse) {
             var ret
-            if (id in idChildrenMap) {
-                ret = idChildrenMap[id]
+            if (id in _idChildrenMap) {
+                ret = _idChildrenMap[id]
                 if (ret === undefined)
                     throw "wrong child: " + id
             }
@@ -214,12 +214,27 @@ NavigableFocusScope {
                 ret = toUse.pop()
                 if (ret === undefined)
                     throw "wrong toRecycle child " + id + ", len " + toUse.length
-                idChildrenMap[id] = ret
+                _idChildrenMap[id] = ret
             }
             return ret
         }
 
-        function layout() {
+        function initialiseItem(item, i, ydelta) {
+            var pos = root.getItemPos(i)
+            _defineObjProperty(item, "index", i)
+            //theses needs an actual binding
+            //item.selected = Qt.binding(function() { return model.items.get(i).inSelected })
+            item.model = model.items.get(i).model
+            //console.log("initialize", .inSelected)
+
+            //theses properties are always defined in Item
+            item.focus = (i === root.currentIndex) && (root._expandIndex === -1)
+            item.x = pos[0]
+            item.y = pos[1] + ydelta
+            item.visible = true
+        }
+
+        function layout(forceRelayout) {
             var i
             var expandItemGridId = getExpandItemGridId()
 
@@ -233,8 +248,8 @@ NavigableFocusScope {
             // Clean the no longer used ids
             var toKeep = {}
 
-            for (var id in idChildrenMap) {
-                var val = idChildrenMap[id]
+            for (var id in _idChildrenMap) {
+                var val = _idChildrenMap[id]
 
                 if (id >= firstId && id < lastId) {
                     toKeep[id] = val
@@ -243,7 +258,7 @@ NavigableFocusScope {
                     val.visible = false
                 }
             }
-            idChildrenMap = toKeep
+            _idChildrenMap = toKeep
 
             // Create delegates if we do not have enough
             if (nbItems > _unusedItemList.length + Object.keys(toKeep).length) {
@@ -254,19 +269,14 @@ NavigableFocusScope {
                 }
             }
 
+            var item
+            var pos
             // Place the delegates before the expandItem
             for (i = firstId; i < topGridEndId; ++i) {
-                var pos = root.getItemPos(i)
-                var item = getChild(i, _unusedItemList)
-                _defineObjProperty(item, "index", i)
-                //theses needs an actual binding
-                item.selected = model.items.get(i).inSelected
-                item.model = model.items.get(i).model
-                //theses properties are always defined in Item
-                item.focus = false
-                item.x = pos[0]
-                item.y = pos[1]
-                item.visible = true
+                if (!forceRelayout && i in _idChildrenMap)
+                    continue
+                item = getChild(i, _unusedItemList)
+                initialiseItem(item, i, 0)
             }
 
             if (root._expandIndex !== -1)
@@ -274,17 +284,10 @@ NavigableFocusScope {
 
             // Place the delegates after the expandItem
             for (i = topGridEndId; i < lastId; ++i) {
-                pos = root.getItemPos(i)
+                if (!forceRelayout && i in _idChildrenMap)
+                    continue
                 item = getChild(i, _unusedItemList)
-                _defineObjProperty(item, "index", i)
-                //theses needs an actual binding
-                item.selected = model.items.get(i).inSelected
-                item.model = model.items.get(i).model
-                //theses properties are always defined in Item
-                item.focus = false
-                item.x = pos[0]
-                item.y = pos[1] + expandItem.height
-                item.visible = true
+                initialiseItem(item, i, expandItem.height)
             }
 
             // Calculate and set the contentHeight
@@ -293,7 +296,8 @@ NavigableFocusScope {
                 newContentHeight += expandItem.height
             contentHeight = newContentHeight
             contentWidth = root.cellWidth * root.getNbItemsPerRow()
-            setCurrentItemFocus()
+
+            _updateSelected()
         }
 
         Connections {
@@ -304,14 +308,14 @@ NavigableFocusScope {
 
                 //flickable.expandItem.height = 0
                 // Regenerate the gridview layout
-                flickable.layout()
+                flickable.layout(true)
             }
         }
 
         Connections {
             target: flickable.expandItem
             onHeightChanged: {
-                flickable.layout()
+                flickable.layout(true)
             }
             onImplicitHeightChanged: {
                 /* This is the only event we have after the expandItem height content was resized.
@@ -397,10 +401,12 @@ NavigableFocusScope {
         }
 
         function setCurrentItemFocus() {
+            if (_expandIndex !== -1)
+                return
             var child
-            if (currentIndex in idChildrenMap)
-                child = idChildrenMap[currentIndex]
-            if (child !== undefined && _expandIndex === -1)
+            if (currentIndex in _idChildrenMap)
+                child = _idChildrenMap[currentIndex]
+            if (child !== undefined)
                 child.focus = true
         }
     }
@@ -436,7 +442,10 @@ NavigableFocusScope {
     }
 
     onCurrentIndexChanged: {
+        if (_expandIndex !== -1)
+            retract()
         flickable.setCurrentItemFocus()
+        _updateSelected()
         animateToCurrentIndex()
     }
 
@@ -469,16 +478,17 @@ NavigableFocusScope {
             event.accepted = true
         }
 
-        if (newIndex != -1 && newIndex != currentIndex) {
+        if (newIndex !== -1 && newIndex !== currentIndex) {
             event.accepted = true
             var oldIndex = currentIndex
             currentIndex = newIndex
             root.selectionUpdated(event.modifiers, oldIndex, newIndex)
-            flickable.layout()
         }
 
         if (!event.accepted)
             defaultKeyAction(event, currentIndex)
+
+        _updateSelected()
     }
 
     Keys.onReleased: {
@@ -489,5 +499,7 @@ NavigableFocusScope {
             event.accepted = true
             root.actionAtIndex(currentIndex)
         }
+
+        _updateSelected()
     }
 }

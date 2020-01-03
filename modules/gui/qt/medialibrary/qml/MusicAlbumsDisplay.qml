@@ -133,8 +133,8 @@ Widgets.NavigableFocusScope {
 
                 onItemClicked : {
                     delegateModel.updateSelection( modifier , root.currentIndex, index)
-                    root.currentIndex = index
-                    view._switchExpandItem( index )
+                    gridView_id.currentIndex = index
+                    gridView_id.forceActiveFocus()
                 }
             }
 

@@ -143,7 +143,6 @@ Widgets.NavigableFocusScope {
                     videosDelegate.updateSelection( modifier , videosGV.currentIndex, index)
                     videosGV.currentIndex = index
                     videosGV.forceActiveFocus()
-                    videosGV.renderLayout()
                 }
             }
 
