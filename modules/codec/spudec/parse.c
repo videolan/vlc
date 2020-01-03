@@ -72,7 +72,7 @@ static int  ParseControlSeq( decoder_t *, vlc_tick_t i_pts,
                              void(*pf_queue)(decoder_t *, subpicture_t *) );
 static int  ParseRLE       ( decoder_t *, subpicture_data_t *,
                              const spu_properties_t *, uint16_t * );
-static void Render         ( decoder_t *, subpicture_t *, const uint16_t *,
+static int  Render         ( decoder_t *, subpicture_t *, const uint16_t *,
                              const subpicture_data_t *, const spu_properties_t * );
 
 /*****************************************************************************
@@ -246,7 +246,13 @@ static void OutputPicture( decoder_t *p_dec,
              render_spu_data.pi_offset[0], render_spu_data.pi_offset[1] );
 #endif
 
-    Render( p_dec, p_spu, p_pixeldata, &render_spu_data, p_spu_properties );
+    if( Render( p_dec, p_spu, p_pixeldata, &render_spu_data, p_spu_properties ) )
+    {
+        subpicture_Delete( p_spu );
+        free( p_pixeldata );
+        return;
+    }
+
     free( p_pixeldata );
 
     if( p_spu_data->p_pxctli && p_spu )
@@ -827,7 +833,7 @@ static int ParseRLE( decoder_t *p_dec,
     return VLC_SUCCESS;
 }
 
-static void Render( decoder_t *p_dec, subpicture_t *p_spu,
+static int Render( decoder_t *p_dec, subpicture_t *p_spu,
                     const uint16_t *p_pixeldata,
                     const subpicture_data_t *p_spu_data,
                     const spu_properties_t *p_spu_properties )
@@ -862,7 +868,7 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
         fmt.p_palette = NULL;
         video_format_Clean( &fmt );
         msg_Err( p_dec, "cannot allocate SPU region" );
-        return;
+        return VLC_EGENERIC;
     }
 
     p_spu->p_region->i_x = p_spu_properties->i_x;
@@ -885,4 +891,6 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
 
     fmt.p_palette = NULL;
     video_format_Clean( &fmt );
+
+    return VLC_SUCCESS;
 }
