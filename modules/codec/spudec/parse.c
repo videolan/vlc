@@ -177,9 +177,9 @@ static int Validate( decoder_t *p_dec, unsigned i_index,
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     /* Check that the next sequence index matches the current one */
-    if( i_next_seq != i_cur_seq )
+    if( i_next_seq < i_cur_seq )
     {
-        msg_Err( p_dec, "index mismatch (0x%.4x != 0x%.4x)",
+        msg_Err( p_dec, "index mismatch (0x%.4x < 0x%.4x)",
                  i_next_seq, i_cur_seq );
         return VLC_EGENERIC;
     }
@@ -206,7 +206,7 @@ static int Validate( decoder_t *p_dec, unsigned i_index,
     }
 
     /* Get rid of padding bytes */
-    if( p_sys->i_spu_size > i_index + 1 )
+    if( i_index > i_next_seq && p_sys->i_spu_size > i_index + 1 )
     {
         /* Zero or one padding byte are quite usual
          * More than one padding byte - this is very strange, but
@@ -447,6 +447,11 @@ static int ParseControlSeq( decoder_t *p_dec, mtime_t i_pts,
             }
 
             i_index += 1;
+
+            if( Validate( p_dec, i_index, i_cur_seq, i_next_seq,
+                          &spu_data, &spu_properties ) == VLC_SUCCESS )
+                OutputPicture( p_dec, &spu_data, &spu_properties, pf_queue );
+
             break;
 
         default: /* xx (unknown command) */
@@ -481,9 +486,6 @@ static int ParseControlSeq( decoder_t *p_dec, mtime_t i_pts,
     }
 
     /* Successfully parsed ! */
-    if( Validate( p_dec, i_index, i_cur_seq, i_next_seq,
-                  &spu_data, &spu_properties ) == VLC_SUCCESS )
-        OutputPicture( p_dec, &spu_data, &spu_properties, pf_queue );
 
     return VLC_SUCCESS;
 }
