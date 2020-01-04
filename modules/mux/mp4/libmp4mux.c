@@ -533,9 +533,11 @@ static bo_t *GetEDTS( mp4mux_trackinfo_t *p_track, uint32_t i_movietimescale, bo
 static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
 {
     bo_t *esds;
+    const uint8_t *p_extradata = p_track->fmt.p_extra;
+    int i_extradata = p_track->fmt.i_extra;
 
     /* */
-    int i_decoder_specific_info_size = (p_track->fmt.i_extra > 0) ? 5 + p_track->fmt.i_extra : 0;
+    int i_decoder_specific_info_size = (i_extradata > 0) ? 5 + i_extradata : 0;
 
     esds = box_full_new("esds", 0, 0);
     if(!esds)
@@ -631,12 +633,12 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
     bo_add_32be(esds, i_bitrate_max);     // maxBitrate
     bo_add_32be(esds, i_bitrate_avg);     // avgBitrate
 
-    if (p_track->fmt.i_extra > 0) {
+    if (i_extradata > 0) {
         /* DecoderSpecificInfo */
-        bo_add_mp4_tag_descr(esds, 0x05, p_track->fmt.i_extra);
+        bo_add_mp4_tag_descr(esds, 0x05, i_extradata);
 
-        for (int i = 0; i < p_track->fmt.i_extra; i++)
-            bo_add_8(esds, ((uint8_t*)p_track->fmt.p_extra)[i]);
+        for (int i = 0; i < i_extradata; i++)
+            bo_add_8(esds, p_extradata[i]);
     }
 
     /* SL_Descr mandatory */
