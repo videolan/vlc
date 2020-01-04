@@ -533,15 +533,44 @@ static bo_t *GetEDTS( mp4mux_trackinfo_t *p_track, uint32_t i_movietimescale, bo
 static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
 {
     bo_t *esds;
-    const uint8_t *p_extradata = p_track->fmt.p_extra;
-    int i_extradata = p_track->fmt.i_extra;
+    const uint8_t *p_extradata = NULL;
+    int i_extradata = 0;
+    uint8_t *p_extradata_allocated = NULL;
+
+    switch(p_track->fmt.i_codec)
+    {
+        case VLC_CODEC_SPU:
+            if(p_track->fmt.subs.spu.palette[0] == SPU_PALETTE_DEFINED)
+            {
+#ifndef WORDS_BIGENDIAN
+                p_extradata = p_extradata_allocated = malloc(16*4);
+                if(p_extradata_allocated)
+                {
+                    for(int i=0; i<16; i++)
+                        SetDWBE(&p_extradata_allocated[i*4], p_track->fmt.subs.spu.palette[i+1]);
+                    i_extradata = 16*4;
+                }
+#else
+                p_extradata = (const uint8_t *) &p_track->fmt.subs.spu.palette[1];
+                i_extradata = 16 * sizeof(p_track->fmt.subs.spu.palette[1]);
+#endif
+            }
+            break;
+        default:
+            p_extradata = p_track->fmt.p_extra;
+            i_extradata = p_track->fmt.i_extra;
+            break;
+    }
 
     /* */
     int i_decoder_specific_info_size = (i_extradata > 0) ? 5 + i_extradata : 0;
 
     esds = box_full_new("esds", 0, 0);
     if(!esds)
+    {
+        free(p_extradata_allocated);
         return NULL;
+    }
 
     /* Compute Max bitrate */
     int64_t i_bitrate_avg = 0;
@@ -605,6 +634,9 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
     case VLC_CODEC_DTS:
         i_object_profile_indication = 0xa9; /* Core Substream */
         break;
+    case VLC_CODEC_SPU:
+        i_object_profile_indication = 0xe0; /* NeroDigital SPU mapping */
+        break;
     default:
         i_object_profile_indication = 0xFE; /* No profile specified */
         break;
@@ -639,6 +671,8 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
 
         for (int i = 0; i < i_extradata; i++)
             bo_add_8(esds, p_extradata[i]);
+
+        free(p_extradata_allocated);
     }
 
     /* SL_Descr mandatory */
@@ -1382,6 +1416,13 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 
         return stpp;
     }
+    else if(p_track->fmt.i_codec == VLC_CODEC_SPU)
+    {
+        bo_t *mp4s = box_full_new("mp4s", 0, 0);
+        bo_add_32be(mp4s, 1); // index
+        box_gather(mp4s, GetESDS(p_track));
+        return mp4s;
+    }
 
     return NULL;
 }
@@ -1889,6 +1930,8 @@ bo_t * mp4mux_GetMoov(mp4mux_handle_t *h, vlc_object_t *p_obj, vlc_tick_t i_dura
                 bo_add_fourcc(hdlr, (h->options & QUICKTIME) ? "sbtl" : "text");
             else if(p_stream->fmt.i_codec == VLC_CODEC_TTML)
                 bo_add_fourcc(hdlr, "sbtl");
+            else if(p_stream->fmt.i_codec == VLC_CODEC_SPU)
+                bo_add_fourcc(hdlr, "subp");
             else
                 bo_add_fourcc(hdlr, "text");
         }
@@ -1905,7 +1948,17 @@ bo_t * mp4mux_GetMoov(mp4mux_handle_t *h, vlc_object_t *p_obj, vlc_tick_t i_dura
         else if (p_stream->fmt.i_cat == VIDEO_ES)
             bo_add_mem(hdlr, 12, (uint8_t*)"VideoHandler");
         else
-            bo_add_mem(hdlr, 12, (uint8_t*)"Text Handler");
+        {
+            if( p_stream->fmt.i_codec == VLC_CODEC_SPU )
+            {
+                char language[13] = { 0 };
+                if( p_stream->fmt.psz_language )
+                    strncpy( language, p_stream->fmt.psz_language, 12 );
+                bo_add_mem(hdlr, 12, language);
+            }
+            else
+                bo_add_mem(hdlr, 12, (uint8_t*)"Text Handler");
+        }
 
         if ((h->options & QUICKTIME) == 0)
             bo_add_8(hdlr, 0);   /* asciiz string for .mp4, yes that's BRAIN DAMAGED F**K MP4 */
@@ -2127,6 +2180,8 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
             return false;
         }
         break;
+    case VLC_CODEC_SPU:
+            return i_brand != BRAND_qt__;
     case VLC_CODEC_SUBT:
         if(p_obj)
             msg_Warn(p_obj, "subtitle track added like in .mov (even when creating .mp4)");
