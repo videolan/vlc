@@ -1292,7 +1292,7 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         }
         return text;
     }
-    else if(p_track->fmt.i_codec == VLC_CODEC_SPU ||
+    else if(p_track->fmt.i_codec == VLC_CODEC_SUBT ||
             p_track->fmt.i_codec == VLC_CODEC_TX3G)
     {
         bo_t *tx3g = box_new("tx3g");
