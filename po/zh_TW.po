@@ -4,14 +4,13 @@
 #
 # Translators:
 # Cheng-Chia Tseng <pswo10680@gmail.com>, 2017
-# Hsiu-Ming Chang <cges30901@gmail.com>, 2016,2019
+# Chen Wang <iwangce@gmail.com>, 2013
 # Ethan Chan <yunsangc207@gmail.com>, 2015
 # Frank Chao <frank0624@gmail.com>, 2013,2015,2017-2018
+# Hsiu-Ming Chang <cges30901@gmail.com>, 2016,2019
 # Jeff Huang <s8321414@gmail.com>, 2014
 # Taijuin Lee <taijuin@gmail.com>, 2013
 # Timo Liu <timoliu@gmail.com>, 2016
-# Chen Wang <iwangce@gmail.com>, 2013
-# Jeff Huang <s8321414@gmail.com>, 2014
 # 盧瑞元（ryuanlu） <rueiyuan.lu@gmail.com>, 2012,2017
 # 洪嘉鴻 <jerry9030@gmail.com>, 2018
 msgid ""
@@ -19,8 +18,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-03-23 15:45+0100\n"
-"Last-Translator: Hsiu-Ming Chang <cges30901@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-02-19 16:19+0100\n"
+"Last-Translator: byStarTW <pan93412@gmail.com>, 2020\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/yaron/teams/16553/"
 "zh_TW/)\n"
 "Language: zh_TW\n"
@@ -1224,15 +1223,15 @@ msgstr "最小輝度"
 
 #: src/input/es_out.c:3318
 msgid "Primary R"
-msgstr ""
+msgstr "主 R"
 
 #: src/input/es_out.c:3325
 msgid "Primary G"
-msgstr ""
+msgstr "主 G"
 
 #: src/input/es_out.c:3332
 msgid "Primary B"
-msgstr ""
+msgstr "主 B"
 
 #: src/input/es_out.c:3339
 msgid "White point"
@@ -10058,15 +10057,15 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1460
 msgid "Disabled"
-msgstr ""
+msgstr "停用"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "啟用 (僅 AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
-msgstr ""
+msgstr "啟用"
 
 #: modules/audio_output/mmdevice.c:1473
 msgid "Windows Multimedia Device output"
