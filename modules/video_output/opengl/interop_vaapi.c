@@ -426,7 +426,7 @@ error:
 
 vlc_module_begin ()
     set_description("VA-API OpenGL surface converter")
-    set_capability("glconv", 1)
+    set_capability("glinterop", 1)
     set_callbacks(Open, Close)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)

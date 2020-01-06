@@ -229,7 +229,7 @@ DecoderDeviceOpen(vlc_decoder_device *device, vout_window_t *window)
 
 vlc_module_begin ()
     set_description("VDPAU OpenGL surface converter")
-    set_capability("glconv", 2)
+    set_capability("glinterop", 2)
     set_callbacks(Open, Close)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)

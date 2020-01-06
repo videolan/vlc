@@ -115,7 +115,7 @@ vlc_module_begin ()
 #ifdef HAVE_GL
     add_submodule()
     set_description("DX OpenGL surface converter for D3D9")
-    set_capability("glconv", 1)
+    set_capability("glinterop", 1)
     set_callbacks(GLConvOpen, GLConvClose)
 #endif
 vlc_module_end ()
