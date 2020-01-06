@@ -30,9 +30,9 @@ libdecklinkoutput_plugin_la_LIBADD = $(LIBS_decklink) $(LIBDL) -lpthread
 vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
 
-libglconv_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.c \
+libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.c \
 	video_output/opengl/interop.h
-libglconv_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
 
 if HAVE_OSX
 libvout_macosx_plugin_la_SOURCES = video_output/macosx.m $(OPENGL_COMMONSOURCES)
@@ -47,14 +47,14 @@ libcaopengllayer_plugin_la_LIBADD = $(OPENGL_COMMONLIBS)
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 
-libglconv_cvpx_plugin_la_SOURCES += codec/vt_utils.c codec/vt_utils.h
-libglconv_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface \
+libglinterop_cvpx_plugin_la_SOURCES += codec/vt_utils.c codec/vt_utils.h
+libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface \
 	-Wl,-framework,Foundation,-framework,CoreVideo,-framework,OpenGL
 vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la \
-	libglconv_cvpx_plugin.la
+	libglinterop_cvpx_plugin.la
 endif
 if HAVE_IOS
-libglconv_cvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
+libglinterop_cvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
 endif
 
 libvout_ios_plugin_la_SOURCES = video_output/ios.m $(OPENGL_COMMONSOURCES)
@@ -63,10 +63,10 @@ libvout_ios_plugin_la_LIBADD = $(OPENGL_COMMONLIBS)
 libvout_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit
 if HAVE_IOS
-vout_LTLIBRARIES += libvout_ios_plugin.la libglconv_cvpx_plugin.la
+vout_LTLIBRARIES += libvout_ios_plugin.la libglinterop_cvpx_plugin.la
 endif
 if HAVE_TVOS
-vout_LTLIBRARIES += libvout_ios_plugin.la libglconv_cvpx_plugin.la
+vout_LTLIBRARIES += libvout_ios_plugin.la libglinterop_cvpx_plugin.la
 endif
 
 ### OpenGL ###
@@ -86,27 +86,27 @@ libgl_plugin_la_CFLAGS += -DHAVE_GL_CORE_SYMBOLS
 libgl_plugin_la_LIBADD += $(GL_LIBS)
 endif
 
-libglconv_vaapi_plugin_la_SOURCES = video_output/opengl/interop_vaapi.c \
+libglinterop_vaapi_plugin_la_SOURCES = video_output/opengl/interop_vaapi.c \
 	video_output/opengl/interop.h \
 	hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h
-libglconv_vaapi_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
-libglconv_vaapi_plugin_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_EGL_LIBS)
+libglinterop_vaapi_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
+libglinterop_vaapi_plugin_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_EGL_LIBS)
 
-libglconv_vdpau_plugin_la_SOURCES = video_output/opengl/interop_vdpau.c \
+libglinterop_vdpau_plugin_la_SOURCES = video_output/opengl/interop_vdpau.c \
 	video_output/opengl/interop.h hw/vdpau/picture.c hw/vdpau/vlc_vdpau.h
-libglconv_vdpau_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS)
-libglconv_vdpau_plugin_la_LIBADD = $(LIBDL) libvlc_vdpau.la $(X_LIBS) $(X_PRE_LIBS) -lX11
+libglinterop_vdpau_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS)
+libglinterop_vdpau_plugin_la_LIBADD = $(LIBDL) libvlc_vdpau.la $(X_LIBS) $(X_PRE_LIBS) -lX11
 
 if HAVE_GL
 vout_LTLIBRARIES += libgl_plugin.la
 if HAVE_EGL
 if HAVE_VAAPI
-vout_LTLIBRARIES += libglconv_vaapi_plugin.la
+vout_LTLIBRARIES += libglinterop_vaapi_plugin.la
 endif
 endif # HAVE_EGL
 
 if HAVE_VDPAU
-vout_LTLIBRARIES += libglconv_vdpau_plugin.la
+vout_LTLIBRARIES += libglinterop_vdpau_plugin.la
 endif
 endif # HAVE_GL
 
@@ -279,14 +279,14 @@ libandroid_display_plugin_la_SOURCES = video_output/android/display.c \
 libandroid_display_plugin_la_CFLAGS = $(AM_CFLAGS)
 libandroid_display_plugin_la_LIBADD = $(LIBDL)
 
-libglconv_android_plugin_la_SOURCES = video_output/opengl/interop_android.c \
+libglinterop_android_plugin_la_SOURCES = video_output/opengl/interop_android.c \
 	video_output/opengl/interop.h
-libglconv_android_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
+libglinterop_android_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
 
 if HAVE_ANDROID
 vout_LTLIBRARIES += libandroid_window_plugin.la libandroid_display_plugin.la
 if HAVE_EGL
-vout_LTLIBRARIES += libegl_android_plugin.la libglconv_android_plugin.la
+vout_LTLIBRARIES += libegl_android_plugin.la libglinterop_android_plugin.la
 endif
 endif
 
