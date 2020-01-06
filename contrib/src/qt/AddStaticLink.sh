@@ -6,7 +6,7 @@
 #
 # This could also be done in configure.ac to detect what plugins are available and where to add them
 
-PREFIX=$(python -c "import os; print(os.path.realpath('$1'))")
+PREFIX=$(python3 -c "import os; print(os.path.realpath('$1'))")
 PLUGIN_PATH="$3"
 PLUGIN_NAME="$4"
 
