@@ -20,7 +20,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-static inline void vobsub_palette_rgb2yuv( const uint32_t *src, uint32_t *dst )
+static inline void vobsub_palette_argb2ayvu( const uint32_t *src, uint32_t *dst )
 {
     int i;
     for( i = 0; i < 16; i++ )
@@ -49,7 +49,7 @@ static inline int vobsub_palette_parse( const char *psz_buf, uint32_t *pu_palett
                 &palette[8], &palette[9], &palette[10], &palette[11],
                 &palette[12], &palette[13], &palette[14], &palette[15] ) == 16 )
     {
-        vobsub_palette_rgb2yuv( palette, pu_palette );
+        vobsub_palette_argb2ayvu( palette, pu_palette );
         return VLC_SUCCESS;
     }
     else
