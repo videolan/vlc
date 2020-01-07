@@ -130,10 +130,11 @@ void NetworkMediaModel::setIndexed(bool indexed)
     if (indexed == m_indexed || !m_canBeIndexed)
         return;
     int res;
-    if ( indexed )
-        res = vlc_ml_add_folder( m_ml, qtu( m_url.toString( QUrl::None ) ) );
-    else
-        res = vlc_ml_remove_folder( m_ml, qtu( m_url.toString( QUrl::None ) ) );
+    if ( indexed ) {
+        printf("add folder %s\n", qtu( m_url.toString( QUrl::FullyEncoded ) ));
+        res = vlc_ml_add_folder( m_ml, qtu( m_url.toString( QUrl::FullyEncoded ) ) );
+    } else
+        res = vlc_ml_remove_folder( m_ml, qtu( m_url.toString( QUrl::FullyEncoded ) ) );
 
     if (res == VLC_SUCCESS) {
         m_indexed = indexed;
