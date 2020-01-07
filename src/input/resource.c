@@ -410,6 +410,9 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
         assert(p_resource->i_vout > 0);
         *order = p_resource->pp_vout[0] == cfg->vout ? VLC_VOUT_ORDER_PRIMARY
                                                      : VLC_VOUT_ORDER_SECONDARY;
+        /* the caller is going to reuse the free vout, it's not free anymore */
+        if (p_resource->p_vout_free == cfg->vout)
+            p_resource->p_vout_free = NULL;
         vlc_mutex_unlock(&p_resource->lock_hold);
     }
 
