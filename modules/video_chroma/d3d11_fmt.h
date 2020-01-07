@@ -61,6 +61,7 @@ typedef struct
     pD3DCompile               OurD3DCompile;
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE                 dxgidebug_dll;
+    HRESULT (WINAPI * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
 #endif
 #endif
 } d3d11_handle_t;
@@ -163,6 +164,7 @@ int D3D11_Create(vlc_object_t *, d3d11_handle_t *, bool with_shaders);
 #define D3D11_Create(a,b,c) D3D11_Create( VLC_OBJECT(a), b, c )
 
 void D3D11_Destroy(d3d11_handle_t *);
+void D3D11_LogResources(d3d11_handle_t *);
 
 bool isXboxHardware(ID3D11Device *d3ddev);
 IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
