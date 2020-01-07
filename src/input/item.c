@@ -1187,6 +1187,7 @@ static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net
         { "fd",     ITEM_TYPE_UNKNOWN, false },
         { "file",   ITEM_TYPE_FILE, false },
         { "ftp",    ITEM_TYPE_FILE, true },
+        { "gopher", ITEM_TYPE_STREAM, true },
         { "http",   ITEM_TYPE_FILE, true },
         { "icyx",   ITEM_TYPE_STREAM, true },
         { "imem",   ITEM_TYPE_UNKNOWN, false },

@@ -119,7 +119,6 @@ static int GopherOpen(vlc_object_t *obj)
     vlc_tls_t *sock;
     vlc_url_t url;
 
-
     if (vlc_UrlParse(&url, access->psz_url) || url.psz_host == NULL) 
     {
         msg_Err(access, "invalid location: %s", access->psz_location);
