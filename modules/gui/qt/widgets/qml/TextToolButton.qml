@@ -45,12 +45,11 @@ ToolButton {
                 bottom: parent.bottom
             }
             height: 2
-            visible: control.activeFocus || control.checked
+            visible: control.checked
             color: control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.bgHover
         }
     }
 
-    background: Rectangle {
-        color: "transparent"
+    background: FocusBackground {
     }
 }

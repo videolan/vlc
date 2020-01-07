@@ -104,9 +104,9 @@ T.MenuItem {
     }
 
 
-    background: Rectangle {
+    background: Widgets.FocusBackground {
         implicitHeight: VLCStyle.fontHeight_normal
-        color: control.highlighted ? VLCStyle.colors.accent : "transparent"
+        active: control.highlighted
     }
 
     //hack around QTBUG-79115

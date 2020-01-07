@@ -26,8 +26,6 @@ ToolButton {
 
     property int size: VLCStyle.icon_normal
 
-    property color highlightColor: VLCStyle.colors.accent
-
     padding: 0
 
     property string iconText: ""
@@ -40,12 +38,6 @@ ToolButton {
     enabled: !paintOnly
 
     contentItem: Item {
-
-        Rectangle {
-            anchors.fill: parent
-            visible: control.activeFocus || control.hovered || control.highlighted
-            color: highlightColor
-        }
 
         Label {
             id: text
@@ -98,9 +90,9 @@ ToolButton {
         }
     }
 
-    background: Rectangle {
+    background: FocusBackground {
+        active: control.activeFocus || control.hovered || control.highlighted
         implicitHeight: control.size
         implicitWidth: control.size
-        color: "transparent"
     }
 }

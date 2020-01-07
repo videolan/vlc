@@ -63,13 +63,12 @@ Widgets.NavigableFocusScope {
             anchors.rightMargin: VLCStyle.applicationHorizontalMargin
             anchors.bottomMargin: VLCStyle.applicationVerticalMargin
 
-            Rectangle {
+            Widgets.FocusBackground {
                 id: playingItemInfo
                 Layout.fillHeight: true
                 Layout.preferredWidth: playingItemInfoRow.implicitWidth
                 width: childrenRect.width
                 focus: true
-                color: activeFocus ? VLCStyle.colors.accent :  "transparent"
 
                 MouseArea {
                     anchors.fill: parent

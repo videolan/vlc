@@ -40,12 +40,10 @@ T.TabButton {
 
     font.pixelSize: VLCStyle.fontSize_normal
 
-    background: Rectangle {
+    background: FocusBackground {
         height: control.height
         width: control.width
-        color: (control.activeFocus || control.hovered)
-               ? VLCStyle.colors.accent
-               : control.bgColor
+        active: (control.activeFocus || control.hovered)
     }
 
     contentItem: Item {

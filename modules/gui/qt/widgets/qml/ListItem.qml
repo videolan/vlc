@@ -59,9 +59,6 @@ NavigableFocusScope {
 
             font.underline: activeFocus
 
-            highlightColor: VLCStyle.colors.getBgColor(
-                                root.isSelected, root.hovered,
-                                root.activeFocus)
             //visible: mouse.containsMouse || root.activeFocus
             onClicked: root.addToPlaylistClicked()
         }
@@ -81,9 +78,6 @@ NavigableFocusScope {
 
             font.underline: activeFocus
 
-            highlightColor: VLCStyle.colors.getBgColor(
-                                root.isSelected, root.hovered,
-                                root.activeFocus)
             onClicked: root.playClicked()
         }
     }
@@ -215,9 +209,6 @@ NavigableFocusScope {
 
                                 font.underline: activeFocus
 
-                                highlightColor: VLCStyle.colors.getBgColor(
-                                                    root.isSelected, root.hovered,
-                                                    root.activeFocus)
                                 onClicked: root.contextMenuButtonClicked(this)
                             }
                         }
