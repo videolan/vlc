@@ -711,31 +711,47 @@ int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d, bool with_shaders)
             return VLC_EGENERIC;
         }
     }
-#endif
-    return VLC_SUCCESS;
-}
-
-void D3D11_Destroy(d3d11_handle_t *hd3d)
-{
-#if !VLC_WINSTORE_APP
 # if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     if (IsDebuggerPresent())
     {
         hd3d->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
-        HRESULT (WINAPI * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug) = NULL;
         if (hd3d->dxgidebug_dll)
-            pf_DXGIGetDebugInterface =
+        {
+            hd3d->pf_DXGIGetDebugInterface =
                     (void *)GetProcAddress(hd3d->dxgidebug_dll, "DXGIGetDebugInterface");
-        if (pf_DXGIGetDebugInterface) {
-            IDXGIDebug *pDXGIDebug;
-            if (SUCCEEDED(pf_DXGIGetDebugInterface(&IID_IDXGIDebug, (void**)&pDXGIDebug)))
+            if (unlikely(!hd3d->pf_DXGIGetDebugInterface))
             {
-                IDXGIDebug_ReportLiveObjects(pDXGIDebug, DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-                IDXGIDebug_Release(pDXGIDebug);
+                FreeLibrary(hd3d->dxgidebug_dll);
+                hd3d->dxgidebug_dll = NULL;
             }
         }
     }
+# endif // !NDEBUG && HAVE_DXGIDEBUG_H
+#endif
+    return VLC_SUCCESS;
+}
+
+void D3D11_LogResources(d3d11_handle_t *hd3d)
+{
+#if !VLC_WINSTORE_APP
+# if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    if (hd3d->pf_DXGIGetDebugInterface)
+    {
+        IDXGIDebug *pDXGIDebug;
+        if (SUCCEEDED(hd3d->pf_DXGIGetDebugInterface(&IID_IDXGIDebug, (void**)&pDXGIDebug)))
+        {
+            IDXGIDebug_ReportLiveObjects(pDXGIDebug, DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+            IDXGIDebug_Release(pDXGIDebug);
+        }
+    }
 # endif
+#endif
+}
+
+void D3D11_Destroy(d3d11_handle_t *hd3d)
+{
+    D3D11_LogResources(hd3d);
+#if !VLC_WINSTORE_APP
     if (hd3d->hdll)
         FreeLibrary(hd3d->hdll);
 
