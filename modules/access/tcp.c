@@ -2,8 +2,10 @@
  * tcp.c: TCP input module
  *****************************************************************************
  * Copyright (C) 2003-2004 VLC authors and VideoLAN
+ * Copyright (C) 2020 Vincenzo "KatolaZ" Nicosia
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Vincenzo "KatolaZ" Nicosia <katolaz@freaknet.org> (gopher sub-module)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -29,8 +31,12 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
+#include <vlc_messages.h>
 #include <vlc_url.h>
 #include <vlc_tls.h>
+
+#include <stdlib.h>
+#include <string.h>
 
 static ssize_t Read(stream_t *access, void *buf, size_t len)
 {
@@ -106,6 +112,74 @@ static void Close( vlc_object_t *p_this )
     vlc_tls_SessionDelete(access->p_sys);
 }
 
+static int GopherOpen(vlc_object_t *obj)
+{
+    char *psz_path = NULL;
+    stream_t *access = (stream_t *)obj;
+    vlc_tls_t *sock;
+    vlc_url_t url;
+
+
+    if (vlc_UrlParse(&url, access->psz_url) || url.psz_host == NULL) 
+    {
+        msg_Err(access, "invalid location: %s", access->psz_location);
+        vlc_UrlClean(&url);
+        return VLC_EGENERIC;
+    }
+
+    if (url.i_port == 0)
+    {
+        url.i_port = 70;
+    }
+    sock = vlc_tls_SocketOpenTCP(obj, url.psz_host, url.i_port);
+
+    if (unlikely(sock == NULL))
+    {
+        msg_Err(access, "cannot connect to %s:%d", url.psz_host, url.i_port);
+        vlc_UrlClean(&url);
+        return VLC_EGENERIC;
+    }
+
+    if (url.psz_path == NULL || strlen(url.psz_path) <= 3)
+    {
+        /* If no resource type is specified, look for the root resource */
+        if (asprintf(&psz_path, "\r\n") == -1)
+        {
+            vlc_UrlClean(&url);
+            vlc_tls_SessionDelete(sock);
+            return VLC_EGENERIC;
+        }
+        msg_Warn(access, "path set to root resource");
+    }
+    else { /* strip resource type from URL */
+        if(asprintf(&psz_path, "%s\r\n", url.psz_path+2) == -1)
+        {
+            vlc_UrlClean(&url);
+            vlc_tls_SessionDelete(sock);
+            return VLC_EGENERIC;
+        }
+        msg_Warn(access, "stripped resource type from path");
+    }
+    vlc_UrlClean(&url);
+
+    access->p_sys = sock;
+    access->pf_read = Read;
+    access->pf_block = NULL;
+    access->pf_control = Control;
+    access->pf_seek = NULL;
+
+    msg_Warn(access, "requesting resource: %s", psz_path);
+    if (vlc_tls_Write(access->p_sys, psz_path, strlen(psz_path)) < 0)
+    {
+        vlc_tls_SessionDelete(access->p_sys);
+        free(psz_path);
+        return VLC_EGENERIC;
+    }
+
+    free(psz_path);
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -118,4 +192,14 @@ vlc_module_begin ()
     set_capability( "access", 0 )
     add_shortcut( "tcp" )
     set_callbacks( Open, Close )
+
+/* Gopher submodule */
+    add_submodule ()
+        set_description( N_("Gopher input") )
+        set_capability( "access", 0 )
+        set_shortname( "gopher" )
+        set_category( CAT_INPUT )
+        set_subcategory( SUBCAT_INPUT_ACCESS )
+        add_shortcut( "gopher" )
+        set_callbacks( GopherOpen, Close )
 vlc_module_end ()
