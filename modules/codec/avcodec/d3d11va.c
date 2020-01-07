@@ -113,9 +113,8 @@ struct vlc_va_sys_t
 
     /* pool */
     va_pool_t                     *va_pool;
-    ID3D11VideoDecoderOutputView *hw_surface[MAX_SURFACE_COUNT];
-
-    ID3D11ShaderResourceView     *renderSrc[MAX_SURFACE_COUNT * D3D11_MAX_SHADER_VIEW];
+    ID3D11VideoDecoderOutputView  *hw_surface[MAX_SURFACE_COUNT];
+    ID3D11ShaderResourceView      *renderSrc[MAX_SURFACE_COUNT * D3D11_MAX_SHADER_VIEW];
 };
 
 /* */
@@ -167,7 +166,6 @@ static picture_context_t *d3d11va_pic_context_copy(picture_context_t *ctx)
 }
 
 static struct d3d11va_pic_context *CreatePicContext(
-                                                  ID3D11Resource *p_resource,
                                                   UINT slice,
                                                   ID3D11ShaderResourceView *renderSrc[D3D11_MAX_SHADER_VIEW],
                                                   vlc_video_context *vctx)
@@ -180,6 +178,9 @@ static struct d3d11va_pic_context *CreatePicContext(
         vlc_video_context_Hold(vctx),
     };
 
+    ID3D11Resource *p_resource;
+    ID3D11ShaderResourceView_GetResource(renderSrc[0], &p_resource);
+
     D3D11_TEXTURE2D_DESC txDesc;
     ID3D11Texture2D_GetDesc((ID3D11Texture2D*)p_resource, &txDesc);
 
@@ -190,6 +191,7 @@ static struct d3d11va_pic_context *CreatePicContext(
         pic_ctx->ctx.picsys.renderSrc[i] = renderSrc[i];
     }
     AcquireD3D11PictureSys(&pic_ctx->ctx.picsys);
+    ID3D11Resource_Release(p_resource);
     return pic_ctx;
 }
 
@@ -198,20 +200,16 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *v
     vlc_va_sys_t *sys = va->sys;
     ID3D11VideoDecoderOutputView *surface = sys->hw_surface[va_surface_GetIndex(va_surface)];
     ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW];
-    ID3D11Resource *p_resource;
-    ID3D11VideoDecoderOutputView_GetResource(surface, &p_resource);
 
     D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC viewDesc;
     ID3D11VideoDecoderOutputView_GetDesc(surface, &viewDesc);
 
-    for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++)
+    for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
         resourceView[i] = sys->renderSrc[viewDesc.Texture2D.ArraySlice*D3D11_MAX_SHADER_VIEW + i];
 
     struct d3d11va_pic_context *pic_ctx = CreatePicContext(
-                                                  p_resource,
                                                   viewDesc.Texture2D.ArraySlice,
                                                   resourceView, sys->vctx);
-    ID3D11Resource_Release(p_resource);
     if (unlikely(pic_ctx==NULL))
         return NULL;
     pic_ctx->va_surface = va_surface;
@@ -647,6 +645,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
                                 &sys->renderSrc[surface_idx * D3D11_MAX_SHADER_VIEW]);
         }
     }
+    ID3D11Texture2D_Release(p_texture);
     msg_Dbg(va, "ID3D11VideoDecoderOutputView succeed with %zu surfaces (%dx%d)",
             surface_count, fmt->i_width, fmt->i_height);
 
@@ -723,23 +722,19 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 static void DxDestroySurfaces(void *opaque)
 {
     vlc_va_sys_t *sys = opaque;
+    if (sys->hw.decoder)
+        ID3D11VideoDecoder_Release(sys->hw.decoder);
     if (sys->hw_surface[0]) {
-        ID3D11Resource *p_texture;
-        ID3D11VideoDecoderOutputView_GetResource( sys->hw_surface[0], &p_texture );
-        ID3D11Resource_Release(p_texture);
-        ID3D11Resource_Release(p_texture);
         for (unsigned i = 0; i < sys->hw.surface_count; i++)
         {
-            ID3D11VideoDecoderOutputView_Release( sys->hw_surface[i] );
             for (int j = 0; j < D3D11_MAX_SHADER_VIEW; j++)
             {
                 if (sys->renderSrc[i*D3D11_MAX_SHADER_VIEW + j])
                     ID3D11ShaderResourceView_Release(sys->renderSrc[i*D3D11_MAX_SHADER_VIEW + j]);
             }
+            ID3D11VideoDecoderOutputView_Release( sys->hw_surface[i] );
         }
     }
-    if (sys->hw.decoder)
-        ID3D11VideoDecoder_Release(sys->hw.decoder);
 
     if (sys->d3ddec)
         ID3D11VideoDevice_Release(sys->d3ddec);
