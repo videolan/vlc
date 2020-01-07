@@ -213,7 +213,6 @@ static int assert_staging(filter_t *p_filter, filter_sys_t *sys, DXGI_FORMAT for
         }
     }
 #endif
-    ID3D11Device_Release(d3d_dev.d3ddevice);
     if (FAILED(hr)) {
         msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%lX)", DxgiFormatToStr(texDesc.Format), hr );
         return VLC_EGENERIC;
