@@ -123,8 +123,8 @@ Widgets.NavigableFocusScope {
 
             activeFocusOnTab:true
 
-            cellWidth: VLCStyle.cover_normal + VLCStyle.margin_small
-            cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal * 2
+            cellWidth: VLCStyle.gridItem_music_width
+            cellHeight: VLCStyle.gridItem_music_height
 
             headerDelegate: root.header
 

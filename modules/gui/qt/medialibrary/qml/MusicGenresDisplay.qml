@@ -141,8 +141,8 @@ Widgets.NavigableFocusScope {
 
             focus: true
 
-            cellWidth: VLCStyle.cover_normal + VLCStyle.margin_small
-            cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal
+            cellWidth: VLCStyle.gridItem_music_width
+            cellHeight: VLCStyle.gridItem_music_height
 
             onSelectAll: delegateModel.selectAll()
             onSelectionUpdated:  delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )

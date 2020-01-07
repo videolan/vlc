@@ -81,7 +81,7 @@ Widgets.NavigableFocusScope {
                 onVisibleChanged: topFocusScope.resetFocus()
 
                 width: flickable.width
-                height: VLCStyle.gridItem_default_height
+                height: VLCStyle.gridItem_network_height
                 orientation: ListView.Horizontal
 
                 model: machineDM.parts.grid
@@ -109,7 +109,7 @@ Widgets.NavigableFocusScope {
                 focus: false
 
                 width: flickable.width
-                height: VLCStyle.gridItem_default_height
+                height: VLCStyle.gridItem_network_height
                 orientation: ListView.Horizontal
 
                 model: lanDM.parts.grid

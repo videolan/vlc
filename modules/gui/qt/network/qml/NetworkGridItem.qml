@@ -28,8 +28,12 @@ import "qrc:///style/"
 Widgets.GridItem {
     id: item
 
+    width: VLCStyle.gridItem_network_width
+    height: VLCStyle.gridItem_network_height
+
     pictureWidth: VLCStyle.network_normal
     pictureHeight: VLCStyle.network_normal
+
     image: {
         switch (model.type){
         case NetworkMediaModel.TYPE_DISC:
@@ -46,6 +50,6 @@ Widgets.GridItem {
             return "qrc:///type/directory_black.svg"
         }
     }
-    subtitle: model.mrl
+    subtitle: model.mrl || ""
     title: model.name || i18n.qtr("Unknown share")
 }

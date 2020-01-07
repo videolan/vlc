@@ -25,16 +25,14 @@ import org.videolan.medialib 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Rectangle {
+Item {
     id: root
 
-    color: "transparent"
     property url image
     property string title: ""
     property string subtitle: ""
     property bool selected: false
 
-    property alias sourceSize: cover.sourceSize
     property string infoLeft: ""
     property string resolution: ""
     property bool isVideo: false
@@ -43,8 +41,11 @@ Rectangle {
     property string channel: ""
     property real pictureWidth: isVideo ? VLCStyle.video_normal_width : VLCStyle.cover_small
     property real pictureHeight: isVideo ? VLCStyle.video_normal_height : VLCStyle.cover_small
-    width: gridItem.width
-    height: gridItem.height
+
+    //space use for zoom
+    readonly property real outterMargin: VLCStyle.margin_xxsmall
+    //margin wihtin the tile
+    readonly property real innerMargin: VLCStyle.margin_xxsmall
 
     signal playClicked
     signal addToPlaylistClicked
@@ -52,241 +53,171 @@ Rectangle {
     signal itemDoubleClicked(Item menuParent, int keys, int modifier)
     signal contextMenuButtonClicked(Item menuParent)
 
-    Keys.onMenuPressed: root.contextMenuButtonClicked(cover_bg)
+    Keys.onMenuPressed: root.contextMenuButtonClicked(picture)
 
     Accessible.role: Accessible.Cell
     Accessible.name: title
 
-    Item {
-        id: gridItem
-        width: childrenRect.width
-        height: childrenRect.height
-        
-        MouseArea {
-            id: mouseArea
-            hoverEnabled: true
-            onClicked: {
-                if (mouse.button === Qt.RightButton)
-                    contextMenuButtonClicked(cover_bg);
-                else {
-                    root.itemClicked(cover_bg,mouse.button, mouse.modifiers);
+    implicitWidth: mouseArea.implicitWidth
+    implicitHeight: mouseArea.implicitHeight
+
+    property bool _zoomed: mouseArea.containsMouse || root.activeFocus
+    property real _picWidth: pictureWidth + (_zoomed ? 2*outterMargin : 0)
+    property real _picHeight: pictureHeight + (_zoomed ? 2*outterMargin : 0)
+
+    MouseArea {
+        id: mouseArea
+        hoverEnabled: true
+
+        anchors.fill: parent
+        implicitWidth: zoomArea.implicitWidth + (_zoomed ? 0 : 2*outterMargin)
+        implicitHeight: zoomArea.implicitHeight + (_zoomed ? 0 : 2*outterMargin)
+
+        acceptedButtons: Qt.RightButton | Qt.LeftButton
+        Keys.onMenuPressed: root.contextMenuButtonClicked(picture)
+
+        onClicked: {
+            if (mouse.button === Qt.RightButton)
+                contextMenuButtonClicked(picture);
+            else {
+                root.itemClicked(picture, mouse.button, mouse.modifiers);
+            }
+        }
+
+        onDoubleClicked: {
+            if (mouse.button === Qt.LeftButton)
+                root.itemDoubleClicked(picture,mouse.buttons, mouse.modifiers)
+        }
+
+        FocusBackground {
+            id: zoomArea
+
+            anchors.fill: parent
+            anchors.margins: outterMargin
+
+            implicitWidth: layout.implicitWidth + 2*innerMargin
+            implicitHeight: layout.implicitHeight + 2*innerMargin
+
+            active: root.activeFocus
+            selected: root.selected || mouseArea.containsMouse
+
+            states: [
+                State {
+                    name: "visiblebig"
+                    PropertyChanges {
+                        target: zoomArea
+                        anchors.margins: 0
+                    }
+                    when: _zoomed
+                },
+                State {
+                    name: "hiddensmall"
+                    PropertyChanges {
+                        target: zoomArea
+                        anchors.margins: VLCStyle.margin_xxsmall
+                    }
+                    when: !_zoomed
+                }
+            ]
+
+            Behavior on anchors.margins {
+                SmoothedAnimation {
+                    duration: 100
                 }
             }
-            onDoubleClicked: {
-                root.itemDoubleClicked(cover_bg,mouse.buttons, mouse.modifiers)
-            }
-            width: childrenRect.width
-            height: childrenRect.height
-            acceptedButtons: Qt.RightButton | Qt.LeftButton
-            Keys.onMenuPressed: root.contextMenuButtonClicked(cover_bg)
 
-            Item {
-                id: picture
-                width: root.pictureWidth
-                height: root.pictureHeight
-                anchors.top: mouseArea.top
-                property bool highlighted: selected || root.activeFocus
+            ColumnLayout {
+                id: layout
+                anchors.fill: parent
+                anchors.margins: innerMargin
 
-                Rectangle {
-                    id: cover_bg
-                    width: picture.width
-                    height: picture.height
+                spacing: 0
 
+                Widgets.RoundImage {
+                    id: picture
+                    width: _picWidth
+                    height: _picHeight
+                    Layout.preferredWidth: _picWidth
+                    Layout.preferredHeight: _picHeight
+                    Layout.alignment: Qt.AlignHCenter
 
-                    color: VLCStyle.colors.getBgColor(
-                               selected, mouseArea.containsMouse,
-                               root.activeFocus)
-
-                    RoundImage {
-                        id: cover
-                        anchors.fill: parent
-                        anchors.margins: VLCStyle.margin_normal
-                        source: image
-
-                        Behavior on anchors.margins {
-                            SmoothedAnimation {
-                                velocity: 100
-                            }
-                        }
-
-                        VideoProgressBar {
-                            value: root.progress
-                            visible: isVideo && root.progress > 0
-                            anchors {
-                                bottom: parent.bottom
-                                left: parent.left
-                                right: parent.right
-                            }
-                        }
-                    }
+                    source: image
 
                     VideoQualityLabel {
                         id: resolutionLabel
                         visible: root.resolution !== ""
                         anchors {
-                            top: cover.top
-                            left: cover.left
+                            top: parent.top
+                            left: parent.left
                             topMargin: VLCStyle.margin_xxsmall
                             leftMargin: VLCStyle.margin_xxsmall
                         }
                         text: root.resolution
                     }
+
                     VideoQualityLabel {
                         anchors {
-                            top: cover.top
+                            top: parent.top
                             left: resolutionLabel.right
                             topMargin: VLCStyle.margin_xxsmall
-                            leftMargin: VLCStyle.margin_xxxsmall
+                            leftMargin: VLCStyle.margin_xxsmall
                         }
                         visible: root.channel !== ""
                         text: root.channel
                         color: "limegreen"
                     }
-                    states: [
-                        State {
-                            name: "visiblebig"
-                            PropertyChanges {
-                                target: cover
-                                anchors.margins: VLCStyle.margin_xxsmall
-                            }
-                            when: mouseArea.containsMouse
-                        },
-                        State {
-                            name: "hiddenbig"
-                            PropertyChanges {
-                                target: cover
-                                anchors.margins: VLCStyle.margin_xxsmall
-                            }
-                            when: !mouseArea.containsMouse
-                                  && picture.highlighted
-                        },
-                        State {
-                            name: "hiddensmall"
-                            PropertyChanges {
-                                target: cover
-                                anchors.margins: VLCStyle.margin_xsmall
-                            }
-                            when: !mouseArea.containsMouse
-                                  && !picture.highlighted
+
+                    VideoProgressBar {
+                        value: root.progress
+                        visible: isVideo && root.progress > 0
+                        anchors {
+                            bottom: parent.bottom
+                            left: parent.left
+                            right: parent.right
                         }
-                    ]
+                    }
                 }
-            }
 
-            Rectangle {
-                id: textHolderRect
-                width: picture.width
-                height: childrenRect.height
-                anchors.top: picture.bottom
-                color: "transparent"
-                Rectangle {
+                Widgets.ScrollingText {
                     id: textTitleRect
-                    height: childrenRect.height
-                    color: "transparent"
-                    clip: true
-                    property bool showTooltip: false
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        rightMargin: VLCStyle.margin_small
-                        leftMargin: VLCStyle.margin_small
-                    }
 
-                    ToolTip {
-                        visible: textTitleRect.showTooltip
-                        x: (parent.width/2) - (width/2)
-                        y: (parent.height/2) - (height/2)
-                        text: root.title
-                    }
+                    Layout.preferredHeight: childrenRect.height
+                    Layout.fillWidth: true
+                    Layout.maximumWidth: _picWidth
 
-                    Text {
-                        id: textTitle
-                        text: root.title
-                        color: VLCStyle.colors.text
-                        font.pixelSize: VLCStyle.fontSize_normal
-                        property bool _needsToScroll: (textTitleRect.width < textTitle.width)
+                    text: root.title
+                    color: VLCStyle.colors.text
+                    font.pixelSize: VLCStyle.fontSize_normal
 
-                        state: ((mouseArea.containsMouse || picture.highlighted)
-                                && textTitle._needsToScroll) ? "HOVERED" : "RELEASED"
-
-                        states: [
-                            State {
-                                name: "HOVERED"
-                                PropertyChanges {
-                                    target: textTitle
-                                    x: textTitleRect.width - textTitle.width - VLCStyle.margin_small
-                                }
-                            },
-                            State {
-                                name: "RELEASED"
-                                PropertyChanges {
-                                    target: textTitle
-                                    x: 0
-                                }
-                            }
-                        ]
-                        transitions: [
-                            Transition {
-                                from: "RELEASED"
-                                to: "HOVERED"
-
-                                SequentialAnimation {
-                                    PauseAnimation {
-                                        duration: 1000
-                                    }
-                                    SmoothedAnimation {
-                                        property: "x"
-                                        maximumEasingTime: 0
-                                        velocity: 25
-                                    }
-                                    PauseAnimation {
-                                        duration: 2000
-                                    }
-                                    ScriptAction {
-                                        script: textTitle.state = "RELEASED"
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }
-
-                MouseArea {
-                    id: titleMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: textTitleRect.showTooltip = true
-                    onExited: textTitleRect.showTooltip = false
+                    scroll: _zoomed || selected
                 }
 
                 Text {
                     id: subtitleTxt
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: textTitleRect.bottom
-                        rightMargin: VLCStyle.margin_small
-                        leftMargin: VLCStyle.margin_small
-                    }
+
+                    Layout.preferredHeight: implicitHeight
+                    Layout.maximumWidth: _picWidth
+                    Layout.fillWidth: true
+
+                    visible: text !== ""
+
                     text: root.subtitle
                     font.weight: Font.Light
                     elide: Text.ElideRight
                     font.pixelSize: VLCStyle.fontSize_small
                     color: VLCStyle.colors.lightText
-                    horizontalAlignment: Qt.AlignHCenter
                 }
+
                 RowLayout {
                     visible: isVideo
-                    anchors {
-                        top: subtitleTxt.top
-                        left: parent.left
-                        right: parent.right
-                        rightMargin: VLCStyle.margin_small
-                        leftMargin: VLCStyle.margin_small
-                        topMargin: VLCStyle.margin_xxxsmall
-                    }
+
+                    Layout.preferredHeight: implicitHeight
+                    Layout.fillWidth: true
+                    Layout.maximumWidth: _picWidth
+
                     Text {
                         Layout.alignment: Qt.AlignLeft
+                        Layout.fillWidth: true
                         font.pixelSize: VLCStyle.fontSize_small
                         color: VLCStyle.colors.videosGridInfoLeft
                         text: infoLeft
@@ -295,13 +226,16 @@ Rectangle {
                         visible: root.isNew
                         Layout.alignment: Qt.AlignRight
                         font.pixelSize: VLCStyle.fontSize_small
-                        color: VLCStyle.colors.accent
+                        color: root.activeFocus ? VLCStyle.colors.lightText : VLCStyle.colors.accent
                         text: "NEW"
                         font.bold: true
                     }
                 }
-            }
 
+                Item {
+                    Layout.fillHeight: true
+                }
+            }
         }
     }
 }

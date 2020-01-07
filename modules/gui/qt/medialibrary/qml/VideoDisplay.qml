@@ -136,7 +136,7 @@ Widgets.NavigableFocusScope {
 
                 onContextMenuButtonClicked: {
                     contextMenu.model = videoGridItem.model
-                    contextMenu.popup(menuParent)
+                    contextMenu.popup()
                 }
 
                 onItemClicked : {
@@ -174,8 +174,8 @@ Widgets.NavigableFocusScope {
                 }
             }
 
-            cellWidth: (VLCStyle.video_normal_width)
-            cellHeight: (VLCStyle.video_normal_height) + VLCStyle.margin_xlarge + VLCStyle.margin_normal
+            cellWidth: VLCStyle.gridItem_video_width
+            cellHeight: VLCStyle.gridItem_video_height
 
             onSelectAll: videosGV.model.selectAll()
             onSelectionUpdated: videosGV.model.updateSelection( keyModifiers, oldIndex, newIndex )
@@ -192,12 +192,12 @@ Widgets.NavigableFocusScope {
             width: view.width
             onContextMenuButtonClicked:{
                 contextMenu.model = menuModel
-                contextMenu.popup(menuParent,contextMenu.width,0)
+                contextMenu.popup(menuParent)
             }
 
             onRightClick:{
                 contextMenu.model = menuModel
-                contextMenu.popup(menuParent)
+                contextMenu.popup()
             }
 
             navigationParent: root

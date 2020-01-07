@@ -136,11 +136,14 @@ Item {
 
 
     //GridItem
-    property int gridItem_default_height: VLCStyle.cover_small + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small + VLCStyle.margin_xxxsmall * 2
-    property int gridItem_default_width: VLCStyle.cover_small + VLCStyle.margin_small * 2
+    property int gridItem_network_height: VLCStyle.network_normal + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small + VLCStyle.margin_xxsmall * 4
+    property int gridItem_network_width: VLCStyle.network_normal + VLCStyle.margin_xxsmall * 4
 
-    property int gridItem_video_height: VLCStyle.video_normal_height + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small * 2  + VLCStyle.margin_xxxsmall * 3
-    property int gridItem_video_width: VLCStyle.video_normal_width + VLCStyle.margin_small * 2
+    property int gridItem_music_height: VLCStyle.cover_normal + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small + VLCStyle.margin_xxsmall * 4
+    property int gridItem_music_width: VLCStyle.cover_normal + VLCStyle.margin_xxsmall * 4
+
+    property int gridItem_video_height: VLCStyle.video_normal_height + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small  + VLCStyle.margin_xxsmall * 4
+    property int gridItem_video_width: VLCStyle.video_normal_width + VLCStyle.margin_xxsmall * 4
 
 
     //global application margin "safe area"

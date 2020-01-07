@@ -146,34 +146,15 @@ Widgets.NavigableFocusScope {
                 }
             }
 
-            cellWidth: VLCStyle.network_normal + VLCStyle.margin_large
-            cellHeight: VLCStyle.network_normal + VLCStyle.margin_xlarge
+            cellWidth: VLCStyle.gridItem_network_width
+            cellHeight: VLCStyle.gridItem_network_height
 
-            delegate: Widgets.GridItem {
+            delegate: NetworkGridItem {
                 id: delegateGrid
+
                 property var model: ({})
 
-                pictureWidth: VLCStyle.network_normal
-                pictureHeight: VLCStyle.network_normal
-
-                image: {
-                    switch (model.type){
-                    case NetworkMediaModel.TYPE_DISC:
-                        return  "qrc:///type/disc.svg"
-                    case NetworkMediaModel.TYPE_CARD:
-                        return  "qrc:///type/capture-card.svg"
-                    case NetworkMediaModel.TYPE_STREAM:
-                        return  "qrc:///type/stream.svg"
-                    case NetworkMediaModel.TYPE_PLAYLIST:
-                        return  "qrc:///type/playlist.svg"
-                    case NetworkMediaModel.TYPE_FILE:
-                        return  "qrc:///type/file_black.svg"
-                    default:
-                        return "qrc:///type/directory_black.svg"
-                    }
-                }
                 subtitle: model.mrl || ""
-                title: model.name || i18n.qtr("Unknown share")
 
                 onItemClicked : {
                     delegateModel.updateSelection( modifier ,  delegateModel.currentIndex, index)
@@ -191,7 +172,7 @@ Widgets.NavigableFocusScope {
                 onContextMenuButtonClicked: {
                     contextMenu.model = model
                     contextMenu.delegateModel = delegateModel
-                    contextMenu.popup(menuParent)
+                    contextMenu.popup()
                 }
             }
 
