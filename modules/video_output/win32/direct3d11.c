@@ -1228,13 +1228,13 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     D3D11_ReleaseQuad(&sys->picQuad);
     Direct3D11DeleteRegions(sys->d3dregion_count, sys->d3dregions);
     sys->d3dregion_count = 0;
+    D3D11_ReleaseQuad(&sys->regionQuad);
 
     ReleaseD3D11PictureSys(&sys->stagingSys);
 
     D3D11_ReleaseVertexShader(&sys->flatVShader);
     D3D11_ReleaseVertexShader(&sys->projectionVShader);
 
-    D3D11_ReleasePixelShader(&sys->regionQuad);
     if (sys->prepareWait)
     {
         ID3D11Query_Release(sys->prepareWait);
