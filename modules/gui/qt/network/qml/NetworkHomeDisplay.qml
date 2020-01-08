@@ -29,6 +29,14 @@ Widgets.NavigableFocusScope {
     id: topFocusScope
     focus: true
 
+    function _centerFlickableOnItem(minY, maxY) {
+        if (maxY > flickable.contentItem.contentY + flickable.height) {
+            flickable.contentItem.contentY = maxY - flickable.height
+        } else if (minY < flickable.contentItem.contentY) {
+            flickable.contentItem.contentY = minY
+        }
+    }
+
     Label {
         anchors.centerIn: parent
         visible: (machineDM.items.count === 0 && lanDM.items.count === 0 )
@@ -68,6 +76,7 @@ Widgets.NavigableFocusScope {
             spacing: VLCStyle.margin_normal
 
             Widgets.LabelSeparator {
+                id: deviceLabel
                 text: i18n.qtr("Devices")
                 width: flickable.width
                 visible: machineDM.items.count !== 0
@@ -93,9 +102,15 @@ Widgets.NavigableFocusScope {
 
                 navigationParent: topFocusScope
                 navigationDownItem: lanSection.visible ?  lanSection : undefined
+
+                onActiveFocusChanged: {
+                    if (activeFocus)
+                        _centerFlickableOnItem(deviceLabel.y, deviceSection.y + deviceSection.height)
+                }
             }
 
             Widgets.LabelSeparator {
+                id: lanLabel
                 text: i18n.qtr("LAN")
                 width: flickable.width
                 visible: lanDM.items.count !== 0
@@ -121,6 +136,11 @@ Widgets.NavigableFocusScope {
 
                 navigationParent: topFocusScope
                 navigationUpItem: deviceSection.visible ? deviceSection : undefined
+
+                onActiveFocusChanged: {
+                    if (activeFocus)
+                        _centerFlickableOnItem(lanLabel.y, lanSection.y + lanSection.height)
+                }
             }
         }
 
