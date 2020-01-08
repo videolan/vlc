@@ -25,6 +25,7 @@ sidplay-libs: sidplay-libs-$(SID_VERSION).tar.gz .sum-sidplay2
 	$(APPLY) $(SRC)/sidplay2/sidplay2-string.patch
 	$(APPLY) $(SRC)/sidplay2/sidplay-fix-ln-s.patch
 	$(APPLY) $(SRC)/sidplay2/sidplay2-resid-dependency.patch
+	$(APPLY) $(SRC)/sidplay2/sidplay2-char-cast.patch
 	$(MOVE)
 
 .sidplay2: sidplay-libs

@@ -1,0 +1,13 @@
+--- sidplay-libs/libsidplay/src/xsid/xsid.cpp.char	2004-06-14 22:08:02.000000000 +0200
++++ sidplay-libs/libsidplay/src/xsid/xsid.cpp	2020-01-10 08:41:49.454974200 +0100
+@@ -96,8 +96,8 @@ const int8_t XSID::sampleConvertTable[16
+ */
+ const int8_t XSID::sampleConvertTable[16] =
+ {
+-    '\x80', '\x94', '\xa9', '\xbc', '\xce', '\xe1', '\xf2', '\x03',
+-    '\x1b', '\x2a', '\x3b', '\x49', '\x58', '\x66', '\x73', '\x7f'
++    (int8_t)0x80, (int8_t)0x94, (int8_t)0xa9, (int8_t)0xbc, (int8_t)0xce, (int8_t)0xe1, (int8_t)0xf2, (int8_t)0x03,
++    (int8_t)0x1b, (int8_t)0x2a, (int8_t)0x3b, (int8_t)0x49, (int8_t)0x58, (int8_t)0x66, (int8_t)0x73, (int8_t)0x7f
+ };
+ 
+ const char *XSID::credit =
