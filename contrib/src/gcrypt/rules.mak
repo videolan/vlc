@@ -3,6 +3,9 @@ GCRYPT_VERSION := 1.7.10
 GCRYPT_URL := http://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-$(GCRYPT_VERSION).tar.bz2
 
 PKGS += gcrypt
+ifeq ($(call need_pkg,"libgcrypt"),)
+PKGS_FOUND += gcrypt
+endif
 
 $(TARBALLS)/libgcrypt-$(GCRYPT_VERSION).tar.bz2:
 	$(call download_pkg,$(GCRYPT_URL),gcrypt)
