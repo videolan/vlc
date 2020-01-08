@@ -69,7 +69,7 @@ variables:
     only:
         refs:
             - merge_requests
-            - master
+            - master@videolan/vlc
     artifacts:
         paths:
             - contrib/vlc-contrib-${TRIPLET}-*.tar.bz2
