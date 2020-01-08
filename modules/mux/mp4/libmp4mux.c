@@ -1190,7 +1190,7 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
      * see 14496-15 8.4.1.1.1 */
     case VLC_CODEC_HEVC: memcpy(fcc, "hev1", 4); break;
     case VLC_CODEC_YV12: memcpy(fcc, "yv12", 4); break;
-    case VLC_CODEC_YUYV: memcpy(fcc, "yuy2", 4); break;
+    case VLC_CODEC_YUYV: memcpy(fcc, "YUY2", 4); break;
     default:
         vlc_fourcc_to_char(p_track->fmt.i_codec, fcc);
         break;
