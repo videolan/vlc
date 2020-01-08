@@ -597,7 +597,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 block_ChainRelease( p_sys->p_packetized_data );
             p_sys->p_packetized_data = NULL;
         }
-        p_sys->p_packetizer->pf_flush( p_sys->p_packetizer );
 
         /* Reset chapter if any */
         p_sys->chapters.i_current = 0;
