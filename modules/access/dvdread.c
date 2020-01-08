@@ -389,7 +389,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *ppp_title = vlc_alloc( p_sys->i_titles, sizeof(input_title_t *) );
             if(!*ppp_title)
                 return VLC_EGENERIC;
-            for (i = 0; i < p_sys->i_title; i++)
+            for (i = 0; i < p_sys->i_titles; i++)
             {
                 input_title_t *p_dup = vlc_input_title_Duplicate(p_sys->titles[i]);
                 if(p_dup)
