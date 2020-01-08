@@ -1172,9 +1172,9 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b_mov)
 {
     VLC_UNUSED(p_obj);
-    VLC_UNUSED(b_mov);
 
     char fcc[4];
+    bool b_colr = false;
 
     switch(p_track->fmt.i_codec)
     {
@@ -1189,8 +1189,8 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     /* FIXME: find a way to know if no non-VCL units are in the stream (->hvc1)
      * see 14496-15 8.4.1.1.1 */
     case VLC_CODEC_HEVC: memcpy(fcc, "hev1", 4); break;
-    case VLC_CODEC_YV12: memcpy(fcc, "yv12", 4); break;
-    case VLC_CODEC_YUYV: memcpy(fcc, "YUY2", 4); break;
+    case VLC_CODEC_YV12: memcpy(fcc, "yv12", 4); b_colr = true; break;
+    case VLC_CODEC_YUYV: memcpy(fcc, "YUY2", 4); b_colr = true; break;
     default:
         vlc_fourcc_to_char(p_track->fmt.i_codec, fcc);
         break;
@@ -1246,7 +1246,7 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     {
     case VLC_CODEC_AV1:
         box_gather(vide, GetxxxxTag(p_extradata, i_extradata, "av1C"));
-        box_gather(vide, GetColrBox(&p_track->fmt.video, b_mov));
+        b_colr = true;
         break;
 
     case VLC_CODEC_MP4V:
@@ -1275,6 +1275,9 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         box_gather(vide, GetHvcCTag(p_extradata, i_extradata, false));
         break;
     }
+
+    if(b_colr)
+        box_gather(vide, GetColrBox(&p_track->fmt.video, b_mov));
 
     box_gather(vide, GetMdcv(&p_track->fmt.video));
     box_gather(vide, GetClli(&p_track->fmt.video));
