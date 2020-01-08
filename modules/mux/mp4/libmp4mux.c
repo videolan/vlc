@@ -1176,6 +1176,12 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     char fcc[4];
     bool b_colr = false;
 
+    static_assert(VLC_CODEC_YUV4 == VLC_FOURCC('y','u','v','4'), "incorrect fcc for yuv4");
+    static_assert(VLC_CODEC_V210 == VLC_FOURCC('v','2','1','0'), "incorrect fcc for v210");
+    static_assert(VLC_CODEC_V308 == VLC_FOURCC('v','3','0','8'), "incorrect fcc for v308");
+    static_assert(VLC_CODEC_V408 == VLC_FOURCC('v','4','0','8'), "incorrect fcc for v408");
+    static_assert(VLC_CODEC_V410 == VLC_FOURCC('v','4','1','0'), "incorrect fcc for v410");
+
     switch(p_track->fmt.i_codec)
     {
     case VLC_CODEC_MP4V:
@@ -1191,6 +1197,15 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     case VLC_CODEC_HEVC: memcpy(fcc, "hev1", 4); break;
     case VLC_CODEC_YV12: memcpy(fcc, "yv12", 4); b_colr = true; break;
     case VLC_CODEC_YUYV: memcpy(fcc, "YUY2", 4); b_colr = true; break;
+    case VLC_CODEC_UYVY: memcpy(fcc, "2vuy", 4); b_colr = true; break;
+    case VLC_CODEC_YUV4:
+    case VLC_CODEC_V210:
+    case VLC_CODEC_V308:
+    case VLC_CODEC_V408:
+    case VLC_CODEC_V410:
+            vlc_fourcc_to_char(p_track->fmt.i_codec, fcc);
+            b_colr = true;
+            break;
     default:
         vlc_fourcc_to_char(p_track->fmt.i_codec, fcc);
         break;
@@ -2165,8 +2180,14 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_H263:
     case VLC_CODEC_AMR_NB:
     case VLC_CODEC_AMR_WB:
+    case VLC_CODEC_YUV4:
     case VLC_CODEC_YV12:
+    case VLC_CODEC_UYVY:
     case VLC_CODEC_YUYV:
+    case VLC_CODEC_V210:
+    case VLC_CODEC_V308:
+    case VLC_CODEC_V408:
+    case VLC_CODEC_V410:
     case VLC_CODEC_VC1:
     case VLC_CODEC_WMAP:
     case VLC_CODEC_AV1:
