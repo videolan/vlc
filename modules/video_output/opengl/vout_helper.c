@@ -632,9 +632,9 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
     }
 
     GLuint fragment_shader =
-        opengl_fragment_shader_init_impl(tc, interop->tex_target,
-                                         interop->sw_fmt.i_chroma,
-                                         interop->sw_fmt.space);
+        opengl_fragment_shader_init(tc, interop->tex_target,
+                                    interop->sw_fmt.i_chroma,
+                                    interop->sw_fmt.space);
     if (!fragment_shader)
     {
         vlc_object_delete(interop);
