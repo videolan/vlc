@@ -71,6 +71,7 @@ const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDe
 
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
+static int OpenDecDevice(vlc_decoder_device *device, vout_window_t *window);
 
 #define VT_ENABLE_TEXT N_("Enable hardware acceleration")
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
@@ -86,9 +87,11 @@ set_capability("video decoder",800)
 set_callbacks(OpenDecoder, CloseDecoder)
 
 add_obsolete_bool("videotoolbox-temporal-deinterlacing")
-add_bool("videotoolbox", true, VT_ENABLE_TEXT, NULL, false)
+add_obsolete_bool("videotoolbox")
 add_bool("videotoolbox-hw-decoder-only", true, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC, false)
 add_string("videotoolbox-cvpx-chroma", "", VT_FORCE_CVPX_CHROMA, VT_FORCE_CVPX_CHROMA_LONG, true);
+add_submodule ()
+    set_callback_dec_device(OpenDecDevice, 1)
 vlc_module_end()
 
 #pragma mark - local prototypes
@@ -184,6 +187,7 @@ typedef struct decoder_sys_t
     bool                        b_drop_blocks;
     date_t                      pts;
 
+    vlc_video_context          *vctx;
     struct pic_pacer           *pic_pacer;
 } decoder_sys_t;
 
@@ -191,7 +195,6 @@ typedef struct decoder_sys_t
  * that can lead to a OOM. cf. pic_pacer_Wait usage in DecoderCallback() */
 struct pic_pacer
 {
-    bool        closed;
     vlc_mutex_t lock;
     vlc_cond_t  wait;
     uint8_t     nb_field_out;
@@ -1317,11 +1320,12 @@ static void StopVideoToolbox(decoder_t *p_dec, bool closing)
 
 #pragma mark - module open and close
 
-static void pic_pacer_Clean(struct pic_pacer *pic_pacer)
+static void pic_pacer_Destroy(void *priv)
 {
+    struct pic_pacer *pic_pacer = priv;
+
     vlc_mutex_destroy(&pic_pacer->lock);
     vlc_cond_destroy(&pic_pacer->wait);
-    free(pic_pacer);
 }
 
 static void pic_pacer_Init(struct pic_pacer *pic_pacer, uint8_t pic_reorder_max)
@@ -1329,16 +1333,63 @@ static void pic_pacer_Init(struct pic_pacer *pic_pacer, uint8_t pic_reorder_max)
     vlc_mutex_init(&pic_pacer->lock);
     vlc_cond_init(&pic_pacer->wait);
     pic_pacer->nb_field_out = 0;
-    pic_pacer->closed = false;
     pic_pacer->field_reorder_max = pic_reorder_max * 2;
+}
+
+static int
+CreateVideoContext(decoder_t *p_dec)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    p_dec->fmt_out.video = p_dec->fmt_in.video;
+    p_dec->fmt_out.video.p_palette = NULL;
+
+    /* Most likely used chroma but can be reconfigured in the future */
+    p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_NV12;
+    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
+
+    if (!p_dec->fmt_out.video.i_sar_num || !p_dec->fmt_out.video.i_sar_den)
+    {
+        p_dec->fmt_out.video.i_sar_num = 1;
+        p_dec->fmt_out.video.i_sar_den = 1;
+    }
+
+    vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
+    if (!dec_dev || dec_dev->type != VLC_DECODER_DEVICE_VIDEOTOOLBOX)
+    {
+        msg_Warn(p_dec, "Could not find an VIDEOTOOLBOX decoder device");
+        return VLC_EGENERIC;
+    }
+
+    static const struct vlc_video_context_operations ops =
+    {
+        pic_pacer_Destroy,
+    };
+    p_sys->vctx =
+        vlc_video_context_Create(dec_dev, VLC_VIDEO_CONTEXT_CVPX,
+                                 sizeof(struct pic_pacer), &ops);
+    vlc_decoder_device_Release(dec_dev);
+
+    if (!p_sys->vctx)
+        return VLC_ENOMEM;
+
+    /* Since pictures can outlive the decoder, the private video context is a
+     * good place to place the pic_pacer that need to be valid during the
+     * lifetime of all pictures */
+    p_sys->pic_pacer =
+        vlc_video_context_GetPrivate(p_sys->vctx,
+                                     VLC_VIDEO_CONTEXT_CVPX);
+    assert(p_sys->pic_pacer);
+
+    pic_pacer_Init(p_sys->pic_pacer, p_sys->i_pic_reorder_max);
+
+    return VLC_SUCCESS;
 }
 
 static int OpenDecoder(vlc_object_t *p_this)
 {
+    int i_ret;
     decoder_t *p_dec = (decoder_t *)p_this;
-
-    if (!var_InheritBool(p_dec, "videotoolbox"))
-        return VLC_EGENERIC;
 
     /* Fail if this module already failed to decode this ES */
     if (var_Type(p_dec, "videotoolbox-failed") != 0)
@@ -1381,14 +1432,13 @@ static int OpenDecoder(vlc_object_t *p_this)
         free(cvpx_chroma);
     }
 
-    p_sys->pic_pacer = malloc(sizeof(struct pic_pacer));
-    if (!p_sys->pic_pacer)
+    i_ret = CreateVideoContext(p_dec);
+    if (i_ret != VLC_SUCCESS)
     {
         free(p_sys);
-        return VLC_ENOMEM;
+        return i_ret;
     }
 
-    pic_pacer_Init(&p_sys->pic_pacer, p_sys->i_pic_reorder_max);
     p_sys->b_vt_need_keyframe = false;
 
     vlc_mutex_init(&p_sys->lock);
@@ -1446,7 +1496,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    int i_ret = StartVideoToolbox(p_dec);
+    i_ret = StartVideoToolbox(p_dec);
     if (i_ret == VLC_SUCCESS) {
         PtsInit(p_dec);
         msg_Info(p_dec, "Using Video Toolbox to decode '%4.4s'",
@@ -1470,17 +1520,8 @@ static void CloseDecoder(vlc_object_t *p_this)
 
     vlc_mutex_destroy(&p_sys->lock);
 
-    vlc_mutex_lock(&p_sys->pic_pacer->lock);
-    if (p_sys->pic_pacer->nb_field_out == 0)
-    {
-        vlc_mutex_unlock(&p_sys->pic_pacer->lock);
-        pic_pacer_Clean(p_sys->pic_pacer);
-    }
-    else
-    {
-        p_sys->pic_pacer->closed = true;
-        vlc_mutex_unlock(&p_sys->pic_pacer->lock);
-    }
+    vlc_video_context_Release(p_sys->vctx);
+
     free(p_sys);
 }
 
@@ -1595,19 +1636,11 @@ static int ConfigureVout(decoder_t *p_dec)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     /* return our proper VLC internal state */
-    p_dec->fmt_out.video = p_dec->fmt_in.video;
-    p_dec->fmt_out.video.p_palette = NULL;
     p_dec->fmt_out.i_codec = 0;
 
     if(p_sys->pf_configure_vout &&
        !p_sys->pf_configure_vout(p_dec))
         return VLC_EGENERIC;
-
-    if (!p_dec->fmt_out.video.i_sar_num || !p_dec->fmt_out.video.i_sar_den)
-    {
-        p_dec->fmt_out.video.i_sar_num = 1;
-        p_dec->fmt_out.video.i_sar_den = 1;
-    }
 
     if (!p_dec->fmt_out.video.i_visible_width || !p_dec->fmt_out.video.i_visible_height)
     {
@@ -2068,7 +2101,7 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
             return -1;
     }
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-    if (decoder_UpdateVideoFormat(p_dec) != 0)
+    if (decoder_UpdateVideoOutput(p_dec, p_sys->vctx) != 0)
     {
         p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
         return -1;
@@ -2077,23 +2110,16 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
 }
 
 static void
-pic_pacer_OnCvpxReleased(CVPixelBufferRef cvpx, void *data, unsigned nb_fields)
+video_context_OnPicReleased(vlc_video_context *vctx, unsigned nb_fields)
 {
-    struct pic_pacer *pic_pacer = data;
+    struct pic_pacer *pic_pacer =
+        vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_CVPX);
 
     vlc_mutex_lock(&pic_pacer->lock);
     assert((int) pic_pacer->nb_field_out - nb_fields >= 0);
     pic_pacer->nb_field_out -= nb_fields;
-    if (pic_pacer->nb_field_out == 0 && pic_pacer->closed)
-    {
-        vlc_mutex_unlock(&pic_pacer->lock);
-        pic_pacer_Clean(pic_pacer);
-    }
-    else
-    {
-        vlc_cond_broadcast(&pic_pacer->wait);
-        vlc_mutex_unlock(&pic_pacer->lock);
-    }
+    vlc_cond_signal(&pic_pacer->wait);
+    vlc_mutex_unlock(&pic_pacer->lock);
 }
 
 static void
@@ -2215,8 +2241,8 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             p_pic->b_top_field_first = p_info->b_top_field_first;
         }
 
-        if (cvpxpic_attach(p_pic, imageBuffer, pic_pacer_OnCvpxReleased,
-                           p_sys->pic_pacer) != VLC_SUCCESS)
+        if (cvpxpic_attach(p_pic, imageBuffer, p_sys->vctx,
+                           video_context_OnPicReleased) != VLC_SUCCESS)
         {
             vlc_mutex_lock(&p_sys->lock);
             goto end;
@@ -2248,4 +2274,17 @@ end:
     free(p_info);
     vlc_mutex_unlock(&p_sys->lock);
     return;
+}
+
+static int
+OpenDecDevice(vlc_decoder_device *device, vout_window_t *window)
+{
+    static const struct vlc_decoder_device_operations ops =
+    {
+        NULL,
+    };
+    device->ops = &ops;
+    device->type = VLC_DECODER_DEVICE_VIDEOTOOLBOX;
+
+    return VLC_SUCCESS;
 }

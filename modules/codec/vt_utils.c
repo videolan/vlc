@@ -49,8 +49,7 @@ struct cvpxpic_ctx
     unsigned nb_fields;
 
     vlc_atomic_rc_t rc;
-    void (*on_released_cb)(CVPixelBufferRef, void *, unsigned);
-    void *on_released_data;
+    void (*on_released_cb)(vlc_video_context *vctx, unsigned);
 };
 
 static void
@@ -62,7 +61,7 @@ cvpxpic_destroy_cb(picture_context_t *opaque)
     {
         CFRelease(ctx->cvpx);
         if (ctx->on_released_cb)
-            ctx->on_released_cb(ctx->cvpx, ctx->on_released_data, ctx->nb_fields);
+            ctx->on_released_cb(opaque->vctx, ctx->nb_fields);
         free(opaque);
     }
 }
@@ -72,14 +71,16 @@ cvpxpic_copy_cb(struct picture_context_t *opaque)
 {
     struct cvpxpic_ctx *ctx = (struct cvpxpic_ctx *)opaque;
     vlc_atomic_rc_inc(&ctx->rc);
+    if (opaque->vctx)
+        vlc_video_context_Hold(opaque->vctx);
     return opaque;
 }
 
 static int
 cvpxpic_attach_common(picture_t *p_pic, CVPixelBufferRef cvpx,
                       void (*pf_destroy)(picture_context_t *),
-                      void (*on_released_cb)(CVPixelBufferRef, void *, unsigned),
-                      void *on_released_data)
+                      vlc_video_context *vctx,
+                      void (*on_released_cb)(vlc_video_context *vctx, unsigned))
 {
     struct cvpxpic_ctx *ctx = malloc(sizeof(struct cvpxpic_ctx));
     if (ctx == NULL)
@@ -88,15 +89,15 @@ cvpxpic_attach_common(picture_t *p_pic, CVPixelBufferRef cvpx,
         return VLC_ENOMEM;
     }
     ctx->s = (picture_context_t) {
-        pf_destroy, cvpxpic_copy_cb,
-        NULL // no video context for now
+        pf_destroy, cvpxpic_copy_cb, vctx,
     };
     ctx->cvpx = CVPixelBufferRetain(cvpx);
     ctx->nb_fields = p_pic->i_nb_fields;
     vlc_atomic_rc_init(&ctx->rc);
 
+    if (vctx)
+        vlc_video_context_Hold(vctx);
     ctx->on_released_cb = on_released_cb;
-    ctx->on_released_data = on_released_data;
 
     p_pic->context = &ctx->s;
 
@@ -104,12 +105,10 @@ cvpxpic_attach_common(picture_t *p_pic, CVPixelBufferRef cvpx,
 }
 
 int
-cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx,
-               void (*on_released_cb)(CVPixelBufferRef, void *, unsigned),
-               void *on_released_data)
+cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx, vlc_video_context *vctx,
+               void (*on_released_cb)(vlc_video_context *vctx, unsigned))
 {
-    return cvpxpic_attach_common(p_pic, cvpx, cvpxpic_destroy_cb, on_released_cb,
-                                 on_released_data);
+    return cvpxpic_attach_common(p_pic, cvpx, cvpxpic_destroy_cb, vctx, on_released_cb);
 }
 
 CVPixelBufferRef
