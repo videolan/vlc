@@ -305,6 +305,8 @@
 #define VLC_CODEC_VYUY            VLC_FOURCC('V','Y','U','Y')
 /* Packed YUV 4:2:2, Y:U:Y:V */
 #define VLC_CODEC_YUYV            VLC_FOURCC('Y','U','Y','2')
+/* Packed YUV 4:2:2, Y:U:Y:V, signed */
+#define VLC_CODEC_YUV2            VLC_FOURCC('y','u','v','2')
 /* Packed YUV 4:2:2, Y:V:Y:U */
 #define VLC_CODEC_YVYU            VLC_FOURCC('Y','V','Y','U')
 /* Packed YUV 2:1:1, Y:U:Y:V */
