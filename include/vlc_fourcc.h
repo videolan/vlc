@@ -297,6 +297,8 @@
 
 /* Packed YUV */
 
+/* Packed YUV 4:2:0, U:V:Y */
+#define VLC_CODEC_YUV4            VLC_FOURCC('y','u','v','4')
 /* Packed YUV 4:2:2, U:Y:V:Y */
 #define VLC_CODEC_UYVY            VLC_FOURCC('U','Y','V','Y')
 /* Packed YUV 4:2:2, V:Y:U:Y */
@@ -309,8 +311,14 @@
 #define VLC_CODEC_Y211            VLC_FOURCC('Y','2','1','1')
 /* Packed YUV 4:2:2, U:Y:V:Y, reverted */
 #define VLC_CODEC_CYUV            VLC_FOURCC('c','y','u','v')
-/* Planar 10-bit 4:2:2 Component YCbCr */
+/* Packed YUV 4:2:2 10-bit U10:Y10:V10:Y10:X2 (12 on 4*32bits) */
 #define VLC_CODEC_V210            VLC_FOURCC('v','2','1','0')
+/* Packed YUV 4:4:4 */
+#define VLC_CODEC_V308            VLC_FOURCC('v','3','0','8')
+/* Packed YUVA 4:4:4:4 */
+#define VLC_CODEC_V408            VLC_FOURCC('v','4','0','8')
+/* Packed YUV 4:4:4 10-bit X2:U10:Y10:V10:Y10 */
+#define VLC_CODEC_V410            VLC_FOURCC('v','4','1','0')
 /* I420 packed for RTP (RFC 4175) */
 #define VLC_CODEC_R420            VLC_FOURCC('r','4','2','0')
 /* Packed YUV 4:2:2 10-bit V10:U10:Y10:A2 */
