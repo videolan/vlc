@@ -5,7 +5,7 @@ MYSOFA_URL = https://github.com/hoene/libmysofa/archive/v$(MYSOFA_VERSION).tar.g
 
 PKGS += mysofa
 
-ifeq ($(call need_pkg,"mysofa"),)
+ifeq ($(call need_pkg,"libmysofa"),)
 PKGS_FOUND += mysofa
 endif
 
