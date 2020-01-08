@@ -556,6 +556,7 @@ static struct picture_context_t *PictureContextCopy(struct picture_context_t *ct
         container_of(ctx, struct android_picture_ctx, s);
 
     atomic_fetch_add_explicit(&apctx->refs, 1, memory_order_relaxed);
+    vlc_video_context_Hold(ctx->vctx);
     return ctx;
 }
 
