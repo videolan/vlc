@@ -183,6 +183,10 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
     if ( !ctx.success || ctx.inputParser == nullptr )
         return medialibrary::parser::Status::Fatal;
 
+    if ( item.fileType() == medialibrary::IFile::Type::Playlist &&
+         item.nbSubItems() == 0 )
+        return medialibrary::parser::Status::Fatal;
+
     populateItem( item, ctx.inputItem.get() );
 
     return medialibrary::parser::Status::Success;
