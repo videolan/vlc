@@ -1366,8 +1366,9 @@ CreateVideoContext(decoder_t *p_dec)
         pic_pacer_Destroy,
     };
     p_sys->vctx =
-        vlc_video_context_Create(dec_dev, VLC_VIDEO_CONTEXT_CVPX,
-                                 sizeof(struct pic_pacer), &ops);
+        vlc_video_context_CreateCVPX(dec_dev,
+                                     CVPX_VIDEO_CONTEXT_VIDEOTOOLBOX,
+                                     sizeof(struct pic_pacer), &ops);
     vlc_decoder_device_Release(dec_dev);
 
     if (!p_sys->vctx)
@@ -1377,8 +1378,8 @@ CreateVideoContext(decoder_t *p_dec)
      * good place to place the pic_pacer that need to be valid during the
      * lifetime of all pictures */
     p_sys->pic_pacer =
-        vlc_video_context_GetPrivate(p_sys->vctx,
-                                     VLC_VIDEO_CONTEXT_CVPX);
+        vlc_video_context_GetCVPXPrivate(p_sys->vctx,
+                                         CVPX_VIDEO_CONTEXT_VIDEOTOOLBOX);
     assert(p_sys->pic_pacer);
 
     pic_pacer_Init(p_sys->pic_pacer, p_sys->i_pic_reorder_max);
@@ -2113,7 +2114,7 @@ static void
 video_context_OnPicReleased(vlc_video_context *vctx, unsigned nb_fields)
 {
     struct pic_pacer *pic_pacer =
-        vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_CVPX);
+        vlc_video_context_GetCVPXPrivate(vctx, CVPX_VIDEO_CONTEXT_VIDEOTOOLBOX);
 
     vlc_mutex_lock(&pic_pacer->lock);
     assert((int) pic_pacer->nb_field_out - nb_fields >= 0);
