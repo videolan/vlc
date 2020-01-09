@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Layouts 1.3
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
@@ -41,7 +42,8 @@ Widgets.NavigableFocusScope {
         else {
             searchBox.placeholderText = ""
             searchBox.text = ""
-            icon.forceActiveFocus()
+            icon.focus = true
+            searchBox.focus = false
             icon.KeyNavigation.right = null
             animateRetract.start()
         }
@@ -71,71 +73,52 @@ Widgets.NavigableFocusScope {
         to: 0
     }
 
-    MouseArea {
-        id: mouseArea
-        hoverEnabled: true
-        anchors.fill: parent
 
-        onClicked: {
-            searchBox.forceActiveFocus()
+    Row {
+        id: content
+
+        Widgets.IconToolButton {
+            id: icon
+
+            size: VLCStyle.icon_normal
+            iconText: VLCIcons.search
+            text: i18n.qtr("Filter")
+
+            focus: true
+
+            onClicked: {
+                if (searchBox.text == "")
+                    expanded = !expanded
+            }
         }
 
-        onEntered: {
-            expanded = true
-        }
+        TextField {
+            id: searchBox
 
-        onExited: {
-            if (searchBox.text == "")
-                expanded = false
-        }
+            anchors.verticalCenter: parent.verticalCenter
 
+            font.pixelSize: VLCStyle.fontSize_normal
 
-        Row {
-            id: content
+            color: VLCStyle.colors.buttonText
+            width: 0
 
-            Widgets.IconToolButton {
-                id: icon
+            selectByMouse: true
 
-                size: VLCStyle.icon_normal
-                iconText: VLCIcons.search
-                text: i18n.qtr("Filter")
-
-                focus: true
-
-                onClicked: {
-                    if (searchBox.text == "")
-                        expanded = !expanded
+            background: Rectangle {
+                color: VLCStyle.colors.button
+                border.color: {
+                    if ( searchBox.text.length < 3 && searchBox.text.length !== 0 )
+                        return VLCStyle.colors.alert
+                    else if ( searchBox.activeFocus )
+                        return VLCStyle.colors.accent
+                    else
+                        return VLCStyle.colors.buttonBorder
                 }
             }
 
-            TextField {
-                id: searchBox
-
-                anchors.verticalCenter: parent.verticalCenter
-
-                font.pixelSize: VLCStyle.fontSize_normal
-
-                color: VLCStyle.colors.buttonText
-                width: 0
-
-                selectByMouse: true
-
-                background: Rectangle {
-                    color: VLCStyle.colors.button
-                    border.color: {
-                        if ( searchBox.text.length < 3 && searchBox.text.length !== 0 )
-                            return VLCStyle.colors.alert
-                        else if ( searchBox.activeFocus )
-                            return VLCStyle.colors.accent
-                        else
-                            return VLCStyle.colors.buttonBorder
-                    }
-                }
-
-                onTextChanged: {
-                    if (contentModel !== undefined)
-                        contentModel.searchPattern = text;
-                }
+            onTextChanged: {
+                if (contentModel !== undefined)
+                    contentModel.searchPattern = text;
             }
         }
     }
