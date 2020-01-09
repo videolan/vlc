@@ -71,8 +71,7 @@ cvpxpic_copy_cb(struct picture_context_t *opaque)
 {
     struct cvpxpic_ctx *ctx = (struct cvpxpic_ctx *)opaque;
     vlc_atomic_rc_inc(&ctx->rc);
-    if (opaque->vctx)
-        vlc_video_context_Hold(opaque->vctx);
+    vlc_video_context_Hold(opaque->vctx);
     return opaque;
 }
 
@@ -95,8 +94,8 @@ cvpxpic_attach_common(picture_t *p_pic, CVPixelBufferRef cvpx,
     ctx->nb_fields = p_pic->i_nb_fields;
     vlc_atomic_rc_init(&ctx->rc);
 
-    if (vctx)
-        vlc_video_context_Hold(vctx);
+    assert(vctx);
+    vlc_video_context_Hold(vctx);
     ctx->on_released_cb = on_released_cb;
 
     p_pic->context = &ctx->s;
