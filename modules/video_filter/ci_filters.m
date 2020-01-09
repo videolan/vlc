@@ -368,7 +368,7 @@ Filter(filter_t *filter, picture_t *src)
     if (!cvpx)
         goto error;
 
-    if (cvpxpic_attach(dst, cvpx, NULL, NULL))
+    if (cvpxpic_attach(dst, cvpx, filter->vctx_out, NULL))
     {
         CFRelease(cvpx);
         goto error;
@@ -521,9 +521,10 @@ Open_CreateFilters(filter_t *filter, struct filter_chain **p_last_filter,
 }
 
 static void
-Close_RemoveConverters(filter_t *filter, struct ci_filters_ctx *ctx)
+cvpx_video_context_Destroy(void *priv)
 {
-    VLC_UNUSED(filter);
+    struct ci_filters_ctx *ctx = priv;
+
     if (ctx->src_converter)
     {
         module_unneed(ctx->src_converter, ctx->src_converter->p_module);
@@ -534,6 +535,9 @@ Close_RemoveConverters(filter_t *filter, struct ci_filters_ctx *ctx)
         module_unneed(ctx->dst_converter, ctx->dst_converter->p_module);
         vlc_object_delete(ctx->dst_converter);
     }
+
+    if (ctx->cvpx_pool)
+        CVPixelBufferPoolRelease(ctx->cvpx_pool);
 }
 
 static filter_t *
@@ -583,6 +587,10 @@ Open(vlc_object_t *obj, char const *psz_filter)
             return VLC_EGENERIC;
     }
 
+    if (filter->vctx_in == NULL ||
+        vlc_video_context_GetType(filter->vctx_in) != VLC_VIDEO_CONTEXT_CVPX)
+        return VLC_EGENERIC;
+
     filter_sys_t *p_sys = filter->p_sys = calloc(1, sizeof(filter_sys_t));
     if (!filter->p_sys)
         return VLC_ENOMEM;
@@ -590,12 +598,34 @@ Open(vlc_object_t *obj, char const *psz_filter)
     enum filter_type filter_types[NUM_MAX_EQUIVALENT_VLC_FILTERS];
     filter_desc_table_GetFilterTypes(psz_filter, filter_types);
 
-    struct ci_filters_ctx *ctx = var_InheritAddress(filter, "ci-filters-ctx");
-    if (!ctx)
+    struct ci_filters_ctx *ctx =
+        vlc_video_context_GetCVPXPrivate(filter->vctx_in, CVPX_VIDEO_CONTEXT_CIFILTERS);
+
+    if (ctx)
+        filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
+    else
     {
-        ctx = malloc(sizeof(*ctx));
-        if (!ctx)
+        static const struct vlc_video_context_operations ops = {
+            cvpx_video_context_Destroy,
+        };
+        vlc_decoder_device *dec_dev =
+            filter_HoldDecoderDeviceType(filter,
+                                         VLC_DECODER_DEVICE_VIDEOTOOLBOX);
+        if (!dec_dev)
+        {
+            msg_Err(filter, "Missing decoder device");
             goto error;
+        }
+        filter->vctx_out =
+            vlc_video_context_CreateCVPX(dec_dev, CVPX_VIDEO_CONTEXT_CIFILTERS,
+                                         sizeof(struct ci_filters_ctx), &ops);
+        vlc_decoder_device_Release(dec_dev);
+        if (!filter->vctx_out)
+            goto error;
+
+        ctx = vlc_video_context_GetCVPXPrivate(filter->vctx_out,
+                                               CVPX_VIDEO_CONTEXT_CIFILTERS);
+        assert(ctx);
 
         ctx->src_converter = ctx->dst_converter = NULL;
         ctx->fchain = NULL;
@@ -643,14 +673,8 @@ Open(vlc_object_t *obj, char const *psz_filter)
         ctx->cvpx_pool = cvpxpool_create(&ctx->cvpx_pool_fmt, 2);
         if (!ctx->cvpx_pool)
             goto error;
-
-        if (Open_CreateFilters(filter, &ctx->fchain, filter_types))
-            goto error;
-
-        var_Create(vlc_object_parent(filter), "ci-filters-ctx", VLC_VAR_ADDRESS);
-        var_SetAddress(vlc_object_parent(filter), "ci-filters-ctx", ctx);
     }
-    else if (Open_CreateFilters(filter, &ctx->fchain, filter_types))
+    if (Open_CreateFilters(filter, &ctx->fchain, filter_types))
         goto error;
 
     p_sys->psz_filter = psz_filter;
@@ -662,13 +686,8 @@ Open(vlc_object_t *obj, char const *psz_filter)
     return VLC_SUCCESS;
 
 error:
-    if (ctx)
-    {
-        Close_RemoveConverters(filter, ctx);
-        if (ctx->cvpx_pool)
-            CVPixelBufferPoolRelease(ctx->cvpx_pool);
-        free(ctx);
-    }
+    if (filter->vctx_out)
+        vlc_video_context_Release(filter->vctx_out);
     free(p_sys);
     return VLC_EGENERIC;
 }
@@ -729,14 +748,7 @@ Close(vlc_object_t *obj)
          ++i)
         filter_chain_RemoveFilter(&ctx->fchain, filter_types[i]);
 
-    if (!ctx->fchain)
-    {
-        Close_RemoveConverters(filter, ctx);
-        if (ctx->cvpx_pool)
-            CVPixelBufferPoolRelease(ctx->cvpx_pool);
-        free(ctx);
-        var_Destroy(vlc_object_parent(filter), "ci-filters-ctx");
-    }
+    vlc_video_context_Release(filter->vctx_out);
     free(p_sys);
 }
 
