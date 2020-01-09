@@ -138,7 +138,8 @@ cvpxpic_destroy_mapped_rw_cb(picture_context_t *opaque)
 
 picture_t *
 cvpxpic_create_mapped(const video_format_t *fmt, CVPixelBufferRef cvpx,
-                      bool readonly)
+                      vlc_video_context *vctx, bool readonly)
+
 {
     unsigned planes_count;
     switch (fmt->i_chroma)
@@ -180,7 +181,7 @@ cvpxpic_create_mapped(const video_format_t *fmt, CVPixelBufferRef cvpx,
 
     picture_t *pic = picture_NewFromResource(fmt, &rsc);
     if (pic == NULL
-     || cvpxpic_attach_common(pic, cvpx, pf_destroy, NULL, NULL) != VLC_SUCCESS)
+     || cvpxpic_attach_common(pic, cvpx, pf_destroy, vctx, NULL) != VLC_SUCCESS)
     {
         CVPixelBufferUnlockBaseAddress(cvpx, lock);
         return NULL;

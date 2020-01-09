@@ -154,7 +154,8 @@ static picture_t *CVPX_TO_SW_Filter(filter_t *p_filter, picture_t *src)
     filter_sys_t *p_sys = p_filter->p_sys;
 
     CVPixelBufferRef cvpx = cvpxpic_get_ref(src);
-    picture_t *src_sw = cvpxpic_create_mapped(&p_sys->sw.fmt, cvpx, true);
+    picture_t *src_sw =
+        cvpxpic_create_mapped(&p_sys->sw.fmt, cvpx, NULL, true);
     if (!src_sw)
     {
         picture_Release(src);
@@ -193,7 +194,7 @@ static picture_t *SW_TO_CVPX_Filter(filter_t *p_filter, picture_t *src)
 
     /* Allocate a CPVX backed picture mapped for read/write */
     picture_t *mapped_dst =
-        cvpxpic_create_mapped(&p_sys->sw.fmt, cvpx, false);
+        cvpxpic_create_mapped(&p_sys->sw.fmt, cvpx, NULL, false);
     CFRelease(cvpx);
     if (!mapped_dst)
     {

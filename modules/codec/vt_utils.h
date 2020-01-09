@@ -52,7 +52,8 @@ CVPixelBufferRef cvpxpic_get_ref(picture_t *pic);
  * the picture and unmap the cvpx buffer.
  */
 picture_t *cvpxpic_create_mapped(const video_format_t *fmt,
-                                 CVPixelBufferRef cvpx, bool readonly);
+                                 CVPixelBufferRef cvpx, vlc_video_context *vctx,
+                                 bool readonly);
 
 /*
  * Create a picture attached to an unmapped cvpx buffer
