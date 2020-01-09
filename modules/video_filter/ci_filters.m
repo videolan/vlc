@@ -593,10 +593,13 @@ Open(vlc_object_t *obj, char const *psz_filter)
     struct ci_filters_ctx *ctx = var_InheritAddress(filter, "ci-filters-ctx");
     if (!ctx)
     {
-        ctx = calloc(1, sizeof(*ctx));
+        ctx = malloc(sizeof(*ctx));
         if (!ctx)
             goto error;
 
+        ctx->src_converter = ctx->dst_converter = NULL;
+        ctx->fchain = NULL;
+        ctx->cvpx_pool = nil;
         ctx->cvpx_pool_fmt = filter->fmt_out.video;
 
         if (filter->fmt_in.video.i_chroma != VLC_CODEC_CVPX_NV12
