@@ -184,10 +184,12 @@ typedef struct decoder_sys_t
     bool                        b_drop_blocks;
     date_t                      pts;
 
-    struct pic_holder          *pic_holder;
+    struct pic_pacer           *pic_pacer;
 } decoder_sys_t;
 
-struct pic_holder
+/* Picture pacer to work-around the VT session allocating too much CVPX buffers
+ * that can lead to a OOM. cf. pic_pacer_Wait usage in DecoderCallback() */
+struct pic_pacer
 {
     bool        closed;
     vlc_mutex_t lock;
@@ -196,7 +198,7 @@ struct pic_holder
     uint8_t     field_reorder_max;
 };
 
-static void pic_holder_update_reorder_max(struct pic_holder *, uint8_t, uint8_t);
+static void pic_pacer_UpdateReorderMax(struct pic_pacer *, uint8_t, uint8_t);
 
 #pragma mark - start & stop
 
@@ -341,7 +343,7 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                     h264_get_dpb_values(p_sps, &i_reorder, &dummy);
                     vlc_mutex_lock(&p_sys->lock);
                     p_sys->i_pic_reorder_max = i_reorder;
-                    pic_holder_update_reorder_max(p_sys->pic_holder,
+                    pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
                                                   p_sys->i_pic_reorder_max,
                                                   p_info->i_num_ts);
                     vlc_mutex_unlock(&p_sys->lock);
@@ -714,7 +716,7 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
                 {
                     vlc_mutex_lock(&p_sys->lock);
                     p_sys->i_pic_reorder_max = hevc_get_max_num_reorder(p_vps);
-                    pic_holder_update_reorder_max(p_sys->pic_holder,
+                    pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
                                                   p_sys->i_pic_reorder_max,
                                                   p_info->i_num_ts);
                     vlc_mutex_unlock(&p_sys->lock);
@@ -952,7 +954,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
             {
                 p_sys->b_invalid_pic_reorder_max = true;
                 p_sys->i_pic_reorder_max++;
-                pic_holder_update_reorder_max(p_sys->pic_holder,
+                pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
                                               p_sys->i_pic_reorder_max, p_info->i_num_ts);
                 msg_Info(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
                 break;
@@ -963,7 +965,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
             {
                 p_sys->b_invalid_pic_reorder_max = true;
                 p_sys->i_pic_reorder_max++;
-                pic_holder_update_reorder_max(p_sys->pic_holder,
+                pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
                                               p_sys->i_pic_reorder_max, p_info->i_num_ts);
                 msg_Info(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
                 break;
@@ -1364,18 +1366,18 @@ static int OpenDecoder(vlc_object_t *p_this)
         free(cvpx_chroma);
     }
 
-    p_sys->pic_holder = malloc(sizeof(struct pic_holder));
-    if (!p_sys->pic_holder)
+    p_sys->pic_pacer = malloc(sizeof(struct pic_pacer));
+    if (!p_sys->pic_pacer)
     {
         free(p_sys);
         return VLC_ENOMEM;
     }
 
-    vlc_mutex_init(&p_sys->pic_holder->lock);
-    vlc_cond_init(&p_sys->pic_holder->wait);
-    p_sys->pic_holder->nb_field_out = 0;
-    p_sys->pic_holder->closed = false;
-    p_sys->pic_holder->field_reorder_max = p_sys->i_pic_reorder_max * 2;
+    vlc_mutex_init(&p_sys->pic_pacer->lock);
+    vlc_cond_init(&p_sys->pic_pacer->wait);
+    p_sys->pic_pacer->nb_field_out = 0;
+    p_sys->pic_pacer->closed = false;
+    p_sys->pic_pacer->field_reorder_max = p_sys->i_pic_reorder_max * 2;
     p_sys->b_vt_need_keyframe = false;
 
     vlc_mutex_init(&p_sys->lock);
@@ -1445,11 +1447,11 @@ static int OpenDecoder(vlc_object_t *p_this)
     return i_ret;
 }
 
-static void pic_holder_clean(struct pic_holder *pic_holder)
+static void pic_pacer_Clean(struct pic_pacer *pic_pacer)
 {
-    vlc_mutex_destroy(&pic_holder->lock);
-    vlc_cond_destroy(&pic_holder->wait);
-    free(pic_holder);
+    vlc_mutex_destroy(&pic_pacer->lock);
+    vlc_cond_destroy(&pic_pacer->wait);
+    free(pic_pacer);
 }
 
 static void CloseDecoder(vlc_object_t *p_this)
@@ -1464,16 +1466,16 @@ static void CloseDecoder(vlc_object_t *p_this)
 
     vlc_mutex_destroy(&p_sys->lock);
 
-    vlc_mutex_lock(&p_sys->pic_holder->lock);
-    if (p_sys->pic_holder->nb_field_out == 0)
+    vlc_mutex_lock(&p_sys->pic_pacer->lock);
+    if (p_sys->pic_pacer->nb_field_out == 0)
     {
-        vlc_mutex_unlock(&p_sys->pic_holder->lock);
-        pic_holder_clean(p_sys->pic_holder);
+        vlc_mutex_unlock(&p_sys->pic_pacer->lock);
+        pic_pacer_Clean(p_sys->pic_pacer);
     }
     else
     {
-        p_sys->pic_holder->closed = true;
-        vlc_mutex_unlock(&p_sys->pic_holder->lock);
+        p_sys->pic_pacer->closed = true;
+        vlc_mutex_unlock(&p_sys->pic_pacer->lock);
     }
     free(p_sys);
 }
@@ -2071,42 +2073,42 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
 }
 
 static void
-pic_holder_on_cvpx_released(CVPixelBufferRef cvpx, void *data, unsigned nb_fields)
+pic_pacer_OnCvpxReleased(CVPixelBufferRef cvpx, void *data, unsigned nb_fields)
 {
-    struct pic_holder *pic_holder = data;
+    struct pic_pacer *pic_pacer = data;
 
-    vlc_mutex_lock(&pic_holder->lock);
-    assert((int) pic_holder->nb_field_out - nb_fields >= 0);
-    pic_holder->nb_field_out -= nb_fields;
-    if (pic_holder->nb_field_out == 0 && pic_holder->closed)
+    vlc_mutex_lock(&pic_pacer->lock);
+    assert((int) pic_pacer->nb_field_out - nb_fields >= 0);
+    pic_pacer->nb_field_out -= nb_fields;
+    if (pic_pacer->nb_field_out == 0 && pic_pacer->closed)
     {
-        vlc_mutex_unlock(&pic_holder->lock);
-        pic_holder_clean(pic_holder);
+        vlc_mutex_unlock(&pic_pacer->lock);
+        pic_pacer_Clean(pic_pacer);
     }
     else
     {
-        vlc_cond_broadcast(&pic_holder->wait);
-        vlc_mutex_unlock(&pic_holder->lock);
+        vlc_cond_broadcast(&pic_pacer->wait);
+        vlc_mutex_unlock(&pic_pacer->lock);
     }
 }
 
 static void
-pic_holder_update_reorder_max(struct pic_holder *pic_holder, uint8_t pic_reorder_max,
+pic_pacer_UpdateReorderMax(struct pic_pacer *pic_pacer, uint8_t pic_reorder_max,
                               uint8_t nb_field)
 {
-    vlc_mutex_lock(&pic_holder->lock);
+    vlc_mutex_lock(&pic_pacer->lock);
 
-    pic_holder->field_reorder_max = pic_reorder_max * (nb_field < 2 ? 2 : nb_field);
-    vlc_cond_signal(&pic_holder->wait);
+    pic_pacer->field_reorder_max = pic_reorder_max * (nb_field < 2 ? 2 : nb_field);
+    vlc_cond_signal(&pic_pacer->wait);
 
-    vlc_mutex_unlock(&pic_holder->lock);
+    vlc_mutex_unlock(&pic_pacer->lock);
 }
 
-static int pic_holder_wait(struct pic_holder *pic_holder, const picture_t *pic)
+static int pic_pacer_Wait(struct pic_pacer *pic_pacer, const picture_t *pic)
 {
     const uint8_t reserved_fields = 2 * (pic->i_nb_fields < 2 ? 2 : pic->i_nb_fields);
 
-    vlc_mutex_lock(&pic_holder->lock);
+    vlc_mutex_lock(&pic_pacer->lock);
 
     /* Wait 200 ms max. We can't really know what the video output will do with
      * output pictures (will they be rendered immediately ?), so don't wait
@@ -2114,12 +2116,12 @@ static int pic_holder_wait(struct pic_holder *pic_holder, const picture_t *pic)
      * call. */
     vlc_tick_t deadline = vlc_tick_now() + VLC_TICK_FROM_MS(200);
     int ret = 0;
-    while (ret == 0 && pic_holder->field_reorder_max != 0
-        && pic_holder->nb_field_out >= pic_holder->field_reorder_max + reserved_fields)
-        ret = vlc_cond_timedwait(&pic_holder->wait, &pic_holder->lock, deadline);
-    pic_holder->nb_field_out += pic->i_nb_fields;
+    while (ret == 0 && pic_pacer->field_reorder_max != 0
+        && pic_pacer->nb_field_out >= pic_pacer->field_reorder_max + reserved_fields)
+        ret = vlc_cond_timedwait(&pic_pacer->wait, &pic_pacer->lock, deadline);
+    pic_pacer->nb_field_out += pic->i_nb_fields;
 
-    vlc_mutex_unlock(&pic_holder->lock);
+    vlc_mutex_unlock(&pic_pacer->lock);
 
     return ret;
 }
@@ -2209,8 +2211,8 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             p_pic->b_top_field_first = p_info->b_top_field_first;
         }
 
-        if (cvpxpic_attach(p_pic, imageBuffer, pic_holder_on_cvpx_released,
-                           p_sys->pic_holder) != VLC_SUCCESS)
+        if (cvpxpic_attach(p_pic, imageBuffer, pic_pacer_OnCvpxReleased,
+                           p_sys->pic_pacer) != VLC_SUCCESS)
         {
             vlc_mutex_lock(&p_sys->lock);
             goto end;
@@ -2220,14 +2222,9 @@ static void DecoderCallback(void *decompressionOutputRefCon,
          * render (release) the output pictures, the VT session can end up
          * allocating way too many frames. This can be problematic for 4K
          * 10bits. To fix this issue, we ensure that we don't have too many
-         * output frames allocated by waiting for the vout to release them.
-         *
-         * FIXME: A proper way to fix this issue is to allow decoder modules to
-         * specify the dpb and having the vout re-allocating output frames when
-         * this number changes. */
-        if (pic_holder_wait(p_sys->pic_holder, p_pic))
-            msg_Warn(p_dec, "pic_holder_wait timed out");
-
+         * output frames allocated by waiting for the vout to release them. */
+        if (pic_pacer_Wait(p_sys->pic_pacer, p_pic))
+            msg_Warn(p_dec, "pic_pacer_Wait timed out");
 
         vlc_mutex_lock(&p_sys->lock);
 
