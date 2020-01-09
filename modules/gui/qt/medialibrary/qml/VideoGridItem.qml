@@ -31,8 +31,7 @@ Widgets.GridItem {
     channel: model.channel || ""
     isVideo: true
     isNew: model.playcount < 1
-    showContextButton: true
-    progress: model.saved_position > 0 ? model.saved_position : 0
+    progress: model.progress > 0 ? model.progress : 0
     pictureWidth: VLCStyle.video_normal_width
     pictureHeight: VLCStyle.video_normal_height
     onItemDoubleClicked: if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }

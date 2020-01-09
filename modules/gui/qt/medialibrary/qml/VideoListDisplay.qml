@@ -86,7 +86,7 @@ Widgets.KeyNavigableTableView {
                         color: "limegreen"
                     }
                     Widgets.VideoProgressBar {
-                        value: !rowModel ? 0 : rowModel.saved_position
+                        value: !rowModel ? 0 : rowModel.progress
                         visible: value > 0
                         anchors {
                             bottom: parent.bottom

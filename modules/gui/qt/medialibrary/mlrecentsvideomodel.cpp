@@ -29,7 +29,6 @@ enum Role {
     VIDEO_PLAYCOUNT,
     VIDEO_RESOLUTION,
     VIDEO_CHANNEL,
-    VIDEO_POSITION,
     VIDEO_MRL,
     VIDEO_VIDEO_TRACK,
     VIDEO_AUDIO_TRACK,
@@ -65,8 +64,6 @@ QVariant MLRecentsVideoModel::data( const QModelIndex& index , int role ) const
             return QVariant::fromValue( video->getResolutionName() );
         case VIDEO_CHANNEL:
             return QVariant::fromValue( video->getChannel() );
-        case VIDEO_POSITION:
-            return QVariant::fromValue( video->getSavedPosition() );
         case VIDEO_MRL:
             return QVariant::fromValue( video->getMRL() );
         case VIDEO_VIDEO_TRACK:
@@ -89,7 +86,6 @@ QHash<int, QByteArray> MLRecentsVideoModel::roleNames() const
         { VIDEO_PLAYCOUNT, "playcount" },
         { VIDEO_RESOLUTION, "resolution_name" },
         { VIDEO_CHANNEL, "channel" },
-        { VIDEO_POSITION, "saved_position" },
         { VIDEO_MRL, "mrl" },
         { VIDEO_AUDIO_TRACK, "audioDesc" },
         { VIDEO_VIDEO_TRACK, "videoDesc" },

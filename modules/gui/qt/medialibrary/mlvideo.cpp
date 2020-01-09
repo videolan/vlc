@@ -22,15 +22,39 @@
 
 #include <vlc_thumbnailer.h>
 
+namespace
+{
+QString MsToString( int64_t time )
+{
+    if (time < 0)
+        return "--:--";
+
+    int t_sec = time / 1000;
+    int sec = t_sec % 60;
+    int min = (t_sec / 60) % 60;
+    int hour = t_sec / 3600;
+    if (hour == 0)
+        return QString("%1:%2")
+                .arg(min, 2, 10, QChar('0'))
+                .arg(sec, 2, 10, QChar('0'));
+    else
+        return QString("%1:%2:%3")
+                .arg(hour, 2, 10, QChar('0'))
+                .arg(min, 2, 10, QChar('0'))
+                .arg(sec, 2, 10, QChar('0'));
+
+}
+}
+
 MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* parent)
     : QObject( parent )
     , m_ml( ml )
     , m_id( data->i_id, VLC_ML_PARENT_UNKNOWN )
     , m_title( QString::fromUtf8( data->psz_title ) )
     , m_thumbnail( QString::fromUtf8( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
+    , m_progress( -1.f )
     , m_playCount( data->i_playcount )
     , m_thumbnailGenerated( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].b_generated )
-    , m_position( 0.f )
     , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
         assert( m_ml != nullptr );
         vlc_ml_event_unregister_callback( m_ml, cb );
@@ -38,19 +62,7 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
 {
     assert( data->i_type == VLC_ML_MEDIA_TYPE_VIDEO || data->i_type == VLC_ML_MEDIA_TYPE_UNKNOWN );
 
-    int t_sec = data->i_duration / 1000;
-    int sec = t_sec % 60;
-    int min = (t_sec / 60) % 60;
-    int hour = t_sec / 3600;
-    if (hour == 0)
-        m_duration = QString("%1:%2")
-                .arg(min, 2, 10, QChar('0'))
-                .arg(sec, 2, 10, QChar('0'));
-    else
-        m_duration = QString("%1:%2:%3")
-                .arg(hour, 2, 10, QChar('0'))
-                .arg(min, 2, 10, QChar('0'))
-                .arg(sec, 2, 10, QChar('0'));
+    m_duration = data->i_duration;
 
     for( const vlc_ml_file_t& file: ml_range_iterate<vlc_ml_file_t>( data->p_files ) )
         if( file.i_type == VLC_ML_FILE_TYPE_MAIN )
@@ -63,11 +75,8 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
     if ( vlc_ml_media_get_playback_state( ml, data->i_id, VLC_ML_PLAYBACK_STATE_PROGRESS,
                                     &psz_progress ) == VLC_SUCCESS && psz_progress != NULL )
     {
-        m_progress = atoi( psz_progress );
+        m_progress = atof( psz_progress );
         free( psz_progress );
-
-        if( data->i_duration )
-            m_position = m_progress / (float)data->i_duration;
     }
 
     unsigned int numChannel = 0 , maxWidth = 0 , maxHeight = 0;
@@ -169,7 +178,7 @@ QString MLVideo::getThumbnail()
 
 QString MLVideo::getDuration() const
 {
-    return m_duration;
+    return MsToString( m_duration );
 }
 
 QString MLVideo::getMRL() const
@@ -185,7 +194,7 @@ QString MLVideo::getChannel() const
     return m_channel;
 }
 
-unsigned int MLVideo::getProgress() const
+float MLVideo::getProgress() const
 {
     return m_progress;
 }
@@ -194,9 +203,9 @@ unsigned int MLVideo::getPlayCount() const
 {
     return m_playCount;
 }
-float MLVideo::getSavedPosition() const
+QString MLVideo::getProgressTime() const
 {
-    return m_position;
+    return MsToString(m_duration * m_progress);
 }
 
 QString MLVideo::getVideoDesc() const

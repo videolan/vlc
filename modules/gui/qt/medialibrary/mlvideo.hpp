@@ -41,11 +41,11 @@ class MLVideo : public QObject
     Q_PROPERTY(QString thumbnail READ getThumbnail NOTIFY onThumbnailChanged);
     Q_PROPERTY(QString duration READ getDuration CONSTANT);
     Q_PROPERTY(QString mrl READ getMRL CONSTANT);
-    Q_PROPERTY(unsigned int progress READ getProgress CONSTANT);
+    Q_PROPERTY(float progress READ getProgress CONSTANT);
     Q_PROPERTY(unsigned int playCount READ getPlayCount CONSTANT);
     Q_PROPERTY(QString resolution_name READ getResolutionName CONSTANT);
     Q_PROPERTY(QString channel READ getChannel CONSTANT);
-    Q_PROPERTY(float saved_position READ getSavedPosition CONSTANT);
+    Q_PROPERTY(QString progressTime READ getProgressTime CONSTANT);
     Q_PROPERTY(QString audioDesc READ getAudioDesc CONSTANT);
     Q_PROPERTY(QString videoDesc READ getVideoDesc CONSTANT);
 
@@ -59,9 +59,9 @@ public:
     QString getResolutionName() const;
     QString getChannel() const;
     QString getMRL() const;
-    unsigned int getProgress() const;
+    float getProgress() const;
     unsigned int getPlayCount() const;
-    float getSavedPosition() const;
+    QString getProgressTime() const;
     QString getAudioDesc() const;
     QString getVideoDesc() const;
 
@@ -81,14 +81,14 @@ private:
     MLParentId m_id;
     QString m_title;
     QString m_thumbnail;
-    QString m_duration;
+    int64_t m_duration;
     QString m_mrl;
     QString m_resolution;
     QString m_channel;
-    unsigned int m_progress;
+    float m_progress;
+    QString m_progressTime;
     unsigned int m_playCount;
     bool m_thumbnailGenerated;
-    float m_position;
     QString audioDesc,videoDesc;
 
     std::unique_ptr<vlc_ml_event_callback_t,
