@@ -1323,13 +1323,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (!var_InheritBool(p_dec, "videotoolbox"))
         return VLC_EGENERIC;
 
-#if TARGET_OS_IPHONE
-    if (unlikely([[UIDevice currentDevice].systemVersion floatValue] < 8.0)) {
-        msg_Warn(p_dec, "decoder skipped as OS is too old");
-        return VLC_EGENERIC;
-    }
-#endif
-
     /* Fail if this module already failed to decode this ES */
     if (var_Type(p_dec, "videotoolbox-failed") != 0)
         return VLC_EGENERIC;
