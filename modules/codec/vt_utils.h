@@ -77,4 +77,28 @@ CVPixelBufferPoolRef cvpxpool_create(const video_format_t *fmt, unsigned count);
  */
 CVPixelBufferRef cvpxpool_new_cvpx(CVPixelBufferPoolRef pool);
 
+enum cvpx_video_context_type
+{
+    CVPX_VIDEO_CONTEXT_DEFAULT,
+    CVPX_VIDEO_CONTEXT_VIDEOTOOLBOX,
+    CVPX_VIDEO_CONTEXT_CIFILTERS,
+};
+
+/*
+ * Create a CVPX video context for a subtype
+ * The private data of a subtype (VIDEOTOOLBOX, CIFILTERS) if only compatible
+ * for this subtype
+ */
+vlc_video_context *
+vlc_video_context_CreateCVPX(vlc_decoder_device *device,
+                             enum cvpx_video_context_type type, size_t type_size,
+                             const struct vlc_video_context_operations *ops);
+
+/*
+ * Get the video context sub private data
+ */
+void *
+vlc_video_context_GetCVPXPrivate(vlc_video_context *vctx,
+                                 enum cvpx_video_context_type type);
+
 #endif

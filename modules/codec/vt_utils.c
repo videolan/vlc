@@ -314,3 +314,54 @@ cvpxpool_new_cvpx(CVPixelBufferPoolRef pool)
 
     return cvpx;
 }
+
+struct cvpx_video_context
+{
+    const struct vlc_video_context_operations *ops;
+    enum cvpx_video_context_type type;
+    uint8_t private[];
+};
+
+static void
+cvpx_video_context_Destroy(void *priv)
+{
+    struct cvpx_video_context *cvpx_vctx = priv;
+    if (cvpx_vctx->ops->destroy)
+        cvpx_vctx->ops->destroy(&cvpx_vctx->private);
+}
+
+vlc_video_context *
+vlc_video_context_CreateCVPX(vlc_decoder_device *device,
+                              enum cvpx_video_context_type type, size_t type_size,
+                              const struct vlc_video_context_operations *ops)
+{
+    static const struct vlc_video_context_operations vctx_ops =
+    {
+        cvpx_video_context_Destroy,
+    };
+    vlc_video_context *vctx =
+        vlc_video_context_Create(device, VLC_VIDEO_CONTEXT_CVPX,
+                                 sizeof(struct cvpx_video_context) + type_size,
+                                 &vctx_ops);
+    if (!vctx)
+        return NULL;
+    struct cvpx_video_context *cvpx_vctx =
+        vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_CVPX);
+    assert(cvpx_vctx != NULL);
+    cvpx_vctx->type = type;
+    cvpx_vctx->ops = ops;
+
+    return vctx;
+}
+
+void *
+vlc_video_context_GetCVPXPrivate(vlc_video_context *vctx,
+                                 enum cvpx_video_context_type type)
+{
+    struct cvpx_video_context *cvpx_vctx =
+        vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_CVPX);
+
+    if (cvpx_vctx && cvpx_vctx->type == type)
+        return &cvpx_vctx->private;
+    return NULL;
+}
