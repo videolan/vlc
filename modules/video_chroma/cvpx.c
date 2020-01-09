@@ -310,20 +310,21 @@ static int Open(vlc_object_t *obj)
     p_sys->sw.fmt = sw_fmt;
 
     unsigned i_cache_width = p_filter->fmt_in.video.i_width * i_cache_pixel_bytes;
-    if (CopyInitCache(&p_sys->sw.cache, i_cache_width) != VLC_SUCCESS)
-    {
-        free(p_sys);
-        return VLC_ENOMEM;
-    }
+    int ret = CopyInitCache(&p_sys->sw.cache, i_cache_width);
+    if (ret != VLC_SUCCESS)
+        goto error;
 
-    if (b_need_pool
-     && (p_sys->pool = cvpxpool_create(&p_filter->fmt_out.video, 3)) == NULL)
+    if (b_need_pool)
     {
-        Close(obj);
-        return VLC_EGENERIC;
+        p_sys->pool = cvpxpool_create(&p_filter->fmt_out.video, 3);
+        if (p_sys->pool == NULL)
+            goto error;
     }
 
     return VLC_SUCCESS;
+error:
+    Close(obj);
+    return ret;
 #undef CASE_CVPX_INPUT
 #undef CASE_CVPX_OUTPUT
 }
