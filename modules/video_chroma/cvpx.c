@@ -155,7 +155,7 @@ static picture_t *CVPX_TO_SW_Filter(filter_t *p_filter, picture_t *src)
 
     CVPixelBufferRef cvpx = cvpxpic_get_ref(src);
     picture_t *src_sw =
-        cvpxpic_create_mapped(&p_sys->sw.fmt, cvpx, NULL, true);
+        cvpxpic_create_mapped(&p_sys->sw.fmt, cvpx, p_filter->vctx_in, true);
     if (!src_sw)
     {
         picture_Release(src);
@@ -194,7 +194,7 @@ static picture_t *SW_TO_CVPX_Filter(filter_t *p_filter, picture_t *src)
 
     /* Allocate a CPVX backed picture mapped for read/write */
     picture_t *mapped_dst =
-        cvpxpic_create_mapped(&p_sys->sw.fmt, cvpx, NULL, false);
+        cvpxpic_create_mapped(&p_sys->sw.fmt, cvpx, p_filter->vctx_out, false);
     CFRelease(cvpx);
     if (!mapped_dst)
     {
@@ -215,7 +215,7 @@ static picture_t *SW_TO_CVPX_Filter(filter_t *p_filter, picture_t *src)
     Copy(p_filter, mapped_dst, src, __MIN(height, src->format.i_visible_height));
 
     /* Attach the CVPX to a new opaque picture */
-    cvpxpic_attach(dst, cvpxpic_get_ref(mapped_dst), NULL, NULL);
+    cvpxpic_attach(dst, cvpxpic_get_ref(mapped_dst), p_filter->vctx_out, NULL);
 
     /* Unlock and unmap the dst picture */
     picture_Release(mapped_dst);
@@ -234,6 +234,8 @@ static void Close(vlc_object_t *obj)
         CVPixelBufferPoolRelease(p_sys->pool);
 
     CopyCleanCache(&p_sys->sw.cache);
+    if (p_filter->vctx_out)
+        vlc_video_context_Release(p_filter->vctx_out);
     free(p_sys);
 }
 
@@ -317,9 +319,33 @@ static int Open(vlc_object_t *obj)
 
     if (b_need_pool)
     {
+        vlc_decoder_device *dec_dev =
+            filter_HoldDecoderDeviceType(p_filter,
+                                         VLC_DECODER_DEVICE_VIDEOTOOLBOX);
+        if (dec_dev == NULL)
+        {
+            msg_Err(p_filter, "Missing decoder device");
+            goto error;
+        }
+        const static struct vlc_video_context_operations vt_vctx_ops = {
+            NULL,
+        };
+        p_filter->vctx_out =
+            vlc_video_context_CreateCVPX(dec_dev, CVPX_VIDEO_CONTEXT_DEFAULT,
+                                         0, &vt_vctx_ops);
+        vlc_decoder_device_Release(dec_dev);
+        if (!p_filter->vctx_out)
+            goto error;
+
         p_sys->pool = cvpxpool_create(&p_filter->fmt_out.video, 3);
         if (p_sys->pool == NULL)
             goto error;
+    }
+    else
+    {
+        if (p_filter->vctx_in == NULL ||
+            vlc_video_context_GetType(p_filter->vctx_in) != VLC_VIDEO_CONTEXT_CVPX)
+            return VLC_EGENERIC;
     }
 
     return VLC_SUCCESS;
@@ -367,7 +393,7 @@ Filter(filter_t *filter, picture_t *src)
         return NULL;
     }
 
-    cvpxpic_attach(dst, dst_cvpx, NULL, NULL);
+    cvpxpic_attach(dst, dst_cvpx, filter->vctx_out, NULL);
 
     picture_CopyProperties(dst, src);
     picture_Release(src);
@@ -384,6 +410,10 @@ static int
 Open_CVPX_to_CVPX(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
+
+    if (filter->vctx_in == NULL ||
+        vlc_video_context_GetType(filter->vctx_in) != VLC_VIDEO_CONTEXT_CVPX)
+        return VLC_EGENERIC;
 
     unsigned int i;
 #define CHECK_CHROMA(fourcc) \
@@ -418,6 +448,7 @@ Open_CVPX_to_CVPX(vlc_object_t *obj)
     }
 
     filter->pf_video_filter = Filter;
+    filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
     return VLC_SUCCESS;
 }
 
@@ -430,6 +461,7 @@ Close_CVPX_to_CVPX(vlc_object_t *obj)
     VTPixelTransferSessionInvalidate(p_sys->vttransfer);
     CFRelease(p_sys->vttransfer);
     CVPixelBufferPoolRelease(p_sys->pool);
+    vlc_video_context_Release(filter->vctx_out);
     free(filter->p_sys);
 }
 
