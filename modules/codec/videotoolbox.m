@@ -1317,6 +1317,21 @@ static void StopVideoToolbox(decoder_t *p_dec, bool closing)
 
 #pragma mark - module open and close
 
+static void pic_pacer_Clean(struct pic_pacer *pic_pacer)
+{
+    vlc_mutex_destroy(&pic_pacer->lock);
+    vlc_cond_destroy(&pic_pacer->wait);
+    free(pic_pacer);
+}
+
+static void pic_pacer_Init(struct pic_pacer *pic_pacer, uint8_t pic_reorder_max)
+{
+    vlc_mutex_init(&pic_pacer->lock);
+    vlc_cond_init(&pic_pacer->wait);
+    pic_pacer->nb_field_out = 0;
+    pic_pacer->closed = false;
+    pic_pacer->field_reorder_max = pic_reorder_max * 2;
+}
 
 static int OpenDecoder(vlc_object_t *p_this)
 {
@@ -1373,11 +1388,7 @@ static int OpenDecoder(vlc_object_t *p_this)
         return VLC_ENOMEM;
     }
 
-    vlc_mutex_init(&p_sys->pic_pacer->lock);
-    vlc_cond_init(&p_sys->pic_pacer->wait);
-    p_sys->pic_pacer->nb_field_out = 0;
-    p_sys->pic_pacer->closed = false;
-    p_sys->pic_pacer->field_reorder_max = p_sys->i_pic_reorder_max * 2;
+    pic_pacer_Init(&p_sys->pic_pacer, p_sys->i_pic_reorder_max);
     p_sys->b_vt_need_keyframe = false;
 
     vlc_mutex_init(&p_sys->lock);
@@ -1445,13 +1456,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     }
 
     return i_ret;
-}
-
-static void pic_pacer_Clean(struct pic_pacer *pic_pacer)
-{
-    vlc_mutex_destroy(&pic_pacer->lock);
-    vlc_cond_destroy(&pic_pacer->wait);
-    free(pic_pacer);
 }
 
 static void CloseDecoder(vlc_object_t *p_this)
