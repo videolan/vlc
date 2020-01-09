@@ -369,7 +369,7 @@ Filter(filter_t *filter, picture_t *src)
     if (!cvpx)
         goto error;
 
-    if (cvpxpic_attach(dst, cvpx))
+    if (cvpxpic_attach(dst, cvpx, NULL, NULL))
     {
         CFRelease(cvpx);
         goto error;

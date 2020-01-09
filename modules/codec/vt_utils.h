@@ -34,11 +34,9 @@ void cfdict_set_int32(CFMutableDictionaryRef dict, CFStringRef key, int value);
  * The cvpx ref will be released when the picture is released
  * @return VLC_SUCCESS or VLC_ENOMEM
  */
-int cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx);
-
-int cvpxpic_attach_with_cb(picture_t *p_pic, CVPixelBufferRef cvpx,
-                           void (*on_released_cb)(CVPixelBufferRef, void *, unsigned nb_fields),
-                           void *on_released_data);
+int cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx,
+                   void (*on_released_cb)(CVPixelBufferRef, void *, unsigned nb_fields),
+                   void *on_released_data);
 
 /*
  * Get the cvpx buffer attached to a picture

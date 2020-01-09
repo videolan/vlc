@@ -214,7 +214,7 @@ static picture_t *SW_TO_CVPX_Filter(filter_t *p_filter, picture_t *src)
     Copy(p_filter, mapped_dst, src, __MIN(height, src->format.i_visible_height));
 
     /* Attach the CVPX to a new opaque picture */
-    cvpxpic_attach(dst, cvpxpic_get_ref(mapped_dst));
+    cvpxpic_attach(dst, cvpxpic_get_ref(mapped_dst), NULL, NULL);
 
     /* Unlock and unmap the dst picture */
     picture_Release(mapped_dst);
@@ -365,7 +365,7 @@ Filter(filter_t *filter, picture_t *src)
         return NULL;
     }
 
-    cvpxpic_attach(dst, dst_cvpx);
+    cvpxpic_attach(dst, dst_cvpx, NULL, NULL);
 
     picture_CopyProperties(dst, src);
     picture_Release(src);

@@ -2216,8 +2216,8 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             p_pic->b_top_field_first = p_info->b_top_field_first;
         }
 
-        if (cvpxpic_attach_with_cb(p_pic, imageBuffer, pic_holder_on_cvpx_released,
-                                   p_sys->pic_holder) != VLC_SUCCESS)
+        if (cvpxpic_attach(p_pic, imageBuffer, pic_holder_on_cvpx_released,
+                           p_sys->pic_holder) != VLC_SUCCESS)
         {
             vlc_mutex_lock(&p_sys->lock);
             goto end;

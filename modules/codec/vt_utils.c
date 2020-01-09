@@ -104,14 +104,9 @@ cvpxpic_attach_common(picture_t *p_pic, CVPixelBufferRef cvpx,
 }
 
 int
-cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx)
-{
-    return cvpxpic_attach_common(p_pic, cvpx, cvpxpic_destroy_cb, NULL, NULL);
-}
-
-int cvpxpic_attach_with_cb(picture_t *p_pic, CVPixelBufferRef cvpx,
-                           void (*on_released_cb)(CVPixelBufferRef, void *, unsigned),
-                           void *on_released_data)
+cvpxpic_attach(picture_t *p_pic, CVPixelBufferRef cvpx,
+               void (*on_released_cb)(CVPixelBufferRef, void *, unsigned),
+               void *on_released_data)
 {
     return cvpxpic_attach_common(p_pic, cvpx, cvpxpic_destroy_cb, on_released_cb,
                                  on_released_data);
@@ -219,7 +214,7 @@ cvpxpic_unmap(picture_t *mapped_pic)
         return NULL;
     }
 
-    cvpxpic_attach(hw_pic, cvpxpic_get_ref(mapped_pic));
+    cvpxpic_attach(hw_pic, cvpxpic_get_ref(mapped_pic), NULL, NULL);
     picture_CopyProperties(hw_pic, mapped_pic);
     picture_Release(mapped_pic);
     return hw_pic;
