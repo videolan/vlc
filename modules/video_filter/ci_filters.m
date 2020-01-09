@@ -81,7 +81,6 @@ struct  ci_filters_ctx
 {
     CVPixelBufferPoolRef        cvpx_pool;
     video_format_t              cvpx_pool_fmt;
-    CVPixelBufferPoolRef        outconv_cvpx_pool;
     CIContext *                 ci_ctx;
     struct filter_chain *       fchain;
     filter_t *                  src_converter;
