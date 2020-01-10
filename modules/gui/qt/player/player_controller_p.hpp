@@ -82,6 +82,8 @@ public:
     float           m_position = 0.f;
     VLCTick      m_length= 0;
 
+    bool            m_canRestorePlayback = false;
+
     int             m_capabilities = 0;
 
     //tracks

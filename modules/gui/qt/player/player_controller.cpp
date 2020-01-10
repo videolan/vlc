@@ -252,6 +252,9 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
         that->UpdateArt( newMediaPtr.get() );
         that->UpdateMeta( newMediaPtr.get() );
 
+        that->m_canRestorePlayback = false;
+        emit q->playbackRestoreQueried();
+
         RecentsMRL::getInstance( that->p_intf )->addRecent( newMediaPtr.get()->psz_uri );
 
         emit q->inputChanged(true);
@@ -310,6 +313,8 @@ static void on_player_state_changed(vlc_player_t *, enum vlc_player_state state,
             emit q->isMenuChanged( false );
             that->m_isInteractive= false;
             emit q->isInteractiveChanged( false );
+            that->m_canRestorePlayback = false;
+            emit q->playbackRestoreQueried();
 
             that->m_teletextAvailable = false;
             emit q->teletextAvailableChanged( false );
@@ -840,6 +845,16 @@ static void on_player_corks_changed(vlc_player_t *, unsigned, void *data)
     msg_Dbg( that->p_intf, "on_player_corks_changed");
 }
 
+static void on_player_playback_restore_queried(vlc_player_t *, void *data)
+{
+    PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
+    msg_Dbg( that->p_intf, "on_playback_restore_queried");
+    that->callAsync([that](){
+        that->m_canRestorePlayback = true;
+        emit that->q_func()->playbackRestoreQueried();
+    });
+}
+
 static void on_player_timer_update(const struct vlc_player_timer_point *point,
                                    void *data)
 {
@@ -950,7 +965,7 @@ static const struct vlc_player_cbs player_cbs = {
     on_player_subitems_changed,
     on_player_vout_changed,
     on_player_corks_changed,
-    nullptr
+    on_player_playback_restore_queried
 };
 
 static const struct vlc_player_vout_cbs player_vout_cbs = {
@@ -1502,6 +1517,13 @@ void PlayerController::updateTimeFromTimer()
         updateTime(system_now, false);
 }
 
+void PlayerController::restorePlaybackPos()
+{
+    Q_D(PlayerController);
+    vlc_player_locker lock{ d->m_player };
+    vlc_player_RestorePlaybackPos( d->m_player );
+}
+
 //MISC
 
 void PlayerController::setABloopState(ABLoopState state)
@@ -1697,6 +1719,7 @@ PRIMITIVETYPE_GETTER(bool, isSeekable, m_capabilities & VLC_PLAYER_CAP_SEEK)
 PRIMITIVETYPE_GETTER(bool, isRewindable, m_capabilities & VLC_PLAYER_CAP_REWIND)
 PRIMITIVETYPE_GETTER(bool, isPausable, m_capabilities & VLC_PLAYER_CAP_PAUSE)
 PRIMITIVETYPE_GETTER(bool, isRateChangable, m_capabilities & VLC_PLAYER_CAP_CHANGE_RATE)
+PRIMITIVETYPE_GETTER(bool, canRestorePlayback, m_canRestorePlayback);
 PRIMITIVETYPE_GETTER(float, getSubtitleFPS, m_subtitleFPS)
 PRIMITIVETYPE_GETTER(bool, hasVideoOutput, m_hasVideo)
 PRIMITIVETYPE_GETTER(float, getBuffering, m_buffering)

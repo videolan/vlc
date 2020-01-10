@@ -125,6 +125,8 @@ public:
     Q_PROPERTY(bool pausable READ isPausable NOTIFY pausableChanged)
     Q_PROPERTY(bool ratechangable READ isRateChangable NOTIFY rateChangableChanged)
 
+    Q_PROPERTY(bool canRestorePlayback READ canRestorePlayback NOTIFY playbackRestoreQueried)
+
     //tracks
     Q_PROPERTY(TrackListModel* videoTracks READ getVideoTracks CONSTANT)
     Q_PROPERTY(TrackListModel* audioTracks READ getAudioTracks CONSTANT)
@@ -273,6 +275,8 @@ public slots:
     bool isRateChangable() const;
     void updatePositionFromTimer();
     void updateTimeFromTimer();
+    bool canRestorePlayback() const;
+    void restorePlaybackPos();
 
     //tracks
     TrackListModel* getVideoTracks();
@@ -364,6 +368,8 @@ signals:
     void pausableChanged( bool );
     void recordableChanged( bool );
     void rateChangableChanged( bool );
+
+    void playbackRestoreQueried();
 
     //tracks
     void audioDelayChanged(VLCTick);
