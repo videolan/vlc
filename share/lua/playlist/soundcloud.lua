@@ -81,7 +81,7 @@ function parse()
 
     if stream then
         -- API magic
-        local client_id = "1XduoqV99lROqCMpijtDo5WnJmpaLuYm"
+        local client_id = "uzhloVwKlWX9bzQ5F1mrqQdjYxKEqDRM"
 
         local api = vlc.stream( stream..( string.match( stream, "?" ) and "&" or "?" ).."client_id="..client_id )
 
