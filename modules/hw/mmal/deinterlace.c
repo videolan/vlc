@@ -146,8 +146,7 @@ static int Open(vlc_object_t *obj)
 
     sys->input = sys->component->input[0];
     sys->input->userdata = (struct MMAL_PORT_USERDATA_T *)filter;
-    if (filter->fmt_in.i_codec == VLC_CODEC_MMAL_OPAQUE)
-        sys->input->format->encoding = MMAL_ENCODING_OPAQUE;
+    sys->input->format->encoding = MMAL_ENCODING_OPAQUE;
     sys->input->format->es->video.width = filter->fmt_in.video.i_width;
     sys->input->format->es->video.height = filter->fmt_in.video.i_height;
     sys->input->format->es->video.crop.x = 0;
@@ -170,18 +169,16 @@ static int Open(vlc_object_t *obj)
     sys->input->buffer_size = sys->input->buffer_size_recommended;
     sys->input->buffer_num = sys->input->buffer_num_recommended;
 
-    if (filter->fmt_in.i_codec == VLC_CODEC_MMAL_OPAQUE) {
-        MMAL_PARAMETER_BOOLEAN_T zero_copy = {
-            { MMAL_PARAMETER_ZERO_COPY, sizeof(MMAL_PARAMETER_BOOLEAN_T) },
-            1
-        };
+    MMAL_PARAMETER_BOOLEAN_T zero_copy = {
+        { MMAL_PARAMETER_ZERO_COPY, sizeof(MMAL_PARAMETER_BOOLEAN_T) },
+        1
+    };
 
-        status = mmal_port_parameter_set(sys->input, &zero_copy.hdr);
-        if (status != MMAL_SUCCESS) {
-           msg_Err(filter, "Failed to set zero copy on port %s (status=%"PRIx32" %s)",
-                    sys->input->name, status, mmal_status_to_string(status));
-           goto out;
-        }
+    status = mmal_port_parameter_set(sys->input, &zero_copy.hdr);
+    if (status != MMAL_SUCCESS) {
+        msg_Err(filter, "Failed to set zero copy on port %s (status=%"PRIx32" %s)",
+                sys->input->name, status, mmal_status_to_string(status));
+        goto out;
     }
 
     status = mmal_port_enable(sys->input, input_port_cb);
@@ -206,29 +203,27 @@ static int Open(vlc_object_t *obj)
 
     sys->output->buffer_num = 3;
 
-    if (filter->fmt_in.i_codec == VLC_CODEC_MMAL_OPAQUE) {
-        MMAL_PARAMETER_UINT32_T extra_buffers = {
-            { MMAL_PARAMETER_EXTRA_BUFFERS, sizeof(MMAL_PARAMETER_UINT32_T) },
-            5
-        };
-        status = mmal_port_parameter_set(sys->output, &extra_buffers.hdr);
-        if (status != MMAL_SUCCESS) {
-            msg_Err(filter, "Failed to set MMAL_PARAMETER_EXTRA_BUFFERS on output port (status=%"PRIx32" %s)",
-                    status, mmal_status_to_string(status));
-            goto out;
-        }
+    MMAL_PARAMETER_UINT32_T extra_buffers = {
+        { MMAL_PARAMETER_EXTRA_BUFFERS, sizeof(MMAL_PARAMETER_UINT32_T) },
+        5
+    };
+    status = mmal_port_parameter_set(sys->output, &extra_buffers.hdr);
+    if (status != MMAL_SUCCESS) {
+        msg_Err(filter, "Failed to set MMAL_PARAMETER_EXTRA_BUFFERS on output port (status=%"PRIx32" %s)",
+                status, mmal_status_to_string(status));
+        goto out;
+    }
 
-        MMAL_PARAMETER_BOOLEAN_T zero_copy = {
-            { MMAL_PARAMETER_ZERO_COPY, sizeof(MMAL_PARAMETER_BOOLEAN_T) },
-            1
-        };
+    MMAL_PARAMETER_BOOLEAN_T zero_copy = {
+        { MMAL_PARAMETER_ZERO_COPY, sizeof(MMAL_PARAMETER_BOOLEAN_T) },
+        1
+    };
 
-        status = mmal_port_parameter_set(sys->output, &zero_copy.hdr);
-        if (status != MMAL_SUCCESS) {
-           msg_Err(filter, "Failed to set zero copy on port %s (status=%"PRIx32" %s)",
-                    sys->output->name, status, mmal_status_to_string(status));
-           goto out;
-        }
+    status = mmal_port_parameter_set(sys->output, &zero_copy.hdr);
+    if (status != MMAL_SUCCESS) {
+        msg_Err(filter, "Failed to set zero copy on port %s (status=%"PRIx32" %s)",
+                sys->output->name, status, mmal_status_to_string(status));
+        goto out;
     }
 
     status = mmal_port_enable(sys->output, output_port_cb);
