@@ -247,7 +247,6 @@ static void CloseDecoder(vlc_object_t *obj)
 {
     decoder_t *dec = (decoder_t *)obj;
     decoder_sys_t *sys = dec->p_sys;
-    MMAL_BUFFER_HEADER_T *buffer;
 
     if (!sys)
         return;
@@ -515,8 +514,6 @@ static void fill_output_port(decoder_t *dec)
 static void flush_decoder(decoder_t *dec)
 {
     decoder_sys_t *sys = dec->p_sys;
-    MMAL_BUFFER_HEADER_T *buffer;
-    MMAL_STATUS_T status;
 
     msg_Dbg(dec, "Flushing decoder ports...");
     mmal_port_flush(sys->output);

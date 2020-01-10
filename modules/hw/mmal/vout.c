@@ -124,8 +124,8 @@ struct vout_display_sys_t {
     unsigned display_width;
     unsigned display_height;
 
-    int i_frame_rate_base; /* cached framerate to detect changes for rate adjustment */
-    int i_frame_rate;
+    unsigned int i_frame_rate_base; /* cached framerate to detect changes for rate adjustment */
+    unsigned int i_frame_rate;
 
     int next_phase_check; /* lowpass for phase check frequency */
     int phase_offset; /* currently applied offset to presentation time in ns */
@@ -189,7 +189,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     MMAL_DISPLAYREGION_T display_region;
     MMAL_STATUS_T status;
     int ret = VLC_SUCCESS;
-    unsigned i;
+    int i;
 
     if (vout_display_cfg_IsWindowed(cfg))
         return VLC_EGENERIC;
