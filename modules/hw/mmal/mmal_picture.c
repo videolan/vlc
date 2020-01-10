@@ -174,6 +174,15 @@ bool hw_mmal_vlc_pic_to_mmal_fmt_update(MMAL_ES_FORMAT_T *const es_fmt, const pi
 }
 
 
+//----------------------------------------------------------------------------
+
+struct mmal_port_pool_ref_s
+{
+    atomic_uint refs;
+    MMAL_POOL_T * pool;
+    MMAL_PORT_T * port;
+};
+
 static hw_mmal_port_pool_ref_t * hw_mmal_port_pool_ref_create(MMAL_PORT_T * const port,
    const unsigned int headers, const uint32_t payload_size)
 {

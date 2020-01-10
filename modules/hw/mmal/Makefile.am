@@ -24,3 +24,10 @@ libmmal_deinterlace_plugin_la_CFLAGS = $(AM_CFLAGS)
 libmmal_deinterlace_plugin_la_LDFLAGS = $(AM_LDFLAGS)
 libmmal_deinterlace_plugin_la_LIBADD = $(LIBS_mmal)
 mmal_LTLIBRARIES += libmmal_deinterlace_plugin.la
+
+libmmal_device_plugin_la_SOURCES = decoder_device.c mmal_picture.c mmal_picture.h \
+  mmal_cma.c mmal_cma.h
+libmmal_device_plugin_la_CFLAGS = $(AM_CFLAGS)
+libmmal_device_plugin_la_LDFLAGS = $(AM_LDFLAGS)
+libmmal_device_plugin_la_LIBADD = $(LIBS_mmal)
+mmal_LTLIBRARIES += libmmal_device_plugin.la

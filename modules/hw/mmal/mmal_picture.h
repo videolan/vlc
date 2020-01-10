@@ -25,19 +25,13 @@
 #define VLC_MMAL_MMAL_PICTURE_H_
 
 #include <vlc_common.h>
+#include <vlc_codec.h>
 #include <interface/mmal/mmal.h>
 
 #include "mmal_cma.h"
 
 /* Think twice before changing this. Incorrect values cause havoc. */
 #define NUM_ACTUAL_OPAQUE_BUFFERS 30
-
-typedef struct mmal_port_pool_ref_s
-{
-    atomic_uint refs;
-    MMAL_POOL_T * pool;
-    MMAL_PORT_T * port;
-} hw_mmal_port_pool_ref_t;
 
 
 #define CTX_BUFS_MAX 4
@@ -61,6 +55,11 @@ bool hw_mmal_vlc_pic_to_mmal_fmt_update(MMAL_ES_FORMAT_T *const es_fmt, const pi
 // Copy pic contents into an existing buffer
 int hw_mmal_copy_pic_to_buf(void * const buf_data, uint32_t * const pLength,
                             const MMAL_ES_FORMAT_T * const fmt, const picture_t * const pic);
+
+//----------------------------------------------------------------------------
+
+struct mmal_port_pool_ref_s;
+typedef struct mmal_port_pool_ref_s hw_mmal_port_pool_ref_t;
 
 void hw_mmal_port_pool_ref_release(hw_mmal_port_pool_ref_t * const ppr, const bool in_cb);
 bool hw_mmal_port_pool_ref_recycle(hw_mmal_port_pool_ref_t * const ppr, MMAL_BUFFER_HEADER_T * const buf);
@@ -163,5 +162,17 @@ const char * cma_vcsm_init_str(const vcsm_init_type_t init_mode);
 #define MMAL_COMPONENT_DEFAULT_RESIZER "vc.ril.resize"
 #define MMAL_COMPONENT_ISP_RESIZER     "vc.ril.isp"
 #define MMAL_COMPONENT_HVS             "vc.ril.hvs"
+
+typedef struct
+{
+    vcsm_init_type_t vcsm_init_type;
+} mmal_decoder_device_t;
+
+static inline mmal_decoder_device_t *GetMMALDeviceOpaque(vlc_decoder_device *dec_dev)
+{
+    if (!dec_dev || dec_dev->type != VLC_DECODER_DEVICE_MMAL)
+        return NULL;
+    return dec_dev->opaque;
+}
 
 #endif
