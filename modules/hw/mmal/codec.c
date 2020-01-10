@@ -80,7 +80,7 @@ typedef struct
     /* statistics */
     int output_in_transit;
     int input_in_transit;
-    atomic_bool started;
+    bool started;
 } decoder_sys_t;
 
 /* Utilities */
@@ -289,7 +289,7 @@ static int change_output_format(decoder_t *dec)
     int pool_size;
     int ret = 0;
 
-    if (atomic_load(&sys->started)) {
+    if (sys->started) {
         mmal_format_full_copy(sys->output->format, sys->output_format);
         status = mmal_port_format_commit(sys->output);
         if (status == MMAL_SUCCESS)
@@ -334,13 +334,13 @@ static int change_output_format(decoder_t *dec)
         return -1;
     }
 
-    if (!atomic_load(&sys->started)) {
+    if (!sys->started) {
         if (!sys->opaque) {
             sys->output_pool = mmal_port_pool_create(sys->output, pool_size, 0);
             msg_Dbg(dec, "Created output pool with %d pictures", sys->output_pool->headers_num);
         }
 
-        atomic_store(&sys->started, true);
+        sys->started = true;
 
         /* we need one picture from vout for each buffer header on the output
          * port */
@@ -546,7 +546,7 @@ static int decode(decoder_t *dec, block_t *block)
         return VLCDEC_SUCCESS;
     }
 
-    if (atomic_load(&sys->started))
+    if (sys->started)
         fill_output_port(dec);
 
     /*
