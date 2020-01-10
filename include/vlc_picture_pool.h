@@ -43,7 +43,6 @@ typedef struct {
     picture_t *const *picture;
 
     int       (*lock)(picture_t *);
-    void      (*unlock)(picture_t *);
 } picture_pool_configuration_t;
 
 /**

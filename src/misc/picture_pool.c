@@ -40,7 +40,6 @@ static_assert ((POOL_MAX & (POOL_MAX - 1)) == 0, "Not a power of two");
 
 struct picture_pool_t {
     int       (*pic_lock)(picture_t *);
-    void      (*pic_unlock)(picture_t *);
     vlc_mutex_t lock;
     vlc_cond_t  wait;
 
@@ -77,8 +76,6 @@ static void picture_pool_ReleasePicture(picture_t *clone)
     unsigned offset = sys & (POOL_MAX - 1);
     picture_t *picture = pool->picture[offset];
 
-    if (pool->pic_unlock != NULL)
-        pool->pic_unlock(picture);
     picture_Release(picture);
 
     vlc_mutex_lock(&pool->lock);
@@ -114,7 +111,6 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
         return NULL;
 
     pool->pic_lock   = cfg->lock;
-    pool->pic_unlock = cfg->unlock;
     vlc_mutex_init(&pool->lock);
     vlc_cond_init(&pool->wait);
     if (cfg->picture_count == POOL_MAX)
