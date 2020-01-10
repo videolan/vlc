@@ -87,6 +87,12 @@ static void flush(filter_t *filter);
 static int Open(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
+    if (filter->fmt_in.video.i_chroma != VLC_CODEC_MMAL_OPAQUE)
+        return VLC_EGENERIC;
+
+    if (filter->fmt_out.video.i_chroma != VLC_CODEC_MMAL_OPAQUE)
+        return VLC_EGENERIC;
+
     int32_t frame_duration = filter->fmt_in.video.i_frame_rate != 0 ?
             vlc_tick_from_samples( filter->fmt_in.video.i_frame_rate_base,
             filter->fmt_in.video.i_frame_rate ) : 0;
@@ -105,12 +111,6 @@ static int Open(vlc_object_t *obj)
 
     msg_Dbg(filter, "Try to open mmal_deinterlace filter. frame_duration: %d, QPU %s!",
             frame_duration, use_qpu ? "used" : "unused");
-
-    if (filter->fmt_in.video.i_chroma != VLC_CODEC_MMAL_OPAQUE)
-        return VLC_EGENERIC;
-
-    if (filter->fmt_out.video.i_chroma != VLC_CODEC_MMAL_OPAQUE)
-        return VLC_EGENERIC;
 
     sys = calloc(1, sizeof(filter_sys_t));
     if (!sys)
@@ -266,9 +266,6 @@ static void Close(vlc_object_t *obj)
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;
     MMAL_BUFFER_HEADER_T *buffer;
-
-    if (!sys)
-        return;
 
     if (sys->component && sys->component->control->is_enabled)
         mmal_port_disable(sys->component->control);
