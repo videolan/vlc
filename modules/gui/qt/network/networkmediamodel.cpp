@@ -104,7 +104,6 @@ Qt::ItemFlags NetworkMediaModel::flags( const QModelIndex& idx ) const
 
 bool NetworkMediaModel::setData( const QModelIndex& idx, const QVariant& value, int role )
 {
-    printf("NetworkMediaModel::setData `\n");
     if (!m_ml)
         return false;
 
@@ -113,7 +112,6 @@ bool NetworkMediaModel::setData( const QModelIndex& idx, const QVariant& value, 
     auto enabled = value.toBool();
     if ( m_items[idx.row()].indexed == enabled )
         return  false;
-    printf("NetworkMediaModel::setData change indexed`\n");
     int res;
     if ( enabled )
         res = vlc_ml_add_folder( m_ml, qtu( m_items[idx.row()].mainMrl.toString( QUrl::None ) ) );
@@ -131,7 +129,6 @@ void NetworkMediaModel::setIndexed(bool indexed)
         return;
     int res;
     if ( indexed ) {
-        printf("add folder %s\n", qtu( m_url.toString( QUrl::FullyEncoded ) ));
         res = vlc_ml_add_folder( m_ml, qtu( m_url.toString( QUrl::FullyEncoded ) ) );
     } else
         res = vlc_ml_remove_folder( m_ml, qtu( m_url.toString( QUrl::FullyEncoded ) ) );
