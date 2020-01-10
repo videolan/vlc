@@ -669,6 +669,8 @@ static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
         if (sys->opaque)
             format->encoding = MMAL_ENCODING_OPAQUE;
 
+        if (sys->output_format)
+            mmal_format_free(sys->output_format);
         sys->output_format = format;
 
         mmal_buffer_header_release(buffer);
