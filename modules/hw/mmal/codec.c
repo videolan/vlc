@@ -305,8 +305,7 @@ static int change_output_format(decoder_t *dec)
     if (status != MMAL_SUCCESS) {
         msg_Err(dec, "Failed to disable output port (status=%"PRIx32" %s)",
                 status, mmal_status_to_string(status));
-        ret = -1;
-        goto out;
+        return -1;
     }
 
     mmal_format_full_copy(sys->output->format, sys->output_format);
@@ -314,8 +313,7 @@ static int change_output_format(decoder_t *dec)
     if (status != MMAL_SUCCESS) {
         msg_Err(dec, "Failed to commit output format (status=%"PRIx32" %s)",
                 status, mmal_status_to_string(status));
-        ret = -1;
-        goto out;
+        return -1;
     }
 
     if (sys->opaque) {
@@ -333,8 +331,7 @@ static int change_output_format(decoder_t *dec)
     if (status != MMAL_SUCCESS) {
         msg_Err(dec, "Failed to enable output port (status=%"PRIx32" %s)",
                 status, mmal_status_to_string(status));
-        ret = -1;
-        goto out;
+        return -1;
     }
 
     if (!atomic_load(&sys->started)) {
@@ -388,7 +385,6 @@ apply_fmt:
                 interlace_type.eMode);
     }
 
-out:
     return ret;
 }
 
