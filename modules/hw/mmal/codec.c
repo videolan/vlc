@@ -109,10 +109,8 @@ static int OpenDecoder(vlc_object_t *obj)
         return VLC_EGENERIC;
 
     sys = calloc(1, sizeof(decoder_sys_t));
-    if (!sys) {
-        ret = VLC_ENOMEM;
-        goto out;
-    }
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
     dec->p_sys = sys;
 
     sys->opaque = var_InheritBool(dec, MMAL_OPAQUE_NAME);
