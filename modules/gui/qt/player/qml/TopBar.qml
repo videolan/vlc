@@ -35,6 +35,7 @@ Widgets.NavigableFocusScope{
     property bool lockAutoHide: false
 
     signal togglePlaylistVisiblity();
+    signal resumeDialogHidden()
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
@@ -77,12 +78,25 @@ Widgets.NavigableFocusScope{
                         }
                         history.previous(History.Go)
                     }
-                    KeyNavigation.right: playlistBtn
+                    KeyNavigation.right: resumeDialog.visible ? resumeDialog : playlistBtn
                     focus: true
                 }
 
                 Item{
                     Layout.fillWidth: true
+                    Layout.preferredHeight: resumeDialog.implicitHeight
+
+                    ResumeDialog {
+                        id: resumeDialog
+                        anchors.fill: parent
+                        onHidden: {
+                            if (activeFocus) {
+                                focus = false
+                                playlistBtn.focus = true
+                                resumeDialogHidden()
+                            }
+                        }
+                    }
                 }
 
                 Widgets.IconToolButton {
@@ -94,6 +108,8 @@ Widgets.NavigableFocusScope{
                     color: VLCStyle.colors.playerFg
                     onClicked: togglePlaylistVisiblity()
                     property bool acceptFocus: true
+
+                    KeyNavigation.left: resumeDialog.visible ? resumeDialog : backBtn
                 }
             }
         }

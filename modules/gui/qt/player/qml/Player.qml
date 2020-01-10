@@ -194,6 +194,8 @@ Widgets.NavigableFocusScope {
                     rootWindow.playlistVisible = !rootWindow.playlistVisible
             }
 
+            onResumeDialogHidden: controlBarView.forceActiveFocus()
+
             navigationParent: rootPlayer
             navigationDownItem: playlistpopup.showPlaylist ? playlistpopup : controlBarView
         }

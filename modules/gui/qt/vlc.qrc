@@ -269,6 +269,7 @@
     <qresource prefix="/player">
         <file alias="Player.qml">player/qml/Player.qml</file>
         <file alias="ControlBar.qml">player/qml/ControlBar.qml</file>
+        <file alias="ResumeDialog.qml">player/qml/ResumeDialog.qml</file>
         <file alias="SliderBar.qml">player/qml/SliderBar.qml</file>
         <file alias="TrackInfo.qml">player/qml/TrackInfo.qml</file>
         <file alias="ControlButtons.qml">player/qml/ControlButtons.qml</file>

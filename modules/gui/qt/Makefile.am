@@ -592,6 +592,7 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/PlayerButtonsLayout.qml \
 	gui/qt/player/qml/PlayerMenu.qml \
 	gui/qt/player/qml/PlayerMenuItem.qml \
+	gui/qt/player/qml/ResumeDialog.qml \
 	gui/qt/player/qml/SliderBar.qml \
 	gui/qt/player/qml/TeletextWidget.qml \
 	gui/qt/player/qml/TopBar.qml \

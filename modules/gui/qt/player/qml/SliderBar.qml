@@ -109,7 +109,7 @@ Slider {
             hoverEnabled: true
 
             onPressed: function (event) {
-                control.focus = true
+                control.forceActiveFocus()
                 control._isHold = true
                 control.value = event.x / control.width
                 player.position = control.value
