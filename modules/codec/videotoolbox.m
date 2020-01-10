@@ -41,7 +41,7 @@
 #import <VideoToolbox/VideoToolbox.h>
 #import <VideoToolbox/VTErrors.h>
 
-#import <Foundation/Foundation.h>
+#import <CoreFoundation/CoreFoundation.h>
 #import <TargetConditionals.h>
 
 #import <sys/types.h>
@@ -52,7 +52,6 @@
 #define VT_RESTART_MAX 1
 
 #if TARGET_OS_IPHONE
-#import <UIKit/UIKit.h>
 
 /* support iOS SDKs < v9.1 */
 #ifndef CPUFAMILY_ARM_TWISTER
@@ -114,9 +113,9 @@ static void RequestFlush(decoder_t *);
 static void Drain(decoder_t *p_dec, bool flush);
 static void DecoderCallback(void *, void *, OSStatus, VTDecodeInfoFlags,
                             CVPixelBufferRef, CMTime, CMTime);
-static BOOL deviceSupportsHEVC();
-static BOOL deviceSupportsAdvancedProfiles();
-static BOOL deviceSupportsAdvancedLevels();
+static Boolean deviceSupportsHEVC();
+static Boolean deviceSupportsAdvancedProfiles();
+static Boolean deviceSupportsAdvancedLevels();
 
 typedef struct frame_info_t frame_info_t;
 
@@ -1528,15 +1527,15 @@ static void CloseDecoder(vlc_object_t *p_this)
 
 #pragma mark - helpers
 
-static BOOL deviceSupportsHEVC()
+static Boolean deviceSupportsHEVC()
 {
-    if (@available(macOS 10.13, iOS 11.0, tvOS 11.0, *))
+    if (__builtin_available(macOS 10.13, iOS 11.0, tvOS 11.0, *))
         return VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC);
     else
-        return NO;
+        return FALSE;
 }
 
-static BOOL deviceSupportsAdvancedProfiles()
+static Boolean deviceSupportsAdvancedProfiles()
 {
 #if TARGET_OS_IPHONE
     size_t size;
@@ -1547,13 +1546,13 @@ static BOOL deviceSupportsAdvancedProfiles()
 
     /* Support for H264 profile HIGH 10 was introduced with the first 64bit Apple ARM SoC, the A7 */
     if (type == CPU_TYPE_ARM64)
-        return YES;
+        return TRUE;
 
 #endif
-    return NO;
+    return FALSE;
 }
 
-static BOOL deviceSupportsAdvancedLevels()
+static Boolean deviceSupportsAdvancedLevels()
 {
 #if TARGET_OS_IPHONE
     #ifdef __LP64__
@@ -1565,16 +1564,16 @@ static BOOL deviceSupportsAdvancedLevels()
         /* Proper 4K decoding requires a Twister SoC
          * Everything below will kill the decoder daemon */
         if (cpufamily == CPUFAMILY_ARM_CYCLONE || cpufamily == CPUFAMILY_ARM_TYPHOON) {
-            return NO;
+            return FALSE;
         }
 
-        return YES;
+        return TRUE;
     #else
         /* we need a 64bit SoC for advanced levels */
-        return NO;
+        return FALSE;
     #endif
 #else
-    return YES;
+    return TRUE;
 #endif
 }
 
@@ -2039,32 +2038,36 @@ skip:
 static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    NSDictionary *attachmentDict =
-        (__bridge NSDictionary *)CVBufferGetAttachments(imageBuffer, kCVAttachmentMode_ShouldPropagate);
+    CFDictionaryRef attachmentDict =
+        CVBufferGetAttachments(imageBuffer, kCVAttachmentMode_ShouldPropagate);
 
-    if (attachmentDict != nil && attachmentDict.count > 0
-     && p_dec->fmt_out.video.chroma_location == CHROMA_LOCATION_UNDEF)
+    if (attachmentDict != NULL && CFDictionaryGetCount(attachmentDict) > 0 &&
+        p_dec->fmt_out.video.chroma_location == CHROMA_LOCATION_UNDEF)
     {
-        NSString *chromaLocation = attachmentDict[(NSString *)kCVImageBufferChromaLocationTopFieldKey];
-        if (chromaLocation != nil) {
-            if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Left] ||
-                [chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_DV420])
+        CFStringRef chromaLocation =
+            CFDictionaryGetValue(attachmentDict, kCVImageBufferChromaLocationTopFieldKey);
+        if (chromaLocation != NULL) {
+            if (CFEqual(chromaLocation, kCVImageBufferChromaLocation_Left) ||
+                CFEqual(chromaLocation, kCVImageBufferChromaLocation_DV420)) {
                 p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_LEFT;
-            else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Center])
+            } else if (CFEqual(chromaLocation, kCVImageBufferChromaLocation_Center)) {
                 p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_CENTER;
-            else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_TopLeft])
+            } else if (CFEqual(chromaLocation, kCVImageBufferChromaLocation_TopLeft)) {
                 p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_TOP_LEFT;
-            else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Top])
+            } else if (CFEqual(chromaLocation, kCVImageBufferChromaLocation_Top)) {
                 p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_TOP_CENTER;
+            }
         }
-        if (p_dec->fmt_out.video.chroma_location == CHROMA_LOCATION_UNDEF)
-        {
-            chromaLocation = attachmentDict[(NSString *)kCVImageBufferChromaLocationBottomFieldKey];
-            if (chromaLocation != nil) {
-                if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_BottomLeft])
+
+        if (p_dec->fmt_out.video.chroma_location == CHROMA_LOCATION_UNDEF) {
+            chromaLocation =
+                CFDictionaryGetValue(attachmentDict, kCVImageBufferChromaLocationBottomFieldKey);
+            if (chromaLocation != NULL) {
+                if (CFEqual(chromaLocation, kCVImageBufferChromaLocation_BottomLeft)) {
                     p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_BOTTOM_LEFT;
-                else if ([chromaLocation isEqualToString:(NSString *)kCVImageBufferChromaLocation_Bottom])
+                } else if (CFEqual(chromaLocation, kCVImageBufferChromaLocation_Bottom)) {
                     p_dec->fmt_out.video.chroma_location = CHROMA_LOCATION_BOTTOM_CENTER;
+                }
             }
         }
     }
@@ -2077,30 +2080,31 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
         case kCVPixelFormatType_422YpCbCr8:
         case 'yuv2':
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_UYVY;
-            assert(CVPixelBufferIsPlanar(imageBuffer) == false);
+            assert(CVPixelBufferIsPlanar(imageBuffer) == FALSE);
             break;
         case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
         case kCVPixelFormatType_420YpCbCr8BiPlanarFullRange:
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_NV12;
-            assert(CVPixelBufferIsPlanar(imageBuffer) == true);
+            assert(CVPixelBufferIsPlanar(imageBuffer) == TRUE);
             break;
         case 'xf20': /* kCVPixelFormatType_420YpCbCr10BiPlanarFullRange */
         case 'x420': /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_P010;
-            assert(CVPixelBufferIsPlanar(imageBuffer) == true);
+            assert(CVPixelBufferIsPlanar(imageBuffer) == TRUE);
             break;
         case kCVPixelFormatType_420YpCbCr8Planar:
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_I420;
-            assert(CVPixelBufferIsPlanar(imageBuffer) == true);
+            assert(CVPixelBufferIsPlanar(imageBuffer) == TRUE);
             break;
         case kCVPixelFormatType_32BGRA:
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_BGRA;
-            assert(CVPixelBufferIsPlanar(imageBuffer) == false);
+            assert(CVPixelBufferIsPlanar(imageBuffer) == FALSE);
             break;
         default:
             p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
             return -1;
     }
+
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     if (decoder_UpdateVideoOutput(p_dec, p_sys->vctx) != 0)
     {
