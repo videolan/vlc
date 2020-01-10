@@ -286,7 +286,6 @@ static int change_output_format(decoder_t *dec)
     MMAL_PARAMETER_VIDEO_INTERLACE_TYPE_T interlace_type;
     decoder_sys_t *sys = dec->p_sys;
     MMAL_STATUS_T status;
-    int pool_size;
     int ret = 0;
 
     if (sys->started) {
@@ -318,11 +317,9 @@ static int change_output_format(decoder_t *dec)
 
     if (sys->opaque) {
         sys->output->buffer_num = NUM_DECODER_BUFFER_HEADERS;
-        pool_size = NUM_DECODER_BUFFER_HEADERS;
     } else {
         sys->output->buffer_num = __MAX(sys->output->buffer_num_recommended,
                 MIN_NUM_BUFFERS_IN_TRANSIT);
-        pool_size = sys->output->buffer_num;
     }
 
     sys->output->buffer_size = sys->output->buffer_size_recommended;
@@ -336,7 +333,7 @@ static int change_output_format(decoder_t *dec)
 
     if (!sys->started) {
         if (!sys->opaque) {
-            sys->output_pool = mmal_port_pool_create(sys->output, pool_size, 0);
+            sys->output_pool = mmal_port_pool_create(sys->output, sys->output->buffer_num, 0);
             msg_Dbg(dec, "Created output pool with %d pictures", sys->output_pool->headers_num);
         }
 
@@ -344,9 +341,9 @@ static int change_output_format(decoder_t *dec)
 
         /* we need one picture from vout for each buffer header on the output
          * port */
-        dec->i_extra_picture_buffers = pool_size;
+        dec->i_extra_picture_buffers = sys->output->buffer_num;
 
-        /* remove what VLC core reserves as it is part of the pool_size
+        /* remove what VLC core reserves as it is part of the pool size
          * already */
         if (dec->fmt_in.i_codec == VLC_CODEC_H264)
             dec->i_extra_picture_buffers -= 19;
