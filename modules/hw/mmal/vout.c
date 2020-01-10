@@ -521,6 +521,9 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
     sys->pictures = calloc(sys->num_buffers, sizeof(picture_t *));
     for (i = 0; i < sys->num_buffers; ++i) {
         picture_sys_t *p_sys = picture_res.p_sys = calloc(1, sizeof(picture_sys_t));
+        if (unlikely(p_sys==NULL)) {
+            goto out;
+        }
         p_sys->owner = (vlc_object_t *)vd;
         p_sys->buffer = mmal_queue_get(sys->pool->queue);
 
