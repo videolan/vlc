@@ -437,7 +437,7 @@
 		6BF56C3D1FCF00AF004A411A /* audiotoolbox_midi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = audiotoolbox_midi.c; path = ../../../modules/codec/audiotoolbox_midi.c; sourceTree = "<group>"; };
 		6BF5C5021EFE66EF008A9C12 /* VLCHUDTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDTableView.h; sourceTree = "<group>"; };
 		6BF5C5031EFE66EF008A9C12 /* VLCHUDTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDTableView.m; sourceTree = "<group>"; };
-		7D0A387820CBCC4D00D4BF3B /* videotoolbox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = videotoolbox.m; path = ../../../modules/codec/videotoolbox.m; sourceTree = "<group>"; };
+		7D0A387820CBCC4D00D4BF3B /* videotoolbox.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = videotoolbox.c; path = ../../../modules/codec/videotoolbox.c; sourceTree = "<group>"; };
 		7D0F5A992264EB410009C48A /* VLCHotkeysController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCHotkeysController.h; sourceTree = "<group>"; };
 		7D0F5A9A2264EB410009C48A /* VLCHotkeysController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCHotkeysController.m; sourceTree = "<group>"; };
 		7D0F63FD2201F63400FDB91F /* VLCPlaylistTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCPlaylistTableCellView.h; sourceTree = "<group>"; };
@@ -1347,7 +1347,7 @@
 		6BF56C3C1FCF0088004A411A /* codec */ = {
 			isa = PBXGroup;
 			children = (
-				7D0A387820CBCC4D00D4BF3B /* videotoolbox.m */,
+				7D0A387820CBCC4D00D4BF3B /* videotoolbox.c */,
 				6BF56C3D1FCF00AF004A411A /* audiotoolbox_midi.c */,
 			);
 			name = codec;

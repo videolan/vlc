@@ -1,5 +1,5 @@
 /*****************************************************************************
- * videotoolbox.m: Video Toolbox decoder
+ * videotoolbox.c: Video Toolbox decoder
  *****************************************************************************
  * Copyright © 2014-2015 VideoLabs SAS
  *

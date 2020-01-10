@@ -339,21 +339,21 @@ codec_LTLIBRARIES += $(LTLIBoggspots)
 
 libvideotoolbox_plugin_la_SOURCES = \
 	codec/vt_utils.c codec/vt_utils.h \
-	codec/videotoolbox.m codec/hxxx_helper.c codec/hxxx_helper.h \
+	codec/videotoolbox.c codec/hxxx_helper.c codec/hxxx_helper.h \
 	packetizer/hxxx_nal.h packetizer/hxxx_nal.c \
 	packetizer/hxxx_sei.h packetizer/hxxx_sei.c \
 	packetizer/h264_slice.c packetizer/h264_slice.h \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
-libvideotoolbox_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
+libvideotoolbox_plugin_la_CFLAGS = $(AM_CFLAGS)
 if HAVE_IOS
-libvideotoolbox_plugin_la_OBJCFLAGS += -miphoneos-version-min=9.0
+libvideotoolbox_plugin_la_CFLAGS += -miphoneos-version-min=9.0
 endif
 if HAVE_TVOS
-libvideotoolbox_plugin_la_OBJCFLAGS += -mtvos-version-min=10.2
+libvideotoolbox_plugin_la_CFLAGS += -mtvos-version-min=10.2
 endif
 libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la
-libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
+libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 EXTRA_LTLIBRARIES += libvideotoolbox_plugin.la
 codec_LTLIBRARIES += $(LTLIBvideotoolbox)
 
