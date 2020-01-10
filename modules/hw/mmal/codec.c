@@ -392,7 +392,6 @@ static int send_output_buffer(decoder_t *dec)
     picture_sys_t *p_sys;
     picture_t *picture = NULL;
     MMAL_STATUS_T status;
-    unsigned buffer_size = 0;
     int ret = 0;
 
     if (!sys->output->is_enabled)
@@ -417,18 +416,19 @@ static int send_output_buffer(decoder_t *dec)
     }
 
     p_sys = picture->p_sys;
-    for (int i = 0; i < picture->i_planes; i++)
-        buffer_size += picture->p[i].i_lines * picture->p[i].i_pitch;
-
     if (sys->output_pool) {
-        mmal_buffer_header_reset(buffer);
-        buffer->alloc_size = sys->output->buffer_size;
+        unsigned buffer_size = 0;
+        for (int i = 0; i < picture->i_planes; i++)
+            buffer_size += picture->p[i].i_lines * picture->p[i].i_pitch;
         if (buffer_size < sys->output->buffer_size) {
             msg_Err(dec, "Retrieved picture with too small data block (%d < %d)",
                     buffer_size, sys->output->buffer_size);
             ret = VLC_EGENERIC;
             goto err;
         }
+
+        mmal_buffer_header_reset(buffer);
+        buffer->alloc_size = sys->output->buffer_size;
 
         if (!sys->opaque)
             buffer->data = picture->p[0].p_pixels;
