@@ -146,13 +146,13 @@ static const vlc_fourcc_t subpicture_chromas[] = {
 
 /* Utility functions */
 static inline uint32_t align(uint32_t x, uint32_t y);
-static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static void configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 const video_format_t *fmt);
 
 /* VLC vout display callbacks */
 static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count);
 static void vd_prepare(vout_display_t *vd, picture_t *picture,
-                subpicture_t *subpicture);
+                       subpicture_t *subpicture, vlc_tick_t date);
 static void vd_display(vout_display_t *vd, picture_t *picture);
 static int vd_control(vout_display_t *vd, int query, va_list args);
 static void vd_manage(vout_display_t *vd);
@@ -318,7 +318,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
 out:
     if (ret != VLC_SUCCESS)
-        Close(object);
+        Close(vd);
 
     (void) context;
     return ret;
@@ -355,7 +355,8 @@ static void Close(vout_display_t *vd)
     else
         for (i = 0; i < sys->num_buffers; ++i)
             if (sys->pictures[i]) {
-                mmal_buffer_header_release(sys->pictures[i]->p_sys->buffer);
+                picture_sys_t *p_sys = sys->pictures[i]->p_sys;
+                mmal_buffer_header_release(p_sys->buffer);
                 picture_Release(sys->pictures[i]);
             }
 
@@ -517,9 +518,9 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
 
     sys->pictures = calloc(sys->num_buffers, sizeof(picture_t *));
     for (i = 0; i < sys->num_buffers; ++i) {
-        picture_res.p_sys = calloc(1, sizeof(picture_sys_t));
-        picture_res.p_sys->owner = (vlc_object_t *)vd;
-        picture_res.p_sys->buffer = mmal_queue_get(sys->pool->queue);
+        picture_sys_t *p_sys = picture_res.p_sys = calloc(1, sizeof(picture_sys_t));
+        p_sys->owner = (vlc_object_t *)vd;
+        p_sys->buffer = mmal_queue_get(sys->pool->queue);
 
         sys->pictures[i] = picture_NewFromResource(&vd->fmt, &picture_res);
         if (!sys->pictures[i]) {
@@ -598,7 +599,7 @@ static void vd_display(vout_display_t *vd, picture_t *picture)
         pic_sys->displayed = true;
     }
 
-    display_subpicture(vd, subpicture);
+    display_subpicture(vd, NULL /*subpicture*/);
 
     if (sys->next_phase_check == 0 && sys->adjust_refresh_rate)
         maintain_phase_sync(vd);
@@ -665,7 +666,7 @@ static void vd_manage(vout_display_t *vd)
         if (query_resolution(vd, &width, &height) >= 0) {
             sys->display_width = width;
             sys->display_height = height;
-            vout_window_ReportSize(sys->last_cfg->window, width, height);
+            vout_window_ReportSize(sys->last_cfg.window, width, height);
         }
 
         sys->need_configure_display = false;

@@ -45,8 +45,8 @@
 #define MMAL_DEINTERLACE_QPU_TEXT N_("Use QPUs for advanced HD deinterlacing.")
 #define MMAL_DEINTERLACE_QPU_LONGTEXT N_("Make use of the QPUs to allow higher quality deinterlacing of HD content.")
 
-static int Open(filter_t *filter);
-static void Close(filter_t *filter);
+static int Open(vlc_object_t *);
+static void Close(vlc_object_t *);
 
 vlc_module_begin()
     set_shortname(N_("MMAL deinterlace"))
@@ -84,8 +84,9 @@ static void flush(filter_t *filter);
 
 #define MMAL_COMPONENT_DEFAULT_DEINTERLACE "vc.ril.image_fx"
 
-static int Open(filter_t *filter)
+static int Open(vlc_object_t *obj)
 {
+    filter_t *filter = (filter_t *)obj;
     int32_t frame_duration = filter->fmt_in.video.i_frame_rate != 0 ?
             vlc_tick_from_samples( filter->fmt_in.video.i_frame_rate_base,
             filter->fmt_in.video.i_frame_rate ) : 0;
@@ -255,13 +256,14 @@ static int Open(filter_t *filter)
 
 out:
     if (ret != VLC_SUCCESS)
-        Close(filter);
+        Close(obj);
 
     return ret;
 }
 
-static void Close(filter_t *filter)
+static void Close(vlc_object_t *obj)
 {
+    filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;
     MMAL_BUFFER_HEADER_T *buffer;
 
@@ -319,7 +321,8 @@ static int send_output_buffer(filter_t *filter)
     picture->format.i_frame_rate = filter->fmt_out.video.i_frame_rate;
     picture->format.i_frame_rate_base = filter->fmt_out.video.i_frame_rate_base;
 
-    buffer = picture->p_sys->buffer;
+    picture_sys_t *p_sys = picture->p_sys;
+    buffer = p_sys->buffer;
     buffer->user_data = picture;
     buffer->cmd = 0;
 
@@ -377,19 +380,20 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
 
     fill_output_port(filter);
 
-    buffer = picture->p_sys->buffer;
+    picture_sys_t *p_sys = picture->p_sys;
+    buffer = p_sys->buffer;
     buffer->user_data = picture;
     buffer->pts = picture->date;
     buffer->cmd = 0;
 
-    if (!picture->p_sys->displayed) {
+    if (!p_sys->displayed) {
         status = mmal_port_send_buffer(sys->input, buffer);
         if (status != MMAL_SUCCESS) {
             msg_Err(filter, "Failed to send buffer to input port (status=%"PRIx32" %s)",
                     status, mmal_status_to_string(status));
             picture_Release(picture);
         } else {
-            picture->p_sys->displayed = true;
+            p_sys->displayed = true;
             atomic_fetch_add(&sys->input_in_transit, 1);
             vlc_sem_post(&sys->sem);
         }

@@ -51,8 +51,8 @@
 #define MMAL_OPAQUE_TEXT N_("Decode frames directly into RPI VideoCore instead of host memory.")
 #define MMAL_OPAQUE_LONGTEXT N_("Decode frames directly into RPI VideoCore instead of host memory. This option must only be used with the MMAL video output plugin.")
 
-static int OpenDecoder(decoder_t *dec);
-static void CloseDecoder(decoder_t *dec);
+static int OpenDecoder(vlc_object_t *);
+static void CloseDecoder(vlc_object_t *);
 
 vlc_module_begin()
     set_shortname(N_("MMAL decoder"))
@@ -97,8 +97,9 @@ static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
 static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
 static void output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
 
-static int OpenDecoder(decoder_t *dec)
+static int OpenDecoder(vlc_object_t *obj)
 {
+    decoder_t *dec = (decoder_t *)obj;
     int ret = VLC_SUCCESS;
     decoder_sys_t *sys;
     MMAL_STATUS_T status;
@@ -237,13 +238,14 @@ static int OpenDecoder(decoder_t *dec)
 
 out:
     if (ret != VLC_SUCCESS)
-        CloseDecoder(dec);
+        CloseDecoder(obj);
 
     return ret;
 }
 
-static void CloseDecoder(decoder_t *dec)
+static void CloseDecoder(vlc_object_t *obj)
 {
+    decoder_t *dec = (decoder_t *)obj;
     decoder_sys_t *sys = dec->p_sys;
     MMAL_BUFFER_HEADER_T *buffer;
 
