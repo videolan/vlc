@@ -549,6 +549,23 @@ typedef int ( * vlc_list_callback_t ) ( vlc_object_t *,      /* variable's objec
 /* clip v in [min, max] */
 #define VLC_CLIP(v, min, max)    __MIN(__MAX((v), (min)), (max))
 
+/**
+ * Make integer v a multiple of align
+ *
+ * \note align must be a power of 2
+ */
+VLC_USED
+static inline size_t vlc_align(size_t v, size_t align)
+{
+    return (v + (align - 1)) & ~(align - 1);
+}
+
+#if defined(__clang__) && __has_attribute(diagnose_if)
+static inline size_t vlc_align(size_t v, size_t align)
+    __attribute__((diagnose_if(((align & (align - 1)) || (align == 0)),
+        "align must be power of 2", "error")));
+#endif
+
 /** Greatest common divisor */
 VLC_USED
 static inline int64_t GCD ( int64_t a, int64_t b )
