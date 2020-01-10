@@ -137,6 +137,8 @@ struct vout_display_sys_t {
     bool b_top_field_first; /* cached interlaced settings to detect changes for native mode */
     bool b_progressive;
     bool opaque; /* indicated use of opaque picture format (zerocopy) */
+
+    subpicture_t *prepare_subpicture;
 };
 
 static const vlc_fourcc_t subpicture_chromas[] = {
@@ -562,6 +564,8 @@ static void vd_prepare(vout_display_t *vd, picture_t *picture,
     /* Apply the required phase_offset to the picture, so that vd_display()
      * will be called at the corrected time from the core */
     picture->date += sys->phase_offset;
+    /* trick for now as we don't get the subpicture during display anymore */
+    sys->prepare_subpicture = subpicture;
 }
 
 static void vd_display(vout_display_t *vd, picture_t *picture)
@@ -599,7 +603,7 @@ static void vd_display(vout_display_t *vd, picture_t *picture)
         pic_sys->displayed = true;
     }
 
-    display_subpicture(vd, NULL /*subpicture*/);
+    display_subpicture(vd, sys->prepare_subpicture);
 
     if (sys->next_phase_check == 0 && sys->adjust_refresh_rate)
         maintain_phase_sync(vd);
