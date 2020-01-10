@@ -391,9 +391,6 @@ apply_fmt:
     }
 
 out:
-    mmal_format_free(sys->output_format);
-    sys->output_format = NULL;
-
     return ret;
 }
 
@@ -539,6 +536,8 @@ static int decode(decoder_t *dec, block_t *block)
     if (sys->output_format) {
         if (change_output_format(dec) < 0)
             msg_Err(dec, "Failed to change output port format");
+        mmal_format_free(sys->output_format);
+        sys->output_format = NULL;
     }
 
     if (!block)
