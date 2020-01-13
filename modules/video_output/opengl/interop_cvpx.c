@@ -22,6 +22,7 @@
 # include "config.h"
 #endif
 
+#include <vlc_common.h>
 #include <vlc_plugin.h>
 #include "interop.h"
 #include "../../codec/vt_utils.h"

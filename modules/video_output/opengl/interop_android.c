@@ -26,6 +26,7 @@
 # error this file must be built from android
 #endif
 
+#include <vlc_common.h>
 #include <vlc_plugin.h>
 #include "interop.h"
 #include "../android/utils.h"
