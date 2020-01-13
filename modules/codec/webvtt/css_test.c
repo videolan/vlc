@@ -36,7 +36,7 @@
 const char * css =
         "el1 { float0: 1; }\n"
         ".class1 { hex1: #F0000f; }\n"
-        "#id1 { text2: \"foobar\"; }\n"
+        "#id1 { text2: \"foo bar\"; }\n"
         ":pseudo { text2: \"foobar\"; }\n"
         "attrib[foo=\"bar\"] { text2: \"foobar\"; }\n"
         "attrib2[foo] { text2: \"foobar\"; }\n"
@@ -111,7 +111,7 @@ int main(void)
     EXPECT(decl && !strcmp(rule->p_declarations->psz_property, "text2"));
     EXPECT(decl->expr && decl->expr->i_count);
     EXPECT(decl->expr->seq[0].term.type == TYPE_STRING);
-    EXPECT(!strcmp(decl->expr->seq[0].term.psz,"foobar"));
+    EXPECT(!strcmp(decl->expr->seq[0].term.psz,"foo bar"));
 
     CHECK("pseudoclass selector");
     rule = rule->p_next;
