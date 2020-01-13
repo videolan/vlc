@@ -52,7 +52,7 @@ struct tf_es_out_id_s
     bool contiguous;
 };
 
-struct tf_es_out_sys_s
+struct tf_es_out_s
 {
     es_out_t *original_es_out;
     DECL_ARRAY(struct tf_es_out_id_s *) es_list;
@@ -111,7 +111,7 @@ static void timestamps_filter_push(const char *s, struct timestamps_filter_s *tf
     mva_add(&tf->mva, i_dts, i_length);
 }
 
-static void timestamps_filter_es_out_Reset(struct tf_es_out_sys_s *out)
+static void timestamps_filter_es_out_Reset(struct tf_es_out_s *out)
 {
     for(int i=0; i<out->es_list.i_size; i++)
     {
@@ -124,7 +124,7 @@ static void timestamps_filter_es_out_Reset(struct tf_es_out_sys_s *out)
 
 static int timestamps_filter_es_out_Control(es_out_t *out, int i_query, va_list va_list)
 {
-    struct tf_es_out_sys_s *p_sys = (struct tf_es_out_sys_s *) out->p_sys;
+    struct tf_es_out_s *p_sys = (struct tf_es_out_s *) out->p_sys;
     switch(i_query)
     {
         case ES_OUT_SET_PCR:
@@ -175,7 +175,7 @@ static int timestamps_filter_es_out_Control(es_out_t *out, int i_query, va_list 
     return es_out_vaControl(p_sys->original_es_out, i_query, va_list);
 }
 
-static struct tf_es_out_id_s * timestamps_filter_es_out_getID(struct tf_es_out_sys_s *p_sys, es_out_id_t *id)
+static struct tf_es_out_id_s * timestamps_filter_es_out_getID(struct tf_es_out_s *p_sys, es_out_id_t *id)
 {
     for(int i=0; i<p_sys->es_list.i_size; i++)
     {
@@ -189,7 +189,7 @@ static struct tf_es_out_id_s * timestamps_filter_es_out_getID(struct tf_es_out_s
 
 static int timestamps_filter_es_out_Send(es_out_t *out, es_out_id_t *id, block_t *p_block)
 {
-    struct tf_es_out_sys_s *p_sys = (struct tf_es_out_sys_s *) out->p_sys;
+    struct tf_es_out_s *p_sys = (struct tf_es_out_s *) out->p_sys;
     struct tf_es_out_id_s *cur = timestamps_filter_es_out_getID(p_sys, id);
 
     timestamps_filter_push((char*)&cur->fourcc, &cur->tf,
@@ -224,7 +224,7 @@ static int timestamps_filter_es_out_Send(es_out_t *out, es_out_id_t *id, block_t
 
 static void timestamps_filter_es_out_Delete(es_out_t *out)
 {
-    struct tf_es_out_sys_s *p_sys = (struct tf_es_out_sys_s *) out->p_sys;
+    struct tf_es_out_s *p_sys = (struct tf_es_out_s *) out->p_sys;
     for(int i=0; i<p_sys->es_list.i_size; i++)
         free(p_sys->es_list.p_elems[i]);
     ARRAY_RESET(p_sys->es_list);
@@ -234,7 +234,7 @@ static void timestamps_filter_es_out_Delete(es_out_t *out)
 
 static es_out_id_t *timestamps_filter_es_out_Add(es_out_t *out, const es_format_t *fmt)
 {
-    struct tf_es_out_sys_s *p_sys = (struct tf_es_out_sys_s *) out->p_sys;
+    struct tf_es_out_s *p_sys = (struct tf_es_out_s *) out->p_sys;
 
     struct tf_es_out_id_s *tf_es_sys = malloc(sizeof(*tf_es_sys));
     if(!tf_es_sys)
@@ -259,7 +259,7 @@ static es_out_id_t *timestamps_filter_es_out_Add(es_out_t *out, const es_format_
 
 static void timestamps_filter_es_out_Del(es_out_t *out, es_out_id_t *id)
 {
-    struct tf_es_out_sys_s *p_sys = (struct tf_es_out_sys_s *) out->p_sys;
+    struct tf_es_out_s *p_sys = (struct tf_es_out_s *) out->p_sys;
 
     es_out_Del(p_sys->original_es_out, id);
 
@@ -279,7 +279,7 @@ static es_out_t * timestamps_filter_es_out_New(es_out_t *orig)
     es_out_t *p_out = malloc(sizeof(*p_out));
     if(!p_out)
         return NULL;
-    struct tf_es_out_sys_s *tf = malloc(sizeof(*tf));
+    struct tf_es_out_s *tf = malloc(sizeof(*tf));
     if(!tf)
     {
         free(p_out);
