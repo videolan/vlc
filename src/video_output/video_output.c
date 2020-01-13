@@ -1998,15 +1998,15 @@ int vout_ChangeSource( vout_thread_t *vout, const video_format_t *original )
     return -1;
 }
 
-static int vout_EnableWindow(vout_thread_t *vout, const video_format_t *original,
+static int EnableWindowLocked(vout_thread_t *vout, const video_format_t *original,
                              vlc_decoder_device **pp_dec_device)
 {
+    assert(vout != NULL);
     vout_thread_sys_t *sys = vout->p;
 
     assert(!sys->dummy);
-    assert(vout != NULL);
+    vlc_mutex_assert(&sys->window_lock);
 
-    vlc_mutex_lock(&sys->window_lock);
     if (!sys->window_enabled) {
         vout_window_cfg_t wcfg = {
             .is_fullscreen = var_GetBool(vout, "fullscreen"),
@@ -2022,7 +2022,6 @@ static int vout_EnableWindow(vout_thread_t *vout, const video_format_t *original
         vout_SizeWindow(vout, original, &wcfg.width, &wcfg.height);
 
         if (vout_window_Enable(sys->display_cfg.window, &wcfg)) {
-            vlc_mutex_unlock(&sys->window_lock);
             msg_Err(vout, "failed to enable window");
             return -1;
         }
@@ -2036,7 +2035,6 @@ static int vout_EnableWindow(vout_thread_t *vout, const video_format_t *original
             sys->dec_device = vlc_decoder_device_Create(&vout->obj, sys->display_cfg.window);
         *pp_dec_device = sys->dec_device ? vlc_decoder_device_Hold( sys->dec_device ) : NULL;
     }
-    vlc_mutex_unlock(&sys->window_lock);
     return 0;
 }
 
@@ -2061,13 +2059,16 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
         return 0;
     }
 
-    if (vout_EnableWindow(vout, &original, NULL) != 0)
+    vlc_mutex_lock(&sys->window_lock);
+    if (EnableWindowLocked(vout, &original, NULL) != 0)
     {
         /* the window was not enabled, nor the display started */
         msg_Err(vout, "failed to enable window");
         video_format_Clean(&original);
+        vlc_mutex_unlock(&sys->window_lock);
         return -1;
     }
+    vlc_mutex_unlock(&sys->window_lock);
 
     if (sys->display != NULL)
         vout_StopDisplay(vout);
@@ -2105,6 +2106,7 @@ vlc_decoder_device *vout_GetDevice(const vout_device_configuration_t *cfg)
     vlc_decoder_device *dec_device = NULL;
 
     assert(cfg->fmt != NULL);
+    vout_thread_sys_t *sys = cfg->vout->p;
 
     if (!VoutCheckFormat(cfg->fmt))
         return NULL;
@@ -2112,7 +2114,9 @@ vlc_decoder_device *vout_GetDevice(const vout_device_configuration_t *cfg)
     video_format_t original;
     VoutFixFormat(&original, cfg->fmt);
 
-    int res = vout_EnableWindow(cfg->vout, &original, &dec_device);
+    vlc_mutex_lock(&sys->window_lock);
+    int res = EnableWindowLocked(cfg->vout, &original, &dec_device);
+    vlc_mutex_unlock(&sys->window_lock);
     video_format_Clean(&original);
     if (res != 0)
         return NULL;
