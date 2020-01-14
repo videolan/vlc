@@ -290,7 +290,7 @@ opengl_init_swizzle(const struct vlc_gl_interop *interop,
         }
         else
         {
-            swizzle_per_tex[0] = NULL;
+            swizzle_per_tex[0] = "x";
             swizzle_per_tex[1] = "xa";
         }
     }
@@ -484,8 +484,7 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
         ADD("uniform vec4 Coefficients[4];\n");
 
     ADD("uniform vec4 FillColor;\n"
-        "void main(void) {\n"
-        " float val;vec4 colors;\n");
+        "void main(void) {\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -494,12 +493,15 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
                  "TexCoord%u.y * TexSize%u.y);\n", i, i, i, i, i);
     }
 
-    unsigned color_idx = 0;
-    for (unsigned i = 0; i < interop->tex_count; ++i)
-    {
-        const char *swizzle = swizzle_per_tex[i];
-        if (swizzle)
+    unsigned color_count;
+    if (is_yuv) {
+        ADD(" float val;\n"
+            " vec4 colors;\n");
+        unsigned color_idx = 0;
+        for (unsigned i = 0; i < interop->tex_count; ++i)
         {
+            const char *swizzle = swizzle_per_tex[i];
+            assert(swizzle);
             size_t swizzle_count = strlen(swizzle);
             ADDF(" colors = %s(Texture%u, %s%u);\n", lookup, i, coord_name, i);
             for (unsigned j = 0; j < swizzle_count; ++j)
@@ -511,24 +513,19 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
                 assert(color_idx <= PICTURE_PLANE_MAX);
             }
         }
-        else
-        {
-            ADDF(" vec4 color%u = %s(Texture%u, %s%u);\n",
-                 color_idx, lookup, i, coord_name, i);
-            color_idx++;
-            assert(color_idx <= PICTURE_PLANE_MAX);
-        }
-    }
-    unsigned color_count = color_idx;
-    assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
-
-    if (is_yuv)
         ADD(" vec4 result = (color0 * Coefficients[0]) + Coefficients[3];\n");
+        color_count = color_idx;
+    }
     else
-        ADD(" vec4 result = color0;\n");
+    {
+        ADDF(" vec4 result = %s(Texture0, %s0);\n", lookup, coord_name);
+        color_count = 1;
+    }
+    assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
 
     for (unsigned i = 1; i < color_count; ++i)
     {
+        unsigned color_idx;
         if (yuv_swap_uv)
         {
             assert(color_count == 3);
