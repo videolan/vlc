@@ -68,7 +68,7 @@ struct opengl_tex_converter_t
     struct {
         GLint Texture[PICTURE_PLANE_MAX];
         GLint TexSize[PICTURE_PLANE_MAX]; /* for GL_TEXTURE_RECTANGLE */
-        GLint Coefficients;
+        GLint ConvMatrix;
         GLint FillColor;
         GLint *pl_vars; /* for pl_sh_res */
     } uloc;

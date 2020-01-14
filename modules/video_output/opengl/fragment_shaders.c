@@ -90,8 +90,12 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, vlc_fourcc_t chroma,
         /* We place coefficient values for coefficient[4] in one array from
          * matrix values. Notice that we fill values from top down instead
          * of left to right.*/
-        for (int j = 0; j < 4; j++)
-            tc->yuv_coefficients[i*4+j] = j < 3 ? correction * matrix[j*4+i] : 0.f;
+        for (int j = 0; j < 3; j++)
+            tc->yuv_coefficients[i*4+j] = correction * matrix[j*4+i];
+        tc->yuv_coefficients[3] = 0.f;
+        tc->yuv_coefficients[7] = 0.f;
+        tc->yuv_coefficients[11] = 0.f;
+        tc->yuv_coefficients[15] = 1.f;
     }
 
     tc->yuv_color = true;
@@ -108,9 +112,9 @@ tc_base_fetch_locations(opengl_tex_converter_t *tc, GLuint program)
 
     if (tc->yuv_color)
     {
-        tc->uloc.Coefficients = tc->vt->GetUniformLocation(program,
-                                                            "Coefficients");
-        if (tc->uloc.Coefficients == -1)
+        tc->uloc.ConvMatrix = tc->vt->GetUniformLocation(program,
+                                                         "ConvMatrix");
+        if (tc->uloc.ConvMatrix == -1)
             return VLC_EGENERIC;
     }
 
@@ -154,7 +158,8 @@ tc_base_prepare_shader(const opengl_tex_converter_t *tc,
     const struct vlc_gl_interop *interop = tc->interop;
 
     if (tc->yuv_color)
-        tc->vt->Uniform4fv(tc->uloc.Coefficients, 4, tc->yuv_coefficients);
+        tc->vt->UniformMatrix4fv(tc->uloc.ConvMatrix, 1, GL_FALSE,
+                                 tc->yuv_coefficients);
 
     for (unsigned i = 0; i < interop->tex_count; ++i)
         tc->vt->Uniform1i(tc->uloc.Texture[i], i);
@@ -481,7 +486,7 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
     }
 
     if (is_yuv)
-        ADD("uniform vec4 Coefficients[4];\n");
+        ADD("uniform mat4 ConvMatrix;\n");
 
     ADD("uniform vec4 FillColor;\n"
         "void main(void) {\n");
@@ -495,51 +500,37 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
 
     unsigned color_count;
     if (is_yuv) {
-        ADD(" float val;\n"
-            " vec4 colors;\n");
+        ADD(" vec4 texel;\n"
+            " vec4 pixel = vec4(0.0, 0.0, 0.0, 1.0);\n");
         unsigned color_idx = 0;
         for (unsigned i = 0; i < interop->tex_count; ++i)
         {
             const char *swizzle = swizzle_per_tex[i];
             assert(swizzle);
             size_t swizzle_count = strlen(swizzle);
-            ADDF(" colors = %s(Texture%u, %s%u);\n", lookup, i, coord_name, i);
+            ADDF(" texel = %s(Texture%u, %s%u);\n", lookup, i, coord_name, i);
             for (unsigned j = 0; j < swizzle_count; ++j)
             {
-                ADDF(" val = colors.%c;\n"
-                     " vec4 color%u = vec4(val, val, val, 1);\n",
-                     swizzle[j], color_idx);
+                ADDF(" pixel[%u] = texel.%c;\n", color_idx, swizzle[j]);
                 color_idx++;
                 assert(color_idx <= PICTURE_PLANE_MAX);
             }
         }
-        ADD(" vec4 result = (color0 * Coefficients[0]) + Coefficients[3];\n");
+        if (yuv_swap_uv) {
+            ADD(" pixel = pixel.xzyw;\n");
+        }
+        ADD(" vec4 result = ConvMatrix * pixel;\n");
         color_count = color_idx;
     }
     else
     {
         ADDF(" vec4 result = %s(Texture0, %s0);\n", lookup, coord_name);
+        if (yuv_swap_uv) {
+            ADD(" result = result.xzyw;\n");
+        }
         color_count = 1;
     }
     assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
-
-    for (unsigned i = 1; i < color_count; ++i)
-    {
-        unsigned color_idx;
-        if (yuv_swap_uv)
-        {
-            assert(color_count == 3);
-            color_idx = (i % 2) + 1;
-        }
-        else
-            color_idx = i;
-
-        if (is_yuv)
-            ADDF(" result = (color%u * Coefficients[%u]) + result;\n",
-                 color_idx, i);
-        else
-            ADDF(" result = color%u + result;\n", color_idx);
-    }
 
 #ifdef HAVE_LIBPLACEBO
     if (tc->pl_sh_res) {
