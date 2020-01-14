@@ -60,7 +60,9 @@
 #include "common.h"
 #include "builtin_shaders.h"
 #include "../../video_chroma/copy.h"
+#ifdef HAVE_GL
 #include "../opengl/interop.h"
+#endif
 
 #include <assert.h>
 
