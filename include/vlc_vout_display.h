@@ -324,7 +324,7 @@ struct vout_display_t {
      *
      * This callback is called once a picture buffer content is ready,
      * as far in advance as possible to the intended display time,
-     * but only after the previous picture was displayed. 
+     * but only after the previous picture was displayed.
      *
      * The callback should perform any preprocessing operation that will not
      * actually cause the picture to be shown, such as blending the subpicture
@@ -438,17 +438,6 @@ static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
 
 VLC_API
 void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height);
-
-static inline int vout_display_Control(vout_display_t *vd, int query, ...)
-{
-    va_list ap;
-    int ret;
-
-    va_start(ap, query);
-    ret = vd->control(vd, query, ap);
-    va_end(ap);
-    return ret;
-}
 
 VLC_API void vout_display_SendEventPicturesInvalid(vout_display_t *vd);
 

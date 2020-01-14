@@ -61,6 +61,17 @@ static picture_t *VideoBufferNew(filter_t *filter)
     return picture_pool_Get(pool);
 }
 
+static int vout_display_Control(vout_display_t *vd, int query, ...)
+{
+    va_list ap;
+    int ret;
+
+    va_start(ap, query);
+    ret = vd->control(vd, query, ap);
+    va_end(ap);
+    return ret;
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
