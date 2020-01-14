@@ -100,7 +100,10 @@ vlc_player_vout_RemoveListener(vlc_player_t *player,
 bool
 vlc_player_vout_IsFullscreen(vlc_player_t *player)
 {
-    return var_GetBool(player, "fullscreen");
+    vout_thread_t *vout = vlc_player_vout_Hold(player);
+    bool fs =  var_GetBool(vout, "fullscreen");
+    vout_Release(vout);
+    return fs;
 }
 
 static int
@@ -185,7 +188,10 @@ vlc_player_vout_SetFullscreen(vlc_player_t *player, bool enabled)
 bool
 vlc_player_vout_IsWallpaperModeEnabled(vlc_player_t *player)
 {
-    return var_GetBool(player, "video-wallpaper");
+    vout_thread_t *vout = vlc_player_vout_Hold(player);
+    bool wm =  var_GetBool(vout, "video-wallpaper");
+    vout_Release(vout);
+    return wm;
 }
 
 void
