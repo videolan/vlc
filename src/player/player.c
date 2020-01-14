@@ -1930,11 +1930,6 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     VAR_CREATE("sub-text-scale", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     VAR_CREATE("demux-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
-    /* vout variables */
-    VAR_CREATE("fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
-    VAR_CREATE("video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
-    VAR_CREATE("video-wallpaper", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
-
     /* aout variables */
     VAR_CREATE("audio-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     VAR_CREATE("mute", VLC_VAR_BOOL);
