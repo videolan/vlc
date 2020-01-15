@@ -308,17 +308,6 @@ struct vout_display_t {
      */
     vout_display_info_t info;
 
-    /* Return a pointer over the current picture_pool_t* (optional).
-     *
-     * For performance reasons, it is best to provide at least count
-     * pictures but it is not mandatory.
-     * You can return NULL when you cannot/do not want to allocate
-     * pictures.
-     * The vout display module keeps the ownership of the pool and can
-     * destroy it only when closing or on invalid pictures control.
-     */
-    picture_pool_t *(*pool)(vout_display_t *, unsigned count);
-
     /**
      * Prepares a picture and an optional subpicture for display (optional).
      *

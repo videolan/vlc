@@ -413,9 +413,6 @@ picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (vd->pool != NULL)
-        return vd->pool(vd, count);
-
     if (osys->pool == NULL)
         osys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
     return osys->pool;
@@ -437,25 +434,7 @@ picture_t *vout_ConvertForDisplay(vout_display_t *vd, picture_t *picture)
         return NULL;
     }
 
-    picture = filter_chain_VideoFilter(osys->converters, picture);
-
-    if (picture != NULL && vd->pool != NULL && picture->i_planes > 0) {
-        picture_pool_t *pool = vd->pool(vd, 3);
-
-        if (!picture_pool_OwnsPic(pool, picture)) {
-            /* The picture is not be allocated from the expected pool. Copy. */
-            picture_t *direct = picture_pool_Get(pool);
-
-            if (direct != NULL) {
-                video_format_CopyCropAr(&direct->format, &picture->format);
-                picture_Copy(direct, picture);
-            }
-            picture_Release(picture);
-            picture = direct;
-        }
-    }
-
-    return picture;
+    return filter_chain_VideoFilter(osys->converters, picture);
 }
 
 picture_t *vout_display_Prepare(vout_display_t *vd, picture_t *picture,
@@ -778,7 +757,6 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     video_format_Copy(&vd->source, source);
     vd->info = (vout_display_info_t){ };
     vd->cfg = &osys->cfg;
-    vd->pool = NULL;
     vd->prepare = NULL;
     vd->display = NULL;
     vd->control = NULL;
