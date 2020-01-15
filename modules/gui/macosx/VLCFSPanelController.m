@@ -31,6 +31,7 @@
 
 @interface VLCFSPanelController () {
     BOOL _isCounting;
+    BOOL _isFadingIn;
 
     // Only used to track changes and trigger centering of FS panel
     NSRect _associatedVoutFrame;
@@ -324,20 +325,26 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     if (!var_InheritBool(getIntf(), "macosx-fspanel"))
         return;
 
-    [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:0.4f];
-    [[self.window animator] setAlphaValue:1.0f];
-    [NSAnimationContext endGrouping];
+    if (_isFadingIn)
+        return;
 
-    [self startAutohideTimer];
+    [self stopAutohideTimer];
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
+        _isFadingIn = YES;
+        [context setDuration:0.4f];
+        [[self.window animator] setAlphaValue:1.0f];
+    } completionHandler:^{
+        _isFadingIn = NO;
+        [self startAutohideTimer];
+    }];
 }
 
 - (void)fadeOut
 {
-    [NSAnimationContext beginGrouping];
-    [[NSAnimationContext currentContext] setDuration:0.4f];
-    [[self.window animator] setAlphaValue:0.0f];
-    [NSAnimationContext endGrouping];
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
+        [context setDuration:0.4f];
+        [[self.window animator] setAlphaValue:0.0f];
+    } completionHandler:nil];
 }
 
 - (void)centerPanel
