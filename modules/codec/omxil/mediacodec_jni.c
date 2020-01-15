@@ -486,15 +486,15 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
 
                 bool ignore_size = false;
 
-                /* The AVC MediaCodec implementation on Amazon fire TV seems to
-                 * report the Output surface size instead of the AVC size. This
-                 * bug is specific to Amazon devices since other MTK
+                /* The AVC/HEVC MediaCodec implementation on Amazon fire TV
+                 * seems to report the Output surface size instead of the Video
+                 * size. This bug is specific to Amazon devices since other MTK
                  * implementations report the correct size. The manufacturer is
-                 * checked only if the codec matches the MKT AVC one in order
-                 * to avoid extra manufacturer check for other every devices.
+                 * checked only if the codec matches the MTK one in order to
+                 * avoid extra manufacturer check for other every devices.
                  * */
-                static const char mtk_avc[] = "OMX.MTK.VIDEO.DECODER.AVC";
-                if (strncmp(psz_name, mtk_avc, sizeof(mtk_avc) - 1) == 0)
+                static const char mtk_dec[] = "OMX.MTK.VIDEO.DECODER.";
+                if (strncmp(psz_name, mtk_dec, sizeof(mtk_dec) - 1) == 0)
                 {
                     char *manufacturer = GetManufacturer(env);
                     if (manufacturer && strcmp(manufacturer, "Amazon") == 0)
