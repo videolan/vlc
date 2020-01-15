@@ -31,6 +31,7 @@ static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
 #define AMEM_SAMPLE_RATE_MAX 384000
+#define AMEM_CHAN_MAX 8
 
 vlc_module_begin ()
     set_shortname (N_("Audio memory"))
@@ -49,7 +50,7 @@ vlc_module_begin ()
         change_private()
     add_integer ("amem-channels", 2,
                  N_("Channels count"), N_("Channels count"), false)
-        change_integer_range (1, AOUT_CHAN_MAX)
+        change_integer_range (1, AMEM_CHAN_MAX)
         change_private()
 
 vlc_module_end ()
@@ -67,8 +68,8 @@ typedef struct
         };
         struct
         {
-             unsigned rate:18;
-             unsigned channels:14;
+             unsigned rate;
+             uint8_t channels;
         };
     };
     void (*play) (void *opaque, const void *data, unsigned count, int64_t pts);
@@ -229,7 +230,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
 
     /* Ensure that format is supported */
     if (fmt->i_rate == 0 || fmt->i_rate > AMEM_SAMPLE_RATE_MAX
-     || channels == 0 || channels > AOUT_CHAN_MAX
+     || channels == 0 || channels > AMEM_CHAN_MAX
      || strcmp(format, "S16N") /* TODO: amem-format */)
     {
         msg_Err (aout, "format not supported: %s, %u channel(s), %u Hz",
