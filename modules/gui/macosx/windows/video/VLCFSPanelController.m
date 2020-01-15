@@ -461,7 +461,14 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     _associatedVoutWindow = voutWindow;
 
     NSRect voutRect = voutWindow.frame;
-    if (!NSEqualRects(_associatedVoutFrame, voutRect)) {
+
+    // In some cases, the FSPanel frame has moved outside of the
+    // vout view --> Also re-center in this case
+    NSRect currentFrame = [self.window frame];
+    NSRect constrainedFrame = [self contrainFrameToAssociatedVoutWindow: currentFrame];
+
+    if (!NSEqualRects(_associatedVoutFrame, voutRect) ||
+        !NSEqualRects(currentFrame, constrainedFrame)) {
         _associatedVoutFrame = voutRect;
         [[NSUserDefaults standardUserDefaults] setObject:NSStringFromRect(_associatedVoutFrame) forKey:kAssociatedFullscreenRect];
 
