@@ -129,31 +129,44 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, vlc_fourcc_t chroma,
                  video_color_space_t yuv_space,
                  bool *swap_uv)
 {
-    float yuv_range_correction = 1.0;
-    if (desc->pixel_size == 2)
-    {
-        /* Do a bit shift if samples are stored on LSB */
-        if (chroma != VLC_CODEC_P010 && chroma != VLC_CODEC_P016)
-            yuv_range_correction = (float)((1 << 16) - 1)
-                                 / ((1 << desc->pixel_bits) - 1);
-    }
-
     /* The current implementation always converts from limited to full range. */
     const video_color_range_t range = COLOR_RANGE_LIMITED;
     float matrix[4*4];
     init_conv_matrix(matrix, yuv_space, range);
 
+    if (desc->pixel_size == 2)
+    {
+        if (chroma != VLC_CODEC_P010 && chroma != VLC_CODEC_P016) {
+            /* Do a bit shift if samples are stored on LSB. */
+            float yuv_range_correction = (float)((1 << 16) - 1)
+                                         / ((1 << desc->pixel_bits) - 1);
+            /* We want to transform the input color (y, u, v, 1) to
+             * (r*y, r*u, r*v, 1), where r = yuv_range_correction.
+             *
+             * This can be done by left-multiplying the color vector by a
+             * matrix R:
+             *
+             *                 R
+             *  / r*y \   / r 0 0 0 \   / y \
+             *  | r*u | = | 0 r 0 0 | * | u |
+             *  | r*v |   | 0 0 r 0 |   | v |
+             *  \  1  /   \ 0 0 0 1 /   \ 1 /
+             *
+             * Combine this transformation with the color conversion matrix:
+             *
+             *     matrix := matrix * R
+             *
+             * This is equivalent to multipying the 3 first rows by r
+             * (yuv_range_conversion).
+             */
+            for (int i = 0; i < 4*3; ++i)
+                matrix[i] *= yuv_range_correction;
+        }
+    }
+
     for (int i = 0; i < 4; i++) {
-        float correction = i < 3 ? yuv_range_correction : 1.f;
-        /* We place coefficient values for coefficient[4] in one array from
-         * matrix values. Notice that we fill values from top down instead
-         * of left to right.*/
-        for (int j = 0; j < 3; j++)
-            tc->yuv_coefficients[i*4+j] = correction * matrix[j*4+i];
-        tc->yuv_coefficients[3] = 0.f;
-        tc->yuv_coefficients[7] = 0.f;
-        tc->yuv_coefficients[11] = 0.f;
-        tc->yuv_coefficients[15] = 1.f;
+        for (int j = 0; j < 4; j++)
+            tc->yuv_coefficients[i*4+j] = matrix[j*4+i];
     }
 
     tc->yuv_color = true;
