@@ -240,9 +240,10 @@ vlc_family_t *NewFamily( filter_t *p_filter, const char *psz_family,
                          const char *psz_key )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    vlc_family_t *p_family = NULL;
 
-    p_family = calloc( 1, sizeof( *p_family ) );
+    vlc_family_t *p_family = calloc( 1, sizeof( *p_family ) );
+    if( unlikely(!p_family) )
+        return NULL;
 
     char *psz_name;
     if( psz_family && *psz_family )
