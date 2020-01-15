@@ -1160,17 +1160,17 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     else if( p_region_in->i_y > 0 && (unsigned)p_region_in->i_y < i_max_height )
         i_max_height -= p_region_in->i_y;
 
+    rv = LayoutText( p_filter,
+                     psz_text, pp_styles, pi_k_durations, i_text_length,
+                     p_region_in->b_gridmode, p_region_in->b_balanced_text,
+                     i_max_width, i_max_height, &p_lines, &bbox, &i_max_face_height );
+
     uint8_t i_background_opacity = var_InheritInteger( p_filter, "freetype-background-opacity" );
     i_background_opacity = VLC_CLIP( i_background_opacity, 0, 255 );
     int i_margin = (i_background_opacity > 0 && !p_region_in->b_gridmode) ? i_max_face_height / 4 : 0;
 
     if( (unsigned)i_margin * 2 >= i_max_width || (unsigned)i_margin * 2 >= i_max_height )
         i_margin = 0;
-
-    rv = LayoutText( p_filter,
-                     psz_text, pp_styles, pi_k_durations, i_text_length,
-                     p_region_in->b_gridmode, p_region_in->b_balanced_text,
-                     i_max_width, i_max_height, &p_lines, &bbox, &i_max_face_height );
 
     /* Don't attempt to render text that couldn't be layed out
      * properly. */
