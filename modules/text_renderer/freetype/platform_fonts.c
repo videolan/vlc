@@ -384,6 +384,7 @@ error:
     return NULL;
 }
 
+#ifdef DEBUG_PLATFORM_FONTS
 void DumpFamily( filter_t *p_filter, const vlc_family_t *p_family,
                  bool b_dump_fonts, int i_max_families )
 {
@@ -435,6 +436,7 @@ void DumpDictionary( filter_t *p_filter, const vlc_dictionary_t *p_dict,
     }
     free( ppsz_keys );
 }
+#endif
 
 char* ToLower( const char *psz_src )
 {

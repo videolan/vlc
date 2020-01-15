@@ -1538,7 +1538,7 @@ static void Destroy( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-#if 0
+#ifdef DEBUG_PLATFORM_FONTS
     msg_Dbg( p_filter, "------------------" );
     msg_Dbg( p_filter, "p_sys->p_families:" );
     msg_Dbg( p_filter, "------------------" );
