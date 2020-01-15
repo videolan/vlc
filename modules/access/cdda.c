@@ -470,13 +470,10 @@ static musicbrainz_recording_t * GetMusicbrainzInfo( vlc_object_t *obj,
     else /* Fuzzy lookup using TOC */
     {
         struct vlc_memstream ms;
-        if( vlc_memstream_open(&ms) )
-        {
-            free( psz_mbserver );
-            return NULL;
-        }
 
+        vlc_memstream_open(&ms);
         vlc_memstream_printf(&ms, "toc=%u+%u", i_first, i_last );
+
         /* LEAD OUT sector info
          * https://github.com/metabrainz/libdiscid/blob/e46249415eb6d657ecc63667b03d670a4347712f/src/toc.c#L90 */
         int i_last_track_end;
@@ -487,18 +484,11 @@ static musicbrainz_recording_t * GetMusicbrainzInfo( vlc_object_t *obj,
         vlc_memstream_printf(&ms, "+%u", i_last_track_end );
         for( int i = 0; i<i_total; i++ ) /* skipped LEAD OUT, audio only */
             vlc_memstream_printf(&ms, "+%u", LBAPregap(p_toc->p_sectors[i].i_lba) );
-        if( vlc_memstream_flush(&ms) )
-        {
-            if( vlc_memstream_close(&ms) )
-                free( ms.ptr );
-            free( psz_mbserver );
-            return NULL;
-        }
-
-        recording = musicbrainz_lookup_recording_by_toc( &cfg, ms.ptr );
-
         if( vlc_memstream_close(&ms) == 0 )
+        {
+            recording = musicbrainz_lookup_recording_by_toc( &cfg, ms.ptr );
             free( ms.ptr );
+        }
     }
 
     free( psz_mbserver );
