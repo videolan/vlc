@@ -130,8 +130,7 @@ init_conv_matrix(float conv_matrix_out[],
 static int
 tc_yuv_base_init(opengl_tex_converter_t *tc, vlc_fourcc_t chroma,
                  const vlc_chroma_description_t *desc,
-                 video_color_space_t yuv_space,
-                 bool *swap_uv)
+                 video_color_space_t yuv_space)
 {
     /* The current implementation always converts from limited to full range. */
     const video_color_range_t range = COLOR_RANGE_LIMITED;
@@ -170,8 +169,35 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, vlc_fourcc_t chroma,
 
     tc->yuv_color = true;
 
-    *swap_uv = chroma == VLC_CODEC_YV12 || chroma == VLC_CODEC_YV9 ||
-               chroma == VLC_CODEC_NV21;
+    /* Some formats require to swap the U and V components.
+     *
+     * This can be done by left-multiplying the color vector by a matrix S:
+     *
+     *               S
+     *  / y \   / 1 0 0 0 \   / y \
+     *  | v | = | 0 0 1 0 | * | u |
+     *  | u |   | 0 1 0 0 |   | v |
+     *  \ 1 /   \ 0 0 0 1 /   \ 1 /
+     *
+     * Combine this transformation with the color conversion matrix:
+     *
+     *     matrix := matrix * S
+     *
+     * This is equivalent to swap columns 1 and 2.
+     */
+    bool swap_uv = chroma == VLC_CODEC_YV12 || chroma == VLC_CODEC_YV9 ||
+                   chroma == VLC_CODEC_NV21;
+    if (swap_uv)
+    {
+        /* Remember, the matrix in column-major order */
+        float tmp[4];
+        /* tmp <- column1 */
+        memcpy(tmp, matrix + 4, sizeof(tmp));
+        /* column1 <- column2 */
+        memcpy(matrix + 4, matrix + 8, sizeof(tmp));
+        /* column2 <- tmp */
+        memcpy(matrix + 8, tmp, sizeof(tmp));
+    }
     return VLC_SUCCESS;
 }
 
@@ -409,7 +435,6 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
 
     const char *swizzle_per_tex[PICTURE_PLANE_MAX] = { NULL, };
     const bool is_yuv = vlc_fourcc_IsYUV(chroma);
-    bool yuv_swap_uv = false;
     int ret;
 
     const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(chroma);
@@ -421,7 +446,7 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
 
     if (is_yuv)
     {
-        ret = tc_yuv_base_init(tc, chroma, desc, yuv_space, &yuv_swap_uv);
+        ret = tc_yuv_base_init(tc, chroma, desc, yuv_space);
         if (ret != VLC_SUCCESS)
             return 0;
         ret = opengl_init_swizzle(tc->interop, swizzle_per_tex, chroma, desc);
@@ -586,18 +611,12 @@ opengl_fragment_shader_init(opengl_tex_converter_t *tc, GLenum tex_target,
                 assert(color_idx <= PICTURE_PLANE_MAX);
             }
         }
-        if (yuv_swap_uv) {
-            ADD(" pixel = pixel.xzyw;\n");
-        }
         ADD(" vec4 result = ConvMatrix * pixel;\n");
         color_count = color_idx;
     }
     else
     {
         ADDF(" vec4 result = %s(Texture0, %s0);\n", lookup, coord_name);
-        if (yuv_swap_uv) {
-            ADD(" result = result.xzyw;\n");
-        }
         color_count = 1;
     }
     assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
