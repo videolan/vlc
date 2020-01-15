@@ -751,8 +751,8 @@ static inline void RenderBackground( subpicture_region_t *p_region,
             continue; /* only spaces */
 
         /* add padding */
-        linebgbox.yMax += (p_paddedbbox->xMax - p_textbbox->xMax);
-        linebgbox.yMin -= (p_textbbox->xMin - p_paddedbbox->xMin);
+        linebgbox.yMax += (p_paddedbbox->yMax - p_textbbox->yMax);
+        linebgbox.yMin -= (p_textbbox->yMin - p_paddedbbox->yMin);
         linebgbox.xMin -= (p_textbbox->xMin - p_paddedbbox->xMin);
         linebgbox.xMax += (p_paddedbbox->xMax - p_textbbox->xMax);
 
