@@ -205,8 +205,6 @@ values2key( const char* const* ppsz_values, bool b_search )
 end:
     free( psz_b64_realm );
     free( psz_b64_auth );
-    if ( vlc_memstream_flush( &ms ) != 0 )
-        b_state = false;
     char *psz_key = vlc_memstream_close( &ms ) == 0 ? ms.ptr : NULL;
     if ( !b_state )
     {
