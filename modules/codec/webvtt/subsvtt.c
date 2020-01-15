@@ -1899,6 +1899,7 @@ struct parser_ctx
     webvtt_region_t *p_region;
 #ifdef HAVE_CSS
     struct vlc_memstream css;
+    bool b_css_memstream_opened;
 #endif
     decoder_t *p_dec;
 };
@@ -1925,7 +1926,7 @@ static void ParserHeaderHandler( void *priv, enum webvtt_header_line_e s,
             ctx->p_region = NULL;
         }
 #ifdef HAVE_CSS
-        else if( ctx->css.stream )
+        else if( ctx->b_css_memstream_opened )
         {
             if( vlc_memstream_close( &ctx->css ) == VLC_SUCCESS )
             {
@@ -1958,7 +1959,7 @@ static void ParserHeaderHandler( void *priv, enum webvtt_header_line_e s,
                 ctx->p_region = webvtt_region_New();
 #ifdef HAVE_CSS
             else if( s == WEBVTT_HEADER_STYLE )
-                (void) vlc_memstream_open( &ctx->css );
+                ctx->b_css_memstream_opened = !vlc_memstream_open( &ctx->css );
 #endif
             return;
         }
@@ -1967,7 +1968,7 @@ static void ParserHeaderHandler( void *priv, enum webvtt_header_line_e s,
     if( s == WEBVTT_HEADER_REGION && ctx->p_region )
         webvtt_region_Parse( ctx->p_region, (char*) psz_line );
 #ifdef HAVE_CSS
-    else if( s == WEBVTT_HEADER_STYLE && ctx->css.stream )
+    else if( s == WEBVTT_HEADER_STYLE && ctx->b_css_memstream_opened )
     {
         vlc_memstream_puts( &ctx->css, psz_line );
         vlc_memstream_putc( &ctx->css, '\n' );
@@ -1986,7 +1987,7 @@ static void LoadExtradata( decoder_t *p_dec )
 
    struct parser_ctx ctx;
 #ifdef HAVE_CSS
-   ctx.css.stream = NULL;
+   ctx.b_css_memstream_opened = false;
 #endif
    ctx.p_region = NULL;
    ctx.p_dec = p_dec;
