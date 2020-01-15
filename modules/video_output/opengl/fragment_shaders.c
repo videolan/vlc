@@ -37,6 +37,92 @@
 #include "internal.h"
 #include "vout_helper.h"
 
+static const float MATRIX_COLOR_RANGE_LIMITED[4*3] = {
+    255.0/219,         0,         0, -255.0/219 *  16.0/255,
+            0, 255.0/224,         0, -255.0/224 * 128.0/255,
+            0,         0, 255.0/224, -255.0/224 * 128.0/255,
+};
+
+static const float MATRIX_COLOR_RANGE_FULL[4*3] = {
+    1, 0, 0,          0,
+    0, 1, 0, -128.0/255,
+    0, 0, 1, -128.0/255,
+};
+
+/*
+ * Construct the transformation matrix from the luma weight of the red and blue
+ * component (the green component is deduced).
+ */
+#define MATRIX_YUV_TO_RGB(KR, KB) \
+    MATRIX_YUV_TO_RGB_(KR, (1-(KR)-(KB)), KB)
+
+/*
+ * Construct the transformation matrix from the luma weight of the RGB
+ * components.
+ *
+ * KR: luma weight of the red component
+ * KG: luma weight of the green component
+ * KB: luma weight of the blue component
+ *
+ * By definition, KR + KG + KB == 1.
+ *
+ * Ref: <https://en.wikipedia.org/wiki/YCbCr#ITU-R_BT.601_conversion>
+ * Ref: libplacebo: src/colorspace.c:luma_coeffs()
+ * */
+#define MATRIX_YUV_TO_RGB_(KR, KG, KB) { \
+    1,                         0,              2*(1.0-(KR)), \
+    1, -2*(1.0-(KB))*((KB)/(KG)), -2*(1.0-(KR))*((KR)/(KG)), \
+    1,              2*(1.0-(KB)),                         0, \
+}
+
+static const float MATRIX_BT601[3*3] = MATRIX_YUV_TO_RGB(0.299, 0.114);
+static const float MATRIX_BT709[3*3] = MATRIX_YUV_TO_RGB(0.2126, 0.0722);
+static const float MATRIX_BT2020[3*3] = MATRIX_YUV_TO_RGB(0.2627, 0.0593);
+
+static void
+init_conv_matrix(float conv_matrix_out[],
+                 video_color_space_t color_space,
+                 video_color_range_t color_range)
+{
+    const float *space_matrix;
+    switch (color_space) {
+        case COLOR_SPACE_BT601:
+            space_matrix = MATRIX_BT601;
+            break;
+        case COLOR_SPACE_BT2020:
+            space_matrix = MATRIX_BT2020;
+            break;
+        default:
+            space_matrix = MATRIX_BT709;
+    }
+
+    /* Init the conversion matrix in row-major order. */
+
+    const float *range_matrix = color_range == COLOR_RANGE_FULL
+                              ? MATRIX_COLOR_RANGE_FULL
+                              : MATRIX_COLOR_RANGE_LIMITED;
+    /* Multiply the matrices on CPU once for all */
+    for (int x = 0; x < 4; ++x)
+    {
+        for (int y = 0; y < 3; ++y)
+        {
+            /* Perform intermediate computation in double precision even if the
+             * result is in single-precision, to avoid unnecessary errors. */
+            double sum = 0;
+            for (int k = 0; k < 3; ++k)
+                sum += space_matrix[y * 3 + k] * range_matrix[k * 4 + x];
+            conv_matrix_out[y * 4 + x] = sum;
+        }
+    }
+
+    /* Add a row to fill a 4x4 matrix.
+     * (non-square matrices are not supported on old OpenGL ES versions) */
+    conv_matrix_out[12] = 0;
+    conv_matrix_out[13] = 0;
+    conv_matrix_out[14] = 0;
+    conv_matrix_out[15] = 1;
+}
+
 static int
 tc_yuv_base_init(opengl_tex_converter_t *tc, vlc_fourcc_t chroma,
                  const vlc_chroma_description_t *desc,
@@ -52,38 +138,10 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, vlc_fourcc_t chroma,
                                  / ((1 << desc->pixel_bits) - 1);
     }
 
-    /* [R/G/B][Y U V O] from TV range to full range
-     * XXX we could also do hue/brightness/constrast/gamma
-     * by simply changing the coefficients
-     */
-    static const float matrix_bt601_tv2full[12] = {
-        1.164383561643836,  0.0000,             1.596026785714286, -0.874202217873451 ,
-        1.164383561643836, -0.391762290094914, -0.812967647237771,  0.531667823499146 ,
-        1.164383561643836,  2.017232142857142,  0.0000,            -1.085630789302022 ,
-    };
-    static const float matrix_bt709_tv2full[12] = {
-        1.164383561643836,  0.0000,             1.792741071428571, -0.972945075016308 ,
-        1.164383561643836, -0.21324861427373,  -0.532909328559444,  0.301482665475862 ,
-        1.164383561643836,  2.112401785714286,  0.0000,            -1.133402217873451 ,
-    };
-    static const float matrix_bt2020_tv2full[12] = {
-        1.164383530616760,  0.0000,             1.678674221038818, -0.915687978267670 ,
-        1.164383530616760, -0.187326118350029, -0.650424420833588,  0.347458571195602 ,
-        1.164383530616760,  2.141772270202637,  0.0000,            -1.148145079612732 ,
-    };
-
-    const float *matrix;
-    switch (yuv_space)
-    {
-        case COLOR_SPACE_BT601:
-            matrix = matrix_bt601_tv2full;
-            break;
-        case COLOR_SPACE_BT2020:
-            matrix = matrix_bt2020_tv2full;
-            break;
-        default:
-            matrix = matrix_bt709_tv2full;
-    };
+    /* The current implementation always converts from limited to full range. */
+    const video_color_range_t range = COLOR_RANGE_LIMITED;
+    float matrix[4*4];
+    init_conv_matrix(matrix, yuv_space, range);
 
     for (int i = 0; i < 4; i++) {
         float correction = i < 3 ? yuv_range_correction : 1.f;
