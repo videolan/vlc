@@ -73,7 +73,7 @@ struct opengl_tex_converter_t
         GLint *pl_vars; /* for pl_sh_res */
     } uloc;
     bool yuv_color;
-    GLfloat yuv_coefficients[16];
+    GLfloat conv_matrix[16];
 
     struct pl_shader *pl_sh;
     const struct pl_shader_res *pl_sh_res;

@@ -135,7 +135,7 @@ tc_yuv_base_init(opengl_tex_converter_t *tc, vlc_fourcc_t chroma,
 {
     /* The current implementation always converts from limited to full range. */
     const video_color_range_t range = COLOR_RANGE_LIMITED;
-    float *matrix = tc->yuv_coefficients;
+    float *matrix = tc->conv_matrix;
     init_conv_matrix(matrix, yuv_space, range);
 
     if (desc->pixel_size == 2)
@@ -229,7 +229,7 @@ tc_base_prepare_shader(const opengl_tex_converter_t *tc,
 
     if (tc->yuv_color)
         tc->vt->UniformMatrix4fv(tc->uloc.ConvMatrix, 1, GL_FALSE,
-                                 tc->yuv_coefficients);
+                                 tc->conv_matrix);
 
     for (unsigned i = 0; i < interop->tex_count; ++i)
         tc->vt->Uniform1i(tc->uloc.Texture[i], i);
