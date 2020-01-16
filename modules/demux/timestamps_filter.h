@@ -113,7 +113,8 @@ static bool timestamps_filter_push(const char *s, struct timestamps_filter_s *tf
 #ifdef DEBUG_TIMESTAMPS_FILTER
         vlc_tick_t next = prev->dts + mva_get(&tf->mva);
 
-        printf("%4.4s expected %ld / %ld , prev %ld+%ld error %ld comp %ld\n",
+        printf("%4.4s expected %" PRId64 " / %" PRId64 " , prev %" PRId64 "+%" PRId64
+               " error %lld comp %" PRId64 "\n",
                s, next, i_dts, prev->dts, mva_get(&tf->mva),
                b_contiguous ? llabs(i_dts - next): 0, i_dts + tf->sequence_offset);
 #else
@@ -257,7 +258,7 @@ static int timestamps_filter_es_out_Send(es_out_t *out, es_out_id_t *id, block_t
             if(i_offsetdiff != 0)
                 cur->tf.sequence_offset -= i_offsetdiff;
 #ifdef DEBUG_TIMESTAMPS_FILTER
-            printf("    ^ diff pcr %ld off %ld ********** pcrnum %ld seq %d/%d\n",
+            printf("    ^ diff pcr %" PRId64 " off %" PRId64 " ********** pcrnum %u seq %u/%u\n",
                    cur->pcrdiff, i_offsetdiff, p_sys->pcrtf.mva.i_packet,
                    cur->tf.sequence, p_sys->pcrtf.sequence);
 #endif
