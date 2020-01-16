@@ -214,7 +214,7 @@ static int Open(vlc_object_t *obj)
         goto out;
     }
 
-    MMAL_PARAMETER_BOOLEAN_T zero_copy = {
+    zero_copy = (MMAL_PARAMETER_BOOLEAN_T) {
         { MMAL_PARAMETER_ZERO_COPY, sizeof(MMAL_PARAMETER_BOOLEAN_T) },
         1
     };
@@ -397,7 +397,7 @@ static picture_t *deinterlace(filter_t *filter, picture_t *picture)
      * Send output buffers
      */
     while(atomic_load(&sys->started) && i < 2) {
-        if (buffer = mmal_queue_timedwait(sys->filtered_pictures, 2000)) {
+        if ((buffer = mmal_queue_timedwait(sys->filtered_pictures, 2000))) {
             i++;
             if (!out_picture) {
                 out_picture = (picture_t *)buffer->user_data;
