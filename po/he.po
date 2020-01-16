@@ -4,14 +4,14 @@
 #
 # Translators:
 # Amir Aharoni <amir.aharoni@mail.huji.ac.il>, 2016
-# Yaron Shahrabani <sh.yaron@gmail.com>, 2014-2019
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2014-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-07-11 07:30+0200\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-02-21 05:35+0100\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2020\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/16553/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -274,7 +274,12 @@ msgid ""
 "RTSP).\n"
 "Sout streams modules allow advanced stream processing (transcoding, "
 "duplicating...)."
-msgstr "שגיאת Blu-Ray"
+msgstr ""
+"בהגדרות פלט תזרים נעשה שימוש בעת העברת פעילות למצב הזרמה או בעת שמירת "
+"תזרימים נכנסים.\n"
+"התזרימים עוברים ריבוב בראש ובראשונה ולאחר מכן נשלחים דרך מודול „פלט גישה” "
+"שיכול להיות שמירה לקובץ או הזרמה (UDP, HTTP, RTP/RTSP).\n"
+"מודולים של פליטת תזרימים מאפשרים עיבוד פלט מתקדם (שינוי קידוד, שכפול…)."
 
 #: include/vlc_config_cat.h:137
 msgid "General stream output settings"
@@ -1527,6 +1532,9 @@ msgid ""
 "list of interface modules. (common values are \"rc\" (remote control), \"http"
 "\", \"gestures\" ...)"
 msgstr ""
+"ניתן לבחור ב„מנשקים נוספים” עבור VLC. הם יופעלו ברקע בנוסף למנשק בררת המחדל. "
+"ניתן להשתמש ברשימת מודולים מופרדים בנקודתיים. (הערכים הנפוצים הם „rc” (שלט "
+"רחוק), „http”,‏ „gestures” …)"
 
 #: src/libvlc-module.c:83
 msgid "You can select control interfaces for VLC."
@@ -1594,6 +1602,9 @@ msgid ""
 "(spectrum analyzer, etc.). Enable these filters here, and configure them in "
 "the \"audio filters\" modules section."
 msgstr ""
+"אפשרויות אלו מאפשרות לך לשנות את התנהגות תת־מערכת השמע ולהוסיף מסנני שמע "
+"שניתן להשתמש בהם לעיבוד או לאפקטים חזותיים (נתח תדרים, וכו׳). ניתן להפעיל את "
+"המסננים האלה כאן ולהגדיר אותם בסעיף המודולים „מסנני שמע”."
 
 #: src/libvlc-module.c:123
 msgid "Audio output module"
@@ -2565,6 +2576,8 @@ msgid ""
 "letter country code, you may use 'none' to avoid a fallback to another "
 "language)."
 msgstr ""
+"שפת רצועת השמע בה ברצונך להשתמש (עם פסיקים כמפרידים, קוד מדינה ב־2 או 3 "
+"תווים, אפשר להשתמש ב־‚none’ כדי להימנע מרשת ביטחון לשפה אחרת)."
 
 #: src/libvlc-module.c:593
 msgid "Subtitle language"
@@ -2575,6 +2588,8 @@ msgid ""
 "Language of the subtitle track you want to use (comma separated, two or "
 "three letters country code, you may use 'any' as a fallback)."
 msgstr ""
+"שפת רצועת הכתוביות בה ברצונך להשתמש (עם פסיקים כמפרידים, קוד מדינה ב־2 או 3 "
+"תווים, אפשר להשתמש ב־‚any’ כרשת ביטחון)."
 
 #: src/libvlc-module.c:598
 msgid "Menu language"
@@ -2733,7 +2748,7 @@ msgstr "תיקיית הקלטה"
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
-msgstr ""
+msgstr "תיקייה בה תישמרנה ההקלטות"
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
@@ -2774,10 +2789,13 @@ msgid ""
 "Track num<br>$p: Now playing<br>$A: Date<br>$D: Duration<br>$Z: \"Now playing"
 "\" (Fall back on Title - Artist)"
 msgstr ""
+"אפשרות זו מאפשרת לך להגדיר את הכותרת בהתאם למה שמתנגן <br>$a: אמן<br>$b: "
+"אלבום<br>$c: זכויות יוצרים<br>$t: כותרת<br>$g: סגנון<br>$n: מס׳ רצועה<br>$p: "
+"מתנגן כעת<br>$A: תאריך<br>$D: משך<br>$Z: „מתנגן כעת” (נסיגה למצב כותרת - אמן)"
 
 #: src/libvlc-module.c:695
 msgid "Disable all lua plugins"
-msgstr ""
+msgstr "השבתת כל תוספי ה־lua"
 
 #: src/libvlc-module.c:699
 msgid ""
@@ -2805,7 +2823,7 @@ msgstr ""
 
 #: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
-msgstr ""
+msgstr "משנה את גודל הכתוביות היכן שניתן"
 
 #: src/libvlc-module.c:713
 msgid "Enable sub-pictures"
@@ -2843,17 +2861,19 @@ msgstr ""
 
 #: src/libvlc-module.c:726
 msgid "Subpictures source module"
-msgstr ""
+msgstr "מודול מקור תת־תמונות"
 
 #: src/libvlc-module.c:728
 msgid ""
 "This adds so-called \"subpicture sources\". These filters overlay some "
 "images or text over the video (like a logo, arbitrary text, ...)."
 msgstr ""
+"תוסף זה מוסיף „מקורות תמונות” כביכול. מסננים אלו מסתירים חלקים מהסרטון "
+"בתמונות או בטקסט (כגון לוגו, טקסט שרירותי וכו׳)."
 
 #: src/libvlc-module.c:731
 msgid "Subpictures filter module"
-msgstr ""
+msgstr "מודול מסנן תת־תמונות"
 
 #: src/libvlc-module.c:733
 msgid ""
@@ -2870,6 +2890,8 @@ msgid ""
 "Automatically detect a subtitle file, if no subtitle filename is specified "
 "(based on the filename of the movie)."
 msgstr ""
+"זיהוי אוטומטי של קובץ כתוביות, אם לא צוין שם קובץ של קובץ כתוביות (על בסיס "
+"שם הקובץ של הסרט)."
 
 #: src/libvlc-module.c:741
 msgid "Subtitle autodetection fuzziness"
@@ -2885,6 +2907,13 @@ msgid ""
 "3 = subtitle file matching the movie name with additional chars\n"
 "4 = subtitle file matching the movie name exactly"
 msgstr ""
+"כאן ניתן לקבוע עד כמה ההתאמה בין שמות הקבצים של הסרט והכתוביות תהיה קשיחה. "
+"האפשרויות הן:\n"
+"0 = לא זוהו כתוביות אוטומטית\n"
+"1 = כל קובץ כתוביות\n"
+"2 = כל קובץ כתוביות שמכיל את שם הסרט\n"
+"3 = קובץ כתוביות שמכיל את שם הסרט עם כמה תווים נספחים\n"
+"4 = קובץ כתוביות שתואם את שם הסרט במדויק"
 
 #: src/libvlc-module.c:751
 msgid "Subtitle autodetection paths"
@@ -2972,6 +3001,9 @@ msgid ""
 "address (e.g. ::1 or 127.0.0.1) or a host name (e.g. localhost) to restrict "
 "them to a specific network interface."
 msgstr ""
+"כבררת מחדל, השרת יאזין לכל כתובת IP מקומית. יש לציין כתובת IP (למשל ‎::1 או "
+"127.0.0.1) או שם מארח (למשל: localhost) כדי להגביל את החיבורים למנשק רשת "
+"מסוים."
 
 #: src/libvlc-module.c:809
 msgid "RTSP server address"
@@ -3586,7 +3618,7 @@ msgstr "הצגת קבצים מוסתרים"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
-msgstr ""
+msgstr "התעלמות מקבצים שמתחילים ב־‚.’"
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
@@ -3597,6 +3629,8 @@ msgid ""
 "Specifies the services discovery modules to preload, separated by colons. "
 "Typical value is \"sap\"."
 msgstr ""
+"מציין את מודולי גילוי השירותים לטעינה מראש, עם פסיק ביניהם. הערך האופייני "
+"הוא „sap”."
 
 #: src/libvlc-module.c:1156
 msgid "Play files randomly forever"
@@ -3660,7 +3694,7 @@ msgstr "התחל אוטומטית"
 
 #: src/libvlc-module.c:1185
 msgid "Automatically start playing the playlist content once it's loaded."
-msgstr ""
+msgstr "להתחיל לנגן את תוכן רשימת הנגינה אוטומטית עם טעינתה."
 
 #: src/libvlc-module.c:1188
 msgid "Pause on audio communication"
@@ -3714,23 +3748,27 @@ msgstr "בקרת מיקום הפוכה"
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
-msgstr ""
+msgstr "שליטה עם גלגלת העכבר בציר האנכי"
 
 #: src/libvlc-module.c:1220
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
+"הציר האנכי (למעלה/למטה) של העכבר יכול לשלוט בעצמת השמע, מיקום הנגינה או בשום "
+"דבר."
 
 #: src/libvlc-module.c:1222
 msgid "Mouse wheel horizontal axis control"
-msgstr ""
+msgstr "שליטה עם גלגלת העכבר בציר האופקי"
 
 #: src/libvlc-module.c:1224
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
+"הציר האופקי (שמאלה/ימינה) של העכבר יכול לשלוט בעצמת השמע, מיקום הנגינה או "
+"בשום דבר."
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:98
@@ -4115,19 +4153,19 @@ msgstr "נא לבחור במקש להקטנת השהיית הכתוביות."
 
 #: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
-msgstr ""
+msgstr "איפוס יחס גודל כתוביות"
 
 #: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
-msgstr ""
+msgstr "הגדלת הכתוביות"
 
 #: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "הקטנת הכתוביות"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
-msgstr ""
+msgstr "נא לבחור את המקשר לשינוי יחס גודל טקסט הכתוביות"
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4360,7 +4398,7 @@ msgstr "החלפה בין רצועות הכתוביות הזמינות."
 
 #: src/libvlc-module.c:1395
 msgid "Toggle subtitles"
-msgstr ""
+msgstr "החלפת מצב הכתוביות"
 
 #: src/libvlc-module.c:1396
 msgid "Toggle subtitle track visibility."
@@ -4519,19 +4557,19 @@ msgstr "ביטול חיתוך של פיקסל אחד מהחלק הימני של 
 
 #: src/libvlc-module.c:1459
 msgid "Shrink the viewpoint field of view (360°)"
-msgstr ""
+msgstr "לצמצם את שדה הראייה של נקודת המבט (360°)"
 
 #: src/libvlc-module.c:1460
 msgid "Expand the viewpoint field of view (360°)"
-msgstr ""
+msgstr "להרחיב את שדה הראייה של נקודת המבט (360°)"
 
 #: src/libvlc-module.c:1461
 msgid "Roll the viewpoint clockwise (360°)"
-msgstr ""
+msgstr "לגלגל את שדה הראייה של נקודת המבט עם כיוון השעון (360°)"
 
 #: src/libvlc-module.c:1462
 msgid "Roll the viewpoint anti-clockwise (360°)"
-msgstr ""
+msgstr "לגלגל את שדה הראייה של נקודת המבט נגד כיוון השעון (360°)"
 
 #: src/libvlc-module.c:1464
 msgid "Toggle wallpaper mode in video output"
@@ -5005,7 +5043,7 @@ msgstr "%.1f KiB"
 #: src/misc/update.c:488
 #, c-format
 msgid "%<PRIu64> B"
-msgstr ""
+msgstr "%<PRIu64> ב׳"
 
 #: src/misc/update.c:580
 msgid "Saving file failed"
@@ -5535,7 +5573,7 @@ msgstr "צ'יצ'ווה"
 
 #: src/text/iso-639_def.h:142
 msgid "Occitan; Provençal"
-msgstr ""
+msgstr "אוקסיטנית פרובנסיאלית"
 
 #: src/text/iso-639_def.h:143
 msgid "Oriya"
@@ -5547,7 +5585,7 @@ msgstr "אורומו"
 
 #: src/text/iso-639_def.h:146
 msgid "Ossetian; Ossetic"
-msgstr ""
+msgstr "אוסטית של אוסטיה"
 
 #: src/text/iso-639_def.h:147
 msgid "Panjabi"
@@ -5575,7 +5613,7 @@ msgstr "פאשטו"
 
 #: src/text/iso-639_def.h:153
 msgid "Quechua"
-msgstr ""
+msgstr "קצ׳ואה"
 
 #: src/text/iso-639_def.h:154
 msgid "Original audio"
@@ -5627,7 +5665,7 @@ msgstr "סלובנית"
 
 #: src/text/iso-639_def.h:166
 msgid "Northern Sami"
-msgstr ""
+msgstr "סאמי צפונית"
 
 #: src/text/iso-639_def.h:167
 msgid "Samoan"
@@ -5647,7 +5685,7 @@ msgstr "סינדהי"
 
 #: src/text/iso-639_def.h:171
 msgid "Sotho, Southern"
-msgstr ""
+msgstr "סותו דרומית"
 
 #: src/text/iso-639_def.h:172
 msgid "Spanish"
@@ -5809,6 +5847,8 @@ msgid ""
 "Pass alsa:// to open the default ALSA capture device, or alsa://SOURCE to "
 "open a specific device named SOURCE."
 msgstr ""
+"יש להעביר alsa://‎ כדי לפתוח את התקן בררת המחדל ללכידה של ALSA, או alsa://"
+"SOURCE כדי לפתוח התקן מסוים בשם SOURCE."
 
 #: modules/access/alsa.c:49
 msgid "192000 Hz"
@@ -5895,12 +5935,16 @@ msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr ""
+"כנראה שה־Mac שלך אינו מצויד בהתקן קלט וידאו. נא לבדוק את החיבורים ואת מנהלי "
+"ההתקנים שלך."
 
 #: modules/access/avcapture.m:325
 msgid ""
 "Your Mac does not seem to be equipped with a suitable input device. Please "
 "check your connectors and drivers."
 msgstr ""
+"כנראה שה־Mac שלך אינו מצויד בהתקן קלט מתאים. נא לבדוק את החיבורים ואת מנהלי "
+"ההתקנים שלך."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -5931,6 +5975,7 @@ msgid ""
 "Blu-Ray player region code. Some discs can be played only with a correct "
 "region code."
 msgstr ""
+"קוד אזור לנגן Blu-Ray. חלק מהתקליטורים ניתן לנגן רק עם קוד האזור הנכון."
 
 #: modules/access/bluray.c:103 modules/services_discovery/udev.c:603
 #: modules/gui/qt/ui/open_disk.h:296
@@ -5949,7 +5994,7 @@ msgstr "נראה שהנתיב אינו מפנה ל־Blu-ray"
 msgid ""
 "This Blu-ray Disc needs a library for AACS decoding, and your system does "
 "not have it."
-msgstr ""
+msgstr "תקליטור ה־Blu-Ray צריך ספרייה לטובת פענוח AACS ואין אותה במערכת שלך."
 
 #: modules/access/bluray.c:866
 msgid "Blu-ray Disc is corrupted."
@@ -5957,11 +6002,11 @@ msgstr "תקליטור ה־Blu-ray פגום."
 
 #: modules/access/bluray.c:868
 msgid "Missing AACS configuration file!"
-msgstr ""
+msgstr "קובץ ההגדרות של AACS חסר!"
 
 #: modules/access/bluray.c:870
 msgid "No valid processing key found in AACS config file."
-msgstr ""
+msgstr "לא נמצא מפתח עיבוד תקף בקובץ ההגדרות של AACS."
 
 #: modules/access/bluray.c:872
 msgid "No valid host certificate found in AACS config file."
@@ -5979,11 +6024,11 @@ msgstr ""
 msgid ""
 "This Blu-ray Disc needs a library for BD+ decoding, and your system does not "
 "have it."
-msgstr ""
+msgstr "תקליטור ה־Blu-Ray צריך ספרייה לטובת פענוח BD+‎ ואין אותה במערכת שלך."
 
 #: modules/access/bluray.c:889
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
-msgstr ""
+msgstr "ספריית פענוח ה־BD+‎ של המערכת שלך לא עובדת. חסרות הגדרות?"
 
 #: modules/access/bluray.c:922
 msgid "Java required"
@@ -6423,11 +6468,11 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:205
 msgid "Audio bits per sample"
-msgstr ""
+msgstr "סיביות שמע לדגימה"
 
 #: modules/access/dshow/dshow.cpp:207
 msgid "Select audio input format with the given bits/sample (if non 0)"
-msgstr ""
+msgstr "נא לבחור תצורת קלט שמע עם הסיביות/דגימה הנתונים (אם שונה מ־0)"
 
 #: modules/access/dshow/dshow.cpp:219
 msgid "DirectShow"
@@ -6449,6 +6494,8 @@ msgstr "לא נבחרו התקני וידאו או שמע."
 #: modules/access/dshow/dshow.cpp:591
 msgid "VLC cannot open ANY capture device. Check the error log for details."
 msgstr ""
+"ל־VLC אין אפשרות לפתוח את אף אחד מהתקני הקלט. יש לעיין ביומן השגיאות לקבלת "
+"פרטים."
 
 #: modules/access/dshow/dshow.cpp:1055
 msgid ""
@@ -6462,29 +6509,31 @@ msgstr "התקן הלכידה „%s” אינו תומך במשתנים הנדר
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 msgid "Windows networks"
-msgstr ""
+msgstr "רשתות Windows"
 
 #: modules/access/dsm/access.c:63
 msgid "libdsm's SMB (Windows network shares) input and browser"
-msgstr ""
+msgstr "קלט וסייר ב־SMB של libdsm (שיתופי רשת של Windows)"
 
 #: modules/access/dsm/access.c:67
 msgid "libdsm SMB input"
-msgstr ""
+msgstr "קלט SMB של libdsm"
 
 #: modules/access/dsm/access.c:80
 msgid "libdsm NETBIOS discovery module"
-msgstr ""
+msgstr "מודול גילוי NETBIOS של libdsm"
 
 #: modules/access/dtv/access.c:38
 msgid "DVB adapter"
-msgstr ""
+msgstr "מתאם DVB"
 
 #: modules/access/dtv/access.c:40
 msgid ""
 "If there is more than one digital broadcasting adapter, the adapter number "
 "must be selected. Numbering starts from zero."
 msgstr ""
+"אם יש למעלה ממתאם שידורים דיגיטליים אחד, יש לבחור את מספר המתאמים. המספור "
+"מתחיל מאפס."
 
 #: modules/access/dtv/access.c:43
 msgid "DVB device"
@@ -6858,7 +6907,7 @@ msgstr "ערוץ פיזי"
 
 #: modules/access/dtv/access.c:244
 msgid "DTV"
-msgstr ""
+msgstr "DTV"
 
 #: modules/access/dtv/access.c:245
 msgid "Digital Television and Radio"
@@ -6866,39 +6915,39 @@ msgstr "טלוויזיה ורדיו דיגיטליים"
 
 #: modules/access/dtv/access.c:283
 msgid "Terrestrial reception parameters"
-msgstr ""
+msgstr "מאפייני קליטה קרקעית"
 
 #: modules/access/dtv/access.c:295
 msgid "DVB-T reception parameters"
-msgstr ""
+msgstr "מאפייני קליטה DVB-T"
 
 #: modules/access/dtv/access.c:311
 msgid "ISDB-T reception parameters"
-msgstr ""
+msgstr "מאפייני קליטה ISDB-T"
 
 #: modules/access/dtv/access.c:352
 msgid "Cable and satellite reception parameters"
-msgstr ""
+msgstr "מאפייני קליטה של כבלים ולוויין"
 
 #: modules/access/dtv/access.c:364
 msgid "DVB-S2 parameters"
-msgstr ""
+msgstr "מאפייני DVB-S2"
 
 #: modules/access/dtv/access.c:375
 msgid "ISDB-S parameters"
-msgstr ""
+msgstr "מאפייני ISDB-S"
 
 #: modules/access/dtv/access.c:380
 msgid "Satellite equipment control"
-msgstr ""
+msgstr "בקרת ציוד לווייני"
 
 #: modules/access/dtv/access.c:422
 msgid "ATSC reception parameters"
-msgstr ""
+msgstr "מאפייני קליטת ATSC"
 
 #: modules/access/dtv/access.c:476
 msgid "Digital broadcasting"
-msgstr ""
+msgstr "שידור דיגיטלי"
 
 #: modules/access/dtv/access.c:477
 msgid ""
@@ -6910,25 +6959,27 @@ msgstr ""
 
 #: modules/access/dv.c:57
 msgid "Digital Video (Firewire/ieee1394) input"
-msgstr ""
+msgstr "קלט וידאו דיגיטלי (Firewire/ieee1394)"
 
 #: modules/access/dv.c:58
 msgid "DV"
-msgstr ""
+msgstr "DV"
 
 #: modules/access/dvb/access.c:66
 msgid "Probe DVB card for capabilities"
-msgstr ""
+msgstr "תשאול היכולות של כרטיס ה־DVB"
 
 #: modules/access/dvb/access.c:67
 msgid ""
 "Some DVB cards do not like to be probed for their capabilities, you can "
 "disable this feature if you experience some trouble."
 msgstr ""
+"חלק מכרטיסי ה־DVB אינם משתפים פעולה עם תשאול יכולות, ניתן להשבית את התכונה "
+"הזאת אם צצות תקלות."
 
 #: modules/access/dvb/access.c:70
 msgid "Satellite scanning config"
-msgstr ""
+msgstr "הגדרות סריקת לוויינים"
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
@@ -6948,7 +6999,7 @@ msgstr ""
 
 #: modules/access/dvb/access.c:79
 msgid "DVB"
-msgstr ""
+msgstr "DVB"
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
@@ -6960,10 +7011,12 @@ msgid ""
 "%.1f MHz (%d services)\n"
 "~%s remaining"
 msgstr ""
+"%.1f מה״ץ (%d שירותים)\n"
+"~%s נותרו"
 
 #: modules/access/dvb/scan.c:827
 msgid "Scanning DVB"
-msgstr ""
+msgstr "DVB נסרק"
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
@@ -6991,7 +7044,7 @@ msgstr "DVD עם תפריטים"
 
 #: modules/access/dvdnav.c:90
 msgid "DVDnav Input"
-msgstr ""
+msgstr "קלט DVDnav"
 
 #: modules/access/dvdnav.c:102
 msgid "DVDnav demuxer"
@@ -7001,12 +7054,14 @@ msgstr "מפלג DVDnav"
 #: modules/access/dvdread.c:216 modules/access/dvdread.c:471
 #: modules/access/dvdread.c:539
 msgid "Playback failure"
-msgstr ""
+msgstr "נגינה כושלת"
 
 #: modules/access/dvdnav.c:299
 msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr ""
+"ל־VLC אין אפשרות להגדיר את כותרת ה־DVD. כנראה שאין אפשרות להצפין את כל "
+"התקליטור."
 
 #: modules/access/dvdread.c:76
 msgid "DVD without menus"
@@ -7019,7 +7074,7 @@ msgstr "קלט DVDRead (ללא תמיכה בתפריטים)"
 #: modules/access/dvdread.c:202
 #, c-format
 msgid "DVDRead could not open the disc \"%s\"."
-msgstr ""
+msgstr "ל־DVDRead אין אפשרות לפתוח את התקליטור „%s”."
 
 #: modules/access/dvdread.c:217
 msgid "Cannot play a non-UDF mastered DVD."
@@ -7028,12 +7083,12 @@ msgstr ""
 #: modules/access/dvdread.c:472
 #, c-format
 msgid "DVDRead could not read block %d."
-msgstr ""
+msgstr "ל־DVDRead לא הייתה אפשרות לקרוא את המקטע %d."
 
 #: modules/access/dvdread.c:540
 #, c-format
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
-msgstr ""
+msgstr "ל־DVDRead לא הייתה אפשרות לקרוא %d/%d מקטעים בכתובת ‎0x%02x‎."
 
 #: modules/access/fs.c:34
 msgid "File input"
@@ -7058,7 +7113,7 @@ msgstr "תיקייה"
 
 #: modules/access/fs.c:53
 msgid "List special files"
-msgstr ""
+msgstr "הצגת קבצים מיוחדים"
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
@@ -7112,12 +7167,12 @@ msgstr "החשבון שישמש לחיבור."
 
 #: modules/access/ftp.c:78
 msgid "FTP authentication"
-msgstr ""
+msgstr "אימות FTP"
 
 #: modules/access/ftp.c:79
 #, c-format
 msgid "Please enter a valid login and password for the ftp connexion to %s"
-msgstr ""
+msgstr "נא למלא שם משתמש וססמה תקפים לחיבור ה־ftp אל %s"
 
 #: modules/access/ftp.c:84
 msgid "FTP input"
@@ -7137,7 +7192,7 @@ msgstr "אין באפשרות VLC להתחבר לשרת הנתון."
 
 #: modules/access/ftp.c:386
 msgid "VLC's connection to the given server was rejected."
-msgstr ""
+msgstr "החיבור של VLC לשרת הנבחר נדחה."
 
 #: modules/access/ftp.c:538
 msgid "Your account was rejected."
@@ -7171,11 +7226,11 @@ msgstr ""
 
 #: modules/access/http/access.c:288
 msgid "HTTPS input"
-msgstr ""
+msgstr "קלט HTTPS"
 
 #: modules/access/http/access.c:289
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7437,7 +7492,7 @@ msgstr "קלט HD-SDI"
 
 #: modules/access/linsys/linsys_hdsdi.c:90
 msgid "HD-SDI"
-msgstr ""
+msgstr "HD-SDI"
 
 #: modules/access/linsys/linsys_sdi.c:80
 msgid "Teletext configuration"
@@ -7553,7 +7608,7 @@ msgstr "נא לרשום שם וססמה תקניים."
 
 #: modules/access/live555.cpp:698
 msgid "RTSP connection failed"
-msgstr ""
+msgstr "חיבור ה־RTSP נכשל"
 
 #: modules/access/live555.cpp:699
 msgid "Access to the stream is denied by the server configuration."
@@ -7589,7 +7644,7 @@ msgstr ""
 
 #: modules/access/mms/mms.c:63
 msgid "Microsoft Media Server (MMS) input"
-msgstr ""
+msgstr "קלט שרת מדיה של Microsoft‏ (MMS)"
 
 #: modules/access/mtp.c:57
 msgid "MTP input"
@@ -7620,15 +7675,15 @@ msgstr ""
 
 #: modules/access/nfs.c:57
 msgid "NFS"
-msgstr ""
+msgstr "NFS"
 
 #: modules/access/nfs.c:58
 msgid "NFS input"
-msgstr ""
+msgstr "קלט NFS"
 
 #: modules/access/nfs.c:114
 msgid "NFS operation failed"
-msgstr ""
+msgstr "פעולת NFS נכשלה"
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -7719,13 +7774,15 @@ msgstr ""
 
 #: modules/access/rtp/rtp.c:49 modules/stream_out/rtp.c:144
 msgid "SRTP key (hexadecimal)"
-msgstr ""
+msgstr "מפתח SRTP (הקסדצימלי)"
 
 #: modules/access/rtp/rtp.c:51
 msgid ""
 "RTP packets will be authenticated and deciphered with this Secure RTP master "
 "shared secret key. This must be a 32-character-long hexadecimal string."
 msgstr ""
+"מנות של RTP יאומתו ויוצפנו בעזרת מפתח אב סודי שיתופי בתצורת Secure RTP. זו "
+"חייבת להיות מחרוזת הקסדצימלית באורך של 32 תווים."
 
 #: modules/access/rtp/rtp.c:55 modules/stream_out/rtp.c:150
 msgid "SRTP salt (hexadecimal)"
@@ -8086,15 +8143,15 @@ msgstr ""
 
 #: modules/access/srt.c:386 modules/access_output/srt.c:436
 msgid "SRT"
-msgstr ""
+msgstr "SRT"
 
 #: modules/access/srt.c:387
 msgid "SRT input"
-msgstr ""
+msgstr "קלט SRT"
 
 #: modules/access/srt.c:392 modules/access_output/srt.c:442
 msgid "SRT chunk size (bytes)"
-msgstr ""
+msgstr "גודל נתח SRT (בתים)"
 
 #: modules/access/srt.c:394 modules/access_output/srt.c:444
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
@@ -8102,7 +8159,7 @@ msgstr ""
 
 #: modules/access/srt.c:395 modules/access_output/srt.c:445
 msgid "SRT latency (ms)"
-msgstr ""
+msgstr "השהיית SRT (מילישניות)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8114,7 +8171,7 @@ msgstr "קלט TCP"
 
 #: modules/access/timecode.c:42
 msgid "Time code"
-msgstr ""
+msgstr "קוד זמן"
 
 #: modules/access/timecode.c:43
 msgid "Time code subpicture elementary stream generator"
@@ -8216,11 +8273,11 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:82
 msgid "Reset controls"
-msgstr ""
+msgstr "איפוס פקדים"
 
 #: modules/access/v4l2/v4l2.c:83
 msgid "Reset controls to defaults."
-msgstr ""
+msgstr "איפוס הפקדים לבררות המחדל."
 
 #: modules/access/v4l2/v4l2.c:84
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:206
@@ -8230,7 +8287,7 @@ msgstr "בהירות"
 
 #: modules/access/v4l2/v4l2.c:85
 msgid "Picture brightness or black level."
-msgstr ""
+msgstr "בהירות התמונה או רמת שחור."
 
 #: modules/access/v4l2/v4l2.c:86
 msgid "Automatic brightness"
@@ -8292,27 +8349,27 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:102
 msgid "Automatic white balance"
-msgstr ""
+msgstr "איזון לבן אוטומטי"
 
 #: modules/access/v4l2/v4l2.c:104
 msgid "Automatically adjust the picture white balance."
-msgstr ""
+msgstr "להתאים אוטומטית את איזון הלבן בתמונה."
 
 #: modules/access/v4l2/v4l2.c:105
 msgid "Red balance"
-msgstr ""
+msgstr "איזון אדום"
 
 #: modules/access/v4l2/v4l2.c:107
 msgid "Red chroma balance."
-msgstr ""
+msgstr "איזון הצביעה האדומה."
 
 #: modules/access/v4l2/v4l2.c:108
 msgid "Blue balance"
-msgstr ""
+msgstr "איזון כחול"
 
 #: modules/access/v4l2/v4l2.c:110
 msgid "Blue chroma balance."
-msgstr ""
+msgstr "איזון הצביעה הכחולה."
 
 #: modules/access/v4l2/v4l2.c:111
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:209
@@ -8322,7 +8379,7 @@ msgstr "גאמה"
 
 #: modules/access/v4l2/v4l2.c:113
 msgid "Gamma adjust."
-msgstr ""
+msgstr "התאמת גאמה."
 
 #: modules/access/v4l2/v4l2.c:114
 msgid "Automatic gain"
@@ -8665,7 +8722,7 @@ msgstr "התחלה"
 
 #: modules/access/vnc.c:48
 msgid "X.509 Certificate Authority"
-msgstr ""
+msgstr "רשות אישורי X.509"
 
 #: modules/access/vnc.c:49
 msgid "Certificate of the Authority to verify server's against"
@@ -8673,27 +8730,27 @@ msgstr ""
 
 #: modules/access/vnc.c:50
 msgid "X.509 Certificate Revocation List"
-msgstr ""
+msgstr "רשימת אישורי X.509 שנשללו"
 
 #: modules/access/vnc.c:51
 msgid "List of revoked servers certificates"
-msgstr ""
+msgstr "רשימת של אישורי שרתים שנשללו"
 
 #: modules/access/vnc.c:52
 msgid "X.509 Client certificate"
-msgstr ""
+msgstr "אישור לקוח X.509"
 
 #: modules/access/vnc.c:53
 msgid "Certificate for client authentication"
-msgstr ""
+msgstr "אישור לאימות לקוח"
 
 #: modules/access/vnc.c:54
 msgid "X.509 Client private key"
-msgstr ""
+msgstr "מפתח פרטי ללקוח X.509"
 
 #: modules/access/vnc.c:55
 msgid "Private key for authentication by certificate"
-msgstr ""
+msgstr "מפתח פרטי לאימות עם אישור"
 
 #: modules/access/vnc.c:58
 msgid "RGB chroma (RV32, RV24, RV16, RGB2)"
@@ -8701,11 +8758,11 @@ msgstr ""
 
 #: modules/access/vnc.c:61
 msgid "Compression level"
-msgstr ""
+msgstr "רמת דחיסה"
 
 #: modules/access/vnc.c:62
 msgid "Transfer compression level from 0 (none) to 9 (max)"
-msgstr ""
+msgstr "רמת דחיסת תעבורה מ־0 (בלי) עד 9 (מרבית)"
 
 #: modules/access/vnc.c:63
 msgid "Image quality"
@@ -8821,11 +8878,11 @@ msgstr ""
 
 #: modules/access_output/http.c:67
 msgid "HTTP stream output"
-msgstr ""
+msgstr "פלט תזרים HTTP"
 
 #: modules/access_output/livehttp.c:67
 msgid "Segment length"
-msgstr ""
+msgstr "אורך מקטע"
 
 #: modules/access_output/livehttp.c:68
 msgid "Length of TS stream segments"
@@ -8833,7 +8890,7 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:70
 msgid "Split segments anywhere"
-msgstr ""
+msgstr "לפצל מקטעים בכל מקום"
 
 #: modules/access_output/livehttp.c:71
 msgid ""
@@ -8842,11 +8899,11 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:74
 msgid "Number of segments"
-msgstr ""
+msgstr "מספר מקטעים"
 
 #: modules/access_output/livehttp.c:75
 msgid "Number of segments to include in index"
-msgstr ""
+msgstr "המקטעים לכלול במפתח"
 
 #: modules/access_output/livehttp.c:77
 msgid "Allow cache"
@@ -8917,11 +8974,11 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:105
 msgid "Number of first segment"
-msgstr ""
+msgstr "מספר המקטע הראשון"
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
-msgstr ""
+msgstr "מספר המקטע הראשון שנוצר"
 
 #: modules/access_output/livehttp.c:109
 msgid "HTTP Live streaming output"
@@ -9019,27 +9076,27 @@ msgstr "פלט IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "אורך מפתח הצפנה בבתים"
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
-msgstr ""
+msgstr "16 בתים"
 
 #: modules/access_output/srt.c:57
 msgid "24 bytes"
-msgstr ""
+msgstr "24 בתים"
 
 #: modules/access_output/srt.c:57
 msgid "32 bytes"
-msgstr ""
+msgstr "32 בתים"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
-msgstr ""
+msgstr "פלט תזרים SRT"
 
 #: modules/access_output/srt.c:446
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "ססמה להצפנת תזרים"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9064,7 +9121,7 @@ msgstr ""
 
 #: modules/access_output/udp.c:75
 msgid "UDP stream output"
-msgstr ""
+msgstr "פלט תזרים UDP"
 
 #: modules/arm_neon/chroma_yuv.c:35
 msgid "ARM NEON video chroma conversions"
@@ -10137,7 +10194,7 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1460
 msgid "Disabled"
-msgstr ""
+msgstr "מושבת"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
@@ -10923,7 +10980,7 @@ msgstr "מקודד כתוביות DVB"
 
 #: modules/codec/edummy.c:40
 msgid "Dummy encoder"
-msgstr ""
+msgstr "מקודד מדומה"
 
 #: modules/codec/faad.c:54
 msgid "AAC audio decoder (using libfaad2)"
@@ -10931,15 +10988,15 @@ msgstr "מפענח אודיו AAC (בעזרת libfaad2)"
 
 #: modules/codec/faad.c:433
 msgid "AAC extension"
-msgstr ""
+msgstr "הרחבת AAC"
 
 #: modules/codec/fdkaac.c:67
 msgid "Encoder Profile"
-msgstr ""
+msgstr "פרופיל מקודד"
 
 #: modules/codec/fdkaac.c:68
 msgid "Encoder Algorithm to use."
-msgstr ""
+msgstr "אלגוריתם קידוד לשימוש."
 
 #: modules/codec/fdkaac.c:70
 msgid "Enable spectral band replication"
@@ -10951,12 +11008,13 @@ msgstr ""
 
 #: modules/codec/fdkaac.c:73
 msgid "VBR Quality"
-msgstr ""
+msgstr "איכות VBR"
 
 #: modules/codec/fdkaac.c:74
 msgid ""
 "Quality of the VBR Encoding (0=cbr, 1-5 constant vbr quality, 5 is the best)."
 msgstr ""
+"איכות קידוד ה־VBR‏ (‎0=cbr,‏ 1-5 איכות vbr קבועה, 5 היא האיכות הגבוהה ביותר)."
 
 #: modules/codec/fdkaac.c:76
 msgid "Enable afterburner library"
@@ -11016,7 +11074,7 @@ msgstr "מקודד שמע Flac"
 
 #: modules/codec/fluidsynth.c:51 modules/meta_engine/ID3Genres.h:130
 msgid "Chorus"
-msgstr ""
+msgstr "מקהלה"
 
 #: modules/codec/fluidsynth.c:53
 msgid "Synthesis gain"
@@ -11712,11 +11770,11 @@ msgstr ""
 
 #: modules/codec/schroedinger.c:113
 msgid "Noise Threshold"
-msgstr ""
+msgstr "סף רעש"
 
 #: modules/codec/schroedinger.c:114
 msgid "Noise threshold to use in constant noise threshold mode"
-msgstr ""
+msgstr "סף רעש לשימוש במצב סף רעש קבוע"
 
 #: modules/codec/schroedinger.c:117
 msgid "CBR bitrate (kbps)"
@@ -12001,11 +12059,11 @@ msgstr ""
 
 #: modules/codec/scte18.c:41
 msgid "SCTE-18 decoder"
-msgstr ""
+msgstr "מפענח SCTE-18"
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
-msgstr ""
+msgstr "SCTE-18"
 
 #: modules/codec/scte18.h:24
 msgid "Emergency Alert Messaging for Cable"
@@ -12013,11 +12071,11 @@ msgstr ""
 
 #: modules/codec/scte27.c:42
 msgid "SCTE-27 decoder"
-msgstr ""
+msgstr "מפענח SCTE-27"
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
-msgstr ""
+msgstr "SCTE-27"
 
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
@@ -13458,11 +13516,11 @@ msgstr "כתוביות טקסט בטלטקסט"
 
 #: modules/codec/zvbi.c:76
 msgid "Output teletext subtitles as text instead of as RGBA."
-msgstr ""
+msgstr "להציג פלט של כתוביות טלטקסט כטקסט במקום RGBA."
 
 #: modules/codec/zvbi.c:79
 msgid "Presentation Level"
-msgstr ""
+msgstr "רמת הצגה"
 
 #: modules/codec/zvbi.c:88 modules/gui/qt/ui/streampanel.h:167
 msgid "1"
@@ -13470,15 +13528,15 @@ msgstr "1"
 
 #: modules/codec/zvbi.c:88
 msgid "1.5"
-msgstr ""
+msgstr "1.5"
 
 #: modules/codec/zvbi.c:88
 msgid "2.5"
-msgstr ""
+msgstr "2.5"
 
 #: modules/codec/zvbi.c:88
 msgid "3.5"
-msgstr ""
+msgstr "3.5"
 
 #: modules/codec/zvbi.c:95
 msgid "VBI and Teletext decoder"
@@ -13518,7 +13576,7 @@ msgstr "נגן המדיה VLC"
 
 #: modules/control/dummy.c:38 modules/control/oldrc.c:176
 msgid "Do not open a DOS command box interface"
-msgstr ""
+msgstr "לא לפתוח מנשק תיבת פקודות DOS"
 
 #: modules/control/dummy.c:40
 msgid ""
@@ -13537,7 +13595,7 @@ msgstr "סף תנועה (10-100)"
 
 #: modules/control/gestures.c:75
 msgid "Amount of movement required for a mouse gesture to be recorded."
-msgstr ""
+msgstr "כמות תזוזת העכבר הנדרשת להקלטה."
 
 #: modules/control/gestures.c:77
 msgid "Trigger button"
@@ -13614,7 +13672,7 @@ msgstr ""
 
 #: modules/control/hotkeys.c:621 modules/control/hotkeys.c:690
 msgid "No active subtitle"
-msgstr ""
+msgstr "אין כתובית פעילה"
 
 #: modules/control/hotkeys.c:627
 msgid "Sub sync: bookmarked subtitle time"
@@ -13902,7 +13960,7 @@ msgstr ""
 
 #: modules/control/oldrc.c:188
 msgid "RC"
-msgstr ""
+msgstr "RC"
 
 #: modules/control/oldrc.c:191
 msgid "Remote control interface"
@@ -13910,24 +13968,24 @@ msgstr "מנשק לשליטה מרחוק"
 
 #: modules/control/oldrc.c:369
 msgid "Remote control interface initialized. Type `help' for help."
-msgstr ""
+msgstr "Remote control interface initialized. Type `help' for help."
 
 #: modules/control/oldrc.c:768
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
-msgstr ""
+msgstr "Unknown command `%s'. Type `help' for help."
 
 #: modules/control/oldrc.c:786
 msgid "+----[ Remote control commands ]"
-msgstr ""
+msgstr "+----[ Remote control commands ]"
 
 #: modules/control/oldrc.c:788
 msgid "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
-msgstr ""
+msgstr "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
 
 #: modules/control/oldrc.c:789
 msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
-msgstr ""
+msgstr "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
 
 #: modules/control/oldrc.c:790
 msgid "| playlist . . . . .  show items currently in playlist"
@@ -13935,7 +13993,7 @@ msgstr "| playlist . . . . .  show items currently in playlist"
 
 #: modules/control/oldrc.c:791
 msgid "| play . . . . . . . . . . . . . . . . . . play stream"
-msgstr ""
+msgstr "| play . . . . . . . . . . . . . . . . . . play stream"
 
 #: modules/control/oldrc.c:792
 msgid "| stop . . . . . . . . . . . . . . . . . . stop stream"
@@ -13943,11 +14001,11 @@ msgstr "| stop . . . . . . . . . . . . . . . . . . stop stream"
 
 #: modules/control/oldrc.c:793
 msgid "| next . . . . . . . . . . . . . .  next playlist item"
-msgstr ""
+msgstr "| next . . . . . . . . . . . . . .  next playlist item"
 
 #: modules/control/oldrc.c:794
 msgid "| prev . . . . . . . . . . . .  previous playlist item"
-msgstr ""
+msgstr "| prev . . . . . . . . . . . .  previous playlist item"
 
 #: modules/control/oldrc.c:795
 msgid "| goto . . . . . . . . . . . . . .  goto item at index"
@@ -13955,55 +14013,55 @@ msgstr "| goto . . . . . . . . . . . . . .  goto item at index"
 
 #: modules/control/oldrc.c:796
 msgid "| repeat [on|off] . . . .  toggle playlist item repeat"
-msgstr ""
+msgstr "| repeat [on|off] . . . .  toggle playlist item repeat"
 
 #: modules/control/oldrc.c:797
 msgid "| loop [on|off] . . . . . . . . . toggle playlist loop"
-msgstr ""
+msgstr "| loop [on|off] . . . . . . . . . toggle playlist loop"
 
 #: modules/control/oldrc.c:798
 msgid "| random [on|off] . . . . . . .  toggle random jumping"
-msgstr ""
+msgstr "| random [on|off] . . . . . . .  toggle random jumping"
 
 #: modules/control/oldrc.c:799
 msgid "| clear . . . . . . . . . . . . . . clear the playlist"
-msgstr ""
+msgstr "| clear . . . . . . . . . . . . . . clear the playlist"
 
 #: modules/control/oldrc.c:800
 msgid "| status . . . . . . . . . . . current playlist status"
-msgstr ""
+msgstr "| status . . . . . . . . . . . current playlist status"
 
 #: modules/control/oldrc.c:801
 msgid "| title [X]  . . . . . . set/get title in current item"
-msgstr ""
+msgstr "| title [X]  . . . . . . set/get title in current item"
 
 #: modules/control/oldrc.c:802
 msgid "| title_n  . . . . . . . .  next title in current item"
-msgstr ""
+msgstr "| title_n  . . . . . . . .  next title in current item"
 
 #: modules/control/oldrc.c:803
 msgid "| title_p  . . . . . .  previous title in current item"
-msgstr ""
+msgstr "| title_p  . . . . . .  previous title in current item"
 
 #: modules/control/oldrc.c:804
 msgid "| chapter [X]  . . . . set/get chapter in current item"
-msgstr ""
+msgstr "| chapter [X]  . . . . set/get chapter in current item"
 
 #: modules/control/oldrc.c:805
 msgid "| chapter_n  . . . . . .  next chapter in current item"
-msgstr ""
+msgstr "| chapter_n  . . . . . .  next chapter in current item"
 
 #: modules/control/oldrc.c:806
 msgid "| chapter_p  . . . .  previous chapter in current item"
-msgstr ""
+msgstr "| chapter_p  . . . .  previous chapter in current item"
 
 #: modules/control/oldrc.c:808
 msgid "| seek X . . . seek in seconds, for instance `seek 12'"
-msgstr ""
+msgstr "| seek X . . . seek in seconds, for instance `seek 12'"
 
 #: modules/control/oldrc.c:809
 msgid "| pause  . . . . . . . . . . . . . . . .  toggle pause"
-msgstr ""
+msgstr "| pause  . . . . . . . . . . . . . . . .  toggle pause"
 
 #: modules/control/oldrc.c:810
 msgid "| fastforward  . . . . . . . .  .  set to maximum rate"
@@ -14011,23 +14069,23 @@ msgstr "| fastforward  . . . . . . . .  .  set to maximum rate"
 
 #: modules/control/oldrc.c:811
 msgid "| rewind  . . . . . . . . . . . .  set to minimum rate"
-msgstr ""
+msgstr "| rewind  . . . . . . . . . . . .  set to minimum rate"
 
 #: modules/control/oldrc.c:812
 msgid "| faster . . . . . . . . . .  faster playing of stream"
-msgstr ""
+msgstr "| faster . . . . . . . . . .  faster playing of stream"
 
 #: modules/control/oldrc.c:813
 msgid "| slower . . . . . . . . . .  slower playing of stream"
-msgstr ""
+msgstr "| slower . . . . . . . . . .  slower playing of stream"
 
 #: modules/control/oldrc.c:814
 msgid "| normal . . . . . . . . . .  normal playing of stream"
-msgstr ""
+msgstr "| normal . . . . . . . . . .  normal playing of stream"
 
 #: modules/control/oldrc.c:815
 msgid "| frame. . . . . . . . . .  play frame by frame"
-msgstr ""
+msgstr "| frame. . . . . . . . . .  play frame by frame"
 
 #: modules/control/oldrc.c:816
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
@@ -14035,7 +14093,7 @@ msgstr "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
 
 #: modules/control/oldrc.c:817
 msgid "| info . . . . .  information about the current stream"
-msgstr ""
+msgstr "| info . . . . .  information about the current stream"
 
 #: modules/control/oldrc.c:818
 msgid "| stats  . . . . . . . .  show statistical information"
@@ -14043,47 +14101,47 @@ msgstr "| stats  . . . . . . . .  show statistical information"
 
 #: modules/control/oldrc.c:819
 msgid "| get_time . . seconds elapsed since stream's beginning"
-msgstr ""
+msgstr "| get_time . . seconds elapsed since stream's beginning"
 
 #: modules/control/oldrc.c:820
 msgid "| is_playing . . . .  1 if a stream plays, 0 otherwise"
-msgstr ""
+msgstr "| is_playing . . . .  1 if a stream plays, 0 otherwise"
 
 #: modules/control/oldrc.c:821
 msgid "| get_title . . . . .  the title of the current stream"
-msgstr ""
+msgstr "| get_title . . . . .  the title of the current stream"
 
 #: modules/control/oldrc.c:822
 msgid "| get_length . . . .  the length of the current stream"
-msgstr ""
+msgstr "| get_length . . . .  the length of the current stream"
 
 #: modules/control/oldrc.c:824
 msgid "| volume [X] . . . . . . . . . .  set/get audio volume"
-msgstr ""
+msgstr "| volume [X] . . . . . . . . . .  set/get audio volume"
 
 #: modules/control/oldrc.c:825
 msgid "| volup [X]  . . . . . . .  raise audio volume X steps"
-msgstr ""
+msgstr "| volup [X]  . . . . . . .  raise audio volume X steps"
 
 #: modules/control/oldrc.c:826
 msgid "| voldown [X]  . . . . . .  lower audio volume X steps"
-msgstr ""
+msgstr "| voldown [X]  . . . . . .  lower audio volume X steps"
 
 #: modules/control/oldrc.c:827
 msgid "| adev [device]  . . . . . . . .  set/get audio device"
-msgstr ""
+msgstr "| adev [device]  . . . . . . . .  set/get audio device"
 
 #: modules/control/oldrc.c:828
 msgid "| achan [X]. . . . . . . . . .  set/get audio channels"
-msgstr ""
+msgstr "| achan [X]. . . . . . . . . .  set/get audio channels"
 
 #: modules/control/oldrc.c:829
 msgid "| atrack [X] . . . . . . . . . . . set/get audio track"
-msgstr ""
+msgstr "| atrack [X] . . . . . . . . . . . set/get audio track"
 
 #: modules/control/oldrc.c:830
 msgid "| vtrack [X] . . . . . . . . . . . set/get video track"
-msgstr ""
+msgstr "| vtrack [X] . . . . . . . . . . . set/get video track"
 
 #: modules/control/oldrc.c:831
 msgid "| vratio [X]  . . . . . . . set/get video aspect ratio"
@@ -14091,11 +14149,11 @@ msgstr "| vratio [X]  . . . . . . . set/get video aspect ratio"
 
 #: modules/control/oldrc.c:832
 msgid "| vcrop [X]  . . . . . . . . . . .  set/get video crop"
-msgstr ""
+msgstr "| vcrop [X]  . . . . . . . . . . .  set/get video crop"
 
 #: modules/control/oldrc.c:833
 msgid "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
-msgstr ""
+msgstr "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
 
 #: modules/control/oldrc.c:834
 msgid "| snapshot . . . . . . . . . . . . take video snapshot"
@@ -14103,40 +14161,40 @@ msgstr "| snapshot . . . . . . . . . . . . take video snapshot"
 
 #: modules/control/oldrc.c:835
 msgid "| strack [X] . . . . . . . . .  set/get subtitle track"
-msgstr ""
+msgstr "| strack [X] . . . . . . . . .  set/get subtitle track"
 
 #: modules/control/oldrc.c:836
 msgid "| key [hotkey name] . . . . . .  simulate hotkey press"
-msgstr ""
+msgstr "| key [hotkey name] . . . . . .  simulate hotkey press"
 
 #: modules/control/oldrc.c:838
 msgid "| help . . . . . . . . . . . . . . . this help message"
-msgstr ""
+msgstr "| help . . . . . . . . . . . . . . . this help message"
 
 #: modules/control/oldrc.c:839
 msgid "| logout . . . . . . .  exit (if in socket connection)"
-msgstr ""
+msgstr "| logout . . . . . . .  exit (if in socket connection)"
 
 #: modules/control/oldrc.c:840
 msgid "| quit . . . . . . . . . . . . . . . . . . .  quit vlc"
-msgstr ""
+msgstr "| quit . . . . . . . . . . . . . . . . . . .  quit vlc"
 
 #: modules/control/oldrc.c:842
 msgid "+----[ end of help ]"
-msgstr ""
+msgstr "+----[ end of help ]"
 
 #: modules/control/oldrc.c:969
 msgid "Press pause to continue."
-msgstr ""
+msgstr "Press pause to continue."
 
 #: modules/control/oldrc.c:1193 modules/control/oldrc.c:1442
 #: modules/control/oldrc.c:1486
 msgid "Type 'pause' to continue."
-msgstr ""
+msgstr "Type 'pause' to continue."
 
 #: modules/control/oldrc.c:1282
 msgid "Error: `goto' needs an argument greater than zero."
-msgstr ""
+msgstr "Error: `goto' needs an argument greater than zero."
 
 #: modules/control/oldrc.c:1292
 #, c-format
@@ -14667,15 +14725,15 @@ msgstr ""
 
 #: modules/demux/mp4/meta.c:68
 msgid "Writer"
-msgstr ""
+msgstr "כתיבה"
 
 #: modules/demux/mp4/meta.c:69
 msgid "Composer"
-msgstr ""
+msgstr "הלחנה"
 
 #: modules/demux/mp4/meta.c:70
 msgid "Producer"
-msgstr ""
+msgstr "הפקה"
 
 #: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
 #: modules/gui/qt/components/controller.hpp:112
@@ -14685,35 +14743,35 @@ msgstr "מידע"
 
 #: modules/demux/mp4/meta.c:72
 msgid "Disclaimer"
-msgstr ""
+msgstr "הצהרה"
 
 #: modules/demux/mp4/meta.c:73
 msgid "Requirements"
-msgstr ""
+msgstr "דרישות"
 
 #: modules/demux/mp4/meta.c:74
 msgid "Original Format"
-msgstr ""
+msgstr "תסדיר מקורי"
 
 #: modules/demux/mp4/meta.c:75
 msgid "Display Source As"
-msgstr ""
+msgstr "הצגת המקור בתור"
 
 #: modules/demux/mp4/meta.c:76
 msgid "Host Computer"
-msgstr ""
+msgstr "מחשב מארח"
 
 #: modules/demux/mp4/meta.c:77
 msgid "Performers"
-msgstr ""
+msgstr "מבצעים"
 
 #: modules/demux/mp4/meta.c:78
 msgid "Original Performer"
-msgstr ""
+msgstr "ביצוע במקור"
 
 #: modules/demux/mp4/meta.c:79
 msgid "Providers Source Content"
-msgstr ""
+msgstr "תוכן מקור ספקים"
 
 #: modules/demux/mp4/meta.c:80 modules/logger/file.c:203
 msgid "Warning"
@@ -14721,7 +14779,7 @@ msgstr "אזהרה"
 
 #: modules/demux/mp4/meta.c:81
 msgid "Software"
-msgstr ""
+msgstr "תכנה"
 
 #: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
 #: modules/demux/xiph_metadata.h:64
@@ -14734,27 +14792,27 @@ msgstr "חברת תקליטים"
 
 #: modules/demux/mp4/meta.c:84
 msgid "Model"
-msgstr ""
+msgstr "דגם"
 
 #: modules/demux/mp4/meta.c:85
 msgid "Product"
-msgstr ""
+msgstr "מוצר"
 
 #: modules/demux/mp4/meta.c:86
 msgid "Grouping"
-msgstr ""
+msgstr "קיבוץ"
 
 #: modules/demux/mp4/meta.c:88
 msgid "Sub-Title"
-msgstr ""
+msgstr "כתובית"
 
 #: modules/demux/mp4/meta.c:89
 msgid "Arranger"
-msgstr ""
+msgstr "עיבוד"
 
 #: modules/demux/mp4/meta.c:90
 msgid "Art Director"
-msgstr ""
+msgstr "ניהול אומנותי"
 
 #: modules/demux/mp4/meta.c:91
 msgid "Copyright Acknowledgement"
@@ -14852,7 +14910,7 @@ msgstr ""
 
 #: modules/demux/mpeg/es.c:60
 msgid "MPEG-I/II/4 / A52 / DTS / MLP audio"
-msgstr ""
+msgstr "שמע MPEG-I/II/4 ‏/ A52 ‏/ DTS ‏/ MLP"
 
 #: modules/demux/mpeg/es.c:61
 msgid "Audio ES"
@@ -14979,13 +15037,15 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:130 modules/mux/mpeg/ts.c:100
 msgid "Digital TV Standard"
-msgstr ""
+msgstr "תקן טלוויזיה דיגיטלית"
 
 #: modules/demux/mpeg/ts.c:131
 msgid ""
 "Selects mode for digital TV standard. This feature affects EPG information "
 "and subtitles."
 msgstr ""
+"בחירת מצב לתקן טלוויזיה דיגיטלי. תכונה זו משפיעה על פרטי לוח השידורים "
+"האלקטרוני ועל הכתוביות."
 
 #: modules/demux/mpeg/ts.c:135
 msgid "MPEG Transport Stream demuxer"
@@ -14993,19 +15053,19 @@ msgstr "מפלג תזרים תעבורת MPEG"
 
 #: modules/demux/mpeg/ts_psi.c:422
 msgid "Main audio"
-msgstr ""
+msgstr "שמע ראשי"
 
 #: modules/demux/mpeg/ts_psi.c:423
 msgid "Audio description for the visually impaired"
-msgstr ""
+msgstr "תיאור השמע לכבדי ראיה"
 
 #: modules/demux/mpeg/ts_psi.c:424
 msgid "Clean audio for the hearing impaired"
-msgstr ""
+msgstr "לנקות את השמע לכבדי שמיעה"
 
 #: modules/demux/mpeg/ts_psi.c:425
 msgid "Spoken subtitles for the visually impaired"
-msgstr ""
+msgstr "כתוביות מוקראות לכבדי ראיה"
 
 #: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:465
 #: modules/gui/qt/dialogs/toolbar.cpp:541
@@ -15030,7 +15090,7 @@ msgstr "כתוביות טלטקסט: כבדי שמיעה"
 
 #: modules/demux/mpeg/ts_psi.c:828
 msgid "DVB subtitles: hearing impaired"
-msgstr ""
+msgstr "כתוביות DVB: כבדי שמיעה"
 
 #: modules/demux/mpeg/ts_psi.c:1332
 msgid "clean effects"
@@ -15118,7 +15178,7 @@ msgstr "ייבוא רשימת נגינה מסוג ASX"
 
 #: modules/demux/playlist/playlist.c:110
 msgid "Kasenna MediaBase parser"
-msgstr ""
+msgstr "מפענח Kasenna MediaBase"
 
 #: modules/demux/playlist/playlist.c:115
 msgid "QuickTime Media Link importer"
@@ -15322,7 +15382,7 @@ msgstr ""
 
 #: modules/demux/subtitle.c:72
 msgid "Text subtitle parser"
-msgstr ""
+msgstr "מפענח כתוביות טקסט"
 
 #: modules/demux/subtitle.c:80 modules/spu/subsdelay.c:275
 msgid "Subtitle delay"
@@ -15330,11 +15390,11 @@ msgstr "השהיית כתוביות"
 
 #: modules/demux/subtitle.c:82
 msgid "Subtitle format"
-msgstr ""
+msgstr "סוג כתוביות"
 
 #: modules/demux/subtitle.c:85
 msgid "Subtitle description"
-msgstr ""
+msgstr "תיאור כתוביות"
 
 #: modules/demux/tta.c:46
 msgid "TTA demuxer"
@@ -15370,7 +15430,7 @@ msgstr "מפלג וידאו VC1"
 
 #: modules/demux/vobsub.c:51
 msgid "Vobsub subtitles parser"
-msgstr ""
+msgstr "מפענח כתוביות Vobsub"
 
 #: modules/demux/voc.c:43
 msgid "VOC demuxer"
@@ -15386,7 +15446,7 @@ msgstr "מפלג XA"
 
 #: modules/demux/xiph_metadata.c:588
 msgid "Unknown category"
-msgstr ""
+msgstr "קטגוריה לא מוכרת"
 
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
@@ -15394,15 +15454,15 @@ msgstr "כתוביות סמויות"
 
 #: modules/demux/xiph_metadata.h:50
 msgid "Textual audio descriptions"
-msgstr ""
+msgstr "תיאור טקסטואלי של שמע"
 
 #: modules/demux/xiph_metadata.h:52
 msgid "Ticker text"
-msgstr ""
+msgstr "טקסט נגלל"
 
 #: modules/demux/xiph_metadata.h:53
 msgid "Active regions"
-msgstr ""
+msgstr "אזורים פעילים"
 
 #: modules/demux/xiph_metadata.h:54
 msgid "Semantic annotations"
@@ -15414,7 +15474,7 @@ msgstr ""
 
 #: modules/demux/xiph_metadata.h:58
 msgid "Linguistic markup"
-msgstr ""
+msgstr "סימון לשוני"
 
 #: modules/demux/xiph_metadata.h:59
 msgid "Cue points"
@@ -15490,7 +15550,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/plugins.cpp:385
 #: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
-msgstr ""
+msgstr "גילוי שירותים"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:109
 #: modules/gui/qt/dialogs/plugins.cpp:389
@@ -15612,7 +15672,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:259
 msgid "Maximum level"
-msgstr ""
+msgstr "רמה מרבית"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:274
 msgid "Filter"
@@ -15628,23 +15688,23 @@ msgstr "אפקטים של שמע"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:327
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:393
 msgid "Duplicate current profile..."
-msgstr ""
+msgstr "שכפול הפרופיל הנוכחי…"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:332
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1062
 msgid "Organize Profiles..."
-msgstr ""
+msgstr "סידור פרופילים…"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:511
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:789
 msgid "Duplicate current profile for a new profile"
-msgstr ""
+msgstr "שכפול הפרופיל הנוכחי לחדש"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:512
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:487
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:790
 msgid "Enter a name for the new profile:"
-msgstr ""
+msgstr "נא להקליד שם לפרופיל החדש:"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:514
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:826
@@ -15663,24 +15723,24 @@ msgstr "שמירה"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:534
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:813
 msgid "Please enter a unique name for the new profile."
-msgstr ""
+msgstr "נא להקליד שם ייחודי לפרופיל החדש."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:535
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:814
 msgid "Multiple profiles with the same name are not allowed."
-msgstr ""
+msgstr "אסור לתת את אותו השם למספר פרופילים שונים."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:568
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:868
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:857
 msgid "Remove a preset"
-msgstr ""
+msgstr "הסרת ערכה"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:569
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:869
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:858
 msgid "Select the preset you would like to remove:"
-msgstr ""
+msgstr "נא לבחור את הערכה אותה ברצונך להסיר:"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:570
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:870
@@ -15693,19 +15753,19 @@ msgstr "הסרה"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:647
 msgid "Add new Preset..."
-msgstr ""
+msgstr "הוספת ערכה חדשה…"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:652
 msgid "Organize Presets..."
-msgstr ""
+msgstr "סידור ערכות…"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
 msgid "Save current selection as new preset"
-msgstr ""
+msgstr "שמירת הבחירה הנוכחית כערכה חדשה"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:824
 msgid "Enter a name for the new preset:"
-msgstr ""
+msgstr "נא להקליד שם לערכה החדשה:"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:77
 msgid "Bookmarks"
@@ -15766,6 +15826,7 @@ msgstr "אין קלט"
 msgid ""
 "No input found. A stream must be playing or paused for bookmarks to work."
 msgstr ""
+"לא נמצא קלט. תזרים חייב להתנגן או להיות מושהה כדי שאפשר יהיה להפעיל סימניות."
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:215
 msgid "Input has changed"
@@ -15814,13 +15875,13 @@ msgstr ""
 #: modules/gui/macosx/VLCControlsBarCommon.m:194
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
 msgid "Go to previous item"
-msgstr ""
+msgstr "מעבר לפריט הקודם"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:197
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
 msgid "Go to next item"
-msgstr ""
+msgstr "מעבר לפריט הבא"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
@@ -15880,7 +15941,7 @@ msgstr "הגדרת הזרמה…"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:404
 msgid "Select Streaming Method"
-msgstr ""
+msgstr "בחירת שיטת הזרמה"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
@@ -15922,7 +15983,7 @@ msgstr "מקודד שמע"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:161
 #: modules/gui/qt/ui/profiles.h:725
 msgid "Keep original video track"
-msgstr ""
+msgstr "לשמור על רצועת הווידאו המקורית"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:165
 #: modules/gui/qt/ui/profiles.h:747
@@ -16295,12 +16356,12 @@ msgstr "כאשר אפשרות זו מופעלת, הנגינה תושהה אוט�
 
 #: modules/gui/macosx/macosx.m:108 modules/gui/qt/qt.cpp:182
 msgid "Allow automatic icon changes"
-msgstr ""
+msgstr "לאפשר שינוי אוטומטי של סמל"
 
 #: modules/gui/macosx/macosx.m:109 modules/gui/qt/qt.cpp:184
 msgid ""
 "This option allows the interface to change its icon on various occasions."
-msgstr ""
+msgstr "אפשרות זו מאפשרת למנשק לשנות את הסמל במגוון מאורעות."
 
 #: modules/gui/macosx/macosx.m:111 modules/gui/macosx/VLCMainMenu.m:1460
 msgid "Lock Aspect Ratio"
@@ -16308,7 +16369,7 @@ msgstr "נעילת יחס תצוגה"
 
 #: modules/gui/macosx/macosx.m:113
 msgid "Dim keyboard backlight during fullscreen playback"
-msgstr ""
+msgstr "עמעום התאורה האחורית של המקלדת בעת נגינה במסך מלא"
 
 #: modules/gui/macosx/macosx.m:114
 msgid ""
@@ -16316,6 +16377,8 @@ msgid ""
 "fullscreen. Automatic brightness adjustment should be disabled in System "
 "Preferences."
 msgstr ""
+"כיבוי התאורה האחורית של המקלדת של MacBook בעת נגינת וידאו במסך מלא. התאמה "
+"אוטומטית של בהירות אמורה להיות כבויה בהעדפות המערכת."
 
 #: modules/gui/macosx/macosx.m:116 modules/gui/macosx/VLCMainMenu.m:375
 msgid "Show Previous & Next Buttons"
@@ -16344,11 +16407,11 @@ msgstr "הצגת לחצן האפקטים של השמע בחלון הראשי."
 #: modules/gui/macosx/macosx.m:125
 #: modules/gui/macosx/VLCSimplePrefsController.m:325
 msgid "Control external music players"
-msgstr ""
+msgstr "שליטה בנגני מוזיקה חיצוניים"
 
 #: modules/gui/macosx/macosx.m:126
 msgid "VLC will pause and resume supported music players on playback."
-msgstr ""
+msgstr "VLC ישהה וימשיך נגני מוזיקה נתמכים בזמן נגינה."
 
 #: modules/gui/macosx/macosx.m:128
 msgid "Use large text for list views"
@@ -16368,7 +16431,7 @@ msgstr "השהייה והמשך נגינה עם iTunes / Spotify"
 
 #: modules/gui/macosx/macosx.m:136
 msgid "Continue playback where you left off"
-msgstr ""
+msgstr "להמשיך את הנגינה איפה שעזבת"
 
 #: modules/gui/macosx/macosx.m:137
 msgid ""
@@ -16392,7 +16455,7 @@ msgstr "לעולם לא"
 
 #: modules/gui/macosx/macosx.m:145 modules/gui/qt/qt.cpp:186
 msgid "Maximum Volume displayed"
-msgstr ""
+msgstr "עצמת השמע המרבית שמוצגת"
 
 #: modules/gui/macosx/macosx.m:149
 msgid "Mac OS X interface"
@@ -16429,7 +16492,7 @@ msgstr "העברה לאשפה וטעינה מחדש של VLC"
 #: modules/gui/macosx/VLCMainMenu.m:249
 #, c-format
 msgid "Level %i"
-msgstr ""
+msgstr "רמה %i"
 
 #: modules/gui/macosx/VLCMainMenu.m:288
 #: modules/text_renderer/freetype/freetype.c:124
