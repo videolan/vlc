@@ -802,7 +802,7 @@ static void on_player_vout_fullscreen_changed(vout_thread_t* vout, bool is_fulls
 static void on_player_vout_wallpaper_mode_changed(vout_thread_t* vout, bool enabled, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
-    msg_Dbg( that->p_intf, "on_player_vout_wallpaper_mode_changed");
+    msg_Dbg( that->p_intf, "on_player_vout_wallpaper_mode_changed %s", enabled ? "enabled" : "disabled");
 
     PlayerController::VoutPtr voutPtr = PlayerController::VoutPtr(vout);
     that->callAsync([that,voutPtr, enabled] () {
