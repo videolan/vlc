@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Michał Trzebiatowski <michtrz@gmail.com>, 2007-2019
+# Michał Trzebiatowski <michtrz@gmail.com>, 2007-2020
 # Michał Ryszard Balicki <balicki93@gmail.com>, 2015
 # Grzegorz Pruchniakowski <gootector@o2.pl>, 2013-2018
 # Daniel Krawczyk <daniekonepl@gmail.com>, 2014
@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-01-15 19:09+0100\n"
-"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-01-16 11:38+0100\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2020\n"
 "Language-Team: Polish (https://www.transifex.com/yaron/teams/16553/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -1359,7 +1359,7 @@ msgstr "Kodowane przez"
 
 #: src/input/meta.c:71
 msgid "Artwork URL"
-msgstr "Adres dzieła"
+msgstr "Adres okładki"
 
 #: src/input/meta.c:72
 msgid "Track ID"
@@ -13417,9 +13417,9 @@ msgid ""
 "ray compatibility\n"
 "e.g. resolution, framerate, level"
 msgstr ""
-"Włącz hacki dotyczące obsługi Blu-ray, to nie wymusza każdego aspektu "
+"Włącz hacki dla obsługi Blu-ray, nie wymusza to każdego aspektu "
 "kompatybilności Blu-ray\n"
-"na przykład: rozdzielczości, ilości klatek na sekundę, poziomu"
+"na przykład: rozdzielczości, liczby klatek na sekundę, poziomu"
 
 #: modules/codec/x264.c:93
 msgid "Extra I-frames aggressivity"
@@ -18217,7 +18217,7 @@ msgstr "Wczytano z nośnika"
 #: modules/gui/macosx/VLCPlaylistInfo.m:86
 #: modules/gui/qt/components/info_panels.cpp:578
 msgid "Input bitrate"
-msgstr "Wejściowy bitrate"
+msgstr "Bitrate wejściowy"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:87
 msgid "Demuxed"
@@ -22458,7 +22458,7 @@ msgstr "Okładka Lua"
 
 #: modules/lua/vlc.c:155
 msgid "Fetch artwork using lua scripts"
-msgstr "Pobierz grafiki przy użyciu skryptów Lua"
+msgstr "Pobierz okładkę przy użyciu skryptów Lua"
 
 #: modules/lua/vlc.c:160 modules/lua/vlc.c:161
 msgid "Lua Extension"
