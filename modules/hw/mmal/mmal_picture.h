@@ -27,6 +27,8 @@
 #include <vlc_common.h>
 #include <interface/mmal/mmal.h>
 
+#include "mmal_cma.h"
+
 /* Think twice before changing this. Incorrect values cause havoc. */
 #define NUM_ACTUAL_OPAQUE_BUFFERS 30
 
@@ -41,6 +43,8 @@ typedef struct mmal_port_pool_ref_s
 #define CTX_BUFS_MAX 4
 typedef struct pic_ctx_mmal_s {
     picture_context_t cmn;  // PARENT: Common els at start
+
+    cma_buf_t * cb;
 
     unsigned int buf_count;
     MMAL_BUFFER_HEADER_T * bufs[CTX_BUFS_MAX];
@@ -113,6 +117,11 @@ static inline void buf_to_pic_copy_props(picture_t * const pic, const MMAL_BUFFE
             VLC_TICK_INVALID;
 }
 
+MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_copied(const picture_t *const pic,
+                                              MMAL_POOL_T * const rep_pool,
+                                              MMAL_PORT_T * const port,
+                                              cma_buf_pool_t * const cbp);
+
 MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_replicated(const picture_t *const pic, MMAL_POOL_T * const rep_pool);
 
 struct vzc_pool_ctl_s;
@@ -142,6 +151,7 @@ bool rpi_is_model_pi4(void);
 typedef enum vcsm_init_type_e {
     VCSM_INIT_NONE = 0,
     VCSM_INIT_LEGACY,
+    VCSM_INIT_CMA
 } vcsm_init_type_t;
 
 vcsm_init_type_t cma_vcsm_init(void);

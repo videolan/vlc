@@ -31,11 +31,33 @@
 #include <interface/vmcs_host/vcgencmd.h>
 #include <interface/vcsm/user-vcsm.h>
 
+#include "mmal_cma.h"
 #include "mmal_picture.h"
 
 const vlc_fourcc_t hw_mmal_vzc_subpicture_chromas[] = { VLC_CODEC_RGBA, VLC_CODEC_BGRA, VLC_CODEC_ARGB, 0 };
 
 #define UINT64_SIZE(s) (((s) + sizeof(uint64_t) - 1)/sizeof(uint64_t))
+
+// WB + Inv
+static void flush_range(void * const start, const size_t len)
+{
+    uint64_t buf[UINT64_SIZE(sizeof(struct vcsm_user_clean_invalid2_s) + sizeof(struct vcsm_user_clean_invalid2_block_s))];
+    struct vcsm_user_clean_invalid2_s * const b = (struct vcsm_user_clean_invalid2_s *)buf;
+
+    *b = (struct vcsm_user_clean_invalid2_s){
+        .op_count = 1
+    };
+
+    b->s[0] = (struct vcsm_user_clean_invalid2_block_s){
+        .invalidate_mode = 3,   // wb + invalidate
+        .block_count = 1,
+        .start_address = start, // Rely on clean inv to fix up align & size boundries
+        .block_size = len,
+        .inter_block_stride = 0
+    };
+
+    vcsm_clean_invalid2(b);
+}
 
 MMAL_FOURCC_T vlc_to_mmal_color_space(const video_color_space_t vlc_cs)
 {
@@ -293,6 +315,9 @@ static void hw_mmal_pic_ctx_destroy(picture_context_t * pic_ctx_cmn)
             mmal_buffer_header_release(ctx->bufs[i]);
     }
 
+    cma_buf_end_flight(ctx->cb);
+    cma_buf_unref(ctx->cb);
+
     free(ctx);
 }
 
@@ -307,6 +332,8 @@ static picture_context_t * hw_mmal_pic_ctx_copy(picture_context_t * pic_ctx_cmn)
 
     // Copy
     dst_ctx->cmn = src_ctx->cmn;
+
+    dst_ctx->cb = cma_buf_ref(src_ctx->cb);
 
     dst_ctx->buf_count = src_ctx->buf_count;
     for (i = 0; i != src_ctx->buf_count; ++i) {
@@ -483,12 +510,25 @@ int hw_mmal_copy_pic_to_buf(void * const buf_data,
             return VLC_EBADVAR;
     }
 
+    if (cma_vcsm_type() == VCSM_INIT_LEGACY) {  // ** CMA is currently always uncached
+        flush_range(dest, length);
+    }
+
     if (pLength != NULL)
         *pLength = (uint32_t)length;
 
     return VLC_SUCCESS;
 }
 
+
+static MMAL_BOOL_T rep_buf_free_cb(MMAL_BUFFER_HEADER_T *header, void *userdata)
+{
+    cma_buf_t * const cb = userdata;
+    VLC_UNUSED(header);
+
+    cma_buf_unref(cb);
+    return MMAL_FALSE;
+}
 
 static void pic_to_buf_copy_props(MMAL_BUFFER_HEADER_T * const buf, const picture_t * const pic)
 {
@@ -516,6 +556,55 @@ static void pic_to_buf_copy_props(MMAL_BUFFER_HEADER_T * const buf, const pictur
     buf->dts = buf->pts;
 }
 
+static int cma_buf_buf_attach(MMAL_BUFFER_HEADER_T * const buf, cma_buf_t * const cb)
+{
+    // Just a CMA buffer - fill in new buffer
+    const uintptr_t vc_h = cma_buf_vc_handle(cb);
+    if (vc_h == 0)
+        return VLC_EGENERIC;
+
+    mmal_buffer_header_reset(buf);
+    buf->data       = (uint8_t *)vc_h;
+    buf->alloc_size = cma_buf_size(cb);
+    buf->length     = buf->alloc_size;
+    // Ensure cb remains valid for the duration of this buffer
+    mmal_buffer_header_pre_release_cb_set(buf, rep_buf_free_cb, cma_buf_ref(cb));
+    return VLC_SUCCESS;
+}
+
+MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_copied(const picture_t *const pic,
+                                              MMAL_POOL_T * const rep_pool,
+                                              MMAL_PORT_T * const port,
+                                              cma_buf_pool_t * const cbp)
+{
+    MMAL_BUFFER_HEADER_T *const buf = mmal_queue_wait(rep_pool->queue);
+    if (buf == NULL)
+        goto fail0;
+
+    cma_buf_t * const cb = cma_buf_pool_alloc_buf(cbp, port->buffer_size);
+    if (cb == NULL)
+        goto fail1;
+
+    if (cma_buf_buf_attach(buf, cb) != VLC_SUCCESS)
+        goto fail2;
+
+    pic_to_buf_copy_props(buf, pic);
+
+    if (hw_mmal_copy_pic_to_buf(cma_buf_addr(cb), &buf->length, port->format, pic) != VLC_SUCCESS)
+        goto fail2;
+    buf->flags = MMAL_BUFFER_HEADER_FLAG_FRAME_END;
+
+    cma_buf_unref(cb);
+    return buf;
+
+fail2:
+    cma_buf_unref(cb);
+fail1:
+    mmal_buffer_header_release(buf);
+fail0:
+    return NULL;
+}
+
 MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_replicated(const picture_t *const pic, MMAL_POOL_T * const rep_pool)
 {
     pic_ctx_mmal_t *const ctx = (pic_ctx_mmal_t *)pic->context;
@@ -528,6 +617,12 @@ MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_replicated(const picture_t *const pic, MM
     {
         // Existing buffer - replicate it
         if (mmal_buffer_header_replicate(rep_buf, ctx->bufs[0]) != MMAL_SUCCESS)
+            goto fail;
+    }
+    else if (ctx->cb != NULL)
+    {
+        // Just a CMA buffer - fill in new buffer
+        if (cma_buf_buf_attach(rep_buf, ctx->cb) != 0)
             goto fail;
     }
     else
@@ -555,6 +650,7 @@ typedef struct pool_ent_s
 
     size_t size;
 
+    int vcsm_hdl;
     int vc_hdl;
     void * buf;
 
@@ -652,6 +748,11 @@ static void ent_free(pool_ent_t * const ent)
         if (ent->pic != NULL)
             picture_Release(ent->pic);
 
+        // Free contents
+        vcsm_unlock_hdl(ent->vcsm_hdl);
+
+        vcsm_free(ent->vcsm_hdl);
+
         free(ent);
     }
 }
@@ -690,6 +791,34 @@ static pool_ent_t * ent_list_extract_pic_ent(ent_list_hdr_t * const elh, picture
 }
 
 #define POOL_ENT_ALLOC_BLOCK  0x10000
+
+static pool_ent_t * pool_ent_alloc_new(size_t req_size)
+{
+    pool_ent_t * ent = calloc(1, sizeof(*ent));
+    const size_t alloc_size = (req_size + POOL_ENT_ALLOC_BLOCK - 1) & ~(POOL_ENT_ALLOC_BLOCK - 1);
+
+    if (ent == NULL)
+        return NULL;
+
+    ent->next = ent->prev = NULL;
+
+    // Alloc from vcsm
+    if ((ent->vcsm_hdl = vcsm_malloc_cache(alloc_size, VCSM_CACHE_TYPE_HOST, (char *)"vlc-subpic")) == -1)
+        goto fail1;
+    if ((ent->vc_hdl = vcsm_vc_hdl_from_hdl(ent->vcsm_hdl)) == 0)
+        goto fail2;
+    if ((ent->buf = vcsm_lock(ent->vcsm_hdl)) == NULL)
+        goto fail2;
+
+    ent->size = alloc_size;
+    return ent;
+
+fail2:
+    vcsm_free(ent->vcsm_hdl);
+fail1:
+    free(ent);
+    return NULL;
+}
 
 static pool_ent_t * pool_ent_ref(pool_ent_t * const ent)
 {
@@ -737,6 +866,39 @@ static void pool_recycle_list(vzc_pool_ctl_t * const pc, ent_list_hdr_t * const 
     while ((ent = ent_extract_tail(elh)) != NULL) {
         pool_recycle(pc, ent);
     }
+}
+
+static pool_ent_t * pool_best_fit(vzc_pool_ctl_t * const pc, size_t req_size)
+{
+    pool_ent_t * best = NULL;
+
+    vlc_mutex_lock(&pc->lock);
+
+    {
+        pool_ent_t * ent = pc->ent_pool.ents;
+
+        // Simple scan
+        while (ent != NULL) {
+            if (ent->size >= req_size && ent->size <= req_size * 2 + POOL_ENT_ALLOC_BLOCK &&
+                    (best == NULL || best->size > ent->size))
+                best = ent;
+            ent = ent->next;
+        }
+
+        // extract best from chain if we've found it
+        ent_extract(&pc->ent_pool, best);
+    }
+
+    vlc_mutex_unlock(&pc->lock);
+
+    if (best == NULL)
+        best = pool_ent_alloc_new(req_size);
+
+    if ((best->seq = ++pc->seq) == 0)
+        best->seq = ++pc->seq;  // Never allow to be zero
+
+    atomic_store(&best->ref_count, 1);
+    return best;
 }
 
 
@@ -845,6 +1007,7 @@ MMAL_BUFFER_HEADER_T * hw_mmal_vzc_buf_from_pic(vzc_pool_ctl_t * const pc,
         const size_t dst_size = dst_stride * dst_lines;
 
         pool_ent_t * ent = ent_list_extract_pic_ent(&pc->ents_prev, pic);
+        bool needs_copy = false;
 
         // If we didn't find ent in last then look in cur in case is_first
         // isn't working
@@ -853,7 +1016,15 @@ MMAL_BUFFER_HEADER_T * hw_mmal_vzc_buf_from_pic(vzc_pool_ctl_t * const pc,
 
         if (ent == NULL)
         {
-            goto fail2;
+            // Need a new ent
+            needs_copy = true;
+
+            if ((ent = pool_best_fit(pc, dst_size)) == NULL)
+                goto fail2;
+            if ((ent->enc_type = vlc_to_mmal_video_fourcc(&pic->format)) == 0)
+                goto fail2;
+
+            ent->pic = picture_Hold(pic);
         }
         buf->user_data = sb;
 
@@ -902,6 +1073,26 @@ MMAL_BUFFER_HEADER_T * hw_mmal_vzc_buf_from_pic(vzc_pool_ctl_t * const pc,
             .width  = fmt->i_visible_width,
             .height = fmt->i_visible_height
         };
+
+        if (needs_copy)
+        {
+            ent->width = dst_stride / bpp;
+            ent->height = dst_lines;
+
+            // 2D copy
+            {
+                uint8_t *d = ent->buf;
+                const uint8_t *s = pic->p[0].p_pixels + xl * bpp + fmt->i_y_offset * pic->p[0].i_pitch;
+
+                // TODO replace by plane_CopyPixels()
+                mem_copy_2d(d, dst_stride, s, pic->p[0].i_pitch, fmt->i_visible_height, dst_stride);
+
+                // And make sure it is actually in memory
+                if (pc->vcsm_init_type != VCSM_INIT_CMA) {  // ** CMA is currently always uncached
+                    flush_range(ent->buf, dst_stride * fmt->i_visible_height);
+                }
+            }
+        }
     }
 
     return buf;
@@ -1003,6 +1194,7 @@ vzc_pool_ctl_t * hw_mmal_vzc_pool_new()
     return pc;
 }
 
+
 //----------------------------------------------------------------------------
 
 /* Returns the type of the Pi being used
@@ -1022,10 +1214,28 @@ vcsm_init_type_t cma_vcsm_type(void)
 vcsm_init_type_t cma_vcsm_init(void)
 {
     vcsm_init_type_t rv = VCSM_INIT_NONE;
+    // We don't bother locking - taking a copy here should be good enough
+    vcsm_init_type_t try_type = last_vcsm_type;
 
+    if (try_type == VCSM_INIT_NONE) {
+        if (bcm_host_is_fkms_active())
+            try_type = VCSM_INIT_CMA;
+        else
+            try_type = VCSM_INIT_LEGACY;
+    }
+
+    if (try_type == VCSM_INIT_CMA) {
+        if (vcsm_init_ex(1, -1) == 0)
+            rv = VCSM_INIT_CMA;
+        else if (vcsm_init_ex(0, -1) == 0)
+            rv = VCSM_INIT_LEGACY;
+    }
+    else
     {
         if (vcsm_init_ex(0, -1) == 0)
             rv = VCSM_INIT_LEGACY;
+        else if (vcsm_init_ex(1, -1) == 0)
+            rv = VCSM_INIT_CMA;
     }
 
     // Just in case this affects vcsm init do after that
@@ -1049,6 +1259,8 @@ const char * cma_vcsm_init_str(const vcsm_init_type_t init_mode)
 {
     switch (init_mode)
     {
+        case VCSM_INIT_CMA:
+            return "CMA";
         case VCSM_INIT_LEGACY:
             return "Legacy";
         case VCSM_INIT_NONE:

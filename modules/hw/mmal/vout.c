@@ -168,6 +168,8 @@ static MMAL_FOURCC_T vout_vlc_to_mmal_pic_fourcc(const unsigned int fcc)
     switch (fcc){
     case VLC_CODEC_MMAL_OPAQUE:
         return MMAL_ENCODING_OPAQUE;
+    case VLC_CODEC_I420:
+        return MMAL_ENCODING_I420;
     default:
         break;
     }
