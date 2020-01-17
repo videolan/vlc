@@ -958,30 +958,19 @@ void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
     vgl->vt.Viewport(x, y, width, height);
 }
 
-int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
-                                picture_t *picture, subpicture_t *subpicture)
+static int
+vout_display_opengl_PrepareSubPicture(vout_display_opengl_t *vgl,
+                                      subpicture_t *subpicture)
 {
     GL_ASSERT_NOERROR();
 
-    opengl_tex_converter_t *tc = vgl->prgm->tc;
+    opengl_tex_converter_t *tc = vgl->sub_prgm->tc;
     const struct vlc_gl_interop *interop = tc->interop;
 
-    /* Update the texture */
-    int ret = interop->ops->update_textures(interop, vgl->texture, vgl->tex_width, vgl->tex_height,
-                                            picture, NULL);
-    if (ret != VLC_SUCCESS)
-        return ret;
-
-    int         last_count = vgl->region_count;
+    int last_count = vgl->region_count;
     gl_region_t *last = vgl->region;
 
-    vgl->region_count = 0;
-    vgl->region       = NULL;
-
-    tc = vgl->sub_prgm->tc;
-    interop = tc->interop;
     if (subpicture) {
-
         int count = 0;
         for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next)
             count++;
@@ -991,7 +980,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 
         int i = 0;
         for (subpicture_region_t *r = subpicture->p_region;
-             r && ret == VLC_SUCCESS; r = r->p_next, i++) {
+             r; r = r->p_next, i++) {
             gl_region_t *glr = &vgl->region[i];
 
             glr->width  = r->fmt.i_visible_width;
@@ -1030,26 +1019,52 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
             if (!glr->texture)
             {
                 /* Could not recycle a previous texture, generate a new one. */
-                ret = GenTextures(interop, &glr->width, &glr->height, &glr->texture);
+                int ret = GenTextures(interop, &glr->width, &glr->height, &glr->texture);
                 if (ret != VLC_SUCCESS)
-                    continue;
+                    break;
             }
             /* Use the visible pitch of the region */
             r->p_picture->p[0].i_visible_pitch = r->fmt.i_visible_width
                                                * r->p_picture->p[0].i_pixel_pitch;
-            ret = interop->ops->update_textures(interop, &glr->texture,
-                                                &glr->width, &glr->height,
-                                                r->p_picture, &pixels_offset);
+            int ret = interop->ops->update_textures(interop, &glr->texture,
+                                                    &glr->width, &glr->height,
+                                                    r->p_picture, &pixels_offset);
+            if (ret != VLC_SUCCESS)
+                break;
         }
     }
+    else
+    {
+        vgl->region_count = 0;
+        vgl->region = NULL;
+    }
+
     for (int i = 0; i < last_count; i++) {
         if (last[i].texture)
             DelTextures(interop, &last[i].texture);
     }
     free(last);
 
-    VLC_UNUSED(subpicture);
+    GL_ASSERT_NOERROR();
 
+    return VLC_SUCCESS;
+}
+
+int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
+                                picture_t *picture, subpicture_t *subpicture)
+{
+    GL_ASSERT_NOERROR();
+
+    opengl_tex_converter_t *tc = vgl->prgm->tc;
+    const struct vlc_gl_interop *interop = tc->interop;
+
+    /* Update the texture */
+    int ret = interop->ops->update_textures(interop, vgl->texture, vgl->tex_width, vgl->tex_height,
+                                            picture, NULL);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    ret = vout_display_opengl_PrepareSubPicture(vgl, subpicture);
     GL_ASSERT_NOERROR();
     return ret;
 }
@@ -1482,67 +1497,11 @@ static void TextureCropForStereo(vout_display_opengl_t *vgl,
     }
 }
 
-int vout_display_opengl_Display(vout_display_opengl_t *vgl,
-                                const video_format_t *source)
+static int
+vout_display_opengl_DrawSubPicture(vout_display_opengl_t *vgl)
 {
     GL_ASSERT_NOERROR();
 
-    /* Why drawing here and not in Render()? Because this way, the
-       OpenGL providers can call vout_display_opengl_Display to force redraw.
-       Currently, the OS X provider uses it to get a smooth window resizing */
-    vgl->vt.Clear(GL_COLOR_BUFFER_BIT);
-
-    vgl->vt.UseProgram(vgl->prgm->id);
-
-    if (source->i_x_offset != vgl->last_source.i_x_offset
-     || source->i_y_offset != vgl->last_source.i_y_offset
-     || source->i_visible_width != vgl->last_source.i_visible_width
-     || source->i_visible_height != vgl->last_source.i_visible_height)
-    {
-        float left[PICTURE_PLANE_MAX];
-        float top[PICTURE_PLANE_MAX];
-        float right[PICTURE_PLANE_MAX];
-        float bottom[PICTURE_PLANE_MAX];
-        const opengl_tex_converter_t *tc = vgl->prgm->tc;
-        const struct vlc_gl_interop *interop = tc->interop;
-        for (unsigned j = 0; j < interop->tex_count; j++)
-        {
-            float scale_w = (float)interop->texs[j].w.num / interop->texs[j].w.den
-                          / vgl->tex_width[j];
-            float scale_h = (float)interop->texs[j].h.num / interop->texs[j].h.den
-                          / vgl->tex_height[j];
-
-            /* Warning: if NPOT is not supported a larger texture is
-               allocated. This will cause right and bottom coordinates to
-               land on the edge of two texels with the texels to the
-               right/bottom uninitialized by the call to
-               glTexSubImage2D. This might cause a green line to appear on
-               the right/bottom of the display.
-               There are two possible solutions:
-               - Manually mirror the edges of the texture.
-               - Add a "-1" when computing right and bottom, however the
-               last row/column might not be displayed at all.
-            */
-            left[j]   = (source->i_x_offset +                       0 ) * scale_w;
-            top[j]    = (source->i_y_offset +                       0 ) * scale_h;
-            right[j]  = (source->i_x_offset + source->i_visible_width ) * scale_w;
-            bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
-        }
-
-        TextureCropForStereo(vgl, left, top, right, bottom);
-        int ret = SetupCoords(vgl, left, top, right, bottom);
-        if (ret != VLC_SUCCESS)
-            return ret;
-
-        vgl->last_source.i_x_offset = source->i_x_offset;
-        vgl->last_source.i_y_offset = source->i_y_offset;
-        vgl->last_source.i_visible_width = source->i_visible_width;
-        vgl->last_source.i_visible_height = source->i_visible_height;
-    }
-    DrawWithShaders(vgl, vgl->prgm);
-
-    /* Draw the subpictures */
-    // Change the program for overlays
     struct prgm *prgm = vgl->sub_prgm;
     GLuint program = prgm->id;
     opengl_tex_converter_t *tc = prgm->tc;
@@ -1617,6 +1576,74 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         vgl->vt.DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
     vgl->vt.Disable(GL_BLEND);
+
+    GL_ASSERT_NOERROR();
+
+    return VLC_SUCCESS;
+}
+
+int vout_display_opengl_Display(vout_display_opengl_t *vgl,
+                                const video_format_t *source)
+{
+    GL_ASSERT_NOERROR();
+
+    /* Why drawing here and not in Render()? Because this way, the
+       OpenGL providers can call vout_display_opengl_Display to force redraw.
+       Currently, the OS X provider uses it to get a smooth window resizing */
+    vgl->vt.Clear(GL_COLOR_BUFFER_BIT);
+
+    vgl->vt.UseProgram(vgl->prgm->id);
+
+    if (source->i_x_offset != vgl->last_source.i_x_offset
+     || source->i_y_offset != vgl->last_source.i_y_offset
+     || source->i_visible_width != vgl->last_source.i_visible_width
+     || source->i_visible_height != vgl->last_source.i_visible_height)
+    {
+        float left[PICTURE_PLANE_MAX];
+        float top[PICTURE_PLANE_MAX];
+        float right[PICTURE_PLANE_MAX];
+        float bottom[PICTURE_PLANE_MAX];
+        const opengl_tex_converter_t *tc = vgl->prgm->tc;
+        const struct vlc_gl_interop *interop = tc->interop;
+        for (unsigned j = 0; j < interop->tex_count; j++)
+        {
+            float scale_w = (float)interop->texs[j].w.num / interop->texs[j].w.den
+                          / vgl->tex_width[j];
+            float scale_h = (float)interop->texs[j].h.num / interop->texs[j].h.den
+                          / vgl->tex_height[j];
+
+            /* Warning: if NPOT is not supported a larger texture is
+               allocated. This will cause right and bottom coordinates to
+               land on the edge of two texels with the texels to the
+               right/bottom uninitialized by the call to
+               glTexSubImage2D. This might cause a green line to appear on
+               the right/bottom of the display.
+               There are two possible solutions:
+               - Manually mirror the edges of the texture.
+               - Add a "-1" when computing right and bottom, however the
+               last row/column might not be displayed at all.
+            */
+            left[j]   = (source->i_x_offset +                       0 ) * scale_w;
+            top[j]    = (source->i_y_offset +                       0 ) * scale_h;
+            right[j]  = (source->i_x_offset + source->i_visible_width ) * scale_w;
+            bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
+        }
+
+        TextureCropForStereo(vgl, left, top, right, bottom);
+        int ret = SetupCoords(vgl, left, top, right, bottom);
+        if (ret != VLC_SUCCESS)
+            return ret;
+
+        vgl->last_source.i_x_offset = source->i_x_offset;
+        vgl->last_source.i_y_offset = source->i_y_offset;
+        vgl->last_source.i_visible_width = source->i_visible_width;
+        vgl->last_source.i_visible_height = source->i_visible_height;
+    }
+    DrawWithShaders(vgl, vgl->prgm);
+
+    int ret = vout_display_opengl_DrawSubPicture(vgl);
+    if (ret != VLC_SUCCESS)
+        return ret;
 
     /* Display */
     vlc_gl_Swap(vgl->gl);
