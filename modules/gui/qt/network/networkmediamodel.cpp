@@ -267,20 +267,29 @@ bool NetworkMediaModel::initializeMediaSources()
 
 void NetworkMediaModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t*)
 {
-    input_item_node_t *res;
-    input_item_node_t *parent;
-    if ( vlc_media_tree_Find( m_treeItem.source->tree, m_treeItem.media.get(),
-                                      &res, &parent ) == false )
-        return;
-    refreshMediaList( std::move( mediaSource ), res->pp_children, res->i_children, true );
+    QMetaObject::invokeMethod(this, [this, mediaSource = std::move(mediaSource)]() {
+        input_item_node_t *res;
+        input_item_node_t *parent;
+        vlc_media_tree_Lock( m_treeItem.source->tree );
+        bool found = vlc_media_tree_Find( m_treeItem.source->tree, m_treeItem.media.get(),
+                                          &res, &parent );
+        vlc_media_tree_Unlock( m_treeItem.source->tree );
+        if (!found)
+            return;
+
+        refreshMediaList( std::move( mediaSource ), res->pp_children, res->i_children, true );
+    }, Qt::QueuedConnection);
 }
 
 void NetworkMediaModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent,
                                   input_item_node_t *const children[],
                                   size_t count )
 {
-    if ( parent->p_item == m_treeItem.media.get() )
-        refreshMediaList( std::move( mediaSource ), children, count, false );
+    InputItemPtr p_parent { parent->p_item };
+    QMetaObject::invokeMethod(this, [this, p_parent = std::move(p_parent), mediaSource = std::move(mediaSource), children, count]() {
+        if ( p_parent.get() == m_treeItem.media.get() )
+            refreshMediaList( std::move( mediaSource ), children, count, false );
+    }, Qt::QueuedConnection);
 }
 
 void NetworkMediaModel::onItemRemoved( MediaSourcePtr,
@@ -353,20 +362,18 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
         item.tree = NetworkTreeItem( mediaSource, it );
         items.push_back( std::move( item ) );
     }
-    QMetaObject::invokeMethod(this, [this, clear, items=std::move(items)]() {
-        if ( clear == true )
-        {
-            beginResetModel();
-            m_items.erase( begin( m_items ) , end( m_items ) );
-        }
-        else
-            beginInsertRows( {}, m_items.size(), m_items.size() + items.size() - 1 );
-        std::move( begin( items ), end( items ), std::back_inserter( m_items ) );
-        if ( clear == true )
-            endResetModel();
-        else
-            endInsertRows();
-    });
+    if ( clear == true )
+    {
+        beginResetModel();
+        m_items.erase( begin( m_items ) , end( m_items ) );
+    }
+    else
+        beginInsertRows( {}, m_items.size(), m_items.size() + items.size() - 1 );
+    std::move( begin( items ), end( items ), std::back_inserter( m_items ) );
+    if ( clear == true )
+        endResetModel();
+    else
+        endInsertRows();
 }
 
 bool NetworkMediaModel::canBeIndexed(const QUrl& url , ItemType itemType )
