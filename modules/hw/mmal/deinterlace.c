@@ -45,8 +45,8 @@
 #define MMAL_DEINTERLACE_QPU_TEXT N_("Use QPUs for advanced HD deinterlacing.")
 #define MMAL_DEINTERLACE_QPU_LONGTEXT N_("Make use of the QPUs to allow higher quality deinterlacing of HD content.")
 
-static int Open(vlc_object_t *);
-static void Close(vlc_object_t *);
+static int OpenMmalDeinterlace(vlc_object_t *);
+static void CloseMmalDeinterlace(vlc_object_t *);
 
 vlc_module_begin()
     set_shortname(N_("MMAL deinterlace"))
@@ -54,7 +54,7 @@ vlc_module_begin()
     set_capability("video filter", 0)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callbacks(Open, Close)
+    set_callbacks(OpenMmalDeinterlace, CloseMmalDeinterlace)
     add_shortcut("deinterlace")
     add_bool(MMAL_DEINTERLACE_QPU, false, MMAL_DEINTERLACE_QPU_TEXT,
                     MMAL_DEINTERLACE_QPU_LONGTEXT, true);
@@ -84,7 +84,7 @@ static void flush(filter_t *filter);
 
 #define MMAL_COMPONENT_DEFAULT_DEINTERLACE "vc.ril.image_fx"
 
-static int Open(vlc_object_t *obj)
+static int OpenMmalDeinterlace(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     if (filter->fmt_in.video.i_chroma != VLC_CODEC_MMAL_OPAQUE)
@@ -251,12 +251,12 @@ static int Open(vlc_object_t *obj)
 
 out:
     if (ret != VLC_SUCCESS)
-        Close(obj);
+        CloseMmalDeinterlace(obj);
 
     return ret;
 }
 
-static void Close(vlc_object_t *obj)
+static void CloseMmalDeinterlace(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;

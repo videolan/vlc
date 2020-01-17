@@ -67,9 +67,9 @@
 #define PHASE_OFFSET_TARGET ((double)0.25)
 #define PHASE_CHECK_INTERVAL 100
 
-static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
-                video_format_t *fmt, vlc_video_context *context);
-static void Close(vout_display_t *vd);
+static int OpenMmalVout(vout_display_t *, const vout_display_cfg_t *,
+                video_format_t *, vlc_video_context *);
+static void CloseMmalVout(vout_display_t *);
 
 vlc_module_begin()
     set_shortname(N_("MMAL vout"))
@@ -82,7 +82,7 @@ vlc_module_begin()
                     MMAL_ADJUST_REFRESHRATE_LONGTEXT, false)
     add_bool(MMAL_NATIVE_INTERLACED, false, MMAL_NATIVE_INTERLACE_TEXT,
                     MMAL_NATIVE_INTERLACE_LONGTEXT, false)
-    set_callback_display(Open, 90)
+    set_callback_display(OpenMmalVout, 90)
 vlc_module_end()
 
 struct dmx_region_t {
@@ -182,7 +182,7 @@ static void dmx_region_delete(struct dmx_region_t *dmx_region,
 static void show_background(vout_display_t *vd, bool enable);
 static void maintain_phase_sync(vout_display_t *vd);
 
-static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmt, vlc_video_context *context)
 {
     vout_display_sys_t *sys;
@@ -303,7 +303,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = vd_prepare;
     vd->display = vd_display;
     vd->control = vd_control;
-    vd->close = Close;
+    vd->close = CloseMmalVout;
 
     vc_tv_register_callback(tvservice_cb, vd);
 
@@ -320,13 +320,13 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
 out:
     if (ret != VLC_SUCCESS)
-        Close(vd);
+        CloseMmalVout(vd);
 
     (void) context;
     return ret;
 }
 
-static void Close(vout_display_t *vd)
+static void CloseMmalVout(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     char response[20]; /* answer is hvs_update_fields=%1d */
