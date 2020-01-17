@@ -26,6 +26,9 @@
 
 #include "mmal_picture.h"
 
+const vlc_fourcc_t hw_mmal_vzc_subpicture_chromas[] = { VLC_CODEC_RGBA, 0 };
+
+
 int mmal_picture_lock(picture_t *picture)
 {
     picture_sys_t *pic_sys = picture->p_sys;

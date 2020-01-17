@@ -39,4 +39,8 @@ typedef struct
 
 int mmal_picture_lock(picture_t *picture);
 
+// At the moment we cope with any mono-planar RGBA thing
+// We could cope with many other things but they currently don't occur
+extern const vlc_fourcc_t hw_mmal_vzc_subpicture_chromas[];
+
 #endif

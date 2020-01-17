@@ -141,11 +141,6 @@ struct vout_display_sys_t {
     subpicture_t *prepare_subpicture;
 };
 
-static const vlc_fourcc_t subpicture_chromas[] = {
-    VLC_CODEC_RGBA,
-    0
-};
-
 /* Utility functions */
 static inline uint32_t align(uint32_t x, uint32_t y);
 static void configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
@@ -316,7 +311,7 @@ static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     sys->dmx_handle = vc_dispmanx_display_open(0);
-    vd->info.subpicture_chromas = subpicture_chromas;
+    vd->info.subpicture_chromas = hw_mmal_vzc_subpicture_chromas;
 
 out:
     if (ret != VLC_SUCCESS)
