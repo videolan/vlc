@@ -328,7 +328,7 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
                                        input_item_node_t* const children[], size_t count,
                                        bool clear )
 {
-    auto items = new std::vector<Item>;
+    std::vector<Item> items;
     for ( auto i = 0u; i < count; ++i )
     {
         auto it = children[i]->p_item;
@@ -351,18 +351,17 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
                 item.indexed = false;
         }
         item.tree = NetworkTreeItem( mediaSource, it );
-        items->push_back( std::move( item ) );
+        items.push_back( std::move( item ) );
     }
-    QMetaObject::invokeMethod(this, [this, clear, items]() {
-        std::unique_ptr<std::vector<Item>> itemsPtr{ items };
+    QMetaObject::invokeMethod(this, [this, clear, items=std::move(items)]() {
         if ( clear == true )
         {
             beginResetModel();
             m_items.erase( begin( m_items ) , end( m_items ) );
         }
         else
-            beginInsertRows( {}, m_items.size(), m_items.size() + items->size() - 1 );
-        std::move( begin( *items ), end( *items ), std::back_inserter( m_items ) );
+            beginInsertRows( {}, m_items.size(), m_items.size() + items.size() - 1 );
+        std::move( begin( items ), end( items ), std::back_inserter( m_items ) );
         if ( clear == true )
             endResetModel();
         else
