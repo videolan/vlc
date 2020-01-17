@@ -467,8 +467,22 @@ static int OpenMmalDeinterlace(vlc_object_t *p_this)
 
     if (filter->fmt_in.video.i_width * filter->fmt_in.video.i_height > 768 * 576)
     {
+        vlc_decoder_device *dec_dev = vlc_video_context_HoldDevice(filter->vctx_in);
+        assert(dec_dev != NULL);
+        mmal_decoder_device_t *devsys = GetMMALDeviceOpaque(dec_dev);
+        assert(devsys != NULL);
         // We get stressed if we have to try too hard - so make life easier
         sys->half_rate = true;
+        // Also check we actually have enough memory to do this
+        // Memory always comes from GPU if Opaque
+        // Assume we have plenty of memory if it comes from CMA
+        if (!devsys->is_cma &&
+            hw_mmal_get_gpu_mem() < (96 << 20))
+        {
+            sys->use_passthrough = true;
+            msg_Warn(filter, "Deinterlace bypassed due to lack of GPU memory");
+        }
+        vlc_decoder_device_Release(dec_dev);
     }
 
     if (var_InheritBool(filter, MMAL_DEINTERLACE_NO_QPU))

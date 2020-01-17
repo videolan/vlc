@@ -3669,7 +3669,7 @@ if test "${enable_mmal}" != "no"; then
         VLC_ADD_PLUGIN([mmal])
         VLC_ADD_LDFLAGS([mmal],[ -L/opt/vc/lib ])
         VLC_ADD_CFLAGS([mmal],[ -isystem /opt/vc/include -isystem /opt/vc/include/interface/vcos/pthreads -isystem /opt/vc/include/interface/vmcs_host/linux ])
-        VLC_ADD_LIBS([mmal],[ -lbcm_host -lmmal -lmmal_core -lmmal_components -lmmal_util -lvchostif -lvcsm ]) ], [
+        VLC_ADD_LIBS([mmal],[ -lbcm_host -lmmal -lmmal_core -lmmal_components -lmmal_util -lvchostif -lvcsm -lvchiq_arm ]) ], [
           AS_IF([test "${enable_mmal}" = "yes"],
             [ AC_MSG_ERROR([Cannot find bcm library...]) ],
             [ AC_MSG_WARN([Cannot find bcm library...]) ])

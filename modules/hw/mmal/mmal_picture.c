@@ -667,6 +667,58 @@ fail:
 
 
 
+
+int hw_mmal_get_gpu_mem(void) {
+    static int stashed_val = -2;
+    VCHI_INSTANCE_T vchi_instance;
+    VCHI_CONNECTION_T *vchi_connection = NULL;
+    char rbuf[1024] = { 0 };
+
+    if (stashed_val >= -1)
+        return stashed_val;
+
+    if (vchi_initialise(&vchi_instance) != 0)
+        goto fail0;
+
+    //create a vchi connection
+    if (vchi_connect(NULL, 0, vchi_instance) != 0)
+        goto fail0;
+
+    vc_vchi_gencmd_init(vchi_instance, &vchi_connection, 1);
+
+    //send the gencmd for the argument
+    if (vc_gencmd_send("get_mem gpu") != 0)
+        goto fail;
+
+    if (vc_gencmd_read_response(rbuf, sizeof(rbuf) - 1) != 0)
+        goto fail;
+
+    if (strncmp(rbuf, "gpu=", 4) != 0)
+        goto fail;
+
+    char *p;
+    unsigned long m = strtoul(rbuf + 4, &p, 10);
+
+    if (p[0] != 'M' || p[1] != '\0')
+        stashed_val = -1;
+    else
+        stashed_val = (int)m << 20;
+
+    vc_gencmd_stop();
+
+    //close the vchi connection
+    vchi_disconnect(vchi_instance);
+
+    return stashed_val;
+
+fail:
+    vc_gencmd_stop();
+    vchi_disconnect(vchi_instance);
+fail0:
+    stashed_val = -1;
+    return -1;
+};
+
 // ===========================================================================
 
 typedef struct pool_ent_s
