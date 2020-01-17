@@ -29,6 +29,7 @@
 #include <interface/mmal/util/mmal_util.h>
 #include <interface/mmal/util/mmal_default_components.h>
 #include <interface/vmcs_host/vcgencmd.h>
+#include <interface/vcsm/user-vcsm.h>
 
 #include "mmal_picture.h"
 
@@ -1020,9 +1021,17 @@ vcsm_init_type_t cma_vcsm_type(void)
 
 vcsm_init_type_t cma_vcsm_init(void)
 {
-    vcsm_init_type_t rv = VCSM_INIT_LEGACY;
+    vcsm_init_type_t rv = VCSM_INIT_NONE;
 
-    bcm_host_init();
+    {
+        if (vcsm_init_ex(0, -1) == 0)
+            rv = VCSM_INIT_LEGACY;
+    }
+
+    // Just in case this affects vcsm init do after that
+    if (rv != VCSM_INIT_NONE)
+        bcm_host_init();
+
     last_vcsm_type = rv;
     return rv;
 }
@@ -1031,6 +1040,7 @@ void cma_vcsm_exit(const vcsm_init_type_t init_mode)
 {
     if (init_mode != VCSM_INIT_NONE)
     {
+        vcsm_exit();
         bcm_host_deinit();  // Does nothing but add in case it ever does
     }
 }
