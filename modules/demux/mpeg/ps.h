@@ -494,8 +494,8 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
 static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int i_skip_extra )
 {
     unsigned int i_skip  = 0;
-    vlc_tick_t i_pts = -1;
-    vlc_tick_t i_dts = -1;
+    stime_t i_pts = -1;
+    stime_t i_dts = -1;
     uint8_t i_stream_id = 0;
     bool b_pes_scrambling = false;
 
