@@ -289,24 +289,20 @@ void NetworkMediaModel::onItemRemoved( MediaSourcePtr,
 {
     for ( auto i = 0u; i < count; ++i )
     {
-        input_item_t* p_item = children[i]->p_item;
-        input_item_Hold( p_item );
-        QMetaObject::invokeMethod(this, [this, p_item]() {
+        InputItemPtr p_item { children[i]->p_item };
+        QMetaObject::invokeMethod(this, [this, p_item=std::move(p_item)]() {
             QUrl itemUri = QUrl::fromEncoded(p_item->psz_uri);
             auto it = std::find_if( begin( m_items ), end( m_items ), [p_item, itemUri](const Item& i) {
                 return QString::compare( qfu(p_item->psz_name), i.name, Qt::CaseInsensitive ) == 0 &&
                     itemUri.scheme() == i.mainMrl.scheme();
             });
             if ( it == end( m_items ) )
-            {
-                input_item_Release( p_item );
                 return;
-            }
+
             auto mrlIt = std::find_if( begin( (*it).mrls ), end( (*it).mrls),
                                        [itemUri]( const QUrl& mrl ) {
                 return mrl == itemUri;
             });
-            input_item_Release( p_item );
             if ( mrlIt == end( (*it).mrls ) )
                 return;
             (*it).mrls.erase( mrlIt );
