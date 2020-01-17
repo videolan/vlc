@@ -292,7 +292,7 @@ void NetworkMediaModel::onItemRemoved( MediaSourcePtr,
         InputItemPtr p_item { children[i]->p_item };
         QMetaObject::invokeMethod(this, [this, p_item=std::move(p_item)]() {
             QUrl itemUri = QUrl::fromEncoded(p_item->psz_uri);
-            auto it = std::find_if( begin( m_items ), end( m_items ), [p_item, itemUri](const Item& i) {
+            auto it = std::find_if( begin( m_items ), end( m_items ), [&](const Item& i) {
                 return QString::compare( qfu(p_item->psz_name), i.name, Qt::CaseInsensitive ) == 0 &&
                     itemUri.scheme() == i.mainMrl.scheme();
             });
