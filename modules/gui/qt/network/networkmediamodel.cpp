@@ -235,7 +235,7 @@ bool NetworkMediaModel::initializeMediaSources()
         return false;
 
     auto tree = m_treeItem.source->tree;
-    std::unique_ptr<NetworkSourceListener> l{ new NetworkSourceListener( m_treeItem.source, this ) };
+    auto l = std::make_unique<NetworkSourceListener>( m_treeItem.source, this );
     if ( l->listener == nullptr )
         return false;
 
