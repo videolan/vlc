@@ -33,7 +33,6 @@
 #include <math.h>
 
 #include <vlc_common.h>
-#include <vlc_picture_pool.h>
 #include <vlc_subpicture.h>
 #include <vlc_opengl.h>
 #include <vlc_modules.h>
@@ -131,9 +130,6 @@ struct vout_display_opengl_t {
 
     int         region_count;
     gl_region_t *region;
-
-
-    picture_pool_t *pool;
 
     /* One YUV program and one RGBA program (for subpics) */
     struct prgm prgms[2];
@@ -934,7 +930,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     /* */
     vgl->region_count = 0;
     vgl->region = NULL;
-    vgl->pool = NULL;
 
     if (vgl->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
      && vout_display_opengl_SetViewpoint(vgl, viewpoint) != VLC_SUCCESS)
@@ -964,8 +959,6 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     const size_t main_tex_count = interop->tex_count;
     const bool main_del_texs = !interop->handle_texs_gen;
 
-    if (vgl->pool)
-        picture_pool_Release(vgl->pool);
     opengl_deinit_program(vgl, vgl->prgm);
     opengl_deinit_program(vgl, vgl->sub_prgm);
 
