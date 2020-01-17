@@ -38,7 +38,7 @@ static bool cmp_rect(const MMAL_RECT_T * const a, const MMAL_RECT_T * const b)
     return a->x == b->x && a->y == b->y && a->width == b->width && a->height == b->height;
 }
 
-static void hw_mmal_subpic_flush(subpic_reg_stash_t * const sub)
+void hw_mmal_subpic_flush(subpic_reg_stash_t * const sub)
 {
     if (sub->port != NULL && sub->port->is_enabled)
         mmal_port_disable(sub->port);

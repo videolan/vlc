@@ -42,6 +42,8 @@ int hw_mmal_subpic_update(vlc_object_t * const p_filter,
                           const MMAL_RECT_T * const scale_out,
                           const uint64_t pts);
 
+void hw_mmal_subpic_flush(subpic_reg_stash_t * const spe);
+
 void hw_mmal_subpic_close(subpic_reg_stash_t * const spe);
 
 // If display id is -1 it will be unset
