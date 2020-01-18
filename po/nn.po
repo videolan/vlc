@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Bjørn I. <bjorn.svindseth@online.no>, 2015-2019
+# Bjørn I. <bjorn.svindseth@online.no>, 2015-2020
 # Copyright (C) Eirik U. Birkeland <eirbir@gmail.com>, 2009
 # Copyright (C) Jon Stødle <jonstodle@gmail.com>, 2009
 # Eirik U. Birkeland <eirbir@gmail.com>, 2009-2010
@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-02-03 17:10+0100\n"
-"Last-Translator: Bjørn I. <bjorn.svindseth@online.no>, 2019\n"
+"PO-Revision-Date: 2020-01-18 12:22+0100\n"
+"Last-Translator: Bjørn I. <bjorn.svindseth@online.no>, 2020\n"
 "Language-Team: Norwegian Nynorsk (https://www.transifex.com/yaron/"
 "teams/16553/nn/)\n"
 "Language: nn\n"
@@ -3393,7 +3393,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1022
 msgid "VoD server module"
-msgstr ""
+msgstr "VoD servermodul"
 
 #: src/libvlc-module.c:1024
 msgid ""
@@ -3455,7 +3455,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1053
 msgid "Scan for new plugins"
-msgstr ""
+msgstr "Skann etter nye programtillegg"
 
 #: src/libvlc-module.c:1055
 msgid ""
@@ -4875,7 +4875,7 @@ msgstr "Mediavinkel"
 
 #: src/misc/actions.c:83
 msgid "Media Audio Track"
-msgstr "Media lydspor"
+msgstr "Medialydspor"
 
 #: src/misc/actions.c:84
 msgid "Media Forward"
@@ -16193,7 +16193,7 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:76
 #: modules/gui/macosx/VLCSimplePrefsController.m:318
 msgid "Control playback with the Apple Remote"
-msgstr ""
+msgstr "Kontroller avspeling med Apple Remote"
 
 #: modules/gui/macosx/macosx.m:77
 msgid "By default, VLC can be remotely controlled with the Apple Remote."
@@ -16202,7 +16202,7 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:79
 #: modules/gui/macosx/VLCSimplePrefsController.m:320
 msgid "Control system volume with the Apple Remote"
-msgstr ""
+msgstr "Kontroller systemlydstyrke med Apple Remote"
 
 #: modules/gui/macosx/macosx.m:80
 msgid ""
@@ -16342,7 +16342,7 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:125
 #: modules/gui/macosx/VLCSimplePrefsController.m:325
 msgid "Control external music players"
-msgstr ""
+msgstr "Kontroller eksterne musikkspelarar"
 
 #: modules/gui/macosx/macosx.m:126
 msgid "VLC will pause and resume supported music players on playback."
@@ -16803,7 +16803,7 @@ msgstr "Abonner på ein podkast"
 #: modules/gui/macosx/VLCMainWindow.m:220
 #: modules/gui/qt/components/playlist/selector.cpp:581
 msgid "Enter URL of the podcast to subscribe to:"
-msgstr ""
+msgstr "Skriv inn adressa til podkasten du vil abbonera på:"
 
 #: modules/gui/macosx/VLCMainWindow.m:225
 msgid "Unsubscribe from a podcast"
@@ -16811,7 +16811,7 @@ msgstr "Meld av frå podkast"
 
 #: modules/gui/macosx/VLCMainWindow.m:226
 msgid "Select the podcast you would like to unsubscribe from:"
-msgstr ""
+msgstr "Vel podkasten du vil melda deg av:"
 
 #: modules/gui/macosx/VLCMainWindow.m:252
 msgid "Check for album art and metadata?"
@@ -17316,12 +17316,12 @@ msgstr "Visualisering"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:274
 msgid "Keep audio level between sessions"
-msgstr ""
+msgstr "Behald lydnivå mellom økter"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:275
 #: modules/gui/qt/ui/sprefs_audio.h:410
 msgid "Always reset audio start level to:"
-msgstr ""
+msgstr "Alltid nullstill lydstartnivå til:"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:278
 #: modules/gui/qt/dialogs/vlm.cpp:492
@@ -17395,7 +17395,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
 msgid "General settings"
-msgstr ""
+msgstr "Generelle innstillingar"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Interface style"
@@ -22701,7 +22701,7 @@ msgstr "Podkastar"
 #: modules/services_discovery/podcast.c:56
 #: modules/gui/qt/ui/podcast_configuration.h:99
 msgid "Podcast URLs list"
-msgstr ""
+msgstr "Podcast-adresseliste"
 
 #: modules/services_discovery/podcast.c:57
 msgid "Enter the list of podcasts to retrieve, separated by '|' (pipe)."
@@ -22818,11 +22818,11 @@ msgstr "Ukjend type"
 
 #: modules/services_discovery/upnp.cpp:72
 msgid "SAT>IP channel list"
-msgstr ""
+msgstr "SAT>IP-kanalliste"
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
-msgstr ""
+msgstr "Tilpassa SAT>IP-kanallisteadresse"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Master List"
@@ -23399,7 +23399,7 @@ msgstr ""
 
 #: modules/spu/rss.c:158
 msgid "Text position"
-msgstr ""
+msgstr "Tekstplassering"
 
 #: modules/spu/rss.c:160
 msgid ""
@@ -26889,11 +26889,11 @@ msgstr ""
 
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
-msgstr ""
+msgstr "Goom-visingsbreidde"
 
 #: modules/visualization/goom.c:47
 msgid "Goom display height"
-msgstr ""
+msgstr "Goom-visingshøgde"
 
 #: modules/visualization/goom.c:48
 msgid ""
@@ -26903,7 +26903,7 @@ msgstr ""
 
 #: modules/visualization/goom.c:51
 msgid "Goom animation speed"
-msgstr ""
+msgstr "Goom-animasjonsfart"
 
 #: modules/visualization/goom.c:52
 msgid ""
@@ -26912,11 +26912,11 @@ msgstr ""
 
 #: modules/visualization/goom.c:58
 msgid "Goom"
-msgstr ""
+msgstr "Goom"
 
 #: modules/visualization/goom.c:59
 msgid "Goom effect"
-msgstr ""
+msgstr "Goom-effekt"
 
 #: modules/visualization/projectm.cpp:52
 msgid "projectM configuration file"
