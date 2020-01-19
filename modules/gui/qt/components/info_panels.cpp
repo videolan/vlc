@@ -648,13 +648,13 @@ void InputStatsPanel::update( input_item_t *p_item )
 #define UPDATE_INT( widget, calc... ) \
     { widget->setText( 1, QString::number( (qulonglong)calc ) ); }
 
-#define UPDATE_FLOAT( widget, format, calc... ) \
-    { QString str; widget->setText( 1 , str.sprintf( format, ## calc ) );  }
+#define UPDATE_FLOAT( widget, calc ) \
+    widget->setText( 1 , QString().setNum(calc, 'f', 0).leftJustified(6) )
 
     UPDATE_INT( read_media_stat, (p_item->p_stats->i_read_bytes / 1024 ) );
-    UPDATE_FLOAT( input_bitrate_stat,  "%6.0f", (float)(p_item->p_stats->f_input_bitrate *  8000 ));
+    UPDATE_FLOAT( input_bitrate_stat,  (float)(p_item->p_stats->f_input_bitrate *  8000 ));
     UPDATE_INT( demuxed_stat,    (p_item->p_stats->i_demux_read_bytes / 1024 ) );
-    UPDATE_FLOAT( stream_bitrate_stat, "%6.0f", (float)(p_item->p_stats->f_demux_bitrate *  8000 ));
+    UPDATE_FLOAT( stream_bitrate_stat, (float)(p_item->p_stats->f_demux_bitrate *  8000 ));
     UPDATE_INT( corrupted_stat,      p_item->p_stats->i_demux_corrupted );
     UPDATE_INT( discontinuity_stat,  p_item->p_stats->i_demux_discontinuity );
 
