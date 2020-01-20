@@ -114,9 +114,9 @@ bool NetworkMediaModel::setData( const QModelIndex& idx, const QVariant& value, 
         return  false;
     int res;
     if ( enabled )
-        res = vlc_ml_add_folder( m_ml, qtu( m_items[idx.row()].mainMrl.toString( QUrl::None ) ) );
+        res = vlc_ml_add_folder( m_ml, qtu( m_items[idx.row()].mainMrl.toString( QUrl::FullyEncoded ) ) );
     else
-        res = vlc_ml_remove_folder( m_ml, qtu( m_items[idx.row()].mainMrl.toString( QUrl::None ) ) );
+        res = vlc_ml_remove_folder( m_ml, qtu( m_items[idx.row()].mainMrl.toString( QUrl::FullyEncoded ) ) );
     m_items[idx.row()].indexed = enabled;
     emit dataChanged(idx, idx, { NETWORK_INDEXED });
     return res == VLC_SUCCESS;
@@ -370,7 +370,7 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
 
         if ( item.canBeIndexed == true )
         {
-            if ( vlc_ml_is_indexed( m_ml, qtu( item.mainMrl.toString( QUrl::None ) ),
+            if ( vlc_ml_is_indexed( m_ml, qtu( item.mainMrl.toString( QUrl::FullyEncoded ) ),
                                     &item.indexed ) != VLC_SUCCESS )
                 item.indexed = false;
         }
