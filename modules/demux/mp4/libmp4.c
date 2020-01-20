@@ -2509,7 +2509,9 @@ static int MP4_ReadBox_fiel( stream_t *p_stream, MP4_Box_t *p_box )
          * 9 – B is displayed earliest, T is stored first in the file.
          * 14 – T is displayed earliest, B is stored first in the file.
         */
-        if(p_peek[1] == 1 || p_peek[1] == 9)
+        if(p_peek[1] == 0)
+            p_fiel->i_flags = BLOCK_FLAG_SINGLE_FIELD;
+        else if(p_peek[1] == 1 || p_peek[1] == 9)
             p_fiel->i_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
         else if(p_peek[1] == 6 || p_peek[1] == 14)
             p_fiel->i_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
