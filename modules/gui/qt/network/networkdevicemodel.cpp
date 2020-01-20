@@ -223,37 +223,38 @@ void NetworkDeviceModel::onItemRemoved( MediaSourcePtr,
                                     input_item_node_t *const children[],
                                     size_t count )
 {
+    std::vector<InputItemPtr> itemList;
+    itemList.reserve( count );
     for ( auto i = 0u; i < count; ++i )
-    {
-        input_item_t* p_item = children[i]->p_item;
-        input_item_Hold( p_item );
-        QMetaObject::invokeMethod(this, [this, p_item]() {
+        itemList.emplace_back( children[i]->p_item );
+
+    QMetaObject::invokeMethod(this, [this, itemList=std::move(itemList)]() {
+        for (auto p_item : itemList)
+        {
             QUrl itemUri = QUrl::fromEncoded(p_item->psz_uri);
             auto it = std::find_if( begin( m_items ), end( m_items ), [p_item, itemUri](const Item& i) {
                 return QString::compare( qfu(p_item->psz_name), i.name, Qt::CaseInsensitive ) == 0 &&
                     itemUri.scheme() == i.mainMrl.scheme();
             });
             if ( it == end( m_items ) )
-            {
-                input_item_Release( p_item );
-                return;
-            }
+                continue;
+
             auto mrlIt = std::find_if( begin( (*it).mrls ), end( (*it).mrls),
                                        [itemUri]( const QUrl& mrl ) {
                 return mrl.matches(itemUri, QUrl::StripTrailingSlash);
             });
-            input_item_Release( p_item );
+
             if ( mrlIt == end( (*it).mrls ) )
-                return;
+                continue;
             (*it).mrls.erase( mrlIt );
             if ( (*it).mrls.empty() == false )
-                return;
+                continue;
             auto idx = std::distance( begin( m_items ), it );
             beginRemoveRows({}, idx, idx );
             m_items.erase( it );
             endRemoveRows();
-        });
-    }
+        }
+    }, Qt::QueuedConnection);
 }
 
 void NetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count, bool clear )
@@ -268,18 +269,24 @@ void NetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_it
             endResetModel();
         });
     }
-    for ( auto i = 0u; i < count; ++i )
-    {
-        Item item;
-        item.mainMrl = QUrl::fromEncoded( children[i]->p_item->psz_uri );
-        item.name = qfu(children[i]->p_item->psz_name);
-        item.mrls.push_back( item.mainMrl );
-        item.type = static_cast<ItemType>( children[i]->p_item->i_type );
-        item.protocol = item.mainMrl.scheme();
-        item.mediaSource = mediaSource;
-        item.inputItem = InputItemPtr(children[i]->p_item);
 
-        QMetaObject::invokeMethod(this, [this, item]() mutable {
+    std::vector<InputItemPtr> itemList;
+    itemList.reserve( count );
+    for ( auto i = 0u; i < count; ++i )
+        itemList.emplace_back( children[i]->p_item );
+
+    QMetaObject::invokeMethod(this, [this, itemList=std::move(itemList), mediaSource=std::move(mediaSource) ]() mutable {
+        for ( auto p_item : itemList )
+        {
+            Item item;
+            item.mainMrl = QUrl::fromEncoded( p_item->psz_uri );
+            item.name = qfu(p_item->psz_name);
+            item.mrls.push_back( item.mainMrl );
+            item.type = static_cast<ItemType>( p_item->i_type );
+            item.protocol = item.mainMrl.scheme();
+            item.mediaSource = mediaSource;
+            item.inputItem = InputItemPtr(p_item);
+
             auto it = std::upper_bound(begin( m_items ), end( m_items ), item, [](const Item& a, const Item& b) {
                 int comp =  QString::compare(a.name , b.name, Qt::CaseInsensitive );
                 if (comp == 0)
@@ -290,12 +297,12 @@ void NetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_it
             if (it != end( m_items )
                 && QString::compare(it->name , item.name, Qt::CaseInsensitive ) == 0
                 && it->mainMrl.scheme() == item.mainMrl.scheme())
-                return;
+                continue;
 
             int pos = std::distance(begin(m_items), it);
             beginInsertRows( {}, pos, pos );
             m_items.insert( it, std::move( item ) );
             endInsertRows();
-        });
-    }
+        }
+    }, Qt::QueuedConnection);
 }
