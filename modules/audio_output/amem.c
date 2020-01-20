@@ -32,6 +32,10 @@ static void Close (vlc_object_t *);
 
 #define AMEM_SAMPLE_RATE_MAX 384000
 #define AMEM_CHAN_MAX 8
+#define AMEM_NB_FORMATS 3
+
+/* Forward declaration */
+static const char *const format_list[AMEM_NB_FORMATS];
 
 vlc_module_begin ()
     set_shortname (N_("Audio memory"))
@@ -43,6 +47,7 @@ vlc_module_begin ()
 
     add_string ("amem-format", "S16N",
                 N_("Sample format"), N_("Sample format"), false)
+        change_string_list( format_list, format_list )
         change_private()
     add_integer ("amem-rate", 44100,
                  N_("Sample rate"), N_("Sample rate"), false)
@@ -54,6 +59,18 @@ vlc_module_begin ()
         change_private()
 
 vlc_module_end ()
+
+static const char *const format_list[AMEM_NB_FORMATS] = {
+    "S16N",
+    "S32N",
+    "FL32",
+};
+
+static const vlc_fourcc_t format_list_fourcc[AMEM_NB_FORMATS] = {
+    VLC_CODEC_S16N,
+    VLC_CODEC_S32N,
+    VLC_CODEC_FL32,
+};
 
 typedef struct
 {
@@ -200,6 +217,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
     aout_sys_t *sys = aout->sys;
     char format[5] = "S16N";
     unsigned channels;
+    int i_idx;
 
     if (aout_FormatNbChannels(fmt) == 0)
         return VLC_EGENERIC;
@@ -218,6 +236,27 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
     }
     else
     {
+        char *psz_format;
+
+        psz_format = var_InheritString (aout, "amem-format");
+        if (psz_format == NULL)
+        {
+            vlc_mutex_unlock(&sys->lock);
+            return VLC_ENOMEM;
+        }
+
+        if (strlen(psz_format) != 4) /* fourcc string length */
+        {
+            msg_Err (aout, "Invalid paramameter for amem-format: '%s'",
+                     psz_format);
+            free(psz_format);
+            vlc_mutex_unlock(&sys->lock);
+
+            return VLC_EGENERIC;
+        }
+
+        strcpy(format, psz_format);
+        free(psz_format);
         fmt->i_rate = sys->rate;
         channels = sys->channels;
     }
@@ -228,10 +267,23 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
         sys->set_volume(sys->opaque, sys->volume, sys->mute);
     vlc_mutex_unlock(&sys->lock);
 
+    /* amem-format: string to fourcc */
+    for (i_idx = 0; i_idx < AMEM_NB_FORMATS; i_idx++)
+    {
+        if (strncmp(format,
+                    format_list[i_idx],
+                    strlen(format_list[i_idx])) == 0)
+        {
+            fmt->i_format = format_list_fourcc[i_idx];
+
+            break;
+        }
+    }
+
     /* Ensure that format is supported */
     if (fmt->i_rate == 0 || fmt->i_rate > AMEM_SAMPLE_RATE_MAX
      || channels == 0 || channels > AMEM_CHAN_MAX
-     || strcmp(format, "S16N") /* TODO: amem-format */)
+     || i_idx == AMEM_NB_FORMATS)
     {
         msg_Err (aout, "format not supported: %s, %u channel(s), %u Hz",
                  format, channels, fmt->i_rate);
@@ -273,7 +325,6 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
             vlc_assert_unreachable();
     }
 
-    fmt->i_format = VLC_CODEC_S16N;
     fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     return VLC_SUCCESS;
 }
