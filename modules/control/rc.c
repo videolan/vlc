@@ -1722,6 +1722,14 @@ static int Activate( vlc_object_t *p_this )
 
         msg_Dbg( p_intf, "trying UNIX socket" );
 
+        /* The given unix path cannot be longer than sun_path - 1 to take into
+         * account the terminated null character. */
+        if ( strlen(psz_unix_path) + 1 >= sizeof( addr.sun_path ) )
+        {
+            msg_Err( p_intf, "rc-unix value is longer than expected" );
+            return VLC_EGENERIC;
+        }
+
         if( (i_socket = vlc_socket( PF_LOCAL, SOCK_STREAM, 0, false ) ) < 0 )
         {
             msg_Warn( p_intf, "can't open socket: %s", vlc_strerror_c(errno) );
