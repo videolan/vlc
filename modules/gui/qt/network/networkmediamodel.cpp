@@ -265,9 +265,12 @@ bool NetworkMediaModel::initializeMediaSources()
     return true;
 }
 
-void NetworkMediaModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t*)
+void NetworkMediaModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node)
 {
-    QMetaObject::invokeMethod(this, [this, mediaSource = std::move(mediaSource)]() {
+    InputItemPtr p_node { node->p_item };
+    QMetaObject::invokeMethod(this, [this, p_node = std::move(p_node), mediaSource = std::move(mediaSource)]() {
+        if (p_node != m_treeItem.media)
+            return;
         input_item_node_t *res;
         input_item_node_t *parent;
         vlc_media_tree_Lock( m_treeItem.source->tree );
@@ -287,12 +290,12 @@ void NetworkMediaModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node
 {
     InputItemPtr p_parent { parent->p_item };
     QMetaObject::invokeMethod(this, [this, p_parent = std::move(p_parent), mediaSource = std::move(mediaSource), children, count]() {
-        if ( p_parent.get() == m_treeItem.media.get() )
+        if ( p_parent == m_treeItem.media )
             refreshMediaList( std::move( mediaSource ), children, count, false );
     }, Qt::QueuedConnection);
 }
 
-void NetworkMediaModel::onItemRemoved(MediaSourcePtr, input_item_node_t *,
+void NetworkMediaModel::onItemRemoved(MediaSourcePtr, input_item_node_t * node,
                                     input_item_node_t *const children[],
                                     size_t count )
 {
@@ -301,7 +304,11 @@ void NetworkMediaModel::onItemRemoved(MediaSourcePtr, input_item_node_t *,
     for ( auto i = 0u; i < count; ++i )
         itemList.emplace_back( children[i]->p_item );
 
-    QMetaObject::invokeMethod(this, [this, itemList=std::move(itemList)]() {
+    InputItemPtr p_node { node->p_item };
+    QMetaObject::invokeMethod(this, [this, p_node=std::move(p_node), itemList=std::move(itemList)]() {
+        if (p_node != m_treeItem.media)
+            return;
+
         for (auto p_item : itemList)
         {
             QUrl itemUri = QUrl::fromEncoded(p_item->psz_uri);
@@ -329,9 +336,13 @@ void NetworkMediaModel::onItemRemoved(MediaSourcePtr, input_item_node_t *,
     }, Qt::QueuedConnection);
 }
 
-void NetworkMediaModel::onItemPreparseEnded(MediaSourcePtr, input_item_node_t*, enum input_item_preparse_status)
+void NetworkMediaModel::onItemPreparseEnded(MediaSourcePtr, input_item_node_t* node, enum input_item_preparse_status)
 {
-    QMetaObject::invokeMethod(this, [this]() {
+    InputItemPtr p_node { node->p_item };
+    QMetaObject::invokeMethod(this, [this, p_node=std::move(p_node)]() {
+        if (p_node != m_treeItem.media)
+            return;
+
         m_parsingPending = false;
         emit parsingPendingChanged(false);
     });
