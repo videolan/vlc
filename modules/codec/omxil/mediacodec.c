@@ -592,9 +592,9 @@ GetPictureContext(decoder_t *p_dec, unsigned index)
         for (size_t i = 0; i < ARRAY_SIZE(p_sys->video.apic_ctxs); ++i)
         {
             struct android_picture_ctx *apctx = &p_sys->video.apic_ctxs[i];
-            /* Find an available picture context (ie. refs == 1) */
-            unsigned expected_refs = 1;
-            if (atomic_compare_exchange_strong(&apctx->refs, &expected_refs, 2))
+            /* Find an available picture context (ie. refs == 0) */
+            unsigned expected_refs = 0;
+            if (atomic_compare_exchange_strong(&apctx->refs, &expected_refs, 1))
             {
                 int expected_index = -1;
                 /* Store the new index */
@@ -606,7 +606,7 @@ GetPictureContext(decoder_t *p_dec, unsigned index)
                  * this picture context is being released. Cf.
                  * PictureContextDestroy(), this function first decrement the
                  * ref count before releasing the index.  */
-                atomic_store(&apctx->refs, 1);
+                atomic_store(&apctx->refs, 0);
             }
         }
 
@@ -695,7 +695,7 @@ CreateVideoContext(decoder_t *p_dec)
             p_sys->video.ctx,
         };
         atomic_init(&apctx->index, -1);
-        atomic_init(&apctx->refs, 1);
+        atomic_init(&apctx->refs, 0);
     }
 
     return VLC_SUCCESS;
