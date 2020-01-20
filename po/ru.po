@@ -9,13 +9,14 @@
 # Konstantin Pavlov <thresh@videolan.org>, 2011
 # Roustam Ghizdatov <roustam@2-u.ru>, 2009
 # Valek Filippov <frob@df.ru>, 2001
+# Viktor <kichnap@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-05-15 19:31+0200\n"
-"Last-Translator: Alexander Lakhin <exclusion@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-01-20 11:07+0100\n"
+"Last-Translator: Viktor <kichnap@gmail.com>, 2020\n"
 "Language-Team: Russian (https://www.transifex.com/yaron/teams/16553/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -1570,7 +1571,7 @@ msgid ""
 "1=warnings, 2=debug)."
 msgstr ""
 "Устанавливает, насколько подробными будут сообщения программы (0=только "
-"ошибки и стандартные сообщения, 1=предупреждения, 2=отладка"
+"ошибки и стандартные сообщения, 1=предупреждения, 2=отладка)."
 
 #: src/libvlc-module.c:90
 msgid "Default stream"
