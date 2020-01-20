@@ -296,33 +296,37 @@ void NetworkMediaModel::onItemRemoved( MediaSourcePtr,
                                     input_item_node_t *const children[],
                                     size_t count )
 {
+    std::vector<InputItemPtr> itemList;
+    itemList.reserve( count );
     for ( auto i = 0u; i < count; ++i )
-    {
-        InputItemPtr p_item { children[i]->p_item };
-        QMetaObject::invokeMethod(this, [this, p_item=std::move(p_item)]() {
+        itemList.emplace_back( children[i]->p_item );
+
+    QMetaObject::invokeMethod(this, [this, itemList=std::move(itemList)]() {
+        for (auto p_item : itemList)
+        {
             QUrl itemUri = QUrl::fromEncoded(p_item->psz_uri);
             auto it = std::find_if( begin( m_items ), end( m_items ), [&](const Item& i) {
                 return QString::compare( qfu(p_item->psz_name), i.name, Qt::CaseInsensitive ) == 0 &&
                     itemUri.scheme() == i.mainMrl.scheme();
             });
             if ( it == end( m_items ) )
-                return;
+                continue;
 
             auto mrlIt = std::find_if( begin( (*it).mrls ), end( (*it).mrls),
                                        [itemUri]( const QUrl& mrl ) {
                 return mrl == itemUri;
             });
             if ( mrlIt == end( (*it).mrls ) )
-                return;
+                continue;
             (*it).mrls.erase( mrlIt );
             if ( (*it).mrls.empty() == false )
-                return;
+                continue;
             auto idx = std::distance( begin( m_items ), it );
             beginRemoveRows({}, idx, idx );
             m_items.erase( it );
             endRemoveRows();
-        });
-    }
+        }
+    }, Qt::QueuedConnection);
 }
 
 void NetworkMediaModel::onItemPreparseEnded(MediaSourcePtr, input_item_node_t*, enum input_item_preparse_status)
