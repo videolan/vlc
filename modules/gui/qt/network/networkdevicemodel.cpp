@@ -219,7 +219,7 @@ void NetworkDeviceModel::onItemAdded( MediaSourcePtr mediaSource, input_item_nod
     refreshDeviceList( std::move( mediaSource ), children, count, false );
 }
 
-void NetworkDeviceModel::onItemRemoved( MediaSourcePtr,
+void NetworkDeviceModel::onItemRemoved(MediaSourcePtr, input_item_node_t*,
                                     input_item_node_t *const children[],
                                     size_t count )
 {

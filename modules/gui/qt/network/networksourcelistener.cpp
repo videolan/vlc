@@ -43,12 +43,12 @@ void NetworkSourceListener::onItemAdded( vlc_media_tree_t *, input_item_node_t *
     self->cb->onItemAdded( self->source, parent, children, count );
 }
 
-void NetworkSourceListener::onItemRemoved( vlc_media_tree_t *, input_item_node_t *,
+void NetworkSourceListener::onItemRemoved( vlc_media_tree_t *, input_item_node_t * node,
                                     input_item_node_t *const children[], size_t count,
                                     void *userdata )
 {
     auto* self = static_cast<NetworkSourceListener*>( userdata );
-    self->cb->onItemRemoved( self->source, children, count );
+    self->cb->onItemRemoved( self->source, node, children, count );
 }
 
 void NetworkSourceListener::onItemPreparseEnded(vlc_media_tree_t *, input_item_node_t * node, enum input_item_preparse_status status, void *userdata)

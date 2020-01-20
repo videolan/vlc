@@ -111,7 +111,7 @@ private:
     bool initializeMediaSources();
     void onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node ) override;
     void onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) override;
-    void onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t *const children[], size_t count ) override;
+    void onItemRemoved( MediaSourcePtr mediaSource, input_item_node_t * node, input_item_node_t *const children[], size_t count ) override;
     inline void onItemPreparseEnded( MediaSourcePtr, input_item_node_t *, enum input_item_preparse_status ) override {}
 
     void refreshDeviceList(MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count , bool clear);

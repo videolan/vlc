@@ -292,7 +292,7 @@ void NetworkMediaModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node
     }, Qt::QueuedConnection);
 }
 
-void NetworkMediaModel::onItemRemoved( MediaSourcePtr,
+void NetworkMediaModel::onItemRemoved(MediaSourcePtr, input_item_node_t *,
                                     input_item_node_t *const children[],
                                     size_t count )
 {
