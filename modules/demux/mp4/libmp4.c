@@ -2500,11 +2500,7 @@ static int MP4_ReadBox_fiel( stream_t *p_stream, MP4_Box_t *p_box )
     p_fiel = p_box->data.p_fiel;
     if(i_read < 2)
         MP4_READBOX_EXIT( 0 );
-    if(p_peek[0] == 1)
-    {
-        p_fiel->i_flags = BLOCK_FLAG_SINGLE_FIELD;
-    }
-    else if(p_peek[0] == 2) /* Interlaced */
+    if(p_peek[0] == 2) /* Interlaced */
     {
         /*
          * 0 – There is only one field.
