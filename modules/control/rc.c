@@ -1738,7 +1738,7 @@ static int Activate( vlc_object_t *p_this )
         }
 
         addr.sun_family = AF_LOCAL;
-        strncpy( addr.sun_path, psz_unix_path, sizeof( addr.sun_path ) );
+        strncpy( addr.sun_path, psz_unix_path, sizeof( addr.sun_path ) - 1 );
         addr.sun_path[sizeof( addr.sun_path ) - 1] = '\0';
 
         if (bind (i_socket, (struct sockaddr *)&addr, sizeof (addr))
