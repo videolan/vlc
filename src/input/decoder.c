@@ -614,6 +614,10 @@ static vlc_decoder_device * ModuleThread_GetDecoderDevice( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
+    /* Requesting a decoder device will automatically enable hw decoding */
+    if( !var_InheritBool( p_dec, "hw-dec" ) )
+        return NULL;
+
     enum vlc_vout_order vout_order;
     vlc_decoder_device *dec_device = NULL;
     int created_vout = CreateVoutIfNeeded(p_owner, NULL, &vout_order, &dec_device);

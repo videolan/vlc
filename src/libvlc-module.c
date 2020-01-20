@@ -968,6 +968,11 @@ static const char *const ppsz_prefres[] = {
     "before trying the other ones. Only advanced users should " \
     "alter this option as it can break playback of all your streams." )
 
+#define HW_DEC_TEXT N_("Enable hardware decoders")
+#define HW_DEC_LONGTEXT N_( \
+    "VLC will fallback automatically to software decoders in case of " \
+    "hardware decoder failure." )
+
 #define ENCODER_TEXT N_("Preferred encoders list")
 #define ENCODER_LONGTEXT N_( \
     "This allows you to select a list of encoders that VLC will use in " \
@@ -2044,6 +2049,7 @@ vlc_module_begin ()
     add_category_hint(N_("Decoders"), CODEC_CAT_LONGTEXT)
     add_string( "codec", NULL, CODEC_TEXT,
                 CODEC_LONGTEXT, true )
+    add_bool( "hw-dec", true, HW_DEC_TEXT, HW_DEC_LONGTEXT, true )
     add_string( "encoder",  NULL, ENCODER_TEXT,
                 ENCODER_LONGTEXT, true )
     add_module("dec-dev", "decoder device", "any", DEC_DEV_TEXT, DEC_DEV_LONGTEXT)
