@@ -749,6 +749,19 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
         }
     }
 
+    /* Flag interlacing on first block */
+    if(mp4mux_track_GetFmt(p_stream->tinfo)->i_cat == VIDEO_ES &&
+       (p_data->i_flags & BLOCK_FLAG_INTERLACED_MASK) &&
+       mp4mux_track_GetInterlacing(p_stream->tinfo) == INTERLACING_NONE)
+    {
+        if(p_data->i_flags & BLOCK_FLAG_SINGLE_FIELD)
+            mp4mux_track_SetInterlacing(p_stream->tinfo, INTERLACING_SINGLE_FIELD);
+        else if(p_data->i_flags & BLOCK_FLAG_TOP_FIELD_FIRST)
+            mp4mux_track_SetInterlacing(p_stream->tinfo, INTERLACING_TOPBOTTOM);
+        else
+            mp4mux_track_SetInterlacing(p_stream->tinfo, INTERLACING_BOTTOMTOP);
+    }
+
     /* Update (Not earlier for SPU!) */
     p_stream->i_last_dts = dts_fb_pts( p_data );
     if( p_data->i_pts > p_stream->i_last_pts )

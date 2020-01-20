@@ -50,6 +50,15 @@ vlc_tick_t mp4mux_track_GetDuration(const mp4mux_trackinfo_t *);
 void       mp4mux_track_ForceDuration(mp4mux_trackinfo_t *, vlc_tick_t); /* Used by frag */
 bool       mp4mux_track_HasBFrames(const mp4mux_trackinfo_t *);
 void       mp4mux_track_SetHasBFrames(mp4mux_trackinfo_t *);
+enum mp4mux_interlacing
+{
+    INTERLACING_NONE = 0,
+    INTERLACING_SINGLE_FIELD = 1,
+    INTERLACING_TOPBOTTOM = 2,
+    INTERLACING_BOTTOMTOP = 3,
+};
+void       mp4mux_track_SetInterlacing(mp4mux_trackinfo_t *, enum mp4mux_interlacing);
+enum mp4mux_interlacing mp4mux_track_GetInterlacing(const mp4mux_trackinfo_t *);
 void       mp4mux_track_SetSamplePriv(mp4mux_trackinfo_t *, const uint8_t *, size_t);
 bool       mp4mux_track_HasSamplePriv(const mp4mux_trackinfo_t *);
 vlc_tick_t mp4mux_track_GetDefaultSampleDuration(const mp4mux_trackinfo_t *);

@@ -60,6 +60,7 @@ struct mp4mux_trackinfo_t
     vlc_tick_t   i_read_duration;
     uint32_t     i_timescale;
     bool         b_hasbframes;
+    enum mp4mux_interlacing e_interlace;
 
     /* frags */
     vlc_tick_t   i_trex_default_length;
@@ -280,6 +281,16 @@ void mp4mux_track_ForceDuration(mp4mux_trackinfo_t *t, vlc_tick_t d)
 uint32_t mp4mux_track_GetID(const mp4mux_trackinfo_t *t)
 {
     return t->i_track_id;
+}
+
+void mp4mux_track_SetInterlacing(mp4mux_trackinfo_t *t, enum mp4mux_interlacing i)
+{
+    t->e_interlace = i;
+}
+
+enum mp4mux_interlacing mp4mux_track_GetInterlacing(const mp4mux_trackinfo_t *t)
+{
+    return t->e_interlace;
 }
 
 void mp4mux_track_SetSamplePriv(mp4mux_trackinfo_t *t,
@@ -869,6 +880,23 @@ static bo_t *GetxxxxTag(const uint8_t *p_extra, size_t i_extra,
     return box;
 }
 
+static bo_t *GetFielBox(enum mp4mux_interlacing i)
+{
+    bo_t *p_box = box_new("fiel");
+    if(p_box)
+    {
+        const uint16_t values[] =
+        {
+            [INTERLACING_NONE]         = 0x0100,
+            [INTERLACING_SINGLE_FIELD] = 0x0200,
+            [INTERLACING_TOPBOTTOM]    = 0x0201,
+            [INTERLACING_BOTTOMTOP   ] = 0x0206,
+        };
+        bo_add_16be(p_box, values[i]);
+    }
+    return p_box;
+}
+
 static bo_t *GetColrBox(const video_format_t *p_vfmt, bool b_mov)
 {
     bo_t *p_box = box_new("colr");
@@ -1174,7 +1202,7 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     VLC_UNUSED(p_obj);
 
     char fcc[4];
-    bool b_colr = false;
+    bool b_colr = false, b_fiel = false;
 
     static_assert(VLC_CODEC_YUV4 == VLC_FOURCC('y','u','v','4'), "incorrect fcc for yuv4");
     static_assert(VLC_CODEC_V210 == VLC_FOURCC('v','2','1','0'), "incorrect fcc for v210");
@@ -1195,16 +1223,16 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     /* FIXME: find a way to know if no non-VCL units are in the stream (->hvc1)
      * see 14496-15 8.4.1.1.1 */
     case VLC_CODEC_HEVC: memcpy(fcc, "hev1", 4); break;
-    case VLC_CODEC_YV12: memcpy(fcc, "yv12", 4); b_colr = true; break;
-    case VLC_CODEC_YUYV: memcpy(fcc, "YUY2", 4); b_colr = true; break;
-    case VLC_CODEC_UYVY: memcpy(fcc, "2vuy", 4); b_colr = true; break;
+    case VLC_CODEC_YV12: memcpy(fcc, "yv12", 4); b_colr = b_fiel = true; break;
+    case VLC_CODEC_YUYV: memcpy(fcc, "YUY2", 4); b_colr = b_fiel= true; break;
+    case VLC_CODEC_UYVY: memcpy(fcc, "2vuy", 4); b_colr = b_fiel= true; break;
     case VLC_CODEC_YUV4:
     case VLC_CODEC_V210:
     case VLC_CODEC_V308:
     case VLC_CODEC_V408:
     case VLC_CODEC_V410:
             vlc_fourcc_to_char(p_track->fmt.i_codec, fcc);
-            b_colr = true;
+            b_colr = b_fiel = true;
             break;
     default:
         vlc_fourcc_to_char(p_track->fmt.i_codec, fcc);
@@ -1293,6 +1321,8 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 
     if(b_colr)
         box_gather(vide, GetColrBox(&p_track->fmt.video, b_mov));
+    if(b_fiel)
+        box_gather(vide, GetFielBox(p_track->e_interlace));
 
     box_gather(vide, GetMdcv(&p_track->fmt.video));
     box_gather(vide, GetClli(&p_track->fmt.video));
