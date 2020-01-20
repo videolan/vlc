@@ -209,20 +209,27 @@ bool NetworkDeviceModel::initializeMediaSources()
 
 void NetworkDeviceModel::onItemCleared( MediaSourcePtr mediaSource, input_item_node_t* node )
 {
+    if (node != &mediaSource->tree->root)
+        return;
     refreshDeviceList( std::move( mediaSource), node->pp_children, node->i_children, true );
 }
 
-void NetworkDeviceModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t*,
+void NetworkDeviceModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node_t* parent,
                                   input_item_node_t *const children[],
                                   size_t count )
 {
+    if (parent != &mediaSource->tree->root)
+        return;
     refreshDeviceList( std::move( mediaSource ), children, count, false );
 }
 
-void NetworkDeviceModel::onItemRemoved(MediaSourcePtr, input_item_node_t*,
+void NetworkDeviceModel::onItemRemoved(MediaSourcePtr mediaSource, input_item_node_t* node,
                                     input_item_node_t *const children[],
                                     size_t count )
 {
+    if (node != &mediaSource->tree->root)
+        return;
+
     std::vector<InputItemPtr> itemList;
     itemList.reserve( count );
     for ( auto i = 0u; i < count; ++i )
