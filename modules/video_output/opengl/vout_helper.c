@@ -431,7 +431,7 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
 
 static int
 opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
-                    struct prgm *prgm, const video_format_t *fmt, bool subpics,
+                    struct prgm *prgm, const video_format_t *fmt,
                     bool b_dump_shaders)
 {
     opengl_tex_converter_t *tc = calloc(1, sizeof(*tc));
@@ -439,7 +439,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
         return VLC_ENOMEM;
 
     struct vlc_gl_interop *interop =
-        vlc_gl_interop_New(vgl->gl, &vgl->vt, context, fmt, subpics);
+        vlc_gl_interop_New(vgl->gl, &vgl->vt, context, fmt, false);
     if (!interop)
     {
         free(tc);
@@ -461,18 +461,15 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
 
 #ifdef HAVE_LIBPLACEBO
     // Create the main libplacebo context
-    if (!subpics)
-    {
-        tc->pl_ctx = vlc_placebo_Create(VLC_OBJECT(vgl->gl));
-        if (tc->pl_ctx) {
+    tc->pl_ctx = vlc_placebo_Create(VLC_OBJECT(vgl->gl));
+    if (tc->pl_ctx) {
 #   if PL_API_VER >= 20
-            tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL);
+        tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL);
 #   elif PL_API_VER >= 6
-            tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0);
+        tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0);
 #   else
-            tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0, 0);
+        tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0, 0);
 #   endif
-        }
     }
 #endif
 
@@ -681,7 +678,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     GL_ASSERT_NOERROR();
-    int ret = opengl_init_program(vgl, context, &vgl->prgm, fmt, false,
+    int ret = opengl_init_program(vgl, context, &vgl->prgm, fmt,
                                   b_dump_shaders);
     if (ret != VLC_SUCCESS)
     {
