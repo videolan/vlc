@@ -23,10 +23,103 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_modules.h>
 
 #include "interop.h"
 #include "internal.h"
 #include "vout_helper.h"
+
+struct vlc_gl_interop *
+vlc_gl_interop_New(struct vlc_gl_t *gl, const opengl_vtable_t *vt,
+                   vlc_video_context *context, const video_format_t *fmt,
+                   bool subpics)
+{
+    const char *glexts = (const char *) vt->GetString(GL_EXTENSIONS);
+    assert(glexts);
+    if (!glexts)
+    {
+        msg_Err(gl, "glGetString returned NULL");
+        return NULL;
+    }
+
+    struct vlc_gl_interop *interop = vlc_object_create(gl, sizeof(*interop));
+    if (!interop)
+        return NULL;
+
+#ifdef USE_OPENGL_ES2
+    interop->is_gles = true;
+#else
+    interop->is_gles = false;
+#endif
+
+    interop->init = opengl_interop_init_impl;
+    interop->ops = NULL;
+    interop->glexts = glexts;
+    interop->fmt = *fmt;
+    /* this is the only allocated field, and we don't need it */
+    interop->fmt.p_palette = NULL;
+
+    interop->gl = gl;
+    interop->vt = vt;
+
+    int ret;
+    if (subpics)
+    {
+        interop->fmt.i_chroma = VLC_CODEC_RGB32;
+        /* Normal orientation and no projection for subtitles */
+        interop->fmt.orientation = ORIENT_NORMAL;
+        interop->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
+        interop->fmt.primaries = COLOR_PRIMARIES_UNDEF;
+        interop->fmt.transfer = TRANSFER_FUNC_UNDEF;
+        interop->fmt.space = COLOR_SPACE_UNDEF;
+
+        ret = opengl_interop_generic_init(interop, false);
+    }
+    else
+    {
+        const vlc_chroma_description_t *desc =
+            vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+
+        if (desc == NULL)
+        {
+            vlc_object_delete(interop);
+            return NULL;
+        }
+        if (desc->plane_count == 0)
+        {
+            /* Opaque chroma: load a module to handle it */
+            interop->vctx = context;
+            interop->module = module_need_var(interop, "glinterop", "glinterop");
+        }
+
+        if (interop->module != NULL)
+            ret = VLC_SUCCESS;
+        else
+        {
+            /* Software chroma or gl hw converter failed: use a generic
+             * converter */
+            ret = opengl_interop_generic_init(interop, true);
+        }
+    }
+
+    if (ret != VLC_SUCCESS)
+    {
+        vlc_object_delete(interop);
+        return NULL;
+    }
+
+    return interop;
+}
+
+void
+vlc_gl_interop_Delete(struct vlc_gl_interop *interop)
+{
+    if (interop->module)
+        module_unneed(interop, interop->module);
+    if (interop->ops && interop->ops->close)
+        interop->ops->close(interop);
+    vlc_object_delete(interop);
+}
 
 static int GetTexFormatSize(const opengl_vtable_t *vt, int target,
                             int tex_format, int tex_internal, int tex_type)

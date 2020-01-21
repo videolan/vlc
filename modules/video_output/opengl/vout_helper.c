@@ -514,12 +514,7 @@ static void
 opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
 {
     opengl_tex_converter_t *tc = prgm->tc;
-    struct vlc_gl_interop *interop = tc->interop;
-    if (interop->module != NULL)
-        module_unneed(interop, interop->module);
-    if (interop->ops && interop->ops->close)
-        interop->ops->close(interop);
-    vlc_object_delete(interop);
+    vlc_gl_interop_Delete(tc->interop);
     if (prgm->id != 0)
         vgl->vt.DeleteProgram(prgm->id);
 
@@ -532,88 +527,6 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
     free(tc);
 }
 
-static struct vlc_gl_interop *
-CreateInterop(struct vlc_gl_t *gl, const opengl_vtable_t *vt,
-              vlc_video_context *context, const video_format_t *fmt,
-              bool subpics)
-{
-    const char *glexts = (const char *) vt->GetString(GL_EXTENSIONS);
-    assert(glexts);
-    if (!glexts)
-    {
-        msg_Err(gl, "glGetString returned NULL");
-        return NULL;
-    }
-
-    struct vlc_gl_interop *interop = vlc_object_create(gl, sizeof(*interop));
-    if (!interop)
-        return NULL;
-
-#ifdef USE_OPENGL_ES2
-    interop->is_gles = true;
-#else
-    interop->is_gles = false;
-#endif
-
-    interop->init = opengl_interop_init_impl;
-    interop->ops = NULL;
-    interop->glexts = glexts;
-    interop->fmt = *fmt;
-    /* this is the only allocated field, and we don't need it */
-    interop->fmt.p_palette = NULL;
-
-    interop->gl = gl;
-    interop->vt = vt;
-
-    int ret;
-    if (subpics)
-    {
-        interop->fmt.i_chroma = VLC_CODEC_RGB32;
-        /* Normal orientation and no projection for subtitles */
-        interop->fmt.orientation = ORIENT_NORMAL;
-        interop->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
-        interop->fmt.primaries = COLOR_PRIMARIES_UNDEF;
-        interop->fmt.transfer = TRANSFER_FUNC_UNDEF;
-        interop->fmt.space = COLOR_SPACE_UNDEF;
-
-        ret = opengl_interop_generic_init(interop, false);
-    }
-    else
-    {
-        const vlc_chroma_description_t *desc =
-            vlc_fourcc_GetChromaDescription(fmt->i_chroma);
-
-        if (desc == NULL)
-        {
-            vlc_object_delete(interop);
-            return NULL;
-        }
-        if (desc->plane_count == 0)
-        {
-            /* Opaque chroma: load a module to handle it */
-            interop->vctx = context;
-            interop->module = module_need_var(interop, "glinterop", "glinterop");
-        }
-
-        if (interop->module != NULL)
-            ret = VLC_SUCCESS;
-        else
-        {
-            /* Software chroma or gl hw converter failed: use a generic
-             * converter */
-            ret = opengl_interop_generic_init(interop, true);
-        }
-    }
-
-    if (ret != VLC_SUCCESS)
-    {
-        vlc_object_delete(interop);
-        return NULL;
-    }
-
-    return interop;
-}
-
 static int
 opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
                     struct prgm *prgm, const video_format_t *fmt, bool subpics,
@@ -624,7 +537,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
         return VLC_ENOMEM;
 
     struct vlc_gl_interop *interop =
-        CreateInterop(vgl->gl, &vgl->vt, context, fmt, subpics);
+        vlc_gl_interop_New(vgl->gl, &vgl->vt, context, fmt, subpics);
     if (!interop)
     {
         free(tc);

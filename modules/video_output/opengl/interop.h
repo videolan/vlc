@@ -156,6 +156,14 @@ struct vlc_gl_interop {
             vlc_fourcc_t chroma, video_color_space_t yuv_space);
 };
 
+struct vlc_gl_interop *
+vlc_gl_interop_New(struct vlc_gl_t *gl, const opengl_vtable_t *vt,
+                   vlc_video_context *context, const video_format_t *fmt,
+                   bool subpics);
+
+void
+vlc_gl_interop_Delete(struct vlc_gl_interop *interop);
+
 static inline int
 opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
                     vlc_fourcc_t chroma, video_color_space_t yuv_space)
