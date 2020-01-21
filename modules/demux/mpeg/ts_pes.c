@@ -116,6 +116,12 @@ static bool ts_pes_Push( ts_pes_parse_callback *cb,
     if( p_pkt == NULL )
         return b_ret;
 
+    if( p_pkt->i_buffer == 0 )
+    {
+        block_Release( p_pkt );
+        return b_ret;
+    }
+
     if( !b_unit_start && p_pes->gather.p_data == NULL )
     {
         /* msg_Dbg( p_demux, "broken packet" ); */
