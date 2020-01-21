@@ -39,6 +39,7 @@
 #include <vlc_vout.h>
 #include <vlc_viewpoint.h>
 
+#include "gl_util.h"
 #include "vout_helper.h"
 #include "internal.h"
 
@@ -262,13 +263,6 @@ static void getOrientationTransformMatrix(video_orientation_t orientation,
         default:
             break;
     }
-}
-
-static inline GLsizei GetAlignedSize(unsigned size)
-{
-    /* Return the smallest larger or equal power of 2 */
-    unsigned align = 1 << (8 * sizeof (unsigned) - clz(size));
-    return ((align >> 1) == size) ? size : align;
 }
 
 static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
@@ -786,8 +780,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
             vgl->tex_width[j]  = w;
             vgl->tex_height[j] = h;
         } else {
-            vgl->tex_width[j]  = GetAlignedSize(w);
-            vgl->tex_height[j] = GetAlignedSize(h);
+            vgl->tex_width[j]  = vlc_align_pot(w);
+            vgl->tex_height[j] = vlc_align_pot(h);
         }
     }
 
@@ -986,8 +980,8 @@ vout_display_opengl_PrepareSubPicture(vout_display_opengl_t *vgl,
             glr->width  = r->fmt.i_visible_width;
             glr->height = r->fmt.i_visible_height;
             if (!vgl->supports_npot) {
-                glr->width  = GetAlignedSize(glr->width);
-                glr->height = GetAlignedSize(glr->height);
+                glr->width  = vlc_align_pot(glr->width);
+                glr->height = vlc_align_pot(glr->height);
                 glr->tex_width  = (float) r->fmt.i_visible_width  / glr->width;
                 glr->tex_height = (float) r->fmt.i_visible_height / glr->height;
             } else {
