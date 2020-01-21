@@ -164,6 +164,15 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, const opengl_vtable_t *vt,
 void
 vlc_gl_interop_Delete(struct vlc_gl_interop *interop);
 
+int
+vlc_gl_interop_GenerateTextures(const struct vlc_gl_interop *interop,
+                                const GLsizei *tex_width,
+                                const GLsizei *tex_height, GLuint *textures);
+
+void
+vlc_gl_interop_DeleteTextures(const struct vlc_gl_interop *interop,
+                              GLuint *textures);
+
 static inline int
 opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
                     vlc_fourcc_t chroma, video_color_space_t yuv_space)

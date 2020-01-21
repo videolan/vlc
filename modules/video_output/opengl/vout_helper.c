@@ -311,10 +311,10 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
     return shader;
 }
 
-static int
-GenTextures(const struct vlc_gl_interop *interop,
-            const GLsizei *tex_width, const GLsizei *tex_height,
-            GLuint *textures)
+int
+vlc_gl_interop_GenerateTextures(const struct vlc_gl_interop *interop,
+                                const GLsizei *tex_width,
+                                const GLsizei *tex_height, GLuint *textures)
 {
     interop->vt->GenTextures(interop->tex_count, textures);
 
@@ -347,8 +347,9 @@ GenTextures(const struct vlc_gl_interop *interop,
     return VLC_SUCCESS;
 }
 
-static void
-DelTextures(const struct vlc_gl_interop *interop, GLuint *textures)
+void
+vlc_gl_interop_DeleteTextures(const struct vlc_gl_interop *interop,
+                              GLuint *textures)
 {
     interop->vt->DeleteTextures(interop->tex_count, textures);
     memset(textures, 0, interop->tex_count * sizeof(GLuint));
@@ -790,8 +791,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     if (!interop->handle_texs_gen)
     {
-        ret = GenTextures(vgl->prgm->tc->interop, vgl->tex_width, vgl->tex_height,
-                          vgl->texture);
+        ret = vlc_gl_interop_GenerateTextures(vgl->prgm->tc->interop,
+                                              vgl->tex_width, vgl->tex_height,
+                                              vgl->texture);
         if (ret != VLC_SUCCESS)
         {
             vout_display_opengl_Delete(vgl);
@@ -1013,7 +1015,9 @@ vout_display_opengl_PrepareSubPicture(vout_display_opengl_t *vgl,
             if (!glr->texture)
             {
                 /* Could not recycle a previous texture, generate a new one. */
-                int ret = GenTextures(interop, &glr->width, &glr->height, &glr->texture);
+                int ret = vlc_gl_interop_GenerateTextures(interop, &glr->width,
+                                                          &glr->height,
+                                                          &glr->texture);
                 if (ret != VLC_SUCCESS)
                     break;
             }
@@ -1035,7 +1039,7 @@ vout_display_opengl_PrepareSubPicture(vout_display_opengl_t *vgl,
 
     for (int i = 0; i < last_count; i++) {
         if (last[i].texture)
-            DelTextures(interop, &last[i].texture);
+            vlc_gl_interop_DeleteTextures(interop, &last[i].texture);
     }
     free(last);
 
