@@ -44,10 +44,17 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input, bool force_pos)
         return;
     input_item_t* item = input_GetItem(input->thread);
     vlc_ml_media_t* media = vlc_ml_get_media_by_mrl( ml, item->psz_uri);
-    if (!media || media->i_type != VLC_ML_MEDIA_TYPE_VIDEO)
+    if (!media)
         return;
-    if (vlc_ml_media_get_all_playback_pref(ml, media->i_id, &input->ml.states) != VLC_SUCCESS)
+    if (media->i_type != VLC_ML_MEDIA_TYPE_VIDEO ||
+        vlc_ml_media_get_all_playback_pref(ml, media->i_id,
+                                           &input->ml.states) != VLC_SUCCESS)
+    {
+        vlc_ml_release(media);
         return;
+    }
+    vlc_ml_release(media);
+
     input->ml.restore = (restore_pos == VLC_PLAYER_RESTORE_PLAYBACK_POS_ALWAYS) ?
                             VLC_RESTOREPOINT_TITLE : VLC_RESTOREPOINT_NONE;
     input->ml.restore_states = restore_states;
@@ -124,7 +131,6 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input, bool force_pos)
             var_SetString(vout, "video-filter", NULL);
         vout_Release(vout);
     }
-    vlc_ml_release(media);
 }
 
 static const float beginning_of_media_percent = .5f;
