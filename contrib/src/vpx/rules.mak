@@ -1,6 +1,6 @@
 # libvpx
 
-VPX_VERSION := 1.8.0
+VPX_VERSION := 1.8.2
 VPX_URL := http://github.com/webmproject/libvpx/archive/v${VPX_VERSION}.tar.gz
 
 PKGS += vpx
@@ -18,7 +18,8 @@ libvpx: libvpx-$(VPX_VERSION).tar.gz .sum-vpx
 	$(APPLY) $(SRC)/vpx/libvpx-ios.patch
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/vpx/libvpx-android.patch
-	$(APPLY) $(SRC)/vpx/libvpx-android-toolchain_path.patch
+	cp "${ANDROID_NDK}"/sources/android/cpufeatures/cpu-features.c $(UNPACK_DIR)/vpx_ports
+	cp "${ANDROID_NDK}"/sources/android/cpufeatures/cpu-features.h $(UNPACK_DIR)
 endif
 	$(MOVE)
 
@@ -126,10 +127,11 @@ else
 VPX_CONF += --extra-cflags="-mstackrealign"
 endif
 ifdef HAVE_MACOSX
-VPX_CONF += --sdk-path=$(MACOSX_SDK) --extra-cflags="$(EXTRA_CFLAGS)"
+VPX_CONF += --extra-cflags="$(CFLAGS) $(EXTRA_CFLAGS)"
 endif
 ifdef HAVE_IOS
-VPX_CONF += --sdk-path=$(IOS_SDK) --enable-vp8-decoder
+VPX_CONF += --enable-vp8-decoder --disable-tools
+VPX_CONF += --extra-cflags="$(CFLAGS) $(EXTRA_CFLAGS)"
 ifdef HAVE_TVOS
 VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) -mtvos-version-min=9.0
 else
@@ -142,11 +144,6 @@ ifndef HAVE_IOS
 VPX_LDFLAGS += -arch $(ARCH)
 endif
 endif
-endif
-ifdef HAVE_ANDROID
-# vpx configure.sh overrides our sysroot and it looks for it itself, and
-# uses that path to look for the compiler (which we already know)
-VPX_CONF += --sdk-path=$(shell dirname $(shell which $(HOST)-clang))
 endif
 
 ifneq ($(filter i386 x86_64,$(ARCH)),)

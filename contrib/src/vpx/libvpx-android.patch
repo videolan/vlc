@@ -1,92 +1,17 @@
-We don't use Android.mk to build libvpx. Then we have to force the build of
-cpu-features.c. Additionally, we don't need to link with pthread.
-
---- libvpx/build/make/configure.sh.orig	2019-05-08 15:33:05.038238914 -0400
-+++ libvpx/build/make/configure.sh	2019-05-08 15:52:29.424209219 -0400
-@@ -689,8 +689,8 @@
- }
- 
- setup_gnu_toolchain() {
--  CC=${CC:-${CROSS}gcc}
--  CXX=${CXX:-${CROSS}g++}
-+  CC=clang
-+  CXX=clang++
-   AR=${AR:-${CROSS}ar}
-   LD=${LD:-${CROSS}${link_with_cc:-ld}}
-   AS=${AS:-${CROSS}as}
-@@ -1110,9 +1110,9 @@
-             COMPILER_LOCATION=`find "${SDK_PATH}" \
-               -name "arm-linux-androideabi-gcc*" -print -quit`
-             TOOLCHAIN_PATH=${COMPILER_LOCATION%/*}/arm-linux-androideabi-
--            CC=${TOOLCHAIN_PATH}gcc
--            CXX=${TOOLCHAIN_PATH}g++
--            AR=${TOOLCHAIN_PATH}ar
-+            CC=clang
-+            CXX=clang++
-+            AR=llvm-ar
-             LD=${TOOLCHAIN_PATH}gcc
-             AS=${TOOLCHAIN_PATH}as
-             STRIP=${TOOLCHAIN_PATH}strip
-@@ -1132,17 +1132,17 @@
-               add_ldflags "--sysroot=${alt_libc}"
-             fi
- 
--            # linker flag that routes around a CPU bug in some
--            # Cortex-A8 implementations (NDK Dev Guide)
--            add_ldflags "-Wl,--fix-cortex-a8"
--
-             enable_feature pic
-             soft_enable realtime_only
-             if [ ${tgt_isa} = "armv7" ]; then
-+              # linker flag that routes around a CPU bug in some
-+              # Cortex-A8 implementations (NDK Dev Guide)
-+              add_ldflags "-Wl,--fix-cortex-a8"
-               soft_enable runtime_cpu_detect
-             fi
-             if enabled runtime_cpu_detect; then
--              add_cflags "-I${SDK_PATH}/sources/android/cpufeatures"
-+              cp "${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c" vpx_ports
-+              add_cflags "-I${ANDROID_NDK}/sources/android/cpufeatures"
-             fi
-           else
-             echo "Assuming standalone build with NDK toolchain."
-@@ -1546,13 +1546,6 @@
-       *-android-gcc)
-         # bionic includes basic pthread functionality, obviating -lpthread.
-         ;;
--      *)
--        check_header pthread.h && check_lib -lpthread <<EOF && add_extralibs -lpthread || disable_feature pthread_h
--#include <pthread.h>
--#include <stddef.h>
--int main(void) { return pthread_create(NULL, NULL, NULL, NULL); }
--EOF
--        ;;
-     esac
-   fi
- 
---- libvpx/libs.mk.orig	2019-05-08 15:46:19.034127288 -0400
-+++ libvpx/libs.mk	2019-05-08 15:52:00.152360798 -0400
-@@ -323,7 +323,7 @@
- 	$(qexec)echo 'Conflicts:' >> $@
- 	$(qexec)echo 'Libs: -L$${libdir} -lvpx -lm' >> $@
- ifeq ($(HAVE_PTHREAD_H),yes)
--	$(qexec)echo 'Libs.private: -lm -lpthread' >> $@
-+	$(qexec)echo 'Libs.private: -lm' >> $@
- else
- 	$(qexec)echo 'Libs.private: -lm' >> $@
- endif
---- libvpx/vpx_ports/vpx_ports.mk.orig	2019-05-08 15:47:31.609751458 -0400
-+++ libvpx/vpx_ports/vpx_ports.mk	2019-05-08 15:47:52.945640970 -0400
+diff -Naur libvpx-1.8.2.orig/vpx_ports/vpx_ports.mk libvpx-1.8.2/vpx_ports/vpx_ports.mk
+--- libvpx-1.8.2.orig/vpx_ports/vpx_ports.mk	2019-12-10 00:09:20.000000000 +0100
++++ libvpx-1.8.2/vpx_ports/vpx_ports.mk	2020-01-22 14:06:41.478331277 +0100
 @@ -35,6 +35,7 @@
  endif
  
- PORTS_SRCS-$(ARCH_ARM) += arm_cpudetect.c
-+PORTS_SRCS-$(ARCH_ARM) += cpu-features.c
- PORTS_SRCS-$(ARCH_ARM) += arm.h
+ PORTS_SRCS-$(VPX_ARCH_ARM) += arm_cpudetect.c
++PORTS_SRCS-$(VPX_ARCH_ARM) += cpu-features.c
+ PORTS_SRCS-$(VPX_ARCH_ARM) += arm.h
  
- PORTS_SRCS-$(ARCH_PPC) += ppc_cpudetect.c
---- libvpx/vpx_ports/x86_abi_support.asm.orig	2019-05-08 15:50:53.016708446 -0400
-+++ libvpx/vpx_ports/x86_abi_support.asm	2019-05-08 15:51:24.152547214 -0400
+ PORTS_SRCS-$(VPX_ARCH_PPC) += ppc_cpudetect.c
+diff -Naur libvpx-1.8.2.orig/vpx_ports/x86_abi_support.asm libvpx-1.8.2/vpx_ports/x86_abi_support.asm
+--- libvpx-1.8.2.orig/vpx_ports/x86_abi_support.asm	2019-12-10 00:09:20.000000000 +0100
++++ libvpx-1.8.2/vpx_ports/x86_abi_support.asm	2020-01-22 14:07:11.774877937 +0100
 @@ -393,6 +393,7 @@
  
  ; On Android platforms use lrand48 when building postproc routines. Prior to L

@@ -1,6 +1,6 @@
---- libvpx/build/make/configure.sh.orig	2019-05-08 15:33:05.038238914 -0400
-+++ libvpx/build/make/configure.sh	2019-05-08 15:34:46.909711375 -0400
-@@ -863,88 +863,6 @@
+--- libvpx/build/make/configure.sh.orig	2020-01-21 18:01:06.103409182 -0500
++++ libvpx/build/make/configure.sh	2020-01-21 18:01:33.395259084 -0500
+@@ -832,92 +832,6 @@
    # PIC is probably what we want when building shared libs
    enabled shared && soft_enable pic
  
@@ -75,6 +75,10 @@
 -      add_cflags  "-mmacosx-version-min=10.13"
 -      add_ldflags "-mmacosx-version-min=10.13"
 -      ;;
+-    *-darwin18-*)
+-      add_cflags  "-mmacosx-version-min=10.14"
+-      add_ldflags "-mmacosx-version-min=10.14"
+-      ;;
 -    *-iphonesimulator-*)
 -      add_cflags  "-miphoneos-version-min=${IOS_VERSION_MIN}"
 -      add_ldflags "-miphoneos-version-min=${IOS_VERSION_MIN}"
@@ -89,30 +93,16 @@
    # Handle Solaris variants. Solaris 10 needs -lposix4
    case ${toolchain} in
      sparc-solaris-*)
-@@ -1177,12 +1095,6 @@
-             add_cflags -isysroot ${alt_libc}
-           fi
+@@ -1106,12 +1020,6 @@
+               add_cflags -isysroot ${alt_libc}
+             fi
  
--          if [ "${LD}" = "${CXX}" ]; then
--            add_ldflags -miphoneos-version-min="${IOS_VERSION_MIN}"
--          else
--            add_ldflags -ios_version_min "${IOS_VERSION_MIN}"
--          fi
+-            if [ "${LD}" = "${CXX}" ]; then
+-              add_ldflags -miphoneos-version-min="${IOS_VERSION_MIN}"
+-            else
+-              add_ldflags -ios_version_min "${IOS_VERSION_MIN}"
+-            fi
 -
-           for d in lib usr/lib usr/lib/system; do
-             try_dir="${alt_libc}/${d}"
-             [ -d "${try_dir}" ] && add_ldflags -L"${try_dir}"
-@@ -1372,6 +1284,13 @@
-       case ${tgt_cc} in
-         gcc*)
-           add_cflags -m${bits}
-+          case ${tgt_os} in
-+              darwin*)
-+              ;;
-+              *)
-+              add_ldflags -m${bits}
-+              ;;
-+          esac
-           add_ldflags -m${bits}
-           ;;
-       esac
+             for d in lib usr/lib usr/lib/system; do
+               try_dir="${alt_libc}/${d}"
+               [ -d "${try_dir}" ] && add_ldflags -L"${try_dir}"
