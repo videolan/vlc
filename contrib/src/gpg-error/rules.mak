@@ -41,7 +41,9 @@ ifneq ($(HOST),aarch64-apple-darwin)
 	cp $@/src/syscfg/lock-obj-pub.aarch64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
 endif
 else
+ifneq ($(ARCH),x86_64)
 	cp $@/src/syscfg/lock-obj-pub.x86_64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
+endif
 endif
 endif
 endif
