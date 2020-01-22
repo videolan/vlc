@@ -48,11 +48,6 @@
  */
 typedef struct {
     vout_thread_t        *vout;
-    const video_format_t *fmt; // for the initial window dimensions
-} vout_device_configuration_t;
-
-typedef struct {
-    vout_thread_t        *vout;
     vlc_clock_t          *clock;
     const video_format_t *fmt;
     vlc_mouse_event      mouse_event;
