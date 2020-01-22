@@ -612,13 +612,13 @@ if ! [ -e configure ]; then
 fi
 
 # Build
-mkdir -p "${VLC_BUILD_DIR}/build/${VLC_PSEUDO_TRIPLET}"
-cd "${VLC_BUILD_DIR}/build/${VLC_PSEUDO_TRIPLET}" || abort_err "Failed cd to VLC build dir"
+mkdir -p "${VLC_BUILD_DIR}/build"
+cd "${VLC_BUILD_DIR}/build" || abort_err "Failed cd to VLC build dir"
 
 # Create VLC install dir if it does not already exist
 mkdir -p "$VLC_INSTALL_DIR"
 
-../../../configure \
+../../configure \
     --with-contrib="$VLC_CONTRIB_INSTALL_DIR" \
     --host="$VLC_HOST_TRIPLET" \
     --prefix="$VLC_INSTALL_DIR" \
@@ -663,8 +663,8 @@ echo ""
 
 echo "Compile VLC static modules list object"
 
-mkdir -p "${VLC_BUILD_DIR}/build/${VLC_PSEUDO_TRIPLET}/build-sh"
-cd "${VLC_BUILD_DIR}/build/${VLC_PSEUDO_TRIPLET}/build-sh" \
+mkdir -p "${VLC_BUILD_DIR}/build/build-sh"
+cd "${VLC_BUILD_DIR}/build/build-sh" \
  || abort_err "Failed cd to VLC build-sh build dir"
 
 # Collect paths of all static libraries needed (plugins and contribs)
@@ -695,7 +695,7 @@ gen_vlc_static_module_list "${VLC_STATIC_MODULELIST_NAME}.c" "${VLC_PLUGINS_SYMB
 ${CC:-cc} -c  ${CFLAGS} "${VLC_STATIC_MODULELIST_NAME}.c" \
   || abort_err "Compiling module list file failed"
 
-echo "${VLC_BUILD_DIR}/build/${VLC_PSEUDO_TRIPLET}/build-sh/${VLC_STATIC_MODULELIST_NAME}.o" \
+echo "${VLC_BUILD_DIR}/build/build-sh/${VLC_STATIC_MODULELIST_NAME}.o" \
   >> "$VLC_STATIC_FILELIST_NAME"
 
 echo ""
