@@ -254,11 +254,11 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
                     p_pes->gather.i_data_size == 0 );
 
             /* If we started reading a fixed size */
-            if( p_pes->gather.i_data_size > p_pes->gather.i_gathered )
+            if( p_pes->gather.i_data_size > p_pes->gather.i_gathered && !b_single_payload )
             {
                 const size_t i_remain = p_pes->gather.i_data_size - p_pes->gather.i_gathered;
                 /* Append whole block */
-                if( likely(p_pkt->i_buffer <= i_remain || b_single_payload) )
+                if( likely(p_pkt->i_buffer <= i_remain) )
                 {
                     b_ret |= ts_pes_Push( cb, p_pes, p_pkt, p_pes->gather.p_data == NULL );
                     p_pkt = NULL;
