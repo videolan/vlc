@@ -55,10 +55,6 @@
 #define MMAL_ALIGN_W      32
 #define MMAL_ALIGN_H      16
 
-#define MMAL_OPAQUE_NAME "mmal-opaque"
-#define MMAL_OPAQUE_TEXT N_("Decode frames directly into RPI VideoCore instead of host memory.")
-#define MMAL_OPAQUE_LONGTEXT N_("Decode frames directly into RPI VideoCore instead of host memory. This option must only be used with the MMAL video output plugin.")
-
 #define MMAL_RESIZE_NAME "mmal-resize"
 #define MMAL_RESIZE_TEXT N_("Use mmal resizer rather than hvs.")
 #define MMAL_RESIZE_LONGTEXT N_("Use mmal resizer rather than isp. This uses less gpu memory than the ISP but is slower.")
@@ -75,7 +71,7 @@ vlc_module_begin()
     set_description(N_("MMAL-based decoder plugin for Raspberry Pi"))
     set_capability("video decoder", 90)
     add_shortcut("mmal_decoder")
-    add_bool(MMAL_OPAQUE_NAME, true, MMAL_OPAQUE_TEXT, MMAL_OPAQUE_LONGTEXT, false)
+    add_obsolete_bool("mmal-opaque")
     set_callbacks(OpenDecoder, CloseDecoder)
 
     add_submodule()
