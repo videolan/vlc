@@ -96,22 +96,13 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
                                  (void*)sys);
 }
 
-/**
- * Picture pool configuration
- */
-typedef struct {
-    unsigned  picture_count;
-    picture_t *const *picture;
-} picture_pool_configuration_t;
-
-static
-picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
+picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
 {
-    if (unlikely(cfg->picture_count > POOL_MAX))
+    if (unlikely(count > POOL_MAX))
         return NULL;
 
     picture_pool_t *pool;
-    size_t size = sizeof (*pool) + cfg->picture_count * sizeof (picture_t *);
+    size_t size = sizeof (*pool) + count * sizeof (picture_t *);
 
     size += (-size) & (POOL_MAX - 1);
     pool = aligned_alloc(POOL_MAX, size);
@@ -120,26 +111,15 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
 
     vlc_mutex_init(&pool->lock);
     vlc_cond_init(&pool->wait);
-    if (cfg->picture_count == POOL_MAX)
+    if (count == POOL_MAX)
         pool->available = ~0ULL;
     else
-        pool->available = (1ULL << cfg->picture_count) - 1;
+        pool->available = (1ULL << count) - 1;
     atomic_init(&pool->refs,  1);
-    pool->picture_count = cfg->picture_count;
-    memcpy(pool->picture, cfg->picture,
-           cfg->picture_count * sizeof (picture_t *));
+    pool->picture_count = count;
+    memcpy(pool->picture, tab, count * sizeof (picture_t *));
     pool->canceled = false;
     return pool;
-}
-
-picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
-{
-    picture_pool_configuration_t cfg = {
-        .picture_count = count,
-        .picture = tab,
-    };
-
-    return picture_pool_NewExtended(&cfg);
 }
 
 picture_pool_t *picture_pool_NewFromFormat(const video_format_t *fmt,
