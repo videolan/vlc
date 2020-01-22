@@ -58,6 +58,8 @@
 
 
 #include <dvdnav/dvdnav.h>
+/* Expose without patching headers */
+dvdnav_status_t dvdnav_jump_to_sector_by_time(dvdnav_t *, uint64_t, int32_t);
 
 #include "../demux/mpeg/pes.h"
 #include "../demux/mpeg/ps.h"
@@ -584,6 +586,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             break;
+
+        case DEMUX_SET_TIME:
+        {
+            vlc_tick_t i_time = va_arg( args, vlc_tick_t );
+            if( dvdnav_jump_to_sector_by_time( p_sys->dvdnav,
+                                               i_time * 9 / 100,
+                                               SEEK_SET ) == DVDNAV_STATUS_OK )
+                return VLC_SUCCESS;
+            msg_Err( p_demux, "can't set time to %" PRId64, i_time );
+            return VLC_EGENERIC;
+        }
 
         /* Special for access_demux */
         case DEMUX_CAN_PAUSE:
