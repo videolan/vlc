@@ -550,15 +550,6 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner,
         return 0; // vout unchanged
     }
 
-    if( !p_dec->fmt_out.video.i_width ||
-        !p_dec->fmt_out.video.i_height ||
-        p_dec->fmt_out.video.i_width < p_dec->fmt_out.video.i_visible_width ||
-        p_dec->fmt_out.video.i_height < p_dec->fmt_out.video.i_visible_height )
-    {
-        /* Can't create a new vout without display size */
-        return -1;
-    }
-
     vlc_mutex_lock( &p_owner->lock );
 
     vout_thread_t *p_vout = p_owner->p_vout;

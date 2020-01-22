@@ -2097,23 +2097,12 @@ vlc_decoder_device *vout_GetDevice(const vout_device_configuration_t *cfg)
 {
     vlc_decoder_device *dec_device = NULL;
 
-    assert(cfg->fmt != NULL);
     vout_thread_sys_t *sys = cfg->vout->p;
 
-    if (!VoutCheckFormat(cfg->fmt))
-        return NULL;
-
-    video_format_t original;
-    VoutFixFormat(&original, cfg->fmt);
-
     vlc_mutex_lock(&sys->window_lock);
-    int res = EnableWindowLocked(cfg->vout, &original);
-    if (res == 0 && sys->dec_device == NULL)
+    if (sys->dec_device == NULL)
         sys->dec_device = vlc_decoder_device_Create(&cfg->vout->obj, sys->display_cfg.window);
     dec_device = sys->dec_device ? vlc_decoder_device_Hold( sys->dec_device ) : NULL;
     vlc_mutex_unlock(&sys->window_lock);
-    video_format_Clean(&original);
-    if (res != 0)
-        return NULL;
     return dec_device;
 }
