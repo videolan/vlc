@@ -158,7 +158,7 @@ struct vlc_gl_interop {
 
 static inline int
 opengl_interop_init(struct vlc_gl_interop *interop, GLenum tex_target,
-                     vlc_fourcc_t chroma, video_color_space_t yuv_space)
+                    vlc_fourcc_t chroma, video_color_space_t yuv_space)
 {
     return interop->init(interop, tex_target, chroma, yuv_space);
 }
