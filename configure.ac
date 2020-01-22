@@ -195,6 +195,8 @@ case "${host_os}" in
              [HAVE_TVOS="1"
              HAVE_IOS="0"
              HAVE_OSX="0"
+             ac_cv_func_daemon=no
+             ac_cv_func_fork=no
              ],)
 
     dnl
