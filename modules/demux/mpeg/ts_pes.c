@@ -272,6 +272,17 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
             }
             else /* if( p_pes->gather.i_data_size == 0 ) // see next packet */
             {
+                if( likely(b_aligned_ts_payload) && b_unit_start )
+                {
+                    b_ret |= ts_pes_Push( cb, p_pes, NULL, true );
+                    /* now points to PES header */
+                    if( p_pkt->i_buffer >= 6 )
+                    {
+                        p_pes->gather.i_data_size = GetWBE(&p_pkt->p_buffer[4]);
+                        if( p_pes->gather.i_data_size > 0 )
+                            p_pes->gather.i_data_size += 6;
+                    }
+                }
                 /* Append or finish current/start new PES depending on unit_start */
                 b_ret |= ts_pes_Push( cb, p_pes, p_pkt, b_unit_start );
                 p_pkt = NULL;
