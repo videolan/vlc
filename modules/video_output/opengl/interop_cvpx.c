@@ -143,9 +143,8 @@ tc_cvpx_update(const struct vlc_gl_interop *interop, GLuint *textures,
 #endif
 
 static void
-Close(vlc_object_t *obj)
+Close(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = (void *) obj;
     struct priv *priv = interop->priv;
 
 #if TARGET_OS_IPHONE
@@ -280,6 +279,7 @@ Open(vlc_object_t *obj)
     interop->priv = priv;
     static const struct vlc_gl_interop_ops ops = {
         .update_textures = tc_cvpx_update,
+        .close = Close,
     };
     interop->ops = &ops;
 
@@ -293,7 +293,7 @@ error:
 vlc_module_begin ()
     set_description("Apple OpenGL CVPX converter")
     set_capability("glinterop", 1)
-    set_callbacks(Open, Close)
+    set_callback(Open)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 vlc_module_end ()

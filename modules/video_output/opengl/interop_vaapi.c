@@ -227,9 +227,8 @@ error:
 }
 
 static void
-Close(vlc_object_t *obj)
+Close(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = (void *)obj;
     struct priv *priv = interop->priv;
 
     if (priv->last.pic != NULL)
@@ -412,6 +411,7 @@ Open(vlc_object_t *obj)
 
     static const struct vlc_gl_interop_ops ops = {
         .update_textures = tc_vaegl_update,
+        .close = Close,
     };
     interop->ops = &ops;
 
@@ -427,7 +427,7 @@ error:
 vlc_module_begin ()
     set_description("VA-API OpenGL surface converter")
     set_capability("glinterop", 1)
-    set_callbacks(Open, Close)
+    set_callback(Open)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_shortcut("vaapi")

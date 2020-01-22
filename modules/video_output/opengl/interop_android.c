@@ -93,9 +93,8 @@ tc_get_transform_matrix(const struct vlc_gl_interop *interop)
 }
 
 static void
-Close(vlc_object_t *obj)
+Close(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = (void *)obj;
     struct priv *priv = interop->priv;
 
     if (priv->stex_attached)
@@ -134,6 +133,7 @@ Open(vlc_object_t *obj)
         .allocate_textures = tc_anop_allocate_textures,
         .update_textures = tc_anop_update,
         .get_transform_matrix = tc_get_transform_matrix,
+        .close = Close,
     };
     interop->ops = &ops;
 
@@ -184,7 +184,7 @@ Open(vlc_object_t *obj)
 vlc_module_begin ()
     set_description("Android OpenGL SurfaceTexture converter")
     set_capability("glinterop", 1)
-    set_callbacks(Open, Close)
+    set_callback(Open)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 vlc_module_end ()

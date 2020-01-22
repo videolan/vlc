@@ -105,9 +105,8 @@ tc_vdpau_gl_update(const struct vlc_gl_interop *interop, GLuint textures[],
 }
 
 static void
-Close(vlc_object_t *obj)
+Close(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_interop *interop = (void *)obj;
     _glVDPAUFiniNV(); assert(interop->vt->GetError() == GL_NO_ERROR);
     converter_sys_t *sys = interop->priv;
     vlc_decoder_device *dec_device = sys->dec_device;
@@ -180,12 +179,13 @@ Open(vlc_object_t *obj)
                                   COLOR_SPACE_UNDEF);
     if (ret != VLC_SUCCESS)
     {
-        Close(obj);
+        Close(interop);
         return VLC_EGENERIC;
     }
 
     static const struct vlc_gl_interop_ops ops = {
         .update_textures = tc_vdpau_gl_update,
+        .close = Close,
     };
     interop->ops = &ops;
     interop->priv = sys;
@@ -230,7 +230,7 @@ DecoderDeviceOpen(vlc_decoder_device *device, vout_window_t *window)
 vlc_module_begin ()
     set_description("VDPAU OpenGL surface converter")
     set_capability("glinterop", 2)
-    set_callbacks(Open, Close)
+    set_callback(Open)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_shortcut("vdpau")

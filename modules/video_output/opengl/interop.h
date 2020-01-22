@@ -92,6 +92,16 @@ struct vlc_gl_interop_ops {
      */
     const float *
     (*get_transform_matrix)(const struct vlc_gl_interop *interop);
+
+    /**
+     * Called before the interop is destroyed
+     *
+     * This function pointer can be NULL.
+     *
+     * \param interop the OpenGL interop
+     */
+    void
+    (*close)(struct vlc_gl_interop *interop);
 };
 
 struct vlc_gl_interop {

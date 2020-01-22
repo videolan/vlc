@@ -517,8 +517,8 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
     struct vlc_gl_interop *interop = tc->interop;
     if (interop->module != NULL)
         module_unneed(interop, interop->module);
-    else if (interop->priv != NULL)
-        opengl_interop_generic_deinit(interop);
+    if (interop->ops && interop->ops->close)
+        interop->ops->close(interop);
     vlc_object_delete(interop);
     if (prgm->id != 0)
         vgl->vt.DeleteProgram(prgm->id);

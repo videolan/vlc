@@ -284,6 +284,16 @@ tc_common_update(const struct vlc_gl_interop *interop, GLuint *textures,
     return ret;
 }
 
+void
+opengl_interop_generic_deinit(struct vlc_gl_interop *interop)
+{
+    struct priv *priv = interop->priv;
+    for (size_t i = 0; i < PBO_DISPLAY_COUNT && priv->pbo.display_pics[i]; ++i)
+        picture_Release(priv->pbo.display_pics[i]);
+    free(priv->texture_temp_buf);
+    free(priv);
+}
+
 int
 opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
 {
@@ -347,6 +357,7 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
     static const struct vlc_gl_interop_ops ops = {
         .allocate_textures = tc_common_allocate_textures,
         .update_textures = tc_common_update,
+        .close = opengl_interop_generic_deinit,
     };
     interop->ops = &ops;
 
@@ -371,6 +382,7 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
             static const struct vlc_gl_interop_ops pbo_ops = {
                 .allocate_textures = tc_common_allocate_textures,
                 .update_textures = tc_pbo_update,
+                .close = opengl_interop_generic_deinit,
             };
             interop->ops = &pbo_ops;
             msg_Dbg(interop->gl, "PBO support enabled");
@@ -378,14 +390,4 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
     }
 
     return VLC_SUCCESS;
-}
-
-void
-opengl_interop_generic_deinit(struct vlc_gl_interop *interop)
-{
-    struct priv *priv = interop->priv;
-    for (size_t i = 0; i < PBO_DISPLAY_COUNT && priv->pbo.display_pics[i]; ++i)
-        picture_Release(priv->pbo.display_pics[i]);
-    free(priv->texture_temp_buf);
-    free(priv);
 }
