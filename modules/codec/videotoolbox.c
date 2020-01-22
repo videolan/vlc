@@ -1343,10 +1343,6 @@ CreateVideoContext(decoder_t *p_dec)
     p_dec->fmt_out.video = p_dec->fmt_in.video;
     p_dec->fmt_out.video.p_palette = NULL;
 
-    /* Most likely used chroma but can be reconfigured in the future */
-    p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_NV12;
-    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-
     if (!p_dec->fmt_out.video.i_sar_num || !p_dec->fmt_out.video.i_sar_den)
     {
         p_dec->fmt_out.video.i_sar_num = 1;
