@@ -824,7 +824,7 @@ retry:
             goto retry;
         }
         msg_Err(p_filter, "Failed to create MMAL component %s (status=%"PRIx32" %s)",
-                MMAL_COMPONENT_DEFAULT_VIDEO_DECODER, status, mmal_status_to_string(status));
+                sys->component_name, status, mmal_status_to_string(status));
         goto fail;
     }
     sys->output = sys->component->output[0];
