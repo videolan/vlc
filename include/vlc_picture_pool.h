@@ -36,14 +36,6 @@
 typedef struct picture_pool_t picture_pool_t;
 
 /**
- * Picture pool configuration
- */
-typedef struct {
-    unsigned  picture_count;
-    picture_t *const *picture;
-} picture_pool_configuration_t;
-
-/**
  * Creates a pool of preallocated pictures. Free pictures can be allocated from
  * the pool, and are returned to the pool when they are no longer referenced.
  *
@@ -53,15 +45,6 @@ typedef struct {
  * To obtain a picture from the pool, use picture_pool_Get(). To increase and
  * decrease the reference count, use picture_Hold() and picture_Release()
  * respectively.
- *
- * @return A pointer to the new pool on success, or NULL on error
- * (pictures are <b>not</b> released on error).
- */
-VLC_API picture_pool_t * picture_pool_NewExtended( const picture_pool_configuration_t * ) VLC_USED;
-
-/**
- * Creates a picture pool with pictures in a given array.
- * This is a convenience wrapper for picture_pool_NewExtended().
  *
  * @param count number of pictures in the array
  * @param tab array of pictures
@@ -86,7 +69,7 @@ VLC_API picture_pool_t * picture_pool_NewFromFormat(const video_format_t *fmt,
                                                     unsigned count) VLC_USED;
 
 /**
- * Releases a pool created by picture_pool_NewExtended(), picture_pool_New()
+ * Releases a pool created by picture_pool_New()
  * or picture_pool_NewFromFormat().
  *
  * @note If there are no pending references to the pooled pictures, and the

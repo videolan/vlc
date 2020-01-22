@@ -96,6 +96,15 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
                                  (void*)sys);
 }
 
+/**
+ * Picture pool configuration
+ */
+typedef struct {
+    unsigned  picture_count;
+    picture_t *const *picture;
+} picture_pool_configuration_t;
+
+static
 picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
 {
     if (unlikely(cfg->picture_count > POOL_MAX))
