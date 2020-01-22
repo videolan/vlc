@@ -394,7 +394,23 @@ opengl_link_program(struct prgm *prgm)
     struct vlc_gl_interop *interop = tc->interop;
 
     GLuint vertex_shader = BuildVertexShader(tc, interop->tex_count);
-    GLuint shaders[] = { tc->fshader, vertex_shader };
+    if (!vertex_shader)
+        return VLC_EGENERIC;
+
+    GLuint fragment_shader =
+        opengl_fragment_shader_init(tc, interop->tex_target,
+                                    interop->sw_fmt.i_chroma,
+                                    interop->sw_fmt.space);
+    if (!fragment_shader)
+        return VLC_EGENERIC;
+
+    assert(interop->tex_target != 0 &&
+           interop->tex_count > 0 &&
+           interop->ops->update_textures != NULL &&
+           tc->pf_fetch_locations != NULL &&
+           tc->pf_prepare_shader != NULL);
+
+    GLuint shaders[] = { fragment_shader, vertex_shader };
 
     /* Check shaders messages */
     for (unsigned i = 0; i < 2; i++) {
@@ -415,12 +431,12 @@ opengl_link_program(struct prgm *prgm)
     }
 
     prgm->id = tc->vt->CreateProgram();
-    tc->vt->AttachShader(prgm->id, tc->fshader);
+    tc->vt->AttachShader(prgm->id, fragment_shader);
     tc->vt->AttachShader(prgm->id, vertex_shader);
     tc->vt->LinkProgram(prgm->id);
 
     tc->vt->DeleteShader(vertex_shader);
-    tc->vt->DeleteShader(tc->fshader);
+    tc->vt->DeleteShader(fragment_shader);
 
     /* Check program messages */
     int infoLength = 0;
@@ -622,26 +638,6 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
         free(tc);
         return VLC_EGENERIC;
     }
-
-    GLuint fragment_shader =
-        opengl_fragment_shader_init(tc, interop->tex_target,
-                                    interop->sw_fmt.i_chroma,
-                                    interop->sw_fmt.space);
-    if (!fragment_shader)
-    {
-        vlc_object_delete(interop);
-        free(tc);
-        return VLC_EGENERIC;
-    }
-
-    tc->fshader = fragment_shader;
-
-    assert(tc->fshader != 0 &&
-           interop->tex_target != 0 &&
-           interop->tex_count > 0 &&
-           interop->ops->update_textures != NULL &&
-           tc->pf_fetch_locations != NULL &&
-           tc->pf_prepare_shader != NULL);
 
     prgm->tc = tc;
 
