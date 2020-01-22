@@ -41,8 +41,6 @@ typedef struct picture_pool_t picture_pool_t;
 typedef struct {
     unsigned  picture_count;
     picture_t *const *picture;
-
-    int       (*lock)(picture_t *);
 } picture_pool_configuration_t;
 
 /**
@@ -56,11 +54,6 @@ typedef struct {
  * decrease the reference count, use picture_Hold() and picture_Release()
  * respectively.
  *
- * If defined, picture_pool_configuration_t::lock will be called before
- * a picture is used, and picture_pool_configuration_t::unlock will be called
- * as soon as a picture is returned to the pool.
- * Those callbacks can modify picture_t::p and access picture_t::p_sys.
- *
  * @return A pointer to the new pool on success, or NULL on error
  * (pictures are <b>not</b> released on error).
  */
@@ -68,8 +61,7 @@ VLC_API picture_pool_t * picture_pool_NewExtended( const picture_pool_configurat
 
 /**
  * Creates a picture pool with pictures in a given array.
- * This is a convenience wrapper for picture_pool_NewExtended() without the
- * lock and unlock callbacks.
+ * This is a convenience wrapper for picture_pool_NewExtended().
  *
  * @param count number of pictures in the array
  * @param tab array of pictures

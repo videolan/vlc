@@ -39,7 +39,6 @@
 static_assert ((POOL_MAX & (POOL_MAX - 1)) == 0, "Not a power of two");
 
 struct picture_pool_t {
-    int       (*pic_lock)(picture_t *);
     vlc_mutex_t lock;
     vlc_cond_t  wait;
 
@@ -110,7 +109,6 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
     if (unlikely(pool == NULL))
         return NULL;
 
-    pool->pic_lock   = cfg->lock;
     vlc_mutex_init(&pool->lock);
     vlc_cond_init(&pool->wait);
     if (cfg->picture_count == POOL_MAX)
@@ -201,14 +199,6 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
         vlc_mutex_unlock(&pool->lock);
         available &= ~(1ULL << i);
 
-        picture_t *picture = pool->picture[i];
-
-        if (pool->pic_lock != NULL && pool->pic_lock(picture) != VLC_SUCCESS) {
-            vlc_mutex_lock(&pool->lock);
-            pool->available |= 1ULL << i;
-            continue;
-        }
-
         picture_t *clone = picture_pool_ClonePicture(pool, i);
         if (clone != NULL) {
             assert(clone->p_next == NULL);
@@ -239,16 +229,6 @@ picture_t *picture_pool_Wait(picture_pool_t *pool)
     int i = ctz(pool->available);
     pool->available &= ~(1ULL << i);
     vlc_mutex_unlock(&pool->lock);
-
-    picture_t *picture = pool->picture[i];
-
-    if (pool->pic_lock != NULL && pool->pic_lock(picture) != VLC_SUCCESS) {
-        vlc_mutex_lock(&pool->lock);
-        pool->available |= 1ULL << i;
-        vlc_cond_signal(&pool->wait);
-        vlc_mutex_unlock(&pool->lock);
-        return NULL;
-    }
 
     picture_t *clone = picture_pool_ClonePicture(pool, i);
     if (clone != NULL) {
