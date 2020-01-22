@@ -106,8 +106,6 @@ typedef struct
     unsigned int seq_in;    // Seq of next frame to submit (1-15) [Init=1]
     unsigned int seq_out;   // Seq of last frame received  (1-15) [Init=15]
 
-    vcsm_init_type_t vcsm_init_type;
-
 } filter_sys_t;
 
 
@@ -414,7 +412,8 @@ static void CloseMmalDeinterlace(vlc_object_t *p_this)
     if (sys->component)
         mmal_component_release(sys->component);
 
-    cma_vcsm_exit(sys->vcsm_init_type);
+    if (filter->vctx_out)
+        vlc_video_context_Release(filter->vctx_out);
 
     free(sys);
 }
@@ -440,6 +439,10 @@ static int OpenMmalDeinterlace(vlc_object_t *p_this)
         filter->fmt_out.video.i_chroma != filter->fmt_in.video.i_chroma)
         return VLC_EGENERIC;
 
+    if (filter->vctx_in == NULL ||
+        vlc_video_context_GetType(filter->vctx_in) != VLC_VIDEO_CONTEXT_MMAL)
+        return VLC_EGENERIC;
+
     sys = calloc(1, sizeof(filter_sys_t));
     if (!sys)
         return VLC_ENOMEM;
@@ -447,11 +450,6 @@ static int OpenMmalDeinterlace(vlc_object_t *p_this)
 
     sys->seq_in = 1;
     sys->seq_out = 15;
-
-    if ((sys->vcsm_init_type = cma_vcsm_init()) == VCSM_INIT_NONE) {
-        msg_Err(filter, "VCSM init failed");
-        goto fail;
-    }
 
     if (rpi_is_model_pi4())
     {
@@ -496,11 +494,10 @@ static int OpenMmalDeinterlace(vlc_object_t *p_this)
     {
         filter->pf_video_filter = pass_deinterlace;
         filter->pf_flush = pass_flush;
-        // Don't need VCSM - get rid of it now
-        cma_vcsm_exit(sys->vcsm_init_type);
-        sys->vcsm_init_type = VCSM_INIT_NONE;
-        return 0;
+        return VLC_SUCCESS;
     }
+
+    filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
 
     status = mmal_component_create(MMAL_COMPONENT_DEFAULT_DEINTERLACE, &sys->component);
     if (status != MMAL_SUCCESS) {
