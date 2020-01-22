@@ -1027,6 +1027,7 @@
 			<array>
 				<string>tp</string>
 				<string>ts</string>
+				<string>m2t</string>
 				<string>m2ts</string>
 				<string>mts</string>
 				<string>mt2s</string>
@@ -2198,6 +2199,7 @@
 					<string>ps</string>
 					<string>tp</string>
 					<string>ts</string>
+					<string>m2t</string>
 					<string>m2ts</string>
 					<string>mts</string>
 					<string>mt2s</string>
