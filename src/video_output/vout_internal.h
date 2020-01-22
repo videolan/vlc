@@ -202,10 +202,10 @@ vout_thread_t *vout_CreateDummy(vlc_object_t *obj) VLC_USED;
 /**
  * Setup the vout for the given configuration and get an associated decoder device.
  *
- * \param cfg the video configuration requested.
+ * \param vout the video configuration requested.
  * \return pointer to a decoder device reference to use with the vout or NULL
  */
-vlc_decoder_device *vout_GetDevice(const vout_device_configuration_t *cfg);
+vlc_decoder_device *vout_GetDevice(vout_thread_t *vout);
 
 /**
  * Returns a suitable vout or release the given one.

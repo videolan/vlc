@@ -2093,15 +2093,15 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     return 0;
 }
 
-vlc_decoder_device *vout_GetDevice(const vout_device_configuration_t *cfg)
+vlc_decoder_device *vout_GetDevice(vout_thread_t *vout)
 {
     vlc_decoder_device *dec_device = NULL;
 
-    vout_thread_sys_t *sys = cfg->vout->p;
+    vout_thread_sys_t *sys = vout->p;
 
     vlc_mutex_lock(&sys->window_lock);
     if (sys->dec_device == NULL)
-        sys->dec_device = vlc_decoder_device_Create(&cfg->vout->obj, sys->display_cfg.window);
+        sys->dec_device = vlc_decoder_device_Create(&vout->obj, sys->display_cfg.window);
     dec_device = sys->dec_device ? vlc_decoder_device_Hold( sys->dec_device ) : NULL;
     vlc_mutex_unlock(&sys->window_lock);
     return dec_device;

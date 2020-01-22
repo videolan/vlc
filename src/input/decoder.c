@@ -543,7 +543,7 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner,
                 .vout = p_owner->p_vout, .fmt = &p_dec->fmt_out.video,
             };
             input_resource_GetVoutDecoderDevice( p_owner->p_resource,
-                                                &cfg, order, pp_dec_dev );
+                                                 p_owner->p_vout, order, pp_dec_dev );
             *order = p_owner->vout_order;
             vlc_mutex_unlock( &p_owner->lock );
         }
@@ -561,7 +561,7 @@ static int CreateVoutIfNeeded(struct decoder_owner *p_owner,
         .vout = p_vout, .fmt = &p_dec->fmt_out.video,
     };
     p_vout = input_resource_GetVoutDecoderDevice( p_owner->p_resource,
-                                    &cfg, order, pp_dec_dev );
+                                                  p_vout, order, pp_dec_dev );
 
     if (pp_vout)
         *pp_vout = p_vout;

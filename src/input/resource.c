@@ -365,30 +365,24 @@ void input_resource_PutVout(input_resource_t *p_resource,
 }
 
 vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
-                                      const vout_device_configuration_t *cfg,
+                                      vout_thread_t *cfg_vout,
                                       enum vlc_vout_order *order,
                                       vlc_decoder_device **pp_dec_dev)
 {
-    vout_device_configuration_t cfg_buf;
     vout_thread_t *vout;
-
-    assert(cfg != NULL);
-    assert(cfg->fmt != NULL);
     vlc_mutex_lock( &p_resource->lock );
 
-    if (cfg->vout == NULL) {
-        cfg_buf = *cfg;
-        cfg_buf.vout = p_resource->p_vout_free;
+    if (cfg_vout == NULL) {
+        cfg_vout = p_resource->p_vout_free;
         p_resource->p_vout_free = NULL;
-        cfg = &cfg_buf;
 
-        if (cfg_buf.vout == NULL) {
+        if (cfg_vout == NULL) {
             /* Use the dummy vout as the parent of the future main vout. This
              * will allow the future vout to inherit all parameters
              * pre-configured on this dummy vout. */
             vlc_object_t *parent = p_resource->i_vout == 0 ?
                 VLC_OBJECT(p_resource->p_vout_dummy) : p_resource->p_parent;
-            cfg_buf.vout = vout = vout_Create(parent);
+            cfg_vout = vout = vout_Create(parent);
             if (vout == NULL)
                 goto out;
 
@@ -408,10 +402,10 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
     {
         vlc_mutex_lock(&p_resource->lock_hold);
         assert(p_resource->i_vout > 0);
-        *order = p_resource->pp_vout[0] == cfg->vout ? VLC_VOUT_ORDER_PRIMARY
+        *order = p_resource->pp_vout[0] == cfg_vout ? VLC_VOUT_ORDER_PRIMARY
                                                      : VLC_VOUT_ORDER_SECONDARY;
         /* the caller is going to reuse the free vout, it's not free anymore */
-        if (p_resource->p_vout_free == cfg->vout)
+        if (p_resource->p_vout_free == cfg_vout)
             p_resource->p_vout_free = NULL;
         vlc_mutex_unlock(&p_resource->lock_hold);
     }
@@ -419,18 +413,18 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
 #ifndef NDEBUG
     {
         int index;
-        TAB_FIND(p_resource->i_vout, p_resource->pp_vout, cfg->vout, index );
+        TAB_FIND(p_resource->i_vout, p_resource->pp_vout, cfg_vout, index );
         assert(index >= 0);
-        assert(p_resource->p_vout_free == NULL || p_resource->p_vout_free == cfg->vout);
+        assert(p_resource->p_vout_free == NULL || p_resource->p_vout_free == cfg_vout);
     }
 #endif
 
     if (pp_dec_dev)
     {
-        *pp_dec_dev = vout_GetDevice(cfg);
+        *pp_dec_dev = vout_GetDevice(cfg_vout);
     }
 
-    vout = cfg->vout;
+    vout = cfg_vout;
 
 out:
     vlc_mutex_unlock( &p_resource->lock );
