@@ -1279,3 +1279,36 @@ const char * cma_vcsm_init_str(const vcsm_init_type_t init_mode)
     }
     return "???";
 }
+
+MMAL_FOURCC_T pic_to_slice_mmal_fourcc(MMAL_FOURCC_T fcc)
+{
+    switch (fcc){
+    case MMAL_ENCODING_I420:
+        return MMAL_ENCODING_I420_SLICE;
+    case MMAL_ENCODING_I422:
+        return MMAL_ENCODING_I422_SLICE;
+    case MMAL_ENCODING_ARGB:
+        return MMAL_ENCODING_ARGB_SLICE;
+    case MMAL_ENCODING_RGBA:
+        return MMAL_ENCODING_RGBA_SLICE;
+    case MMAL_ENCODING_ABGR:
+        return MMAL_ENCODING_ABGR_SLICE;
+    case MMAL_ENCODING_BGRA:
+        return MMAL_ENCODING_BGRA_SLICE;
+    case MMAL_ENCODING_RGB16:
+        return MMAL_ENCODING_RGB16_SLICE;
+    case MMAL_ENCODING_RGB24:
+        return MMAL_ENCODING_RGB24_SLICE;
+    case MMAL_ENCODING_RGB32:
+        return MMAL_ENCODING_RGB32_SLICE;
+    case MMAL_ENCODING_BGR16:
+        return MMAL_ENCODING_BGR16_SLICE;
+    case MMAL_ENCODING_BGR24:
+        return MMAL_ENCODING_BGR24_SLICE;
+    case MMAL_ENCODING_BGR32:
+        return MMAL_ENCODING_BGR32_SLICE;
+    default:
+        break;
+    }
+    return 0;
+}
