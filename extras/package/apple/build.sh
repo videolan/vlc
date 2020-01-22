@@ -663,9 +663,9 @@ echo ""
 
 echo "Compile VLC static modules list object"
 
-mkdir -p "${VLC_BUILD_DIR}/build/build-sh"
-cd "${VLC_BUILD_DIR}/build/build-sh" \
- || abort_err "Failed cd to VLC build-sh build dir"
+mkdir -p "${VLC_BUILD_DIR}/static-lib"
+cd "${VLC_BUILD_DIR}/static-lib" \
+ || abort_err "Failed cd to VLC static-lib build dir"
 
 # Collect paths of all static libraries needed (plugins and contribs)
 VLC_STATIC_FILELIST_NAME="static-libs-list"
@@ -695,7 +695,7 @@ gen_vlc_static_module_list "${VLC_STATIC_MODULELIST_NAME}.c" "${VLC_PLUGINS_SYMB
 ${CC:-cc} -c  ${CFLAGS} "${VLC_STATIC_MODULELIST_NAME}.c" \
   || abort_err "Compiling module list file failed"
 
-echo "${VLC_BUILD_DIR}/build/build-sh/${VLC_STATIC_MODULELIST_NAME}.o" \
+echo "${VLC_BUILD_DIR}/static-lib/${VLC_STATIC_MODULELIST_NAME}.o" \
   >> "$VLC_STATIC_FILELIST_NAME"
 
 echo ""
