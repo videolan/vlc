@@ -514,7 +514,7 @@ place_to_mmal_rect(const vout_display_place_t place)
 }
 
 static void
-place_dest(vout_display_t *vd, vout_display_sys_t * const sys,
+place_dest(vout_display_sys_t * const sys,
            const vout_display_cfg_t * const cfg, const video_format_t * fmt)
 {
     video_format_t tfmt;
@@ -572,7 +572,7 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!cfg)
         cfg = vd->cfg;
 
-    place_dest(vd, sys, cfg, fmt);
+    place_dest(sys, cfg, fmt);
 
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);
@@ -808,7 +808,7 @@ static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const 
 static void vd_prepare(vout_display_t *vd, picture_t *p_pic,
                        subpicture_t *subpicture, vlc_tick_t date)
 {
-    MMAL_STATUS_T err;
+    VLC_UNUSED(date);
     vout_display_sys_t * const sys = vd->sys;
 
     vd_manage(vd);
@@ -1201,7 +1201,7 @@ static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->display_height = vd->cfg->display.height;
     }
 
-    place_dest(vd, sys, vd->cfg, &vd->source);  // Sets sys->dest_rect
+    place_dest(sys, vd->cfg, &vd->source);  // Sets sys->dest_rect
 
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);
