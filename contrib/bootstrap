@@ -273,10 +273,6 @@ case "${OS}" in
 			add_make_enabled "HAVE_IOS" "HAVE_DARWIN_OS" "HAVE_BSD" "HAVE_FPU"
 
 			case "${HOST}" in
-				*armv7s*)
-					add_make "PLATFORM_SHORT_ARCH := armv7s"
-					add_make_enabled "HAVE_NEON" "HAVE_ARMV7A"
-					;;
 				*arm64*|*aarch64*)
 					add_make "PLATFORM_SHORT_ARCH := arm64"
 					;;

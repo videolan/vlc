@@ -104,7 +104,7 @@ usage()
 {
     echo "Usage: $VLC_SCRIPT_NAME [options]"
     echo " --arch=ARCH     Architecture to build for"
-    echo "                   (i386|x86_64|armv7|armv7s|arm64)"
+    echo "                   (i386|x86_64|armv7|arm64)"
     echo " --sdk=SDK       Name of the SDK to build with (see 'xcodebuild -showsdks')"
     echo " --disable-debug Disable libvlc debug mode (for release)"
     echo " --verbose       Print verbose output and disable multi-core use"
@@ -182,7 +182,7 @@ set_deployment_target()
 validate_architecture()
 {
     case "$1" in
-    i386|x86_64|armv7|armv7s|arm64)
+    i386|x86_64|armv7|arm64)
         VLC_HOST_ARCH="$1"
         ;;
     aarch64)

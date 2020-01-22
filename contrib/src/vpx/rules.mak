@@ -38,15 +38,7 @@ endif
 VPX_LDFLAGS := $(LDFLAGS)
 
 ifeq ($(ARCH),arm)
-ifdef HAVE_IOS
-ifneq ($(filter armv7s%,$(subst -, ,$(HOST))),)
-VPX_ARCH := armv7s
-else
 VPX_ARCH := armv7
-endif
-else
-VPX_ARCH := armv7
-endif
 else ifeq ($(ARCH),i386)
 VPX_ARCH := x86
 else ifeq ($(ARCH),mips)
