@@ -147,8 +147,18 @@ ifndef WITH_OPTIMIZATION
 VPX_CONF += --enable-debug --disable-optimizations
 endif
 
+ifdef HAVE_ANDROID
+# Starting NDK19, standalone toolchains are deprecated and gcc is not shipped.
+# The presence of gcc can be used to detect if we are using an old standalone
+# toolchain. Unfortunately, libvpx buildsystem only work with standalone
+# toolchains, therefore pass the HOSTVARS directly to bypass any detection.
+ifneq ($(shell $(VPX_CROSS)gcc -v >/dev/null 2>&1 || echo FAIL),)
+VPX_HOSTVARS = $(HOSTVARS)
+endif
+endif
+
 .vpx: libvpx
-	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) ./configure --target=$(VPX_TARGET) \
+	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) ./configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
 	cd $< && $(MAKE)
 	$(call pkg_static,"vpx.pc")
