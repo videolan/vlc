@@ -105,7 +105,7 @@ typedef struct
 
     bool b_flushed;
 
-    vcsm_init_type_t vcsm_init_type;
+    vlc_video_context *vctx;
 
     // Lock to avoid pic update & allocate happenening simultainiously
     // * We should be able to arrange life s.t. this isn't needed
@@ -343,7 +343,7 @@ static void fill_output_port(decoder_t *dec)
 {
     decoder_sys_t *sys = dec->p_sys;
 
-    if (decoder_UpdateVideoFormat(dec) != 0)
+    if (decoder_UpdateVideoOutput(dec, sys->vctx) != 0)
     {
         // If we have a new format don't bother stuffing the buffer
         // We should get a reset RSN
@@ -431,7 +431,7 @@ apply_fmt:
 
     // Tell the rest of the world we have changed format
     vlc_mutex_lock(&sys->pic_lock);
-    ret = decoder_UpdateVideoFormat(dec);
+    ret = decoder_UpdateVideoOutput(dec, sys->vctx);
     vlc_mutex_unlock(&sys->pic_lock);
 
     return ret;
@@ -646,9 +646,11 @@ static void CloseDecoder(vlc_object_t *p_this)
 
     hw_mmal_port_pool_ref_release(sys->ppr, false);
 
-    cma_vcsm_exit(sys->vcsm_init_type);
-
     vlc_mutex_destroy(&sys->pic_lock);
+
+    if (sys->vctx)
+        vlc_video_context_Release(sys->vctx);
+
     free(sys);
 }
 
@@ -666,14 +668,19 @@ static int OpenDecoder(vlc_object_t *p_this)
     sys = calloc(1, sizeof(decoder_sys_t));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+
+    vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(dec);
+    mmal_decoder_device_t *devsys = GetMMALDeviceOpaque(dec_dev);
+    if (devsys == NULL)
+    {
+        msg_Err(dec, "Could not find a MMAL decoder device");
+        return VLC_EGENERIC;
+    }
+    sys->vctx = vlc_video_context_Create(dec_dev, VLC_VIDEO_CONTEXT_MMAL, 0, NULL);
+    vlc_decoder_device_Release(dec_dev);
+
     dec->p_sys = sys;
     vlc_mutex_init(&sys->pic_lock);
-
-    if ((sys->vcsm_init_type = cma_vcsm_init()) == VCSM_INIT_NONE) {
-        msg_Err(dec, "VCSM init failed");
-        goto fail;
-    }
-    msg_Info(dec, "VCSM init succeeded: %s", cma_vcsm_init_str(sys->vcsm_init_type));
 
     sys->err_stream = MMAL_SUCCESS;
 
