@@ -151,16 +151,15 @@ struct vout_display_sys_t {
 
 // ISP setup
 
-static bool want_copy(const vout_display_t * const vd)
+static bool want_copy(const video_format_t * const fmt)
 {
-    return (vd->fmt.i_chroma == VLC_CODEC_I420 || vd->fmt.i_chroma == VLC_CODEC_I420_10L);
+    return (fmt->i_chroma == VLC_CODEC_I420 || fmt->i_chroma == VLC_CODEC_I420_10L);
 }
 
-static vlc_fourcc_t req_chroma(const vout_display_t * const vd)
+static vlc_fourcc_t req_chroma(const video_format_t * const fmt)
 {
-    return !hw_mmal_chroma_is_mmal(vd->fmt.i_chroma) && !want_copy(vd) ?
-        VLC_CODEC_I420 :
-        vd->fmt.i_chroma;
+    return hw_mmal_chroma_is_mmal(fmt->i_chroma) || want_copy(fmt) ?
+        fmt->i_chroma : VLC_CODEC_I420;
 }
 
 static MMAL_FOURCC_T vout_vlc_to_mmal_pic_fourcc(const unsigned int fcc)
@@ -727,7 +726,7 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
             msg_Warn(vd, "Reset Pictures");
             kill_pool(sys);
             vd->fmt = vd->source; // Take (nearly) whatever source wants to give us
-            vd->fmt.i_chroma = req_chroma(vd);  // Adjust chroma to something we can actually deal with
+            vd->fmt.i_chroma = req_chroma(&vd->fmt);  // Adjust chroma to something we can actually deal with
             ret = VLC_SUCCESS;
             break;
 
@@ -835,7 +834,7 @@ static void vd_prepare(vout_display_t *vd, picture_t *p_pic,
     }
 
     // *****
-    if (want_copy(vd)) {
+    if (want_copy(&vd->fmt)) {
         if (sys->copy_buf != NULL) {
             msg_Err(vd, "Copy buf not NULL");
             mmal_buffer_header_release(sys->copy_buf);
@@ -1267,7 +1266,7 @@ static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     // If we can't deal with it directly ask for I420
-    vd->fmt.i_chroma = req_chroma(vd);
+    fmtp->i_chroma = req_chroma(fmtp);
 
     vd->info = (vout_display_info_t){
         .subpicture_chromas = hw_mmal_vzc_subpicture_chromas
