@@ -95,7 +95,7 @@ typedef struct vout_subpic_s {
 struct vout_display_sys_t {
     vlc_mutex_t manage_mutex;
 
-    vcsm_init_type_t init_type;
+    vlc_decoder_device *dec_dev;
     MMAL_COMPONENT_T *component;
     MMAL_PORT_T *input;
     MMAL_POOL_T *pool; /* mmal buffer headers, used for pushing pictures to component*/
@@ -1076,7 +1076,8 @@ static void CloseMmalVout(vout_display_t * vd)
             msg_Warn(vd, "Could not reset hvs field mode");
     }
 
-    cma_vcsm_exit(sys->init_type);
+    if (sys->dec_dev)
+        vlc_decoder_device_Release(sys->dec_dev);
 
     free(sys);
 }
@@ -1101,7 +1102,7 @@ static int find_display_num(const char * name)
 }
 
 static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
-                        video_format_t *fmtp, vlc_video_context *context)
+                        video_format_t *fmtp, vlc_video_context *vctx)
 {
     vout_display_sys_t *sys;
     MMAL_DISPLAYREGION_T display_region;
@@ -1117,13 +1118,25 @@ static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
     vd->sys = sys;
 
-    vlc_mutex_init(&sys->manage_mutex);
-
-    if ((sys->init_type = cma_vcsm_init()) == VCSM_INIT_NONE)
+    if (vctx)
     {
-        msg_Err(vd, "VCSM init fail");
+        sys->dec_dev = vlc_video_context_HoldDevice(vctx);
+        if (sys->dec_dev && sys->dec_dev->type != VLC_DECODER_DEVICE_MMAL)
+        {
+            vlc_decoder_device_Release(sys->dec_dev);
+            sys->dec_dev = NULL;
+        }
+    }
+
+    if (sys->dec_dev == NULL)
+        sys->dec_dev = vlc_decoder_device_Create(VLC_OBJECT(vd), cfg->window);
+    if (sys->dec_dev == NULL || sys->dec_dev->type != VLC_DECODER_DEVICE_MMAL)
+    {
+        msg_Err(vd, "Missing decoder device");
         goto fail;
     }
+
+    vlc_mutex_init(&sys->manage_mutex);
 
     vc_tv_register_callback(tvservice_cb, vd);
 
