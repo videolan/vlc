@@ -29,17 +29,6 @@
 #include <vlc_common.h>
 #include "internal.h"
 
-#ifndef GL_UNPACK_ROW_LENGTH
-# define GL_UNPACK_ROW_LENGTH 0x0CF2
-#endif
-
-#ifndef GL_PIXEL_UNPACK_BUFFER
-# define GL_PIXEL_UNPACK_BUFFER 0x88EC
-#endif
-#ifndef GL_DYNAMIC_DRAW
-# define GL_DYNAMIC_DRAW 0x88E8
-#endif
-
 #define PBO_DISPLAY_COUNT 2 /* Double buffering */
 typedef struct
 {

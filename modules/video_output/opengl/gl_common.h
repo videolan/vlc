@@ -80,6 +80,19 @@
 # define GL_TEXTURE_LUMINANCE_SIZE 0x8060
 #endif
 
+#ifndef GL_CLAMP_TO_EDGE
+# define GL_CLAMP_TO_EDGE 0x812F
+#endif
+#ifndef GL_UNPACK_ROW_LENGTH
+# define GL_UNPACK_ROW_LENGTH 0x0CF2
+#endif
+#ifndef GL_PIXEL_UNPACK_BUFFER
+# define GL_PIXEL_UNPACK_BUFFER 0x88EC
+#endif
+#ifndef GL_DYNAMIC_DRAW
+# define GL_DYNAMIC_DRAW 0x88E8
+#endif
+
 #ifndef APIENTRY
 # define APIENTRY
 #endif

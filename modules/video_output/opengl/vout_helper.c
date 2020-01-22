@@ -42,10 +42,6 @@
 #include "vout_helper.h"
 #include "internal.h"
 
-#ifndef GL_CLAMP_TO_EDGE
-# define GL_CLAMP_TO_EDGE 0x812F
-#endif
-
 #define SPHERE_RADIUS 1.f
 
 /* FIXME: GL_ASSERT_NOERROR disabled for now because:
