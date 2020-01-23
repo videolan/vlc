@@ -88,6 +88,7 @@ endif
 
 # libaom doesn't allow in-tree builds
 .aom: aom toolchain.cmake
+	rm -rf $(PREFIX)/include/aom
 	cd $< && rm -rf aom_build && mkdir -p aom_build
 	cd $</aom_build && LDFLAGS="$(AOM_LDFLAGS)" $(HOSTVARS) $(CMAKE) ../ $(AOM_CONF)
 	cd $< && $(MAKE) -C aom_build
