@@ -158,6 +158,7 @@ endif
 endif
 
 .vpx: libvpx
+	rm -rf $(PREFIX)/include/vpx
 	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) ./configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
 	cd $< && $(MAKE)
