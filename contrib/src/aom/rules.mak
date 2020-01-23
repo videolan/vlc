@@ -48,12 +48,6 @@ AOM_CONF := \
 	-DCONFIG_INSTALL_DOCS=0 \
 	-DCONFIG_DEPENDENCY_TRACKING=0
 
-ifdef HAVE_NEON
-AOM_CONF += -DENABLE_NEON=ON
-else
-AOM_CONF += -DENABLE_NEON=OFF
-endif
-
 ifndef BUILD_ENCODERS
 AOM_CONF += -DCONFIG_AV1_ENCODER=0
 endif
@@ -82,12 +76,6 @@ endif
 
 # Force cpu detection
 ifdef HAVE_ANDROID
-ifneq ($(ARCH),x86)
-ifneq ($(ARCH),x86_64)
-AOM_CONF += -DAS_EXECUTABLE="$(AS)"
-endif
-endif
-
 ifeq ($(ARCH),aarch64)
 AOM_CONF += -DAOM_TARGET_CPU=arm64
 endif
