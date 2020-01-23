@@ -94,6 +94,8 @@ CORE_COUNT=$(sysctl -n machdep.cpu.core_count)
 let VLC_USE_NUMBER_OF_CORES=$CORE_COUNT+1
 # whether to disable debug mode (the default) or not
 VLC_DISABLE_DEBUG=0
+# whether to compile with bitcode or not
+VLC_USE_BITCODE=0
 
 ##########################################################
 #                    Helper functions                    #
@@ -103,12 +105,13 @@ VLC_DISABLE_DEBUG=0
 usage()
 {
     echo "Usage: $VLC_SCRIPT_NAME [options]"
-    echo " --arch=ARCH     Architecture to build for"
+    echo " --arch=ARCH      Architecture to build for"
     echo "                   (i386|x86_64|armv7|arm64)"
-    echo " --sdk=SDK       Name of the SDK to build with (see 'xcodebuild -showsdks')"
-    echo " --disable-debug Disable libvlc debug mode (for release)"
-    echo " --verbose       Print verbose output and disable multi-core use"
-    echo " --help          Print this help"
+    echo " --sdk=SDK        Name of the SDK to build with (see 'xcodebuild -showsdks')"
+    echo " --enable-bitcode Enable bitcode for compilation"
+    echo " --disable-debug  Disable libvlc debug mode (for release)"
+    echo " --verbose        Print verbose output and disable multi-core use"
+    echo " --help           Print this help"
     echo ""
     echo "Advanced options:"
     echo " --package-contribs        Create a prebuilt contrib package"
@@ -285,6 +288,9 @@ set_host_envvars()
 {
     # Flags to be used for C-like compilers (C, C++, Obj-C)
     local clike_flags="$VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH $1"
+    if [ "$VLC_USE_BITCODE" -gt "0" ]; then
+        clike_flags+=" -fembed-bitcode"
+    fi
 
     export CPPFLAGS="-arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH"
 
@@ -315,6 +321,9 @@ write_config_mak()
 {
     # Flags to be used for C-like compilers (C, C++, Obj-C)
     local clike_flags="$VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH $1"
+    if [ "$VLC_USE_BITCODE" -gt "0" ]; then
+        clike_flags+=" -fembed-bitcode"
+    fi
 
     local vlc_cppflags="-arch $VLC_HOST_ARCH -isysroot $VLC_APPLE_SDK_PATH"
     local vlc_cflags="$clike_flags"
@@ -395,6 +404,9 @@ do
             ;;
         --disable-debug)
             VLC_DISABLE_DEBUG=1
+            ;;
+        --enable-bitcode)
+            VLC_USE_BITCODE=1
             ;;
         --arch=*)
             VLC_HOST_ARCH="${1#--arch=}"
