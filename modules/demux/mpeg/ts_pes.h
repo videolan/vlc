@@ -29,8 +29,7 @@ typedef struct
     void(*pf_parse)(vlc_object_t *, void *, block_t *);
 } ts_pes_parse_callback;
 
-bool ts_pes_Push( ts_pes_parse_callback *cb,
-                  ts_stream_t *p_pes, block_t *p_pkt, bool b_unit_start );
+bool ts_pes_Drain( ts_pes_parse_callback *cb, ts_stream_t *p_pes );
 
 bool ts_pes_Gather( ts_pes_parse_callback *cb,
                     ts_stream_t *p_pes, block_t *p_pkt,
