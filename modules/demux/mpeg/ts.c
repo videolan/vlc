@@ -2270,7 +2270,7 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, stime_t i_pcr)
                 ts_pes_parse_callback cb = { .p_obj = VLC_OBJECT(p_demux),
                                              .priv = p_pid,
                                              .pf_parse = PESDataChainHandle };
-                ts_pes_Push( &cb, p_pes, NULL, true, VLC_TICK_INVALID ); /* Flush */
+                ts_pes_Drain( &cb, p_pes );
             }
         }
     }

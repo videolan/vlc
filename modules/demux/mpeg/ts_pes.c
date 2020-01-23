@@ -96,7 +96,7 @@ static uint8_t *FindNextPESHeader( uint8_t *p_buf, size_t i_buffer )
     return NULL;
 }
 
-bool ts_pes_Push( ts_pes_parse_callback *cb,
+static bool ts_pes_Push( ts_pes_parse_callback *cb,
                   ts_stream_t *p_pes, block_t *p_pkt,
                   bool b_unit_start, stime_t i_append_pcr )
 {
@@ -139,6 +139,11 @@ bool ts_pes_Push( ts_pes_parse_callback *cb,
     }
 
     return b_ret;
+}
+
+bool ts_pes_Drain( ts_pes_parse_callback *cb, ts_stream_t *p_pes )
+{
+    return ts_pes_Push( cb, p_pes, NULL, true, VLC_TICK_INVALID );
 }
 
 bool ts_pes_Gather( ts_pes_parse_callback *cb,
