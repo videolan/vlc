@@ -97,7 +97,7 @@ cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(MOVE)
 
 .buildcmake: cmake
-	(cd $<; ./configure --prefix=$(PREFIX) $(CMAKEFLAGS) && $(MAKE) && $(MAKE) install)
+	(cd $<; ./configure --prefix=$(PREFIX) $(CMAKEFLAGS) --no-qt-gui -- -DCMAKE_USE_OPENSSL:BOOL=OFF && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_FILE += .buildcmake
