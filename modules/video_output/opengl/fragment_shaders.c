@@ -128,9 +128,9 @@ init_conv_matrix(float conv_matrix_out[],
 }
 
 static int
-tc_yuv_base_init(struct vlc_gl_renderer *renderer, vlc_fourcc_t chroma,
-                 const vlc_chroma_description_t *desc,
-                 video_color_space_t yuv_space)
+renderer_yuv_base_init(struct vlc_gl_renderer *renderer, vlc_fourcc_t chroma,
+                       const vlc_chroma_description_t *desc,
+                       video_color_space_t yuv_space)
 {
     /* The current implementation always converts from limited to full range. */
     const video_color_range_t range = COLOR_RANGE_LIMITED;
@@ -202,7 +202,7 @@ tc_yuv_base_init(struct vlc_gl_renderer *renderer, vlc_fourcc_t chroma,
 }
 
 static int
-tc_base_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
+renderer_base_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
 {
     struct vlc_gl_interop *interop = renderer->interop;
     const opengl_vtable_t *vt = renderer->vt;
@@ -247,9 +247,9 @@ tc_base_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
 }
 
 static void
-tc_base_prepare_shader(const struct vlc_gl_renderer *renderer,
-                       const GLsizei *tex_width, const GLsizei *tex_height,
-                       float alpha)
+renderer_base_prepare_shader(const struct vlc_gl_renderer *renderer,
+                             const GLsizei *tex_width,
+                             const GLsizei *tex_height, float alpha)
 {
     (void) tex_width; (void) tex_height;
     const struct vlc_gl_interop *interop = renderer->interop;
@@ -306,7 +306,7 @@ tc_base_prepare_shader(const struct vlc_gl_renderer *renderer,
 }
 
 static int
-tc_xyz12_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
+renderer_xyz12_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
 {
     const opengl_vtable_t *vt = renderer->vt;
     renderer->uloc.Texture[0] = vt->GetUniformLocation(program, "Texture0");
@@ -314,9 +314,9 @@ tc_xyz12_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
 }
 
 static void
-tc_xyz12_prepare_shader(const struct vlc_gl_renderer *renderer,
-                        const GLsizei *tex_width, const GLsizei *tex_height,
-                        float alpha)
+renderer_xyz12_prepare_shader(const struct vlc_gl_renderer *renderer,
+                              const GLsizei *tex_width,
+                              const GLsizei *tex_height, float alpha)
 {
     (void) tex_width; (void) tex_height; (void) alpha;
     const opengl_vtable_t *vt = renderer->vt;
@@ -327,8 +327,8 @@ static GLuint
 xyz12_shader_init(struct vlc_gl_renderer *renderer)
 {
     const opengl_vtable_t *vt = renderer->vt;
-    renderer->pf_fetch_locations = tc_xyz12_fetch_locations;
-    renderer->pf_prepare_shader = tc_xyz12_prepare_shader;
+    renderer->pf_fetch_locations = renderer_xyz12_fetch_locations;
+    renderer->pf_prepare_shader = renderer_xyz12_prepare_shader;
 
     /* Shader for XYZ to RGB correction
      * 3 steps :
@@ -453,7 +453,7 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
 
     if (is_yuv)
     {
-        ret = tc_yuv_base_init(renderer, chroma, desc, yuv_space);
+        ret = renderer_yuv_base_init(renderer, chroma, desc, yuv_space);
         if (ret != VLC_SUCCESS)
             return 0;
         ret = opengl_init_swizzle(renderer->interop, swizzle_per_tex, chroma, desc);
@@ -660,8 +660,8 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
                 (const char *)&chroma, yuv_space, ms.ptr);
     free(ms.ptr);
 
-    renderer->pf_fetch_locations = tc_base_fetch_locations;
-    renderer->pf_prepare_shader = tc_base_prepare_shader;
+    renderer->pf_fetch_locations = renderer_base_fetch_locations;
+    renderer->pf_prepare_shader = renderer_base_prepare_shader;
 
     return fragment_shader;
 }
