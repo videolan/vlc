@@ -1,0 +1,28 @@
+From f92a4b23994fa7516f16fbb5b3c02caa07534b3f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Mon, 2 Dec 2019 16:42:07 +0100
+Subject: [PATCH] FindPkgConfig: Fix path manipulations when cross compiling
+
+When cross compiling from a unix machine, if(UNIX) is false,
+whih causes the path not to be fixed for unix, leading to false
+negative if PKG_CONFIG_PATH needs to be probed
+---
+ Modules/FindPkgConfig.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Modules/FindPkgConfig.cmake b/Modules/FindPkgConfig.cmake
+index 5162a44b33..f4b6ea121c 100644
+--- a/Modules/FindPkgConfig.cmake
++++ b/Modules/FindPkgConfig.cmake
+@@ -337,7 +337,7 @@ macro(_pkg_set_path_internal)
+       # remove empty values from the list
+       list(REMOVE_ITEM _pkgconfig_path "")
+       file(TO_NATIVE_PATH "${_pkgconfig_path}" _pkgconfig_path)
+-      if(UNIX)
++      if(CMAKE_HOST_UNIX)
+         string(REPLACE ";" ":" _pkgconfig_path "${_pkgconfig_path}")
+         string(REPLACE "\\ " " " _pkgconfig_path "${_pkgconfig_path}")
+       endif()
+-- 
+2.19.1.windows.1
+

@@ -92,6 +92,7 @@ cmake-$(CMAKE_VERSION).tar.gz:
 
 cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(UNPACK)
+	$(APPLY) $(TOOLS)/0001-FindPkgConfig-Fix-path-manipulations-when-cross-comp.patch
 	$(APPLY) $(TOOLS)/cmake-msys-FindPkg.patch
 	$(MOVE)
 
