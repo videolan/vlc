@@ -55,15 +55,34 @@ struct vlc_gl_renderer
      * has no default precision qualifier for floating point types. */
     const char *glsl_precision_header;
 
-    /* The following is used and filled by the opengl_fragment_shader_init
-     * function. */
+    GLuint program_id;
+
+    struct {
+        GLfloat OrientationMatrix[16];
+        GLfloat ProjectionMatrix[16];
+        GLfloat ZoomMatrix[16];
+        GLfloat ViewMatrix[16];
+    } var;
+
     struct {
         GLint Texture[PICTURE_PLANE_MAX];
         GLint TexSize[PICTURE_PLANE_MAX]; /* for GL_TEXTURE_RECTANGLE */
         GLint ConvMatrix;
         GLint FillColor;
         GLint *pl_vars; /* for pl_sh_res */
+
+        GLint TransformMatrix;
+        GLint OrientationMatrix;
+        GLint ProjectionMatrix;
+        GLint ViewMatrix;
+        GLint ZoomMatrix;
     } uloc;
+
+    struct {
+        GLint MultiTexCoord[3];
+        GLint VertexPosition;
+    } aloc;
+
     bool yuv_color;
     GLfloat conv_matrix[16];
 
