@@ -34,15 +34,23 @@ endif
 endif
 ifdef HAVE_DARWIN_OS
 ifdef HAVE_ARMV7A
+ifneq ($(HOST),arm-apple-darwin)
 	cp $@/src/syscfg/lock-obj-pub.arm-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
+endif
 else
 ifeq ($(ARCH),aarch64)
 ifneq ($(HOST),aarch64-apple-darwin)
 	cp $@/src/syscfg/lock-obj-pub.aarch64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
 endif
 else
-ifneq ($(ARCH),x86_64)
+ifeq ($(ARCH),x86_64)
+ifneq ($(HOST),x86_64-apple-darwin)
 	cp $@/src/syscfg/lock-obj-pub.x86_64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
+endif
+else
+ifneq ($(HOST),i386-apple-darwin)
+	cp $@/src/syscfg/lock-obj-pub.x86_64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
+endif
 endif
 endif
 endif
