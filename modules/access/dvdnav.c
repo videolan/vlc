@@ -63,6 +63,7 @@ dvdnav_status_t dvdnav_jump_to_sector_by_time(dvdnav_t *, uint64_t, int32_t);
 
 #include "../demux/mpeg/pes.h"
 #include "../demux/mpeg/ps.h"
+#include "../demux/timestamps_filter.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -119,6 +120,7 @@ vlc_module_end ()
 typedef struct
 {
     dvdnav_t    *dvdnav;
+    es_out_t    *p_tf_out;
 
     /* */
     bool        b_reset_pcr;
@@ -205,6 +207,12 @@ static int CommonOpen( vlc_object_t *p_this,
     /* Fill p_demux field */
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     p_sys->dvdnav = p_dvdnav;
+    p_sys->p_tf_out = timestamps_filter_es_out_New( p_demux->out );
+    if( !p_sys->p_tf_out )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     ps_track_init( p_sys->tk );
     p_sys->b_readahead = b_readahead;
@@ -274,6 +282,7 @@ static int CommonOpen( vlc_object_t *p_this,
             vlc_dialog_display_error( p_demux, _("Playback failure"), "%s",
                 _("VLC cannot set the DVD's title. It possibly "
                   "cannot decrypt the entire disc.") );
+            timestamps_filter_es_out_Delete( p_sys->p_tf_out );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -480,7 +489,7 @@ static void Close( vlc_object_t *p_this )
         if( tk->b_configured )
         {
             es_format_Clean( &tk->fmt );
-            if( tk->es ) es_out_Del( p_demux->out, tk->es );
+            if( tk->es ) es_out_Del( p_sys->p_tf_out, tk->es );
         }
     }
 
@@ -488,6 +497,8 @@ static void Close( vlc_object_t *p_this )
     for( int i = 0; i < p_sys->i_title; i++ )
         vlc_input_title_Delete( p_sys->title[i] );
     TAB_CLEAN( p_sys->i_title, p_sys->title );
+
+    timestamps_filter_es_out_Delete( p_sys->p_tf_out );
 
     dvdnav_close( p_sys->dvdnav );
     free( p_sys );
@@ -826,7 +837,7 @@ static int Demux( demux_t *p_demux )
         vlc_mutex_unlock( &p_sys->still.lock );
         if( p_sys->b_reset_pcr )
         {
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+            es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
             p_sys->b_reset_pcr = false;
         }
         DemuxBlock( p_demux, packet, i_len );
@@ -939,7 +950,7 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - domain=%d", event->new_domain );
 
         /* reset PCR */
-        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+        es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
 
         for( int i = 0; i < PS_TK_COUNT; i++ )
         {
@@ -956,7 +967,7 @@ static int Demux( demux_t *p_demux )
                         p_sys->highlight.b_pending = false;
                         vlc_mutex_unlock( &p_sys->event_lock );
                     }
-                    es_out_Del( p_demux->out, tk->es );
+                    es_out_Del( p_sys->p_tf_out, tk->es );
                 }
             }
             tk->b_configured = false;
@@ -1098,14 +1109,14 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "DVDNAV_HOP_CHANNEL" );
         p_sys->i_vobu_index = 0;
         p_sys->i_vobu_flush = 0;
-        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+        es_out_Control( p_sys->p_tf_out, ES_OUT_RESET_PCR );
         break;
 
     case DVDNAV_WAIT:
         msg_Dbg( p_demux, "DVDNAV_WAIT" );
 
         bool b_empty;
-        es_out_Control( p_demux->out, ES_OUT_GET_EMPTY, &b_empty );
+        es_out_Control( p_sys->p_tf_out, ES_OUT_GET_EMPTY, &b_empty );
         if( !b_empty )
         {
             vlc_tick_sleep( VLC_TICK_FROM_MS(40) );
@@ -1305,12 +1316,12 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
             spu_hl.palette.palette[i][3] = i_alpha;
         }
 
-        i_ret = es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT,
+        i_ret = es_out_Control( p_sys->p_tf_out, ES_OUT_SPU_SET_HIGHLIGHT,
                                 p_sys->spu_es, &spu_hl );
     }
     else
     {
-        i_ret = es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT,
+        i_ret = es_out_Control( p_sys->p_tf_out, ES_OUT_SPU_SET_HIGHLIGHT,
                                 p_sys->spu_es, NULL );
     }
 
@@ -1346,11 +1357,11 @@ static void ESSubtitleUpdate( demux_t *p_demux )
         /* be sure to unselect it (reset) */
         if( tk->es )
         {
-            es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->es,
+            es_out_Control( p_sys->p_tf_out, ES_OUT_SET_ES_STATE, tk->es,
                             (bool)false );
 
             /* now select it */
-            es_out_Control( p_demux->out, ES_OUT_SET_ES, tk->es );
+            es_out_Control( p_sys->p_tf_out, ES_OUT_SET_ES, tk->es );
 
             if( tk->fmt.i_cat == SPU_ES )
             {
@@ -1368,7 +1379,7 @@ static void ESSubtitleUpdate( demux_t *p_demux )
             ps_track_t *tk = &p_sys->tk[ps_id_to_tk(0xbd20 + i_spu)];
             if( tk->es )
             {
-                es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->es,
+                es_out_Control( p_sys->p_tf_out, ES_OUT_SET_ES_STATE, tk->es,
                                 (bool)false );
             }
         }
@@ -1422,7 +1433,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
             if( !ps_pkt_parse_pack( p_pkt->p_buffer, p_pkt->i_buffer,
                                     &i_scr, &i_mux_rate ) )
             {
-                es_out_SetPCR( p_demux->out, i_scr );
+                es_out_SetPCR( p_sys->p_tf_out, i_scr );
                 if( i_mux_rate > 0 ) p_sys->i_mux_rate = i_mux_rate;
             }
             block_Release( p_pkt );
@@ -1455,7 +1466,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
                         else tk->i_next_block_flags = BLOCK_FLAG_CELL_DISCONTINUITY;
                     }
                     p_pkt->i_flags |= i_next_block_flags;
-                    es_out_Send( p_demux->out, tk->es, p_pkt );
+                    es_out_Send( p_sys->p_tf_out, tk->es, p_pkt );
                 }
                 else
                 {
@@ -1483,6 +1494,8 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
  *****************************************************************************/
 static void DemuxForceStill( demux_t *p_demux )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
+
     static const uint8_t buffer[] = {
         0x00, 0x00, 0x01, 0xe0, 0x00, 0x07,
         0x80, 0x00, 0x00,
@@ -1491,7 +1504,7 @@ static void DemuxForceStill( demux_t *p_demux )
     DemuxBlock( p_demux, buffer, sizeof(buffer) );
 
     bool b_empty;
-    es_out_Control( p_demux->out, ES_OUT_GET_EMPTY, &b_empty );
+    es_out_Control( p_sys->p_tf_out, ES_OUT_GET_EMPTY, &b_empty );
 }
 
 /*****************************************************************************
@@ -1579,14 +1592,14 @@ static void ESNew( demux_t *p_demux, int i_id )
     }
 
     tk->fmt.i_id = i_id;
-    tk->es = es_out_Add( p_demux->out, &tk->fmt );
+    tk->es = es_out_Add( p_sys->p_tf_out, &tk->fmt );
     if( b_select && tk->es )
     {
-        es_out_Control( p_demux->out, ES_OUT_SET_ES, tk->es );
+        es_out_Control( p_sys->p_tf_out, ES_OUT_SET_ES, tk->es );
 
         if( tk->fmt.i_cat == VIDEO_ES )
         {
-            es_out_Control( p_demux->out, ES_OUT_VOUT_SET_MOUSE_EVENT, tk->es,
+            es_out_Control( p_sys->p_tf_out, ES_OUT_VOUT_SET_MOUSE_EVENT, tk->es,
                             EventMouse, p_demux );
             vlc_mutex_lock( &p_sys->event_lock );
             ButtonUpdate( p_demux, false );
