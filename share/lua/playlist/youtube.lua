@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2007-2019 the VideoLAN team
+ Copyright © 2007-2020 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -107,11 +107,11 @@ function js_descramble( sig, js_url )
     end
 
     -- Look for the descrambler function's name
-    -- k.s&&f.set(k.sp,encodeURIComponent(DK(decodeURIComponent(k.s))));
+    -- if(k.s){var l=k.sp,m=pt(decodeURIComponent(k.s));f.set(l,encodeURIComponent(m))}
     -- k.s (from stream map field "s") holds the input scrambled signature
     -- k.sp (from stream map field "sp") holds a parameter name (normally
     -- "signature" or "sig") to set with the output, descrambled signature
-    local descrambler = js_extract( js, "%.set%([^,]-%.sp,[^;]-%((..)%(" )
+    local descrambler = js_extract( js, "[=%(,&|](..)%(decodeURIComponent%(.%.s%)%)" )
     if not descrambler then
         vlc.msg.dbg( "Couldn't extract youtube video URL signature descrambling function name" )
         return sig
