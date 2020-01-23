@@ -97,9 +97,6 @@ struct vout_display_opengl_t {
         unsigned int i_visible_height;
     } last_source;
 
-    /* Non-power-of-2 texture size support */
-    bool supports_npot;
-
     /* View point */
     vlc_viewpoint_t vp;
     float f_teta;
@@ -657,19 +654,21 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         (GLint)fmt->i_height > max_tex_size)
         ResizeFormatToGLMaxTexSize(fmt, max_tex_size);
 
+    /* Non-power-of-2 texture size support */
+    bool supports_npot;
 #if defined(USE_OPENGL_ES2)
     /* OpenGL ES 2 includes support for non-power of 2 textures by specification
      * so checks for extensions are bound to fail. Check for OpenGL ES version instead. */
-    vgl->supports_npot = true;
+    supports_npot = true;
 #else
-    vgl->supports_npot = vlc_gl_StrHasToken(extensions, "GL_ARB_texture_non_power_of_two") ||
-                         vlc_gl_StrHasToken(extensions, "GL_APPLE_texture_2D_limited_npot");
+    supports_npot = vlc_gl_StrHasToken(extensions, "GL_ARB_texture_non_power_of_two") ||
+                    vlc_gl_StrHasToken(extensions, "GL_APPLE_texture_2D_limited_npot");
 #endif
 
     bool b_dump_shaders = var_InheritInteger(gl, "verbose") >= 4;
 
     vgl->sub_renderer =
-        vlc_gl_sub_renderer_New(gl, &vgl->vt, vgl->supports_npot);
+        vlc_gl_sub_renderer_New(gl, &vgl->vt, supports_npot);
     if (!vgl->sub_renderer)
     {
         msg_Err(gl, "Could not create sub renderer");
@@ -703,7 +702,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                         / interop->texs[j].w.den;
         const GLsizei h = vgl->fmt.i_visible_height * interop->texs[j].h.num
                         / interop->texs[j].h.den;
-        if (vgl->supports_npot) {
+        if (supports_npot) {
             vgl->tex_width[j]  = w;
             vgl->tex_height[j] = h;
         } else {
