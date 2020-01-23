@@ -29,7 +29,7 @@
 #ifndef VLC_OPENGL_VOUT_HELPER_H
 #define VLC_OPENGL_VOUT_HELPER_H
 
-#include "converter.h"
+#include "gl_common.h"
 
 #ifdef HAVE_LIBPLACEBO
 #include "../placebo_utils.h"

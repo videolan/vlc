@@ -21,15 +21,15 @@
 #ifndef VLC_OPENGL_INTERNAL_H
 #define VLC_OPENGL_INTERNAL_H
 
-#include "converter.h"
 #include "interop.h"
+#include "renderer.h"
 
 int
 opengl_interop_init_impl(struct vlc_gl_interop *interop, GLenum tex_target,
                          vlc_fourcc_t chroma, video_color_space_t yuv_space);
 
 GLuint
-opengl_fragment_shader_init(opengl_tex_converter_t *,
+opengl_fragment_shader_init(struct vlc_gl_renderer *rendeer,
                             GLenum, vlc_fourcc_t, video_color_space_t);
 int
 opengl_interop_generic_init(struct vlc_gl_interop *interop, bool);

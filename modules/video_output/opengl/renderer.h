@@ -1,5 +1,5 @@
 /*****************************************************************************
- * converter.h: OpenGL internal header
+ * renderer.h: OpenGL internal header
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  *
@@ -18,13 +18,12 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_OPENGL_CONVERTER_H
-#define VLC_OPENGL_CONVERTER_H
+#ifndef VLC_GL_RENDERER_H
+#define VLC_GL_RENDERER_H
 
 #include <vlc_common.h>
 #include <vlc_codec.h>
 #include <vlc_opengl.h>
-#include <vlc_picture_pool.h>
 #include <vlc_plugin.h>
 #include "gl_common.h"
 #include "interop.h"
@@ -33,13 +32,10 @@ struct pl_context;
 struct pl_shader;
 struct pl_shader_res;
 
-/*
- * Structure that is filled by "glhw converter" module probe function
- * The implementation should initialize every members of the struct that are
- * not set by the caller
+/**
+ * OpenGL picture renderer
  */
-typedef struct opengl_tex_converter_t opengl_tex_converter_t;
-struct opengl_tex_converter_t
+struct vlc_gl_renderer
 {
     /* Pointer to object gl, set by the caller */
     vlc_gl_t *gl;
@@ -82,11 +78,11 @@ struct opengl_tex_converter_t
      * This function pointer cannot be NULL. This callback is called one time
      * after init.
      *
-     * \param tc OpenGL tex converter
-     * \param program linked program that will be used by this tex converter
+     * \param renderer OpenGL renderer
+     * \param program linked program that will be used by this renderer
      * \return VLC_SUCCESS or a VLC error
      */
-    int (*pf_fetch_locations)(opengl_tex_converter_t *tc, GLuint program);
+    int (*pf_fetch_locations)(struct vlc_gl_renderer *renderer, GLuint program);
 
     /**
      * Callback to prepare the fragment shader
@@ -94,12 +90,12 @@ struct opengl_tex_converter_t
      * This function pointer cannot be NULL. This callback can be used to
      * specify values of uniform variables.
      *
-     * \param tc OpenGL tex converter
+     * \param renderer OpenGL renderer
      * \param tex_width array of tex width (one per plane)
      * \param tex_height array of tex height (one per plane)
      * \param alpha alpha value, used only for RGBA fragment shader
      */
-    void (*pf_prepare_shader)(const opengl_tex_converter_t *tc,
+    void (*pf_prepare_shader)(const struct vlc_gl_renderer *renderer,
                               const GLsizei *tex_width, const GLsizei *tex_height,
                               float alpha);
 };

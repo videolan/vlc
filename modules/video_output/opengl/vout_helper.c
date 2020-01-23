@@ -49,7 +49,7 @@
 struct prgm
 {
     GLuint id;
-    opengl_tex_converter_t *tc;
+    struct vlc_gl_renderer *renderer;
 
     struct {
         GLfloat OrientationMatrix[16];
@@ -240,9 +240,11 @@ static void getOrientationTransformMatrix(video_orientation_t orientation,
     }
 }
 
-static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
+static GLuint BuildVertexShader(const struct vlc_gl_renderer *renderer,
                                 unsigned plane_count)
 {
+    const opengl_vtable_t *vt = renderer->vt;
+
     /* Basic vertex shader */
     static const char *template =
         "#version %u\n"
@@ -272,16 +274,16 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         " TexCoord2 = vec4(TransformMatrix * OrientationMatrix * MultiTexCoord2).st;\n" : "";
 
     char *code;
-    if (asprintf(&code, template, tc->glsl_version, coord1_header, coord2_header,
-                 coord1_code, coord2_code) < 0)
+    if (asprintf(&code, template, renderer->glsl_version, coord1_header,
+                 coord2_header, coord1_code, coord2_code) < 0)
         return 0;
 
-    GLuint shader = tc->vt->CreateShader(GL_VERTEX_SHADER);
-    tc->vt->ShaderSource(shader, 1, (const char **) &code, NULL);
-    if (tc->b_dump_shaders)
-        msg_Dbg(tc->gl, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
-                (const char *)&tc->interop->fmt.i_chroma, code);
-    tc->vt->CompileShader(shader);
+    GLuint shader = vt->CreateShader(GL_VERTEX_SHADER);
+    vt->ShaderSource(shader, 1, (const char **) &code, NULL);
+    if (renderer->b_dump_shaders)
+        msg_Dbg(renderer->gl, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
+                (const char *) &renderer->interop->fmt.i_chroma, code);
+    vt->CompileShader(shader);
     free(code);
     return shader;
 }
@@ -289,15 +291,16 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
 static int
 opengl_link_program(struct prgm *prgm)
 {
-    opengl_tex_converter_t *tc = prgm->tc;
-    struct vlc_gl_interop *interop = tc->interop;
+    struct vlc_gl_renderer *renderer = prgm->renderer;
+    struct vlc_gl_interop *interop = renderer->interop;
+    const opengl_vtable_t *vt = renderer->vt;
 
-    GLuint vertex_shader = BuildVertexShader(tc, interop->tex_count);
+    GLuint vertex_shader = BuildVertexShader(renderer, interop->tex_count);
     if (!vertex_shader)
         return VLC_EGENERIC;
 
     GLuint fragment_shader =
-        opengl_fragment_shader_init(tc, interop->tex_target,
+        opengl_fragment_shader_init(renderer, interop->tex_target,
                                     interop->sw_fmt.i_chroma,
                                     interop->sw_fmt.space);
     if (!fragment_shader)
@@ -306,15 +309,15 @@ opengl_link_program(struct prgm *prgm)
     assert(interop->tex_target != 0 &&
            interop->tex_count > 0 &&
            interop->ops->update_textures != NULL &&
-           tc->pf_fetch_locations != NULL &&
-           tc->pf_prepare_shader != NULL);
+           renderer->pf_fetch_locations != NULL &&
+           renderer->pf_prepare_shader != NULL);
 
     GLuint shaders[] = { fragment_shader, vertex_shader };
 
     /* Check shaders messages */
     for (unsigned i = 0; i < 2; i++) {
         int infoLength;
-        tc->vt->GetShaderiv(shaders[i], GL_INFO_LOG_LENGTH, &infoLength);
+        vt->GetShaderiv(shaders[i], GL_INFO_LOG_LENGTH, &infoLength);
         if (infoLength <= 1)
             continue;
 
@@ -322,52 +325,52 @@ opengl_link_program(struct prgm *prgm)
         if (infolog != NULL)
         {
             int charsWritten;
-            tc->vt->GetShaderInfoLog(shaders[i], infoLength, &charsWritten,
-                                      infolog);
-            msg_Err(tc->gl, "shader %u: %s", i, infolog);
+            vt->GetShaderInfoLog(shaders[i], infoLength, &charsWritten,
+                                 infolog);
+            msg_Err(renderer->gl, "shader %u: %s", i, infolog);
             free(infolog);
         }
     }
 
-    prgm->id = tc->vt->CreateProgram();
-    tc->vt->AttachShader(prgm->id, fragment_shader);
-    tc->vt->AttachShader(prgm->id, vertex_shader);
-    tc->vt->LinkProgram(prgm->id);
+    prgm->id = vt->CreateProgram();
+    vt->AttachShader(prgm->id, fragment_shader);
+    vt->AttachShader(prgm->id, vertex_shader);
+    vt->LinkProgram(prgm->id);
 
-    tc->vt->DeleteShader(vertex_shader);
-    tc->vt->DeleteShader(fragment_shader);
+    vt->DeleteShader(vertex_shader);
+    vt->DeleteShader(fragment_shader);
 
     /* Check program messages */
     int infoLength = 0;
-    tc->vt->GetProgramiv(prgm->id, GL_INFO_LOG_LENGTH, &infoLength);
+    vt->GetProgramiv(prgm->id, GL_INFO_LOG_LENGTH, &infoLength);
     if (infoLength > 1)
     {
         char *infolog = malloc(infoLength);
         if (infolog != NULL)
         {
             int charsWritten;
-            tc->vt->GetProgramInfoLog(prgm->id, infoLength, &charsWritten,
-                                       infolog);
-            msg_Err(tc->gl, "shader program: %s", infolog);
+            vt->GetProgramInfoLog(prgm->id, infoLength, &charsWritten,
+                                  infolog);
+            msg_Err(renderer->gl, "shader program: %s", infolog);
             free(infolog);
         }
 
         /* If there is some message, better to check linking is ok */
         GLint link_status = GL_TRUE;
-        tc->vt->GetProgramiv(prgm->id, GL_LINK_STATUS, &link_status);
+        vt->GetProgramiv(prgm->id, GL_LINK_STATUS, &link_status);
         if (link_status == GL_FALSE)
         {
-            msg_Err(tc->gl, "Unable to use program");
+            msg_Err(renderer->gl, "Unable to use program");
             goto error;
         }
     }
 
     /* Fetch UniformLocations and AttribLocations */
 #define GET_LOC(type, x, str) do { \
-    x = tc->vt->Get##type##Location(prgm->id, str); \
+    x = vt->Get##type##Location(prgm->id, str); \
     assert(x != -1); \
     if (x == -1) { \
-        msg_Err(tc->gl, "Unable to Get"#type"Location(%s)", str); \
+        msg_Err(renderer->gl, "Unable to Get"#type"Location(%s)", str); \
         goto error; \
     } \
 } while (0)
@@ -393,18 +396,18 @@ opengl_link_program(struct prgm *prgm)
 #undef GET_LOC
 #undef GET_ULOC
 #undef GET_ALOC
-    int ret = prgm->tc->pf_fetch_locations(prgm->tc, prgm->id);
+    int ret = prgm->renderer->pf_fetch_locations(prgm->renderer, prgm->id);
     assert(ret == VLC_SUCCESS);
     if (ret != VLC_SUCCESS)
     {
-        msg_Err(tc->gl, "Unable to get locations from tex_conv");
+        msg_Err(renderer->gl, "Unable to get locations from tex_conv");
         goto error;
     }
 
     return VLC_SUCCESS;
 
 error:
-    tc->vt->DeleteProgram(prgm->id);
+    vt->DeleteProgram(prgm->id);
     prgm->id = 0;
     return VLC_EGENERIC;
 }
@@ -412,18 +415,18 @@ error:
 static void
 opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
 {
-    opengl_tex_converter_t *tc = prgm->tc;
-    vlc_gl_interop_Delete(tc->interop);
+    struct vlc_gl_renderer *renderer = prgm->renderer;
+    vlc_gl_interop_Delete(renderer->interop);
     if (prgm->id != 0)
         vgl->vt.DeleteProgram(prgm->id);
 
 #ifdef HAVE_LIBPLACEBO
-    FREENULL(tc->uloc.pl_vars);
-    if (tc->pl_ctx)
-        pl_context_destroy(&tc->pl_ctx);
+    FREENULL(renderer->uloc.pl_vars);
+    if (renderer->pl_ctx)
+        pl_context_destroy(&renderer->pl_ctx);
 #endif
 
-    free(tc);
+    free(renderer);
 }
 
 static int
@@ -431,46 +434,46 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
                     struct prgm *prgm, const video_format_t *fmt,
                     bool b_dump_shaders)
 {
-    opengl_tex_converter_t *tc = calloc(1, sizeof(*tc));
-    if (tc == NULL)
+    struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
+    if (!renderer)
         return VLC_ENOMEM;
 
     struct vlc_gl_interop *interop =
         vlc_gl_interop_New(vgl->gl, &vgl->vt, context, fmt, false);
     if (!interop)
     {
-        free(tc);
+        free(renderer);
         return VLC_ENOMEM;
     }
 
-    tc->interop = interop;
+    renderer->interop = interop;
 
-    tc->gl = vgl->gl;
-    tc->vt = &vgl->vt;
-    tc->b_dump_shaders = b_dump_shaders;
+    renderer->gl = vgl->gl;
+    renderer->vt = &vgl->vt;
+    renderer->b_dump_shaders = b_dump_shaders;
 #if defined(USE_OPENGL_ES2)
-    tc->glsl_version = 100;
-    tc->glsl_precision_header = "precision highp float;\n";
+    renderer->glsl_version = 100;
+    renderer->glsl_precision_header = "precision highp float;\n";
 #else
-    tc->glsl_version = 120;
-    tc->glsl_precision_header = "";
+    renderer->glsl_version = 120;
+    renderer->glsl_precision_header = "";
 #endif
 
 #ifdef HAVE_LIBPLACEBO
     // Create the main libplacebo context
-    tc->pl_ctx = vlc_placebo_Create(VLC_OBJECT(vgl->gl));
-    if (tc->pl_ctx) {
+    renderer->pl_ctx = vlc_placebo_Create(VLC_OBJECT(vgl->gl));
+    if (renderer->pl_ctx) {
 #   if PL_API_VER >= 20
-        tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL);
+        renderer->pl_sh = pl_shader_alloc(renderer->pl_ctx, NULL);
 #   elif PL_API_VER >= 6
-        tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0);
+        renderer->pl_sh = pl_shader_alloc(renderer->pl_ctx, NULL, 0);
 #   else
-        tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0, 0);
+        renderer->pl_sh = pl_shader_alloc(renderer->pl_ctx, NULL, 0, 0);
 #   endif
     }
 #endif
 
-    prgm->tc = tc;
+    prgm->renderer = renderer;
 
     int ret = opengl_link_program(prgm);
     if (ret != VLC_SUCCESS)
@@ -690,7 +693,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GL_ASSERT_NOERROR();
 
-    const struct vlc_gl_interop *interop = vgl->prgm.tc->interop;
+    const struct vlc_gl_interop *interop = vgl->prgm.renderer->interop;
     /* Update the fmt to main program one */
     vgl->fmt = interop->fmt;
     /* The orientation is handled by the orientation matrix */
@@ -713,7 +716,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     if (!interop->handle_texs_gen)
     {
-        ret = vlc_gl_interop_GenerateTextures(vgl->prgm.tc->interop,
+        ret = vlc_gl_interop_GenerateTextures(interop,
                                               vgl->tex_width, vgl->tex_height,
                                               vgl->texture);
         if (ret != VLC_SUCCESS)
@@ -759,7 +762,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vgl->vt.Finish();
     vgl->vt.Flush();
 
-    const struct vlc_gl_interop *interop = vgl->prgm.tc->interop;
+    const struct vlc_gl_interop *interop = vgl->prgm.renderer->interop;
     const size_t main_tex_count = interop->tex_count;
     const bool main_del_texs = !interop->handle_texs_gen;
 
@@ -857,8 +860,8 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 {
     GL_ASSERT_NOERROR();
 
-    opengl_tex_converter_t *tc = vgl->prgm.tc;
-    const struct vlc_gl_interop *interop = tc->interop;
+    struct vlc_gl_renderer *renderer = vgl->prgm.renderer;
+    const struct vlc_gl_interop *interop = renderer->interop;
 
     /* Update the texture */
     int ret = interop->ops->update_textures(interop, vgl->texture, vgl->tex_width, vgl->tex_height,
@@ -1143,7 +1146,7 @@ static int SetupCoords(vout_display_opengl_t *vgl,
                        const float *left, const float *top,
                        const float *right, const float *bottom)
 {
-    const struct vlc_gl_interop *interop = vgl->prgm.tc->interop;
+    const struct vlc_gl_interop *interop = vgl->prgm.renderer->interop;
 
     GLfloat *vertexCoord, *textureCoord;
     GLushort *indices;
@@ -1206,9 +1209,9 @@ static int SetupCoords(vout_display_opengl_t *vgl,
 
 static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm)
 {
-    opengl_tex_converter_t *tc = prgm->tc;
-    const struct vlc_gl_interop *interop = tc->interop;
-    tc->pf_prepare_shader(tc, vgl->tex_width, vgl->tex_height, 1.0f);
+    struct vlc_gl_renderer *renderer = prgm->renderer;
+    const struct vlc_gl_interop *interop = renderer->interop;
+    renderer->pf_prepare_shader(renderer, vgl->tex_width, vgl->tex_height, 1.0f);
 
     for (unsigned j = 0; j < interop->tex_count; j++) {
         assert(vgl->texture[j] != 0);
@@ -1271,7 +1274,7 @@ static void TextureCropForStereo(vout_display_opengl_t *vgl,
                                  float *left, float *top,
                                  float *right, float *bottom)
 {
-    const struct vlc_gl_interop *interop = vgl->prgm.tc->interop;
+    const struct vlc_gl_interop *interop = vgl->prgm.renderer->interop;
 
     float stereoCoefs[2];
     float stereoOffsets[2];
@@ -1320,8 +1323,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         float top[PICTURE_PLANE_MAX];
         float right[PICTURE_PLANE_MAX];
         float bottom[PICTURE_PLANE_MAX];
-        const opengl_tex_converter_t *tc = vgl->prgm.tc;
-        const struct vlc_gl_interop *interop = tc->interop;
+        const struct vlc_gl_renderer *renderer = vgl->prgm.renderer;
+        const struct vlc_gl_interop *interop = renderer->interop;
         for (unsigned j = 0; j < interop->tex_count; j++)
         {
             float scale_w = (float)interop->texs[j].w.num / interop->texs[j].w.den
