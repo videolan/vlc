@@ -24,6 +24,7 @@ endif
 	$(APPLY) $(SRC)/gpg-error/win32-unicode.patch
 	$(APPLY) $(SRC)/gpg-error/version-bump-gawk-5.patch
 	$(APPLY) $(SRC)/gpg-error/win32-extern-struct.patch
+	$(APPLY) $(SRC)/gpg-error/darwin-triplet.patch
 	$(MOVE)
 ifdef HAVE_ANDROID
 ifeq ($(ARCH),aarch64)
@@ -31,29 +32,6 @@ ifeq ($(ARCH),aarch64)
 	cp $@/src/syscfg/lock-obj-pub.x86_64-pc-linux-gnu.h $@/src/syscfg/lock-obj-pub.linux-android.h
 else
 	cp $@/src/syscfg/lock-obj-pub.arm-unknown-linux-androideabi.h $@/src/syscfg/lock-obj-pub.linux-android.h
-endif
-endif
-ifdef HAVE_DARWIN_OS
-ifdef HAVE_ARMV7A
-ifneq ($(HOST),arm-apple-darwin)
-	cp $@/src/syscfg/lock-obj-pub.arm-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
-endif
-else
-ifeq ($(ARCH),aarch64)
-ifneq ($(HOST),aarch64-apple-darwin)
-	cp $@/src/syscfg/lock-obj-pub.aarch64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
-endif
-else
-ifeq ($(ARCH),x86_64)
-ifneq ($(HOST),x86_64-apple-darwin)
-	cp $@/src/syscfg/lock-obj-pub.x86_64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
-endif
-else
-ifneq ($(HOST),i386-apple-darwin)
-	cp $@/src/syscfg/lock-obj-pub.x86_64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
-endif
-endif
-endif
 endif
 endif
 ifdef HAVE_NACL
