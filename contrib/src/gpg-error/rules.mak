@@ -24,6 +24,7 @@ endif
 	$(APPLY) $(SRC)/gpg-error/win32-unicode.patch
 	$(APPLY) $(SRC)/gpg-error/version-bump-gawk-5.patch
 	$(APPLY) $(SRC)/gpg-error/win32-extern-struct.patch
+	$(APPLY) $(SRC)/gpg-error/darwin-triplet.patch
 	$(MOVE)
 ifdef HAVE_ANDROID
 ifeq ($(ARCH),aarch64)
@@ -36,17 +37,6 @@ endif
 ifdef HAVE_TIZEN
 ifeq ($(TIZEN_ABI), x86)
 	cp $@/src/syscfg/lock-obj-pub.i686-pc-linux-gnu.h $@/src/syscfg/lock-obj-pub.linux-gnueabi.h
-endif
-endif
-ifdef HAVE_DARWIN_OS
-ifdef HAVE_ARMV7A
-	cp $@/src/syscfg/lock-obj-pub.arm-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
-else
-ifeq ($(ARCH),aarch64)
-	cp $@/src/syscfg/lock-obj-pub.aarch64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
-else
-	cp $@/src/syscfg/lock-obj-pub.x86_64-apple-darwin.h $@/src/syscfg/lock-obj-pub.$(HOST).h
-endif
 endif
 endif
 

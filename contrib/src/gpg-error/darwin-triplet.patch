@@ -1,0 +1,25 @@
+--- libgpg-error-1.27_orig/src/mkheader.c	2017-02-28 13:32:33.000000000 +0100
++++ libgpg-error-1.27/src/mkheader.c	2020-01-23 11:36:50.000000000 +0100
+@@ -107,7 +107,21 @@
+           return xstrdup (lastalias);
+         }
+     }
+-  return xstrdup (triplet);
++  /* Darwin triplet de-versioning */
++  char *res_triplet = xstrdup (triplet);
++
++  char *triplet_last = strrchr(res_triplet, '-');
++  if (triplet_last == NULL) {
++    fprintf (stderr, PGM ": unexpected host triplet missing any separator: '%s'",
++               res_triplet);
++    exit (1);
++  }
++  triplet_last++; /* Advance past the dash */
++  if (strncmp("darwin", triplet_last, 6) == 0) {
++    triplet_last[6] = '\0';
++  }
++
++  return res_triplet;
+ }
+ 
+ 
