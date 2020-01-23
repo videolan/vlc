@@ -51,35 +51,6 @@ struct vout_display_opengl_t {
     vlc_gl_t   *gl;
     opengl_vtable_t vt;
 
-    video_format_t fmt;
-
-    GLsizei    tex_width[PICTURE_PLANE_MAX];
-    GLsizei    tex_height[PICTURE_PLANE_MAX];
-
-    GLuint     texture[PICTURE_PLANE_MAX];
-
-    unsigned nb_indices;
-    GLuint vertex_buffer_object;
-    GLuint index_buffer_object;
-    GLuint texture_buffer_object[PICTURE_PLANE_MAX];
-
-    struct {
-        unsigned int i_x_offset;
-        unsigned int i_y_offset;
-        unsigned int i_visible_width;
-        unsigned int i_visible_height;
-    } last_source;
-
-    /* View point */
-    vlc_viewpoint_t vp;
-    float f_teta;
-    float f_phi;
-    float f_roll;
-    float f_fovx; /* f_fovx and f_fovy are linked but we keep both */
-    float f_fovy; /* to avoid recalculating them when needed.      */
-    float f_z;    /* Position of the camera on the shpere radius vector */
-    float f_sar;
-
     struct vlc_gl_renderer *renderer;
     struct vlc_gl_sub_renderer *sub_renderer;
 };
@@ -133,11 +104,12 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
     if (projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
         || projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
     {
-        getProjectionMatrix(vgl->f_sar, vgl->f_fovy, renderer->var.ProjectionMatrix);
-        getZoomMatrix(vgl->f_z, renderer->var.ZoomMatrix);
+        getProjectionMatrix(renderer->f_sar, renderer->f_fovy,
+                            renderer->var.ProjectionMatrix);
+        getZoomMatrix(renderer->f_z, renderer->var.ZoomMatrix);
 
-        /* vgl->vp has been reversed and is a world transform */
-        vlc_viewpoint_to_4x4(&vgl->vp, renderer->var.ViewMatrix);
+        /* renderer->vp has been reversed and is a world transform */
+        vlc_viewpoint_to_4x4(&renderer->vp, renderer->var.ViewMatrix);
     }
     else
     {
@@ -664,32 +636,33 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GL_ASSERT_NOERROR();
 
-    const struct vlc_gl_interop *interop = vgl->renderer->interop;
+    struct vlc_gl_renderer *renderer = vgl->renderer;
+    const struct vlc_gl_interop *interop = renderer->interop;
     /* Update the fmt to main program one */
-    vgl->fmt = interop->fmt;
+    renderer->fmt = interop->fmt;
     /* The orientation is handled by the orientation matrix */
-    vgl->fmt.orientation = fmt->orientation;
+    renderer->fmt.orientation = fmt->orientation;
 
     /* Texture size */
     for (unsigned j = 0; j < interop->tex_count; j++) {
-        const GLsizei w = vgl->fmt.i_visible_width  * interop->texs[j].w.num
+        const GLsizei w = renderer->fmt.i_visible_width  * interop->texs[j].w.num
                         / interop->texs[j].w.den;
-        const GLsizei h = vgl->fmt.i_visible_height * interop->texs[j].h.num
+        const GLsizei h = renderer->fmt.i_visible_height * interop->texs[j].h.num
                         / interop->texs[j].h.den;
         if (supports_npot) {
-            vgl->tex_width[j]  = w;
-            vgl->tex_height[j] = h;
+            renderer->tex_width[j]  = w;
+            renderer->tex_height[j] = h;
         } else {
-            vgl->tex_width[j]  = vlc_align_pot(w);
-            vgl->tex_height[j] = vlc_align_pot(h);
+            renderer->tex_width[j]  = vlc_align_pot(w);
+            renderer->tex_height[j] = vlc_align_pot(h);
         }
     }
 
     if (!interop->handle_texs_gen)
     {
-        ret = vlc_gl_interop_GenerateTextures(interop,
-                                              vgl->tex_width, vgl->tex_height,
-                                              vgl->texture);
+        ret = vlc_gl_interop_GenerateTextures(interop, renderer->tex_width,
+                                              renderer->tex_height,
+                                              renderer->texture);
         if (ret != VLC_SUCCESS)
         {
             vout_display_opengl_Delete(vgl);
@@ -705,18 +678,18 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     vgl->vt.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     vgl->vt.Clear(GL_COLOR_BUFFER_BIT);
 
-    vgl->vt.GenBuffers(1, &vgl->vertex_buffer_object);
-    vgl->vt.GenBuffers(1, &vgl->index_buffer_object);
-    vgl->vt.GenBuffers(interop->tex_count, vgl->texture_buffer_object);
+    vgl->vt.GenBuffers(1, &renderer->vertex_buffer_object);
+    vgl->vt.GenBuffers(1, &renderer->index_buffer_object);
+    vgl->vt.GenBuffers(interop->tex_count, renderer->texture_buffer_object);
 
-    if (vgl->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
+    if (renderer->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
      && vout_display_opengl_SetViewpoint(vgl, viewpoint) != VLC_SUCCESS)
     {
         vout_display_opengl_Delete(vgl);
         return NULL;
     }
 
-    *fmt = vgl->fmt;
+    *fmt = renderer->fmt;
     if (subpicture_chromas) {
         *subpicture_chromas = gl_subpicture_chromas;
     }
@@ -733,7 +706,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vgl->vt.Finish();
     vgl->vt.Flush();
 
-    const struct vlc_gl_interop *interop = vgl->renderer->interop;
+    struct vlc_gl_renderer *renderer = vgl->renderer;
+    const struct vlc_gl_interop *interop = renderer->interop;
     const size_t main_tex_count = interop->tex_count;
     const bool main_del_texs = !interop->handle_texs_gen;
 
@@ -741,12 +715,12 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 
     opengl_deinit_program(vgl);
 
-    vgl->vt.DeleteBuffers(1, &vgl->vertex_buffer_object);
-    vgl->vt.DeleteBuffers(1, &vgl->index_buffer_object);
-    vgl->vt.DeleteBuffers(main_tex_count, vgl->texture_buffer_object);
+    vgl->vt.DeleteBuffers(1, &renderer->vertex_buffer_object);
+    vgl->vt.DeleteBuffers(1, &renderer->index_buffer_object);
+    vgl->vt.DeleteBuffers(main_tex_count, renderer->texture_buffer_object);
 
     if (main_del_texs)
-        vgl->vt.DeleteTextures(main_tex_count, vgl->texture);
+        vgl->vt.DeleteTextures(main_tex_count, renderer->texture);
 
     GL_ASSERT_NOERROR();
 
@@ -755,36 +729,39 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 
 static void UpdateZ(vout_display_opengl_t *vgl)
 {
+    struct vlc_gl_renderer *renderer = vgl->renderer;
     /* Do trigonometry to calculate the minimal z value
      * that will allow us to zoom out without seeing the outside of the
      * sphere (black borders). */
-    float tan_fovx_2 = tanf(vgl->f_fovx / 2);
-    float tan_fovy_2 = tanf(vgl->f_fovy / 2);
+    float tan_fovx_2 = tanf(renderer->f_fovx / 2);
+    float tan_fovy_2 = tanf(renderer->f_fovy / 2);
     float z_min = - SPHERE_RADIUS / sinf(atanf(sqrtf(
                     tan_fovx_2 * tan_fovx_2 + tan_fovy_2 * tan_fovy_2)));
 
     /* The FOV value above which z is dynamically calculated. */
     const float z_thresh = 90.f;
 
-    if (vgl->f_fovx <= z_thresh * M_PI / 180)
-        vgl->f_z = 0;
+    if (renderer->f_fovx <= z_thresh * M_PI / 180)
+        renderer->f_z = 0;
     else
     {
         float f = z_min / ((FIELD_OF_VIEW_DEGREES_MAX - z_thresh) * M_PI / 180);
-        vgl->f_z = f * vgl->f_fovx - f * z_thresh * M_PI / 180;
-        if (vgl->f_z < z_min)
-            vgl->f_z = z_min;
+        renderer->f_z = f * renderer->f_fovx - f * z_thresh * M_PI / 180;
+        if (renderer->f_z < z_min)
+            renderer->f_z = z_min;
     }
 }
 
 static void UpdateFOVy(vout_display_opengl_t *vgl)
 {
-    vgl->f_fovy = 2 * atanf(tanf(vgl->f_fovx / 2) / vgl->f_sar);
+    struct vlc_gl_renderer *renderer = vgl->renderer;
+    renderer->f_fovy = 2 * atanf(tanf(renderer->f_fovx / 2) / renderer->f_sar);
 }
 
 int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
                                      const vlc_viewpoint_t *p_vp)
 {
+    struct vlc_gl_renderer *renderer = vgl->renderer;
     if (p_vp->fov > FIELD_OF_VIEW_DEGREES_MAX
             || p_vp->fov < FIELD_OF_VIEW_DEGREES_MIN)
         return VLC_EBADVAR;
@@ -793,16 +770,16 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
     float f_fovx = p_vp->fov * (float)M_PI / 180.f;
 
     /* vgl->vp needs to be converted into world transform */
-    vlc_viewpoint_reverse(&vgl->vp, p_vp);
+    vlc_viewpoint_reverse(&renderer->vp, p_vp);
 
-    if (fabsf(f_fovx - vgl->f_fovx) >= 0.001f)
+    if (fabsf(f_fovx - renderer->f_fovx) >= 0.001f)
     {
         /* FOVx has changed. */
-        vgl->f_fovx = f_fovx;
+        renderer->f_fovx = f_fovx;
         UpdateFOVy(vgl);
         UpdateZ(vgl);
     }
-    getViewpointMatrixes(vgl, vgl->fmt.projection_mode);
+    getViewpointMatrixes(vgl, renderer->fmt.projection_mode);
 
     return VLC_SUCCESS;
 }
@@ -811,13 +788,14 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
 void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
                                               float f_sar)
 {
+    struct vlc_gl_renderer *renderer = vgl->renderer;
     /* Each time the window size changes, we must recompute the minimum zoom
      * since the aspect ration changes.
      * We must also set the new current zoom value. */
-    vgl->f_sar = f_sar;
+    renderer->f_sar = f_sar;
     UpdateFOVy(vgl);
     UpdateZ(vgl);
-    getViewpointMatrixes(vgl, vgl->fmt.projection_mode);
+    getViewpointMatrixes(vgl, renderer->fmt.projection_mode);
 }
 
 void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
@@ -835,8 +813,10 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     const struct vlc_gl_interop *interop = renderer->interop;
 
     /* Update the texture */
-    int ret = interop->ops->update_textures(interop, vgl->texture, vgl->tex_width, vgl->tex_height,
-                                            picture, NULL);
+    int ret = interop->ops->update_textures(interop, renderer->texture,
+                                            renderer->tex_width,
+                                            renderer->tex_height, picture,
+                                            NULL);
     if (ret != VLC_SUCCESS)
         return ret;
 
@@ -1117,14 +1097,15 @@ static int SetupCoords(vout_display_opengl_t *vgl,
                        const float *left, const float *top,
                        const float *right, const float *bottom)
 {
-    const struct vlc_gl_interop *interop = vgl->renderer->interop;
+    struct vlc_gl_renderer *renderer = vgl->renderer;
+    const struct vlc_gl_interop *interop = renderer->interop;
 
     GLfloat *vertexCoord, *textureCoord;
     GLushort *indices;
     unsigned nbVertices, nbIndices;
 
     int i_ret;
-    switch (vgl->fmt.projection_mode)
+    switch (renderer->fmt.projection_mode)
     {
     case PROJECTION_MODE_RECTANGULAR:
         i_ret = BuildRectangle(interop->tex_count,
@@ -1140,8 +1121,8 @@ static int SetupCoords(vout_display_opengl_t *vgl,
         break;
     case PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD:
         i_ret = BuildCube(interop->tex_count,
-                          (float)vgl->fmt.i_cubemap_padding / vgl->fmt.i_width,
-                          (float)vgl->fmt.i_cubemap_padding / vgl->fmt.i_height,
+                          (float)renderer->fmt.i_cubemap_padding / renderer->fmt.i_width,
+                          (float)renderer->fmt.i_cubemap_padding / renderer->fmt.i_height,
                           &vertexCoord, &textureCoord, &nbVertices,
                           &indices, &nbIndices,
                           left, top, right, bottom);
@@ -1156,16 +1137,16 @@ static int SetupCoords(vout_display_opengl_t *vgl,
 
     for (unsigned j = 0; j < interop->tex_count; j++)
     {
-        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object[j]);
         vgl->vt.BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
                            textureCoord + j * nbVertices * 2, GL_STATIC_DRAW);
     }
 
-    vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object);
+    vgl->vt.BindBuffer(GL_ARRAY_BUFFER, renderer->vertex_buffer_object);
     vgl->vt.BufferData(GL_ARRAY_BUFFER, nbVertices * 3 * sizeof(GLfloat),
                        vertexCoord, GL_STATIC_DRAW);
 
-    vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
+    vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->index_buffer_object);
     vgl->vt.BufferData(GL_ELEMENT_ARRAY_BUFFER, nbIndices * sizeof(GLushort),
                        indices, GL_STATIC_DRAW);
 
@@ -1173,7 +1154,7 @@ static int SetupCoords(vout_display_opengl_t *vgl,
     free(vertexCoord);
     free(indices);
 
-    vgl->nb_indices = nbIndices;
+    renderer->nb_indices = nbIndices;
 
     return VLC_SUCCESS;
 }
@@ -1182,14 +1163,15 @@ static void DrawWithShaders(vout_display_opengl_t *vgl)
 {
     struct vlc_gl_renderer *renderer = vgl->renderer;
     const struct vlc_gl_interop *interop = renderer->interop;
-    renderer->pf_prepare_shader(renderer, vgl->tex_width, vgl->tex_height, 1.0f);
+    renderer->pf_prepare_shader(renderer, renderer->tex_width,
+                                renderer->tex_height, 1.0f);
 
     for (unsigned j = 0; j < interop->tex_count; j++) {
-        assert(vgl->texture[j] != 0);
+        assert(renderer->texture[j] != 0);
         vgl->vt.ActiveTexture(GL_TEXTURE0+j);
-        vgl->vt.BindTexture(interop->tex_target, vgl->texture[j]);
+        vgl->vt.BindTexture(interop->tex_target, renderer->texture[j]);
 
-        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->texture_buffer_object[j]);
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object[j]);
 
         assert(renderer->aloc.MultiTexCoord[j] != -1);
         vgl->vt.EnableVertexAttribArray(renderer->aloc.MultiTexCoord[j]);
@@ -1197,8 +1179,8 @@ static void DrawWithShaders(vout_display_opengl_t *vgl)
                                     GL_FLOAT, 0, 0, 0);
     }
 
-    vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->vertex_buffer_object);
-    vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, vgl->index_buffer_object);
+    vgl->vt.BindBuffer(GL_ARRAY_BUFFER, renderer->vertex_buffer_object);
+    vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->index_buffer_object);
     vgl->vt.EnableVertexAttribArray(renderer->aloc.VertexPosition);
     vgl->vt.VertexAttribPointer(renderer->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
@@ -1219,7 +1201,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl)
     vgl->vt.UniformMatrix4fv(renderer->uloc.ZoomMatrix, 1, GL_FALSE,
                              renderer->var.ZoomMatrix);
 
-    vgl->vt.DrawElements(GL_TRIANGLES, vgl->nb_indices, GL_UNSIGNED_SHORT, 0);
+    vgl->vt.DrawElements(GL_TRIANGLES, renderer->nb_indices, GL_UNSIGNED_SHORT, 0);
 }
 
 
@@ -1245,12 +1227,13 @@ static void TextureCropForStereo(vout_display_opengl_t *vgl,
                                  float *left, float *top,
                                  float *right, float *bottom)
 {
-    const struct vlc_gl_interop *interop = vgl->renderer->interop;
+    struct vlc_gl_renderer *renderer = vgl->renderer;
+    const struct vlc_gl_interop *interop = renderer->interop;
 
     float stereoCoefs[2];
     float stereoOffsets[2];
 
-    switch (vgl->fmt.multiview_mode)
+    switch (renderer->fmt.multiview_mode)
     {
     case MULTIVIEW_STEREO_TB:
         // Display only the left eye.
@@ -1277,6 +1260,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                                 const video_format_t *source)
 {
     GL_ASSERT_NOERROR();
+    struct vlc_gl_renderer *renderer = vgl->renderer;
 
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call vout_display_opengl_Display to force redraw.
@@ -1285,23 +1269,22 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 
     vgl->vt.UseProgram(vgl->renderer->program_id);
 
-    if (source->i_x_offset != vgl->last_source.i_x_offset
-     || source->i_y_offset != vgl->last_source.i_y_offset
-     || source->i_visible_width != vgl->last_source.i_visible_width
-     || source->i_visible_height != vgl->last_source.i_visible_height)
+    if (source->i_x_offset != renderer->last_source.i_x_offset
+     || source->i_y_offset != renderer->last_source.i_y_offset
+     || source->i_visible_width != renderer->last_source.i_visible_width
+     || source->i_visible_height != renderer->last_source.i_visible_height)
     {
         float left[PICTURE_PLANE_MAX];
         float top[PICTURE_PLANE_MAX];
         float right[PICTURE_PLANE_MAX];
         float bottom[PICTURE_PLANE_MAX];
-        const struct vlc_gl_renderer *renderer = vgl->renderer;
         const struct vlc_gl_interop *interop = renderer->interop;
         for (unsigned j = 0; j < interop->tex_count; j++)
         {
             float scale_w = (float)interop->texs[j].w.num / interop->texs[j].w.den
-                          / vgl->tex_width[j];
+                          / renderer->tex_width[j];
             float scale_h = (float)interop->texs[j].h.num / interop->texs[j].h.den
-                          / vgl->tex_height[j];
+                          / renderer->tex_height[j];
 
             /* Warning: if NPOT is not supported a larger texture is
                allocated. This will cause right and bottom coordinates to
@@ -1325,10 +1308,10 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         if (ret != VLC_SUCCESS)
             return ret;
 
-        vgl->last_source.i_x_offset = source->i_x_offset;
-        vgl->last_source.i_y_offset = source->i_y_offset;
-        vgl->last_source.i_visible_width = source->i_visible_width;
-        vgl->last_source.i_visible_height = source->i_visible_height;
+        renderer->last_source.i_x_offset = source->i_x_offset;
+        renderer->last_source.i_y_offset = source->i_y_offset;
+        renderer->last_source.i_visible_width = source->i_visible_width;
+        renderer->last_source.i_visible_height = source->i_visible_height;
     }
     DrawWithShaders(vgl);
 

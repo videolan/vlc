@@ -91,6 +91,35 @@ struct vlc_gl_renderer
 
     struct vlc_gl_interop *interop;
 
+    video_format_t fmt;
+
+    GLsizei tex_width[PICTURE_PLANE_MAX];
+    GLsizei tex_height[PICTURE_PLANE_MAX];
+
+    GLuint texture[PICTURE_PLANE_MAX];
+
+    unsigned nb_indices;
+    GLuint vertex_buffer_object;
+    GLuint index_buffer_object;
+    GLuint texture_buffer_object[PICTURE_PLANE_MAX];
+
+    struct {
+        unsigned int i_x_offset;
+        unsigned int i_y_offset;
+        unsigned int i_visible_width;
+        unsigned int i_visible_height;
+    } last_source;
+
+    /* View point */
+    vlc_viewpoint_t vp;
+    float f_teta;
+    float f_phi;
+    float f_roll;
+    float f_fovx; /* f_fovx and f_fovy are linked but we keep both */
+    float f_fovy; /* to avoid recalculating them when needed.      */
+    float f_z;    /* Position of the camera on the shpere radius vector */
+    float f_sar;
+
     /**
      * Callback to fetch locations of uniform or attributes variables
      *
