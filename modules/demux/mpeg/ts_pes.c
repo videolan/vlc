@@ -212,7 +212,7 @@ bool ts_pes_Gather( ts_pes_parse_callback *cb,
     {
         assert( p_pes->gather.i_saved == 0 );
 
-        if( p_pes->gather.p_data == NULL && !b_first_sync_done && p_pkt->i_buffer >= 6 )
+        if( p_pes->gather.p_data == NULL && b_unit_start && !b_first_sync_done && p_pkt->i_buffer >= 6 )
         {
             if( likely(b_aligned_ts_payload) )
             {
