@@ -51,11 +51,6 @@
 #define ALIGN_16( x ) ( ( ( x ) + 15 ) / 16 * 16 )
 #define VT_RESTART_MAX 1
 
-#if (!TARGET_OS_OSX)
-const CFStringRef kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder = CFSTR("EnableHardwareAcceleratedVideoDecoder");
-const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder = CFSTR("RequireHardwareAcceleratedVideoDecoder");
-#endif
-
 #pragma mark - module descriptor
 
 static int OpenDecoder(vlc_object_t *);
@@ -1136,6 +1131,7 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
     CFDictionarySetValue(decoderConfiguration, kCVImageBufferYCbCrMatrixKey,
                          yuvmatrix);
 
+#if TARGET_OS_OSX
     /* enable HW accelerated playback, since this is optional on OS X
      * note that the backend may still fallback on software mode if no
      * suitable hardware is available */
@@ -1149,6 +1145,7 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
         CFDictionarySetValue(decoderConfiguration,
                              kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder,
                              kCFBooleanTrue);
+#endif
 
     CFDictionarySetValue(decoderConfiguration,
                          kVTDecompressionPropertyKey_FieldMode,
