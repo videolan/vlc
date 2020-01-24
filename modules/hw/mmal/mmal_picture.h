@@ -34,17 +34,6 @@
 #define NUM_ACTUAL_OPAQUE_BUFFERS 30
 
 
-#define CTX_BUFS_MAX 4
-typedef struct pic_ctx_mmal_s {
-    picture_context_t cmn;  // PARENT: Common els at start
-
-    cma_buf_t * cb;
-
-    unsigned int buf_count;
-    MMAL_BUFFER_HEADER_T * bufs[CTX_BUFS_MAX];
-
-} pic_ctx_mmal_t;
-
 MMAL_FOURCC_T vlc_to_mmal_video_fourcc(const video_frame_format_t * const vf_vlc);
 MMAL_FOURCC_T vlc_to_mmal_color_space(const video_color_space_t vlc_cs);
 void hw_mmal_vlc_fmt_to_mmal_fmt(MMAL_ES_FORMAT_T *const es_fmt, const video_frame_format_t * const vf_vlc);
@@ -70,12 +59,7 @@ MMAL_STATUS_T hw_mmal_opaque_output(vlc_object_t * const obj,
                                     MMAL_PORT_T * const port,
                                     const unsigned int extra_buffers, MMAL_PORT_BH_CB_T callback);
 
-static inline MMAL_BUFFER_HEADER_T * hw_mmal_pic_sub_buf_get(picture_t * const pic, const unsigned int n)
-{
-    pic_ctx_mmal_t * const ctx = (pic_ctx_mmal_t *)pic->context;
-
-    return n + 1 > ctx->buf_count ? NULL : ctx->bufs[n + 1];
-}
+MMAL_BUFFER_HEADER_T * hw_mmal_pic_sub_buf_get(picture_t * const pic, const unsigned int n);
 
 static inline bool hw_mmal_chroma_is_mmal(const vlc_fourcc_t chroma)
 {

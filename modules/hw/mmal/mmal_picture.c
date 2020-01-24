@@ -313,6 +313,25 @@ MMAL_STATUS_T hw_mmal_opaque_output(vlc_object_t * const obj,
     return MMAL_SUCCESS;
 }
 
+//----------------------------------------------------------------------------
+
+#define CTX_BUFS_MAX 4
+typedef struct pic_ctx_mmal_s {
+    picture_context_t cmn;  // PARENT: Common els at start
+
+    cma_buf_t * cb;
+
+    unsigned int buf_count;
+    MMAL_BUFFER_HEADER_T * bufs[CTX_BUFS_MAX];
+
+} pic_ctx_mmal_t;
+
+MMAL_BUFFER_HEADER_T * hw_mmal_pic_sub_buf_get(picture_t * const pic, const unsigned int sub_no)
+{
+    pic_ctx_mmal_t * const ctx = (pic_ctx_mmal_t *)pic->context;
+
+    return sub_no + 1 > ctx->buf_count ? NULL : ctx->bufs[sub_no + 1];
+}
 
 static void hw_mmal_pic_ctx_destroy(picture_context_t * pic_ctx_cmn)
 {
