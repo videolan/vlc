@@ -141,7 +141,7 @@ endif
 
 # Darwin
 ifdef HAVE_DARWIN_OS
-FFMPEGCONF += --arch=$(ARCH) --target-os=darwin
+FFMPEGCONF += --arch=$(ARCH) --target-os=darwin --extra-cflags="$(CFLAGS)"
 ifdef USE_FFMPEG
 FFMPEGCONF += --disable-lzma
 endif
