@@ -802,6 +802,7 @@ static CFMutableDictionaryRef GetDecoderExtradataMPEG4(decoder_t *p_dec)
 
 static CFMutableDictionaryRef GetDecoderExtradataDefault(decoder_t *p_dec)
 {
+    VLC_UNUSED(p_dec);
     return ExtradataInfoCreate(NULL, NULL, 0); /* Empty Needed ? */
 }
 
@@ -991,8 +992,6 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
 
 static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
     /* check for the codec we can and want to decode */
     switch (p_dec->fmt_in.i_codec) {
         case VLC_CODEC_H264:
@@ -1303,6 +1302,8 @@ static void StopVideoToolbox(decoder_t *p_dec, bool closing)
             (void) decoder_UpdateVideoFormat(p_dec);
             p_dec->fmt_out.video = orig;
         }
+#else
+        VLC_UNUSED(closing);
 #endif
 
         p_sys->b_format_propagated = false;
@@ -1585,11 +1586,9 @@ static CFMutableDictionaryRef ESDSExtradataInfoCreate(decoder_t *p_dec,
                                                       uint8_t *p_buf,
                                                       uint32_t i_buf_size)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
+    VLC_UNUSED(p_dec);
     int full_size = 3 + 5 +13 + 5 + i_buf_size + 3;
     int config_size = 13 + 5 + i_buf_size;
-    int padding = 12;
 
     bo_t bo;
     bool status = bo_init(&bo, 1024);
@@ -1729,8 +1728,6 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
 static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
                           enum vtsession_status * p_vtsession_status)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
 #define VTERRCASE(x) \
     case x: msg_Warn(p_dec, "vt session error: '" #x "'"); break;
 
@@ -2279,6 +2276,7 @@ end:
 static int
 OpenDecDevice(vlc_decoder_device *device, vout_window_t *window)
 {
+    VLC_UNUSED(window);
     static const struct vlc_decoder_device_operations ops =
     {
         NULL,
