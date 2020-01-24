@@ -139,6 +139,15 @@ typedef struct
 } converter_sys_t;
 
 
+static void cma_buf_pool_deletez(cma_buf_pool_t ** const pp)
+{
+    cma_buf_pool_t * const p = *pp;
+    if (p != NULL) {
+        *pp = NULL;
+        cma_buf_pool_delete(p);
+    }
+}
+
 static MMAL_STATUS_T pic_to_format(MMAL_ES_FORMAT_T * const es_fmt, const picture_t * const pic)
 {
     unsigned int bpp = (pic->format.i_bits_per_pixel + 7) >> 3;
@@ -867,7 +876,7 @@ retry:
     assert(devsys != NULL);
 
     if (sys->needs_copy_in &&
-        (sys->cma_in_pool = cma_buf_pool_new(2, 2, true, devsys->vcsm_init_type == VCSM_INIT_CMA, "conv-copy-in")) == NULL)
+        (sys->cma_in_pool = cma_buf_pool_new(2, 2, devsys->vcsm_init_type == VCSM_INIT_CMA, "conv-copy-in")) == NULL)
     {
         msg_Err(p_filter, "Failed to allocate input CMA pool");
         goto fail;

@@ -324,7 +324,6 @@ static void hw_mmal_pic_ctx_destroy(picture_context_t * pic_ctx_cmn)
             mmal_buffer_header_release(ctx->bufs[i]);
     }
 
-    cma_buf_end_flight(ctx->cb);
     cma_buf_unref(ctx->cb);
 
     free(ctx);
