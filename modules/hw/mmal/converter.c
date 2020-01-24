@@ -701,6 +701,9 @@ void CloseConverter(vlc_object_t * obj)
     if (sys->component)
         mmal_component_release(sys->component);
 
+    if (p_filter->vctx_out)
+        vlc_video_context_Release(p_filter->vctx_out);
+
     if (sys->dec_dev)
         vlc_decoder_device_Release(sys->dec_dev);
 
@@ -804,6 +807,19 @@ retry:
     if (sys->dec_dev == NULL) {
         msg_Err(p_filter, "missing MMAL decoder device");
         goto fail;
+    }
+
+    if (hw_mmal_chroma_is_mmal(p_filter->fmt_out.video.i_chroma))
+    {
+        if (hw_mmal_chroma_is_mmal(p_filter->fmt_in.video.i_chroma))
+            p_filter->vctx_out = vlc_video_context_Hold(p_filter->vctx_in);
+        else {
+            p_filter->vctx_out = vlc_video_context_Create(sys->dec_dev, VLC_VIDEO_CONTEXT_MMAL, 0, NULL);
+            if (unlikely(p_filter->vctx_out == NULL)) {
+                msg_Err(p_filter, "failed to create the output video context");
+                goto fail;
+            }
+        }
     }
 
     if (use_resizer) {
