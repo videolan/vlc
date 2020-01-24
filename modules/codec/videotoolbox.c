@@ -1001,7 +1001,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
             if (!deviceSupportsHEVC())
             {
                 msg_Warn(p_dec, "device doesn't support HEVC");
-                return -1;
+                return 0;
             }
             return kCMVideoCodecType_HEVC;
 
@@ -1009,7 +1009,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
         {
             if (p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'X','V','I','D' )) {
                 msg_Warn(p_dec, "XVID decoding not implemented, fallback on software");
-                return -1;
+                return 0;
             }
 
             msg_Dbg(p_dec, "Will decode MP4V with original FourCC '%4.4s'", (char *)&p_dec->fmt_in.i_original_fourcc);
@@ -1055,7 +1055,7 @@ static CMVideoCodecType CodecPrecheck(decoder_t *p_dec)
                     msg_Dbg(p_dec, "Decoding DV PAL");
                     return kCMVideoCodecType_DVCPAL;
                 default:
-                    return -1;
+                    return 0;
             }
 #endif
             /* mpgv / mp2v needs fixing, so disable it for now */
@@ -1387,7 +1387,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     CMVideoCodecType codec;
 
     codec = CodecPrecheck(p_dec);
-    if (codec == -1)
+    if (codec == 0)
         return VLC_EGENERIC;
 
     /* now that we see a chance to decode anything, allocate the
