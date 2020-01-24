@@ -56,7 +56,7 @@
 #define MMAL_ADJUST_REFRESHRATE_LONGTEXT N_("Adjust HDMI refresh rate to the video.")
 
 #define MMAL_NATIVE_INTERLACED "mmal-native-interlaced"
-#define MMAL_NATIVE_INTERLACE_TEXT N_("Force interlaced video mode.")
+#define MMAL_NATIVE_INTERLACE_TEXT N_("Force interlaced HDMI mode.")
 #define MMAL_NATIVE_INTERLACE_LONGTEXT N_("Force the HDMI output into an " \
         "interlaced video mode for interlaced video content.")
 
