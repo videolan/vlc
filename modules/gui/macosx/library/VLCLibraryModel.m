@@ -277,7 +277,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         vlc_ml_query_params_t queryParameters;
         memset(&queryParameters, 0, sizeof(vlc_ml_query_params_t));
-        queryParameters.i_nbResults = 20;
+        queryParameters.i_nbResults = 0;
         queryParameters.i_sort = self->_sortCriteria;
         queryParameters.b_desc = self->_sortDescending;
         vlc_ml_media_list_t *p_media_list = vlc_ml_list_video_media(self->_p_mediaLibrary, &queryParameters);
