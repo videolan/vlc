@@ -451,6 +451,7 @@ static int st_Handshake (vlc_tls_t *session,
             OSStatus res = SSLCopyALPNProtocols(sys->p_context, &alpnArray);
             if (res == noErr && alpnArray) {
                 *alp = CFArrayALPNCopyFirst(alpnArray);
+                CFRelease(alpnArray);
                 if (unlikely(*alp == NULL))
                     return -1;
             } else {
