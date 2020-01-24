@@ -565,7 +565,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     {
         case DEMUX_SET_POSITION:
         case DEMUX_GET_POSITION:
-        case DEMUX_GET_TIME:
         case DEMUX_GET_LENGTH:
         {
             uint32_t pos, len;
@@ -590,14 +589,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
                 break;
 
-            case DEMUX_GET_TIME:
-                if( p_sys->i_pgc_length > 0 )
-                {
-                    *va_arg( args, int64_t * ) = p_sys->i_pgc_length*pos/len;
-                    return VLC_SUCCESS;
-                }
-                break;
-
             case DEMUX_GET_LENGTH:
                 if( p_sys->i_pgc_length > 0 )
                 {
@@ -608,6 +599,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             return VLC_EGENERIC;
         }
+
+        case DEMUX_GET_TIME:
+            if( p_sys->i_pgc_length > 0 )
+            {
+                *va_arg( args, mtime_t * ) =
+                        dvdnav_get_current_time( p_sys->dvdnav ) * 100 / 9;
+                return VLC_SUCCESS;
+            }
+            break;
 
         /* Special for access_demux */
         case DEMUX_CAN_PAUSE:
