@@ -439,6 +439,7 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         case VLC_CODEC_AV1:
             dpb_size = 10;
             break;
+        case VLC_CODEC_MP4V:
         case VLC_CODEC_VP5:
         case VLC_CODEC_VP6:
         case VLC_CODEC_VP6F:
