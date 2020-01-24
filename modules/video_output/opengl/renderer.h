@@ -96,7 +96,7 @@ struct vlc_gl_renderer
     GLsizei tex_width[PICTURE_PLANE_MAX];
     GLsizei tex_height[PICTURE_PLANE_MAX];
 
-    GLuint texture[PICTURE_PLANE_MAX];
+    GLuint textures[PICTURE_PLANE_MAX];
 
     unsigned nb_indices;
     GLuint vertex_buffer_object;

@@ -662,7 +662,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     {
         ret = vlc_gl_interop_GenerateTextures(interop, renderer->tex_width,
                                               renderer->tex_height,
-                                              renderer->texture);
+                                              renderer->textures);
         if (ret != VLC_SUCCESS)
         {
             vout_display_opengl_Delete(vgl);
@@ -720,7 +720,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vgl->vt.DeleteBuffers(main_tex_count, renderer->texture_buffer_object);
 
     if (main_del_texs)
-        vgl->vt.DeleteTextures(main_tex_count, renderer->texture);
+        vgl->vt.DeleteTextures(main_tex_count, renderer->textures);
 
     GL_ASSERT_NOERROR();
 
@@ -813,7 +813,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     const struct vlc_gl_interop *interop = renderer->interop;
 
     /* Update the texture */
-    int ret = interop->ops->update_textures(interop, renderer->texture,
+    int ret = interop->ops->update_textures(interop, renderer->textures,
                                             renderer->tex_width,
                                             renderer->tex_height, picture,
                                             NULL);
@@ -1167,9 +1167,9 @@ static void DrawWithShaders(vout_display_opengl_t *vgl)
                                 renderer->tex_height, 1.0f);
 
     for (unsigned j = 0; j < interop->tex_count; j++) {
-        assert(renderer->texture[j] != 0);
+        assert(renderer->textures[j] != 0);
         vgl->vt.ActiveTexture(GL_TEXTURE0+j);
-        vgl->vt.BindTexture(interop->tex_target, renderer->texture[j]);
+        vgl->vt.BindTexture(interop->tex_target, renderer->textures[j]);
 
         vgl->vt.BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object[j]);
 
