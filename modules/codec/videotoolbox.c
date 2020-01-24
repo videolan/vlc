@@ -1147,13 +1147,6 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
                              kCFBooleanTrue);
 #endif
 
-    CFDictionarySetValue(decoderConfiguration,
-                         kVTDecompressionPropertyKey_FieldMode,
-                         kVTDecompressionProperty_FieldMode_DeinterlaceFields);
-    CFDictionarySetValue(decoderConfiguration,
-                         kVTDecompressionPropertyKey_DeinterlaceMode,
-                         kVTDecompressionProperty_DeinterlaceMode_Temporal);
-
     return decoderConfiguration;
 }
 
