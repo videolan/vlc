@@ -41,13 +41,25 @@
 
 #include "subpic.h"
 
-#define MMAL_RESIZE_NAME "mmal-resize"
-#define MMAL_RESIZE_TEXT N_("Use mmal resizer rather than hvs.")
-#define MMAL_RESIZE_LONGTEXT N_("Use mmal resizer rather than isp. This uses less gpu memory than the ISP but is slower.")
+typedef enum filter_resizer_e {
+    FILTER_RESIZER_HVS,
+    FILTER_RESIZER_ISP,
+    FILTER_RESIZER_RESIZER,
+} filter_resizer_t;
 
-#define MMAL_ISP_NAME    "mmal-isp"
-#define MMAL_ISP_TEXT N_("Use mmal isp rather than hvs.")
-#define MMAL_ISP_LONGTEXT N_("Use mmal isp rather than Hardware Video Scaler. This may be faster but has no blend.")
+#ifndef NDEBUG
+#define MMAL_CONVERTER_TYPE_NAME "mmal-hw-converter"
+#define MMAL_CONVERTER_TYPE_TEXT "Hardware used for MMAL conversions"
+#define MMAL_CONVERTER_TYPE_LONGTEXT "Hardware component used for MMAL conversions. Hardware Video Scaler"\
+        " (default) gives the best result and allows blending, Resizer is slower but uses less memory."
+#endif
+
+static const int pi_converter_modes[] = {
+    FILTER_RESIZER_HVS, FILTER_RESIZER_ISP, FILTER_RESIZER_RESIZER,
+};
+static const char * const  ppsz_converter_text[] = {
+    "Hardware Video Scaler", "ISP", "Resizer"
+};
 
 int OpenConverter(vlc_object_t *);
 void CloseConverter(vlc_object_t *);
@@ -60,8 +72,10 @@ vlc_module_begin()
     set_description(N_("MMAL resizing conversion filter"))
     add_shortcut("mmal_converter")
     set_capability( "video converter", 900 )
-    add_bool(MMAL_RESIZE_NAME, /* default */ false, MMAL_RESIZE_TEXT, MMAL_RESIZE_LONGTEXT, /* advanced option */ false)
-    add_bool(MMAL_ISP_NAME, /* default */ false, MMAL_ISP_TEXT, MMAL_ISP_LONGTEXT, /* advanced option */ false)
+#ifndef NDEBUG
+    add_integer( MMAL_CONVERTER_TYPE_NAME, FILTER_RESIZER_HVS, MMAL_CONVERTER_TYPE_TEXT, MMAL_CONVERTER_TYPE_LONGTEXT, true )
+        change_integer_list( pi_converter_modes, ppsz_converter_text )
+#endif
     set_callbacks(OpenConverter, CloseConverter)
 vlc_module_end()
 
@@ -142,12 +156,6 @@ static void pic_fifo_put(pic_fifo_t * const pf, picture_t * pic)
 }
 
 #define SUBS_MAX 3
-
-typedef enum filter_resizer_e {
-    FILTER_RESIZER_RESIZER,
-    FILTER_RESIZER_ISP,
-    FILTER_RESIZER_HVS,
-} filter_resizer_t;
 
 typedef struct conv_frame_stash_s
 {
@@ -805,15 +813,17 @@ int OpenConverter(vlc_object_t * obj)
         return VLC_EGENERIC;
     const MMAL_FOURCC_T enc_out = vlc_to_mmal_video_fourcc(&p_filter->fmt_out.video);
     const MMAL_FOURCC_T enc_in = filter_enc_in(&p_filter->fmt_in.video);
-    bool use_resizer;
-    bool use_isp;
 
     // At least in principle we should deal with any mmal format as input
     if (enc_in == 0 || enc_out == 0)
         return VLC_EGENERIC;
 
-    use_resizer = var_InheritBool(p_filter, MMAL_RESIZE_NAME);
-    use_isp = var_InheritBool(p_filter, MMAL_ISP_NAME);
+    filter_resizer_t resizer_type =
+#ifdef NDEBUG
+    FILTER_RESIZER_HVS;
+#else // !NDEBUG
+    var_GetInteger(p_filter, MMAL_CONVERTER_TYPE_NAME);
+#endif // !NDEBUG
 
 retry:
     // ** Make more generic by checking supported encs
@@ -821,29 +831,23 @@ retry:
     // Must use ISP - HVS can't do this, nor can resizer
     if (enc_in == MMAL_ENCODING_YUVUV64_10) {
         // If resizer selected then just give up
-        if (use_resizer)
+        if (resizer_type == FILTER_RESIZER_RESIZER)
             return VLC_EGENERIC;
         // otherwise downgrade HVS to ISP
-        use_isp = true;
+        resizer_type = FILTER_RESIZER_ISP;
     }
     // HVS can't do I420
-    if (enc_out == MMAL_ENCODING_I420) {
-        use_isp = true;
+    if (enc_out == MMAL_ENCODING_I420 && resizer_type == FILTER_RESIZER_HVS) {
+        resizer_type = FILTER_RESIZER_ISP;
     }
     // Only HVS can deal with SAND30
     if (enc_in == MMAL_ENCODING_YUV10_COL) {
-        if (use_isp || use_resizer)
+        if (resizer_type != FILTER_RESIZER_HVS)
             return VLC_EGENERIC;
     }
 
-
-    if (use_resizer) {
-        // use resizer overrides use_isp
-        use_isp = false;
-    }
-
     // Check we have a sliced version of the fourcc if we want the resizer
-    if (use_resizer && pic_to_slice_mmal_fourcc(enc_out) == 0) {
+    if (resizer_type == FILTER_RESIZER_RESIZER && pic_to_slice_mmal_fourcc(enc_out) == 0) {
         return VLC_EGENERIC;
     }
 
@@ -891,8 +895,7 @@ retry:
     }
 
     const char *component_name;
-    if (use_resizer) {
-        sys->resizer_type = FILTER_RESIZER_RESIZER;
+    if (resizer_type == FILTER_RESIZER_RESIZER) {
         sys->is_sliced = true;
         sys->out_port_cb_fn = slice_output_port_cb;
         component_name = MMAL_COMPONENT_DEFAULT_RESIZER;
@@ -900,21 +903,19 @@ retry:
     else {
         sys->is_sliced = false;  // Copy directly into filter picture
         sys->out_port_cb_fn = conv_output_port_cb;
-        if (use_isp) {
-            sys->resizer_type = FILTER_RESIZER_ISP;
+        if (resizer_type == FILTER_RESIZER_ISP)
             component_name = MMAL_COMPONENT_ISP_RESIZER;
-        } else {
-            sys->resizer_type = FILTER_RESIZER_HVS;
+        else
             component_name = MMAL_COMPONENT_HVS;
-        }
     }
+    sys->resizer_type = resizer_type;
 
     status = mmal_component_create(component_name, &sys->component);
     if (status != MMAL_SUCCESS) {
-        if (!use_isp && !use_resizer) {
+        if (resizer_type == FILTER_RESIZER_HVS) {
             msg_Warn(p_filter, "Failed to create HVS resizer - retrying with ISP");
             CloseConverter(obj);
-            use_isp = true;
+            resizer_type = FILTER_RESIZER_ISP;
             goto retry;
         }
         msg_Err(p_filter, "Failed to create MMAL component %s (status=%"PRIx32" %s)",
@@ -999,8 +1000,8 @@ retry:
 fail:
     CloseConverter(obj);
 
-    if (!use_resizer && status == MMAL_ENOMEM) {
-        use_resizer = true;
+    if (resizer_type != FILTER_RESIZER_RESIZER && status == MMAL_ENOMEM) {
+        resizer_type = FILTER_RESIZER_RESIZER;
         msg_Warn(p_filter, "Lack of memory to use HVS/ISP: trying resizer");
         goto retry;
     }
