@@ -1340,15 +1340,6 @@ CreateVideoContext(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    p_dec->fmt_out.video = p_dec->fmt_in.video;
-    p_dec->fmt_out.video.p_palette = NULL;
-
-    if (!p_dec->fmt_out.video.i_sar_num || !p_dec->fmt_out.video.i_sar_den)
-    {
-        p_dec->fmt_out.video.i_sar_num = 1;
-        p_dec->fmt_out.video.i_sar_den = 1;
-    }
-
     vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
     if (!dec_dev || dec_dev->type != VLC_DECODER_DEVICE_VIDEOTOOLBOX)
     {
@@ -1426,6 +1417,15 @@ static int OpenDecoder(vlc_object_t *p_this)
         p_sys->i_cvpx_format = ntohl(p_sys->i_cvpx_format);
         p_sys->b_cvpx_format_forced = true;
         free(cvpx_chroma);
+    }
+
+    p_dec->fmt_out.video = p_dec->fmt_in.video;
+    p_dec->fmt_out.video.p_palette = NULL;
+
+    if (!p_dec->fmt_out.video.i_sar_num || !p_dec->fmt_out.video.i_sar_den)
+    {
+        p_dec->fmt_out.video.i_sar_num = 1;
+        p_dec->fmt_out.video.i_sar_den = 1;
     }
 
     i_ret = CreateVideoContext(p_dec);
