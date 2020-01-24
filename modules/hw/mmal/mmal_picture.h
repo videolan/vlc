@@ -123,8 +123,7 @@ MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_copied(const picture_t *const pic,
 
 MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_replicated(const picture_t *const pic, MMAL_POOL_T * const rep_pool);
 
-struct vzc_pool_ctl_s;
-typedef struct vzc_pool_ctl_s vzc_pool_ctl_t;
+//----------------------------------------------------------------------------
 
 // At the moment we cope with any mono-planar RGBA thing
 // We could cope with many other things but they currently don't occur
@@ -134,6 +133,12 @@ bool hw_mmal_vzc_buf_set_format(MMAL_BUFFER_HEADER_T * const buf, MMAL_ES_FORMAT
 MMAL_DISPLAYREGION_T * hw_mmal_vzc_buf_region(MMAL_BUFFER_HEADER_T * const buf);
 void hw_mmal_vzc_buf_scale_dest_rect(MMAL_BUFFER_HEADER_T * const buf, const MMAL_RECT_T * const scale_rect);
 unsigned int hw_mmal_vzc_buf_seq(MMAL_BUFFER_HEADER_T * const buf);
+
+//----------------------------------------------------------------------------
+
+struct vzc_pool_ctl_s;
+typedef struct vzc_pool_ctl_s vzc_pool_ctl_t;
+
 MMAL_BUFFER_HEADER_T * hw_mmal_vzc_buf_from_pic(vzc_pool_ctl_t * const pc, picture_t * const pic,
                                                 const MMAL_RECT_T dst_pic_rect,
                                                 const int x_offset, const int y_offset,
@@ -144,6 +149,8 @@ void hw_mmal_vzc_pool_release(vzc_pool_ctl_t * const pc);
 void hw_mmal_vzc_pool_ref(vzc_pool_ctl_t * const pc);
 vzc_pool_ctl_t * hw_mmal_vzc_pool_new(void);
 
+
+//----------------------------------------------------------------------------
 
 #define NUM_DECODER_BUFFER_HEADERS 30
 
@@ -172,6 +179,8 @@ void CloseConverter(vlc_object_t *);
 #define MMAL_COMPONENT_DEFAULT_RESIZER "vc.ril.resize"
 #define MMAL_COMPONENT_ISP_RESIZER     "vc.ril.isp"
 #define MMAL_COMPONENT_HVS             "vc.ril.hvs"
+
+//----------------------------------------------------------------------------
 
 typedef struct
 {

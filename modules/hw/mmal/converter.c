@@ -135,6 +135,7 @@ typedef struct
         unsigned int line;  // Lines filled
     } slice;
 
+    vlc_decoder_device *dec_dev;
     vcsm_init_type_t vcsm_init_type;
 } converter_sys_t;
 
@@ -701,6 +702,8 @@ void CloseConverter(vlc_object_t * obj)
     if (sys->component)
         mmal_component_release(sys->component);
 
+    if (sys->dec_dev)
+        vlc_decoder_device_Release(sys->dec_dev);
     cma_vcsm_exit(sys->vcsm_init_type);
 
     vlc_sem_destroy(&sys->sem);
@@ -791,6 +794,19 @@ retry:
 
     sys->needs_copy_in = !hw_mmal_chroma_is_mmal(p_filter->fmt_in.video.i_chroma);
     sys->in_port_cb_fn = conv_input_port_cb;
+
+    if (hw_mmal_chroma_is_mmal(p_filter->fmt_in.video.i_chroma))
+    {
+        assert(p_filter->vctx_in);
+        sys->dec_dev = vlc_video_context_HoldDevice(p_filter->vctx_in);
+        assert(sys->dec_dev->type == VLC_DECODER_DEVICE_MMAL);
+    }
+    else
+        sys->dec_dev = filter_HoldDecoderDeviceType(p_filter, VLC_DECODER_DEVICE_MMAL);
+    if (sys->dec_dev == NULL) {
+        msg_Err(p_filter, "missing MMAL decoder device");
+        goto fail;
+    }
 
     if ((sys->vcsm_init_type = cma_vcsm_init()) == VCSM_INIT_NONE) {
         msg_Err(p_filter, "VCSM init failed");
