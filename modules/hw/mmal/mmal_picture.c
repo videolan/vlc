@@ -1207,69 +1207,6 @@ bool rpi_is_model_pi4(void) {
     return bcm_host_is_model_pi4();
 }
 
-// Preferred mode - none->cma on Pi4 otherwise legacy
-static volatile vcsm_init_type_t last_vcsm_type = VCSM_INIT_NONE;
-
-vcsm_init_type_t cma_vcsm_init(void)
-{
-    vcsm_init_type_t rv = VCSM_INIT_NONE;
-    // We don't bother locking - taking a copy here should be good enough
-    vcsm_init_type_t try_type = last_vcsm_type;
-
-    if (try_type == VCSM_INIT_NONE) {
-        if (bcm_host_is_fkms_active())
-            try_type = VCSM_INIT_CMA;
-        else
-            try_type = VCSM_INIT_LEGACY;
-    }
-
-    if (try_type == VCSM_INIT_CMA) {
-        if (vcsm_init_ex(1, -1) == 0)
-            rv = VCSM_INIT_CMA;
-        else if (vcsm_init_ex(0, -1) == 0)
-            rv = VCSM_INIT_LEGACY;
-    }
-    else
-    {
-        if (vcsm_init_ex(0, -1) == 0)
-            rv = VCSM_INIT_LEGACY;
-        else if (vcsm_init_ex(1, -1) == 0)
-            rv = VCSM_INIT_CMA;
-    }
-
-    // Just in case this affects vcsm init do after that
-    if (rv != VCSM_INIT_NONE)
-        bcm_host_init();
-
-    last_vcsm_type = rv;
-    return rv;
-}
-
-void cma_vcsm_exit(const vcsm_init_type_t init_mode)
-{
-    if (init_mode != VCSM_INIT_NONE)
-    {
-        vcsm_exit();
-        bcm_host_deinit();  // Does nothing but add in case it ever does
-    }
-}
-
-const char * cma_vcsm_init_str(const vcsm_init_type_t init_mode)
-{
-    switch (init_mode)
-    {
-        case VCSM_INIT_CMA:
-            return "CMA";
-        case VCSM_INIT_LEGACY:
-            return "Legacy";
-        case VCSM_INIT_NONE:
-            return "none";
-        default:
-            break;
-    }
-    return "???";
-}
-
 MMAL_FOURCC_T pic_to_slice_mmal_fourcc(MMAL_FOURCC_T fcc)
 {
     switch (fcc){
