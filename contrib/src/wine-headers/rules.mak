@@ -1,6 +1,6 @@
 # WINE
-WINE_VERSION := 4.5
-WINE_URL := https://dl.winehq.org/wine/source/4.x/wine-$(WINE_VERSION).tar.xz
+WINE_VERSION := 5.0
+WINE_URL := https://dl.winehq.org/wine/source/5.0/wine-$(WINE_VERSION).tar.xz
 
 ifdef HAVE_WIN32
 PKGS += wine-headers
@@ -29,8 +29,6 @@ $(TARBALLS)/wine-$(WINE_VERSION).tar.xz:
 wine-headers: wine-$(WINE_VERSION).tar.xz .sum-wine-headers
 	$(UNPACK)
 	$(APPLY) $(SRC)/wine-headers/dxva2api.patch
-	$(APPLY) $(SRC)/wine-headers/dxgidebug.patch
-	$(APPLY) $(SRC)/wine-headers/processor_format.patch
 	$(MOVE)
 
 wine_widl = echo "GEN $(1)" && \
