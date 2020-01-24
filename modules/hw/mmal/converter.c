@@ -863,8 +863,11 @@ retry:
         goto fail;
     }
 
+    mmal_decoder_device_t *devsys = GetMMALDeviceOpaque(sys->dec_dev);
+    assert(devsys != NULL);
+
     if (sys->needs_copy_in &&
-        (sys->cma_in_pool = cma_buf_pool_new(2, 2, true, "conv-copy-in")) == NULL)
+        (sys->cma_in_pool = cma_buf_pool_new(2, 2, true, devsys->vcsm_init_type == VCSM_INIT_CMA, "conv-copy-in")) == NULL)
     {
         msg_Err(p_filter, "Failed to allocate input CMA pool");
         goto fail;

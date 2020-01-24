@@ -54,8 +54,9 @@ void cma_buf_pool_delete(cma_buf_pool_t * const p);
 int cma_buf_pool_fill(cma_buf_pool_t * const cbp, const size_t el_size);
 int cma_buf_pool_resize(cma_buf_pool_t * const cbp,
                           const unsigned int new_pool_size, const int new_flight_size);
-cma_buf_pool_t * cma_buf_pool_new(const unsigned int pool_size, const unsigned int flight_size,
-                                  const bool all_in_flight, const char * const name);
+cma_buf_pool_t * cma_buf_pool_new(const unsigned int pool_size,
+                                  const unsigned int flight_size,
+                                  const bool all_in_flight, bool is_cma, const char * const name);
 
 static inline void cma_buf_pool_deletez(cma_buf_pool_t ** const pp)
 {

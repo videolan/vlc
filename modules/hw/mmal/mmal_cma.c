@@ -350,7 +350,7 @@ cma_pool_fixed_new(const unsigned int pool_size,
 
 struct cma_buf_pool_s {
     cma_pool_fixed_t * pool;
-    vcsm_init_type_t init_type;
+    bool is_cma;
 
     bool all_in_flight;
 };
@@ -377,7 +377,7 @@ static void cma_pool_delete(cma_buf_t * const cb)
 
     if (cb->mmap != MAP_FAILED)
     {
-        if (cb->cbp->init_type == VCSM_INIT_CMA)
+        if (cb->cbp->is_cma)
             munmap(cb->mmap, cb->size);
         else
             vcsm_unlock_hdl(cb->vcsm_h);
@@ -421,7 +421,7 @@ static cma_buf_t * cma_pool_alloc_cb(cma_buf_pool_t * const v, size_t size)
         goto fail;
     }
 
-    if (cbp->init_type == VCSM_INIT_CMA)
+    if (cbp->is_cma)
     {
         if ((cb->fd = vcsm_export_dmabuf(cb->vcsm_h)) == -1)
         {
@@ -453,7 +453,6 @@ fail:
 // Pool has died - safe now to exit vcsm
 static void cma_buf_pool_on_delete_cb(cma_buf_pool_t * const cbp)
 {
-    cma_vcsm_exit(cbp->init_type);
     free(cbp);
 }
 
@@ -503,17 +502,14 @@ int cma_buf_pool_resize(cma_buf_pool_t * const cbp,
     return cma_pool_fixed_resize(cbp->pool, new_pool_size, new_flight_size);
 }
 
-cma_buf_pool_t * cma_buf_pool_new(const unsigned int pool_size, const unsigned int flight_size, const bool all_in_flight, const char * const name)
+cma_buf_pool_t * cma_buf_pool_new(const unsigned int pool_size, const unsigned int flight_size, const bool all_in_flight,
+                                  bool is_cma, const char * const name)
 {
-    vcsm_init_type_t const init_type = cma_vcsm_init();
-    if (init_type == VCSM_INIT_NONE)
-        return NULL;
-
     cma_buf_pool_t * const cbp = calloc(1, sizeof(cma_buf_pool_t));
     if (cbp == NULL)
         return NULL;
 
-    cbp->init_type = init_type;
+    cbp->is_cma = is_cma;
     cbp->all_in_flight = all_in_flight;
 
     if ((cbp->pool = cma_pool_fixed_new(pool_size, flight_size, cbp, name)) == NULL)
