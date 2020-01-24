@@ -598,16 +598,25 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TITLE_INFO:
             ppp_title = va_arg( args, input_title_t*** );
-            *va_arg( args, int* ) = p_sys->i_title;
-            *va_arg( args, int* ) = 0; /* Title offset */
-            *va_arg( args, int* ) = 1; /* Chapter offset */
 
             /* Duplicate title infos */
             *ppp_title = vlc_alloc( p_sys->i_title, sizeof( input_title_t * ) );
+            if( !*ppp_title )
+                return VLC_EGENERIC;
             for( i = 0; i < p_sys->i_title; i++ )
             {
                 (*ppp_title)[i] = vlc_input_title_Duplicate( p_sys->title[i] );
+                if(!(*ppp_title)[i])
+                {
+                    while( i )
+                        free( (*ppp_title)[--i] );
+                    free( *ppp_title );
+                    return VLC_EGENERIC;
+                }
             }
+            *va_arg( args, int* ) = p_sys->i_title;
+            *va_arg( args, int* ) = 0; /* Title offset */
+            *va_arg( args, int* ) = 1; /* Chapter offset */
             return VLC_SUCCESS;
 
         case DEMUX_SET_TITLE:
