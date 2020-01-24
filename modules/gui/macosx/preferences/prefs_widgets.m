@@ -40,6 +40,8 @@
 #include "extensions/NSString+Helpers.h"
 #include "preferences/prefs_widgets.h"
 
+NSString *VLCPrefsWidgetModuleDragType = @"VLC media player module";
+
 #define CONFIG_ITEM_STRING_LIST (CONFIG_ITEM_STRING + 10)
 #define CONFIG_ITEM_RANGED_INTEGER (CONFIG_ITEM_INTEGER + 10)
 
@@ -896,11 +898,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     return self.label.frame.size.width;
 }
 
-- (void) alignWithXPosition:(int)i_xPos;
+- (void)alignWithXPosition:(int)i_xPos
 {
-    /* FIXME: not implemented atm, but created to shut up the warning
-     * about "method definition not found" -- FK @ 7/24/05 */
 }
+
 @end
 
 @interface StringConfigControl()
@@ -2056,7 +2057,7 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     [o_tableColumn setDataCell: o_dataCell];
     [o_tableColumn setWidth:s_rc.size.width - 34];
     [o_tableview addTableColumn: o_tableColumn];
-    [o_tableview registerForDraggedTypes:[NSArray arrayWithObject:@"VLC media player module"]];
+    [o_tableview registerForDraggedTypes:@[VLCPrefsWidgetModuleDragType]];
 
     [o_tableview setDataSource:self];
     [o_tableview setTarget: self];
@@ -2141,8 +2142,8 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
 
 - (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-    [pboard declareTypes:@[@"VLC media player module"] owner:nil];
-    [pboard setPropertyList:@[@(rowIndexes.firstIndex)] forType:@"VLC media player module"];
+    [pboard declareTypes:@[VLCPrefsWidgetModuleDragType] owner:nil];
+    [pboard setPropertyList:@[@(rowIndexes.firstIndex)] forType:VLCPrefsWidgetModuleDragType];
     return YES;
 }
 
@@ -2175,7 +2176,7 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
 
     // Intra-table drag - data is the array of rows.
     if (!accepted && (array =
-                      [pb propertyListForType:@"VLC media player module"]) != NULL) {
+                      [pb propertyListForType:VLCPrefsWidgetModuleDragType]) != NULL) {
         NSEnumerator *iter = nil;
         id val;
         // Move the modules
