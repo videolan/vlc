@@ -1210,11 +1210,6 @@ bool rpi_is_model_pi4(void) {
 // Preferred mode - none->cma on Pi4 otherwise legacy
 static volatile vcsm_init_type_t last_vcsm_type = VCSM_INIT_NONE;
 
-vcsm_init_type_t cma_vcsm_type(void)
-{
-    return last_vcsm_type;
-}
-
 vcsm_init_type_t cma_vcsm_init(void)
 {
     vcsm_init_type_t rv = VCSM_INIT_NONE;

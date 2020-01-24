@@ -168,7 +168,6 @@ typedef enum vcsm_init_type_e {
 
 vcsm_init_type_t cma_vcsm_init(void);
 void cma_vcsm_exit(const vcsm_init_type_t init_mode);
-vcsm_init_type_t cma_vcsm_type(void);
 const char * cma_vcsm_init_str(const vcsm_init_type_t init_mode);
 
 #define MMAL_RESIZE_NAME "mmal-resize"
