@@ -51,16 +51,6 @@
 #define ALIGN_16( x ) ( ( ( x ) + 15 ) / 16 * 16 )
 #define VT_RESTART_MAX 1
 
-#if TARGET_OS_IPHONE
-
-/* support iOS SDKs < v9.1 */
-#ifndef CPUFAMILY_ARM_TWISTER
-#define CPUFAMILY_ARM_TWISTER 0x92fb37c8
-#endif
-
-#endif
-
-
 #if (!TARGET_OS_OSX)
 const CFStringRef kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder = CFSTR("EnableHardwareAcceleratedVideoDecoder");
 const CFStringRef kVTVideoDecoderSpecification_RequireHardwareAcceleratedVideoDecoder = CFSTR("RequireHardwareAcceleratedVideoDecoder");
