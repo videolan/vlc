@@ -190,6 +190,23 @@ int main(void)
     assert(es_out_Control(out, ES_OUT_TF_FILTER_GET_TIME, &i_pcrtime) == VLC_SUCCESS);
     assert(i_pcrtime == TIMELINE_0 +600);
 
+    es_format_Init(&fmt, SPU_ES, VLC_FOURCC('S','P','U','0'));
+    fmt.i_id = 2;
+    assert(es_out_Add(out, &fmt) == ESID(2));
+    p_block->i_dts = TIMELINE_1 + 100;
+    es_out_Send(out, ESID(2), p_block);
+    assert(p_block->i_dts == TIMELINE_0 + 700);
+
+    es_out_SetPCR(out, TIMELINE_2 +0);
+    assert(es_out_Control(out, ES_OUT_TF_FILTER_GET_TIME, &i_pcrtime) == VLC_SUCCESS);
+    assert(i_pcrtime == TIMELINE_0 +700);
+    p_block->i_dts = TIMELINE_2 + 300;
+    es_out_Send(out, ESID(2), p_block);
+    assert(p_block->i_dts == TIMELINE_0 + 1000);
+    p_block->i_dts = TIMELINE_2 + 5300;
+    es_out_Send(out, ESID(2), p_block);
+    assert(p_block->i_dts == TIMELINE_0 + 6000);
+
     block_Release(p_block);
     es_out_Delete(out);
     return 0;
