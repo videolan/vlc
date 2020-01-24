@@ -43,6 +43,12 @@ vlc_module_begin()
 vlc_module_end()
 
 
+typedef enum {
+    VCSM_INIT_NONE = 0,
+    VCSM_INIT_LEGACY,
+    VCSM_INIT_CMA
+} vcsm_init_type_t;
+
 // Preferred mode - none->cma on Pi4 otherwise legacy
 static volatile vcsm_init_type_t last_vcsm_type = VCSM_INIT_NONE;
 
@@ -81,13 +87,10 @@ static vcsm_init_type_t cma_vcsm_init(void)
     return rv;
 }
 
-static void cma_vcsm_exit(const vcsm_init_type_t init_mode)
+static void cma_vcsm_exit()
 {
-    if (init_mode != VCSM_INIT_NONE)
-    {
-        vcsm_exit();
-        bcm_host_deinit();  // Does nothing but add in case it ever does
-    }
+    vcsm_exit();
+    bcm_host_deinit();  // Does nothing but add in case it ever does
 }
 
 static const char * cma_vcsm_init_str(const vcsm_init_type_t init_mode)
@@ -98,18 +101,16 @@ static const char * cma_vcsm_init_str(const vcsm_init_type_t init_mode)
             return "CMA";
         case VCSM_INIT_LEGACY:
             return "Legacy";
-        case VCSM_INIT_NONE:
-            return "none";
         default:
-            break;
+            vlc_assert_unreachable();
+            return NULL;
     }
-    return "???";
 }
 
 static void CloseDecoderDevice(vlc_decoder_device *device)
 {
-    mmal_decoder_device_t *sys = device->opaque;
-    cma_vcsm_exit(sys->vcsm_init_type);
+    VLC_UNUSED(device);
+    cma_vcsm_exit();
 }
 
 static const struct vlc_decoder_device_operations mmal_device_ops = {

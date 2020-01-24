@@ -160,12 +160,6 @@ MMAL_FOURCC_T pic_to_slice_mmal_fourcc(MMAL_FOURCC_T);
 
 bool rpi_is_model_pi4(void);
 
-typedef enum vcsm_init_type_e {
-    VCSM_INIT_NONE = 0,
-    VCSM_INIT_LEGACY,
-    VCSM_INIT_CMA
-} vcsm_init_type_t;
-
 #define MMAL_RESIZE_NAME "mmal-resize"
 #define MMAL_ISP_NAME    "mmal-isp"
 
@@ -181,7 +175,7 @@ void CloseConverter(vlc_object_t *);
 
 typedef struct
 {
-    vcsm_init_type_t vcsm_init_type;
+    bool is_cma; // legacy MMAL mode otherwise
 } mmal_decoder_device_t;
 
 static inline mmal_decoder_device_t *GetMMALDeviceOpaque(vlc_decoder_device *dec_dev)

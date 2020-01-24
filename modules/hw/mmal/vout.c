@@ -771,7 +771,7 @@ static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const 
 
     if (sys->vzc == NULL) {
         mmal_decoder_device_t *devsys = GetMMALDeviceOpaque(sys->dec_dev);
-        if ((sys->vzc = hw_mmal_vzc_pool_new(devsys->vcsm_init_type == VCSM_INIT_CMA)) == NULL)
+        if ((sys->vzc = hw_mmal_vzc_pool_new(devsys->is_cma)) == NULL)
         {
             msg_Err(vd, "Failed to allocate VZC");
             return VLC_ENOMEM;
@@ -846,7 +846,7 @@ static void vd_prepare(vout_display_t *vd, picture_t *p_pic,
         // Copy 2d
         mmal_decoder_device_t *devsys = GetMMALDeviceOpaque(sys->dec_dev);
         hw_mmal_copy_pic_to_buf(buf->data, &buf->length, sys->input->format, p_pic,
-                                devsys->vcsm_init_type == VCSM_INIT_CMA);
+                                devsys->is_cma);
         buf->flags = MMAL_BUFFER_HEADER_FLAG_FRAME_END;
 
         sys->copy_buf = buf;

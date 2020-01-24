@@ -618,7 +618,7 @@ static picture_t *conv_filter(filter_t *p_filter, picture_t *p_pic)
         mmal_decoder_device_t *devsys = GetMMALDeviceOpaque(sys->dec_dev);
         MMAL_BUFFER_HEADER_T *const pic_buf = sys->needs_copy_in ?
             hw_mmal_pic_buf_copied(p_pic, sys->in_pool, sys->input, sys->cma_in_pool,
-                                   devsys->vcsm_init_type == VCSM_INIT_CMA) :
+                                   devsys->is_cma) :
             hw_mmal_pic_buf_replicated(p_pic, sys->in_pool);
 
         // Whether or not we extracted the pic_buf we are done with the picture
@@ -878,7 +878,7 @@ retry:
     assert(devsys != NULL);
 
     if (sys->needs_copy_in &&
-        (sys->cma_in_pool = cma_buf_pool_new(2, 2, devsys->vcsm_init_type == VCSM_INIT_CMA, "conv-copy-in")) == NULL)
+        (sys->cma_in_pool = cma_buf_pool_new(2, 2, devsys->is_cma, "conv-copy-in")) == NULL)
     {
         msg_Err(p_filter, "Failed to allocate input CMA pool");
         goto fail;
