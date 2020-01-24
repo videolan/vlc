@@ -2101,7 +2101,6 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
             return -1;
     }
 
-    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     if (decoder_UpdateVideoOutput(p_dec, p_sys->vctx) != 0)
     {
         p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
