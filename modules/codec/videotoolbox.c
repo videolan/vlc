@@ -1509,7 +1509,7 @@ static Boolean deviceSupportsHEVC()
     if (__builtin_available(macOS 10.13, iOS 11.0, tvOS 11.0, *))
         return VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC);
     else
-        return FALSE;
+        return false;
 }
 
 static Boolean deviceSupportsAdvancedProfiles()
@@ -1523,10 +1523,10 @@ static Boolean deviceSupportsAdvancedProfiles()
 
     /* Support for H264 profile HIGH 10 was introduced with the first 64bit Apple ARM SoC, the A7 */
     if (type == CPU_TYPE_ARM64)
-        return TRUE;
+        return true;
 
 #endif
-    return FALSE;
+    return false;
 }
 
 static Boolean deviceSupportsAdvancedLevels()
@@ -1541,16 +1541,16 @@ static Boolean deviceSupportsAdvancedLevels()
         /* Proper 4K decoding requires a Twister SoC
          * Everything below will kill the decoder daemon */
         if (cpufamily == CPUFAMILY_ARM_CYCLONE || cpufamily == CPUFAMILY_ARM_TYPHOON) {
-            return FALSE;
+            return false;
         }
 
-        return TRUE;
+        return true;
     #else
         /* we need a 64bit SoC for advanced levels */
-        return FALSE;
+        return false;
     #endif
 #else
-    return TRUE;
+    return true;
 #endif
 }
 
@@ -1683,7 +1683,7 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
     if (!status) {
         status = CMSampleBufferCreate(kCFAllocatorDefault,  // allocator
                                       block_buf,            // dataBuffer
-                                      TRUE,                 // dataReady
+                                      true,                 // dataReady
                                       0,                    // makeDataReadyCallback
                                       0,                    // makeDataReadyRefcon
                                       fmt_desc,             // formatDescription
@@ -2053,25 +2053,25 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
         case kCVPixelFormatType_422YpCbCr8:
         case 'yuv2':
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_UYVY;
-            assert(CVPixelBufferIsPlanar(imageBuffer) == FALSE);
+            assert(CVPixelBufferIsPlanar(imageBuffer) == false);
             break;
         case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
         case kCVPixelFormatType_420YpCbCr8BiPlanarFullRange:
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_NV12;
-            assert(CVPixelBufferIsPlanar(imageBuffer) == TRUE);
+            assert(CVPixelBufferIsPlanar(imageBuffer) == true);
             break;
         case 'xf20': /* kCVPixelFormatType_420YpCbCr10BiPlanarFullRange */
         case 'x420': /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_P010;
-            assert(CVPixelBufferIsPlanar(imageBuffer) == TRUE);
+            assert(CVPixelBufferIsPlanar(imageBuffer) == true);
             break;
         case kCVPixelFormatType_420YpCbCr8Planar:
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_I420;
-            assert(CVPixelBufferIsPlanar(imageBuffer) == TRUE);
+            assert(CVPixelBufferIsPlanar(imageBuffer) == true);
             break;
         case kCVPixelFormatType_32BGRA:
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_BGRA;
-            assert(CVPixelBufferIsPlanar(imageBuffer) == FALSE);
+            assert(CVPixelBufferIsPlanar(imageBuffer) == false);
             break;
         default:
             p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
