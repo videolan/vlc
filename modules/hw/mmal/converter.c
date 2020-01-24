@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_codec.h>
 #include <vlc_filter.h>
+#include <vlc_plugin.h>
 
 #include <interface/mmal/mmal.h>
 #include <interface/mmal/util/mmal_util.h>
@@ -40,9 +41,66 @@
 
 #include "subpic.h"
 
+#define MMAL_RESIZE_NAME "mmal-resize"
+#define MMAL_RESIZE_TEXT N_("Use mmal resizer rather than hvs.")
+#define MMAL_RESIZE_LONGTEXT N_("Use mmal resizer rather than isp. This uses less gpu memory than the ISP but is slower.")
+
+#define MMAL_ISP_NAME    "mmal-isp"
+#define MMAL_ISP_TEXT N_("Use mmal isp rather than hvs.")
+#define MMAL_ISP_LONGTEXT N_("Use mmal isp rather than Hardware Video Scaler. This may be faster but has no blend.")
+
+int OpenConverter(vlc_object_t *);
+void CloseConverter(vlc_object_t *);
+
+vlc_module_begin()
+    add_submodule()
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
+    set_shortname(N_("MMAL resizer"))
+    set_description(N_("MMAL resizing conversion filter"))
+    add_shortcut("mmal_converter")
+    set_capability( "video converter", 900 )
+    add_bool(MMAL_RESIZE_NAME, /* default */ false, MMAL_RESIZE_TEXT, MMAL_RESIZE_LONGTEXT, /* advanced option */ false)
+    add_bool(MMAL_ISP_NAME, /* default */ false, MMAL_ISP_TEXT, MMAL_ISP_LONGTEXT, /* advanced option */ false)
+    set_callbacks(OpenConverter, CloseConverter)
+vlc_module_end()
+
 #define MMAL_SLICE_HEIGHT 16
 
 #define CONV_MAX_LATENCY 1  // In frames
+
+static MMAL_FOURCC_T pic_to_slice_mmal_fourcc(MMAL_FOURCC_T fcc)
+{
+    switch (fcc){
+    case MMAL_ENCODING_I420:
+        return MMAL_ENCODING_I420_SLICE;
+    case MMAL_ENCODING_I422:
+        return MMAL_ENCODING_I422_SLICE;
+    case MMAL_ENCODING_ARGB:
+        return MMAL_ENCODING_ARGB_SLICE;
+    case MMAL_ENCODING_RGBA:
+        return MMAL_ENCODING_RGBA_SLICE;
+    case MMAL_ENCODING_ABGR:
+        return MMAL_ENCODING_ABGR_SLICE;
+    case MMAL_ENCODING_BGRA:
+        return MMAL_ENCODING_BGRA_SLICE;
+    case MMAL_ENCODING_RGB16:
+        return MMAL_ENCODING_RGB16_SLICE;
+    case MMAL_ENCODING_RGB24:
+        return MMAL_ENCODING_RGB24_SLICE;
+    case MMAL_ENCODING_RGB32:
+        return MMAL_ENCODING_RGB32_SLICE;
+    case MMAL_ENCODING_BGR16:
+        return MMAL_ENCODING_BGR16_SLICE;
+    case MMAL_ENCODING_BGR24:
+        return MMAL_ENCODING_BGR24_SLICE;
+    case MMAL_ENCODING_BGR32:
+        return MMAL_ENCODING_BGR32_SLICE;
+    default:
+        break;
+    }
+    return 0;
+}
 
 typedef struct pic_fifo_s {
     picture_t * head;

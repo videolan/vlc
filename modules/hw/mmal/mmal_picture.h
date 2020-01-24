@@ -156,15 +156,7 @@ vzc_pool_ctl_t * hw_mmal_vzc_pool_new(bool is_cma);
 
 #define NUM_DECODER_BUFFER_HEADERS 30
 
-MMAL_FOURCC_T pic_to_slice_mmal_fourcc(MMAL_FOURCC_T);
-
 bool rpi_is_model_pi4(void);
-
-#define MMAL_RESIZE_NAME "mmal-resize"
-#define MMAL_ISP_NAME    "mmal-isp"
-
-int OpenConverter(vlc_object_t *);
-void CloseConverter(vlc_object_t *);
 
 
 #define MMAL_COMPONENT_DEFAULT_RESIZER "vc.ril.resize"

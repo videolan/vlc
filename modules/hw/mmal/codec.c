@@ -31,7 +31,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
-#include <vlc_filter.h>
 
 #include <interface/mmal/mmal.h>
 #include <interface/mmal/util/mmal_util.h>
@@ -45,12 +44,6 @@
 #define NUM_EXTRA_BUFFERS 5
 //#define NUM_EXTRA_BUFFERS 10
 
-#define MMAL_RESIZE_TEXT N_("Use mmal resizer rather than hvs.")
-#define MMAL_RESIZE_LONGTEXT N_("Use mmal resizer rather than isp. This uses less gpu memory than the ISP but is slower.")
-
-#define MMAL_ISP_TEXT N_("Use mmal isp rather than hvs.")
-#define MMAL_ISP_LONGTEXT N_("Use mmal isp rather than Hardware Video Scaler. This may be faster but has no blend.")
-
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
@@ -63,17 +56,6 @@ vlc_module_begin()
     add_shortcut("mmal_decoder")
     add_obsolete_bool("mmal-opaque")
     set_callbacks(OpenDecoder, CloseDecoder)
-
-    add_submodule()
-    set_category( CAT_VIDEO )
-    set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_shortname(N_("MMAL resizer"))
-    set_description(N_("MMAL resizing conversion filter"))
-    add_shortcut("mmal_converter")
-    set_capability( "video converter", 900 )
-    add_bool(MMAL_RESIZE_NAME, /* default */ false, MMAL_RESIZE_TEXT, MMAL_RESIZE_LONGTEXT, /* advanced option */ false)
-    add_bool(MMAL_ISP_NAME, /* default */ false, MMAL_ISP_TEXT, MMAL_ISP_LONGTEXT, /* advanced option */ false)
-    set_callbacks(OpenConverter, CloseConverter)
 vlc_module_end()
 
 typedef struct
