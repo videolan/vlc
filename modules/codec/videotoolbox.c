@@ -396,7 +396,7 @@ static CFMutableDictionaryRef GetDecoderExtradataH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    CFMutableDictionaryRef extradata = nil;
+    CFMutableDictionaryRef extradata = NULL;
     if (p_dec->fmt_in.i_extra && p_sys->hh.b_is_xvcC)
     {
         /* copy DecoderConfiguration */
@@ -545,7 +545,7 @@ static bool VideoToolboxNeedsToRestartH264(decoder_t *p_dec,
 
     CFMutableDictionaryRef decoderConfiguration =
             CreateSessionDescriptionFormat(p_dec, sarn, sard);
-    if (decoderConfiguration != nil)
+    if (decoderConfiguration != NULL)
     {
         CMFormatDescriptionRef newvideoFormatDesc;
         /* create new video format description */
@@ -746,7 +746,7 @@ static CFMutableDictionaryRef GetDecoderExtradataHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    CFMutableDictionaryRef extradata = nil;
+    CFMutableDictionaryRef extradata = NULL;
     if (p_dec->fmt_in.i_extra && p_sys->hh.b_is_xvcC)
     {
         /* copy DecoderConfiguration */
@@ -797,7 +797,7 @@ static CFMutableDictionaryRef GetDecoderExtradataMPEG4(decoder_t *p_dec)
         return ESDSExtradataInfoCreate(p_dec, p_dec->fmt_in.p_extra,
                                               p_dec->fmt_in.i_extra);
     else
-        return nil; /* MPEG4 without esds ? */
+        return NULL; /* MPEG4 without esds ? */
 }
 
 static CFMutableDictionaryRef GetDecoderExtradataDefault(decoder_t *p_dec)
@@ -1084,10 +1084,10 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
 
     CFMutableDictionaryRef decoderConfiguration = cfdict_create(0);
     if (decoderConfiguration == NULL)
-        return nil;
+        return NULL;
 
     CFMutableDictionaryRef extradata = p_sys->pf_get_extradata
-                                     ? p_sys->pf_get_extradata(p_dec) : nil;
+                                     ? p_sys->pf_get_extradata(p_dec) : NULL;
     if(extradata)
     {
         /* then decoder will also fail if required, no need to handle it */
@@ -1111,7 +1111,7 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
         if(pixelaspectratio == NULL)
         {
             CFRelease(decoderConfiguration);
-            return nil;
+            return NULL;
         }
 
         cfdict_set_int32(pixelaspectratio,
@@ -1199,14 +1199,14 @@ static int StartVideoToolbox(decoder_t *p_dec)
 
     /* destination pixel buffer attributes */
     CFMutableDictionaryRef destinationPixelBufferAttributes = cfdict_create(0);
-    if(destinationPixelBufferAttributes == nil)
+    if(destinationPixelBufferAttributes == NULL)
         return VLC_EGENERIC;
 
     CFMutableDictionaryRef decoderConfiguration =
         CreateSessionDescriptionFormat(p_dec,
                                        p_dec->fmt_out.video.i_sar_num,
                                        p_dec->fmt_out.video.i_sar_den);
-    if(decoderConfiguration == nil)
+    if(decoderConfiguration == NULL)
     {
         CFRelease(destinationPixelBufferAttributes);
         return VLC_EGENERIC;
@@ -1279,13 +1279,13 @@ static void StopVideoToolbox(decoder_t *p_dec, bool closing)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if (p_sys->session != nil)
+    if (p_sys->session != NULL)
     {
         Drain(p_dec, true);
 
         VTDecompressionSessionInvalidate(p_sys->session);
         CFRelease(p_sys->session);
-        p_sys->session = nil;
+        p_sys->session = NULL;
 
 #if TARGET_OS_IPHONE
         /* In case of 4K 10bits (BGRA), we can easily reach the device max
@@ -1310,9 +1310,9 @@ static void StopVideoToolbox(decoder_t *p_dec, bool closing)
         p_dec->fmt_out.i_codec = 0;
     }
 
-    if (p_sys->videoFormatDescription != nil) {
+    if (p_sys->videoFormatDescription != NULL) {
         CFRelease(p_sys->videoFormatDescription);
-        p_sys->videoFormatDescription = nil;
+        p_sys->videoFormatDescription = NULL;
     }
     p_sys->b_vt_feed = false;
     p_sys->b_drop_blocks = false;
@@ -1397,9 +1397,9 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (!p_sys)
         return VLC_ENOMEM;
     p_dec->p_sys = p_sys;
-    p_sys->session = nil;
+    p_sys->session = NULL;
     p_sys->codec = codec;
-    p_sys->videoFormatDescription = nil;
+    p_sys->videoFormatDescription = NULL;
     p_sys->i_pic_reorder_max = 4;
     p_sys->vtsession_status = VTSESSION_STATUS_OK;
     p_sys->b_cvpx_format_forced = false;
@@ -1593,7 +1593,7 @@ static CFMutableDictionaryRef ESDSExtradataInfoCreate(decoder_t *p_dec,
     bo_t bo;
     bool status = bo_init(&bo, 1024);
     if (status != true)
-        return nil;
+        return NULL;
 
     bo_add_8(&bo, 0);       // Version
     bo_add_24be(&bo, 0);    // Flags
@@ -1653,17 +1653,17 @@ static CFMutableDictionaryRef ExtradataInfoCreate(CFStringRef name,
                                                   void *p_data, size_t i_data)
 {
     CFMutableDictionaryRef extradataInfo = cfdict_create(1);
-    if (extradataInfo == nil)
-        return nil;
+    if (extradataInfo == NULL)
+        return NULL;
 
     if (p_data == NULL)
-        return nil;
+        return NULL;
 
     CFDataRef extradata = CFDataCreate(kCFAllocatorDefault, p_data, i_data);
-    if (extradata == nil)
+    if (extradata == NULL)
     {
         CFRelease(extradataInfo);
-        return nil;
+        return NULL;
     }
     CFDictionarySetValue(extradataInfo, name, extradata);
     CFRelease(extradata);
@@ -1718,9 +1718,9 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
     } else
         msg_Warn(p_dec, "cm block buffer creation failure %i", (int)status);
 
-    if (block_buf != nil)
+    if (block_buf != NULL)
         CFRelease(block_buf);
-    block_buf = nil;
+    block_buf = NULL;
 
     return sample_buf;
 }
@@ -1863,7 +1863,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
             p_sys->i_cvpx_format = kCVPixelFormatType_420YpCbCr8Planar;
             msg_Warn(p_dec, "Interlaced content: forcing VT to output I420");
-            if (p_sys->session != nil && p_sys->vtsession_status == VTSESSION_STATUS_OK)
+            if (p_sys->session != NULL && p_sys->vtsession_status == VTSESSION_STATUS_OK)
             {
                 msg_Warn(p_dec, "restarting vt session (color changed)");
                 vlc_mutex_unlock(&p_sys->lock);
