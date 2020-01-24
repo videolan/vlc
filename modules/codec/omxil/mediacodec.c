@@ -624,15 +624,6 @@ CreateVideoContext(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    /* If MediaCodec can handle the rotation, reset the orientation to
-     * Normal in order to ask the vout not to rotate. */
-    if (p_sys->video.i_angle != 0)
-    {
-        assert(p_dec->fmt_out.i_codec == VLC_CODEC_ANDROID_OPAQUE);
-        p_dec->fmt_out.video.orientation = p_dec->fmt_in.video.orientation;
-        video_format_TransformTo(&p_dec->fmt_out.video, ORIENT_NORMAL);
-    }
-
     vlc_decoder_device *dec_dev = decoder_GetDecoderDevice(p_dec);
     if (!dec_dev || dec_dev->type != VLC_DECODER_DEVICE_AWINDOW)
     {
@@ -652,7 +643,7 @@ CreateVideoContext(decoder_t *p_dec)
      * to modify its layout, or if there is no external subtitle surfaces. */
 
     if (p_dec->fmt_out.video.projection_mode != PROJECTION_MODE_RECTANGULAR
-     || p_dec->fmt_out.video.orientation != ORIENT_NORMAL
+     || (!p_sys->api.b_support_rotation && p_dec->fmt_out.video.orientation != ORIENT_NORMAL)
      || !AWindowHandler_canSetVideoLayout(awh)
      || !has_subtitle_surface)
         id = AWindow_SurfaceTexture;
@@ -1183,6 +1174,15 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
                 p_sys->video.i_mpeg_dar_num * p_dec->fmt_out.video.i_height;
             p_dec->fmt_out.video.i_sar_den =
                 p_sys->video.i_mpeg_dar_den * p_dec->fmt_out.video.i_width;
+        }
+
+        /* If MediaCodec can handle the rotation, reset the orientation to
+         * Normal in order to ask the vout not to rotate. */
+        if (p_sys->video.i_angle != 0)
+        {
+            assert(p_dec->fmt_out.i_codec == VLC_CODEC_ANDROID_OPAQUE);
+            p_dec->fmt_out.video.orientation = p_dec->fmt_in.video.orientation;
+            video_format_TransformTo(&p_dec->fmt_out.video, ORIENT_NORMAL);
         }
 
         if (decoder_UpdateVideoOutput(p_dec, p_sys->video.ctx) != 0)
