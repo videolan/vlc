@@ -615,8 +615,10 @@ static picture_t *conv_filter(filter_t *p_filter, picture_t *p_pic)
     // We assume the BH is already set up with values reflecting pic date etc.
     stash->pts = p_pic->date;
     {
+        mmal_decoder_device_t *devsys = GetMMALDeviceOpaque(sys->dec_dev);
         MMAL_BUFFER_HEADER_T *const pic_buf = sys->needs_copy_in ?
-            hw_mmal_pic_buf_copied(p_pic, sys->in_pool, sys->input, sys->cma_in_pool) :
+            hw_mmal_pic_buf_copied(p_pic, sys->in_pool, sys->input, sys->cma_in_pool,
+                                   devsys->vcsm_init_type == VCSM_INIT_CMA) :
             hw_mmal_pic_buf_replicated(p_pic, sys->in_pool);
 
         // Whether or not we extracted the pic_buf we are done with the picture

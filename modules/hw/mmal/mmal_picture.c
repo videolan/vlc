@@ -453,7 +453,8 @@ static void mem_copy_2d_10_to_8(uint8_t * d_ptr, const size_t d_stride,
 int hw_mmal_copy_pic_to_buf(void * const buf_data,
                             uint32_t * const pLength,
                             const MMAL_ES_FORMAT_T * const fmt,
-                            const picture_t * const pic)
+                            const picture_t * const pic,
+                            bool is_cma)
 {
     const MMAL_VIDEO_FORMAT_T *const video = &fmt->es->video;
     uint8_t * const dest = buf_data;
@@ -518,7 +519,7 @@ int hw_mmal_copy_pic_to_buf(void * const buf_data,
             return VLC_EBADVAR;
     }
 
-    if (cma_vcsm_type() == VCSM_INIT_LEGACY) {  // ** CMA is currently always uncached
+    if (!is_cma) {  // ** CMA is currently always uncached
         flush_range(dest, length);
     }
 
@@ -583,7 +584,8 @@ static int cma_buf_buf_attach(MMAL_BUFFER_HEADER_T * const buf, cma_buf_t * cons
 MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_copied(const picture_t *const pic,
                                               MMAL_POOL_T * const rep_pool,
                                               MMAL_PORT_T * const port,
-                                              cma_buf_pool_t * const cbp)
+                                              cma_buf_pool_t * const cbp,
+                                              bool is_cma)
 {
     MMAL_BUFFER_HEADER_T *const buf = mmal_queue_wait(rep_pool->queue);
     if (buf == NULL)
@@ -598,7 +600,7 @@ MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_copied(const picture_t *const pic,
 
     pic_to_buf_copy_props(buf, pic);
 
-    if (hw_mmal_copy_pic_to_buf(cma_buf_addr(cb), &buf->length, port->format, pic) != VLC_SUCCESS)
+    if (hw_mmal_copy_pic_to_buf(cma_buf_addr(cb), &buf->length, port->format, pic, is_cma) != VLC_SUCCESS)
         goto fail2;
     buf->flags = MMAL_BUFFER_HEADER_FLAG_FRAME_END;
 

@@ -54,7 +54,8 @@ bool hw_mmal_vlc_pic_to_mmal_fmt_update(MMAL_ES_FORMAT_T *const es_fmt, const pi
 
 // Copy pic contents into an existing buffer
 int hw_mmal_copy_pic_to_buf(void * const buf_data, uint32_t * const pLength,
-                            const MMAL_ES_FORMAT_T * const fmt, const picture_t * const pic);
+                            const MMAL_ES_FORMAT_T * const fmt, const picture_t * const pic,
+                            bool is_cma);
 
 //----------------------------------------------------------------------------
 
@@ -119,7 +120,8 @@ static inline void buf_to_pic_copy_props(picture_t * const pic, const MMAL_BUFFE
 MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_copied(const picture_t *const pic,
                                               MMAL_POOL_T * const rep_pool,
                                               MMAL_PORT_T * const port,
-                                              cma_buf_pool_t * const cbp);
+                                              cma_buf_pool_t * const cbp,
+                                              bool is_cma);
 
 MMAL_BUFFER_HEADER_T * hw_mmal_pic_buf_replicated(const picture_t *const pic, MMAL_POOL_T * const rep_pool);
 

@@ -844,7 +844,9 @@ static void vd_prepare(vout_display_t *vd, picture_t *p_pic,
 
         MMAL_BUFFER_HEADER_T * const buf = mmal_queue_wait(sys->copy_pool->queue);
         // Copy 2d
-        hw_mmal_copy_pic_to_buf(buf->data, &buf->length, sys->input->format, p_pic);
+        mmal_decoder_device_t *devsys = GetMMALDeviceOpaque(sys->dec_dev);
+        hw_mmal_copy_pic_to_buf(buf->data, &buf->length, sys->input->format, p_pic,
+                                devsys->vcsm_init_type == VCSM_INIT_CMA);
         buf->flags = MMAL_BUFFER_HEADER_FLAG_FRAME_END;
 
         sys->copy_buf = buf;
