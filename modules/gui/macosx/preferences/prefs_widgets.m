@@ -2139,19 +2139,10 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
 
 @implementation ModuleListConfigControl (NSTableDataSource)
 
-- (BOOL)tableView:(NSTableView*)table writeRows:(NSArray*)rows
-     toPasteboard:(NSPasteboard*)pb
+- (BOOL)tableView:(NSTableView *)tableView writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard *)pboard
 {
-    // We only want to allow dragging of selected rows.
-    NSEnumerator    *iter = [rows objectEnumerator];
-    NSNumber        *row;
-    while ((row = [iter nextObject]) != nil) {
-        if (![table isRowSelected:[row intValue]])
-            return NO;
-    }
-
-    [pb declareTypes:[NSArray arrayWithObject:@"VLC media player module"] owner:nil];
-    [pb setPropertyList:rows forType:@"VLC media player module"];
+    [pboard declareTypes:@[@"VLC media player module"] owner:nil];
+    [pboard setPropertyList:@[@(rowIndexes.firstIndex)] forType:@"VLC media player module"];
     return YES;
 }
 
