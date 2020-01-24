@@ -266,7 +266,7 @@ static int timestamps_filter_es_out_Send(es_out_t *out, es_out_id_t *id, block_t
     }
     else /* PCR had discontinuity, we're in a new segment */
     {
-        if(cur->tf.mva.i_packet == 1)
+        if(cur->tf.mva.i_packet == 1 || !cur->contiguous)
         {
           cur->tf.sync.stream = p_sys->pcrtf.sync.stream;
           cur->tf.sync.contiguous = p_sys->pcrtf.sync.contiguous;
