@@ -147,7 +147,7 @@ MMAL_BUFFER_HEADER_T * hw_mmal_vzc_buf_from_pic(vzc_pool_ctl_t * const pc, pictu
 void hw_mmal_vzc_pool_flush(vzc_pool_ctl_t * const pc);
 void hw_mmal_vzc_pool_release(vzc_pool_ctl_t * const pc);
 void hw_mmal_vzc_pool_ref(vzc_pool_ctl_t * const pc);
-vzc_pool_ctl_t * hw_mmal_vzc_pool_new(void);
+vzc_pool_ctl_t * hw_mmal_vzc_pool_new(bool is_cma);
 
 
 //----------------------------------------------------------------------------

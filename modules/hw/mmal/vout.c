@@ -770,7 +770,8 @@ static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const 
     unsigned int n = 0;
 
     if (sys->vzc == NULL) {
-        if ((sys->vzc = hw_mmal_vzc_pool_new()) == NULL)
+        mmal_decoder_device_t *devsys = GetMMALDeviceOpaque(sys->dec_dev);
+        if ((sys->vzc = hw_mmal_vzc_pool_new(devsys->vcsm_init_type == VCSM_INIT_CMA)) == NULL)
         {
             msg_Err(vd, "Failed to allocate VZC");
             return VLC_ENOMEM;
