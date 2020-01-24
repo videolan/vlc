@@ -41,7 +41,7 @@ extern NSString *VLCLibraryCellIdentifier;
 @property (readwrite, assign) IBOutlet NSButton *addToPlaylistButton;
 @property (readwrite, assign) IBOutlet VLCLinearProgressIndicator *progressIndicator;
 
-@property (readwrite, assign, nonatomic) VLCMediaLibraryMediaItem *representedMediaItem;
+@property (readwrite, retain, nonatomic) VLCMediaLibraryMediaItem *representedMediaItem;
 
 - (IBAction)playInstantly:(id)sender;
 - (IBAction)addToPlaylist:(id)sender;
