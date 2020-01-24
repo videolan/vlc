@@ -180,7 +180,6 @@ typedef struct
     bool needs_copy_in;
     bool is_sliced;
     bool out_fmt_set;
-    const char * component_name;
     MMAL_PORT_BH_CB_T in_port_cb_fn;
     MMAL_PORT_BH_CB_T out_port_cb_fn;
 
@@ -891,34 +890,35 @@ retry:
         }
     }
 
+    const char *component_name;
     if (use_resizer) {
         sys->resizer_type = FILTER_RESIZER_RESIZER;
         sys->is_sliced = true;
-        sys->component_name = MMAL_COMPONENT_DEFAULT_RESIZER;
         sys->out_port_cb_fn = slice_output_port_cb;
+        component_name = MMAL_COMPONENT_DEFAULT_RESIZER;
     }
-    else if (use_isp) {
-        sys->resizer_type = FILTER_RESIZER_ISP;
+    else {
         sys->is_sliced = false;  // Copy directly into filter picture
-        sys->component_name = MMAL_COMPONENT_ISP_RESIZER;
         sys->out_port_cb_fn = conv_output_port_cb;
-    } else {
-        sys->resizer_type = FILTER_RESIZER_HVS;
-        sys->is_sliced = false;  // Copy directly into filter picture
-        sys->component_name = MMAL_COMPONENT_HVS;
-        sys->out_port_cb_fn = conv_output_port_cb;
+        if (use_isp) {
+            sys->resizer_type = FILTER_RESIZER_ISP;
+            component_name = MMAL_COMPONENT_ISP_RESIZER;
+        } else {
+            sys->resizer_type = FILTER_RESIZER_HVS;
+            component_name = MMAL_COMPONENT_HVS;
+        }
     }
 
-    status = mmal_component_create(sys->component_name, &sys->component);
+    status = mmal_component_create(component_name, &sys->component);
     if (status != MMAL_SUCCESS) {
         if (!use_isp && !use_resizer) {
-            msg_Warn(p_filter, "Failed to rcreate HVS resizer - retrying with ISP");
+            msg_Warn(p_filter, "Failed to create HVS resizer - retrying with ISP");
             CloseConverter(obj);
             use_isp = true;
             goto retry;
         }
         msg_Err(p_filter, "Failed to create MMAL component %s (status=%"PRIx32" %s)",
-                sys->component_name, status, mmal_status_to_string(status));
+                component_name, status, mmal_status_to_string(status));
         goto fail;
     }
     sys->output = sys->component->output[0];
