@@ -25,12 +25,14 @@
 #import "main/VLCMain.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryInformationPanel.h"
 
 #import "extensions/NSString+Helpers.h"
 
 @interface VLCLibraryMenuController ()
 {
     NSMenu *_libraryMenu;
+    VLCLibraryInformationPanel *_informationPanel;
 }
 @end
 
@@ -57,9 +59,11 @@
     revealItem.target = self;
     NSMenuItem *deleteItem = [[NSMenuItem alloc] initWithTitle:_NS("Delete from Library") action:@selector(moveToTrash:) keyEquivalent:@""];
     deleteItem.target = self;
+    NSMenuItem *informationItem = [[NSMenuItem alloc] initWithTitle:_NS("Information...") action:@selector(showInformation:) keyEquivalent:@""];
+    informationItem.target = self;
 
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
-    _libraryMenu.itemArray = @[playItem, appendItem, revealItem, deleteItem, [NSMenuItem separatorItem], addItem];
+    _libraryMenu.itemArray = @[playItem, appendItem, revealItem, deleteItem, informationItem, [NSMenuItem separatorItem], addItem];
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
@@ -114,6 +118,16 @@
         VLCMediaLibraryFile *fileToTrash = filesToTrash[x];
         [fileManager trashItemAtURL:fileToTrash.fileURL resultingItemURL:nil error:nil];
     }
+}
+
+- (void)showInformation:(id)sender
+{
+    if (!_informationPanel) {
+        _informationPanel = [[VLCLibraryInformationPanel alloc] initWithWindowNibName:@"VLCLibraryInformationPanel"];
+    }
+
+    [_informationPanel setRepresentedMediaItem:self.representedMediaItem];
+    [_informationPanel showWindow:self];
 }
 
 @end

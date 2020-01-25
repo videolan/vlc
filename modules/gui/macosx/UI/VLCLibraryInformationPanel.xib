@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryInformationPanel">
+            <connections>
+                <outlet property="imageView" destination="N4h-LP-IRY" id="Ned-Ju-hyu"/>
+                <outlet property="multiLineTextLabel" destination="OhC-hA-R2H" id="Q6T-Ol-Gdc"/>
+                <outlet property="window" destination="oPi-wT-0nK" id="ODs-Hv-85I"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="" animationBehavior="default" id="oPi-wT-0nK" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="136" y="189" width="595" height="512"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <value key="minSize" type="size" width="386" height="227"/>
+            <view key="contentView" misplaced="YES" id="Nfs-rF-cUN">
+                <rect key="frame" x="0.0" y="0.0" width="595" height="403"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="N4h-LP-IRY">
+                        <rect key="frame" x="20" y="20" width="555" height="347"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="N4h-LP-IRY" secondAttribute="height" multiplier="16:10" id="bqe-XE-yWC"/>
+                        </constraints>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="8o3-U6-XgQ"/>
+                    </imageView>
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="OhC-hA-R2H">
+                        <rect key="frame" x="18" y="367" width="559" height="16"/>
+                        <textFieldCell key="cell" selectable="YES" title="Multiline Label" id="caT-3r-bkd">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="selectedMenuItemTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="OhC-hA-R2H" firstAttribute="leading" secondItem="Nfs-rF-cUN" secondAttribute="leading" constant="20" id="BVL-Xu-cDU"/>
+                    <constraint firstAttribute="trailing" secondItem="N4h-LP-IRY" secondAttribute="trailing" constant="20" id="cEY-J9-usm"/>
+                    <constraint firstItem="N4h-LP-IRY" firstAttribute="leading" secondItem="Nfs-rF-cUN" secondAttribute="leading" constant="20" id="kKf-aB-0vG"/>
+                    <constraint firstItem="N4h-LP-IRY" firstAttribute="top" secondItem="OhC-hA-R2H" secondAttribute="bottom" id="mhR-pO-oDr"/>
+                    <constraint firstItem="OhC-hA-R2H" firstAttribute="top" secondItem="Nfs-rF-cUN" secondAttribute="top" constant="20" id="ugM-Yv-u0C"/>
+                    <constraint firstAttribute="trailing" secondItem="OhC-hA-R2H" secondAttribute="trailing" constant="20" id="yEE-lN-RaR"/>
+                    <constraint firstAttribute="bottom" secondItem="N4h-LP-IRY" secondAttribute="bottom" constant="20" id="zc5-8x-CjC"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="209.5" y="121"/>
+        </window>
+    </objects>
+</document>

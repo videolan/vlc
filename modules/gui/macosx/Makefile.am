@@ -64,6 +64,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryController.m \
 	gui/macosx/library/VLCLibraryDataTypes.h \
 	gui/macosx/library/VLCLibraryDataTypes.m \
+	gui/macosx/library/VLCLibraryInformationPanel.h \
+	gui/macosx/library/VLCLibraryInformationPanel.m \
 	gui/macosx/library/VLCLibraryMenuController.h \
 	gui/macosx/library/VLCLibraryMenuController.m \
 	gui/macosx/library/VLCLibraryModel.h \
@@ -278,6 +280,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCCustomCropARPanel.xib \
 	gui/macosx/UI/VLCDetachedAudioWindow.xib \
 	gui/macosx/UI/VLCLibraryAlbumTableCellView.xib \
+	gui/macosx/UI/VLCLibraryInformationPanel.xib \
 	gui/macosx/UI/VLCLibraryWindow.xib \
 	gui/macosx/UI/VLCLibraryTableCellView.xib \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \
