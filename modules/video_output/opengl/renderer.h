@@ -148,4 +148,57 @@ struct vlc_gl_renderer
                               float alpha);
 };
 
+/**
+ * Create a new renderer
+ *
+ * \param gl the GL context
+ * \param vt the OpenGL functions vtable
+ * \param context the video context
+ * \param fmt the video format
+ * \param supports_npot indicate if the implementation supports non-power-of-2
+ *                      texture size
+ * \param dump_shaders indicate if the shaders must be dumped in logs
+ */
+struct vlc_gl_renderer *
+vlc_gl_renderer_New(vlc_gl_t *gl, const opengl_vtable_t *vt,
+                    vlc_video_context *context, const video_format_t *fmt,
+                    bool supports_npot, bool dump_shaders);
+
+/**
+ * Delete a renderer
+ *
+ * \param renderer the renderer
+ */
+void
+vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer);
+
+/**
+ * Prepare the fragment shader
+ *
+ * Concretely, it allocates OpenGL textures if necessary and uploads the
+ * picture.
+ *
+ * \param sr the renderer
+ * \param subpicture the subpicture to render
+ */
+int
+vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture);
+
+/**
+ * Draw the prepared picture
+ *
+ * \param sr the renderer
+ */
+int
+vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
+                     const video_format_t *source);
+
+int
+vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,
+                             const vlc_viewpoint_t *p_vp);
+
+void
+vlc_gl_renderer_SetWindowAspectRatio(struct vlc_gl_renderer *renderer,
+                                     float f_sar);
+
 #endif /* include-guard */
