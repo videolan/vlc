@@ -322,7 +322,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "uniform mat4 ZoomMatrix;\n"
         "uniform mat4 ViewMatrix;\n"
         "void main() {\n"
-        " TexCoord0 = vec4(OrientationMatrix * TransformMatrix * MultiTexCoord0).st;\n"
+        " TexCoord0 = vec4(TransformMatrix * OrientationMatrix * MultiTexCoord0).st;\n"
         "%s%s"
         " gl_Position = ProjectionMatrix * ZoomMatrix * ViewMatrix\n"
         "               * vec4(VertexPosition, 1.0);\n"
