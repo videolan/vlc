@@ -43,6 +43,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) NSString *MRL;
 @property (readonly) NSURL *fileURL;
 @property (readonly) vlc_ml_file_type_t fileType;
+@property (readonly) NSString *readableFileType;
 @property (readonly) BOOL external;
 @property (readonly) BOOL removable;
 @property (readonly) BOOL present;
@@ -57,6 +58,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) NSString *language;
 @property (readonly) NSString *trackDescription;
 @property (readonly) vlc_ml_track_type_t trackType;
+@property (readonly) NSString *readableTrackType;
 @property (readonly) uint32_t bitrate;
 
 @property (readonly) uint32_t numberOfAudioChannels;
@@ -156,7 +158,9 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 
 @property (readonly) int64_t libraryID;
 @property (readonly) vlc_ml_media_type_t mediaType;
+@property (readonly) NSString *readableMediaType;
 @property (readonly) vlc_ml_media_subtype_t mediaSubType;
+@property (readonly) NSString *readableMediaSubType;
 @property (readonly) VLCInputItem *inputItem;
 
 @property (readonly) NSArray <VLCMediaLibraryFile *> *files;

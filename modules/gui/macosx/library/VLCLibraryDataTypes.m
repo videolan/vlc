@@ -63,6 +63,34 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     return [NSURL URLWithString:_MRL];
 }
 
+- (NSString *)readableFileType
+{
+    switch (_fileType) {
+        case VLC_ML_FILE_TYPE_MAIN:
+            return _NS("Main");
+            break;
+
+        case VLC_ML_FILE_TYPE_PART:
+            return _NS("Part");
+            break;
+
+        case VLC_ML_FILE_TYPE_PLAYLIST:
+            return _NS("Playlist");
+            break;
+
+        case VLC_ML_FILE_TYPE_SUBTITLE:
+            return _NS("Subtitle");
+            break;
+
+        case VLC_ML_FILE_TYPE_SOUNDTRACK:
+            return _NS("Soundtrack");
+
+        default:
+            return _NS("Unknown");
+            break;
+    }
+}
+
 @end
 
 @implementation VLCMediaLibraryTrack
@@ -93,6 +121,22 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"%@ — type: %i, codec %@", NSStringFromClass([self class]), _trackType, _codec];
+}
+
+- (NSString *)readableTrackType
+{
+    switch (_trackType) {
+        case VLC_ML_TRACK_TYPE_AUDIO:
+            return _NS("Audio");
+            break;
+
+        case VLC_ML_TRACK_TYPE_VIDEO:
+            return _NS("Video");
+
+        default:
+            return _NS("Unknown");
+            break;
+    }
 }
 
 @end
@@ -371,6 +415,44 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 {
     return [NSString stringWithFormat:@"%@ — title: %@, ID: %lli, type: %i, artwork: %@",
             NSStringFromClass([self class]), _title, _libraryID, _mediaType, _smallArtworkMRL];
+}
+
+- (NSString *)readableMediaType
+{
+    switch (_mediaType) {
+        case VLC_ML_MEDIA_TYPE_AUDIO:
+            return _NS("Audio");
+            break;
+
+        case VLC_ML_MEDIA_TYPE_VIDEO:
+            return _NS("Video");
+            break;
+
+        default:
+            return _NS("Unknown");
+            break;
+    }
+}
+
+- (NSString *)readableMediaSubType
+{
+    switch (_mediaSubType) {
+        case VLC_ML_MEDIA_SUBTYPE_MOVIE:
+            return _NS("Movie");
+            break;
+
+        case VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE:
+            return _NS("Show Episode");
+            break;
+
+        case VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK:
+            return _NS("Album Track");
+            break;
+
+        default:
+            return _NS("Unknown");
+            break;
+    }
 }
 
 - (VLCInputItem *)inputItem
