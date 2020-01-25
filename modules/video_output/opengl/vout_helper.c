@@ -97,10 +97,9 @@ static void getProjectionMatrix(float sar, float fovy, GLfloat matrix[static 16]
      memcpy(matrix, m, sizeof(m));
 }
 
-static void getViewpointMatrixes(vout_display_opengl_t *vgl,
+static void getViewpointMatrixes(struct vlc_gl_renderer *renderer,
                                  video_projection_mode_t projection_mode)
 {
-    struct vlc_gl_renderer *renderer = vgl->renderer;
     if (projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
         || projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
     {
@@ -428,7 +427,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
 
     getOrientationTransformMatrix(interop->fmt.orientation,
                                   renderer->var.OrientationMatrix);
-    getViewpointMatrixes(vgl, interop->fmt.projection_mode);
+    getViewpointMatrixes(renderer, interop->fmt.projection_mode);
 
     return VLC_SUCCESS;
 }
@@ -727,9 +726,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     free(vgl);
 }
 
-static void UpdateZ(vout_display_opengl_t *vgl)
+static void UpdateZ(struct vlc_gl_renderer *renderer)
 {
-    struct vlc_gl_renderer *renderer = vgl->renderer;
     /* Do trigonometry to calculate the minimal z value
      * that will allow us to zoom out without seeing the outside of the
      * sphere (black borders). */
@@ -752,9 +750,8 @@ static void UpdateZ(vout_display_opengl_t *vgl)
     }
 }
 
-static void UpdateFOVy(vout_display_opengl_t *vgl)
+static void UpdateFOVy(struct vlc_gl_renderer *renderer)
 {
-    struct vlc_gl_renderer *renderer = vgl->renderer;
     renderer->f_fovy = 2 * atanf(tanf(renderer->f_fovx / 2) / renderer->f_sar);
 }
 
@@ -776,10 +773,10 @@ int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
     {
         /* FOVx has changed. */
         renderer->f_fovx = f_fovx;
-        UpdateFOVy(vgl);
-        UpdateZ(vgl);
+        UpdateFOVy(renderer);
+        UpdateZ(renderer);
     }
-    getViewpointMatrixes(vgl, renderer->fmt.projection_mode);
+    getViewpointMatrixes(renderer, renderer->fmt.projection_mode);
 
     return VLC_SUCCESS;
 }
@@ -793,9 +790,9 @@ void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
      * since the aspect ration changes.
      * We must also set the new current zoom value. */
     renderer->f_sar = f_sar;
-    UpdateFOVy(vgl);
-    UpdateZ(vgl);
-    getViewpointMatrixes(vgl, renderer->fmt.projection_mode);
+    UpdateFOVy(renderer);
+    UpdateZ(renderer);
+    getViewpointMatrixes(renderer, renderer->fmt.projection_mode);
 }
 
 void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
@@ -1093,12 +1090,12 @@ static int BuildRectangle(unsigned nbPlanes,
     return VLC_SUCCESS;
 }
 
-static int SetupCoords(vout_display_opengl_t *vgl,
+static int SetupCoords(struct vlc_gl_renderer *renderer,
                        const float *left, const float *top,
                        const float *right, const float *bottom)
 {
-    struct vlc_gl_renderer *renderer = vgl->renderer;
     const struct vlc_gl_interop *interop = renderer->interop;
+    const opengl_vtable_t *vt = renderer->vt;
 
     GLfloat *vertexCoord, *textureCoord;
     GLushort *indices;
@@ -1137,18 +1134,18 @@ static int SetupCoords(vout_display_opengl_t *vgl,
 
     for (unsigned j = 0; j < interop->tex_count; j++)
     {
-        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object[j]);
-        vgl->vt.BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
-                           textureCoord + j * nbVertices * 2, GL_STATIC_DRAW);
+        vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object[j]);
+        vt->BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
+                       textureCoord + j * nbVertices * 2, GL_STATIC_DRAW);
     }
 
-    vgl->vt.BindBuffer(GL_ARRAY_BUFFER, renderer->vertex_buffer_object);
-    vgl->vt.BufferData(GL_ARRAY_BUFFER, nbVertices * 3 * sizeof(GLfloat),
-                       vertexCoord, GL_STATIC_DRAW);
+    vt->BindBuffer(GL_ARRAY_BUFFER, renderer->vertex_buffer_object);
+    vt->BufferData(GL_ARRAY_BUFFER, nbVertices * 3 * sizeof(GLfloat),
+                   vertexCoord, GL_STATIC_DRAW);
 
-    vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->index_buffer_object);
-    vgl->vt.BufferData(GL_ELEMENT_ARRAY_BUFFER, nbIndices * sizeof(GLushort),
-                       indices, GL_STATIC_DRAW);
+    vt->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->index_buffer_object);
+    vt->BufferData(GL_ELEMENT_ARRAY_BUFFER, nbIndices * sizeof(GLushort),
+                   indices, GL_STATIC_DRAW);
 
     free(textureCoord);
     free(vertexCoord);
@@ -1159,30 +1156,30 @@ static int SetupCoords(vout_display_opengl_t *vgl,
     return VLC_SUCCESS;
 }
 
-static void DrawWithShaders(vout_display_opengl_t *vgl)
+static void DrawWithShaders(struct vlc_gl_renderer *renderer)
 {
-    struct vlc_gl_renderer *renderer = vgl->renderer;
     const struct vlc_gl_interop *interop = renderer->interop;
+    const opengl_vtable_t *vt = renderer->vt;
     renderer->pf_prepare_shader(renderer, renderer->tex_width,
                                 renderer->tex_height, 1.0f);
 
     for (unsigned j = 0; j < interop->tex_count; j++) {
         assert(renderer->textures[j] != 0);
-        vgl->vt.ActiveTexture(GL_TEXTURE0+j);
-        vgl->vt.BindTexture(interop->tex_target, renderer->textures[j]);
+        vt->ActiveTexture(GL_TEXTURE0+j);
+        vt->BindTexture(interop->tex_target, renderer->textures[j]);
 
-        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object[j]);
+        vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object[j]);
 
         assert(renderer->aloc.MultiTexCoord[j] != -1);
-        vgl->vt.EnableVertexAttribArray(renderer->aloc.MultiTexCoord[j]);
-        vgl->vt.VertexAttribPointer(renderer->aloc.MultiTexCoord[j], 2,
-                                    GL_FLOAT, 0, 0, 0);
+        vt->EnableVertexAttribArray(renderer->aloc.MultiTexCoord[j]);
+        vt->VertexAttribPointer(renderer->aloc.MultiTexCoord[j], 2,
+                                GL_FLOAT, 0, 0, 0);
     }
 
-    vgl->vt.BindBuffer(GL_ARRAY_BUFFER, renderer->vertex_buffer_object);
-    vgl->vt.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->index_buffer_object);
-    vgl->vt.EnableVertexAttribArray(renderer->aloc.VertexPosition);
-    vgl->vt.VertexAttribPointer(renderer->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
+    vt->BindBuffer(GL_ARRAY_BUFFER, renderer->vertex_buffer_object);
+    vt->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->index_buffer_object);
+    vt->EnableVertexAttribArray(renderer->aloc.VertexPosition);
+    vt->VertexAttribPointer(renderer->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
     const GLfloat *tm = NULL;
     if (interop->ops && interop->ops->get_transform_matrix)
@@ -1190,18 +1187,18 @@ static void DrawWithShaders(vout_display_opengl_t *vgl)
     if (!tm)
         tm = identity;
 
-    vgl->vt.UniformMatrix4fv(renderer->uloc.TransformMatrix, 1, GL_FALSE, tm);
+    vt->UniformMatrix4fv(renderer->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
-    vgl->vt.UniformMatrix4fv(renderer->uloc.OrientationMatrix, 1, GL_FALSE,
-                             renderer->var.OrientationMatrix);
-    vgl->vt.UniformMatrix4fv(renderer->uloc.ProjectionMatrix, 1, GL_FALSE,
-                             renderer->var.ProjectionMatrix);
-    vgl->vt.UniformMatrix4fv(renderer->uloc.ViewMatrix, 1, GL_FALSE,
-                             renderer->var.ViewMatrix);
-    vgl->vt.UniformMatrix4fv(renderer->uloc.ZoomMatrix, 1, GL_FALSE,
-                             renderer->var.ZoomMatrix);
+    vt->UniformMatrix4fv(renderer->uloc.OrientationMatrix, 1, GL_FALSE,
+                         renderer->var.OrientationMatrix);
+    vt->UniformMatrix4fv(renderer->uloc.ProjectionMatrix, 1, GL_FALSE,
+                         renderer->var.ProjectionMatrix);
+    vt->UniformMatrix4fv(renderer->uloc.ViewMatrix, 1, GL_FALSE,
+                         renderer->var.ViewMatrix);
+    vt->UniformMatrix4fv(renderer->uloc.ZoomMatrix, 1, GL_FALSE,
+                         renderer->var.ZoomMatrix);
 
-    vgl->vt.DrawElements(GL_TRIANGLES, renderer->nb_indices, GL_UNSIGNED_SHORT, 0);
+    vt->DrawElements(GL_TRIANGLES, renderer->nb_indices, GL_UNSIGNED_SHORT, 0);
 }
 
 
@@ -1223,11 +1220,10 @@ static void GetTextureCropParamsForStereo(unsigned i_nbTextures,
     }
 }
 
-static void TextureCropForStereo(vout_display_opengl_t *vgl,
+static void TextureCropForStereo(struct vlc_gl_renderer *renderer,
                                  float *left, float *top,
                                  float *right, float *bottom)
 {
-    struct vlc_gl_renderer *renderer = vgl->renderer;
     const struct vlc_gl_interop *interop = renderer->interop;
 
     float stereoCoefs[2];
@@ -1303,8 +1299,8 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
             bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
         }
 
-        TextureCropForStereo(vgl, left, top, right, bottom);
-        int ret = SetupCoords(vgl, left, top, right, bottom);
+        TextureCropForStereo(renderer, left, top, right, bottom);
+        int ret = SetupCoords(renderer, left, top, right, bottom);
         if (ret != VLC_SUCCESS)
             return ret;
 
@@ -1313,7 +1309,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
         renderer->last_source.i_visible_width = source->i_visible_width;
         renderer->last_source.i_visible_height = source->i_visible_height;
     }
-    DrawWithShaders(vgl);
+    DrawWithShaders(renderer);
 
     int ret = vlc_gl_sub_renderer_Draw(vgl->sub_renderer);
     if (ret != VLC_SUCCESS)
