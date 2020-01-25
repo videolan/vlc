@@ -375,7 +375,7 @@ DeleteRenderer(struct vlc_gl_renderer *renderer)
 static struct vlc_gl_renderer *
 CreateRenderer(vlc_gl_t *gl, const opengl_vtable_t *vt,
                vlc_video_context *context, const video_format_t *fmt,
-               bool b_dump_shaders)
+               bool supports_npot, bool b_dump_shaders)
 {
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
@@ -426,6 +426,50 @@ CreateRenderer(vlc_gl_t *gl, const opengl_vtable_t *vt,
     getOrientationTransformMatrix(interop->fmt.orientation,
                                   renderer->var.OrientationMatrix);
     getViewpointMatrixes(renderer, interop->fmt.projection_mode);
+
+    /* Update the fmt to main program one */
+    renderer->fmt = interop->fmt;
+    /* The orientation is handled by the orientation matrix */
+    renderer->fmt.orientation = fmt->orientation;
+
+    /* Texture size */
+    for (unsigned j = 0; j < interop->tex_count; j++) {
+        const GLsizei w = renderer->fmt.i_visible_width  * interop->texs[j].w.num
+                        / interop->texs[j].w.den;
+        const GLsizei h = renderer->fmt.i_visible_height * interop->texs[j].h.num
+                        / interop->texs[j].h.den;
+        if (supports_npot) {
+            renderer->tex_width[j]  = w;
+            renderer->tex_height[j] = h;
+        } else {
+            renderer->tex_width[j]  = vlc_align_pot(w);
+            renderer->tex_height[j] = vlc_align_pot(h);
+        }
+    }
+
+    if (!interop->handle_texs_gen)
+    {
+        ret = vlc_gl_interop_GenerateTextures(interop, renderer->tex_width,
+                                              renderer->tex_height,
+                                              renderer->textures);
+        if (ret != VLC_SUCCESS)
+        {
+            DeleteRenderer(renderer);
+            return NULL;
+        }
+    }
+
+    /* */
+    vt->Disable(GL_BLEND);
+    vt->Disable(GL_DEPTH_TEST);
+    vt->DepthMask(GL_FALSE);
+    vt->Enable(GL_CULL_FACE);
+    vt->ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    vt->Clear(GL_COLOR_BUFFER_BIT);
+
+    vt->GenBuffers(1, &renderer->vertex_buffer_object);
+    vt->GenBuffers(1, &renderer->index_buffer_object);
+    vt->GenBuffers(interop->tex_count, renderer->texture_buffer_object);
 
     return renderer;
 }
@@ -622,7 +666,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GL_ASSERT_NOERROR();
     struct vlc_gl_renderer *renderer = vgl->renderer =
-        CreateRenderer(gl, &vgl->vt, context, fmt, b_dump_shaders);
+        CreateRenderer(gl, &vgl->vt, context, fmt, supports_npot,
+                       b_dump_shaders);
     if (!vgl->renderer)
     {
         msg_Warn(gl, "Could not create renderer for %4.4s",
@@ -633,51 +678,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     GL_ASSERT_NOERROR();
-
-    const struct vlc_gl_interop *interop = renderer->interop;
-    /* Update the fmt to main program one */
-    renderer->fmt = interop->fmt;
-    /* The orientation is handled by the orientation matrix */
-    renderer->fmt.orientation = fmt->orientation;
-
-    /* Texture size */
-    for (unsigned j = 0; j < interop->tex_count; j++) {
-        const GLsizei w = renderer->fmt.i_visible_width  * interop->texs[j].w.num
-                        / interop->texs[j].w.den;
-        const GLsizei h = renderer->fmt.i_visible_height * interop->texs[j].h.num
-                        / interop->texs[j].h.den;
-        if (supports_npot) {
-            renderer->tex_width[j]  = w;
-            renderer->tex_height[j] = h;
-        } else {
-            renderer->tex_width[j]  = vlc_align_pot(w);
-            renderer->tex_height[j] = vlc_align_pot(h);
-        }
-    }
-
-    if (!interop->handle_texs_gen)
-    {
-        int ret = vlc_gl_interop_GenerateTextures(interop, renderer->tex_width,
-                                                  renderer->tex_height,
-                                                  renderer->textures);
-        if (ret != VLC_SUCCESS)
-        {
-            vout_display_opengl_Delete(vgl);
-            return NULL;
-        }
-    }
-
-    /* */
-    vgl->vt.Disable(GL_BLEND);
-    vgl->vt.Disable(GL_DEPTH_TEST);
-    vgl->vt.DepthMask(GL_FALSE);
-    vgl->vt.Enable(GL_CULL_FACE);
-    vgl->vt.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    vgl->vt.Clear(GL_COLOR_BUFFER_BIT);
-
-    vgl->vt.GenBuffers(1, &renderer->vertex_buffer_object);
-    vgl->vt.GenBuffers(1, &renderer->index_buffer_object);
-    vgl->vt.GenBuffers(interop->tex_count, renderer->texture_buffer_object);
 
     if (renderer->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
      && vout_display_opengl_SetViewpoint(vgl, viewpoint) != VLC_SUCCESS)
