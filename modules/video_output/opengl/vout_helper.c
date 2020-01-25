@@ -357,12 +357,11 @@ error:
 }
 
 static void
-opengl_deinit_program(vout_display_opengl_t *vgl)
+DeleteRenderer(struct vlc_gl_renderer *renderer)
 {
-    struct vlc_gl_renderer *renderer = vgl->renderer;
     vlc_gl_interop_Delete(renderer->interop);
     if (renderer->program_id != 0)
-        vgl->vt.DeleteProgram(renderer->program_id);
+        renderer->vt->DeleteProgram(renderer->program_id);
 
 #ifdef HAVE_LIBPLACEBO
     FREENULL(renderer->uloc.pl_vars);
@@ -373,26 +372,27 @@ opengl_deinit_program(vout_display_opengl_t *vgl)
     free(renderer);
 }
 
-static int
-opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
-                    const video_format_t *fmt, bool b_dump_shaders)
+static struct vlc_gl_renderer *
+CreateRenderer(vlc_gl_t *gl, const opengl_vtable_t *vt,
+               vlc_video_context *context, const video_format_t *fmt,
+               bool b_dump_shaders)
 {
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
-        return VLC_ENOMEM;
+        return NULL;
 
     struct vlc_gl_interop *interop =
-        vlc_gl_interop_New(vgl->gl, &vgl->vt, context, fmt, false);
+        vlc_gl_interop_New(gl, vt, context, fmt, false);
     if (!interop)
     {
         free(renderer);
-        return VLC_ENOMEM;
+        return NULL;
     }
 
     renderer->interop = interop;
 
-    renderer->gl = vgl->gl;
-    renderer->vt = &vgl->vt;
+    renderer->gl = gl;
+    renderer->vt = vt;
     renderer->b_dump_shaders = b_dump_shaders;
 #if defined(USE_OPENGL_ES2)
     renderer->glsl_version = 100;
@@ -404,7 +404,7 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
 
 #ifdef HAVE_LIBPLACEBO
     // Create the main libplacebo context
-    renderer->pl_ctx = vlc_placebo_Create(VLC_OBJECT(vgl->gl));
+    renderer->pl_ctx = vlc_placebo_Create(VLC_OBJECT(gl));
     if (renderer->pl_ctx) {
 #   if PL_API_VER >= 20
         renderer->pl_sh = pl_shader_alloc(renderer->pl_ctx, NULL);
@@ -416,20 +416,18 @@ opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
     }
 #endif
 
-    vgl->renderer = renderer;
-
     int ret = opengl_link_program(renderer);
     if (ret != VLC_SUCCESS)
     {
-        opengl_deinit_program(vgl);
-        return VLC_EGENERIC;
+        DeleteRenderer(renderer);
+        return NULL;
     }
 
     getOrientationTransformMatrix(interop->fmt.orientation,
                                   renderer->var.OrientationMatrix);
     getViewpointMatrixes(renderer, interop->fmt.projection_mode);
 
-    return VLC_SUCCESS;
+    return renderer;
 }
 
 static void
@@ -623,10 +621,11 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     GL_ASSERT_NOERROR();
-    int ret = opengl_init_program(vgl, context, fmt, b_dump_shaders);
-    if (ret != VLC_SUCCESS)
+    struct vlc_gl_renderer *renderer = vgl->renderer =
+        CreateRenderer(gl, &vgl->vt, context, fmt, b_dump_shaders);
+    if (!vgl->renderer)
     {
-        msg_Warn(gl, "could not init tex converter for %4.4s",
+        msg_Warn(gl, "Could not create renderer for %4.4s",
                  (const char *) &fmt->i_chroma);
         vlc_gl_sub_renderer_Delete(vgl->sub_renderer);
         free(vgl);
@@ -635,7 +634,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GL_ASSERT_NOERROR();
 
-    struct vlc_gl_renderer *renderer = vgl->renderer;
     const struct vlc_gl_interop *interop = renderer->interop;
     /* Update the fmt to main program one */
     renderer->fmt = interop->fmt;
@@ -659,9 +657,9 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     if (!interop->handle_texs_gen)
     {
-        ret = vlc_gl_interop_GenerateTextures(interop, renderer->tex_width,
-                                              renderer->tex_height,
-                                              renderer->textures);
+        int ret = vlc_gl_interop_GenerateTextures(interop, renderer->tex_width,
+                                                  renderer->tex_height,
+                                                  renderer->textures);
         if (ret != VLC_SUCCESS)
         {
             vout_display_opengl_Delete(vgl);
@@ -711,8 +709,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     const bool main_del_texs = !interop->handle_texs_gen;
 
     vlc_gl_sub_renderer_Delete(vgl->sub_renderer);
-
-    opengl_deinit_program(vgl);
+    DeleteRenderer(vgl->renderer);
 
     vgl->vt.DeleteBuffers(1, &renderer->vertex_buffer_object);
     vgl->vt.DeleteBuffers(1, &renderer->index_buffer_object);
