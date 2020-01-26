@@ -28,8 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryImageCache : NSObject
 
-+ (NSImage *)thumbnailForMediaItemWithID:(int64_t)libraryID;
-+ (NSImage *)thumbnailForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem;
++ (nullable NSImage *)thumbnailForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem;
 
 @end
 
