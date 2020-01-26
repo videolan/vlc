@@ -25,11 +25,18 @@
 #import <vlc_input.h>
 #import <vlc_url.h>
 
+#import "playlist/VLCPlaylistImageCache.h"
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 
 NSString *VLCPlaylistItemPasteboardType = @"org.videolan.vlc.playlistitemtype";
+
+@interface VLCPlaylistItem()
+{
+    NSURL *_artworkURL;
+}
+@end
 
 @implementation VLCPlaylistItem
 
@@ -87,7 +94,11 @@ NSString *VLCPlaylistItemPasteboardType = @"org.videolan.vlc.playlistitemtype";
     if (p_media->p_meta) {
         _artistName = toNSStr(vlc_meta_Get(p_media->p_meta, vlc_meta_Artist));
         _albumName = toNSStr(vlc_meta_Get(p_media->p_meta, vlc_meta_Album));
-        _artworkURLString = toNSStr(vlc_meta_Get(p_media->p_meta, vlc_meta_ArtworkURL));
+
+        NSString *artworkURLString = toNSStr(vlc_meta_Get(p_media->p_meta, vlc_meta_ArtworkURL));
+        if (artworkURLString.length > 1) {
+            _artworkURL = [NSURL URLWithString:artworkURLString];
+        }
     }
     vlc_mutex_unlock(&p_media->lock);
 }
@@ -133,14 +144,10 @@ NSString *VLCPlaylistItemPasteboardType = @"org.videolan.vlc.playlistitemtype";
 
 - (NSImage *)artworkImage
 {
-    NSImage *image;
-
-    if (_artworkURLString != nil && _artworkURLString.length > 0) {
-        image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:_artworkURLString]];
-    } else {
+    NSImage *image = [VLCPlaylistImageCache artworkForPlaylistItemWithURL:_artworkURL];
+    if (!image) {
         image = [NSImage imageNamed: @"noart.png"];
     }
-
     return image;
 }
 
