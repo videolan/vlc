@@ -55,6 +55,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 - (instancetype)initWithTrack:(struct vlc_ml_media_track_t *)p_track;
 
 @property (readonly) NSString *codec;
+@property (readonly) NSString *readableCodecName;
 @property (readonly) NSString *language;
 @property (readonly) NSString *trackDescription;
 @property (readonly) vlc_ml_track_type_t trackType;

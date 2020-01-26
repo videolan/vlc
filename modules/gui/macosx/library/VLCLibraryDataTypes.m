@@ -123,6 +123,12 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     return [NSString stringWithFormat:@"%@ — type: %i, codec %@", NSStringFromClass([self class]), _trackType, _codec];
 }
 
+- (NSString *)readableCodecName
+{
+    vlc_fourcc_t fourcc = vlc_fourcc_GetCodecFromString(UNKNOWN_ES, _codec.UTF8String);
+    return toNSStr(vlc_fourcc_GetDescription(UNKNOWN_ES, fourcc));
+}
+
 - (NSString *)readableTrackType
 {
     switch (_trackType) {
