@@ -47,20 +47,16 @@
 
 - (void)updateRepresentation
 {
-    NSMutableString *textContent = [[NSMutableString alloc] initWithFormat:@"ID: %lli\n", _representedMediaItem.libraryID];
-    [textContent appendFormat:@"Title: %@\n", _representedMediaItem.title];
+    NSMutableString *textContent = [[NSMutableString alloc] initWithFormat:@"Title: '%@', ID: %lli\n", _representedMediaItem.title, _representedMediaItem.libraryID];
     if (_representedMediaItem.mediaSubType != VLC_ML_MEDIA_SUBTYPE_UNKNOWN) {
         [textContent appendFormat:@"Type: %@ — %@\n", _representedMediaItem.readableMediaType, _representedMediaItem.readableMediaSubType];
     } else {
         [textContent appendFormat:@"Type: %@\n", _representedMediaItem.readableMediaType];
     }
     [textContent appendFormat:@"Duration: %@\n", [NSString stringWithTime:_representedMediaItem.duration / VLCMediaLibraryMediaItemDurationDenominator]];
-    [textContent appendFormat:@"Play count: %u\n", _representedMediaItem.playCount];
-    [textContent appendFormat:@"Last played: %@\n", [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:_representedMediaItem.lastPlayedDate]
-                                                                                 dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterShortStyle]];
+    [textContent appendFormat:@"Play count: %u, last played: %@\n", _representedMediaItem.playCount, [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:_representedMediaItem.lastPlayedDate] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterShortStyle]];
     [textContent appendFormat:@"Small artwork generated? %@\n", _representedMediaItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
-    [textContent appendFormat:@"Favorited? %@\n", _representedMediaItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
-    [textContent appendFormat:@"Playback progress: %2.f%%\n", _representedMediaItem.lastPlaybackPosition * 100.];
+    [textContent appendFormat:@"Favorited? %@, Playback progress: %2.f%%\n", _representedMediaItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No"), _representedMediaItem.lastPlaybackPosition * 100.];
 
     NSArray *array = _representedMediaItem.files;
     NSUInteger count = array.count;
@@ -77,8 +73,7 @@
     for (NSUInteger x = 0; x < count; x++) {
         VLCMediaLibraryTrack *track = array[x];
         [textContent appendFormat:@"Type: %@\n", track.readableTrackType];
-        [textContent appendFormat:@"Codec: %@\n", track.codec];
-        [textContent appendFormat:@"Bitrate: %u\n", track.bitrate];
+        [textContent appendFormat:@"Codec: %@ (%@) @ %u kB/s\n", track.readableCodecName, track.codec, track.bitrate / 1024 / 8];
         if (track.language.length > 0) {
             [textContent appendFormat:@"Language: %@\n", track.language];
         }
@@ -87,11 +82,9 @@
         }
 
         if (track.trackType == VLC_ML_TRACK_TYPE_AUDIO) {
-            [textContent appendFormat:@"Number of Channels: %u\n", track.numberOfAudioChannels];
-            [textContent appendFormat:@"Sample rate: %u\n", track.audioSampleRate];
+            [textContent appendFormat:@"Number of Channels: %u, Sample rate: %u\n", track.numberOfAudioChannels, track.audioSampleRate];
         } else if (track.trackType == VLC_ML_TRACK_TYPE_VIDEO) {
-            [textContent appendFormat:@"Dimensions: %ux%u px\n", track.videoWidth, track.videoHeight];
-            [textContent appendFormat:@"Aspect-Ratio: %2.f\n", (float)track.sourceAspectRatio / track.sourceAspectRatioDenominator];
+            [textContent appendFormat:@"Dimensions: %ux%u px, Aspect-Ratio: %2.f\n", track.videoWidth, track.videoHeight, (float)track.sourceAspectRatio / track.sourceAspectRatioDenominator];
             [textContent appendFormat:@"Framerate: %2.f\n", (float)track.frameRate / track.frameRateDenominator];;
         }
         [textContent appendString:@"\n"];
