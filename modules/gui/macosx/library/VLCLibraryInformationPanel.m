@@ -92,9 +92,7 @@
 
     self.multiLineTextLabel.stringValue = textContent;
     self.window.title = _representedMediaItem.title;
-    if (_representedMediaItem.smallArtworkMRL) {
-        self.imageView.image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:_representedMediaItem.smallArtworkMRL]];
-    }
+    self.imageView.image = _representedMediaItem.smallArtworkImage;
 }
 
 @end

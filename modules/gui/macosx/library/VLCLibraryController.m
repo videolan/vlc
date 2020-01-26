@@ -30,10 +30,6 @@
 
 #import <vlc_media_library.h>
 
-uint32_t kVLCDesiredThumbnailWidth = 512;
-uint32_t kVLCDesiredThumbnailHeight = 320;
-float kVLCDefaultThumbnailPosition = .15;
-
 @interface VLCLibraryController()
 {
     vlc_medialibrary_t *_p_libraryInstance;
@@ -138,19 +134,6 @@ float kVLCDefaultThumbnailPosition = .15;
             [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:@[URL]];
         }
     }
-}
-
-- (int)attemptToGenerateThumbnailForMediaItem:(VLCMediaLibraryMediaItem *)mediaItem
-{
-    if (!_p_libraryInstance) {
-        return VLC_ENOOBJ;
-    }
-    return vlc_ml_media_generate_thumbnail(_p_libraryInstance,
-                                           mediaItem.libraryID,
-                                           VLC_ML_THUMBNAIL_SMALL,
-                                           kVLCDesiredThumbnailWidth,
-                                           kVLCDesiredThumbnailHeight,
-                                           kVLCDefaultThumbnailPosition);
 }
 
 #pragma mark - folder management

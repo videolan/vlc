@@ -139,6 +139,7 @@
 		7D903EAF224392B400917358 /* timespec_get.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EAE224392B400917358 /* timespec_get.c */; };
 		7D903EB6224394BE00917358 /* specific.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EB5224394BE00917358 /* specific.c */; };
 		7D903EB92243952100917358 /* threads.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EB82243952100917358 /* threads.c */; };
+		7D92AF2123DDCA8D00D81EA3 /* VLCLibraryImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D92AF2023DDCA8D00D81EA3 /* VLCLibraryImageCache.m */; };
 		7D93D8FC2316C2DC001C0063 /* VLCCustomCropArWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D93D8FB2316C2DC001C0063 /* VLCCustomCropArWindowController.m */; };
 		7DB40D2A20CBCEB500F63173 /* VLCMainMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB40D2920CBCEB500F63173 /* VLCMainMenu.m */; };
 		7DB40D2D20CBCEC200F63173 /* VLCStatusBarIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB40D2B20CBCEC200F63173 /* VLCStatusBarIcon.m */; };
@@ -540,6 +541,8 @@
 		7D903EAE224392B400917358 /* timespec_get.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = timespec_get.c; path = ../../../../compat/timespec_get.c; sourceTree = "<group>"; };
 		7D903EB5224394BE00917358 /* specific.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = specific.c; path = ../../../src/darwin/specific.c; sourceTree = "<group>"; };
 		7D903EB82243952100917358 /* threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = threads.c; path = ../../../../src/misc/threads.c; sourceTree = "<group>"; };
+		7D92AF1F23DDCA8D00D81EA3 /* VLCLibraryImageCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryImageCache.h; sourceTree = "<group>"; };
+		7D92AF2023DDCA8D00D81EA3 /* VLCLibraryImageCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryImageCache.m; sourceTree = "<group>"; };
 		7D93D8F92316C142001C0063 /* VLCCustomCropARPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCCustomCropARPanel.xib; sourceTree = "<group>"; };
 		7D93D8FA2316C2DC001C0063 /* VLCCustomCropArWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCCustomCropArWindowController.h; sourceTree = "<group>"; };
 		7D93D8FB2316C2DC001C0063 /* VLCCustomCropArWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCCustomCropArWindowController.m; sourceTree = "<group>"; };
@@ -1052,6 +1055,8 @@
 				7DFBDCAA2269E77F00B700A5 /* VLCLibraryModel.m */,
 				7DFBDCB2226CD00900B700A5 /* VLCLibraryDataTypes.h */,
 				7DFBDCB3226CD00900B700A5 /* VLCLibraryDataTypes.m */,
+				7D92AF1F23DDCA8D00D81EA3 /* VLCLibraryImageCache.h */,
+				7D92AF2023DDCA8D00D81EA3 /* VLCLibraryImageCache.m */,
 				7DFBDCAC2269ED0C00B700A5 /* VLCLibraryVideoDataSource.h */,
 				7DFBDCAD2269ED0C00B700A5 /* VLCLibraryVideoDataSource.m */,
 				7DE2F0422282C84A0040DD0A /* VLCLibraryAudioDataSource.h */,
@@ -1754,6 +1759,7 @@
 				7DE9C7DD220728420089108F /* VLCPlayerController.m in Sources */,
 				7D93D8FC2316C2DC001C0063 /* VLCCustomCropArWindowController.m in Sources */,
 				1C3113941E508C6900D4DD76 /* VLCAddonsWindowController.m in Sources */,
+				7D92AF2123DDCA8D00D81EA3 /* VLCLibraryImageCache.m in Sources */,
 				7D2E0EDE20CD206F0033A221 /* VLCVideoWindowCommon.m in Sources */,
 				1C3113961E508C6900D4DD76 /* applescript.m in Sources */,
 				1C3113981E508C6900D4DD76 /* VLCAudioEffectsWindowController.m in Sources */,

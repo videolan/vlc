@@ -25,6 +25,7 @@
 #import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryImageCache.h"
 
 #import <vlc_url.h>
 
@@ -459,6 +460,11 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
             return _NS("Unknown");
             break;
     }
+}
+
+- (NSImage *)smallArtworkImage
+{
+    return [VLCLibraryImageCache thumbnailForMediaItem:self];
 }
 
 - (VLCInputItem *)inputItem

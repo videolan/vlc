@@ -189,12 +189,7 @@ static NSString *VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier
         {
             VLCMediaLibraryMediaItem *mediaItem = _displayedCollection[row];
 
-            NSImage *image;
-            if (mediaItem.smallArtworkGenerated) {
-                if (mediaItem.smallArtworkMRL.length > 0) {
-                    image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:mediaItem.smallArtworkMRL]];
-                }
-            }
+            NSImage *image = mediaItem.smallArtworkImage;
             if (!image) {
                 image = [NSImage imageNamed: @"noart.png"];
             }
