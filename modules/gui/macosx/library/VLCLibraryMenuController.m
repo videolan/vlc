@@ -68,7 +68,15 @@
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
 {
-    [NSMenu popUpContextMenu:_libraryMenu withEvent:theEvent forView:theView];
+    if (self.representedMediaItem != nil) {
+        [NSMenu popUpContextMenu:_libraryMenu withEvent:theEvent forView:theView];
+    } else {
+        NSMenu *minimalMenu = [[NSMenu alloc] initWithTitle:@""];
+        NSMenuItem *addItem = [[NSMenuItem alloc] initWithTitle:_NS("Add Media Folder...") action:@selector(addMedia:) keyEquivalent:@""];
+        addItem.target = self;
+        minimalMenu.itemArray = @[addItem];
+        [NSMenu popUpContextMenu:minimalMenu withEvent:theEvent forView:theView];
+    }
 }
 
 #pragma mark - actions
