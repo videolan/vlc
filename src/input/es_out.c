@@ -4027,22 +4027,47 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
     case AUDIO_ES:
         info_category_AddInfo( p_cat, _("Type"), _("Audio") );
 
-        if( fmt->audio.i_physical_channels )
+        if( p_fmt_es->audio.i_physical_channels )
             info_category_AddInfo( p_cat, _("Channels"), "%s",
-                vlc_gettext( aout_FormatPrintChannels( &fmt->audio ) ) );
+                vlc_gettext( aout_FormatPrintChannels( &p_fmt_es->audio ) ) );
 
-        if( fmt->audio.i_rate != 0 )
-        {
+        if( p_fmt_es->audio.i_rate )
             info_category_AddInfo( p_cat, _("Sample rate"), _("%u Hz"),
-                                   fmt->audio.i_rate );
+                                   p_fmt_es->audio.i_rate );
+
+        unsigned int i_orgbps = p_fmt_es->audio.i_bitspersample;
+        if( i_orgbps == 0 )
+            i_orgbps = aout_BitsPerSample( p_fmt_es->i_codec );
+        if( i_orgbps != 0 )
+            info_category_AddInfo( p_cat, _("Bits per sample"), "%u",
+                                   i_orgbps );
+
+        if( fmt->audio.i_format &&
+            fmt->audio.i_format != p_fmt_es->i_codec )
+        {
+            psz_codec_description = vlc_fourcc_GetDescription( AUDIO_ES,
+                                                               fmt->audio.i_format );
+            info_category_AddCodecInfo( p_cat, _("Decoded format"),
+                                        fmt->audio.i_format,
+                                        psz_codec_description );
         }
 
-        unsigned int i_bitspersample = fmt->audio.i_bitspersample;
-        if( i_bitspersample == 0 )
-            i_bitspersample = aout_BitsPerSample( fmt->i_codec );
-        if( i_bitspersample != 0 )
-            info_category_AddInfo( p_cat, _("Bits per sample"), "%u",
-                                   i_bitspersample );
+        if( fmt->audio.i_physical_channels &&
+            fmt->audio.i_physical_channels != p_fmt_es->audio.i_physical_channels )
+            info_category_AddInfo( p_cat, _("Decoded channels"), "%s",
+                vlc_gettext( aout_FormatPrintChannels( &fmt->audio ) ) );
+
+        if( fmt->audio.i_rate &&
+            fmt->audio.i_rate != p_fmt_es->audio.i_rate )
+            info_category_AddInfo( p_cat, _("Decoded sample rate"), _("%u Hz"),
+                                   fmt->audio.i_rate );
+
+        unsigned i_outbps = fmt->audio.i_bitspersample;
+        if( i_outbps == 0 )
+            i_outbps = aout_BitsPerSample( fmt->i_codec );
+        if( i_outbps != 0 && i_outbps != i_orgbps )
+            info_category_AddInfo( p_cat, _("Decoded bits per sample"), "%u",
+                                   i_outbps );
 
         if( fmt->i_bitrate != 0 )
         {
