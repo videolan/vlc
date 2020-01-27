@@ -95,7 +95,11 @@ static bool timestamps_filter_push(const char *s, struct timestamps_filter_s *tf
 
         if(b_contiguous)
         {
-            const int64_t i_maxdiff = tf->mva.i_packet > MVA_PACKETS ? mva_get(&tf->mva) * 2 : CLOCK_FREQ;
+            int64_t i_maxdiff = 0;
+            if(tf->mva.i_packet > MVA_PACKETS)
+                i_maxdiff = mva_get(&tf->mva) * 2;
+            if(i_maxdiff < CLOCK_FREQ)
+                i_maxdiff = CLOCK_FREQ;
             if(llabs(i_dts - prev->dts) > i_maxdiff || b_discontinuity) /* Desync */
             {
                 prev->diff = mva_get(&tf->mva);
