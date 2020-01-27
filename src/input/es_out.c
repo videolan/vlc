@@ -3967,6 +3967,18 @@ static int EsOutEsUpdateFmt(es_out_t *out, es_out_id_t *es,
     return ret;
 }
 
+static void info_category_AddCodecInfo( info_category_t* p_cat,
+                                        const char *psz_info,
+                                        vlc_fourcc_t i_fourcc,
+                                        const char *psz_description )
+{
+    const char *ps_fcc = (const char*)&i_fourcc;
+    if( psz_description && *psz_description )
+        info_category_AddInfo( p_cat, psz_info, "%s (%.4s)",
+                               psz_description, ps_fcc );
+    else if ( i_fourcc != VLC_FOURCC(0,0,0,0) )
+        info_category_AddInfo( p_cat, psz_info, "%.4s", ps_fcc );
+}
 /****************************************************************************
  * EsOutUpdateInfo:
  * - add meta info to the playlist item
@@ -4000,12 +4012,8 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
     const vlc_fourcc_t i_codec_fourcc = p_fmt_es->i_original_fourcc;
     const char *psz_codec_description =
         vlc_fourcc_GetDescription( p_fmt_es->i_cat, i_codec_fourcc );
-    if( psz_codec_description && *psz_codec_description )
-        info_category_AddInfo( p_cat, _("Codec"), "%s (%.4s)",
-                               psz_codec_description, (char*)&i_codec_fourcc );
-    else if ( i_codec_fourcc != VLC_FOURCC(0,0,0,0) )
-        info_category_AddInfo( p_cat, _("Codec"), "%.4s",
-                               (char*)&i_codec_fourcc );
+    info_category_AddCodecInfo( p_cat, _("Codec"),
+                                i_codec_fourcc, psz_codec_description );
 
     if( es->psz_language && *es->psz_language )
         info_category_AddInfo( p_cat, _("Language"), "%s",
@@ -4082,11 +4090,11 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
        }
        if( fmt->i_codec != p_fmt_es->i_codec )
        {
-           const char *psz_chroma_description =
-                vlc_fourcc_GetDescription( VIDEO_ES, fmt->i_codec );
-           if( psz_chroma_description )
-               info_category_AddInfo( p_cat, _("Decoded format"), "%s",
-                                      psz_chroma_description );
+           psz_codec_description = vlc_fourcc_GetDescription( VIDEO_ES,
+                                                              fmt->i_codec );
+           info_category_AddCodecInfo( p_cat, _("Decoded format"),
+                                       fmt->i_codec,
+                                       psz_codec_description );
        }
        {
            static const char orient_names[][13] = {
