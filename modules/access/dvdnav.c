@@ -210,23 +210,6 @@ static int CommonOpen( vlc_object_t *p_this,
     p_sys->b_readahead = b_readahead;
     vlc_mouse_Init( &p_sys->oldmouse );
 
-    if( 1 )
-    {
-        // Hack for libdvdnav CVS.
-        // Without it dvdnav_get_number_of_titles() fails.
-        // Remove when fixed in libdvdnav CVS.
-        uint8_t buffer[DVD_VIDEO_LB_LEN];
-        int i_event, i_len;
-
-        if( dvdnav_get_next_block( p_sys->dvdnav, buffer, &i_event, &i_len )
-              == DVDNAV_STATUS_ERR )
-        {
-            msg_Warn( p_demux, "dvdnav_get_next_block failed" );
-        }
-
-        dvdnav_sector_search( p_sys->dvdnav, 0, SEEK_SET );
-    }
-
     /* Configure dvdnav */
     if( dvdnav_set_readahead_flag( p_sys->dvdnav, p_sys->b_readahead ) !=
           DVDNAV_STATUS_OK )
