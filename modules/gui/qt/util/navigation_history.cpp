@@ -1,5 +1,5 @@
 #include "navigation_history.hpp"
-#include <QDebug>
+#include <cassert>
 
 NavigationHistory::NavigationHistory(QObject *parent)
     : QObject(parent), m_position(-1)
@@ -65,6 +65,21 @@ void NavigationHistory::push(QVariantList itemList, NavigationHistory::PostActio
     QVariantMap itemMap;
     pushListRec(itemMap, itemList.cbegin(), itemList.cend());
     push(itemMap, postAction);
+}
+
+
+void NavigationHistory::update(QVariantMap item)
+{
+    int length = m_history.length();
+    assert(length >= 1);
+    m_history.replace(m_position, item);
+}
+
+void NavigationHistory::update(QVariantList itemList)
+{
+    QVariantMap itemMap;
+    pushListRec(itemMap, itemList.cbegin(), itemList.cend());
+    update(itemMap);
 }
 
 void NavigationHistory::previous(PostAction postAction)

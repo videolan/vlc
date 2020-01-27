@@ -66,6 +66,21 @@ public slots:
      */
     Q_INVOKABLE void push(QVariantList itemList, PostAction = PostAction::Stay );
 
+
+    /**
+     * @brief same as @a push(QVariantMap) but modify the last (current) item instead of insterting a new one
+     *
+     * @see push
+     */
+    Q_INVOKABLE void update(QVariantMap itemList);
+
+    /**
+     * @brief same as @a push(QVariantList) but modify the last (current) item instead of insterting a new one
+     *
+     * @see push
+     */
+    Q_INVOKABLE void update(QVariantList itemList);
+
     // Go to previous page
     void previous( PostAction = PostAction::Stay );
 
