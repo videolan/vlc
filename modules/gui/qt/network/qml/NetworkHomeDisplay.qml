@@ -52,6 +52,10 @@ Widgets.NavigableFocusScope {
             ctx: mainctx
             sd_source: NetworkDeviceModel.CAT_DEVICES
         }
+
+        onCurrentIndexChanged: {
+            deviceSection.currentIndex = currentIndex
+        }
     }
 
     NetworksSectionSelectableDM{
@@ -60,6 +64,10 @@ Widgets.NavigableFocusScope {
             id: lanModel
             ctx: mainctx
             sd_source: NetworkDeviceModel.CAT_LAN
+        }
+
+        onCurrentIndexChanged: {
+            lanSection.currentIndex = currentIndex
         }
     }
 
@@ -88,6 +96,12 @@ Widgets.NavigableFocusScope {
                 focus: false
                 visible: machineDM.items.count !== 0
                 onVisibleChanged: topFocusScope.resetFocus()
+
+                currentIndex: machineDM.currentIndex
+                onFocusChanged: {
+                    if (activeFocus && machineDM.currentIndex === -1 && machineDM.items.count > 0)
+                        machineDM.currentIndex = 0
+                }
 
                 width: flickable.width
                 height: VLCStyle.gridItem_network_height
@@ -122,6 +136,12 @@ Widgets.NavigableFocusScope {
                 visible: lanDM.items.count !== 0
                 onVisibleChanged: topFocusScope.resetFocus()
                 focus: false
+
+                currentIndex: lanDM.currentIndex
+                onFocusChanged: {
+                    if (activeFocus && lanDM.currentIndex === -1 && lanDM.items.count > 0)
+                        lanDM.currentIndex = 0
+                }
 
                 width: flickable.width
                 height: VLCStyle.gridItem_network_height
