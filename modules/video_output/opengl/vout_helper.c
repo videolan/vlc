@@ -359,7 +359,18 @@ error:
 static void
 DeleteRenderer(struct vlc_gl_renderer *renderer)
 {
-    vlc_gl_interop_Delete(renderer->interop);
+    const opengl_vtable_t *vt = renderer->vt;
+    struct vlc_gl_interop *interop = renderer->interop;
+
+    vt->DeleteBuffers(1, &renderer->vertex_buffer_object);
+    vt->DeleteBuffers(1, &renderer->index_buffer_object);
+    vt->DeleteBuffers(interop->tex_count, renderer->texture_buffer_object);
+
+    if (!interop->handle_texs_gen)
+        vt->DeleteTextures(interop->tex_count, renderer->textures);
+
+    vlc_gl_interop_Delete(interop);
+
     if (renderer->program_id != 0)
         renderer->vt->DeleteProgram(renderer->program_id);
 
@@ -703,20 +714,8 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vgl->vt.Finish();
     vgl->vt.Flush();
 
-    struct vlc_gl_renderer *renderer = vgl->renderer;
-    const struct vlc_gl_interop *interop = renderer->interop;
-    const size_t main_tex_count = interop->tex_count;
-    const bool main_del_texs = !interop->handle_texs_gen;
-
     vlc_gl_sub_renderer_Delete(vgl->sub_renderer);
     DeleteRenderer(vgl->renderer);
-
-    vgl->vt.DeleteBuffers(1, &renderer->vertex_buffer_object);
-    vgl->vt.DeleteBuffers(1, &renderer->index_buffer_object);
-    vgl->vt.DeleteBuffers(main_tex_count, renderer->texture_buffer_object);
-
-    if (main_del_texs)
-        vgl->vt.DeleteTextures(main_tex_count, renderer->textures);
 
     GL_ASSERT_NOERROR();
 
