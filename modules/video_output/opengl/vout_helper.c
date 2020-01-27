@@ -534,10 +534,17 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
 
 static int
 opengl_init_program(vout_display_opengl_t *vgl, vlc_video_context *context,
-                    struct prgm *prgm, const char *glexts,
-                    const video_format_t *fmt, bool subpics,
+                    struct prgm *prgm, const video_format_t *fmt, bool subpics,
                     bool b_dump_shaders)
 {
+    const char *glexts = (const char *) vgl->vt.GetString(GL_EXTENSIONS);
+    assert(glexts);
+    if (!glexts)
+    {
+        msg_Err(vgl->gl, "glGetString returned NULL");
+        return VLC_EGENERIC;
+    }
+
     opengl_tex_converter_t *tc = calloc(1, sizeof(*tc));
     if (tc == NULL)
         return VLC_ENOMEM;
@@ -839,7 +846,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GL_ASSERT_NOERROR();
     int ret;
-    ret = opengl_init_program(vgl, context, vgl->prgm, extensions, fmt, false,
+    ret = opengl_init_program(vgl, context, vgl->prgm, fmt, false,
                               b_dump_shaders);
     if (ret != VLC_SUCCESS)
     {
@@ -850,7 +857,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     GL_ASSERT_NOERROR();
-    ret = opengl_init_program(vgl, context, vgl->sub_prgm, extensions, fmt, true,
+    ret = opengl_init_program(vgl, context, vgl->sub_prgm, fmt, true,
                               b_dump_shaders);
     if (ret != VLC_SUCCESS)
     {
