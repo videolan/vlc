@@ -311,50 +311,6 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
     return shader;
 }
 
-int
-vlc_gl_interop_GenerateTextures(const struct vlc_gl_interop *interop,
-                                const GLsizei *tex_width,
-                                const GLsizei *tex_height, GLuint *textures)
-{
-    interop->vt->GenTextures(interop->tex_count, textures);
-
-    for (unsigned i = 0; i < interop->tex_count; i++)
-    {
-        interop->vt->BindTexture(interop->tex_target, textures[i]);
-
-#if !defined(USE_OPENGL_ES2)
-        /* Set the texture parameters */
-        interop->vt->TexParameterf(interop->tex_target, GL_TEXTURE_PRIORITY, 1.0);
-        interop->vt->TexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-#endif
-
-        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        interop->vt->TexParameteri(interop->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    }
-
-    if (interop->ops->allocate_textures != NULL)
-    {
-        int ret = interop->ops->allocate_textures(interop, textures, tex_width, tex_height);
-        if (ret != VLC_SUCCESS)
-        {
-            interop->vt->DeleteTextures(interop->tex_count, textures);
-            memset(textures, 0, interop->tex_count * sizeof(GLuint));
-            return ret;
-        }
-    }
-    return VLC_SUCCESS;
-}
-
-void
-vlc_gl_interop_DeleteTextures(const struct vlc_gl_interop *interop,
-                              GLuint *textures)
-{
-    interop->vt->DeleteTextures(interop->tex_count, textures);
-    memset(textures, 0, interop->tex_count * sizeof(GLuint));
-}
-
 static int
 opengl_link_program(struct prgm *prgm)
 {
