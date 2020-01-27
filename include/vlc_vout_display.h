@@ -209,17 +209,6 @@ enum vout_display_query {
 };
 
 /**
- * Event from vout_display_t
- *
- * Events modifiying the state may be sent multiple times.
- * Only the transition will be retained and acted upon.
- */
-enum {
-    /* VR navigation, vlc_viewpoint_t* */
-    VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED,
-};
-
-/**
  * Vout owner structures
  */
 struct vout_display_owner_t {
