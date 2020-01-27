@@ -205,18 +205,8 @@ static int CommonOpen( vlc_object_t *p_this,
     /* Fill p_demux field */
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     p_sys->dvdnav = p_dvdnav;
-    p_sys->b_reset_pcr = false;
 
     ps_track_init( p_sys->tk );
-    p_sys->spu_es = NULL;
-    p_sys->sar.i_num = 0;
-    p_sys->sar.i_den = 0;
-    p_sys->i_mux_rate = 0;
-    p_sys->i_pgc_length = 0;
-    p_sys->b_spu_change = false;
-    p_sys->highlight.b_pending = false;
-    p_sys->i_vobu_index = 0;
-    p_sys->i_vobu_flush = 0;
     p_sys->b_readahead = b_readahead;
     vlc_mouse_Init( &p_sys->oldmouse );
 
