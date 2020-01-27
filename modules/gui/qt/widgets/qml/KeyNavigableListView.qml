@@ -107,9 +107,12 @@ NavigableFocusScope {
         contentWidth: contentItem.childrenRect.width
         contentHeight: contentItem.childrenRect.height
 
-
-        preferredHighlightBegin : highlightMargin + (headerItem ? headerItem.height : 0)
-        preferredHighlightEnd : height - highlightMargin
+        preferredHighlightBegin : (view.orientation === ListView.Vertical)
+                                    ? highlightMargin + (headerItem ? headerItem.height : 0)
+                                    : highlightMargin
+        preferredHighlightEnd : (view.orientation === ListView.Vertical)
+                                    ? height - highlightMargin
+                                    : width - highlightMargin
         highlightRangeMode: ListView.ApplyRange
 
         focus: true
