@@ -869,6 +869,24 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
              * the surface attached to it */
             p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
 
+            p_dec->fmt_out.video = p_dec->fmt_in.video;
+            if (p_dec->fmt_out.video.i_sar_num * p_dec->fmt_out.video.i_sar_den == 0)
+            {
+                p_dec->fmt_out.video.i_sar_num = 1;
+                p_dec->fmt_out.video.i_sar_den = 1;
+            }
+
+            p_sys->video.i_input_width =
+            p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
+            p_sys->video.i_input_height =
+            p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
+
+            if (CreateVideoContext(p_dec) != VLC_SUCCESS)
+            {
+                msg_Err(p_dec, "video context creation failed");
+                goto bailout;
+            }
+
             if (p_sys->api.b_support_rotation)
             {
                 switch (p_dec->fmt_in.video.orientation)
@@ -890,23 +908,6 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
             else
                 p_sys->video.i_angle = 0;
 
-            p_dec->fmt_out.video = p_dec->fmt_in.video;
-            if (p_dec->fmt_out.video.i_sar_num * p_dec->fmt_out.video.i_sar_den == 0)
-            {
-                p_dec->fmt_out.video.i_sar_num = 1;
-                p_dec->fmt_out.video.i_sar_den = 1;
-            }
-
-            p_sys->video.i_input_width =
-            p_dec->fmt_out.video.i_visible_width = p_dec->fmt_out.video.i_width;
-            p_sys->video.i_input_height =
-            p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
-
-            if (CreateVideoContext(p_dec) != VLC_SUCCESS)
-            {
-                msg_Err(p_dec, "video context creation failed");
-                goto bailout;
-            }
         }
         p_sys->cat = VIDEO_ES;
     }
