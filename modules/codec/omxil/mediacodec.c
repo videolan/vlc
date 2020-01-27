@@ -887,7 +887,11 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
                 goto bailout;
             }
 
-            if (p_sys->api.b_support_rotation)
+            android_video_context_t *avctx =
+                vlc_video_context_GetPrivate(p_sys->video.ctx,
+                                             VLC_VIDEO_CONTEXT_AWINDOW);
+
+            if (p_sys->api.b_support_rotation && avctx->id == AWindow_Video)
             {
                 switch (p_dec->fmt_in.video.orientation)
                 {
@@ -906,7 +910,10 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
                 }
             }
             else
+            {
+                /* Let the GL vout handle the rotation */
                 p_sys->video.i_angle = 0;
+            }
 
         }
         p_sys->cat = VIDEO_ES;
