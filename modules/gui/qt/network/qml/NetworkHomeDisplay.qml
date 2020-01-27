@@ -169,11 +169,21 @@ Widgets.NavigableFocusScope {
     Component.onCompleted: resetFocus()
     onActiveFocusChanged: resetFocus()
     function resetFocus() {
-        if (!deviceSection.focus && !lanSection.focus) {
-            if (deviceSection.visible)
-                deviceSection.focus = true
-            else if (lanSection.visible)
-                lanSection.focus = true
+        var widgetlist = [deviceSection, lanSection]
+        var i;
+        for (i in widgetlist) {
+            if (widgetlist[i].activeFocus && widgetlist[i].visible)
+                return
+        }
+
+        var found  = false;
+        for (i in widgetlist) {
+            if (widgetlist[i].visible && !found) {
+                widgetlist[i].focus = true
+                found = true
+            } else {
+                widgetlist[i].focus = false
+            }
         }
     }
 }
