@@ -152,7 +152,7 @@ Widgets.NavigableFocusScope {
 
                 property var model: ({})
 
-                subtitle: model.mrl || ""
+                subtitle: ""
 
                 onItemClicked : {
                     delegateModel.updateSelection( modifier ,  delegateModel.currentIndex, index)
