@@ -209,7 +209,7 @@ Widgets.NavigableFocusScope {
 
             onSelectAll: videosGV.model.selectAll()
             onSelectionUpdated: videosGV.model.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: switchExpandItem( index )
+            onActionAtIndex: videosDelegate.actionAtIndex( index )
         }
 
     }
