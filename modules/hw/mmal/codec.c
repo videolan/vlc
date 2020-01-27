@@ -101,12 +101,10 @@ typedef struct supported_mmal_enc_s {
 
 static supported_mmal_enc_t supported_decode_in_enc = SUPPORTED_MMAL_ENC_INIT;
 
-static bool is_enc_supported(supported_mmal_enc_t * const support, const MMAL_FOURCC_T fcc)
+static bool is_enc_supported(const supported_mmal_enc_t * const support, const MMAL_FOURCC_T fcc)
 {
     int i;
 
-    if (fcc == 0)
-        return false;
     if (support->n == -1)
         return true;  // Unknown - say OK
     for (i = 0; i < support->n; ++i) {
@@ -116,15 +114,22 @@ static bool is_enc_supported(supported_mmal_enc_t * const support, const MMAL_FO
     return false;
 }
 
-static bool set_and_test_enc_supported(supported_mmal_enc_t * const support, MMAL_PORT_T * port, const MMAL_FOURCC_T fcc)
+static bool set_and_test_enc_supported(vlc_object_t *obj, supported_mmal_enc_t * const support,
+                                       MMAL_PORT_T * port, const MMAL_FOURCC_T fcc)
 {
-    if (support->n >= 0)
-        /* already done */;
-    else if (mmal_port_parameter_get(port, (MMAL_PARAMETER_HEADER_T *)&support->supported) != MMAL_SUCCESS)
-        support->n = 0;
-    else
+    if (support->n == -1)
+    {
+        if (mmal_port_parameter_get(port, (MMAL_PARAMETER_HEADER_T *)&support->supported) != MMAL_SUCCESS) {
+            support->n = 0;
+            msg_Err(obj, "Failed to get the supported codecs");
+            return false;
+        }
+
         support->n = (support->supported.header.size - sizeof(support->supported.header)) /
-          sizeof(support->supported.encodings[0]);
+                     sizeof(support->supported.encodings[0]);
+        for (int i=0; i<support->n; i++)
+            msg_Dbg(obj, "%4.4s supported", (const char*)&support->supported.encodings[i]);
+    }
 
     return is_enc_supported(support, fcc);
 }
@@ -596,9 +601,16 @@ static int OpenDecoder(vlc_object_t *p_this)
     decoder_sys_t *sys;
     MMAL_STATUS_T status;
     const MMAL_FOURCC_T in_fcc = vlc_to_mmal_es_fourcc(dec->fmt_in.i_codec);
-
-    if (!is_enc_supported(&supported_decode_in_enc, in_fcc))
+    if (in_fcc == 0) {
+        msg_Dbg(p_this, "codec %4.4s not supported", (const char*)&dec->fmt_in.i_codec);
         return VLC_EGENERIC;
+    }
+
+    if (!is_enc_supported(&supported_decode_in_enc, in_fcc)) {
+        msg_Dbg(p_this, "codec %4.4s (MMAL %4.4s) not supported",
+                (const char*)&dec->fmt_in.i_codec, (const char*)&in_fcc);
+        return VLC_EGENERIC;
+    }
 
     sys = calloc(1, sizeof(decoder_sys_t));
     if (unlikely(sys == NULL))
@@ -632,7 +644,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     sys->input->userdata = (struct MMAL_PORT_USERDATA_T *)dec;
     sys->input->format->encoding = in_fcc;
 
-    if (!set_and_test_enc_supported(&supported_decode_in_enc, sys->input, in_fcc)) {
+    if (!set_and_test_enc_supported(p_this, &supported_decode_in_enc, sys->input, in_fcc)) {
+        msg_Warn(p_this, "codec %4.4s not supported", (const char*)&dec->fmt_in.i_codec);
         goto fail;
     }
 
