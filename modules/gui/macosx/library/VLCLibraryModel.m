@@ -74,6 +74,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
             if (p_event->media_thumbnail_generated.b_success) {
                 VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:(struct vlc_ml_media_t *)p_event->media_thumbnail_generated.p_media];
+                if (mediaItem == nil) {
+                    return;
+                }
                 dispatch_async(dispatch_get_main_queue(), ^{
                     VLCLibraryModel *libraryModel = (__bridge VLCLibraryModel *)p_data;
                     [libraryModel mediaItemWasUpdated:mediaItem];
@@ -145,7 +148,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_media_list->i_nb_items];
         for (size_t x = 0; x < p_media_list->i_nb_items; x++) {
             VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_media_list->p_items[x]];
-            [mutableArray addObject:mediaItem];
+            if (mediaItem != nil) {
+                [mutableArray addObject:mediaItem];
+            }
         }
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -178,7 +183,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_artist_list->i_nb_items];
         for (size_t x = 0; x < p_artist_list->i_nb_items; x++) {
             VLCMediaLibraryArtist *artist = [[VLCMediaLibraryArtist alloc] initWithArtist:&p_artist_list->p_items[x]];
-            [mutableArray addObject:artist];
+            if (artist != nil) {
+                [mutableArray addObject:artist];
+            }
         }
         vlc_ml_artist_list_release(p_artist_list);
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -287,7 +294,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_media_list->i_nb_items];
         for (size_t x = 0; x < p_media_list->i_nb_items; x++) {
             VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_media_list->p_items[x]];
-            [mutableArray addObject:mediaItem];
+            if (mediaItem != nil) {
+                [mutableArray addObject:mediaItem];
+            }
         }
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -321,7 +330,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_media_list->i_nb_items];
         for (size_t x = 0; x < p_media_list->i_nb_items; x++) {
             VLCMediaLibraryMediaItem *mediaItem = [[VLCMediaLibraryMediaItem alloc] initWithMediaItem:&p_media_list->p_items[x]];
-            [mutableArray addObject:mediaItem];
+            if (mediaItem != nil) {
+                [mutableArray addObject:mediaItem];
+            }
         }
         vlc_ml_media_list_release(p_media_list);
         dispatch_async(dispatch_get_main_queue(), ^{
