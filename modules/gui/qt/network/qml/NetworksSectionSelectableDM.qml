@@ -123,7 +123,6 @@ Util.SelectableDelegateModel {
         } else {
             if (delegateModel.items.get(index).model.type === NetworkMediaModel.TYPE_DIRECTORY
                     || delegateModel.items.get(index).model.type === NetworkMediaModel.TYPE_NODE)  {
-                console.log("push network tree", delegateModel.items.get(index).model.tree)
                 history.push(["mc", "network", { tree: delegateModel.items.get(index).model.tree }], History.Go);
             } else {
                 playSelection()
