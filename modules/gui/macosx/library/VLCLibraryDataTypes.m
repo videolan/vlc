@@ -180,9 +180,13 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 @implementation VLCMediaLibraryArtist
 
-+ (instancetype)artistWithID:(int64_t)artistID
++ (nullable instancetype)artistWithID:(int64_t)artistID
 {
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf) {
+        return nil;
+    }
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
     vlc_ml_artist_t *p_artist = vlc_ml_get_artist(p_mediaLibrary, artistID);
     VLCMediaLibraryArtist *artist = nil;
     if (p_artist) {
@@ -229,7 +233,11 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)tracksAsMediaItems
 {
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf) {
+        return @[];
+    }
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
     vlc_ml_media_list_t *p_mediaList = vlc_ml_list_album_tracks(p_mediaLibrary, NULL, _albumID);
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_mediaList->i_nb_items];
     for (size_t x = 0; x < p_mediaList->i_nb_items; x++) {
@@ -287,7 +295,11 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID
 {
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf) {
+        return nil;
+    }
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
     vlc_ml_media_t *p_mediaItem = vlc_ml_get_media(p_mediaLibrary, libraryID);
     VLCMediaLibraryMediaItem *returnValue = nil;
     if (p_mediaItem) {
@@ -296,9 +308,13 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     return returnValue;
 }
 
-+ (instancetype)mediaItemForURL:(NSURL *)url
++ (nullable instancetype)mediaItemForURL:(NSURL *)url
 {
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf) {
+        return nil;
+    }
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
     vlc_ml_media_t *p_mediaItem = vlc_ml_get_media_by_mrl(p_mediaLibrary,
                                                           [[url absoluteString] UTF8String]);
     VLCMediaLibraryMediaItem *returnValue = nil;
@@ -308,10 +324,17 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     return returnValue;
 }
 
-- (instancetype)initWithMediaItem:(struct vlc_ml_media_t *)p_mediaItem
+- (nullable instancetype)initWithMediaItem:(struct vlc_ml_media_t *)p_mediaItem
 {
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
-    return [self initWithMediaItem:p_mediaItem library:p_mediaLibrary];
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf) {
+        return nil;
+    }
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
+    if (p_mediaItem != NULL && p_mediaLibrary != NULL) {
+        return [self initWithMediaItem:p_mediaItem library:p_mediaLibrary];
+    }
+    return nil;
 }
 
 - (instancetype)initWithMediaItem:(struct vlc_ml_media_t *)p_mediaItem library:(vlc_medialibrary_t *)p_mediaLibrary
@@ -374,14 +397,18 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     return self;
 }
 
-- (instancetype)initWithExternalURL:(NSURL *)url
+- (nullable instancetype)initWithExternalURL:(NSURL *)url
 {
     NSString *urlString = url.absoluteString;
     if (!urlString) {
         return self;
     }
 
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf) {
+        return nil;
+    }
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
     vlc_ml_media_t *p_media = vlc_ml_new_external_media(p_mediaLibrary, urlString.UTF8String);
     if (p_media) {
         self = [self initWithMediaItem:p_media library:p_mediaLibrary];
@@ -390,14 +417,18 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     return self;
 }
 
-- (instancetype)initWithStreamURL:(NSURL *)url
+- (nullable instancetype)initWithStreamURL:(NSURL *)url
 {
     NSString *urlString = url.absoluteString;
     if (!urlString) {
         return self;
     }
 
-    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(getIntf());
+    intf_thread_t *p_intf = getIntf();
+    if (!p_intf) {
+        return nil;
+    }
+    vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
     vlc_ml_media_t *p_media = vlc_ml_new_stream(p_mediaLibrary, urlString.UTF8String);
     if (p_media) {
         self = [self initWithMediaItem:p_media library:p_mediaLibrary];
