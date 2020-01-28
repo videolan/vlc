@@ -140,7 +140,9 @@ typedef struct
     uint16_t i_h_size_value;
     uint16_t i_v_size_value;
     uint8_t  i_aspect_ratio_info;
+    uint32_t i_bitratelower18;
     /* Extended Sequence properties (MPEG2) */
+    uint16_t i_bitrateupper12;
     bool  b_seq_progressive;
     bool  b_low_delay;
 
@@ -242,6 +244,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_h_size_value = 0;
     p_sys->i_v_size_value = 0;
     p_sys->i_aspect_ratio_info = 0;
+    p_sys->i_bitratelower18 = 0;
+    p_sys->i_bitrateupper12 = 0;
     p_sys->b_seq_progressive = true;
     p_sys->b_low_delay = false;
     p_sys->i_seq_old = 0;
@@ -366,6 +370,11 @@ static void ProcessSequenceParameters( decoder_t *p_dec )
         fmt->i_height = (fmt->i_visible_height + 0x0F) & ~0x0F;
     else
         fmt->i_height = (fmt->i_visible_height + 0x1F) & ~0x1F;
+
+    /* Bitrate */
+    if( p_dec->fmt_out.i_bitrate == 0 )
+        p_dec->fmt_out.i_bitrate = ((p_sys->i_bitrateupper12 << 18) |
+                                    p_sys->i_bitratelower18) * 400;
 
     /* Frame Rate */
     if( fmt->i_frame_rate != (p_sys->dts.i_divider_num >> 1) ||
@@ -761,7 +770,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             p_sys->i_seq_old = 0;
         }
     }
-    else if( startcode == SEQUENCE_HEADER_STARTCODE && p_frag->i_buffer >= 8 )
+    else if( startcode == SEQUENCE_HEADER_STARTCODE && p_frag->i_buffer >= 11 )
     {
         /* Sequence header code */
         static const int code_to_frame_rate[16][2] =
@@ -802,6 +811,10 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
                 date_Change( &p_sys->prev_iframe_dts, num, den );
             }
         }
+
+        p_sys->i_bitratelower18 = (p_frag->p_buffer[ 8] << 12) |
+                                  (p_frag->p_buffer[ 9] <<  4) |
+                                  (p_frag->p_buffer[10] & 0x0F);
     }
     else if( startcode == EXTENSION_STARTCODE && p_frag->i_buffer > 4 )
     {
@@ -872,6 +885,9 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
                 p_sys->b_seq_progressive =
                     p_frag->p_buffer[5]&0x08 ? true : false;
+
+                p_sys->i_bitrateupper12 = ((p_frag->p_buffer[6] & 0x1F) << 8) | (p_frag->p_buffer[7] >> 1);
+
                 p_sys->b_low_delay =
                     p_frag->p_buffer[9]&0x80 ? true : false;
             }
