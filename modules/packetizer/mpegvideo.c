@@ -136,9 +136,12 @@ typedef struct
     date_t  prev_iframe_dts;
 
     /* Sequence properties */
+    uint16_t i_h_size_value;
+    uint16_t i_v_size_value;
+    uint8_t  i_aspect_ratio_info;
+    /* Extended Sequence properties (MPEG2) */
     bool  b_seq_progressive;
     bool  b_low_delay;
-    int         i_aspect_ratio_info;
 
     /* Picture properties */
     int i_temporal_ref;
@@ -235,8 +238,11 @@ static int Open( vlc_object_t *p_this )
     date_Init( &p_sys->dts, 2 * num, den ); /* fields / den */
     date_Init( &p_sys->prev_iframe_dts, 2 * num, den );
 
+    p_sys->i_h_size_value = 0;
+    p_sys->i_v_size_value = 0;
+    p_sys->i_aspect_ratio_info = 0;
     p_sys->b_seq_progressive = true;
-    p_sys->b_low_delay = true;
+    p_sys->b_low_delay = false;
     p_sys->i_seq_old = 0;
 
     p_sys->i_temporal_ref = 0;
@@ -344,6 +350,37 @@ static block_t *GetCc( decoder_t *p_dec, decoder_cc_desc_t *p_desc )
 }
 
 /*****************************************************************************
+ * ProcessSequenceParameters
+ *****************************************************************************/
+static void ProcessSequenceParameters( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    video_format_t *fmt = &p_dec->fmt_out.video;
+
+    /* Picture size */
+    fmt->i_visible_width = p_sys->i_h_size_value;
+    fmt->i_width = (fmt->i_visible_width + 0x0F) & ~0x0F;
+    fmt->i_visible_height = p_sys->i_v_size_value;
+    if( p_sys->b_seq_progressive )
+        fmt->i_height = (fmt->i_visible_height + 0x0F) & ~0x0F;
+    else
+        fmt->i_height = (fmt->i_visible_height + 0x1F) & ~0x1F;
+
+    /* Frame Rate */
+    if( fmt->i_frame_rate != (p_sys->dts.i_divider_num >> 1) ||
+        fmt->i_frame_rate_base != p_sys->dts.i_divider_den )
+    {
+        fmt->i_frame_rate = p_sys->dts.i_divider_num >> 1;
+        fmt->i_frame_rate_base = p_sys->dts.i_divider_den;
+
+        msg_Dbg( p_dec, "size %ux%u/%ux%u fps %u:%u",
+             fmt->i_visible_width, fmt->i_visible_height,
+             fmt->i_width, fmt->i_height,
+             fmt->i_frame_rate, fmt->i_frame_rate_base);
+    }
+}
+
+/*****************************************************************************
  * OutputFrame: assemble and tag frame
  *****************************************************************************/
 static block_t *OutputFrame( decoder_t *p_dec )
@@ -353,6 +390,8 @@ static block_t *OutputFrame( decoder_t *p_dec )
 
     if( !p_sys->p_frame )
         return NULL;
+
+    ProcessSequenceParameters( p_dec );
 
     p_pic = block_ChainGather( p_sys->p_frame );
     if( p_pic == NULL )
@@ -743,15 +782,8 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->i_seq_old = 0;
         p_sys->p_ext = NULL;
 
-        p_dec->fmt_out.video.i_visible_width =
-            ( p_frag->p_buffer[4] << 4)|(p_frag->p_buffer[5] >> 4 );
-        p_dec->fmt_out.video.i_width = (p_dec->fmt_out.video.i_visible_width + 0x0F) & ~0x0F;
-        p_dec->fmt_out.video.i_visible_height =
-            ( (p_frag->p_buffer[5]&0x0f) << 8 )|p_frag->p_buffer[6];
-        if( p_sys->b_seq_progressive )
-            p_dec->fmt_out.video.i_height = (p_dec->fmt_out.video.i_visible_height + 0x0F) & ~0x0F;
-        else
-            p_dec->fmt_out.video.i_height = (p_dec->fmt_out.video.i_visible_height + 0x1F) & ~0x1F;
+        p_sys->i_h_size_value = ( p_frag->p_buffer[4] << 4)|(p_frag->p_buffer[5] >> 4 );
+        p_sys->i_v_size_value = ( (p_frag->p_buffer[5]&0x0f) << 8 )|p_frag->p_buffer[6];
         p_sys->i_aspect_ratio_info = p_frag->p_buffer[7] >> 4;
 
         /* TODO: MPEG1 aspect ratio */
@@ -769,22 +801,6 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
                 date_Change( &p_sys->prev_iframe_dts, num, den );
             }
         }
-
-        if( p_dec->fmt_out.video.i_frame_rate != (p_sys->dts.i_divider_num >> 1) ||
-            p_dec->fmt_out.video.i_frame_rate_base != p_sys->dts.i_divider_den )
-        {
-            p_dec->fmt_out.video.i_frame_rate = p_sys->dts.i_divider_num >> 1;
-            p_dec->fmt_out.video.i_frame_rate_base = p_sys->dts.i_divider_den;
-
-            msg_Dbg( p_dec, "size %ux%u/%ux%u fps %u:%u",
-                 p_dec->fmt_out.video.i_visible_width, p_dec->fmt_out.video.i_visible_height,
-                 p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height,
-                 p_dec->fmt_out.video.i_frame_rate,
-                 p_dec->fmt_out.video.i_frame_rate_base);
-        }
-
-        p_sys->b_seq_progressive = true;
-        p_sys->b_low_delay = true;
     }
     else if( startcode == EXTENSION_STARTCODE && p_frag->i_buffer > 4 )
     {
