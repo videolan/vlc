@@ -136,7 +136,7 @@ Widgets.NavigableFocusScope {
 
             property alias currentIndex: albumSubView.currentIndex
 
-            MusicAlbumsDisplay {
+            MusicAlbums {
                 id: albumSubView
                 anchors.fill: parent
 

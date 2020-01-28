@@ -223,6 +223,7 @@
         <file alias="NetworkListItem.qml">network/qml/NetworkListItem.qml</file>
     </qresource>
     <qresource prefix="/medialibrary">
+        <file alias="MusicAlbums.qml">medialibrary/qml/MusicAlbums.qml</file>
         <file alias="MusicDisplay.qml">medialibrary/qml/MusicDisplay.qml</file>
         <file alias="VideoDisplay.qml">medialibrary/qml/VideoDisplay.qml</file>
         <file alias="MusicAlbumsDisplay.qml">medialibrary/qml/MusicAlbumsDisplay.qml</file>
