@@ -322,6 +322,10 @@ libftp_plugin_la_SOURCES = access/ftp.c
 libftp_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libftp_plugin.la
 
+libgopher_plugin_la_SOURCES = access/gopher.c
+libgopher_plugin_la_LIBADD = $(SOCKET_LIBS)
+access_LTLIBRARIES += libgopher_plugin.la
+
 libhttp_plugin_la_SOURCES = access/http.c
 libhttp_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libhttp_plugin.la
