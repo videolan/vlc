@@ -47,7 +47,7 @@ public slots:
      * }, History.Go)
      * \endcode
      */
-    Q_INVOKABLE void push( QVariantMap, PostAction = PostAction::Stay );
+    Q_INVOKABLE void push( QVariantMap, PostAction = PostAction::Go );
 
     /**
      * provide a short version of the history push({k:v}), wich implicitly create a dictonnary tree from the input list
@@ -64,7 +64,7 @@ public slots:
      *  push(["foo", "bar", {baz: "plop"} ], History.Go)
      * \endcode
      */
-    Q_INVOKABLE void push(QVariantList itemList, PostAction = PostAction::Stay );
+    Q_INVOKABLE void push(QVariantList itemList, PostAction = PostAction::Go );
 
 
     /**
@@ -82,10 +82,10 @@ public slots:
     Q_INVOKABLE void update(QVariantList itemList);
 
     // Go to previous page
-    void previous( PostAction = PostAction::Stay );
+    void previous( PostAction = PostAction::Go );
 
     // Go to next page
-    void next( PostAction = PostAction::Stay );
+    void next( PostAction = PostAction::Go );
 
 private:
     QVariantList m_history;
