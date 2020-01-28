@@ -323,10 +323,9 @@ renderer_xyz12_prepare_shader(const struct vlc_gl_renderer *renderer,
     vt->Uniform1i(renderer->uloc.Texture[0], 0);
 }
 
-static GLuint
+static char *
 xyz12_shader_init(struct vlc_gl_renderer *renderer)
 {
-    const opengl_vtable_t *vt = renderer->vt;
     renderer->pf_fetch_locations = renderer_xyz12_fetch_locations;
     renderer->pf_prepare_shader = renderer_xyz12_prepare_shader;
 
@@ -365,13 +364,9 @@ xyz12_shader_init(struct vlc_gl_renderer *renderer)
     char *code;
     if (asprintf(&code, template, renderer->glsl_version,
                  renderer->glsl_precision_header) < 0)
-        return 0;
+        return NULL;
 
-    GLuint fragment_shader = vt->CreateShader(GL_FRAGMENT_SHADER);
-    vt->ShaderSource(fragment_shader, 1, (const char **) &code, NULL);
-    vt->CompileShader(fragment_shader);
-    free(code);
-    return fragment_shader;
+    return code;
 }
 
 static int
@@ -433,7 +428,7 @@ opengl_init_swizzle(const struct vlc_gl_interop *interop,
     return VLC_SUCCESS;
 }
 
-GLuint
+char *
 opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
                             vlc_fourcc_t chroma, video_color_space_t yuv_space)
 {
@@ -446,7 +441,7 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
 
     const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(chroma);
     if (desc == NULL)
-        return 0;
+        return NULL;
 
     if (chroma == VLC_CODEC_XYZ12)
         return xyz12_shader_init(renderer);
@@ -455,10 +450,10 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
     {
         ret = renderer_yuv_base_init(renderer, chroma, desc, yuv_space);
         if (ret != VLC_SUCCESS)
-            return 0;
+            return NULL;
         ret = opengl_init_swizzle(renderer->interop, swizzle_per_tex, chroma, desc);
         if (ret != VLC_SUCCESS)
-            return 0;
+            return NULL;
     }
 
     const char *sampler, *lookup, *coord_name;
@@ -485,7 +480,7 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
 
     struct vlc_memstream ms;
     if (vlc_memstream_open(&ms) != 0)
-        return 0;
+        return NULL;
 
 #define ADD(x) vlc_memstream_puts(&ms, x)
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
@@ -644,24 +639,14 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
 #undef ADDF
 
     if (vlc_memstream_close(&ms) != 0)
-        return 0;
+        return NULL;
 
-    GLuint fragment_shader = vt->CreateShader(GL_FRAGMENT_SHADER);
-    if (fragment_shader == 0)
-    {
-        free(ms.ptr);
-        return 0;
-    }
-    GLint length = ms.length;
-    vt->ShaderSource(fragment_shader, 1, (const char **)&ms.ptr, &length);
-    vt->CompileShader(fragment_shader);
     if (renderer->b_dump_shaders)
         msg_Dbg(renderer->gl, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
                 (const char *)&chroma, yuv_space, ms.ptr);
-    free(ms.ptr);
 
     renderer->pf_fetch_locations = renderer_base_fetch_locations;
     renderer->pf_prepare_shader = renderer_base_prepare_shader;
 
-    return fragment_shader;
+    return ms.ptr;
 }

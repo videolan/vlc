@@ -82,140 +82,6 @@ struct vlc_gl_sub_renderer
     unsigned buffer_object_count;
 };
 
-static void
-LogShaderErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
-{
-    GLint info_len;
-    vt->GetShaderiv(id, GL_INFO_LOG_LENGTH, &info_len);
-    if (info_len > 0)
-    {
-        char *info_log = malloc(info_len);
-        if (info_log)
-        {
-            GLsizei written;
-            vt->GetShaderInfoLog(id, info_len, &written, info_log);
-            msg_Err(obj, "shader: %s", info_log);
-            free(info_log);
-        }
-    }
-}
-
-static void
-LogProgramErrors(vlc_object_t *obj, const opengl_vtable_t *vt, GLuint id)
-{
-    GLint info_len;
-    vt->GetProgramiv(id, GL_INFO_LOG_LENGTH, &info_len);
-    if (info_len > 0)
-    {
-        char *info_log = malloc(info_len);
-        if (info_log)
-        {
-            GLsizei written;
-            vt->GetProgramInfoLog(id, info_len, &written, info_log);
-            msg_Err(obj, "program: %s", info_log);
-            free(info_log);
-        }
-    }
-}
-
-static GLuint
-CreateShader(vlc_object_t *obj, const opengl_vtable_t *vt, GLenum type,
-             const char *src)
-{
-    GLuint shader = vt->CreateShader(type);
-    if (!shader)
-        return 0;
-
-    vt->ShaderSource(shader, 1, &src, NULL);
-    vt->CompileShader(shader);
-
-    LogShaderErrors(obj, vt, shader);
-
-    GLint compiled;
-    vt->GetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-    if (!compiled)
-    {
-        msg_Err(obj, "Failed to compile shader");
-        vt->DeleteShader(shader);
-        return 0;
-    }
-
-    return shader;
-}
-
-static GLuint
-CreateProgram(vlc_object_t *obj, const opengl_vtable_t *vt)
-{
-    static const char *const VERTEX_SHADER_SRC =
-#if defined(USE_OPENGL_ES2)
-        "#version 100\n"
-#else
-        "#version 120\n"
-#endif
-        "attribute vec2 vertex_pos;\n"
-        "attribute vec2 tex_coords_in;\n"
-        "varying vec2 tex_coords;\n"
-        "void main() {\n"
-        "  tex_coords = tex_coords_in;\n"
-        "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
-        "}\n";
-
-    static const char *const FRAGMENT_SHADER_SRC =
-#if defined(USE_OPENGL_ES2)
-        "#version 100\n"
-        "precision mediump float;\n"
-#else
-        "#version 120\n"
-#endif
-        "uniform sampler2D sampler;\n"
-        "uniform float alpha;\n"
-        "varying vec2 tex_coords;\n"
-        "void main() {\n"
-        "  vec4 color = texture2D(sampler, tex_coords);\n"
-        "  color.a *= alpha;\n"
-        "  gl_FragColor = color;\n"
-        "}\n";
-
-    GLuint program = 0;
-
-    GLuint vertex_shader = CreateShader(obj, vt, GL_VERTEX_SHADER,
-                                        VERTEX_SHADER_SRC);
-    if (!vertex_shader)
-        return 0;
-
-    GLuint fragment_shader = CreateShader(obj, vt, GL_FRAGMENT_SHADER,
-                                          FRAGMENT_SHADER_SRC);
-    if (!fragment_shader)
-        goto finally_1;
-
-    program = vt->CreateProgram();
-    if (!program)
-        goto finally_2;
-
-    vt->AttachShader(program, vertex_shader);
-    vt->AttachShader(program, fragment_shader);
-
-    vt->LinkProgram(program);
-
-    LogProgramErrors(obj, vt, program);
-
-    GLint linked;
-    vt->GetProgramiv(program, GL_LINK_STATUS, &linked);
-    if (!linked)
-    {
-        msg_Err(obj, "Failed to link program");
-        vt->DeleteProgram(program);
-        program = 0;
-    }
-
-finally_2:
-    vt->DeleteShader(fragment_shader);
-finally_1:
-    vt->DeleteShader(vertex_shader);
-
-    return program;
-}
-
 static int
 FetchLocations(struct vlc_gl_sub_renderer *sr)
 {
@@ -268,7 +134,40 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const opengl_vtable_t *vt,
     sr->region_count = 0;
     sr->regions = NULL;
 
-    sr->program_id = CreateProgram(VLC_OBJECT(sr->gl), vt);
+    static const char *const VERTEX_SHADER_SRC =
+#if defined(USE_OPENGL_ES2)
+        "#version 100\n"
+#else
+        "#version 120\n"
+#endif
+        "attribute vec2 vertex_pos;\n"
+        "attribute vec2 tex_coords_in;\n"
+        "varying vec2 tex_coords;\n"
+        "void main() {\n"
+        "  tex_coords = tex_coords_in;\n"
+        "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
+        "}\n";
+
+    static const char *const FRAGMENT_SHADER_SRC =
+#if defined(USE_OPENGL_ES2)
+        "#version 100\n"
+        "precision mediump float;\n"
+#else
+        "#version 120\n"
+#endif
+        "uniform sampler2D sampler;\n"
+        "uniform float alpha;\n"
+        "varying vec2 tex_coords;\n"
+        "void main() {\n"
+        "  vec4 color = texture2D(sampler, tex_coords);\n"
+        "  color.a *= alpha;\n"
+        "  gl_FragColor = color;\n"
+        "}\n";
+
+    sr->program_id =
+        vlc_gl_BuildProgram(VLC_OBJECT(sr->gl), vt,
+                            1, (const char **) &VERTEX_SHADER_SRC,
+                            1, (const char **) &FRAGMENT_SHADER_SRC);
     if (!sr->program_id)
         goto error_2;
 

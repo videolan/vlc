@@ -169,11 +169,9 @@ static void getOrientationTransformMatrix(video_orientation_t orientation,
     }
 }
 
-static GLuint BuildVertexShader(const struct vlc_gl_renderer *renderer,
-                                unsigned plane_count)
+static char *
+BuildVertexShader(const struct vlc_gl_renderer *renderer, unsigned plane_count)
 {
-    const opengl_vtable_t *vt = renderer->vt;
-
     /* Basic vertex shader */
     static const char *template =
         "#version %u\n"
@@ -205,16 +203,12 @@ static GLuint BuildVertexShader(const struct vlc_gl_renderer *renderer,
     char *code;
     if (asprintf(&code, template, renderer->glsl_version, coord1_header,
                  coord2_header, coord1_code, coord2_code) < 0)
-        return 0;
+        return NULL;
 
-    GLuint shader = vt->CreateShader(GL_VERTEX_SHADER);
-    vt->ShaderSource(shader, 1, (const char **) &code, NULL);
     if (renderer->b_dump_shaders)
         msg_Dbg(renderer->gl, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
                 (const char *) &renderer->interop->fmt.i_chroma, code);
-    vt->CompileShader(shader);
-    free(code);
-    return shader;
+    return code;
 }
 
 static int
@@ -223,16 +217,19 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
     struct vlc_gl_interop *interop = renderer->interop;
     const opengl_vtable_t *vt = renderer->vt;
 
-    GLuint vertex_shader = BuildVertexShader(renderer, interop->tex_count);
+    char *vertex_shader = BuildVertexShader(renderer, interop->tex_count);
     if (!vertex_shader)
         return VLC_EGENERIC;
 
-    GLuint fragment_shader =
+    char *fragment_shader =
         opengl_fragment_shader_init(renderer, interop->tex_target,
                                     interop->sw_fmt.i_chroma,
                                     interop->sw_fmt.space);
     if (!fragment_shader)
+    {
+        free(vertex_shader);
         return VLC_EGENERIC;
+    }
 
     assert(interop->tex_target != 0 &&
            interop->tex_count > 0 &&
@@ -240,58 +237,14 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
            renderer->pf_fetch_locations != NULL &&
            renderer->pf_prepare_shader != NULL);
 
-    GLuint shaders[] = { fragment_shader, vertex_shader };
-
-    /* Check shaders messages */
-    for (unsigned i = 0; i < 2; i++) {
-        int infoLength;
-        vt->GetShaderiv(shaders[i], GL_INFO_LOG_LENGTH, &infoLength);
-        if (infoLength <= 1)
-            continue;
-
-        char *infolog = malloc(infoLength);
-        if (infolog != NULL)
-        {
-            int charsWritten;
-            vt->GetShaderInfoLog(shaders[i], infoLength, &charsWritten,
-                                 infolog);
-            msg_Err(renderer->gl, "shader %u: %s", i, infolog);
-            free(infolog);
-        }
-    }
-
-    GLuint program_id = renderer->program_id = vt->CreateProgram();
-    vt->AttachShader(program_id, fragment_shader);
-    vt->AttachShader(program_id, vertex_shader);
-    vt->LinkProgram(program_id);
-
-    vt->DeleteShader(vertex_shader);
-    vt->DeleteShader(fragment_shader);
-
-    /* Check program messages */
-    int infoLength = 0;
-    vt->GetProgramiv(program_id, GL_INFO_LOG_LENGTH, &infoLength);
-    if (infoLength > 1)
-    {
-        char *infolog = malloc(infoLength);
-        if (infolog != NULL)
-        {
-            int charsWritten;
-            vt->GetProgramInfoLog(program_id, infoLength, &charsWritten,
-                                  infolog);
-            msg_Err(renderer->gl, "shader program: %s", infolog);
-            free(infolog);
-        }
-
-        /* If there is some message, better to check linking is ok */
-        GLint link_status = GL_TRUE;
-        vt->GetProgramiv(program_id, GL_LINK_STATUS, &link_status);
-        if (link_status == GL_FALSE)
-        {
-            msg_Err(renderer->gl, "Unable to use program");
-            goto error;
-        }
-    }
+    GLuint program_id =
+        vlc_gl_BuildProgram(VLC_OBJECT(renderer->gl), vt,
+                            1, (const char **) &vertex_shader,
+                            1, (const char **) &fragment_shader);
+    free(vertex_shader);
+    free(fragment_shader);
+    if (!program_id)
+        return VLC_EGENERIC;
 
     /* Fetch UniformLocations and AttribLocations */
 #define GET_LOC(type, x, str) do { \
@@ -331,6 +284,8 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
         msg_Err(renderer->gl, "Unable to get locations from tex_conv");
         goto error;
     }
+
+    renderer->program_id = program_id;
 
     return VLC_SUCCESS;
 
