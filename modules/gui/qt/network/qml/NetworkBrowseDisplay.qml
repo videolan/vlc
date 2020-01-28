@@ -41,14 +41,10 @@ Widgets.NavigableFocusScope {
     NetworksSectionSelectableDM{
         id: delegateModel
         model: providerModel
+        onCountChanged: resetFocus()
     }
 
-    /*
-     *define the intial position/selection
-     * This is done on activeFocus rather than Component.onCompleted because delegateModel.
-     * selectedGroup update itself after this event
-     */
-    onActiveFocusChanged: {
+    function resetFocus() {
         if (delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
             var initialIndex = 0
             if (delegateModel.currentIndex !== -1)
