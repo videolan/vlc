@@ -46,15 +46,15 @@ public:
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-        
+
     void updateCurrent(QString current);
-        
+
     QHash<int, QByteArray> roleNames() const override;
 
 private:
     int m_inputs = 0;
-    char **m_names;
-    char **m_ids;
+    char **m_names = nullptr;
+    char **m_ids = nullptr;
     QString m_current;
     vlc_player_aout_listener_id* m_player_aout_listener = nullptr;
     audio_output_t* m_aout = nullptr;

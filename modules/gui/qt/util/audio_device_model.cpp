@@ -52,16 +52,14 @@ AudioDeviceModel::AudioDeviceModel(vlc_player_t *player, QObject *parent)
 
 AudioDeviceModel::~AudioDeviceModel()
 {
-    if (m_inputs > 0)
+    for (int i=0; i<m_inputs; i++)
     {
-        for (int i=0; i<m_inputs; i++){
-            free(m_ids[i]);
-            free(m_names[i]);
-        }
-
-        free(m_ids);
-        free(m_names);
+        free(m_ids[i]);
+        free(m_names[i]);
     }
+
+    free(m_ids);
+    free(m_names);
 
     vlc_player_locker locker{m_player};
     vlc_player_aout_RemoveListener(m_player, m_player_aout_listener);
