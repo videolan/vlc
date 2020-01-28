@@ -61,7 +61,7 @@ Widgets.NavigableFocusScope {
     }
 
     navigationCancel: function() {
-        history.previous(History.Go)
+        history.previous()
     }
 
     Keys.onPressed: {
@@ -170,7 +170,7 @@ Widgets.NavigableFocusScope {
                         sourcesBanner.subTabModel = undefined
                         var name = root.tabModel.get(index).name
                         selectedIndex = index
-                        history.push(["mc", name], History.Go)
+                        history.push(["mc", name])
                     }
 
                     onSubItemClicked: {

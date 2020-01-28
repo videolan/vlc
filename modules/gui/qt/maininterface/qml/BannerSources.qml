@@ -104,7 +104,7 @@ Widgets.NavigableFocusScope {
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.topbar_previous
                             text: i18n.qtr("Previous")
-                            onClicked: history.previous(History.Go)
+                            onClicked: history.previous()
                             enabled: !history.previousEmpty
                         }
 
@@ -113,7 +113,7 @@ Widgets.NavigableFocusScope {
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.topbar_next
                             text: i18n.qtr("Next")
-                            onClicked: history.next(History.Go)
+                            onClicked: history.next()
                             enabled: !history.nextEmpty
                         }
                     }

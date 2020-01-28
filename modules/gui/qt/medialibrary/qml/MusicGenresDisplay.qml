@@ -32,8 +32,8 @@ Widgets.NavigableFocusScope {
         { text: i18n.qtr("Alphabetic"), criteria: "title" }
     ]
 
-    function goToView( parent ) {
-        history.push([ "mc", "music", "albums", { parentId: parent } ], History.Go)
+    function showAlbumView( parent ) {
+        history.push([ "mc", "music", "albums", { parentId: parent } ])
     }
 
     navigationCancel: function() {
@@ -76,7 +76,7 @@ Widgets.NavigableFocusScope {
                     medialib.addAndPlay( model.id )
                 }
                 onItemDoubleClicked: {
-                    history.push([ "mc", "music", "albums", { parentId: model.id } ], History.Go)
+                    root.showAlbumView(model.id)
                 }
                 onAddToPlaylistClicked: {
                     console.log('Clicked on addToPlaylist : '+model.name);
@@ -92,7 +92,7 @@ Widgets.NavigableFocusScope {
                     list.push(delegateModel.selectedGroup.get(i).model.id)
                 medialib.addAndPlay( list )
             } else if (delegateModel.selectedGroup.count === 1) {
-                goToView(delegateModel.selectedGroup.get(0).model.id)
+                showAlbumView(delegateModel.selectedGroup.get(0).model.id)
             }
         }
     }
@@ -135,7 +135,7 @@ Widgets.NavigableFocusScope {
                 }
 
                 onItemDoubleClicked: {
-                    history.push(["mc", "music", "albums", { parentId: model.id } ], History.Go)
+                    root.showAlbumView(model.id)
                 }
             }
 

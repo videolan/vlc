@@ -72,7 +72,7 @@ Widgets.NavigableFocusScope {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: history.push(["player"], History.Go)
+                    onClicked: history.push(["player"])
                 }
 
                 Keys.onPressed: {
@@ -82,7 +82,7 @@ Widgets.NavigableFocusScope {
                 }
                 Keys.onReleased: {
                     if (!event.accepted && KeyHelper.matchOk(event))
-                        history.push(["player"], History.Go)
+                        history.push(["player"])
                 }
 
                 Row {

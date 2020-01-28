@@ -39,7 +39,7 @@ Widgets.NavigableFocusScope {
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
-    onActionCancel: history.previous(History.Go)
+    onActionCancel: history.previous()
 
     implicitHeight: columnLayout.implicitHeight
 

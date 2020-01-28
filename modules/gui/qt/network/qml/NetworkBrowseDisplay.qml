@@ -162,7 +162,7 @@ Widgets.NavigableFocusScope {
 
                 onItemDoubleClicked: {
                     if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
-                        history.push( ["mc", "network", { tree: model.tree } ], History.Go)
+                        history.push( ["mc", "network", { tree: model.tree } ])
                     else
                         delegateModel.model.addAndPlay( index )
                 }
@@ -181,7 +181,7 @@ Widgets.NavigableFocusScope {
             navigationParent: root
             navigationUpItem: gridView.headerItem
             navigationCancel: function() {
-                history.previous(History.Go)
+                history.previous()
             }
         }
     }
@@ -206,7 +206,7 @@ Widgets.NavigableFocusScope {
             navigationParent: root
             navigationUpItem: listView.headerItem
             navigationCancel: function() {
-                history.previous(History.Go)
+                history.previous()
             }
 
             header:  Widgets.LabelSeparator {

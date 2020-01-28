@@ -47,7 +47,7 @@ Util.SelectableDelegateModel {
 
             onItemDoubleClicked: {
                 if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
-                    history.push( ["mc", "network", { tree: model.tree } ], History.Go)
+                    history.push( ["mc", "network", { tree: model.tree } ])
                 else
                     delegateModel.model.addAndPlay( index )
             }
@@ -72,7 +72,7 @@ Util.SelectableDelegateModel {
 
             onItemDoubleClicked: {
                 if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
-                    history.push( ["mc", "network", { tree: model.tree } ], History.Go)
+                    history.push( ["mc", "network", { tree: model.tree } ])
                 else
                     delegateModel.model.addAndPlay( index )
             }
@@ -123,7 +123,7 @@ Util.SelectableDelegateModel {
         } else {
             if (delegateModel.items.get(index).model.type === NetworkMediaModel.TYPE_DIRECTORY
                     || delegateModel.items.get(index).model.type === NetworkMediaModel.TYPE_NODE)  {
-                history.push(["mc", "network", { tree: delegateModel.items.get(index).model.tree }], History.Go);
+                history.push(["mc", "network", { tree: delegateModel.items.get(index).model.tree }]);
             } else {
                 playSelection()
             }

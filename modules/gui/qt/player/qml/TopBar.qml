@@ -76,7 +76,7 @@ Widgets.NavigableFocusScope{
                         if (player.hasVideoOutput) {
                            mainPlaylistController.stop()
                         }
-                        history.previous(History.Go)
+                        history.previous()
                     }
                     KeyNavigation.right: resumeDialog.visible ? resumeDialog : playlistBtn
                     focus: true

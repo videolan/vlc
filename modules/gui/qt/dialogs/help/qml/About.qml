@@ -99,7 +99,7 @@ Widgets.NavigableFocusScope {
                     KeyNavigation.right: textScroll
 
                     onClicked: {
-                        history.previous(History.Go)
+                        history.previous()
                     }
                 }
             }

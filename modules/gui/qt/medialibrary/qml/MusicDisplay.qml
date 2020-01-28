@@ -56,7 +56,7 @@ Widgets.NavigableFocusScope {
     }
 
     function loadIndex(index) {
-        history.push(["mc", "music", root.pageModel[index].name], History.Go)
+        history.push(["mc", "music", root.pageModel[index].name])
     }
 
     Component { id: albumComp; MusicAlbumsDisplay{ navigationParent: root } }

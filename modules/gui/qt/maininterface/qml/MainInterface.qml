@@ -76,7 +76,7 @@ Rectangle {
             focus: true
             onActionCancel: {
                 console.log("onActionCancel")
-                history.previous(History.Go)
+                history.previous()
             }
         }
     }
@@ -105,13 +105,13 @@ Rectangle {
     function setInitialView() {
         //set the initial view
         if (!mainPlaylistController.empty)
-            history.push(["player"], History.Go)
+            history.push(["player"])
         else
         {
             if (medialib)
-                history.push(["mc", "video"], History.Go)
+                history.push(["mc", "video"])
             else
-                history.push(["playlist"], History.Go)
+                history.push(["playlist"])
         }
     }
 
@@ -151,12 +151,12 @@ Rectangle {
                         if (history.previousEmpty)
                         {
                             if (medialib)
-                                history.push(["mc", "video"], History.Go)
+                                history.push(["mc", "video"])
                             else
-                                history.push(["playlist"], History.Go)
+                                history.push(["playlist"])
                         }
                         else
-                            history.previous(History.Go)
+                            history.previous()
                     }
                 }
             }
@@ -167,7 +167,7 @@ Rectangle {
                     if (player.videoTracks.rowCount() > 0
                             && player.playingState === PlayerController.PLAYING_STATE_PLAYING
                             && history.current.view !== "player") {
-                        history.push(["player"], History.Go)
+                        history.push(["player"])
                     }
                 }
             }

@@ -104,7 +104,7 @@ Item{
             size: VLCStyle.icon_medium
             iconText: VLCIcons.exit
             text: i18n.qtr("Back")
-            onClicked: history.previous(History.Go)
+            onClicked: history.previous()
             property bool acceptFocus: true
         }
     }
