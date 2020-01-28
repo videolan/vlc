@@ -6,6 +6,7 @@ libpacketizer_av1_plugin_la_SOURCES = packetizer/av1.c \
                                       packetizer/av1_obu.h
 libpacketizer_copy_plugin_la_SOURCES = packetizer/copy.c
 libpacketizer_mpegvideo_plugin_la_SOURCES = packetizer/mpegvideo.c \
+                                            packetizer/mpegvideo.h \
                                             packetizer/iso_color_tables.h
 libpacketizer_mpeg4video_plugin_la_SOURCES = packetizer/mpeg4video.c \
                                              packetizer/iso_color_tables.h

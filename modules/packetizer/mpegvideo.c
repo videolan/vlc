@@ -50,6 +50,7 @@
 #include <vlc_block.h>
 #include <vlc_codec.h>
 #include <vlc_block_helper.h>
+#include "mpegvideo.h"
 #include "../codec/cc.h"
 #include "packetizer_helper.h"
 #include "startcode_helper.h"
@@ -818,13 +819,57 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
                 {0,1}, {0,1}
             };
 #endif
-
             /* sequence extension */
             if( p_sys->p_ext) block_Release( p_sys->p_ext );
             p_sys->p_ext = block_Duplicate( p_frag );
 
             if( p_frag->i_buffer >= 10 )
             {
+                /* profile and level indication */
+                if( p_dec->fmt_out.i_profile == -1 )
+                {
+                    const uint16_t profilelevel = ((p_frag->p_buffer[4] << 4) |
+                                                   (p_frag->p_buffer[5] >> 4)) & 0xFF;
+                    int i_profile = -1;
+                    int i_level = -1;
+                    switch( profilelevel )
+                    {
+                        case 0x82:
+                            i_profile = PROFILE_MPEG2_422;
+                            i_level = LEVEL_MPEG2_HIGH;
+                            break;
+                        case 0x85:
+                            i_profile = PROFILE_MPEG2_422;
+                            i_level = LEVEL_MPEG2_MAIN;
+                            break;
+                        case 0x8A:
+                            i_profile = PROFILE_MPEG2_MULTIVIEW;
+                            i_level = LEVEL_MPEG2_HIGH;
+                            break;
+                        case 0x8B:
+                            i_profile = PROFILE_MPEG2_MULTIVIEW;
+                            i_level = LEVEL_MPEG2_HIGH_1440;
+                            break;
+                        case 0x8D:
+                            i_profile = PROFILE_MPEG2_MULTIVIEW;
+                            i_level = LEVEL_MPEG2_MAIN;
+                            break;
+                        case 0x8E:
+                            i_profile = PROFILE_MPEG2_MULTIVIEW;
+                            i_level = LEVEL_MPEG2_LOW;
+                            break;
+                        default:
+                            if( (profilelevel & 0x80) == 0 ) /* escape bit */
+                            {
+                                i_profile = (profilelevel >> 4) & 0x07;
+                                i_level = profilelevel & 0x0F;
+                            }
+                            break;
+                    }
+                    p_dec->fmt_out.i_profile = i_profile;
+                    p_dec->fmt_out.i_level = i_level;
+                }
+
                 p_sys->b_seq_progressive =
                     p_frag->p_buffer[5]&0x08 ? true : false;
                 p_sys->b_low_delay =
