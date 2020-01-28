@@ -38,18 +38,39 @@ Widgets.NavigableFocusScope {
 
     property alias model: delegateModel.model
     property alias parentId: delegateModel.parentId
-    property var currentIndex: view.currentItem.currentIndex
+    readonly property var currentIndex: view.currentItem.currentIndex
+    //the index to "go to" when the view is loaded
+    property var initialIndex: 0
 
 
     navigationCancel: function() {
-        if (view.currentItem.currentIndex <= 0)
+        if (view.currentItem.currentIndex <= 0) {
             defaultNavigationCancel()
-        else
+        } else {
             view.currentItem.currentIndex = 0;
+            view.currentItem.positionViewAtIndex(0, ItemView.Contain)
+        }
     }
 
     property Component header: Item{}
     readonly property var headerItem: view.currentItem ? view.currentItem.headerItem : undefined
+
+    onInitialIndexChanged:  resetFocus()
+    onModelChanged: resetFocus()
+    onParentIdChanged: resetFocus()
+
+    function resetFocus() {
+        if (delegateModel.items.count === 0) {
+            return
+        }
+        var initialIndex = root.initialIndex
+        if (initialIndex >= delegateModel.items.count)
+            initialIndex = 0
+        delegateModel.selectNone()
+        delegateModel.items.get(initialIndex).inSelected = true
+        view.currentItem.currentIndex = initialIndex
+        view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+    }
 
     Util.SelectableDelegateModel {
         id: delegateModel
@@ -88,6 +109,12 @@ Widgets.NavigableFocusScope {
             }
         }
 
+        onCountChanged: {
+            if (delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
+                root.resetFocus()
+            }
+        }
+
         function actionAtIndex(index) {
             if (delegateModel.selectedGroup.count > 1) {
                 var list = []
@@ -97,21 +124,6 @@ Widgets.NavigableFocusScope {
             } else {
                 medialib.addAndPlay( delegateModel.items.get(index).model.id )
             }
-        }
-    }
-
-    /*
-     *define the intial position/selection
-     * This is done on activeFocus rather than Component.onCompleted because delegateModel.
-     * selectedGroup update itself after this event
-     */
-    onActiveFocusChanged: {
-        if (activeFocus && delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
-            var initialIndex = 0
-            if (view.currentItem.currentIndex !== -1)
-                initialIndex = view.currentItem.currentIndex
-            delegateModel.items.get(initialIndex).inSelected = true
-            view.currentItem.currentIndex = initialIndex
         }
     }
 

@@ -30,4 +30,8 @@ MusicAlbums {
         text: i18n.qtr("Albums")
         width: root.width
     }
+
+    onCurrentIndexChanged: {
+        history.update(["mc","music", "albums", {"initialIndex": currentIndex}])
+    }
 }
