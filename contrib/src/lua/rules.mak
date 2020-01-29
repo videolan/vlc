@@ -94,6 +94,11 @@ LUACVARS=CPPFLAGS="-DLUA_DL_DLL"
 endif
 endif
 
+ifdef HAVE_CROSS_COMPILE
+# Remove the cross-compiler environment for the native compiler
+LUACVARS+=CFLAGS="" CPPFLAGS="" LDFLAGS=""
+endif
+
 luac: lua-$(LUA_VERSION).tar.gz .sum-luac
 	# DO NOT use the same intermediate directory as the lua target
 	rm -Rf -- $@-$(LUA_VERSION) $@
