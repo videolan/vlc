@@ -46,7 +46,7 @@ struct vlc_gl_interop_ops {
      * \return VLC_SUCCESS or a VLC error
      */
     int
-    (*allocate_textures)(const struct vlc_gl_interop *interoporter,
+    (*allocate_textures)(const struct vlc_gl_interop *interop,
                          GLuint textures[], const GLsizei tex_width[],
                          const GLsizei tex_height[]);
 
@@ -66,7 +66,7 @@ struct vlc_gl_interop_ops {
      * \return VLC_SUCCESS or a VLC error
      */
     int
-    (*update_textures)(const struct vlc_gl_interop *interoporter,
+    (*update_textures)(const struct vlc_gl_interop *interop,
                        GLuint textures[], const GLsizei tex_width[],
                        const GLsizei tex_height[], picture_t *pic,
                        const size_t plane_offsets[]);
@@ -91,7 +91,7 @@ struct vlc_gl_interop_ops {
      * \return a 4x4 transformatoin matrix (possibly NULL)
      */
     const float *
-    (*get_transform_matrix)(const struct vlc_gl_interop *interoporter);
+    (*get_transform_matrix)(const struct vlc_gl_interop *interop);
 };
 
 struct vlc_gl_interop {
