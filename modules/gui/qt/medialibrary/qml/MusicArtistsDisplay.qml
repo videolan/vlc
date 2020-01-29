@@ -35,14 +35,45 @@ Widgets.NavigableFocusScope {
 
     property var artistId
 
+    property alias currentIndex: artistList.currentIndex
+    property int initialIndex: 0
+    property int initialAlbumIndex: 0
+
+    onInitialAlbumIndexChanged: resetFocus()
+    onInitialIndexChanged: resetFocus()
+
+    onCurrentIndexChanged: {
+        history.update([ "mc", "music", "artists", {"initialIndex": currentIndex}])
+    }
+
+    function resetFocus() {
+        if (delegateModel.items.count === 0) {
+            return
+        }
+        var initialIndex = root.initialIndex
+        if (initialIndex >= delegateModel.items.count)
+            initialIndex = 0
+        if (initialIndex !== artistList.currentIndex) {
+            delegateModel.selectNone()
+            delegateModel.items.get(initialIndex).inSelected = true
+            artistList.currentIndex = initialIndex
+            artistList.positionViewAtIndex(initialIndex, ItemView.Contain)
+        }
+    }
+
     Util.SelectableDelegateModel {
         id: delegateModel
         model: MLArtistModel {
             ml: medialib
         }
 
-        Component.onCompleted: {
-            artistId = items.get(0).model.id
+        onCountChanged: {
+            if (delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
+                var initialIndex = root.initialIndex
+                if (initialIndex >= delegateModel.items.count)
+                    initialIndex = 0
+                artistList.currentIndex = initialIndex
+            }
         }
 
         delegate: Widgets.ListItem {
@@ -81,41 +112,31 @@ Widgets.NavigableFocusScope {
             view.forceActiveFocus()
         }
     }
-
-    /*
-     *define the intial position/selection
-     * This is done on activeFocus rather than Component.onCompleted because delegateModel.
-     * selectedGroup update itself after this event
-     */
-    onActiveFocusChanged: {
-        if (activeFocus && delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
-            var initialIndex = 0
-            if (view.currentIndex !== -1)
-                initialIndex = view.currentIndex
-            delegateModel.items.get(initialIndex).inSelected = true
-            view.currentIndex = initialIndex
-        }
-    }
-
     Row {
         anchors.fill: parent
         visible: delegateModel.items.count > 0
 
         Widgets.KeyNavigableListView {
+            id: artistList
+
             width: parent.width * 0.25
             height: parent.height
 
-            id: artistList
             spacing: 4
             model: delegateModel
             modelCount: delegateModel.items.count
+            currentIndex: -1
 
             focus: true
 
             onSelectAll: delegateModel.selectAll()
             onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onCurrentIndexChanged: {
-                root.artistId = delegateModel.items.get(artistList.currentIndex).model.id
+                if (artistList.currentIndex < delegateModel.count) {
+                    root.artistId = delegateModel.items.get(artistList.currentIndex).model.id
+                } else {
+                    root.artistId = undefined
+                }
             }
 
             navigationParent: root
@@ -135,6 +156,7 @@ Widgets.NavigableFocusScope {
             height: parent.height
 
             property alias currentIndex: albumSubView.currentIndex
+            property alias initialIndex: albumSubView.initialIndex
 
             MusicAlbums {
                 id: albumSubView
@@ -156,10 +178,15 @@ Widgets.NavigableFocusScope {
 
                 focus: true
                 parentId: artistId
+                initialIndex: root.initialAlbumIndex
 
                 navigationParent: root
                 navigationUpItem: albumSubView.headerItem
                 navigationLeftItem: artistList
+
+                onCurrentIndexChanged: {
+                    history.update(["mc", "music", "artists", {"initialIndex" : root.currentIndex, "initialAlbumIndex": albumSubView.currentIndex  }])
+                }
             }
 
         }
