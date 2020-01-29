@@ -148,6 +148,8 @@ typedef struct
     uint16_t i_bitrateupper12;
     bool  b_seq_progressive;
     bool  b_low_delay;
+    uint8_t i_frame_rate_ext_n;
+    uint8_t i_frame_rate_ext_d;
 
     /* Picture properties */
     int i_temporal_ref;
@@ -254,6 +256,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_v_size_ext = 0;
     p_sys->b_seq_progressive = true;
     p_sys->b_low_delay = false;
+    p_sys->i_frame_rate_ext_n = 0;
+    p_sys->i_frame_rate_ext_d = 0;
     p_sys->i_seq_old = 0;
 
     p_sys->i_temporal_ref = 0;
@@ -403,6 +407,14 @@ static void ProcessSequenceParameters( decoder_t *p_dec )
         /* frames / den */
         unsigned num = code_to_frame_rate[p_sys->i_frame_rate_value][0] << 1;
         unsigned den = code_to_frame_rate[p_sys->i_frame_rate_value][1];
+        if( p_sys->i_frame_rate_ext_n || p_sys->i_frame_rate_ext_d )
+        {
+            vlc_ureduce( &num, &den,
+                         num * (1 + p_sys->i_frame_rate_ext_n),
+                         den * (1 + p_sys->i_frame_rate_ext_d),
+                         CLOCK_FREQ );
+        }
+
         if( num && den ) /* fields / den */
         {
             date_Change( &p_sys->dts, num, den );
@@ -902,6 +914,9 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
                 p_sys->b_low_delay =
                     p_frag->p_buffer[9]&0x80 ? true : false;
+
+                p_sys->i_frame_rate_ext_n = (p_frag->p_buffer[9] >> 5) & 0x03;
+                p_sys->i_frame_rate_ext_d = p_frag->p_buffer[9] & 0x1F;
             }
 
             /* Do not set aspect ratio : in case we're transcoding,
