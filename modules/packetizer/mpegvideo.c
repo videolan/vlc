@@ -709,12 +709,15 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         if( p_sys->p_seq && p_sys->i_seq_old > i_fps )
         {
             /* Useful for mpeg1: repeat sequence header every second */
-            block_ChainLastAppend( &p_sys->pp_last, block_Duplicate( p_sys->p_seq ) );
-            if( p_sys->p_ext )
+            const block_t * params[2] = { p_sys->p_seq, p_sys->p_ext };
+            for( int i=0; i<2; i++ )
             {
-                block_ChainLastAppend( &p_sys->pp_last, block_Duplicate( p_sys->p_ext ) );
+                if( params[i] == NULL )
+                    break;
+                block_t *p_dup = block_Duplicate( params[i] );
+                if( p_dup )
+                    block_ChainLastAppend( &p_sys->pp_last, p_dup );
             }
-
             p_sys->i_seq_old = 0;
         }
     }
