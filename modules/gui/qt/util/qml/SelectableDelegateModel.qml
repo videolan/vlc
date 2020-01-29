@@ -39,6 +39,11 @@ DelegateModel {
         }
     }
 
+    function selectNone() {
+        if (selectedGroup.count > 0)
+            selectedGroup.remove(0,selectedGroup.count)
+    }
+
     function selectAll() {
         delegateModel.items.addGroups(0, delegateModel.items.count, ["selected"])
     }
@@ -66,22 +71,12 @@ DelegateModel {
                 _delRange(oldIndex, newIndex - 1)
             }
         } else {
-
             var e = delegateModel.items.get(newIndex)
-            if (e.inSelected) {
-                if ((keymodifiers & Qt.ControlModifier) == Qt.ControlModifier) {
-                    e.inSelected = false
-                } else {
-                    selectedGroup.remove(0,selectedGroup.count) //clear
-                }
+            if ((keymodifiers & Qt.ControlModifier) == Qt.ControlModifier) {
+                e.inSelected = !e.inSelected
             } else {
-                if ((keymodifiers & Qt.ControlModifier) == Qt.ControlModifier) {
-                    e.inSelected = true
-                } else {
-                    if (selectedGroup.count > 0)
-                        selectedGroup.remove(0,selectedGroup.count) //clear
-                    e.inSelected = true
-                }
+                selectNone()
+                e.inSelected = true
             }
             shiftIndex = newIndex
         }
