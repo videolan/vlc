@@ -140,6 +140,7 @@ typedef struct
     uint16_t i_h_size_value;
     uint16_t i_v_size_value;
     uint8_t  i_aspect_ratio_info;
+    uint8_t  i_frame_rate_value;
     uint32_t i_bitratelower18;
     /* Extended Sequence properties (MPEG2) */
     uint8_t  i_h_size_ext;
@@ -246,6 +247,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_h_size_value = 0;
     p_sys->i_v_size_value = 0;
     p_sys->i_aspect_ratio_info = 0;
+    p_sys->i_frame_rate_value = 0;
     p_sys->i_bitratelower18 = 0;
     p_sys->i_bitrateupper12 = 0;
     p_sys->i_h_size_ext = 0;
@@ -381,6 +383,33 @@ static void ProcessSequenceParameters( decoder_t *p_dec )
                                     p_sys->i_bitratelower18) * 400;
 
     /* Frame Rate */
+
+    /* Only of not specified by container */
+    if ( !p_dec->fmt_in.video.i_frame_rate ||
+         !p_dec->fmt_in.video.i_frame_rate_base )
+    {
+        static const int code_to_frame_rate[16][2] =
+        {
+            { 1, 1 },  /* invalid */
+            { 24000, 1001 }, { 24, 1 }, { 25, 1 },       { 30000, 1001 },
+            { 30, 1 },       { 50, 1 }, { 60000, 1001 }, { 60, 1 },
+            /* Unofficial 15fps from Xing*/
+            { 15, 1 },
+            /* Unofficial economy rates from libmpeg3 */
+            { 5, 1 }, { 10, 1 }, { 12, 1 }, { 15, 1 },
+            { 1, 1 },  { 1, 1 }  /* invalid */
+        };
+
+        /* frames / den */
+        unsigned num = code_to_frame_rate[p_sys->i_frame_rate_value][0] << 1;
+        unsigned den = code_to_frame_rate[p_sys->i_frame_rate_value][1];
+        if( num && den ) /* fields / den */
+        {
+            date_Change( &p_sys->dts, num, den );
+            date_Change( &p_sys->prev_iframe_dts, num, den );
+        }
+    }
+
     if( fmt->i_frame_rate != (p_sys->dts.i_divider_num >> 1) ||
         fmt->i_frame_rate_base != p_sys->dts.i_divider_den )
     {
@@ -777,18 +806,6 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     else if( startcode == SEQUENCE_HEADER_STARTCODE && p_frag->i_buffer >= 11 )
     {
         /* Sequence header code */
-        static const int code_to_frame_rate[16][2] =
-        {
-            { 1, 1 },  /* invalid */
-            { 24000, 1001 }, { 24, 1 }, { 25, 1 },       { 30000, 1001 },
-            { 30, 1 },       { 50, 1 }, { 60000, 1001 }, { 60, 1 },
-            /* Unofficial 15fps from Xing*/
-            { 15, 1 },
-            /* Unofficial economy rates from libmpeg3 */
-            { 5, 1 }, { 10, 1 }, { 12, 1 }, { 15, 1 },
-            { 1, 1 },  { 1, 1 }  /* invalid */
-        };
-
         if( p_sys->p_seq ) block_Release( p_sys->p_seq );
         if( p_sys->p_ext ) block_Release( p_sys->p_ext );
 
@@ -802,19 +819,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
         /* TODO: MPEG1 aspect ratio */
 
-        /* Only of not specified by container */
-        if ( !p_dec->fmt_in.video.i_frame_rate ||
-             !p_dec->fmt_in.video.i_frame_rate_base )
-        {
-            /* frames / den */
-            unsigned num = code_to_frame_rate[p_frag->p_buffer[7]&0x0f][0] << 1;
-            unsigned den = code_to_frame_rate[p_frag->p_buffer[7]&0x0f][1];
-            if( num && den ) /* fields / den */
-            {
-                date_Change( &p_sys->dts, num, den );
-                date_Change( &p_sys->prev_iframe_dts, num, den );
-            }
-        }
+        p_sys->i_frame_rate_value = p_frag->p_buffer[7] & 0x0f;
 
         p_sys->i_bitratelower18 = (p_frag->p_buffer[ 8] << 12) |
                                   (p_frag->p_buffer[ 9] <<  4) |
