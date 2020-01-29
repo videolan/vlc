@@ -29,15 +29,39 @@ import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
     id: root
-    property var currentIndex: view.currentItem.currentIndex
+    readonly property var currentIndex: view.currentItem.currentIndex
+    //the index to "go to" when the view is loaded
+    property var initialIndex: 0
 
     property alias contentModel: videosDelegate.model;
 
     navigationCancel: function() {
-        if (view.currentItem.currentIndex <= 0)
+        if (view.currentItem.currentIndex <= 0) {
             defaultNavigationCancel()
-        else
+        } else {
             view.currentItem.currentIndex = 0;
+            view.currentItem.positionViewAtIndex(0, ItemView.Contain)
+        }
+    }
+
+    onCurrentIndexChanged: {
+        history.update([ "mc", "video", {"initialIndex": currentIndex}])
+    }
+
+    onInitialIndexChanged: resetFocus()
+    onContentModelChanged: resetFocus()
+
+    function resetFocus() {
+        if (videosDelegate.items.count === 0) {
+            return
+        }
+        var initialIndex = root.initialIndex
+        if (initialIndex >= videosDelegate.items.count)
+            initialIndex = 0
+        videosDelegate.selectNone()
+        videosDelegate.items.get(initialIndex).inSelected = true
+        view.currentItem.currentIndex = initialIndex
+        view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
 
     DG.ModalDialog {
@@ -103,6 +127,12 @@ Widgets.NavigableFocusScope {
         }
         delegate: Package{
             Item { Package.name: "grid" }
+        }
+
+        onCountChanged: {
+            if (videosDelegate.items.count > 0 && videosDelegate.selectedGroup.count === 0) {
+                root.resetFocus()
+            }
         }
 
         function actionAtIndex(index) {
