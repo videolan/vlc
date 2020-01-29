@@ -142,6 +142,8 @@ typedef struct
     uint8_t  i_aspect_ratio_info;
     uint32_t i_bitratelower18;
     /* Extended Sequence properties (MPEG2) */
+    uint8_t  i_h_size_ext;
+    uint8_t  i_v_size_ext;
     uint16_t i_bitrateupper12;
     bool  b_seq_progressive;
     bool  b_low_delay;
@@ -246,6 +248,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_aspect_ratio_info = 0;
     p_sys->i_bitratelower18 = 0;
     p_sys->i_bitrateupper12 = 0;
+    p_sys->i_h_size_ext = 0;
+    p_sys->i_v_size_ext = 0;
     p_sys->b_seq_progressive = true;
     p_sys->b_low_delay = false;
     p_sys->i_seq_old = 0;
@@ -363,9 +367,9 @@ static void ProcessSequenceParameters( decoder_t *p_dec )
     video_format_t *fmt = &p_dec->fmt_out.video;
 
     /* Picture size */
-    fmt->i_visible_width = p_sys->i_h_size_value;
+    fmt->i_visible_width = p_sys->i_h_size_value + (p_sys->i_h_size_ext << 14);
     fmt->i_width = (fmt->i_visible_width + 0x0F) & ~0x0F;
-    fmt->i_visible_height = p_sys->i_v_size_value;
+    fmt->i_visible_height = p_sys->i_v_size_value + (p_sys->i_v_size_ext << 14);
     if( p_sys->b_seq_progressive )
         fmt->i_height = (fmt->i_visible_height + 0x0F) & ~0x0F;
     else
@@ -885,6 +889,9 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
                 p_sys->b_seq_progressive =
                     p_frag->p_buffer[5]&0x08 ? true : false;
+
+                p_sys->i_h_size_ext = ((p_frag->p_buffer[5] & 0x01) << 1) | (p_frag->p_buffer[6] >> 7);
+                p_sys->i_v_size_ext = (p_frag->p_buffer[6] >> 5) & 0x03;
 
                 p_sys->i_bitrateupper12 = ((p_frag->p_buffer[6] & 0x1F) << 8) | (p_frag->p_buffer[7] >> 1);
 
