@@ -53,6 +53,10 @@ NavigableFocusScope {
 
     Accessible.role: Accessible.Table
 
+    function positionViewAtIndex(index, mode) {
+        view.positionViewAtIndex(index, mode)
+    }
+
     GridView {
         id: view
 

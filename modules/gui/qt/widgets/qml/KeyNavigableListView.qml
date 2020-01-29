@@ -69,6 +69,10 @@ NavigableFocusScope {
         view.contentX -= Math.min(view.width,view.contentX )
     }
 
+    function positionViewAtIndex(index, mode) {
+        view.positionViewAtIndex(index, mode)
+    }
+
     Component {
         id: sectionHeading
 
