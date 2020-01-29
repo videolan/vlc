@@ -56,4 +56,21 @@ libvlc_media_t * libvlc_media_new_from_input_item(
 void libvlc_media_set_state( libvlc_media_t *, libvlc_state_t );
 void libvlc_media_add_subtree(libvlc_media_t *, input_item_node_t *);
 
+static inline enum es_format_category_e
+libvlc_track_type_to_escat( libvlc_track_type_t i_type )
+{
+    switch( i_type )
+    {
+        case libvlc_track_audio:
+            return AUDIO_ES;
+        case libvlc_track_video:
+            return VIDEO_ES;
+        case libvlc_track_text:
+            return SPU_ES;
+        case libvlc_track_unknown:
+        default:
+            return UNKNOWN_ES;
+    }
+}
+
 #endif
