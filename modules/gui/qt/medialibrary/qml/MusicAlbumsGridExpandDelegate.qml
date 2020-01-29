@@ -51,6 +51,8 @@ Widgets.NavigableFocusScope {
             Layout.preferredWidth: artAndControlLayout.implicitWidth
             Layout.alignment: Qt.AlignTop
 
+            focus: true
+
             Column {
                 id: artAndControlLayout
 
@@ -154,7 +156,6 @@ Widgets.NavigableFocusScope {
                 parentId : root.model.id
                 onParentIdChanged: {
                     currentIndex = 0
-                    focus = true
                 }
 
                 onCurrentItemChanged: {
@@ -168,7 +169,6 @@ Widgets.NavigableFocusScope {
                     { isPrimary: true, criteria: "title",         width:0.70, visible: true, text: i18n.qtr("Title"), showSection: "" },
                     { criteria: "duration",      width:0.20, visible: true, text: i18n.qtr("Duration"), showSection: "" },
                 ]
-                focus: true
 
                 navigationParent: root
                 navigationLeftItem: actionButtons
