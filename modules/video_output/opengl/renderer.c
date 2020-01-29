@@ -170,14 +170,13 @@ static void getOrientationTransformMatrix(video_orientation_t orientation,
 }
 
 static char *
-BuildVertexShader(const struct vlc_gl_renderer *renderer, unsigned plane_count)
+BuildVertexShader(const struct vlc_gl_renderer *renderer)
 {
     /* Basic vertex shader */
     static const char *template =
         "#version %u\n"
-        "varying vec2 TexCoord0;\n"
-        "attribute vec4 MultiTexCoord0;\n"
-        "%s%s"
+        "attribute vec2 PicCoordsIn;\n"
+        "varying vec2 PicCoords;\n"
         "attribute vec3 VertexPosition;\n"
         "uniform mat4 TransformMatrix;\n"
         "uniform mat4 OrientationMatrix;\n"
@@ -185,24 +184,13 @@ BuildVertexShader(const struct vlc_gl_renderer *renderer, unsigned plane_count)
         "uniform mat4 ZoomMatrix;\n"
         "uniform mat4 ViewMatrix;\n"
         "void main() {\n"
-        " TexCoord0 = vec4(TransformMatrix * OrientationMatrix * MultiTexCoord0).st;\n"
-        "%s%s"
+        " PicCoords = vec4(TransformMatrix * OrientationMatrix * vec4(PicCoordsIn, 0.0, 1.0)).st;\n"
         " gl_Position = ProjectionMatrix * ZoomMatrix * ViewMatrix\n"
         "               * vec4(VertexPosition, 1.0);\n"
         "}";
 
-    const char *coord1_header = plane_count > 1 ?
-        "varying vec2 TexCoord1;\nattribute vec4 MultiTexCoord1;\n" : "";
-    const char *coord1_code = plane_count > 1 ?
-        " TexCoord1 = vec4(TransformMatrix * OrientationMatrix * MultiTexCoord1).st;\n" : "";
-    const char *coord2_header = plane_count > 2 ?
-        "varying vec2 TexCoord2;\nattribute vec4 MultiTexCoord2;\n" : "";
-    const char *coord2_code = plane_count > 2 ?
-        " TexCoord2 = vec4(TransformMatrix * OrientationMatrix * MultiTexCoord2).st;\n" : "";
-
     char *code;
-    if (asprintf(&code, template, renderer->glsl_version, coord1_header,
-                 coord2_header, coord1_code, coord2_code) < 0)
+    if (asprintf(&code, template, renderer->glsl_version) < 0)
         return NULL;
 
     if (renderer->b_dump_shaders)
@@ -217,7 +205,7 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
     struct vlc_gl_interop *interop = renderer->interop;
     const opengl_vtable_t *vt = renderer->vt;
 
-    char *vertex_shader = BuildVertexShader(renderer, interop->tex_count);
+    char *vertex_shader = BuildVertexShader(renderer);
     if (!vertex_shader)
         return VLC_EGENERIC;
 
@@ -263,17 +251,19 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
     GET_ULOC(ViewMatrix, "ViewMatrix");
     GET_ULOC(ZoomMatrix, "ZoomMatrix");
 
+    GET_ALOC(PicCoordsIn, "PicCoordsIn");
     GET_ALOC(VertexPosition, "VertexPosition");
-    GET_ALOC(MultiTexCoord[0], "MultiTexCoord0");
+
+    GET_ULOC(TexCoordsMap[0], "TexCoordsMap0");
     /* MultiTexCoord 1 and 2 can be optimized out if not used */
     if (interop->tex_count > 1)
-        GET_ALOC(MultiTexCoord[1], "MultiTexCoord1");
+        GET_ULOC(TexCoordsMap[1], "TexCoordsMap1");
     else
-        renderer->aloc.MultiTexCoord[1] = -1;
+        renderer->uloc.TexCoordsMap[1] = -1;
     if (interop->tex_count > 2)
-        GET_ALOC(MultiTexCoord[2], "MultiTexCoord2");
+        GET_ULOC(TexCoordsMap[2], "TexCoordsMap2");
     else
-        renderer->aloc.MultiTexCoord[2] = -1;
+        renderer->uloc.TexCoordsMap[2] = -1;
 #undef GET_LOC
 #undef GET_ULOC
 #undef GET_ALOC
@@ -303,7 +293,7 @@ vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
 
     vt->DeleteBuffers(1, &renderer->vertex_buffer_object);
     vt->DeleteBuffers(1, &renderer->index_buffer_object);
-    vt->DeleteBuffers(interop->tex_count, renderer->texture_buffer_object);
+    vt->DeleteBuffers(1, &renderer->texture_buffer_object);
 
     if (!interop->handle_texs_gen)
         vt->DeleteTextures(interop->tex_count, renderer->textures);
@@ -421,7 +411,7 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
 
     vt->GenBuffers(1, &renderer->vertex_buffer_object);
     vt->GenBuffers(1, &renderer->index_buffer_object);
-    vt->GenBuffers(interop->tex_count, renderer->texture_buffer_object);
+    vt->GenBuffers(1, &renderer->texture_buffer_object);
 
     return renderer;
 }
@@ -505,11 +495,8 @@ vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture)
                                          NULL);
 }
 
-static int BuildSphere(unsigned nbPlanes,
-                        GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
-                        GLushort **indices, unsigned *nbIndices,
-                        const float *left, const float *top,
-                        const float *right, const float *bottom)
+static int BuildSphere(GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
+                       GLushort **indices, unsigned *nbIndices)
 {
     unsigned nbLatBands = 128;
     unsigned nbLonBands = 128;
@@ -520,7 +507,7 @@ static int BuildSphere(unsigned nbPlanes,
     *vertexCoord = vlc_alloc(*nbVertices * 3, sizeof(GLfloat));
     if (*vertexCoord == NULL)
         return VLC_ENOMEM;
-    *textureCoord = vlc_alloc(nbPlanes * *nbVertices * 2, sizeof(GLfloat));
+    *textureCoord = vlc_alloc(*nbVertices * 2, sizeof(GLfloat));
     if (*textureCoord == NULL)
     {
         free(*vertexCoord);
@@ -555,17 +542,11 @@ static int BuildSphere(unsigned nbPlanes,
             (*vertexCoord)[off1 + 1] = SPHERE_RADIUS * y;
             (*vertexCoord)[off1 + 2] = SPHERE_RADIUS * z;
 
-            for (unsigned p = 0; p < nbPlanes; ++p)
-            {
-                unsigned off2 = (p * (nbLatBands + 1) * (nbLonBands + 1)
-                                + lat * (nbLonBands + 1) + lon) * 2;
-                float width = right[p] - left[p];
-                float height = bottom[p] - top[p];
-                float u = (float)lon / nbLonBands * width;
-                float v = (float)lat / nbLatBands * height;
-                (*textureCoord)[off2] = u;
-                (*textureCoord)[off2 + 1] = v;
-            }
+            unsigned off2 = (lat * (nbLonBands + 1) + lon) * 2;
+            float u = (float)lon / nbLonBands;
+            float v = (float)lat / nbLatBands;
+            (*textureCoord)[off2] = u;
+            (*textureCoord)[off2 + 1] = v;
         }
     }
 
@@ -590,12 +571,9 @@ static int BuildSphere(unsigned nbPlanes,
 }
 
 
-static int BuildCube(unsigned nbPlanes,
-                     float padW, float padH,
+static int BuildCube(float padW, float padH,
                      GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
-                     GLushort **indices, unsigned *nbIndices,
-                     const float *left, const float *top,
-                     const float *right, const float *bottom)
+                     GLushort **indices, unsigned *nbIndices)
 {
     *nbVertices = 4 * 6;
     *nbIndices = 6 * 6;
@@ -603,7 +581,7 @@ static int BuildCube(unsigned nbPlanes,
     *vertexCoord = vlc_alloc(*nbVertices * 3, sizeof(GLfloat));
     if (*vertexCoord == NULL)
         return VLC_ENOMEM;
-    *textureCoord = vlc_alloc(nbPlanes * *nbVertices * 2, sizeof(GLfloat));
+    *textureCoord = vlc_alloc(*nbVertices * 2, sizeof(GLfloat));
     if (*textureCoord == NULL)
     {
         free(*vertexCoord);
@@ -651,55 +629,43 @@ static int BuildCube(unsigned nbPlanes,
 
     memcpy(*vertexCoord, coord, *nbVertices * 3 * sizeof(GLfloat));
 
-    for (unsigned p = 0; p < nbPlanes; ++p)
-    {
-        float width = right[p] - left[p];
-        float height = bottom[p] - top[p];
+    float col[] = {0.f, 1.f/3, 2.f/3, 1.f};
+    float row[] = {0.f, 1.f/2, 1.0};
 
-        float col[] = {left[p],
-                       left[p] + width * 1.f/3,
-                       left[p] + width * 2.f/3,
-                       left[p] + width};
+    const GLfloat tex[] = {
+        col[1] + padW, row[1] + padH, // front
+        col[1] + padW, row[2] - padH,
+        col[2] - padW, row[1] + padH,
+        col[2] - padW, row[2] - padH,
 
-        float row[] = {top[p],
-                       top[p] + height * 1.f/2,
-                       top[p] + height};
+        col[3] - padW, row[1] + padH, // back
+        col[3] - padW, row[2] - padH,
+        col[2] + padW, row[1] + padH,
+        col[2] + padW, row[2] - padH,
 
-        const GLfloat tex[] = {
-            col[1] + padW, row[1] + padH, // front
-            col[1] + padW, row[2] - padH,
-            col[2] - padW, row[1] + padH,
-            col[2] - padW, row[2] - padH,
+        col[2] - padW, row[0] + padH, // left
+        col[2] - padW, row[1] - padH,
+        col[1] + padW, row[0] + padH,
+        col[1] + padW, row[1] - padH,
 
-            col[3] - padW, row[1] + padH, // back
-            col[3] - padW, row[2] - padH,
-            col[2] + padW, row[1] + padH,
-            col[2] + padW, row[2] - padH,
+        col[0] + padW, row[0] + padH, // right
+        col[0] + padW, row[1] - padH,
+        col[1] - padW, row[0] + padH,
+        col[1] - padW, row[1] - padH,
 
-            col[2] - padW, row[0] + padH, // left
-            col[2] - padW, row[1] - padH,
-            col[1] + padW, row[0] + padH,
-            col[1] + padW, row[1] - padH,
+        col[0] + padW, row[2] - padH, // bottom
+        col[0] + padW, row[1] + padH,
+        col[1] - padW, row[2] - padH,
+        col[1] - padW, row[1] + padH,
 
-            col[0] + padW, row[0] + padH, // right
-            col[0] + padW, row[1] - padH,
-            col[1] - padW, row[0] + padH,
-            col[1] - padW, row[1] - padH,
+        col[2] + padW, row[0] + padH, // top
+        col[2] + padW, row[1] - padH,
+        col[3] - padW, row[0] + padH,
+        col[3] - padW, row[1] - padH,
+    };
 
-            col[0] + padW, row[2] - padH, // bottom
-            col[0] + padW, row[1] + padH,
-            col[1] - padW, row[2] - padH,
-            col[1] - padW, row[1] + padH,
-
-            col[2] + padW, row[0] + padH, // top
-            col[2] + padW, row[1] - padH,
-            col[3] - padW, row[0] + padH,
-            col[3] - padW, row[1] - padH,
-        };
-
-        memcpy(*textureCoord + p * *nbVertices * 2, tex,
-               *nbVertices * 2 * sizeof(GLfloat));
-    }
+    memcpy(*textureCoord, tex,
+           *nbVertices * 2 * sizeof(GLfloat));
 
     const GLushort ind[] = {
         0, 1, 2,       2, 1, 3, // front
@@ -715,11 +681,8 @@ static int BuildCube(unsigned nbPlanes,
     return VLC_SUCCESS;
 }
 
-static int BuildRectangle(unsigned nbPlanes,
-                          GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
-                          GLushort **indices, unsigned *nbIndices,
-                          const float *left, const float *top,
-                          const float *right, const float *bottom)
+static int BuildRectangle(GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
+                          GLushort **indices, unsigned *nbIndices)
 {
     *nbVertices = 4;
     *nbIndices = 6;
@@ -727,7 +690,7 @@ static int BuildRectangle(unsigned nbPlanes,
     *vertexCoord = vlc_alloc(*nbVertices * 3, sizeof(GLfloat));
     if (*vertexCoord == NULL)
         return VLC_ENOMEM;
-    *textureCoord = vlc_alloc(nbPlanes * *nbVertices * 2, sizeof(GLfloat));
+    *textureCoord = vlc_alloc(*nbVertices * 2, sizeof(GLfloat));
     if (*textureCoord == NULL)
     {
         free(*vertexCoord);
@@ -750,18 +713,14 @@ static int BuildRectangle(unsigned nbPlanes,
 
     memcpy(*vertexCoord, coord, *nbVertices * 3 * sizeof(GLfloat));
 
-    for (unsigned p = 0; p < nbPlanes; ++p)
-    {
-        const GLfloat tex[] = {
-            left[p],  top[p],
-            left[p],  bottom[p],
-            right[p], top[p],
-            right[p], bottom[p]
-        };
+    static const GLfloat tex[] = {
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 0.0,
+        1.0, 1.0,
+    };
 
-        memcpy(*textureCoord + p * *nbVertices * 2, tex,
-               *nbVertices * 2 * sizeof(GLfloat));
-    }
+    memcpy(*textureCoord, tex, *nbVertices * 2 * sizeof(GLfloat));
 
     const GLushort ind[] = {
         0, 1, 2,
@@ -773,11 +732,8 @@ static int BuildRectangle(unsigned nbPlanes,
     return VLC_SUCCESS;
 }
 
-static int SetupCoords(struct vlc_gl_renderer *renderer,
-                       const float *left, const float *top,
-                       const float *right, const float *bottom)
+static int SetupCoords(struct vlc_gl_renderer *renderer)
 {
-    const struct vlc_gl_interop *interop = renderer->interop;
     const opengl_vtable_t *vt = renderer->vt;
 
     GLfloat *vertexCoord, *textureCoord;
@@ -788,24 +744,18 @@ static int SetupCoords(struct vlc_gl_renderer *renderer,
     switch (renderer->fmt.projection_mode)
     {
     case PROJECTION_MODE_RECTANGULAR:
-        i_ret = BuildRectangle(interop->tex_count,
-                               &vertexCoord, &textureCoord, &nbVertices,
-                               &indices, &nbIndices,
-                               left, top, right, bottom);
+        i_ret = BuildRectangle(&vertexCoord, &textureCoord, &nbVertices,
+                               &indices, &nbIndices);
         break;
     case PROJECTION_MODE_EQUIRECTANGULAR:
-        i_ret = BuildSphere(interop->tex_count,
-                            &vertexCoord, &textureCoord, &nbVertices,
-                            &indices, &nbIndices,
-                            left, top, right, bottom);
+        i_ret = BuildSphere(&vertexCoord, &textureCoord, &nbVertices,
+                            &indices, &nbIndices);
         break;
     case PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD:
-        i_ret = BuildCube(interop->tex_count,
-                          (float)renderer->fmt.i_cubemap_padding / renderer->fmt.i_width,
+        i_ret = BuildCube((float)renderer->fmt.i_cubemap_padding / renderer->fmt.i_width,
                           (float)renderer->fmt.i_cubemap_padding / renderer->fmt.i_height,
                           &vertexCoord, &textureCoord, &nbVertices,
-                          &indices, &nbIndices,
-                          left, top, right, bottom);
+                          &indices, &nbIndices);
         break;
     default:
         i_ret = VLC_EGENERIC;
@@ -815,12 +765,9 @@ static int SetupCoords(struct vlc_gl_renderer *renderer,
     if (i_ret != VLC_SUCCESS)
         return i_ret;
 
-    for (unsigned j = 0; j < interop->tex_count; j++)
-    {
-        vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object[j]);
-        vt->BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
-                       textureCoord + j * nbVertices * 2, GL_STATIC_DRAW);
-    }
+    vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
+    vt->BufferData(GL_ARRAY_BUFFER, nbVertices * 2 * sizeof(GLfloat),
+                   textureCoord, GL_STATIC_DRAW);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->vertex_buffer_object);
     vt->BufferData(GL_ARRAY_BUFFER, nbVertices * 3 * sizeof(GLfloat),
@@ -851,13 +798,14 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
         vt->ActiveTexture(GL_TEXTURE0+j);
         vt->BindTexture(interop->tex_target, renderer->textures[j]);
 
-        vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object[j]);
-
-        assert(renderer->aloc.MultiTexCoord[j] != -1);
-        vt->EnableVertexAttribArray(renderer->aloc.MultiTexCoord[j]);
-        vt->VertexAttribPointer(renderer->aloc.MultiTexCoord[j], 2,
-                                GL_FLOAT, 0, 0, 0);
+        vt->UniformMatrix3fv(renderer->uloc.TexCoordsMap[j], 1, GL_FALSE,
+                             renderer->var.TexCoordsMap[j]);
     }
+
+    vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
+    assert(renderer->aloc.PicCoordsIn != -1);
+    vt->EnableVertexAttribArray(renderer->aloc.PicCoordsIn);
+    vt->VertexAttribPointer(renderer->aloc.PicCoordsIn, 2, GL_FLOAT, 0, 0, 0);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->vertex_buffer_object);
     vt->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->index_buffer_object);
@@ -979,8 +927,58 @@ vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
             bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
         }
 
+        /* TODO crop stereo using a separate transform matrix */
         TextureCropForStereo(renderer, left, top, right, bottom);
-        int ret = SetupCoords(renderer, left, top, right, bottom);
+
+        memset(renderer->var.TexCoordsMap, 0,
+               sizeof(renderer->var.TexCoordsMap));
+        for (unsigned j = 0; j < interop->tex_count; ++j)
+        {
+            /**
+             * This matrix converts from picture coordinates (in range [0; 1])
+             * to textures coordinates where the picture is actually stored
+             * (removing paddings).
+             *
+             *        texture           (in texture coordinates)
+             *       +----------------+--- 0.0
+             *       |                |
+             *       |  +---------+---|--- top
+             *       |  | picture |   |
+             *       |  +---------+---|--- bottom
+             *       |  .         .   |
+             *       |  .         .   |
+             *       +----------------+--- 1.0
+             *       |  .         .   |
+             *      0.0 left  right  1.0  (in texture coordinates)
+             *
+             * In particular:
+             *  - (0.0, 0.0) is mapped to (left, top)
+             *  - (1.0, 1.0) is mapped to (right, bottom)
+             *
+             * This is an affine 2D transformation, so the input coordinates
+             * are given as a 3D vector in the form (x, y, 1), and the output
+             * is (x', y', 1).
+             *
+             * The paddings are l (left), r (right), t (top) and b (bottom).
+             *
+             *               / (r-l)   0     l \
+             *      matrix = |   0   (b-t)   t |
+             *               \   0     0     1 /
+             *
+             * It is stored in column-major order.
+             */
+            GLfloat *matrix = renderer->var.TexCoordsMap[j];
+#define COL(x) (x*3)
+#define ROW(x) (x)
+            matrix[COL(0) + ROW(0)] = right[j] - left[j];
+            matrix[COL(1) + ROW(1)] = bottom[j] - top[j];
+            matrix[COL(2) + ROW(0)] = left[j];
+            matrix[COL(2) + ROW(1)] = top[j];
+#undef COL
+#undef ROW
+        }
+
+        int ret = SetupCoords(renderer);
         if (ret != VLC_SUCCESS)
             return ret;
 

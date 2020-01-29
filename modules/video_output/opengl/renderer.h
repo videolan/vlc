@@ -65,6 +65,8 @@ struct vlc_gl_renderer
         GLfloat ProjectionMatrix[16];
         GLfloat ZoomMatrix[16];
         GLfloat ViewMatrix[16];
+
+        GLfloat TexCoordsMap[PICTURE_PLANE_MAX][3*3];
     } var;
 
     struct {
@@ -79,10 +81,12 @@ struct vlc_gl_renderer
         GLint ProjectionMatrix;
         GLint ViewMatrix;
         GLint ZoomMatrix;
+
+        GLint TexCoordsMap[PICTURE_PLANE_MAX];
     } uloc;
 
     struct {
-        GLint MultiTexCoord[3];
+        GLint PicCoordsIn;
         GLint VertexPosition;
     } aloc;
 
@@ -104,7 +108,7 @@ struct vlc_gl_renderer
     unsigned nb_indices;
     GLuint vertex_buffer_object;
     GLuint index_buffer_object;
-    GLuint texture_buffer_object[PICTURE_PLANE_MAX];
+    GLuint texture_buffer_object;
 
     struct {
         unsigned int i_x_offset;

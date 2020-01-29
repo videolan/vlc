@@ -349,11 +349,11 @@ xyz12_shader_init(struct vlc_gl_renderer *renderer)
         "    0.0,      0.0,         0.0,        1.0 "
         " );"
 
-        "varying vec2 TexCoord0;"
+        "varying vec2 PicCoords;"
         "void main()"
         "{ "
         " vec4 v_in, v_out;"
-        " v_in  = texture2D(Texture0, TexCoord0);"
+        " v_in  = texture2D(Texture0, PicCoords);"
         " v_in = pow(v_in, xyz_gamma);"
         " v_out = matrix_xyz_rgb * v_in ;"
         " v_out = pow(v_out, rgb_gamma) ;"
@@ -455,23 +455,20 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
             return NULL;
     }
 
-    const char *sampler, *lookup, *coord_name;
+    const char *sampler, *lookup;
     switch (tex_target)
     {
         case GL_TEXTURE_EXTERNAL_OES:
             sampler = "samplerExternalOES";
             lookup = "texture2D";
-            coord_name = "TexCoord";
             break;
         case GL_TEXTURE_2D:
             sampler = "sampler2D";
             lookup  = "texture2D";
-            coord_name = "TexCoord";
             break;
         case GL_TEXTURE_RECTANGLE:
             sampler = "sampler2DRect";
             lookup  = "texture2DRect";
-            coord_name = "TexCoordRect";
             break;
         default:
             vlc_assert_unreachable();
@@ -491,9 +488,10 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
 
     ADDF("%s", renderer->glsl_precision_header);
 
+    ADD("varying vec2 PicCoords;\n");
     for (unsigned i = 0; i < interop->tex_count; ++i)
         ADDF("uniform %s Texture%u;\n"
-             "varying vec2 TexCoord%u;\n", sampler, i, i);
+             "uniform mat3 TexCoordsMap%u;\n", sampler, i, i);
 
 #ifdef HAVE_LIBPLACEBO
     if (renderer->pl_sh) {
@@ -586,14 +584,10 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
         ADD("uniform mat4 ConvMatrix;\n");
 
     ADD("uniform vec4 FillColor;\n"
-        "void main(void) {\n");
-
-    if (tex_target == GL_TEXTURE_RECTANGLE)
-    {
-        for (unsigned i = 0; i < interop->tex_count; ++i)
-            ADDF(" vec2 TexCoordRect%u = vec2(TexCoord%u.x * TexSize%u.x, "
-                 "TexCoord%u.y * TexSize%u.y);\n", i, i, i, i, i);
-    }
+        "void main(void) {\n"
+        /* Homogeneous coordinates */
+        " vec3 pic_hcoords = vec3(PicCoords, 1.0);\n"
+        " vec2 tex_coords;\n");
 
     unsigned color_count;
     if (is_yuv) {
@@ -605,7 +599,14 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
             const char *swizzle = swizzle_per_tex[i];
             assert(swizzle);
             size_t swizzle_count = strlen(swizzle);
-            ADDF(" texel = %s(Texture%u, %s%u);\n", lookup, i, coord_name, i);
+            ADDF(" tex_coords = (TexCoordsMap%u * pic_hcoords).st;\n", i);
+            if (tex_target == GL_TEXTURE_RECTANGLE)
+            {
+                /* The coordinates are in texels values, not normalized */
+                ADDF(" tex_coords = vec2(tex_coords.x * TexSize%u.x,\n"
+                     "                   tex_coords.y * TexSize%u.y);\n", i, i);
+            }
+            ADDF(" texel = %s(Texture%u, tex_coords);\n", lookup, i);
             for (unsigned j = 0; j < swizzle_count; ++j)
             {
                 ADDF(" pixel[%u] = texel.%c;\n", color_idx, swizzle[j]);
@@ -618,7 +619,8 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
     }
     else
     {
-        ADDF(" vec4 result = %s(Texture0, %s0);\n", lookup, coord_name);
+        ADD(" tex_coords = (TexCoordsMap0 * pic_hcoords).st;\n");
+        ADDF(" vec4 result = %s(Texture0, tex_coords);\n", lookup);
         color_count = 1;
     }
     assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
