@@ -43,6 +43,14 @@ Widgets.NavigableFocusScope {
             view.currentItem.currentIndex = 0;
     }
 
+    Component {
+        id: headerComponent
+        Widgets.LabelSeparator {
+            text: i18n.qtr("Genres")
+            width: root.width
+        }
+    }
+
     Util.SelectableDelegateModel {
         id: delegateModel
         model: MLGenreModel {
@@ -120,6 +128,9 @@ Widgets.NavigableFocusScope {
 
             model: delegateModel
             modelCount: delegateModel.items.count
+
+            headerDelegate: headerComponent
+
             delegate: AudioGridItem {
                 id: gridItem
 
@@ -160,6 +171,8 @@ Widgets.NavigableFocusScope {
 
             model: delegateModel.parts.list
             modelCount: delegateModel.items.count
+
+            header: headerComponent
 
             focus: true
             spacing: VLCStyle.margin_xxxsmall
