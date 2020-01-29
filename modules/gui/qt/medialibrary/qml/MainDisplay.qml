@@ -235,6 +235,10 @@ Widgets.NavigableFocusScope {
                         navigationLeftItem: stackView
                         navigationUpItem: sourcesBanner
                         navigationDownItem: miniPlayer.expanded ? miniPlayer : undefined
+                        navigationCancel: function() {
+                            rootWindow.playlistVisible = false
+                            stackView.forceActiveFocus()
+                        }
 
                         Rectangle {
                             anchors {
