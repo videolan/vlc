@@ -327,11 +327,11 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
     const char *coord1_header = plane_count > 1 ?
         "varying vec2 TexCoord1;\nattribute vec4 MultiTexCoord1;\n" : "";
     const char *coord1_code = plane_count > 1 ?
-        " TexCoord1 = vec4(OrientationMatrix * MultiTexCoord1).st;\n" : "";
+        " TexCoord1 = vec4(TransformMatrix * OrientationMatrix * MultiTexCoord1).st;\n" : "";
     const char *coord2_header = plane_count > 2 ?
         "varying vec2 TexCoord2;\nattribute vec4 MultiTexCoord2;\n" : "";
     const char *coord2_code = plane_count > 2 ?
-        " TexCoord2 = vec4(OrientationMatrix * MultiTexCoord2).st;\n" : "";
+        " TexCoord2 = vec4(TransformMatrix * OrientationMatrix * MultiTexCoord2).st;\n" : "";
 
     char *code;
     if (asprintf(&code, template, tc->glsl_version, coord1_header, coord2_header,
