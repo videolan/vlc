@@ -889,11 +889,10 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_stream_t *p_pes,
             for( unsigned i = 0; i < i_page; i++ )
             {
                 const ts_teletext_page_t *p = &p_page[i];
-                if(p->i_magazine == 1 && pass != TXT_INDEX_PAGE)
+                if(p->i_magazine !=1 && pass == TXT_INDEX_PAGE)
                     continue;
                 if((p->i_type == 0x02 || p->i_type == 0x05) && pass != TXT_SUBTITLES)
                     continue;
-
                 /* */
                 if( !p_page_es )
                 {
