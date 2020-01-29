@@ -100,6 +100,42 @@ NavigableFocusScope {
         return [(rowCol[0] * root.cellWidth) + (remainingSpace / 2), rowCol[1] * root.cellHeight + headerHeight]
     }
 
+    //use the same signature as Gridview.positionViewAtIndex(index, PositionMode mode)
+    //mode is ignored at the moment
+    function positionViewAtIndex(index, mode) {
+        if (flickable.width === 0 || flickable.height === 0)
+            return
+
+        if (index <= 0) {
+            animateFlickableContentY(0)
+            return
+        } else if (index >= modelCount) {
+            return
+        }
+
+        var newContentY = flickable.contentY
+
+        var itemTopY = root.getItemPos(index)[1]
+        var itemBottomY = itemTopY + root.cellHeight
+
+        var viewTopY = flickable.contentY
+        var viewBottomY = viewTopY + flickable.height
+
+        if (index < getNbItemsPerRow()) {
+            //force to see the header when on the first row
+            newContentY = 0
+        } else if ( itemTopY < viewTopY ) {
+            //item above view
+            newContentY = itemTopY - marginTop
+        } else if (itemBottomY > viewBottomY) {
+            //item below view
+            newContentY = itemBottomY + marginBottom - flickable.height
+        }
+
+        if (newContentY !== flickable.contentY)
+            animateFlickableContentY(newContentY)
+    }
+
 
     function _defineObjProperty( obj, prop, value )
     {
@@ -385,7 +421,7 @@ NavigableFocusScope {
             onStopped: {
                 _expandIndex = -1
                 flickable.setCurrentItemFocus()
-                root.animateToCurrentIndex()
+                root.positionViewAtIndex(root.currentIndex, ItemView.Contain)
                 if (_newExpandIndex !== -1)
                     flickable.expand()
             }
@@ -424,29 +460,12 @@ NavigableFocusScope {
         animateContentY.start()
     }
 
-    function animateToCurrentIndex() {
-        var newContentY = flickable.contentY;
-        var currentItemYPos = root.getItemPos(currentIndex)[1]
-        if (currentItemYPos + cellHeight > flickable.contentY + flickable.height) {
-            //move viewport to see current item bottom
-            newContentY = Math.min(
-                        currentItemYPos + cellHeight - flickable.height,
-                        flickable.contentHeight - flickable.height)
-        } else if (currentItemYPos < flickable.contentY) {
-            //move viewport to see current item top
-            newContentY = Math.max(currentItemYPos, 0)
-        }
-
-        if (newContentY !== flickable.contentY)
-            animateFlickableContentY(newContentY)
-    }
-
     onCurrentIndexChanged: {
         if (_expandIndex !== -1)
             retract()
         flickable.setCurrentItemFocus()
         _updateSelected()
-        animateToCurrentIndex()
+        positionViewAtIndex(root.currentIndex, ItemView.Contain)
     }
 
     Keys.onPressed: {
