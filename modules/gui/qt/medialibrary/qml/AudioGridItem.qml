@@ -30,5 +30,4 @@ Widgets.GridItem {
     isVideo: false
     pictureWidth: VLCStyle.cover_normal
     pictureHeight: VLCStyle.cover_normal
-    onItemDoubleClicked: if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
 }

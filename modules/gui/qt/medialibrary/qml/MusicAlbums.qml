@@ -148,6 +148,10 @@ Widgets.NavigableFocusScope {
                     gridView_id.currentIndex = index
                     gridView_id.forceActiveFocus()
                 }
+
+                onItemDoubleClicked: {
+                    if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
+                }
             }
 
             expandDelegate: MusicAlbumsGridExpandDelegate {
