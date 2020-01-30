@@ -40,6 +40,8 @@ NavigableFocusScope {
     property alias contentX: flickable.contentX
     property bool isAnimating: animateRetractItem.running || animateExpandItem.running
 
+    property bool _isInitialised: false
+
     /// the id of the item to be expanded
     property int _expandIndex: -1
     property int _newExpandIndex: -1
@@ -152,6 +154,17 @@ NavigableFocusScope {
             var item = _idChildrenMap[id]
             item.selected = model.items.get(id).inSelected
         }
+    }
+
+    function _initialize() {
+        if (root._isInitialised)
+            return;
+
+        if (flickable.width === 0 || flickable.height === 0)
+            return;
+        if (currentIndex !== 0)
+            positionViewAtIndex(currentIndex, ItemView.Contain)
+        root._isInitialised = true;
     }
 
     //Gridview visible above the expanded item
@@ -271,6 +284,11 @@ NavigableFocusScope {
         }
 
         function layout(forceRelayout) {
+            if (flickable.width === 0 || flickable.height === 0)
+                return
+            else if (!root._isInitialised)
+                root._initialize()
+
             var i
             var expandItemGridId = getExpandItemGridId()
 
