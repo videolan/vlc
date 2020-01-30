@@ -350,16 +350,19 @@ xyz12_shader_init(struct vlc_gl_renderer *renderer)
         " );"
 
         "varying vec2 PicCoords;"
-        "void main()"
+        "vec4 vlc_texture(vec2 pic_coords)\n"
         "{ "
         " vec4 v_in, v_out;"
-        " v_in  = texture2D(Texture0, PicCoords);"
+        " v_in  = texture2D(Texture0, pic_coords);"
         " v_in = pow(v_in, xyz_gamma);"
         " v_out = matrix_xyz_rgb * v_in ;"
         " v_out = pow(v_out, rgb_gamma) ;"
         " v_out = clamp(v_out, 0.0, 1.0) ;"
-        " gl_FragColor = v_out;"
-        "}";
+        " return v_out;"
+        "}\n"
+        "void main() {\n"
+        " gl_FragColor = vlc_texture(PicCoords);\n"
+        "}\n";
 
     char *code;
     if (asprintf(&code, template, renderer->glsl_version,
@@ -586,9 +589,9 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
         ADD("uniform mat4 ConvMatrix;\n");
 
     ADD("uniform vec4 FillColor;\n"
-        "void main(void) {\n"
+        "vec4 vlc_texture(vec2 pic_coords) {\n"
         /* Homogeneous (oriented) coordinates */
-        " vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(PicCoords, 0.0, 1.0)).st, 1.0);\n"
+        " vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).st, 1.0);\n"
         " vec2 tex_coords;\n");
 
     unsigned color_count;
@@ -636,8 +639,12 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
     }
 #endif
 
-    ADD(" gl_FragColor = result * FillColor;\n"
-        "}");
+    ADD(" return result * FillColor;\n"
+        "}\n");
+
+    ADD("void main() {\n"
+        " gl_FragColor = vlc_texture(PicCoords);\n"
+        "}\n");
 
 #undef ADD
 #undef ADDF
