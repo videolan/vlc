@@ -623,8 +623,15 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                     goto error;
             }
 
+            /* Store the current encoder input chroma to detect whether we need
+             * a converter in p_final_conv_static. The encoder will override it
+             * if it needs any different format or chroma. */
+            es_format_t filter_fmt_out;
+            es_format_Copy( &filter_fmt_out, transcode_encoder_format_in( id->encoder ) );
+            bool is_encoder_open = transcode_encoder_opened( id->encoder );
+
             /* Start missing encoder */
-            if( !transcode_encoder_opened( id->encoder ) &&
+            if( !is_encoder_open &&
                 transcode_encoder_open( id->encoder, id->p_enccfg ) != VLC_SUCCESS )
             {
                 msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s). "
@@ -633,6 +640,26 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                                    (char *)&id->p_enccfg->i_codec );
                 goto error;
             }
+
+            /* The fmt_in may have been overriden by the encoder. */
+            const es_format_t *encoder_fmt_in = transcode_encoder_format_in( id->encoder );
+
+            /* In case the encoder wasn't open yet, check if we need to add
+             * a converter between last user filter and encoder. */
+            if( !is_encoder_open &&
+                filter_fmt_out.i_codec != encoder_fmt_in->i_codec )
+            {
+                if ( !id->p_final_conv_static )
+                    id->p_final_conv_static =
+                        filter_chain_NewVideo( p_stream, false, NULL );
+                filter_chain_Reset( id->p_final_conv_static,
+                                    &filter_fmt_out,
+                                    //encoder_vctx_in,
+                                    NULL,
+                                    encoder_fmt_in );
+                filter_chain_AppendConverter( id->p_final_conv_static, NULL );
+            }
+            es_format_Clean(&filter_fmt_out);
 
             msg_Dbg( p_stream, "destination (after video filters) %ux%u",
                                transcode_encoder_format_in( id->encoder )->video.i_width,
