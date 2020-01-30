@@ -30,11 +30,11 @@
 #include "vout_helper.h"
 
 struct vlc_gl_interop *
-vlc_gl_interop_New(struct vlc_gl_t *gl, const opengl_vtable_t *vt,
+vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
                    vlc_video_context *context, const video_format_t *fmt,
                    bool subpics)
 {
-    const char *glexts = (const char *) vt->GetString(GL_EXTENSIONS);
+    const char *glexts = (const char *) api->vt.GetString(GL_EXTENSIONS);
     assert(glexts);
     if (!glexts)
     {
@@ -60,7 +60,8 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, const opengl_vtable_t *vt,
     interop->fmt.p_palette = NULL;
 
     interop->gl = gl;
-    interop->vt = vt;
+    interop->api = api;
+    interop->vt = &api->vt;
 
     int ret;
     if (subpics)

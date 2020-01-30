@@ -25,6 +25,8 @@
 #include <vlc_codec.h>
 #include <vlc_opengl.h>
 #include <vlc_plugin.h>
+
+#include "gl_api.h"
 #include "gl_common.h"
 #include "interop.h"
 
@@ -43,8 +45,9 @@ struct vlc_gl_renderer
     /* libplacebo context, created by the caller (optional) */
     struct pl_context *pl_ctx;
 
-    /* Function pointers to OpenGL functions, set by the caller */
-    const opengl_vtable_t *vt;
+    /* Set by the caller */
+    const struct vlc_gl_api *api;
+    const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
 
     /* True to dump shaders, set by the caller */
     bool b_dump_shaders;
@@ -152,7 +155,7 @@ struct vlc_gl_renderer
  * Create a new renderer
  *
  * \param gl the GL context
- * \param vt the OpenGL functions vtable
+ * \param api the OpenGL API
  * \param context the video context
  * \param fmt the video format
  * \param supports_npot indicate if the implementation supports non-power-of-2
@@ -160,7 +163,7 @@ struct vlc_gl_renderer
  * \param dump_shaders indicate if the shaders must be dumped in logs
  */
 struct vlc_gl_renderer *
-vlc_gl_renderer_New(vlc_gl_t *gl, const opengl_vtable_t *vt,
+vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
                     vlc_video_context *context, const video_format_t *fmt,
                     bool supports_npot, bool dump_shaders);
 

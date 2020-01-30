@@ -60,7 +60,8 @@ typedef struct {
 struct vlc_gl_sub_renderer
 {
     vlc_gl_t *gl;
-    const opengl_vtable_t *vt;
+    const struct vlc_gl_api *api;
+    const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
 
     struct vlc_gl_interop *interop;
 
@@ -112,16 +113,18 @@ FetchLocations(struct vlc_gl_sub_renderer *sr)
 }
 
 struct vlc_gl_sub_renderer *
-vlc_gl_sub_renderer_New(vlc_gl_t *gl, const opengl_vtable_t *vt,
+vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
                         bool supports_npot)
 {
+    const opengl_vtable_t *vt = &api->vt;
+
     struct vlc_gl_sub_renderer *sr = malloc(sizeof(*sr));
     if (!sr)
         return NULL;
 
     video_format_t fmt;
     video_format_Init(&fmt, VLC_CODEC_RGB32);
-    sr->interop = vlc_gl_interop_New(gl, vt, NULL, &fmt, true);
+    sr->interop = vlc_gl_interop_New(gl, api, NULL, &fmt, true);
     if (!sr->interop)
         goto error_1;
 
@@ -129,6 +132,7 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const opengl_vtable_t *vt,
     assert(!sr->interop->handle_texs_gen);
 
     sr->gl = gl;
+    sr->api = api;
     sr->vt = vt;
     sr->supports_npot = supports_npot;
     sr->region_count = 0;

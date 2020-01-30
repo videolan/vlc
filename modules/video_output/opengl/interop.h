@@ -109,7 +109,8 @@ struct vlc_gl_interop {
     module_t *module;
 
     vlc_gl_t *gl;
-    const opengl_vtable_t *vt;
+    const struct vlc_gl_api *api;
+    const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
     GLenum tex_target;
 
     /* True if the current API is OpenGL ES, set by the caller */
@@ -157,7 +158,7 @@ struct vlc_gl_interop {
 };
 
 struct vlc_gl_interop *
-vlc_gl_interop_New(struct vlc_gl_t *gl, const opengl_vtable_t *vt,
+vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
                    vlc_video_context *context, const video_format_t *fmt,
                    bool subpics);
 

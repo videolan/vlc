@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_opengl.h>
 
+#include "gl_api.h"
 #include "gl_common.h"
 
 /**
@@ -39,12 +40,12 @@ struct vlc_gl_sub_renderer;
  * Create a new subpictures renderer
  *
  * \param gl the GL context
- * \param vt the OpenGL functions vtable
+ * \param api the OpenGL API
  * \param supports_npot indicate if the implementation supports non-power-of-2
  *                      texture size
  */
 struct vlc_gl_sub_renderer *
-vlc_gl_sub_renderer_New(vlc_gl_t *gl, const opengl_vtable_t *vt,
+vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
                         bool supports_npot);
 
 /**

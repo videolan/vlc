@@ -310,7 +310,7 @@ vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
 
     vlc_gl_interop_Delete(interop);
     if (renderer->program_id != 0)
-        renderer->vt->DeleteProgram(renderer->program_id);
+        vt->DeleteProgram(renderer->program_id);
 
 #ifdef HAVE_LIBPLACEBO
     FREENULL(renderer->uloc.pl_vars);
@@ -322,16 +322,18 @@ vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
 }
 
 struct vlc_gl_renderer *
-vlc_gl_renderer_New(vlc_gl_t *gl, const opengl_vtable_t *vt,
+vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
                     vlc_video_context *context, const video_format_t *fmt,
                     bool supports_npot, bool b_dump_shaders)
 {
+    const opengl_vtable_t *vt = &api->vt;
+
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
         return NULL;
 
     struct vlc_gl_interop *interop =
-        vlc_gl_interop_New(gl, vt, context, fmt, false);
+        vlc_gl_interop_New(gl, api, context, fmt, false);
     if (!interop)
     {
         free(renderer);
@@ -341,6 +343,7 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const opengl_vtable_t *vt,
     renderer->interop = interop;
 
     renderer->gl = gl;
+    renderer->api = api;
     renderer->vt = vt;
     renderer->b_dump_shaders = b_dump_shaders;
 #if defined(USE_OPENGL_ES2)
