@@ -37,7 +37,10 @@ Widgets.NavigableFocusScope {
     property var sortModel
     property var contentModel
 
-    onViewChanged: loadView()
+    onViewChanged: {
+        viewProperties = ({})
+        loadView()
+    }
     onViewPropertiesChanged: loadView()
     Component.onCompleted: loadView()
 

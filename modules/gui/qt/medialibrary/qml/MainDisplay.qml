@@ -36,7 +36,10 @@ Widgets.NavigableFocusScope {
     property string view: ""
     property var viewProperties: ({})
 
-    onViewChanged: loadView()
+    onViewChanged: {
+        viewProperties = ({})
+        loadView()
+    }
     onViewPropertiesChanged: loadView()
     Component.onCompleted: {
         loadView()
