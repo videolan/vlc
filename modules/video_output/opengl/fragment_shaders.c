@@ -336,8 +336,6 @@ xyz12_shader_init(struct vlc_gl_renderer *renderer)
      *  - reverse RGB gamma correction
      */
     static const char *template =
-        "#version %u\n"
-        "%s"
         "uniform sampler2D Texture0;"
         "uniform vec4 xyz_gamma = vec4(2.6);"
         "uniform vec4 rgb_gamma = vec4(1.0/2.2);"
@@ -349,7 +347,6 @@ xyz12_shader_init(struct vlc_gl_renderer *renderer)
         "    0.0,      0.0,         0.0,        1.0 "
         " );"
 
-        "varying vec2 PicCoords;"
         "vec4 vlc_texture(vec2 pic_coords)\n"
         "{ "
         " vec4 v_in, v_out;"
@@ -359,17 +356,9 @@ xyz12_shader_init(struct vlc_gl_renderer *renderer)
         " v_out = pow(v_out, rgb_gamma) ;"
         " v_out = clamp(v_out, 0.0, 1.0) ;"
         " return v_out;"
-        "}\n"
-        "void main() {\n"
-        " gl_FragColor = vlc_texture(PicCoords);\n"
         "}\n";
 
-    char *code;
-    if (asprintf(&code, template, renderer->glsl_version,
-                 renderer->glsl_precision_header) < 0)
-        return NULL;
-
-    return code;
+    return strdup(template);
 }
 
 static int
@@ -484,15 +473,7 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
 #define ADD(x) vlc_memstream_puts(&ms, x)
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
 
-    ADDF("#version %u\n", renderer->glsl_version);
-
-    if (tex_target == GL_TEXTURE_EXTERNAL_OES)
-        ADDF("#extension GL_OES_EGL_image_external : require\n");
-
-    ADDF("%s", renderer->glsl_precision_header);
-
-    ADD("varying vec2 PicCoords;\n"
-        "uniform mat4 TransformMatrix;\n"
+    ADD("uniform mat4 TransformMatrix;\n"
         "uniform mat4 OrientationMatrix;\n");
     for (unsigned i = 0; i < interop->tex_count; ++i)
         ADDF("uniform %s Texture%u;\n"
@@ -642,19 +623,11 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
     ADD(" return result * FillColor;\n"
         "}\n");
 
-    ADD("void main() {\n"
-        " gl_FragColor = vlc_texture(PicCoords);\n"
-        "}\n");
-
 #undef ADD
 #undef ADDF
 
     if (vlc_memstream_close(&ms) != 0)
         return NULL;
-
-    if (renderer->b_dump_shaders)
-        msg_Dbg(renderer->gl, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
-                (const char *)&chroma, yuv_space, ms.ptr);
 
     renderer->pf_fetch_locations = renderer_base_fetch_locations;
     renderer->pf_prepare_shader = renderer_base_prepare_shader;

@@ -273,6 +273,47 @@ BuildVertexShader(const struct vlc_gl_renderer *renderer)
     return code;
 }
 
+static char *
+BuildFragmentShader(struct vlc_gl_renderer *renderer)
+{
+    struct vlc_gl_interop *interop = renderer->interop;
+    char *vlc_texture =
+        opengl_fragment_shader_init(renderer, interop->tex_target,
+                                    interop->sw_fmt.i_chroma,
+                                    interop->sw_fmt.space);
+    if (!vlc_texture)
+        return NULL;
+
+    static const char *template =
+        "#version %u\n"
+        "%s" /* extensions */
+        "%s" /* precision header */
+        "%s" /* vlc_texture definition */
+        "varying vec2 PicCoords;\n"
+        "void main() {\n"
+        " gl_FragColor = vlc_texture(PicCoords);\n"
+        "}\n";
+
+    /* TODO move extensions back to fragment_shaders.c */
+    const char *extensions = interop->tex_target == GL_TEXTURE_EXTERNAL_OES
+                           ? "#extension GL_OES_EGL_image_external : require\n"
+                           : "";
+
+    char *code;
+    int ret = asprintf(&code, template, renderer->glsl_version, extensions,
+                       renderer->glsl_precision_header, vlc_texture);
+    free(vlc_texture);
+    if (ret < 0)
+        return NULL;
+
+    if (renderer->b_dump_shaders)
+        msg_Dbg(renderer->gl, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
+                              (const char *) &interop->sw_fmt.i_chroma,
+                              interop->sw_fmt.space, code);
+
+    return code;
+}
+
 static int
 opengl_link_program(struct vlc_gl_renderer *renderer)
 {
@@ -283,10 +324,7 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
     if (!vertex_shader)
         return VLC_EGENERIC;
 
-    char *fragment_shader =
-        opengl_fragment_shader_init(renderer, interop->tex_target,
-                                    interop->sw_fmt.i_chroma,
-                                    interop->sw_fmt.space);
+    char *fragment_shader = BuildFragmentShader(renderer);
     if (!fragment_shader)
     {
         free(vertex_shader);
