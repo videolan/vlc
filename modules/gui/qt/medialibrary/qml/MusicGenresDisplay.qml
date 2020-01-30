@@ -27,192 +27,87 @@ import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
     id: root
-    property alias model: delegateModel.model
-    property var sortModel: [
-        { text: i18n.qtr("Alphabetic"), criteria: "title" }
-    ]
 
-    function showAlbumView( parent ) {
-        history.push([ "mc", "music", "albums", { parentId: parent } ])
+    //name and properties of the tab to be initially loaded
+    property string view: "all"
+    property var viewProperties: ({})
+
+    property var sortModel
+    property var contentModel
+
+    readonly property var pageModel: [{
+        name: "all",
+        component: genresComponent
+    }, {
+        name: "albums",
+        component: albumGenreComponent
+    }]
+
+    Component.onCompleted: loadView()
+    onViewChanged: {
+        viewProperties = {}
+        loadView()
+    }
+    onViewPropertiesChanged: loadView()
+
+    function loadDefaultView() {
+        root.view = "all"
+        root.viewProperties= ({})
     }
 
-    navigationCancel: function() {
-        if (view.currentItem.currentIndex <= 0)
-            defaultNavigationCancel()
-        else
-            view.currentItem.currentIndex = 0;
+    function loadView() {
+        var found = stackView.loadView(root.pageModel, view, viewProperties)
+        if (!found)
+            stackView.replace(root.pageModel[0].component)
+        sortModel = stackView.currentItem.sortModel
+        contentModel = stackView.currentItem.model
     }
 
-    Component {
-        id: headerComponent
-        Widgets.LabelSeparator {
-            text: i18n.qtr("Genres")
-            width: root.width
-        }
+    function _updateGenresAllHistory(currentIndex) {
+        history.update(["mc", "music", "genres", "all", { "initialIndex": currentIndex }])
     }
 
-    Util.SelectableDelegateModel {
-        id: delegateModel
-        model: MLGenreModel {
-            ml: medialib
-        }
-
-        delegate: Package {
-            Widgets.ListItem {
-                Package.name: "list"
-
-                width: root.width
-                height: VLCStyle.icon_normal + VLCStyle.margin_small
-
-                cover: Image {
-                    id: cover_obj
-                    fillMode: Image.PreserveAspectFit
-                    source: model.cover || VLCStyle.noArtAlbum
-                    sourceSize: Qt.size(width, height)
-                }
-
-                line1: (model.name || "Unknown genre")+" - "+model.nb_tracks+" tracks"
-
-                onItemClicked: {
-                    console.log("Clicked on : "+model.name);
-                    delegateModel.updateSelection( modifier, view.currentItem.currentIndex, index )
-                    view.currentItem.currentIndex = index
-                    this.forceActiveFocus()
-                }
-                onPlayClicked: {
-                    console.log('Clicked on play : '+model.name);
-                    medialib.addAndPlay( model.id )
-                }
-                onItemDoubleClicked: {
-                    root.showAlbumView(model.id)
-                }
-                onAddToPlaylistClicked: {
-                    console.log('Clicked on addToPlaylist : '+model.name);
-                    medialib.addToPlaylist( model.id );
-                }
-            }
-        }
-
-        function actionAtIndex(index) {
-            if (delegateModel.selectedGroup.count > 1) {
-                var list = []
-                for (var i = 0; i < delegateModel.selectedGroup.count; i++)
-                    list.push(delegateModel.selectedGroup.get(i).model.id)
-                medialib.addAndPlay( list )
-            } else if (delegateModel.selectedGroup.count === 1) {
-                showAlbumView(delegateModel.selectedGroup.get(0).model.id)
-            }
-        }
-    }
-
-    /*
-     *define the intial position/selection
-     * This is done on activeFocus rather than Component.onCompleted because delegateModel.
-     * selectedGroup update itself after this event
-     */
-    onActiveFocusChanged: {
-        if (activeFocus && delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
-            var initialIndex = 0
-            if (view.currentItem.currentIndex !== -1)
-                initialIndex = view.currentItem.currentIndex
-            delegateModel.items.get(initialIndex).inSelected = true
-            view.currentItem.currentIndex = initialIndex
-        }
-    }
-
-    /* Grid View */
-    Component {
-        id: gridComponent
-        Widgets.ExpandGridView {
-            id: gridView_id
-
-            model: delegateModel
-            modelCount: delegateModel.items.count
-
-            headerDelegate: headerComponent
-
-            delegate: AudioGridItem {
-                id: gridItem
-
-                image: model.cover || VLCStyle.noArtAlbum
-                title: model.name || "Unknown genre"
-                subtitle: ""
-                //selected: element.DelegateModel.inSelected
-
-                onItemClicked: {
-                    delegateModel.updateSelection( modifier , view.currentItem.currentIndex, index)
-                    view.currentItem.currentIndex = index
-                    view.currentItem.forceActiveFocus()
-                }
-
-                onItemDoubleClicked: {
-                    root.showAlbumView(model.id)
-                }
-            }
-
-            focus: true
-
-            cellWidth: VLCStyle.gridItem_music_width
-            cellHeight: VLCStyle.gridItem_music_height
-
-            onSelectAll: delegateModel.selectAll()
-            onSelectionUpdated:  delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: delegateModel.actionAtIndex(index)
-
-            navigationParent: root
-        }
+    function _updateGenresAlbumsHistory(currentIndex, parentId, genreName) {
+        history.update(["mc","music", "genres", "albums", {
+            "initialIndex": currentIndex,
+            "parentId": parentId,
+            "genreName": genreName,
+        }])
     }
 
     Component {
-        id: listComponent
+        id: genresComponent
         /* List View */
-        Widgets.KeyNavigableListView {
-            id: listView_id
-
-            model: delegateModel.parts.list
-            modelCount: delegateModel.items.count
-
-            header: headerComponent
-
-            focus: true
-            spacing: VLCStyle.margin_xxxsmall
-
-            onSelectAll: delegateModel.selectAll()
-            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: delegateModel.actionAtIndex(index)
+        MusicGenres {
+            onCurrentIndexChanged: _updateGenresAllHistory(currentIndex)
 
             navigationParent: root
         }
     }
 
+    Component {
+        id: albumGenreComponent
+        /* List View */
+        MusicAlbums {
+            property string genreName: ""
+
+            header: Widgets.LabelSeparator {
+                text: i18n.qtr("Genres - %1").arg(genreName)
+                width: root.width
+            }
+
+            onParentIdChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
+            onGenreNameChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
+            onCurrentIndexChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
+
+            navigationParent: root
+        }
+    }
 
     Widgets.StackViewExt {
-        id: view
+        id: stackView
 
         anchors.fill: parent
         focus: true
-
-        initialItem: medialib.gridView ? gridComponent : listComponent
-
-        Connections {
-            target: medialib
-            onGridViewChanged: {
-                if (medialib.gridView)
-                    view.replace(gridComponent)
-                else
-                    view.replace(listComponent)
-            }
-        }
-    }
-
-    Label {
-        anchors.fill: parent
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        visible: delegateModel.items.count === 0
-        font.pixelSize: VLCStyle.fontHeight_xxlarge
-        color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        wrapMode: Text.WordWrap
-        text: i18n.qtr("No genres found\nPlease try adding sources, by going to the Network tab")
     }
 }

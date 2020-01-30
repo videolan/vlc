@@ -561,6 +561,7 @@ libqt_plugin_la_QML = \
 	gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml \
 	gui/qt/medialibrary/qml/MusicArtistsDisplay.qml \
 	gui/qt/medialibrary/qml/MusicDisplay.qml \
+	gui/qt/medialibrary/qml/MusicGenres.qml \
 	gui/qt/medialibrary/qml/MusicGenresDisplay.qml \
 	gui/qt/medialibrary/qml/MusicTrackListDisplay.qml \
 	gui/qt/medialibrary/qml/MusicTracksDisplay.qml \
