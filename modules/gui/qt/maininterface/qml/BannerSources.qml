@@ -266,6 +266,14 @@ Widgets.NavigableFocusScope {
 
                     visible: !!model
                     enabled: !!model
+                    onVisibleChanged: {
+                        //reset the focus on the global group when the local group is hidden,
+                        //this avoids losing the focus if the subview changes
+                        if (!visible && localMenuGroup.focus) {
+                                        localMenuGroup.focus = false
+                                        globalMenuGroup.focus = true
+                        }
+                    }
 
                     delegate: Widgets.TabButtonExt {
                         text: model.displayText
