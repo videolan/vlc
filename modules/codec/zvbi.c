@@ -118,6 +118,7 @@ vlc_module_end ()
 // #define ZVBI_DEBUG
 
 //Guessing table for missing "default region triplet"
+/* Triplet 1 values from Table 32 */
 static const int pi_default_triplet[] = {
  0, 0, 0, 0,     // slo slk cze ces
  8,              // pol
@@ -126,7 +127,7 @@ static const int pi_default_triplet[] = {
  32,32,32,32,32, //est lit rus bul ukr
  48,48,          //gre ell
  64,             //ara
- 88,             //heb
+ 80,             //heb
  16 };           //default
 static const char *const ppsz_default_triplet[] = {
  "slo", "slk", "cze", "ces",
