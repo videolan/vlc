@@ -18,6 +18,7 @@ variables:
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20191023134128
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20190717134531
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-bionic:20190627090437
+    VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-debian-raspbian:20200213203125
 
 .variables-debian: &variables-debian
         HOST_ARCH: x86_64
@@ -26,6 +27,10 @@ variables:
 .variables-snap: &variables-snap
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-linux-gnu
+
+.variables-raspbian-arm: &variables-raspbian-arm
+        HOST_ARCH: arm
+        TRIPLET: $HOST_ARCH-linux-gnueabihf
 
 .variables-win32: &variables-win32
         HOST_ARCH: i686
@@ -167,6 +172,22 @@ snap:
         - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
         - mv extras/package/snap/parts/vlc/build/contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 2>/dev/null || true
     variables: *variables-snap
+
+#
+# Raspbian
+#
+raspbian-arm:
+    extends: .docker-template
+    image:
+        name: $VLC_RASPBIAN_IMAGE
+    script: |
+        if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+            echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
+            extras/package/raspberry/build.sh -p -x -a $HOST_ARCH
+        else
+            extras/package/raspberry/build.sh -c -x -a $HOST_ARCH
+        fi
+    variables: *variables-raspbian-arm
 
 #
 # macOS
