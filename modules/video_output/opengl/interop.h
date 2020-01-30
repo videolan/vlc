@@ -113,12 +113,6 @@ struct vlc_gl_interop {
     const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
     GLenum tex_target;
 
-    /* True if the current API is OpenGL ES, set by the caller */
-    bool is_gles;
-
-    /* Available gl extensions (from GL_EXTENSIONS) */
-    const char *glexts;
-
     /* Can only be changed from the module open function */
     video_format_t fmt;
 

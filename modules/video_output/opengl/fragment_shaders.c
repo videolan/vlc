@@ -376,7 +376,7 @@ opengl_init_swizzle(const struct vlc_gl_interop *interop,
                     const vlc_chroma_description_t *desc)
 {
     GLint oneplane_texfmt;
-    if (vlc_gl_StrHasToken(interop->glexts, "GL_ARB_texture_rg"))
+    if (vlc_gl_StrHasToken(interop->api->extensions, "GL_ARB_texture_rg"))
         oneplane_texfmt = GL_RED;
     else
         oneplane_texfmt = GL_LUMINANCE;

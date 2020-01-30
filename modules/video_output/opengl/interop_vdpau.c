@@ -35,6 +35,7 @@
 #include <vlc_codec.h>
 #include <vlc_plugin.h>
 
+#include "gl_api.h"
 #include "../../hw/vdpau/vlc_vdpau.h"
 #include "internal.h"
 #include "interop.h"
@@ -124,7 +125,7 @@ Open(vlc_object_t *obj)
      || (interop->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
       && interop->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
       && interop->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
-     || !vlc_gl_StrHasToken(interop->glexts, "GL_NV_vdpau_interop")
+     || !vlc_gl_StrHasToken(interop->api->extensions, "GL_NV_vdpau_interop")
      || interop->gl->surface->type != VOUT_WINDOW_TYPE_XID)
     {
         vlc_decoder_device_Release(dec_device);

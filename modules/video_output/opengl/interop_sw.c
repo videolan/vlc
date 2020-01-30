@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include <vlc_common.h>
+#include "gl_api.h"
 #include "internal.h"
 
 #define PBO_DISPLAY_COUNT 2 /* Double buffering */
@@ -363,7 +364,7 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
 
     /* OpenGL or OpenGL ES2 with GL_EXT_unpack_subimage ext */
     priv->has_unpack_subimage =
-        !interop->is_gles || vlc_gl_StrHasToken(interop->glexts, "GL_EXT_unpack_subimage");
+        !interop->api->is_gles || vlc_gl_StrHasToken(interop->api->extensions, "GL_EXT_unpack_subimage");
 
     if (allow_dr && priv->has_unpack_subimage)
     {
@@ -372,8 +373,8 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         const bool glver_ok = strverscmp((const char *)ogl_version, "3.0") >= 0;
 
         const bool has_pbo = glver_ok &&
-            (vlc_gl_StrHasToken(interop->glexts, "GL_ARB_pixel_buffer_object") ||
-             vlc_gl_StrHasToken(interop->glexts, "GL_EXT_pixel_buffer_object"));
+            (vlc_gl_StrHasToken(interop->api->extensions, "GL_ARB_pixel_buffer_object") ||
+             vlc_gl_StrHasToken(interop->api->extensions, "GL_EXT_pixel_buffer_object"));
 
         const bool supports_pbo = has_pbo && interop->vt->BufferData
             && interop->vt->BufferSubData;

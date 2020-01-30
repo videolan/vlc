@@ -33,6 +33,7 @@
 #include <vlc_codec.h>
 #include <vlc_plugin.h>
 
+#include "gl_api.h"
 #include "interop.h"
 #include "../../hw/vaapi/vlc_vaapi.h"
 
@@ -353,7 +354,7 @@ Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    if (!vlc_gl_StrHasToken(interop->glexts, "GL_OES_EGL_image"))
+    if (!vlc_gl_StrHasToken(interop->api->extensions, "GL_OES_EGL_image"))
     {
         vlc_decoder_device_Release(dec_device);
         return VLC_EGENERIC;

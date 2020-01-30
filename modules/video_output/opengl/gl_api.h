@@ -26,6 +26,7 @@
 # include "config.h"
 #endif
 
+#include <stdbool.h>
 #include <vlc_common.h>
 #include <vlc_opengl.h>
 
@@ -33,6 +34,12 @@
 
 struct vlc_gl_api {
     opengl_vtable_t vt;
+
+    /* True if the current API is OpenGL ES, set by the caller */
+    bool is_gles;
+
+    /* Available gl extensions (from GL_EXTENSIONS) */
+    const char *extensions;
 };
 
 int

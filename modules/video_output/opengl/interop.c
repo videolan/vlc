@@ -46,15 +46,8 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     if (!interop)
         return NULL;
 
-#ifdef USE_OPENGL_ES2
-    interop->is_gles = true;
-#else
-    interop->is_gles = false;
-#endif
-
     interop->init = opengl_interop_init_impl;
     interop->ops = NULL;
-    interop->glexts = glexts;
     interop->fmt = *fmt;
     /* this is the only allocated field, and we don't need it */
     interop->fmt.p_palette = NULL;
@@ -211,7 +204,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop, GLenum tex_target,
     GLint oneplane_texfmt, oneplane16_texfmt,
           twoplanes_texfmt, twoplanes16_texfmt;
 
-    if (vlc_gl_StrHasToken(interop->glexts, "GL_ARB_texture_rg"))
+    if (vlc_gl_StrHasToken(interop->api->extensions, "GL_ARB_texture_rg"))
     {
         oneplane_texfmt = GL_RED;
         oneplane16_texfmt = GL_R16;
