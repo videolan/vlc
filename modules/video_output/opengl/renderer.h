@@ -29,6 +29,7 @@
 #include "gl_api.h"
 #include "gl_common.h"
 #include "interop.h"
+#include "sampler.h"
 
 struct pl_context;
 struct pl_shader;
@@ -41,9 +42,6 @@ struct vlc_gl_renderer
 {
     /* Pointer to object gl, set by the caller */
     vlc_gl_t *gl;
-
-    /* libplacebo context, created by the caller (optional) */
-    struct pl_context *pl_ctx;
 
     /* Set by the caller */
     const struct vlc_gl_api *api;
@@ -61,30 +59,17 @@ struct vlc_gl_renderer
     GLuint program_id;
 
     struct {
-        GLfloat OrientationMatrix[16];
         GLfloat ProjectionMatrix[16];
         GLfloat StereoMatrix[3*3];
         GLfloat ZoomMatrix[16];
         GLfloat ViewMatrix[16];
-
-        GLfloat TexCoordsMap[PICTURE_PLANE_MAX][3*3];
     } var;
 
     struct {
-        GLint Texture[PICTURE_PLANE_MAX];
-        GLint TexSize[PICTURE_PLANE_MAX]; /* for GL_TEXTURE_RECTANGLE */
-        GLint ConvMatrix;
-        GLint FillColor;
-        GLint *pl_vars; /* for pl_sh_res */
-
-        GLint TransformMatrix;
-        GLint OrientationMatrix;
         GLint StereoMatrix;
         GLint ProjectionMatrix;
         GLint ViewMatrix;
         GLint ZoomMatrix;
-
-        GLint TexCoordsMap[PICTURE_PLANE_MAX];
     } uloc;
 
     struct {
@@ -92,32 +77,15 @@ struct vlc_gl_renderer
         GLint VertexPosition;
     } aloc;
 
-    bool yuv_color;
-    GLfloat conv_matrix[16];
-
-    struct pl_shader *pl_sh;
-    const struct pl_shader_res *pl_sh_res;
-
     struct vlc_gl_interop *interop;
+    struct vlc_gl_sampler *sampler;
 
     video_format_t fmt;
-
-    GLsizei tex_width[PICTURE_PLANE_MAX];
-    GLsizei tex_height[PICTURE_PLANE_MAX];
-
-    GLuint textures[PICTURE_PLANE_MAX];
 
     unsigned nb_indices;
     GLuint vertex_buffer_object;
     GLuint index_buffer_object;
     GLuint texture_buffer_object;
-
-    struct {
-        unsigned int i_x_offset;
-        unsigned int i_y_offset;
-        unsigned int i_visible_width;
-        unsigned int i_visible_height;
-    } last_source;
 
     /* View point */
     vlc_viewpoint_t vp;

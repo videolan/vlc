@@ -318,6 +318,7 @@ static int
 opengl_link_program(struct vlc_gl_renderer *renderer)
 {
     struct vlc_gl_interop *interop = renderer->interop;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
 
     char *vertex_shader = BuildVertexShader(renderer);
@@ -357,8 +358,6 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
 } while (0)
 #define GET_ULOC(x, str) GET_LOC(Uniform, renderer->uloc.x, str)
 #define GET_ALOC(x, str) GET_LOC(Attrib, renderer->aloc.x, str)
-    GET_ULOC(TransformMatrix, "TransformMatrix");
-    GET_ULOC(OrientationMatrix, "OrientationMatrix");
     GET_ULOC(StereoMatrix, "StereoMatrix");
     GET_ULOC(ProjectionMatrix, "ProjectionMatrix");
     GET_ULOC(ViewMatrix, "ViewMatrix");
@@ -367,19 +366,23 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
     GET_ALOC(PicCoordsIn, "PicCoordsIn");
     GET_ALOC(VertexPosition, "VertexPosition");
 
-    GET_ULOC(TexCoordsMap[0], "TexCoordsMap0");
+#define GET_SAMPLER_ULOC(x, str) GET_LOC(Uniform, sampler->uloc.x, str)
+    GET_SAMPLER_ULOC(TransformMatrix, "TransformMatrix");
+    GET_SAMPLER_ULOC(OrientationMatrix, "OrientationMatrix");
+    GET_SAMPLER_ULOC(TexCoordsMap[0], "TexCoordsMap0");
     /* MultiTexCoord 1 and 2 can be optimized out if not used */
     if (interop->tex_count > 1)
-        GET_ULOC(TexCoordsMap[1], "TexCoordsMap1");
+        GET_SAMPLER_ULOC(TexCoordsMap[1], "TexCoordsMap1");
     else
-        renderer->uloc.TexCoordsMap[1] = -1;
+        sampler->uloc.TexCoordsMap[1] = -1;
     if (interop->tex_count > 2)
-        GET_ULOC(TexCoordsMap[2], "TexCoordsMap2");
+        GET_SAMPLER_ULOC(TexCoordsMap[2], "TexCoordsMap2");
     else
-        renderer->uloc.TexCoordsMap[2] = -1;
+        sampler->uloc.TexCoordsMap[2] = -1;
 #undef GET_LOC
 #undef GET_ULOC
 #undef GET_ALOC
+#undef GET_SAMPLER_ULOC
     int ret = renderer->pf_fetch_locations(renderer, program_id);
     assert(ret == VLC_SUCCESS);
     if (ret != VLC_SUCCESS)
@@ -402,6 +405,7 @@ void
 vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
 {
     struct vlc_gl_interop *interop = renderer->interop;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
 
     vt->DeleteBuffers(1, &renderer->vertex_buffer_object);
@@ -409,18 +413,19 @@ vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
     vt->DeleteBuffers(1, &renderer->texture_buffer_object);
 
     if (!interop->handle_texs_gen)
-        vt->DeleteTextures(interop->tex_count, renderer->textures);
+        vt->DeleteTextures(interop->tex_count, sampler->textures);
 
     vlc_gl_interop_Delete(interop);
     if (renderer->program_id != 0)
         vt->DeleteProgram(renderer->program_id);
 
 #ifdef HAVE_LIBPLACEBO
-    FREENULL(renderer->uloc.pl_vars);
-    if (renderer->pl_ctx)
-        pl_context_destroy(&renderer->pl_ctx);
+    FREENULL(sampler->uloc.pl_vars);
+    if (sampler->pl_ctx)
+        pl_context_destroy(&sampler->pl_ctx);
 #endif
 
+    free(renderer->sampler);
     free(renderer);
 }
 
@@ -433,15 +438,30 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
 {
     const opengl_vtable_t *vt = &api->vt;
 
+    struct vlc_gl_sampler *sampler = malloc(sizeof(*sampler));
+    if (!sampler)
+        return NULL;
+
+    sampler->uloc.pl_vars = NULL;
+    sampler->pl_ctx = NULL;
+    sampler->pl_sh = NULL;
+    sampler->pl_sh_res = NULL;
+
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
+    {
+        free(sampler);
         return NULL;
+    }
+
+    renderer->sampler = sampler;
 
     struct vlc_gl_interop *interop =
         vlc_gl_interop_New(gl, api, context, fmt, false);
     if (!interop)
     {
         free(renderer);
+        free(sampler);
         return NULL;
     }
 
@@ -461,10 +481,10 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
 
 #ifdef HAVE_LIBPLACEBO
     // Create the main libplacebo context
-    renderer->pl_ctx = vlc_placebo_Create(VLC_OBJECT(gl));
-    if (renderer->pl_ctx) {
+    sampler->pl_ctx = vlc_placebo_Create(VLC_OBJECT(gl));
+    if (sampler->pl_ctx) {
 #   if PL_API_VER >= 20
-        renderer->pl_sh = pl_shader_alloc(renderer->pl_ctx, &(struct pl_shader_params) {
+        sampler->pl_sh = pl_shader_alloc(sampler->pl_ctx, &(struct pl_shader_params) {
             .glsl = {
 #       ifdef USE_OPENGL_ES2
                 .version = 100,
@@ -475,9 +495,9 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
             },
         });
 #   elif PL_API_VER >= 6
-        renderer->pl_sh = pl_shader_alloc(renderer->pl_ctx, NULL, 0);
+        sampler->pl_sh = pl_shader_alloc(sampler->pl_ctx, NULL, 0);
 #   else
-        renderer->pl_sh = pl_shader_alloc(renderer->pl_ctx, NULL, 0, 0);
+        sampler->pl_sh = pl_shader_alloc(sampler->pl_ctx, NULL, 0, 0);
 #   endif
     }
 #endif
@@ -492,7 +512,7 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     InitStereoMatrix(renderer->var.StereoMatrix, interop->fmt.multiview_mode);
 
     getOrientationTransformMatrix(interop->fmt.orientation,
-                                  renderer->var.OrientationMatrix);
+                                  sampler->var.OrientationMatrix);
     getViewpointMatrixes(renderer, interop->fmt.projection_mode);
 
     /* Update the fmt to main program one */
@@ -507,19 +527,19 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
         const GLsizei h = renderer->fmt.i_visible_height * interop->texs[j].h.num
                         / interop->texs[j].h.den;
         if (api->supports_npot) {
-            renderer->tex_width[j]  = w;
-            renderer->tex_height[j] = h;
+            sampler->tex_width[j]  = w;
+            sampler->tex_height[j] = h;
         } else {
-            renderer->tex_width[j]  = vlc_align_pot(w);
-            renderer->tex_height[j] = vlc_align_pot(h);
+            sampler->tex_width[j]  = vlc_align_pot(w);
+            sampler->tex_height[j] = vlc_align_pot(h);
         }
     }
 
     if (!interop->handle_texs_gen)
     {
-        ret = vlc_gl_interop_GenerateTextures(interop, renderer->tex_width,
-                                              renderer->tex_height,
-                                              renderer->textures);
+        ret = vlc_gl_interop_GenerateTextures(interop, sampler->tex_width,
+                                              sampler->tex_height,
+                                              sampler->textures);
         if (ret != VLC_SUCCESS)
         {
             vlc_gl_renderer_Delete(renderer);
@@ -911,17 +931,18 @@ static int SetupCoords(struct vlc_gl_renderer *renderer)
 static void DrawWithShaders(struct vlc_gl_renderer *renderer)
 {
     const struct vlc_gl_interop *interop = renderer->interop;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
-    renderer->pf_prepare_shader(renderer, renderer->tex_width,
-                                renderer->tex_height, 1.0f);
+    renderer->pf_prepare_shader(renderer, sampler->tex_width,
+                                sampler->tex_height, 1.0f);
 
     for (unsigned j = 0; j < interop->tex_count; j++) {
-        assert(renderer->textures[j] != 0);
+        assert(sampler->textures[j] != 0);
         vt->ActiveTexture(GL_TEXTURE0+j);
-        vt->BindTexture(interop->tex_target, renderer->textures[j]);
+        vt->BindTexture(interop->tex_target, sampler->textures[j]);
 
-        vt->UniformMatrix3fv(renderer->uloc.TexCoordsMap[j], 1, GL_FALSE,
-                             renderer->var.TexCoordsMap[j]);
+        vt->UniformMatrix3fv(sampler->uloc.TexCoordsMap[j], 1, GL_FALSE,
+                             sampler->var.TexCoordsMap[j]);
     }
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
@@ -940,10 +961,10 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
     if (!tm)
         tm = identity;
 
-    vt->UniformMatrix4fv(renderer->uloc.TransformMatrix, 1, GL_FALSE, tm);
+    vt->UniformMatrix4fv(sampler->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
-    vt->UniformMatrix4fv(renderer->uloc.OrientationMatrix, 1, GL_FALSE,
-                         renderer->var.OrientationMatrix);
+    vt->UniformMatrix4fv(sampler->uloc.OrientationMatrix, 1, GL_FALSE,
+                         sampler->var.OrientationMatrix);
     vt->UniformMatrix3fv(renderer->uloc.StereoMatrix, 1, GL_FALSE,
                          renderer->var.StereoMatrix);
     vt->UniformMatrix4fv(renderer->uloc.ProjectionMatrix, 1, GL_FALSE,
@@ -960,21 +981,22 @@ int
 vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture)
 {
     const struct vlc_gl_interop *interop = renderer->interop;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
     const video_format_t *source = &picture->format;
 
-    if (source->i_x_offset != renderer->last_source.i_x_offset
-     || source->i_y_offset != renderer->last_source.i_y_offset
-     || source->i_visible_width != renderer->last_source.i_visible_width
-     || source->i_visible_height != renderer->last_source.i_visible_height)
+    if (source->i_x_offset != sampler->last_source.i_x_offset
+     || source->i_y_offset != sampler->last_source.i_y_offset
+     || source->i_visible_width != sampler->last_source.i_visible_width
+     || source->i_visible_height != sampler->last_source.i_visible_height)
     {
-        memset(renderer->var.TexCoordsMap, 0,
-               sizeof(renderer->var.TexCoordsMap));
+        memset(sampler->var.TexCoordsMap, 0,
+               sizeof(sampler->var.TexCoordsMap));
         for (unsigned j = 0; j < interop->tex_count; j++)
         {
             float scale_w = (float)interop->texs[j].w.num / interop->texs[j].w.den
-                          / renderer->tex_width[j];
+                          / sampler->tex_width[j];
             float scale_h = (float)interop->texs[j].h.num / interop->texs[j].h.den
-                          / renderer->tex_height[j];
+                          / sampler->tex_height[j];
 
             /* Warning: if NPOT is not supported a larger texture is
                allocated. This will cause right and bottom coordinates to
@@ -1025,7 +1047,7 @@ vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture)
              *
              * It is stored in column-major order.
              */
-            GLfloat *matrix = renderer->var.TexCoordsMap[j];
+            GLfloat *matrix = sampler->var.TexCoordsMap[j];
 #define COL(x) (x*3)
 #define ROW(x) (x)
             matrix[COL(0) + ROW(0)] = right - left;
@@ -1036,16 +1058,16 @@ vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture)
 #undef ROW
         }
 
-        renderer->last_source.i_x_offset = source->i_x_offset;
-        renderer->last_source.i_y_offset = source->i_y_offset;
-        renderer->last_source.i_visible_width = source->i_visible_width;
-        renderer->last_source.i_visible_height = source->i_visible_height;
+        sampler->last_source.i_x_offset = source->i_x_offset;
+        sampler->last_source.i_y_offset = source->i_y_offset;
+        sampler->last_source.i_visible_width = source->i_visible_width;
+        sampler->last_source.i_visible_height = source->i_visible_height;
     }
 
     /* Update the texture */
-    return interop->ops->update_textures(interop, renderer->textures,
-                                         renderer->tex_width,
-                                         renderer->tex_height, picture,
+    return interop->ops->update_textures(interop, sampler->textures,
+                                         sampler->tex_width,
+                                         sampler->tex_height, picture,
                                          NULL);
 }
 

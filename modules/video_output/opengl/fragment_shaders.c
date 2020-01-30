@@ -35,6 +35,7 @@
 #include <vlc_memstream.h>
 #include "interop.h"
 #include "internal.h"
+#include "sampler.h"
 #include "vout_helper.h"
 
 static const float MATRIX_COLOR_RANGE_LIMITED[4*3] = {
@@ -132,9 +133,11 @@ renderer_yuv_base_init(struct vlc_gl_renderer *renderer, vlc_fourcc_t chroma,
                        const vlc_chroma_description_t *desc,
                        video_color_space_t yuv_space)
 {
+    struct vlc_gl_sampler *sampler = renderer->sampler;
+
     /* The current implementation always converts from limited to full range. */
     const video_color_range_t range = COLOR_RANGE_LIMITED;
-    float *matrix = renderer->conv_matrix;
+    float *matrix = sampler->conv_matrix;
     init_conv_matrix(matrix, yuv_space, range);
 
     if (desc->pixel_size == 2)
@@ -167,7 +170,7 @@ renderer_yuv_base_init(struct vlc_gl_renderer *renderer, vlc_fourcc_t chroma,
         }
     }
 
-    renderer->yuv_color = true;
+    sampler->yuv_color = true;
 
     /* Some formats require to swap the U and V components.
      *
@@ -205,13 +208,14 @@ static int
 renderer_base_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
 {
     struct vlc_gl_interop *interop = renderer->interop;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
 
-    if (renderer->yuv_color)
+    if (sampler->yuv_color)
     {
-        renderer->uloc.ConvMatrix = vt->GetUniformLocation(program,
-                                                           "ConvMatrix");
-        if (renderer->uloc.ConvMatrix == -1)
+        sampler->uloc.ConvMatrix = vt->GetUniformLocation(program,
+                                                          "ConvMatrix");
+        if (sampler->uloc.ConvMatrix == -1)
             return VLC_EGENERIC;
     }
 
@@ -219,27 +223,27 @@ renderer_base_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
     {
         char name[sizeof("TextureX")];
         snprintf(name, sizeof(name), "Texture%1u", i);
-        renderer->uloc.Texture[i] = vt->GetUniformLocation(program, name);
-        if (renderer->uloc.Texture[i] == -1)
+        sampler->uloc.Texture[i] = vt->GetUniformLocation(program, name);
+        if (sampler->uloc.Texture[i] == -1)
             return VLC_EGENERIC;
         if (interop->tex_target == GL_TEXTURE_RECTANGLE)
         {
             snprintf(name, sizeof(name), "TexSize%1u", i);
-            renderer->uloc.TexSize[i] = vt->GetUniformLocation(program, name);
-            if (renderer->uloc.TexSize[i] == -1)
+            sampler->uloc.TexSize[i] = vt->GetUniformLocation(program, name);
+            if (sampler->uloc.TexSize[i] == -1)
                 return VLC_EGENERIC;
         }
     }
 
-    renderer->uloc.FillColor = vt->GetUniformLocation(program, "FillColor");
-    if (renderer->uloc.FillColor == -1)
+    sampler->uloc.FillColor = vt->GetUniformLocation(program, "FillColor");
+    if (sampler->uloc.FillColor == -1)
         return VLC_EGENERIC;
 
 #ifdef HAVE_LIBPLACEBO
-    const struct pl_shader_res *res = renderer->pl_sh_res;
+    const struct pl_shader_res *res = sampler->pl_sh_res;
     for (int i = 0; res && i < res->num_variables; i++) {
         struct pl_shader_var sv = res->variables[i];
-        renderer->uloc.pl_vars[i] = vt->GetUniformLocation(program, sv.var.name);
+        sampler->uloc.pl_vars[i] = vt->GetUniformLocation(program, sv.var.name);
     }
 #endif
 
@@ -253,28 +257,29 @@ renderer_base_prepare_shader(const struct vlc_gl_renderer *renderer,
 {
     (void) tex_width; (void) tex_height;
     const struct vlc_gl_interop *interop = renderer->interop;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
 
-    if (renderer->yuv_color)
-        vt->UniformMatrix4fv(renderer->uloc.ConvMatrix, 1, GL_FALSE,
-                             renderer->conv_matrix);
+    if (sampler->yuv_color)
+        vt->UniformMatrix4fv(sampler->uloc.ConvMatrix, 1, GL_FALSE,
+                             sampler->conv_matrix);
 
     for (unsigned i = 0; i < interop->tex_count; ++i)
-        vt->Uniform1i(renderer->uloc.Texture[i], i);
+        vt->Uniform1i(sampler->uloc.Texture[i], i);
 
-    vt->Uniform4f(renderer->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
+    vt->Uniform4f(sampler->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
 
     if (interop->tex_target == GL_TEXTURE_RECTANGLE)
     {
         for (unsigned i = 0; i < interop->tex_count; ++i)
-            vt->Uniform2f(renderer->uloc.TexSize[i], tex_width[i],
+            vt->Uniform2f(sampler->uloc.TexSize[i], tex_width[i],
                           tex_height[i]);
     }
 
 #ifdef HAVE_LIBPLACEBO
-    const struct pl_shader_res *res = renderer->pl_sh_res;
+    const struct pl_shader_res *res = sampler->pl_sh_res;
     for (int i = 0; res && i < res->num_variables; i++) {
-        GLint loc = renderer->uloc.pl_vars[i];
+        GLint loc = sampler->uloc.pl_vars[i];
         if (loc == -1) // uniform optimized out
             continue;
 
@@ -309,8 +314,10 @@ static int
 renderer_xyz12_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
 {
     const opengl_vtable_t *vt = renderer->vt;
-    renderer->uloc.Texture[0] = vt->GetUniformLocation(program, "Texture0");
-    return renderer->uloc.Texture[0] != -1 ? VLC_SUCCESS : VLC_EGENERIC;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
+
+    sampler->uloc.Texture[0] = vt->GetUniformLocation(program, "Texture0");
+    return sampler->uloc.Texture[0] != -1 ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static void
@@ -320,7 +327,9 @@ renderer_xyz12_prepare_shader(const struct vlc_gl_renderer *renderer,
 {
     (void) tex_width; (void) tex_height; (void) alpha;
     const opengl_vtable_t *vt = renderer->vt;
-    vt->Uniform1i(renderer->uloc.Texture[0], 0);
+    struct vlc_gl_sampler *sampler = renderer->sampler;
+
+    vt->Uniform1i(sampler->uloc.Texture[0], 0);
 }
 
 static char *
@@ -431,6 +440,7 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
                             vlc_fourcc_t chroma, video_color_space_t yuv_space)
 {
     struct vlc_gl_interop *interop = renderer->interop;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
 
     const char *swizzle_per_tex[PICTURE_PLANE_MAX] = { NULL, };
     const bool is_yuv = vlc_fourcc_IsYUV(chroma);
@@ -453,19 +463,19 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
             return NULL;
     }
 
-    const char *sampler, *lookup;
+    const char *glsl_sampler, *lookup;
     switch (tex_target)
     {
         case GL_TEXTURE_EXTERNAL_OES:
-            sampler = "samplerExternalOES";
+            glsl_sampler = "samplerExternalOES";
             lookup = "texture2D";
             break;
         case GL_TEXTURE_2D:
-            sampler = "sampler2D";
+            glsl_sampler = "sampler2D";
             lookup  = "texture2D";
             break;
         case GL_TEXTURE_RECTANGLE:
-            sampler = "sampler2DRect";
+            glsl_sampler = "sampler2DRect";
             lookup  = "texture2DRect";
             break;
         default:
@@ -483,11 +493,11 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
         "uniform mat4 OrientationMatrix;\n");
     for (unsigned i = 0; i < interop->tex_count; ++i)
         ADDF("uniform %s Texture%u;\n"
-             "uniform mat3 TexCoordsMap%u;\n", sampler, i, i);
+             "uniform mat3 TexCoordsMap%u;\n", glsl_sampler, i, i);
 
 #ifdef HAVE_LIBPLACEBO
-    if (renderer->pl_sh) {
-        struct pl_shader *sh = renderer->pl_sh;
+    if (sampler->pl_sh) {
+        struct pl_shader *sh = sampler->pl_sh;
         struct pl_color_map_params color_params = pl_color_map_default_params;
         color_params.intent = var_InheritInteger(renderer->gl, "rendering-intent");
         color_params.tone_mapping_algo = var_InheritInteger(renderer->gl, "tone-mapping");
@@ -539,11 +549,11 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
             });
         }
 
-        const struct pl_shader_res *res = renderer->pl_sh_res = pl_shader_finalize(sh);
+        const struct pl_shader_res *res = sampler->pl_sh_res = pl_shader_finalize(sh);
         pl_shader_obj_destroy(&dither_state);
 
-        FREENULL(renderer->uloc.pl_vars);
-        renderer->uloc.pl_vars = calloc(res->num_variables, sizeof(GLint));
+        FREENULL(sampler->uloc.pl_vars);
+        sampler->uloc.pl_vars = calloc(res->num_variables, sizeof(GLint));
         for (int i = 0; i < res->num_variables; i++) {
             struct pl_shader_var sv = res->variables[i];
             const char *glsl_type_name = pl_var_glsl_type_name(sv.var);
@@ -618,8 +628,8 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
     assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
 
 #ifdef HAVE_LIBPLACEBO
-    if (renderer->pl_sh_res) {
-        const struct pl_shader_res *res = renderer->pl_sh_res;
+    if (sampler->pl_sh_res) {
+        const struct pl_shader_res *res = sampler->pl_sh_res;
         assert(res->input  == PL_SHADER_SIG_COLOR);
         assert(res->output == PL_SHADER_SIG_COLOR);
         ADDF(" result = %s(result);\n", res->name);
