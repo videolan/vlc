@@ -40,26 +40,6 @@
 
 #include <math.h>
 
-static const video_format_t* filtered_video_format( sout_stream_id_sys_t *id,
-                                                  picture_t *p_pic )
-{
-    assert( id && p_pic );
-    const filter_chain_t * chains[] =
-    {
-        id->p_final_conv_static,
-        id->p_uf_chain,
-        id->p_conv_static,
-        id->p_conv_nonstatic,
-        id->p_f_chain,
-    };
-    for( size_t i=0; i<ARRAY_SIZE(chains); i++ )
-    {
-        if( chains[i] )
-            return &filter_chain_GetFmtOut( chains[i] )->video;
-    }
-    return &p_pic->format;
-}
-
 struct encoder_owner
 {
     encoder_t enc;
