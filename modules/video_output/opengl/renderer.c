@@ -913,30 +913,13 @@ int
 vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture)
 {
     const struct vlc_gl_interop *interop = renderer->interop;
-    /* Update the texture */
-    return interop->ops->update_textures(interop, renderer->textures,
-                                         renderer->tex_width,
-                                         renderer->tex_height, picture,
-                                         NULL);
-}
-
-int
-vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
-                     const video_format_t *source)
-{
-    const opengl_vtable_t *vt = renderer->vt;
-
-    vt->Clear(GL_COLOR_BUFFER_BIT);
-
-    vt->UseProgram(renderer->program_id);
+    const video_format_t *source = &picture->format;
 
     if (source->i_x_offset != renderer->last_source.i_x_offset
      || source->i_y_offset != renderer->last_source.i_y_offset
      || source->i_visible_width != renderer->last_source.i_visible_width
      || source->i_visible_height != renderer->last_source.i_visible_height)
     {
-        const struct vlc_gl_interop *interop = renderer->interop;
-
         memset(renderer->var.TexCoordsMap, 0,
                sizeof(renderer->var.TexCoordsMap));
         for (unsigned j = 0; j < interop->tex_count; j++)
@@ -1011,6 +994,25 @@ vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
         renderer->last_source.i_visible_width = source->i_visible_width;
         renderer->last_source.i_visible_height = source->i_visible_height;
     }
+
+    /* Update the texture */
+    return interop->ops->update_textures(interop, renderer->textures,
+                                         renderer->tex_width,
+                                         renderer->tex_height, picture,
+                                         NULL);
+}
+
+int
+vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
+                     const video_format_t *source)
+{
+    (void) source;
+    const opengl_vtable_t *vt = renderer->vt;
+
+    vt->Clear(GL_COLOR_BUFFER_BIT);
+
+    vt->UseProgram(renderer->program_id);
+
     DrawWithShaders(renderer);
 
     return VLC_SUCCESS;
