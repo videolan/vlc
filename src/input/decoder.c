@@ -2337,6 +2337,26 @@ void input_DecoderFlush( decoder_t *p_dec )
     vlc_fifo_Signal( p_owner->p_fifo );
 
     vlc_fifo_Unlock( p_owner->p_fifo );
+
+    if( p_owner->paused )
+    {
+        /* The DecoderThread could be stuck in pf_decode(). This is likely the
+         * case with paused asynchronous decoder modules that have a limited
+         * input and output pool size. Indeed, with such decoders, you have to
+         * release an output buffer to get an input buffer. So, when paused and
+         * flushed, the DecoderThread could be waiting for an output buffer to
+         * be released (or rendered). In that case, the DecoderThread will
+         * never be flushed since it be never leave pf_decode(). To fix this
+         * issue, pre-flush the vout from here. The vout will have to be
+         * flushed again since the module could be outputting more buffers just
+         * after being unstuck. */
+
+        vlc_mutex_lock( &p_owner->lock );
+        if( p_dec->fmt_out.i_cat == VIDEO_ES
+         && p_owner->p_vout && p_owner->vout_thread_started )
+            vout_FlushAll( p_owner->p_vout );
+        vlc_mutex_unlock( &p_owner->lock );
+    }
 }
 
 void input_DecoderGetCcDesc( decoder_t *p_dec, decoder_cc_desc_t *p_desc )
