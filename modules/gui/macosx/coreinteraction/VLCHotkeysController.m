@@ -81,7 +81,7 @@
     VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
     unichar key = 0;
     vlc_value_t val;
-    unsigned int i_pressed_modifiers = 0;
+    NSEventModifierFlags i_pressed_modifiers = 0;
     val.i_int = 0;
 
     i_pressed_modifiers = [anEvent modifierFlags];
@@ -197,7 +197,7 @@
 
     unichar key = 0;
     vlc_value_t val;
-    unsigned int i_pressed_modifiers = 0;
+    NSEventModifierFlags i_pressed_modifiers = 0;
 
     val.i_int = 0;
     i_pressed_modifiers = [o_event modifierFlags];
