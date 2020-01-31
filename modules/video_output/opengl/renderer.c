@@ -570,17 +570,6 @@ vlc_gl_renderer_SetWindowAspectRatio(struct vlc_gl_renderer *renderer,
     getViewpointMatrixes(renderer, renderer->fmt.projection_mode);
 }
 
-int
-vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture)
-{
-    const struct vlc_gl_interop *interop = renderer->interop;
-    /* Update the texture */
-    return interop->ops->update_textures(interop, renderer->textures,
-                                         renderer->tex_width,
-                                         renderer->tex_height, picture,
-                                         NULL);
-}
-
 static int BuildSphere(GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
                        GLushort **indices, unsigned *nbIndices)
 {
@@ -918,6 +907,17 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
                          renderer->var.ZoomMatrix);
 
     vt->DrawElements(GL_TRIANGLES, renderer->nb_indices, GL_UNSIGNED_SHORT, 0);
+}
+
+int
+vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture)
+{
+    const struct vlc_gl_interop *interop = renderer->interop;
+    /* Update the texture */
+    return interop->ops->update_textures(interop, renderer->textures,
+                                         renderer->tex_width,
+                                         renderer->tex_height, picture,
+                                         NULL);
 }
 
 int
