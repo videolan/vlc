@@ -105,8 +105,9 @@ static const int kCurrentPreferencesVersion = 4;
     } else {
         NSArray *libraries = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
                                                                  NSUserDomainMask, YES);
-        if (!libraries || [libraries count] == 0) return;
-        NSString * preferences = [[libraries firstObject] stringByAppendingPathComponent:@"Preferences"];
+        if (!libraries || [libraries count] == 0)
+            return;
+        NSString *preferences = [[libraries firstObject] stringByAppendingPathComponent:@"Preferences"];
 
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setAlertStyle:NSAlertStyleInformational];
@@ -122,15 +123,14 @@ static const int kCurrentPreferencesVersion = 4;
 
         // Do NOT add the current plist file here as this would conflict with caching.
         // Instead, just reset below.
-        NSArray * ourPreferences = [NSArray arrayWithObjects:@"org.videolan.vlc", @"VLC", nil];
+        NSArray *ourPreferences = @[[[NSURL alloc] initFileURLWithPath:[preferences stringByAppendingPathComponent:@"org.videolan.vlc"]],
+                                    [[NSURL alloc] initFileURLWithPath:[preferences stringByAppendingPathComponent:@"VLC"]]];
 
-        /* Move the file to trash one by one. Using above array the method would stop after first file
-         not found. */
-        for (NSString *file in ourPreferences) {
-            [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:preferences destination:@"" files:[NSArray arrayWithObject:file] tag:nil];
-        }
-
-        [self resetAndReinitializeUserDefaults];
+        [[NSWorkspace sharedWorkspace] recycleURLs:ourPreferences completionHandler:^(NSDictionary *newURLs, NSError *error){
+            [self resetAndReinitializeUserDefaults];
+            [VLCMain relaunchApplication];
+        }];
+        return;
     }
 
     [VLCMain relaunchApplication];
