@@ -122,6 +122,19 @@ if [ "$INTERACTIVE" != "yes" ] || [ ! -f ./Makefile ]; then
     NEEDED="$FORCED_TOOLS" ${SCRIPT_PATH}/../../tools/bootstrap
 fi
 make -j$JOBS
+
+# avoid installing wine on WSL
+# wine is needed to build Qt with shaders
+if test -z "`command -v wine`"
+then
+    if test -n "`command -v wsl.exe`"
+    then
+        echo "Using wsl.exe to replace wine"
+        echo "#!/bin/sh" > build/bin/wine
+        echo "wsl.exe \"\$@\"" >> build/bin/wine
+    fi
+fi
+
 cd ../../
 
 export USE_FFMPEG=1
