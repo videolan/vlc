@@ -311,6 +311,8 @@ vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
     free(renderer);
 }
 
+static int SetupCoords(struct vlc_gl_renderer *renderer);
+
 struct vlc_gl_renderer *
 vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
                     vlc_video_context *context, const video_format_t *fmt,
@@ -412,6 +414,13 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     vt->GenBuffers(1, &renderer->vertex_buffer_object);
     vt->GenBuffers(1, &renderer->index_buffer_object);
     vt->GenBuffers(1, &renderer->texture_buffer_object);
+
+    ret = SetupCoords(renderer);
+    if (ret != VLC_SUCCESS)
+    {
+        vlc_gl_renderer_Delete(renderer);
+        return NULL;
+    }
 
     return renderer;
 }
@@ -977,10 +986,6 @@ vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
 #undef COL
 #undef ROW
         }
-
-        int ret = SetupCoords(renderer);
-        if (ret != VLC_SUCCESS)
-            return ret;
 
         renderer->last_source.i_x_offset = source->i_x_offset;
         renderer->last_source.i_y_offset = source->i_y_offset;
