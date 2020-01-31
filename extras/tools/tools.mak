@@ -388,6 +388,7 @@ meson-$(MESON_VERSION).tar.gz:
 
 meson: meson-$(MESON_VERSION).tar.gz
 	$(UNPACK)
+	$(APPLY) $(TOOLS)/meson-shlib-undefined.patch
 	$(MOVE)
 
 .buildmeson: meson

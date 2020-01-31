@@ -111,7 +111,7 @@ mkdir -p extras/tools
 cd extras/tools
 
 export PATH="$PWD/build/bin":"$PATH"
-# Force meson 0.51.1 as newer versions don't add -lpthread properly in libplacebo.pc
+# Force patched meson as newer versions don't add -lpthread properly in libplacebo.pc
 FORCED_TOOLS="meson"
 # Force libtool build when compiling with clang
 if [ "$COMPILING_WITH_CLANG" -gt 0 ] && [ ! -d "libtool" ]; then
