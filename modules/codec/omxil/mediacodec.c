@@ -1469,7 +1469,6 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block = NULL;
-    bool b_dequeue_timeout = false;
 
     assert(p_sys->api.b_started);
 
@@ -1480,14 +1479,8 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
     /* Queue CSD blocks and input blocks */
     while (b_drain || (p_block = GetNextBlock(p_sys, p_in_block)))
     {
-        int i_index;
-
         vlc_mutex_unlock(&p_sys->lock);
-        /* Wait for an input buffer. This function returns when a new input
-         * buffer is available or after 2secs of timeout. */
-        i_index = p_sys->api.dequeue_in(&p_sys->api,
-                                        p_sys->api.b_direct_rendering ?
-                                        INT64_C(2000000) : -1);
+        int i_index = p_sys->api.dequeue_in(&p_sys->api, -1);
         vlc_mutex_lock(&p_sys->lock);
 
         if (p_sys->b_aborted)
@@ -1531,35 +1524,11 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
                     assert(p_block == p_in_block),
                     p_in_block = NULL;
                 }
-                b_dequeue_timeout = false;
                 if (b_drain)
                     break;
             } else
             {
                 msg_Err(p_dec, "queue_in failed");
-                goto error;
-            }
-        }
-        else if (i_index == MC_API_INFO_TRYAGAIN)
-        {
-            /* HACK: When direct rendering is enabled, there is a possible
-             * deadlock between the Decoder and the Vout. It happens when the
-             * Vout is paused and when the Decoder is flushing. In that case,
-             * the Vout won't release any output buffers, therefore MediaCodec
-             * won't dequeue any input buffers. To work around this issue,
-             * release all output buffers if DecodeBlock is waiting more than
-             * 2secs for a new input buffer. */
-            if (!b_dequeue_timeout)
-            {
-                msg_Warn(p_dec, "Decoder stuck: invalidate all buffers");
-                if (p_sys->cat == VIDEO_ES)
-                    ReleaseAllPictureContexts(p_sys);
-                b_dequeue_timeout = true;
-                continue;
-            }
-            else
-            {
-                msg_Err(p_dec, "dequeue_in timeout: no input available for 2secs");
                 goto error;
             }
         }
