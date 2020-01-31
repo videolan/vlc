@@ -82,6 +82,7 @@ RANLIB ?= ranlib
 STRIP ?= strip
 WIDL ?= widl
 WINDRES ?= windres
+PKG_CONFIG ?= pkg-config
 else
 ifneq ($(findstring $(origin CC),undefined default),)
 CC := $(HOST)-gcc
@@ -99,6 +100,22 @@ RANLIB ?= $(HOST)-ranlib
 STRIP ?= $(HOST)-strip
 WIDL ?= $(HOST)-widl
 WINDRES ?= $(HOST)-windres
+
+# On Debian x86_64-w64-mingw32-pkg-config exists, runs but returns an error when checking packages
+ifeq ($(shell unset PKG_CONFIG_LIBDIR; $(HOST)-pkg-config --version 1>/dev/null 2>/dev/null || echo FAIL),)
+PKG_CONFIG ?= $(HOST)-pkg-config
+else
+# Use the regular pkg-config and set some PKG_CONFIG_LIBDIR ourselves
+PKG_CONFIG = pkg-config
+ifeq ($(findstring $(origin PKG_CONFIG_LIBDIR),undefined),)
+# an extra PKG_CONFIG_LIBDIR was provided, use it prioritarily
+PKG_CONFIG_LIBDIR := $(PKG_CONFIG_LIBDIR):/usr/$(HOST)/lib/pkgconfig:/usr/lib/$(HOST)/pkgconfig
+else
+PKG_CONFIG_LIBDIR := /usr/$(HOST)/lib/pkgconfig:/usr/lib/$(HOST)/pkgconfig
+endif
+export PKG_CONFIG_LIBDIR
+endif
+
 endif
 
 ifdef HAVE_ANDROID
@@ -208,13 +225,10 @@ export ACLOCAL_AMFLAGS
 # Tools #
 #########
 
-PKG_CONFIG ?= pkg-config
 ifdef HAVE_CROSS_COMPILE
 # This inhibits .pc file from within the cross-compilation toolchain sysroot.
 # Hopefully, nobody ever needs that.
 PKG_CONFIG_PATH := /usr/share/pkgconfig
-PKG_CONFIG_LIBDIR := /usr/$(HOST)/lib/pkgconfig:/usr/lib/$(HOST)/pkgconfig
-export PKG_CONFIG_LIBDIR
 endif
 PKG_CONFIG_PATH := $(PREFIX)/lib/pkgconfig:$(PKG_CONFIG_PATH)
 ifeq ($(findstring mingw32,$(BUILD)),mingw32)
