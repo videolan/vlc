@@ -197,8 +197,7 @@ vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture);
  * \param sr the renderer
  */
 int
-vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
-                     const video_format_t *source);
+vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer);
 
 int
 vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,

@@ -1003,10 +1003,8 @@ vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture)
 }
 
 int
-vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
-                     const video_format_t *source)
+vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer)
 {
-    (void) source;
     const opengl_vtable_t *vt = renderer->vt;
 
     vt->Clear(GL_COLOR_BUFFER_BIT);

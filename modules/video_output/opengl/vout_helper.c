@@ -221,8 +221,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
     GL_ASSERT_NOERROR(&vgl->api.vt);
     return ret;
 }
-int vout_display_opengl_Display(vout_display_opengl_t *vgl,
-                                const video_format_t *source)
+int vout_display_opengl_Display(vout_display_opengl_t *vgl)
 {
     GL_ASSERT_NOERROR(&vgl->api.vt);
 
@@ -230,7 +229,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
        OpenGL providers can call vout_display_opengl_Display to force redraw.
        Currently, the OS X provider uses it to get a smooth window resizing */
 
-    int ret = vlc_gl_renderer_Draw(vgl->renderer, source);
+    int ret = vlc_gl_renderer_Draw(vgl->renderer);
     if (ret != VLC_SUCCESS)
         return ret;
 

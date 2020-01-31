@@ -327,7 +327,7 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
                                          place.width, place.height);
         }
 
-        vout_display_opengl_Display (sys->vgl, &vd->source);
+        vout_display_opengl_Display(sys->vgl);
         vlc_gl_ReleaseCurrent(sys->gl);
     }
     [sys->glView setVoutFlushing:NO];
@@ -605,7 +605,7 @@ static void OpenglSwap (vlc_gl_t *gl)
 
     if (hasFirstFrame)
         // This will lock gl.
-        vout_display_opengl_Display (vd->sys->vgl, &vd->source);
+        vout_display_opengl_Display(vd->sys->vgl);
     else
         glClear (GL_COLOR_BUFFER_BIT);
 }

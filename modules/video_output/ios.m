@@ -291,7 +291,7 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic)
 
     if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
-        vout_display_opengl_Display(glsys->vgl, &vd->source);
+        vout_display_opengl_Display(glsys->vgl);
         vlc_gl_ReleaseCurrent(sys->gl);
     }
 }
