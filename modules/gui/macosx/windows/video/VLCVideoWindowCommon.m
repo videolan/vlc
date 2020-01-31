@@ -640,13 +640,13 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
                 CGDisplayFade(token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES);
             }
 
-            NSDisableScreenUpdates();
+            [NSAnimationContext beginGrouping];
             [[_videoView superview] replaceSubview:_videoView with:o_temp_view];
             [o_temp_view setFrame:[_videoView frame]];
             [[o_fullscreen_window contentView] addSubview:_videoView];
             [_videoView setFrame: [[o_fullscreen_window contentView] frame]];
             [_videoView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
-            NSEnableScreenUpdates();
+            [NSAnimationContext endGrouping];
 
             [screen setFullscreenPresentationOptions];
 
@@ -668,7 +668,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         }
 
         /* Make sure we don't see the _videoView disappearing of the screen during this operation */
-        NSDisableScreenUpdates();
+        [NSAnimationContext beginGrouping];
         [[_videoView superview] replaceSubview:_videoView with:o_temp_view];
         [o_temp_view setFrame:[_videoView frame]];
         [[o_fullscreen_window contentView] addSubview:_videoView];
@@ -676,7 +676,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         [_videoView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
 
         [o_fullscreen_window makeKeyAndOrderFront:self];
-        NSEnableScreenUpdates();
+        [NSAnimationContext endGrouping];
     }
 
     /* We are in fullscreen (and no animation is running) */
@@ -850,7 +850,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
     /* This function is private and should be only triggered at the end of the fullscreen change animation */
     /* Make sure we don't see the _videoView disappearing of the screen during this operation */
-    NSDisableScreenUpdates();
+    [NSAnimationContext beginGrouping];
     [_videoView removeFromSuperviewWithoutNeedingDisplay];
     [[o_temp_view superview] replaceSubview:o_temp_view with:_videoView];
     // TODO Replace tmpView by an existing view (e.g. middle view)
@@ -864,7 +864,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     [self makeKeyAndOrderFront:self];
 
     [o_fullscreen_window orderOut: self];
-    NSEnableScreenUpdates();
+    [NSAnimationContext endGrouping];
 
     o_fullscreen_window = nil;
 

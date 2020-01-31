@@ -314,7 +314,7 @@ int WindowOpen(vout_window_t *p_wnd)
     NSSize videoViewSize = NSMakeSize(videoViewPosition.size.width, videoViewPosition.size.height);
 
     // Avoid flashes if video will directly start in fullscreen
-    NSDisableScreenUpdates();
+    [NSAnimationContext beginGrouping];
 
     if (!videoWallpaper) {
         // set (only!) window origin if specified
@@ -373,7 +373,7 @@ int WindowOpen(vout_window_t *p_wnd)
         [self setFullscreen:1 forWindow:p_wnd withAnimation:NO];
     }
 
-    NSEnableScreenUpdates();
+    [NSAnimationContext endGrouping];
 
     return voutView;
 }
@@ -394,7 +394,7 @@ int WindowOpen(vout_window_t *p_wnd)
     [videoWindow setHasActiveVideo: NO];
 
     // prevent visible extra window if in fullscreen
-    NSDisableScreenUpdates();
+    [NSAnimationContext beginGrouping];
     BOOL b_native = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
     // close fullscreen, without changing fullscreen vars
@@ -412,7 +412,7 @@ int WindowOpen(vout_window_t *p_wnd)
     } else {
         [(VLCLibraryWindow *)videoWindow disableVideoPlaybackAppearance];
     }
-    NSEnableScreenUpdates();
+    [NSAnimationContext endGrouping];
 
     [_voutWindows removeObjectForKey:key];
     if ([_voutWindows count] == 0) {
