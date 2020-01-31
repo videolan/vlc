@@ -158,14 +158,12 @@ struct vlc_gl_renderer
  * \param api the OpenGL API
  * \param context the video context
  * \param fmt the video format
- * \param supports_npot indicate if the implementation supports non-power-of-2
- *                      texture size
  * \param dump_shaders indicate if the shaders must be dumped in logs
  */
 struct vlc_gl_renderer *
 vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
                     vlc_video_context *context, const video_format_t *fmt,
-                    bool supports_npot, bool dump_shaders);
+                    bool dump_shaders);
 
 /**
  * Delete a renderer

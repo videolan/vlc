@@ -324,7 +324,7 @@ vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
 struct vlc_gl_renderer *
 vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
                     vlc_video_context *context, const video_format_t *fmt,
-                    bool supports_npot, bool b_dump_shaders)
+                    bool b_dump_shaders)
 {
     const opengl_vtable_t *vt = &api->vt;
 
@@ -390,7 +390,7 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
                         / interop->texs[j].w.den;
         const GLsizei h = renderer->fmt.i_visible_height * interop->texs[j].h.num
                         / interop->texs[j].h.den;
-        if (supports_npot) {
+        if (api->supports_npot) {
             renderer->tex_width[j]  = w;
             renderer->tex_height[j] = h;
         } else {

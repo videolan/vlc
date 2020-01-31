@@ -40,6 +40,9 @@ struct vlc_gl_api {
 
     /* Available gl extensions (from GL_EXTENSIONS) */
     const char *extensions;
+
+    /* Non-power-of-2 texture size support */
+    bool supports_npot;
 };
 
 int

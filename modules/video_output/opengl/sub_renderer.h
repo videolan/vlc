@@ -45,8 +45,7 @@ struct vlc_gl_sub_renderer;
  *                      texture size
  */
 struct vlc_gl_sub_renderer *
-vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
-                        bool supports_npot);
+vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api);
 
 /**
  * Delete a subpictures renderer

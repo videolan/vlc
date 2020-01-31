@@ -65,7 +65,6 @@ struct vlc_gl_sub_renderer
 
     struct vlc_gl_interop *interop;
 
-    bool supports_npot;
     gl_region_t *regions;
     unsigned region_count;
 
@@ -113,8 +112,7 @@ FetchLocations(struct vlc_gl_sub_renderer *sr)
 }
 
 struct vlc_gl_sub_renderer *
-vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
-                        bool supports_npot)
+vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api)
 {
     const opengl_vtable_t *vt = &api->vt;
 
@@ -134,7 +132,6 @@ vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     sr->gl = gl;
     sr->api = api;
     sr->vt = vt;
-    sr->supports_npot = supports_npot;
     sr->region_count = 0;
     sr->regions = NULL;
 
@@ -249,7 +246,7 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr, subpicture_t *subpic
 
             glr->width  = r->fmt.i_visible_width;
             glr->height = r->fmt.i_visible_height;
-            if (!sr->supports_npot) {
+            if (!sr->api->supports_npot) {
                 glr->width  = vlc_align_pot(glr->width);
                 glr->height = vlc_align_pot(glr->height);
                 glr->tex_width  = (float) r->fmt.i_visible_width  / glr->width;

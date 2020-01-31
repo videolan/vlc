@@ -110,14 +110,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     const opengl_vtable_t *vt = &vgl->api.vt;
 
-    const char *extensions = (const char *) vt->GetString(GL_EXTENSIONS);
-    assert(extensions);
-    if (!extensions)
-    {
-        msg_Err(gl, "glGetString returned NULL");
-        free(vgl);
-        return NULL;
-    }
 #if !defined(USE_OPENGL_ES2)
     const unsigned char *ogl_version = vt->GetString(GL_VERSION);
     bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
@@ -138,22 +130,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         (GLint)fmt->i_height > max_tex_size)
         ResizeFormatToGLMaxTexSize(fmt, max_tex_size);
 
-    /* Non-power-of-2 texture size support */
-    bool supports_npot;
-#if defined(USE_OPENGL_ES2)
-    /* OpenGL ES 2 includes support for non-power of 2 textures by specification
-     * so checks for extensions are bound to fail. Check for OpenGL ES version instead. */
-    supports_npot = true;
-#else
-    supports_npot = vlc_gl_StrHasToken(extensions, "GL_ARB_texture_non_power_of_two") ||
-                    vlc_gl_StrHasToken(extensions, "GL_APPLE_texture_2D_limited_npot");
-#endif
-
     bool b_dump_shaders = var_InheritInteger(gl, "verbose") >= 4;
 
     struct vlc_gl_renderer *renderer = vgl->renderer =
-        vlc_gl_renderer_New(gl, &vgl->api, context, fmt, supports_npot,
-                            b_dump_shaders);
+        vlc_gl_renderer_New(gl, &vgl->api, context, fmt, b_dump_shaders);
     if (!vgl->renderer)
     {
         msg_Warn(gl, "Could not create renderer for %4.4s",
@@ -164,8 +144,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GL_ASSERT_NOERROR(vt);
 
-    vgl->sub_renderer = vlc_gl_sub_renderer_New(gl, &vgl->api,
-                                                supports_npot);
+    vgl->sub_renderer = vlc_gl_sub_renderer_New(gl, &vgl->api);
     if (!vgl->sub_renderer)
     {
         msg_Err(gl, "Could not create sub renderer");
