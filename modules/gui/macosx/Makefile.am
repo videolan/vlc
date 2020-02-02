@@ -34,6 +34,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSColor+VLCAdditions.m \
 	gui/macosx/extensions/NSFont+VLCAdditions.h \
 	gui/macosx/extensions/NSFont+VLCAdditions.m \
+	gui/macosx/extensions/NSMenu+VLCAdditions.h \
+	gui/macosx/extensions/NSMenu+VLCAdditions.m \
 	gui/macosx/extensions/NSScreen+VLCAdditions.h \
 	gui/macosx/extensions/NSScreen+VLCAdditions.m \
 	gui/macosx/extensions/NSSound+VLCAdditions.h \

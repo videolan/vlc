@@ -28,6 +28,7 @@
 #import "library/VLCLibraryInformationPanel.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSMenu+VLCAdditions.h"
 
 @interface VLCLibraryMenuController ()
 {
@@ -63,7 +64,7 @@
     informationItem.target = self;
 
     _libraryMenu = [[NSMenu alloc] initWithTitle:@""];
-    _libraryMenu.itemArray = @[playItem, appendItem, revealItem, deleteItem, informationItem, [NSMenuItem separatorItem], addItem];
+    [_libraryMenu addMenuItemsFromArray:@[playItem, appendItem, revealItem, deleteItem, informationItem, [NSMenuItem separatorItem], addItem]];
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
@@ -74,7 +75,7 @@
         NSMenu *minimalMenu = [[NSMenu alloc] initWithTitle:@""];
         NSMenuItem *addItem = [[NSMenuItem alloc] initWithTitle:_NS("Add Media Folder...") action:@selector(addMedia:) keyEquivalent:@""];
         addItem.target = self;
-        minimalMenu.itemArray = @[addItem];
+        [minimalMenu addItem:addItem];
         [NSMenu popUpContextMenu:minimalMenu withEvent:theEvent forView:theView];
     }
 }

@@ -445,6 +445,8 @@ modules/gui/macosx/extensions/NSColor+VLCAdditions.h
 modules/gui/macosx/extensions/NSColor+VLCAdditions.m
 modules/gui/macosx/extensions/NSFont+VLCAdditions.h
 modules/gui/macosx/extensions/NSFont+VLCAdditions.m
+modules/gui/macosx/extensions/NSMenu+VLCAdditions.h
+modules/gui/macosx/extensions/NSMenu+VLCAdditions.m
 modules/gui/macosx/extensions/NSScreen+VLCAdditions.h
 modules/gui/macosx/extensions/NSScreen+VLCAdditions.m
 modules/gui/macosx/extensions/NSSound+VLCAdditions.h

@@ -25,6 +25,7 @@
 #import "VLCPlaylistMenuController.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSMenu+VLCAdditions.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistModel.h"
@@ -86,7 +87,7 @@
     [_sortMenuItem setSubmenu:_playlistSortingMenuController.playlistSortingMenu];
 
     _playlistMenu = [[NSMenu alloc] init];
-    _playlistMenu.itemArray = @[_playMenuItem, _removeMenuItem, _revealInFinderMenuItem, _informationMenuItem, [NSMenuItem separatorItem], _addFilesToPlaylistMenuItem, _clearPlaylistMenuItem, _sortMenuItem];
+    [_playlistMenu addMenuItemsFromArray:@[_playMenuItem, _removeMenuItem, _revealInFinderMenuItem, _informationMenuItem, [NSMenuItem separatorItem], _addFilesToPlaylistMenuItem, _clearPlaylistMenuItem, _sortMenuItem]];
 }
 
 - (void)play:(id)sender
