@@ -122,6 +122,12 @@ export SDKROOT
 vlcSetBaseEnvironment
 vlcroot="$(vlcGetRootDir)"
 
+# Checking prerequisites
+info "Checking for python3 ..."
+python3 --version || { echo "python3 not found. Please install from python.org, or set" \
+	"VLC_PATH environment variable to include python3." \
+	; exit 1; }
+
 
 builddir="$(pwd)"
 info "Building in \"$builddir\""
