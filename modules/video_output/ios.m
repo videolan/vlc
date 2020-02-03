@@ -621,8 +621,8 @@ static void GLESSwap(vlc_gl_t *gl)
     vlc_mutex_lock(&_mutex);
     assert(_gl_attached);
     _gl_attached = NO;
-    vlc_mutex_unlock(&_mutex);
     vlc_cond_signal(&_gl_attached_wait);
+    vlc_mutex_unlock(&_mutex);
 }
 
 - (void)presentRenderbuffer
