@@ -60,7 +60,12 @@ static int vlc_futex_wake(void *addr, int nr)
 
 static int vlc_futex_wait(void *addr, unsigned val, const struct timespec *to)
 {
-    return sys_futex(addr, FUTEX_WAIT_PRIVATE, val, to, NULL, 0);
+    int ret, type;
+
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &type);
+    ret = sys_futex(addr, FUTEX_WAIT_PRIVATE, val, to, NULL, 0);
+    pthread_setcanceltype(type, NULL);
+    return ret;
 }
 
 void vlc_addr_signal(void *addr)
