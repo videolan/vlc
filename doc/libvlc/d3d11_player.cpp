@@ -348,10 +348,10 @@ static void init_direct3d(struct render_context *ctx, HWND hWnd)
     hr = ctx->d3device->CreateInputLayout(ied, 2, VS->GetBufferPointer(), VS->GetBufferSize(), &ctx->pShadersInputLayout);
     SHADER_INPUT OurVertices[] =
     {
-        {BORDER_LEFT,  BORDER_BOTTOM, 0.0f,  0.0f, 1.0f},
-        {BORDER_RIGHT, BORDER_BOTTOM, 0.0f,  1.0f, 1.0f},
-        {BORDER_RIGHT, BORDER_TOP,    0.0f,  1.0f, 0.0f},
-        {BORDER_LEFT,  BORDER_TOP,    0.0f,  0.0f, 0.0f},
+        {{BORDER_LEFT,  BORDER_BOTTOM, 0.0f},  {0.0f, 1.0f}},
+        {{BORDER_RIGHT, BORDER_BOTTOM, 0.0f},  {1.0f, 1.0f}},
+        {{BORDER_RIGHT, BORDER_TOP,    0.0f},  {1.0f, 0.0f}},
+        {{BORDER_LEFT,  BORDER_TOP,    0.0f},  {0.0f, 0.0f}},
     };
 
     D3D11_BUFFER_DESC bd;
