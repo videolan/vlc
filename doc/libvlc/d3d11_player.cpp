@@ -33,9 +33,16 @@ struct render_context
     /* resources shared by VLC */
     ID3D11Device            *d3deviceVLC;
     ID3D11DeviceContext     *d3dctxVLC;
-    ID3D11Texture2D         *textureVLC; // shared between VLC and the app
-    HANDLE                  sharedHandled; // handle of the texture used by VLC and the app
-    ID3D11RenderTargetView  *textureRenderTarget;
+
+    struct {
+        ID3D11Texture2D         *textureVLC; // shared between VLC and the app
+        ID3D11RenderTargetView  *textureRenderTarget;
+        HANDLE                  sharedHandled; // handle of the texture used by VLC and the app
+
+        /* texture VLC renders into */
+        ID3D11Texture2D          *texture;
+        ID3D11ShaderResourceView *textureShaderInput;
+    } resized;
 
     /* Direct3D11 device/context */
     ID3D11Device        *d3device;
@@ -56,10 +63,6 @@ struct render_context
     ID3D11Buffer *pIndexBuffer;
 
     ID3D11SamplerState *samplerState;
-
-    /* texture VLC renders into */
-    ID3D11Texture2D          *texture;
-    ID3D11ShaderResourceView *textureShaderInput;
 
     CRITICAL_SECTION sizeLock; // the ReportSize callback cannot be called during/after the Cleanup_cb is called
     unsigned width, height;
@@ -270,9 +273,9 @@ static void release_direct3d(struct render_context *ctx)
     ctx->d3dctxVLC->Release();
 
     ctx->samplerState->Release();
-    ctx->textureRenderTarget->Release();
-    ctx->textureShaderInput->Release();
-    ctx->texture->Release();
+    ctx->resized.textureRenderTarget->Release();
+    ctx->resized.textureShaderInput->Release();
+    ctx->resized.texture->Release();
     ctx->pShadersInputLayout->Release();
     ctx->pVS->Release();
     ctx->pPS->Release();
@@ -292,25 +295,25 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cf
 
     DXGI_FORMAT renderFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-    if (ctx->texture)
+    if (ctx->resized.texture)
     {
-        ctx->texture->Release();
-        ctx->texture = NULL;
+        ctx->resized.texture->Release();
+        ctx->resized.texture = NULL;
     }
-    if (ctx->textureVLC)
+    if (ctx->resized.textureVLC)
     {
-        ctx->textureVLC->Release();
-        ctx->textureVLC = NULL;
+        ctx->resized.textureVLC->Release();
+        ctx->resized.textureVLC = NULL;
     }
-    if (ctx->textureShaderInput)
+    if (ctx->resized.textureShaderInput)
     {
-        ctx->textureShaderInput->Release();
-        ctx->textureShaderInput = NULL;
+        ctx->resized.textureShaderInput->Release();
+        ctx->resized.textureShaderInput = NULL;
     }
-    if (ctx->textureRenderTarget)
+    if (ctx->resized.textureRenderTarget)
     {
-        ctx->textureRenderTarget->Release();
-        ctx->textureRenderTarget = NULL;
+        ctx->resized.textureRenderTarget->Release();
+        ctx->resized.textureRenderTarget = NULL;
     }
 
     /* interim texture */
@@ -327,17 +330,17 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cf
     texDesc.Width  = cfg->width;
     texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
 
-    hr = ctx->d3device->CreateTexture2D( &texDesc, NULL, &ctx->texture );
+    hr = ctx->d3device->CreateTexture2D( &texDesc, NULL, &ctx->resized.texture );
     if (FAILED(hr)) return false;
 
     IDXGIResource1* sharedResource = NULL;
-    ctx->texture->QueryInterface(__uuidof(IDXGIResource1), (LPVOID*) &sharedResource);
-    hr = sharedResource->CreateSharedHandle(NULL, DXGI_SHARED_RESOURCE_READ|DXGI_SHARED_RESOURCE_WRITE, NULL, &ctx->sharedHandled);
+    ctx->resized.texture->QueryInterface(__uuidof(IDXGIResource1), (LPVOID*) &sharedResource);
+    hr = sharedResource->CreateSharedHandle(NULL, DXGI_SHARED_RESOURCE_READ|DXGI_SHARED_RESOURCE_WRITE, NULL, &ctx->resized.sharedHandled);
     sharedResource->Release();
 
     ID3D11Device1* d3d11VLC1;
     ctx->d3deviceVLC->QueryInterface(__uuidof(ID3D11Device1), (LPVOID*) &d3d11VLC1);
-    hr = d3d11VLC1->OpenSharedResource1(ctx->sharedHandled, __uuidof(ID3D11Texture2D), (void**)&ctx->textureVLC);
+    hr = d3d11VLC1->OpenSharedResource1(ctx->resized.sharedHandled, __uuidof(ID3D11Texture2D), (void**)&ctx->resized.textureVLC);
     d3d11VLC1->Release();
 
     D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc;
@@ -345,19 +348,19 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cf
     resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resviewDesc.Texture2D.MipLevels = 1;
     resviewDesc.Format = texDesc.Format;
-    hr = ctx->d3device->CreateShaderResourceView(ctx->texture, &resviewDesc, &ctx->textureShaderInput );
+    hr = ctx->d3device->CreateShaderResourceView(ctx->resized.texture, &resviewDesc, &ctx->resized.textureShaderInput );
     if (FAILED(hr)) return false;
 
-    ctx->d3dctx->PSSetShaderResources(0, 1, &ctx->textureShaderInput);
+    ctx->d3dctx->PSSetShaderResources(0, 1, &ctx->resized.textureShaderInput);
 
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {
         .Format = texDesc.Format,
         .ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D,
     };
-    hr = ctx->d3deviceVLC->CreateRenderTargetView(ctx->textureVLC, &renderTargetViewDesc, &ctx->textureRenderTarget);
+    hr = ctx->d3deviceVLC->CreateRenderTargetView(ctx->resized.textureVLC, &renderTargetViewDesc, &ctx->resized.textureRenderTarget);
     if (FAILED(hr)) return false;
 
-    ctx->d3dctxVLC->OMSetRenderTargets( 1, &ctx->textureRenderTarget, NULL );
+    ctx->d3dctxVLC->OMSetRenderTargets( 1, &ctx->resized.textureRenderTarget, NULL );
 
     out->surface_format = renderFormat;
     out->full_range     = true;
@@ -382,7 +385,7 @@ static bool StartRendering_cb( void *opaque, bool enter, const libvlc_video_dire
         // DEBUG: draw greenish background to show where libvlc doesn't draw in the texture
         // Normally you should Clear with a black background
         static const FLOAT greenRGBA[4] = {0.5f, 0.5f, 0.0f, 1.0f};
-        ctx->d3dctxVLC->ClearRenderTargetView( ctx->textureRenderTarget, greenRGBA);
+        ctx->d3dctxVLC->ClearRenderTargetView( ctx->resized.textureRenderTarget, greenRGBA);
     }
     else
     {
