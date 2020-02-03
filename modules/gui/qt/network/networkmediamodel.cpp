@@ -34,6 +34,7 @@ enum Role {
     NETWORK_PROTOCOL,
     NETWORK_TREE,
     NETWORK_SOURCE,
+    NETWORK_ARTWORK,
 };
 
 }
@@ -83,6 +84,8 @@ QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
             return QVariant::fromValue( item.tree );
         case NETWORK_SOURCE:
             return item.mediaSource->description;
+        case NETWORK_ARTWORK:
+            return item.artworkUrl;
         default:
             return {};
     }
@@ -99,6 +102,7 @@ QHash<int, QByteArray> NetworkMediaModel::roleNames() const
         { NETWORK_PROTOCOL, "protocol" },
         { NETWORK_TREE, "tree" },
         { NETWORK_SOURCE, "source" },
+        { NETWORK_ARTWORK, "artwork" },
     };
 }
 
@@ -391,6 +395,13 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
 
         item.canBeIndexed = canBeIndexed( item.mainMrl , item.type );
         item.mediaSource = mediaSource;
+
+        char* artwork = input_item_GetArtworkURL(it.get());
+        if (artwork)
+        {
+            item.artworkUrl = QUrl::fromEncoded(artwork);
+            free(artwork);
+        }
 
         if ( item.canBeIndexed == true )
         {

@@ -106,6 +106,7 @@ private:
         ItemType type;
         MediaSourcePtr mediaSource;
         InputItemPtr inputItem;
+        QUrl artworkUrl;
     };
 
     bool initializeMediaSources();

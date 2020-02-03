@@ -31,6 +31,7 @@ enum Role {
     NETWORK_PROTOCOL,
     NETWORK_SOURCE,
     NETWORK_TREE,
+    NETWORK_ARTWORK,
 };
 
 }
@@ -63,6 +64,8 @@ QVariant NetworkDeviceModel::data( const QModelIndex& index, int role ) const
             return item.mediaSource->description;
         case NETWORK_TREE:
             return QVariant::fromValue( NetworkTreeItem(item.mediaSource, item.inputItem.get()) );
+        case NETWORK_ARTWORK:
+            return item.artworkUrl;
         default:
             return {};
     }
@@ -77,6 +80,7 @@ QHash<int, QByteArray> NetworkDeviceModel::roleNames() const
         { NETWORK_PROTOCOL, "protocol" },
         { NETWORK_SOURCE, "source" },
         { NETWORK_TREE, "tree" },
+        { NETWORK_ARTWORK, "artwork" },
     };
 }
 
@@ -293,6 +297,13 @@ void NetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_it
             item.protocol = item.mainMrl.scheme();
             item.mediaSource = mediaSource;
             item.inputItem = InputItemPtr(p_item);
+
+            char* artwork = input_item_GetArtworkURL( p_item.get() );
+            if (artwork)
+            {
+                item.artworkUrl = QUrl::fromEncoded(artwork);
+                free(artwork);
+            }
 
             auto it = std::upper_bound(begin( m_items ), end( m_items ), item, [](const Item& a, const Item& b) {
                 int comp =  QString::compare(a.name , b.name, Qt::CaseInsensitive );

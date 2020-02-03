@@ -153,6 +153,7 @@ private:
         bool canBeIndexed;
         NetworkTreeItem tree;
         MediaSourcePtr mediaSource;
+        QUrl artworkUrl;
     };
 
 
