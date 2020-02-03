@@ -17,6 +17,11 @@
 #include <d3d11_1.h>
 #include <dxgi1_2.h>
 
+#ifdef DEBUG_D3D11_LEAKS
+# include <initguid.h>
+# include <dxgidebug.h>
+#endif
+
 #include <vlc/vlc.h>
 
 #define SCREEN_WIDTH  1500
@@ -296,6 +301,28 @@ static void release_textures(struct render_context *ctx)
     }
 }
 
+static void list_dxgi_leaks(void)
+{
+#ifdef DEBUG_D3D11_LEAKS
+    HMODULE dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
+    if (dxgidebug_dll)
+    {
+        typedef HRESULT (WINAPI * LPDXGIGETDEBUGINTERFACE)(REFIID, void ** );
+        LPDXGIGETDEBUGINTERFACE pf_DXGIGetDebugInterface;
+        pf_DXGIGetDebugInterface = reinterpret_cast<LPDXGIGETDEBUGINTERFACE>(
+            reinterpret_cast<void*>( GetProcAddress( dxgidebug_dll, "DXGIGetDebugInterface" ) ) );
+        if (pf_DXGIGetDebugInterface)
+        {
+            IDXGIDebug *pDXGIDebug;
+            if (SUCCEEDED(pf_DXGIGetDebugInterface(__uuidof(IDXGIDebug), (void**)&pDXGIDebug)))
+                pDXGIDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+            pDXGIDebug->Release();
+        }
+        FreeLibrary(dxgidebug_dll);
+    }
+#endif // DEBUG_D3D11_LEAKS
+}
+
 static void release_direct3d(struct render_context *ctx)
 {
     ctx->d3deviceVLC->Release();
@@ -315,6 +342,8 @@ static void release_direct3d(struct render_context *ctx)
     ctx->swapchainRenderTarget->Release();
     ctx->d3dctx->Release();
     ctx->d3device->Release();
+
+    list_dxgi_leaks();
 }
 
 static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
