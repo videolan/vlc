@@ -85,6 +85,8 @@ struct vlc_gl_sampler {
         unsigned int i_visible_width;
         unsigned int i_visible_height;
     } last_source;
+
+    struct vlc_gl_interop *interop;
 };
 
 #endif
