@@ -404,27 +404,17 @@ error:
 void
 vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
 {
-    struct vlc_gl_interop *interop = renderer->interop;
-    struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
 
     vt->DeleteBuffers(1, &renderer->vertex_buffer_object);
     vt->DeleteBuffers(1, &renderer->index_buffer_object);
     vt->DeleteBuffers(1, &renderer->texture_buffer_object);
 
-    if (!interop->handle_texs_gen)
-        vt->DeleteTextures(interop->tex_count, sampler->textures);
+    vlc_gl_sampler_Delete(renderer->sampler);
 
     if (renderer->program_id != 0)
         vt->DeleteProgram(renderer->program_id);
 
-#ifdef HAVE_LIBPLACEBO
-    FREENULL(sampler->uloc.pl_vars);
-    if (sampler->pl_ctx)
-        pl_context_destroy(&sampler->pl_ctx);
-#endif
-
-    free(renderer->sampler);
     free(renderer);
 }
 
@@ -437,16 +427,9 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     const opengl_vtable_t *vt = &api->vt;
     const video_format_t *fmt = &interop->fmt;
 
-    struct vlc_gl_sampler *sampler = malloc(sizeof(*sampler));
+    struct vlc_gl_sampler *sampler = vlc_gl_sampler_New(interop);
     if (!sampler)
         return NULL;
-
-    sampler->uloc.pl_vars = NULL;
-    sampler->pl_ctx = NULL;
-    sampler->pl_sh = NULL;
-    sampler->pl_sh_res = NULL;
-
-    sampler->interop = interop;
 
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
@@ -470,29 +453,6 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     renderer->glsl_precision_header = "";
 #endif
 
-#ifdef HAVE_LIBPLACEBO
-    // Create the main libplacebo context
-    sampler->pl_ctx = vlc_placebo_Create(VLC_OBJECT(gl));
-    if (sampler->pl_ctx) {
-#   if PL_API_VER >= 20
-        sampler->pl_sh = pl_shader_alloc(sampler->pl_ctx, &(struct pl_shader_params) {
-            .glsl = {
-#       ifdef USE_OPENGL_ES2
-                .version = 100,
-                .gles = true,
-#       else
-                .version = 120,
-#       endif
-            },
-        });
-#   elif PL_API_VER >= 6
-        sampler->pl_sh = pl_shader_alloc(sampler->pl_ctx, NULL, 0);
-#   else
-        sampler->pl_sh = pl_shader_alloc(sampler->pl_ctx, NULL, 0, 0);
-#   endif
-    }
-#endif
-
     int ret = opengl_link_program(renderer);
     if (ret != VLC_SUCCESS)
     {
@@ -507,33 +467,6 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     getViewpointMatrixes(renderer, fmt->projection_mode);
 
     renderer->fmt = *fmt;
-
-    /* Texture size */
-    for (unsigned j = 0; j < interop->tex_count; j++) {
-        const GLsizei w = renderer->fmt.i_visible_width  * interop->texs[j].w.num
-                        / interop->texs[j].w.den;
-        const GLsizei h = renderer->fmt.i_visible_height * interop->texs[j].h.num
-                        / interop->texs[j].h.den;
-        if (api->supports_npot) {
-            sampler->tex_width[j]  = w;
-            sampler->tex_height[j] = h;
-        } else {
-            sampler->tex_width[j]  = vlc_align_pot(w);
-            sampler->tex_height[j] = vlc_align_pot(h);
-        }
-    }
-
-    if (!interop->handle_texs_gen)
-    {
-        ret = vlc_gl_interop_GenerateTextures(interop, sampler->tex_width,
-                                              sampler->tex_height,
-                                              sampler->textures);
-        if (ret != VLC_SUCCESS)
-        {
-            vlc_gl_renderer_Delete(renderer);
-            return NULL;
-        }
-    }
 
     /* */
     vt->Disable(GL_BLEND);

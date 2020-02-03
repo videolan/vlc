@@ -89,4 +89,20 @@ struct vlc_gl_sampler {
     struct vlc_gl_interop *interop;
 };
 
+/**
+ * Create a new sampler
+ *
+ * \param interop the interop
+ */
+struct vlc_gl_sampler *
+vlc_gl_sampler_New(struct vlc_gl_interop *interop);
+
+/**
+ * Delete a sampler
+ *
+ * \param sampler the sampler
+ */
+void
+vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler);
+
 #endif
