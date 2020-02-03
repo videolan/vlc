@@ -132,8 +132,6 @@ int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
     return VLC_SUCCESS;
 }
 
-#undef D3D11_GetDriverVersion
-
 #if !VLC_WINSTORE_APP
 static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc)
 {
@@ -169,30 +167,14 @@ static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc
     return NULL;
 }
 
-void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
+static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
     memset(&d3d_dev->WDDM, 0, sizeof(d3d_dev->WDDM));
-
-    IDXGIAdapter *pAdapter = D3D11DeviceAdapter(d3d_dev->d3ddevice);
-    if (unlikely(!pAdapter))
-    {
-        msg_Warn(obj, "can't get adapter from device %p", (void*)d3d_dev->d3ddevice);
-        return;
-    }
-
-    DXGI_ADAPTER_DESC adapterDesc;
-    HRESULT hr = IDXGIAdapter_GetDesc(pAdapter, &adapterDesc);
-    IDXGIAdapter_Release(pAdapter);
-    if (FAILED(hr))
-    {
-        msg_Warn(obj, "can't get adapter description");
-        return;
-    }
 
     LONG err = ERROR_ACCESS_DENIED;
     WCHAR szData[256];
     DWORD len = sizeof(szData);
-    HKEY hKey = GetAdapterRegistry(obj, &adapterDesc);
+    HKEY hKey = GetAdapterRegistry(obj, &d3d_dev->adapterDesc);
     if (hKey == NULL)
     {
         msg_Warn(obj, "can't find adapter in registry");
@@ -219,15 +201,15 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
     d3d_dev->WDDM.d3d_features = d3d_features;
     d3d_dev->WDDM.revision     = revision;
     d3d_dev->WDDM.build        = build;
-    msg_Dbg(obj, "%s WDDM driver %d.%d.%d.%d", DxgiVendorStr(adapterDesc.VendorId), wddm, d3d_features, revision, build);
-    if (adapterDesc.VendorId == GPU_MANUFACTURER_INTEL && revision >= 100)
+    msg_Dbg(obj, "%s WDDM driver %d.%d.%d.%d", DxgiVendorStr(d3d_dev->adapterDesc.VendorId), wddm, d3d_features, revision, build);
+    if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_INTEL && revision >= 100)
     {
         /* new Intel driver format */
         d3d_dev->WDDM.build += (revision - 100) * 1000;
     }
 }
 #else /* VLC_WINSTORE_APP */
-void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
+static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
     VLC_UNUSED(obj);
     VLC_UNUSED(d3d_dev);
@@ -275,6 +257,19 @@ HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *d3d11
             return E_FAIL;
         }
     }
+
+    IDXGIAdapter *pAdapter = D3D11DeviceAdapter(out->d3ddevice);
+    if (unlikely(!pAdapter))
+    {
+        msg_Warn(obj, "can't get adapter from device %p", (void*)out->d3ddevice);
+        ID3D11Device_Release(out->d3ddevice);
+        out->d3ddevice = NULL;
+        return E_FAIL;
+    }
+    hr = IDXGIAdapter_GetDesc(pAdapter, &out->adapterDesc);
+    IDXGIAdapter_Release(pAdapter);
+    if (FAILED(hr))
+        msg_Warn(obj, "can't get adapter description");
 
     ID3D11DeviceContext_AddRef( d3d11ctx );
     out->d3dcontext = d3d11ctx;
@@ -349,6 +344,22 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
         if (SUCCEEDED(hr)) {
             msg_Dbg(obj, "Created the D3D11 device type %d level %x.",
                     driverAttempts[driver], out->feature_level);
+            if (adapter != NULL)
+                hr = IDXGIAdapter_GetDesc(adapter, &out->adapterDesc);
+            else
+            {
+                IDXGIAdapter *adap = D3D11DeviceAdapter(out->d3ddevice);
+                if (adap == NULL)
+                    hr = E_FAIL;
+                else
+                {
+                    hr = IDXGIAdapter_GetDesc(adap, &out->adapterDesc);
+                    IDXGIAdapter_Release(adap);
+                }
+            }
+            if (hr)
+                msg_Warn(obj, "can't get adapter description");
+
             D3D11_GetDriverVersion( obj, out );
             /* we can work with legacy levels but only if forced */
             if ( obj->force || out->feature_level >= D3D_FEATURE_LEVEL_11_0 )
