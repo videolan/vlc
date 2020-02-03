@@ -31,6 +31,7 @@
 #include <stdarg.h>
 
 #include <vlc_common.h>
+#include <vlc_charset.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 #include <vlc_mouse.h>
@@ -72,7 +73,7 @@ typedef struct vout_window_sys_t
     LONG            i_window_style;
 
     /* Title */
-    char *psz_title;
+    wchar_t *pwz_title;
 } vout_window_sys_t;
 
 
@@ -138,14 +139,16 @@ static void SetTitle(vout_window_t *wnd, const char *title)
 {
     vout_window_sys_t *sys = wnd->sys;
     char *psz_title = var_InheritString( wnd, "video-title" );
-    if( !psz_title )
-        psz_title = strdup( title );
-    if( !psz_title )
+    wchar_t *pwz_title = ToWide(psz_title ? psz_title : title);
+
+    free(psz_title);
+
+    if (unlikely(pwz_title == NULL))
         return;
 
     vlc_mutex_lock( &sys->lock );
-    free( sys->psz_title );
-    sys->psz_title = psz_title;
+    free( sys->pwz_title );
+    sys->pwz_title = pwz_title;
     vlc_mutex_unlock( &sys->lock );
 
     PostMessage( sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
@@ -450,18 +453,11 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
     case WM_VLC_CHANGE_TEXT:
         {
             vout_window_sys_t *sys = wnd->sys;
+            wchar_t *pwz_title;
+
             vlc_mutex_lock( &sys->lock );
-            wchar_t *pwz_title = NULL;
-            if( sys->psz_title )
-            {
-                const size_t i_length = strlen(sys->psz_title);
-                pwz_title = vlc_alloc( i_length + 1, 2 );
-                if( pwz_title )
-                {
-                    mbstowcs( pwz_title, sys->psz_title, 2 * i_length );
-                    pwz_title[i_length] = 0;
-                }
-            }
+            pwz_title = sys->pwz_title;
+            sys->pwz_title = NULL;
             vlc_mutex_unlock( &sys->lock );
 
             if( pwz_title )
@@ -480,7 +476,7 @@ static void Close(vout_window_t *wnd)
 {
     vout_window_sys_t *sys = wnd->sys;
 
-    free( sys->psz_title );
+    free( sys->pwz_title );
     if (sys->hwnd)
         PostMessage( sys->hwnd, WM_CLOSE, 0, 0 );
     vlc_join(sys->thread, NULL);
