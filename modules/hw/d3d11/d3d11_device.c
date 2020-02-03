@@ -57,7 +57,7 @@ static void D3D11CloseDecoderDevice(vlc_decoder_device *device)
 {
     d3d11_decoder_device *sys = device->sys;
 
-    ID3D11DeviceContext_Release(sys->dec_device.device);
+    D3D11_ReleaseDevice(&sys->d3d_dev);
 
     D3D11_Destroy(&sys->hd3d);
 
@@ -144,7 +144,6 @@ static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_
     }
 
     sys->dec_device.device = sys->d3d_dev.d3dcontext;
-    ID3D11DeviceContext_AddRef(sys->dec_device.device);
 
     device->ops = &d3d11_dev_ops;
     device->opaque = &sys->dec_device;
