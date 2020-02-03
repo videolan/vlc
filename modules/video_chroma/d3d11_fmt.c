@@ -361,22 +361,15 @@ IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev)
     return p_adapter;
 }
 
-bool isXboxHardware(ID3D11Device *d3ddev)
+bool isXboxHardware(const d3d11_device_t *d3ddev)
 {
-    IDXGIAdapter *p_adapter = D3D11DeviceAdapter(d3ddev);
-    if (!p_adapter)
-        return NULL;
-
     bool result = false;
-    DXGI_ADAPTER_DESC adapterDesc;
-    if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc))) {
-        if (adapterDesc.VendorId == 0 &&
-            adapterDesc.DeviceId == 0 &&
-            !wcscmp(L"ROOT\\SraKmd\\0000", adapterDesc.Description))
-            result = true;
-    }
 
-    IDXGIAdapter_Release(p_adapter);
+    if (d3ddev->adapterDesc.VendorId == 0 &&
+        d3ddev->adapterDesc.DeviceId == 0 &&
+        !wcscmp(L"ROOT\\SraKmd\\0000", d3ddev->adapterDesc.Description))
+        result = true;
+
     return result;
 }
 
@@ -407,19 +400,9 @@ bool CanUseVoutPool(d3d11_device_t *d3d_dev, UINT slices)
 #endif
 }
 
-int D3D11CheckDriverVersion(d3d11_device_t *d3d_dev, UINT vendorId, const struct wddm_version *min_ver)
+int D3D11CheckDriverVersion(const d3d11_device_t *d3d_dev, UINT vendorId, const struct wddm_version *min_ver)
 {
-    IDXGIAdapter *pAdapter = D3D11DeviceAdapter(d3d_dev->d3ddevice);
-    if (!pAdapter)
-        return VLC_EGENERIC;
-
-    DXGI_ADAPTER_DESC adapterDesc;
-    HRESULT hr = IDXGIAdapter_GetDesc(pAdapter, &adapterDesc);
-    IDXGIAdapter_Release(pAdapter);
-    if (FAILED(hr))
-        return VLC_EGENERIC;
-
-    if (vendorId && adapterDesc.VendorId != vendorId)
+    if (vendorId && d3d_dev->adapterDesc.VendorId != vendorId)
         return VLC_SUCCESS;
 
     if (min_ver->wddm)

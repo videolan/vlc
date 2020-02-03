@@ -1515,21 +1515,12 @@ static bool CanUseTextureArray(vout_display_t *vd)
 #endif
 }
 
-static bool BogusZeroCopy(vout_display_t *vd)
+static bool BogusZeroCopy(const vout_display_t *vd)
 {
-    IDXGIAdapter *p_adapter = D3D11DeviceAdapter(vd->sys->d3d_dev.d3ddevice);
-    if (!p_adapter)
+    if (vd->sys->d3d_dev.adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
         return false;
 
-    DXGI_ADAPTER_DESC adapterDesc;
-    if (FAILED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc)))
-        return false;
-    IDXGIAdapter_Release(p_adapter);
-
-    if (adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
-        return false;
-
-    switch (adapterDesc.DeviceId)
+    switch (vd->sys->d3d_dev.adapterDesc.DeviceId)
     {
     case 0x687F: // RX Vega 56/64
     case 0x6863: // RX Vega Frontier Edition
