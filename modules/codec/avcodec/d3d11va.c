@@ -308,7 +308,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
 
     video_format_t final_fmt = *fmt_out;
     static const directx_sys_t dx_sys = { DxGetInputList, DxSetupOutput };
-    sys->selected_decoder = directx_va_Setup(va, &dx_sys, ctx, desc, fmt_in, isXboxHardware(sys->d3d_dev.d3ddevice),
+    sys->selected_decoder = directx_va_Setup(va, &dx_sys, ctx, desc, fmt_in, isXboxHardware(&sys->d3d_dev),
                                              &final_fmt, &sys->hw.surface_count);
     if (sys->selected_decoder == NULL)
     {
@@ -321,16 +321,10 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
     if (err != VLC_SUCCESS)
         goto error;
 
-    IDXGIAdapter *p_adapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
-    if (p_adapter) {
-        DXGI_ADAPTER_DESC adapterDesc;
-        if (SUCCEEDED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc))) {
-            msg_Info(va, "Using D3D11VA (%ls, vendor %x(%s), device %x, revision %x)",
-                        adapterDesc.Description,
-                        adapterDesc.VendorId, DxgiVendorStr(adapterDesc.VendorId), adapterDesc.DeviceId, adapterDesc.Revision);
-        }
-        IDXGIAdapter_Release(p_adapter);
-    }
+    msg_Info(va, "Using D3D11VA (%ls, vendor %x(%s), device %x, revision %x)",
+                sys->d3d_dev.adapterDesc.Description,
+                sys->d3d_dev.adapterDesc.VendorId, DxgiVendorStr(sys->d3d_dev.adapterDesc.VendorId),
+                sys->d3d_dev.adapterDesc.DeviceId, sys->d3d_dev.adapterDesc.Revision);
 
     sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_D3D11VA,
                                           sizeof(d3d11_video_context_t), &d3d11_vctx_ops );
@@ -445,17 +439,7 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     }
 #endif
 
-    IDXGIAdapter *pAdapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
-    if (!pAdapter)
-        return VLC_EGENERIC;
-
-    DXGI_ADAPTER_DESC adapterDesc;
-    hr = IDXGIAdapter_GetDesc(pAdapter, &adapterDesc);
-    IDXGIAdapter_Release(pAdapter);
-    if (FAILED(hr))
-        return VLC_EGENERIC;
-
-    if (!directx_va_canUseDecoder(va, adapterDesc.VendorId, adapterDesc.DeviceId,
+    if (!directx_va_canUseDecoder(va, sys->d3d_dev.adapterDesc.VendorId, sys->d3d_dev.adapterDesc.DeviceId,
                                   mode->guid, sys->d3d_dev.WDDM.build))
     {
         msg_Warn(va, "GPU blacklisted for %s codec", mode->name);
@@ -551,21 +535,11 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     return VLC_EGENERIC;
 }
 
-static bool CanUseDecoderPadding(vlc_va_sys_t *sys)
+static bool CanUseDecoderPadding(const vlc_va_sys_t *sys)
 {
-    IDXGIAdapter *pAdapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
-    if (!pAdapter)
-        return false;
-
-    DXGI_ADAPTER_DESC adapterDesc;
-    HRESULT hr = IDXGIAdapter_GetDesc(pAdapter, &adapterDesc);
-    IDXGIAdapter_Release(pAdapter);
-    if (FAILED(hr))
-        return false;
-
     /* Qualcomm hardware has issues with textures and pixels that should not be
     * part of the decoded area */
-    return adapterDesc.VendorId != GPU_MANUFACTURER_QUALCOMM;
+    return sys->d3d_dev.adapterDesc.VendorId != GPU_MANUFACTURER_QUALCOMM;
 }
 
 /**
@@ -589,7 +563,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
      * crashes totally the device */
     if (codec_id == AV_CODEC_ID_H264 &&
         (fmt->i_width > 2304 || fmt->i_height > 2304) &&
-        isXboxHardware(sys->d3d_dev.d3ddevice))
+        isXboxHardware(&sys->d3d_dev))
     {
         msg_Warn(va, "%dx%d resolution not supported by your hardware", fmt->i_width, fmt->i_height);
         return VLC_EGENERIC;
