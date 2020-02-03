@@ -712,6 +712,8 @@ int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d, bool with_shaders)
         }
     }
 # if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    hd3d->dxgidebug_dll = NULL;
+    hd3d->pf_DXGIGetDebugInterface = NULL;
     if (IsDebuggerPresent())
     {
         hd3d->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
