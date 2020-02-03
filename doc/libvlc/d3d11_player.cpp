@@ -271,6 +271,7 @@ static void release_direct3d(struct render_context *ctx)
 {
     ctx->d3deviceVLC->Release();
     ctx->d3dctxVLC->Release();
+    ctx->d3deviceVLC->Release();
 
     ctx->samplerState->Release();
     ctx->resized.textureRenderTarget->Release();
