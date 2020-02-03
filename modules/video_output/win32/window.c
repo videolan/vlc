@@ -28,6 +28,7 @@
 # include <config.h>
 #endif
 
+#include <stdatomic.h>
 #include <stdarg.h>
 
 #include <vlc_common.h>
@@ -50,7 +51,6 @@
 typedef struct vout_window_sys_t
 {
     vlc_thread_t thread;
-    vlc_mutex_t  lock;
     vlc_sem_t    ready;
 
     HWND hwnd;
@@ -73,7 +73,7 @@ typedef struct vout_window_sys_t
     LONG            i_window_style;
 
     /* Title */
-    wchar_t *pwz_title;
+    wchar_t *_Atomic pwz_title;
 } vout_window_sys_t;
 
 
@@ -146,11 +146,7 @@ static void SetTitle(vout_window_t *wnd, const char *title)
     if (unlikely(pwz_title == NULL))
         return;
 
-    vlc_mutex_lock( &sys->lock );
-    free( sys->pwz_title );
-    sys->pwz_title = pwz_title;
-    vlc_mutex_unlock( &sys->lock );
-
+    free(atomic_exchange(&sys->pwz_title, pwz_title));
     PostMessage( sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
 }
 
@@ -453,12 +449,7 @@ static long FAR PASCAL WinVoutEventProc( HWND hwnd, UINT message,
     case WM_VLC_CHANGE_TEXT:
         {
             vout_window_sys_t *sys = wnd->sys;
-            wchar_t *pwz_title;
-
-            vlc_mutex_lock( &sys->lock );
-            pwz_title = sys->pwz_title;
-            sys->pwz_title = NULL;
-            vlc_mutex_unlock( &sys->lock );
+            wchar_t *pwz_title = atomic_exchange(&sys->pwz_title, NULL);
 
             if( pwz_title )
             {
@@ -476,12 +467,11 @@ static void Close(vout_window_t *wnd)
 {
     vout_window_sys_t *sys = wnd->sys;
 
-    free( sys->pwz_title );
     if (sys->hwnd)
         PostMessage( sys->hwnd, WM_CLOSE, 0, 0 );
     vlc_join(sys->thread, NULL);
     vlc_sem_destroy( &sys->ready );
-    vlc_mutex_destroy( &sys->lock );
+    free(atomic_load(&sys->pwz_title));
 
     HINSTANCE hInstance = GetModuleHandle(NULL);
     UnregisterClass( sys->class_main, hInstance );
@@ -725,7 +715,6 @@ static int Open(vout_window_t *wnd)
         msg_Err( wnd, "RegisterClass FAILED (err=%lu)", GetLastError() );
         return VLC_EGENERIC;
     }
-    vlc_mutex_init( &sys->lock );
     vlc_sem_init( &sys->ready, 0 );
 
     wnd->sys = sys;
