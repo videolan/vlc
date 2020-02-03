@@ -315,6 +315,11 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cf
         ctx->resized.textureRenderTarget->Release();
         ctx->resized.textureRenderTarget = NULL;
     }
+    if (ctx->resized.sharedHandled)
+    {
+        CloseHandle(ctx->resized.sharedHandled);
+        ctx->resized.sharedHandled = NULL;
+    }
 
     /* interim texture */
     D3D11_TEXTURE2D_DESC texDesc = { };
