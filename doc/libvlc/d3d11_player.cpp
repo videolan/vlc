@@ -13,6 +13,7 @@
 #include <windows.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
+#include <assert.h>
 
 #include <d3d11_1.h>
 #include <dxgi1_2.h>
@@ -30,6 +31,8 @@
 #define BORDER_RIGHT   ( 0.85f)
 #define BORDER_TOP     ( 0.95f)
 #define BORDER_BOTTOM  (-0.90f)
+
+#define check_leak(x)  assert(x)
 
 struct render_context
 {
@@ -274,6 +277,7 @@ static void init_direct3d(struct render_context *ctx)
 
 static void release_textures(struct render_context *ctx)
 {
+    ULONG ref;
     if (ctx->resized.sharedHandled)
     {
         CloseHandle(ctx->resized.sharedHandled);
@@ -281,22 +285,26 @@ static void release_textures(struct render_context *ctx)
     }
     if (ctx->resized.textureVLC)
     {
-        ctx->resized.textureVLC->Release();
+        ref = ctx->resized.textureVLC->Release();
+        check_leak(ref == 0);
         ctx->resized.textureVLC = NULL;
     }
     if (ctx->resized.textureShaderInput)
     {
-        ctx->resized.textureShaderInput->Release();
+        ref = ctx->resized.textureShaderInput->Release();
+        check_leak(ref == 0);
         ctx->resized.textureShaderInput = NULL;
     }
     if (ctx->resized.textureRenderTarget)
     {
-        ctx->resized.textureRenderTarget->Release();
+        ref = ctx->resized.textureRenderTarget->Release();
+        check_leak(ref == 0);
         ctx->resized.textureRenderTarget = NULL;
     }
     if (ctx->resized.texture)
     {
-        ctx->resized.texture->Release();
+        ref = ctx->resized.texture->Release();
+        check_leak(ref == 0);
         ctx->resized.texture = NULL;
     }
 }
@@ -325,23 +333,35 @@ static void list_dxgi_leaks(void)
 
 static void release_direct3d(struct render_context *ctx)
 {
-    ctx->d3deviceVLC->Release();
+    ULONG ref;
 
     release_textures(ctx);
 
-    ctx->d3dctxVLC->Release();
-    ctx->d3deviceVLC->Release();
+    ref = ctx->d3dctxVLC->Release();
+    check_leak(ref == 0);
+    ref = ctx->d3deviceVLC->Release();
+    check_leak(ref == 0);
 
-    ctx->samplerState->Release();
-    ctx->pShadersInputLayout->Release();
-    ctx->pVS->Release();
-    ctx->pPS->Release();
-    ctx->pIndexBuffer->Release();
-    ctx->pVertexBuffer->Release();
-    ctx->swapchain->Release();
-    ctx->swapchainRenderTarget->Release();
-    ctx->d3dctx->Release();
-    ctx->d3device->Release();
+    ref = ctx->samplerState->Release();
+    check_leak(ref == 0);
+    ref = ctx->pShadersInputLayout->Release();
+    check_leak(ref == 0);
+    ref = ctx->pVS->Release();
+    check_leak(ref == 0);
+    ref = ctx->pPS->Release();
+    check_leak(ref == 0);
+    ref = ctx->pIndexBuffer->Release();
+    check_leak(ref == 0);
+    ref = ctx->pVertexBuffer->Release();
+    check_leak(ref == 0);
+    ref = ctx->swapchain->Release();
+    check_leak(ref == 0);
+    ref = ctx->swapchainRenderTarget->Release();
+    check_leak(ref == 0);
+    ref = ctx->d3dctx->Release();
+    check_leak(ref == 0);
+    ref = ctx->d3device->Release();
+    check_leak(ref == 0);
 
     list_dxgi_leaks();
 }
