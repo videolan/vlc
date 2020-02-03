@@ -218,13 +218,31 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
             return VLC_EGENERIC;
     }
 
+    sampler->uloc.TransformMatrix =
+        vt->GetUniformLocation(program, "TransformMatrix");
+    if (sampler->uloc.TransformMatrix == -1)
+        return VLC_EGENERIC;
+
+    sampler->uloc.OrientationMatrix =
+        vt->GetUniformLocation(program, "OrientationMatrix");
+    if (sampler->uloc.OrientationMatrix == -1)
+        return VLC_EGENERIC;
+
+    assert(interop->tex_count < 10); /* to guarantee variable names length */
     for (unsigned int i = 0; i < interop->tex_count; ++i)
     {
-        char name[sizeof("TextureX")];
+        char name[sizeof("TexCoordsMapX")];
+
         snprintf(name, sizeof(name), "Texture%1u", i);
         sampler->uloc.Texture[i] = vt->GetUniformLocation(program, name);
         if (sampler->uloc.Texture[i] == -1)
             return VLC_EGENERIC;
+
+        snprintf(name, sizeof(name), "TexCoordsMap%1u", i);
+        sampler->uloc.TexCoordsMap[i] = vt->GetUniformLocation(program, name);
+        if (sampler->uloc.TexCoordsMap[i] == -1)
+            return VLC_EGENERIC;
+
         if (interop->tex_target == GL_TEXTURE_RECTANGLE)
         {
             snprintf(name, sizeof(name), "TexSize%1u", i);
@@ -314,7 +332,25 @@ sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
     const opengl_vtable_t *vt = sampler->vt;
 
     sampler->uloc.Texture[0] = vt->GetUniformLocation(program, "Texture0");
-    return sampler->uloc.Texture[0] != -1 ? VLC_SUCCESS : VLC_EGENERIC;
+    if (sampler->uloc.Texture[0] == -1)
+        return VLC_EGENERIC;
+
+    sampler->uloc.TransformMatrix =
+        vt->GetUniformLocation(program, "TransformMatrix");
+    if (sampler->uloc.TransformMatrix == -1)
+        return VLC_EGENERIC;
+
+    sampler->uloc.OrientationMatrix =
+        vt->GetUniformLocation(program, "OrientationMatrix");
+    if (sampler->uloc.OrientationMatrix == -1)
+        return VLC_EGENERIC;
+
+    sampler->uloc.TexCoordsMap[0] =
+        vt->GetUniformLocation(program, "TexCoordsMap0");
+    if (sampler->uloc.TexCoordsMap[0] == -1)
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
 }
 
 static void

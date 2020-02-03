@@ -357,24 +357,10 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
 
     GET_ALOC(PicCoordsIn, "PicCoordsIn");
     GET_ALOC(VertexPosition, "VertexPosition");
-
-#define GET_SAMPLER_ULOC(x, str) GET_LOC(Uniform, sampler->uloc.x, str)
-    GET_SAMPLER_ULOC(TransformMatrix, "TransformMatrix");
-    GET_SAMPLER_ULOC(OrientationMatrix, "OrientationMatrix");
-    GET_SAMPLER_ULOC(TexCoordsMap[0], "TexCoordsMap0");
-    /* MultiTexCoord 1 and 2 can be optimized out if not used */
-    if (interop->tex_count > 1)
-        GET_SAMPLER_ULOC(TexCoordsMap[1], "TexCoordsMap1");
-    else
-        sampler->uloc.TexCoordsMap[1] = -1;
-    if (interop->tex_count > 2)
-        GET_SAMPLER_ULOC(TexCoordsMap[2], "TexCoordsMap2");
-    else
-        sampler->uloc.TexCoordsMap[2] = -1;
 #undef GET_LOC
 #undef GET_ULOC
 #undef GET_ALOC
-#undef GET_SAMPLER_ULOC
+
     int ret = sampler->pf_fetch_locations(sampler, program_id);
     assert(ret == VLC_SUCCESS);
     if (ret != VLC_SUCCESS)
