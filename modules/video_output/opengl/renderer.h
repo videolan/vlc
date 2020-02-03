@@ -77,7 +77,6 @@ struct vlc_gl_renderer
         GLint VertexPosition;
     } aloc;
 
-    struct vlc_gl_interop *interop;
     struct vlc_gl_sampler *sampler;
 
     video_format_t fmt;
