@@ -182,26 +182,10 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
     memset(&d3d_dev->WDDM, 0, sizeof(d3d_dev->WDDM));
 
-    IDXGIAdapter *pAdapter = D3D11DeviceAdapter(d3d_dev->d3ddevice);
-    if (unlikely(!pAdapter))
-    {
-        msg_Warn(obj, "can't get adapter from device %p", (void*)d3d_dev->d3ddevice);
-        return;
-    }
-
-    DXGI_ADAPTER_DESC adapterDesc;
-    HRESULT hr = IDXGIAdapter_GetDesc(pAdapter, &adapterDesc);
-    IDXGIAdapter_Release(pAdapter);
-    if (FAILED(hr))
-    {
-        msg_Warn(obj, "can't get adapter description");
-        return;
-    }
-
     LONG err = ERROR_ACCESS_DENIED;
     CHAR szData[256];
     DWORD len = 256;
-    HKEY hKey = GetAdapterRegistry(obj, &adapterDesc);
+    HKEY hKey = GetAdapterRegistry(obj, &d3d_dev->adapterDesc);
     if (hKey == NULL)
     {
         msg_Warn(obj, "can't find adapter in registry");
@@ -228,8 +212,8 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
     d3d_dev->WDDM.d3d_features = d3d_features;
     d3d_dev->WDDM.revision     = revision;
     d3d_dev->WDDM.build        = build;
-    msg_Dbg(obj, "%s WDDM driver %d.%d.%d.%d", DxgiVendorStr(adapterDesc.VendorId), wddm, d3d_features, revision, build);
-    if (adapterDesc.VendorId == GPU_MANUFACTURER_INTEL && revision >= 100)
+    msg_Dbg(obj, "%s WDDM driver %d.%d.%d.%d", DxgiVendorStr(d3d_dev->adapterDesc.VendorId), wddm, d3d_features, revision, build);
+    if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_INTEL && revision >= 100)
     {
         /* new Intel driver format */
         d3d_dev->WDDM.build += (revision - 100) * 1000;
@@ -320,6 +304,19 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
         if (SUCCEEDED(hr)) {
             msg_Dbg(obj, "Created the D3D11 device type %d level %x.",
                     driverAttempts[driver], out->feature_level);
+            {
+                IDXGIAdapter *adap = D3D11DeviceAdapter(out->d3ddevice);
+                if (adap == NULL)
+                    hr = E_FAIL;
+                else
+                {
+                    hr = IDXGIAdapter_GetDesc(adap, &out->adapterDesc);
+                    IDXGIAdapter_Release(adap);
+                }
+            }
+            if (hr)
+                msg_Warn(obj, "can't get adapter description");
+
             D3D11_GetDriverVersion( obj, out );
             /* we can work with legacy levels but only if forced */
             if ( obj->obj.force || out->feature_level >= D3D_FEATURE_LEVEL_11_0 )

@@ -44,6 +44,7 @@ typedef struct
     HANDLE                   context_mutex;
     struct wddm_version      WDDM;
     D3D_FEATURE_LEVEL        feature_level;
+    DXGI_ADAPTER_DESC        adapterDesc;
 } d3d11_device_t;
 
 typedef struct
