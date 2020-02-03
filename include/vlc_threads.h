@@ -688,19 +688,20 @@ VLC_API void *vlc_threadvar_get(vlc_threadvar_t);
  *
  * Puts the calling thread to sleep if a specific value is stored at a
  * specified address. The thread will sleep until it is woken up by a call to
- * vlc_addr_signal() or vlc_addr_broadcast() in another thread, or spuriously.
+ * vlc_atomic_notify_one() or vlc_atomic_notify_all() in another thread, or
+ * spuriously.
  *
  * If the value does not match, do nothing and return immediately.
  *
  * \param addr address to check for
  * \param val value to match at the address
  */
-void vlc_addr_wait(void *addr, unsigned val);
+void vlc_atomic_wait(void *addr, unsigned val);
 
 /**
  * Waits on an address with a time-out.
  *
- * This function operates as vlc_addr_wait() but provides an additional
+ * This function operates as vlc_atomic_wait() but provides an additional
  * time-out. If the time-out elapses, the thread resumes and the function
  * returns.
  *
@@ -711,30 +712,31 @@ void vlc_addr_wait(void *addr, unsigned val);
  * \return true if the function was woken up before the time-out,
  * false if the time-out elapsed.
  */
-bool vlc_addr_timedwait(void *addr, unsigned val, vlc_tick_t delay);
+bool vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t delay);
 
 /**
  * Wakes up one thread on an address.
  *
  * Wakes up (at least) one of the thread sleeping on the specified address.
  * The address must be equal to the first parameter given by at least one
- * thread sleeping within the vlc_addr_wait() or vlc_addr_timedwait()
+ * thread sleeping within the vlc_atomic_wait() or vlc_atomic_timedwait()
  * functions. If no threads are found, this function does nothing.
  *
  * \param addr address identifying which threads may be woken up
  */
-void vlc_addr_signal(void *addr);
+void vlc_atomic_notify_one(void *addr);
 
 /**
  * Wakes up all thread on an address.
  *
  * Wakes up all threads sleeping on the specified address (if any).
- * Any thread sleeping within a call to vlc_addr_wait() or vlc_addr_timedwait()
- * with the specified address as first call parameter will be woken up.
+ * Any thread sleeping within a call to vlc_atomic_wait() or
+ * vlc_atomic_timedwait() with the specified address as first call parameter
+ * will be woken up.
  *
  * \param addr address identifying which threads to wake up
  */
-void vlc_addr_broadcast(void *addr);
+void vlc_atomic_notify_all(void *addr);
 
 /**
  * Creates and starts a new thread.

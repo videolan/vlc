@@ -177,7 +177,7 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
 
     while ((delay = (deadline - vlc_tick_now())) > 0)
     {
-        vlc_addr_timedwait(&value, 0, delay);
+        vlc_atomic_timedwait(&value, 0, delay);
         vlc_testcancel();
     }
 
@@ -236,13 +236,13 @@ void vlc_cond_signal(vlc_cond_t *cond)
      * - cnd_wait() sets the futex to the equal-or-next even value.
      **/
     atomic_fetch_or_explicit(vlc_cond_value(cond), 1, memory_order_relaxed);
-    vlc_addr_signal(&cond->value);
+    vlc_atomic_notify_one(&cond->value);
 }
 
 void vlc_cond_broadcast(vlc_cond_t *cond)
 {
     atomic_fetch_or_explicit(vlc_cond_value(cond), 1, memory_order_relaxed);
-    vlc_addr_broadcast(&cond->value);
+    vlc_atomic_notify_all(&cond->value);
 }
 
 void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
@@ -261,7 +261,7 @@ void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
     vlc_cancel_addr_prepare(&cond->value);
     vlc_mutex_unlock(mutex);
 
-    vlc_addr_wait(&cond->value, value);
+    vlc_atomic_wait(&cond->value, value);
 
     vlc_mutex_lock(mutex);
     vlc_cancel_addr_finish(&cond->value);
@@ -285,7 +285,7 @@ static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
     vlc_mutex_unlock(mutex);
 
     if (delay > 0)
-        value = vlc_addr_timedwait(&cond->value, value, delay);
+        value = vlc_atomic_timedwait(&cond->value, value, delay);
     else
         value = 0;
 

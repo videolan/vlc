@@ -293,7 +293,7 @@ void vlc_cancel (vlc_thread_t thread_id)
     if (addr != NULL)
     {
         atomic_fetch_or_explicit(addr, 1, memory_order_relaxed);
-        vlc_addr_broadcast(addr);
+        vlc_atomic_notify_all(addr);
     }
     vlc_mutex_unlock(&thread_id->wait.lock);
 }

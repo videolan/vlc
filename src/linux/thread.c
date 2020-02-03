@@ -68,22 +68,22 @@ static int vlc_futex_wait(void *addr, unsigned val, const struct timespec *to)
     return ret;
 }
 
-void vlc_addr_signal(void *addr)
+void vlc_atomic_notify_one(void *addr)
 {
     vlc_futex_wake(addr, 1);
 }
 
-void vlc_addr_broadcast(void *addr)
+void vlc_atomic_notify_all(void *addr)
 {
     vlc_futex_wake(addr, INT_MAX);
 }
 
-void vlc_addr_wait(void *addr, unsigned val)
+void vlc_atomic_wait(void *addr, unsigned val)
 {
     vlc_futex_wait(addr, val, NULL);
 }
 
-bool vlc_addr_timedwait(void *addr, unsigned val, vlc_tick_t delay)
+bool vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t delay)
 {
     struct timespec ts = timespec_from_vlc_tick(delay);
 

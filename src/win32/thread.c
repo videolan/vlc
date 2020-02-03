@@ -424,12 +424,12 @@ static void WINAPI WakeByAddressFallback(void *addr)
 }
 #endif
 
-void vlc_addr_wait(void *addr, unsigned val)
+void vlc_atomic_wait(void *addr, unsigned val)
 {
     WaitOnAddress(addr, &val, sizeof (val), -1);
 }
 
-bool vlc_addr_timedwait(void *addr, unsigned val, vlc_tick_t delay)
+bool vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t delay)
 {
     delay = (delay + (1000-1)) / 1000;
 
@@ -442,12 +442,12 @@ bool vlc_addr_timedwait(void *addr, unsigned val, vlc_tick_t delay)
     return WaitOnAddress(addr, &val, sizeof (val), delay);
 }
 
-void vlc_addr_signal(void *addr)
+void vlc_atomic_notify_one(void *addr)
 {
     WakeByAddressSingle(addr);
 }
 
-void vlc_addr_broadcast(void *addr)
+void vlc_atomic_notify_all(void *addr)
 {
     WakeByAddressAll(addr);
 }
@@ -585,7 +585,7 @@ void vlc_cancel (vlc_thread_t th)
     if (th->wait.addr != NULL)
     {
         atomic_fetch_or_explicit(th->wait.addr, 1, memory_order_relaxed);
-        vlc_addr_broadcast(th->wait.addr);
+        vlc_atomic_notify_all(th->wait.addr);
     }
     LeaveCriticalSection(&th->wait.lock);
 
