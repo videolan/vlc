@@ -28,6 +28,8 @@
 
 struct render_context
 {
+    HWND hWnd;
+
     /* resources shared by VLC */
     ID3D11Device            *d3deviceVLC;
     ID3D11DeviceContext     *d3dctxVLC;
@@ -261,7 +263,7 @@ struct SHADER_INPUT {
     } texture;
 };
 
-static void init_direct3d(struct render_context *ctx, HWND hWnd)
+static void init_direct3d(struct render_context *ctx)
 {
     HRESULT hr;
     DXGI_SWAP_CHAIN_DESC scd = { };
@@ -271,7 +273,7 @@ static void init_direct3d(struct render_context *ctx, HWND hWnd)
     scd.BufferDesc.Width = SCREEN_WIDTH;
     scd.BufferDesc.Height = SCREEN_HEIGHT;
     scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    scd.OutputWindow = hWnd;
+    scd.OutputWindow = ctx->hWnd;
     scd.SampleDesc.Count = 1;
     scd.Windowed = TRUE;
     scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -476,7 +478,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
                    LPSTR lpCmdLine,
                    int nCmdShow)
 {
-    HWND hWnd;
     WNDCLASSEX wc;
     struct render_context Context = { };
     char *file_path;
@@ -516,7 +517,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     RECT wr = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
     AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
 
-    hWnd = CreateWindowEx(NULL,
+    Context.hWnd = CreateWindowEx(NULL,
                           "WindowClass",
                           "libvlc Demo app",
                           WS_OVERLAPPEDWINDOW,
@@ -528,9 +529,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
                           hInstance,
                           &Context);
 
-    ShowWindow(hWnd, nCmdShow);
+    ShowWindow(Context.hWnd, nCmdShow);
 
-    init_direct3d(&Context, hWnd);
+    init_direct3d(&Context);
 
     // DON'T use with callbacks libvlc_media_player_set_hwnd(p_mp, hWnd);
 
