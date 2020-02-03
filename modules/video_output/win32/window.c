@@ -52,7 +52,6 @@ typedef struct vout_window_sys_t
     vlc_mutex_t  lock;
     vlc_cond_t   wait;
     bool         b_ready;
-    bool         b_done;
 
     HWND hwnd;
 
@@ -484,16 +483,7 @@ static void Close(vout_window_t *wnd)
 
     free( sys->psz_title );
     if (sys->hwnd)
-    {
         PostMessage( sys->hwnd, WM_CLOSE, 0, 0 );
-        /* wait until the thread is done */
-        vlc_mutex_lock( &sys->lock );
-        while( !sys->b_done )
-        {
-            vlc_cond_wait( &sys->wait, &sys->lock );
-        }
-        vlc_mutex_unlock( &sys->lock );
-    }
     vlc_join(sys->thread, NULL);
     vlc_mutex_destroy( &sys->lock );
     vlc_cond_destroy( &sys->wait );
@@ -689,8 +679,6 @@ static void *EventThread( void *p_this )
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-    sys->b_done = true;
-    vlc_cond_signal( &sys->wait );
     vlc_restorecancel(canc);
     return NULL;
 }
@@ -748,7 +736,6 @@ static int Open(vout_window_t *wnd)
     vlc_mutex_init( &sys->lock );
     vlc_cond_init( &sys->wait );
     sys->b_ready = false;
-    sys->b_done = false;
 
     wnd->sys = sys;
     if( vlc_clone( &sys->thread, EventThread, wnd, VLC_THREAD_PRIORITY_LOW ) )
