@@ -415,7 +415,6 @@ vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
     if (!interop->handle_texs_gen)
         vt->DeleteTextures(interop->tex_count, sampler->textures);
 
-    vlc_gl_interop_Delete(interop);
     if (renderer->program_id != 0)
         vt->DeleteProgram(renderer->program_id);
 
@@ -433,8 +432,8 @@ static int SetupCoords(struct vlc_gl_renderer *renderer);
 
 struct vlc_gl_renderer *
 vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
-                    vlc_video_context *context, const video_format_t *fmt,
-                    bool b_dump_shaders)
+                    struct vlc_gl_interop *interop,
+                    const video_format_t *fmt, bool b_dump_shaders)
 {
     const opengl_vtable_t *vt = &api->vt;
 
@@ -455,16 +454,6 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     }
 
     renderer->sampler = sampler;
-
-    struct vlc_gl_interop *interop =
-        vlc_gl_interop_New(gl, api, context, fmt, false);
-    if (!interop)
-    {
-        free(renderer);
-        free(sampler);
-        return NULL;
-    }
-
     renderer->interop = interop;
 
     renderer->gl = gl;

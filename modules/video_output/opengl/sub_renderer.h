@@ -30,6 +30,7 @@
 
 #include "gl_api.h"
 #include "gl_common.h"
+#include "interop.h"
 
 /**
  * A subpictures renderer handles the rendering of RGB subpictures.
@@ -45,7 +46,8 @@ struct vlc_gl_sub_renderer;
  *                      texture size
  */
 struct vlc_gl_sub_renderer *
-vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api);
+vlc_gl_sub_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
+                        struct vlc_gl_interop *interop);
 
 /**
  * Delete a subpictures renderer

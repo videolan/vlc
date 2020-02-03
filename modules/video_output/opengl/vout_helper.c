@@ -51,7 +51,10 @@ struct vout_display_opengl_t {
     vlc_gl_t   *gl;
     struct vlc_gl_api api;
 
+    struct vlc_gl_interop *interop;
     struct vlc_gl_renderer *renderer;
+
+    struct vlc_gl_interop *sub_interop;
     struct vlc_gl_sub_renderer *sub_renderer;
 };
 
@@ -132,23 +135,45 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     bool b_dump_shaders = var_InheritInteger(gl, "verbose") >= 4;
 
+    vgl->interop = vlc_gl_interop_New(gl, &vgl->api, context, fmt, false);
+    if (!vgl->interop)
+    {
+        msg_Err(gl, "Could not create interop");
+        free(vgl);
+        return NULL;
+    }
+
     struct vlc_gl_renderer *renderer = vgl->renderer =
-        vlc_gl_renderer_New(gl, &vgl->api, context, fmt, b_dump_shaders);
+        vlc_gl_renderer_New(gl, &vgl->api, vgl->interop, fmt, b_dump_shaders);
     if (!vgl->renderer)
     {
         msg_Warn(gl, "Could not create renderer for %4.4s",
                  (const char *) &fmt->i_chroma);
+        vlc_gl_interop_Delete(vgl->interop);
         free(vgl);
         return NULL;
     }
 
     GL_ASSERT_NOERROR(vt);
 
-    vgl->sub_renderer = vlc_gl_sub_renderer_New(gl, &vgl->api);
+    vgl->sub_interop = vlc_gl_interop_New(gl, &vgl->api, NULL, fmt, true);
+    if (!vgl->sub_interop)
+    {
+        msg_Err(gl, "Could not create sub interop");
+        vlc_gl_renderer_Delete(vgl->renderer);
+        vlc_gl_interop_Delete(vgl->interop);
+        free(vgl);
+        return NULL;
+    }
+
+    vgl->sub_renderer =
+        vlc_gl_sub_renderer_New(gl, &vgl->api, vgl->sub_interop);
     if (!vgl->sub_renderer)
     {
         msg_Err(gl, "Could not create sub renderer");
+        vlc_gl_interop_Delete(vgl->sub_interop);
         vlc_gl_renderer_Delete(vgl->renderer);
+        vlc_gl_interop_Delete(vgl->interop);
         free(vgl);
         return NULL;
     }
@@ -182,7 +207,10 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vt->Flush();
 
     vlc_gl_sub_renderer_Delete(vgl->sub_renderer);
+    vlc_gl_interop_Delete(vgl->sub_interop);
+
     vlc_gl_renderer_Delete(vgl->renderer);
+    vlc_gl_interop_Delete(vgl->interop);
 
     GL_ASSERT_NOERROR(vt);
 
