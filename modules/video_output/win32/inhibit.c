@@ -42,8 +42,8 @@ static void Inhibit (vlc_inhibit_t *ih, unsigned mask)
     vlc_inhibit_sys_t *sys = ih->p_sys;
     vlc_mutex_lock(&sys->mutex);
     sys->mask = mask;
-    vlc_mutex_unlock(&sys->mutex);
     vlc_cond_signal(&sys->cond);
+    vlc_mutex_unlock(&sys->mutex);
 }
 
 static void RestoreStateOnCancel( void* p_opaque )
