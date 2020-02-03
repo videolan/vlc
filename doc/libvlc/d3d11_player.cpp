@@ -409,6 +409,9 @@ static bool SelectPlane_cb( void *opaque, size_t plane )
 static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
 {
     struct render_context *ctx = static_cast<struct render_context *>(*opaque);
+
+    init_direct3d(ctx);
+
     out->device_context = ctx->d3dctxVLC;
     return true;
 }
@@ -417,6 +420,7 @@ static void Cleanup_cb( void *opaque )
 {
     // here we can release all things Direct3D11 for good (if playing only one file)
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
+    release_direct3d(ctx);
 }
 
 static void Resize_cb( void *opaque,
@@ -531,8 +535,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     ShowWindow(Context.hWnd, nCmdShow);
 
-    init_direct3d(&Context);
-
     // DON'T use with callbacks libvlc_media_player_set_hwnd(p_mp, hWnd);
 
     /* Tell VLC to render into our D3D11 environment */
@@ -563,7 +565,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
     libvlc_release( p_libvlc );
 
     DeleteCriticalSection(&Context.sizeLock);
-    release_direct3d(&Context);
 
     return msg.wParam;
 }
