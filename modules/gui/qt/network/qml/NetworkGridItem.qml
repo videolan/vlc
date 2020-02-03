@@ -35,6 +35,10 @@ Widgets.GridItem {
     pictureHeight: VLCStyle.network_normal
 
     image: {
+        if (model.artwork && model.artwork.toString() !== "") {
+            return model.artwork
+        }
+
         switch (model.type){
         case NetworkMediaModel.TYPE_DISC:
             return  "qrc:///type/disc.svg"
