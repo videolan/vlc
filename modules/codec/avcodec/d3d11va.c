@@ -281,16 +281,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
     if (sys->d3d_dev.context_mutex == INVALID_HANDLE_VALUE)
         msg_Warn(va, "No mutex found to lock the decoder");
 
-    void *d3dvidctx = NULL;
-    hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
-    if (FAILED(hr)) {
-        msg_Err(va, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
-        D3D11_ReleaseDevice(&sys->d3d_dev);
-        // TODO we can try all adapters to see if there's one that can decode
-        goto error;
-    }
-    sys->hw.video_context = d3dvidctx;
-
     struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
         DxDestroySurfaces,
