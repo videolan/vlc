@@ -94,34 +94,23 @@ static int Open( vlc_object_t *p_this )
     // No theme yet
     p_intf->p_sys->p_theme = NULL;
 
-    vlc_mutex_init( &p_intf->p_sys->init_lock );
-    vlc_cond_init( &p_intf->p_sys->init_wait );
-
-    vlc_mutex_lock( &p_intf->p_sys->init_lock );
+    vlc_sem_init( &p_intf->p_sys->init_wait, 0 );
     p_intf->p_sys->b_error = false;
-    p_intf->p_sys->b_ready = false;
 
     if( vlc_clone( &p_intf->p_sys->thread, Run, p_intf,
                                VLC_THREAD_PRIORITY_LOW ) )
     {
-        vlc_mutex_unlock( &p_intf->p_sys->init_lock );
-
-        vlc_cond_destroy( &p_intf->p_sys->init_wait );
-        vlc_mutex_destroy( &p_intf->p_sys->init_lock );
+        vlc_sem_destroy( &p_intf->p_sys->init_wait );
         free( p_intf->p_sys );
         return VLC_EGENERIC;
     }
 
-    while( !p_intf->p_sys->b_ready )
-        vlc_cond_wait( &p_intf->p_sys->init_wait, &p_intf->p_sys->init_lock );
-    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+    vlc_sem_wait( &p_intf->p_sys->init_wait );
+    vlc_sem_destroy( &p_intf->p_sys->init_wait );
 
     if( p_intf->p_sys->b_error )
     {
         vlc_join( p_intf->p_sys->thread, NULL );
-
-        vlc_mutex_destroy( &p_intf->p_sys->init_lock );
-        vlc_cond_destroy( &p_intf->p_sys->init_wait );
 
         free( p_intf->p_sys );
         return VLC_EGENERIC;
@@ -167,9 +156,6 @@ static void Close( vlc_object_t *p_this )
 
     vlc_join( p_intf->p_sys->thread, NULL );
 
-    vlc_mutex_destroy( &p_intf->p_sys->init_lock );
-    vlc_cond_destroy( &p_intf->p_sys->init_wait );
-
     // Destroy structure
     free( p_intf->p_sys );
 }
@@ -188,8 +174,6 @@ static void *Run( void * p_obj )
     char *skin_last = NULL;
     ThemeLoader *pLoader = NULL;
     OSLoop *loop = NULL;
-
-    vlc_mutex_lock( &p_intf->p_sys->init_lock );
 
     // Initialize singletons
     if( OSFactory::instance( p_intf ) == NULL )
@@ -268,9 +252,7 @@ static void *Run( void * p_obj )
 
     // Signal the main thread this thread is now ready
     p_intf->p_sys->b_error = false;
-    p_intf->p_sys->b_ready = true;
-    vlc_cond_signal( &p_intf->p_sys->init_wait );
-    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+    vlc_sem_post( &p_intf->p_sys->init_wait );
 
     // Enter the main event loop
     loop->run();
@@ -307,9 +289,7 @@ end:
     if( b_error )
     {
         p_intf->p_sys->b_error = true;
-        p_intf->p_sys->b_ready = true;
-        vlc_cond_signal( &p_intf->p_sys->init_wait );
-        vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+        vlc_sem_post( &p_intf->p_sys->init_wait );
     }
 
     vlc_restorecancel(canc);

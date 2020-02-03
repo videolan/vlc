@@ -115,10 +115,8 @@ struct intf_sys_t
 
     /// synchronisation at start of interface
     vlc_thread_t thread;
-    vlc_mutex_t  init_lock;
-    vlc_cond_t   init_wait;
+    vlc_sem_t    init_wait;
     bool         b_error;
-    bool         b_ready;
 };
 
 
