@@ -96,33 +96,6 @@ struct vlc_gl_renderer
     float f_fovy; /* to avoid recalculating them when needed.      */
     float f_z;    /* Position of the camera on the shpere radius vector */
     float f_sar;
-
-    /**
-     * Callback to fetch locations of uniform or attributes variables
-     *
-     * This function pointer cannot be NULL. This callback is called one time
-     * after init.
-     *
-     * \param renderer OpenGL renderer
-     * \param program linked program that will be used by this renderer
-     * \return VLC_SUCCESS or a VLC error
-     */
-    int (*pf_fetch_locations)(struct vlc_gl_renderer *renderer, GLuint program);
-
-    /**
-     * Callback to prepare the fragment shader
-     *
-     * This function pointer cannot be NULL. This callback can be used to
-     * specify values of uniform variables.
-     *
-     * \param renderer OpenGL renderer
-     * \param tex_width array of tex width (one per plane)
-     * \param tex_height array of tex height (one per plane)
-     * \param alpha alpha value, used only for RGBA fragment shader
-     */
-    void (*pf_prepare_shader)(const struct vlc_gl_renderer *renderer,
-                              const GLsizei *tex_width, const GLsizei *tex_height,
-                              float alpha);
 };
 
 /**

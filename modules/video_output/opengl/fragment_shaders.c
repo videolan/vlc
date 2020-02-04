@@ -205,11 +205,10 @@ renderer_yuv_base_init(struct vlc_gl_renderer *renderer, vlc_fourcc_t chroma,
 }
 
 static int
-renderer_base_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
+sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 {
-    struct vlc_gl_interop *interop = renderer->interop;
-    struct vlc_gl_sampler *sampler = renderer->sampler;
-    const opengl_vtable_t *vt = renderer->vt;
+    struct vlc_gl_interop *interop = sampler->interop;
+    const opengl_vtable_t *vt = sampler->vt;
 
     if (sampler->yuv_color)
     {
@@ -251,14 +250,13 @@ renderer_base_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
 }
 
 static void
-renderer_base_prepare_shader(const struct vlc_gl_renderer *renderer,
-                             const GLsizei *tex_width,
-                             const GLsizei *tex_height, float alpha)
+sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler,
+                            const GLsizei *tex_width,
+                            const GLsizei *tex_height, float alpha)
 {
     (void) tex_width; (void) tex_height;
-    const struct vlc_gl_interop *interop = renderer->interop;
-    struct vlc_gl_sampler *sampler = renderer->sampler;
-    const opengl_vtable_t *vt = renderer->vt;
+    const struct vlc_gl_interop *interop = sampler->interop;
+    const opengl_vtable_t *vt = sampler->vt;
 
     if (sampler->yuv_color)
         vt->UniformMatrix4fv(sampler->uloc.ConvMatrix, 1, GL_FALSE,
@@ -311,23 +309,21 @@ renderer_base_prepare_shader(const struct vlc_gl_renderer *renderer,
 }
 
 static int
-renderer_xyz12_fetch_locations(struct vlc_gl_renderer *renderer, GLuint program)
+sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 {
-    const opengl_vtable_t *vt = renderer->vt;
-    struct vlc_gl_sampler *sampler = renderer->sampler;
+    const opengl_vtable_t *vt = sampler->vt;
 
     sampler->uloc.Texture[0] = vt->GetUniformLocation(program, "Texture0");
     return sampler->uloc.Texture[0] != -1 ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static void
-renderer_xyz12_prepare_shader(const struct vlc_gl_renderer *renderer,
-                              const GLsizei *tex_width,
-                              const GLsizei *tex_height, float alpha)
+sampler_xyz12_prepare_shader(const struct vlc_gl_sampler *sampler,
+                             const GLsizei *tex_width,
+                             const GLsizei *tex_height, float alpha)
 {
     (void) tex_width; (void) tex_height; (void) alpha;
-    const opengl_vtable_t *vt = renderer->vt;
-    struct vlc_gl_sampler *sampler = renderer->sampler;
+    const opengl_vtable_t *vt = sampler->vt;
 
     vt->Uniform1i(sampler->uloc.Texture[0], 0);
 }
@@ -335,8 +331,10 @@ renderer_xyz12_prepare_shader(const struct vlc_gl_renderer *renderer,
 static char *
 xyz12_shader_init(struct vlc_gl_renderer *renderer)
 {
-    renderer->pf_fetch_locations = renderer_xyz12_fetch_locations;
-    renderer->pf_prepare_shader = renderer_xyz12_prepare_shader;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
+
+    sampler->pf_fetch_locations = sampler_xyz12_fetch_locations;
+    sampler->pf_prepare_shader = sampler_xyz12_prepare_shader;
 
     /* Shader for XYZ to RGB correction
      * 3 steps :
@@ -645,8 +643,8 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
     if (vlc_memstream_close(&ms) != 0)
         return NULL;
 
-    renderer->pf_fetch_locations = renderer_base_fetch_locations;
-    renderer->pf_prepare_shader = renderer_base_prepare_shader;
+    sampler->pf_fetch_locations = sampler_base_fetch_locations;
+    sampler->pf_prepare_shader = sampler_base_prepare_shader;
 
     return ms.ptr;
 }

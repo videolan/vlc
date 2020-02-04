@@ -90,6 +90,33 @@ struct vlc_gl_sampler {
     } last_source;
 
     struct vlc_gl_interop *interop;
+
+    /**
+     * Callback to fetch locations of uniform or attributes variables
+     *
+     * This function pointer cannot be NULL. This callback is called one time
+     * after init.
+     *
+     * \param sampler the sampler
+     * \param program linked program that will be used by this sampler
+     * \return VLC_SUCCESS or a VLC error
+     */
+    int (*pf_fetch_locations)(struct vlc_gl_sampler *sampler, GLuint program);
+
+    /**
+     * Callback to prepare the fragment shader
+     *
+     * This function pointer cannot be NULL. This callback can be used to
+     * specify values of uniform variables.
+     *
+     * \param sampler the sampler
+     * \param tex_width array of tex width (one per plane)
+     * \param tex_height array of tex height (one per plane)
+     * \param alpha alpha value, used only for RGBA fragment shader
+     */
+    void (*pf_prepare_shader)(const struct vlc_gl_sampler *sampler,
+                              const GLsizei *tex_width, const GLsizei *tex_height,
+                              float alpha);
 };
 
 /**

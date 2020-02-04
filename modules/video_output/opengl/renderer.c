@@ -327,8 +327,8 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
     assert(interop->tex_target != 0 &&
            interop->tex_count > 0 &&
            interop->ops->update_textures != NULL &&
-           renderer->pf_fetch_locations != NULL &&
-           renderer->pf_prepare_shader != NULL);
+           sampler->pf_fetch_locations != NULL &&
+           sampler->pf_prepare_shader != NULL);
 
     GLuint program_id =
         vlc_gl_BuildProgram(VLC_OBJECT(renderer->gl), vt,
@@ -375,7 +375,7 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
 #undef GET_ULOC
 #undef GET_ALOC
 #undef GET_SAMPLER_ULOC
-    int ret = renderer->pf_fetch_locations(renderer, program_id);
+    int ret = sampler->pf_fetch_locations(sampler, program_id);
     assert(ret == VLC_SUCCESS);
     if (ret != VLC_SUCCESS)
     {
@@ -846,8 +846,8 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
     const struct vlc_gl_interop *interop = renderer->interop;
     struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
-    renderer->pf_prepare_shader(renderer, sampler->tex_width,
-                                sampler->tex_height, 1.0f);
+    sampler->pf_prepare_shader(sampler, sampler->tex_width,
+                               sampler->tex_height, 1.0f);
 
     for (unsigned j = 0; j < interop->tex_count; j++) {
         assert(sampler->textures[j] != 0);
