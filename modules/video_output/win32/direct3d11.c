@@ -124,7 +124,7 @@ struct vout_display_sys_t
     libvlc_video_swap_cb                     swapCb;
     libvlc_video_makeCurrent_cb              startEndRenderingCb;
     libvlc_video_frameMetadata_cb            sendMetadataCb;
-    libvlc_video_direct3d_select_plane_cb    selectPlaneCb;
+    libvlc_video_output_select_plane_cb      selectPlaneCb;
 };
 
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture, vlc_tick_t);

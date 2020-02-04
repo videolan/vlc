@@ -693,6 +693,26 @@ typedef void( *libvlc_video_output_set_resize_cb )( void *opaque,
                                                     void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
                                                     void *report_opaque );
 
+/** Tell the host the rendering for the given plane is about to start
+ *
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
+ * \param plane number of the rendering plane to select
+ * \return true on success
+ * \version LibVLC 4.0.0 or later
+ *
+ * \note This is only used with \ref libvlc_video_direct3d_engine_d3d11.
+ *
+ * The host should call OMSetRenderTargets for Direct3D11. If this callback is
+ * not used (set to NULL in @a libvlc_video_direct3d_set_callbacks()) OMSetRenderTargets
+ * has to be set during the @a libvlc_video_makeCurrent_cb()
+ * entering call.
+ *
+ * The number of planes depend on the DXGI_FORMAT returned during the
+ * \ref LIBVLC_VIDEO_UPDATE_OUTPUT call. It's usually one plane except for
+ * semi-planar formats like DXGI_FORMAT_NV12 or DXGI_FORMAT_P010.
+ */
+typedef bool( *libvlc_video_output_select_plane_cb )( void *opaque, size_t plane );
+
 /**
  * Set callbacks and data to render decoded video to a custom texture
  *
@@ -740,26 +760,6 @@ typedef enum libvlc_video_direct3d_engine_t {
     libvlc_video_direct3d_engine_d3d9,
 } libvlc_video_direct3d_engine_t;
 
-/** Tell the host the rendering for the given plane is about to start
- *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
- * \param plane number of the rendering plane to select
- * \return true on success
- * \version LibVLC 4.0.0 or later
- *
- * \note This is only used with \ref libvlc_video_direct3d_engine_d3d11.
- *
- * The host should call OMSetRenderTargets for Direct3D11. If this callback is
- * not used (set to NULL in @a libvlc_video_direct3d_set_callbacks()) OMSetRenderTargets
- * has to be set during the @a libvlc_video_makeCurrent_cb()
- * entering call.
- *
- * The number of planes depend on the DXGI_FORMAT returned during the
- * \ref LIBVLC_VIDEO_UPDATE_OUTPUT call. It's usually one plane except for
- * semi-planar formats like DXGI_FORMAT_NV12 or DXGI_FORMAT_P010.
- */
-typedef bool( *libvlc_video_direct3d_select_plane_cb )( void *opaque, size_t plane );
-
 /**
  * Set callbacks and data to render decoded video to a custom Direct3D output
  *
@@ -793,7 +793,7 @@ bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
                                          libvlc_video_swap_cb swap_cb,
                                          libvlc_video_makeCurrent_cb makeCurrent_cb,
                                          libvlc_video_frameMetadata_cb metadata_cb,
-                                         libvlc_video_direct3d_select_plane_cb select_plane_cb,
+                                         libvlc_video_output_select_plane_cb select_plane_cb,
                                          void* opaque );
 
 /**
