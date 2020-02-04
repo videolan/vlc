@@ -98,10 +98,10 @@ static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_
             /* decoder device coming from the external app */
             sys->external.opaque          = var_InheritAddress( device, "vout-cb-opaque" );
             sys->external.cleanupDeviceCb = var_InheritAddress( device, "vout-cb-cleanup" );
-            libvlc_video_direct3d_device_cfg_t cfg = {
+            libvlc_video_setup_device_cfg_t cfg = {
                 .hardware_decoding = true, /* always favor hardware decoding */
             };
-            libvlc_video_direct3d_device_setup_t out = { .device_context = NULL };
+            libvlc_video_setup_device_info_t out = { .device_context = NULL };
             if (!setupDeviceCb( &sys->external.opaque, &cfg, &out ))
             {
                 if (sys->external.cleanupDeviceCb)

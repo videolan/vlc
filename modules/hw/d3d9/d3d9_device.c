@@ -74,10 +74,10 @@ int D3D9OpenDecoderDevice(vlc_decoder_device *device, vout_window_t *wnd)
     if ( setupDeviceCb )
     {
         /* external rendering */
-        libvlc_video_direct3d_device_setup_t out = { .device_context = NULL, .adapter = 0 };
+        libvlc_video_setup_device_info_t out = { .device_context = NULL, .adapter = 0 };
         sys->opaque          = var_InheritAddress( device, "vout-cb-opaque" );
         sys->cleanupDeviceCb = var_InheritAddress( device, "vout-cb-cleanup" );
-        libvlc_video_direct3d_device_cfg_t cfg = {
+        libvlc_video_setup_device_cfg_t cfg = {
             .hardware_decoding = true, /* ignored anyway */
         };
         if (!setupDeviceCb( &sys->opaque, &cfg, &out ))

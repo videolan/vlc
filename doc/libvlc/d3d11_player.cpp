@@ -449,7 +449,7 @@ static bool SelectPlane_cb( void *opaque, size_t plane )
     return true;
 }
 
-static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
+static bool Setup_cb( void **opaque, const libvlc_video_setup_device_cfg_t *cfg, libvlc_video_setup_device_info_t *out )
 {
     struct render_context *ctx = static_cast<struct render_context *>(*opaque);
 

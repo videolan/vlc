@@ -699,7 +699,7 @@ typedef enum libvlc_video_direct3d_engine_t {
 typedef struct
 {
     bool hardware_decoding; /** set if D3D11_CREATE_DEVICE_VIDEO_SUPPORT is needed for D3D11 */
-} libvlc_video_direct3d_device_cfg_t;
+} libvlc_video_setup_device_cfg_t;
 
 typedef struct
 {
@@ -707,7 +707,7 @@ typedef struct
         void *device_context; /** ID3D11DeviceContext* for D3D11, IDirect3D9 * for D3D9 */
         int  adapter;         /** Adapter to use with the IDirect3D9 for D3D9 */
     };
-} libvlc_video_direct3d_device_setup_t;
+} libvlc_video_setup_device_info_t;
 
 /** Setup the rendering environment.
  *
@@ -715,7 +715,7 @@ typedef struct
  *               on input. The callback can change this value on output to be
  *               passed to all the other callbacks set on @a libvlc_video_direct3d_set_callbacks(). [IN/OUT]
  * \param cfg requested configuration of the video device [IN]
- * \param out libvlc_video_direct3d_device_setup_t* to fill [OUT]
+ * \param out libvlc_video_setup_device_info_t* to fill [OUT]
  * \return true on success
  * \version LibVLC 4.0.0 or later
  *
@@ -728,8 +728,8 @@ typedef struct
  * The ID3D11Device used to create ID3D11DeviceContext must have multithreading enabled.
  */
 typedef bool( *libvlc_video_direct3d_device_setup_cb )( void **opaque,
-                                                        const libvlc_video_direct3d_device_cfg_t *cfg,
-                                                        libvlc_video_direct3d_device_setup_t *out );
+                                                        const libvlc_video_setup_device_cfg_t *cfg,
+                                                        libvlc_video_setup_device_info_t *out );
 
 /** Cleanup the rendering environment initialized during \ref libvlc_video_direct3d_device_setup_cb.
  *

@@ -200,7 +200,7 @@ static void release_direct3d(struct render_context *ctx)
     IDirect3D9_Release(ctx->d3d);
 }
 
-static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
+static bool Setup_cb( void **opaque, const libvlc_video_setup_device_cfg_t *cfg, libvlc_video_setup_device_info_t *out )
 {
     struct render_context *ctx = *opaque;
     out->device_context = ctx->d3d;
