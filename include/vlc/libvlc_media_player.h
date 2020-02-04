@@ -521,10 +521,9 @@ typedef struct
  * Setup the rendering environment.
  *
  * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks()
- *               or @a libvlc_video_direct3d_set_callbacks()
  *               on input. The callback can change this value on output to be
- *               passed to all the other callbacks set on @a libvlc_video_set_output_callbacks(). [IN/OUT]
- *               or @a libvlc_video_set_output_callbacks(). [IN/OUT]
+ *               passed to all the other callbacks set on @a libvlc_video_set_output_callbacks().
+ *               [IN/OUT]
  * \param cfg requested configuration of the video device [IN]
  * \param out libvlc_video_setup_device_info_t* to fill [OUT]
  * \return true on success
@@ -674,6 +673,10 @@ typedef void (*libvlc_video_frameMetadata_cb)(void* opaque, libvlc_video_metadat
 typedef enum libvlc_video_engine_t {
     libvlc_video_engine_opengl,
     libvlc_video_engine_gles2,
+    /** Direct3D11 rendering engine */
+    libvlc_video_direct3d_engine_d3d11,
+    /** Direct3D9 rendering engine */
+    libvlc_video_direct3d_engine_d3d9,
 } libvlc_video_engine_t;
 
 /** Set the callback to call when the host app resizes the rendering area.
@@ -703,7 +706,7 @@ typedef void( *libvlc_video_output_set_resize_cb )( void *opaque,
  * \note This is only used with \ref libvlc_video_direct3d_engine_d3d11.
  *
  * The host should call OMSetRenderTargets for Direct3D11. If this callback is
- * not used (set to NULL in @a libvlc_video_direct3d_set_callbacks()) OMSetRenderTargets
+ * not used (set to NULL in @a libvlc_video_set_output_callbacks()) OMSetRenderTargets
  * has to be set during the @a libvlc_video_makeCurrent_cb()
  * entering call.
  *
@@ -719,8 +722,6 @@ typedef bool( *libvlc_video_output_select_plane_cb )( void *opaque, size_t plane
  * \warning VLC will perform video rendering in its own thread and at its own rate,
  * You need to provide your own synchronisation mechanism.
  *
- * OpenGL context need to be created before playing a media.
- *
  * \param mp the media player
  * \param engine the GPU engine to use
  * \param setup_cb callback called to initialize user data
@@ -728,7 +729,7 @@ typedef bool( *libvlc_video_output_select_plane_cb )( void *opaque, size_t plane
  * \param resize_cb callback to set the resize callback
  * \param update_output_cb callback to get the rendering format of the host (cannot be NULL)
  * \param swap_cb callback called after rendering a video frame (cannot be NULL)
- * \param makeCurrent_cb callback called to enter/leave the opengl context (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
+ * \param makeCurrent_cb callback called to enter/leave the opengl context (cannot be NULL)
  * \param getProcAddress_cb opengl function loading callback (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
  * \param metadata_cb callback to provide frame metadata (D3D11 only)
  * \param select_plane_cb callback to select different D3D11 rendering targets
@@ -751,54 +752,6 @@ bool libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_frameMetadata_cb metadata_cb,
                                         libvlc_video_output_select_plane_cb select_plane_cb,
                                         void* opaque );
-
-
-/**
- * Enumeration of the Video engine to be used on output.
- * can be passed to @a libvlc_video_direct3d_set_callbacks
- */
-typedef enum libvlc_video_direct3d_engine_t {
-    /** Direct3D11 rendering engine */
-    libvlc_video_direct3d_engine_d3d11,
-    /** Direct3D9 rendering engine */
-    libvlc_video_direct3d_engine_d3d9,
-} libvlc_video_direct3d_engine_t;
-
-/**
- * Set callbacks and data to render decoded video to a custom Direct3D output
- *
- * \warning VLC will perform video rendering in its own thread and at its own rate,
- * You need to provide your own synchronisation mechanism.
- *
- * \param mp the media player
- * \param engine the GPU engine to use
- * \param setup_cb callback to setup and return the device to use (cannot be NULL)
- * \param cleanup_cb callback to cleanup the device given by the \ref setup_cb callback
- * \param resize_cb callback to set the resize callback
- * \param update_output_cb callback to notify of the source format and get the
- *                         rendering format used by the host (cannot be NULL)
- * \param swap_cb callback to tell the host it should display the rendered picture (cannot be NULL)
- * \param makeCurrent_cb callback to tell the host the rendering is starting/ended (cannot be NULL)
- * \param metadata_cb callback to provide frame metadata (D3D11 only)
- * \param select_plane_cb callback to select different D3D11 rendering targets
- * \param opaque private pointer passed to the \ref cleanup_cb callback
- *
- * \retval true Direct3D selected and callbacks set
- * \retval false Direct3D version, callbacks not set
- * \version LibVLC 4.0.0 or later
- */
-LIBVLC_API
-bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
-                                         libvlc_video_direct3d_engine_t engine,
-                                         libvlc_video_output_setup_cb setup_cb,
-                                         libvlc_video_output_cleanup_cb cleanup_cb,
-                                         libvlc_video_output_set_resize_cb resize_cb,
-                                         libvlc_video_update_output_cb update_output_cb,
-                                         libvlc_video_swap_cb swap_cb,
-                                         libvlc_video_makeCurrent_cb makeCurrent_cb,
-                                         libvlc_video_frameMetadata_cb metadata_cb,
-                                         libvlc_video_output_select_plane_cb select_plane_cb,
-                                         void* opaque );
 
 /**
  * Set the NSView handler where the media player should render its video output.
