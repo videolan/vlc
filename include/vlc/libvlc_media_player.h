@@ -541,12 +541,29 @@ typedef void (*libvlc_video_update_output_cb)(void* opaque, unsigned width, unsi
 typedef void (*libvlc_video_swap_cb)(void* opaque);
 
 /**
- * Callback prototype to set up the OpenGL context for rendering
+ * Callback prototype to set up the OpenGL context for rendering.
+ * Tell the host the rendering is about to start/has finished.
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
+ * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() or
+ *          @a libvlc_video_direct3d_device_setup_cb() [IN]
  * \param enter true to set the context as current, false to unset it [IN]
  * \return true on success
  * \version LibVLC 4.0.0 or later
+ *
+ * On Direct3D11 the following may change on the provided ID3D11DeviceContext*
+ * between \ref enter being true and \ref enter being false:
+ * - IASetPrimitiveTopology()
+ * - IASetInputLayout()
+ * - IASetVertexBuffers()
+ * - IASetIndexBuffer()
+ * - VSSetConstantBuffers()
+ * - VSSetShader()
+ * - PSSetSamplers()
+ * - PSSetConstantBuffers()
+ * - PSSetShaderResources()
+ * - PSSetShader()
+ * - RSSetViewports()
+ * - DrawIndexed()
  */
 typedef bool (*libvlc_video_makeCurrent_cb)(void* opaque, bool enter);
 
@@ -739,30 +756,6 @@ typedef bool( *libvlc_video_direct3d_update_output_cb )( void *opaque,
                                                          const libvlc_video_direct3d_cfg_t *cfg,
                                                          libvlc_video_output_cfg_t *output );
 
-/** Tell the host the rendering is about to start/has finished.
- *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
- * \param enter true if the rendering is about to start, false if it's finished
- * \return true on success
- * \version LibVLC 4.0.0 or later
- *
- * On Direct3D11 the following may change on the provided ID3D11DeviceContext*
- * between \ref enter being true and \ref enter being false:
- * - IASetPrimitiveTopology()
- * - IASetInputLayout()
- * - IASetVertexBuffers()
- * - IASetIndexBuffer()
- * - VSSetConstantBuffers()
- * - VSSetShader()
- * - PSSetSamplers()
- * - PSSetConstantBuffers()
- * - PSSetShaderResources()
- * - PSSetShader()
- * - RSSetViewports()
- * - DrawIndexed()
- */
-typedef bool( *libvlc_video_direct3d_start_end_rendering_cb )( void *opaque, bool enter );
-
 /** Tell the host the rendering for the given plane is about to start
  *
  * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
@@ -774,7 +767,7 @@ typedef bool( *libvlc_video_direct3d_start_end_rendering_cb )( void *opaque, boo
  *
  * The host should call OMSetRenderTargets for Direct3D11. If this callback is
  * not used (set to NULL in @a libvlc_video_direct3d_set_callbacks()) OMSetRenderTargets
- * has to be set during the @a libvlc_video_direct3d_start_end_rendering_cb()
+ * has to be set during the @a libvlc_video_makeCurrent_cb()
  * entering call.
  *
  * The number of planes depend on the DXGI_FORMAT returned during the
@@ -814,7 +807,7 @@ bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
                                          libvlc_video_direct3d_set_resize_cb resize_cb,
                                          libvlc_video_direct3d_update_output_cb update_output_cb,
                                          libvlc_video_swap_cb swap_cb,
-                                         libvlc_video_direct3d_start_end_rendering_cb makeCurrent_cb,
+                                         libvlc_video_makeCurrent_cb makeCurrent_cb,
                                          libvlc_video_frameMetadata_cb metadata_cb,
                                          libvlc_video_direct3d_select_plane_cb select_plane_cb,
                                          void* opaque );

@@ -122,7 +122,7 @@ struct vout_display_sys_t
     void *outside_opaque;
     libvlc_video_direct3d_update_output_cb   updateOutputCb;
     libvlc_video_swap_cb                     swapCb;
-    libvlc_video_direct3d_start_end_rendering_cb startEndRenderingCb;
+    libvlc_video_makeCurrent_cb              startEndRenderingCb;
     libvlc_video_frameMetadata_cb            sendMetadataCb;
     libvlc_video_direct3d_select_plane_cb    selectPlaneCb;
 };
