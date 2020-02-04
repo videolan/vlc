@@ -546,12 +546,22 @@ typedef struct
 } libvlc_video_output_cfg_t;
 
 /**
- * Callback prototype called on video size changes
+ * Callback prototype called on video size changes.
+ * Update the rendering output setup.
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
+ * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() or
+ *         @a libvlc_video_direct3d_device_setup_cb() [IN]
  * \param cfg configuration of the video that will be rendered [IN]
  * \param output configuration describing with how the rendering is setup [OUT]
  * \version LibVLC 4.0.0 or later
+ *
+ * \note the configuration device for Direct3D9 is the IDirect3DDevice9 that VLC
+ *       uses to render. The host must set a Render target and call Present()
+ *       when it needs the drawing from VLC to be done. This object is not valid
+ *       anymore after Cleanup is called.
+ *
+ * Tone mapping, range and color conversion will be done depending on the values
+ * set in the output structure.
  */
 typedef bool (*libvlc_video_update_output_cb)(void* opaque, const libvlc_video_render_cfg_t *cfg,
                                               libvlc_video_output_cfg_t *output );
@@ -740,25 +750,6 @@ typedef void( *libvlc_video_direct3d_set_resize_cb )( void *opaque,
                                                       void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
                                                       void *report_opaque );
 
-/** Update the rendering output setup.
- *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
- * \param cfg configuration of the video that will be rendered [IN]
- * \param output configuration describing with how the rendering is setup [OUT]
- * \version LibVLC 4.0.0 or later
- *
- * \note the configuration device for Direct3D9 is the IDirect3DDevice9 that VLC
- *       uses to render. The host must set a Render target and call Present()
- *       when it needs the drawing from VLC to be done. This object is not valid
- *       anymore after Cleanup is called.
- *
- * Tone mapping, range and color conversion will be done depending on the values
- * set in the output structure.
- */
-typedef bool( *libvlc_video_direct3d_update_output_cb )( void *opaque,
-                                                         const libvlc_video_render_cfg_t *cfg,
-                                                         libvlc_video_output_cfg_t *output );
-
 /** Tell the host the rendering for the given plane is about to start
  *
  * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
@@ -808,7 +799,7 @@ bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
                                          libvlc_video_direct3d_device_setup_cb setup_cb,
                                          libvlc_video_direct3d_device_cleanup_cb cleanup_cb,
                                          libvlc_video_direct3d_set_resize_cb resize_cb,
-                                         libvlc_video_direct3d_update_output_cb update_output_cb,
+                                         libvlc_video_update_output_cb update_output_cb,
                                          libvlc_video_swap_cb swap_cb,
                                          libvlc_video_makeCurrent_cb makeCurrent_cb,
                                          libvlc_video_frameMetadata_cb metadata_cb,

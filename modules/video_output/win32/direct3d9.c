@@ -171,7 +171,7 @@ struct vout_display_sys_t
 
     /* outside rendering */
     void *outside_opaque;
-    libvlc_video_direct3d_update_output_cb   updateOutputCb;
+    libvlc_video_update_output_cb            updateOutputCb;
     libvlc_video_swap_cb                     swapCb;
     libvlc_video_makeCurrent_cb              startEndRenderingCb;
 };
