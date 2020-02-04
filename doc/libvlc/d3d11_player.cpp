@@ -67,158 +67,6 @@ struct render_context
     void *ReportOpaque;
 };
 
-static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
-{
-    struct render_context *ctx = static_cast<struct render_context *>( opaque );
-
-    HRESULT hr;
-
-    DXGI_FORMAT renderFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-
-    if (ctx->texture)
-    {
-        ctx->texture->Release();
-        ctx->texture = NULL;
-    }
-    if (ctx->textureVLC)
-    {
-        ctx->textureVLC->Release();
-        ctx->textureVLC = NULL;
-    }
-    if (ctx->textureShaderInput)
-    {
-        ctx->textureShaderInput->Release();
-        ctx->textureShaderInput = NULL;
-    }
-    if (ctx->textureRenderTarget)
-    {
-        ctx->textureRenderTarget->Release();
-        ctx->textureRenderTarget = NULL;
-    }
-
-    /* interim texture */
-    D3D11_TEXTURE2D_DESC texDesc = { };
-    texDesc.MipLevels = 1;
-    texDesc.SampleDesc.Count = 1;
-    texDesc.MiscFlags = 0;
-    texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-    texDesc.Usage = D3D11_USAGE_DEFAULT;
-    texDesc.CPUAccessFlags = 0;
-    texDesc.ArraySize = 1;
-    texDesc.Format = renderFormat;
-    texDesc.Height = cfg->height;
-    texDesc.Width  = cfg->width;
-    texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
-
-    hr = ctx->d3device->CreateTexture2D( &texDesc, NULL, &ctx->texture );
-    if (FAILED(hr)) return false;
-
-    IDXGIResource1* sharedResource = NULL;
-    ctx->texture->QueryInterface(__uuidof(IDXGIResource1), (LPVOID*) &sharedResource);
-    hr = sharedResource->CreateSharedHandle(NULL, DXGI_SHARED_RESOURCE_READ|DXGI_SHARED_RESOURCE_WRITE, NULL, &ctx->sharedHandled);
-    sharedResource->Release();
-
-    ID3D11Device1* d3d11VLC1;
-    ctx->d3deviceVLC->QueryInterface(__uuidof(ID3D11Device1), (LPVOID*) &d3d11VLC1);
-    hr = d3d11VLC1->OpenSharedResource1(ctx->sharedHandled, __uuidof(ID3D11Texture2D), (void**)&ctx->textureVLC);
-    d3d11VLC1->Release();
-
-    D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc;
-    ZeroMemory(&resviewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
-    resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-    resviewDesc.Texture2D.MipLevels = 1;
-    resviewDesc.Format = texDesc.Format;
-    hr = ctx->d3device->CreateShaderResourceView(ctx->texture, &resviewDesc, &ctx->textureShaderInput );
-    if (FAILED(hr)) return false;
-
-    ctx->d3dctx->PSSetShaderResources(0, 1, &ctx->textureShaderInput);
-
-    D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {
-        .Format = texDesc.Format,
-        .ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D,
-    };
-    hr = ctx->d3deviceVLC->CreateRenderTargetView(ctx->textureVLC, &renderTargetViewDesc, &ctx->textureRenderTarget);
-    if (FAILED(hr)) return false;
-
-    ctx->d3dctxVLC->OMSetRenderTargets( 1, &ctx->textureRenderTarget, NULL );
-
-    out->surface_format = renderFormat;
-    out->full_range     = true;
-    out->colorspace     = libvlc_video_colorspace_BT709;
-    out->primaries      = libvlc_video_primaries_BT709;
-    out->transfer       = libvlc_video_transfer_func_SRGB;
-
-    return true;
-}
-
-static void Swap_cb( void* opaque )
-{
-    struct render_context *ctx = static_cast<struct render_context *>( opaque );
-    ctx->swapchain->Present( 0, 0 );
-}
-
-static bool StartRendering_cb( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *hdr10 )
-{
-    struct render_context *ctx = static_cast<struct render_context *>( opaque );
-    if ( enter )
-    {
-        // DEBUG: draw greenish background to show where libvlc doesn't draw in the texture
-        // Normally you should Clear with a black background
-        static const FLOAT greenRGBA[4] = {0.5f, 0.5f, 0.0f, 1.0f};
-        ctx->d3dctxVLC->ClearRenderTargetView( ctx->textureRenderTarget, greenRGBA);
-    }
-    else
-    {
-        static const FLOAT orangeRGBA[4] = {1.0f, 0.5f, 0.0f, 1.0f};
-        ctx->d3dctx->ClearRenderTargetView(ctx->swapchainRenderTarget, orangeRGBA);
-
-        // Render into the swapchain
-        // We start the drawing of the shared texture in our app as early as possible
-        // in hope it's done as soon as Swap_cb is called
-        ctx->d3dctx->DrawIndexed(ctx->quadIndexCount, 0, 0);
-    }
-
-    return true;
-}
-
-static bool SelectPlane_cb( void *opaque, size_t plane )
-{
-    struct render_context *ctx = static_cast<struct render_context *>( opaque );
-    if ( plane != 0 ) // we only support one packed RGBA plane (DXGI_FORMAT_R8G8B8A8_UNORM)
-        return false;
-    return true;
-}
-
-static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
-{
-    struct render_context *ctx = static_cast<struct render_context *>(*opaque);
-    out->device_context = ctx->d3dctxVLC;
-    return true;
-}
-
-static void Cleanup_cb( void *opaque )
-{
-    // here we can release all things Direct3D11 for good (if playing only one file)
-    struct render_context *ctx = static_cast<struct render_context *>( opaque );
-}
-
-static void Resize_cb( void *opaque,
-                       void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
-                       void *report_opaque )
-{
-    struct render_context *ctx = static_cast<struct render_context *>( opaque );
-    EnterCriticalSection(&ctx->sizeLock);
-    ctx->ReportSize = report_size_change;
-    ctx->ReportOpaque = report_opaque;
-
-    if (ctx->ReportSize != nullptr)
-    {
-        /* report our initial size */
-        ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
-    }
-    LeaveCriticalSection(&ctx->sizeLock);
-}
-
 static const char *shaderStr = "\
 Texture2D shaderTexture;\n\
 SamplerState samplerState;\n\
@@ -434,6 +282,158 @@ static void release_direct3d(struct render_context *ctx)
     ctx->swapchainRenderTarget->Release();
     ctx->d3dctx->Release();
     ctx->d3device->Release();
+}
+
+static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
+{
+    struct render_context *ctx = static_cast<struct render_context *>( opaque );
+
+    HRESULT hr;
+
+    DXGI_FORMAT renderFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+    if (ctx->texture)
+    {
+        ctx->texture->Release();
+        ctx->texture = NULL;
+    }
+    if (ctx->textureVLC)
+    {
+        ctx->textureVLC->Release();
+        ctx->textureVLC = NULL;
+    }
+    if (ctx->textureShaderInput)
+    {
+        ctx->textureShaderInput->Release();
+        ctx->textureShaderInput = NULL;
+    }
+    if (ctx->textureRenderTarget)
+    {
+        ctx->textureRenderTarget->Release();
+        ctx->textureRenderTarget = NULL;
+    }
+
+    /* interim texture */
+    D3D11_TEXTURE2D_DESC texDesc = { };
+    texDesc.MipLevels = 1;
+    texDesc.SampleDesc.Count = 1;
+    texDesc.MiscFlags = 0;
+    texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    texDesc.CPUAccessFlags = 0;
+    texDesc.ArraySize = 1;
+    texDesc.Format = renderFormat;
+    texDesc.Height = cfg->height;
+    texDesc.Width  = cfg->width;
+    texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+
+    hr = ctx->d3device->CreateTexture2D( &texDesc, NULL, &ctx->texture );
+    if (FAILED(hr)) return false;
+
+    IDXGIResource1* sharedResource = NULL;
+    ctx->texture->QueryInterface(__uuidof(IDXGIResource1), (LPVOID*) &sharedResource);
+    hr = sharedResource->CreateSharedHandle(NULL, DXGI_SHARED_RESOURCE_READ|DXGI_SHARED_RESOURCE_WRITE, NULL, &ctx->sharedHandled);
+    sharedResource->Release();
+
+    ID3D11Device1* d3d11VLC1;
+    ctx->d3deviceVLC->QueryInterface(__uuidof(ID3D11Device1), (LPVOID*) &d3d11VLC1);
+    hr = d3d11VLC1->OpenSharedResource1(ctx->sharedHandled, __uuidof(ID3D11Texture2D), (void**)&ctx->textureVLC);
+    d3d11VLC1->Release();
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC resviewDesc;
+    ZeroMemory(&resviewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+    resviewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    resviewDesc.Texture2D.MipLevels = 1;
+    resviewDesc.Format = texDesc.Format;
+    hr = ctx->d3device->CreateShaderResourceView(ctx->texture, &resviewDesc, &ctx->textureShaderInput );
+    if (FAILED(hr)) return false;
+
+    ctx->d3dctx->PSSetShaderResources(0, 1, &ctx->textureShaderInput);
+
+    D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {
+        .Format = texDesc.Format,
+        .ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D,
+    };
+    hr = ctx->d3deviceVLC->CreateRenderTargetView(ctx->textureVLC, &renderTargetViewDesc, &ctx->textureRenderTarget);
+    if (FAILED(hr)) return false;
+
+    ctx->d3dctxVLC->OMSetRenderTargets( 1, &ctx->textureRenderTarget, NULL );
+
+    out->surface_format = renderFormat;
+    out->full_range     = true;
+    out->colorspace     = libvlc_video_colorspace_BT709;
+    out->primaries      = libvlc_video_primaries_BT709;
+    out->transfer       = libvlc_video_transfer_func_SRGB;
+
+    return true;
+}
+
+static void Swap_cb( void* opaque )
+{
+    struct render_context *ctx = static_cast<struct render_context *>( opaque );
+    ctx->swapchain->Present( 0, 0 );
+}
+
+static bool StartRendering_cb( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *hdr10 )
+{
+    struct render_context *ctx = static_cast<struct render_context *>( opaque );
+    if ( enter )
+    {
+        // DEBUG: draw greenish background to show where libvlc doesn't draw in the texture
+        // Normally you should Clear with a black background
+        static const FLOAT greenRGBA[4] = {0.5f, 0.5f, 0.0f, 1.0f};
+        ctx->d3dctxVLC->ClearRenderTargetView( ctx->textureRenderTarget, greenRGBA);
+    }
+    else
+    {
+        static const FLOAT orangeRGBA[4] = {1.0f, 0.5f, 0.0f, 1.0f};
+        ctx->d3dctx->ClearRenderTargetView(ctx->swapchainRenderTarget, orangeRGBA);
+
+        // Render into the swapchain
+        // We start the drawing of the shared texture in our app as early as possible
+        // in hope it's done as soon as Swap_cb is called
+        ctx->d3dctx->DrawIndexed(ctx->quadIndexCount, 0, 0);
+    }
+
+    return true;
+}
+
+static bool SelectPlane_cb( void *opaque, size_t plane )
+{
+    struct render_context *ctx = static_cast<struct render_context *>( opaque );
+    if ( plane != 0 ) // we only support one packed RGBA plane (DXGI_FORMAT_R8G8B8A8_UNORM)
+        return false;
+    return true;
+}
+
+static bool Setup_cb( void **opaque, const libvlc_video_direct3d_device_cfg_t *cfg, libvlc_video_direct3d_device_setup_t *out )
+{
+    struct render_context *ctx = static_cast<struct render_context *>(*opaque);
+    out->device_context = ctx->d3dctxVLC;
+    return true;
+}
+
+static void Cleanup_cb( void *opaque )
+{
+    // here we can release all things Direct3D11 for good (if playing only one file)
+    struct render_context *ctx = static_cast<struct render_context *>( opaque );
+}
+
+static void Resize_cb( void *opaque,
+                       void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
+                       void *report_opaque )
+{
+    struct render_context *ctx = static_cast<struct render_context *>( opaque );
+    EnterCriticalSection(&ctx->sizeLock);
+    ctx->ReportSize = report_size_change;
+    ctx->ReportOpaque = report_opaque;
+
+    if (ctx->ReportSize != nullptr)
+    {
+        /* report our initial size */
+        ctx->ReportSize(ctx->ReportOpaque, ctx->width, ctx->height);
+    }
+    LeaveCriticalSection(&ctx->sizeLock);
 }
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
