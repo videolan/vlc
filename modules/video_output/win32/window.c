@@ -493,8 +493,6 @@ static void Close(vout_window_t *wnd)
             vlc_cond_wait( &sys->wait, &sys->lock );
         }
         vlc_mutex_unlock( &sys->lock );
-
-        DestroyWindow( sys->hwnd );
     }
     vlc_join(sys->thread, NULL);
     vlc_mutex_destroy( &sys->lock );
