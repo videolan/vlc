@@ -488,7 +488,9 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
 
     ADDF("%s", renderer->glsl_precision_header);
 
-    ADD("varying vec2 PicCoords;\n");
+    ADD("varying vec2 PicCoords;\n"
+        "uniform mat4 TransformMatrix;\n"
+        "uniform mat4 OrientationMatrix;\n");
     for (unsigned i = 0; i < interop->tex_count; ++i)
         ADDF("uniform %s Texture%u;\n"
              "uniform mat3 TexCoordsMap%u;\n", sampler, i, i);
@@ -585,8 +587,8 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
 
     ADD("uniform vec4 FillColor;\n"
         "void main(void) {\n"
-        /* Homogeneous coordinates */
-        " vec3 pic_hcoords = vec3(PicCoords, 1.0);\n"
+        /* Homogeneous (oriented) coordinates */
+        " vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(PicCoords, 0.0, 1.0)).st, 1.0);\n"
         " vec2 tex_coords;\n");
 
     unsigned color_count;
