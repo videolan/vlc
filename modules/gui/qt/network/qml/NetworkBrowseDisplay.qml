@@ -125,6 +125,8 @@ Widgets.NavigableFocusScope {
                 width: view.width
                 text: providerModel.name
 
+                navigable: inlineItem.visible
+
                 inlineComponent: Widgets.TabButtonExt {
                     focus: true
                     iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
@@ -211,6 +213,8 @@ Widgets.NavigableFocusScope {
                 text: providerModel.name
                 width: view.width
 
+                navigable: inlineItem.visible
+
                 inlineComponent: Widgets.TabButtonExt {
                     focus: true
                     iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
@@ -221,6 +225,7 @@ Widgets.NavigableFocusScope {
 
                 Keys.onPressed: defaultKeyAction(event, 0)
                 navigationParent: root
+                navigationUpItem: root.navigationUpItem
                 navigationDown: function() {
                     focus = false
                     listView.forceActiveFocus()

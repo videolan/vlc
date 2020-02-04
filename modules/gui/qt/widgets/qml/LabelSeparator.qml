@@ -34,6 +34,7 @@ Widgets.NavigableFocusScope {
     property alias color: txt.color
 
     property Component inlineComponent: Item {}
+    property alias inlineItem: inlineComponentLoader.item
 
     ColumnLayout {
         id: colLayout
