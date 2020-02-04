@@ -36,6 +36,11 @@ Dialog {
     padding: VLCStyle.margin_normal
     margins: VLCStyle.margin_large
 
+    implicitWidth: contentWidth > 0 ? contentWidth + leftPadding + rightPadding : 0
+    implicitHeight: (header && header.visible ? header.implicitHeight + spacing : 0)
+                    + (footer && footer.visible ? footer.implicitHeight + spacing : 0)
+                    + (contentHeight > 0 ? contentHeight + topPadding + bottomPadding : 0)
+
     Overlay.modal: GaussianBlur {
         source: ShaderEffectSource {
             sourceItem: control.rootWindow
