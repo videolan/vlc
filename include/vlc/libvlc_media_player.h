@@ -676,6 +676,23 @@ typedef enum libvlc_video_engine_t {
     libvlc_video_engine_gles2,
 } libvlc_video_engine_t;
 
+/** Set the callback to call when the host app resizes the rendering area.
+ *
+ * This allows text rendering and aspect ratio to be handled properly when the host
+ * rendering size changes.
+ *
+ * It may be called before the \ref libvlc_video_output_setup_cb callback.
+ *
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
+ * \param report_size_change callback which must be called when the host size changes. [IN]
+ *        The callback is valid until another call to \ref libvlc_video_output_set_resize_cb
+ *        is done. This may be called from any thread.
+ * \param report_opaque private pointer to pass to the \ref report_size_change callback. [IN]
+ */
+typedef void( *libvlc_video_output_set_resize_cb )( void *opaque,
+                                                    void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
+                                                    void *report_opaque );
+
 /**
  * Set callbacks and data to render decoded video to a custom texture
  *
@@ -720,23 +737,6 @@ typedef enum libvlc_video_direct3d_engine_t {
     /** Direct3D9 rendering engine */
     libvlc_video_direct3d_engine_d3d9,
 } libvlc_video_direct3d_engine_t;
-
-/** Set the callback to call when the host app resizes the rendering area.
- *
- * This allows text rendering and aspect ratio to be handled properly when the host
- * rendering size changes.
- *
- * It may be called before the \ref libvlc_video_output_setup_cb callback.
- *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
- * \param report_size_change callback which must be called when the host size changes. [IN]
- *        The callback is valid until another call to \ref libvlc_video_direct3d_set_resize_cb
- *        is done. This may be called from any thread.
- * \param report_opaque private pointer to pass to the \ref report_size_change callback. [IN]
- */
-typedef void( *libvlc_video_direct3d_set_resize_cb )( void *opaque,
-                                                      void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
-                                                      void *report_opaque );
 
 /** Tell the host the rendering for the given plane is about to start
  *
@@ -786,7 +786,7 @@ bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
                                          libvlc_video_direct3d_engine_t engine,
                                          libvlc_video_output_setup_cb setup_cb,
                                          libvlc_video_output_cleanup_cb cleanup_cb,
-                                         libvlc_video_direct3d_set_resize_cb resize_cb,
+                                         libvlc_video_output_set_resize_cb resize_cb,
                                          libvlc_video_update_output_cb update_output_cb,
                                          libvlc_video_swap_cb swap_cb,
                                          libvlc_video_makeCurrent_cb makeCurrent_cb,

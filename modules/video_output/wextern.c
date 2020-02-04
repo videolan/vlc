@@ -48,8 +48,8 @@ vlc_module_begin()
 vlc_module_end()
 
 typedef struct {
-    void                                     *opaque;
-    libvlc_video_direct3d_set_resize_cb      setResizeCb;
+    void                                   *opaque;
+    libvlc_video_output_set_resize_cb      setResizeCb;
 } wextern_t;
 
 static void WindowResize(void *opaque, unsigned width, unsigned height)
