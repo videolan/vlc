@@ -503,16 +503,44 @@ void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_cleanup_cb cleanup );
 
 
+typedef struct
+{
+    bool hardware_decoding; /** set if D3D11_CREATE_DEVICE_VIDEO_SUPPORT is needed for D3D11 */
+} libvlc_video_setup_device_cfg_t;
+
+typedef struct
+{
+    union {
+        void *device_context; /** ID3D11DeviceContext* for D3D11, IDirect3D9 * for D3D9 */
+        int  adapter;         /** Adapter to use with the IDirect3D9 for D3D9 */
+    };
+} libvlc_video_setup_device_info_t;
+
 /**
  * Callback prototype called to initialize user data.
+ * Setup the rendering environment.
  *
  * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks()
+ *               or @a libvlc_video_direct3d_set_callbacks()
  *               on input. The callback can change this value on output to be
  *               passed to all the other callbacks set on @a libvlc_video_set_output_callbacks(). [IN/OUT]
+ *               or @a libvlc_video_set_output_callbacks(). [IN/OUT]
+ * \param cfg requested configuration of the video device [IN]
+ * \param out libvlc_video_setup_device_info_t* to fill [OUT]
  * \return true on success
  * \version LibVLC 4.0.0 or later
+ *
+ * For \ref libvlc_video_direct3d_engine_d3d9 the output must be a IDirect3D9*.
+ * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
+ * the device must be created with D3DPRESENT_PARAMETERS.hDeviceWindow set to 0.
+ *
+ * For \ref libvlc_video_direct3d_engine_d3d11 the output must be a ID3D11DeviceContext*.
+ * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
+ * The ID3D11Device used to create ID3D11DeviceContext must have multithreading enabled.
  */
-typedef bool (*libvlc_video_setup_cb)(void** opaque);
+typedef bool (*libvlc_video_setup_cb)(void **opaque,
+                                      const libvlc_video_setup_device_cfg_t *cfg,
+                                      libvlc_video_setup_device_info_t *out);
 
 
 /**
@@ -551,8 +579,7 @@ typedef struct
  * Callback prototype called on video size changes.
  * Update the rendering output setup.
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb()
- *        or @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
  * \param cfg configuration of the video that will be rendered [IN]
  * \param output configuration describing with how the rendering is setup [OUT]
  * \version LibVLC 4.0.0 or later
@@ -572,8 +599,7 @@ typedef bool (*libvlc_video_update_output_cb)(void* opaque, const libvlc_video_r
 /**
  * Callback prototype called after performing drawing calls.
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb()
- *        or @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
  * \version LibVLC 4.0.0 or later
  */
 typedef void (*libvlc_video_swap_cb)(void* opaque);
@@ -582,8 +608,7 @@ typedef void (*libvlc_video_swap_cb)(void* opaque);
  * Callback prototype to set up the OpenGL context for rendering.
  * Tell the host the rendering is about to start/has finished.
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb()
- *        or @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
  * \param enter true to set the context as current, false to unset it [IN]
  * \return true on success
  * \version LibVLC 4.0.0 or later
@@ -696,44 +721,9 @@ typedef enum libvlc_video_direct3d_engine_t {
     libvlc_video_direct3d_engine_d3d9,
 } libvlc_video_direct3d_engine_t;
 
-typedef struct
-{
-    bool hardware_decoding; /** set if D3D11_CREATE_DEVICE_VIDEO_SUPPORT is needed for D3D11 */
-} libvlc_video_setup_device_cfg_t;
-
-typedef struct
-{
-    union {
-        void *device_context; /** ID3D11DeviceContext* for D3D11, IDirect3D9 * for D3D9 */
-        int  adapter;         /** Adapter to use with the IDirect3D9 for D3D9 */
-    };
-} libvlc_video_setup_device_info_t;
-
-/** Setup the rendering environment.
+/** Cleanup the rendering environment initialized during \ref libvlc_video_setup_cb.
  *
- * \param opaque private pointer passed to the @a libvlc_video_direct3d_set_callbacks()
- *               on input. The callback can change this value on output to be
- *               passed to all the other callbacks set on @a libvlc_video_direct3d_set_callbacks(). [IN/OUT]
- * \param cfg requested configuration of the video device [IN]
- * \param out libvlc_video_setup_device_info_t* to fill [OUT]
- * \return true on success
- * \version LibVLC 4.0.0 or later
- *
- * For \ref libvlc_video_direct3d_engine_d3d9 the output must be a IDirect3D9*.
- * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
- * the device must be created with D3DPRESENT_PARAMETERS.hDeviceWindow set to 0.
- *
- * For \ref libvlc_video_direct3d_engine_d3d11 the output must be a ID3D11DeviceContext*.
- * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
- * The ID3D11Device used to create ID3D11DeviceContext must have multithreading enabled.
- */
-typedef bool( *libvlc_video_direct3d_device_setup_cb )( void **opaque,
-                                                        const libvlc_video_setup_device_cfg_t *cfg,
-                                                        libvlc_video_setup_device_info_t *out );
-
-/** Cleanup the rendering environment initialized during \ref libvlc_video_direct3d_device_setup_cb.
- *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
  * \version LibVLC 4.0.0 or later
  */
 typedef void( *libvlc_video_direct3d_device_cleanup_cb )( void *opaque );
@@ -743,9 +733,9 @@ typedef void( *libvlc_video_direct3d_device_cleanup_cb )( void *opaque );
  * This allows text rendering and aspect ratio to be handled properly when the host
  * rendering size changes.
  *
- * It may be called before the \ref libvlc_video_direct3d_device_setup_cb callback.
+ * It may be called before the \ref libvlc_video_setup_cb callback.
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
  * \param report_size_change callback which must be called when the host size changes. [IN]
  *        The callback is valid until another call to \ref libvlc_video_direct3d_set_resize_cb
  *        is done. This may be called from any thread.
@@ -757,8 +747,7 @@ typedef void( *libvlc_video_direct3d_set_resize_cb )( void *opaque,
 
 /** Tell the host the rendering for the given plane is about to start
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb()
- *        or @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
  * \param plane number of the rendering plane to select
  * \return true on success
  * \version LibVLC 4.0.0 or later
@@ -802,7 +791,7 @@ typedef bool( *libvlc_video_direct3d_select_plane_cb )( void *opaque, size_t pla
 LIBVLC_API
 bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
                                          libvlc_video_direct3d_engine_t engine,
-                                         libvlc_video_direct3d_device_setup_cb setup_cb,
+                                         libvlc_video_setup_cb setup_cb,
                                          libvlc_video_direct3d_device_cleanup_cb cleanup_cb,
                                          libvlc_video_direct3d_set_resize_cb resize_cb,
                                          libvlc_video_update_output_cb update_output_cb,

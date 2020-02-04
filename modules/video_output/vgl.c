@@ -141,11 +141,15 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     gl->destroy = Close;
 
     if( sys->setupCb )
-        if( !sys->setupCb(&sys->opaque) )
+    {
+        libvlc_video_setup_device_cfg_t setup_cfg = {};
+        libvlc_video_setup_device_info_t configured_cfg;
+        if( !sys->setupCb(&sys->opaque, &setup_cfg, &configured_cfg) )
         {
             msg_Err( gl, "user setup failed" );
             return VLC_EGENERIC;
         }
+    }
 
     Resize(gl, width, height);
     return VLC_SUCCESS;
