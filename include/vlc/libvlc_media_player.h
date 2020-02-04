@@ -417,7 +417,7 @@ typedef unsigned (*libvlc_video_format_cb)(void **opaque, char *chroma,
 /**
  * Callback prototype to configure picture buffers format.
  *
- * \param opaque private pointer as passed to libvlc_video_set_callbacks()
+ * \param opaque private pointer as passed to libvlc_video_set_format_callbacks()
  *               (and possibly modified by @ref libvlc_video_format_cb) [IN]
  */
 typedef void (*libvlc_video_cleanup_cb)(void *opaque);
