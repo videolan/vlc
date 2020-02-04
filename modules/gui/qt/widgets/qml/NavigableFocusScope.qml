@@ -52,12 +52,12 @@ FocusScope {
 
     function defaultNavigationUp(index) {
         if (navigationUpItem) {
-            var item = navigationUpItem
-            while (item && (!item.visible || !item.enabled || !(item.navigable === undefined || item.navigable))) {
-                item = item.navigationUpItem
-            }
-            if (item) {
-                item.forceActiveFocus()
+            if (navigationUpItem.visible
+                && navigationUpItem.enabled
+                && (navigationUpItem.navigable === undefined || navigationUpItem.navigable)) {
+                navigationUpItem.forceActiveFocus()
+            } else {
+                navigationUpItem.navigationUp(index)
             }
         } else if (navigationParent) {
             navigationParent.navigationUp(index)
@@ -69,11 +69,12 @@ FocusScope {
     function defaultNavigationDown(index) {
         if (navigationDownItem) {
             var item = navigationDownItem
-            while (item && (!item.visible || !item.enabled || !(item.navigable === undefined || item.navigable))) {
-                item = item.navigationDownItem
-            }
-            if (item) {
+            if (item.visible
+                && item.enabled
+                && (item.navigable === undefined || item.navigable)) {
                 item.forceActiveFocus()
+            } else {
+                item.navigationDown(index)
             }
         } else if (navigationParent) {
             navigationParent.navigationDown(index)
@@ -85,11 +86,12 @@ FocusScope {
     function defaultNavigationLeft(index) {
         if (navigationLeftItem) {
             var item = navigationLeftItem
-            while (item && (!item.visible || !item.enabled || !(item.navigable === undefined || item.navigable))) {
-                item = item.navigationLeftItem
-            }
-            if (item) {
+            if (item.visible
+                && item.enabled
+                && (item.navigable === undefined || item.navigable)) {
                 item.forceActiveFocus()
+            } else {
+                item.navigationLeft(index)
             }
         } else if (navigationParent) {
             navigationParent.navigationLeft(index)
@@ -101,11 +103,12 @@ FocusScope {
     function defaultNavigationRight(index) {
         if (navigationRightItem) {
             var item = navigationRightItem
-            while (item && (!item.visible || !item.enabled || !(item.navigable === undefined || item.navigable))) {
-                item = item.navigationRightItem
-            }
-            if (item) {
+            if (item.visible
+                && item.enabled
+                && (item.navigable === undefined || item.navigable)) {
                 item.forceActiveFocus()
+            } else {
+                item.navigationRight(index)
             }
         } else if (navigationParent) {
             navigationParent.navigationRight(index)
@@ -117,11 +120,12 @@ FocusScope {
     function defaultNavigationCancel(index) {
         if (navigationCancelItem) {
             var item = navigationCancelItem
-            while (item && (!item.visible || !item.enabled || !(item.navigable === undefined || item.navigable))) {
-                item = item.navigationCancelItem
-            }
-            if (item) {
+            if (item.visible
+                && item.enabled
+                && (item.navigable === undefined || item.navigable)) {
                 item.forceActiveFocus()
+            } else {
+                item.navigationCancel(index)
             }
         } else if (navigationParent) {
             navigationParent.navigationCancel(index)
