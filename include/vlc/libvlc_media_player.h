@@ -523,6 +523,12 @@ typedef void (*libvlc_video_cleanup_cb)(void* opaque);
 
 typedef struct
 {
+    unsigned width;                        /** rendering video width in pixel */
+    unsigned height;                      /** rendering video height in pixel */
+} libvlc_video_render_cfg_t;
+
+typedef struct
+{
     int surface_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_direct3d_engine_d3d11,
                           D3DFORMAT for \ref libvlc_video_direct3d_engine_d3d9,
                           GL_RGBA or GL_RGB for \ref libvlc_video_engine_opengl and
@@ -537,12 +543,11 @@ typedef struct
  * Callback prototype called on video size changes
  *
  * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
- * \param width video width in pixel [IN]
- * \param height video height in pixel [IN]
+ * \param cfg configuration of the video that will be rendered [IN]
  * \param output configuration describing with how the rendering is setup [OUT]
  * \version LibVLC 4.0.0 or later
  */
-typedef void (*libvlc_video_update_output_cb)(void* opaque, unsigned width, unsigned height,
+typedef void (*libvlc_video_update_output_cb)(void* opaque, const libvlc_video_render_cfg_t *cfg,
                                               libvlc_video_output_cfg_t *output );
 
 

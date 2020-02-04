@@ -116,11 +116,11 @@ public:
     }
 
     /// this callback will create the surfaces and FBO used by VLC to perform its rendering
-    static void resize(void* data, unsigned width, unsigned height,
+    static void resize(void* data, const libvlc_video_render_cfg_t *cfg,
                        libvlc_video_output_cfg_t *render_cfg)
     {
         VLCVideo* that = static_cast<VLCVideo*>(data);
-        if (width != that->m_width || height != that->m_height)
+        if (cfg->width != that->m_width || cfg->height != that->m_height)
             cleanup(data);
 
         glGenTextures(3, that->m_tex);
@@ -128,7 +128,7 @@ public:
 
         for (int i = 0; i < 3; i++) {
             glBindTexture(GL_TEXTURE_2D, that->m_tex[i]);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cfg->width, cfg->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -145,8 +145,8 @@ public:
             return;
         }
 
-        that->m_width = width;
-        that->m_height = height;
+        that->m_width = cfg->width;
+        that->m_height = cfg->height;
 
         glBindFramebuffer(GL_FRAMEBUFFER, that->m_fbo[that->m_idx_render]);
 

@@ -38,19 +38,19 @@ public:
     }
 
     /// this callback will create the surfaces and FBO used by VLC to perform its rendering
-    static void resizeRenderTextures(void* data, unsigned width, unsigned height,
+    static void resizeRenderTextures(void* data, const libvlc_video_render_cfg_t *cfg,
                                      libvlc_video_output_cfg_t *render_cfg)
     {
        VLCVideo* that = static_cast<VLCVideo*>(data);
-        if (width != that->m_width || height != that->m_height)
+        if (cfg->width != that->m_width || cfg->height != that->m_height)
             cleanup(data);
 
-        that->mBuffers[0] = new QOpenGLFramebufferObject(width, height);
-        that->mBuffers[1] = new QOpenGLFramebufferObject(width, height);
-        that->mBuffers[2] = new QOpenGLFramebufferObject(width, height);
+        that->mBuffers[0] = new QOpenGLFramebufferObject(cfg->width, cfg->height);
+        that->mBuffers[1] = new QOpenGLFramebufferObject(cfg->width, cfg->height);
+        that->mBuffers[2] = new QOpenGLFramebufferObject(cfg->width, cfg->height);
 
-        that->m_width = width;
-        that->m_height = height;
+        that->m_width = cfg->width;
+        that->m_height = cfg->height;
 
         that->mBuffers[that->m_idx_render]->bind();
 

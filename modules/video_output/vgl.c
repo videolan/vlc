@@ -82,8 +82,11 @@ static void Resize(vlc_gl_t * gl, unsigned w, unsigned h)
         return;
 
     MakeCurrent(gl);
+    libvlc_video_render_cfg_t output_cfg = {
+        w, h,
+    };
     libvlc_video_output_cfg_t render_cfg;
-    sys->resizeCb(sys->opaque, h, w, &render_cfg);
+    sys->resizeCb(sys->opaque, &output_cfg, &render_cfg);
     ReleaseCurrent(gl);
     assert(render_cfg.surface_format == GL_RGBA);
     assert(render_cfg.full_range == true);
