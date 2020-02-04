@@ -160,11 +160,11 @@ public:
     }
 
     // This callback is called during initialisation.
-    static bool setup(void* data)
+    static bool setup(void** data)
     {
-        VLCVideo* that = static_cast<VLCVideo*>(data);
-        that->m_width = 0;
-        that->m_height = 0;
+        VLCVideo** that = static_cast<VLCVideo**>(data);
+        (*that)->m_width = 0;
+        (*that)->m_height = 0;
         return true;
     }
 

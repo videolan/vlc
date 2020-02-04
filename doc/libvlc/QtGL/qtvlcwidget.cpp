@@ -64,14 +64,14 @@ public:
     }
 
     // This callback is called during initialisation.
-    static bool setup(void* data)
+    static bool setup(void** data)
     {
         if (!QOpenGLContext::supportsThreadedOpenGL())
             return false;
 
-        VLCVideo* that = static_cast<VLCVideo*>(data);
-        that->m_width = 0;
-        that->m_height = 0;
+        VLCVideo** that = static_cast<VLCVideo**>(data);
+        (*that)->m_width = 0;
+        (*that)->m_height = 0;
         return true;
     }
 

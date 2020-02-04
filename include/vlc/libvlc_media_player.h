@@ -506,17 +506,19 @@ void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
 /**
  * Callback prototype called to initialize user data.
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
+ * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks()
+ *               on input. The callback can change this value on output to be
+ *               passed to all the other callbacks set on @a libvlc_video_set_output_callbacks(). [IN/OUT]
  * \return true on success
  * \version LibVLC 4.0.0 or later
  */
-typedef bool (*libvlc_video_setup_cb)(void* opaque);
+typedef bool (*libvlc_video_setup_cb)(void** opaque);
 
 
 /**
  * Callback prototype called to release user data
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
  * \version LibVLC 4.0.0 or later
  */
 typedef void (*libvlc_video_output_cleanup_cb)(void* opaque);
@@ -549,8 +551,8 @@ typedef struct
  * Callback prototype called on video size changes.
  * Update the rendering output setup.
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() or
- *         @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb()
+ *        or @a libvlc_video_direct3d_device_setup_cb() [IN]
  * \param cfg configuration of the video that will be rendered [IN]
  * \param output configuration describing with how the rendering is setup [OUT]
  * \version LibVLC 4.0.0 or later
@@ -570,7 +572,8 @@ typedef bool (*libvlc_video_update_output_cb)(void* opaque, const libvlc_video_r
 /**
  * Callback prototype called after performing drawing calls.
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb()
+ *        or @a libvlc_video_direct3d_device_setup_cb() [IN]
  * \version LibVLC 4.0.0 or later
  */
 typedef void (*libvlc_video_swap_cb)(void* opaque);
@@ -579,8 +582,8 @@ typedef void (*libvlc_video_swap_cb)(void* opaque);
  * Callback prototype to set up the OpenGL context for rendering.
  * Tell the host the rendering is about to start/has finished.
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() or
- *          @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb()
+ *        or @a libvlc_video_direct3d_device_setup_cb() [IN]
  * \param enter true to set the context as current, false to unset it [IN]
  * \return true on success
  * \version LibVLC 4.0.0 or later
@@ -605,7 +608,7 @@ typedef bool (*libvlc_video_makeCurrent_cb)(void* opaque, bool enter);
 /**
  * Callback prototype to load opengl functions
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
  * \param fct_name name of the opengl function to load
  * \return a pointer to the named OpenGL function the NULL otherwise
  * \version LibVLC 4.0.0 or later
@@ -754,7 +757,8 @@ typedef void( *libvlc_video_direct3d_set_resize_cb )( void *opaque,
 
 /** Tell the host the rendering for the given plane is about to start
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb()
+ *        or @a libvlc_video_direct3d_device_setup_cb() [IN]
  * \param plane number of the rendering plane to select
  * \return true on success
  * \version LibVLC 4.0.0 or later

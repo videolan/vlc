@@ -141,7 +141,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     gl->destroy = Close;
 
     if( sys->setupCb )
-        if( !sys->setupCb(sys->opaque) )
+        if( !sys->setupCb(&sys->opaque) )
         {
             msg_Err( gl, "user setup failed" );
             return VLC_EGENERIC;
