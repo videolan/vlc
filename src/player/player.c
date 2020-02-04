@@ -752,25 +752,24 @@ void
 vlc_player_SetTeletextEnabled(vlc_player_t *player, bool enabled)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    if (!input || !input->teletext_menu)
+    if (!input || !input->teletext_source)
         return;
     if (enabled)
-        vlc_player_SelectEsId(player, input->teletext_menu->t.es_id,
+        vlc_player_SelectEsId(player, input->teletext_source->t.es_id,
                               VLC_PLAYER_SELECT_EXCLUSIVE);
     else
-        vlc_player_UnselectEsId(player, input->teletext_menu->t.es_id);
+        vlc_player_UnselectEsId(player, input->teletext_source->t.es_id);
 }
 
 void
 vlc_player_SelectTeletextPage(vlc_player_t *player, unsigned page)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    if (!input || !input->teletext_menu)
+    if (!input || !input->teletext_source)
         return;
-
     input_ControlPush(input->thread, INPUT_CONTROL_SET_VBI_PAGE,
         &(input_control_param_t) {
-            .vbi_page.id = input->teletext_menu->t.es_id,
+            .vbi_page.id = input->teletext_source->t.es_id,
             .vbi_page.page = page,
     });
 }
@@ -779,12 +778,12 @@ void
 vlc_player_SetTeletextTransparency(vlc_player_t *player, bool enabled)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    if (!input || !input->teletext_menu)
+    if (!input || !input->teletext_source)
         return;
 
     input_ControlPush(input->thread, INPUT_CONTROL_SET_VBI_TRANSPARENCY,
         &(input_control_param_t) {
-            .vbi_transparency.id = input->teletext_menu->t.es_id,
+            .vbi_transparency.id = input->teletext_source->t.es_id,
             .vbi_transparency.enabled = enabled,
     });
 }
@@ -793,7 +792,7 @@ bool
 vlc_player_HasTeletextMenu(vlc_player_t *player)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    return input && input->teletext_menu;
+    return input && input->teletext_source;
 }
 
 bool
@@ -802,7 +801,7 @@ vlc_player_IsTeletextEnabled(vlc_player_t *player)
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
     if (input && input->teletext_enabled)
     {
-        assert(input->teletext_menu);
+        assert(input->teletext_source);
         return true;
     }
     return false;

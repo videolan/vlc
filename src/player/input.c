@@ -354,48 +354,123 @@ vlc_player_input_HandleProgramEvent(struct vlc_player_input *input,
     }
 }
 
+static const struct vlc_player_track_priv *
+vlc_player_FindTeletextSource(const struct vlc_player_input *input,
+                              const struct vlc_player_track_priv *exclude,
+                              bool selected)
+{
+    const struct vlc_player_track_priv *t;
+    vlc_vector_foreach(t, &input->spu_track_vector)
+    {
+        if (t->t.fmt.i_codec == VLC_CODEC_TELETEXT &&
+           t != exclude &&
+           t->t.selected == selected)
+            return t;
+    }
+    return NULL;
+}
+
+static unsigned
+vlc_player_input_TeletextUserPage(const struct vlc_player_track_priv *t)
+{
+    const uint8_t mag = t->t.fmt.subs.teletext.i_magazine;
+    const uint8_t page = t->t.fmt.subs.teletext.i_page;
+    return (mag % 10) * 100 +
+           (page & 0x0F) + ((page >> 4) & 0x0F) * 10;
+}
+
 static void
 vlc_player_input_HandleTeletextMenu(struct vlc_player_input *input,
-                                    const struct vlc_input_event_es *ev)
+                                    const struct vlc_input_event_es *ev,
+                                    const struct vlc_player_track_priv *trackpriv)
 {
     vlc_player_t *player = input->player;
+    if (ev->fmt->i_cat != SPU_ES ||
+        ev->fmt->i_codec != VLC_CODEC_TELETEXT)
+        return;
     switch (ev->action)
     {
         case VLC_INPUT_ES_ADDED:
-            if (input->teletext_menu)
+        {
+            if (!input->teletext_source)
             {
-                msg_Warn(player, "Can't handle more than one teletext menu "
-                         "track. Using the last one.");
-                vlc_player_track_priv_Delete(input->teletext_menu);
+                input->teletext_source = trackpriv;
+                vlc_player_SendEvent(player, on_teletext_menu_changed, true);
             }
-            input->teletext_menu = vlc_player_track_priv_New(ev->id, ev->title,
-                                                             ev->fmt);
-            if (!input->teletext_menu)
-                return;
-
-            vlc_player_SendEvent(player, on_teletext_menu_changed, true);
             break;
+        }
         case VLC_INPUT_ES_DELETED:
         {
-            if (input->teletext_menu && input->teletext_menu->t.es_id == ev->id)
+            if (input->teletext_source == trackpriv)
             {
-                assert(!input->teletext_enabled);
-
-                vlc_player_track_priv_Delete(input->teletext_menu);
-                input->teletext_menu = NULL;
-                vlc_player_SendEvent(player, on_teletext_menu_changed, false);
+                input->teletext_source =
+                        vlc_player_FindTeletextSource(input, trackpriv, true);
+                if (!input->teletext_source)
+                    input->teletext_source =
+                            vlc_player_FindTeletextSource(input, trackpriv, false);
+                if (!input->teletext_source) /* no more teletext ES */
+                {
+                    if (input->teletext_enabled)
+                    {
+                        input->teletext_enabled = false;
+                        vlc_player_SendEvent(player, on_teletext_enabled_changed, false);
+                    }
+                    vlc_player_SendEvent(player, on_teletext_menu_changed, false);
+                }
+                else /* another teletext ES was reselected */
+                {
+                    if (input->teletext_source->t.selected != input->teletext_enabled)
+                    {
+                        input->teletext_enabled = input->teletext_source->t.selected;
+                        vlc_player_SendEvent(player, on_teletext_enabled_changed,
+                                             input->teletext_source->t.selected);
+                    }
+                    input->teletext_page =
+                            vlc_player_input_TeletextUserPage(input->teletext_source);
+                    vlc_player_SendEvent(player, on_teletext_page_changed,
+                                         input->teletext_page);
+                }
             }
             break;
         }
         case VLC_INPUT_ES_UPDATED:
             break;
         case VLC_INPUT_ES_SELECTED:
-        case VLC_INPUT_ES_UNSELECTED:
-            if (input->teletext_menu->t.es_id == ev->id)
+        {
+            if (!input->teletext_enabled) /* we stick with the first selected */
             {
-                input->teletext_enabled = ev->action == VLC_INPUT_ES_SELECTED;
-                vlc_player_SendEvent(player, on_teletext_enabled_changed,
-                                     input->teletext_enabled);
+                input->teletext_source = trackpriv;
+                input->teletext_enabled = true;
+                input->teletext_page = vlc_player_input_TeletextUserPage(trackpriv);
+                vlc_player_SendEvent(player, on_teletext_enabled_changed, true);
+                vlc_player_SendEvent(player, on_teletext_page_changed,
+                                     input->teletext_page);
+            }
+            break;
+        }
+        case VLC_INPUT_ES_UNSELECTED:
+            if (input->teletext_source == trackpriv)
+            {
+                /* If there's another selected teletext, it needs to become source */
+                const struct vlc_player_track_priv *other =
+                        vlc_player_FindTeletextSource(input, trackpriv, true);
+                if (other)
+                {
+                    input->teletext_source = other;
+                    if (!input->teletext_enabled)
+                    {
+                        input->teletext_enabled = true;
+                        vlc_player_SendEvent(player, on_teletext_enabled_changed, true);
+                    }
+                    input->teletext_page = vlc_player_input_TeletextUserPage(other);
+                    vlc_player_SendEvent(player, on_teletext_page_changed,
+                                         input->teletext_page);
+                }
+                else
+                {
+                    input->teletext_enabled = false;
+                    vlc_player_SendEvent(player, on_teletext_enabled_changed, false);
+                }
             }
             break;
         default:
@@ -408,14 +483,6 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
                                const struct vlc_input_event_es *ev)
 {
     assert(ev->id && ev->title && ev->fmt);
-
-    if (ev->fmt->i_cat == SPU_ES && ev->fmt->i_codec == VLC_CODEC_TELETEXT
-     && (ev->fmt->subs.teletext.i_magazine == 1
-      || ev->fmt->subs.teletext.i_magazine > 8))
-    {
-        vlc_player_input_HandleTeletextMenu(input, ev);
-        return;
-    }
 
     vlc_player_track_vector *vec =
         vlc_player_input_GetTrackVector(input, ev->fmt->i_cat);
@@ -438,6 +505,7 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
             }
             vlc_player_SendEvent(player, on_track_list_changed,
                                  VLC_PLAYER_LIST_ADDED, &trackpriv->t);
+            vlc_player_input_HandleTeletextMenu(input, ev, trackpriv);
             break;
         case VLC_INPUT_ES_DELETED:
         {
@@ -445,6 +513,7 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
             trackpriv = vlc_player_track_vector_FindById(vec, ev->id, &idx);
             if (trackpriv)
             {
+                vlc_player_input_HandleTeletextMenu(input, ev, trackpriv);
                 vlc_player_SendEvent(player, on_track_list_changed,
                                      VLC_PLAYER_LIST_REMOVED, &trackpriv->t);
                 vlc_vector_remove(vec, idx);
@@ -460,6 +529,7 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
                 break;
             vlc_player_SendEvent(player, on_track_list_changed,
                                  VLC_PLAYER_LIST_UPDATED, &trackpriv->t);
+            vlc_player_input_HandleTeletextMenu(input, ev, trackpriv);
             break;
         case VLC_INPUT_ES_SELECTED:
             trackpriv = vlc_player_track_vector_FindById(vec, ev->id, NULL);
@@ -469,6 +539,7 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
                 trackpriv->selected_by_user = ev->forced;
                 vlc_player_SendEvent(player, on_track_selection_changed,
                                      NULL, trackpriv->t.es_id);
+                vlc_player_input_HandleTeletextMenu(input, ev, trackpriv);
             }
             break;
         case VLC_INPUT_ES_UNSELECTED:
@@ -480,6 +551,7 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
                 trackpriv->selected_by_user = false;
                 vlc_player_SendEvent(player, on_track_selection_changed,
                                      trackpriv->t.es_id, NULL);
+                vlc_player_input_HandleTeletextMenu(input, ev, trackpriv);
             }
             break;
         default:
@@ -856,7 +928,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     vlc_vector_init(&input->video_track_vector);
     vlc_vector_init(&input->audio_track_vector);
     vlc_vector_init(&input->spu_track_vector);
-    input->teletext_menu = NULL;
+    input->teletext_source = NULL;
 
     input->titles = NULL;
     input->title_selected = input->chapter_selected = 0;
@@ -934,7 +1006,7 @@ vlc_player_input_Delete(struct vlc_player_input *input)
     assert(input->video_track_vector.size == 0);
     assert(input->audio_track_vector.size == 0);
     assert(input->spu_track_vector.size == 0);
-    assert(input->teletext_menu == NULL);
+    assert(input->teletext_source == NULL);
 
     vlc_vector_destroy(&input->program_vector);
     vlc_vector_destroy(&input->video_track_vector);

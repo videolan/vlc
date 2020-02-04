@@ -85,7 +85,7 @@ struct vlc_player_input
     vlc_player_track_vector video_track_vector;
     vlc_player_track_vector audio_track_vector;
     vlc_player_track_vector spu_track_vector;
-    struct vlc_player_track_priv *teletext_menu;
+    const struct vlc_player_track_priv *teletext_source;
 
     struct vlc_player_title_list *titles;
 
