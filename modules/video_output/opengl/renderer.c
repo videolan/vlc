@@ -935,11 +935,10 @@ vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
      || source->i_visible_width != renderer->last_source.i_visible_width
      || source->i_visible_height != renderer->last_source.i_visible_height)
     {
-        float left[PICTURE_PLANE_MAX];
-        float top[PICTURE_PLANE_MAX];
-        float right[PICTURE_PLANE_MAX];
-        float bottom[PICTURE_PLANE_MAX];
         const struct vlc_gl_interop *interop = renderer->interop;
+
+        memset(renderer->var.TexCoordsMap, 0,
+               sizeof(renderer->var.TexCoordsMap));
         for (unsigned j = 0; j < interop->tex_count; j++)
         {
             float scale_w = (float)interop->texs[j].w.num / interop->texs[j].w.den
@@ -958,16 +957,11 @@ vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
                - Add a "-1" when computing right and bottom, however the
                last row/column might not be displayed at all.
             */
-            left[j]   = (source->i_x_offset +                       0 ) * scale_w;
-            top[j]    = (source->i_y_offset +                       0 ) * scale_h;
-            right[j]  = (source->i_x_offset + source->i_visible_width ) * scale_w;
-            bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
-        }
+            float left   = (source->i_x_offset +                       0 ) * scale_w;
+            float top    = (source->i_y_offset +                       0 ) * scale_h;
+            float right  = (source->i_x_offset + source->i_visible_width ) * scale_w;
+            float bottom = (source->i_y_offset + source->i_visible_height) * scale_h;
 
-        memset(renderer->var.TexCoordsMap, 0,
-               sizeof(renderer->var.TexCoordsMap));
-        for (unsigned j = 0; j < interop->tex_count; ++j)
-        {
             /**
              * This matrix converts from picture coordinates (in range [0; 1])
              * to textures coordinates where the picture is actually stored
@@ -1004,10 +998,10 @@ vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
             GLfloat *matrix = renderer->var.TexCoordsMap[j];
 #define COL(x) (x*3)
 #define ROW(x) (x)
-            matrix[COL(0) + ROW(0)] = right[j] - left[j];
-            matrix[COL(1) + ROW(1)] = bottom[j] - top[j];
-            matrix[COL(2) + ROW(0)] = left[j];
-            matrix[COL(2) + ROW(1)] = top[j];
+            matrix[COL(0) + ROW(0)] = right - left;
+            matrix[COL(1) + ROW(1)] = bottom - top;
+            matrix[COL(2) + ROW(0)] = left;
+            matrix[COL(2) + ROW(1)] = top;
 #undef COL
 #undef ROW
         }
