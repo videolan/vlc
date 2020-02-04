@@ -116,7 +116,7 @@ public:
     }
 
     /// this callback will create the surfaces and FBO used by VLC to perform its rendering
-    static void resize(void* data, const libvlc_video_render_cfg_t *cfg,
+    static bool resize(void* data, const libvlc_video_render_cfg_t *cfg,
                        libvlc_video_output_cfg_t *render_cfg)
     {
         VLCVideo* that = static_cast<VLCVideo*>(data);
@@ -155,6 +155,8 @@ public:
         render_cfg->colorspace = libvlc_video_colorspace_BT709;
         render_cfg->primaries  = libvlc_video_primaries_BT709;
         render_cfg->transfer   = libvlc_video_transfer_func_SRGB;
+
+        return true;
     }
 
     // This callback is called during initialisation.

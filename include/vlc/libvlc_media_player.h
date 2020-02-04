@@ -553,7 +553,7 @@ typedef struct
  * \param output configuration describing with how the rendering is setup [OUT]
  * \version LibVLC 4.0.0 or later
  */
-typedef void (*libvlc_video_update_output_cb)(void* opaque, const libvlc_video_render_cfg_t *cfg,
+typedef bool (*libvlc_video_update_output_cb)(void* opaque, const libvlc_video_render_cfg_t *cfg,
                                               libvlc_video_output_cfg_t *output );
 
 
