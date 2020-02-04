@@ -17,13 +17,19 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Templates 2.4 as T
 
 import "qrc:///style/"
 
-ToolButton {
+T.ToolButton {
     id: control
 
     font.pixelSize: VLCStyle.fontSize_normal
+
+    implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding
+    implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
+
+    padding: VLCStyle.margin_xxsmall
 
     contentItem: Label {
         text: control.text
@@ -51,5 +57,6 @@ ToolButton {
     }
 
     background: FocusBackground {
+        active: (control.activeFocus || control.hovered)
     }
 }
