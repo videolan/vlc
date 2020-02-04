@@ -519,7 +519,7 @@ typedef bool (*libvlc_video_setup_cb)(void* opaque);
  * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
  * \version LibVLC 4.0.0 or later
  */
-typedef void (*libvlc_video_cleanup_cb)(void* opaque);
+typedef void (*libvlc_video_output_cleanup_cb)(void* opaque);
 
 typedef struct
 {
@@ -674,7 +674,7 @@ LIBVLC_API
 bool libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_engine_t engine,
                                         libvlc_video_setup_cb setup_cb,
-                                        libvlc_video_cleanup_cb cleanup_cb,
+                                        libvlc_video_output_cleanup_cb cleanup_cb,
                                         libvlc_video_update_output_cb update_output_cb,
                                         libvlc_video_swap_cb swap_cb,
                                         libvlc_video_makeCurrent_cb makeCurrent_cb,
