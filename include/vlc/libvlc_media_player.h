@@ -705,6 +705,7 @@ typedef void( *libvlc_video_output_set_resize_cb )( void *opaque,
  * \param engine the GPU engine to use
  * \param setup_cb callback called to initialize user data
  * \param cleanup_cb callback called to clean up user data
+ * \param resize_cb callback to set the resize callback
  * \param update_output_cb callback to get the rendering format of the host (cannot be NULL)
  * \param swap_cb callback called after rendering a video frame (cannot be NULL)
  * \param makeCurrent_cb callback called to enter/leave the opengl context (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
@@ -720,6 +721,7 @@ bool libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_engine_t engine,
                                         libvlc_video_output_setup_cb setup_cb,
                                         libvlc_video_output_cleanup_cb cleanup_cb,
+                                        libvlc_video_output_set_resize_cb resize_cb,
                                         libvlc_video_update_output_cb update_output_cb,
                                         libvlc_video_swap_cb swap_cb,
                                         libvlc_video_makeCurrent_cb makeCurrent_cb,

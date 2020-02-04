@@ -1036,6 +1036,7 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
                                        libvlc_video_engine_t engine,
                                        libvlc_video_output_setup_cb setup_cb,
                                        libvlc_video_output_cleanup_cb cleanup_cb,
+                                       libvlc_video_output_set_resize_cb resize_cb,
                                        libvlc_video_update_output_cb update_output_cb,
                                        libvlc_video_swap_cb swap_cb,
                                        libvlc_video_makeCurrent_cb makeCurrent_cb,
@@ -1046,7 +1047,7 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
     //use the default android window
     var_SetString( mp, "window", "");
 #else
-    var_SetString( mp, "window", "wdummy");
+    var_SetString( mp, "window", "wextern");
 #endif
 
     if( engine == libvlc_video_engine_gles2 )
@@ -1065,6 +1066,7 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
     var_SetAddress( mp, "vout-cb-opaque", opaque );
     var_SetAddress( mp, "vout-cb-setup", setup_cb );
     var_SetAddress( mp, "vout-cb-cleanup", cleanup_cb );
+    var_SetAddress( mp, "vout-cb-resize-cb", resize_cb );
     var_SetAddress( mp, "vout-cb-update-output", update_output_cb );
     var_SetAddress( mp, "vout-cb-swap", swap_cb );
     var_SetAddress( mp, "vout-cb-get-proc-address", getProcAddress_cb );

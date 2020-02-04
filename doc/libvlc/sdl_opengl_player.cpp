@@ -80,7 +80,7 @@ public:
         }
         // Define the opengl rendering callbacks
         libvlc_video_set_output_callbacks(m_mp, libvlc_video_engine_opengl,
-            setup, cleanup, resize, swap,
+            setup, cleanup, nullptr, resize, swap,
             make_current, get_proc_address,
             this);
 

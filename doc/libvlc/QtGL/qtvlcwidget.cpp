@@ -171,7 +171,7 @@ bool QtVLCWidget::playMedia(const char* url)
 
     // Define the opengl rendering callbacks
     libvlc_video_set_output_callbacks(m_mp, libvlc_video_engine_opengl,
-        VLCVideo::setup, VLCVideo::cleanup, VLCVideo::resizeRenderTextures, VLCVideo::swap,
+        VLCVideo::setup, VLCVideo::cleanup, nullptr, VLCVideo::resizeRenderTextures, VLCVideo::swap,
         VLCVideo::make_current, VLCVideo::get_proc_address,
         mVLC);
 
