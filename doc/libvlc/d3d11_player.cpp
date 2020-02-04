@@ -346,7 +346,7 @@ static void release_direct3d(struct render_context *ctx)
     list_dxgi_leaks();
 }
 
-static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
+static bool UpdateOutput_cb( void *opaque, const libvlc_video_render_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
     struct render_context *ctx = static_cast<struct render_context *>( opaque );
 

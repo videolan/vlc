@@ -472,7 +472,7 @@ static void Direct3D9DestroyResources(vout_display_t *vd)
 static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
-    libvlc_video_direct3d_cfg_t cfg;
+    libvlc_video_render_cfg_t cfg;
     cfg.width  = sys->area.vdcfg.display.width;
     cfg.height = sys->area.vdcfg.display.height;
 
@@ -1505,7 +1505,7 @@ static int FindShadersCallback(const char *name, char ***values, char ***descs)
 
 VLC_CONFIG_STRING_ENUM(FindShadersCallback)
 
-static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
+static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
     vout_display_t *vd = opaque;
     out->surface_format = vd->sys->d3d9_device->d3ddev.BufferFormat;

@@ -141,7 +141,7 @@ static bool canHandleConversion(const dxgi_color_space *src, const dxgi_color_sp
 }
 #endif
 
-static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, const libvlc_video_direct3d_cfg_t *cfg)
+static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, const libvlc_video_render_cfg_t *cfg)
 {
     HRESULT hr;
     int best = 0;
@@ -314,7 +314,7 @@ static void CreateSwapchain(struct d3d11_local_swapchain *display, UINT width, U
 }
 #endif /* !VLC_WINSTORE_APP */
 
-static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc_video_direct3d_cfg_t *cfg )
+static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc_video_render_cfg_t *cfg )
 {
     ID3D11Texture2D* pBackBuffer;
     HRESULT hr;
@@ -470,7 +470,7 @@ void LocalSwapchainSwap( void *opaque )
     }
 }
 
-bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
+bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
     struct d3d11_local_swapchain *display = opaque;
     if ( !UpdateSwapchain( display, cfg ) )

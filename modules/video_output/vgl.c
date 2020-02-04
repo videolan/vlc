@@ -83,7 +83,9 @@ static void Resize(vlc_gl_t * gl, unsigned w, unsigned h)
 
     MakeCurrent(gl);
     libvlc_video_render_cfg_t output_cfg = {
-        w, h,
+        w, h, 8, true,
+        libvlc_video_colorspace_BT709, libvlc_video_primaries_BT709,
+        libvlc_video_transfer_func_SRGB, NULL,
     };
     libvlc_video_output_cfg_t render_cfg;
     sys->resizeCb(sys->opaque, &output_cfg, &render_cfg);

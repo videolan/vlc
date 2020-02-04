@@ -236,7 +236,7 @@ static void Resize_cb( void *opaque,
     LeaveCriticalSection(&ctx->sizeLock);
 }
 
-static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cfg, libvlc_video_output_cfg_t *out )
+static bool UpdateOutput_cb( void *opaque, const libvlc_video_render_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
     struct render_context *ctx = opaque;
     return Resize(ctx, cfg->width, cfg->height, (IDirect3DDevice9*)cfg->device, out);

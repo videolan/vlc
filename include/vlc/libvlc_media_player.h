@@ -525,6 +525,12 @@ typedef struct
 {
     unsigned width;                        /** rendering video width in pixel */
     unsigned height;                      /** rendering video height in pixel */
+    unsigned bitdepth;      /** rendering video bit depth in bits per channel */
+    bool full_range;          /** video is full range or studio/limited range */
+    libvlc_video_color_space_t colorspace;              /** video color space */
+    libvlc_video_color_primaries_t primaries;       /** video color primaries */
+    libvlc_video_transfer_func_t transfer;        /** video transfer function */
+    void *device;   /** device used for rendering, IDirect3DDevice9* for D3D9 */
 } libvlc_video_render_cfg_t;
 
 typedef struct
@@ -734,18 +740,6 @@ typedef void( *libvlc_video_direct3d_set_resize_cb )( void *opaque,
                                                       void (*report_size_change)(void *report_opaque, unsigned width, unsigned height),
                                                       void *report_opaque );
 
-typedef struct
-{
-    unsigned width;                        /** rendering video width in pixel */
-    unsigned height;                      /** rendering video height in pixel */
-    unsigned bitdepth;      /** rendering video bit depth in bits per channel */
-    bool full_range;          /** video is full range or studio/limited range */
-    libvlc_video_color_space_t colorspace;              /** video color space */
-    libvlc_video_color_primaries_t primaries;       /** video color primaries */
-    libvlc_video_transfer_func_t transfer;        /** video transfer function */
-    void *device;   /** device used for rendering, IDirect3DDevice9* for D3D9 */
-} libvlc_video_direct3d_cfg_t;
-
 /** Update the rendering output setup.
  *
  * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
@@ -762,7 +756,7 @@ typedef struct
  * set in the output structure.
  */
 typedef bool( *libvlc_video_direct3d_update_output_cb )( void *opaque,
-                                                         const libvlc_video_direct3d_cfg_t *cfg,
+                                                         const libvlc_video_render_cfg_t *cfg,
                                                          libvlc_video_output_cfg_t *output );
 
 /** Tell the host the rendering for the given plane is about to start
