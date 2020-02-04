@@ -27,6 +27,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_opengl.h>
+#include "opengl/gl_common.h"
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_picture.h>
@@ -80,12 +81,15 @@ static void Resize(vlc_gl_t * gl, unsigned w, unsigned h)
     if( sys->width == w && sys->height == h )
         return;
 
-    if( !sys->resizeCb )
-        return;
-
     MakeCurrent(gl);
-    sys->resizeCb(sys->opaque, w, h);
+    libvlc_video_output_cfg_t render_cfg;
+    sys->resizeCb(sys->opaque, h, w, &render_cfg);
     ReleaseCurrent(gl);
+    assert(render_cfg.surface_format == GL_RGBA);
+    assert(render_cfg.full_range == true);
+    assert(render_cfg.colorspace == libvlc_video_colorspace_BT709);
+    assert(render_cfg.primaries  == libvlc_video_primaries_BT709);
+    assert(render_cfg.transfer   == libvlc_video_transfer_func_SRGB);
     sys->width = w;
     sys->height = h;
 }
@@ -119,7 +123,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     sys->opaque = var_InheritAddress(gl, "vout-cb-opaque");
     sys->setupCb = var_InheritAddress(gl, "vout-cb-setup");
     sys->cleanupCb = var_InheritAddress(gl, "vout-cb-cleanup");
-    sys->resizeCb = var_InheritAddress(gl, "vout-cb-update-output");
+    SET_CALLBACK_ADDR(sys->resizeCb, "vout-cb-update-output");
     SET_CALLBACK_ADDR(sys->swapCb, "vout-cb-swap");
     SET_CALLBACK_ADDR(sys->makeCurrentCb, "vout-cb-make-current");
     SET_CALLBACK_ADDR(sys->getProcAddressCb, "vout-cb-get-proc-address");

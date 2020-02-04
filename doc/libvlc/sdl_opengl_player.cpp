@@ -116,7 +116,8 @@ public:
     }
 
     /// this callback will create the surfaces and FBO used by VLC to perform its rendering
-    static void resize(void* data, unsigned width, unsigned height)
+    static void resize(void* data, unsigned width, unsigned height,
+                       libvlc_video_output_cfg_t *render_cfg)
     {
         VLCVideo* that = static_cast<VLCVideo*>(data);
         if (width != that->m_width || height != that->m_height)
@@ -148,6 +149,12 @@ public:
         that->m_height = height;
 
         glBindFramebuffer(GL_FRAMEBUFFER, that->m_fbo[that->m_idx_render]);
+
+        render_cfg->surface_format = GL_RGBA;
+        render_cfg->full_range = true;
+        render_cfg->colorspace = libvlc_video_colorspace_BT709;
+        render_cfg->primaries  = libvlc_video_primaries_BT709;
+        render_cfg->transfer   = libvlc_video_transfer_func_SRGB;
     }
 
     // This callback is called during initialisation.

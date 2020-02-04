@@ -521,15 +521,29 @@ typedef bool (*libvlc_video_setup_cb)(void* opaque);
  */
 typedef void (*libvlc_video_cleanup_cb)(void* opaque);
 
+typedef struct
+{
+    int surface_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_direct3d_engine_d3d11,
+                          D3DFORMAT for \ref libvlc_video_direct3d_engine_d3d9,
+                          GL_RGBA or GL_RGB for \ref libvlc_video_engine_opengl and
+                          for \ref libvlc_video_engine_gles2 */
+    bool full_range;          /** video is full range or studio/limited range */
+    libvlc_video_color_space_t colorspace;              /** video color space */
+    libvlc_video_color_primaries_t primaries;       /** video color primaries */
+    libvlc_video_transfer_func_t transfer;        /** video transfer function */
+} libvlc_video_output_cfg_t;
+
 /**
  * Callback prototype called on video size changes
  *
  * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
  * \param width video width in pixel [IN]
  * \param height video height in pixel [IN]
+ * \param output configuration describing with how the rendering is setup [OUT]
  * \version LibVLC 4.0.0 or later
  */
-typedef void (*libvlc_video_update_output_cb)(void* opaque, unsigned width, unsigned height);
+typedef void (*libvlc_video_update_output_cb)(void* opaque, unsigned width, unsigned height,
+                                              libvlc_video_output_cfg_t *output );
 
 
 /**
@@ -625,7 +639,7 @@ typedef enum libvlc_video_engine_t {
  * \param engine the GPU engine to use
  * \param setup_cb callback called to initialize user data
  * \param cleanup_cb callback called to clean up user data
- * \param update_output_cb callback called to get the size of the video
+ * \param update_output_cb callback to get the rendering format of the host (cannot be NULL)
  * \param swap_cb callback called after rendering a video frame (cannot be NULL)
  * \param makeCurrent_cb callback called to enter/leave the opengl context (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
  * \param getProcAddress_cb opengl function loading callback (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
@@ -726,16 +740,6 @@ typedef struct
     libvlc_video_transfer_func_t transfer;        /** video transfer function */
     void *device;   /** device used for rendering, IDirect3DDevice9* for D3D9 */
 } libvlc_video_direct3d_cfg_t;
-
-typedef struct
-{
-    int surface_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_direct3d_engine_d3d11,
-                          D3DFORMAT for \ref libvlc_video_direct3d_engine_d3d9 */
-    bool full_range;          /** video is full range or studio/limited range */
-    libvlc_video_color_space_t colorspace;              /** video color space */
-    libvlc_video_color_primaries_t primaries;       /** video color primaries */
-    libvlc_video_transfer_func_t transfer;        /** video transfer function */
-} libvlc_video_output_cfg_t;
 
 /** Update the rendering output setup.
  *
