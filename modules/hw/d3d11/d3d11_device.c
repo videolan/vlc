@@ -45,8 +45,8 @@ typedef struct {
     d3d11_handle_t         hd3d;
 
     struct {
-        void                                     *opaque;
-        libvlc_video_direct3d_device_cleanup_cb  cleanupDeviceCb;
+        void                            *opaque;
+        libvlc_video_output_cleanup_cb  cleanupDeviceCb;
     } external;
 
     d3d11_decoder_device_t                    dec_device;

@@ -40,8 +40,8 @@
 #include "d3d9_filters.h"
 
 typedef struct {
-    void                                     *opaque;
-    libvlc_video_direct3d_device_cleanup_cb  cleanupDeviceCb;
+    void                            *opaque;
+    libvlc_video_output_cleanup_cb  cleanupDeviceCb;
 
     d3d9_decoder_device_t                    dec_device;
 } d3d9_decoder_device;

@@ -721,13 +721,6 @@ typedef enum libvlc_video_direct3d_engine_t {
     libvlc_video_direct3d_engine_d3d9,
 } libvlc_video_direct3d_engine_t;
 
-/** Cleanup the rendering environment initialized during \ref libvlc_video_output_setup_cb.
- *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
- * \version LibVLC 4.0.0 or later
- */
-typedef void( *libvlc_video_direct3d_device_cleanup_cb )( void *opaque );
-
 /** Set the callback to call when the host app resizes the rendering area.
  *
  * This allows text rendering and aspect ratio to be handled properly when the host
@@ -792,7 +785,7 @@ LIBVLC_API
 bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
                                          libvlc_video_direct3d_engine_t engine,
                                          libvlc_video_output_setup_cb setup_cb,
-                                         libvlc_video_direct3d_device_cleanup_cb cleanup_cb,
+                                         libvlc_video_output_cleanup_cb cleanup_cb,
                                          libvlc_video_direct3d_set_resize_cb resize_cb,
                                          libvlc_video_update_output_cb update_output_cb,
                                          libvlc_video_swap_cb swap_cb,
