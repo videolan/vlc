@@ -155,6 +155,8 @@ Item {
 
                 RowLayout {
                     anchors.fill: parent
+                    anchors.leftMargin: VLCStyle.margin_xxsmall
+                    anchors.rightMargin: VLCStyle.margin_xxsmall
 
                     Widgets.TextToolButton {
                         id: loginCancel
@@ -226,6 +228,8 @@ Item {
             Rectangle {
                 color: VLCStyle.colors.banner
                 anchors.fill: parent
+                anchors.leftMargin: VLCStyle.margin_xxsmall
+                anchors.rightMargin: VLCStyle.margin_xxsmall
 
                 RowLayout {
                     anchors.fill: parent
