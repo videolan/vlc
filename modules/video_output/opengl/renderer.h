@@ -63,6 +63,7 @@ struct vlc_gl_renderer
     struct {
         GLfloat OrientationMatrix[16];
         GLfloat ProjectionMatrix[16];
+        GLfloat StereoMatrix[3*3];
         GLfloat ZoomMatrix[16];
         GLfloat ViewMatrix[16];
 
@@ -78,6 +79,7 @@ struct vlc_gl_renderer
 
         GLint TransformMatrix;
         GLint OrientationMatrix;
+        GLint StereoMatrix;
         GLint ProjectionMatrix;
         GLint ViewMatrix;
         GLint ZoomMatrix;

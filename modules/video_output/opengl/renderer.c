@@ -169,6 +169,81 @@ static void getOrientationTransformMatrix(video_orientation_t orientation,
     }
 }
 
+static void
+InitStereoMatrix(GLfloat matrix_out[static 3*3],
+                 video_multiview_mode_t multiview_mode)
+{
+    /*
+     * The stereo matrix transforms 2D pictures coordinates to crop the
+     * content, in order to view only one eye.
+     *
+     * This 2D transformation is affine, so the matrix is 3x3 and applies to 3D
+     * vectors in the form (x, y, 1).
+     *
+     * Note that since for now, we always crop the left eye, in practice the
+     * offset is always 0, so the transform is actually linear (a 2x2 matrix
+     * would be sufficient).
+     */
+
+#define COL(x) (x*3)
+#define ROW(x) (x)
+
+    /* Initialize to identity 3x3 */
+    memset(matrix_out, 0, 3 * 3 * sizeof(float));
+    matrix_out[COL(0) + ROW(0)] = 1;
+    matrix_out[COL(1) + ROW(1)] = 1;
+    matrix_out[COL(2) + ROW(2)] = 1;
+
+    switch (multiview_mode)
+    {
+        case MULTIVIEW_STEREO_SBS:
+            /*
+             * +----------+----------+
+             * |          .          |
+             * |  LEFT    .   RIGHT  |
+             * |  EYE     .     EYE  |
+             * |          .          |
+             * +----------+----------+
+             *
+             * To crop the coordinates to the left eye, divide the x
+             * coordinates by 2:
+             *
+             *            / 0.5  0    0 \
+             *  matrix =  | 0    1    0 |
+             *            \ 0    0    1 /
+             */
+            matrix_out[COL(0) + ROW(0)] = 0.5;
+            break;
+        case MULTIVIEW_STEREO_TB:
+            /*
+             * +----------+
+             * |          |
+             * |  LEFT    |
+             * |  EYE     |
+             * |          |
+             * +..........+
+             * |          |
+             * |   RIGHT  |
+             * |     EYE  |
+             * |          |
+             * +----------+
+             *
+             * To crop the coordinates to the left eye, divide the y
+             * coordinates by 2:
+             *
+             *            / 1    0    0 \
+             *  matrix =  | 0    0.5  0 |
+             *            \ 0    0    1 /
+             */
+            matrix_out[COL(1) + ROW(1)] = 0.5;
+            break;
+        default:
+            break;
+    }
+#undef COL
+#undef ROW
+}
+
 static char *
 BuildVertexShader(const struct vlc_gl_renderer *renderer)
 {
@@ -178,11 +253,12 @@ BuildVertexShader(const struct vlc_gl_renderer *renderer)
         "attribute vec2 PicCoordsIn;\n"
         "varying vec2 PicCoords;\n"
         "attribute vec3 VertexPosition;\n"
+        "uniform mat3 StereoMatrix;\n"
         "uniform mat4 ProjectionMatrix;\n"
         "uniform mat4 ZoomMatrix;\n"
         "uniform mat4 ViewMatrix;\n"
         "void main() {\n"
-        " PicCoords = PicCoordsIn;\n"
+        " PicCoords = (StereoMatrix * vec3(PicCoordsIn, 1.0)).st;\n"
         " gl_Position = ProjectionMatrix * ZoomMatrix * ViewMatrix\n"
         "               * vec4(VertexPosition, 1.0);\n"
         "}";
@@ -245,6 +321,7 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
 #define GET_ALOC(x, str) GET_LOC(Attrib, renderer->aloc.x, str)
     GET_ULOC(TransformMatrix, "TransformMatrix");
     GET_ULOC(OrientationMatrix, "OrientationMatrix");
+    GET_ULOC(StereoMatrix, "StereoMatrix");
     GET_ULOC(ProjectionMatrix, "ProjectionMatrix");
     GET_ULOC(ViewMatrix, "ViewMatrix");
     GET_ULOC(ZoomMatrix, "ZoomMatrix");
@@ -364,6 +441,8 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
         vlc_gl_renderer_Delete(renderer);
         return NULL;
     }
+
+    InitStereoMatrix(renderer->var.StereoMatrix, interop->fmt.multiview_mode);
 
     getOrientationTransformMatrix(interop->fmt.orientation,
                                   renderer->var.OrientationMatrix);
@@ -829,6 +908,8 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
 
     vt->UniformMatrix4fv(renderer->uloc.OrientationMatrix, 1, GL_FALSE,
                          renderer->var.OrientationMatrix);
+    vt->UniformMatrix3fv(renderer->uloc.StereoMatrix, 1, GL_FALSE,
+                         renderer->var.StereoMatrix);
     vt->UniformMatrix4fv(renderer->uloc.ProjectionMatrix, 1, GL_FALSE,
                          renderer->var.ProjectionMatrix);
     vt->UniformMatrix4fv(renderer->uloc.ViewMatrix, 1, GL_FALSE,
@@ -837,57 +918,6 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
                          renderer->var.ZoomMatrix);
 
     vt->DrawElements(GL_TRIANGLES, renderer->nb_indices, GL_UNSIGNED_SHORT, 0);
-}
-
-
-static void GetTextureCropParamsForStereo(unsigned i_nbTextures,
-                                          const float *stereoCoefs,
-                                          const float *stereoOffsets,
-                                          float *left, float *top,
-                                          float *right, float *bottom)
-{
-    for (unsigned i = 0; i < i_nbTextures; ++i)
-    {
-        float f_2eyesWidth = right[i] - left[i];
-        left[i] = left[i] + f_2eyesWidth * stereoOffsets[0];
-        right[i] = left[i] + f_2eyesWidth * stereoCoefs[0];
-
-        float f_2eyesHeight = bottom[i] - top[i];
-        top[i] = top[i] + f_2eyesHeight * stereoOffsets[1];
-        bottom[i] = top[i] + f_2eyesHeight * stereoCoefs[1];
-    }
-}
-
-static void TextureCropForStereo(struct vlc_gl_renderer *renderer,
-                                 float *left, float *top,
-                                 float *right, float *bottom)
-{
-    const struct vlc_gl_interop *interop = renderer->interop;
-
-    float stereoCoefs[2];
-    float stereoOffsets[2];
-
-    switch (renderer->fmt.multiview_mode)
-    {
-    case MULTIVIEW_STEREO_TB:
-        // Display only the left eye.
-        stereoCoefs[0] = 1; stereoCoefs[1] = 0.5;
-        stereoOffsets[0] = 0; stereoOffsets[1] = 0;
-        GetTextureCropParamsForStereo(interop->tex_count,
-                                      stereoCoefs, stereoOffsets,
-                                      left, top, right, bottom);
-        break;
-    case MULTIVIEW_STEREO_SBS:
-        // Display only the left eye.
-        stereoCoefs[0] = 0.5; stereoCoefs[1] = 1;
-        stereoOffsets[0] = 0; stereoOffsets[1] = 0;
-        GetTextureCropParamsForStereo(interop->tex_count,
-                                      stereoCoefs, stereoOffsets,
-                                      left, top, right, bottom);
-        break;
-    default:
-        break;
-    }
 }
 
 int
@@ -933,9 +963,6 @@ vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer,
             right[j]  = (source->i_x_offset + source->i_visible_width ) * scale_w;
             bottom[j] = (source->i_y_offset + source->i_visible_height) * scale_h;
         }
-
-        /* TODO crop stereo using a separate transform matrix */
-        TextureCropForStereo(renderer, left, top, right, bottom);
 
         memset(renderer->var.TexCoordsMap, 0,
                sizeof(renderer->var.TexCoordsMap));
