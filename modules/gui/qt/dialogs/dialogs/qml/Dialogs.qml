@@ -163,8 +163,7 @@ Item {
                         KeyNavigation.up: savePassword
                         KeyNavigation.right: loginOk
                         onClicked: {
-                            dialogModel.dismiss(loginDialog.dialogId)
-                            loginDialog.dialogId = undefined
+                            loginDialog.reject()
                             loginDialog.close()
                         }
                     }
@@ -176,8 +175,7 @@ Item {
                         focus: true
                         KeyNavigation.up: savePassword
                         onClicked: {
-                            dialogModel.post_login(loginDialog.dialogId, username.text, password.text, savePassword.checked)
-                            loginDialog.dialogId = undefined
+                            loginDialog.accept()
                             loginDialog.close()
                         }
                     }
@@ -186,10 +184,16 @@ Item {
         }
 
         onAccepted: {
-            dialogModel.post_login(dialogId, username.text, password.text, savePassword.checked)
+            if (loginDialog.dialogId !== undefined) {
+                dialogModel.post_login(loginDialog.dialogId, username.text, password.text, savePassword.checked)
+                loginDialog.dialogId = undefined
+            }
         }
         onRejected: {
-            dialogModel.dismiss(dialogId)
+            if (loginDialog.dialogId !== undefined) {
+                dialogModel.dismiss(loginDialog.dialogId)
+                loginDialog.dialogId = undefined
+            }
         }
     }
 
@@ -302,9 +306,11 @@ Item {
         onCancelled: {
             if (questionDialog.dialogId === dialogId) {
                 questionDialog.close()
+                questionDialog.dialogId = undefined
                 dialogModel.dismiss(dialogId)
             } else if (loginDialog.dialogId === dialogId)  {
                 loginDialog.close()
+                loginDialog.dialogId = undefined
                 dialogModel.dismiss(dialogId)
             } else {
                 dialogModel.dismiss(dialogId)
@@ -312,10 +318,12 @@ Item {
         }
 
         Component.onDestruction: {
-            if (questionDialog.dialogId) {
+            if (questionDialog.dialogId !== undefined) {
                 dialogModel.dismiss(questionDialog.dialogId)
-            } if (loginDialog.dialogId) {
+                questionDialog.dialogId = undefined
+            } if (loginDialog.dialogId !== undefined) {
                 dialogModel.dismiss(loginDialog.dialogId)
+                loginDialog.dialogId = undefined
             }
         }
     }
