@@ -730,6 +730,8 @@ typedef bool( *libvlc_video_output_select_plane_cb )( void *opaque, size_t plane
  * \param swap_cb callback called after rendering a video frame (cannot be NULL)
  * \param makeCurrent_cb callback called to enter/leave the opengl context (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
  * \param getProcAddress_cb opengl function loading callback (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
+ * \param metadata_cb callback to provide frame metadata (D3D11 only)
+ * \param select_plane_cb callback to select different D3D11 rendering targets
  * \param opaque private pointer passed to callbacks
  *
  * \retval true engine selected and callbacks set
@@ -746,6 +748,8 @@ bool libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_swap_cb swap_cb,
                                         libvlc_video_makeCurrent_cb makeCurrent_cb,
                                         libvlc_video_getProcAddress_cb getProcAddress_cb,
+                                        libvlc_video_frameMetadata_cb metadata_cb,
+                                        libvlc_video_output_select_plane_cb select_plane_cb,
                                         void* opaque );
 
 

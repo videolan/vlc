@@ -1041,6 +1041,8 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
                                        libvlc_video_swap_cb swap_cb,
                                        libvlc_video_makeCurrent_cb makeCurrent_cb,
                                        libvlc_video_getProcAddress_cb getProcAddress_cb,
+                                       libvlc_video_frameMetadata_cb metadata_cb,
+                                       libvlc_video_output_select_plane_cb select_plane_cb,
                                        void *opaque)
 {
 #ifdef __ANDROID__
@@ -1071,6 +1073,8 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
     var_SetAddress( mp, "vout-cb-swap", swap_cb );
     var_SetAddress( mp, "vout-cb-get-proc-address", getProcAddress_cb );
     var_SetAddress( mp, "vout-cb-make-current", makeCurrent_cb );
+    var_SetAddress( mp, "vout-cb-metadata", metadata_cb );
+    var_SetAddress( mp, "vout-cb-select-plane", select_plane_cb );
     return true;
 }
 
