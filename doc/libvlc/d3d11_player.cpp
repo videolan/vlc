@@ -267,16 +267,45 @@ static void init_direct3d(struct render_context *ctx)
 
 }
 
+static void release_textures(struct render_context *ctx)
+{
+    if (ctx->resized.sharedHandled)
+    {
+        CloseHandle(ctx->resized.sharedHandled);
+        ctx->resized.sharedHandled = NULL;
+    }
+    if (ctx->resized.textureVLC)
+    {
+        ctx->resized.textureVLC->Release();
+        ctx->resized.textureVLC = NULL;
+    }
+    if (ctx->resized.textureShaderInput)
+    {
+        ctx->resized.textureShaderInput->Release();
+        ctx->resized.textureShaderInput = NULL;
+    }
+    if (ctx->resized.textureRenderTarget)
+    {
+        ctx->resized.textureRenderTarget->Release();
+        ctx->resized.textureRenderTarget = NULL;
+    }
+    if (ctx->resized.texture)
+    {
+        ctx->resized.texture->Release();
+        ctx->resized.texture = NULL;
+    }
+}
+
 static void release_direct3d(struct render_context *ctx)
 {
     ctx->d3deviceVLC->Release();
+
+    release_textures(ctx);
+
     ctx->d3dctxVLC->Release();
     ctx->d3deviceVLC->Release();
 
     ctx->samplerState->Release();
-    ctx->resized.textureRenderTarget->Release();
-    ctx->resized.textureShaderInput->Release();
-    ctx->resized.texture->Release();
     ctx->pShadersInputLayout->Release();
     ctx->pVS->Release();
     ctx->pPS->Release();
@@ -296,31 +325,7 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_direct3d_cfg_t *cf
 
     DXGI_FORMAT renderFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-    if (ctx->resized.texture)
-    {
-        ctx->resized.texture->Release();
-        ctx->resized.texture = NULL;
-    }
-    if (ctx->resized.textureVLC)
-    {
-        ctx->resized.textureVLC->Release();
-        ctx->resized.textureVLC = NULL;
-    }
-    if (ctx->resized.textureShaderInput)
-    {
-        ctx->resized.textureShaderInput->Release();
-        ctx->resized.textureShaderInput = NULL;
-    }
-    if (ctx->resized.textureRenderTarget)
-    {
-        ctx->resized.textureRenderTarget->Release();
-        ctx->resized.textureRenderTarget = NULL;
-    }
-    if (ctx->resized.sharedHandled)
-    {
-        CloseHandle(ctx->resized.sharedHandled);
-        ctx->resized.sharedHandled = NULL;
-    }
+    release_textures(ctx);
 
     /* interim texture */
     D3D11_TEXTURE2D_DESC texDesc = { };
