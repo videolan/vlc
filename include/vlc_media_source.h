@@ -191,10 +191,21 @@ vlc_media_tree_Find(vlc_media_tree_t *tree, const input_item_t *media,
  * \param tree   the media tree (not necessarily locked)
  * \param libvlc the libvlc instance
  * \param media  the media to preparse
+ * \param id     a task identifier
  */
 VLC_API void
 vlc_media_tree_Preparse(vlc_media_tree_t *tree, libvlc_int_t *libvlc,
-                        input_item_t *media);
+                        input_item_t *media, void *id);
+
+
+/**
+ * Cancel a media tree preparse request
+ *
+ * \param libvlc the libvlc instance
+ * \param id the preparse task id
+ */
+VLC_API void
+vlc_media_tree_PreparseCancel(libvlc_int_t *libvlc, void* id);
 
 /**
  * Media source.

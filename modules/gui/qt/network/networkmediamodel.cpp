@@ -255,8 +255,7 @@ bool NetworkMediaModel::initializeMediaSources()
         emit isIndexedChanged();
     }
 
-
-    vlc_media_tree_Preparse( tree, libvlc, m_treeItem.media.get() );
+    vlc_media_tree_Preparse( tree, libvlc, m_treeItem.media.get(), this );
     m_parsingPending = true;
     emit parsingPendingChanged(m_parsingPending);
 

@@ -128,7 +128,7 @@ static const struct vlc_media_tree_callbacks treeCallbacks = {
     if (inputItem == nil) {
         return;
     }
-    vlc_media_tree_Preparse(_p_mediaSource->tree, _p_libvlcInstance, inputItem.vlcInputItem);
+    vlc_media_tree_Preparse(_p_mediaSource->tree, _p_libvlcInstance, inputItem.vlcInputItem, NULL);
 }
 
 - (NSString *)mediaSourceDescription

@@ -342,17 +342,30 @@ static const input_preparser_callbacks_t input_preparser_callbacks = {
 
 void
 vlc_media_tree_Preparse(vlc_media_tree_t *tree, libvlc_int_t *libvlc,
-                        input_item_t *media)
+                        input_item_t *media, void* id)
 {
 #ifdef TEST_MEDIA_SOURCE
     VLC_UNUSED(tree);
     VLC_UNUSED(libvlc);
     VLC_UNUSED(media);
+    VLC_UNUSED(id);
     VLC_UNUSED(input_preparser_callbacks);
 #else
     media->i_preparse_depth = 1;
     vlc_MetadataRequest(libvlc, media, META_REQUEST_OPTION_SCOPE_ANY |
                         META_REQUEST_OPTION_DO_INTERACT,
-                        &input_preparser_callbacks, tree, 0, NULL);
+                        &input_preparser_callbacks, tree, 0, id);
+#endif
+}
+
+
+void
+vlc_media_tree_PreparseCancel(libvlc_int_t *libvlc, void* id)
+{
+#ifdef TEST_MEDIA_SOURCE
+    VLC_UNUSED(libvlc);
+    VLC_UNUSED(id);
+#else
+    libvlc_MetadataCancel(libvlc, id);
 #endif
 }
