@@ -33,6 +33,8 @@
 
 #include <vlc_common.h>
 #include <vlc_memstream.h>
+
+#include "gl_util.h"
 #include "interop.h"
 #include "internal.h"
 #include "sampler.h"
@@ -267,6 +269,17 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
     return VLC_SUCCESS;
 }
 
+static const GLfloat *
+GetTransformMatrix(const struct vlc_gl_interop *interop)
+{
+    const GLfloat *tm = NULL;
+    if (interop->ops && interop->ops->get_transform_matrix)
+        tm = interop->ops->get_transform_matrix(interop);
+    if (!tm)
+        tm = MATRIX4_IDENTITY;
+    return tm;
+}
+
 static void
 sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler,
                             const GLsizei *tex_width,
@@ -281,9 +294,24 @@ sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler,
                              sampler->conv_matrix);
 
     for (unsigned i = 0; i < interop->tex_count; ++i)
+    {
         vt->Uniform1i(sampler->uloc.Texture[i], i);
 
+        assert(sampler->textures[i] != 0);
+        vt->ActiveTexture(GL_TEXTURE0 + i);
+        vt->BindTexture(interop->tex_target, sampler->textures[i]);
+
+        vt->UniformMatrix3fv(sampler->uloc.TexCoordsMap[i], 1, GL_FALSE,
+                             sampler->var.TexCoordsMap[i]);
+    }
+
     vt->Uniform4f(sampler->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
+
+    const GLfloat *tm = GetTransformMatrix(interop);
+    vt->UniformMatrix4fv(sampler->uloc.TransformMatrix, 1, GL_FALSE, tm);
+
+    vt->UniformMatrix4fv(sampler->uloc.OrientationMatrix, 1, GL_FALSE,
+                         sampler->var.OrientationMatrix);
 
     if (interop->tex_target == GL_TEXTURE_RECTANGLE)
     {
@@ -359,9 +387,23 @@ sampler_xyz12_prepare_shader(const struct vlc_gl_sampler *sampler,
                              const GLsizei *tex_height, float alpha)
 {
     (void) tex_width; (void) tex_height; (void) alpha;
+    const struct vlc_gl_interop *interop = sampler->interop;
     const opengl_vtable_t *vt = sampler->vt;
 
     vt->Uniform1i(sampler->uloc.Texture[0], 0);
+
+    assert(sampler->textures[0] != 0);
+    vt->ActiveTexture(GL_TEXTURE0);
+    vt->BindTexture(interop->tex_target, sampler->textures[0]);
+
+    vt->UniformMatrix3fv(sampler->uloc.TexCoordsMap[0], 1, GL_FALSE,
+                         sampler->var.TexCoordsMap[0]);
+
+    const GLfloat *tm = GetTransformMatrix(interop);
+    vt->UniformMatrix4fv(sampler->uloc.TransformMatrix, 1, GL_FALSE, tm);
+
+    vt->UniformMatrix4fv(sampler->uloc.OrientationMatrix, 1, GL_FALSE,
+                         sampler->var.OrientationMatrix);
 }
 
 static char *

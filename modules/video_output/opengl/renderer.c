@@ -829,20 +829,10 @@ static int SetupCoords(struct vlc_gl_renderer *renderer)
 
 static void DrawWithShaders(struct vlc_gl_renderer *renderer)
 {
-    const struct vlc_gl_interop *interop = renderer->interop;
     struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
     sampler->pf_prepare_shader(sampler, sampler->tex_width,
                                sampler->tex_height, 1.0f);
-
-    for (unsigned j = 0; j < interop->tex_count; j++) {
-        assert(sampler->textures[j] != 0);
-        vt->ActiveTexture(GL_TEXTURE0+j);
-        vt->BindTexture(interop->tex_target, sampler->textures[j]);
-
-        vt->UniformMatrix3fv(sampler->uloc.TexCoordsMap[j], 1, GL_FALSE,
-                             sampler->var.TexCoordsMap[j]);
-    }
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
     assert(renderer->aloc.PicCoordsIn != -1);
@@ -854,16 +844,6 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
     vt->EnableVertexAttribArray(renderer->aloc.VertexPosition);
     vt->VertexAttribPointer(renderer->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
-    const GLfloat *tm = NULL;
-    if (interop->ops && interop->ops->get_transform_matrix)
-        tm = interop->ops->get_transform_matrix(interop);
-    if (!tm)
-        tm = MATRIX4_IDENTITY;
-
-    vt->UniformMatrix4fv(sampler->uloc.TransformMatrix, 1, GL_FALSE, tm);
-
-    vt->UniformMatrix4fv(sampler->uloc.OrientationMatrix, 1, GL_FALSE,
-                         sampler->var.OrientationMatrix);
     vt->UniformMatrix3fv(renderer->uloc.StereoMatrix, 1, GL_FALSE,
                          renderer->var.StereoMatrix);
     vt->UniformMatrix4fv(renderer->uloc.ProjectionMatrix, 1, GL_FALSE,
