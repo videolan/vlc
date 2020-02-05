@@ -61,7 +61,6 @@ struct vlc_gl_sampler {
         GLint Texture[PICTURE_PLANE_MAX];
         GLint TexSize[PICTURE_PLANE_MAX]; /* for GL_TEXTURE_RECTANGLE */
         GLint ConvMatrix;
-        GLint FillColor;
         GLint *pl_vars; /* for pl_sh_res */
 
         GLint TransformMatrix;
@@ -112,11 +111,10 @@ struct vlc_gl_sampler {
      * \param sampler the sampler
      * \param tex_width array of tex width (one per plane)
      * \param tex_height array of tex height (one per plane)
-     * \param alpha alpha value, used only for RGBA fragment shader
      */
     void (*pf_prepare_shader)(const struct vlc_gl_sampler *sampler,
-                              const GLsizei *tex_width, const GLsizei *tex_height,
-                              float alpha);
+                              const GLsizei *tex_width,
+                              const GLsizei *tex_height);
 };
 
 /**

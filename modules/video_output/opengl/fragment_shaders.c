@@ -254,10 +254,6 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         }
     }
 
-    sampler->uloc.FillColor = vt->GetUniformLocation(program, "FillColor");
-    if (sampler->uloc.FillColor == -1)
-        return VLC_EGENERIC;
-
 #ifdef HAVE_LIBPLACEBO
     const struct pl_shader_res *res = sampler->pl_sh_res;
     for (int i = 0; res && i < res->num_variables; i++) {
@@ -283,7 +279,7 @@ GetTransformMatrix(const struct vlc_gl_interop *interop)
 static void
 sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler,
                             const GLsizei *tex_width,
-                            const GLsizei *tex_height, float alpha)
+                            const GLsizei *tex_height)
 {
     (void) tex_width; (void) tex_height;
     const struct vlc_gl_interop *interop = sampler->interop;
@@ -304,8 +300,6 @@ sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler,
         vt->UniformMatrix3fv(sampler->uloc.TexCoordsMap[i], 1, GL_FALSE,
                              sampler->var.TexCoordsMap[i]);
     }
-
-    vt->Uniform4f(sampler->uloc.FillColor, 1.0f, 1.0f, 1.0f, alpha);
 
     const GLfloat *tm = GetTransformMatrix(interop);
     vt->UniformMatrix4fv(sampler->uloc.TransformMatrix, 1, GL_FALSE, tm);
@@ -384,9 +378,9 @@ sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 static void
 sampler_xyz12_prepare_shader(const struct vlc_gl_sampler *sampler,
                              const GLsizei *tex_width,
-                             const GLsizei *tex_height, float alpha)
+                             const GLsizei *tex_height)
 {
-    (void) tex_width; (void) tex_height; (void) alpha;
+    (void) tex_width; (void) tex_height;
     const struct vlc_gl_interop *interop = sampler->interop;
     const opengl_vtable_t *vt = sampler->vt;
 
@@ -661,8 +655,7 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
     if (is_yuv)
         ADD("uniform mat4 ConvMatrix;\n");
 
-    ADD("uniform vec4 FillColor;\n"
-        "vec4 vlc_texture(vec2 pic_coords) {\n"
+    ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
         /* Homogeneous (oriented) coordinates */
         " vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).st, 1.0);\n"
         " vec2 tex_coords;\n");
@@ -712,7 +705,7 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
     }
 #endif
 
-    ADD(" return result * FillColor;\n"
+    ADD(" return result;\n"
         "}\n");
 
 #undef ADD
