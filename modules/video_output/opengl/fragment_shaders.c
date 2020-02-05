@@ -277,11 +277,8 @@ GetTransformMatrix(const struct vlc_gl_interop *interop)
 }
 
 static void
-sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler,
-                            const GLsizei *tex_width,
-                            const GLsizei *tex_height)
+sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler)
 {
-    (void) tex_width; (void) tex_height;
     const struct vlc_gl_interop *interop = sampler->interop;
     const opengl_vtable_t *vt = sampler->vt;
 
@@ -310,8 +307,8 @@ sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler,
     if (interop->tex_target == GL_TEXTURE_RECTANGLE)
     {
         for (unsigned i = 0; i < interop->tex_count; ++i)
-            vt->Uniform2f(sampler->uloc.TexSize[i], tex_width[i],
-                          tex_height[i]);
+            vt->Uniform2f(sampler->uloc.TexSize[i], sampler->tex_width[i],
+                          sampler->tex_height[i]);
     }
 
 #ifdef HAVE_LIBPLACEBO
@@ -376,11 +373,8 @@ sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 }
 
 static void
-sampler_xyz12_prepare_shader(const struct vlc_gl_sampler *sampler,
-                             const GLsizei *tex_width,
-                             const GLsizei *tex_height)
+sampler_xyz12_prepare_shader(const struct vlc_gl_sampler *sampler)
 {
-    (void) tex_width; (void) tex_height;
     const struct vlc_gl_interop *interop = sampler->interop;
     const opengl_vtable_t *vt = sampler->vt;
 

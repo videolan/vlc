@@ -831,8 +831,7 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
 {
     struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
-    sampler->pf_prepare_shader(sampler, sampler->tex_width,
-                               sampler->tex_height);
+    sampler->pf_prepare_shader(sampler);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
     assert(renderer->aloc.PicCoordsIn != -1);
