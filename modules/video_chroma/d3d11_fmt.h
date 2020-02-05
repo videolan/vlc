@@ -47,7 +47,7 @@ typedef struct
 {
     ID3D11Device             *d3ddevice;       /* D3D device */
     ID3D11DeviceContext      *d3dcontext;      /* D3D context */
-    bool                     owner;
+    bool                     mutex_owner;
     HANDLE                   context_mutex;
     struct wddm_version      WDDM;
     D3D_FEATURE_LEVEL        feature_level;
