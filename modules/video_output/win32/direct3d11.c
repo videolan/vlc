@@ -525,6 +525,8 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 {
     vout_display_sys_t *sys = vd->sys;
 
+    d3d11_device_lock( sys->d3d_dev );
+
     if (sys->picQuad.textureFormat->formatTexture == DXGI_FORMAT_UNKNOWN)
     {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -583,8 +585,6 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     else
     {
         picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(picture);
-
-        d3d11_device_lock( sys->d3d_dev );
 
         if (sys->legacy_shader) {
             D3D11_TEXTURE2D_DESC srcDesc,texDesc;
@@ -676,8 +676,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             SleepEx(2, TRUE);
     }
 
-    if (is_d3d11_opaque(picture->format.i_chroma) && sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_UNKNOWN)
-        d3d11_device_unlock( sys->d3d_dev );
+    d3d11_device_unlock( sys->d3d_dev );
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
@@ -687,6 +686,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
     VLC_UNUSED(date);
 
+    d3d11_device_lock( sys->d3d_dev );
     libvlc_video_direct3d_hdr10_metadata_t hdr10;
     if (picture->format.mastering.max_luminance)
     {
@@ -711,6 +711,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
         sys->startEndRenderingCb( sys->outside_opaque, false, NULL );
     }
+    d3d11_device_unlock( sys->d3d_dev );
 }
 
 static void Display(vout_display_t *vd, picture_t *picture)
