@@ -44,13 +44,6 @@
 
 #define SPHERE_RADIUS 1.f
 
-static const GLfloat identity[] = {
-    1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
-    0.0f, 0.0f, 0.0f, 1.0f
-};
-
 static void getZoomMatrix(float zoom, GLfloat matrix[static 16]) {
 
     const GLfloat m[] = {
@@ -96,9 +89,12 @@ static void getViewpointMatrixes(struct vlc_gl_renderer *renderer,
     }
     else
     {
-        memcpy(renderer->var.ProjectionMatrix, identity, sizeof(identity));
-        memcpy(renderer->var.ZoomMatrix, identity, sizeof(identity));
-        memcpy(renderer->var.ViewMatrix, identity, sizeof(identity));
+        memcpy(renderer->var.ProjectionMatrix, MATRIX4_IDENTITY,
+                                               sizeof(MATRIX4_IDENTITY));
+        memcpy(renderer->var.ZoomMatrix, MATRIX4_IDENTITY,
+                                         sizeof(MATRIX4_IDENTITY));
+        memcpy(renderer->var.ViewMatrix, MATRIX4_IDENTITY,
+                                         sizeof(MATRIX4_IDENTITY));
     }
 
 }
@@ -106,7 +102,7 @@ static void getViewpointMatrixes(struct vlc_gl_renderer *renderer,
 static void getOrientationTransformMatrix(video_orientation_t orientation,
                                           GLfloat matrix[static 16])
 {
-    memcpy(matrix, identity, sizeof(identity));
+    memcpy(matrix, MATRIX4_IDENTITY, sizeof(MATRIX4_IDENTITY));
 
     const int k_cos_pi = -1;
     const int k_cos_pi_2 = 0;
@@ -185,14 +181,10 @@ InitStereoMatrix(GLfloat matrix_out[static 3*3],
      * would be sufficient).
      */
 
+    memcpy(matrix_out, MATRIX3_IDENTITY, sizeof(MATRIX3_IDENTITY));
+
 #define COL(x) (x*3)
 #define ROW(x) (x)
-
-    /* Initialize to identity 3x3 */
-    memset(matrix_out, 0, 3 * 3 * sizeof(float));
-    matrix_out[COL(0) + ROW(0)] = 1;
-    matrix_out[COL(1) + ROW(1)] = 1;
-    matrix_out[COL(2) + ROW(2)] = 1;
 
     switch (multiview_mode)
     {
@@ -880,7 +872,7 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
     if (interop->ops && interop->ops->get_transform_matrix)
         tm = interop->ops->get_transform_matrix(interop);
     if (!tm)
-        tm = identity;
+        tm = MATRIX4_IDENTITY;
 
     vt->UniformMatrix4fv(sampler->uloc.TransformMatrix, 1, GL_FALSE, tm);
 

@@ -29,6 +29,19 @@
 #include <vlc_common.h>
 #include "gl_common.h"
 
+static const float MATRIX4_IDENTITY[4*4] = {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1,
+};
+
+static const float MATRIX3_IDENTITY[3*3] = {
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1,
+};
+
 /** Return the smallest larger or equal power of 2 */
 static inline unsigned vlc_align_pot(unsigned x)
 {
