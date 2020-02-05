@@ -344,7 +344,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 #endif /* !VLC_WINSTORE_APP */
 
         /* use our internal swapchain callbacks */
-        sys->outside_opaque      = CreateLocalSwapchainHandle(VLC_OBJECT(vd), sys->sys.hvideownd, sys->d3d_dev.d3dcontext);
+        sys->outside_opaque      = CreateLocalSwapchainHandle(VLC_OBJECT(vd), sys->sys.hvideownd, &sys->d3d_dev);
         if (unlikely(sys->outside_opaque == NULL))
             goto error;
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;

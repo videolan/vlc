@@ -28,7 +28,7 @@
 #include <vlc_codec.h>
 #include "../../video_chroma/d3d11_fmt.h"
 
-void *CreateLocalSwapchainHandle(vlc_object_t *, HWND, ID3D11DeviceContext *);
+void *CreateLocalSwapchainHandle(vlc_object_t *, HWND, d3d11_device_t *d3d_dev);
 
 void LocalSwapchainCleanupDevice( void *opaque );
 void LocalSwapchainSwap( void *opaque );
