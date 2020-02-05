@@ -361,7 +361,7 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
 #undef GET_ULOC
 #undef GET_ALOC
 
-    int ret = sampler->pf_fetch_locations(sampler, program_id);
+    int ret = vlc_gl_sampler_FetchLocations(sampler, program_id);
     assert(ret == VLC_SUCCESS);
     if (ret != VLC_SUCCESS)
     {
@@ -831,7 +831,8 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
 {
     struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
-    sampler->pf_prepare_shader(sampler);
+
+    vlc_gl_sampler_PrepareShader(sampler);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
     assert(renderer->aloc.PicCoordsIn != -1);

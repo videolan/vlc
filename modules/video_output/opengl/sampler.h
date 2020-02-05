@@ -129,4 +129,16 @@ vlc_gl_sampler_New(struct vlc_gl_interop *interop);
 void
 vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler);
 
+static inline int
+vlc_gl_sampler_FetchLocations(struct vlc_gl_sampler *sampler, GLuint program)
+{
+    return sampler->pf_fetch_locations(sampler, program);
+}
+
+static inline void
+vlc_gl_sampler_PrepareShader(const struct vlc_gl_sampler *sampler)
+{
+    sampler->pf_prepare_shader(sampler);
+}
+
 #endif
