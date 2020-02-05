@@ -710,6 +710,16 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     if (vlc_memstream_close(&ms) != 0)
         return VLC_EGENERIC;
 
+    if (tex_target == GL_TEXTURE_EXTERNAL_OES)
+    {
+        sampler->shader.extensions =
+            strdup("#extension GL_OES_EGL_image_external : require\n");
+        if (!sampler->shader.extensions)
+        {
+            free(ms.ptr);
+            return VLC_EGENERIC;
+        }
+    }
     sampler->shader.body = ms.ptr;
 
     sampler->pf_fetch_locations = sampler_base_fetch_locations;

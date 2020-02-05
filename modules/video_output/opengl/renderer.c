@@ -287,10 +287,8 @@ BuildFragmentShader(struct vlc_gl_renderer *renderer)
         " gl_FragColor = vlc_texture(PicCoords);\n"
         "}\n";
 
-    /* TODO move extensions back to fragment_shaders.c */
-    const char *extensions = interop->tex_target == GL_TEXTURE_EXTERNAL_OES
-                           ? "#extension GL_OES_EGL_image_external : require\n"
-                           : "";
+    const char *extensions = sampler->shader.extensions
+                           ? sampler->shader.extensions : "";
 
     char *code;
     ret = asprintf(&code, template, renderer->glsl_version, extensions,

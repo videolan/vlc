@@ -92,6 +92,17 @@ struct vlc_gl_sampler {
 
     struct {
         /**
+         * Piece of fragment shader code declaration OpenGL extensions.
+         *
+         * It is initialized by the sampler, and may be NULL if no extensions
+         * are required.
+         *
+         * If non-NULL, users of this sampler must inject this provided code
+         * into their fragment shader, immediately after the "version" line.
+         */
+        char *extensions;
+
+        /**
          * Piece of fragment shader code providing the GLSL function
          * vlc_texture(vec2 coords).
          *
