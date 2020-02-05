@@ -560,6 +560,33 @@ typedef bool (*libvlc_video_makeCurrent_cb)(void* opaque, bool enter);
  */
 typedef void* (*libvlc_video_getProcAddress_cb)(void* opaque, const char* fct_name);
 
+typedef struct
+{
+    /* similar to SMPTE ST 2086 mastering display color volume */
+    uint16_t RedPrimary[2];
+    uint16_t GreenPrimary[2];
+    uint16_t BluePrimary[2];
+    uint16_t WhitePoint[2];
+    unsigned int MaxMasteringLuminance;
+    unsigned int MinMasteringLuminance;
+    uint16_t MaxContentLightLevel;
+    uint16_t MaxFrameAverageLightLevel;
+} libvlc_video_direct3d_hdr10_metadata_t;
+
+typedef enum libvlc_video_metadata_type_t {
+    libvlc_video_metadata_frame_hdr10, /**< libvlc_video_direct3d_hdr10_metadata_t */
+} libvlc_video_metadata_type_t;
+
+/**
+ * Callback prototype to receive metadata before rendering.
+ *
+ * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
+ * \param type type of data passed in metadata [IN]
+ * \param metadata the type of metadata [IN]
+ * \version LibVLC 4.0.0 or later
+ */
+typedef void (*libvlc_video_frameMetadata_cb)(void* opaque, libvlc_video_metadata_type_t type, const void *metadata);
+
 /**
  * Enumeration of the Video engine to be used on output.
  * can be passed to @a libvlc_video_set_output_callbacks
@@ -712,24 +739,10 @@ typedef bool( *libvlc_video_direct3d_update_output_cb )( void *opaque,
                                                          const libvlc_video_direct3d_cfg_t *cfg,
                                                          libvlc_video_output_cfg_t *output );
 
-typedef struct
-{
-    /* similar to SMPTE ST 2086 mastering display color volume */
-    uint16_t RedPrimary[2];
-    uint16_t GreenPrimary[2];
-    uint16_t BluePrimary[2];
-    uint16_t WhitePoint[2];
-    unsigned int MaxMasteringLuminance;
-    unsigned int MinMasteringLuminance;
-    uint16_t MaxContentLightLevel;
-    uint16_t MaxFrameAverageLightLevel;
-} libvlc_video_direct3d_hdr10_metadata_t;
-
 /** Tell the host the rendering is about to start/has finished.
  *
  * \param opaque private pointer set on the opaque parameter of @a libvlc_video_direct3d_device_setup_cb() [IN]
  * \param enter true if the rendering is about to start, false if it's finished
- * \param hdr10 libvlc_video_direct3d_hdr10_metadata_t* or NULL [IN]
  * \return true on success
  * \version LibVLC 4.0.0 or later
  *
@@ -748,7 +761,7 @@ typedef struct
  * - RSSetViewports()
  * - DrawIndexed()
  */
-typedef bool( *libvlc_video_direct3d_start_end_rendering_cb )( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *hdr10 );
+typedef bool( *libvlc_video_direct3d_start_end_rendering_cb )( void *opaque, bool enter );
 
 /** Tell the host the rendering for the given plane is about to start
  *
@@ -785,6 +798,7 @@ typedef bool( *libvlc_video_direct3d_select_plane_cb )( void *opaque, size_t pla
  *                         rendering format used by the host (cannot be NULL)
  * \param swap_cb callback to tell the host it should display the rendered picture (cannot be NULL)
  * \param makeCurrent_cb callback to tell the host the rendering is starting/ended (cannot be NULL)
+ * \param metadata_cb callback to provide frame metadata (D3D11 only)
  * \param select_plane_cb callback to select different D3D11 rendering targets
  * \param opaque private pointer passed to the \ref cleanup_cb callback
  *
@@ -801,6 +815,7 @@ bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
                                          libvlc_video_direct3d_update_output_cb update_output_cb,
                                          libvlc_video_swap_cb swap_cb,
                                          libvlc_video_direct3d_start_end_rendering_cb makeCurrent_cb,
+                                         libvlc_video_frameMetadata_cb metadata_cb,
                                          libvlc_video_direct3d_select_plane_cb select_plane_cb,
                                          void* opaque );
 

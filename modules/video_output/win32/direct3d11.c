@@ -123,6 +123,7 @@ struct vout_display_sys_t
     libvlc_video_direct3d_update_output_cb   updateOutputCb;
     libvlc_video_swap_cb                     swapCb;
     libvlc_video_direct3d_start_end_rendering_cb startEndRenderingCb;
+    libvlc_video_frameMetadata_cb            sendMetadataCb;
     libvlc_video_direct3d_select_plane_cb    selectPlaneCb;
 };
 
@@ -316,6 +317,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
     sys->swapCb              = var_InheritAddress( vd, "vout-cb-swap" );
     sys->startEndRenderingCb = var_InheritAddress( vd, "vout-cb-make-current" );
+    sys->sendMetadataCb      = var_InheritAddress( vd, "vout-cb-metadata" );
     sys->selectPlaneCb       = var_InheritAddress( vd, "vout-cb-select-plane" );
 
     d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(context);
@@ -349,6 +351,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;
         sys->swapCb              = LocalSwapchainSwap;
         sys->startEndRenderingCb = LocalSwapchainStartEndRendering;
+        sys->sendMetadataCb      = LocalSwapchainSetMetadata;
         sys->selectPlaneCb       = LocalSwapchainSelectPlane;
     }
 
@@ -687,29 +690,30 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     VLC_UNUSED(date);
 
     d3d11_device_lock( sys->d3d_dev );
-    libvlc_video_direct3d_hdr10_metadata_t hdr10;
-    if (picture->format.mastering.max_luminance)
+    if ( sys->startEndRenderingCb( sys->outside_opaque, true ))
     {
-        hdr10.GreenPrimary[0] = picture->format.mastering.primaries[0];
-        hdr10.GreenPrimary[1] = picture->format.mastering.primaries[1];
-        hdr10.BluePrimary[0]  = picture->format.mastering.primaries[2];
-        hdr10.BluePrimary[1]  = picture->format.mastering.primaries[3];
-        hdr10.RedPrimary[0]   = picture->format.mastering.primaries[4];
-        hdr10.RedPrimary[1]   = picture->format.mastering.primaries[5];
-        hdr10.WhitePoint[0]   = picture->format.mastering.white_point[0];
-        hdr10.WhitePoint[1]   = picture->format.mastering.white_point[1];
-        hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
-        hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
-        hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
-        hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
-    }
+        if ( sys->sendMetadataCb && picture->format.mastering.max_luminance )
+        {
+            libvlc_video_direct3d_hdr10_metadata_t hdr10;
+            hdr10.GreenPrimary[0] = picture->format.mastering.primaries[0];
+            hdr10.GreenPrimary[1] = picture->format.mastering.primaries[1];
+            hdr10.BluePrimary[0]  = picture->format.mastering.primaries[2];
+            hdr10.BluePrimary[1]  = picture->format.mastering.primaries[3];
+            hdr10.RedPrimary[0]   = picture->format.mastering.primaries[4];
+            hdr10.RedPrimary[1]   = picture->format.mastering.primaries[5];
+            hdr10.WhitePoint[0]   = picture->format.mastering.white_point[0];
+            hdr10.WhitePoint[1]   = picture->format.mastering.white_point[1];
+            hdr10.MinMasteringLuminance = picture->format.mastering.min_luminance;
+            hdr10.MaxMasteringLuminance = picture->format.mastering.max_luminance;
+            hdr10.MaxContentLightLevel = picture->format.lighting.MaxCLL;
+            hdr10.MaxFrameAverageLightLevel = picture->format.lighting.MaxFALL;
 
-    if ( sys->startEndRenderingCb( sys->outside_opaque, true,
-                                   picture->format.mastering.max_luminance ? &hdr10 : NULL))
-    {
+            sys->sendMetadataCb( sys->outside_opaque, libvlc_video_metadata_frame_hdr10, &hdr10 );
+        }
+
         PreparePicture(vd, picture, subpicture);
 
-        sys->startEndRenderingCb( sys->outside_opaque, false, NULL );
+        sys->startEndRenderingCb( sys->outside_opaque, false );
     }
     d3d11_device_unlock( sys->d3d_dev );
 }

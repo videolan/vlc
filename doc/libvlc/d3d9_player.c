@@ -256,7 +256,7 @@ static void Swap_cb( void* opaque )
  *
  * This is called outside of the UI thread (in the VLC rendering thread).
  */
-static bool StartRendering_cb( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *hdr10 )
+static bool StartRendering_cb( void *opaque, bool enter )
 {
     struct render_context *ctx = opaque;
     if ( enter )
@@ -377,7 +377,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     /* Tell VLC to render into our D3D9 environment */
     libvlc_video_direct3d_set_callbacks( p_mp, libvlc_video_direct3d_engine_d3d9,
-                                        Setup_cb, Cleanup_cb, Resize_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb, NULL,
+                                        Setup_cb, Cleanup_cb, Resize_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb,
+                                        NULL, NULL,
                                         &Context );
 
     libvlc_media_player_play( p_mp );

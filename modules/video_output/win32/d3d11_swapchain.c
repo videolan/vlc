@@ -483,7 +483,7 @@ bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_direct3d_cfg_t
     return true;
 }
 
-bool LocalSwapchainStartEndRendering( void *opaque, bool enter, const libvlc_video_direct3d_hdr10_metadata_t *p_hdr10 )
+bool LocalSwapchainStartEndRendering( void *opaque, bool enter )
 {
     struct d3d11_local_swapchain *display = opaque;
 
@@ -507,27 +507,34 @@ bool LocalSwapchainStartEndRendering( void *opaque, bool enter, const libvlc_vid
         }
 #endif
 
-        if ( display->dxgiswapChain4 && p_hdr10 != NULL )
-        {
-            DXGI_HDR_METADATA_HDR10 hdr10 = { 0 };
-            hdr10.GreenPrimary[0] = p_hdr10->GreenPrimary[0];
-            hdr10.GreenPrimary[1] = p_hdr10->GreenPrimary[1];
-            hdr10.BluePrimary[0] = p_hdr10->BluePrimary[0];
-            hdr10.BluePrimary[1] = p_hdr10->BluePrimary[1];
-            hdr10.RedPrimary[0] = p_hdr10->RedPrimary[0];
-            hdr10.RedPrimary[1] = p_hdr10->RedPrimary[1];
-            hdr10.WhitePoint[0] = p_hdr10->WhitePoint[0];
-            hdr10.WhitePoint[1] = p_hdr10->WhitePoint[1];
-            hdr10.MinMasteringLuminance = p_hdr10->MinMasteringLuminance;
-            hdr10.MaxMasteringLuminance = p_hdr10->MaxMasteringLuminance;
-            hdr10.MaxContentLightLevel = p_hdr10->MaxContentLightLevel;
-            hdr10.MaxFrameAverageLightLevel = p_hdr10->MaxFrameAverageLightLevel;
-            IDXGISwapChain4_SetHDRMetaData( display->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof( hdr10 ), &hdr10 );
-        }
-
         D3D11_ClearRenderTargets( display->d3d_dev, display->pixelFormat, display->swapchainTargetView );
     }
     return true;
+}
+
+void LocalSwapchainSetMetadata( void *opaque, libvlc_video_metadata_type_t type, const void *metadata )
+{
+    struct d3d11_local_swapchain *display = opaque;
+
+    assert(type == libvlc_video_metadata_frame_hdr10);
+    if (type == libvlc_video_metadata_frame_hdr10 && metadata && display->dxgiswapChain4)
+    {
+        const libvlc_video_direct3d_hdr10_metadata_t *p_hdr10 = metadata;
+        DXGI_HDR_METADATA_HDR10 hdr10 = { 0 };
+        hdr10.GreenPrimary[0] = p_hdr10->GreenPrimary[0];
+        hdr10.GreenPrimary[1] = p_hdr10->GreenPrimary[1];
+        hdr10.BluePrimary[0] = p_hdr10->BluePrimary[0];
+        hdr10.BluePrimary[1] = p_hdr10->BluePrimary[1];
+        hdr10.RedPrimary[0] = p_hdr10->RedPrimary[0];
+        hdr10.RedPrimary[1] = p_hdr10->RedPrimary[1];
+        hdr10.WhitePoint[0] = p_hdr10->WhitePoint[0];
+        hdr10.WhitePoint[1] = p_hdr10->WhitePoint[1];
+        hdr10.MinMasteringLuminance = p_hdr10->MinMasteringLuminance;
+        hdr10.MaxMasteringLuminance = p_hdr10->MaxMasteringLuminance;
+        hdr10.MaxContentLightLevel = p_hdr10->MaxContentLightLevel;
+        hdr10.MaxFrameAverageLightLevel = p_hdr10->MaxFrameAverageLightLevel;
+        IDXGISwapChain4_SetHDRMetaData( display->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof( hdr10 ), &hdr10 );
+    }
 }
 
 bool LocalSwapchainSelectPlane( void *opaque, size_t plane )

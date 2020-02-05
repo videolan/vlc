@@ -1087,7 +1087,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
     IDirect3DDevice9 *d3ddev = sys->d3d9_device->d3ddev.dev;
     HRESULT hr;
 
-    if (sys->startEndRenderingCb && !sys->startEndRenderingCb( sys->outside_opaque, true, NULL ))
+    if (sys->startEndRenderingCb && !sys->startEndRenderingCb( sys->outside_opaque, true ))
         return;
 
     if (sys->clear_scene) {
@@ -1125,7 +1125,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
         msg_Dbg(vd, "Failed EndScene: 0x%lX", hr);
 
     if (sys->startEndRenderingCb)
-        sys->startEndRenderingCb( sys->outside_opaque, false, NULL );
+        sys->startEndRenderingCb( sys->outside_opaque, false );
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
