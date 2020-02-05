@@ -96,7 +96,8 @@ struct vout_display_sys_t
     display_info_t           display;
 
     d3d11_handle_t           hd3d;
-    d3d11_device_t           d3d_dev;
+    d3d11_device_t           *d3d_dev;
+    d3d11_device_t           local_d3d_dev; // when opened without a video context
     d3d_quad_t               picQuad;
 
     ID3D11Query              *prepareWait;
@@ -269,7 +270,7 @@ static void UpdateSize(vout_display_t *vd)
 
     QueryDisplayFormat(vd, &vd->fmt);
 
-    d3d11_device_lock( &sys->d3d_dev );
+    d3d11_device_lock( sys->d3d_dev );
 
     UpdatePicQuadPosition(vd);
 
@@ -279,10 +280,10 @@ static void UpdateSize(vout_display_t *vd)
         .top    = vd->source.i_y_offset,
         .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
     };
-    D3D11_UpdateQuadPosition(vd, &sys->d3d_dev, &sys->picQuad, &source_rect,
+    D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
                              vd->source.orientation);
 
-    d3d11_device_unlock( &sys->d3d_dev );
+    d3d11_device_unlock( sys->d3d_dev );
 }
 
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
@@ -317,22 +318,20 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->startEndRenderingCb = var_InheritAddress( vd, "vout-cb-make-current" );
     sys->selectPlaneCb       = var_InheritAddress( vd, "vout-cb-select-plane" );
 
-    HRESULT hr;
-    d3d11_decoder_device_t *d3d11_decoder = GetD3D11OpaqueContext(context);
-    if ( d3d11_decoder != NULL )
+    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(context);
+    if ( vctx_sys != NULL )
     {
-        hr = D3D11_CreateDeviceExternal(vd, d3d11_decoder->device,
-                                        is_d3d11_opaque(vd->source.i_chroma),
-                                        &sys->d3d_dev);
+        sys->d3d_dev = &vctx_sys->d3d_dev;
     }
     else
     {
         // No d3d11 device, we create one
-        hr = D3D11_CreateDevice(vd, &sys->hd3d, NULL, false, &sys->d3d_dev);
-    }
-    if (FAILED(hr)) {
-        msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
-        goto error;
+        HRESULT hr = D3D11_CreateDevice(vd, &sys->hd3d, NULL, false, &sys->local_d3d_dev);
+        if (FAILED(hr)) {
+            msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
+            goto error;
+        }
+        sys->d3d_dev = &sys->local_d3d_dev;
     }
 
     if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
@@ -344,7 +343,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 #endif /* !VLC_WINSTORE_APP */
 
         /* use our internal swapchain callbacks */
-        sys->outside_opaque      = CreateLocalSwapchainHandle(VLC_OBJECT(vd), sys->sys.hvideownd, &sys->d3d_dev);
+        sys->outside_opaque      = CreateLocalSwapchainHandle(VLC_OBJECT(vd), sys->sys.hvideownd, sys->d3d_dev);
         if (unlikely(sys->outside_opaque == NULL))
             goto error;
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;
@@ -479,7 +478,7 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 
     HRESULT hr;
     D3D11_MAPPED_SUBRESOURCE mapped;
-    hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    hr = ID3D11DeviceContext_Map(sys->d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
     if (SUCCEEDED(hr)) {
         VS_PROJECTION_CONST *dst_data = mapped.pData;
         getZoomMatrix(SPHERE_RADIUS * f_z, dst_data->Zoom);
@@ -489,7 +488,7 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
         vlc_viewpoint_reverse(&vp, p_vp);
         vlc_viewpoint_to_4x4(&vp, dst_data->View);
     }
-    ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0);
+    ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0);
 }
 
 static int Control(vout_display_t *vd, int query, va_list args)
@@ -534,12 +533,12 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 
         bool b_mapped = true;
         for (i = 0; i < picture->i_planes; i++) {
-            hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[i],
+            hr = ID3D11DeviceContext_Map(sys->d3d_dev->d3dcontext, sys->stagingSys.resource[i],
                                          0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
             if( unlikely(FAILED(hr)) )
             {
                 while (i-- > 0)
-                    ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[i], 0);
+                    ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, sys->stagingSys.resource[i], 0);
                 b_mapped = false;
                 break;
             }
@@ -553,7 +552,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 plane_CopyPixels(&sys->stagingPlanes[i], &picture->p[i]);
 
             for (i = 0; i < picture->i_planes; i++)
-                ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[i], 0);
+                ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, sys->stagingSys.resource[i], 0);
         }
     }
     else if (!is_d3d11_opaque(picture->format.i_chroma))
@@ -561,7 +560,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         D3D11_MAPPED_SUBRESOURCE mappedResource;
         HRESULT hr;
 
-        hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[0],
+        hr = ID3D11DeviceContext_Map(sys->d3d_dev->d3dcontext, sys->stagingSys.resource[0],
                                         0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
         if( unlikely(FAILED(hr)) )
             msg_Err(vd, "Failed to map the %4.4s staging picture. (hr=0x%lX)", (const char*)&picture->format.i_chroma, hr);
@@ -578,14 +577,14 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 buf += sys->stagingPlanes[i].i_pitch * sys->stagingPlanes[i].i_lines;
             }
 
-            ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, sys->stagingSys.resource[0], 0);
+            ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, sys->stagingSys.resource[0], 0);
         }
     }
     else
     {
         picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(picture);
 
-        d3d11_device_lock( &sys->d3d_dev );
+        d3d11_device_lock( sys->d3d_dev );
 
         if (sys->legacy_shader) {
             D3D11_TEXTURE2D_DESC srcDesc,texDesc;
@@ -598,7 +597,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 .right = __MIN(srcDesc.Width, texDesc.Width),
                 .back = 1,
             };
-            ID3D11DeviceContext_CopySubresourceRegion(sys->d3d_dev.d3dcontext,
+            ID3D11DeviceContext_CopySubresourceRegion(sys->d3d_dev->d3dcontext,
                                                       sys->stagingSys.resource[KNOWN_DXGI_INDEX],
                                                       0, 0, 0, 0,
                                                       p_sys->resource[KNOWN_DXGI_INDEX],
@@ -639,7 +638,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
 
     if (picture->format.mastering.max_luminance)
     {
-        D3D11_UpdateQuadLuminanceScale(vd, &sys->d3d_dev, &sys->picQuad, (float)sys->display.luminance_peak / GetFormatLuminance(VLC_OBJECT(vd), &picture->format));
+        D3D11_UpdateQuadLuminanceScale(vd, sys->d3d_dev, &sys->picQuad, (float)sys->display.luminance_peak / GetFormatLuminance(VLC_OBJECT(vd), &picture->format));
     }
 
     /* Render the quad */
@@ -650,7 +649,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(picture);
         renderSrc = p_sys->renderSrc;
     }
-    D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad,
+    D3D11_RenderQuad(sys->d3d_dev, &sys->picQuad,
                      vd->source.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
                      renderSrc, SelectRenderPlane, sys);
 
@@ -660,7 +659,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             if (sys->d3dregions[i])
             {
                 d3d_quad_t *quad = (d3d_quad_t *) sys->d3dregions[i]->p_sys;
-                D3D11_RenderQuad(&sys->d3d_dev, quad, &sys->flatVShader,
+                D3D11_RenderQuad(sys->d3d_dev, quad, &sys->flatVShader,
                                  quad->picSys.renderSrc, SelectRenderPlane, sys);
             }
         }
@@ -669,16 +668,16 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
     if (sys->prepareWait)
     {
         int maxWait = 10;
-        ID3D11DeviceContext_End(sys->d3d_dev.d3dcontext, (ID3D11Asynchronous*)sys->prepareWait);
+        ID3D11DeviceContext_End(sys->d3d_dev->d3dcontext, (ID3D11Asynchronous*)sys->prepareWait);
 
-        while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev.d3dcontext,
+        while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev->d3dcontext,
                                                       (ID3D11Asynchronous*)sys->prepareWait, NULL, 0, 0)
                && --maxWait)
             SleepEx(2, TRUE);
     }
 
     if (is_d3d11_opaque(picture->format.i_chroma) && sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_UNKNOWN)
-        d3d11_device_unlock( &sys->d3d_dev );
+        d3d11_device_unlock( sys->d3d_dev );
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
@@ -719,9 +718,9 @@ static void Display(vout_display_t *vd, picture_t *picture)
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
 
-    d3d11_device_lock( &sys->d3d_dev );
+    d3d11_device_lock( sys->d3d_dev );
     sys->swapCb(sys->outside_opaque);
-    d3d11_device_unlock( &sys->d3d_dev );
+    d3d11_device_unlock( sys->d3d_dev );
 }
 
 static void Direct3D11Destroy(vout_display_t *vd)
@@ -736,14 +735,14 @@ static const d3d_format_t *GetDirectRenderingFormat(vout_display_t *vd, vlc_four
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (is_d3d11_opaque(i_src_chroma))
         supportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-    return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT, 0, 0, 0,
+    return FindD3D11Format( vd, vd->sys->d3d_dev, i_src_chroma, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT, 0, 0, 0,
                             is_d3d11_opaque(i_src_chroma) ? D3D11_CHROMA_GPU : D3D11_CHROMA_CPU, supportFlags );
 }
 
 static const d3d_format_t *GetDirectDecoderFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-    return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT, 0, 0, 0,
+    return FindD3D11Format( vd, vd->sys->d3d_dev, i_src_chroma, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT, 0, 0, 0,
                             D3D11_CHROMA_GPU, supportFlags );
 }
 
@@ -756,7 +755,7 @@ static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t b
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (from_processor)
         supportFlags |= D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT;
-    return FindD3D11Format( vd, &vd->sys->d3d_dev, 0, rgb_yuv,
+    return FindD3D11Format( vd, vd->sys->d3d_dev, 0, rgb_yuv,
                             bit_depth, widthDenominator, heightDenominator,
                             D3D11_CHROMA_CPU, supportFlags );
 }
@@ -764,7 +763,7 @@ static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t b
 static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_BLENDABLE;
-    return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT, 0, 0, 0, D3D11_CHROMA_CPU, supportFlags );
+    return FindD3D11Format( vd, vd->sys->d3d_dev, i_src_chroma, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT, 0, 0, 0, D3D11_CHROMA_CPU, supportFlags );
 }
 
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_context *vctx)
@@ -847,7 +846,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
 
     d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate(vctx);
     if (vtcx_sys != NULL &&
-        DeviceSupportsFormat( vd->sys->d3d_dev.d3ddevice, vtcx_sys->format, D3D11_FORMAT_SUPPORT_SHADER_LOAD ))
+        DeviceSupportsFormat( vd->sys->d3d_dev->d3ddevice, vtcx_sys->format, D3D11_FORMAT_SUPPORT_SHADER_LOAD ))
     {
         for (const d3d_format_t *output_format = GetRenderFormatList();
             output_format->name != NULL; ++output_format)
@@ -973,7 +972,8 @@ static void Direct3D11Close(vout_display_t *vd)
 
     Direct3D11DestroyResources(vd);
 
-    D3D11_ReleaseDevice( &sys->d3d_dev );
+    if (sys->d3d_dev == &sys->local_d3d_dev)
+        D3D11_ReleaseDevice( &sys->local_d3d_dev );
 
     if ( sys->swapCb == LocalSwapchainSwap )
         LocalSwapchainCleanupDevice( sys->outside_opaque );
@@ -1015,7 +1015,7 @@ static bool CanUseTextureArray(vout_display_t *vd)
     struct wddm_version WDDM_os = {
         .wddm         = 21,  // starting with drivers designed for W10 Anniversary Update
     };
-    if (D3D11CheckDriverVersion(&vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_os) != VLC_SUCCESS)
+    if (D3D11CheckDriverVersion(vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_os) != VLC_SUCCESS)
     {
         msg_Dbg(vd, "AMD driver too old, fallback to legacy shader mode");
         return false;
@@ -1025,7 +1025,7 @@ static bool CanUseTextureArray(vout_display_t *vd)
     struct wddm_version WDDM_build = {
         .revision     = 162,
     };
-    if (D3D11CheckDriverVersion(&vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_build) != VLC_SUCCESS)
+    if (D3D11CheckDriverVersion(vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_build) != VLC_SUCCESS)
     {
         msg_Dbg(vd, "Bogus AMD driver detected, fallback to legacy shader mode");
         return false;
@@ -1037,10 +1037,10 @@ static bool CanUseTextureArray(vout_display_t *vd)
 
 static bool BogusZeroCopy(const vout_display_t *vd)
 {
-    if (vd->sys->d3d_dev.adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
+    if (vd->sys->d3d_dev->adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
         return false;
 
-    switch (vd->sys->d3d_dev.adapterDesc.DeviceId)
+    switch (vd->sys->d3d_dev->adapterDesc.DeviceId)
     {
     case 0x687F: // RX Vega 56/64
     case 0x6863: // RX Vega Frontier Edition
@@ -1049,7 +1049,7 @@ static bool BogusZeroCopy(const vout_display_t *vd)
         struct wddm_version WDDM = {
             .revision     = 14011, // 18.10.2 - 2018/06/11
         };
-        return D3D11CheckDriverVersion(&vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM) != VLC_SUCCESS;
+        return D3D11CheckDriverVersion(vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM) != VLC_SUCCESS;
     }
     default:
         return false;
@@ -1063,10 +1063,10 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
 
-    sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
+    sys->legacy_shader = sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
             BogusZeroCopy(vd);
 
-    hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
+    hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, sys->d3d_dev,
                                   &sys->display, fmt->transfer, fmt->primaries,
                                   fmt->color_range == COLOR_RANGE_FULL,
                                   &sys->picQuad);
@@ -1076,7 +1076,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         return VLC_EGENERIC;
     }
 
-    if (D3D11_AllocateQuad(vd, &sys->d3d_dev, vd->source.projection_mode, &sys->picQuad) != VLC_SUCCESS)
+    if (D3D11_AllocateQuad(vd, sys->d3d_dev, vd->source.projection_mode, &sys->picQuad) != VLC_SUCCESS)
     {
         msg_Err(vd, "Could not allocate quad buffers.");
        return VLC_EGENERIC;
@@ -1088,7 +1088,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         .top    = vd->source.i_y_offset,
         .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
     };
-    if (D3D11_SetupQuad( vd, &sys->d3d_dev, &sys->area.texture_source, &sys->picQuad, &sys->display,
+    if (D3D11_SetupQuad( vd, sys->d3d_dev, &sys->area.texture_source, &sys->picQuad, &sys->display,
                          &source_rect,
                          vd->source.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
@@ -1101,7 +1101,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     if (is_d3d11_opaque(fmt->i_chroma)) {
         ID3D10Multithread *pMultithread;
-        hr = ID3D11Device_QueryInterface( sys->d3d_dev.d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
+        hr = ID3D11Device_QueryInterface( sys->d3d_dev->d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
         if (SUCCEEDED(hr)) {
             ID3D10Multithread_SetMultithreadProtected(pMultithread, TRUE);
             ID3D10Multithread_Release(pMultithread);
@@ -1116,13 +1116,13 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         if (!is_d3d11_opaque(fmt->i_chroma))
             sys->area.texture_source.i_chroma = sys->picQuad.textureFormat->fourcc;
 
-        if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &sys->area.texture_source, 1, textures, sys->stagingPlanes))
+        if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.textureFormat, &sys->area.texture_source, 1, textures, sys->stagingPlanes))
         {
             msg_Err(vd, "Failed to allocate the staging texture");
             return VLC_EGENERIC;
         }
 
-        if (D3D11_AllocateResourceView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.textureFormat,
+        if (D3D11_AllocateResourceView(vd, sys->d3d_dev->d3ddevice, sys->picQuad.textureFormat,
                                      textures, 0, sys->stagingSys.renderSrc))
         {
             msg_Err(vd, "Failed to allocate the staging shader view");
@@ -1144,7 +1144,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
 
     D3D11_QUERY_DESC query = { 0 };
     query.Query = D3D11_QUERY_EVENT;
-    hr = ID3D11Device_CreateQuery(sys->d3d_dev.d3ddevice, &query, &sys->prepareWait);
+    hr = ID3D11Device_CreateQuery(sys->d3d_dev->d3ddevice, &query, &sys->prepareWait);
 
     ID3D11BlendState *pSpuBlendState;
     D3D11_BLEND_DESC spuBlendDesc = { 0 };
@@ -1159,12 +1159,12 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     spuBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE; /* keep source intact */
     spuBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO; /* discard */
 
-    hr = ID3D11Device_CreateBlendState(sys->d3d_dev.d3ddevice, &spuBlendDesc, &pSpuBlendState);
+    hr = ID3D11Device_CreateBlendState(sys->d3d_dev->d3ddevice, &spuBlendDesc, &pSpuBlendState);
     if (FAILED(hr)) {
        msg_Err(vd, "Could not create SPU blend state. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
-    ID3D11DeviceContext_OMSetBlendState(sys->d3d_dev.d3dcontext, pSpuBlendState, NULL, 0xFFFFFFFF);
+    ID3D11DeviceContext_OMSetBlendState(sys->d3d_dev->d3dcontext, pSpuBlendState, NULL, 0xFFFFFFFF);
     ID3D11BlendState_Release(pSpuBlendState);
 
     /* disable depth testing as we're only doing 2D
@@ -1175,15 +1175,15 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     ZeroMemory(&stencilDesc, sizeof(stencilDesc));
 
     ID3D11DepthStencilState *pDepthStencilState;
-    hr = ID3D11Device_CreateDepthStencilState(sys->d3d_dev.d3ddevice, &stencilDesc, &pDepthStencilState );
+    hr = ID3D11Device_CreateDepthStencilState(sys->d3d_dev->d3ddevice, &stencilDesc, &pDepthStencilState );
     if (SUCCEEDED(hr)) {
-        ID3D11DeviceContext_OMSetDepthStencilState(sys->d3d_dev.d3dcontext, pDepthStencilState, 0);
+        ID3D11DeviceContext_OMSetDepthStencilState(sys->d3d_dev->d3dcontext, pDepthStencilState, 0);
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
     if (sys->regionQuad.textureFormat != NULL)
     {
-        hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
+        hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, sys->d3d_dev,
                                       &sys->display, TRANSFER_FUNC_SRGB, COLOR_PRIMARIES_SRGB, true,
                                       &sys->regionQuad);
         if (FAILED(hr))
@@ -1194,13 +1194,13 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         }
     }
 
-    hr = D3D11_CompileFlatVertexShader(vd, &sys->hd3d, &sys->d3d_dev, &sys->flatVShader);
+    hr = D3D11_CompileFlatVertexShader(vd, &sys->hd3d, sys->d3d_dev, &sys->flatVShader);
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
 
-    hr = D3D11_CompileProjectionVertexShader(vd, &sys->hd3d, &sys->d3d_dev, &sys->projectionVShader);
+    hr = D3D11_CompileProjectionVertexShader(vd, &sys->hd3d, sys->d3d_dev, &sys->projectionVShader);
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to create the projection vertex shader. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
@@ -1302,7 +1302,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
-            if (AllocateTextures(vd, &sys->d3d_dev, sys->regionQuad.textureFormat, &r->p_picture->format, 1, d3dquad->picSys.texture, NULL)) {
+            if (AllocateTextures(vd, sys->d3d_dev, sys->regionQuad.textureFormat, &r->p_picture->format, 1, d3dquad->picSys.texture, NULL)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 for (int j=0; j<D3D11_MAX_SHADER_VIEW; j++)
@@ -1312,7 +1312,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
 
-            if (D3D11_AllocateResourceView(vd, sys->d3d_dev.d3ddevice, sys->regionQuad.textureFormat,
+            if (D3D11_AllocateResourceView(vd, sys->d3d_dev->d3ddevice, sys->regionQuad.textureFormat,
                                            d3dquad->picSys.texture, 0,
                                            d3dquad->picSys.renderSrc)) {
                 msg_Err(vd, "Failed to create %dx%d shader view for OSD",
@@ -1324,7 +1324,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             d3dquad->i_height   = r->fmt.i_height;
 
             d3dquad->textureFormat = sys->regionQuad.textureFormat;
-            err = D3D11_AllocateQuad(vd, &sys->d3d_dev, PROJECTION_MODE_RECTANGULAR, d3dquad);
+            err = D3D11_AllocateQuad(vd, sys->d3d_dev, PROJECTION_MODE_RECTANGULAR, d3dquad);
             if (err != VLC_SUCCESS)
             {
                 msg_Err(vd, "Failed to allocate %dx%d quad for OSD",
@@ -1333,7 +1333,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
 
-            err = D3D11_SetupQuad( vd, &sys->d3d_dev, &r->fmt, d3dquad, &sys->display, &output,
+            err = D3D11_SetupQuad( vd, sys->d3d_dev, &r->fmt, d3dquad, &sys->display, &output,
                                    ORIENT_NORMAL );
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to setup %dx%d quad for OSD",
@@ -1363,15 +1363,15 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 }
             }
         } else {
-            D3D11_UpdateQuadPosition(vd, &sys->d3d_dev, (d3d_quad_t *) quad_picture->p_sys, &output, ORIENT_NORMAL);
+            D3D11_UpdateQuadPosition(vd, sys->d3d_dev, (d3d_quad_t *) quad_picture->p_sys, &output, ORIENT_NORMAL);
         }
 
-        hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+        hr = ID3D11DeviceContext_Map(sys->d3d_dev->d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
         if( SUCCEEDED(hr) ) {
             err = picture_UpdatePlanes(quad_picture, mappedResource.pData, mappedResource.RowPitch);
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to set the buffer on the SPU picture" );
-                ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0);
+                ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0);
                 picture_Release(quad_picture);
                 if ((*region)[i] == quad_picture)
                     (*region)[i] = NULL;
@@ -1380,7 +1380,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
             picture_CopyPixels(quad_picture, r->p_picture);
 
-            ID3D11DeviceContext_Unmap(sys->d3d_dev.d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0);
+            ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0);
         } else {
             msg_Err(vd, "Failed to map the SPU texture (hr=0x%lX)", hr );
             picture_Release(quad_picture);
@@ -1416,7 +1416,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
 
         D3D11_UpdateViewport( quad, &spuViewport, sys->display.pixelFormat );
 
-        D3D11_UpdateQuadOpacity(vd, &sys->d3d_dev, quad, r->i_alpha / 255.0f );
+        D3D11_UpdateQuadOpacity(vd, sys->d3d_dev, quad, r->i_alpha / 255.0f );
     }
     return VLC_SUCCESS;
 }
