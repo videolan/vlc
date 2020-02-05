@@ -152,7 +152,8 @@ void webvtt_text_parser_Delete( webvtt_text_parser_t *p )
 static void forward_line( webvtt_text_parser_t *p, const char *psz_line, bool b_new )
 {
     if( p->pf_header )
-        p->pf_header( p->priv, p->section, b_new, psz_line );
+        p->pf_header( p->priv, (enum webvtt_header_line_e)p->section,
+                      b_new, psz_line );
 }
 
 void webvtt_text_parser_Feed( webvtt_text_parser_t *p, char *psz_line )
