@@ -42,7 +42,7 @@
 typedef struct
 {
     d3d11_handle_t                 hd3d;
-    d3d11_device_t                 d3d_dev;
+    d3d11_device_t                 *d3d_dev;
     d3d11_processor_t              d3d_proc;
 
     union {
@@ -168,9 +168,7 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
         .back = 1,
     };
 
-    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(p_filter->vctx_out);
-
-    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->d3d_dev.d3dcontext,
+    ID3D11DeviceContext_CopySubresourceRegion(p_sys->d3d_dev->d3dcontext,
                                               p_out_sys->resource[KNOWN_DXGI_INDEX],
                                               p_out_sys->slice_index,
                                               0, 0, 0,
@@ -188,11 +186,11 @@ static picture_t *Deinterlace(filter_t *p_filter, picture_t *p_pic)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    d3d11_device_lock( &p_sys->d3d_dev );
+    d3d11_device_lock( p_sys->d3d_dev );
 
     picture_t *res = DoDeinterlacing( p_filter, &p_sys->context, p_pic );
 
-    d3d11_device_unlock( &p_sys->d3d_dev );
+    d3d11_device_unlock( p_sys->d3d_dev );
 
     return res;
 }
@@ -234,7 +232,7 @@ picture_t *AllocPicture( filter_t *p_filter )
         return NULL;
 
     struct d3d11_pic_context *pic_ctx = container_of(pic->context, struct d3d11_pic_context, s);
-    D3D11_AllocateResourceView(p_filter, p_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
+    D3D11_AllocateResourceView(p_filter, p_sys->d3d_dev->d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
 
     return pic;
 }
@@ -264,14 +262,8 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
        goto error;
     }
 
-    hr = D3D11_CreateDeviceExternal( filter, vtcx_sys->d3d_dev.d3dcontext, true, &sys->d3d_dev );
-    if (FAILED(hr))
-    {
-        msg_Dbg(filter, "Failed to use the given video context");
-        goto error;
-    }
-
-    if (D3D11_CreateProcessor(filter, &sys->d3d_dev, D3D11_VIDEO_FRAME_FORMAT_INTERLACED_TOP_FIELD_FIRST,
+    sys->d3d_dev = &vtcx_sys->d3d_dev;
+    if (D3D11_CreateProcessor(filter, sys->d3d_dev, D3D11_VIDEO_FRAME_FORMAT_INTERLACED_TOP_FIELD_FIRST,
                               &filter->fmt_out.video, &filter->fmt_out.video, &sys->d3d_proc) != VLC_SUCCESS)
         goto error;
 
@@ -356,7 +348,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
     texDesc.Height = filter->fmt_out.video.i_height;
     texDesc.Width  = filter->fmt_out.video.i_width;
 
-    hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &sys->outTexture );
+    hr = ID3D11Device_CreateTexture2D( sys->d3d_dev->d3ddevice, &texDesc, NULL, &sys->outTexture );
     if (FAILED(hr)) {
         msg_Err(filter, "CreateTexture2D failed. (hr=0x%lX)", hr);
         goto error;
@@ -410,8 +402,6 @@ error:
     if (sys->outTexture)
         ID3D11Texture2D_Release(sys->outTexture);
     D3D11_ReleaseProcessor(&sys->d3d_proc);
-    if (sys->d3d_dev.d3dcontext)
-        D3D11_ReleaseDevice(&sys->d3d_dev);
     D3D11_Destroy(&sys->hd3d);
     free(sys);
 
@@ -427,7 +417,6 @@ void D3D11CloseDeinterlace(vlc_object_t *obj)
         ID3D11VideoProcessorOutputView_Release(sys->processorOutput);
     ID3D11Texture2D_Release(sys->outTexture);
     D3D11_ReleaseProcessor( &sys->d3d_proc );
-    D3D11_ReleaseDevice(&sys->d3d_dev);
     vlc_video_context_Release(filter->vctx_out);
     D3D11_Destroy(&sys->hd3d);
 
