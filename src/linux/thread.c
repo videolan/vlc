@@ -60,11 +60,16 @@ static int vlc_futex_wake(void *addr, int nr)
 
 static int vlc_futex_wait(void *addr, unsigned val, const struct timespec *to)
 {
-    int ret, type;
+    int ret;
 
+#ifndef __ANDROID__
+    int type;
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &type);
+#endif
     ret = sys_futex(addr, FUTEX_WAIT_PRIVATE, val, to, NULL, 0);
+#ifndef __ANDROID__
     pthread_setcanceltype(type, NULL);
+#endif
     return ret;
 }
 
