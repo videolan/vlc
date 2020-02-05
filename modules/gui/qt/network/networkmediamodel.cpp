@@ -294,7 +294,12 @@ void NetworkMediaModel::onItemCleared( MediaSourcePtr mediaSource, input_item_no
         if (!found)
             return;
 
-        refreshMediaList( std::move( mediaSource ), res->pp_children, res->i_children, true );
+        std::vector<InputItemPtr> itemList;
+        itemList.reserve( static_cast<size_t>(res->i_children) );
+        for (int i = 0; i < res->i_children; i++)
+            itemList.emplace_back(res->pp_children[i]->p_item);
+
+        refreshMediaList( std::move( mediaSource ), std::move( itemList ), true );
     }, Qt::QueuedConnection);
 }
 
@@ -303,9 +308,14 @@ void NetworkMediaModel::onItemAdded( MediaSourcePtr mediaSource, input_item_node
                                   size_t count )
 {
     InputItemPtr p_parent { parent->p_item };
-    QMetaObject::invokeMethod(this, [this, p_parent = std::move(p_parent), mediaSource = std::move(mediaSource), children, count]() {
+    std::vector<InputItemPtr> itemList;
+    itemList.reserve( count );
+    for (size_t i = 0; i < count; i++)
+        itemList.emplace_back(children[i]->p_item);
+
+    QMetaObject::invokeMethod(this, [this, p_parent = std::move(p_parent), mediaSource = std::move(mediaSource), itemList=std::move(itemList)]() {
         if ( p_parent == m_treeItem.media )
-            refreshMediaList( std::move( mediaSource ), children, count, false );
+            refreshMediaList( std::move( mediaSource ), std::move( itemList ), false );
     }, Qt::QueuedConnection);
 }
 
@@ -364,13 +374,12 @@ void NetworkMediaModel::onItemPreparseEnded(MediaSourcePtr, input_item_node_t* n
 }
 
 void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
-                                       input_item_node_t* const children[], size_t count,
+                                       std::vector<InputItemPtr> childrens,
                                        bool clear )
 {
     std::vector<Item> items;
-    for ( auto i = 0u; i < count; ++i )
+    for ( auto it: childrens)
     {
-        auto it = children[i]->p_item;
         Item item;
         item.name = it->psz_name;
         item.protocol = "";
@@ -389,7 +398,7 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
                                     &item.indexed ) != VLC_SUCCESS )
                 item.indexed = false;
         }
-        item.tree = NetworkTreeItem( mediaSource, it );
+        item.tree = NetworkTreeItem( mediaSource, it.get() );
         items.push_back( std::move( item ) );
     }
     if ( clear == true )
