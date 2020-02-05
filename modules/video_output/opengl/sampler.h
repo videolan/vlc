@@ -90,6 +90,19 @@ struct vlc_gl_sampler {
 
     struct vlc_gl_interop *interop;
 
+    struct {
+        /**
+         * Piece of fragment shader code providing the GLSL function
+         * vlc_texture(vec2 coords).
+         *
+         * It is initialized by the sampler, and is never NULL.
+         *
+         * Users of this sampler should inject this provided code into their
+         * fragment shader, before any call to vlc_texture().
+         */
+        char *body;
+    } shader;
+
     /**
      * Callback to fetch locations of uniform or attributes variables
      *

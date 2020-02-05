@@ -270,11 +270,11 @@ BuildFragmentShader(struct vlc_gl_renderer *renderer)
 {
     struct vlc_gl_sampler *sampler = renderer->sampler;
     const struct vlc_gl_interop *interop = sampler->interop;
-    char *vlc_texture =
+    int ret =
         opengl_fragment_shader_init(sampler, interop->tex_target,
                                     interop->sw_fmt.i_chroma,
                                     interop->sw_fmt.space);
-    if (!vlc_texture)
+    if (ret != VLC_SUCCESS)
         return NULL;
 
     static const char *template =
@@ -293,9 +293,8 @@ BuildFragmentShader(struct vlc_gl_renderer *renderer)
                            : "";
 
     char *code;
-    int ret = asprintf(&code, template, renderer->glsl_version, extensions,
-                       renderer->glsl_precision_header, vlc_texture);
-    free(vlc_texture);
+    ret = asprintf(&code, template, renderer->glsl_version, extensions,
+                   renderer->glsl_precision_header, sampler->shader.body);
     if (ret < 0)
         return NULL;
 

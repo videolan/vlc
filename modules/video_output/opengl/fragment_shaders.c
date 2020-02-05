@@ -392,7 +392,7 @@ sampler_xyz12_prepare_shader(const struct vlc_gl_sampler *sampler)
                          sampler->var.OrientationMatrix);
 }
 
-static char *
+static int
 xyz12_shader_init(struct vlc_gl_sampler *sampler)
 {
     sampler->pf_fetch_locations = sampler_xyz12_fetch_locations;
@@ -433,7 +433,11 @@ xyz12_shader_init(struct vlc_gl_sampler *sampler)
         " return v_out;"
         "}\n";
 
-    return strdup(template);
+    sampler->shader.body = strdup(template);
+    if (!sampler->shader.body)
+        return VLC_ENOMEM;
+
+    return VLC_SUCCESS;
 }
 
 static int
@@ -495,7 +499,7 @@ opengl_init_swizzle(const struct vlc_gl_interop *interop,
     return VLC_SUCCESS;
 }
 
-char *
+int
 opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
                             vlc_fourcc_t chroma, video_color_space_t yuv_space)
 {
@@ -507,7 +511,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 
     const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(chroma);
     if (desc == NULL)
-        return NULL;
+        return VLC_EGENERIC;
 
     if (chroma == VLC_CODEC_XYZ12)
         return xyz12_shader_init(sampler);
@@ -516,10 +520,10 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     {
         ret = sampler_yuv_base_init(sampler, chroma, desc, yuv_space);
         if (ret != VLC_SUCCESS)
-            return NULL;
+            return ret;
         ret = opengl_init_swizzle(interop, swizzle_per_tex, chroma, desc);
         if (ret != VLC_SUCCESS)
-            return NULL;
+            return ret;
     }
 
     const char *glsl_sampler, *lookup;
@@ -543,7 +547,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 
     struct vlc_memstream ms;
     if (vlc_memstream_open(&ms) != 0)
-        return NULL;
+        return VLC_EGENERIC;
 
 #define ADD(x) vlc_memstream_puts(&ms, x)
 #define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
@@ -704,10 +708,12 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 #undef ADDF
 
     if (vlc_memstream_close(&ms) != 0)
-        return NULL;
+        return VLC_EGENERIC;
+
+    sampler->shader.body = ms.ptr;
 
     sampler->pf_fetch_locations = sampler_base_fetch_locations;
     sampler->pf_prepare_shader = sampler_base_prepare_shader;
 
-    return ms.ptr;
+    return VLC_SUCCESS;
 }
