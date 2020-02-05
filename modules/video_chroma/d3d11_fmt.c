@@ -800,7 +800,7 @@ picture_context_t *d3d11_pic_context_copy(picture_context_t *ctx)
     return &pic_ctx->s;
 }
 
-picture_t *D3D11_AllocPicture(vlc_object_t *obj, d3d11_device_t *d3d_dev,
+picture_t *D3D11_AllocPicture(vlc_object_t *obj,
                               const video_format_t *fmt, vlc_video_context *vctx_out, const d3d_format_t *cfg)
 {
     if (unlikely(cfg == NULL))
@@ -817,7 +817,8 @@ picture_t *D3D11_AllocPicture(vlc_object_t *obj, d3d11_device_t *d3d_dev,
         return NULL;
     }
 
-    if (AllocateTextures(obj, d3d_dev, cfg,
+    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(vctx_out);
+    if (AllocateTextures(obj, &vctx_sys->d3d_dev, cfg,
                          fmt, 1, pic_ctx->picsys.texture, NULL) != VLC_SUCCESS)
     {
         picture_Release(pic);
@@ -825,7 +826,7 @@ picture_t *D3D11_AllocPicture(vlc_object_t *obj, d3d11_device_t *d3d_dev,
         return NULL;
     }
 
-    D3D11_AllocateResourceView(obj, d3d_dev->d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
+    D3D11_AllocateResourceView(obj, vctx_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
 
     pic_ctx->s = (picture_context_t) {
         d3d11_pic_context_destroy, d3d11_pic_context_copy,

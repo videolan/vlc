@@ -229,7 +229,7 @@ picture_t *AllocPicture( filter_t *p_filter )
     if (unlikely(cfg == NULL))
         return NULL;
 
-    picture_t *pic = D3D11_AllocPicture(VLC_OBJECT(p_filter), &p_sys->d3d_dev, &p_filter->fmt_out.video, p_filter->vctx_out, cfg);
+    picture_t *pic = D3D11_AllocPicture(VLC_OBJECT(p_filter), &p_filter->fmt_out.video, p_filter->vctx_out, cfg);
     if (unlikely(pic == NULL))
         return NULL;
 

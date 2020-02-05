@@ -219,7 +219,7 @@ static inline void d3d11_device_unlock(d3d11_device_t *d3d_dev)
 void d3d11_pic_context_destroy(picture_context_t *);
 picture_context_t *d3d11_pic_context_copy(picture_context_t *);
 
-picture_t *D3D11_AllocPicture(vlc_object_t *, d3d11_device_t *,
+picture_t *D3D11_AllocPicture(vlc_object_t *,
                               const video_format_t *, vlc_video_context *, const d3d_format_t *);
 
 #endif /* include-guard */
