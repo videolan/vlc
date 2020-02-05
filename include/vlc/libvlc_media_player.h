@@ -571,10 +571,10 @@ typedef struct
     unsigned int MinMasteringLuminance;
     uint16_t MaxContentLightLevel;
     uint16_t MaxFrameAverageLightLevel;
-} libvlc_video_direct3d_hdr10_metadata_t;
+} libvlc_video_frame_hdr10_metadata_t;
 
 typedef enum libvlc_video_metadata_type_t {
-    libvlc_video_metadata_frame_hdr10, /**< libvlc_video_direct3d_hdr10_metadata_t */
+    libvlc_video_metadata_frame_hdr10, /**< libvlc_video_frame_hdr10_metadata_t */
 } libvlc_video_metadata_type_t;
 
 /**

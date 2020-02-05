@@ -519,7 +519,7 @@ void LocalSwapchainSetMetadata( void *opaque, libvlc_video_metadata_type_t type,
     assert(type == libvlc_video_metadata_frame_hdr10);
     if (type == libvlc_video_metadata_frame_hdr10 && metadata && display->dxgiswapChain4)
     {
-        const libvlc_video_direct3d_hdr10_metadata_t *p_hdr10 = metadata;
+        const libvlc_video_frame_hdr10_metadata_t *p_hdr10 = metadata;
         DXGI_HDR_METADATA_HDR10 hdr10 = { 0 };
         hdr10.GreenPrimary[0] = p_hdr10->GreenPrimary[0];
         hdr10.GreenPrimary[1] = p_hdr10->GreenPrimary[1];

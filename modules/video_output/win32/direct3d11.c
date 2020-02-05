@@ -694,7 +694,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     {
         if ( sys->sendMetadataCb && picture->format.mastering.max_luminance )
         {
-            libvlc_video_direct3d_hdr10_metadata_t hdr10;
+            libvlc_video_frame_hdr10_metadata_t hdr10;
             hdr10.GreenPrimary[0] = picture->format.mastering.primaries[0];
             hdr10.GreenPrimary[1] = picture->format.mastering.primaries[1];
             hdr10.BluePrimary[0]  = picture->format.mastering.primaries[2];
