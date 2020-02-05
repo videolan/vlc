@@ -268,10 +268,10 @@ BuildVertexShader(const struct vlc_gl_renderer *renderer)
 static char *
 BuildFragmentShader(struct vlc_gl_renderer *renderer)
 {
-    const struct vlc_gl_sampler *sampler = renderer->sampler;
+    struct vlc_gl_sampler *sampler = renderer->sampler;
     const struct vlc_gl_interop *interop = sampler->interop;
     char *vlc_texture =
-        opengl_fragment_shader_init(renderer, interop->tex_target,
+        opengl_fragment_shader_init(sampler, interop->tex_target,
                                     interop->sw_fmt.i_chroma,
                                     interop->sw_fmt.space);
     if (!vlc_texture)

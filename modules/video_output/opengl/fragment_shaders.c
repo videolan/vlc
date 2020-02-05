@@ -131,12 +131,10 @@ init_conv_matrix(float conv_matrix_out[],
 }
 
 static int
-renderer_yuv_base_init(struct vlc_gl_renderer *renderer, vlc_fourcc_t chroma,
-                       const vlc_chroma_description_t *desc,
-                       video_color_space_t yuv_space)
+sampler_yuv_base_init(struct vlc_gl_sampler *sampler, vlc_fourcc_t chroma,
+                      const vlc_chroma_description_t *desc,
+                      video_color_space_t yuv_space)
 {
-    struct vlc_gl_sampler *sampler = renderer->sampler;
-
     /* The current implementation always converts from limited to full range. */
     const video_color_range_t range = COLOR_RANGE_LIMITED;
     float *matrix = sampler->conv_matrix;
@@ -395,10 +393,8 @@ sampler_xyz12_prepare_shader(const struct vlc_gl_sampler *sampler)
 }
 
 static char *
-xyz12_shader_init(struct vlc_gl_renderer *renderer)
+xyz12_shader_init(struct vlc_gl_sampler *sampler)
 {
-    struct vlc_gl_sampler *sampler = renderer->sampler;
-
     sampler->pf_fetch_locations = sampler_xyz12_fetch_locations;
     sampler->pf_prepare_shader = sampler_xyz12_prepare_shader;
 
@@ -500,10 +496,9 @@ opengl_init_swizzle(const struct vlc_gl_interop *interop,
 }
 
 char *
-opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
+opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
                             vlc_fourcc_t chroma, video_color_space_t yuv_space)
 {
-    struct vlc_gl_sampler *sampler = renderer->sampler;
     struct vlc_gl_interop *interop = sampler->interop;
 
     const char *swizzle_per_tex[PICTURE_PLANE_MAX] = { NULL, };
@@ -515,11 +510,11 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
         return NULL;
 
     if (chroma == VLC_CODEC_XYZ12)
-        return xyz12_shader_init(renderer);
+        return xyz12_shader_init(sampler);
 
     if (is_yuv)
     {
-        ret = renderer_yuv_base_init(renderer, chroma, desc, yuv_space);
+        ret = sampler_yuv_base_init(sampler, chroma, desc, yuv_space);
         if (ret != VLC_SUCCESS)
             return NULL;
         ret = opengl_init_swizzle(interop, swizzle_per_tex, chroma, desc);
@@ -563,39 +558,39 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
     if (sampler->pl_sh) {
         struct pl_shader *sh = sampler->pl_sh;
         struct pl_color_map_params color_params = pl_color_map_default_params;
-        color_params.intent = var_InheritInteger(renderer->gl, "rendering-intent");
-        color_params.tone_mapping_algo = var_InheritInteger(renderer->gl, "tone-mapping");
-        color_params.tone_mapping_param = var_InheritFloat(renderer->gl, "tone-mapping-param");
+        color_params.intent = var_InheritInteger(sampler->gl, "rendering-intent");
+        color_params.tone_mapping_algo = var_InheritInteger(sampler->gl, "tone-mapping");
+        color_params.tone_mapping_param = var_InheritFloat(sampler->gl, "tone-mapping-param");
 #    if PL_API_VER >= 10
-        color_params.desaturation_strength = var_InheritFloat(renderer->gl, "desat-strength");
-        color_params.desaturation_exponent = var_InheritFloat(renderer->gl, "desat-exponent");
-        color_params.desaturation_base = var_InheritFloat(renderer->gl, "desat-base");
+        color_params.desaturation_strength = var_InheritFloat(sampler->gl, "desat-strength");
+        color_params.desaturation_exponent = var_InheritFloat(sampler->gl, "desat-exponent");
+        color_params.desaturation_base = var_InheritFloat(sampler->gl, "desat-base");
 #    else
-        color_params.tone_mapping_desaturate = var_InheritFloat(renderer->gl, "tone-mapping-desat");
+        color_params.tone_mapping_desaturate = var_InheritFloat(sampler->gl, "tone-mapping-desat");
 #    endif
-        color_params.gamut_warning = var_InheritBool(renderer->gl, "tone-mapping-warn");
+        color_params.gamut_warning = var_InheritBool(sampler->gl, "tone-mapping-warn");
 
         struct pl_color_space dst_space = pl_color_space_unknown;
-        dst_space.primaries = var_InheritInteger(renderer->gl, "target-prim");
-        dst_space.transfer = var_InheritInteger(renderer->gl, "target-trc");
+        dst_space.primaries = var_InheritInteger(sampler->gl, "target-prim");
+        dst_space.transfer = var_InheritInteger(sampler->gl, "target-trc");
 
         pl_shader_color_map(sh, &color_params,
                 vlc_placebo_ColorSpace(&interop->fmt),
                 dst_space, NULL, false);
 
         struct pl_shader_obj *dither_state = NULL;
-        int method = var_InheritInteger(renderer->gl, "dither-algo");
+        int method = var_InheritInteger(sampler->gl, "dither-algo");
         if (method >= 0) {
 
             unsigned out_bits = 0;
-            int override = var_InheritInteger(renderer->gl, "dither-depth");
+            int override = var_InheritInteger(sampler->gl, "dither-depth");
             if (override > 0)
                 out_bits = override;
             else
             {
                 GLint fb_depth = 0;
 #if !defined(USE_OPENGL_ES2)
-                const opengl_vtable_t *vt = renderer->vt;
+                const opengl_vtable_t *vt = sampler->vt;
                 /* fetch framebuffer depth (we are already bound to the default one). */
                 if (vt->GetFramebufferAttachmentParameteriv != NULL)
                     vt->GetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_BACK_LEFT,
@@ -635,7 +630,7 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
         interop->fmt.primaries == COLOR_PRIMARIES_BT2020)
     {
         // no warning for HLG because it's more or less backwards-compatible
-        msg_Warn(renderer->gl, "VLC needs to be built with support for libplacebo "
+        msg_Warn(sampler->gl, "VLC needs to be built with support for libplacebo "
                  "in order to display wide gamut or HDR signals correctly.");
     }
 #endif
