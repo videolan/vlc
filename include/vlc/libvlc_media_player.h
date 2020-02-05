@@ -538,7 +538,7 @@ typedef struct
  * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
  * The ID3D11Device used to create ID3D11DeviceContext must have multithreading enabled.
  */
-typedef bool (*libvlc_video_setup_cb)(void **opaque,
+typedef bool (*libvlc_video_output_setup_cb)(void **opaque,
                                       const libvlc_video_setup_device_cfg_t *cfg,
                                       libvlc_video_setup_device_info_t *out);
 
@@ -546,7 +546,7 @@ typedef bool (*libvlc_video_setup_cb)(void **opaque,
 /**
  * Callback prototype called to release user data
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
  * \version LibVLC 4.0.0 or later
  */
 typedef void (*libvlc_video_output_cleanup_cb)(void* opaque);
@@ -579,7 +579,7 @@ typedef struct
  * Callback prototype called on video size changes.
  * Update the rendering output setup.
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
  * \param cfg configuration of the video that will be rendered [IN]
  * \param output configuration describing with how the rendering is setup [OUT]
  * \version LibVLC 4.0.0 or later
@@ -599,7 +599,7 @@ typedef bool (*libvlc_video_update_output_cb)(void* opaque, const libvlc_video_r
 /**
  * Callback prototype called after performing drawing calls.
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
  * \version LibVLC 4.0.0 or later
  */
 typedef void (*libvlc_video_swap_cb)(void* opaque);
@@ -608,7 +608,7 @@ typedef void (*libvlc_video_swap_cb)(void* opaque);
  * Callback prototype to set up the OpenGL context for rendering.
  * Tell the host the rendering is about to start/has finished.
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
  * \param enter true to set the context as current, false to unset it [IN]
  * \return true on success
  * \version LibVLC 4.0.0 or later
@@ -633,7 +633,7 @@ typedef bool (*libvlc_video_makeCurrent_cb)(void* opaque, bool enter);
 /**
  * Callback prototype to load opengl functions
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
  * \param fct_name name of the opengl function to load
  * \return a pointer to the named OpenGL function the NULL otherwise
  * \version LibVLC 4.0.0 or later
@@ -701,7 +701,7 @@ typedef enum libvlc_video_engine_t {
 LIBVLC_API
 bool libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_engine_t engine,
-                                        libvlc_video_setup_cb setup_cb,
+                                        libvlc_video_output_setup_cb setup_cb,
                                         libvlc_video_output_cleanup_cb cleanup_cb,
                                         libvlc_video_update_output_cb update_output_cb,
                                         libvlc_video_swap_cb swap_cb,
@@ -721,9 +721,9 @@ typedef enum libvlc_video_direct3d_engine_t {
     libvlc_video_direct3d_engine_d3d9,
 } libvlc_video_direct3d_engine_t;
 
-/** Cleanup the rendering environment initialized during \ref libvlc_video_setup_cb.
+/** Cleanup the rendering environment initialized during \ref libvlc_video_output_setup_cb.
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
  * \version LibVLC 4.0.0 or later
  */
 typedef void( *libvlc_video_direct3d_device_cleanup_cb )( void *opaque );
@@ -733,9 +733,9 @@ typedef void( *libvlc_video_direct3d_device_cleanup_cb )( void *opaque );
  * This allows text rendering and aspect ratio to be handled properly when the host
  * rendering size changes.
  *
- * It may be called before the \ref libvlc_video_setup_cb callback.
+ * It may be called before the \ref libvlc_video_output_setup_cb callback.
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
  * \param report_size_change callback which must be called when the host size changes. [IN]
  *        The callback is valid until another call to \ref libvlc_video_direct3d_set_resize_cb
  *        is done. This may be called from any thread.
@@ -747,7 +747,7 @@ typedef void( *libvlc_video_direct3d_set_resize_cb )( void *opaque,
 
 /** Tell the host the rendering for the given plane is about to start
  *
- * \param opaque private pointer set on the opaque parameter of @a libvlc_video_setup_cb() [IN]
+ * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
  * \param plane number of the rendering plane to select
  * \return true on success
  * \version LibVLC 4.0.0 or later
@@ -791,7 +791,7 @@ typedef bool( *libvlc_video_direct3d_select_plane_cb )( void *opaque, size_t pla
 LIBVLC_API
 bool libvlc_video_direct3d_set_callbacks( libvlc_media_player_t *mp,
                                          libvlc_video_direct3d_engine_t engine,
-                                         libvlc_video_setup_cb setup_cb,
+                                         libvlc_video_output_setup_cb setup_cb,
                                          libvlc_video_direct3d_device_cleanup_cb cleanup_cb,
                                          libvlc_video_direct3d_set_resize_cb resize_cb,
                                          libvlc_video_update_output_cb update_output_cb,

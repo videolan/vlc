@@ -70,7 +70,7 @@ int D3D9OpenDecoderDevice(vlc_decoder_device *device, vout_window_t *wnd)
 
     int adapter;
     sys->cleanupDeviceCb = NULL;
-    libvlc_video_setup_cb setupDeviceCb = var_InheritAddress( device, "vout-cb-setup" );
+    libvlc_video_output_setup_cb setupDeviceCb = var_InheritAddress( device, "vout-cb-setup" );
     if ( setupDeviceCb )
     {
         /* external rendering */

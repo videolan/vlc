@@ -92,7 +92,7 @@ static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_
     else
 #endif
     {
-        libvlc_video_setup_cb setupDeviceCb = var_InheritAddress( device, "vout-cb-setup" );
+        libvlc_video_output_setup_cb setupDeviceCb = var_InheritAddress( device, "vout-cb-setup" );
         if ( setupDeviceCb )
         {
             /* decoder device coming from the external app */

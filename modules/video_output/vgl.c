@@ -38,7 +38,7 @@
 struct vout_display_sys_t
 {
     libvlc_video_output_cleanup_cb cleanupCb;
-    libvlc_video_setup_cb setupCb;
+    libvlc_video_output_setup_cb setupCb;
     libvlc_video_update_output_cb resizeCb;
     libvlc_video_swap_cb swapCb;
     libvlc_video_makeCurrent_cb makeCurrentCb;
