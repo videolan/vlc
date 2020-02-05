@@ -373,7 +373,7 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
         }
     }
 
-    if (SUCCEEDED(hr))
+    if (hw_decoding && SUCCEEDED(hr))
     {
 #if defined(HAVE_ID3D11VIDEODECODER)
         out->context_mutex = CreateMutexEx( NULL, NULL, 0, SYNCHRONIZE );
