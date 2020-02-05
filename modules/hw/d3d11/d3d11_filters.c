@@ -301,7 +301,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
 
     if (count == 0)
     {
-        ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->device,
+        ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->d3d_dev.d3dcontext,
                                                   p_out_sys->resource[KNOWN_DXGI_INDEX],
                                                   p_out_sys->slice_index,
                                                   0, 0, 0,
@@ -311,7 +311,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     }
     else
     {
-        ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->device,
+        ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->d3d_dev.d3dcontext,
                                                   p_out_sys->resource[KNOWN_DXGI_INDEX],
                                                   p_out_sys->slice_index,
                                                   0, 0, 0,
@@ -363,7 +363,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     memset(sys, 0, sizeof (*sys));
 
     d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate( filter->vctx_in );
-    hr = D3D11_CreateDeviceExternal( filter, vtcx_sys->device, true, &sys->d3d_dev );
+    hr = D3D11_CreateDeviceExternal( filter, vtcx_sys->d3d_dev.d3dcontext, true, &sys->d3d_dev );
     if (FAILED(hr))
     {
         msg_Dbg(filter, "Failed to use the given video context");

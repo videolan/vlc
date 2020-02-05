@@ -170,7 +170,7 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
 
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(p_filter->vctx_out);
 
-    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->device,
+    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->d3d_dev.d3dcontext,
                                               p_out_sys->resource[KNOWN_DXGI_INDEX],
                                               p_out_sys->slice_index,
                                               0, 0, 0,
@@ -264,7 +264,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
        goto error;
     }
 
-    hr = D3D11_CreateDeviceExternal( filter, vtcx_sys->device, true, &sys->d3d_dev );
+    hr = D3D11_CreateDeviceExternal( filter, vtcx_sys->d3d_dev.d3dcontext, true, &sys->d3d_dev );
     if (FAILED(hr))
     {
         msg_Dbg(filter, "Failed to use the given video context");

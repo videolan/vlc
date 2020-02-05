@@ -93,7 +93,7 @@ typedef struct
 
 typedef struct
 {
-    ID3D11DeviceContext *device;
+    d3d11_device_t      d3d_dev;
     DXGI_FORMAT         format;
 } d3d11_video_context_t;
 

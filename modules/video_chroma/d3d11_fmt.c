@@ -775,7 +775,7 @@ void D3D11_Destroy(d3d11_handle_t *hd3d)
 static void ReleaseD3D11ContextPrivate(void *private)
 {
     d3d11_video_context_t *octx = private;
-    ID3D11DeviceContext_Release(octx->device);
+    ID3D11DeviceContext_Release(octx->d3d_dev.d3dcontext);
 }
 
 const struct vlc_video_context_operations d3d11_vctx_ops = {

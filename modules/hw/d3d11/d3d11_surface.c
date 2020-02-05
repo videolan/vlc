@@ -267,13 +267,13 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 #endif
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(picture_GetVideoContext(src));
-    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->device, sys->staging_resource,
+    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->d3d_dev.d3dcontext, sys->staging_resource,
                                               0, 0, 0, 0,
                                               srcResource,
                                               srcSlice,
                                               NULL);
 
-    HRESULT hr = ID3D11DeviceContext_Map(vctx_sys->device, sys->staging_resource,
+    HRESULT hr = ID3D11DeviceContext_Map(vctx_sys->d3d_dev.d3dcontext, sys->staging_resource,
                                          0, D3D11_MAP_READ, 0, &lock);
     if (FAILED(hr)) {
         msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
@@ -332,7 +332,7 @@ static void D3D11_YUY2(filter_t *p_filter, picture_t *src, picture_t *dst)
         picture_SwapUV( dst );
 
     /* */
-    ID3D11DeviceContext_Unmap(vctx_sys->device, sys->staging_resource, 0);
+    ID3D11DeviceContext_Unmap(vctx_sys->d3d_dev.d3dcontext, sys->staging_resource, 0);
     vlc_mutex_unlock(&sys->staging_lock);
 }
 
@@ -382,13 +382,13 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 #endif
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(picture_GetVideoContext(src));
-    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->device, sys->staging_resource,
+    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->d3d_dev.d3dcontext, sys->staging_resource,
                                               0, 0, 0, 0,
                                               srcResource,
                                               srcSlice,
                                               NULL);
 
-    HRESULT hr = ID3D11DeviceContext_Map(vctx_sys->device, sys->staging_resource,
+    HRESULT hr = ID3D11DeviceContext_Map(vctx_sys->d3d_dev.d3dcontext, sys->staging_resource,
                                          0, D3D11_MAP_READ, 0, &lock);
     if (FAILED(hr)) {
         msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
@@ -415,7 +415,7 @@ static void D3D11_NV12(filter_t *p_filter, picture_t *src, picture_t *dst)
     }
 
     /* */
-    ID3D11DeviceContext_Unmap(vctx_sys->device, sys->staging_resource, 0);
+    ID3D11DeviceContext_Unmap(vctx_sys->d3d_dev.d3dcontext, sys->staging_resource, 0);
     vlc_mutex_unlock(&sys->staging_lock);
 }
 
@@ -430,13 +430,13 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
 
     vlc_mutex_lock(&sys->staging_lock);
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(picture_GetVideoContext(src));
-    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->device, sys->staging_resource,
+    ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->d3d_dev.d3dcontext, sys->staging_resource,
                                               0, 0, 0, 0,
                                               p_sys->resource[KNOWN_DXGI_INDEX],
                                               p_sys->slice_index,
                                               NULL);
 
-    HRESULT hr = ID3D11DeviceContext_Map(vctx_sys->device, sys->staging_resource,
+    HRESULT hr = ID3D11DeviceContext_Map(vctx_sys->d3d_dev.d3dcontext, sys->staging_resource,
                                          0, D3D11_MAP_READ, 0, &lock);
     if (FAILED(hr)) {
         msg_Err(p_filter, "Failed to map source surface. (hr=0x%lX)", hr);
@@ -453,7 +453,7 @@ static void D3D11_RGBA(filter_t *p_filter, picture_t *src, picture_t *dst)
     plane_CopyPixels( dst->p, &src_planes );
 
     /* */
-    ID3D11DeviceContext_Unmap(vctx_sys->device,
+    ID3D11DeviceContext_Unmap(vctx_sys->d3d_dev.d3dcontext,
                               p_sys->resource[KNOWN_DXGI_INDEX], p_sys->slice_index);
     vlc_mutex_unlock(&sys->staging_lock);
 }
@@ -716,7 +716,7 @@ int D3D11OpenConverter( vlc_object_t *obj )
         return VLC_ENOMEM;
 
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(p_filter->vctx_in);
-    D3D11_CreateDeviceExternal(obj, vctx_sys->device, false, &p_sys->d3d_dev);
+    D3D11_CreateDeviceExternal(obj, vctx_sys->d3d_dev.d3dcontext, false, &p_sys->d3d_dev);
 
     if (assert_staging(p_filter, p_sys, vctx_sys->format) != VLC_SUCCESS)
     {
@@ -810,7 +810,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
     default:
         vlc_assert_unreachable();
     }
-    vctx_sys->device = p_sys->d3d_dev.d3dcontext;
+    vctx_sys->d3d_dev.d3dcontext = p_sys->d3d_dev.d3dcontext;
     p_filter->p_sys = p_sys;
 
     vlc_fourcc_t d3d_fourcc = DxgiFormatFourcc(vctx_sys->format);
