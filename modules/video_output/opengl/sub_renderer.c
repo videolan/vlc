@@ -75,6 +75,7 @@ struct vlc_gl_sub_renderer
     } aloc;
     struct {
         GLint sampler;
+        GLint alpha;
     } uloc;
 
     GLuint *buffer_objects;
@@ -159,9 +160,12 @@ CreateProgram(vlc_object_t *obj, const opengl_vtable_t *vt)
         "#version 100\n"
         "precision mediump float;\n"
         "uniform sampler2D sampler;\n"
+        "uniform float alpha;\n"
         "varying vec2 tex_coords;\n"
         "void main() {\n"
-        "  gl_FragColor = texture2D(sampler, tex_coords);\n"
+        "  vec4 color = texture2D(sampler, tex_coords);\n"
+        "  color.a *= alpha;\n"
+        "  gl_FragColor = color;\n"
         "}\n";
 
     GLuint program = 0;
@@ -222,6 +226,7 @@ FetchLocations(struct vlc_gl_sub_renderer *sr)
 #define GET_ULOC(x, str) GET_LOC(Uniform, x, str)
 #define GET_ALOC(x, str) GET_LOC(Attrib, x, str)
     GET_ULOC(sr->uloc.sampler, "sampler");
+    GET_ULOC(sr->uloc.alpha, "alpha");
     GET_ALOC(sr->aloc.vertex_pos, "vertex_pos");
     GET_ALOC(sr->aloc.tex_coords_in, "tex_coords_in");
 
@@ -447,6 +452,8 @@ vlc_gl_sub_renderer_Draw(struct vlc_gl_sub_renderer *sr)
 
         assert(glr->texture != 0);
         vt->BindTexture(interop->tex_target, glr->texture);
+
+        vt->Uniform1f(sr->uloc.alpha, glr->alpha);
 
         vt->BindBuffer(GL_ARRAY_BUFFER, sr->buffer_objects[2 * i]);
         vt->BufferData(GL_ARRAY_BUFFER, sizeof(textureCoord), textureCoord, GL_STATIC_DRAW);
