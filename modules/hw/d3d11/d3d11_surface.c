@@ -773,33 +773,28 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         return VLC_ENOMEM;
     }
 
-    p_filter->vctx_out = vlc_video_context_Create(dec_device, VLC_VIDEO_CONTEXT_D3D11VA,
-                                          sizeof(d3d11_video_context_t), &d3d11_vctx_ops);
-    vlc_decoder_device_Release(dec_device);
-
+    DXGI_FORMAT vctx_fmt;
+    switch( p_filter->fmt_in.video.i_chroma ) {
+    case VLC_CODEC_I420:
+    case VLC_CODEC_YV12:
+    case VLC_CODEC_NV12:
+        vctx_fmt = DXGI_FORMAT_NV12;
+        break;
+    case VLC_CODEC_I420_10L:
+    case VLC_CODEC_P010:
+        vctx_fmt = DXGI_FORMAT_P010;
+        break;
+    default:
+        vlc_assert_unreachable();
+    }
+    p_filter->vctx_out = D3D11CreateVideoContext(dec_device, vctx_fmt);
     if ( p_filter->vctx_out == NULL )
     {
         msg_Dbg(p_filter, "no video context");
         goto done;
     }
 
-    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate( p_filter->vctx_out );
-    switch( p_filter->fmt_in.video.i_chroma ) {
-    case VLC_CODEC_I420:
-    case VLC_CODEC_YV12:
-    case VLC_CODEC_NV12:
-        vctx_sys->format = DXGI_FORMAT_NV12;
-        break;
-    case VLC_CODEC_I420_10L:
-    case VLC_CODEC_P010:
-        vctx_sys->format = DXGI_FORMAT_P010;
-        break;
-    default:
-        vlc_assert_unreachable();
-    }
-    p_filter->p_sys = p_sys;
-
-    vlc_fourcc_t d3d_fourcc = DxgiFormatFourcc(vctx_sys->format);
+    vlc_fourcc_t d3d_fourcc = DxgiFormatFourcc(vctx_fmt);
 
     if ( p_filter->fmt_in.video.i_chroma != d3d_fourcc )
     {

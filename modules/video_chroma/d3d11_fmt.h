@@ -139,6 +139,8 @@ static inline d3d11_video_context_t *GetD3D11ContextPrivate(vlc_video_context *v
     return (d3d11_video_context_t *) vlc_video_context_GetPrivate( vctx, VLC_VIDEO_CONTEXT_D3D11VA );
 }
 
+vlc_video_context *D3D11CreateVideoContext(vlc_decoder_device *, DXGI_FORMAT);
+
 void AcquireD3D11PictureSys(picture_sys_d3d11_t *p_sys);
 
 void ReleaseD3D11PictureSys(picture_sys_d3d11_t *p_sys);

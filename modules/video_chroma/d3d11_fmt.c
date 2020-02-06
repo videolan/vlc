@@ -778,6 +778,18 @@ const struct vlc_video_context_operations d3d11_vctx_ops = {
     NULL,
 };
 
+vlc_video_context *D3D11CreateVideoContext(vlc_decoder_device *dec_dev, DXGI_FORMAT vctx_fmt)
+{
+    vlc_video_context *vctx = vlc_video_context_Create( dec_dev, VLC_VIDEO_CONTEXT_D3D11VA,
+                                          sizeof(d3d11_video_context_t), &d3d11_vctx_ops );
+    if (unlikely(vctx == NULL))
+        return NULL;
+
+    d3d11_video_context_t *priv = GetD3D11ContextPrivate(vctx);
+    priv->format = vctx_fmt;
+    return vctx;
+}
+
 void d3d11_pic_context_destroy(picture_context_t *ctx)
 {
     struct d3d11_pic_context *pic_ctx = D3D11_PICCONTEXT_FROM_PICCTX(ctx);

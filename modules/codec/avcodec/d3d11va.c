@@ -310,17 +310,13 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
                 sys->d3d_dev->adapterDesc.VendorId, DxgiVendorStr(sys->d3d_dev->adapterDesc.VendorId),
                 sys->d3d_dev->adapterDesc.DeviceId, sys->d3d_dev->adapterDesc.Revision);
 
-    sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_D3D11VA,
-                                          sizeof(d3d11_video_context_t), &d3d11_vctx_ops );
+    sys->vctx = D3D11CreateVideoContext(dec_device, sys->render_fmt->formatTexture);
     if (sys->vctx == NULL)
     {
         msg_Dbg(va, "no video context");
         err = VLC_EGENERIC;
         goto error;
     }
-
-    d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
-    priv->format = sys->render_fmt->formatTexture;
 
     va->ops = &ops;
     *fmt_out = final_fmt;
