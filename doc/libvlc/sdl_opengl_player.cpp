@@ -150,7 +150,7 @@ public:
 
         glBindFramebuffer(GL_FRAMEBUFFER, that->m_fbo[that->m_idx_render]);
 
-        render_cfg->surface_format = GL_RGBA;
+        render_cfg->opengl_format = GL_RGBA;
         render_cfg->full_range = true;
         render_cfg->colorspace = libvlc_video_colorspace_BT709;
         render_cfg->primaries  = libvlc_video_primaries_BT709;

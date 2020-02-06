@@ -158,7 +158,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, libvlc_video_output_cfg_t *ou
     for (const d3d_format_t *output_format = GetRenderFormatList();
          output_format->name != NULL; ++output_format)
     {
-        if (output_format->formatTexture == (DXGI_FORMAT)out->surface_format &&
+        if (output_format->formatTexture == (DXGI_FORMAT)out->dxgi_format &&
             !is_d3d11_opaque(output_format->fourcc))
         {
             new_display.pixelFormat = output_format;

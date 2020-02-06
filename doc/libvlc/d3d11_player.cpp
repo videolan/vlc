@@ -402,7 +402,7 @@ static bool UpdateOutput_cb( void *opaque, const libvlc_video_render_cfg_t *cfg,
 
     ctx->d3dctxVLC->OMSetRenderTargets( 1, &ctx->resized.textureRenderTarget, NULL );
 
-    out->surface_format = renderFormat;
+    out->dxgi_format    = renderFormat;
     out->full_range     = true;
     out->colorspace     = libvlc_video_colorspace_BT709;
     out->primaries      = libvlc_video_primaries_BT709;

@@ -565,9 +565,9 @@ typedef struct
 typedef struct
 {
     union {
-        int surface_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_direct3d_engine_d3d11,
-                            D3DFORMAT for \ref libvlc_video_direct3d_engine_d3d9,
-                            GL_RGBA or GL_RGB for \ref libvlc_video_engine_opengl and
+        int dxgi_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_direct3d_engine_d3d11*/
+        uint32_t d3d9_format;  /** the rendering D3DFORMAT for \ref libvlc_video_direct3d_engine_d3d9 */
+        int opengl_format;  /** the rendering GLint GL_RGBA or GL_RGB for \ref libvlc_video_engine_opengl and
                             for \ref libvlc_video_engine_gles2 */
         void *p_surface; /** currently unused */
     };

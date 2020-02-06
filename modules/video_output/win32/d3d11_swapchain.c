@@ -475,7 +475,7 @@ bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_cfg_t *
     struct d3d11_local_swapchain *display = opaque;
     if ( !UpdateSwapchain( display, cfg ) )
         return false;
-    out->surface_format = display->pixelFormat->formatTexture;
+    out->dxgi_format    = display->pixelFormat->formatTexture;
     out->full_range     = display->colorspace->b_full_range;
     out->colorspace     = (libvlc_video_color_space_t)     display->colorspace->color;
     out->primaries      = (libvlc_video_color_primaries_t) display->colorspace->primaries;

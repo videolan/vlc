@@ -90,7 +90,7 @@ static void Resize(vlc_gl_t * gl, unsigned w, unsigned h)
     libvlc_video_output_cfg_t render_cfg;
     sys->resizeCb(sys->opaque, &output_cfg, &render_cfg);
     ReleaseCurrent(gl);
-    assert(render_cfg.surface_format == GL_RGBA);
+    assert(render_cfg.opengl_format == GL_RGBA);
     assert(render_cfg.full_range == true);
     assert(render_cfg.colorspace == libvlc_video_colorspace_BT709);
     assert(render_cfg.primaries  == libvlc_video_primaries_BT709);

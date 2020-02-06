@@ -134,7 +134,7 @@ static bool Resize(struct render_context *ctx, unsigned width, unsigned height,
     hr = IDirect3DDevice9_SetRenderTarget(ctx->libvlc_d3d, 0, ctx->sharedRenderSurface);
     if (FAILED(hr)) return false;
 
-    out->surface_format = d3ddm.Format;
+    out->d3d9_format    = d3ddm.Format;
     out->full_range     = true;
     out->colorspace     = libvlc_video_colorspace_BT709;
     out->primaries      = libvlc_video_primaries_BT709;

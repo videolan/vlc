@@ -1508,7 +1508,7 @@ VLC_CONFIG_STRING_ENUM(FindShadersCallback)
 static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
     vout_display_t *vd = opaque;
-    out->surface_format = vd->sys->d3d9_device->d3ddev.BufferFormat;
+    out->d3d9_format = vd->sys->d3d9_device->d3ddev.BufferFormat;
     return true;
 }
 

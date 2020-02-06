@@ -54,7 +54,7 @@ public:
 
         that->mBuffers[that->m_idx_render]->bind();
 
-        render_cfg->surface_format = GL_RGBA;
+        render_cfg->opengl_format = GL_RGBA;
         render_cfg->full_range = true;
         render_cfg->colorspace = libvlc_video_colorspace_BT709;
         render_cfg->primaries  = libvlc_video_primaries_BT709;
