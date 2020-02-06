@@ -85,7 +85,8 @@ vlc_gl_sampler_New(struct vlc_gl_interop *interop)
     int ret =
         opengl_fragment_shader_init(sampler, interop->tex_target,
                                     interop->sw_fmt.i_chroma,
-                                    interop->sw_fmt.space);
+                                    interop->sw_fmt.space,
+                                    interop->sw_fmt.orientation);
     if (ret != VLC_SUCCESS)
     {
         free(sampler);

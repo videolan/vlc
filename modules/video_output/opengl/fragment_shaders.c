@@ -499,9 +499,77 @@ opengl_init_swizzle(const struct vlc_gl_interop *interop,
     return VLC_SUCCESS;
 }
 
+static void
+InitOrientationMatrix(GLfloat matrix[static 4*4],
+                      video_orientation_t orientation)
+{
+    memcpy(matrix, MATRIX4_IDENTITY, sizeof(MATRIX4_IDENTITY));
+
+    const int k_cos_pi = -1;
+    const int k_cos_pi_2 = 0;
+    const int k_cos_n_pi_2 = 0;
+
+    const int k_sin_pi = 0;
+    const int k_sin_pi_2 = 1;
+    const int k_sin_n_pi_2 = -1;
+
+    switch (orientation) {
+
+        case ORIENT_ROTATED_90:
+            matrix[0 * 4 + 0] = k_cos_pi_2;
+            matrix[0 * 4 + 1] = -k_sin_pi_2;
+            matrix[1 * 4 + 0] = k_sin_pi_2;
+            matrix[1 * 4 + 1] = k_cos_pi_2;
+            matrix[3 * 4 + 1] = 1;
+            break;
+        case ORIENT_ROTATED_180:
+            matrix[0 * 4 + 0] = k_cos_pi;
+            matrix[0 * 4 + 1] = -k_sin_pi;
+            matrix[1 * 4 + 0] = k_sin_pi;
+            matrix[1 * 4 + 1] = k_cos_pi;
+            matrix[3 * 4 + 0] = 1;
+            matrix[3 * 4 + 1] = 1;
+            break;
+        case ORIENT_ROTATED_270:
+            matrix[0 * 4 + 0] = k_cos_n_pi_2;
+            matrix[0 * 4 + 1] = -k_sin_n_pi_2;
+            matrix[1 * 4 + 0] = k_sin_n_pi_2;
+            matrix[1 * 4 + 1] = k_cos_n_pi_2;
+            matrix[3 * 4 + 0] = 1;
+            break;
+        case ORIENT_HFLIPPED:
+            matrix[0 * 4 + 0] = -1;
+            matrix[3 * 4 + 0] = 1;
+            break;
+        case ORIENT_VFLIPPED:
+            matrix[1 * 4 + 1] = -1;
+            matrix[3 * 4 + 1] = 1;
+            break;
+        case ORIENT_TRANSPOSED:
+            matrix[0 * 4 + 0] = 0;
+            matrix[1 * 4 + 1] = 0;
+            matrix[2 * 4 + 2] = -1;
+            matrix[0 * 4 + 1] = 1;
+            matrix[1 * 4 + 0] = 1;
+            break;
+        case ORIENT_ANTI_TRANSPOSED:
+            matrix[0 * 4 + 0] = 0;
+            matrix[1 * 4 + 1] = 0;
+            matrix[2 * 4 + 2] = -1;
+            matrix[0 * 4 + 1] = -1;
+            matrix[1 * 4 + 0] = -1;
+            matrix[3 * 4 + 0] = 1;
+            matrix[3 * 4 + 1] = 1;
+            break;
+        default:
+            break;
+    }
+}
+
 int
 opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
-                            vlc_fourcc_t chroma, video_color_space_t yuv_space)
+                            vlc_fourcc_t chroma, video_color_space_t yuv_space,
+                            video_orientation_t orientation)
 {
     struct vlc_gl_interop *interop = sampler->interop;
 
@@ -512,6 +580,8 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(chroma);
     if (desc == NULL)
         return VLC_EGENERIC;
+
+    InitOrientationMatrix(sampler->var.OrientationMatrix, orientation);
 
     if (chroma == VLC_CODEC_XYZ12)
         return xyz12_shader_init(sampler);

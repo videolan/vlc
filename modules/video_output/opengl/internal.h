@@ -30,7 +30,8 @@ opengl_interop_init_impl(struct vlc_gl_interop *interop, GLenum tex_target,
 
 int
 opengl_fragment_shader_init(struct vlc_gl_sampler *sampler,
-                            GLenum, vlc_fourcc_t, video_color_space_t);
+                            GLenum, vlc_fourcc_t, video_color_space_t,
+                            video_orientation_t);
 int
 opengl_interop_generic_init(struct vlc_gl_interop *interop, bool);
 

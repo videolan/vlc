@@ -99,72 +99,6 @@ static void getViewpointMatrixes(struct vlc_gl_renderer *renderer,
 
 }
 
-static void getOrientationTransformMatrix(video_orientation_t orientation,
-                                          GLfloat matrix[static 16])
-{
-    memcpy(matrix, MATRIX4_IDENTITY, sizeof(MATRIX4_IDENTITY));
-
-    const int k_cos_pi = -1;
-    const int k_cos_pi_2 = 0;
-    const int k_cos_n_pi_2 = 0;
-
-    const int k_sin_pi = 0;
-    const int k_sin_pi_2 = 1;
-    const int k_sin_n_pi_2 = -1;
-
-    switch (orientation) {
-
-        case ORIENT_ROTATED_90:
-            matrix[0 * 4 + 0] = k_cos_pi_2;
-            matrix[0 * 4 + 1] = -k_sin_pi_2;
-            matrix[1 * 4 + 0] = k_sin_pi_2;
-            matrix[1 * 4 + 1] = k_cos_pi_2;
-            matrix[3 * 4 + 1] = 1;
-            break;
-        case ORIENT_ROTATED_180:
-            matrix[0 * 4 + 0] = k_cos_pi;
-            matrix[0 * 4 + 1] = -k_sin_pi;
-            matrix[1 * 4 + 0] = k_sin_pi;
-            matrix[1 * 4 + 1] = k_cos_pi;
-            matrix[3 * 4 + 0] = 1;
-            matrix[3 * 4 + 1] = 1;
-            break;
-        case ORIENT_ROTATED_270:
-            matrix[0 * 4 + 0] = k_cos_n_pi_2;
-            matrix[0 * 4 + 1] = -k_sin_n_pi_2;
-            matrix[1 * 4 + 0] = k_sin_n_pi_2;
-            matrix[1 * 4 + 1] = k_cos_n_pi_2;
-            matrix[3 * 4 + 0] = 1;
-            break;
-        case ORIENT_HFLIPPED:
-            matrix[0 * 4 + 0] = -1;
-            matrix[3 * 4 + 0] = 1;
-            break;
-        case ORIENT_VFLIPPED:
-            matrix[1 * 4 + 1] = -1;
-            matrix[3 * 4 + 1] = 1;
-            break;
-        case ORIENT_TRANSPOSED:
-            matrix[0 * 4 + 0] = 0;
-            matrix[1 * 4 + 1] = 0;
-            matrix[2 * 4 + 2] = -1;
-            matrix[0 * 4 + 1] = 1;
-            matrix[1 * 4 + 0] = 1;
-            break;
-        case ORIENT_ANTI_TRANSPOSED:
-            matrix[0 * 4 + 0] = 0;
-            matrix[1 * 4 + 1] = 0;
-            matrix[2 * 4 + 2] = -1;
-            matrix[0 * 4 + 1] = -1;
-            matrix[1 * 4 + 0] = -1;
-            matrix[3 * 4 + 0] = 1;
-            matrix[3 * 4 + 1] = 1;
-            break;
-        default:
-            break;
-    }
-}
-
 static void
 InitStereoMatrix(GLfloat matrix_out[static 3*3],
                  video_multiview_mode_t multiview_mode)
@@ -431,8 +365,6 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
 
     InitStereoMatrix(renderer->var.StereoMatrix, fmt->multiview_mode);
 
-    getOrientationTransformMatrix(fmt->orientation,
-                                  sampler->var.OrientationMatrix);
     getViewpointMatrixes(renderer, fmt->projection_mode);
 
     renderer->fmt = *fmt;
