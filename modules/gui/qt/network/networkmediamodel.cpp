@@ -40,8 +40,21 @@ enum Role {
 
 NetworkMediaModel::NetworkMediaModel( QObject* parent )
     : QAbstractListModel( parent )
+    , m_preparseSem(1)
     , m_ml( nullptr )
 {
+}
+
+NetworkMediaModel::~NetworkMediaModel()
+{
+    //this can only be aquired from UI thread
+    if (!m_preparseSem.tryAcquire())
+    {
+        auto libvlc = vlc_object_instance(m_ctx->getIntf());
+        vlc_media_tree_PreparseCancel( libvlc, this );
+        //wait for the callback call on cancel
+        m_preparseSem.acquire();
+    }
 }
 
 QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
@@ -255,6 +268,8 @@ bool NetworkMediaModel::initializeMediaSources()
         emit isIndexedChanged();
     }
 
+    vlc_media_tree_PreparseCancel( libvlc, this );
+    m_preparseSem.acquire();
     vlc_media_tree_Preparse( tree, libvlc, m_treeItem.media.get(), this );
     m_parsingPending = true;
     emit parsingPendingChanged(m_parsingPending);
@@ -335,8 +350,9 @@ void NetworkMediaModel::onItemRemoved(MediaSourcePtr, input_item_node_t * node,
     }, Qt::QueuedConnection);
 }
 
-void NetworkMediaModel::onItemPreparseEnded(MediaSourcePtr, input_item_node_t* node, enum input_item_preparse_status)
+void NetworkMediaModel::onItemPreparseEnded(MediaSourcePtr, input_item_node_t* node, enum input_item_preparse_status )
 {
+    m_preparseSem.release();
     InputItemPtr p_node { node->p_item };
     QMetaObject::invokeMethod(this, [this, p_node=std::move(p_node)]() {
         if (p_node != m_treeItem.media)

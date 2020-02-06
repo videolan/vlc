@@ -33,6 +33,8 @@
 #include <util/qml_main_context.hpp>
 #include "networksourcelistener.hpp"
 
+#include <QSemaphore>
+
 #include <memory>
 
 using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
@@ -98,6 +100,7 @@ public:
 
     explicit NetworkMediaModel(QObject* parent = nullptr);
     NetworkMediaModel( QmlMainContext* ctx, QString parentMrl, QObject* parent = nullptr );
+    virtual ~NetworkMediaModel() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
@@ -171,7 +174,7 @@ private:
     bool m_indexed = false;
     bool m_canBeIndexed  = false;
     bool m_parsingPending = false;
-
+    QSemaphore m_preparseSem;
 
     std::vector<Item> m_items;
     QmlMainContext* m_ctx = nullptr;
