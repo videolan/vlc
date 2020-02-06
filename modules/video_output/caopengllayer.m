@@ -234,6 +234,11 @@ static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
+    if (sys->vgl != NULL && !OpenglLock(sys->gl)) {
+        vout_display_opengl_Delete(sys->vgl);
+        OpenglUnlock(sys->gl);
+    }
+
     if (sys->cgLayer) {
         if ([sys->container respondsToSelector:@selector(removeVoutLayer:)])
             [sys->container removeVoutLayer:sys->cgLayer];
@@ -248,11 +253,6 @@ static void Close(vout_display_t *vd)
 
     if (sys->container)
         [sys->container release];
-
-    if (sys->vgl != NULL && !OpenglLock(sys->gl)) {
-        vout_display_opengl_Delete(sys->vgl);
-        OpenglUnlock(sys->gl);
-    }
 
     if (sys->gl != NULL)
     {
