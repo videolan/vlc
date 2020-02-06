@@ -564,10 +564,13 @@ typedef struct
 
 typedef struct
 {
-    int surface_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_direct3d_engine_d3d11,
-                          D3DFORMAT for \ref libvlc_video_direct3d_engine_d3d9,
-                          GL_RGBA or GL_RGB for \ref libvlc_video_engine_opengl and
-                          for \ref libvlc_video_engine_gles2 */
+    union {
+        int surface_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_direct3d_engine_d3d11,
+                            D3DFORMAT for \ref libvlc_video_direct3d_engine_d3d9,
+                            GL_RGBA or GL_RGB for \ref libvlc_video_engine_opengl and
+                            for \ref libvlc_video_engine_gles2 */
+        void *p_surface; /** currently unused */
+    };
     bool full_range;          /** video is full range or studio/limited range */
     libvlc_video_color_space_t colorspace;              /** video color space */
     libvlc_video_color_primaries_t primaries;       /** video color primaries */
