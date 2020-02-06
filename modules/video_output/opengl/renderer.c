@@ -432,10 +432,10 @@ static int SetupCoords(struct vlc_gl_renderer *renderer);
 
 struct vlc_gl_renderer *
 vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
-                    struct vlc_gl_interop *interop,
-                    const video_format_t *fmt, bool b_dump_shaders)
+                    struct vlc_gl_interop *interop, bool b_dump_shaders)
 {
     const opengl_vtable_t *vt = &api->vt;
+    const video_format_t *fmt = &interop->fmt;
 
     struct vlc_gl_sampler *sampler = malloc(sizeof(*sampler));
     if (!sampler)
@@ -498,11 +498,11 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
         return NULL;
     }
 
-    InitStereoMatrix(renderer->var.StereoMatrix, interop->fmt.multiview_mode);
+    InitStereoMatrix(renderer->var.StereoMatrix, fmt->multiview_mode);
 
-    getOrientationTransformMatrix(interop->fmt.orientation,
+    getOrientationTransformMatrix(fmt->orientation,
                                   sampler->var.OrientationMatrix);
-    getViewpointMatrixes(renderer, interop->fmt.projection_mode);
+    getViewpointMatrixes(renderer, fmt->projection_mode);
 
     renderer->fmt = *fmt;
 

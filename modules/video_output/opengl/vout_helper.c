@@ -144,7 +144,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
 
     vgl->renderer =
-        vlc_gl_renderer_New(gl, &vgl->api, vgl->interop, fmt, b_dump_shaders);
+        vlc_gl_renderer_New(gl, &vgl->api, vgl->interop, b_dump_shaders);
     if (!vgl->renderer)
     {
         msg_Warn(gl, "Could not create renderer for %4.4s",
