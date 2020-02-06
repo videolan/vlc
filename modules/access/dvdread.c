@@ -195,8 +195,16 @@ static int Open( vlc_object_t *p_this )
     if( p_dvdread == NULL )
     {
         msg_Err( p_demux, "DVDRead cannot open source: %s", psz_file );
+#ifdef __APPLE__
+        vlc_dialog_display_error( p_demux, _("Problem accessing a system resource"),
+            _("Potentially, macOS blocks access to your disc. "
+              "Please open \"System Preferences\" -> \"Security & Privacy\" "
+              "and allow VLC to access your external media in \"Files and Folders\" section."));
+#else
         vlc_dialog_display_error( p_demux, _("Playback failure"),
                       _("DVDRead could not open the disc \"%s\"."), psz_file );
+#endif
+
         free( psz_file );
         return VLC_EGENERIC;
     }
