@@ -49,14 +49,6 @@
 static int  Open   (vlc_object_t *);
 static void Close  (vlc_object_t *);
 
-vlc_module_begin()
-    set_description(N_("Core Animation OpenGL Layer (Mac OS X)"))
-    set_capability("vout display", 0)
-    set_category(CAT_VIDEO)
-    set_subcategory(SUBCAT_VIDEO_VOUT)
-    set_callbacks(Open, Close)
-vlc_module_end()
-
 static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);
 static void PictureRender   (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
 static void PictureDisplay  (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
@@ -568,3 +560,15 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
 }
 
 @end
+
+/*
+ * Module descriptor
+ */
+
+vlc_module_begin()
+    set_description(N_("Core Animation OpenGL Layer (Mac OS X)"))
+    set_capability("vout display", 0)
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    set_callbacks(Open, Close)
+vlc_module_end()
