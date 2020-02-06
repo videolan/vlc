@@ -386,6 +386,13 @@ static int AccessDemuxOpen ( vlc_object_t *p_this )
     if( dvdnav_open( &p_dvdnav, psz_path ) != DVDNAV_STATUS_OK )
     {
         msg_Warn( p_demux, "cannot open DVD (%s)", psz_file);
+
+#ifdef __APPLE__
+        vlc_dialog_display_error( p_demux, _("Problem accessing a system resource"),
+            _("Potentially, macOS blocks access to your disc. "
+              "Please open \"System Preferences\" -> \"Security & Privacy\" "
+              "and allow VLC to access your external media in \"Files and Folders\" section."));
+#endif
         goto bailout;
     }
 
