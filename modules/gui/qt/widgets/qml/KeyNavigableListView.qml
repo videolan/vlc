@@ -104,8 +104,6 @@ NavigableFocusScope {
         anchors.fill: parent
         //key navigation is reimplemented for item selection
         keyNavigationEnabled: false
-        contentWidth: contentItem.childrenRect.width
-        contentHeight: contentItem.childrenRect.height
 
         preferredHighlightBegin : (view.orientation === ListView.Vertical)
                                     ? highlightMargin + (headerItem ? headerItem.height : 0)
