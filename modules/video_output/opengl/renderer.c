@@ -314,8 +314,6 @@ vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
     vt->DeleteBuffers(1, &renderer->index_buffer_object);
     vt->DeleteBuffers(1, &renderer->texture_buffer_object);
 
-    vlc_gl_sampler_Delete(renderer->sampler);
-
     if (renderer->program_id != 0)
         vt->DeleteProgram(renderer->program_id);
 
@@ -326,21 +324,14 @@ static int SetupCoords(struct vlc_gl_renderer *renderer);
 
 struct vlc_gl_renderer *
 vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
-                    struct vlc_gl_interop *interop, bool b_dump_shaders)
+                    struct vlc_gl_sampler *sampler, bool b_dump_shaders)
 {
     const opengl_vtable_t *vt = &api->vt;
-    const video_format_t *fmt = &interop->fmt;
-
-    struct vlc_gl_sampler *sampler = vlc_gl_sampler_New(interop);
-    if (!sampler)
-        return NULL;
+    const video_format_t *fmt = sampler->fmt;
 
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
-    {
-        free(sampler);
         return NULL;
-    }
 
     renderer->sampler = sampler;
 

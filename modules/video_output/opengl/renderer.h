@@ -102,12 +102,12 @@ struct vlc_gl_renderer
  *
  * \param gl the GL context
  * \param api the OpenGL API
- * \param interop the interop
+ * \param sampler the OpenGL sampler
  * \param dump_shaders indicate if the shaders must be dumped in logs
  */
 struct vlc_gl_renderer *
 vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
-                    struct vlc_gl_interop *interop, bool dump_shaders);
+                    struct vlc_gl_sampler *sampler, bool dump_shaders);
 
 /**
  * Delete a renderer
