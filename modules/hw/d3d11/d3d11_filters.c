@@ -70,7 +70,7 @@ typedef struct
     struct filter_level Hue;
     struct filter_level Saturation;
 
-    d3d11_device_t                 d3d_dev;
+    d3d11_device_t                 *d3d_dev;
     d3d11_processor_t              d3d_proc;
 
     union {
@@ -214,7 +214,7 @@ static picture_t *AllocPicture( filter_t *p_filter )
         return NULL;
 
     struct d3d11_pic_context *pic_ctx = container_of(pic->context, struct d3d11_pic_context, s);
-    D3D11_AllocateResourceView(p_filter, p_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
+    D3D11_AllocateResourceView(p_filter, p_sys->d3d_dev->d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
 
     return pic;
 }
@@ -261,7 +261,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
         p_sys->procOutput[1]
     };
 
-    d3d11_device_lock( &p_sys->d3d_dev );
+    d3d11_device_lock( p_sys->d3d_dev );
 
     size_t idx = 0, count = 0;
     /* contrast */
@@ -297,11 +297,9 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
         count++;
     }
 
-    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(p_filter->vctx_out);
-
     if (count == 0)
     {
-        ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->d3d_dev.d3dcontext,
+        ID3D11DeviceContext_CopySubresourceRegion(p_sys->d3d_dev->d3dcontext,
                                                   p_out_sys->resource[KNOWN_DXGI_INDEX],
                                                   p_out_sys->slice_index,
                                                   0, 0, 0,
@@ -311,7 +309,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
     }
     else
     {
-        ID3D11DeviceContext_CopySubresourceRegion(vctx_sys->d3d_dev.d3dcontext,
+        ID3D11DeviceContext_CopySubresourceRegion(p_sys->d3d_dev->d3dcontext,
                                                   p_out_sys->resource[KNOWN_DXGI_INDEX],
                                                   p_out_sys->slice_index,
                                                   0, 0, 0,
@@ -320,7 +318,7 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
                                                   NULL);
     }
 
-    d3d11_device_unlock( &p_sys->d3d_dev );
+    d3d11_device_unlock( p_sys->d3d_dev );
 
     picture_Release( p_pic );
     return p_outpic;
@@ -363,15 +361,10 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     memset(sys, 0, sizeof (*sys));
 
     d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate( filter->vctx_in );
-    hr = D3D11_CreateDeviceExternal( filter, vtcx_sys->d3d_dev.d3dcontext, true, &sys->d3d_dev );
-    if (FAILED(hr))
-    {
-        msg_Dbg(filter, "Failed to use the given video context");
-        return VLC_EGENERIC;
-    }
+    sys->d3d_dev = &vtcx_sys->d3d_dev;
     DXGI_FORMAT format = vtcx_sys->format;
 
-    if (D3D11_CreateProcessor(filter, &sys->d3d_dev, D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,
+    if (D3D11_CreateProcessor(filter, sys->d3d_dev, D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,
                               &filter->fmt_out.video, &filter->fmt_out.video, &sys->d3d_proc) != VLC_SUCCESS)
         goto error;
 
@@ -471,12 +464,12 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     texDesc.Height = filter->fmt_out.video.i_height;
     texDesc.Width  = filter->fmt_out.video.i_width;
 
-    hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &sys->out[0].texture );
+    hr = ID3D11Device_CreateTexture2D( sys->d3d_dev->d3ddevice, &texDesc, NULL, &sys->out[0].texture );
     if (FAILED(hr)) {
         msg_Err(filter, "CreateTexture2D failed. (hr=0x%lX)", hr);
         goto error;
     }
-    hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &sys->out[1].texture );
+    hr = ID3D11Device_CreateTexture2D( sys->d3d_dev->d3ddevice, &texDesc, NULL, &sys->out[1].texture );
     if (FAILED(hr)) {
         ID3D11Texture2D_Release(sys->out[0].texture);
         msg_Err(filter, "CreateTexture2D failed. (hr=0x%lX)", hr);
@@ -538,8 +531,6 @@ error:
     if (sys->out[1].texture)
         ID3D11Texture2D_Release(sys->out[1].texture);
     D3D11_ReleaseProcessor(&sys->d3d_proc);
-    if (sys->d3d_dev.d3dcontext)
-        D3D11_ReleaseDevice(&sys->d3d_dev);
     free(sys);
 
     return VLC_EGENERIC;
@@ -568,7 +559,6 @@ static void D3D11CloseAdjust(vlc_object_t *obj)
     ID3D11Texture2D_Release(sys->out[0].texture);
     ID3D11Texture2D_Release(sys->out[1].texture);
     D3D11_ReleaseProcessor( &sys->d3d_proc );
-    D3D11_ReleaseDevice(&sys->d3d_dev);
     vlc_video_context_Release(filter->vctx_out);
 
     free(sys);
