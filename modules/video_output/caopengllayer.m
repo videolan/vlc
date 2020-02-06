@@ -224,6 +224,11 @@ static void Close (vlc_object_t *p_this)
     vout_display_t *vd = (vout_display_t *)p_this;
     vout_display_sys_t *sys = vd->sys;
 
+    if (sys->vgl != NULL && !OpenglLock(sys->gl)) {
+        vout_display_opengl_Delete(sys->vgl);
+        OpenglUnlock(sys->gl);
+    }
+
     if (sys->cgLayer) {
         if ([sys->container respondsToSelector:@selector(removeVoutLayer:)])
             [sys->container removeVoutLayer:sys->cgLayer];
@@ -241,11 +246,6 @@ static void Close (vlc_object_t *p_this)
 
     if (sys->embed)
         vout_display_DeleteWindow(vd, sys->embed);
-
-    if (sys->vgl != NULL && !OpenglLock(sys->gl)) {
-        vout_display_opengl_Delete(sys->vgl);
-        OpenglUnlock(sys->gl);
-    }
 
     if (sys->gl != NULL)
     {
