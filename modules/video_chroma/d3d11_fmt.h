@@ -88,7 +88,7 @@ struct d3d11_pic_context
 
 typedef struct
 {
-    ID3D11DeviceContext *device;
+    d3d11_device_t      d3d_dev;
 } d3d11_decoder_device_t;
 
 typedef struct

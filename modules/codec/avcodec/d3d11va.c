@@ -97,7 +97,7 @@ DEFINE_GUID(DXVA2_NoEncrypt,                        0x1b81bed0, 0xa0c7, 0x11d3, 
 struct vlc_va_sys_t
 {
     d3d11_handle_t               hd3d;
-    d3d11_device_t               d3d_dev;
+    d3d11_device_t               *d3d_dev;
 
     vlc_video_context            *vctx;
 
@@ -132,7 +132,7 @@ static void SetupAVCodecContext(void *opaque, AVCodecContext *avctx)
     vlc_va_sys_t *sys = opaque;
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface = sys->hw_surface;
-    sys->hw.context_mutex = sys->d3d_dev.context_mutex;
+    sys->hw.context_mutex = sys->d3d_dev->context_mutex;
     sys->hw.workaround = sys->selected_decoder->workaround;
     avctx->hwaccel_context = &sys->hw;
 }
@@ -256,8 +256,8 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
     if ( hwfmt != AV_PIX_FMT_D3D11VA_VLD )
         return VLC_EGENERIC;
 
-    d3d11_decoder_device_t *d3d11_device = GetD3D11OpaqueDevice( dec_device );
-    if ( d3d11_device == NULL )
+    d3d11_decoder_device_t *devsys = GetD3D11OpaqueDevice( dec_device );
+    if ( devsys == NULL )
         return VLC_EGENERIC;
 
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
@@ -270,15 +270,9 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
 
     va->sys = sys;
 
-    sys->d3d_dev.d3ddevice = NULL;
     sys->render_fmt = NULL;
-    HRESULT hr = D3D11_CreateDeviceExternal(va, d3d11_device->device, true, &sys->d3d_dev);
-    if (FAILED(hr))
-    {
-        msg_Err(va, "can't use the provided D3D11 context");
-        goto error;
-    }
-    if (sys->d3d_dev.context_mutex == INVALID_HANDLE_VALUE)
+    sys->d3d_dev = &devsys->d3d_dev;
+    if (sys->d3d_dev->context_mutex == INVALID_HANDLE_VALUE)
         msg_Warn(va, "No mutex found to lock the decoder");
 
     struct va_pool_cfg pool_cfg = {
@@ -298,7 +292,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
 
     video_format_t final_fmt = *fmt_out;
     static const directx_sys_t dx_sys = { DxGetInputList, DxSetupOutput };
-    sys->selected_decoder = directx_va_Setup(va, &dx_sys, ctx, desc, fmt_in, isXboxHardware(&sys->d3d_dev),
+    sys->selected_decoder = directx_va_Setup(va, &dx_sys, ctx, desc, fmt_in, isXboxHardware(sys->d3d_dev),
                                              &final_fmt, &sys->hw.surface_count);
     if (sys->selected_decoder == NULL)
     {
@@ -312,9 +306,9 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
         goto error;
 
     msg_Info(va, "Using D3D11VA (%ls, vendor %x(%s), device %x, revision %x)",
-                sys->d3d_dev.adapterDesc.Description,
-                sys->d3d_dev.adapterDesc.VendorId, DxgiVendorStr(sys->d3d_dev.adapterDesc.VendorId),
-                sys->d3d_dev.adapterDesc.DeviceId, sys->d3d_dev.adapterDesc.Revision);
+                sys->d3d_dev->adapterDesc.Description,
+                sys->d3d_dev->adapterDesc.VendorId, DxgiVendorStr(sys->d3d_dev->adapterDesc.VendorId),
+                sys->d3d_dev->adapterDesc.DeviceId, sys->d3d_dev->adapterDesc.Revision);
 
     sys->vctx = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_D3D11VA,
                                           sizeof(d3d11_video_context_t), &d3d11_vctx_ops );
@@ -327,7 +321,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
 
     d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
     priv->format = sys->render_fmt->formatTexture;
-    priv->d3d_dev = sys->d3d_dev;
+    priv->d3d_dev = devsys->d3d_dev;
     ID3D11DeviceContext_AddRef(priv->d3d_dev.d3dcontext);
 
     va->ops = &ops;
@@ -348,9 +342,9 @@ static int D3dCreateDevice(vlc_va_t *va)
     vlc_va_sys_t *sys = va->sys;
     HRESULT hr;
 
-    assert(sys->d3d_dev.d3ddevice && sys->d3d_dev.d3dcontext);
+    assert(sys->d3d_dev->d3ddevice && sys->d3d_dev->d3dcontext);
     void *d3dvidctx = NULL;
-    hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
+    hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev->d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
     if (FAILED(hr)) {
        msg_Err(va, "Could not Query ID3D11VideoContext Interface. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
@@ -358,7 +352,7 @@ static int D3dCreateDevice(vlc_va_t *va)
     sys->hw.video_context = d3dvidctx;
 
     void *d3dviddev = NULL;
-    hr = ID3D11Device_QueryInterface(sys->d3d_dev.d3ddevice, &IID_ID3D11VideoDevice, &d3dviddev);
+    hr = ID3D11Device_QueryInterface(sys->d3d_dev->d3ddevice, &IID_ID3D11VideoDevice, &d3dviddev);
     if (FAILED(hr)) {
        msg_Err(va, "Could not Query ID3D11VideoDevice Interface. (hr=0x%lX)", hr);
        ID3D11VideoContext_Release(sys->hw.video_context);
@@ -429,8 +423,8 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     }
 #endif
 
-    if (!directx_va_canUseDecoder(va, sys->d3d_dev.adapterDesc.VendorId, sys->d3d_dev.adapterDesc.DeviceId,
-                                  mode->guid, sys->d3d_dev.WDDM.build))
+    if (!directx_va_canUseDecoder(va, sys->d3d_dev->adapterDesc.VendorId, sys->d3d_dev->adapterDesc.DeviceId,
+                                  mode->guid, sys->d3d_dev->WDDM.build))
     {
         msg_Warn(va, "GPU blacklisted for %s codec", mode->name);
         return VLC_EGENERIC;
@@ -440,17 +434,17 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     int idx = 0;
     const d3d_format_t *decoder_format;
     UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
-    decoder_format = FindD3D11Format( va, &va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
+    decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
                                       mode->bit_depth, mode->log2_chroma_h+1, mode->log2_chroma_w+1,
                                       D3D11_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL)
-        decoder_format = FindD3D11Format( va, &va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
+        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
                                         mode->bit_depth, 0, 0, D3D11_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL && mode->bit_depth > 10)
-        decoder_format = FindD3D11Format( va, &va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
+        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
                                         10, 0, 0, D3D11_CHROMA_GPU, supportFlags );
     if (decoder_format == NULL)
-        decoder_format = FindD3D11Format( va, &va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
+        decoder_format = FindD3D11Format( va, va->sys->d3d_dev, 0, D3D11_RGB_FORMAT|D3D11_YUV_FORMAT,
                                         0, 0, 0, D3D11_CHROMA_GPU, supportFlags );
     if (decoder_format != NULL)
     {
@@ -478,14 +472,14 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
 
        // check if we can create render texture of that format
        // check the decoder can output to that format
-       if ( !DeviceSupportsFormat(sys->d3d_dev.d3ddevice, processorInput[idx]->formatTexture,
+       if ( !DeviceSupportsFormat(sys->d3d_dev->d3ddevice, processorInput[idx]->formatTexture,
                                   D3D11_FORMAT_SUPPORT_SHADER_LOAD) )
        {
 #ifndef ID3D11VideoContext_VideoProcessorBlt
            msg_Dbg(va, "Format %s needs a processor but is not supported",
                    DxgiFormatToStr(processorInput[idx]->formatTexture));
 #else
-           if ( !DeviceSupportsFormat(sys->d3d_dev.d3ddevice, processorInput[idx]->formatTexture,
+           if ( !DeviceSupportsFormat(sys->d3d_dev->d3ddevice, processorInput[idx]->formatTexture,
                                       D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT) )
            {
                msg_Dbg(va, "Format %s needs a processor but is not available",
@@ -529,7 +523,7 @@ static bool CanUseDecoderPadding(const vlc_va_sys_t *sys)
 {
     /* Qualcomm hardware has issues with textures and pixels that should not be
     * part of the decoded area */
-    return sys->d3d_dev.adapterDesc.VendorId != GPU_MANUFACTURER_QUALCOMM;
+    return sys->d3d_dev->adapterDesc.VendorId != GPU_MANUFACTURER_QUALCOMM;
 }
 
 /**
@@ -542,7 +536,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     HRESULT hr;
 
     ID3D10Multithread *pMultithread;
-    hr = ID3D11Device_QueryInterface( sys->d3d_dev.d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
+    hr = ID3D11Device_QueryInterface( sys->d3d_dev->d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
     if (SUCCEEDED(hr)) {
         ID3D10Multithread_SetMultithreadProtected(pMultithread, TRUE);
         ID3D10Multithread_Release(pMultithread);
@@ -578,11 +572,11 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
     texDesc.BindFlags = D3D11_BIND_DECODER;
     texDesc.CPUAccessFlags = 0;
 
-    if (DeviceSupportsFormat(sys->d3d_dev.d3ddevice, texDesc.Format, D3D11_FORMAT_SUPPORT_SHADER_LOAD))
+    if (DeviceSupportsFormat(sys->d3d_dev->d3ddevice, texDesc.Format, D3D11_FORMAT_SUPPORT_SHADER_LOAD))
         texDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
     ID3D11Texture2D *p_texture;
-    hr = ID3D11Device_CreateTexture2D( sys->d3d_dev.d3ddevice, &texDesc, NULL, &p_texture );
+    hr = ID3D11Device_CreateTexture2D( sys->d3d_dev->d3ddevice, &texDesc, NULL, &p_texture );
     if (FAILED(hr)) {
         msg_Err(va, "CreateTexture2D %zu failed. (hr=0x%lX)", surface_count, hr);
         return VLC_EGENERIC;
@@ -605,7 +599,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
         if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
         {
             ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {p_texture, p_texture, p_texture};
-            D3D11_AllocateResourceView(va, sys->d3d_dev.d3ddevice, sys->render_fmt, textures, surface_idx,
+            D3D11_AllocateResourceView(va, sys->d3d_dev->d3ddevice, sys->render_fmt, textures, surface_idx,
                                 &sys->renderSrc[surface_idx * D3D11_MAX_SHADER_VIEW]);
         }
     }
@@ -704,7 +698,6 @@ static void DxDestroySurfaces(void *opaque)
         ID3D11VideoDevice_Release(sys->d3ddec);
     if (sys->hw.video_context)
         ID3D11VideoContext_Release(sys->hw.video_context);
-    D3D11_ReleaseDevice( &sys->d3d_dev );
 
     D3D11_Destroy( &sys->hd3d );
 
