@@ -347,6 +347,10 @@ static int Open(vlc_object_t *p_this)
             dispatch_release(sema);
             if (!accessGranted) {
                 msg_Err(p_demux, "Can't use the video device as access has not been granted by the user");
+                vlc_dialog_display_error(p_demux, _("Problem accessing a system resource"),
+                    _("Please open \"System Preferences\" -> \"Security & Privacy\" "
+                      "and allow VLC to access your camera."));
+
                 goto error;
             }
         }
