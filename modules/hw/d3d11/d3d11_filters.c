@@ -361,7 +361,8 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     memset(sys, 0, sizeof (*sys));
 
     d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate( filter->vctx_in );
-    sys->d3d_dev = &vtcx_sys->d3d_dev;
+    d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext( filter->vctx_in );
+    sys->d3d_dev = &dev_sys->d3d_dev;
     DXGI_FORMAT format = vtcx_sys->format;
 
     if (D3D11_CreateProcessor(filter, sys->d3d_dev, D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,

@@ -797,7 +797,6 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
     default:
         vlc_assert_unreachable();
     }
-    vctx_sys->d3d_dev = devsys->d3d_dev;
     p_filter->p_sys = p_sys;
 
     vlc_fourcc_t d3d_fourcc = DxgiFormatFourcc(vctx_sys->format);

@@ -318,10 +318,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->startEndRenderingCb = var_InheritAddress( vd, "vout-cb-make-current" );
     sys->selectPlaneCb       = var_InheritAddress( vd, "vout-cb-select-plane" );
 
-    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(context);
-    if ( vctx_sys != NULL )
+    d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(context);
+    if ( dev_sys != NULL )
     {
-        sys->d3d_dev = &vctx_sys->d3d_dev;
+        sys->d3d_dev = &dev_sys->d3d_dev;
     }
     else
     {

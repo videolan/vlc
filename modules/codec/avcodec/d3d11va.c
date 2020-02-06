@@ -321,8 +321,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
 
     d3d11_video_context_t *priv = GetD3D11ContextPrivate(sys->vctx);
     priv->format = sys->render_fmt->formatTexture;
-    priv->d3d_dev = devsys->d3d_dev;
-    ID3D11DeviceContext_AddRef(priv->d3d_dev.d3dcontext);
 
     va->ops = &ops;
     *fmt_out = final_fmt;

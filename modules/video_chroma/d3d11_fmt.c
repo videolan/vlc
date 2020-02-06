@@ -774,14 +774,8 @@ void D3D11_Destroy(d3d11_handle_t *hd3d)
 #endif
 }
 
-static void ReleaseD3D11ContextPrivate(void *private)
-{
-    d3d11_video_context_t *octx = private;
-    ID3D11DeviceContext_Release(octx->d3d_dev.d3dcontext);
-}
-
 const struct vlc_video_context_operations d3d11_vctx_ops = {
-    ReleaseD3D11ContextPrivate,
+    NULL,
 };
 
 void d3d11_pic_context_destroy(picture_context_t *ctx)
@@ -819,8 +813,8 @@ picture_t *D3D11_AllocPicture(vlc_object_t *obj,
         return NULL;
     }
 
-    d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(vctx_out);
-    if (AllocateTextures(obj, &vctx_sys->d3d_dev, cfg,
+    d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(vctx_out);
+    if (AllocateTextures(obj, &dev_sys->d3d_dev, cfg,
                          fmt, 1, pic_ctx->picsys.texture, NULL) != VLC_SUCCESS)
     {
         picture_Release(pic);
@@ -828,7 +822,7 @@ picture_t *D3D11_AllocPicture(vlc_object_t *obj,
         return NULL;
     }
 
-    D3D11_AllocateResourceView(obj, vctx_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
+    D3D11_AllocateResourceView(obj, dev_sys->d3d_dev.d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
 
     pic_ctx->s = (picture_context_t) {
         d3d11_pic_context_destroy, d3d11_pic_context_copy,
