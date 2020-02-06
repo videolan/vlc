@@ -92,7 +92,7 @@ extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
 static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
                                  const struct addrinfo *ptr)
 {
-#ifdef SO_REUSEPORT
+#if defined (SO_REUSEPORT) && !defined (__linux__)
     setsockopt (fd, SOL_SOCKET, SO_REUSEPORT, &(int){ 1 }, sizeof (int));
 #endif
 
