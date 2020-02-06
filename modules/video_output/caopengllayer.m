@@ -43,8 +43,6 @@
 
 #include "opengl/vout_helper.h"
 
-#define OSX_SIERRA_AND_HIGHER (NSAppKitVersionNumber >= 1485)
-
 /*****************************************************************************
  * Vout interface
  *****************************************************************************/
@@ -204,13 +202,6 @@ static int Open (vlc_object_t *p_this)
         vd->prepare = PictureRender;
         vd->display = PictureDisplay;
         vd->control = Control;
-
-        if (OSX_SIERRA_AND_HIGHER) {
-            /* request our screen's HDR mode (introduced in OS X 10.11, but correctly supported in 10.12 only) */
-            if ([sys->cgLayer respondsToSelector:@selector(setWantsExtendedDynamicRangeContent:)]) {
-                [sys->cgLayer setWantsExtendedDynamicRangeContent:YES];
-            }
-        }
 
         /* setup initial state */
         CGSize outputSize;
