@@ -39,7 +39,6 @@
 
 #include "gl_util.h"
 #include "internal.h"
-#include "interop.h"
 #include "vout_helper.h"
 
 #define SPHERE_RADIUS 1.f
@@ -195,7 +194,7 @@ BuildVertexShader(const struct vlc_gl_renderer *renderer)
 
     if (renderer->b_dump_shaders)
         msg_Dbg(renderer->gl, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
-                (const char *) &renderer->sampler->interop->fmt.i_chroma, code);
+                (const char *) &renderer->sampler->fmt->i_chroma, code);
     return code;
 }
 
@@ -203,7 +202,6 @@ static char *
 BuildFragmentShader(struct vlc_gl_renderer *renderer)
 {
     struct vlc_gl_sampler *sampler = renderer->sampler;
-    const struct vlc_gl_interop *interop = sampler->interop;
 
     static const char *template =
         "#version %u\n"
@@ -226,8 +224,8 @@ BuildFragmentShader(struct vlc_gl_renderer *renderer)
 
     if (renderer->b_dump_shaders)
         msg_Dbg(renderer->gl, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
-                              (const char *) &interop->sw_fmt.i_chroma,
-                              interop->sw_fmt.space, code);
+                              (const char *) &sampler->fmt->i_chroma,
+                              sampler->fmt->space, code);
 
     return code;
 }
@@ -236,7 +234,6 @@ static int
 opengl_link_program(struct vlc_gl_renderer *renderer)
 {
     struct vlc_gl_sampler *sampler = renderer->sampler;
-    struct vlc_gl_interop *interop = sampler->interop;
     const opengl_vtable_t *vt = renderer->vt;
 
     char *vertex_shader = BuildVertexShader(renderer);
@@ -250,10 +247,7 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
         return VLC_EGENERIC;
     }
 
-    assert(interop->tex_target != 0 &&
-           interop->tex_count > 0 &&
-           interop->ops->update_textures != NULL &&
-           sampler->pf_fetch_locations != NULL &&
+    assert(sampler->pf_fetch_locations != NULL &&
            sampler->pf_prepare_shader != NULL);
 
     GLuint program_id =
