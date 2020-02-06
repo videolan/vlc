@@ -178,13 +178,14 @@ static void background_worker_Destroy(struct background_worker *worker)
 static void TerminateTask(struct background_thread *thread, struct task *task)
 {
     struct background_worker *worker = thread->owner;
-    task_Destroy(worker, task);
 
     vlc_mutex_lock(&worker->lock);
     thread->task = NULL;
     worker->uncompleted--;
     assert(worker->uncompleted >= 0);
     vlc_mutex_unlock(&worker->lock);
+
+    task_Destroy(worker, task);
 }
 
 static void RemoveThread(struct background_thread *thread)
