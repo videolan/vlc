@@ -118,18 +118,6 @@ void
 vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer);
 
 /**
- * Prepare the fragment shader
- *
- * Concretely, it allocates OpenGL textures if necessary and uploads the
- * picture.
- *
- * \param sr the renderer
- * \param subpicture the subpicture to render
- */
-int
-vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture);
-
-/**
  * Draw the prepared picture
  *
  * \param sr the renderer

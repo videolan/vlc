@@ -765,13 +765,6 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
 }
 
 int
-vlc_gl_renderer_Prepare(struct vlc_gl_renderer *renderer, picture_t *picture)
-{
-    struct vlc_gl_sampler *sampler = renderer->sampler;
-    return vlc_gl_sampler_Update(sampler, picture);
-}
-
-int
 vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer)
 {
     const opengl_vtable_t *vt = renderer->vt;
