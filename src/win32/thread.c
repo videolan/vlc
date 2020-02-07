@@ -943,7 +943,7 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
         case DLL_PROCESS_ATTACH:
         {
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-            HANDLE h = GetModuleHandle(TEXT("kernel32.dll"));
+            HMODULE h = GetModuleHandle(TEXT("kernel32.dll"));
             if (unlikely(h == NULL))
                 return FALSE;
 
