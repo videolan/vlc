@@ -222,7 +222,7 @@ Slider {
                 model: player.chapters
                 Rectangle {
                     id: seekpointsRect
-                    property real position: model.position
+                    property real position: model.position === undefined ? 0.0 : model.position
 
                     color: VLCStyle.colors.seekpoint
                     width: 1 * VLCStyle.scale
