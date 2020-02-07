@@ -666,17 +666,20 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_meta_t* p_demux_meta, vlc_
  */
 static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta, vlc_meta_t* p_meta )
 {
-    StringList list;
     bool hasTrackTotal = false;
-#define SET( keyName, metaName )                                               \
-    list = tag->fieldListMap()[keyName];                                       \
-    if( !list.isEmpty() )                                                      \
-        vlc_meta_Set##metaName( p_meta, (*list.begin()).toCString( true ) );
+#define SET( keyName, metaName ) \
+    { \
+        StringList tmp_list { tag->fieldListMap()[keyName] }; \
+        if( !tmp_list.isEmpty() ) \
+            vlc_meta_Set##metaName( p_meta, (*tmp_list.begin()).toCString( true ) ); \
+    }
 
 #define SET_EXTRA( keyName, metaName ) \
-    list = tag->fieldListMap()[keyName]; \
-    if( !list.isEmpty() ) \
-        vlc_meta_AddExtra( p_meta, keyName, (*list.begin()).toCString( true ) );
+    { \
+        StringList tmp_list = tag->fieldListMap()[keyName]; \
+        if( !tmp_list.isEmpty() ) \
+            vlc_meta_AddExtra( p_meta, keyName, (*tmp_list.begin()).toCString( true ) ); \
+    }
 
     SET( "COPYRIGHT", Copyright );
     SET( "ORGANIZATION", Publisher );
@@ -692,25 +695,31 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
 #undef SET
 #undef SET_EXTRA
 
-    list = tag->fieldListMap()["TRACKNUMBER"];
-    if( !list.isEmpty() )
+    StringList track_number_list = tag->fieldListMap()["TRACKNUMBER"];
+    if( !track_number_list.isEmpty() )
     {
-        int i_values = ExtractCoupleNumberValues( p_meta, (*list.begin()).toCString( true ),
+        int i_values = ExtractCoupleNumberValues( p_meta, (*track_number_list.begin()).toCString( true ),
                  vlc_meta_TrackNumber, vlc_meta_TrackTotal );
         hasTrackTotal = i_values == 2;
     }
     if( !hasTrackTotal )
     {
-        list = tag->fieldListMap()["TRACKTOTAL"];
-        if( list.isEmpty() )
-            list = tag->fieldListMap()["TOTALTRACKS"];
-        if( !list.isEmpty() )
-            vlc_meta_SetTrackTotal( p_meta, (*list.begin()).toCString( true ) );
+        StringList track_total_list { tag->fieldListMap()["TRACKTOTAL"] };
+        if( track_total_list.isEmpty() )
+        {
+            StringList total_tracks_list { tag->fieldListMap()["TOTALTRACKS"] };
+            if( !total_tracks_list.isEmpty() )
+                vlc_meta_SetTrackTotal( p_meta, (*total_tracks_list.begin()).toCString( true ) );
+        }
+        else
+        {
+            vlc_meta_SetTrackTotal( p_meta, (*track_total_list.begin()).toCString( true ) );
+        }
     }
 
     // Try now to get embedded art
-    StringList mime_list = tag->fieldListMap()[ "COVERARTMIME" ];
-    StringList art_list = tag->fieldListMap()[ "COVERART" ];
+    StringList mime_list { tag->fieldListMap()[ "COVERARTMIME" ] };
+    StringList art_list { tag->fieldListMap()[ "COVERART" ] };
 
     input_attachment_t *p_attachment;
 
@@ -737,14 +746,14 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
     }
     else
     {
-        art_list = tag->fieldListMap()[ "METADATA_BLOCK_PICTURE" ];
-        if( art_list.size() == 0 )
+        StringList block_picture_list { tag->fieldListMap()[ "METADATA_BLOCK_PICTURE" ] };
+        if( block_picture_list.size() == 0 )
             return;
 
         uint8_t *p_data;
         int i_cover_score;
         int i_cover_idx;
-        int i_data = vlc_b64_decode_binary( &p_data, art_list[0].toCString(true) );
+        int i_data = vlc_b64_decode_binary( &p_data, block_picture_list[0].toCString(true) );
         i_cover_score = i_cover_idx = 0;
         /* TODO: Use i_cover_score / i_cover_idx to select the picture. */
         p_attachment = ParseFlacPicture( p_data, i_data, 0,
