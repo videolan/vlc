@@ -241,6 +241,12 @@ FileRead(stream_t *access, void *buf, size_t len)
     if (sys->eof)
         return 0;
 
+    /* Limit the read size since smb2_read_async() will complete only after
+     * reading the whole requested data and not when whatever data is available
+     * (high read size means a faster I/O but a higher latency). */
+    if (len > 262144)
+        len = 262144;
+
     sys->res.read.len = 0;
     if (smb2_read_async(sys->smb2, sys->smb2fh, buf, len,
                         smb2_read_cb, access) < 0)
