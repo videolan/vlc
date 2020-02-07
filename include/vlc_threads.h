@@ -357,7 +357,12 @@ typedef struct vlc_timer *vlc_timer_t;
 
 typedef struct
 {
-    unsigned value;
+    union {
+#ifndef __cplusplus
+        atomic_uint value;
+#endif
+        int        cpp_value;
+    };
 } vlc_cond_t;
 # define VLC_STATIC_COND { 0 }
 #endif

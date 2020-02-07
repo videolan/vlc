@@ -200,12 +200,12 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 
 static inline atomic_uint *vlc_cond_value(vlc_cond_t *cond)
 {
-    /* XXX: ugly but avoids including stdatomic.h in vlc_threads.h */
-    static_assert (sizeof (cond->value) <= sizeof (atomic_uint),
+    /* Don't use C++ atomic types in vlc_threads.h for the C atomic storage */
+    static_assert (sizeof (cond->cpp_value) <= sizeof (cond->value),
                    "Size mismatch!");
-    static_assert ((alignof (cond->value) % alignof (atomic_uint)) == 0,
+    static_assert ((alignof (cond->cpp_value) % alignof (cond->value)) == 0,
                    "Alignment mismatch");
-    return (atomic_uint *)&cond->value;
+    return &cond->value;
 }
 
 void vlc_cond_init(vlc_cond_t *cond)
