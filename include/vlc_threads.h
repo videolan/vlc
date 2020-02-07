@@ -351,6 +351,10 @@ typedef struct vlc_timer *vlc_timer_t;
 #endif
 
 #ifdef LIBVLC_NEED_CONDVAR
+#ifndef __cplusplus
+#include <stdatomic.h>
+#endif
+
 typedef struct
 {
     unsigned value;
@@ -1098,9 +1102,9 @@ static inline void vlc_cleanup_lock (void *lock)
 }
 #define mutex_cleanup_push( lock ) vlc_cleanup_push (vlc_cleanup_lock, lock)
 
-#if defined(LIBVLC_NEED_CONDVAR)
-void vlc_cancel_addr_set(void *addr);
-void vlc_cancel_addr_clear(void *addr);
+#if defined(LIBVLC_NEED_CONDVAR) && !defined(__cplusplus)
+void vlc_cancel_addr_set(atomic_uint *addr);
+void vlc_cancel_addr_clear(atomic_uint *addr);
 #endif
 
 #ifdef __cplusplus

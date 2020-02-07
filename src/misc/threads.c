@@ -149,17 +149,22 @@ bool vlc_mutex_marked(const vlc_mutex_t *mutex)
 #if defined(LIBVLC_NEED_SLEEP) || defined(LIBVLC_NEED_CONDVAR)
 #include <stdatomic.h>
 
-static void vlc_cancel_addr_prepare(void *addr)
+static void do_vlc_cancel_addr_clear(void *addr)
+{
+    vlc_cancel_addr_clear(addr);
+}
+
+static void vlc_cancel_addr_prepare(atomic_uint *addr)
 {
     /* Let thread subsystem on address to broadcast for cancellation */
     vlc_cancel_addr_set(addr);
-    vlc_cleanup_push(vlc_cancel_addr_clear, addr);
+    vlc_cleanup_push(do_vlc_cancel_addr_clear, addr);
     /* Check if cancellation was pending before vlc_cancel_addr_set() */
     vlc_testcancel();
     vlc_cleanup_pop();
 }
 
-static void vlc_cancel_addr_finish(void *addr)
+static void vlc_cancel_addr_finish(atomic_uint *addr)
 {
     vlc_cancel_addr_clear(addr);
     /* Act on cancellation as potential wake-up source */
@@ -171,7 +176,7 @@ static void vlc_cancel_addr_finish(void *addr)
 void (vlc_tick_wait)(vlc_tick_t deadline)
 {
     vlc_tick_t delay;
-    atomic_int value = ATOMIC_VAR_INIT(0);
+    atomic_uint value = ATOMIC_VAR_INIT(0);
 
     vlc_cancel_addr_prepare(&value);
 
@@ -258,13 +263,13 @@ void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
             value++;
     }
 
-    vlc_cancel_addr_prepare(&cond->value);
+    vlc_cancel_addr_prepare(vlc_cond_value(cond));
     vlc_mutex_unlock(mutex);
 
     vlc_atomic_wait(&cond->value, value);
 
     vlc_mutex_lock(mutex);
-    vlc_cancel_addr_finish(&cond->value);
+    vlc_cancel_addr_finish(vlc_cond_value(cond));
 }
 
 static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
@@ -281,7 +286,7 @@ static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
             value++;
     }
 
-    vlc_cancel_addr_prepare(&cond->value);
+    vlc_cancel_addr_prepare(vlc_cond_value(cond));
     vlc_mutex_unlock(mutex);
 
     if (delay > 0)
@@ -290,7 +295,7 @@ static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
         value = 0;
 
     vlc_mutex_lock(mutex);
-    vlc_cancel_addr_finish(&cond->value);
+    vlc_cancel_addr_finish(vlc_cond_value(cond));
 
     return value ? 0 : ETIMEDOUT;
 }

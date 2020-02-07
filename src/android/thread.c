@@ -140,7 +140,7 @@ struct vlc_thread
 
     struct
     {
-        void *addr; /// Non-null if waiting on futex
+        atomic_uint *addr; /// Non-null if waiting on futex
         vlc_mutex_t lock ; /// Protects futex address
     } wait;
 
@@ -285,7 +285,7 @@ int vlc_set_priority (vlc_thread_t th, int priority)
 
 void vlc_cancel (vlc_thread_t thread_id)
 {
-    atomic_int *addr;
+    atomic_uint *addr;
 
     atomic_store(&thread_id->killed, true);
 
@@ -335,7 +335,7 @@ noreturn void vlc_control_cancel (int cmd, ...)
     vlc_assert_unreachable ();
 }
 
-void vlc_cancel_addr_set(void *addr)
+void vlc_cancel_addr_set(atomic_uint *addr)
 {
     vlc_thread_t th = vlc_thread_self();
     if (th == NULL)
@@ -347,7 +347,7 @@ void vlc_cancel_addr_set(void *addr)
     vlc_mutex_unlock(&th->wait.lock);
 }
 
-void vlc_cancel_addr_clear(void *addr)
+void vlc_cancel_addr_clear(atomic_uint *addr)
 {
     vlc_thread_t th = vlc_thread_self();
     if (th == NULL)

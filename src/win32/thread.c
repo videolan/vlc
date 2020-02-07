@@ -65,7 +65,7 @@ struct vlc_thread
 
     struct
     {
-        atomic_int      *addr;
+        atomic_uint     *addr;
         CRITICAL_SECTION lock;
     } wait;
 };
@@ -670,7 +670,7 @@ void vlc_control_cancel (int cmd, ...)
     va_end (ap);
 }
 
-void vlc_cancel_addr_set(void *addr)
+void vlc_cancel_addr_set(atomic_uint *addr)
 {
     struct vlc_thread *th = vlc_thread_self();
     if (th == NULL)
@@ -682,7 +682,7 @@ void vlc_cancel_addr_set(void *addr)
     LeaveCriticalSection(&th->wait.lock);
 }
 
-void vlc_cancel_addr_clear(void *addr)
+void vlc_cancel_addr_clear(atomic_uint *addr)
 {
     struct vlc_thread *th = vlc_thread_self();
     if (th == NULL)
