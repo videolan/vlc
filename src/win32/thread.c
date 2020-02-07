@@ -806,10 +806,8 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 }
 #endif
 
-static BOOL SelectClockSource(void *data)
+static BOOL SelectClockSource(vlc_object_t *obj)
 {
-    vlc_object_t *obj = data;
-
 #if VLC_WINSTORE_APP
     const char *name = "perf";
 #else
