@@ -186,7 +186,7 @@ NativeSurface_fromSurface(JNIEnv *p_env, jobject jsurf)
         return NULL;
     p_ns->p_surface_handle = p_surface_handle;
 
-    for (size_t i = 0; i < sizeof(libs) / sizeof(*libs); i++)
+    for (size_t i = 0; i < ARRAY_SIZE(libs); i++)
     {
         void *p_dl_handle = NativeSurface_Load(libs[i], p_ns);
         if (p_dl_handle)
