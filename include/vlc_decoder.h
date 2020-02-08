@@ -25,9 +25,7 @@
 #define VLC_DECODER_H 1
 
 /**
- * \defgroup input Decoder
- * \ingroup vlc
- * Decoder
+ * \ingroup decoder
  * @{
  */
 
