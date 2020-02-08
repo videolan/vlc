@@ -686,10 +686,10 @@ VLC_API void *vlc_threadvar_get(vlc_threadvar_t);
 /**
  * Waits on an address.
  *
- * Puts the calling thread to sleep if a specific value is stored at a
- * specified address. The thread will sleep until it is woken up by a call to
- * vlc_atomic_notify_one() or vlc_atomic_notify_all() in another thread, or
- * spuriously.
+ * Puts the calling thread to sleep if a specific unsigned 32-bits value is
+ * stored at a specified address. The thread will sleep until it is woken up by
+ * a call to vlc_atomic_notify_one() or vlc_atomic_notify_all() in another
+ * thread, or spuriously.
  *
  * If the value does not match, do nothing and return immediately.
  *
@@ -709,8 +709,8 @@ void vlc_atomic_wait(void *addr, unsigned val);
  * \param val value to match at the address
  * \param delay time-out duration
  *
- * \return true if the function was woken up before the time-out,
- * false if the time-out elapsed.
+ * \retval true the function was woken up before the time-out
+ * \retval false the time-out elapsed
  */
 bool vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t delay);
 
