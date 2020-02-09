@@ -1695,6 +1695,7 @@ static void *DecoderThread( void *p_data )
 
             vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
+            continue;
         }
 
         if( delay != p_owner->delay )
@@ -1708,6 +1709,7 @@ static void *DecoderThread( void *p_data )
 
             vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
+            continue;
         }
 
         if( p_owner->paused && p_owner->frames_countdown == 0 )
