@@ -396,7 +396,7 @@ static int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
 static void* Manage( void* p_object )
 {
     vlm_t *vlm = (vlm_t*)p_object;
-    time_t lastcheck, now, nextschedule = 0;
+    time_t lastcheck;
 
     time(&lastcheck);
 
@@ -404,20 +404,6 @@ static void* Manage( void* p_object )
     {
         char **ppsz_scheduled_commands = NULL;
         int    i_scheduled_commands = 0;
-        bool scheduled_command = false;
-
-        vlc_mutex_lock( &vlm->lock_manage );
-        mutex_cleanup_push( &vlm->lock_manage );
-        while( !vlm->input_state_changed && !scheduled_command )
-        {
-            if( nextschedule != 0 )
-                scheduled_command = vlc_cond_timedwait_daytime( &vlm->wait_manage, &vlm->lock_manage, nextschedule ) != 0;
-            else
-                vlc_cond_wait( &vlm->wait_manage, &vlm->lock_manage );
-        }
-        vlm->input_state_changed = false;
-        vlc_cleanup_pop( );
-        vlc_mutex_unlock( &vlm->lock_manage );
 
         int canc = vlc_savecancel ();
         /* destroy the inputs that wants to die, and launch the next input */
@@ -458,8 +444,9 @@ static void* Manage( void* p_object )
         }
 
         /* scheduling */
+        time_t now, nextschedule = 0;
+
         time(&now);
-        nextschedule = 0;
 
         for( int i = 0; i < vlm->i_schedule; i++ )
         {
@@ -525,6 +512,25 @@ static void* Manage( void* p_object )
         lastcheck = now;
         vlc_mutex_unlock( &vlm->lock );
         vlc_restorecancel (canc);
+
+        vlc_mutex_lock( &vlm->lock_manage );
+        mutex_cleanup_push( &vlm->lock_manage );
+
+        while( !vlm->input_state_changed )
+        {
+            if( nextschedule )
+            {
+                if( vlc_cond_timedwait_daytime( &vlm->wait_manage,
+                                                &vlm->lock_manage,
+                                                nextschedule ) )
+                    break;
+            }
+            else
+                vlc_cond_wait( &vlm->wait_manage, &vlm->lock_manage );
+        }
+        vlm->input_state_changed = false;
+        vlc_cleanup_pop( );
+        vlc_mutex_unlock( &vlm->lock_manage );
     }
 
     return NULL;
