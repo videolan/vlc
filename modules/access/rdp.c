@@ -119,8 +119,6 @@ typedef struct
     /* pre-connect params */
     char *psz_hostname;
     int i_port;
-    /* cancelability */
-    int i_cancel_state;
 } demux_sys_t;
 
 /* context */
@@ -342,10 +340,10 @@ static void *DemuxThread( void *p_data )
     for(;;)
     {
         i_ret = 0;
-        p_sys->i_cancel_state = vlc_savecancel();
+        int cancel_state = vlc_savecancel();
         if ( freerdp_shall_disconnect( p_sys->p_instance ) )
         {
-            vlc_restorecancel( p_sys->i_cancel_state );
+            vlc_restorecancel( cancel_state );
             msg_Warn( p_demux, "RDP server closed session" );
             es_out_Del( p_demux->out, p_sys->es );
             p_sys->es = NULL;
@@ -366,13 +364,13 @@ static void *DemuxThread( void *p_data )
         if ( freerdp_get_fds( p_sys->p_instance, fds.pp_rfds, &fds.i_nbr,
                               fds.pp_wfds, &fds.i_nbw ) != true )
         {
-            vlc_restorecancel( p_sys->i_cancel_state );
+            vlc_restorecancel( cancel_state );
             msg_Err( p_demux, "cannot get FDS" );
         }
         else
         if ( (fds.i_nbr + fds.i_nbw) > 0 && p_sys->es )
         {
-            vlc_restorecancel( p_sys->i_cancel_state );
+            vlc_restorecancel( cancel_state );
             int i_count = 0;
 
             for( int i = 0; i < fds.i_nbr; i++ )
@@ -389,7 +387,7 @@ static void *DemuxThread( void *p_data )
             }
             i_ret = poll( fds.ufds, i_count, p_sys->i_frame_interval * 1000/2 );
         } else {
-            vlc_restorecancel( p_sys->i_cancel_state );
+            vlc_restorecancel( cancel_state );
         }
 
         vlc_tick_wait( i_next_frame_date );
@@ -398,9 +396,9 @@ static void *DemuxThread( void *p_data )
         if ( i_ret >= 0 )
         {
             /* Do the rendering */
-            p_sys->i_cancel_state = vlc_savecancel();
+            cancel_state = vlc_savecancel();
             freerdp_check_fds( p_sys->p_instance );
-            vlc_restorecancel( p_sys->i_cancel_state );
+            vlc_restorecancel( cancel_state );
             block_t *p_block = block_Duplicate( p_sys->p_block );
             if (likely( p_block && p_sys->p_block ))
             {
