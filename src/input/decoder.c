@@ -157,6 +157,7 @@ struct decoder_owner
     bool b_draining;
     atomic_bool drained;
     bool b_idle;
+    bool aborting;
 
     /* CC */
 #define MAX_CC_DECODERS 64 /* The es_out only creates one type of es */
@@ -1633,22 +1634,18 @@ static void *DecoderThread( void *p_data )
 
     /* The decoder's main loop */
     vlc_fifo_Lock( p_owner->p_fifo );
-    vlc_fifo_CleanupPush( p_owner->p_fifo );
 
-    for( ;; )
+    while( !p_owner->aborting )
     {
         if( p_owner->flushing )
         {   /* Flush before/regardless of pause. We do not want to resume just
              * for the sake of flushing (glitches could otherwise happen). */
-            int canc = vlc_savecancel();
-
             vlc_fifo_Unlock( p_owner->p_fifo );
 
             /* Flush the decoder (and the output) */
             DecoderThread_Flush( p_owner );
 
             vlc_fifo_Lock( p_owner->p_fifo );
-            vlc_restorecancel( canc );
 
             /* Reset flushing after DecoderThread_ProcessInput in case input_DecoderFlush
              * is called again. This will avoid a second useless flush (but
@@ -1671,7 +1668,6 @@ static void *DecoderThread( void *p_data )
 
         if( paused != p_owner->paused )
         {   /* Update playing/paused status of the output */
-            int canc = vlc_savecancel();
             vlc_tick_t date = p_owner->pause_date;
 
             paused = p_owner->paused;
@@ -1679,35 +1675,28 @@ static void *DecoderThread( void *p_data )
 
             DecoderThread_ChangePause( p_owner, paused, date );
 
-            vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
             continue;
         }
 
         if( rate != p_owner->request_rate )
         {
-            int canc = vlc_savecancel();
-
             rate = p_owner->request_rate;
             vlc_fifo_Unlock( p_owner->p_fifo );
 
             DecoderThread_ChangeRate( p_owner, rate );
 
-            vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
             continue;
         }
 
         if( delay != p_owner->delay )
         {
-            int canc = vlc_savecancel();
-
             delay = p_owner->delay;
             vlc_fifo_Unlock( p_owner->p_fifo );
 
             DecoderThread_ChangeDelay( p_owner, delay );
 
-            vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
             continue;
         }
@@ -1722,7 +1711,6 @@ static void *DecoderThread( void *p_data )
         }
 
         vlc_cond_signal( &p_owner->wait_fifo );
-        vlc_testcancel(); /* forced expedited cancellation in case of stop */
 
         block_t *p_block = vlc_fifo_DequeueUnlocked( p_owner->p_fifo );
         if( p_block == NULL )
@@ -1741,7 +1729,6 @@ static void *DecoderThread( void *p_data )
 
         vlc_fifo_Unlock( p_owner->p_fifo );
 
-        int canc = vlc_savecancel();
         DecoderThread_ProcessInput( p_owner, p_block );
 
         if( p_block == NULL && p_owner->dec.fmt_out.i_cat == AUDIO_ES )
@@ -1750,7 +1737,6 @@ static void *DecoderThread( void *p_data )
             if( p_owner->p_aout != NULL )
                 aout_DecDrain( p_owner->p_aout );
         }
-        vlc_restorecancel( canc );
 
         /* TODO? Wait for draining instead of polling. */
         vlc_mutex_lock( &p_owner->lock );
@@ -1763,8 +1749,9 @@ static void *DecoderThread( void *p_data )
         vlc_cond_signal( &p_owner->wait_acknowledge );
         vlc_mutex_unlock( &p_owner->lock );
     }
-    vlc_cleanup_pop();
-    vlc_assert_unreachable();
+
+    vlc_fifo_Unlock( p_owner->p_fifo );
+    return NULL;
 }
 
 static const struct decoder_owner_callbacks dec_video_cbs =
@@ -2183,10 +2170,10 @@ void input_DecoderDelete( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
-    vlc_cancel( p_owner->thread );
-
     vlc_fifo_Lock( p_owner->p_fifo );
+    p_owner->aborting = true;
     p_owner->flushing = true;
+    vlc_fifo_Signal( p_owner->p_fifo );
     vlc_fifo_Unlock( p_owner->p_fifo );
 
     /* Make sure we aren't waiting/decoding anymore */
