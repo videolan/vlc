@@ -599,7 +599,7 @@ static int Open( vlc_object_t *p_this )
     p_stream->pace_nocontrol = true;
 
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX"sap" ) )
-        SDPHandleUrl( p_stream, "sap" );
+        SDPHandleUrl( p_stream, "sap://" );
 
     psz = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "sdp" );
     if( psz != NULL )
