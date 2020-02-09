@@ -92,6 +92,7 @@ struct vlm_t
 
     /* tell vlm thread there is work to do */
     bool         input_state_changed;
+    bool         exiting;
     /* */
     int64_t        i_id;
 
