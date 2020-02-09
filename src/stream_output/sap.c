@@ -104,23 +104,11 @@ static sap_address_t *AddressCreate (vlc_object_t *obj, const char *group)
     vlc_cond_init (&addr->wait);
     addr->session_count = 0;
     vlc_list_init(&addr->sessions);
-
-    if (vlc_clone (&addr->thread, RunThread, addr, VLC_THREAD_PRIORITY_LOW))
-    {
-        msg_Err (obj, "unable to spawn SAP announce thread");
-        net_Close (fd);
-        free (addr);
-        return NULL;
-    }
     return addr;
 }
 
 static void AddressDestroy (sap_address_t *addr)
 {
-    assert(vlc_list_is_empty(&addr->sessions));
-
-    vlc_cancel (addr->thread);
-    vlc_join (addr->thread, NULL);
     vlc_cond_destroy (&addr->wait);
     net_Close (addr->fd);
     free (addr);
@@ -141,14 +129,10 @@ noreturn static void *RunThread (void *self)
     for (;;)
     {
         session_descriptor_t *p_session;
-        vlc_tick_t deadline;
-
-        while (vlc_list_is_empty(&addr->sessions))
-            vlc_cond_wait(&addr->wait, &sap_mutex);
+        vlc_tick_t deadline = vlc_tick_now();
 
         assert (addr->session_count > 0);
 
-        deadline = vlc_tick_now ();
         vlc_list_foreach (p_session, &addr->sessions, node)
         {
             send (addr->fd, p_session->data, p_session->length, 0);
@@ -348,8 +332,22 @@ matched:
     session->data = stream.ptr;
     session->length = stream.length;
     vlc_list_append(&session->node, &sap_addr->sessions);
-    sap_addr->session_count++;
-    vlc_cond_signal (&sap_addr->wait);
+
+    if (sap_addr->session_count++ == 0)
+    {
+        if (vlc_clone(&sap_addr->thread, RunThread, sap_addr,
+                      VLC_THREAD_PRIORITY_LOW))
+        {
+            msg_Err(obj, "unable to spawn SAP announce thread");
+            AddressDestroy(sap_addr);
+            free(session->data);
+            free(session);
+            session = NULL;
+            goto out;
+        }
+    }
+    else
+        vlc_cond_signal(&sap_addr->wait);
 out:
     vlc_mutex_unlock(&sap_mutex);
     return session;
@@ -382,8 +380,11 @@ void sout_AnnounceUnRegister (vlc_object_t *obj, session_descriptor_t *session)
     vlc_mutex_unlock (&sap_mutex);
 
     if (vlc_list_is_empty(&addr->sessions))
-        /* Last session for this address -> unlink the address */
-        AddressDestroy (addr);
+    {
+        vlc_cancel(addr->thread);
+        vlc_join(addr->thread, NULL);
+        AddressDestroy(addr);
+    }
 
     free(session->data);
     free(session);
