@@ -27,7 +27,6 @@
 
 #include <vlc_common.h>
 
-#include <stdnoreturn.h>
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>
@@ -80,7 +79,7 @@ static vlc_mutex_t sap_mutex = VLC_STATIC_MUTEX;
 #define MIN_INTERVAL 2
 #define MAX_INTERVAL 300
 
-noreturn static void *RunThread (void *);
+static void *RunThread (void *);
 
 static sap_address_t *AddressCreate (vlc_object_t *obj, const char *group)
 {
@@ -119,14 +118,13 @@ static void AddressDestroy (sap_address_t *addr)
  * \param p_this the SAP Handler object
  * \return nothing
  */
-noreturn static void *RunThread (void *self)
+static void *RunThread (void *self)
 {
     sap_address_t *addr = self;
 
     vlc_mutex_lock(&sap_mutex);
-    mutex_cleanup_push(&sap_mutex);
 
-    for (;;)
+    while (!vlc_list_is_empty(&addr->sessions))
     {
         session_descriptor_t *p_session;
         vlc_tick_t deadline = vlc_tick_now();
@@ -143,8 +141,8 @@ noreturn static void *RunThread (void *self)
         }
     }
 
-    vlc_cleanup_pop ();
-    vlc_assert_unreachable ();
+    vlc_mutex_unlock(&sap_mutex);
+    return NULL;
 }
 
 #undef sout_AnnounceRegisterSDP
@@ -371,17 +369,13 @@ void sout_AnnounceUnRegister (vlc_object_t *obj, session_descriptor_t *session)
     if (vlc_list_is_empty(&addr->sessions))
         /* Last session for this address -> unlink the address */
         vlc_list_remove(&addr->node);
-    else
-    {
-        addr->session_count--;
-        vlc_cond_signal (&addr->wait);
-    }
 
-    vlc_mutex_unlock (&sap_mutex);
+    addr->session_count--;
+    vlc_cond_signal(&addr->wait);
+    vlc_mutex_unlock(&sap_mutex);
 
     if (vlc_list_is_empty(&addr->sessions))
     {
-        vlc_cancel(addr->thread);
         vlc_join(addr->thread, NULL);
         AddressDestroy(addr);
     }
