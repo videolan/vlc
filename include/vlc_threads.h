@@ -473,16 +473,14 @@ VLC_API bool vlc_mutex_marked(const vlc_mutex_t *) VLC_USED;
  */
 
 #ifdef LIBVLC_NEED_CONDVAR
+struct vlc_cond_waiter;
+
 typedef struct
 {
-    union {
-#ifndef __cplusplus
-        atomic_uint value;
-#endif
-        int        cpp_value;
-    };
+    struct vlc_cond_waiter *head;
+    vlc_mutex_t lock;
 } vlc_cond_t;
-# define VLC_STATIC_COND { 0 }
+# define VLC_STATIC_COND { NULL, VLC_STATIC_MUTEX }
 #endif
 
 /**
