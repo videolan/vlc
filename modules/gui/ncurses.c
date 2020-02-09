@@ -36,6 +36,7 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 
 #include <assert.h>
+#include <stdatomic.h>
 #include <wchar.h>
 #include <sys/stat.h>
 #include <math.h>
@@ -176,6 +177,7 @@ typedef struct VLC_VECTOR(char const *) pl_item_names;
 struct intf_sys_t
 {
     vlc_thread_t    thread;
+    atomic_bool     alive;
 
     bool            color;
 
@@ -1647,17 +1649,13 @@ static const struct vlc_logger_operations log_ops = { MsgCallback, NULL };
 static void *Run(void *data)
 {
     intf_thread_t *intf = data;
+    intf_sys_t *sys = intf->p_sys;
 
-    for (;;) {
-        vlc_testcancel();
-
-        int canc = vlc_savecancel();
-
+    while (atomic_load_explicit(&sys->alive, memory_order_relaxed)) {
         Redraw(intf);
         HandleKey(intf);
-        vlc_restorecancel(canc);
     }
-    vlc_assert_unreachable();
+    return NULL;
 }
 
 /*****************************************************************************
@@ -1671,6 +1669,7 @@ static int Open(vlc_object_t *p_this)
     if (!sys)
         return VLC_ENOMEM;
 
+    atomic_init(&sys->alive, true);
     vlc_mutex_init(&sys->msg_lock);
 
     sys->verbosity = var_InheritInteger(intf, "verbose");
@@ -1738,7 +1737,7 @@ static void Close(vlc_object_t *p_this)
     intf_thread_t *intf = (intf_thread_t *)p_this;
     intf_sys_t *sys = intf->p_sys;
 
-    vlc_cancel(sys->thread);
+    atomic_store_explicit(&sys->alive, false, memory_order_relaxed);
     vlc_join(sys->thread, NULL);
 
     vlc_playlist_t *playlist = sys->playlist;
