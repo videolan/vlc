@@ -55,7 +55,7 @@ struct session_descriptor_t
  * control flow algorithm */
 typedef struct sap_address_t
 {
-    struct sap_address_t   *next;
+    struct vlc_list         node;
 
     vlc_thread_t            thread;
     vlc_mutex_t             lock;
@@ -71,7 +71,7 @@ typedef struct sap_address_t
     session_descriptor_t   *first;
 } sap_address_t;
 
-static sap_address_t *sap_addrs = NULL;
+static struct vlc_list sap_addrs = VLC_LIST_INITIALIZER(&sap_addrs);
 static vlc_mutex_t sap_mutex = VLC_STATIC_MUTEX;
 
 #define SAP_MAX_BUFFER 65534
@@ -278,21 +278,18 @@ sout_AnnounceRegisterSDP (vlc_object_t *obj, const char *sdp,
 
     msg_Dbg (obj, "using SAP address: %s", psz_addr);
     vlc_mutex_lock (&sap_mutex);
-    for (sap_addr = sap_addrs; sap_addr; sap_addr = sap_addr->next)
+    vlc_list_foreach (sap_addr, &sap_addrs, node)
         if (!strcmp (psz_addr, sap_addr->group))
-            break;
+            goto matched;
 
+    sap_addr = AddressCreate (obj, psz_addr);
     if (sap_addr == NULL)
     {
-        sap_addr = AddressCreate (obj, psz_addr);
-        if (sap_addr == NULL)
-        {
-            vlc_mutex_unlock (&sap_mutex);
-            return NULL;
-        }
-        sap_addr->next = sap_addrs;
-        sap_addrs = sap_addr;
+        vlc_mutex_unlock(&sap_mutex);
+        return NULL;
     }
+matched:
+    vlc_list_append(&sap_addr->node, &sap_addrs);
     /* Switch locks.
      * NEVER take the global SAP lock when holding a SAP thread lock! */
     vlc_mutex_lock (&sap_addr->lock);
@@ -372,17 +369,14 @@ out:
  */
 void sout_AnnounceUnRegister (vlc_object_t *obj, session_descriptor_t *session)
 {
-    sap_address_t *addr, **paddr;
-    session_descriptor_t **psession;
+    sap_address_t *addr;
+    session_descriptor_t **psession = NULL;
 
     msg_Dbg (obj, "removing SAP session");
     vlc_mutex_lock (&sap_mutex);
-    paddr = &sap_addrs;
-    for (;;)
-    {
-        addr = *paddr;
-        assert (addr != NULL);
 
+    vlc_list_foreach (addr, &sap_addrs, node)
+    {
         psession = &addr->first;
         vlc_mutex_lock (&addr->lock);
         while (*psession != NULL)
@@ -392,15 +386,16 @@ void sout_AnnounceUnRegister (vlc_object_t *obj, session_descriptor_t *session)
             psession = &(*psession)->next;
         }
         vlc_mutex_unlock (&addr->lock);
-        paddr = &addr->next;
     }
+
+    vlc_assert_unreachable();
 
 found:
     *psession = session->next;
 
     if (addr->first == NULL)
         /* Last session for this address -> unlink the address */
-        *paddr = addr->next;
+        vlc_list_remove(&addr->node);
     vlc_mutex_unlock (&sap_mutex);
 
     if (addr->first == NULL)
