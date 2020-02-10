@@ -329,12 +329,6 @@ void vlc_testcancel (void)
     pthread_exit(NULL);
 }
 
-noreturn void vlc_control_cancel (int cmd, ...)
-{
-    (void) cmd;
-    vlc_assert_unreachable ();
-}
-
 void vlc_cancel_addr_set(atomic_uint *addr)
 {
     vlc_thread_t th = vlc_thread_self();

@@ -554,12 +554,6 @@ void vlc_testcancel (void)
     pthread_testcancel ();
 }
 
-noreturn void vlc_control_cancel (int cmd, ...)
-{
-    (void) cmd;
-    vlc_assert_unreachable ();
-}
-
 vlc_tick_t vlc_tick_now (void)
 {
     struct timespec ts;
