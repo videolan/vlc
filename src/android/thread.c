@@ -34,6 +34,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <stdatomic.h>
+#include <stdnoreturn.h>
 #include <time.h>
 #include <assert.h>
 
@@ -328,44 +329,35 @@ void vlc_testcancel (void)
     pthread_exit(NULL);
 }
 
-void vlc_control_cancel(int cmd, ...)
+noreturn void vlc_control_cancel (int cmd, ...)
+{
+    (void) cmd;
+    vlc_assert_unreachable ();
+}
+
+void vlc_cancel_addr_set(void *addr)
 {
     vlc_thread_t th = vlc_thread_self();
-    va_list ap;
-
     if (th == NULL)
         return;
 
-    va_start(ap, cmd);
-    switch (cmd)
-    {
-        case VLC_CANCEL_ADDR_SET:
-        {
-            void *addr = va_arg(ap, void *);
+    vlc_mutex_lock(&th->wait.lock);
+    assert(th->wait.addr == NULL);
+    th->wait.addr = addr;
+    vlc_mutex_unlock(&th->wait.lock);
+}
 
-            vlc_mutex_lock(&th->wait.lock);
-            assert(th->wait.addr == NULL);
-            th->wait.addr = addr;
-            vlc_mutex_unlock(&th->wait.lock);
-            break;
-        }
+void vlc_cancel_addr_clear(void *addr)
+{
+    vlc_thread_t th = vlc_thread_self();
+    if (th == NULL)
+        return;
 
-        case VLC_CANCEL_ADDR_CLEAR:
-        {
-            void *addr = va_arg(ap, void *);
-
-            vlc_mutex_lock(&th->wait.lock);
-            assert(th->wait.addr == addr);
-            th->wait.addr = NULL;
-            (void) addr;
-            vlc_mutex_unlock(&th->wait.lock);
-            break;
-        }
-
-        default:
-            vlc_assert_unreachable ();
-    }
-    va_end(ap);
+    vlc_mutex_lock(&th->wait.lock);
+    assert(th->wait.addr == addr);
+    th->wait.addr = NULL;
+    (void) addr;
+    vlc_mutex_unlock(&th->wait.lock);
 }
 
 /* threadvar */

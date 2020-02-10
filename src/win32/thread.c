@@ -666,30 +666,32 @@ void vlc_control_cancel (int cmd, ...)
             th->cleaners = th->cleaners->next;
             break;
         }
-
-        case VLC_CANCEL_ADDR_SET:
-        {
-            void *addr = va_arg(ap, void *);
-
-            EnterCriticalSection(&th->wait.lock);
-            assert(th->wait.addr == NULL);
-            th->wait.addr = addr;
-            LeaveCriticalSection(&th->wait.lock);
-            break;
-        }
-
-        case VLC_CANCEL_ADDR_CLEAR:
-        {
-            void *addr = va_arg(ap, void *);
-
-            EnterCriticalSection(&th->wait.lock);
-            assert(th->wait.addr == addr);
-            th->wait.addr = NULL;
-            LeaveCriticalSection(&th->wait.lock);
-            break;
-        }
     }
     va_end (ap);
+}
+
+void vlc_cancel_addr_set(void *addr)
+{
+    struct vlc_thread *th = vlc_thread_self();
+    if (th == NULL)
+        return; /* Main thread - cannot be cancelled anyway */
+
+    EnterCriticalSection(&th->wait.lock);
+    assert(th->wait.addr == NULL);
+    th->wait.addr = addr;
+    LeaveCriticalSection(&th->wait.lock);
+}
+
+void vlc_cancel_addr_clear(void *addr)
+{
+    struct vlc_thread *th = vlc_thread_self();
+    if (th == NULL)
+        return; /* Main thread - cannot be cancelled anyway */
+
+    EnterCriticalSection(&th->wait.lock);
+    assert(th->wait.addr == addr);
+    th->wait.addr = NULL;
+    LeaveCriticalSection(&th->wait.lock);
 }
 
 /*** Clock ***/

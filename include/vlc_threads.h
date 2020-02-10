@@ -1028,8 +1028,6 @@ enum
 {
     VLC_CLEANUP_PUSH,
     VLC_CLEANUP_POP,
-    VLC_CANCEL_ADDR_SET,
-    VLC_CANCEL_ADDR_CLEAR,
 };
 
 #if defined (LIBVLC_USE_PTHREAD_CLEANUP)
@@ -1100,15 +1098,10 @@ static inline void vlc_cleanup_lock (void *lock)
 }
 #define mutex_cleanup_push( lock ) vlc_cleanup_push (vlc_cleanup_lock, lock)
 
-static inline void vlc_cancel_addr_set(void *addr)
-{
-    vlc_control_cancel(VLC_CANCEL_ADDR_SET, addr);
-}
-
-static inline void vlc_cancel_addr_clear(void *addr)
-{
-    vlc_control_cancel(VLC_CANCEL_ADDR_CLEAR, addr);
-}
+#if defined(LIBVLC_NEED_CONDVAR)
+void vlc_cancel_addr_set(void *addr);
+void vlc_cancel_addr_clear(void *addr);
+#endif
 
 #ifdef __cplusplus
 /**
