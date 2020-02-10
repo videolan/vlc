@@ -638,36 +638,26 @@ void vlc_testcancel (void)
     _endthreadex(0);
 }
 
-void vlc_control_cancel (int cmd, ...)
+void vlc_control_cancel (vlc_cleanup_t *cleaner)
 {
     /* NOTE: This function only modifies thread-specific data, so there is no
      * need to lock anything. */
-    va_list ap;
 
     struct vlc_thread *th = vlc_thread_self();
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
-    va_start (ap, cmd);
-    switch (cmd)
+    if (cleaner != NULL)
     {
-        case VLC_CLEANUP_PUSH:
-        {
-            /* cleaner is a pointer to the caller stack, no need to allocate
-             * and copy anything. As a nice side effect, this cannot fail. */
-            vlc_cleanup_t *cleaner = va_arg (ap, vlc_cleanup_t *);
-            cleaner->next = th->cleaners;
-            th->cleaners = cleaner;
-            break;
-        }
-
-        case VLC_CLEANUP_POP:
-        {
-            th->cleaners = th->cleaners->next;
-            break;
-        }
+        /* cleaner is a pointer to the caller stack, no need to allocate
+            * and copy anything. As a nice side effect, this cannot fail. */
+        cleaner->next = th->cleaners;
+        th->cleaners = cleaner;
     }
-    va_end (ap);
+    else
+    {
+        th->cleaners = th->cleaners->next;
+    }
 }
 
 void vlc_cancel_addr_set(atomic_uint *addr)

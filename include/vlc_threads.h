@@ -816,13 +816,15 @@ VLC_API int vlc_savecancel(void);
  */
 VLC_API void vlc_restorecancel(int state);
 
+typedef struct vlc_cleanup_t vlc_cleanup_t;
+
 /**
  * Internal handler for thread cancellation.
  *
  * Do not call this function directly. Use wrapper macros instead:
  * vlc_cleanup_push(), vlc_cleanup_pop().
  */
-VLC_API void vlc_control_cancel(int cmd, ...);
+VLC_API void vlc_control_cancel(vlc_cleanup_t *);
 
 /**
  * Thread handle.
@@ -1033,12 +1035,6 @@ VLC_API unsigned vlc_timer_getoverrun(vlc_timer_t) VLC_USED;
  */
 VLC_API unsigned vlc_GetCPUCount(void);
 
-enum
-{
-    VLC_CLEANUP_PUSH,
-    VLC_CLEANUP_POP,
-};
-
 #if defined (LIBVLC_USE_PTHREAD_CLEANUP)
 /**
  * Registers a thread cancellation handler.
@@ -1067,9 +1063,7 @@ enum
  */
 # define vlc_cleanup_pop( ) pthread_cleanup_pop (0)
 
-#else
-typedef struct vlc_cleanup_t vlc_cleanup_t;
-
+#else /* !LIBVLC_USE_PTHREAD_CLEANUP */
 struct vlc_cleanup_t
 {
     vlc_cleanup_t *next;
@@ -1084,11 +1078,10 @@ struct vlc_cleanup_t
  */
 # define vlc_cleanup_push( routine, arg ) \
     do { \
-        vlc_control_cancel(VLC_CLEANUP_PUSH, \
-                           &(vlc_cleanup_t){ NULL, routine, arg })
+        vlc_control_cancel(&(vlc_cleanup_t){ NULL, routine, arg })
 
 #  define vlc_cleanup_pop( ) \
-        vlc_control_cancel (VLC_CLEANUP_POP); \
+        vlc_control_cancel (NULL); \
     } while (0)
 # else
 /* Those macros do not work in C++. However common C/C++ helpers may call them

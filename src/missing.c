@@ -297,9 +297,9 @@ noreturn update_release_t *update_GetRelease(update_t *u)
 
 #include <vlc_threads.h>
 #if defined(LIBVLC_USE_PTHREAD_CLEANUP)
-noreturn void vlc_control_cancel (int cmd, ...)
+noreturn void vlc_control_cancel (vlc_cleanup_t *cleaner)
 {
-    (void) cmd;
+    (void) cleaner;
     vlc_assert_unreachable ();
 }
 #endif
