@@ -64,6 +64,7 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
     failedupdates = 0;
     b_thread = false;
     b_buffering = false;
+    b_canceled = false;
     nextPlaylistupdate = 0;
     demux.i_nzpcr = VLC_TICK_INVALID;
     demux.i_firstpcr = VLC_TICK_INVALID;
@@ -180,7 +181,11 @@ void PlaylistManager::stop()
 {
     if(b_thread)
     {
-        vlc_cancel(thread);
+        vlc_mutex_lock(&lock);
+        b_canceled = true;
+        vlc_cond_signal(&waitcond);
+        vlc_mutex_unlock(&lock);
+
         vlc_join(thread, NULL);
         b_thread = false;
     }
@@ -614,11 +619,10 @@ void PlaylistManager::Run()
     const vlc_tick_t i_extra_buffering = playlist->getMaxBuffering() - i_min_buffering;
     while(1)
     {
-        mutex_cleanup_push(&lock);
-        while(!b_buffering)
+        while(!b_buffering && !b_canceled)
             vlc_cond_wait(&waitcond, &lock);
-        vlc_testcancel();
-        vlc_cleanup_pop();
+        if (b_canceled)
+            break;
 
         if(needsUpdate())
         {
@@ -654,11 +658,12 @@ void PlaylistManager::Run()
             vlc_cond_signal(&demux.cond);
             vlc_mutex_unlock(&demux.lock);
 
-            mutex_cleanup_push(&lock);
             while(b_buffering &&
                     vlc_cond_timedwait(&waitcond, &lock, i_deadline) == 0 &&
-                    i_deadline > vlc_tick_now());
-            vlc_cleanup_pop();
+                    i_deadline > vlc_tick_now() &&
+                    !b_canceled);
+            if (b_canceled)
+                break;
         }
     }
     vlc_mutex_unlock(&lock);
