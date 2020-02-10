@@ -1868,8 +1868,8 @@ static void EsOutFillEsFmt(es_out_t *out, es_format_t *fmt)
     }
 }
 
-static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
-                                         es_out_id_t *p_master )
+static es_out_id_t *EsOutAddLocked( es_out_t *out, const es_format_t *fmt,
+                                    es_out_id_t *p_master )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
@@ -1983,7 +1983,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     vlc_mutex_lock( &p_sys->lock );
-    es_out_id_t *es = EsOutAddSlaveLocked( out, fmt, NULL );
+    es_out_id_t *es = EsOutAddLocked( out, fmt, NULL );
     vlc_mutex_unlock( &p_sys->lock );
     return es;
 }
@@ -2474,7 +2474,7 @@ static void EsOutCreateCCChannels( es_out_t *out, vlc_fourcc_t codec, uint64_t i
             fmt.psz_description = NULL;
 
         es_out_id_t **pp_es = &parent->cc.pp_es[i];
-        *pp_es = EsOutAddSlaveLocked( out, &fmt, parent );
+        *pp_es = EsOutAddLocked( out, &fmt, parent );
         es_format_Clean( &fmt );
 
         /* */
