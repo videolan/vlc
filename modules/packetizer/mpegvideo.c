@@ -997,6 +997,18 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             p_sys->i_picture_type = ( p_frag->p_buffer[5] >> 3 ) & 0x03;
         }
 
+        /* Check if we can use timestamps */
+        if(p_frag->i_dts != VLC_TICK_INVALID &&
+           p_frag->i_dts <= date_Get(&p_sys->dts))
+        {
+            date_t next = p_sys->dts;
+            date_Set(&next, p_frag->i_dts);
+            /* Because the prev timestamp could have been repeated though
+             * helper, clear up if we are within 2 frames backward */
+            if(date_Increment(&next, 4) >= p_sys->i_dts)
+                p_frag->i_dts = p_frag->i_pts = VLC_TICK_INVALID; /* do not reuse */
+        }
+
         p_sys->i_dts = p_frag->i_dts;
         p_sys->i_pts = p_frag->i_pts;
     }
