@@ -136,6 +136,7 @@ namespace adaptive
             bool         b_thread;
             vlc_cond_t   waitcond;
             bool         b_buffering;
+            bool         b_canceled;
     };
 
 }
