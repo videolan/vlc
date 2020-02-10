@@ -198,20 +198,15 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 #ifdef LIBVLC_NEED_CONDVAR
 #include <stdalign.h>
 
-static inline atomic_uint *vlc_cond_value(vlc_cond_t *cond)
+void vlc_cond_init(vlc_cond_t *cond)
 {
     /* Don't use C++ atomic types in vlc_threads.h for the C atomic storage */
     static_assert (sizeof (cond->cpp_value) <= sizeof (cond->value),
                    "Size mismatch!");
     static_assert ((alignof (cond->cpp_value) % alignof (cond->value)) == 0,
                    "Alignment mismatch");
-    return &cond->value;
-}
-
-void vlc_cond_init(vlc_cond_t *cond)
-{
     /* Initial value is irrelevant but set it for happy debuggers */
-    atomic_init(vlc_cond_value(cond), 0);
+    atomic_init(&cond->value, 0);
 }
 
 void vlc_cond_init_daytime(vlc_cond_t *cond)
@@ -222,7 +217,7 @@ void vlc_cond_init_daytime(vlc_cond_t *cond)
 void vlc_cond_destroy(vlc_cond_t *cond)
 {
     /* Tempting sanity check but actually incorrect:
-    assert((atomic_load_explicit(vlc_cond_value(cond),
+    assert((atomic_load_explicit(&cond->value,
                                  memory_order_relaxed) & 1) == 0);
      * Due to timeouts and spurious wake-ups, the futex value can look like
      * there are waiters, even though there are none. */
@@ -240,53 +235,53 @@ void vlc_cond_signal(vlc_cond_t *cond)
      * - cnd_signal() sets the futex to the equal-or-next odd value, while
      * - cnd_wait() sets the futex to the equal-or-next even value.
      **/
-    atomic_fetch_or_explicit(vlc_cond_value(cond), 1, memory_order_relaxed);
+    atomic_fetch_or_explicit(&cond->value, 1, memory_order_relaxed);
     vlc_atomic_notify_one(&cond->value);
 }
 
 void vlc_cond_broadcast(vlc_cond_t *cond)
 {
-    atomic_fetch_or_explicit(vlc_cond_value(cond), 1, memory_order_relaxed);
+    atomic_fetch_or_explicit(&cond->value, 1, memory_order_relaxed);
     vlc_atomic_notify_all(&cond->value);
 }
 
 void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
 {
-    unsigned value = atomic_load_explicit(vlc_cond_value(cond),
+    unsigned value = atomic_load_explicit(&cond->value,
                                      memory_order_relaxed);
     while (value & 1)
     {
-        if (atomic_compare_exchange_weak_explicit(vlc_cond_value(cond), &value,
+        if (atomic_compare_exchange_weak_explicit(&cond->value, &value,
                                                   value + 1,
                                                   memory_order_relaxed,
                                                   memory_order_relaxed))
             value++;
     }
 
-    vlc_cancel_addr_prepare(vlc_cond_value(cond));
+    vlc_cancel_addr_prepare(&cond->value);
     vlc_mutex_unlock(mutex);
 
     vlc_atomic_wait(&cond->value, value);
 
     vlc_mutex_lock(mutex);
-    vlc_cancel_addr_finish(vlc_cond_value(cond));
+    vlc_cancel_addr_finish(&cond->value);
 }
 
 static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
                                vlc_tick_t delay)
 {
-    unsigned value = atomic_load_explicit(vlc_cond_value(cond),
+    unsigned value = atomic_load_explicit(&cond->value, 
                                           memory_order_relaxed);
     while (value & 1)
     {
-        if (atomic_compare_exchange_weak_explicit(vlc_cond_value(cond), &value,
+        if (atomic_compare_exchange_weak_explicit(&cond->value, &value,
                                                   value + 1,
                                                   memory_order_relaxed,
                                                   memory_order_relaxed))
             value++;
     }
 
-    vlc_cancel_addr_prepare(vlc_cond_value(cond));
+    vlc_cancel_addr_prepare(&cond->value);
     vlc_mutex_unlock(mutex);
 
     if (delay > 0)
@@ -295,7 +290,7 @@ static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
         value = 0;
 
     vlc_mutex_lock(mutex);
-    vlc_cancel_addr_finish(vlc_cond_value(cond));
+    vlc_cancel_addr_finish(&cond->value);
 
     return value ? 0 : ETIMEDOUT;
 }
