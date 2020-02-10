@@ -28,11 +28,12 @@ OPTIONS:
    -s            Interactive shell (get correct environment variables for build)
    -b <url>      Enable breakpad support and send crash reports to this URL
    -d            Create PDB files during the build
+   -x            Add extra checks when compiling
 EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:sb:d" OPTION
+while getopts "hra:pcli:sb:dx" OPTION
 do
      case $OPTION in
          h)
@@ -66,6 +67,9 @@ do
          ;;
          d)
              WITH_PDB="yes"
+         ;;
+         x)
+             EXTRA_CHECKS="yes"
          ;;
      esac
 done
@@ -188,6 +192,10 @@ if [ ! -z "$BREAKPAD" ]; then
 fi
 if [ ! -z "$WITH_PDB" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --enable-pdb"
+fi
+if [ ! -z "$EXTRA_CHECKS" ]; then
+    CFLAGS="$CFLAGS -Werror=incompatible-pointer-types -Werror=missing-field-initializers"
+    CXXFLAGS="$CXXFLAGS -Werror=missing-field-initializers"
 fi
 
 ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$TRIPLET $CONFIGFLAGS
