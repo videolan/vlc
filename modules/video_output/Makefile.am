@@ -335,7 +335,10 @@ libwextern_plugin_la_SOURCES = video_output/wextern.c
 libyuv_plugin_la_SOURCES = video_output/yuv.c
 
 libvgl_plugin_la_SOURCES = video_output/vgl.c
-libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS) $(GLES2_CFLAGS)
+libvgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
+if HAVE_ANDROID
+libvgl_plugin_la_CFLAGS += $(GLES2_CFLAGS) -DUSE_OPENGL_ES2
+endif
 
 vout_LTLIBRARIES += \
 	libflaschen_plugin.la \
