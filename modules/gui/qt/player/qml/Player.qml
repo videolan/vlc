@@ -51,12 +51,6 @@ Widgets.NavigableFocusScope {
             return
         if (event.key === Qt.Key_Menu) {
             toolbarAutoHide.toggleForceVisible()
-        } else if (KeyHelper.matchCancel(event)) {
-
-            if (player.hasVideoOutput) {
-               mainPlaylistController.stop()
-            }
-            history.previous(History.Go)
         } else {
             defaultKeyReleaseAction(event, 0)
         }
@@ -64,6 +58,13 @@ Widgets.NavigableFocusScope {
         //unhandled keys are forwarded as hotkeys
         if (!event.accepted)
             rootWindow.sendHotkey(event.key, event.modifiers);
+    }
+
+    navigationCancel: function() {
+        if (player.hasVideoOutput) {
+           mainPlaylistController.stop()
+        }
+        history.previous()
     }
 
     //center image
