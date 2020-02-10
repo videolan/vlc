@@ -333,7 +333,9 @@ libvmem_plugin_la_SOURCES = video_output/vmem.c
 libwdummy_plugin_la_SOURCES = video_output/wdummy.c
 libwextern_plugin_la_SOURCES = video_output/wextern.c
 libyuv_plugin_la_SOURCES = video_output/yuv.c
+
 libvgl_plugin_la_SOURCES = video_output/vgl.c
+libgles2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS) $(GLES2_CFLAGS)
 
 vout_LTLIBRARIES += \
 	libflaschen_plugin.la \
