@@ -1222,7 +1222,7 @@ share/lua/http/mobile_view.html
 
 
 # qt .ui files
-# uncomment (and prepend $builddir} if you want to generate a proper vlc.pot 
+# uncomment (and prepend $builddir} if you want to generate a proper vlc.pot
 
 #modules/gui/qt/ui/about.h
 #modules/gui/qt/ui/equalizer.h
