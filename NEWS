@@ -21,9 +21,13 @@ Text renderer:
  * Fix crashes on macOS with SSA/ASS subtitles containing emoji
 
 macOS:
+ * Remove qtsound module and add avaudiocapture module as replacement
+ * Fix audio capture on macOS Catalina by using avaudiocapture
+ * Inform the user in case OS permissions are missing for certain actions
  * Fix Apple Remote support on macOS Catalina
  * Add support for pausing Apple Music on macOS Catalina
  * Fix UPnP discovery crash without an active network interface
+ * Fix rare placement issues with fullscreen panel
 
 Misc:
  * Add missing .wpl & .zpl file associations on Windows
