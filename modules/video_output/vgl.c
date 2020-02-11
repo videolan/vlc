@@ -27,13 +27,16 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_opengl.h>
-#include "opengl/gl_common.h"
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_picture.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_renderer_discoverer.h>
 #include <vlc/libvlc_media_player.h>
+
+#ifndef GL_RGBA
+#define GL_RGBA 0x1908
+#endif
 
 struct vout_display_sys_t
 {
