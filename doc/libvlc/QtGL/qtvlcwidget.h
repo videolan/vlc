@@ -2,13 +2,12 @@
 #define GLWIDGET_H
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
-class QtVLCWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class QtVLCWidget : public QOpenGLWidget
 {
     Q_OBJECT
 

@@ -3,6 +3,7 @@
 #include <QOpenGLShaderProgram>
 #include <QCoreApplication>
 #include <QOpenGLFramebufferObject>
+#include <QOpenGLFunctions>
 #include <QThread>
 #include <cmath>
 
@@ -41,7 +42,7 @@ public:
     static bool resizeRenderTextures(void* data, const libvlc_video_render_cfg_t *cfg,
                                      libvlc_video_output_cfg_t *render_cfg)
     {
-       VLCVideo* that = static_cast<VLCVideo*>(data);
+        VLCVideo* that = static_cast<VLCVideo*>(data);
         if (cfg->width != that->m_width || cfg->height != that->m_height)
             cleanup(data);
 
@@ -263,8 +264,6 @@ void QtVLCWidget::initializeGL()
     // the signal will be followed by an invocation of initializeGL() where we
     // can recreate all resources.
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &QtVLCWidget::cleanup);
-
-    initializeOpenGLFunctions();
 
     vertexBuffer.create();
     vertexBuffer.bind();
