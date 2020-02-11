@@ -237,7 +237,7 @@ static void DTVCC_ServiceData_Handler( void *priv, uint8_t i_sid, mtime_t i_time
     decoder_t *p_dec = priv;
     decoder_sys_t *p_sys = p_dec->p_sys;
     //msg_Err( p_dec, "DTVCC_ServiceData_Handler sid %d bytes %ld", i_sid, i_data );
-    if( i_sid == 1 )
+    if( i_sid == 1 + p_dec->fmt_in.subs.cc.i_channel )
         CEA708_Decoder_Push( p_sys->p_cea708, i_time, p_data, i_data );
 }
 
