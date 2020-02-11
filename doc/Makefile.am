@@ -7,6 +7,10 @@ LIBVLC_SAMPLES = \
 	libvlc/QtPlayer/player.cpp \
 	libvlc/QtPlayer/player.h \
 	libvlc/QtPlayer/QtVLC.pro \
+	libvlc/QtGL/main.cpp \
+	libvlc/QtGL/qtvlcwidget.cpp \
+	libvlc/QtGL/qtvlcwidget.h \
+	libvlc/QtGL/QtGl.pro \
 	libvlc/vlc-thumb.c \
 	libvlc/wx_player.cpp \
 	libvlc/d3d11_player.cpp \
