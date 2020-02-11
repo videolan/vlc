@@ -82,12 +82,13 @@ static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_
         return ret;
 
     sys->external.cleanupDeviceCb = NULL;
+    HRESULT hr;
 #if VLC_WINSTORE_APP
     /* LEGACY, the d3dcontext and swapchain were given by the host app */
     ID3D11DeviceContext *d3dcontext = (ID3D11DeviceContext*)(uintptr_t) var_InheritInteger(device, "winrt-d3dcontext");
     if ( likely(d3dcontext != NULL) )
     {
-        D3D11_CreateDeviceExternal(device, d3dcontext, true, &sys->dec_device.d3d_dev);
+        hr = D3D11_CreateDeviceExternal(device, d3dcontext, true, &sys->dec_device.d3d_dev);
     }
     else
 #endif
@@ -108,7 +109,7 @@ static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_
                     sys->external.cleanupDeviceCb( sys->external.opaque );
                 goto error;
             }
-            D3D11_CreateDeviceExternal(device, out.device_context, true, &sys->dec_device.d3d_dev);
+            hr = D3D11_CreateDeviceExternal(device, out.device_context, true, &sys->dec_device.d3d_dev);
         }
         else
         {
@@ -122,25 +123,18 @@ static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_
                 if (likely(hKernel32 != NULL))
                     isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
                 if (!isWin81OrGreater)
-                    return VLC_EGENERIC;
+                    goto error;
             }
 #endif /* !VLC_WINSTORE_APP */
 
-            HRESULT hr = D3D11_CreateDevice( device, &sys->hd3d, NULL,
-                                            true /* is_d3d11_opaque(chroma) */,
-                                            &sys->dec_device.d3d_dev );
-            if ( FAILED( hr ) )
-            {
-                D3D11_Destroy(&sys->hd3d);
-                return VLC_EGENERIC;
-            }
+            hr = D3D11_CreateDevice( device, &sys->hd3d, NULL,
+                                     true /* is_d3d11_opaque(chroma) */,
+                                     &sys->dec_device.d3d_dev );
         }
     }
 
-    if ( !sys->dec_device.d3d_dev.d3dcontext )
-    {
-        return VLC_EGENERIC;
-    }
+    if ( FAILED( hr ) )
+        goto error;
 
     device->ops = &d3d11_dev_ops;
     device->opaque = &sys->dec_device;
