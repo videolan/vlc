@@ -123,6 +123,11 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 {
     vout_display_sys_t * sys;
 
+    libvlc_video_engine_t engineType = var_InheritInteger( gl, "vout-cb-type" );
+    if ( engineType != libvlc_video_engine_opengl &&
+         engineType != libvlc_video_engine_gles2 )
+        return VLC_EBADVAR;
+
     /* Allocate structure */
     gl->sys = sys = vlc_obj_calloc(VLC_OBJECT(gl), 1, sizeof(*sys));
     if( !sys )

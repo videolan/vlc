@@ -494,8 +494,11 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
     else
 #endif
     {
-        libvlc_video_output_setup_cb setupDeviceCb = var_InheritAddress( obj, "vout-cb-setup" );
-        if ( setupDeviceCb )
+        libvlc_video_engine_t engineType = var_InheritInteger( obj, "vout-cb-type" );
+        libvlc_video_output_setup_cb setupDeviceCb = NULL;
+        if (engineType == libvlc_video_engine_d3d11)
+            setupDeviceCb = var_InheritAddress( obj, "vout-cb-setup" );
+        if ( setupDeviceCb != NULL)
         {
             /* decoder device coming from the external app */
             sys->external.opaque          = var_InheritAddress( obj, "vout-cb-opaque" );
@@ -512,7 +515,8 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
             }
             hr = D3D11_CreateDeviceExternal(obj, out.d3d11.device_context, true, &sys->dec_device.d3d_dev);
         }
-        else
+        else if ( engineType == libvlc_video_engine_disable ||
+                  engineType == libvlc_video_engine_d3d11 )
         {
             /* internal decoder device */
 #if !VLC_WINSTORE_APP
@@ -530,6 +534,8 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
 
             hr = CreateDevice( obj, &sys->hd3d, adapter, hw_decoding, &sys->dec_device.d3d_dev );
         }
+        else
+            goto error;
     }
 
 error:

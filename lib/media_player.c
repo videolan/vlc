@@ -593,6 +593,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "vmem-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "vmem-pitch", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
 
+    var_Create (mp, "vout-cb-type", VLC_VAR_INTEGER );
     var_Create( mp, "vout-cb-opaque", VLC_VAR_ADDRESS );
     var_Create( mp, "vout-cb-setup", VLC_VAR_ADDRESS );
     var_Create( mp, "vout-cb-cleanup", VLC_VAR_ADDRESS );
@@ -1045,6 +1046,7 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
                                        libvlc_video_output_select_plane_cb select_plane_cb,
                                        void *opaque)
 {
+    static_assert(libvlc_video_engine_disable == 0, "No engine set must default to 0");
 #ifdef __ANDROID__
     //use the default android window
     var_SetString( mp, "window", "");
@@ -1072,9 +1074,17 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
         var_SetString ( mp, "vout", "direct3d9" );
         var_SetString ( mp, "dec-dev", "d3d9" );
     }
+    else if ( engine == libvlc_video_engine_disable )
+    {
+        // use the default display module
+        var_SetString ( mp, "vout", "" );
+        // use the default window
+        var_SetString( mp, "window", "");
+    }
     else
         return false;
 
+    var_SetInteger( mp, "vout-cb-type", engine );
     var_SetAddress( mp, "vout-cb-opaque", opaque );
     var_SetAddress( mp, "vout-cb-setup", setup_cb );
     var_SetAddress( mp, "vout-cb-cleanup", cleanup_cb );

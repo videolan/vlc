@@ -179,8 +179,11 @@ d3d9_handle_t *hd3d = &sys->dec_device.hd3d;
     int AdapterToUse;
 
     sys->cleanupDeviceCb = NULL;
-    libvlc_video_output_setup_cb setupDeviceCb = var_InheritAddress( o, "vout-cb-setup" );
-    if ( setupDeviceCb )
+    libvlc_video_engine_t engineType = var_InheritInteger( o, "vout-cb-type" );
+    libvlc_video_output_setup_cb setupDeviceCb = NULL;
+    if (engineType == libvlc_video_engine_d3d9)
+        setupDeviceCb = var_InheritAddress( o, "vout-cb-setup" );
+    if ( setupDeviceCb != NULL)
     {
         /* external rendering */
         libvlc_video_setup_device_info_t extern_out = { .d3d9.adapter = -1 };
@@ -195,7 +198,9 @@ d3d9_handle_t *hd3d = &sys->dec_device.hd3d;
         D3D9_CloneExternal( hd3d, (IDirect3D9 *) extern_out.d3d9.device );
         AdapterToUse = extern_out.d3d9.adapter;
     }
-    else
+    else if ( engineType == libvlc_video_engine_disable ||
+              engineType == libvlc_video_engine_d3d9 ||
+              engineType == libvlc_video_engine_opengl )
     {
         /* internal rendering */
         if (D3D9_Create(o, hd3d) != VLC_SUCCESS)
@@ -206,6 +211,8 @@ d3d9_handle_t *hd3d = &sys->dec_device.hd3d;
         /* find the best adapter to use, not based on the HWND used */
         AdapterToUse = -1;
     }
+    else
+        goto error;
 
     if (AdapterToUse == -1)
     {

@@ -679,6 +679,8 @@ typedef void (*libvlc_video_frameMetadata_cb)(void* opaque, libvlc_video_metadat
  * can be passed to @a libvlc_video_set_output_callbacks
  */
 typedef enum libvlc_video_engine_t {
+    /** Disable rendering engine */
+    libvlc_video_engine_disable,
     libvlc_video_engine_opengl,
     libvlc_video_engine_gles2,
     /** Direct3D11 rendering engine */

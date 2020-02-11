@@ -254,6 +254,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     /* some default internal settings */
     var_Create( p_libvlc, "window", VLC_VAR_STRING );
+    var_Create( p_libvlc, "vout-cb-type", VLC_VAR_INTEGER );
+
     /* NOTE: Because the playlist and interfaces start before this function
      * returns control to the application (DESIGN BUG!), all these variables
      * must be created (in place of libvlc_new()) and set to VLC defaults
