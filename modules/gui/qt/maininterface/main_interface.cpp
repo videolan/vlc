@@ -51,6 +51,7 @@
 #include "medialibrary/mlgenremodel.hpp"
 #include "medialibrary/mlvideomodel.hpp"
 #include "medialibrary/mlrecentsvideomodel.hpp"
+#include "medialibrary/mlfoldersmodel.hpp"
 
 #include "util/recent_media_model.hpp"
 #include "util/settings.hpp"
@@ -352,6 +353,7 @@ void MainInterface::createMainWidget( QSettings * )
         qRegisterMetaType<NetworkTreeItem>();
         qmlRegisterType<NetworkMediaModel>( "org.videolan.medialib", 0, 1, "NetworkMediaModel");
         qmlRegisterType<NetworkDeviceModel>( "org.videolan.medialib", 0, 1, "NetworkDeviceModel");
+        qmlRegisterType<MlFoldersModel>( "org.videolan.medialib", 0, 1, "MLFolderModel");
 
         //expose base object, they aren't instanciable from QML side
         qmlRegisterType<MLAlbum>();

@@ -19,24 +19,52 @@
 #include "mlfoldersmodel.hpp"
 #include <cassert>
 
-MlFoldersModel::MlFoldersModel( vlc_medialibrary_t *p_ml , QObject *parent )
+MlFoldersModel::MlFoldersModel( QObject *parent )
     : QAbstractListModel( parent )
-    ,m_ml( p_ml )
-    ,m_ml_event_handle( nullptr , [this](vlc_ml_event_callback_t* cb ) {
-        assert( m_ml != nullptr );
-        vlc_ml_event_unregister_callback( m_ml , cb );
-})
+    , m_ml_event_handle( nullptr , [this](vlc_ml_event_callback_t* cb ) {
+        if ( m_ml )
+            vlc_ml_event_unregister_callback( m_ml , cb );
+    })
 {
-    assert( p_ml );
     connect( this , &MlFoldersModel::onMLEntryPointModified , this , &MlFoldersModel::update );
-    m_ml_event_handle.reset( vlc_ml_event_register_callback( m_ml , onMlEvent , this ) );
+}
+
+MlFoldersModel::EntryPoint::EntryPoint( const vlc_ml_entry_point_t& entryPoint)
+    : mrl(entryPoint.psz_mrl)
+    , banned(entryPoint.b_banned)
+{
+}
+
+void MlFoldersModel::setCtx(QmlMainContext *ctx)
+{
+    if (ctx)
+    {
+        m_ctx = ctx;
+        setMl(vlc_ml_instance_get( m_ctx->getIntf() ));
+    }
+    else
+    {
+        m_ctx = nullptr;
+        setMl(nullptr);
+    }
+    emit ctxChanged();
+}
+
+void MlFoldersModel::setMl(vlc_medialibrary_t *ml)
+{
+    if (ml)
+        m_ml_event_handle.reset( vlc_ml_event_register_callback( ml , onMlEvent , this ) );
+    else
+        m_ml_event_handle.reset( nullptr );
+    m_ml = ml;
     update();
 }
 
 int MlFoldersModel::rowCount( QModelIndex const & ) const
 {
-    return m_mrls.count();
+    return static_cast<int>(m_mrls.size());
 }
+
 int MlFoldersModel::columnCount( QModelIndex const & ) const
 {
     return 3;
@@ -49,13 +77,23 @@ QVariant MlFoldersModel::data( const QModelIndex &index ,
         switch ( role )
         {
         case Qt::DisplayRole :
-            if ( index.column() == 1 )
-                return QVariant::fromValue( m_mrls[index.row()].toDisplayString( QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments ) );
-            break;
-        case CustomCheckBoxRole :
-            return ( index.row() %2 ) ? //TODO: if mrl banned?
-                                      Qt::Checked : Qt::Unchecked;
-            break;
+        {
+            if ( index.column() != 1 )
+                return {};
+            QUrl url = QUrl::fromUserInput(m_mrls[index.row()].mrl);
+            if (!url.isValid())
+                return {};
+            return QVariant::fromValue( url.toDisplayString( QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments ) );
+        }
+        case DisplayUrl:
+        {
+            QUrl url = QUrl::fromUserInput(m_mrls[index.row()].mrl);
+            if (!url.isValid())
+                return {};
+            return QVariant::fromValue( url.toDisplayString( QUrl::RemovePassword | QUrl::PreferLocalFile | QUrl::NormalizePathSegments ) );
+        }
+        case Banned:
+            return m_mrls[index.row()].banned;
         default :
             return {};
         }
@@ -65,7 +103,8 @@ QVariant MlFoldersModel::data( const QModelIndex &index ,
 
 void MlFoldersModel::removeAt( int index )
 {
-    vlc_ml_remove_folder( m_ml , qtu( m_mrls[index].toString() ) );
+    assert(index  < static_cast<int>(m_mrls.size()));
+    vlc_ml_remove_folder( m_ml , qtu( m_mrls[index].mrl ) );
 }
 
 void MlFoldersModel::add( QUrl mrl )
@@ -83,10 +122,9 @@ void MlFoldersModel::update()
     vlc_ml_list_folder( m_ml , &entrypoints ); //TODO: get list of banned folders as well
 
     for ( unsigned int i=0 ; i<entrypoints->i_nb_items ; i++ )
-        m_mrls.append( QUrl::fromUserInput( entrypoints->p_items[i].psz_mrl ) );
+        m_mrls.emplace_back( entrypoints->p_items[i] );
 
     endResetModel();
-
 }
 
 Qt::ItemFlags MlFoldersModel::flags ( const QModelIndex & index ) const {
@@ -97,21 +135,26 @@ Qt::ItemFlags MlFoldersModel::flags ( const QModelIndex & index ) const {
     return defaultFlags;
 }
 
+QHash<int, QByteArray> MlFoldersModel::roleNames() const
+{
+    return {
+        {DisplayUrl, "display_url"},
+        {Banned, "banned"},
+    };
+}
+
 bool MlFoldersModel::setData( const QModelIndex &index ,
                                 const QVariant &value , int role){
     if( !index.isValid() )
         return false;
 
-    else if( role == CustomCheckBoxRole ){
+    else if( role == Banned ){
         if( !value.toBool() ){
-            vlc_ml_unban_folder(m_ml, qtu( m_mrls[index.row()].toString() ) );
+            vlc_ml_unban_folder(m_ml, qtu( m_mrls[index.row()].mrl ) );
         }
         else{
-            vlc_ml_ban_folder( m_ml , qtu( m_mrls[index.row()].toString() ) );
+            vlc_ml_ban_folder( m_ml , qtu( m_mrls[index.row()].mrl ) );
         }
-    }
-    else if(role == CustomRemoveRole){
-        removeAt( index.row() );
     }
 
     return true;
@@ -122,7 +165,7 @@ void MlFoldersModel::onMlEvent( void* data , const vlc_ml_event_t* event )
     if ( event->i_type == VLC_ML_EVENT_ENTRY_POINT_ADDED || event->i_type == VLC_ML_EVENT_ENTRY_POINT_REMOVED ||
          event->i_type == VLC_ML_EVENT_ENTRY_POINT_UNBANNED || event->i_type == VLC_ML_EVENT_ENTRY_POINT_BANNED  )
     {
-        emit self->onMLEntryPointModified();
+        emit self->onMLEntryPointModified( QPrivateSignal() );
     }
 }
 
@@ -145,3 +188,4 @@ void MlFoldersModel::onMlEvent( void* data , const vlc_ml_event_t* event )
      }
      return QVariant();
  }
+

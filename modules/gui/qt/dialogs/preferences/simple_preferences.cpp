@@ -732,7 +732,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             if ( vlc_ml_instance_get( p_intf ) != NULL )
             {
-                mlModel = new MlFoldersModel( vlc_ml_instance_get( p_intf ) , this );
+                mlModel = new MlFoldersModel( this );
+                mlModel->setMl( vlc_ml_instance_get( p_intf ) );
 
                 mlTableView = ui.entryPointsTV;
 
@@ -1529,7 +1530,7 @@ QWidget *SPrefsPanel::MLgenerateWidget( QModelIndex index , MlFoldersModel *mlf 
         wid->setLayout( layout );
 
         connect( cb , &QPushButton::clicked, [=]( ) {
-            mlf->setData( index , cb->isChecked() , MlFoldersModel::CustomCheckBoxRole);
+            mlf->setData( index , cb->isChecked() , MlFoldersModel::Banned);
         } );
         return wid;
     }
@@ -1546,7 +1547,7 @@ QWidget *SPrefsPanel::MLgenerateWidget( QModelIndex index , MlFoldersModel *mlf 
 
 
         connect( pb , &QPushButton::clicked , [=]() {
-             mlf->setData( index , {} , MlFoldersModel::CustomRemoveRole);
+            mlf->removeAt(index.row());
         } );
 
         return wid;
