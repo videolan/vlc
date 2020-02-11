@@ -112,9 +112,14 @@ Widgets.NavigableFocusScope {
             view.forceActiveFocus()
         }
     }
+
+    FocusScope {
+        visible: delegateModel.count > 0
+        focus: visible
+        anchors.fill: parent
+
     Row {
         anchors.fill: parent
-        visible: delegateModel.items.count > 0
 
         Widgets.KeyNavigableListView {
             id: artistList
@@ -191,15 +196,13 @@ Widgets.NavigableFocusScope {
 
         }
     }
+    }
 
-    Label {
+    EmptyLabel {
         anchors.fill: parent
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        visible: delegateModel.items.count === 0
-        font.pixelSize: VLCStyle.fontHeight_xxlarge
-        color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        wrapMode: Text.WordWrap
+        visible: delegateModel.count === 0
+        focus: visible
         text: i18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
+        navigationParent: root
     }
 }

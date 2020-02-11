@@ -238,7 +238,7 @@ Widgets.NavigableFocusScope {
         id: view
         anchors.fill:parent
         clip: true
-        focus: true
+        focus: videosDelegate.items.count !== 0
         initialItem: medialib.gridView ? gridComponent : listComponent
         Connections {
             target: medialib
@@ -251,14 +251,12 @@ Widgets.NavigableFocusScope {
         }
 
     }
-    Label {
+
+    EmptyLabel {
         anchors.fill: parent
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
         visible: videosDelegate.items.count === 0
-        font.pixelSize: VLCStyle.fontHeight_xxlarge
-        color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        wrapMode: Text.WordWrap
+        focus: visible
         text: i18n.qtr("No video found\nPlease try adding sources, by going to the Network tab")
+        navigationParent: root
     }
 }

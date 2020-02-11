@@ -20,15 +20,30 @@ import QtQuick.Controls 2.4
 import org.videolan.medialib 0.1
 
 import "qrc:///style/"
+import "qrc:///widgets/" as Widgets
 
+Widgets.NavigableFocusScope {
+    id: root
 
-MusicTrackListDisplay {
-    id: tracklistdisplay_id
+    MusicTrackListDisplay {
+        id: tracklistdisplay_id
+        anchors.fill: parent
+        visible: tracklistdisplay_id.delegateModel.count > 0
+        focus: visible
+        navigationParent: root
+        navigationCancel: function() {
+            if (tracklistdisplay_id.currentIndex <= 0)
+                defaultNavigationCancel()
+            else
+                tracklistdisplay_id.currentIndex = 0;
+        }
+    }
 
-    navigationCancel: function() {
-        if (tracklistdisplay_id.currentIndex <= 0)
-            defaultNavigationCancel()
-        else
-            tracklistdisplay_id.currentIndex = 0;
+    EmptyLabel {
+        anchors.fill: parent
+        visible: tracklistdisplay_id.delegateModel.count === 0
+        focus: visible
+        text: i18n.qtr("No tracks found\nPlease try adding sources, by going to the Network tab")
+        navigationParent: root
     }
 }

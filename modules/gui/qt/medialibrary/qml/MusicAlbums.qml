@@ -211,7 +211,7 @@ Widgets.NavigableFocusScope {
         id: view
 
         anchors.fill: parent
-        focus: true
+        focus: delegateModel.items.count !== 0
 
         initialItem: medialib.gridView ? gridComponent : listComponent
 
@@ -235,14 +235,11 @@ Widgets.NavigableFocusScope {
         }
     }
 
-    Label {
+    EmptyLabel {
         anchors.fill: parent
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
         visible: delegateModel.items.count === 0
-        font.pixelSize: VLCStyle.fontHeight_xxlarge
-        color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        wrapMode: Text.WordWrap
+        focus: visible
         text: i18n.qtr("No albums found\nPlease try adding sources, by going to the Network tab")
+        navigationParent: root
     }
 }
