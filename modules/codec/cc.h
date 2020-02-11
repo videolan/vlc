@@ -47,6 +47,19 @@ typedef struct
 
     /* */
     bool b_reorder;
+    struct
+    {
+        uint8_t pktsize;
+        uint8_t seq;
+        uint8_t sid_bs;
+        enum
+        {
+            CEA708_PKT_END,
+            CEA708_PKT_WAIT_BLOCK_HEADER,
+            CEA708_PKT_WAIT_EXT_BLOCK_HEADER,
+            CEA708_PKT_IN_BLOCK,
+        } state;
+    } cea708;
 
     /* */
     enum cc_payload_type_e i_payload_type;
@@ -67,6 +80,10 @@ static inline void cc_Init( cc_data_t *c )
     c->i_708channels = 0;
     c->i_data = 0;
     c->b_reorder = false;
+    c->cea708.pktsize = 0;
+    c->cea708.seq = 0;
+    c->cea708.sid_bs = 0;
+    c->cea708.state = CEA708_PKT_END;
     c->i_payload_type = CC_PAYLOAD_NONE;
     c->i_payload_other_count = 0;
 }
@@ -78,15 +95,118 @@ static inline void cc_Exit( cc_data_t *c )
 static inline void cc_Flush( cc_data_t *c )
 {
     c->i_data = 0;
+    c->cea708.state = CEA708_PKT_END;
+}
+
+static inline void cc_ProbeCEA708OneByte( cc_data_t *c, bool b_start, const uint8_t cc )
+{
+    if( b_start )
+    {
+        const uint8_t i_pkt_sequence = cc >> 6;
+        if( i_pkt_sequence > 0 && ((c->cea708.seq + 1) % 4) != i_pkt_sequence )
+        {
+            c->cea708.pktsize = 0;
+            c->cea708.seq = i_pkt_sequence;
+            c->cea708.state = CEA708_PKT_END;
+        }
+        else
+        {
+            c->cea708.seq = i_pkt_sequence;
+            c->cea708.pktsize = cc & 63;
+            if( c->cea708.pktsize == 0 )
+                c->cea708.pktsize = 127;
+            else
+                c->cea708.pktsize = c->cea708.pktsize * 2 - 1;
+            c->cea708.state = CEA708_PKT_WAIT_BLOCK_HEADER;
+        }
+    }
+    else if( c->cea708.pktsize == 0 ) /* empty pkt reading service blocks */
+    {
+        c->cea708.state = CEA708_PKT_END;
+    }
+    else if( c->cea708.state != CEA708_PKT_END )
+    {
+        switch( c->cea708.state )
+        {
+            case CEA708_PKT_WAIT_BLOCK_HEADER: /* Byte is service block header */
+            {
+                uint8_t i_sid = cc >> 5;
+                c->cea708.sid_bs = cc & 0x1F;
+                if( i_sid != 0x00 && c->cea708.sid_bs != 0 )
+                {
+                    if( i_sid != 0x07 )
+                    {
+                        const uint8_t mask = (1 << --i_sid);
+                        c->i_708channels |= (mask + (mask - 1));
+                        c->cea708.state = CEA708_PKT_IN_BLOCK;
+                    }
+                    else if( c->cea708.sid_bs < 2 )
+                    {
+                        c->cea708.state = CEA708_PKT_END;
+                    }
+                    else
+                    {
+                        /* need to look up next byte in next pkt */
+                        c->cea708.state = CEA708_PKT_WAIT_EXT_BLOCK_HEADER;
+                    }
+                }
+                else c->cea708.state = CEA708_PKT_END;
+            } break;
+
+            case CEA708_PKT_WAIT_EXT_BLOCK_HEADER:
+            {
+                uint8_t i_extsid = cc & 0x3F;
+                if( i_extsid >= 0x07 )
+                {
+                    const uint8_t mask = (1 << --i_extsid);
+                    c->i_708channels |= (mask + (mask - 1));
+                }
+                if( c->cea708.sid_bs == 0 )
+                    c->cea708.state = CEA708_PKT_WAIT_BLOCK_HEADER;
+                else
+                    c->cea708.state = CEA708_PKT_IN_BLOCK;
+            } break;
+
+            case CEA708_PKT_IN_BLOCK:
+            {
+                c->cea708.sid_bs--;
+                if( c->cea708.sid_bs == 0 )
+                    c->cea708.state = CEA708_PKT_WAIT_BLOCK_HEADER;
+            } break;
+
+            default:
+                vlc_assert_unreachable();
+                break;
+        }
+        c->cea708.pktsize--;
+
+        if(c->cea708.pktsize == 0)
+            c->cea708.state = CEA708_PKT_END;
+    }
+}
+
+static inline void cc_ProbeCEA708( cc_data_t *c, uint8_t i_field, const uint8_t cc[2] )
+{
+    if( i_field == 3 ) /* DTVCC_PACKET_START */
+        cc_ProbeCEA708OneByte( c, true,  cc[0] );
+    else /* DTVCC_PACKET_DATA */
+        cc_ProbeCEA708OneByte( c, false, cc[0] );
+    cc_ProbeCEA708OneByte( c, false, cc[1] );
 }
 
 static inline void cc_AppendData( cc_data_t *c, uint8_t cc_preamble, const uint8_t cc[2] )
 {
-    uint8_t i_field = cc_preamble & 0x03;
-    if( i_field == 0 || i_field == 1 )
+    const uint8_t i_field = cc_preamble & 0x03;
+    if( i_field == 0 || i_field == 1 ) /* NTSC_CC_FIELD_1 NTSC_CC_FIELD_2 */
+    {
         c->i_608channels |= (3 << (2 * i_field));
+    }
     else
+    {
+        cc_ProbeCEA708( c, i_field, cc );
+        /* By default enable at least channel 1 */
         c->i_708channels |= 1;
+    }
 
     c->p_data[c->i_data++] = cc_preamble;
     c->p_data[c->i_data++] = cc[0];
