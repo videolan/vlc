@@ -581,7 +581,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     // DON'T use with callbacks libvlc_media_player_set_hwnd(p_mp, hWnd);
 
     /* Tell VLC to render into our D3D11 environment */
-    libvlc_video_set_output_callbacks( p_mp, libvlc_video_direct3d_engine_d3d11,
+    libvlc_video_set_output_callbacks( p_mp, libvlc_video_engine_d3d11,
                                        Setup_cb, Cleanup_cb, Resize_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb,
                                        nullptr, nullptr, SelectPlane_cb,
                                        &Context );

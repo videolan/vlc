@@ -538,7 +538,7 @@ typedef struct
  * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
  * the device must be created with D3DPRESENT_PARAMETERS.hDeviceWindow set to 0.
  *
- * For \ref libvlc_video_direct3d_engine_d3d11 the output must be a ID3D11DeviceContext*.
+ * For \ref libvlc_video_engine_d3d11 the output must be a ID3D11DeviceContext*.
  * A reference to this object is held until the \ref LIBVLC_VIDEO_DEVICE_CLEANUP is called.
  * The ID3D11Device used to create ID3D11DeviceContext must have multithreading enabled.
  */
@@ -570,7 +570,7 @@ typedef struct
 typedef struct
 {
     union {
-        int dxgi_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_direct3d_engine_d3d11*/
+        int dxgi_format;  /** the rendering DXGI_FORMAT for \ref libvlc_video_engine_d3d11*/
         uint32_t d3d9_format;  /** the rendering D3DFORMAT for \ref libvlc_video_direct3d_engine_d3d9 */
         int opengl_format;  /** the rendering GLint GL_RGBA or GL_RGB for \ref libvlc_video_engine_opengl and
                             for \ref libvlc_video_engine_gles2 */
@@ -682,7 +682,7 @@ typedef enum libvlc_video_engine_t {
     libvlc_video_engine_opengl,
     libvlc_video_engine_gles2,
     /** Direct3D11 rendering engine */
-    libvlc_video_direct3d_engine_d3d11,
+    libvlc_video_engine_d3d11,
     /** Direct3D9 rendering engine */
     libvlc_video_direct3d_engine_d3d9,
 } libvlc_video_engine_t;
@@ -711,7 +711,7 @@ typedef void( *libvlc_video_output_set_resize_cb )( void *opaque,
  * \return true on success
  * \version LibVLC 4.0.0 or later
  *
- * \note This is only used with \ref libvlc_video_direct3d_engine_d3d11.
+ * \note This is only used with \ref libvlc_video_engine_d3d11.
  *
  * The host should call OMSetRenderTargets for Direct3D11. If this callback is
  * not used (set to NULL in @a libvlc_video_set_output_callbacks()) OMSetRenderTargets
