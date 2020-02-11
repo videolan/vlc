@@ -2995,7 +2995,7 @@ AS_IF([test "${enable_tiger}" != "no"], [
 ])
 
 dnl
-dnl  check if we can build the css selector engine 
+dnl  check if we can build the css selector engine
 dnl
 AC_ARG_ENABLE(css,
 [  --enable-css            CSS selector engine (default auto)])
@@ -4204,7 +4204,7 @@ AC_SUBST(soliddatadir)
 AM_CONDITIONAL(KDE_SOLID, [test "x${soliddatadir}" != "x"])
 
 dnl
-dnl Check wether we have the PROCESS_MITIGATION_IMAGE_LOAD_POLICY 
+dnl Check wether we have the PROCESS_MITIGATION_IMAGE_LOAD_POLICY
 dnl It should only be available when building for win10, but some SDKs define it unconditionnaly
 dnl
 if test "${SYS}" = "mingw32"; then
