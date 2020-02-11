@@ -1084,12 +1084,10 @@ struct vlc_cleanup_t
         vlc_control_cancel (NULL); \
     } while (0)
 # else
-/* Those macros do not work in C++. However common C/C++ helpers may call them
- * anyway - this is fine if the code is never cancelled in C++ case.
- * So define the macros to do nothing.
- */
-#  define vlc_cleanup_push(routine, arg) do { (routine, arg)
-#  define vlc_cleanup_pop() } while (0)
+#  define vlc_cleanup_push(routine, arg) \
+    static_assert(false, "don't use vlc_cleanup_push in portable C++ code")
+#  define vlc_cleanup_pop() \
+    static_assert(false, "don't use vlc_cleanup_pop in portable C++ code")
 # endif
 
 #endif /* !LIBVLC_USE_PTHREAD_CLEANUP */
