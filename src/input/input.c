@@ -2408,7 +2408,7 @@ InputStreamHandleAnchor( input_thread_t *p_input, input_source_t *source,
     return VLC_SUCCESS;
 }
 
-static demux_t *InputDemuxNew( input_thread_t *p_input,
+static demux_t *InputDemuxNew( input_thread_t *p_input, es_out_t *p_es_out,
                                input_source_t *p_source, const char *url,
                                const char *psz_demux, const char *psz_anchor )
 {
@@ -2416,7 +2416,7 @@ static demux_t *InputDemuxNew( input_thread_t *p_input,
     vlc_object_t *obj = VLC_OBJECT(p_input);
 
     /* create the underlying access stream */
-    stream_t *p_stream = stream_AccessNew( obj, p_input, priv->p_es_out,
+    stream_t *p_stream = stream_AccessNew( obj, p_input, p_es_out,
                                            priv->b_preparsing, url );
     if( p_stream == NULL )
         return NULL;
@@ -2450,7 +2450,7 @@ static demux_t *InputDemuxNew( input_thread_t *p_input,
 
     /* create a regular demux with the access stream created */
     demux_t *demux = demux_NewAdvanced( obj, p_input, psz_demux, url, p_stream,
-                                        priv->p_es_out, priv->b_preparsing );
+                                        p_es_out, priv->b_preparsing );
     if( demux != NULL )
         return demux;
 
@@ -2559,7 +2559,8 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
     char *url;
     if( likely(asprintf( &url, "%s://%s", psz_access, psz_path ) >= 0) )
     {
-        in->p_demux = InputDemuxNew( p_input, in, url, psz_demux, psz_anchor );
+        in->p_demux = InputDemuxNew( p_input, priv->p_es_out, in, url,
+                                     psz_demux, psz_anchor );
         free( url );
     }
     else
