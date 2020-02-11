@@ -156,8 +156,9 @@ static void timestamps_filter_es_out_Reset(struct tf_es_out_s *out)
     out->b_discontinuity = false;
 }
 
-static int timestamps_filter_es_out_Control(es_out_t *out, int i_query, va_list va_list)
+static int timestamps_filter_es_out_Control(es_out_t *out, input_source_t *in, int i_query, va_list va_list)
 {
+    VLC_UNUSED(in);
     struct tf_es_out_s *p_sys = container_of(out, struct tf_es_out_s, es_out);
     switch(i_query)
     {
@@ -303,8 +304,9 @@ static void timestamps_filter_es_out_Delete(es_out_t *out)
     free(p_sys);
 }
 
-static es_out_id_t *timestamps_filter_es_out_Add(es_out_t *out, const es_format_t *fmt)
+static es_out_id_t *timestamps_filter_es_out_Add(es_out_t *out, input_source_t *in, const es_format_t *fmt)
 {
+    VLC_UNUSED(in);
     struct tf_es_out_s *p_sys = container_of(out, struct tf_es_out_s, es_out);
 
     struct tf_es_out_id_s *tf_es_sys = malloc(sizeof(*tf_es_sys));

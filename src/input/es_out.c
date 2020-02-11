@@ -243,7 +243,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced );
 static void EsOutGlobalMeta( es_out_t *p_out, const vlc_meta_t *p_meta );
 static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta, const vlc_meta_t *p_progmeta );
 static int EsOutEsUpdateFmt(es_out_t *out, es_out_id_t *es, const es_format_t *fmt);
-static int EsOutControlLocked( es_out_t *out, int i_query, ... );
+static int EsOutControlLocked( es_out_t *out, input_source_t *, int i_query, ... );
 static int EsOutPrivControlLocked( es_out_t *out, int i_query, ... );
 
 static char *LanguageGetName( const char *psz_code );
@@ -1982,8 +1982,9 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, const es_format_t *fmt,
 /* EsOutAdd:
  *  Add an es_out
  */
-static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
+static es_out_id_t *EsOutAdd( es_out_t *out, input_source_t *source, const es_format_t *fmt )
 {
+    VLC_UNUSED(source);
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     vlc_mutex_lock( &p_sys->lock );
     es_out_id_t *es = EsOutAddLocked( out, fmt, NULL );
@@ -2693,13 +2694,13 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     vlc_mutex_unlock( &p_sys->lock );
 }
 
-static int EsOutVaControlLocked( es_out_t *, int, va_list );
-static int EsOutControlLocked( es_out_t *out, int i_query, ... )
+static int EsOutVaControlLocked( es_out_t *, input_source_t *, int, va_list );
+static int EsOutControlLocked( es_out_t *out, input_source_t *source, int i_query, ... )
 {
     va_list args;
 
     va_start( args, i_query );
-    int ret = EsOutVaControlLocked( out, i_query, args );
+    int ret = EsOutVaControlLocked( out, source, i_query, args );
     va_end( args );
     return ret;
 }
@@ -2742,7 +2743,8 @@ static vlc_tick_t EsOutGetTracksDelay(es_out_t *out)
  * \param args a variable list of arguments for the query
  * \return VLC_SUCCESS or an error code
  */
-static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
+static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
+                                 int i_query, va_list args )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
@@ -3002,7 +3004,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
                 }
 
                 /* Force a rebufferization when we are too late */
-                EsOutControlLocked( out, ES_OUT_RESET_PCR );
+                EsOutControlLocked( out, source, ES_OUT_RESET_PCR );
 
                 EsOutPrivControlLocked( out, ES_OUT_PRIV_SET_JITTER,
                                         p_sys->i_pts_delay, i_new_jitter,
@@ -3292,7 +3294,7 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
             case ES_OUT_PRIV_RESTART_ES: new_query = ES_OUT_RESTART_ES; break;
             default: vlc_assert_unreachable();
         }
-        return EsOutControlLocked( out, new_query, es );
+        return EsOutControlLocked( out, NULL, new_query, es );
     }
     case ES_OUT_PRIV_GET_WAKE_UP:
     {
@@ -3350,7 +3352,7 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
         default:
           vlc_assert_unreachable();
         }
-        int i_ret = EsOutControlLocked( out, i_new_query, p_es );
+        int i_ret = EsOutControlLocked( out, NULL, i_new_query, p_es );
 
         return i_ret;
     }
@@ -3567,13 +3569,14 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
 
 }
 
-static int EsOutControl( es_out_t *out, int i_query, va_list args )
+static int EsOutControl( es_out_t *out, input_source_t *source,
+                         int i_query, va_list args )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     int i_ret;
 
     vlc_mutex_lock( &p_sys->lock );
-    i_ret = EsOutVaControlLocked( out, i_query, args );
+    i_ret = EsOutVaControlLocked( out, source, i_query, args );
     vlc_mutex_unlock( &p_sys->lock );
 
     return i_ret;

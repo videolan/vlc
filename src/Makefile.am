@@ -258,6 +258,7 @@ libvlccore_la_SOURCES = \
 	input/demux.c \
 	input/demux_chained.c \
 	input/es_out.c \
+	input/es_out_source.c \
 	input/es_out_timeshift.c \
 	input/input.c \
 	input/info.h \

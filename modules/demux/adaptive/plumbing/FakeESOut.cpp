@@ -37,10 +37,10 @@ namespace adaptive
     {
         public:
             /* static callbacks for demuxer */
-            static es_out_id_t *es_out_Add( es_out_t *, const es_format_t * );
+            static es_out_id_t *es_out_Add( es_out_t *, input_source_t *, const es_format_t * );
             static int es_out_Send( es_out_t *, es_out_id_t *, block_t * );
             static void es_out_Del( es_out_t *, es_out_id_t * );
-            static int es_out_Control( es_out_t *, int, va_list );
+            static int es_out_Control( es_out_t *, input_source_t *in, int, va_list );
             static void es_out_Destroy( es_out_t * );
             static const struct es_out_callbacks cbs;
             struct Private
@@ -60,7 +60,7 @@ const struct es_out_callbacks EsOutCallbacks::cbs =
     EsOutCallbacks::es_out_Destroy,
 };
 
-es_out_id_t * EsOutCallbacks::es_out_Add(es_out_t *fakees, const es_format_t *p_fmt)
+es_out_id_t * EsOutCallbacks::es_out_Add(es_out_t *fakees, input_source_t *, const es_format_t *p_fmt)
 {
     AbstractFakeEsOut *me = container_of(fakees, Private, es_out)->fake;
     return me->esOutAdd(p_fmt);
@@ -78,7 +78,7 @@ void EsOutCallbacks::es_out_Del(es_out_t *fakees, es_out_id_t *p_es)
     me->esOutDel(p_es);
 }
 
-int EsOutCallbacks::es_out_Control(es_out_t *fakees, int i_query, va_list args)
+int EsOutCallbacks::es_out_Control(es_out_t *fakees, input_source_t *, int i_query, va_list args)
 {
     AbstractFakeEsOut *me = container_of(fakees, Private, es_out)->fake;
     return me->esOutControl(i_query, args);

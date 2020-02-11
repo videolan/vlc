@@ -35,10 +35,11 @@
 #define TRASH_ID 0xfeca1
 #define ESID(n) ((void *)(INT64_C(0)+TRASH_ID+n))
 
-static int trash_es_out_Control(es_out_t *out, int i_query, va_list va_list)
+static int trash_es_out_Control(es_out_t *out, input_source_t *in, int i_query, va_list va_list)
 {
     VLC_UNUSED(i_query);
     VLC_UNUSED(out);
+    VLC_UNUSED(in);
     VLC_UNUSED(va_list);
     return VLC_EGENERIC;
 }
@@ -56,9 +57,10 @@ static void trash_es_out_Delete(es_out_t *out)
     VLC_UNUSED(out);
 }
 
-static es_out_id_t *trash_es_out_Add(es_out_t *out, const es_format_t *fmt)
+static es_out_id_t *trash_es_out_Add(es_out_t *out, input_source_t *in, const es_format_t *fmt)
 {
     VLC_UNUSED(out);
+    VLC_UNUSED(in);
     VLC_UNUSED(fmt);
     return ESID(fmt->i_id);
 }

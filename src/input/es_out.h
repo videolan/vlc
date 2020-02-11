@@ -260,6 +260,7 @@ static inline int es_out_SetVbiTransparency( es_out_t *p_out, vlc_es_id_t *id,
 
 es_out_t  *input_EsOutNew( input_thread_t *, float rate );
 es_out_t  *input_EsOutTimeshiftNew( input_thread_t *, es_out_t *, float i_rate );
+es_out_t  *input_EsOutSourceNew(es_out_t *master_out, input_source_t *in);
 
 es_out_id_t *vlc_es_id_get_out(vlc_es_id_t *id);
 

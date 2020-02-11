@@ -125,10 +125,10 @@ enum es_out_policy_e
 
 struct es_out_callbacks
 {
-    es_out_id_t *(*add)(es_out_t *, const es_format_t *);
+    es_out_id_t *(*add)(es_out_t *, input_source_t *in, const es_format_t *);
     int          (*send)(es_out_t *, es_out_id_t *, block_t *);
     void         (*del)(es_out_t *, es_out_id_t *);
-    int          (*control)(es_out_t *, int query, va_list);
+    int          (*control)(es_out_t *, input_source_t *in, int query, va_list);
     void         (*destroy)(es_out_t *);
     /**
      * Private control callback, must be NULL for es_out created from modules.
@@ -144,7 +144,7 @@ struct es_out_t
 VLC_USED
 static inline es_out_id_t * es_out_Add( es_out_t *out, const es_format_t *fmt )
 {
-    return out->cbs->add( out, fmt );
+    return out->cbs->add( out, NULL, fmt );
 }
 
 static inline void es_out_Del( es_out_t *out, es_out_id_t *id )
@@ -160,7 +160,7 @@ static inline int es_out_Send( es_out_t *out, es_out_id_t *id,
 
 static inline int es_out_vaControl( es_out_t *out, int i_query, va_list args )
 {
-    return out->cbs->control( out, i_query, args );
+    return out->cbs->control( out, NULL, i_query, args );
 }
 
 static inline int es_out_Control( es_out_t *out, int i_query, ... )

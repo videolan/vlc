@@ -1331,8 +1331,9 @@ static es_out_id_t *bluray_esOutAddUnlocked(bluray_esout_priv_t *esout_priv,
     return p_es;
 }
 
-static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
+static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, input_source_t *in, const es_format_t *p_fmt)
 {
+    VLC_UNUSED(in);
     bluray_esout_priv_t *esout_priv = container_of(p_out, bluray_esout_priv_t, es_out);
 
     vlc_mutex_lock(&esout_priv->lock);
@@ -1408,8 +1409,9 @@ static void bluray_esOutDel(es_out_t *p_out, es_out_id_t *p_es)
     vlc_mutex_unlock(&esout_priv->lock);
 }
 
-static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
+static int bluray_esOutControl(es_out_t *p_out, input_source_t *in, int i_query, va_list args)
 {
+    VLC_UNUSED(in);
     bluray_esout_priv_t *esout_priv = container_of(p_out, bluray_esout_priv_t, es_out);
     int i_ret;
     vlc_mutex_lock(&esout_priv->lock);
