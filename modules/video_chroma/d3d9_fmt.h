@@ -56,7 +56,6 @@ typedef struct
 
 typedef struct
 {
-    /* d3d9_handle_t           hd3d; TODO */
     union
     {
         IDirect3DDevice9    *dev;
@@ -137,11 +136,6 @@ d3d9_decoder_device_t *D3D9_CreateDevice(vlc_object_t *);
 #define D3D9_CreateDevice(a) D3D9_CreateDevice( VLC_OBJECT(a) )
 
 void D3D9_ReleaseDevice(d3d9_decoder_device_t *);
-int D3D9_Create(vlc_object_t *, d3d9_handle_t *);
-#define D3D9_Create(a,b) D3D9_Create( VLC_OBJECT(a), b )
-void D3D9_CloneExternal(d3d9_handle_t *, IDirect3D9 *);
-
-void D3D9_Destroy(d3d9_handle_t *);
 
 int D3D9_FillPresentationParameters(const d3d9_decoder_device_t *, D3DPRESENT_PARAMETERS *);
 
