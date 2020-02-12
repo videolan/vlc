@@ -39,7 +39,7 @@
 #include "d3d11_shaders.h"
 
 #if !VLC_WINSTORE_APP
-# define D3DCompile(args...)                    hd3d->OurD3DCompile(args)
+# define D3DCompile(args...)                    hd3d->shaders.OurD3DCompile(args)
 #endif
 
 #define ST2084_PQ_CONSTANTS  "const float ST2084_m1 = 2610.0 / (4096.0 * 4);\n\

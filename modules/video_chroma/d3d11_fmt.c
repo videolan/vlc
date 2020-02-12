@@ -702,17 +702,17 @@ int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d, bool with_shaders)
 
     if (with_shaders)
     {
-        hd3d->compiler_dll = Direct3D11LoadShaderLibrary();
-        if (!hd3d->compiler_dll) {
+        hd3d->shaders.compiler_dll = Direct3D11LoadShaderLibrary();
+        if (!hd3d->shaders.compiler_dll) {
             msg_Err(obj, "cannot load d3dcompiler.dll, aborting");
             FreeLibrary(hd3d->hdll);
             return VLC_EGENERIC;
         }
 
-        hd3d->OurD3DCompile = (void *)GetProcAddress(hd3d->compiler_dll, "D3DCompile");
-        if (!hd3d->OurD3DCompile) {
+        hd3d->shaders.OurD3DCompile = (void *)GetProcAddress(hd3d->shaders.compiler_dll, "D3DCompile");
+        if (!hd3d->shaders.OurD3DCompile) {
             msg_Err(obj, "Cannot locate reference to D3DCompile in d3dcompiler DLL");
-            FreeLibrary(hd3d->compiler_dll);
+            FreeLibrary(hd3d->shaders.compiler_dll);
             FreeLibrary(hd3d->hdll);
             return VLC_EGENERIC;
         }
@@ -760,12 +760,12 @@ void D3D11_Destroy(d3d11_handle_t *hd3d)
     if (hd3d->hdll)
         FreeLibrary(hd3d->hdll);
 
-    if (hd3d->compiler_dll)
+    if (hd3d->shaders.compiler_dll)
     {
-        FreeLibrary(hd3d->compiler_dll);
-        hd3d->compiler_dll = NULL;
+        FreeLibrary(hd3d->shaders.compiler_dll);
+        hd3d->shaders.compiler_dll = NULL;
     }
-    hd3d->OurD3DCompile = NULL;
+    hd3d->shaders.OurD3DCompile = NULL;
 
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     if (hd3d->dxgidebug_dll)

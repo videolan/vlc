@@ -56,10 +56,15 @@ typedef struct
 
 typedef struct
 {
-#if !VLC_WINSTORE_APP
-    HINSTANCE                 hdll;         /* handle of the opened d3d11 dll */
     HINSTANCE                 compiler_dll; /* handle of the opened d3dcompiler dll */
     pD3DCompile               OurD3DCompile;
+} d3d11_shaders_t;
+
+typedef struct
+{
+#if !VLC_WINSTORE_APP
+    HINSTANCE                 hdll;         /* handle of the opened d3d11 dll */
+    d3d11_shaders_t           shaders;
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE                 dxgidebug_dll;
     HRESULT (WINAPI * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
