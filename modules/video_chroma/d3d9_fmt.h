@@ -51,6 +51,7 @@ typedef struct
         IDirect3D9Ex        *objex;
     };
     bool                    use_ex;
+    D3DCAPS9                caps;
 } d3d9_handle_t;
 
 typedef struct
@@ -66,7 +67,6 @@ typedef struct
     /* creation parameters */
     D3DFORMAT               BufferFormat;
     UINT                    adapterId;
-    D3DCAPS9                caps;
 } d3d9_device_t;
 
 typedef struct

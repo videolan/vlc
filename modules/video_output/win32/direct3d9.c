@@ -598,14 +598,14 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 
     // Set linear filtering quality
-    if (sys->d3d9_device->d3ddev.caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR) {
+    if (sys->d3d9_device->hd3d.caps.TextureFilterCaps & D3DPTFILTERCAPS_MINFLINEAR) {
         //msg_Dbg(vd, "Using D3DTEXF_LINEAR for minification");
         IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
     } else {
         //msg_Dbg(vd, "Using D3DTEXF_POINT for minification");
         IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
     }
-    if (sys->d3d9_device->d3ddev.caps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR) {
+    if (sys->d3d9_device->hd3d.caps.TextureFilterCaps & D3DPTFILTERCAPS_MAGFLINEAR) {
         //msg_Dbg(vd, "Using D3DTEXF_LINEAR for magnification");
         IDirect3DDevice9_SetSamplerState(d3ddev, 0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
     } else {
@@ -636,7 +636,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_SRCBLEND,D3DBLEND_SRCALPHA);
     IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_DESTBLEND,D3DBLEND_INVSRCALPHA);
 
-    if (sys->d3d9_device->d3ddev.caps.AlphaCmpCaps & D3DPCMPCAPS_GREATER) {
+    if (sys->d3d9_device->hd3d.caps.AlphaCmpCaps & D3DPCMPCAPS_GREATER) {
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHATESTENABLE,TRUE);
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHAREF, 0x00);
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHAFUNC,D3DCMP_GREATER);
@@ -1583,13 +1583,13 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
 
-    if ( vd->source.i_visible_width  > sys->d3d9_device->d3ddev.caps.MaxTextureWidth ||
-         vd->source.i_visible_height > sys->d3d9_device->d3ddev.caps.MaxTextureHeight )
+    if ( vd->source.i_visible_width  > sys->d3d9_device->hd3d.caps.MaxTextureWidth ||
+         vd->source.i_visible_height > sys->d3d9_device->hd3d.caps.MaxTextureHeight )
     {
         msg_Err(vd, "Textures too large %ux%u max possible: %lx%lx",
                 vd->source.i_visible_width, vd->source.i_visible_height,
-                sys->d3d9_device->d3ddev.caps.MaxTextureWidth,
-                sys->d3d9_device->d3ddev.caps.MaxTextureHeight);
+                sys->d3d9_device->hd3d.caps.MaxTextureWidth,
+                sys->d3d9_device->hd3d.caps.MaxTextureHeight);
         goto error;
     }
 
@@ -1614,11 +1614,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     /* Setup vout_display now that everything is fine */
     if (var_InheritBool(vd, "direct3d9-hw-blending") &&
         sys->d3dregion_format != D3DFMT_UNKNOWN &&
-        (sys->d3d9_device->d3ddev.caps.SrcBlendCaps  & D3DPBLENDCAPS_SRCALPHA) &&
-        (sys->d3d9_device->d3ddev.caps.DestBlendCaps & D3DPBLENDCAPS_INVSRCALPHA) &&
-        (sys->d3d9_device->d3ddev.caps.TextureCaps   & D3DPTEXTURECAPS_ALPHA) &&
-        (sys->d3d9_device->d3ddev.caps.TextureOpCaps & D3DTEXOPCAPS_SELECTARG1) &&
-        (sys->d3d9_device->d3ddev.caps.TextureOpCaps & D3DTEXOPCAPS_MODULATE))
+        (sys->d3d9_device->hd3d.caps.SrcBlendCaps  & D3DPBLENDCAPS_SRCALPHA) &&
+        (sys->d3d9_device->hd3d.caps.DestBlendCaps & D3DPBLENDCAPS_INVSRCALPHA) &&
+        (sys->d3d9_device->hd3d.caps.TextureCaps   & D3DPTEXTURECAPS_ALPHA) &&
+        (sys->d3d9_device->hd3d.caps.TextureOpCaps & D3DTEXOPCAPS_SELECTARG1) &&
+        (sys->d3d9_device->hd3d.caps.TextureOpCaps & D3DTEXOPCAPS_MODULATE))
         vd->info.subpicture_chromas = d3d_subpicture_chromas;
     else
         vd->info.subpicture_chromas = NULL;
