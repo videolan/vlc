@@ -319,8 +319,7 @@ void D3D11_ReleaseDevice(d3d11_decoder_device_t *dev_sys)
     D3D11_Destroy( &sys->hd3d );
 }
 
-#undef D3D11_CreateDeviceExternal
-HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *d3d11ctx,
+static HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *d3d11ctx,
                                    bool hw_decoding, d3d11_device_t *out)
 {
     HRESULT hr;
