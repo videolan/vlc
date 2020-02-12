@@ -143,7 +143,7 @@ void D3D9_CloneExternal(d3d9_handle_t *, IDirect3D9 *);
 
 void D3D9_Destroy(d3d9_handle_t *);
 
-int D3D9_FillPresentationParameters(d3d9_handle_t *, const d3d9_device_t *, D3DPRESENT_PARAMETERS *);
+int D3D9_FillPresentationParameters(const d3d9_decoder_device_t *, D3DPRESENT_PARAMETERS *);
 
 void d3d9_pic_context_destroy(picture_context_t *);
 picture_context_t *d3d9_pic_context_copy(picture_context_t *);

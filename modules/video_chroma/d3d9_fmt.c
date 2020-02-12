@@ -134,7 +134,7 @@ d3d9_handle_t *hd3d = &sys->dec_device.hd3d;
     out->adapterId = AdapterToUse;
     /* TODO only create a device for the decoder dimensions */
     D3DPRESENT_PARAMETERS d3dpp;
-    if (D3D9_FillPresentationParameters(hd3d, out, &d3dpp))
+    if (D3D9_FillPresentationParameters(&sys->dec_device, &d3dpp))
     {
         msg_Err(o, "Could not get presentation parameters");
         goto error;
@@ -203,8 +203,7 @@ void D3D9_ReleaseDevice(d3d9_decoder_device_t *dec_dev)
  * It setup vout_display_sys_t::d3dpp and vout_display_sys_t::rect_display
  * from the default adapter.
  */
-int D3D9_FillPresentationParameters(d3d9_handle_t *hd3d,
-                                    const d3d9_device_t *d3ddev,
+int D3D9_FillPresentationParameters(const d3d9_decoder_device_t *dec_dev,
                                     D3DPRESENT_PARAMETERS *d3dpp)
 {
     /*
@@ -212,7 +211,7 @@ int D3D9_FillPresentationParameters(d3d9_handle_t *hd3d,
     ** buffer of the same format
     */
     D3DDISPLAYMODE d3ddm;
-    HRESULT hr = IDirect3D9_GetAdapterDisplayMode(hd3d->obj, d3ddev->adapterId, &d3ddm);
+    HRESULT hr = IDirect3D9_GetAdapterDisplayMode(dec_dev->hd3d.obj, dec_dev->d3ddev.adapterId, &d3ddm);
     if (FAILED(hr))
         return VLC_EGENERIC;
 
