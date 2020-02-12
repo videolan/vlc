@@ -130,14 +130,7 @@ int D3D11CheckDriverVersion(const d3d11_device_t *, UINT vendorId,
 void D3D11_GetDriverVersion(vlc_object_t *, d3d11_device_t *);
 #define D3D11_GetDriverVersion(a,b) D3D11_GetDriverVersion(VLC_OBJECT(a),b)
 
-static inline bool DeviceSupportsFormat(ID3D11Device *d3ddevice,
-                                        DXGI_FORMAT format, UINT supportFlags)
-{
-    UINT i_formatSupport;
-    return SUCCEEDED( ID3D11Device_CheckFormatSupport(d3ddevice, format,
-                                                      &i_formatSupport) )
-            && ( i_formatSupport & supportFlags ) == supportFlags;
-}
+bool DeviceSupportsFormat(ID3D11Device *d3ddevice, DXGI_FORMAT format, UINT supportFlags);
 
 const d3d_format_t *FindD3D11Format(vlc_object_t *,
                                     d3d11_device_t*,

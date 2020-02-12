@@ -503,6 +503,14 @@ done:
     return result;
 }
 
+bool DeviceSupportsFormat(ID3D11Device *d3ddevice, DXGI_FORMAT format, UINT supportFlags)
+{
+    UINT i_formatSupport;
+    return SUCCEEDED( ID3D11Device_CheckFormatSupport(d3ddevice, format,
+                                                      &i_formatSupport) )
+            && ( i_formatSupport & supportFlags ) == supportFlags;
+}
+
 #undef FindD3D11Format
 const d3d_format_t *FindD3D11Format(vlc_object_t *o,
                                     d3d11_device_t *d3d_dev,
