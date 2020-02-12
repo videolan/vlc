@@ -74,7 +74,7 @@ int D3D9OpenDecoderDevice(vlc_decoder_device *device, vout_window_t *wnd)
     if ( setupDeviceCb )
     {
         /* external rendering */
-        libvlc_video_setup_device_info_t out = { .device_context = NULL, .adapter = 0 };
+        libvlc_video_setup_device_info_t out = { .d3d9.adapter = 0 };
         sys->opaque          = var_InheritAddress( device, "vout-cb-opaque" );
         sys->cleanupDeviceCb = var_InheritAddress( device, "vout-cb-cleanup" );
         libvlc_video_setup_device_cfg_t cfg = {
@@ -87,8 +87,8 @@ int D3D9OpenDecoderDevice(vlc_decoder_device *device, vout_window_t *wnd)
             goto error;
         }
 
-        D3D9_CloneExternal( &sys->dec_device.hd3d, (IDirect3D9*) out.device_context );
-        adapter = out.adapter;
+        D3D9_CloneExternal( &sys->dec_device.hd3d, (IDirect3D9*) out.d3d9.device );
+        adapter = out.d3d9.adapter;
     }
     else
     {

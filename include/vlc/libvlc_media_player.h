@@ -511,8 +511,13 @@ typedef struct
 typedef struct
 {
     union {
-        void *device_context; /** ID3D11DeviceContext* for D3D11, IDirect3D9 * for D3D9 */
-        int  adapter;         /** Adapter to use with the IDirect3D9 for D3D9 */
+        struct {
+            void *device_context; /** ID3D11DeviceContext* */
+        } d3d11;
+        struct {
+            void *device;         /** IDirect3D9* */
+            int  adapter;         /** Adapter to use with the IDirect3D9* */
+        } d3d9;
     };
 } libvlc_video_setup_device_info_t;
 

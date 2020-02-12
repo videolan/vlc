@@ -455,7 +455,7 @@ static bool Setup_cb( void **opaque, const libvlc_video_setup_device_cfg_t *cfg,
 
     init_direct3d(ctx);
 
-    out->device_context = ctx->d3dctxVLC;
+    out->d3d11.device_context = ctx->d3dctxVLC;
     return true;
 }
 

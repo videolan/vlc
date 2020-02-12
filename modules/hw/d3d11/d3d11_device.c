@@ -102,14 +102,14 @@ static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_
             libvlc_video_setup_device_cfg_t cfg = {
                 .hardware_decoding = true, /* always favor hardware decoding */
             };
-            libvlc_video_setup_device_info_t out = { .device_context = NULL };
+            libvlc_video_setup_device_info_t out = { .d3d11.device_context = NULL };
             if (!setupDeviceCb( &sys->external.opaque, &cfg, &out ))
             {
                 if (sys->external.cleanupDeviceCb)
                     sys->external.cleanupDeviceCb( sys->external.opaque );
                 goto error;
             }
-            hr = D3D11_CreateDeviceExternal(device, out.device_context, true, &sys->dec_device.d3d_dev);
+            hr = D3D11_CreateDeviceExternal(device, out.d3d11.device_context, true, &sys->dec_device.d3d_dev);
         }
         else
         {
