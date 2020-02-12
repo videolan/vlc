@@ -50,7 +50,6 @@
 
 #include "d3d11_swapchain.h"
 #include "d3d11_shaders.h"
-#include "../../video_chroma/d3d9_fmt.h"
 
 typedef enum video_color_axis {
     COLOR_AXIS_RGB,
@@ -453,8 +452,6 @@ void LocalSwapchainCleanupDevice( void *opaque )
         IDXGISwapChain_Release(display->dxgiswapChain);
         display->dxgiswapChain = NULL;
     }
-
-    D3D11_ReleaseDevice( display->d3d_dev );
 }
 
 void LocalSwapchainSwap( void *opaque )
