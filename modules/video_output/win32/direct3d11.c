@@ -97,7 +97,7 @@ struct vout_display_sys_t
 
     d3d11_handle_t           hd3d;
     d3d11_device_t           *d3d_dev;
-    d3d11_device_t           local_d3d_dev; // when opened without a video context
+    d3d11_decoder_device_t   *local_d3d_dev; // when opened without a video context
     d3d11_shaders_t          shaders;
     d3d_quad_t               picQuad;
 
@@ -312,21 +312,18 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->sendMetadataCb      = var_InheritAddress( vd, "vout-cb-metadata" );
     sys->selectPlaneCb       = var_InheritAddress( vd, "vout-cb-select-plane" );
 
-    d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(context);
-    if ( dev_sys != NULL )
-    {
-        sys->d3d_dev = &dev_sys->d3d_dev;
-    }
-    else
+    d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext( context );
+    if ( dev_sys == NULL )
     {
         // No d3d11 device, we create one
-        HRESULT hr = D3D11_CreateDevice(vd, &sys->hd3d, NULL, false, vd->obj.force, &sys->local_d3d_dev);
-        if (FAILED(hr)) {
-            msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
+        sys->local_d3d_dev = D3D11_CreateDevice(vd, NULL, false, vd->obj.force);
+        if (sys->local_d3d_dev == NULL) {
+            msg_Err(vd, "Could not Create the D3D11 device.");
             goto error;
         }
-        sys->d3d_dev = &sys->local_d3d_dev;
+        dev_sys = sys->local_d3d_dev;
     }
+    sys->d3d_dev = &dev_sys->d3d_dev;
 
     if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
@@ -970,11 +967,11 @@ static void Direct3D11Close(vout_display_t *vd)
 
     Direct3D11DestroyResources(vd);
 
-    if (sys->d3d_dev == &sys->local_d3d_dev)
-        D3D11_ReleaseDevice( &sys->local_d3d_dev );
-
     if ( sys->swapCb == LocalSwapchainSwap )
         LocalSwapchainCleanupDevice( sys->outside_opaque );
+
+    if (sys->d3d_dev == &sys->local_d3d_dev->d3d_dev)
+        D3D11_ReleaseDevice( sys->local_d3d_dev );
 
     msg_Dbg(vd, "Direct3D11 display adapter closed");
 }

@@ -147,15 +147,15 @@ int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
                              ID3D11ShaderResourceView *output[D3D11_MAX_SHADER_VIEW]);
 #define D3D11_AllocateResourceView(a,b,c,d,e,f)  D3D11_AllocateResourceView(VLC_OBJECT(a),b,c,d,e,f)
 
-HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *, IDXGIAdapter *,
-                           bool hw_decoding, bool forced, d3d11_device_t *out);
-#define D3D11_CreateDevice(a,b,c,d,e,f)  D3D11_CreateDevice( VLC_OBJECT(a), b, c, d, e, f )
+d3d11_decoder_device_t *D3D11_CreateDevice(vlc_object_t *obj, IDXGIAdapter *,
+                                   bool hw_decoding, bool forced);
+#define D3D11_CreateDevice(a,b,c,d)  D3D11_CreateDevice( VLC_OBJECT(a), b, c, d )
 HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *,
                                    bool hw_decoding, d3d11_device_t *out);
 #define D3D11_CreateDeviceExternal(a,b,c,d) \
     D3D11_CreateDeviceExternal( VLC_OBJECT(a), b, c, d )
 
-void D3D11_ReleaseDevice(d3d11_device_t *);
+void D3D11_ReleaseDevice(d3d11_decoder_device_t *);
 
 int D3D11_Create(vlc_object_t *, d3d11_handle_t *);
 #define D3D11_Create(a,b) D3D11_Create( VLC_OBJECT(a), b )

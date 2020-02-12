@@ -28,6 +28,12 @@
 #include <vlc_picture.h>
 #include <vlc_charset.h>
 
+#include <vlc/libvlc.h>
+#include <vlc/libvlc_picture.h>
+#include <vlc/libvlc_media.h>
+#include <vlc/libvlc_renderer_discoverer.h>
+#include <vlc/libvlc_media_player.h>
+
 #define COBJMACROS
 #include <d3d11.h>
 #include <assert.h>
@@ -217,8 +223,20 @@ static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 }
 #endif /* VLC_WINSTORE_APP */
 
-void D3D11_ReleaseDevice(d3d11_device_t *d3d_dev)
+typedef struct {
+    struct {
+        void                            *opaque;
+        libvlc_video_output_cleanup_cb  cleanupDeviceCb;
+    } external;
+
+    d3d11_handle_t                      hd3d;
+    d3d11_decoder_device_t              dec_device;
+} d3d11_decoder_device;
+
+void D3D11_ReleaseDevice(d3d11_decoder_device_t *dev_sys)
 {
+    d3d11_decoder_device *sys = container_of(dev_sys, d3d11_decoder_device, dec_device);
+    d3d11_device_t *d3d_dev = &dev_sys->d3d_dev;
     if (d3d_dev->d3dcontext)
     {
         ID3D11DeviceContext_Flush(d3d_dev->d3dcontext);
@@ -237,6 +255,11 @@ void D3D11_ReleaseDevice(d3d11_device_t *d3d_dev)
         d3d_dev->context_mutex = INVALID_HANDLE_VALUE;
     }
 #endif
+
+    if ( sys->external.cleanupDeviceCb )
+        sys->external.cleanupDeviceCb( sys->external.opaque );
+
+    D3D11_Destroy( &sys->hd3d );
 }
 
 #undef D3D11_CreateDeviceExternal
@@ -288,21 +311,11 @@ HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *d3d11
     return S_OK;
 }
 
-HRESULT (D3D11_CreateDevice)(vlc_object_t *obj, d3d11_handle_t *hd3d,
-                             IDXGIAdapter *adapter,
-                             bool hw_decoding, bool forced, d3d11_device_t *out)
+static HRESULT CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
+                            IDXGIAdapter *adapter,
+                            bool hw_decoding, d3d11_device_t *out)
 {
 #if !VLC_WINSTORE_APP
-    if (!forced)
-    {
-        /* Allow using D3D11 automatically starting from Windows 8.1 */
-        bool isWin81OrGreater = false;
-        HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
-        if (likely(hKernel32 != NULL))
-            isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
-        if (!isWin81OrGreater)
-            return E_FAIL;
-    }
 # define D3D11CreateDevice(args...)             pf_CreateDevice(args)
     /* */
     PFN_D3D11_CREATE_DEVICE pf_CreateDevice;
@@ -396,6 +409,81 @@ HRESULT (D3D11_CreateDevice)(vlc_object_t *obj, d3d11_handle_t *hd3d,
         out->context_mutex = INVALID_HANDLE_VALUE;
 
     return hr;
+}
+
+d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
+                                      IDXGIAdapter *adapter,
+                                      bool hw_decoding, bool forced)
+{
+    d3d11_decoder_device *sys = vlc_obj_malloc(obj, sizeof(*sys));
+    if (unlikely(sys==NULL))
+        return NULL;
+
+    int ret = D3D11_Create(obj, &sys->hd3d);
+    if (ret != VLC_SUCCESS)
+    {
+        vlc_obj_free( obj, sys );
+        return NULL;
+    }
+
+    sys->external.cleanupDeviceCb = NULL;
+    HRESULT hr = E_FAIL;
+#if VLC_WINSTORE_APP
+    /* LEGACY, the d3dcontext and swapchain were given by the host app */
+    ID3D11DeviceContext *d3dcontext = (ID3D11DeviceContext*)(uintptr_t) var_InheritInteger(obj, "winrt-d3dcontext");
+    if ( likely(d3dcontext != NULL) )
+    {
+        hr = D3D11_CreateDeviceExternal(obj, d3dcontext, true, &sys->dec_device.d3d_dev);
+    }
+    else
+#endif
+    {
+        libvlc_video_output_setup_cb setupDeviceCb = var_InheritAddress( obj, "vout-cb-setup" );
+        if ( setupDeviceCb )
+        {
+            /* decoder device coming from the external app */
+            sys->external.opaque          = var_InheritAddress( obj, "vout-cb-opaque" );
+            sys->external.cleanupDeviceCb = var_InheritAddress( obj, "vout-cb-cleanup" );
+            libvlc_video_setup_device_cfg_t cfg = {
+                .hardware_decoding = true, /* always favor hardware decoding */
+            };
+            libvlc_video_setup_device_info_t out = { .d3d11.device_context = NULL };
+            if (!setupDeviceCb( &sys->external.opaque, &cfg, &out ))
+            {
+                if (sys->external.cleanupDeviceCb)
+                    sys->external.cleanupDeviceCb( sys->external.opaque );
+                goto error;
+            }
+            hr = D3D11_CreateDeviceExternal(obj, out.d3d11.device_context, true, &sys->dec_device.d3d_dev);
+        }
+        else
+        {
+            /* internal decoder device */
+#if !VLC_WINSTORE_APP
+            if (!forced)
+            {
+                /* Allow using D3D11 automatically starting from Windows 8.1 */
+                bool isWin81OrGreater = false;
+                HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+                if (likely(hKernel32 != NULL))
+                    isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
+                if (!isWin81OrGreater)
+                    goto error;
+            }
+#endif /* !VLC_WINSTORE_APP */
+
+            hr = CreateDevice( obj, &sys->hd3d, adapter, hw_decoding, &sys->dec_device.d3d_dev );
+        }
+    }
+
+error:
+    if (FAILED(hr))
+    {
+        D3D11_Destroy(&sys->hd3d);
+        vlc_obj_free( obj, sys );
+        return NULL;
+    }
+    return &sys->dec_device;
 }
 
 IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev)
