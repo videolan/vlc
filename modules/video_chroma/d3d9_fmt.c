@@ -87,7 +87,7 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, int AdapterToUse
     D3DPRESENT_PARAMETERS d3dpp;
     if (D3D9_FillPresentationParameters(hd3d, out, &d3dpp))
     {
-        msg_Err(o, "Could not presentation parameters");
+        msg_Err(o, "Could not get presentation parameters");
         return E_INVALIDARG;
     }
 
