@@ -117,7 +117,6 @@ static inline void cc_ProbeCEA708OneByte( cc_data_t *c, bool b_start, const uint
             else
                 c->cea708.pktsize = c->cea708.pktsize * 2 - 1;
             c->cea708.state = CEA708_PKT_WAIT_BLOCK_HEADER;
-            printf("NEW PKT SIZE %d\n", c->cea708.pktsize);
         }
     }
     else if( c->cea708.pktsize == 0 ) /* empty pkt reading service blocks */
