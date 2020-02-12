@@ -39,7 +39,7 @@
 #include "d3d11_shaders.h"
 
 #if !VLC_WINSTORE_APP
-# define D3DCompile(args...)                    hd3d->shaders.OurD3DCompile(args)
+# define D3DCompile(args...)                    shaders->OurD3DCompile(args)
 #endif
 
 #define ST2084_PQ_CONSTANTS  "const float ST2084_m1 = 2610.0 / (4096.0 * 4);\n\
@@ -195,7 +195,7 @@ VS_OUTPUT main( VS_INPUT In )\n\
 }\n\
 ";
 
-static ID3DBlob* D3D11_CompileShader(vlc_object_t *, const d3d11_handle_t *, const d3d11_device_t *,
+static ID3DBlob* D3D11_CompileShader(vlc_object_t *, const d3d11_shaders_t *, const d3d11_device_t *,
                               const char *psz_shader, bool pixel);
 
 bool IsRGBShader(const d3d_format_t *cfg)
@@ -207,7 +207,7 @@ bool IsRGBShader(const d3d_format_t *cfg)
            cfg->formatTexture != DXGI_FORMAT_420_OPAQUE;
 }
 
-static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool legacy_shader,
+static HRESULT CompileTargetShader(vlc_object_t *o, const d3d11_shaders_t *shaders, bool legacy_shader,
                                    d3d11_device_t *d3d_dev,
                                    const char *psz_sampler,
                                    const char *psz_src_to_linear,
@@ -241,7 +241,7 @@ static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool l
     }
 #endif
 
-    ID3DBlob *pPSBlob = D3D11_CompileShader(o, hd3d, d3d_dev, shader, true);
+    ID3DBlob *pPSBlob = D3D11_CompileShader(o, shaders, d3d_dev, shader, true);
     free(shader);
     if (!pPSBlob)
         return E_INVALIDARG;
@@ -254,8 +254,7 @@ static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool l
     return hr;
 }
 
-#undef D3D11_CompilePixelShader
-HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool legacy_shader,
+HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shaders_t *shaders, bool legacy_shader,
                                  d3d11_device_t *d3d_dev,
                                  const display_info_t *display,
                                  video_transfer_func_t transfer,
@@ -616,13 +615,13 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
         }
     }
 
-    hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
+    hr = CompileTargetShader(o, shaders, legacy_shader, d3d_dev,
                                      psz_sampler[0], psz_src_to_linear,
                                      psz_primaries_transform,
                                      psz_linear_to_display, psz_tone_mapping,
                                      psz_adjust_range, psz_move_planes[0], &quad->d3dpixelShader[0]);
     if (!FAILED(hr) && psz_sampler[1])
-        hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
+        hr = CompileTargetShader(o, shaders, legacy_shader, d3d_dev,
                                  psz_sampler[1], psz_src_to_linear,
                                  psz_primaries_transform,
                                  psz_linear_to_display, psz_tone_mapping,
@@ -644,7 +643,7 @@ void D3D11_ReleasePixelShader(d3d_quad_t *quad)
     }
 }
 
-static ID3DBlob* D3D11_CompileShader(vlc_object_t *obj, const d3d11_handle_t *hd3d,
+static ID3DBlob* D3D11_CompileShader(vlc_object_t *obj, const d3d11_shaders_t *shaders,
                                      const d3d11_device_t *d3d_dev,
                                      const char *psz_shader, bool pixel)
 {
@@ -763,12 +762,12 @@ void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
     }
 }
 
-static HRESULT D3D11_CompileVertexShader(vlc_object_t *obj, d3d11_handle_t *hd3d,
+static HRESULT D3D11_CompileVertexShader(vlc_object_t *obj, const d3d11_shaders_t *shaders,
                                          d3d11_device_t *d3d_dev, const char *psz_shader,
                                          d3d_vshader_t *output)
 {
    HRESULT hr = E_FAIL;
-   ID3DBlob *pVSBlob = D3D11_CompileShader(obj, hd3d, d3d_dev, psz_shader, false);
+   ID3DBlob *pVSBlob = D3D11_CompileShader(obj, shaders, d3d_dev, psz_shader, false);
    if (!pVSBlob)
        goto error;
 
@@ -822,16 +821,14 @@ void D3D11_ReleaseVertexShader(d3d_vshader_t *shader)
     }
 }
 
-#undef D3D11_CompileFlatVertexShader
-HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *obj, d3d11_handle_t *hd3d,
+HRESULT (D3D11_CompileFlatVertexShader)(vlc_object_t *obj, const d3d11_shaders_t *shaders,
                                       d3d11_device_t *d3d_dev, d3d_vshader_t *output)
 {
-    return D3D11_CompileVertexShader(obj, hd3d, d3d_dev, globVertexShaderFlat, output);
+    return D3D11_CompileVertexShader(obj, shaders, d3d_dev, globVertexShaderFlat, output);
 }
 
-#undef D3D11_CompileProjectionVertexShader
-HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *obj, d3d11_handle_t *hd3d,
+HRESULT (D3D11_CompileProjectionVertexShader)(vlc_object_t *obj, const d3d11_shaders_t *shaders,
                                             d3d11_device_t *d3d_dev, d3d_vshader_t *output)
 {
-    return D3D11_CompileVertexShader(obj, hd3d, d3d_dev, globVertexShaderProjection, output);
+    return D3D11_CompileVertexShader(obj, shaders, d3d_dev, globVertexShaderProjection, output);
 }

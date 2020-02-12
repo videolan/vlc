@@ -98,7 +98,7 @@ typedef struct
 
 bool IsRGBShader(const d3d_format_t *);
 
-HRESULT D3D11_CompilePixelShader(vlc_object_t *, d3d11_handle_t *, bool legacy_shader,
+HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d11_shaders_t *, bool legacy_shader,
                                  d3d11_device_t *, const display_info_t *,
                                  video_transfer_func_t, video_color_primaries_t,
                                  bool src_full_range,
@@ -107,10 +107,10 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *, d3d11_handle_t *, bool legacy_s
     D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 void D3D11_ReleasePixelShader(d3d_quad_t *);
 
-HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, d3d11_handle_t *, d3d11_device_t *, d3d_vshader_t *);
+HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, const d3d11_shaders_t *, d3d11_device_t *, d3d_vshader_t *);
 #define D3D11_CompileFlatVertexShader(a,b,c,d) D3D11_CompileFlatVertexShader(VLC_OBJECT(a),b,c,d)
 
-HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *, d3d11_handle_t *, d3d11_device_t *, d3d_vshader_t *);
+HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *, const d3d11_shaders_t *, d3d11_device_t *, d3d_vshader_t *);
 #define D3D11_CompileProjectionVertexShader(a,b,c,d) D3D11_CompileProjectionVertexShader(VLC_OBJECT(a),b,c,d)
 
 float GetFormatLuminance(vlc_object_t *, const video_format_t *);

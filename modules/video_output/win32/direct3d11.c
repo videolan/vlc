@@ -1071,7 +1071,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     sys->legacy_shader = sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
             BogusZeroCopy(vd);
 
-    hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, sys->d3d_dev,
+    hr = D3D11_CompilePixelShader(vd, &sys->hd3d.shaders, sys->legacy_shader, sys->d3d_dev,
                                   &sys->display, fmt->transfer, fmt->primaries,
                                   fmt->color_range == COLOR_RANGE_FULL,
                                   &sys->picQuad);
@@ -1188,7 +1188,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
 
     if (sys->regionQuad.textureFormat != NULL)
     {
-        hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, sys->d3d_dev,
+        hr = D3D11_CompilePixelShader(vd, &sys->hd3d.shaders, sys->legacy_shader, sys->d3d_dev,
                                       &sys->display, TRANSFER_FUNC_SRGB, COLOR_PRIMARIES_SRGB, true,
                                       &sys->regionQuad);
         if (FAILED(hr))
@@ -1199,13 +1199,13 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         }
     }
 
-    hr = D3D11_CompileFlatVertexShader(vd, &sys->hd3d, sys->d3d_dev, &sys->flatVShader);
+    hr = D3D11_CompileFlatVertexShader(vd, &sys->hd3d.shaders, sys->d3d_dev, &sys->flatVShader);
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
 
-    hr = D3D11_CompileProjectionVertexShader(vd, &sys->hd3d, sys->d3d_dev, &sys->projectionVShader);
+    hr = D3D11_CompileProjectionVertexShader(vd, &sys->hd3d.shaders, sys->d3d_dev, &sys->projectionVShader);
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to create the projection vertex shader. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
