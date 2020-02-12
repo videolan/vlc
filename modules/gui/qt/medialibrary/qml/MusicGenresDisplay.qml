@@ -59,6 +59,7 @@ Widgets.NavigableFocusScope {
         var found = stackView.loadView(root.pageModel, view, viewProperties)
         if (!found)
             stackView.replace(root.pageModel[0].component)
+        stackView.currentItem.navigationParent = root
         sortModel = stackView.currentItem.sortModel
         contentModel = stackView.currentItem.model
     }
@@ -80,8 +81,6 @@ Widgets.NavigableFocusScope {
         /* List View */
         MusicGenres {
             onCurrentIndexChanged: _updateGenresAllHistory(currentIndex)
-
-            navigationParent: root
         }
     }
 
@@ -99,8 +98,6 @@ Widgets.NavigableFocusScope {
             onParentIdChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
             onGenreNameChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
             onCurrentIndexChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
-
-            navigationParent: root
         }
     }
 

@@ -27,7 +27,6 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///playlist/" as PL
 import "qrc:///player/" as Player
-import "qrc:///network/" as Network
 
 Widgets.NavigableFocusScope {
     id: root
@@ -48,6 +47,13 @@ Widgets.NavigableFocusScope {
 
     function loadView() {
         var found = stackView.loadView(root.pageModel, root.view, root.viewProperties)
+
+        stackView.currentItem.navigationParent = medialibId
+        stackView.currentItem.navigationUpItem = sourcesBanner
+        stackView.currentItem.navigationRightItem = playlist
+        stackView.currentItem.navigationDownItem = Qt.binding(function() {
+            return miniPlayer.expanded ? miniPlayer : medialibId
+        })
 
         sourcesBanner.subTabModel = stackView.currentItem.tabModel
         sourcesBanner.sortModel = stackView.currentItem.sortModel
@@ -77,52 +83,22 @@ Widgets.NavigableFocusScope {
             rootWindow.sendHotkey(event.key, event.modifiers);
     }
 
-    Component {
-        id: musicComp
-        MusicDisplay {
-            navigationParent: medialibId
-            navigationUpItem: sourcesBanner
-            navigationRightItem: playlist
-            navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
-        }
-    }
-
-    Component {
-        id: videoComp
-        VideoDisplay {
-            navigationParent: medialibId
-            navigationUpItem: sourcesBanner
-            navigationRightItem: playlist
-            navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
-        }
-    }
-
-    Component {
-        id: networkComp
-        Network.NetworkDisplay {
-            navigationParent: medialibId
-            navigationUpItem: sourcesBanner
-            navigationRightItem: playlist
-            navigationDownItem: miniPlayer.expanded ? miniPlayer : medialibId
-        }
-    }
-
     readonly property var pageModel: [
         {
             displayText: i18n.qtr("Video"),
             icon: VLCIcons.topbar_video,
             name: "video",
-            component: videoComp
+            url: "qrc:///medialibrary/VideoDisplay.qml"
         }, {
             displayText: i18n.qtr("Music"),
             icon: VLCIcons.topbar_music,
             name: "music",
-            component: musicComp
+            url: "qrc:///medialibrary/MusicDisplay.qml"
         }, {
             displayText: i18n.qtr("Network"),
             icon: VLCIcons.topbar_network,
             name: "network",
-            component: networkComp
+            url: "qrc:///network/NetworkDisplay.qml"
         }
     ]
 

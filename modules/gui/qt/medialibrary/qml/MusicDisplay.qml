@@ -48,6 +48,8 @@ Widgets.NavigableFocusScope {
         var found = stackView.loadView(root.pageModel, view, viewProperties)
         if (!found)
             stackView.replace(root.pageModel[0].component)
+
+        stackView.currentItem.navigationParent = root
         sortModel = stackView.currentItem.sortModel
         contentModel = stackView.currentItem.model
     }
@@ -62,27 +64,22 @@ Widgets.NavigableFocusScope {
         history.push(["mc", "music", root.pageModel[index].name])
     }
 
-    Component { id: albumComp; MusicAlbumsDisplay{ navigationParent: root } }
-    Component { id: artistComp; MusicArtistsDisplay{ navigationParent: root } }
-    Component { id: genresComp; MusicGenresDisplay{ navigationParent: root } }
-    Component { id: tracksComp; MusicTracksDisplay{  navigationParent: root } }
-
     readonly property var pageModel: [{
             displayText: i18n.qtr("Albums"),
             name: "albums",
-            component: albumComp
+            url: "qrc:///medialibrary/MusicAlbumsDisplay.qml"
         }, {
             displayText: i18n.qtr("Artists"),
             name: "artists",
-            component: artistComp
+            url: "qrc:///medialibrary/MusicArtistsDisplay.qml"
         }, {
             displayText: i18n.qtr("Genres"),
             name: "genres" ,
-            component: genresComp
+            url: "qrc:///medialibrary/MusicGenresDisplay.qml"
         }, {
             displayText: i18n.qtr("Tracks"),
             name: "tracks" ,
-            component: tracksComp
+            url: "qrc:///medialibrary/MusicTracksDisplay.qml"
         }
     ]
 
