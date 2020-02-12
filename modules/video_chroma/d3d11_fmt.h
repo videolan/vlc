@@ -29,8 +29,6 @@
 
 #include "dxgi_fmt.h"
 
-#include <vlc_picture.h>
-
 DEFINE_GUID(GUID_CONTEXT_MUTEX, 0x472e8835, 0x3f8e, 0x4f93, 0xa0, 0xcb, 0x25, 0x79, 0x77, 0x6c, 0xed, 0x86);
 
 /* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics
@@ -170,14 +168,7 @@ IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
 int D3D11CheckDriverVersion(const d3d11_device_t *, UINT vendorId,
                             const struct wddm_version *min_ver);
 
-static inline bool DeviceSupportsFormat(ID3D11Device *d3ddevice,
-                                        DXGI_FORMAT format, UINT supportFlags)
-{
-    UINT i_formatSupport;
-    return SUCCEEDED( ID3D11Device_CheckFormatSupport(d3ddevice, format,
-                                                      &i_formatSupport) )
-            && ( i_formatSupport & supportFlags ) == supportFlags;
-}
+bool DeviceSupportsFormat(ID3D11Device *d3ddevice, DXGI_FORMAT format, UINT supportFlags);
 
 #define D3D11_RGB_FORMAT  1
 #define D3D11_YUV_FORMAT  2
