@@ -1289,8 +1289,7 @@ static void Direct3D9Destroy(vout_display_sys_t *sys)
         vlc_decoder_device_Release(sys->dec_device);
     else if (sys->d3d9_device)
     {
-        D3D9_ReleaseDevice(&sys->d3d9_device->d3ddev);
-        free(sys->d3d9_device);
+        D3D9_ReleaseDevice(sys->d3d9_device);
     }
     if (sys->hxdll)
     {
@@ -1575,21 +1574,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
             vlc_decoder_device_Release(sys->dec_device);
             sys->dec_device = NULL;
         }
-        // No d3d9_decoder_device_t, create one
-        sys->d3d9_device = calloc(1, sizeof(*sys->d3d9_device));
-        if (unlikely(sys->d3d9_device == NULL))
-            goto error;
-        if (D3D9_Create(vd, &sys->d3d9_device->hd3d) != VLC_SUCCESS)
-        {
-            free(sys->d3d9_device);
-            sys->d3d9_device = NULL;
-            goto error;
-        }
 
-        HRESULT hr;
-        hr = D3D9_CreateDevice(vd, &sys->d3d9_device->hd3d, -1, &sys->d3d9_device->d3ddev);
-        if (FAILED(hr)) {
-            msg_Err( vd, "D3D9 Creation failed! (hr=0x%lX)", hr);
+        sys->d3d9_device = D3D9_CreateDevice( vd );
+        if (sys->d3d9_device == NULL) {
+            msg_Err( vd, "D3D9 Creation failed!" );
             goto error;
         }
     }

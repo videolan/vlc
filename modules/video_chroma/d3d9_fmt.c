@@ -25,6 +25,12 @@
 
 #include <assert.h>
 
+#include <vlc/libvlc.h>
+#include <vlc/libvlc_picture.h>
+#include <vlc/libvlc_media.h>
+#include <vlc/libvlc_renderer_discoverer.h>
+#include <vlc/libvlc_media_player.h>
+
 #include <initguid.h>
 #include "d3d9_fmt.h"
 
@@ -39,12 +45,55 @@ picture_sys_d3d9_t *ActiveD3D9PictureSys(picture_t *pic)
     return &pic_ctx->picsys;
 }
 
-#undef D3D9_CreateDevice
-HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, int AdapterToUse,
-                          d3d9_device_t *out)
+typedef struct {
+    void                            *opaque;
+    libvlc_video_output_cleanup_cb  cleanupDeviceCb;
+
+    d3d9_decoder_device_t           dec_device;
+} d3d9_decoder_device;
+
+d3d9_decoder_device_t *(D3D9_CreateDevice)(vlc_object_t *o)
 {
     HRESULT hr;
     D3DDEVTYPE DeviceType = D3DDEVTYPE_HAL;
+
+    d3d9_decoder_device *sys = vlc_obj_malloc(o, sizeof(*sys));
+    if (unlikely(sys==NULL))
+        return NULL;
+
+d3d9_device_t *out = &sys->dec_device.d3ddev;
+d3d9_handle_t *hd3d = &sys->dec_device.hd3d;
+
+    int AdapterToUse;
+
+    sys->cleanupDeviceCb = NULL;
+    libvlc_video_output_setup_cb setupDeviceCb = var_InheritAddress( o, "vout-cb-setup" );
+    if ( setupDeviceCb )
+    {
+        /* external rendering */
+        libvlc_video_setup_device_info_t extern_out = { .d3d9.adapter = -1 };
+        sys->opaque          = var_InheritAddress( o, "vout-cb-opaque" );
+        sys->cleanupDeviceCb = var_InheritAddress( o, "vout-cb-cleanup" );
+        libvlc_video_setup_device_cfg_t cfg = {
+            .hardware_decoding = true, /* ignored anyway */
+        };
+        if (!setupDeviceCb( &sys->opaque, &cfg, &extern_out ))
+            goto error;
+
+        D3D9_CloneExternal( hd3d, (IDirect3D9 *) extern_out.d3d9.device );
+        AdapterToUse = extern_out.d3d9.adapter;
+    }
+    else
+    {
+        /* internal rendering */
+        if (D3D9_Create(o, hd3d) != VLC_SUCCESS)
+        {
+            msg_Err( o, "Direct3D9 could not be initialized" );
+            goto error;
+        }
+        /* find the best adapter to use, not based on the HWND used */
+        AdapterToUse = -1;
+    }
 
     if (AdapterToUse == -1)
     {
@@ -72,14 +121,14 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, int AdapterToUse
     hr = IDirect3D9_GetDeviceCaps(hd3d->obj, AdapterToUse, DeviceType, &out->caps);
     if (FAILED(hr)) {
        msg_Err(o, "Could not read adapter capabilities. (hr=0x%lX)", hr);
-       return hr;
+       goto error;
     }
     msg_Dbg(o, "D3D9 device caps 0x%lX / 0x%lX", out->caps.DevCaps, out->caps.DevCaps2);
 
     /* TODO: need to test device capabilities and select the right render function */
     if (!(out->caps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES)) {
         msg_Err(o, "Device does not support stretching from textures.");
-        return E_INVALIDARG;
+        goto error;
     }
 
     out->adapterId = AdapterToUse;
@@ -88,7 +137,7 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, int AdapterToUse
     if (D3D9_FillPresentationParameters(hd3d, out, &d3dpp))
     {
         msg_Err(o, "Could not get presentation parameters");
-        return E_INVALIDARG;
+        goto error;
     }
 
     /* */
@@ -125,23 +174,29 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, int AdapterToUse
             {
                 out->BufferFormat = d3dpp.BackBufferFormat;
                 out->owner = true;
-                return hr;
+                return &sys->dec_device;
             }
         }
     }
 
     msg_Err(o, "failed to create the D3D9%s device %d/%d. (hr=0x%lX)",
                hd3d->use_ex?"Ex":"", AdapterToUse, DeviceType, hr);
-    return hr;
+
+error:
+    if ( sys->cleanupDeviceCb )
+        sys->cleanupDeviceCb( sys->opaque );
+    vlc_obj_free( o, sys );
+    return NULL;
 }
 
-void D3D9_ReleaseDevice(d3d9_device_t *d3d_dev)
+void D3D9_ReleaseDevice(d3d9_decoder_device_t *dec_dev)
 {
-    if (d3d_dev->dev)
-    {
-       IDirect3DDevice9_Release(d3d_dev->dev);
-       d3d_dev->dev = NULL;
-    }
+    d3d9_decoder_device *sys = container_of(dec_dev, d3d9_decoder_device, dec_device);
+    if (dec_dev->d3ddev.dev)
+       IDirect3DDevice9_Release(dec_dev->d3ddev.dev);
+    D3D9_Destroy( &dec_dev->hd3d );
+    if ( sys->cleanupDeviceCb )
+        sys->cleanupDeviceCb( sys->opaque );
 }
 
 /**
