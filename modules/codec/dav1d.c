@@ -252,8 +252,7 @@ static int Decode(decoder_t *dec, block_t *block)
         }
         else if (res != DAV1D_ERR(EAGAIN))
         {
-            msg_Err(dec, "Decoder error %d!", res);
-            i_ret = VLC_EGENERIC;
+            msg_Warn(dec, "Decoder error %d!", res);
             break;
         }
 
