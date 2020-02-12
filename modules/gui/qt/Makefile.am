@@ -542,6 +542,7 @@ libqt_plugin_la_RES = \
 
 #QML and JS resources
 libqt_plugin_la_QML = \
+	gui/qt/dialogs/dialogs/qml/CustomDialog.qml \
 	gui/qt/dialogs/dialogs/qml/Dialogs.qml \
 	gui/qt/dialogs/dialogs/qml/ModalDialog.qml \
 	gui/qt/dialogs/help/qml/About.qml \

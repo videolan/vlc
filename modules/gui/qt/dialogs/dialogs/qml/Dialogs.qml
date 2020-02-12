@@ -30,6 +30,10 @@ Item {
     signal restoreFocus();
     property var bgContent: undefined
 
+    function ask(text, acceptCb, rejectCb, buttons) {
+        customDialog.ask(text, acceptCb, rejectCb, buttons)
+    }
+
     Widgets.DrawerExt {
         id: errorPopup
         anchors {
@@ -272,6 +276,12 @@ Item {
                 }
             }
         }
+    }
+
+    CustomDialog {
+        id: customDialog
+        rootWindow: root.bgContent
+        onAboutToHide: restoreFocus()
     }
 
     DialogModel {

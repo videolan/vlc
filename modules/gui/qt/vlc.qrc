@@ -288,6 +288,7 @@
         <file alias="About.qml">dialogs/help/qml/About.qml</file>
     </qresource>
     <qresource prefix="/dialogs">
+        <file alias="CustomDialog.qml">dialogs/dialogs/qml/CustomDialog.qml</file>
         <file alias="Dialogs.qml">dialogs/dialogs/qml/Dialogs.qml</file>
         <file alias="ModalDialog.qml">dialogs/dialogs/qml/ModalDialog.qml</file>
         <file alias="EditorDummyButton.qml">dialogs/toolbar/qml/EditorDummyButton.qml</file>

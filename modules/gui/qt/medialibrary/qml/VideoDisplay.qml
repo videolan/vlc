@@ -24,7 +24,6 @@ import org.videolan.medialib 0.1
 
 import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
-import "qrc:///dialogs/" as DG
 import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
@@ -62,16 +61,6 @@ Widgets.NavigableFocusScope {
         videosDelegate.items.get(initialIndex).inSelected = true
         view.currentItem.currentIndex = initialIndex
         view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
-    }
-
-    DG.ModalDialog {
-        id: deleteDialog
-        rootWindow: root
-        title: i18n.qtr("Are you sure you want to delete?")
-        standardButtons: Dialog.Yes | Dialog.No
-
-        onAccepted: console.log("Ok clicked")
-        onRejected: console.log("Cancel clicked")
     }
 
     Widgets.MenuExt {
@@ -116,7 +105,9 @@ Widgets.NavigableFocusScope {
         }
         Widgets.MenuItemExt {
             text: "Delete"
-            onTriggered: deleteDialog.open()
+            onTriggered: g_dialogs.ask(i18n.qtr("Are you sure you want to delete?"), function() {
+                console.log("unimplemented")
+            })
         }
 
         onClosed: contextMenu.parent.forceActiveFocus()

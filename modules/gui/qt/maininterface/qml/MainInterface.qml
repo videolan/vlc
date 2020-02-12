@@ -175,6 +175,7 @@ Rectangle {
     }
 
     DG.Dialogs {
+        id: g_dialogs
         anchors.fill: parent
         bgContent: root
         onRestoreFocus: {
