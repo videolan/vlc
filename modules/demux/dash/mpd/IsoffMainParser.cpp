@@ -267,14 +267,15 @@ void    IsoffMainParser::parseAdaptationSets  (Node *periodNode, Period *period)
                     adaptationSet->setRole(Role::ROLE_SUBTITLE);
             }
         }
-#ifdef ADAPTATIVE_ADVANCED_DEBUG
-        if(adaptationSet->description.Get().empty())
-            adaptationSet->description.Set(adaptationSet->getMimeType());
-#endif
 
         parseSegmentInformation(*it, adaptationSet, &nextid);
 
         parseRepresentations((*it), adaptationSet);
+
+#ifdef ADAPTATIVE_ADVANCED_DEBUG
+        if(adaptationSet->description.Get().empty())
+            adaptationSet->description.Set(adaptationSet->getID().str());
+#endif
 
         if(!adaptationSet->getRepresentations().empty())
             period->addAdaptationSet(adaptationSet);
