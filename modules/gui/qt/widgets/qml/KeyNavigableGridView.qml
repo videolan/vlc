@@ -23,7 +23,7 @@ import "qrc:///util/KeyHelper.js" as KeyHelper
 NavigableFocusScope {
     id: gridview_id
 
-    property int modelCount: 0
+    property int modelCount: view.count
 
     signal selectionUpdated( int keyModifiers, int oldIndex,int newIndex )
     signal selectAll()
