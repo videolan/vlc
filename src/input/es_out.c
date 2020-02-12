@@ -61,6 +61,9 @@
  *****************************************************************************/
 typedef struct
 {
+    /* Program context */
+    input_source_t *source;
+
     /* Program ID */
     int i_id;
 
@@ -89,6 +92,9 @@ struct vlc_es_id_t
 {
     int i_id;
     enum es_format_category_e i_cat;
+    /* Input source used to create this ES. Equals to p_pgrm->source when not
+     * using a default program id. */
+    input_source_t *source;
 };
 
 struct es_out_id_t
@@ -582,6 +588,7 @@ static void EsRelease(es_out_id_t *es)
         free(es->psz_language);
         free(es->psz_language_code);
         es_format_Clean(&es->fmt);
+        input_source_Release(es->id.source);
         free(es);
     }
 }
@@ -611,6 +618,7 @@ static void ProgramDelete( es_out_pgrm_t *p_pgrm )
     vlc_clock_main_Delete( p_pgrm->p_main_clock );
     if( p_pgrm->p_meta )
         vlc_meta_Delete( p_pgrm->p_meta );
+    input_source_Release( p_pgrm->source );
 
     free( p_pgrm );
 }
@@ -1245,10 +1253,11 @@ static void EsOutSendEsEvent(es_out_t *out, es_out_id_t *es, int action)
     });
 }
 
-static bool EsOutIsProgramVisible( es_out_t *out, int i_group )
+static bool EsOutIsProgramVisible( es_out_t *out, input_source_t *source, int i_group )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
-    return p_sys->i_group_id == 0 || p_sys->i_group_id == i_group;
+    return p_sys->i_group_id == 0
+        || (p_sys->i_group_id == i_group && p_sys->p_pgrm->source == source);
 }
 
 /* EsOutProgramSelect:
@@ -1333,7 +1342,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
 /* EsOutAddProgram:
  *  Add a program
  */
-static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
+static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, int i_group )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
@@ -1343,6 +1352,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
         return NULL;
 
     /* Init */
+    p_pgrm->source = input_source_Hold( source );
     p_pgrm->i_id = i_group;
     p_pgrm->i_es = 0;
     p_pgrm->b_selected = false;
@@ -1376,7 +1386,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     vlc_list_append(&p_pgrm->node, &p_sys->programs);
 
     /* Update "program" variable */
-    if( EsOutIsProgramVisible( out, i_group ) )
+    if( EsOutIsProgramVisible( out, source, i_group ) )
         input_SendEventProgramAdd( p_input, i_group, NULL );
 
     if( i_group == p_sys->i_group_id || ( !p_sys->p_pgrm && p_sys->i_group_id == 0 ) )
@@ -1387,34 +1397,37 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
 
 /* EsOutProgramSearch
  */
-static es_out_pgrm_t *EsOutProgramSearch( es_out_t *p_out, int i_group )
+static es_out_pgrm_t *EsOutProgramSearch( es_out_t *p_out, input_source_t *source,
+                                          int i_group )
 {
     es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
     es_out_pgrm_t *pgrm;
 
     vlc_list_foreach(pgrm, &p_sys->programs, node)
-        if (pgrm->i_id == i_group)
+        if (pgrm->i_id == i_group && (pgrm->source == source || i_group == 0))
             return pgrm;
+
     return NULL;
 }
 
 /* EsOutProgramInsert
  */
-static es_out_pgrm_t *EsOutProgramInsert( es_out_t *p_out, int i_group )
+static es_out_pgrm_t *EsOutProgramInsert( es_out_t *p_out, input_source_t *source,
+                                          int i_group )
 {
-    es_out_pgrm_t *pgrm = EsOutProgramSearch( p_out, i_group );
-    return pgrm ? pgrm : EsOutProgramAdd( p_out, i_group );
+    es_out_pgrm_t *pgrm = EsOutProgramSearch( p_out, source, i_group );
+    return pgrm ? pgrm : EsOutProgramAdd( p_out, source, i_group );
 }
 
 /* EsOutDelProgram:
  *  Delete a program
  */
-static int EsOutProgramDel( es_out_t *out, int i_group )
+static int EsOutProgramDel( es_out_t *out, input_source_t *source, int i_group )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
 
-    es_out_pgrm_t *p_pgrm = EsOutProgramSearch( out, i_group );
+    es_out_pgrm_t *p_pgrm = EsOutProgramSearch( out, source, i_group );
     if( p_pgrm == NULL )
         return VLC_EGENERIC;
 
@@ -1483,7 +1496,8 @@ static char *EsInfoCategoryName( es_out_id_t* es )
     return psz_category;
 }
 
-static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_meta )
+static void EsOutProgramMeta( es_out_t *out, input_source_t *source,
+                              int i_group, const vlc_meta_t *p_meta )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     es_out_pgrm_t     *p_pgrm;
@@ -1511,9 +1525,9 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
     }
 
     /* Find program */
-    if( !EsOutIsProgramVisible( out, i_group ) )
+    if( !EsOutIsProgramVisible( out, source, i_group ) )
         return;
-    p_pgrm = EsOutProgramInsert( out, i_group );
+    p_pgrm = EsOutProgramInsert( out, source, i_group );
     if( !p_pgrm )
         return;
 
@@ -1612,7 +1626,8 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
         input_SendEventMetaInfo( p_input );
 }
 
-static void EsOutProgramEpgEvent( es_out_t *out, int i_group, const vlc_epg_event_t *p_event )
+static void EsOutProgramEpgEvent( es_out_t *out, input_source_t *source,
+                                  int i_group, const vlc_epg_event_t *p_event )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
@@ -1620,16 +1635,17 @@ static void EsOutProgramEpgEvent( es_out_t *out, int i_group, const vlc_epg_even
     es_out_pgrm_t     *p_pgrm;
 
     /* Find program */
-    if( !EsOutIsProgramVisible( out, i_group ) )
+    if( !EsOutIsProgramVisible( out, source, i_group ) )
         return;
-    p_pgrm = EsOutProgramInsert( out, i_group );
+    p_pgrm = EsOutProgramInsert( out, source, i_group );
     if( !p_pgrm )
         return;
 
     input_item_SetEpgEvent( p_item, p_event );
 }
 
-static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg )
+static void EsOutProgramEpg( es_out_t *out, input_source_t *source,
+                             int i_group, const vlc_epg_t *p_epg )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
@@ -1638,9 +1654,9 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     char *psz_cat;
 
     /* Find program */
-    if( !EsOutIsProgramVisible( out, i_group ) )
+    if( !EsOutIsProgramVisible( out, source, i_group ) )
         return;
-    p_pgrm = EsOutProgramInsert( out, i_group );
+    p_pgrm = EsOutProgramInsert( out, source, i_group );
     if( !p_pgrm )
         return;
 
@@ -1874,11 +1890,13 @@ static void EsOutFillEsFmt(es_out_t *out, es_format_t *fmt)
     }
 }
 
-static es_out_id_t *EsOutAddLocked( es_out_t *out, const es_format_t *fmt,
+static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
+                                    const es_format_t *fmt,
                                     es_out_id_t *p_master )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
+    assert( source ); /* == p_sys->main_source if the given source is NULL */
 
     if( fmt->i_group < 0 )
     {
@@ -1893,25 +1911,31 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, const es_format_t *fmt,
         return NULL;
 
     es->out = out;
+    es->id.source = input_source_Hold( source );
 
     if( es_format_Copy( &es->fmt, fmt ) != VLC_SUCCESS )
     {
         free( es );
         return NULL;
     }
+
     if( es->fmt.i_id < 0 )
-        es->fmt.i_id = p_sys->i_id;
+        es->fmt.i_id = input_source_GetNewAutoId( source );
     if( !es->fmt.i_original_fourcc )
         es->fmt.i_original_fourcc = es->fmt.i_codec;
 
     /* Search the program */
-    p_pgrm = EsOutProgramInsert( out, fmt->i_group );
+    p_pgrm = EsOutProgramInsert( out, source, fmt->i_group );
     if( !p_pgrm )
     {
         es_format_Clean( &es->fmt );
+        input_source_Release( es->id.source );
         free( es );
         return NULL;
     }
+
+    /* The group 0 is the default one and can be used by different contexts */
+    assert( fmt->i_group == 0 || p_pgrm->source == es->id.source );
 
     /* Get the number of ES already added in order to get the position of the es */
     es->i_pos = 0;
@@ -1987,10 +2011,13 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, const es_format_t *fmt,
  */
 static es_out_id_t *EsOutAdd( es_out_t *out, input_source_t *source, const es_format_t *fmt )
 {
-    VLC_UNUSED(source);
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    if( !source )
+        source = p_sys->main_source;
+
     vlc_mutex_lock( &p_sys->lock );
-    es_out_id_t *es = EsOutAddLocked( out, fmt, NULL );
+    es_out_id_t *es = EsOutAddLocked( out, source, fmt, NULL );
     vlc_mutex_unlock( &p_sys->lock );
     return es;
 }
@@ -2481,7 +2508,7 @@ static void EsOutCreateCCChannels( es_out_t *out, vlc_fourcc_t codec, uint64_t i
             fmt.psz_description = NULL;
 
         es_out_id_t **pp_es = &parent->cc.pp_es[i];
-        *pp_es = EsOutAddLocked( out, &fmt, parent );
+        *pp_es = EsOutAddLocked( out, parent->p_pgrm->source, &fmt, parent );
         es_format_Clean( &fmt );
 
         /* */
@@ -2750,6 +2777,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
                                  int i_query, va_list args )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    assert( source ); /* == p_sys->main_source if the given source is NULL */
 
     switch( i_query )
     {
@@ -2920,12 +2948,12 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         {
             p_pgrm = p_sys->p_pgrm;
             if( !p_pgrm )
-                p_pgrm = EsOutProgramAdd( out, i_group );   /* Create it */
+                p_pgrm = EsOutProgramAdd( out, source, i_group );   /* Create it */
         }
         else
         {
             i_group = va_arg( args, int );
-            p_pgrm = EsOutProgramInsert( out, i_group );
+            p_pgrm = EsOutProgramInsert( out, source, i_group );
         }
         if( !p_pgrm )
             return VLC_EGENERIC;
@@ -3097,7 +3125,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         int i_group = va_arg( args, int );
         const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
 
-        EsOutProgramMeta( out, i_group, p_meta );
+        EsOutProgramMeta( out, source, i_group, p_meta );
         return VLC_SUCCESS;
     }
     case ES_OUT_SET_GROUP_EPG:
@@ -3105,7 +3133,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         int i_group = va_arg( args, int );
         const vlc_epg_t *p_epg = va_arg( args, const vlc_epg_t * );
 
-        EsOutProgramEpg( out, i_group, p_epg );
+        EsOutProgramEpg( out, source, i_group, p_epg );
         return VLC_SUCCESS;
     }
     case ES_OUT_SET_GROUP_EPG_EVENT:
@@ -3113,7 +3141,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         int i_group = va_arg( args, int );
         const vlc_epg_event_t *p_evt = va_arg( args, const vlc_epg_event_t * );
 
-        EsOutProgramEpgEvent( out, i_group, p_evt );
+        EsOutProgramEpgEvent( out, source, i_group, p_evt );
         return VLC_SUCCESS;
     }
     case ES_OUT_SET_EPG_TIME:
@@ -3128,7 +3156,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
     {
         int i_group = va_arg( args, int );
 
-        return EsOutProgramDel( out, i_group );
+        return EsOutProgramDel( out, source, i_group );
     }
 
     case ES_OUT_SET_META:
@@ -3297,7 +3325,7 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
             case ES_OUT_PRIV_RESTART_ES: new_query = ES_OUT_RESTART_ES; break;
             default: vlc_assert_unreachable();
         }
-        return EsOutControlLocked( out, NULL, new_query, es );
+        return EsOutControlLocked( out, p_sys->main_source, new_query, es );
     }
     case ES_OUT_PRIV_GET_WAKE_UP:
     {
@@ -3355,7 +3383,8 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
         default:
           vlc_assert_unreachable();
         }
-        int i_ret = EsOutControlLocked( out, NULL, i_new_query, p_es );
+        int i_ret = EsOutControlLocked( out, p_sys->main_source, i_new_query,
+                                        p_es );
 
         return i_ret;
     }
@@ -3577,6 +3606,9 @@ static int EsOutControl( es_out_t *out, input_source_t *source,
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     int i_ret;
+
+    if( !source )
+        source = p_sys->main_source;
 
     vlc_mutex_lock( &p_sys->lock );
     i_ret = EsOutVaControlLocked( out, source, i_query, args );
