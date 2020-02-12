@@ -256,7 +256,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         return VLC_ENOMEM;
     memset(sys, 0, sizeof (*sys));
 
-    if ( unlikely(D3D11_Create(filter, &sys->hd3d, false) != VLC_SUCCESS ))
+    if ( unlikely(D3D11_Create(filter, &sys->hd3d) != VLC_SUCCESS ))
     {
        msg_Err(filter, "Could not access the d3d11.");
        goto error;

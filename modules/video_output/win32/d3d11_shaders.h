@@ -23,7 +23,14 @@
 #ifndef VLC_D3D11_SHADERS_H
 #define VLC_D3D11_SHADERS_H
 
+#include <d3dcompiler.h>
 #include "../../video_chroma/d3d11_fmt.h"
+
+typedef struct
+{
+    HINSTANCE                 compiler_dll; /* handle of the opened d3dcompiler dll */
+    pD3DCompile               OurD3DCompile;
+} d3d11_shaders_t;
 
 #include <vlc_es.h>
 
@@ -97,6 +104,9 @@ typedef struct
 #define D3D11_MAX_RENDER_TARGET    2
 
 bool IsRGBShader(const d3d_format_t *);
+
+int D3D11_InitShaders(vlc_object_t *, d3d11_shaders_t *);
+void D3D11_ReleaseShaders(d3d11_shaders_t *);
 
 HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d11_shaders_t *, bool legacy_shader,
                                  d3d11_device_t *, const display_info_t *,

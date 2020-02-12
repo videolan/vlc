@@ -98,6 +98,7 @@ struct vout_display_sys_t
     d3d11_handle_t           hd3d;
     d3d11_device_t           *d3d_dev;
     d3d11_device_t           local_d3d_dev; // when opened without a video context
+    d3d11_shaders_t          shaders;
     d3d_quad_t               picQuad;
 
     ID3D11Query              *prepareWait;
@@ -307,9 +308,13 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    int ret = D3D11_Create(vd, &sys->hd3d, true);
+    int ret = D3D11_Create(vd, &sys->hd3d);
     if (ret != VLC_SUCCESS)
         return ret;
+
+    ret = D3D11_InitShaders(VLC_OBJECT(vd), &sys->shaders);
+    if (ret != VLC_SUCCESS)
+        goto error;
 
     CommonInit(vd, &sys->area, cfg);
 
@@ -394,6 +399,7 @@ error:
 
 static void Close(vout_display_t *vd)
 {
+    D3D11_ReleaseShaders(&vd->sys->shaders);
     Direct3D11Close(vd);
     UnhookWindowsSensors(vd->sys->p_sensors);
 #if !VLC_WINSTORE_APP
@@ -1071,7 +1077,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     sys->legacy_shader = sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
             BogusZeroCopy(vd);
 
-    hr = D3D11_CompilePixelShader(vd, &sys->hd3d.shaders, sys->legacy_shader, sys->d3d_dev,
+    hr = D3D11_CompilePixelShader(vd, &sys->shaders, sys->legacy_shader, sys->d3d_dev,
                                   &sys->display, fmt->transfer, fmt->primaries,
                                   fmt->color_range == COLOR_RANGE_FULL,
                                   &sys->picQuad);
@@ -1188,7 +1194,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
 
     if (sys->regionQuad.textureFormat != NULL)
     {
-        hr = D3D11_CompilePixelShader(vd, &sys->hd3d.shaders, sys->legacy_shader, sys->d3d_dev,
+        hr = D3D11_CompilePixelShader(vd, &sys->shaders, sys->legacy_shader, sys->d3d_dev,
                                       &sys->display, TRANSFER_FUNC_SRGB, COLOR_PRIMARIES_SRGB, true,
                                       &sys->regionQuad);
         if (FAILED(hr))
@@ -1199,13 +1205,13 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         }
     }
 
-    hr = D3D11_CompileFlatVertexShader(vd, &sys->hd3d.shaders, sys->d3d_dev, &sys->flatVShader);
+    hr = D3D11_CompileFlatVertexShader(vd, &sys->shaders, sys->d3d_dev, &sys->flatVShader);
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
 
-    hr = D3D11_CompileProjectionVertexShader(vd, &sys->hd3d.shaders, sys->d3d_dev, &sys->projectionVShader);
+    hr = D3D11_CompileProjectionVertexShader(vd, &sys->shaders, sys->d3d_dev, &sys->projectionVShader);
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to create the projection vertex shader. (hr=0x%lX)", hr);
       return VLC_EGENERIC;

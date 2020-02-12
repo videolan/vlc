@@ -264,7 +264,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    err = D3D11_Create( va, &sys->hd3d, false );
+    err = D3D11_Create( va, &sys->hd3d );
     if (err != VLC_SUCCESS)
         goto error;
 

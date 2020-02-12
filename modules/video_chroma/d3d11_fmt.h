@@ -26,7 +26,6 @@
 #include <vlc_codec.h>
 
 #include <d3d11.h>
-#include <d3dcompiler.h>
 
 #include "dxgi_fmt.h"
 
@@ -56,15 +55,8 @@ typedef struct
 
 typedef struct
 {
-    HINSTANCE                 compiler_dll; /* handle of the opened d3dcompiler dll */
-    pD3DCompile               OurD3DCompile;
-} d3d11_shaders_t;
-
-typedef struct
-{
 #if !VLC_WINSTORE_APP
     HINSTANCE                 hdll;         /* handle of the opened d3d11 dll */
-    d3d11_shaders_t           shaders;
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE                 dxgidebug_dll;
     HRESULT (WINAPI * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
@@ -167,8 +159,8 @@ HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *,
 
 void D3D11_ReleaseDevice(d3d11_device_t *);
 
-int D3D11_Create(vlc_object_t *, d3d11_handle_t *, bool with_shaders);
-#define D3D11_Create(a,b,c) D3D11_Create( VLC_OBJECT(a), b, c )
+int D3D11_Create(vlc_object_t *, d3d11_handle_t *);
+#define D3D11_Create(a,b) D3D11_Create( VLC_OBJECT(a), b )
 
 void D3D11_Destroy(d3d11_handle_t *);
 void D3D11_LogResources(d3d11_handle_t *);

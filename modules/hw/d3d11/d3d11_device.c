@@ -77,7 +77,7 @@ static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_
     if (unlikely(sys==NULL))
         return VLC_ENOMEM;
 
-    int ret = D3D11_Create(device, &sys->hd3d, true);
+    int ret = D3D11_Create(device, &sys->hd3d);
     if (ret != VLC_SUCCESS)
         return ret;
 

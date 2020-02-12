@@ -832,3 +832,50 @@ HRESULT (D3D11_CompileProjectionVertexShader)(vlc_object_t *obj, const d3d11_sha
 {
     return D3D11_CompileVertexShader(obj, shaders, d3d_dev, globVertexShaderProjection, output);
 }
+
+#if !VLC_WINSTORE_APP
+static HINSTANCE Direct3D11LoadShaderLibrary(void)
+{
+    HINSTANCE instance = NULL;
+    /* d3dcompiler_47 is the latest on windows 8.1 */
+    for (int i = 47; i > 41; --i) {
+        WCHAR filename[19];
+        _snwprintf(filename, 19, TEXT("D3DCOMPILER_%d.dll"), i);
+        instance = LoadLibrary(filename);
+        if (instance) break;
+    }
+    return instance;
+}
+#endif // !VLC_WINSTORE_APP
+
+int (D3D11_InitShaders)(vlc_object_t *obj, d3d11_shaders_t *shaders)
+{
+#if !VLC_WINSTORE_APP
+    shaders->compiler_dll = Direct3D11LoadShaderLibrary();
+    if (!shaders->compiler_dll) {
+        msg_Err(obj, "cannot load d3dcompiler.dll, aborting");
+        return VLC_EGENERIC;
+    }
+
+    shaders->OurD3DCompile = (void *)GetProcAddress(shaders->compiler_dll, "D3DCompile");
+    if (!shaders->OurD3DCompile) {
+        msg_Err(obj, "Cannot locate reference to D3DCompile in d3dcompiler DLL");
+        FreeLibrary(shaders->compiler_dll);
+        return VLC_EGENERIC;
+    }
+#endif // !VLC_WINSTORE_APP
+
+    return VLC_SUCCESS;
+}
+
+void D3D11_ReleaseShaders(d3d11_shaders_t *shaders)
+{
+#if !VLC_WINSTORE_APP
+    if (shaders->compiler_dll)
+    {
+        FreeLibrary(shaders->compiler_dll);
+        shaders->compiler_dll = NULL;
+    }
+    shaders->OurD3DCompile = NULL;
+#endif // !VLC_WINSTORE_APP
+}
