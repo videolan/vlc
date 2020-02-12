@@ -288,12 +288,21 @@ HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *d3d11
     return S_OK;
 }
 
-#undef D3D11_CreateDevice
-HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
-                           IDXGIAdapter *adapter,
-                           bool hw_decoding, d3d11_device_t *out)
+HRESULT (D3D11_CreateDevice)(vlc_object_t *obj, d3d11_handle_t *hd3d,
+                             IDXGIAdapter *adapter,
+                             bool hw_decoding, bool forced, d3d11_device_t *out)
 {
 #if !VLC_WINSTORE_APP
+    if (!forced)
+    {
+        /* Allow using D3D11 automatically starting from Windows 8.1 */
+        bool isWin81OrGreater = false;
+        HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+        if (likely(hKernel32 != NULL))
+            isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
+        if (!isWin81OrGreater)
+            return E_FAIL;
+    }
 # define D3D11CreateDevice(args...)             pf_CreateDevice(args)
     /* */
     PFN_D3D11_CREATE_DEVICE pf_CreateDevice;

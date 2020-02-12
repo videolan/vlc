@@ -114,22 +114,9 @@ static int D3D11OpenDecoderDevice(vlc_decoder_device *device, bool forced, vout_
         else
         {
             /* internal decoder device */
-#if !VLC_WINSTORE_APP
-            if (!forced)
-            {
-                /* Allow using D3D11 automatically starting from Windows 8.1 */
-                bool isWin81OrGreater = false;
-                HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
-                if (likely(hKernel32 != NULL))
-                    isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
-                if (!isWin81OrGreater)
-                    goto error;
-            }
-#endif /* !VLC_WINSTORE_APP */
-
             hr = D3D11_CreateDevice( device, &sys->hd3d, NULL,
                                      true /* is_d3d11_opaque(chroma) */,
-                                     &sys->dec_device.d3d_dev );
+                                     forced, &sys->dec_device.d3d_dev );
         }
     }
 

@@ -291,19 +291,6 @@ static void UpdateSize(vout_display_t *vd)
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
 {
-#if !VLC_WINSTORE_APP
-    /* Allow using D3D11 automatically starting from Windows 8.1 */
-    if (!vd->obj.force)
-    {
-        bool isWin81OrGreater = false;
-        HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
-        if (likely(hKernel32 != NULL))
-            isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
-        if (!isWin81OrGreater)
-            return VLC_EGENERIC;
-    }
-#endif
-
     vout_display_sys_t *sys = vd->sys = vlc_obj_calloc(VLC_OBJECT(vd), 1, sizeof(vout_display_sys_t));
     if (!sys)
         return VLC_ENOMEM;
@@ -333,7 +320,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     else
     {
         // No d3d11 device, we create one
-        HRESULT hr = D3D11_CreateDevice(vd, &sys->hd3d, NULL, false, &sys->local_d3d_dev);
+        HRESULT hr = D3D11_CreateDevice(vd, &sys->hd3d, NULL, false, vd->obj.force, &sys->local_d3d_dev);
         if (FAILED(hr)) {
             msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
             goto error;
