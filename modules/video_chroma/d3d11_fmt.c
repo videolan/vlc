@@ -259,6 +259,7 @@ void D3D11_ReleaseDevice(d3d11_decoder_device_t *dev_sys)
     if ( sys->external.cleanupDeviceCb )
         sys->external.cleanupDeviceCb( sys->external.opaque );
 
+    D3D11_LogResources( &sys->dec_device );
     D3D11_Destroy( &sys->hd3d );
 }
 
@@ -479,6 +480,7 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
 error:
     if (FAILED(hr))
     {
+        D3D11_LogResources( &sys->dec_device );
         D3D11_Destroy(&sys->hd3d);
         vlc_obj_free( obj, sys );
         return NULL;
@@ -813,10 +815,12 @@ int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
     return VLC_SUCCESS;
 }
 
-void D3D11_LogResources(d3d11_handle_t *hd3d)
+void D3D11_LogResources(d3d11_decoder_device_t *dev_sys)
 {
 #if !VLC_WINSTORE_APP
 # if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    d3d11_decoder_device *sys = container_of(dev_sys, d3d11_decoder_device, dec_device);
+    d3d11_handle_t *hd3d = &sys->hd3d;
     if (hd3d->pf_DXGIGetDebugInterface)
     {
         IDXGIDebug *pDXGIDebug;
@@ -829,7 +833,6 @@ void D3D11_LogResources(d3d11_handle_t *hd3d)
 
 void D3D11_Destroy(d3d11_handle_t *hd3d)
 {
-    D3D11_LogResources(hd3d);
 #if !VLC_WINSTORE_APP
     if (hd3d->hdll)
         FreeLibrary(hd3d->hdll);

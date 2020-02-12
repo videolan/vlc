@@ -161,7 +161,7 @@ int D3D11_Create(vlc_object_t *, d3d11_handle_t *);
 #define D3D11_Create(a,b) D3D11_Create( VLC_OBJECT(a), b )
 
 void D3D11_Destroy(d3d11_handle_t *);
-void D3D11_LogResources(d3d11_handle_t *);
+void D3D11_LogResources(d3d11_decoder_device_t *);
 
 bool isXboxHardware(const d3d11_device_t *);
 IDXGIAdapter *D3D11DeviceAdapter(ID3D11Device *d3ddev);
