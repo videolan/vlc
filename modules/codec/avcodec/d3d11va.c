@@ -96,7 +96,6 @@ DEFINE_GUID(DXVA2_NoEncrypt,                        0x1b81bed0, 0xa0c7, 0x11d3, 
 
 struct vlc_va_sys_t
 {
-    d3d11_handle_t               hd3d;
     d3d11_device_t               *d3d_dev;
 
     vlc_video_context            *vctx;
@@ -263,10 +262,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
-
-    err = D3D11_Create( va, &sys->hd3d );
-    if (err != VLC_SUCCESS)
-        goto error;
 
     va->sys = sys;
 
@@ -692,8 +687,6 @@ static void DxDestroySurfaces(void *opaque)
         ID3D11VideoDevice_Release(sys->d3ddec);
     if (sys->hw.video_context)
         ID3D11VideoContext_Release(sys->hw.video_context);
-
-    D3D11_Destroy( &sys->hd3d );
 
     free(sys);
 }

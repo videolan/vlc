@@ -95,7 +95,6 @@ struct vout_display_sys_t
 
     display_info_t           display;
 
-    d3d11_handle_t           hd3d;
     d3d11_device_t           *d3d_dev;
     d3d11_decoder_device_t   *local_d3d_dev; // when opened without a video context
     d3d11_shaders_t          shaders;
@@ -130,8 +129,6 @@ struct vout_display_sys_t
 
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture, vlc_tick_t);
 static void Display(vout_display_t *, picture_t *);
-
-static void Direct3D11Destroy(vout_display_t *);
 
 static int  Direct3D11Open (vout_display_t *, video_format_t *, vlc_video_context *);
 static void Direct3D11Close(vout_display_t *);
@@ -295,11 +292,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    int ret = D3D11_Create(vd, &sys->hd3d);
-    if (ret != VLC_SUCCESS)
-        return ret;
-
-    ret = D3D11_InitShaders(VLC_OBJECT(vd), &sys->shaders);
+    int ret = D3D11_InitShaders(VLC_OBJECT(vd), &sys->shaders);
     if (ret != VLC_SUCCESS)
         goto error;
 
@@ -389,7 +382,6 @@ static void Close(vout_display_t *vd)
 #if !VLC_WINSTORE_APP
     CommonWindowClean(VLC_OBJECT(vd), &vd->sys->sys);
 #endif
-    Direct3D11Destroy(vd);
 }
 
 static void getZoomMatrix(float zoom, FLOAT matrix[static 16]) {
@@ -716,13 +708,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
     d3d11_device_lock( sys->d3d_dev );
     sys->swapCb(sys->outside_opaque);
     d3d11_device_unlock( sys->d3d_dev );
-}
-
-static void Direct3D11Destroy(vout_display_t *vd)
-{
-#if !VLC_WINSTORE_APP
-    D3D11_Destroy( &vd->sys->hd3d );
-#endif
 }
 
 static const d3d_format_t *GetDirectRenderingFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)

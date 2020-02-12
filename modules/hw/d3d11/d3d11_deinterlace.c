@@ -41,7 +41,6 @@
 
 typedef struct
 {
-    d3d11_handle_t                 hd3d;
     d3d11_device_t                 *d3d_dev;
     d3d11_processor_t              d3d_proc;
 
@@ -256,12 +255,6 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         return VLC_ENOMEM;
     memset(sys, 0, sizeof (*sys));
 
-    if ( unlikely(D3D11_Create(filter, &sys->hd3d) != VLC_SUCCESS ))
-    {
-       msg_Err(filter, "Could not access the d3d11.");
-       goto error;
-    }
-
     d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext( filter->vctx_in );
     sys->d3d_dev = &dev_sys->d3d_dev;
     if (D3D11_CreateProcessor(filter, sys->d3d_dev, D3D11_VIDEO_FRAME_FORMAT_INTERLACED_TOP_FIELD_FIRST,
@@ -403,7 +396,6 @@ error:
     if (sys->outTexture)
         ID3D11Texture2D_Release(sys->outTexture);
     D3D11_ReleaseProcessor(&sys->d3d_proc);
-    D3D11_Destroy(&sys->hd3d);
     free(sys);
 
     return VLC_EGENERIC;
@@ -419,7 +411,6 @@ void D3D11CloseDeinterlace(vlc_object_t *obj)
     ID3D11Texture2D_Release(sys->outTexture);
     D3D11_ReleaseProcessor( &sys->d3d_proc );
     vlc_video_context_Release(filter->vctx_out);
-    D3D11_Destroy(&sys->hd3d);
 
     free(sys);
 }
