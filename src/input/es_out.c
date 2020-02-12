@@ -1379,6 +1379,27 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     return p_pgrm;
 }
 
+/* EsOutProgramSearch
+ */
+static es_out_pgrm_t *EsOutProgramSearch( es_out_t *p_out, int i_group )
+{
+    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    es_out_pgrm_t *pgrm;
+
+    vlc_list_foreach(pgrm, &p_sys->programs, node)
+        if (pgrm->i_id == i_group)
+            return pgrm;
+    return NULL;
+}
+
+/* EsOutProgramInsert
+ */
+static es_out_pgrm_t *EsOutProgramInsert( es_out_t *p_out, int i_group )
+{
+    es_out_pgrm_t *pgrm = EsOutProgramSearch( p_out, i_group );
+    return pgrm ? pgrm : EsOutProgramAdd( p_out, i_group );
+}
+
 /* EsOutDelProgram:
  *  Delete a program
  */
@@ -1386,15 +1407,8 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
-    es_out_pgrm_t *p_pgrm = NULL, *pgrm;
 
-    vlc_list_foreach(pgrm, &p_sys->programs, node)
-        if (pgrm->i_id == i_group)
-        {
-            p_pgrm = pgrm;
-            break;
-        }
-
+    es_out_pgrm_t *p_pgrm = EsOutProgramSearch( out, i_group );
     if( p_pgrm == NULL )
         return VLC_EGENERIC;
 
@@ -1422,20 +1436,6 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
     input_SendEventProgramDel( p_input, i_group );
 
     return VLC_SUCCESS;
-}
-
-/* EsOutProgramFind
- */
-static es_out_pgrm_t *EsOutProgramFind( es_out_t *p_out, int i_group )
-{
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
-    es_out_pgrm_t *pgrm;
-
-    vlc_list_foreach(pgrm, &p_sys->programs, node)
-        if (pgrm->i_id == i_group)
-            return pgrm;
-
-    return EsOutProgramAdd( p_out, i_group );
 }
 
 /* EsOutProgramMeta:
@@ -1512,7 +1512,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
     /* Find program */
     if( !EsOutIsProgramVisible( out, i_group ) )
         return;
-    p_pgrm = EsOutProgramFind( out, i_group );
+    p_pgrm = EsOutProgramInsert( out, i_group );
     if( !p_pgrm )
         return;
 
@@ -1621,7 +1621,7 @@ static void EsOutProgramEpgEvent( es_out_t *out, int i_group, const vlc_epg_even
     /* Find program */
     if( !EsOutIsProgramVisible( out, i_group ) )
         return;
-    p_pgrm = EsOutProgramFind( out, i_group );
+    p_pgrm = EsOutProgramInsert( out, i_group );
     if( !p_pgrm )
         return;
 
@@ -1639,7 +1639,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     /* Find program */
     if( !EsOutIsProgramVisible( out, i_group ) )
         return;
-    p_pgrm = EsOutProgramFind( out, i_group );
+    p_pgrm = EsOutProgramInsert( out, i_group );
     if( !p_pgrm )
         return;
 
@@ -1904,7 +1904,7 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, const es_format_t *fmt,
         es->fmt.i_original_fourcc = es->fmt.i_codec;
 
     /* Search the program */
-    p_pgrm = EsOutProgramFind( out, fmt->i_group );
+    p_pgrm = EsOutProgramInsert( out, fmt->i_group );
     if( !p_pgrm )
     {
         es_format_Clean( &es->fmt );
@@ -3026,7 +3026,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         else
         {
             i_group = va_arg( args, int );
-            p_pgrm = EsOutProgramFind( out, i_group );
+            p_pgrm = EsOutProgramInsert( out, i_group );
         }
         if( !p_pgrm )
             return VLC_EGENERIC;
