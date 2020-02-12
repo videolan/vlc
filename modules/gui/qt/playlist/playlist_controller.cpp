@@ -156,6 +156,14 @@ on_playlist_items_updated(vlc_playlist_t *playlist, size_t index,
         if (that->m_playlist != playlist)
             return;
         emit that->q_func()->itemsUpdated(index, vec);
+        if (that->m_currentIndex != -1) {
+            size_t currentIndex = static_cast<size_t>(that->m_currentIndex);
+            if (currentIndex >= index && currentIndex < index + len)
+            {
+                that->m_currentItem = vec[currentIndex - index];
+                emit that->q_func()->currentItemChanged();
+            }
+        }
     });
 }
 
