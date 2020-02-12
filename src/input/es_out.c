@@ -39,6 +39,7 @@
 #include <vlc_meta.h>
 #include <vlc_list.h>
 #include <vlc_decoder.h>
+#include <vlc_memstream.h>
 
 #include "input_internal.h"
 #include "../clock/input_clock.h"
@@ -95,6 +96,8 @@ struct vlc_es_id_t
     /* Input source used to create this ES. Equals to p_pgrm->source when not
      * using a default program id. */
     input_source_t *source;
+    bool stable;
+    char *str_id;
 };
 
 struct es_out_id_t
@@ -589,6 +592,7 @@ static void EsRelease(es_out_id_t *es)
         free(es->psz_language_code);
         es_format_Clean(&es->fmt);
         input_source_Release(es->id.source);
+        free(es->id.str_id);
         free(es);
     }
 }
@@ -1890,6 +1894,43 @@ static void EsOutFillEsFmt(es_out_t *out, es_format_t *fmt)
     }
 }
 
+static char *EsOutCreateStrId( es_out_id_t *es, bool stable, const char *id,
+                               es_out_id_t *p_master )
+{
+    struct vlc_memstream ms;
+    int ret = vlc_memstream_open( &ms );
+    if( ret != 0 )
+        return NULL;
+
+    if( p_master )
+    {
+        vlc_memstream_puts( &ms, p_master->id.str_id );
+        vlc_memstream_puts( &ms, "/cc/" );
+    }
+    else if ( id )
+    {
+        vlc_memstream_puts( &ms, id );
+        vlc_memstream_putc( &ms, '/' );
+    }
+
+    switch (es->fmt.i_cat)
+    {
+        case VIDEO_ES:  vlc_memstream_puts( &ms, "video" );    break;
+        case AUDIO_ES:  vlc_memstream_puts( &ms, "audio" );    break;
+        case SPU_ES:    vlc_memstream_puts( &ms, "spu" );      break;
+        case DATA_ES:   vlc_memstream_puts( &ms, "data" );     break;
+        default:        vlc_memstream_puts( &ms, "unknown" );  break;
+    }
+
+    if( !stable )
+        vlc_memstream_puts( &ms, "auto/" );
+
+    vlc_memstream_printf( &ms, "/%d", es->fmt.i_id );
+    ret = vlc_memstream_close( &ms );
+
+    return ret == 0 ? ms.ptr : NULL;
+}
+
 static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
                                     const es_format_t *fmt,
                                     es_out_id_t *p_master )
@@ -1919,10 +1960,27 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
         return NULL;
     }
 
+    bool stable;
     if( es->fmt.i_id < 0 )
+    {
         es->fmt.i_id = input_source_GetNewAutoId( source );
+        stable = false;
+    }
+    else
+        stable = true;
+
     if( !es->fmt.i_original_fourcc )
         es->fmt.i_original_fourcc = es->fmt.i_codec;
+
+    char *str_id =
+        EsOutCreateStrId( es, stable, input_source_GetStrId(source), p_master );
+    if( !str_id )
+    {
+        es_format_Clean( &es->fmt );
+        input_source_Release( es->id.source );
+        free( es );
+        return NULL;
+    }
 
     /* Search the program */
     p_pgrm = EsOutProgramInsert( out, source, fmt->i_group );
@@ -1930,6 +1988,7 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
     {
         es_format_Clean( &es->fmt );
         input_source_Release( es->id.source );
+        free( str_id );
         free( es );
         return NULL;
     }
@@ -1952,6 +2011,8 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
 
     es->id.i_id = es->fmt.i_id;
     es->id.i_cat = es->fmt.i_cat;
+    es->id.str_id = str_id;
+    es->id.stable = stable;
 
     es_format_Init( &es->fmt_out, UNKNOWN_ES, 0 );
 
@@ -4198,6 +4259,18 @@ int
 vlc_es_id_GetInputId(vlc_es_id_t *id)
 {
     return id->i_id;
+}
+
+bool
+vlc_es_id_IsStrIdStable(vlc_es_id_t *id)
+{
+    return id->stable;
+}
+
+const char *
+vlc_es_id_GetStrId(vlc_es_id_t *id)
+{
+    return id->str_id;
 }
 
 enum es_format_category_e

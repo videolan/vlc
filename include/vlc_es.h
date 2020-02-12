@@ -730,6 +730,35 @@ VLC_API int
 vlc_es_id_GetInputId(vlc_es_id_t *id);
 
 /**
+ * Return whether the ES track identifier is stable
+ *
+ * An string identifier is stable when it is certified to be the same across
+ * different playback instances for the same ES track.
+ *
+ * @param id pointer to the ES track id
+ * @return true if stable
+ */
+VLC_API bool
+vlc_es_id_IsStrIdStable(vlc_es_id_t *id);
+
+/**
+ * Get the unique string identifier
+ *
+ * This id could be used to identify a track across different playback
+ * instances.  For example, it can be used to store a track selection
+ * preference in a database.
+ *
+ * @warning Check with vlc_es_id_IsStrIdStable() if the ES track is stable
+ * before saving it for a future usage.
+ *
+ * @param id pointer to the ES track id
+ * @return the ES track string identifier, can't be NULL, valid until id is
+ * released
+ */
+VLC_API const char *
+vlc_es_id_GetStrId(vlc_es_id_t *id);
+
+/**
  * Get the ES category
  *
  * @param id pointer to the ES track id
