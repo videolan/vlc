@@ -999,7 +999,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
         /* Check if we can use timestamps */
         if(p_frag->i_dts != VLC_TICK_INVALID &&
-           p_frag->i_dts <= date_Get(&p_sys->dts))
+           p_frag->i_dts <= p_sys->i_dts)
         {
             date_t next = p_sys->dts;
             date_Set(&next, p_frag->i_dts);
