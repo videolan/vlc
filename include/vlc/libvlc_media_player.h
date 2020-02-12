@@ -732,7 +732,7 @@ typedef bool( *libvlc_video_output_select_plane_cb )( void *opaque, size_t plane
  * \param resize_cb callback to set the resize callback
  * \param update_output_cb callback to get the rendering format of the host (cannot be NULL)
  * \param swap_cb callback called after rendering a video frame (cannot be NULL)
- * \param makeCurrent_cb callback called to enter/leave the opengl context (cannot be NULL)
+ * \param makeCurrent_cb callback called to enter/leave the rendering context (cannot be NULL)
  * \param getProcAddress_cb opengl function loading callback (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
  * \param metadata_cb callback to provide frame metadata (D3D11 only)
  * \param select_plane_cb callback to select different D3D11 rendering targets
