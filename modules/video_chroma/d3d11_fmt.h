@@ -51,17 +51,6 @@ typedef struct
     DXGI_ADAPTER_DESC        adapterDesc;
 } d3d11_device_t;
 
-typedef struct
-{
-#if !VLC_WINSTORE_APP
-    HINSTANCE                 hdll;         /* handle of the opened d3d11 dll */
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    HINSTANCE                 dxgidebug_dll;
-    HRESULT (WINAPI * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
-#endif
-#endif
-} d3d11_handle_t;
-
 /* owned by the vout for VLC_CODEC_D3D11_OPAQUE */
 typedef struct
 {
@@ -157,10 +146,6 @@ HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *,
 
 void D3D11_ReleaseDevice(d3d11_decoder_device_t *);
 
-int D3D11_Create(vlc_object_t *, d3d11_handle_t *);
-#define D3D11_Create(a,b) D3D11_Create( VLC_OBJECT(a), b )
-
-void D3D11_Destroy(d3d11_handle_t *);
 void D3D11_LogResources(d3d11_decoder_device_t *);
 
 bool isXboxHardware(const d3d11_device_t *);

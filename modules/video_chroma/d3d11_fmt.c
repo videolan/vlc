@@ -223,6 +223,17 @@ static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 }
 #endif /* VLC_WINSTORE_APP */
 
+typedef struct
+{
+#if !VLC_WINSTORE_APP
+    HINSTANCE                 hdll;         /* handle of the opened d3d11 dll */
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    HINSTANCE                 dxgidebug_dll;
+    HRESULT (WINAPI * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
+#endif
+#endif
+} d3d11_handle_t;
+
 typedef struct {
     struct {
         void                            *opaque;
@@ -232,6 +243,51 @@ typedef struct {
     d3d11_handle_t                      hd3d;
     d3d11_decoder_device_t              dec_device;
 } d3d11_decoder_device;
+
+static int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
+{
+#if !VLC_WINSTORE_APP
+    hd3d->hdll = LoadLibrary(TEXT("D3D11.DLL"));
+    if (!hd3d->hdll)
+    {
+        msg_Warn(obj, "cannot load d3d11.dll, aborting");
+        return VLC_EGENERIC;
+    }
+
+# if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    hd3d->dxgidebug_dll = NULL;
+    hd3d->pf_DXGIGetDebugInterface = NULL;
+    if (IsDebuggerPresent())
+    {
+        hd3d->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
+        if (hd3d->dxgidebug_dll)
+        {
+            hd3d->pf_DXGIGetDebugInterface =
+                    (void *)GetProcAddress(hd3d->dxgidebug_dll, "DXGIGetDebugInterface");
+            if (unlikely(!hd3d->pf_DXGIGetDebugInterface))
+            {
+                FreeLibrary(hd3d->dxgidebug_dll);
+                hd3d->dxgidebug_dll = NULL;
+            }
+        }
+    }
+# endif // !NDEBUG && HAVE_DXGIDEBUG_H
+#endif // !VLC_WINSTORE_APP
+    return VLC_SUCCESS;
+}
+
+static void D3D11_Destroy(d3d11_handle_t *hd3d)
+{
+#if !VLC_WINSTORE_APP
+    if (hd3d->hdll)
+        FreeLibrary(hd3d->hdll);
+
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    if (hd3d->dxgidebug_dll)
+        FreeLibrary(hd3d->dxgidebug_dll);
+#endif
+#endif
+}
 
 void D3D11_ReleaseDevice(d3d11_decoder_device_t *dev_sys)
 {
@@ -782,39 +838,6 @@ error:
     return VLC_EGENERIC;
 }
 
-#undef D3D11_Create
-int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
-{
-#if !VLC_WINSTORE_APP
-    hd3d->hdll = LoadLibrary(TEXT("D3D11.DLL"));
-    if (!hd3d->hdll)
-    {
-        msg_Warn(obj, "cannot load d3d11.dll, aborting");
-        return VLC_EGENERIC;
-    }
-
-# if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    hd3d->dxgidebug_dll = NULL;
-    hd3d->pf_DXGIGetDebugInterface = NULL;
-    if (IsDebuggerPresent())
-    {
-        hd3d->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
-        if (hd3d->dxgidebug_dll)
-        {
-            hd3d->pf_DXGIGetDebugInterface =
-                    (void *)GetProcAddress(hd3d->dxgidebug_dll, "DXGIGetDebugInterface");
-            if (unlikely(!hd3d->pf_DXGIGetDebugInterface))
-            {
-                FreeLibrary(hd3d->dxgidebug_dll);
-                hd3d->dxgidebug_dll = NULL;
-            }
-        }
-    }
-# endif // !NDEBUG && HAVE_DXGIDEBUG_H
-#endif
-    return VLC_SUCCESS;
-}
-
 void D3D11_LogResources(d3d11_decoder_device_t *dev_sys)
 {
 #if !VLC_WINSTORE_APP
@@ -828,19 +851,6 @@ void D3D11_LogResources(d3d11_decoder_device_t *dev_sys)
             IDXGIDebug_ReportLiveObjects(pDXGIDebug, DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
     }
 # endif
-#endif
-}
-
-void D3D11_Destroy(d3d11_handle_t *hd3d)
-{
-#if !VLC_WINSTORE_APP
-    if (hd3d->hdll)
-        FreeLibrary(hd3d->hdll);
-
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    if (hd3d->dxgidebug_dll)
-        FreeLibrary(hd3d->dxgidebug_dll);
-#endif
 #endif
 }
 
