@@ -1183,8 +1183,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
      * wrapper, we can't */
     IDirect3DSurface9 *surface;
 
-    picture_sys_d3d9_t *p_sys = ActiveD3D9PictureSys(picture);
-    surface = p_sys->surface;
     if ( !is_d3d9_opaque(picture->format.i_chroma) )
     {
         D3DLOCKED_RECT d3drect;
@@ -1200,9 +1198,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         picture_CopyPixels(&fake_pic, picture);
         IDirect3DSurface9_UnlockRect(surface);
     }
-    else if (picture->context)
+    else
     {
         const picture_sys_d3d9_t *picsys = ActiveD3D9PictureSys(picture);
+        surface = picsys->surface;
         if (picsys->surface != surface)
         {
             D3DSURFACE_DESC srcDesc, dstDesc;
