@@ -225,7 +225,7 @@ static int Decode(decoder_t *dec, block_t *block)
         if( p_data )
         {
             res = dav1d_send_data(p_sys->c, p_data);
-            if (res < 0 && res != -EAGAIN)
+            if (res < 0 && res != DAV1D_ERR(EAGAIN))
             {
                 msg_Err(dec, "Decoder feed error %d!", res);
                 i_ret = VLC_EGENERIC;
@@ -250,7 +250,7 @@ static int Decode(decoder_t *dec, block_t *block)
             decoder_QueueVideo(dec, pic);
             dav1d_picture_unref(&img);
         }
-        else if (res != -EAGAIN)
+        else if (res != DAV1D_ERR(EAGAIN))
         {
             msg_Err(dec, "Decoder error %d!", res);
             i_ret = VLC_EGENERIC;
@@ -258,7 +258,8 @@ static int Decode(decoder_t *dec, block_t *block)
         }
 
         /* on drain, we must ignore the 1st EAGAIN */
-        if(!b_draining && (res == -EAGAIN || res == 0) && (p_data == NULL||b_eos))
+        if(!b_draining && (res == DAV1D_ERR(EAGAIN) || res == 0)
+                       && (p_data == NULL||b_eos))
         {
             b_draining = true;
             res = 0;
