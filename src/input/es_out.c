@@ -1254,6 +1254,18 @@ static void EsOutSendEsEvent(es_out_t *out, es_out_id_t *es, int action)
     });
 }
 
+/* EsOutIsGroupSticky
+ *
+ * A sticky group can be attached to any other programs. This is the case for
+ * default groups (i_group == 0) sent by slave sources.
+ */
+static inline bool EsOutIsGroupSticky( es_out_t *p_out, input_source_t *source,
+                                         int i_group )
+{
+    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    return source != input_priv(p_sys->p_input)->master && i_group == 0;
+}
+
 static bool EsOutIsProgramVisible( es_out_t *out, input_source_t *source, int i_group )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
@@ -1287,10 +1299,16 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
             if (EsIsSelected(es) && p_sys->i_mode != ES_OUT_MODE_ALL)
                 EsOutUnselectEs(out, es, true);
 
-            /* ES tracks are deleted (and unselected) when their programs are
-             * unselected (they will be added back when their programs are
-             * selected back). */
-            EsOutSendEsEvent( out, es, VLC_INPUT_ES_DELETED );
+            if( EsOutIsGroupSticky( out, es->id.source, es->fmt.i_group ) )
+                es->p_pgrm = NULL; /* Skip the DELETED event, cf. bellow */
+            else
+            {
+                /* ES tracks are deleted (and unselected) when their programs
+                 * are unselected (they will be added back when their programs
+                 * are selected back). */
+                EsOutSendEsEvent( out, es, VLC_INPUT_ES_DELETED );
+            }
+
         }
 
         p_sys->audio.p_main_es = NULL;
@@ -1314,7 +1332,14 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
 
     foreach_es_then_es_slaves(es)
     {
-        if (es->p_pgrm == p_sys->p_pgrm)
+
+        if (es->p_pgrm == NULL)
+        {
+            /* Attach this sticky ES to this new program. Skip the ADDED event,
+             * cf.above */
+            es->p_pgrm = p_sys->p_pgrm;
+        }
+        else if (es->p_pgrm == p_sys->p_pgrm)
         {
             EsOutSendEsEvent(out, es, VLC_INPUT_ES_ADDED);
             EsOutUpdateInfo(out, es, NULL);
@@ -1347,6 +1372,11 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, input_source_t *source, in
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
+
+    /* Sticky groups will be attached to any existing programs, no need to
+     * create one. */
+    if( EsOutIsGroupSticky( out, source, i_group ) )
+        return NULL;
 
     es_out_pgrm_t *p_pgrm = malloc( sizeof( es_out_pgrm_t ) );
     if( !p_pgrm )
@@ -1405,7 +1435,7 @@ static es_out_pgrm_t *EsOutProgramSearch( es_out_t *p_out, input_source_t *sourc
     es_out_pgrm_t *pgrm;
 
     vlc_list_foreach(pgrm, &p_sys->programs, node)
-        if (pgrm->i_id == i_group && (pgrm->source == source || i_group == 0))
+        if (pgrm->i_id == i_group && pgrm->source == source)
             return pgrm;
 
     return NULL;
@@ -1437,6 +1467,21 @@ static int EsOutProgramDel( es_out_t *out, input_source_t *source, int i_group )
         msg_Dbg( p_input, "can't delete program %d which still has %i ES",
                  i_group, p_pgrm->i_es );
         return VLC_EGENERIC;
+    }
+
+    /* Unselect sticky ES tracks */
+    es_out_id_t *es;
+    foreach_es_then_es_slaves(es)
+    {
+        if (es->p_pgrm != p_pgrm)
+            continue;
+
+        /* The remaining ES tracks are necessary sticky, cf. 'p_pgrm->i_es'
+         * test above. */
+        assert(EsOutIsGroupSticky( out, es->id.source, es->fmt.i_group));
+
+        EsOutUnselectEs(out, es, true);
+        es->p_pgrm = NULL;
     }
 
     vlc_list_remove(&p_pgrm->node);
@@ -1979,19 +2024,27 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
         return NULL;
     }
 
-    /* Search the program */
-    p_pgrm = EsOutProgramInsert( out, source, fmt->i_group );
-    if( !p_pgrm )
+    if( !EsOutIsGroupSticky( out, source, fmt->i_group ) )
     {
-        es_format_Clean( &es->fmt );
-        input_source_Release( es->id.source );
-        free( str_id );
-        free( es );
-        return NULL;
-    }
+        /* Search the program */
+        p_pgrm = EsOutProgramInsert( out, source, fmt->i_group );
+        if( !p_pgrm )
+        {
+            es_format_Clean( &es->fmt );
+            input_source_Release( es->id.source );
+            free( str_id );
+            free( es );
+            return NULL;
+        }
+        /* Increase ref count for program */
+        if( p_pgrm )
+            p_pgrm->i_es++;
 
-    /* The group 0 is the default one and can be used by different contexts */
-    assert( fmt->i_group == 0 || p_pgrm->source == es->id.source );
+        /* The group 0 is the default one and can be used by different contexts */
+        assert( fmt->i_group == 0 || p_pgrm->source == es->id.source );
+    }
+    else
+        p_pgrm = p_sys->p_pgrm; /* Use the selected program (can be NULL) */
 
     /* Get the number of ES already added in order to get the position of the es */
     es->i_pos = 0;
@@ -1999,9 +2052,6 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
     foreach_es_then_es_slaves(it)
         if( it->fmt.i_cat == fmt->i_cat && it->fmt.i_group == fmt->i_group )
             es->i_pos++;
-
-    /* Increase ref count for program */
-    p_pgrm->i_es++;
 
     /* Set up ES */
     es->p_pgrm = p_pgrm;
@@ -2119,6 +2169,8 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
         .on_update = ClockUpdate
     };
 
+    assert( p_es->p_pgrm );
+
     if( p_es->fmt.i_cat != UNKNOWN_ES
      && p_es->fmt.i_cat == p_sys->i_master_source_cat
      && p_es->p_pgrm->p_master_clock == NULL )
@@ -2183,6 +2235,8 @@ static void EsOutDestroyDecoder( es_out_t *out, es_out_id_t *p_es )
     if( !p_es->p_dec )
         return;
 
+    assert( p_es->p_pgrm );
+
     input_DecoderDelete( p_es->p_dec );
     p_es->p_dec = NULL;
     if( p_es->p_pgrm->p_master_clock == p_es->p_clock )
@@ -2210,6 +2264,9 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es )
         msg_Warn( p_input, "ES 0x%x is already selected", es->fmt.i_id );
         return;
     }
+
+    if( !es->p_pgrm )
+        return;
 
     if( es->p_master )
     {
@@ -2372,7 +2429,8 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
     es_out_es_props_t *p_esprops = GetPropsByCat( p_sys, es->fmt.i_cat );
 
     if( !p_sys->b_active ||
-        ( !b_force && es->fmt.i_priority < ES_PRIORITY_SELECTABLE_MIN ) )
+        ( !b_force && es->fmt.i_priority < ES_PRIORITY_SELECTABLE_MIN ) ||
+        !es->p_pgrm )
     {
         return;
     }
@@ -2733,11 +2791,15 @@ static void EsOutDelLocked( es_out_t *out, es_out_id_t *es )
     EsOutDeleteInfoEs( out, es );
 
     /* Update program */
-    es->p_pgrm->i_es--;
-    if( es->p_pgrm->i_es == 0 )
-        msg_Dbg( p_sys->p_input, "Program doesn't contain anymore ES" );
+    if( EsOutIsGroupSticky( out, es->id.source, es->fmt.i_group ) )
+    {
+        assert( es->p_pgrm );
 
-    if( es->b_scrambled )
+        es->p_pgrm->i_es--;
+        if( es->p_pgrm->i_es == 0 )
+            msg_Dbg( p_sys->p_input, "Program doesn't contain anymore ES" );
+    }
+    if( es->b_scrambled && es->p_pgrm )
         EsOutProgramUpdateScrambled( out, es->p_pgrm );
 
     /* */
@@ -3158,7 +3220,7 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         es_out_id_t *es = va_arg( args, es_out_id_t * );
         bool b_scrambled = (bool)va_arg( args, int );
 
-        if( !es->b_scrambled != !b_scrambled )
+        if( es->p_pgrm && !es->b_scrambled != !b_scrambled )
         {
             es->b_scrambled = b_scrambled;
             EsOutProgramUpdateScrambled( out, es->p_pgrm );
