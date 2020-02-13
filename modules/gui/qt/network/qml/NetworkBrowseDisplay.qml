@@ -39,24 +39,24 @@ Widgets.NavigableFocusScope {
     }
 
     NetworksSectionSelectableDM{
-        id: delegateModel
+        id: delegateModelId
         model: providerModel
         onCountChanged: resetFocus()
     }
 
     function resetFocus() {
-        if (delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
+        if (delegateModelId.items.count > 0 && delegateModelId.selectedGroup.count === 0) {
             var initialIndex = 0
-            if (delegateModel.currentIndex !== -1)
-                initialIndex = delegateModel.currentIndex
-            delegateModel.items.get(initialIndex).inSelected = true
-            delegateModel.currentIndex = initialIndex
+            if (delegateModelId.currentIndex !== -1)
+                initialIndex = delegateModelId.currentIndex
+            delegateModelId.items.get(initialIndex).inSelected = true
+            delegateModelId.currentIndex = initialIndex
         }
     }
 
     Widgets.MenuExt {
         id: contextMenu
-        property var delegateModel: undefined
+        property var delegateModelId: undefined
         property var model: ({})
         closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
         focus:true
@@ -65,14 +65,14 @@ Widgets.NavigableFocusScope {
             id: instanciator
             property var modelActions: {
                 "play": function() {
-                    if (delegateModel) {
-                        delegateModel.playSelection()
+                    if (delegateModelId) {
+                        delegateModelId.playSelection()
                     }
                     contextMenu.close()
                 },
                 "enqueue": function() {
-                    if (delegateModel)
-                        delegateModel.enqueueSelection()
+                    if (delegateModelId)
+                        delegateModelId.enqueueSelection()
                     contextMenu.close()
                 },
                 "index": function(index) {
@@ -118,8 +118,8 @@ Widgets.NavigableFocusScope {
 
         Widgets.ExpandGridView {
             id: gridView
-            model: delegateModel
-            modelCount: delegateModel.items.count
+
+            delegateModel: delegateModelId
 
             headerDelegate: Widgets.LabelSeparator {
                 width: view.width
@@ -155,8 +155,8 @@ Widgets.NavigableFocusScope {
                 subtitle: ""
 
                 onItemClicked : {
-                    delegateModel.updateSelection( modifier ,  delegateModel.currentIndex, index)
-                    delegateModel.currentIndex = index
+                    delegateModelId.updateSelection( modifier ,  delegateModelId.currentIndex, index)
+                    delegateModelId.currentIndex = index
                     delegateGrid.forceActiveFocus()
                 }
 
@@ -164,19 +164,19 @@ Widgets.NavigableFocusScope {
                     if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
                         history.push( ["mc", "network", { tree: model.tree } ])
                     else
-                        delegateModel.model.addAndPlay( index )
+                        delegateModelId.model.addAndPlay( index )
                 }
 
                 onContextMenuButtonClicked: {
                     contextMenu.model = model
-                    contextMenu.delegateModel = delegateModel
+                    contextMenu.delegateModelId = delegateModelId
                     contextMenu.popup()
                 }
             }
 
-            onSelectAll: delegateModel.selectAll()
-            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: delegateModel.actionAtIndex(index)
+            onSelectAll: delegateModelId.selectAll()
+            onSelectionUpdated: delegateModelId.updateSelection( keyModifiers, oldIndex, newIndex )
+            onActionAtIndex: delegateModelId.actionAtIndex(index)
 
             navigationParent: root
             navigationUpItem: gridView.headerItem
@@ -192,16 +192,15 @@ Widgets.NavigableFocusScope {
             id: listView
             height: view.height
             width: view.width
-            model: delegateModel.parts.list
-            modelCount: delegateModel.items.count
-            currentIndex: delegateModel.currentIndex
+            model: delegateModelId.parts.list
+            currentIndex: delegateModelId.currentIndex
 
             focus: true
             spacing: VLCStyle.margin_xxxsmall
 
-            onSelectAll: delegateModel.selectAll()
-            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: delegateModel.actionAtIndex(index)
+            onSelectAll: delegateModelId.selectAll()
+            onSelectionUpdated: delegateModelId.updateSelection( keyModifiers, oldIndex, newIndex )
+            onActionAtIndex: delegateModelId.actionAtIndex(index)
 
             navigationParent: root
             navigationUpItem: listView.headerItem

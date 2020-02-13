@@ -31,8 +31,7 @@ NavigableFocusScope {
     property int marginBottom: root.cellHeight / 2
     property int marginTop: root.cellHeight / 3
 
-    property variant model
-    property int modelCount: 0
+    property variant delegateModel
 
     property int currentIndex: 0
     property alias contentHeight: flickable.contentHeight
@@ -65,7 +64,7 @@ NavigableFocusScope {
     Accessible.role: Accessible.Table
 
     function switchExpandItem(index) {
-        if (modelCount === 0)
+        if (delegateModel.count === 0)
             return
 
         if (index === _expandIndex)
@@ -111,7 +110,7 @@ NavigableFocusScope {
         if (index <= 0) {
             animateFlickableContentY(0)
             return
-        } else if (index >= modelCount) {
+        } else if (index >= delegateModel.count) {
             return
         }
 
@@ -152,7 +151,7 @@ NavigableFocusScope {
     function _updateSelected() {
         for (var id in _idChildrenMap) {
             var item = _idChildrenMap[id]
-            item.selected = model.items.get(id).inSelected
+            item.selected = delegateModel.items.get(id).inSelected
         }
     }
 
@@ -221,7 +220,7 @@ NavigableFocusScope {
                 var rowId = rowCol[1] + 1
                 ret = rowId * root.getNbItemsPerRow()
             } else {
-                ret = model.count
+                ret = delegateModel.count
             }
             return ret
         }
@@ -247,7 +246,7 @@ NavigableFocusScope {
             var firstId = Math.max(rowId * root.getNbItemsPerRow(), 0)
 
             rowId = Math.ceil((contentYWithoutExpand + heightWithoutExpand) / root.cellHeight)
-            var lastId = Math.min(rowId * root.getNbItemsPerRow(), model.count)
+            var lastId = Math.min(rowId * root.getNbItemsPerRow(), delegateModel.count)
 
             return [firstId, lastId]
         }
@@ -272,8 +271,8 @@ NavigableFocusScope {
             var pos = root.getItemPos(i)
             _defineObjProperty(item, "index", i)
             //theses needs an actual binding
-            //item.selected = Qt.binding(function() { return model.items.get(i).inSelected })
-            item.model = model.items.get(i).model
+            //item.selected = Qt.binding(function() { return delegateModel.items.get(i).inSelected })
+            item.model = delegateModel.items.get(i).model
             //console.log("initialize", .inSelected)
 
             //theses properties are always defined in Item
@@ -345,7 +344,7 @@ NavigableFocusScope {
             }
 
             // Calculate and set the contentHeight
-            var newContentHeight = root.getItemPos(model.count - 1)[1] + root.cellHeight
+            var newContentHeight = root.getItemPos(delegateModel.count - 1)[1] + root.cellHeight
             if (root._expandIndex !== -1)
                 newContentHeight += expandItem.height
             contentHeight = newContentHeight
@@ -355,7 +354,7 @@ NavigableFocusScope {
         }
 
         Connections {
-            target: model.items
+            target: delegateModel.items
             onChanged: {
                 // Hide the expandItem with no animation
                 _expandIndex = -1
@@ -399,7 +398,7 @@ NavigableFocusScope {
             _expandIndex = _newExpandIndex
             if (_expandIndex === -1)
                 return
-            expandItem.model = model.items.get(_expandIndex).model
+            expandItem.model = delegateModel.items.get(_expandIndex).model
             /* We must also start the expand animation here since the expandItem implicitHeight is not
                changed if it had the same height at previous opening. */
             expandAnimation()
@@ -492,18 +491,18 @@ NavigableFocusScope {
         var newIndex = -1
         if (KeyHelper.matchRight(event)) {
             if ((currentIndex + 1) % colCount !== 0) {//are we not at the end of line
-                newIndex = Math.min(root.modelCount - 1, currentIndex + 1)
+                newIndex = Math.min(delegateModel.count - 1, currentIndex + 1)
             }
         } else if (KeyHelper.matchLeft(event)) {
             if (currentIndex % colCount !== 0) {//are we not at the begining of line
                 newIndex = Math.max(0, currentIndex - 1)
             }
         } else if (KeyHelper.matchDown(event)) {
-            if (Math.floor(currentIndex / colCount) !== Math.floor(root.modelCount / colCount)) { //we are not on the last line
-                newIndex = Math.min(root.modelCount - 1, currentIndex + colCount)
+            if (Math.floor(currentIndex / colCount) !== Math.floor(delegateModel.count / colCount)) { //we are not on the last line
+                newIndex = Math.min(delegateModel.count - 1, currentIndex + colCount)
             }
         } else if (KeyHelper.matchPageDown(event)) {
-            newIndex = Math.min(root.modelCount - 1, currentIndex + colCount * 5)
+            newIndex = Math.min(delegateModel.count - 1, currentIndex + colCount * 5)
         } else if (KeyHelper.matchUp(event)) {
             if (Math.floor(currentIndex / colCount) !== 0) { //we are not on the first line
                 newIndex = Math.max(0, currentIndex - colCount)

@@ -36,8 +36,8 @@ Widgets.NavigableFocusScope {
         { text: i18n.qtr("Artist"),      criteria: "main_artist" },
     ]
 
-    property alias model: delegateModel.model
-    property alias parentId: delegateModel.parentId
+    property alias model: delegateModelId.model
+    property alias parentId: delegateModelId.parentId
     readonly property var currentIndex: view.currentItem.currentIndex
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
@@ -60,20 +60,20 @@ Widgets.NavigableFocusScope {
     onParentIdChanged: resetFocus()
 
     function resetFocus() {
-        if (delegateModel.items.count === 0) {
+        if (delegateModelId.items.count === 0) {
             return
         }
         var initialIndex = root.initialIndex
-        if (initialIndex >= delegateModel.items.count)
+        if (initialIndex >= delegateModelId.items.count)
             initialIndex = 0
-        delegateModel.selectNone()
-        delegateModel.items.get(initialIndex).inSelected = true
+        delegateModelId.selectNone()
+        delegateModelId.items.get(initialIndex).inSelected = true
         view.currentItem.currentIndex = initialIndex
         view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
 
     Util.SelectableDelegateModel {
-        id: delegateModel
+        id: delegateModelId
         property alias parentId: albumModelId.parentId
 
         model: MLAlbumModel {
@@ -100,7 +100,7 @@ Widgets.NavigableFocusScope {
                 line2: model.main_artist || i18n.qtr("Unknown artist")
 
                 onItemClicked : {
-                    delegateModel.updateSelection( modifier, view.currentItem.currentIndex, index )
+                    delegateModelId.updateSelection( modifier, view.currentItem.currentIndex, index )
                     view.currentItem.currentIndex = index
                     this.forceActiveFocus()
                 }
@@ -110,19 +110,19 @@ Widgets.NavigableFocusScope {
         }
 
         onCountChanged: {
-            if (delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
+            if (delegateModelId.items.count > 0 && delegateModelId.selectedGroup.count === 0) {
                 root.resetFocus()
             }
         }
 
         function actionAtIndex(index) {
-            if (delegateModel.selectedGroup.count > 1) {
+            if (delegateModelId.selectedGroup.count > 1) {
                 var list = []
-                for (var i = 0; i < delegateModel.selectedGroup.count; i++)
-                    list.push(delegateModel.selectedGroup.get(i).model.id)
+                for (var i = 0; i < delegateModelId.selectedGroup.count; i++)
+                    list.push(delegateModelId.selectedGroup.get(i).model.id)
                 medialib.addAndPlay( list )
             } else {
-                medialib.addAndPlay( delegateModel.items.get(index).model.id )
+                medialib.addAndPlay( delegateModelId.items.get(index).model.id )
             }
         }
     }
@@ -140,11 +140,13 @@ Widgets.NavigableFocusScope {
 
             headerDelegate: root.header
 
+            delegateModel: delegateModelId
+
             delegate: AudioGridItem {
                 id: audioGridItem
 
                 onItemClicked : {
-                    delegateModel.updateSelection( modifier , root.currentIndex, index)
+                    delegateModelId.updateSelection( modifier , root.currentIndex, index)
                     gridView_id.currentIndex = index
                     gridView_id.forceActiveFocus()
                 }
@@ -167,18 +169,15 @@ Widgets.NavigableFocusScope {
 
             }
 
-            model: delegateModel
-            modelCount: delegateModel.items.count
-
             onActionAtIndex: {
-                if (delegateModel.selectedGroup.count === 1) {
+                if (delegateModelId.selectedGroup.count === 1) {
                     view._switchExpandItem(index)
                 } else {
-                    delegateModel.actionAtIndex(index)
+                    delegateModelId.actionAtIndex(index)
                 }
             }
-            onSelectAll: delegateModel.selectAll()
-            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            onSelectAll: delegateModelId.selectAll()
+            onSelectionUpdated: delegateModelId.updateSelection( keyModifiers, oldIndex, newIndex )
 
             navigationParent: root
         }
@@ -194,12 +193,12 @@ Widgets.NavigableFocusScope {
 
             spacing: VLCStyle.margin_xxxsmall
 
-            model: delegateModel.parts.list
-            modelCount: delegateModel.items.count
+            model: delegateModelId.parts.list
+            modelCount: delegateModelId.items.count
 
-            onActionAtIndex: delegateModel.actionAtIndex(index)
-            onSelectAll: delegateModel.selectAll()
-            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            onActionAtIndex: delegateModelId.actionAtIndex(index)
+            onSelectAll: delegateModelId.selectAll()
+            onSelectionUpdated: delegateModelId.updateSelection( keyModifiers, oldIndex, newIndex )
 
             navigationParent: root
             navigationCancel: function() {
@@ -215,7 +214,7 @@ Widgets.NavigableFocusScope {
         id: view
 
         anchors.fill: parent
-        focus: delegateModel.items.count !== 0
+        focus: delegateModelId.items.count !== 0
 
         initialItem: medialib.gridView ? gridComponent : listComponent
 
@@ -241,7 +240,7 @@ Widgets.NavigableFocusScope {
 
     EmptyLabel {
         anchors.fill: parent
-        visible: delegateModel.items.count === 0
+        visible: delegateModelId.items.count === 0
         focus: visible
         text: i18n.qtr("No albums found\nPlease try adding sources, by going to the Network tab")
         navigationParent: root

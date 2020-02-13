@@ -126,6 +126,7 @@ Widgets.NavigableFocusScope {
         id: videosDelegate
 
         model: MLVideoModel {
+            id: videoModel
             ml: medialib
         }
         delegate: Package{
@@ -155,8 +156,7 @@ Widgets.NavigableFocusScope {
             property Item currentItem: Item{}
 
             activeFocusOnTab:true
-            model: videosDelegate
-            modelCount: videosDelegate.items.count
+            delegateModel: videosDelegate
 
             headerDelegate: Widgets.LabelSeparator {
                 id: videosSeparator
@@ -211,8 +211,8 @@ Widgets.NavigableFocusScope {
             cellWidth: VLCStyle.gridItem_video_width
             cellHeight: VLCStyle.gridItem_video_height
 
-            onSelectAll: videosGV.model.selectAll()
-            onSelectionUpdated: videosGV.model.updateSelection( keyModifiers, oldIndex, newIndex )
+            onSelectAll:videosDelegate.selectAll()
+            onSelectionUpdated: videosDelegate.updateSelection( keyModifiers, oldIndex, newIndex )
             onActionAtIndex: videosDelegate.actionAtIndex( index )
         }
 
