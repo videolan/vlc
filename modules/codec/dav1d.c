@@ -234,8 +234,6 @@ static int Decode(decoder_t *dec, block_t *block)
         b_eos = (block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
     }
 
-    Dav1dPicture img = { 0 };
-
     bool b_draining = false;
     int i_ret = VLCDEC_SUCCESS;
     int res;
@@ -251,27 +249,37 @@ static int Decode(decoder_t *dec, block_t *block)
             }
         }
 
-        res = dav1d_get_picture(p_sys->c, &img);
-        if (res == 0)
+        bool b_output_error = false;
+        do
         {
-            picture_t *_pic = img.allocator_data;
-            picture_t *pic = picture_Clone(_pic);
-            if (unlikely(pic == NULL))
+            Dav1dPicture img = { 0 };
+            res = dav1d_get_picture(p_sys->c, &img);
+            if (res == 0)
             {
-                i_ret = VLC_EGENERIC;
-                picture_Release(_pic);
+                picture_t *_pic = img.allocator_data;
+                picture_t *pic = picture_Clone(_pic);
+                if (unlikely(pic == NULL))
+                {
+                    i_ret = VLC_EGENERIC;
+                    picture_Release(_pic);
+                    b_output_error = true;
+                    break;
+                }
+                pic->b_progressive = true; /* codec does not support interlacing */
+                pic->date = img.m.timestamp;
+                decoder_QueueVideo(dec, pic);
+                dav1d_picture_unref(&img);
+            }
+            else if (res != DAV1D_ERR(EAGAIN))
+            {
+                msg_Warn(dec, "Decoder error %d!", res);
+                b_output_error = true;
                 break;
             }
-            pic->b_progressive = true; /* codec does not support interlacing */
-            pic->date = img.m.timestamp;
-            decoder_QueueVideo(dec, pic);
-            dav1d_picture_unref(&img);
-        }
-        else if (res != DAV1D_ERR(EAGAIN))
-        {
-            msg_Warn(dec, "Decoder error %d!", res);
+        } while(res == 0);
+
+        if(b_output_error)
             break;
-        }
 
         /* on drain, we must ignore the 1st EAGAIN */
         if(!b_draining && (res == DAV1D_ERR(EAGAIN) || res == 0)
