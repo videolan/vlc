@@ -159,6 +159,13 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
         v->mastering.white_point[1] = md->white_point[1];
     }
 
+    const Dav1dContentLightLevel *cll = img->content_light;
+    if( dec->fmt_in.video.lighting.MaxCLL == 0 && cll )
+    {
+        v->lighting.MaxCLL = cll->max_content_light_level;
+        v->lighting.MaxFALL = cll->max_frame_average_light_level;
+    }
+
     v->projection_mode = dec->fmt_in.video.projection_mode;
     v->multiview_mode = dec->fmt_in.video.multiview_mode;
     v->pose = dec->fmt_in.video.pose;
@@ -280,7 +287,6 @@ static int Decode(decoder_t *dec, block_t *block)
             }
             pic->b_progressive = true; /* codec does not support interlacing */
             pic->date = img.m.timestamp;
-            /* TODO udpate the color primaries and such */
             decoder_QueueVideo(dec, pic);
             dav1d_picture_unref(&img);
         }
@@ -394,6 +400,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     dec->fmt_out.video.space       = dec->fmt_in.video.space;
     dec->fmt_out.video.b_color_range_full = dec->fmt_in.video.b_color_range_full;
     dec->fmt_out.video.mastering   = dec->fmt_in.video.mastering;
+    dec->fmt_out.video.lighting    = dec->fmt_in.video.lighting;
 
     return VLC_SUCCESS;
 }
