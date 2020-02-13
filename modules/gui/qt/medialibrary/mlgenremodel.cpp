@@ -111,7 +111,12 @@ void MLGenreModel::onVlcMlEvent(const vlc_ml_event_t* event)
             m_need_reset = true;
             break;
     }
-    MLBaseModel::onVlcMlEvent(event);
+    MLSlidingWindowModel::onVlcMlEvent(event);
+}
+
+void MLGenreModel::thumbnailUpdated(int idx)
+{
+    emit dataChanged(index(idx), index(idx), {GENRE_COVER});
 }
 
 vlc_ml_sorting_criteria_t MLGenreModel::roleToCriteria(int role) const

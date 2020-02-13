@@ -44,7 +44,7 @@ QVariant MLAlbumModel::data(const QModelIndex &index, int role) const
     switch (role)
     {
     case ALBUM_ID :
-        return QVariant::fromValue( ml_item->getParentId() );
+        return QVariant::fromValue( ml_item->getId() );
     case ALBUM_TITLE :
         return QVariant::fromValue( ml_item->getTitle() );
     case ALBUM_RELEASE_YEAR :
@@ -125,7 +125,12 @@ void MLAlbumModel::onVlcMlEvent(const vlc_ml_event_t* event)
         default:
             break;
     }
-    MLBaseModel::onVlcMlEvent( event );
+    MLSlidingWindowModel::onVlcMlEvent( event );
+}
+
+void MLAlbumModel::thumbnailUpdated(int idx)
+{
+    emit dataChanged(index(idx), index(idx), {ALBUM_COVER});
 }
 
 vlc_ml_sorting_criteria_t MLAlbumModel::roleToCriteria(int role) const

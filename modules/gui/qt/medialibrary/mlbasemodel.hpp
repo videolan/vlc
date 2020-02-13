@@ -193,9 +193,34 @@ protected:
         return m_item_list[idx - m_query_param.i_offset].get();
     }
 
+    virtual void onVlcMlEvent(const vlc_ml_event_t* event) override
+    {
+        switch (event->i_type)
+        {
+            case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
+            {
+                if (event->media_thumbnail_generated.b_success) {
+                    int idx = static_cast<int>(m_query_param.i_offset);
+                    for ( const auto& it : m_item_list ) {
+                        if (it->getId().id == event->media_thumbnail_generated.p_media->i_id) {
+                            thumbnailUpdated(idx);
+                            break;
+                        }
+                        idx += 1;
+                    }
+                }
+                break;
+            }
+            default:
+                break;
+        }
+        MLBaseModel::onVlcMlEvent( event );
+    }
+
 private:
     virtual size_t countTotalElements() const = 0;
     virtual std::vector<std::unique_ptr<T>> fetch() = 0;
+    virtual void thumbnailUpdated( int ) {}
 
 protected:
     mutable std::vector<std::unique_ptr<T>> m_item_list;

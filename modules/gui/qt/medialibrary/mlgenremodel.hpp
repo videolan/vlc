@@ -43,6 +43,7 @@ private:
     std::vector<std::unique_ptr<MLGenre>> fetch() override;
     size_t countTotalElements() const override;
     void onVlcMlEvent(const vlc_ml_event_t* event) override;
+    void thumbnailUpdated(int idx) override;
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
 

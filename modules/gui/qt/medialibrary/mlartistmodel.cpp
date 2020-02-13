@@ -137,5 +137,10 @@ void MLArtistModel::onVlcMlEvent(const vlc_ml_event_t* event)
                 m_need_reset = true;
             break;
     }
-    MLBaseModel::onVlcMlEvent(event);
+    MLSlidingWindowModel::onVlcMlEvent(event);
+}
+
+void MLArtistModel::thumbnailUpdated(int idx)
+{
+    emit dataChanged(index(idx), index(idx), {ARTIST_COVER});
 }

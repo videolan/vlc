@@ -162,8 +162,14 @@ void MLVideoModel::onVlcMlEvent(const vlc_ml_event_t* event)
         default:
             break;
     }
-    MLBaseModel::onVlcMlEvent( event );
+    MLSlidingWindowModel::onVlcMlEvent( event );
 }
+
+void MLVideoModel::thumbnailUpdated(int idx)
+{
+    emit dataChanged(index(idx), index(idx), {VIDEO_THUMBNAIL});
+}
+
 QString MLVideoModel::getFirstSymbol( const QString& str )
 {
     QString ret("#");
