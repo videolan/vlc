@@ -1265,11 +1265,16 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
 
         foreach_es_then_es_slaves(es)
         {
-            if (es->p_pgrm == old && EsIsSelected(es)
-             && p_sys->i_mode != ES_OUT_MODE_ALL)
+            if (es->p_pgrm != old)
+                continue;
+
+            if (EsIsSelected(es) && p_sys->i_mode != ES_OUT_MODE_ALL)
                 EsOutUnselectEs(out, es, true);
-            if (es->p_pgrm == old)
-                EsOutSendEsEvent( out, es, VLC_INPUT_ES_DELETED );
+
+            /* ES tracks are deleted (and unselected) when their programs are
+             * unselected (they will be added back when their programs are
+             * selected back). */
+            EsOutSendEsEvent( out, es, VLC_INPUT_ES_DELETED );
         }
 
         p_sys->audio.p_main_es = NULL;
