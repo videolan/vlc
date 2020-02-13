@@ -1973,9 +1973,6 @@ static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
     EsOutUpdateInfo( out, es, NULL );
     EsOutSelect( out, es, false );
 
-    if( es->b_scrambled )
-        EsOutProgramUpdateScrambled( out, es->p_pgrm );
-
     return es;
 }
 
