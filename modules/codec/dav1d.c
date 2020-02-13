@@ -282,6 +282,8 @@ static int Decode(decoder_t *dec, block_t *block)
         }
     } while (res == 0 || (p_data && p_data->sz != 0));
 
+    if(p_data && p_data->sz > 0)
+        dav1d_data_unref(p_data);
 
     return i_ret;
 }
