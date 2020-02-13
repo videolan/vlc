@@ -2059,9 +2059,7 @@ REPORT_LIST
     reports_init(&ctx->report);
 
     /* Force wdummy window */
-    int ret = var_Create(vlc->p_libvlc_int, "window", VLC_VAR_STRING);
-    assert(ret == VLC_SUCCESS);
-    ret = var_SetString(vlc->p_libvlc_int, "window", "wdummy");
+    int ret = var_SetString(vlc->p_libvlc_int, "window", "wdummy");
     assert(ret == VLC_SUCCESS);
 
     ctx->player = vlc_player_New(VLC_OBJECT(vlc->p_libvlc_int),
