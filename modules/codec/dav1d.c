@@ -136,6 +136,17 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
         v->color_range = img->seq_hdr->color_range ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
     }
 
+    const Dav1dMasteringDisplay *md = img->mastering_display;
+    if( dec->fmt_in.video.mastering.max_luminance == 0 && md )
+    {
+        for( size_t i=0;i<6; i++ )
+            v->mastering.primaries[i] = md->primaries[i >> 1][i % 2];
+        v->mastering.min_luminance = md->min_luminance;
+        v->mastering.max_luminance = md->max_luminance;
+        v->mastering.white_point[0] = md->white_point[0];
+        v->mastering.white_point[1] = md->white_point[1];
+    }
+
     v->projection_mode = dec->fmt_in.video.projection_mode;
     v->multiview_mode = dec->fmt_in.video.multiview_mode;
     v->pose = dec->fmt_in.video.pose;
@@ -320,6 +331,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     dec->fmt_out.video.transfer    = dec->fmt_in.video.transfer;
     dec->fmt_out.video.space       = dec->fmt_in.video.space;
     dec->fmt_out.video.color_range = dec->fmt_in.video.color_range;
+    dec->fmt_out.video.mastering   = dec->fmt_in.video.mastering;
 
     return VLC_SUCCESS;
 }
