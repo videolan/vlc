@@ -1655,7 +1655,7 @@ static void Close(vout_display_t *vd)
 }
 
 #if defined(HAVE_GL) && defined(HAVE_GL_WGLEW_H)
-#include "../opengl/converter.h"
+#include "../opengl/renderer.h"
 #include <GL/glew.h>
 #include <GL/wglew.h>
 
