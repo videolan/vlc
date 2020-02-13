@@ -603,6 +603,16 @@ static void EsOutDelete( es_out_t *out )
     free( p_sys );
 }
 
+static void ProgramDelete( es_out_pgrm_t *p_pgrm )
+{
+    input_clock_Delete( p_pgrm->p_input_clock );
+    vlc_clock_main_Delete( p_pgrm->p_main_clock );
+    if( p_pgrm->p_meta )
+        vlc_meta_Delete( p_pgrm->p_meta );
+
+    free( p_pgrm );
+}
+
 static void EsOutTerminate( es_out_t *out )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
@@ -620,18 +630,12 @@ static void EsOutTerminate( es_out_t *out )
         EsRelease(es);
     }
 
-    /* FIXME duplicate work EsOutProgramDel (but we cannot use it) add a EsOutProgramClean ? */
     es_out_pgrm_t *p_pgrm;
     vlc_list_foreach(p_pgrm, &p_sys->programs, node)
     {
-        input_clock_Delete( p_pgrm->p_input_clock );
-        vlc_clock_main_Delete( p_pgrm->p_main_clock );
-        if( p_pgrm->p_meta )
-            vlc_meta_Delete( p_pgrm->p_meta );
-
         vlc_list_remove(&p_pgrm->node);
         input_SendEventProgramDel( p_sys->p_input, p_pgrm->i_id );
-        free( p_pgrm );
+        ProgramDelete(p_pgrm);
     }
 
     p_sys->p_pgrm = NULL;
@@ -1425,15 +1429,10 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
     if( p_sys->p_pgrm == p_pgrm )
         p_sys->p_pgrm = NULL;
 
-    input_clock_Delete( p_pgrm->p_input_clock );
-    vlc_clock_main_Delete( p_pgrm->p_main_clock );
-
-    if( p_pgrm->p_meta )
-        vlc_meta_Delete( p_pgrm->p_meta );
-    free( p_pgrm );
-
     /* Update "program" variable */
     input_SendEventProgramDel( p_input, i_group );
+
+    ProgramDelete( p_pgrm );
 
     return VLC_SUCCESS;
 }
