@@ -67,7 +67,7 @@ vlc_module_begin ()
     set_callbacks(OpenDecoder, CloseDecoder)
     add_submodule()
         set_callback_dec_device(DecoderContextOpen, 3)
-        add_shortcut("nvdec-device")
+        add_shortcut("nvdec")
 vlc_module_end ()
 
 /* */
