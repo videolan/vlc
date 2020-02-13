@@ -39,7 +39,7 @@ static int OpenDecoderDevice(vlc_decoder_device *, vout_window_t *);
 vlc_module_begin()
     set_description(N_("MMAL"))
     set_callback_dec_device(OpenDecoderDevice, 100)
-    add_shortcut("mmal-device")
+    add_shortcut("mmal")
 vlc_module_end()
 
 
