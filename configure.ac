@@ -2808,7 +2808,7 @@ PKG_ENABLE_MODULES_VLC([AOM], [], [aom], [experimental AV1 codec (default auto)]
 dnl
 dnl  Dav1d decoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([DAV1D], [], [dav1d], [AV1 decoder (default auto)])
+PKG_ENABLE_MODULES_VLC([DAV1D], [], [dav1d >= 0.5.0], [AV1 decoder (default auto)])
 
 dnl
 dnl libvpx decoder plugin
