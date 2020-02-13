@@ -38,6 +38,7 @@
 #include <dav1d/dav1d.h>
 
 #include "../packetizer/iso_color_tables.h"
+#include "cc.h"
 
 /****************************************************************************
  * Local prototypes
@@ -76,7 +77,19 @@ typedef struct
 {
     Dav1dSettings s;
     Dav1dContext *c;
+    cc_data_t cc;
 } decoder_sys_t;
+
+struct user_data_s
+{
+    vlc_tick_t dts;
+};
+
+static void FreeUserData_Handler(const uint8_t *p, void *userdata)
+{
+    VLC_UNUSED(p);
+    free(userdata);
+}
 
 static const struct
 {
@@ -178,6 +191,38 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
     return -1;
 }
 
+static void ExtractCaptions(decoder_t *dec, const Dav1dPicture *img)
+{
+    decoder_sys_t *p_sys = dec->p_sys;
+    const struct user_data_s *userdata = (struct user_data_s *) img->m.user_data.data;
+    const Dav1dITUTT35 *itu_t35 = img->itut_t35;
+    if(itu_t35 && itu_t35->country_code == 0xb5 &&
+       itu_t35->payload_size > 9 &&
+       !memcmp(itu_t35->payload, "\x00\x0x31GA94\x03", 7))
+    {
+        cc_Extract(&p_sys->cc, CC_PAYLOAD_GA94, true,
+                   &itu_t35->payload[7], itu_t35->payload_size - 7);
+        if(p_sys->cc.b_reorder || p_sys->cc.i_data)
+        {
+            block_t *p_cc = block_Alloc(p_sys->cc.i_data);
+            if(p_cc)
+            {
+                memcpy(p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data);
+                if(p_sys->cc.b_reorder || userdata == NULL)
+                    p_cc->i_dts = p_cc->i_pts = img->m.timestamp;
+                else
+                    p_cc->i_pts = p_cc->i_dts = userdata->dts;
+                decoder_cc_desc_t desc;
+                desc.i_608_channels = p_sys->cc.i_608channels;
+                desc.i_708_channels = p_sys->cc.i_708channels;
+                desc.i_reorder_depth = 4;
+                decoder_QueueCc(dec, p_cc, &desc);
+            }
+            cc_Flush(&p_sys->cc);
+        }
+    }
+}
+
 static void FreePicture(Dav1dPicture *data, void *cookie)
 {
     picture_t *pic = data->allocator_data;
@@ -194,6 +239,7 @@ static void FlushDecoder(decoder_t *dec)
 {
     decoder_sys_t *p_sys = dec->p_sys;
     dav1d_flush(p_sys->c);
+    cc_Flush(&p_sys->cc);
 }
 
 static void release_block(const uint8_t *buf, void *b)
@@ -229,8 +275,22 @@ static int Decode(decoder_t *dec, block_t *block)
             block_Release(block);
             return VLCDEC_ECRITICAL;
         }
-        vlc_tick_t pts = block->i_pts == VLC_TICK_INVALID ? block->i_dts : block->i_pts;
-        p_data->m.timestamp = pts;
+
+        p_data->m.timestamp = block->i_pts == VLC_TICK_INVALID ? block->i_dts : block->i_pts;
+        if(block->i_dts != p_data->m.timestamp)
+        {
+            struct user_data_s *userdata = malloc(sizeof(*userdata));
+            if(unlikely(userdata == NULL ||
+                        0 != dav1d_data_wrap_user_data(&data, (const uint8_t *) userdata,
+                                                       FreeUserData_Handler, userdata)))
+            {
+                free(userdata);
+                dav1d_data_unref(&data);
+                return VLCDEC_ECRITICAL;
+            }
+            userdata->dts = block->i_dts;
+        }
+
         b_eos = (block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
     }
 
@@ -268,6 +328,7 @@ static int Decode(decoder_t *dec, block_t *block)
                 pic->b_progressive = true; /* codec does not support interlacing */
                 pic->date = img.m.timestamp;
                 decoder_QueueVideo(dec, pic);
+                ExtractCaptions(dec, &img);
                 dav1d_picture_unref(&img);
             }
             else if (res != DAV1D_ERR(EAGAIN))
@@ -349,6 +410,8 @@ static int OpenDecoder(vlc_object_t *p_this)
     dec->fmt_out.video.color_range = dec->fmt_in.video.color_range;
     dec->fmt_out.video.mastering   = dec->fmt_in.video.mastering;
     dec->fmt_out.video.lighting    = dec->fmt_in.video.lighting;
+
+    cc_Init(&p_sys->cc);
 
     return VLC_SUCCESS;
 }
