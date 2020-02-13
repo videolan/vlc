@@ -43,6 +43,7 @@ namespace adaptive
                 virtual bool                    isLive() const = 0;
                 void                            setType(const std::string &);
                 void                            setMinBuffering( mtime_t );
+                void                            setMaxBuffering( mtime_t );
                 mtime_t                         getMinBuffering() const;
                 mtime_t                         getMaxBuffering() const;
                 virtual void                    debug() = 0;
@@ -77,6 +78,7 @@ namespace adaptive
                 std::string                         playlistUrl;
                 std::string                         type;
                 mtime_t                             minBufferTime;
+                mtime_t                             maxBufferTime;
                 bool                                b_needsUpdates;
         };
     }

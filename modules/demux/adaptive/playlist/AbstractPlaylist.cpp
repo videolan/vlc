@@ -44,6 +44,7 @@ AbstractPlaylist::AbstractPlaylist (vlc_object_t *p_object_) :
     minUpdatePeriod.Set( 2 * CLOCK_FREQ );
     maxSegmentDuration.Set( 0 );
     minBufferTime = 0;
+    maxBufferTime = 0;
     timeShiftBufferDepth.Set( 0 );
     suggestedPresentationDelay.Set( 0 );
     b_needsUpdates = true;
@@ -85,6 +86,11 @@ void AbstractPlaylist::setMinBuffering( mtime_t min )
     minBufferTime = min;
 }
 
+void AbstractPlaylist::setMaxBuffering( mtime_t max )
+{
+    maxBufferTime = max;
+}
+
 mtime_t AbstractPlaylist::getMinBuffering() const
 {
     return std::max(minBufferTime, 6*CLOCK_FREQ);
@@ -93,7 +99,8 @@ mtime_t AbstractPlaylist::getMinBuffering() const
 mtime_t AbstractPlaylist::getMaxBuffering() const
 {
     const mtime_t minbuf = getMinBuffering();
-    return std::max(minbuf, 60 * CLOCK_FREQ);
+    const mtime_t maxbuf = maxBufferTime ? maxBufferTime : CLOCK_FREQ * 60;
+    return std::max(minbuf, maxbuf);
 }
 
 Url AbstractPlaylist::getUrlSegment() const
