@@ -616,6 +616,6 @@ vlc_module_begin()
     /* LEGACY, the d3dcontext and swapchain were given by the host app */
     add_integer("winrt-d3dcontext",    0x0, NULL, NULL, true) /* ID3D11DeviceContext* */
 #endif /* VLC_WINSTORE_APP */
-    add_shortcut ("d3d11-device")
+    add_shortcut ("d3d11")
 
 vlc_module_end()

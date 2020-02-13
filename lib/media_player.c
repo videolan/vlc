@@ -1065,7 +1065,7 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
     else if ( engine == libvlc_video_engine_d3d11 )
     {
         var_SetString ( mp, "vout", "direct3d11" );
-        var_SetString ( mp, "dec-dev", "d3d11-device" );
+        var_SetString ( mp, "dec-dev", "d3d11" );
     }
     else if ( engine == libvlc_video_engine_d3d9 )
     {
