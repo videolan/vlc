@@ -32,6 +32,7 @@ NavigableFocusScope {
     property int marginTop: root.cellHeight / 3
 
     property variant delegateModel
+    property variant model
 
     property int currentIndex: 0
     property alias contentHeight: flickable.contentHeight
@@ -48,6 +49,7 @@ NavigableFocusScope {
     //delegate to display the extended item
     property Component delegate: Item{}
     property Component expandDelegate: Item{}
+    property alias expandItem: expandItemLoader.item
 
     property Component headerDelegate: Item{}
     property int headerHeight: headerItemLoader.implicitHeight
@@ -166,11 +168,47 @@ NavigableFocusScope {
         root._isInitialised = true;
     }
 
+    function _getFirstAndLastInstanciatedItemIds() {
+        var myContentY = flickable.contentY - root.headerHeight
+
+        var contentYWithoutExpand = myContentY
+        var heightWithoutExpand = flickable.height
+        if (root._expandIndex !== -1) {
+            if (myContentY >= expandItem.y && myContentY < expandItem.y + expandItem.height)
+                contentYWithoutExpand = expandItem.y
+            if (myContentY >= expandItem.y + expandItem.height)
+                contentYWithoutExpand = myContentY - expandItem.height
+
+            var expandYStart = Math.max(myContentY, expandItem.y)
+            var expandYEnd = Math.min(myContentY + height, expandItem.y + expandItem.height)
+            var expandDisplayedHeight = Math.max(expandYEnd - expandYStart, 0)
+            heightWithoutExpand -= expandDisplayedHeight
+        }
+
+        var rowId = Math.floor(contentYWithoutExpand / root.cellHeight)
+        var firstId = Math.max(rowId * root.getNbItemsPerRow(), 0)
+
+        rowId = Math.ceil((contentYWithoutExpand + heightWithoutExpand) / root.cellHeight)
+        var lastId = Math.min(rowId * root.getNbItemsPerRow(), delegateModel.count)
+
+        return [firstId, lastId]
+    }
+
+    Connections {
+        target: model
+        onDataChanged: {
+            var iMin = topLeft.row
+            var iMax = bottomRight.row
+            var f_l = _getFirstAndLastInstanciatedItemIds()
+            if (iMin <= f_l[1] && f_l[0] <= iMax) {
+                flickable.layout(true)
+            }
+        }
+    }
+
     //Gridview visible above the expanded item
     Flickable {
         id: flickable
-
-        property alias expandItem: expandItemLoader.item
 
         clip: true
 
@@ -225,32 +263,6 @@ NavigableFocusScope {
             return ret
         }
 
-        function getFirstAndLastInstanciatedItemIds() {
-            var myContentY = contentY - root.headerHeight
-
-            var contentYWithoutExpand = myContentY
-            var heightWithoutExpand = height
-            if (root._expandIndex !== -1) {
-                if (myContentY >= expandItem.y && myContentY < expandItem.y + expandItem.height)
-                    contentYWithoutExpand = expandItem.y
-                if (myContentY >= expandItem.y + expandItem.height)
-                    contentYWithoutExpand = myContentY - expandItem.height
-
-                var expandYStart = Math.max(myContentY, expandItem.y)
-                var expandYEnd = Math.min(myContentY + height, expandItem.y + expandItem.height)
-                var expandDisplayedHeight = Math.max(expandYEnd - expandYStart, 0)
-                heightWithoutExpand -= expandDisplayedHeight
-            }
-
-            var rowId = Math.floor(contentYWithoutExpand / root.cellHeight)
-            var firstId = Math.max(rowId * root.getNbItemsPerRow(), 0)
-
-            rowId = Math.ceil((contentYWithoutExpand + heightWithoutExpand) / root.cellHeight)
-            var lastId = Math.min(rowId * root.getNbItemsPerRow(), delegateModel.count)
-
-            return [firstId, lastId]
-        }
-
         function getChild(id, toUse) {
             var ret
             if (id in _idChildrenMap) {
@@ -291,7 +303,7 @@ NavigableFocusScope {
             var i
             var expandItemGridId = getExpandItemGridId()
 
-            var f_l = getFirstAndLastInstanciatedItemIds()
+            var f_l = _getFirstAndLastInstanciatedItemIds()
             var nbItems = f_l[1] - f_l[0]
             var firstId = f_l[0]
             var lastId = f_l[1]
@@ -359,14 +371,14 @@ NavigableFocusScope {
                 // Hide the expandItem with no animation
                 _expandIndex = -1
 
-                //flickable.expandItem.height = 0
+                //expandItem.height = 0
                 // Regenerate the gridview layout
                 flickable.layout(true)
             }
         }
 
         Connections {
-            target: flickable.expandItem
+            target: expandItem
             onHeightChanged: {
                 flickable.layout(true)
             }
@@ -378,11 +390,11 @@ NavigableFocusScope {
             }
             onCurrentItemYChanged: {
                 var newContentY = flickable.contentY;
-                var currentItemYPos = root.getItemPos(currentIndex)[1] + cellHeight + flickable.expandItem.currentItemY
-                if (currentItemYPos + flickable.expandItem.currentItemHeight > flickable.contentY + flickable.height) {
+                var currentItemYPos = root.getItemPos(currentIndex)[1] + cellHeight + expandItem.currentItemY
+                if (currentItemYPos + expandItem.currentItemHeight > flickable.contentY + flickable.height) {
                     //move viewport to see current item bottom
                     newContentY = Math.min(
-                                currentItemYPos + flickable.expandItem.currentItemHeight - flickable.height,
+                                currentItemYPos + expandItem.currentItemHeight - flickable.height,
                                 flickable.contentHeight - flickable.height)
                 } else if (currentItemYPos < flickable.contentY) {
                     //move viewport to see current item top
@@ -408,11 +420,11 @@ NavigableFocusScope {
             if (_expandIndex === -1)
                 return
 
-            var expandItemHeight = flickable.expandItem.implicitHeight;
+            var expandItemHeight = expandItem.implicitHeight;
 
             // Expand animation
 
-            flickable.expandItem.focus = true
+            expandItem.focus = true
             // The animation may have already been triggered, we must stop it.
             animateExpandItem.stop()
             animateExpandItem.to = expandItemHeight
@@ -430,7 +442,7 @@ NavigableFocusScope {
 
         NumberAnimation {
             id: animateRetractItem;
-            target: flickable.expandItem;
+            target: expandItem;
             properties: "height"
             easing.type: Easing.OutQuad
             duration: 250
@@ -446,7 +458,7 @@ NavigableFocusScope {
 
         NumberAnimation {
             id: animateExpandItem;
-            target: flickable.expandItem;
+            target: expandItem;
             properties: "height"
             easing.type: Easing.InQuad
             duration: 250

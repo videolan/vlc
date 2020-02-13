@@ -120,6 +120,7 @@ Widgets.NavigableFocusScope {
             id: gridView
 
             delegateModel: delegateModelId
+            model: providerModel
 
             headerDelegate: Widgets.LabelSeparator {
                 width: view.width

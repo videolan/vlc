@@ -157,6 +157,7 @@ Widgets.NavigableFocusScope {
 
             activeFocusOnTab:true
             delegateModel: videosDelegate
+            model: videoModel
 
             headerDelegate: Widgets.LabelSeparator {
                 id: videosSeparator

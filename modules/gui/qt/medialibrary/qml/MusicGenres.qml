@@ -165,6 +165,7 @@ Widgets.NavigableFocusScope {
             id: gridView_id
 
             delegateModel: delegateModelId
+            model: genreModel
 
             headerDelegate: headerComponent
 

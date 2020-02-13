@@ -141,6 +141,7 @@ Widgets.NavigableFocusScope {
             headerDelegate: root.header
 
             delegateModel: delegateModelId
+            model: albumModelId
 
             delegate: AudioGridItem {
                 id: audioGridItem
