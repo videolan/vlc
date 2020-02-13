@@ -34,11 +34,10 @@ Item {
     property bool selected: false
 
     property string infoLeft: ""
-    property string resolution: ""
     property bool isVideo: false
     property bool isNew: false
     property double progress: 0
-    property string channel: ""
+    property var labels: []
     property real pictureWidth: isVideo ? VLCStyle.video_normal_width : VLCStyle.cover_small
     property real pictureHeight: isVideo ? VLCStyle.video_normal_height : VLCStyle.cover_small
 
@@ -64,6 +63,7 @@ Item {
     property bool _zoomed: mouseArea.containsMouse || root.activeFocus
     property real _picWidth: pictureWidth + (_zoomed ? 2*outterMargin : 0)
     property real _picHeight: pictureHeight + (_zoomed ? 2*outterMargin : 0)
+
 
     MouseArea {
         id: mouseArea
@@ -143,28 +143,30 @@ Item {
 
                     source: image
 
-                    VideoQualityLabel {
-                        id: resolutionLabel
-                        visible: root.resolution !== ""
+                    RowLayout {
                         anchors {
                             top: parent.top
                             left: parent.left
+                            right: parent.right
                             topMargin: VLCStyle.margin_xxsmall
                             leftMargin: VLCStyle.margin_xxsmall
+                            rightMargin: VLCStyle.margin_xxsmall
                         }
-                        text: root.resolution
-                    }
 
-                    VideoQualityLabel {
-                        anchors {
-                            top: parent.top
-                            left: resolutionLabel.right
-                            topMargin: VLCStyle.margin_xxsmall
-                            leftMargin: VLCStyle.margin_xxsmall
+                        spacing: VLCStyle.margin_xxsmall
+
+                        Repeater {
+                            model: labels
+                            VideoQualityLabel {
+                                Layout.preferredWidth: implicitWidth
+                                Layout.preferredHeight: implicitHeight
+                                text: modelData
+                            }
                         }
-                        visible: root.channel !== ""
-                        text: root.channel
-                        color: "limegreen"
+
+                        Item {
+                            Layout.fillWidth: true
+                        }
                     }
 
                     VideoProgressBar {
