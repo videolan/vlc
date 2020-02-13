@@ -43,6 +43,7 @@ namespace adaptive
                 virtual bool                    isLive() const = 0;
                 void                            setType(const std::string &);
                 void                            setMinBuffering( vlc_tick_t );
+                void                            setMaxBuffering( vlc_tick_t );
                 vlc_tick_t                      getMinBuffering() const;
                 vlc_tick_t                      getMaxBuffering() const;
                 virtual void                    debug() = 0;
@@ -77,6 +78,7 @@ namespace adaptive
                 std::string                         playlistUrl;
                 std::string                         type;
                 vlc_tick_t                          minBufferTime;
+                vlc_tick_t                          maxBufferTime;
                 bool                                b_needsUpdates;
         };
     }
