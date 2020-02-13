@@ -147,9 +147,6 @@ struct es_out_id_t
     /* Field for CC track from a master video */
     es_out_id_t *p_master;
 
-    /* ID for the meta data */
-    int         i_meta_id;
-
     struct vlc_list node;
 
     vlc_mouse_event mouse_event_cb;
@@ -1494,7 +1491,7 @@ static char *EsInfoCategoryName( es_out_id_t* es )
 {
     char *psz_category;
 
-    if( asprintf( &psz_category, _("Stream %d"), es->i_meta_id ) == -1 )
+    if( asprintf( &psz_category, _("Stream '%s'"), es->id.str_id ) == -1 )
         return NULL;
 
     return psz_category;
@@ -2016,7 +2013,6 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
 
     es_format_Init( &es->fmt_out, UNKNOWN_ES, 0 );
 
-    es->i_meta_id = p_sys->i_id++; /* always incremented */
     es->b_scrambled = false;
     es->b_forced = false;
     es->b_terminated = false;
@@ -3906,11 +3902,6 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
 
     if( unlikely( !p_cat ) )
         return;
-
-    /* Add information */
-    if( es->i_meta_id != es->fmt.i_id )
-        info_category_AddInfo( p_cat, _("Original ID"),
-                       "%d", es->fmt.i_id );
 
     const vlc_fourcc_t i_codec_fourcc = p_fmt_es->i_original_fourcc;
     const char *psz_codec_description =
