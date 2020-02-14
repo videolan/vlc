@@ -142,7 +142,6 @@ Widgets.NavigableFocusScope {
                     Layout.maximumHeight: height
                     Layout.fillWidth: true
 
-                    focus: true
                     model: root.tabModel
 
                     onItemClicked: {
@@ -170,6 +169,9 @@ Widgets.NavigableFocusScope {
 
                     Widgets.StackViewExt {
                         id: stackView
+
+                        focus: true
+
                         anchors {
                             top: parent.top
                             left: parent.left
