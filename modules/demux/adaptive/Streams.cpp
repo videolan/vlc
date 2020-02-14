@@ -463,7 +463,10 @@ AbstractStream::status AbstractStream::dequeue(vlc_tick_t nz_deadline, vlc_tick_
 std::string AbstractStream::getContentType()
 {
     if (currentChunk == NULL && !eof)
-        currentChunk = segmentTracker->getNextChunk(!fakeEsOut()->restarting(), connManager);
+    {
+        const bool b_restarting = fakeEsOut()->restarting();
+        currentChunk = segmentTracker->getNextChunk(!b_restarting, connManager);
+    }
     if(currentChunk)
         return currentChunk->getContentType();
     else
@@ -473,7 +476,10 @@ std::string AbstractStream::getContentType()
 block_t * AbstractStream::readNextBlock()
 {
     if (currentChunk == NULL && !eof)
-        currentChunk = segmentTracker->getNextChunk(!fakeEsOut()->restarting(), connManager);
+    {
+        const bool b_restarting = fakeEsOut()->restarting();
+        currentChunk = segmentTracker->getNextChunk(!b_restarting, connManager);
+    }
 
     if(discontinuity && demuxfirstchunk)
     {
