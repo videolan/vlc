@@ -45,15 +45,7 @@ ifeq ($(ARCH)-$(HAVE_WIN32),aarch64-1)
 HAVE_WIN64 := 1
 endif
 
-ifdef HAVE_CROSS_COMPILE
-need_pkg = 1
-else
-ifeq ($(findstring mingw32,$(BUILD)),mingw32)
-need_pkg = $(shell PKG_CONFIG_LIBDIR="${PKG_CONFIG_PATH}" $(PKG_CONFIG) $(1) || echo 1)
-else
 need_pkg = $(shell $(PKG_CONFIG) $(1) || echo 1)
-endif
-endif
 
 ifeq ($(findstring mingw32,$(BUILD)),mingw32)
 MSYS_BUILD := 1
@@ -114,6 +106,7 @@ else
 PKG_CONFIG_LIBDIR := /usr/$(HOST)/lib/pkgconfig:/usr/lib/$(HOST)/pkgconfig
 endif
 export PKG_CONFIG_LIBDIR
+need_pkg = $(shell PKG_CONFIG_LIBDIR=$(PKG_CONFIG_LIBDIR) $(PKG_CONFIG) $(1) || echo 1)
 endif
 
 endif
