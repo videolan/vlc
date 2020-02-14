@@ -85,20 +85,27 @@ Widgets.NavigableFocusScope {
 
     readonly property var pageModel: [
         {
+            listed: true,
             displayText: i18n.qtr("Video"),
             icon: VLCIcons.topbar_video,
             name: "video",
             url: "qrc:///medialibrary/VideoDisplay.qml"
         }, {
+            listed: true,
             displayText: i18n.qtr("Music"),
             icon: VLCIcons.topbar_music,
             name: "music",
             url: "qrc:///medialibrary/MusicDisplay.qml"
         }, {
+            listed: true,
             displayText: i18n.qtr("Network"),
             icon: VLCIcons.topbar_network,
             name: "network",
             url: "qrc:///network/NetworkDisplay.qml"
+        }, {
+            listed: false,
+            name: "mlsettings",
+            url: "qrc:///medialibrary/MLFoldersSettings.qml"
         }
     ]
 
@@ -106,6 +113,8 @@ Widgets.NavigableFocusScope {
         id: tabModelid
         Component.onCompleted: {
             pageModel.forEach(function(e) {
+                if (!e.listed)
+                    return
                 append({
                            displayText: e.displayText,
                            icon: e.icon,
