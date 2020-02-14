@@ -139,7 +139,6 @@ fi
 cd ../../
 
 export USE_FFMPEG=1
-export PKG_CONFIG_LIBDIR="$PWD/contrib/$TRIPLET/lib/pkgconfig"
 export PATH="$PWD/contrib/$TRIPLET/bin":"$PATH"
 
 if [ "$INTERACTIVE" = "yes" ]; then
@@ -190,6 +189,22 @@ if ! [ -e ${SCRIPT_PATH}/../../../configure ]; then
 fi
 
 info "Configuring VLC"
+if [ -z "$PKG_CONFIG" ]; then
+    if [ `unset PKG_CONFIG_LIBDIR; $TRIPLET-pkg-config --version 1>/dev/null 2>/dev/null || echo FAIL` = "FAIL" ]; then
+        # $TRIPLET-pkg-config DOESNT WORK
+        # on Debian it pretends it works to autoconf
+        export PKG_CONFIG="pkg-config"
+        if [ -z "$PKG_CONFIG_LIBDIR" ]; then
+            export PKG_CONFIG_LIBDIR="/usr/$TRIPLET/lib/pkgconfig:/usr/lib/$TRIPLET/pkgconfig"
+        else
+            export PKG_CONFIG_LIBDIR="$PKG_CONFIG_LIBDIR:/usr/$TRIPLET/lib/pkgconfig:/usr/lib/$TRIPLET/pkgconfig"
+        fi
+    else
+        # $TRIPLET-pkg-config WORKs
+        export PKG_CONFIG="pkg-config"
+    fi
+fi
+
 mkdir -p $SHORTARCH
 cd $SHORTARCH
 
