@@ -184,7 +184,10 @@ cd ../..
 
 info "Bootstrapping"
 
-${SCRIPT_PATH}/../../../bootstrap
+if ! [ -e ${SCRIPT_PATH}/../../../configure ]; then
+    echo "Bootstraping vlc"
+    ${SCRIPT_PATH}/../../../bootstrap
+fi
 
 info "Configuring VLC"
 mkdir -p $SHORTARCH
