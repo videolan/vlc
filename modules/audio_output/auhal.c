@@ -519,6 +519,7 @@ RebuildDeviceList(audio_output_t * p_aout, UInt32 *p_id_exists)
             continue;
         }
 
+        // Report back audio device in analog mode
         if (p_id_exists && i_id == i_id_exists)
             *p_id_exists = i_id;
 
@@ -540,6 +541,10 @@ RebuildDeviceList(audio_output_t * p_aout, UInt32 *p_id_exists)
             CFArrayAppendValue(currentListOfDevices, deviceNumber);
             CFRelease(deviceNumber);
             free(psz_encoded_name);
+
+            // Report back audio device in digital mode
+            if (p_id_exists && i_id == i_id_exists)
+                *p_id_exists = i_id;
         }
 
         // TODO: only register once for each device
