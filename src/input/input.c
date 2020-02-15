@@ -2171,6 +2171,8 @@ static bool Control( input_thread_t *p_input,
             demux_Control( priv->master->p_demux,
                            DEMUX_SET_SEEKPOINT, i_seekpoint );
             input_SendEventSeekpoint( p_input, i_title, i_seekpoint );
+            if( priv->i_slave > 0 )
+                SlaveSeek( p_input );
             break;
         }
 
