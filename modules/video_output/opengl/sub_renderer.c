@@ -147,7 +147,11 @@ static GLuint
 CreateProgram(vlc_object_t *obj, const opengl_vtable_t *vt)
 {
     static const char *const VERTEX_SHADER_SRC =
+#if defined(USE_OPENGL_ES2)
         "#version 100\n"
+#else
+        "#version 120\n"
+#endif
         "attribute vec2 vertex_pos;\n"
         "attribute vec2 tex_coords_in;\n"
         "varying vec2 tex_coords;\n"
@@ -157,8 +161,12 @@ CreateProgram(vlc_object_t *obj, const opengl_vtable_t *vt)
         "}\n";
 
     static const char *const FRAGMENT_SHADER_SRC =
+#if defined(USE_OPENGL_ES2)
         "#version 100\n"
         "precision mediump float;\n"
+#else
+        "#version 120\n"
+#endif
         "uniform sampler2D sampler;\n"
         "uniform float alpha;\n"
         "varying vec2 tex_coords;\n"
