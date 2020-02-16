@@ -122,7 +122,7 @@ int vlc_getaddrinfo (const char *node, unsigned port,
 #if defined (_WIN32) || defined (__OS2__) \
  || defined (__ANDROID__) || defined (__APPLE__) \
  || defined (__native_client__)
-#warning vlc_getaddr_info_i11e() not implemented!
+#warning vlc_getaddrinfo_i11e() not implemented!
 int vlc_getaddrinfo_i11e(const char *node, unsigned port,
                          const struct addrinfo *hints, struct addrinfo **res)
 {
