@@ -411,7 +411,8 @@ libvlccore_la_SOURCES += posix/timer.c
 else
 libvlccore_la_SOURCES += win32/timer.c
 endif
-else
+endif
+
 if HAVE_OS2
 libvlccore_la_SOURCES += \
 	os2/dirs.c \
@@ -423,7 +424,8 @@ libvlccore_la_SOURCES += \
 	os2/specific.c \
 	os2/rand.c \
 	os2/thread.c
-else
+endif
+
 if HAVE_NACL
 libvlccore_la_SOURCES += \
 	android/error.c \
@@ -433,12 +435,8 @@ libvlccore_la_SOURCES += \
 	posix/rand.c \
 	posix/specific.c \
 	posix/timer.c
-else
-libvlccore_la_SOURCES += \
-	posix/filesystem.c \
-	posix/plugin.c \
-	posix/rand.c \
-	posix/timer.c
+endif
+
 if HAVE_ANDROID
 libvlccore_la_SOURCES += \
 	android/error.c \
@@ -447,29 +445,20 @@ libvlccore_la_SOURCES += \
 	linux/cpu.c \
 	linux/dirs.c \
 	linux/thread.c
-else
-
-# All except OS2/WIN32/NACL/ANDROID
-libvlccore_la_SOURCES += posix/sort.c
+endif
 
 if HAVE_DARWIN
 libvlccore_la_SOURCES += \
 	darwin/error.c \
 	darwin/specific.c \
 	darwin/thread.c
-
 libvlccore_objc_la_SOURCES = \
 	darwin/dirs.m \
 	darwin/netconf.m
 noinst_LTLIBRARIES = libvlccore_objc.la
-else
-libvlccore_la_SOURCES += \
-	posix/dirs.c \
-	posix/error.c \
-	posix/netconf.c \
-	posix/picture.c \
-	posix/specific.c \
-	posix/thread.c
+endif
+
+if !HAVE_ANDROID
 if HAVE_LINUX
 libvlccore_la_SOURCES += \
 	linux/cpu.c \
@@ -477,6 +466,26 @@ libvlccore_la_SOURCES += \
 	linux/filesystem.c \
 	linux/thread.c
 endif
+endif
+
+if !HAVE_WIN32
+if !HAVE_OS2
+if !HAVE_NACL
+libvlccore_la_SOURCES += \
+	posix/filesystem.c \
+	posix/plugin.c \
+	posix/rand.c \
+	posix/timer.c
+if !HAVE_ANDROID
+libvlccore_la_SOURCES += posix/sort.c
+if !HAVE_DARWIN
+libvlccore_la_SOURCES += \
+	posix/dirs.c \
+	posix/error.c \
+	posix/netconf.c \
+	posix/picture.c \
+	posix/specific.c \
+	posix/thread.c
 if HAVE_LIBANL
 libvlccore_la_SOURCES += \
 	linux/getaddrinfo.c
