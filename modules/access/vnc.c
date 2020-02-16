@@ -114,6 +114,7 @@ vlc_module_end()
 typedef struct
 {
     vlc_thread_t thread;
+    vlc_sem_t closing;
 
     rfbClient* p_client;
     int i_framebuffersize;
@@ -343,21 +344,19 @@ static void *DemuxThread( void *p_data )
 
     for(;;)
     {
-        int cancel_state = vlc_savecancel();
         i_status = WaitForMessage( p_sys->p_client, p_sys->i_frame_interval );
-        vlc_restorecancel( cancel_state );
 
         /* Ensure we're not building frames too fast */
         /* as WaitForMessage takes only a maximum wait */
-        vlc_tick_wait( i_next_frame_date );
+        if( vlc_sem_timedwait( &p_sys->closing, i_next_frame_date ) == 0 )
+            break;
+
         i_next_frame_date += p_sys->i_frame_interval;
 
         if ( i_status > 0 )
         {
             p_sys->p_client->frameBuffer = p_sys->p_block->p_buffer;
-            cancel_state = vlc_savecancel();
             i_status = HandleRFBServerMessage( p_sys->p_client );
-            vlc_restorecancel( cancel_state );
             if ( ! i_status )
             {
                 msg_Warn( p_demux, "Cannot get announced data. Server closed ?" );
@@ -474,6 +473,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->i_starttime = vlc_tick_now();
+    vlc_sem_init( &p_sys->closing, 0 );
 
     if ( vlc_clone( &p_sys->thread, DemuxThread, p_demux, VLC_THREAD_PRIORITY_INPUT ) != VLC_SUCCESS )
     {
@@ -495,7 +495,7 @@ static void Close( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    vlc_cancel( p_sys->thread );
+    vlc_sem_post( &p_sys->closing );
     vlc_join( p_sys->thread, NULL );
 
     if ( p_sys->es )
