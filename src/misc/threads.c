@@ -30,6 +30,14 @@
 #include <vlc_common.h>
 #include "libvlc.h"
 
+/* <stdatomic.h> types cannot be used in the C++ view of <vlc_threads.h> */
+struct vlc_suuint { union { unsigned int value; }; };
+
+static_assert (sizeof (atomic_uint) <= sizeof (struct vlc_suuint),
+               "Size mismatch");
+static_assert (alignof (atomic_uint) <= alignof (struct vlc_suuint),
+               "Alignment mismatch");
+
 /*** Global locks ***/
 
 void vlc_global_mutex (unsigned n, bool acquire)
@@ -198,15 +206,8 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 #endif
 
 #ifdef LIBVLC_NEED_CONDVAR
-#include <stdalign.h>
-
 void vlc_cond_init(vlc_cond_t *cond)
 {
-    /* Don't use C++ atomic types in vlc_threads.h for the C atomic storage */
-    static_assert (sizeof (cond->cpp_value) <= sizeof (cond->value),
-                   "Size mismatch!");
-    static_assert ((alignof (cond->cpp_value) % alignof (cond->value)) == 0,
-                   "Alignment mismatch");
     /* Initial value is irrelevant but set it for happy debuggers */
     atomic_init(&cond->value, 0);
 }
