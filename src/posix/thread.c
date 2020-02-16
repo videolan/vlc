@@ -226,50 +226,6 @@ int vlc_cond_timedwait_daytime (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     return val;
 }
 
-void vlc_sem_init (vlc_sem_t *sem, unsigned value)
-{
-    if (unlikely(sem_init (sem, 0, value)))
-        abort ();
-}
-
-void vlc_sem_destroy (vlc_sem_t *sem)
-{
-    int val;
-
-    if (likely(sem_destroy (sem) == 0))
-        return;
-
-    val = errno;
-
-    VLC_THREAD_ASSERT ("destroying semaphore");
-}
-
-int vlc_sem_post (vlc_sem_t *sem)
-{
-    int val;
-
-    if (likely(sem_post (sem) == 0))
-        return 0;
-
-    val = errno;
-
-    if (unlikely(val != EOVERFLOW))
-        VLC_THREAD_ASSERT ("unlocking semaphore");
-    return val;
-}
-
-void vlc_sem_wait (vlc_sem_t *sem)
-{
-    int val;
-
-    do
-        if (likely(sem_wait (sem) == 0))
-            return;
-    while ((val = errno) == EINTR);
-
-    VLC_THREAD_ASSERT ("locking semaphore");
-}
-
 void vlc_rwlock_init (vlc_rwlock_t *lock)
 {
     if (unlikely(pthread_rwlock_init (lock, NULL)))

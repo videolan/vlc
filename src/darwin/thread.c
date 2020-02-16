@@ -312,51 +312,6 @@ int vlc_cond_timedwait_daytime (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 }
 
 
-/* Initialize a semaphore. */
-void vlc_sem_init (vlc_sem_t *sem, unsigned value)
-{
-    if (unlikely(semaphore_create(mach_task_self(), sem, SYNC_POLICY_FIFO, value) != KERN_SUCCESS))
-        abort ();
-}
-
-void vlc_sem_destroy (vlc_sem_t *sem)
-{
-    int val;
-
-    if (likely(semaphore_destroy(mach_task_self(), *sem) == KERN_SUCCESS))
-        return;
-
-    val = EINVAL;
-
-    VLC_THREAD_ASSERT ("destroying semaphore");
-}
-
-int vlc_sem_post (vlc_sem_t *sem)
-{
-    int val;
-
-    if (likely(semaphore_signal(*sem) == KERN_SUCCESS))
-        return 0;
-
-    val = EINVAL;
-
-    if (unlikely(val != EOVERFLOW))
-        VLC_THREAD_ASSERT ("unlocking semaphore");
-    return val;
-}
-
-void vlc_sem_wait (vlc_sem_t *sem)
-{
-    int val;
-
-    if (likely(semaphore_wait(*sem) == KERN_SUCCESS))
-        return;
-
-    val = EINVAL;
-
-    VLC_THREAD_ASSERT ("locking semaphore");
-}
-
 void vlc_rwlock_init (vlc_rwlock_t *lock)
 {
     if (unlikely(pthread_rwlock_init (lock, NULL)))

@@ -153,7 +153,6 @@ bool vlc_mutex_marked(const vlc_mutex_t *mutex)
 #if defined (_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WIN8)
 /* Cannot define OS version-dependent stuff in public headers */
 # undef LIBVLC_NEED_SLEEP
-# undef LIBVLC_NEED_SEMAPHORE
 #endif
 
 #if defined(LIBVLC_NEED_SLEEP) || defined(LIBVLC_NEED_CONDVAR)
@@ -397,7 +396,6 @@ void vlc_rwlock_unlock (vlc_rwlock_t *lock)
 }
 #endif /* LIBVLC_NEED_RWLOCK */
 
-#ifdef LIBVLC_NEED_SEMAPHORE
 /*** Generic semaphores ***/
 
 void vlc_sem_init (vlc_sem_t *sem, unsigned value)
@@ -441,4 +439,3 @@ void vlc_sem_wait (vlc_sem_t *sem)
         }
     }
 }
-#endif /* LIBVLC_NEED_SEMAPHORE */

@@ -70,7 +70,6 @@ typedef struct
 } vlc_mutex_t;
 #define VLC_STATIC_MUTEX { false, { { false, 0 } } }
 #define LIBVLC_NEED_CONDVAR
-#define LIBVLC_NEED_SEMAPHORE
 #define LIBVLC_NEED_RWLOCK
 typedef INIT_ONCE vlc_once_t;
 #define VLC_STATIC_ONCE INIT_ONCE_STATIC_INIT
@@ -123,7 +122,6 @@ typedef struct
     unsigned signaled;
 } vlc_cond_t;
 #define VLC_STATIC_COND { NULLHANDLE, 0, NULLHANDLE, 0 }
-#define LIBVLC_NEED_SEMAPHORE
 #define LIBVLC_NEED_RWLOCK
 typedef struct
 {
@@ -172,7 +170,6 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 # define LIBVLC_USE_PTHREAD_CLEANUP   1
 # define LIBVLC_NEED_SLEEP
 # define LIBVLC_NEED_CONDVAR
-# define LIBVLC_NEED_SEMAPHORE
 # define LIBVLC_NEED_RWLOCK
 
 typedef struct vlc_thread *vlc_thread_t;
@@ -226,7 +223,6 @@ typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
 typedef pthread_cond_t vlc_cond_t;
 #define VLC_STATIC_COND PTHREAD_COND_INITIALIZER
-typedef semaphore_t     vlc_sem_t;
 typedef pthread_rwlock_t vlc_rwlock_t;
 #define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
 typedef pthread_once_t  vlc_once_t;
@@ -244,7 +240,6 @@ typedef struct vlc_timer *vlc_timer_t;
 #else /* POSIX threads */
 # include <unistd.h> /* _POSIX_SPIN_LOCKS */
 # include <pthread.h>
-# include <semaphore.h>
 
 /**
  * Whether LibVLC threads are based on POSIX threads.
@@ -298,13 +293,6 @@ typedef pthread_cond_t  vlc_cond_t;
  * initializer.
  */
 #define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
-
-/**
- * Semaphore.
- *
- * Storage space for a thread-safe semaphore.
- */
-typedef sem_t           vlc_sem_t;
 
 /**
  * Read/write lock.
@@ -367,7 +355,6 @@ typedef struct
 # define VLC_STATIC_COND { 0 }
 #endif
 
-#ifdef LIBVLC_NEED_SEMAPHORE
 typedef struct vlc_sem
 {
     union {
@@ -377,7 +364,6 @@ typedef struct vlc_sem
         int dummy;
    };
 } vlc_sem_t;
-#endif
 
 #ifdef LIBVLC_NEED_RWLOCK
 typedef struct vlc_rwlock
