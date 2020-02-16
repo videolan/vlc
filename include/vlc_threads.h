@@ -350,11 +350,11 @@ typedef struct vlc_timer *vlc_timer_t;
 
 #endif
 
-#ifdef LIBVLC_NEED_CONDVAR
 #ifndef __cplusplus
 #include <stdatomic.h>
 #endif
 
+#ifdef LIBVLC_NEED_CONDVAR
 typedef struct
 {
     union {
@@ -370,9 +370,12 @@ typedef struct
 #ifdef LIBVLC_NEED_SEMAPHORE
 typedef struct vlc_sem
 {
-    vlc_mutex_t lock;
-    vlc_cond_t  wait;
-    unsigned    value;
+    union {
+#ifndef __cplusplus
+        atomic_uint value;
+#endif
+        int dummy;
+   };
 } vlc_sem_t;
 #endif
 

@@ -24,6 +24,8 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
+#include <stdatomic.h>
 
 #include <vlc_common.h>
 #include "libvlc.h"
@@ -396,45 +398,46 @@ void vlc_rwlock_unlock (vlc_rwlock_t *lock)
 
 #ifdef LIBVLC_NEED_SEMAPHORE
 /*** Generic semaphores ***/
-#include <limits.h>
-#include <errno.h>
 
 void vlc_sem_init (vlc_sem_t *sem, unsigned value)
 {
-    vlc_mutex_init (&sem->lock);
-    vlc_cond_init (&sem->wait);
-    sem->value = value;
+    atomic_init(&sem->value, value);
 }
 
 void vlc_sem_destroy (vlc_sem_t *sem)
 {
-    vlc_cond_destroy (&sem->wait);
-    vlc_mutex_destroy (&sem->lock);
+    (void) sem;
 }
 
 int vlc_sem_post (vlc_sem_t *sem)
 {
-    int ret = 0;
+    unsigned exp = atomic_load_explicit(&sem->value, memory_order_relaxed);
 
-    vlc_mutex_lock (&sem->lock);
-    if (likely(sem->value != UINT_MAX))
-        sem->value++;
-    else
-        ret = EOVERFLOW;
-    vlc_mutex_unlock (&sem->lock);
-    vlc_cond_signal (&sem->wait);
+    do
+    {
+        if (unlikely(exp == UINT_MAX))
+           return EOVERFLOW;
+    } while (!atomic_compare_exchange_weak_explicit(&sem->value, &exp, exp + 1,
+                                                    memory_order_release,
+                                                    memory_order_relaxed));
 
-    return ret;
+    vlc_atomic_notify_one(&sem->value);
+    return 0;
 }
 
 void vlc_sem_wait (vlc_sem_t *sem)
 {
-    vlc_mutex_lock (&sem->lock);
-    mutex_cleanup_push (&sem->lock);
-    while (!sem->value)
-        vlc_cond_wait (&sem->wait, &sem->lock);
-    sem->value--;
-    vlc_cleanup_pop ();
-    vlc_mutex_unlock (&sem->lock);
+    unsigned exp = 1;
+
+    while (!atomic_compare_exchange_weak_explicit(&sem->value, &exp, exp - 1,
+                                                  memory_order_acquire,
+                                                  memory_order_relaxed))
+    {
+        if (likely(exp == 0))
+        {
+            vlc_atomic_wait(&sem->value, 0);
+            exp = 1;
+        }
+    }
 }
 #endif /* LIBVLC_NEED_SEMAPHORE */
