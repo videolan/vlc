@@ -33,7 +33,6 @@
 
 #include <errno.h>
 #include <assert.h>
-#include <stdnoreturn.h>
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -1585,22 +1584,17 @@ static int mms_HeaderMediaRead( stream_t *p_access, int i_type )
     return -1;
 }
 
-noreturn static void *KeepAliveThread( void *p_data )
+static void *KeepAliveThread( void *p_data )
 {
     stream_t *p_access = p_data;
+    access_sys_t *p_sys = p_access->p_sys;
 
-    for( ;; )
-    {
-        /* Send keep-alive every ten seconds */
-        int canc = vlc_savecancel();
-
+    do  /* Send keep-alive every ten seconds */
         mms_CommandSend( p_access, 0x1b, 0, 0, NULL, 0 );
+    while (vlc_sem_timedwait( &p_sys->keep_alive.sem,
+                              vlc_tick_now() + VLC_TICK_FROM_SEC(10) ));
 
-        vlc_restorecancel( canc );
-
-        vlc_tick_sleep( VLC_TICK_FROM_SEC(10) );
-    }
-    vlc_assert_unreachable();
+    return NULL;
 }
 
 static void KeepAliveStart( stream_t *p_access )
@@ -1609,7 +1603,8 @@ static void KeepAliveStart( stream_t *p_access )
     if( p_sys->b_keep_alive )
         return;
 
-    p_sys->b_keep_alive = !vlc_clone( &p_sys->keep_alive,
+    vlc_sem_init( &p_sys->keep_alive.sem, 0 );
+    p_sys->b_keep_alive = !vlc_clone( &p_sys->keep_alive.thread,
                                       KeepAliveThread, p_access,
                                       VLC_THREAD_PRIORITY_LOW );
 }
@@ -1620,7 +1615,7 @@ static void KeepAliveStop( stream_t *p_access )
     if( !p_sys->b_keep_alive )
         return;
 
-    vlc_cancel( p_sys->keep_alive );
-    vlc_join( p_sys->keep_alive, NULL );
+    vlc_sem_post( &p_sys->keep_alive.sem );
+    vlc_join( p_sys->keep_alive.thread, NULL );
     p_sys->b_keep_alive = false;
 }

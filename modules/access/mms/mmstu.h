@@ -92,7 +92,10 @@ typedef struct
 
     vlc_mutex_t  lock_netwrite;
     bool         b_keep_alive;
-    vlc_thread_t keep_alive;
+    struct {
+         vlc_thread_t thread;
+         vlc_sem_t    sem;
+    } keep_alive;
 } access_sys_t;
 
 #endif
