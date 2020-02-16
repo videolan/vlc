@@ -60,6 +60,7 @@ struct libvlc_media_list_player_t
     libvlc_event_manager_t      event_manager;
     int                         i_refcount;
     int                         seek_offset;
+    bool                        dead;
     /* Protect access to this structure. */
     vlc_mutex_t                 object_lock;
     /* Protect access to this structure and from callback execution. */
@@ -324,23 +325,19 @@ static void *playlist_thread(void *data)
     libvlc_media_list_player_t *mlp = data;
 
     vlc_mutex_lock(&mlp->mp_callback_lock);
-    mutex_cleanup_push(&mlp->mp_callback_lock);
 
-    for (;;)
+    while (!mlp->dead)
     {
-        int canc;
-
-        while (mlp->seek_offset == 0)
-            vlc_cond_wait(&mlp->seek_pending, &mlp->mp_callback_lock);
-
-        canc = vlc_savecancel();
-        set_relative_playlist_position_and_play(mlp, mlp->seek_offset);
-        mlp->seek_offset = 0;
-        vlc_restorecancel(canc);
+        if (mlp->seek_offset != 0)
+        {
+            set_relative_playlist_position_and_play(mlp, mlp->seek_offset);
+            mlp->seek_offset = 0;
+        }
+        vlc_cond_wait(&mlp->seek_pending, &mlp->mp_callback_lock);
     }
 
-    vlc_cleanup_pop();
-    vlc_assert_unreachable();
+    vlc_mutex_unlock(&mlp->mp_callback_lock);
+    return NULL;
 }
 
 /**************************************************************************
@@ -478,6 +475,7 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
 
     p_mlp->i_refcount = 1;
     p_mlp->seek_offset = 0;
+    p_mlp->dead = false;
     vlc_mutex_init(&p_mlp->object_lock);
     vlc_mutex_init(&p_mlp->mp_callback_lock);
     vlc_cond_init(&p_mlp->seek_pending);
@@ -524,7 +522,10 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
     assert(p_mlp->i_refcount == 0);
     unlock(p_mlp);
 
-    vlc_cancel(p_mlp->thread);
+    vlc_mutex_lock(&p_mlp->mp_callback_lock);
+    p_mlp->dead = true;
+    vlc_cond_signal(&p_mlp->seek_pending);
+    vlc_mutex_unlock(&p_mlp->mp_callback_lock);
     vlc_join(p_mlp->thread, NULL);
 
     lock(p_mlp);
