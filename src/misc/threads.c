@@ -434,3 +434,28 @@ void vlc_sem_wait (vlc_sem_t *sem)
         }
     }
 }
+
+int vlc_sem_timedwait(vlc_sem_t *sem, vlc_tick_t deadline)
+{
+    unsigned exp = 1;
+
+    while (!atomic_compare_exchange_weak_explicit(&sem->value, &exp, exp - 1,
+                                                  memory_order_acquire,
+                                                  memory_order_relaxed))
+    {
+        if (likely(exp == 0))
+        {
+            vlc_tick_t delay = deadline - vlc_tick_now();
+
+            if (delay < 0)
+                delay = 0;
+
+            if (!vlc_atomic_timedwait(&sem->value, 0, delay))
+                return ETIMEDOUT;
+
+            exp = 1;
+        }
+    }
+
+    return 0;
+}

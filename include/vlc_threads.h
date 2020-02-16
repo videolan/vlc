@@ -590,6 +590,20 @@ VLC_API int vlc_sem_post(vlc_sem_t *);
 VLC_API void vlc_sem_wait(vlc_sem_t *);
 
 /**
+ * Waits on a semaphore within a dealine.
+ *
+ * This function waits for the semaphore just like vlc_sem_wait(), but only
+ * up to a given deadline.
+ *
+ * \param sem semaphore to wait for
+ * \param deadline deadline to wait until
+ *
+ * \retval 0 the semaphore was decremented
+ * \retval ETIMEDOUT the deadline was reached
+ */
+VLC_API int vlc_sem_timedwait(vlc_sem_t *sem, vlc_tick_t deadline) VLC_USED;
+
+/**
  * Initializes a read/write lock.
  */
 VLC_API void vlc_rwlock_init(vlc_rwlock_t *);
