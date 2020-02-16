@@ -437,16 +437,6 @@ libvlccore_la_SOURCES += \
 	posix/timer.c
 endif
 
-if HAVE_ANDROID
-libvlccore_la_SOURCES += \
-	android/error.c \
-	android/specific.c \
-	android/thread.c \
-	linux/cpu.c \
-	linux/dirs.c \
-	linux/thread.c
-endif
-
 if HAVE_DARWIN
 libvlccore_la_SOURCES += \
 	darwin/error.c \
@@ -458,13 +448,19 @@ libvlccore_objc_la_SOURCES = \
 noinst_LTLIBRARIES = libvlccore_objc.la
 endif
 
-if !HAVE_ANDROID
 if HAVE_LINUX
 libvlccore_la_SOURCES += \
 	linux/cpu.c \
 	linux/dirs.c \
-	linux/filesystem.c \
 	linux/thread.c
+if !HAVE_ANDROID
+libvlccore_la_SOURCES += \
+	linux/filesystem.c
+else
+libvlccore_la_SOURCES += \
+	android/error.c \
+	android/specific.c \
+	android/thread.c
 endif
 endif
 
