@@ -470,7 +470,6 @@ static void Close(vout_window_t *wnd)
     if (sys->hwnd)
         PostMessage( sys->hwnd, WM_CLOSE, 0, 0 );
     vlc_join(sys->thread, NULL);
-    vlc_sem_destroy( &sys->ready );
     free(atomic_load(&sys->pwz_title));
 
     HINSTANCE hInstance = GetModuleHandle(NULL);

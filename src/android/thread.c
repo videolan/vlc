@@ -259,7 +259,6 @@ int vlc_clone (vlc_thread_t *th, void *(*entry) (void *), void *data,
 void vlc_join (vlc_thread_t handle, void **result)
 {
     vlc_sem_wait (&handle->finished);
-    vlc_sem_destroy (&handle->finished);
 
     int val = pthread_join (handle->thread, result);
     VLC_THREAD_ASSERT ("joining thread");

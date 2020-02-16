@@ -116,7 +116,6 @@ static void test_media_preparsed(libvlc_instance_t *vlc, const char *path,
 
     // Wait for preparsed event
     vlc_sem_wait (&sem);
-    vlc_sem_destroy (&sem);
 
     // We are good, now check Elementary Stream info.
     assert (libvlc_media_get_parsed_status(media) == i_expected_status);
@@ -173,7 +172,6 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
     vlc_sem_wait(&sem);
 
     input_item_Release(p_item);
-    vlc_sem_destroy(&sem);
     vlc_close(p_pipe[0]);
     vlc_close(p_pipe[1]);
 }
@@ -266,8 +264,6 @@ static void test_media_subitems_media(libvlc_media_t *media, bool play,
         assert(i_ret == 0);
         vlc_sem_wait (&sem);
     }
-
-    vlc_sem_destroy (&sem);
 
     if (!b_items_expected)
         return;

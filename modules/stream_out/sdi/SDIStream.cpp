@@ -112,7 +112,6 @@ PictureStreamOutputBuffer::PictureStreamOutputBuffer()
 
 PictureStreamOutputBuffer::~PictureStreamOutputBuffer()
 {
-    vlc_sem_destroy(&pool_semaphore);
 }
 
 void * PictureStreamOutputBuffer::Dequeue()

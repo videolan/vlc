@@ -403,11 +403,6 @@ void vlc_sem_init (vlc_sem_t *sem, unsigned value)
     atomic_init(&sem->value, value);
 }
 
-void vlc_sem_destroy (vlc_sem_t *sem)
-{
-    (void) sem;
-}
-
 int vlc_sem_post (vlc_sem_t *sem)
 {
     unsigned exp = atomic_load_explicit(&sem->value, memory_order_relaxed);

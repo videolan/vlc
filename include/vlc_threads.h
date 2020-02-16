@@ -570,11 +570,6 @@ int vlc_cond_timedwait_daytime(vlc_cond_t *, vlc_mutex_t *, time_t);
 VLC_API void vlc_sem_init(vlc_sem_t *, unsigned count);
 
 /**
- * Deinitializes a semaphore.
- */
-VLC_API void vlc_sem_destroy(vlc_sem_t *);
-
-/**
  * Increments the value of a semaphore.
  *
  * \note This function is not a cancellation point.

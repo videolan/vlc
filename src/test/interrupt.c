@@ -207,6 +207,5 @@ int main (void)
 
     vlc_close(fds[1]);
     vlc_close(fds[0]);
-    vlc_sem_destroy(&sem);
     return 0;
 }

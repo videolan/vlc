@@ -134,7 +134,6 @@ ca_Close(audio_output_t *p_aout)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
-    vlc_sem_destroy(&p_sys->flush_sem);
     lock_destroy(p_sys);
 }
 

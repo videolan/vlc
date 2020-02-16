@@ -48,8 +48,6 @@ media_parse_sync(libvlc_media_t *p_m)
     vlc_sem_wait (&sem);
 
     libvlc_event_detach(p_em, libvlc_MediaParsedChanged, finished_event, &sem);
-
-    vlc_sem_destroy (&sem);
 }
 
 static char *

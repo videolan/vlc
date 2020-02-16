@@ -47,8 +47,6 @@ static void play_and_wait(libvlc_media_player_t *mp)
     vlc_sem_wait(&sem);
 
     libvlc_event_detach(em, libvlc_MediaPlayerPlaying, on_event, &sem);
-
-    vlc_sem_destroy(&sem);
 }
 
 static void pause_and_wait(libvlc_media_player_t *mp)
@@ -73,7 +71,6 @@ static void pause_and_wait(libvlc_media_player_t *mp)
         vlc_sem_wait(&sem);
     }
 
-    vlc_sem_destroy(&sem);
     libvlc_event_detach(em, libvlc_MediaPlayerPaused, on_event, &sem);
     libvlc_event_detach(em, libvlc_MediaPlayerEndReached, on_event, &sem);
 }

@@ -134,7 +134,6 @@ int main(void)
     out = vlc_h2_output_create(&fake_tls, expect_hello = true);
     assert(out != NULL);
     vlc_h2_output_destroy(out);
-    vlc_sem_destroy(&rx);
 
     /* Success */
     vlc_sem_init(&rx, 0);
@@ -156,7 +155,6 @@ int main(void)
     assert(vlc_h2_output_send(out, frame(9)) == 0);
 
     vlc_h2_output_destroy(out);
-    vlc_sem_destroy(&rx);
 
     /* Failure */
     send_failure = true;
@@ -172,7 +170,6 @@ int main(void)
     assert(vlc_h2_output_send(out, frame(0)) == -1);
     assert(vlc_h2_output_send_prio(out, frame(0)) == -1);
     vlc_h2_output_destroy(out);
-    vlc_sem_destroy(&rx);
 
     /* Failure during hello */
     vlc_sem_init(&rx, 0);
@@ -186,7 +183,6 @@ int main(void)
     assert(vlc_h2_output_send(out, frame(0)) == -1);
     assert(vlc_h2_output_send_prio(out, frame(0)) == -1);
     vlc_h2_output_destroy(out);
-    vlc_sem_destroy(&rx);
 
     return 0;
 }

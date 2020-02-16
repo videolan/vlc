@@ -78,8 +78,6 @@ static inline bool vlc_mta_acquire( vlc_object_t *p_parent )
         p_mta->i_refcount = 1;
         if ( vlc_clone( &p_mta->thread, MtaMainLoop, p_mta, VLC_THREAD_PRIORITY_LOW ) )
         {
-            vlc_sem_destroy( &p_mta->release_sem );
-            vlc_sem_destroy( &p_mta->ready_sem );
             free( p_mta );
             p_mta = NULL;
             vlc_global_unlock( VLC_MTA_MUTEX );
@@ -116,8 +114,6 @@ static inline void vlc_mta_release( vlc_object_t* p_parent )
 
         vlc_join( p_mta->thread, NULL );
 
-        vlc_sem_destroy( &p_mta->release_sem );
-        vlc_sem_destroy( &p_mta->ready_sem );
         free( p_mta );
     }
 }

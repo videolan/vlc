@@ -127,7 +127,6 @@ static void vlc_vidsplit_Close(vout_display_t *vd)
 
         vout_window_Disable(part->window);
         vout_window_Delete(part->window);
-        vlc_sem_destroy(&part->lock);
     }
 
     module_unneed(&sys->splitter, sys->splitter.p_module);
@@ -295,7 +294,6 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
         if (display == NULL) {
             vout_window_Disable(part->window);
             vout_window_Delete(part->window);
-            vlc_sem_destroy(&part->lock);
             splitter->i_output = i;
             vlc_vidsplit_Close(vd);
             return VLC_EGENERIC;

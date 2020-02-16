@@ -313,7 +313,6 @@ Open(vlc_object_t *p_this)
         vlc_sem_wait_i11e(&watch_data.sem);
 
         g_bus_unwatch_name(i_id);
-        vlc_sem_destroy(&watch_data.sem);
 
         if (!watch_data.b_running)
             return VLC_EGENERIC;

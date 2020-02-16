@@ -76,16 +76,12 @@ int vlc_getaddrinfo_i11e(const char *name, unsigned port,
     vlc_sem_init(&req.done, 0);
 
     if (vlc_clone(&th, vlc_gai_thread, &req, VLC_THREAD_PRIORITY_LOW))
-    {
-        vlc_sem_destroy(&req.done);
         return EAI_SYSTEM;
-    }
 
     vlc_sem_wait_i11e(&req.done);
 
     vlc_cancel(th);
     vlc_join(th, NULL);
-    vlc_sem_destroy(&req.done);
 
     return req.error;
 }

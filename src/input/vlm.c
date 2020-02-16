@@ -684,7 +684,6 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 }
                 vlc_player_Unlock(player);
                 vlc_player_Delete(player);
-                vlc_sem_destroy( &sem_preparse );
 
             }
 

@@ -376,7 +376,6 @@ public:
     }
     ~semaphore()
     {
-        vlc_sem_destroy( &m_sem );
     }
 
     semaphore( const semaphore& ) = delete;
