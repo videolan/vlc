@@ -472,6 +472,9 @@ libvlccore_la_SOURCES += \
 	posix/plugin.c \
 	posix/rand.c \
 	posix/timer.c
+if !HAVE_LINUX
+libvlccore_la_SOURCES += posix/wait.c
+endif
 if !HAVE_ANDROID
 libvlccore_la_SOURCES += posix/sort.c
 if !HAVE_DARWIN
