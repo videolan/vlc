@@ -1117,6 +1117,7 @@ bool matroska_segment_c::ESCreate()
             track.p_es = NULL;
             continue;
         }
+        track.fmt.i_id = static_cast<int>( track_id );
 
         if( !track.p_es )
         {
