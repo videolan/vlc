@@ -30,6 +30,7 @@ enum Role {
     VIDEO_RESOLUTION,
     VIDEO_CHANNEL,
     VIDEO_MRL,
+    VIDEO_DISPLAY_MRL,
     VIDEO_VIDEO_TRACK,
     VIDEO_AUDIO_TRACK,
 
@@ -75,6 +76,8 @@ QVariant MLVideoModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue( video->getChannel() );
         case VIDEO_MRL:
             return QVariant::fromValue( video->getMRL() );
+        case VIDEO_DISPLAY_MRL:
+            return QVariant::fromValue( video->getDisplayMRL() );
         case VIDEO_VIDEO_TRACK:
             return QVariant::fromValue( video->getVideoDesc() );
         case VIDEO_AUDIO_TRACK:
@@ -99,6 +102,7 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
         { VIDEO_RESOLUTION, "resolution_name" },
         { VIDEO_CHANNEL, "channel" },
         { VIDEO_MRL, "mrl" },
+        { VIDEO_DISPLAY_MRL, "display_mrl" },
         { VIDEO_AUDIO_TRACK, "audioDesc" },
         { VIDEO_VIDEO_TRACK, "videoDesc" },
         { VIDEO_TITLE_FIRST_SYMBOL, "title_first_symbol"},

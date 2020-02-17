@@ -195,7 +195,7 @@ Widgets.NavigableFocusScope {
                             spacing: VLCStyle.margin_xsmall
                             model: [
                                 {text: i18n.qtr("File Name"),    data: expandRect.model.title, bold: true},
-                                {text: i18n.qtr("Path"),         data: expandRect.model.mrl},
+                                {text: i18n.qtr("Path"),         data: expandRect.model.display_mrl},
                                 {text: i18n.qtr("Length"),       data: expandRect.model.duration},
                                 {text: i18n.qtr("File size"),    data: ""},
                                 {text: i18n.qtr("Times played"), data: expandRect.model.playcount},

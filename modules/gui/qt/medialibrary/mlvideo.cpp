@@ -68,7 +68,7 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
         if( file.i_type == VLC_ML_FILE_TYPE_MAIN )
         {
             //FIXME should we store every mrl
-            m_mrl = QString::fromUtf8(file.psz_mrl);
+            m_mrl = QUrl::fromEncoded(file.psz_mrl);
             break;
         }
     char *psz_progress;
@@ -183,8 +183,14 @@ QString MLVideo::getDuration() const
 
 QString MLVideo::getMRL() const
 {
-    return m_mrl;
+    return m_mrl.toEncoded();
 }
+
+QString MLVideo::getDisplayMRL() const
+{
+    return m_mrl.toString(QUrl::PrettyDecoded | QUrl::RemoveUserInfo | QUrl::PreferLocalFile | QUrl::NormalizePathSegments);
+}
+
 QString MLVideo::getResolutionName() const
 {
     return m_resolution;

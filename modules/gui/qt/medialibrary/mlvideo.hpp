@@ -41,6 +41,7 @@ class MLVideo : public QObject
     Q_PROPERTY(QString thumbnail READ getThumbnail NOTIFY onThumbnailChanged);
     Q_PROPERTY(QString duration READ getDuration CONSTANT);
     Q_PROPERTY(QString mrl READ getMRL CONSTANT);
+    Q_PROPERTY(QString displayMrl READ getDisplayMRL CONSTANT)
     Q_PROPERTY(float progress READ getProgress CONSTANT);
     Q_PROPERTY(unsigned int playCount READ getPlayCount CONSTANT);
     Q_PROPERTY(QString resolution_name READ getResolutionName CONSTANT);
@@ -59,6 +60,7 @@ public:
     QString getResolutionName() const;
     QString getChannel() const;
     QString getMRL() const;
+    QString getDisplayMRL() const;
     float getProgress() const;
     unsigned int getPlayCount() const;
     QString getProgressTime() const;
@@ -82,7 +84,7 @@ private:
     QString m_title;
     QString m_thumbnail;
     int64_t m_duration;
-    QString m_mrl;
+    QUrl m_mrl;
     QString m_resolution;
     QString m_channel;
     float m_progress;
