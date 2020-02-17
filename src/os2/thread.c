@@ -674,9 +674,9 @@ int vlc_set_priority (vlc_thread_t th, int priority)
     return VLC_SUCCESS;
 }
 
-vlc_thread_t vlc_thread_self (void)
+unsigned long vlc_thread_self(void)
 {
-    return vlc_threadvar_get (thread_key);
+    return vlc_thread_id();
 }
 
 unsigned long vlc_thread_id (void)

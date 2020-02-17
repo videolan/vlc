@@ -439,10 +439,9 @@ int vlc_clone_detach (vlc_thread_t *th, void *(*entry) (void *), void *data,
     return vlc_clone_attr (th, &attr, entry, data, priority);
 }
 
-vlc_thread_t vlc_thread_self (void)
+pthread_t vlc_thread_self(void)
 {
-    vlc_thread_t thread = { pthread_self() };
-    return thread;
+    return pthread_self();
 }
 
 VLC_WEAK unsigned long vlc_thread_id(void)
