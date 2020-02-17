@@ -34,5 +34,10 @@ Widgets.GridItem {
     progress: model.progress > 0 ? model.progress : 0
     pictureWidth: VLCStyle.video_normal_width
     pictureHeight: VLCStyle.video_normal_height
-    onItemDoubleClicked: if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
+    onItemDoubleClicked: {
+        if ( model.id !== undefined ) {
+            medialib.addAndPlay( model.id )
+            history.push(["player"])
+        }
+    }
 }

@@ -82,7 +82,10 @@ Widgets.NavigableFocusScope {
         Widgets.MenuItemExt {
             id: playMenuItem
             text: "Play from start"
-            onTriggered: medialib.addAndPlay( contextMenu.model.id )
+            onTriggered: {
+                medialib.addAndPlay( contextMenu.model.id )
+                history.push(["player"])
+            }
         }
         Widgets.MenuItemExt {
             text: "Play all"
@@ -140,6 +143,7 @@ Widgets.NavigableFocusScope {
             for (var i = 0; i < videosDelegate.selectedGroup.count; i++)
                 list.push(videosDelegate.selectedGroup.get(i).model.id)
             medialib.addAndPlay( list )
+            history.push(["player"])
         }
     }
 
