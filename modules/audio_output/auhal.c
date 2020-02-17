@@ -1754,6 +1754,11 @@ static int Open(vlc_object_t *obj)
     {
         int dev_id_int = atoi(psz_audio_device);
         UInt32 dev_id = dev_id_int < 0 ? 0 : dev_id_int;
+
+        bool isDigital = (dev_id & AOUT_VAR_SPDIF_FLAG) != 0;
+        msg_Dbg(obj, "Trying to use stored audio device %d (%s)",
+                (dev_id & ~AOUT_VAR_SPDIF_FLAG), isDigital ? "digital" : "analog");
+
         RebuildDeviceList(p_aout, &dev_id);
         p_sys->i_new_selected_dev = dev_id;
         free(psz_audio_device);
