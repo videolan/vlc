@@ -799,17 +799,17 @@ void vlc_atomic_wait(void *addr, unsigned val);
  * Waits on an address with a time-out.
  *
  * This function operates as vlc_atomic_wait() but provides an additional
- * time-out. If the time-out elapses, the thread resumes and the function
+ * time-out. If the deadline is reached, the thread resumes and the function
  * returns.
  *
  * \param addr address to check for
  * \param val value to match at the address
- * \param delay time-out duration
+ * \param deadline deadline to wait until
  *
- * \retval true the function was woken up before the time-out
- * \retval false the time-out elapsed
+ * \retval 0 the function was woken up before the time-out
+ * \retval ETIMEDOUT the deadline was reached
  */
-bool vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t delay);
+int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline);
 
 /**
  * Wakes up one thread on an address.

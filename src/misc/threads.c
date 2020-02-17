@@ -184,16 +184,12 @@ static void vlc_cancel_addr_finish(atomic_uint *addr)
 #ifdef LIBVLC_NEED_SLEEP
 void (vlc_tick_wait)(vlc_tick_t deadline)
 {
-    vlc_tick_t delay;
     atomic_uint value = ATOMIC_VAR_INIT(0);
 
     vlc_cancel_addr_prepare(&value);
 
-    while ((delay = (deadline - vlc_tick_now())) > 0)
-    {
-        vlc_atomic_timedwait(&value, 0, delay);
+    while (vlc_atomic_timedwait(&value, 0, deadline) == 0)
         vlc_testcancel();
-    }
 
     vlc_cancel_addr_finish(&value);
 }
@@ -269,11 +265,13 @@ void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
     vlc_cancel_addr_finish(&cond->value);
 }
 
-static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
-                               vlc_tick_t delay)
+int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex,
+                       vlc_tick_t deadline)
 {
     unsigned value = atomic_load_explicit(&cond->value, 
                                           memory_order_relaxed);
+    int ret;
+
     while (value & 1)
     {
         if (atomic_compare_exchange_weak_explicit(&cond->value, &value,
@@ -286,20 +284,12 @@ static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
     vlc_cancel_addr_prepare(&cond->value);
     vlc_mutex_unlock(mutex);
 
-    if (delay > 0)
-        value = vlc_atomic_timedwait(&cond->value, value, delay);
-    else
-        value = 0;
+    ret = vlc_atomic_timedwait(&cond->value, value, deadline);
 
     vlc_mutex_lock(mutex);
     vlc_cancel_addr_finish(&cond->value);
 
-    return value ? 0 : ETIMEDOUT;
-}
-
-int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex, vlc_tick_t deadline)
-{
-    return vlc_cond_wait_delay(cond, mutex, deadline - vlc_tick_now());
+    return ret;
 }
 
 int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
@@ -309,9 +299,10 @@ int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
     vlc_tick_t deadline = vlc_tick_from_sec( deadline_daytime );
 
     timespec_get(&ts, TIME_UTC);
-    deadline -= vlc_tick_from_timespec( &ts );
+    /* real-time to monotonic timestamp conversion */
+    deadline += vlc_tick_from_timespec(&ts) - vlc_tick_now();
 
-    return vlc_cond_wait_delay(cond, mutex, deadline);
+    return vlc_cond_timedwait(cond, mutex, deadline);
 }
 #endif
 
@@ -445,13 +436,9 @@ int vlc_sem_timedwait(vlc_sem_t *sem, vlc_tick_t deadline)
     {
         if (likely(exp == 0))
         {
-            vlc_tick_t delay = deadline - vlc_tick_now();
-
-            if (delay < 0)
-                delay = 0;
-
-            if (!vlc_atomic_timedwait(&sem->value, 0, delay))
-                return ETIMEDOUT;
+            int ret = vlc_atomic_timedwait(&sem->value, 0, deadline);
+            if (ret)
+                return ret;
 
             exp = 1;
         }

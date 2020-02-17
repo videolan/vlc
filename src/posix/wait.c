@@ -85,15 +85,16 @@ void vlc_atomic_wait(void *addr, unsigned value)
     pthread_cleanup_pop(1);
 }
 
-bool vlc_atomic_timedwait(void *addr, unsigned value, vlc_tick_t delay)
+int vlc_atomic_timedwait(void *addr, unsigned value, vlc_tick_t deadline)
 {
     atomic_uint *futex = addr;
     struct wait_bucket *bucket;
     struct timespec ts;
-    lldiv_t d = lldiv(delay, CLOCK_FREQ);
+    vlc_tick_t delay = deadline - vlc_tick_now();
+    lldiv_t d = lldiv((delay >= 0) ? delay : 0, CLOCK_FREQ);
     int ret = 0;
 
-    /* TODO: monotonic clock */
+    /* TODO: use monotonic clock directly */
     clock_gettime(CLOCK_REALTIME, &ts);
     ts.tv_sec += d.quot;
     ts.tv_nsec += NS_FROM_VLC_TICK(d.rem);
@@ -110,7 +111,7 @@ bool vlc_atomic_timedwait(void *addr, unsigned value, vlc_tick_t delay)
         ret = pthread_cond_timedwait(&bucket->wait, &bucket->lock, &ts);
 
     pthread_cleanup_pop(1);
-    return ret == 0;
+    return ret;
 }
 
 void vlc_atomic_notify_one(void *addr)

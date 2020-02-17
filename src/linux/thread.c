@@ -22,6 +22,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -33,6 +34,7 @@
 #ifndef FUTEX_PRIVATE_FLAG
 #define FUTEX_WAKE_PRIVATE FUTEX_WAKE
 #define FUTEX_WAIT_PRIVATE FUTEX_WAIT
+#define FUTEX_WAIT_BITSET_PRIVATE FUTEX_WAIT_BITSET
 #endif
 
 #include <vlc_common.h>
@@ -66,7 +68,8 @@ static int vlc_futex_wait(void *addr, unsigned val, const struct timespec *to)
     int type;
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &type);
 #endif
-    ret = sys_futex(addr, FUTEX_WAIT_PRIVATE, val, to, NULL, 0);
+    ret = sys_futex(addr, FUTEX_WAIT_BITSET_PRIVATE, val, to, NULL,
+                    FUTEX_BITSET_MATCH_ANY);
 #ifndef __ANDROID__
     pthread_setcanceltype(type, NULL);
 #endif
@@ -88,9 +91,22 @@ void vlc_atomic_wait(void *addr, unsigned val)
     vlc_futex_wait(addr, val, NULL);
 }
 
-bool vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t delay)
+int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
 {
-    struct timespec ts = timespec_from_vlc_tick(delay);
+    struct timespec ts = timespec_from_vlc_tick(deadline);
 
-    return (vlc_futex_wait(addr, val, &ts) == 0 || errno != ETIMEDOUT);
+    if (vlc_futex_wait(addr, val, &ts) == 0)
+        return 0;
+
+    switch (errno) {
+        case EINTR:
+        case EAGAIN:
+            return 0;
+        case EFAULT:
+        case EINVAL:
+            vlc_assert_unreachable(); /* BUG! */
+        default:
+            break;
+     }
+     return errno;
 }

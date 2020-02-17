@@ -378,17 +378,29 @@ void vlc_atomic_wait(void *addr, unsigned val)
     WaitOnAddress(addr, &val, sizeof (val), -1);
 }
 
-bool vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t delay)
+int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
 {
-    delay = (delay + (1000-1)) / 1000;
+    vlc_tick_t delay;
 
-    if (delay > 0x7fffffff)
+    do
     {
-        WaitOnAddress(addr, &val, sizeof (val), 0x7fffffff);
-        return true; /* woke up early, claim spurious wake-up */
-    }
+        long ms;
 
-    return WaitOnAddress(addr, &val, sizeof (val), delay);
+        delay = deadline - vlc_tick_now();
+
+        if (delay < 0)
+            ms = 0;
+        else if (delay >= VLC_TICK_FROM_MS(LONG_MAX))
+            ms = LONG_MAX;
+        else
+            ms = MS_FROM_VLC_TICK(delay);
+
+        if (WaitOnAddress(addr, &val, sizeof (val), ms))
+            return 0;
+    }
+    while (delay > 0);
+
+    return ETIMEDOUT;
 }
 
 void vlc_atomic_notify_one(void *addr)
