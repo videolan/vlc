@@ -637,7 +637,7 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
 
         case SegmentTrackerEvent::FORMATCHANGE:
             /* Check if our current demux is still valid */
-            if(*event.u.format.f != format)
+            if(*event.u.format.f != format || format == StreamFormat(StreamFormat::UNKNOWN))
             {
                 /* Format has changed between segments, we need to drain and change demux */
                 msg_Info(p_realdemux, "Changing stream format %s -> %s",

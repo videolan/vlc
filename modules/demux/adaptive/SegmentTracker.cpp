@@ -233,6 +233,13 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
             return NULL; /* Force current demux to end */
         }
     }
+    else if(format == StreamFormat(StreamFormat::UNKNOWN) && prevRep && prevRep != rep)
+    {
+        /* Handle the corner case when only the demuxer can know the format and
+         * demuxer starts after the format change (Probe != buffering) */
+        notify(SegmentTrackerEvent(&format)); /* Notify new demux format */
+        return NULL; /* Force current demux to end */
+    }
 
     if(format == StreamFormat(StreamFormat::UNSUPPORTED))
     {
