@@ -355,6 +355,11 @@ typedef struct
 # define VLC_STATIC_COND { 0 }
 #endif
 
+/**
+ * Semaphore.
+ *
+ * Storage space for a thread-safe semaphore.
+ */
 typedef struct vlc_sem
 {
     union {
