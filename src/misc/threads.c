@@ -358,16 +358,18 @@ int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex,
 }
 
 int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
-                               time_t deadline_daytime)
+                               time_t deadline)
 {
-    struct timespec ts;
-    vlc_tick_t deadline = vlc_tick_from_sec(deadline_daytime);
+    struct vlc_cond_waiter waiter;
+    int ret;
 
-    timespec_get(&ts, TIME_UTC);
-    /* real-time to monotonic timestamp conversion */
-    deadline += vlc_tick_from_timespec(&ts) - vlc_tick_now();
+    vlc_cond_wait_prepare(&waiter, cond, mutex);
+    vlc_cleanup_push(vlc_cond_wait_cleanup, &waiter);
+    ret = vlc_atomic_timedwait_daytime(&waiter.value, 0, deadline);
+    vlc_cleanup_pop();
+    vlc_cond_wait_cleanup(&waiter);
 
-    return vlc_cond_timedwait(cond, mutex, deadline);
+    return ret;
 }
 #endif
 

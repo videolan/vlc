@@ -403,6 +403,31 @@ int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
     return ETIMEDOUT;
 }
 
+int vlc_atomic_timedwait_daytime(void *addr, unsigned val, time_t deadline)
+{
+    long delay;
+
+    do
+    {
+        long ms;
+
+        delay = deadline - time(NULL);
+
+        if (delay < 0)
+            ms = 0;
+        else if (delay >= (LONG_MAX / 1000))
+            ms = LONG_MAX;
+        else
+            ms = delay * 1000;
+
+        if (WaitOnAddress(addr, &val, sizeof (val), ms))
+            return 0;
+    }
+    while (delay > 0);
+
+    return ETIMEDOUT;
+}
+
 void vlc_atomic_notify_one(void *addr)
 {
     WakeByAddressSingle(addr);

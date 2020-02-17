@@ -85,14 +85,27 @@ void vlc_atomic_wait(void *addr, unsigned value)
     pthread_cleanup_pop(1);
 }
 
-int vlc_atomic_timedwait(void *addr, unsigned value, vlc_tick_t deadline)
+static int vlc_atomic_timedwait_timespec(void *addr, unsigned value,
+                                         const struct timespec *restrict ts)
 {
     atomic_uint *futex = addr;
-    struct wait_bucket *bucket;
+    struct wait_bucket *bucket = wait_bucket_enter(futex);
+    int ret = 0;
+
+    pthread_cleanup_push(wait_bucket_leave, bucket);
+
+    if (value == atomic_load_explicit(futex, memory_order_relaxed))
+        ret = pthread_cond_timedwait(&bucket->wait, &bucket->lock, ts);
+
+    pthread_cleanup_pop(1);
+    return ret;
+}
+
+int vlc_atomic_timedwait(void *addr, unsigned value, vlc_tick_t deadline)
+{
     struct timespec ts;
     vlc_tick_t delay = deadline - vlc_tick_now();
     lldiv_t d = lldiv((delay >= 0) ? delay : 0, CLOCK_FREQ);
-    int ret = 0;
 
     /* TODO: use monotonic clock directly */
     clock_gettime(CLOCK_REALTIME, &ts);
@@ -104,14 +117,14 @@ int vlc_atomic_timedwait(void *addr, unsigned value, vlc_tick_t deadline)
         ts.tv_nsec -= 1000000000;
     }
 
-    bucket = wait_bucket_enter(futex);
-    pthread_cleanup_push(wait_bucket_leave, bucket);
+    return vlc_atomic_timedwait_timespec(addr, value, &ts);
+}
 
-    if (value == atomic_load_explicit(futex, memory_order_relaxed))
-        ret = pthread_cond_timedwait(&bucket->wait, &bucket->lock, &ts);
+int vlc_atomic_timedwait_daytime(void *addr, unsigned value, time_t deadline)
+{
+    struct timespec ts = { .tv_sec = deadline, .tv_nsec = 0 };
 
-    pthread_cleanup_pop(1);
-    return ret;
+    return vlc_atomic_timedwait_timespec(addr, value, &ts);
 }
 
 void vlc_atomic_notify_one(void *addr)

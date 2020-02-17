@@ -809,6 +809,8 @@ void vlc_atomic_wait(void *addr, unsigned val);
  */
 int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline);
 
+int vlc_atomic_timedwait_daytime(void *addr, unsigned val, time_t deadline);
+
 /**
  * Wakes up one thread on an address.
  *
