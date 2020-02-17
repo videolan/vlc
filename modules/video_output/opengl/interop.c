@@ -114,10 +114,10 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, const opengl_vtable_t *vt,
 void
 vlc_gl_interop_Delete(struct vlc_gl_interop *interop)
 {
-    if (interop->module)
-        module_unneed(interop, interop->module);
     if (interop->ops && interop->ops->close)
         interop->ops->close(interop);
+    if (interop->module)
+        module_unneed(interop, interop->module);
     vlc_object_delete(interop);
 }
 
