@@ -79,7 +79,7 @@ static ULONG vlc_DosWaitEventSemEx( HEV hev, ULONG ulTimeout )
     int       n;
     ULONG     rc;
 
-    struct vlc_thread *th = vlc_thread_self ();
+    struct vlc_thread *th = vlc_threadvar_get(thread_key);
     if( th == NULL || !th->killable )
     {
         /* Main thread - cannot be cancelled anyway
@@ -705,7 +705,7 @@ int vlc_savecancel (void)
 {
     int state;
 
-    struct vlc_thread *th = vlc_thread_self ();
+    struct vlc_thread *th = vlc_threadvar_get(thread_key);
     if (th == NULL)
         return false; /* Main thread - cannot be cancelled anyway */
 
@@ -716,7 +716,7 @@ int vlc_savecancel (void)
 
 void vlc_restorecancel (int state)
 {
-    struct vlc_thread *th = vlc_thread_self ();
+    struct vlc_thread *th = vlc_threadvar_get(thread_key);
     assert (state == false || state == true);
 
     if (th == NULL)
@@ -728,7 +728,7 @@ void vlc_restorecancel (int state)
 
 void vlc_testcancel (void)
 {
-    struct vlc_thread *th = vlc_thread_self ();
+    struct vlc_thread *th = vlc_threadvar_get(thread_key);
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
@@ -754,7 +754,7 @@ void vlc_control_cancel (vlc_cleanup_t *cleaner)
     /* NOTE: This function only modifies thread-specific data, so there is no
      * need to lock anything. */
 
-    struct vlc_thread *th = vlc_thread_self ();
+    struct vlc_thread *th = vlc_threadvar_get(thread_key);
     if (th == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
@@ -774,7 +774,7 @@ void vlc_control_cancel (vlc_cleanup_t *cleaner)
 static int vlc_select( int nfds, fd_set *rdset, fd_set *wrset, fd_set *exset,
                        struct timeval *timeout )
 {
-    struct vlc_thread *th = vlc_thread_self( );
+    struct vlc_thread *th = vlc_threadvar_get(thread_key);
 
     int rc;
 
