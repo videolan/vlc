@@ -73,45 +73,67 @@ Widgets.NavigableFocusScope {
         }
     }
 
-    RowLayout {
-        id: layout
+    Keys.priority: Keys.AfterItem
+    Keys.onPressed: defaultKeyAction(event)
+    Keys.onReleased: defaultKeyReleaseAction(event)
+
+    navigationCancel: function() {
+        hideResumePanel()
+    }
+
+    Rectangle {
         anchors.fill: parent
+        color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.playerBg, 0.8)
 
-        Text {
-            Layout.preferredHeight: implicitHeight
-            Layout.fillWidth: true
+        RowLayout {
+            id: layout
+            anchors.fill: parent
+            anchors.topMargin: VLCStyle.applicationVerticalMargin
+            anchors.leftMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_small
+            anchors.rightMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_small
 
-            color: VLCStyle.colors.playerFg
-            font.pixelSize: VLCStyle.fontSize_normal
-            font.bold: true
+            spacing: VLCStyle.margin_small
 
-            text: i18n.qtr("Do you want to restart the playback where you left off?")
-        }
+            Text {
+                Layout.preferredHeight: implicitHeight
+                Layout.preferredWidth: implicitWidth
 
-        Widgets.TabButtonExt {
-            id: continueBtn
-            Layout.preferredHeight: implicitHeight
-            Layout.preferredWidth: implicitWidth
-            text: i18n.qtr("Continue")
-            font.bold: true
-            focus: true
-            onClicked: {
-                player.restorePlaybackPos()
-                hideResumePanel()
+                color: VLCStyle.colors.playerFg
+                font.pixelSize: VLCStyle.fontSize_normal
+                font.bold: true
+
+                text: i18n.qtr("Do you want to restart the playback where you left off?")
             }
 
-            KeyNavigation.right: closeBtn
-        }
+            Widgets.TabButtonExt {
+                id: continueBtn
+                Layout.preferredHeight: implicitHeight
+                Layout.preferredWidth: implicitWidth
+                text: i18n.qtr("Continue")
+                font.bold: true
+                focus: true
+                onClicked: {
+                    player.restorePlaybackPos()
+                    hideResumePanel()
+                }
 
-        Widgets.TabButtonExt {
-            id: closeBtn
-            Layout.preferredHeight: implicitHeight
-            Layout.preferredWidth: implicitWidth
-            text: "X"
-            font.bold: true
-            onClicked: hideResumePanel()
+                KeyNavigation.right: closeBtn
+            }
 
-            KeyNavigation.left: continueBtn
+            Widgets.TabButtonExt {
+                id: closeBtn
+                Layout.preferredHeight: implicitHeight
+                Layout.preferredWidth: implicitWidth
+                text: i18n.qtr("Dismiss")
+                font.bold: true
+                onClicked: hideResumePanel()
+
+                KeyNavigation.left: continueBtn
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
         }
     }
 }

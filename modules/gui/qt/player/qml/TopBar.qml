@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 import QtQuick 2.11
+import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 
 import org.videolan.vlc 0.1
@@ -27,7 +28,7 @@ import "qrc:///widgets/" as Widgets
 Widgets.NavigableFocusScope{
     id: topFocusScope
 
-    height: topcontrolContent.implicitHeight
+    implicitHeight: topcontrolContent.implicitHeight
 
     property bool autoHide: player.hasVideoOutput
                             && rootWindow.hasEmbededVideo
@@ -36,8 +37,9 @@ Widgets.NavigableFocusScope{
 
     property bool lockAutoHide: false
 
+    property alias title: titleText.text
+
     signal togglePlaylistVisiblity();
-    signal resumeDialogHidden()
 
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
@@ -69,6 +71,9 @@ Widgets.NavigableFocusScope{
 
                 Widgets.IconToolButton {
                     id: backBtn
+
+                    Layout.alignment: Qt.AlignTop
+
                     objectName: "IconToolButton"
                     size: VLCStyle.icon_normal
                     iconText: VLCIcons.exit
@@ -80,29 +85,31 @@ Widgets.NavigableFocusScope{
                         }
                         history.previous()
                     }
-                    KeyNavigation.right: resumeDialog.visible ? resumeDialog : playlistBtn
+                    KeyNavigation.right: playlistBtn
                     focus: true
                 }
 
-                Item{
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: resumeDialog.implicitHeight
+                Label {
+                    id: titleText
 
-                    ResumeDialog {
-                        id: resumeDialog
-                        anchors.fill: parent
-                        onHidden: {
-                            if (activeFocus) {
-                                focus = false
-                                playlistBtn.focus = true
-                                resumeDialogHidden()
-                            }
-                        }
-                    }
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: implicitHeight
+                    Layout.leftMargin:  VLCStyle.margin_large
+                    Layout.rightMargin: VLCStyle.margin_large
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+
+                    horizontalAlignment: Text.AlignHCenter
+                    color: VLCStyle.colors.playerFg
+                    font.pixelSize: VLCStyle.fontSize_xxxlarge
+                    textFormat: Text.PlainText
+                    elide: Text.ElideRight
                 }
 
                 Widgets.IconToolButton {
                     id: playlistBtn
+
+                    Layout.alignment: Qt.AlignTop
+
                     objectName: PlayerControlBarModel.PLAYLIST_BUTTON
                     size: VLCStyle.icon_normal
                     iconText: VLCIcons.playlist
@@ -111,7 +118,7 @@ Widgets.NavigableFocusScope{
                     onClicked: togglePlaylistVisiblity()
                     property bool acceptFocus: true
 
-                    KeyNavigation.left: resumeDialog.visible ? resumeDialog : backBtn
+                    KeyNavigation.left: backBtn
                 }
             }
         }
