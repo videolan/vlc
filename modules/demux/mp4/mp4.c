@@ -2830,6 +2830,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         p_sample->i_type = p_frma->data.p_frma->i_type;
     }
 
+    p_track->fmt.i_id = p_track->i_track_ID;
+
     /* */
     switch( p_track->fmt.i_cat )
     {
