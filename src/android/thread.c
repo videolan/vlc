@@ -330,7 +330,7 @@ void vlc_testcancel (void)
 
 void vlc_cancel_addr_set(atomic_uint *addr)
 {
-    vlc_thread_t th = vlc_thread_self();
+    vlc_thread_t th = thread;
     if (th == NULL)
         return;
 
@@ -342,7 +342,7 @@ void vlc_cancel_addr_set(atomic_uint *addr)
 
 void vlc_cancel_addr_clear(atomic_uint *addr)
 {
-    vlc_thread_t th = vlc_thread_self();
+    vlc_thread_t th = thread;
     if (th == NULL)
         return;
 
