@@ -34,6 +34,7 @@
 #include <vlc_url.h>                /* vlc_uri2path */
 #include <vlc_mime.h>               /* mime type */
 #include <vlc_fs.h>
+#include <vlc_cxx_helpers.hpp>
 
 #include <sys/stat.h>
 
@@ -135,7 +136,7 @@ static VLCTagLib::ExtResolver<MPEG::File> aacresolver(".aac");
 static bool b_extensions_registered = false;
 
 // taglib is not thread safe
-static vlc_mutex_t taglib_lock = VLC_STATIC_MUTEX;
+static vlc::threads::mutex taglib_lock;
 
 // Local functions
 static int ReadMeta    ( vlc_object_t * );
@@ -830,7 +831,7 @@ static void ReadMetaFromMP4( MP4::Tag* tag, demux_meta_t *p_demux_meta, vlc_meta
  */
 static int ReadMeta( vlc_object_t* p_this)
 {
-    vlc_mutex_locker locker (&taglib_lock);
+    vlc::threads::mutex_locker locker(taglib_lock);
     demux_meta_t*   p_demux_meta = (demux_meta_t *)p_this;
     vlc_meta_t*     p_meta;
     FileRef f;
@@ -1165,7 +1166,7 @@ static void WriteMetaToXiph( Ogg::XiphComment* tag, input_item_t* p_item )
 
 static int WriteMeta( vlc_object_t *p_this )
 {
-    vlc_mutex_locker locker (&taglib_lock);
+    vlc::threads::mutex_locker locker(taglib_lock);
     meta_export_t *p_export = (meta_export_t *)p_this;
     input_item_t *p_item = p_export->p_item;
     FileRef f;
