@@ -673,6 +673,7 @@ static int Open( vlc_object_t * p_this )
                 free( tk );
                 continue;
         }
+        tk->fmt.i_id = i;
         if( p_strn && p_strn->p_str )
             tk->fmt.psz_description = FromACP( p_strn->p_str );
         tk->p_es = es_out_Add( p_demux->out, &tk->fmt );
