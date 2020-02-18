@@ -70,6 +70,7 @@
 
 #include "util/qmleventfilter.hpp"
 #include "util/i18n.hpp"
+#include "util/systempalette.hpp"
 
 #include "menus/menus.hpp"                            // Menu creation
 
@@ -406,6 +407,7 @@ void MainInterface::createMainWidget( QSettings * )
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
     rootCtx->setContextProperty( "recentsMedias",  new VLCRecentMediaModel( p_intf, this ));
     rootCtx->setContextProperty( "settings",  new Settings( p_intf, this ));
+    rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));
 
     if (b_hasMedialibrary)
     {
