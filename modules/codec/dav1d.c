@@ -151,12 +151,21 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
     const Dav1dMasteringDisplay *md = img->mastering_display;
     if( dec->fmt_in.video.mastering.max_luminance == 0 && md )
     {
+        const uint8_t RGB2GBR[3] = {2,0,1};
         for( size_t i=0;i<6; i++ )
-            v->mastering.primaries[i] = md->primaries[i >> 1][i % 2];
-        v->mastering.min_luminance = md->min_luminance;
-        v->mastering.max_luminance = md->max_luminance;
-        v->mastering.white_point[0] = md->white_point[0];
-        v->mastering.white_point[1] = md->white_point[1];
+        {
+            v->mastering.primaries[i] =
+                    50000 * (double) md->primaries[RGB2GBR[i >> 1]][i % 2]
+                          / (double)(1 << 16);
+        }
+        v->mastering.min_luminance = 10000 * (double)md->min_luminance
+                                           / (double) (1<<14);
+        v->mastering.max_luminance = 10000 * (double) md->max_luminance
+                                           / (double) (1<<8);
+        v->mastering.white_point[0] = 50000 * (double)md->white_point[0]
+                                            / (double) (1<<16);
+        v->mastering.white_point[1] = 50000 * (double)md->white_point[1]
+                                            / (double) (1<<16);
     }
 
     const Dav1dContentLightLevel *cll = img->content_light;
