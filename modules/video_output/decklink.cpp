@@ -41,6 +41,7 @@
 
 #include <vlc_block.h>
 #include <vlc_aout.h>
+#include <vlc_cxx_helpers.hpp>
 
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
@@ -292,14 +293,14 @@ vlc_module_begin()
 vlc_module_end ()
 
 /* Protects decklink_sys_t creation/deletion */
-static vlc_mutex_t sys_lock = VLC_STATIC_MUTEX;
+static vlc::threads::mutex sys_lock;
 
 static decklink_sys_t *HoldDLSys(vlc_object_t *obj, int i_cat)
 {
     vlc_object_t *libvlc = VLC_OBJECT(vlc_object_instance(obj));
     decklink_sys_t *sys;
 
-    vlc_mutex_lock(&sys_lock);
+    sys_lock.lock();
 
     if (var_Type(libvlc, "decklink-sys") == VLC_VAR_ADDRESS)
     {
@@ -310,10 +311,10 @@ static decklink_sys_t *HoldDLSys(vlc_object_t *obj, int i_cat)
         {
             while(sys->b_videomodule)
             {
-                vlc_mutex_unlock(&sys_lock);
+                sys_lock.unlock();
                 msg_Info(obj, "Waiting for previous vout module to exit");
                 vlc_tick_sleep(VLC_TICK_FROM_MS(100));
-                vlc_mutex_lock(&sys_lock);
+                sys_lock.lock();
             }
         }
     }
@@ -336,7 +337,7 @@ static decklink_sys_t *HoldDLSys(vlc_object_t *obj, int i_cat)
         }
     }
 
-    vlc_mutex_unlock(&sys_lock);
+    sys_lock.unlock();
     return sys;
 }
 
@@ -344,7 +345,7 @@ static void ReleaseDLSys(vlc_object_t *obj, int i_cat)
 {
     vlc_object_t *libvlc = VLC_OBJECT(vlc_object_instance(obj));
 
-    vlc_mutex_lock(&sys_lock);
+    sys_lock.lock();
 
     struct decklink_sys_t *sys = (struct decklink_sys_t*)var_GetAddress(libvlc, "decklink-sys");
 
@@ -373,7 +374,7 @@ static void ReleaseDLSys(vlc_object_t *obj, int i_cat)
         sys->b_recycling = true;
     }
 
-    vlc_mutex_unlock(&sys_lock);
+    sys_lock.unlock();
 }
 
 static BMDVideoConnection getVConn(vout_display_t *vd, BMDVideoConnection mask)
