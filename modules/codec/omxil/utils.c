@@ -440,76 +440,112 @@ int OMXCodec_GetQuirks( enum es_format_category_e i_cat, vlc_fourcc_t i_codec,
  *****************************************************************************/
 const char *StateToString(OMX_STATETYPE state)
 {
-    static const char *psz_names[] = {
-        "OMX_StateInvalid", "OMX_StateLoaded", "OMX_StateIdle",
-        "OMX_StateExecuting", "OMX_StatePause", "OMX_StateWaitForResources",
-        "OMX_State unknown"
-    };
-
-    if((unsigned int)state > sizeof(psz_names)/sizeof(char*)-1)
-        state = (OMX_STATETYPE)(sizeof(psz_names)/sizeof(char*)-1);
-    return psz_names[state];
+    switch (state)
+    {
+#define CASE(state) case state: return #state
+        CASE(OMX_StateInvalid);
+        CASE(OMX_StateLoaded);
+        CASE(OMX_StateIdle);
+        CASE(OMX_StateExecuting);
+        CASE(OMX_StatePause);
+        CASE(OMX_StateWaitForResources);
+        CASE(OMX_StateKhronosExtensions);
+        CASE(OMX_StateVendorStartUnused);
+#undef CASE
+        case OMX_StateMax: break;
+    }
+    return "OMX_State unknown";
 }
 
 const char *CommandToString(OMX_COMMANDTYPE command)
 {
-    static const char *psz_names[] = {
-        "OMX_CommandStateSet", "OMX_CommandFlush", "OMX_CommandPortDisable",
-        "OMX_CommandPortEnable", "OMX_CommandMarkBuffer",
-        "OMX_Command unknown"
-    };
-
-    if((unsigned int)command > sizeof(psz_names)/sizeof(char*)-1)
-        command = (OMX_COMMANDTYPE)(sizeof(psz_names)/sizeof(char*)-1);
-    return psz_names[command];
+    switch (command)
+    {
+#define CASE(command) case command: return #command
+        CASE(OMX_CommandStateSet);
+        CASE(OMX_CommandFlush);
+        CASE(OMX_CommandPortDisable);
+        CASE(OMX_CommandPortEnable);
+        CASE(OMX_CommandMarkBuffer);
+        CASE(OMX_CommandKhronosExtensions);
+        CASE(OMX_CommandVendorStartUnused);
+#undef CASE
+        case OMX_CommandMax: break;
+    }
+    return "OMX_Command unknown";
 }
 
 const char *EventToString(OMX_EVENTTYPE event)
 {
-    static const char *psz_names[] = {
-        "OMX_EventCmdComplete", "OMX_EventError", "OMX_EventMark",
-        "OMX_EventPortSettingsChanged", "OMX_EventBufferFlag",
-        "OMX_EventResourcesAcquired", "OMX_EventComponentResumed",
-        "OMX_EventDynamicResourcesAvailable", "OMX_EventPortFormatDetected",
-        "OMX_Event unknown"
-    };
-
-    if((unsigned int)event > sizeof(psz_names)/sizeof(char*)-1)
-        event = (OMX_EVENTTYPE)(sizeof(psz_names)/sizeof(char*)-1);
-    return psz_names[event];
+    switch (event)
+    {
+#define CASE(event) case event: return #event
+        CASE(OMX_EventCmdComplete);
+        CASE(OMX_EventError);
+        CASE(OMX_EventMark);
+        CASE(OMX_EventPortSettingsChanged);
+        CASE(OMX_EventBufferFlag);
+        CASE(OMX_EventResourcesAcquired);
+        CASE(OMX_EventComponentResumed);
+        CASE(OMX_EventDynamicResourcesAvailable);
+        CASE(OMX_EventPortFormatDetected);
+        CASE(OMX_EventKhronosExtensions);
+        CASE(OMX_EventVendorStartUnused);
+#undef CASE
+        case OMX_EventMax: break;
+    }
+    return "OMX_Event unknown";
 }
 
 const char *ErrorToString(OMX_ERRORTYPE error)
 {
-    static const char *psz_names[] = {
-        "OMX_ErrorInsufficientResources", "OMX_ErrorUndefined",
-        "OMX_ErrorInvalidComponentName", "OMX_ErrorComponentNotFound",
-        "OMX_ErrorInvalidComponent", "OMX_ErrorBadParameter",
-        "OMX_ErrorNotImplemented", "OMX_ErrorUnderflow",
-        "OMX_ErrorOverflow", "OMX_ErrorHardware", "OMX_ErrorInvalidState",
-        "OMX_ErrorStreamCorrupt", "OMX_ErrorPortsNotCompatible",
-        "OMX_ErrorResourcesLost", "OMX_ErrorNoMore", "OMX_ErrorVersionMismatch",
-        "OMX_ErrorNotReady", "OMX_ErrorTimeout", "OMX_ErrorSameState",
-        "OMX_ErrorResourcesPreempted", "OMX_ErrorPortUnresponsiveDuringAllocation",
-        "OMX_ErrorPortUnresponsiveDuringDeallocation",
-        "OMX_ErrorPortUnresponsiveDuringStop", "OMX_ErrorIncorrectStateTransition",
-        "OMX_ErrorIncorrectStateOperation", "OMX_ErrorUnsupportedSetting",
-        "OMX_ErrorUnsupportedIndex", "OMX_ErrorBadPortIndex",
-        "OMX_ErrorPortUnpopulated", "OMX_ErrorComponentSuspended",
-        "OMX_ErrorDynamicResourcesUnavailable", "OMX_ErrorMbErrorsInFrame",
-        "OMX_ErrorFormatNotDetected", "OMX_ErrorContentPipeOpenFailed",
-        "OMX_ErrorContentPipeCreationFailed", "OMX_ErrorSeperateTablesUsed",
-        "OMX_ErrorTunnelingUnsupported",
-        "OMX_Error unknown"
-    };
-
-    if(error == OMX_ErrorNone) return "OMX_ErrorNone";
-
-    error -= OMX_ErrorInsufficientResources;
-
-    if((unsigned int)error > sizeof(psz_names)/sizeof(char*)-1)
-        error = (OMX_STATETYPE)(sizeof(psz_names)/sizeof(char*)-1);
-    return psz_names[error];
+    switch (error)
+    {
+#define CASE(error) case error: return #error
+        CASE(OMX_ErrorNone);
+        CASE(OMX_ErrorInsufficientResources);
+        CASE(OMX_ErrorUndefined);
+        CASE(OMX_ErrorInvalidComponentName);
+        CASE(OMX_ErrorComponentNotFound);
+        CASE(OMX_ErrorInvalidComponent);
+        CASE(OMX_ErrorBadParameter);
+        CASE(OMX_ErrorNotImplemented);
+        CASE(OMX_ErrorUnderflow);
+        CASE(OMX_ErrorOverflow);
+        CASE(OMX_ErrorHardware);
+        CASE(OMX_ErrorInvalidState);
+        CASE(OMX_ErrorStreamCorrupt);
+        CASE(OMX_ErrorPortsNotCompatible);
+        CASE(OMX_ErrorResourcesLost);
+        CASE(OMX_ErrorNoMore);
+        CASE(OMX_ErrorVersionMismatch);
+        CASE(OMX_ErrorNotReady);
+        CASE(OMX_ErrorTimeout);
+        CASE(OMX_ErrorSameState);
+        CASE(OMX_ErrorResourcesPreempted);
+        CASE(OMX_ErrorPortUnresponsiveDuringAllocation);
+        CASE(OMX_ErrorPortUnresponsiveDuringDeallocation);
+        CASE(OMX_ErrorPortUnresponsiveDuringStop);
+        CASE(OMX_ErrorIncorrectStateTransition);
+        CASE(OMX_ErrorIncorrectStateOperation);
+        CASE(OMX_ErrorUnsupportedSetting);
+        CASE(OMX_ErrorUnsupportedIndex);
+        CASE(OMX_ErrorBadPortIndex);
+        CASE(OMX_ErrorPortUnpopulated);
+        CASE(OMX_ErrorComponentSuspended);
+        CASE(OMX_ErrorDynamicResourcesUnavailable);
+        CASE(OMX_ErrorMbErrorsInFrame);
+        CASE(OMX_ErrorFormatNotDetected);
+        CASE(OMX_ErrorContentPipeOpenFailed);
+        CASE(OMX_ErrorContentPipeCreationFailed);
+        CASE(OMX_ErrorSeperateTablesUsed);
+        CASE(OMX_ErrorTunnelingUnsupported);
+        CASE(OMX_ErrorKhronosExtensions);
+        CASE(OMX_ErrorVendorStartUnused);
+#undef CASE
+        case OMX_ErrorMax: break;
+    }
+    return "OMX_Error unknown";
 }
 
 /*****************************************************************************
