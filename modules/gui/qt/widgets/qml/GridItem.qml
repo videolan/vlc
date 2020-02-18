@@ -207,7 +207,8 @@ Item {
                     font.weight: Font.Light
                     elide: Text.ElideRight
                     font.pixelSize: VLCStyle.fontSize_small
-                    color: VLCStyle.colors.lightText
+                    color: VLCStyle.colors.textInactive
+
                 }
 
                 RowLayout {
@@ -221,14 +222,14 @@ Item {
                         Layout.alignment: Qt.AlignLeft
                         Layout.fillWidth: true
                         font.pixelSize: VLCStyle.fontSize_small
-                        color: VLCStyle.colors.videosGridInfoLeft
+                        color: VLCStyle.colors.textInactive
                         text: infoLeft
                     }
                     Text {
                         visible: root.isNew
                         Layout.alignment: Qt.AlignRight
                         font.pixelSize: VLCStyle.fontSize_small
-                        color: root.activeFocus ? VLCStyle.colors.lightText : VLCStyle.colors.accent
+                        color: root.activeFocus ? VLCStyle.colors.text : VLCStyle.colors.accent
                         text: "NEW"
                         font.bold: true
                     }

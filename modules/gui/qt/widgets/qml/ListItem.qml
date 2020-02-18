@@ -126,7 +126,7 @@ NavigableFocusScope {
                         Text {
                             id: cover_text
                             anchors.centerIn: parent
-                            color: VLCStyle.colors.lightText
+                            color: VLCStyle.colors.textInactive
                             font.pixelSize: VLCStyle.fontSize_xsmall
                         }
                     }
@@ -156,7 +156,7 @@ NavigableFocusScope {
                                 id: line2_text
                                 width: parent.width
                                 elide: Text.ElideRight
-                                color: VLCStyle.colors.lightText
+                                color: VLCStyle.colors.textInactive
                                 font.pixelSize: VLCStyle.fontSize_small
                                 visible: text !== ""
                                 enabled: text !== ""

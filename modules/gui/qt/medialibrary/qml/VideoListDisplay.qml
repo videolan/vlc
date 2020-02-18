@@ -118,7 +118,7 @@ Widgets.KeyNavigableTableView {
                     text: !rowModel ? "" : rowModel[model.criteria] || ""
                     elide: Text.ElideRight
                     font.pixelSize: VLCStyle.fontSize_normal
-                    color: (model.isPrimary)? VLCStyle.colors.text : VLCStyle.colors.textInactive
+                    color: (model.isPrimary)? VLCStyle.colors.text : VLCStyle.colors.textDisabled
 
                     anchors {
                         fill: parent

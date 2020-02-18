@@ -20,10 +20,6 @@ import QtQuick 2.11
 Item {
     id: colors_id
 
-    SystemPalette { id: activePalette; colorGroup: SystemPalette.Active }
-    SystemPalette { id: inactivePalette; colorGroup: SystemPalette.Inactive }
-    SystemPalette { id: disabledPalette; colorGroup: SystemPalette.Disabled }
-
     function blendColors( a, b, blend ) {
         return Qt.rgba( a.r * blend + b.r * (1. - blend),
                        a.g * blend + b.g * (1. - blend),
@@ -48,34 +44,33 @@ Item {
             return "transparent"
     }
 
-    property color text: activePalette.text;
-    property color textInactive: disabledPalette.text;
+    property color text: systemPalette.text;
+    property color textInactive: systemPalette.textInactive;
+    property color textDisabled: systemPalette.textDisabled;
 
-    property color bg: activePalette.base;
-    property color bgInactive: inactivePalette.base;
+    property color bg: systemPalette.base;
+    property color bgInactive: systemPalette.baseInactive;
 
     //for alternate rows
-    property color bgAlt: activePalette.alternateBase;
-    property color bgAltInactive: inactivePalette.alternateBase;
+    property color bgAlt: systemPalette.alternateBase;
+    property color bgAltInactive: systemPalette.alternateBaseInactive;
 
-    property color bgHover: activePalette.highlight;
-    property color bgHoverInactive: inactivePalette.highlight;
+    property color bgHover: systemPalette.highlight;
+    property color bgHoverInactive: systemPalette.highlightInactive;
 
-    property color button: activePalette.button;
-    property color buttonText: activePalette.buttonText;
-    property color buttonBorder: blendColors(activePalette.button, activePalette.buttonText, 0.8);
+    property color button: systemPalette.button;
+    property color buttonText: systemPalette.buttonText;
+    property color buttonBorder: blendColors(systemPalette.button, systemPalette.buttonText, 0.8);
 
     property color textActiveSource: "red";
 
-    property color banner: activePalette.window;
-    property color bannerHover: activePalette.highlight;
+    property color banner: systemPalette.window;
+    property color bannerHover: systemPalette.highlight;
     property color volsliderbg: "#bdbebf"
     property color volbelowmid: "#99d299"
     property color volabovemid: "#14d214"
     property color volhigh: "#ffc70f"
     property color volmax: "#f5271d"
-
-    property color videosGridInfoLeft: "grey"
 
     property color playerFg: "white"
     property color playerFgInactive: "#888888"
@@ -86,8 +81,6 @@ Item {
     property color accent: "#FFFF950D";
 
     property color alert: "red";
-
-    property color lightText: "#747474";
 
     property color buffer: "#696969";
 
@@ -117,7 +110,7 @@ Item {
 
                 button: "#eff0f1";
                 buttonText: "#232627";
-                buttonBorder: blendColors(activePalette.button, activePalette.buttonText, 0.8);
+                buttonBorder: blendColors(button, buttonText, 0.8);
 
                 textActiveSource: "#ff950d";
 
@@ -126,8 +119,6 @@ Item {
 
                 accent: "#ff950d";
                 alert: "#ff0000";
-
-                lightText: "#747474";
             }
         },
         State {
@@ -136,7 +127,7 @@ Item {
                 target: colors_id
 
                 text: "#eff0f1"
-                textInactive: "#626c76"
+                textInactive: "#bdc3c7"
                 bg: "#232629"
                 bgInactive: "#232629"
                 bgAlt: "#31363b"
@@ -151,7 +142,6 @@ Item {
                 bannerHover: "#3daee9"
                 accent: "#ff950d"
                 alert: "#ff0000"
-                lightText: "#8b8b8b";
             }
         },
         State {
@@ -159,25 +149,26 @@ Item {
             PropertyChanges {
                 target: colors_id
 
-                bg: activePalette.base
-                bgInactive: inactivePalette.base
+                bg: systemPalette.base
+                bgInactive: systemPalette.baseInactive
 
-                bgAlt: activePalette.alternateBase
-                bgAltInactive: inactivePalette.alternateBase
+                bgAlt: systemPalette.alternateBase
+                bgAltInactive: systemPalette.alternateBaseInactive
 
-                bgHover: activePalette.highlight
-                bgHoverInactive: inactivePalette.highlight
+                bgHover: systemPalette.highlight
+                bgHoverInactive: systemPalette.highlightInactive
 
-                text: activePalette.text
-                textInactive: disabledPalette.text
+                text: systemPalette.text
+                textDisabled: systemPalette.textDisabled
+                textInactive: systemPalette.textInactive
 
-                button: activePalette.button
-                buttonText: activePalette.buttonText
+                button: systemPalette.button
+                buttonText: systemPalette.buttonText
                 buttonBorder: blendColors(button, buttonText, 0.8)
 
                 textActiveSource: accent
-                banner: activePalette.window
-                bannerHover: activePalette.highlight
+                banner: systemPalette.window
+                bannerHover: systemPalette.highlight
             }
         }
     ]

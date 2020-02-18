@@ -57,7 +57,7 @@ T.MenuItem {
         icon: control.icon
         text: control.text
         font: control.font
-        color: control.enabled ? VLCStyle.colors.text : VLCStyle.colors.textInactive
+        color: control.enabled ? VLCStyle.colors.text : VLCStyle.colors.textDisabled
     }
 
     indicator: ColorImage {
@@ -66,7 +66,7 @@ T.MenuItem {
 
         visible: control.checked
         source: control.checkable ? "qrc:/qt-project.org/imports/QtQuick/Controls.2/images/check.png" : ""
-        color: control.enabled ? VLCStyle.colors.text : VLCStyle.colors.textInactive
+        color: control.enabled ? VLCStyle.colors.text : VLCStyle.colors.textDisabled
         defaultColor: "#353637"
     }
 
@@ -77,7 +77,7 @@ T.MenuItem {
         visible: control.subMenu
         mirror: control.mirrored
         source: control.subMenu ? "qrc:/qt-project.org/imports/QtQuick/Controls.2/images/arrow-indicator.png" : ""
-        color: control.enabled ? VLCStyle.colors.text : VLCStyle.colors.textInactive
+        color: control.enabled ? VLCStyle.colors.text : VLCStyle.colors.textDisabled
         defaultColor: "#353637"
     }
 

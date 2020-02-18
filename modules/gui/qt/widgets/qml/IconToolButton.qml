@@ -30,7 +30,7 @@ ToolButton {
 
     property string iconText: ""
     property color color: VLCStyle.colors.buttonText
-    property color colorDisabled: VLCStyle.colors.lightText
+    property color colorDisabled: VLCStyle.colors.textInactive
     property color colorOverlay: "transparent"
     property string textOverlay: ""
     property bool borderEnabled: false

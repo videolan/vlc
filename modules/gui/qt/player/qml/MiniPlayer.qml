@@ -118,7 +118,7 @@ Widgets.NavigableFocusScope {
                             id: artistLabel
                             text: mainPlaylistController.currentItem.artist
                             font.pixelSize: VLCStyle.fontSize_normal
-                            color: VLCStyle.colors.lightText
+                            color: VLCStyle.colors.textInactive
                         }
                     }
                 }
