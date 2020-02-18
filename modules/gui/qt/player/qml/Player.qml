@@ -61,10 +61,14 @@ Widgets.NavigableFocusScope {
     }
 
     navigationCancel: function() {
-        if (player.hasVideoOutput) {
-           mainPlaylistController.stop()
+        if (rootWindow.hasEmbededVideo && controlBarView.state === "visible") {
+            toolbarAutoHide._setVisibleControlBar(false)
+        } else {
+            if (player.hasVideoOutput) {
+               mainPlaylistController.stop()
+            }
+            history.previous()
         }
-        history.previous()
     }
 
     //property alias centralLayout: mainLayout.centralLayout
