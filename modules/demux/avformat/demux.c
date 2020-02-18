@@ -712,6 +712,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
                 }
             }
 
+            es_fmt.i_id = i;
             p_track->p_es = es_out_Add( p_demux->out, &es_fmt );
             if( p_track->p_es && (s->disposition & AV_DISPOSITION_DEFAULT) )
                 es_out_Control( p_demux->out, ES_OUT_SET_ES_DEFAULT, p_track->p_es );
