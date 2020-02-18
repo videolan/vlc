@@ -26,6 +26,8 @@
 #endif
 
 #define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
+
+#include <atomic>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_playlist.h>
@@ -61,11 +63,7 @@ static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
 static void *Run  ( void * );
 
-static struct
-{
-    intf_thread_t *intf;
-    vlc_mutex_t mutex;
-} skin_load = { NULL, VLC_STATIC_MUTEX };
+static std::atomic<intf_thread_t *> skin_load_intf;
 
 //---------------------------------------------------------------------------
 // Open: initialize interface
@@ -114,10 +112,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    vlc_mutex_lock( &skin_load.mutex );
-    skin_load.intf = p_intf;
-    vlc_mutex_unlock( &skin_load.mutex );
-
+    skin_load_intf = p_intf;
     return VLC_SUCCESS;
 }
 
@@ -136,9 +131,7 @@ static void Close( vlc_object_t *p_this )
     vlc_playlist_Stop ( playlist );
     vlc_playlist_Unlock( playlist );
 
-    vlc_mutex_lock( &skin_load.mutex );
-    skin_load.intf = NULL;
-    vlc_mutex_unlock( &skin_load.mutex);
+    skin_load_intf = NULL;
 
     AsyncQueue *pQueue = p_intf->p_sys->p_queue;
     if( pQueue )
@@ -351,9 +344,7 @@ static void WindowDisable( vout_window_t *pWnd )
     // then comes the playlist along with the player and possible vouts.
     // problem: the interface is no longer active to properly deallocate
     // ressources allocated as a vout window submodule.
-    vlc_mutex_lock( &skin_load.mutex );
-    intf_thread_t *pIntf = skin_load.intf;
-    vlc_mutex_unlock( &skin_load.mutex );
+    intf_thread_t *pIntf = skin_load_intf;
     if( pIntf == NULL )
     {
         msg_Err( pWnd, "Design issue: the interface no longer exists !!!!" );
@@ -436,9 +427,7 @@ static int WindowOpen( vout_window_t *pWnd )
 
     vout_window_skins_t* sys;
 
-    vlc_mutex_lock( &skin_load.mutex );
-    intf_thread_t *pIntf = skin_load.intf;
-    vlc_mutex_unlock( &skin_load.mutex );
+    intf_thread_t *pIntf = skin_load_intf;
 
     if( pIntf == NULL )
         return VLC_EGENERIC;
