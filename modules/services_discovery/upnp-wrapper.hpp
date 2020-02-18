@@ -29,6 +29,7 @@
 
 #include <vlc_common.h>
 #include <vlc_charset.h>
+#include <vlc_cxx_helpers.hpp>
 
 #include <memory>
 #include <vector>
@@ -69,7 +70,7 @@ public:
 
 private:
     static UpnpInstanceWrapper* s_instance;
-    static vlc_mutex_t s_lock;
+    static vlc::threads::mutex s_lock;
     UpnpClient_Handle m_handle;
     int m_refcount;
     typedef std::shared_ptr<Listener> ListenerPtr;

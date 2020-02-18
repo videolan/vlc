@@ -34,11 +34,10 @@
 #endif
 
 #include "upnp-wrapper.hpp"
-#include <vlc_cxx_helpers.hpp>
 
 UpnpInstanceWrapper* UpnpInstanceWrapper::s_instance;
 UpnpInstanceWrapper::Listeners UpnpInstanceWrapper::s_listeners;
-vlc_mutex_t UpnpInstanceWrapper::s_lock = VLC_STATIC_MUTEX;
+vlc::threads::mutex UpnpInstanceWrapper::s_lock;
 
 UpnpInstanceWrapper::UpnpInstanceWrapper()
     : m_handle( -1 )
@@ -54,7 +53,7 @@ UpnpInstanceWrapper::~UpnpInstanceWrapper()
 
 UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj)
 {
-    vlc_mutex_locker lock( &s_lock );
+    vlc::threads::mutex_locker lock( s_lock );
     if ( s_instance == NULL )
     {
         UpnpInstanceWrapper* instance = new(std::nothrow) UpnpInstanceWrapper;
@@ -113,7 +112,7 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj)
 void UpnpInstanceWrapper::release()
 {
     UpnpInstanceWrapper *p_delete = NULL;
-    vlc::threads::mutex_locker lock( &s_lock );
+    vlc::threads::mutex_locker lock( s_lock );
     if (--s_instance->m_refcount == 0)
     {
         p_delete = s_instance;
@@ -129,7 +128,7 @@ UpnpClient_Handle UpnpInstanceWrapper::handle() const
 
 int UpnpInstanceWrapper::Callback(Upnp_EventType event_type, UpnpEventPtr p_event, void *p_user_data)
 {
-    vlc::threads::mutex_locker lock( &s_lock );
+    vlc::threads::mutex_locker lock( s_lock );
     for (Listeners::iterator iter = s_listeners.begin(); iter != s_listeners.end(); ++iter)
     {
         (*iter)->onEvent(event_type, p_event, p_user_data);
@@ -140,14 +139,14 @@ int UpnpInstanceWrapper::Callback(Upnp_EventType event_type, UpnpEventPtr p_even
 
 void UpnpInstanceWrapper::addListener(ListenerPtr listener)
 {
-    vlc::threads::mutex_locker lock( &s_lock );
+    vlc::threads::mutex_locker lock( s_lock );
     if ( std::find( s_listeners.begin(), s_listeners.end(), listener) == s_listeners.end() )
         s_listeners.push_back( std::move(listener) );
 }
 
 void UpnpInstanceWrapper::removeListener(ListenerPtr listener)
 {
-    vlc::threads::mutex_locker lock( &s_lock );
+    vlc::threads::mutex_locker lock( s_lock );
     Listeners::iterator iter = std::find( s_listeners.begin(), s_listeners.end(), listener );
     if ( iter != s_listeners.end() )
         s_listeners.erase( iter );
