@@ -189,6 +189,7 @@ static int Open( vlc_object_t * p_this )
 #undef CONVERT_GAIN
 #undef CONVERT_PEAK
 
+    fmt.i_id = 0;
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     if( !p_sys->p_es )
         goto error;

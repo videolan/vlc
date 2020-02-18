@@ -669,6 +669,7 @@ int webvtt_OpenDemux ( vlc_object_t *p_this )
     size_t i_extra = 0;
     MakeExtradata( p_sys, &fmt.p_extra, &i_extra );
     fmt.i_extra = i_extra;
+    fmt.i_id = 0;
     p_sys->es = es_out_Add( p_demux->out, &fmt );
     es_format_Clean( &fmt );
     if( p_sys->es == NULL )

@@ -660,6 +660,7 @@ static bool Parse( demux_t *p_demux, block_t **pp_output )
             if( !p_sys->p_es )
             {
                 p_sys->p_packetizer->fmt_out.b_packetized = true;
+                p_sys->p_packetizer->fmt_out.i_id = 0;
                 p_sys->p_es = es_out_Add( p_demux->out,
                                           &p_sys->p_packetizer->fmt_out);
 

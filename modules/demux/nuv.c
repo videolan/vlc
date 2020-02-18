@@ -296,6 +296,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Create audio/video (will work only with extended header and audio=mp3 */
+    int id = 0;
     if( p_sys->hdr.i_video_blocks != 0 )
     {
         es_format_t fmt;
@@ -310,6 +311,7 @@ static int Open( vlc_object_t * p_this )
         fmt.video.i_sar_num = p_sys->hdr.d_aspect * fmt.video.i_height;
         fmt.video.i_sar_den = fmt.video.i_width;
 
+        fmt.i_id = id++;
         p_sys->p_es_video = es_out_Add( p_demux->out, &fmt );
     }
     if( p_sys->hdr.i_audio_blocks != 0 )
@@ -320,6 +322,7 @@ static int Open( vlc_object_t * p_this )
         fmt.audio.i_rate = p_sys->exh.i_audio_sample_rate;
         fmt.audio.i_bitspersample = p_sys->exh.i_audio_bits_per_sample;
 
+        fmt.i_id = id++;
         p_sys->p_es_audio = es_out_Add( p_demux->out, &fmt );
     }
     if( p_sys->hdr.i_text_blocks != 0 )

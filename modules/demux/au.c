@@ -271,6 +271,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* add the es */
+    p_sys->fmt.i_id = 0;
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
     if( unlikely(p_sys->es == NULL) )
         return VLC_ENOMEM;

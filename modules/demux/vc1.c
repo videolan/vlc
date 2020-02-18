@@ -166,6 +166,7 @@ static int Demux( demux_t *p_demux)
             if( p_sys->p_es == NULL )
             {
                 p_sys->p_packetizer->fmt_out.b_packetized = true;
+                p_sys->p_packetizer->fmt_out.i_id = 0;
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
             }
 

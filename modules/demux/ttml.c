@@ -536,6 +536,7 @@ int tt_OpenDemux( vlc_object_t* p_this )
 
     es_format_t fmt;
     es_format_Init( &fmt, SPU_ES, VLC_CODEC_TTML );
+    fmt.i_id = 0;
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     if( !p_sys->p_es )
         goto error;

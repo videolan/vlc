@@ -202,6 +202,7 @@ static int Open( vlc_object_t * p_this )
             p_sys->fmt.i_bitrate);
 
     /* add the es */
+    p_sys->fmt.i_id = 0;
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
     msg_Dbg( p_demux, "elementary stream added");
 

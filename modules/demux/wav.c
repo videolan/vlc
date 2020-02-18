@@ -428,6 +428,7 @@ static int Open( vlc_object_t * p_this )
             p_sys->fmt.audio.i_rate * 8 / p_sys->i_frame_samples;
     }
 
+    p_sys->fmt.i_id = 0;
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
     if( unlikely(p_sys->p_es == NULL) )
         goto error;

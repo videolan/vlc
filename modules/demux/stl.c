@@ -314,6 +314,7 @@ static int Open(vlc_object_t *object)
     fmt.i_extra = sizeof(header);
     fmt.p_extra = header;
 
+    fmt.i_id = 0;
     sys->es = es_out_Add(demux->out, &fmt);
     fmt.i_extra = 0;
     fmt.p_extra = NULL;

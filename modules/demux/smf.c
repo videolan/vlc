@@ -706,6 +706,7 @@ static int Open (vlc_object_t *obj)
     es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MIDI);
     fmt.audio.i_channels = 2;
     fmt.audio.i_rate = 44100; /* dummy value */
+    fmt.i_id = 0;
     sys->es = es_out_Add (demux->out, &fmt);
 
     demux->pf_demux = Demux;

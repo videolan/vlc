@@ -174,6 +174,7 @@ static int Open( vlc_object_t * p_this )
         vlc_meta_Set( p_sys->p_meta, vlc_meta_ArtworkURL, psz_url );
     }
 
+    p_sys->p_packetizer->fmt_in.i_id = 0;
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_in );
     if( !p_sys->p_es )
         goto error;
