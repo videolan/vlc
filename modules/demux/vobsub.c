@@ -547,6 +547,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
                 memcpy( &fmt.subs.spu.palette[1], p_sys->palette, 16 * sizeof( uint32_t ) );
             }
 
+            fmt.i_id = i_track_id;
             current_tk->p_es = es_out_Add( p_demux->out, &fmt );
             msg_Dbg( p_demux, "New vobsub track detected: %i [%s]", i_track_id, language );
         }
