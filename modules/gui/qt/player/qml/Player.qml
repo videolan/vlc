@@ -175,18 +175,18 @@ Widgets.NavigableFocusScope {
             top: parent.top
         }
         edge: Widgets.DrawerExt.Edges.Top
-        property var noAutoHide: topcontrolView.contentItem.noAutoHide
+        property var autoHide: topcontrolView.contentItem.autoHide
 
         state: "visible"
 
         component: TopBar{
             focus: true
             width: topcontrolView.width
-            noAutoHide: noAutoHideInt ||  playlistpopup.state === "visible"
-            onNoAutoHideChanged: {
-                if (!noAutoHide)
+            onAutoHideChanged: {
+                if (autoHide)
                     toolbarAutoHide.restart()
             }
+            lockAutoHide: playlistpopup.state === "visible"
 
             onTogglePlaylistVisiblity:  {
                 if (rootWindow.playlistDocked)
@@ -251,7 +251,7 @@ Widgets.NavigableFocusScope {
             right: parent.right
             bottom: parent.bottom
         }
-        property var  noAutoHide: controlBarView.contentItem.noAutoHide
+        property var autoHide: controlBarView.contentItem.autoHide
 
         state: "visible"
         edge: Widgets.DrawerExt.Edges.Bottom
@@ -265,7 +265,7 @@ Widgets.NavigableFocusScope {
 
             width: controlBarView.width
             height: controllerId.implicitHeight + controllerId.anchors.bottomMargin
-            property alias noAutoHide: controllerId.noAutoHide
+            property alias autoHide: controllerId.autoHide
 
             MouseArea {
                 id: controllerMouseArea
@@ -280,9 +280,12 @@ Widgets.NavigableFocusScope {
                     anchors.rightMargin: VLCStyle.applicationHorizontalMargin
                     anchors.bottomMargin: VLCStyle.applicationVerticalMargin
 
-                    property bool disableAutoHide: playlistpopup.state === "visible" || !player.hasVideoOutput || !rootWindow.hasEmbededVideo || controllerMouseArea.containsMouse
-                    onNoAutoHideChanged: {
-                        if (!noAutoHide && disableAutoHide)
+                    lockAutoHide: playlistpopup.state === "visible"
+                        || !player.hasVideoOutput
+                        || !rootWindow.hasEmbededVideo
+                        || controllerMouseArea.containsMouse
+                    onAutoHideChanged: {
+                        if (autoHide)
                             toolbarAutoHide.restart()
                     }
 
@@ -314,7 +317,7 @@ Widgets.NavigableFocusScope {
             }
             else
             {
-                if (controlBarView.noAutoHide || topcontrolView.noAutoHide)
+                if (!controlBarView.autoHide || !topcontrolView.autoHide)
                     return;
                 controlBarView.state = "hidden"
                 topcontrolView.state = "hidden"

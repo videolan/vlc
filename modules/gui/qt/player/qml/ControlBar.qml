@@ -34,7 +34,8 @@ Widgets.NavigableFocusScope {
 
     signal showTrackBar()
 
-    property bool noAutoHide: _lockAutoHide !== 0
+    property bool autoHide: _lockAutoHide === 0 && !lockAutoHide
+    property bool lockAutoHide: false
     property int  _lockAutoHide: 0 //count the number of element locking the autoHide
 
     Keys.priority: Keys.AfterItem

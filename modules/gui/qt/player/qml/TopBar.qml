@@ -26,12 +26,14 @@ import "qrc:///widgets/" as Widgets
 
 Widgets.NavigableFocusScope{
     id: topFocusScope
-    height: topcontrolContent.implicitHeight
-    property bool noAutoHide: false
 
-    property bool noAutoHideInt: !player.hasVideoOutput
-                              || !rootWindow.hasEmbededVideo
-                              || topcontrollerMouseArea.containsMouse || lockAutoHide
+    height: topcontrolContent.implicitHeight
+
+    property bool autoHide: player.hasVideoOutput
+                            && rootWindow.hasEmbededVideo
+                            && !topcontrollerMouseArea.containsMouse
+                            && !lockAutoHide
+
     property bool lockAutoHide: false
 
     signal togglePlaylistVisiblity();
