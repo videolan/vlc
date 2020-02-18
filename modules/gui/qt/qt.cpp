@@ -376,8 +376,8 @@ vlc_module_end ()
 /*****************************************/
 
 /* Ugly, but the Qt interface assumes single instance anyway */
-static vlc_cond_t wait_ready = VLC_STATIC_COND;
-static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+static vlc::threads::condition_variable wait_ready;
+static vlc::threads::mutex lock;
 static bool busy = false;
 static enum {
     OPEN_STATE_INIT,
@@ -438,7 +438,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     /* Get the playlist before the lock to avoid a lock-order-inversion */
     vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(p_intf);
 
-    vlc_mutex_locker locker (&lock);
+    vlc::threads::mutex_locker locker (lock);
     if (busy || open_state == OPEN_STATE_ERROR)
     {
         if (busy)
@@ -472,7 +472,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
      * LibVLC thread from starting video playback before we can create
      * an embedded video window. */
     while (open_state == OPEN_STATE_INIT)
-        vlc_cond_wait(&wait_ready, &lock);
+        wait_ready.wait(lock);
 
     if (open_state == OPEN_STATE_ERROR)
     {
@@ -514,7 +514,7 @@ static void Close( vlc_object_t *p_this )
 #endif
     delete p_sys;
 
-    vlc_mutex_locker locker (&lock);
+    vlc::threads::mutex_locker locker (lock);
     assert (busy);
     assert (open_state == OPEN_STATE_INIT);
     busy = false;
@@ -695,9 +695,9 @@ static void *Thread( void *obj )
 
     /* Tell the main LibVLC thread we are ready */
     {
-        vlc_mutex_locker locker (&lock);
+        vlc::threads::mutex_locker locker (lock);
         open_state = OPEN_STATE_OPENED;
-        vlc_cond_signal(&wait_ready);
+        wait_ready.signal();
     }
 
 #ifdef Q_OS_MAC
@@ -742,11 +742,11 @@ static void *ThreadCleanup( intf_thread_t *p_intf, bool error )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     {
-        vlc_mutex_locker locker (&lock);
+        vlc::threads::mutex_locker locker (lock);
         if( error )
         {
             open_state = OPEN_STATE_ERROR;
-            vlc_cond_signal( &wait_ready );
+            wait_ready.signal();
         }
         else
             open_state = OPEN_STATE_INIT;
@@ -829,7 +829,7 @@ static int WindowOpen( vout_window_t *p_wnd )
             break;
     }
 
-    vlc_mutex_locker locker (&lock);
+    vlc::threads::mutex_locker locker (lock);
     if (unlikely(open_state != OPEN_STATE_OPENED))
         return VLC_EGENERIC;
 
