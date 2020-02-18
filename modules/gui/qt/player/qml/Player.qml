@@ -44,6 +44,10 @@ Widgets.NavigableFocusScope {
         if (event.accepted)
             return
         defaultKeyAction(event, 0)
+
+        //unhandled keys are forwarded as hotkeys
+        if (!event.accepted || controlBarView.state !== "visible")
+            rootWindow.sendHotkey(event.key, event.modifiers);
     }
 
     Keys.onReleased: {
@@ -54,10 +58,6 @@ Widgets.NavigableFocusScope {
         } else {
             defaultKeyReleaseAction(event, 0)
         }
-
-        //unhandled keys are forwarded as hotkeys
-        if (!event.accepted)
-            rootWindow.sendHotkey(event.key, event.modifiers);
     }
 
     navigationCancel: function() {
