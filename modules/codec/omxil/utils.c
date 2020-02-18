@@ -183,6 +183,11 @@ void ArchitectureSpecificCopyHooks( decoder_t *p_dec, int i_color_format,
         p_architecture_specific->data = p_surface_cache;
         p_dec->fmt_out.i_codec = VLC_CODEC_YV12;
     }
+#else
+    VLC_UNUSED(p_dec);
+    VLC_UNUSED(i_color_format);
+    VLC_UNUSED(i_src_stride);
+    VLC_UNUSED(p_architecture_specific);
 #endif
 }
 
@@ -197,6 +202,8 @@ void ArchitectureSpecificCopyHooksDestroy( int i_color_format,
         copy_cache_t *p_surface_cache = (copy_cache_t*)p_architecture_specific->data;
         CopyCleanCache(p_surface_cache);
     }
+#else
+    VLC_UNUSED(i_color_format);
 #endif
     free(p_architecture_specific->data);
     p_architecture_specific->data = NULL;
@@ -227,6 +234,8 @@ void CopyOmxPicture( int i_color_format, picture_t *p_pic,
         picture_SwapUV( p_pic );
         return;
     }
+#else
+    VLC_UNUSED(p_architecture_specific);
 #endif
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
