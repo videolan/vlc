@@ -135,7 +135,7 @@ static inline bool Ogg_HasQueuedBlocks( const logical_stream_t *p_stream )
     return ( p_stream->queue.p_blocks != NULL );
 }
 
-static void Ogg_CreateES( demux_t *p_demux );
+static void Ogg_CreateES( demux_t *p_demux, bool );
 static int Ogg_BeginningOfStream( demux_t *p_demux );
 static int Ogg_FindLogicalStreams( demux_t *p_demux );
 static void Ogg_EndOfStream( demux_t *p_demux );
@@ -252,7 +252,7 @@ static int Open( vlc_object_t * p_this )
     while ( !p_sys->b_preparsing_done && p_demux->pf_demux( p_demux ) > 0 )
     {}
     if ( p_sys->b_preparsing_done && p_demux->b_preparsing )
-        Ogg_CreateES( p_demux );
+        Ogg_CreateES( p_demux, true );
 
     return VLC_SUCCESS;
 }
@@ -435,7 +435,7 @@ static int Demux( demux_t * p_demux )
     }
 
     if ( p_sys->b_preparsing_done && !p_sys->b_es_created )
-        Ogg_CreateES( p_demux );
+        Ogg_CreateES( p_demux, false );
 
     /*
      * The first data page of a physical stream is stored in the relevant logical stream
@@ -2108,7 +2108,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 /****************************************************************************
  * Ogg_CreateES: Creates all Elementary streams once headers are parsed
  ****************************************************************************/
-static void Ogg_CreateES( demux_t *p_demux )
+static void Ogg_CreateES( demux_t *p_demux, bool stable_id )
 {
     demux_sys_t *p_ogg = p_demux->p_sys;
     logical_stream_t *p_old_stream = p_ogg->p_old_stream;
@@ -2152,6 +2152,13 @@ static void Ogg_CreateES( demux_t *p_demux )
             }
             else
             {
+                if( stable_id )
+                {
+                    /* IDs are stable when ES tracks are created from the Open
+                     * function. Don't specify ids when tracks are added
+                     * midstream */
+                    p_stream->fmt.i_id = i_stream;
+                }
                 p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
             }
         }
