@@ -28,6 +28,8 @@ macOS:
  * Add support for pausing Apple Music on macOS Catalina
  * Fix UPnP discovery crash without an active network interface
  * Fix rare placement issues with fullscreen panel
+ * Fix problem in audio output remembering the last device configuration
+   in digital mode
 
 Misc:
  * Add missing .wpl & .zpl file associations on Windows
