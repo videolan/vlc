@@ -2929,9 +2929,6 @@ vlc_module_begin ()
     add_string( "config", NULL, CONFIG_TEXT, "", false )
         change_volatile ()
 
-   /* Usage (mainly useful for cmd line stuff) */
-    /* add_usage_hint( PLAYLIST_USAGE ) */
-
     set_description( N_("core program") )
 vlc_module_end ()
 
