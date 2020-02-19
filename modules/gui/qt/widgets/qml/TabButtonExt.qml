@@ -75,7 +75,7 @@ T.TabButton {
                     text: control.iconTxt
                     color: VLCStyle.colors.buttonText
 
-                    font.pixelSize: VLCStyle.icon_topbar
+                    font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_topbar)
                     font.family: VLCIcons.fontFamily
                 }
             }

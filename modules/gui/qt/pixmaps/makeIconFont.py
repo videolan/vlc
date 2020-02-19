@@ -56,6 +56,10 @@ Item {
 
     property string fontFamily: "{{font_name}}"
 
+    function pixelSize(size) {
+        return size * 0.6
+    }
+
     // Icons
 {% for f in glyphs %}    property string {{f.key}} : "{{f.charcode}}"
 {% endfor %}
@@ -90,13 +94,17 @@ def main(model_fd):
     font.familyname = data["font_name"]
     font.fontname = data["font_name"]
     font.design_size = 1000.0
+    font.ascent = 800
+    font.descent = 200
+    #we might need to specify ascent/descent of hhea_ os2_typo os2_win
+
     for i, glyph in enumerate(data["glyphs"]):
         charcode = UTF8_AREA + i
         c = font.createChar(charcode)
         glyph["charcode"]  = "\\u{:x}".format(charcode)
         c.importOutlines(glyph["path"])
         #scale glyph to fit between 200 (base line) and 800 (x 0.6)
-        c.transform((0.6, 0.0, 0.0, 0.6, 200.0, 200.0))
+        #c.transform((0.6, 0.0, 0.0, 0.6, 200, 200.))
         c.vwidth = 1000
         c.width = 1000
 

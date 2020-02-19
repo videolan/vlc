@@ -372,7 +372,7 @@ Item{
 
                 anchors.centerIn: parent
 
-                font.pixelSize: VLCStyle.icon_medium
+                font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_medium)
                 font.family: VLCIcons.fontFamily
 
                 verticalAlignment: Text.AlignVCenter
@@ -399,7 +399,7 @@ Item{
 
                 anchors.centerIn: parent
 
-                font.pixelSize: VLCStyle.icon_medium
+                font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_medium)
                 font.family: VLCIcons.fontFamily
 
                 verticalAlignment: Text.AlignVCenter

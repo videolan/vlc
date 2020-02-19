@@ -28,7 +28,7 @@ Button {
     height: VLCStyle.icon_normal
     text: VLCIcons.ellipsis
     font.family: VLCIcons.fontFamily
-    font.pointSize: VLCStyle.icon_small
+    font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_medium)
 
     property alias color: contextButtonContent.color
     property alias backgroundColor: contextButtonBg.color

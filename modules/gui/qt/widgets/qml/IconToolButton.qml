@@ -46,7 +46,7 @@ ToolButton {
 
             anchors.centerIn: parent
 
-            font.pixelSize: control.size
+            font.pixelSize: VLCIcons.pixelSize(control.size)
             font.family: VLCIcons.fontFamily
             font.underline: control.font.underline
 
@@ -61,7 +61,7 @@ ToolButton {
 
                 anchors.centerIn: parent
 
-                font.pixelSize: control.size
+                font.pixelSize: VLCIcons.pixelSize(control.size)
                 font.family: VLCIcons.fontFamily
 
                 verticalAlignment: Text.AlignVCenter
@@ -78,7 +78,7 @@ ToolButton {
 
                 anchors.centerIn: parent
 
-                font.pixelSize: control.size
+                font.pixelSize: VLCIcons.pixelSize(control.size)
                 font.family: VLCIcons.fontFamily
 
                 verticalAlignment: Text.AlignVCenter

@@ -12,6 +12,10 @@ Item {
 
     property string fontFamily: "VLCIcons"
 
+    function pixelSize(size) {
+        return size * 0.6
+    }
+
     // Icons
     property string eject : "\ue000"
     property string stop : "\ue001"
