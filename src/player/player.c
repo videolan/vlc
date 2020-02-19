@@ -526,25 +526,18 @@ vlc_player_SelectEsIdList(vlc_player_t *player,
     return track_count;
 }
 
-unsigned
-vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *id,
-                      enum vlc_player_select_policy policy)
+/* Returns an array of selected tracks, putting id in first position (if any).
+ * */
+static vlc_es_id_t **
+vlc_player_GetEsIdList(vlc_player_t *player,
+                       const enum es_format_category_e cat,
+                       vlc_es_id_t *id)
 {
-    struct vlc_player_input *input = vlc_player_get_input_locked(player);
-    if (!input)
-        return 0;
-
-    if (policy == VLC_PLAYER_SELECT_EXCLUSIVE)
-        goto select_one;
-
-    /* VLC_PLAYER_SELECT_SIMULTANEOUS */
-    const enum es_format_category_e cat = vlc_es_id_GetCat(id);
     const size_t track_count = vlc_player_GetTrackCount(player, cat);
-
     if (track_count == 0)
-        return 0;
+        return NULL;
 
-    size_t selected_track_count = 1;
+    size_t selected_track_count = id ? 1 : 0;
     for (size_t i = 0; i < track_count; ++i)
     {
         const struct vlc_player_track *track =
@@ -553,17 +546,15 @@ vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *id,
             selected_track_count++;
     }
 
-    if (selected_track_count == 1)
-        goto select_one;
-
     vlc_es_id_t **es_id_list =
-        vlc_alloc(selected_track_count + 1, sizeof(vlc_es_id_t*));
+        vlc_alloc(selected_track_count + 1 /* NULL */, sizeof(vlc_es_id_t*));
     if (!es_id_list)
-        return 0;
+        return NULL;
 
     size_t es_id_list_idx = 0;
-    /* Assure to select the requeste track */
-    es_id_list[es_id_list_idx++] = id;
+    /* Assure to select the requested track */
+    if (id)
+        es_id_list[es_id_list_idx++] = id;
 
     for (size_t i = 0; i < track_count; ++i)
     {
@@ -574,16 +565,34 @@ vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *id,
     }
     es_id_list[selected_track_count] = NULL;
 
+    return es_id_list;
+}
+
+unsigned
+vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *id,
+                      enum vlc_player_select_policy policy)
+{
+    struct vlc_player_input *input = vlc_player_get_input_locked(player);
+    if (!input)
+        return 0;
+
+    if (policy == VLC_PLAYER_SELECT_EXCLUSIVE)
+    {
+        if (input_ControlPushEsHelper(input->thread, INPUT_CONTROL_SET_ES, id)
+         == VLC_SUCCESS)
+            vlc_player_osd_Track(player, id, true);
+        return 1;
+    }
+
+    /* VLC_PLAYER_SELECT_SIMULTANEOUS */
+    const enum es_format_category_e cat = vlc_es_id_GetCat(id);
+    vlc_es_id_t **es_id_list = vlc_player_GetEsIdList(player, cat, id);
+    if (!es_id_list)
+        return 0;
+
     unsigned ret = vlc_player_SelectEsIdList(player, cat, es_id_list);
     free(es_id_list);
     return ret;
-
-select_one:
-    if (input_ControlPushEsHelper(input->thread, INPUT_CONTROL_SET_ES, id)
-     == VLC_SUCCESS)
-        vlc_player_osd_Track(player, id, true);
-    return 1;
-
 }
 
 static void
