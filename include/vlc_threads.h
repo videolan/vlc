@@ -77,6 +77,7 @@ typedef struct
     };
 } vlc_mutex_t;
 #define VLC_STATIC_MUTEX { false, { { false, 0 } } }
+#define LIBVLC_DONT_WANT_MUTEX
 #define LIBVLC_NEED_RWLOCK
 typedef INIT_ONCE vlc_once_t;
 #define VLC_STATIC_ONCE INIT_ONCE_STATIC_INIT
@@ -125,6 +126,7 @@ typedef struct
     };
 } vlc_mutex_t;
 #define VLC_STATIC_MUTEX { false, { { false, 0 } } }
+#define LIBVLC_DONT_WANT_MUTEX
 #define LIBVLC_NEED_RWLOCK
 typedef struct
 {
@@ -180,6 +182,7 @@ typedef pthread_t vlc_osthread_t;
 #define vlc_thread_equal(a,b) pthread_equal(a,b)
 typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
+#define LIBVLC_DONT_WANT_MUTEX
 typedef pthread_once_t  vlc_once_t;
 #define VLC_STATIC_ONCE   PTHREAD_ONCE_INIT
 typedef pthread_key_t   vlc_threadvar_t;
@@ -227,6 +230,7 @@ typedef pthread_t       vlc_osthread_t;
 #define vlc_thread_equal(a,b) pthread_equal(a,b)
 typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
+#define LIBVLC_DONT_WANT_MUTEX
 typedef pthread_rwlock_t vlc_rwlock_t;
 #define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
 typedef pthread_once_t  vlc_once_t;
@@ -271,21 +275,9 @@ typedef struct
 typedef pthread_t vlc_osthread_t;
 #define vlc_thread_equal(a,b) pthread_equal(a,b)
 
-/**
- * Mutex.
- *
- * Storage space for a mutual exclusion lock.
- *
- * \ingroup mutex
- */
 typedef pthread_mutex_t vlc_mutex_t;
-
-/**
- * Static initializer for (static) mutex.
- *
- * \ingroup mutex
- */
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
+#define LIBVLC_DONT_WANT_MUTEX
 
 /**
  * Read/write lock.
@@ -343,6 +335,43 @@ typedef struct vlc_timer *vlc_timer_t;
  * \defgroup mutex Mutual exclusion locks
  * @{
  */
+#ifndef LIBVLC_DONT_WANT_MUTEX
+/**
+ * Mutex.
+ *
+ * Storage space for a mutual exclusion lock.
+ */
+typedef struct
+{
+    union {
+#ifndef __cplusplus
+        struct {
+            atomic_uint value;
+            atomic_uint recursion;
+            const void *_Atomic owner;
+        };
+#endif
+        struct {
+            unsigned int value;
+            unsigned int recursion;
+            const void *owner;
+        } dummy;
+    };
+} vlc_mutex_t;
+
+/**
+ * Static initializer for (static) mutex.
+ *
+ * \note This only works in C code.
+ * In C++, consider using a global \ref vlc::threads::mutex instance instead.
+ */
+#define VLC_STATIC_MUTEX { \
+    .value = ATOMIC_VAR_INIT(0), \
+    .recursion = ATOMIC_VAR_INIT(0), \
+    .owner = ATOMIC_VAR_INIT(NULL), \
+}
+#endif
+
 /**
  * Initializes a fast mutex.
  *

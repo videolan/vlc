@@ -201,6 +201,130 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 }
 #endif
 
+#ifndef LIBVLC_DONT_WANT_MUTEX
+static void vlc_mutex_init_common(vlc_mutex_t *mtx, bool recursive)
+{
+    atomic_init(&mtx->value, 0);
+    atomic_init(&mtx->recursion, recursive);
+    atomic_init(&mtx->owner, NULL);
+}
+
+void vlc_mutex_init(vlc_mutex_t *mtx)
+{
+    vlc_mutex_init_common(mtx, false);
+}
+
+void vlc_mutex_init_recursive(vlc_mutex_t *mtx)
+{
+    vlc_mutex_init_common(mtx, true);
+}
+
+void vlc_mutex_destroy(vlc_mutex_t *mtx)
+{
+    assert(atomic_load_explicit(&mtx->value, memory_order_relaxed) == 0);
+    assert(atomic_load_explicit(&mtx->recursion, memory_order_relaxed) <= 1);
+    assert(atomic_load_explicit(&mtx->owner, memory_order_relaxed) == NULL);
+    (void) mtx;
+}
+
+static _Thread_local char thread_self[1];
+#define THREAD_SELF ((const void *)thread_self)
+
+static bool vlc_mutex_held(const vlc_mutex_t *mtx)
+{
+    /* This comparison is thread-safe:
+     * Even though other threads may modify the owner field at any time,
+     * they will never make ti compare equal to the calling thread.
+     */
+    return THREAD_SELF == atomic_load_explicit(&mtx->owner,
+                                               memory_order_relaxed);
+}
+
+void vlc_mutex_lock(vlc_mutex_t *mtx)
+{
+    unsigned value;
+
+    /* This is the Drepper (non-recursive) mutex algorithm
+     * from his "Futexes are tricky" paper. The mutex can value be:
+     * - 0: the mutex is free
+     * - 1: the mutex is locked and uncontended
+     * - 2: the mutex is contended (i.e., unlock needs to wake up a waiter)
+     */
+    if (vlc_mutex_trylock(mtx) == 0)
+        return;
+
+    int canc = vlc_savecancel(); /* locking is never a cancellation point */
+
+    while ((value = atomic_exchange_explicit(&mtx->value, 2,
+                                             memory_order_acquire)) != 0)
+        vlc_atomic_wait(&mtx->value, 2);
+
+    vlc_restorecancel(canc);
+    atomic_store_explicit(&mtx->owner, THREAD_SELF, memory_order_relaxed);
+    vlc_mutex_mark(mtx);
+}
+
+int vlc_mutex_trylock(vlc_mutex_t *mtx)
+{
+    /* Check the recursion counter:
+     * - 0: mutex is not recursive.
+     * - 1: mutex is recursive but free or locked non-recursively.
+     * - n > 1: mutex is recursive and locked n time(s).
+     */
+    unsigned recursion = atomic_load_explicit(&mtx->recursion,
+                                              memory_order_relaxed);
+    if (unlikely(recursion) && vlc_mutex_held(mtx)) {
+        /* This thread already owns the mutex, locks recursively.
+         * Other threads shall not have modified the recursion or owner fields.
+         */
+        atomic_store_explicit(&mtx->recursion, recursion + 1,
+                              memory_order_relaxed);
+        vlc_mutex_mark(mtx);
+        return 0;
+    } else
+        assert(!vlc_mutex_held(mtx));
+
+    unsigned value = 0;
+
+    if (atomic_compare_exchange_strong_explicit(&mtx->value, &value, 1,
+                                                memory_order_acquire,
+                                                memory_order_relaxed)) {
+        atomic_store_explicit(&mtx->owner, THREAD_SELF, memory_order_relaxed);
+        vlc_mutex_mark(mtx);
+        return 0;
+    }
+
+    return EBUSY;
+}
+
+void vlc_mutex_unlock(vlc_mutex_t *mtx)
+{
+    assert(vlc_mutex_held(mtx));
+
+    unsigned recursion = atomic_load_explicit(&mtx->recursion,
+                                              memory_order_relaxed);
+    if (unlikely(recursion > 1)) {
+        /* Non-last recursive unlocking. */
+        atomic_store_explicit(&mtx->recursion, recursion - 1,
+                              memory_order_relaxed);
+        vlc_mutex_unmark(mtx);
+        return;
+    }
+
+    atomic_store_explicit(&mtx->owner, NULL, memory_order_relaxed);
+    vlc_mutex_unmark(mtx);
+
+    switch (atomic_exchange_explicit(&mtx->value, 0, memory_order_release)) {
+        case 2:
+            vlc_atomic_notify_one(&mtx->value);
+        case 1:
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+#endif
+
 void vlc_cond_init(vlc_cond_t *cond)
 {
     cond->head = NULL;
