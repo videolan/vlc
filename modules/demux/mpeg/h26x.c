@@ -362,7 +362,7 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
         fmt.video.i_frame_rate = p_sys->feed_dts.i_divider_num;
         fmt.video.i_frame_rate_base = p_sys->feed_dts.i_divider_den;
     }
-    p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, psz_module );
+    p_sys->p_packetizer = vlc_packetizer_New( p_demux, &fmt, psz_module );
     if( !p_sys->p_packetizer )
     {
         free( p_sys );
@@ -403,7 +403,7 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    demux_PacketizerDestroy( p_sys->p_packetizer );
+    vlc_packetizer_Destroy( p_sys->p_packetizer );
     free( p_sys );
 }
 
@@ -527,4 +527,3 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                        0, -1,
                                        0, 1, i_query, args );
 }
-

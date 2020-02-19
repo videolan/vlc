@@ -2694,3 +2694,44 @@ int vlc_input_decoder_SetSpuHighlight( vlc_input_decoder_t *p_owner,
     vlc_mutex_unlock( &p_owner->lock );
     return VLC_SUCCESS;
 }
+
+decoder_t *(vlc_packetizer_New)( vlc_object_t *p_parent, es_format_t *p_fmt,
+                                 const char *psz_msg )
+{
+    decoder_t *p_packetizer;
+    p_packetizer = vlc_custom_create( p_parent, sizeof( *p_packetizer ), "demux packetizer" );
+    if( !p_packetizer )
+    {
+        es_format_Clean( p_fmt );
+        return NULL;
+    }
+    p_fmt->b_packetized = false;
+
+    p_packetizer->pf_decode = NULL;
+    p_packetizer->pf_packetize = NULL;
+
+    p_packetizer->fmt_in = *p_fmt;
+    es_format_Init( &p_packetizer->fmt_out, p_fmt->i_cat, 0 );
+
+    p_packetizer->p_module = module_need( p_packetizer, "packetizer", NULL, false );
+    if( !p_packetizer->p_module )
+    {
+        es_format_Clean( p_fmt );
+        vlc_object_delete(p_packetizer);
+        msg_Err( p_parent, "cannot find packetizer for %s", psz_msg );
+        return NULL;
+    }
+
+    return p_packetizer;
+}
+
+void vlc_packetizer_Destroy( decoder_t *p_packetizer )
+{
+    if( p_packetizer->p_module )
+        module_unneed( p_packetizer, p_packetizer->p_module );
+    es_format_Clean( &p_packetizer->fmt_in );
+    es_format_Clean( &p_packetizer->fmt_out );
+    if( p_packetizer->p_description )
+        vlc_meta_Delete( p_packetizer->p_description );
+    vlc_object_delete( p_packetizer );
+}

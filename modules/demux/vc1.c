@@ -110,7 +110,7 @@ static int Open( vlc_object_t * p_this )
 
     /* Load the packetizer */
     es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_VC1 );
-    p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "VC-1" );
+    p_sys->p_packetizer = vlc_packetizer_New( p_demux, &fmt, "VC-1" );
     if( !p_sys->p_packetizer )
     {
         free( p_sys );
@@ -127,7 +127,7 @@ static void Close( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    demux_PacketizerDestroy( p_sys->p_packetizer );
+    vlc_packetizer_Destroy( p_sys->p_packetizer );
     free( p_sys );
 }
 
@@ -207,4 +207,3 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                        0, -1,
                                        0, 1, i_query, args );
 }
-
