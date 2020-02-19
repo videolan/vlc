@@ -45,6 +45,7 @@
 struct access_sys_t
 {
     char *base_uri;
+    bool need_separator;
     DIR *dir;
 };
 
@@ -68,6 +69,12 @@ int DirInit (stream_t *access, DIR *dir)
     if (unlikely(sys->base_uri == NULL))
         goto error;
 
+    char last_char = sys->base_uri[strlen(sys->base_uri) - 1];
+    sys->need_separator =
+#ifdef _WIN32
+            last_char != '\\' &&
+#endif
+            last_char != '/';
     sys->dir = dir;
 
     access->p_sys = sys;
@@ -173,7 +180,9 @@ int DirRead (stream_t *access, input_item_node_t *node)
         }
 
         char *uri;
-        if (unlikely(asprintf(&uri, "%s/%s", sys->base_uri, encoded) == -1))
+        if (unlikely(asprintf(&uri, "%s%s%s", sys->base_uri,
+                              sys->need_separator ? "/" : "",
+                              encoded) == -1))
             uri = NULL;
         free(encoded);
         if (unlikely(uri == NULL))
