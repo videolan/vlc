@@ -1517,6 +1517,35 @@ vlc_player_GetSelectedTrack(vlc_player_t *player, enum es_format_category_e cat)
 }
 
 /**
+ * Select tracks by their string identifier
+ *
+ * This function can be used pre-select a list of tracks before starting the
+ * player. It has only effect for the current media. It can also be used when
+ * the player is already started.
+
+ * 'str_ids' can contain more than one track id, delimited with ','. "" or any
+ * invalid track id will cause the player to unselect all tracks of that
+ * category. NULL will disable the preference for newer tracks without
+ * unselecting any current tracks.
+ *
+ * Example:
+ * - (VIDEO_ES, "video/1,video/2") will select these 2 video tracks. If there
+ * is only one video track with the id "video/0", no tracks will be selected.
+ * - (SPU_ES, "${slave_url_md5sum}/spu/0) will select one spu added by an input
+ * slave with the corresponding url.
+ *
+ * @note The string identifier of a track can be found via vlc_es_id_GetStrId().
+ *
+ * @param player locked player instance
+ * @param cat VIDEO_ES, AUDIO_ES or SPU_ES
+ * @param str_ids list of string identifier or NULL
+ */
+VLC_API void
+vlc_player_SelectTracksByStringIds(vlc_player_t *player,
+                                   enum es_format_category_e cat,
+                                   const char *str_ids);
+
+/**
  * Select a track from an ES identifier
  *
  * @note A successful call will trigger the

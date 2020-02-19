@@ -852,6 +852,7 @@ vlc_player_SelectProgram
 vlc_player_SelectTeletextPage
 vlc_player_SelectTitle
 vlc_player_SelectTitleIdx
+vlc_player_SelectTracksByStringIds
 vlc_player_SetAssociatedSubsFPS
 vlc_player_SetAtoBLoop
 vlc_player_SetCategoryDelay

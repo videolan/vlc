@@ -72,6 +72,13 @@ vlc_player_OpenNextMedia(vlc_player_t *player)
 
     player->next_media_requested = false;
 
+    /* Tracks string ids are only remembered for one media */
+    free(player->video_string_ids);
+    free(player->audio_string_ids);
+    free(player->sub_string_ids);
+    player->video_string_ids = player->audio_string_ids =
+    player->sub_string_ids = NULL;
+
     int ret = VLC_SUCCESS;
     if (player->releasing_media)
     {
@@ -593,6 +600,30 @@ vlc_player_SelectEsId(vlc_player_t *player, vlc_es_id_t *id,
     unsigned ret = vlc_player_SelectEsIdList(player, cat, es_id_list);
     free(es_id_list);
     return ret;
+}
+
+void
+vlc_player_SelectTracksByStringIds(vlc_player_t *player,
+                                   enum es_format_category_e cat,
+                                   const char *str_ids)
+{
+    vlc_player_assert_locked(player);
+    char **cat_str_ids;
+
+    switch (cat)
+    {
+        case VIDEO_ES: cat_str_ids = &player->video_string_ids; break;
+        case AUDIO_ES: cat_str_ids = &player->audio_string_ids; break;
+        case SPU_ES:   cat_str_ids = &player->sub_string_ids; break;
+        default: return;
+    }
+
+    free(*cat_str_ids);
+    *cat_str_ids = str_ids ? strdup(str_ids) : NULL;
+
+    struct vlc_player_input *input = vlc_player_get_input_locked(player);
+    if (input)
+        vlc_player_input_SelectTracksByStringIds(input, cat, str_ids);
 }
 
 static void
@@ -1873,6 +1904,10 @@ vlc_player_Delete(vlc_player_t *player)
     if (player->next_media)
         input_item_Release(player->next_media);
 
+    free(player->video_string_ids);
+    free(player->audio_string_ids);
+    free(player->sub_string_ids);
+
     vlc_player_DestroyTimer(player);
 
     vlc_player_aout_DelCallbacks(player);
@@ -1920,6 +1955,9 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     player->releasing_media = false;
     player->next_media_requested = false;
     player->next_media = NULL;
+
+    player->video_string_ids = player->audio_string_ids =
+    player->sub_string_ids = NULL;
 
 #define VAR_CREATE(var, flag) do { \
     if (var_Create(player, var, flag) != VLC_SUCCESS) \

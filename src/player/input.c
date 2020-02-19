@@ -832,6 +832,14 @@ input_thread_Events(input_thread_t *input_thread,
     vlc_mutex_unlock(&player->lock);
 }
 
+void
+vlc_player_input_SelectTracksByStringIds(struct vlc_player_input *input,
+                                         enum es_format_category_e cat,
+                                         const char *str_ids)
+{
+    input_SetEsCatIds(input->thread, cat, str_ids);
+}
+
 struct vlc_player_input *
 vlc_player_input_New(vlc_player_t *player, input_item_t *item)
 {
@@ -894,6 +902,18 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
         return NULL;
     }
     vlc_player_input_RestoreMlStates(input, false);
+
+    if (player->video_string_ids)
+        vlc_player_input_SelectTracksByStringIds(input, VIDEO_ES,
+                                                 player->video_string_ids);
+
+    if (player->audio_string_ids)
+        vlc_player_input_SelectTracksByStringIds(input, AUDIO_ES,
+                                                 player->audio_string_ids);
+
+    if (player->sub_string_ids)
+        vlc_player_input_SelectTracksByStringIds(input, SPU_ES,
+                                                 player->sub_string_ids);
 
     /* Initial sub/audio delay */
     const vlc_tick_t cat_delays[DATA_ES] = {

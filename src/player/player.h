@@ -237,6 +237,10 @@ struct vlc_player_t
     bool next_media_requested;
     input_item_t *next_media;
 
+    char *video_string_ids;
+    char *audio_string_ids;
+    char *sub_string_ids;
+
     enum vlc_player_state global_state;
     bool started;
 
@@ -392,6 +396,11 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item);
 
 void
 vlc_player_input_Delete(struct vlc_player_input *input);
+
+void
+vlc_player_input_SelectTracksByStringIds(struct vlc_player_input *input,
+                                         enum es_format_category_e cat,
+                                         const char *str_ids);
 
 vlc_tick_t
 vlc_player_input_GetTime(struct vlc_player_input *input);
