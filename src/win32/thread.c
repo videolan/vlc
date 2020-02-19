@@ -514,11 +514,10 @@ void vlc_join (vlc_thread_t th, void **result)
 
     do
     {
-        vlc_testcancel ();
-        ret = WaitForSingleObjectEx(th->id, INFINITE, TRUE);
+        ret = WaitForSingleObject(th->id, INFINITE);
         assert(ret != WAIT_ABANDONED_0);
     }
-    while (ret == WAIT_IO_COMPLETION || ret == WAIT_FAILED);
+    while (ret == WAIT_FAILED);
 
     if (result != NULL)
         *result = th->data;
