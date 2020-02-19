@@ -631,7 +631,6 @@ static const char *const ppsz_clock_descriptions[] =
     "Language of the menus you want to use with DVD/BluRay " \
     "(comma separated, two or three letters country code, you may use 'any' as a fallback).")
 
-/// \todo Document how to find it
 #define INPUT_VIDEOTRACK_ID_TEXT N_("Video track ID")
 #define INPUT_VIDEOTRACK_ID_LONGTEXT N_( \
     "Stream ID of the video track to use.")
@@ -1848,13 +1847,13 @@ vlc_module_begin ()
                  INPUT_MENUTRACK_LANG_TEXT, INPUT_MENUTRACK_LANG_LONGTEXT,
                   false )
         change_safe ()
-    add_integer( "video-track-id", -1, INPUT_VIDEOTRACK_ID_TEXT,
+    add_string( "video-track-id", NULL, INPUT_VIDEOTRACK_ID_TEXT,
                  INPUT_VIDEOTRACK_ID_LONGTEXT, true )
         change_safe ()
-    add_integer( "audio-track-id", -1, INPUT_AUDIOTRACK_ID_TEXT,
+    add_string( "audio-track-id", NULL, INPUT_AUDIOTRACK_ID_TEXT,
                  INPUT_AUDIOTRACK_ID_LONGTEXT, true )
         change_safe ()
-    add_integer( "sub-track-id", -1,
+    add_string( "sub-track-id", NULL,
                  INPUT_SUBTRACK_ID_TEXT, INPUT_SUBTRACK_ID_LONGTEXT, true )
         change_safe ()
     add_integer( "captions", 608,

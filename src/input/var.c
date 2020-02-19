@@ -58,11 +58,11 @@ void input_ConfigVarInit ( input_thread_t *p_input )
                     VLC_VAR_STRING|VLC_VAR_DOINHERIT );
 
         var_Create( p_input, "video-track-id",
-                    VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+                    VLC_VAR_STRING|VLC_VAR_DOINHERIT );
         var_Create( p_input, "audio-track-id",
-                    VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+                    VLC_VAR_STRING|VLC_VAR_DOINHERIT );
         var_Create( p_input, "sub-track-id",
-                    VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+                    VLC_VAR_STRING|VLC_VAR_DOINHERIT );
 
         var_Create( p_input, "sub-file", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
         var_Create( p_input, "sub-autodetect-file", VLC_VAR_BOOL |
