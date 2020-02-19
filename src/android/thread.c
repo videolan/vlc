@@ -133,7 +133,6 @@ void vlc_once(vlc_once_t *once, void (*cb)(void))
 struct vlc_thread
 {
     pthread_t      thread;
-    vlc_sem_t      finished;
 
     void *(*entry)(void*);
     void *data;
@@ -183,25 +182,12 @@ static void *detached_thread(void *data)
     return NULL;
 }
 
-static void finish_joinable_thread(void *data)
-{
-    vlc_thread_t th = data;
-
-    vlc_sem_post(&th->finished);
-}
-
 static void *joinable_thread(void *data)
 {
     vlc_thread_t th = data;
-    void *ret;
 
-    vlc_cleanup_push(finish_joinable_thread, th);
     thread = th;
-    ret = th->entry(th->data);
-    vlc_cleanup_pop();
-    vlc_sem_post(&th->finished);
-
-    return ret;
+    return th->entry(th->data);
 }
 
 static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
@@ -226,8 +212,6 @@ static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
         pthread_sigmask (SIG_BLOCK, &set, &oldset);
     }
 
-    if (!detach)
-        vlc_sem_init(&thread->finished, 0);
     atomic_store(&thread->killed, false);
     thread->killable = true;
     thread->entry = entry;
@@ -258,8 +242,6 @@ int vlc_clone (vlc_thread_t *th, void *(*entry) (void *), void *data,
 
 void vlc_join (vlc_thread_t handle, void **result)
 {
-    vlc_sem_wait (&handle->finished);
-
     int val = pthread_join (handle->thread, result);
     VLC_THREAD_ASSERT ("joining thread");
     clean_detached_thread(handle);
