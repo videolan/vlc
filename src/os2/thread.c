@@ -134,8 +134,6 @@ static vlc_mutex_t super_mutex;
 static vlc_cond_t  super_variable;
 extern vlc_rwlock_t config_lock;
 
-static void vlc_static_cond_destroy_all(void);
-
 int _CRT_init(void);
 void _CRT_term(void);
 
@@ -163,7 +161,6 @@ unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
             vlc_threadvar_delete (&thread_key);
             vlc_cond_destroy (&super_variable);
             vlc_mutex_destroy (&super_mutex);
-            vlc_static_cond_destroy_all ();
 
             _CRT_term();
 
@@ -262,178 +259,6 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
         DosReleaseMutexSem( p_mutex->hmtx );
 
     vlc_mutex_unmark(p_mutex);
-}
-
-/*** Condition variables ***/
-typedef struct vlc_static_cond_t vlc_static_cond_t;
-
-struct vlc_static_cond_t
-{
-    vlc_cond_t condvar;
-    vlc_static_cond_t *next;
-};
-
-static vlc_static_cond_t *static_condvar_start = NULL;
-
-static void vlc_static_cond_init (vlc_cond_t *p_condvar)
-{
-    vlc_mutex_lock (&super_mutex);
-
-    if (p_condvar->hev == NULLHANDLE)
-    {
-        vlc_cond_init (p_condvar);
-
-        vlc_static_cond_t *new_static_condvar;
-
-        new_static_condvar = malloc (sizeof (*new_static_condvar));
-        if (unlikely (!new_static_condvar))
-            abort();
-
-        memcpy (&new_static_condvar->condvar, p_condvar, sizeof (*p_condvar));
-        new_static_condvar->next = static_condvar_start;
-        static_condvar_start = new_static_condvar;
-    }
-
-    vlc_mutex_unlock (&super_mutex);
-}
-
-static void vlc_static_cond_destroy_all (void)
-{
-    vlc_static_cond_t *static_condvar;
-    vlc_static_cond_t *static_condvar_next;
-
-
-    for (static_condvar = static_condvar_start; static_condvar;
-         static_condvar = static_condvar_next)
-    {
-        static_condvar_next = static_condvar->next;
-
-        vlc_cond_destroy (&static_condvar->condvar);
-        free (static_condvar);
-    }
-}
-
-void vlc_cond_init (vlc_cond_t *p_condvar)
-{
-    if (DosCreateEventSem (NULL, &p_condvar->hev, 0, FALSE) ||
-        DosCreateEventSem (NULL, &p_condvar->hevAck, 0, FALSE))
-        abort();
-
-    p_condvar->waiters = 0;
-    p_condvar->signaled = 0;
-}
-
-void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
-{
-    vlc_cond_init (p_condvar);
-}
-
-void vlc_cond_destroy (vlc_cond_t *p_condvar)
-{
-    DosCloseEventSem( p_condvar->hev );
-    DosCloseEventSem( p_condvar->hevAck );
-}
-
-void vlc_cond_signal (vlc_cond_t *p_condvar)
-{
-    if (p_condvar->hev == NULLHANDLE)
-        vlc_static_cond_init (p_condvar);
-
-    if (!__atomic_cmpxchg32 (&p_condvar->waiters, 0, 0))
-    {
-        ULONG ulPost;
-
-        __atomic_xchg (&p_condvar->signaled, 1);
-        DosPostEventSem (p_condvar->hev);
-
-        DosWaitEventSem (p_condvar->hevAck, SEM_INDEFINITE_WAIT);
-        DosResetEventSem (p_condvar->hevAck, &ulPost);
-    }
-}
-
-void vlc_cond_broadcast (vlc_cond_t *p_condvar)
-{
-    if (p_condvar->hev == NULLHANDLE)
-        vlc_static_cond_init (p_condvar);
-
-    while (!__atomic_cmpxchg32 (&p_condvar->waiters, 0, 0))
-        vlc_cond_signal (p_condvar);
-}
-
-static int vlc_cond_wait_common (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
-                                 ULONG ulTimeout)
-{
-    ULONG ulPost;
-    ULONG rc;
-
-    assert(p_condvar->hev != NULLHANDLE);
-
-    do
-    {
-        vlc_testcancel();
-
-        __atomic_increment (&p_condvar->waiters);
-
-        vlc_mutex_unlock (p_mutex);
-
-        do
-        {
-            rc = vlc_WaitForSingleObject( p_condvar->hev, ulTimeout );
-            if (rc == NO_ERROR)
-                DosResetEventSem (p_condvar->hev, &ulPost);
-        } while (rc == NO_ERROR &&
-                 __atomic_cmpxchg32 (&p_condvar->signaled, 0, 1) == 0);
-
-        __atomic_decrement (&p_condvar->waiters);
-
-        DosPostEventSem (p_condvar->hevAck);
-
-        vlc_mutex_lock (p_mutex);
-    } while( rc == ERROR_INTERRUPT );
-
-    return rc ? ETIMEDOUT : 0;
-}
-
-void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
-{
-    if (p_condvar->hev == NULLHANDLE)
-        vlc_static_cond_init (p_condvar);
-
-    vlc_cond_wait_common (p_condvar, p_mutex, SEM_INDEFINITE_WAIT);
-}
-
-int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
-                        vlc_tick_t deadline)
-{
-    ULONG ulTimeout;
-
-    vlc_tick_t total = vlc_tick_now();
-    total = (deadline - total) / 1000;
-    if( total < 0 )
-        total = 0;
-
-    ulTimeout = ( total > 0x7fffffff ) ? 0x7fffffff : total;
-
-    return vlc_cond_wait_common (p_condvar, p_mutex, ulTimeout);
-}
-
-int vlc_cond_timedwait_daytime (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
-                                time_t deadline)
-{
-    ULONG ulTimeout;
-    vlc_tick_t total;
-    struct timeval tv;
-
-    gettimeofday (&tv, NULL);
-
-    total = vlc_tick_from_timeval( &tv );
-    total = (deadline - total) / 1000;
-    if( total < 0 )
-        total = 0;
-
-    ulTimeout = ( total > 0x7fffffff ) ? 0x7fffffff : total;
-
-    return vlc_cond_wait_common (p_condvar, p_mutex, ulTimeout);
 }
 
 void vlc_once(vlc_once_t *once, void (*cb)(void))

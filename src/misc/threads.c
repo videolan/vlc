@@ -155,9 +155,7 @@ bool vlc_mutex_marked(const vlc_mutex_t *mutex)
 # undef LIBVLC_NEED_SLEEP
 #endif
 
-#if defined(LIBVLC_NEED_SLEEP) || defined(LIBVLC_NEED_CONDVAR)
-#include <stdatomic.h>
-
+#if defined(_WIN32) || defined(__ANDROID__)
 static void do_vlc_cancel_addr_clear(void *addr)
 {
     vlc_cancel_addr_clear(addr);
@@ -179,6 +177,9 @@ static void vlc_cancel_addr_finish(atomic_uint *addr)
     /* Act on cancellation as potential wake-up source */
     vlc_testcancel();
 }
+#else
+# define vlc_cancel_addr_prepare(addr) ((void)0)
+# define vlc_cancel_addr_finish(addr) ((void)0)
 #endif
 
 #ifdef LIBVLC_NEED_SLEEP
@@ -200,7 +201,6 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 }
 #endif
 
-#ifdef LIBVLC_NEED_CONDVAR
 void vlc_cond_init(vlc_cond_t *cond)
 {
     cond->head = NULL;
@@ -371,7 +371,6 @@ int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
 
     return ret;
 }
-#endif
 
 #ifdef LIBVLC_NEED_RWLOCK
 /*** Generic read/write locks ***/

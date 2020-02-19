@@ -77,7 +77,6 @@ typedef struct
     };
 } vlc_mutex_t;
 #define VLC_STATIC_MUTEX { false, { { false, 0 } } }
-#define LIBVLC_NEED_CONDVAR
 #define LIBVLC_NEED_RWLOCK
 typedef INIT_ONCE vlc_once_t;
 #define VLC_STATIC_ONCE INIT_ONCE_STATIC_INIT
@@ -126,14 +125,6 @@ typedef struct
     };
 } vlc_mutex_t;
 #define VLC_STATIC_MUTEX { false, { { false, 0 } } }
-typedef struct
-{
-    HEV      hev;
-    unsigned waiters;
-    HEV      hevAck;
-    unsigned signaled;
-} vlc_cond_t;
-#define VLC_STATIC_COND { NULLHANDLE, 0, NULLHANDLE, 0 }
 #define LIBVLC_NEED_RWLOCK
 typedef struct
 {
@@ -181,7 +172,6 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 # include <poll.h>
 # define LIBVLC_USE_PTHREAD_CLEANUP   1
 # define LIBVLC_NEED_SLEEP
-# define LIBVLC_NEED_CONDVAR
 # define LIBVLC_NEED_RWLOCK
 
 typedef struct vlc_thread *vlc_thread_t;
@@ -237,8 +227,6 @@ typedef pthread_t       vlc_osthread_t;
 #define vlc_thread_equal(a,b) pthread_equal(a,b)
 typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
-typedef pthread_cond_t vlc_cond_t;
-#define VLC_STATIC_COND PTHREAD_COND_INITIALIZER
 typedef pthread_rwlock_t vlc_rwlock_t;
 #define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
 typedef pthread_once_t  vlc_once_t;
@@ -298,28 +286,6 @@ typedef pthread_mutex_t vlc_mutex_t;
  * \ingroup mutex
  */
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
-
-/**
- * Condition variable.
- *
- * Storage space for a thread condition variable.
- *
- * \ingroup condvar
- */
-typedef pthread_cond_t  vlc_cond_t;
-
-/**
- * Static initializer for (static) condition variable.
- *
- * \note
- * The condition variable will use the default clock, which is OS-dependent.
- * Therefore, where timed waits are necessary the condition variable should
- * always be initialized dynamically explicit instead of using this
- * initializer.
- *
- * \ingroup condvar
- */
-#define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
 
 /**
  * Read/write lock.
@@ -472,16 +438,29 @@ VLC_API bool vlc_mutex_marked(const vlc_mutex_t *) VLC_USED;
  * @{
  */
 
-#ifdef LIBVLC_NEED_CONDVAR
 struct vlc_cond_waiter;
 
+/**
+ * Condition variable.
+ *
+ * Storage space for a thread condition variable.
+ */
 typedef struct
 {
     struct vlc_cond_waiter *head;
     vlc_mutex_t lock;
 } vlc_cond_t;
-# define VLC_STATIC_COND { NULL, VLC_STATIC_MUTEX }
-#endif
+
+/**
+ * Static initializer for (static) condition variable.
+ *
+ * \note
+ * The condition variable will use the default clock, which is OS-dependent.
+ * Therefore, where timed waits are necessary the condition variable should
+ * always be initialized dynamically explicit instead of using this
+ * initializer.
+ */
+#define VLC_STATIC_COND { NULL, VLC_STATIC_MUTEX }
 
 /**
  * Initializes a condition variable.
@@ -1197,12 +1176,10 @@ static inline void vlc_cleanup_lock (void *lock)
 }
 #define mutex_cleanup_push( lock ) vlc_cleanup_push (vlc_cleanup_lock, lock)
 
-#if defined(LIBVLC_NEED_CONDVAR) && !defined(__cplusplus)
+#ifndef __cplusplus
 void vlc_cancel_addr_set(atomic_uint *addr);
 void vlc_cancel_addr_clear(atomic_uint *addr);
-#endif
-
-#ifdef __cplusplus
+#else
 /**
  * Helper C++ class to lock a mutex.
  *

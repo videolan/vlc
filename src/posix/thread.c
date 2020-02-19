@@ -165,67 +165,6 @@ void vlc_mutex_unlock(vlc_mutex_t *mutex)
     vlc_mutex_unmark(mutex);
 }
 
-void vlc_cond_init (vlc_cond_t *p_condvar)
-{
-    pthread_condattr_t attr;
-
-    if (unlikely(pthread_condattr_init (&attr))
-     || unlikely(pthread_condattr_setclock(&attr, CLOCK_MONOTONIC))
-     || unlikely(pthread_cond_init (p_condvar, &attr)))
-        abort ();
-
-    pthread_condattr_destroy (&attr);
-}
-
-void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
-{
-    if (unlikely(pthread_cond_init (p_condvar, NULL)))
-        abort ();
-}
-
-void vlc_cond_destroy (vlc_cond_t *p_condvar)
-{
-    int val = pthread_cond_destroy( p_condvar );
-    VLC_THREAD_ASSERT ("destroying condition");
-}
-
-void vlc_cond_signal (vlc_cond_t *p_condvar)
-{
-    int val = pthread_cond_signal( p_condvar );
-    VLC_THREAD_ASSERT ("signaling condition variable");
-}
-
-void vlc_cond_broadcast (vlc_cond_t *p_condvar)
-{
-    pthread_cond_broadcast (p_condvar);
-}
-
-void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
-{
-    int val = pthread_cond_wait( p_condvar, p_mutex );
-    VLC_THREAD_ASSERT ("waiting on condition");
-}
-
-int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
-                        vlc_tick_t deadline)
-{
-    struct timespec ts = timespec_from_vlc_tick (deadline);
-    int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
-    if (val != ETIMEDOUT)
-        VLC_THREAD_ASSERT ("timed-waiting on condition");
-    return val;
-}
-
-int vlc_cond_timedwait_daytime (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
-                                time_t deadline)
-{
-    struct timespec ts = { deadline, 0 };
-    int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
-    if (val != ETIMEDOUT)
-        VLC_THREAD_ASSERT ("timed-waiting on condition");
-    return val;
-}
-
 void vlc_rwlock_init (vlc_rwlock_t *lock)
 {
     if (unlikely(pthread_rwlock_init (lock, NULL)))
