@@ -462,7 +462,7 @@ vlc_player_SelectEsIdList(vlc_player_t *player,
        Ids will be released in input.c:ControlRelease */
     size_t track_count = 0;
     for (size_t i = 0; es_id_list[i] != NULL; i++)
-        if (track_count < max_tracks && vlc_es_id_GetCat(es_id_list[i]))
+        if (track_count < max_tracks && vlc_es_id_GetCat(es_id_list[i]) == cat)
             track_count++;
 
     /* Copy es_id_list into an allocated list so that it remains in memory until
