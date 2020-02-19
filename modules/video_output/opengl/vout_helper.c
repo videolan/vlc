@@ -855,13 +855,17 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 #if !defined(USE_OPENGL_ES2)
+    // Check for OpenGL < 2.0
     const unsigned char *ogl_version = vgl->vt.GetString(GL_VERSION);
-    bool supports_shaders = strverscmp((const char *)ogl_version, "2.0") >= 0;
-    if (!supports_shaders)
-    {
-        msg_Err(gl, "shaders not supported, bailing out\n");
-        free(vgl);
-        return NULL;
+    if (strverscmp((const char *)ogl_version, "2.0") < 0) {
+        // Even with OpenGL < 2.0 we might have GLSL support,
+        // so check the GLSL version before finally giving up:
+        const unsigned char *glsl_version = vgl->vt.GetString(GL_SHADING_LANGUAGE_VERSION);
+        if (!glsl_version || strverscmp((const char *)glsl_version, "1.10") < 0) {
+            msg_Err(gl, "shaders not supported, bailing out\n");
+            free(vgl);
+            return NULL;
+        }
     }
 #endif
 
