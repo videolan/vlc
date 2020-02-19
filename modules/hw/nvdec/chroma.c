@@ -78,7 +78,7 @@ static picture_t * FilterCUDAToCPU( filter_t *p_filter, picture_t *src )
         }
         CUDA_MEMCPY2D cu_cpy = {
             .srcMemoryType  = CU_MEMORYTYPE_DEVICE,
-            .srcDevice      = srcpic->devidePtr,
+            .srcDevice      = srcpic->devicePtr,
             .srcY           = srcY,
             .srcPitch       = srcpic->bufferPitch,
             .dstMemoryType  = CU_MEMORYTYPE_HOST,

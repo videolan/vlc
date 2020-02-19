@@ -390,7 +390,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
             p_sys->vctx_out,
         };
         uintptr_t pool_idx = (uintptr_t)p_pic->p_sys;
-        picctx->devidePtr = p_sys->outputDevicePtr[pool_idx];
+        picctx->devicePtr = p_sys->outputDevicePtr[pool_idx];
         picctx->bufferPitch = p_sys->outputPitch;
         picctx->bufferHeight = p_sys->decoderHeight;
 
@@ -405,7 +405,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
                     .srcY           = srcY,
                     .srcPitch       = i_pitch,
                     .dstMemoryType  = CU_MEMORYTYPE_DEVICE,
-                    .dstDevice      = picctx->devidePtr,
+                    .dstDevice      = picctx->devicePtr,
                     .dstPitch       = picctx->bufferPitch,
                     .dstY           = dstY,
                     .WidthInBytes   = i_pitch,
@@ -430,7 +430,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
                     .srcY           = srcY,
                     .srcPitch       = i_pitch,
                     .dstMemoryType  = CU_MEMORYTYPE_DEVICE,
-                    .dstDevice      = picctx->devidePtr,
+                    .dstDevice      = picctx->devicePtr,
                     .dstPitch       = picctx->bufferPitch,
                     .dstY           = dstY,
                     .WidthInBytes   = i_pitch,

@@ -64,7 +64,7 @@ static inline bool is_nvdec_opaque(vlc_fourcc_t fourcc)
 typedef struct
 {
     picture_context_t ctx;
-    CUdeviceptr  devidePtr;
+    CUdeviceptr  devicePtr;
     unsigned int bufferPitch;
     unsigned int bufferHeight;
 } pic_context_nvdec_t;

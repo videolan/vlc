@@ -125,7 +125,7 @@ tc_nvdec_gl_update(const struct vlc_gl_interop *interop, GLuint textures[],
     {
         CUDA_MEMCPY2D cu_cpy = {
             .srcMemoryType  = CU_MEMORYTYPE_DEVICE,
-            .srcDevice      = srcpic->devidePtr,
+            .srcDevice      = srcpic->devicePtr,
             .srcPitch       = srcpic->bufferPitch,
             .srcY           = srcY,
             .dstMemoryType = CU_MEMORYTYPE_ARRAY,
