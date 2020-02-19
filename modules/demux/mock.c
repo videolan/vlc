@@ -425,7 +425,7 @@ CreateSubBlock(demux_t *demux, struct mock_track *track)
 }
 
 static int
-AppendMockTrack(demux_t *demux, const es_format_t *fmt, int group,
+AppendMockTrack(demux_t *demux, const es_format_t *fmt, int id, int group,
                 bool packetized)
 {
     struct demux_sys *sys = demux->p_sys;
@@ -433,6 +433,7 @@ AppendMockTrack(demux_t *demux, const es_format_t *fmt, int group,
     if (!mock_track)
         return VLC_EGENERIC;
     mock_track->fmt = *fmt;
+    mock_track->fmt.i_id = id;
     mock_track->fmt.i_group = group;
     mock_track->fmt.b_packetized = packetized;
     mock_track->id = es_out_Add(demux->out, & mock_track->fmt);
@@ -489,7 +490,7 @@ InitVideoTracks(demux_t *demux, int group, size_t count)
         fmt.video.i_frame_rate = sys->video_frame_rate;
         fmt.video.i_frame_rate_base = sys->video_frame_rate_base;
 
-        if (AppendMockTrack(demux, &fmt, group, sys->video_packetized))
+        if (AppendMockTrack(demux, &fmt, i, group, sys->video_packetized))
             return VLC_ENOMEM;
     }
     return VLC_SUCCESS;
@@ -543,7 +544,7 @@ InitAudioTracks(demux_t *demux, int group, size_t count)
         fmt.audio.i_physical_channels = physical_channels;
         aout_FormatPrepare(&fmt.audio);
 
-        if (AppendMockTrack(demux, &fmt, group, sys->audio_packetized))
+        if (AppendMockTrack(demux, &fmt, i, group, sys->audio_packetized))
             return VLC_ENOMEM;
     }
 
@@ -563,7 +564,7 @@ InitSubTracks(demux_t *demux, int group, size_t count)
         es_format_t fmt;
         es_format_Init(&fmt, SPU_ES, VLC_CODEC_SUBT);
 
-        if (AppendMockTrack(demux, &fmt, group, sys->sub_packetized))
+        if (AppendMockTrack(demux, &fmt, i, group, sys->sub_packetized))
             return VLC_ENOMEM;
     }
 
