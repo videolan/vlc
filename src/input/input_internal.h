@@ -431,6 +431,11 @@ typedef union
     } cat_delay;
     struct
     {
+        enum es_format_category_e cat;
+        char *str_ids;
+    } cat_ids;
+    struct
+    {
         vlc_es_id_t *id;
         vlc_tick_t delay;
     } es_delay;
@@ -578,6 +583,7 @@ enum input_control_e
     INPUT_CONTROL_SET_ES_LIST,  // select a list of ES atomically
     INPUT_CONTROL_UNSET_ES,
     INPUT_CONTROL_RESTART_ES,
+    INPUT_CONTROL_SET_ES_CAT_IDS,
 
     INPUT_CONTROL_SET_VIEWPOINT,    // new absolute viewpoint
     INPUT_CONTROL_SET_INITIAL_VIEWPOINT, // set initial viewpoint (generally from video)
@@ -635,6 +641,15 @@ static inline int input_ControlPushEsHelper( input_thread_t *p_input, int i_type
  * input is started
  */
 void input_ControlSync(input_thread_t *, int, const input_control_param_t *);
+
+/**
+ * Set the list of string ids to enable for a category
+ *
+ * cf. ES_OUT_SET_ES_CAT_IDS
+ * This function can be called before start or while started.
+ */
+void input_SetEsCatIds(input_thread_t *, enum es_format_category_e cat,
+                       const char *str_ids);
 
 bool input_Stopped( input_thread_t * );
 

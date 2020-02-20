@@ -1619,6 +1619,9 @@ static void ControlRelease( int i_type, const input_control_param_t *p_param )
         free(p_param->list.ids);
         break;
     }
+    case INPUT_CONTROL_SET_ES_CAT_IDS:
+        free( p_param->cat_ids.str_ids );
+        break;
 
     default:
         break;
@@ -1823,6 +1826,26 @@ void input_ControlSync(input_thread_t *p_input, int i_type,
 {
     assert( !input_priv(p_input)->is_running );
     Control( p_input, i_type, *param );
+}
+
+void input_SetEsCatIds(input_thread_t *input, enum es_format_category_e cat,
+                       const char *str_ids)
+{
+    input_thread_private_t *sys = input_priv(input);
+
+    if (!sys->is_running && !sys->is_stopped)
+    {
+        /* Not running, send the control synchronously since we are sure that
+         * it won't block */
+        es_out_SetEsCatIds(sys->p_es_out_display, cat, str_ids);
+    }
+    else
+    {
+        const input_control_param_t param = {
+            .cat_ids = { cat, str_ids ? strdup(str_ids) : NULL }
+        };
+        input_ControlPush(input, INPUT_CONTROL_SET_ES_CAT_IDS, &param);
+    }
 }
 
 static bool Control( input_thread_t *p_input,
@@ -2061,6 +2084,10 @@ static bool Control( input_thread_t *p_input,
             break;
         case INPUT_CONTROL_RESTART_ES:
             es_out_RestartEs( priv->p_es_out_display, param.id );
+            break;
+        case INPUT_CONTROL_SET_ES_CAT_IDS:
+            es_out_SetEsCatIds( priv->p_es_out_display, param.cat_ids.cat,
+                                param.cat_ids.str_ids );
             break;
 
         case INPUT_CONTROL_SET_VIEWPOINT:
