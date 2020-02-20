@@ -2246,7 +2246,5 @@ Close( vlc_object_t *obj )
     audio_output_t *p_aout = (audio_output_t *) obj;
     aout_sys_t *p_sys = p_aout->sys;
 
-    vlc_cond_destroy(&p_sys->aout_cond);
-    vlc_cond_destroy(&p_sys->thread_cond);
     free( p_sys );
 }

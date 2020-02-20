@@ -494,8 +494,6 @@ static int Open(vlc_object_t *obj)
 
     if (vlc_clone(&sys->thread, Thread, stream, VLC_THREAD_PRIORITY_LOW))
     {
-        vlc_cond_destroy(&sys->wait_space);
-        vlc_cond_destroy(&sys->wait_data);
         vlc_interrupt_destroy(sys->interrupt);
         goto error;
     }
@@ -526,8 +524,6 @@ static void Close (vlc_object_t *obj)
     vlc_interrupt_kill(sys->interrupt);
     vlc_join(sys->thread, NULL);
     vlc_interrupt_destroy(sys->interrupt);
-    vlc_cond_destroy(&sys->wait_space);
-    vlc_cond_destroy(&sys->wait_data);
 
     while(sys->controls)
     {

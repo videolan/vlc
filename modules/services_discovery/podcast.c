@@ -150,7 +150,6 @@ static int Open( vlc_object_t *p_this )
     {
         var_DelCallback( pl, "podcast-request", Request, p_sys );
         var_DelCallback( pl, "podcast-urls", UrlsChange, p_sys );
-        vlc_cond_destroy( &p_sys->wait );
         free (p_sys);
         return VLC_EGENERIC;
     }
@@ -171,7 +170,6 @@ static void Close( vlc_object_t *p_this )
 
     var_DelCallback( pl, "podcast-urls", UrlsChange, p_sys );
     var_DelCallback( pl, "podcast-request", Request, p_sys );
-    vlc_cond_destroy( &p_sys->wait );
 
     for( int i = 0; i < p_sys->i_urls; i++ )
          free( p_sys->ppsz_urls[i] );

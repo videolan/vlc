@@ -323,8 +323,6 @@ HTTPChunkBufferedSource::~HTTPChunkBufferedSource()
     }
     buffered = 0;
     vlc_mutex_unlock(&lock);
-
-    vlc_cond_destroy(&avail);
 }
 
 bool HTTPChunkBufferedSource::isDone() const

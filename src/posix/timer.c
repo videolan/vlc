@@ -121,7 +121,6 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
     if (vlc_clone (&timer->thread, vlc_timer_thread, timer,
                    VLC_THREAD_PRIORITY_INPUT))
     {
-        vlc_cond_destroy (&timer->reschedule);
         free (timer);
         return ENOMEM;
     }
@@ -138,7 +137,6 @@ void vlc_timer_destroy (vlc_timer_t timer)
     vlc_mutex_unlock(&timer->lock);
 
     vlc_join (timer->thread, NULL);
-    vlc_cond_destroy (&timer->reschedule);
     free (timer);
 }
 

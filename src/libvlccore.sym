@@ -488,7 +488,6 @@ VLC_CompileBy
 VLC_CompileHost
 VLC_Compiler
 vlc_cond_broadcast
-vlc_cond_destroy
 vlc_cond_init
 vlc_cond_signal
 vlc_cond_timedwait

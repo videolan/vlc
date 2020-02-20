@@ -176,7 +176,6 @@ void Close_Extension( vlc_object_t *p_this )
         free( p_ext->psz_version );
         free( p_ext->p_icondata );
 
-        vlc_cond_destroy( &p_ext->p_sys->wait );
         vlc_timer_destroy( p_ext->p_sys->timer );
 
         free( p_ext->p_sys );
@@ -484,7 +483,6 @@ exit:
         free( p_ext->psz_description );
         free( p_ext->psz_shortdescription );
         free( p_ext->psz_version );
-        vlc_cond_destroy( &p_ext->p_sys->wait );
         free( p_ext->p_sys );
         free( p_ext );
     }

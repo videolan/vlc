@@ -322,7 +322,6 @@ struct vlc_h2_output *vlc_h2_output_create(struct vlc_tls *tls, bool client)
                                  : vlc_h2_output_thread;
     if (vlc_clone(&out->thread, cb, out, VLC_THREAD_PRIORITY_INPUT))
     {
-        vlc_cond_destroy(&out->wait);
         free(out);
         out = NULL;
     }
@@ -339,7 +338,6 @@ void vlc_h2_output_destroy(struct vlc_h2_output *out)
     vlc_cancel(out->thread);
     vlc_join(out->thread, NULL);
 
-    vlc_cond_destroy(&out->wait);
     /* Flush queues in case the thread was terminated within poll() and some
      * packets were still queued. */
     vlc_h2_output_flush_unlocked(out);

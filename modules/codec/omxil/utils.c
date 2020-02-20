@@ -50,7 +50,7 @@ void InitOmxEventQueue(OmxEventQueue *queue)
 
 void DeinitOmxEventQueue(OmxEventQueue *queue)
 {
-    vlc_cond_destroy(&queue->cond);
+    (void) queue;
 }
 
 OMX_ERRORTYPE PostOmxEvent(OmxEventQueue *queue, OMX_EVENTTYPE event,

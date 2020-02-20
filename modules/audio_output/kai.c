@@ -371,8 +371,6 @@ static void DestroyBuffer( audio_output_t *aout )
     aout_sys_t     *sys = aout->sys;
     audio_buffer_t *buffer = sys->buffer;
 
-    vlc_cond_destroy( &buffer->cond );
-
     free( buffer->data );
     free( buffer );
 }

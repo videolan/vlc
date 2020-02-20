@@ -90,8 +90,6 @@ DBMSDIOutput::~DBMSDIOutput()
     }
     if(p_card)
         p_card->Release();
-
-    vlc_cond_destroy(&feeder.cond);
 }
 
 AbstractStream *DBMSDIOutput::Add(const es_format_t *fmt)

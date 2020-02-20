@@ -497,7 +497,6 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
     return p_mlp;
 error:
     libvlc_event_manager_destroy(&p_mlp->event_manager);
-    vlc_cond_destroy(&p_mlp->seek_pending);
     free(p_mlp);
     return NULL;
 }
@@ -541,7 +540,6 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
     unlock(p_mlp);
 
     libvlc_event_manager_destroy(&p_mlp->event_manager);
-    vlc_cond_destroy(&p_mlp->seek_pending);
     free(p_mlp->current_playing_item_path);
     free(p_mlp);
 }

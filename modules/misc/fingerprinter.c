@@ -302,7 +302,6 @@ static void CleanSys( fingerprinter_sys_t *p_sys )
     for ( size_t i = 0; i < vlc_array_count( &p_sys->processing.queue ); i++ )
         fingerprint_request_Delete( vlc_array_item_at_index( &p_sys->processing.queue, i ) );
     vlc_array_clear( &p_sys->processing.queue );
-    vlc_cond_destroy( &p_sys->processing.cond );
 
     for ( size_t i = 0; i < vlc_array_count( &p_sys->results.queue ); i++ )
         fingerprint_request_Delete( vlc_array_item_at_index( &p_sys->results.queue, i ) );

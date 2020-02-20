@@ -438,7 +438,6 @@ static void Destroy(input_thread_t *input)
         ControlRelease(ctrl->i_type, &ctrl->param);
     }
 
-    vlc_cond_destroy(&priv->wait_control);
     vlc_object_delete(VLC_OBJECT(input));
 }
 

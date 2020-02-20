@@ -221,7 +221,6 @@ static void vlc_mwait_i11e_cleanup(void *opaque)
 
     vlc_mutex_unlock(&ctx->lock);
     vlc_interrupt_finish(ctx);
-    vlc_cond_destroy(cond);
 }
 
 int vlc_mwait_i11e(vlc_tick_t deadline)
@@ -242,9 +241,7 @@ int vlc_mwait_i11e(vlc_tick_t deadline)
     vlc_cleanup_pop();
     vlc_mutex_unlock(&ctx->lock);
 
-    int ret = vlc_interrupt_finish(ctx);
-    vlc_cond_destroy(&wait);
-    return ret;
+    return vlc_interrupt_finish(ctx);
 }
 
 static void vlc_interrupt_forward_wake(void *opaque)

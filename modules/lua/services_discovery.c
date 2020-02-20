@@ -239,7 +239,6 @@ int Open_LuaSD( vlc_object_t *p_this )
     if( vlc_clone( &p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW ) )
     {
         TAB_CLEAN( p_sys->i_query, p_sys->ppsz_query );
-        vlc_cond_destroy( &p_sys->cond );
         goto error;
     }
     return VLC_SUCCESS;
@@ -267,7 +266,6 @@ void Close_LuaSD( vlc_object_t *p_this )
         free( p_sys->ppsz_query[i] );
     TAB_CLEAN( p_sys->i_query, p_sys->ppsz_query );
 
-    vlc_cond_destroy( &p_sys->cond );
     free( p_sys->psz_filename );
     lua_close( p_sys->L );
     free( p_sys );

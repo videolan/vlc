@@ -420,10 +420,7 @@ fail:
     {
         vlc_playlist_Lock(playlist);
         if (p_sys->player_listener)
-        {
-            vlc_cond_destroy(&p_sys->wait);
             vlc_player_RemoveListener(player, p_sys->player_listener);
-        }
         vlc_playlist_RemoveListener(playlist, p_sys->playlist_listener);
         vlc_playlist_Unlock(playlist);
     }
@@ -449,8 +446,6 @@ static void Close(vlc_object_t *p_this)
         DeleteSong(&p_sys->p_queue[i]);
     vlc_UrlClean(&p_sys->p_submit_url);
     vlc_UrlClean(&p_sys->p_nowp_url);
-
-    vlc_cond_destroy(&p_sys->wait);
 
     vlc_playlist_Lock(playlist);
     vlc_player_RemoveListener(

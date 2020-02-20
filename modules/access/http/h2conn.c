@@ -391,7 +391,6 @@ static void vlc_h2_stream_close(struct vlc_http_stream *stream, bool aborted)
         free(f);
     }
 
-    vlc_cond_destroy(&s->recv_wait);
     free(s);
 
     if (destroy)
@@ -464,7 +463,6 @@ static struct vlc_http_stream *vlc_h2_stream_open(struct vlc_http_conn *c,
 
 error:
     vlc_mutex_unlock(&conn->lock);
-    vlc_cond_destroy(&s->recv_wait);
     free(s);
     return NULL;
 }

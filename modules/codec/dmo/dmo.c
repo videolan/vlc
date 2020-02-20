@@ -273,8 +273,6 @@ found:
 
     vlc_join( p_sys->thread, NULL );
 error:
-    vlc_cond_destroy( &p_sys->wait_input );
-    vlc_cond_destroy( &p_sys->wait_output );
     free( p_sys );
     return VLC_ENOMEM;
 }
@@ -293,8 +291,6 @@ static void DecoderClose( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_sys->lock );
 
     vlc_join( p_sys->thread, NULL );
-    vlc_cond_destroy( &p_sys->wait_input );
-    vlc_cond_destroy( &p_sys->wait_output );
     free( p_sys );
 }
 

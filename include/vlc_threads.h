@@ -458,14 +458,6 @@ VLC_API void vlc_cond_init(vlc_cond_t *);
 void vlc_cond_init_daytime(vlc_cond_t *);
 
 /**
- * Deinitializes a condition variable.
- *
- * No threads shall be waiting or signaling the condition, otherwise the
- * behavior is undefined.
- */
-VLC_API void vlc_cond_destroy(vlc_cond_t *);
-
-/**
  * Wakes up one thread waiting on a condition variable.
  *
  * If any thread is currently waiting on the condition variable, at least one

@@ -70,7 +70,6 @@ public:
 
     virtual ~CmdExecuteBlock()
     {
-        vlc_cond_destroy( &m_wait );
     }
 
     static void executeWait( const CmdGenericPtr& rcCommand  )

@@ -107,6 +107,5 @@ int main (void)
     assert(ts >= VLC_TICK_FROM_MS(200));
 
     vlc_timer_destroy (data.timer);
-    vlc_cond_destroy (&data.wait);
     return 0;
 }

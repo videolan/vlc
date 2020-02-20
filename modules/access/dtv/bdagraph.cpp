@@ -321,7 +321,6 @@ BDAOutput::BDAOutput( vlc_object_t *p_access ) :
 BDAOutput::~BDAOutput()
 {
     Empty();
-    vlc_cond_destroy( &wait );
 }
 
 void BDAOutput::Push( block_t *p_block )

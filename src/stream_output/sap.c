@@ -108,7 +108,6 @@ static sap_address_t *AddressCreate (vlc_object_t *obj, const char *group)
 
 static void AddressDestroy (sap_address_t *addr)
 {
-    vlc_cond_destroy (&addr->wait);
     net_Close (addr->fd);
     free (addr);
 }

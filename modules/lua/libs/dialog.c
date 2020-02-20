@@ -287,7 +287,6 @@ static int vlclua_dialog_delete( lua_State *L )
     ARRAY_RESET( p_dlg->widgets );
 
     /* Note: At this point, the UI must not use these resources */
-    vlc_cond_destroy( &p_dlg->cond );
     free( p_dlg );
 
     return 1;

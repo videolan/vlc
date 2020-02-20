@@ -1840,13 +1840,6 @@ vlc_player_InitLocks(vlc_player_t *player, enum vlc_player_lock_type lock_type)
     vlc_cond_init(&player->destructor.wait);
 }
 
-static void
-vlc_player_DestroyLocks(vlc_player_t *player)
-{
-    vlc_cond_destroy(&player->start_delay_cond);
-    vlc_cond_destroy(&player->destructor.wait);
-}
-
 void
 vlc_player_Delete(vlc_player_t *player)
 {
@@ -1870,8 +1863,6 @@ vlc_player_Delete(vlc_player_t *player)
         input_item_Release(player->media);
     if (player->next_media)
         input_item_Release(player->next_media);
-
-    vlc_player_DestroyLocks(player);
 
     vlc_player_DestroyTimer(player);
 
@@ -1976,7 +1967,6 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     if (vlc_clone(&player->destructor.thread, vlc_player_destructor_Thread,
                   player, VLC_THREAD_PRIORITY_LOW) != 0)
     {
-        vlc_player_DestroyLocks(player);
         vlc_player_DestroyTimer(player);
         goto error;
     }

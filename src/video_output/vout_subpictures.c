@@ -1609,8 +1609,6 @@ static void spu_Cleanup(spu_t *spu)
 
     vlc_vector_destroy(&sys->channels);
 
-    vlc_cond_destroy(&sys->prerender.cond);
-    vlc_cond_destroy(&sys->prerender.output_cond);
     vlc_vector_clear(&sys->prerender.vector);
     video_format_Clean(&sys->prerender.fmtdst);
     video_format_Clean(&sys->prerender.fmtsrc);

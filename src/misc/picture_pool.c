@@ -55,7 +55,6 @@ static void picture_pool_Destroy(picture_pool_t *pool)
         return;
 
     atomic_thread_fence(memory_order_acquire);
-    vlc_cond_destroy(&pool->wait);
     aligned_free(pool);
 }
 

@@ -507,7 +507,6 @@ static void GLESSwap(vlc_gl_t *gl)
 
 - (void)dealloc
 {
-    vlc_cond_destroy(&_gl_attached_wait);
     [super dealloc];
 }
 

@@ -1302,9 +1302,7 @@ static void StopVideoToolbox(decoder_t *p_dec, bool closing)
 
 static void pic_pacer_Destroy(void *priv)
 {
-    struct pic_pacer *pic_pacer = priv;
-
-    vlc_cond_destroy(&pic_pacer->wait);
+    (void) priv;
 }
 
 static void pic_pacer_Init(struct pic_pacer *pic_pacer, uint8_t pic_reorder_max)

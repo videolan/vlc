@@ -351,7 +351,6 @@ static void ReleaseDLSys(vlc_object_t *obj, int i_cat)
 
     if (--sys->users == 0) {
         msg_Dbg(obj, "Destroying decklink data");
-        vlc_cond_destroy(&sys->cond);
 
         if (sys->p_output) {
             sys->p_output->StopScheduledPlayback(0, NULL, 0);

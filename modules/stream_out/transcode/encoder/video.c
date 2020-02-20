@@ -442,8 +442,6 @@ void transcode_encoder_video_close( transcode_encoder_t *p_enc )
     /* Close encoder */
     module_unneed( p_enc->p_encoder, p_enc->p_encoder->p_module );
     p_enc->p_encoder->p_module = NULL;
-
-    vlc_cond_destroy( &p_enc->cond );
 }
 
 int transcode_encoder_video_open( transcode_encoder_t *p_enc,
@@ -472,7 +470,6 @@ int transcode_encoder_video_open( transcode_encoder_t *p_enc,
     {
         if( vlc_clone( &p_enc->thread, EncoderThread, p_enc, p_cfg->video.threads.i_priority ) )
         {
-            vlc_cond_destroy( &p_enc->cond );
             module_unneed( p_enc->p_encoder, p_enc->p_encoder->p_module );
             p_enc->p_encoder->p_module = NULL;
             return VLC_EGENERIC;

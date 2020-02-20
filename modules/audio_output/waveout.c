@@ -823,8 +823,6 @@ static void Close(vlc_object_t *obj)
     var_Destroy(aout, "waveout-audio-device");
 
     vlc_timer_destroy( sys->volume_poll_timer );
-    vlc_cond_destroy( &sys->cond );
-
     free(sys);
 }
 

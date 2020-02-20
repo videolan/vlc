@@ -143,7 +143,6 @@ background_thread_Create(struct background_worker *owner)
 
 static void background_thread_Destroy(struct background_thread *thread)
 {
-    vlc_cond_destroy(&thread->probe_cancel_wait);
     free(thread);
 }
 
@@ -170,7 +169,6 @@ static struct background_worker *background_worker_Create(void *owner,
 
 static void background_worker_Destroy(struct background_worker *worker)
 {
-    vlc_cond_destroy(&worker->queue_wait);
     free(worker);
 }
 

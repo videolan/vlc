@@ -552,7 +552,6 @@ static HRESULT Stop( aout_stream_sys_t *p_sys )
     vlc_mutex_unlock( &p_sys->lock );
     vlc_cancel( p_sys->eraser_thread );
     vlc_join( p_sys->eraser_thread, NULL );
-    vlc_cond_destroy( &p_sys->cond );
 
     if( p_sys->p_notify != NULL )
     {
@@ -659,10 +658,7 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
             fmt.i_frame_length = A52_FRAME_NB;
         }
         else
-        {
-            vlc_cond_destroy(&sys->cond);
             return E_FAIL;
-        }
     }
 
     if( hr != DS_OK )
@@ -805,8 +801,6 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
     return DS_OK;
 
 error:
-    vlc_cond_destroy(&sys->cond);
-
     if( sys->p_notify != NULL )
     {
         IDirectSoundNotify_Release( sys->p_notify );

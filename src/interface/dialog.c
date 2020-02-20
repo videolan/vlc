@@ -140,7 +140,6 @@ dialog_id_release(vlc_dialog_id *p_id)
         free(p_id->answer.u.login.psz_password);
     }
     free(p_id->psz_progress_text);
-    vlc_cond_destroy(&p_id->wait);
     free(p_id);
 }
 

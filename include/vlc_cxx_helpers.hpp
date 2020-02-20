@@ -309,10 +309,6 @@ public:
     {
         vlc_cond_init( &m_cond );
     }
-    ~condition_variable()
-    {
-        vlc_cond_destroy( &m_cond );
-    }
     void signal() noexcept
     {
         vlc_cond_signal( &m_cond );

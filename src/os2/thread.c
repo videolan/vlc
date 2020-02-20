@@ -159,7 +159,6 @@ unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
         case 1 :    /* Termination */
             vlc_rwlock_destroy (&config_lock);
             vlc_threadvar_delete (&thread_key);
-            vlc_cond_destroy (&super_variable);
 
             _CRT_term();
 

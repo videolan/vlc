@@ -2039,10 +2039,6 @@ static void DeleteDecoder( decoder_t * p_dec )
         vlc_meta_Delete( p_owner->p_description );
 
     decoder_Destroy( p_owner->p_packetizer );
-
-    vlc_cond_destroy( &p_owner->wait_fifo );
-    vlc_cond_destroy( &p_owner->wait_acknowledge );
-    vlc_cond_destroy( &p_owner->wait_request );
     decoder_Destroy( &p_owner->dec );
 }
 

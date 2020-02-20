@@ -991,7 +991,6 @@ error:
 
     if (host) {
         net_ListenClose(host->fds);
-        vlc_cond_destroy(&host->wait);
         vlc_object_delete(host);
     }
 
@@ -1027,7 +1026,6 @@ void httpd_HostDelete(httpd_host_t *host)
     assert(vlc_list_is_empty(&host->urls));
     vlc_tls_ServerDelete(host->p_tls);
     net_ListenClose(host->fds);
-    vlc_cond_destroy(&host->wait);
     vlc_object_delete(host);
     vlc_mutex_unlock(&httpd.mutex);
 }

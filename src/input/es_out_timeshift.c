@@ -782,7 +782,6 @@ static const struct es_out_callbacks es_out_timeshift_cbs =
  *****************************************************************************/
 static void TsDestroy( ts_thread_t *p_ts )
 {
-    vlc_cond_destroy( &p_ts->wait );
     free( p_ts );
 }
 static int TsStart( es_out_t *p_out )

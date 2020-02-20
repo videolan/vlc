@@ -233,11 +233,6 @@ void vlc_cond_init_daytime(vlc_cond_t *cond)
     vlc_cond_init(cond);
 }
 
-void vlc_cond_destroy(vlc_cond_t *cond)
-{
-    assert(cond->head == NULL);
-}
-
 struct vlc_cond_waiter {
     struct vlc_cond_waiter **pprev, *next;
     atomic_uint value;
@@ -416,7 +411,7 @@ void vlc_rwlock_init (vlc_rwlock_t *lock)
 
 void vlc_rwlock_destroy (vlc_rwlock_t *lock)
 {
-    vlc_cond_destroy (&lock->wait);
+    (void) lock;
 }
 
 void vlc_rwlock_rdlock (vlc_rwlock_t *lock)

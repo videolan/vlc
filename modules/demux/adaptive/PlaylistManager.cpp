@@ -89,8 +89,6 @@ PlaylistManager::~PlaylistManager   ()
     delete playlist;
     delete logic;
     delete resources;
-    vlc_cond_destroy(&waitcond);
-    vlc_cond_destroy(&demux.cond);
 }
 
 void PlaylistManager::unsetPeriod()

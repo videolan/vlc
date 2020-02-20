@@ -161,7 +161,6 @@ block_fifo_t *block_FifoNew( void )
 void block_FifoRelease( block_fifo_t *p_fifo )
 {
     block_ChainRelease( p_fifo->p_first );
-    vlc_cond_destroy( &p_fifo->wait );
     free( p_fifo );
 }
 

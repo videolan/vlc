@@ -77,7 +77,6 @@ void vout_snapshot_Destroy(vout_snapshot_t *snap)
         picture = next;
     }
 
-    vlc_cond_destroy(&snap->wait);
     free(snap);
 }
 

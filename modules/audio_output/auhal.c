@@ -878,8 +878,6 @@ out:
     if (ret != VLC_SUCCESS)
         retValue = false;
 
-    vlc_cond_destroy(&w.cond);
-
     return retValue;
 }
 

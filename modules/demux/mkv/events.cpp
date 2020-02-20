@@ -42,7 +42,6 @@ event_thread_t::event_thread_t(demux_t *p_demux) : p_demux(p_demux)
 event_thread_t::~event_thread_t()
 {
     ResetPci();
-    vlc_cond_destroy( &wait );
 }
 
 void event_thread_t::SetPci(const pci_t *data)
