@@ -201,7 +201,6 @@ void (vlc_tick_sleep)(vlc_tick_t delay)
 }
 #endif
 
-#ifndef LIBVLC_DONT_WANT_MUTEX
 static void vlc_mutex_init_common(vlc_mutex_t *mtx, bool recursive)
 {
     atomic_init(&mtx->value, 0);
@@ -323,7 +322,6 @@ void vlc_mutex_unlock(vlc_mutex_t *mtx)
             vlc_assert_unreachable();
     }
 }
-#endif
 
 void vlc_cond_init(vlc_cond_t *cond)
 {

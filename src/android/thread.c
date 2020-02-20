@@ -67,63 +67,6 @@ vlc_thread_fatal_print (const char *action, int error,
 # define VLC_THREAD_ASSERT( action ) ((void)val)
 #endif
 
-/* mutexes */
-void vlc_mutex_init( vlc_mutex_t *p_mutex )
-{
-    pthread_mutexattr_t attr;
-
-    pthread_mutexattr_init (&attr);
-#ifdef NDEBUG
-    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_DEFAULT);
-#else
-    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_ERRORCHECK);
-#endif
-    pthread_mutex_init (p_mutex, &attr);
-    pthread_mutexattr_destroy( &attr );
-}
-
-void vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
-{
-    pthread_mutexattr_t attr;
-
-    pthread_mutexattr_init (&attr);
-    pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init (p_mutex, &attr);
-    pthread_mutexattr_destroy( &attr );
-}
-
-
-void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
-{
-    int val = pthread_mutex_destroy( p_mutex );
-    VLC_THREAD_ASSERT ("destroying mutex");
-}
-
-void vlc_mutex_lock (vlc_mutex_t *p_mutex)
-{
-    int val = pthread_mutex_lock( p_mutex );
-    VLC_THREAD_ASSERT ("locking mutex");
-    vlc_mutex_mark(p_mutex);
-}
-
-int vlc_mutex_trylock (vlc_mutex_t *p_mutex)
-{
-    int val = pthread_mutex_trylock( p_mutex );
-
-    if (val != EBUSY) {
-        VLC_THREAD_ASSERT ("locking mutex");
-        vlc_mutex_mark(p_mutex);
-    }
-    return val;
-}
-
-void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
-{
-    int val = pthread_mutex_unlock( p_mutex );
-    VLC_THREAD_ASSERT ("unlocking mutex");
-    vlc_mutex_unmark(p_mutex);
-}
-
 void vlc_once(vlc_once_t *once, void (*cb)(void))
 {
     int val = pthread_once(once, cb);
