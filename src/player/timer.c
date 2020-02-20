@@ -323,6 +323,7 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
         /* When paused (INT64_MAX), the same ts can be send more than one time
          * from the video source, only send it if different in that case. */
         if (point->ts != player->timer.last_ts
+          || source->point.system_date != point->system_date
           || point->system_date != INT64_MAX)
         {
             vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
