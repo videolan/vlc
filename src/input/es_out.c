@@ -2566,15 +2566,19 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
 static void EsOutSelectList( es_out_t *out, enum es_format_category_e cat,
                              vlc_es_id_t * const*es_id_list )
 {
-
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     es_out_id_t *other;
+    es_out_es_props_t *p_esprops = GetPropsByCat( p_sys, cat );
 
+    bool unselect_others = false;
     foreach_es_then_es_slaves(other)
     {
-        if( other->fmt.i_cat == cat )
+        if( other->fmt.i_cat != cat )
+            continue;
+
+        bool select = false;
+        if( !unselect_others )
         {
-            bool select = false;
             for( size_t i = 0; ; i++ )
             {
                 vlc_es_id_t *es_id = es_id_list[i];
@@ -2586,14 +2590,18 @@ static void EsOutSelectList( es_out_t *out, enum es_format_category_e cat,
                     break;
                 }
             }
-            if( !select && EsIsSelected( other ) )
-            {
+        }
+        if( !select )
+        {
+            if( EsIsSelected( other ) )
                 EsOutUnselectEs( out, other, other->p_pgrm == p_sys->p_pgrm );
-            }
-            else if( select && !EsIsSelected( other ) )
-            {
+        }
+        else
+        {
+            if( !EsIsSelected( other ) )
                 EsOutSelectEs( out, other );
-            }
+            if( p_esprops->e_policy == ES_OUT_ES_POLICY_EXCLUSIVE )
+                unselect_others = true;
         }
     }
 }
