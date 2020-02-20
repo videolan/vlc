@@ -914,11 +914,11 @@ vlc_player_Lock(vlc_player_t *player)
 {
     /* Vout and aout locks should not be held, cf. vlc_player_vout_cbs and
      * vlc_player_aout_cbs documentation */
-    assert(!vlc_mutex_marked(&player->vout_listeners_lock));
-    assert(!vlc_mutex_marked(&player->aout_listeners_lock));
+    assert(!vlc_mutex_held(&player->vout_listeners_lock));
+    assert(!vlc_mutex_held(&player->aout_listeners_lock));
     /* The timer lock should not be held (possible lock-order-inversion), cf.
      * vlc_player_timer_cbs.on_update documentation */
-    assert(!vlc_mutex_marked(&player->timer.lock));
+    assert(!vlc_mutex_held(&player->timer.lock));
 
     vlc_mutex_lock(&player->lock);
 }

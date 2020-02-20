@@ -62,94 +62,6 @@ void vlc_global_mutex (unsigned n, bool acquire)
         vlc_mutex_unlock (lock);
 }
 
-#ifndef NDEBUG
-# ifdef HAVE_SEARCH_H
-#  include <search.h>
-# endif
-
-struct vlc_lock_mark
-{
-    const void *object;
-    uintptr_t refs;
-};
-
-static int vlc_lock_mark_cmp(const void *a, const void *b)
-{
-    const struct vlc_lock_mark *ma = a, *mb = b;
-
-    if (ma->object == mb->object)
-        return 0;
-
-    return ((uintptr_t)(ma->object) > (uintptr_t)(mb->object)) ? +1 : -1;
-}
-
-static void vlc_lock_mark(const void *lock, void **rootp)
-{
-    struct vlc_lock_mark *mark = malloc(sizeof (*mark));
-    if (unlikely(mark == NULL))
-        abort();
-
-    mark->object = lock;
-    mark->refs = 0;
-
-    void **entry = tsearch(mark, rootp, vlc_lock_mark_cmp);
-    if (unlikely(entry == NULL))
-        abort();
-
-    if (unlikely(*entry != mark)) {
-        /* Recursive locking: lock is already in the tree */
-        free(mark);
-        mark = *entry;
-    }
-
-    mark->refs++;
-}
-
-static void vlc_lock_unmark(const void *lock, void **rootp)
-{
-    struct vlc_lock_mark *mark = &(struct vlc_lock_mark){ lock, 0 };
-    void **entry = tfind(mark, rootp, vlc_lock_mark_cmp);
-
-    assert(entry != NULL);
-    mark = *entry;
-    assert(mark->refs > 0);
-
-    if (likely(--mark->refs == 0)) {
-        tdelete(mark, rootp, vlc_lock_mark_cmp);
-        free(mark);
-    }
-}
-
-static bool vlc_lock_marked(const void *lock, void **rootp)
-{
-    struct vlc_lock_mark *mark = &(struct vlc_lock_mark){ lock, 0 };
-
-    return tfind(mark, rootp, vlc_lock_mark_cmp) != NULL;
-}
-
-static _Thread_local void *vlc_mutex_marks = NULL;
-
-void vlc_mutex_mark(const vlc_mutex_t *mutex)
-{
-    vlc_lock_mark(mutex, &vlc_mutex_marks);
-}
-
-void vlc_mutex_unmark(const vlc_mutex_t *mutex)
-{
-    vlc_lock_unmark(mutex, &vlc_mutex_marks);
-}
-
-bool vlc_mutex_marked(const vlc_mutex_t *mutex)
-{
-    return vlc_lock_marked(mutex, &vlc_mutex_marks);
-}
-#else
-bool vlc_mutex_marked(const vlc_mutex_t *mutex)
-{
-    return true;
-}
-#endif
-
 #if defined (_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WIN8)
 /* Cannot define OS version-dependent stuff in public headers */
 # undef LIBVLC_NEED_SLEEP
@@ -229,7 +141,7 @@ void vlc_mutex_destroy(vlc_mutex_t *mtx)
 static _Thread_local char thread_self[1];
 #define THREAD_SELF ((const void *)thread_self)
 
-static bool vlc_mutex_held(const vlc_mutex_t *mtx)
+bool vlc_mutex_held(const vlc_mutex_t *mtx)
 {
     /* This comparison is thread-safe:
      * Even though other threads may modify the owner field at any time,
@@ -260,7 +172,6 @@ void vlc_mutex_lock(vlc_mutex_t *mtx)
 
     vlc_restorecancel(canc);
     atomic_store_explicit(&mtx->owner, THREAD_SELF, memory_order_relaxed);
-    vlc_mutex_mark(mtx);
 }
 
 int vlc_mutex_trylock(vlc_mutex_t *mtx)
@@ -278,7 +189,6 @@ int vlc_mutex_trylock(vlc_mutex_t *mtx)
          */
         atomic_store_explicit(&mtx->recursion, recursion + 1,
                               memory_order_relaxed);
-        vlc_mutex_mark(mtx);
         return 0;
     } else
         assert(!vlc_mutex_held(mtx));
@@ -289,7 +199,6 @@ int vlc_mutex_trylock(vlc_mutex_t *mtx)
                                                 memory_order_acquire,
                                                 memory_order_relaxed)) {
         atomic_store_explicit(&mtx->owner, THREAD_SELF, memory_order_relaxed);
-        vlc_mutex_mark(mtx);
         return 0;
     }
 
@@ -306,12 +215,10 @@ void vlc_mutex_unlock(vlc_mutex_t *mtx)
         /* Non-last recursive unlocking. */
         atomic_store_explicit(&mtx->recursion, recursion - 1,
                               memory_order_relaxed);
-        vlc_mutex_unmark(mtx);
         return;
     }
 
     atomic_store_explicit(&mtx->owner, NULL, memory_order_relaxed);
-    vlc_mutex_unmark(mtx);
 
     switch (atomic_exchange_explicit(&mtx->value, 0, memory_order_release)) {
         case 2:
