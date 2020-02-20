@@ -121,6 +121,9 @@ enum es_out_policy_e
 {
     ES_OUT_ES_POLICY_EXCLUSIVE = 0,/* Enforces single ES selection only */
     ES_OUT_ES_POLICY_SIMULTANEOUS, /* Allows multiple ES per cat */
+    /* Exclusive by default, and simultaneous if specifically requested more
+     * than one track at once */
+    ES_OUT_ES_POLICY_AUTO,
 };
 
 struct es_out_callbacks

@@ -503,11 +503,11 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
     vlc_list_init(&p_sys->es_slaves);
 
     /* */
-    EsOutPropsInit( &p_sys->video, true, p_input, ES_OUT_ES_POLICY_EXCLUSIVE,
+    EsOutPropsInit( &p_sys->video, true, p_input, ES_OUT_ES_POLICY_AUTO,
                     "video-track-id", "video-track", NULL, NULL );
     EsOutPropsInit( &p_sys->audio, true, p_input, ES_OUT_ES_POLICY_EXCLUSIVE,
                     "audio-track-id", "audio-track", "audio-language", "audio" );
-    EsOutPropsInit( &p_sys->sub,  false, p_input, ES_OUT_ES_POLICY_EXCLUSIVE,
+    EsOutPropsInit( &p_sys->sub,  false, p_input, ES_OUT_ES_POLICY_AUTO,
                     "sub-track-id", "sub-track", "sub-language", "sub" );
 
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
