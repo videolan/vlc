@@ -159,7 +159,6 @@ static void Destroy( vlc_object_t *p_this )
     var_DelCallback( p_filter, CFG_PREFIX "vt", BluescreenCallback, p_sys );
 
     free( p_sys->p_at );
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 

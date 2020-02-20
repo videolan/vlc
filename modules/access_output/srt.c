@@ -402,8 +402,6 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 failed:
-    vlc_mutex_destroy( &p_sys->lock );
-
     if ( p_sys->sock != -1 ) srt_close( p_sys->sock );
     if ( p_sys->i_poll_id != -1 ) srt_epoll_release( p_sys->i_poll_id );
 
@@ -414,8 +412,6 @@ static void Close( vlc_object_t * p_this )
 {
     sout_access_out_t     *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-
-    vlc_mutex_destroy( &p_sys->lock );
 
     srt_epoll_remove_usock( p_sys->i_poll_id, p_sys->sock );
     srt_close( p_sys->sock );

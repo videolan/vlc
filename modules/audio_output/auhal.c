@@ -878,7 +878,6 @@ out:
     if (ret != VLC_SUCCESS)
         retValue = false;
 
-    vlc_mutex_destroy(&w.lock);
     vlc_cond_destroy(&w.cond);
 
     return retValue;
@@ -1689,10 +1688,6 @@ static void Close(vlc_object_t *obj)
     config_PutPsz("auhal-audio-device", psz_device);
     free(psz_device);
 
-    vlc_mutex_destroy(&p_sys->selected_device_lock);
-    vlc_mutex_destroy(&p_sys->device_list_lock);
-
-    ca_Close(p_aout);
     free(p_sys);
 }
 

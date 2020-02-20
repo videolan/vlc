@@ -282,9 +282,6 @@ static void Close( vlc_object_t *p_this )
     var_DelCallback( p_aout, "compressor-knee", KneeCallback, p_sys );
     var_DelCallback( p_aout, "compressor-makeup-gain", MakeupGainCallback, p_sys );
 
-    /* Destroy the mutex */
-    vlc_mutex_destroy( &p_sys->lock );
-
     /* Destroy the filter parameter structure */
     free( p_sys );
 }

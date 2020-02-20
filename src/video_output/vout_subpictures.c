@@ -1582,7 +1582,6 @@ static void spu_Cleanup(spu_t *spu)
 
     if (sys->text)
         FilterRelease(sys->text);
-    vlc_mutex_destroy(&sys->textlock);
 
     if (sys->scale_yuvp)
         FilterRelease(sys->scale_yuvp);
@@ -1601,7 +1600,6 @@ static void spu_Cleanup(spu_t *spu)
                              SubFilterDelProxyCallbacks, sys->vout);
     filter_chain_Delete(sys->filter_chain);
     free(sys->filter_chain_current);
-    vlc_mutex_destroy(&sys->filter_chain_lock);
     free(sys->source_chain_update);
     free(sys->filter_chain_update);
 
@@ -1611,9 +1609,6 @@ static void spu_Cleanup(spu_t *spu)
 
     vlc_vector_destroy(&sys->channels);
 
-    vlc_mutex_destroy(&sys->lock);
-
-    vlc_mutex_destroy(&sys->prerender.lock);
     vlc_cond_destroy(&sys->prerender.cond);
     vlc_cond_destroy(&sys->prerender.output_cond);
     vlc_vector_clear(&sys->prerender.vector);

@@ -176,16 +176,12 @@ void Close_Extension( vlc_object_t *p_this )
         free( p_ext->psz_version );
         free( p_ext->p_icondata );
 
-        vlc_mutex_destroy( &p_ext->p_sys->running_lock );
-        vlc_mutex_destroy( &p_ext->p_sys->command_lock );
         vlc_cond_destroy( &p_ext->p_sys->wait );
         vlc_timer_destroy( p_ext->p_sys->timer );
 
         free( p_ext->p_sys );
         free( p_ext );
     }
-
-    vlc_mutex_destroy( &p_mgr->lock );
 
     ARRAY_RESET( p_mgr->extensions );
 }
@@ -488,8 +484,6 @@ exit:
         free( p_ext->psz_description );
         free( p_ext->psz_shortdescription );
         free( p_ext->psz_version );
-        vlc_mutex_destroy( &p_ext->p_sys->command_lock );
-        vlc_mutex_destroy( &p_ext->p_sys->running_lock );
         vlc_cond_destroy( &p_ext->p_sys->wait );
         free( p_ext->p_sys );
         free( p_ext );

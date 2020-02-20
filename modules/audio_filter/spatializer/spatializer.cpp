@@ -192,7 +192,6 @@ static void Close( vlc_object_t *p_this )
     }
 
     delete p_sys->p_reverbm;
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
     msg_Dbg( p_this, "Closing filter spatializer" );
 }

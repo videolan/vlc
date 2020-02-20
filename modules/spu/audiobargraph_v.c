@@ -602,8 +602,6 @@ static void Close(vlc_object_t *p_this)
     if (p_sys->p_blend)
         filter_DeleteBlend(p_sys->p_blend);
 
-    vlc_mutex_destroy(&p_sys->lock);
-
     if (p_sys->p_BarGraph.p_pic)
         picture_Release(p_sys->p_BarGraph.p_pic);
 

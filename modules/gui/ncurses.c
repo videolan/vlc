@@ -1760,7 +1760,6 @@ static void Close(vlc_object_t *p_this)
     endwin();   /* Close the ncurses interface */
 
     vlc_LogSet(vlc_object_instance(p_this), NULL, NULL);
-    vlc_mutex_destroy(&sys->msg_lock);
     for(unsigned i = 0; i < sizeof sys->msgs / sizeof *sys->msgs; i++) {
         if (sys->msgs[i].item)
             msg_Free(sys->msgs[i].item);

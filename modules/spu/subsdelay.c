@@ -518,8 +518,6 @@ static void SubsdelayHeapDestroy( subsdelay_heap_t *p_heap )
     }
 
     SubsdelayHeapUnlock( p_heap );
-
-    vlc_mutex_destroy( &p_heap->lock );
 }
 
 /*****************************************************************************

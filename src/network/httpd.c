@@ -866,7 +866,6 @@ void httpd_StreamDelete(httpd_stream_t *stream)
         free(stream->p_http_headers[i].value);
     }
     free(stream->p_http_headers);
-    vlc_mutex_destroy(&stream->lock);
     free(stream->psz_mime);
     free(stream->p_header);
     free(stream->p_buffer);
@@ -993,7 +992,6 @@ error:
     if (host) {
         net_ListenClose(host->fds);
         vlc_cond_destroy(&host->wait);
-        vlc_mutex_destroy(&host->lock);
         vlc_object_delete(host);
     }
 
@@ -1030,7 +1028,6 @@ void httpd_HostDelete(httpd_host_t *host)
     vlc_tls_ServerDelete(host->p_tls);
     net_ListenClose(host->fds);
     vlc_cond_destroy(&host->wait);
-    vlc_mutex_destroy(&host->lock);
     vlc_object_delete(host);
     vlc_mutex_unlock(&httpd.mutex);
 }
@@ -1117,7 +1114,6 @@ void httpd_UrlDelete(httpd_url_t *url)
     vlc_mutex_lock(&host->lock);
     vlc_list_remove(&url->node);
 
-    vlc_mutex_destroy(&url->lock);
     free(url->psz_url);
     free(url->psz_user);
     free(url->psz_password);

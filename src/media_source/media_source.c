@@ -243,7 +243,6 @@ vlc_media_source_provider_New(vlc_object_t *parent)
 void
 vlc_media_source_provider_Delete(vlc_media_source_provider_t *provider)
 {
-    vlc_mutex_destroy(&provider->lock);
     ReleaseObject(provider);
 }
 

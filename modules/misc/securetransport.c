@@ -619,8 +619,6 @@ static int st_SessionShutdown (vlc_tls_t *session, bool duplex) {
 
     msg_Dbg(sys->obj, "shutdown TLS session");
 
-    vlc_mutex_destroy(&sys->lock);
-
     OSStatus ret = noErr;
     VLC_UNUSED(duplex);
 

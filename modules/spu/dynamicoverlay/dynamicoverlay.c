@@ -148,7 +148,6 @@ static void Destroy( vlc_object_t *p_this )
     var_DelCallback( p_filter, "overlay-input", AdjustCallback, p_sys );
     var_DelCallback( p_filter, "overlay-output", AdjustCallback, p_sys );
 
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->psz_inputfile );
     free( p_sys->psz_outputfile );
     free( p_sys );

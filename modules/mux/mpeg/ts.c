@@ -769,7 +769,6 @@ static void Close( vlc_object_t * p_this )
         var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa2-ck", ChangeKeyCallback, NULL );
         var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa-use", ActiveKeyCallback, NULL );
         csa_Delete( p_sys->csa );
-        vlc_mutex_destroy( &p_sys->csa_lock );
     }
 
     for (int i = 0; i < MAX_SDT_DESC; i++ )

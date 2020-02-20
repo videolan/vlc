@@ -43,7 +43,6 @@ event_thread_t::~event_thread_t()
 {
     ResetPci();
     vlc_cond_destroy( &wait );
-    vlc_mutex_destroy( &lock );
 }
 
 void event_thread_t::SetPci(const pci_t *data)

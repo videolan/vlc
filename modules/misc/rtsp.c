@@ -462,8 +462,6 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
         MediaDelES( p_vod, p_media, &p_media->es[0]->fmt );
     TAB_CLEAN( p_media->i_es, p_media->es );
 
-    vlc_mutex_destroy( &p_media->lock );
-
     free( p_media );
 }
 

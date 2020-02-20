@@ -157,7 +157,6 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->lock );
     if( EqzInit( p_filter, p_filter->fmt_in.audio.i_rate ) != VLC_SUCCESS )
     {
-        vlc_mutex_destroy( &p_sys->lock );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -179,7 +178,6 @@ static void Close( vlc_object_t *p_this )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     EqzClean( p_filter );
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 

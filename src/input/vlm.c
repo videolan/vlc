@@ -179,8 +179,6 @@ vlm_t *vlm_New( libvlc_int_t *libvlc, const char *psz_vlmconf )
     if( vlc_clone( &p_vlm->thread, Manage, p_vlm, VLC_THREAD_PRIORITY_LOW ) )
     {
         vlc_cond_destroy( &p_vlm->wait_manage );
-        vlc_mutex_destroy( &p_vlm->lock );
-        vlc_mutex_destroy( &p_vlm->lock_manage );
         vlc_object_delete(p_vlm);
         vlc_mutex_unlock( &vlm_mutex );
         return NULL;
@@ -257,8 +255,6 @@ void vlm_Delete( vlm_t *p_vlm )
     vlc_join( p_vlm->thread, NULL );
 
     vlc_cond_destroy( &p_vlm->wait_manage );
-    vlc_mutex_destroy( &p_vlm->lock );
-    vlc_mutex_destroy( &p_vlm->lock_manage );
     vlc_object_delete(p_vlm);
 }
 

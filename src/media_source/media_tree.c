@@ -204,7 +204,6 @@ vlc_media_tree_Delete(vlc_media_tree_t *tree)
         free(listener);
     vlc_list_init(&priv->listeners); /* reset */
     vlc_media_tree_DestroyRootNode(tree);
-    vlc_mutex_destroy(&priv->lock);
     free(tree);
 }
 

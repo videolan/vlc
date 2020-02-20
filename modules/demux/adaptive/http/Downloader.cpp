@@ -58,7 +58,6 @@ Downloader::~Downloader()
 
     if(thread_handle_valid)
         vlc_join(thread_handle, NULL);
-    vlc_mutex_destroy(&lock);
     vlc_cond_destroy(&waitcond);
 }
 void Downloader::schedule(HTTPChunkBufferedSource *source)

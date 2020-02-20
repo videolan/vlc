@@ -611,7 +611,6 @@ Close(vlc_object_t *obj)
 
     [sys->aoutWrapper release];
 
-    ca_Close(aout);
     free(sys);
 }
 
@@ -636,7 +635,6 @@ Open(vlc_object_t *obj)
     sys->aoutWrapper = [[AoutWrapper alloc] initWithAout:aout];
     if (sys->aoutWrapper == NULL)
     {
-        ca_Close(aout);
         free(sys);
         return VLC_ENOMEM;
     }

@@ -88,8 +88,7 @@ static inline OMX_TICKS ToOmxTicks(int64_t value)
          (p_fifo)->pp_last = &(p_fifo)->p_first; } while(0)
 
 #define OMX_FIFO_DESTROY(p_fifo) \
-    do { vlc_mutex_destroy( &(p_fifo)->lock ); \
-         vlc_cond_destroy (&(p_fifo)->wait); } while(0)
+    do { vlc_cond_destroy (&(p_fifo)->wait); } while(0)
 
 #define OMX_FIFO_PEEK(p_fifo, p_buffer) \
          p_buffer = (p_fifo)->p_first;

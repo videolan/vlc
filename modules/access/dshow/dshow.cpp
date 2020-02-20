@@ -816,7 +816,6 @@ static void CommonClose( vlc_object_t *p_this, access_sys_t *p_sys )
 
     vlc_delete_all( p_sys->pp_streams );
 
-    vlc_mutex_destroy( &p_sys->lock );
     vlc_cond_destroy( &p_sys->wait );
 
     vlc_mta_release( p_this );

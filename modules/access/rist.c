@@ -1035,8 +1035,6 @@ static void Clean( stream_t *p_access )
         free(p_sys->flow->buffer);
         free(p_sys->flow);
     }
-
-    vlc_mutex_destroy( &p_sys->lock );
 }
 
 static void Close(vlc_object_t *p_this)

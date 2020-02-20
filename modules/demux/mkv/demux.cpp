@@ -45,8 +45,6 @@ demux_sys_t::~demux_sys_t()
 
     while( titles.size() )
     { vlc_input_title_Delete( titles.back() ); titles.pop_back();}
-
-    vlc_mutex_destroy( &lock_demuxer );
 }
 
 

@@ -346,8 +346,6 @@ playlist_listener_failure:
     dbus_connection_unref( p_conn );
 
 dbus_connection_failure:
-    vlc_mutex_destroy( &p_sys->lock );
-
     vlc_close( p_sys->p_pipe_fds[1] );
     vlc_close( p_sys->p_pipe_fds[0] );
 
@@ -387,7 +385,6 @@ static void Close   ( vlc_object_t *p_this )
         callback_info_t* info = vlc_array_item_at_index( &p_sys->events, i );
         free( info );
     }
-    vlc_mutex_destroy( &p_sys->lock );
     vlc_array_clear( &p_sys->events );
     vlc_array_clear( &p_sys->timeouts );
     vlc_array_clear( &p_sys->watches );

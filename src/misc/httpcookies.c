@@ -289,7 +289,6 @@ void vlc_http_cookies_destroy( vlc_http_cookie_jar_t * p_jar )
         cookie_destroy( vlc_array_item_at_index( &p_jar->cookies, i ) );
 
     vlc_array_clear( &p_jar->cookies );
-    vlc_mutex_destroy( &p_jar->lock );
 
     free( p_jar );
 }

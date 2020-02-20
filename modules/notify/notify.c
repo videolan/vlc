@@ -170,7 +170,6 @@ static void Close( vlc_object_t *p_this )
         g_object_unref( p_sys->notification );
     }
 
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
     notify_uninit();
 }

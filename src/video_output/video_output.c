@@ -1845,10 +1845,6 @@ void vout_Release(vout_thread_t *vout)
 
     free(sys->splitter_name);
 
-    /* Destroy the locks */
-    vlc_mutex_destroy(&sys->window_lock);
-    vlc_mutex_destroy(&sys->filter.lock);
-
     if (sys->dec_device)
         vlc_decoder_device_Release(sys->dec_device);
 
@@ -1856,7 +1852,6 @@ void vout_Release(vout_thread_t *vout)
     vout_display_window_Delete(sys->display_cfg.window);
 
     vout_control_Clean(&sys->control);
-    vlc_mutex_destroy(&sys->display_lock);
 
     /* */
     vout_statistic_Clean(&sys->statistic);

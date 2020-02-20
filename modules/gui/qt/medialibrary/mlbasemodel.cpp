@@ -44,7 +44,6 @@ MLBaseModel::MLBaseModel(QObject *parent)
 
 MLBaseModel::~MLBaseModel()
 {
-    vlc_mutex_destroy( &m_item_lock );
 }
 
 void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)

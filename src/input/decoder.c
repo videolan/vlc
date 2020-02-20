@@ -2043,9 +2043,6 @@ static void DeleteDecoder( decoder_t * p_dec )
     vlc_cond_destroy( &p_owner->wait_fifo );
     vlc_cond_destroy( &p_owner->wait_acknowledge );
     vlc_cond_destroy( &p_owner->wait_request );
-    vlc_mutex_destroy( &p_owner->lock );
-    vlc_mutex_destroy( &p_owner->mouse_lock );
-
     decoder_Destroy( &p_owner->dec );
 }
 

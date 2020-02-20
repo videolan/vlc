@@ -752,7 +752,6 @@ static void Close(vout_window_t *wnd)
     vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
 
-    vlc_mutex_destroy(&sys->lock);
     seat_destroy_all(&sys->seats);
     output_list_destroy(sys->outputs);
 #ifdef XDG_SHELL

@@ -108,7 +108,6 @@ static void clean_detached_thread(void *data)
     struct vlc_thread *th = data;
 
     /* release thread handle */
-    vlc_mutex_destroy(&th->wait.lock);
     free(th);
 }
 

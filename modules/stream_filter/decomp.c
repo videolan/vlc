@@ -328,7 +328,6 @@ static int Open (stream_t *stream, const char *path)
     {
         if (p_sys->pid != -1)
             while (waitpid (p_sys->pid, &(int){ 0 }, 0) == -1);
-        vlc_mutex_destroy (&p_sys->lock);
         vlc_cond_destroy (&p_sys->wait);
         free (p_sys);
         return ret;
@@ -361,7 +360,6 @@ static void Close (vlc_object_t *obj)
     while (waitpid (p_sys->pid, &status, 0) == -1);
     msg_Dbg (obj, "exit status %d", status);
 
-    vlc_mutex_destroy (&p_sys->lock);
     vlc_cond_destroy (&p_sys->wait);
     free (p_sys);
 }

@@ -537,5 +537,4 @@ vlc_player_DestroyTimer(vlc_player_t *player)
 {
     for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
         assert(vlc_list_is_empty(&player->timer.sources[i].listeners));
-    vlc_mutex_destroy(&player->timer.lock);
 }

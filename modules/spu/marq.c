@@ -255,7 +255,6 @@ static void DestroyFilter( vlc_object_t *p_this )
     DEL_VAR( "marq-color" );
     DEL_VAR( "marq-size" );
 
-    vlc_mutex_destroy( &p_sys->lock );
     text_style_Delete( p_sys->p_style );
     free( p_sys->format );
     free( p_sys->filepath );

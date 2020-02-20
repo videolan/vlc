@@ -71,7 +71,6 @@ vlc_interrupt_t *vlc_interrupt_create(void)
 void vlc_interrupt_deinit(vlc_interrupt_t *ctx)
 {
     assert(ctx->callback == NULL);
-    vlc_mutex_destroy(&ctx->lock);
 }
 
 void vlc_interrupt_destroy(vlc_interrupt_t *ctx)

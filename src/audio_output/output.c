@@ -385,7 +385,6 @@ void aout_Release(audio_output_t *aout)
 
     atomic_thread_fence(memory_order_acquire);
 
-    vlc_mutex_destroy (&owner->dev.lock);
     for (aout_dev_t *dev = owner->dev.list, *next; dev != NULL; dev = next)
     {
         next = dev->next;
@@ -393,8 +392,6 @@ void aout_Release(audio_output_t *aout)
         free (dev);
     }
 
-    vlc_mutex_destroy (&owner->vp.lock);
-    vlc_mutex_destroy (&owner->lock);
     vlc_object_delete(VLC_OBJECT(aout));
 }
 

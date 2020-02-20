@@ -157,7 +157,6 @@ HTTPChunkSource::~HTTPChunkSource()
 {
     if(connection)
         connection->setUsed(false);
-    vlc_mutex_destroy(&lock);
 }
 
 bool HTTPChunkSource::init(const std::string &url)

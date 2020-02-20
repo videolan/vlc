@@ -405,7 +405,6 @@ static void Destroy( es_out_t *p_out )
     TAB_CLEAN( p_sys->i_es, p_sys->pp_es  );
 
     free( p_sys->psz_tmp_path );
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 
@@ -784,7 +783,6 @@ static const struct es_out_callbacks es_out_timeshift_cbs =
 static void TsDestroy( ts_thread_t *p_ts )
 {
     vlc_cond_destroy( &p_ts->wait );
-    vlc_mutex_destroy( &p_ts->lock );
     free( p_ts );
 }
 static int TsStart( es_out_t *p_out )

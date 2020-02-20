@@ -90,10 +90,7 @@ PlaylistManager::~PlaylistManager   ()
     delete logic;
     delete resources;
     vlc_cond_destroy(&waitcond);
-    vlc_mutex_destroy(&lock);
-    vlc_mutex_destroy(&demux.lock);
     vlc_cond_destroy(&demux.cond);
-    vlc_mutex_destroy(&cached.lock);
 }
 
 void PlaylistManager::unsetPeriod()

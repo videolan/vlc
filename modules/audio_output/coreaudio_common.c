@@ -83,13 +83,6 @@ lock_init(struct aout_sys_common *p_sys)
 }
 
 static inline void
-lock_destroy(struct aout_sys_common *p_sys)
-{
-    if (unlikely(!os_unfair_lock_lock))
-        vlc_mutex_destroy(&p_sys->lock.mutex);
-}
-
-static inline void
 lock_lock(struct aout_sys_common *p_sys)
 {
     if (likely(os_unfair_lock_lock))
@@ -127,14 +120,6 @@ ca_Open(audio_output_t *p_aout)
     p_aout->time_get = ca_TimeGet;
 
     return VLC_SUCCESS;
-}
-
-void
-ca_Close(audio_output_t *p_aout)
-{
-    struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
-
-    lock_destroy(p_sys);
 }
 
 /* Called from render callbacks. No lock, wait, and IO here */

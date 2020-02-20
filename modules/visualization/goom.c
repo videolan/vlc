@@ -147,7 +147,6 @@ static int Open( vlc_object_t *p_this )
                    Thread, p_thread, VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_filter, "cannot launch goom thread" );
-        vlc_mutex_destroy( &p_thread->lock );
         vlc_cond_destroy( &p_thread->wait );
         vout_Close( p_thread->p_vout );
         free( p_thread );
@@ -353,7 +352,6 @@ static void Close( vlc_object_t *p_this )
 
     /* Free data */
     vout_Close( p_thread->p_vout );
-    vlc_mutex_destroy( &p_thread->lock );
     vlc_cond_destroy( &p_thread->wait );
 
     while( p_thread->i_blocks-- )

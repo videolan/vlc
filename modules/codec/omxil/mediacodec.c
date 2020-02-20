@@ -1004,7 +1004,6 @@ static void AbortDecoderLocked(decoder_t *p_dec)
 
 static void CleanDecoder(decoder_sys_t *p_sys)
 {
-    vlc_mutex_destroy(&p_sys->lock);
     vlc_cond_destroy(&p_sys->cond);
     vlc_cond_destroy(&p_sys->dec_cond);
 

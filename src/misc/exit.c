@@ -34,12 +34,6 @@ void vlc_ExitInit( vlc_exit_t *exit )
     exit->opaque = NULL;
 }
 
-void vlc_ExitDestroy( vlc_exit_t *exit )
-{
-    vlc_mutex_destroy( &exit->lock );
-}
-
-
 /**
  * Registers a callback for the LibVLC exit event.
  */

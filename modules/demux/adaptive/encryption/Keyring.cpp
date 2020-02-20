@@ -39,7 +39,6 @@ Keyring::Keyring(vlc_object_t *obj_)
 
 Keyring::~Keyring()
 {
-    vlc_mutex_destroy(&lock);
 }
 
 KeyringKey Keyring::getKey(SharedResources *resources, const std::string &uri)

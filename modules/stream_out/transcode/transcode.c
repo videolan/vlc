@@ -494,18 +494,12 @@ static void Close( vlc_object_t * p_this )
 
     transcode_encoder_config_clean( &p_sys->senc_cfg );
 
-    vlc_mutex_destroy( &p_sys->lock );
-
     free( p_sys );
 }
 
 static void DeleteSoutStreamID( sout_stream_id_sys_t *id )
 {
-    if( id )
-    {
-        vlc_mutex_destroy(&id->fifo.lock);
-        free( id );
-    }
+    free( id );
 }
 
 static void SendSpuToVideoCallback( void *cbdata, subpicture_t *p_subpicture )

@@ -151,8 +151,6 @@ void RtspUnsetup( rtsp_stream_t *rtsp )
         vlc_timer_destroy(rtsp->timer);
 
     free( rtsp->psz_path );
-    vlc_mutex_destroy( &rtsp->lock );
-
     free( rtsp );
 }
 

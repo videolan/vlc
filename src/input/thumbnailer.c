@@ -117,7 +117,6 @@ static void thumbnailer_request_Release( void* data )
         input_Close( request->input_thread );
 
     input_item_Release( request->params.input_item );
-    vlc_mutex_destroy( &request->lock );
     free( request );
 }
 

@@ -98,7 +98,6 @@ static void cma_pool_fixed_delete(cma_pool_fixed_t * const p)
     free(p->name);
 
     vlc_cond_destroy(&p->flight_cond);
-    vlc_mutex_destroy(&p->lock);
     free(p);
 
     // Inform our container that we are dead (if it cares)

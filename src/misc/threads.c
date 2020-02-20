@@ -130,14 +130,6 @@ void vlc_mutex_init_recursive(vlc_mutex_t *mtx)
     vlc_mutex_init_common(mtx, true);
 }
 
-void vlc_mutex_destroy(vlc_mutex_t *mtx)
-{
-    assert(atomic_load_explicit(&mtx->value, memory_order_relaxed) == 0);
-    assert(atomic_load_explicit(&mtx->recursion, memory_order_relaxed) <= 1);
-    assert(atomic_load_explicit(&mtx->owner, memory_order_relaxed) == NULL);
-    (void) mtx;
-}
-
 static _Thread_local char thread_self[1];
 #define THREAD_SELF ((const void *)thread_self)
 
@@ -244,7 +236,6 @@ void vlc_cond_init_daytime(vlc_cond_t *cond)
 void vlc_cond_destroy(vlc_cond_t *cond)
 {
     assert(cond->head == NULL);
-    vlc_mutex_destroy(&cond->lock);
 }
 
 struct vlc_cond_waiter {
@@ -426,7 +417,6 @@ void vlc_rwlock_init (vlc_rwlock_t *lock)
 void vlc_rwlock_destroy (vlc_rwlock_t *lock)
 {
     vlc_cond_destroy (&lock->wait);
-    vlc_mutex_destroy (&lock->mutex);
 }
 
 void vlc_rwlock_rdlock (vlc_rwlock_t *lock)

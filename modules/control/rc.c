@@ -1891,7 +1891,6 @@ error:
     }
     net_ListenClose( pi_socket );
     free( psz_unix_path );
-    vlc_mutex_destroy( &p_sys->status_lock );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -1923,7 +1922,6 @@ static void Deactivate( vlc_object_t *p_this )
         free( p_sys->psz_unix_path );
     }
 #endif
-    vlc_mutex_destroy( &p_sys->status_lock );
     free( p_sys );
 }
 

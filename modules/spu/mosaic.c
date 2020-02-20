@@ -421,7 +421,6 @@ static void DestroyFilter( vlc_object_t *p_this )
         p_sys->i_offsets_length = 0;
     }
 
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 

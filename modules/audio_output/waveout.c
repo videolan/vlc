@@ -824,7 +824,6 @@ static void Close(vlc_object_t *obj)
 
     vlc_timer_destroy( sys->volume_poll_timer );
     vlc_cond_destroy( &sys->cond );
-    vlc_mutex_destroy( &sys->lock );
 
     free(sys);
 }

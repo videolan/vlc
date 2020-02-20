@@ -50,7 +50,6 @@ void transcode_encoder_delete( transcode_encoder_t *p_enc )
         {
             block_ChainRelease( p_enc->p_buffers );
             picture_fifo_Delete( p_enc->pp_pics );
-            vlc_mutex_destroy( &p_enc->lock_out );
         }
         es_format_Clean( &p_enc->p_encoder->fmt_in );
         es_format_Clean( &p_enc->p_encoder->fmt_out );

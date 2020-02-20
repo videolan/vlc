@@ -521,7 +521,6 @@ static void Close(vlc_object_t *obj)
     Destroy(sys->outputMixObject);
     Destroy(sys->engineObject);
     dlclose(sys->p_so_handle);
-    vlc_mutex_destroy(&sys->lock);
     free(sys);
 }
 

@@ -71,7 +71,6 @@ public:
     virtual ~CmdExecuteBlock()
     {
         vlc_cond_destroy( &m_wait );
-        vlc_mutex_destroy( &m_lock );
     }
 
     static void executeWait( const CmdGenericPtr& rcCommand  )

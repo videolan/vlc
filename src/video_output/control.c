@@ -69,7 +69,6 @@ void vout_control_Clean(vout_control_t *ctrl)
     }
     ARRAY_RESET(ctrl->cmd);
 
-    vlc_mutex_destroy(&ctrl->lock);
     vlc_cond_destroy(&ctrl->wait_request);
     vlc_cond_destroy(&ctrl->wait_available);
 }

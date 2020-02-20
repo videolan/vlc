@@ -456,11 +456,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
  */
 void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 {
-    libvlc_priv_t *priv = libvlc_priv( p_libvlc );
-
-    vlc_ExitDestroy( &priv->exit );
-
-    vlc_mutex_destroy(&priv->lock);
     vlc_object_delete(p_libvlc);
 }
 

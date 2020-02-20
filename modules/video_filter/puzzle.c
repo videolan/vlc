@@ -226,9 +226,6 @@ static void Close( vlc_object_t *p_this ) {
     var_DelCallback( p_filter, CFG_PREFIX "rotation",      puzzle_Callback, p_sys );
     var_DelCallback( p_filter, CFG_PREFIX "mode",          puzzle_Callback, p_sys );
 
-    vlc_mutex_destroy( &p_sys->lock );
-    vlc_mutex_destroy( &p_sys->pce_lock );
-
     /* Free allocated memory */
     puzzle_free_ps_puzzle_array ( p_filter );
     puzzle_free_ps_pieces_shapes ( p_filter);

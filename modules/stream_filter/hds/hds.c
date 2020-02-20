@@ -1222,9 +1222,7 @@ static void cleanup_Manifest( manifest_t *m )
 
 static void cleanup_threading( hds_stream_t *stream )
 {
-    vlc_mutex_destroy( &stream->dl_lock );
     vlc_cond_destroy( &stream->dl_cond );
-    vlc_mutex_destroy( &stream->abst_lock );
 }
 
 static void write_int_24( uint8_t *p, uint32_t val )

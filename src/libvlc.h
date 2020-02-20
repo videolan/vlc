@@ -73,7 +73,6 @@ typedef struct vlc_exit
 } vlc_exit_t;
 
 void vlc_ExitInit( vlc_exit_t * );
-void vlc_ExitDestroy( vlc_exit_t * );
 
 /*
  * LibVLC objects stuff

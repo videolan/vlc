@@ -1304,7 +1304,6 @@ static void pic_pacer_Destroy(void *priv)
 {
     struct pic_pacer *pic_pacer = priv;
 
-    vlc_mutex_destroy(&pic_pacer->lock);
     vlc_cond_destroy(&pic_pacer->wait);
 }
 
@@ -1494,8 +1493,6 @@ static void CloseDecoder(vlc_object_t *p_this)
 
     if(p_sys->pf_codec_clean)
         p_sys->pf_codec_clean(p_dec);
-
-    vlc_mutex_destroy(&p_sys->lock);
 
     vlc_video_context_Release(p_sys->vctx);
 

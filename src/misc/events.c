@@ -80,8 +80,6 @@ void vlc_event_manager_fini( vlc_event_manager_t * p_em )
 {
     struct vlc_event_listener_t * listener;
 
-    vlc_mutex_destroy( &p_em->lock );
-
     for( size_t i = 0; i < ARRAY_SIZE(p_em->events); i++ )
     {
         struct vlc_event_listeners_group_t *slot = p_em->events + i;

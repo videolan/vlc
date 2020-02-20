@@ -487,8 +487,6 @@ static void Close( vlc_object_t *p_this )
     /* Stop still image handler */
     if( p_sys->still.b_created )
         vlc_timer_destroy( p_sys->still.timer );
-    vlc_mutex_destroy( &p_sys->still.lock );
-    vlc_mutex_destroy( &p_sys->event_lock );
 
     for( int i = 0; i < PS_TK_COUNT; i++ )
     {

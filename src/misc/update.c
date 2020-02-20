@@ -147,8 +147,6 @@ void update_Delete( update_t *p_update )
         vlc_object_delete(p_update->p_download);
     }
 
-    vlc_mutex_destroy( &p_update->lock );
-
     free( p_update->release.psz_url );
     free( p_update->release.psz_desc );
     free( p_update->p_pkey );

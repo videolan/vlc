@@ -237,7 +237,6 @@ AbstractDecodedStream::~AbstractDecodedStream()
     deinit();
     es_format_Clean(&requestedoutput);
     vlc_cond_destroy(&inputWait);
-    vlc_mutex_destroy(&inputLock);
 }
 
 void AbstractDecodedStream::deinit()

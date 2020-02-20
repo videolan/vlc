@@ -586,8 +586,6 @@ static void CloseDecoder(vlc_object_t *p_this)
 
     hw_mmal_port_pool_ref_release(sys->ppr, false);
 
-    vlc_mutex_destroy(&sys->pic_lock);
-
     if (sys->vctx)
         vlc_video_context_Release(sys->vctx);
 

@@ -89,7 +89,6 @@ static void CloseInhibit (vlc_object_t *obj)
     vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
     vlc_cond_destroy(&sys->cond);
-    vlc_mutex_destroy(&sys->mutex);
 }
 
 static int OpenInhibit (vlc_object_t *obj)
@@ -108,7 +107,6 @@ static int OpenInhibit (vlc_object_t *obj)
     if (vlc_clone(&sys->thread, Run, ih, VLC_THREAD_PRIORITY_LOW))
     {
         vlc_cond_destroy(&sys->cond);
-        vlc_mutex_destroy(&sys->mutex);
         return VLC_EGENERIC;
     }
 

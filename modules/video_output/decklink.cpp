@@ -351,7 +351,6 @@ static void ReleaseDLSys(vlc_object_t *obj, int i_cat)
 
     if (--sys->users == 0) {
         msg_Dbg(obj, "Destroying decklink data");
-        vlc_mutex_destroy(&sys->lock);
         vlc_cond_destroy(&sys->cond);
 
         if (sys->p_output) {

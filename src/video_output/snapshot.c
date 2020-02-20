@@ -78,7 +78,6 @@ void vout_snapshot_Destroy(vout_snapshot_t *snap)
     }
 
     vlc_cond_destroy(&snap->wait);
-    vlc_mutex_destroy(&snap->lock);
     free(snap);
 }
 

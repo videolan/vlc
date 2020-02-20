@@ -598,8 +598,6 @@ static void EsOutDelete( es_out_t *out )
     EsOutPropsCleanup( &p_sys->audio );
     EsOutPropsCleanup( &p_sys->sub );
 
-    vlc_mutex_destroy( &p_sys->lock );
-
     free( p_sys );
 }
 

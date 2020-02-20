@@ -563,8 +563,6 @@ void libvlc_media_release( libvlc_media_t *p_md )
     input_item_Release( p_md->p_input_item );
 
     vlc_cond_destroy( &p_md->parsed_cond );
-    vlc_mutex_destroy( &p_md->parsed_lock );
-    vlc_mutex_destroy( &p_md->subitems_lock );
 
     /* Construct the event */
     libvlc_event_t event;

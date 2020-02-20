@@ -47,8 +47,7 @@
 
 struct aout_sys_common
 {
-    /* The following is owned by common.c (initialized from ca_Open, cleaned
-     * from ca_Close) */
+    /* The following is owned by common.c (initialized from ca_Open) */
 
     mach_timebase_info_data_t tinfo;
 
@@ -86,8 +85,6 @@ struct aout_sys_common
 };
 
 int ca_Open(audio_output_t *p_aout);
-
-void ca_Close(audio_output_t *p_aout);
 
 void ca_Render(audio_output_t *p_aout, uint32_t i_nb_samples, uint64_t i_host_time,
                uint8_t *p_output, size_t i_requested);

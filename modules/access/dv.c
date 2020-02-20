@@ -238,7 +238,6 @@ static void Close( vlc_object_t *p_this )
             raw1394_iso_shutdown( p_sys->p_raw1394 );
 
         vlc_join( p_sys->p_ev->thread, NULL );
-        vlc_mutex_destroy( &p_sys->p_ev->lock );
 
         /* Cleanup frame data */
         if( p_sys->p_ev->p_frame )
@@ -256,8 +255,6 @@ static void Close( vlc_object_t *p_this )
         raw1394_destroy_handle( p_sys->p_raw1394 );
 
     AVCClose( p_access );
-
-    vlc_mutex_destroy( &p_sys->lock );
 }
 
 /*****************************************************************************

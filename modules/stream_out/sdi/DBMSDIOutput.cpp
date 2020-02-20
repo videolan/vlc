@@ -92,7 +92,6 @@ DBMSDIOutput::~DBMSDIOutput()
         p_card->Release();
 
     vlc_cond_destroy(&feeder.cond);
-    vlc_mutex_destroy(&feeder.lock);
 }
 
 AbstractStream *DBMSDIOutput::Add(const es_format_t *fmt)

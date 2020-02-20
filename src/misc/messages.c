@@ -257,7 +257,6 @@ static void vlc_LogEarlyClose(void *d)
         free(log);
     }
 
-    vlc_mutex_destroy(&early->lock);
     free(early);
 }
 

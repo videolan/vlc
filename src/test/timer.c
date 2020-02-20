@@ -108,7 +108,5 @@ int main (void)
 
     vlc_timer_destroy (data.timer);
     vlc_cond_destroy (&data.wait);
-    vlc_mutex_destroy (&data.lock);
-
     return 0;
 }

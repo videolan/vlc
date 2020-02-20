@@ -90,8 +90,6 @@ void libvlc_event_manager_init(libvlc_event_manager_t *em, void *obj)
 
 void libvlc_event_manager_destroy(libvlc_event_manager_t *em)
 {
-    vlc_mutex_destroy(&em->lock);
-
     for (size_t i = 0; i < vlc_array_count(&em->listeners); i++)
         free(vlc_array_item_at_index(&em->listeners, i));
 

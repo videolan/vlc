@@ -93,7 +93,6 @@ void libvlc_release( libvlc_instance_t *p_instance )
 
     if( refs == 0 )
     {
-        vlc_mutex_destroy( lock );
         libvlc_Quit( p_instance->p_libvlc_int );
         libvlc_InternalCleanup( p_instance->p_libvlc_int );
         libvlc_InternalDestroy( p_instance->p_libvlc_int );

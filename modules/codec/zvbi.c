@@ -288,8 +288,6 @@ static void Close( vlc_object_t *p_this )
     var_DelCallback( p_dec, "vbi-opaque", Opaque, p_sys );
     var_DelCallback( p_dec, "vbi-page", RequestPage, p_sys );
 
-    vlc_mutex_destroy( &p_sys->lock );
-
     if( p_sys->p_vbi_dec )
         vbi_decoder_delete( p_sys->p_vbi_dec );
     free( p_sys );

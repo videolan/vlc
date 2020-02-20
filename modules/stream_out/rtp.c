@@ -553,9 +553,6 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_stream, "unsupported muxer type for RTP (only TS/PS)" );
             free( psz );
-            vlc_mutex_destroy( &p_sys->lock_sdp );
-            vlc_mutex_destroy( &p_sys->lock_ts );
-            vlc_mutex_destroy( &p_sys->lock_es );
             free( p_sys->psz_vod_session );
             free( p_sys->psz_destination );
             free( p_sys );
@@ -570,9 +567,6 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_stream, "cannot create muxer" );
             sout_AccessOutDelete( p_sys->p_grab );
-            vlc_mutex_destroy( &p_sys->lock_sdp );
-            vlc_mutex_destroy( &p_sys->lock_ts );
-            vlc_mutex_destroy( &p_sys->lock_es );
             free( p_sys->psz_vod_session );
             free( p_sys->psz_destination );
             free( p_sys );
@@ -661,10 +655,6 @@ static void Close( vlc_object_t * p_this )
 
     if( p_sys->rtsp != NULL )
         RtspUnsetup( p_sys->rtsp );
-
-    vlc_mutex_destroy( &p_sys->lock_sdp );
-    vlc_mutex_destroy( &p_sys->lock_ts );
-    vlc_mutex_destroy( &p_sys->lock_es );
 
     if( p_sys->p_httpd_file )
         httpd_FileDelete( p_sys->p_httpd_file );
@@ -1250,8 +1240,6 @@ static void Del( sout_stream_t *p_stream, void *_id )
     if( id->srtp != NULL )
         srtp_destroy( id->srtp );
 #endif
-
-    vlc_mutex_destroy( &id->lock_sink );
 
     /* Update SDP (sap/file) */
     if( p_sys->b_export_sap ) SapSetup( p_stream );

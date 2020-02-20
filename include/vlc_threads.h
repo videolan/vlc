@@ -345,13 +345,6 @@ VLC_API void vlc_mutex_init(vlc_mutex_t *);
 VLC_API void vlc_mutex_init_recursive(vlc_mutex_t *);
 
 /**
- * Deinitializes a mutex.
- *
- * The mutex must not be locked, otherwise behaviour is undefined.
- */
-VLC_API void vlc_mutex_destroy(vlc_mutex_t *);
-
-/**
  * Acquires a mutex.
  *
  * If needed, this waits for any other thread to release it.

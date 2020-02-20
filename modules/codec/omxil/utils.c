@@ -50,7 +50,6 @@ void InitOmxEventQueue(OmxEventQueue *queue)
 
 void DeinitOmxEventQueue(OmxEventQueue *queue)
 {
-    vlc_mutex_destroy(&queue->mutex);
     vlc_cond_destroy(&queue->cond);
 }
 

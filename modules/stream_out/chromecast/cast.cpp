@@ -113,7 +113,6 @@ struct sout_stream_sys_t
 
     ~sout_stream_sys_t()
     {
-        vlc_mutex_destroy(&lock);
     }
 
     bool canDecodeVideo( vlc_fourcc_t i_codec ) const;

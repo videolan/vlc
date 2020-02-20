@@ -332,8 +332,6 @@ static void Destroy( vlc_object_t *p_this )
     var_DelCallback( p_filter, FILTER_PREFIX "edge-visible",
                      ballCallback, p_sys );
 
-    vlc_mutex_destroy( &p_sys->lock );
-
     image_HandlerDelete( p_sys->p_image );
 
     free( p_sys->p_smooth );

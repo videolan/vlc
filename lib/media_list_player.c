@@ -498,8 +498,6 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
 error:
     libvlc_event_manager_destroy(&p_mlp->event_manager);
     vlc_cond_destroy(&p_mlp->seek_pending);
-    vlc_mutex_destroy(&p_mlp->mp_callback_lock);
-    vlc_mutex_destroy(&p_mlp->object_lock);
     free(p_mlp);
     return NULL;
 }
@@ -544,9 +542,6 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
 
     libvlc_event_manager_destroy(&p_mlp->event_manager);
     vlc_cond_destroy(&p_mlp->seek_pending);
-    vlc_mutex_destroy(&p_mlp->mp_callback_lock);
-    vlc_mutex_destroy(&p_mlp->object_lock);
-
     free(p_mlp->current_playing_item_path);
     free(p_mlp);
 }

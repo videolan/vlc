@@ -553,7 +553,6 @@ static HRESULT Stop( aout_stream_sys_t *p_sys )
     vlc_cancel( p_sys->eraser_thread );
     vlc_join( p_sys->eraser_thread, NULL );
     vlc_cond_destroy( &p_sys->cond );
-    vlc_mutex_destroy( &p_sys->lock );
 
     if( p_sys->p_notify != NULL )
     {
@@ -661,7 +660,6 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
         }
         else
         {
-            vlc_mutex_destroy(&sys->lock);
             vlc_cond_destroy(&sys->cond);
             return E_FAIL;
         }
@@ -808,7 +806,6 @@ static HRESULT Start( vlc_object_t *obj, aout_stream_sys_t *sys,
 
 error:
     vlc_cond_destroy(&sys->cond);
-    vlc_mutex_destroy(&sys->lock);
 
     if( sys->p_notify != NULL )
     {

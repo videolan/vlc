@@ -111,7 +111,6 @@ vlc_medialibrary_t* libvlc_MlCreate( libvlc_int_t* p_libvlc  )
     p_ml->m.p_module = module_need( &p_ml->m, "medialibrary", NULL, false );
     if ( p_ml->m.p_module == NULL )
     {
-        vlc_mutex_destroy( &p_ml->lock );
         vlc_object_delete(&p_ml->m);
         return NULL;
     }
@@ -123,7 +122,6 @@ void libvlc_MlRelease( vlc_medialibrary_t* p_ml )
     assert( p_ml != NULL );
     module_unneed( &p_ml->m, p_ml->m.p_module );
     assert( vlc_list_is_empty( &p_ml->cbs ) );
-    vlc_mutex_destroy( &p_ml->lock );
     vlc_object_delete(&p_ml->m);
 }
 

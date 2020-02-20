@@ -298,7 +298,6 @@ static void CleanSys( fingerprinter_sys_t *p_sys )
     for ( size_t i = 0; i < vlc_array_count( &p_sys->incoming.queue ); i++ )
         fingerprint_request_Delete( vlc_array_item_at_index( &p_sys->incoming.queue, i ) );
     vlc_array_clear( &p_sys->incoming.queue );
-    vlc_mutex_destroy( &p_sys->incoming.lock );
 
     for ( size_t i = 0; i < vlc_array_count( &p_sys->processing.queue ); i++ )
         fingerprint_request_Delete( vlc_array_item_at_index( &p_sys->processing.queue, i ) );
@@ -308,7 +307,6 @@ static void CleanSys( fingerprinter_sys_t *p_sys )
     for ( size_t i = 0; i < vlc_array_count( &p_sys->results.queue ); i++ )
         fingerprint_request_Delete( vlc_array_item_at_index( &p_sys->results.queue, i ) );
     vlc_array_clear( &p_sys->results.queue );
-    vlc_mutex_destroy( &p_sys->results.lock );
 
     vlc_player_Lock(p_sys->player);
     vlc_player_RemoveListener(p_sys->player, p_sys->listener_id);

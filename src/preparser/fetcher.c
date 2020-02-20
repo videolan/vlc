@@ -481,7 +481,5 @@ void input_fetcher_Delete( input_fetcher_t* fetcher )
     background_worker_Delete( fetcher->downloader );
 
     vlc_dictionary_clear( &fetcher->album_cache, FreeCacheEntry, NULL );
-    vlc_mutex_destroy( &fetcher->lock );
-
     free( fetcher );
 }

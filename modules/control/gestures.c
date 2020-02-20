@@ -161,7 +161,6 @@ static int Open ( vlc_object_t *p_this )
 
 error:
     vlc_vector_clear(&p_sys->vout_vector);
-    vlc_mutex_destroy( &p_sys->lock );
     free(p_sys);
     return VLC_EGENERIC;
 }
@@ -198,7 +197,6 @@ static void Close ( vlc_object_t *p_this )
     vlc_vector_clear(&p_sys->vout_vector);
 
     /* Destroy structure */
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 

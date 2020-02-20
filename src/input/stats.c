@@ -72,8 +72,6 @@ struct input_stats *input_stats_Create(void)
 
 void input_stats_Destroy(struct input_stats *stats)
 {
-    vlc_mutex_destroy(&stats->demux_bitrate.lock);
-    vlc_mutex_destroy(&stats->input_bitrate.lock);
     free(stats);
 }
 

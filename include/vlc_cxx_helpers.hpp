@@ -281,10 +281,6 @@ public:
     {
         vlc_mutex_init( &m_mutex );
     }
-    ~mutex()
-    {
-        vlc_mutex_destroy( &m_mutex );
-    }
 
     mutex( const mutex& ) = delete;
     mutex& operator=( const mutex& ) = delete;

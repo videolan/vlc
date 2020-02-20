@@ -240,7 +240,6 @@ int Open_LuaSD( vlc_object_t *p_this )
     {
         TAB_CLEAN( p_sys->i_query, p_sys->ppsz_query );
         vlc_cond_destroy( &p_sys->cond );
-        vlc_mutex_destroy( &p_sys->lock );
         goto error;
     }
     return VLC_SUCCESS;
@@ -269,7 +268,6 @@ void Close_LuaSD( vlc_object_t *p_this )
     TAB_CLEAN( p_sys->i_query, p_sys->ppsz_query );
 
     vlc_cond_destroy( &p_sys->cond );
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->psz_filename );
     lua_close( p_sys->L );
     free( p_sys );

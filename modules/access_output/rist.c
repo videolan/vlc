@@ -714,8 +714,6 @@ static void Clean( sout_access_out_t *p_access )
         free(p_sys->flow);
     }
 
-    vlc_mutex_destroy( &p_sys->lock );
-    vlc_mutex_destroy( &p_sys->fd_lock );
     if (p_sys->p_pktbuffer)
         block_Release(p_sys->p_pktbuffer);
 }

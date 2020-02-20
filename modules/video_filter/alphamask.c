@@ -135,7 +135,6 @@ static void Destroy( vlc_object_t *p_this )
     var_DelCallback( p_filter, CFG_PREFIX "mask", MaskCallback,
                      p_filter );
 
-    vlc_mutex_destroy( &p_sys->mask_lock );
     if( p_sys->p_mask )
         picture_Release( p_sys->p_mask );
 

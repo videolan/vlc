@@ -693,7 +693,6 @@ int InitVideoDec( vlc_object_t *obj )
     /* ***** Open the codec ***** */
     if( OpenVideoCodec( p_dec ) < 0 )
     {
-        vlc_mutex_destroy( &p_sys->lock );
         free( p_sys );
         avcodec_free_context( &p_context );
         return VLC_EGENERIC;
@@ -1403,7 +1402,6 @@ void EndVideoDec( vlc_object_t *obj )
     if( p_sys->p_va )
         vlc_va_Delete( p_sys->p_va );
 
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 

@@ -1071,8 +1071,6 @@ static void CloseMmalVout(vout_display_t * vd)
 
     hw_mmal_vzc_pool_release(sys->vzc);
 
-    vlc_mutex_destroy(&sys->manage_mutex);
-
     if (sys->native_interlaced) {
         if (vc_gencmd(response, sizeof(response), "hvs_update_fields 0") < 0 ||
                 response[18] != '0')

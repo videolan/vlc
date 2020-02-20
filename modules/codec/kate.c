@@ -1308,7 +1308,6 @@ static void DecSysRelease( decoder_sys_t *p_sys )
     }
 
     vlc_mutex_unlock( &p_sys->lock );
-    vlc_mutex_destroy( &p_sys->lock );
 
 #ifdef HAVE_TIGER
     if( p_sys->p_tr )

@@ -272,7 +272,6 @@ static void ClosePostproc( vlc_object_t *p_this )
     var_DelCallback( p_filter, FILTER_PREFIX "name", PPNameCallback, NULL );
 
     /* Destroy the resources */
-    vlc_mutex_destroy( &p_sys->lock );
     pp_free_context( p_sys->pp_context );
     pp_free_mode( p_sys->pp_mode );
     free( p_sys );

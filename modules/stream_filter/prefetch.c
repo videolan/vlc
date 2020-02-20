@@ -496,7 +496,6 @@ static int Open(vlc_object_t *obj)
     {
         vlc_cond_destroy(&sys->wait_space);
         vlc_cond_destroy(&sys->wait_data);
-        vlc_mutex_destroy(&sys->lock);
         vlc_interrupt_destroy(sys->interrupt);
         goto error;
     }
@@ -529,7 +528,6 @@ static void Close (vlc_object_t *obj)
     vlc_interrupt_destroy(sys->interrupt);
     vlc_cond_destroy(&sys->wait_space);
     vlc_cond_destroy(&sys->wait_data);
-    vlc_mutex_destroy(&sys->lock);
 
     while(sys->controls)
     {

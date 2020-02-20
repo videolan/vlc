@@ -417,14 +417,12 @@ static int Open( vlc_object_t *p_this )
     patpid = GetPID(p_sys, 0);
     if ( !PIDSetup( p_demux, TYPE_PAT, patpid, NULL ) )
     {
-        vlc_mutex_destroy( &p_sys->csa_lock );
         free( p_sys );
         return VLC_ENOMEM;
     }
     if( !ts_psi_PAT_Attach( patpid, p_demux ) )
     {
         PIDRelease( p_demux, patpid );
-        vlc_mutex_destroy( &p_sys->csa_lock );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -585,8 +583,6 @@ static void Close( vlc_object_t *p_this )
         p_sys->arib.b25stream->s = NULL; /* don't chain kill demuxer's source */
         vlc_stream_Delete( p_sys->arib.b25stream );
     }
-
-    vlc_mutex_destroy( &p_sys->csa_lock );
 
     /* Release all non default pids */
     ts_pid_list_Release( p_demux, &p_sys->pids );

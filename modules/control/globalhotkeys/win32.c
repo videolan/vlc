@@ -79,7 +79,6 @@ static int Open( vlc_object_t *p_this )
 
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
-        vlc_mutex_destroy( &p_sys->lock );
         vlc_cond_destroy( &p_sys->wait );
         free( p_sys );
         p_intf->p_sys = NULL;
@@ -94,7 +93,6 @@ static int Open( vlc_object_t *p_this )
     {
         vlc_mutex_unlock( &p_sys->lock );
         vlc_join( p_sys->thread, NULL );
-        vlc_mutex_destroy( &p_sys->lock );
         vlc_cond_destroy( &p_sys->wait );
         free( p_sys );
         p_intf->p_sys = NULL;
@@ -121,7 +119,6 @@ static void Close( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_sys->lock );
 
     vlc_join( p_sys->thread, NULL );
-    vlc_mutex_destroy( &p_sys->lock );
     vlc_cond_destroy( &p_sys->wait );
     free( p_sys );
 }

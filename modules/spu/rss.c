@@ -308,10 +308,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     /* Create and arm the timer */
     if( vlc_timer_create( &p_sys->timer, Fetch, p_filter ) )
-    {
-        vlc_mutex_destroy( &p_sys->lock );
         goto error;
-    }
     vlc_timer_schedule_asap( p_sys->timer, vlc_tick_from_sec(i_ttl) );
 
     free( psz_urls );
@@ -334,7 +331,6 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     vlc_timer_destroy( p_sys->timer );
-    vlc_mutex_destroy( &p_sys->lock );
 
     text_style_Delete( p_sys->p_style );
     free( p_sys->psz_marquee );

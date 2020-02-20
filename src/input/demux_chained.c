@@ -124,7 +124,6 @@ vlc_demux_chained_t *vlc_demux_chained_New(vlc_object_t *parent,
     {
         vlc_stream_Delete(dc->reader);
         vlc_stream_fifo_Close(dc->writer);
-        vlc_mutex_destroy(&dc->lock);
         free(dc);
         dc = NULL;
     }
@@ -165,6 +164,5 @@ void vlc_demux_chained_Delete(vlc_demux_chained_t *dc)
 {
     vlc_stream_fifo_Close(dc->writer);
     vlc_join(dc->thread, NULL);
-    vlc_mutex_destroy(&dc->lock);
     free(dc);
 }

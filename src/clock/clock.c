@@ -469,7 +469,6 @@ void vlc_clock_main_ChangePause(vlc_clock_main_t *main_clock, vlc_tick_t now,
 
 void vlc_clock_main_Delete(vlc_clock_main_t *main_clock)
 {
-    vlc_mutex_destroy(&main_clock->lock);
     vlc_cond_destroy(&main_clock->cond);
     assert(main_clock->rc == 1);
     free(main_clock);

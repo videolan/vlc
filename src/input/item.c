@@ -519,7 +519,6 @@ void input_item_Release( input_item_t *p_item )
         input_item_slave_Delete( p_item->pp_slaves[i] );
     TAB_CLEAN( p_item->i_slaves, p_item->pp_slaves );
 
-    vlc_mutex_destroy( &p_item->lock );
     free( owner );
 }
 

@@ -1843,9 +1843,6 @@ vlc_player_InitLocks(vlc_player_t *player, enum vlc_player_lock_type lock_type)
 static void
 vlc_player_DestroyLocks(vlc_player_t *player)
 {
-    vlc_mutex_destroy(&player->lock);
-    vlc_mutex_destroy(&player->vout_listeners_lock);
-    vlc_mutex_destroy(&player->aout_listeners_lock);
     vlc_cond_destroy(&player->start_delay_cond);
     vlc_cond_destroy(&player->destructor.wait);
 }

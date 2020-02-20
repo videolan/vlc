@@ -124,7 +124,6 @@ void addon_entry_Release( addon_entry_t * p_entry )
     }
     ARRAY_RESET( p_entry->files );
 
-    vlc_mutex_destroy( &p_entry->lock );
     free( owner );
 }
 
@@ -199,7 +198,6 @@ void addons_manager_Delete( addons_manager_t *p_manager )
     ARRAY_FOREACH( p_entry, p_manager->p_priv->name.entries )\
         addon_entry_Release( p_entry );\
     ARRAY_RESET( p_manager->p_priv->name.entries );\
-    vlc_mutex_destroy( &p_manager->p_priv->name.lock );\
     vlc_cond_destroy( &p_manager->p_priv->name.waitcond );\
     vlc_interrupt_destroy( p_manager->p_priv->name.p_interrupt );
 

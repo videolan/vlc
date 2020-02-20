@@ -422,7 +422,6 @@ fail:
         if (p_sys->player_listener)
         {
             vlc_cond_destroy(&p_sys->wait);
-            vlc_mutex_destroy(&p_sys->lock);
             vlc_player_RemoveListener(player, p_sys->player_listener);
         }
         vlc_playlist_RemoveListener(playlist, p_sys->playlist_listener);
@@ -452,7 +451,6 @@ static void Close(vlc_object_t *p_this)
     vlc_UrlClean(&p_sys->p_nowp_url);
 
     vlc_cond_destroy(&p_sys->wait);
-    vlc_mutex_destroy(&p_sys->lock);
 
     vlc_playlist_Lock(playlist);
     vlc_player_RemoveListener(

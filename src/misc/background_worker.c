@@ -171,7 +171,6 @@ static struct background_worker *background_worker_Create(void *owner,
 static void background_worker_Destroy(struct background_worker *worker)
 {
     vlc_cond_destroy(&worker->queue_wait);
-    vlc_mutex_destroy(&worker->lock);
     free(worker);
 }
 

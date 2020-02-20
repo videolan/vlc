@@ -740,7 +740,6 @@ static void vlc_h2_conn_destroy(struct vlc_h2_conn *conn)
 
     vlc_cancel(conn->thread);
     vlc_join(conn->thread, NULL);
-    vlc_mutex_destroy(&conn->lock);
 
     vlc_h2_output_destroy(conn->out);
     vlc_tls_Shutdown(conn->conn.tls, true);
@@ -796,7 +795,6 @@ struct vlc_http_conn *vlc_h2_conn_create(void *ctx, struct vlc_tls *tls)
      || vlc_clone(&conn->thread, vlc_h2_recv_thread, conn,
                   VLC_THREAD_PRIORITY_INPUT))
     {
-        vlc_mutex_destroy(&conn->lock);
         vlc_h2_output_destroy(conn->out);
         goto error;
     }

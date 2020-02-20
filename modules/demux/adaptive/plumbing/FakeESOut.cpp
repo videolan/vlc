@@ -165,7 +165,6 @@ FakeESOut::~FakeESOut()
     gc();
 
     delete commandsqueue;
-    vlc_mutex_destroy(&lock);
 }
 
 void FakeESOut::resetTimestamps()

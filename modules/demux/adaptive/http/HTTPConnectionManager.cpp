@@ -74,7 +74,6 @@ HTTPConnectionManager::~HTTPConnectionManager   ()
     delete downloader;
     delete factory;
     this->closeAllConnections();
-    vlc_mutex_destroy(&lock);
 }
 
 void HTTPConnectionManager::closeAllConnections      ()

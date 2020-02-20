@@ -110,7 +110,6 @@ int  MMSTUOpen( stream_t *p_access )
     {
         msg_Err( p_access, "invalid server name" );
         vlc_UrlClean( &p_sys->url );
-        vlc_mutex_destroy( &p_sys->lock_netwrite );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -147,7 +146,6 @@ int  MMSTUOpen( stream_t *p_access )
     {
         msg_Err( p_access, "cannot connect to server" );
         vlc_UrlClean( &p_sys->url );
-        vlc_mutex_destroy( &p_sys->lock_netwrite );
         free( p_sys );
         return VLC_EGENERIC;
     }

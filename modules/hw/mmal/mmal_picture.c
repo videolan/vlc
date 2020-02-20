@@ -1201,8 +1201,6 @@ static void hw_mmal_vzc_pool_delete(vzc_pool_ctl_t * const pc)
     if (pc->buf_pool != NULL)
         mmal_pool_destroy(pc->buf_pool);
 
-    vlc_mutex_destroy(&pc->lock);
-
 //    memset(pc, 0xba, sizeof(*pc)); // Zap for (hopefully) faster crash
     free (pc);
 }

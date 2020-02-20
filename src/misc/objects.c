@@ -129,7 +129,6 @@ void vlc_object_deinit(vlc_object_t *obj)
     vlc_restorecancel(canc);
 
     vlc_cond_destroy(&priv->var_wait);
-    vlc_mutex_destroy(&priv->var_lock);
     free(priv);
 }
 

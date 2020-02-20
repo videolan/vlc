@@ -119,8 +119,6 @@ AbstractStream::~AbstractStream()
     delete demuxer;
     delete demuxersource;
     delete fakeesout;
-
-    vlc_mutex_destroy(&lock);
 }
 
 void AbstractStream::prepareRestart(bool b_discontinuity)

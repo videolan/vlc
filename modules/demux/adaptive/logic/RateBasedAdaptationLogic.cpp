@@ -49,7 +49,6 @@ RateBasedAdaptationLogic::RateBasedAdaptationLogic  (vlc_object_t *obj) :
 
 RateBasedAdaptationLogic::~RateBasedAdaptationLogic()
 {
-    vlc_mutex_destroy(&lock);
 }
 
 BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *currep)

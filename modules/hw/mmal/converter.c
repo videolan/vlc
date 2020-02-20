@@ -782,8 +782,6 @@ void CloseConverter(vlc_object_t * obj)
     if (sys->dec_dev)
         vlc_decoder_device_Release(sys->dec_dev);
 
-    vlc_mutex_destroy(&sys->lock);
-
     p_filter->p_sys = NULL;
     free(sys);
 }

@@ -299,8 +299,6 @@ void input_resource_Release( input_resource_t *p_resource )
     if( p_resource->p_aout != NULL )
         aout_Destroy( p_resource->p_aout );
 
-    vlc_mutex_destroy( &p_resource->lock_hold );
-    vlc_mutex_destroy( &p_resource->lock );
     vout_Release( p_resource->p_vout_dummy );
     free( p_resource );
 }

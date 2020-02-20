@@ -830,7 +830,6 @@ void D3D11CloseConverter( vlc_object_t *obj )
     D3D11_ReleaseProcessor( &p_sys->d3d_proc );
 #endif
     CopyCleanCache(&p_sys->cache);
-    vlc_mutex_destroy(&p_sys->staging_lock);
     if (p_sys->staging)
         ID3D11Texture2D_Release(p_sys->staging);
 }

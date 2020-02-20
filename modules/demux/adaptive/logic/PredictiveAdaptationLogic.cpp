@@ -63,7 +63,6 @@ PredictiveAdaptationLogic::PredictiveAdaptationLogic(vlc_object_t *obj)
 
 PredictiveAdaptationLogic::~PredictiveAdaptationLogic()
 {
-    vlc_mutex_destroy(&lock);
 }
 
 BaseRepresentation *PredictiveAdaptationLogic::getNextRepresentation(BaseAdaptationSet *adaptSet, BaseRepresentation *prevRep)

@@ -476,10 +476,8 @@ static void unref_subpicture_updater(bluray_spu_updater_sys_t *p_sys)
     p_sys->p_overlay = NULL;
     vlc_mutex_unlock(&p_sys->lock);
 
-    if (refs < 1) {
-        vlc_mutex_destroy(&p_sys->lock);
+    if (refs < 1)
         free(p_sys);
-    }
 }
 
 /* Get a 3 char code
@@ -1131,10 +1129,6 @@ static void blurayClose(vlc_object_t *object)
 
     ARRAY_RESET(p_sys->events_delayed);
 
-    vlc_mutex_destroy(&p_sys->pl_info_lock);
-    vlc_mutex_destroy(&p_sys->bdj.lock);
-    vlc_mutex_destroy(&p_sys->read_block_lock);
-
     free(p_sys->psz_bd_path);
 }
 
@@ -1576,7 +1570,6 @@ static void bluray_esOutDestroy(es_out_t *p_out)
     for (size_t i = 0; i < vlc_array_count(&esout_priv->es); ++i)
         es_pair_Delete(vlc_array_item_at_index(&esout_priv->es, i));
     vlc_array_clear(&esout_priv->es);
-    vlc_mutex_destroy(&esout_priv->lock);
     free(esout_priv);
 }
 
@@ -1804,7 +1797,6 @@ static void blurayCloseOverlay(demux_t *p_demux, int plane)
         /* no references to this overlay exist in vo anymore */
         es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_DELETE_OVERLAY, plane);
 
-        vlc_mutex_destroy(&ov->lock);
         subpicture_region_ChainDelete(ov->p_regions);
         free(ov);
 

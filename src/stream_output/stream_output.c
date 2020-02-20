@@ -131,7 +131,6 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
 
     FREENULL( p_sout->psz_sout );
 
-    vlc_mutex_destroy( &p_sout->lock );
     vlc_object_delete(p_sout);
     return NULL;
 }
@@ -146,8 +145,6 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
 
     /* *** free all string *** */
     FREENULL( p_sout->psz_sout );
-
-    vlc_mutex_destroy( &p_sout->lock );
 
     /* *** free structure *** */
     vlc_object_delete(p_sout);

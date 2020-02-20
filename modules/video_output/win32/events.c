@@ -167,7 +167,6 @@ event_thread_t *EventThreadCreate( vlc_object_t *obj, vout_window_t *parent_wind
 void EventThreadDestroy( event_thread_t *p_event )
 {
     vlc_cond_destroy( &p_event->wait );
-    vlc_mutex_destroy( &p_event->lock );
     free( p_event );
 }
 
