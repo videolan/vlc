@@ -819,6 +819,7 @@ static int PrivControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_PRIV_SET_ES:
     case ES_OUT_PRIV_UNSET_ES:
     case ES_OUT_PRIV_RESTART_ES:
+    case ES_OUT_PRIV_SET_ES_CAT_IDS:
     case ES_OUT_PRIV_SET_ES_LIST:
     case ES_OUT_PRIV_SET_ES_BY_ID:
     case ES_OUT_PRIV_RESTART_ES_BY_ID:

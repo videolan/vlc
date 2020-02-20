@@ -2585,6 +2585,59 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
         p_esprops->p_main_es = es;
 }
 
+static void EsOutSelectListFromProps( es_out_t *out, enum es_format_category_e cat )
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    es_out_es_props_t *esprops = GetPropsByCat( p_sys, cat );
+    if( !esprops || !esprops->str_ids )
+        return;
+
+    char *buffer = malloc( strlen( esprops->str_ids ) + 1);
+    if( !buffer )
+        return;
+
+    bool unselect_others = false;
+    es_out_id_t *other;
+    foreach_es_then_es_slaves( other )
+    {
+        if( other->fmt.i_cat != cat )
+            continue;
+
+        bool select = false;
+        if( !unselect_others )
+        {
+            /* strtok_r will modify str_ids */
+            strcpy( buffer, esprops->str_ids );
+            char *saveptr;
+            for( const char *str_id = strtok_r( buffer, ",", &saveptr );
+                 str_id != NULL;
+                 str_id = strtok_r( NULL, ",", &saveptr ) )
+            {
+                if( strcmp( other->id.str_id, str_id ) == 0 )
+                {
+                    select = true;
+                    break;
+                }
+            }
+        }
+
+        if( !select )
+        {
+            if( EsIsSelected( other ) )
+                EsOutUnselectEs( out, other, other->p_pgrm == p_sys->p_pgrm );
+        }
+        else
+        {
+            if( !EsIsSelected( other ) )
+                EsOutSelectEs( out, other );
+            if( esprops->e_policy == ES_OUT_ES_POLICY_EXCLUSIVE )
+                unselect_others = true;
+        }
+    }
+
+    free( buffer );
+}
+
 static void EsOutSelectList( es_out_t *out, enum es_format_category_e cat,
                              vlc_es_id_t * const*es_id_list )
 {
@@ -3477,6 +3530,22 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
             default: vlc_assert_unreachable();
         }
         return EsOutControlLocked( out, p_sys->main_source, new_query, es );
+    }
+    case ES_OUT_PRIV_SET_ES_CAT_IDS:
+    {
+        enum es_format_category_e cat = va_arg( args, enum es_format_category_e );
+        const char *str_ids = va_arg( args, const char * );
+        es_out_es_props_t *p_esprops = GetPropsByCat( p_sys, cat );
+        free( p_esprops->str_ids );
+        p_esprops->str_ids = str_ids ? strdup( str_ids ) : NULL;
+
+        if( p_esprops->str_ids )
+        {
+            /* Update new tracks selection using the new str_ids */
+            EsOutSelectListFromProps( out, cat );
+        }
+
+        return VLC_SUCCESS;
     }
     case ES_OUT_PRIV_GET_WAKE_UP:
     {

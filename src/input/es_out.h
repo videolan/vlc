@@ -60,6 +60,8 @@ enum es_out_query_private_e
     ES_OUT_PRIV_RESTART_ES_BY_ID,
     ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID,
 
+    ES_OUT_PRIV_SET_ES_CAT_IDS, /* arg1=es_format_category_e arg2=const char *, res=cannot fail */
+
     /* Stop all selected ES and save the stopped state in a context. free the
      * context or call ES_OUT_PRIV_STOP_ALL_ES */
     ES_OUT_PRIV_STOP_ALL_ES,                        /* arg1=void ** */
@@ -168,6 +170,14 @@ static inline int es_out_RestartEsById( es_out_t *p_out, int id )
 static inline int es_out_SetEsDefaultById( es_out_t *p_out, int id )
 {
     return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID, id );
+}
+static inline void es_out_SetEsCatIds( es_out_t *p_out,
+                                       enum es_format_category_e cat,
+                                       const char *str_ids )
+{
+    int ret = es_out_PrivControl( p_out, ES_OUT_PRIV_SET_ES_CAT_IDS,
+                                  cat, str_ids );
+    assert( ret == VLC_SUCCESS );
 }
 static inline int es_out_StopAllEs( es_out_t *p_out, void **context )
 {
