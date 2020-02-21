@@ -156,6 +156,13 @@ static int  DvdReadSeek     ( demux_t *, int );
 static void DvdReadHandleDSI( demux_t *, uint8_t * );
 static void DvdReadFindCell ( demux_t * );
 
+#if DVDREAD_VERSION >= DVDREAD_VERSION_CODE(6, 1, 0)
+static void DvdReadLog( void *foo, dvd_logger_level_t i, const char *p, va_list z )
+{
+    demux_t *p_demux = (demux_t*)foo;
+    msg_GenericVa( p_demux, i, p, z );
+}
+#endif
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -189,8 +196,13 @@ static int Open( vlc_object_t *p_this )
 
     /* Open dvdread */
     const char *psz_path = ToLocale( psz_file );
+#if DVDREAD_VERSION >= DVDREAD_VERSION_CODE(6, 1, 0)
+    dvd_logger_cb cbs;
+    cbs.pf_log = DvdReadLog;
+    dvd_reader_t *p_dvdread = DVDOpen2( p_demux, &cbs, psz_path );
+#else
     dvd_reader_t *p_dvdread = DVDOpen( psz_path );
-
+#endif
     LocaleFree( psz_path );
     if( p_dvdread == NULL )
     {
