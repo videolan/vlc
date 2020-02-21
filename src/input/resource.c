@@ -350,6 +350,7 @@ static void input_resource_PutVoutLocked(input_resource_t *p_resource,
 
         TAB_REMOVE(p_resource->i_vout, p_resource->pp_vout, vout);
         vlc_mutex_unlock(&p_resource->lock_hold);
+        vout_Stop(vout);
         vout_Close(vout);
     }
 }
