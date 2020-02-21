@@ -25,6 +25,7 @@
 
 # include <stdatomic.h>
 
+# include <vlc_atomic.h>
 # include <vlc_viewpoint.h>
 # include "../clock/clock.h"
 
@@ -97,7 +98,7 @@ typedef struct
     atomic_uint buffers_played;
     atomic_uchar restart;
 
-    atomic_uintptr_t refs;
+    vlc_atomic_rc_t rc;
 } aout_owner_t;
 
 typedef struct
