@@ -523,6 +523,8 @@ static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
     if( i_read < 0 )
     {
         msg_Err( p_access, "read failed" );
+        if (errno != EINTR && errno != EAGAIN)
+            return 0;
         return -1;
     }
 
