@@ -2487,6 +2487,8 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         return NULL;
     }
 
+    vlc_atomic_rc_init( &in->rc );
+
     /* Split uri */
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, &psz_anchor, psz_dup );
 
@@ -2695,6 +2697,18 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
     return in;
 }
 
+input_source_t *input_source_Hold( input_source_t *in )
+{
+    vlc_atomic_rc_inc( &in->rc );
+    return in;
+}
+
+void input_source_Release( input_source_t *in )
+{
+    if( vlc_atomic_rc_dec( &in->rc ) )
+        free( in );
+}
+
 /*****************************************************************************
  * InputSourceDestroy:
  *****************************************************************************/
@@ -2712,7 +2726,7 @@ static void InputSourceDestroy( input_source_t *in )
     }
     TAB_CLEAN( in->i_title, in->title );
 
-    free( in );
+    input_source_Release( in );
 }
 
 /*****************************************************************************

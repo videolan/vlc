@@ -30,6 +30,7 @@
 #include <vlc_demux.h>
 #include <vlc_input.h>
 #include <vlc_viewpoint.h>
+#include <vlc_atomic.h>
 #include <libvlc.h>
 #include "input_interface.h"
 #include "misc/interrupt.h"
@@ -366,6 +367,8 @@ input_item_t* input_GetItem( input_thread_t * ) VLC_USED;
 /* input_source_t: gathers all information per input source */
 typedef struct
 {
+    vlc_atomic_rc_t rc;
+
     demux_t  *p_demux; /**< Demux object (most downstream) */
 
     /* Title infos for that input */
@@ -634,6 +637,16 @@ bool input_Stopped( input_thread_t * );
 int input_GetAttachments(input_thread_t *input, input_attachment_t ***attachments);
 
 input_attachment_t *input_GetAttachment(input_thread_t *input, const char *name);
+
+/**
+ * Hold the input_source_t
+ */
+input_source_t *input_source_Hold( input_source_t *in );
+
+/**
+ * Release the input_source_t
+ */
+void input_source_Release( input_source_t *in );
 
 /* Bound pts_delay */
 #define INPUT_PTS_DELAY_MAX VLC_TICK_FROM_SEC(60)
