@@ -1184,31 +1184,45 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    navRead_DSI( &p_sys->dsi_pack, &p_data[DSI_START_BYTE] );
+    /* Check we are really on a DSI packet
+     * http://www.mpucoder.com/DVD/dsi_pkt.html
+     * Some think it's funny to fill with 0x42 */
+    const uint8_t dsiheader[7] = { 0x00, 0x00, 0x01, 0xbf, 0x03, 0xfa, 0x01 };
+    if(!memcmp(&p_data[DSI_START_BYTE-7], dsiheader, 7))
+    {
+        navRead_DSI( &p_sys->dsi_pack, &p_data[DSI_START_BYTE] );
 
-    /*
-     * Determine where we go next.  These values are the ones we mostly
-     * care about.
-     */
-    p_sys->i_cur_block = p_sys->dsi_pack.dsi_gi.nv_pck_lbn;
-    p_sys->i_pack_len = p_sys->dsi_pack.dsi_gi.vobu_ea;
+        /*
+         * Store the timecodes so we can get the current time
+         */
+        p_sys->i_title_cur_time = (mtime_t) p_sys->dsi_pack.dsi_gi.nv_pck_scr / 90 * 1000;
+        p_sys->i_cell_cur_time = (mtime_t) dvdtime_to_time( &p_sys->dsi_pack.dsi_gi.c_eltm, 0 );
 
-    /*
-     * Store the timecodes so we can get the current time
-     */
-    p_sys->i_title_cur_time = (mtime_t) p_sys->dsi_pack.dsi_gi.nv_pck_scr / 90 * 1000;
-    p_sys->i_cell_cur_time = (mtime_t) dvdtime_to_time( &p_sys->dsi_pack.dsi_gi.c_eltm, 0 );
+        /*
+         * Determine where we go next.  These values are the ones we mostly
+        * care about.
+        */
+        p_sys->i_cur_block = p_sys->dsi_pack.dsi_gi.nv_pck_lbn;
+        p_sys->i_pack_len = p_sys->dsi_pack.dsi_gi.vobu_ea;
 
-    /*
-     * If we're not at the end of this cell, we can determine the next
-     * VOBU to display using the VOBU_SRI information section of the
-     * DSI.  Using this value correctly follows the current angle,
-     * avoiding the doubled scenes in The Matrix, and makes our life
-     * really happy.
-     */
+        /*
+        * If we're not at the end of this cell, we can determine the next
+        * VOBU to display using the VOBU_SRI information section of the
+        * DSI.  Using this value correctly follows the current angle,
+        * avoiding the doubled scenes in The Matrix, and makes our life
+        * really happy.
+        */
 
-    p_sys->i_next_vobu = p_sys->i_cur_block +
-        ( p_sys->dsi_pack.vobu_sri.next_vobu & 0x7fffffff );
+        p_sys->i_next_vobu = p_sys->i_cur_block +
+            ( p_sys->dsi_pack.vobu_sri.next_vobu & 0x7fffffff );
+    }
+    else
+    {
+        /* resync after decoy/corrupted titles */
+        msg_Warn(p_demux, "Invalid DSI packet in VOBU %d found, skipping Cell %d / %d",
+                 p_sys->i_next_vobu, p_sys->i_cur_cell, p_sys->i_title_end_cell);
+        p_sys->dsi_pack.vobu_sri.next_vobu = SRI_END_OF_CELL;
+    }
 
     if( p_sys->dsi_pack.vobu_sri.next_vobu != SRI_END_OF_CELL
         && p_sys->i_angle > 1 )
