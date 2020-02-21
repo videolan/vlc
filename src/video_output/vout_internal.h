@@ -24,8 +24,7 @@
 #ifndef LIBVLC_VOUT_INTERNAL_H
 #define LIBVLC_VOUT_INTERNAL_H 1
 
-#include <stdatomic.h>
-
+#include <vlc_atomic.h>
 #include <vlc_picture_fifo.h>
 #include <vlc_picture_pool.h>
 #include <vlc_vout_display.h>
@@ -184,7 +183,7 @@ struct vout_thread_sys_t
     picture_fifo_t  *decoder_fifo;
     vout_chrono_t   render;           /**< picture render time estimator */
 
-    atomic_uintptr_t refs;
+    vlc_atomic_rc_t rc;
 };
 
 /**

@@ -1829,7 +1829,7 @@ void vout_Release(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
 
-    if (atomic_fetch_sub_explicit(&sys->refs, 1, memory_order_release))
+    if (!vlc_atomic_rc_dec(&sys->rc))
         return;
 
     if (sys->dummy)
@@ -1869,6 +1869,7 @@ static vout_thread_t *vout_CreateCommon(vlc_object_t *object)
     vout_CreateVars(vout);
 
     vout_thread_sys_t *sys = (vout_thread_sys_t *)&vout[1];
+    vlc_atomic_rc_init(&sys->rc);
 
     vout->p = sys;
     return vout;
@@ -1954,9 +1955,6 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     /* Arbitrary initial time */
     vout_chrono_Init(&sys->render, 5, VLC_TICK_FROM_MS(10));
 
-    /* */
-    atomic_init(&sys->refs, 0);
-
     if (var_InheritBool(vout, "video-wallpaper"))
         vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_BELOW);
     else if (var_InheritBool(vout, "video-on-top"))
@@ -1969,7 +1967,7 @@ vout_thread_t *vout_Hold(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
 
-    atomic_fetch_add_explicit(&sys->refs, 1, memory_order_relaxed);
+    vlc_atomic_rc_inc(&sys->rc);
     return vout;
 }
 
