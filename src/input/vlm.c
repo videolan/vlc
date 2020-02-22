@@ -166,7 +166,7 @@ vlm_t *vlm_New( libvlc_int_t *libvlc, const char *psz_vlmconf )
 
     vlc_mutex_init( &p_vlm->lock );
     vlc_mutex_init( &p_vlm->lock_manage );
-    vlc_cond_init_daytime( &p_vlm->wait_manage );
+    vlc_cond_init( &p_vlm->wait_manage );
     p_vlm->users = 1;
     p_vlm->input_state_changed = false;
     p_vlm->exiting = false;

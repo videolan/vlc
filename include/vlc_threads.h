@@ -432,12 +432,6 @@ typedef struct
 
 /**
  * Static initializer for (static) condition variable.
- *
- * \note
- * The condition variable will use the default clock, which is OS-dependent.
- * Therefore, where timed waits are necessary the condition variable should
- * always be initialized dynamically explicit instead of using this
- * initializer.
  */
 #define VLC_STATIC_COND { NULL, VLC_STATIC_MUTEX }
 
@@ -445,17 +439,6 @@ typedef struct
  * Initializes a condition variable.
  */
 VLC_API void vlc_cond_init(vlc_cond_t *);
-
-/**
- * Initializes a condition variable (wall clock).
- *
- * This function initializes a condition variable for timed waiting using the
- * UTC wall clock time. The time reference is the same as with time() and with
- * timespec_get() and TIME_UTC.
- * vlc_cond_timedwait_daytime() must be instead of
- * vlc_cond_timedwait() for actual waiting.
- */
-void vlc_cond_init_daytime(vlc_cond_t *);
 
 /**
  * Wakes up one thread waiting on a condition variable.
@@ -524,11 +507,6 @@ VLC_API void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex);
  * \param mutex mutex which is unlocked while waiting,
  *              then locked again when waking up
  * \param deadline <b>absolute</b> timeout
- *
- * \warning If the variable was initialized with vlc_cond_init_daytime(), or
- * was statically initialized with \ref VLC_STATIC_COND, the time reference
- * used by this function is unspecified (depending on the implementation, it
- * might be the Unix epoch or the vlc_tick_now() clock).
  *
  * \return 0 if the condition was signaled, an error code in case of timeout.
  */

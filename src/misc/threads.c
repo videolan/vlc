@@ -228,11 +228,6 @@ void vlc_cond_init(vlc_cond_t *cond)
     vlc_mutex_init(&cond->lock);
 }
 
-void vlc_cond_init_daytime(vlc_cond_t *cond)
-{
-    vlc_cond_init(cond);
-}
-
 struct vlc_cond_waiter {
     struct vlc_cond_waiter **pprev, *next;
     atomic_uint value;
