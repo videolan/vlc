@@ -72,7 +72,7 @@ struct aout_sys_common
 #pragma clang diagnostic ignored "-Wpartial-availability"
         os_unfair_lock  unfair;
 #pragma clang diagnostic pop
-        pthread_mutex_t mutex;
+        vlc_mutex_t     mutex;
     } lock;
 
     int                 i_rate;
