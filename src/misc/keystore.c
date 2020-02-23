@@ -234,8 +234,7 @@ protocol_set_port(const vlc_url_t *p_url, char *psz_port)
         i_port = p_url->i_port;
     else
     {
-        for (unsigned int i = 0; i < sizeof(protocol_default_ports)
-                                   / sizeof(*protocol_default_ports); ++i)
+        for (unsigned int i = 0; i < ARRAY_SIZE(protocol_default_ports); ++i)
         {
             if (strcasecmp(p_url->psz_protocol,
                            protocol_default_ports[i].psz_protocol) == 0)

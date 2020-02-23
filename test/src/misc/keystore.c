@@ -353,7 +353,7 @@ main(void)
 
     libvlc_instance_t *p_libvlc = create_libvlc(i_vlc_argc, ppsz_vlc_argv);
 
-    for (unsigned int i = 0; i < sizeof(testcases)/sizeof(*testcases); ++i)
+    for (unsigned int i = 0; i < ARRAY_SIZE(testcases); ++i)
     {
         if (testcases[i].psz_url == NULL)
         {

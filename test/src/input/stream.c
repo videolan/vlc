@@ -199,7 +199,7 @@ stream_open( const char *psz_url )
     p_reader = calloc( 1, sizeof(struct reader) );
     assert( p_reader );
 
-    p_vlc = libvlc_new( sizeof(argv) / sizeof(argv[0]), argv );
+    p_vlc = libvlc_new( ARRAY_SIZE(argv), argv );
     assert( p_vlc != NULL );
 
     p_reader->u.s = vlc_stream_NewURL( p_vlc->p_libvlc_int, psz_url );

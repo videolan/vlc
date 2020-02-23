@@ -170,8 +170,7 @@ main (void)
         { NULL, libvlc_media_slave_type_subtitle, 0 /* none */ },
     };
 
-    #define EXPECTED_SLAVES_COUNT (sizeof(p_expected_slaves) / sizeof(*p_expected_slaves))
-    static_assert((sizeof(pp_slave_paths) / sizeof(*pp_slave_paths)) == EXPECTED_SLAVES_COUNT,
+    static_assert(ARRAY_SIZE(pp_slave_paths) == ARRAY_SIZE(p_expected_slaves),
                   "pp_slave_paths and p_expected_slaves mismatch");
 
     const char *pp_args[] = {
@@ -180,13 +179,12 @@ main (void)
         "--codec", "none", /* to ensure we don't depend on codec modules */
         NULL /* "sub-autodetect-file" place holder */
     };
-    #define ARGC (sizeof(pp_args) / sizeof(*pp_args))
 
-    libvlc_instance_t *p_vlc = libvlc_new(ARGC - 1, pp_args);
+    libvlc_instance_t *p_vlc = libvlc_new(ARRAY_SIZE(pp_args) - 1, pp_args);
     assert(p_vlc != NULL);
 
     /* Fill p_expected_slaves with correct VLC mrls */
-    for (unsigned int i = 0; i < EXPECTED_SLAVES_COUNT; ++i)
+    for (unsigned int i = 0; i < ARRAY_SIZE(p_expected_slaves); ++i)
     {
         p_expected_slaves[i].psz_uri = path_to_mrl(p_vlc, pp_slave_paths[i]);
         assert(p_expected_slaves[i].psz_uri != NULL);
@@ -195,12 +193,12 @@ main (void)
     printf("== Testing --sub-autodetect-fuzzy 1 (everything) ==\n");
     test_media_has_slaves_from_parent(p_vlc, SLAVES_DIR "/test.mp4",
                                       p_expected_slaves,
-                                      EXPECTED_SLAVES_COUNT);
+                                      ARRAY_SIZE(p_expected_slaves));
     libvlc_release(p_vlc);
 
     printf("== Testing --sub-autodetect-fuzzy 2 (full, left, and right match) ==\n");
     pp_args[2] = "2";
-    p_vlc = libvlc_new(ARGC - 1, pp_args);
+    p_vlc = libvlc_new(ARRAY_SIZE(pp_args) - 1, pp_args);
     assert(p_vlc != NULL);
     test_media_has_slaves_from_parent(p_vlc, SLAVES_DIR "/test.mp4",
                                       p_expected_slaves, 3);
@@ -212,7 +210,7 @@ main (void)
 
     printf("== Testing --sub-autodetect-fuzzy 3 (full and left match) ==\n");
     pp_args[2] = "3";
-    p_vlc = libvlc_new(ARGC - 1, pp_args);
+    p_vlc = libvlc_new(ARRAY_SIZE(pp_args) - 1, pp_args);
     assert(p_vlc != NULL);
     test_media_has_slaves_from_parent(p_vlc, SLAVES_DIR "/test.mp4",
                                       p_expected_slaves, 2);
@@ -220,20 +218,20 @@ main (void)
 
     printf("== Testing --sub-autodetect-fuzzy 4 (full match) ==\n");
     pp_args[2] = "4";
-    p_vlc = libvlc_new(ARGC - 1, pp_args);
+    p_vlc = libvlc_new(ARRAY_SIZE(pp_args) - 1, pp_args);
     assert(p_vlc != NULL);
     test_media_has_slaves_from_parent(p_vlc, SLAVES_DIR "/test.mp4",
                                       p_expected_slaves, 1);
     libvlc_release(p_vlc);
 
     printf("== Testing  --no-sub-autodetect-file (no match) ==\n");
-    pp_args[ARGC - 1] = "--no-sub-autodetect-file";
-    p_vlc = libvlc_new(ARGC, pp_args);
+    pp_args[ARRAY_SIZE(pp_args) - 1] = "--no-sub-autodetect-file";
+    p_vlc = libvlc_new(ARRAY_SIZE(pp_args), pp_args);
     assert(p_vlc != NULL);
     test_media_has_slaves_from_parent(p_vlc, SLAVES_DIR "/test.mp4", NULL, 0);
     libvlc_release(p_vlc);
 
-    for (unsigned int i = 0; i < EXPECTED_SLAVES_COUNT; ++i)
+    for (unsigned int i = 0; i < ARRAY_SIZE(p_expected_slaves); ++i)
         free(p_expected_slaves[i].psz_uri);
 
     return 0;

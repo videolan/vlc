@@ -231,7 +231,7 @@ int main (void)
     }
 
     char buf[256];
-    char *tmpdir = getcwd(buf, sizeof (buf) / sizeof (*buf));
+    char *tmpdir = getcwd(buf, ARRAY_SIZE (buf));
     if (tmpdir == NULL)
     {
         perror("getcwd");

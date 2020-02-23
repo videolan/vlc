@@ -1161,7 +1161,7 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
     size_t subtitle_area_count = 0;
 
     subtitle_area = subtitle_area_buffer;
-    if (subtitle_region_count > sizeof(subtitle_area_buffer)/sizeof(*subtitle_area_buffer))
+    if (subtitle_region_count > ARRAY_SIZE(subtitle_area_buffer))
         subtitle_area = calloc(subtitle_region_count, sizeof(*subtitle_area));
 
     /* Process all subpictures and regions (in the right order) */

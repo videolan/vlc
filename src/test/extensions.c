@@ -39,7 +39,7 @@ static void check_extensions( const char* const* extensions, size_t nb_exts )
      do \
      { \
         const char* const exts[] = { ext_list }; \
-        check_extensions( exts, sizeof( exts ) / sizeof( exts[0] ) ); \
+        check_extensions( exts, ARRAY_SIZE( exts ) ); \
      } while(0);
 
 int main(void)

@@ -71,7 +71,7 @@ void vlc_trace (const char *fn, const char *file, unsigned line)
      fflush (stderr); /* needed before switch to low-level I/O */
 #ifdef HAVE_BACKTRACE
      void *stack[20];
-     int len = backtrace (stack, sizeof (stack) / sizeof (stack[0]));
+     int len = backtrace (stack, ARRAY_SIZE (stack) );
      backtrace_symbols_fd (stack, len, 2);
 #endif
      fsync (2);

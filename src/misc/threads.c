@@ -51,9 +51,9 @@ void vlc_global_mutex (unsigned n, bool acquire)
         VLC_STATIC_MUTEX, // For MTA holder
 #endif
     };
-    static_assert (VLC_MAX_MUTEX == (sizeof (locks) / sizeof (locks[0])),
+    static_assert (VLC_MAX_MUTEX == ARRAY_SIZE(locks),
                    "Wrong number of global mutexes");
-    assert (n < (sizeof (locks) / sizeof (locks[0])));
+    assert (n < ARRAY_SIZE(locks));
 
     vlc_mutex_t *lock = locks + n;
     if (acquire)

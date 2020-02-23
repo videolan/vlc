@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <vlc_common.h>
 
 using namespace dash::mpd;
 
@@ -105,7 +106,7 @@ static const struct
 
 int main(int, char **)
 {
-    for(size_t i=0; i<sizeof(dataset)/sizeof(dataset[0]); i++)
+    for(size_t i=0; i<ARRAY_SIZE(dataset); i++)
     {
         std::string str = std::string(dataset[i].src);
 

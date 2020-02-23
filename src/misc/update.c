@@ -447,7 +447,7 @@ bool update_NeedUpgrade( update_t *p_update )
         p_update->release.i_extra
     };
 
-    for (unsigned i = 0; i < sizeof latest / sizeof *latest; i++) {
+    for (unsigned i = 0; i < ARRAY_SIZE( latest ); i++) {
         /* there is a new version available */
         if (latest[i] > current[i])
             return true;

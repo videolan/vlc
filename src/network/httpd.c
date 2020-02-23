@@ -1734,7 +1734,7 @@ static void httpdLoop(httpd_host_t *host)
         }
 
         struct pollfd *pufd = ufd + nfd;
-        assert (pufd < ufd + (sizeof (ufd) / sizeof (ufd[0])));
+        assert (pufd < ufd + ARRAY_SIZE (ufd));
 
         pufd->events = pufd->revents = 0;
 
@@ -1984,7 +1984,7 @@ static void httpdLoop(httpd_host_t *host)
     vlc_list_foreach(cl, &host->clients, node) {
         const struct pollfd *pufd = &ufd[nfd];
 
-        assert(pufd < &ufd[sizeof(ufd) / sizeof(ufd[0])]);
+        assert(pufd < &ufd[ARRAY_SIZE(ufd)]);
 
         if (vlc_tls_GetFD(cl->sock) != pufd->fd)
             continue; // we were not waiting for this client

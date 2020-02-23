@@ -115,7 +115,7 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
     vlc_cond_init( &ctx.cond );
     vlc_mutex_init( &ctx.lock );
 
-    for ( size_t i = 0; i < sizeof(test_params) / sizeof(test_params[0]); ++i)
+    for ( size_t i = 0; i < ARRAY_SIZE(test_params); ++i)
     {
         char* psz_mrl;
 

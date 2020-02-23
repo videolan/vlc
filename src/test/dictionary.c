@@ -65,7 +65,7 @@ int main (void)
     static const char * our_keys[] = {
         "Hello", "Hella", "flowmeter", "Frostnipped", "frostnipped", "remiform", "quadrifoliolate", "singularity", "unafflicted"
     };
-    const int size = sizeof(our_keys)/sizeof(our_keys[0]);
+    const int size = ARRAY_SIZE(our_keys);
     char ** keys;
     intptr_t i = 0;
 

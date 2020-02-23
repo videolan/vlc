@@ -309,7 +309,7 @@ main(int i_argc, char *ppsz_argv[])
     libvlc_instance_t *p_libvlc = libvlc_new(0, NULL);
     assert(p_libvlc != NULL);
 
-    for (unsigned int i = 0; i < sizeof(keystore_args)/sizeof(*keystore_args); ++i)
+    for (unsigned int i = 0; i < ARRAY_SIZE(keystore_args); ++i)
     {
         const char *psz_module = keystore_args[i].psz_module;
 
