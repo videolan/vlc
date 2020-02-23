@@ -32,6 +32,8 @@
 #include <sys/types.h>
 #include <pthread.h>
 
+static clockid_t vlc_clock_id = CLOCK_REALTIME;
+
 #define WAIT_BUCKET_INIT \
      { PTHREAD_MUTEX_INITIALIZER, PTHREAD_COND_INITIALIZER, 0 }
 #define WAIT_BUCKET_INIT_2 WAIT_BUCKET_INIT, WAIT_BUCKET_INIT
@@ -101,22 +103,29 @@ static int vlc_atomic_timedwait_timespec(void *addr, unsigned value,
     return ret;
 }
 
+static void vlc_timespec_adjust(clockid_t cid, struct timespec *restrict ts)
+{
+    struct timespec now_from, now_to;
+    lldiv_t d;
+
+    if (vlc_clock_id == cid)
+        return;
+
+    clock_gettime(cid, &now_from);
+    clock_gettime(vlc_clock_id, &now_to);
+
+    d = lldiv((ts->tv_sec - now_from.tv_sec + now_to.tv_sec) * 1000000000LL
+              + ts->tv_nsec - now_from.tv_nsec - now_to.tv_nsec, 1000000000LL);
+
+    ts->tv_sec = d.quot;
+    ts->tv_nsec = d.rem;
+}
+
 int vlc_atomic_timedwait(void *addr, unsigned value, vlc_tick_t deadline)
 {
-    struct timespec ts;
-    vlc_tick_t delay = deadline - vlc_tick_now();
-    lldiv_t d = lldiv((delay >= 0) ? delay : 0, CLOCK_FREQ);
+    struct timespec ts = timespec_from_vlc_tick(deadline);
 
-    /* TODO: use monotonic clock directly */
-    clock_gettime(CLOCK_REALTIME, &ts);
-    ts.tv_sec += d.quot;
-    ts.tv_nsec += NS_FROM_VLC_TICK(d.rem);
-
-    if (ts.tv_nsec >= 1000000000) {
-        ts.tv_sec++;
-        ts.tv_nsec -= 1000000000;
-    }
-
+    vlc_timespec_adjust(CLOCK_MONOTONIC, &ts);
     return vlc_atomic_timedwait_timespec(addr, value, &ts);
 }
 
@@ -124,6 +133,7 @@ int vlc_atomic_timedwait_daytime(void *addr, unsigned value, time_t deadline)
 {
     struct timespec ts = { .tv_sec = deadline, .tv_nsec = 0 };
 
+    vlc_timespec_adjust(CLOCK_REALTIME, &ts);
     return vlc_atomic_timedwait_timespec(addr, value, &ts);
 }
 
@@ -141,3 +151,27 @@ void vlc_atomic_notify_all(void *addr)
         pthread_cond_broadcast(&bucket->wait);
     pthread_mutex_unlock(&bucket->lock);
 }
+
+#ifdef __ELF__
+__attribute__((constructor))
+static void vlc_atomic_clock_select(void)
+{
+    pthread_condattr_t attr;
+
+    pthread_condattr_init(&attr);
+    pthread_condattr_setclock(&attr, CLOCK_MONOTONIC);
+
+    for (size_t i = 0; i < ARRAY_SIZE(wait_buckets); i++)
+        pthread_cond_init(&wait_buckets[i].wait, &attr);
+
+    pthread_condattr_destroy(&attr);
+    vlc_clock_id = CLOCK_MONOTONIC;
+}
+
+__attribute__((destructor))
+static void vlc_atomic_clock_deselect(void)
+{
+    for (size_t i = 0; i < ARRAY_SIZE(wait_buckets); i++)
+        pthread_cond_destroy(&wait_buckets[i].wait);
+}
+#endif
