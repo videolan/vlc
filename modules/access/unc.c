@@ -56,14 +56,18 @@ static void Win32AddConnection(stream_t *access, const char *server,
 {
     char *remote_name;
 
-    if (asprintf(&remote_name, "\\\\%s\\%s", server,
-                 (share != NULL) ? share + 1 /* skip leading '/' */: "") < 0)
-        return;
+    if (share != NULL)
+    {   /* skip leading and remove trailing slashes */
+        int slen = strcspn(++share, "/");
 
-    /* remove trailings '/' */
-    char *delim = strchr(remote_name, '/');
-    if (delim != NULL)
-        *delim = '\0';
+        if (asprintf(&remote_name, "\\\\%s\\%.*s", server, slen, share) < 0)
+            return;
+    }
+    else
+    {
+        if (asprintf(&remote_name, "\\\\%s\\", server) < 0)
+            return;
+    }
 
     NETRESOURCE net_resource = {
         .dwType = RESOURCETYPE_DISK,
