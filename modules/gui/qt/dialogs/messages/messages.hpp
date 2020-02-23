@@ -28,7 +28,7 @@
 #include "dialogs/messages/ui_messages_panel.h"
 #include <stdarg.h>
 #include <QMutex>
-#include <QAtomicInt>
+#include <atomic>
 
 class QPushButton;
 class QTreeWidget;
@@ -48,7 +48,7 @@ private:
     void sinkMessage( const MsgEvent * );
     bool matchFilter( const QString& );
 
-    QAtomicInt verbosity;
+    std::atomic<int> verbosity;
     static void MsgCallback( void *, int, const vlc_log_t *, const char *,
                              va_list );
 
