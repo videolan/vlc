@@ -217,7 +217,6 @@ static void vlc_mwait_i11e_wake(void *opaque)
 static void vlc_mwait_i11e_cleanup(void *opaque)
 {
     vlc_interrupt_t *ctx = opaque;
-    vlc_cond_t *cond = ctx->data;
 
     vlc_mutex_unlock(&ctx->lock);
     vlc_interrupt_finish(ctx);
