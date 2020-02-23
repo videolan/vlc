@@ -307,7 +307,7 @@ typedef struct
         struct {
             atomic_uint value;
             atomic_uint recursion;
-            const void *_Atomic owner;
+            _Atomic (const void *) owner;
         };
 #endif
         struct {
