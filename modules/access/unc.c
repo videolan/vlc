@@ -54,42 +54,44 @@ static void Win32AddConnection(stream_t *access, const char *server,
                                const char *share, const char *user,
                                const char *pwd)
 {
-    NETRESOURCE net_resource;
-    char remote_name[MAX_PATH];
+    char *remote_name;
 
-    memset(&net_resource, 0, sizeof (net_resource));
-    net_resource.dwType = RESOURCETYPE_DISK;
-
-    snprintf(remote_name, sizeof (remote_name), "\\\\%s\\%s", server,
-             (share != NULL) ? share + 1 /* skip leading '/' */: "");
+    if (asprintf(&remote_name, "\\\\%s\\%s", server,
+                 (share != NULL) ? share + 1 /* skip leading '/' */: "") < 0)
+        return;
 
     /* remove trailings '/' */
     char *delim = strchr(remote_name, '/');
     if (delim != NULL)
         *delim = '\0';
 
-    const char *msg;
-    net_resource.lpRemoteName = ToWide(remote_name);
+    NETRESOURCE net_resource = {
+        .dwType = RESOURCETYPE_DISK,
+        .lpRemoteName = ToWide(remote_name),
+    };
 
+    free(remote_name);
+
+    const char *msg;
     wchar_t *wpwd  = pwd  ? ToWide(pwd)  : NULL;
     wchar_t *wuser = user ? ToWide(user) : NULL;
 
     switch (WNetAddConnection2(&net_resource, wpwd, wuser, 0))
     {
         case NO_ERROR:
-            msg = "connected to %s";
+            msg = "connected to %ls";
             break;
         case ERROR_ALREADY_ASSIGNED:
         case ERROR_DEVICE_ALREADY_REMEMBERED:
-            msg = "already connected to %s";
+            msg = "already connected to %ls";
             break;
         default:
-            msg = "failed to connect to %s";
+            msg = "failed to connect to %ls";
     }
+    msg_Dbg(access, msg, net_resource.lpRemoteName);
     free(net_resource.lpRemoteName);
     free(wpwd);
     free(wuser);
-    msg_Dbg(access, msg, remote_name);
 }
 
 /* Build an SMB URI
