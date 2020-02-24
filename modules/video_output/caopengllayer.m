@@ -86,7 +86,14 @@ static int Control          (vout_display_t *vd, int query, va_list ap);
 /**
  * View subclass which is backed by a VLCCAOpenGLLayer
  */
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101400
+// macOS SDKs lower than 10.14 did not have a NSViewLayerContentScaleDelegate
+// protocol definition, but its not needed, it will work fine without it as the
+// delegate method even existed before, just not the protocol.
+@interface VLCVideoLayerView : NSView <CALayerDelegate>
+#else
 @interface VLCVideoLayerView : NSView <CALayerDelegate, NSViewLayerContentScaleDelegate>
+#endif
 {
     vout_display_t *_vlc_vd; // All accesses to this must be @synchronized(self)
 }
