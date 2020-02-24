@@ -536,7 +536,9 @@ int vlc_sem_timedwait(vlc_sem_t *sem, vlc_tick_t deadline)
 
 enum { VLC_ONCE_UNDONE, VLC_ONCE_DOING, VLC_ONCE_CONTEND, VLC_ONCE_DONE };
 
-void vlc_once(vlc_once_t *restrict once, void (*cb)(void))
+static_assert (VLC_ONCE_DONE == 3, "Check vlc_once in header file");
+
+void (vlc_once)(vlc_once_t *restrict once, void (*cb)(void))
 {
     unsigned int value = VLC_ONCE_UNDONE;
 
