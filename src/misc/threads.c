@@ -533,3 +533,43 @@ int vlc_sem_timedwait(vlc_sem_t *sem, vlc_tick_t deadline)
 
     return 0;
 }
+
+#if 0
+enum { VLC_ONCE_UNDONE, VLC_ONCE_DOING, VLC_ONCE_CONTEND, VLC_ONCE_DONE };
+
+void vlc_once(vlc_once_t *restrict once, void (*cb)(void))
+{
+    unsigned int value = VLC_ONCE_UNDONE;
+
+    if (atomic_compare_exchange_strong_explicit(&once->value, &value,
+                                                VLC_ONCE_DOING,
+                                                memory_order_acquire,
+                                                memory_order_acquire)) {
+        /* First time: run the callback */
+        cb();
+
+        if (atomic_exchange_explicit(&once->value, VLC_ONCE_DONE,
+                                     memory_order_release) == VLC_ONCE_CONTEND)
+            /* Notify waiters if any */
+            vlc_atomic_notify_all(&once->value);
+
+        return;
+    }
+
+    assert(value >= VLC_ONCE_DOING);
+
+    if (unlikely(value == VLC_ONCE_DOING)
+     && atomic_compare_exchange_strong_explicit(&once->value, &value,
+                                                VLC_ONCE_CONTEND,
+                                                memory_order_acquire,
+                                                memory_order_acquire))
+        value = VLC_ONCE_CONTEND;
+
+    assert(value >= VLC_ONCE_CONTEND);
+
+    while (unlikely(value != VLC_ONCE_DONE)) {
+        vlc_atomic_wait(&once->value, VLC_ONCE_CONTEND);
+        value = atomic_load_explicit(&once->value, memory_order_acquire);
+    }
+}
+#endif

@@ -633,6 +633,25 @@ VLC_API void vlc_rwlock_unlock(vlc_rwlock_t *);
 
 /** @} */
 
+#ifndef __cplusplus
+#if 0
+/**
+ * One-time initialization.
+ *
+ * A one-time initialization object must always be initialized assigned to
+ * \ref VLC_STATIC_ONCE before use.
+ */
+typedef struct
+{
+    atomic_uint value;
+} vlc_once_t;
+
+/**
+ * Static initializer for one-time initialization.
+ */
+#define VLC_STATIC_ONCE { ATOMIC_VAR_INIT(0) }
+#endif
+
 /**
  * Executes a function one time.
  *
@@ -650,6 +669,7 @@ VLC_API void vlc_rwlock_unlock(vlc_rwlock_t *);
  * \param cb callback to execute (the first time)
  */
 VLC_API void vlc_once(vlc_once_t *restrict once, void (*cb)(void));
+#endif
 
 /**
  * \defgroup threadvar Thread-specific variables
