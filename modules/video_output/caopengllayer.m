@@ -80,6 +80,7 @@ static int Control          (vout_display_t *vd, int);
 - (void)placePictureWithConfig:(const vout_display_cfg_t *)cfg;
 - (void)displayFromVout;
 - (void)reportCurrentLayerSize;
+- (void)reportCurrentLayerSizeWithScale:(CGFloat)scale;
 - (void)vlcClose;
 @end
 
@@ -559,6 +560,17 @@ static int Control (vout_display_t *vd, int query)
 shouldInheritContentsScale:(CGFloat)newScale
    fromWindow:(NSWindow *)window
 {
+    // If the scale changes, from the OpenGL point of view
+    // the size changes, so we need to indicate a resize
+    if (layer == self.layer) {
+        [(VLCCAOpenGLLayer *)self.layer
+            reportCurrentLayerSizeWithScale:newScale];
+        // FIXME
+        // For a brief moment the old image with a wrong scale
+        // is still visible, thats because the resize event is not
+        // processed immediately. Ideally this would be handled similar
+        // to how the live resize is done, to avoid this.
+    }
     return YES;
 }
 
@@ -762,10 +774,9 @@ shouldInheritContentsScale:(CGFloat)newScale
     [self reportCurrentLayerSize];
 }
 
-- (void)reportCurrentLayerSize
+- (void)reportCurrentLayerSizeWithScale:(CGFloat)scale
 {
     CGSize newSize = self.visibleRect.size;
-    CGFloat scale = self.contentsScale;
 
     // Calculate pixel values
     newSize.width *= scale;
@@ -778,6 +789,12 @@ shouldInheritContentsScale:(CGFloat)newScale
         vout_window_ReportSize(_voutDisplay->cfg->window,
                                newSize.width, newSize.height);
     }
+}
+
+- (void)reportCurrentLayerSize
+{
+    CGFloat scale = self.contentsScale;
+    [self reportCurrentLayerSizeWithScale:scale];
 }
 
 - (void)display
