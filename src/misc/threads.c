@@ -137,7 +137,7 @@ bool vlc_mutex_held(const vlc_mutex_t *mtx)
 {
     /* This comparison is thread-safe:
      * Even though other threads may modify the owner field at any time,
-     * they will never make ti compare equal to the calling thread.
+     * they will never make it compare equal to the calling thread.
      */
     return THREAD_SELF == atomic_load_explicit(&mtx->owner,
                                                memory_order_relaxed);
