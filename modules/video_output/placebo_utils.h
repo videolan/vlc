@@ -29,22 +29,22 @@
 #include <libplacebo/utils/upload.h>
 
 // Create a libplacebo context, hooked up to the log system; or NULL on OOM
-VLC_API struct pl_context *vlc_placebo_Create(vlc_object_t *);
+struct pl_context *vlc_placebo_Create(vlc_object_t *);
 
 // Turn a video_format_t into the equivalent libplacebo values
-VLC_API struct pl_color_space vlc_placebo_ColorSpace(const video_format_t *);
-VLC_API struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *);
-VLC_API enum pl_chroma_location vlc_placebo_ChromaLoc(const video_format_t *);
+struct pl_color_space vlc_placebo_ColorSpace(const video_format_t *);
+struct pl_color_repr vlc_placebo_ColorRepr(const video_format_t *);
+enum pl_chroma_location vlc_placebo_ChromaLoc(const video_format_t *);
 
 // Fill a pl_plane_data array with various data. Returns the number of planes,
 // or 0 if the format is unsupported by the libplacebo API. If `buf` is set,
 // then all addresses of the picture_t must lie within `buf`'s mapped memory.
-VLC_API int vlc_placebo_PlaneFormat(const video_format_t *, struct pl_plane_data[4]);
-VLC_API int vlc_placebo_PlaneData(const picture_t *, struct pl_plane_data[4],
-                                  const struct pl_buf *buf);
+int vlc_placebo_PlaneFormat(const video_format_t *, struct pl_plane_data[4]);
+int vlc_placebo_PlaneData(const picture_t *, struct pl_plane_data[4],
+                          const struct pl_buf *buf);
 
 // See if a given FourCC is physically supported by a given GPU
-VLC_API bool vlc_placebo_FormatSupported(const struct pl_gpu *, vlc_fourcc_t);
+bool vlc_placebo_FormatSupported(const struct pl_gpu *, vlc_fourcc_t);
 
 // Shared options strings/structs for libplacebo options
 
