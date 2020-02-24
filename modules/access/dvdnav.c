@@ -191,6 +191,13 @@ static void StillTimer( void * );
 
 static void EventMouse( const vlc_mouse_t *mouse, void *p_data );
 
+#if DVDNAV_VERSION >= 60100
+static void DvdNavLog( void *foo, dvdnav_logger_level_t i, const char *p, va_list z)
+{
+    msg_GenericVa( (demux_t*)foo, i, p, z );
+}
+#endif
+
 /*****************************************************************************
  * CommonOpen:
  *****************************************************************************/
@@ -359,7 +366,13 @@ static int AccessDemuxOpen ( vlc_object_t *p_this )
 
     /* Open dvdnav */
     psz_path = ToLocale( psz_file );
-    if( dvdnav_open( &p_dvdnav, psz_path ) != DVDNAV_STATUS_OK )
+#if DVDNAV_VERSION >= 60100
+    dvdnav_logger_cb cbs;
+    cbs.pf_log = DvdNavLog;
+    if( dvdnav_open2( &p_dvdnav, p_demux, &cbs, psz_path  ) != DVDNAV_STATUS_OK )
+#else
+    if( dvdnav_open( &p_dvdnav, psz_path  ) != DVDNAV_STATUS_OK )
+#endif
     {
         msg_Warn( p_demux, "cannot open DVD (%s)", psz_file);
 
@@ -422,14 +435,14 @@ static int StreamProbeDVD( stream_t *s )
 /*****************************************************************************
  * dvdnav stream callbacks
  *****************************************************************************/
-static int stream_cb_seek( void *s, uint64_t pos )
+static int stream_cb_seek( void *demux, uint64_t pos )
 {
-    return vlc_stream_Seek( (stream_t *)s, pos );
+    return vlc_stream_Seek( ((demux_t *)demux)->s, pos );
 }
 
-static int stream_cb_read( void *s, void* buffer, int size )
+static int stream_cb_read( void *demux, void* buffer, int size )
 {
-    return vlc_stream_Read( (stream_t *)s, buffer, size );
+    return vlc_stream_Read( ((demux_t *)demux)->s, buffer, size );
 }
 
 /*****************************************************************************
@@ -463,8 +476,15 @@ static int DemuxOpen ( vlc_object_t *p_this )
     };
 
     /* Open dvdnav with stream callbacks */
-    if( dvdnav_open_stream( &p_dvdnav, p_demux->s,
+#if DVDNAV_VERSION >= 60100
+    dvdnav_logger_cb cbs;
+    cbs.pf_log = DvdNavLog;
+    if( dvdnav_open_stream2( &p_dvdnav, p_demux,
+                             &cbs, &stream_cb ) != DVDNAV_STATUS_OK )
+#else
+    if( dvdnav_open_stream( &p_dvdnav, p_demux,
                             &stream_cb ) != DVDNAV_STATUS_OK )
+#endif
     {
         msg_Warn( p_demux, "cannot open DVD with open_stream" );
         return VLC_EGENERIC;
