@@ -93,10 +93,31 @@ def main(model_fd):
     font = fontforge.font()
     font.familyname = data["font_name"]
     font.fontname = data["font_name"]
-    font.design_size = 1000.0
-    font.ascent = 800
-    font.descent = 200
-    #we might need to specify ascent/descent of hhea_ os2_typo os2_win
+    font.design_size = 1024.0
+
+    font.hasvmetrics = True
+
+    font.upos=0
+    font.ascent = 1024
+    font.descent = 0
+
+    font.hhea_ascent = 1024
+    font.hhea_ascent_add = False
+    font.hhea_descent = 0
+    font.hhea_descent_add = False
+    font.hhea_linegap = 0
+
+    font.os2_use_typo_metrics = True
+    font.os2_typoascent = 1024
+    font.os2_typoascent_add = False
+    font.os2_typodescent = 0
+    font.os2_typodescent_add = False
+    font.os2_typolinegap = 0
+
+    font.os2_winascent = 1024
+    font.os2_winascent_add = False
+    font.os2_windescent = 0
+    font.os2_windescent_add = False
 
     for i, glyph in enumerate(data["glyphs"]):
         charcode = UTF8_AREA + i
@@ -105,8 +126,8 @@ def main(model_fd):
         c.importOutlines(glyph["path"])
         #scale glyph to fit between 200 (base line) and 800 (x 0.6)
         #c.transform((0.6, 0.0, 0.0, 0.6, 200, 200.))
-        c.vwidth = 1000
-        c.width = 1000
+        c.vwidth = 1024
+        c.width = 1024
 
     font.generate(data["font_file"])
     genQml(data)
