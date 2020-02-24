@@ -67,12 +67,6 @@ vlc_thread_fatal_print (const char *action, int error,
 # define VLC_THREAD_ASSERT( action ) ((void)val)
 #endif
 
-void vlc_once(vlc_once_t *once, void (*cb)(void))
-{
-    int val = pthread_once(once, cb);
-    VLC_THREAD_ASSERT("initializing once");
-}
-
 struct vlc_thread
 {
     pthread_t      thread;

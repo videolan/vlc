@@ -534,7 +534,6 @@ int vlc_sem_timedwait(vlc_sem_t *sem, vlc_tick_t deadline)
     return 0;
 }
 
-#if 0
 enum { VLC_ONCE_UNDONE, VLC_ONCE_DOING, VLC_ONCE_CONTEND, VLC_ONCE_DONE };
 
 void vlc_once(vlc_once_t *restrict once, void (*cb)(void))
@@ -572,4 +571,3 @@ void vlc_once(vlc_once_t *restrict once, void (*cb)(void))
         value = atomic_load_explicit(&once->value, memory_order_acquire);
     }
 }
-#endif

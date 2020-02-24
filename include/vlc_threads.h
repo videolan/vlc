@@ -61,8 +61,6 @@ typedef struct vlc_thread *vlc_thread_t;
 
 # define LIBVLC_NEED_SLEEP
 #define LIBVLC_NEED_RWLOCK
-typedef INIT_ONCE vlc_once_t;
-#define VLC_STATIC_ONCE INIT_ONCE_STATIC_INIT
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
@@ -92,12 +90,6 @@ typedef struct vlc_thread *vlc_thread_t;
 #define VLC_THREAD_CANCELED NULL
 
 #define LIBVLC_NEED_RWLOCK
-typedef struct
-{
-    unsigned done;
-    vlc_mutex_t mutex;
-} vlc_once_t;
-#define VLC_STATIC_ONCE { 0, VLC_STATIC_MUTEX }
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
@@ -142,8 +134,6 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 
 typedef struct vlc_thread *vlc_thread_t;
 #define VLC_THREAD_CANCELED NULL
-typedef pthread_once_t  vlc_once_t;
-#define VLC_STATIC_ONCE   PTHREAD_ONCE_INIT
 typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
@@ -187,8 +177,6 @@ typedef pthread_t       vlc_thread_t;
 #define VLC_THREAD_CANCELED PTHREAD_CANCELED
 typedef pthread_rwlock_t vlc_rwlock_t;
 #define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
-typedef pthread_once_t  vlc_once_t;
-#define VLC_STATIC_ONCE   PTHREAD_ONCE_INIT
 typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
@@ -241,19 +229,6 @@ typedef pthread_rwlock_t vlc_rwlock_t;
  * \ingroup rwlock
  */
 #define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
-
-/**
- * One-time initialization.
- *
- * A one-time initialization object must always be initialized assigned to
- * \ref VLC_STATIC_ONCE before use.
- */
-typedef pthread_once_t  vlc_once_t;
-
-/**
- * Static initializer for one-time initialization.
- */
-#define VLC_STATIC_ONCE   PTHREAD_ONCE_INIT
 
 /**
  * Thread-local key handle.
@@ -634,7 +609,6 @@ VLC_API void vlc_rwlock_unlock(vlc_rwlock_t *);
 /** @} */
 
 #ifndef __cplusplus
-#if 0
 /**
  * One-time initialization.
  *
@@ -650,7 +624,6 @@ typedef struct
  * Static initializer for one-time initialization.
  */
 #define VLC_STATIC_ONCE { ATOMIC_VAR_INIT(0) }
-#endif
 
 /**
  * Executes a function one time.

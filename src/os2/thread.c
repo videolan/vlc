@@ -168,34 +168,6 @@ unsigned long _System _DLL_InitTerm(unsigned long hmod, unsigned long flag)
     return 0;   /* Failed */
 }
 
-void vlc_once(vlc_once_t *once, void (*cb)(void))
-{
-    unsigned done;
-
-    /* load once->done */
-    __atomic_xchg( &done, once->done );
-
-    /* not initialized ? */
-    if( done == 0 )
-    {
-        vlc_mutex_lock( &once->mutex );
-
-        /* load once->done */
-        __atomic_xchg( &done, once->done );
-
-        /* still not initialized ? */
-        if( done == 0 )
-        {
-            cb();
-
-            /* set once->done to 1 */
-            __atomic_xchg( &once->done, 1 );
-        }
-
-        vlc_mutex_unlock( &once->mutex );
-    }
-}
-
 /*** Thread-specific variables (TLS) ***/
 struct vlc_threadvar
 {
