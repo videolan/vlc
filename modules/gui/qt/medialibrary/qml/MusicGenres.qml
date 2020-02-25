@@ -107,7 +107,8 @@ Widgets.NavigableFocusScope {
             if (delegateModelId.selectedGroup.count > 1) {
                 medialib.addAndPlay(model.getIdsForIndexes(delegateModelId.selectedIndexes()))
             } else if (delegateModelId.selectedGroup.count === 1) {
-                showAlbumView( delegateModelId.selectedGroup.get(0).model )
+                var sel = delegateModelId.selectedIndexes()[0]
+                showAlbumView( genreModel.getDataAt(sel) )
             }
         }
     }

@@ -47,6 +47,8 @@ NavigableFocusScope {
     property alias contentX: flickable.contentX
     property bool isAnimating: animateRetractItem.running || animateExpandItem.running
 
+    property int _count: 0
+
     property bool _isInitialised: false
 
     /// the id of the item to be expanded
@@ -73,7 +75,7 @@ NavigableFocusScope {
     Accessible.role: Accessible.Table
 
     function switchExpandItem(index) {
-        if (delegateModel.count === 0)
+        if (_count === 0)
             return
 
         if (index === _expandIndex)
@@ -119,7 +121,7 @@ NavigableFocusScope {
         if (index <= 0) {
             animateFlickableContentY(0)
             return
-        } else if (index >= delegateModel.count) {
+        } else if (index >= _count) {
             return
         }
 
@@ -195,10 +197,90 @@ NavigableFocusScope {
         var rowId = Math.floor(contentYWithoutExpand / root._effectiveCellHeight)
         var firstId = Math.max(rowId * root.getNbItemsPerRow(), 0)
 
+
         rowId = Math.ceil((contentYWithoutExpand + heightWithoutExpand) / root._effectiveCellHeight)
-        var lastId = Math.min(rowId * root.getNbItemsPerRow(), delegateModel.count)
+        var lastId = Math.min(rowId * root.getNbItemsPerRow(), _count)
 
         return [firstId, lastId]
+    }
+
+    function _setupChild(id, ydelta) {
+        var item
+        var pos = root.getItemPos(id)
+
+        if (id in _idChildrenMap) {
+            // re-position
+
+            item = _idChildrenMap[id]
+            if (item === undefined)
+                throw "wrong child: " + id
+            //theses properties are always defined in Item
+            item.focus = (id === root.currentIndex) && (root._expandIndex === -1)
+            item.x = pos[0]
+            item.y = pos[1] + ydelta
+
+        }  else if (_unusedItemList.length > 0) {
+            //recyle
+
+            item = _unusedItemList.pop()
+            if (item === undefined)
+                throw "wrong toRecycle child " + id + ", len " + toUse.length
+
+            _defineObjProperty(item, "index", id)
+            item.model = model.getDataAt(id)
+
+            item.focus = (id === root.currentIndex) && (root._expandIndex === -1)
+            item.x = pos[0]
+            item.y = pos[1] + ydelta
+            item.visible = true
+
+            _idChildrenMap[id] = item
+
+        } else {
+            //instanciate a new item
+
+            item = root.delegate.createObject( flickable.contentItem, {
+                            model: model.getDataAt(id),
+                            focus: (id === root.currentIndex) && (root._expandIndex === -1),
+                            x: pos[0],
+                            y: pos[1] + ydelta,
+                            visible: true
+                        });
+            if (item === undefined)
+                throw "wrong unable to instantiate child " + id
+            _defineObjProperty(item, "index", id)
+            _idChildrenMap[id] = item
+        }
+        return item
+    }
+
+    function _refreshData( iMin, iMax ) {
+        var f_l = _getFirstAndLastInstanciatedItemIds()
+        if (!iMin || iMin < f_l[0])
+            iMin = f_l[0]
+        if (!iMax || iMax > f_l[1])
+            iMax= f_l[1]
+
+        for (var id  = iMin; id <= iMax; id++) {
+            var item = _idChildrenMap[id]
+            if (!item) {
+                continue
+            }
+            item.model = model.getDataAt(id)
+        }
+    }
+
+    function _onModelCountChanged() {
+        _count = model ? model.rowCount() : 0
+        if (!root._isInitialised)
+            return
+
+        // Hide the expandItem with no animation
+        _expandIndex = -1
+
+        // Regenerate the gridview layout
+        flickable.layout(true)
+        _refreshData()
     }
 
     Connections {
@@ -209,9 +291,15 @@ NavigableFocusScope {
             var f_l = _getFirstAndLastInstanciatedItemIds()
             if (iMin <= f_l[1] && f_l[0] <= iMax) {
                 flickable.layout(true)
+                _refreshData(iMin, iMax)
             }
         }
+        onRowsInserted: _onModelCountChanged()
+        onRowsRemoved: _onModelCountChanged()
+        onModelReset: _onModelCountChanged()
     }
+
+    onModelChanged: _onModelCountChanged()
 
     //Gridview visible above the expanded item
     Flickable {
@@ -265,38 +353,9 @@ NavigableFocusScope {
                 var rowId = rowCol[1] + 1
                 ret = rowId * root.getNbItemsPerRow()
             } else {
-                ret = delegateModel.count
+                ret = _count
             }
             return ret
-        }
-
-        function getChild(id, toUse) {
-            var ret
-            if (id in _idChildrenMap) {
-                ret = _idChildrenMap[id]
-                if (ret === undefined)
-                    throw "wrong child: " + id
-            }
-            else {
-                ret = toUse.pop()
-                if (ret === undefined)
-                    throw "wrong toRecycle child " + id + ", len " + toUse.length
-                _idChildrenMap[id] = ret
-            }
-            return ret
-        }
-
-        function initialiseItem(item, i, ydelta) {
-            var pos = root.getItemPos(i)
-            _defineObjProperty(item, "index", i)
-            //theses needs an actual binding
-            item.model = delegateModel.items.get(i).model
-
-            //theses properties are always defined in Item
-            item.focus = (i === root.currentIndex) && (root._expandIndex === -1)
-            item.x = pos[0]
-            item.y = pos[1] + ydelta
-            item.visible = true
         }
 
         function layout(forceRelayout) {
@@ -330,14 +389,6 @@ NavigableFocusScope {
             }
             _idChildrenMap = toKeep
 
-            // Create delegates if we do not have enough
-            if (nbItems > _unusedItemList.length + Object.keys(toKeep).length) {
-                var toCreate = nbItems - (_unusedItemList.length + Object.keys(toKeep).length)
-                for (i = 0; i < toCreate; ++i) {
-                    val = root.delegate.createObject(contentItem);
-                    _unusedItemList.push(val)
-                }
-            }
 
             var item
             var pos
@@ -345,8 +396,7 @@ NavigableFocusScope {
             for (i = firstId; i < topGridEndId; ++i) {
                 if (!forceRelayout && i in _idChildrenMap)
                     continue
-                item = getChild(i, _unusedItemList)
-                initialiseItem(item, i, 0)
+                _setupChild(i,  0)
             }
 
             if (root._expandIndex !== -1)
@@ -356,30 +406,17 @@ NavigableFocusScope {
             for (i = topGridEndId; i < lastId; ++i) {
                 if (!forceRelayout && i in _idChildrenMap)
                     continue
-                item = getChild(i, _unusedItemList)
-                initialiseItem(item, i, expandItem.height)
+                 _setupChild(i, expandItem.height)
             }
 
             // Calculate and set the contentHeight
-            var newContentHeight = root.getItemPos(delegateModel.count - 1)[1] + root._effectiveCellHeight
+            var newContentHeight = root.getItemPos(_count - 1)[1] + root._effectiveCellHeight
             if (root._expandIndex !== -1)
                 newContentHeight += expandItem.height
             contentHeight = newContentHeight
             contentWidth = root._effectiveCellWidth * root.getNbItemsPerRow() - root.horizontalSpacing
 
             _updateSelected()
-        }
-
-        Connections {
-            target: delegateModel.items
-            onChanged: {
-                // Hide the expandItem with no animation
-                _expandIndex = -1
-
-                //expandItem.height = 0
-                // Regenerate the gridview layout
-                flickable.layout(true)
-            }
         }
 
         Connections {
@@ -415,7 +452,7 @@ NavigableFocusScope {
             _expandIndex = _newExpandIndex
             if (_expandIndex === -1)
                 return
-            expandItem.model = delegateModel.items.get(_expandIndex).model
+            expandItem.model = model.getDataAt(_expandIndex)
             /* We must also start the expand animation here since the expandItem implicitHeight is not
                changed if it had the same height at previous opening. */
             expandAnimation()
@@ -508,18 +545,18 @@ NavigableFocusScope {
         var newIndex = -1
         if (KeyHelper.matchRight(event)) {
             if ((currentIndex + 1) % colCount !== 0) {//are we not at the end of line
-                newIndex = Math.min(delegateModel.count - 1, currentIndex + 1)
+                newIndex = Math.min(_count - 1, currentIndex + 1)
             }
         } else if (KeyHelper.matchLeft(event)) {
             if (currentIndex % colCount !== 0) {//are we not at the begining of line
                 newIndex = Math.max(0, currentIndex - 1)
             }
         } else if (KeyHelper.matchDown(event)) {
-            if (Math.floor(currentIndex / colCount) !== Math.floor(delegateModel.count / colCount)) { //we are not on the last line
-                newIndex = Math.min(delegateModel.count - 1, currentIndex + colCount)
+            if (Math.floor(currentIndex / colCount) !== Math.floor(_count / colCount)) { //we are not on the last line
+                newIndex = Math.min(_count - 1, currentIndex + colCount)
             }
         } else if (KeyHelper.matchPageDown(event)) {
-            newIndex = Math.min(delegateModel.count - 1, currentIndex + colCount * 5)
+            newIndex = Math.min(_count - 1, currentIndex + colCount * 5)
         } else if (KeyHelper.matchUp(event)) {
             if (Math.floor(currentIndex / colCount) !== 0) { //we are not on the first line
                 newIndex = Math.max(0, currentIndex - colCount)
