@@ -68,6 +68,7 @@ static picture_t * FilterCUDAToCPU( filter_t *p_filter, picture_t *src )
         return NULL;
     }
 
+    int sync_result;
     size_t srcY = 0;
     for (int i_plane = 0; i_plane < dst->i_planes; i_plane++) {
         plane_t plane = dst->p[i_plane];
@@ -89,17 +90,28 @@ static picture_t * FilterCUDAToCPU( filter_t *p_filter, picture_t *src )
         };
         result = CALL_CUDA(cuMemcpy2DAsync, &cu_cpy, 0);
         if (result != VLC_SUCCESS)
-        {
-            picture_Release(dst);
-            dst = NULL;
             goto done;
-        }
         srcY += srcpic->bufferHeight;
     }
     picture_CopyProperties(dst, src);
 
 done:
+    // Always synchronize the cuda stream before releasing src:
+    // there may be pending async copies even if one of them
+    // returned an error
+    sync_result = CALL_CUDA(cuStreamSynchronize, 0);
+    // Keep result as it was if it was an error
+    // Otherwise use the result of cuStreamSynchronize, which
+    // may return an error related to the async copies as well
+    result = result != VLC_SUCCESS ? result : sync_result;
+
     CALL_CUDA(cuCtxPopCurrent, NULL);
+
+    if (result != VLC_SUCCESS)
+    {
+        picture_Release(dst);
+        dst = NULL;
+    }
     picture_Release(src);
     vlc_decoder_device_Release(dec_dev);
     return dst;
