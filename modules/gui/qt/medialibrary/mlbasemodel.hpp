@@ -57,6 +57,8 @@ public:
     Q_INVOKABLE virtual QVariantList getIdsForIndexes( QVariantList indexes ) const = 0;
     Q_INVOKABLE virtual QVariantList getIdsForIndexes( QModelIndexList indexes ) const = 0;
 
+    Q_INVOKABLE QMap<QString, QVariant> getDataAt(int index);
+
 signals:
     void parentIdChanged();
     void resetRequested();
