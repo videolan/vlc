@@ -117,12 +117,9 @@ Widgets.NavigableFocusScope {
 
         function actionAtIndex(index) {
             if (delegateModelId.selectedGroup.count > 1) {
-                var list = []
-                for (var i = 0; i < delegateModelId.selectedGroup.count; i++)
-                    list.push(delegateModelId.selectedGroup.get(i).model.id)
-                medialib.addAndPlay( list )
+                medialib.addAndPlay( model.getIdsForIndexes( delegateModelId.selectedIndexes() ) )
             } else {
-                medialib.addAndPlay( delegateModelId.items.get(index).model.id )
+                medialib.addAndPlay( model.getIdsForIndexes([index]) )
             }
         }
     }

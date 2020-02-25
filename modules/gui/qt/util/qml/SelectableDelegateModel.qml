@@ -49,6 +49,15 @@ DelegateModel {
         delegateModel.items.addGroups(0, delegateModel.items.count, ["selected"])
     }
 
+    function selectedIndexes() {
+        var list = []
+        for (var i = 0; i < delegateModel.selectedGroup.count; i++) {
+            var index = delegateModel.selectedGroup.get(i).itemsIndex;
+            list.push(index)
+        }
+        return list
+    }
+
     function updateSelection( keymodifiers, oldIndex, newIndex ) {
         if ((keymodifiers & Qt.ShiftModifier)) {
             if ( shiftIndex === oldIndex) {

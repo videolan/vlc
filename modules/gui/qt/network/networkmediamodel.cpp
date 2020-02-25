@@ -198,11 +198,16 @@ bool NetworkMediaModel::addToPlaylist(const QVariantList &itemIdList)
     bool ret = false;
     for (const QVariant& varValue: itemIdList)
     {
+        int index = -1;
+
         if (varValue.canConvert<int>())
-        {
-            auto index = varValue.value<int>();
-            ret |= addToPlaylist(index);
-        }
+            index = varValue.value<int>();
+        else if (varValue.canConvert<QModelIndex>())
+            index = varValue.value<QModelIndex>().row();
+        else
+            continue;
+
+        ret |= addToPlaylist(index);
     }
     return ret;
 }
@@ -224,14 +229,19 @@ bool NetworkMediaModel::addAndPlay(const QVariantList& itemIdList)
     bool ret = false;
     for (const QVariant& varValue: itemIdList)
     {
+        int index = -1;
+
         if (varValue.canConvert<int>())
-        {
-            auto index = varValue.value<int>();
-            if (!ret)
-                ret |= addAndPlay(index);
-            else
-                ret |= addToPlaylist(index);
-        }
+            index = varValue.value<int>();
+        else if (varValue.canConvert<QModelIndex>())
+            index = varValue.value<QModelIndex>().row();
+        else
+            continue;
+
+        if (!ret)
+            ret |= addAndPlay(index);
+        else
+            ret |= addToPlaylist(index);
     }
     return ret;
 }

@@ -66,13 +66,14 @@ Widgets.NavigableFocusScope {
             property var modelActions: {
                 "play": function() {
                     if (delegateModelId) {
-                        delegateModelId.playSelection()
+                        providerModel.addAndPlay(delegateModelId.selectedIndexes())
                     }
                     contextMenu.close()
                 },
                 "enqueue": function() {
-                    if (delegateModelId)
-                        delegateModelId.enqueueSelection()
+                    if (delegateModelId) {
+                        providerModel.addToPlaylist(delegateModelId.selectedIndexes())
+                    }
                     contextMenu.close()
                 },
                 "index": function(index) {

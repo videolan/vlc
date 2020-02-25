@@ -133,10 +133,7 @@ Widgets.NavigableFocusScope {
 
         function actionAtIndex(index) {
             if (delegateModelId.selectedGroup.count > 1) {
-                var list = []
-                for (var i = 0; i < delegateModelId.selectedGroup.count; i++)
-                    list.push(delegateModelId.selectedGroup.get(i).model.id)
-                medialib.addAndPlay( list )
+                medialib.addAndPlay(model.getIdsForIndexes(delegateModelId.selectedIndexes()))
             } else if (delegateModelId.selectedGroup.count === 1) {
                 showAlbumView(delegateModelId.selectedGroup.get(0).model.id, delegateModelId.selectedGroup.get(0).model.name)
             }

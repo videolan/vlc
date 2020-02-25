@@ -135,13 +135,8 @@ Widgets.KeyNavigableTableView {
     headerColor: VLCStyle.colors.bg
     spacing: VLCStyle.margin_small
 
-    onActionForSelection: {
-        var list = []
-        for (var i = 0; i < selection.count; i++ ) {
-            list.push(selection.get(i).model.id)
-        }
-        medialib.addAndPlay(list)
-    }
+    onActionForSelection: medialib.addAndPlay(model.getIdsForIndexes( selection ))
+
     navigationLeft:  function(index) {
         if (isFocusOnContextButton )
             isFocusOnContextButton = false

@@ -83,11 +83,5 @@ Widgets.KeyNavigableTableView {
         }
     }
 
-    onActionForSelection: {
-        var list = []
-        for (var i = 0; i < selection.count; i++ ) {
-            list.push(selection.get(i).model.id)
-        }
-        medialib.addAndPlay(list)
-    }
+    onActionForSelection:  medialib.addAndPlay(model.getIdsForIndexes( selection ))
 }

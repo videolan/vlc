@@ -131,10 +131,7 @@ Widgets.NavigableFocusScope {
         }
 
         function actionAtIndex(index) {
-            var list = []
-            for (var i = 0; i < videosDelegate.selectedGroup.count; i++)
-                list.push(videosDelegate.selectedGroup.get(i).model.id)
-            medialib.addAndPlay( list )
+            medialib.addAndPlay( videoModel.getIdsForIndexes( videosDelegate.selectedIndexes() ) )
             history.push(["player"])
         }
     }

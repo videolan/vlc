@@ -99,33 +99,15 @@ Util.SelectableDelegateModel {
         }
     }
 
-    function playSelection() {
-        var list = []
-        for (var i = 0; i < delegateModel.selectedGroup.count; i++) {
-            var index = delegateModel.selectedGroup.get(i).itemsIndex;
-            list.push(index)
-        }
-        delegateModel.model.addAndPlay( list )
-    }
-
-    function enqueueSelection() {
-        var list = []
-        for (var i = 0; i < delegateModel.selectedGroup.count; i++) {
-            var index = delegateModel.selectedGroup.get(i).itemsIndex;
-            list.push(index)
-        }
-        delegateModel.model.addToPlaylist( list )
-    }
-
     function actionAtIndex(index) {
         if ( delegateModel.selectedGroup.count > 1 ) {
-            playSelection()
+            model.addAndPlay( delegateModel.selectedIndexes() )
         } else {
             if (delegateModel.items.get(index).model.type === NetworkMediaModel.TYPE_DIRECTORY
                     || delegateModel.items.get(index).model.type === NetworkMediaModel.TYPE_NODE)  {
                 history.push(["mc", "network", { tree: delegateModel.items.get(index).model.tree }]);
             } else {
-                playSelection()
+                model.addAndPlay( delegateModel.selectedIndexes() )
             }
         }
     }

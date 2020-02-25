@@ -94,7 +94,7 @@ NavigableFocusScope {
                     }
 
                     onDoubleClicked: {
-                        actionForSelection(delegateModel.selectedGroup)
+                        actionForSelection(delegateModel.selectedIndexes())
                     }
 
                         Row {
@@ -213,7 +213,7 @@ NavigableFocusScope {
 
         onSelectAll: delegateModel.selectAll()
         onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-        onActionAtIndex: root.actionForSelection( delegateModel.selectedGroup )
+        onActionAtIndex: root.actionForSelection( delegateModel.selectedIndexes() )
 
         navigationParent: root
     }
