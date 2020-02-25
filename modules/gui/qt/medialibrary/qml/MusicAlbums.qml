@@ -110,7 +110,7 @@ Widgets.NavigableFocusScope {
         }
 
         onCountChanged: {
-            if (delegateModelId.items.count > 0 && delegateModelId.selectedGroup.count === 0) {
+            if (delegateModelId.items.count > 0 && !delegateModelId.hasSelection) {
                 root.resetFocus()
             }
         }

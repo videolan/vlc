@@ -23,6 +23,7 @@ DelegateModel {
 
     property int shiftIndex: -1
     property alias selectedGroup: selectedGroup
+    readonly property bool hasSelection: selectedGroup.count > 0
 
     groups: [
         DelegateModelGroup { id: selectedGroup; name: "selected"; includeByDefault: false }
@@ -40,7 +41,7 @@ DelegateModel {
     }
 
     function selectNone() {
-        if (selectedGroup.count > 0)
+        if (hasSelection)
             selectedGroup.remove(0,selectedGroup.count)
     }
 

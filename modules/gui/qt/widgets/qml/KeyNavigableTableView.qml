@@ -224,7 +224,7 @@ NavigableFocusScope {
      * selectedGroup update itself after this event
      */
     onActiveFocusChanged: {
-        if (activeFocus && delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
+        if (activeFocus && view.count > 0 && !delegateModel.hasSelection) {
             var initialIndex = 0
             if (view.currentIndex !== -1)
                 initialIndex = view.currentIndex

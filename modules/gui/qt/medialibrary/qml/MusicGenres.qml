@@ -126,7 +126,7 @@ Widgets.NavigableFocusScope {
         }
 
         onCountChanged: {
-            if (delegateModelId.items.count > 0 && delegateModelId.selectedGroup.count === 0) {
+            if (delegateModelId.items.count > 0 && !delegateModelId.hasSelection) {
                 root.resetFocus()
             }
         }
@@ -149,7 +149,7 @@ Widgets.NavigableFocusScope {
      * selectedGroup update itself after this event
      */
     onActiveFocusChanged: {
-        if (activeFocus && delegateModelId.items.count > 0 && delegateModelId.selectedGroup.count === 0) {
+        if (activeFocus && delegateModelId.items.count > 0 && !delegateModelId.hasSelection) {
             var initialIndex = 0
             if (view.currentItem.currentIndex !== -1)
                 initialIndex = view.currentItem.currentIndex

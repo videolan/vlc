@@ -45,7 +45,7 @@ Widgets.NavigableFocusScope {
     }
 
     function resetFocus() {
-        if (delegateModelId.items.count > 0 && delegateModelId.selectedGroup.count === 0) {
+        if (providerModel.count > 0 && !delegateModelId.hasSelection) {
             var initialIndex = 0
             if (delegateModelId.currentIndex !== -1)
                 initialIndex = delegateModelId.currentIndex

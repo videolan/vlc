@@ -68,7 +68,7 @@ Widgets.NavigableFocusScope {
         }
 
         onCountChanged: {
-            if (delegateModel.items.count > 0 && delegateModel.selectedGroup.count === 0) {
+            if (delegateModel.items.count > 0 && !delegateModel.hasSelection) {
                 var initialIndex = root.initialIndex
                 if (initialIndex >= delegateModel.items.count)
                     initialIndex = 0

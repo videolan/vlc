@@ -125,7 +125,7 @@ Widgets.NavigableFocusScope {
         }
 
         onCountChanged: {
-            if (videosDelegate.items.count > 0 && videosDelegate.selectedGroup.count === 0) {
+            if (videosDelegate.items.count > 0 && !videosDelegate.hasSelection) {
                 root.resetFocus()
             }
         }
@@ -195,7 +195,7 @@ Widgets.NavigableFocusScope {
              * selectedGroup update itself after this event
              */
             onActiveFocusChanged: {
-                if (activeFocus && videosDelegate.items.count > 0 && videosDelegate.selectedGroup.count === 0) {
+                if (activeFocus && videosDelegate.items.count > 0 && !videosDelegate.hasSelection) {
                     videosDelegate.items.get(0).inSelected = true
                 }
             }
