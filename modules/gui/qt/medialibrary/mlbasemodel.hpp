@@ -52,6 +52,10 @@ public:
     Q_PROPERTY( Qt::SortOrder sortOrder READ getSortOrder WRITE setSortOder NOTIFY sortOrderChanged )
     Q_PROPERTY( QString sortCriteria READ getSortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged RESET unsetSortCriteria )
 
+    Q_INVOKABLE virtual QVariant getIdForIndex( QVariant index) const = 0;
+    Q_INVOKABLE virtual QVariantList getIdsForIndexes( QVariantList indexes ) const = 0;
+    Q_INVOKABLE virtual QVariantList getIdsForIndexes( QModelIndexList indexes ) const = 0;
+
 signals:
     void parentIdChanged();
     void resetRequested();
@@ -161,6 +165,57 @@ public:
         m_initialized = false;
         m_total_count = 0;
         m_item_list.clear();
+    }
+
+
+    virtual QVariant getIdForIndex( QVariant index ) const override
+    {
+        vlc_mutex_locker lock( &m_item_lock );
+        T* obj = nullptr;
+        if (index.canConvert<int>())
+            obj = item( index.toInt() );
+        else if ( index.canConvert<QModelIndex>() )
+            obj = item( index.value<QModelIndex>().row() );
+
+        if (!obj)
+            return {};
+
+        return QVariant::fromValue(obj->getId());
+    }
+
+    virtual QVariantList getIdsForIndexes( QModelIndexList indexes ) const override
+    {
+        QVariantList idList;
+        idList.reserve(indexes.length());
+        vlc_mutex_locker lock( &m_item_lock );
+        std::transform( indexes.begin(), indexes.end(),std::back_inserter(idList), [this](const QModelIndex& index) -> QVariant {
+            T* obj = item( index.row() );
+            if (!obj)
+                return {};
+            return QVariant::fromValue(obj->getId());
+        });
+        return idList;
+    }
+
+    virtual QVariantList getIdsForIndexes( QVariantList indexes ) const override
+    {
+        QVariantList idList;
+
+        idList.reserve(indexes.length());
+        vlc_mutex_locker lock( &m_item_lock );
+        std::transform( indexes.begin(), indexes.end(),std::back_inserter(idList), [this](const QVariant& index) -> QVariant {
+            T* obj = nullptr;
+            if (index.canConvert<int>())
+                obj = item( index.toInt() );
+            else if ( index.canConvert<QModelIndex>() )
+                obj = item( index.value<QModelIndex>().row() );
+
+            if (!obj)
+                return {};
+
+            return QVariant::fromValue(obj->getId());
+        });
+        return idList;
     }
 
 protected:
