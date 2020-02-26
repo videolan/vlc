@@ -25,9 +25,9 @@
 #endif
 
 #include <assert.h>
+#include <stdatomic.h>
 
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 #include <vlc_filter.h>
 #include <vlc_plugin.h>
 #include "filters.h"
@@ -101,7 +101,7 @@ struct  adjust_params
 {
     struct
     {
-        vlc_atomic_float        drv_value;
+        _Atomic float           drv_value;
         VAProcFilterValueRange  drv_range;
         bool                    is_available;
     } sigma[NUM_ADJUST_MODES];
@@ -142,7 +142,7 @@ struct  basic_filter_data
 {
     struct
     {
-        vlc_atomic_float        drv_value;
+        _Atomic float           drv_value;
         VAProcFilterValueRange  drv_range;
         struct range const *    p_vlc_range;
         const char *            psz_name;
@@ -420,7 +420,7 @@ FilterCallback(vlc_object_t * obj, char const * psz_var,
 { VLC_UNUSED(obj); VLC_UNUSED(oldval);
     struct range const *                p_vlc_range;
     VAProcFilterValueRange const *      p_drv_range;
-    vlc_atomic_float *                  p_drv_value;
+    _Atomic float *                     p_drv_value;
     bool                                b_found = false;
     bool                                b_adjust = false;
 
@@ -465,7 +465,7 @@ FilterCallback(vlc_object_t * obj, char const * psz_var,
     float const drv_sigma = GET_DRV_SIGMA(vlc_sigma,
                                           *p_vlc_range, *p_drv_range);
 
-    vlc_atomic_store_float(p_drv_value, drv_sigma);
+    atomic_store_explicit(p_drv_value, drv_sigma, memory_order_relaxed);
 
     return VLC_SUCCESS;
 }
@@ -477,15 +477,16 @@ FilterCallback(vlc_object_t * obj, char const * psz_var,
 static void
 Adjust_UpdateVAFilterParams(void * p_data, void * va_params)
 {
-    struct adjust_data *const   p_adjust_data = p_data;
-    struct adjust_params *const p_adjust_params = &p_adjust_data->params;
-    VAProcFilterParameterBufferColorBalance *const      p_va_params = va_params;
+    const struct adjust_data *const   p_adjust_data = p_data;
+    const struct adjust_params *const p_adjust_params = &p_adjust_data->params;
+    VAProcFilterParameterBufferColorBalance *const p_va_params = va_params;
 
     unsigned int i = 0;
     for (unsigned int j = 0; j < NUM_ADJUST_MODES; ++j)
         if (p_adjust_params->sigma[j].is_available)
             p_va_params[i++].value =
-                vlc_atomic_load_float(&p_adjust_params->sigma[j].drv_value);
+                atomic_load_explicit(&p_adjust_params->sigma[j].drv_value,
+                                     memory_order_relaxed);
 }
 
 static picture_t *
@@ -539,8 +540,7 @@ OpenAdjust_InitFilterParams(filter_t * filter, void * p_data,
                     GET_DRV_SIGMA(vlc_sigma, vlc_adjust_sigma_ranges[i],
                                   p_adjust_params->sigma[i].drv_range);
 
-                vlc_atomic_init_float(&p_adjust_params->sigma[i].drv_value,
-                                      drv_sigma);
+                atomic_init(&p_adjust_params->sigma[i].drv_value, drv_sigma);
                 break;
             }
     }
@@ -621,11 +621,11 @@ CloseAdjust(vlc_object_t * obj)
 static void
 BasicFilter_UpdateVAFilterParams(void * p_data, void * va_params)
 {
-    struct basic_filter_data *const     p_basic_filter_data = p_data;
+    const struct basic_filter_data *const p_basic_filter_data = p_data;
+    const _Atomic float *drv_value = &p_basic_filter_data->sigma.drv_value;
     VAProcFilterParameterBuffer *const  p_va_param = va_params;
 
-    p_va_param->value =
-        vlc_atomic_load_float(&p_basic_filter_data->sigma.drv_value);
+    p_va_param->value = atomic_load_explicit(drv_value, memory_order_relaxed);
 }
 
 static picture_t *
@@ -667,7 +667,7 @@ OpenBasicFilter_InitFilterParams(filter_t * filter, void * p_data,
         GET_DRV_SIGMA(vlc_sigma, *p_basic_filter_data->sigma.p_vlc_range,
                       p_basic_filter_data->sigma.drv_range);
 
-    vlc_atomic_init_float(&p_basic_filter_data->sigma.drv_value, drv_sigma);
+    atomic_init(&p_basic_filter_data->sigma.drv_value, drv_sigma);
 
     VAProcFilterParameterBuffer *       p_va_param;
 
