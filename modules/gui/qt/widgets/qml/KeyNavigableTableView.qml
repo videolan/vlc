@@ -67,6 +67,11 @@ NavigableFocusScope {
         delegate: Package {
             id: element
             property var rowModel: model
+            property bool selected: delegateModel.isSelected(index)
+            Connections {
+               target: delegateModel
+               onSelectionChanged: element.selected = delegateModel.isSelected(index)
+            }
 
             Rectangle {
                 Package.name: "list"
@@ -74,7 +79,7 @@ NavigableFocusScope {
 
                 width: root.width
                 height: root.rowHeight
-                color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, hoverArea.containsMouse, lineView.activeFocus)
+                color: VLCStyle.colors.getBgColor(selected, hoverArea.containsMouse, lineView.activeFocus)
 
                 MouseArea {
                     id: hoverArea

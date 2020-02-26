@@ -79,7 +79,13 @@ Widgets.NavigableFocusScope {
             height: VLCStyle.icon_normal + VLCStyle.margin_small
             width: artistList.width
 
-            color: VLCStyle.colors.getBgColor(delegateModel.inSelected, this.hovered, this.activeFocus)
+            property bool selected: delegateModel.isSelected(index)
+            Connections {
+               target: delegateModel
+               onSelectionChanged: selected = delegateModel.isSelected(index)
+            }
+
+            color: VLCStyle.colors.getBgColor(selected, this.hovered, this.activeFocus)
 
             cover: Widgets.RoundImage {
                 source: model.cover || VLCStyle.noArtArtistSmall

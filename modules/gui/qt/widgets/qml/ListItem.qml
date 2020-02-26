@@ -43,6 +43,8 @@ NavigableFocusScope {
     property alias color: linerect.color
     property bool showContextButton: false
 
+    property bool selected: false
+
     Keys.onMenuPressed: root.contextMenuButtonClicked(cover_bg)
 
     Accessible.role: Accessible.ListItem
@@ -88,7 +90,7 @@ NavigableFocusScope {
         id: linerect
         anchors.fill: parent
         color: VLCStyle.colors.getBgColor(
-                   root.isSelected, root.hovered,
+                   root.selected, root.hovered,
                    root.activeFocus)
 
         MouseArea {

@@ -25,6 +25,8 @@ DelegateModel {
     property alias selectedGroup: selectedGroup
     readonly property bool hasSelection: selectedGroup.count > 0
 
+    signal selectionChanged()
+
     groups: [
         DelegateModelGroup { id: selectedGroup; name: "selected"; includeByDefault: false }
     ]
@@ -33,20 +35,25 @@ DelegateModel {
         for (var i = from; i <= to; i++) {
             delegateModel.items.get(i).inSelected = true
         }
+        selectionChanged()
     }
     function _delRange(from, to) {
         for (var i = from; i <= to; i++) {
             delegateModel.items.get(i).inSelected = false
         }
+        selectionChanged()
     }
 
     function selectNone() {
-        if (hasSelection)
+        if (hasSelection) {
             selectedGroup.remove(0,selectedGroup.count)
+            selectionChanged()
+        }
     }
 
     function selectAll() {
         delegateModel.items.addGroups(0, delegateModel.items.count, ["selected"])
+        selectionChanged()
     }
 
     function selectedIndexes() {
@@ -56,6 +63,12 @@ DelegateModel {
             list.push(index)
         }
         return list
+    }
+
+    function isSelected( index ) {
+        if (index < 0 || index >= delegateModel.count)
+            return false
+        return items.get(index).inSelected
     }
 
     function select( index, command ) {

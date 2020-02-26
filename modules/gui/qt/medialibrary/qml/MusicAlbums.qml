@@ -85,9 +85,18 @@ Widgets.NavigableFocusScope {
             id: element
 
             Widgets.ListItem {
+                id: listDelegate
+
                 Package.name: "list"
+
                 width: root.width
                 height: VLCStyle.icon_normal + VLCStyle.margin_small
+
+                selected: delegateModelId.isSelected(index)
+                Connections {
+                   target: delegateModelId
+                   onSelectionChanged: listDelegate.selected = delegateModelId.isSelected(index)
+                }
 
                 cover: Image {
                     id: cover_obj

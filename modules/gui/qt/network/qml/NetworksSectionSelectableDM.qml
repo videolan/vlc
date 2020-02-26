@@ -64,6 +64,12 @@ Util.SelectableDelegateModel {
             focus: true
             Package.name: "list"
 
+            selected: delegateModel.isSelected( index )
+            Connections {
+               target: delegateModel
+               onSelectionChanged: delegateList.selected = delegateModel.isSelected(index)
+            }
+
             onItemClicked : {
                 delegateModel.updateSelection( modifier, delegateModel.currentIndex, index )
                 delegateModel.currentIndex = index

@@ -33,8 +33,6 @@ Widgets.ListItem {
 
     focus: true
 
-    color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, this.hovered, this.activeFocus)
-
     cover: Image {
         id: cover_obj
         fillMode: Image.PreserveAspectFit

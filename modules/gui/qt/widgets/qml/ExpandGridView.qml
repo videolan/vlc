@@ -160,7 +160,7 @@ NavigableFocusScope {
     function _updateSelected() {
         for (var id in _idChildrenMap) {
             var item = _idChildrenMap[id]
-            item.selected = delegateModel.items.get(id).inSelected
+            item.selected = delegateModel.isSelected(id)
         }
     }
 
@@ -290,9 +290,7 @@ NavigableFocusScope {
             var pos = root.getItemPos(i)
             _defineObjProperty(item, "index", i)
             //theses needs an actual binding
-            //item.selected = Qt.binding(function() { return delegateModel.items.get(i).inSelected })
             item.model = delegateModel.items.get(i).model
-            //console.log("initialize", .inSelected)
 
             //theses properties are always defined in Item
             item.focus = (i === root.currentIndex) && (root._expandIndex === -1)
