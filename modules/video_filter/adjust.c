@@ -50,9 +50,6 @@ static void Destroy   ( vlc_object_t * );
 
 static picture_t *FilterPlanar( filter_t *, picture_t * );
 static picture_t *FilterPacked( filter_t *, picture_t * );
-static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
-                           vlc_value_t oldval, vlc_value_t newval,
-                           void *p_data );
 
 /*****************************************************************************
  * Module descriptor
@@ -125,6 +122,26 @@ typedef struct
                                     int, int, int );
 } filter_sys_t;
 
+static int FloatCallback( vlc_object_t *obj, char const *varname,
+                          vlc_value_t oldval, vlc_value_t newval, void *data )
+{
+    vlc_atomic_float *atom = data;
+
+    vlc_atomic_store_float( atom, newval.f_float );
+    (void) obj; (void) varname; (void) oldval;
+    return VLC_SUCCESS;
+}
+
+static int BoolCallback( vlc_object_t *obj, char const *varname,
+                         vlc_value_t oldval, vlc_value_t newval, void *data )
+{
+    atomic_bool *atom = data;
+
+    atomic_store( atom, newval.b_bool );
+    (void) obj; (void) varname; (void) oldval;
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Create: allocates adjust video filter
  *****************************************************************************/
@@ -195,13 +212,15 @@ static int Create( vlc_object_t *p_this )
     atomic_init( &p_sys->b_brightness_threshold,
                  var_CreateGetBoolCommand( p_filter, "brightness-threshold" ) );
 
-    var_AddCallback( p_filter, "contrast",   AdjustCallback, p_sys );
-    var_AddCallback( p_filter, "brightness", AdjustCallback, p_sys );
-    var_AddCallback( p_filter, "hue",        AdjustCallback, p_sys );
-    var_AddCallback( p_filter, "saturation", AdjustCallback, p_sys );
-    var_AddCallback( p_filter, "gamma",      AdjustCallback, p_sys );
-    var_AddCallback( p_filter, "brightness-threshold",
-                                             AdjustCallback, p_sys );
+    var_AddCallback( p_filter, "contrast", FloatCallback, &p_sys->f_contrast );
+    var_AddCallback( p_filter, "brightness", FloatCallback,
+                     &p_sys->f_brightness );
+    var_AddCallback( p_filter, "hue", FloatCallback, &p_sys->f_hue );
+    var_AddCallback( p_filter, "saturation", FloatCallback,
+                     &p_sys->f_saturation );
+    var_AddCallback( p_filter, "gamma", FloatCallback, &p_sys->f_gamma );
+    var_AddCallback( p_filter, "brightness-threshold", BoolCallback,
+                     &p_sys->b_brightness_threshold );
 
     return VLC_SUCCESS;
 }
@@ -214,14 +233,15 @@ static void Destroy( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    var_DelCallback( p_filter, "contrast",   AdjustCallback, p_sys );
-    var_DelCallback( p_filter, "brightness", AdjustCallback, p_sys );
-    var_DelCallback( p_filter, "hue",        AdjustCallback, p_sys );
-    var_DelCallback( p_filter, "saturation", AdjustCallback, p_sys );
-    var_DelCallback( p_filter, "gamma",      AdjustCallback, p_sys );
-    var_DelCallback( p_filter, "brightness-threshold",
-                                             AdjustCallback, p_sys );
-
+    var_DelCallback( p_filter, "contrast", FloatCallback, &p_sys->f_contrast );
+    var_DelCallback( p_filter, "brightness", FloatCallback,
+                     &p_sys->f_brightness );
+    var_DelCallback( p_filter, "hue", FloatCallback, &p_sys->f_hue );
+    var_DelCallback( p_filter, "saturation", FloatCallback,
+                     &p_sys->f_saturation );
+    var_DelCallback( p_filter, "gamma", FloatCallback, &p_sys->f_gamma );
+    var_DelCallback( p_filter, "brightness-threshold", BoolCallback,
+                     &p_sys->b_brightness_threshold );
     free( p_sys );
 }
 
@@ -588,27 +608,4 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
     }
 
     return CopyInfoAndRelease( p_outpic, p_pic );
-}
-
-static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
-                           vlc_value_t oldval, vlc_value_t newval,
-                           void *p_data )
-{
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    filter_sys_t *p_sys = (filter_sys_t *)p_data;
-
-    if( !strcmp( psz_var, "contrast" ) )
-        vlc_atomic_store_float( &p_sys->f_contrast, newval.f_float );
-    else if( !strcmp( psz_var, "brightness" ) )
-        vlc_atomic_store_float( &p_sys->f_brightness, newval.f_float );
-    else if( !strcmp( psz_var, "hue" ) )
-        vlc_atomic_store_float( &p_sys->f_hue, newval.f_float );
-    else if( !strcmp( psz_var, "saturation" ) )
-        vlc_atomic_store_float( &p_sys->f_saturation, newval.f_float );
-    else if( !strcmp( psz_var, "gamma" ) )
-        vlc_atomic_store_float( &p_sys->f_gamma, newval.f_float );
-    else if( !strcmp( psz_var, "brightness-threshold" ) )
-        atomic_store( &p_sys->b_brightness_threshold, newval.b_bool );
-
-    return VLC_SUCCESS;
 }
