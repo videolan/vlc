@@ -356,6 +356,7 @@ typedef struct config_category_t config_category_t;
 /* Input */
 typedef struct input_item_t input_item_t;
 typedef struct input_item_node_t input_item_node_t;
+typedef struct input_source_t input_source_t;
 typedef struct stream_t     stream_t;
 typedef struct stream_t demux_t;
 typedef struct es_out_t     es_out_t;

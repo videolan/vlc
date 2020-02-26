@@ -365,7 +365,7 @@ input_item_t* input_GetItem( input_thread_t * ) VLC_USED;
 #define INPUT_CONTROL_FIFO_SIZE    100
 
 /* input_source_t: gathers all information per input source */
-typedef struct
+struct input_source_t
 {
     vlc_atomic_rc_t rc;
 
@@ -401,7 +401,7 @@ typedef struct
 
     bool       b_eof;   /* eof of demuxer */
 
-} input_source_t;
+};
 
 typedef union
 {
