@@ -30,10 +30,10 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include <vlc_atomic.h>
 #include <vlc_filter.h>
 #include <vlc_modules.h>
 
+#include <stdatomic.h>
 #include <string.h> /* for memset */
 #include <limits.h> /* form INT_MIN */
 
@@ -132,7 +132,7 @@ typedef struct
 #ifdef PITCH_SHIFTER
     /* pitch */
     filter_t * resampler;
-    vlc_atomic_float rate_shift;
+    _Atomic float rate_shift;
 #endif
 } filter_sys_t;
 
@@ -452,8 +452,8 @@ static int Open( vlc_object_t *p_this )
 #ifdef PITCH_SHIFTER
 static inline void PitchSetRateShift( filter_sys_t *p_sys, float pitch_shift )
 {
-    vlc_atomic_store_float( &p_sys->rate_shift,
-                            p_sys->sample_rate / powf(2, pitch_shift / 12) );
+    atomic_store( &p_sys->rate_shift,
+                  p_sys->sample_rate / powf(2, pitch_shift / 12) );
 }
 
 static int PitchCallback( vlc_object_t *p_this, char const *psz_var,
@@ -478,8 +478,7 @@ static filter_t *ResamplerCreate(filter_t *p_filter)
     p_resampler->p_cfg = NULL;
     p_resampler->fmt_in = p_filter->fmt_in;
     p_resampler->fmt_out = p_filter->fmt_in;
-    p_resampler->fmt_out.audio.i_rate =
-        vlc_atomic_load_float( &p_sys->rate_shift );
+    p_resampler->fmt_out.audio.i_rate = atomic_load( &p_sys->rate_shift );
     aout_FormatPrepare( &p_resampler->fmt_out.audio );
     p_resampler->p_module = module_need( p_resampler, "audio resampler", NULL,
                                          false );
@@ -603,7 +602,7 @@ static block_t *DoPitchWork( filter_t * p_filter, block_t * p_in_buf )
 {
     filter_sys_t *p = p_filter->p_sys;
 
-    float rate_shift = vlc_atomic_load_float( &p->rate_shift );
+    float rate_shift = atomic_load( &p->rate_shift );
 
     /* Set matching rates for resampler's output and scaletempo's input */
     p->resampler->fmt_out.audio.i_rate = rate_shift;
