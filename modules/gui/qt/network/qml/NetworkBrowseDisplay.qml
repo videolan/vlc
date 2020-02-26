@@ -170,7 +170,7 @@ Widgets.NavigableFocusScope {
                 }
 
                 onContextMenuButtonClicked: {
-                    contextMenu.model = model
+                    contextMenu.model = providerModel
                     contextMenu.delegateModelId = delegateModelId
                     contextMenu.popup()
                 }
@@ -194,8 +194,41 @@ Widgets.NavigableFocusScope {
             id: listView
             height: view.height
             width: view.width
-            model: delegateModelId.parts.list
+            model: providerModel
             currentIndex: delegateModelId.currentIndex
+
+            delegate: NetworkListItem {
+                id: delegateList
+                focus: true
+
+                selected: delegateModelId.isSelected( index )
+                Connections {
+                    target: delegateModelId
+                    onSelectionChanged: selected = delegateModelId.isSelected(index)
+                }
+
+                onItemClicked : {
+                    delegateModelId.updateSelection( modifier, delegateModelId.currentIndex, index )
+                    delegateModelId.currentIndex = index
+                    delegateList.forceActiveFocus()
+                }
+
+                onItemDoubleClicked: {
+                    if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
+                        history.push( ["mc", "network", { tree: model.tree } ])
+                    else
+                        providerModel.addAndPlay( index )
+                }
+
+                onContextMenuButtonClicked: {
+                    contextMenu.model = providerModel
+                    contextMenu.delegateModelId = delegateModelId
+                    contextMenu.popup(menuParent)
+                }
+
+                onActionLeft: root.navigationLeft(0)
+                onActionRight: root.navigationRight(0)
+            }
 
             focus: true
             spacing: VLCStyle.margin_xxxsmall

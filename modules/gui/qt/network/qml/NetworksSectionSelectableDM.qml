@@ -32,67 +32,7 @@ Util.SelectableDelegateModel {
     property int currentIndex: -1
 
     property string viewIndexPropertyName: "currentIndex"
-    delegate: Package {
-        id: element
-        NetworkGridItem {
-            id: delegateGrid
-            focus: true
-            Package.name: "grid"
-
-            onItemClicked : {
-                delegateModel.updateSelection( modifier ,  delegateModel.currentIndex, index)
-                delegateModel.currentIndex = index
-                delegateGrid.forceActiveFocus()
-            }
-
-            onItemDoubleClicked: {
-                if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
-                    history.push( ["mc", "network", { tree: model.tree } ])
-                else
-                    delegateModel.model.addAndPlay( index )
-            }
-
-            onContextMenuButtonClicked: {
-                contextMenu.model = model
-                contextMenu.delegateModel = delegateModel
-                contextMenu.popup(menuParent)
-            }
-        }
-
-        NetworkListItem {
-            id: delegateList
-            focus: true
-            Package.name: "list"
-
-            selected: delegateModel.isSelected( index )
-            Connections {
-               target: delegateModel
-               onSelectionChanged: delegateList.selected = delegateModel.isSelected(index)
-            }
-
-            onItemClicked : {
-                delegateModel.updateSelection( modifier, delegateModel.currentIndex, index )
-                delegateModel.currentIndex = index
-                delegateList.forceActiveFocus()
-            }
-
-            onItemDoubleClicked: {
-                if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
-                    history.push( ["mc", "network", { tree: model.tree } ])
-                else
-                    delegateModel.model.addAndPlay( index )
-            }
-
-            onContextMenuButtonClicked: {
-                contextMenu.model = model
-                contextMenu.delegateModel = delegateModel
-                contextMenu.popup(menuParent)
-            }
-
-            onActionLeft: root.navigationLeft(0)
-            onActionRight: root.navigationRight(0)
-        }
-
+    delegate: Item {
     }
 
     function switchIndex() {

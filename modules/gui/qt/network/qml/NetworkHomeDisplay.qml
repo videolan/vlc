@@ -39,7 +39,7 @@ Widgets.NavigableFocusScope {
 
     Label {
         anchors.centerIn: parent
-        visible: (machineDM.items.count === 0 && lanDM.items.count === 0 )
+        visible: (machineModel.count === 0 && lanModel.count === 0 )
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: topFocusScope.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
         text: i18n.qtr("No network shares found")
@@ -87,19 +87,19 @@ Widgets.NavigableFocusScope {
                 id: deviceLabel
                 text: i18n.qtr("Devices")
                 width: flickable.width
-                visible: machineDM.items.count !== 0
+                visible: machineModel.count !== 0
             }
 
             Widgets.KeyNavigableListView {
                 id: deviceSection
 
                 focus: false
-                visible: machineDM.items.count !== 0
+                visible: machineModel.count !== 0
                 onVisibleChanged: topFocusScope.resetFocus()
 
                 currentIndex: machineDM.currentIndex
                 onFocusChanged: {
-                    if (activeFocus && machineDM.currentIndex === -1 && machineDM.items.count > 0)
+                    if (activeFocus && machineDM.currentIndex === -1 && machineModel.count > 0)
                         machineDM.currentIndex = 0
                 }
 
@@ -107,8 +107,23 @@ Widgets.NavigableFocusScope {
                 height: VLCStyle.gridItem_network_height
                 orientation: ListView.Horizontal
 
-                model: machineDM.parts.grid
-                modelCount: machineDM.items.count
+                model: machineModel
+                delegate: NetworkGridItem {
+                    focus: true
+
+                    onItemClicked : {
+                        machineDM.updateSelection( modifier ,  machineDM.currentIndex, index)
+                        machineDM.currentIndex = index
+                        forceActiveFocus()
+                    }
+
+                    onItemDoubleClicked: {
+                        if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
+                            history.push( ["mc", "network", { tree: model.tree } ])
+                        else
+                            model.addAndPlay( index )
+                    }
+                }
 
                 onSelectAll: machineDM.selectAll()
                 onSelectionUpdated:  machineDM.updateSelection( keyModifiers, oldIndex, newIndex )
@@ -127,19 +142,19 @@ Widgets.NavigableFocusScope {
                 id: lanLabel
                 text: i18n.qtr("LAN")
                 width: flickable.width
-                visible: lanDM.items.count !== 0
+                visible: lanModel.count !== 0
             }
 
             Widgets.KeyNavigableListView {
                 id: lanSection
 
-                visible: lanDM.items.count !== 0
+                visible: lanModel.count !== 0
                 onVisibleChanged: topFocusScope.resetFocus()
                 focus: false
 
                 currentIndex: lanDM.currentIndex
                 onFocusChanged: {
-                    if (activeFocus && lanDM.currentIndex === -1 && lanDM.items.count > 0)
+                    if (activeFocus && lanDM.currentIndex === -1 && lanModel.count > 0)
                         lanDM.currentIndex = 0
                 }
 
@@ -147,8 +162,23 @@ Widgets.NavigableFocusScope {
                 height: VLCStyle.gridItem_network_height
                 orientation: ListView.Horizontal
 
-                model: lanDM.parts.grid
-                modelCount: lanDM.items.count
+                model: lanModel
+                delegate: NetworkGridItem {
+                    focus: true
+
+                    onItemClicked : {
+                        lanDM.updateSelection( modifier ,  lanDM.currentIndex, index)
+                        lanDM.currentIndex = index
+                        forceActiveFocus()
+                    }
+
+                    onItemDoubleClicked: {
+                        if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
+                            history.push( ["mc", "network", { tree: model.tree } ])
+                        else
+                            model.addAndPlay( index )
+                    }
+                }
 
                 onSelectAll: lanDM.selectAll()
                 onSelectionUpdated:  lanDM.updateSelection( keyModifiers, oldIndex, newIndex )
