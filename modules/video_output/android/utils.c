@@ -546,8 +546,8 @@ AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
          */
         char *vout_modules = var_InheritString(wnd, "vout");
         if (vout_modules
-         && (strcmp(vout_modules, "gles2") == 0
-          || strcmp(vout_modules, "opengles2") == 0))
+         && (strncmp(vout_modules, "gles2", sizeof("gles2") - 1) == 0
+          || strncmp(vout_modules, "opengles2", sizeof("opengles2") - 1) == 0))
             p_awh->b_has_video_layout_listener = false;
         free(vout_modules);
     }
