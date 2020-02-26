@@ -51,6 +51,7 @@ public:
 
     Q_PROPERTY( Qt::SortOrder sortOrder READ getSortOrder WRITE setSortOder NOTIFY sortOrderChanged )
     Q_PROPERTY( QString sortCriteria READ getSortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged RESET unsetSortCriteria )
+    Q_PROPERTY( unsigned int count READ getCount NOTIFY countChanged )
 
     Q_INVOKABLE virtual QVariant getIdForIndex( QVariant index) const = 0;
     Q_INVOKABLE virtual QVariantList getIdsForIndexes( QVariantList indexes ) const = 0;
@@ -61,6 +62,7 @@ signals:
     void resetRequested();
     void sortOrderChanged();
     void sortCriteriaChanged();
+    void countChanged(unsigned int) const;
 
 protected slots:
     void onResetRequested();
@@ -94,6 +96,8 @@ protected:
     const QString getSortCriteria() const;
     void setSortCriteria(const QString& criteria);
     void unsetSortCriteria();
+
+    virtual unsigned int getCount() const = 0;
 
     virtual void onVlcMlEvent( const vlc_ml_event_t* event );
 
@@ -137,15 +141,21 @@ public:
 
     int rowCount(const QModelIndex &parent) const override
     {
+        bool countHasChanged = false;
         if (parent.isValid())
             return 0;
-        vlc_mutex_locker lock( &m_item_lock );
-        if ( m_initialized == false )
         {
-            m_item_list = const_cast<MLSlidingWindowModel<T>*>(this)->fetch();
-            m_total_count = countTotalElements();
-            m_initialized = true;
+            vlc_mutex_locker lock( &m_item_lock );
+            if ( m_initialized == false )
+            {
+                m_item_list = const_cast<MLSlidingWindowModel<T>*>(this)->fetch();
+                m_total_count = countTotalElements();
+                m_initialized = true;
+                countHasChanged = true;
+            }
         }
+        if (countHasChanged)
+            emit countChanged( static_cast<unsigned int>(m_total_count) );
         return m_total_count;
     }
 
@@ -160,11 +170,14 @@ public:
 
     void clear() override
     {
-        vlc_mutex_locker lock( &m_item_lock );
-        m_query_param.i_offset = 0;
-        m_initialized = false;
-        m_total_count = 0;
-        m_item_list.clear();
+        {
+            vlc_mutex_locker lock( &m_item_lock );
+            m_query_param.i_offset = 0;
+            m_initialized = false;
+            m_total_count = 0;
+            m_item_list.clear();
+        }
+        emit countChanged( static_cast<unsigned int>(m_total_count) );
     }
 
 
@@ -218,6 +231,10 @@ public:
         return idList;
     }
 
+    unsigned int getCount() const override {
+        return static_cast<unsigned int>(m_total_count);
+    }
+
 protected:
     T* item(unsigned int idx) const
     {
@@ -228,6 +245,7 @@ protected:
             if ( m_total_count > 0 )
                 m_item_list = const_cast<MLSlidingWindowModel<T>*>(this)->fetch();
             m_initialized = true;
+            emit countChanged( static_cast<unsigned int>(m_total_count) );
         }
 
         if ( m_total_count == 0 || idx >= m_total_count || idx < 0 )
