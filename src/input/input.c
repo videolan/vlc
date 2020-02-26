@@ -87,9 +87,10 @@ static void UpdateTitleListfromDemux( input_thread_t * );
 
 static void MRLSections( const char *, int *, int *, int *, int *);
 
-static input_source_t *InputSourceNew( input_thread_t *, const char *,
-                                       const char *psz_forced_demux,
-                                       bool b_in_can_fail );
+static input_source_t *InputSourceNew( void );
+static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
+                            const char *psz_mrl,
+                            const char *psz_forced_demux, bool b_in_can_fail );
 static void InputSourceDestroy( input_source_t * );
 static void InputSourceMeta( input_thread_t *, input_source_t *, vlc_meta_t * );
 
@@ -1268,10 +1269,16 @@ static int Init( input_thread_t * p_input )
         goto error;
 
     /* */
-    master = InputSourceNew( p_input, priv->p_item->psz_uri, NULL, false );
+    priv->master = master = InputSourceNew();
     if( master == NULL )
         goto error;
-    priv->master = master;
+    int ret = InputSourceInit( master, p_input, priv->p_item->psz_uri,
+                               NULL, false );
+    if( ret != VLC_SUCCESS )
+    {
+        InputSourceDestroy( master );
+        goto error;
+    }
 
     InitTitle( p_input, false );
 
@@ -2462,19 +2469,21 @@ error:
 static void input_SplitMRL( const char **, const char **, const char **,
                             const char **, char * );
 
-/*****************************************************************************
- * InputSourceNew:
- *****************************************************************************/
-static input_source_t *InputSourceNew( input_thread_t *p_input,
-                                       const char *psz_mrl,
-                                       const char *psz_forced_demux,
-                                       bool b_in_can_fail )
+static input_source_t *InputSourceNew( void )
 {
-    input_thread_private_t *priv = input_priv(p_input);
     input_source_t *in = calloc(1, sizeof(*in) );
     if( unlikely(in == NULL) )
         return NULL;
 
+    vlc_atomic_rc_init( &in->rc );
+    return in;
+}
+
+static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
+                            const char *psz_mrl,
+                            const char *psz_forced_demux, bool b_in_can_fail )
+{
+    input_thread_private_t *priv = input_priv(p_input);
     const char *psz_access, *psz_demux, *psz_path, *psz_anchor = NULL;
 
     assert( psz_mrl );
@@ -2482,12 +2491,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
     char *psz_demux_var = NULL;
 
     if( psz_dup == NULL )
-    {
-        free( in );
-        return NULL;
-    }
-
-    vlc_atomic_rc_init( &in->rc );
+        return VLC_ENOMEM;
 
     /* Split uri */
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, &psz_anchor, psz_dup );
@@ -2575,8 +2579,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
             vlc_dialog_display_error( p_input, _("Your input can't be opened"),
                                       _("VLC is unable to open the MRL '%s'."
                                       " Check the log for details."), psz_mrl );
-        free( in );
-        return NULL;
+        return VLC_EGENERIC;
     }
 
     char *psz_demux_chain = NULL;
@@ -2597,8 +2600,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         if( in->p_demux == NULL )
         {
             msg_Err(p_input, "Failed to create demux filter");
-            free( in );
-            return NULL;
+            return VLC_EGENERIC;
         }
     }
 
@@ -2695,7 +2697,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
     if( var_GetInteger( p_input, "clock-synchro" ) != -1 )
         in->b_can_pace_control = !var_GetInteger( p_input, "clock-synchro" );
 
-    return in;
+    return VLC_SUCCESS;
 }
 
 input_source_t *input_source_Hold( input_source_t *in )
@@ -3264,14 +3266,18 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
 
     priv->i_last_es_cat = UNKNOWN_ES;
 
-    input_source_t *p_source = InputSourceNew( p_input, psz_uri,
-                                               psz_forced_demux,
-                                               b_can_fail || psz_forced_demux );
+    input_source_t *p_source = InputSourceNew();
+    if( !p_source )
+        return VLC_EGENERIC;
 
-    if( psz_forced_demux && p_source == NULL )
-        p_source = InputSourceNew( p_input, psz_uri, NULL, b_can_fail );
+    int ret = InputSourceInit( p_source, p_input, psz_uri,
+                               psz_forced_demux,
+                               b_can_fail || psz_forced_demux );
 
-    if( p_source == NULL )
+    if( psz_forced_demux && ret != VLC_SUCCESS )
+        ret = InputSourceInit( p_source, p_input, psz_uri, NULL, b_can_fail );
+
+    if( ret != VLC_SUCCESS )
     {
         msg_Warn( p_input, "failed to add %s as slave", psz_uri );
         return VLC_EGENERIC;
