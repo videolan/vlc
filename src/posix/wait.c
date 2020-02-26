@@ -83,6 +83,8 @@ void vlc_atomic_wait(void *addr, unsigned value)
 
     if (value == atomic_load_explicit(futex, memory_order_relaxed))
         pthread_cond_wait(&bucket->wait, &bucket->lock);
+    else
+        pthread_testcancel();
 
     pthread_cleanup_pop(1);
 }
@@ -98,6 +100,8 @@ static int vlc_atomic_timedwait_timespec(void *addr, unsigned value,
 
     if (value == atomic_load_explicit(futex, memory_order_relaxed))
         ret = pthread_cond_timedwait(&bucket->wait, &bucket->lock, ts);
+    else
+        pthread_testcancel();
 
     pthread_cleanup_pop(1);
     return ret;
