@@ -348,8 +348,5 @@ vout_LTLIBRARIES += \
 	libvmem_plugin.la \
 	libwdummy_plugin.la \
 	libwextern_plugin.la \
+	libvgl_plugin.la \
 	libyuv_plugin.la
-
-if HAVE_GL
-vout_LTLIBRARIES += libvgl_plugin.la
-endif
