@@ -148,7 +148,6 @@ static int BoolCallback( vlc_object_t *obj, char const *varname,
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys;
 
     if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
     {
@@ -157,10 +156,10 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Allocate structure */
-    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
-    if( p_filter->p_sys == NULL )
+    filter_sys_t *p_sys = vlc_obj_malloc( p_this, sizeof( *p_sys ) );
+    if( p_sys == NULL )
         return VLC_ENOMEM;
-    p_sys = p_filter->p_sys;
+    p_filter->p_sys = p_sys;
 
     /* Choose Planar/Packed function and pointer to a Hue/Saturation processing
      * function*/
@@ -242,7 +241,6 @@ static void Destroy( vlc_object_t *p_this )
     var_DelCallback( p_filter, "gamma", FloatCallback, &p_sys->f_gamma );
     var_DelCallback( p_filter, "brightness-threshold", BoolCallback,
                      &p_sys->b_brightness_threshold );
-    free( p_sys );
 }
 
 /*****************************************************************************
