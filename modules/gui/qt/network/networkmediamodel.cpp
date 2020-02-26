@@ -110,6 +110,11 @@ int NetworkMediaModel::rowCount(const QModelIndex& parent) const
 {
     if ( parent.isValid() )
         return 0;
+    return getCount();
+}
+
+int NetworkMediaModel::getCount() const
+{
     assert( m_items.size() < INT32_MAX );
     return static_cast<int>( m_items.size() );
 }
@@ -256,6 +261,7 @@ bool NetworkMediaModel::initializeMediaSources()
         beginResetModel();
         m_items.clear();
         endResetModel();
+        emit countChanged();
     }
 
     if (!m_treeItem)
@@ -370,6 +376,7 @@ void NetworkMediaModel::onItemRemoved(MediaSourcePtr, input_item_node_t * node,
             beginRemoveRows({}, idx, idx );
             m_items.erase( it );
             endRemoveRows();
+            emit countChanged();
         }
     }, Qt::QueuedConnection);
 }
@@ -434,6 +441,7 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
         endResetModel();
     else
         endInsertRows();
+    emit countChanged();
 }
 
 bool NetworkMediaModel::canBeIndexed(const QUrl& url , ItemType itemType )

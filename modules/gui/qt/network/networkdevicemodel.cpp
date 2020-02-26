@@ -89,8 +89,7 @@ int NetworkDeviceModel::rowCount(const QModelIndex& parent) const
 {
     if ( parent.isValid() )
         return 0;
-    assert( m_items.size() < INT32_MAX );
-    return static_cast<int>( m_items.size() );
+    return getCount();
 }
 
 
@@ -113,6 +112,12 @@ void NetworkDeviceModel::setSdSource(SDCatType s)
         initializeMediaSources();
     }
     emit sdSourceChanged();
+}
+
+int NetworkDeviceModel::getCount() const
+{
+    assert( m_items.size() < INT32_MAX );
+    return static_cast<int>( m_items.size() );
 }
 
 
@@ -180,6 +185,7 @@ bool NetworkDeviceModel::initializeMediaSources()
         beginResetModel();
         m_items.clear();
         endResetModel();
+        emit countChanged();
     }
 
     auto provider = vlc_media_source_provider_Get( libvlc );
@@ -264,6 +270,7 @@ void NetworkDeviceModel::onItemRemoved(MediaSourcePtr mediaSource, input_item_no
             beginRemoveRows({}, idx, idx );
             m_items.erase( it );
             endRemoveRows();
+            emit countChanged();
         }
     }, Qt::QueuedConnection);
 }
@@ -278,6 +285,7 @@ void NetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_it
                 return value.mediaSource == mediaSource;
             }), m_items.end());
             endResetModel();
+            emit countChanged();
         });
     }
 
@@ -321,6 +329,7 @@ void NetworkDeviceModel::refreshDeviceList( MediaSourcePtr mediaSource, input_it
             beginInsertRows( {}, pos, pos );
             m_items.insert( it, std::move( item ) );
             endInsertRows();
+            emit countChanged();
         }
     }, Qt::QueuedConnection);
 }
