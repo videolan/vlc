@@ -54,6 +54,7 @@
 #include <vlc_stream.h>
 #include <vlc_stream_extractor.h>
 #include <vlc_renderer_discovery.h>
+#include <vlc_md5.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -87,7 +88,7 @@ static void UpdateTitleListfromDemux( input_thread_t * );
 
 static void MRLSections( const char *, int *, int *, int *, int *);
 
-static input_source_t *InputSourceNew( void );
+static input_source_t *InputSourceNew( const char *psz_mrl );
 static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
                             const char *psz_mrl,
                             const char *psz_forced_demux, bool b_in_can_fail );
@@ -270,7 +271,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     if( unlikely(priv == NULL) )
         return NULL;
 
-    priv->master = InputSourceNew();
+    priv->master = InputSourceNew( NULL );
     if( !priv->master )
     {
         free( priv );
@@ -2479,13 +2480,29 @@ error:
 static void input_SplitMRL( const char **, const char **, const char **,
                             const char **, char * );
 
-static input_source_t *InputSourceNew( void )
+static input_source_t *InputSourceNew( const char *psz_mrl )
 {
     input_source_t *in = calloc(1, sizeof(*in) );
     if( unlikely(in == NULL) )
         return NULL;
 
     vlc_atomic_rc_init( &in->rc );
+
+    if( psz_mrl )
+    {
+        /* Use the MD5 sum of the complete source URL as an identifier. */
+        struct md5_s md5;
+        InitMD5( &md5 );
+        AddMD5( &md5, psz_mrl, strlen( psz_mrl ) );
+        EndMD5( &md5 );
+        in->str_id = psz_md5_hash( &md5 );
+        if( !in->str_id )
+        {
+            free( in );
+            return NULL;
+        }
+    }
+
     return in;
 }
 
@@ -2719,7 +2736,15 @@ input_source_t *input_source_Hold( input_source_t *in )
 void input_source_Release( input_source_t *in )
 {
     if( vlc_atomic_rc_dec( &in->rc ) )
+    {
+        free( in->str_id );
         free( in );
+    }
+}
+
+const char *input_source_GetStrId( input_source_t *in )
+{
+    return in->str_id;
 }
 
 /*****************************************************************************
@@ -3274,7 +3299,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
 
     priv->i_last_es_cat = UNKNOWN_ES;
 
-    input_source_t *p_source = InputSourceNew();
+    input_source_t *p_source = InputSourceNew( psz_uri );
     if( !p_source )
         return VLC_EGENERIC;
 

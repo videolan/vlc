@@ -370,6 +370,7 @@ struct input_source_t
     vlc_atomic_rc_t rc;
 
     demux_t  *p_demux; /**< Demux object (most downstream) */
+    char *str_id;
 
     /* Title infos for that input */
     bool         b_title_demux; /* Titles/Seekpoints provided by demux */
@@ -647,6 +648,13 @@ input_source_t *input_source_Hold( input_source_t *in );
  * Release the input_source_t
  */
 void input_source_Release( input_source_t *in );
+
+/**
+ * Returns the string identifying this input source
+ *
+ * @return a string id or NULL if the source is the master
+ */
+const char *input_source_GetStrId( input_source_t *in );
 
 /* Bound pts_delay */
 #define INPUT_PTS_DELAY_MAX VLC_TICK_FROM_SEC(60)
