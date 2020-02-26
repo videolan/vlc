@@ -36,8 +36,8 @@ Widgets.NavigableFocusScope {
         { text: i18n.qtr("Artist"),      criteria: "main_artist" },
     ]
 
-    property alias model: delegateModelId.model
-    property alias parentId: delegateModelId.parentId
+    property alias model: albumModelId
+    property alias parentId: albumModelId.parentId
     readonly property var currentIndex: view.currentItem.currentIndex
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
@@ -80,41 +80,7 @@ Widgets.NavigableFocusScope {
             ml: medialib
         }
 
-
-        delegate: Package {
-            id: element
-
-            Widgets.ListItem {
-                id: listDelegate
-
-                Package.name: "list"
-
-                width: root.width
-                height: VLCStyle.icon_normal + VLCStyle.margin_small
-
-                selected: delegateModelId.isSelected(index)
-                Connections {
-                   target: delegateModelId
-                   onSelectionChanged: listDelegate.selected = delegateModelId.isSelected(index)
-                }
-
-                cover: Image {
-                    id: cover_obj
-                    fillMode: Image.PreserveAspectFit
-                    source: model.cover || VLCStyle.noArtAlbum
-                    sourceSize: Qt.size(width, height)
-                }
-                line1: (model.title || i18n.qtr("Unknown title"))+" ["+model.duration+"]"
-                line2: model.main_artist || i18n.qtr("Unknown artist")
-
-                onItemClicked : {
-                    delegateModelId.updateSelection( modifier, view.currentItem.currentIndex, index )
-                    view.currentItem.currentIndex = index
-                    this.forceActiveFocus()
-                }
-                onPlayClicked: medialib.addAndPlay( model.id )
-                onAddToPlaylistClicked : medialib.addToPlaylist( model.id )
-            }
+        delegate: Item {
         }
 
         onCountChanged: {
@@ -199,8 +165,37 @@ Widgets.NavigableFocusScope {
 
             spacing: VLCStyle.margin_xxxsmall
 
-            model: delegateModelId.parts.list
-            modelCount: delegateModelId.items.count
+            model: albumModelId
+
+            delegate: Widgets.ListItem {
+                id: listDelegate
+
+                width: root.width
+                height: VLCStyle.icon_normal + VLCStyle.margin_small
+
+                selected: delegateModelId.isSelected(index)
+                Connections {
+                   target: delegateModelId
+                   onSelectionChanged: listDelegate.selected = delegateModelId.isSelected(index)
+                }
+
+                cover: Image {
+                    id: cover_obj
+                    fillMode: Image.PreserveAspectFit
+                    source: model.cover || VLCStyle.noArtAlbum
+                    sourceSize: Qt.size(width, height)
+                }
+                line1: (model.title || i18n.qtr("Unknown title"))+" ["+model.duration+"]"
+                line2: model.main_artist || i18n.qtr("Unknown artist")
+
+                onItemClicked : {
+                    delegateModelId.updateSelection( modifier, view.currentItem.currentIndex, index )
+                    view.currentItem.currentIndex = index
+                    this.forceActiveFocus()
+                }
+                onPlayClicked: medialib.addAndPlay( model.id )
+                onAddToPlaylistClicked : medialib.addToPlaylist( model.id )
+            }
 
             onActionAtIndex: delegateModelId.actionAtIndex(index)
             onSelectAll: delegateModelId.selectAll()

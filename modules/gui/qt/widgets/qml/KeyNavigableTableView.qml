@@ -64,74 +64,7 @@ NavigableFocusScope {
 
         model: root.model
 
-        delegate: Package {
-            id: element
-            property var rowModel: model
-            property bool selected: delegateModel.isSelected(index)
-            Connections {
-               target: delegateModel
-               onSelectionChanged: element.selected = delegateModel.isSelected(index)
-            }
-
-            Rectangle {
-                Package.name: "list"
-                id: lineView
-
-                width: root.width
-                height: root.rowHeight
-                color: VLCStyle.colors.getBgColor(selected, hoverArea.containsMouse, lineView.activeFocus)
-
-                MouseArea {
-                    id: hoverArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    Keys.onMenuPressed: root.contextMenuButtonClicked(contextButton,rowModel)
-                    acceptedButtons: Qt.RightButton | Qt.LeftButton
-
-                    onClicked: {
-                        delegateModel.updateSelection( mouse.modifiers , view.currentIndex, index)
-                        view.currentIndex = rowModel.index
-                        lineView.forceActiveFocus()
-
-                        if (mouse.button === Qt.RightButton){
-                            root.rightClick(lineView,rowModel)
-                        }
-                    }
-
-                    onDoubleClicked: {
-                        actionForSelection(delegateModel.selectedIndexes())
-                    }
-
-                        Row {
-                            anchors {
-                                topMargin: VLCStyle.margin_xxsmall
-                                bottomMargin: VLCStyle.margin_xxsmall
-                                leftMargin: VLCStyle.margin_xxxsmall
-                                rightMargin: VLCStyle.margin_xxxsmall
-                                fill: parent
-                            }
-                            Repeater {
-                                model: sortModel
-
-                                Item {
-                                    height: parent.height
-                                    width: modelData.width * view.width
-                                    Layout.alignment: Qt.AlignVCenter
-                                    Loader{
-                                        anchors.fill: parent
-                                        sourceComponent: colDelegate
-
-                                        property var rowModel: element.rowModel
-                                        property var colModel: modelData
-
-                                    }
-
-                                }
-                            }
-                        }
-
-                }
-            }
+        delegate: Item {
         }
     }
 
@@ -143,8 +76,7 @@ NavigableFocusScope {
 
         focus: true
 
-        model : delegateModel.parts.list
-        modelCount: delegateModel.items.count
+        model : root.model
 
         headerPositioning: ListView.OverlayHeader
 
@@ -212,6 +144,69 @@ NavigableFocusScope {
                     width: parent.width
                     height: 1
                     color: VLCStyle.colors.textInactive
+                }
+            }
+        }
+
+        delegate:Rectangle {
+            id: lineView
+
+            width: view.width
+            height: root.rowHeight
+            color: VLCStyle.colors.getBgColor(selected, hoverArea.containsMouse, lineView.activeFocus)
+
+            property var rowModel: model
+            property bool selected: delegateModel.isSelected(index)
+            Connections {
+                target: delegateModel
+                onSelectionChanged: lineView.selected = delegateModel.isSelected(index)
+            }
+
+            MouseArea {
+                id: hoverArea
+                anchors.fill: parent
+                hoverEnabled: true
+                Keys.onMenuPressed: root.contextMenuButtonClicked(contextButton,rowModel)
+                acceptedButtons: Qt.RightButton | Qt.LeftButton
+
+                onClicked: {
+                    delegateModel.updateSelection( mouse.modifiers , view.currentIndex, index)
+                    view.currentIndex = rowModel.index
+                    lineView.forceActiveFocus()
+
+                    if (mouse.button === Qt.RightButton){
+                        root.rightClick(lineView,rowModel)
+                    }
+                }
+
+                onDoubleClicked: {
+                    actionForSelection(delegateModel.selectedIndexes())
+                }
+
+                Row {
+                    anchors {
+                        topMargin: VLCStyle.margin_xxsmall
+                        bottomMargin: VLCStyle.margin_xxsmall
+                        leftMargin: VLCStyle.margin_xxxsmall
+                        rightMargin: VLCStyle.margin_xxxsmall
+                        fill: parent
+                    }
+                    Repeater {
+                        model: sortModel
+
+                        Item {
+                            height: parent.height
+                            width: modelData.width * view.width
+                            Layout.alignment: Qt.AlignVCenter
+                            Loader{
+                                anchors.fill: parent
+                                sourceComponent: colDelegate
+
+                                property var rowModel: lineView.rowModel
+                                property var colModel: modelData
+                            }
+                        }
+                    }
                 }
             }
         }

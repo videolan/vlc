@@ -50,7 +50,7 @@ Widgets.KeyNavigableTableView {
         property var model: parent.colModel
         FocusScope{
             anchors.fill: parent
-            focus: isFocusOnContextButton && rowModel.index === currentIndex
+            focus: isFocusOnContextButton && colDel.rowModel.index === currentIndex
             onFocusChanged: focus && contextButtonLoader.forceActiveFocus()
 
             Loader{

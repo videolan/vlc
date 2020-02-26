@@ -27,7 +27,7 @@ import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
     id: root
-    property alias model: delegateModelId.model
+    property alias model: genreModel
     property var sortModel: [
         { text: i18n.qtr("Alphabetic"), criteria: "title" }
     ]
@@ -55,8 +55,8 @@ Widgets.NavigableFocusScope {
         }
     }
 
-    function showAlbumView( parent, name ) {
-        history.push([ "mc", "music", "genres", "albums", { parentId: parent, genreName: name } ])
+    function showAlbumView( m ) {
+        history.push([ "mc", "music", "genres", "albums", { parentId: m.id, genreName: m.name } ])
     }
 
     function resetFocus() {
@@ -91,44 +91,7 @@ Widgets.NavigableFocusScope {
             ml: medialib
         }
 
-        delegate: Package {
-            Widgets.ListItem {
-                id: listDelegate
-                Package.name: "list"
-
-                width: root.width
-                height: VLCStyle.icon_normal + VLCStyle.margin_small
-                selected: delegateModelId.isSelected(index)
-                Connections {
-                   target: delegateModelId
-                   onSelectionChanged: listDelegate.selected = delegateModelId.isSelected(index)
-                }
-
-
-                cover: Image {
-                    id: cover_obj
-                    fillMode: Image.PreserveAspectFit
-                    source: model.cover || VLCStyle.noArtAlbum
-                    sourceSize: Qt.size(width, height)
-                }
-
-                line1: (model.name || "Unknown genre")+" - "+model.nb_tracks+" tracks"
-
-                onItemClicked: {
-                    delegateModelId.updateSelection( modifier, view.currentItem.currentIndex, index )
-                    view.currentItem.currentIndex = index
-                    this.forceActiveFocus()
-                }
-                onPlayClicked: {
-                    medialib.addAndPlay( model.id )
-                }
-                onItemDoubleClicked: {
-                    root.showAlbumView(model.id, model.name)
-                }
-                onAddToPlaylistClicked: {
-                    medialib.addToPlaylist( model.id );
-                }
-            }
+        delegate: Item {
         }
 
         onCountChanged: {
@@ -141,7 +104,7 @@ Widgets.NavigableFocusScope {
             if (delegateModelId.selectedGroup.count > 1) {
                 medialib.addAndPlay(model.getIdsForIndexes(delegateModelId.selectedIndexes()))
             } else if (delegateModelId.selectedGroup.count === 1) {
-                showAlbumView(delegateModelId.selectedGroup.get(0).model.id, delegateModelId.selectedGroup.get(0).model.name)
+                showAlbumView( delegateModelId.selectedGroup.get(0).model )
             }
         }
     }
@@ -178,11 +141,6 @@ Widgets.NavigableFocusScope {
                 image: model.cover || VLCStyle.noArtAlbum
                 title: model.name || "Unknown genre"
                 subtitle: ""
-                selected: delegateModelId.isSelected( index )
-                Connections {
-                   target: delegateModelId
-                   onSelectionChanged: selected = delegateModelId.isSelected(index)
-                }
 
                 onItemClicked: {
                     delegateModelId.updateSelection( modifier , view.currentItem.currentIndex, index)
@@ -190,7 +148,7 @@ Widgets.NavigableFocusScope {
                     view.currentItem.forceActiveFocus()
                 }
 
-                onItemDoubleClicked: root.showAlbumView(model.id, model.name)
+                onItemDoubleClicked: root.showAlbumView(model)
             }
 
             focus: true
@@ -214,7 +172,7 @@ Widgets.NavigableFocusScope {
         Widgets.KeyNavigableListView {
             id: listView_id
 
-            model: delegateModelId.parts.list
+            model: genreModel
 
             header: headerComponent
 
@@ -226,6 +184,43 @@ Widgets.NavigableFocusScope {
             onActionAtIndex: delegateModelId.actionAtIndex(index)
 
             navigationParent: root
+
+            delegate: Widgets.ListItem {
+                id: listDelegate
+
+                width: root.width
+                height: VLCStyle.icon_normal + VLCStyle.margin_small
+                selected: delegateModelId.isSelected(index)
+                Connections {
+                   target: delegateModelId
+                   onSelectionChanged: listDelegate.selected = delegateModelId.isSelected(index)
+                }
+
+
+                cover: Image {
+                    id: cover_obj
+                    fillMode: Image.PreserveAspectFit
+                    source: model.cover || VLCStyle.noArtAlbum
+                    sourceSize: Qt.size(width, height)
+                }
+
+                line1: (model.name || "Unknown genre")+" - "+model.nb_tracks+" tracks"
+
+                onItemClicked: {
+                    delegateModelId.updateSelection( modifier, view.currentItem.currentIndex, index )
+                    view.currentItem.currentIndex = index
+                    this.forceActiveFocus()
+                }
+                onPlayClicked: {
+                    medialib.addAndPlay( model.id )
+                }
+                onItemDoubleClicked: {
+                    root.showAlbumView(model)
+                }
+                onAddToPlaylistClicked: {
+                    medialib.addToPlaylist( model.id );
+                }
+            }
         }
     }
 

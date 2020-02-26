@@ -28,7 +28,7 @@ import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
     id: root
-    property alias model: delegateModel.model
+    property alias model: artistModel
     property var sortModel: [
         { text: i18n.qtr("Alphabetic"),  criteria: "title" }
     ]
@@ -63,6 +63,7 @@ Widgets.NavigableFocusScope {
     Util.SelectableDelegateModel {
         id: delegateModel
         model: MLArtistModel {
+            id: artistModel
             ml: medialib
         }
 
@@ -75,43 +76,7 @@ Widgets.NavigableFocusScope {
             }
         }
 
-        delegate: Widgets.ListItem {
-            height: VLCStyle.icon_normal + VLCStyle.margin_small
-            width: artistList.width
-
-            property bool selected: delegateModel.isSelected(index)
-            Connections {
-               target: delegateModel
-               onSelectionChanged: selected = delegateModel.isSelected(index)
-            }
-
-            color: VLCStyle.colors.getBgColor(selected, this.hovered, this.activeFocus)
-
-            cover: Widgets.RoundImage {
-                source: model.cover || VLCStyle.noArtArtistSmall
-                height: VLCStyle.icon_normal
-                width: VLCStyle.icon_normal
-                radius: VLCStyle.icon_normal
-            }
-
-            line1: model.name || i18n.qtr("Unknown artist")
-
-            actionButtons: []
-
-            onItemClicked: {
-                artistId = model.id
-                delegateModel.updateSelection( modifier , artistList.currentIndex, index)
-                artistList.currentIndex = index
-                artistList.forceActiveFocus()
-            }
-
-            onItemDoubleClicked: {
-                if (keys === Qt.RightButton)
-                    medialib.addAndPlay( model.id )
-                else
-                    view.forceActiveFocus()
-            }
-        }
+        delegate: Item {}
 
         function actionAtIndex(index) {
             view.forceActiveFocus()
@@ -133,8 +98,7 @@ Widgets.NavigableFocusScope {
             height: parent.height
 
             spacing: 4
-            model: delegateModel
-            modelCount: delegateModel.items.count
+            model: artistModel
             currentIndex: -1
 
             focus: true
@@ -158,6 +122,44 @@ Widgets.NavigableFocusScope {
                     artistList.currentIndex = 0;
             }
 
+            delegate: Widgets.ListItem {
+                height: VLCStyle.icon_normal + VLCStyle.margin_small
+                width: artistList.width
+
+                property bool selected: delegateModel.isSelected(index)
+                Connections {
+                   target: delegateModel
+                   onSelectionChanged: selected = delegateModel.isSelected(index)
+                }
+
+                color: VLCStyle.colors.getBgColor(selected, this.hovered, this.activeFocus)
+
+                cover: Widgets.RoundImage {
+                    source: model.cover || VLCStyle.noArtArtistSmall
+                    height: VLCStyle.icon_normal
+                    width: VLCStyle.icon_normal
+                    radius: VLCStyle.icon_normal
+                }
+
+                line1: model.name || i18n.qtr("Unknown artist")
+
+                actionButtons: []
+
+                onItemClicked: {
+                    artistId = model.id
+                    delegateModel.updateSelection( modifier , artistList.currentIndex, index)
+                    artistList.currentIndex = index
+                    artistList.forceActiveFocus()
+                }
+
+                onItemDoubleClicked: {
+                    if (keys === Qt.RightButton)
+                        medialib.addAndPlay( model.id )
+                    else
+                        view.forceActiveFocus()
+                }
+            }
+
         }
 
         FocusScope {
@@ -176,7 +178,7 @@ Widgets.NavigableFocusScope {
                     id: artistBanner
                     width: albumSubView.width
                     artist: (artistList.currentIndex >= 0)
-                            ? delegateModel.items.get(artistList.currentIndex).model
+                            ? artistModel.getDataAt(artistList.currentIndex)
                             : ({})
                     navigationParent: root
                     navigationLeftItem: artistList

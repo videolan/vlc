@@ -45,8 +45,6 @@ NavigableFocusScope {
 
     property bool selected: false
 
-    Keys.onMenuPressed: root.contextMenuButtonClicked(cover_bg)
-
     Accessible.role: Accessible.ListItem
     Accessible.name: line1
 

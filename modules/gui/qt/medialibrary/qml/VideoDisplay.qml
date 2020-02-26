@@ -119,8 +119,7 @@ Widgets.NavigableFocusScope {
             id: videoModel
             ml: medialib
         }
-        delegate: Package{
-            Item { Package.name: "grid" }
+        delegate: Item{
         }
 
         onCountChanged: {
