@@ -23,6 +23,7 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
 #include <stddef.h>
 #include <math.h>
 
@@ -31,14 +32,13 @@
 #include <vlc_modules.h>
 #include <vlc_aout.h>
 #include <vlc_aout_volume.h>
-#include <vlc_atomic.h>
 #include "aout_internal.h"
 
 struct aout_volume
 {
     audio_volume_t object;
     audio_replay_gain_t replay_gain;
-    vlc_atomic_float gain_factor;
+    _Atomic float gain_factor;
     float output_factor;
     module_t *module;
 };
@@ -135,8 +135,7 @@ int aout_volume_Amplify(aout_volume_t *vol, block_t *block)
     if (unlikely(vol == NULL) || vol->module == NULL)
         return -1;
 
-    float amp = vol->output_factor
-              * vlc_atomic_load_float (&vol->gain_factor);
+    float amp = vol->output_factor * atomic_load(&vol->gain_factor);
 
     vol->object.amplify(&vol->object, block, amp);
     return 0;
@@ -198,7 +197,7 @@ static int ReplayGainCallback (vlc_object_t *obj, char const *var,
     aout_volume_t *vol = data;
     float multiplier = aout_ReplayGainSelect(obj, val.psz_string,
                                              &vol->replay_gain);
-    vlc_atomic_store_float (&vol->gain_factor, multiplier);
+    atomic_store(&vol->gain_factor, multiplier);
     VLC_UNUSED(var); VLC_UNUSED(oldval);
     return VLC_SUCCESS;
 }
