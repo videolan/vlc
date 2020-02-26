@@ -76,6 +76,7 @@ static const struct es_out_callbacks trash_es_out_cbs =
     trash_es_out_Del,
     trash_es_out_Control,
     trash_es_out_Delete,
+    NULL,
 };
 
 #define TIMELINE_0 (CLOCK_FREQ)

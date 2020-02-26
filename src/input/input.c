@@ -2014,9 +2014,9 @@ static bool Control( input_thread_t *p_input,
             break;
         case INPUT_CONTROL_SET_ES_LIST:
         {
-            if( es_out_Control( input_priv(p_input)->p_es_out_display,
-                                ES_OUT_SET_ES_LIST, param.list.cat,
-                                param.list.ids ) == VLC_SUCCESS )
+            if( es_out_PrivControl( input_priv(p_input)->p_es_out_display,
+                                    ES_OUT_PRIV_SET_ES_LIST, param.list.cat,
+                                    param.list.ids ) == VLC_SUCCESS )
             {
                 if( param.list.ids[0] != NULL && param.list.ids[1] == NULL )
                     demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_ES,
@@ -2238,8 +2238,8 @@ static bool Control( input_thread_t *p_input,
                 break;
 
             void *context;
-            if( es_out_Control( priv->p_es_out_display,
-                                ES_OUT_STOP_ALL_ES, &context ) != VLC_SUCCESS )
+            if( es_out_PrivControl( priv->p_es_out_display,
+                                    ES_OUT_PRIV_STOP_ALL_ES, &context ) != VLC_SUCCESS )
                 break;
 
             if ( p_priv->p_renderer )
@@ -2261,23 +2261,23 @@ static bool Control( input_thread_t *p_input,
                                         vlc_renderer_item_demux_filter( p_item ) );
                 }
             }
-            es_out_Control( priv->p_es_out_display, ES_OUT_START_ALL_ES,
-                            context );
+            es_out_PrivControl( priv->p_es_out_display, ES_OUT_PRIV_START_ALL_ES,
+                                context );
 #endif
             break;
         }
         case INPUT_CONTROL_SET_VBI_PAGE:
-            es_out_Control( priv->p_es_out_display, ES_OUT_SET_VBI_PAGE,
-                            param.vbi_page.id, param.vbi_page.page );
+            es_out_PrivControl( priv->p_es_out_display, ES_OUT_PRIV_SET_VBI_PAGE,
+                                param.vbi_page.id, param.vbi_page.page );
             break;
         case INPUT_CONTROL_SET_VBI_TRANSPARENCY:
-            es_out_Control( priv->p_es_out_display, ES_OUT_SET_VBI_TRANSPARENCY,
-                            param.vbi_transparency.id,
-                            param.vbi_transparency.enabled );
+            es_out_PrivControl( priv->p_es_out_display, ES_OUT_PRIV_SET_VBI_TRANSPARENCY,
+                                param.vbi_transparency.id,
+                                param.vbi_transparency.enabled );
             break;
         case INPUT_CONTROL_SET_ES_AUTOSELECT:
-            es_out_Control( priv->p_es_out_display, ES_OUT_SET_AUTOSELECT,
-                            param.es_autoselect.cat, param.es_autoselect.enabled );
+            es_out_PrivControl( priv->p_es_out_display, ES_OUT_PRIV_SET_AUTOSELECT,
+                                param.es_autoselect.cat, param.es_autoselect.enabled );
             break;
 
         case INPUT_CONTROL_NAV_ACTIVATE:
@@ -3306,10 +3306,10 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
 
     assert( priv->i_last_es_id != -1 );
 
-    es_out_Control( priv->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID,
-                    priv->i_last_es_id );
-    es_out_Control( priv->p_es_out_display, ES_OUT_SET_ES_BY_ID,
-                    priv->i_last_es_id, false );
+    es_out_PrivControl( priv->p_es_out_display, ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID,
+                        priv->i_last_es_id );
+    es_out_PrivControl( priv->p_es_out_display, ES_OUT_PRIV_SET_ES_BY_ID,
+                        priv->i_last_es_id, false );
 
     return VLC_SUCCESS;
 }

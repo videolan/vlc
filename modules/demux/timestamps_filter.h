@@ -353,6 +353,7 @@ static const struct es_out_callbacks timestamps_filter_es_out_cbs =
     timestamps_filter_es_out_Del,
     timestamps_filter_es_out_Control,
     timestamps_filter_es_out_Delete,
+    NULL,
 };
 
 static es_out_t * timestamps_filter_es_out_New(es_out_t *orig)

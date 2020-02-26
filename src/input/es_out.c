@@ -244,6 +244,7 @@ static void EsOutGlobalMeta( es_out_t *p_out, const vlc_meta_t *p_meta );
 static void EsOutMeta( es_out_t *p_out, const vlc_meta_t *p_meta, const vlc_meta_t *p_progmeta );
 static int EsOutEsUpdateFmt(es_out_t *out, es_out_id_t *es, const es_format_t *fmt);
 static int EsOutControlLocked( es_out_t *out, int i_query, ... );
+static int EsOutPrivControlLocked( es_out_t *out, int i_query, ... );
 
 static char *LanguageGetName( const char *psz_code );
 static char *LanguageGetCode( const char *psz_lang );
@@ -727,8 +728,8 @@ static void EsOutSetEsDelay(es_out_t *out, es_out_id_t *es, vlc_tick_t delay)
     EsOutDecoderChangeDelay(out, es);
 
     /* Update the clock pts delay only if the extra tracks delay changed */
-    EsOutControlLocked(out, ES_OUT_SET_JITTER, p_sys->i_pts_delay,
-                       p_sys->i_pts_jitter, p_sys->i_cr_average);
+    EsOutPrivControlLocked(out, ES_OUT_PRIV_SET_JITTER, p_sys->i_pts_delay,
+                           p_sys->i_pts_jitter, p_sys->i_cr_average);
 }
 
 static void EsOutSetDelay( es_out_t *out, int i_cat, vlc_tick_t i_delay )
@@ -745,8 +746,8 @@ static void EsOutSetDelay( es_out_t *out, int i_cat, vlc_tick_t i_delay )
         EsOutDecoderChangeDelay(out, es);
 
     /* Update the clock pts delay only if the extra tracks delay changed */
-    EsOutControlLocked(out, ES_OUT_SET_JITTER, p_sys->i_pts_delay,
-                       p_sys->i_pts_jitter, p_sys->i_cr_average);
+    EsOutPrivControlLocked(out, ES_OUT_PRIV_SET_JITTER, p_sys->i_pts_delay,
+                           p_sys->i_pts_jitter, p_sys->i_cr_average);
 }
 
 static int EsOutSetRecord(  es_out_t *out, bool b_record )
@@ -2784,59 +2785,6 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         return VLC_SUCCESS;
     }
 
-    case ES_OUT_GET_GROUP_FORCED:
-    {
-        int *pi_group = va_arg( args, int * );
-        *pi_group = p_sys->i_group_id;
-        return VLC_SUCCESS;
-    }
-
-    case ES_OUT_SET_MODE:
-    {
-        const int i_mode = va_arg( args, int );
-        assert( i_mode == ES_OUT_MODE_NONE || i_mode == ES_OUT_MODE_ALL ||
-                i_mode == ES_OUT_MODE_AUTO || i_mode == ES_OUT_MODE_PARTIAL ||
-                i_mode == ES_OUT_MODE_END );
-
-        if (i_mode != ES_OUT_MODE_NONE && !p_sys->b_active && !vlc_list_is_empty(&p_sys->es))
-        {
-            /* XXX Terminate vout if there are tracks but no video one.
-             * This one is not mandatory but is he earliest place where it
-             * can be done */
-            es_out_id_t *p_es;
-            bool found = false;
-
-            foreach_es_then_es_slaves(p_es)
-                if( p_es->fmt.i_cat == VIDEO_ES && !found /* nested loop */ )
-                {
-                    found = true;
-                    break;
-                }
-
-            if (!found)
-                EsOutStopFreeVout( out );
-        }
-        p_sys->b_active = i_mode != ES_OUT_MODE_NONE;
-        p_sys->i_mode = i_mode;
-
-        /* Reapply policy mode */
-        es_out_id_t *es;
-
-        foreach_es_then_es_slaves(es)
-        {
-            if (EsIsSelected(es))
-                EsOutUnselectEs(out, es, es->p_pgrm == p_sys->p_pgrm);
-        }
-        foreach_es_then_es_slaves(es)
-        {
-            EsOutSelect(out, es, false);
-        }
-
-        if( i_mode == ES_OUT_MODE_END )
-            EsOutTerminate( out );
-        return VLC_SUCCESS;
-    }
-
     case ES_OUT_SET_ES:
     case ES_OUT_RESTART_ES:
     {
@@ -2898,13 +2846,6 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         EsOutStopFreeVout( out );
         return VLC_SUCCESS;
     }
-    case ES_OUT_SET_ES_LIST:
-    {
-        enum es_format_category_e cat = va_arg( args, enum es_format_category_e );
-        vlc_es_id_t *const*es_id_list = va_arg( args, vlc_es_id_t ** );
-        EsOutSelectList( out, cat, es_id_list );
-        return VLC_SUCCESS;
-    }
     case ES_OUT_UNSET_ES:
     {
         es_out_id_t *es = va_arg( args, es_out_id_t * ), *other;
@@ -2924,50 +2865,6 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
             }
         }
         return VLC_EGENERIC;
-    }
-    case ES_OUT_STOP_ALL_ES:
-    {
-        es_out_id_t *es;
-        int count = 0;
-
-        foreach_es_then_es_slaves(es)
-            count++;
-
-        int *selected_es = vlc_alloc(count + 1, sizeof(int));
-        if (!selected_es)
-            return VLC_ENOMEM;
-
-        *va_arg(args, void **) = selected_es;
-        *selected_es = count;
-
-        foreach_es_then_es_slaves(es)
-        {
-            if (EsIsSelected(es))
-            {
-                EsOutDestroyDecoder(out, es);
-                *++selected_es = es->fmt.i_id;
-            }
-            else
-                *++selected_es = -1;
-        }
-        return VLC_SUCCESS;
-    }
-    case ES_OUT_START_ALL_ES:
-    {
-        int *selected_es = va_arg( args, void * );
-        int count = selected_es[0];
-        for( int i = 0; i < count; ++i )
-        {
-            int i_id = selected_es[i + 1];
-            if( i_id != -1 )
-            {
-                es_out_id_t *p_es = EsOutGetFromID( out, i_id );
-                EsOutCreateDecoder( out, p_es );
-            }
-        }
-        free(selected_es);
-        EsOutStopFreeVout( out );
-        return VLC_SUCCESS;
     }
 
     case ES_OUT_SET_ES_DEFAULT:
@@ -3107,10 +3004,9 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
                 /* Force a rebufferization when we are too late */
                 EsOutControlLocked( out, ES_OUT_RESET_PCR );
 
-                EsOutControlLocked( out, ES_OUT_SET_JITTER,
-                                    p_sys->i_pts_delay,
-                                    i_new_jitter,
-                                    p_sys->i_cr_average );
+                EsOutPrivControlLocked( out, ES_OUT_PRIV_SET_JITTER,
+                                        p_sys->i_pts_delay, i_new_jitter,
+                                        p_sys->i_cr_average );
             }
         }
         return VLC_SUCCESS;
@@ -3238,170 +3134,10 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         return VLC_SUCCESS;
     }
 
-    case ES_OUT_GET_WAKE_UP:
-    {
-        vlc_tick_t *pi_wakeup = va_arg( args, vlc_tick_t* );
-        *pi_wakeup = EsOutGetWakeup( out );
-        return VLC_SUCCESS;
-    }
-
-    case ES_OUT_SET_ES_BY_ID:
-    case ES_OUT_RESTART_ES_BY_ID:
-    case ES_OUT_SET_ES_DEFAULT_BY_ID:
-    {
-        const int i_id = va_arg( args, int );
-        es_out_id_t *p_es = EsOutGetFromID( out, i_id );
-        int i_new_query = 0;
-
-        switch( i_query )
-        {
-        case ES_OUT_SET_ES_BY_ID:         i_new_query = ES_OUT_SET_ES;
-            p_es->b_forced = va_arg( args, int );
-            break;
-        case ES_OUT_RESTART_ES_BY_ID:     i_new_query = ES_OUT_RESTART_ES; break;
-        case ES_OUT_SET_ES_DEFAULT_BY_ID: i_new_query = ES_OUT_SET_ES_DEFAULT; break;
-        default:
-          vlc_assert_unreachable();
-        }
-        int i_ret = EsOutControlLocked( out, i_new_query, p_es );
-
-        return i_ret;
-    }
-
-    case ES_OUT_GET_BUFFERING:
-    {
-        bool *pb = va_arg( args, bool* );
-        *pb = p_sys->b_buffering;
-        return VLC_SUCCESS;
-    }
-
     case ES_OUT_GET_EMPTY:
     {
         bool *pb = va_arg( args, bool* );
         *pb = EsOutDecodersIsEmpty( out );
-        return VLC_SUCCESS;
-    }
-
-    case ES_OUT_SET_ES_DELAY:
-    {
-        es_out_id_t *es = va_arg(args, es_out_id_t *);
-        const vlc_tick_t delay = va_arg(args, vlc_tick_t);
-        EsOutSetEsDelay(out, es, delay);
-        return VLC_SUCCESS;
-    }
-
-    case ES_OUT_SET_DELAY:
-    {
-        const int i_cat = va_arg( args, int );
-        const vlc_tick_t i_delay = va_arg( args, vlc_tick_t );
-        EsOutSetDelay( out, i_cat, i_delay );
-        return VLC_SUCCESS;
-    }
-
-    case ES_OUT_SET_RECORD_STATE:
-    {
-        bool b = va_arg( args, int );
-        return EsOutSetRecord( out, b );
-    }
-
-    case ES_OUT_SET_PAUSE_STATE:
-    {
-        const bool b_source_paused = (bool)va_arg( args, int );
-        const bool b_paused = (bool)va_arg( args, int );
-        const vlc_tick_t i_date = va_arg( args, vlc_tick_t );
-
-        assert( !b_source_paused == !b_paused );
-        EsOutChangePause( out, b_paused, i_date );
-
-        return VLC_SUCCESS;
-    }
-
-    case ES_OUT_SET_RATE:
-    {
-        const float src_rate = va_arg( args, double );
-        const float rate = va_arg( args, double );
-
-        assert( src_rate == rate );
-        EsOutChangeRate( out, rate );
-
-        return VLC_SUCCESS;
-    }
-
-    case ES_OUT_SET_FRAME_NEXT:
-        EsOutFrameNext( out );
-        return VLC_SUCCESS;
-
-    case ES_OUT_SET_TIMES:
-    {
-        double f_position = va_arg( args, double );
-        vlc_tick_t i_time = va_arg( args, vlc_tick_t );
-        vlc_tick_t i_normal_time = va_arg( args, vlc_tick_t );
-        vlc_tick_t i_length = va_arg( args, vlc_tick_t );
-
-        if( !p_sys->b_buffering )
-        {
-            vlc_tick_t i_delay;
-
-            /* Fix for buffering delay */
-            if( !input_priv(p_sys->p_input)->p_sout ||
-                !input_priv(p_sys->p_input)->b_out_pace_control )
-                i_delay = EsOutGetBuffering( out );
-            else
-                i_delay = 0;
-
-            if( i_time != VLC_TICK_INVALID )
-            {
-                i_time -= i_delay;
-                if( i_time < VLC_TICK_0 )
-                    i_time = VLC_TICK_0;
-            }
-
-            if( i_length != VLC_TICK_INVALID )
-                f_position -= (double)i_delay / i_length;
-            if( f_position < 0 )
-                f_position = 0;
-
-            assert( i_normal_time >= VLC_TICK_0 );
-
-            input_SendEventTimes( p_sys->p_input, f_position, i_time,
-                                  i_normal_time, i_length );
-        }
-        else
-            input_SendEventTimes( p_sys->p_input, 0.0, VLC_TICK_INVALID,
-                                  i_normal_time, i_length );
-        return VLC_SUCCESS;
-    }
-    case ES_OUT_SET_JITTER:
-    {
-        vlc_tick_t i_pts_delay  = va_arg( args, vlc_tick_t );
-        vlc_tick_t i_pts_jitter = va_arg( args, vlc_tick_t );
-        int     i_cr_average = va_arg( args, int );
-        es_out_pgrm_t *pgrm;
-
-        const vlc_tick_t i_tracks_pts_delay = EsOutGetTracksDelay(out);
-        bool b_change_clock =
-            i_pts_delay != p_sys->i_pts_delay ||
-            i_pts_jitter != p_sys->i_pts_jitter ||
-            i_cr_average != p_sys->i_cr_average ||
-            i_tracks_pts_delay != p_sys->i_tracks_pts_delay;
-
-        assert( i_pts_jitter >= 0 );
-        p_sys->i_pts_delay  = i_pts_delay;
-        p_sys->i_pts_jitter = i_pts_jitter;
-        p_sys->i_cr_average = i_cr_average;
-        p_sys->i_tracks_pts_delay = i_tracks_pts_delay;
-
-        if (b_change_clock)
-        {
-            i_pts_delay += i_pts_jitter + i_tracks_pts_delay;
-
-            vlc_list_foreach(pgrm, &p_sys->programs, node)
-            {
-                input_clock_SetJitter(pgrm->p_input_clock, i_pts_delay,
-                                      i_cr_average);
-                vlc_clock_main_SetInputDejitter(pgrm->p_main_clock, i_pts_delay);
-            }
-        }
         return VLC_SUCCESS;
     }
 
@@ -3432,14 +3168,6 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         const bool    b_absolute = va_arg( args, int );
         const vlc_tick_t i_system   = va_arg( args, vlc_tick_t );
         input_clock_ChangeSystemOrigin( p_pgrm->p_input_clock, b_absolute, i_system );
-        return VLC_SUCCESS;
-    }
-    case ES_OUT_SET_EOS:
-    {
-        es_out_id_t *id;
-        foreach_es_then_es_slaves(id)
-            if (id->p_dec != NULL)
-                input_DecoderDrain(id->p_dec);
         return VLC_SUCCESS;
     }
 
@@ -3495,33 +3223,78 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
             return input_DecoderSetSpuHighlight( p_es->p_dec, spu_hl );
         return VLC_EGENERIC;
     }
-    case ES_OUT_SET_VBI_PAGE:
-    case ES_OUT_SET_VBI_TRANSPARENCY:
-    {
-        es_out_id_t *es = va_arg( args, es_out_id_t * );
-        assert(es);
-        if( !es->p_dec || es->fmt.i_cat != SPU_ES
-          || es->fmt.i_codec != VLC_CODEC_TELETEXT )
-            return VLC_EGENERIC;
-
-        int ret;
-        if( i_query == ES_OUT_SET_VBI_PAGE )
-        {
-            unsigned page = va_arg( args, unsigned );
-            ret = var_SetInteger( es->p_dec, "vbi-page", page );
-            if( ret == VLC_SUCCESS )
-                input_SendEventVbiPage( p_sys->p_input, page );
-        }
-        else
-        {
-            bool opaque = va_arg( args, int );
-            ret = var_SetBool( es->p_dec, "vbi-opaque", opaque );
-            if( ret == VLC_SUCCESS )
-                input_SendEventVbiTransparency( p_sys->p_input, opaque );
-        }
-        return ret;
+    default:
+        msg_Err( p_sys->p_input, "unknown query 0x%x in %s", i_query,
+                 __func__  );
+        return VLC_EGENERIC;
     }
-    case ES_OUT_SET_AUTOSELECT:
+}
+
+static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    switch (query)
+    {
+    case ES_OUT_PRIV_SET_MODE:
+    {
+        const int i_mode = va_arg( args, int );
+        assert( i_mode == ES_OUT_MODE_NONE || i_mode == ES_OUT_MODE_ALL ||
+                i_mode == ES_OUT_MODE_AUTO || i_mode == ES_OUT_MODE_PARTIAL ||
+                i_mode == ES_OUT_MODE_END );
+
+        if (i_mode != ES_OUT_MODE_NONE && !p_sys->b_active && !vlc_list_is_empty(&p_sys->es))
+        {
+            /* XXX Terminate vout if there are tracks but no video one.
+             * This one is not mandatory but is he earliest place where it
+             * can be done */
+            es_out_id_t *p_es;
+            bool found = false;
+
+            foreach_es_then_es_slaves(p_es)
+                if( p_es->fmt.i_cat == VIDEO_ES && !found /* nested loop */ )
+                {
+                    found = true;
+                    break;
+                }
+
+            if (!found)
+                EsOutStopFreeVout( out );
+        }
+        p_sys->b_active = i_mode != ES_OUT_MODE_NONE;
+        p_sys->i_mode = i_mode;
+
+        /* Reapply policy mode */
+        es_out_id_t *es;
+
+        foreach_es_then_es_slaves(es)
+        {
+            if (EsIsSelected(es))
+                EsOutUnselectEs(out, es, es->p_pgrm == p_sys->p_pgrm);
+        }
+        foreach_es_then_es_slaves(es)
+        {
+            EsOutSelect(out, es, false);
+        }
+
+        if( i_mode == ES_OUT_MODE_END )
+            EsOutTerminate( out );
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_GET_WAKE_UP:
+    {
+        vlc_tick_t *pi_wakeup = va_arg( args, vlc_tick_t* );
+        *pi_wakeup = EsOutGetWakeup( out );
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_SET_ES_LIST:
+    {
+        enum es_format_category_e cat = va_arg( args, enum es_format_category_e );
+        vlc_es_id_t *const*es_id_list = va_arg( args, vlc_es_id_t ** );
+        EsOutSelectList( out, cat, es_id_list );
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_SET_AUTOSELECT:
     {
         int i_cat = va_arg( args, int );
         bool b_enabled = va_arg( args, int );
@@ -3541,12 +3314,244 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         }
         return VLC_SUCCESS;
     }
-    default:
-        msg_Err( p_sys->p_input, "unknown query 0x%x in %s", i_query,
-                 __func__  );
-        return VLC_EGENERIC;
+    case ES_OUT_PRIV_SET_ES_BY_ID:
+    case ES_OUT_PRIV_RESTART_ES_BY_ID:
+    case ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID:
+    {
+        const int i_id = va_arg( args, int );
+        es_out_id_t *p_es = EsOutGetFromID( out, i_id );
+        int i_new_query = 0;
+
+        switch( query )
+        {
+        case ES_OUT_PRIV_SET_ES_BY_ID:
+            i_new_query = ES_OUT_SET_ES;
+            p_es->b_forced = va_arg( args, int );
+            break;
+        case ES_OUT_PRIV_RESTART_ES_BY_ID:
+            i_new_query = ES_OUT_RESTART_ES;
+            break;
+        case ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID:
+            i_new_query = ES_OUT_SET_ES_DEFAULT;
+            break;
+        default:
+          vlc_assert_unreachable();
+        }
+        int i_ret = EsOutControlLocked( out, i_new_query, p_es );
+
+        return i_ret;
     }
+    case ES_OUT_PRIV_STOP_ALL_ES:
+    {
+        es_out_id_t *es;
+        int count = 0;
+
+        foreach_es_then_es_slaves(es)
+            count++;
+
+        int *selected_es = vlc_alloc(count + 1, sizeof(int));
+        if (!selected_es)
+            return VLC_ENOMEM;
+
+        *va_arg(args, void **) = selected_es;
+        *selected_es = count;
+
+        foreach_es_then_es_slaves(es)
+        {
+            if (EsIsSelected(es))
+            {
+                EsOutDestroyDecoder(out, es);
+                *++selected_es = es->fmt.i_id;
+            }
+            else
+                *++selected_es = -1;
+        }
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_START_ALL_ES:
+    {
+        int *selected_es = va_arg( args, void * );
+        int count = selected_es[0];
+        for( int i = 0; i < count; ++i )
+        {
+            int i_id = selected_es[i + 1];
+            if( i_id != -1 )
+            {
+                es_out_id_t *p_es = EsOutGetFromID( out, i_id );
+                EsOutCreateDecoder( out, p_es );
+            }
+        }
+        free(selected_es);
+        EsOutStopFreeVout( out );
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_GET_BUFFERING:
+    {
+        bool *pb = va_arg( args, bool* );
+        *pb = p_sys->b_buffering;
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_SET_ES_DELAY:
+    {
+        es_out_id_t *es = va_arg(args, es_out_id_t *);
+        const vlc_tick_t delay = va_arg(args, vlc_tick_t);
+        EsOutSetEsDelay(out, es, delay);
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_SET_DELAY:
+    {
+        const int i_cat = va_arg( args, int );
+        const vlc_tick_t i_delay = va_arg( args, vlc_tick_t );
+        EsOutSetDelay( out, i_cat, i_delay );
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_SET_RECORD_STATE:
+    {
+        bool b = va_arg( args, int );
+        return EsOutSetRecord( out, b );
+    }
+    case ES_OUT_PRIV_SET_PAUSE_STATE:
+    {
+        const bool b_source_paused = (bool)va_arg( args, int );
+        const bool b_paused = (bool)va_arg( args, int );
+        const vlc_tick_t i_date = va_arg( args, vlc_tick_t );
+
+        assert( !b_source_paused == !b_paused );
+        EsOutChangePause( out, b_paused, i_date );
+
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_SET_RATE:
+    {
+        const float src_rate = va_arg( args, double );
+        const float rate = va_arg( args, double );
+
+        assert( src_rate == rate );
+        EsOutChangeRate( out, rate );
+
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_SET_FRAME_NEXT:
+        EsOutFrameNext( out );
+        return VLC_SUCCESS;
+    case ES_OUT_PRIV_SET_TIMES:
+    {
+        double f_position = va_arg( args, double );
+        vlc_tick_t i_time = va_arg( args, vlc_tick_t );
+        vlc_tick_t i_normal_time = va_arg( args, vlc_tick_t );
+        vlc_tick_t i_length = va_arg( args, vlc_tick_t );
+
+        if( !p_sys->b_buffering )
+        {
+            vlc_tick_t i_delay;
+
+            /* Fix for buffering delay */
+            if( !input_priv(p_sys->p_input)->p_sout ||
+                !input_priv(p_sys->p_input)->b_out_pace_control )
+                i_delay = EsOutGetBuffering( out );
+            else
+                i_delay = 0;
+
+            if( i_time != VLC_TICK_INVALID )
+            {
+                i_time -= i_delay;
+                if( i_time < VLC_TICK_0 )
+                    i_time = VLC_TICK_0;
+            }
+
+            if( i_length != VLC_TICK_INVALID )
+                f_position -= (double)i_delay / i_length;
+            if( f_position < 0 )
+                f_position = 0;
+
+            assert( i_normal_time >= VLC_TICK_0 );
+
+            input_SendEventTimes( p_sys->p_input, f_position, i_time,
+                                  i_normal_time, i_length );
+        }
+        else
+            input_SendEventTimes( p_sys->p_input, 0.0, VLC_TICK_INVALID,
+                                  i_normal_time, i_length );
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_SET_JITTER:
+    {
+        vlc_tick_t i_pts_delay  = va_arg( args, vlc_tick_t );
+        vlc_tick_t i_pts_jitter = va_arg( args, vlc_tick_t );
+        int     i_cr_average = va_arg( args, int );
+        es_out_pgrm_t *pgrm;
+
+        const vlc_tick_t i_tracks_pts_delay = EsOutGetTracksDelay(out);
+        bool b_change_clock =
+            i_pts_delay != p_sys->i_pts_delay ||
+            i_pts_jitter != p_sys->i_pts_jitter ||
+            i_cr_average != p_sys->i_cr_average ||
+            i_tracks_pts_delay != p_sys->i_tracks_pts_delay;
+
+        assert( i_pts_jitter >= 0 );
+        p_sys->i_pts_delay  = i_pts_delay;
+        p_sys->i_pts_jitter = i_pts_jitter;
+        p_sys->i_cr_average = i_cr_average;
+        p_sys->i_tracks_pts_delay = i_tracks_pts_delay;
+
+        if (b_change_clock)
+        {
+            i_pts_delay += i_pts_jitter + i_tracks_pts_delay;
+
+            vlc_list_foreach(pgrm, &p_sys->programs, node)
+            {
+                input_clock_SetJitter(pgrm->p_input_clock, i_pts_delay,
+                                      i_cr_average);
+                vlc_clock_main_SetInputDejitter(pgrm->p_main_clock, i_pts_delay);
+            }
+        }
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_GET_GROUP_FORCED:
+    {
+        int *pi_group = va_arg( args, int * );
+        *pi_group = p_sys->i_group_id;
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_SET_EOS:
+    {
+        es_out_id_t *id;
+        foreach_es_then_es_slaves(id)
+            if (id->p_dec != NULL)
+                input_DecoderDrain(id->p_dec);
+        return VLC_SUCCESS;
+    }
+    case ES_OUT_PRIV_SET_VBI_PAGE:
+    case ES_OUT_PRIV_SET_VBI_TRANSPARENCY:
+    {
+        es_out_id_t *es = va_arg( args, es_out_id_t * );
+        assert(es);
+        if( !es->p_dec || es->fmt.i_cat != SPU_ES
+          || es->fmt.i_codec != VLC_CODEC_TELETEXT )
+            return VLC_EGENERIC;
+
+        int ret;
+        if( query == ES_OUT_PRIV_SET_VBI_PAGE )
+        {
+            unsigned page = va_arg( args, unsigned );
+            ret = var_SetInteger( es->p_dec, "vbi-page", page );
+            if( ret == VLC_SUCCESS )
+                input_SendEventVbiPage( p_sys->p_input, page );
+        }
+        else
+        {
+            bool opaque = va_arg( args, int );
+            ret = var_SetBool( es->p_dec, "vbi-opaque", opaque );
+            if( ret == VLC_SUCCESS )
+                input_SendEventVbiTransparency( p_sys->p_input, opaque );
+        }
+        return ret;
+    }
+    default: vlc_assert_unreachable();
+    }
+
 }
+
 static int EsOutControl( es_out_t *out, int i_query, va_list args )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
@@ -3559,6 +3564,27 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
     return i_ret;
 }
 
+static int EsOutPrivControlLocked( es_out_t *out, int i_query, ... )
+{
+    va_list args;
+
+    va_start( args, i_query );
+    int ret = EsOutVaPrivControlLocked( out, i_query, args );
+    va_end( args );
+    return ret;
+}
+
+static int EsOutPrivControl( es_out_t *out, int query, va_list args )
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+
+    vlc_mutex_lock( &p_sys->lock );
+    int ret = EsOutVaPrivControlLocked( out, query, args );
+    vlc_mutex_unlock( &p_sys->lock );
+
+    return ret;
+}
+
 static const struct es_out_callbacks es_out_cbs =
 {
     .add = EsOutAdd,
@@ -3566,6 +3592,7 @@ static const struct es_out_callbacks es_out_cbs =
     .del = EsOutDel,
     .control = EsOutControl,
     .destroy = EsOutDelete,
+    .priv_control = EsOutPrivControl,
 };
 
 /****************************************************************************

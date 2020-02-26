@@ -38,78 +38,93 @@ enum es_out_mode_e
 enum es_out_query_private_e
 {
     /* set/get mode */
-    ES_OUT_SET_MODE = ES_OUT_PRIVATE_START,         /* arg1= int                            */
+    ES_OUT_PRIV_SET_MODE,                           /* arg1= int */
 
     /* Get date to wait before demuxing more data */
-    ES_OUT_GET_WAKE_UP,                             /* arg1=vlc_tick_t*            res=cannot fail */
+    ES_OUT_PRIV_GET_WAKE_UP,                        /* arg1=vlc_tick_t*            res=cannot fail */
 
     /* Select a list of ES */
-    ES_OUT_SET_ES_LIST, /* arg1= es_out_id_t *const* (null terminated array) */
+    ES_OUT_PRIV_SET_ES_LIST, /* arg1= es_out_id_t *const* (null terminated array) */
 
     /* Disable autoselection of tracks from a given category */
-    ES_OUT_SET_AUTOSELECT,  /* arg1= int (es category),
-                               arg2= int (enabled/disabled), res=can fail */
+    ES_OUT_PRIV_SET_AUTOSELECT,  /* arg1= int (es category),
+                                    arg2= int (enabled/disabled), res=can fail */
 
     /* Wrapper for some ES command to work with id */
-    ES_OUT_SET_ES_BY_ID,                            /* arg1= int, arg2= bool (forced) */
-    ES_OUT_RESTART_ES_BY_ID,
-    ES_OUT_SET_ES_DEFAULT_BY_ID,
+    ES_OUT_PRIV_SET_ES_BY_ID,                       /* arg1= int, arg2= bool (forced) */
+    ES_OUT_PRIV_RESTART_ES_BY_ID,
+    ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID,
 
     /* Stop all selected ES and save the stopped state in a context. free the
-     * context or call ES_OUT_STOP_ALL_ES */
-    ES_OUT_STOP_ALL_ES,                             /* arg1=void ** */
-    /* Start all ES from the context returned by ES_OUT_STOP_ALL_ES */
-    ES_OUT_START_ALL_ES,                            /* arg1=void * */
+     * context or call ES_OUT_PRIV_STOP_ALL_ES */
+    ES_OUT_PRIV_STOP_ALL_ES,                        /* arg1=void ** */
+    /* Start all ES from the context returned by ES_OUT_PRIV_STOP_ALL_ES */
+    ES_OUT_PRIV_START_ALL_ES,                       /* arg1=void * */
 
     /* Get buffering state */
-    ES_OUT_GET_BUFFERING,                           /* arg1=bool*               res=cannot fail */
+    ES_OUT_PRIV_GET_BUFFERING,                      /* arg1=bool*               res=cannot fail */
 
     /* Set delay for an ES identifier */
-    ES_OUT_SET_ES_DELAY,                            /* arg1=es_out_id_t *, res=cannot fail */
+    ES_OUT_PRIV_SET_ES_DELAY,                       /* arg1=es_out_id_t *, res=cannot fail */
 
     /* Set delay for a ES category */
-    ES_OUT_SET_DELAY,                               /* arg1=es_category_e,      res=cannot fail */
+    ES_OUT_PRIV_SET_DELAY,                          /* arg1=es_category_e,      res=cannot fail */
 
     /* Set record state */
-    ES_OUT_SET_RECORD_STATE,                        /* arg1=bool                res=can fail */
+    ES_OUT_PRIV_SET_RECORD_STATE,                        /* arg1=bool                res=can fail */
 
     /* Set pause state */
-    ES_OUT_SET_PAUSE_STATE,                         /* arg1=bool b_source_paused, bool b_paused arg2=vlc_tick_t res=can fail */
+    ES_OUT_PRIV_SET_PAUSE_STATE,                    /* arg1=bool b_source_paused, bool b_paused arg2=vlc_tick_t res=can fail */
 
     /* Set rate */
-    ES_OUT_SET_RATE,                                /* arg1=double source_rate arg2=double rate res=can fail */
+    ES_OUT_PRIV_SET_RATE,                           /* arg1=double source_rate arg2=double rate res=can fail */
 
     /* Set next frame */
-    ES_OUT_SET_FRAME_NEXT,                          /*                          res=can fail */
+    ES_OUT_PRIV_SET_FRAME_NEXT,                     /*                          res=can fail */
 
     /* Set position/time/length */
-    ES_OUT_SET_TIMES,                               /* arg1=double f_position arg2=vlc_tick_t i_time arg3=vlc_tick_t i_normal_time arg4=vlc_tick_t i_length res=cannot fail */
+    ES_OUT_PRIV_SET_TIMES,                          /* arg1=double f_position arg2=vlc_tick_t i_time arg3=vlc_tick_t i_normal_time arg4=vlc_tick_t i_length res=cannot fail */
 
     /* Set jitter */
-    ES_OUT_SET_JITTER,                              /* arg1=vlc_tick_t i_pts_delay arg2= vlc_tick_t i_pts_jitter, arg2=int i_cr_average res=cannot fail */
+    ES_OUT_PRIV_SET_JITTER,                         /* arg1=vlc_tick_t i_pts_delay arg2= vlc_tick_t i_pts_jitter, arg2=int i_cr_average res=cannot fail */
 
     /* Get forced group */
-    ES_OUT_GET_GROUP_FORCED,                        /* arg1=int * res=cannot fail */
+    ES_OUT_PRIV_GET_GROUP_FORCED,                   /* arg1=int * res=cannot fail */
 
     /* Set End Of Stream */
-    ES_OUT_SET_EOS,                                 /* res=cannot fail */
+    ES_OUT_PRIV_SET_EOS,                            /* res=cannot fail */
 
     /* Set a VBI/Teletext page */
-    ES_OUT_SET_VBI_PAGE,                            /* arg1=unsigned res=can fail */
+    ES_OUT_PRIV_SET_VBI_PAGE,                       /* arg1=unsigned res=can fail */
 
     /* Set VBI/Teletext menu transparent */
-    ES_OUT_SET_VBI_TRANSPARENCY                     /* arg1=bool res=can fail */
+    ES_OUT_PRIV_SET_VBI_TRANSPARENCY                /* arg1=bool res=can fail */
 };
+
+static inline int es_out_vaPrivControl( es_out_t *out, int query, va_list args )
+{
+    vlc_assert( out->cbs->priv_control );
+    return out->cbs->priv_control( out, query, args );
+}
+
+static inline int es_out_PrivControl( es_out_t *out, int query, ... )
+{
+    va_list args;
+    va_start( args, query );
+    int result = es_out_vaPrivControl( out, query, args );
+    va_end( args );
+    return result;
+}
 
 static inline void es_out_SetMode( es_out_t *p_out, int i_mode )
 {
-    int i_ret = es_out_Control( p_out, ES_OUT_SET_MODE, i_mode );
+    int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_SET_MODE, i_mode );
     assert( !i_ret );
 }
 static inline vlc_tick_t es_out_GetWakeup( es_out_t *p_out )
 {
     vlc_tick_t i_wu;
-    int i_ret = es_out_Control( p_out, ES_OUT_GET_WAKE_UP, &i_wu );
+    int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_GET_WAKE_UP, &i_wu );
 
     assert( !i_ret );
     return i_wu;
@@ -117,7 +132,7 @@ static inline vlc_tick_t es_out_GetWakeup( es_out_t *p_out )
 static inline bool es_out_GetBuffering( es_out_t *p_out )
 {
     bool b;
-    int i_ret = es_out_Control( p_out, ES_OUT_GET_BUFFERING, &b );
+    int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_GET_BUFFERING, &b );
 
     assert( !i_ret );
     return b;
@@ -132,55 +147,55 @@ static inline bool es_out_GetEmpty( es_out_t *p_out )
 }
 static inline void es_out_SetEsDelay( es_out_t *p_out, es_out_id_t *es, vlc_tick_t i_delay )
 {
-    int i_ret = es_out_Control( p_out, ES_OUT_SET_ES_DELAY, es, i_delay );
+    int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_SET_ES_DELAY, es, i_delay );
     assert( !i_ret );
 }
 static inline void es_out_SetDelay( es_out_t *p_out, int i_cat, vlc_tick_t i_delay )
 {
-    int i_ret = es_out_Control( p_out, ES_OUT_SET_DELAY, i_cat, i_delay );
+    int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_SET_DELAY, i_cat, i_delay );
     assert( !i_ret );
 }
 static inline int es_out_SetRecordState( es_out_t *p_out, bool b_record )
 {
-    return es_out_Control( p_out, ES_OUT_SET_RECORD_STATE, b_record );
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_RECORD_STATE, b_record );
 }
 static inline int es_out_SetPauseState( es_out_t *p_out, bool b_source_paused, bool b_paused, vlc_tick_t i_date )
 {
-    return es_out_Control( p_out, ES_OUT_SET_PAUSE_STATE, b_source_paused, b_paused, i_date );
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_PAUSE_STATE, b_source_paused, b_paused, i_date );
 }
 static inline int es_out_SetRate( es_out_t *p_out, float source_rate, float rate )
 {
-    return es_out_Control( p_out, ES_OUT_SET_RATE, source_rate, rate );
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_RATE, source_rate, rate );
 }
 static inline int es_out_SetFrameNext( es_out_t *p_out )
 {
-    return es_out_Control( p_out, ES_OUT_SET_FRAME_NEXT );
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_FRAME_NEXT );
 }
 static inline void es_out_SetTimes( es_out_t *p_out, double f_position,
                                     vlc_tick_t i_time, vlc_tick_t i_normal_time,
                                     vlc_tick_t i_length )
 {
-    int i_ret = es_out_Control( p_out, ES_OUT_SET_TIMES, f_position, i_time,
-                                i_normal_time, i_length );
+    int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_SET_TIMES, f_position, i_time,
+                                    i_normal_time, i_length );
     assert( !i_ret );
 }
 static inline void es_out_SetJitter( es_out_t *p_out,
                                      vlc_tick_t i_pts_delay, vlc_tick_t i_pts_jitter, int i_cr_average )
 {
-    int i_ret = es_out_Control( p_out, ES_OUT_SET_JITTER,
-                                i_pts_delay, i_pts_jitter, i_cr_average );
+    int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_SET_JITTER,
+                                    i_pts_delay, i_pts_jitter, i_cr_average );
     assert( !i_ret );
 }
 static inline int es_out_GetGroupForced( es_out_t *p_out )
 {
     int i_group;
-    int i_ret = es_out_Control( p_out, ES_OUT_GET_GROUP_FORCED, &i_group );
+    int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_GET_GROUP_FORCED, &i_group );
     assert( !i_ret );
     return i_group;
 }
 static inline void es_out_Eos( es_out_t *p_out )
 {
-    int i_ret = es_out_Control( p_out, ES_OUT_SET_EOS );
+    int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_SET_EOS );
     assert( !i_ret );
 }
 
