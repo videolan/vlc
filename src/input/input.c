@@ -2512,6 +2512,7 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
 {
     input_thread_private_t *priv = input_priv(p_input);
     const char *psz_access, *psz_demux, *psz_path, *psz_anchor = NULL;
+    const bool master = priv->master == in;
 
     assert( psz_mrl );
     char *psz_dup = strdup( psz_mrl );
@@ -2590,8 +2591,16 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
     char *url;
     if( likely(asprintf( &url, "%s://%s", psz_access, psz_path ) >= 0) )
     {
-        in->p_demux = InputDemuxNew( p_input, priv->p_es_out, in, url,
-                                     psz_demux, psz_anchor );
+        es_out_t *es_out;
+        if (!master )
+            es_out = in->p_slave_es_out =
+                input_EsOutSourceNew( priv->p_es_out, in );
+        else
+            es_out = priv->p_es_out;
+
+        if( es_out )
+            in->p_demux = InputDemuxNew( p_input, es_out, in, url,
+                                         psz_demux, psz_anchor );
         free( url );
     }
     else
@@ -2606,6 +2615,11 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
             vlc_dialog_display_error( p_input, _("Your input can't be opened"),
                                       _("VLC is unable to open the MRL '%s'."
                                       " Check the log for details."), psz_mrl );
+        if( in->p_slave_es_out )
+        {
+            es_out_Delete( in->p_slave_es_out );
+            in->p_slave_es_out = NULL;
+        }
         return VLC_EGENERIC;
     }
 
@@ -2627,6 +2641,11 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
         if( in->p_demux == NULL )
         {
             msg_Err(p_input, "Failed to create demux filter");
+            if( in->p_slave_es_out )
+            {
+                es_out_Delete( in->p_slave_es_out );
+                in->p_slave_es_out = NULL;
+            }
             return VLC_EGENERIC;
         }
     }
@@ -2761,6 +2780,8 @@ static void InputSourceDestroy( input_source_t *in )
 
     if( in->p_demux )
         demux_Delete( in->p_demux );
+    if( in->p_slave_es_out )
+        es_out_Delete( in->p_slave_es_out );
 
     if( in->i_title > 0 )
     {

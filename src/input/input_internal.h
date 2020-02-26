@@ -370,6 +370,8 @@ struct input_source_t
     vlc_atomic_rc_t rc;
 
     demux_t  *p_demux; /**< Demux object (most downstream) */
+    es_out_t *p_slave_es_out; /**< Slave es out */
+
     char *str_id;
     int auto_id;
 
