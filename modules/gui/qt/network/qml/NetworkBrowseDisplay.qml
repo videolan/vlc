@@ -49,7 +49,7 @@ Widgets.NavigableFocusScope {
             var initialIndex = 0
             if (delegateModelId.currentIndex !== -1)
                 initialIndex = delegateModelId.currentIndex
-            delegateModelId.items.get(initialIndex).inSelected = true
+            delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
             delegateModelId.currentIndex = initialIndex
         }
     }

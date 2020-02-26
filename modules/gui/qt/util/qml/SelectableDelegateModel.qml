@@ -58,6 +58,28 @@ DelegateModel {
         return list
     }
 
+    function select( index, command ) {
+        switch (command) {
+            case ItemSelectionModel.Select:
+                items.get(index).inSelected = true
+                break;
+            case ItemSelectionModel.Deselect:
+                items.get(index).inSelected = false
+                break;
+            case ItemSelectionModel.Toggle:
+                items.get(index).inSelected = !items.get(index).inSelected
+                break;
+            case ItemSelectionModel.Clear:
+                selectNone()
+                break;
+            case ItemSelectionModel.ClearAndSelect:
+                selectNone()
+                items.get(index).inSelected = true
+                selectionChanged()
+                break;
+        }
+    }
+
     function updateSelection( keymodifiers, oldIndex, newIndex ) {
         if ((keymodifiers & Qt.ShiftModifier)) {
             if ( shiftIndex === oldIndex) {

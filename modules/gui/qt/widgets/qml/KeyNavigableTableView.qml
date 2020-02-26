@@ -228,7 +228,7 @@ NavigableFocusScope {
             var initialIndex = 0
             if (view.currentIndex !== -1)
                 initialIndex = view.currentIndex
-            delegateModel.items.get(initialIndex).inSelected = true
+            delegateModel.select(initialIndex, ItemSelectionModel.ClearAndSelect)
             view.currentIndex = initialIndex
         }
     }

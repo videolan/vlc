@@ -54,8 +54,7 @@ Widgets.NavigableFocusScope {
         if (initialIndex >= delegateModel.items.count)
             initialIndex = 0
         if (initialIndex !== artistList.currentIndex) {
-            delegateModel.selectNone()
-            delegateModel.items.get(initialIndex).inSelected = true
+            delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
             artistList.currentIndex = initialIndex
             artistList.positionViewAtIndex(initialIndex, ItemView.Contain)
         }

@@ -57,8 +57,7 @@ Widgets.NavigableFocusScope {
         var initialIndex = root.initialIndex
         if (initialIndex >= videosDelegate.items.count)
             initialIndex = 0
-        videosDelegate.selectNone()
-        videosDelegate.items.get(initialIndex).inSelected = true
+        videosDelegate.select(initialIndex, ItemSelectionModel.ClearAndSelect)
         view.currentItem.currentIndex = initialIndex
         view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
@@ -193,7 +192,7 @@ Widgets.NavigableFocusScope {
              */
             onActiveFocusChanged: {
                 if (activeFocus && videosDelegate.items.count > 0 && !videosDelegate.hasSelection) {
-                    videosDelegate.items.get(0).inSelected = true
+                    videosDelegate.select(0, ItemSelectionModel.ClearAndSelect)
                 }
             }
 

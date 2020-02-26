@@ -66,8 +66,7 @@ Widgets.NavigableFocusScope {
         var initialIndex = root.initialIndex
         if (initialIndex >= delegateModelId.items.count)
             initialIndex = 0
-        delegateModelId.selectNone()
-        delegateModelId.items.get(initialIndex).inSelected = true
+        delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
         view.currentItem.currentIndex = initialIndex
         view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
     }

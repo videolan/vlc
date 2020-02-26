@@ -66,8 +66,7 @@ Widgets.NavigableFocusScope {
         var initialIndex = root.initialIndex
         if (initialIndex >= delegateModelId.items.count)
             initialIndex = 0
-        delegateModelId.selectNone()
-        delegateModelId.items.get(initialIndex).inSelected = true
+        delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
         view.currentItem.currentIndex = initialIndex
         view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
@@ -150,7 +149,7 @@ Widgets.NavigableFocusScope {
             var initialIndex = 0
             if (view.currentItem.currentIndex !== -1)
                 initialIndex = view.currentItem.currentIndex
-            delegateModelId.items.get(initialIndex).inSelected = true
+            delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
             view.currentItem.currentIndex = initialIndex
         }
     }
