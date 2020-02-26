@@ -371,6 +371,7 @@ struct input_source_t
 
     demux_t  *p_demux; /**< Demux object (most downstream) */
     char *str_id;
+    int auto_id;
 
     /* Title infos for that input */
     bool         b_title_demux; /* Titles/Seekpoints provided by demux */
@@ -655,6 +656,15 @@ void input_source_Release( input_source_t *in );
  * @return a string id or NULL if the source is the master
  */
 const char *input_source_GetStrId( input_source_t *in );
+
+/**
+ * Get a new fmt.i_id from the input source
+ *
+ * This auto id will be relative to this input source. It allows to have stable
+ * ids across different playback instances, by not relying on the input source
+ * addition order.
+ */
+int input_source_GetNewAutoId( input_source_t *in );
 
 /* Bound pts_delay */
 #define INPUT_PTS_DELAY_MAX VLC_TICK_FROM_SEC(60)

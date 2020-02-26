@@ -2747,6 +2747,11 @@ const char *input_source_GetStrId( input_source_t *in )
     return in->str_id;
 }
 
+int input_source_GetNewAutoId( input_source_t *in )
+{
+    return in->auto_id++;
+}
+
 /*****************************************************************************
  * InputSourceDestroy:
  *****************************************************************************/
