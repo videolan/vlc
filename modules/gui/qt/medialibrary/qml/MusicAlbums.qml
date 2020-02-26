@@ -60,40 +60,42 @@ Widgets.NavigableFocusScope {
     onParentIdChanged: resetFocus()
 
     function resetFocus() {
-        if (delegateModelId.items.count === 0) {
+        if (albumModelId.count === 0) {
             return
         }
         var initialIndex = root.initialIndex
-        if (initialIndex >= delegateModelId.items.count)
+        if (initialIndex >= albumModelId.count)
             initialIndex = 0
         delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
         view.currentItem.currentIndex = initialIndex
         view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
 
+    MLAlbumModel {
+        id: albumModelId
+        ml: medialib
+
+        onCountChanged: {
+            if (albumModelId.count > 0 && !delegateModelId.hasSelection) {
+                root.resetFocus()
+            }
+        }
+    }
+
     Util.SelectableDelegateModel {
         id: delegateModelId
         property alias parentId: albumModelId.parentId
 
-        model: MLAlbumModel {
-            id: albumModelId
-            ml: medialib
-        }
+        model: albumModelId
 
         delegate: Item {
-        }
-
-        onCountChanged: {
-            if (delegateModelId.items.count > 0 && !delegateModelId.hasSelection) {
-                root.resetFocus()
-            }
         }
 
         function actionAtIndex(index) {
             if (delegateModelId.selectedGroup.count > 1) {
                 medialib.addAndPlay( model.getIdsForIndexes( delegateModelId.selectedIndexes() ) )
             } else {
-                medialib.addAndPlay( model.getIdsForIndexes([index]) )
+                medialib.addAndPlay( model.getIdForIndex(index) )
             }
         }
     }
@@ -215,7 +217,7 @@ Widgets.NavigableFocusScope {
         id: view
 
         anchors.fill: parent
-        focus: delegateModelId.items.count !== 0
+        focus: albumModelId.count !== 0
 
         initialItem: medialib.gridView ? gridComponent : listComponent
 
@@ -241,7 +243,7 @@ Widgets.NavigableFocusScope {
 
     EmptyLabel {
         anchors.fill: parent
-        visible: delegateModelId.items.count === 0
+        visible: albumModelId.count === 0
         focus: visible
         text: i18n.qtr("No albums found\nPlease try adding sources, by going to the Network tab")
         navigationParent: root

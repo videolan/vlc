@@ -32,7 +32,7 @@ Widgets.NavigableFocusScope {
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
 
-    property alias contentModel: videosDelegate.model;
+    property alias contentModel: videoModel ;
 
     navigationCancel: function() {
         if (view.currentItem.currentIndex <= 0) {
@@ -51,11 +51,11 @@ Widgets.NavigableFocusScope {
     onContentModelChanged: resetFocus()
 
     function resetFocus() {
-        if (videosDelegate.items.count === 0) {
+        if (videoModel.count === 0) {
             return
         }
         var initialIndex = root.initialIndex
-        if (initialIndex >= videosDelegate.items.count)
+        if (initialIndex >= videoModel.count)
             initialIndex = 0
         videosDelegate.select(initialIndex, ItemSelectionModel.ClearAndSelect)
         view.currentItem.currentIndex = initialIndex
@@ -112,20 +112,24 @@ Widgets.NavigableFocusScope {
         onClosed: contextMenu.parent.forceActiveFocus()
 
     }
+
+    MLVideoModel {
+        id: videoModel
+        ml: medialib
+
+        onCountChanged: {
+            if (videoModel.count > 0 && !videosDelegate.hasSelection) {
+                root.resetFocus()
+            }
+        }
+    }
+
     Util.SelectableDelegateModel {
         id: videosDelegate
 
-        model: MLVideoModel {
-            id: videoModel
-            ml: medialib
-        }
-        delegate: Item{
-        }
+        model: videoModel
 
-        onCountChanged: {
-            if (videosDelegate.items.count > 0 && !videosDelegate.hasSelection) {
-                root.resetFocus()
-            }
+        delegate: Item{
         }
 
         function actionAtIndex(index) {
@@ -190,7 +194,7 @@ Widgets.NavigableFocusScope {
              * selectedGroup update itself after this event
              */
             onActiveFocusChanged: {
-                if (activeFocus && videosDelegate.items.count > 0 && !videosDelegate.hasSelection) {
+                if (activeFocus && videoModel.count > 0 && !videosDelegate.hasSelection) {
                     videosDelegate.select(0, ItemSelectionModel.ClearAndSelect)
                 }
             }
@@ -229,7 +233,7 @@ Widgets.NavigableFocusScope {
         id: view
         anchors.fill:parent
         clip: true
-        focus: videosDelegate.items.count !== 0
+        focus: videoModel.count !== 0
         initialItem: medialib.gridView ? gridComponent : listComponent
         Connections {
             target: medialib
@@ -245,7 +249,7 @@ Widgets.NavigableFocusScope {
 
     EmptyLabel {
         anchors.fill: parent
-        visible: videosDelegate.items.count === 0
+        visible: videoModel.count === 0
         focus: visible
         text: i18n.qtr("No video found\nPlease try adding sources, by going to the Network tab")
         navigationParent: root

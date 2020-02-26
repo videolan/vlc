@@ -60,11 +60,11 @@ Widgets.NavigableFocusScope {
     }
 
     function resetFocus() {
-        if (delegateModelId.items.count === 0) {
+        if (genreModel.count === 0) {
             return
         }
         var initialIndex = root.initialIndex
-        if (initialIndex >= delegateModelId.items.count)
+        if (initialIndex >= genreModel.count)
             initialIndex = 0
         delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
         view.currentItem.currentIndex = initialIndex
@@ -83,22 +83,25 @@ Widgets.NavigableFocusScope {
             width: root.width
         }
     }
+    MLGenreModel {
+        id: genreModel
+        ml: medialib
+
+        onCountChanged: {
+            if (genreModel.count > 0 && !delegateModelId.hasSelection) {
+                root.resetFocus()
+            }
+        }
+    }
 
     Util.SelectableDelegateModel {
         id: delegateModelId
-        model: MLGenreModel {
-            id: genreModel
-            ml: medialib
-        }
+
+        model: genreModel
 
         delegate: Item {
         }
 
-        onCountChanged: {
-            if (delegateModelId.items.count > 0 && !delegateModelId.hasSelection) {
-                root.resetFocus()
-            }
-        }
 
         function actionAtIndex(index) {
             if (delegateModelId.selectedGroup.count > 1) {
@@ -115,7 +118,7 @@ Widgets.NavigableFocusScope {
      * selectedGroup update itself after this event
      */
     onActiveFocusChanged: {
-        if (activeFocus && delegateModelId.items.count > 0 && !delegateModelId.hasSelection) {
+        if (activeFocus && genreModel.count > 0 && !delegateModelId.hasSelection) {
             var initialIndex = 0
             if (view.currentItem.currentIndex !== -1)
                 initialIndex = view.currentItem.currentIndex
@@ -230,12 +233,12 @@ Widgets.NavigableFocusScope {
         initialItem: medialib.gridView ? gridComponent : listComponent
 
         anchors.fill: parent
-        focus: delegateModelId.items.count !== 0
+        focus: genreModel.count !== 0
     }
 
     EmptyLabel {
         anchors.fill: parent
-        visible: delegateModelId.items.count === 0
+        visible: genreModel.count === 0
         focus: visible
         text: i18n.qtr("No genres found\nPlease try adding sources, by going to the Network tab")
         navigationParent: root

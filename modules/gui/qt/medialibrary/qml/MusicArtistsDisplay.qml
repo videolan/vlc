@@ -47,11 +47,11 @@ Widgets.NavigableFocusScope {
     }
 
     function resetFocus() {
-        if (delegateModel.items.count === 0) {
+        if (artistModel.count === 0) {
             return
         }
         var initialIndex = root.initialIndex
-        if (initialIndex >= delegateModel.items.count)
+        if (initialIndex >= artistModel.count)
             initialIndex = 0
         if (initialIndex !== artistList.currentIndex) {
             delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
@@ -60,21 +60,23 @@ Widgets.NavigableFocusScope {
         }
     }
 
-    Util.SelectableDelegateModel {
-        id: delegateModel
-        model: MLArtistModel {
-            id: artistModel
-            ml: medialib
-        }
+    MLArtistModel {
+        id: artistModel
+        ml: medialib
 
         onCountChanged: {
-            if (delegateModel.items.count > 0 && !delegateModel.hasSelection) {
+            if (artistModel.count > 0 && !delegateModel.hasSelection) {
                 var initialIndex = root.initialIndex
-                if (initialIndex >= delegateModel.items.count)
+                if (initialIndex >= artistModel.count)
                     initialIndex = 0
                 artistList.currentIndex = initialIndex
             }
         }
+    }
+
+    Util.SelectableDelegateModel {
+        id: delegateModel
+        model: artistModel
 
         delegate: Item {}
 
@@ -84,7 +86,7 @@ Widgets.NavigableFocusScope {
     }
 
     FocusScope {
-        visible: delegateModel.count > 0
+        visible: artistModel.count > 0
         focus: visible
         anchors.fill: parent
 
@@ -106,8 +108,8 @@ Widgets.NavigableFocusScope {
             onSelectAll: delegateModel.selectAll()
             onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onCurrentIndexChanged: {
-                if (artistList.currentIndex < delegateModel.count) {
-                    root.artistId = delegateModel.items.get(artistList.currentIndex).model.id
+                if (artistList.currentIndex < artistModel.count) {
+                    root.artistId =  artistModel.getIdForIndex(artistList.currentIndex)
                 } else {
                     root.artistId = undefined
                 }
@@ -207,7 +209,7 @@ Widgets.NavigableFocusScope {
 
     EmptyLabel {
         anchors.fill: parent
-        visible: delegateModel.count === 0
+        visible: artistModel.count === 0
         focus: visible
         text: i18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
         navigationParent: root
