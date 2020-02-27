@@ -410,7 +410,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     else
         priv->stats = NULL;
 
-    priv->p_es_out_display = input_EsOutNew( p_input, priv->rate );
+    priv->p_es_out_display = input_EsOutNew( p_input, priv->master, priv->rate );
     if( !priv->p_es_out_display )
     {
         Destroy( p_input );

@@ -165,6 +165,8 @@ typedef struct
 {
     input_thread_t *p_input;
 
+    input_source_t *main_source;
+
     /* */
     vlc_mutex_t   lock;
 
@@ -474,7 +476,7 @@ static const struct es_out_callbacks es_out_cbs;
 /*****************************************************************************
  * input_EsOutNew:
  *****************************************************************************/
-es_out_t *input_EsOutNew( input_thread_t *p_input, float rate )
+es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, float rate )
 {
     es_out_sys_t *p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )
@@ -484,6 +486,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, float rate )
 
     vlc_mutex_init( &p_sys->lock );
     p_sys->p_input = p_input;
+    p_sys->main_source = main_source;
 
     p_sys->b_active = false;
     p_sys->i_mode   = ES_OUT_MODE_NONE;
