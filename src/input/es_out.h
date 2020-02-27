@@ -43,6 +43,9 @@ enum es_out_query_private_e
     /* Get date to wait before demuxing more data */
     ES_OUT_GET_WAKE_UP,                             /* arg1=vlc_tick_t*            res=cannot fail */
 
+    /* Select a list of ES */
+    ES_OUT_SET_ES_LIST, /* arg1= es_out_id_t *const* (null terminated array) */
+
     /* Wrapper for some ES command to work with id */
     ES_OUT_SET_ES_BY_ID,                            /* arg1= int, arg2= bool (forced) */
     ES_OUT_RESTART_ES_BY_ID,
