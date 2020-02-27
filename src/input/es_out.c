@@ -3223,10 +3223,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
             return input_DecoderSetSpuHighlight( p_es->p_dec, spu_hl );
         return VLC_EGENERIC;
     }
-    default:
-        msg_Err( p_sys->p_input, "unknown query 0x%x in %s", i_query,
-                 __func__  );
-        return VLC_EGENERIC;
+    default: vlc_assert_unreachable();
     }
 }
 
