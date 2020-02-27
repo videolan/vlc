@@ -2005,20 +2005,6 @@ static bool Control( input_thread_t *p_input,
                                (size_t)1, &(const int){ param.val.i_int });
             break;
 
-        case INPUT_CONTROL_SET_ES_BY_ID:
-            /* No need to force update, es_out does it if needed */
-            es_out_Control( priv->p_es_out_display,
-                            ES_OUT_SET_ES_BY_ID, (int)param.val.i_int, true );
-
-            demux_Control( priv->master->p_demux, DEMUX_SET_ES,
-                    (int)param.val.i_int );
-            break;
-
-        case INPUT_CONTROL_RESTART_ES_BY_ID:
-            es_out_Control( priv->p_es_out_display,
-                            ES_OUT_RESTART_ES_BY_ID, (int)param.val.i_int );
-            break;
-
         case INPUT_CONTROL_SET_ES:
             if( es_out_Control( input_priv(p_input)->p_es_out_display,
                                 ES_OUT_SET_ES, vlc_es_id_get_out( param.id ) )
