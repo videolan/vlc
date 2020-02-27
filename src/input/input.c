@@ -270,6 +270,13 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     if( unlikely(priv == NULL) )
         return NULL;
 
+    priv->master = InputSourceNew();
+    if( !priv->master )
+    {
+        free( priv );
+        return NULL;
+    }
+
     input_thread_t *p_input = &priv->input;
 
     char * psz_name = input_item_GetName( p_item );
@@ -328,7 +335,6 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     priv->p_item = p_item;
 
     /* Init Input fields */
-    priv->master = NULL;
     vlc_mutex_lock( &p_item->lock );
 
     if( !p_item->p_stats )
@@ -432,6 +438,7 @@ static void Destroy(input_thread_t *input)
     if (priv->p_resource != NULL)
         input_resource_Release(priv->p_resource);
 
+    input_source_Release(priv->master);
     input_item_Release(priv->p_item);
 
     if (priv->stats != NULL)
@@ -1269,7 +1276,7 @@ static int Init( input_thread_t * p_input )
         goto error;
 
     /* */
-    priv->master = master = InputSourceNew();
+    master = priv->master;
     if( master == NULL )
         goto error;
     int ret = InputSourceInit( master, p_input, priv->p_item->psz_uri,
@@ -1277,7 +1284,6 @@ static int Init( input_thread_t * p_input )
     if( ret != VLC_SUCCESS )
     {
         InputSourceDestroy( master );
-        input_source_Release( master );
         goto error;
     }
 
@@ -1394,7 +1400,6 @@ static void End( input_thread_t * p_input )
 
     /* Clean up master */
     InputSourceDestroy( priv->master );
-    input_source_Release( priv->master );
     priv->i_title_offset = 0;
     priv->i_seekpoint_offset = 0;
 
