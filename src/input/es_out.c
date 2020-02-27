@@ -3278,6 +3278,22 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
             EsOutTerminate( out );
         return VLC_SUCCESS;
     }
+    case ES_OUT_PRIV_SET_ES:
+    case ES_OUT_PRIV_UNSET_ES:
+    case ES_OUT_PRIV_RESTART_ES:
+    {
+        vlc_es_id_t *es_id = va_arg( args, vlc_es_id_t * );
+        es_out_id_t *es = vlc_es_id_get_out( es_id );
+        int new_query;
+        switch( query )
+        {
+            case ES_OUT_PRIV_SET_ES: new_query = ES_OUT_SET_ES; break;
+            case ES_OUT_PRIV_UNSET_ES: new_query = ES_OUT_UNSET_ES; break;
+            case ES_OUT_PRIV_RESTART_ES: new_query = ES_OUT_RESTART_ES; break;
+            default: vlc_assert_unreachable();
+        }
+        return EsOutControlLocked( out, new_query, es );
+    }
     case ES_OUT_PRIV_GET_WAKE_UP:
     {
         vlc_tick_t *pi_wakeup = va_arg( args, vlc_tick_t* );

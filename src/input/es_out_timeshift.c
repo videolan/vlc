@@ -789,6 +789,9 @@ static int PrivControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_PRIV_GET_GROUP_FORCED:
         return es_out_vaPrivControl( p_sys->p_out, i_query, args );
     /* Invalid queries for this es_out level */
+    case ES_OUT_PRIV_SET_ES:
+    case ES_OUT_PRIV_UNSET_ES:
+    case ES_OUT_PRIV_RESTART_ES:
     case ES_OUT_PRIV_SET_ES_LIST:
     case ES_OUT_PRIV_SET_ES_BY_ID:
     case ES_OUT_PRIV_RESTART_ES_BY_ID:

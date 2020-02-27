@@ -40,6 +40,11 @@ enum es_out_query_private_e
     /* set/get mode */
     ES_OUT_PRIV_SET_MODE,                           /* arg1= int */
 
+    /* Same than ES_OUT_SET_ES/ES_OUT_UNSET_ES/ES_OUT_RESTART_ES, but with vlc_es_id_t * */
+    ES_OUT_PRIV_SET_ES,      /* arg1= vlc_es_id_t*                   */
+    ES_OUT_PRIV_UNSET_ES,    /* arg1= vlc_es_id_t* res=can fail      */
+    ES_OUT_PRIV_RESTART_ES,  /* arg1= vlc_es_id_t*                   */
+
     /* Get date to wait before demuxing more data */
     ES_OUT_PRIV_GET_WAKE_UP,                        /* arg1=vlc_tick_t*            res=cannot fail */
 
@@ -120,6 +125,18 @@ static inline void es_out_SetMode( es_out_t *p_out, int i_mode )
 {
     int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_SET_MODE, i_mode );
     assert( !i_ret );
+}
+static inline int es_out_SetEs( es_out_t *p_out, vlc_es_id_t *id )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_ES, id );
+}
+static inline int es_out_UnsetEs( es_out_t *p_out, vlc_es_id_t *id )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_UNSET_ES, id );
+}
+static inline int es_out_RestartEs( es_out_t *p_out, vlc_es_id_t *id )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_RESTART_ES, id );
 }
 static inline vlc_tick_t es_out_GetWakeup( es_out_t *p_out )
 {

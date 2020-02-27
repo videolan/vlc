@@ -2006,9 +2006,7 @@ static bool Control( input_thread_t *p_input,
             break;
 
         case INPUT_CONTROL_SET_ES:
-            if( es_out_Control( input_priv(p_input)->p_es_out_display,
-                                ES_OUT_SET_ES, vlc_es_id_get_out( param.id ) )
-                                == VLC_SUCCESS )
+            if( es_out_SetEs( priv->p_es_out_display, param.id ) == VLC_SUCCESS )
                 demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_ES,
                                vlc_es_id_GetInputId( param.id ) );
             break;
@@ -2041,12 +2039,10 @@ static bool Control( input_thread_t *p_input,
             break;
         }
         case INPUT_CONTROL_UNSET_ES:
-            es_out_Control( input_priv(p_input)->p_es_out_display,
-                            ES_OUT_UNSET_ES, vlc_es_id_get_out(param.id) );
+            es_out_UnsetEs( priv->p_es_out_display, param.id );
             break;
         case INPUT_CONTROL_RESTART_ES:
-            es_out_Control( input_priv(p_input)->p_es_out_display,
-                            ES_OUT_RESTART_ES, vlc_es_id_get_out( param.id ) );
+            es_out_RestartEs( priv->p_es_out_display, param.id );
             break;
 
         case INPUT_CONTROL_SET_VIEWPOINT:
