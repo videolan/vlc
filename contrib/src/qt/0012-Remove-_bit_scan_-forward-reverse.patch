@@ -1,0 +1,418 @@
+From 7f59c885535a7ba0c6271319759c3a853aedd55c Mon Sep 17 00:00:00 2001
+From: Erik Verbruggen <erik.verbruggen@theqtcompany.com>
+Date: Thu, 3 Dec 2015 12:50:44 +0100
+Subject: [PATCH 12/13] Remove _bit_scan_{forward,reverse}
+
+Use qCountTrailingZeroBits and qCountLeadingZeroBits from qalgorithms.h
+instead. Also extended these versions for MSVC. The _bit_scan_* versions
+stem from a time before the glorious days of qalgorithms.h. A big
+advantage is that these functions can be used on all platforms.
+
+Change-Id: I5a1b886371520310a7fe16e617635ea335046beb
+Reviewed-by: Simon Hausmann <simon.hausmann@qt.io>
+Backport-Of: e70324f8dd1f191556599cf60100dd0ad0b16708 (v5.8)
+---
+ src/corelib/codecs/qutfcodec.cpp |  16 +++-
+ src/corelib/kernel/qmath.h       |  22 ++---
+ src/corelib/tools/qalgorithms.h  | 139 +++++++++++++++++++++++++------
+ src/corelib/tools/qsimd_p.h      |  43 ----------
+ src/corelib/tools/qstring.cpp    |   8 +-
+ 5 files changed, 144 insertions(+), 84 deletions(-)
+
+diff --git a/src/corelib/codecs/qutfcodec.cpp b/src/corelib/codecs/qutfcodec.cpp
+index 476990fb7a..f82d999501 100644
+--- a/src/corelib/codecs/qutfcodec.cpp
++++ b/src/corelib/codecs/qutfcodec.cpp
+@@ -47,6 +47,16 @@ enum { Endian = 0, Data = 1 };
+ static const uchar utf8bom[] = { 0xef, 0xbb, 0xbf };
+ 
+ #if defined(__SSE2__) && defined(QT_COMPILER_SUPPORTS_SSE2)
++static Q_ALWAYS_INLINE uint qBitScanReverse(unsigned v) Q_DECL_NOTHROW
++{
++    uint result = qCountLeadingZeroBits(v);
++    // Now Invert the result: clz will count *down* from the msb to the lsb, so the msb index is 31
++    // and the lsb index is 0. The result for _bit_scan_reverse is expected to be the index when
++    // counting up: msb index is 0 (because it starts there), and the lsb index is 31.
++    result ^= sizeof(unsigned) * 8 - 1;
++    return result;
++}
++
+ static inline bool simdEncodeAscii(uchar *&dst, const ushort *&nextAscii, const ushort *&src, const ushort *end)
+ {
+     // do sixteen characters at a time
+@@ -75,9 +85,9 @@ static inline bool simdEncodeAscii(uchar *&dst, const ushort *&nextAscii, const
+             // find the next probable ASCII character
+             // we don't want to load 32 bytes again in this loop if we know there are non-ASCII
+             // characters still coming
+-            nextAscii = src + _bit_scan_reverse(n) + 1;
++            nextAscii = src + qBitScanReverse(n) + 1;
+ 
+-            n = _bit_scan_forward(n);
++            n = qCountTrailingZeroBits(n);
+             dst += n;
+             src += n;
+             return false;
+@@ -126,7 +136,7 @@ static inline bool simdDecodeAscii(ushort *&dst, const uchar *&nextAscii, const
+         // find the next probable ASCII character
+         // we don't want to load 16 bytes again in this loop if we know there are non-ASCII
+         // characters still coming
+-        n = _bit_scan_reverse(n);
++        n = qBitScanReverse(n);
+         nextAscii = src + (n / BitSpacing) + 1;
+         return false;
+ 
+diff --git a/src/corelib/kernel/qmath.h b/src/corelib/kernel/qmath.h
+index e60561c05f..d52895175f 100644
+--- a/src/corelib/kernel/qmath.h
++++ b/src/corelib/kernel/qmath.h
+@@ -39,6 +39,7 @@
+ #endif
+ 
+ #include <QtCore/qglobal.h>
++#include <QtCore/qalgorithms.h>
+ 
+ #ifndef _USE_MATH_DEFINES
+ #  define _USE_MATH_DEFINES
+@@ -235,20 +236,12 @@ Q_DECL_CONSTEXPR inline double qRadiansToDegrees(double radians)
+ }
+ 
+ 
+-#if defined(Q_CC_GNU)
+-// clz instructions exist in at least MIPS, ARM, PowerPC and X86, so we can assume this builtin always maps to an efficient instruction.
++#if defined(QT_HAS_BUILTIN_CLZ)
+ inline quint32 qNextPowerOfTwo(quint32 v)
+ {
+     if (v == 0)
+         return 1;
+-    return 2U << (31 ^ __builtin_clz(v));
+-}
+-
+-inline quint64 qNextPowerOfTwo(quint64 v)
+-{
+-    if (v == 0)
+-        return 1;
+-    return Q_UINT64_C(2) << (63 ^ __builtin_clzll(v));
++    return 2U << (31 ^ QAlgorithmsPrivate::qt_builtin_clz(v));
+ }
+ #else
+ inline quint32 qNextPowerOfTwo(quint32 v)
+@@ -261,7 +254,16 @@ inline quint32 qNextPowerOfTwo(quint32 v)
+     ++v;
+     return v;
+ }
++#endif
+ 
++#if defined(QT_HAS_BUILTIN_CLZLL)
++inline quint64 qNextPowerOfTwo(quint64 v)
++{
++    if (v == 0)
++        return 1;
++    return Q_UINT64_C(2) << (63 ^ QAlgorithmsPrivate::qt_builtin_clzll(v));
++}
++#else
+ inline quint64 qNextPowerOfTwo(quint64 v)
+ {
+     v |= v >> 1;
+diff --git a/src/corelib/tools/qalgorithms.h b/src/corelib/tools/qalgorithms.h
+index f066e5c28a..66b30e81a5 100644
+--- a/src/corelib/tools/qalgorithms.h
++++ b/src/corelib/tools/qalgorithms.h
+@@ -549,6 +549,105 @@ QT_DEPRECATED_X("Use std::binary_search") Q_OUTOFLINE_TEMPLATE RandomAccessItera
+ 
+ #endif // QT_DEPRECATED_SINCE(5, 2)
+ 
++// Clang had a bug where __builtin_ctz/clz is not marked as constexpr.
++#if defined Q_CC_CLANG && defined __apple_build_version__ &&  __clang_major__ < 7
++#  undef QT_HAS_CONSTEXPR_BUILTIN_CTZ_CLZ
++#else
++#  define QT_HAS_CONSTEXPR_BUILTIN_CTZ_CLZ
++#endif
++
++#if defined QT_HAS_CONSTEXPR_BUILTIN_CTZ_CLZ
++#if defined(Q_CC_GNU)
++#  define QT_HAS_BUILTIN_CTZS
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE uint qt_builtin_ctzs(quint16 v) Q_DECL_NOTHROW
++{
++#  if QT_HAS_BUILTIN(__builtin_ctzs) || defined(__BMI__)
++    return __builtin_ctzs(v);
++#  else
++    return __builtin_ctz(v);
++#  endif
++}
++#define QT_HAS_BUILTIN_CLZS
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE uint qt_builtin_clzs(quint16 v) Q_DECL_NOTHROW
++{
++#  if QT_HAS_BUILTIN(__builtin_clzs) || defined(__BMI__)
++    return __builtin_clzs(v);
++#  else
++    return __builtin_clz(v) - 16U;
++#  endif
++}
++#define QT_HAS_BUILTIN_CTZ
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE uint qt_builtin_ctz(quint32 v) Q_DECL_NOTHROW
++{
++    return __builtin_ctz(v);
++}
++#define QT_HAS_BUILTIN_CLZ
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE uint qt_builtin_clz(quint32 v) Q_DECL_NOTHROW
++{
++    return __builtin_clz(v);
++}
++#define QT_HAS_BUILTIN_CTZLL
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE uint qt_builtin_ctzll(quint64 v) Q_DECL_NOTHROW
++{
++    return __builtin_ctzll(v);
++}
++#define QT_HAS_BUILTIN_CLZLL
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE uint qt_builtin_clzll(quint64 v) Q_DECL_NOTHROW
++{
++    return __builtin_clzll(v);
++}
++#elif defined(Q_CC_MSVC) && !defined(Q_OS_WINCE)
++#define QT_HAS_BUILTIN_CTZ
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE unsigned long qt_builtin_ctz(quint32 val)
++{
++    unsigned long result;
++    _BitScanForward(&result, val);
++    return result;
++}
++#define QT_HAS_BUILTIN_CLZ
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE unsigned long qt_builtin_clz(quint32 val)
++{
++    unsigned long result;
++    _BitScanReverse(&result, val);
++    // Now Invert the result: clz will count *down* from the msb to the lsb, so the msb index is 31
++    // and the lsb index is 0. The result for the index when counting up: msb index is 0 (because it
++    // starts there), and the lsb index is 31.
++    result ^= sizeof(quint32) * 8 - 1;
++    return result;
++}
++#if Q_PROCESSOR_WORDSIZE == 8
++// These are only defined for 64bit builds.
++#define QT_HAS_BUILTIN_CTZLL
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE unsigned long qt_builtin_ctzll(quint64 val)
++{
++    unsigned long result;
++    _BitScanForward64(&result, val);
++    return result;
++}
++// MSVC calls it _BitScanReverse and returns the carry flag, which we don't need
++#define QT_HAS_BUILTIN_CLZLL
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE unsigned long qt_builtin_clzll(quint64 val)
++{
++    unsigned long result;
++    _BitScanReverse64(&result, val);
++    // see qt_builtin_clz
++    result ^= sizeof(quint64) * 8 - 1;
++    return result;
++}
++#endif
++#  define QT_HAS_BUILTIN_CTZS
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE uint qt_builtin_ctzs(quint16 v) Q_DECL_NOTHROW
++{
++    return qt_builtin_ctz(v);
++}
++#define QT_HAS_BUILTIN_CLZS
++Q_DECL_CONSTEXPR Q_ALWAYS_INLINE uint qt_builtin_clzs(quint16 v) Q_DECL_NOTHROW
++{
++    return qt_builtin_clz(v) - 16U;
++}
++#endif
++#endif // QT_HAS_CONSTEXPR_BUILTIN_CTZ_CLZ
++
+ } //namespace QAlgorithmsPrivate
+ 
+ 
+@@ -619,8 +718,8 @@ Q_DECL_CONST_FUNCTION Q_DECL_CONSTEXPR inline uint qPopulationCount(long unsigne
+ 
+ Q_DECL_RELAXED_CONSTEXPR inline uint qCountTrailingZeroBits(quint32 v) Q_DECL_NOTHROW
+ {
+-#if defined(Q_CC_GNU)
+-    return v ? __builtin_ctz(v) : 32U;
++#if defined(QT_HAS_BUILTIN_CTZ)
++    return v ? QAlgorithmsPrivate::qt_builtin_ctz(v) : 32U;
+ #else
+     // see http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightParallel
+     unsigned int c = 32; // c will be the number of zero bits on the right
+@@ -637,8 +736,8 @@ Q_DECL_RELAXED_CONSTEXPR inline uint qCountTrailingZeroBits(quint32 v) Q_DECL_NO
+ 
+ Q_DECL_RELAXED_CONSTEXPR inline uint qCountTrailingZeroBits(quint8 v) Q_DECL_NOTHROW
+ {
+-#if defined(Q_CC_GNU)
+-    return v ? __builtin_ctz(v) : 8U;
++#if defined(QT_HAS_BUILTIN_CTZ)
++    return v ? QAlgorithmsPrivate::qt_builtin_ctz(v) : 8U;
+ #else
+     unsigned int c = 8; // c will be the number of zero bits on the right
+     v &= -signed(v);
+@@ -652,12 +751,8 @@ Q_DECL_RELAXED_CONSTEXPR inline uint qCountTrailingZeroBits(quint8 v) Q_DECL_NOT
+ 
+ Q_DECL_RELAXED_CONSTEXPR inline uint qCountTrailingZeroBits(quint16 v) Q_DECL_NOTHROW
+ {
+-#if defined(Q_CC_GNU)
+-#  if QT_HAS_BUILTIN(__builtin_ctzs) || defined(__BMI__)
+-    return v ? __builtin_ctzs(v) : 16U;
+-#  else
+-    return v ? __builtin_ctz(v) : 16U;
+-#  endif
++#if defined(QT_HAS_BUILTIN_CTZS)
++    return v ? QAlgorithmsPrivate::qt_builtin_ctzs(v) : 16U;
+ #else
+     unsigned int c = 16; // c will be the number of zero bits on the right
+     v &= -signed(v);
+@@ -672,8 +767,8 @@ Q_DECL_RELAXED_CONSTEXPR inline uint qCountTrailingZeroBits(quint16 v) Q_DECL_NO
+ 
+ Q_DECL_RELAXED_CONSTEXPR inline uint qCountTrailingZeroBits(quint64 v) Q_DECL_NOTHROW
+ {
+-#if defined(Q_CC_GNU)
+-    return v ? __builtin_ctzll(v) : 64;
++#if defined(QT_HAS_BUILTIN_CTZLL)
++    return v ? QAlgorithmsPrivate::qt_builtin_ctzll(v) : 64;
+ #else
+     quint32 x = static_cast<quint32>(v);
+     return x ? qCountTrailingZeroBits(x)
+@@ -688,8 +783,8 @@ Q_DECL_RELAXED_CONSTEXPR inline uint qCountTrailingZeroBits(unsigned long v) Q_D
+ 
+ Q_DECL_RELAXED_CONSTEXPR inline uint qCountLeadingZeroBits(quint32 v) Q_DECL_NOTHROW
+ {
+-#if defined(Q_CC_GNU)
+-    return v ? __builtin_clz(v) : 32U;
++#if defined(QT_HAS_BUILTIN_CLZ)
++    return v ? QAlgorithmsPrivate::qt_builtin_clz(v) : 32U;
+ #else
+     // Hacker's Delight, 2nd ed. Fig 5-16, p. 102
+     v = v | (v >> 1);
+@@ -703,8 +798,8 @@ Q_DECL_RELAXED_CONSTEXPR inline uint qCountLeadingZeroBits(quint32 v) Q_DECL_NOT
+ 
+ Q_DECL_RELAXED_CONSTEXPR inline uint qCountLeadingZeroBits(quint8 v) Q_DECL_NOTHROW
+ {
+-#if defined(Q_CC_GNU)
+-    return v ? __builtin_clz(v)-24U : 8U;
++#if defined(QT_HAS_BUILTIN_CLZ)
++    return v ? QAlgorithmsPrivate::qt_builtin_clz(v)-24U : 8U;
+ #else
+     v = v | (v >> 1);
+     v = v | (v >> 2);
+@@ -715,12 +810,8 @@ Q_DECL_RELAXED_CONSTEXPR inline uint qCountLeadingZeroBits(quint8 v) Q_DECL_NOTH
+ 
+ Q_DECL_RELAXED_CONSTEXPR inline uint qCountLeadingZeroBits(quint16 v) Q_DECL_NOTHROW
+ {
+-#if defined(Q_CC_GNU)
+-#  if QT_HAS_BUILTIN(__builtin_clzs) || defined(__BMI__)
+-    return v ? __builtin_clzs(v) : 16U;
+-#  else
+-    return v ? __builtin_clz(v)-16U : 16U;
+-#  endif
++#if defined(QT_HAS_BUILTIN_CLZS)
++    return v ? QAlgorithmsPrivate::qt_builtin_clzs(v) : 16U;
+ #else
+     v = v | (v >> 1);
+     v = v | (v >> 2);
+@@ -732,8 +823,8 @@ Q_DECL_RELAXED_CONSTEXPR inline uint qCountLeadingZeroBits(quint16 v) Q_DECL_NOT
+ 
+ Q_DECL_RELAXED_CONSTEXPR inline uint qCountLeadingZeroBits(quint64 v) Q_DECL_NOTHROW
+ {
+-#if defined(Q_CC_GNU)
+-    return v ? __builtin_clzll(v) : 64U;
++#if defined(QT_HAS_BUILTIN_CLZLL)
++    return v ? QAlgorithmsPrivate::qt_builtin_clzll(v) : 64U;
+ #else
+     v = v | (v >> 1);
+     v = v | (v >> 2);
+diff --git a/src/corelib/tools/qsimd_p.h b/src/corelib/tools/qsimd_p.h
+index d689654b29..ff1fe34eb9 100644
+--- a/src/corelib/tools/qsimd_p.h
++++ b/src/corelib/tools/qsimd_p.h
+@@ -430,49 +430,6 @@ static inline quint64 qCpuFeatures()
+ #define qCpuHasFeature(feature)     ((qCompilerCpuFeatures & (Q_UINT64_C(1) << CpuFeature ## feature)) \
+                                      || (qCpuFeatures() & (Q_UINT64_C(1) << CpuFeature ## feature)))
+ 
+-#ifdef Q_PROCESSOR_X86
+-// Bit scan functions for x86
+-#  if defined(Q_CC_MSVC)
+-#    if defined _WIN32_WCE && _WIN32_WCE < 0x800
+-extern "C" unsigned char _BitScanForward(unsigned long* Index, unsigned long Mask);
+-extern "C" unsigned char _BitScanReverse(unsigned long* Index, unsigned long Mask);
+-#       pragma intrinsic(_BitScanForward)
+-#       pragma intrinsic(_BitScanReverse)
+-#    endif
+-// MSVC calls it _BitScanReverse and returns the carry flag, which we don't need
+-static __forceinline unsigned long _bit_scan_reverse(uint val)
+-{
+-    unsigned long result;
+-    _BitScanReverse(&result, val);
+-    return result;
+-}
+-static __forceinline unsigned long _bit_scan_forward(uint val)
+-{
+-    unsigned long result;
+-    _BitScanForward(&result, val);
+-    return result;
+-}
+-#  elif (defined(Q_CC_CLANG) || (defined(Q_CC_GNU) && Q_CC_GNU < 405)) \
+-    && !defined(Q_CC_INTEL)
+-// Clang is missing the intrinsic for _bit_scan_reverse
+-// GCC only added it in version 4.5
+-static inline __attribute__((always_inline))
+-unsigned _bit_scan_reverse(unsigned val)
+-{
+-    unsigned result;
+-    asm("bsr %1, %0" : "=r" (result) : "r" (val));
+-    return result;
+-}
+-static inline __attribute__((always_inline))
+-unsigned _bit_scan_forward(unsigned val)
+-{
+-    unsigned result;
+-    asm("bsf %1, %0" : "=r" (result) : "r" (val));
+-    return result;
+-}
+-#  endif
+-#endif // Q_PROCESSOR_X86
+-
+ #define ALIGNMENT_PROLOGUE_16BYTES(ptr, i, length) \
+     for (; i < static_cast<int>(qMin(static_cast<quintptr>(length), ((4 - ((reinterpret_cast<quintptr>(ptr) >> 2) & 0x3)) & 0x3))); ++i)
+ 
+diff --git a/src/corelib/tools/qstring.cpp b/src/corelib/tools/qstring.cpp
+index 645d213d82..85f70a3e34 100644
+--- a/src/corelib/tools/qstring.cpp
++++ b/src/corelib/tools/qstring.cpp
+@@ -464,7 +464,7 @@ static int ucstrncmp(const QChar *a, const QChar *b, int l)
+         uint mask = ~_mm_movemask_epi8(result);
+         if (ushort(mask)) {
+             // found a different byte
+-            uint idx = uint(_bit_scan_forward(mask));
++            uint idx = qCountTrailingZeroBits(mask);
+             return reinterpret_cast<const QChar *>(ptr + idx)->unicode()
+                     - reinterpret_cast<const QChar *>(ptr + distance + idx)->unicode();
+         }
+@@ -565,7 +565,7 @@ static int ucstrncmp(const QChar *a, const uchar *c, int l)
+ #  endif
+         if (mask) {
+             // found a different character
+-            uint idx = uint(_bit_scan_forward(mask));
++            uint idx = qCountTrailingZeroBits(mask);
+             return uc[offset + idx / 2] - c[offset + idx / 2];
+         }
+     }
+@@ -583,7 +583,7 @@ static int ucstrncmp(const QChar *a, const uchar *c, int l)
+         uint mask = ~_mm_movemask_epi8(result);
+         if (ushort(mask)) {
+             // found a different character
+-            uint idx = uint(_bit_scan_forward(mask));
++            uint idx = qCountTrailingZeroBits(mask);
+             return uc[offset + idx / 2] - c[offset + idx / 2];
+         }
+ 
+@@ -678,7 +678,7 @@ static int findChar(const QChar *str, int len, QChar ch, int from,
+                     // found a match
+                     // same as: return n - s + _bit_scan_forward(mask) / 2
+                     return (reinterpret_cast<const char *>(n) - reinterpret_cast<const char *>(s)
+-                            + _bit_scan_forward(mask)) >> 1;
++                            + qCountTrailingZeroBits(mask)) >> 1;
+                 }
+             }
+ 
+-- 
+2.21.1 (Apple Git-122.3)
+

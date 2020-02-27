@@ -1,0 +1,159 @@
+From 35a0fcb2f7934189701a4a328d3d2896bda75d22 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Wed, 1 Jul 2015 14:38:22 -0700
+Subject: [PATCH 10/13] Add the QT_HAS_xxx macros for post-C++11 feature
+ testing
+
+And for compiler extensions. QT_HAS_BUILTIN and QT_HAS_ATTRIBUTE will
+come in handy.
+
+Change-Id: I255870833a024a36adf6ffff13ecf06624bfc1ef
+Reviewed-by: Olivier Goffart (Woboq GmbH) <ogoffart@woboq.com>
+Backport-Of: 6f298be07681f4038ddd5694d259ef64a574ac6f (v5.7)
+---
+ src/corelib/global/qcompilerdetection.h | 31 +++++++++++++++++++++++++
+ src/corelib/global/qendian.h            |  2 --
+ src/corelib/global/qlogging.cpp         |  8 ++-----
+ src/corelib/global/qnumeric_p.h         | 16 +++++--------
+ 4 files changed, 39 insertions(+), 18 deletions(-)
+
+diff --git a/src/corelib/global/qcompilerdetection.h b/src/corelib/global/qcompilerdetection.h
+index 038ad03cb0..60c11003ba 100644
+--- a/src/corelib/global/qcompilerdetection.h
++++ b/src/corelib/global/qcompilerdetection.h
+@@ -1164,6 +1164,37 @@
+ #  define QT_HAS_FEATURE(x)             0
+ #endif
+ 
++/*
++ * SG10's SD-6 feature detection and some useful extensions from Clang and GCC
++ * https://isocpp.org/std/standing-documents/sd-6-sg10-feature-test-recommendations
++ * http://clang.llvm.org/docs/LanguageExtensions.html#feature-checking-macros
++ */
++#ifdef __has_builtin
++#  define QT_HAS_BUILTIN(x)             __has_builtin(x)
++#else
++#  define QT_HAS_BUILTIN(x)             0
++#endif
++#ifdef __has_attribute
++#  define QT_HAS_ATTRIBUTE(x)           __has_attribute(x)
++#else
++#  define QT_HAS_ATTRIBUTE(x)           0
++#endif
++#ifdef __has_cpp_attribute
++#  define QT_HAS_CPP_ATTRIBUTE(x)       __has_cpp_attribute(x)
++#else
++#  define QT_HAS_CPP_ATTRIBUTE(x)       0
++#endif
++#ifdef __has_include
++#  define QT_HAS_INCLUDE(x)             __has_include(x)
++#else
++#  define QT_HAS_INCLUDE(x)             0
++#endif
++#ifdef __has_include_next
++#  define QT_HAS_INCLUDE_NEXT(x)        __has_include_next(x)
++#else
++#  define QT_HAS_INCLUDE_NEXT(x)        0
++#endif
++
+ /*
+  * Warning/diagnostic handling
+  */
+diff --git a/src/corelib/global/qendian.h b/src/corelib/global/qendian.h
+index 23dda270e3..a678d567ae 100644
+--- a/src/corelib/global/qendian.h
++++ b/src/corelib/global/qendian.h
+@@ -164,8 +164,6 @@ template <> inline quint16 qbswap<quint16>(quint16 source)
+ }
+ #endif // GCC & Clang intrinsics
+ 
+-#undef QT_HAS_BUILTIN
+-
+ // signed specializations
+ template <> inline qint64 qbswap<qint64>(qint64 source)
+ {
+diff --git a/src/corelib/global/qlogging.cpp b/src/corelib/global/qlogging.cpp
+index 6b95449b3d..7c7adbec99 100644
+--- a/src/corelib/global/qlogging.cpp
++++ b/src/corelib/global/qlogging.cpp
+@@ -75,17 +75,13 @@
+ # include "private/qcore_unix_p.h"
+ #endif
+ 
+-#ifndef __has_include
+-#  define __has_include(x) 0
+-#endif
+-
+ #ifndef QT_BOOTSTRAPPED
+ #if !defined QT_NO_REGULAREXPRESSION
+ #  ifdef __UCLIBC__
+ #    if __UCLIBC_HAS_BACKTRACE__
+ #      define QLOGGING_HAVE_BACKTRACE
+ #    endif
+-#  elif (defined(__GLIBC__) && defined(__GLIBCXX__)) || (__has_include(<cxxabi.h>) && __has_include(<execinfo.h>))
++#  elif (defined(__GLIBC__) && defined(__GLIBCXX__)) || (QT_HAS_INCLUDE(<cxxabi.h>) && QT_HAS_INCLUDE(<execinfo.h>))
+ #    define QLOGGING_HAVE_BACKTRACE
+ #  endif
+ #endif
+@@ -94,7 +90,7 @@
+ extern char *__progname;
+ #endif
+ 
+-#if defined(Q_OS_LINUX) && (defined(__GLIBC__) || __has_include(<sys/syscall.h>))
++#if defined(Q_OS_LINUX) && (defined(__GLIBC__) || QT_HAS_INCLUDE(<sys/syscall.h>))
+ #  include <sys/syscall.h>
+ 
+ # if defined(Q_OS_ANDROID) && !defined(SYS_gettid)
+diff --git a/src/corelib/global/qnumeric_p.h b/src/corelib/global/qnumeric_p.h
+index b18d521d05..c29ec0ea7b 100644
+--- a/src/corelib/global/qnumeric_p.h
++++ b/src/corelib/global/qnumeric_p.h
+@@ -56,10 +56,6 @@
+ #  include <immintrin.h>    // for _addcarry_u<nn>
+ #endif
+ 
+-#ifndef __has_builtin
+-#  define __has_builtin(x)  0
+-#endif
+-
+ QT_BEGIN_NAMESPACE
+ 
+ #if !defined(Q_CC_MIPS)
+@@ -230,28 +226,28 @@ mul_overflow(T v1, T v2, T *r)
+ #endif
+ 
+ // GCC 5 and Clang have builtins to detect overflows
+-#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || __has_builtin(__builtin_uadd_overflow)
++#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || QT_HAS_BUILTIN(__builtin_uadd_overflow)
+ template <> inline bool add_overflow(unsigned v1, unsigned v2, unsigned *r)
+ { return __builtin_uadd_overflow(v1, v2, r); }
+ #endif
+-#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || __has_builtin(__builtin_uaddl_overflow)
++#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || QT_HAS_BUILTIN(__builtin_uaddl_overflow)
+ template <> inline bool add_overflow(unsigned long v1, unsigned long v2, unsigned long *r)
+ { return __builtin_uaddl_overflow(v1, v2, r); }
+ #endif
+-#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || __has_builtin(__builtin_uaddll_overflow)
++#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || QT_HAS_BUILTIN(__builtin_uaddll_overflow)
+ template <> inline bool add_overflow(unsigned long long v1, unsigned long long v2, unsigned long long *r)
+ { return __builtin_uaddll_overflow(v1, v2, r); }
+ #endif
+ 
+-#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || __has_builtin(__builtin_umul_overflow)
++#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || QT_HAS_BUILTIN(__builtin_umul_overflow)
+ template <> inline bool mul_overflow(unsigned v1, unsigned v2, unsigned *r)
+ { return __builtin_umul_overflow(v1, v2, r); }
+ #endif
+-#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || __has_builtin(__builtin_umull_overflow)
++#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || QT_HAS_BUILTIN(__builtin_umull_overflow)
+ template <> inline bool mul_overflow(unsigned long v1, unsigned long v2, unsigned long *r)
+ { return __builtin_umull_overflow(v1, v2, r); }
+ #endif
+-#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || __has_builtin(__builtin_umulll_overflow)
++#if (defined(Q_CC_GNU) && !defined(Q_CC_INTEL) && Q_CC_GNU >= 500) || QT_HAS_BUILTIN(__builtin_umulll_overflow)
+ template <> inline bool mul_overflow(unsigned long long v1, unsigned long long v2, unsigned long long *r)
+ { return __builtin_umulll_overflow(v1, v2, r); }
+ #  define HAVE_MUL64_OVERFLOW
+-- 
+2.21.1 (Apple Git-122.3)
+

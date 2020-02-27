@@ -1,0 +1,54 @@
+From 88c0c1b2b5b5fb780afbe4a0b82adfe87c1a45a4 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Thu, 3 Dec 2015 17:37:02 -0800
+Subject: [PATCH 11/13] qCount{Leading,Trailing}ZeroBits: Use __builtin_clzs
+ for 16-bit
+
+If possible.
+
+The BSF/BSR/TZCNT/LZCNT Intel instruction does not exist for 8-bit. And
+it's a good idea to use the 32-bit instruction instead of the 16-bit one
+for that case, to avoid the Length Changing Prefix (LCP).
+
+GCC doesn't allow us to use __builtin_cl[tz]s unless BMI is active,
+while ICC generates the same code either way (Clang understands
+__has_builtin).
+
+Change-Id: I8de47ed6c7be4847b99bffff141c91603c7024dc
+Reviewed-by: Allan Sandfeld Jensen <allan.jensen@theqtcompany.com>
+Backport-Of: f5f47987ce369aa3f7553e6c0da509461a1ddf1a (v5.7)
+---
+ src/corelib/tools/qalgorithms.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/corelib/tools/qalgorithms.h b/src/corelib/tools/qalgorithms.h
+index 503f98feee..f066e5c28a 100644
+--- a/src/corelib/tools/qalgorithms.h
++++ b/src/corelib/tools/qalgorithms.h
+@@ -653,7 +653,11 @@ Q_DECL_RELAXED_CONSTEXPR inline uint qCountTrailingZeroBits(quint8 v) Q_DECL_NOT
+ Q_DECL_RELAXED_CONSTEXPR inline uint qCountTrailingZeroBits(quint16 v) Q_DECL_NOTHROW
+ {
+ #if defined(Q_CC_GNU)
++#  if QT_HAS_BUILTIN(__builtin_ctzs) || defined(__BMI__)
++    return v ? __builtin_ctzs(v) : 16U;
++#  else
+     return v ? __builtin_ctz(v) : 16U;
++#  endif
+ #else
+     unsigned int c = 16; // c will be the number of zero bits on the right
+     v &= -signed(v);
+@@ -712,7 +716,11 @@ Q_DECL_RELAXED_CONSTEXPR inline uint qCountLeadingZeroBits(quint8 v) Q_DECL_NOTH
+ Q_DECL_RELAXED_CONSTEXPR inline uint qCountLeadingZeroBits(quint16 v) Q_DECL_NOTHROW
+ {
+ #if defined(Q_CC_GNU)
++#  if QT_HAS_BUILTIN(__builtin_clzs) || defined(__BMI__)
++    return v ? __builtin_clzs(v) : 16U;
++#  else
+     return v ? __builtin_clz(v)-16U : 16U;
++#  endif
+ #else
+     v = v | (v >> 1);
+     v = v | (v >> 2);
+-- 
+2.21.1 (Apple Git-122.3)
+

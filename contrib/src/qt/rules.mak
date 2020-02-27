@@ -31,6 +31,10 @@ qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0007-Only-define-QT_FASTCALL-on-x86_32.patch
 	$(APPLY) $(SRC)/qt/0008-Skip-arm-pixman-drawhelpers-on-windows-just-like-on-.patch
 	$(APPLY) $(SRC)/qt/0009-mkspecs-Add-a-win32-clang-g-mkspec-for-clang-targeti.patch
+	$(APPLY) $(SRC)/qt/0010-Add-the-QT_HAS_xxx-macros-for-post-C-11-feature-test.patch
+	$(APPLY) $(SRC)/qt/0011-qCount-Leading-Trailing-ZeroBits-Use-__builtin_clzs-.patch
+	$(APPLY) $(SRC)/qt/0012-Remove-_bit_scan_-forward-reverse.patch
+	$(APPLY) $(SRC)/qt/0013-qsimd-Fix-compilation-with-trunk-clang-for-mingw.patch
 	$(APPLY) $(SRC)/qt/systray-no-sound.patch
 	$(MOVE)
 

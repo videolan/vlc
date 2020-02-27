@@ -1,0 +1,40 @@
+From 4d7a9efed1a3e65b1ec0232140a707fdf2458493 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Fri, 18 Jan 2019 09:31:10 +0200
+Subject: [PATCH 13/13] qsimd: Fix compilation with trunk clang for mingw
+
+Current tip-of-tree clang (after Clang 8 was branched) added an
+intrinsic function __builtin_ia32_xgetbv, and added the following
+define that provides _xgetbv:
+    #define _xgetbv(A) __builtin_ia32_xgetbv((long long)(A))
+
+This fallback declaration of the _xgetbv function only is used
+in case the Q_OS_WIN branch of the #if/#elif below is used, if
+the #if (defined(Q_CC_GNU) && !defined(Q_CC_EMSCRIPTEN)) ||
+defined(Q_CC_GHS) wasn't taken. I left out the
+!defined(Q_CC_EMSCRIPTEN) part as I believe Q_OS_WIN and
+Q_CC_EMSCRIPTEN are mutually exclusive.
+
+Change-Id: I257fc4283ff9f0845df51ab764cf58acdf285c66
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Backport-Of: 9818af7d436f7aa1bf5c635041cc5d08fec599b5 (v5.12.2)
+---
+ src/corelib/tools/qsimd.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/corelib/tools/qsimd.cpp b/src/corelib/tools/qsimd.cpp
+index 334e37b674..4316496ae2 100644
+--- a/src/corelib/tools/qsimd.cpp
++++ b/src/corelib/tools/qsimd.cpp
+@@ -226,7 +226,7 @@ static void cpuidFeatures07_00(uint &ebx, uint &ecx)
+ #endif
+ }
+ 
+-#ifdef Q_OS_WIN
++#if defined(Q_OS_WIN) && !(defined(Q_CC_GNU) || defined(Q_CC_GHS))
+ // fallback overload in case this intrinsic does not exist: unsigned __int64 _xgetbv(unsigned int);
+ inline quint64 _xgetbv(__int64) { return 0; }
+ #endif
+-- 
+2.21.1 (Apple Git-122.3)
+
