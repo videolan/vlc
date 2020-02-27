@@ -217,6 +217,18 @@ bool NetworkMediaModel::addToPlaylist(const QVariantList &itemIdList)
     return ret;
 }
 
+bool NetworkMediaModel::addToPlaylist(const QModelIndexList &itemIdList)
+{
+    bool ret = false;
+    for (const QModelIndex& index: itemIdList)
+    {
+        if (!index.isValid())
+            continue;
+        ret |= addToPlaylist(index.row());
+    }
+    return ret;
+}
+
 bool NetworkMediaModel::addAndPlay(int index)
 {
     if (!(m_ctx && m_hasTree))
@@ -247,6 +259,22 @@ bool NetworkMediaModel::addAndPlay(const QVariantList& itemIdList)
             ret |= addAndPlay(index);
         else
             ret |= addToPlaylist(index);
+    }
+    return ret;
+}
+
+bool NetworkMediaModel::addAndPlay(const QModelIndexList& itemIdList)
+{
+    bool ret = false;
+    for (const QModelIndex& index: itemIdList)
+    {
+        if (!index.isValid())
+            continue;
+
+        if (!ret)
+            ret |= addAndPlay(index.row());
+        else
+            ret |= addToPlaylist(index.row());
     }
     return ret;
 }

@@ -147,6 +147,19 @@ bool NetworkDeviceModel::addToPlaylist(const QVariantList &itemIdList)
     return ret;
 }
 
+bool NetworkDeviceModel::addToPlaylist(const QModelIndexList &itemIdList)
+{
+    bool ret = false;
+    for (const QModelIndex& index: itemIdList)
+    {
+        if (!index.isValid())
+            continue;
+        ret |= addToPlaylist(index.row());
+    }
+    return ret;
+}
+
+
 bool NetworkDeviceModel::addAndPlay(int index)
 {
     if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
@@ -172,6 +185,21 @@ bool NetworkDeviceModel::addAndPlay(const QVariantList& itemIdList)
             else
                 ret |= addToPlaylist(index);
         }
+    }
+    return ret;
+}
+
+bool NetworkDeviceModel::addAndPlay(const QModelIndexList& itemIdList)
+{
+    bool ret = false;
+    for (const QModelIndex& index: itemIdList)
+    {
+        if (!index.isValid())
+            continue;
+        if (!ret)
+            ret |= addAndPlay(index.row());
+        else
+            ret |= addToPlaylist(index.row());
     }
     return ret;
 }
