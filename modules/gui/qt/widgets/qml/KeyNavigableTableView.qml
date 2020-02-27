@@ -35,7 +35,7 @@ NavigableFocusScope {
 
     property var sortModel: []
     property Component colDelegate: Item { }
-    property var model: []
+    property alias model: view.model
 
     property alias contentHeight: view.contentHeight
 
@@ -49,7 +49,7 @@ NavigableFocusScope {
     property alias headerItem: view.headerItem
     property color headerColor
 
-    property alias delegateModel: delegateModel
+    property alias selectionModel: selectionModel
     property real rowHeight: VLCStyle.fontHeight_normal + VLCStyle.margin_large
     property alias spacing: view.spacing
 
@@ -60,12 +60,9 @@ NavigableFocusScope {
     }
 
     Util.SelectableDelegateModel {
-        id: delegateModel
+        id: selectionModel
 
         model: root.model
-
-        delegate: Item {
-        }
     }
 
 
@@ -75,8 +72,6 @@ NavigableFocusScope {
         anchors.fill: parent
 
         focus: true
-
-        model : root.model
 
         headerPositioning: ListView.OverlayHeader
 
@@ -156,10 +151,10 @@ NavigableFocusScope {
             color: VLCStyle.colors.getBgColor(selected, hoverArea.containsMouse, lineView.activeFocus)
 
             property var rowModel: model
-            property bool selected: delegateModel.isSelected(index)
+            property bool selected: selectionModel.isSelected(root.model.index(index, 0))
             Connections {
-                target: delegateModel
-                onSelectionChanged: lineView.selected = delegateModel.isSelected(index)
+                target: selectionModel
+                onSelectionChanged: lineView.selected = selectionModel.isSelected(root.model.index(index, 0))
             }
 
             MouseArea {
@@ -170,7 +165,7 @@ NavigableFocusScope {
                 acceptedButtons: Qt.RightButton | Qt.LeftButton
 
                 onClicked: {
-                    delegateModel.updateSelection( mouse.modifiers , view.currentIndex, index)
+                    selectionModel.updateSelection( mouse.modifiers , view.currentIndex, index)
                     view.currentIndex = rowModel.index
                     lineView.forceActiveFocus()
 
@@ -180,7 +175,7 @@ NavigableFocusScope {
                 }
 
                 onDoubleClicked: {
-                    actionForSelection(delegateModel.selectedIndexes())
+                    actionForSelection(selectionModel.selectedIndexes)
                 }
 
                 Row {
@@ -211,9 +206,9 @@ NavigableFocusScope {
             }
         }
 
-        onSelectAll: delegateModel.selectAll()
-        onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
-        onActionAtIndex: root.actionForSelection( delegateModel.selectedIndexes() )
+        onSelectAll: selectionModel.selectAll()
+        onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
+        onActionAtIndex: root.actionForSelection( selectionModel.selectedIndexes )
 
         navigationParent: root
     }
@@ -224,11 +219,11 @@ NavigableFocusScope {
      * selectedGroup update itself after this event
      */
     onActiveFocusChanged: {
-        if (activeFocus && view.count > 0 && !delegateModel.hasSelection) {
+        if (activeFocus && view.count > 0 && !selectionModel.hasSelection) {
             var initialIndex = 0
             if (view.currentIndex !== -1)
                 initialIndex = view.currentIndex
-            delegateModel.select(initialIndex, ItemSelectionModel.ClearAndSelect)
+            selectionModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
             view.currentIndex = initialIndex
         }
     }

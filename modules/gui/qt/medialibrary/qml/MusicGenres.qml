@@ -66,8 +66,7 @@ Widgets.NavigableFocusScope {
         var initialIndex = root.initialIndex
         if (initialIndex >= genreModel.count)
             initialIndex = 0
-        delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
-        view.currentItem.currentIndex = initialIndex
+        selectionModel.select(genreModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
         view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
 
@@ -88,42 +87,38 @@ Widgets.NavigableFocusScope {
         ml: medialib
 
         onCountChanged: {
-            if (genreModel.count > 0 && !delegateModelId.hasSelection) {
+            if (genreModel.count > 0 && !selectionModel.hasSelection) {
                 root.resetFocus()
             }
         }
     }
 
+    function _actionAtIndex(index) {
+        if (selectionModel.selectedIndexes.length > 1) {
+            medialib.addAndPlay(model.getIdsForIndexes(selectionModel.selectedIndexes))
+        } else if (selectionModel.selectedIndexes.length === 1) {
+            var sel = selectionModel.selectedIndexes[0]
+            showAlbumView( genreModel.getDataAt(sel) )
+        }
+    }
+
     Util.SelectableDelegateModel {
-        id: delegateModelId
+        id: selectionModel
 
         model: genreModel
-
-        delegate: Item {
-        }
-
-
-        function actionAtIndex(index) {
-            if (delegateModelId.selectedGroup.count > 1) {
-                medialib.addAndPlay(model.getIdsForIndexes(delegateModelId.selectedIndexes()))
-            } else if (delegateModelId.selectedGroup.count === 1) {
-                var sel = delegateModelId.selectedIndexes()[0]
-                showAlbumView( genreModel.getDataAt(sel) )
-            }
-        }
     }
 
     /*
      *define the intial position/selection
-     * This is done on activeFocus rather than Component.onCompleted because delegateModelId.
+     * This is done on activeFocus rather than Component.onCompleted because selectionModel.
      * selectedGroup update itself after this event
      */
     onActiveFocusChanged: {
-        if (activeFocus && genreModel.count > 0 && !delegateModelId.hasSelection) {
+        if (activeFocus && genreModel.count > 0 && !selectionModel.hasSelection) {
             var initialIndex = 0
             if (view.currentItem.currentIndex !== -1)
                 initialIndex = view.currentItem.currentIndex
-            delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
+            selectionModel.select(genreModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
             view.currentItem.currentIndex = initialIndex
         }
     }
@@ -134,7 +129,7 @@ Widgets.NavigableFocusScope {
         Widgets.ExpandGridView {
             id: gridView_id
 
-            delegateModel: delegateModelId
+            delegateModel: selectionModel
             model: genreModel
 
             headerDelegate: headerComponent
@@ -147,7 +142,7 @@ Widgets.NavigableFocusScope {
                 subtitle: ""
 
                 onItemClicked: {
-                    delegateModelId.updateSelection( modifier , view.currentItem.currentIndex, index)
+                    selectionModel.updateSelection( modifier , view.currentItem.currentIndex, index)
                     view.currentItem.currentIndex = index
                     view.currentItem.forceActiveFocus()
                 }
@@ -160,11 +155,9 @@ Widgets.NavigableFocusScope {
             cellWidth: VLCStyle.gridItem_music_width
             cellHeight: VLCStyle.gridItem_music_height
 
-            onSelectAll: delegateModelId.selectAll()
-            onSelectionUpdated:  delegateModelId.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: {
-                delegateModelId.actionAtIndex(index)
-            }
+            onSelectAll: selectionModel.selectAll()
+            onSelectionUpdated:  selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            onActionAtIndex: _actionAtIndex(index)
 
             navigationParent: root
         }
@@ -183,9 +176,9 @@ Widgets.NavigableFocusScope {
             focus: true
             spacing: VLCStyle.margin_xxxsmall
 
-            onSelectAll: delegateModelId.selectAll()
-            onSelectionUpdated: delegateModelId.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: delegateModelId.actionAtIndex(index)
+            onSelectAll: selectionModel.selectAll()
+            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            onActionAtIndex: _actionAtIndex(index)
 
             navigationParent: root
 
@@ -194,10 +187,10 @@ Widgets.NavigableFocusScope {
 
                 width: root.width
                 height: VLCStyle.icon_normal + VLCStyle.margin_small
-                selected: delegateModelId.isSelected(index)
+                selected: selectionModel.isSelected(genreModel.index(index, 0))
                 Connections {
-                   target: delegateModelId
-                   onSelectionChanged: listDelegate.selected = delegateModelId.isSelected(index)
+                   target: selectionModel
+                   onSelectionChanged: listDelegate.selected = selectionModel.isSelected(genreModel.index(index, 0))
                 }
 
 
@@ -211,7 +204,7 @@ Widgets.NavigableFocusScope {
                 line1: (model.name || "Unknown genre")+" - "+model.nb_tracks+" tracks"
 
                 onItemClicked: {
-                    delegateModelId.updateSelection( modifier, view.currentItem.currentIndex, index )
+                    selectionModel.updateSelection( modifier, view.currentItem.currentIndex, index )
                     view.currentItem.currentIndex = index
                     this.forceActiveFocus()
                 }

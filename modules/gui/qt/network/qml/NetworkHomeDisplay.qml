@@ -23,6 +23,7 @@ import QtQml 2.11
 import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/" as Util
 import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
@@ -34,6 +35,15 @@ Widgets.NavigableFocusScope {
             flickable.contentItem.contentY = maxY - flickable.height
         } else if (minY < flickable.contentItem.contentY) {
             flickable.contentItem.contentY = minY
+        }
+    }
+
+    function _actionAtIndex(index, model, selectionModel) {
+        if (selectionModel.items.get(index).model.type === NetworkMediaModel.TYPE_DIRECTORY
+                || selectionModel.items.get(index).model.type === NetworkMediaModel.TYPE_NODE)  {
+            history.push(["mc", "network", { tree: selectionModel.items.get(index).model.tree }]);
+        } else {
+            model.addAndPlay( selectionModel.selectedIndexes )
         }
     }
 

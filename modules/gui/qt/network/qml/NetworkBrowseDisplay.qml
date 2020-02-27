@@ -32,7 +32,7 @@ Widgets.NavigableFocusScope {
     id: root
 
     property alias tree: providerModel.tree
-    readonly property var currentIndex: delegateModelId.currentIndex
+    readonly property var currentIndex: view.currentItem.currentIndex
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
 
@@ -40,41 +40,41 @@ Widgets.NavigableFocusScope {
         id: providerModel
         ctx: mainctx
         tree: undefined
+        onCountChanged: resetFocus()
     }
 
     Util.SelectableDelegateModel{
-        id: delegateModelId
+        id: selectionModel
         model: providerModel
-        onCountChanged: resetFocus()
     }
 
     function resetFocus() {
         var initialIndex = root.initialIndex
         if (initialIndex >= providerModel.count)
             initialIndex = 0
-        delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
+        selectionModel.select(providerModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
         view.currentItem.currentIndex = initialIndex
         view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
 
 
     function _actionAtIndex(index) {
-        if ( delegateModelId.selectedIndexes().length > 1 ) {
-            providerModel.addAndPlay( delegateModelId.selectedIndexes() )
+        if ( selectionModel.selectedIndexes.length > 1 ) {
+            providerModel.addAndPlay( selectionModel.selectedIndexes )
         } else {
             var data = providerModel.getDataAt(index)
             if (data.type === NetworkMediaModel.TYPE_DIRECTORY
                     || data.type === NetworkMediaModel.TYPE_NODE)  {
                 history.push(["mc", "network", { tree: data.tree }]);
             } else {
-                providerModel.addAndPlay( delegateModelId.selectedIndexes() )
+                providerModel.addAndPlay( selectionModel.selectedIndexes )
             }
         }
     }
 
     Widgets.MenuExt {
         id: contextMenu
-        property var delegateModelId: undefined
+        property var selectionModel: undefined
         property var model: ({})
         closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
         focus:true
@@ -83,14 +83,14 @@ Widgets.NavigableFocusScope {
             id: instanciator
             property var modelActions: {
                 "play": function() {
-                    if (delegateModelId) {
-                        providerModel.addAndPlay(delegateModelId.selectedIndexes())
+                    if (selectionModel) {
+                        providerModel.addAndPlay(selectionModel.selectedIndexes )
                     }
                     contextMenu.close()
                 },
                 "enqueue": function() {
-                    if (delegateModelId) {
-                        providerModel.addToPlaylist(delegateModelId.selectedIndexes())
+                    if (selectionModel) {
+                        providerModel.addToPlaylist(selectionModel.selectedIndexes )
                     }
                     contextMenu.close()
                 },
@@ -138,7 +138,7 @@ Widgets.NavigableFocusScope {
         Widgets.ExpandGridView {
             id: gridView
 
-            delegateModel: delegateModelId
+            delegateModel: selectionModel
             model: providerModel
 
             headerDelegate: Widgets.LabelSeparator {
@@ -175,8 +175,8 @@ Widgets.NavigableFocusScope {
                 subtitle: ""
 
                 onItemClicked : {
-                    delegateModelId.updateSelection( modifier ,  delegateModelId.currentIndex, index)
-                    delegateModelId.currentIndex = index
+                    selectionModel.updateSelection( modifier ,  view.currentItem.currentIndex, index)
+                    view.currentItem.currentIndex = index
                     delegateGrid.forceActiveFocus()
                 }
 
@@ -184,19 +184,19 @@ Widgets.NavigableFocusScope {
                     if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
                         history.push( ["mc", "network", { tree: model.tree } ])
                     else
-                        delegateModelId.model.addAndPlay( index )
+                        selectionModel.model.addAndPlay( index )
                 }
 
                 onContextMenuButtonClicked: {
                     contextMenu.model = providerModel
-                    contextMenu.delegateModelId = delegateModelId
+                    contextMenu.selectionModel = selectionModel
                     contextMenu.popup()
                 }
             }
 
-            onSelectAll: delegateModelId.selectAll()
-            onSelectionUpdated: delegateModelId.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: delegateModelId.actionAtIndex(index)
+            onSelectAll: selectionModel.selectAll()
+            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            onActionAtIndex: _actionAtIndex(index)
 
             navigationParent: root
             navigationUpItem: gridView.headerItem
@@ -213,21 +213,20 @@ Widgets.NavigableFocusScope {
             height: view.height
             width: view.width
             model: providerModel
-            currentIndex: delegateModelId.currentIndex
 
             delegate: NetworkListItem {
                 id: delegateList
                 focus: true
 
-                selected: delegateModelId.isSelected( index )
+                selected: selectionModel.isSelected( providerModel.index(index, 0) )
                 Connections {
-                    target: delegateModelId
-                    onSelectionChanged: selected = delegateModelId.isSelected(index)
+                    target: selectionModel
+                    onSelectionChanged: delegateList.selected = selectionModel.isSelected(providerModel.index(index, 0))
                 }
 
                 onItemClicked : {
-                    delegateModelId.updateSelection( modifier, delegateModelId.currentIndex, index )
-                    delegateModelId.currentIndex = index
+                    selectionModel.updateSelection( modifier, view.currentItem.currentIndex, index )
+                    view.currentItem.currentIndex = index
                     delegateList.forceActiveFocus()
                 }
 
@@ -240,7 +239,7 @@ Widgets.NavigableFocusScope {
 
                 onContextMenuButtonClicked: {
                     contextMenu.model = providerModel
-                    contextMenu.delegateModelId = delegateModelId
+                    contextMenu.selectionModel = selectionModel
                     contextMenu.popup(menuParent)
                 }
 
@@ -251,9 +250,9 @@ Widgets.NavigableFocusScope {
             focus: true
             spacing: VLCStyle.margin_xxxsmall
 
-            onSelectAll: delegateModelId.selectAll()
-            onSelectionUpdated: delegateModelId.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: delegateModelId.actionAtIndex(index)
+            onSelectAll: selectionModel.selectAll()
+            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            onActionAtIndex: _actionAtIndex(index)
 
             navigationParent: root
             navigationUpItem: listView.headerItem

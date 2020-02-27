@@ -30,7 +30,7 @@ Widgets.NavigableFocusScope {
     MusicTrackListDisplay {
         id: tracklistdisplay_id
         anchors.fill: parent
-        visible: tracklistdisplay_id.delegateModel.count > 0
+        visible: model.count > 0
         focus: visible
         navigationParent: root
         navigationCancel: function() {
@@ -43,7 +43,7 @@ Widgets.NavigableFocusScope {
 
     EmptyLabel {
         anchors.fill: parent
-        visible: tracklistdisplay_id.delegateModel.count === 0
+        visible: tracklistdisplay_id.model.count === 0
         focus: visible
         text: i18n.qtr("No tracks found\nPlease try adding sources, by going to the Network tab")
         navigationParent: root

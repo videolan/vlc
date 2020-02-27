@@ -54,10 +54,14 @@ Widgets.NavigableFocusScope {
         if (initialIndex >= artistModel.count)
             initialIndex = 0
         if (initialIndex !== artistList.currentIndex) {
-            delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
+            selectionModel.select(artistModel.index(initialIndex), ItemSelectionModel.ClearAndSelect)
             artistList.currentIndex = initialIndex
             artistList.positionViewAtIndex(initialIndex, ItemView.Contain)
         }
+    }
+
+    function _actionAtIndex(index) {
+        view.forceActiveFocus()
     }
 
     MLArtistModel {
@@ -65,7 +69,7 @@ Widgets.NavigableFocusScope {
         ml: medialib
 
         onCountChanged: {
-            if (artistModel.count > 0 && !delegateModel.hasSelection) {
+            if (artistModel.count > 0 && !selectionModel.hasSelection) {
                 var initialIndex = root.initialIndex
                 if (initialIndex >= artistModel.count)
                     initialIndex = 0
@@ -75,14 +79,8 @@ Widgets.NavigableFocusScope {
     }
 
     Util.SelectableDelegateModel {
-        id: delegateModel
+        id: selectionModel
         model: artistModel
-
-        delegate: Item {}
-
-        function actionAtIndex(index) {
-            view.forceActiveFocus()
-        }
     }
 
     FocusScope {
@@ -105,8 +103,8 @@ Widgets.NavigableFocusScope {
 
             focus: true
 
-            onSelectAll: delegateModel.selectAll()
-            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            onSelectAll: selectionModel.selectAll()
+            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onCurrentIndexChanged: {
                 if (artistList.currentIndex < artistModel.count) {
                     root.artistId =  artistModel.getIdForIndex(artistList.currentIndex)
@@ -128,10 +126,10 @@ Widgets.NavigableFocusScope {
                 height: VLCStyle.icon_normal + VLCStyle.margin_small
                 width: artistList.width
 
-                property bool selected: delegateModel.isSelected(index)
+                property bool selected: selectionModel.isSelected(artistModel.index(index, 0))
                 Connections {
-                   target: delegateModel
-                   onSelectionChanged: selected = delegateModel.isSelected(index)
+                   target: selectionModel
+                   onSelectionChanged: selected = selectionModel.isSelected(artistModel.index(index, 0))
                 }
 
                 color: VLCStyle.colors.getBgColor(selected, this.hovered, this.activeFocus)
@@ -149,7 +147,7 @@ Widgets.NavigableFocusScope {
 
                 onItemClicked: {
                     artistId = model.id
-                    delegateModel.updateSelection( modifier , artistList.currentIndex, index)
+                    selectionModel.updateSelection( modifier , artistList.currentIndex, index)
                     artistList.currentIndex = index
                     artistList.forceActiveFocus()
                 }

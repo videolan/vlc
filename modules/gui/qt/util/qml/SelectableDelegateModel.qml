@@ -16,82 +16,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick 2.11
-import QtQml.Models 2.2
+import QtQml.Models 2.11
 
-DelegateModel {
+ItemSelectionModel {
     id: delegateModel
 
-    property int currentIndex: -1
     property int shiftIndex: -1
-    property alias selectedGroup: selectedGroup
-    readonly property bool hasSelection: selectedGroup.count > 0
-
-    signal selectionChanged()
-
-    groups: [
-        DelegateModelGroup { id: selectedGroup; name: "selected"; includeByDefault: false }
-    ]
 
     function _addRange(from, to) {
         for (var i = from; i <= to; i++) {
-            delegateModel.items.get(i).inSelected = true
+            select(model.index(i, 0), ItemSelectionModel.Select)
         }
-        selectionChanged()
     }
     function _delRange(from, to) {
         for (var i = from; i <= to; i++) {
-            delegateModel.items.get(i).inSelected = false
-        }
-        selectionChanged()
-    }
-
-    function selectNone() {
-        if (hasSelection) {
-            selectedGroup.remove(0,selectedGroup.count)
-            selectionChanged()
+            select(model.index(i, 0), ItemSelectionModel.Deselect)
         }
     }
 
     function selectAll() {
-        delegateModel.items.addGroups(0, delegateModel.items.count, ["selected"])
-        selectionChanged()
-    }
-
-    function selectedIndexes() {
-        var list = []
-        for (var i = 0; i < delegateModel.selectedGroup.count; i++) {
-            var index = delegateModel.selectedGroup.get(i).itemsIndex;
-            list.push(index)
-        }
-        return list
-    }
-
-    function isSelected( index ) {
-        if (index < 0 || index >= delegateModel.count)
-            return false
-        return items.get(index).inSelected
-    }
-
-    function select( index, command ) {
-        switch (command) {
-            case ItemSelectionModel.Select:
-                items.get(index).inSelected = true
-                break;
-            case ItemSelectionModel.Deselect:
-                items.get(index).inSelected = false
-                break;
-            case ItemSelectionModel.Toggle:
-                items.get(index).inSelected = !items.get(index).inSelected
-                break;
-            case ItemSelectionModel.Clear:
-                selectNone()
-                break;
-            case ItemSelectionModel.ClearAndSelect:
-                selectNone()
-                items.get(index).inSelected = true
-                selectionChanged()
-                break;
-        }
+        select(model.index(0, 0), ItemSelectionModel.Select | ItemSelectionModel.Columns)
     }
 
     function updateSelection( keymodifiers, oldIndex, newIndex ) {
@@ -117,12 +61,10 @@ DelegateModel {
                 _delRange(oldIndex, newIndex - 1)
             }
         } else {
-            var e = delegateModel.items.get(newIndex)
             if ((keymodifiers & Qt.ControlModifier) == Qt.ControlModifier) {
-                e.inSelected = !e.inSelected
+                select(model.index(newIndex, 0), ItemSelectionModel.Toggle)
             } else {
-                selectNone()
-                e.inSelected = true
+                select(model.index(newIndex, 0), ItemSelectionModel.ClearAndSelect)
             }
             shiftIndex = newIndex
         }

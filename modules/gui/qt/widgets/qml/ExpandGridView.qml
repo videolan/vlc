@@ -162,7 +162,7 @@ NavigableFocusScope {
     function _updateSelected() {
         for (var id in _idChildrenMap) {
             var item = _idChildrenMap[id]
-            item.selected = delegateModel.isSelected(id)
+            item.selected = delegateModel.isSelected(model.index(id, 0))
         }
     }
 
