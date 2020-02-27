@@ -1277,6 +1277,7 @@ static int Init( input_thread_t * p_input )
     if( ret != VLC_SUCCESS )
     {
         InputSourceDestroy( master );
+        input_source_Release( master );
         goto error;
     }
 
@@ -1385,11 +1386,15 @@ static void End( input_thread_t * p_input )
 
     /* Delete slave */
     for( int i = 0; i < priv->i_slave; i++ )
+    {
         InputSourceDestroy( priv->slave[i] );
+        input_source_Release( priv->slave[i] );
+    }
     free( priv->slave );
 
     /* Clean up master */
     InputSourceDestroy( priv->master );
+    input_source_Release( priv->master );
     priv->i_title_offset = 0;
     priv->i_seekpoint_offset = 0;
 
@@ -2728,8 +2733,6 @@ static void InputSourceDestroy( input_source_t *in )
             vlc_input_title_Delete( in->title[i] );
     }
     TAB_CLEAN( in->i_title, in->title );
-
-    input_source_Release( in );
 }
 
 /*****************************************************************************
@@ -3294,6 +3297,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
             {
                 msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
                 InputSourceDestroy( p_source );
+                input_source_Release( p_source );
                 return VLC_EGENERIC;
             }
 
@@ -3302,6 +3306,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
             {
                 msg_Err( p_input, "seek failed for new slave" );
                 InputSourceDestroy( p_source );
+                input_source_Release( p_source );
                 return VLC_EGENERIC;
             }
         }
