@@ -129,6 +129,37 @@ static inline vlc_tick_t es_out_GetWakeup( es_out_t *p_out )
     assert( !i_ret );
     return i_wu;
 }
+static inline int es_out_SetEsList( es_out_t *p_out,
+                                    enum es_format_category_e cat,
+                                    vlc_es_id_t **ids )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_ES_LIST, cat, ids );
+}
+static inline int es_out_SetAutoSelect( es_out_t *p_out,
+                                        enum es_format_category_e cat, bool enabled )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_AUTOSELECT, cat, enabled );
+}
+static inline int es_out_SetEsById( es_out_t *p_out, int id, bool forced )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_ES_BY_ID, id, forced );
+}
+static inline int es_out_RestartEsById( es_out_t *p_out, int id )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_RESTART_ES_BY_ID, id  );
+}
+static inline int es_out_SetEsDefaultById( es_out_t *p_out, int id )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID, id );
+}
+static inline int es_out_StopAllEs( es_out_t *p_out, void **context )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_STOP_ALL_ES, context );
+}
+static inline int es_out_StartAllEs( es_out_t *p_out, void *context )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_START_ALL_ES, context );
+}
 static inline bool es_out_GetBuffering( es_out_t *p_out )
 {
     bool b;
@@ -197,6 +228,17 @@ static inline void es_out_Eos( es_out_t *p_out )
 {
     int i_ret = es_out_PrivControl( p_out, ES_OUT_PRIV_SET_EOS );
     assert( !i_ret );
+}
+static inline int es_out_SetVbiPage( es_out_t *p_out, vlc_es_id_t *id,
+                                     unsigned page )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_VBI_PAGE, id, page );
+}
+static inline int es_out_SetVbiTransparency( es_out_t *p_out, vlc_es_id_t *id,
+                                             bool enabled )
+{
+    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_VBI_TRANSPARENCY, id,
+                               enabled );
 }
 
 es_out_t  *input_EsOutNew( input_thread_t *, float rate );
