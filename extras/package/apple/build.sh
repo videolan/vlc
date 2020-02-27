@@ -433,7 +433,7 @@ do
 done
 
 # Validate arguments
-if [ "$VLC_MAKE_PREBUILT_CONTRIBS" -gt "0" ] && 
+if [ "$VLC_MAKE_PREBUILT_CONTRIBS" -gt "0" ] &&
    [ "$VLC_USE_PREBUILT_CONTRIBS" -gt "0" ]; then
     echo >&2 "ERROR: The --package-contribs and --with-prebuilt-contribs options"
     echo >&2 "       can not be used together."
