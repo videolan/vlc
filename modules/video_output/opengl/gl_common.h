@@ -267,6 +267,7 @@ typedef void (APIENTRY *PFNGLREADPIXELSPROC) (GLint, GLint, GLsizei, GLsizei, GL
 #   define PFNGLBUFFERDATAPROC               typeof(glBufferData)*
 #   define PFNGLBUFFERSUBDATAPROC            typeof(glBufferSubData)*
 #   define PFNGLDELETEBUFFERSPROC            typeof(glDeleteBuffers)*
+#   define PFNGLDELETEFRAMEBUFFERSPROC       typeof(glDeleteFramebuffers)*
 #   define PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC typeof(glGetFramebufferAttachmentParameteriv)*
 #   define PFNGLGENFRAMEBUFFERSPROC          typeof(glGenFramebuffers)*
 #   define PFNGLDELETEFRAMEBUFFERSPROC       typeof(glDeleteFramebuffers)*
