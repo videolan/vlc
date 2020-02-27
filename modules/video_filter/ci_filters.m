@@ -25,9 +25,9 @@
 #endif
 
 #include <assert.h>
+#include <stdatomic.h>
 
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_plugin.h>
@@ -63,7 +63,7 @@ struct  filter_chain
 {
     enum filter_type            filter;
     CIFilter *                  ci_filter;
-    vlc_atomic_float            ci_params[NUM_FILTER_PARAM_MAX];
+    _Atomic float               ci_params[NUM_FILTER_PARAM_MAX];
     struct filter_chain *       next;
     union {
         struct
@@ -305,9 +305,8 @@ ParamsCallback(vlc_object_t *obj,
     else
         vlc_assert_unreachable();
 
-    vlc_atomic_store_float(filter->ci_params + i,
-                           filter_ConvertParam(new_vlc_val,
-                                               filter_param_descs + i));
+    atomic_store(filter->ci_params + i,
+                 filter_ConvertParam(new_vlc_val, filter_param_descs + i));
 
     return VLC_SUCCESS;
 }
@@ -398,7 +397,7 @@ Filter(filter_t *filter, picture_t *src)
             {
                 NSString *ci_param_name =
                     filter_desc_table[fchain->filter].param_descs[i].ci;
-                float ci_value = vlc_atomic_load_float(fchain->ci_params + i);
+                float ci_value = atomic_load(fchain->ci_params + i);
 
                 [fchain->ci_filter setValue: [NSNumber numberWithFloat: ci_value]
                                      forKey: ci_param_name];
@@ -482,9 +481,9 @@ Open_FilterInit(filter_t *filter, struct filter_chain *fchain)
         else
             vlc_assert_unreachable();
 
-        vlc_atomic_init_float(fchain->ci_params + i,
-                              filter_ConvertParam(vlc_param_val,
-                                                  filter_param_descs + i));
+        atomic_init(fchain->ci_params + i,
+                    filter_ConvertParam(vlc_param_val,
+                                        filter_param_descs + i));
 
         var_AddCallback(filter, filter_param_descs[i].vlc,
                         ParamsCallback, fchain);
