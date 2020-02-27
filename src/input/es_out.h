@@ -46,6 +46,10 @@ enum es_out_query_private_e
     /* Select a list of ES */
     ES_OUT_SET_ES_LIST, /* arg1= es_out_id_t *const* (null terminated array) */
 
+    /* Disable autoselection of tracks from a given category */
+    ES_OUT_SET_AUTOSELECT,  /* arg1= int (es category),
+                               arg2= int (enabled/disabled), res=can fail */
+
     /* Wrapper for some ES command to work with id */
     ES_OUT_SET_ES_BY_ID,                            /* arg1= int, arg2= bool (forced) */
     ES_OUT_RESTART_ES_BY_ID,
