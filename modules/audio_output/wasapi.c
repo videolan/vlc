@@ -27,13 +27,13 @@
 #define CONST_VTABLE
 #define NONEWWAVE
 
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_codecs.h>
 #include <vlc_aout.h>
-#include <vlc_atomic.h>
 #include <vlc_plugin.h>
 
 #include <audioclient.h>

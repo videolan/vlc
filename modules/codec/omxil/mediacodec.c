@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
 #include <stdint.h>
 #include <assert.h>
 
@@ -37,7 +38,6 @@
 #include <vlc_block_helper.h>
 #include <vlc_timestamp_helper.h>
 #include <vlc_threads.h>
-#include <vlc_atomic.h>
 #include <vlc_bits.h>
 
 #include "mediacodec.h"

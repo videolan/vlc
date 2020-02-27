@@ -26,6 +26,7 @@
 #define COBJMACROS
 #define CONST_VTABLE
 
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
@@ -37,7 +38,6 @@ DEFINE_PROPERTYKEY(PKEY_Device_FriendlyName, 0xa45c254e, 0xdf1c, 0x4efd,
    0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 14);
 
 #include <vlc_common.h>
-#include <vlc_atomic.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_charset.h>
