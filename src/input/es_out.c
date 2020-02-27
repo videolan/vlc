@@ -3390,7 +3390,8 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
     }
     case ES_OUT_PRIV_SET_ES_DELAY:
     {
-        es_out_id_t *es = va_arg(args, es_out_id_t *);
+        vlc_es_id_t *es_id = va_arg( args, vlc_es_id_t * );
+        es_out_id_t *es = vlc_es_id_get_out( es_id );
         const vlc_tick_t delay = va_arg(args, vlc_tick_t);
         EsOutSetEsDelay(out, es, delay);
         return VLC_SUCCESS;
@@ -3521,7 +3522,8 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
     case ES_OUT_PRIV_SET_VBI_PAGE:
     case ES_OUT_PRIV_SET_VBI_TRANSPARENCY:
     {
-        es_out_id_t *es = va_arg( args, es_out_id_t * );
+        vlc_es_id_t *es_id = va_arg( args, vlc_es_id_t * );
+        es_out_id_t *es = vlc_es_id_get_out( es_id );
         assert(es);
         if( !es->p_dec || es->fmt.i_cat != SPU_ES
           || es->fmt.i_codec != VLC_CODEC_TELETEXT )

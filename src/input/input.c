@@ -2086,8 +2086,7 @@ static bool Control( input_thread_t *p_input,
             break;
         case INPUT_CONTROL_SET_ES_DELAY:
             assert(param.es_delay.id);
-            es_out_SetEsDelay(priv->p_es_out_display,
-                              vlc_es_id_get_out(param.es_delay.id),
+            es_out_SetEsDelay(priv->p_es_out_display, param.es_delay.id,
                               param.es_delay.delay);
             break;
 
