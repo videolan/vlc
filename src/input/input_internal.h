@@ -235,6 +235,11 @@ struct vlc_input_event_es {
      * ES track information, can be updated after the VLC_INPUT_ES_UPDATED event.
      */
     const es_format_t *fmt;
+    /**
+     * Only valid with VLC_INPUT_ES_SELECTED, true if the track was selected by
+     * the user.
+     */
+    bool forced;
 };
 
 struct vlc_input_event_signal {
