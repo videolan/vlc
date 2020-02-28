@@ -171,6 +171,31 @@ vlc_player_UpdateMediaType(const struct vlc_player_input* input,
     return true;
 }
 
+static void
+vlc_player_CompareAssignState(char **target_ptr, char **input_ptr)
+{
+    /* We only want to save these states if they are different, and not the
+     * default values (NULL), so this means that either one is NULL and the
+     * other isn't, or they are both non null and differ lexicographically */
+
+    char *target = *target_ptr;
+    char *input = *input_ptr;
+    if ( ( input != NULL && target != NULL &&
+           strcmp(input, target ) ) ||
+         ( input == NULL && target != NULL ) ||
+         ( input != NULL && target == NULL ) )
+    {
+        free(target);
+        *target_ptr = input;
+        *input_ptr = NULL;
+    }
+    else
+    {
+        free(target);
+        *target_ptr = NULL;
+    }
+}
+
 void
 vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
 {
@@ -258,30 +283,20 @@ vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
     }
     if (vout != NULL)
     {
-        /* We only want to save these states if they are different, and not the
-         * default values (NULL), so this means that either one is NULL and the
-         * other isn't, or they are both non null and differ lexicographically */
-#define COMPARE_ASSIGN_STR(field, var) \
-        char* field = var_GetNonEmptyString(vout, var); \
-        if ( ( field != NULL && input->ml.states.field != NULL && \
-               strcmp(field, input->ml.states.field) ) || \
-             ( field == NULL && input->ml.states.field != NULL ) || \
-             ( field != NULL && input->ml.states.field == NULL ) ) \
-        { \
-            free(input->ml.states.field); \
-            input->ml.states.field = field; \
-            field = NULL; \
-        } \
-        else \
-        { \
-            free(input->ml.states.field); \
-            input->ml.states.field = NULL; \
-        }
+        char* aspect_ratio = var_GetNonEmptyString(vout, "aspect-ratio");
+        char* crop = var_GetNonEmptyString(vout, "crop");
+        char* deinterlace = var_GetNonEmptyString(vout, "deinterlace-mode");
+        char* video_filter = var_GetNonEmptyString(vout, "video-filter");
 
-        COMPARE_ASSIGN_STR(aspect_ratio, "aspect-ratio" );
-        COMPARE_ASSIGN_STR(crop, "crop");
-        COMPARE_ASSIGN_STR(deinterlace, "deinterlace-mode");
-        COMPARE_ASSIGN_STR(video_filter, "video-filter");
+        vlc_player_CompareAssignState(&input->ml.states.aspect_ratio, &aspect_ratio);
+        vlc_player_CompareAssignState(&input->ml.states.crop, &crop);
+        vlc_player_CompareAssignState(&input->ml.states.deinterlace, &deinterlace);
+        vlc_player_CompareAssignState(&input->ml.states.video_filter, &video_filter);
+
+        free(video_filter);
+        free(deinterlace);
+        free(crop);
+        free(aspect_ratio);
 
         if (input->ml.states.deinterlace != NULL &&
             !strcmp(input->ml.states.deinterlace, "auto"))
@@ -296,12 +311,6 @@ vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
             input->ml.states.zoom = zoom;
         else
             input->ml.states.zoom = -1.f;
-
-#undef COMPARE_ASSIGN_STR
-        free(video_filter);
-        free(deinterlace);
-        free(crop);
-        free(aspect_ratio);
     }
 
     if (input->ml.default_video_track != -2)
