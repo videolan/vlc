@@ -3566,37 +3566,32 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
         foreach_es_then_es_slaves(es)
             count++;
 
-        int *selected_es = vlc_alloc(count + 1, sizeof(int));
+        vlc_es_id_t **selected_es = vlc_alloc(count + 1, sizeof(vlc_es_id_t *));
         if (!selected_es)
             return VLC_ENOMEM;
 
-        *va_arg(args, void **) = selected_es;
-        *selected_es = count;
+        *va_arg(args, vlc_es_id_t ***) = selected_es;
 
         foreach_es_then_es_slaves(es)
         {
             if (EsIsSelected(es))
             {
                 EsOutDestroyDecoder(out, es);
-                *++selected_es = es->fmt.i_id;
+                *selected_es++ = vlc_es_id_Hold(&es->id);
             }
-            else
-                *++selected_es = -1;
+            *selected_es = NULL;
         }
         return VLC_SUCCESS;
     }
     case ES_OUT_PRIV_START_ALL_ES:
     {
-        int *selected_es = va_arg( args, void * );
-        int count = selected_es[0];
-        for( int i = 0; i < count; ++i )
+        vlc_es_id_t **selected_es = va_arg( args, vlc_es_id_t ** );
+        vlc_es_id_t **selected_es_it = selected_es;
+        for( vlc_es_id_t *id = *selected_es_it; id != NULL;
+             id = *++selected_es_it )
         {
-            int i_id = selected_es[i + 1];
-            if( i_id != -1 )
-            {
-                es_out_id_t *p_es = EsOutGetFromID( out, i_id );
-                EsOutCreateDecoder( out, p_es );
-            }
+            EsOutCreateDecoder( out, vlc_es_id_get_out( id ) );
+            vlc_es_id_Release( id );
         }
         free(selected_es);
         EsOutStopFreeVout( out );

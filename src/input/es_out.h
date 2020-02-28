@@ -53,11 +53,11 @@ enum es_out_query_private_e
 
     ES_OUT_PRIV_SET_ES_CAT_IDS, /* arg1=es_format_category_e arg2=const char *, res=cannot fail */
 
-    /* Stop all selected ES and save the stopped state in a context. free the
-     * context or call ES_OUT_PRIV_STOP_ALL_ES */
-    ES_OUT_PRIV_STOP_ALL_ES,                        /* arg1=void ** */
+    /* Stop all selected ES and save the stopped state in a context.
+     * Call ES_OUT_PRIV_START_ALL_ES to release the context. */
+    ES_OUT_PRIV_STOP_ALL_ES,                        /* arg1=vlc_es_id_t *** */
     /* Start all ES from the context returned by ES_OUT_PRIV_STOP_ALL_ES */
-    ES_OUT_PRIV_START_ALL_ES,                       /* arg1=void * */
+    ES_OUT_PRIV_START_ALL_ES,                       /* arg1=vlc_es_id_t ** */
 
     /* Get buffering state */
     ES_OUT_PRIV_GET_BUFFERING,                      /* arg1=bool*               res=cannot fail */
@@ -153,11 +153,11 @@ static inline void es_out_SetEsCatIds( es_out_t *p_out,
                                   cat, str_ids );
     assert( ret == VLC_SUCCESS );
 }
-static inline int es_out_StopAllEs( es_out_t *p_out, void **context )
+static inline int es_out_StopAllEs( es_out_t *p_out, vlc_es_id_t ***context )
 {
     return es_out_PrivControl( p_out, ES_OUT_PRIV_STOP_ALL_ES, context );
 }
-static inline int es_out_StartAllEs( es_out_t *p_out, void *context )
+static inline int es_out_StartAllEs( es_out_t *p_out, vlc_es_id_t **context )
 {
     return es_out_PrivControl( p_out, ES_OUT_PRIV_START_ALL_ES, context );
 }

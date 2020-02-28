@@ -2301,7 +2301,7 @@ static bool Control( input_thread_t *p_input,
             if ( p_item == NULL && p_priv->p_renderer == NULL )
                 break;
 
-            void *context;
+            vlc_es_id_t **context;
             if( es_out_StopAllEs( priv->p_es_out_display, &context ) != VLC_SUCCESS )
                 break;
 
