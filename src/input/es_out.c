@@ -607,6 +607,7 @@ static void EsOutDelete( es_out_t *out )
     assert(vlc_list_is_empty(&p_sys->es_slaves));
     assert(vlc_list_is_empty(&p_sys->programs));
     assert(p_sys->p_pgrm == NULL);
+    EsOutPropsCleanup( &p_sys->video );
     EsOutPropsCleanup( &p_sys->audio );
     EsOutPropsCleanup( &p_sys->sub );
 
