@@ -3558,34 +3558,6 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
         EsOutSelectList( out, cat, es_id_list );
         return VLC_SUCCESS;
     }
-    case ES_OUT_PRIV_SET_ES_BY_ID:
-    case ES_OUT_PRIV_RESTART_ES_BY_ID:
-    case ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID:
-    {
-        const int i_id = va_arg( args, int );
-        es_out_id_t *p_es = EsOutGetFromID( out, i_id );
-        int i_new_query = 0;
-
-        switch( query )
-        {
-        case ES_OUT_PRIV_SET_ES_BY_ID:
-            i_new_query = ES_OUT_SET_ES;
-            p_es->b_forced = va_arg( args, int );
-            break;
-        case ES_OUT_PRIV_RESTART_ES_BY_ID:
-            i_new_query = ES_OUT_RESTART_ES;
-            break;
-        case ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID:
-            i_new_query = ES_OUT_SET_ES_DEFAULT;
-            break;
-        default:
-          vlc_assert_unreachable();
-        }
-        int i_ret = EsOutControlLocked( out, p_sys->main_source, i_new_query,
-                                        p_es );
-
-        return i_ret;
-    }
     case ES_OUT_PRIV_STOP_ALL_ES:
     {
         es_out_id_t *es;

@@ -51,11 +51,6 @@ enum es_out_query_private_e
     /* Select a list of ES */
     ES_OUT_PRIV_SET_ES_LIST, /* arg1= vlc_es_id_t *const* (null terminated array) */
 
-    /* Wrapper for some ES command to work with id */
-    ES_OUT_PRIV_SET_ES_BY_ID,                       /* arg1= int, arg2= bool (forced) */
-    ES_OUT_PRIV_RESTART_ES_BY_ID,
-    ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID,
-
     ES_OUT_PRIV_SET_ES_CAT_IDS, /* arg1=es_format_category_e arg2=const char *, res=cannot fail */
 
     /* Stop all selected ES and save the stopped state in a context. free the
@@ -149,18 +144,6 @@ static inline int es_out_SetEsList( es_out_t *p_out,
                                     vlc_es_id_t **ids )
 {
     return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_ES_LIST, cat, ids );
-}
-static inline int es_out_SetEsById( es_out_t *p_out, int id, bool forced )
-{
-    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_ES_BY_ID, id, forced );
-}
-static inline int es_out_RestartEsById( es_out_t *p_out, int id )
-{
-    return es_out_PrivControl( p_out, ES_OUT_PRIV_RESTART_ES_BY_ID, id  );
-}
-static inline int es_out_SetEsDefaultById( es_out_t *p_out, int id )
-{
-    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID, id );
 }
 static inline void es_out_SetEsCatIds( es_out_t *p_out,
                                        enum es_format_category_e cat,
