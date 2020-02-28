@@ -1057,7 +1057,7 @@ int MediaLibrary::getMeta( const medialibrary::IMedia& media,
     res->current_title = -1;
     // For tracks, -1 means disabled, so we can't use it for "unset"
     res->current_video_track = res->current_audio_track =
-        res->current_subtitle_track = -2;
+        res->current_subtitle_track = nullptr;
     res->aspect_ratio = res->crop = res->deinterlace =
         res->video_filter = nullptr;
     for ( const auto& meta : metas )
@@ -1077,7 +1077,7 @@ int MediaLibrary::getMeta( const medialibrary::IMedia& media,
                 res->current_title = atoi( meta.second.c_str() );
                 break;
             case medialibrary::IMedia::MetadataType::VideoTrack:
-                res->current_video_track = atoi( meta.second.c_str() );
+                COPY_META( current_video_track );
                 break;
             case medialibrary::IMedia::MetadataType::AspectRatio:
                 COPY_META( aspect_ratio );
@@ -1095,10 +1095,10 @@ int MediaLibrary::getMeta( const medialibrary::IMedia& media,
                 COPY_META( video_filter );
                 break;
             case medialibrary::IMedia::MetadataType::AudioTrack:
-                res->current_audio_track = atoi( meta.second.c_str() );
+                COPY_META( current_audio_track );
                 break;
             case medialibrary::IMedia::MetadataType::SubtitleTrack:
-                res->current_subtitle_track = atoi( meta.second.c_str() );
+                COPY_META( current_subtitle_track );
                 break;
             default:
                 break;
@@ -1141,12 +1141,12 @@ int MediaLibrary::setMeta( medialibrary::IMedia& media,
         metas[MT::Deinterlace] = values->deinterlace;
     if ( values->video_filter != nullptr )
         metas[MT::VideoFilter] = values->video_filter;
-    if ( values->current_video_track != -2 )
-        metas[MT::VideoTrack] = std::to_string( values->current_video_track );
-    if ( values->current_audio_track != -2 )
-        metas[MT::AudioTrack] = std::to_string( values->current_audio_track );
-    if ( values->current_subtitle_track != -2 )
-        metas[MT::SubtitleTrack] = std::to_string( values->current_subtitle_track );
+    if ( values->current_video_track != nullptr )
+        metas[MT::VideoTrack] = values->current_video_track;
+    if ( values->current_audio_track != nullptr )
+        metas[MT::AudioTrack] = values->current_audio_track;
+    if ( values->current_subtitle_track != nullptr )
+        metas[MT::SubtitleTrack] = values->current_subtitle_track;
 
     if ( media.setMetadata( std::move( metas ) ) == false )
         return VLC_EGENERIC;

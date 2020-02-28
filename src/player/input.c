@@ -438,35 +438,6 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
             }
             vlc_player_SendEvent(player, on_track_list_changed,
                                  VLC_PLAYER_LIST_ADDED, &trackpriv->t);
-            switch (ev->fmt->i_cat)
-            {
-                case VIDEO_ES:
-                    /* If we need to restore a specific track, let's do it upon
-                     * insertion. The initialization of the default track when
-                     * we don't have a value will be done when the first track
-                     * gets selected */
-                    if (input->ml.restore_states &&
-                        input->ml.states.current_video_track != -2 &&
-                        input->ml.states.current_video_track == ev->fmt->i_id)
-                        vlc_player_SelectTrack(input->player, &trackpriv->t,
-                                               VLC_PLAYER_SELECT_EXCLUSIVE);
-                    break;
-                case AUDIO_ES:
-                    if (input->ml.restore_states &&
-                        input->ml.states.current_audio_track != -2 &&
-                        input->ml.states.current_audio_track == ev->fmt->i_id)
-                        vlc_player_SelectTrack(input->player, &trackpriv->t,
-                                               VLC_PLAYER_SELECT_EXCLUSIVE);
-                    break;
-                case SPU_ES:
-                    if (input->ml.restore_states &&
-                        input->ml.states.current_subtitle_track != -2 &&
-                        input->ml.states.current_subtitle_track == ev->fmt->i_id)
-                        vlc_player_SelectTrack(input->player, &trackpriv->t,
-                                               VLC_PLAYER_SELECT_EXCLUSIVE);
-                default:
-                    break;
-            }
             break;
         case VLC_INPUT_ES_DELETED:
         {
@@ -498,26 +469,6 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
                 trackpriv->selected_by_user = ev->forced;
                 vlc_player_SendEvent(player, on_track_selection_changed,
                                      NULL, trackpriv->t.es_id);
-            }
-            switch (ev->fmt->i_cat)
-            {
-                /* Save the default selected track to know if it changed
-                 * when the playback stops, in order to save the user's
-                 * explicitely selected track */
-                case VIDEO_ES:
-                    if (input->ml.default_video_track == -2)
-                        input->ml.default_video_track = ev->fmt->i_id;
-                    break;
-                case AUDIO_ES:
-                    if (input->ml.default_audio_track == -2)
-                        input->ml.default_audio_track = ev->fmt->i_id;
-                    break;
-                case SPU_ES:
-                    if (input->ml.default_subtitle_track == -2)
-                        input->ml.default_subtitle_track = ev->fmt->i_id;
-                    break;
-                default:
-                    break;
             }
             break;
         case VLC_INPUT_ES_UNSELECTED:
@@ -921,9 +872,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     input->ml.states.current_title = -1;
     input->ml.states.current_video_track =
         input->ml.states.current_audio_track =
-        input->ml.states.current_subtitle_track =
-        input->ml.default_video_track = input->ml.default_audio_track =
-        input->ml.default_subtitle_track = -2;
+        input->ml.states.current_subtitle_track = -2;
     input->ml.states.progress = -1.f;
     input->ml.restore = VLC_RESTOREPOINT_NONE;
     input->ml.restore_states = false;

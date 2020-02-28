@@ -75,34 +75,20 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input, bool force_pos)
     if (input->ml.states.rate != .0f)
         vlc_player_ChangeRate(player, input->ml.states.rate);
 
-    /* Tracks are restored upon insertion, except when explicitely disabled */
-    if (input->ml.states.current_video_track == -1)
-    {
-        input->ml.default_video_track = -1;
-        input_ControlSync(input->thread, INPUT_CONTROL_SET_ES_AUTOSELECT,
-                          &(input_control_param_t) {
-                              .es_autoselect.cat = VIDEO_ES,
-                              .es_autoselect.enabled = false,
-                          });
-    }
-    if (input->ml.states.current_audio_track == -1)
-    {
-        input->ml.default_audio_track = -1;
-        input_ControlSync(input->thread, INPUT_CONTROL_SET_ES_AUTOSELECT,
-                          &(input_control_param_t) {
-                              .es_autoselect.cat = AUDIO_ES,
-                              .es_autoselect.enabled = false,
-                          });
-    }
-    if (input->ml.states.current_subtitle_track == -1)
-    {
-        input->ml.default_subtitle_track = -1;
-        input_ControlSync(input->thread, INPUT_CONTROL_SET_ES_AUTOSELECT,
-                          &(input_control_param_t) {
-                              .es_autoselect.cat = SPU_ES,
-                              .es_autoselect.enabled = false,
-                          });
-    }
+
+    const char *video_track_ids = input->ml.states.current_video_track;
+    const char *audio_track_ids = input->ml.states.current_audio_track;
+    const char *subtitle_track_ids = input->ml.states.current_subtitle_track;
+
+    if (video_track_ids)
+        vlc_player_input_SelectTracksByStringIds(input, VIDEO_ES,
+                                                 video_track_ids);
+    if (audio_track_ids)
+        vlc_player_input_SelectTracksByStringIds(input, AUDIO_ES,
+                                                 audio_track_ids);
+    if (subtitle_track_ids)
+        vlc_player_input_SelectTracksByStringIds(input, SPU_ES,
+                                                 subtitle_track_ids);
 
     vout_thread_t* vout = vlc_player_vout_Hold(player);
     if (vout != NULL)
@@ -313,34 +299,23 @@ vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
             input->ml.states.zoom = -1.f;
     }
 
-    if (input->ml.default_video_track != -2)
-    {
-        int current_video_track = vlc_player_GetFirstSelectedTrackId(&input->video_track_vector);
-        if (input->ml.default_video_track != current_video_track)
-            input->ml.states.current_video_track = current_video_track;
-        else
-            input->ml.states.current_video_track = -2;
-    }
+    char *video_track_ids =
+        vlc_player_input_GetSelectedTrackStringIds(input, VIDEO_ES);
+    char *audio_track_ids =
+        vlc_player_input_GetSelectedTrackStringIds(input, AUDIO_ES);
+    char *subtitle_track_ids =
+        vlc_player_input_GetSelectedTrackStringIds(input, SPU_ES);
 
-    if (input->ml.default_audio_track != -2)
-    {
-        int current_audio_track = vlc_player_GetFirstSelectedTrackId(&input->audio_track_vector);
-        if (input->ml.default_audio_track != current_audio_track)
-            input->ml.states.current_audio_track = current_audio_track;
-        else
-            input->ml.states.current_audio_track = -2;
-    }
+    vlc_player_CompareAssignState(&input->ml.states.current_video_track, &video_track_ids);
+    vlc_player_CompareAssignState(&input->ml.states.current_audio_track, &audio_track_ids);
+    vlc_player_CompareAssignState(&input->ml.states.current_subtitle_track, &subtitle_track_ids);
 
-    if (input->ml.default_subtitle_track != -2)
-    {
-        int current_subtitle_track = vlc_player_GetFirstSelectedTrackId(&input->spu_track_vector);
-        if (input->ml.default_subtitle_track != current_subtitle_track)
-            input->ml.states.current_subtitle_track = current_subtitle_track;
-        else
-            input->ml.states.current_subtitle_track = -2;
-    }
+    free(video_track_ids);
+    free(audio_track_ids);
+    free(subtitle_track_ids);
 
     vlc_ml_media_set_all_playback_states(ml, media->i_id, &input->ml.states);
+
     vlc_ml_release(&input->ml.states);
     vlc_ml_release(media);
 }

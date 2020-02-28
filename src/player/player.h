@@ -108,9 +108,6 @@ struct vlc_player_input
     struct
     {
         vlc_ml_playback_states_all states;
-        int default_video_track;
-        int default_audio_track;
-        int default_subtitle_track;
         enum
         {
             VLC_RESTOREPOINT_TITLE,

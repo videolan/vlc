@@ -506,9 +506,9 @@ typedef struct vlc_ml_playback_states_all
     float rate;
     float zoom;
     int current_title;
-    int current_video_track;
-    int current_audio_track;
-    int current_subtitle_track;
+    char* current_video_track;
+    char* current_audio_track;
+    char *current_subtitle_track;
     char* aspect_ratio;
     char* crop;
     char* deinterlace;
