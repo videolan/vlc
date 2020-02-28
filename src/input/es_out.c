@@ -2452,6 +2452,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
             policy = ES_OUT_ES_POLICY_EXCLUSIVE;
     }
 
+    bool b_auto_selected = p_esprops->b_autoselect;
     bool b_auto_unselect = p_sys->i_mode == ES_OUT_MODE_AUTO &&
                            policy == ES_OUT_ES_POLICY_EXCLUSIVE &&
                            p_esprops->p_main_es && p_esprops->p_main_es != es;
@@ -2553,7 +2554,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                         else if( p_esprops->p_main_es == NULL ||
                                  es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority )
                         {
-                            if( p_esprops->b_autoselect )
+                            if( b_auto_selected )
                                 wanted_es = es;
                         }
                     }
@@ -2570,7 +2571,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
         else if( p_esprops->p_main_es == NULL ||
                  es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority )
         {
-            if( p_esprops->b_autoselect )
+            if( b_auto_selected )
                 wanted_es = es;
         }
 
