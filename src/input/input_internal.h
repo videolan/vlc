@@ -636,11 +636,6 @@ static inline int input_ControlPushEsHelper( input_thread_t *p_input, int i_type
     } );
 }
 
-/** Synchronously execute a control sequence. This MUST only be used before the
- * input is started
- */
-void input_ControlSync(input_thread_t *, int, const input_control_param_t *);
-
 /**
  * Set the list of string ids to enable for a category
  *
