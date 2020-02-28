@@ -248,6 +248,9 @@ static int Open( vlc_object_t * p_this )
     /* */
     TAB_INIT( p_sys->i_seekpoints, p_sys->pp_seekpoints );
 
+    /* Enforce exclusive mode, only one track can be selected at once. */
+    es_out_Control( p_demux->out, ES_OUT_SET_ES_CAT_POLICY, AUDIO_ES,
+                    ES_OUT_ES_POLICY_EXCLUSIVE );
 
     while ( !p_sys->b_preparsing_done && p_demux->pf_demux( p_demux ) > 0 )
     {}
