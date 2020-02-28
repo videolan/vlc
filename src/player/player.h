@@ -36,6 +36,8 @@ struct vlc_player_track_priv
     vlc_tick_t delay;
     /* only valid if selected and if category is VIDEO_ES or SPU_ES */
     enum vlc_vout_order vout_order;
+    /* Used to save or not the track selection */
+    bool selected_by_user;
 };
 
 typedef struct VLC_VECTOR(struct vlc_player_program *)

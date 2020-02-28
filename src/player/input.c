@@ -494,6 +494,7 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
             if (trackpriv)
             {
                 trackpriv->t.selected = true;
+                trackpriv->selected_by_user = ev->forced;
                 vlc_player_SendEvent(player, on_track_selection_changed,
                                      NULL, trackpriv->t.es_id);
             }
@@ -524,6 +525,7 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
             {
                 vlc_player_RemoveTimerSource(player, ev->id);
                 trackpriv->t.selected = false;
+                trackpriv->selected_by_user = false;
                 vlc_player_SendEvent(player, on_track_selection_changed,
                                      trackpriv->t.es_id, NULL);
             }

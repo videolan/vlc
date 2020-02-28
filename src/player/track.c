@@ -113,6 +113,7 @@ vlc_player_track_priv_New(vlc_es_id_t *id, const char *name, const es_format_t *
     trackpriv->delay = INT64_MAX;
     trackpriv->vout = NULL;
     trackpriv->vout_order = VLC_VOUT_ORDER_NONE;
+    trackpriv->selected_by_user = false;
 
     track->name = strdup(name);
     if (!track->name)
