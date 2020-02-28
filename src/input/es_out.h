@@ -51,10 +51,6 @@ enum es_out_query_private_e
     /* Select a list of ES */
     ES_OUT_PRIV_SET_ES_LIST, /* arg1= vlc_es_id_t *const* (null terminated array) */
 
-    /* Disable autoselection of tracks from a given category */
-    ES_OUT_PRIV_SET_AUTOSELECT,  /* arg1= int (es category),
-                                    arg2= int (enabled/disabled), res=can fail */
-
     /* Wrapper for some ES command to work with id */
     ES_OUT_PRIV_SET_ES_BY_ID,                       /* arg1= int, arg2= bool (forced) */
     ES_OUT_PRIV_RESTART_ES_BY_ID,
@@ -153,11 +149,6 @@ static inline int es_out_SetEsList( es_out_t *p_out,
                                     vlc_es_id_t **ids )
 {
     return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_ES_LIST, cat, ids );
-}
-static inline int es_out_SetAutoSelect( es_out_t *p_out,
-                                        enum es_format_category_e cat, bool enabled )
-{
-    return es_out_PrivControl( p_out, ES_OUT_PRIV_SET_AUTOSELECT, cat, enabled );
 }
 static inline int es_out_SetEsById( es_out_t *p_out, int id, bool forced )
 {

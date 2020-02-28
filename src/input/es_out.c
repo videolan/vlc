@@ -3563,26 +3563,6 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
         EsOutSelectList( out, cat, es_id_list );
         return VLC_SUCCESS;
     }
-    case ES_OUT_PRIV_SET_AUTOSELECT:
-    {
-        int i_cat = va_arg( args, int );
-        bool b_enabled = va_arg( args, int );
-        switch ( i_cat )
-        {
-            case VIDEO_ES:
-                p_sys->video.b_autoselect = b_enabled;
-                break;
-            case AUDIO_ES:
-                p_sys->audio.b_autoselect = b_enabled;
-                break;
-            case SPU_ES:
-                p_sys->sub.b_autoselect = b_enabled;
-                break;
-            default:
-                return VLC_EGENERIC;
-        }
-        return VLC_SUCCESS;
-    }
     case ES_OUT_PRIV_SET_ES_BY_ID:
     case ES_OUT_PRIV_RESTART_ES_BY_ID:
     case ES_OUT_PRIV_SET_ES_DEFAULT_BY_ID:
