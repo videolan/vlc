@@ -1859,22 +1859,46 @@ static void ControlSetEsList(input_thread_t *input,
 
     if (ids[0] != NULL && ids[1] == NULL)
     {
-        demux_Control(priv->master->p_demux, DEMUX_SET_ES,
+        /* Update the only demux touched by this change */
+        const input_source_t *source = vlc_es_id_GetSource(ids[0]);
+        assert(source);
+        demux_Control(source->p_demux, DEMUX_SET_ES,
                       vlc_es_id_GetInputId(ids[0]));
         return;
     }
 
-    /* Send an array of int id from the array of es_id to the demux */
+    /* Send the updated list for each different sources */
     size_t count;
     for (count = 0; ids[count] != NULL; count++);
-
     int *array = count ? vlc_alloc(count, sizeof(int)) : NULL;
     if (!array)
         return;
 
-    for (size_t i = 0; i < count; ++i)
-        array[i] = vlc_es_id_GetInputId(ids[i]);
-    demux_Control(priv->master->p_demux, DEMUX_SET_ES_LIST, count, array);
+    for (int i = 0; i < priv->i_slave + 1; ++ i)
+    {
+        /* For master and all slaves */
+        input_source_t *source = i == 0 ? priv->master : priv->slave[i - 1];
+
+        /* Split the ids array into smaller arrays of ids having the same
+         * source. */
+        size_t set_es_idx = 0;
+        for (size_t ids_idx = 0; ids_idx < count; ++ids_idx)
+        {
+            vlc_es_id_t *id = ids[ids_idx];
+            if (vlc_es_id_GetSource(id) == source)
+                array[set_es_idx++] = vlc_es_id_GetInputId(id);
+        }
+
+        /* Update all demuxers */
+        if (set_es_idx > 0)
+        {
+            if (set_es_idx == 1)
+                demux_Control(source->p_demux, DEMUX_SET_ES, array[0]);
+            else
+                demux_Control(source->p_demux, DEMUX_SET_ES_LIST, set_es_idx,
+                              array);
+        }
+    }
     free(array);
 }
 
@@ -2078,8 +2102,12 @@ static bool Control( input_thread_t *p_input,
 
         case INPUT_CONTROL_SET_ES:
             if( es_out_SetEs( priv->p_es_out_display, param.id ) == VLC_SUCCESS )
-                demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_ES,
+            {
+                const input_source_t *source = vlc_es_id_GetSource( param.id );
+                assert( source );
+                demux_Control( source->p_demux, DEMUX_SET_ES,
                                vlc_es_id_GetInputId( param.id ) );
+            }
             break;
         case INPUT_CONTROL_SET_ES_LIST:
             ControlSetEsList( p_input, param.list.cat, param.list.ids );
