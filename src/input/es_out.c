@@ -4435,3 +4435,8 @@ vlc_es_id_GetCat(vlc_es_id_t *id)
 {
     return id->i_cat;
 }
+
+const input_source_t *vlc_es_id_GetSource(vlc_es_id_t *id)
+{
+    return id->source;
+}
