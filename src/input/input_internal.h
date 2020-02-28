@@ -379,6 +379,7 @@ struct input_source_t
 
     char *str_id;
     int auto_id;
+    bool autoselect_cats[ES_CATEGORY_COUNT];
 
     /* Title infos for that input */
     bool         b_title_demux; /* Titles/Seekpoints provided by demux */
@@ -676,6 +677,12 @@ const char *input_source_GetStrId( input_source_t *in );
  * addition order.
  */
 int input_source_GetNewAutoId( input_source_t *in );
+
+/**
+ * Returns true if a category should be auto-selected for a given source
+ */
+bool input_source_IsCatAutoselected( input_source_t *in,
+                                     enum es_format_category_e cat );
 
 /* Bound pts_delay */
 #define INPUT_PTS_DELAY_MAX VLC_TICK_FROM_SEC(60)
