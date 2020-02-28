@@ -1848,6 +1848,36 @@ void input_SetEsCatIds(input_thread_t *input, enum es_format_category_e cat,
     }
 }
 
+static void ControlSetEsList(input_thread_t *input,
+                             enum es_format_category_e cat,
+                             vlc_es_id_t **ids)
+{
+    input_thread_private_t *priv = input_priv(input);
+
+    if (es_out_SetEsList(priv->p_es_out_display, cat, ids) != VLC_SUCCESS)
+        return;
+
+    if (ids[0] != NULL && ids[1] == NULL)
+    {
+        demux_Control(priv->master->p_demux, DEMUX_SET_ES,
+                      vlc_es_id_GetInputId(ids[0]));
+        return;
+    }
+
+    /* Send an array of int id from the array of es_id to the demux */
+    size_t count;
+    for (count = 0; ids[count] != NULL; count++);
+
+    int *array = count ? vlc_alloc(count, sizeof(int)) : NULL;
+    if (!array)
+        return;
+
+    for (size_t i = 0; i < count; ++i)
+        array[i] = vlc_es_id_GetInputId(ids[i]);
+    demux_Control(priv->master->p_demux, DEMUX_SET_ES_LIST, count, array);
+    free(array);
+}
+
 static bool Control( input_thread_t *p_input,
                      int i_type, input_control_param_t param )
 {
@@ -2052,33 +2082,8 @@ static bool Control( input_thread_t *p_input,
                                vlc_es_id_GetInputId( param.id ) );
             break;
         case INPUT_CONTROL_SET_ES_LIST:
-        {
-            if( es_out_SetEsList( input_priv(p_input)->p_es_out_display,
-                                  param.list.cat, param.list.ids ) == VLC_SUCCESS )
-            {
-                if( param.list.ids[0] != NULL && param.list.ids[1] == NULL )
-                    demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_ES,
-                                   vlc_es_id_GetInputId( param.list.ids[0] ) );
-                else
-                {
-                    /* Send an array of int id from the array of es_id to the
-                     * demux */
-                    size_t count;
-                    for (count = 0; param.list.ids[count] != NULL; count++);
-
-                    int *ids = count ? vlc_alloc(count, sizeof(int)) : NULL;
-                    if (count == 0 || ids)
-                    {
-                        for (size_t i = 0; i < count; ++i)
-                            ids[i] = vlc_es_id_GetInputId(param.list.ids[i]);
-                        demux_Control(input_priv(p_input)->master->p_demux,
-                                      DEMUX_SET_ES_LIST, count, ids);
-                    }
-                    free(ids);
-                }
-            }
+            ControlSetEsList( p_input, param.list.cat, param.list.ids );
             break;
-        }
         case INPUT_CONTROL_UNSET_ES:
             es_out_UnsetEs( priv->p_es_out_display, param.id );
             break;
