@@ -669,7 +669,7 @@ AC_SEARCH_LIBS(connect, [socket], [
   ])
 ], [
   AS_IF([test "${SYS}" = "mingw32"], [
-    SOCKET_LIBS="-lws2_32"
+    SOCKET_LIBS="-lws2_32 -liphlpapi"
   ])
 ])
 
@@ -680,6 +680,7 @@ AC_SEARCH_LIBS([inet_pton], [nsl], [
 ],, [${SOCKET_LIBS}])
 
 LIBS="${LIBS} ${SOCKET_LIBS}"
+CFLAGS="${CFLAGS} -Werror-implicit-function-declaration"
 AC_LINK_IFELSE([
     AC_LANG_PROGRAM([#ifdef _WIN32
         # if _WIN32_WINNT < 0x600
@@ -693,8 +694,18 @@ AC_LINK_IFELSE([
         char dst[[sizeof(struct in_addr)]];
         inet_pton(AF_INET, "127.0.0.1", dst);
     ])],[AC_DEFINE([HAVE_INET_PTON],[1],[Define to 1 if you have inet_pton function])],[AC_LIBOBJ([inet_pton])])
+AC_LINK_IFELSE([
+    AC_LANG_PROGRAM([#ifdef _WIN32
+        #include <iphlpapi.h>
+        #else
+        #include <sys/types.h>
+        #include <sys/socket.h>
+        #include <net/if.h>
+        #endif], [
+        if_nametoindex("");
+    ])],[AC_DEFINE([HAVE_IF_NAMETOINDEX],[1],[Define to 1 if you have if_nametoindex function])])
 AC_CHECK_TYPES([struct if_nameindex],,,[#include <net/if.h>])
-AC_CHECK_FUNCS([if_nameindex if_nametoindex])
+AC_CHECK_FUNCS([if_nameindex])
 VLC_RESTORE_FLAGS
 AC_SUBST(SOCKET_LIBS)
 
