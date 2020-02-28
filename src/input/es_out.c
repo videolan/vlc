@@ -1242,13 +1242,6 @@ static void EsOutSendEsEvent(es_out_t *out, es_out_id_t *es, int action,
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t *p_input = p_sys->p_input;
 
-    if (action == VLC_INPUT_ES_ADDED)
-    {
-        input_thread_private_t *priv = input_priv(p_input);
-        /*FIXME: see input_SlaveSourceAdd */
-        priv->i_last_es_id = es->fmt.i_id;
-        priv->i_last_es_cat = es->fmt.i_cat;
-    }
     input_SendEventEs(p_input, &(struct vlc_input_event_es) {
         .action = action,
         .id = &es->id,
@@ -2452,7 +2445,8 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
             policy = ES_OUT_ES_POLICY_EXCLUSIVE;
     }
 
-    bool b_auto_selected = p_esprops->b_autoselect;
+    bool b_auto_selected = p_esprops->b_autoselect
+        || input_source_IsCatAutoselected( es->id.source, es->fmt.i_cat );
     bool b_auto_unselect = p_sys->i_mode == ES_OUT_MODE_AUTO &&
                            policy == ES_OUT_ES_POLICY_EXCLUSIVE &&
                            p_esprops->p_main_es && p_esprops->p_main_es != es;

@@ -330,8 +330,6 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     else
         vlc_viewpoint_init( &priv->viewpoint );
 
-    priv->i_last_es_cat = UNKNOWN_ES;
-
     input_item_Hold( p_item ); /* Released in Destructor() */
     priv->p_item = p_item;
 
@@ -3379,8 +3377,6 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
     msg_Dbg( p_input, "loading %s slave: %s (forced: %d)",
              i_cat == SPU_ES ? "spu" : "audio", psz_uri, b_forced );
 
-    priv->i_last_es_cat = UNKNOWN_ES;
-
     input_source_t *p_source = InputSourceNew( psz_uri );
     if( !p_source )
         return VLC_EGENERIC;
@@ -3433,14 +3429,6 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
         p_source->b_slave_sub = true;
 
     TAB_APPEND( priv->i_slave, priv->slave, p_source );
-
-    if( !b_forced || priv->i_last_es_cat != i_cat )
-        return VLC_SUCCESS;
-
-    assert( priv->i_last_es_id != -1 );
-
-    es_out_SetEsDefaultById( priv->p_es_out_display, priv->i_last_es_id );
-    es_out_SetEsById( priv->p_es_out_display, priv->i_last_es_id, false );
 
     return VLC_SUCCESS;
 }

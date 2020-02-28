@@ -521,10 +521,6 @@ typedef struct input_thread_private_t
     input_source_t **slave;
     float          slave_subs_rate;
 
-    /* Last ES added */
-    enum es_format_category_e i_last_es_cat;
-    int                       i_last_es_id;
-
     /* Resources */
     input_resource_t *p_resource;
 
