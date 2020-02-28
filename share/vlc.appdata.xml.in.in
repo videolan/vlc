@@ -28,8 +28,14 @@
     <developer_name>VideoLAN et al.</developer_name>
     <update_contact>vlc-devel -- videolan.org</update_contact>
     <screenshots>
-        <screenshot type="default">http://images.videolan.org/vlc/screenshots/2.0.0/vlc-2.0-poney.jpg</screenshot>
-        <screenshot type="default">http://images.videolan.org/vlc/screenshots/2.0.0/vlc-2.0-gnome3-open.jpg</screenshot>
-        <screenshot type="default">http://images.videolan.org/vlc/screenshots/2.0.0/vlc-2.0-gnome3-debian.jpg</screenshot>
+        <screenshot type="default">
+            <image>http://images.videolan.org/vlc/screenshots/2.0.0/vlc-2.0-poney.jpg</image>
+        </screenshot>
+        <screenshot type="default">
+            <image>http://images.videolan.org/vlc/screenshots/2.0.0/vlc-2.0-gnome3-open.jpg</image>
+        </screenshot>
+        <screenshot type="default">
+            <image>http://images.videolan.org/vlc/screenshots/2.0.0/vlc-2.0-gnome3-debian.jpg</image>
+        </screenshot>
     </screenshots>
 </component>
