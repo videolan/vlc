@@ -119,7 +119,7 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input, bool force_pos)
     }
 }
 
-static const float beginning_of_media_percent = .5f;
+static const float beginning_of_media_percent = .05f;
 static const int64_t beginning_of_media_sec = 60;
 
 static int
