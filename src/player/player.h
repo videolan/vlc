@@ -404,6 +404,10 @@ vlc_player_input_SelectTracksByStringIds(struct vlc_player_input *input,
                                          enum es_format_category_e cat,
                                          const char *str_ids);
 
+char *
+vlc_player_input_GetSelectedTrackStringIds(struct vlc_player_input *input,
+                                           enum es_format_category_e cat);
+
 vlc_tick_t
 vlc_player_input_GetTime(struct vlc_player_input *input);
 

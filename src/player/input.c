@@ -24,6 +24,7 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_memstream.h>
 #include "player.h"
 
 struct vlc_player_track_priv *
@@ -840,6 +841,38 @@ vlc_player_input_SelectTracksByStringIds(struct vlc_player_input *input,
                                          const char *str_ids)
 {
     input_SetEsCatIds(input->thread, cat, str_ids);
+}
+
+char *
+vlc_player_input_GetSelectedTrackStringIds(struct vlc_player_input *input,
+                                           enum es_format_category_e cat)
+{
+    vlc_player_track_vector *vec = vlc_player_input_GetTrackVector(input, cat);
+    assert(vec);
+    bool first_track = true;
+    struct vlc_memstream ms;
+
+    struct vlc_player_track_priv* t;
+    vlc_vector_foreach(t, vec)
+    {
+        if (t->selected_by_user && vlc_es_id_IsStrIdStable(t->t.es_id))
+        {
+            if (first_track)
+            {
+                int ret = vlc_memstream_open(&ms);
+                if (ret != 0)
+                    return NULL;
+            }
+            const char *str_id = vlc_es_id_GetStrId(t->t.es_id);
+            assert(str_id);
+
+            if (!first_track)
+                vlc_memstream_putc(&ms, ',');
+            vlc_memstream_puts(&ms, str_id);
+            first_track = false;
+        }
+    }
+    return !first_track && vlc_memstream_close(&ms) == 0 ? ms.ptr : NULL;
 }
 
 struct vlc_player_input *
