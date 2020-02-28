@@ -680,23 +680,6 @@ static vlc_tick_t EsOutGetWakeup( es_out_t *out )
 
 static es_out_id_t es_cat[DATA_ES];
 
-static es_out_id_t *EsOutGetFromID( es_out_t *out, int i_id )
-{
-    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
-    es_out_id_t *es;
-
-    if( i_id < 0 )
-    {
-        /* Special HACK, -i_id is the cat of the stream */
-        return es_cat - i_id;
-    }
-
-    foreach_es_then_es_slaves(es)
-        if (es->fmt.i_id == i_id)
-            return es;
-    return NULL;
-}
-
 static es_out_id_t *EsOutGetSelectedCat( es_out_t *out,
                                          enum es_format_category_e cat )
 {
