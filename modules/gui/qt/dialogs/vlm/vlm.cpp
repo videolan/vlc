@@ -71,7 +71,6 @@ VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 #define ADDMEDIATYPES( str, type ) ui.mediaType->addItem( qtr( str ), QVariant( type ) );
     ADDMEDIATYPES( N_("Broadcast"), QVLM_Broadcast );
     ADDMEDIATYPES( N_("Schedule"), QVLM_Schedule );
-    ADDMEDIATYPES( N_("Video On Demand ( VOD )"), QVLM_VOD );
 #undef ADDMEDIATYPES
 
     /* Schedule Stuffs */
@@ -172,7 +171,6 @@ void VLMDialog::showScheduleWidget( int i )
 {
     ui.schedBox->setVisible( ( i == QVLM_Schedule ) );
     ui.loopBCast->setVisible( ( i == QVLM_Broadcast ) );
-    ui.vodBox->setVisible( ( i == QVLM_VOD ) );
 }
 
 void VLMDialog::selectVLMItem( int i )
@@ -226,12 +224,6 @@ void VLMDialog::addVLMItem()
         vlm->AddBroadcast( name, inputText, inputOptions, outputText,
                            b_checked, b_looped );
     break;
-    case QVLM_VOD:
-        typeShortName = "VOD";
-        vlmAwidget = new VLMVod( vlm, name, inputText, inputOptions, outputText,
-                                 b_checked, ui.muxLedit->text(), this );
-        vlm->AddVod( name, inputText, inputOptions, outputText, b_checked );
-        break;
     case QVLM_Schedule:
         typeShortName = "Sched";
         vlmAwidget = new VLMSchedule( vlm, name, inputText, inputOptions, outputText,
@@ -256,7 +248,6 @@ void VLMDialog::addVLMItem()
     clearWidgets();
 }
 
-/* TODO : VOD are not exported to the file */
 bool VLMDialog::exportVLMConf()
 {
     QString saveVLMConfFileName = QFileDialog::getSaveFileName( this,
@@ -298,15 +289,6 @@ void VLMDialog::mediasPopulator()
             QString outputText = qfu( pp_dsc[i]->psz_output );
 
             /* Schedule media is a quite especial, maybe there is another way to grab information */
-            if( pp_dsc[i]->b_vod )
-            {
-                typeShortName = "VOD";
-                QString mux = qfu( pp_dsc[i]->vod.psz_mux );
-                vlmAwidget = new VLMVod( vlm, mediaName, inputText,
-                                         inputOptions, outputText,
-                                         pp_dsc[i]->b_enabled, mux, this );
-            }
-            else
             {
                 typeShortName = "Bcast";
                 vlmAwidget = new VLMBroadcast( vlm, mediaName, inputText, inputOptions,
@@ -360,7 +342,6 @@ void VLMDialog::clearWidgets()
     ui.enableCheck->setChecked( true );
     ui.nameLedit->setReadOnly( false );
     ui.loopBCast->setChecked( false );
-    ui.muxLedit->clear();
     ui.saveButton->hide();
     ui.addButton->show();
 }
@@ -411,9 +392,6 @@ void VLMDialog::startModifyVLMItem( VLMAWidget *vlmObj )
     case QVLM_Broadcast:
         ui.loopBCast->setChecked( (qobject_cast<VLMBroadcast *>(vlmObj))->b_looped );
         break;
-    case QVLM_VOD:
-        ui.muxLedit->setText( (qobject_cast<VLMVod *>(vlmObj))->mux );
-        break;
     case QVLM_Schedule:
         time->setDateTime( ( qobject_cast<VLMSchedule *>(vlmObj))->schetime );
         date->setDateTime( ( qobject_cast<VLMSchedule *>(vlmObj))->schedate );
@@ -438,9 +416,6 @@ void VLMDialog::saveModifications()
         {
         case QVLM_Broadcast:
             (qobject_cast<VLMBroadcast *>(vlmObj))->b_looped = ui.loopBCast->isChecked();
-            break;
-        case QVLM_VOD:
-            (qobject_cast<VLMVod *>(vlmObj))->mux = ui.muxLedit->text();
             break;
         case QVLM_Schedule:
             (qobject_cast<VLMSchedule *>(vlmObj))->schetime = time->dateTime();
@@ -616,31 +591,6 @@ void VLMSchedule::update()
                        rNumber, rDays, b_enabled);
 }
 
-/****************
- * VLMVOD
- ****************/
-VLMVod::VLMVod( VLMWrapper *vlm, const QString& name_, const QString& input,
-                const QString& inputOptions, const QString& output,
-                bool enabled, const QString& _mux, VLMDialog *parent)
-       : VLMAWidget( vlm, name_, input, inputOptions, output, enabled, parent,
-                     QVLM_VOD )
-{
-    nameLabel->setText( qtr("VOD: ") + name );
-
-    mux = _mux;
-    muxLabel = new QLabel;
-    objLayout->addWidget( muxLabel, 1, 0 );
-
-    update();
-}
-
-void VLMVod::update()
-{
-    muxLabel->setText( mux );
-    vlm->EditVod( name, input, inputOptions, output, b_enabled, mux );
-}
-
-
 /*******************
  * VLMWrapper
  *******************/
@@ -751,61 +701,6 @@ void VLMWrapper::ControlBroadcast( const QString& name, int BroadcastStatus,
     }
     vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
     vlm_MessageDelete( message );
-}
-
-void VLMWrapper::AddVod( const QString& name, const QString& input,
-                         const QString& inputOptions, const QString& output,
-                         bool b_enabled, const QString& mux )
-{
-    vlm_message_t *message;
-    QString command = "new \"" + name + "\" vod";
-    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
-    vlm_MessageDelete( message );
-    EditVod(  name, input, inputOptions, output, b_enabled, mux );
-}
-
-void VLMWrapper::EditVod( const QString& name, const QString& input,
-                          const QString& inputOptions, const QString& output,
-                          bool b_enabled,
-                          const QString& mux )
-{
-    vlm_message_t *message;
-    QString command;
-
-    if( !input.isEmpty() )
-    {
-        command = "setup \"" + name + "\" input \"" + input + "\"";
-        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
-        vlm_MessageDelete( message );
-
-        QStringList options = inputOptions.split( " :", QString::SkipEmptyParts );
-        for( int i = 0; i < options.count(); i++ )
-        {
-            command = "setup \"" + name + "\" option \"" + options[i].trimmed() + "\"";
-            vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
-            vlm_MessageDelete( message );
-        }
-    }
-
-    if( !output.isEmpty() )
-    {
-        command = "setup \"" + name + "\" output \"" + output + "\"";
-        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
-        vlm_MessageDelete( message );
-    }
-
-    if( b_enabled )
-    {
-        command = "setup \"" + name + "\" enabled";
-        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
-        vlm_MessageDelete( message );
-    }
-    if( !mux.isEmpty() )
-    {
-        command = "setup \"" + name + "\" mux \"" + mux + "\"";
-        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
-        vlm_MessageDelete( message );
-    }
 }
 
 void VLMWrapper::AddSchedule( const QString& name, const QString& input,

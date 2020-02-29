@@ -38,7 +38,6 @@
 enum{
     QVLM_Broadcast,
     QVLM_Schedule,
-    QVLM_VOD
 };
 
 enum{
@@ -124,12 +123,6 @@ public:
                        QDateTime _schetime, QDateTime _schedate,
                        int _scherepeatnumber, int _repeatDays,
                        bool b_enabled = true, const QString& mux = "" );
-    void AddVod( const QString&, const QString&,
-                 const QString&, const QString&,
-                 bool b_enabled = true, const QString& mux = "" );
-    void EditVod( const QString&, const QString&,
-                  const QString&, const QString&,
-                  bool b_enabled = true, const QString& mux = "" );
     void AddSchedule( const QString&, const QString&,
                       const QString&, const QString&,
                       QDateTime _schetime, QDateTime _schedate,
@@ -189,20 +182,6 @@ private slots:
     void stop();
     void togglePlayPause();
     void toggleLoop();
-};
-
-class VLMVod : public VLMAWidget
-{
-    Q_OBJECT
-    friend class VLMDialog;
-public:
-    VLMVod( VLMWrapper *, const QString& name, const QString& input,
-            const QString& inputOptions, const QString& output,
-            bool _enable, const QString& _mux, VLMDialog *parent );
-    void update();
-private:
-    QString mux;
-    QLabel *muxLabel;
 };
 
 class VLMSchedule : public VLMAWidget

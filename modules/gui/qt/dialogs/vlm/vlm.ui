@@ -121,49 +121,7 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0" colspan="3" >
-       <widget class="QGroupBox" name="vodBox" >
-        <property name="title" >
-         <string>Mux Control</string>
-        </property>
-        <layout class="QHBoxLayout" >
-         <item>
-          <widget class="QLabel" name="label" >
-           <property name="text" >
-            <string>Muxer:</string>
-           </property>
-           <property name="margin" >
-            <number>3</number>
-           </property>
-           <property name="buddy" >
-            <cstring>muxLedit</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="muxLedit" >
-           <property name="inputMask" >
-            <string>AAAA; </string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer>
-           <property name="orientation" >
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0" >
-            <size>
-             <width>411</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="7" column="0" colspan="2" >
+      <item row="6" column="0" colspan="2" >
        <widget class="QCheckBox" name="loopBCast" >
         <property name="text" >
          <string>Loop</string>
