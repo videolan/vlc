@@ -414,7 +414,6 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
         int index;
         TAB_FIND(p_resource->i_vout, p_resource->pp_vout, cfg_vout, index );
         assert(index >= 0);
-        assert(p_resource->p_vout_free == NULL || p_resource->p_vout_free == cfg_vout);
     }
 #endif
 
