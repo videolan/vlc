@@ -187,7 +187,7 @@ vlc_module_begin ()
     set_shortname( N_("RTP"))
     set_description( N_("RTP stream output") )
     set_capability( "sout stream", 0 )
-    add_shortcut( "rtp", "vod" )
+    add_shortcut( "rtp" )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
 
@@ -239,21 +239,6 @@ vlc_module_begin ()
                  RFC3016_LONGTEXT, false )
 
     set_callbacks( Open, Close )
-
-    add_submodule ()
-    set_shortname( N_("RTSP VoD" ) )
-    set_description( N_("RTSP VoD server") )
-    set_category( CAT_SOUT )
-    set_subcategory( SUBCAT_SOUT_VOD )
-    set_capability( "vod server", 10 )
-    set_callbacks( OpenVoD, CloseVoD )
-    add_shortcut( "rtsp" )
-    add_integer( "rtsp-timeout", 60, RTSP_TIMEOUT_TEXT,
-                 RTSP_TIMEOUT_LONGTEXT, true )
-    add_string( "sout-rtsp-user", "",
-                RTSP_USER_TEXT, RTSP_USER_LONGTEXT, true )
-    add_password("sout-rtsp-pwd", "", RTSP_PASS_TEXT, RTSP_PASS_LONGTEXT)
-
 vlc_module_end ()
 
 /*****************************************************************************
@@ -286,9 +271,6 @@ static void SDPHandleUrl( sout_stream_t *, const char * );
 static int SapSetup( sout_stream_t *p_stream );
 static int FileSetup( sout_stream_t *p_stream );
 static int HttpSetup( sout_stream_t *p_stream, const vlc_url_t * );
-
-static vlc_tick_t rtp_init_ts( const vod_media_t *p_media,
-                            const char *psz_vod_session );
 
 typedef struct
 {
@@ -324,10 +306,6 @@ typedef struct
     uint8_t   proto;
     bool      rtcp_mux;
     bool      b_latm;
-
-    /* VoD */
-    vod_media_t *p_vod_media;
-    char     *psz_vod_session;
 
     /* in case we do TS/PS over rtp */
     sout_mux_t        *p_mux;
@@ -475,33 +453,7 @@ static int Open( vlc_object_t *p_this )
     free (psz);
     var_Create (p_this, "dccp-service", VLC_VAR_STRING);
 
-    p_sys->p_vod_media = NULL;
-    p_sys->psz_vod_session = NULL;
-
-    if (! strcmp(p_stream->psz_name, "vod"))
-    {
-        /* The VLM stops all instances before deleting a media, so this
-         * reference will remain valid during the lifetime of the rtp
-         * stream output. */
-        p_sys->p_vod_media = var_InheritAddress(p_stream, "vod-media");
-
-        if (p_sys->p_vod_media != NULL)
-        {
-            p_sys->psz_vod_session = var_InheritString(p_stream, "vod-session");
-            if (p_sys->psz_vod_session == NULL)
-            {
-                msg_Err(p_stream, "missing VoD session");
-                free(p_sys);
-                return VLC_EGENERIC;
-            }
-
-            const char *mux = vod_get_mux(p_sys->p_vod_media);
-            var_SetString(p_stream, SOUT_CFG_PREFIX "mux", mux);
-        }
-    }
-
-    if( p_sys->psz_destination == NULL && !b_rtsp
-        && p_sys->p_vod_media == NULL )
+    if( p_sys->psz_destination == NULL && !b_rtsp )
     {
         msg_Err( p_stream, "missing destination and not in RTSP mode" );
         free( p_sys );
@@ -519,12 +471,11 @@ static int Open( vlc_object_t *p_this )
 
     /* NPT=0 time will be determined when we packetize the first packet
      * (of any ES). But we want to be able to report rtptime in RTSP
-     * without waiting (and already did in the VoD case). So until then,
+     * without waiting. So until then,
      * we use an arbitrary reference PTS for timestamp computations, and
      * then actual PTS will catch up using offsets. */
     p_sys->i_npt_zero = VLC_TICK_INVALID;
-    p_sys->i_pts_zero = rtp_init_ts(p_sys->p_vod_media,
-                                    p_sys->psz_vod_session);
+    p_sys->i_pts_zero = vlc_tick_now();
     p_sys->i_es = 0;
     p_sys->es   = NULL;
     p_sys->rtsp = NULL;
@@ -553,7 +504,6 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_stream, "unsupported muxer type for RTP (only TS/PS)" );
             free( psz );
-            free( p_sys->psz_vod_session );
             free( p_sys->psz_destination );
             free( p_sys );
             return VLC_EGENERIC;
@@ -567,7 +517,6 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_stream, "cannot create muxer" );
             sout_AccessOutDelete( p_sys->p_grab );
-            free( p_sys->psz_vod_session );
             free( p_sys->psz_destination );
             free( p_sys );
             return VLC_EGENERIC;
@@ -669,7 +618,6 @@ static void Close( vlc_object_t * p_this )
         unlink( p_sys->psz_sdp_file );
         free( p_sys->psz_sdp_file );
     }
-    free( p_sys->psz_vod_session );
     free( p_sys->psz_destination );
     free( p_sys );
 }
@@ -724,7 +672,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
             var_SetInteger( p_stream, "rtsp-port", url.i_port );
         }
 
-        p_sys->rtsp = RtspSetup( VLC_OBJECT(p_stream), NULL, url.psz_path );
+        p_sys->rtsp = RtspSetup( VLC_OBJECT(p_stream), url.psz_path );
         if( p_sys->rtsp == NULL )
             msg_Err( p_stream, "cannot export SDP as RTSP" );
     }
@@ -975,27 +923,6 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
     bool format = false;
 
-    if (p_sys->p_vod_media != NULL)
-    {
-        id->rtp_fmt.ptname = NULL;
-        uint32_t ssrc;
-        int val = vod_init_id(p_sys->p_vod_media, p_sys->psz_vod_session,
-                              p_fmt ? p_fmt->i_id : 0, id, &id->rtp_fmt,
-                              &ssrc, &id->i_seq_sent_next);
-        if (val == VLC_SUCCESS)
-        {
-            memcpy(id->ssrc, &ssrc, sizeof(id->ssrc));
-            /* This is ugly, but id->i_seq_sent_next needs to be
-             * initialized inside vod_init_id() to avoid race
-             * conditions. */
-            id->i_sequence = id->i_seq_sent_next;
-        }
-        /* vod_init_id() may fail either because the ES wasn't found in
-         * the VoD media, or because the RTSP session is gone. In the
-         * former case, id->rtp_fmt was left untouched. */
-        format = (id->rtp_fmt.ptname != NULL);
-    }
-
     if (!format)
     {
         id->rtp_fmt.fmtp = NULL; /* don't free() garbage on error */
@@ -1222,8 +1149,6 @@ static void Del( sout_stream_t *p_stream, void *_id )
 
     free( id->rtp_fmt.fmtp );
 
-    if (p_sys->p_vod_media != NULL)
-        vod_detach_id(p_sys->p_vod_media, p_sys->psz_vod_session, id);
     if( id->rtsp_id )
         RtspDelId( p_sys->rtsp, id->rtsp_id );
     if( id->listen.fd != NULL )
@@ -1536,37 +1461,12 @@ uint16_t rtp_get_seq( sout_stream_id_sys_t *id )
     return seq;
 }
 
-/* Return an arbitrary initial timestamp for RTP timestamp computations.
- * RFC 3550 states that the resulting initial RTP timestamps SHOULD be
- * random (although we use the same reference for all the ES as a
- * feature). In the VoD case, this function is called independently
- * from several parts of the code, so we need to always return the same
- * value. */
-static vlc_tick_t rtp_init_ts( const vod_media_t *p_media,
-                            const char *psz_vod_session )
-{
-    if (p_media == NULL || psz_vod_session == NULL)
-        return vlc_tick_now();
-
-    uint64_t i_ts_init = 0;
-    /* As per RFC 2326, session identifiers are at least 8 bytes long */
-    size_t session_length = strlen(psz_vod_session);
-    memcpy(&i_ts_init, psz_vod_session, __MIN(session_length,
-                                              sizeof(uint64_t)));
-    i_ts_init ^= (uintptr_t)p_media;
-    /* Limit the timestamp to 48 bits, this is enough and allows us
-     * to stay away from overflows */
-    i_ts_init &= 0xFFFFFFFFFFFF;
-    return i_ts_init;
-}
-
 /* Return a timestamp corresponding to packets being sent now, and that
  * can be passed to rtp_compute_ts() to get rtptime values for each ES.
  * Also return the NPT corresponding to this timestamp. If the stream
  * output is not started, the initial timestamp that will be used with
  * the first packets for NPT=0 is returned instead. */
 vlc_tick_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *id,
-                    const vod_media_t *p_media, const char *psz_vod_session,
                     vlc_tick_t *p_npt )
 {
     if (p_npt != NULL)
@@ -1576,7 +1476,7 @@ vlc_tick_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t
         p_stream = id->p_stream;
 
     if (p_stream == NULL)
-        return rtp_init_ts(p_media, psz_vod_session);
+        return vlc_tick_now();
 
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     vlc_tick_t i_npt_zero;
