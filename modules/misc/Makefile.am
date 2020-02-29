@@ -98,12 +98,6 @@ misc_LTLIBRARIES += \
 	libaddonsfsstorage_plugin.la
 endif
 
-libvod_rtsp_plugin_la_SOURCES = misc/rtsp.c
-libvod_rtsp_plugin_la_LIBADD = $(SOCKET_LIBS)
-if ENABLE_SOUT
-misc_LTLIBRARIES += libvod_rtsp_plugin.la
-endif
-
 libxml_plugin_la_SOURCES = misc/xml/libxml.c
 libxml_plugin_la_CFLAGS = $(AM_CFLAGS) $(LIBXML2_CFLAGS)
 libxml_plugin_la_LIBADD = $(LIBXML2_LIBS)
