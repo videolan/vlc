@@ -510,7 +510,7 @@ static int Open( vlc_object_t *p_this )
         }
 
         p_sys->p_grab = GrabberCreate( p_stream );
-        p_sys->p_mux = sout_MuxNew( p_stream->p_sout, psz, p_sys->p_grab );
+        p_sys->p_mux = sout_MuxNew( p_sys->p_grab, psz );
         free( psz );
 
         if( p_sys->p_mux == NULL )

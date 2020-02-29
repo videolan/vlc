@@ -149,10 +149,9 @@ noreturn int sout_MuxGetStream(sout_mux_t *mux, unsigned n, vlc_tick_t *date)
     vlc_assert_unreachable ();
 }
 
-noreturn sout_mux_t *sout_MuxNew(sout_instance_t *instance, const char *mux,
-                                 sout_access_out_t *out)
+noreturn sout_mux_t *sout_MuxNew(sout_access_out_t *out, const char *mux)
 {
-    VLC_UNUSED (instance); VLC_UNUSED (mux); VLC_UNUSED (out);
+    VLC_UNUSED(out); VLC_UNUSED(mux);
     vlc_assert_unreachable ();
 }
 

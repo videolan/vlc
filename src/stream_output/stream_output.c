@@ -388,13 +388,12 @@ int sout_AccessOutControl (sout_access_out_t *access, int query, ...)
 /*****************************************************************************
  * sout_MuxNew: create a new mux
  *****************************************************************************/
-sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, const char *psz_mux,
-                          sout_access_out_t *p_access )
+sout_mux_t *sout_MuxNew( sout_access_out_t *p_access, const char *psz_mux )
 {
     sout_mux_t *p_mux;
     char       *psz_next;
 
-    p_mux = vlc_custom_create( p_sout, sizeof( *p_mux ), "mux" );
+    p_mux = vlc_custom_create( p_access, sizeof( *p_mux ), "mux" );
     if( p_mux == NULL )
         return NULL;
 
@@ -440,7 +439,7 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, const char *psz_mux,
 
         if( b_answer )
         {
-            msg_Dbg( p_sout, "muxer support adding stream at any time" );
+            msg_Dbg( p_access, "muxer support adding stream at any time" );
             p_mux->b_add_stream_any_time = true;
             p_mux->b_waiting_stream = true;
         }

@@ -384,7 +384,7 @@ static int Open( vlc_object_t *p_this )
         goto end;
     }
 
-    p_sys->p_mux = sout_MuxNew( p_stream->p_sout, psz_mux, p_access );
+    p_sys->p_mux = sout_MuxNew( p_access, psz_mux );
     if( !p_sys->p_mux )
     {
         const char *psz_mux_guess = getMuxFromAlias( psz_mux );
@@ -392,7 +392,7 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Dbg( p_stream, "Couldn't open mux `%s', trying `%s' instead",
                 psz_mux, psz_mux_guess );
-            p_sys->p_mux = sout_MuxNew( p_stream->p_sout, psz_mux_guess, p_access );
+            p_sys->p_mux = sout_MuxNew( p_access, psz_mux_guess );
         }
 
         if( !p_sys->p_mux )

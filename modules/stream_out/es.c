@@ -354,7 +354,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     bool pace_control = sout_AccessOutCanControlPace( p_access );
 
     /* *** find and open appropriate mux module *** */
-    p_mux = sout_MuxNew( p_stream->p_sout, psz_mux, p_access );
+    p_mux = sout_MuxNew( p_access, psz_mux );
     if( p_mux == NULL )
     {
         msg_Err( p_stream, "no suitable sout mux module for `%s/%s://%s'",
