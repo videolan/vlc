@@ -118,8 +118,6 @@ struct  sout_mux_t
     struct vlc_object_t obj;
     module_t            *p_module;
 
-    sout_instance_t     *p_sout;
-
     char                *psz_mux;
     config_chain_t          *p_cfg;
 

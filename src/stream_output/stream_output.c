@@ -398,7 +398,6 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, const char *psz_mux,
     if( p_mux == NULL )
         return NULL;
 
-    p_mux->p_sout = p_sout;
     psz_next = config_ChainCreate( &p_mux->psz_mux, &p_mux->p_cfg, psz_mux );
     free( psz_next );
 
@@ -576,7 +575,7 @@ int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
 
     if( p_mux->b_waiting_stream && i_dts != VLC_TICK_INVALID )
     {
-        const vlc_tick_t i_caching = VLC_TICK_FROM_MS(var_GetInteger( p_mux->p_sout, "sout-mux-caching" ));
+        const vlc_tick_t i_caching = VLC_TICK_FROM_MS(var_InheritInteger( p_mux, "sout-mux-caching" ));
 
         if( p_mux->i_add_stream_start == VLC_TICK_INVALID )
             p_mux->i_add_stream_start = i_dts;
