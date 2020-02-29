@@ -872,7 +872,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     input->ml.states.current_title = -1;
     input->ml.states.current_video_track =
         input->ml.states.current_audio_track =
-        input->ml.states.current_subtitle_track = -2;
+        input->ml.states.current_subtitle_track = NULL;;
     input->ml.states.progress = -1.f;
     input->ml.restore = VLC_RESTOREPOINT_NONE;
     input->ml.restore_states = false;
