@@ -124,7 +124,6 @@ noinst_HEADERS = \
 	../include/vlc_iso_lang.h \
 	../include/vlc_pgpkey.h \
 	../include/vlc_update.h \
-	../include/vlc_vod.h \
 	$(NULL)
 
 ../include/vlc_about.h: Makefile.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_srcdir)/AUTHORS

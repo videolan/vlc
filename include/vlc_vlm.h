@@ -55,15 +55,10 @@ typedef struct
 
     char *psz_output;   /*< */
 
-    bool b_vod;         /*< vlm_media_t is of type VOD */
     struct
     {
         bool b_loop;    /*< this vlc_media_t broadcast item should loop */
     } broadcast;        /*< Broadcast specific information */
-    struct
-    {
-        char *psz_mux;  /*< name of muxer to use */
-    } vod;              /*< VOD specific information */
 
 } vlm_media_t;
 
@@ -136,22 +131,20 @@ enum vlm_query_e
     VLM_ADD_MEDIA,                      /* arg1=vlm_media_t* arg2=int64_t *p_id         res=can fail */
     /* Delete an existing media */
     VLM_DEL_MEDIA,                      /* arg1=int64_t id */
-    /* Change properties of an existing media (all fields but id and b_vod) */
+    /* Change properties of an existing media (all fields but id) */
     VLM_CHANGE_MEDIA,                   /* arg1=vlm_media_t*                            res=can fail */
     /* Get 1 media by it's ID */
     VLM_GET_MEDIA,                      /* arg1=int64_t id arg2=vlm_media_t **  */
     /* Get media ID from its name */
     VLM_GET_MEDIA_ID,                   /* arg1=const char *psz_name arg2=int64_t*  */
 
-    /* Media instance control XXX VOD control are for internal use only */
+    /* Media instance control */
     /* Get all media instances */
     VLM_GET_MEDIA_INSTANCES,            /* arg1=int64_t id arg2=vlm_media_instance_t *** arg3=int *pi_instance */
     /* Delete all media instances */
     VLM_CLEAR_MEDIA_INSTANCES,          /* arg1=int64_t id */
     /* Control broadcast instance */
     VLM_START_MEDIA_BROADCAST_INSTANCE, /* arg1=int64_t id, arg2=const char *psz_instance_name, int i_input_index  res=can fail */
-    /* Control VOD instance */
-    VLM_START_MEDIA_VOD_INSTANCE,       /* arg1=int64_t id, arg2=const char *psz_instance_name, int i_input_index char *psz_vod_output res=can fail */
     /* Stop an instance */
     VLM_STOP_MEDIA_INSTANCE,            /* arg1=int64_t id, arg2=const char *psz_instance_name      res=can fail */
     /* Pause an instance */
@@ -217,9 +210,7 @@ static inline void vlm_media_Init( vlm_media_t *p_media )
     TAB_INIT( p_media->i_input, p_media->ppsz_input );
     TAB_INIT( p_media->i_option, p_media->ppsz_option );
     p_media->psz_output = NULL;
-    p_media->b_vod = false;
 
-    p_media->vod.psz_mux = NULL;
     p_media->broadcast.b_loop = false;
 }
 
@@ -251,16 +242,7 @@ vlm_media_Copy( vlm_media_t *p_dst, const vlm_media_t *p_src )
     if( p_src->psz_output )
         p_dst->psz_output = strdup( p_src->psz_output );
 
-    p_dst->b_vod = p_src->b_vod;
-    if( p_src->b_vod )
-    {
-        if( p_src->vod.psz_mux )
-            p_dst->vod.psz_mux = strdup( p_src->vod.psz_mux );
-    }
-    else
-    {
-        p_dst->broadcast.b_loop = p_src->broadcast.b_loop;
-    }
+    p_dst->broadcast.b_loop = p_src->broadcast.b_loop;
 }
 
 /**
@@ -282,8 +264,6 @@ static inline void vlm_media_Clean( vlm_media_t *p_media )
     TAB_CLEAN(p_media->i_option, p_media->ppsz_option );
 
     free( p_media->psz_output );
-    if( p_media->b_vod )
-        free( p_media->vod.psz_mux );
 }
 
 /**

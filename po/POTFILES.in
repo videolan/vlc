@@ -48,7 +48,6 @@ include/vlc_url.h
 include/vlc_variables.h
 include/vlc/vlc.h
 include/vlc_vlm.h
-include/vlc_vod.h
 include/vlc_vout.h
 include/vlc_vout_window.h
 include/vlc_xml.h

@@ -49,12 +49,6 @@ typedef struct
     struct vlc_object_t obj;
     vlm_media_t cfg;
 
-    struct
-    {
-        input_item_t *p_item;
-        vod_media_t *p_media;
-    } vod;
-
     /* actual input instances */
     int                      i_instance;
     vlm_media_instance_sys_t **instance;
@@ -95,9 +89,6 @@ struct vlm_t
     bool         exiting;
     /* */
     int64_t        i_id;
-
-    /* Vod server (used by media) */
-    vod_t          *p_vod;
 
     /* Media list */
     int                i_media;
