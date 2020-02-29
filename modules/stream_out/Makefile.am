@@ -4,7 +4,6 @@ libstream_out_dummy_plugin_la_SOURCES = stream_out/dummy.c
 libstream_out_cycle_plugin_la_SOURCES = stream_out/cycle.c
 libstream_out_delay_plugin_la_SOURCES = stream_out/delay.c
 libstream_out_stats_plugin_la_SOURCES = stream_out/stats.c
-libstream_out_description_plugin_la_SOURCES = stream_out/description.c
 libstream_out_standard_plugin_la_SOURCES = stream_out/standard.c
 libstream_out_standard_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_access_output_srt)
 libstream_out_standard_plugin_la_LIBADD = $(SOCKET_LIBS)
@@ -36,7 +35,6 @@ sout_LTLIBRARIES = \
 	libstream_out_cycle_plugin.la \
 	libstream_out_delay_plugin.la \
 	libstream_out_stats_plugin.la \
-	libstream_out_description_plugin.la \
 	libstream_out_standard_plugin.la \
 	libstream_out_duplicate_plugin.la \
 	libstream_out_es_plugin.la \

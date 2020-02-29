@@ -293,14 +293,6 @@ VLC_API void sdp_AddMedia(struct vlc_memstream *, const char *type,
 VLC_API void sdp_AddAttribute(struct vlc_memstream *, const char *name,
                               const char *fmt, ...) VLC_FORMAT(3, 4);
 
-/** Description module */
-typedef struct sout_description_data_t
-{
-    int i_es;
-    es_format_t **es;
-    vlc_sem_t *sem;
-} sout_description_data_t;
-
 /** @} */
 
 #ifdef __cplusplus
