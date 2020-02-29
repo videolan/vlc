@@ -226,8 +226,9 @@ static int LoadDecoder( decoder_t *p_dec, bool b_packetizer,
     return 0;
 }
 
-static int DecoderThread_Reload( struct decoder_owner *p_owner, bool b_packetizer,
-                                 const es_format_t *restrict p_fmt, enum reload reload )
+static int DecoderThread_Reload( struct decoder_owner *p_owner,
+                                 const es_format_t *restrict p_fmt,
+                                 enum reload reload )
 {
     /* Copy p_fmt since it can be destroyed by decoder_Clean */
     decoder_t *p_dec = &p_owner->dec;
@@ -255,7 +256,7 @@ static int DecoderThread_Reload( struct decoder_owner *p_owner, bool b_packetize
         }
     }
 
-    if( LoadDecoder( p_dec, b_packetizer, &fmt_in ) )
+    if( LoadDecoder( p_dec, false, &fmt_in ) )
     {
         p_owner->error = true;
         es_format_Clean( &fmt_in );
@@ -1392,7 +1393,7 @@ static void DecoderThread_ProcessInput( struct decoder_owner *p_owner, block_t *
         msg_Warn( p_dec, "Reloading the decoder module%s",
                   reload == RELOAD_DECODER_AOUT ? " and the audio output" : "" );
 
-        if( DecoderThread_Reload( p_owner, false, &p_dec->fmt_in, reload ) != VLC_SUCCESS )
+        if( DecoderThread_Reload( p_owner, &p_dec->fmt_in, reload ) != VLC_SUCCESS )
             goto error;
     }
 
@@ -1435,7 +1436,7 @@ static void DecoderThread_ProcessInput( struct decoder_owner *p_owner, block_t *
                 /* Drain the decoder module */
                 DecoderThread_DecodeBlock( p_owner, NULL );
 
-                if( DecoderThread_Reload( p_owner, false, &p_packetizer->fmt_out,
+                if( DecoderThread_Reload( p_owner, &p_packetizer->fmt_out,
                                           RELOAD_DECODER ) != VLC_SUCCESS )
                 {
                     block_ChainRelease( p_packetized_block );
