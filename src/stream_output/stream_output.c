@@ -150,6 +150,16 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     vlc_object_delete(p_sout);
 }
 
+bool sout_instance_ControlsPace( sout_instance_t *sout )
+{
+    bool ret;
+
+    vlc_mutex_lock( &sout->lock );
+    ret = sout->i_out_pace_nocontrol <= 0;
+    vlc_mutex_unlock( &sout->lock );
+    return ret;
+}
+
 /*****************************************************************************
  * Packetizer/Input
  *****************************************************************************/
