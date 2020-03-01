@@ -149,7 +149,6 @@ enum sout_mux_query_e
     /* capabilities */
     MUX_CAN_ADD_STREAM_WHILE_MUXING,    /* arg1= bool *,      res=cannot fail */
     /* properties */
-    MUX_GET_ADD_STREAM_WAIT,            /* arg1= bool *,      res=cannot fail */
     MUX_GET_MIME,                       /* arg1= char **            res=can fail    */
 };
 

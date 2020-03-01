@@ -442,26 +442,7 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, const char *psz_mux,
         {
             msg_Dbg( p_sout, "muxer support adding stream at any time" );
             p_mux->b_add_stream_any_time = true;
-            p_mux->b_waiting_stream = false;
-
-            /* If we control the output pace then it's better to wait before
-             * starting muxing (generates better streams/files). */
-            if( !p_sout->i_out_pace_nocontrol )
-            {
-                b_answer = true;
-            }
-            else if( sout_MuxControl( p_mux, MUX_GET_ADD_STREAM_WAIT,
-                                      &b_answer ) )
-            {
-                b_answer = false;
-            }
-
-            if( b_answer )
-            {
-                msg_Dbg( p_sout, "muxer prefers to wait for all ES before "
-                         "starting to mux" );
-                p_mux->b_waiting_stream = true;
-            }
+            p_mux->b_waiting_stream = true;
         }
     }
 

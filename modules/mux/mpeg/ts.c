@@ -850,11 +850,6 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
         *pb_bool = true;
         return VLC_SUCCESS;
 
-    case MUX_GET_ADD_STREAM_WAIT:
-        pb_bool = va_arg( args, bool * );
-        *pb_bool = false;
-        return VLC_SUCCESS;
-
     case MUX_GET_MIME:
         ppsz = va_arg( args, char ** );
         *ppsz = strdup( "video/mp2t" );
