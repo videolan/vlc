@@ -2755,15 +2755,14 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     /* Check for sout mode */
     if( input_priv(p_input)->p_sout )
     {
-        /* FIXME review this, proper lock may be missing */
-        if( input_priv(p_input)->p_sout->i_out_pace_nocontrol > 0 &&
-            input_priv(p_input)->b_out_pace_control )
+        bool pace = sout_instance_ControlsPace(input_priv(p_input)->p_sout);
+
+        if( !pace && input_priv(p_input)->b_out_pace_control )
         {
             msg_Dbg( p_input, "switching to sync mode" );
             input_priv(p_input)->b_out_pace_control = false;
         }
-        else if( input_priv(p_input)->p_sout->i_out_pace_nocontrol <= 0 &&
-                 !input_priv(p_input)->b_out_pace_control )
+        else if( pace && !input_priv(p_input)->b_out_pace_control )
         {
             msg_Dbg( p_input, "switching to async mode" );
             input_priv(p_input)->b_out_pace_control = true;
