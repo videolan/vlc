@@ -351,6 +351,8 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         return( NULL );
     }
 
+    bool pace_control = sout_AccessOutCanControlPace( p_access );
+
     /* *** find and open appropriate mux module *** */
     p_mux = sout_MuxNew( p_stream->p_sout, psz_mux, p_access );
     if( p_mux == NULL )
@@ -384,7 +386,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         return NULL;
     }
 
-    if( !sout_AccessOutCanControlPace( p_access ) )
+    if( !pace_control )
         p_stream->p_sout->i_out_pace_nocontrol++;
 
     return id;
