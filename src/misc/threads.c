@@ -135,11 +135,23 @@ static _Thread_local char thread_self[1];
 
 bool vlc_mutex_held(const vlc_mutex_t *mtx)
 {
+#if defined(__clang__) && !defined(__apple_build_version__) && (__clang_major__ < 8)
+    /* The explicit cast to non-const is needed to workaround a clang
+     * error with clang 7 or lower, as atomic_load_explicit in C11 did not
+     * allow its first argument to be const-qualified (see DR459).
+     * Apple Clang is not checked as it uses a different versioning and
+     * oldest supported Xcode/Apple Clang version is not affected.
+     */
+    vlc_mutex_t *tmp_mtx = (vlc_mutex_t *)mtx;
+#else
+    const vlc_mutex_t *tmp_mtx = mtx;
+#endif
+
     /* This comparison is thread-safe:
      * Even though other threads may modify the owner field at any time,
      * they will never make it compare equal to the calling thread.
      */
-    return THREAD_SELF == atomic_load_explicit(&mtx->owner,
+    return THREAD_SELF == atomic_load_explicit(&tmp_mtx->owner,
                                                memory_order_relaxed);
 }
 
