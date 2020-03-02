@@ -1301,11 +1301,11 @@ static void Direct3D9Destroy(vout_display_sys_t *sys)
 /**
  * It tests if the conversion from src to dst is supported.
  */
-static int Direct3D9CheckConversion(vout_display_t *vd,
-                                   D3DFORMAT src, D3DFORMAT dst)
+static int Direct3D9CheckConversion(vout_display_t *vd, D3DFORMAT src)
 {
     vout_display_sys_t *sys = vd->sys;
     IDirect3D9 *d3dobj = sys->d3d9_device->hd3d.obj;
+    D3DFORMAT dst = sys->d3d9_device->d3ddev.BufferFormat;
     HRESULT hr;
 
     /* test whether device can create a surface of that format */
@@ -1350,7 +1350,7 @@ static const d3d9_format_t d3d_formats[] = {
 
 /**
  * It returns the format (closest to chroma) that can be converted to target */
-static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_format_t *fmt, D3DFORMAT target)
+static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
     bool hardware_scale_ok = !(fmt->i_visible_width & 1) && !(fmt->i_visible_height & 1);
@@ -1379,7 +1379,7 @@ static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_f
 
                 msg_Warn(vd, "trying surface pixel format: %s",
                          format->name);
-                if (!Direct3D9CheckConversion(vd, format->format, target)) {
+                if (!Direct3D9CheckConversion(vd, format->format)) {
                     msg_Dbg(vd, "selected surface pixel format is %s",
                             format->name);
                     return format;
@@ -1397,14 +1397,13 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    const d3d9_device_t *p_d3d9_dev = &sys->d3d9_device->d3ddev;
     /* */
     *fmt = vd->source;
 
     /* Find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
      * the requested chroma which is usable by the hardware in an offscreen surface, as they
      * typically support more formats than textures */
-    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, fmt, p_d3d9_dev->BufferFormat);
+    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, fmt);
     if (!d3dfmt) {
         msg_Err(vd, "surface pixel format is not supported.");
         goto error;
