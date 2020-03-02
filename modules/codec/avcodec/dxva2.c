@@ -328,13 +328,11 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
     if (err != VLC_SUCCESS)
         goto error;
 
-    D3DADAPTER_IDENTIFIER9 d3dai;
-    if (SUCCEEDED(IDirect3D9_GetAdapterIdentifier(d3d9_decoder->hd3d.obj,
-                                               d3d9_decoder->d3ddev.adapterId, 0, &d3dai))) {
-        msg_Info(va, "Using DXVA2 (%.*s, vendor %s(%lx), device %lx, revision %lx)",
-                    (int)sizeof(d3dai.Description), d3dai.Description,
-                    DxgiVendorStr(d3dai.VendorId), d3dai.VendorId, d3dai.DeviceId, d3dai.Revision);
-    }
+    const D3DADAPTER_IDENTIFIER9 *identifier = &d3d9_decoder->d3ddev.identifier;
+    msg_Info(va, "Using DXVA2 (%.*s, vendor %s(%lx), device %lx, revision %lx)",
+                (int)sizeof(identifier->Description), identifier->Description,
+                DxgiVendorStr(identifier->VendorId), identifier->VendorId,
+                identifier->DeviceId, identifier->Revision);
 
     d3d9_video_context_t *octx = GetD3D9ContextPrivate(sys->vctx);
     octx->format = sys->render;
@@ -436,18 +434,14 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
 
     d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(sys->vctx);
 
-    D3DADAPTER_IDENTIFIER9 identifier;
-    HRESULT hr = IDirect3D9_GetAdapterIdentifier(d3d9_decoder->hd3d.obj, d3d9_decoder->d3ddev.adapterId, 0, &identifier);
-    if (FAILED(hr))
-        return VLC_EGENERIC;
-
-    UINT driverBuild = identifier.DriverVersion.LowPart & 0xFFFF;
-    if (identifier.VendorId == GPU_MANUFACTURER_INTEL && (identifier.DriverVersion.LowPart >> 16) >= 100)
+    const D3DADAPTER_IDENTIFIER9 *identifier = &d3d9_decoder->d3ddev.identifier;
+    UINT driverBuild = identifier->DriverVersion.LowPart & 0xFFFF;
+    if (identifier->VendorId == GPU_MANUFACTURER_INTEL && (identifier->DriverVersion.LowPart >> 16) >= 100)
     {
         /* new Intel driver format */
-        driverBuild += ((identifier.DriverVersion.LowPart >> 16) - 100) * 1000;
+        driverBuild += ((identifier->DriverVersion.LowPart >> 16) - 100) * 1000;
     }
-    if (!directx_va_canUseDecoder(va, identifier.VendorId, identifier.DeviceId,
+    if (!directx_va_canUseDecoder(va, identifier->VendorId, identifier->DeviceId,
                                   mode->guid, driverBuild))
     {
         msg_Warn(va, "GPU blacklisted for %s codec", mode->name);

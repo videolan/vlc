@@ -67,6 +67,7 @@ typedef struct
     UINT                    adapterId;
 
     D3DCAPS9                caps;
+    D3DADAPTER_IDENTIFIER9  identifier;
 } d3d9_device_t;
 
 typedef struct
