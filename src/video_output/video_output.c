@@ -1786,11 +1786,6 @@ static void vout_DisableWindow(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
     vlc_mutex_lock(&sys->window_lock);
-    if (sys->dec_device)
-    {
-        vlc_decoder_device_Release(sys->dec_device);
-        sys->dec_device = NULL;
-    }
     if (sys->window_enabled) {
         vout_window_Disable(sys->display_cfg.window);
         sys->window_enabled = false;
