@@ -107,21 +107,31 @@ static int vlclua_get_player( lua_State *L )
     return 1;
 }
 
+static void do_vout_Release( void *vout )
+{
+    vout_Release( vout );
+}
+
 static int vlclua_get_vout( lua_State *L )
 {
     vout_thread_t *vout = vlclua_get_vout_internal(L);
     if (vout)
-        vlclua_push_vlc_object(L, vout, vout_Release);
+        vlclua_push_vlc_object(L, vout, do_vout_Release);
     else
         lua_pushnil(L);
     return 1;
+}
+
+static void do_aout_Release( void *aout )
+{
+    aout_Release( aout );
 }
 
 static int vlclua_get_aout( lua_State *L )
 {
     audio_output_t *aout = vlclua_get_aout_internal(L);
     if (aout)
-        vlclua_push_vlc_object(L, aout, aout_Release);
+        vlclua_push_vlc_object(L, aout, do_aout_Release);
     else
         lua_pushnil(L);
     return 1;
