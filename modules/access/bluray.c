@@ -1817,6 +1817,9 @@ static void blurayActivateOverlay(demux_t *p_demux, int plane)
     demux_sys_t *p_sys = p_demux->p_sys;
     bluray_overlay_t *ov = p_sys->bdj.p_overlays[plane];
 
+    if(!ov)
+        return;
+
     /*
      * If the overlay is already displayed, mark the picture as outdated.
      * We must NOT use vout_PutSubpicture if a picture is already displayed.
@@ -1869,6 +1872,9 @@ static void blurayClearOverlay(demux_t *p_demux, int plane)
     demux_sys_t *p_sys = p_demux->p_sys;
     bluray_overlay_t *ov = p_sys->bdj.p_overlays[plane];
 
+    if(!ov)
+        return;
+
     vlc_mutex_lock(&ov->lock);
 
     subpicture_region_ChainDelete(ov->p_regions);
@@ -1887,6 +1893,9 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const eventov)
     demux_sys_t *p_sys = p_demux->p_sys;
 
     bluray_overlay_t *ov = p_sys->bdj.p_overlays[eventov->plane];
+    if(!ov)
+        return;
+
     /*
      * Compute a subpicture_region_t.
      * It will be copied and sent to the vout later.
@@ -2015,6 +2024,8 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
     demux_sys_t *p_sys = p_demux->p_sys;
 
     bluray_overlay_t *ov = p_sys->bdj.p_overlays[eventov->plane];
+    if(!ov)
+        return;
     vlc_mutex_lock(&ov->lock);
 
     if (!ov->p_regions)
