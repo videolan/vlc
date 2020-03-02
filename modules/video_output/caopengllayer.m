@@ -934,7 +934,7 @@ shouldInheritContentsScale:(CGFloat)newScale
 
 vlc_module_begin()
     set_description(N_("Core Animation OpenGL Layer (Mac OS X)"))
-    set_capability("vout display", 0)
+    set_capability("vout display", 300)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_callbacks(Open, Close)
