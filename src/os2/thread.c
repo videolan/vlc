@@ -406,11 +406,6 @@ int vlc_set_priority (vlc_thread_t th, int priority)
     return VLC_SUCCESS;
 }
 
-unsigned long vlc_thread_self(void)
-{
-    return vlc_thread_id();
-}
-
 unsigned long vlc_thread_id (void)
 {
     return _gettid();

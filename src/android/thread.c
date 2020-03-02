@@ -92,11 +92,6 @@ struct vlc_thread
 
 static thread_local struct vlc_thread *thread = NULL;
 
-pthread_t vlc_thread_self(void)
-{
-    return pthread_self();
-}
-
 void vlc_threads_setup (libvlc_int_t *p_libvlc)
 {
     (void)p_libvlc;

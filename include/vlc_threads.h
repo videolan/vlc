@@ -59,9 +59,6 @@ VLC_API void vlc_testcancel(void);
 typedef struct vlc_thread *vlc_thread_t;
 # define VLC_THREAD_CANCELED NULL
 
-typedef unsigned long vlc_osthread_t;
-#define vlc_thread_equal(a,b) ((a) == (b))
-
 # define LIBVLC_NEED_SLEEP
 #define LIBVLC_NEED_RWLOCK
 typedef INIT_ONCE vlc_once_t;
@@ -93,9 +90,6 @@ static inline int vlc_poll(struct pollfd *fds, unsigned nfds, int timeout)
 
 typedef struct vlc_thread *vlc_thread_t;
 #define VLC_THREAD_CANCELED NULL
-
-typedef unsigned long vlc_osthread_t;
-#define vlc_thread_equal(a,b) ((a) == (b))
 
 #define LIBVLC_NEED_RWLOCK
 typedef struct
@@ -148,8 +142,6 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 
 typedef struct vlc_thread *vlc_thread_t;
 #define VLC_THREAD_CANCELED NULL
-typedef pthread_t vlc_osthread_t;
-#define vlc_thread_equal(a,b) pthread_equal(a,b)
 typedef pthread_once_t  vlc_once_t;
 #define VLC_STATIC_ONCE   PTHREAD_ONCE_INIT
 typedef pthread_key_t   vlc_threadvar_t;
@@ -193,8 +185,6 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 
 typedef pthread_t       vlc_thread_t;
 #define VLC_THREAD_CANCELED PTHREAD_CANCELED
-typedef pthread_t       vlc_osthread_t;
-#define vlc_thread_equal(a,b) pthread_equal(a,b)
 typedef pthread_rwlock_t vlc_rwlock_t;
 #define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
 typedef pthread_once_t  vlc_once_t;
@@ -235,9 +225,6 @@ typedef struct
  * Return value of a canceled thread.
  */
 #define VLC_THREAD_CANCELED PTHREAD_CANCELED
-
-typedef pthread_t vlc_osthread_t;
-#define vlc_thread_equal(a,b) pthread_equal(a,b)
 
 /**
  * Read/write lock.
@@ -843,26 +830,6 @@ typedef struct vlc_cleanup_t vlc_cleanup_t;
 VLC_API void vlc_control_cancel(vlc_cleanup_t *);
 
 /**
- * Thread handle.
- *
- * This function returns the thread handle of the calling thread.
- * This works even if the thread was <b>not</b> created with vlc_clone().
- * As a consequence, depending on the platform, this might or might not be the
- * same as the @ref vlc_thread_t thread handle returned by vlc_clone().
- *
- * Also depending on the platform, this might be an integer type, a pointer
- * type, or a compound type of any (reasonable) size. To compare two thread
- * handles, use the vlc_thread_equal() macro, not a hand-coded comparison.
- * Comparing the calling thread for equality with another thread is in fact
- * pretty much the only purpose of this function.
- *
- * \note If you need an integer identifier, use vlc_thread_id() instead.
- *
- * \return the OS run-time thread handle
- */
-VLC_API vlc_osthread_t vlc_thread_self(void) VLC_USED;
-
-/**
  * Thread identifier.
  *
  * This function returns the identifier of the calling thread. The identifier
@@ -873,8 +840,6 @@ VLC_API vlc_osthread_t vlc_thread_self(void) VLC_USED;
  *
  * There are no particular semantics to the thread ID with LibVLC.
  * It is provided mainly for tracing and debugging.
- *
- * See also vlc_thread_self().
  *
  * \warning This function is not currently implemented on all supported
  * platforms. Where not implemented, it returns (unsigned long)-1.
