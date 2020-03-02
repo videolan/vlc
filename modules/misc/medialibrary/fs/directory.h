@@ -36,10 +36,10 @@ class SDDirectory : public IDirectory
 public:
     explicit SDDirectory(const std::string &mrl, SDFileSystemFactory &fs);
     const std::string &mrl() const override;
-    const std::vector<std::shared_ptr<IFile>> &files() const override;
-    const std::vector<std::shared_ptr<IDirectory>> &dirs() const override;
-    std::shared_ptr<IDevice> device() const override;
-    std::shared_ptr<IFile> file( const std::string& mrl ) const override;
+    const std::vector<std::shared_ptr<fs::IFile>> &files() const override;
+    const std::vector<std::shared_ptr<fs::IDirectory>> &dirs() const override;
+    std::shared_ptr<fs::IDevice> device() const override;
+    std::shared_ptr<fs::IFile> file( const std::string& mrl ) const override;
 
 private:
     void read() const;
@@ -48,8 +48,8 @@ private:
     SDFileSystemFactory &m_fs;
 
     mutable bool m_read_done = false;
-    mutable std::vector<std::shared_ptr<IFile>> m_files;
-    mutable std::vector<std::shared_ptr<IDirectory>> m_dirs;
+    mutable std::vector<std::shared_ptr<fs::IFile>> m_files;
+    mutable std::vector<std::shared_ptr<fs::IDirectory>> m_dirs;
     mutable std::shared_ptr<IDevice> m_device;
 };
 

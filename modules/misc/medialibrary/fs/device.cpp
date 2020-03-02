@@ -23,8 +23,6 @@
 #endif
 
 #include "device.h"
-#include <vlc_common.h>
-#include <vlc_url.h>
 
 #include <algorithm>
 #include <cassert>
@@ -33,14 +31,12 @@
 namespace vlc {
   namespace medialibrary {
 
-SDDevice::SDDevice( const std::string& uuid, std::string mrl )
+SDDevice::SDDevice(const std::string& uuid, std::string scheme, bool removable, bool isNetwork)
     : m_uuid(uuid)
+    , m_scheme( std::move( scheme ) )
+    , m_removable(removable)
+    , m_isNetwork(isNetwork)
 {
-    // Ensure the mountpoint always ends with a '/' to avoid mismatch between
-    // smb://foo and smb://foo/
-    if ( *mrl.crbegin() != '/' )
-        mrl += '/';
-    m_mountpoints.push_back( std::move( mrl ) );
 }
 
 const std::string &
@@ -52,7 +48,7 @@ SDDevice::uuid() const
 bool
 SDDevice::isRemovable() const
 {
-    return true;
+    return m_removable;
 }
 
 bool
@@ -61,20 +57,42 @@ SDDevice::isPresent() const
     return m_mountpoints.empty() == false;
 }
 
+bool SDDevice::isNetwork() const
+{
+    return m_isNetwork;
+}
+
 const
 std::string &SDDevice::mountpoint() const
 {
-    return m_mountpoints[0];
+    return m_mountpoints[0].mrl;
 }
 
 void SDDevice::addMountpoint( std::string mrl )
 {
-    m_mountpoints.push_back( std::move( mrl ) );
+    // Ensure the mountpoint always ends with a '/' to avoid mismatch between
+    // smb://foo and smb://foo/
+    if ( *mrl.crbegin() != '/' )
+        mrl += '/';
+    auto it = std::find_if( cbegin( m_mountpoints ), cend( m_mountpoints ),
+                    [&mrl]( const Mountpoint& mp ) { return mp.mrl == mrl; } );
+    if ( it != cend( m_mountpoints ) )
+        return;
+
+    try
+    {
+        auto mp = Mountpoint{ std::move( mrl ) };
+        m_mountpoints.push_back( std::move( mp ) );
+    }
+    catch ( const vlc::url::invalid& )
+    {
+    }
 }
 
 void SDDevice::removeMountpoint( const std::string& mrl )
 {
-    auto it = std::find( begin( m_mountpoints ), end( m_mountpoints ), mrl );
+    auto it = std::find_if( begin( m_mountpoints ), end( m_mountpoints ),
+                            [&mrl]( const Mountpoint& mp ) { return mp.mrl == mrl; } );
     if ( it != end( m_mountpoints ) )
         m_mountpoints.erase( it );
 }
@@ -82,24 +100,31 @@ void SDDevice::removeMountpoint( const std::string& mrl )
 std::tuple<bool, std::string>
 SDDevice::matchesMountpoint( const std::string& mrl ) const
 {
-    vlc_url_t probedUrl;
-    vlc_UrlParse( &probedUrl, mrl.c_str() );
+    vlc::url probedUrl;
+    try
+    {
+        probedUrl = vlc::url{ mrl };
+    }
+    catch ( const vlc::url::invalid& )
+    {
+        return std::make_tuple( false, "" );
+    }
 
     for ( const auto& m : m_mountpoints )
     {
-        vlc_url_t url;
-        vlc_UrlParse( &url, m.c_str() );
-        if ( strcasecmp( probedUrl.psz_protocol, url.psz_protocol ) )
+        if ( strcasecmp( probedUrl.psz_protocol, m.url.psz_protocol ) )
+            continue;
+        if ( strcasecmp( probedUrl.psz_host, m.url.psz_host ) )
+            continue;
+        /* Ignore path for plain network hosts, ie. without any path specified */
+        if ( m.url.psz_path != nullptr && *m.url.psz_path != 0 &&
+             probedUrl.psz_path != nullptr &&
+             strncasecmp( m.url.psz_path, probedUrl.psz_path,
+                          strlen( m.url.psz_path ) ) != 0 )
         {
-            vlc_UrlClean( &url );
             continue;
         }
-        if ( strcasecmp( probedUrl.psz_host, url.psz_host ) )
-        {
-            vlc_UrlClean( &url );
-            continue;
-        }
-        if ( probedUrl.i_port != url.i_port )
+        if ( probedUrl.i_port != m.url.i_port )
         {
             unsigned int defaultPort = 0;
             if ( !strcasecmp( probedUrl.psz_protocol, "smb" ) )
@@ -107,35 +132,23 @@ SDDevice::matchesMountpoint( const std::string& mrl ) const
             if ( defaultPort != 0 )
             {
                 if ( probedUrl.i_port != 0 && probedUrl.i_port != defaultPort &&
-                     url.i_port != 0 && url.i_port != defaultPort )
+                     m.url.i_port != 0 && m.url.i_port != defaultPort )
                 {
-                    vlc_UrlClean( &url );
                     continue;
                 }
-                else
-                {
-                    url.i_port = probedUrl.i_port;
-                    char* tmpUrl_psz = vlc_uri_compose(&url);
-                    vlc_UrlClean( &url );
-                    if (!tmpUrl_psz)
-                        continue;
-                    std::string tmpUrl(tmpUrl_psz);
-                    free(tmpUrl_psz);
-                    vlc_UrlClean( &probedUrl );
-                    return std::make_tuple( true, tmpUrl );
-                }
+                vlc_url_t url = m.url;
+                url.i_port = probedUrl.i_port;
+                char* tmpUrl_psz = vlc_uri_compose(&url);
+                if (!tmpUrl_psz)
+                    continue;
+                std::string tmpUrl(tmpUrl_psz);
+                free(tmpUrl_psz);
+                return std::make_tuple( true, tmpUrl );
             }
-            else
-            {
-                vlc_UrlClean( &url );
-                continue;
-            }
+            continue;
         }
-        vlc_UrlClean( &url );
-        vlc_UrlClean( &probedUrl );
-        return std::make_tuple( true, m );
+        return std::make_tuple( true, m.mrl );
     }
-    vlc_UrlClean( &probedUrl );
     return std::make_tuple( false, "" );
 }
 
@@ -151,7 +164,12 @@ std::string SDDevice::relativeMrl( const std::string& absoluteMrl ) const
 std::string SDDevice::absoluteMrl( const std::string& relativeMrl ) const
 {
     assert( m_mountpoints.empty() == false );
-    return m_mountpoints[0] + relativeMrl;
+    return m_mountpoints[0].mrl + relativeMrl;
+}
+
+const std::string& SDDevice::scheme() const
+{
+    return m_scheme;
 }
 
   } /* namespace medialibrary */

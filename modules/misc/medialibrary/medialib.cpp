@@ -29,6 +29,7 @@
 #include <vlc_dialog.h>
 #include "medialibrary.h"
 #include "fs/fs.h"
+#include "fs/devicelister.h"
 
 #include <medialibrary/IMedia.h>
 #include <medialibrary/IAlbumTrack.h>
@@ -103,7 +104,7 @@ void wrapEntityCreatedEventCallback( vlc_medialibrary_module_t* ml,
 }
 
 void wrapEntityModifiedEventCallback( vlc_medialibrary_module_t* ml,
-                                      const std::vector<int64_t>& ids,
+                                      const std::set<int64_t>& ids,
                                       vlc_ml_event_type evType )
 {
     vlc_ml_event_t ev;
@@ -116,7 +117,7 @@ void wrapEntityModifiedEventCallback( vlc_medialibrary_module_t* ml,
 }
 
 void wrapEntityDeletedEventCallback( vlc_medialibrary_module_t* ml,
-                                     const std::vector<int64_t>& ids, vlc_ml_event_type evType )
+                                     const std::set<int64_t>& ids, vlc_ml_event_type evType )
 {
     vlc_ml_event_t ev;
     ev.i_type = evType;
@@ -134,12 +135,12 @@ void MediaLibrary::onMediaAdded( std::vector<medialibrary::MediaPtr> media )
     wrapEntityCreatedEventCallback<vlc_ml_media_t>( m_vlc_ml, media, VLC_ML_EVENT_MEDIA_ADDED );
 }
 
-void MediaLibrary::onMediaModified( std::vector<int64_t> mediaIds )
+void MediaLibrary::onMediaModified( std::set<int64_t> mediaIds )
 {
     wrapEntityModifiedEventCallback( m_vlc_ml, mediaIds, VLC_ML_EVENT_MEDIA_UPDATED );
 }
 
-void MediaLibrary::onMediaDeleted( std::vector<int64_t> mediaIds )
+void MediaLibrary::onMediaDeleted( std::set<int64_t> mediaIds )
 {
     wrapEntityDeletedEventCallback( m_vlc_ml, mediaIds, VLC_ML_EVENT_MEDIA_DELETED );
 }
@@ -149,12 +150,12 @@ void MediaLibrary::onArtistsAdded( std::vector<medialibrary::ArtistPtr> artists 
     wrapEntityCreatedEventCallback<vlc_ml_artist_t>( m_vlc_ml, artists, VLC_ML_EVENT_ARTIST_ADDED );
 }
 
-void MediaLibrary::onArtistsModified( std::vector<int64_t> artistIds )
+void MediaLibrary::onArtistsModified( std::set<int64_t> artistIds )
 {
     wrapEntityModifiedEventCallback( m_vlc_ml, artistIds, VLC_ML_EVENT_ARTIST_UPDATED );
 }
 
-void MediaLibrary::onArtistsDeleted( std::vector<int64_t> artistIds )
+void MediaLibrary::onArtistsDeleted( std::set<int64_t> artistIds )
 {
     wrapEntityDeletedEventCallback( m_vlc_ml, artistIds, VLC_ML_EVENT_ARTIST_DELETED );
 }
@@ -164,12 +165,12 @@ void MediaLibrary::onAlbumsAdded( std::vector<medialibrary::AlbumPtr> albums )
     wrapEntityCreatedEventCallback<vlc_ml_album_t>( m_vlc_ml, albums, VLC_ML_EVENT_ALBUM_ADDED );
 }
 
-void MediaLibrary::onAlbumsModified( std::vector<int64_t> albumIds )
+void MediaLibrary::onAlbumsModified( std::set<int64_t> albumIds )
 {
     wrapEntityModifiedEventCallback( m_vlc_ml, albumIds, VLC_ML_EVENT_ALBUM_UPDATED );
 }
 
-void MediaLibrary::onAlbumsDeleted( std::vector<int64_t> albumIds )
+void MediaLibrary::onAlbumsDeleted( std::set<int64_t> albumIds )
 {
     wrapEntityDeletedEventCallback( m_vlc_ml, albumIds, VLC_ML_EVENT_ALBUM_DELETED );
 }
@@ -179,12 +180,12 @@ void MediaLibrary::onPlaylistsAdded( std::vector<medialibrary::PlaylistPtr> play
     wrapEntityCreatedEventCallback<vlc_ml_playlist_t>( m_vlc_ml, playlists, VLC_ML_EVENT_PLAYLIST_ADDED );
 }
 
-void MediaLibrary::onPlaylistsModified( std::vector<int64_t> playlistIds )
+void MediaLibrary::onPlaylistsModified( std::set<int64_t> playlistIds )
 {
     wrapEntityModifiedEventCallback( m_vlc_ml, playlistIds, VLC_ML_EVENT_PLAYLIST_UPDATED );
 }
 
-void MediaLibrary::onPlaylistsDeleted( std::vector<int64_t> playlistIds )
+void MediaLibrary::onPlaylistsDeleted( std::set<int64_t> playlistIds )
 {
     wrapEntityDeletedEventCallback( m_vlc_ml, playlistIds, VLC_ML_EVENT_PLAYLIST_DELETED );
 }
@@ -194,26 +195,41 @@ void MediaLibrary::onGenresAdded( std::vector<medialibrary::GenrePtr> genres )
     wrapEntityCreatedEventCallback<vlc_ml_genre_t>( m_vlc_ml, genres, VLC_ML_EVENT_GENRE_ADDED );
 }
 
-void MediaLibrary::onGenresModified( std::vector<int64_t> genreIds )
+void MediaLibrary::onGenresModified( std::set<int64_t> genreIds )
 {
     wrapEntityModifiedEventCallback( m_vlc_ml, genreIds, VLC_ML_EVENT_GENRE_UPDATED );
 }
 
-void MediaLibrary::onGenresDeleted( std::vector<int64_t> genreIds )
+void MediaLibrary::onGenresDeleted( std::set<int64_t> genreIds )
 {
     wrapEntityDeletedEventCallback( m_vlc_ml, genreIds, VLC_ML_EVENT_GENRE_DELETED );
 }
 
-void MediaLibrary::onMediaGroupAdded( std::vector<medialibrary::MediaGroupPtr> )
+void MediaLibrary::onMediaGroupsAdded( std::vector<medialibrary::MediaGroupPtr> )
 {
 }
 
-void MediaLibrary::onMediaGroupModified( std::vector<int64_t> )
+void MediaLibrary::onMediaGroupsModified( std::set<int64_t> )
 {
 }
 
-void MediaLibrary::onMediaGroupDeleted( std::vector<int64_t> )
+void MediaLibrary::onMediaGroupsDeleted( std::set<int64_t> )
 {
+}
+
+void MediaLibrary::onBookmarksAdded( std::vector<medialibrary::BookmarkPtr> )
+{
+
+}
+
+void MediaLibrary::onBookmarksModified( std::set<int64_t> )
+{
+
+}
+
+void MediaLibrary::onBookmarksDeleted( std::set<int64_t> )
+{
+
 }
 
 void MediaLibrary::onDiscoveryStarted( const std::string& entryPoint )
@@ -372,6 +388,12 @@ bool MediaLibrary::Init()
     auto userDir = vlc::wrap_cptr( config_GetUserDir( VLC_USERDATA_DIR ) );
     std::string mlDir = std::string{ userDir.get() } + "/ml/";
 
+    m_ml->registerDeviceLister( std::make_shared<vlc::medialibrary::DeviceLister>(
+                                    VLC_OBJECT(m_vlc_ml) ), "smb://" );
+    m_ml->addFileSystemFactory( std::make_shared<vlc::medialibrary::SDFileSystemFactory>(
+                                    VLC_OBJECT( m_vlc_ml ), m_ml.get(), "file://") );
+    m_ml->addFileSystemFactory( std::make_shared<vlc::medialibrary::SDFileSystemFactory>(
+                                    VLC_OBJECT( m_vlc_ml ), m_ml.get(), "smb://") );
     auto initStatus = m_ml->initialize( mlDir + "ml.db", mlDir + "/mlstorage/", this );
     switch ( initStatus )
     {
@@ -421,8 +443,6 @@ bool MediaLibrary::Init()
         return false;
     }
 
-    auto networkFs = std::make_shared<vlc::medialibrary::SDFileSystemFactory>( VLC_OBJECT( m_vlc_ml ), "smb://");
-    m_ml->addNetworkFileSystemFactory( networkFs );
     m_ml->setDiscoverNetworkEnabled( true );
 
     return true;
@@ -433,22 +453,13 @@ bool MediaLibrary::Start()
     if ( Init() == false )
         return false;
 
-    auto startRes = m_ml->start();
-    switch ( startRes )
-    {
-        case medialibrary::StartResult::Failed:
-            msg_Err( m_vlc_ml, "Failed to start the MediaLibrary" );
-            return false;
-        case medialibrary::StartResult::AlreadyStarted:
-            return true;
-        case medialibrary::StartResult::Success:
-            break;
-    }
-
-    // Reload entry points we already know about, and then add potential new ones.
-    // Doing it the other way around would cause the initial scan to be performed
-    // twice, as we start discovering the new folders, then reload them.
-    m_ml->reload();
+    /*
+     * If we already provided the medialib with some entry points, then we have
+     * nothing left to do
+     */
+    auto entryPoints = m_ml->entryPoints()->all();
+    if ( entryPoints.empty() == false )
+        return true;
 
     auto folders = vlc::wrap_cptr( var_InheritString( m_vlc_ml, "ml-folders" ) );
     if ( folders != nullptr && strlen( folders.get() ) > 0 )

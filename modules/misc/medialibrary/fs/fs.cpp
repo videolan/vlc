@@ -22,45 +22,16 @@
 # include "config.h"
 #endif
 
-#include "fs.h"
-
 #include <algorithm>
 #include <vlc_services_discovery.h>
 #include <medialibrary/IDeviceLister.h>
 #include <medialibrary/filesystem/IDevice.h>
+#include <medialibrary/IMediaLibrary.h>
 
 #include "device.h"
 #include "directory.h"
 #include "util.h"
-
-extern "C" {
-
-static void
-services_discovery_item_added(services_discovery_t *sd,
-                              input_item_t *parent, input_item_t *media,
-                              const char *cat)
-{
-    VLC_UNUSED(parent);
-    VLC_UNUSED(cat);
-    vlc::medialibrary::SDFileSystemFactory *that =
-        static_cast<vlc::medialibrary::SDFileSystemFactory *>(sd->owner.sys);
-    that->onDeviceAdded(media);
-}
-
-static void
-services_discovery_item_removed(services_discovery_t *sd, input_item_t *media)
-{
-    vlc::medialibrary::SDFileSystemFactory *that =
-        static_cast<vlc::medialibrary::SDFileSystemFactory *>(sd->owner.sys);
-    that->onDeviceRemoved(media);
-}
-
-static const struct services_discovery_callbacks sd_cbs = {
-    .item_added = services_discovery_item_added,
-    .item_removed = services_discovery_item_removed,
-};
-
-}
+#include "fs.h"
 
 namespace vlc {
   namespace medialibrary {
@@ -68,19 +39,25 @@ namespace vlc {
 using namespace ::medialibrary;
 
 SDFileSystemFactory::SDFileSystemFactory(vlc_object_t *parent,
+                                         IMediaLibrary* ml,
                                          const std::string &scheme)
     : m_parent(parent)
+    , m_ml( ml )
     , m_scheme(scheme)
+    , m_deviceLister( m_ml->deviceLister( scheme ) )
+    , m_callbacks( nullptr )
 {
+    m_isNetwork = strncasecmp( m_scheme.c_str(), "file://",
+                               m_scheme.length() ) != 0;
 }
 
-std::shared_ptr<IDirectory>
+std::shared_ptr<fs::IDirectory>
 SDFileSystemFactory::createDirectory(const std::string &mrl)
 {
     return std::make_shared<SDDirectory>(mrl, *this);
 }
 
-std::shared_ptr<IFile>
+std::shared_ptr<fs::IFile>
 SDFileSystemFactory::createFile(const std::string& mrl)
 {
     auto dir = createDirectory(mrl);
@@ -93,21 +70,9 @@ SDFileSystemFactory::createDevice(const std::string &uuid)
 {
     vlc::threads::mutex_locker locker(m_mutex);
 
-    vlc_tick_t deadline = vlc_tick_now() + VLC_TICK_FROM_SEC(15);
-    while ( true )
-    {
-        auto it = std::find_if(m_devices.cbegin(), m_devices.cend(),
-                [&uuid](const std::shared_ptr<IDevice>& device) {
-                    return strcasecmp( uuid.c_str(), device->uuid().c_str() ) == 0;
-                });
-        if (it != m_devices.cend())
-            return (*it);
-        /* wait a bit, maybe the device is not detected yet */
-        int timeout = m_itemAddedCond.timedwait(m_mutex, deadline);
-        if (timeout)
-            return nullptr;
-    }
-    vlc_assert_unreachable();
+    assert( isStarted() == true );
+
+    return deviceByUuid(uuid);
 }
 
 std::shared_ptr<IDevice>
@@ -115,20 +80,14 @@ SDFileSystemFactory::createDeviceFromMrl(const std::string &mrl)
 {
     vlc::threads::mutex_locker locker(m_mutex);
 
-    auto it = std::find_if(m_devices.cbegin(), m_devices.cend(),
-            [&mrl](const std::shared_ptr<IDevice>& device) {
-                auto match = device->matchesMountpoint( mrl );
-                return std::get<0>( match );
-            });
-    if (it != m_devices.cend())
-        return (*it);
-    return nullptr;
+    assert( isStarted() == true );
+    return deviceByMrl(mrl);
 }
 
 void
 SDFileSystemFactory::refreshDevices()
 {
-    /* nothing to do */
+    m_deviceLister->refresh();
 }
 
 bool
@@ -140,7 +99,7 @@ SDFileSystemFactory::isMrlSupported(const std::string &path) const
 bool
 SDFileSystemFactory::isNetworkFileSystem() const
 {
-    return true;
+    return m_isNetwork;
 }
 
 const std::string &
@@ -152,40 +111,16 @@ SDFileSystemFactory::scheme() const
 bool
 SDFileSystemFactory::start(IFileSystemFactoryCb *callbacks)
 {
-    this->m_callbacks = callbacks;
-    struct services_discovery_owner_t owner = {
-        .cbs = &sd_cbs,
-        .sys = this,
-    };
-    char** sdLongNames;
-    int* categories;
-    auto releaser = [](char** ptr) {
-        for ( auto i = 0u; ptr[i] != nullptr; ++i )
-            free( ptr[i] );
-        free( ptr );
-    };
-    auto sdNames = vlc_sd_GetNames( libvlc(), &sdLongNames, &categories );
-    if ( sdNames == nullptr )
-        return false;
-    auto sdNamesPtr = vlc::wrap_carray( sdNames, releaser );
-    auto sdLongNamesPtr = vlc::wrap_carray( sdLongNames, releaser );
-    auto categoriesPtr = vlc::wrap_carray( categories );
-    for ( auto i = 0u; sdNames[i] != nullptr; ++i )
-    {
-        if ( categories[i] != SD_CAT_LAN )
-            continue;
-        SdPtr sd{ vlc_sd_Create( libvlc(), sdNames[i], &owner ), &vlc_sd_Destroy };
-        if ( sd == nullptr )
-            continue;
-        m_sds.push_back( std::move( sd ) );
-    }
-    return m_sds.empty() == false;
+    assert( isStarted() == false );
+    m_callbacks = callbacks;
+    return m_deviceLister->start( this );
 }
 
 void
 SDFileSystemFactory::stop()
 {
-    m_sds.clear();
+    assert( isStarted() == true );
+    m_deviceLister->stop();
     m_callbacks = nullptr;
 }
 
@@ -195,65 +130,82 @@ SDFileSystemFactory::libvlc() const
     return vlc_object_instance(m_parent);
 }
 
-void
-SDFileSystemFactory::onDeviceAdded(input_item_t *media)
+void SDFileSystemFactory::onDeviceMounted(const std::string& uuid,
+                                          const std::string& mountpoint,
+                                          bool removable)
 {
-    auto mrl = std::string{ media->psz_uri };
-    auto name = media->psz_name;
-    if ( *mrl.crbegin() != '/' )
-        mrl += '/';
-
-    if ( strncasecmp( mrl.c_str(), m_scheme.c_str(), m_scheme.length() ) != 0 )
+    if ( strncasecmp( mountpoint.c_str(), m_scheme.c_str(), m_scheme.length() ) != 0 )
         return;
 
+    std::shared_ptr<fs::IDevice> device;
     {
-        vlc::threads::mutex_locker locker(m_mutex);
-        auto it = std::find_if(m_devices.begin(), m_devices.end(),
-                [name](const std::shared_ptr<IDevice>& device) {
-                    return strcasecmp( name, device->uuid().c_str() ) == 0;
-                });
-        if (it != m_devices.end())
+        vlc::threads::mutex_locker lock(m_mutex);
+        device = deviceByUuid(uuid);
+        if (device == nullptr)
         {
-            auto& device = (*it);
-            auto match = device->matchesMountpoint( mrl );
-            if ( std::get<0>( match ) == false )
-            {
-                device->addMountpoint( mrl );
-                m_callbacks->onDeviceMounted( *device, mrl );
-            }
-            return; /* already exists */
+            device = std::make_shared<SDDevice>(uuid, m_scheme,
+                                                removable, isNetworkFileSystem() );
+            m_devices.push_back(device);
         }
-        auto device = std::make_shared<SDDevice>( name, mrl );
-        m_devices.push_back( device );
-        m_callbacks->onDeviceMounted( *device, mrl );
+        device->addMountpoint(mountpoint);
     }
 
-    m_itemAddedCond.signal();
+    m_callbacks->onDeviceMounted( *device );
 }
 
-void
-SDFileSystemFactory::onDeviceRemoved(input_item_t *media)
+void vlc::medialibrary::SDFileSystemFactory::onDeviceUnmounted(const std::string& uuid,
+                                                               const std::string& mountpoint)
 {
-    auto name = media->psz_name;
-    auto mrl = std::string{ media->psz_uri };
-    if ( *mrl.crbegin() != '/' )
-        mrl += '/';
-
-    if ( strncasecmp( mrl.c_str(), m_scheme.c_str(), m_scheme.length() ) != 0 )
+    if ( strncasecmp( mountpoint.c_str(), m_scheme.c_str(), m_scheme.length() ) != 0 )
         return;
 
+    std::shared_ptr<fs::IDevice> device;
     {
-        vlc::threads::mutex_locker locker(m_mutex);
-        auto it = std::find_if(m_devices.begin(), m_devices.end(),
-                [&name](const std::shared_ptr<IDevice>& device) {
-                    return strcasecmp( name, device->uuid().c_str() ) == 0;
-                });
-        if ( it != m_devices.end() )
+        vlc::threads::mutex_locker lock(m_mutex);
+        device = deviceByUuid(uuid);
+    }
+    if ( device == nullptr )
+    {
+        assert( !"Unknown device was unmounted" );
+        return;
+    }
+    device->removeMountpoint(mountpoint);
+    m_callbacks->onDeviceUnmounted(*device);
+}
+
+std::shared_ptr<IDevice> SDFileSystemFactory::deviceByUuid(const std::string& uuid)
+{
+    auto it = std::find_if( begin( m_devices ), end( m_devices ),
+                            [&uuid]( const std::shared_ptr<fs::IDevice>& d ) {
+        return strcasecmp( d->uuid().c_str(), uuid.c_str() ) == 0;
+    });
+    if ( it == end( m_devices ) )
+        return nullptr;
+    return *it;
+}
+
+bool SDFileSystemFactory::isStarted() const
+{
+    return m_callbacks != nullptr;
+}
+
+std::shared_ptr<IDevice> SDFileSystemFactory::deviceByMrl(const std::string& mrl)
+{
+    std::shared_ptr<fs::IDevice> res;
+    std::string mountpoint;
+    for ( const auto& d : m_devices )
+    {
+        auto match = d->matchesMountpoint( mrl );
+        if ( std::get<0>( match ) == false )
+            continue;
+        auto newMountpoint = std::get<1>( match );
+        if ( res == nullptr || newMountpoint.length() > mountpoint.length() )
         {
-            (*it)->removeMountpoint( mrl );
-            m_callbacks->onDeviceUnmounted( *(*it), mrl );
+            res = d;
+            mountpoint = std::move( newMountpoint );
         }
     }
+    return res;
 }
 
   } /* namespace medialibrary */

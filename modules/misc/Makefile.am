@@ -119,6 +119,8 @@ libmedialibrary_plugin_la_SOURCES = \
 	misc/medialibrary/fs/file.cpp \
 	misc/medialibrary/fs/fs.h \
 	misc/medialibrary/fs/fs.cpp \
+	misc/medialibrary/fs/devicelister.cpp \
+	misc/medialibrary/fs/devicelister.h \
 	misc/medialibrary/fs/util.h \
 	misc/medialibrary/fs/util.cpp
 

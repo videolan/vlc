@@ -27,16 +27,13 @@
 #include <vlc_threads.h>
 #include <vlc_cxx_helpers.hpp>
 #include <medialibrary/filesystem/IFileSystemFactory.h>
+#include <medialibrary/IDeviceLister.h>
 
-struct input_item_t;
-struct services_discovery_t;
 struct libvlc_int_t;
-extern "C" {
-void vlc_sd_Destroy(services_discovery_t *sd);
-}
 
 namespace medialibrary {
 class IDeviceListerCb;
+class IMediaLibrary;
 }
 
 namespace vlc {
@@ -45,9 +42,10 @@ namespace vlc {
 using namespace ::medialibrary;
 using namespace ::medialibrary::fs;
 
-class SDFileSystemFactory : public IFileSystemFactory {
+class SDFileSystemFactory : public IFileSystemFactory, private IDeviceListerCb {
 public:
     SDFileSystemFactory(vlc_object_t *m_parent,
+                        IMediaLibrary* ml,
                         const std::string &scheme);
 
     std::shared_ptr<IDirectory>
@@ -83,20 +81,30 @@ public:
     libvlc_int_t *
     libvlc() const;
 
-    /* public to be called from C callback */
-    void onDeviceAdded(input_item_t *media);
-    void onDeviceRemoved(input_item_t *media);
+    void
+    onDeviceMounted(const std::string& uuid, const std::string& mountpoint, bool removable) override;
+
+    void
+    onDeviceUnmounted(const std::string& uuid, const std::string& mountpoint) override;
+
+private:
+    std::shared_ptr<fs::IDevice>
+    deviceByUuid(const std::string& uuid);
+
+    bool isStarted() const;
+
+    std::shared_ptr<fs::IDevice> deviceByMrl(const std::string& mrl);
 
 private:
     vlc_object_t *const m_parent;
+    IMediaLibrary* m_ml;
     const std::string m_scheme;
+    std::shared_ptr<IDeviceLister> m_deviceLister;
     IFileSystemFactoryCb *m_callbacks;
+    bool m_isNetwork;
 
     vlc::threads::mutex m_mutex;
-    vlc::threads::condition_variable m_itemAddedCond;
     std::vector<std::shared_ptr<IDevice>> m_devices;
-    using SdPtr = std::unique_ptr<services_discovery_t, decltype(&vlc_sd_Destroy)>;
-    std::vector<SdPtr> m_sds;
 };
 
   } /* namespace medialibrary */

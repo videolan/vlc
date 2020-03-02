@@ -1,9 +1,9 @@
-MEDIALIBRARY_HASH := 137eb0ac50c0c8493421c8e209c2c4b16195aec5
+MEDIALIBRARY_HASH := cfc889fcd97ee9b1a71e100888715389025b12ea
 MEDIALIBRARY_VERSION := git-$(MEDIALIBRARY_HASH)
 MEDIALIBRARY_GITURL := https://code.videolan.org/videolan/medialibrary.git
 
 PKGS += medialibrary
-ifeq ($(call need_pkg,"medialibrary >= 0.7.1"),)
+ifeq ($(call need_pkg,"medialibrary >= 0.8"),)
 PKGS_FOUND += medialibrary
 endif
 
@@ -20,8 +20,6 @@ medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.xz .sum-medialibrary
 	rm -rf $@-$(MEDIALIBRARY_VERSION) $@
 	mkdir -p $@-$(MEDIALIBRARY_VERSION)
 	tar xvf "$<" --strip-components=1 -C $@-$(MEDIALIBRARY_VERSION)
-	$(APPLY) $(SRC)/medialibrary/0001-include-medialibrary-IDeviceLister.h-Include-string.patch
-	$(APPLY) $(SRC)/medialibrary/0001-use-GetFullPathNameW-for-the-wide-char-API.patch
 	$(call pkg_static, "medialibrary.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
