@@ -49,13 +49,14 @@ typedef struct vlclua_object {
     int (*release)(vlc_object_t *);
 } vlclua_object_t;
 
-static void vlclua_release_vlc_object(lua_State *L)
+static int vlclua_release_vlc_object(lua_State *L)
 {
     vlclua_object_t *p_luaobj = luaL_checkudata(L, 1, "vlc_object");
 
     lua_pop(L, 1);
     if (p_luaobj->release)
         p_luaobj->release(p_luaobj->object);
+    return 0;
 }
 
 static int vlclua_push_vlc_object(lua_State *L, vlc_object_t *p_obj,
