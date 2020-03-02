@@ -810,7 +810,7 @@ static int Direct3D9CreateResources(vout_display_t *vd, const video_format_t *fm
     for (int i = 0; i < 2; i++) {
         D3DFORMAT dfmt = i == 0 ? D3DFMT_A8B8G8R8 : D3DFMT_A8R8G8B8;
         if (SUCCEEDED(IDirect3D9_CheckDeviceFormat(sys->d3d9_device->hd3d.obj,
-                                                   D3DADAPTER_DEFAULT,
+                                                   sys->d3d9_device->d3ddev.adapterId,
                                                    D3DDEVTYPE_HAL,
                                                    sys->d3d9_device->d3ddev.BufferFormat,
                                                    D3DUSAGE_DYNAMIC,
@@ -1309,7 +1309,7 @@ static int Direct3D9CheckConversion(vout_display_t *vd, D3DFORMAT src)
     HRESULT hr;
 
     /* test whether device can create a surface of that format */
-    hr = IDirect3D9_CheckDeviceFormat(d3dobj, D3DADAPTER_DEFAULT,
+    hr = IDirect3D9_CheckDeviceFormat(d3dobj, sys->d3d9_device->d3ddev.adapterId,
                                       D3DDEVTYPE_HAL, dst, 0,
                                       D3DRTYPE_SURFACE, src);
     if (SUCCEEDED(hr)) {
@@ -1317,7 +1317,7 @@ static int Direct3D9CheckConversion(vout_display_t *vd, D3DFORMAT src)
         ** from that format to target format
         */
         hr = IDirect3D9_CheckDeviceFormatConversion(d3dobj,
-                                                    D3DADAPTER_DEFAULT,
+                                                    sys->d3d9_device->d3ddev.adapterId,
                                                     D3DDEVTYPE_HAL,
                                                     src, dst);
     }
