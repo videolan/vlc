@@ -272,6 +272,18 @@ static int Open(vlc_object_t *this)
         if (sys == NULL)
             return VLC_ENOMEM;
 
+        // Only use this video output on macOS 10.14 or higher
+        // currently, as it has some issues on at least macOS 10.7
+        // and the old NSView based output still works fine on old
+        // macOS versions.
+        if (@available(macOS 10.14, *)) {
+            // This is intentionally left empty, as the check
+            // can not be negated or combined with other conditions!
+        } else {
+            if (!vd->obj.force)
+                return VLC_EGENERIC;
+        }
+
         // Obtain container NSObject
         id container = var_CreateGetAddress(vd, "drawable-nsobject");
         if (container) {
