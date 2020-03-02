@@ -45,8 +45,8 @@
  *****************************************************************************/
 
 typedef struct vlclua_object {
-    vlc_object_t *object;
-    void (*release)(vlc_object_t *);
+    void *object;
+    void (*release)(void *);
 } vlclua_object_t;
 
 static int vlclua_release_vlc_object(lua_State *L)
@@ -59,8 +59,8 @@ static int vlclua_release_vlc_object(lua_State *L)
     return 0;
 }
 
-static int vlclua_push_vlc_object(lua_State *L, vlc_object_t *p_obj,
-                                  void (*release)(vlc_object_t *))
+static int vlclua_push_vlc_object(lua_State *L, void *p_obj,
+                                  void (*release)(void *))
 {
     vlclua_object_t *udata =
         (vlclua_object_t *)lua_newuserdata(L, sizeof (vlclua_object_t));
@@ -83,7 +83,7 @@ static int vlclua_push_vlc_object(lua_State *L, vlc_object_t *p_obj,
 static int vlclua_get_libvlc( lua_State *L )
 {
     libvlc_int_t *p_libvlc = vlc_object_instance(vlclua_get_this( L ));
-    vlclua_push_vlc_object(L, VLC_OBJECT(p_libvlc), NULL);
+    vlclua_push_vlc_object(L, p_libvlc, NULL);
     return 1;
 }
 
@@ -111,7 +111,7 @@ static int vlclua_get_vout( lua_State *L )
 {
     vout_thread_t *vout = vlclua_get_vout_internal(L);
     if (vout)
-        vlclua_push_vlc_object(L, VLC_OBJECT(vout), vout_Release);
+        vlclua_push_vlc_object(L, vout, vout_Release);
     else
         lua_pushnil(L);
     return 1;
@@ -121,7 +121,7 @@ static int vlclua_get_aout( lua_State *L )
 {
     audio_output_t *aout = vlclua_get_aout_internal(L);
     if (aout)
-        vlclua_push_vlc_object(L, VLC_OBJECT(aout), aout_Release);
+        vlclua_push_vlc_object(L, aout, aout_Release);
     else
         lua_pushnil(L);
     return 1;
