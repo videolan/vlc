@@ -113,6 +113,7 @@ fi
 info "Building extra tools"
 mkdir -p extras/tools
 cd extras/tools
+export VLC_TOOLS="$PWD/build"
 
 export PATH="$PWD/build/bin":"$PATH"
 # Force patched meson as newer versions don't add -lpthread properly in libplacebo.pc
