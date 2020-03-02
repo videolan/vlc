@@ -495,18 +495,14 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     VLC_UNUSED(fmt);
     vlc_va_sys_t *sys = va->sys;
 
-    D3DADAPTER_IDENTIFIER9 identifier;
-    HRESULT hr = IDirect3D9_GetAdapterIdentifier(sys->hd3d.obj, sys->d3d_dev.adapterId, 0, &identifier);
-    if (FAILED(hr))
-        return VLC_EGENERIC;
-
-    UINT driverBuild = identifier.DriverVersion.LowPart & 0xFFFF;
-    if (identifier.VendorId == GPU_MANUFACTURER_INTEL && (identifier.DriverVersion.LowPart >> 16) >= 100)
+    const D3DADAPTER_IDENTIFIER9 *identifier = &sys->d3d_dev.identifier;
+    UINT driverBuild = identifier->DriverVersion.LowPart & 0xFFFF;
+    if (identifier->VendorId == GPU_MANUFACTURER_INTEL && (identifier->DriverVersion.LowPart >> 16) >= 100)
     {
         /* new Intel driver format */
-        driverBuild += ((identifier.DriverVersion.LowPart >> 16) - 100) * 1000;
+        driverBuild += ((identifier->DriverVersion.LowPart >> 16) - 100) * 1000;
     }
-    if (!directx_va_canUseDecoder(va, identifier.VendorId, identifier.DeviceId,
+    if (!directx_va_canUseDecoder(va, identifier->VendorId, identifier->DeviceId,
                                   input, driverBuild))
     {
         char* psz_decoder_name = directx_va_GetDecoderName(input);

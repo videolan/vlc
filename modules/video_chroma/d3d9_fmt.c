@@ -97,12 +97,11 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
     }
 
     /* */
-    D3DADAPTER_IDENTIFIER9 d3dai;
-    if (FAILED(IDirect3D9_GetAdapterIdentifier(hd3d->obj, AdapterToUse,0, &d3dai))) {
+    if (FAILED(IDirect3D9_GetAdapterIdentifier(hd3d->obj, AdapterToUse,0, &out->identifier))) {
         msg_Warn(o, "IDirect3D9_GetAdapterIdentifier failed");
     } else {
-        msg_Dbg(o, "Direct3d9 Device: %s %lx %lx %lx", d3dai.Description,
-                d3dai.VendorId, d3dai.DeviceId, d3dai.Revision );
+        msg_Dbg(o, "Direct3d9 Device: %s %lx %lx %lx", out->identifier.Description,
+                out->identifier.VendorId, out->identifier.DeviceId, out->identifier.Revision );
     }
 
     DWORD thread_modes[] = { D3DCREATE_MULTITHREADED, 0 };
