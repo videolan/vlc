@@ -190,16 +190,16 @@ d3d9_handle_t *hd3d = &sys->dec_device.hd3d;
     /*
     ** Get device capabilities
     */
-    ZeroMemory(&hd3d->caps, sizeof(hd3d->caps));
-    hr = IDirect3D9_GetDeviceCaps(hd3d->obj, AdapterToUse, DeviceType, &hd3d->caps);
+    ZeroMemory(&out->caps, sizeof(out->caps));
+    hr = IDirect3D9_GetDeviceCaps(hd3d->obj, AdapterToUse, DeviceType, &out->caps);
     if (FAILED(hr)) {
        msg_Err(o, "Could not read adapter capabilities. (hr=0x%lX)", hr);
        goto error;
     }
-    msg_Dbg(o, "D3D9 device caps 0x%lX / 0x%lX", hd3d->caps.DevCaps, hd3d->caps.DevCaps2);
+    msg_Dbg(o, "D3D9 device caps 0x%lX / 0x%lX", out->caps.DevCaps, out->caps.DevCaps2);
 
     /* TODO: need to test device capabilities and select the right render function */
-    if (!(hd3d->caps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES)) {
+    if (!(out->caps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES)) {
         msg_Err(o, "Device does not support stretching from textures.");
         goto error;
     }
