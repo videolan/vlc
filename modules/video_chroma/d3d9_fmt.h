@@ -139,7 +139,7 @@ d3d9_decoder_device_t *D3D9_CreateDevice(vlc_object_t *);
 
 void D3D9_ReleaseDevice(d3d9_decoder_device_t *);
 
-int D3D9_FillPresentationParameters(const d3d9_decoder_device_t *, D3DPRESENT_PARAMETERS *);
+int D3D9_ResetDevice(vlc_object_t *, d3d9_decoder_device_t *);
 
 void d3d9_pic_context_destroy(picture_context_t *);
 picture_context_t *d3d9_pic_context_copy(picture_context_t *);

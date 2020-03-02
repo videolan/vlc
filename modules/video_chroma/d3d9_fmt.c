@@ -52,6 +52,63 @@ typedef struct {
     d3d9_decoder_device_t           dec_device;
 } d3d9_decoder_device;
 
+/**
+ * It setup vout_display_sys_t::d3dpp and vout_display_sys_t::rect_display
+ * from the default adapter.
+ */
+static HRESULT FillPresentationParameters(const d3d9_decoder_device_t *dec_dev,
+                                    D3DPRESENT_PARAMETERS *d3dpp)
+{
+    /*
+    ** Get the current desktop display mode, so we can set up a back
+    ** buffer of the same format
+    */
+    D3DDISPLAYMODE d3ddm;
+    HRESULT hr = IDirect3D9_GetAdapterDisplayMode(dec_dev->hd3d.obj, dec_dev->d3ddev.adapterId, &d3ddm);
+    if (FAILED(hr))
+        return hr;
+
+    /* Set up the structure used to create the D3DDevice. */
+    ZeroMemory(d3dpp, sizeof(D3DPRESENT_PARAMETERS));
+    d3dpp->Flags                  = D3DPRESENTFLAG_VIDEO;
+    d3dpp->Windowed               = TRUE;
+    d3dpp->MultiSampleType        = D3DMULTISAMPLE_NONE;
+    d3dpp->PresentationInterval   = D3DPRESENT_INTERVAL_DEFAULT;
+    d3dpp->EnableAutoDepthStencil = FALSE;
+    d3dpp->hDeviceWindow          = NULL;
+    d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
+    d3dpp->BackBufferFormat       = d3ddm.Format;
+    d3dpp->BackBufferCount        = 1;
+    d3dpp->BackBufferWidth        = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    d3dpp->BackBufferHeight       = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
+    return D3D_OK;
+}
+
+int D3D9_ResetDevice(vlc_object_t *o, d3d9_decoder_device_t *dec_dev)
+{
+    D3DPRESENT_PARAMETERS d3dpp;
+    if (FAILED(FillPresentationParameters(dec_dev, &d3dpp)))
+    {
+        msg_Err(o, "Could not get presentation parameters to reset device");
+        return VLC_EGENERIC;
+    }
+
+    /* */
+    HRESULT hr;
+    if (dec_dev->hd3d.use_ex){
+        hr = IDirect3DDevice9Ex_ResetEx(dec_dev->d3ddev.devex, &d3dpp, NULL);
+    } else {
+        hr = IDirect3DDevice9_Reset(dec_dev->d3ddev.dev, &d3dpp);
+    }
+    if (FAILED(hr)) {
+        msg_Err(o, "IDirect3DDevice9_Reset failed! (hr=0x%lX)", hr);
+        return VLC_EGENERIC;
+    }
+    dec_dev->d3ddev.BufferFormat = d3dpp.BackBufferFormat;
+    return VLC_SUCCESS;
+}
+
 static void D3D9_Destroy(d3d9_handle_t *hd3d)
 {
     if (hd3d->obj)
@@ -207,7 +264,7 @@ d3d9_handle_t *hd3d = &sys->dec_device.hd3d;
     out->adapterId = AdapterToUse;
     /* TODO only create a device for the decoder dimensions */
     D3DPRESENT_PARAMETERS d3dpp;
-    if (D3D9_FillPresentationParameters(&sys->dec_device, &d3dpp))
+    if (FAILED(FillPresentationParameters(&sys->dec_device, &d3dpp)))
     {
         msg_Err(o, "Could not get presentation parameters");
         goto error;
@@ -269,39 +326,6 @@ void D3D9_ReleaseDevice(d3d9_decoder_device_t *dec_dev)
     D3D9_Destroy( &dec_dev->hd3d );
     if ( sys->cleanupDeviceCb )
         sys->cleanupDeviceCb( sys->opaque );
-}
-
-/**
- * It setup vout_display_sys_t::d3dpp and vout_display_sys_t::rect_display
- * from the default adapter.
- */
-int D3D9_FillPresentationParameters(const d3d9_decoder_device_t *dec_dev,
-                                    D3DPRESENT_PARAMETERS *d3dpp)
-{
-    /*
-    ** Get the current desktop display mode, so we can set up a back
-    ** buffer of the same format
-    */
-    D3DDISPLAYMODE d3ddm;
-    HRESULT hr = IDirect3D9_GetAdapterDisplayMode(dec_dev->hd3d.obj, dec_dev->d3ddev.adapterId, &d3ddm);
-    if (FAILED(hr))
-        return VLC_EGENERIC;
-
-    /* Set up the structure used to create the D3DDevice. */
-    ZeroMemory(d3dpp, sizeof(D3DPRESENT_PARAMETERS));
-    d3dpp->Flags                  = D3DPRESENTFLAG_VIDEO;
-    d3dpp->Windowed               = TRUE;
-    d3dpp->MultiSampleType        = D3DMULTISAMPLE_NONE;
-    d3dpp->PresentationInterval   = D3DPRESENT_INTERVAL_DEFAULT;
-    d3dpp->EnableAutoDepthStencil = FALSE;
-    d3dpp->hDeviceWindow          = NULL;
-    d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
-    d3dpp->BackBufferFormat       = d3ddm.Format;
-    d3dpp->BackBufferCount        = 1;
-    d3dpp->BackBufferWidth        = GetSystemMetrics(SM_CXVIRTUALSCREEN);
-    d3dpp->BackBufferHeight       = GetSystemMetrics(SM_CYVIRTUALSCREEN);
-
-    return VLC_SUCCESS;
 }
 
 const struct vlc_video_context_operations d3d9_vctx_ops = {

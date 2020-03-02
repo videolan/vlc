@@ -427,6 +427,8 @@ static void Direct3D9DestroyScene(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     Direct3D9DeleteRegions(sys->d3dregion_count, sys->d3dregion);
+    sys->d3dregion_count = 0;
+    sys->d3dregion       = NULL;
 
     if (sys->sceneVertexBuffer)
     {
@@ -440,9 +442,6 @@ static void Direct3D9DestroyScene(vout_display_t *vd)
         sys->sceneTexture = NULL;
     }
 
-    sys->d3dregion_count = 0;
-    sys->d3dregion       = NULL;
-
     msg_Dbg(vd, "Direct3D9 scene released successfully");
 }
 
@@ -451,8 +450,10 @@ static void Direct3D9DestroyShaders(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->d3dx_shader)
+    {
         IDirect3DPixelShader9_Release(sys->d3dx_shader);
-    sys->d3dx_shader = NULL;
+        sys->d3dx_shader = NULL;
+    }
 }
 
 /**
@@ -845,30 +846,13 @@ static int Direct3D9CreateResources(vout_display_t *vd, const video_format_t *fm
 static int Direct3D9Reset(vout_display_t *vd, const video_format_t *fmtp)
 {
     vout_display_sys_t *sys = vd->sys;
-    d3d9_device_t *p_d3d9_dev = &sys->d3d9_device->d3ddev;
 
-    D3DPRESENT_PARAMETERS d3dpp;
-    if (D3D9_FillPresentationParameters(sys->d3d9_device, &d3dpp))
-    {
-        msg_Err(vd, "Could not get presentation parameters to reset device");
-        return VLC_EGENERIC;
-    }
+    int res = D3D9_ResetDevice( VLC_OBJECT(vd), sys->d3d9_device );
+    if (res != VLC_SUCCESS)
+        return res;
 
     /* release all D3D objects */
     Direct3D9DestroyResources(vd);
-
-    /* */
-    HRESULT hr;
-    if (sys->d3d9_device->hd3d.use_ex){
-        hr = IDirect3DDevice9Ex_ResetEx(p_d3d9_dev->devex, &d3dpp, NULL);
-    } else {
-        hr = IDirect3DDevice9_Reset(p_d3d9_dev->dev, &d3dpp);
-    }
-    if (FAILED(hr)) {
-        msg_Err(vd, "IDirect3DDevice9_Reset failed! (hr=0x%lX)", hr);
-        return VLC_EGENERIC;
-    }
-    p_d3d9_dev->BufferFormat = d3dpp.BackBufferFormat;
 
     /* re-create them */
     if (Direct3D9CreateResources(vd, fmtp)) {
