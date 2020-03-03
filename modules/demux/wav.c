@@ -29,6 +29,7 @@
 #endif
 
 #include <assert.h>
+#include <limits.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -116,6 +117,24 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                    i_query, args );
 }
 
+static int ChunkSkip( demux_t *p_demux, uint32_t i_size )
+{
+    i_size += i_size & 1;
+
+    if( unlikely( i_size >= 65536 ) )
+    {
+        /* Arbitrary size where a seek should be performed instead of skipping
+         * by reading NULL. Non data chunks are generally smaller than this.
+         * This seek may be used to skip the data chunk if there is an other
+         * chunk after it (unlikely). */
+        return vlc_stream_Seek( p_demux->s,
+                                vlc_stream_Tell( p_demux->s ) + i_size );
+    }
+
+    ssize_t i_ret = vlc_stream_Read( p_demux->s, NULL, i_size );
+    return i_ret < 0 || (size_t) i_ret != i_size ? VLC_EGENERIC : VLC_SUCCESS;
+}
+
 static int ChunkFind( demux_t *p_demux, const char *fcc, unsigned int *pi_size )
 {
     const uint8_t *p_peek;
@@ -143,10 +162,7 @@ static int ChunkFind( demux_t *p_demux, const char *fcc, unsigned int *pi_size )
             return VLC_SUCCESS;
         }
 
-        /* Skip chunk */
-        if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 ||
-            vlc_stream_Read( p_demux->s, NULL, i_size ) != (int)i_size ||
-            ( (i_size & 1) && vlc_stream_Read( p_demux->s, NULL, 1 ) != 1 ) )
+        if( ChunkSkip( p_demux, i_size + 8 ) != VLC_SUCCESS )
             return VLC_EGENERIC;
     }
 }
@@ -302,8 +318,7 @@ static int Open( vlc_object_t * p_this )
             p_sys->i_data_size = (int64_t)1 << 62;
         else
             p_sys->i_data_size = i_data_size;
-        if( vlc_stream_Read( p_demux->s, NULL, i_size ) != (int)i_size ||
-            ( (i_size & 1) && vlc_stream_Read( p_demux->s, NULL, 1 ) != 1 ) )
+        if( ChunkSkip( p_demux, i_size ) != VLC_SUCCESS )
             goto error;
     }
 
