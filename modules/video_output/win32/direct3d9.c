@@ -151,6 +151,8 @@ struct vout_display_sys_t
     d3d9_decoder_device_t  *d3d9_device;
     vlc_decoder_device     *dec_device; // if d3d9_decoder comes from a decoder device
 
+    D3DFORMAT               BufferFormat;
+
     HINSTANCE               hxdll;      /* handle of the opened d3d9x dll */
     IDirect3DPixelShader9*  d3dx_shader;
 
@@ -514,6 +516,7 @@ static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt)
         msg_Err(vd, "Failed to set the external render size");
         return VLC_EGENERIC;
     }
+    sys->BufferFormat = out.d3d9_format;
 
     return VLC_SUCCESS;
 }
@@ -524,12 +527,8 @@ static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt)
 static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
-    const d3d9_device_t *p_d3d9_dev = &sys->d3d9_device->d3ddev;
-    IDirect3DDevice9        *d3ddev = p_d3d9_dev->dev;
+    IDirect3DDevice9        *d3ddev = sys->d3d9_device->d3ddev.dev;
     HRESULT hr;
-
-    if (UpdateOutput(vd, fmt) != VLC_SUCCESS)
-        return VLC_EGENERIC;
 
     UINT width  = fmt->i_visible_width;
     UINT height = fmt->i_visible_height;
@@ -549,7 +548,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
                                         height,
                                         1,
                                         D3DUSAGE_RENDERTARGET,
-                                        p_d3d9_dev->BufferFormat,
+                                        sys->BufferFormat,
                                         D3DPOOL_DEFAULT,
                                         &sys->sceneTexture,
                                         NULL);
@@ -813,7 +812,7 @@ static int Direct3D9CreateResources(vout_display_t *vd, const video_format_t *fm
         if (SUCCEEDED(IDirect3D9_CheckDeviceFormat(sys->d3d9_device->hd3d.obj,
                                                    sys->d3d9_device->d3ddev.adapterId,
                                                    D3DDEVTYPE_HAL,
-                                                   sys->d3d9_device->d3ddev.BufferFormat,
+                                                   sys->BufferFormat,
                                                    D3DUSAGE_DYNAMIC,
                                                    D3DRTYPE_TEXTURE,
                                                    dfmt))) {
@@ -853,6 +852,9 @@ static int Direct3D9Reset(vout_display_t *vd, const video_format_t *fmtp)
 
     /* release all D3D objects */
     Direct3D9DestroyResources(vd);
+
+    if (UpdateOutput(vd, fmtp) != VLC_SUCCESS)
+        return VLC_EGENERIC;
 
     /* re-create them */
     if (Direct3D9CreateResources(vd, fmtp)) {
@@ -1289,7 +1291,7 @@ static int Direct3D9CheckConversion(vout_display_t *vd, D3DFORMAT src)
 {
     vout_display_sys_t *sys = vd->sys;
     IDirect3D9 *d3dobj = sys->d3d9_device->hd3d.obj;
-    D3DFORMAT dst = sys->d3d9_device->d3ddev.BufferFormat;
+    D3DFORMAT dst = sys->BufferFormat;
     HRESULT hr;
 
     /* test whether device can create a surface of that format */
@@ -1383,6 +1385,9 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
 
     /* */
     *fmt = vd->source;
+
+    if (UpdateOutput(vd, fmt) != VLC_SUCCESS)
+        return VLC_EGENERIC;
 
     /* Find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
      * the requested chroma which is usable by the hardware in an offscreen surface, as they
@@ -1490,7 +1495,13 @@ static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_
 {
     vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
-    out->d3d9_format = sys->d3d9_device->d3ddev.BufferFormat;
+
+    D3DDISPLAYMODE d3ddm;
+    HRESULT hr = IDirect3D9_GetAdapterDisplayMode(sys->d3d9_device->hd3d.obj, sys->d3d9_device->d3ddev.adapterId, &d3ddm);
+    if (unlikely(FAILED(hr)))
+        return false;
+
+    out->d3d9_format = d3ddm.Format;
     return true;
 }
 
