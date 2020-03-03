@@ -1502,6 +1502,11 @@ static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_
         return false;
 
     out->d3d9_format = d3ddm.Format;
+    out->full_range  = true;
+    out->colorspace  = libvlc_video_colorspace_BT709;
+    out->primaries   = libvlc_video_primaries_BT709;
+    out->transfer    = libvlc_video_transfer_func_SRGB;
+
     return true;
 }
 
