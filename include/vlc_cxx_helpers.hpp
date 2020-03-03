@@ -32,6 +32,8 @@
 #include <memory>
 #include <utility>
 #include <type_traits>
+#include <string>
+#include <stdexcept>
 
 #ifdef VLC_THREADS_H_
 // Ensure we can use vlc_sem_wait_i11e. We can't declare different versions
@@ -396,6 +398,66 @@ private:
 }
 
 #endif // VLC_THREADS_H_
+
+#ifdef VLC_URL_H
+
+class url : public vlc_url_t
+{
+public:
+    class invalid : public std::runtime_error
+    {
+    public:
+        invalid( const char* url )
+            : std::runtime_error( std::string{ "Invalid url: " } + url )
+        {
+        }
+    };
+
+    url()
+    {
+        psz_buffer = nullptr;
+        psz_pathbuffer = nullptr;
+        psz_host = nullptr;
+    }
+
+    url( const char* str )
+    {
+        if ( vlc_UrlParse( this, str ) )
+            throw invalid( str );
+    }
+
+    url( const std::string& str )
+        : url( str.c_str() )
+    {
+    }
+
+    ~url()
+    {
+        vlc_UrlClean(this);
+    }
+
+    url( const url& ) = delete;
+    url& operator=( const url& ) = delete;
+
+    url( url&& u ) noexcept
+        : vlc_url_t( u )
+    {
+        u.psz_buffer = nullptr;
+        u.psz_pathbuffer = nullptr;
+        u.psz_host = nullptr;
+    }
+
+    url& operator=( url&& u ) noexcept
+    {
+        *(static_cast<vlc_url_t*>( this )) = u;
+        u.psz_buffer = nullptr;
+        u.psz_pathbuffer = nullptr;
+        u.psz_host = nullptr;
+        return *this;
+    }
+};
+
+#endif
 
 } // namespace vlc
 
