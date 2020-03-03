@@ -2419,8 +2419,6 @@
 			</array>
 			<key>UTTypeDescription</key>
 			<string>RAR Archive</string>
-			<key>UTTypeIconFile</key>
-			<string>rar</string>
 			<key>UTTypeIdentifier</key>
 			<string>com.rarlab.rar-archive</string>
 			<key>UTTypeTagSpecification</key>
