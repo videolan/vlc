@@ -35,42 +35,8 @@
 #include <vlc_fs.h>
 
 /*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-#define OUTPUT_TEXT N_("Output file")
-#define OUTPUT_LONGTEXT N_( \
-    "Writes stats to file instead of stdout" )
-#define PREFIX_TEXT N_("Prefix to show on output line")
-
-static int  Open    ( vlc_object_t * );
-static void Close   ( vlc_object_t * );
-
-#define SOUT_CFG_PREFIX "sout-stats-"
-
-vlc_module_begin()
-    set_shortname( N_("Stats"))
-    set_description( N_("Writes statistic info about stream"))
-    set_capability( "sout stream", 0 )
-    add_shortcut( "stats" )
-    set_category( CAT_SOUT )
-    set_subcategory( SUBCAT_SOUT_STREAM )
-    set_callbacks( Open, Close )
-    add_string( SOUT_CFG_PREFIX "output", "", OUTPUT_TEXT,OUTPUT_LONGTEXT, false );
-    add_string( SOUT_CFG_PREFIX "prefix", "stats", PREFIX_TEXT,PREFIX_TEXT, false );
-vlc_module_end()
-
-
-/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static const char *ppsz_sout_options[] = {
-    "output", "prefix", NULL
-};
-
-static void *Add( sout_stream_t *, const es_format_t * );
-static void  Del( sout_stream_t *, void * );
-static int   Send( sout_stream_t *, void *, block_t * );
-
 typedef struct
 {
     FILE *output;
@@ -86,67 +52,6 @@ typedef struct
     vlc_tick_t previous_dts,track_duration;
     struct md5_s hash;
 } sout_stream_id_sys_t;
-
-/*****************************************************************************
- * Open:
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys;
-    char              *outputFile;
-
-    p_sys = calloc( 1, sizeof( sout_stream_sys_t ) );
-    if( !p_sys )
-        return VLC_ENOMEM;
-
-
-    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
-                   p_stream->p_cfg );
-
-
-    outputFile = var_InheritString( p_stream, SOUT_CFG_PREFIX "output" );
-
-    if( outputFile )
-    {
-        p_sys->output = vlc_fopen( outputFile, "wt" );
-        if( !p_sys->output )
-        {
-            msg_Err( p_stream, "Unable to open file '%s' for writing", outputFile );
-            free( p_sys );
-            free( outputFile );
-            return VLC_EGENERIC;
-        } else {
-            fprintf( p_sys->output,"#prefix\ttrack\ttype\tsegment_number\tdts_difference\tlength\tmd5\n");
-        }
-        free( outputFile );
-    }
-    p_sys->prefix = var_InheritString( p_stream, SOUT_CFG_PREFIX "prefix" );
-
-    p_stream->p_sys     = p_sys;
-
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
-
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close:
- *****************************************************************************/
-static void Close( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
-
-    if( p_sys->output )
-        fclose( p_sys->output );
-
-    free( p_sys->prefix );
-    free( p_sys );
-}
 
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
@@ -255,3 +160,90 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
         block_Release( p_buffer );
     return VLC_SUCCESS;
 }
+
+/*****************************************************************************
+ * Open:
+ *****************************************************************************/
+static const char *ppsz_sout_options[] = {
+    "output", "prefix", NULL
+};
+
+#define SOUT_CFG_PREFIX "sout-stats-"
+
+static int Open( vlc_object_t *p_this )
+{
+    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    sout_stream_sys_t *p_sys;
+    char              *outputFile;
+
+    p_sys = calloc( 1, sizeof( sout_stream_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+
+
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+                   p_stream->p_cfg );
+
+
+    outputFile = var_InheritString( p_stream, SOUT_CFG_PREFIX "output" );
+
+    if( outputFile )
+    {
+        p_sys->output = vlc_fopen( outputFile, "wt" );
+        if( !p_sys->output )
+        {
+            msg_Err( p_stream, "Unable to open file '%s' for writing", outputFile );
+            free( p_sys );
+            free( outputFile );
+            return VLC_EGENERIC;
+        } else {
+            fprintf( p_sys->output,"#prefix\ttrack\ttype\tsegment_number\tdts_difference\tlength\tmd5\n");
+        }
+        free( outputFile );
+    }
+    p_sys->prefix = var_InheritString( p_stream, SOUT_CFG_PREFIX "prefix" );
+
+    p_stream->p_sys     = p_sys;
+
+    p_stream->pf_add    = Add;
+    p_stream->pf_del    = Del;
+    p_stream->pf_send   = Send;
+
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close:
+ *****************************************************************************/
+static void Close( vlc_object_t * p_this )
+{
+    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
+
+    if( p_sys->output )
+        fclose( p_sys->output );
+
+    free( p_sys->prefix );
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define OUTPUT_TEXT N_("Output file")
+#define OUTPUT_LONGTEXT N_( \
+    "Writes stats to file instead of stdout" )
+#define PREFIX_TEXT N_("Prefix to show on output line")
+
+vlc_module_begin()
+    set_shortname( N_("Stats"))
+    set_description( N_("Writes statistic info about stream"))
+    set_capability( "sout stream", 0 )
+    add_shortcut( "stats" )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )
+    set_callbacks( Open, Close )
+    add_string( SOUT_CFG_PREFIX "output", "", OUTPUT_TEXT,OUTPUT_LONGTEXT, false );
+    add_string( SOUT_CFG_PREFIX "prefix", "stats", PREFIX_TEXT,PREFIX_TEXT, false );
+vlc_module_end()
