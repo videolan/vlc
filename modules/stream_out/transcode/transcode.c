@@ -387,11 +387,6 @@ static int Open( vlc_object_t *p_this )
     sout_stream_sys_t *p_sys;
     char              *psz_string;
 
-    if( !p_stream->p_next )
-    {
-        msg_Err( p_stream, "cannot create chain" );
-        return VLC_EGENERIC;
-    }
     p_sys = calloc( 1, sizeof( *p_sys ) );
 
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
