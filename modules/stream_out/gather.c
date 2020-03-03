@@ -41,7 +41,7 @@ static void     Close   ( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("Gathering stream output") )
-    set_capability( "sout stream", 50 )
+    set_capability( "sout filter", 50 )
     add_shortcut( "gather" )
     set_callbacks( Open, Close )
 vlc_module_end ()

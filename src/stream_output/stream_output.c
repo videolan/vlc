@@ -797,6 +797,7 @@ void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_last)
 static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
                                config_chain_t *p_cfg, sout_stream_t *p_next)
 {
+    const char *cap = (p_next != NULL) ? "sout filter" : "sout output";
     sout_stream_t *p_stream;
 
     assert(psz_name);
@@ -816,8 +817,7 @@ static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
 
     msg_Dbg( p_sout, "stream=`%s'", p_stream->psz_name );
 
-    p_stream->p_module =
-        module_need( p_stream, "sout stream", p_stream->psz_name, true );
+    p_stream->p_module = module_need( p_stream, cap, p_stream->psz_name, true );
 
     if( !p_stream->p_module )
     {

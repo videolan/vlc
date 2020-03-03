@@ -186,7 +186,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( N_("RTP"))
     set_description( N_("RTP stream output") )
-    set_capability( "sout stream", 0 )
+    set_capability( "sout output", 0 )
     add_shortcut( "rtp" )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )

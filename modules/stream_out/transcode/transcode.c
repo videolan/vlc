@@ -144,7 +144,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( N_("Transcode"))
     set_description( N_("Transcode stream output") )
-    set_capability( "sout stream", 50 )
+    set_capability( "sout filter", 50 )
     add_shortcut( "transcode" )
     set_callbacks( Open, Close )
     set_category( CAT_SOUT )

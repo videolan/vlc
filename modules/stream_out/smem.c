@@ -94,7 +94,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( N_("Smem"))
     set_description( N_("Stream output to memory buffer") )
-    set_capability( "sout stream", 0 )
+    set_capability( "sout output", 0 )
     add_shortcut( "smem" )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )

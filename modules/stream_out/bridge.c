@@ -92,7 +92,7 @@ vlc_module_begin ()
     set_description( N_("Bridge stream output"))
     add_submodule ()
     set_section( N_("Bridge out"), NULL )
-    set_capability( "sout stream", 50 )
+    set_capability( "sout output", 50 )
     add_shortcut( "bridge-out" )
     /* Only usable with VLM. No category so not in gui preferences
     set_category( CAT_SOUT )
@@ -105,7 +105,7 @@ vlc_module_begin ()
 
     add_submodule ()
     set_section( N_("Bridge in"), NULL )
-    set_capability( "sout stream", 50 )
+    set_capability( "sout filter", 50 )
     add_shortcut( "bridge-in" )
     /*set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )*/
