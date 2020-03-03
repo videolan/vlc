@@ -345,6 +345,14 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         return VLC_EGENERIC;
     }
 
+    /* retrieve texture top-level surface */
+    IDirect3DSurface9 *destination;
+    hr = IDirect3DTexture9_GetSurfaceLevel(sys->sceneTexture, 0, &destination);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "Failed IDirect3DTexture9_GetSurfaceLevel: 0x%lX", hr);
+        return VLC_EGENERIC;
+    }
+
     /* Copy picture surface into texture surface
      * color space conversion happen here */
     RECT source_visible_rect = {
@@ -371,14 +379,6 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     {
         texture_visible_rect.bottom++;
         source_visible_rect.bottom++;
-    }
-
-    /* retrieve texture top-level surface */
-    IDirect3DSurface9 *destination;
-    hr = IDirect3DTexture9_GetSurfaceLevel(sys->sceneTexture, 0, &destination);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed IDirect3DTexture9_GetSurfaceLevel: 0x%lX", hr);
-        return VLC_EGENERIC;
     }
 
     hr = IDirect3DDevice9_StretchRect(sys->d3d9_device->d3ddev.dev, source, &source_visible_rect,
@@ -472,7 +472,8 @@ static void Direct3D9DestroyResources(vout_display_t *vd)
     Direct3D9DestroyShaders(vd);
 }
 
-static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt)
+static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt,
+                        libvlc_video_output_cfg_t *out)
 {
     vout_display_sys_t *sys = vd->sys;
     libvlc_video_render_cfg_t cfg;
@@ -510,13 +511,14 @@ static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt)
 
     cfg.device = sys->d3d9_device->d3ddev.dev;
 
-    libvlc_video_output_cfg_t out;
-    if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))
+    libvlc_video_output_cfg_t local_out;
+    if (out == NULL)
+        out = &local_out;
+    if (!sys->updateOutputCb( sys->outside_opaque, &cfg, out ))
     {
         msg_Err(vd, "Failed to set the external render size");
         return VLC_EGENERIC;
     }
-    sys->BufferFormat = out.d3d9_format;
 
     return VLC_SUCCESS;
 }
@@ -853,7 +855,7 @@ static int Direct3D9Reset(vout_display_t *vd, const video_format_t *fmtp)
     /* release all D3D objects */
     Direct3D9DestroyResources(vd);
 
-    if (UpdateOutput(vd, fmtp) != VLC_SUCCESS)
+    if (UpdateOutput(vd, fmtp, NULL) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
     /* re-create them */
@@ -1138,7 +1140,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
                 return VLC_EGENERIC;
         }
 #endif
-        UpdateOutput(vd, &vd->fmt);
+        UpdateOutput(vd, &vd->fmt, NULL);
 
         sys->clear_scene = true;
         sys->area.place_changed = false;
@@ -1383,20 +1385,23 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    /* */
-    *fmt = vd->source;
-
-    if (UpdateOutput(vd, fmt) != VLC_SUCCESS)
+    libvlc_video_output_cfg_t render_out;
+    if (UpdateOutput(vd, &vd->source, &render_out) != VLC_SUCCESS)
         return VLC_EGENERIC;
+
+    sys->BufferFormat = render_out.d3d9_format;
 
     /* Find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
      * the requested chroma which is usable by the hardware in an offscreen surface, as they
      * typically support more formats than textures */
-    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, fmt);
+    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, &vd->source);
     if (!d3dfmt) {
         msg_Err(vd, "surface pixel format is not supported.");
         goto error;
     }
+
+    /* */
+    *fmt = vd->source;
     fmt->i_chroma = d3dfmt->fourcc;
     fmt->i_rmask  = d3dfmt->rmask;
     fmt->i_gmask  = d3dfmt->gmask;
