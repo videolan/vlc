@@ -317,7 +317,7 @@ static int ProxyOpen(vlc_object_t *p_this)
 {
     sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *) var_InheritAddress(p_this, SOUT_CFG_PREFIX "sys");
-    if (p_sys == NULL || p_stream->p_next == NULL)
+    if (p_sys == NULL)
         return VLC_EGENERIC;
 
     p_stream->p_sys = (sout_stream_sys_t *) p_sys;
