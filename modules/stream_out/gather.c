@@ -80,11 +80,6 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_EGENERIC;
 
-    if( !p_stream->p_next )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
