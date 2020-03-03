@@ -105,7 +105,6 @@ int D3D9_ResetDevice(vlc_object_t *o, d3d9_decoder_device_t *dec_dev)
         msg_Err(o, "IDirect3DDevice9_Reset failed! (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
-    dec_dev->d3ddev.BufferFormat = d3dpp.BackBufferFormat;
     return VLC_SUCCESS;
 }
 
@@ -301,8 +300,6 @@ d3d9_handle_t *hd3d = &sys->dec_device.hd3d;
                                              &d3dpp, &out->dev);
             if (SUCCEEDED(hr))
             {
-                out->BufferFormat = d3dpp.BackBufferFormat;
-                out->owner = true;
                 return &sys->dec_device;
             }
         }

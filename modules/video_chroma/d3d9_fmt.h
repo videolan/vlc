@@ -60,10 +60,8 @@ typedef struct
         IDirect3DDevice9    *dev;
         IDirect3DDevice9Ex  *devex;
     };
-    bool                    owner;
 
     /* creation parameters */
-    D3DFORMAT               BufferFormat;
     UINT                    adapterId;
 
     D3DCAPS9                caps;
