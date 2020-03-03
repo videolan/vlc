@@ -82,12 +82,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys          = malloc( sizeof( sout_stream_sys_t ) );
 
-    if( !p_stream->p_next )
-    {
-        msg_Err( p_stream, "cannot create chain" );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
     p_sys->pp_es = NULL;
     p_sys->i_es_num = 0;
 
