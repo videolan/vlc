@@ -423,7 +423,7 @@ static int OpenEncoder(vlc_object_t *p_this)
 
     const struct aom_codec_iface *iface = &aom_codec_av1_cx_algo;
 
-    struct aom_codec_enc_cfg enccfg = {};
+    struct aom_codec_enc_cfg enccfg = { 0 };
     aom_codec_enc_config_default(iface, &enccfg, 0);
     enccfg.g_timebase.num = p_enc->fmt_in.video.i_frame_rate_base;
     enccfg.g_timebase.den = p_enc->fmt_in.video.i_frame_rate;
@@ -532,7 +532,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
 
     if (!p_pict) return NULL;
 
-    aom_image_t img = {};
+    aom_image_t img = { 0 };
     unsigned i_w = p_enc->fmt_in.video.i_visible_width;
     unsigned i_h = p_enc->fmt_in.video.i_visible_height;
     const aom_img_fmt_t img_fmt = p_enc->fmt_in.i_codec == VLC_CODEC_I420_10L ?
