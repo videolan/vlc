@@ -40,6 +40,12 @@
 # include "config.h"
 #endif
 
+// For dynamic use of DXVA-HD
+#if _WIN32_WINNT < 0x0601 // _WIN32_WINNT_WIN7
+# undef _WIN32_WINNT
+# define _WIN32_WINNT _WIN32_WINNT_WIN7
+#endif
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
@@ -51,6 +57,7 @@
 #include <d3dx9effect.h>
 #endif
 #include "../../video_chroma/d3d9_fmt.h"
+#include <dxvahd.h>
 
 #include "common.h"
 #include "builtin_shaders.h"
@@ -163,9 +170,16 @@ struct vout_display_sys_t
     vlc_mutex_t    lock;
     bool           ch_desktop;
     bool           desktop_requested;
+
+    /* range converter */
+    struct {
+        HMODULE                 dll;
+        IDXVAHD_VideoProcessor *proc;
+    } processor;
 };
 
 static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, vlc_fourcc_t chroma, D3DFORMAT target);
+static const d3d9_format_t *FindBufferFormat(vout_display_t *, D3DFORMAT);
 
 static int  Open(vlc_object_t *);
 
@@ -753,6 +767,11 @@ static void Manage (vout_display_t *vd)
  */
 static void Direct3D9Destroy(vout_display_sys_t *sys)
 {
+    if (sys->processor.proc)
+    {
+        IDXVAHD_VideoProcessor_Release(sys->processor.proc);
+        FreeLibrary(sys->processor.dll);
+    }
     D3D9_Destroy( &sys->hd3d );
 
     if (sys->hxdll)
@@ -765,6 +784,180 @@ static void Direct3D9Destroy(vout_display_sys_t *sys)
 /* */
 static int  Direct3D9CreateResources (vout_display_t *, video_format_t *);
 static void Direct3D9DestroyResources(vout_display_t *);
+
+static void SetupProcessorInput(vout_display_t *vd, const video_format_t *fmt, const d3d9_format_t *d3dfmt)
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+    DXVAHD_STREAM_STATE_D3DFORMAT_DATA d3dformat = { d3dfmt->format };
+    hr = IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_D3DFORMAT, sizeof(d3dformat), &d3dformat );
+
+    DXVAHD_STREAM_STATE_FRAME_FORMAT_DATA frame_format = { DXVAHD_FRAME_FORMAT_PROGRESSIVE };
+    hr = IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_FRAME_FORMAT, sizeof(frame_format), &frame_format );
+
+    DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE_DATA colorspace = { 0 };
+    colorspace.RGB_Range = fmt->b_color_range_full ? 0 : 1;
+    colorspace.YCbCr_xvYCC = fmt->b_color_range_full ? 1 : 0;
+    colorspace.YCbCr_Matrix = fmt->space == COLOR_SPACE_BT601 ? 0 : 1;
+    hr = IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_INPUT_COLOR_SPACE, sizeof(colorspace), &colorspace );
+
+    DXVAHD_STREAM_STATE_SOURCE_RECT_DATA srcRect;
+    srcRect.Enable = TRUE;
+    srcRect.SourceRect = (RECT) {
+        .left   = vd->source.i_x_offset,
+        .right  = vd->source.i_x_offset + vd->source.i_visible_width,
+        .top    = vd->source.i_y_offset,
+        .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
+    };;
+    hr = IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_SOURCE_RECT, sizeof(srcRect), &srcRect );
+
+    DXVAHD_BLT_STATE_TARGET_RECT_DATA dstRect;
+    dstRect.Enable = TRUE;
+    dstRect.TargetRect = (RECT) {
+        .left   = 0,
+        .right  = vd->source.i_visible_width,
+        .top    = 0,
+        .bottom = vd->source.i_visible_height,
+    };
+    hr = IDXVAHD_VideoProcessor_SetVideoProcessBltState( sys->processor.proc, DXVAHD_BLT_STATE_TARGET_RECT, sizeof(dstRect), &dstRect);
+}
+
+static void GetFrameRate(DXVAHD_RATIONAL *r, const video_format_t *fmt)
+{
+    if (fmt->i_frame_rate && fmt->i_frame_rate_base)
+    {
+        r->Numerator   = fmt->i_frame_rate;
+        r->Denominator = fmt->i_frame_rate_base;
+    }
+    else
+    {
+        r->Numerator   = 0;
+        r->Denominator = 0;
+    }
+}
+
+static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    HRESULT hr;
+
+    sys->processor.dll = LoadLibrary(TEXT("DXVA2.DLL"));
+    if (!sys->processor.dll)
+        return VLC_EGENERIC;
+
+    D3DFORMAT *formatsList = NULL;
+    DXVAHD_VPCAPS *capsList = NULL;
+    IDXVAHD_Device *hd_device = NULL;
+
+    HRESULT (WINAPI *CreateDevice)(IDirect3DDevice9Ex *,const DXVAHD_CONTENT_DESC *,DXVAHD_DEVICE_USAGE,PDXVAHDSW_Plugin,IDXVAHD_Device **);
+    CreateDevice = (void *)GetProcAddress(sys->processor.dll, "DXVAHD_CreateDevice");
+    if (CreateDevice == NULL)
+    {
+        msg_Err(vd, "Can't create HD device (not Windows 7+)");
+        goto error;
+    }
+
+    DXVAHD_CONTENT_DESC desc;
+    desc.InputFrameFormat = DXVAHD_FRAME_FORMAT_PROGRESSIVE;
+    GetFrameRate( &desc.InputFrameRate, &vd->source );
+    desc.InputWidth       = vd->source.i_visible_width;
+    desc.InputHeight      = vd->source.i_visible_height;
+    desc.OutputFrameRate  = desc.InputFrameRate;
+    desc.OutputWidth      = vd->source.i_visible_width;
+    desc.OutputHeight     = vd->source.i_visible_height;
+
+    hr = CreateDevice(sys->d3d_dev.devex, &desc, DXVAHD_DEVICE_USAGE_PLAYBACK_NORMAL, NULL, &hd_device);
+    if (FAILED(hr))
+    {
+        msg_Dbg(vd, "Failed to create the device (error 0x%lX)", hr);
+        goto error;
+    }
+
+    DXVAHD_VPDEVCAPS devcaps = { 0 };
+    hr = IDXVAHD_Device_GetVideoProcessorDeviceCaps( hd_device, &devcaps );
+    if (unlikely(FAILED(hr)))
+    {
+        msg_Err(vd, "Failed to get the device capabilities (error 0x%lX)", hr);
+        goto error;
+    }
+    if (devcaps.VideoProcessorCount == 0)
+    {
+        msg_Warn(vd, "No good video processor found for range conversion");
+        goto error;
+    }
+
+    formatsList = malloc(devcaps.InputFormatCount * sizeof(*formatsList));
+    if (unlikely(formatsList == NULL))
+        goto error;
+
+    hr = IDXVAHD_Device_GetVideoProcessorInputFormats( hd_device, devcaps.InputFormatCount, formatsList);
+    UINT i;
+    for (i=0; i<devcaps.InputFormatCount; i++)
+    {
+        if (formatsList[i] == d3dfmt->format)
+            break;
+    }
+    if (i == devcaps.InputFormatCount)
+    {
+        msg_Warn(vd, "Input format %s not supported for range conversion", d3dfmt->name);
+        goto error;
+    }
+
+    free(formatsList);
+    formatsList = malloc(devcaps.OutputFormatCount * sizeof(*formatsList));
+    if (unlikely(formatsList == NULL))
+        goto error;
+
+    hr = IDXVAHD_Device_GetVideoProcessorOutputFormats( hd_device, devcaps.OutputFormatCount, formatsList);
+    for (i=0; i<devcaps.OutputFormatCount; i++)
+    {
+        if (formatsList[i] == sys->d3d_dev.pp.BackBufferFormat)
+            break;
+    }
+    if (i == devcaps.OutputFormatCount)
+    {
+        msg_Warn(vd, "Output format %s not supported for range conversion", d3dfmt->name);
+        goto error;
+    }
+
+    capsList = malloc(devcaps.VideoProcessorCount * sizeof(*capsList));
+    if (unlikely(capsList == NULL))
+        goto error;
+    hr = IDXVAHD_Device_GetVideoProcessorCaps( hd_device, devcaps.VideoProcessorCount, capsList);
+    if (FAILED(hr))
+    {
+        msg_Dbg(vd, "Failed to get the processor caps (error 0x%lX)", hr);
+        goto error;
+    }
+
+    hr = IDXVAHD_Device_CreateVideoProcessor( hd_device, &capsList->VPGuid, &sys->processor.proc );
+    if (FAILED(hr))
+    {
+        msg_Dbg(vd, "Failed to create the processor (error 0x%lX)", hr);
+        goto error;
+    }
+    IDXVAHD_Device_Release( hd_device );
+
+    SetupProcessorInput(vd, &vd->source, d3dfmt);
+
+    DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA colorspace;
+    colorspace.Usage = 0; // playback
+    colorspace.RGB_Range = 0; // full range display
+    colorspace.YCbCr_xvYCC = 1;
+    colorspace.YCbCr_Matrix = 1; // BT.709
+    hr = IDXVAHD_VideoProcessor_SetVideoProcessBltState( sys->processor.proc, DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE, sizeof(colorspace), &colorspace);
+
+    return VLC_SUCCESS;
+
+error:
+    free(capsList);
+    free(formatsList);
+    if (hd_device)
+        IDXVAHD_Device_Release(hd_device);
+    FreeLibrary(sys->processor.dll);
+    return VLC_EGENERIC;
+}
 
 /**
  * It creates a Direct3D9 device and the associated resources.
@@ -795,6 +988,15 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
         msg_Err(vd, "surface pixel format is not supported.");
         goto error;
     }
+    const d3d9_format_t *d3dbuffer = FindBufferFormat(vd, p_d3d9_dev->pp.BackBufferFormat);
+    if (!d3dbuffer)
+        msg_Warn(vd, "Unknown back buffer format 0x%X", p_d3d9_dev->pp.BackBufferFormat);
+    else if (!vd->source.b_color_range_full && d3dbuffer->rmask && !d3dfmt->rmask)
+    {
+        // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
+        InitRangeProcessor( vd, d3dfmt );
+    }
+
     fmt->i_chroma = d3dfmt->fourcc;
     fmt->i_rmask  = d3dfmt->rmask;
     fmt->i_gmask  = d3dfmt->gmask;
@@ -971,6 +1173,19 @@ static const d3d9_format_t d3d_formats[] = {
 
     { NULL, 0, 0, 0,0,0}
 };
+
+static const d3d9_format_t *FindBufferFormat(vout_display_t *vd, D3DFORMAT fmt)
+{
+    for (unsigned j = 0; d3d_formats[j].name; j++) {
+        const d3d9_format_t *format = &d3d_formats[j];
+
+        if (format->format != fmt)
+            continue;
+
+        return format;
+    }
+    return NULL;
+}
 
 /**
  * It returns the format (closest to chroma) that can be converted to target */
@@ -1453,6 +1668,15 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         return VLC_EGENERIC;
     }
 
+    if (sys->processor.proc)
+    {
+        DXVAHD_STREAM_DATA inputStream = { 0 };
+        inputStream.Enable = TRUE;
+        inputStream.pInputSurface = source;
+        hr = IDXVAHD_VideoProcessor_VideoProcessBltHD( sys->processor.proc, destination, 0, 1, &inputStream );
+    }
+    else
+    {
     /* Copy picture surface into texture surface
      * color space conversion happen here */
     RECT copy_rect = sys->sys.rect_src_clipped;
@@ -1465,6 +1689,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     if ( copy_rect.top & 1 ) copy_rect.top--;
     hr = IDirect3DDevice9_StretchRect(sys->d3d_dev.dev, source, &copy_rect, destination,
                                       &copy_rect, D3DTEXF_NONE);
+    }  
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DDevice9_StretchRect: source 0x%p 0x%0lx",
