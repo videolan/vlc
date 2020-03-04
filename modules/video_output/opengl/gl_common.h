@@ -21,6 +21,8 @@
 #ifndef VLC_GL_COMMON_H
 #define VLC_GL_COMMON_H
 
+#include <assert.h>
+
 /* if USE_OPENGL_ES2 is defined, OpenGL ES version 2 will be used, otherwise
  * normal OpenGL will be used */
 #ifdef __APPLE__
@@ -107,8 +109,8 @@
 #endif
 
 #ifdef HAVE_GL_ASSERT_NOERROR
-# define GL_ASSERT_NOERROR() do { \
-    GLenum glError = vgl->vt.GetError(); \
+# define GL_ASSERT_NOERROR(vt) do { \
+    GLenum glError = (vt)->GetError(); \
     switch (glError) \
     { \
         case GL_NO_ERROR: break; \
@@ -121,7 +123,7 @@
     } \
 } while(0)
 #else
-# define GL_ASSERT_NOERROR()
+# define GL_ASSERT_NOERROR(vt)
 #endif
 
 /* Core OpenGL/OpenGLES functions: the following functions pointers typedefs

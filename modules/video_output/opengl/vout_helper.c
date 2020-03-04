@@ -197,7 +197,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR_OPTIONAL(ClientWaitSync);
 #undef GET_PROC_ADDR
 
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(&vgl->vt);
 
     const char *extensions = (const char *)vgl->vt.GetString(GL_EXTENSIONS);
     assert(extensions);
@@ -251,7 +251,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(&vgl->vt);
 
     vgl->sub_renderer =
         vlc_gl_sub_renderer_New(gl, &vgl->vt, supports_npot);
@@ -263,7 +263,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(&vgl->vt);
 
     if (renderer->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
      && vout_display_opengl_SetViewpoint(vgl, viewpoint) != VLC_SUCCESS)
@@ -277,13 +277,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         *subpicture_chromas = gl_subpicture_chromas;
     }
 
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(&vgl->vt);
     return vgl;
 }
 
 void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 {
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(&vgl->vt);
 
     /* */
     vgl->vt.Finish();
@@ -292,7 +292,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vlc_gl_sub_renderer_Delete(vgl->sub_renderer);
     vlc_gl_renderer_Delete(vgl->renderer);
 
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(&vgl->vt);
 
     free(vgl);
 }
@@ -318,20 +318,20 @@ void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                                 picture_t *picture, subpicture_t *subpicture)
 {
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(&vgl->vt);
 
     int ret = vlc_gl_renderer_Prepare(vgl->renderer, picture);
     if (ret != VLC_SUCCESS)
         return ret;
 
     ret = vlc_gl_sub_renderer_Prepare(vgl->sub_renderer, subpicture);
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(&vgl->vt);
     return ret;
 }
 int vout_display_opengl_Display(vout_display_opengl_t *vgl,
                                 const video_format_t *source)
 {
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(&vgl->vt);
 
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call vout_display_opengl_Display to force redraw.
@@ -348,7 +348,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     /* Display */
     vlc_gl_Swap(vgl->gl);
 
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(&vgl->vt);
 
     return VLC_SUCCESS;
 }

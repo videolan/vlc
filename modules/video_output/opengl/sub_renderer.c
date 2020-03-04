@@ -320,7 +320,7 @@ vlc_gl_sub_renderer_Delete(struct vlc_gl_sub_renderer *sr)
 int
 vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr, subpicture_t *subpicture)
 {
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(sr->vt);
 
     const struct vlc_gl_interop *interop = sr->interop;
 
@@ -408,7 +408,7 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr, subpicture_t *subpic
     }
     free(last);
 
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(sr->vt);
 
     return VLC_SUCCESS;
 }
@@ -416,10 +416,10 @@ vlc_gl_sub_renderer_Prepare(struct vlc_gl_sub_renderer *sr, subpicture_t *subpic
 int
 vlc_gl_sub_renderer_Draw(struct vlc_gl_sub_renderer *sr)
 {
-    GL_ASSERT_NOERROR();
-
     const struct vlc_gl_interop *interop = sr->interop;
     const opengl_vtable_t *vt = sr->vt;
+
+    GL_ASSERT_NOERROR(vt);
 
     assert(sr->program_id);
     vt->UseProgram(sr->program_id);
@@ -477,7 +477,7 @@ vlc_gl_sub_renderer_Draw(struct vlc_gl_sub_renderer *sr)
     }
     vt->Disable(GL_BLEND);
 
-    GL_ASSERT_NOERROR();
+    GL_ASSERT_NOERROR(vt);
 
     return VLC_SUCCESS;
 }
