@@ -75,6 +75,7 @@ Video output:
  * Remove omxil_vout plugin
  * Remove RealRTSP plugin
  * Remove Real demuxer plugin
+ * Fix washed out black on NVIDIA cards with Direct3D9
 
 Video filter:
  * Update yadif
