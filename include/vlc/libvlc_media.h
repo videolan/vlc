@@ -479,8 +479,8 @@ LIBVLC_API libvlc_media_t *libvlc_media_new_as_node(
  * read the media. This allows to use VLC's advanced
  * reading/streaming options on a per-media basis.
  *
- * \note The options are listed in 'vlc --long-help' from the command line,
- * e.g. "-sout-all". Keep in mind that available options and their semantics
+ * \note The options are listed in 'vlc --longhelp' from the command line,
+ * e.g. "--sout-all". Keep in mind that available options and their semantics
  * vary across LibVLC versions and builds.
  * \warning Not all options affects libvlc_media_t objects:
  * Specifically, due to architectural issues most audio and video options,
@@ -501,7 +501,7 @@ LIBVLC_API void libvlc_media_add_option(
  * read the media. This allows to use VLC's advanced
  * reading/streaming options on a per-media basis.
  *
- * The options are detailed in vlc --long-help, for instance
+ * The options are detailed in vlc --longhelp, for instance
  * "--sout-all". Note that all options are not usable on medias:
  * specifically, due to architectural issues, video-related options
  * such as text renderer options cannot be set on a single media. They
