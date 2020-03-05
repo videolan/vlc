@@ -993,8 +993,13 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
         msg_Warn(vd, "Unknown back buffer format 0x%X", p_d3d9_dev->pp.BackBufferFormat);
     else if (!vd->source.b_color_range_full && d3dbuffer->rmask && !d3dfmt->rmask)
     {
-        // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
-        InitRangeProcessor( vd, d3dfmt );
+        D3DADAPTER_IDENTIFIER9 d3dai;
+        if (sys->hd3d.use_ex && SUCCEEDED(IDirect3D9Ex_GetAdapterIdentifier(sys->hd3d.objex, sys->d3d_dev.adapterId, 0, &d3dai)) && 
+            d3dai.VendorId == GPU_MANUFACTURER_NVIDIA) {
+
+            // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
+            InitRangeProcessor( vd, d3dfmt );
+        }
     }
 
     fmt->i_chroma = d3dfmt->fourcc;
