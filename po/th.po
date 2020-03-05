@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# bact' <arthit@gmail.com>, 2017
+# Arthit Suriyawongkul <arthit@gmail.com>, 2017,2020
 # Chaisiri Toomthong <chaisiri_tt@hotmail.com>, 2015
 # Chalermpon Dasri <d.chalermpon@gmail.com>, 2013
 # jerng <jernghan@gmail.com>, 2014
@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2020-03-05 21:04+0100\n"
+"Last-Translator: Arthit Suriyawongkul <arthit@gmail.com>, 2020\n"
 "Language-Team: Thai (https://www.transifex.com/yaron/teams/16553/th/)\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
@@ -5111,7 +5111,7 @@ msgstr "%.1f KiB"
 #: src/misc/update.c:488
 #, c-format
 msgid "%<PRIu64> B"
-msgstr ""
+msgstr "%<PRIu64> B"
 
 #: src/misc/update.c:580
 msgid "Saving file failed"
@@ -5178,7 +5178,7 @@ msgstr ""
 
 #: src/misc/update.c:661 src/misc/update.c:673
 msgid "Invalid signature"
-msgstr ""
+msgstr "ลายเซ็นไม่ถูกต้อง"
 
 #: src/misc/update.c:662 src/misc/update.c:674
 #, c-format
@@ -6188,7 +6188,7 @@ msgstr ""
 
 #: modules/access/dcp/dcp.cpp:77
 msgid "DCP"
-msgstr ""
+msgstr "DCP"
 
 #: modules/access/dcp/dcp.cpp:80
 msgid "Digital Cinema Package module"
