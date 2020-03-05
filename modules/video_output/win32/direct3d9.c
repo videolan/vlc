@@ -1616,7 +1616,8 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
     const d3d9_format_t *d3dbuffer = FindBufferFormat(vd, sys->BufferFormat);
     if (!d3dbuffer)
         msg_Warn(vd, "Unknown back buffer format 0x%X", sys->BufferFormat);
-    else if (vd->source.color_range != COLOR_RANGE_FULL && d3dbuffer->rmask && !d3dfmt->rmask)
+    else if (vd->source.color_range != COLOR_RANGE_FULL && d3dbuffer->rmask && !d3dfmt->rmask &&
+             sys->d3d9_device->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA)
     {
         // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
         InitRangeProcessor( vd, d3dfmt, &render_out );
