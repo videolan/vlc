@@ -289,6 +289,7 @@ static const staticentry_t p_list_video[] = {
         A("S263"),
         A("u263"),
         A("lsvm"),
+        E("T263", "March H263"),
         E("D263", "DEC H263"),
         E("d263", "DEC H263"),
         E("L263", "LEAD H263"),
