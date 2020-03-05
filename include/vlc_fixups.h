@@ -658,6 +658,17 @@ FILE *vlc_win32_tmpfile(void);
 
 #ifdef __APPLE__
 # define fdatasync fsync
+
+# include <time.h>
+# ifndef CLOCK_REALTIME
+#  define CLOCK_REALTIME 0
+# endif
+# ifndef CLOCK_MONOTONIC
+#  define CLOCK_MONOTONIC 6
+# endif
+# ifndef HAVE_CLOCK_GETTIME
+int clock_gettime(clockid_t clock_id, struct timespec *tp);
+# endif
 #endif
 
 #ifdef __cplusplus

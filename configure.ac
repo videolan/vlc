@@ -928,6 +928,10 @@ AS_IF([test "${SYS}" != "mingw32"], [
 ])
 AC_SUBST([LIBRT])
 
+dnl  Check for clock_* functions, needs to be done here,
+dnl  after the -lrt check
+AC_REPLACE_FUNCS([clock_gettime])
+
 dnl
 dnl Check for headers
 dnl
