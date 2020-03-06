@@ -1751,8 +1751,11 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const eventov)
     subpicture_region_t *p_last = NULL;
     while (p_reg != NULL) {
         p_last = p_reg;
-        if (p_reg->i_x == eventov->x && p_reg->i_y == eventov->y &&
-                p_reg->fmt.i_width == eventov->w && p_reg->fmt.i_height == eventov->h)
+        if (p_reg->i_x == eventov->x &&
+            p_reg->i_y == eventov->y &&
+            p_reg->fmt.i_width == eventov->w &&
+            p_reg->fmt.i_height == eventov->h &&
+            p_reg->fmt.i_chroma == VLC_CODEC_YUVP)
             break;
         pp_reg = &p_reg->p_next;
         p_reg = p_reg->p_next;
@@ -1889,7 +1892,7 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
 
     /* Find a region to update */
     subpicture_region_t *p_reg = ov->p_regions;
-    if (!p_reg) {
+    if (!p_reg || p_reg->fmt.i_chroma != VLC_CODEC_RGBA) {
         vlc_mutex_unlock(&ov->lock);
         return;
     }
