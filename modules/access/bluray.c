@@ -1719,36 +1719,37 @@ static void blurayClearOverlay(demux_t *p_demux, int plane)
  * This will draw to the overlay by adding a region to our region list
  * This will have to be copied to the subpicture used to render the overlay.
  */
-static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
+static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const eventov)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    bluray_overlay_t *ov = p_sys->p_overlays[eventov->plane];
     /*
      * Compute a subpicture_region_t.
      * It will be copied and sent to the vout later.
      */
-    vlc_mutex_lock(&p_sys->p_overlays[ov->plane]->lock);
+    vlc_mutex_lock(&ov->lock);
 
     /* Find a region to update */
-    subpicture_region_t **pp_reg = &p_sys->p_overlays[ov->plane]->p_regions;
-    subpicture_region_t *p_reg = p_sys->p_overlays[ov->plane]->p_regions;
+    subpicture_region_t **pp_reg = &ov->p_regions;
+    subpicture_region_t *p_reg = ov->p_regions;
     subpicture_region_t *p_last = NULL;
     while (p_reg != NULL) {
         p_last = p_reg;
-        if (p_reg->i_x == ov->x && p_reg->i_y == ov->y &&
-                p_reg->fmt.i_width == ov->w && p_reg->fmt.i_height == ov->h)
+        if (p_reg->i_x == eventov->x && p_reg->i_y == eventov->y &&
+                p_reg->fmt.i_width == eventov->w && p_reg->fmt.i_height == eventov->h)
             break;
         pp_reg = &p_reg->p_next;
         p_reg = p_reg->p_next;
     }
 
-    if (!ov->img) {
+    if (!eventov->img) {
         if (p_reg) {
             /* drop region */
             *pp_reg = p_reg->p_next;
             subpicture_region_Delete(p_reg);
         }
-        vlc_mutex_unlock(&p_sys->p_overlays[ov->plane]->lock);
+        vlc_mutex_unlock(&ov->lock);
         return;
     }
 
@@ -1756,41 +1757,41 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
     if (!p_reg) {
         video_format_t fmt;
         video_format_Init(&fmt, 0);
-        video_format_Setup(&fmt, VLC_CODEC_YUVP, ov->w, ov->h, ov->w, ov->h, 1, 1);
+        video_format_Setup(&fmt, VLC_CODEC_YUVP, eventov->w, eventov->h, eventov->w, eventov->h, 1, 1);
 
         p_reg = subpicture_region_New(&fmt);
         if (p_reg) {
-            p_reg->i_x = ov->x;
-            p_reg->i_y = ov->y;
+            p_reg->i_x = eventov->x;
+            p_reg->i_y = eventov->y;
             /* Append it to our list. */
             if (p_last != NULL)
                 p_last->p_next = p_reg;
             else /* If we don't have a last region, then our list empty */
-                p_sys->p_overlays[ov->plane]->p_regions = p_reg;
+                ov->p_regions = p_reg;
         }
     }
 
     /* Now we can update the region, regardless it's an update or an insert */
-    const BD_PG_RLE_ELEM *img = ov->img;
-    for (int y = 0; y < ov->h; y++)
-        for (int x = 0; x < ov->w;) {
+    const BD_PG_RLE_ELEM *img = eventov->img;
+    for (int y = 0; y < eventov->h; y++)
+        for (int x = 0; x < eventov->w;) {
             plane_t *p = &p_reg->p_picture->p[0];
             memset(&p->p_pixels[y * p->i_pitch + x], img->color, img->len);
             x += img->len;
             img++;
         }
 
-    if (ov->palette) {
+    if (eventov->palette) {
         p_reg->fmt.p_palette->i_entries = 256;
         for (int i = 0; i < 256; ++i) {
-            p_reg->fmt.p_palette->palette[i][0] = ov->palette[i].Y;
-            p_reg->fmt.p_palette->palette[i][1] = ov->palette[i].Cb;
-            p_reg->fmt.p_palette->palette[i][2] = ov->palette[i].Cr;
-            p_reg->fmt.p_palette->palette[i][3] = ov->palette[i].T;
+            p_reg->fmt.p_palette->palette[i][0] = eventov->palette[i].Y;
+            p_reg->fmt.p_palette->palette[i][1] = eventov->palette[i].Cb;
+            p_reg->fmt.p_palette->palette[i][2] = eventov->palette[i].Cr;
+            p_reg->fmt.p_palette->palette[i][3] = eventov->palette[i].T;
         }
     }
 
-    vlc_mutex_unlock(&p_sys->p_overlays[ov->plane]->lock);
+    vlc_mutex_unlock(&ov->lock);
     /*
      * /!\ The region is now stored in our internal list, but not in the subpicture /!\
      */
@@ -1856,40 +1857,41 @@ static void blurayInitArgbOverlay(demux_t *p_demux, int plane, int width, int he
     }
 }
 
-static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const ov)
+static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const eventov)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    vlc_mutex_lock(&p_sys->p_overlays[ov->plane]->lock);
+    bluray_overlay_t *ov = p_sys->p_overlays[eventov->plane];
+    vlc_mutex_lock(&ov->lock);
 
     /* Find a region to update */
-    subpicture_region_t *p_reg = p_sys->p_overlays[ov->plane]->p_regions;
+    subpicture_region_t *p_reg = ov->p_regions;
     if (!p_reg) {
-        vlc_mutex_unlock(&p_sys->p_overlays[ov->plane]->lock);
+        vlc_mutex_unlock(&ov->lock);
         return;
     }
 
     /* Now we can update the region */
-    const uint32_t *src0 = ov->argb;
+    const uint32_t *src0 = eventov->argb;
     uint8_t        *dst0 = p_reg->p_picture->p[0].p_pixels +
-                           p_reg->p_picture->p[0].i_pitch * ov->y +
-                           ov->x * 4;
+                           p_reg->p_picture->p[0].i_pitch * eventov->y +
+                           eventov->x * 4;
 
-    for (int y = 0; y < ov->h; y++) {
+    for (int y = 0; y < eventov->h; y++) {
         // XXX: add support for this format ? Should be possible with OPENGL/VDPAU/...
         // - or add libbluray option to select the format ?
-        for (int x = 0; x < ov->w; x++) {
+        for (int x = 0; x < eventov->w; x++) {
             dst0[x*4  ] = src0[x]>>16; /* R */
             dst0[x*4+1] = src0[x]>>8;  /* G */
             dst0[x*4+2] = src0[x];     /* B */
             dst0[x*4+3] = src0[x]>>24; /* A */
         }
 
-        src0 += ov->stride;
+        src0 += eventov->stride;
         dst0 += p_reg->p_picture->p[0].i_pitch;
     }
 
-    vlc_mutex_unlock(&p_sys->p_overlays[ov->plane]->lock);
+    vlc_mutex_unlock(&ov->lock);
     /*
      * /!\ The region is now stored in our internal list, but not in the subpicture /!\
      */
