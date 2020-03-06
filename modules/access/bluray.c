@@ -1947,6 +1947,11 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const eventov)
             else /* If we don't have a last region, then our list empty */
                 ov->p_regions = p_reg;
         }
+        else
+        {
+            vlc_mutex_unlock(&ov->lock);
+            return;
+        }
     }
 
     /* Now we can update the region, regardless it's an update or an insert */
