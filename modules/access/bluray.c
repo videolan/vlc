@@ -1840,25 +1840,6 @@ static void blurayActivateOverlay(demux_t *p_demux, int plane)
     vlc_mutex_unlock(&ov->lock);
 }
 
-static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height)
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    assert(p_sys->bdj.p_overlays[plane] == NULL);
-
-    bluray_overlay_t *ov = calloc(1, sizeof(*ov));
-    if (unlikely(ov == NULL))
-        return;
-
-    ov->width = width;
-    ov->height = height;
-    ov->b_on_vout = false;
-
-    vlc_mutex_init(&ov->lock);
-
-    p_sys->bdj.p_overlays[plane] = ov;
-}
-
 /**
  * Destroy every regions in the subpicture.
  * This is done in two steps:
@@ -1882,6 +1863,31 @@ static void blurayClearOverlay(demux_t *p_demux, int plane)
     ov->status = Outdated;
 
     vlc_mutex_unlock(&ov->lock);
+}
+
+static void blurayInitOverlay(demux_t *p_demux, int plane, int width, int height)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if(p_sys->bdj.p_overlays[plane])
+    {
+        /* Should not happen */
+        msg_Warn( p_demux, "Trying to init over an existing overlay" );
+        blurayClearOverlay( p_demux, plane );
+        blurayCloseOverlay( p_demux, plane );
+    }
+
+    bluray_overlay_t *ov = calloc(1, sizeof(*ov));
+    if (unlikely(ov == NULL))
+        return;
+
+    ov->width = width;
+    ov->height = height;
+    ov->b_on_vout = false;
+
+    vlc_mutex_init(&ov->lock);
+
+    p_sys->bdj.p_overlays[plane] = ov;
 }
 
 /*
