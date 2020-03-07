@@ -119,7 +119,7 @@ static void vlc_timespec_adjust(clockid_t cid, struct timespec *restrict ts)
     clock_gettime(vlc_clock_id, &now_to);
 
     d = lldiv((ts->tv_sec - now_from.tv_sec + now_to.tv_sec) * 1000000000LL
-              + ts->tv_nsec - now_from.tv_nsec - now_to.tv_nsec, 1000000000LL);
+              + ts->tv_nsec - now_from.tv_nsec + now_to.tv_nsec, 1000000000LL);
 
     ts->tv_sec = d.quot;
     ts->tv_nsec = d.rem;
