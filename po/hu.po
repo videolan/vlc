@@ -4,7 +4,7 @@
 #
 # Translators:
 # Balázs Meskó <meskobalazs@gmail.com>, 2017-2018
-# Dávid Eredics, 2015
+# Dávid Eredics, 2015,2020
 # Gabor Kelemen <kelemeng@ubuntu.com>, 2005-2015
 # iskr <iscreamd@gmail.com>, 2013
 # Schafer Gergő <gergoschafer@gmail.com>, 2017
@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2018-12-20 18:26+0100\n"
-"Last-Translator: Balázs Meskó <meskobalazs@gmail.com>, 2018\n"
+"PO-Revision-Date: 2020-03-08 13:15+0100\n"
+"Last-Translator: Dávid Eredics <mail@davideredics.com>, 2020\n"
 "Language-Team: Hungarian (https://www.transifex.com/yaron/teams/16553/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -5249,7 +5249,7 @@ msgstr "Nyomtatás"
 
 #: src/misc/actions.c:110 modules/meta_engine/ID3Genres.h:77
 msgid "Space"
-msgstr "Űr"
+msgstr "Szóköz"
 
 #: src/misc/actions.c:111
 msgid "Tab"
@@ -18206,7 +18206,7 @@ msgstr "Feliratfájl"
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:52
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:56
 msgid "s"
-msgstr "mp"
+msgstr "s"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:370
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:59
