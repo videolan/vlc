@@ -143,7 +143,7 @@ check ant
 check xz
 check bison 3.0.0
 check flex
-check_nasm 2.13.02
+check_nasm 2.14
 check gettext
 check help2man
 check meson 0.51.1
