@@ -137,7 +137,6 @@ debian:
 macos:
     extends: .base-template
     tags:
-        - macos
         - old-macmini
     script: |
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
