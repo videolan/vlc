@@ -1998,6 +1998,9 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
         return;
     }
 
+    if(overlay->plane >= MAX_OVERLAY)
+        return;
+
     switch (overlay->cmd) {
     case BD_OVERLAY_INIT:
         msg_Info(p_demux, "Initializing overlay");
@@ -2097,6 +2100,9 @@ static void blurayArgbOverlayProc(void *ptr, const BD_ARGB_OVERLAY *const overla
 {
     demux_t *p_demux = (demux_t*)ptr;
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    if(overlay->plane >= MAX_OVERLAY)
+        return;
 
     switch (overlay->cmd) {
     case BD_ARGB_OVERLAY_INIT:
