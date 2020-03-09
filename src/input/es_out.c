@@ -2752,6 +2752,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         return VLC_SUCCESS;
     }
 
+#ifdef ENABLE_SOUT
     /* Check for sout mode */
     if( input_priv(p_input)->p_sout )
     {
@@ -2762,6 +2763,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 
         input_priv(p_input)->b_out_pace_control = pace;
     }
+#endif
 
     /* Decode */
     if( es->p_dec_record )
