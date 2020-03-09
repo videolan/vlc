@@ -1677,18 +1677,18 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     }
     else
     {
-    /* Copy picture surface into texture surface
-     * color space conversion happen here */
-    RECT copy_rect = sys->sys.rect_src_clipped;
-    // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
-    // When copying the entire buffer, the margin end up being blended in the actual picture
-    // on nVidia (regardless of even/odd dimensions)
-    if ( copy_rect.right & 1 ) copy_rect.right++;
-    if ( copy_rect.left & 1 ) copy_rect.left--;
-    if ( copy_rect.bottom & 1 ) copy_rect.bottom++;
-    if ( copy_rect.top & 1 ) copy_rect.top--;
-    hr = IDirect3DDevice9_StretchRect(sys->d3d_dev.dev, source, &copy_rect, destination,
-                                      &copy_rect, D3DTEXF_NONE);
+        /* Copy picture surface into texture surface
+        * color space conversion happen here */
+        RECT copy_rect = sys->sys.rect_src_clipped;
+        // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
+        // When copying the entire buffer, the margin end up being blended in the actual picture
+        // on nVidia (regardless of even/odd dimensions)
+        if ( copy_rect.right & 1 ) copy_rect.right++;
+        if ( copy_rect.left & 1 ) copy_rect.left--;
+        if ( copy_rect.bottom & 1 ) copy_rect.bottom++;
+        if ( copy_rect.top & 1 ) copy_rect.top--;
+        hr = IDirect3DDevice9_StretchRect(sys->d3d_dev.dev, source, &copy_rect, destination,
+                                        &copy_rect, D3DTEXF_NONE);
     }  
     IDirect3DSurface9_Release(destination);
     if (FAILED(hr)) {
