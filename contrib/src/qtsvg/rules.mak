@@ -1,7 +1,7 @@
 # Qt
 
 QTSVG_VERSION_MAJOR := 5.12
-QTSVG_VERSION := $(QTSVG_VERSION_MAJOR).2
+QTSVG_VERSION := $(QTSVG_VERSION_MAJOR).7
 QTSVG_URL := https://download.qt.io/official_releases/qt/$(QTSVG_VERSION_MAJOR)/$(QTSVG_VERSION)/submodules/qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz
 
 DEPS_qtsvg += qt $(DEPS_qt)

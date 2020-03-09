@@ -1,7 +1,7 @@
 # QtDeclarative
 
 QTDECLARATIVE_VERSION_MAJOR := 5.12
-QTDECLARATIVE_VERSION := $(QTDECLARATIVE_VERSION_MAJOR).2
+QTDECLARATIVE_VERSION := $(QTDECLARATIVE_VERSION_MAJOR).7
 QTDECLARATIVE_URL := http://download.qt.io/official_releases/qt/$(QTDECLARATIVE_VERSION_MAJOR)/$(QTDECLARATIVE_VERSION)/submodules/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz
 
 DEPS_qtdeclarative += qt $(DEPS_qt)
@@ -21,7 +21,6 @@ $(TARBALLS)/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz:
 
 qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
 	$(UNPACK)
-	$(APPLY) $(SRC)/qtdeclarative/0001-V4-Only-enable-the-JIT-on-ARM-on-specific-known-OSes.patch
 	$(MOVE)
 
 .qtdeclarative: qtdeclarative
