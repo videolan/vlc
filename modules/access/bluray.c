@@ -2072,11 +2072,19 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
                            p_reg->p_picture->p[0].i_pitch * eventov->y +
                            eventov->x * 4;
 
-    for (int y = 0; y < eventov->h; y++)
+    /* always true as for now, see bd_bdj_osd_cb */
+    if(likely(eventov->stride == p_reg->p_picture->p[0].i_pitch / 4))
     {
-        memcpy(dst0, src0, eventov->w * 4);
-        src0 += eventov->stride;
-        dst0 += p_reg->p_picture->p[0].i_pitch;
+        memcpy(dst0, src0, (eventov->stride * eventov->h - eventov->x)*4);
+    }
+    else
+    {
+        for(uint16_t h = 0; h < eventov->h; h++)
+        {
+            memcpy(dst0, src0, eventov->w * 4);
+            src0 += eventov->stride;
+            dst0 += p_reg->p_picture->p[0].i_pitch;
+        }
     }
 
     vlc_mutex_unlock(&ov->lock);
