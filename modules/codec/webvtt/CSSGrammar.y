@@ -28,10 +28,9 @@
  */
 %define api.pure full
 
-%parse-param { yyscan_t scanner }
+%param { yyscan_t scanner }
 %parse-param { vlc_css_parser_t *css_parser }
-%lex-param   { yyscan_t scanner }
-%lex-param   { vlc_css_parser_t *css_parser }
+
 
 %{
 #ifdef HAVE_CONFIG_H
@@ -64,7 +63,7 @@ typedef void* yyscan_t;
 
 %{
 /* See bison pure calling */
-#define YY_DECL int yylex(union YYSTYPE *, yyscan_t, vlc_css_parser_t *)
+#define YY_DECL int yylex(union YYSTYPE *, yyscan_t)
 YY_DECL;
 
 static int yyerror(yyscan_t scanner, vlc_css_parser_t *p, const char *msg)
