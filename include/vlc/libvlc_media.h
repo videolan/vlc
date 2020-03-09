@@ -746,12 +746,18 @@ typedef enum libvlc_thumbnailer_seek_speed_t
  *
  * If the request is successfuly queued, the libvlc_MediaThumbnailGenerated
  * is guaranteed to be emited.
+ * The resulting thumbnail size can either be:
+ * - Hardcoded by providing both width & height. In which case, the image will
+ *   be stretched to match the provided aspect ratio, or cropped if crop is true.
+ * - Derived from the media aspect ratio if only width or height is provided and
+ *   the other one is set to 0.
  *
  * \param md media descriptor object
  * \param time The time at which the thumbnail should be generated
  * \param speed The seeking speed \sa{libvlc_thumbnailer_seek_speed_t}
  * \param width The thumbnail width
  * \param height the thumbnail height
+ * \param crop Should the picture be cropped to preserve source aspect ratio
  * \param picture_type The thumbnail picture type \sa{libvlc_picture_type_t}
  * \param timeout A timeout value in ms, or 0 to disable timeout
  *
@@ -777,12 +783,18 @@ libvlc_media_thumbnail_request_by_time( libvlc_media_t *md,
  *
  * If the request is successfuly queued, the libvlc_MediaThumbnailGenerated
  * is guaranteed to be emited.
+ * The resulting thumbnail size can either be:
+ * - Hardcoded by providing both width & height. In which case, the image will
+ *   be stretched to match the provided aspect ratio, or cropped if crop is true.
+ * - Derived from the media aspect ratio if only width or height is provided and
+ *   the other one is set to 0.
  *
  * \param md media descriptor object
  * \param pos The position at which the thumbnail should be generated
  * \param speed The seeking speed \sa{libvlc_thumbnailer_seek_speed_t}
  * \param width The thumbnail width
  * \param height the thumbnail height
+ * \param crop Should the picture be cropped to preserve source aspect ratio
  * \param picture_type The thumbnail picture type \sa{libvlc_picture_type_t}
  * \param timeout A timeout value in ms, or 0 to disable timeout
  *
