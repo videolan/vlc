@@ -1,0 +1,51 @@
+From a0d8fb4ac3cb7bafdb39f340055eacee4f957513 Mon Sep 17 00:00:00 2001
+From: Kai Pastor <dg0yt@darc.de>
+Date: Wed, 30 Jan 2019 07:36:51 +0100
+Subject: [PATCH] Fix mingw pkgconfig file and dependency naming
+
+This change adds the correct suffix to debug mode .pc filenames for
+MinGW and also to the Qt libraries listed in the `Requires` field.
+The filename adjustment fixes the accidental overwriting of release
+mode .pc files with the debug mode variant which required the wrong
+variant of the libraries when `debug_and_release` is active.
+
+Note that macOS also supports the `debug_and_release' configuration
+but may use the regular library names together with DYLD_IMAGE_SUFFIX.
+Creation of *_debug.pc files is turned off as they're identical to their
+non-debug counterparts.
+
+[ChangeLog][Platform Specific Changes][MinGW] Added a suffix to debug
+mode pkgconfig files.
+
+Task-number: QTBUG-4155
+Change-Id: I221c2dae51d7bd011836cb03945631a43180d7b5
+Reviewed-by: Kai Koehne <kai.koehne@qt.io>
+---
+ mkspecs/features/qt_module.prf | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/mkspecs/features/qt_module.prf b/mkspecs/features/qt_module.prf
+index a52a4486bc5..213556904d2 100644
+--- a/mkspecs/features/qt_module.prf
++++ b/mkspecs/features/qt_module.prf
+@@ -264,7 +264,7 @@ load(qt_installs)
+ load(qt_targets)
+ 
+ # this builds on top of qt_common
+-!internal_module:if(unix|mingw) {
++!internal_module:if(unix|mingw):!if(darwin:debug_and_release:CONFIG(debug, debug|release)) {
+     CONFIG += create_pc
+     QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+     host_build: \
+@@ -281,9 +281,9 @@ load(qt_targets)
+             QMAKE_PKGCONFIG_CFLAGS += -I${includedir}/$$section(inc, /, 1, 1)
+     }
+     QMAKE_PKGCONFIG_NAME = $$replace(TARGET, ^Qt, "Qt$$QT_MAJOR_VERSION ")
+-    QMAKE_PKGCONFIG_FILE = $$replace(TARGET, ^Qt, Qt$$QT_MAJOR_VERSION)
++    QMAKE_PKGCONFIG_FILE = $$replace(TARGET, ^Qt, Qt$$QT_MAJOR_VERSION)$$qtPlatformTargetSuffix()
+     for(i, MODULE_DEPENDS): \
+-        QMAKE_PKGCONFIG_REQUIRES += $$replace(QT.$${i}.name, ^Qt, Qt$$section(QT.$${i}.VERSION, ., 0, 0))
++        QMAKE_PKGCONFIG_REQUIRES += $$replace(QT.$${i}.name, ^Qt, Qt$$section(QT.$${i}.VERSION, ., 0, 0))$$qtPlatformTargetSuffix()
+     isEmpty(QMAKE_PKGCONFIG_DESCRIPTION): \
+         QMAKE_PKGCONFIG_DESCRIPTION = $$replace(TARGET, ^Qt, "Qt ") module
+     pclib_replace.match = $$lib_replace.match
