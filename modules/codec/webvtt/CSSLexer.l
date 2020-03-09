@@ -107,4 +107,3 @@ U\+{range}		{ yylval->string = strdup(yytext); return UNICODERANGE;}
 U\+{h}{1,6}-{h}{1,6}	{ yylval->string = strdup(yytext); return UNICODERANGE;}
 
 .			{return *yytext;}
-
