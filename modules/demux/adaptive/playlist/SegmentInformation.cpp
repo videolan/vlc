@@ -505,8 +505,11 @@ bool SegmentInformation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
         }
         else
         {
-            stime = number * mediaTemplate->duration.Get();
-            sduration = mediaTemplate->duration.Get();
+            uint64_t startNumber = mediaTemplate->inheritStartNumber();
+            if(number < startNumber)
+                return false;
+            sduration = mediaTemplate->inheritDuration();
+            stime = (number - startNumber) * sduration;
         }
         *time = timescale.ToTime(stime);
         *duration = timescale.ToTime(sduration);
