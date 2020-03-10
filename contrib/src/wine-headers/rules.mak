@@ -27,6 +27,7 @@ $(TARBALLS)/wine-$(WINE_VERSION).tar.xz:
 
 wine-headers: wine-$(WINE_VERSION).tar.xz .sum-wine-headers
 	$(UNPACK)
+	$(APPLY) $(SRC)/wine-headers/0001-include-add-HEVC-and-VP8-VP9-support-to-dxva.h.patch
 	$(MOVE)
 
 wine_widl = echo "GEN $(1)" && \
