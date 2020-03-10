@@ -551,6 +551,7 @@ static webvtt_dom_node_t * webvtt_domnode_getFirstChild( webvtt_dom_node_t *p_no
 }
 #define webvtt_domnode_getFirstChild(a) webvtt_domnode_getFirstChild((webvtt_dom_node_t *)a)
 
+#ifdef HAVE_CSS
 static vlc_tick_t webvtt_domnode_GetPlaybackTime( const webvtt_dom_node_t *p_node, bool b_end )
 {
     for( ; p_node; p_node = p_node->p_parent )
@@ -572,7 +573,6 @@ static vlc_tick_t webvtt_domnode_GetPlaybackTime( const webvtt_dom_node_t *p_nod
     return VLC_TICK_INVALID;
 }
 
-#ifdef HAVE_CSS
 static bool webvtt_domnode_Match_Class( const webvtt_dom_node_t *p_node, const char *psz )
 {
     const size_t i_len = strlen( psz );
@@ -1313,7 +1313,6 @@ static text_style_t * ComputeStyle( decoder_t *p_dec, const webvtt_dom_node_t *p
     text_style_t *p_style = NULL;
     text_style_t *p_dfltstyle = NULL;
     vlc_tick_t i_tagtime = -1;
-    decoder_sys_t *p_sys = p_dec->p_sys;
 
     for( const webvtt_dom_node_t *p_node = p_leaf ; p_node; p_node = p_node->p_parent )
     {
@@ -1369,6 +1368,7 @@ static text_style_t * ComputeStyle( decoder_t *p_dec, const webvtt_dom_node_t *p
                 else if ( !strcmp( p_tagnode->psz_tag, "v" ) && p_tagnode->psz_attrs )
                 {
 #ifdef HAVE_CSS
+                    decoder_sys_t *p_sys = p_dec->p_sys;
                     if( p_sys->p_css_rules == NULL ) /* Only auto style when no CSS sheet */
 #endif
                     {
