@@ -1,0 +1,11 @@
+--- libgpg-error-1.27/src/gpgrt-int.h.orig	2020-03-10 10:54:53.127491822 +0200
++++ libgpg-error-1.27/src/gpgrt-int.h	2020-03-10 10:55:48.526283928 +0200
+@@ -359,7 +359,7 @@
+ 
+ #if _WIN32
+ /* Prototypes for w32-estream.c.  */
+-struct cookie_io_functions_s _gpgrt_functions_w32_pollable;
++extern struct cookie_io_functions_s _gpgrt_functions_w32_pollable;
+ int _gpgrt_w32_pollable_create (void *_GPGRT__RESTRICT *_GPGRT__RESTRICT cookie,
+                                 unsigned int modeflags,
+                                 struct cookie_io_functions_s next_functions,
