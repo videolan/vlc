@@ -433,7 +433,6 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
                             vlc_fourcc_t chroma, video_color_space_t yuv_space)
 {
     struct vlc_gl_interop *interop = renderer->interop;
-    const opengl_vtable_t *vt = renderer->vt;
 
     const char *swizzle_per_tex[PICTURE_PLANE_MAX] = { NULL, };
     const bool is_yuv = vlc_fourcc_IsYUV(chroma);
@@ -532,6 +531,7 @@ opengl_fragment_shader_init(struct vlc_gl_renderer *renderer, GLenum tex_target,
             {
                 GLint fb_depth = 0;
 #if !defined(USE_OPENGL_ES2)
+                const opengl_vtable_t *vt = renderer->vt;
                 /* fetch framebuffer depth (we are already bound to the default one). */
                 if (vt->GetFramebufferAttachmentParameteriv != NULL)
                     vt->GetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_BACK_LEFT,
