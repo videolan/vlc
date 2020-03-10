@@ -98,6 +98,10 @@ static const d3d9_format_t d3d_formats[] = {
     { "NV12",   MAKEFOURCC('N','V','1','2'),    VLC_CODEC_NV12 },
     //{ "IMC3",   MAKEFOURCC('I','M','C','3'),    VLC_CODEC_YV12 },
     { "P010",   MAKEFOURCC('P','0','1','0'),    VLC_CODEC_P010 },
+    { "AYUV",   MAKEFOURCC('A','Y','U','V'),    VLC_CODEC_YUVA },
+    { "YUY2",   MAKEFOURCC('Y','U','Y','2'),    VLC_CODEC_YUYV },
+    { "Y410",   MAKEFOURCC('Y','4','1','0'),    VLC_CODEC_Y410 },
+    { "Y210",   MAKEFOURCC('Y','2','1','0'),    VLC_CODEC_Y210 },
 
     { NULL, 0, 0 }
 };
