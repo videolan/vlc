@@ -92,7 +92,7 @@ static inline bool is_d3d11_opaque(vlc_fourcc_t chroma)
            chroma == VLC_CODEC_D3D11_OPAQUE_BGRA;
 }
 
-const struct vlc_video_context_operations d3d11_vctx_ops;
+extern const struct vlc_video_context_operations d3d11_vctx_ops;
 
 picture_sys_d3d11_t *ActiveD3D11PictureSys(picture_t *);
 
