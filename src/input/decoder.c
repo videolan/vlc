@@ -650,6 +650,7 @@ static picture_t *ModuleThread_NewVideoBuffer( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     assert( p_owner->p_vout );
+    assert( p_owner->out_pool );
 
     picture_t *pic = picture_pool_Wait( p_owner->out_pool );
     if (pic)
