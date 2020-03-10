@@ -23,9 +23,13 @@ qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum
 	$(UNPACK)
 	$(MOVE)
 
+QT_DECLARATIVE_CONFIG := \
+     -no-feature-qml-debug \
+     -no-feature-quick-designer
+
 .qtdeclarative: qtdeclarative
 	# Generate Makefile & src/Makefile
-	cd $< && $(PREFIX)/bin/qmake
+	cd $< && $(PREFIX)/bin/qmake -- $(QT_DECLARATIVE_CONFIG)
 	cd $</src && $(PREFIX)/bin/qmake -o Makefile src.pro
 	# Build & install only what we require
 	# Invoke the build rules one at a time as some rule dependencies seem to be broken

@@ -24,8 +24,14 @@ qtquickcontrols2: qtquickcontrols2-everywhere-src-$(QTQC2_VERSION).tar.xz .sum-q
 	$(UNPACK)
 	$(MOVE)
 
+QUICK_CONTROL_CONFIG := \
+    -no-feature-quicktemplates2-multitouch \
+    -no-feature-quickcontrols2-universal \
+    -no-feature-quickcontrols2-material \
+    -no-feature-quickcontrols2-imagine
+
 .qtquickcontrols2: qtquickcontrols2
-	cd $< && $(PREFIX)/bin/qmake
+	cd $< && $(PREFIX)/bin/qmake -- $(QUICK_CONTROL_CONFIG)
 	# Make && Install libraries
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C src sub-quickcontrols2-install_subtargets sub-imports-install_subtargets
