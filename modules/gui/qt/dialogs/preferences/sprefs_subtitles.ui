@@ -14,7 +14,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="mainLayout">
    <item>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
@@ -188,7 +188,7 @@
           </widget>
          </item>
          <item row="1" column="2">
-          <spacer name="horizontalSpacer">
+          <spacer name="fontSizeSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -351,7 +351,7 @@
              </widget>
             </item>
             <item row="0" column="2">
-             <spacer name="horizontalSpacer">
+             <spacer name="secondarySubsAlignmentSpacer">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
