@@ -50,6 +50,12 @@ bool vlc_va_MightDecode(enum PixelFormat hwfmt, enum PixelFormat swfmt)
                 case AV_PIX_FMT_YUV420P10LE:
                 case AV_PIX_FMT_YUVJ420P:
                 case AV_PIX_FMT_YUV420P:
+                case AV_PIX_FMT_YUV444P:
+                case AV_PIX_FMT_YUV420P12:
+                case AV_PIX_FMT_YUV444P10:
+                case AV_PIX_FMT_YUV444P12:
+                case AV_PIX_FMT_YUV422P10:
+                case AV_PIX_FMT_YUV422P12:
                     return true;
                 default:
                     return false;
@@ -62,6 +68,12 @@ bool vlc_va_MightDecode(enum PixelFormat hwfmt, enum PixelFormat swfmt)
                 case AV_PIX_FMT_YUV420P10LE:
                 case AV_PIX_FMT_YUVJ420P:
                 case AV_PIX_FMT_YUV420P:
+                case AV_PIX_FMT_YUV444P:
+                case AV_PIX_FMT_YUV420P12:
+                case AV_PIX_FMT_YUV444P10:
+                case AV_PIX_FMT_YUV444P12:
+                case AV_PIX_FMT_YUV422P10:
+                case AV_PIX_FMT_YUV422P12:
                     return true;
                 default:
                     return false;
