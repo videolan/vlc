@@ -187,7 +187,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
-    *fmt = renderer->fmt;
+    video_orientation_t orientation = fmt->orientation;
+    *fmt = vgl->interop->fmt;
+    /* The orientation is handled by the orientation matrix: from the core
+     * point of view, it does not change. */
+    fmt->orientation = orientation;
+
     if (subpicture_chromas) {
         *subpicture_chromas = gl_subpicture_chromas;
     }
