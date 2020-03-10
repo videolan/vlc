@@ -1336,15 +1336,6 @@ static int Direct3D9CheckConversion(vout_display_t *vd, D3DFORMAT src)
     hr = IDirect3D9_CheckDeviceFormat(d3dobj, sys->d3d9_device->d3ddev.adapterId,
                                       D3DDEVTYPE_HAL, dst, 0,
                                       D3DRTYPE_SURFACE, src);
-    if (SUCCEEDED(hr)) {
-        /* test whether device can perform color-conversion
-        ** from that format to target format
-        */
-        hr = IDirect3D9_CheckDeviceFormatConversion(d3dobj,
-                                                    sys->d3d9_device->d3ddev.adapterId,
-                                                    D3DDEVTYPE_HAL,
-                                                    src, dst);
-    }
     if (!SUCCEEDED(hr)) {
         if (D3DERR_NOTAVAILABLE != hr)
             msg_Err(vd, "Could not query adapter supported formats. (hr=0x%lX)", hr);
@@ -1573,7 +1564,7 @@ static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt,
     }
     if (i == devcaps.OutputFormatCount)
     {
-        msg_Warn(vd, "Output format %s not supported for range conversion", d3dfmt->name);
+        msg_Warn(vd, "Output format %d not supported for range conversion", sys->BufferFormat);
         goto error;
     }
 
@@ -1630,25 +1621,40 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
         return VLC_EGENERIC;
 
     sys->BufferFormat = render_out.d3d9_format;
+    const d3d9_format_t *dst_format = FindBufferFormat(vd, sys->BufferFormat);
+    if (unlikely(!dst_format))
+        msg_Warn(vd, "Unknown back buffer format 0x%X", sys->BufferFormat);
 
     /* Find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
      * the requested chroma which is usable by the hardware in an offscreen surface, as they
      * typically support more formats than textures */
     const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, &vd->source, vctx);
     if (!d3dfmt) {
-        msg_Err(vd, "surface pixel format is not supported.");
+        msg_Err(vd, "unsupported source pixel format %4.4s", &vd->source.i_chroma);
         goto error;
     }
-    msg_Dbg(vd, "selected input surface format %s", d3dfmt->name);
-    const d3d9_format_t *dst_format = FindBufferFormat(vd, sys->BufferFormat);
-    if (unlikely(!dst_format))
-        msg_Warn(vd, "Unknown back buffer format 0x%X", sys->BufferFormat);
-    else if (vd->source.color_range != COLOR_RANGE_FULL && dst_format->rmask && !d3dfmt->rmask &&
-             sys->d3d9_device->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA)
+    msg_Dbg(vd, "found input surface format %s", d3dfmt->name);
+
+    bool force_dxva_hd = false;
+    // test whether device can perform color-conversion from that format to target format
+    HRESULT hr = IDirect3D9_CheckDeviceFormatConversion(sys->d3d9_device->hd3d.obj,
+                                                sys->d3d9_device->d3ddev.adapterId,
+                                                D3DDEVTYPE_HAL,
+                                                d3dfmt->format, sys->BufferFormat);
+    if (FAILED(hr))
+    {
+        msg_Dbg(vd, "Unsupported conversion trying with DXVA-HD");
+        force_dxva_hd = true;
+    }
+
+    if (force_dxva_hd || (dst_format && vd->source.color_range != COLOR_RANGE_FULL && dst_format->rmask && !d3dfmt->rmask &&
+                          sys->d3d9_device->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA))
     {
         // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
-        msg_Dbg(vd, "Try to init DXVA-HD processor from %s to %s", d3dfmt->name, dst_format->name);
-        InitRangeProcessor( vd, d3dfmt, &render_out );
+        msg_Dbg(vd, "init DXVA-HD processor from %s to %s", d3dfmt->name, dst_format?dst_format->name:"unknown");
+        int err = InitRangeProcessor( vd, d3dfmt, &render_out );
+        if (err != VLC_SUCCESS)
+            goto error;
     }
 
     /* */
