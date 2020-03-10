@@ -1964,12 +1964,12 @@ static void DeleteDecoder( decoder_t * p_dec )
              (char*)&p_dec->fmt_in.i_codec );
 
     const enum es_format_category_e i_cat =p_dec->fmt_in.i_cat;
+    decoder_Clean( p_dec );
     if ( p_owner->out_pool )
     {
         picture_pool_Release( p_owner->out_pool );
         p_owner->out_pool = NULL;
     }
-    decoder_Clean( p_dec );
 
     if (p_owner->vctx)
         vlc_video_context_Release( p_owner->vctx );
