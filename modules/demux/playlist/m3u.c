@@ -42,7 +42,6 @@
  * Local prototypes
  *****************************************************************************/
 static int ReadDir( stream_t *, input_item_node_t * );
-static void parseEXTINF( char *psz_string, char **ppsz_artist, char **ppsz_name, int *pi_duration );
 static bool ContainsURL(const uint8_t *, size_t);
 
 static char *GuessEncoding (const char *str)
@@ -212,19 +211,66 @@ static bool ContainsURL(const uint8_t *p_peek, size_t i_peek)
     return false;
 }
 
+struct entry_meta_s
+{
+    char *psz_name;
+    char *psz_artist;
+    char *psz_album_art;
+    char *psz_mrl;
+    vlc_tick_t i_duration;
+    const char**ppsz_options;
+    int   i_options;
+};
+
+static void entry_meta_Init( struct entry_meta_s *e )
+{
+    memset(e, 0, sizeof(*e));
+    e->i_duration = INPUT_DURATION_INDEFINITE;
+}
+
+static void entry_meta_Clean( struct entry_meta_s *e )
+{
+    free( e->psz_name );
+    free( e->psz_artist );
+    free( e->psz_album_art );
+    free( e->psz_mrl );
+    while( e->i_options-- ) free( (char*)e->ppsz_options[e->i_options] );
+}
+
+static void parseEXTINF( char *, char *(*)(const char *), struct entry_meta_s * );
+
+static int CreateEntry( input_item_node_t *p_node, const struct entry_meta_s *meta )
+{
+    if( !meta->psz_mrl )
+        return VLC_EGENERIC;
+
+    input_item_t *p_input =
+        input_item_NewExt( meta->psz_mrl, meta->psz_name, meta->i_duration,
+                           ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN );
+    if( !p_input )
+        return VLC_EGENERIC;
+
+    input_item_AddOptions( p_input, meta->i_options, meta->ppsz_options, 0 );
+
+    if( meta->psz_artist )
+        input_item_SetArtist( p_input, meta->psz_artist );
+    if( meta->psz_name )
+        input_item_SetTitle( p_input, meta->psz_name );
+    if( meta->psz_album_art )
+        input_item_SetArtURL( p_input, meta->psz_album_art );
+
+    input_item_node_AppendItem( p_node, p_input );
+    input_item_Release( p_input );
+
+    return VLC_SUCCESS;
+}
+
 static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 {
     char       *psz_line;
-    char       *psz_name = NULL;
-    char       *psz_artist = NULL;
-    char       *psz_album_art = NULL;
-    int        i_parsed_duration = 0;
-    vlc_tick_t i_duration = INPUT_DURATION_INDEFINITE;
-    const char**ppsz_options = NULL;
+    struct entry_meta_s meta;
+    entry_meta_Init( &meta );
     char *    (*pf_dup) (const char *) = p_demux->p_sys;
-    int        i_options = 0;
-    bool b_cleanup = false;
-    input_item_t *p_input;
 
     psz_line = vlc_stream_ReadLine( p_demux->s );
     while( psz_line )
@@ -243,21 +289,14 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
             while( isspace( *psz_parse ) || *psz_parse == '#' )
                 psz_parse++;
 
-            if( !*psz_parse ) goto error;
+            if( !*psz_parse ) goto nextline;
 
             if( !strncasecmp( psz_parse, "EXTINF:", sizeof("EXTINF:") -1 ) )
             {
                 /* Extended info */
                 psz_parse += sizeof("EXTINF:") - 1;
-                FREENULL( psz_name );
-                FREENULL( psz_artist );
-                parseEXTINF( psz_parse, &psz_artist, &psz_name, &i_parsed_duration );
-                if( i_parsed_duration >= 0 )
-                    i_duration = vlc_tick_from_sec( i_parsed_duration );
-                if( psz_name )
-                    psz_name = pf_dup( psz_name );
-                if( psz_artist )
-                    psz_artist = pf_dup( psz_artist );
+                meta.i_duration = INPUT_DURATION_INDEFINITE;
+                parseEXTINF( psz_parse, pf_dup, &meta );
             }
             else if( !strncasecmp( psz_parse, "EXTVLCOPT:",
                                    sizeof("EXTVLCOPT:") -1 ) )
@@ -265,11 +304,11 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                 /* VLC Option */
                 char *psz_option;
                 psz_parse += sizeof("EXTVLCOPT:") -1;
-                if( !*psz_parse ) goto error;
+                if( !*psz_parse ) goto nextline;
 
                 psz_option = pf_dup( psz_parse );
                 if( psz_option )
-                    TAB_APPEND( i_options, ppsz_options, psz_option );
+                    TAB_APPEND( meta.i_options, meta.ppsz_options, psz_option );
             }
             /* Special case for jamendo which provide the albumart */
             else if( !strncasecmp( psz_parse, "EXTALBUMARTURL:",
@@ -278,8 +317,8 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                 psz_parse += sizeof( "EXTALBUMARTURL:" ) - 1;
                 if( *psz_parse )
                 {
-                    free( psz_album_art );
-                    psz_album_art = pf_dup( psz_parse );
+                    free( meta.psz_album_art );
+                    meta.psz_album_art = pf_dup( psz_parse );
                 }
             }
         }
@@ -289,69 +328,38 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
         }
         else if( *psz_parse )
         {
-            char *psz_mrl;
-
             psz_parse = pf_dup( psz_parse );
-            if( !psz_name && psz_parse )
+            if( !meta.psz_name && psz_parse )
                 /* Use filename as name for relative entries */
-                psz_name = strdup( psz_parse );
+                meta.psz_name = strdup( psz_parse );
 
-            psz_mrl = ProcessMRL( psz_parse, p_demux->psz_url );
-
-            b_cleanup = true;
-            if( !psz_mrl )
-            {
-                free( psz_parse );
-                goto error;
-            }
-
-            p_input = input_item_NewExt( psz_mrl, psz_name, i_duration,
-                                         ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN );
+            meta.psz_mrl = ProcessMRL( psz_parse, p_demux->psz_url );
             free( psz_parse );
-            free( psz_mrl );
 
-            if( !p_input )
-                goto error;
-            input_item_AddOptions( p_input, i_options, ppsz_options, 0 );
+            CreateEntry( p_subitems, &meta );
 
-            if( !EMPTY_STR(psz_artist) )
-                input_item_SetArtist( p_input, psz_artist );
-            if( !EMPTY_STR(psz_name) ) input_item_SetTitle( p_input, psz_name );
-            if( psz_album_art )
-                input_item_SetArtURL( p_input, psz_album_art );
-
-            input_item_node_AppendItem( p_subitems, p_input );
-            input_item_Release( p_input );
+            /* Cleanup state after entry */
+            entry_meta_Clean( &meta );
+            entry_meta_Init( &meta );
         }
 
- error:
-
+ nextline:
         /* Fetch another line */
         free( psz_line );
         psz_line = vlc_stream_ReadLine( p_demux->s );
-        if( !psz_line ) b_cleanup = true;
-
-        if( b_cleanup )
+        if( !psz_line )
         {
             /* Cleanup state */
-            while( i_options-- ) free( (char*)ppsz_options[i_options] );
-            FREENULL( ppsz_options );
-            i_options = 0;
-            FREENULL( psz_name );
-            FREENULL( psz_artist );
-            FREENULL( psz_album_art );
-            i_parsed_duration = 0;
-            i_duration = INPUT_DURATION_INDEFINITE;
-
-            b_cleanup = false;
+            entry_meta_Clean( &meta );
+            entry_meta_Init( &meta );
         }
     }
     return VLC_SUCCESS; /* Needed for correct operation of go back */
 }
 
-static void parseEXTINFTitle(char *psz_string,
-                             char **ppsz_artist,
-                             char **ppsz_name)
+static void parseEXTINFTitle( char *psz_string,
+                              char *(*pf_dup) (const char *),
+                              struct entry_meta_s *meta )
 {
     char *psz_item = strstr( psz_string, " - " );
 
@@ -360,8 +368,10 @@ static void parseEXTINFTitle(char *psz_string,
     {
         /* *** "EXTINF:time,artist - name" */
         *psz_item = '\0';
-        *ppsz_artist = psz_string;
-        *ppsz_name = psz_item + 3;          /* points directly after ' - ' */
+        if( *psz_string )
+            meta->psz_artist = pf_dup( psz_string );
+        if( psz_item[3] )
+            meta->psz_name = pf_dup( &psz_item[3] ); /* points directly after ' - ' */
         return;
     }
 
@@ -370,7 +380,8 @@ static void parseEXTINFTitle(char *psz_string,
     {
         /* *** "EXTINF:time,,name" */
         psz_string++;
-        *ppsz_name = psz_string;
+        if( *psz_string )
+            meta->psz_name = pf_dup( psz_string );
         return;
     }
 
@@ -380,20 +391,27 @@ static void parseEXTINFTitle(char *psz_string,
     {
         /* *** "EXTINF:time,artist,name" */
         *psz_string = '\0';
-        *ppsz_artist = psz_item;
-        *ppsz_name = psz_string+1;
+        if( *psz_item )
+            meta->psz_artist = pf_dup( psz_item );
+        if( psz_string[1] )
+            meta->psz_name = pf_dup( &psz_string[1] );
     }
     else
     {
         /* *** "EXTINF:time,name" */
-        *ppsz_name = psz_item;
+        if( *psz_item )
+            meta->psz_name = pf_dup( psz_item );
     }
 }
 
-static void parseEXTINF( char *psz_string, char **ppsz_artist,
-                         char **ppsz_name, int *pi_duration )
+static void parseEXTINF( char *psz_string,
+                         char *(*pf_dup)(const char *),
+                         struct entry_meta_s *meta )
 {
     char *end = psz_string + strlen( psz_string );
+
+    FREENULL( meta->psz_name );
+    FREENULL( meta->psz_artist );
 
     /* strip leading whitespaces */
     while( psz_string < end && isspace( *psz_string ) )
@@ -405,10 +423,12 @@ static void parseEXTINF( char *psz_string, char **ppsz_artist,
     {
         *psz_comma = '\0'; /* Split strings */
         if( ++psz_comma < end )
-            parseEXTINFTitle( psz_comma, ppsz_artist, ppsz_name );
+            parseEXTINFTitle( psz_comma, pf_dup, meta );
     }
 
     /* Parse duration */
-    *pi_duration = strtol( psz_string, NULL, 10 );
+    long i_parsed_duration = strtol( psz_string, NULL, 10 );
+    if( i_parsed_duration > 0 )
+        meta->i_duration = vlc_tick_from_sec( i_parsed_duration );
 }
 
