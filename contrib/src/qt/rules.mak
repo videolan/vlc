@@ -82,10 +82,9 @@ endif
 QT_CONFIG := -static -no-shared -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl $(QT_OPENGL) -no-dbus \
 	-no-vulkan -no-sql-odbc -no-pch \
-	-no-compile-examples -nomake examples -nomake tests
+	-no-compile-examples -nomake examples -nomake tests -qt-zlib
 
 QT_CONFIG += -skip qtsql
-QT_CONFIG += -skip qttest
 QT_CONFIG += -release
 
 ifeq ($(V),1)
@@ -104,7 +103,7 @@ ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
 	+cd $< && $(ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -I $(PREFIX)/include
 	# Make && Install libraries
 	cd $< && $(ENV_VARS) $(MAKE)
-	cd $< && $(MAKE) -C src sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-bootstrap-install_subtargets sub-network-install_subtargets
+	cd $< && $(MAKE) -C src sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-zlib-install_subtargets sub-bootstrap-install_subtargets sub-network-install_subtargets sub-testlib-install_subtargets
 	# Install tools
 	cd $< && $(MAKE) -C src sub-moc-install_subtargets sub-rcc-install_subtargets sub-uic-install_subtargets sub-qlalr-install_subtargets
 	# Install plugins
