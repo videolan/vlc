@@ -148,6 +148,18 @@ static const char * const tone_text[] = {
 #define TONEMAP_DESAT_TEXT "Tone-mapping desaturation coefficient"
 #define TONEMAP_DESAT_LONGTEXT "How strongly to desaturate overbright colors towards white. 0.0 disables this behavior."
 
+#define DESAT_STRENGTH_TEXT "Desaturation strength"
+#define DESAT_STRENGTH_LONGTEXT "How strongly to desaturate bright spectral colors towards white. 0.0 disables this behavior, 1.0 enables full desaturation (hollywood-style)"
+
+#define DESAT_EXPONENT_TEXT "Desaturation exponent"
+#define DESAT_EXPONENT_LONGTEXT "Controls the steepness of the desaturation curve. If you set this to 0.0, the curve will be flat, i.e. desaturation always enabled (hollywood-style)."
+
+#define DESAT_BASE_TEXT "Desaturation base"
+#define DESAT_BASE_LONGTEXT "Controls the starting offset of the desaturation curve. Brightness values below this base will always be colorimetrically tone mapped (never desaturated)."
+
+#define MAX_BOOST_TEXT "Maximum brightness boost"
+#define MAX_BOOST_LONGTEXT "Maximum allowed brightness boost to compensate for dark scenes. A value of 1.0 means no brightness boost is allowed."
+
 #define TONEMAP_WARN_TEXT "Highlight clipped pixels"
 #define TONEMAP_WARN_LONGTEXT "Debugging tool to indicate which pixels were clipped as part of the tone mapping process."
 
@@ -171,6 +183,23 @@ static const char * const dither_text[] = {
 #define DEPTH_TEXT "Dither depth override (0 = framebuffer depth)"
 #define DEPTH_LONGTEXT "Overrides the detected framebuffer depth. Useful to dither to lower bit depths than otherwise required."
 
+#if PL_API_VER >= 10
+#define add_desat_params() \
+    add_float("desat-strength", pl_color_map_default_params.desaturation_strength, \
+            DESAT_STRENGTH_TEXT, DESAT_STRENGTH_LONGTEXT, false) \
+    add_float("desat-exponent", pl_color_map_default_params.desaturation_exponent, \
+            DESAT_EXPONENT_TEXT, DESAT_EXPONENT_LONGTEXT, false) \
+    add_float("desat-base", pl_color_map_default_params.desaturation_base, \
+            DESAT_BASE_TEXT, DESAT_BASE_LONGTEXT, false) \
+    add_float("max-boost", pl_color_map_default_params.max_boost, \
+            MAX_BOOST_TEXT, MAX_BOOST_LONGTEXT, false) \
+    add_obsolete_string("tone-mapping-desat")
+#else
+#define add_desat_params() \
+    add_float("tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate, \
+            TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT, false)
+#endif
+
 #define add_glopts_placebo() \
     set_section("Colorspace conversion", NULL) \
     add_integer("rendering-intent", pl_color_map_default_params.intent, \
@@ -186,13 +215,12 @@ static const char * const dither_text[] = {
             change_integer_list(tone_values, tone_text) \
     add_float("tone-mapping-param", pl_color_map_default_params.tone_mapping_param, \
               TONEMAP_PARAM_TEXT, TONEMAP_PARAM_LONGTEXT, true) \
-    add_float("tone-mapping-desat", pl_color_map_default_params.tone_mapping_desaturate, \
-              TONEMAP_DESAT_TEXT, TONEMAP_DESAT_LONGTEXT, false) \
     add_bool("tone-mapping-warn", false, TONEMAP_WARN_TEXT, TONEMAP_WARN_LONGTEXT, false) \
     set_section("Dithering", NULL) \
     add_integer("dither-algo", -1, DITHER_TEXT, DITHER_LONGTEXT, false) \
             change_integer_list(dither_values, dither_text) \
-    add_integer_with_range("dither-depth", 0, 0, 16, DEPTH_TEXT, DEPTH_LONGTEXT, false)
+    add_integer_with_range("dither-depth", 0, 0, 16, DEPTH_TEXT, DEPTH_LONGTEXT, false) \
+    add_desat_params()
 #else
 #define add_glopts_placebo()
 #endif

@@ -616,7 +616,14 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         color_params.intent = var_InheritInteger(tc->gl, "rendering-intent");
         color_params.tone_mapping_algo = var_InheritInteger(tc->gl, "tone-mapping");
         color_params.tone_mapping_param = var_InheritFloat(tc->gl, "tone-mapping-param");
+#if PL_API_VER >= 10
+        color_params.desaturation_strength = var_InheritFloat(tc->gl, "desat-strength");
+        color_params.desaturation_exponent = var_InheritFloat(tc->gl, "desat-exponent");
+        color_params.desaturation_base = var_InheritFloat(tc->gl, "desat-base");
+        color_params.max_boost = var_InheritFloat(tc->gl, "max-boost");
+#else
         color_params.tone_mapping_desaturate = var_InheritFloat(tc->gl, "tone-mapping-desat");
+#endif
         color_params.gamut_warning = var_InheritBool(tc->gl, "tone-mapping-warn");
 
         struct pl_color_space dst_space = pl_color_space_unknown;
