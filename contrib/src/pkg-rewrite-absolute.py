@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 import os, sys, argparse
+from collections import OrderedDict
 
 class PkgConfigFile():
     """Representation of a pkg-config file (.pc)"""
 
-    pc_variables = {}
-    pc_variables_expanded = {}
+    pc_variables = OrderedDict()
+    pc_variables_expanded = OrderedDict()
 
-    pc_keywords = {}
+    pc_keywords = OrderedDict()
 
     def __init__(self, file):
         for line in file:
