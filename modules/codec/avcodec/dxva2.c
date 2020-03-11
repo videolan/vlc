@@ -281,11 +281,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
 
     va->sys = sys;
 
-    if (desc->comp[0].depth > 8)
-        sys->render = MAKEFOURCC('P','0','1','0');
-    else
-        sys->render =  MAKEFOURCC('N','V','1','2');
-
     /* Load dll*/
     sys->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
     if (!sys->dxva2_dll) {
@@ -470,6 +465,14 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
         }
     }
 
+    D3DFORMAT preferredOutput;
+    if (mode->bit_depth > 8)
+        preferredOutput = MAKEFOURCC('P','0','1','0');
+    else
+        preferredOutput =  MAKEFOURCC('N','V','1','2');
+    msg_Dbg(va, "favor decoder format %4.4s (for %d bits)", (const char*)&preferredOutput,
+            mode->bit_depth);
+
     /* */
     for (unsigned pass = 0; pass < 2 && err != VLC_SUCCESS; ++pass)
     {
@@ -483,7 +486,7 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
             }
             if (!is_supported)
                 continue;
-            if (pass == 0 && format->format != sys->render)
+            if (pass == 0 && format->format != preferredOutput)
                 continue;
 
             /* We have our solution */
