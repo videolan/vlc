@@ -736,7 +736,7 @@ static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t b
     if (from_processor)
         supportFlags |= D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT;
     return FindD3D11Format( vd, vd->sys->d3d_dev, 0, rgb_yuv,
-                            bit_depth, widthDenominator, heightDenominator,
+                            bit_depth, widthDenominator+1, heightDenominator+1,
                             D3D11_CHROMA_CPU, supportFlags );
 }
 
