@@ -111,10 +111,12 @@ dnl Prevent clang from accepting unknown flags with a mere warning
 AX_CHECK_COMPILE_FLAG([-Werror=invalid-command-line-argument], [
   AX_APPEND_FLAG([-Werror=invalid-command-line-argument], [CFLAGS])
   AX_APPEND_FLAG([-Werror=invalid-command-line-argument], [CXXFLAGS])
+  AX_APPEND_FLAG([-Werror=invalid-command-line-argument], [OBJCFLAGS])
 ])
 AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option], [
   AX_APPEND_FLAG([-Werror=unknown-warning-option], [CFLAGS])
   AX_APPEND_FLAG([-Werror=unknown-warning-option], [CXXFLAGS])
+  AX_APPEND_FLAG([-Werror=unknown-warning-option], [OBJCFLAGS])
 ])
 
 dnl
