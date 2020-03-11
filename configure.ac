@@ -184,12 +184,12 @@ case "${host_os}" in
       i?86)
         ARCH_flag="-arch i386"
         X86ASMFLAGS="-f macho32"
-        X86ASMDEFS="${X86ASMDEFS} -DPREFIX"
+        AX_APPEND_FLAG([-DPREFIX], [X86ASMDEFS])
       ;;
       x86_64)
         ARCH_flag="-arch x86_64"
         X86ASMFLAGS="-f macho64"
-        X86ASMDEFS="${X86ASMDEFS} -DPREFIX"
+        AX_APPEND_FLAG([-DPREFIX], [X86ASMDEFS])
       ;;
       arm*)
         ac_cv_c_bigendian="no"
