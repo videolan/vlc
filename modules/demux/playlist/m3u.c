@@ -217,6 +217,9 @@ struct entry_meta_s
     char *psz_artist;
     char *psz_album_art;
     char *psz_mrl;
+    char *psz_language;
+    char *psz_tvgid;
+    char *psz_grouptitle;
     vlc_tick_t i_duration;
     const char**ppsz_options;
     int   i_options;
@@ -234,6 +237,9 @@ static void entry_meta_Clean( struct entry_meta_s *e )
     free( e->psz_artist );
     free( e->psz_album_art );
     free( e->psz_mrl );
+    free( e->psz_language );
+    free( e->psz_tvgid );
+    free( e->psz_grouptitle );
     while( e->i_options-- ) free( (char*)e->ppsz_options[e->i_options] );
 }
 
@@ -258,6 +264,12 @@ static int CreateEntry( input_item_node_t *p_node, const struct entry_meta_s *me
         input_item_SetTitle( p_input, meta->psz_name );
     if( meta->psz_album_art )
         input_item_SetArtURL( p_input, meta->psz_album_art );
+    if( meta->psz_language )
+        input_item_SetLanguage( p_input, meta->psz_language );
+    if( meta->psz_tvgid )
+        input_item_AddInfo( p_input, "XMLTV", "tvg-id", "%s", meta->psz_tvgid );
+    if( meta->psz_grouptitle )
+        input_item_SetAlbum( p_input, meta->psz_grouptitle );
 
     input_item_node_AppendItem( p_node, p_input );
     input_item_Release( p_input );
@@ -404,6 +416,100 @@ static void parseEXTINFTitle( char *psz_string,
     }
 }
 
+static void parseEXTINFIptvDiots( char *psz_string,
+                                  char *(*pf_dup)(const char *),
+                                  struct entry_meta_s *meta )
+{
+    char **ppsz_meta = NULL;
+    if( strncmp( psz_string, "tvg-", 4 ) &&
+        strncmp( psz_string, "group-", 6 ) )
+        return;
+    char *psz_sep = strchr( psz_string + 4, '=' );
+    if( unlikely(!psz_sep) )
+        return;
+    size_t i_keylen = psz_sep - psz_string;
+
+    if( !strncmp( psz_string + 4, "logo", i_keylen - 4 ) )
+        ppsz_meta = &meta->psz_album_art;
+    else if( !strncmp( psz_string + 4, "name", i_keylen - 4 ) )
+        ppsz_meta = &meta->psz_name;
+    else if( !strncmp( psz_string + 4, "language", i_keylen - 4 ) )
+        ppsz_meta = &meta->psz_language;
+    else if( !strncmp( psz_string + 4, "id", i_keylen - 4 ) )
+        ppsz_meta = &meta->psz_tvgid;
+    else if( !strncmp( psz_string + 6, "title", i_keylen - 4 ) )
+        ppsz_meta = &meta->psz_grouptitle;
+
+    if( !ppsz_meta || *ppsz_meta /* no overwrite */ )
+        return;
+
+    char *psz_value = psz_sep + 1;
+    size_t i_valuelen = strlen( psz_value );
+    if( unlikely(i_valuelen == 0) )
+        return;
+
+    bool b_escaped = (*psz_value == '"');
+    if( i_valuelen > 2 && b_escaped )
+    {
+        psz_value[ i_valuelen - 1 ] = 0;
+        *ppsz_meta = pf_dup( psz_value + 1 );
+    }
+    else
+        *ppsz_meta = pf_dup( psz_value );
+}
+
+static void parseEXTINFIptvDiotsInDuration( char *psz_string,
+                                            char *(*pf_dup)(const char *),
+                                            struct entry_meta_s *meta )
+{
+    for( ;; )
+    {
+        while( isspace( *psz_string ) )
+            psz_string++;
+
+        char *psz_start = psz_string;
+        bool b_escaped = false;
+        bool b_key = false;
+        bool b_value = false;
+        bool b_next = false;
+
+        for( ;!b_next; ++psz_string )
+        {
+            switch( *psz_string )
+            {
+                case '"':
+                    if(!b_escaped && b_value)
+                        return;
+                    if(!b_key)
+                        return;
+                    b_value = true;
+                    b_escaped = !b_escaped;
+                    break;
+                case '\0':
+                    if(!b_escaped && b_value)
+                        parseEXTINFIptvDiots( psz_start, pf_dup, meta );
+                    return;
+                case ' ':
+                    if(!b_escaped)
+                    {
+                        *psz_string = '\0';
+                        if(b_value)
+                            parseEXTINFIptvDiots( psz_start, pf_dup, meta );
+                        b_next = true;
+                    }
+                    break;
+                case '=':
+                    b_key = true;
+                    break;
+                default:
+                    if(b_key)
+                        b_value = true;
+                    break;
+            }
+        }
+    }
+}
+
 static void parseEXTINF( char *psz_string,
                          char *(*pf_dup)(const char *),
                          struct entry_meta_s *meta )
@@ -427,8 +533,14 @@ static void parseEXTINF( char *psz_string,
     }
 
     /* Parse duration */
-    long i_parsed_duration = strtol( psz_string, NULL, 10 );
+    char *psz_end = NULL;
+    long i_parsed_duration = strtol( psz_string, &psz_end, 10 );
     if( i_parsed_duration > 0 )
         meta->i_duration = vlc_tick_from_sec( i_parsed_duration );
+
+    if( psz_end && psz_end != psz_string && isspace(*psz_end) )
+    {
+        parseEXTINFIptvDiotsInDuration( psz_end, pf_dup, meta );
+    }
 }
 
