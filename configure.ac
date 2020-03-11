@@ -186,12 +186,6 @@ case "${host_os}" in
         X86ASMFLAGS="-f macho32"
         X86ASMDEFS="${X86ASMDEFS} -DPREFIX"
       ;;
-      ppc64*)
-        ARCH_flag="-arch ppc64"
-      ;;
-      ppc*)
-        ARCH_flag="-arch ppc"
-      ;;
       x86_64)
         ARCH_flag="-arch x86_64"
         X86ASMFLAGS="-f macho64"
