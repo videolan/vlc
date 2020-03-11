@@ -171,6 +171,8 @@ case "${host_os}" in
     SYS=dragonfly
     ;;
   darwin*)
+    SYS=darwin
+
     dnl Workaround possible Xcode 11 bug
     CFLAGS="${CFLAGS} -fno-stack-check"
     CXXFLAGS="${CXXFLAGS} -fno-stack-check"
@@ -201,7 +203,6 @@ case "${host_os}" in
       ;;
     esac
 
-    SYS=darwin
     CFLAGS="${CFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu11 ${ARCH_flag}"
     CXX="${CXX} -stdlib=libc++ -std=c++11"
     CXXFLAGS="${CXXFLAGS} -D_INTL_REDIRECT_MACROS ${ARCH_flag}"
