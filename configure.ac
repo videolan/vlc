@@ -178,16 +178,12 @@ case "${host_os}" in
     CXXFLAGS="${CXXFLAGS} -fno-stack-check"
     OBJCFLAGS="${OBJCFLAGS} -fno-stack-check"
 
-    dnl Force gcc "-arch" flag
-    ARCH_flag=""
     case "${host_cpu}" in
       i?86)
-        ARCH_flag="-arch i386"
         X86ASMFLAGS="-f macho32"
         AX_APPEND_FLAG([-DPREFIX], [X86ASMDEFS])
       ;;
       x86_64)
-        ARCH_flag="-arch x86_64"
         X86ASMFLAGS="-f macho64"
         AX_APPEND_FLAG([-DPREFIX], [X86ASMDEFS])
       ;;
@@ -197,12 +193,12 @@ case "${host_os}" in
       ;;
     esac
 
-    CFLAGS="${CFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu11 ${ARCH_flag}"
+    CFLAGS="${CFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu11"
     CXX="${CXX} -stdlib=libc++ -std=c++11"
-    CXXFLAGS="${CXXFLAGS} -D_INTL_REDIRECT_MACROS ${ARCH_flag}"
-    CPPFLAGS="${CPPFLAGS} ${ARCH_flag}"
-    OBJCFLAGS="${OBJCFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu11 ${ARCH_flag} -Werror=partial-availability"
-    LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names ${ARCH_flag}"
+    CXXFLAGS="${CXXFLAGS} -D_INTL_REDIRECT_MACROS"
+    CPPFLAGS="${CPPFLAGS}"
+    OBJCFLAGS="${OBJCFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu11 -Werror=partial-availability"
+    LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names"
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,AppKit])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation,-framework,CoreServices])
 
