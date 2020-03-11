@@ -155,9 +155,9 @@ case "${host_os}" in
     ;;
   darwin*)
     dnl Workaround possible Xcode 11 bug
-    CFLAGS="${CFLAGS} -fno-stack-check"
-    CXXFLAGS="${CXXFLAGS} -fno-stack-check"
-    OBJCFLAGS="${OBJCFLAGS} -fno-stack-check"
+    AX_APPEND_FLAG([-fno-stack-check], [CFLAGS])
+    AX_APPEND_FLAG([-fno-stack-check], [CXXFLAGS])
+    AX_APPEND_FLAG([-fno-stack-check], [OBJCFLAGS])
 
     dnl Force gcc "-arch" flag
     ARCH_flag=""
