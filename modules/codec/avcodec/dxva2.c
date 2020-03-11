@@ -320,7 +320,9 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat hwfmt, const
         goto error;
     }
 
-    if (sys->render == MAKEFOURCC('P','0','1','0'))
+    if (sys->render == MAKEFOURCC('P','0','1','0') ||
+        sys->render == MAKEFOURCC('Y','4','1','0') ||
+        sys->render == MAKEFOURCC('Y','2','1','0'))
         final_fmt.i_chroma = VLC_CODEC_D3D9_OPAQUE_10B;
     else
         final_fmt.i_chroma = VLC_CODEC_D3D9_OPAQUE;
@@ -471,6 +473,19 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
 
     D3DFORMAT preferredOutput;
     if (mode->bit_depth > 8)
+    {
+        if (mode->log2_chroma_w == 0 && mode->log2_chroma_h == 0)
+            preferredOutput = MAKEFOURCC('Y','4','1','0'); // 10 bits 4:4:4
+        else if (mode->log2_chroma_w == 1 && mode->log2_chroma_h == 0)
+            preferredOutput = MAKEFOURCC('Y','2','1','0'); // 10 bits 4:2:2
+        else
+        preferredOutput = MAKEFOURCC('P','0','1','0');
+    }
+    else if (mode->log2_chroma_w == 0 && mode->log2_chroma_h == 0)
+        preferredOutput = MAKEFOURCC('A','Y','U','V'); // 8 bits 4:4:4
+    else if (mode->log2_chroma_w == 1 && mode->log2_chroma_h == 0)
+        preferredOutput = MAKEFOURCC('Y','U','Y','2'); // 8 bits 4:2:2
+    else if (mode->bit_depth > 8)
         preferredOutput = MAKEFOURCC('P','0','1','0');
     else
         preferredOutput =  MAKEFOURCC('N','V','1','2');
