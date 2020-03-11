@@ -159,6 +159,8 @@ static int ChunkFind( demux_t *p_demux, const char *fcc, unsigned int *pi_size )
             {
                 *pi_size = i_size;
             }
+            if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 )
+                return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
 
@@ -309,8 +311,6 @@ static int Open( vlc_object_t * p_this )
             msg_Err( p_demux, "invalid 'ds64' chunk" );
             goto error;
         }
-        if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 )
-            goto error;
         if( vlc_stream_Peek( p_demux->s, &p_peek, 24 ) < 24 )
             goto error;
         i_data_size = GetQWLE( &p_peek[8] );
@@ -334,9 +334,6 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_demux, "invalid 'fmt ' chunk" );
         goto error;
     }
-    if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 )
-        goto error;
-
 
     /* load waveformatex */
     p_wf_ext = malloc( i_size );
@@ -574,8 +571,6 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 )
-        goto error;
     p_sys->i_data_pos = vlc_stream_Tell( p_demux->s );
 
     if( !b_is_rf64 || i_size < UINT32_MAX )
