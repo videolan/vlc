@@ -36,6 +36,8 @@
 
 #include "playlist.h"
 
+#include <ctype.h>
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -230,17 +232,16 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
         char *psz_parse = psz_line;
 
         /* Skip leading tabs and spaces */
-        while( *psz_parse == ' ' || *psz_parse == '\t' ||
-               *psz_parse == '\n' || *psz_parse == '\r' ) psz_parse++;
+        while( isspace( *psz_parse ) )
+            psz_parse++;
 
         if( *psz_parse == '#' )
         {
             /* Parse extra info */
 
             /* Skip leading tabs and spaces */
-            while( *psz_parse == ' ' || *psz_parse == '\t' ||
-                   *psz_parse == '\n' || *psz_parse == '\r' ||
-                   *psz_parse == '#' ) psz_parse++;
+            while( isspace( *psz_parse ) || *psz_parse == '#' )
+                psz_parse++;
 
             if( !*psz_parse ) goto error;
 
@@ -353,9 +354,9 @@ static void parseEXTINF(char *psz_string, char **ppsz_artist,
 
     end = psz_string + strlen( psz_string );
 
-    /* ignore whitespaces */
-    for (; psz_string < end && ( *psz_string == '\t' || *psz_string == ' ' );
-         psz_string++ );
+    /* strip leading whitespaces */
+    while( psz_string < end && isspace( *psz_string ) )
+        psz_string++;
 
     /* duration: read to next comma */
     psz_item = psz_string;
