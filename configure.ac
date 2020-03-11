@@ -193,11 +193,10 @@ case "${host_os}" in
       ;;
     esac
 
-    CFLAGS="${CFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu11"
+    AX_APPEND_FLAG([-D_INTL_REDIRECT_MACROS], [CPPFLAGS])
+    CFLAGS="${CFLAGS} -std=gnu11"
     CXX="${CXX} -stdlib=libc++ -std=c++11"
-    CXXFLAGS="${CXXFLAGS} -D_INTL_REDIRECT_MACROS"
-    CPPFLAGS="${CPPFLAGS}"
-    OBJCFLAGS="${OBJCFLAGS} -D_INTL_REDIRECT_MACROS -std=gnu11 -Werror=partial-availability"
+    OBJCFLAGS="${OBJCFLAGS} -std=gnu11 -Werror=partial-availability"
     LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names"
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,AppKit])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation,-framework,CoreServices])
