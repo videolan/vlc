@@ -256,6 +256,29 @@ static void Close ( vlc_object_t * p_this )
     free( p_sys );
 }
 
+static int ChunkParseDS64( demux_t *p_demux, uint32_t i_size )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    const uint8_t *p_peek;
+
+    if( i_size < 24 )
+    {
+        msg_Err( p_demux, "invalid 'ds64' chunk" );
+        return VLC_EGENERIC;
+    }
+
+    if( vlc_stream_Peek( p_demux->s, &p_peek, 24 ) < 24 )
+        return VLC_EGENERIC;
+
+    uint64_t i_data_size = GetQWLE( &p_peek[8] );
+    if( i_data_size >> 62 )
+        p_sys->i_data_size = INT64_C(1) << 62;
+    else
+        p_sys->i_data_size = i_data_size;
+
+    return ChunkSkip( p_demux, i_size );
+}
+
 static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -516,7 +539,6 @@ static int Open( vlc_object_t * p_this )
     const uint8_t *p_peek;
     bool           b_is_rf64;
     unsigned int   i_size;
-    uint64_t       i_data_size;
 
     /* Is it a wav file ? */
     if( vlc_stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
@@ -553,19 +575,7 @@ static int Open( vlc_object_t * p_this )
             msg_Err( p_demux, "cannot find 'ds64' chunk" );
             goto error;
         }
-        if( i_size < 24 )
-        {
-            msg_Err( p_demux, "invalid 'ds64' chunk" );
-            goto error;
-        }
-        if( vlc_stream_Peek( p_demux->s, &p_peek, 24 ) < 24 )
-            goto error;
-        i_data_size = GetQWLE( &p_peek[8] );
-        if( i_data_size >> 62 )
-            p_sys->i_data_size = (int64_t)1 << 62;
-        else
-            p_sys->i_data_size = i_data_size;
-        if( ChunkSkip( p_demux, i_size ) != VLC_SUCCESS )
+        if( ChunkParseDS64( p_demux, i_size ) != VLC_SUCCESS )
             goto error;
     }
 
