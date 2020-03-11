@@ -173,7 +173,7 @@ case "${host_os}" in
   darwin*)
     SYS=darwin
 
-    dnl Workaround possible Xcode 11 bug
+    dnl Work around an Xcode 11 bug, fixed in Xcode 11.3.1
     AX_APPEND_FLAG([-fno-stack-check], [CFLAGS])
     AX_APPEND_FLAG([-fno-stack-check], [CXXFLAGS])
     AX_APPEND_FLAG([-fno-stack-check], [OBJCFLAGS])
