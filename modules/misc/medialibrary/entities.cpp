@@ -40,6 +40,7 @@
 #include <medialibrary/IFolder.h>
 #include <medialibrary/filesystem/IDevice.h>
 #include <medialibrary/filesystem/Errors.h>
+#include <medialibrary/IBookmark.h>
 
 #include <algorithm>
 
@@ -413,6 +414,16 @@ bool Convert( const medialibrary::IFolder* input, vlc_ml_entry_point_t& output )
         output.b_present = false;
     }
     output.b_banned = input->isBanned();
+    return true;
+}
+
+bool Convert( const medialibrary::IBookmark* input, vlc_ml_bookmark_t& output )
+{
+    if ( strdup_helper( input->name(), output.psz_name ) == false ||
+         strdup_helper( input->description(), output.psz_description ) == false )
+        return false;
+    output.i_media_id = input->mediaId();
+    output.i_time = input->time();
     return true;
 }
 

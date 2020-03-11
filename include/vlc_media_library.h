@@ -305,6 +305,20 @@ typedef struct vlc_ml_entry_point_list_t
     vlc_ml_entry_point_t p_items[];
 } vlc_ml_entry_point_list_t;
 
+typedef struct vlc_ml_bookmark_t
+{
+    int64_t i_media_id; /**< The associated media ID */
+    int64_t i_time; /**< The bookmark time. The unit is arbitrary */
+    char* psz_name; /**< The bookmark name */
+    char* psz_description; /**< The bookmark description */
+} vlc_ml_bookmark_t;
+
+typedef struct vlc_ml_boomkmark_list_t
+{
+    size_t i_nb_items;
+    vlc_ml_bookmark_t p_items[];
+} vlc_ml_bookmark_list_t;
+
 /* Opaque medialibrary pointer, to be used by any non-medialibrary module */
 typedef struct vlc_medialibrary_t vlc_medialibrary_t;
 /* "Private" medialibrary pointer, to be used by the core & medialibrary modules */
@@ -404,6 +418,7 @@ enum vlc_ml_list_queries
     /* Media specific listings */
     VLC_ML_LIST_MEDIA_LABELS,     /**< arg1: media id;  arg2 (out): vlc_ml_label_list_t**    */
     VLC_ML_COUNT_MEDIA_LABELS,    /**< arg1: media id;  arg2 (out): size_t*              */
+    VLC_ML_LIST_MEDIA_BOOKMARKS,  /**< arg1: media id;  arg2 (out): vlc_ml_bookmark_list_t** */
 
     /* Playlist specific listings */
     VLC_ML_LIST_PLAYLIST_MEDIA,   /**< arg1: playlist id; arg2 (out): vlc_ml_media_list_t** */
@@ -465,6 +480,10 @@ enum vlc_ml_control
     VLC_ML_MEDIA_GENERATE_THUMBNAIL,        /**< arg1: media id; arg2: vlc_ml_thumbnail_size_t; arg3: width; arg4: height; arg5: position */
     VLC_ML_MEDIA_ADD_EXTERNAL_MRL,          /**< arg1: media id; arg2: const char*; arg3: type(vlc_ml_file_type_t) */
     VLC_ML_MEDIA_SET_TYPE,                  /**< arg1: media id; arg2: vlc_ml_media_type_t */
+    VLC_ML_MEDIA_ADD_BOOKMARK,              /**< arg1: media id; arg2: int64_t */
+    VLC_ML_MEDIA_REMOVE_BOOKMARK,           /**< arg1: media id; arg2: int64_t */
+    VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS,      /**< arg1: media id */
+    VLC_ML_MEDIA_UPDATE_BOOKMARK,           /**< arg1: media id; arg2: int64_t; arg3: const char*; arg4: const char* */
 };
 
 /**
@@ -541,6 +560,9 @@ enum vlc_ml_event_type
     VLC_ML_EVENT_GENRE_ADDED,
     VLC_ML_EVENT_GENRE_UPDATED,
     VLC_ML_EVENT_GENRE_DELETED,
+    VLC_ML_EVENT_BOOKMARKS_ADDED,
+    VLC_ML_EVENT_BOOKMARKS_UPDATED,
+    VLC_ML_EVENT_BOOKMARKS_DELETED,
     /**
      * A discovery started.
      * For each VLC_ML_EVENT_DISCOVERY_STARTED event, there will be
@@ -704,6 +726,7 @@ typedef struct vlc_ml_event_t
             const vlc_ml_album_t* p_album;
             const vlc_ml_playlist_t* p_playlist;
             const vlc_ml_genre_t* p_genre;
+            const vlc_ml_bookmark_t* p_bookmark;
         } creation;
         struct
         {
@@ -827,6 +850,8 @@ VLC_API void vlc_ml_genre_list_release( vlc_ml_genre_list_t* p_list );
 VLC_API void vlc_ml_playlist_list_release( vlc_ml_playlist_list_t* p_list );
 VLC_API void vlc_ml_entry_point_list_release( vlc_ml_entry_point_list_t* p_list );
 VLC_API void vlc_ml_playback_states_all_release( vlc_ml_playback_states_all* prefs );
+VLC_API void vlc_ml_bookmark_release( vlc_ml_bookmark_t* p_bookmark );
+VLC_API void vlc_ml_bookmark_list_release( vlc_ml_bookmark_list_t* p_list );
 
 static inline vlc_ml_query_params_t vlc_ml_query_params_create()
 {
@@ -962,6 +987,49 @@ static inline int vlc_ml_media_set_type( vlc_medialibrary_t* p_ml, int64_t i_med
                                          vlc_ml_media_type_t i_type )
 {
     return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_TYPE, i_media_id, (int)i_type );
+}
+
+static inline vlc_ml_bookmark_list_t*
+vlc_ml_list_media_bookmarks( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params,
+                             int64_t i_media_id )
+{
+    assert( p_ml != NULL );
+    vlc_ml_bookmark_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_MEDIA_BOOKMARKS, params, i_media_id,
+                      &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline int
+vlc_ml_media_add_bookmark( vlc_medialibrary_t* p_ml, int64_t i_media_id, int64_t i_time )
+{
+    assert( p_ml != NULL );
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_ADD_BOOKMARK, i_media_id, i_time );
+}
+
+static inline int
+vlc_ml_media_remove_bookmark( vlc_medialibrary_t* p_ml, int64_t i_media_id, int64_t i_time )
+{
+    assert( p_ml != NULL );
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_REMOVE_BOOKMARK, i_media_id, i_time );
+}
+
+static inline int
+vlc_ml_media_update_bookmark( vlc_medialibrary_t* p_ml, int64_t i_media_id,
+                              int64_t i_time, const char* psz_name,
+                              const char* psz_desc )
+{
+    assert( p_ml != NULL );
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_UPDATE_BOOKMARK, i_media_id,
+                           i_time, psz_name, psz_desc );
+}
+
+static inline int
+vlc_ml_media_remove_all_bookmarks( vlc_medialibrary_t* p_ml, int64_t i_media_id )
+{
+    assert( p_ml != NULL );
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS, i_media_id );
 }
 
 static inline vlc_ml_media_t* vlc_ml_get_media( vlc_medialibrary_t* p_ml, int64_t i_media_id )
@@ -1416,7 +1484,9 @@ static inline size_t vlc_ml_count_playlist_media( vlc_medialibrary_t* p_ml, cons
     vlc_ml_genre_list_t*: vlc_ml_genre_list_release, \
     vlc_ml_playlist_list_t*: vlc_ml_playlist_list_release, \
     vlc_ml_entry_point_list_t*: vlc_ml_entry_point_list_release, \
-    vlc_ml_playback_states_all*: vlc_ml_playback_states_all_release \
+    vlc_ml_playback_states_all*: vlc_ml_playback_states_all_release, \
+    vlc_ml_bookmark_t*: vlc_ml_bookmark_release, \
+    vlc_ml_bookmark_list_t*: vlc_ml_bookmark_list_release \
     )( OBJ )
 #else
 static inline void vlc_ml_release( vlc_ml_show_t* show ) { vlc_ml_show_release( show ); }
@@ -1435,6 +1505,8 @@ static inline void vlc_ml_release( vlc_ml_genre_list_t* list ) { vlc_ml_genre_li
 static inline void vlc_ml_release( vlc_ml_playlist_list_t* list ) { vlc_ml_playlist_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_entry_point_list_t* list ) { vlc_ml_entry_point_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_playback_states_all* prefs ) { vlc_ml_playback_states_all_release( prefs ); }
+static inline void vlc_ml_release( vlc_ml_bookmark_t* bookmark ) { vlc_ml_bookmark_release( bookmark ); }
+static inline void vlc_ml_release( vlc_ml_bookmark_list_t* list ) { vlc_ml_bookmark_list_release( list ); }
 #endif
 
 #endif /* VLC_MEDIA_LIBRARY_H */

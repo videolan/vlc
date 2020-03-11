@@ -348,6 +348,29 @@ void vlc_ml_playback_states_all_release( vlc_ml_playback_states_all* prefs )
     free( prefs->video_filter );
 }
 
+static void vlc_ml_bookmark_release_inner( vlc_ml_bookmark_t* bookmark )
+{
+    free( bookmark->psz_name );
+    free( bookmark->psz_description );
+}
+
+void vlc_ml_bookmark_release( vlc_ml_bookmark_t* bookmark )
+{
+    if ( bookmark == NULL )
+        return;
+    vlc_ml_bookmark_release_inner( bookmark );
+    free( bookmark );
+}
+
+void vlc_ml_bookmark_list_release( vlc_ml_bookmark_list_t* list )
+{
+    if ( list == NULL )
+        return;
+    for ( size_t i = 0; i < list->i_nb_items; ++i )
+        vlc_ml_bookmark_release_inner( &list->p_items[i] );
+    free( list );
+}
+
 void* vlc_ml_get( vlc_medialibrary_t* p_ml, int i_query, ... )
 {
     assert( p_ml != NULL );

@@ -575,6 +575,8 @@ vlc_ml_show_list_release
 vlc_ml_genre_list_release
 vlc_ml_playlist_list_release
 vlc_ml_entry_point_list_release
+vlc_ml_bookmark_release
+vlc_ml_bookmark_list_release
 vlc_poll_i11e
 vlc_read_i11e
 vlc_readv_i11e

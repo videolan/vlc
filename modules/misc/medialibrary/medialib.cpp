@@ -39,6 +39,7 @@
 #include <medialibrary/IMetadata.h>
 #include <medialibrary/IShow.h>
 #include <medialibrary/IPlaylist.h>
+#include <medialibrary/IBookmark.h>
 
 #include <sstream>
 #include <initializer_list>
@@ -82,6 +83,7 @@ void assignToEvent( vlc_ml_event_t* ev, vlc_ml_artist_t* a )   { ev->creation.p_
 void assignToEvent( vlc_ml_event_t* ev, vlc_ml_album_t* a )    { ev->creation.p_album    = a; }
 void assignToEvent( vlc_ml_event_t* ev, vlc_ml_genre_t* g )    { ev->creation.p_genre    = g; }
 void assignToEvent( vlc_ml_event_t* ev, vlc_ml_playlist_t* p ) { ev->creation.p_playlist = p; }
+void assignToEvent( vlc_ml_event_t* ev, vlc_ml_bookmark_t* b ) { ev->creation.p_bookmark = b; }
 
 template <typename To, typename From>
 void wrapEntityCreatedEventCallback( vlc_medialibrary_module_t* ml,
@@ -217,19 +219,22 @@ void MediaLibrary::onMediaGroupsDeleted( std::set<int64_t> )
 {
 }
 
-void MediaLibrary::onBookmarksAdded( std::vector<medialibrary::BookmarkPtr> )
+void MediaLibrary::onBookmarksAdded( std::vector<medialibrary::BookmarkPtr> bookmarks )
 {
-
+    wrapEntityCreatedEventCallback<vlc_ml_bookmark_t>( m_vlc_ml, bookmarks,
+                                                       VLC_ML_EVENT_BOOKMARKS_ADDED );
 }
 
-void MediaLibrary::onBookmarksModified( std::set<int64_t> )
+void MediaLibrary::onBookmarksModified( std::set<int64_t> bookmarkIds )
 {
-
+    wrapEntityModifiedEventCallback( m_vlc_ml, bookmarkIds,
+                                     VLC_ML_EVENT_BOOKMARKS_UPDATED );
 }
 
-void MediaLibrary::onBookmarksDeleted( std::set<int64_t> )
+void MediaLibrary::onBookmarksDeleted( std::set<int64_t> bookmarkIds )
 {
-
+    wrapEntityDeletedEventCallback( m_vlc_ml, bookmarkIds,
+                                    VLC_ML_EVENT_BOOKMARKS_DELETED );
 }
 
 void MediaLibrary::onDiscoveryStarted( const std::string& entryPoint )
@@ -594,6 +599,10 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
         case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:
         case VLC_ML_MEDIA_SET_TYPE:
+        case VLC_ML_MEDIA_ADD_BOOKMARK:
+        case VLC_ML_MEDIA_REMOVE_BOOKMARK:
+        case VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS:
+        case VLC_ML_MEDIA_UPDATE_BOOKMARK:
             return controlMedia( query, args );
         default:
             return VLC_EGENERIC;
@@ -795,6 +804,7 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
 
         case VLC_ML_LIST_MEDIA_LABELS:
         case VLC_ML_COUNT_MEDIA_LABELS:
+        case VLC_ML_LIST_MEDIA_BOOKMARKS:
             return listMedia( listQuery, paramsPtr, psz_pattern, nbItems, offset, args );
 
         case VLC_ML_LIST_SHOWS:
@@ -1232,6 +1242,43 @@ int MediaLibrary::controlMedia( int query, va_list args )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
+        case VLC_ML_MEDIA_ADD_BOOKMARK:
+        {
+            auto time = va_arg( args, int64_t );
+            if ( m->addBookmark( time ) == nullptr )
+                return VLC_EGENERIC;
+            return VLC_EGENERIC;
+        }
+        case VLC_ML_MEDIA_REMOVE_BOOKMARK:
+        {
+            auto time = va_arg( args, int64_t );
+            if ( m->removeBookmark( time ) == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_MEDIA_REMOVE_ALL_BOOKMARKS:
+        {
+            if ( m->removeAllBookmarks() == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_MEDIA_UPDATE_BOOKMARK:
+        {
+            auto time = va_arg( args, int64_t );
+            auto name = va_arg( args, const char* );
+            auto desc = va_arg( args, const char* );
+            auto bookmark = m->bookmark( time );
+            if ( bookmark == nullptr )
+                return VLC_EGENERIC;
+            auto res = false;
+            if ( name != nullptr && desc != nullptr )
+                res = bookmark->setNameAndDescription( name, desc );
+            else if ( name != nullptr )
+                res = bookmark->setName( name );
+            else if ( desc != nullptr )
+                res = bookmark->setDescription( desc );
+            return res ? VLC_SUCCESS : VLC_EGENERIC;
+        }
         default:
             vlc_assert_unreachable();
     }
@@ -1584,26 +1631,42 @@ int MediaLibrary::listPlaylist( int listQuery, const medialibrary::QueryParamete
     }
 }
 
-int MediaLibrary::listMedia( int listQuery, const medialibrary::QueryParameters *,
+int MediaLibrary::listMedia( int listQuery, const medialibrary::QueryParameters *params,
                              const char *, uint32_t nbItems, uint32_t offset,
                              va_list args )
 {
     auto media = m_ml->media( va_arg( args, int64_t ) );
     if ( media == nullptr )
         return VLC_EGENERIC;
-    auto query = media->labels();
-    if ( query == nullptr )
-        return VLC_EGENERIC;
     switch ( listQuery )
     {
         case VLC_ML_LIST_MEDIA_LABELS:
-            *va_arg( args, vlc_ml_label_list_t**) =
-                    ml_convert_list<vlc_ml_label_list_t, vlc_ml_label_t>(
-                        query->items( nbItems, offset ) );
-            return VLC_SUCCESS;
         case VLC_ML_COUNT_MEDIA_LABELS:
-            *va_arg( args, size_t* ) = query->count();
+        {
+            auto query = media->labels();
+            if ( query == nullptr )
+                return VLC_EGENERIC;
+            switch ( listQuery )
+            {
+                case VLC_ML_LIST_MEDIA_LABELS:
+                    *va_arg( args, vlc_ml_label_list_t**) =
+                            ml_convert_list<vlc_ml_label_list_t, vlc_ml_label_t>(
+                                query->items( nbItems, offset ) );
+                    return VLC_SUCCESS;
+                case VLC_ML_COUNT_MEDIA_LABELS:
+                    *va_arg( args, size_t* ) = query->count();
+                    return VLC_SUCCESS;
+                default:
+                    vlc_assert_unreachable();
+            }
+        }
+        case VLC_ML_LIST_MEDIA_BOOKMARKS:
+        {
+            *va_arg( args, vlc_ml_bookmark_list_t** ) =
+                    ml_convert_list<vlc_ml_bookmark_list_t, vlc_ml_bookmark_t>(
+                        media->bookmarks( params )->all() );
             return VLC_SUCCESS;
+        }
         default:
             vlc_assert_unreachable();
     }
