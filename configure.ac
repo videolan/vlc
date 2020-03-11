@@ -174,9 +174,9 @@ case "${host_os}" in
     SYS=darwin
 
     dnl Workaround possible Xcode 11 bug
-    CFLAGS="${CFLAGS} -fno-stack-check"
-    CXXFLAGS="${CXXFLAGS} -fno-stack-check"
-    OBJCFLAGS="${OBJCFLAGS} -fno-stack-check"
+    AX_APPEND_FLAG([-fno-stack-check], [CFLAGS])
+    AX_APPEND_FLAG([-fno-stack-check], [CXXFLAGS])
+    AX_APPEND_FLAG([-fno-stack-check], [OBJCFLAGS])
 
     case "${host_cpu}" in
       i?86)
@@ -195,8 +195,9 @@ case "${host_os}" in
 
     AX_APPEND_FLAG([-D_INTL_REDIRECT_MACROS], [CPPFLAGS])
     AX_APPEND_FLAG([-stdlib=libc++], [CXXFLAGS])
-    LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names"
-    OBJCFLAGS="${OBJCFLAGS} -Werror=partial-availability"
+    AX_APPEND_FLAG([-Werror=partial-availability], [OBJCFLAGS])
+    AX_APPEND_FLAG([-Wl,-headerpad_max_install_names], [LDFLAGS])
+
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,AppKit])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation,-framework,CoreServices])
 
