@@ -195,9 +195,8 @@ case "${host_os}" in
 
     AX_APPEND_FLAG([-D_INTL_REDIRECT_MACROS], [CPPFLAGS])
     AX_APPEND_FLAG([-stdlib=libc++], [CXXFLAGS])
-    CFLAGS="${CFLAGS} -std=gnu11"
-    OBJCFLAGS="${OBJCFLAGS} -std=gnu11 -Werror=partial-availability"
     LDFLAGS="${LDFLAGS} -Wl,-headerpad_max_install_names"
+    OBJCFLAGS="${OBJCFLAGS} -Werror=partial-availability"
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,AppKit])
     VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation,-framework,CoreServices])
 
