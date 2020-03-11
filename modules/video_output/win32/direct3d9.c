@@ -1377,7 +1377,7 @@ static const d3d9_format_t *FindBufferFormat(vout_display_t *vd, D3DFORMAT fmt)
 
 /**
  * It returns the format (closest to chroma) that can be converted to target */
-static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_format_t *fmt)
+static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_format_t *fmt, vlc_video_context *vctx)
 {
     vout_display_sys_t *sys = vd->sys;
     bool hardware_scale_ok = !(fmt->i_visible_width & 1) && !(fmt->i_visible_height & 1);
@@ -1387,9 +1387,15 @@ static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_f
     for (unsigned pass = 0; pass < 2; pass++) {
         const vlc_fourcc_t *list;
         const vlc_fourcc_t dxva_chroma[] = {fmt->i_chroma, 0};
+        D3DFORMAT decoder_format = D3DFMT_UNKNOWN;
 
         if (pass == 0 && is_d3d9_opaque(fmt->i_chroma))
+        {
+            d3d9_video_context_t *vctx_sys = GetD3D9ContextPrivate(vctx);
+            assert(vctx_sys != NULL);
             list = dxva_chroma;
+            decoder_format = vctx_sys->format;
+        }
         else if (pass == 0 && hardware_scale_ok && sys->allow_hw_yuv && vlc_fourcc_IsYUV(fmt->i_chroma))
             list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
         else if (pass == 1)
@@ -1403,14 +1409,12 @@ static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_f
 
                 if (format->fourcc != list[i])
                     continue;
+                if (decoder_format != D3DFMT_UNKNOWN && format->format != decoder_format)
+                    continue; // not the Hardware format we prefer
 
-                msg_Warn(vd, "trying surface pixel format: %s",
-                         format->name);
-                if (!Direct3D9CheckConversion(vd, format->format)) {
-                    msg_Dbg(vd, "selected surface pixel format is %s",
-                            format->name);
+                msg_Dbg(vd, "trying surface pixel format: %s", format->name);
+                if (!Direct3D9CheckConversion(vd, format->format))
                     return format;
-                }
             }
         }
     }
@@ -1595,7 +1599,7 @@ error:
 /**
  * It creates a Direct3D9 device and the associated resources.
  */
-static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
+static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_context *vctx)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -1608,15 +1612,16 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
     /* Find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
      * the requested chroma which is usable by the hardware in an offscreen surface, as they
      * typically support more formats than textures */
-    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, &vd->source);
+    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, &vd->source, vctx);
     if (!d3dfmt) {
         msg_Err(vd, "surface pixel format is not supported.");
         goto error;
     }
-    const d3d9_format_t *d3dbuffer = FindBufferFormat(vd, sys->BufferFormat);
-    if (!d3dbuffer)
+    msg_Dbg(vd, "selected input surface format %s", d3dfmt->name);
+    const d3d9_format_t *dst_format = FindBufferFormat(vd, sys->BufferFormat);
+    if (unlikely(!dst_format))
         msg_Warn(vd, "Unknown back buffer format 0x%X", sys->BufferFormat);
-    else if (vd->source.color_range != COLOR_RANGE_FULL && d3dbuffer->rmask && !d3dfmt->rmask &&
+    else if (vd->source.color_range != COLOR_RANGE_FULL && dst_format->rmask && !d3dfmt->rmask &&
              sys->d3d9_device->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA)
     {
         // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
@@ -1834,7 +1839,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* */
     video_format_t fmt;
-    if (Direct3D9Open(vd, &fmt)) {
+    if (Direct3D9Open(vd, &fmt, context)) {
         msg_Err(vd, "Direct3D9 could not be opened");
         goto error;
     }
