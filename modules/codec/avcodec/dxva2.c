@@ -178,6 +178,7 @@ static picture_context_t *dxva2_pic_context_copy(picture_context_t *ctx)
     if (unlikely(pic_ctx==NULL))
         return NULL;
     *pic_ctx = *src_ctx;
+    pic_ctx->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
     vlc_video_context_Hold(pic_ctx->ctx.s.vctx);
     va_surface_AddRef(pic_ctx->va_surface);
     AcquireD3D9PictureSys(&pic_ctx->ctx.picsys);
