@@ -276,8 +276,11 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                      sizeof( "EXTALBUMARTURL:" ) -1 ) )
             {
                 psz_parse += sizeof( "EXTALBUMARTURL:" ) - 1;
-                free( psz_album_art );
-                psz_album_art = pf_dup( psz_parse );
+                if( *psz_parse )
+                {
+                    free( psz_album_art );
+                    psz_album_art = pf_dup( psz_parse );
+                }
             }
         }
         else if( !strncasecmp( psz_parse, "RTSPtext", sizeof("RTSPtext") -1 ) )
@@ -313,8 +316,8 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 
             if( !EMPTY_STR(psz_artist) )
                 input_item_SetArtist( p_input, psz_artist );
-            if( psz_name ) input_item_SetTitle( p_input, psz_name );
-            if( !EMPTY_STR(psz_album_art) )
+            if( !EMPTY_STR(psz_name) ) input_item_SetTitle( p_input, psz_name );
+            if( psz_album_art )
                 input_item_SetArtURL( p_input, psz_album_art );
 
             input_item_node_AppendItem( p_subitems, p_input );
@@ -346,36 +349,11 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     return VLC_SUCCESS; /* Needed for correct operation of go back */
 }
 
-static void parseEXTINF(char *psz_string, char **ppsz_artist,
-                        char **ppsz_name, int *pi_duration)
+static void parseEXTINFTitle(char *psz_string,
+                             char **ppsz_artist,
+                             char **ppsz_name)
 {
-    char *end = NULL;
-    char *psz_item = NULL;
-
-    end = psz_string + strlen( psz_string );
-
-    /* strip leading whitespaces */
-    while( psz_string < end && isspace( *psz_string ) )
-        psz_string++;
-
-    /* duration: read to next comma */
-    psz_item = psz_string;
-    psz_string = strchr( psz_string, ',' );
-    if ( psz_string )
-    {
-        *psz_string = '\0';
-        *pi_duration = atoi( psz_item );
-    }
-    else
-    {
-        return;
-    }
-
-    if ( psz_string < end )               /* continue parsing if possible */
-        psz_string++;
-
-    /* analyse the remaining string */
-    psz_item = strstr( psz_string, " - " );
+    char *psz_item = strstr( psz_string, " - " );
 
     /* here we have the 0.8.2+ format with artist */
     if ( psz_item )
@@ -410,6 +388,27 @@ static void parseEXTINF(char *psz_string, char **ppsz_artist,
         /* *** "EXTINF:time,name" */
         *ppsz_name = psz_item;
     }
-    return;
+}
+
+static void parseEXTINF( char *psz_string, char **ppsz_artist,
+                         char **ppsz_name, int *pi_duration )
+{
+    char *end = psz_string + strlen( psz_string );
+
+    /* strip leading whitespaces */
+    while( psz_string < end && isspace( *psz_string ) )
+        psz_string++;
+
+    /* duration: read to next comma */
+    char *psz_comma = strchr( psz_string, ',' );
+    if( psz_comma )
+    {
+        *psz_comma = '\0'; /* Split strings */
+        if( ++psz_comma < end )
+            parseEXTINFTitle( psz_comma, ppsz_artist, ppsz_name );
+    }
+
+    /* Parse duration */
+    *pi_duration = strtol( psz_string, NULL, 10 );
 }
 
