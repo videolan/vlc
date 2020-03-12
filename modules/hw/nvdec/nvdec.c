@@ -549,7 +549,9 @@ static int CuvidPushBlock(decoder_t *p_dec, block_t *p_block)
     cupacket.payload = p_block->p_buffer;
     cupacket.timestamp = p_block->i_pts == VLC_TICK_INVALID ? p_block->i_dts : p_block->i_pts;
 
-    return CALL_CUVID(cuvidParseVideoData, p_sys->cuparser, &cupacket);
+    int ret = CALL_CUVID(cuvidParseVideoData, p_sys->cuparser, &cupacket);
+    block_Release(p_block);
+    return ret;
 }
 
 static block_t * HXXXProcessBlock(decoder_t *p_dec, block_t *p_block)
@@ -612,8 +614,12 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 {
     nvdec_ctx_t *p_sys = p_dec->p_sys;
     // If HandleVideoSequence fails, we give up decoding
-    if (!p_sys->b_nvparser_success)
+    if (!p_sys->b_nvparser_success) {
+        if (p_block != NULL) {
+            block_Release(p_block);
+        }
         return VLCDEC_ECRITICAL;
+    }
     if (p_block == NULL) {
         // Flush stream
         return CuvidPushEOS(p_dec);
