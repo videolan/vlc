@@ -91,6 +91,8 @@ static int Demux( demux_t *p_demux )
     block_t     *p_block;
     const int64_t i_pos = vlc_stream_Tell( p_demux->s );
     unsigned int i_read_size = p_sys->i_frame_size;
+    uint32_t i_read_samples = p_sys->i_frame_samples;
+
 
     if( p_sys->i_data_size > 0 )
     {
@@ -100,7 +102,11 @@ static int Demux( demux_t *p_demux )
 
         /* Don't read past data chunk boundary */
         if ( i_end < i_pos + i_read_size )
+        {
             i_read_size = i_end - i_pos;
+            i_read_samples = ( p_sys->i_frame_size - i_read_size )
+                           * p_sys->i_frame_samples / p_sys->i_frame_size;
+        }
     }
 
     if( ( p_block = vlc_stream_Block( p_demux->s, i_read_size ) ) == NULL )
@@ -123,7 +129,7 @@ static int Demux( demux_t *p_demux )
 
     es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
-    date_Increment( &p_sys->pts, p_sys->i_frame_samples );
+    date_Increment( &p_sys->pts, i_read_samples );
 
     return VLC_DEMUXER_SUCCESS;
 }
