@@ -1396,6 +1396,7 @@ static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_f
             assert(vctx_sys != NULL);
             list = dxva_chroma;
             decoder_format = vctx_sys->format;
+            msg_Dbg(vd, "favor decoder format: %4.4s (%d)", (const char*)&decoder_format, decoder_format);
         }
         else if (pass == 0 && hardware_scale_ok && sys->allow_hw_yuv && vlc_fourcc_IsYUV(fmt->i_chroma))
             list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
