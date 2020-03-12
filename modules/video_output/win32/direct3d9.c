@@ -366,6 +366,15 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         inputStream.Enable = TRUE;
         inputStream.pInputSurface = source;
         hr = IDXVAHD_VideoProcessor_VideoProcessBltHD( sys->processor.proc, destination, 0, 1, &inputStream );
+        if (FAILED(hr)) {
+            D3DSURFACE_DESC srcDesc, dstDesc;
+            IDirect3DSurface9_GetDesc(source, &srcDesc);
+            IDirect3DSurface9_GetDesc(destination, &dstDesc);
+
+            msg_Dbg(vd, "Failed VideoProcessBltHD src:%4.4s (%d) dst:%4.4s (%d) (hr=0x%lX)",
+                    (const char*)&srcDesc.Format, srcDesc.Format,
+                    (const char*)&dstDesc.Format, dstDesc.Format, hr);
+        }
     }
     else
     {
@@ -400,13 +409,14 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         hr = IDirect3DDevice9_StretchRect(sys->d3d9_device->d3ddev.dev, source, &source_visible_rect,
                                         destination, &texture_visible_rect,
                                         D3DTEXF_NONE);
+        if (FAILED(hr)) {
+            msg_Dbg(vd, "Failed StretchRect: source 0x%p. (hr=0x%lX)",
+                    (LPVOID)source, hr);
+        }
     }
     IDirect3DSurface9_Release(destination);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed StretchRect: source 0x%p 0x%lX",
-                (LPVOID)source, hr);
+    if (FAILED(hr))
         return VLC_EGENERIC;
-    }
 
     /* */
     region->texture = sys->sceneTexture;
@@ -1480,8 +1490,11 @@ static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt,
     HRESULT hr;
 
     sys->processor.dll = LoadLibrary(TEXT("DXVA2.DLL"));
-    if (!sys->processor.dll)
+    if (unlikely(!sys->processor.dll))
+    {
+        msg_Err(vd, "Failed to load DXVA2.DLL");
         return VLC_EGENERIC;
+    }
 
     D3DFORMAT *formatsList = NULL;
     DXVAHD_VPCAPS *capsList = NULL;
@@ -1526,7 +1539,10 @@ static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt,
 
     formatsList = malloc(devcaps.InputFormatCount * sizeof(*formatsList));
     if (unlikely(formatsList == NULL))
+    {
+        msg_Dbg(vd, "Failed to allocate %u input formats", devcaps.InputFormatCount);
         goto error;
+    }
 
     hr = IDXVAHD_Device_GetVideoProcessorInputFormats( hd_device, devcaps.InputFormatCount, formatsList);
     UINT i;
@@ -1544,7 +1560,10 @@ static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt,
     free(formatsList);
     formatsList = malloc(devcaps.OutputFormatCount * sizeof(*formatsList));
     if (unlikely(formatsList == NULL))
+    {
+        msg_Dbg(vd, "Failed to allocate %u output formats", devcaps.OutputFormatCount);
         goto error;
+    }
 
     hr = IDXVAHD_Device_GetVideoProcessorOutputFormats( hd_device, devcaps.OutputFormatCount, formatsList);
     for (i=0; i<devcaps.OutputFormatCount; i++)
@@ -1560,7 +1579,10 @@ static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt,
 
     capsList = malloc(devcaps.VideoProcessorCount * sizeof(*capsList));
     if (unlikely(capsList == NULL))
+    {
+        msg_Dbg(vd, "Failed to allocate %u video processors", devcaps.VideoProcessorCount);
         goto error;
+    }
     hr = IDXVAHD_Device_GetVideoProcessorCaps( hd_device, devcaps.VideoProcessorCount, capsList);
     if (FAILED(hr))
     {
@@ -1625,6 +1647,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
              sys->d3d9_device->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA)
     {
         // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
+        msg_Dbg(vd, "Try to init DXVA-HD processor from %s to %s", d3dfmt->name, dst_format->name);
         InitRangeProcessor( vd, d3dfmt, &render_out );
     }
 
