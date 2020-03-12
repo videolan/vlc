@@ -135,7 +135,7 @@ static int ChunkSkip( demux_t *p_demux, uint32_t i_size )
     return i_ret < 0 || (size_t) i_ret != i_size ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
-static int ChunkFind( demux_t *p_demux, const char *fcc, unsigned int *pi_size )
+static int ChunkFind( demux_t *p_demux, const char *fcc, uint32_t *pi_size )
 {
     const uint8_t *p_peek;
 
@@ -534,7 +534,7 @@ static int Open( vlc_object_t * p_this )
 
     const uint8_t *p_peek;
     bool           b_is_rf64;
-    unsigned int   i_size;
+    uint32_t       i_size;
 
     /* Is it a wav file ? */
     if( vlc_stream_Peek( p_demux->s, &p_peek, 12 ) < 12 )
