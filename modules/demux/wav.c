@@ -48,7 +48,7 @@ typedef struct
     es_out_id_t     *p_es;
 
     uint64_t        i_data_pos;
-    int64_t         i_data_size;
+    uint64_t        i_data_size;
 
     unsigned int    i_frame_size;
     int             i_frame_samples;
@@ -270,11 +270,7 @@ static int ChunkParseDS64( demux_t *p_demux, uint32_t i_size )
     if( vlc_stream_Peek( p_demux->s, &p_peek, 24 ) < 24 )
         return VLC_EGENERIC;
 
-    uint64_t i_data_size = GetQWLE( &p_peek[8] );
-    if( i_data_size >> 62 )
-        p_sys->i_data_size = INT64_C(1) << 62;
-    else
-        p_sys->i_data_size = i_data_size;
+    p_sys->i_data_size = GetQWLE( &p_peek[8] );
 
     return ChunkSkip( p_demux, i_size );
 }
