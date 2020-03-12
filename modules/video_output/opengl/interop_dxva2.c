@@ -66,6 +66,8 @@ vlc_module_begin ()
     set_description("DXVA2 surface converter")
     set_capability("glinterop", 1)
     set_callbacks(GLConvOpen, GLConvClose)
+
+    add_bool("direct3d9-dxvahd", true, DXVAHD_TEXT, DXVAHD_LONGTEXT, true)
 vlc_module_end ()
 
 struct wgl_vt {
@@ -453,15 +455,15 @@ GLConvOpen(vlc_object_t *obj)
     priv->vt = vt;
 
     HRESULT hr;
-    bool force_dxva_hd = false;
-    if ( interop->fmt.color_range != COLOR_RANGE_FULL &&
-         d3d9_decoder->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA )
+    bool force_dxva_hd = var_InheritBool(interop, "direct3d9-dxvahd");
+    if (force_dxva_hd || (interop->fmt.color_range != COLOR_RANGE_FULL &&
+                          d3d9_decoder->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA))
     {
         // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
         msg_Dbg(interop->gl, "init DXVA-HD processor from %4.4s to RGB", (const char*)&vctx_sys->format);
         int err = InitRangeProcessor(interop, d3d9_decoder->d3ddev.devex, vctx_sys->format);
-        if (err == VLC_SUCCESS)
-            force_dxva_hd = true;
+        if (err != VLC_SUCCESS)
+            force_dxva_hd = false;
     }
     if (!force_dxva_hd)
     {

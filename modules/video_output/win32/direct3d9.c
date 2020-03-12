@@ -106,6 +106,8 @@ vlc_module_begin ()
     add_loadfile("direct3d9-shader-file", NULL,
                  PIXEL_SHADER_FILE_TEXT, PIXEL_SHADER_FILE_LONGTEXT)
 
+    add_bool("direct3d9-dxvahd", true, DXVAHD_TEXT, DXVAHD_LONGTEXT, true)
+
     add_shortcut("direct3d9", "direct3d")
     set_callback_display(Open, 280)
 vlc_module_end ()
@@ -1625,20 +1627,9 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
         msg_Err(vd, "unsupported source pixel format %4.4s", &vd->source.i_chroma);
         goto error;
     }
-    msg_Dbg(vd, "found input surface format %s", d3dfmt->name);
+    msg_Dbg(vd, "found input surface format %s for source %4.4s", d3dfmt->name, (const char *)&vd->source.i_chroma);
 
-    bool force_dxva_hd = false;
-    // test whether device can perform color-conversion from that format to target format
-    HRESULT hr = IDirect3D9_CheckDeviceFormatConversion(sys->d3d9_device->hd3d.obj,
-                                                sys->d3d9_device->d3ddev.adapterId,
-                                                D3DDEVTYPE_HAL,
-                                                d3dfmt->format, sys->BufferFormat);
-    if (FAILED(hr))
-    {
-        msg_Dbg(vd, "Unsupported conversion trying with DXVA-HD");
-        force_dxva_hd = true;
-    }
-
+    bool force_dxva_hd = var_InheritBool(vd, "direct3d9-dxvahd");
     if (force_dxva_hd || (dst_format && vd->source.color_range != COLOR_RANGE_FULL && dst_format->rmask && !d3dfmt->rmask &&
                           sys->d3d9_device->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA))
     {
@@ -1646,7 +1637,21 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
         msg_Dbg(vd, "init DXVA-HD processor from %s to %s", d3dfmt->name, dst_format?dst_format->name:"unknown");
         int err = InitRangeProcessor( vd, d3dfmt, &render_out );
         if (err != VLC_SUCCESS)
+            force_dxva_hd = false;
+    }
+    if (!force_dxva_hd)
+    {
+        // test whether device can perform color-conversion from that format to target format
+        HRESULT hr = IDirect3D9_CheckDeviceFormatConversion(sys->d3d9_device->hd3d.obj,
+                                                    sys->d3d9_device->d3ddev.adapterId,
+                                                    D3DDEVTYPE_HAL,
+                                                    d3dfmt->format, sys->BufferFormat);
+        if (FAILED(hr))
+        {
+            msg_Dbg(vd, "Unsupported conversion from %s to %s", d3dfmt->name, dst_format?dst_format->name:"unknown" );
             goto error;
+        }
+        msg_Dbg(vd, "using StrecthRect from %s to %s", d3dfmt->name, dst_format?dst_format->name:"unknown" );
     }
 
     /* */
