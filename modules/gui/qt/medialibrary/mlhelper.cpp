@@ -16,61 +16,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef MLHELPER_HPP
-#define MLHELPER_HPP
+#include "mlhelper.hpp"
 
-#include <memory>
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include "vlc_media_library.h"
-#include <QString>
-
-template<typename T>
-class MLDeleter
+QString MsToString( int64_t time , bool doShort )
 {
-public:
-    void operator() (T* obj) {
-        vlc_ml_release(obj);
-    }
-};
+    if (time < 0)
+        return "--:--";
 
-template<typename T>
-using ml_unique_ptr = std::unique_ptr<T, MLDeleter<T> >;
+    int t_sec = time / 1000;
+    int sec = t_sec % 60;
+    int min = (t_sec / 60) % 60;
+    int hour = t_sec / 3600;
+    if (hour == 0)
+        return QString("%1:%2")
+                .arg(min, 2, 10, QChar('0'))
+                .arg(sec, 2, 10, QChar('0'));
+    else if ( doShort )
+        return QString("%1h%2")
+                .arg(hour)
+                .arg(min, 2, 10, QChar('0'));
+    else
+        return QString("%1:%2:%3")
+                .arg(hour, 2, 10, QChar('0'))
+                .arg(min, 2, 10, QChar('0'))
+                .arg(sec, 2, 10, QChar('0'));
 
-template<typename T>
-class MLListRange
-{
-public:
-    MLListRange( T* begin, T* end )
-        : m_begin(begin)
-        , m_end(end)
-    {
-    }
-
-    T* begin() const
-    {
-        return m_begin;
-    }
-
-    T* end() const
-    {
-        return m_end;
-    }
-
-private:
-    T* m_begin;
-    T* m_end;
-};
-
-template<typename T, typename L>
-MLListRange<T> ml_range_iterate(L& list)
-{
-    return MLListRange<T>{ list->p_items, list->p_items + list->i_nb_items };
 }
-
-QString MsToString( int64_t time, bool doShort = false );
-
-#endif // MLHELPER_HPP

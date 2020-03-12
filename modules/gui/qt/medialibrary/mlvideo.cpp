@@ -22,34 +22,6 @@
 
 #include <vlc_thumbnailer.h>
 
-namespace
-{
-QString MsToString( int64_t time , bool doShort = false )
-{
-    if (time < 0)
-        return "--:--";
-
-    int t_sec = time / 1000;
-    int sec = t_sec % 60;
-    int min = (t_sec / 60) % 60;
-    int hour = t_sec / 3600;
-    if (hour == 0)
-        return QString("%1:%2")
-                .arg(min, 2, 10, QChar('0'))
-                .arg(sec, 2, 10, QChar('0'));
-    else if ( doShort )
-        return QString("%1h%2")
-                .arg(hour)
-                .arg(min, 2, 10, QChar('0'));
-    else
-        return QString("%1:%2:%3")
-                .arg(hour, 2, 10, QChar('0'))
-                .arg(min, 2, 10, QChar('0'))
-                .arg(sec, 2, 10, QChar('0'));
-
-}
-}
-
 MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* parent)
     : QObject( parent )
     , m_ml( ml )
