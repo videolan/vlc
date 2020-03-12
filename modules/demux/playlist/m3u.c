@@ -36,8 +36,6 @@
 
 #include "playlist.h"
 
-#include <ctype.h>
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -290,16 +288,17 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
         char *psz_parse = psz_line;
 
         /* Skip leading tabs and spaces */
-        while( isspace( *psz_parse ) )
-            psz_parse++;
+        while( *psz_parse == ' ' || *psz_parse == '\t' ||
+               *psz_parse == '\n' || *psz_parse == '\r' ) psz_parse++;
 
         if( *psz_parse == '#' )
         {
             /* Parse extra info */
 
             /* Skip leading tabs and spaces */
-            while( isspace( *psz_parse ) || *psz_parse == '#' )
-                psz_parse++;
+            while( *psz_parse == ' ' || *psz_parse == '\t' ||
+                   *psz_parse == '\n' || *psz_parse == '\r' ||
+                   *psz_parse == '#' ) psz_parse++;
 
             if( !*psz_parse ) goto nextline;
 
@@ -464,7 +463,7 @@ static void parseEXTINFIptvDiotsInDuration( char *psz_string,
 {
     for( ;; )
     {
-        while( isspace( *psz_string ) )
+        while( *psz_string == '\t' || *psz_string == ' ' )
             psz_string++;
 
         char *psz_start = psz_string;
@@ -520,7 +519,7 @@ static void parseEXTINF( char *psz_string,
     FREENULL( meta->psz_artist );
 
     /* strip leading whitespaces */
-    while( psz_string < end && isspace( *psz_string ) )
+    while( psz_string < end && ( *psz_string == '\t' || *psz_string == ' ' ) )
         psz_string++;
 
     /* duration: read to next comma */
@@ -538,7 +537,7 @@ static void parseEXTINF( char *psz_string,
     if( i_parsed_duration > 0 )
         meta->i_duration = vlc_tick_from_sec( i_parsed_duration );
 
-    if( psz_end && psz_end != psz_string && isspace(*psz_end) )
+    if( psz_end && psz_end != psz_string && ( *psz_end == '\t' || *psz_end == ' ' ) )
     {
         parseEXTINFIptvDiotsInDuration( psz_end, pf_dup, meta );
     }
