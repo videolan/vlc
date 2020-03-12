@@ -172,7 +172,12 @@ static vlc_plugin_t *module_InitStatic(vlc_plugin_cb entry)
     return lib;
 }
 
-#if defined(__ELF__) || !HAVE_DYNAMIC_PLUGINS
+/* With weak linking in __ELF__, there is no need to provide a definition
+ * of vlc_static_modules at build time and it will be evaluated to NULL if
+ * not provided at runtime. However, although __MACH__ implies the same runtime
+ * consequences for weak linking, it will still require the definition to exist
+ * at build time. To workaround this, we add -Wl,-U,vlc_static_modules. */
+#if defined(__ELF__) || defined(__MACH__) || !HAVE_DYNAMIC_PLUGINS
 VLC_WEAK
 extern vlc_plugin_cb vlc_static_modules[];
 
