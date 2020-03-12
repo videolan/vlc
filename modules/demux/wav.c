@@ -142,10 +142,33 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     if( p_sys->i_data_size > 0 )
         i_end = p_sys->i_data_pos + p_sys->i_data_size;
 
-    return demux_vaControlHelper( p_demux->s, p_sys->i_data_pos, i_end,
-                                   p_sys->fmt.i_bitrate,
-                                   p_sys->fmt.audio.i_blockalign,
-                                   i_query, args );
+    int ret = demux_vaControlHelper( p_demux->s, p_sys->i_data_pos, i_end,
+                                     p_sys->fmt.i_bitrate,
+                                     p_sys->fmt.audio.i_blockalign,
+                                     i_query, args );
+    if( ret != VLC_SUCCESS )
+        return ret;
+
+    /* Update the date to the new seek point */
+    switch( i_query )
+    {
+        case DEMUX_SET_POSITION:
+        case DEMUX_SET_TIME:
+        {
+            uint64_t ofs = vlc_stream_Tell( p_demux->s );
+            if( unlikely( ofs < p_sys->i_data_pos ) )
+                return VLC_SUCCESS;
+
+            ofs -= p_sys->i_data_pos;
+            vlc_tick_t pts =
+                vlc_tick_from_samples( ofs * 8, p_sys->fmt.i_bitrate );
+            date_Set( &p_sys->pts, pts );
+            break;
+        }
+        default:
+            break;
+    }
+    return VLC_SUCCESS;
 }
 
 static int ChunkSkip( demux_t *p_demux, uint32_t i_size )
