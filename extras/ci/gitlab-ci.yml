@@ -17,8 +17,13 @@ variables:
     VLC_WIN_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-mingw:20190621125349
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20191023134128
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20190717134531
+    VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-bionic:20190627090437
 
 .variables-debian: &variables-debian
+        HOST_ARCH: x86_64
+        TRIPLET: $HOST_ARCH-linux-gnu
+
+.variables-snap: &variables-snap
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-linux-gnu
 
@@ -147,6 +152,21 @@ debian:
         # Run tests
         VLC_TEST_TIMEOUT=60 sh -x ./test/make_check_wrapper.sh -j4
     variables: *variables-debian
+
+#
+# Snap builds
+#
+snap:
+    extends: .docker-template
+    image:
+        name: $VLC_SNAP_IMAGE
+    script: |
+            cd extras/package/snap
+            make -f package.mak snap
+    after_script:
+        - export VLC_CONTRIB_SHA="$(extras/ci/get-contrib-sha.sh)"
+        - mv extras/package/snap/parts/vlc/build/contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 2>/dev/null || true
+    variables: *variables-snap
 
 #
 # macOS
