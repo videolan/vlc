@@ -204,6 +204,7 @@ bool IsRGBShader(const d3d_format_t *cfg)
            cfg->resourceFormat[0] != DXGI_FORMAT_R16_UNORM &&
            cfg->formatTexture != DXGI_FORMAT_YUY2 &&
            cfg->formatTexture != DXGI_FORMAT_AYUV &&
+           cfg->formatTexture != DXGI_FORMAT_Y210 &&
            cfg->formatTexture != DXGI_FORMAT_420_OPAQUE;
 }
 
@@ -373,6 +374,13 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shaders_t *shade
             psz_sampler[0] =
                     "sample.x  = shaderTexture[0].Sample(samplerState, coords).x;\n"
                     "sample.y  = shaderTexture[0].Sample(samplerState, coords).y;\n"
+                    "sample.z  = shaderTexture[0].Sample(samplerState, coords).a;\n"
+                    "sample.a  = 1;";
+            break;
+        case DXGI_FORMAT_Y210:
+            psz_sampler[0] =
+                    "sample.x  = shaderTexture[0].Sample(samplerState, coords).r;\n"
+                    "sample.y  = shaderTexture[0].Sample(samplerState, coords).g;\n"
                     "sample.z  = shaderTexture[0].Sample(samplerState, coords).a;\n"
                     "sample.a  = 1;";
             break;
@@ -734,6 +742,7 @@ void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
     static const FLOAT blackRGBA[4] = {0.0f, 0.0f, 0.0f, 1.0f};
     static const FLOAT blackYUY2[4] = {0.0f, 0.5f, 0.0f, 0.5f};
     static const FLOAT blackVUYA[4] = {0.5f, 0.5f, 0.0f, 1.0f};
+    static const FLOAT blackY210[4] = {0.0f, 0.5f, 0.5f, 0.0f};
 
     static_assert(D3D11_MAX_RENDER_TARGET >= 2, "we need at least 2 RenderTargetView for NV12/P010");
 
@@ -753,6 +762,9 @@ void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
         break;
     case DXGI_FORMAT_YUY2:
         ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackYUY2);
+        break;
+    case DXGI_FORMAT_Y210:
+        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackY210);
         break;
     case DXGI_FORMAT_AYUV:
         ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackVUYA);
