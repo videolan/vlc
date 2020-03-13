@@ -6,14 +6,14 @@
 # Denis ARNAUD <denisarnuad@hotmail.com>, 2012,2015
 # ernest olory <ernestolory@hotmail.fr>, 2016
 # Gwenn M <tornoz@laposte.net>, 2016-2019
-# Irriep Nala Novram <allannkorh@yahoo.fr>, 2016-2019
+# Irriep Nala Novram <allannkorh@yahoo.fr>, 2016-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2019-05-23 14:39+0200\n"
-"PO-Revision-Date: 2019-03-10 12:00+0100\n"
-"Last-Translator: Gwenn M <tornoz@laposte.net>, 2019\n"
+"PO-Revision-Date: 2020-03-13 09:47+0100\n"
+"Last-Translator: Irriep Nala Novram <allannkorh@yahoo.fr>, 2020\n"
 "Language-Team: Breton (https://www.transifex.com/yaron/teams/16553/br/)\n"
 "Language: br\n"
 "MIME-Version: 1.0\n"
@@ -32,12 +32,12 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"Dont a ra ar programm-mañ gant GWARANT EBET, en astennad aotreet dre "
+"Ne zeu ar programm-mañ gant tamm GWARANT EBET, en astennad aotreet gant al "
 "lezenn.\n"
-"Marteze e c’hallot disrannañ se en-dro dindan termenoù Aotre Publik Dre vras "
-"ar GNU;\n"
-"gwelet ar restr anvet OC’H EILAÑ EMAÑ evit munudoù.\n"
-"Skrivet gant skipailh VideoLAN; gwelet restr an OBEROURIEN.\n"
+"Gellout a rafec'h e zisrannañ marteze en-dro dindan Lisañs Publik Hollek ar "
+"GNU;\n"
+"gwelet ar restr anvet EILAÑ evit munudoù.\n"
+"Skrivet gant skipailh VideoLAN; gwelet restr an AOZERIEN.\n"
 "\n"
 
 #: include/vlc_config_cat.h:33
@@ -628,13 +628,13 @@ msgstr ""
 "\"http://www.videolan.org/support/faq.html\">FAG</a> mar plij.</p><p>Gellout "
 "a refet kaout (ha reiñ give) sikour war ar <a href=\"http://forum.videolan."
 "org\">Foromoù</a>, al<a href=\"http://www.videolan.org/vlc/lists.html"
-"\">rolloù-posteloù</a> pe hor chadenn irc (<em>#videolan</em> war irc."
-"freenode.net).</p><h3>Kemerit-perzh e-barzh ar raktres</h3><p>Gellout a rit "
-"reiñ an dorn d'ar raktres VideoLAN en ur reiñ amzer evit reiñ sikour d'ar "
-"gumuniezh, evit tresañ temoù, en ur reiñ an dorn evit treiñ an teuliadur "
-"skoazell, evit testiñ ha kodiñ. Gellout a rit reiñ roadennoù-arc'hant deomp "
-"pe madoù evit reiñ an dorn deomp. Hag evel-just e c'hallit <b>arwerzhiñ</b> "
-"VLC media player.</p></body></html>"
+"\">listennadoù-postel skignañ</a> pe hor chadenn irc (<em>#videolan</em> war "
+"irc.freenode.net).</p><h3>Kemerit-perzh e-barzh ar raktres</h3><p>Gellout a "
+"rit reiñ an dorn d'ar raktres VideoLAN en ur reiñ amzer evit reiñ sikour "
+"d'ar gumuniezh, evit tresañ temoù, en ur reiñ an dorn evit treiñ an "
+"teuliadur skoazell, evit testiñ ha kodiñ. Gellout a rit reiñ roadennoù-"
+"arc'hant deomp pe madoù evit reiñ an dorn deomp. Hag evel-just e c'hallit "
+"<b>arwerzhiñ</b> VLC media player.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -2580,7 +2580,7 @@ msgstr ""
 
 #: src/libvlc-module.c:598
 msgid "Menu language"
-msgstr ""
+msgstr "Yezh al lañserioù"
 
 #: src/libvlc-module.c:600
 msgid ""
@@ -2610,7 +2610,7 @@ msgstr "Digoder istitloù muiañ karet"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
-msgstr ""
+msgstr "Spisder video karetañ"
 
 #: src/libvlc-module.c:618
 msgid ""
@@ -2619,6 +2619,10 @@ msgid ""
 "option if you don't have enough CPU power or network bandwidth to play "
 "higher resolutions."
 msgstr ""
+"Pa vez hegerz meur a furmad video, diuzit 'ta an hini a zo tostoc'h e "
+"spisder ouzh (ha n'eo ket uheloc'h eget) an arventenn-mañ, e niver a "
+"linennoù. Implijit an opsion-mañ ma n'ho po ket trawalc'h a c'halloud CPU pe "
+"a vandenn dremen kenrouedad evit gellout lenn spisderioù uheloc'h."
 
 #: src/libvlc-module.c:624
 msgid "Best available"
@@ -5167,7 +5171,7 @@ msgstr "Euskareg"
 
 #: src/text/iso-639_def.h:53
 msgid "Belarusian"
-msgstr ""
+msgstr "Bieloruseg"
 
 #: src/text/iso-639_def.h:54
 msgid "Bengali"
@@ -5179,7 +5183,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:56
 msgid "Bislama"
-msgstr ""
+msgstr "Bislama"
 
 #: src/text/iso-639_def.h:57
 msgid "Bosnian"
@@ -5307,7 +5311,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:88
 msgid "Guarani"
-msgstr ""
+msgstr "Guarani"
 
 #: src/text/iso-639_def.h:89
 msgid "Gujarati"
@@ -5623,7 +5627,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:168
 msgid "Shona"
-msgstr ""
+msgstr "Shona"
 
 #: src/text/iso-639_def.h:169
 msgid "Sindhi"
@@ -5743,7 +5747,7 @@ msgstr "Vietnameg"
 
 #: src/text/iso-639_def.h:198
 msgid "Volapuk"
-msgstr ""
+msgstr "Volapuk"
 
 #: src/text/iso-639_def.h:199
 msgid "Welsh"
@@ -6184,7 +6188,7 @@ msgstr ""
 
 #: modules/access/decklink.cpp:102
 msgid "DeckLink"
-msgstr ""
+msgstr "DeckLink"
 
 #: modules/access/decklink.cpp:103
 msgid "Blackmagic DeckLink SDI input"
@@ -6952,11 +6956,11 @@ msgstr ""
 
 #: modules/access/dvdnav.c:71 modules/access/dvdread.c:70
 msgid "Default DVD angle."
-msgstr ""
+msgstr "Korn DVD dre-ziouer."
 
 #: modules/access/dvdnav.c:73
 msgid "Start directly in menu"
-msgstr ""
+msgstr "Kregiñ d'al lañser nemetken"
 
 #: modules/access/dvdnav.c:75
 msgid ""
@@ -7410,7 +7414,7 @@ msgstr ""
 #: modules/access/linsys/linsys_hdsdi.c:81
 #: modules/access/linsys/linsys_sdi.c:77
 msgid "Audio configuration"
-msgstr ""
+msgstr "Kefluniadur aodio"
 
 #: modules/access/linsys/linsys_hdsdi.c:83
 #: modules/access/linsys/linsys_sdi.c:79
@@ -7499,7 +7503,7 @@ msgstr ""
 
 #: modules/access/live555.cpp:97
 msgid "RTP/RTSP/SDP demuxer (using Live555)"
-msgstr "Displezher RTP/RTSP/SDP (oc'h arverañ Live555)"
+msgstr "Displezher RTP/RTSP/SDP (oc'h implijout Live555)"
 
 #: modules/access/live555.cpp:106
 msgid "RTSP/RTP access and demux"
@@ -8020,7 +8024,7 @@ msgstr ""
 
 #: modules/access/shm.c:76 modules/access/vnc.c:68
 msgid "8 bits"
-msgstr ""
+msgstr "8 bits"
 
 #: modules/access/shm.c:76
 msgid "15 bits"
@@ -8036,11 +8040,11 @@ msgstr ""
 
 #: modules/access/shm.c:76 modules/access/vnc.c:68
 msgid "32 bits"
-msgstr ""
+msgstr "32 bits"
 
 #: modules/access/shm.c:83
 msgid "Framebuffer input"
-msgstr ""
+msgstr "Enmont memor-skurzer"
 
 #: modules/access/shm.c:84
 msgid "Shared memory framebuffer"
@@ -8178,6 +8182,8 @@ msgid ""
 "The specified pixel resolution is forced (if both width and height are "
 "strictly positive)."
 msgstr ""
+"Forset eo spisder ar pikseloù spisaet (m'emañ pozitivel da vat an uhelder "
+"hag al ledander)."
 
 #: modules/access/v4l2/v4l2.c:71
 msgid "Maximum frame rate to use (0 = no limits)."
@@ -8714,7 +8720,7 @@ msgstr ""
 
 #: modules/access/vnc.c:82
 msgid "VNC client access"
-msgstr ""
+msgstr "Moned pratik VNC"
 
 #: modules/access/wasapi.c:485
 msgid "Loopback mode"
@@ -9252,7 +9258,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/simple.c:43
 msgid "Audio filter for simple channel mixing"
-msgstr ""
+msgstr "Meskañ ar chadennoù simpl"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:50
 msgid "HRTF file for the binauralization"
@@ -9715,7 +9721,7 @@ msgstr ""
 
 #: modules/audio_filter/resampler/src.c:50
 msgid "Sinc function (fast)"
-msgstr ""
+msgstr "Arc'hweladur sink (herrek)"
 
 #: modules/audio_filter/resampler/src.c:50
 msgid "Zero Order Hold (fastest)"
@@ -10117,7 +10123,7 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1460
 msgid "Disabled"
-msgstr ""
+msgstr "Lazhet"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
@@ -11041,7 +11047,7 @@ msgstr ""
 
 #: modules/codec/g711.c:54
 msgid "G.711 encoder"
-msgstr ""
+msgstr "Enkoder G.711"
 
 #: modules/codec/gstreamer/gstdecode.c:76
 msgid "Uses GStreamer framework's plugins to decode the media codecs"
@@ -11119,7 +11125,7 @@ msgstr "Gwenn"
 #: modules/codec/kate.c:207 modules/spu/marq.c:62 modules/spu/rss.c:70
 #: modules/text_renderer/freetype/freetype.c:135
 msgid "Maroon"
-msgstr ""
+msgstr "Gell"
 
 #: modules/codec/kate.c:208 modules/gui/macosx/VLCMainMenu.m:468
 #: modules/gui/macosx/VLCMainMenu.m:1103 modules/spu/marq.c:62
@@ -11420,6 +11426,9 @@ msgid ""
 "the correct profile from other sources, such as resolution and bitrate. E.g. "
 "'high'"
 msgstr ""
+"Spisait profil ar c'hodek en un doare splann. Ma ne rafec'h ket, ar c'hodek "
+"a dermeno ar profil mat adalek mammennoù all, evel da skouer ar spister hag "
+"ar c'has. D.sk. \"uhel\""
 
 #: modules/codec/qsv.c:67
 msgid "Codec Level"
@@ -11431,6 +11440,9 @@ msgid ""
 "the correct profile from other sources, such as resolution and bitrate. E.g. "
 "'4.2' for mpeg4-part10 or 'low' for mpeg2"
 msgstr ""
+"Spisait live ar c'hodek en un doare splann. Ma ne rafec'h ket, ar c'hodek a "
+"dermeno ar profil adalek mammennoù all, evel da skouer ar spisder hag ar "
+"c'has. D.sk. \"4.2\" evit mpeg4-part10 pe \"gwan\" evit mpeg2"
 
 #: modules/codec/qsv.c:73
 msgid "Group of Picture size"
@@ -11455,7 +11467,7 @@ msgstr ""
 
 #: modules/codec/qsv.c:85
 msgid "Target Usage"
-msgstr ""
+msgstr "Implij buket"
 
 #: modules/codec/qsv.c:86
 msgid ""
@@ -11719,7 +11731,7 @@ msgstr ""
 
 #: modules/codec/schroedinger.c:129
 msgid "GOP length"
-msgstr ""
+msgstr "Hirded GOP"
 
 #: modules/codec/schroedinger.c:130
 msgid ""
@@ -12481,7 +12493,7 @@ msgstr ""
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
-msgstr ""
+msgstr "Displezher TTML"
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -12648,6 +12660,9 @@ msgid ""
 "ray compatibility\n"
 "e.g. resolution, framerate, level"
 msgstr ""
+"Enaouiñ an hentoù-tro evit ar skor Blu-ray, daoust da-se ne fors ket kement "
+"arvez evit kenglotusted ar Blu-ray\n"
+"d.sk. spisder, ar c'has-skeudennoù pe al live"
 
 #: modules/codec/x264.c:93
 msgid "Extra I-frames aggressivity"
@@ -12925,7 +12940,7 @@ msgstr ""
 
 #: modules/codec/x264.c:231
 msgid "Strength of AQ"
-msgstr ""
+msgstr "Rediañ evit AQ"
 
 #: modules/codec/x264.c:232
 msgid ""
@@ -13821,7 +13836,7 @@ msgstr ""
 
 #: modules/control/oldrc.c:69
 msgid "Initializing"
-msgstr ""
+msgstr "Deraouekaat"
 
 #: modules/control/oldrc.c:70
 msgid "Opening"
@@ -14276,7 +14291,7 @@ msgstr "Displezher ASF/WMW"
 
 #: modules/demux/asf/asf.c:267 modules/demux/asf/asf.c:821
 msgid "Could not demux ASF stream"
-msgstr ""
+msgstr "N'heller ket diliesaat ar froud ASF"
 
 #: modules/demux/asf/asf.c:268
 msgid "VLC failed to load the ASF header."
@@ -14312,7 +14327,7 @@ msgstr ""
 
 #: modules/demux/avformat/avformat.h:36
 msgid "Force use of a specific avformat muxer."
-msgstr ""
+msgstr "Rediañ implij al liesplezher avformat."
 
 #: modules/demux/avformat/avformat.h:37
 msgid "Format name"
@@ -14376,7 +14391,7 @@ msgstr ""
 
 #: modules/demux/avi/avi.c:851
 msgid "Play as is"
-msgstr ""
+msgstr "Lenn evel"
 
 #: modules/demux/avi/avi.c:852 modules/demux/mp4/mp4.c:4262
 msgid "Broken or missing Index"
@@ -14444,7 +14459,7 @@ msgstr "Displezher Flac"
 
 #: modules/demux/image.c:44
 msgid "ES ID"
-msgstr ""
+msgstr "ID ES"
 
 #: modules/demux/image.c:52
 msgid "Decode"
@@ -14466,7 +14481,7 @@ msgstr ""
 
 #: modules/demux/image.c:61
 msgid "Duration in seconds"
-msgstr ""
+msgstr "Padelezh en eilennoù"
 
 #: modules/demux/image.c:63
 msgid ""
@@ -14674,7 +14689,7 @@ msgstr ""
 
 #: modules/demux/mp4/meta.c:75
 msgid "Display Source As"
-msgstr ""
+msgstr "Diskouez ar mamennoù evel"
 
 #: modules/demux/mp4/meta.c:76
 msgid "Host Computer"
@@ -14682,7 +14697,7 @@ msgstr ""
 
 #: modules/demux/mp4/meta.c:77
 msgid "Performers"
-msgstr ""
+msgstr "C'hoarier/Kaner"
 
 #: modules/demux/mp4/meta.c:78
 msgid "Original Performer"
@@ -14819,7 +14834,7 @@ msgstr ""
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
-msgstr "Displezher Musepack"
+msgstr "Displezher MusePack"
 
 #: modules/demux/mpeg/es.c:54
 msgid ""
@@ -14849,7 +14864,7 @@ msgstr "Displezher videoioù H264"
 
 #: modules/demux/mpeg/h26x.c:64 modules/demux/mpeg/h26x.c:66
 msgid "HEVC/H.265 video demuxer"
-msgstr ""
+msgstr "Displezher videoioù HEVC/H.265"
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
@@ -15019,7 +15034,7 @@ msgstr ""
 
 #: modules/demux/nsv.c:49
 msgid "NullSoft demuxer"
-msgstr "Displezher Nullsoft"
+msgstr "Displezher NullSoft"
 
 #: modules/demux/nuv.c:50
 msgid "Nuv demuxer"
@@ -15126,7 +15141,7 @@ msgstr ""
 
 #: modules/demux/playlist/podcast.c:236 modules/demux/playlist/podcast.c:313
 msgid "Podcast Subtitle"
-msgstr ""
+msgstr "Istitl ar podkast"
 
 #: modules/demux/playlist/podcast.c:242 modules/demux/playlist/podcast.c:314
 msgid "Podcast Summary"
@@ -15223,7 +15238,7 @@ msgstr ""
 
 #: modules/demux/rawdv.c:51
 msgid "DV (Digital Video) demuxer"
-msgstr ""
+msgstr "Displezher DV (Digital Video)"
 
 #: modules/demux/rawvid.c:44
 msgid ""
@@ -15293,7 +15308,7 @@ msgstr ""
 
 #: modules/demux/subtitle.c:80 modules/spu/subsdelay.c:275
 msgid "Subtitle delay"
-msgstr ""
+msgstr "Dale an istitloù"
 
 #: modules/demux/subtitle.c:82
 msgid "Subtitle format"
@@ -15373,7 +15388,7 @@ msgstr ""
 
 #: modules/demux/xiph_metadata.h:54
 msgid "Semantic annotations"
-msgstr ""
+msgstr "Enotadurioù steroniezh"
 
 #: modules/demux/xiph_metadata.h:56
 msgid "Transcript"
@@ -15412,7 +15427,7 @@ msgstr "Kreditoù"
 #: modules/gui/macosx/VLCAboutWindowController.m:101
 #: modules/gui/macosx/VLCMainMenu.m:490 modules/gui/qt/dialogs/help.cpp:119
 msgid "License"
-msgstr "Lañvaz"
+msgstr "Lisañs"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:103
 #: modules/gui/qt/dialogs/help.cpp:122
@@ -15511,7 +15526,7 @@ msgstr ""
 #: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:535
 msgid "Skins"
-msgstr "Krec'hin"
+msgstr "Temoù"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
@@ -15655,7 +15670,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:652
 msgid "Organize Presets..."
-msgstr ""
+msgstr "Aozañ ar c'hefluniadurioù..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
 msgid "Save current selection as new preset"
@@ -15886,7 +15901,7 @@ msgstr "Mirout ar roudenn video orin"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:165
 #: modules/gui/qt/ui/profiles.h:747
 msgid "Resolution"
-msgstr "Diarunusted"
+msgstr "Spisder"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:166
 #: modules/gui/qt/ui/profiles.h:738
@@ -16520,7 +16535,7 @@ msgstr "Lenn"
 
 #: modules/gui/macosx/VLCMainMenu.m:390
 msgid "Playback Speed"
-msgstr ""
+msgstr "Tizh lenn"
 
 #: modules/gui/macosx/VLCMainMenu.m:394
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:48
@@ -17006,7 +17021,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
-msgstr ""
+msgstr "Tapadenn aodio"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:344
 msgid "Add Subtitle File:"
@@ -17383,7 +17398,7 @@ msgstr "Enaouiñ ar c'hemennadennoù war ar cheñchamant elfenn roll-lenn"
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Privacy / Network Interaction"
-msgstr ""
+msgstr "Buhez prevez / Etregweredoù Kenrouedad"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:329
 msgid "Automatically check for updates"
@@ -17759,7 +17774,7 @@ msgstr ""
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:222
 #: modules/gui/qt/ui/video_effects.h:1233
 msgid "Synchronize left and right"
-msgstr ""
+msgstr "Sinkronelaat kleiz ha dehoù"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:224
 #: modules/gui/qt/ui/video_effects.h:1258
@@ -17851,7 +17866,7 @@ msgstr ""
 #: modules/video_filter/gradient.c:76 modules/video_filter/gradient.c:82
 #: modules/gui/qt/ui/video_effects.h:1242
 msgid "Gradient"
-msgstr ""
+msgstr "Gradiant"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:264
 #: modules/video_filter/gradient.c:76
@@ -18054,7 +18069,7 @@ msgstr ""
 
 #: modules/gui/ncurses.c:870
 msgid " Ctrl-l                 Refresh the screen"
-msgstr ""
+msgstr " Ktrl-l                 Freskaat ar skramm"
 
 #: modules/gui/ncurses.c:874
 msgid "[Global]"
@@ -18172,7 +18187,7 @@ msgstr "     A           Ouzhpennañ un elfenn"
 #. xgettext: You can use ⌫ character to translate <backspace>
 #: modules/gui/ncurses.c:911
 msgid " D, <backspace>, <del>  Delete an entry"
-msgstr ""
+msgstr " D, <backspace>, <del>  Dilemel un enmont"
 
 #: modules/gui/ncurses.c:912
 msgid " e                      Eject (if stopped)"
@@ -18443,7 +18458,7 @@ msgstr ""
 #: modules/gui/qt/components/controller_widget.cpp:275
 #: modules/video_output/decklink.cpp:80
 msgid "Aspect Ratio"
-msgstr ""
+msgstr "Feur Neuz"
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
 msgid "No EPG Data Available"
@@ -18521,7 +18536,7 @@ msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1113
 msgid "6 KHz"
-msgstr ""
+msgstr "6 KHz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1114
 msgid "12 KHz"
@@ -18546,7 +18561,7 @@ msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1122
 msgid "125 Hz"
-msgstr ""
+msgstr "125 Hz"
 
 #: modules/gui/qt/components/extended_panels.cpp:1123
 msgid "250 Hz"
@@ -18690,7 +18705,7 @@ msgstr ""
 
 #: modules/gui/qt/components/info_panels.cpp:623
 msgid "Overall"
-msgstr ""
+msgstr "En holl"
 
 #: modules/gui/qt/components/interface_widgets.cpp:639
 msgid ""
@@ -18721,7 +18736,7 @@ msgstr ""
 #: modules/gui/qt/components/interface_widgets.cpp:917
 #: modules/gui/qt/dialogs/toolbar.cpp:573
 msgid "Elapsed time"
-msgstr ""
+msgstr "Amzer aet e-bioù"
 
 #: modules/gui/qt/components/interface_widgets.cpp:921
 #: modules/gui/qt/dialogs/toolbar.cpp:577
@@ -19068,10 +19083,12 @@ msgstr ""
 #: modules/gui/qt/components/simple_preferences.cpp:744
 msgid "This is VLC's skinnable interface. You can download other skins at"
 msgstr ""
+"An dra-mañ a zo etrefas VLC hag a c'haller cheñch e dem. Gellout a rit "
+"pellgargañ temoù war"
 
 #: modules/gui/qt/components/simple_preferences.cpp:746
 msgid "VLC skins website"
-msgstr ""
+msgstr "lec'hienn web temoù VLC"
 
 #: modules/gui/qt/components/simple_preferences.cpp:770
 msgid "System's default"
@@ -19623,6 +19640,8 @@ msgid ""
 "Skins customize player's appearance. You can activate them through "
 "preferences."
 msgstr ""
+"Gant an temoù e vez personelaet neuz al lenner. Gellout a rit enaouiñ anezho "
+"e-barzh an arventennoù."
 
 #: modules/gui/qt/dialogs/plugins.cpp:382
 msgid ""
@@ -19721,7 +19740,7 @@ msgstr "&Adderaouekaat ar gwellvezioù"
 
 #: modules/gui/qt/dialogs/preferences.cpp:167
 msgid "Only show current"
-msgstr ""
+msgstr "Diskouez war-ober hepken"
 
 #: modules/gui/qt/dialogs/preferences.cpp:169
 msgid "Only show modules related to current playback"
@@ -19792,7 +19811,7 @@ msgstr "Afell vras"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:80
 msgid "Native Slider"
-msgstr ""
+msgstr "Rinkler genidik"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:94
 msgid "Main Toolbar"
@@ -20142,7 +20161,7 @@ msgstr "Roll-&lenn"
 
 #: modules/gui/qt/menus.cpp:488
 msgid "Ctrl+L"
-msgstr "Ctrl+L"
+msgstr "Ktrl+L"
 
 #: modules/gui/qt/menus.cpp:491
 msgid "Docked Playlist"
@@ -20158,7 +20177,7 @@ msgstr ""
 
 #: modules/gui/qt/menus.cpp:510
 msgid "Ctrl+H"
-msgstr "Ctrl+H"
+msgstr "Krl+H"
 
 #: modules/gui/qt/menus.cpp:519
 msgid "&Fullscreen Interface"
@@ -20310,7 +20329,7 @@ msgstr "Lammat &distro"
 
 #: modules/gui/qt/menus.cpp:926
 msgid "Ctrl+T"
-msgstr ""
+msgstr "Ktrl+T"
 
 #: modules/gui/qt/menus.cpp:941
 msgid "Open &Network..."
@@ -20512,7 +20531,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Start in minimal view (without menus)"
-msgstr ""
+msgstr "Loc'hañ gant ar mod-gwelet bihanañ (hep lañser)"
 
 #: modules/gui/qt/qt.cpp:164
 msgid "Display background cone or art"
@@ -20564,7 +20583,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:200
 msgid "When minimized"
-msgstr ""
+msgstr "Pa vez bihanikaet"
 
 #: modules/gui/qt/qt.cpp:218
 msgid "Qt interface"
@@ -20666,6 +20685,8 @@ msgid ""
 "When set to 'no', this parameter is intended to give old skins a chance to "
 "play back video even though no video tag is implemented"
 msgstr ""
+"P'emañ lakaet war \"Ket\", an arventenn-mañ a zo soñjet evit reiñ an tu d'an "
+"temoù kozh da lenn ar videoioù ha pa ne vefe ket emplementet baliz ar video"
 
 #: modules/gui/skins2/src/skin_main.cpp:536
 msgid "Skinnable Interface"
@@ -20838,7 +20859,7 @@ msgstr ""
 
 #: modules/hw/vdpau/chroma.c:883
 msgid "Temporal-spatial"
-msgstr ""
+msgstr "Amzerel-spas"
 
 #: modules/hw/vdpau/chroma.c:887 modules/hw/vdpau/display.c:45
 msgid "VDPAU"
@@ -20906,7 +20927,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:41
 msgid "No"
-msgstr ""
+msgstr "Ket"
 
 #: modules/keystore/keychain.m:41
 msgid "Any"
@@ -21203,7 +21224,7 @@ msgstr "Lua"
 
 #: modules/lua/vlc.c:86
 msgid "Lua interpreter"
-msgstr ""
+msgstr "Jubenner Lua"
 
 #: modules/lua/vlc.c:97 modules/lua/vlc.c:104
 msgid "Lua HTTP"
@@ -21632,7 +21653,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:134
 msgid "Speech"
-msgstr ""
+msgstr "Komzoù"
 
 #: modules/meta_engine/ID3Genres.h:135
 msgid "Chanson"
@@ -21640,7 +21661,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:136
 msgid "Opera"
-msgstr ""
+msgstr "Opera"
 
 #: modules/meta_engine/ID3Genres.h:137
 msgid "Chamber Music"
@@ -21704,7 +21725,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:153
 msgid "Duet"
-msgstr ""
+msgstr "Daouad"
 
 #: modules/meta_engine/ID3Genres.h:154
 msgid "Punk Rock"
@@ -22221,7 +22242,7 @@ msgstr "Liesplezher MP4/MOV"
 
 #: modules/mux/mp4/mp4.c:77
 msgid "Fragmented and streamable MP4 muxer"
-msgstr ""
+msgstr "Liesplezher MP4 bruzunet ha skignus"
 
 #: modules/mux/mpeg/ps.c:48 modules/mux/mpeg/ts.c:162
 msgid "DTS delay (ms)"
@@ -22441,7 +22462,7 @@ msgstr "Liesplezher TS (libdvbpsi)"
 
 #: modules/mux/mpjpeg.c:47
 msgid "Multipart JPEG muxer"
-msgstr ""
+msgstr "Liesplezher liesfurmad JPEG"
 
 #: modules/mux/ogg.c:47
 msgid "Index interval"
@@ -23570,7 +23591,7 @@ msgstr ""
 
 #: modules/stream_filter/skiptags.c:243
 msgid "APE/ID3 tags-skipping filter"
-msgstr ""
+msgstr "Sil ar balizoù APR/ID3"
 
 #: modules/stream_out/autodel.c:46
 msgid "Autodel"
@@ -23661,7 +23682,7 @@ msgstr ""
 
 #: modules/stream_out/bridge.c:92
 msgid "Bridge"
-msgstr ""
+msgstr "Pont"
 
 #: modules/stream_out/bridge.c:93
 msgid "Bridge stream output"
@@ -23732,7 +23753,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Conversion quality"
-msgstr ""
+msgstr "Kalite an emdroañ"
 
 #: modules/stream_out/chromecast/cast.cpp:224
 msgid "Change this option to increase conversion speed or quality."
@@ -23856,15 +23877,15 @@ msgstr ""
 
 #: modules/stream_out/es.c:53 modules/stream_out/standard.c:45
 msgid "Output muxer"
-msgstr "Liesplezher an ec'hankad"
+msgstr "Liesplezher an ezvont"
 
 #: modules/stream_out/es.c:55
 msgid "This is the default muxer method that will be used."
-msgstr ""
+msgstr "An hentenn liesplezher dre-ziouer-mañ a vo implijet."
 
 #: modules/stream_out/es.c:56
 msgid "Audio output muxer"
-msgstr "Liesplezher an ec'hankad aodio"
+msgstr "Liesplezher an ezvont aodio"
 
 #: modules/stream_out/es.c:58
 msgid "This is the muxer that will be used for audio."
@@ -23876,7 +23897,7 @@ msgstr "Liesplezher an ec'hankad video"
 
 #: modules/stream_out/es.c:61
 msgid "This is the muxer that will be used for video."
-msgstr ""
+msgstr "Al liesplezher-mañ eo a vo implijet evit ar video."
 
 #: modules/stream_out/es.c:63
 msgid "Output URL"
@@ -24161,7 +24182,7 @@ msgstr ""
 
 #: modules/stream_out/setid.c:61
 msgid "Set ID"
-msgstr ""
+msgstr "Dibab an ID"
 
 #: modules/stream_out/setid.c:62
 msgid "Set ES id"
@@ -24335,7 +24356,7 @@ msgstr ""
 #: modules/stream_out/transcode/transcode.c:52
 #: share/lua/http/dialogs/create_stream.html:212
 msgid "Video bitrate"
-msgstr ""
+msgstr "Kas binarel video"
 
 #: modules/stream_out/transcode/transcode.c:54
 msgid "Target bitrate of the transcoded video stream."
@@ -24411,7 +24432,7 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:90
 msgid "This is the audio codec that will be used."
-msgstr ""
+msgstr "Kodek aodio da implijout."
 
 #: modules/stream_out/transcode/transcode.c:91
 #: share/lua/http/dialogs/create_stream.html:231
@@ -24706,7 +24727,7 @@ msgstr ""
 
 #: modules/video_chroma/omxdl.c:36
 msgid "OpenMAX DL image processing"
-msgstr ""
+msgstr "Tretadur ar skeudennoù OpenMAX DL"
 
 #: modules/video_chroma/rv32.c:46
 msgid "RV32 conversion filter"
@@ -24714,7 +24735,7 @@ msgstr "Sil an amdrodur RV32"
 
 #: modules/video_chroma/swscale.c:58
 msgid "Scaling mode"
-msgstr ""
+msgstr "Mod skeuliañ"
 
 #: modules/video_chroma/swscale.c:59
 msgid "Scaling mode to use."
@@ -25034,7 +25055,7 @@ msgstr ""
 
 #: modules/video_filter/canvas.c:86
 msgid "Output height"
-msgstr ""
+msgstr "Uhelder an ezvont"
 
 #: modules/video_filter/canvas.c:88
 msgid "Output (canvas) image height"
@@ -25111,7 +25132,7 @@ msgstr ""
 
 #: modules/video_filter/croppadd.c:47
 msgid "Pixels to crop from top"
-msgstr ""
+msgstr "Pikselioù da grennañ adalek al laez"
 
 #: modules/video_filter/croppadd.c:49
 msgid "Number of pixels to crop from the top of the image."
@@ -25199,7 +25220,7 @@ msgstr ""
 
 #: modules/video_filter/deinterlace/algo_phosphor.h:56
 msgid "Low"
-msgstr ""
+msgstr "Izel"
 
 #: modules/video_filter/deinterlace/algo_phosphor.h:57
 msgid "Medium"
@@ -25249,6 +25270,9 @@ msgid ""
 "phosphor light decay for the old field in the Phosphor framerate doubler. "
 "Default: Low."
 msgstr ""
+"An dra-se a gontrol kreñver ar sil teñvalaat hag a ra evel ma vefe ar "
+"c'houlaouenn fosforek a oa gant ar skrammoù kozh d'an TVoù gant ur sil "
+"fosfor. Dre ziouer: izel."
 
 #: modules/video_filter/deinterlace/deinterlace.c:299
 msgid "Deinterlacing video filter"
@@ -25601,7 +25625,7 @@ msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:81
 msgid "Scale factor (0.1-2.0)"
-msgstr ""
+msgstr "Feur skeuliañ (0,1-2,0)"
 
 #: modules/video_filter/opencv_wrapper.c:82
 msgid ""
@@ -25800,7 +25824,7 @@ msgstr ""
 
 #: modules/video_filter/rotate.c:56
 msgid "Angle in degrees"
-msgstr ""
+msgstr "Korn e derezioù"
 
 #: modules/video_filter/rotate.c:57
 msgid "Angle in degrees (0 to 359)"
@@ -26126,17 +26150,19 @@ msgstr ""
 
 #: modules/video_output/fb.c:65
 msgid "Framebuffer resolution to use"
-msgstr ""
+msgstr "Spisder memor-skurzer da implijout"
 
 #: modules/video_output/fb.c:67
 msgid ""
 "Select the resolution for the framebuffer. Currently it supports the values "
 "0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (default 4=auto)"
 msgstr ""
+"Diuzit ar spisder evit ar memor-skurzer. An talvoudegezhioù 0=QCIF 1=CIF "
+"2=NTSC 3=PAL, 4=auto (dre ziouer 4=otom) a vez degemeret gantañ"
 
 #: modules/video_output/fb.c:70
 msgid "Framebuffer uses hw acceleration"
-msgstr ""
+msgstr "Ar \"memor-skurzer\" a implij fonusadurioù an dafar"
 
 #: modules/video_output/fb.c:71
 msgid "Disable for double buffering in software."
@@ -26667,7 +26693,7 @@ msgstr ""
 
 #: modules/video_splitter/panoramix.c:110
 msgid "Attenuation, middle (in %)"
-msgstr ""
+msgstr "Skañvadur, kreizad (e %)"
 
 #: modules/video_splitter/panoramix.c:111
 msgid ""
@@ -26868,6 +26894,8 @@ msgid ""
 "This allows you to set the resolution of the Goom display (bigger resolution "
 "will be prettier but more CPU intensive)."
 msgstr ""
+"An dra-se a ro an tu deoc'h da dermeniñ spisder diskwel ar prenestr Goom (ur "
+"spisder uheloc'h a vo bravoc'h met a c'houlenno muioc'h digant ar prosesor)."
 
 #: modules/visualization/goom.c:51
 msgid "Goom animation speed"
@@ -27551,7 +27579,7 @@ msgstr "ASF/WMV"
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "MP&3"
-msgstr ""
+msgstr "MP&3"
 
 #: modules/gui/qt/ui/profiles.h:715
 msgid "Features"
@@ -27761,7 +27789,7 @@ msgstr "Trobarzhell lenner kantennoù dre ziouer"
 
 #: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Damaged or incomplete AVI file"
-msgstr ""
+msgstr "Restr AVI labezet pe diglok"
 
 #: modules/gui/qt/ui/sprefs_input.h:369
 msgid "HTTP proxy URL"
@@ -27825,7 +27853,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:540
 msgid "Force window style:"
-msgstr ""
+msgstr "Rediañ neuz ar prenestr:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:541
 msgid "Integrate video in interface"
