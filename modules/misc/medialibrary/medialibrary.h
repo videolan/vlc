@@ -156,6 +156,8 @@ private:
                    const char* pattern, uint32_t nbItems, uint32_t offset, va_list args );
     int listPlaylist( int listQuery, const medialibrary::QueryParameters* paramsPtr,
                       const char* pattern, uint32_t nbItems, uint32_t offset, va_list args );
+    int listMedia( int listQuery, const medialibrary::QueryParameters* paramsPtr,
+                   const char* pattern, uint32_t nbItems, uint32_t offset, va_list args );
 
     static medialibrary::IMedia::MetadataType metadataType( int meta );
     static medialibrary::SortingCriteria sortingCriteria( int sort );

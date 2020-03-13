@@ -795,27 +795,8 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
 
         case VLC_ML_LIST_MEDIA_LABELS:
         case VLC_ML_COUNT_MEDIA_LABELS:
-        {
-            auto media = m_ml->media( va_arg( args, int64_t ) );
-            if ( media == nullptr )
-                return VLC_EGENERIC;
-            auto query = media->labels();
-            if ( query == nullptr )
-                return VLC_EGENERIC;
-            switch ( listQuery )
-            {
-                case VLC_ML_LIST_MEDIA_LABELS:
-                    *va_arg( args, vlc_ml_label_list_t**) =
-                            ml_convert_list<vlc_ml_label_list_t, vlc_ml_label_t>(
-                                query->items( nbItems, offset ) );
-                    return VLC_SUCCESS;
-                case VLC_ML_COUNT_MEDIA_LABELS:
-                    *va_arg( args, size_t* ) = query->count();
-                    return VLC_SUCCESS;
-                default:
-                    vlc_assert_unreachable();
-            }
-        }
+            return listMedia( listQuery, paramsPtr, psz_pattern, nbItems, offset, args );
+
         case VLC_ML_LIST_SHOWS:
         {
             medialibrary::Query<medialibrary::IShow> query;
@@ -1598,6 +1579,31 @@ int MediaLibrary::listPlaylist( int listQuery, const medialibrary::QueryParamete
                     vlc_assert_unreachable();
             }
         }
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
+int MediaLibrary::listMedia( int listQuery, const medialibrary::QueryParameters *,
+                             const char *, uint32_t nbItems, uint32_t offset,
+                             va_list args )
+{
+    auto media = m_ml->media( va_arg( args, int64_t ) );
+    if ( media == nullptr )
+        return VLC_EGENERIC;
+    auto query = media->labels();
+    if ( query == nullptr )
+        return VLC_EGENERIC;
+    switch ( listQuery )
+    {
+        case VLC_ML_LIST_MEDIA_LABELS:
+            *va_arg( args, vlc_ml_label_list_t**) =
+                    ml_convert_list<vlc_ml_label_list_t, vlc_ml_label_t>(
+                        query->items( nbItems, offset ) );
+            return VLC_SUCCESS;
+        case VLC_ML_COUNT_MEDIA_LABELS:
+            *va_arg( args, size_t* ) = query->count();
+            return VLC_SUCCESS;
         default:
             vlc_assert_unreachable();
     }
