@@ -612,21 +612,21 @@ static int Open( vlc_object_t * p_this )
         {
             case wav_chunk_id_data:
             {
-                int64_t i_stream_size = stream_Size( p_demux->s );
+                uint64_t i_stream_size;
+                if( vlc_stream_GetSize( p_demux->s, &i_stream_size ) != VLC_SUCCESS )
+                    goto error;
                 p_sys->i_data_pos = vlc_stream_Tell( p_demux->s );
 
-                if( !b_is_rf64 && i_stream_size > 0
-                 && (uint64_t) i_stream_size >= i_size + p_sys->i_data_pos )
+                if( !b_is_rf64 && i_stream_size >= i_size + p_sys->i_data_pos )
                     p_sys->i_data_size = i_size;
 
                 if( likely( b_is_rf64
-                 || p_sys->i_data_pos + i_size == (uint64_t) i_stream_size ) )
+                 || p_sys->i_data_pos + i_size == i_stream_size ) )
                 {
                     /* Bypass the final ChunkGetNext() to avoid a read+seek
                      * since this chunk is the last one */
                     eof = true;
-                }
-                /* Unlikely case where there is a chunk after 'data' */
+                }   /* Unlikely case where there is a chunk after 'data' */
                 else if( ChunkSkip( p_demux, i_size ) != VLC_SUCCESS )
                     goto error;
                 break;
