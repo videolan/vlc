@@ -381,7 +381,7 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shaders_t *shade
                     "sample.x  = shaderTexture[0].Sample(samplerState, coords).z;\n"
                     "sample.y  = shaderTexture[0].Sample(samplerState, coords).y;\n"
                     "sample.z  = shaderTexture[0].Sample(samplerState, coords).x;\n"
-                    "sample.a  = shaderTexture[0].Sample(samplerState, coords).a;";
+                    "sample.a  = 1;";
             break;
         case DXGI_FORMAT_R8G8B8A8_UNORM:
         case DXGI_FORMAT_B8G8R8A8_UNORM:
