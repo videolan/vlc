@@ -33,11 +33,12 @@
 
 #include <assert.h>
 
-#include <windows.h>
-#if !defined(_WIN32_WINNT) || _WIN32_WINNT < _WIN32_WINNT_WIN7
+#if !defined(_WIN32_WINNT) || _WIN32_WINNT < 0x0601 // _WIN32_WINNT_WIN7
 # undef _WIN32_WINNT
-# define _WIN32_WINNT _WIN32_WINNT_WIN7
+# define _WIN32_WINNT 0x0601 // _WIN32_WINNT_WIN7
 #endif
+
+#include <windows.h>
 
 #define COBJMACROS
 #include <initguid.h>
