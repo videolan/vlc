@@ -136,8 +136,7 @@ bool Representation::needsUpdate() const
     return !b_loaded || (isLive() && nextUpdateTime < time(NULL));
 }
 
-bool Representation::runLocalUpdates(SharedResources *res,
-                                     vlc_tick_t, uint64_t, bool)
+bool Representation::runLocalUpdates(SharedResources *res)
 {
     const time_t now = time(NULL);
     AbstractPlaylist *playlist = getPlaylist();
