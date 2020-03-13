@@ -470,8 +470,8 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
         preferredOutput = MAKEFOURCC('P','0','1','0');
     else
         preferredOutput =  MAKEFOURCC('N','V','1','2');
-    msg_Dbg(va, "favor decoder format %4.4s (for %d bits)", (const char*)&preferredOutput,
-            mode->bit_depth);
+    msg_Dbg(va, "favor decoder format %4.4s (for 4:%d:%d %d bits)", (const char*)&preferredOutput,
+            (2-mode->log2_chroma_w)*2, (2-mode->log2_chroma_w-mode->log2_chroma_h)*2, mode->bit_depth);
 
     /* */
     for (unsigned pass = 0; pass < 2 && err != VLC_SUCCESS; ++pass)
