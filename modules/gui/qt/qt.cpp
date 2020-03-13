@@ -681,7 +681,6 @@ static void *Thread( void *obj )
         libvlc_int_t *libvlc = vlc_object_instance( p_intf );
 
         var_Create( libvlc, "qt4-iface", VLC_VAR_ADDRESS );
-        var_Create( libvlc, "window", VLC_VAR_STRING );
 
         if( known_type )
         {
@@ -731,7 +730,6 @@ static void *Thread( void *obj )
     if (p_mi != NULL)
     {
         libvlc_int_t *libvlc = vlc_object_instance( p_intf );
-        var_Destroy( libvlc, "window" );
         var_Destroy( libvlc, "qt4-iface" );
     }
     return ThreadCleanup( p_intf, false );
