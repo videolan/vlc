@@ -1090,6 +1090,7 @@ void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t
     case DXGI_FORMAT_YUY2:
     case DXGI_FORMAT_AYUV:
     case DXGI_FORMAT_Y210:
+    case DXGI_FORMAT_Y410:
         if ( display->formatTexture == DXGI_FORMAT_NV12 ||
              display->formatTexture == DXGI_FORMAT_P010 )
         {

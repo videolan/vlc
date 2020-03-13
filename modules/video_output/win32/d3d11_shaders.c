@@ -205,6 +205,7 @@ bool IsRGBShader(const d3d_format_t *cfg)
            cfg->formatTexture != DXGI_FORMAT_YUY2 &&
            cfg->formatTexture != DXGI_FORMAT_AYUV &&
            cfg->formatTexture != DXGI_FORMAT_Y210 &&
+           cfg->formatTexture != DXGI_FORMAT_Y410 &&
            cfg->formatTexture != DXGI_FORMAT_420_OPAQUE;
 }
 
@@ -382,6 +383,13 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shaders_t *shade
                     "sample.x  = shaderTexture[0].Sample(samplerState, coords).r;\n"
                     "sample.y  = shaderTexture[0].Sample(samplerState, coords).g;\n"
                     "sample.z  = shaderTexture[0].Sample(samplerState, coords).a;\n"
+                    "sample.a  = 1;";
+            break;
+        case DXGI_FORMAT_Y410:
+            psz_sampler[0] =
+                    "sample.x  = shaderTexture[0].Sample(samplerState, coords).g;\n"
+                    "sample.y  = shaderTexture[0].Sample(samplerState, coords).r;\n"
+                    "sample.z  = shaderTexture[0].Sample(samplerState, coords).b;\n"
                     "sample.a  = 1;";
             break;
         case DXGI_FORMAT_AYUV:
@@ -762,6 +770,9 @@ void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
         break;
     case DXGI_FORMAT_YUY2:
         ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackYUY2);
+        break;
+    case DXGI_FORMAT_Y410:
+        ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackVUYA);
         break;
     case DXGI_FORMAT_Y210:
         ID3D11DeviceContext_ClearRenderTargetView( d3d_dev->d3dcontext, targets[0], blackY210);
