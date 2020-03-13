@@ -70,6 +70,7 @@ static const d3d_format_t d3d_formats[] = {
     { "VA_P010",  DXGI_FORMAT_P010,           VLC_CODEC_D3D11_OPAQUE_10B, 10, 2, 2, { DXGI_FORMAT_R16_UNORM,      DXGI_FORMAT_R16G16_UNORM } },
     { "VA_AYUV",  DXGI_FORMAT_AYUV,           VLC_CODEC_D3D11_OPAQUE,      8, 1, 1, { DXGI_FORMAT_R8G8B8A8_UNORM } },
     { "YUY2",     DXGI_FORMAT_YUY2,           VLC_CODEC_YUYV,              8, 1, 2, { DXGI_FORMAT_R8G8B8A8_UNORM } },
+    { "VA_YUY2",  DXGI_FORMAT_YUY2,           VLC_CODEC_D3D11_OPAQUE,      8, 1, 2, { DXGI_FORMAT_R8G8B8A8_UNORM } },
 #ifdef BROKEN_PIXEL
     { "Y416",     DXGI_FORMAT_Y416,           VLC_CODEC_I444_16L,     16, 1, 1, { DXGI_FORMAT_R16G16B16A16_UINT } },
 #endif
