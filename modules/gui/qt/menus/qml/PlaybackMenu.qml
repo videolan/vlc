@@ -45,13 +45,11 @@ Widgets.MenuExt {
         model: player.programs
     }
 
-    /*
-    //FIXME unimplemented
-    Menu {
-        title: i18n.qtr("Custom Bookmarks");
-        enabled: isPlaying
+    Action {
+        text: i18n.qtr("Custom Bookmarks")
+        onTriggered: dialogProvider.bookmarksDialog()
+        enabled: player.isPlaying
     }
-    */
 
     MenuSeparator { }
 

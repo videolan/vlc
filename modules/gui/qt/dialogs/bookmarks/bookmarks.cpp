@@ -26,6 +26,7 @@
 
 #include "bookmarks.hpp"
 #include "player/player_controller.hpp"
+#include "medialibrary/mlbookmarkmodel.hpp"
 
 #include <QHBoxLayout>
 #include <QSpacerItem>
@@ -35,7 +36,6 @@
 
 BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
 {
-    b_ignore_updates = false;
     setWindowFlags( Qt::Tool );
     setWindowOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );
     setWindowTitle( qtr( "Edit Bookmarks" ) );
@@ -62,35 +62,29 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
     buttonsBox->addButton( new QPushButton( qtr( "&Close" ) ),
                           QDialogButtonBox::RejectRole);
 
-    bookmarksList = new QTreeWidget( this );
+    bookmarksList = new QTreeView( this );
+    m_model = new MLBookmarkModel( vlc_ml_instance_get(_p_intf ),
+                                   _p_intf->p_sys->p_player,
+                                   bookmarksList );
+    bookmarksList->setModel( m_model );
     bookmarksList->setRootIsDecorated( false );
     bookmarksList->setAlternatingRowColors( true );
+    /* Sort by default model order, otherwise column 0 will be used */
+    bookmarksList->sortByColumn( -1, Qt::AscendingOrder );
+    bookmarksList->setSortingEnabled( true );
     bookmarksList->setSelectionMode( QAbstractItemView::ExtendedSelection );
     bookmarksList->setSelectionBehavior( QAbstractItemView::SelectRows );
-    bookmarksList->setEditTriggers( QAbstractItemView::SelectedClicked );
-    bookmarksList->setColumnCount( 3 );
-    bookmarksList->resize( sizeHint() );
+    bookmarksList->setEditTriggers( QAbstractItemView::SelectedClicked |
+                                    QAbstractItemView::DoubleClicked );
 
-    QStringList headerLabels;
-    headerLabels << qtr( "Description" );
-    headerLabels << qtr( "Bytes" );
-    headerLabels << qtr( "Time" );
-    bookmarksList->setHeaderLabels( headerLabels );
+    bookmarksList->resize( sizeHint() );
 
     layout->addWidget( buttonsBox );
     layout->addWidget( bookmarksList );
 
-    CONNECT( THEMIM, bookmarksChanged(),
-             this, update() );
-
     CONNECT( bookmarksList, activated( QModelIndex ), this,
              activateItem( QModelIndex ) );
-    CONNECT( bookmarksList, itemChanged( QTreeWidgetItem*, int ),
-             this, edit( QTreeWidgetItem*, int ) );
-    CONNECT( bookmarksList->model(), rowsInserted( const QModelIndex &, int, int ),
-             this, updateButtons() );
-    CONNECT( bookmarksList->model(), rowsRemoved( const QModelIndex &, int, int ),
-             this, updateButtons() );
+    CONNECT( m_model, modelReset(), this, updateButtons() );
     CONNECT( bookmarksList->selectionModel(), selectionChanged( const QItemSelection &, const QItemSelection & ),
              this, updateButtons() );
     BUTTONACT( addButton, add() );
@@ -118,29 +112,19 @@ void BookmarksDialog::updateButtons()
     delButton->setEnabled( bookmarksList->selectionModel()->hasSelection() );
 }
 
-void BookmarksDialog::update()
-{
-    //FIXME unimplemented
-}
-
 void BookmarksDialog::add()
 {
-    //FIXME unimplemented
+    m_model->add();
 }
 
 void BookmarksDialog::del()
 {
-    //FIXME unimplemented
+    m_model->remove( bookmarksList->selectionModel()->selectedIndexes() );
 }
 
 void BookmarksDialog::clear()
 {
-    //FIXME unimplemented
-}
-
-void BookmarksDialog::edit( QTreeWidgetItem *, int )
-{
-    //FIXME unimplemented
+    m_model->clear();
 }
 
 void BookmarksDialog::extract()
@@ -148,9 +132,9 @@ void BookmarksDialog::extract()
     // TODO
 }
 
-void BookmarksDialog::activateItem( QModelIndex )
+void BookmarksDialog::activateItem( const QModelIndex& index )
 {
-    //FIXME unimplemented
+    m_model->select( index );
 }
 
 void BookmarksDialog::toggleVisible()
