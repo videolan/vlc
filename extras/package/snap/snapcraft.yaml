@@ -72,13 +72,19 @@ parts:
       export PATH=$PWD/extras/tools/build/bin:$PATH
       cd contrib && mkdir linux && cd linux
       ../bootstrap \
-        --enable-libdsm \
-        --enable-dvdcss \
-        --disable-upnp \
-        --disable-chromaprint
-      make list
-      make -j $(getconf _NPROCESSORS_ONLN) fetch
-      make -j $(getconf _NPROCESSORS_ONLN) -k install || make -j1
+          --host=$TRIPLET \
+          --enable-libdsm \
+          --enable-dvdcss \
+          --disable-upnp \
+          --disable-chromaprint
+      if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
+          make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
+      else
+          make list
+          make -j $(getconf _NPROCESSORS_ONLN) fetch
+          make -j $(getconf _NPROCESSORS_ONLN) -k install || make -j1
+          make package
+      fi
       cd ../../
       export NOCONFIGURE=1
       autoreconf -fi
