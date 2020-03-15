@@ -440,8 +440,7 @@ endif
 if HAVE_DARWIN
 libvlccore_la_SOURCES += \
 	darwin/error.c \
-	darwin/specific.c \
-	darwin/thread.c
+	darwin/specific.c
 libvlccore_objc_la_SOURCES = \
 	darwin/dirs.m \
 	darwin/netconf.m
@@ -481,15 +480,16 @@ if !HAVE_LINUX
 libvlccore_la_SOURCES += posix/wait.c
 endif
 if !HAVE_ANDROID
-libvlccore_la_SOURCES += posix/sort.c
+libvlccore_la_SOURCES += \
+	posix/sort.c \
+	posix/thread.c
 if !HAVE_DARWIN
 libvlccore_la_SOURCES += \
 	posix/dirs.c \
 	posix/error.c \
 	posix/netconf.c \
 	posix/picture.c \
-	posix/specific.c \
-	posix/thread.c
+	posix/specific.c
 if HAVE_LIBANL
 libvlccore_la_SOURCES += \
 	linux/getaddrinfo.c

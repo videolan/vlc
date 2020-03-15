@@ -164,29 +164,6 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 
 # define poll(u,n,t) vlc_poll(u, n, t)
 
-#elif defined (__APPLE__)
-# define _APPLE_C_SOURCE    1 /* Proper pthread semantics on OSX */
-# include <unistd.h>
-# include <pthread.h>
-/* Unnamed POSIX semaphores not supported on Mac OS X */
-# include <mach/semaphore.h>
-# include <mach/task.h>
-# define LIBVLC_USE_PTHREAD_CLEANUP   1
-
-typedef pthread_t       vlc_thread_t;
-#define VLC_THREAD_CANCELED PTHREAD_CANCELED
-typedef pthread_rwlock_t vlc_rwlock_t;
-#define VLC_STATIC_RWLOCK PTHREAD_RWLOCK_INITIALIZER
-typedef pthread_key_t   vlc_threadvar_t;
-typedef struct vlc_timer *vlc_timer_t;
-
-# define VLC_THREAD_PRIORITY_LOW      0
-# define VLC_THREAD_PRIORITY_INPUT   22
-# define VLC_THREAD_PRIORITY_AUDIO   22
-# define VLC_THREAD_PRIORITY_VIDEO    0
-# define VLC_THREAD_PRIORITY_OUTPUT  22
-# define VLC_THREAD_PRIORITY_HIGHEST 22
-
 #else /* POSIX threads */
 # include <unistd.h> /* _POSIX_SPIN_LOCKS */
 # include <pthread.h>
