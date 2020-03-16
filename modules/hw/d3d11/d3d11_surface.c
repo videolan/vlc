@@ -713,6 +713,8 @@ int D3D11OpenConverter( vlc_object_t *obj )
         return VLC_ENOMEM;
 
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate(p_filter->vctx_in);
+    d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(p_filter->vctx_in);
+    p_sys->d3d_dev = &dev_sys->d3d_dev;
 
     if (assert_staging(p_filter, p_sys, vctx_sys->format) != VLC_SUCCESS)
     {
@@ -772,6 +774,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         vlc_decoder_device_Release(dec_device);
         return VLC_ENOMEM;
     }
+    p_sys->d3d_dev = &devsys->d3d_dev;
 
     DXGI_FORMAT vctx_fmt;
     switch( p_filter->fmt_in.video.i_chroma ) {
