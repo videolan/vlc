@@ -83,6 +83,8 @@ struct glpriv
     HANDLE gl_handle_d3d;
     HANDLE gl_render;
     IDirect3DSurface9 *dx_render;
+
+    D3DFORMAT OutputFormat;
 };
 
 static int
@@ -230,14 +232,26 @@ GLConvOpen(vlc_object_t *obj)
     if (!priv)
         return VLC_ENOMEM;
     interop->priv = priv;
+    priv->OutputFormat = D3DFMT_X8R8G8B8;
     priv->vt = vt;
 
     HRESULT hr;
+    // test whether device can perform color-conversion from that format to target format
+    hr = IDirect3D9_CheckDeviceFormatConversion(d3d9_decoder->hd3d.obj,
+                                                d3d9_decoder->d3ddev.adapterId,
+                                                D3DDEVTYPE_HAL,
+                                                vctx_sys->format, priv->OutputFormat);
+    if (FAILED(hr))
+    {
+        msg_Dbg(interop->gl, "Unsupported conversion from %4.4s to RGB", (const char*)&vctx_sys->format );
+        goto error;
+    }
+
     HANDLE shared_handle = NULL;
     hr = IDirect3DDevice9Ex_CreateRenderTarget(d3d9_decoder->d3ddev.devex,
                                                interop->fmt.i_visible_width,
                                                interop->fmt.i_visible_height,
-                                               D3DFMT_X8R8G8B8,
+                                               priv->OutputFormat,
                                                D3DMULTISAMPLE_NONE, 0, FALSE,
                                                &priv->dx_render, &shared_handle);
     if (FAILED(hr))
