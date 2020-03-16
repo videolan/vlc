@@ -276,7 +276,7 @@ GLConvOpen(vlc_object_t *obj)
    if (shared_handle)
         priv->vt.DXSetResourceShareHandleNV(priv->dx_render, shared_handle);
 
-    priv->gl_handle_d3d = priv->vt.DXOpenDeviceNV(priv->d3d_dev.dev);
+    priv->gl_handle_d3d = priv->vt.DXOpenDeviceNV(priv->d3d_dev.devex);
     if (!priv->gl_handle_d3d)
     {
         msg_Warn(obj, "DXOpenDeviceNV failed: %lu", GetLastError());
