@@ -758,17 +758,33 @@ static int OpenDecoder(vlc_object_t *p_this)
             return VLC_EGENERIC;
     }
 
+    vlc_decoder_device *dec_device = decoder_GetDecoderDevice( p_dec );
+    if (dec_device == NULL)
+        return VLC_ENOOBJ;
+    if (dec_device->type != VLC_DECODER_DEVICE_NVDEC)
+    {
+        vlc_decoder_device_Release(dec_device);
+        return VLC_ENOOBJ;
+    }
+    p_sys->vctx_out = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_NVDEC, 0, NULL );
+    vlc_decoder_device_Release(dec_device);
+    if (unlikely(p_sys->vctx_out == NULL))
+    {
+        msg_Err(p_dec, "failed to create a video context");
+        return VLC_ENOOBJ;
+    }
+
     result = cuvid_load_functions(&p_sys->cuvidFunctions, p_dec);
     if (result != VLC_SUCCESS) {
         if (p_sys->b_is_hxxx)
             hxxx_helper_clean(&p_sys->hh);
-        return VLC_EGENERIC;
+        goto error;
     }
     result = cuda_load_functions(&p_sys->cudaFunctions, p_dec);
     if (result != VLC_SUCCESS) {
         if (p_sys->b_is_hxxx)
             hxxx_helper_clean(&p_sys->hh);
-        return VLC_EGENERIC;
+        goto error;
     }
 
     result = CALL_CUDA_DEC(cuInit, 0);
@@ -915,20 +931,6 @@ static int OpenDecoder(vlc_object_t *p_this)
         msg_Err( p_dec, "dimensions too big: max %dx%d, got %dx%d",
                  p_sys->selectedDecoder.nMaxWidth, p_sys->selectedDecoder.nMaxHeight,
                  p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height);
-        goto error;
-    }
-
-    vlc_decoder_device *dec_device = decoder_GetDecoderDevice( p_dec );
-    if (dec_device == NULL)
-        goto error;
-    if (dec_device->type == VLC_DECODER_DEVICE_NVDEC)
-    {
-        p_sys->vctx_out = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_NVDEC, 0, NULL );
-    }
-    vlc_decoder_device_Release(dec_device);
-    if (unlikely(p_sys->vctx_out == NULL))
-    {
-        msg_Err(p_dec, "failed to create a video context");
         goto error;
     }
 
