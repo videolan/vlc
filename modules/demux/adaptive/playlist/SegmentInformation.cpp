@@ -531,6 +531,9 @@ bool SegmentInformation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
         }
     }
 
+    if(parent)
+        return parent->getPlaybackTimeDurationBySegmentNumber(number, time, duration);
+
     return false;
 }
 
