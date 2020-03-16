@@ -157,9 +157,10 @@ uint64_t MediaSegmentTemplate::getLiveTemplateNumber(vlc_tick_t playbacktime) co
     {
         /* compute, based on current time */
         const Timescale timescale = inheritTimescale();
-        time_t streamstart = parentSegmentInformation->getPlaylist()->availabilityStartTime.Get();
+        vlc_tick_t streamstart =
+                vlc_tick_from_sec(parentSegmentInformation->getPlaylist()->availabilityStartTime.Get());
         streamstart += parentSegmentInformation->getPeriodStart();
-        stime_t elapsed = timescale.ToScaled(playbacktime - vlc_tick_from_sec(streamstart));
+        stime_t elapsed = timescale.ToScaled(playbacktime - streamstart);
         number += elapsed / dur;
     }
 
