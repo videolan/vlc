@@ -64,6 +64,18 @@ IsoffMainParser::~IsoffMainParser   ()
 {
 }
 
+template <class T>
+static void parseAvailability(Node *node, T *s)
+{
+    if(node->hasAttribute("availabilityTimeOffset"))
+    {
+        double val = Integer<double>(node->getAttributeValue("availabilityTimeOffset"));
+        s->setAvailabilityTimeOffset(val * CLOCK_FREQ);
+    }
+    if(node->hasAttribute("availabilityTimeComplete"))
+        s->setAvailabilityTimeComplete(node->getAttributeValue("availabilityTimeComplete") != "false");
+}
+
 void IsoffMainParser::parseMPDBaseUrl(MPD *mpd, Node *root)
 {
     std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(root, "BaseURL");
@@ -151,7 +163,10 @@ void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)
             period->duration.Set(IsoTime((*it)->getAttributeValue("duration")));
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(*it, "BaseURL");
         if(!baseUrls.empty())
+        {
             period->baseUrl.Set( new Url( baseUrls.front()->getText() ) );
+            parseAvailability<Period>(baseUrls.front(), period);
+        }
 
         parseAdaptationSets(*it, period);
         mpd->addPeriod(period);
@@ -182,6 +197,8 @@ size_t IsoffMainParser::parseSegmentTemplate(Node *templateNode, SegmentInformat
     if(templateNode->hasAttribute("duration"))
         mediaTemplate->duration.Set(Integer<stime_t>(templateNode->getAttributeValue("duration")));
 
+    parseAvailability<SegmentInformation>(templateNode, info);
+
     InitSegmentTemplate *initTemplate = NULL;
 
     if(templateNode->hasAttribute("initialization"))
@@ -207,6 +224,8 @@ size_t IsoffMainParser::parseSegmentInformation(Node *node, SegmentInformation *
     total += parseSegmentTemplate(DOMHelper::getFirstChildElementByName(node, "SegmentTemplate" ), info);
     if(node->hasAttribute("timescale"))
         info->setTimescale(Integer<uint64_t>(node->getAttributeValue("timescale")));
+
+    parseAvailability<SegmentInformation>(node, info);
 
     if(node->hasAttribute("id"))
         info->setID(ID(node->getAttributeValue("id")));
@@ -241,7 +260,10 @@ void    IsoffMainParser::parseAdaptationSets  (Node *periodNode, Period *period)
 
         Node *baseUrl = DOMHelper::getFirstChildElementByName((*it), "BaseURL");
         if(baseUrl)
+        {
+            parseAvailability<AdaptationSet>(baseUrl, adaptationSet);
             adaptationSet->baseUrl.Set(new Url(baseUrl->getText()));
+        }
 
         Node *role = DOMHelper::getFirstChildElementByName((*it), "Role");
         if(role && role->hasAttribute("schemeIdUri") && role->hasAttribute("value"))
@@ -295,7 +317,10 @@ void    IsoffMainParser::parseRepresentations (Node *adaptationSetNode, Adaptati
 
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(repNode, "BaseURL");
         if(!baseUrls.empty())
+        {
             currentRepresentation->baseUrl.Set(new Url(baseUrls.front()->getText()));
+            parseAvailability<Representation>(baseUrls.front(), currentRepresentation);
+        }
 
         if(repNode->hasAttribute("id"))
             currentRepresentation->setID(ID(repNode->getAttributeValue("id")));
@@ -353,6 +378,7 @@ size_t IsoffMainParser::parseSegmentBase(Node * segmentBaseNode, SegmentInformat
     }
 
     parseInitSegment(DOMHelper::getFirstChildElementByName(segmentBaseNode, "Initialization"), base, info);
+    parseAvailability<SegmentInformation>(segmentBaseNode, info);
 
     if(!base->initialisationSegment.Get() && base->indexSegment.Get() && base->indexSegment.Get()->getOffset())
     {
@@ -383,6 +409,8 @@ size_t IsoffMainParser::parseSegmentList(Node * segListNode, SegmentInformation 
 
             if(segListNode->hasAttribute("timescale"))
                 list->setTimescale(Integer<uint64_t>(segListNode->getAttributeValue("timescale")));
+
+            parseAvailability<SegmentInformation>(segListNode, info);
 
             uint64_t nzStartTime = 0;
             std::vector<Node *>::const_iterator it;

@@ -51,6 +51,10 @@ namespace adaptive
                 void    addPeriod               (BasePeriod *period);
                 void    addBaseUrl              (const std::string &);
                 void    setPlaylistUrl          (const std::string &);
+                void    setAvailabilityTimeOffset(vlc_tick_t);
+                void    setAvailabilityTimeComplete(bool);
+                vlc_tick_t getAvailabilityTimeOffset() const;
+                bool    getAvailabilityTimeComplete() const;
 
                 virtual Url         getUrlSegment() const; /* impl */
                 vlc_object_t *      getVLCObject()  const;
@@ -80,6 +84,10 @@ namespace adaptive
                 vlc_tick_t                          minBufferTime;
                 vlc_tick_t                          maxBufferTime;
                 bool                                b_needsUpdates;
+
+             private:
+                Undef<bool>                         availabilityTimeComplete;
+                Undef<vlc_tick_t>                   availabilityTimeOffset;
         };
     }
 }
