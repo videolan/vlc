@@ -172,9 +172,18 @@ libdirect3d9_plugin_la_SOURCES = video_output/win32/direct3d9.c \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libdirect3d9_plugin_la_LIBADD = libchroma_copy.la libd3d9_common.la -lgdi32 $(LIBCOM) -luuid
 libdirect3d9_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+
+libglinterop_dxva2_plugin_la_SOURCES = video_output/opengl/interop_dxva2.c \
+	video_output/opengl/interop.h
+libglinterop_dxva2_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS)
+libglinterop_dxva2_plugin_la_LIBADD = libd3d9_common.la
+
 if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += $(LTLIBdirect3d9)
 EXTRA_LTLIBRARIES += libdirect3d9_plugin.la
+if HAVE_GL
+vout_LTLIBRARIES += libglinterop_dxva2_plugin.la
+endif
 endif
 
 libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.c \
