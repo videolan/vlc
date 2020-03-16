@@ -131,19 +131,19 @@ GLConvUpdate(const opengl_tex_converter_t *tc, GLuint *textures,
     }
     else
     {
-    const RECT rect = {
-        .left = 0,
-        .top = 0,
-        .right = pic->format.i_visible_width,
-        .bottom = pic->format.i_visible_height
-    };
-    hr = IDirect3DDevice9Ex_StretchRect(priv->d3d_dev.devex, picsys->surface,
-                                        &rect, priv->dx_render, NULL, D3DTEXF_NONE);
-    if (FAILED(hr))
-    {
-        msg_Warn(tc->gl, "IDirect3DDevice9Ex_StretchRect failed");
-        return VLC_EGENERIC;
-    }
+        const RECT rect = {
+            .left = 0,
+            .top = 0,
+            .right = pic->format.i_visible_width,
+            .bottom = pic->format.i_visible_height
+        };
+        hr = IDirect3DDevice9Ex_StretchRect(priv->d3d_dev.devex, picsys->surface,
+                                            &rect, priv->dx_render, NULL, D3DTEXF_NONE);
+        if (FAILED(hr))
+        {
+            msg_Warn(tc->gl, "IDirect3DDevice9Ex_StretchRect failed");
+            return VLC_EGENERIC;
+        }
     }
 
     if (!priv->vt.DXLockObjectsNV(priv->gl_handle_d3d, 1, &priv->gl_render))
@@ -478,17 +478,17 @@ GLConvOpen(vlc_object_t *obj)
     }
     if (!force_dxva_hd)
     {
-    // test whether device can perform color-conversion from that format to target format
-    hr = IDirect3D9_CheckDeviceFormatConversion(priv->hd3d.obj,
-                                                priv->d3d_dev.adapterId,
-                                                D3DDEVTYPE_HAL,
-                                                format, priv->OutputFormat);
-    if (FAILED(hr))
-    {
-        msg_Dbg(tc->gl, "Unsupported conversion from %4.4s to RGB", (const char*)&format );
-        goto error;
-    }
-    msg_Dbg(tc->gl, "using StrecthRect from %4.4s to RGB", (const char*)&format );
+        // test whether device can perform color-conversion from that format to target format
+        hr = IDirect3D9_CheckDeviceFormatConversion(priv->hd3d.obj,
+                                                    priv->d3d_dev.adapterId,
+                                                    D3DDEVTYPE_HAL,
+                                                    format, priv->OutputFormat);
+        if (FAILED(hr))
+        {
+            msg_Dbg(tc->gl, "Unsupported conversion from %4.4s to RGB", (const char*)&format );
+            goto error;
+        }
+        msg_Dbg(tc->gl, "using StrecthRect from %4.4s to RGB", (const char*)&format );
     }
 
     HANDLE shared_handle = NULL;
