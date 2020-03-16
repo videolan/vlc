@@ -761,3 +761,33 @@ MediaSegmentTemplate * SegmentInformation::inheritSegmentTemplate() const
     else
         return NULL;
 }
+
+void SegmentInformation::setAvailabilityTimeOffset(mtime_t t)
+{
+    availabilityTimeOffset = t;
+}
+
+void SegmentInformation::setAvailabilityTimeComplete(bool b)
+{
+    availabilityTimeComplete = b;
+}
+
+mtime_t SegmentInformation::inheritAvailabilityTimeOffset() const
+{
+    for(const SegmentInformation *p = this; p; p = p->parent)
+    {
+        if(availabilityTimeOffset.isSet())
+            return availabilityTimeOffset.value();
+    }
+    return getPlaylist()->getAvailabilityTimeOffset();
+}
+
+bool SegmentInformation::inheritAvailabilityTimeComplete() const
+{
+    for(const SegmentInformation *p = this; p; p = p->parent)
+    {
+        if(availabilityTimeComplete.isSet())
+            return availabilityTimeComplete.value();
+    }
+    return getPlaylist()->getAvailabilityTimeComplete();
+}

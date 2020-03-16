@@ -71,6 +71,26 @@ void AbstractPlaylist::setPlaylistUrl(const std::string &url)
     playlistUrl = url;
 }
 
+void AbstractPlaylist::setAvailabilityTimeOffset(mtime_t t)
+{
+    availabilityTimeOffset = t;
+}
+
+void AbstractPlaylist::setAvailabilityTimeComplete(bool b)
+{
+    availabilityTimeComplete = b;
+}
+
+mtime_t AbstractPlaylist::getAvailabilityTimeOffset() const
+{
+    return availabilityTimeOffset.isSet() ? availabilityTimeOffset.value() : 0;
+}
+
+bool AbstractPlaylist::getAvailabilityTimeComplete() const
+{
+    return !availabilityTimeComplete.isSet() || availabilityTimeComplete.value();
+}
+
 void AbstractPlaylist::addPeriod(BasePeriod *period)
 {
     periods.push_back(period);

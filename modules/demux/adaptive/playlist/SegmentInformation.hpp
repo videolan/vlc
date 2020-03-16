@@ -99,17 +99,23 @@ namespace adaptive
                 void setSegmentTemplate(MediaSegmentTemplate *);
                 virtual Url getUrlSegment() const; /* impl */
                 Property<Url *> baseUrl;
+                void setAvailabilityTimeOffset(mtime_t);
+                void setAvailabilityTimeComplete(bool);
 
             private:
                 void init();
                 SegmentBase *     inheritSegmentBase() const;
                 SegmentList *     inheritSegmentList() const;
                 MediaSegmentTemplate * inheritSegmentTemplate() const;
+                mtime_t           inheritAvailabilityTimeOffset() const;
+                bool              inheritAvailabilityTimeComplete() const;
 
                 SegmentBase     *segmentBase;
                 SegmentList     *segmentList;
                 MediaSegmentTemplate *mediaSegmentTemplate;
                 CommonEncryption commonEncryption;
+                Undef<bool>      availabilityTimeComplete;
+                Undef<mtime_t>   availabilityTimeOffset;
         };
     }
 }
