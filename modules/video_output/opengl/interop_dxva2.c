@@ -195,6 +195,12 @@ GLConvOpen(vlc_object_t *obj)
     if ( vctx_sys == NULL || d3d9_decoder == NULL )
         return VLC_EGENERIC;
 
+    if (!d3d9_decoder->hd3d.use_ex)
+    {
+        msg_Warn(obj, "DX/GL interrop only working on d3d9x");
+        return VLC_EGENERIC;
+    }
+
     if (interop->gl->ext != VLC_GL_EXT_WGL || !interop->gl->wgl.getExtensionsString)
         return VLC_EGENERIC;
 
@@ -226,12 +232,6 @@ GLConvOpen(vlc_object_t *obj)
     interop->priv = priv;
     priv->vt = vt;
 
-    if (!d3d9_decoder->hd3d.use_ex)
-    {
-        msg_Warn(obj, "DX/GL interrop only working on d3d9x");
-        goto error;
-    }
-
     HRESULT hr;
     HANDLE shared_handle = NULL;
     hr = IDirect3DDevice9Ex_CreateRenderTarget(d3d9_decoder->d3ddev.devex,
@@ -249,7 +249,7 @@ GLConvOpen(vlc_object_t *obj)
    if (shared_handle)
         priv->vt.DXSetResourceShareHandleNV(priv->dx_render, shared_handle);
 
-    priv->gl_handle_d3d = priv->vt.DXOpenDeviceNV(d3d9_decoder->d3ddev.dev);
+    priv->gl_handle_d3d = priv->vt.DXOpenDeviceNV(d3d9_decoder->d3ddev.devex);
     if (!priv->gl_handle_d3d)
     {
         msg_Warn(obj, "DXOpenDeviceNV failed: %lu", GetLastError());
