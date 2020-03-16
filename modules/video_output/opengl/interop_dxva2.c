@@ -133,19 +133,19 @@ GLConvUpdate(const struct vlc_gl_interop *interop, GLuint *textures,
     }
     else
     {
-    const RECT rect = {
-        .left = 0,
-        .top = 0,
-        .right = pic->format.i_visible_width,
-        .bottom = pic->format.i_visible_height
-    };
-    hr = IDirect3DDevice9Ex_StretchRect(d3d9_decoder->d3ddev.devex, picsys->surface,
-                                        &rect, priv->dx_render, NULL, D3DTEXF_NONE);
-    if (FAILED(hr))
-    {
-        msg_Warn(interop->gl, "IDirect3DDevice9Ex_StretchRect failed. (0x%lX)", hr);
-        return VLC_EGENERIC;
-    }
+        const RECT rect = {
+            .left = 0,
+            .top = 0,
+            .right = pic->format.i_visible_width,
+            .bottom = pic->format.i_visible_height
+        };
+        hr = IDirect3DDevice9Ex_StretchRect(d3d9_decoder->d3ddev.devex, picsys->surface,
+                                            &rect, priv->dx_render, NULL, D3DTEXF_NONE);
+        if (FAILED(hr))
+        {
+            msg_Warn(interop->gl, "IDirect3DDevice9Ex_StretchRect failed. (0x%lX)", hr);
+            return VLC_EGENERIC;
+        }
     }
 
     if (!priv->vt.DXLockObjectsNV(priv->gl_handle_d3d, 1, &priv->gl_render))
@@ -465,17 +465,17 @@ GLConvOpen(vlc_object_t *obj)
     }
     if (!force_dxva_hd)
     {
-    // test whether device can perform color-conversion from that format to target format
-    hr = IDirect3D9_CheckDeviceFormatConversion(d3d9_decoder->hd3d.obj,
-                                                d3d9_decoder->d3ddev.adapterId,
-                                                D3DDEVTYPE_HAL,
-                                                vctx_sys->format, priv->OutputFormat);
-    if (FAILED(hr))
-    {
-        msg_Dbg(interop->gl, "Unsupported conversion from %4.4s to RGB", (const char*)&vctx_sys->format );
-        goto error;
-    }
-    msg_Dbg(interop->gl, "using StrecthRect from %4.4s to RGB", (const char*)&vctx_sys->format );
+        // test whether device can perform color-conversion from that format to target format
+        hr = IDirect3D9_CheckDeviceFormatConversion(d3d9_decoder->hd3d.obj,
+                                                    d3d9_decoder->d3ddev.adapterId,
+                                                    D3DDEVTYPE_HAL,
+                                                    vctx_sys->format, priv->OutputFormat);
+        if (FAILED(hr))
+        {
+            msg_Dbg(interop->gl, "Unsupported conversion from %4.4s to RGB", (const char*)&vctx_sys->format );
+            goto error;
+        }
+        msg_Dbg(interop->gl, "using StrecthRect from %4.4s to RGB", (const char*)&vctx_sys->format );
     }
 
     HANDLE shared_handle = NULL;
