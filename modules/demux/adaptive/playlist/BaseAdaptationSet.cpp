@@ -45,8 +45,6 @@ BaseAdaptationSet::BaseAdaptationSet(BasePeriod *period) :
     CommonAttributesElements(),
     SegmentInformation( period )
 {
-    segmentAligned = TRIBOOL_UNKNOWN;
-    bitswitchAble = TRIBOOL_UNKNOWN;
 }
 
 BaseAdaptationSet::~BaseAdaptationSet   ()
@@ -105,22 +103,22 @@ void BaseAdaptationSet::setLang( const std::string &lang_ )
 
 void BaseAdaptationSet::setSegmentAligned(bool b)
 {
-    segmentAligned = b ? TRIBOOL_TRUE : TRIBOOL_FALSE;
+    segmentAligned = b;
 }
 
 void BaseAdaptationSet::setBitswitchAble(bool b)
 {
-    bitswitchAble = b ? TRIBOOL_TRUE : TRIBOOL_FALSE;
+    bitswitchAble = b;
 }
 
 bool BaseAdaptationSet::isSegmentAligned() const
 {
-    return segmentAligned != TRIBOOL_FALSE;
+    return segmentAligned.isSet() && segmentAligned.value();
 }
 
 bool BaseAdaptationSet::isBitSwitchable() const
 {
-    return bitswitchAble == TRIBOOL_TRUE;
+    return bitswitchAble.isSet() && segmentAligned.value();
 }
 
 void BaseAdaptationSet::setRole(const Role &r)

@@ -68,8 +68,8 @@ namespace adaptive
                 Role                            role;
                 std::vector<BaseRepresentation *>   representations;
                 std::string                     lang;
-                Tribool                         segmentAligned;
-                Tribool                         bitswitchAble;
+                Undef<bool>                     segmentAligned;
+                Undef<bool>                     bitswitchAble;
         };
     }
 }
