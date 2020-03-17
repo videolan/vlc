@@ -1359,7 +1359,6 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
 void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
 {
     assert(!vout->p->dummy);
-    assert(vout->p->display);
 
     vout_control_Hold(&vout->p->control);
     assert(!vout->p->pause.is_on || !is_paused);
