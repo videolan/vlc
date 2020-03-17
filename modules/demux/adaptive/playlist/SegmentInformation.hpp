@@ -39,13 +39,6 @@ namespace adaptive
         class AbstractPlaylist;
         class ISegment;
 
-        enum Tribool
-        {
-            TRIBOOL_UNKNOWN,
-            TRIBOOL_FALSE,
-            TRIBOOL_TRUE,
-        };
-
         /* common segment elements for period/adaptset/rep 5.3.9.1,
          * with properties inheritance */
         class SegmentInformation : public ICanonicalUrl,
