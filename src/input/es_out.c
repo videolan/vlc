@@ -127,8 +127,8 @@ struct es_out_id_t
     char        *psz_title;
     bool        b_terminated;
 
-    decoder_t   *p_dec;
-    decoder_t   *p_dec_record;
+    vlc_input_decoder_t   *p_dec;
+    vlc_input_decoder_t   *p_dec_record;
     vlc_clock_t *p_clock;
 
     /* Used by vlc_clock_cbs, need to be const during the lifetime of the clock */
@@ -279,7 +279,7 @@ static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
         vlc_list_foreach( pos, (!fetes_i ? &p_sys->es : &p_sys->es_slaves), node )
 
 static void
-decoder_on_vout_started(decoder_t *decoder, vout_thread_t *vout,
+decoder_on_vout_started(vlc_input_decoder_t *decoder, vout_thread_t *vout,
                       enum vlc_vout_order order, void *userdata)
 {
     (void) decoder;
@@ -302,7 +302,7 @@ decoder_on_vout_started(decoder_t *decoder, vout_thread_t *vout,
 }
 
 static void
-decoder_on_vout_stopped(decoder_t *decoder, vout_thread_t *vout, void *userdata)
+decoder_on_vout_stopped(vlc_input_decoder_t *decoder, vout_thread_t *vout, void *userdata)
 {
     (void) decoder;
 
@@ -324,7 +324,7 @@ decoder_on_vout_stopped(decoder_t *decoder, vout_thread_t *vout, void *userdata)
 }
 
 static void
-decoder_on_thumbnail_ready(decoder_t *decoder, picture_t *pic, void *userdata)
+decoder_on_thumbnail_ready(vlc_input_decoder_t *decoder, picture_t *pic, void *userdata)
 {
     (void) decoder;
 
@@ -344,7 +344,7 @@ decoder_on_thumbnail_ready(decoder_t *decoder, picture_t *pic, void *userdata)
 }
 
 static void
-decoder_on_new_video_stats(decoder_t *decoder, unsigned decoded, unsigned lost,
+decoder_on_new_video_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsigned lost,
                            unsigned displayed, void *userdata)
 {
     (void) decoder;
@@ -369,7 +369,7 @@ decoder_on_new_video_stats(decoder_t *decoder, unsigned decoded, unsigned lost,
 }
 
 static void
-decoder_on_new_audio_stats(decoder_t *decoder, unsigned decoded, unsigned lost,
+decoder_on_new_audio_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsigned lost,
                            unsigned played, void *userdata)
 {
     (void) decoder;
@@ -394,7 +394,7 @@ decoder_on_new_audio_stats(decoder_t *decoder, unsigned decoded, unsigned lost,
 }
 
 static int
-decoder_get_attachments(decoder_t *decoder,
+decoder_get_attachments(vlc_input_decoder_t *decoder,
                         input_attachment_t ***ppp_attachment,
                         void *userdata)
 {
@@ -2146,7 +2146,7 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t *p_input = p_sys->p_input;
-    decoder_t *dec;
+    vlc_input_decoder_t *dec;
 
     static const struct vlc_clock_cbs clock_cbs = {
         .on_update = ClockUpdate
