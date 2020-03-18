@@ -147,7 +147,8 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     }
 
     vlc_input_decoder_t *p_dec =
-        input_DecoderCreate( VLC_OBJECT(p_stream), p_fmt, p_sys->p_resource );
+        vlc_input_decoder_Create( VLC_OBJECT(p_stream), p_fmt,
+                                  p_sys->p_resource );
     if( p_dec == NULL )
     {
         msg_Err( p_stream, "cannot create decoder for fcc=`%4.4s'",
@@ -160,7 +161,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 static void Del( sout_stream_t *p_stream, void *id )
 {
     (void) p_stream;
-    input_DecoderDelete( id );
+    vlc_input_decoder_Delete( id );
 }
 
 static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
@@ -185,7 +186,7 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
             else
                 p_buffer->i_pts += p_sys->i_delay;
 
-            input_DecoderDecode( id, p_buffer, false );
+            vlc_input_decoder_Decode( id, p_buffer, false );
         }
 
         p_buffer = p_next;
@@ -200,7 +201,7 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
     {
         vlc_input_decoder_t *p_dec = va_arg(args, void *);
         void *spu_hl = va_arg(args, void *);
-        return input_DecoderSetSpuHighlight( p_dec, spu_hl );
+        return vlc_input_decoder_SetSpuHighlight( p_dec, spu_hl );
     }
     (void) p_stream;
     return VLC_EGENERIC;
