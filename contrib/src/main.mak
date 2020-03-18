@@ -78,18 +78,10 @@ endif
 ifneq ($(findstring $(origin AR),undefined default),)
 AR := ar
 endif
-ifneq ($(findstring $(origin RANLIB),undefined default),)
-RANLIB := ranlib
-endif
-ifneq ($(findstring $(origin STRIP),undefined default),)
-STRIP := strip
-endif
-ifneq ($(findstring $(origin WIDL),undefined default),)
-WIDL := widl
-endif
-ifneq ($(findstring $(origin WINDRES),undefined default),)
-WINDRES := windres
-endif
+RANLIB ?= ranlib
+STRIP ?= strip
+WIDL ?= widl
+WINDRES ?= windres
 else
 ifneq ($(findstring $(origin CC),undefined default),)
 CC := $(HOST)-gcc
@@ -103,18 +95,10 @@ endif
 ifneq ($(findstring $(origin AR),undefined default),)
 AR := $(HOST)-ar
 endif
-ifneq ($(findstring $(origin RANLIB),undefined default),)
-RANLIB := $(HOST)-ranlib
-endif
-ifneq ($(findstring $(origin STRIP),undefined default),)
-STRIP := $(HOST)-strip
-endif
-ifneq ($(findstring $(origin WIDL),undefined default),)
-WIDL := $(HOST)-widl
-endif
-ifneq ($(findstring $(origin WINDRES),undefined default),)
-WINDRES := $(HOST)-windres
-endif
+RANLIB ?= $(HOST)-ranlib
+STRIP ?= $(HOST)-strip
+WIDL ?= $(HOST)-widl
+WINDRES ?= $(HOST)-windres
 endif
 
 ifdef HAVE_ANDROID
