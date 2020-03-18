@@ -2313,14 +2313,15 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es, bool b_force )
 
     /* Special case of the zvbi decoder for teletext: send the initial selected
      * page and transparency */
-    if( !es->p_master && es->fmt.i_cat == SPU_ES
-     && es->fmt.i_codec == VLC_CODEC_TELETEXT
-     && var_Type( es->p_dec, "vbi-page" ) == VLC_VAR_INTEGER )
+    if( !es->p_master )
     {
-        input_SendEventVbiPage( p_input,
-                                var_GetInteger( es->p_dec, "vbi-page" ) );
-        input_SendEventVbiTransparency( p_input,
-                                        var_GetBool( es->p_dec, "vbi-opaque" ) );
+        bool vbi_opaque;
+        int vbi_page = input_DecoderGetVbiPage( es->p_dec, &vbi_opaque );
+        if( vbi_page >= 0 )
+        {
+            input_SendEventVbiPage( p_input, vbi_page );
+            input_SendEventVbiTransparency( p_input, vbi_opaque );
+        }
     }
 }
 
@@ -3718,22 +3719,21 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
         vlc_es_id_t *es_id = va_arg( args, vlc_es_id_t * );
         es_out_id_t *es = vlc_es_id_get_out( es_id );
         assert(es);
-        if( !es->p_dec || es->fmt.i_cat != SPU_ES
-          || es->fmt.i_codec != VLC_CODEC_TELETEXT )
+        if( !es->p_dec )
             return VLC_EGENERIC;
 
         int ret;
         if( query == ES_OUT_PRIV_SET_VBI_PAGE )
         {
             unsigned page = va_arg( args, unsigned );
-            ret = var_SetInteger( es->p_dec, "vbi-page", page );
+            ret = input_DecoderSetVbiPage( es->p_dec, page );
             if( ret == VLC_SUCCESS )
                 input_SendEventVbiPage( p_sys->p_input, page );
         }
         else
         {
             bool opaque = va_arg( args, int );
-            ret = var_SetBool( es->p_dec, "vbi-opaque", opaque );
+            ret = input_DecoderSetVbiOpaque( es->p_dec, opaque );
             if( ret == VLC_SUCCESS )
                 input_SendEventVbiTransparency( p_sys->p_input, opaque );
         }

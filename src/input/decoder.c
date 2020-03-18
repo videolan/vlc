@@ -2583,6 +2583,34 @@ size_t input_DecoderGetFifoSize( decoder_t *p_dec )
     return block_FifoSize( p_owner->p_fifo );
 }
 
+static bool DecoderHasVbi( decoder_t *dec )
+{
+    return dec->fmt_in.i_cat == SPU_ES && dec->fmt_in.i_codec == VLC_CODEC_TELETEXT
+        && var_Type( dec, "vbi-page" ) == VLC_VAR_INTEGER;
+}
+
+int input_DecoderGetVbiPage( decoder_t *dec, bool *opaque )
+{
+    if( !DecoderHasVbi( dec ) )
+        return -1;
+    *opaque = var_GetBool( dec, "vbi-opaque" );
+    return var_GetInteger( dec, "vbi-page" );
+}
+
+int input_DecoderSetVbiPage( decoder_t *dec, unsigned page )
+{
+    if( !DecoderHasVbi( dec ) )
+        return VLC_EGENERIC;
+    return var_SetInteger( dec, "vbi-page", page );
+}
+
+int input_DecoderSetVbiOpaque( decoder_t *dec, bool opaque )
+{
+    if( !DecoderHasVbi( dec ) )
+        return VLC_EGENERIC;
+    return var_SetBool( dec, "vbi-opaque", opaque );
+}
+
 void input_DecoderSetVoutMouseEvent( decoder_t *dec, vlc_mouse_event mouse_event,
                                     void *user_data )
 {

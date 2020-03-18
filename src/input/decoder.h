@@ -134,6 +134,10 @@ bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt, vlc_me
  */
 size_t input_DecoderGetFifoSize( decoder_t *p_dec );
 
+int input_DecoderGetVbiPage( decoder_t *, bool *opaque );
+int input_DecoderSetVbiPage( decoder_t *, unsigned page );
+int input_DecoderSetVbiOpaque( decoder_t *, bool opaque );
+
 void input_DecoderSetVoutMouseEvent( decoder_t *, vlc_mouse_event, void * );
 int  input_DecoderAddVoutOverlay( decoder_t *, subpicture_t *, size_t * );
 int  input_DecoderDelVoutOverlay( decoder_t *, size_t );
