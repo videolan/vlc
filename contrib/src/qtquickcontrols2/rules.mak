@@ -33,8 +33,7 @@ QUICK_CONTROL_CONFIG := \
 .qtquickcontrols2: qtquickcontrols2
 	cd $< && $(PREFIX)/bin/qmake -- $(QUICK_CONTROL_CONFIG)
 	# Make && Install libraries
-	cd $< && $(MAKE)
-	cd $< && $(MAKE) -C src sub-quickcontrols2-install_subtargets sub-imports-install_subtargets
+	cd $< && $(MAKE) install_subtargets
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5QuickControls2 qml/QtQuick/Controls.2 qtquickcontrols2plugin
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5QuickControls2 qml/QtQuick/Templates.2 qtquicktemplates2plugin
 	touch $@
