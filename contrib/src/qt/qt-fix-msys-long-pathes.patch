@@ -1,0 +1,8 @@
+--- qt/src/angle/src/common/gles_common.pri.msys	2020-03-19 15:10:05.865014200 +0100
++++ qt/src/angle/src/common/gles_common.pri	2020-03-19 15:10:09.946228700 +0100
+@@ -1,4 +1,4 @@
+-CONFIG += simd no_batch object_parallel_to_source
++CONFIG += simd no_batch
+ include(common.pri)
+ 
+ INCLUDEPATH += \
