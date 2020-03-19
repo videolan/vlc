@@ -33,6 +33,11 @@ QUICK_CONTROL_CONFIG := \
 .qtquickcontrols2: qtquickcontrols2
 	cd $< && $(PREFIX)/bin/qmake -- $(QUICK_CONTROL_CONFIG)
 	# Make && Install libraries
+	cd $< && $(MAKE) sub-src-qmake_all
+ifndef HAVE_CROSS_COMPILE
+	cd $<; for i in QtQuickControls2 QtQuickTemplates2; do \
+		sed -i -e 's,"../../../../../src,"../src,g' include/$$i/$(QTQC2_VERSION)/$$i/private/*.h; done
+endif
 	cd $< && $(MAKE) install_subtargets
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5QuickControls2 qml/QtQuick/Controls.2 qtquickcontrols2plugin
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5QuickControls2 qml/QtQuick/Templates.2 qtquicktemplates2plugin
