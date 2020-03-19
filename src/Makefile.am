@@ -586,7 +586,8 @@ check_PROGRAMS = \
 	test_playlist \
 	test_randomizer \
 	test_media_source \
-	test_extensions
+	test_extensions \
+	test_thread
 
 TESTS = $(check_PROGRAMS) check_symbols
 
@@ -632,6 +633,7 @@ test_media_source_CFLAGS = -DTEST_MEDIA_SOURCE
 test_media_source_SOURCES = media_source/test.c \
 	media_source/media_source.c \
 	media_source/media_tree.c
+test_thread_SOURCES = test/thread.c
 
 AM_LDFLAGS = -no-install
 LDADD = libvlccore.la \
