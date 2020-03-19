@@ -6,7 +6,12 @@
 #
 # This could also be done in configure.ac to detect what plugins are available and where to add them
 
-PREFIX=$(python3 -c "import os; print(os.path.realpath('$1'))")
+REAL_PREFIX="$1"
+if [ ! `cygpath.exe -pm / || echo FAIL` = "FAIL" ]; then
+    REAL_PREFIX=`cygpath.exe -pm ${REAL_PREFIX}`
+fi
+
+PREFIX=$(python3 -c "import os; print(os.path.realpath('${REAL_PREFIX}'))")
 PLUGIN_PATH="$3"
 PLUGIN_NAME="$4"
 
