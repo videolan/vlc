@@ -342,6 +342,8 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/logic/AlwaysBestAdaptationLogic.h \
     demux/adaptive/logic/AlwaysLowestAdaptationLogic.cpp \
     demux/adaptive/logic/AlwaysLowestAdaptationLogic.hpp \
+    demux/adaptive/logic/BufferingLogic.cpp \
+    demux/adaptive/logic/BufferingLogic.hpp \
     demux/adaptive/logic/IDownloadRateObserver.h \
     demux/adaptive/logic/NearOptimalAdaptationLogic.cpp \
     demux/adaptive/logic/NearOptimalAdaptationLogic.hpp \
