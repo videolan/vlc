@@ -133,8 +133,10 @@ if [ "$PREBUILT" != "yes" ]; then
     fi
 elif [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
     make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL"
+    make -j$JOBS --output-sync=recurse .luac
 else
     make prebuilt
+    make -j$JOBS --output-sync=recurse .luac
 fi
 cd ../..
 
