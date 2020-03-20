@@ -82,6 +82,11 @@ public:
     float           m_position = 0.f;
     VLCTick      m_length= 0;
 
+    using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
+                                                  input_item_Hold,
+                                                  input_item_Release);
+
+    InputItemPtr    m_currentItem;
     bool            m_canRestorePlayback = false;
 
     int             m_capabilities = 0;

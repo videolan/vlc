@@ -431,6 +431,8 @@ private slots:
     void menusUpdateAudio( const QString& );
 
 private:
+    bool isCurrentItemSynced();
+
     Q_DECLARE_PRIVATE(PlayerController)
     QScopedPointer<PlayerControllerPrivate> d_ptr;
     QSignalMapper *menusAudioMapper; //used by VLCMenuBar
