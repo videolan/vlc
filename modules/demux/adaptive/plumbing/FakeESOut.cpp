@@ -58,6 +58,7 @@ const struct es_out_callbacks EsOutCallbacks::cbs =
     EsOutCallbacks::es_out_Del,
     EsOutCallbacks::es_out_Control,
     EsOutCallbacks::es_out_Destroy,
+    nullptr,
 };
 
 es_out_id_t * EsOutCallbacks::es_out_Add(es_out_t *fakees, input_source_t *, const es_format_t *p_fmt)
