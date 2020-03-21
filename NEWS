@@ -50,6 +50,13 @@ Mux:
  * Fixed some YUV mappings
 
 macOS:
+ * Use a layer based video output on 10.14 and higher, which should
+   fix various rendering issues where the vout would glitch between
+   a wrong size and the correct size.
+   Additionally this works around OpenGL issues with Macs that have a
+   dedicated NVIDIA GPU, which caused rendering artifacts in the whole
+   OS, especially when the "Reduce transparency" accessibility option
+   is used
  * Remove qtsound module and add avaudiocapture module as replacement
  * Fix audio capture on macOS Catalina by using avaudiocapture
  * Inform the user in case OS permissions are missing for certain actions
