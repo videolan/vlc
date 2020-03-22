@@ -30,6 +30,9 @@
 #include "playlist/SegmentChunk.hpp"
 #include "logic/AbstractAdaptationLogic.h"
 
+#include <cassert>
+#include <limits>
+
 using namespace adaptive;
 using namespace adaptive::logic;
 using namespace adaptive::playlist;
@@ -81,7 +84,7 @@ SegmentTracker::SegmentTracker(SharedResources *res,
 {
     resources = res;
     first = true;
-    curNumber = next = 0;
+    curNumber = next = std::numeric_limits<uint64_t>::max();
     initializing = true;
     index_sent = false;
     init_sent = false;
@@ -148,7 +151,10 @@ bool SegmentTracker::segmentsListReady() const
     if(!rep)
         rep = logic->getNextRepresentation(adaptationSet, NULL);
     if(rep && rep->getPlaylist()->isLive())
+    {
+        assert(curNumber != std::numeric_limits<uint64_t>::max());
         return rep->getMinAheadTime(curNumber) > 0;
+    }
     return true;
 }
 
@@ -205,15 +211,16 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     if(rep->needsUpdate())
         b_updated = rep->runLocalUpdates(resources);
 
-    if(prevRep && !rep->consistentSegmentNumber())
+    if(curNumber == std::numeric_limits<uint64_t>::max())
+    {
+        next = rep->getLiveStartSegmentNumber(next);
+        if(next == std::numeric_limits<uint64_t>::max())
+            return NULL;
+    }
+    else if(prevRep && !rep->consistentSegmentNumber())
     {
         /* Convert our segment number */
         next = rep->translateSegmentNumber(next, prevRep);
-    }
-    else if(first && rep->getPlaylist()->isLive())
-    {
-        next = rep->getLiveStartSegmentNumber(next);
-        first = false;
     }
 
     if(b_updated)
