@@ -930,7 +930,7 @@ AC_SUBST([LIBRT])
 
 dnl  Check for clock_* functions, needs to be done here,
 dnl  after the -lrt check
-AC_REPLACE_FUNCS([clock_gettime])
+AC_REPLACE_FUNCS([clock_gettime clock_nanosleep])
 
 dnl
 dnl Check for headers
