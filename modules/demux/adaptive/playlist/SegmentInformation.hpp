@@ -101,15 +101,14 @@ namespace adaptive
                 Property<Url *> baseUrl;
                 void setAvailabilityTimeOffset(vlc_tick_t);
                 void setAvailabilityTimeComplete(bool);
-
-            private:
-                void init();
                 SegmentBase *     inheritSegmentBase() const;
                 SegmentList *     inheritSegmentList() const;
                 MediaSegmentTemplate * inheritSegmentTemplate() const;
                 vlc_tick_t        inheritAvailabilityTimeOffset() const;
                 bool              inheritAvailabilityTimeComplete() const;
 
+            private:
+                void init();
                 SegmentBase     *segmentBase;
                 SegmentList     *segmentList;
                 MediaSegmentTemplate *mediaSegmentTemplate;
