@@ -489,12 +489,17 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
                 .WidthInBytes   = i_pitch,
                 .Height         = plane.i_visible_lines,
             };
-            result = CALL_CUDA_DEC(cuMemcpy2D, &cu_cpy);
+            result = CALL_CUDA_DEC(cuMemcpy2DAsync, &cu_cpy, 0);
             if (result != VLC_SUCCESS)
                 goto error;
             srcY += p_sys->decoderHeight;
         }
     }
+
+    // Wait until copies are finished
+    result = CALL_CUDA_DEC(cuStreamSynchronize, 0);
+    if (unlikely(result != VLC_SUCCESS))
+        goto error;
 
     // Release surface on GPU
     result = CALL_CUVID(cuvidUnmapVideoFrame, p_sys->cudecoder, frameDevicePtr);
@@ -522,7 +527,13 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
 
 error:
     if (frameDevicePtr)
+    {
+        // Synchronize stream to wait for potentitally pending copies
+        // then unmap the frame.
+        // No need to check for errors, there is nothing we can do anyway
+        CALL_CUDA_DEC(cuStreamSynchronize, 0);
         CALL_CUVID(cuvidUnmapVideoFrame, p_sys->cudecoder, frameDevicePtr);
+    }
     CALL_CUDA_DEC(cuCtxPopCurrent, NULL);
     if (p_pic)
         picture_Release(p_pic);
