@@ -51,6 +51,8 @@ struct fingerprinter_sys_t
         vlc_mutex_t         lock;
     } incoming, results;
 
+    vlc_cond_t              incoming_cond;
+
     struct
     {
         vlc_array_t         queue;
@@ -85,14 +87,13 @@ static int EnqueueRequest( fingerprinter_thread_t *f, fingerprint_request_t *r )
     fingerprinter_sys_t *p_sys = f->p_sys;
     vlc_mutex_lock( &p_sys->incoming.lock );
     int i_ret = vlc_array_append( &p_sys->incoming.queue, r );
+    vlc_cond_signal( &p_sys->incoming_cond );
     vlc_mutex_unlock( &p_sys->incoming.lock );
     return i_ret;
 }
 
 static void QueueIncomingRequests( fingerprinter_sys_t *p_sys )
 {
-    vlc_mutex_lock( &p_sys->incoming.lock );
-
     for( size_t i = vlc_array_count( &p_sys->incoming.queue ); i > 0 ; i-- )
     {
         fingerprint_request_t *r = vlc_array_item_at_index( &p_sys->incoming.queue, i - 1 );
@@ -100,7 +101,6 @@ static void QueueIncomingRequests( fingerprinter_sys_t *p_sys )
             fingerprint_request_Delete( r );
     }
     vlc_array_clear( &p_sys->incoming.queue );
-    vlc_mutex_unlock(&p_sys->incoming.lock);
 }
 
 static fingerprint_request_t * GetResult( fingerprinter_thread_t *f )
@@ -250,6 +250,7 @@ static int Open(vlc_object_t *p_this)
 
     vlc_array_init( &p_sys->incoming.queue );
     vlc_mutex_init( &p_sys->incoming.lock );
+    vlc_cond_init( &p_sys->incoming_cond );
 
     vlc_array_init( &p_sys->processing.queue );
     vlc_cond_init( &p_sys->processing.cond );
@@ -344,11 +345,16 @@ static void *Run( void *opaque )
     /* main loop */
     for (;;)
     {
-        vlc_tick_sleep( VLC_TICK_FROM_SEC(1) );
+        vlc_mutex_lock( &p_sys->incoming.lock );
+        mutex_cleanup_push( &p_sys->incoming.lock );
+
+        while( vlc_array_count( &p_sys->incoming.queue ) == 0 )
+            vlc_cond_wait( &p_sys->incoming_cond, &p_sys->incoming.lock );
 
         QueueIncomingRequests( p_sys );
 
-        vlc_testcancel();
+        vlc_cleanup_pop();
+        vlc_mutex_unlock( &p_sys->incoming.lock );
 
         bool results_available = false;
         while( vlc_array_count( &p_sys->processing.queue ) )
