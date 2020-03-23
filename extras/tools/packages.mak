@@ -42,9 +42,6 @@ SED_URL=$(GNU)/sed/sed-$(SED_VERSION).tar.bz2
 ANT_VERSION=1.9.7
 ANT_URL=$(APACHE)/ant/binaries/apache-ant-$(ANT_VERSION)-bin.tar.bz2
 
-PROTOBUF_VERSION := 3.1.0
-PROTOBUF_URL := https://github.com/google/protobuf/releases/download/v$(PROTOBUF_VERSION)/protobuf-cpp-$(PROTOBUF_VERSION).tar.gz
-
 BISON_VERSION=3.0.4
 BISON_URL=$(GNU)/bison/bison-$(BISON_VERSION).tar.xz
 

@@ -308,25 +308,6 @@ DISTCLEAN_PKG += apache-ant-$(ANT_VERSION).tar.bz2
 CLEAN_FILE += .buildant
 
 
-# Protobuf Protoc
-
-protobuf-$(PROTOBUF_VERSION).tar.gz:
-	$(call download_pkg,$(PROTOBUF_URL),protobuf)
-
-protobuf: protobuf-$(PROTOBUF_VERSION).tar.gz
-	$(UNPACK)
-	$(APPLY) $(TOOLS)/protobuf-fix-build.patch
-	$(MOVE)
-
-.buildprotoc: protobuf
-	(cd $< && ./configure --prefix="$(PREFIX)" --disable-shared --enable-static --disable-dependency-tracking && $(MAKE) && $(MAKE) install)
-	(find $(PREFIX) -name 'protobuf*.pc' -exec rm -f {} \;)
-	touch $@
-
-CLEAN_PKG += protobuf
-DISTCLEAN_PKG += protobuf-$(PROTOBUF_VERSION).tar.gz
-CLEAN_FILE += .buildprotoc
-
 #
 # GNU bison
 #

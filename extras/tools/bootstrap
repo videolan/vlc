@@ -112,22 +112,6 @@ else
 fi
 }
 
-check_majmin() {
-if ! $1 --version >/dev/null 2>&1 && ! $1 -version >/dev/null 2>&1 && ! $1 --version 2>/dev/null
-then
-    echo "$1 not found"
-    NEEDED="$NEEDED $1"
-else
-    # found, need to check version ?
-    if [ -z "$2" ];then
-        FOUND="$FOUND $1"
-    else
-        gotver=`$1 --version | head -1 | sed s/'.* '//`
-        check_version_majmin $1 $gotver $2
-    fi
-fi
-}
-
 check autoconf 2.69
 check automake 1.15
 check m4 1.4.16
@@ -137,7 +121,6 @@ check cmake 3.17.0
 check_tar
 check ragel
 check_sed
-check_majmin protoc 3.1.0
 check ant
 check xz
 check bison 3.0.0
