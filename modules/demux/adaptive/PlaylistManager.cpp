@@ -833,5 +833,15 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
 
 AbstractBufferingLogic *PlaylistManager::createBufferingLogic() const
 {
-    return new DefaultBufferingLogic();
+    DefaultBufferingLogic *bl = new DefaultBufferingLogic();
+    if(bl)
+    {
+        unsigned v = var_InheritInteger(p_demux, "adaptive-livedelay");
+        if(v)
+            bl->setUserLiveDelay(VLC_TICK_FROM_MS(v));
+        v = var_InheritInteger(p_demux, "adaptive-maxbuffer");
+        if(v)
+            bl->setUserMinBuffering(VLC_TICK_FROM_MS(v));
+    }
+    return bl;
 }
