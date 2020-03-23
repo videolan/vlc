@@ -55,7 +55,7 @@ namespace adaptive
                 void setSegmentTimeline( SegmentTimeline * );
                 void updateWith( MediaSegmentTemplate * );
                 virtual uint64_t getSequenceNumber() const; /* reimpl */
-                uint64_t getLiveTemplateNumber(vlc_tick_t) const;
+                uint64_t getLiveTemplateNumber(vlc_tick_t, bool = true) const;
                 stime_t getMinAheadScaledTime(uint64_t) const;
                 void pruneByPlaybackTime(vlc_tick_t);
                 size_t pruneBySequenceNumber(uint64_t);

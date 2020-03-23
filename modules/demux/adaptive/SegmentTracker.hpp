@@ -39,6 +39,7 @@ namespace adaptive
     namespace logic
     {
         class AbstractAdaptationLogic;
+        class AbstractBufferingLogic;
     }
 
     namespace playlist
@@ -116,7 +117,9 @@ namespace adaptive
     {
         public:
             SegmentTracker(SharedResources *,
-                           AbstractAdaptationLogic *, BaseAdaptationSet *);
+                           AbstractAdaptationLogic *,
+                           const AbstractBufferingLogic *,
+                           BaseAdaptationSet *);
             ~SegmentTracker();
 
             StreamFormat getCurrentFormat() const;
@@ -136,6 +139,7 @@ namespace adaptive
             void notifyBufferingLevel(vlc_tick_t, vlc_tick_t, vlc_tick_t) const;
             void registerListener(SegmentTrackerListenerInterface *);
             void updateSelected();
+            bool bufferingAvailable() const;
 
         private:
             void setAdaptationLogic(AbstractAdaptationLogic *);
@@ -149,6 +153,7 @@ namespace adaptive
             StreamFormat format;
             SharedResources *resources;
             AbstractAdaptationLogic *logic;
+            const AbstractBufferingLogic *bufferingLogic;
             BaseAdaptationSet *adaptationSet;
             BaseRepresentation *curRepresentation;
             std::list<SegmentTrackerListenerInterface *> listeners;

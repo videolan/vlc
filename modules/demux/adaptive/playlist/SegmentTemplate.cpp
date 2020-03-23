@@ -148,7 +148,7 @@ SegmentTimeline * MediaSegmentTemplate::inheritSegmentTimeline() const
     return NULL;
 }
 
-uint64_t MediaSegmentTemplate::getLiveTemplateNumber(vlc_tick_t playbacktime) const
+uint64_t MediaSegmentTemplate::getLiveTemplateNumber(vlc_tick_t playbacktime, bool abs) const
 {
     uint64_t number = inheritStartNumber();
     /* live streams / templated */
@@ -156,12 +156,18 @@ uint64_t MediaSegmentTemplate::getLiveTemplateNumber(vlc_tick_t playbacktime) co
     if(dur)
     {
         /* compute, based on current time */
+        /* N = (T - AST - PS - D)/D + sSN */
         const Timescale timescale = inheritTimescale();
-        vlc_tick_t streamstart =
-                vlc_tick_from_sec(parentSegmentInformation->getPlaylist()->availabilityStartTime.Get());
-        streamstart += parentSegmentInformation->getPeriodStart();
-        stime_t elapsed = timescale.ToScaled(playbacktime - streamstart);
-        number += elapsed / dur;
+        if(abs)
+        {
+            vlc_tick_t streamstart =
+                    vlc_tick_from_sec(parentSegmentInformation->getPlaylist()->availabilityStartTime.Get());
+            streamstart += parentSegmentInformation->getPeriodStart();
+            playbacktime -= streamstart;
+        }
+        stime_t elapsed = timescale.ToScaled(playbacktime) - dur;
+        if(elapsed > 0)
+            number += elapsed / dur;
     }
 
     return number;
