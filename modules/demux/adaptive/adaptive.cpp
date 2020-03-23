@@ -34,6 +34,7 @@
 
 #include "SharedResources.hpp"
 #include "playlist/BasePeriod.h"
+#include "logic/BufferingLogic.hpp"
 #include "xml/DOMParser.h"
 
 #include "../dash/DASHManager.h"
@@ -71,10 +72,18 @@ static void Close   (vlc_object_t *);
 #define ADAPT_BW_TEXT N_("Fixed Bandwidth in KiB/s")
 #define ADAPT_BW_LONGTEXT N_("Preferred bandwidth for non adaptive streams")
 
+#define ADAPT_BUFFER_TEXT N_("Live Playback delay (ms)")
+#define ADAPT_BUFFER_LONGTEXT N_("Tradeoff between stability and real time")
+
+#define ADAPT_MAXBUFFER_TEXT N_("Max buffering (ms)")
+
 #define ADAPT_LOGIC_TEXT N_("Adaptive Logic")
 
 #define ADAPT_ACCESS_TEXT N_("Use regular HTTP modules")
 #define ADAPT_ACCESS_LONGTEXT N_("Connect using HTTP access instead of custom HTTP code")
+
+#define ADAPT_LOWLATENCY_TEXT N_("Low latency")
+#define ADAPT_LOWLATENCY_LONGTEXT N_("Overrides low latency parameters")
 
 static const AbstractAdaptationLogic::LogicType pi_logics[] = {
                                 AbstractAdaptationLogic::Default,
@@ -108,6 +117,12 @@ static_assert( ARRAY_SIZE( pi_logics ) == ARRAY_SIZE( ppsz_logics ),
 static_assert( ARRAY_SIZE( pi_logics ) == ARRAY_SIZE( ppsz_logics_values ),
     "pi_logics and ppsz_logics_values shall have the same number of elements" );
 
+static const int rgi_latency[] = { -1, 1, 0 };
+
+static const char *const ppsz_latency[] = { N_("Auto"),
+                                            N_("Force"),
+                                            N_("Disable") };
+
 vlc_module_begin ()
         set_shortname( N_("Adaptive"))
         set_description( N_("Unified adaptive streaming for DASH/HLS") )
@@ -122,6 +137,14 @@ vlc_module_begin ()
                      ADAPT_HEIGHT_TEXT, ADAPT_HEIGHT_TEXT, false )
         add_integer( "adaptive-bw",     250, ADAPT_BW_TEXT,     ADAPT_BW_LONGTEXT,     false )
         add_bool   ( "adaptive-use-access", false, ADAPT_ACCESS_TEXT, ADAPT_ACCESS_LONGTEXT, true );
+        add_integer( "adaptive-livedelay",
+                     AbstractBufferingLogic::DEFAULT_LIVE_BUFFERING / 1000,
+                     ADAPT_BUFFER_TEXT, ADAPT_BUFFER_LONGTEXT, true );
+        add_integer( "adaptive-maxbuffer",
+                     AbstractBufferingLogic::DEFAULT_MAX_BUFFERING  / 1000,
+                     ADAPT_MAXBUFFER_TEXT, NULL, true );
+        add_integer( "adaptive-lowlatency", -1, ADAPT_LOWLATENCY_TEXT, ADAPT_LOWLATENCY_LONGTEXT, true );
+            change_integer_list(rgi_latency, ppsz_latency)
         set_callbacks( Open, Close )
 vlc_module_end ()
 
