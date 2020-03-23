@@ -3,14 +3,23 @@ PROTOBUF_VERSION := 3.1.0
 PROTOBUF_URL := https://github.com/google/protobuf/releases/download/v$(PROTOBUF_VERSION)/protobuf-cpp-$(PROTOBUF_VERSION).tar.gz
 
 ifndef HAVE_TVOS
-PKGS += protobuf
+PKGS += protobuf protoc
 endif # !HAVE_TVOS
+PKGS_ALL += protoc
 ifeq ($(call need_pkg, "protobuf-lite >= 3.1.0 protobuf-lite < 3.2.0"),)
-PKGS_FOUND += protobuf
+PKGS_FOUND += protobuf protoc
+else
+ifeq ($(shell protoc --version 2>/dev/null | head -1 | sed s/'.* '//),$(PROTOBUF_VERSION))
+PKGS_FOUND += protoc
+endif # protoc
 endif
 
 $(TARBALLS)/protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz:
 	$(call download_pkg,$(PROTOBUF_URL),protobuf)
+
+$(TARBALLS)/protoc-$(PROTOBUF_VERSION)-cpp.tar.gz: $(TARBALLS)/protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz
+	$(RM) -R "$@"
+	cp "$<" "$@"
 
 .sum-protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz
 
@@ -20,6 +29,25 @@ DEPS_protobuf += pthreads $(DEPS_pthreads)
 endif
 
 PROTOBUFVARS := DIST_LANG="cpp"
+PROTOCVARS := DIST_LANG="cpp"
+
+PROTOCCONF += --enable-static --disable-shared
+
+.sum-protoc: .sum-protobuf
+	touch $@
+
+protoc: protoc-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protoc
+	$(RM) -Rf $@ $(UNPACK_DIR) && mkdir -p $(UNPACK_DIR)
+	tar xvzfo "$<" -C $(UNPACK_DIR) --strip-components=1
+	$(APPLY) $(SRC)/protobuf/protobuf-disable-gmock.patch
+	$(APPLY) $(SRC)/protobuf/protobuf-fix-build.patch
+	$(MOVE)
+
+.protoc: protoc
+	$(RECONF)
+	cd $< && $(BUILDVARS) $(PROTOCVARS) ./configure $(BUILDTOOLCONF) $(PROTOCCONF)
+	cd $< && $(MAKE) && $(MAKE) install
+	touch $@
 
 protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	$(UNPACK)
