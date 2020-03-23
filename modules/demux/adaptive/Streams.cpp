@@ -340,6 +340,13 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
         return AbstractStream::buffering_suspended;
     }
 
+    /* Reached end of live playlist */
+    if(!segmentTracker->bufferingAvailable())
+    {
+        vlc_mutex_unlock(&lock);
+        return AbstractStream::buffering_suspended;
+    }
+
     if(!demuxer)
     {
         format = segmentTracker->getCurrentFormat();

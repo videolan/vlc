@@ -36,6 +36,7 @@
 #include "logic/AlwaysLowestAdaptationLogic.hpp"
 #include "logic/PredictiveAdaptationLogic.hpp"
 #include "logic/NearOptimalAdaptationLogic.hpp"
+#include "logic/BufferingLogic.hpp"
 #include "tools/Debug.hpp"
 #include <vlc_stream.h>
 #include <vlc_demux.h>
@@ -61,6 +62,7 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
 {
     currentPeriod = playlist->getFirstPeriod();
     resources = res;
+    bufferingLogic = NULL;
     failedupdates = 0;
     b_thread = false;
     b_buffering = false;
@@ -89,6 +91,7 @@ PlaylistManager::~PlaylistManager   ()
     delete playlist;
     delete logic;
     delete resources;
+    delete bufferingLogic;
     vlc_cond_destroy(&waitcond);
     vlc_mutex_destroy(&lock);
     vlc_mutex_destroy(&demux.lock);
@@ -112,6 +115,9 @@ bool PlaylistManager::setupPeriod()
     if(!logic && !(logic = createLogic(logicType, resources->getConnManager())))
         return false;
 
+    if(!bufferingLogic && !(bufferingLogic = createBufferingLogic()))
+        return false;
+
     std::vector<BaseAdaptationSet*> sets = currentPeriod->getAdaptationSets();
     std::vector<BaseAdaptationSet*>::iterator it;
     for(it=sets.begin();it!=sets.end();++it)
@@ -119,7 +125,8 @@ bool PlaylistManager::setupPeriod()
         BaseAdaptationSet *set = *it;
         if(set && streamFactory)
         {
-            SegmentTracker *tracker = new SegmentTracker(resources, logic, set);
+            SegmentTracker *tracker = new SegmentTracker(resources, logic,
+                                                         bufferingLogic, set);
             if(!tracker)
                 continue;
 
@@ -624,8 +631,8 @@ void PlaylistManager::setBufferingRunState(bool b)
 void PlaylistManager::Run()
 {
     vlc_mutex_lock(&lock);
-    const unsigned i_min_buffering = playlist->getMinBuffering();
-    const unsigned i_extra_buffering = playlist->getMaxBuffering() - i_min_buffering;
+    const mtime_t i_min_buffering = bufferingLogic->getMinBuffering(playlist);
+    const mtime_t i_extra_buffering = bufferingLogic->getMaxBuffering(playlist) - i_min_buffering;
     while(1)
     {
         while(!b_buffering && !b_canceled)
@@ -836,4 +843,9 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
     }
 
     return logic;
+}
+
+AbstractBufferingLogic *PlaylistManager::createBufferingLogic() const
+{
+    return new DefaultBufferingLogic();
 }

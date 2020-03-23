@@ -29,6 +29,7 @@
 #include "playlist/Segment.h"
 #include "playlist/SegmentChunk.hpp"
 #include "logic/AbstractAdaptationLogic.h"
+#include "logic/BufferingLogic.hpp"
 
 #include <cassert>
 #include <limits>
@@ -80,7 +81,9 @@ SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, mtime_t duration)
 }
 
 SegmentTracker::SegmentTracker(SharedResources *res,
-        AbstractAdaptationLogic *logic_, BaseAdaptationSet *adaptSet)
+        AbstractAdaptationLogic *logic_,
+        const AbstractBufferingLogic *bl,
+        BaseAdaptationSet *adaptSet)
 {
     resources = res;
     first = true;
@@ -89,6 +92,7 @@ SegmentTracker::SegmentTracker(SharedResources *res,
     index_sent = false;
     init_sent = false;
     curRepresentation = NULL;
+    bufferingLogic = bl;
     setAdaptationLogic(logic_);
     adaptationSet = adaptSet;
     format = StreamFormat::UNKNOWN;
@@ -213,7 +217,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
 
     if(curNumber == std::numeric_limits<uint64_t>::max())
     {
-        next = rep->getLiveStartSegmentNumber(next);
+        next = bufferingLogic->getStartSegmentNumber(rep);
         if(next == std::numeric_limits<uint64_t>::max())
             return NULL;
     }
@@ -381,7 +385,15 @@ mtime_t SegmentTracker::getMinAheadTime() const
     if(!rep)
         rep = logic->getNextRepresentation(adaptationSet, NULL);
     if(rep)
-        return rep->getMinAheadTime(curNumber);
+    {
+        /* Ensure ephemere content is updated/loaded */
+        if(rep->needsUpdate())
+            (void) rep->runLocalUpdates(resources);
+
+        uint64_t startnumber = bufferingLogic->getStartSegmentNumber(rep);
+        assert(startnumber != std::numeric_limits<uint64_t>::max());
+        return rep->getMinAheadTime(startnumber);
+    }
     return 0;
 }
 
@@ -398,6 +410,13 @@ void SegmentTracker::notifyBufferingLevel(mtime_t min, mtime_t current, mtime_t 
 void SegmentTracker::registerListener(SegmentTrackerListenerInterface *listener)
 {
     listeners.push_back(listener);
+}
+
+bool SegmentTracker::bufferingAvailable() const
+{
+    if(adaptationSet->getPlaylist()->isLive())
+        return bufferingLogic->getMinBuffering(adaptationSet->getPlaylist()) <= getMinAheadTime();
+    return true;
 }
 
 void SegmentTracker::updateSelected()

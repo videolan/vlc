@@ -56,7 +56,7 @@ namespace adaptive
                 void setSegmentTimeline( SegmentTimeline * );
                 void updateWith( MediaSegmentTemplate * );
                 virtual uint64_t getSequenceNumber() const; /* reimpl */
-                uint64_t getLiveTemplateNumber(mtime_t) const;
+                uint64_t getLiveTemplateNumber(mtime_t, bool = true) const;
                 stime_t getMinAheadScaledTime(uint64_t) const;
                 void pruneByPlaybackTime(mtime_t);
                 size_t pruneBySequenceNumber(uint64_t);

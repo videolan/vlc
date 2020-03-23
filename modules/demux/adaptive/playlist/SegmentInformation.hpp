@@ -75,8 +75,6 @@ namespace adaptive
                 ISegment * getNextSegment(SegmentInfoType, uint64_t, uint64_t *, bool *) const;
                 bool getSegmentNumberByTime(mtime_t, uint64_t *) const;
                 bool getPlaybackTimeDurationBySegmentNumber(uint64_t, mtime_t *, mtime_t *) const;
-                uint64_t getLiveSegmentNumberByTime(uint64_t, mtime_t) const;
-                uint64_t getLiveStartSegmentNumber(uint64_t) const;
                 bool     getMediaPlaybackRange(mtime_t *, mtime_t *, mtime_t *) const;
                 virtual void updateWith(SegmentInformation *);
                 virtual void mergeWithTimeline(SegmentTimeline *); /* ! don't use with global merge */

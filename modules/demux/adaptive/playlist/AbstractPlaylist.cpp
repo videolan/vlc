@@ -118,14 +118,12 @@ void AbstractPlaylist::setMaxBuffering( mtime_t max )
 
 mtime_t AbstractPlaylist::getMinBuffering() const
 {
-    return std::max(minBufferTime, 6*CLOCK_FREQ);
+    return minBufferTime;
 }
 
 mtime_t AbstractPlaylist::getMaxBuffering() const
 {
-    const mtime_t minbuf = getMinBuffering();
-    const mtime_t maxbuf = maxBufferTime ? maxBufferTime : CLOCK_FREQ * 60;
-    return std::max(minbuf, maxbuf);
+    return maxBufferTime;
 }
 
 Url AbstractPlaylist::getUrlSegment() const

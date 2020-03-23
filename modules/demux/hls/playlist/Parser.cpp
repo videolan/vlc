@@ -32,6 +32,7 @@
 #include "../../adaptive/tools/Retrieve.hpp"
 #include "../../adaptive/tools/Helper.h"
 #include "../../adaptive/tools/Conversions.hpp"
+#include "../../adaptive/logic/BufferingLogic.hpp"
 #include "M3U8.hpp"
 #include "Tags.hpp"
 
@@ -148,7 +149,8 @@ void M3U8Parser::createAndFillRepresentation(vlc_object_t *p_obj, BaseAdaptation
         if(rep->isLive())
         {
             /* avoid update playlist immediately */
-            uint64_t startseq = rep->getLiveStartSegmentNumber(0);
+            logic::DefaultBufferingLogic buflogic;
+            uint64_t startseq = buflogic.getStartSegmentNumber(rep);
             rep->scheduleNextUpdate(startseq);
         }
         adaptSet->addRepresentation(rep);

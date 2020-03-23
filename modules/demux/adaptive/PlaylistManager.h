@@ -90,10 +90,12 @@ namespace adaptive
             /* local factories */
             virtual AbstractAdaptationLogic *createLogic(AbstractAdaptationLogic::LogicType,
                                                          AbstractConnectionManager *);
+            virtual AbstractBufferingLogic *createBufferingLogic() const;
 
             SharedResources                     *resources;
             AbstractAdaptationLogic::LogicType  logicType;
             AbstractAdaptationLogic             *logic;
+            AbstractBufferingLogic              *bufferingLogic;
             AbstractPlaylist                    *playlist;
             AbstractStreamFactory               *streamFactory;
             demux_t                             *p_demux;
