@@ -360,9 +360,8 @@ static void *Run( void *opaque )
             char *psz_uri = input_item_GetURI( p_data->p_item );
             if ( psz_uri != NULL )
             {
-                 acoustid_fingerprint_t acoustid_print;
+                 acoustid_fingerprint_t acoustid_print = {0};
 
-                 memset( &acoustid_print , 0, sizeof (acoustid_print) );
                 /* overwrite with hint, as in this case, fingerprint's session will be truncated */
                 if ( p_data->i_duration )
                      acoustid_print.i_duration = p_data->i_duration;
