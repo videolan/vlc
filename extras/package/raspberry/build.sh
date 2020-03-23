@@ -89,8 +89,8 @@ SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 TRIPLET=$ARCH-linux-$EABI
 
 info "Building extra tools"
-mkdir -p extra/tools
-cd extra/tools
+mkdir -p extras/tools
+cd extras/tools
 export PATH="$PWD/build/bin":"$PATH"
 if [ "$INTERACTIVE" != "yes" ] || [ ! -f ./Makefile ]; then
     ${SCRIPT_PATH}/../../tools/bootstrap
