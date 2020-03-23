@@ -85,6 +85,7 @@ bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
         case VLC_CODEC_VC1:
+        case VLC_CODEC_AV1:
         {
             if(fmt.i_codec == p_other->fmt.i_codec &&
                fmt.i_extra && p_other->fmt.i_extra &&
