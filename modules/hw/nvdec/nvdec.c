@@ -227,7 +227,7 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
     };
     ret = CALL_CUVID(cuvidCreateDecoder, &p_sys->cudecoder, &dparams);
     if (ret != VLC_SUCCESS)
-        goto error;
+        goto cuda_error;
 
     // ensure the output surfaces have the same pitch so copies can work properly
     if ( is_nvdec_opaque(p_dec->fmt_out.video.i_chroma) )
@@ -240,7 +240,7 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
         };
         ret = CALL_CUVID( cuvidMapVideoFrame, p_sys->cudecoder, 0, &frameDevicePtr, &p_sys->outputPitch, &params );
         if (ret != VLC_SUCCESS)
-            goto error;
+            goto cuda_error;
         CALL_CUVID(cuvidUnmapVideoFrame, p_sys->cudecoder, frameDevicePtr);
 
         unsigned int ByteWidth = p_sys->outputPitch;
@@ -294,7 +294,7 @@ clean_pics:
             break;
         }
         if (ret != VLC_SUCCESS)
-            goto error;
+            goto cuda_error;
 
         p_sys->out_pool = picture_pool_New( ARRAY_SIZE(p_sys->outputDevicePtr), pics );
     }
@@ -305,6 +305,9 @@ clean_pics:
 
     ret = decoder_UpdateVideoOutput(p_dec, p_sys->vctx_out);
     return (ret == VLC_SUCCESS);
+
+cuda_error:
+    CALL_CUDA_DEC(cuCtxPopCurrent, NULL);
 error:
     p_sys->b_nvparser_success = false;
     return 0;
