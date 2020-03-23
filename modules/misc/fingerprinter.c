@@ -54,7 +54,6 @@ struct fingerprinter_sys_t
     struct
     {
         vlc_array_t         queue;
-        vlc_mutex_t         lock;
         vlc_cond_t          cond;
         bool                b_working;
     } processing;
