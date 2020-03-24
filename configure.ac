@@ -3842,7 +3842,8 @@ dnl  Chromecast streaming support
 dnl
 m4_pushdef([protobuf_lite_version], 2.5.0)
 AC_ARG_VAR(PROTOC, [protobuf compiler])
-AC_CHECK_PROGS(PROTOC, protoc, no)
+dnl Intentionally using prefixed binaries for native tool in contribs
+AC_CHECK_TOOL(PROTOC, protoc, no)
 PKG_WITH_MODULES([CHROMECAST],[protobuf-lite >= protobuf_lite_version], [
     AS_IF([test "x${PROTOC}" != "xno"], [
         build_chromecast="yes"
