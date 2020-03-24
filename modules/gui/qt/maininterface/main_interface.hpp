@@ -77,21 +77,11 @@ public:
 
     static const QEvent::Type ToolbarsNeedRebuild;
 
-    /* Video requests from core */
-    bool getVideo( struct vout_window_t * );
-private:
-    bool m_hasEmbededVideo = false;
-    bool m_showRemainingTime = false;
-    VLCVarChoiceModel* m_extraInterfaces;
-    std::atomic_flag videoActive;
-    static int enableVideo( struct vout_window_t *,
-                            const struct vout_window_cfg_t * );
-    static void disableVideo( struct vout_window_t * );
-    static void releaseVideo( struct vout_window_t * );
-    static void resizeVideo( struct vout_window_t *, unsigned, unsigned );
-    static void requestVideoState( struct vout_window_t *, unsigned );
-    static void requestVideoWindowed( struct vout_window_t * );
-    static void requestVideoFullScreen( struct vout_window_t *, const char * );
+public:
+    void requestResizeVideo( unsigned, unsigned );
+    void requestVideoState( unsigned );
+    void requestVideoWindowed( );
+    void requestVideoFullScreen( const char * );
 
 public:
     /* Getters */
@@ -114,10 +104,7 @@ public:
     bool isPlaylistDocked() { return b_playlistDocked; }
     bool isPlaylistVisible() { return playlistVisible; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
-    bool hasEmbededVideo() { return m_hasEmbededVideo; }
-
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
-    QList<QQmlError> qmlErrors() const;
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -135,9 +122,6 @@ protected:
     void resizeWindow(int width, int height);
 
 protected:
-    /* Main Widgets Creation */
-    void createMainWidget( QSettings* );
-
     /* Systray */
     void createSystray();
     void initSystray();
@@ -158,9 +142,6 @@ protected:
 
     QString              input_name;
     QVBoxLayout         *mainLayout;
-
-    QQuickWidget        *mediacenterView;
-    QWidget             *mediacenterWrapper;
 
     /* Status Bar */
     QLabel              *nameLabel;
@@ -193,13 +174,13 @@ protected:
     bool                 b_hasMedialibrary = false;
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
-//    bool                 videoIsActive;       ///< Having a video now / THEMIM->hasV
-//    bool                 b_visualSelectorEnabled;
 
     bool                 b_hasPausedWhenMinimized;
 
     static const Qt::Key kc[10]; /* easter eggs */
     int i_kc_offset;
+
+    VLCVarChoiceModel* m_extraInterfaces;
 
 public slots:
     void toggleUpdateSystrayMenu();
@@ -220,7 +201,6 @@ public slots:
     VLCVarChoiceModel* getExtraInterfaces();
 
 protected slots:
-    void setVLCWindowsTitle( const QString& title = "" );
     void handleSystrayClick( QSystemTrayIcon::ActivationReason );
     void updateSystrayTooltipName( const QString& );
     void updateSystrayTooltipStatus( PlayerController::PlayingState );
@@ -228,9 +208,6 @@ protected slots:
     void showBuffering( float );
 
     /* Manage the Video Functions from the vout threads */
-    void getVideoSlot( bool );
-    void releaseVideoSlot( void );
-
     void setVideoSize(unsigned int w, unsigned int h);
     virtual void setVideoFullScreen( bool );
     void setVideoOnTop( bool );
@@ -242,8 +219,6 @@ protected slots:
     void sendHotkey(Qt::Key key, Qt::KeyboardModifiers modifiers );
 
 signals:
-    void askGetVideo( bool );
-    void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );
     void askVideoOnTop( bool );

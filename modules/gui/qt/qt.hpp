@@ -62,9 +62,12 @@ enum{
 };
 
 namespace vlc {
+class Compositor;
+
 namespace playlist {
 class PlaylistControllerModel;
 }
+
 }
 class PlayerController;
 struct intf_sys_t
@@ -84,6 +87,7 @@ struct intf_sys_t
     vlc_player_t *p_player; /* player */
     vlc::playlist::PlaylistControllerModel* p_mainPlaylistController;
     PlayerController* p_mainPlayerController;
+    vlc::Compositor*  p_compositor;
 
 #ifdef _WIN32
     bool disable_volume_keys;
