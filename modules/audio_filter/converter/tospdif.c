@@ -519,9 +519,8 @@ static int write_buffer_dtshd( filter_t *p_filter, block_t *p_in_buf )
 
     /* Align so that (length_code & 0xf) == 0x8. This is reportedly needed
      * with some receivers, but the exact requirement is unconfirmed. */
-#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
-    size_t i_align = ALIGN( i_in_size + 0x8, 0x10 ) - 0x8;
-#undef ALIGN
+    size_t i_align = vlc_align( i_in_size + 0x8, 0x10 ) - 0x8;
+
     if( i_align > i_in_size && i_align - i_in_size
         <= p_sys->p_out_buf->i_buffer - p_sys->i_out_offset )
         write_padding( p_filter, i_align - i_in_size );
