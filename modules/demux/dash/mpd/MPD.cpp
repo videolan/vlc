@@ -42,6 +42,7 @@ MPD::MPD (vlc_object_t *p_object, Profile profile_) :
     profile( profile_ )
 {
     programInfo.Set( NULL );
+    lowLatency = false;
 }
 
 MPD::~MPD()
@@ -58,6 +59,16 @@ bool MPD::isLive() const
     }
     else
         return (type != "static");
+}
+
+bool MPD::isLowLatency() const
+{
+    return lowLatency;
+}
+
+void MPD::setLowLatency(bool b)
+{
+    lowLatency = b;
 }
 
 Profile MPD::getProfile() const

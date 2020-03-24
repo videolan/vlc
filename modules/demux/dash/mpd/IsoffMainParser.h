@@ -72,15 +72,15 @@ namespace dash
                 mpd::Profile getProfile     () const;
                 void    parseMPDBaseUrl     (MPD *, xml::Node *);
                 void    parseMPDAttributes  (MPD *, xml::Node *);
-                void    parseAdaptationSets (xml::Node *periodNode, Period *period);
-                void    parseRepresentations(xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);
+                void    parseAdaptationSets (MPD *, xml::Node *periodNode, Period *period);
+                void    parseRepresentations(MPD *, xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);
                 void    parseInitSegment    (xml::Node *, Initializable<Segment> *, SegmentInformation *);
                 void    parseTimeline       (xml::Node *, MediaSegmentTemplate *);
                 void    parsePeriods        (MPD *, xml::Node *);
-                size_t  parseSegmentInformation(xml::Node *, SegmentInformation *, uint64_t *);
-                size_t  parseSegmentBase    (xml::Node *, SegmentInformation *);
-                size_t  parseSegmentList    (xml::Node *, SegmentInformation *);
-                size_t  parseSegmentTemplate(xml::Node *, SegmentInformation *);
+                size_t  parseSegmentInformation(MPD *, xml::Node *, SegmentInformation *, uint64_t *);
+                size_t  parseSegmentBase    (MPD *, xml::Node *, SegmentInformation *);
+                size_t  parseSegmentList    (MPD *, xml::Node *, SegmentInformation *);
+                size_t  parseSegmentTemplate(MPD *, xml::Node *, SegmentInformation *);
                 void    parseProgramInformation(xml::Node *, MPD *);
 
                 xml::Node       *root;

@@ -41,6 +41,7 @@ namespace adaptive
                 virtual ~AbstractPlaylist();
 
                 virtual bool                    isLive() const = 0;
+                virtual bool                    isLowLatency() const;
                 void                            setType(const std::string &);
                 void                            setMinBuffering( vlc_tick_t );
                 void                            setMaxBuffering( vlc_tick_t );
