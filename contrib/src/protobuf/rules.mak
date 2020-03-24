@@ -19,6 +19,8 @@ ifdef HAVE_WIN32
 DEPS_protobuf += pthreads $(DEPS_pthreads)
 endif
 
+PROTOBUFVARS := DIST_LANG="cpp"
+
 protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	$(UNPACK)
 	mv protobuf-$(PROTOBUF_VERSION) protobuf-$(PROTOBUF_VERSION)-cpp
@@ -28,6 +30,6 @@ protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 
 .protobuf: protobuf
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) $(PROTOBUFVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
