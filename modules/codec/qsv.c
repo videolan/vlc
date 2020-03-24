@@ -49,9 +49,6 @@
 /* The SDK doesn't have a default bitrate, so here's one. */
 #define QSV_BITRATE_DEFAULT (842)
 
-/* Makes x a multiple of 'align'. 'align' must be a power of 2 */
-#define QSV_ALIGN(align, x)     (((x)+(align)-1)&~((align)-1))
-
 /*****************************************************************************
  * Modules descriptor
  *****************************************************************************/
@@ -459,8 +456,8 @@ static int Open(vlc_object_t *this)
     sys->params.mfx.FrameInfo.FrameRateExtD = enc->fmt_in.video.i_frame_rate_base;
     sys->params.mfx.FrameInfo.FourCC        = MFX_FOURCC_NV12;
     sys->params.mfx.FrameInfo.ChromaFormat  = MFX_CHROMAFORMAT_YUV420;
-    sys->params.mfx.FrameInfo.Width         = QSV_ALIGN(16, enc->fmt_in.video.i_width);
-    sys->params.mfx.FrameInfo.Height        = QSV_ALIGN(32, enc->fmt_in.video.i_height);
+    sys->params.mfx.FrameInfo.Width         = vlc_align(enc->fmt_in.video.i_width, 16);
+    sys->params.mfx.FrameInfo.Height        = vlc_align(enc->fmt_in.video.i_height, 32);
     sys->params.mfx.FrameInfo.CropW         = enc->fmt_in.video.i_visible_width;
     sys->params.mfx.FrameInfo.CropH         = enc->fmt_in.video.i_visible_height;
     sys->params.mfx.FrameInfo.PicStruct     = MFX_PICSTRUCT_PROGRESSIVE;
@@ -762,7 +759,7 @@ static int submit_frame(encoder_t *enc, picture_t *pic, QSVFrame **new_frame)
     else
         qf->surface.Info.PicStruct = MFX_PICSTRUCT_FIELD_BFF;
 
-    //qf->surface.Data.Pitch = QSV_ALIGN(16, qf->surface.Info.Width);
+    //qf->surface.Data.Pitch = vlc_align(qf->surface.Info.Width, 16);
 
     qf->surface.Data.PitchLow  = qf->pic->p[0].i_pitch;
     qf->surface.Data.Y         = qf->pic->p[0].p_pixels;
