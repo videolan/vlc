@@ -20,31 +20,41 @@
 
 #include <QtQuick/QQuickItem>
 #include <QCursor>
+#include <QMutex>
 #include <util/qml_main_context.hpp>
 #include "qt.hpp"
+#include "vlc_vout_window.h"
 
 class VideoSurfaceProvider : public QObject
 {
     Q_OBJECT
 public:
-    VideoSurfaceProvider(QObject* parent);
+    VideoSurfaceProvider(QObject* parent = nullptr);
     virtual ~VideoSurfaceProvider() {}
-    virtual QSGNode* updatePaintNode(QQuickItem* item, QSGNode* oldNode, QQuickItem::UpdatePaintNodeData*) = 0;
+
+    bool hasVideo();
+
+    void enable(vout_window_t* voutWindow);
+    void disable();
+
 
 signals:
     void ctxChanged(QmlMainContext*);
-    void sourceSizeChanged(QSize);
+    bool hasVideoChanged(bool);
 
-    void surfaceSizeChanged(QSizeF);
+public slots:
+    void onWindowClosed();
+    void onMousePressed( int vlcButton );
+    void onMouseReleased( int vlcButton );
+    void onMouseDoubleClick( int vlcButton );
+    void onMouseMoved( float x, float y );
+    void onMouseWheeled(const QPointF &pos, int delta, Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers, Qt::Orientation orient);
+    void onKeyPressed(int key, Qt::KeyboardModifiers modifiers);
+    void onSurfaceSizeChanged(QSizeF size);
 
-    void mousePressed( int vlcButton );
-    void mouseReleased( int vlcButton );
-    void mouseDblClicked( int vlcButton );
-    void mouseMoved( float x, float y );
-    void keyPressed(int key, Qt::KeyboardModifiers modifier);
-    void mouseWheeled(const QPointF& pos, int delta, Qt::MouseButtons buttons,  Qt::KeyboardModifiers modifiers, Qt::Orientation orient);
-
-    void update();
+protected:
+    QMutex m_voutlock;
+    vout_window_t* m_voutWindow = nullptr;
 };
 
 
@@ -76,6 +86,9 @@ protected:
     virtual void wheelEvent(QWheelEvent *event) override;
 #endif
 
+    virtual void geometryChanged(const QRectF &newGeometry,
+                                 const QRectF &oldGeometry) override;
+
     Qt::CursorShape getCursorShape() const;
     void setCursorShape(Qt::CursorShape);
 
@@ -93,11 +106,9 @@ signals:
     void keyPressed(int key, Qt::KeyboardModifiers modifier);
     void mouseWheeled(const QPointF& pos, int delta, Qt::MouseButtons buttons,  Qt::KeyboardModifiers modifiers, Qt::Orientation orient);
 
-private slots:
-    void onSourceSizeChanged(QSize);
+private:
     void onSurfaceSizeChanged();
 
-private:
     QmlMainContext* m_mainCtx = nullptr;
 
     bool m_sourceSizeChanged = false;

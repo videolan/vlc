@@ -17,12 +17,100 @@
  *****************************************************************************/
 #include "videosurface.hpp"
 #include "maininterface/main_interface.hpp"
-
+#include "widgets/native/customwidgets.hpp" //for qtEventToVLCKey
+#include <QSGRectangleNode>
 
 VideoSurfaceProvider::VideoSurfaceProvider(QObject* parent)
     : QObject(parent)
 {
 }
+
+bool VideoSurfaceProvider::hasVideo()
+{
+    QMutexLocker lock(&m_voutlock);
+    return m_voutWindow != nullptr;
+}
+
+void VideoSurfaceProvider::enable(vout_window_t* voutWindow)
+{
+    assert(voutWindow);
+    {
+        QMutexLocker lock(&m_voutlock);
+        m_voutWindow = voutWindow;
+    }
+    emit hasVideoChanged(true);
+}
+
+void VideoSurfaceProvider::disable()
+{
+    {
+        QMutexLocker lock(&m_voutlock);
+        m_voutWindow = nullptr;
+    }
+    emit hasVideoChanged(false);
+}
+
+void VideoSurfaceProvider::onWindowClosed()
+{
+    QMutexLocker lock(&m_voutlock);
+    if (m_voutWindow)
+        vout_window_ReportClose(m_voutWindow);
+}
+
+void VideoSurfaceProvider::onMousePressed(int vlcButton)
+{
+    QMutexLocker lock(&m_voutlock);
+    if (m_voutWindow)
+        vout_window_ReportMousePressed(m_voutWindow, vlcButton);
+}
+
+void VideoSurfaceProvider::onMouseReleased(int vlcButton)
+{
+    QMutexLocker lock(&m_voutlock);
+    if (m_voutWindow)
+        vout_window_ReportMouseReleased(m_voutWindow, vlcButton);
+}
+
+void VideoSurfaceProvider::onMouseDoubleClick(int vlcButton)
+{
+    QMutexLocker lock(&m_voutlock);
+    if (m_voutWindow)
+        vout_window_ReportMouseDoubleClick(m_voutWindow, vlcButton);
+}
+
+void VideoSurfaceProvider::onMouseMoved(float x, float y)
+{
+    QMutexLocker lock(&m_voutlock);
+    if (m_voutWindow)
+        vout_window_ReportMouseMoved(m_voutWindow, x, y);
+}
+
+void VideoSurfaceProvider::onMouseWheeled(const QPointF& pos, int delta, Qt::MouseButtons buttons,  Qt::KeyboardModifiers modifiers, Qt::Orientation orient)
+{
+    QWheelEvent event(pos, delta, buttons, modifiers, orient);
+    int vlckey = qtWheelEventToVLCKey(&event);
+    QMutexLocker lock(&m_voutlock);
+    if (m_voutWindow)
+        vout_window_ReportKeyPress(m_voutWindow, vlckey);
+}
+
+void VideoSurfaceProvider::onKeyPressed(int key, Qt::KeyboardModifiers modifiers)
+{
+    QKeyEvent event(QEvent::KeyPress, key, modifiers);
+    int vlckey = qtEventToVLCKey(&event);
+    QMutexLocker lock(&m_voutlock);
+    if (m_voutWindow)
+        vout_window_ReportKeyPress(m_voutWindow, vlckey);
+
+}
+
+void VideoSurfaceProvider::onSurfaceSizeChanged(QSizeF size)
+{
+    QMutexLocker lock(&m_voutlock);
+    if (m_voutWindow)
+        vout_window_ReportSize(m_voutWindow, size.width(), size.height());
+}
+
 
 VideoSurface::VideoSurface(QQuickItem* parent)
     : QQuickItem(parent)
@@ -129,6 +217,12 @@ void VideoSurface::keyPressEvent(QKeyEvent* event)
     event->ignore();
 }
 
+void VideoSurface::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
+{
+    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    onSurfaceSizeChanged();
+}
+
 #if QT_CONFIG(wheelevent)
 void VideoSurface::wheelEvent(QWheelEvent *event)
 {
@@ -147,43 +241,40 @@ void VideoSurface::setCursorShape(Qt::CursorShape shape)
     setCursor(shape);
 }
 
-QSGNode*VideoSurface::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData* nodeData)
+QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData*)
 {
+    QSGRectangleNode* node = static_cast<QSGRectangleNode*>(oldNode);
+
+    if (!node)
+    {
+        node = this->window()->createRectangleNode();
+        node->setColor(Qt::transparent);
+    }
+    node->setRect(this->boundingRect());
+
     if (m_provider == nullptr)
     {
         if (m_mainCtx == nullptr)
-            return nullptr;
+            return node;
         m_provider =  m_mainCtx->getMainInterface()->getVideoSurfaceProvider();
         if (!m_provider)
-            return nullptr;
+            return node;
 
         //forward signal to the provider
-        connect(this, &VideoSurface::mouseMoved, m_provider, &VideoSurfaceProvider::mouseMoved);
-        connect(this, &VideoSurface::mousePressed, m_provider, &VideoSurfaceProvider::mousePressed);
-        connect(this, &VideoSurface::mouseDblClicked, m_provider, &VideoSurfaceProvider::mouseDblClicked);
-        connect(this, &VideoSurface::mouseReleased, m_provider, &VideoSurfaceProvider::mouseReleased);
-        connect(this, &VideoSurface::mouseWheeled, m_provider, &VideoSurfaceProvider::mouseWheeled);
-        connect(this, &VideoSurface::keyPressed, m_provider, &VideoSurfaceProvider::keyPressed);
-        connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::surfaceSizeChanged);
-
-        connect(m_provider, &VideoSurfaceProvider::update, this, &VideoSurface::update);
-        connect(m_provider, &VideoSurfaceProvider::sourceSizeChanged, this, &VideoSurface::onSourceSizeChanged);
+        connect(this, &VideoSurface::mouseMoved, m_provider, &VideoSurfaceProvider::onMouseMoved);
+        connect(this, &VideoSurface::mousePressed, m_provider, &VideoSurfaceProvider::onMousePressed);
+        connect(this, &VideoSurface::mouseDblClicked, m_provider, &VideoSurfaceProvider::onMouseDoubleClick);
+        connect(this, &VideoSurface::mouseReleased, m_provider, &VideoSurfaceProvider::onMouseReleased);
+        connect(this, &VideoSurface::mouseWheeled, m_provider, &VideoSurfaceProvider::onMouseWheeled);
+        connect(this, &VideoSurface::keyPressed, m_provider, &VideoSurfaceProvider::onKeyPressed);
+        connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged);
 
         onSurfaceSizeChanged();
     }
-    return m_provider->updatePaintNode(this, node, nodeData);
-}
-
-void VideoSurface::onSourceSizeChanged(QSize newSize)
-{
-    if (newSize != m_sourceSize) {
-        m_sourceSize = newSize;
-        emit sourceSizeChanged(m_sourceSize);
-        onSurfaceSizeChanged();
-    }
+    return node;
 }
 
 void VideoSurface::onSurfaceSizeChanged()
 {
-    emit surfaceSizeChanged(size());
+    emit surfaceSizeChanged(size() * this->window()->effectiveDevicePixelRatio());
 }

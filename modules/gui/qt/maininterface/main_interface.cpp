@@ -64,13 +64,13 @@
 #include "dialogs/dialogs/dialogmodel.hpp"
 #include "player/playercontrolbarmodel.hpp"
 
-#include "voutwindow/qvoutwindowdummy.hpp"
-
 #include "util/qml_main_context.hpp"
 
 #include "util/qmleventfilter.hpp"
 #include "util/i18n.hpp"
 #include "util/systempalette.hpp"
+
+#include "videosurface.hpp"
 
 #include "menus/menus.hpp"                            // Menu creation
 
@@ -200,9 +200,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf ),
 #ifdef QT5_HAS_WAYLAND
     b_hasWayland = platformName.startsWith(QLatin1String("wayland"), Qt::CaseInsensitive);
 #endif
-
-    // TODO: handle Wayland/X11/Win32 windows
-    m_videoRenderer.reset(new QVoutWindowDummy(this));
 
     /**************************
      *  UI and Widgets design
@@ -648,6 +645,7 @@ void MainInterface::resizeVideo( vout_window_t *p_wnd,
     emit p_mi->askVideoToResize( i_width, i_height );
 }
 
+
 void MainInterface::requestVideoWindowed( struct vout_window_t *wnd )
 {
    MainInterface *p_mi = (MainInterface *)wnd->sys;
@@ -694,9 +692,27 @@ QQuickWindow*MainInterface::getRootQuickWindow()
     return rootObject->window();
 }
 
+
+bool MainInterface::hasEmbededVideo() const
+{
+    return m_videoSurfaceProvider && m_videoSurfaceProvider->hasVideo();
+}
+
+void MainInterface::setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider)
+{
+    if (m_videoSurfaceProvider)
+        disconnect(m_videoSurfaceProvider, &VideoSurfaceProvider::hasVideoChanged, this, &MainInterface::hasEmbededVideoChanged);
+    m_videoSurfaceProvider = videoSurfaceProvider;
+    if (m_videoSurfaceProvider)
+        connect(m_videoSurfaceProvider, &VideoSurfaceProvider::hasVideoChanged,
+                this, &MainInterface::hasEmbededVideoChanged,
+                Qt::QueuedConnection);
+    emit hasEmbededVideoChanged(m_videoSurfaceProvider && m_videoSurfaceProvider->hasVideo());
+}
+
 VideoSurfaceProvider* MainInterface::getVideoSurfaceProvider() const
 {
-    return m_videoRenderer->getVideoSurfaceProvider();
+    return m_videoSurfaceProvider;
 }
 
 const Qt::Key MainInterface::kc[10] =
@@ -1084,8 +1100,8 @@ void MainInterface::closeEvent( QCloseEvent *e )
     PlaylistControllerModel* playlistController = p_intf->p_sys->p_mainPlaylistController;
     PlayerController* playerController = p_intf->p_sys->p_mainPlayerController;
 
-    if (m_videoRenderer)
-        m_videoRenderer->windowClosed();
+    if (m_videoSurfaceProvider)
+        m_videoSurfaceProvider->onWindowClosed();
     //We need to make sure that noting is playing anymore otherwise the vout will be closed
     //after the main interface, and it requires (at least with OpenGL) that the OpenGL context
     //from the main window is still valid.

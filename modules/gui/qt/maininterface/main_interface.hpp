@@ -28,7 +28,6 @@
 
 #include "widgets/native/qvlcframe.hpp"
 #include "player/player_controller.hpp"
-#include "voutwindow/qvoutwindow.hpp"
 
 #include <QSystemTrayIcon>
 #include <QStackedWidget>
@@ -57,7 +56,7 @@ class QScreen;
 class QTimer;
 class StandardPLPanel;
 struct vout_window_t;
-struct vout_window_cfg_t;
+class VideoSurfaceProvider;
 
 class MainInterface : public QVLCMW
 {
@@ -95,11 +94,6 @@ private:
     static void requestVideoFullScreen( struct vout_window_t *, const char * );
 
 public:
-    QQmlContext* getRootCtx() { return mediacenterView->rootContext(); }
-    QQuickWindow* getRootQuickWindow();
-    QQmlEngine* getEngine(){ return mediacenterView->engine(); }
-    VideoSurfaceProvider* getVideoSurfaceProvider() const;
-
     /* Getters */
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu; }
@@ -121,8 +115,13 @@ public:
     bool isPlaylistVisible() { return playlistVisible; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     bool hasEmbededVideo() { return m_hasEmbededVideo; }
+
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
     QList<QQmlError> qmlErrors() const;
+
+    bool hasEmbededVideo() const;
+    VideoSurfaceProvider* getVideoSurfaceProvider() const;
+    void setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider);;
 
 protected:
     void dropEventPlay( QDropEvent* event, bool b_play );
@@ -148,6 +147,10 @@ protected:
     void setInterfaceFullScreen( bool );
     void computeMinimumSize();
 
+    bool m_hasEmbededVideo = false;
+    VideoSurfaceProvider* m_videoSurfaceProvider = nullptr;
+    bool m_showRemainingTime = false;
+
     /* */
     QSettings           *settings;
     QSystemTrayIcon     *sysTray;
@@ -155,8 +158,6 @@ protected:
 
     QString              input_name;
     QVBoxLayout         *mainLayout;
-
-    std::unique_ptr<QVoutWindow> m_videoRenderer;
 
     QQuickWidget        *mediacenterView;
     QWidget             *mediacenterWrapper;

@@ -114,7 +114,10 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/sout_widgets.hpp \
 	gui/qt/dialogs/toolbar/toolbareditor.cpp gui/qt/dialogs/toolbar/toolbareditor.hpp \
 	gui/qt/dialogs/vlm/vlm.cpp gui/qt/dialogs/vlm/vlm.hpp \
-	gui/qt/maininterface/main_interface.cpp gui/qt/maininterface/main_interface.hpp \
+	gui/qt/maininterface/main_interface.cpp \
+	gui/qt/maininterface/main_interface.hpp \
+	gui/qt/maininterface/videosurface.cpp \
+	gui/qt/maininterface/videosurface.hpp \
 	gui/qt/medialibrary/medialib.cpp \
 	gui/qt/medialibrary/medialib.hpp \
 	gui/qt/medialibrary/mlalbum.cpp \
@@ -197,12 +200,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/variables.cpp gui/qt/util/variables.hpp \
 	gui/qt/util/vlctick.cpp \
 	gui/qt/util/vlctick.hpp \
-	gui/qt/voutwindow/qvoutwindow.cpp \
-	gui/qt/voutwindow/qvoutwindow.hpp \
-	gui/qt/voutwindow/qvoutwindowdummy.cpp \
-	gui/qt/voutwindow/qvoutwindowdummy.hpp \
-	gui/qt/voutwindow/videosurface.cpp \
-	gui/qt/voutwindow/videosurface.hpp \
 	gui/qt/widgets/native/animators.cpp \
 	gui/qt/widgets/native/animators.hpp \
 	gui/qt/widgets/native/customwidgets.cpp gui/qt/widgets/native/customwidgets.hpp \
@@ -270,6 +267,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/sout_widgets.moc.cpp \
 	gui/qt/dialogs/toolbar/toolbareditor.moc.cpp \
 	gui/qt/maininterface/main_interface.moc.cpp \
+	gui/qt/maininterface/videosurface.moc.cpp \
 	gui/qt/medialibrary/medialib.moc.cpp \
 	gui/qt/medialibrary/mlalbum.moc.cpp \
 	gui/qt/medialibrary/mlalbummodel.moc.cpp \
@@ -312,9 +310,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/varchoicemodel.moc.cpp \
 	gui/qt/util/variables.moc.cpp \
 	gui/qt/util/vlctick.moc.cpp \
-	gui/qt/voutwindow/qvoutwindow.moc.cpp \
-	gui/qt/voutwindow/qvoutwindowdummy.moc.cpp \
-	gui/qt/voutwindow/videosurface.moc.cpp \
 	gui/qt/widgets/native/animators.moc.cpp \
 	gui/qt/widgets/native/customwidgets.moc.cpp \
 	gui/qt/widgets/native/interface_widgets.moc.cpp \
