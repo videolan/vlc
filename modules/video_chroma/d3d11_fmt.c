@@ -684,7 +684,9 @@ static HINSTANCE Direct3D11LoadShaderLibrary(void)
 int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d, bool with_shaders)
 {
 #if !VLC_WINSTORE_APP
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     hd3d->dxgidebug_dll = NULL;
+#endif
     hd3d->hdll = LoadLibrary(TEXT("D3D11.DLL"));
     if (!hd3d->hdll)
     {
