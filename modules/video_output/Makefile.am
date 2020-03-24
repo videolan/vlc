@@ -75,6 +75,25 @@ libcaeagl_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
 	-Wl,-framework,Foundation,-framework,OpenGLES,-framework,QuartzCore,-framework,UIKit
 libcaeagl_ios_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 
+libcvpx_gl_plugin_la_SOURCES = video_output/apple/VLCCVOpenGLProvider.m
+libcvpx_gl_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
+libcvpx_gl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DGL_SILENCE_DEPRECATION
+libcvpx_gl_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
+    -Wl,-framework,Foundation,-framework,CoreFoundation,-framework,CoreVideo
+libcvpx_gl_plugin_la_LIBADD = libvlc_vtutils.la
+
+if HAVE_DARWIN
+if HAVE_OSX
+libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
+libcvpx_gl_plugin_la_LIBADD += libvlc_opengl.la
+else
+libcvpx_gl_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
+libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
+libcvpx_gl_plugin_la_LIBADD += libvlc_opengles.la
+endif
+vout_LTLIBRARIES += libcvpx_gl_plugin.la
+endif
+
 if HAVE_IOS
 vout_LTLIBRARIES += libvout_ios_plugin.la \
 	libuiview_window_plugin.la \
