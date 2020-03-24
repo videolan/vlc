@@ -96,6 +96,11 @@ void AbstractPlaylist::addPeriod(BasePeriod *period)
     periods.push_back(period);
 }
 
+bool AbstractPlaylist::isLowLatency() const
+{
+    return false;
+}
+
 void AbstractPlaylist::setType(const std::string &type_)
 {
     type = type_;

@@ -48,12 +48,15 @@ namespace dash
 
                 Profile                         getProfile() const;
                 virtual bool                    isLive() const;
+                virtual bool                    isLowLatency() const;
+                void                            setLowLatency(bool);
                 virtual void                    debug();
 
                 Property<ProgramInformation *>      programInfo;
 
             private:
                 Profile                             profile;
+                bool                                lowLatency;
         };
     }
 }
