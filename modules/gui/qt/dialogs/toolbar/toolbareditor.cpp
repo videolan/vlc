@@ -21,12 +21,18 @@
 #endif
 
 #include "toolbareditor.hpp"
+#include "util/i18n.hpp"
+#include "util/recent_media_model.hpp"
 #include "util/settings.hpp"
+#include "util/systempalette.hpp"
+#include "util/qml_main_context.hpp"
 #include "player/playercontrolbarmodel.hpp"
 #include "maininterface/main_interface.hpp"
 
 #include <QInputDialog>
+#include <QQuickItem>
 #include <QtQml/QQmlContext>
+#include <QQmlEngine>
 
 #define PROFILE_NAME_1 "Minimalist Style"
 #define VALUE_1 "0;64;3;1;4;64;11;64;34;64;9;64;33 | 3;0;1;4"
@@ -83,17 +89,23 @@ ToolbarEditorDialog::ToolbarEditorDialog( QWidget *_w, intf_thread_t *_p_intf)
     profileCombo->setCurrentIndex( -1 );
 
     /* Drag and Drop */
-    editorView = new QQuickWidget(p_intf->p_sys->p_mi->getEngine(),this);
+    editorView = new QQuickWidget(this);
     editorView->setClearColor(Qt::transparent);
-    QQmlContext *rootCtx = editorView->rootContext();
-    QQmlContext *p_mi_rootCtx = p_intf->p_sys->p_mi->getRootCtx();
+    QQmlContext* rootCtx = editorView->rootContext();
+    QQmlEngine* engine = editorView->engine();
 
-    rootCtx->setContextProperty( "mainctx", p_mi_rootCtx->contextProperty("mainctx"));
-    rootCtx->setContextProperty( "player", p_mi_rootCtx->contextProperty("player") );
-    rootCtx->setContextProperty( "settings",  p_mi_rootCtx->contextProperty("settings"));
-    rootCtx->setContextProperty( "medialib",  p_mi_rootCtx->contextProperty("medialib"));
-    rootCtx->setContextProperty( "recentsMedias",  p_mi_rootCtx->contextProperty("recentsMedias"));
-    rootCtx->setContextProperty( "rootWindow",  p_mi_rootCtx->contextProperty("rootWindow"));
+    intf_sys_t* p_sys = p_intf->p_sys;
+    MainInterface* mainInterface = p_sys->p_mi;
+
+    rootCtx->setContextProperty( "player", p_sys->p_mainPlayerController );
+    rootCtx->setContextProperty( "i18n", new I18n(engine) );
+    rootCtx->setContextProperty( "mainctx", new QmlMainContext(p_intf, mainInterface, engine));
+    rootCtx->setContextProperty( "mainInterface", mainInterface);
+    rootCtx->setContextProperty( "topWindow", mainInterface->windowHandle());
+    rootCtx->setContextProperty( "settings",  new Settings( p_intf, engine));
+    rootCtx->setContextProperty( "systemPalette", new SystemPalette(engine));
+    rootCtx->setContextProperty( "medialib", nullptr );
+    rootCtx->setContextProperty( "recentsMedias",  new VLCRecentMediaModel( p_intf, engine ));
     rootCtx->setContextProperty( "toolbareditor",  this);
 
     editorView->setSource( QUrl ( QStringLiteral("qrc:/dialogs/ToolbarEditor.qml") ) );
