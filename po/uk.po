@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2019-05-23 14:39+0200\n"
+"POT-Creation-Date: 2020-03-24 21:54+0100\n"
 "PO-Revision-Date: 2019-05-19 17:37+0200\n"
 "Last-Translator: Андрій Бандура <andriykopanytsia@gmail.com>, 2019\n"
 "Language-Team: Ukrainian (https://www.transifex.com/yaron/teams/16553/uk/)\n"
@@ -45,8 +45,8 @@ msgid "Select \"Advanced Options\" to see all options."
 msgstr "Натисніть кнопку „Додаткові параметри“, щоб побачити всі параметри."
 
 #: include/vlc_config_cat.h:38
-#: modules/gui/macosx/VLCSimplePrefsController.m:227
-#: modules/gui/qt/components/simple_preferences.cpp:238
+#: modules/gui/macosx/VLCSimplePrefsController.m:233
+#: modules/gui/qt/components/simple_preferences.cpp:239
 #: modules/gui/qt/menus.cpp:1093
 msgid "Interface"
 msgstr "Інтерфейс"
@@ -76,7 +76,7 @@ msgid "Settings for VLC's control interfaces"
 msgstr "Установки інтерфейсів елементів керування VLC"
 
 #: include/vlc_config_cat.h:49 include/vlc_config_cat.h:50
-#: modules/gui/macosx/VLCSimplePrefsController.m:237
+#: modules/gui/macosx/VLCSimplePrefsController.m:243
 msgid "Hotkeys settings"
 msgstr "Установки гарячих клавіш"
 
@@ -84,10 +84,10 @@ msgstr "Установки гарячих клавіш"
 #: modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:171
 #: modules/gui/macosx/VLCMainMenu.m:414 modules/gui/macosx/VLCOutput.m:92
-#: modules/gui/macosx/VLCPlaylistInfo.m:95
-#: modules/gui/macosx/VLCSimplePrefsController.m:229
+#: modules/gui/macosx/VLCPlaylistInfo.m:91
+#: modules/gui/macosx/VLCSimplePrefsController.m:235
 #: modules/gui/qt/components/info_panels.cpp:572
-#: modules/gui/qt/components/simple_preferences.cpp:240
+#: modules/gui/qt/components/simple_preferences.cpp:241
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:77
 #: modules/stream_out/es.c:94 modules/stream_out/transcode/transcode.c:182
 #: share/lua/http/dialogs/create_stream.html:150
@@ -148,11 +148,11 @@ msgstr "Інші модулі та установки звуку."
 #: src/libvlc-module.c:1551 modules/access/imem.c:64
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:160
 #: modules/gui/macosx/VLCMainMenu.m:427 modules/gui/macosx/VLCOutput.m:82
-#: modules/gui/macosx/VLCPlaylistInfo.m:90
-#: modules/gui/macosx/VLCSimplePrefsController.m:231
-#: modules/gui/macosx/VLCSimplePrefsController.m:374
+#: modules/gui/macosx/VLCPlaylistInfo.m:86
+#: modules/gui/macosx/VLCSimplePrefsController.m:237
+#: modules/gui/macosx/VLCSimplePrefsController.m:380
 #: modules/gui/qt/components/info_panels.cpp:573
-#: modules/gui/qt/components/simple_preferences.cpp:242
+#: modules/gui/qt/components/simple_preferences.cpp:243
 #: modules/gui/qt/qt.cpp:213 modules/services_discovery/mediadirs.c:70
 #: modules/stream_out/es.c:102 modules/stream_out/transcode/transcode.c:153
 #: share/lua/http/dialogs/create_stream.html:147
@@ -472,7 +472,7 @@ msgstr "&Про програму"
 #: include/vlc_intf_strings.h:65 modules/control/oldrc.c:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
 #: modules/gui/macosx/VLCControlsBarCommon.m:432
-#: modules/gui/macosx/VLCFSPanelController.m:232
+#: modules/gui/macosx/VLCFSPanelController.m:233
 #: modules/gui/macosx/VLCMainMenu.m:385 modules/gui/macosx/VLCMainMenu.m:497
 #: modules/gui/macosx/VLCMainMenu.m:504 modules/gui/macosx/VLCMainMenu.m:1339
 #: modules/gui/macosx/VLCMainMenu.m:1340 modules/gui/macosx/VLCMainMenu.m:1341
@@ -739,7 +739,7 @@ msgstr "Навушники"
 #: modules/access/dtv/access.c:125 modules/access/dtv/access.c:134
 #: modules/access/dtv/access.c:142 modules/access/dtv/access.c:164
 #: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:976
-#: modules/gui/qt/components/simple_preferences.cpp:385
+#: modules/gui/qt/components/simple_preferences.cpp:386
 msgid "Automatic"
 msgstr "Автоматично"
 
@@ -1006,7 +1006,7 @@ msgstr "Кодек"
 
 #: src/input/es_out.c:3111 src/input/meta.c:66 modules/access/imem.c:71
 #: modules/gui/macosx/VLCPlaylist.m:114
-#: modules/gui/macosx/VLCSimplePrefsController.m:311
+#: modules/gui/macosx/VLCSimplePrefsController.m:317
 #: modules/stream_out/setid.c:49 modules/gui/qt/ui/sprefs_interface.h:527
 msgid "Language"
 msgstr "Мова"
@@ -1032,7 +1032,7 @@ msgid "Channels"
 msgstr "Канали"
 
 #: src/input/es_out.c:3128 modules/access/alsa.c:39 modules/access/imem.c:75
-#: modules/audio_output/amem.c:45 modules/codec/fluidsynth.c:64
+#: modules/audio_output/amem.c:47 modules/codec/fluidsynth.c:64
 msgid "Sample rate"
 msgstr "Частота дискретизації"
 
@@ -1273,11 +1273,11 @@ msgstr "Субтитр"
 msgid "Volume %ld%%"
 msgstr "Гучність %ld%%"
 
-#: src/input/input.c:2719
+#: src/input/input.c:2725
 msgid "Your input can't be opened"
 msgstr "Не вдалося відкрити введення"
 
-#: src/input/input.c:2720
+#: src/input/input.c:2726
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
@@ -1288,7 +1288,7 @@ msgstr ""
 #: modules/gui/macosx/VLCMainMenu.m:410
 #: modules/gui/macosx/VLCOpenWindowController.m:178
 #: modules/gui/macosx/VLCOpenWindowController.m:180
-#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:63
+#: modules/gui/macosx/VLCPlaylist.m:107 modules/gui/macosx/VLCPlaylistInfo.m:59
 #: modules/gui/qt/components/open_panels.cpp:507
 #: modules/gui/qt/components/open_panels.cpp:521
 #: modules/gui/qt/dialogs/epg.cpp:70 modules/mux/asf.c:56
@@ -1296,7 +1296,7 @@ msgstr ""
 msgid "Title"
 msgstr "Назва"
 
-#: src/input/meta.c:56 modules/gui/macosx/VLCPlaylistInfo.m:64
+#: src/input/meta.c:56 modules/gui/macosx/VLCPlaylistInfo.m:60
 #: modules/mux/avi.c:49
 msgid "Artist"
 msgstr "Виконавець"
@@ -1453,7 +1453,7 @@ msgstr "Наступна частина"
 msgid "Previous chapter"
 msgstr "Попередня частина"
 
-#: src/input/vlm.c:623 src/input/vlm.c:999
+#: src/input/vlm.c:641 src/input/vlm.c:1018
 #, c-format
 msgid "Media: %s"
 msgstr "Медіа: %s"
@@ -1643,7 +1643,7 @@ msgstr "Медіароль"
 msgid "Media (player) role for operating system policy."
 msgstr "Медіароль (програвач) для політик операційної системи."
 
-#: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:267
+#: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:407
 msgid "Enable audio"
 msgstr "Увімкнути звук"
@@ -1903,7 +1903,7 @@ msgstr ""
 "Стандартний метод виведення відео, використовуваний VLC. Стандартно, "
 "найкращий доступний метод вибирається автоматично."
 
-#: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:353
+#: src/libvlc-module.c:258 modules/gui/macosx/VLCSimplePrefsController.m:359
 #: modules/stream_out/display.c:42 modules/gui/qt/ui/sprefs_video.h:311
 msgid "Enable video"
 msgstr "Увімкнути відео"
@@ -2147,7 +2147,7 @@ msgstr ""
 #: src/libvlc-module.c:342 src/libvlc-module.c:344
 #: src/video_output/interlacing.c:112 modules/gui/macosx/VLCMainMenu.m:443
 #: modules/gui/macosx/VLCMainMenu.m:444
-#: modules/gui/macosx/VLCSimplePrefsController.m:372
+#: modules/gui/macosx/VLCSimplePrefsController.m:378
 #: modules/gui/qt/dialogs/convert.cpp:123 modules/hw/vdpau/chroma.c:896
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
@@ -2156,7 +2156,7 @@ msgstr "Усунення черезрядковості"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:445 modules/gui/macosx/VLCMainMenu.m:446
-#: modules/gui/macosx/VLCSimplePrefsController.m:373
+#: modules/gui/macosx/VLCSimplePrefsController.m:379
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
 msgstr "Режим усунення черезрядковості"
@@ -2199,7 +2199,7 @@ msgstr "Вимикати заставку"
 msgid "Disable the screensaver during video playback."
 msgstr "Вимикати заставку під час відтворення відео."
 
-#: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:358
+#: src/libvlc-module.c:374 modules/gui/macosx/VLCSimplePrefsController.m:364
 #: modules/gui/qt/ui/sprefs_video.h:314
 msgid "Window decorations"
 msgstr "Оформлення вікна"
@@ -2403,7 +2403,7 @@ msgstr ""
 "сторін екрана — 16:9, то, ймовірно, потрібно змінити цей параметр на 4:3, "
 "щоб зберегти правильні пропорції."
 
-#: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:301
+#: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:307
 msgid "Skip frames"
 msgstr "Пропускати кадри"
 
@@ -2551,13 +2551,13 @@ msgstr ""
 #: src/video_output/vout_intf.c:116 modules/access/dshow/dshow.cpp:92
 #: modules/access/dshow/dshow.cpp:99 modules/access/dshow/dshow.cpp:119
 #: modules/access/dshow/dshow.cpp:2081 modules/audio_output/alsa.c:767
-#: modules/audio_output/directsound.c:1045 modules/audio_output/mmdevice.c:1285
+#: modules/audio_output/directsound.c:1048 modules/audio_output/mmdevice.c:1285
 #: modules/audio_output/mmdevice.c:1424 modules/codec/avcodec/avcodec.c:50
 #: modules/demux/adaptive/adaptive.cpp:97
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:79
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:322
 #: modules/gui/macosx/VLCMainMenu.m:602
-#: modules/gui/macosx/VLCSimplePrefsController.m:655
+#: modules/gui/macosx/VLCSimplePrefsController.m:661
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:54
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:388
 #: modules/gui/macosx/prefs_widgets.m:1221
@@ -2947,7 +2947,7 @@ msgid "You can completely disable the sub-picture processing."
 msgstr "Можна повністю вимкнути обробку шарів."
 
 #: src/libvlc-module.c:717 src/libvlc-module.c:1674 src/text/iso-639_def.h:145
-#: modules/gui/macosx/VLCSimplePrefsController.m:345
+#: modules/gui/macosx/VLCSimplePrefsController.m:351
 #: modules/gui/qt/ui/sprefs_subtitles.h:287
 msgid "On Screen Display"
 msgstr "OSD"
@@ -3764,7 +3764,7 @@ msgid "Maximum time allowed to preparse an item, in milliseconds"
 msgstr ""
 "Найбільший час дозволений для попереднього аналізу елемента, у мілісекундах"
 
-#: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:328
+#: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:334
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:562
 msgid "Allow metadata network access"
@@ -4000,7 +4000,7 @@ msgstr "Вийти з повноекранного режиму"
 msgid "Select the hotkey to use to exit fullscreen state."
 msgstr "Виберіть гарячу клавішу для виходу з повноекранного режиму."
 
-#: src/libvlc-module.c:1230 modules/gui/macosx/VLCFSPanelController.m:109
+#: src/libvlc-module.c:1230 modules/gui/macosx/VLCFSPanelController.m:110
 msgid "Play/Pause"
 msgstr "Відтворити/Призупинити"
 
@@ -4063,7 +4063,7 @@ msgstr "Повільніше (точно)"
 
 #: src/libvlc-module.c:1246 modules/control/hotkeys.c:410
 #: modules/gui/macosx/VLCControlsBarCommon.m:196
-#: modules/gui/macosx/VLCFSPanelController.m:112
+#: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCMainMenu.m:396 modules/gui/macosx/VLCMainMenu.m:499
 #: modules/gui/macosx/VLCMainMenu.m:507
 #: modules/gui/qt/components/controller.hpp:112
@@ -4080,7 +4080,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1248 modules/control/hotkeys.c:414
 #: modules/gui/macosx/VLCControlsBarCommon.m:193
-#: modules/gui/macosx/VLCFSPanelController.m:115
+#: modules/gui/macosx/VLCFSPanelController.m:116
 #: modules/gui/macosx/VLCMainMenu.m:395 modules/gui/macosx/VLCMainMenu.m:500
 #: modules/gui/macosx/VLCMainMenu.m:506
 #: modules/gui/qt/components/controller.hpp:112 modules/notify/notify.c:333
@@ -4106,7 +4106,7 @@ msgid "Select the hotkey to stop playback."
 msgstr "Виберіть гарячу клавішу для зупинки відтворення."
 
 #: src/libvlc-module.c:1252 modules/gui/macosx/VLCControlsBarCommon.m:92
-#: modules/gui/macosx/VLCFSPanelController.m:130
+#: modules/gui/macosx/VLCFSPanelController.m:131
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:287
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:309
 #: modules/spu/marq.c:151 modules/spu/rss.c:198
@@ -4852,7 +4852,7 @@ msgstr "Оверлеї"
 msgid "Track settings"
 msgstr "Налаштування доріжки"
 
-#: src/libvlc-module.c:1753 modules/gui/macosx/VLCSimplePrefsController.m:316
+#: src/libvlc-module.c:1753 modules/gui/macosx/VLCSimplePrefsController.m:322
 msgid "Playback control"
 msgstr "Керування відтворенням"
 
@@ -4877,7 +4877,7 @@ msgid "Decoders"
 msgstr "Декодери"
 
 #: src/libvlc-module.c:1944 modules/access/avio.h:40
-#: modules/access/v4l2/v4l2.c:59 modules/gui/macosx/VLCPlaylistInfo.m:84
+#: modules/access/v4l2/v4l2.c:59 modules/gui/macosx/VLCPlaylistInfo.m:80
 msgid "Input"
 msgstr "Введення"
 
@@ -5193,7 +5193,7 @@ msgstr "Наступна сторінка"
 
 #: src/misc/actions.c:107 modules/control/oldrc.c:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:423
-#: modules/gui/macosx/VLCFSPanelController.m:238
+#: modules/gui/macosx/VLCFSPanelController.m:239
 #: modules/gui/macosx/VLCMainMenu.m:1346 modules/gui/macosx/VLCMainMenu.m:1347
 #: modules/gui/macosx/VLCMainMenu.m:1348
 #: modules/gui/qt/components/playlist/standardpanel.cpp:196
@@ -5267,8 +5267,8 @@ msgstr "%.1f ГіБ"
 msgid "%.1f MiB"
 msgstr "%.1f МіБ"
 
-#: src/misc/update.c:486 modules/gui/macosx/VLCPlaylistInfo.m:142
-#: modules/gui/macosx/VLCPlaylistInfo.m:144
+#: src/misc/update.c:486 modules/gui/macosx/VLCPlaylistInfo.m:138
+#: modules/gui/macosx/VLCPlaylistInfo.m:140
 #, c-format
 msgid "%.1f KiB"
 msgstr "%.1f КіБ"
@@ -5288,7 +5288,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "Не вдалося відкрити „%s“ для записування"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2734
+#: modules/demux/avi/avi.c:2772
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:825
@@ -5305,10 +5305,10 @@ msgstr "Не вдалося відкрити „%s“ для записуван�
 #: modules/gui/macosx/VLCMainWindow.m:228
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
-#: modules/gui/macosx/VLCSimplePrefsController.m:280
-#: modules/gui/macosx/VLCSimplePrefsController.m:307
-#: modules/gui/macosx/VLCSimplePrefsController.m:378
-#: modules/gui/macosx/VLCSimplePrefsController.m:821
+#: modules/gui/macosx/VLCSimplePrefsController.m:286
+#: modules/gui/macosx/VLCSimplePrefsController.m:313
+#: modules/gui/macosx/VLCSimplePrefsController.m:384
+#: modules/gui/macosx/VLCSimplePrefsController.m:827
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:50
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:791
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:860
@@ -5317,7 +5317,7 @@ msgstr "Не вдалося відкрити „%s“ для записуван�
 #: modules/gui/qt/components/preferences_widgets.cpp:1428
 #: modules/gui/qt/components/sout/profile_selector.cpp:452
 #: modules/gui/qt/dialogs/sout.cpp:92
-#: modules/stream_out/chromecast/cast.cpp:1195
+#: modules/stream_out/chromecast/cast.cpp:1197
 msgid "Cancel"
 msgstr "Скасувати"
 
@@ -6154,6 +6154,40 @@ msgstr "Вкладення"
 msgid "Attachment input"
 msgstr "Введення із вкладень"
 
+#: modules/access/avaudiocapture.m:212
+msgid "No Audio Input device found"
+msgstr "Вхідного звукового пристрою не знайдено"
+
+#: modules/access/avaudiocapture.m:213
+msgid ""
+"Your Mac does not seem to be equipped with a suitable audio input device."
+"Please check your connectors and drivers."
+msgstr ""
+"Вірогідно, ваш Mac не оснащений відповідним пристроєм для введення відео. "
+"Будь ласка, перевірте роз'єми і драйвери."
+
+#: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
+#: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
+#, fuzzy
+msgid "Problem accessing a system resource"
+msgstr "Відомості про проблему та системна конфігурація"
+
+#: modules/access/avaudiocapture.m:237
+msgid ""
+"Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
+"to access your microphone."
+msgstr ""
+
+#: modules/access/avaudiocapture.m:341
+#, fuzzy
+msgid "AVFoundation Audio Capture"
+msgstr "Захоплення відео AVFoundation"
+
+#: modules/access/avaudiocapture.m:342
+#, fuzzy
+msgid "AVFoundation audio capture module."
+msgstr "Модуль захоплення відео AVFoundation"
+
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
 msgstr "Захоплення відео AVFoundation"
@@ -6181,6 +6215,12 @@ msgid ""
 msgstr ""
 "Імовірно, Mac не обладнано відповідним пристроєм введення. Перевірте "
 "з’єднання та драйвери."
+
+#: modules/access/avcapture.m:351
+msgid ""
+"Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
+"to access your camera."
+msgstr ""
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -6296,16 +6336,16 @@ msgid "Failed to start bluray playback. Please try without menu support."
 msgstr ""
 "Не вдалося запустити відтворення Blu-ray. Спробуйте без підтримки меню."
 
-#: modules/access/bluray.c:978 modules/access/bluray.c:2764
-#: modules/access/bluray.c:2769
+#: modules/access/bluray.c:988 modules/access/bluray.c:2819
+#: modules/access/bluray.c:2824
 msgid "Blu-ray error"
 msgstr "Помилка Blu-ray"
 
-#: modules/access/bluray.c:2054
+#: modules/access/bluray.c:2109
 msgid "Top Menu"
 msgstr "Верхнє меню"
 
-#: modules/access/bluray.c:2057
+#: modules/access/bluray.c:2112
 msgid "First Play"
 msgstr "Перша гра"
 
@@ -6794,19 +6834,19 @@ msgstr ""
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "Пристрій захоплення „%s“ не підтримує необхідні параметри."
 
-#: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
+#: modules/access/dsm/access.c:72 modules/access/dsm/sd.c:138
 msgid "Windows networks"
 msgstr "Мережі Windows"
 
-#: modules/access/dsm/access.c:63
+#: modules/access/dsm/access.c:74
 msgid "libdsm's SMB (Windows network shares) input and browser"
 msgstr "Введення та браузер libdsm's SMB (мережевих дисків Windows)"
 
-#: modules/access/dsm/access.c:67
+#: modules/access/dsm/access.c:78
 msgid "libdsm SMB input"
 msgstr "Введення із libdsm SMB"
 
-#: modules/access/dsm/access.c:80
+#: modules/access/dsm/access.c:98
 msgid "libdsm NETBIOS discovery module"
 msgstr "модуль виявлення libdsm NETBIOS"
 
@@ -7338,19 +7378,19 @@ msgstr ""
 msgid "Scanning DVB"
 msgstr "Сканування DVB"
 
-#: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
+#: modules/access/dvdnav.c:71 modules/access/dvdread.c:69
 msgid "DVD angle"
 msgstr "Версія сцени DVD"
 
-#: modules/access/dvdnav.c:71 modules/access/dvdread.c:70
+#: modules/access/dvdnav.c:73 modules/access/dvdread.c:71
 msgid "Default DVD angle."
 msgstr "Стандартна версія сцени DVD."
 
-#: modules/access/dvdnav.c:73
+#: modules/access/dvdnav.c:75
 msgid "Start directly in menu"
 msgstr "Починати безпосередньо з меню"
 
-#: modules/access/dvdnav.c:75
+#: modules/access/dvdnav.c:77
 msgid ""
 "Start the DVD directly in the main menu. This will try to skip all the "
 "useless warning introductions."
@@ -7358,54 +7398,61 @@ msgstr ""
 "Починати відтворення DVD безпосередньо з головного меню. Якщо цю опцію "
 "ввімкнено, всі несуттєві попередження на початку буде пропущено."
 
-#: modules/access/dvdnav.c:89
+#: modules/access/dvdnav.c:91
 msgid "DVD with menus"
 msgstr "DVD з меню"
 
-#: modules/access/dvdnav.c:90
+#: modules/access/dvdnav.c:92
 msgid "DVDnav Input"
 msgstr "Введення DVDnav"
 
-#: modules/access/dvdnav.c:102
+#: modules/access/dvdnav.c:104
 msgid "DVDnav demuxer"
 msgstr "Демультиплексор DVDnav"
 
-#: modules/access/dvdnav.c:298 modules/access/dvdread.c:201
-#: modules/access/dvdread.c:216 modules/access/dvdread.c:471
-#: modules/access/dvdread.c:539
+#: modules/access/dvdnav.c:275 modules/access/dvdread.c:208
+#: modules/access/dvdread.c:225 modules/access/dvdread.c:484
+#: modules/access/dvdread.c:549
 msgid "Playback failure"
 msgstr "Сталася помилка відтворення"
 
-#: modules/access/dvdnav.c:299
+#: modules/access/dvdnav.c:276
 msgid ""
 "VLC cannot set the DVD's title. It possibly cannot decrypt the entire disc."
 msgstr ""
 "VLC не вдалося задати заголовок DVD. Імовірно, не вдалося декодувати весь "
 "диск."
 
-#: modules/access/dvdread.c:76
+#: modules/access/dvdnav.c:369 modules/access/dvdread.c:204
+msgid ""
+"Potentially, macOS blocks access to your disc. Please open \"System "
+"Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
+"external media in \"Files and Folders\" section."
+msgstr ""
+
+#: modules/access/dvdread.c:77
 msgid "DVD without menus"
 msgstr "DVD без меню"
 
-#: modules/access/dvdread.c:77
+#: modules/access/dvdread.c:78
 msgid "DVDRead Input (no menu support)"
 msgstr "Введення DVDRead (без підтримки меню)"
 
-#: modules/access/dvdread.c:202
+#: modules/access/dvdread.c:209
 #, c-format
 msgid "DVDRead could not open the disc \"%s\"."
 msgstr "DVDRead не вдалося відкрити диск «%s»."
 
-#: modules/access/dvdread.c:217
+#: modules/access/dvdread.c:226
 msgid "Cannot play a non-UDF mastered DVD."
 msgstr "Неможливо відтворити DVD-диск, який не є UDF."
 
-#: modules/access/dvdread.c:472
+#: modules/access/dvdread.c:485
 #, c-format
 msgid "DVDRead could not read block %d."
 msgstr "DVDRead не вдалося прочитати блок %d."
 
-#: modules/access/dvdread.c:540
+#: modules/access/dvdread.c:550
 #, c-format
 msgid "DVDRead could not read %d/%d blocks at 0x%02x."
 msgstr "DVDRead не вдалося прочитати %d/%d блоків у позиції 0x%02x."
@@ -7444,7 +7491,7 @@ msgstr "Включити пристрої та канали, коли  пере�
 #: modules/access/smb_common.h:21 modules/access/vnc.c:46
 #: modules/access_output/http.c:52
 #: modules/gui/macosx/VLCCoreDialogProvider.m:191
-#: modules/gui/macosx/VLCSimplePrefsController.m:272
+#: modules/gui/macosx/VLCSimplePrefsController.m:278
 #: modules/gui/qt/dialogs/external.cpp:203 modules/misc/audioscrobbler.c:114
 #: modules/stream_out/rtp.c:173
 msgid "Username"
@@ -7464,8 +7511,8 @@ msgstr ""
 #: modules/access/smb_common.h:24 modules/access/vnc.c:47
 #: modules/access_output/http.c:55
 #: modules/gui/macosx/VLCCoreDialogProvider.m:192
-#: modules/gui/macosx/VLCSimplePrefsController.m:271
-#: modules/gui/macosx/VLCSimplePrefsController.m:334
+#: modules/gui/macosx/VLCSimplePrefsController.m:277
+#: modules/gui/macosx/VLCSimplePrefsController.m:340
 #: modules/gui/qt/dialogs/external.cpp:208 modules/lua/vlc.c:54
 #: modules/lua/vlc.c:70 modules/misc/audioscrobbler.c:116
 #: modules/stream_out/rtp.c:176
@@ -7653,7 +7700,7 @@ msgstr "Мова елементарного потоку відповідно д
 msgid "Sample rate of an audio elementary stream"
 msgstr "Частота дискретизації звуку елементарного потоку"
 
-#: modules/access/imem.c:79 modules/audio_output/amem.c:49
+#: modules/access/imem.c:79 modules/audio_output/amem.c:51
 msgid "Channels count"
 msgstr "Число каналів"
 
@@ -8073,30 +8120,6 @@ msgstr "PulseAudio"
 msgid "PulseAudio input"
 msgstr "Введення з PulseAudio"
 
-#: modules/access/qtsound.m:69
-msgid "QTSound"
-msgstr "QTSound"
-
-#: modules/access/qtsound.m:70
-msgid "QuickTime Sound Capture"
-msgstr "Запис звуку QuickTime"
-
-#: modules/access/qtsound.m:272
-msgid "No Audio Input device found"
-msgstr "Вхідного звукового пристрою не знайдено"
-
-#: modules/access/qtsound.m:273 modules/access/qtsound.m:304
-msgid ""
-"Your Mac does not seem to be equipped with a suitable audio input device."
-"Please check your connectors and drivers."
-msgstr ""
-"Вірогідно, ваш Mac не оснащений відповідним пристроєм для введення відео. "
-"Будь ласка, перевірте роз'єми і драйвери."
-
-#: modules/access/qtsound.m:303
-msgid "No audio input device found"
-msgstr "Вхідного звукового пристрою не знайдено"
-
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
 msgstr "Зашифроване з'єднання"
@@ -8361,7 +8384,7 @@ msgstr "Введення з екрана"
 #: modules/gui/macosx/VLCOpenWindowController.m:209
 #: modules/gui/macosx/VLCOpenWindowController.m:485
 #: modules/gui/macosx/VLCOpenWindowController.m:1103
-#: modules/gui/macosx/VLCSimplePrefsController.m:660
+#: modules/gui/macosx/VLCSimplePrefsController.m:666
 msgid "Screen"
 msgstr "Екран"
 
@@ -8504,11 +8527,11 @@ msgstr "Домен SMB"
 msgid "Domain/Workgroup that will be used for the connection."
 msgstr "Домен/робоча група, використовувана для з’єднання."
 
-#: modules/access/smb_common.h:31
+#: modules/access/smb_common.h:34
 msgid "SMB authentication required"
 msgstr "Потрібна автентифікація SMB"
 
-#: modules/access/smb_common.h:32
+#: modules/access/smb_common.h:35
 #, c-format
 msgid ""
 "The computer (%s) you are trying to connect to requires authentication.\n"
@@ -10472,7 +10495,7 @@ msgstr "Оточення 7.1"
 msgid "ALSA audio output"
 msgstr "Виведення звуку через ALSA"
 
-#: modules/audio_output/alsa.c:393 modules/audio_output/auhal.c:1182
+#: modules/audio_output/alsa.c:393 modules/audio_output/auhal.c:1185
 msgid "Audio output failed"
 msgstr "Помилка виводу звуку"
 
@@ -10485,15 +10508,15 @@ msgstr ""
 "Не вдалося використати звуковий пристрій «%s»:\n"
 "%s."
 
-#: modules/audio_output/amem.c:34
+#: modules/audio_output/amem.c:36
 msgid "Audio memory"
 msgstr "Звукова пам’ять"
 
-#: modules/audio_output/amem.c:35
+#: modules/audio_output/amem.c:37
 msgid "Audio memory output"
 msgstr "Виведення звукової пам’яті"
 
-#: modules/audio_output/amem.c:42
+#: modules/audio_output/amem.c:44
 msgid "Sample format"
 msgstr "Формат фрагмента"
 
@@ -10509,16 +10532,16 @@ msgstr "Вивід звуку через HAL AudioUnit"
 msgid "System Sound Output Device"
 msgstr "Системний пристрій виведення звуку"
 
-#: modules/audio_output/auhal.c:542
+#: modules/audio_output/auhal.c:543
 #, c-format
 msgid "%s (Encoded Output)"
 msgstr "%s (Закодований вивід)"
 
-#: modules/audio_output/auhal.c:1036
+#: modules/audio_output/auhal.c:1041
 msgid "Audio device is not configured"
 msgstr "Звуковий пристрій не сконфігуровано"
 
-#: modules/audio_output/auhal.c:1037
+#: modules/audio_output/auhal.c:1042
 msgid ""
 "You should configure your speaker layout with \"Audio Midi Setup\" in /"
 "Applications/Utilities. VLC will output Stereo only."
@@ -10526,7 +10549,7 @@ msgstr ""
 "Ви маєте налаштувати ваш звуковий шар за допомогою утиліти „Параметри звуку "
 "Midi“ в /Програмах/Утилітах. Зараз використовується стереорежим."
 
-#: modules/audio_output/auhal.c:1183
+#: modules/audio_output/auhal.c:1186
 msgid ""
 "The selected audio output device is exclusively in use by another program."
 msgstr ""
@@ -10716,7 +10739,7 @@ msgstr "Програмне підсилення"
 msgid "This linear gain will be applied in software."
 msgstr "Це лінійне підсилення буде застосовуватися у програмі."
 
-#: modules/audio_output/wasapi.c:651
+#: modules/audio_output/wasapi.c:652
 msgid "Windows Audio Session API output"
 msgstr "Вивід API сесії Windows Audio"
 
@@ -11016,7 +11039,7 @@ msgid "Internal libavcodec codec name"
 msgstr "Внутрішня назва кодека libavcodec"
 
 #: modules/codec/avcodec/avcodec.h:108
-#: modules/gui/macosx/VLCSimplePrefsController.m:299
+#: modules/gui/macosx/VLCSimplePrefsController.m:305
 msgid "Skip the loop filter for H.264 decoding"
 msgstr "Пропустити loop-фільтр при декодуванні H.264"
 
@@ -11029,7 +11052,7 @@ msgstr ""
 "однак дає великий приріст продуктивності на потоках високої якості."
 
 #: modules/codec/avcodec/avcodec.h:113
-#: modules/gui/macosx/VLCSimplePrefsController.m:297
+#: modules/gui/macosx/VLCSimplePrefsController.m:303
 msgid "Hardware decoding"
 msgstr "Апаратне декодування"
 
@@ -11374,7 +11397,7 @@ msgid "BPG image decoder"
 msgstr "Декодер зображень BPG"
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
-#: modules/gui/macosx/VLCSimplePrefsController.m:347 modules/spu/marq.c:108
+#: modules/gui/macosx/VLCSimplePrefsController.m:353 modules/spu/marq.c:108
 #: modules/spu/rss.c:144 modules/gui/qt/ui/video_effects.h:1273
 msgid "Opacity"
 msgstr "Непрозорість"
@@ -11549,7 +11572,7 @@ msgstr "Фіктивний кодер"
 msgid "AAC audio decoder (using libfaad2)"
 msgstr "Декодер звуку AAC (через libfaad2)"
 
-#: modules/codec/faad.c:433
+#: modules/codec/faad.c:434
 msgid "AAC extension"
 msgstr "Розширення AAC"
 
@@ -14165,7 +14188,7 @@ msgstr ""
 msgid "Quiet mode"
 msgstr "Тихий режим"
 
-#: modules/codec/x264.c:397 modules/gui/macosx/VLCPlaylistInfo.m:69
+#: modules/codec/x264.c:397 modules/gui/macosx/VLCPlaylistInfo.m:65
 #: modules/gui/qt/ui/streampanel.h:168
 msgid "Statistics"
 msgstr "Статистика"
@@ -14253,8 +14276,8 @@ msgstr "Швидкий"
 
 #: modules/codec/x264.c:429 modules/gui/macosx/VLCMainMenu.m:290
 #: modules/gui/macosx/VLCMainMenu.m:392
-#: modules/gui/macosx/VLCSimplePrefsController.m:697
-#: modules/gui/qt/components/simple_preferences.cpp:694
+#: modules/gui/macosx/VLCSimplePrefsController.m:703
+#: modules/gui/qt/components/simple_preferences.cpp:695
 #: modules/misc/gnutls.c:779 modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:143
 msgid "Normal"
@@ -14389,7 +14412,7 @@ msgstr "Інтерфейс керування D-Bus"
 #: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:185
 #: modules/gui/macosx/VLCMainWindow.m:687
 #: modules/gui/macosx/VLCMainWindow.m:693
-#: modules/gui/macosx/VLCMainWindow.m:1315
+#: modules/gui/macosx/VLCMainWindow.m:1318
 #: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1026
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1258
 #: modules/gui/qt/main_interface.cpp:1262
@@ -14464,9 +14487,9 @@ msgid "Global Hotkeys interface"
 msgstr "Інтерфейс керування глобальними гарячими клавішами"
 
 #: modules/control/hotkeys.c:100
-#: modules/gui/macosx/VLCSimplePrefsController.m:237
+#: modules/gui/macosx/VLCSimplePrefsController.m:243
 #: modules/gui/qt/components/preferences_widgets.cpp:1145
-#: modules/gui/qt/components/simple_preferences.cpp:248
+#: modules/gui/qt/components/simple_preferences.cpp:249
 msgid "Hotkeys"
 msgstr "Гарячі клавіші"
 
@@ -15337,7 +15360,7 @@ msgstr "Виправити, коли необхідно"
 msgid "AVI demuxer"
 msgstr "Демультиплексор AVI"
 
-#: modules/demux/avi/avi.c:841 modules/demux/mp4/mp4.c:4251
+#: modules/demux/avi/avi.c:876 modules/demux/mp4/mp4.c:4256
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15353,27 +15376,27 @@ msgstr ""
 "Ця дія може тривати довго, якщо файл великий.\n"
 "Що потрібно зробити?"
 
-#: modules/demux/avi/avi.c:849
+#: modules/demux/avi/avi.c:884
 msgid "Do not play"
 msgstr "Не відтворювати"
 
-#: modules/demux/avi/avi.c:850
+#: modules/demux/avi/avi.c:885
 msgid "Build index then play"
 msgstr "Побудувати індекс, а потім відтворити"
 
-#: modules/demux/avi/avi.c:851
+#: modules/demux/avi/avi.c:886
 msgid "Play as is"
 msgstr "Відтворити як є"
 
-#: modules/demux/avi/avi.c:852 modules/demux/mp4/mp4.c:4262
+#: modules/demux/avi/avi.c:887 modules/demux/mp4/mp4.c:4267
 msgid "Broken or missing Index"
 msgstr "Пошкоджений індекс або його немає"
 
-#: modules/demux/avi/avi.c:2735
+#: modules/demux/avi/avi.c:2773
 msgid "Broken or missing AVI Index"
 msgstr "Пошкоджено індекс AVI або його немає"
 
-#: modules/demux/avi/avi.c:2736
+#: modules/demux/avi/avi.c:2774
 msgid "Fixing AVI Index..."
 msgstr "Виправлення індексу AVI…"
 
@@ -15813,11 +15836,11 @@ msgstr "Демультиплексор потоку MP4"
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4259
+#: modules/demux/mp4/mp4.c:4264
 msgid "Do not seek"
 msgstr "Не шукати"
 
-#: modules/demux/mp4/mp4.c:4260
+#: modules/demux/mp4/mp4.c:4265
 msgid "Build index"
 msgstr "Побудувати індекс"
 
@@ -16024,15 +16047,15 @@ msgstr "Субтитри телетексту: погіршений слух"
 msgid "DVB subtitles: hearing impaired"
 msgstr "Субтитри DVB: погіршений слух"
 
-#: modules/demux/mpeg/ts_psi.c:1332
+#: modules/demux/mpeg/ts_psi.c:1333
 msgid "clean effects"
 msgstr "очистити ефекти"
 
-#: modules/demux/mpeg/ts_psi.c:1333
+#: modules/demux/mpeg/ts_psi.c:1334
 msgid "hearing impaired"
 msgstr "погіршений слух"
 
-#: modules/demux/mpeg/ts_psi.c:1334
+#: modules/demux/mpeg/ts_psi.c:1335
 msgid "visual impaired commentary"
 msgstr "візуально сповільнений коментар"
 
@@ -16626,7 +16649,7 @@ msgstr "Фільтр"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:276
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:88
-#: modules/gui/macosx/VLCSimplePrefsController.m:266
+#: modules/gui/macosx/VLCSimplePrefsController.m:272
 #: modules/gui/qt/dialogs/extended.cpp:96
 msgid "Audio Effects"
 msgstr "Звукові ефекти"
@@ -16657,8 +16680,8 @@ msgstr "Введіть ім'я нового профілю:"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:377
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:489
 #: modules/gui/macosx/VLCMainMenu.m:1164 modules/gui/macosx/VLCOutput.m:414
-#: modules/gui/macosx/VLCSimplePrefsController.m:306
-#: modules/gui/macosx/VLCSimplePrefsController.m:380
+#: modules/gui/macosx/VLCSimplePrefsController.m:312
+#: modules/gui/macosx/VLCSimplePrefsController.m:386
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:792
 #: modules/gui/macosx/prefs.m:188
 #: modules/gui/qt/components/sout/profile_selector.cpp:449
@@ -16724,7 +16747,7 @@ msgid "Add"
 msgstr "Додати"
 
 #: modules/gui/macosx/VLCBookmarksWindowController.m:79
-#: modules/gui/macosx/VLCSimplePrefsController.m:282
+#: modules/gui/macosx/VLCSimplePrefsController.m:288
 #: modules/gui/qt/dialogs/bookmarks.cpp:53 modules/gui/qt/ui/vlm.h:297
 msgid "Clear"
 msgstr "Очистити"
@@ -16751,11 +16774,11 @@ msgstr "Час"
 #: modules/gui/macosx/VLCCoreDialogProvider.m:194
 #: modules/gui/macosx/VLCCoreDialogProvider.m:236
 #: modules/gui/macosx/VLCOpenWindowController.m:364
-#: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:341
-#: modules/gui/macosx/VLCSimplePrefsController.m:281
+#: modules/gui/macosx/VLCOutput.m:60 modules/gui/macosx/VLCPlaylistInfo.m:337
+#: modules/gui/macosx/VLCSimplePrefsController.m:287
 #: modules/gui/macosx/VLCTimeSelectionPanelController.m:51
 #: modules/gui/qt/components/open_panels.cpp:1365
-#: modules/stream_out/chromecast/cast.cpp:1195
+#: modules/stream_out/chromecast/cast.cpp:1197
 msgid "OK"
 msgstr "Гаразд"
 
@@ -16789,25 +16812,25 @@ msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:84
 #: modules/gui/macosx/VLCControlsBarCommon.m:182
-#: modules/gui/macosx/VLCFSPanelController.m:121
+#: modules/gui/macosx/VLCFSPanelController.m:122
 msgid "Backward"
 msgstr "Назад"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:85
 #: modules/gui/macosx/VLCControlsBarCommon.m:183
-#: modules/gui/macosx/VLCFSPanelController.m:122
+#: modules/gui/macosx/VLCFSPanelController.m:123
 msgid "Seek backward"
 msgstr "Пошук назад"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:88
 #: modules/gui/macosx/VLCControlsBarCommon.m:185
-#: modules/gui/macosx/VLCFSPanelController.m:118
+#: modules/gui/macosx/VLCFSPanelController.m:119
 msgid "Forward"
 msgstr "Вперед"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:89
 #: modules/gui/macosx/VLCControlsBarCommon.m:186
-#: modules/gui/macosx/VLCFSPanelController.m:119
+#: modules/gui/macosx/VLCFSPanelController.m:120
 msgid "Seek forward"
 msgstr "Пошук вперед"
 
@@ -16825,7 +16848,7 @@ msgid "Go to previous item"
 msgstr "Перейти до попереднього елемента"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:197
-#: modules/gui/macosx/VLCFSPanelController.m:113
+#: modules/gui/macosx/VLCFSPanelController.m:114
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
 msgid "Go to next item"
 msgstr "Перейти до наступного елемента"
@@ -16869,11 +16892,11 @@ msgstr "Виберіть розташування виводу"
 #: modules/gui/macosx/VLCOpenWindowController.m:147
 #: modules/gui/macosx/VLCOpenWindowController.m:351
 #: modules/gui/macosx/VLCOutput.m:67
-#: modules/gui/macosx/VLCSimplePrefsController.m:289
-#: modules/gui/macosx/VLCSimplePrefsController.m:367
+#: modules/gui/macosx/VLCSimplePrefsController.m:295
+#: modules/gui/macosx/VLCSimplePrefsController.m:373
 #: modules/gui/macosx/prefs_widgets.m:1125
 #: modules/gui/qt/components/preferences_widgets.cpp:264
-#: modules/gui/qt/components/simple_preferences.cpp:462
+#: modules/gui/qt/components/simple_preferences.cpp:463
 #: modules/gui/qt/components/sout/sout_widgets.cpp:135
 #: modules/gui/qt/ui/open.h:279 modules/gui/qt/ui/open_disk.h:304
 #: modules/gui/qt/ui/open_file.h:146 modules/gui/qt/ui/sprefs_audio.h:414
@@ -17082,10 +17105,10 @@ msgid "A SDP export is requested, but no URL is provided."
 msgstr "Вибрано експорт SDP, але відповідну адресу не вказано."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1060
-#: modules/gui/macosx/VLCSimplePrefsController.m:691
-#: modules/gui/macosx/VLCSimplePrefsController.m:719
-#: modules/gui/macosx/VLCSimplePrefsController.m:1252
-#: modules/gui/qt/components/simple_preferences.cpp:691
+#: modules/gui/macosx/VLCSimplePrefsController.m:697
+#: modules/gui/macosx/VLCSimplePrefsController.m:725
+#: modules/gui/macosx/VLCSimplePrefsController.m:1258
+#: modules/gui/qt/components/simple_preferences.cpp:692
 msgid "Custom"
 msgstr "Довільно"
 
@@ -17109,34 +17132,34 @@ msgstr "Помилки та попередження"
 msgid "Clean up"
 msgstr "Очистити"
 
-#: modules/gui/macosx/VLCFSPanelController.m:110
+#: modules/gui/macosx/VLCFSPanelController.m:111
 msgid "Play/Pause the current media"
 msgstr "Відтворити/призупинити медіа"
 
-#: modules/gui/macosx/VLCFSPanelController.m:116
+#: modules/gui/macosx/VLCFSPanelController.m:117
 msgid "Go to the previous item"
 msgstr "Перехід до попереднього елемента"
 
-#: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
+#: modules/gui/macosx/VLCFSPanelController.m:126
 msgid "Leave fullscreen"
 msgstr "Вийти з повноекранного режиму"
 
-#: modules/gui/macosx/VLCFSPanelController.m:127
+#: modules/gui/macosx/VLCFSPanelController.m:128
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:80
 #: modules/gui/qt/dialogs/toolbar.cpp:477 modules/gui/qt/ui/sprefs_audio.h:408
 msgid "Volume"
 msgstr "Гучність"
 
-#: modules/gui/macosx/VLCFSPanelController.m:128
+#: modules/gui/macosx/VLCFSPanelController.m:129
 msgid "Adjust the volume"
 msgstr "Регулювання гучності"
 
-#: modules/gui/macosx/VLCFSPanelController.m:131
+#: modules/gui/macosx/VLCFSPanelController.m:132
 msgid "Adjust the current playback position"
 msgstr "Регулювання позиції відтворення"
 
-#: modules/gui/macosx/VLCFSPanelController.m:316
+#: modules/gui/macosx/VLCFSPanelController.m:317
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:78
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:503
 #, c-format
@@ -17208,7 +17231,7 @@ msgstr ""
 "бути відключена тут."
 
 #: modules/gui/macosx/macosx.m:76
-#: modules/gui/macosx/VLCSimplePrefsController.m:318
+#: modules/gui/macosx/VLCSimplePrefsController.m:324
 msgid "Control playback with the Apple Remote"
 msgstr "Керувати відтворенням за допомогою Apple Remote"
 
@@ -17217,7 +17240,7 @@ msgid "By default, VLC can be remotely controlled with the Apple Remote."
 msgstr "Стандартно, VLC може віддалено контролюватися через Apple Remote."
 
 #: modules/gui/macosx/macosx.m:79
-#: modules/gui/macosx/VLCSimplePrefsController.m:320
+#: modules/gui/macosx/VLCSimplePrefsController.m:326
 msgid "Control system volume with the Apple Remote"
 msgstr "Управління загальною гучністю з пульта Apple Remote"
 
@@ -17230,7 +17253,7 @@ msgstr ""
 "можете також включити режим зміни загальної гучності системи."
 
 #: modules/gui/macosx/macosx.m:82
-#: modules/gui/macosx/VLCSimplePrefsController.m:321
+#: modules/gui/macosx/VLCSimplePrefsController.m:327
 msgid "Display VLC status menu icon"
 msgstr "Показувати піктограму меню стану VLC"
 
@@ -17255,7 +17278,7 @@ msgstr ""
 "відтворення з пульта Apple Remote. Цей прапорець вимикає таку поведінку."
 
 #: modules/gui/macosx/macosx.m:88
-#: modules/gui/macosx/VLCSimplePrefsController.m:319
+#: modules/gui/macosx/VLCSimplePrefsController.m:325
 msgid "Control playback with media keys"
 msgstr "Контролювати відтворення медіаклавішами"
 
@@ -17280,7 +17303,7 @@ msgstr ""
 "іншому випадку - сірий."
 
 #: modules/gui/macosx/macosx.m:95
-#: modules/gui/macosx/VLCSimplePrefsController.m:363
+#: modules/gui/macosx/VLCSimplePrefsController.m:369
 msgid "Use the native fullscreen mode"
 msgstr "Використовувати рідний повноекранний режим"
 
@@ -17311,7 +17334,7 @@ msgstr ""
 " Стандартно, інтерфейс змінює розмір до розміру відео."
 
 #: modules/gui/macosx/macosx.m:104
-#: modules/gui/macosx/VLCSimplePrefsController.m:356 modules/gui/qt/qt.cpp:178
+#: modules/gui/macosx/VLCSimplePrefsController.m:362 modules/gui/qt/qt.cpp:178
 msgid "Pause the video playback when minimized"
 msgstr "Призупиняти відтворення, якщо вікно мінімізовано"
 
@@ -17375,7 +17398,7 @@ msgid "Shows the audio effects button in the main window."
 msgstr "Показує кнопку аудіоефектів у головному вікні."
 
 #: modules/gui/macosx/macosx.m:125
-#: modules/gui/macosx/VLCSimplePrefsController.m:325
+#: modules/gui/macosx/VLCSimplePrefsController.m:331
 msgid "Control external music players"
 msgstr "Управляти зовнішніми музичними програвачами"
 
@@ -17510,7 +17533,7 @@ msgid "Hide Others"
 msgstr "Приховати інше"
 
 #: modules/gui/macosx/VLCMainMenu.m:351
-#: modules/gui/macosx/VLCSimplePrefsController.m:377
+#: modules/gui/macosx/VLCSimplePrefsController.m:383
 msgid "Show All"
 msgstr "Показати все"
 
@@ -17666,12 +17689,12 @@ msgid "Fit to Screen"
 msgstr "Екранний розмір"
 
 #: modules/gui/macosx/VLCMainMenu.m:433
-#: modules/gui/macosx/VLCSimplePrefsController.m:357
+#: modules/gui/macosx/VLCSimplePrefsController.m:363
 msgid "Float on Top"
 msgstr "Зверху всіх вікон"
 
 #: modules/gui/macosx/VLCMainMenu.m:441 modules/gui/macosx/VLCMainMenu.m:442
-#: modules/gui/macosx/VLCSimplePrefsController.m:364
+#: modules/gui/macosx/VLCSimplePrefsController.m:370
 #: modules/gui/qt/ui/sprefs_video.h:316
 msgid "Fullscreen Video Device"
 msgstr "Пристрій повноекранного відео"
@@ -17960,7 +17983,7 @@ msgid "Disc"
 msgstr "Диск"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:142
-#: modules/gui/macosx/VLCSimplePrefsController.m:296
+#: modules/gui/macosx/VLCSimplePrefsController.m:302
 #: modules/gui/qt/ui/sprefs_input.h:368
 msgid "Network"
 msgstr "Мережа"
@@ -17989,7 +18012,7 @@ msgstr "Відтворити синхронно інше медіа"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:152
 #: modules/gui/macosx/VLCOpenWindowController.m:348
-#: modules/gui/macosx/VLCSimplePrefsController.m:339
+#: modules/gui/macosx/VLCSimplePrefsController.m:345
 #: modules/gui/qt/ui/sprefs_interface.h:545
 msgid "Choose..."
 msgstr "Вибрати…"
@@ -18132,7 +18155,7 @@ msgid "Subtitle encoding"
 msgstr "Кодування субтитрів"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:360
-#: modules/gui/macosx/VLCSimplePrefsController.m:341
+#: modules/gui/macosx/VLCSimplePrefsController.m:347
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Font size"
 msgstr "Розмір шрифту"
@@ -18235,71 +18258,71 @@ msgstr "Розкрити все"
 msgid "Collapse All"
 msgstr "Згорнути все"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:58
+#: modules/gui/macosx/VLCPlaylistInfo.m:54
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
 msgid "Media Information"
 msgstr "Медіаінформація"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:62
+#: modules/gui/macosx/VLCPlaylistInfo.m:58
 msgid "Location"
 msgstr "Місцезнаходження"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:65
+#: modules/gui/macosx/VLCPlaylistInfo.m:61
 msgid "Save Metadata"
 msgstr "Зберегти метадані"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:67
+#: modules/gui/macosx/VLCPlaylistInfo.m:63
 #: modules/visualization/visual/visual.c:122
 msgid "General"
 msgstr "Загальні"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:68
+#: modules/gui/macosx/VLCPlaylistInfo.m:64
 msgid "Codec Details"
 msgstr "Деталі кодеку"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:85
+#: modules/gui/macosx/VLCPlaylistInfo.m:81
 msgid "Read at media"
 msgstr "Прочитано"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:86
+#: modules/gui/macosx/VLCPlaylistInfo.m:82
 #: modules/gui/qt/components/info_panels.cpp:578
 msgid "Input bitrate"
 msgstr "Бітрейт вхідного потоку"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:87
+#: modules/gui/macosx/VLCPlaylistInfo.m:83
 msgid "Demuxed"
 msgstr "Демультиплексовано"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:88
+#: modules/gui/macosx/VLCPlaylistInfo.m:84
 msgid "Stream bitrate"
 msgstr "Бітрейт потоку"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:91
-#: modules/gui/macosx/VLCPlaylistInfo.m:96
+#: modules/gui/macosx/VLCPlaylistInfo.m:87
+#: modules/gui/macosx/VLCPlaylistInfo.m:92
 msgid "Decoded blocks"
 msgstr "Блоків декодовано"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:92
+#: modules/gui/macosx/VLCPlaylistInfo.m:88
 msgid "Displayed frames"
 msgstr "Показано кадрів"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:93
+#: modules/gui/macosx/VLCPlaylistInfo.m:89
 msgid "Lost frames"
 msgstr "Загублено кадрів"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:97
+#: modules/gui/macosx/VLCPlaylistInfo.m:93
 msgid "Played buffers"
 msgstr "Відтворено буферів"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:98
+#: modules/gui/macosx/VLCPlaylistInfo.m:94
 msgid "Lost buffers"
 msgstr "Загублено буферів"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:339
+#: modules/gui/macosx/VLCPlaylistInfo.m:335
 msgid "Error while saving meta"
 msgstr "Помилка збереження метаданих"
 
-#: modules/gui/macosx/VLCPlaylistInfo.m:340
+#: modules/gui/macosx/VLCPlaylistInfo.m:336
 msgid "VLC was unable to save the meta data."
 msgstr "VLC не зміг зберегти метадані."
 
@@ -18309,7 +18332,7 @@ msgid "Continue playback?"
 msgstr "Продовжити відтворення?"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
-#: modules/gui/macosx/VLCSimplePrefsController.m:822
+#: modules/gui/macosx/VLCSimplePrefsController.m:828
 #: modules/gui/qt/dialogs/firstrun.cpp:106
 msgid "Continue"
 msgstr "Продовжити"
@@ -18327,105 +18350,105 @@ msgstr "Перезапустити відтворення"
 msgid "Playback of \"%@\" will continue at %@"
 msgstr "Відтворення \"%@\" буде продовжене о %@"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:227
-#: modules/gui/qt/components/simple_preferences.cpp:238
-#: modules/gui/qt/components/simple_preferences.cpp:718
+#: modules/gui/macosx/VLCSimplePrefsController.m:233
+#: modules/gui/qt/components/simple_preferences.cpp:239
+#: modules/gui/qt/components/simple_preferences.cpp:719
 #: modules/gui/qt/dialogs/plugins.cpp:375
 msgid "Interface Settings"
 msgstr "Параметри інтерфейсу"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:229
-#: modules/gui/qt/components/simple_preferences.cpp:240
-#: modules/gui/qt/components/simple_preferences.cpp:437
+#: modules/gui/macosx/VLCSimplePrefsController.m:235
+#: modules/gui/qt/components/simple_preferences.cpp:241
+#: modules/gui/qt/components/simple_preferences.cpp:438
 msgid "Audio Settings"
 msgstr "Параметри звуку"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:231
-#: modules/gui/qt/components/simple_preferences.cpp:242
-#: modules/gui/qt/components/simple_preferences.cpp:370
+#: modules/gui/macosx/VLCSimplePrefsController.m:237
+#: modules/gui/qt/components/simple_preferences.cpp:243
+#: modules/gui/qt/components/simple_preferences.cpp:371
 msgid "Video Settings"
 msgstr "Параметри відео"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:233
-#: modules/gui/qt/components/simple_preferences.cpp:244
-#: modules/gui/qt/components/simple_preferences.cpp:859
+#: modules/gui/macosx/VLCSimplePrefsController.m:239
+#: modules/gui/qt/components/simple_preferences.cpp:245
+#: modules/gui/qt/components/simple_preferences.cpp:860
 msgid "Subtitle & On Screen Display Settings"
 msgstr "Параметри субтитрів і екранного відображення"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:235
+#: modules/gui/macosx/VLCSimplePrefsController.m:241
 msgid "Input & Codec Settings"
 msgstr "Параметри введення і кодеків"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:268
+#: modules/gui/macosx/VLCSimplePrefsController.m:274
 msgid "General Audio"
 msgstr "Загальний звук"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:269
+#: modules/gui/macosx/VLCSimplePrefsController.m:275
 msgid "Preferred Audio language"
 msgstr "Бажана мова звуку"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:270
+#: modules/gui/macosx/VLCSimplePrefsController.m:276
 msgid "Enable Last.fm submissions"
 msgstr "Увімкнути публікацію на Last.fm"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:273
+#: modules/gui/macosx/VLCSimplePrefsController.m:279
 msgid "Visualization"
 msgstr "Візуалізація"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:274
+#: modules/gui/macosx/VLCSimplePrefsController.m:280
 msgid "Keep audio level between sessions"
 msgstr "Витримувати рівень звуку між сесіями"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:275
+#: modules/gui/macosx/VLCSimplePrefsController.m:281
 #: modules/gui/qt/ui/sprefs_audio.h:410
 msgid "Always reset audio start level to:"
 msgstr "Завжди вертати початковий рівень звуку до:"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:278
+#: modules/gui/macosx/VLCSimplePrefsController.m:284
 #: modules/gui/qt/dialogs/vlm.cpp:492
 msgid "Change"
 msgstr "Змінити"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:279
+#: modules/gui/macosx/VLCSimplePrefsController.m:285
 msgid "Change Hotkey"
 msgstr "Змінити гарячу клавішу"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:283
+#: modules/gui/macosx/VLCSimplePrefsController.m:289
 msgid "Select an action to change the associated hotkey:"
 msgstr "Оберіть дію для зміни асоційованої гарячої клавіші:"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:284
+#: modules/gui/macosx/VLCSimplePrefsController.m:290
 #: modules/gui/qt/components/preferences_widgets.cpp:1150
 msgid "Action"
 msgstr "Дія"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:285
+#: modules/gui/macosx/VLCSimplePrefsController.m:291
 msgid "Shortcut"
 msgstr "Комбінація"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:288
+#: modules/gui/macosx/VLCSimplePrefsController.m:294
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Record directory or filename"
 msgstr "Каталог або назва файлу для записування"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:290
+#: modules/gui/macosx/VLCSimplePrefsController.m:296
 msgid "Directory or filename where the records will be stored"
 msgstr "Каталог або назва файлу, куди зберігатимуться записи"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:291
+#: modules/gui/macosx/VLCSimplePrefsController.m:297
 msgid "Repair AVI Files"
 msgstr "Виправити AVI-файли"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:292
+#: modules/gui/macosx/VLCSimplePrefsController.m:298
 msgid "Default Caching Level"
 msgstr "Стандартний рівень кешування"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:293
+#: modules/gui/macosx/VLCSimplePrefsController.m:299
 #: modules/gui/qt/ui/open.h:263
 msgid "Caching"
 msgstr "Кешування"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:294
+#: modules/gui/macosx/VLCSimplePrefsController.m:300
 msgid ""
 "Use the complete preferences to configure custom caching values for each "
 "access module."
@@ -18433,213 +18456,213 @@ msgstr ""
 "Використовуйте повноцінні параметри для конфігурування довільних значень "
 "кешування для кожного модулю доступу."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:295
+#: modules/gui/macosx/VLCSimplePrefsController.m:301
 msgid "Codecs / Muxers"
 msgstr "Кодеки й мультиплексори"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:298
+#: modules/gui/macosx/VLCSimplePrefsController.m:304
 msgid "Post-Processing Quality"
 msgstr "Якість пост-обробки"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:300
+#: modules/gui/macosx/VLCSimplePrefsController.m:306
 msgid "Edit default application settings for network protocols"
 msgstr "Змінити налаштування типових програм для мережевих протоколів"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:304
+#: modules/gui/macosx/VLCSimplePrefsController.m:310
 msgid "Open network streams using the following protocols"
 msgstr "Відкрити мережеві потоки, використовуючи такі протоколи"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:305
+#: modules/gui/macosx/VLCSimplePrefsController.m:311
 msgid "Note that these are system-wide settings."
 msgstr "Зауважте, що ці налаштування діють глобально."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:310
+#: modules/gui/macosx/VLCSimplePrefsController.m:316
 msgid "General settings"
 msgstr "Загальні налаштування"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:312
+#: modules/gui/macosx/VLCSimplePrefsController.m:318
 msgid "Interface style"
 msgstr "Стиль інтерфейсу"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:313
+#: modules/gui/macosx/VLCSimplePrefsController.m:319
 msgid "Dark"
 msgstr "Темний"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:314
+#: modules/gui/macosx/VLCSimplePrefsController.m:320
 msgid "Bright"
 msgstr "Світлий"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:317
+#: modules/gui/macosx/VLCSimplePrefsController.m:323
 msgid "Continue playback"
 msgstr "Продовжити відтворення"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:323
+#: modules/gui/macosx/VLCSimplePrefsController.m:329
 msgid "Playback behaviour"
 msgstr "Поводження відтворення"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:324
+#: modules/gui/macosx/VLCSimplePrefsController.m:330
 msgid "Enable notifications on playlist item change"
 msgstr "Увімкнути сповіщення при зміні елемента списку відтворення"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:327
+#: modules/gui/macosx/VLCSimplePrefsController.m:333
 #: modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Privacy / Network Interaction"
 msgstr "Приватність/мережева взаємодія"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:329
+#: modules/gui/macosx/VLCSimplePrefsController.m:335
 msgid "Automatically check for updates"
 msgstr "Автоматично перевіряти оновлення"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:332
+#: modules/gui/macosx/VLCSimplePrefsController.m:338
 msgid "HTTP web interface"
 msgstr "Веб-інтерфейс HTTP"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:333
+#: modules/gui/macosx/VLCSimplePrefsController.m:339
 msgid "Enable HTTP web interface"
 msgstr "Увімкнути веб-інтерфейс HTTP"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:337
+#: modules/gui/macosx/VLCSimplePrefsController.m:343
 msgid "Default Encoding"
 msgstr "Стандартне кодування"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:338
+#: modules/gui/macosx/VLCSimplePrefsController.m:344
 msgid "Display Settings"
 msgstr "Параметри дисплею"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:340
+#: modules/gui/macosx/VLCSimplePrefsController.m:346
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
 msgid "Font color"
 msgstr "Колір шрифту"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:342 modules/spu/marq.c:157
+#: modules/gui/macosx/VLCSimplePrefsController.m:348 modules/spu/marq.c:157
 #: modules/spu/rss.c:204 modules/text_renderer/freetype/freetype.c:80
 #: modules/gui/qt/ui/sprefs_subtitles.h:296
 msgid "Font"
 msgstr "Шрифт"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:343
+#: modules/gui/macosx/VLCSimplePrefsController.m:349
 msgid "Subtitle languages"
 msgstr "Мови субтитрів"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:344
+#: modules/gui/macosx/VLCSimplePrefsController.m:350
 #: modules/gui/qt/ui/sprefs_subtitles.h:293
 msgid "Preferred subtitle language"
 msgstr "Переважна мова субтитрів"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:346
+#: modules/gui/macosx/VLCSimplePrefsController.m:352
 msgid "Enable OSD"
 msgstr "Увімкнути OSD"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:348
+#: modules/gui/macosx/VLCSimplePrefsController.m:354
 #: modules/text_renderer/freetype/freetype.c:104
 msgid "Force bold"
 msgstr "Примусово використовувати жирний шрифт"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:349
+#: modules/gui/macosx/VLCSimplePrefsController.m:355
 #: modules/text_renderer/freetype/freetype.c:110
 #: modules/gui/qt/ui/sprefs_subtitles.h:300
 msgid "Outline color"
 msgstr "Колір контура"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:350
+#: modules/gui/macosx/VLCSimplePrefsController.m:356
 #: modules/text_renderer/freetype/freetype.c:111
 #: modules/gui/qt/ui/sprefs_subtitles.h:299
 msgid "Outline thickness"
 msgstr "Товщина обведення"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:354
+#: modules/gui/macosx/VLCSimplePrefsController.m:360
 #: modules/stream_out/display.c:53 modules/gui/qt/ui/sprefs_video.h:312
 msgid "Display"
 msgstr "Дисплей"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:355
+#: modules/gui/macosx/VLCSimplePrefsController.m:361
 msgid "Show video within the main window"
 msgstr "Показувати відео в головному вікні"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:360
+#: modules/gui/macosx/VLCSimplePrefsController.m:366
 msgid "Fullscreen settings"
 msgstr "Параметри повноекран. режиму"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:361
+#: modules/gui/macosx/VLCSimplePrefsController.m:367
 msgid "Start in fullscreen"
 msgstr "Запускати на увесь екран"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:362
+#: modules/gui/macosx/VLCSimplePrefsController.m:368
 msgid "Black screens in Fullscreen mode"
 msgstr "Робити чорним екран для повноекранного режиму"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:366
+#: modules/gui/macosx/VLCSimplePrefsController.m:372
 #: modules/gui/qt/ui/sprefs_video.h:327
 msgid "Video snapshots"
 msgstr "Стоп-кадри"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:368
+#: modules/gui/macosx/VLCSimplePrefsController.m:374
 #: modules/meta_engine/folder.c:70
 msgid "Folder"
 msgstr "Каталог"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:369
+#: modules/gui/macosx/VLCSimplePrefsController.m:375
 #: modules/gui/qt/ui/sprefs_video.h:333
 msgid "Format"
 msgstr "Формат"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:370
+#: modules/gui/macosx/VLCSimplePrefsController.m:376
 #: modules/gui/qt/ui/sprefs_video.h:330
 msgid "Prefix"
 msgstr "Префікс"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:371
+#: modules/gui/macosx/VLCSimplePrefsController.m:377
 #: modules/gui/qt/ui/sprefs_video.h:332
 msgid "Sequential numbering"
 msgstr "Послідовна нумерація"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:379
+#: modules/gui/macosx/VLCSimplePrefsController.m:385
 #: modules/gui/macosx/prefs.m:190
 msgid "Reset All"
 msgstr "Перезапуск усього"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:381
+#: modules/gui/macosx/VLCSimplePrefsController.m:387
 #: modules/gui/macosx/prefs.m:187 modules/gui/qt/dialogs/preferences.cpp:56
 msgid "Preferences"
 msgstr "Параметри"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:554
+#: modules/gui/macosx/VLCSimplePrefsController.m:560
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
 msgstr ""
 "Мультимедійні файли не можуть бути відновлені, бо збереження останніх медіа "
 "елементів вимкнено."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:574
+#: modules/gui/macosx/VLCSimplePrefsController.m:580
 msgid "Last check on: %@"
 msgstr "Остання перевірка: %@"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:576
+#: modules/gui/macosx/VLCSimplePrefsController.m:582
 msgid "No check was performed yet."
 msgstr "Ще не було перевірки."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:693
+#: modules/gui/macosx/VLCSimplePrefsController.m:699
 msgid "Lowest Latency"
 msgstr "Найнижча затримка"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:695
+#: modules/gui/macosx/VLCSimplePrefsController.m:701
 msgid "Low Latency"
 msgstr "Низька затримка"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:699
+#: modules/gui/macosx/VLCSimplePrefsController.m:705
 msgid "Higher Latency"
 msgstr "Вища затримка"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:701
+#: modules/gui/macosx/VLCSimplePrefsController.m:707
 msgid "Highest Latency"
 msgstr "Найвища затримка"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:821
+#: modules/gui/macosx/VLCSimplePrefsController.m:827
 #: modules/gui/qt/dialogs/preferences.cpp:336
 msgid "Reset Preferences"
 msgstr "Перезапуск параметрів"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:824
+#: modules/gui/macosx/VLCSimplePrefsController.m:830
 msgid ""
 "This will reset VLC media player's preferences.\n"
 "\n"
@@ -18661,26 +18684,26 @@ msgstr ""
 "\n"
 "Ви справді хочете продовжити?"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1094
+#: modules/gui/macosx/VLCSimplePrefsController.m:1100
 msgid ""
 "This setting cannot be changed because the native fullscreen mode is enabled."
 msgstr ""
 "Цей параметр не можна змінити, бо власний повноекранний режим увімкнений."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1163
+#: modules/gui/macosx/VLCSimplePrefsController.m:1169
 msgid "Choose the folder to save your video snapshots to."
 msgstr "Оберіть каталог, до якого зберігати стоп-кадри"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1165
-#: modules/gui/macosx/VLCSimplePrefsController.m:1264
+#: modules/gui/macosx/VLCSimplePrefsController.m:1171
+#: modules/gui/macosx/VLCSimplePrefsController.m:1270
 msgid "Choose"
 msgstr "Вибрати"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1262
+#: modules/gui/macosx/VLCSimplePrefsController.m:1268
 msgid "Choose the directory or filename where the records will be stored."
 msgstr "Виберіть каталог або файл, куди зберігатимуться записи."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1375
+#: modules/gui/macosx/VLCSimplePrefsController.m:1381
 msgid ""
 "Press new keys for\n"
 "\"%@\""
@@ -18688,16 +18711,16 @@ msgstr ""
 "Натисніть клавішу для\n"
 "\"%@\""
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1448
+#: modules/gui/macosx/VLCSimplePrefsController.m:1454
 msgid "Invalid combination"
 msgstr "Неправильна комбінація"
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1449
+#: modules/gui/macosx/VLCSimplePrefsController.m:1455
 msgid "Regrettably, these keys cannot be assigned as hotkey shortcuts."
 msgstr "На жаль, ці клавіші не можуть бути комбінацією гарячих клавіш."
 
-#: modules/gui/macosx/VLCSimplePrefsController.m:1459
-#: modules/gui/macosx/VLCSimplePrefsController.m:1463
+#: modules/gui/macosx/VLCSimplePrefsController.m:1465
+#: modules/gui/macosx/VLCSimplePrefsController.m:1469
 msgid "This combination is already taken by \"%@\"."
 msgstr "Ця комбінація вже зайнята \"%@\"."
 
@@ -20181,21 +20204,21 @@ msgstr "Клавіша або комбінація:"
 msgid "Key: "
 msgstr "Клавіша: "
 
-#: modules/gui/qt/components/simple_preferences.cpp:246
-#: modules/gui/qt/components/simple_preferences.cpp:619
+#: modules/gui/qt/components/simple_preferences.cpp:247
+#: modules/gui/qt/components/simple_preferences.cpp:620
 msgid "Input & Codecs Settings"
 msgstr "Параметри введення й кодеків"
 
-#: modules/gui/qt/components/simple_preferences.cpp:248
-#: modules/gui/qt/components/simple_preferences.cpp:903
+#: modules/gui/qt/components/simple_preferences.cpp:249
+#: modules/gui/qt/components/simple_preferences.cpp:904
 msgid "Configure Hotkeys"
 msgstr "Конфігурувати гарячі клавіші"
 
-#: modules/gui/qt/components/simple_preferences.cpp:445
+#: modules/gui/qt/components/simple_preferences.cpp:446
 msgid "Device:"
 msgstr "Пристрій:"
 
-#: modules/gui/qt/components/simple_preferences.cpp:624
+#: modules/gui/qt/components/simple_preferences.cpp:625
 msgid ""
 "If this property is blank, different values\n"
 "for DVD, VCD, and CDDA are set.\n"
@@ -20207,58 +20230,58 @@ msgstr ""
 "Ви можете вказати унікальне або сконфігурувати їх \n"
 "індивідуально у розширених параметрах."
 
-#: modules/gui/qt/components/simple_preferences.cpp:692
+#: modules/gui/qt/components/simple_preferences.cpp:693
 msgid "Lowest latency"
 msgstr "Найнижча затримка"
 
-#: modules/gui/qt/components/simple_preferences.cpp:693
+#: modules/gui/qt/components/simple_preferences.cpp:694
 msgid "Low latency"
 msgstr "Низька затримка"
 
-#: modules/gui/qt/components/simple_preferences.cpp:695
+#: modules/gui/qt/components/simple_preferences.cpp:696
 msgid "High latency"
 msgstr "Висока затримка"
 
-#: modules/gui/qt/components/simple_preferences.cpp:696
+#: modules/gui/qt/components/simple_preferences.cpp:697
 msgid "Higher latency"
 msgstr "Вища затримка"
 
-#: modules/gui/qt/components/simple_preferences.cpp:744
+#: modules/gui/qt/components/simple_preferences.cpp:745
 msgid "This is VLC's skinnable interface. You can download other skins at"
 msgstr "Це змінний інтерфейс VLC. Ви можете завантажити інші обкладинки на"
 
-#: modules/gui/qt/components/simple_preferences.cpp:746
+#: modules/gui/qt/components/simple_preferences.cpp:747
 msgid "VLC skins website"
 msgstr "Веб-сайт обкладинок VLC"
 
-#: modules/gui/qt/components/simple_preferences.cpp:770
+#: modules/gui/qt/components/simple_preferences.cpp:771
 msgid "System's default"
 msgstr "Стандартне системи"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1308
+#: modules/gui/qt/components/simple_preferences.cpp:1309
 msgid "File associations"
 msgstr "Файлові асоціації"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1317
+#: modules/gui/qt/components/simple_preferences.cpp:1318
 #: modules/gui/qt/dialogs_provider.hpp:42
 msgid "Audio Files"
 msgstr "Звукові файли"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1318
+#: modules/gui/qt/components/simple_preferences.cpp:1319
 #: modules/gui/qt/dialogs_provider.hpp:41
 msgid "Video Files"
 msgstr "Відеофайли"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1319
+#: modules/gui/qt/components/simple_preferences.cpp:1320
 #: modules/gui/qt/dialogs_provider.hpp:43
 msgid "Playlist Files"
 msgstr "Файли списків відтворення"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1384
+#: modules/gui/qt/components/simple_preferences.cpp:1385
 msgid "&Apply"
 msgstr "Застосувати"
 
-#: modules/gui/qt/components/simple_preferences.cpp:1385
+#: modules/gui/qt/components/simple_preferences.cpp:1386
 #: modules/gui/qt/dialogs/convert.cpp:137
 #: modules/gui/qt/dialogs/gototime.cpp:49 modules/gui/qt/dialogs/open.cpp:108
 #: modules/gui/qt/dialogs/openurl.cpp:60
@@ -23896,13 +23919,18 @@ msgstr "Відео MPEG"
 msgid "VC-1 packetizer"
 msgstr "Пакетувальник VC-1"
 
-#: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:283
+#: modules/services_discovery/avahi.c:55 modules/services_discovery/avahi.c:484
 msgid "Zeroconf network services"
 msgstr "Мережеві послуги Zeroconf"
 
-#: modules/services_discovery/avahi.c:56
+#: modules/services_discovery/avahi.c:60
 msgid "Zeroconf services"
 msgstr "Послуги Zeroconf"
+
+#: modules/services_discovery/avahi.c:69
+#, fuzzy
+msgid "Avahi Renderer Discovery"
+msgstr "Виявлення відтворювача mDNS"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
@@ -24141,7 +24169,7 @@ msgid "Applications"
 msgstr "Програми"
 
 #: modules/services_discovery/xcb_apps.c:361
-#: modules/video_output/win32/direct3d9.c:326
+#: modules/video_output/win32/direct3d9.c:340
 msgid "Desktop"
 msgstr "Робочий стіл"
 
@@ -25122,7 +25150,7 @@ msgstr ""
 "медіа на Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:192
-#: modules/stream_out/chromecast/cast.cpp:1196
+#: modules/stream_out/chromecast/cast.cpp:1198
 msgid "Performance warning"
 msgstr "Застереження про швидкодію"
 
@@ -25183,11 +25211,11 @@ msgstr "Chromecast"
 msgid "Chromecast stream output"
 msgstr "Виведення потоку Chromecast"
 
-#: modules/stream_out/chromecast/cast.cpp:1195
+#: modules/stream_out/chromecast/cast.cpp:1197
 msgid "Ok, Don't warn me again"
 msgstr "Гаразд, більше не попереджайте мене"
 
-#: modules/stream_out/chromecast/cast.cpp:1197
+#: modules/stream_out/chromecast/cast.cpp:1199
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
@@ -27552,7 +27580,7 @@ msgstr "Власне вікно ОС Андроїд"
 msgid "Color ASCII art video output"
 msgstr "Вивід відео через кольорове ASCII"
 
-#: modules/video_output/caopengllayer.m:55
+#: modules/video_output/caopengllayer.m:936
 msgid "Core Animation OpenGL Layer (Mac OS X)"
 msgstr "Шар базової анімації OpenGL (Mac OS X)"
 
@@ -27822,54 +27850,54 @@ msgstr "OpenGL"
 msgid "OpenGL video output"
 msgstr "Вивід відео OpenGL"
 
-#: modules/video_output/opengl/egl.c:440
+#: modules/video_output/opengl/egl.c:441
 msgid "EGL"
 msgstr "EGL"
 
-#: modules/video_output/opengl/egl.c:441
+#: modules/video_output/opengl/egl.c:442
 msgid "EGL extension for OpenGL"
 msgstr "Розширення EGL для OpenGL"
 
-#: modules/video_output/win32/direct3d9.c:70
+#: modules/video_output/win32/direct3d9.c:77
 msgid "The desktop mode allows you to display the video on the desktop."
 msgstr "Режим робочого столу дозволяє відтворювати відео на робочому столі."
 
-#: modules/video_output/win32/direct3d9.c:72
+#: modules/video_output/win32/direct3d9.c:79
 #: modules/video_output/win32/direct3d11.c:65
 msgid "Use hardware blending support"
 msgstr "Використовувати підтримку апаратного змішування"
 
-#: modules/video_output/win32/direct3d9.c:74
+#: modules/video_output/win32/direct3d9.c:81
 #: modules/video_output/win32/direct3d11.c:67
 msgid "Try to use hardware acceleration for subtitle/OSD blending."
 msgstr ""
 "Намагатися використовувати апаратне прискорення для змішування субтитрів/OSD."
 
-#: modules/video_output/win32/direct3d9.c:76
+#: modules/video_output/win32/direct3d9.c:83
 msgid "Pixel Shader"
 msgstr "Піксельний шейдер"
 
-#: modules/video_output/win32/direct3d9.c:78
+#: modules/video_output/win32/direct3d9.c:85
 msgid "Choose a pixel shader to apply."
 msgstr "Виберіть піксельний шейдер для застосування."
 
-#: modules/video_output/win32/direct3d9.c:79
+#: modules/video_output/win32/direct3d9.c:86
 msgid "Path to HLSL file"
 msgstr "Шлях до файлу HLSL"
 
-#: modules/video_output/win32/direct3d9.c:80
+#: modules/video_output/win32/direct3d9.c:87
 msgid "Path to an HLSL file containing a single pixel shader."
 msgstr "Шлях до файлу HLSL, який містить один піксельний шейдер."
 
-#: modules/video_output/win32/direct3d9.c:82
+#: modules/video_output/win32/direct3d9.c:89
 msgid "HLSL File"
 msgstr "Файл HLSL"
 
-#: modules/video_output/win32/direct3d9.c:84
+#: modules/video_output/win32/direct3d9.c:91
 msgid "Recommended video output for Windows Vista and later versions"
 msgstr "Рекомендований відеовивід для Windows Vista та більш пізніх версій"
 
-#: modules/video_output/win32/direct3d9.c:91
+#: modules/video_output/win32/direct3d9.c:98
 msgid "Direct3D9 video output"
 msgstr "Відеовивід через Direct3D9"
 
@@ -29794,6 +29822,15 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Список медіаменеджеру"
 
+#~ msgid "QTSound"
+#~ msgstr "QTSound"
+
+#~ msgid "QuickTime Sound Capture"
+#~ msgstr "Запис звуку QuickTime"
+
+#~ msgid "No audio input device found"
+#~ msgstr "Вхідного звукового пристрою не знайдено"
+
 #~ msgid ""
 #~ "none: use closed GOPs only\n"
 #~ "normal: use standard open GOPs\n"
@@ -30082,9 +30119,6 @@ msgstr "Список медіаменеджеру"
 #~ msgstr ""
 #~ "%@ була несподівано перервана під час останнього запуску. Ви хочете "
 #~ "відправити звіт про крах до %@?"
-
-#~ msgid "Problem details and system configuration"
-#~ msgstr "Відомості про проблему та системна конфігурація"
 
 #~ msgid "Problem Report for %@"
 #~ msgstr "Звіт про проблему для %@"
