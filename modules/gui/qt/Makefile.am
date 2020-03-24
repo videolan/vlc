@@ -114,6 +114,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/sout_widgets.hpp \
 	gui/qt/dialogs/toolbar/toolbareditor.cpp gui/qt/dialogs/toolbar/toolbareditor.hpp \
 	gui/qt/dialogs/vlm/vlm.cpp gui/qt/dialogs/vlm/vlm.hpp \
+	gui/qt/maininterface/compositor.hpp \
+	gui/qt/maininterface/compositor.cpp \
 	gui/qt/maininterface/main_interface.cpp \
 	gui/qt/maininterface/main_interface.hpp \
 	gui/qt/maininterface/videosurface.cpp \
