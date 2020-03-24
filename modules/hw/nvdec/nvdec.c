@@ -817,7 +817,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     int i_sar_num, i_sar_den = 0;
 
     // try different output
-#define ALIGN(v, mod) ((v + (mod - 1)) & ~(mod - 1))
     if (p_sys->b_is_hxxx)
     {
         uint8_t i_chroma_idc, i_depth_chroma;
@@ -854,7 +853,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             }
         }
 
-        p_dec->fmt_out.video.i_width = ALIGN(i_w, OUTPUT_WIDTH_ALIGN);
+        p_dec->fmt_out.video.i_width = vlc_align(i_w, OUTPUT_WIDTH_ALIGN);
         p_dec->fmt_out.video.i_height = i_h;
 
         if (!p_dec->fmt_in.video.i_visible_width || !p_dec->fmt_in.video.i_visible_height)
@@ -871,7 +870,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     }
     else
     {
-        p_dec->fmt_out.video.i_width = ALIGN(p_dec->fmt_in.video.i_width, OUTPUT_WIDTH_ALIGN);
+        p_dec->fmt_out.video.i_width = vlc_align(p_dec->fmt_in.video.i_width, OUTPUT_WIDTH_ALIGN);
         p_dec->fmt_out.video.i_height = p_dec->fmt_in.video.i_height;
         cudaChroma = cudaVideoChromaFormat_420;
         i_depth_luma = 8;
