@@ -22,6 +22,7 @@ endif
 protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	$(UNPACK)
 	mv protobuf-$(PROTOBUF_VERSION) protobuf-$(PROTOBUF_VERSION)-cpp
+	$(APPLY) $(SRC)/protobuf/protobuf-disable-gmock.patch
 	$(APPLY) $(SRC)/protobuf/dont-build-protoc.patch
 	$(MOVE)
 
