@@ -348,9 +348,9 @@ const directx_va_mode_t *directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_
         return NULL;
 
     assert((surface_alignment & (surface_alignment - 1)) == 0); /* power of 2 */
-#define ALIGN(x, y) (((x) + ((y) - 1)) & ~((y) - 1))
-    int surface_width  = ALIGN(avctx->coded_width,  surface_alignment);
-    int surface_height = ALIGN(avctx->coded_height, surface_alignment);
+
+    int surface_width  = vlc_align(avctx->coded_width,  surface_alignment);
+    int surface_height = vlc_align(avctx->coded_height, surface_alignment);
 
     if (avctx->coded_width != surface_width || avctx->coded_height != surface_height)
         msg_Warn( va, "surface dimensions (%dx%d) differ from avcodec dimensions (%dx%d)",
