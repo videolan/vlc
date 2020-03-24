@@ -48,7 +48,7 @@
 #import <sys/sysctl.h>
 #import <mach/machine.h>
 
-#define ALIGN_16( x ) ( ( ( x ) + 15 ) / 16 * 16 )
+#define VT_ALIGNMENT 16
 #define VT_RESTART_MAX 1
 
 #pragma mark - module descriptor
@@ -490,9 +490,9 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
                                                 &i_vis_width, &i_vis_height))
         {
             p_dec->fmt_out.video.i_visible_width = i_vis_width;
-            p_dec->fmt_out.video.i_width = ALIGN_16( i_vis_width );
+            p_dec->fmt_out.video.i_width = vlc_align( i_vis_width, VT_ALIGNMENT );
             p_dec->fmt_out.video.i_visible_height = i_vis_height;
-            p_dec->fmt_out.video.i_height = ALIGN_16( i_vis_height );
+            p_dec->fmt_out.video.i_height = vlc_align( i_vis_height, VT_ALIGNMENT );
         }
         else return false;
     }
@@ -1618,8 +1618,8 @@ static int ConfigureVout(decoder_t *p_dec)
         p_dec->fmt_out.video.i_visible_height = p_dec->fmt_out.video.i_height;
     }
 
-    p_dec->fmt_out.video.i_width = ALIGN_16( p_dec->fmt_out.video.i_visible_width );
-    p_dec->fmt_out.video.i_height = ALIGN_16( p_dec->fmt_out.video.i_visible_height );
+    p_dec->fmt_out.video.i_width = vlc_align( p_dec->fmt_out.video.i_visible_width, VT_ALIGNMENT );
+    p_dec->fmt_out.video.i_height = vlc_align( p_dec->fmt_out.video.i_visible_height, VT_ALIGNMENT );
 
     return VLC_SUCCESS;
 }
