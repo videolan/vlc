@@ -15,15 +15,39 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef VLC_COMPOSITOR_DUMMY
+#define VLC_COMPOSITOR_DUMMY
+
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
 #include "compositor.hpp"
-#include "compositor_dummy.hpp"
+
+class MainInterface;
 
 namespace vlc {
 
-Compositor* Compositor::createCompositor(intf_thread_t *p_intf)
+class CompositorDummy : public QObject, public Compositor
 {
-    return new CompositorDummy(p_intf);
-}
+    Q_OBJECT
+public:
+    CompositorDummy(intf_thread_t *p_intf, QObject* parent = nullptr);
+    ~CompositorDummy() = default;
+
+    MainInterface *makeMainInterface() override;
+    virtual void destroyMainInterface() override;
+
+    bool setupVoutWindow(vout_window_t *p_wnd) override;
+
+private:
+
+    intf_thread_t *m_intf;
+
+    MainInterface* m_rootWindow;
+};
 
 }
+
+#endif // VLC_COMPOSITOR_DUMMY
