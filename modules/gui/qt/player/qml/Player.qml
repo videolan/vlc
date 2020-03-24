@@ -422,7 +422,7 @@ Widgets.NavigableFocusScope {
     //visible when user navigates within the control bar
     EventFilter {
         id: filter
-        source: rootQMLView
+        source: topWindow
         filterEnabled: controlBarView.state === "visible"
                        && (controlBarView.focus || topcontrolView.focus)
         Keys.onPressed: toolbarAutoHide.setVisible(5000)
