@@ -120,6 +120,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/maininterface/compositor_dummy.cpp \
 	gui/qt/maininterface/main_interface.cpp \
 	gui/qt/maininterface/main_interface.hpp \
+	gui/qt/maininterface/mainui.cpp \
+	gui/qt/maininterface/mainui.hpp \
 	gui/qt/maininterface/videosurface.cpp \
 	gui/qt/maininterface/videosurface.hpp \
 	gui/qt/medialibrary/medialib.cpp \
@@ -282,6 +284,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/toolbar/toolbareditor.moc.cpp \
 	gui/qt/maininterface/compositor_dummy.moc.cpp \
 	gui/qt/maininterface/main_interface.moc.cpp \
+	gui/qt/maininterface/mainui.moc.cpp \
 	gui/qt/maininterface/videosurface.moc.cpp \
 	gui/qt/medialibrary/medialib.moc.cpp \
 	gui/qt/medialibrary/mlalbum.moc.cpp \
