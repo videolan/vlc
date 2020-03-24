@@ -115,9 +115,6 @@ static void DestroyFB(vout_display_sys_t const *sys, uint32_t const buf)
     drmIoctl(sys->drm_fd, DRM_IOCTL_MODE_DESTROY_DUMB, &destroy_req);
 }
 
-
-#define ALIGN(v, a) (((v) + (a)-1) & ~((a)-1))
-
 static deviceRval CreateFB(vout_display_t *vd, const int buf)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -143,23 +140,23 @@ static deviceRval CreateFB(vout_display_t *vd, const int buf)
     case DRM_FORMAT_P016:
 #endif
 #if defined(DRM_FORMAT_P010) || defined(DRM_FORMAT_P012) || defined(DRM_FORMAT_P016)
-        sys->stride = ALIGN(sys->width*2, tile_width);
-        sys->offsets[1] = sys->stride*ALIGN(sys->height, tile_height);
-        create_req.height = 2*ALIGN(sys->height, tile_height);
+        sys->stride = vlc_align(sys->width*2, tile_width);
+        sys->offsets[1] = sys->stride*vlc_align(sys->height, tile_height);
+        create_req.height = 2*vlc_align(sys->height, tile_height);
         break;
 #endif
     case DRM_FORMAT_NV12:
-        sys->stride = ALIGN(sys->width, tile_width);
-        sys->offsets[1] = sys->stride*ALIGN(sys->height, tile_height);
-        create_req.height = 2*ALIGN(sys->height, tile_height);
+        sys->stride = vlc_align(sys->width, tile_width);
+        sys->offsets[1] = sys->stride*vlc_align(sys->height, tile_height);
+        create_req.height = 2*vlc_align(sys->height, tile_height);
         break;
     default:
-        create_req.height = ALIGN(sys->height, tile_height);
+        create_req.height = vlc_align(sys->height, tile_height);
 
         /*
          * width *4 so there's enough space for anything.
          */
-        sys->stride = ALIGN(sys->width*4, tile_width);
+        sys->stride = vlc_align(sys->width*4, tile_width);
         break;
     }
 
