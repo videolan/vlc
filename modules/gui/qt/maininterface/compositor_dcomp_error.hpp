@@ -15,33 +15,52 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef COMPOSITOR_DCOMP_ERROR_HPP
+#define COMPOSITOR_DCOMP_ERROR_HPP
 
-#include "compositor.hpp"
-#include "compositor_dummy.hpp"
 
-#ifdef _WIN32
-#ifdef HAVE_DCOMP_H
-#  include "compositor_dcomp.hpp"
-#endif
-#endif
+#include <stdexcept>
+#include <windows.h>
 
 namespace vlc {
 
-Compositor* Compositor::createCompositor(intf_thread_t *p_intf)
+class DXError : public std::runtime_error
 {
-    bool ret;
-    VLC_UNUSED(ret);
-#ifdef _WIN32
-#ifdef HAVE_DCOMP_H
-    CompositorDirectComposition* dcomp_compositor = new CompositorDirectComposition(p_intf);
-    ret = dcomp_compositor->init();
-    if (ret)
-        return dcomp_compositor;
-    else
-        delete dcomp_compositor;
-#endif
-#endif
-    return new CompositorDummy(p_intf);
+public:
+    explicit DXError(const std::string& msg, HRESULT code)
+        : std::runtime_error(msg)
+        , m_code(code)
+    {
+    }
+
+    explicit DXError(const char* msg, HRESULT code)
+        : std::runtime_error(msg)
+        , m_code(code)
+    {
+    }
+
+    inline HRESULT code() const
+    {
+        return m_code;
+    }
+
+private:
+    HRESULT m_code;
+};
+
+inline void HR( HRESULT hr, const std::string& msg )
+{
+    if( FAILED( hr ) )
+        throw DXError{ msg, hr };
+}
+
+inline void HR( HRESULT hr, const char* msg = "" )
+{
+    if( FAILED( hr ) )
+        throw DXError{ msg, hr  };
 }
 
 }
+
+
+#endif // COMPOSITOR_DCOMP_ERROR_HPP

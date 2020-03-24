@@ -45,7 +45,7 @@ libqt_plugin_la_CXXFLAGS += $(WAYLAND_CLIENT_CFLAGS)
 libqt_plugin_la_LIBADD += $(WAYLAND_CLIENT_LIBS)
 endif
 if HAVE_WIN32
-libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid
+libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid -ld3d11
 endif
 if UPDATE_CHECK
 libqt_plugin_la_CPPFLAGS += -DUPDATE_CHECK
@@ -214,7 +214,17 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/widgets/native/searchlineedit.cpp gui/qt/widgets/native/searchlineedit.hpp
 if HAVE_WIN32
 libqt_plugin_la_SOURCES += \
-	gui/qt/maininterface/main_interface_win32.cpp gui/qt/maininterface/main_interface_win32.hpp
+	gui/qt/maininterface/main_interface_win32.cpp \
+	gui/qt/maininterface/main_interface_win32.hpp
+
+if HAVE_DCOMP
+libqt_plugin_la_SOURCES += \
+	gui/qt/maininterface/compositor_dcomp.cpp \
+	gui/qt/maininterface/compositor_dcomp.hpp \
+	gui/qt/maininterface/compositor_error.hpp \
+	gui/qt/maininterface/compositor_dcomp_uisurface.cpp \
+	gui/qt/maininterface/compositor_dcomp_uisurface.hpp
+endif
 endif
 
 # Meta-object compilation
@@ -322,6 +332,13 @@ nodist_libqt_plugin_la_SOURCES = \
 
 if HAVE_WIN32
 nodist_libqt_plugin_la_SOURCES += gui/qt/maininterface/main_interface_win32.moc.cpp
+
+if HAVE_DCOMP
+nodist_libqt_plugin_la_SOURCES += \
+	gui/qt/maininterface/compositor_dcomp.moc.cpp \
+	gui/qt/maininterface/compositor_dcomp_uisurface.moc.cpp
+endif
+
 endif
 
 nodist_libqt_plugin_la_SOURCES += \

@@ -349,7 +349,7 @@ void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
 
 void MainInterfaceWin32::resizeEvent(QResizeEvent *event)
 {
-    QWidget::resizeEvent(event);
+    MainInterface::resizeEvent(event);
 
     /*
      * Detects if window placement is not in its normal position (ex: win7 aero snap)
