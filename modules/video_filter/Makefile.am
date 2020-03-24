@@ -170,6 +170,27 @@ libopengl_filter_plugin_la_LIBADD = libvlc_opengl.la
 video_filter_LTLIBRARIES += libopengl_filter_plugin.la
 endif
 
+libcvpx_gl_plugin_la_SOURCES = \
+    video_filter/cvpx_gl.m \
+    video_output/opengl/gl_api.h \
+    codec/vt_utils.c \
+    codec/vt_utils.h
+libcvpx_gl_plugin_la_OBJCFLAGS = -fobjc-arc -DUSE_OPENGL_ES2
+libcvpx_gl_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
+    -Wl,-framework,Foundation,-framework,CoreFoundation,-framework,CoreVideo
+
+if HAVE_IOS
+libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
+libcvpx_gl_plugin_la_LIBADD = libvlc_opengles.la
+video_filter_LTLIBRARIES += libcvpx_gl_plugin.la
+endif
+
+if HAVE_OSX
+libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
+libcvpx_gl_plugin_la_LIBADD = libvlc_opengl.la
+video_filter_LTLIBRARIES += libcvpx_gl_plugin.la
+endif
+
 libdeinterlace_common_la_SOURCES = video_filter/deinterlace/common.c video_filter/deinterlace/common.h
 libdeinterlace_common_la_LDFLAGS = -static
 noinst_LTLIBRARIES += libdeinterlace_common.la
