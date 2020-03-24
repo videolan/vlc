@@ -157,6 +157,9 @@ libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.c \
  video_output/win32/d3d11_swapchain.c video_output/win32/d3d11_swapchain.h \
  video_output/win32/common.c video_output/win32/common.h
 libdirect3d11_plugin_la_LIBADD = libchroma_copy.la libd3d11_common.la $(LIBCOM) -luuid
+if HAVE_DCOMP
+libdirect3d11_plugin_la_SOURCES += video_output/win32/dcomp_wrapper.cpp video_output/win32/dcomp_wrapper.h
+endif
 if !HAVE_WINSTORE
 libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
  video_output/win32/events.h \

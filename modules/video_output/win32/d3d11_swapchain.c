@@ -52,10 +52,19 @@
 #include "d3d11_swapchain.h"
 #include "d3d11_shaders.h"
 
+#ifdef HAVE_DCOMP_H
+#  include "dcomp_wrapper.h"
+#endif
+
 typedef enum video_color_axis {
     COLOR_AXIS_RGB,
     COLOR_AXIS_YCBCR,
 } video_color_axis;
+
+typedef enum swapchain_surface_type {
+    SWAPCHAIN_SURFACE_HWND,
+    SWAPCHAIN_SURFACE_DCOMP,
+} swapchain_surface_type;
 
 typedef struct {
     DXGI_COLOR_SPACE_TYPE   dxgi;
@@ -75,9 +84,17 @@ struct d3d11_local_swapchain
     const d3d_format_t     *pixelFormat;
     const dxgi_color_space *colorspace;
 
+    swapchain_surface_type  swapchainSurfaceType;
+    union {
 #if !VLC_WINSTORE_APP
-    HWND                   swapchainHwnd;
+        HWND                hwnd;
 #endif /* !VLC_WINSTORE_APP */
+        struct {
+            void*           device;
+            void*           visual;
+        } dcomp;
+    } swapchainSurface;
+
     IDXGISwapChain1        *dxgiswapChain;   /* DXGI 1.2 swap chain */
     IDXGISwapChain4        *dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
     bool                    send_metadata;
@@ -276,9 +293,10 @@ static void FillSwapChainDesc(struct d3d11_local_swapchain *display, UINT width,
     }
 }
 
-static void CreateSwapchain(struct d3d11_local_swapchain *display, UINT width, UINT height)
+static void CreateSwapchainHwnd(struct d3d11_local_swapchain *display, UINT width, UINT height)
 {
-    if (display->swapchainHwnd == NULL)
+    vlc_assert(display->swapchainSurfaceType == SWAPCHAIN_SURFACE_HWND);
+    if (display->swapchainSurface.hwnd == NULL)
     {
         msg_Err(display->obj, "missing a HWND to create the swapchain");
         return;
@@ -302,14 +320,15 @@ static void CreateSwapchain(struct d3d11_local_swapchain *display, UINT width, U
     }
 
     hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)display->d3d_dev->d3ddevice,
-                                              display->swapchainHwnd, &scd,
-                                              NULL, NULL, &display->dxgiswapChain);
+                                                  display->swapchainSurface.hwnd, &scd,
+                                                  NULL, NULL, &display->dxgiswapChain);
+
     if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
     {
         msg_Warn(display->obj, "10 bits swapchain failed, try 8 bits");
         scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)display->d3d_dev->d3ddevice,
-                                                  display->swapchainHwnd, &scd,
+                                                  display->swapchainSurface.hwnd, &scd,
                                                   NULL, NULL, &display->dxgiswapChain);
     }
     IDXGIFactory2_Release(dxgifactory);
@@ -317,6 +336,65 @@ static void CreateSwapchain(struct d3d11_local_swapchain *display, UINT width, U
         msg_Err(display->obj, "Could not create the SwapChain. (hr=0x%lX)", hr);
     }
 }
+
+#ifdef HAVE_DCOMP_H
+static void CreateSwapchainDComp(struct d3d11_local_swapchain *display, UINT width, UINT height)
+{
+    vlc_assert(display->swapchainSurfaceType == SWAPCHAIN_SURFACE_DCOMP);
+    if (display->swapchainSurface.dcomp.device == NULL || display->swapchainSurface.dcomp.visual == NULL)
+    {
+        msg_Err(display->obj, "missing a HWND to create the swapchain");
+        return;
+    }
+
+    DXGI_SWAP_CHAIN_DESC1 scd;
+    FillSwapChainDesc(display, width, height, &scd);
+    ZeroMemory(&scd, sizeof(scd));
+    scd.BufferCount = 3;
+    scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    scd.SampleDesc.Count = 1;
+    scd.SampleDesc.Quality = 0;
+    scd.Width = width;
+    scd.Height = height;
+    scd.Format = display->pixelFormat->formatTexture;
+    scd.Scaling = DXGI_SCALING_STRETCH;
+    scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+    scd.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+
+    IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(display->d3d_dev->d3ddevice);
+    if (unlikely(dxgiadapter==NULL)) {
+        msg_Err(display->obj, "Could not get the DXGI Adapter");
+        return;
+    }
+
+    IDXGIFactory2 *dxgifactory;
+    HRESULT hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
+    IDXGIAdapter_Release(dxgiadapter);
+    if (FAILED(hr)) {
+        msg_Err(display->obj, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
+        return;
+    }
+
+    hr = IDXGIFactory2_CreateSwapChainForComposition(dxgifactory, (IUnknown *)display->d3d_dev->d3ddevice,
+                                                    &scd, NULL, &display->dxgiswapChain);
+    if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
+    {
+        msg_Warn(display->obj, "10 bits swapchain failed, try 8 bits");
+        scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        hr = IDXGIFactory2_CreateSwapChainForComposition(dxgifactory, (IUnknown *)display->d3d_dev->d3ddevice,
+                                                        &scd, NULL, &display->dxgiswapChain);
+    }
+    IDXGIFactory2_Release(dxgifactory);
+    if (SUCCEEDED(hr)) {
+        IDCompositionVisual_SetContent(display->swapchainSurface.dcomp.visual, (IUnknown *)display->dxgiswapChain);
+        IDCompositionDevice_Commit(display->swapchainSurface.dcomp.device);
+    }
+    if (FAILED(hr)) {
+        msg_Err(display->obj, "Could not create the SwapChain. (hr=0x%lX)", hr);
+    }
+}
+#endif /* HAVE_DCOMP_H */
+
 #endif /* !VLC_WINSTORE_APP */
 
 static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc_video_render_cfg_t *cfg )
@@ -400,7 +478,13 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc
     if ( display->dxgiswapChain == NULL )
     {
         display->pixelFormat = newPixelFormat;
-        CreateSwapchain(display, cfg->width, cfg->height);
+
+#ifdef HAVE_DCOMP_H
+        if (display->swapchainSurfaceType == SWAPCHAIN_SURFACE_DCOMP)
+            CreateSwapchainDComp(display, cfg->width, cfg->height);
+        else // SWAPCHAIN_TARGET_HWND
+#endif
+            CreateSwapchainHwnd(display, cfg->width, cfg->height);
 
         if (display->dxgiswapChain == NULL)
             return false;
@@ -555,7 +639,7 @@ bool LocalSwapchainSelectPlane( void *opaque, size_t plane )
     return true;
 }
 
-void *CreateLocalSwapchainHandle(vlc_object_t *o, HWND hwnd, d3d11_device_t *d3d_dev)
+void *CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd, d3d11_device_t *d3d_dev)
 {
     struct d3d11_local_swapchain *display = vlc_obj_calloc(o, 1, sizeof(*display));
     if (unlikely(display == NULL))
@@ -563,7 +647,8 @@ void *CreateLocalSwapchainHandle(vlc_object_t *o, HWND hwnd, d3d11_device_t *d3d
 
     display->obj = o;
 #if !VLC_WINSTORE_APP
-    display->swapchainHwnd = hwnd;
+    display->swapchainSurfaceType = SWAPCHAIN_SURFACE_HWND;
+    display->swapchainSurface.hwnd = hwnd;
 #else // VLC_WINSTORE_APP
     VLC_UNUSED(hwnd);
 #endif // VLC_WINSTORE_APP
@@ -571,3 +656,20 @@ void *CreateLocalSwapchainHandle(vlc_object_t *o, HWND hwnd, d3d11_device_t *d3d
 
     return display;
 }
+
+#ifdef HAVE_DCOMP_H
+void *CreateLocalSwapchainHandleDComp(vlc_object_t *o, void* dcompDevice, void* dcompVisual, d3d11_device_t *d3d_dev)
+{
+    struct d3d11_local_swapchain *display = vlc_obj_calloc(o, 1, sizeof(*display));
+    if (unlikely(display == NULL))
+        return NULL;
+
+    display->obj = o;
+    display->swapchainSurfaceType = SWAPCHAIN_SURFACE_DCOMP;
+    display->swapchainSurface.dcomp.device = dcompDevice;
+    display->swapchainSurface.dcomp.visual = dcompVisual;
+    display->d3d_dev = d3d_dev;
+
+    return display;
+}
+#endif

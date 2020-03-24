@@ -2724,6 +2724,19 @@ have_iapplication_data2="no"
 AC_CHECK_TYPES([IApplicationData2],[],[],[#include <windows.storage.h>])
 
 dnl
+dnl DirectComposition
+dnl
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADERS([dcomp.h], [
+    have_dcomp="yes"
+], [], [
+  #include <windows.h>
+])
+AC_LANG_POP([C++])
+AM_CONDITIONAL([HAVE_DCOMP], [test "${have_dcomp}" = "yes"])
+
+
+dnl
 dnl  avformat demuxer/muxer plugin
 dnl
 

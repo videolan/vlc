@@ -321,13 +321,22 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
 #if !VLC_WINSTORE_APP
-        if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
+        if (cfg->window->type == VOUT_WINDOW_TYPE_HWND)
+        {
+            if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
                        vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
-            goto error;
+                goto error;
+        }
+
 #endif /* !VLC_WINSTORE_APP */
 
         /* use our internal swapchain callbacks */
-        sys->outside_opaque      = CreateLocalSwapchainHandle(VLC_OBJECT(vd), sys->sys.hvideownd, sys->d3d_dev);
+#ifdef HAVE_DCOMP_H
+        if (cfg->window->type == VOUT_WINDOW_TYPE_DCOMP)
+            sys->outside_opaque      = CreateLocalSwapchainHandleDComp(VLC_OBJECT(vd), cfg->window->display.dcomp_device, cfg->window->handle.dcomp_visual, sys->d3d_dev);
+        else
+#endif
+            sys->outside_opaque      = CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), sys->sys.hvideownd, sys->d3d_dev);
         if (unlikely(sys->outside_opaque == NULL))
             goto error;
         sys->updateOutputCb      = LocalSwapchainUpdateOutput;
