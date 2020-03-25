@@ -1,0 +1,34 @@
+From 7e20c8f5ebe96de94694be10e24b791e1ed4ea2d Mon Sep 17 00:00:00 2001
+From: Hendrik Leppkes <h.leppkes@gmail.com>
+Date: Mon, 29 May 2017 12:09:47 +0200
+Subject: [PATCH] avcodec/vp9: add profile 2 10-bit DXVA2/D3D11 decoding
+ support
+
+Fixes trac ticket #7099.
+---
+ libavcodec/vp9.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/vp9.c b/libavcodec/vp9.c
+index 0fac638ec9..b1178c9c0c 100644
+--- a/libavcodec/vp9.c
++++ b/libavcodec/vp9.c
+@@ -188,6 +188,7 @@ static int update_size(AVCodecContext *avctx, int w, int h)
+ 
+         switch (s->pix_fmt) {
+         case AV_PIX_FMT_YUV420P:
++        case AV_PIX_FMT_YUV420P10:
+ #if CONFIG_VP9_DXVA2_HWACCEL
+             *fmtp++ = AV_PIX_FMT_DXVA2_VLD;
+ #endif
+@@ -202,7 +203,6 @@ static int update_size(AVCodecContext *avctx, int w, int h)
+             *fmtp++ = AV_PIX_FMT_VAAPI;
+ #endif
+             break;
+-        case AV_PIX_FMT_YUV420P10:
+         case AV_PIX_FMT_YUV420P12:
+ #if CONFIG_VP9_NVDEC_HWACCEL
+             *fmtp++ = AV_PIX_FMT_CUDA;
+-- 
+2.26.0.windows.1
+
