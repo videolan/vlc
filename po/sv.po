@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Anton Regnander <anton_r_3@hotmail.com>, 2014-2019
+# Anton Regnander <anton_r_3@hotmail.com>, 2014-2020
 # Christopher Rönngren <christopher.ronngren@hotmail.com>, 2015
 # Claes-Göran Nydahl <goldug@gmail.com>, 2016
 # Daniel <daniel.a.back@telia.com>, 2015
@@ -18,29 +18,24 @@
 # Joel Arvidsson <dogai@privat.utfors.se>, 2002
 # Jonathan Schmidt <jhschmidt@wpsdk12.org>, 2016
 # Josef Andersson <josef.andersson@fripost.org>, 2015
-# Andreas Everos, 2014
 # Kristoffer Grundström <hamnisdude@gmail.com>, 2015-2018
-# Isis, 2013,2014
-# leveebreaks, 2013,2014
 # Linus Malmgren <linus@malmgren.nu>, 2015
 # Magnus Boman <magnus@kittehcat.org>, 2014-2015
 # Magnus Österlund, 2015
-# pilino1234 <pilino1234@zoho.eu>, 2016
-# Staś Zw. <staszw@live.se>, 2013
-# Nadia, 2015
 # Niklas Åkerström, 2009
 # Olle Neiman <olle.neiman@seoseon.com>, 2016
 # Paulus Paulus <suluap@alamier.com>, 2016
+# pilino1234 <pilino1234@zoho.eu>, 2016
 # Sebastian Rasmussen <sebras@gmail.com>, 2015,2019
+# Staś Zw. <staszw@live.se>, 2013
 # theschitz <theodore@theschitz.se>, 2015-2016
-# Isis, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-12-04 09:29+0100\n"
-"Last-Translator: Anton Regnander <anton_r_3@hotmail.com>, 2019\n"
+"PO-Revision-Date: 2020-03-25 11:31+0100\n"
+"Last-Translator: Anton Regnander <anton_r_3@hotmail.com>, 2020\n"
 "Language-Team: Swedish (https://www.transifex.com/yaron/teams/16553/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -6177,25 +6172,24 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "Problemdetaljer och systemkonfiguration"
+msgstr "Problem uppstod med att komma åt en systemresurs"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"Öppna \"Systeminställningar\" -> \"Säkerhet och integritet\" och ge VLC "
+"åtkomst till din mikrofon."
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "Ljudfångst"
+msgstr ""
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "Ljudutmatningsmodul"
+msgstr ""
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6230,6 +6224,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"Öppna \"Systeminställningar\" -> \"Säkerhet och integritet\" och ge VLC "
+"åtkomst till din kamera."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -7381,6 +7377,9 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"macOS kanske blockerar åtkomst till din hårddisk. Öppna \"Systeminställningar"
+"\" -> \"Säkerhet och integritet\" och ge VLC åtkomst till din externa media "
+"i avsnittet \"Filer och mappar\"."
 
 #: modules/access/dvdread.c:77
 msgid "DVD without menus"
@@ -23385,9 +23384,8 @@ msgid "Zeroconf services"
 msgstr "Zeroconf-tjänster"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "Tjänstupptäckt"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
