@@ -80,6 +80,7 @@ struct d3d11_local_swapchain
 #endif /* !VLC_WINSTORE_APP */
     IDXGISwapChain1        *dxgiswapChain;   /* DXGI 1.2 swap chain */
     IDXGISwapChain4        *dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
+    bool                    send_metadata;
     DXGI_HDR_METADATA_HDR10 hdr10;
 
     ID3D11RenderTargetView *swapchainTargetView[D3D11_MAX_RENDER_TARGET];
@@ -234,6 +235,9 @@ static void SelectSwapchainColorspace(struct d3d11_local_swapchain *display, con
         msg_Err(display->obj, "Failed to set colorspace %s. (hr=0x%lX)", color_spaces[best].name, hr);
 done:
     display->colorspace = &color_spaces[best];
+    display->send_metadata = color_spaces[best].transfer == (video_transfer_func_t) cfg->transfer &&
+                             color_spaces[best].primaries == (video_color_primaries_t) cfg->primaries &&
+                             color_spaces[best].color == (video_color_space_t) cfg->colorspace;
     if (dxgiswapChain3)
         IDXGISwapChain3_Release(dxgiswapChain3);
 }
@@ -516,7 +520,8 @@ void LocalSwapchainSetMetadata( void *opaque, libvlc_video_metadata_type_t type,
     struct d3d11_local_swapchain *display = opaque;
 
     assert(type == libvlc_video_metadata_frame_hdr10);
-    if (type == libvlc_video_metadata_frame_hdr10 && metadata && display->dxgiswapChain4)
+    if ( type == libvlc_video_metadata_frame_hdr10 && metadata &&
+         display->send_metadata && display->dxgiswapChain4 )
     {
         const libvlc_video_frame_hdr10_metadata_t *p_hdr10 = metadata;
         DXGI_HDR_METADATA_HDR10 hdr10 = { 0 };
