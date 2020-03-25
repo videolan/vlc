@@ -6,14 +6,14 @@
 # Alexander Henket <ahenket at xs4all dot nl>, 2009
 # Derk-Jan Hartman <hartman at videolan dot org>, 2004-2005
 # Myckel Habets <myckel at sdf dot lonestar dot org>, 2007-2010
-# Thomas De Rocker <thomasderocker at outlook dot com>, 2008-2019
+# Thomas De Rocker <thomasderocker at outlook dot com>, 2008-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-10-24 10:21+0200\n"
-"Last-Translator: Thomas De Rocker <thomasderocker at outlook dot com>, 2019\n"
+"PO-Revision-Date: 2020-03-25 16:56+0100\n"
+"Last-Translator: Thomas De Rocker <thomasderocker at outlook dot com>, 2020\n"
 "Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -6204,23 +6204,23 @@ msgstr ""
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
 msgid "Problem accessing a system resource"
-msgstr ""
+msgstr "Probleem met toegang tot een systeembron"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"Open \"systeemvoorkeuren\" -> \"beveiliging en privacy\" en geef VLC toegang "
+"tot uw microfoon."
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "AVFoundation video-opname"
+msgstr "AVFoundation audio-opname"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "AVFoundation video-opname module."
+msgstr "AVFoundation audio-opname module"
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6255,6 +6255,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"Open \"systeemvoorkeuren\" -> \"beveiliging en privacy\" en geef VLC toegang "
+"tot uw camera."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -7461,6 +7463,9 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"MacOS blokkeert mogelijk de toegang tot uw schijf. Open \"systeemvoorkeuren"
+"\" -> \"beveiliging en privacy\" en geef VLC toegang tot uw externe media in "
+"de sectie \"bestanden en mappen\"."
 
 #: modules/access/dvdread.c:77
 msgid "DVD without menus"
@@ -15378,8 +15383,8 @@ msgid ""
 "Recreate a index for the AVI file. Use this if your AVI file is damaged or "
 "incomplete (not seekable)."
 msgstr ""
-"Herbouw een index voor het avi-bestand. Gebruik dit als uw avi-bestand "
-"beschadigd of incompleet (niet zoekbaar) is."
+"Herbouw een index voor het AVI-bestand. Gebruik dit als uw AVI-bestand "
+"beschadigd of onvolledig (niet zoekbaar) is."
 
 #: modules/demux/avi/avi.c:66
 msgid "Ask for action"
@@ -15399,7 +15404,7 @@ msgstr "Repareren indien nodig"
 
 #: modules/demux/avi/avi.c:73
 msgid "AVI demuxer"
-msgstr "Avi-demuxer"
+msgstr "AVI-demuxer"
 
 #: modules/demux/avi/avi.c:876 modules/demux/mp4/mp4.c:4256
 msgid ""
@@ -15435,11 +15440,11 @@ msgstr "Kapotte of ontbrekende index"
 
 #: modules/demux/avi/avi.c:2773
 msgid "Broken or missing AVI Index"
-msgstr "Kapotte of ontbrekende avi-index"
+msgstr "Kapotte of ontbrekende AVI-index"
 
 #: modules/demux/avi/avi.c:2774
 msgid "Fixing AVI Index..."
-msgstr "Avi-index repareren..."
+msgstr "AVI-index repareren..."
 
 #: modules/demux/caf.c:53
 msgid "CAF demuxer"
@@ -18496,7 +18501,7 @@ msgstr "Map of bestandsnaam waar de opnames in opgeslagen worden"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:297
 msgid "Repair AVI Files"
-msgstr "Avi-bestanden repareren"
+msgstr "AVI-bestanden repareren"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:298
 msgid "Default Caching Level"
@@ -19320,7 +19325,7 @@ msgstr " m                      Dempen"
 #. xgettext: You can use ↑ and ↓ characters
 #: modules/gui/ncurses.c:891
 msgid " <up>,<down>            Navigate through the box line by line"
-msgstr " <pijl-omhoog>,<pijl-omlaag>     Navigeer door de box lijn per lijn"
+msgstr " <pijl-omhoog>,<pijl-omlaag>     Navigeer door de box regel per regel"
 
 #. xgettext: You can use ⇞ and ⇟ characters
 #: modules/gui/ncurses.c:893
@@ -23563,7 +23568,7 @@ msgstr "Encoder"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
-msgstr "Avi-muxer"
+msgstr "AVI-muxer"
 
 #: modules/mux/dummy.c:45
 msgid "Dummy/Raw muxer"
@@ -23994,9 +23999,8 @@ msgid "Zeroconf services"
 msgstr "Zeroconf-diensten"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "mDNS-renderer-ontdekking"
+msgstr "Avahi-renderer-ontdekking"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
@@ -29558,7 +29562,7 @@ msgstr "Standaard optisch apparaat"
 
 #: modules/gui/qt/ui/sprefs_input.h:366
 msgid "Damaged or incomplete AVI file"
-msgstr "Beschadigd of incompleet avi-bestand"
+msgstr "Beschadigd of onvolledig AVI-bestand"
 
 #: modules/gui/qt/ui/sprefs_input.h:369
 msgid "HTTP proxy URL"
