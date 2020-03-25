@@ -226,7 +226,7 @@ static block_t *GetPacketizedBlock( decoder_t *p_packetizer,
     {
         if( p_block->i_buffer >= FLAC_HEADER_SIZE_MAX )
         {
-            struct flac_header_info headerinfo;
+            struct flac_header_info headerinfo = { .i_pts = VLC_TICK_INVALID };
             int i_ret = FLAC_ParseSyncInfo( p_block->p_buffer, streaminfo, NULL, &headerinfo );
             assert( i_ret != 0 ); /* Same as packetizer */
             /* Use Frame PTS, not the interpolated one */
@@ -832,4 +832,3 @@ static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, size_t i_data
 
     TAB_APPEND( p_sys->i_attachments, p_sys->attachments, p_attachment );
 }
-
