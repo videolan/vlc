@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Fumio Nakayama <fumio.n6a@gmail.com>, 2002,2009-2019
+# Fumio Nakayama <fumio.n6a@gmail.com>, 2002,2009-2020
 # Tadashi Jokagi <elf@elf.no-ip.org>, 2004-2009
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2018-12-20 16:17+0200\n"
-"Last-Translator: Fumio Nakayama <fumio.n6a@gmail.com>, 2018\n"
+"PO-Revision-Date: 2020-03-25 12:23+0100\n"
+"Last-Translator: Fumio Nakayama <fumio.n6a@gmail.com>, 2020\n"
 "Language-Team: Japanese (https://www.transifex.com/yaron/teams/16553/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -6099,9 +6099,8 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "問題の詳細とシステム設定"
+msgstr "システムリソースへのアクセスで問題が発生しました"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
@@ -6110,14 +6109,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "AVFoundationビデオキャプチャー"
+msgstr "AVFoundationオーディオキャプチャー"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "AVFoundationビデオキャプチャーモジュール"
+msgstr "AVFoundationオーディオキャプチャーモジュール"
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -23760,9 +23757,8 @@ msgid "Zeroconf services"
 msgstr "Zeroconfサービス"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "mDNSレンダラー検索"
+msgstr "Avahiレンダラー検索"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
