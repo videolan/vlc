@@ -479,14 +479,12 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
         else if (mode->log2_chroma_w == 1 && mode->log2_chroma_h == 0)
             preferredOutput = MAKEFOURCC('Y','2','1','0'); // 10 bits 4:2:2
         else
-        preferredOutput = MAKEFOURCC('P','0','1','0');
+            preferredOutput = MAKEFOURCC('P','0','1','0');
     }
     else if (mode->log2_chroma_w == 0 && mode->log2_chroma_h == 0)
         preferredOutput = MAKEFOURCC('A','Y','U','V'); // 8 bits 4:4:4
     else if (mode->log2_chroma_w == 1 && mode->log2_chroma_h == 0)
         preferredOutput = MAKEFOURCC('Y','U','Y','2'); // 8 bits 4:2:2
-    else if (mode->bit_depth > 8)
-        preferredOutput = MAKEFOURCC('P','0','1','0');
     else
         preferredOutput =  MAKEFOURCC('N','V','1','2');
     msg_Dbg(va, "favor decoder format %4.4s (for 4:%d:%d %d bits)", (const char*)&preferredOutput,
