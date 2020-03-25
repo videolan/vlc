@@ -870,7 +870,7 @@ static int amt_sockets_init( stream_t *p_access )
     }
 
     /* bind socket to local address */
-    struct sockaddr_in stLocalAddr = 
+    struct sockaddr_in stLocalAddr =
     {
         .sin_family      = AF_INET,
         .sin_port        = htons( 0 ),
