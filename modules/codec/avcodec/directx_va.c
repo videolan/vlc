@@ -59,8 +59,11 @@ static const int PROF_HEVC_MAIN[]    = { FF_PROFILE_HEVC_MAIN,
 static const int PROF_HEVC_MAIN10[]  = { FF_PROFILE_HEVC_MAIN,
                                          FF_PROFILE_HEVC_MAIN_10,
                                          FF_PROFILE_UNKNOWN };
+
+#ifdef FF_DXVA2_WORKAROUND_HEVC_REXT
 static const int PROF_HEVC_MAIN_REXT[]  = { FF_PROFILE_HEVC_REXT,
                                             FF_PROFILE_UNKNOWN };
+#endif
 
 static const int PROF_VP9_MAIN[]    = { FF_PROFILE_VP9_0, FF_PROFILE_UNKNOWN };
 static const int PROF_VP9_10[]      = { FF_PROFILE_VP9_2, FF_PROFILE_UNKNOWN };
