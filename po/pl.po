@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-01-16 11:38+0100\n"
+"PO-Revision-Date: 2020-03-25 23:07+0100\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2020\n"
 "Language-Team: Polish (https://www.transifex.com/yaron/teams/16553/pl/)\n"
 "Language: pl\n"
@@ -6167,25 +6167,24 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "Szczegóły problemu i konfiguracja systemu"
+msgstr "Problem dostępu do zasobu systemowego"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"Otwórz \"Preferencje systemowe\" -> \"Ochrona i prywatność\" i zezwól VLC na "
+"dostęp do mikrofonu."
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "AVFoundation - przechwytywanie wideo"
+msgstr "AVFoundation - przechwytywanie dźwięku"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "AVFoundation - moduł przechwytywania wideo."
+msgstr "AVFoundation - moduł przechwytywania dźwięku."
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6220,6 +6219,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"Otwórz \"Preferencje systemowe\" -> \"Ochrona i prywatność\" i zezwól VLC na "
+"dostęp do kamery."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -7421,6 +7422,9 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"MacOS może blokować dostęp do dysku twardego. Otwórz \"Preferencje systemowe"
+"\" -> \"Ochrona i prywatność\" i zezwól VLC na dostęp do zewnętrznych mediów "
+"w sekcji „Pliki i foldery”."
 
 #: modules/access/dvdread.c:77
 msgid "DVD without menus"
@@ -23895,9 +23899,8 @@ msgid "Zeroconf services"
 msgstr "Usługi Zeroconf"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "Wykrywanie rendera mDNS"
+msgstr "Wykrywanie rendera Avahi"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
