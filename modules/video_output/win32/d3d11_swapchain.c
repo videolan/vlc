@@ -80,6 +80,7 @@ struct d3d11_local_swapchain
 #endif /* !VLC_WINSTORE_APP */
     IDXGISwapChain1        *dxgiswapChain;   /* DXGI 1.2 swap chain */
     IDXGISwapChain4        *dxgiswapChain4;  /* DXGI 1.5 for HDR metadata */
+    DXGI_HDR_METADATA_HDR10 hdr10;
 
     ID3D11RenderTargetView *swapchainTargetView[D3D11_MAX_RENDER_TARGET];
 
@@ -531,7 +532,12 @@ void LocalSwapchainSetMetadata( void *opaque, libvlc_video_metadata_type_t type,
         hdr10.MaxMasteringLuminance = p_hdr10->MaxMasteringLuminance;
         hdr10.MaxContentLightLevel = p_hdr10->MaxContentLightLevel;
         hdr10.MaxFrameAverageLightLevel = p_hdr10->MaxFrameAverageLightLevel;
-        IDXGISwapChain4_SetHDRMetaData( display->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10, sizeof( hdr10 ), &hdr10 );
+        if (memcmp(&display->hdr10, &hdr10, sizeof(hdr10)))
+        {
+            memcpy(&display->hdr10, &hdr10, sizeof(hdr10));
+            IDXGISwapChain4_SetHDRMetaData( display->dxgiswapChain4, DXGI_HDR_METADATA_TYPE_HDR10,
+                                            sizeof( &display->hdr10 ), &display->hdr10 );
+        }
     }
 }
 
