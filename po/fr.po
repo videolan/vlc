@@ -13,6 +13,7 @@
 # Freddydelanuit Dec <fred.dec@free.fr>, 2014
 # Hugo Beauzée-Luyssen <hugo@beauzee.fr>, 2015
 # Irriep Nala Novram <allannkorh@yahoo.fr>, 2018
+# JeanDeLaMouche <urgau@numericable.fr>, 2020
 # Lionel Hannequin <lionel.hannequin@free.fr>, 2018
 # Mortimer <doug.mortimer@netcourrier.com>, 2017
 # Paul Caranton <caranton.paul@gmail.com>, 2015
@@ -25,7 +26,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-02-28 21:04+0100\n"
+"PO-Revision-Date: 2020-03-26 11:04+0100\n"
 "Last-Translator: JeanDeLaMouche <urgau@numericable.fr>, 2020\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/16553/fr/)\n"
 "Language: fr\n"
@@ -6243,25 +6244,24 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "Détails du problème et configuration système"
+msgstr "Problème d'accès à une ressource du système"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"Veuillez ouvrir \"Préférences système\" -> \"Sécurité et confidentialité\" "
+"et autoriser VLC à accéder à votre microphone."
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "Capture vidéo AVFoundation"
+msgstr "Capture audio AVFoundation"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "Module de capture vidéo AVFoundation."
+msgstr "Module de capture audio AVFoundation."
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6296,6 +6296,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"Veuillez ouvrir \"Préférences système\" -> \"Sécurité et confidentialité\" "
+"et autoriser VLC à accéder à votre caméra."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -7511,6 +7513,9 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"Potentiellement, macOS bloque l'accès à votre disque. Veuillez ouvrir "
+"\"Préférences système\" -> \"Sécurité et confidentialité\" et autoriser VLC "
+"à accéder à vos médias externes dans la section \"Fichiers et dossiers\"."
 
 #: modules/access/dvdread.c:77
 msgid "DVD without menus"
@@ -24067,9 +24072,8 @@ msgid "Zeroconf services"
 msgstr "Services Zeroconf"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "Découverte de moteur de rendu mDNS"
+msgstr "Découverte par Avahi Renderer"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
