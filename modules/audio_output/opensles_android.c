@@ -51,11 +51,11 @@ JNIEnv *android_getEnv(vlc_object_t *p_obj, const char *psz_thread_name);
  * with 255 buffers we can buffer 2.55s of audio.
  */
 
-#define CHECK_OPENSL_ERROR(msg)                \
+#define CHECK_OPENSL_ERROR(msg) \
     if (unlikely(result != SL_RESULT_SUCCESS)) \
-    {                                          \
-        msg_Err(aout, msg" (%lu)", result);    \
-        goto error;                            \
+    { \
+        msg_Err(aout, msg" (%" PRIu32 ")", (uint32_t)result); \
+        goto error; \
     }
 
 typedef SLresult (*slCreateEngine_t)(
@@ -157,7 +157,7 @@ static int TimeGet(audio_output_t* aout, vlc_tick_t* restrict drift)
     SLAndroidSimpleBufferQueueState st;
     SLresult res = GetState(sys->playerBufferQueue, &st);
     if (unlikely(res != SL_RESULT_SUCCESS)) {
-        msg_Err(aout, "Could not query buffer queue state in TimeGet (%lu)", res);
+        msg_Err(aout, "Could not query buffer queue state in TimeGet (%" PRIu32 ")", (uint32_t)res);
         return -1;
     }
 
@@ -262,7 +262,8 @@ static int WriteBuffer(audio_output_t *aout)
     SLAndroidSimpleBufferQueueState st;
     SLresult res = GetState(sys->playerBufferQueue, &st);
     if (unlikely(res != SL_RESULT_SUCCESS)) {
-        msg_Err(aout, "Could not query buffer queue state in %s (%lu)", __func__, res);
+        msg_Err(aout, "Could not query buffer queue state in %s (%" PRIu32 ")",
+                __func__, (uint32_t)res);
         return false;
     }
 
@@ -307,8 +308,8 @@ static int WriteBuffer(audio_output_t *aout)
         return true;
     } else {
         /* XXX : if writing fails, we don't retry */
-        msg_Err(aout, "error %lu when writing %d bytes %s",
-                r, b->i_buffer,
+        msg_Err(aout, "error %" PRIu32 " when writing %zu bytes %s",
+                (uint32_t)r, b->i_buffer,
                 (r == SL_RESULT_BUFFER_INSUFFICIENT) ? " (buffer insufficient)" : "");
         return false;
     }
