@@ -5,10 +5,8 @@
 # Translators:
 # Andrejs Pavars <andrejs.pavars@gmail.com>, 2017
 # Anita Reitere <nitalynx@gmail.com>, 2015
-# Arnis Lupiks, 2014
 # Baiba Bērziņa <baibabeerzinnaa@gmail.com>, 2015
-# Dāvis Mosāns, 2014
-# Ingmārs Dīriņš <melhiors14@gmail.com>, 2016-2019
+# Ingmārs Dīriņš <melhiors14@gmail.com>, 2016-2020
 # Jānis-Marks Gailis <jeanmarc.gailis@gmail.com>, 2013-2014
 # Kristaps Ancāns <kristaps.ancans@gmail.com>, 2013
 # Ojārs Spriņķis <ojars.sprinkis@inbox.lv>, 2014
@@ -18,8 +16,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-10-27 10:12+0100\n"
-"Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-03-26 09:45+0100\n"
+"Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2020\n"
 "Language-Team: Latvian (https://www.transifex.com/yaron/teams/16553/lv/)\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
@@ -6186,25 +6184,24 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "Problēmas detaļas un sistēmas konfigurācija"
+msgstr "Problēma, piekļūstot sistēmas resursam"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"Lūdzu, atveriet \"System Preferences\" -> \"Security & Privacy\" un "
+"atļaujiet VLC piekļūt savam mikrofonam."
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "AVFoundation video tveršana"
+msgstr "AVFoundation audio tveršana"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "AVFoundation video tveršanas modulis."
+msgstr "AVFoundation audio tveršanas modulis."
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6239,6 +6236,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"Lūdzu, atveriet \"System Preferences\" -> \"Security & Privacy\" un "
+"atļaujiet VLC piekļūt savai kamerai."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -7435,6 +7434,9 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"macOS potenciāli bloķē piekļuvi jūsu diskam. Lūdzu, atveriet \"System "
+"Preferences\" -> \"Security & Privacy\" un sadaļā \"Files and Folders\" "
+"atļaujiet VLC piekļūt savam ārējam medijam."
 
 #: modules/access/dvdread.c:77
 msgid "DVD without menus"
@@ -23901,9 +23903,8 @@ msgid "Zeroconf services"
 msgstr "Zeroconf pakalpojumi"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "mDNS renderētāja atklāšana"
+msgstr "Avahi renderētāja atklāšana"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
