@@ -908,7 +908,7 @@ static int
 VolumeSet(audio_output_t * p_aout, float volume)
 {
     aout_sys_t *p_sys = p_aout->sys;
-    OSStatus ostatus = 0;
+    OSStatus err = noErr;
 
     if (p_sys->b_digital)
         return VLC_EGENERIC;
@@ -919,7 +919,7 @@ VolumeSet(audio_output_t * p_aout, float volume)
     /* Set volume for output unit */
     if (!p_sys->b_mute)
     {
-        ostatus = AudioUnitSetParameter(p_sys->au_unit,
+        err = AudioUnitSetParameter(p_sys->au_unit,
                                         kHALOutputParam_Volume,
                                         kAudioUnitScope_Global,
                                         0,
@@ -930,7 +930,7 @@ VolumeSet(audio_output_t * p_aout, float volume)
     if (var_InheritBool(p_aout, "volume-save"))
         config_PutInt("auhal-volume", lroundf(volume * AOUT_VOLUME_DEFAULT));
 
-    return ostatus;
+    return (err == noErr) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static int
