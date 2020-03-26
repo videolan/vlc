@@ -653,7 +653,7 @@ int aout_VolumeSet (audio_output_t *aout, float vol)
     int ret;
 
     vlc_mutex_lock(&owner->lock);
-    ret = aout->volume_set(aout, vol);
+    ret = aout->volume_set ? aout->volume_set(aout, vol) : -1;
     vlc_mutex_unlock(&owner->lock);
     return ret ? -1 : 0;
 }
@@ -704,7 +704,7 @@ int aout_MuteSet (audio_output_t *aout, bool mute)
     int ret;
 
     vlc_mutex_lock(&owner->lock);
-    ret = aout->mute_set(aout, mute);
+    ret = aout->mute_set ? aout->mute_set(aout, mute) : -1;
     vlc_mutex_unlock(&owner->lock);
     return ret ? -1 : 0;
 }
@@ -730,7 +730,7 @@ int aout_DeviceSet (audio_output_t *aout, const char *id)
     int ret;
 
     vlc_mutex_lock(&owner->lock);
-    ret = aout->device_select(aout, id);
+    ret = aout->device_select ? aout->device_select(aout, id) : -1;
     vlc_mutex_unlock(&owner->lock);
     return ret ? -1 : 0;
 }
