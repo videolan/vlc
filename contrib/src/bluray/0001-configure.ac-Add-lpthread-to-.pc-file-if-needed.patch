@@ -1,0 +1,26 @@
+From 4efd8acf4b0a476eef47f8b99ed8c1b5c6d246a0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Wed, 25 Mar 2020 15:48:11 +0100
+Subject: [PATCH] configure.ac: Add -lpthread to .pc file if needed
+
+---
+ configure.ac | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 92e2d705..2c8a212b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -146,6 +146,9 @@ AS_IF([test "${SYS}" != "mingw32"], [
+     [AC_MSG_ERROR([pthread required])])
+   AC_SEARCH_LIBS([pthread_create], [pthread], ,
+     [AC_MSG_ERROR([pthread required])])
++  PTHREAD_LIBS="$ac_cv_search_pthread_create"
++  AS_IF([test x"$PTHREAD_LIBS" != x"none required"],
++        [EXTRA_LIBS="$EXTRA_LIBS $PTHREAD_LIBS"])
+   AC_SEARCH_LIBS([dlopen], [dl])
+   DLOPEN_LIBS="$ac_cv_search_dlopen"
+   AS_CASE([$DLOPEN_LIBS],
+-- 
+2.20.1
+
