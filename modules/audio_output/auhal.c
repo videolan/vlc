@@ -24,14 +24,14 @@
 
 #pragma mark includes
 
-#import "coreaudio_common.h"
+#include "coreaudio_common.h"
 
-#import <vlc_plugin.h>
-#import <vlc_dialog.h>                      // vlc_dialog_display_error
-#import <vlc_charset.h>                     // FromCFString
+#include <vlc_plugin.h>
+#include <vlc_dialog.h>                      // vlc_dialog_display_error
+#include <vlc_charset.h>                     // FromCFString
 
-#import <CoreAudio/CoreAudio.h>             // AudioDeviceID
-#import <CoreServices/CoreServices.h>
+#include <CoreAudio/CoreAudio.h>             // AudioDeviceID
+#include <CoreServices/CoreServices.h>
 
 #pragma mark -
 #pragma mark local prototypes & module descriptor

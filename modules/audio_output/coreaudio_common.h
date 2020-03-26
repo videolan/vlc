@@ -23,17 +23,17 @@
  *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-# import "config.h"
+# include "config.h"
 #endif
 
-#import <vlc_common.h>
-#import <vlc_aout.h>
-#import <vlc_threads.h>
+#include <vlc_common.h>
+#include <vlc_aout.h>
+#include <vlc_threads.h>
 
-#import <AudioUnit/AudioUnit.h>
-#import <AudioToolbox/AudioToolbox.h>
-#import <os/lock.h>
-#import <mach/mach_time.h>
+#include <AudioUnit/AudioUnit.h>
+#include <AudioToolbox/AudioToolbox.h>
+#include <os/lock.h>
+#include <mach/mach_time.h>
 
 #define STREAM_FORMAT_MSG(pre, sfm) \
     pre "[%f][%4.4s][%u][%u][%u][%u][%u][%u]", \

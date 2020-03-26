@@ -22,8 +22,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "coreaudio_common.h"
-#import <CoreAudio/CoreAudioTypes.h>
+#include "coreaudio_common.h"
+#include <CoreAudio/CoreAudioTypes.h>
 
 static inline uint64_t
 BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
