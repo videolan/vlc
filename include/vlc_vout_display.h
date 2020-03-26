@@ -86,6 +86,7 @@ typedef struct vlc_video_align {
  * window, as follows:
  * - If \ref is_display_filled is set,
  *   the video size is fitted to the display size.
+ * - If \ref window size is valid, the video size is set to the window size,
  * - Otherwise, the video size is determined from the original video format,
  *   multiplied by the zoom factor.
  */
@@ -101,6 +102,18 @@ typedef struct vout_display_cfg {
         unsigned height; /**< Requested display pixel height (0 by default). */
         vlc_rational_t sar; /**< Requested sample aspect ratio */
     } display;
+
+    /**
+     * Window properties
+     *
+     * Should be ignored from display modules.
+     */
+    struct {
+        /** Current window width */
+        unsigned width;
+        /** Current window height */
+        unsigned height;
+    } window_props;
 
     /** Alignment of the video within the window */
     vlc_video_align_t align;

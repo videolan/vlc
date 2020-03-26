@@ -102,6 +102,7 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
                                         const video_format_t *source,
                                         const vout_display_cfg_t *cfg)
 {
+    /* Requested by the user */
     if (cfg->display.width != 0 && cfg->display.height != 0) {
         *width  = cfg->display.width;
         *height = cfg->display.height;
@@ -113,7 +114,14 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
         *width  = (int64_t)source->i_visible_width * source->i_sar_num * cfg->display.height * cfg->display.sar.den /
             source->i_visible_height / source->i_sar_den / cfg->display.sar.num;
         *height = cfg->display.height;
-    } else if (source->i_sar_num >= source->i_sar_den) {
+    }
+    /* Size reported by the window module */
+    else if (cfg->window_props.width != 0 && cfg->window_props.height != 0) {
+        *width = cfg->window_props.width;
+        *height = cfg->window_props.height;
+    }
+    /* Use the original video size */
+    else if (source->i_sar_num >= source->i_sar_den) {
         *width  = (int64_t)source->i_visible_width * source->i_sar_num * cfg->display.sar.den / source->i_sar_den / cfg->display.sar.num;
         *height = source->i_visible_height;
     } else {
@@ -137,6 +145,10 @@ void vout_display_PlacePicture(vout_display_place_t *place,
                                const video_format_t *source,
                                const vout_display_cfg_t *cfg)
 {
+    /* vout_display_PlacePicture() is called from vd plugins. They should not
+     * care about the initial window properties. */
+    assert(cfg->window_props.width == 0 && cfg->window_props.height == 0);
+
     /* */
     memset(place, 0, sizeof(*place));
     if (cfg->display.width == 0 || cfg->display.height == 0)
@@ -733,10 +745,17 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     if (unlikely(osys == NULL))
         return NULL;
 
+    unsigned display_width, display_height;
+    vout_display_GetDefaultDisplaySize(&display_width, &display_height,
+                                       source, cfg);
+
     osys->cfg = *cfg;
-    vout_display_GetDefaultDisplaySize(&osys->cfg.display.width,
-                                       &osys->cfg.display.height,
-                                       source, &osys->cfg);
+    /* The window size was used for the initial setup. Now it can be dropped in
+     * favor of the calculated display size. */
+    osys->cfg.display.width = display_width;
+    osys->cfg.display.height = display_height;
+    osys->cfg.window_props.width = osys->cfg.window_props.height = 0;
+
 #ifdef _WIN32
     osys->reset_pictures = false;
 #endif
