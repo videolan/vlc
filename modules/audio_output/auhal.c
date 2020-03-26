@@ -33,6 +33,8 @@
 #include <CoreAudio/CoreAudio.h>             // AudioDeviceID
 #include <CoreServices/CoreServices.h>
 
+#include <IOKit/audio/IOAudioTypes.h>
+
 #pragma mark -
 #pragma mark local prototypes & module descriptor
 
@@ -431,13 +433,13 @@ AudioDeviceIsAHeadphone(audio_output_t *p_aout, AudioDeviceID i_dev_id)
     AudioObjectGetPropertyData(i_dev_id, &property, 0, NULL, &size, &data);
 
     /*
-     'hdpn' == headphone
-     'ispk' == internal speaker
+     'hdpn' == headphone (kIOAudioOutputPortSubTypeHeadphones)
+     'ispk' == internal speaker (kIOAudioOutputPortSubTypeInternalSpeaker)
      '61pd' == HDMI
      '    ' == Bluetooth accessory or AirPlay
     */
 
-    return data == 'hdpn';
+    return data == kIOAudioOutputPortSubTypeHeadphones;
 }
 
 /*
