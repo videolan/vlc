@@ -1,6 +1,6 @@
 # libdca
 
-DCA_VERSION := 0.0.6
+DCA_VERSION := 0.0.7
 DCA_URL := $(VIDEOLAN)/libdca/$(DCA_VERSION)/libdca-$(DCA_VERSION).tar.bz2
 
 ifdef HAVE_FPU
