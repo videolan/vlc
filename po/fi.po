@@ -1,5 +1,5 @@
 # Finnish translation
-# Copyright (C) 2019 VideoLAN
+# Copyright (C) 2020 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -19,7 +19,7 @@
 # Kasvain <kasvain@gmail.com>, 2014-2015
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.7\n"
+"Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
 "PO-Revision-Date: 2018-12-19 22:50+0100\n"

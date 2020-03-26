@@ -1,16 +1,15 @@
 # Norwegian Nynorsk translation
-# Copyright (C) 2019 VideoLAN
+# Copyright (C) 2020 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Bjørn I. <bjorn.svindseth@online.no>, 2015-2020
-# Copyright (C) Eirik U. Birkeland <eirbir@gmail.com>, 2009
-# Copyright (C) Jon Stødle <jonstodle@gmail.com>, 2009
 # Eirik U. Birkeland <eirbir@gmail.com>, 2009-2010
 # Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2017
+# Jon Stødle <jonstodle@gmail.com>, 2009
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.7\n"
+"Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
 "PO-Revision-Date: 2020-01-18 12:22+0100\n"
