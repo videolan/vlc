@@ -43,7 +43,6 @@ ifdef HAVE_WINSTORE
 endif
 endif
 	$(APPLY) $(SRC)/upnp/libpthread.patch
-	$(APPLY) $(SRC)/upnp/libupnp-ipv6.patch
 	$(APPLY) $(SRC)/upnp/miniserver.patch
 	$(APPLY) $(SRC)/upnp/missing_win32.patch
 	$(APPLY) $(SRC)/upnp/fix_infinite_loop.patch
