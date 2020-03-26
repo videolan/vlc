@@ -891,10 +891,7 @@ SwitchAudioDevice(audio_output_t *p_aout, const char *name)
 {
     aout_sys_t *p_sys = p_aout->sys;
 
-    if (name)
-        p_sys->i_new_selected_dev = atoi(name);
-    else
-        p_sys->i_new_selected_dev = 0;
+    p_sys->i_new_selected_dev = (name) ? atoi(name) : 0;
 
     p_sys->i_new_selected_dev = p_sys->i_new_selected_dev;
 
@@ -938,7 +935,7 @@ MuteSet(audio_output_t * p_aout, bool mute)
 {
     aout_sys_t *p_sys = p_aout->sys;
 
-    if(p_sys->b_digital)
+    if (p_sys->b_digital)
         return VLC_EGENERIC;
 
     p_sys->b_mute = mute;
@@ -953,7 +950,7 @@ MuteSet(audio_output_t * p_aout, bool mute)
                               kAudioUnitScope_Global, 0,
                               volume * volume * volume, 0);
 
-    return err == noErr ? VLC_SUCCESS : VLC_EGENERIC;
+    return (err == noErr) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 #pragma mark -
