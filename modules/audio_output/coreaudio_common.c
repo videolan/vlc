@@ -50,12 +50,26 @@ TicksToFrames(struct aout_sys_common *p_sys, vlc_tick_t i_ticks)
     return samples_from_vlc_tick(i_ticks, p_sys->i_rate);
 }
 
+/**
+ * Convert a relative audio host time to vlc_ticks
+ *
+ * \warning  This function may only be used to convert relative
+ *           host times to ticks, as vlc_ticks do not have the
+ *           same clock origin as the audio host clock!
+ */
 static inline vlc_tick_t
 HostTimeToTick(struct aout_sys_common *p_sys, int64_t i_host_time)
 {
     return VLC_TICK_FROM_NS(i_host_time * p_sys->tinfo.numer / p_sys->tinfo.denom);
 }
 
+/**
+ * Convert relative vlc_ticks to an audio host time
+ *
+ * \warning  This function may only be used to convert relative
+ *           vlc_ticks, as vlc_ticks do not have the same origin
+ *           as the audio host clock!
+ */
 static inline int64_t
 TickToHostTime(struct aout_sys_common *p_sys, vlc_tick_t i_ticks)
 {
