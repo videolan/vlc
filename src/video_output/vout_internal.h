@@ -170,6 +170,8 @@ struct vout_thread_sys_t
 
     /* Video output window */
     bool            window_enabled;
+    unsigned        window_width; /* protected by display_lock */
+    unsigned        window_height; /* protected by display_lock */
     vlc_mutex_t     window_lock;
     vlc_decoder_device *dec_device;
 

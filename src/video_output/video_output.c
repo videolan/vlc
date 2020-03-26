@@ -425,6 +425,10 @@ void vout_ChangeDisplaySize(vout_thread_t *vout,
 
     /* DO NOT call this outside the vout window callbacks */
     vlc_mutex_lock(&sys->display_lock);
+
+    sys->window_width = width;
+    sys->window_height = height;
+
     if (sys->display != NULL)
         vout_display_SetSize(sys->display, width, height);
     vlc_mutex_unlock(&sys->display_lock);
@@ -1605,6 +1609,10 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
     vlc_mutex_lock(&sys->display_lock);
     vlc_mutex_unlock(&sys->window_lock);
 
+    /* Setup the window size, protected by the display_lock */
+    dcfg.window_props.width = sys->window_width;
+    dcfg.window_props.height = sys->window_height;
+
     sys->display = vout_OpenWrapper(vout, sys->splitter_name, &dcfg, vctx);
     if (sys->display == NULL) {
         vlc_mutex_unlock(&sys->display_lock);
@@ -1938,6 +1946,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     vlc_mutex_init(&sys->display_lock);
 
     /* Window */
+    sys->window_width = sys->window_height = 0;
     sys->display_cfg.window = vout_display_window_New(vout);
     if (sys->display_cfg.window == NULL) {
         if (sys->spu)
