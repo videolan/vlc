@@ -1,6 +1,17 @@
---- libarchive/libarchive/archive_entry.c	2017-07-18 15:27:58.259298500 +0200
-+++ libarchive/libarchive/archive_entry.c.types	2017-07-18 15:21:43.800236200 +0200
-@@ -348,7 +348,7 @@ archive_entry_devminor(struct archive_en
+From 93a8b303904e40261ac58fbd95eb338d6b9cb1df Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 27 Mar 2020 16:26:07 +0100
+Subject: [PATCH 2/4] archive_entry: use the proper define for mode_t
+
+---
+ libarchive/archive_entry.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libarchive/archive_entry.c b/libarchive/archive_entry.c
+index 72c644e6..7afec1b1 100644
+--- a/libarchive/archive_entry.c
++++ b/libarchive/archive_entry.c
+@@ -353,7 +353,7 @@ archive_entry_devminor(struct archive_entry *entry)
  		return minor(entry->ae_stat.aest_dev);
  }
  
@@ -9,7 +20,7 @@
  archive_entry_filetype(struct archive_entry *entry)
  {
  	return (AE_IFMT & entry->acl.mode);
-@@ -520,7 +520,7 @@ archive_entry_ino64(struct archive_entry
+@@ -525,7 +525,7 @@ archive_entry_ino64(struct archive_entry *entry)
  	return (entry->ae_stat.aest_ino);
  }
  
@@ -18,7 +29,7 @@
  archive_entry_mode(struct archive_entry *entry)
  {
  	return (entry->acl.mode);
-@@ -593,7 +593,7 @@ _archive_entry_pathname_l(struct archive
+@@ -598,7 +598,7 @@ _archive_entry_pathname_l(struct archive_entry *entry,
  	return (archive_mstring_get_mbs_l(&entry->ae_pathname, p, len, sc));
  }
  
@@ -27,3 +38,6 @@
  archive_entry_perm(struct archive_entry *entry)
  {
  	return (~AE_IFMT & entry->acl.mode);
+-- 
+2.26.0.windows.1
+
