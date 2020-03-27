@@ -6,17 +6,18 @@
 # Arthit Suriyawongkul <arthit@gmail.com>, 2017,2020
 # Chaisiri Toomthong <chaisiri_tt@hotmail.com>, 2015
 # Chalermpon Dasri <d.chalermpon@gmail.com>, 2013
-# jerng <jernghan@gmail.com>, 2014
+# Juro Timothy Symon <urashimon@gmail.com>, 2020
 # Phattanon Duangdara <sfalpha@gmail.com>, 2017
 # Rockers <sumorock@hotmail.com>, 2017-2018
+# T. Chomphuming <jernghan@gmail.com> , 2011,2014
 # Theppitak Karoonboonyanan <theppitak@gmail.com>, 2013,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-05 21:04+0100\n"
-"Last-Translator: Arthit Suriyawongkul <arthit@gmail.com>, 2020\n"
+"PO-Revision-Date: 2020-03-28 00:50+0100\n"
+"Last-Translator: Juro Timothy Symon <urashimon@gmail.com>, 2020\n"
 "Language-Team: Thai (https://www.transifex.com/yaron/teams/16553/th/)\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
@@ -5211,7 +5212,7 @@ msgstr "แฟ้มที่ดาวนโหลดมา \"%s\" ชำรุ�
 msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
-msgstr ""
+msgstr "โปรแกรมรุ่นใหม่ได้รับการดาวน์โหลดเรียบร้อย ท่านต้องการปิดโปรแกรมเพื่อติดตั้งทันทีหรือไม่"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:200
 msgid "Install"
@@ -6001,16 +6002,16 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"กรุณาเปิดหน้าต่าง \"System Preferences\" -> \"Security & Privacy\" และอนุญาตให้ "
+"VLC เข้าถึงไมโครโฟนของท่าน"
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "ส่วนรับเสียง"
+msgstr ""
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "มอดูลเสียงออก"
+msgstr ""
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -17690,7 +17691,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:103
 msgid "Toggle Play/Pause"
-msgstr ""
+msgstr "กดเพื่อ เล่น/หยุด"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
 msgid "Toggle random order playback"
@@ -17737,7 +17738,7 @@ msgstr "การประสานร่องข้อมูลเสียง
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:53
 msgid "A positive value means that the audio is ahead of the video"
-msgstr ""
+msgstr "หากมีค่าเป็นจำนวนบวกหมายถึงสัญญาณเสียงนั้นนำหน้าสัญญาณภาพ"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:54
 #: modules/gui/qt/components/extended_panels.cpp:1424
@@ -17751,7 +17752,7 @@ msgstr "การประสานร่องข้อมูลบทบรร
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:57
 msgid "A positive value means that the subtitles are ahead of the video"
-msgstr ""
+msgstr "หากมีค่าเป็นจำนวนบวกหมายถึงบทบรรยายนั้นนำหน้าสัญญาณภาพ"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:58
 #: modules/gui/qt/components/extended_panels.cpp:1435
