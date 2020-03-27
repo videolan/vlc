@@ -6,7 +6,7 @@
 # Benny Beat <bennybeat@gmail.com>, 2016-2018
 # Eva Castillo <evac1295@gmail.com>, 2013
 # Jaume Ferrer <jaumeferrerg@msn.com>, 2016
-# Joan Montané <joan@montane.cat>, 2013-2015,2018-2019
+# Joan Montané <joan@montane.cat>, 2013-2015,2018-2020
 # Jordi Serratosa <jordis@softcatala.cat>, 2018
 # Lorena Gomes and Xènia Albà, April 2005
 # Pau Iranzo <paugnu@gmail.com>, 2013-2016
@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-09-17 05:15+0200\n"
-"Last-Translator: Joan Montané <joan@montane.cat>, 2019\n"
+"PO-Revision-Date: 2020-03-27 22:33+0100\n"
+"Last-Translator: Joan Montané <joan@montane.cat>, 2020\n"
 "Language-Team: Catalan (https://www.transifex.com/yaron/teams/16553/ca/)\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -191,7 +191,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:88
 msgid "Splitters"
-msgstr ""
+msgstr "Divisors"
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
@@ -669,7 +669,7 @@ msgstr "Espectre"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "Mesurador VU"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -848,11 +848,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr "(per defecte és habilitat)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr "(per defecte és inhabilitat)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -6323,14 +6323,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "Captura d'àudio"
+msgstr ""
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "Mòdul de sortida d'àudio"
+msgstr ""
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -7492,7 +7490,7 @@ msgstr ""
 
 #: modules/access/dvb/access.c:70
 msgid "Satellite scanning config"
-msgstr ""
+msgstr "Configuració de l'escaneig del satèl·lit"
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
@@ -9679,15 +9677,15 @@ msgstr ""
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
-msgstr ""
+msgstr "16 bytes"
 
 #: modules/access_output/srt.c:57
 msgid "24 bytes"
-msgstr ""
+msgstr "24 bytes"
 
 #: modules/access_output/srt.c:57
 msgid "32 bytes"
-msgstr ""
+msgstr "32 bytes"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
@@ -11551,7 +11549,7 @@ msgstr "àudio"
 
 #: modules/codec/avcodec/encoder.c:893
 msgid "subpicture"
-msgstr ""
+msgstr "subimatge"
 
 #: modules/codec/avcodec/encoder.c:906
 #, c-format
@@ -12184,7 +12182,7 @@ msgstr "Subtítols (avançat)"
 
 #: modules/codec/libass.c:61
 msgid "Subtitle renderers using libass"
-msgstr "Renderitzador de subtítols amb libass"
+msgstr "Renderitzadors de subtítols amb libass"
 
 #: modules/codec/libass.c:249
 #: modules/text_renderer/freetype/fonts/fontconfig.c:78
@@ -17747,11 +17745,11 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr ""
+msgstr "Renderitzador"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
-msgstr ""
+msgstr "No hi ha cap renderitzador"
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -21363,7 +21361,7 @@ msgstr "A&juda"
 
 #: modules/gui/qt/menus.cpp:357
 msgid "Open &File..."
-msgstr "Obre el &fitxer..."
+msgstr "Obre un &fitxer..."
 
 #: modules/gui/qt/menus.cpp:359
 msgid "&Open Multiple Files..."
@@ -21639,7 +21637,7 @@ msgstr "&Esborra"
 
 #: modules/gui/qt/menus.cpp:1629
 msgid "&Renderer"
-msgstr ""
+msgstr "&Renderitzador"
 
 #: modules/gui/qt/menus.cpp:1633
 msgid "<Local>"
@@ -21898,7 +21896,7 @@ msgstr "depuració"
 #: modules/gui/qt/util/searchlineedit.cpp:49
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr ""
+msgstr "Neteja"
 
 #: modules/gui/skins2/src/dialogs.cpp:212
 msgid "Open a skin file"
@@ -21910,11 +21908,11 @@ msgstr "Fitxers d'aparença |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr ""
+msgstr "Fitxers de les llistes de reproducció |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
-msgstr ""
+msgstr "|Tots els fitxers |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -21997,7 +21995,7 @@ msgstr "Seleccioneu una aparença"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
 msgid "Open skin..."
-msgstr ""
+msgstr "Obre una aparença..."
 
 #: modules/hw/d3d11/d3d11_filters.c:86 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -22142,7 +22140,7 @@ msgstr ""
 
 #: modules/hw/vaapi/filters.c:1185
 msgid "VAAPI filters"
-msgstr ""
+msgstr "Filtres VAAPI"
 
 #: modules/hw/vaapi/filters.c:1186
 msgid "Video Accelerated API filters"
@@ -22226,7 +22224,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:41
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: modules/keystore/keychain.m:41
 msgid "Any"
@@ -22339,15 +22337,15 @@ msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: modules/logger/file.c:203
 msgid "Info"
-msgstr ""
+msgstr "Informació"
 
 #: modules/logger/file.c:203
 msgid "Debug"
-msgstr ""
+msgstr "Depuració"
 
 #: modules/logger/file.c:205
 msgid "Log to file"
@@ -22409,7 +22407,7 @@ msgstr ""
 
 #: modules/logger/syslog.c:141
 msgid "Debug messages"
-msgstr ""
+msgstr "Missatges de depuració"
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
@@ -23545,7 +23543,7 @@ msgstr ""
 
 #: modules/mux/avi.c:56
 msgid "Encoder"
-msgstr ""
+msgstr "Codificador"
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
@@ -23974,9 +23972,8 @@ msgid "Zeroconf services"
 msgstr ""
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "Descobriment de serveis"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
