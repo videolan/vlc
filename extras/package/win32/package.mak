@@ -205,11 +205,13 @@ EXTRA_DIST += \
 	extras/package/win32/NSIS/languages/AfrikaansExtra.nsh \
 	extras/package/win32/NSIS/languages/AlbanianExtra.nsh \
 	extras/package/win32/NSIS/languages/ArabicExtra.nsh \
+	extras/package/win32/NSIS/languages/AsturianExtra.nsh \
 	extras/package/win32/NSIS/languages/BasqueExtra.nsh \
 	extras/package/win32/NSIS/languages/BosnianExtra.nsh \
 	extras/package/win32/NSIS/languages/BretonExtra.nsh \
 	extras/package/win32/NSIS/languages/BulgarianExtra.nsh \
 	extras/package/win32/NSIS/languages/CatalanExtra.nsh \
+	extras/package/win32/NSIS/languages/CorsicanExtra.nsh \
 	extras/package/win32/NSIS/languages/CroatianExtra.nsh \
 	extras/package/win32/NSIS/languages/CzechExtra.nsh \
 	extras/package/win32/NSIS/languages/DanishExtra.nsh \
@@ -227,10 +229,12 @@ EXTRA_DIST += \
 	extras/package/win32/NSIS/languages/IndonesianExtra.nsh \
 	extras/package/win32/NSIS/languages/ItalianExtra.nsh \
 	extras/package/win32/NSIS/languages/JapaneseExtra.nsh \
+	extras/package/win32/NSIS/languages/KhmerExtra.nsh \
 	extras/package/win32/NSIS/languages/KoreanExtra.nsh \
 	extras/package/win32/NSIS/languages/LatvianExtra.nsh \
 	extras/package/win32/NSIS/languages/LithuanianExtra.nsh \
 	extras/package/win32/NSIS/languages/MalayExtra.nsh \
+	extras/package/win32/NSIS/languages/MongolianExtra.nsh \
 	extras/package/win32/NSIS/languages/NorwegianExtra.nsh \
 	extras/package/win32/NSIS/languages/NorwegianNynorskExtra.nsh \
 	extras/package/win32/NSIS/languages/PolishExtra.nsh \
