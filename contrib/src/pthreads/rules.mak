@@ -37,5 +37,6 @@ endif
 		"$(PREFIX)/include/pthread.h"
 	mkdir -p -- "$(PREFIX)/lib"
 	cp -v $</*.a $</*.dll "$(PREFIX)/lib/"
+	cp -f "$(PREFIX)/lib/libpthreadGC2.a" "$(PREFIX)/lib/libpthread.a"
 	touch $@
 endif
