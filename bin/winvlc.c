@@ -218,6 +218,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         CheckCrashDump( &path[0] );
         eh = InstallCrashHandler( &path[0] );
     }
+#else
+    (void)crash_handling;
 #endif
 
     _setmode( _fileno( stdin ), _O_BINARY ); /* Needed for pipes */
