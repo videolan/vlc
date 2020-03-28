@@ -5,15 +5,15 @@
 # Translators:
 # Tomas <jawnuolis@gmail.com>, 2013
 # Karolis Runas <karolis.runas@yahoo.com>, 2014
-# Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2009-2019
+# Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2009-2020
 # Vaidotas Kalvelis <vaidotaskal@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-09-21 11:52+0200\n"
-"Last-Translator: Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-03-28 10:50+0100\n"
+"Last-Translator: Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2020\n"
 "Language-Team: Lithuanian (https://www.transifex.com/yaron/teams/16553/lt/)\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
@@ -1273,7 +1273,7 @@ msgstr "Subtitrai"
 #: src/input/input.c:1821 modules/control/hotkeys.c:1512
 #, c-format
 msgid "Volume %ld%%"
-msgstr ""
+msgstr "%ld%% garsumas"
 
 #: src/input/input.c:2725
 msgid "Your input can't be opened"
@@ -1429,7 +1429,7 @@ msgstr "Ankstesnis įrašas"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "Meniu pavadinimas"
 
 #: src/input/var.c:285
 msgid "Menu popup"
@@ -2912,7 +2912,7 @@ msgstr ""
 #: modules/gui/macosx/VLCSimplePrefsController.m:351
 #: modules/gui/qt/ui/sprefs_subtitles.h:287
 msgid "On Screen Display"
-msgstr "Ekrane Rodomi Pranešimai"
+msgstr "Ekrane rodomi pranešimai"
 
 #: src/libvlc-module.c:719
 msgid ""
@@ -2920,7 +2920,7 @@ msgid ""
 "Display)."
 msgstr ""
 "VLC gali rodyti pranešimus tiesiai ant rodomo vaizdo ekrane. Tai vadinama "
-"ERP (Ekrane Rodomais Pranešimais)"
+"ERP (ekrane rodomais pranešimais)"
 
 #: src/libvlc-module.c:722
 msgid "Text rendering module"
@@ -3682,7 +3682,7 @@ msgstr "Ieškant metaduomenų, leisti prieiti prie tinklo"
 
 #: src/libvlc-module.c:1131
 msgid "Collapse"
-msgstr ""
+msgstr "Suskleisti"
 
 #: src/libvlc-module.c:1131
 msgid "Expand"
@@ -3722,11 +3722,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1147
 msgid "Show hidden files"
-msgstr ""
+msgstr "Rodyti slepiamąsias rinkmenas"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
-msgstr ""
+msgstr "Nepaisyti rinkmenų, prasidedančių tašku"
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
@@ -3792,7 +3792,7 @@ msgstr "Pristabdyti kiekvieną grojaraščio įrašą ties paskutiniu kadru."
 
 #: src/libvlc-module.c:1180
 msgid "Start paused"
-msgstr ""
+msgstr "Paleidus pristabdyti"
 
 #: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
@@ -3851,19 +3851,19 @@ msgstr "Nepaisyti"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr ""
+msgstr "Garsumo valdymas"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr ""
+msgstr "Padėties valdymas"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
-msgstr ""
+msgstr "Atvirkščias padėties valdymas"
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
-msgstr ""
+msgstr "Valdymas pelės ratuku vertikalia ašimi"
 
 #: src/libvlc-module.c:1220
 msgid ""
@@ -3873,7 +3873,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1222
 msgid "Mouse wheel horizontal axis control"
-msgstr ""
+msgstr "Valdymas pelės ratuku horizontalia ašimi"
 
 #: src/libvlc-module.c:1224
 msgid ""
@@ -4511,7 +4511,7 @@ msgstr "Eiti per galimus subtitrų takelius."
 
 #: src/libvlc-module.c:1395
 msgid "Toggle subtitles"
-msgstr ""
+msgstr "Perjungti subtitrus"
 
 #: src/libvlc-module.c:1396
 msgid "Toggle subtitle track visibility."
@@ -4855,7 +4855,7 @@ msgstr "spausdinti informaciją apie versiją"
 
 #: src/libvlc-module.c:2819
 msgid "core program"
-msgstr ""
+msgstr "pagrindinė programa"
 
 #: src/misc/actions.c:52
 msgid "Backspace"
@@ -6057,14 +6057,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "Garso įrašymas"
+msgstr ""
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "Garso išvesties modulis"
+msgstr ""
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6671,7 +6669,7 @@ msgstr "Įrašymo įrenginys „%s“ nepalaiko reikalingų parametrų."
 
 #: modules/access/dsm/access.c:72 modules/access/dsm/sd.c:138
 msgid "Windows networks"
-msgstr ""
+msgstr "Windows tinklai"
 
 #: modules/access/dsm/access.c:74
 msgid "libdsm's SMB (Windows network shares) input and browser"
@@ -6977,7 +6975,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:196
 msgid "Continuous 22kHz tone"
-msgstr ""
+msgstr "Ištisinis 22kHz tonas"
 
 #: modules/access/dtv/access.c:198
 msgid ""
@@ -7324,7 +7322,7 @@ msgstr "Prisijungimui naudojama paskyra."
 
 #: modules/access/ftp.c:78
 msgid "FTP authentication"
-msgstr ""
+msgstr "FTP tapatumo nustatymas"
 
 #: modules/access/ftp.c:79
 #, c-format
@@ -7388,7 +7386,7 @@ msgstr ""
 
 #: modules/access/http/access.c:289
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7828,7 +7826,7 @@ msgstr "Skaitant failą įvyko klaida"
 #: modules/access/mtp.c:168
 #, c-format
 msgid "VLC could not read the file: %s"
-msgstr ""
+msgstr "VLC negali perskaityti rinkmenos: %s"
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
@@ -7842,7 +7840,7 @@ msgstr ""
 
 #: modules/access/nfs.c:57
 msgid "NFS"
-msgstr ""
+msgstr "NFS"
 
 #: modules/access/nfs.c:58
 msgid "NFS input"
@@ -9052,7 +9050,7 @@ msgstr ""
 
 #: modules/access_output/livehttp.c:77
 msgid "Allow cache"
-msgstr ""
+msgstr "Įgalinti podėlį"
 
 #: modules/access_output/livehttp.c:78
 msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
@@ -9172,7 +9170,7 @@ msgstr ""
 
 #: modules/access_output/shout.c:85
 msgid "URL description"
-msgstr ""
+msgstr "URL aprašas"
 
 #: modules/access_output/shout.c:86
 msgid "URL with information about the stream or your channel."
@@ -10341,7 +10339,7 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1460
 msgid "Disabled"
-msgstr ""
+msgstr "Išjungta"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
@@ -10349,7 +10347,7 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
-msgstr ""
+msgstr "Įgalinta"
 
 #: modules/audio_output/mmdevice.c:1473
 msgid "Windows Multimedia Device output"
@@ -17544,7 +17542,7 @@ msgstr "Vaizdo nuostatos"
 #: modules/gui/qt/components/simple_preferences.cpp:245
 #: modules/gui/qt/components/simple_preferences.cpp:860
 msgid "Subtitle & On Screen Display Settings"
-msgstr ""
+msgstr "Subtitrų ir ekrane rodomų pranešimų nuostatos"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:241
 msgid "Input & Codec Settings"
@@ -17591,7 +17589,7 @@ msgstr "Pasirinkite veiksmą, kurio spartųjį klavišą keisite:"
 #: modules/gui/macosx/VLCSimplePrefsController.m:290
 #: modules/gui/qt/components/preferences_widgets.cpp:1150
 msgid "Action"
-msgstr "Veikmas"
+msgstr "Veiksmas"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:291
 msgid "Shortcut"
@@ -22931,9 +22929,8 @@ msgid "Zeroconf services"
 msgstr ""
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "Paslaugų aptikimas"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
@@ -28242,7 +28239,7 @@ msgstr "Jei suskleista, pristabdyti grojimą"
 
 #: modules/gui/qt/ui/sprefs_interface.h:538
 msgid "Show media change popup:"
-msgstr ""
+msgstr "Rodyti iškylantį pranešimą keičiant kūrinį:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
 msgid "Start in minimal view mode"
@@ -28310,7 +28307,7 @@ msgstr "Derinti susiejimus..."
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:288
 msgid "Enable On Screen Display (OSD)"
-msgstr "Įgalinti Ekrane Rodomus Pranešimus (ERP)"
+msgstr "Įgalinti ekrane rodomus pranešimus (ERP)"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
 msgid "Show media title on video start"
