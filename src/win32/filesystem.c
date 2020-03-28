@@ -353,6 +353,30 @@ int vlc_accept (int lfd, struct sockaddr *addr, socklen_t *alen, bool nonblock)
     return fd;
 }
 
+ssize_t vlc_send(int fd, const void *buf, size_t len, int flags)
+{
+    WSABUF wsabuf = { .buf = (char *)buf, .len = len };
+    DWORD sent;
+
+    return WSASend(fd, &wsabuf, 1, &sent, flags,
+                   NULL, NULL) ? -1 : (ssize_t)sent;
+}
+
+ssize_t vlc_sendto(int fd, const void *buf, size_t len, int flags,
+                   const struct sockaddr *dst, socklen_t dstlen)
+{
+    WSABUF wsabuf = { .buf = (char *)buf, .len = len };
+    DWORD sent;
+
+    return WSASendTo(fd, &wsabuf, 1, &sent, flags, dst, dstlen,
+                     NULL, NULL) ? -1 : (ssize_t)sent;
+}
+
+ssize_t vlc_sendmsg(int fd, const struct msghdr *msg, int flags)
+{
+    return sendmsg(fd, msg, flags);
+}
+
 #if !VLC_WINSTORE_APP
 FILE *vlc_win32_tmpfile(void)
 {

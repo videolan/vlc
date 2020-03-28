@@ -113,6 +113,60 @@ struct sockaddr;
 VLC_API int vlc_accept(int lfd, struct sockaddr *addr, socklen_t *alen,
                        bool nonblock) VLC_USED;
 
+/**
+ * Sends data.
+ *
+ * Like @c send(), this function sends raw data to the peer of a
+ * connection-mode socket, or to the predefined peer of a connection-less
+ * socket.
+ * Unlike @c send(), this function never triggers a signal; if the peer hung
+ * up, it returns an error.
+ *
+ * @param fd socket to send data through
+ * @param buf start address of data
+ * @param buflen byte size of data
+ * @param flags socket send flags (see @c send() documentation)
+ * @return number of bytes actually sent, or -1 on error (@c errno is set)
+ */
+VLC_API ssize_t vlc_send(int fd, const void *buf, size_t buflen, int flags);
+
+/**
+ * Sends data to a peer.
+ *
+ * This function operates like @c sendto() with the exception that it never
+ * triggers a signal.
+ *
+ * This function mainly exists for the sakes of completeness and consistency:
+ * - To send data on a connection-mode socket, using \ref vlc_send() is
+ *   simpler.
+ * - To send data on a connection-less socket, @c sendto() and/or @c send() can
+ *   be used directly.
+ *
+ * @param fd socket to send data through
+ * @param buf start address of data
+ * @param buflen byte size of data
+ * @param flags socket send flags (see @c send() documentation)
+ * @param dst destination address (ignored for connection-mode sockets)
+ * @param dstlen byte size of destination address
+ * @return number of bytes actually sent, or -1 on error (@c errno is set)
+ */
+VLC_API ssize_t vlc_sendto(int fd, const void *buf, size_t buflen, int flags,
+                           const struct sockaddr *dst, socklen_t dstlen);
+
+/**
+ * Sends a socket message.
+ *
+ * Like @c sendmsg(), this function sends a message through a socket.
+ * Unlike @c sendmsg(), this function never triggers a signal; if the peer hung
+ * up, it returns an error.
+ *
+ * @param fd socket to send data through
+ * @param msg message to send (see @c sendmsg() documentation)
+ * @param flags socket send flags (see @c sendmsg() documentation)
+ * @return number of bytes actually sent, or -1 on error (@c errno is set)
+ */
+VLC_API ssize_t vlc_sendmsg(int fd, const struct msghdr *msg, int flags);
+
 # ifdef __cplusplus
 extern "C" {
 # endif
