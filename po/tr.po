@@ -4,15 +4,14 @@
 #
 # Translators:
 # Adem GUNES <xleopar@yahoo.com>, 2008
+# AYBERK HALAC <diskjockey@windowslive.com>, 2013
 # Can Berkol <can.berkol@biberltd.com>, 2013
 # Caner Başaran <basaran.caner@protonmail.com>, 2013
-# Servet CEBECİ <servet.cebeci@hotmail.com>, 2013
-# AYBERK HALAC <diskjockey@windowslive.com>, 2013
-# Kaya Zeren <kayazeren@gmail.com>, 2014-2019
+# Kaya Zeren <kayazeren@gmail.com>, 2014-2020
 # Mehmet Ertekin <byscul@gmail.com>, 2013
-# muaz742, 2013
 # Ozancan Karataş <ozancankaratas96@outlook.com>, 2015-2017
 # Özgür Turanlı, 2013
+# Servet CEBECİ <servet.cebeci@hotmail.com>, 2013
 # Ufuk UYUMAZ <ufukuyumaz@gmail.com>, 2013
 # Yaşar TAY <yasartay@yahoo.com>, 2009
 msgid ""
@@ -20,8 +19,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-12-13 10:51+0100\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-03-28 10:38+0100\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2020\n"
 "Language-Team: Turkish (https://www.transifex.com/yaron/teams/16553/tr/)\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -6237,23 +6236,23 @@ msgstr ""
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
 msgid "Problem accessing a system resource"
-msgstr ""
+msgstr "Bir sistem kaynağına erişilirken sorun çıktı"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"Lütfen \"Sistem Ayarları\" -> \"Güvenlik ve Gizlilik\" bölümüne giderek VLC "
+"uygulamasına mikrofona erişme izni verin."
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "AVFoundation Görüntü Yakalama"
+msgstr "AVFoundation Ses Yakalama"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "AVFoundation görüntü yakalama modülü."
+msgstr "AVFoundation ses yakalama modülü."
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6288,6 +6287,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"Lütfen \"Sistem Ayarları\" -> \"Güvenlik ve Gizlilik\" bölümüne giderek VLC "
+"uygulamasına kameraya erişme izni verin."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -7482,6 +7483,9 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"macOS büyük olasılıkla diskinize erişimi engeller. Lütfen \"Sistem Ayarları"
+"\" -> \"Güvenlik ve Gizlilik\" bölümüne giderek VLC uygulamasına \"Dosyalar "
+"ve Klasörler\" altından dış ortamlara erişme izni verin."
 
 #: modules/access/dvdread.c:77
 msgid "DVD without menus"
@@ -24021,9 +24025,8 @@ msgid "Zeroconf services"
 msgstr "Zeroconf hizmetleri"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "mDNS Görüntüleyici Keşfi"
+msgstr "Avahi Oluşturucu Arayıcı"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
