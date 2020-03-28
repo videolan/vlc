@@ -411,7 +411,7 @@ static void satip_teardown(void *data) {
                     return;
                 }
 
-                ret = send(sys->tcp_sock, msg + sent, len, MSG_NOSIGNAL);
+                ret = vlc_send(sys->tcp_sock, msg + sent, len, 0);
                 if (ret < 0) {
                     msg_Err(access, "Failed to send RTSP teardown: %d\n", ret);
                     free(msg);
