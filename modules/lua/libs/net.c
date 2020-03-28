@@ -271,7 +271,7 @@ static int vlclua_net_send( lua_State *L )
 
     i_len = (size_t)luaL_optinteger( L, 3, i_len );
     lua_pushinteger( L,
-        (fd != -1) ? send( fd, psz_buffer, i_len, MSG_NOSIGNAL ) : -1 );
+        (fd != -1) ? vlc_send( fd, psz_buffer, i_len, 0 ) : -1 );
     return 1;
 }
 
