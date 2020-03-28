@@ -163,7 +163,7 @@ static ssize_t Send(sout_access_out_t *access, block_t *block)
         }
 
         /* TODO: vectorized I/O with sendmsg() */
-        ssize_t val = send(fd, block->p_buffer, block->i_buffer, MSG_NOSIGNAL);
+        ssize_t val = vlc_send(fd, block->p_buffer, block->i_buffer, 0);
         if (val <= 0)
         {   /* FIXME: errno is meaningless if val is zero */
             if (errno == EINTR)
