@@ -251,9 +251,6 @@ out:
     cpu_flags = i_capabilities;
 }
 
-/**
- * Retrieves pre-computed CPU capability flags
- */
 VLC_WEAK unsigned vlc_CPU(void)
 {
     static vlc_once_t once = VLC_STATIC_ONCE;
