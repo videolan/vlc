@@ -55,8 +55,6 @@
 #include <machine/cpu.h>
 #endif
 
-static uint32_t cpu_flags;
-
 #if defined (__i386__) || defined (__x86_64__) || defined (__powerpc__) \
  || defined (__ppc__) || defined (__ppc64__) || defined (__powerpc64__)
 # if defined (HAVE_FORK)
@@ -113,10 +111,9 @@ static void Altivec_test (void)
 #endif
 
 /**
- * Determines the CPU capabilities and stores them in cpu_flags.
- * The result can be retrieved with vlc_CPU().
+ * Determines the CPU capabilities.
  */
-static void vlc_CPU_init(void)
+static unsigned vlc_CPU_raw(void)
 {
     uint32_t i_capabilities = 0;
 
@@ -247,8 +244,14 @@ out:
 #   endif
 
 #endif
+    return i_capabilities;
+}
 
-    cpu_flags = i_capabilities;
+static unsigned cpu_flags;
+
+static void vlc_CPU_init(void)
+{
+    cpu_flags = vlc_CPU_raw();
 }
 
 VLC_WEAK unsigned vlc_CPU(void)
