@@ -40,13 +40,11 @@
 #endif
 
 #ifdef CPU_FLAGS
-static uint32_t cpu_flags = 0;
-
-static void vlc_CPU_init (void)
+static unsigned vlc_CPU_raw(void)
 {
     FILE *info = fopen ("/proc/cpuinfo", "rte");
     if (info == NULL)
-        return;
+        return 0;
 
     char *line = NULL;
     size_t linelen = 0;
@@ -120,7 +118,14 @@ static void vlc_CPU_init (void)
     if (all_caps == 0xFFFFFFFF) /* Error parsing of cpuinfo? */
         all_caps = 0; /* Do not assume any capability! */
 
-    cpu_flags = all_caps;
+    return all_caps;
+}
+
+static unsigned cpu_flags = 0;
+
+static void vlc_CPU_init(void)
+{
+    cpu_flags = vlc_CPU_raw();
 }
 
 unsigned vlc_CPU (void)
