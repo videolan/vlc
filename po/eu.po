@@ -9,14 +9,15 @@
 # Ixiar Iza <i.iza@elhuyar.com>, 2015
 # julen <julenx@gmail.com>, 2012-2014,2018
 # LEIRE LÓPEZ GOIBURU <leirerentzat@gmail.com>, 2015
+# Osoitz <oelkoro@gmail.com>, 2020
 # Txopi <txopi@ikusimakusi.eus>, 2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-02-09 20:01+0100\n"
-"Last-Translator: Txopi <txopi@ikusimakusi.eus>, 2019\n"
+"PO-Revision-Date: 2020-03-29 18:23+0200\n"
+"Last-Translator: Osoitz <oelkoro@gmail.com>, 2020\n"
 "Language-Team: Basque (https://www.transifex.com/yaron/teams/16553/eu/)\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -234,7 +235,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
-msgstr "Demuxerrak"
+msgstr "Demultiplexadoreak"
 
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
@@ -1379,7 +1380,7 @@ msgstr "Pista-identifikatzailea"
 
 #: src/input/meta.c:73
 msgid "Number of Tracks"
-msgstr "Pista zenbakia"
+msgstr "Pista kopurua"
 
 #: src/input/meta.c:74
 msgid "Director"
@@ -6274,25 +6275,24 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "Arazoen xehetasunak eta sistemaren konfigurazioa"
+msgstr "Arazoa sistemaren baliabidea atzitzean"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"Mesedez, ireki \"Sistemaren hobespenak\" -> \"Segurtasuna eta Pribatutasuna"
+"\" eta baimendu VLC zure mikrofonoa erabiltzen."
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "AVFoundation bideo-kaptura"
+msgstr "AVFoundation audio-kaptura"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "AVFoundation bideo-kaptura modulua."
+msgstr "AVFoundation audio-kaptura modulua."
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6327,6 +6327,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"Mesedez, ireki \"Sistemaren hobespenak\" -> \"Segurtasuna eta Pribatutasuna"
+"\" eta baimendu VLC zure kamera erabiltzen."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -7543,6 +7545,9 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"macOS zure diskoa atzitzea blokeatzen egon daiteke. Mesedez, ireki "
+"\"Sistemaren hobespenak\" -> \"Segurtasuna eta Pribatutasuna\" eta baimendu "
+"VLC zure kanpoko euskarriak atzitzen \"Fitxategiak eta Karpetak\" atalean."
 
 #: modules/access/dvdread.c:77
 msgid "DVD without menus"
@@ -8888,7 +8893,7 @@ msgid ""
 "White balance temperature as a color temperation in Kelvin (2800 is minimum "
 "incandescence, 6500 is maximum daylight)."
 msgstr ""
-"Zuri oreka berotasuna, margo baten berotasuna Kelvinetan da (2800 "
+"Zuri oreka berotasuna, kolore baten berotasuna Kelvinetan da (2800 "
 "gutxienezko goritasuna da, 6500 gehienezko egun-argia da)."
 
 #: modules/access/v4l2/v4l2.c:102
@@ -11483,8 +11488,8 @@ msgid ""
 msgstr ""
 "Zehaztu AAC audio-profila kodeketan audioaren bit-jarioak erabiltzeko. "
 "Hurrengo aukerak ditu: nagusia, baxua, ssr (ez-onartua), ltp, hev1, hev2 "
-"(berezkoa:baxua). Une honetan hev1 eta hev2  libfdk-aac gaitutako libavcodec-"
-"arekin onartzen dira soilik."
+"(lehenetsia:baxua). Une honetan hev1 eta hev2  libfdk-aac gaitutako "
+"libavcodec-arekin onartzen dira soilik."
 
 #: modules/codec/avcodec/d3d11va.c:63
 msgid "Direct3D11 Video Acceleration"
@@ -11867,7 +11872,7 @@ msgid ""
 "Please install a sound font and configure it from the VLC preferences "
 "(Input / Codecs > Audio codecs > FluidSynth).\n"
 msgstr ""
-"Soinu iturri agiri bat (.SF2) beharrezkoa da MIDI sintesirako.\n"
+"Soinu iturri fitxategi bat (.SF2) beharrezkoa da MIDI sintesirako.\n"
 "Mesedez instalatu soinu iturri bat eta konfiguratu ezazu VLC-ren "
 "hobespenetatik (Sarrera / Kodekak > Audioa kodekak > FluidSyntg).\n"
 
@@ -12618,7 +12623,7 @@ msgstr "Kalitatea-faktorea etengabeko kalitate-moduan erabiltzeko"
 
 #: modules/codec/schroedinger.c:113
 msgid "Noise Threshold"
-msgstr "Zarataren muga"
+msgstr "Zarata-atalasea"
 
 #: modules/codec/schroedinger.c:114
 msgid "Noise threshold to use in constant noise threshold mode"
@@ -13443,7 +13448,7 @@ msgstr "TTML"
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
-msgstr "TTML deskodetzailea"
+msgstr "TTML demultiplexadorea"
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -14815,7 +14820,7 @@ msgstr "Gurutzelarkatuak bereiztea aktibatuta"
 
 #: modules/control/hotkeys.c:1319
 msgid "Subtitle position: no active subtitle"
-msgstr "Azpidatzien kokapena: ez dago azpititulurik aktibatuta"
+msgstr "Azpitituluen kokapena: ez dago azpititulurik aktibatuta"
 
 #: modules/control/hotkeys.c:1331
 #, c-format
@@ -15317,12 +15322,12 @@ msgstr "| sarrerako bit-emaria    :   %6.0f kb/s"
 #: modules/control/oldrc.c:1743 modules/gui/ncurses.c:814
 #, c-format
 msgid "| demux bytes read : %8.0f KiB"
-msgstr "| irakurritako demux byteak : %8.0f KiB"
+msgstr "| demultiplexadoreak irakurritako byteak : %8.0f KiB"
 
 #: modules/control/oldrc.c:1745 modules/gui/ncurses.c:816
 #, c-format
 msgid "| demux bitrate    :   %6.0f kb/s"
-msgstr "| demux bit-emaria    :   %6.0f kb/s"
+msgstr "| demultiplexadorearen bit-emaria    :   %6.0f KB/s"
 
 #: modules/control/oldrc.c:1747
 #, c-format
@@ -15470,7 +15475,7 @@ msgstr "Avformat"
 
 #: modules/demux/avformat/avformat.c:45
 msgid "Demuxer"
-msgstr "demultiplexadoreak"
+msgstr "Demultiplexadorea"
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
@@ -16179,7 +16184,7 @@ msgid ""
 "and subtitles."
 msgstr ""
 "Telebista digital estandarraren modua hautatzen du. Ezaugarri honek EPG "
-"informazioari eta azpidatziei eragiten die."
+"informazioari eta azpitituluei eragiten die."
 
 #: modules/demux/mpeg/ts.c:135
 msgid "MPEG Transport Stream demuxer"
@@ -16689,10 +16694,10 @@ msgstr ""
 "eta transmisorea da <a href=\"https://www.videolan.org/\"><span style=\" "
 "text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> "
 "komunitateko boluntarioek egina.</p><p>VLC-k bere barruko kodekak erabiltzen "
-"ditu, plataforma ezagun guztietan lan egiten du eta agiri gehienak irakur "
-"ditzake, CD-ak, DVD-ak, sare transmisio-jarraituak, kaptura-txartelak eta "
-"beste multimedia formatu batzuk!</p><p><a href=\"https://www.videolan.org/"
-"contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"ditu, plataforma ezagun guztietan lan egiten du eta fitxategi gehienak "
+"irakur ditzake, CD-ak, DVD-ak, sare transmisio-jarraituak, kaptura-txartelak "
+"eta beste multimedia formatu batzuk!</p><p><a href=\"https://www.videolan."
+"org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">Lagundu eta kide bihurtu!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
@@ -17572,7 +17577,7 @@ msgid ""
 msgstr ""
 "Itzali MacBook teklatuaren atzeko argia bideoa pantaila osoan "
 "erreproduzitzen ari den bitartean. Distiraren doitze automatikoa desgaitu "
-"egin behar da sistemaren ezarpenetan."
+"egin behar da sistemaren hobespenetan."
 
 #: modules/gui/macosx/macosx.m:116 modules/gui/macosx/VLCMainMenu.m:375
 msgid "Show Previous & Next Buttons"
@@ -18399,7 +18404,7 @@ msgstr "Ireki fitxategia"
 #: modules/gui/macosx/VLCOpenWindowController.m:764
 #, c-format
 msgid "%i tracks"
-msgstr "%i pistak"
+msgstr "%i pista"
 
 #: modules/gui/macosx/VLCOutput.m:61
 msgid "Streaming and Transcoding Options"
@@ -20802,9 +20807,9 @@ msgstr ""
 "zerrendako multimedia argibideak berreskuratzeko hirugarrenen Internet-"
 "oinarriko zerbitzuetatik. Honek karatulak, pista izenak, egileak eta beste "
 "metadatu batzuk ditu.</p>\n"
-"Ondorioz, honek zure multimedia agiri batzuk hirugarren erakundeei "
+"Ondorioz, honek zure multimedia fitxategi batzuk hirugarren erakundeei "
 "ezagutaraztea ekar dezake. Hortaz, <i>VLC</i> garatzaileek zure onespena "
-"behar dute multimedia erreproduzigailuak internetera automatikoki sarbidea "
+"behar dute multimedia erreproduzigailuak Internetera automatikoki sarbidea "
 "izan dezan.</p>\n"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:88
@@ -20847,9 +20852,9 @@ msgstr ""
 "eta transmisorea da  <a href=\"http://www.videolan.org/\"><span style=\" "
 "text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> "
 "komunitateko boluntarioek egina.</p><p>VLC-k bere barruko kodekak erabiltzen "
-"ditu, plataforma ezagun guztietan lan egiten du eta agiri gehienak irakur "
-"ditzake, CD-ak, DVD-ak, sare transmisio-jarraituak, kaptura-txartelak eta "
-"beste multimedia formatu batzuk!</p><p><a href=\"http://www.videolan.org/"
+"ditu, plataforma ezagun guztietan lan egiten du eta fitxategi gehienak "
+"irakur ditzake, CD-ak, DVD-ak, sare transmisio-jarraituak, kaptura-txartelak "
+"eta beste multimedia formatu batzuk!</p><p><a href=\"http://www.videolan.org/"
 "contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">Lagundu eta kide bihurtu!</span></a>"
 
@@ -23479,7 +23484,7 @@ msgid ""
 "\n"
 "If in doubt, abort now.\n"
 msgstr ""
-"Hau %s-ek aurkezturiko egiaztagiria da:\n"
+"Hau da %s-ek aurkezturiko ziurtagiria:\n"
 "%s\n"
 "\n"
 "Zalantzarik baduzu, utzi orain.\n"
@@ -23648,7 +23653,7 @@ msgid ""
 "If in doubt, abort now.\n"
 msgstr ""
 "%s-ra sartzen saiatu zara. Baina zerbitzariak aurkezturiko segurtasun "
-"egiaztagiria ezezaguna da eta ezin izan du  Egiaztapen Erakunde fidagarri "
+"ziurtagiria ezezaguna da eta ezin izan du  Egiaztapen Erakunde fidagarri "
 "batek egiaztatu. Arazo hau konfigurazio akats batek, edo zure segurtasuna "
 "edo pribatutasuna hausteko saiakera batek eraginda izan daiteke.\n"
 "\n"
@@ -24183,9 +24188,8 @@ msgid "Zeroconf services"
 msgstr "Zeroconf zerbitzuak"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "mDNS errendatzaileen aurkikuntza"
+msgstr "Avahi errendatzailearen aurkikuntza"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
@@ -24195,7 +24199,7 @@ msgstr "Bonjour sareen aurkikuntza"
 
 #: modules/services_discovery/bonjour.m:70
 msgid "Bonjour Renderer Discovery"
-msgstr "Bonjour errendatzaileen aurkikuntza"
+msgstr "Bonjour errendatzailearen aurkikuntza"
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
