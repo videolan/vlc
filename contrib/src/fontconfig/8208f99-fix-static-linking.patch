@@ -1,0 +1,130 @@
+From 8208f99fa1676c42bfd8d74de3e9dac5366c150c Mon Sep 17 00:00:00 2001
+From: Akira TAGOH <akira@tagoh.org>
+Date: Mon, 3 Sep 2018 04:56:16 +0000
+Subject: [PATCH] Fix the build issue with --enable-static
+
+Fixes https://gitlab.freedesktop.org/fontconfig/fontconfig/issues/109
+---
+ doc/fcstring.fncs       | 12 ++++++++++++
+ fontconfig/fontconfig.h |  4 ++++
+ src/fcint.h             |  4 ----
+ test/test-bz106632.c    | 35 ++++++++++++-----------------------
+ 4 files changed, 28 insertions(+), 27 deletions(-)
+
+diff --git a/doc/fcstring.fncs b/doc/fcstring.fncs
+index 0412bbd..d5ec043 100644
+--- a/doc/fcstring.fncs
++++ b/doc/fcstring.fncs
+@@ -223,6 +223,18 @@ This is just a wrapper around free(3) which helps track memory usage of
+ strings within the fontconfig library.
+ @@
+ 
++@RET@		FcChar8 *
++@FUNC@		FcStrBuildFilename
++@TYPE1@		const FcChar8 *			@ARG1@		path
++@TYPE2@		...
++@PURPOSE@	Concatenate strings as a file path
++@DESC@
++Creates a filename from the given elements of strings as file paths
++and concatenate them with the appropriate file separator.
++Arguments must be null-terminated.
++This returns a newly-allocated memory which should be freed when no longer needed.
++@@
++
+ @RET@		FcChar8 *
+ @FUNC@		FcStrDirname
+ @TYPE1@		const FcChar8 *			@ARG1@		file
+diff --git a/fontconfig/fontconfig.h b/fontconfig/fontconfig.h
+index bac1dda..af870d0 100644
+--- a/fontconfig/fontconfig.h
++++ b/fontconfig/fontconfig.h
+@@ -1076,6 +1076,10 @@ FcUtf16Len (const FcChar8   *string,
+ 	    int		    *nchar,
+ 	    int		    *wchar);
+ 
++FcPublic FcChar8 *
++FcStrBuildFilename (const FcChar8 *path,
++		    ...);
++
+ FcPublic FcChar8 *
+ FcStrDirname (const FcChar8 *file);
+ 
+diff --git a/src/fcint.h b/src/fcint.h
+index de78cd8..a9d075a 100644
+--- a/src/fcint.h
++++ b/src/fcint.h
+@@ -1282,10 +1282,6 @@ FcStrUsesHome (const FcChar8 *s);
+ FcPrivate FcBool
+ FcStrIsAbsoluteFilename (const FcChar8 *s);
+ 
+-FcPrivate FcChar8 *
+-FcStrBuildFilename (const FcChar8 *path,
+-		    ...);
+-
+ FcPrivate FcChar8 *
+ FcStrLastSlash (const FcChar8  *path);
+ 
+diff --git a/test/test-bz106632.c b/test/test-bz106632.c
+index daa0c1e..2d67c2e 100644
+--- a/test/test-bz106632.c
++++ b/test/test-bz106632.c
+@@ -25,25 +25,26 @@
+ #ifdef HAVE_CONFIG_H
+ #include "config.h"
+ #endif
++#include <stdio.h>
+ #include <stdlib.h>
++#include <string.h>
+ #include <dirent.h>
++#include <unistd.h>
++#include <errno.h>
+ #ifndef HAVE_STRUCT_DIRENT_D_TYPE
+ #include <sys/types.h>
+ #include <sys/stat.h>
+-#include <unistd.h>
+ #endif
+-#include "fcstr.c"
+-#undef FcConfigBuildFonts
+-#undef FcConfigCreate
+-#undef FcConfigGetCurrent
+-#undef FcConfigParseAndLoadFromMemory
+-#undef FcConfigUptoDate
+-#undef FcFontList
+-#undef FcInitReinitialize
+-#undef FcPatternCreate
+-#undef FcPatternDestroy
+ #include <fontconfig/fontconfig.h>
+ 
++#ifdef _WIN32
++#  define FC_DIR_SEPARATOR         '\\'
++#  define FC_DIR_SEPARATOR_S       "\\"
++#else
++#  define FC_DIR_SEPARATOR         '/'
++#  define FC_DIR_SEPARATOR_S       "/"
++#endif
++
+ #ifdef HAVE_MKDTEMP
+ #define fc_mkdtemp	mkdtemp
+ #else
+@@ -154,18 +155,6 @@ unlink_dirs (const char *dir)
+     return ret;
+ }
+ 
+-FcChar8 *
+-FcLangNormalize (const FcChar8 *lang)
+-{
+-    return NULL;
+-}
+-
+-FcChar8 *
+-FcConfigHome (void)
+-{
+-    return NULL;
+-}
+-
+ int
+ main (void)
+ {
+-- 
+2.24.1
+
