@@ -51,6 +51,9 @@ static inline void vlc_cloexec(int fd)
     fcntl(fd, F_SETFD, FD_CLOEXEC | fcntl(fd, F_GETFD));
 }
 #endif
+#if !defined(MSG_NOSIGNAL) && defined(SO_NOSIGPIPE)
+# define MSG_NOSIGNAL 0
+#endif
 
 int vlc_open (const char *filename, int flags, ...)
 {

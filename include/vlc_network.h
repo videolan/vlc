@@ -56,10 +56,6 @@
 #   define net_Close(fd) ((void)vlc_close(fd))
 #endif
 
-#ifndef MSG_NOSIGNAL
-# define MSG_NOSIGNAL 0
-#endif
-
 /**
  * Creates a socket file descriptor.
  *
