@@ -1,0 +1,31 @@
+From d36fe71173f213307de41711415f56861c71e62c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Mon, 30 Mar 2020 16:06:18 +0200
+Subject: [PATCH] CMakeLists: Enable big objects support for win64
+
+---
+ CMakeLists.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2cdfd4b3..6442d9b6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -499,6 +499,14 @@ if (UNIX OR MINGW)
+   endif()
+ endif ()
+ 
++if (MINGW)
++  if(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
++    CHECK_CXX_COMPILER_FLAG("-Wa,-mbig-obj" COMPILER_SUPPORTS_BIG_OBJ)
++    if (COMPILER_SUPPORTS_BIG_OBJ)
++      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
++    endif()
++  endif()
++endif()
+ 
+ ## Define harfbuzz-gobject library
+ if (HB_HAVE_GOBJECT)
+-- 
+2.20.1
+

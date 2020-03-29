@@ -1,28 +1,57 @@
---- harfbuzz/CMakeLists.txt.old	2018-05-27 12:03:25.000000000 +0200
-+++ harfbuzz/CMakeLists.txt	2018-05-27 12:02:45.000000000 +0200
-@@ -385,18 +385,21 @@ if (APPLE AND HB_HAVE_CORETEXT)
-   find_library(CORETEXT_FRAMEWORK CoreText)
-   if (CORETEXT_FRAMEWORK)
-     list(APPEND THIRD_PARTY_LIBS ${CORETEXT_FRAMEWORK})
+diff -urN harfbuzz.bak/CMakeLists.txt harfbuzz/CMakeLists.txt
+--- harfbuzz.bak/CMakeLists.txt	2020-04-01 22:11:59.430060242 +0300
++++ harfbuzz/CMakeLists.txt	2020-04-01 22:34:27.074188908 +0300
+@@ -303,32 +303,26 @@
+ 
+   list(APPEND project_headers ${PROJECT_SOURCE_DIR}/src/hb-coretext.h)
+ 
+-  if (HB_IOS)
+-    find_library(COREFOUNDATION CoreFoundation)
+-    if (COREFOUNDATION)
+-      list(APPEND THIRD_PARTY_LIBS ${COREFOUNDATION})
+-    endif ()
+-    mark_as_advanced(COREFOUNDATION)
+-
+-    find_library(CORETEXT CoreText)
+-    if (CORETEXT)
+-      list(APPEND THIRD_PARTY_LIBS ${CORETEXT})
+-    endif ()
+-    mark_as_advanced(CORETEXT)
++  find_library(COREFOUNDATION CoreFoundation)
++  if (COREFOUNDATION)
++    list(APPEND THIRD_PARTY_LIBS ${COREFOUNDATION})
 +    set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreText")
-   endif (CORETEXT_FRAMEWORK)
-   mark_as_advanced(CORETEXT_FRAMEWORK)
-   
-   find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
-   if (COREFOUNDATION_FRAMEWORK)
-     list(APPEND THIRD_PARTY_LIBS ${COREFOUNDATION_FRAMEWORK})
++  endif ()
++  mark_as_advanced(COREFOUNDATION)
+ 
+-    find_library(COREGRAPHICS CoreGraphics)
+-    if (COREGRAPHICS)
+-      list(APPEND THIRD_PARTY_LIBS ${COREGRAPHICS})
+-    endif ()
+-    mark_as_advanced(COREGRAPHICS)
+-  else ()
+-    find_library(APPLICATION_SERVICES_FRAMEWORK ApplicationServices)
+-    if (APPLICATION_SERVICES_FRAMEWORK)
+-      list(APPEND THIRD_PARTY_LIBS ${APPLICATION_SERVICES_FRAMEWORK})
+-    endif ()
++  find_library(CORETEXT CoreText)
++  if (CORETEXT)
++    list(APPEND THIRD_PARTY_LIBS ${CORETEXT})
 +    set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreFoundation")
-   endif (COREFOUNDATION_FRAMEWORK)
-   mark_as_advanced(COREFOUNDATION_FRAMEWORK)
-   
-   find_library(COREGRAPHICS_FRAMEWORK CoreGraphics)
-   if (COREGRAPHICS_FRAMEWORK)
-     list(APPEND THIRD_PARTY_LIBS ${COREGRAPHICS_FRAMEWORK})
++  endif ()
++  mark_as_advanced(CORETEXT)
+ 
+-    mark_as_advanced(APPLICATION_SERVICES_FRAMEWORK)
++  find_library(COREGRAPHICS CoreGraphics)
++  if (COREGRAPHICS)
++    list(APPEND THIRD_PARTY_LIBS ${COREGRAPHICS})
 +    set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreGraphics")
-   endif (COREGRAPHICS_FRAMEWORK)
-   mark_as_advanced(COREGRAPHICS_FRAMEWORK)
+   endif ()
++  mark_as_advanced(COREGRAPHICS)
  endif ()
-@@ -561,6 +564,18 @@ endif ()
+ 
+ if (WIN32 AND HB_HAVE_GDI)
+@@ -489,6 +483,18 @@
  add_library(harfbuzz ${project_sources} ${project_extra_sources} ${project_headers})
  target_link_libraries(harfbuzz ${THIRD_PARTY_LIBS})
  
@@ -39,10 +68,11 @@
 +        DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
 +
  ## Define harfbuzz-subset library
- add_library(harfbuzz-subset ${subset_project_sources} ${subset_project_headers})
- add_dependencies(harfbuzz-subset harfbuzz)
---- /dev/null	2018-05-27 12:22:37.000000000 +0200
-+++ harfbuzz/harfbuzz-cmake.pc.in	2018-05-27 12:24:00.000000000 +0200
+ if (HB_BUILD_SUBSET)
+   add_library(harfbuzz-subset ${subset_project_sources} ${subset_project_headers})
+diff -urN harfbuzz.bak/harfbuzz-cmake.pc.in harfbuzz/harfbuzz-cmake.pc.in
+--- harfbuzz.bak/harfbuzz-cmake.pc.in	1970-01-01 03:00:00.000000000 +0300
++++ harfbuzz/harfbuzz-cmake.pc.in	2020-04-01 22:12:10.638058586 +0300
 @@ -0,0 +1,12 @@
 +prefix=@CMAKE_INSTALL_PREFIX@
 +exec_prefix=${prefix}
