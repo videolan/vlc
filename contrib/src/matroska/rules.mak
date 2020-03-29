@@ -1,6 +1,6 @@
 # matroska
 
-MATROSKA_VERSION := 1.5.1
+MATROSKA_VERSION := 1.5.2
 MATROSKA_URL := http://dl.matroska.org/downloads/libmatroska/libmatroska-$(MATROSKA_VERSION).tar.xz
 
 PKGS += matroska
