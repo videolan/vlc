@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
+
 #include <vlc_common.h>
 #include <vlc_cpu.h>
 #include <vlc_memstream.h>
@@ -247,18 +249,17 @@ out:
     return i_capabilities;
 }
 
-static unsigned cpu_flags;
-
-static void vlc_CPU_init(void)
-{
-    cpu_flags = vlc_CPU_raw();
-}
-
 unsigned vlc_CPU(void)
 {
-    static vlc_once_t once = VLC_STATIC_ONCE;
-    vlc_once(&once, vlc_CPU_init);
-    return cpu_flags;
+    static atomic_uint cpu_flags = ATOMIC_VAR_INIT(-1);
+    unsigned flags = atomic_load_explicit(&cpu_flags, memory_order_relaxed);
+
+    if (unlikely(flags == -1U)) {
+        flags = vlc_CPU_raw();
+        atomic_store_explicit(&cpu_flags, flags, memory_order_relaxed);
+    }
+
+    return flags;
 }
 
 void vlc_CPU_dump (vlc_object_t *obj)
