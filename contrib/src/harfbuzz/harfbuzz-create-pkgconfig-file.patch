@@ -1,28 +1,28 @@
---- harfbuzz/CMakeLists.txt.old	2018-05-27 12:03:25.000000000 +0200
-+++ harfbuzz/CMakeLists.txt	2018-05-27 12:02:45.000000000 +0200
-@@ -385,18 +385,21 @@ if (APPLE AND HB_HAVE_CORETEXT)
-   find_library(CORETEXT_FRAMEWORK CoreText)
-   if (CORETEXT_FRAMEWORK)
-     list(APPEND THIRD_PARTY_LIBS ${CORETEXT_FRAMEWORK})
-+    set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreText")
-   endif (CORETEXT_FRAMEWORK)
-   mark_as_advanced(CORETEXT_FRAMEWORK)
-   
-   find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
-   if (COREFOUNDATION_FRAMEWORK)
-     list(APPEND THIRD_PARTY_LIBS ${COREFOUNDATION_FRAMEWORK})
-+    set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreFoundation")
-   endif (COREFOUNDATION_FRAMEWORK)
-   mark_as_advanced(COREFOUNDATION_FRAMEWORK)
-   
-   find_library(COREGRAPHICS_FRAMEWORK CoreGraphics)
-   if (COREGRAPHICS_FRAMEWORK)
-     list(APPEND THIRD_PARTY_LIBS ${COREGRAPHICS_FRAMEWORK})
-+    set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreGraphics")
-   endif (COREGRAPHICS_FRAMEWORK)
-   mark_as_advanced(COREGRAPHICS_FRAMEWORK)
- endif ()
-@@ -561,6 +564,18 @@ endif ()
+--- harfbuzz-2.0.0/CMakeLists.txt.orig	2020-03-29 16:57:36.480432086 +0200
++++ harfbuzz-2.0.0/CMakeLists.txt	2020-03-29 16:59:29.568430730 +0200
+@@ -396,18 +396,21 @@
+     find_library(COREFOUNDATION CoreFoundation)
+     if (COREFOUNDATION)
+       list(APPEND THIRD_PARTY_LIBS ${COREFOUNDATION})
++      set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreText")
+     endif ()
+     mark_as_advanced(COREFOUNDATION)
+ 
+     find_library(CORETEXT CoreText)
+     if (CORETEXT)
+       list(APPEND THIRD_PARTY_LIBS ${CORETEXT})
++      set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreFoundation")
+     endif ()
+     mark_as_advanced(CORETEXT)
+ 
+     find_library(COREGRAPHICS CoreGraphics)
+     if (COREGRAPHICS)
+       list(APPEND THIRD_PARTY_LIBS ${COREGRAPHICS})
++      set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreGraphics")
+     endif ()
+     mark_as_advanced(COREGRAPHICS)
+   else ()
+@@ -579,6 +582,18 @@
  add_library(harfbuzz ${project_sources} ${project_extra_sources} ${project_headers})
  target_link_libraries(harfbuzz ${THIRD_PARTY_LIBS})
  
@@ -34,25 +34,10 @@
 +endforeach()
 +
 +set(PRIVATE_LIBS "${PRIVATE_LIBS} ${FRAMEWORK_FLAGS}")
-+configure_file("harfbuzz-cmake.pc.in" "harfbuzz.pc" @ONLY)
-+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/harfbuzz.pc"
++configure_file("src/harfbuzz.pc.in" "src/harfbuzz.pc" @ONLY)
++install(FILES "${CMAKE_CURRENT_BINARY_DIR}/src/harfbuzz.pc"
 +        DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
 +
  ## Define harfbuzz-subset library
- add_library(harfbuzz-subset ${subset_project_sources} ${subset_project_headers})
- add_dependencies(harfbuzz-subset harfbuzz)
---- /dev/null	2018-05-27 12:22:37.000000000 +0200
-+++ harfbuzz/harfbuzz-cmake.pc.in	2018-05-27 12:24:00.000000000 +0200
-@@ -0,0 +1,12 @@
-+prefix=@CMAKE_INSTALL_PREFIX@
-+exec_prefix=${prefix}
-+libdir=${prefix}/lib
-+includedir=${prefix}/include
-+
-+Name: harfbuzz
-+Description: HarfBuzz text shaping library
-+Version: @HB_VERSION@
-+
-+Libs: -L${libdir} -lharfbuzz -lm @PRIVATE_LIBS@
-+Requires.private:
-+Cflags: -I${includedir}/harfbuzz
+ if (NOT HB_DISABLE_SUBSET)
+   add_library(harfbuzz-subset ${subset_project_sources} ${subset_project_headers})

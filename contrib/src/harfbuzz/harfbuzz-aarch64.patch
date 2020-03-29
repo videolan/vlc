@@ -1,6 +1,6 @@
---- harfbuzz-1.0.6/src/hb-atomic-private.hh.orig	2015-09-29 15:48:46.947083938 +0200
-+++ harfbuzz-1.0.6/src/hb-atomic-private.hh	2015-10-26 00:06:08.564306388 +0100
-@@ -73,10 +73,8 @@
+--- harfbuzz-2.0.0/src/hb-atomic.hh.orig	2018-10-01 19:49:23.000000000 +0200
++++ harfbuzz-2.0.0/src/hb-atomic.hh	2020-03-29 16:44:27.520441550 +0200
+@@ -163,10 +163,8 @@
  #elif !defined(HB_NO_MT) && defined(__APPLE__)
  
  #include <libkern/OSAtomic.h>
@@ -11,15 +11,15 @@
 -#include <Availability.h>
  #endif
  
+ #define _hb_memory_barrier()			OSMemoryBarrier ()
+@@ -174,7 +172,11 @@
+ #define hb_atomic_int_impl_add(AI, V)		(OSAtomicAdd32Barrier ((V), (AI)) - (V))
  
-@@ -86,7 +84,11 @@
- 
- #define hb_atomic_ptr_impl_get(P)		(OSMemoryBarrier (), (void *) *(P))
  #if (MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_4 || __IPHONE_VERSION_MIN_REQUIRED >= 20100)
 +#if __aarch64__
 +#define hb_atomic_ptr_impl_cmpexch(P,O,N)	OSAtomicCompareAndSwap64Barrier ((int64_t) (O), (int64_t) (N), (int64_t*) (P))
 +#else
- #define hb_atomic_ptr_impl_cmpexch(P,O,N)	OSAtomicCompareAndSwapPtrBarrier ((void *) (O), (void *) (N), (void **) (P))
+ #define hb_atomic_ptr_impl_cmpexch(P,O,N)	OSAtomicCompareAndSwapPtrBarrier ((O), (N), (P))
 +#endif
  #else
  #if __ppc64__ || __x86_64__ || __aarch64__
