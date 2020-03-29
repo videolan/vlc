@@ -1,0 +1,41 @@
+From 84d7caf52322a33deed868655d19ed2b41c226a9 Mon Sep 17 00:00:00 2001
+From: Jean-Baptiste Kempf <jb@videolan.org>
+Date: Sun, 29 Mar 2020 18:57:39 +0200
+Subject: [PATCH] meson: allow to disable building tests and binaries
+
+---
+ meson.build       | 8 ++++++--
+ meson_options.txt | 4 ++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 75e796e..03e9388 100644
+--- a/meson.build
++++ b/meson.build
+@@ -84,8 +84,12 @@ incs = include_directories('.', 'lib', 'gen.tab')
+ 
+ subdir('gen.tab')
+ subdir('lib')
+-subdir('bin')
+-subdir('test')
++if get_option('bin')
++  subdir('bin')
++endif
++if get_option('tests')
++   subdir('test')
++endif
+ if get_option('docs')
+   subdir('doc')
+ endif
+diff --git a/meson_options.txt b/meson_options.txt
+index c312fe8..11cae8d 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -2,3 +2,7 @@ option('deprecated', type : 'boolean', value : true,
+   description: 'Build deprecated functionality')
+ option('docs', type : 'boolean', value : true,
+   description: 'Build documentation')
++option('bin', type : 'boolean', value : true,
++  description: 'Build binaries')
++option('tests', type : 'boolean', value : true,
++  description: 'Build tests')
