@@ -1,6 +1,6 @@
 # fontconfig
 
-FONTCONFIG_VERSION := 2.12.3
+FONTCONFIG_VERSION := 2.13.1
 FONTCONFIG_URL := https://www.freedesktop.org/software/fontconfig/release/fontconfig-$(FONTCONFIG_VERSION).tar.gz
 
 ifndef HAVE_WIN32
@@ -21,7 +21,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/fontconfig/fontconfig-win32.patch
 	$(APPLY) $(SRC)/fontconfig/fontconfig-noxml2.patch
 endif
-	$(RM) $(UNPACK_DIR)/src/fcobjshash.gperf
+	$(APPLY) $(SRC)/fontconfig/8208f99-fix-static-linking.patch
 	$(call pkg_static, "fontconfig.pc.in")
 	$(MOVE)
 
