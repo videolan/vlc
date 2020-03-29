@@ -1,6 +1,6 @@
 # ebml
 
-EBML_VERSION := 1.3.8
+EBML_VERSION := 1.3.10
 EBML_URL := http://dl.matroska.org/downloads/libebml/libebml-$(EBML_VERSION).tar.xz
 
 ifeq ($(call need_pkg,"libebml >= 1.3.8"),)
