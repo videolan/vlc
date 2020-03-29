@@ -200,7 +200,7 @@ static ssize_t vlc_tls_SocketWrite(vlc_tls_t *tls, const struct iovec *iov,
         .msg_iovlen = count,
     };
 
-    return sendmsg(sock->fd, &msg, MSG_NOSIGNAL);
+    return vlc_sendmsg(sock->fd, &msg, 0);
 }
 
 static int vlc_tls_SocketShutdown(vlc_tls_t *tls, bool duplex)
@@ -371,7 +371,7 @@ static ssize_t vlc_tls_ConnectWrite(vlc_tls_t *tls,
     };
     ssize_t ret;
 
-    ret = sendmsg(sock->fd, &msg, MSG_NOSIGNAL|MSG_FASTOPEN);
+    ret = vlc_sendmsg(sock->fd, &msg, MSG_FASTOPEN);
     if (ret >= 0)
     {   /* Fast open in progress */
         return ret;
