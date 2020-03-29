@@ -421,7 +421,7 @@ ssize_t (net_Write)(vlc_object_t *obj, int fd, const void *buf, size_t len)
             return -1;
         }
 
-        ssize_t val = vlc_send_i11e (fd, buf, len, MSG_NOSIGNAL);
+        ssize_t val = vlc_send_i11e(fd, buf, len, 0);
         if (val == -1)
         {
             if (errno == EINTR || errno == EAGAIN)

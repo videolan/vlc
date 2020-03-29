@@ -505,8 +505,8 @@ ssize_t vlc_sendmsg_i11e(int fd, const struct msghdr *msg, int flags)
 
     if (vlc_poll_i11e(&ufd, 1, -1) < 0)
         return -1;
-    /* NOTE: MSG_EOR, MSG_OOB and MSG_NOSIGNAL should all work fine here. */
-    return sendmsg(fd, msg, flags);
+    /* NOTE: MSG_EOR and MSG_OOB should all work fine here. */
+    return vlc_sendmsg(fd, msg, flags);
 }
 
 ssize_t vlc_sendto_i11e(int fd, const void *buf, size_t len, int flags,
