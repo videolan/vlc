@@ -113,7 +113,7 @@ static void Altivec_test (void)
 /**
  * Determines the CPU capabilities.
  */
-static unsigned vlc_CPU_raw(void)
+VLC_WEAK unsigned vlc_CPU_raw(void)
 {
     uint32_t i_capabilities = 0;
 
@@ -254,7 +254,7 @@ static void vlc_CPU_init(void)
     cpu_flags = vlc_CPU_raw();
 }
 
-VLC_WEAK unsigned vlc_CPU(void)
+unsigned vlc_CPU(void)
 {
     static vlc_once_t once = VLC_STATIC_ONCE;
     vlc_once(&once, vlc_CPU_init);

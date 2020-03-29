@@ -40,7 +40,7 @@
 #endif
 
 #ifdef CPU_FLAGS
-static unsigned vlc_CPU_raw(void)
+unsigned vlc_CPU_raw(void)
 {
     FILE *info = fopen ("/proc/cpuinfo", "rte");
     if (info == NULL)
@@ -119,25 +119,5 @@ static unsigned vlc_CPU_raw(void)
         all_caps = 0; /* Do not assume any capability! */
 
     return all_caps;
-}
-
-static unsigned cpu_flags = 0;
-
-static void vlc_CPU_init(void)
-{
-    cpu_flags = vlc_CPU_raw();
-}
-
-unsigned vlc_CPU (void)
-{
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-
-    pthread_once (&once, vlc_CPU_init);
-    return cpu_flags;
-}
-#else /* CPU_FLAGS */
-unsigned vlc_CPU (void)
-{
-    return 0;
 }
 #endif

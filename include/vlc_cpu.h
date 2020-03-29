@@ -31,6 +31,14 @@
  */
 VLC_API unsigned vlc_CPU(void);
 
+/**
+ * Computes CPU capability flags.
+ *
+ * Do not call this function directly.
+ * Call vlc_CPU() instead, which caches the correct value.
+ */
+unsigned vlc_CPU_raw(void);
+
 # if defined (__i386__) || defined (__x86_64__)
 #  define HAVE_FPU 1
 #  define VLC_CPU_MMX    0x00000008
