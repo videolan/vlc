@@ -121,43 +121,42 @@ static void vlc_CPU_init(void)
     uint32_t i_capabilities = 0;
 
 #if defined( __i386__ ) || defined( __x86_64__ )
-     unsigned int i_eax, i_ebx, i_ecx, i_edx;
-     bool b_amd;
+    unsigned int i_eax, i_ebx, i_ecx, i_edx;
+    bool b_amd;
 
     /* Needed for x86 CPU capabilities detection */
 # if defined (__i386__) && defined (__PIC__)
 #  define cpuid(reg) \
-     asm volatile ("xchgl %%ebx,%1\n\t" \
-                   "cpuid\n\t" \
-                   "xchgl %%ebx,%1\n\t" \
-                   : "=a" (i_eax), "=r" (i_ebx), "=c" (i_ecx), "=d" (i_edx) \
-                   : "a" (reg) \
-                   : "cc");
+    asm volatile ("xchgl %%ebx,%1\n\t" \
+                  "cpuid\n\t" \
+                  "xchgl %%ebx,%1\n\t" \
+                  : "=a" (i_eax), "=r" (i_ebx), "=c" (i_ecx), "=d" (i_edx) \
+                  : "a" (reg) \
+                  : "cc");
 # else
 #  define cpuid(reg) \
-     asm volatile ("cpuid\n\t" \
-                   : "=a" (i_eax), "=b" (i_ebx), "=c" (i_ecx), "=d" (i_edx) \
-                   : "a" (reg) \
-                   : "cc");
+    asm volatile ("cpuid\n\t" \
+                  : "=a" (i_eax), "=b" (i_ebx), "=c" (i_ecx), "=d" (i_edx) \
+                  : "a" (reg) \
+                  : "cc");
 # endif
      /* Check if the OS really supports the requested instructions */
 # if defined (__i386__) && !defined (__i486__) && !defined (__i586__) \
   && !defined (__i686__) && !defined (__pentium4__) \
   && !defined (__k6__) && !defined (__athlon__) && !defined (__k8__)
     /* check if cpuid instruction is supported */
-    asm volatile ( "push %%ebx\n\t"
-                   "pushf\n\t"
-                   "pop %%eax\n\t"
-                   "movl %%eax, %%ebx\n\t"
-                   "xorl $0x200000, %%eax\n\t"
-                   "push %%eax\n\t"
-                   "popf\n\t"
-                   "pushf\n\t"
-                   "pop %%eax\n\t"
-                   "movl %%ebx,%1\n\t"
-                   "pop %%ebx\n\t"
-                 : "=a" ( i_eax ),
-                   "=r" ( i_ebx )
+   asm volatile ("push %%ebx\n\t"
+                 "pushf\n\t"
+                 "pop %%eax\n\t"
+                 "movl %%eax, %%ebx\n\t"
+                 "xorl $0x200000, %%eax\n\t"
+                 "push %%eax\n\t"
+                 "popf\n\t"
+                 "pushf\n\t"
+                 "pop %%eax\n\t"
+                 "movl %%ebx,%1\n\t"
+                 "pop %%ebx\n\t"
+                 : "=a" (i_eax), "=r" (i_ebx)
                  :
                  : "cc" );
 
