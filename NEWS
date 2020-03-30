@@ -4,21 +4,50 @@ Changes between 3.0.8 and 3.0.9:
 Core:
  * Work around busy looping when playing an invalid item through VLM 
 
+Access:
+ * Multiple dvdread and dvdnav crashs fixes
+ * Fixed DVD glitches on clip change
+ * Fixed dvdread commands/data sequence inversion in some cases causing
+   unwanted glitches
+ * Better handling of authored as corrupted DVD
+
 Demux:
  * Fix TTML entities not passed to decoder
+ * Fixed some WebVTT styling tags being not applied
  * Misc raw H264/HEVC frame rate fixes
  * Fix adaptive regression on TS format change (mostly HLS)
+ * Fixed MP4 regression with twos/sowt PCM audio
+ * Fixed some MP4 raw quicktime and ms-PCM audio
+ * Fixed MP4 interlacing handling
+ * Multiple adaptive stack (DASH/HLS/Smooth) fixes
+ * Enabled Live seeking for HLS
+ * Fixed seeking in some cases for HLS
+ * Improved Live playback for Smooth and DASH
+ * Fixed adaptive unwanted end of stream in some cases
+ * Faster adaptive start and new buffering control options
 
 Packetizers:
  * Fixes H264/HEVC incomplete draining in some cases
  * packetizer_helper: Fix potential trailing junk on last packet
+ * Added missing drain in packetizers that was causing missing
+   last frame or audio
  * Improved check to prevent fLAC synchronization drops
 
 Decoder:
  * avcodec: revector video decoder to fix incomplete drain
+ * spudec: implemented palette updates, fixing missing subtitles
+   on some DVD
+ * Fixed WebVTT CSS styling not being applied on Windows/macOS
+ * Fixed Hebrew teletext pages support in zvbi
+ * Fixed Dav1d aborting decoding on corrupted picture
+ * Extract and display of all CEA708 subtitles
 
 Text renderer:
  * Fix crashes on macOS with SSA/ASS subtitles containing emoji
+ * Fixed unwanted growing background in Freetype rendering and Y padding
+
+Mux:
+ * Fixed some YUV mappings
 
 macOS:
  * Remove qtsound module and add avaudiocapture module as replacement
