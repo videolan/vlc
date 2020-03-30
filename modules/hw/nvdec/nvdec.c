@@ -115,10 +115,6 @@ typedef struct nvdec_ctx {
 #define CALL_CUVID(func, ...)    CudaCheckErr(VLC_OBJECT(p_dec),  p_sys->devsys->cudaFunctions, p_sys->cuvidFunctions->func(__VA_ARGS__), #func)
 #define CALL_CUDA_POOL(func, ...) pool->nvdec_dev->cudaFunctions->func(__VA_ARGS__)
 
-
-static void NVDecCtxDestroy(struct picture_context_t *picctx);
-static struct picture_context_t *NVDecCtxClone(struct picture_context_t *srcctx);
-
 static void nvdec_pool_Destroy(nvdec_pool_t *pool)
 {
     for (size_t i=0; i < ARRAY_SIZE(pool->outputDevicePtr); i++)
@@ -195,6 +191,24 @@ error:
     return NULL;
 }
 
+static void nvdec_picture_CtxDestroy(struct picture_context_t *picctx)
+{
+    pic_context_nvdec_t *srcpic = NVDEC_PICCONTEXT_FROM_PICCTX(picctx);
+    free(srcpic);
+}
+
+static struct picture_context_t *nvdec_picture_CtxClone(struct picture_context_t *srcctx)
+{
+    pic_context_nvdec_t *clonectx = malloc(sizeof(*clonectx));
+    if (unlikely(clonectx == NULL))
+        return NULL;
+    pic_context_nvdec_t *srcpic = NVDEC_PICCONTEXT_FROM_PICCTX(srcctx);
+
+    *clonectx = *srcpic;
+    vlc_video_context_Hold(clonectx->ctx.vctx);
+    return &clonectx->ctx;
+}
+
 static picture_t* nvdec_pool_Wait(nvdec_pool_t *pool)
 {
     picture_t *pic = picture_pool_Wait(pool->picture_pool);
@@ -206,8 +220,8 @@ static picture_t* nvdec_pool_Wait(nvdec_pool_t *pool)
         goto error;
 
     picctx->ctx = (picture_context_t) {
-        NVDecCtxDestroy,
-        NVDecCtxClone,
+        nvdec_picture_CtxDestroy,
+        nvdec_picture_CtxClone,
         pool->vctx,
     };
     vlc_video_context_Hold(picctx->ctx.vctx);
@@ -403,25 +417,6 @@ static int CUDAAPI HandlePictureDecode(void *p_opaque, CUVIDPICPARAMS *p_picpara
 
     return (ret == VLC_SUCCESS);
 }
-
-static void NVDecCtxDestroy(struct picture_context_t *picctx)
-{
-    pic_context_nvdec_t *srcpic = NVDEC_PICCONTEXT_FROM_PICCTX(picctx);
-    free(srcpic);
-}
-
-static struct picture_context_t *NVDecCtxClone(struct picture_context_t *srcctx)
-{
-    pic_context_nvdec_t *clonectx = malloc(sizeof(*clonectx));
-    if (unlikely(clonectx == NULL))
-        return NULL;
-    pic_context_nvdec_t *srcpic = NVDEC_PICCONTEXT_FROM_PICCTX(srcctx);
-
-    *clonectx = *srcpic;
-    vlc_video_context_Hold(clonectx->ctx.vctx);
-    return &clonectx->ctx;
-}
-
 
 static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_dispinfo)
 {
