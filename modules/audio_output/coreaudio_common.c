@@ -243,9 +243,10 @@ ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
         return -1;
     }
 
-    const vlc_tick_t i_render_time_us =
-        HostTimeToTick(p_sys, p_sys->i_render_host_time);
-    const vlc_tick_t i_render_delay = i_render_time_us - vlc_tick_now();
+    uint64_t i_render_delay_host_time = p_sys->i_render_host_time
+                                      - mach_absolute_time();
+    const vlc_tick_t i_render_delay =
+        HostTimeToTick(p_sys, i_render_delay_host_time);
 
     *delay = ca_GetLatencyLocked(p_aout) + i_render_delay;
     lock_unlock(p_sys);
@@ -307,9 +308,14 @@ ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
          * first (non-silence/zero) frame is rendered by the render callback.
          * Once the rendering is truly started, the date can be ignored. */
 
-        const vlc_tick_t first_render_time = date - ca_GetLatencyLocked(p_aout);
-        p_sys->i_first_render_host_time =
-            TickToHostTime(p_sys, first_render_time);
+        /* We can't convert date to host time directly since the clock source
+         * may be different (MONOTONIC vs continue during sleep). The solution
+         * is to convert it to a relative time and then add it to
+         * mach_absolute_time() */
+        const vlc_tick_t first_render_delay = date - vlc_tick_now()
+                                            - ca_GetLatencyLocked(p_aout);
+        p_sys->i_first_render_host_time
+            = mach_absolute_time() + TickToHostTime(p_sys, first_render_delay);
     }
 
     do
