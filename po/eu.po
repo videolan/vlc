@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-29 18:23+0200\n"
+"PO-Revision-Date: 2020-03-30 18:20+0200\n"
 "Last-Translator: Osoitz <oelkoro@gmail.com>, 2020\n"
 "Language-Team: Basque (https://www.transifex.com/yaron/teams/16553/eu/)\n"
 "Language: eu\n"
@@ -116,17 +116,17 @@ msgstr ""
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
-msgstr "Audio berlagingailua"
+msgstr "Audio birlagingailua"
 
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
 #: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:425
 msgid "Visualizations"
-msgstr "Bistaratzeak"
+msgstr "Bisualizazioak"
 
 #: include/vlc_config_cat.h:64 src/audio_output/output.c:321
 #: src/libvlc-module.c:206
 msgid "Audio visualizations"
-msgstr "Audio-bistaratzeak"
+msgstr "Audio-bisualizazioak"
 
 #: include/vlc_config_cat.h:66 include/vlc_config_cat.h:78
 msgid "Output modules"
@@ -1392,7 +1392,7 @@ msgstr "Denboraldia"
 
 #: src/input/meta.c:76
 msgid "Episode"
-msgstr "Episodioa"
+msgstr "Kapitulua"
 
 #: src/input/meta.c:77
 msgid "Show Name"
@@ -1839,7 +1839,7 @@ msgstr ""
 #: src/libvlc-module.c:208
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
 msgstr ""
-"Honek bistaratze-moduluak gehitzen ditu (espektro-analizatzailea, etab.)."
+"Honek bisualizazio-moduluak gehitzen ditu (espektro-analizatzailea, etab.)."
 
 #: src/libvlc-module.c:212
 msgid "Replay gain mode"
@@ -1851,7 +1851,7 @@ msgstr "Hautatu erreprodukzio-irabaziko modua"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
-msgstr "Erreproduzitu aurreanp"
+msgstr "Erreprodukzioaren aurre-anplifikazioa"
 
 #: src/libvlc-module.c:218
 msgid ""
@@ -3814,7 +3814,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1104
 msgid "Expose media player via D-Bus"
-msgstr "Jarri agerian multimedia erreproduzigailua D-Bus bidez"
+msgstr "Jarri agerian multimedia-erreproduzigailua D-Bus bidez"
 
 #: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
@@ -5335,7 +5335,7 @@ msgstr "Igo bolumena"
 
 #: src/misc/actions.c:117
 msgid "Zoom In"
-msgstr "Gerturatu zooma"
+msgstr "Hurbildu zooma"
 
 #: src/misc/actions.c:118
 msgid "Zoom Out"
@@ -9807,12 +9807,12 @@ msgstr "Barra-grafikoaren funtzioaren audioaren zatia"
 
 #: modules/audio_filter/audiobargraph_a.c:71
 msgid "Audiobar Graph"
-msgstr "Audiobar grafikoa"
+msgstr "Audio-barra grafikoa"
 
 #: modules/audio_filter/channel_mixer/dolby.c:50
 msgid "Simple decoder for Dolby Surround encoded streams"
 msgstr ""
-"Deskodetzaile soila Dolby Surround kodetutako transmisio jarraituetarako"
+"Deskodetzaile sinplea Dolby Surround kodetutako transmisio jarraituetarako"
 
 #: modules/audio_filter/channel_mixer/dolby.c:51
 msgid "Dolby Surround decoder"
@@ -10133,7 +10133,7 @@ msgstr "Ekualizadorearen aurrezarpena"
 
 #: modules/audio_filter/equalizer.c:59
 msgid "Preset to use for the equalizer."
-msgstr "Ekualizadorerako erabili beharko aurrezarpena."
+msgstr "Ekualizadorean erabiltzeko aurrezarpena."
 
 #: modules/audio_filter/equalizer.c:61
 msgid "Bands gain"
@@ -10609,7 +10609,7 @@ msgstr "Audio-bolumen osokoa"
 
 #: modules/audio_output/adummy.c:37
 msgid "Dummy audio output"
-msgstr "Audio-irteeraren adibidea"
+msgstr "Adibidezko audio-irteera"
 
 #: modules/audio_output/alsa.c:64 modules/audio_output/oss.c:69
 msgid "Audio output device"
@@ -10786,7 +10786,7 @@ msgstr ""
 
 #: modules/audio_output/file.c:112
 msgid "File audio output"
-msgstr "Fitxategiaren audio-irteera"
+msgstr "Fitxategi audio-irteera"
 
 #: modules/audio_output/jack.c:83
 msgid "Automatically connect to writable clients"
@@ -11046,7 +11046,7 @@ msgstr "bit"
 
 #: modules/codec/avcodec/avcodec.c:59
 msgid "simple"
-msgstr "soila"
+msgstr "sinplea"
 
 #: modules/codec/avcodec/avcodec.c:71
 msgid ""
@@ -14440,7 +14440,7 @@ msgstr "Erabilitako lehenetsitako sintonizazio-ezarpena"
 
 #: modules/codec/x264.c:413
 msgid "Default preset setting used"
-msgstr "Erabilitako lehenetsitako aurrezarri-ezarpena"
+msgstr "Erabilitako aurrezarpen ezarpen lehenetsia"
 
 #: modules/codec/x264.c:415
 msgid "x264 advanced options"
@@ -16676,7 +16676,7 @@ msgstr "Egileak"
 msgid ""
 "VLC media player and VideoLAN are trademarks of the VideoLAN Association."
 msgstr ""
-"VLC multimedia erreproduzigailua eta VideoLAN, VideoLAN Association-en marka "
+"VLC multimedia-erreproduzigailua eta VideoLAN, VideoLAN Association-en marka "
 "erregistratuak dira."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:130
@@ -17612,7 +17612,7 @@ msgstr "Kontrolatu kanpoko musika-erreproduzigailuak"
 #: modules/gui/macosx/macosx.m:126
 msgid "VLC will pause and resume supported music players on playback."
 msgstr ""
-"VLC-k pausarazi eta berrekingo dio erreproduzitzen ari den onartutako musika "
+"VLC-k pausarazi eta berrekingo dio erreproduzitzen ari den onartutako musika-"
 "erreproduzigailuari."
 
 #: modules/gui/macosx/macosx.m:128
@@ -17645,7 +17645,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:206
 msgid "Ask"
-msgstr "Eskatu"
+msgstr "Galdetu"
 
 #: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:200
 #: modules/gui/qt/qt.cpp:206 modules/keystore/keychain.m:50
@@ -18734,7 +18734,7 @@ msgstr "Kodeketa lehenetsia"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:344
 msgid "Display Settings"
-msgstr "Bistaratu ezarpenak"
+msgstr "Bistaratze ezarpenak"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:346
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
@@ -18881,7 +18881,7 @@ msgid ""
 "\n"
 "Are you sure you want to continue?"
 msgstr ""
-"Honek VLC multimedia erreproduzigailuaren hobespenak berrezarriko ditu.\n"
+"Honek VLC multimedia-erreproduzigailuaren hobespenak berrezarriko ditu.\n"
 "\n"
 "Kontuan izan VLC berrabiarazi egingo dela prozesu honetan, hortaz zure "
 "oraingo erreprodukzio-zerrenda hustu egingo da eta uneko erreprodukzioa, "
@@ -19143,7 +19143,7 @@ msgstr "Irauli bertikalki"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:241
 msgid "Magnification/Zoom"
-msgstr "Handitu/Zooma"
+msgstr "Handitzea/Zooma"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:242
 #: modules/gui/qt/ui/video_effects.h:1261
@@ -20800,9 +20800,9 @@ msgid ""
 "express consent for the media player to access the Internet automatically.</"
 "p>\n"
 msgstr ""
-"<p>Zure pribatutasuna babesteko asmoz, <i>VLC multimedia irakurgailuak</i>k "
-"<b>ez</b> du datu pertsonalik biltzen edo igortzen, ez modu anonimoan, ezta "
-"inori ere.</p>\n"
+"<p>Zure pribatutasuna babesteko asmoz, <i>VLC multimedia-erreproduzigailuak</"
+"i>k <b>ez</b> du datu pertsonalik biltzen edo igortzen, ez modu anonimoan, "
+"ezta inori ere.</p>\n"
 "<p>Hala eta guztiz ere, <i>VLC</i> gai da automatikoki zure erreprodukzio-"
 "zerrendako multimedia argibideak berreskuratzeko hirugarrenen Internet-"
 "oinarriko zerbitzuetatik. Honek karatulak, pista izenak, egileak eta beste "
@@ -20848,7 +20848,7 @@ msgid ""
 "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC multimedia erreproduzigailua askea eta iturburu irekikoa, kodetzailea "
+"<p>VLC multimedia-erreproduzigailua askea eta iturburu irekikoa, kodetzailea "
 "eta transmisorea da  <a href=\"http://www.videolan.org/\"><span style=\" "
 "text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> "
 "komunitateko boluntarioek egina.</p><p>VLC-k bere barruko kodekak erabiltzen "
@@ -21058,7 +21058,7 @@ msgid ""
 "Skins customize player's appearance. You can activate them through "
 "preferences."
 msgstr ""
-"Azalek pertsonalizatzen dute erreproduzigailuaren itxura. Hobespenetatik "
+"Azalek erreproduzigailuaren itxura pertsonalizatzen dute. Hobespenetatik "
 "aktiba ditzakezu."
 
 #: modules/gui/qt/dialogs/plugins.cpp:382
@@ -21146,7 +21146,7 @@ msgstr "Erakutsi ezarpenak"
 
 #: modules/gui/qt/dialogs/preferences.cpp:76
 msgid "Simple"
-msgstr "Soila"
+msgstr "Sinplea"
 
 #: modules/gui/qt/dialogs/preferences.cpp:77
 msgid "Switch to simple preferences view"
@@ -21665,7 +21665,7 @@ msgstr "Gehitu &azpitituluen fitxategia..."
 
 #: modules/gui/qt/menus.cpp:655
 msgid "Sub &Track"
-msgstr "Azpi &Pista"
+msgstr "Azpitituluen &pista"
 
 #: modules/gui/qt/menus.cpp:677
 msgid "Video &Track"
@@ -21809,14 +21809,14 @@ msgstr "Eskaneatzen..."
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
-msgstr "Erakutsi hobespen aurreratuak soilak baino lehen"
+msgstr "Erakutsi hobespen aurreratuak sinpleak baino"
 
 #: modules/gui/qt/qt.cpp:82
 msgid ""
 "Show advanced preferences and not simple preferences when opening the "
 "preferences dialog."
 msgstr ""
-"Erakutsi hobespen aurreratuak eta soilak ez diren hobespenak hobespenen "
+"Erakutsi hobespen aurreratuak eta ez hobespenen sinpleak hobespenen "
 "elkarrizketa-koadroa irekitzean."
 
 #: modules/gui/qt/qt.cpp:86 modules/gui/skins2/src/skin_main.cpp:499
@@ -22796,7 +22796,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:33
 msgid "Blues"
-msgstr "Blues-ak"
+msgstr "Blues"
 
 #: modules/meta_engine/ID3Genres.h:34
 msgid "Classic Rock"
@@ -23120,7 +23120,7 @@ msgstr "Rock gotikoa"
 
 #: modules/meta_engine/ID3Genres.h:125
 msgid "Progressive Rock"
-msgstr "Rock aurrerakoia"
+msgstr "Rock progresiboa"
 
 #: modules/meta_engine/ID3Genres.h:126
 msgid "Psychedelic Rock"
@@ -23156,7 +23156,7 @@ msgstr "Hizketa"
 
 #: modules/meta_engine/ID3Genres.h:135
 msgid "Chanson"
-msgstr "Abestia"
+msgstr "Chanson"
 
 #: modules/meta_engine/ID3Genres.h:136
 msgid "Opera"
@@ -28886,7 +28886,7 @@ msgstr "projectM-ren bide-izen aurrezarria"
 
 #: modules/visualization/projectm.cpp:57
 msgid "Path to the projectM preset directory"
-msgstr "projectM-ren aurrezarritako direktorioaren bide-izena"
+msgstr "projectM-ren aurrezarpen direktorioaren bide-izena"
 
 #: modules/visualization/projectm.cpp:59
 msgid "Title font"
@@ -28972,7 +28972,7 @@ msgstr "FFT leihoa"
 #: modules/visualization/visual/visual.c:63
 msgid "The type of FFT window to use for spectrum-based visualizations."
 msgstr ""
-"FFT leiho mota, espektrotan oinarrituriko bistaratzeetarako erabiltzeko. "
+"FFT leiho mota, espektrotan oinarrituriko bisualizazioetan erabiltzeko. "
 
 #: modules/visualization/visual/visual.c:65
 msgid "Kaiser window parameter"
@@ -29206,7 +29206,7 @@ msgstr "Denbora:"
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
 msgid "VLC media player - Web Interface"
-msgstr "VLC multimedia erreproduzigailua - Web interfazea"
+msgstr "VLC multimedia-erreproduzigailua - Web interfazea"
 
 #: share/lua/http/index.html:215
 msgid "Hide / Show Library"
@@ -29286,8 +29286,7 @@ msgstr ""
 msgid ""
 "Volume will be controlled by the player, and not the <i>Main Controls</i>."
 msgstr ""
-"Bolumena erreproduzigailutik kontrolatuko da, eta ez <i>Kontrol nagusiak</i>-"
-"etik."
+"Bolumena erreproduzigailuak kontrolatuko du, eta ez <i>Kontrol nagusiak</i>."
 
 #: share/lua/http/index.html:272
 msgid ""
@@ -29327,7 +29326,7 @@ msgstr "Inprimakia"
 
 #: modules/gui/qt/ui/equalizer.h:132
 msgid "Preset"
-msgstr "Aurrezarri"
+msgstr "Aurrezarpena"
 
 #: modules/gui/qt/ui/equalizer.h:134
 msgid "0.00 dB"
@@ -29650,7 +29649,7 @@ msgstr "Helburu berria"
 
 #: modules/gui/qt/ui/sout.h:207
 msgid "Display locally"
-msgstr "Bistaratu modu lokalean"
+msgstr "Bistaratu lokalki"
 
 #: modules/gui/qt/ui/sout.h:209
 msgid "Transcoding Options"
@@ -29758,7 +29757,7 @@ msgstr "Saltatu H.264 begizta-iragazkia"
 
 #: modules/gui/qt/ui/sprefs_input.h:359
 msgid "x264 preset and tuning selection"
-msgstr "x264 aurrezarpena eta sintonizazio-hautapena"
+msgstr "x264 aurrezarpen eta sintonizazio hautapena"
 
 #: modules/gui/qt/ui/sprefs_input.h:361
 msgid "Optical drive"
@@ -29798,7 +29797,7 @@ msgstr "Menuen hizkuntza:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:529
 msgid "Look and feel"
-msgstr "Begiratu eta ukitu"
+msgstr "Itxura eta giroa"
 
 #: modules/gui/qt/ui/sprefs_interface.h:530
 msgid "Use custom skin"
