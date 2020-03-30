@@ -34,6 +34,7 @@
 
 #include "SharedResources.hpp"
 #include "playlist/BasePeriod.h"
+#include "logic/BufferingLogic.hpp"
 #include "xml/DOMParser.h"
 
 #include "../dash/DASHManager.h"
@@ -136,8 +137,12 @@ vlc_module_begin ()
                      ADAPT_HEIGHT_TEXT, ADAPT_HEIGHT_TEXT, false )
         add_integer( "adaptive-bw",     250, ADAPT_BW_TEXT,     ADAPT_BW_LONGTEXT,     false )
         add_bool   ( "adaptive-use-access", false, ADAPT_ACCESS_TEXT, ADAPT_ACCESS_LONGTEXT, true );
-        add_integer( "adaptive-livedelay", 0, ADAPT_BUFFER_TEXT, ADAPT_BUFFER_LONGTEXT, true );
-        add_integer( "adaptive-maxbuffer", 0, ADAPT_MAXBUFFER_TEXT, NULL, true );
+        add_integer( "adaptive-livedelay",
+                     MS_FROM_VLC_TICK(AbstractBufferingLogic::DEFAULT_LIVE_BUFFERING),
+                     ADAPT_BUFFER_TEXT, ADAPT_BUFFER_LONGTEXT, true );
+        add_integer( "adaptive-maxbuffer",
+                     MS_FROM_VLC_TICK(AbstractBufferingLogic::DEFAULT_MAX_BUFFERING),
+                     ADAPT_MAXBUFFER_TEXT, NULL, true );
         add_integer( "adaptive-lowlatency", -1, ADAPT_LOWLATENCY_TEXT, ADAPT_LOWLATENCY_LONGTEXT, true );
             change_integer_list(rgi_latency, ppsz_latency)
         set_callbacks( Open, Close )
