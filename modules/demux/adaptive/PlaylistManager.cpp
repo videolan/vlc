@@ -841,7 +841,7 @@ AbstractBufferingLogic *PlaylistManager::createBufferingLogic() const
             bl->setUserLiveDelay(VLC_TICK_FROM_MS(v));
         v = var_InheritInteger(p_demux, "adaptive-maxbuffer");
         if(v)
-            bl->setUserMinBuffering(VLC_TICK_FROM_MS(v));
+            bl->setUserMaxBuffering(VLC_TICK_FROM_MS(v));
     }
     return bl;
 }

@@ -104,42 +104,47 @@ vlc_tick_t DefaultBufferingLogic::getMinBuffering(const AbstractPlaylist *p) con
 {
     if(isLowLatency(p))
         return BUFFERING_LOWEST_LIMIT;
-    else if(userMinBuffering)
-        return std::max(BUFFERING_LOWEST_LIMIT, userMinBuffering);
-    else if(p->getMinBuffering())
-        return std::max(BUFFERING_LOWEST_LIMIT, p->getMinBuffering());
-    else
-        return DEFAULT_MIN_BUFFERING;
+
+    vlc_tick_t buffering = userMinBuffering ? userMinBuffering
+                                            : DEFAULT_MIN_BUFFERING;
+    if(p->getMinBuffering())
+        buffering = std::max(buffering, p->getMinBuffering());
+    return std::max(buffering, BUFFERING_LOWEST_LIMIT);
 }
 
 vlc_tick_t DefaultBufferingLogic::getMaxBuffering(const AbstractPlaylist *p) const
 {
     if(isLowLatency(p))
         return getMinBuffering(p);
-    else if(p->isLive())
-    {
-        if(userLiveDelay)
-            return std::max(getMinBuffering(p), userLiveDelay);
-        else
-            return std::max(getMinBuffering(p), DEFAULT_LIVE_BUFFERING);
-    }
-    else
-    {
-        if(userMaxBuffering)
-            return std::max(getMinBuffering(p), userMaxBuffering);
-        else if(p->getMaxBuffering())
-            return std::max(getMinBuffering(p), p->getMaxBuffering());
-        else
-            return std::max(getMinBuffering(p), DEFAULT_MAX_BUFFERING);
-    }
+
+    vlc_tick_t buffering = userMaxBuffering ? userMaxBuffering
+                                            : DEFAULT_MAX_BUFFERING;
+    if(p->isLive())
+        buffering = std::min(buffering, getLiveDelay(p));
+    if(p->getMaxBuffering())
+        buffering = std::min(buffering, p->getMaxBuffering());
+    return std::max(buffering, getMinBuffering(p));
+}
+
+vlc_tick_t DefaultBufferingLogic::getLiveDelay(const AbstractPlaylist *p) const
+{
+    if(isLowLatency(p))
+        return getMinBuffering(p);
+    vlc_tick_t delay = userLiveDelay ? userLiveDelay
+                                     : DEFAULT_LIVE_BUFFERING;
+    if(p->suggestedPresentationDelay.Get())
+        delay = p->suggestedPresentationDelay.Get();
+    if(p->timeShiftBufferDepth.Get())
+        delay = std::min(delay, p->timeShiftBufferDepth.Get());
+    return std::max(delay, getMinBuffering(p));
 }
 
 uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *rep) const
 {
     AbstractPlaylist *playlist = rep->getPlaylist();
 
-    /* Get buffering amount */
-    vlc_tick_t i_buffering = getBufferingAmount(playlist);
+    /* Get buffering offset min <= max <= live delay */
+    vlc_tick_t i_buffering = getBufferingOffset(playlist);
 
     /* Try to never buffer up to really end */
     /* Enforce no overlap for demuxers segments 3.0.0 */
@@ -354,23 +359,9 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
     return std::numeric_limits<uint64_t>::max();
 }
 
-vlc_tick_t DefaultBufferingLogic::getBufferingAmount(const AbstractPlaylist *p) const
+vlc_tick_t DefaultBufferingLogic::getBufferingOffset(const AbstractPlaylist *p) const
 {
-    const vlc_tick_t i_min_buffering = getMinBuffering(p);
-    const vlc_tick_t i_max_buffering = getMaxBuffering(p);
-
-    /* Get buffering amount */
-    vlc_tick_t i_buffering = i_max_buffering;
-    if(p->suggestedPresentationDelay.Get() &&
-       p->suggestedPresentationDelay.Get() > i_min_buffering)
-    {
-        i_buffering = p->suggestedPresentationDelay.Get();
-    }
-
-    if(p->timeShiftBufferDepth.Get())
-        i_buffering = std::min(i_buffering, p->timeShiftBufferDepth.Get());
-
-    return i_buffering;
+    return p->isLive() ? getLiveDelay(p) : getMaxBuffering(p);
 }
 
 bool DefaultBufferingLogic::isLowLatency(const AbstractPlaylist *p) const

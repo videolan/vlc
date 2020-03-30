@@ -45,16 +45,17 @@ namespace adaptive
                 virtual uint64_t getStartSegmentNumber(BaseRepresentation *) const = 0;
                 virtual vlc_tick_t getMinBuffering(const AbstractPlaylist *) const = 0;
                 virtual vlc_tick_t getMaxBuffering(const AbstractPlaylist *) const = 0;
+                virtual vlc_tick_t getLiveDelay(const AbstractPlaylist *) const = 0;
                 void setUserMinBuffering(vlc_tick_t);
                 void setUserMaxBuffering(vlc_tick_t);
                 void setUserLiveDelay(vlc_tick_t);
                 void setLowDelay(bool);
-
-            protected:
                 static const vlc_tick_t BUFFERING_LOWEST_LIMIT;
                 static const vlc_tick_t DEFAULT_MIN_BUFFERING;
                 static const vlc_tick_t DEFAULT_MAX_BUFFERING;
                 static const vlc_tick_t DEFAULT_LIVE_BUFFERING;
+
+            protected:
                 vlc_tick_t userMinBuffering;
                 vlc_tick_t userMaxBuffering;
                 vlc_tick_t userLiveDelay;
@@ -69,9 +70,10 @@ namespace adaptive
                 virtual uint64_t getStartSegmentNumber(BaseRepresentation *) const; /* impl */
                 virtual vlc_tick_t getMinBuffering(const AbstractPlaylist *) const; /* impl */
                 virtual vlc_tick_t getMaxBuffering(const AbstractPlaylist *) const; /* impl */
+                virtual vlc_tick_t getLiveDelay(const AbstractPlaylist *) const; /* impl */
 
             protected:
-                vlc_tick_t getBufferingAmount(const AbstractPlaylist *) const;
+                vlc_tick_t getBufferingOffset(const AbstractPlaylist *) const;
                 uint64_t getLiveStartSegmentNumber(BaseRepresentation *) const;
                 bool isLowLatency(const AbstractPlaylist *) const;
         };
