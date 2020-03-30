@@ -1094,20 +1094,6 @@ static const char *const ppsz_prefres[] = {
     "You can select which VoD server module you want to use. Set this " \
     "to 'vod_rtsp' to switch back to the old, legacy module." )
 
-#define RT_PRIORITY_TEXT N_("Allow real-time priority")
-#define RT_PRIORITY_LONGTEXT N_( \
-    "Running VLC in real-time priority will allow for much more precise " \
-    "scheduling and yield better, especially when streaming content. " \
-    "It can however lock up your whole machine, or make it very very " \
-    "slow. You should only activate this if you know what you're " \
-    "doing.")
-
-#define RT_OFFSET_TEXT N_("Adjust VLC priority")
-#define RT_OFFSET_LONGTEXT N_( \
-    "This option adds an offset (positive or negative) to VLC default " \
-    "priorities. You can use it to tune VLC priority against other " \
-    "programs, or against other VLC instances.")
-
 #define USE_STREAM_IMMEDIATE_LONGTEXT N_( \
      "This option is useful if you want to lower the latency when " \
      "reading a stream")
@@ -2160,10 +2146,8 @@ vlc_module_begin ()
     set_section( N_("Performance options"), NULL )
 
 #if defined (LIBVLC_USE_PTHREAD)
-    add_bool( "rt-priority", false, RT_PRIORITY_TEXT,
-              RT_PRIORITY_LONGTEXT, true )
-    add_integer( "rt-offset", 0, RT_OFFSET_TEXT,
-                 RT_OFFSET_LONGTEXT, true )
+    add_obsolete_bool( "rt-priority" ) /* since 4.0.0 */
+    add_obsolete_integer( "rt-offset" ) /* since 4.0.0 */
 #endif
 
 #if defined(HAVE_DBUS)

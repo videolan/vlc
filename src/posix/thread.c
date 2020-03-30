@@ -159,29 +159,10 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
     return pthread_getspecific (key);
 }
 
-static bool rt_priorities = false;
-static int rt_offset;
-
 void vlc_threads_setup (libvlc_int_t *p_libvlc)
 {
-    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
-    static bool initialized = false;
-
-    vlc_mutex_lock (&lock);
-    /* Initializes real-time priorities before any thread is created,
-     * just once per process. */
-    if (!initialized)
-    {
-        if (var_InheritBool (p_libvlc, "rt-priority"))
-        {
-            rt_offset = var_InheritInteger (p_libvlc, "rt-offset");
-            rt_priorities = true;
-        }
-        initialized = true;
-    }
-    vlc_mutex_unlock (&lock);
+    (void) p_libvlc;
 }
-
 
 static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
                            void *(*entry) (void *), void *data, int priority)
@@ -211,27 +192,6 @@ static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
         pthread_sigmask (SIG_BLOCK, &set, &oldset);
     }
 
-#if defined (_POSIX_PRIORITY_SCHEDULING) && (_POSIX_PRIORITY_SCHEDULING >= 0) \
- && defined (_POSIX_THREAD_PRIORITY_SCHEDULING) \
- && (_POSIX_THREAD_PRIORITY_SCHEDULING >= 0)
-    if (rt_priorities)
-    {
-        struct sched_param sp = { .sched_priority = priority + rt_offset, };
-        int policy;
-
-        if (sp.sched_priority <= 0)
-            sp.sched_priority += sched_get_priority_max (policy = SCHED_OTHER);
-        else
-            sp.sched_priority += sched_get_priority_min (policy = SCHED_RR);
-
-        pthread_attr_setschedpolicy (attr, policy);
-        pthread_attr_setschedparam (attr, &sp);
-        pthread_attr_setinheritsched (attr, PTHREAD_EXPLICIT_SCHED);
-    }
-#else
-    (void) priority;
-#endif
-
     /* The thread stack size.
      * The lower the value, the less address space per thread, the highest
      * maximum simultaneous threads per process. Too low values will cause
@@ -254,6 +214,7 @@ static int vlc_clone_attr (vlc_thread_t *th, pthread_attr_t *attr,
     ret = pthread_create(&th->handle, attr, entry, data);
     pthread_sigmask (SIG_SETMASK, &oldset, NULL);
     pthread_attr_destroy (attr);
+    (void) priority;
     return ret;
 }
 
@@ -323,25 +284,7 @@ VLC_WEAK unsigned long vlc_thread_id(void)
 
 int vlc_set_priority (vlc_thread_t th, int priority)
 {
-#if defined (_POSIX_PRIORITY_SCHEDULING) && (_POSIX_PRIORITY_SCHEDULING >= 0) \
- && defined (_POSIX_THREAD_PRIORITY_SCHEDULING) \
- && (_POSIX_THREAD_PRIORITY_SCHEDULING >= 0)
-    if (rt_priorities)
-    {
-        struct sched_param sp = { .sched_priority = priority + rt_offset, };
-        int policy;
-
-        if (sp.sched_priority <= 0)
-            sp.sched_priority += sched_get_priority_max (policy = SCHED_OTHER);
-        else
-            sp.sched_priority += sched_get_priority_min (policy = SCHED_RR);
-
-        if (pthread_setschedparam(th.handle, policy, &sp))
-            return VLC_EGENERIC;
-    }
-#else
     (void) th; (void) priority;
-#endif
     return VLC_SUCCESS;
 }
 
