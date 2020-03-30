@@ -74,7 +74,6 @@ parts:
       ../bootstrap \
         --enable-libdsm \
         --enable-dvdcss \
-        --enable-protobuf \
         --disable-upnp \
         --disable-chromaprint
       make list
