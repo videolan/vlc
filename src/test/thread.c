@@ -296,7 +296,7 @@ static void test__cond_wait_timeout()
 static void *thread_func_tick_sleep(void *data)
 {
     assert(data == &thread_data_magic);
-    vlc_tick_sleep(VLC_TICK_FROM_SEC(10));
+    (vlc_tick_sleep)(VLC_TICK_FROM_SEC(10));
     return &thread_return_magic;
 }
 
@@ -315,7 +315,7 @@ static void test__vlc_tick_sleep()
 {
     vlc_tick_t now = vlc_tick_now();
 
-    vlc_tick_sleep(VLC_TICK_FROM_MS(25));
+    (vlc_tick_sleep)(VLC_TICK_FROM_MS(25));
 
     vlc_tick_t elapsed = vlc_tick_now() - now;
     assert(elapsed >= VLC_TICK_FROM_MS(25));
