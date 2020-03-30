@@ -69,4 +69,7 @@ typedef struct
     unsigned int bufferHeight;
 } pic_context_nvdec_t;
 
+#define NVDEC_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
+    container_of(pic_ctx, pic_context_nvdec_t, ctx)
+
 #endif /* include-guard */

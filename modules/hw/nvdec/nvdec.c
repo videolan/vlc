@@ -406,7 +406,7 @@ static int CUDAAPI HandlePictureDecode(void *p_opaque, CUVIDPICPARAMS *p_picpara
 
 static void NVDecCtxDestroy(struct picture_context_t *picctx)
 {
-    pic_context_nvdec_t *srcpic = container_of(picctx, pic_context_nvdec_t, ctx);
+    pic_context_nvdec_t *srcpic = NVDEC_PICCONTEXT_FROM_PICCTX(picctx);
     free(srcpic);
 }
 
@@ -415,7 +415,7 @@ static struct picture_context_t *NVDecCtxClone(struct picture_context_t *srcctx)
     pic_context_nvdec_t *clonectx = malloc(sizeof(*clonectx));
     if (unlikely(clonectx == NULL))
         return NULL;
-    pic_context_nvdec_t *srcpic = container_of(srcctx, pic_context_nvdec_t, ctx);
+    pic_context_nvdec_t *srcpic = NVDEC_PICCONTEXT_FROM_PICCTX(srcctx);
 
     *clonectx = *srcpic;
     vlc_video_context_Hold(clonectx->ctx.vctx);
@@ -442,7 +442,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
         p_pic = nvdec_pool_Wait(p_sys->out_pool);
         if (unlikely(p_pic == NULL))
             return 0;
-        pic_context_nvdec_t *picctx = container_of(p_pic->context, pic_context_nvdec_t, ctx);
+        pic_context_nvdec_t *picctx = NVDEC_PICCONTEXT_FROM_PICCTX(p_pic->context);
 
         result = CALL_CUDA_DEC(cuCtxPushCurrent, p_sys->devsys->cuCtx);
         if (unlikely(result != VLC_SUCCESS))
