@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-29 20:02+0200\n"
+"PO-Revision-Date: 2020-03-30 16:55+0200\n"
 "Last-Translator: Dian Li <xslidian@gmail.com>, 2020\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/yaron/teams/16553/"
 "zh_CN/)\n"
@@ -5917,7 +5917,7 @@ msgstr "访问系统资源时出现问题"
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
-msgstr "请打开「系统偏好设置」->「安全与隐私」并允许 VLC 访问您的麦克风。"
+msgstr "请打开「系统偏好设置」→「安全与隐私」并允许 VLC 访问您的麦克风。"
 
 #: modules/access/avaudiocapture.m:341
 msgid "AVFoundation Audio Capture"
@@ -5955,7 +5955,7 @@ msgstr "您的 Mac 似乎未配备合适的输入设备。请检查您的接头�
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
-msgstr "请打开「系统偏好设置」->「安全与隐私」并允许 VLC 访问您的摄像头。"
+msgstr "请打开「系统偏好设置」→「安全与隐私」并允许 VLC 访问您的摄像头。"
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -7092,7 +7092,7 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
-"可能是因为 macOS 阻止访问您的磁盘。请打开「系统偏好设置」->「安全与隐私」并在"
+"可能是因为 macOS 阻止访问您的磁盘。请打开「系统偏好设置」→「安全与隐私」并在"
 "「文件与文件夹」段落允许 VLC 访问您的外部媒体。"
 
 #: modules/access/dvdread.c:77
