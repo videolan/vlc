@@ -33,6 +33,7 @@ apps:
       - dvb
       - audio-playback
       - audio-record
+      - jack1
     slots:
       - mpris
 
