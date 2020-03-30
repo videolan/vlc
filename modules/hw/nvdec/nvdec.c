@@ -266,7 +266,7 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
             if (ret != VLC_SUCCESS || p_sys->outputDevicePtr[i] == 0)
                 goto clean_pics;
             picture_resource_t res = {
-                .p_sys = (void*)(uintptr_t)i,
+                .p_sys = p_sys->outputDevicePtr[i],
             };
             pics[i] = picture_NewFromResource( &p_dec->fmt_out.video, &res );
             if (unlikely(pics[i] == NULL))
@@ -391,8 +391,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
             NVDecCtxDestroy, NVDecCtxClone,
             p_sys->vctx_out,
         };
-        uintptr_t pool_idx = (uintptr_t)p_pic->p_sys;
-        picctx->devicePtr = p_sys->outputDevicePtr[pool_idx];
+        picctx->devicePtr = (CUdeviceptr)p_pic->p_sys;
         picctx->bufferPitch = p_sys->outputPitch;
         picctx->bufferHeight = p_sys->decoderHeight;
 
