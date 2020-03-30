@@ -1133,14 +1133,6 @@ static const char *const ppsz_prefres[] = {
 #define STATS_LONGTEXT N_( \
      "Collect miscellaneous local statistics about the playing media.")
 
-#define DAEMON_TEXT N_("Run as daemon process")
-#define DAEMON_LONGTEXT N_( \
-     "Runs VLC as a background daemon process.")
-
-#define PIDFILE_TEXT N_("Write process id to file")
-#define PIDFILE_LONGTEXT N_( \
-       "Writes process id into specified file.")
-
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
 #define ONEINSTANCE_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
@@ -2272,11 +2264,9 @@ vlc_module_begin ()
         change_volatile ()
     add_obsolete_string( "verbose-objects" ) /* since 2.1.0 */
 #if !defined(_WIN32) && !defined(__OS2__)
-    add_bool( "daemon", 0, DAEMON_TEXT, DAEMON_LONGTEXT, true )
+    add_obsolete_bool( "daemon" ) /* since 4.0.0 */
         change_short('d')
-
-    add_string( "pidfile", NULL, PIDFILE_TEXT, PIDFILE_LONGTEXT,
-                                       false )
+    add_obsolete_string( "pidfile" ) /* since 4.0.0 */
 #endif
 
 #if defined (_WIN32) || defined (__APPLE__)

@@ -182,35 +182,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         exit(0);
     }
 
-#ifdef HAVE_DAEMON
-    /* Check for daemon mode */
-    if( var_InheritBool( p_libvlc, "daemon" ) )
-    {
-        if( daemon( 1, 0) != 0 )
-        {
-            msg_Err( p_libvlc, "Unable to fork vlc to daemon mode" );
-            goto error;
-        }
-
-        /* lets check if we need to write the pidfile */
-        char *pidfile = var_InheritString( p_libvlc, "pidfile" );
-        if( pidfile != NULL )
-        {
-            FILE *stream = vlc_fopen( pidfile, "w" );
-            if( stream != NULL )
-            {
-                fprintf( stream, "%d", (int)getpid() );
-                fclose( stream );
-                msg_Dbg( p_libvlc, "written PID file %s", pidfile );
-            }
-            else
-                msg_Err( p_libvlc, "cannot write PID file %s: %s",
-                         pidfile, vlc_strerror_c(errno) );
-            free( pidfile );
-        }
-    }
-#endif
-
     i_ret = VLC_ENOMEM;
 
     if( libvlc_InternalDialogInit( p_libvlc ) != VLC_SUCCESS )
