@@ -45,7 +45,8 @@ npapi-vlc/Makefile: npapi-vlc/configure
 		CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS)" \
 		LD="$(LD)" LDFLAGS="$(LDFLAGS)" \
 		SHELL="$(SHELL)" \
-		PKG_CONFIG_PATH="$(libdir)/pkgconfig:$(CONTRIB_DIR)/lib/pkgconfig"
+		PKG_CONFIG_PATH="$(libdir)/pkgconfig:$(CONTRIB_DIR)/lib/pkgconfig" \
+		PKG_CONFIG="$(PKG_CONFIG)"
 	touch $@
 
 npapi-vlc/npapi/npvlc.la: npapi-vlc/Makefile
