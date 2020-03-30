@@ -569,6 +569,19 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
 
     playlist->addPeriod(period);
 
+    auto xstart = std::find_if(tagslist.cbegin(), tagslist.cend(),
+                               [](auto t) {return t->getType() == AttributesTag::EXTXSTART;});
+    if(xstart != tagslist.end())
+    {
+        auto xstartTag = static_cast<const AttributesTag *>(*xstart);
+        if(xstartTag->getAttributeByName("TIME-OFFSET"))
+        {
+            float offset = xstartTag->getAttributeByName("TIME-OFFSET")->floatingPoint();
+            if(offset > 0)
+                playlist->suggestedPresentationDelay.Set(CLOCK_FREQ * offset);
+        }
+    }
+
     releaseTagsList(tagslist);
 
     playlist->debug();

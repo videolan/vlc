@@ -318,6 +318,7 @@ Tag * TagFactory::createTagByName(const std::string &name, const std::string &va
         {"EXT-X-PLAYLIST-TYPE",             SingleValueTag::EXTXPLAYLISTTYPE},
         {"EXT-X-I-FRAMES-ONLY",             Tag::EXTXIFRAMESONLY},
         {"EXT-X-MEDIA",                     AttributesTag::EXTXMEDIA},
+        {"EXT-X-START",                     AttributesTag::EXTXSTART},
         {"EXT-X-STREAM-INF",                AttributesTag::EXTXSTREAMINF},
         {"EXT-X-SESSION-KEY",               AttributesTag::EXTXSESSIONKEY},
         {"EXTINF",                          ValuesListTag::EXTINF},
@@ -355,6 +356,7 @@ Tag * TagFactory::createTagByName(const std::string &name, const std::string &va
         case AttributesTag::EXTXSESSIONKEY:
         case AttributesTag::EXTXMAP:
         case AttributesTag::EXTXMEDIA:
+        case AttributesTag::EXTXSTART:
         case AttributesTag::EXTXSTREAMINF:
             return new (std::nothrow) AttributesTag(exttagmapping[i].i, value);
         }

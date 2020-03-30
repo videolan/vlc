@@ -96,6 +96,7 @@ namespace hls
                     EXTXKEY = 20,
                     EXTXMAP,
                     EXTXMEDIA,
+                    EXTXSTART,
                     EXTXSTREAMINF,
                     EXTXSESSIONKEY,
                 };
