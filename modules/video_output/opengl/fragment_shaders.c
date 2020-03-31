@@ -347,10 +347,16 @@ xyz12_shader_init(struct vlc_gl_renderer *renderer)
         "    0.0,      0.0,         0.0,        1.0 "
         " );"
 
+        "uniform mat4 TransformMatrix;\n"
+        "uniform mat4 OrientationMatrix;\n"
+        "uniform mat3 TexCoordsMap0;\n"
         "vec4 vlc_texture(vec2 pic_coords)\n"
         "{ "
         " vec4 v_in, v_out;"
-        " v_in  = texture2D(Texture0, pic_coords);"
+        /* Homogeneous (oriented) coordinates */
+        " vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).st, 1.0);\n"
+        " vec2 tex_coords = (TexCoordsMap0 * pic_hcoords).st;\n"
+        " v_in  = texture2D(Texture0, tex_coords);\n"
         " v_in = pow(v_in, xyz_gamma);"
         " v_out = matrix_xyz_rgb * v_in ;"
         " v_out = pow(v_out, rgb_gamma) ;"
