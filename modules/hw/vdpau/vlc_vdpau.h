@@ -19,6 +19,8 @@
  *****************************************************************************/
 
 #ifndef VLC_VDPAU_H
+#define VLC_VDPAU_H
+
 # include <stdint.h>
 # include <vdpau/vdpau.h>
 #include <vlc_codec.h>
