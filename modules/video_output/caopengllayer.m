@@ -621,10 +621,10 @@ shouldInheritContentsScale:(CGFloat)newScale
             !(event.modifierFlags & NSControlKeyMask) &&
             event.clickCount == 1) {
             vout_display_SendEventMousePressed(_vlc_vd, MOUSE_BUTTON_LEFT);
-        } else {
-            [super mouseDown:event];
         }
     }
+
+    [super mouseDown:event];
 }
 
 /* Left mouse button up */
@@ -640,6 +640,8 @@ shouldInheritContentsScale:(CGFloat)newScale
             vout_display_SendEventMouseReleased(_vlc_vd, MOUSE_BUTTON_LEFT);
         }
     }
+
+    [super mouseUp:event];
 }
 
 /* Middle mouse button down */
@@ -648,9 +650,9 @@ shouldInheritContentsScale:(CGFloat)newScale
     @synchronized(self) {
         if (_vlc_vd)
             vout_display_SendEventMousePressed(_vlc_vd, MOUSE_BUTTON_CENTER);
-        else
-            [super otherMouseDown:event];
     }
+
+    [super otherMouseDown:event];
 }
 
 /* Middle mouse button up */
@@ -659,17 +661,15 @@ shouldInheritContentsScale:(CGFloat)newScale
     @synchronized(self) {
         if (_vlc_vd)
             vout_display_SendEventMouseReleased(_vlc_vd, MOUSE_BUTTON_CENTER);
-        else
-            [super otherMouseUp:event];
     }
+
+    [super otherMouseUp:event];
 }
 
-/* Mouse moved */
-- (void)mouseMoved:(NSEvent *)event
+- (void)mouseMovedInternal:(NSEvent *)event
 {
     @synchronized(self) {
         if (!_vlc_vd) {
-            [super mouseMoved:event];
             return;
         }
 
@@ -685,22 +685,32 @@ shouldInheritContentsScale:(CGFloat)newScale
     }
 }
 
+/* Mouse moved */
+- (void)mouseMoved:(NSEvent *)event
+{
+    [self mouseMovedInternal:event];
+    [super mouseMoved:event];
+}
+
 /* Mouse moved while clicked */
 - (void)mouseDragged:(NSEvent *)event
 {
-    [self mouseMoved:event];
+    [self mouseMovedInternal:event];
+    [super mouseDragged:event];
 }
 
 /* Mouse moved while center-clicked */
 - (void)otherMouseDragged:(NSEvent *)event
 {
-    [self mouseMoved:event];
+    [self mouseMovedInternal:event];
+    [super otherMouseDragged:event];
 }
 
 /* Mouse moved while right-clicked */
 - (void)rightMouseDragged:(NSEvent *)event
 {
-    [self mouseMoved:event];
+    [self mouseMovedInternal:event];
+    [super rightMouseDragged:event];
 }
 
 @end
