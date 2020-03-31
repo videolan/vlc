@@ -326,7 +326,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
         for(auto it = list.begin(); it != list.end(); ++it)
         {
             start = (*it)->getSequenceNumber();
-            if((*it)->duration.Get() < skipduration)
+            if((*it)->duration.Get() > skipduration)
                 break;
             skipduration -= (*it)->duration.Get();
         }
