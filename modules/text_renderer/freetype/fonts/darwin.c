@@ -39,7 +39,7 @@
 
 #include "../platform_fonts.h"
 
-char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
+static char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
 {
     CFURLRef url = CTFontDescriptorCopyAttribute(fontDescriptor, kCTFontURLAttribute);
     if (url == NULL)
@@ -55,7 +55,7 @@ char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
     return retPath;
 }
 
-void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *p_family)
+static void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *p_family)
 {
     bool b_bold = false;
     bool b_italic = false;
