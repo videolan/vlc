@@ -223,7 +223,7 @@ Widgets.NavigableFocusScope {
 
                             popupAlignment: Qt.AlignLeft | Qt.AlignBottom
 
-                            visible: !!root.contentModel
+                            visible: root.sortModel !== undefined && root.sortModel.length > 1
                             enabled: visible
 
                             onSortSelected: {
