@@ -803,9 +803,9 @@ shouldInheritContentsScale:(CGFloat)newScale
     }
 }
 
-- (void)resizeWithOldSuperlayerSize:(CGSize)size
+- (void)layoutSublayers
 {
-    [super resizeWithOldSuperlayerSize:size];
+    [super layoutSublayers];
 
     if (self.asynchronous) {
         // During live resize, the size is updated in the
