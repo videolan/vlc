@@ -28,7 +28,8 @@
 #include <string.h>
 
 #include <vlc_common.h>
-#include <vlc_md5.h>
+#include <vlc_strings.h>
+#include <vlc_hash.h>
 
 typedef struct
 {
@@ -55,11 +56,11 @@ static void test_vlc_hash_md5()
 {
     for( int i = 0; md5_samples[i].psz_string; i++ )
     {
-        struct md5_s md5;
-        InitMD5( &md5 );
-        AddMD5( &md5, md5_samples[i].psz_string, strlen( md5_samples[i].psz_string ) );
-        EndMD5( &md5 );
-        char * psz_hash = psz_md5_hash( &md5 );
+        char psz_hash[VLC_HASH_MD5_DIGEST_HEX_SIZE];
+        vlc_hash_md5_t md5;
+        vlc_hash_md5_Init( &md5 );
+        vlc_hash_md5_Update( &md5, md5_samples[i].psz_string, strlen( md5_samples[i].psz_string ) );
+        vlc_hash_FinishHex( &md5, psz_hash );
 
         if( strcmp( psz_hash, md5_samples[i].psz_md5 ) )
         {
@@ -67,7 +68,6 @@ static void test_vlc_hash_md5()
                     md5_samples[i].psz_md5 );
             abort();
         }
-        free( psz_hash );
     }
 }
 
