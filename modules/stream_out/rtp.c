@@ -818,10 +818,26 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
                 continue;
         }
 
-        sdp_AddMedia( &sdp, mime_major, proto, inclport * id->i_port,
-                      rtp_fmt->payload_type, false, rtp_fmt->bitrate,
-                      rtp_fmt->ptname, rtp_fmt->clock_rate, rtp_fmt->channels,
-                      rtp_fmt->fmtp);
+        vlc_memstream_printf(&sdp, "m=%s %u %s %"PRIu8"\r\n", mime_major,
+                             inclport * id->i_port, proto,
+                             rtp_fmt->payload_type);
+
+        if (rtp_fmt->bitrate > 0)
+            vlc_memstream_printf(&sdp, "b=AS:%u\r\n", rtp_fmt->bitrate);
+        vlc_memstream_puts(&sdp, "b=RR:0\r\n");
+
+        /* RTP payload type map */
+        vlc_memstream_printf(&sdp, "a=rtpmap:%"PRIu8" %s/%u",
+                             rtp_fmt->payload_type, rtp_fmt->ptname,
+                             rtp_fmt->clock_rate);
+        if (rtp_fmt->cat == AUDIO_ES && rtp_fmt->channels != 1)
+            vlc_memstream_printf(&sdp, "/%u", rtp_fmt->channels);
+        vlc_memstream_puts(&sdp, "\r\n");
+
+        /* Format parameters */
+        if (rtp_fmt->fmtp != NULL)
+            vlc_memstream_printf(&sdp, "a=fmtp:%"PRIu8" %s\r\n",
+                                 rtp_fmt->payload_type, rtp_fmt->fmtp);
 
         /* cf RFC4566 §5.14 */
         if( inclport && !p_sys->rtcp_mux && (id->i_port & 1) )
