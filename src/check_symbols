@@ -20,7 +20,7 @@ cat libvlccore.sym | grep -v \
 	-e '^text_style_' -e '^text_segment_' \
 	-e '^net_' -e '^httpd_' \
 	-e '^config_' -e '^module_' -e '^var_' \
-	-e '^date_' -e '^sdp_' -e '^plane_' \
+	-e '^date_' -e '^plane_' \
 	-e '^us_' -e '^utf8_' -e '^xml_' -e '^GetLang_' \
 	-e '^m\(date\|sleep\|wait\)$' -e '^[A-Z][a-z]*Charset$' -e 'MD5$' \
 	-e '^NTPtime64$' -e '^secstotimestr$' \
