@@ -791,75 +791,6 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 
     p_track->fmt.i_original_fourcc = p_sample->i_type;
 
-    if( ( p_track->i_sample_size == 1 || p_track->i_sample_size == 2 ) )
-    {
-        if( p_soun->i_qt_version == 0 )
-        {
-            switch( p_sample->i_type )
-            {
-            case VLC_CODEC_ADPCM_IMA_QT:
-                p_soun->i_qt_version = 1;
-                p_soun->i_sample_per_packet = 64;
-                p_soun->i_bytes_per_packet  = 34;
-                p_soun->i_bytes_per_frame   = 34 * p_soun->i_channelcount;
-                p_soun->i_bytes_per_sample  = 2;
-                break;
-            case VLC_CODEC_MACE3:
-                p_soun->i_qt_version = 1;
-                p_soun->i_sample_per_packet = 6;
-                p_soun->i_bytes_per_packet  = 2;
-                p_soun->i_bytes_per_frame   = 2 * p_soun->i_channelcount;
-                p_soun->i_bytes_per_sample  = 2;
-                break;
-            case VLC_CODEC_MACE6:
-                p_soun->i_qt_version = 1;
-                p_soun->i_sample_per_packet = 12;
-                p_soun->i_bytes_per_packet  = 2;
-                p_soun->i_bytes_per_frame   = 2 * p_soun->i_channelcount;
-                p_soun->i_bytes_per_sample  = 2;
-                break;
-            default:
-                p_track->fmt.i_codec = p_sample->i_type;
-                break;
-            }
-
-        }
-        else if( p_soun->i_qt_version == 1 && p_soun->i_sample_per_packet <= 0 )
-        {
-            p_soun->i_qt_version = 0;
-        }
-    }
-    else if( p_sample->data.p_sample_soun->i_qt_version == 1 )
-    {
-        switch( p_sample->i_type )
-        {
-        case( VLC_FOURCC( '.', 'm', 'p', '3' ) ):
-        case( VLC_FOURCC( 'm', 's', 0x00, 0x55 ) ):
-        {
-            if( p_track->i_sample_size > 1 )
-                p_soun->i_qt_version = 0;
-            break;
-        }
-        case( ATOM_ac3 ):
-        case( ATOM_eac3 ):
-        case( VLC_FOURCC( 'm', 's', 0x20, 0x00 ) ):
-            p_soun->i_qt_version = 0;
-            break;
-        default:
-            break;
-        }
-
-        if ( p_sample->data.p_sample_soun->i_compressionid == 0xFFFE /* -2 */)
-        {
-            /* redefined sample tables for vbr audio */
-        }
-        else if ( p_track->i_sample_size != 0 && p_soun->i_sample_per_packet == 0 )
-        {
-            msg_Err( p_demux, "Invalid sample per packet value for qt_version 1. Broken muxer! %u %u",
-                     p_track->i_sample_size, p_soun->i_sample_per_packet );
-            p_soun->i_qt_version = 0;
-        }
-    }
 
     /* Endianness atom */
     const MP4_Box_t *p_enda = MP4_BoxGet( p_sample, "wave/enda" );
@@ -1148,8 +1079,6 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                         p_track->fmt.audio.i_blockalign =
                                 p_soun->i_channelcount * p_soun->i_constbitsperchannel / 8;
                         p_track->i_sample_size = p_track->fmt.audio.i_blockalign;
-
-                        p_soun->i_qt_version = 0;
                         break;
                     }
                 }
@@ -1267,14 +1196,6 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
     const MP4_Box_t *p_SA3D = MP4_BoxGet(p_sample, "SA3D");
     if (p_SA3D && BOXDATA(p_SA3D))
         p_track->fmt.audio.channel_type = AUDIO_CHANNEL_TYPE_AMBISONICS;
-
-    /* Late fixes */
-    if ( p_soun->i_qt_version == 0 && p_track->fmt.i_codec == VLC_CODEC_QCELP )
-    {
-        /* Shouldn't be v0, as it is a compressed codec !*/
-        p_soun->i_qt_version = 1;
-        p_soun->i_compressionid = 0xFFFE;
-    }
 
     return 1;
 }
