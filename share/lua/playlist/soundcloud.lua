@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2012, 2015, 2019 the VideoLAN team
+ Copyright © 2012, 2015, 2019-2020 the VideoLAN team
 
  Authors: Cheng Sun <chengsun9atgmail.com>
           Pierre Ynard
@@ -38,10 +38,33 @@ function fix_quotes( value )
     return string.gsub( value, "\\\"", "\"" )
 end
 
+-- Search and extract API magic parameter from web asset
+function extract_magic( url )
+    local s = vlc.stream( url )
+    if not s then
+        return nil
+    end
+
+    while true do
+        local line = s:readline()
+        if not line then break end
+
+        -- The API magic appears under a similar form several times
+        -- in one of the javascript assets
+        -- {client_id:"z21TN9SfM0GjGteSzk4ViM1KEwMRNWZF"}
+        local client_id = string.match( line, '[{,]client_id:"(%w+)"[},]' )
+        if client_id then
+            vlc.msg.dbg( "Found soundcloud API magic" )
+            return client_id
+        end
+    end
+    return nil
+end
+
 -- Parse function.
 function parse()
     while true do
-        line = vlc.readline()
+        local line = vlc.readline()
         if not line then break end
 
         -- API endpoint for audio stream URL
@@ -50,6 +73,19 @@ function parse()
             -- tracks in particular it contains a secret token, e.g.
             -- https://api-v2.soundcloud.com/media/soundcloud:tracks:123456789/986421ee-f9ba-42b2-a642-df8e9761a49b/stream/progressive?secret_token=s-ABCDE
             stream = string.match( line, '"url":"([^"]-/stream/progressive[^"]-)"' )
+        end
+
+        -- API magic parameter
+        if not client_id then
+            local script = string.match( line, '<script( .-)>' )
+            if script then
+                local src = string.match( script, ' src="(.-)"' )
+                if src then
+                    -- Assume absolute path
+                    -- https://a-v2.sndcdn.com/assets/48-551fb851-3.js
+                    client_id = extract_magic( src )
+                end
+            end
         end
 
         -- Metadata
@@ -80,10 +116,10 @@ function parse()
     end
 
     if stream then
-        -- API magic
-        local client_id = "uzhloVwKlWX9bzQ5F1mrqQdjYxKEqDRM"
-
-        local api = vlc.stream( stream..( string.match( stream, "?" ) and "&" or "?" ).."client_id="..client_id )
+        if client_id then
+            stream = stream..( string.match( stream, "?" ) and "&" or "?" ).."client_id="..client_id
+        end
+        local api = vlc.stream( stream )
 
         if api then
             local streams = api:readline() -- data is on one line only
