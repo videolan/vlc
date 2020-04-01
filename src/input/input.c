@@ -54,7 +54,7 @@
 #include <vlc_stream.h>
 #include <vlc_stream_extractor.h>
 #include <vlc_renderer_discovery.h>
-#include <vlc_md5.h>
+#include <vlc_hash.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -2539,16 +2539,18 @@ static input_source_t *InputSourceNew( const char *psz_mrl )
     if( psz_mrl )
     {
         /* Use the MD5 sum of the complete source URL as an identifier. */
-        struct md5_s md5;
-        InitMD5( &md5 );
-        AddMD5( &md5, psz_mrl, strlen( psz_mrl ) );
-        EndMD5( &md5 );
-        in->str_id = psz_md5_hash( &md5 );
+        vlc_hash_md5_t md5;
+
+        in->str_id = malloc(VLC_HASH_MD5_DIGEST_HEX_SIZE);
         if( !in->str_id )
         {
             free( in );
             return NULL;
         }
+
+        vlc_hash_md5_Init( &md5 );
+        vlc_hash_md5_Update( &md5, psz_mrl, strlen( psz_mrl ) );
+        vlc_hash_FinishHex( &md5, in->str_id );
     }
 
     return in;
