@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-30 18:20+0200\n"
+"PO-Revision-Date: 2020-04-01 15:34+0200\n"
 "Last-Translator: Osoitz <oelkoro@gmail.com>, 2020\n"
 "Language-Team: Basque (https://www.transifex.com/yaron/teams/16553/eu/)\n"
 "Language: eu\n"
@@ -684,7 +684,7 @@ msgstr "Audio-iragazkiak"
 
 #: src/audio_output/output.c:327
 msgid "Replay gain"
-msgstr "Erreprodukzio-irabazia"
+msgstr "ReplayGain"
 
 #: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:420
 #: modules/gui/macosx/VLCMainMenu.m:421
@@ -1083,11 +1083,11 @@ msgstr "%u kb/s"
 
 #: src/input/es_out.c:3155
 msgid "Track replay gain"
-msgstr "Pistaren erreprodukzio-irabazia"
+msgstr "Pistaren ReplayGain"
 
 #: src/input/es_out.c:3157
 msgid "Album replay gain"
-msgstr "Albumaren erreprodukzio-irabazia"
+msgstr "Albumaren ReplayGain"
 
 #: src/input/es_out.c:3158
 #, c-format
@@ -1843,11 +1843,11 @@ msgstr ""
 
 #: src/libvlc-module.c:212
 msgid "Replay gain mode"
-msgstr "Erreprodukzio-irabaziaren modua"
+msgstr "ReplayGain modua"
 
 #: src/libvlc-module.c:214
 msgid "Select the replay gain mode"
-msgstr "Hautatu erreprodukzio-irabaziko modua"
+msgstr "Hautatu ReplayGain modua"
 
 #: src/libvlc-module.c:216
 msgid "Replay preamp"
@@ -1859,17 +1859,17 @@ msgid ""
 "replay gain information"
 msgstr ""
 "Honen bidez, helburuko maila lehenetsia (89 dB) aldatu ahal izango duzu "
-"erreprodukzio-irabaziaren informazioa duten transmisio jarraituetarako"
+"ReplayGain informazioa duten transmisio jarraituetarako"
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
-msgstr "Erreprodukzio-irabazi lehenetsia"
+msgstr "ReplayGain lehenetsia"
 
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
 msgstr ""
-"Erreprodukzio-irabaziari buruzko informaziorik ez duten transmisio "
-"jarraituetarako irabazi hau erabiltzen da"
+"ReplayGain informaziorik ez duten transmisio jarraituetarako irabazi hau "
+"erabiltzen da"
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
@@ -29709,7 +29709,7 @@ msgstr "Gaitu audioaren denbora-luzatzea"
 
 #: modules/gui/qt/ui/sprefs_audio.h:420
 msgid "Replay gain mode:"
-msgstr "Erreprodukzio-irabaziaren modua:"
+msgstr "ReplayGain modua:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:421
 msgid "Normalize volume to:"
