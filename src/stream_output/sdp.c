@@ -145,8 +145,6 @@ int vlc_sdp_Start(struct vlc_memstream *restrict stream,
         vlc_memstream_printf(stream, "i=%s\r\n", str);
         free(str);
     }
-    else
-        vlc_memstream_printf(stream, "i=%s\r\n", "N/A");
 
     // no URL, email, no phone (useless)
 
