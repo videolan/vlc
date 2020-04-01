@@ -1,6 +1,5 @@
 access_vaDirectoryControlHelper
 vlc_access_NewMRL
-AddMD5
 aout_BitsPerSample
 aout_ChannelExtract
 aout_ChannelReorder
@@ -93,7 +92,6 @@ vlc_demux_chained_New
 vlc_demux_chained_Send
 vlc_demux_chained_ControlVa
 vlc_demux_chained_Delete
-EndMD5
 es_format_Clean
 es_format_Copy
 es_format_Init
@@ -163,7 +161,6 @@ image_HandlerCreate
 image_HandlerDelete
 image_Mime2Fourcc
 image_Type2Fourcc
-InitMD5
 vlc_input_decoder_Create
 vlc_input_decoder_Delete
 vlc_input_decoder_Decode

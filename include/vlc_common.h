@@ -427,7 +427,7 @@ typedef struct block_t      block_t;
 typedef struct block_fifo_t block_fifo_t;
 
 /* Hashing */
-typedef struct md5_s md5_t;
+typedef struct vlc_hash_md5_ctx vlc_hash_md5_t;
 
 /* XML */
 typedef struct xml_t xml_t;

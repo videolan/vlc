@@ -334,22 +334,7 @@ md5_read( void *context )
 }
 #endif
 
-void InitMD5( struct md5_s *h )
-{
-    md5_init( h );
-}
-
-void AddMD5( struct md5_s *restrict h, const void *data, size_t len )
-{
-    md5_write( h, data, len );
-}
-
-void EndMD5( struct md5_s *h )
-{
-    md5_final( h );
-}
-
-/* New API */
+/* Public API */
 void vlc_hash_md5_Init(vlc_hash_md5_t *ctx)
 {
     md5_init(&ctx->priv);

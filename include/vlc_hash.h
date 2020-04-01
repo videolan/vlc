@@ -25,8 +25,6 @@
 #ifndef VLC_HASH_H
 # define VLC_HASH_H
 
-#include <vlc_md5.h>
-
 /**
  * \defgroup vlc_hash  Hash functions
  * APIs for simple and frequently used hash algorithms in VLC
@@ -85,7 +83,12 @@
  */
 typedef struct vlc_hash_md5_ctx
 {
-    struct md5_s priv; /**< \internal Private */
+    struct md5_s {
+        uint32_t A, B, C, D; /* chaining variables */
+        uint32_t nblocks;
+        uint8_t buf[64];
+        int count;
+    } priv; /**< \internal Private */
 } vlc_hash_md5_t;
 
 /**

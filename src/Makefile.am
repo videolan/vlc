@@ -64,7 +64,6 @@ pluginsinclude_HEADERS = \
 	../include/vlc_interface.h \
 	../include/vlc_keystore.h \
 	../include/vlc_list.h \
-	../include/vlc_md5.h \
 	../include/vlc_media_source.h \
 	../include/vlc_messages.h \
 	../include/vlc_meta.h \
