@@ -12,6 +12,7 @@ ifeq ($(ARCH),arm)
 NETTLE_CONF += --disable-assembler
 endif
 endif
+NETTLE_CONF += --disable-documentation
 
 $(TARBALLS)/nettle-$(NETTLE_VERSION).tar.gz:
 	$(call download_pkg,$(NETTLE_URL),nettle)
