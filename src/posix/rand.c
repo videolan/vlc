@@ -105,13 +105,11 @@ void vlc_rand_bytes (void *buf, size_t len)
         vlc_hash_md5_Update (&mdo, mdi_buf, sizeof(mdi_buf));
         vlc_hash_md5_Finish (&mdo, mdo_buf, sizeof(mdo_buf));
 
-        if (len < sizeof(mdo_buf))
-        {
-            memcpy (buf, mdo_buf, len);
-            break;
-        }
+        memcpy (buf, mdo_buf, (len < sizeof(mdo_buf)) ? len : sizeof(mdo_buf));
 
-        memcpy (buf, mdo_buf, sizeof(mdo_buf));
+        if (len < sizeof(mdo_buf))
+            break;
+
         len -= 16;
         buf = ((uint8_t *)buf) + 16;
     }
