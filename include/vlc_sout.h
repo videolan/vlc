@@ -282,11 +282,6 @@ VLC_API int vlc_sdp_Start(struct vlc_memstream *, vlc_object_t *obj,
                           const char *cfgpref,
                           const struct sockaddr *src, size_t slen,
                           const struct sockaddr *addr, size_t alen) VLC_USED;
-VLC_API void sdp_AddMedia(struct vlc_memstream *, const char *type,
-                          const char *protocol, int dport, unsigned pt,
-                          bool bw_indep, unsigned bw, const char *ptname,
-                          unsigned clockrate, unsigned channels,
-                          const char *fmtp);
 
 /** @} */
 

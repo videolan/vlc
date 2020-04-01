@@ -90,40 +90,6 @@ static bool IsSDPString (const char *str)
     return true;
 }
 
-void sdp_AddMedia(struct vlc_memstream *restrict stream,
-                  const char *type, const char *proto, int dport,
-                  unsigned pt, bool bw_indep, unsigned bw,
-                  const char *ptname, unsigned clock, unsigned chans,
-                  const char *fmtp)
-{
-    /* Some default values */
-    if (type == NULL)
-        type = "video";
-    if (proto == NULL)
-        proto = "RTP/AVP";
-    assert (pt < 128u);
-
-    vlc_memstream_printf(stream, "m=%s %u %s %u\r\n", type, dport, proto, pt);
-
-    if (bw > 0)
-        vlc_memstream_printf(stream, "b=%s:%u\r\n",
-                             bw_indep ? "TIAS" : "AS", bw);
-    vlc_memstream_printf(stream, "b=%s:%u\r\n", "RR", 0);
-
-    /* RTP payload type map */
-    if (ptname != NULL)
-    {
-        vlc_memstream_printf(stream, "a=rtpmap:%u %s/%u", pt, ptname, clock);
-        if ((strcmp(type, "audio") == 0) && (chans != 1))
-            vlc_memstream_printf(stream, "/%u", chans);
-        vlc_memstream_puts(stream, "\r\n");
-    }
-
-    /* Format parameters */
-    if (fmtp != NULL)
-        vlc_memstream_printf(stream, "a=fmtp:%u %s\r\n", pt, fmtp);
-}
-
 int vlc_sdp_Start(struct vlc_memstream *restrict stream,
                   vlc_object_t *obj, const char *cfgpref,
                   const struct sockaddr *src, size_t srclen,
