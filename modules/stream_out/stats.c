@@ -31,7 +31,8 @@
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
-#include <vlc_md5.h>
+#include <vlc_strings.h>
+#include <vlc_hash.h>
 #include <vlc_fs.h>
 
 /*****************************************************************************
@@ -50,7 +51,7 @@ typedef struct
     void *next_id;
     const char *type;
     vlc_tick_t previous_dts,track_duration;
-    struct md5_s hash;
+    vlc_hash_md5_t hash;
 } sout_stream_id_sys_t;
 
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
@@ -82,7 +83,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     id->segment_number = 0;
     id->previous_dts = VLC_TICK_INVALID;
     id->track_duration = 0;
-    InitMD5( &id->hash );
+    vlc_hash_md5_Init( &id->hash );
 
     msg_Dbg( p_stream, "%s: Adding track type:%s id:%d", p_sys->prefix, id->type, id->id);
     return id;
@@ -90,11 +91,11 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
 static void Del( sout_stream_t *p_stream, void *_id )
 {
+    char outputhash[VLC_HASH_MD5_DIGEST_HEX_SIZE];
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
 
-    EndMD5( &id->hash );
-    char *outputhash = psz_md5_hash( &id->hash );
+    vlc_hash_FinishHex( &id->hash, outputhash );
     unsigned int num,den;
     vlc_ureduce( &num, &den, id->track_duration, id->segment_number, 0 );
     msg_Dbg( p_stream, "%s: Removing track type:%s id:%d", p_sys->prefix, id->type, id->id );
@@ -106,7 +107,6 @@ static void Del( sout_stream_t *p_stream, void *_id )
         msg_Info( p_stream, "%s: final type:%s id:%d segments:%"PRIu64" total_duration:%"PRId64" avg_track:%d/%d md5:%16s",
                p_sys->prefix, id->type, id->id, id->segment_number, id->track_duration, num, den, outputhash );
     }
-    free( outputhash );
     free( id );
 }
 
@@ -114,16 +114,16 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
-    struct md5_s hash;
+    vlc_hash_md5_t hash;
 
     block_t *p_block = p_buffer;
     while ( p_block != NULL )
     {
-        InitMD5( &hash );
-        AddMD5( &hash, p_block->p_buffer, p_block->i_buffer );
-        AddMD5( &id->hash, p_block->p_buffer, p_block->i_buffer );
-        EndMD5( &hash );
-        char *outputhash = psz_md5_hash( &hash );
+        char outputhash[VLC_HASH_MD5_DIGEST_HEX_SIZE];
+        vlc_hash_md5_Init( &hash );
+        vlc_hash_md5_Update( &hash, p_block->p_buffer, p_block->i_buffer );
+        vlc_hash_md5_Update( &id->hash, p_block->p_buffer, p_block->i_buffer );
+        vlc_hash_FinishHex( &hash, outputhash );
 
         /* We could just set p_sys->output to stdout and remove user of msg_Dbg
          * if we don't need ability to output info to gui modules (like qt messages window
@@ -144,7 +144,6 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
                   p_block->i_length, outputhash );
         }
         id->track_duration += p_block->i_length ? p_block->i_length : dts_difference;
-        free( outputhash );
         id->previous_dts = p_block->i_dts;
         p_block = p_block->p_next;
     }
