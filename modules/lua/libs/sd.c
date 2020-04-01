@@ -37,7 +37,8 @@
 #include <vlc_common.h>
 #include <vlc_services_discovery.h>
 #include <vlc_charset.h>
-#include <vlc_md5.h>
+#include <vlc_strings.h>
+#include <vlc_hash.h>
 
 #include "../vlc.h"
 #include "../libs.h"
@@ -215,15 +216,13 @@ static input_item_t *vlclua_sd_create_item( services_discovery_t *p_sd,
         char *s = strdup( luaL_checkstring( L, -1 ) );
         if ( s )
         {
-            struct md5_s md5;
-            InitMD5( &md5 );
-            AddMD5( &md5, s, strlen( s ) );
-            EndMD5( &md5 );
+            vlc_hash_md5_t md5;
+            vlc_hash_md5_Init( &md5 );
+            vlc_hash_md5_Update( &md5, s, strlen( s ) );
             free( s );
-            s = psz_md5_hash( &md5 );
-            if ( s )
-                 input_item_AddInfo( p_input, "uid", "md5", "%s", s );
-            free( s );
+            char tmp[VLC_HASH_MD5_DIGEST_HEX_SIZE];
+            vlc_hash_FinishHex( &md5, tmp );
+            input_item_AddInfo( p_input, "uid", "md5", "%s", tmp );
         }
     }
     lua_pop( L, 1 );
