@@ -44,7 +44,8 @@
 #include <vlc_input_item.h>
 #include <vlc_dialog.h>
 #include <vlc_meta.h>
-#include <vlc_md5.h>
+#include <vlc_strings.h>
+#include <vlc_hash.h>
 #include <vlc_memstream.h>
 #include <vlc_stream.h>
 #include <vlc_url.h>
@@ -466,7 +467,7 @@ static int Handshake(intf_thread_t *p_this)
     time_t              timestamp;
     char                psz_timestamp[21];
 
-    struct md5_s        p_struct_md5;
+    vlc_hash_md5_t      struct_md5;
 
     stream_t            *p_stream;
     char                *psz_handshake_url;
@@ -493,18 +494,12 @@ static int Handshake(intf_thread_t *p_this)
     time(&timestamp);
 
     /* generates a md5 hash of the password */
-    InitMD5(&p_struct_md5);
-    AddMD5(&p_struct_md5, (uint8_t*) psz_password, strlen(psz_password));
-    EndMD5(&p_struct_md5);
-
+    vlc_hash_md5_Init(&struct_md5);
+    vlc_hash_md5_Update(&struct_md5, psz_password, strlen(psz_password));
     free(psz_password);
 
-    char *psz_password_md5 = psz_md5_hash(&p_struct_md5);
-    if (!psz_password_md5)
-    {
-        free(psz_username);
-        return VLC_ENOMEM;
-    }
+    char psz_password_md5[VLC_HASH_MD5_DIGEST_HEX_SIZE];
+    vlc_hash_FinishHex(&struct_md5, psz_password_md5);
 
     snprintf(psz_timestamp, sizeof(psz_timestamp), "%"PRIu64,
               (uint64_t)timestamp);
@@ -513,23 +508,15 @@ static int Handshake(intf_thread_t *p_this)
      * - md5 hash of the password, plus
      * - timestamp in clear text
      */
-    InitMD5(&p_struct_md5);
-    AddMD5(&p_struct_md5, (uint8_t*) psz_password_md5, 32);
-    AddMD5(&p_struct_md5, (uint8_t*) psz_timestamp, strlen(psz_timestamp));
-    EndMD5(&p_struct_md5);
-    free(psz_password_md5);
-
-    char *psz_auth_token = psz_md5_hash(&p_struct_md5);
-    if (!psz_auth_token)
-    {
-        free(psz_username);
-        return VLC_ENOMEM;
-    }
+    vlc_hash_md5_Init(&struct_md5);
+    vlc_hash_md5_Update(&struct_md5, psz_password_md5, sizeof(psz_password_md5) - 1);
+    vlc_hash_md5_Update(&struct_md5, psz_timestamp, strlen(psz_timestamp));
+    char psz_auth_token[VLC_HASH_MD5_DIGEST_HEX_SIZE];
+    vlc_hash_FinishHex(&struct_md5, psz_auth_token);
 
     psz_scrobbler_url = var_InheritString(p_this, "scrobbler-url");
     if (!psz_scrobbler_url)
     {
-        free(psz_auth_token);
         free(psz_username);
         return VLC_ENOMEM;
     }
@@ -538,7 +525,6 @@ static int Handshake(intf_thread_t *p_this)
     "http://%s/?hs=true&p=1.2&c="CLIENT_NAME"&v="CLIENT_VERSION"&u=%s&t=%s&a=%s"
     , psz_scrobbler_url, psz_username, psz_timestamp, psz_auth_token);
 
-    free(psz_auth_token);
     free(psz_scrobbler_url);
     free(psz_username);
     if (i_ret == -1)
