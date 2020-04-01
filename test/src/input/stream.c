@@ -21,7 +21,8 @@
 #include "../../libvlc/test.h"
 #include "../lib/libvlc_internal.h"
 
-#include <vlc_md5.h>
+#include <vlc_strings.h>
+#include <vlc_hash.h>
 #include <vlc_stream.h>
 #include <vlc_rand.h>
 #include <vlc_fs.h>
@@ -294,8 +295,8 @@ test( struct reader **pp_readers, unsigned int i_readers, const char *psz_md5 )
     ssize_t i_ret = 0;
     uint64_t i_offset = 0;
     uint64_t i_size;
-    char *psz_read_md5;
-    struct md5_s md5;
+    char psz_read_md5[VLC_HASH_MD5_DIGEST_HEX_SIZE];
+    vlc_hash_md5_t md5;
 
     /* Compare size between each readers */
     i_size = pp_readers[0]->pf_getsize( pp_readers[0] );
@@ -307,20 +308,17 @@ test( struct reader **pp_readers, unsigned int i_readers, const char *psz_md5 )
 
     /* Read the whole file and compare between each readers */
     if( psz_md5 != NULL )
-        InitMD5( &md5 );
+        vlc_hash_md5_Init( &md5 );
     while( ( i_ret = READ_AT( i_offset, 4096 ) ) > 0 )
     {
         i_offset += i_ret;
         if( psz_md5 != NULL )
-            AddMD5( &md5, p_buf, i_ret );
+            vlc_hash_md5_Update( &md5, p_buf, i_ret );
     }
     if( psz_md5 != NULL )
     {
-        EndMD5( &md5 );
-        psz_read_md5 = psz_md5_hash( &md5 );
-        assert( psz_read_md5 );
+        vlc_hash_FinishHex( &md5, psz_read_md5 );
         assert( strcmp( psz_read_md5, psz_md5 ) == 0 );
-        free( psz_read_md5 );
     }
 
     /* Test cache skip */
