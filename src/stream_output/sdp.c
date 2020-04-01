@@ -148,29 +148,7 @@ int vlc_sdp_Start(struct vlc_memstream *restrict stream,
     else
         vlc_memstream_printf(stream, "i=%s\r\n", "N/A");
 
-    strcpy(subvar, "url");
-    str = var_GetNonEmptyString(obj, varname);
-    if (str != NULL)
-    {
-        if (!IsSDPString(str))
-            goto error;
-
-        vlc_memstream_printf(stream, "u=%s\r\n", str);
-        free(str);
-    }
-
-    strcpy(subvar, "email");
-    str = var_GetNonEmptyString(obj, varname);
-    if (str != NULL)
-    {
-        if (!IsSDPString(str))
-            goto error;
-
-        vlc_memstream_printf(stream, "e=%s\r\n", str);
-        free(str);
-    }
-
-    // no phone (useless)
+    // no URL, email, no phone (useless)
 
     vlc_memstream_printf(stream, "c=%s\r\n", connection);
     // bandwidth not specified
