@@ -599,7 +599,7 @@ static bool rist_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf,
     if ( len < RTP_HEADER_SIZE )
     {
         /* check if packet size >= rtp header size */
-        msg_Err(p_access, "Rist rtp packet must have at least 12 bytes, we have %lu", len);
+        msg_Err(p_access, "Rist rtp packet must have at least 12 bytes, we have %zu", len);
         return false;
     }
     else if (!rtp_check_hdr(buf))
