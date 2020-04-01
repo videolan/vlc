@@ -54,6 +54,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_fs.h \
 	../include/vlc_gcrypt.h \
 	../include/vlc_opengl.h \
+	../include/vlc_hash.h \
 	../include/vlc_http.h \
 	../include/vlc_httpd.h \
 	../include/vlc_image.h \

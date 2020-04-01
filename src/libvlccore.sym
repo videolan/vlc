@@ -141,6 +141,9 @@ httpd_HandlerNew
 httpd_HostDelete
 vlc_http_HostNew
 vlc_https_HostNew
+vlc_hash_md5_Init
+vlc_hash_md5_Update
+vlc_hash_md5_Finish
 vlc_rtsp_HostNew
 httpd_MsgAdd
 httpd_MsgGet
