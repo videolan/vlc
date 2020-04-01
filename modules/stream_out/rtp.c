@@ -731,7 +731,7 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
      * output chain with two different RTSP URLs if you need to handle this
      * scenario.
      */
-    int inclport;
+    bool inclport;
 
     vlc_mutex_lock( &p_sys->lock_es );
     if( unlikely(p_sys->i_es == 0 || (rtsp_url != NULL && !p_sys->es[0]->rtsp_id)) )
@@ -739,7 +739,7 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
 
     if( p_sys->psz_destination != NULL )
     {
-        inclport = 1;
+        inclport = true;
 
         /* Oh boy, this is really ugly! */
         dstlen = sizeof( dst );
@@ -752,7 +752,7 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
     }
     else
     {
-        inclport = 0;
+        inclport = false;
 
         /* Check against URL format rtsp://[<ipv6>]:<port>/<path> */
         bool ipv6 = rtsp_url != NULL && strlen( rtsp_url ) > 7
@@ -819,7 +819,7 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
         }
 
         vlc_memstream_printf(&sdp, "m=%s %u %s %"PRIu8"\r\n", mime_major,
-                             inclport * id->i_port, proto,
+                             inclport ? id->i_port : 0, proto,
                              rtp_fmt->payload_type);
 
         if (rtp_fmt->bitrate > 0)
