@@ -24,6 +24,8 @@ import "qrc:///widgets/" as Widgets
 
 Widgets.NavigableFocusScope {
     id: root
+    property alias sortModel: tracklistdisplay_id.sortModel
+    property alias model: tracklistdisplay_id.model
 
     MusicTrackListDisplay {
         id: tracklistdisplay_id
