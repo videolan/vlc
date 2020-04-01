@@ -51,7 +51,7 @@ static const md5_sample_t md5_samples[] =
     { NULL,         NULL            }
 };
 
-static void test_config_StringEscape()
+static void test_vlc_hash_md5()
 {
     for( int i = 0; md5_samples[i].psz_string; i++ )
     {
@@ -73,7 +73,7 @@ static void test_config_StringEscape()
 
 int main( void )
 {
-    test_config_StringEscape();
+    test_vlc_hash_md5();
 
     return 0;
 }
