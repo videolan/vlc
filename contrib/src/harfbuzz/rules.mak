@@ -19,7 +19,8 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.xz .sum-harfbuzz
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-fix-freetype-detect.patch
 	#It does not search for CoreText Framework everywhere
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-fix-coretext-detection.patch
-	#Missing Frameworks in the pkgconfig file
+	#Missing Frameworks in the pkgconfig file and a proper .pc file
+	#The one in src/ does not work because it's autotools-specific
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-create-pkgconfig-file.patch
 	$(APPLY) $(SRC)/harfbuzz/0001-CMakeLists-Enable-big-objects-support-for-win64.patch
 	$(MOVE)
