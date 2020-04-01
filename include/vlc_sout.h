@@ -287,8 +287,6 @@ VLC_API void sdp_AddMedia(struct vlc_memstream *, const char *type,
                           bool bw_indep, unsigned bw, const char *ptname,
                           unsigned clockrate, unsigned channels,
                           const char *fmtp);
-VLC_API void sdp_AddAttribute(struct vlc_memstream *, const char *name,
-                              const char *fmt, ...) VLC_FORMAT(3, 4);
 
 /** @} */
 

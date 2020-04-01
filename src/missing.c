@@ -54,12 +54,6 @@ void sdp_AddMedia (struct vlc_memstream *sdp, const char *type, const char *prot
     assert (sdp == NULL);
 }
 
-void sdp_AddAttribute (struct vlc_memstream *sdp, const char *name, const char *fmt, ...)
-{
-    VLC_UNUSED (sdp); VLC_UNUSED (name); VLC_UNUSED (fmt);
-    assert (sdp == NULL);
-}
-
 noreturn int sout_AccessOutControl(sout_access_out_t *out, int query, ...)
 {
     VLC_UNUSED (out); VLC_UNUSED (query);

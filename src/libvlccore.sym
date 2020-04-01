@@ -322,7 +322,6 @@ picture_pool_Wait
 picture_Reset
 picture_Setup
 plane_CopyPixels
-sdp_AddAttribute
 sdp_AddMedia
 secstotimestr
 sout_AccessOutControl

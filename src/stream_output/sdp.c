@@ -90,29 +90,6 @@ static bool IsSDPString (const char *str)
     return true;
 }
 
-static void vsdp_AddAttribute(struct vlc_memstream *restrict stream,
-                              const char *name, const char *fmt, va_list ap)
-{
-    if (fmt == NULL)
-    {
-        vlc_memstream_printf(stream, "a=%s\r\n", name);
-        return;
-    }
-    vlc_memstream_printf(stream, "a=%s:", name);
-    vlc_memstream_vprintf(stream, fmt, ap);
-    vlc_memstream_puts(stream, "\r\n");
-}
-
-void sdp_AddAttribute(struct vlc_memstream *restrict stream, const char *name,
-                      const char *fmt, ...)
-{
-    va_list ap;
-
-    va_start(ap, fmt);
-    vsdp_AddAttribute(stream, name, fmt, ap);
-    va_end(ap);
-}
-
 void sdp_AddMedia(struct vlc_memstream *restrict stream,
                   const char *type, const char *proto, int dport,
                   unsigned pt, bool bw_indep, unsigned bw,
