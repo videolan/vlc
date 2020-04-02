@@ -26,6 +26,7 @@ ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/libarchive/winrt.patch
 endif
 	$(APPLY) $(SRC)/libarchive/fix-types.patch
+	$(APPLY) $(SRC)/libarchive/0005-don-t-force-windows-versions-if-they-are-set-in-the-.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 
