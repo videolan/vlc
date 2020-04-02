@@ -653,7 +653,7 @@ static void SetupAVCDescriptors( demux_t *p_demux, ts_es_t *p_es, const dvbpsi_p
     {
         p_es->fmt.i_profile = p_dr->p_data[0];
         p_es->fmt.i_level = p_dr->p_data[2];
-        msg_Dbg( p_demux, "     - found AVC_video_descriptor profile=0x%"PRIx8" level=0x%"PRIx8,
+        msg_Dbg( p_demux, "     - found AVC_video_descriptor profile=0x%.2x level=0x%.2x",
                  p_es->fmt.i_profile, p_es->fmt.i_level );
     }
 }
@@ -681,7 +681,7 @@ static void SetupJ2KDescriptors( demux_t *p_demux, ts_es_t *p_es, const dvbpsi_p
             if( p_es->fmt.p_extra )
                 p_es->fmt.i_extra = p_dr->i_length - 24;
         }
-        msg_Dbg( p_demux, "     - found J2K_video_descriptor profile=0x%"PRIx8" level=0x%"PRIx8,
+        msg_Dbg( p_demux, "     - found J2K_video_descriptor profile=0x%.2x level=0x%.2x",
                  p_es->fmt.i_profile, p_es->fmt.i_level );
     }
 }
@@ -1214,8 +1214,9 @@ static void PMTSetupEs0x05PrivateData( demux_t *p_demux, ts_es_t *p_es,
             for( uint8_t i_data = p_ait_dr->i_length; i_data >= 3; i_data -= 3, p_data += 3 )
             {
                 uint16_t i_app_type = ((p_data[0] & 0x7F) << 8) | p_data[1];
+                uint8_t i_version   = p_data[2] & 0x1F;
                 msg_Dbg( p_demux, "      - Application type 0x%"PRIx16" version %"PRIu8,
-                         i_app_type, p_data[2] & 0x1F);
+                         i_app_type, i_version);
             }
         }
     }
