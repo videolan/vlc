@@ -574,8 +574,9 @@ bool AbstractStream::setPosition(vlc_tick_t time, bool tryonly)
         }
         else fakeEsOut()->commandsQueue()->Abort( true );
 
-        es_out_Control(p_realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                       VLC_TICK_0 + time);
+// in some cases, media time seek != sent dts
+//        es_out_Control(p_realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
+//                       VLC_TICK_0 + time);
     }
     return ret;
 }
