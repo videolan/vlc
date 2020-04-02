@@ -8,14 +8,3 @@
  AM_CONDITIONAL([INC_WINDOWS_FILES], [test $inc_windows_files = yes])
  AM_CONDITIONAL([INC_CYGWIN_FILES], [test $inc_cygwin_files = yes])
  
---- libarchive/libarchive/archive_entry.h.old	2017-06-06 16:19:37.998058703 +0200
-+++ libarchive/libarchive/archive_entry.h	2017-06-06 16:19:41.830066940 +0200
-@@ -294,7 +294,7 @@
-
- __LA_DECL void	archive_entry_set_atime(struct archive_entry *, time_t, long);
- __LA_DECL void  archive_entry_unset_atime(struct archive_entry *);
--#if defined(_WIN32) && !defined(__CYGWIN__)
-+#if defined(_WIN32) && !defined(__CYGWIN__) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
- __LA_DECL void archive_entry_copy_bhfi(struct archive_entry *, BY_HANDLE_FILE_INFORMATION *);
- #endif
- __LA_DECL void	archive_entry_set_birthtime(struct archive_entry *, time_t, long);
