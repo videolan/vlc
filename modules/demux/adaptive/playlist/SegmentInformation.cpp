@@ -329,7 +329,15 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
         {
             if( getPlaylist()->isLive() )
             {
-                *ret = mediaSegmentTemplate->getLiveTemplateNumber(time, false);
+                mtime_t now = CLOCK_FREQ * ::time(NULL);
+                if(getPlaylist()->availabilityStartTime.Get())
+                {
+                    if(time >= getPlaylist()->availabilityStartTime.Get() && time < now)
+                        *ret = mediaSegmentTemplate->getLiveTemplateNumber(time, true);
+                    else if(now - getPlaylist()->availabilityStartTime.Get() > time)
+                        *ret = mediaSegmentTemplate->getLiveTemplateNumber(time, false);
+                }
+                else return false;
             }
             else
             {
