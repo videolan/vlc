@@ -28,7 +28,7 @@
 #ifndef AVCODEC_DIRECTX_VA_H
 #define AVCODEC_DIRECTX_VA_H
 
-# if _WIN32_WINNT < _WIN32_WINNT_VISTA
+# if _WIN32_WINNT < 0x0600 // _WIN32_WINNT_VISTA
 /* d3d11 needs Vista support */
 #  undef _WIN32_WINNT
 #  define _WIN32_WINNT _WIN32_WINNT_VISTA
