@@ -69,8 +69,8 @@ namespace adaptive
 
                 Property<vlc_tick_t>                   duration;
                 Property<time_t>                    playbackStart;
-                Property<time_t>                    availabilityEndTime;
-                Property<time_t>                    availabilityStartTime;
+                Property<vlc_tick_t>                   availabilityEndTime;
+                Property<vlc_tick_t>                   availabilityStartTime;
                 Property<vlc_tick_t>                   minUpdatePeriod;
                 Property<vlc_tick_t>                   maxSegmentDuration;
                 Property<vlc_tick_t>                   timeShiftBufferDepth;

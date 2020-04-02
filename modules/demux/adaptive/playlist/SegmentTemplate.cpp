@@ -161,7 +161,7 @@ uint64_t MediaSegmentTemplate::getLiveTemplateNumber(vlc_tick_t playbacktime, bo
         if(abs)
         {
             vlc_tick_t streamstart =
-                    vlc_tick_from_sec(parentSegmentInformation->getPlaylist()->availabilityStartTime.Get());
+                    parentSegmentInformation->getPlaylist()->availabilityStartTime.Get();
             streamstart += parentSegmentInformation->getPeriodStart();
             playbacktime -= streamstart;
         }
