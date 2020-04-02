@@ -241,8 +241,8 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
                 vlc_tick_t elapsed = now - minavailtime;
                 elapsed = elapsed - (elapsed % duration); /* align to last segment */
                 vlc_tick_t alignednow = minavailtime + elapsed;
-                if(mediaSegmentTemplate->duration.Get() < elapsed)
-                    minavailtime = alignednow - mediaSegmentTemplate->duration.Get();
+                if(playlist->timeShiftBufferDepth.Get() < elapsed)
+                    minavailtime = alignednow - playlist->timeShiftBufferDepth.Get();
 
                 if(playbacktime < minavailtime)
                     playbacktime = minavailtime;
