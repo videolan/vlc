@@ -68,6 +68,8 @@ macOS:
    in digital mode
 
 Misc:
+ * Update YouTube, SoundCloud and Vocaroo scripts: this restores
+   playback of YouTube URLs.
  * Add missing .wpl & .zpl file associations on Windows
 
 Changes between 3.0.7.1 and 3.0.8:
