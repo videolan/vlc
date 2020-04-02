@@ -1064,10 +1064,16 @@ static int Demux( demux_t *p_demux )
         p_sys->i_vobu_flush = 0;
 
         /* Look if we have need to force a flush (and when) */
-        const pci_gi_t *p_pci_gi = &dvdnav_get_current_nav_pci( p_sys->dvdnav )->pci_gi;
+        const pci_t *p_pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+        if( unlikely(!p_pci) )
+            break;
+        const pci_gi_t *p_pci_gi = &p_pci->pci_gi;
         if( p_pci_gi->vobu_se_e_ptm != 0 && p_pci_gi->vobu_se_e_ptm < p_pci_gi->vobu_e_ptm )
         {
-            const dsi_gi_t *p_dsi_gi = &dvdnav_get_current_nav_dsi( p_sys->dvdnav )->dsi_gi;
+            const dsi_t *p_dsi = dvdnav_get_current_nav_dsi( p_sys->dvdnav );
+            if( unlikely(!p_dsi) )
+                break;
+            const dsi_gi_t *p_dsi_gi = &p_dsi->dsi_gi;
             if( p_dsi_gi->vobu_3rdref_ea != 0 )
                 p_sys->i_vobu_flush = p_dsi_gi->vobu_3rdref_ea;
             else if( p_dsi_gi->vobu_2ndref_ea != 0 )
