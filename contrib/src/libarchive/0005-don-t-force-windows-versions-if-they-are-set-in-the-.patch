@@ -1,0 +1,44 @@
+From a4fa6bef8bdb141d629d79d8d1f3e67448bd67e1 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 2 Apr 2020 15:33:40 +0200
+Subject: [PATCH 5/5] don't force windows versions if they are set in the
+ environment
+
+---
+ configure.ac | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 7312c4d5..05ca4955 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -244,9 +244,23 @@ AM_CONDITIONAL([STATIC_BSDCPIO], [ test "$static_bsdcpio" = yes ])
+ # Set up defines needed before including any headers
+ case $host in
+   *mingw* | *cygwin* | *msys*  )
+-  AC_DEFINE([_WIN32_WINNT], 0x0502, [Define to '0x0502' for Windows Server 2003 APIs.])
+-  AC_DEFINE([WINVER], 0x0502, [Define to '0x0502' for Windows Server 2003 APIs.])
+-  AC_DEFINE([NTDDI_VERSION], 0x05020000, [Define to '0x05020000' for Windows Server 2003 APIs.])
++  AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
++    [[#ifdef _WIN32_WINNT
++     # error _WIN32_WINNT already defined
++     #endif
++    ]],[[;]])
++  ],[
++    AC_DEFINE([_WIN32_WINNT], 0x0502, [Define to '0x0502' for Windows Server 2003 APIs.])
++    AC_DEFINE([NTDDI_VERSION], 0x05020000, [Define to '0x05020000' for Windows Server 2003 APIs.])
++  ])
++  AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
++    [[#ifdef WINVER
++     # error WINVER already defined
++     #endif
++    ]],[[;]])
++  ],[
++    AC_DEFINE([WINVER], 0x0502, [Define to '0x0502' for Windows Server 2003 APIs.])
++  ])
+   ;;
+ esac
+ 
+-- 
+2.26.0.windows.1
+
