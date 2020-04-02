@@ -202,12 +202,12 @@ static inline uint32_t bs_read( bs_t *s, uint8_t i_count )
         {
             i_shr = i_count - s->i_left;
             /* less in the buffer than requested */
-           if( i_shr >= 32 )
-               i_result = 0;
-           else
-               i_result |= (*s->p&i_mask[s->i_left]) << i_shr;
-           i_count  -= s->i_left;
-           s->i_left = 0;
+            if( i_shr >= 32 )
+                i_result = 0;
+            else
+                i_result |= (*s->p&i_mask[s->i_left]) << i_shr;
+            i_count  -= s->i_left;
+            s->i_left = 0;
         }
     }
 
