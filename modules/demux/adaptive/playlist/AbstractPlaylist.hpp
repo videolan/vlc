@@ -69,8 +69,8 @@ namespace adaptive
 
                 Property<mtime_t>                   duration;
                 Property<time_t>                    playbackStart;
-                Property<time_t>                    availabilityEndTime;
-                Property<time_t>                    availabilityStartTime;
+                Property<mtime_t>                   availabilityEndTime;
+                Property<mtime_t>                   availabilityStartTime;
                 Property<mtime_t>                   minUpdatePeriod;
                 Property<mtime_t>                   maxSegmentDuration;
                 Property<mtime_t>                   timeShiftBufferDepth;

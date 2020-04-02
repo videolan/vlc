@@ -161,7 +161,7 @@ uint64_t MediaSegmentTemplate::getLiveTemplateNumber(mtime_t playbacktime, bool 
         const Timescale timescale = inheritTimescale();
         if(abs)
         {
-            mtime_t streamstart = CLOCK_FREQ *
+            mtime_t streamstart =
                     parentSegmentInformation->getPlaylist()->availabilityStartTime.Get();
             streamstart += parentSegmentInformation->getPeriodStart();
             playbacktime -= streamstart;
