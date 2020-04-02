@@ -38,7 +38,6 @@ class UTCTime
 {
     public:
         UTCTime(const std::string&);
-        time_t  time() const;
         mtime_t mtime() const;
 
     private:
