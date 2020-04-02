@@ -31,7 +31,7 @@ npapi-vlc/configure: stamp-npapi
 	touch $@
 
 if ENABLE_PDB
-ENABLE_PDB_OPTION := --enable-pdb
+ENABLE_PDB_OPTION = --enable-pdb
 endif
 
 npapi-vlc/Makefile: npapi-vlc/configure
