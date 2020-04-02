@@ -2432,8 +2432,8 @@ static int MP4_ReadBox_dvc1( stream_t *p_stream, MP4_Box_t *p_box )
         memcpy( p_dvc1->p_vc1, p_peek, i_read );
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream,
-             "read box: \"dvc1\" profile=%"PRIu8, (p_dvc1->i_profile_level & 0xf0) >> 4 );
+    uint8_t i_profile = (p_dvc1->i_profile_level & 0xf0) >> 4;
+    msg_Dbg( p_stream, "read box: \"dvc1\" profile=%"PRIu8, i_profile );
 #endif
 
     MP4_READBOX_EXIT( 1 );
