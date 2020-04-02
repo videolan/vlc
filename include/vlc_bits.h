@@ -166,16 +166,6 @@ static inline void bs_skip( bs_t *s, size_t i_count )
 
 static inline uint32_t bs_read( bs_t *s, uint8_t i_count )
 {
-     static const uint32_t i_mask[33] =
-     {  0x00,
-        0x01,      0x03,      0x07,      0x0f,
-        0x1f,      0x3f,      0x7f,      0xff,
-        0x1ff,     0x3ff,     0x7ff,     0xfff,
-        0x1fff,    0x3fff,    0x7fff,    0xffff,
-        0x1ffff,   0x3ffff,   0x7ffff,   0xfffff,
-        0x1fffff,  0x3fffff,  0x7fffff,  0xffffff,
-        0x1ffffff, 0x3ffffff, 0x7ffffff, 0xfffffff,
-        0x1fffffff,0x3fffffff,0x7fffffff,0xffffffff};
     uint8_t  i_shr, i_drop = 0;
     uint32_t i_result = 0;
 
@@ -192,20 +182,24 @@ static inline uint32_t bs_read( bs_t *s, uint8_t i_count )
 
         if( s->i_left > i_count )
         {
+            uint_fast32_t mask = (UINT64_C(1) << i_count) - 1;
+
             i_shr = s->i_left - i_count;
             /* more in the buffer than requested */
-            i_result |= ( *s->p >> i_shr )&i_mask[i_count];
+            i_result |= ( *s->p >> i_shr ) & mask;
             s->i_left -= i_count;
             break;
         }
         else
         {
+            uint_fast32_t mask = (UINT64_C(1) << s->i_left) - 1;
+
             i_shr = i_count - s->i_left;
             /* less in the buffer than requested */
             if( i_shr >= 32 )
                 i_result = 0;
             else
-                i_result |= (*s->p&i_mask[s->i_left]) << i_shr;
+                i_result |= (*s->p & mask) << i_shr;
             i_count  -= s->i_left;
             s->i_left = 0;
         }
