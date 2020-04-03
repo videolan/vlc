@@ -782,6 +782,7 @@ static const struct
     { { VLC_CODEC_YUVA_444_10L,
         VLC_CODEC_YUVA_444_10B },              PLANAR_16(4, 1, 1, 10) },
     { { VLC_CODEC_P010 },                      SEMIPLANAR(2, 2, 2, 10) },
+    { { VLC_CODEC_P016 },                      SEMIPLANAR(2, 2, 2, 16) },
 
     { { VLC_CODEC_YUYV, VLC_CODEC_YVYU,
         VLC_CODEC_UYVY, VLC_CODEC_VYUY },      PACKED_FMT(2, 16) },
