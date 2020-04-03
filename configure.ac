@@ -221,6 +221,11 @@ case "${host_os}" in
     AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
       [[#ifdef _WIN32_WINNT
        # error _WIN32_WINNT already defined
+       #else
+       # include <windows.h>
+       # if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0502
+       #  error _WIN32_WINNT toolchain default high enough
+       # endif
        #endif
       ]],[[;]])
     ],[
