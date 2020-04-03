@@ -1,0 +1,84 @@
+From 6b1c0cb9a88424f4d1af769067acf1f6fea66ece Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 3 Apr 2020 13:05:14 +0200
+Subject: [PATCH 3/3] Fix winstore app detection with mingw64
+
+mingw64 doesn't have WINAPI_FAMILY_PC_APP and WINAPI_FAMILY_PHONE_APP but the
+same detection can be achieved by testing WINAPI_PARTITION_DESKTOP.
+---
+ src/hb-blob.cc  | 6 +++---
+ src/hb-mutex.hh | 2 +-
+ src/hb.hh       | 5 +++--
+ 3 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/src/hb-blob.cc b/src/hb-blob.cc
+index 2e72683c..609b87d8 100644
+--- a/src/hb-blob.cc
++++ b/src/hb-blob.cc
+@@ -581,7 +581,7 @@ fail_without_close:
+   wchar_t * wchar_file_name = (wchar_t *) malloc (sizeof (wchar_t) * size);
+   if (unlikely (wchar_file_name == nullptr)) goto fail_without_close;
+   mbstowcs (wchar_file_name, file_name, size);
+-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY==WINAPI_FAMILY_PC_APP || WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP)
++#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+   {
+     CREATEFILE2_EXTENDED_PARAMETERS ceparams = { 0 };
+     ceparams.dwSize = sizeof(CREATEFILE2_EXTENDED_PARAMETERS);
+@@ -602,7 +602,7 @@ fail_without_close:
+ 
+   if (unlikely (fd == INVALID_HANDLE_VALUE)) goto fail_without_close;
+ 
+-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY==WINAPI_FAMILY_PC_APP || WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP)
++#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+   {
+     LARGE_INTEGER length;
+     GetFileSizeEx (fd, &length);
+@@ -615,7 +615,7 @@ fail_without_close:
+ #endif
+   if (unlikely (file->mapping == nullptr)) goto fail;
+ 
+-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY==WINAPI_FAMILY_PC_APP || WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP)
++#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+   file->contents = (char *) MapViewOfFileFromApp (file->mapping, FILE_MAP_READ, 0, 0);
+ #else
+   file->contents = (char *) MapViewOfFile (file->mapping, FILE_MAP_READ, 0, 0, 0);
+diff --git a/src/hb-mutex.hh b/src/hb-mutex.hh
+index e7f8b1c4..f48d6b29 100644
+--- a/src/hb-mutex.hh
++++ b/src/hb-mutex.hh
+@@ -64,7 +64,7 @@ typedef pthread_mutex_t hb_mutex_impl_t;
+ #include <windows.h>
+ typedef CRITICAL_SECTION hb_mutex_impl_t;
+ #define HB_MUTEX_IMPL_INIT	{0}
+-#if defined(WINAPI_FAMILY) && (WINAPI_FAMILY==WINAPI_FAMILY_PC_APP || WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP)
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+ #define hb_mutex_impl_init(M)	InitializeCriticalSectionEx (M, 0, 0)
+ #else
+ #define hb_mutex_impl_init(M)	InitializeCriticalSection (M)
+diff --git a/src/hb.hh b/src/hb.hh
+index fcbd3305..492b9848 100644
+--- a/src/hb.hh
++++ b/src/hb.hh
+@@ -334,8 +334,9 @@ extern "C" void  hb_free_impl(void *ptr);
+ #  if defined(_WIN32_WINNT) && _WIN32_WINNT < 0x0600
+ #    undef _WIN32_WINNT
+ #  endif
++#  include <winapifamily.h>
+ #  ifndef _WIN32_WINNT
+-#    if !defined(WINAPI_FAMILY) || !(WINAPI_FAMILY==WINAPI_FAMILY_PC_APP || WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP)
++#    if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ #      define _WIN32_WINNT 0x0600
+ #    endif
+ #  endif
+@@ -356,7 +357,7 @@ extern "C" void  hb_free_impl(void *ptr);
+ #      define HB_NO_SETLOCALE
+ #      define HB_NO_ERRNO
+ #    endif
+-#  elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY==WINAPI_FAMILY_PC_APP || WINAPI_FAMILY==WINAPI_FAMILY_PHONE_APP)
++#  elif !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ #    ifndef HB_NO_GETENV
+ #      define HB_NO_GETENV
+ #    endif
+-- 
+2.26.0.windows.1
+

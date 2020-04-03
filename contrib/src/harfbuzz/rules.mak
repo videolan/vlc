@@ -16,6 +16,7 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.xz .sum-harfbuzz
 	$(UNPACK)
 	$(APPLY) $(SRC)/harfbuzz/0001-fix-OSAtomic-calls-for-AArch64.patch
 	$(APPLY) $(SRC)/harfbuzz/0002-Update-the-bundled-ax_pthread.m4.patch
+	$(APPLY) $(SRC)/harfbuzz/0003-Fix-winstore-app-detection-with-mingw64.patch
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
