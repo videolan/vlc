@@ -1,5 +1,22 @@
---- flac.orig/src/share/win_utf8_io/win_utf8_io.c	2017-01-02 18:07:08.794676209 -0500
-+++ flac/src/share/win_utf8_io/win_utf8_io.c	2017-01-02 18:10:16.633867994 -0500
+From 9d6fbddfd031852f7c6d1a10aff9fa5ef690858b Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 3 Apr 2020 13:33:26 +0200
+Subject: [PATCH 1/2] Don't call Console APIs on Winstore builds
+
+The API's are only available on desktop builds.
+https://docs.microsoft.com/en-us/windows/console/getstdhandle
+https://docs.microsoft.com/en-us/windows/console/getconsolescreenbufferinfo
+https://docs.microsoft.com/en-us/windows/console/writeconsole
+
+Instead send logs to the debug output
+---
+ src/share/win_utf8_io/win_utf8_io.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/share/win_utf8_io/win_utf8_io.c b/src/share/win_utf8_io/win_utf8_io.c
+index bbb6a74a..1e0c1e86 100644
+--- a/src/share/win_utf8_io/win_utf8_io.c
++++ b/src/share/win_utf8_io/win_utf8_io.c
 @@ -34,6 +34,7 @@
  #endif
  
@@ -8,7 +25,7 @@
  #include "share/win_utf8_io.h"
  #include "share/windows_unicode_filenames.h"
  
-@@ -164,11 +165,13 @@
+@@ -182,11 +183,13 @@ size_t strlen_utf8(const char *str)
  int win_get_console_width(void)
  {
  	int width = 80;
@@ -22,23 +39,25 @@
  	return width;
  }
  
-@@ -176,6 +179,11 @@
+@@ -194,6 +197,10 @@ int win_get_console_width(void)
  
  static int wprint_console(FILE *stream, const wchar_t *text, size_t len)
  {
-+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 +	(void)stream;
 +	OutputDebugStringW(text);
-+	return len;
 +#else
  	DWORD out;
  	int ret;
  
-@@ -202,6 +210,7 @@
+@@ -219,6 +226,7 @@ static int wprint_console(FILE *stream, const wchar_t *text, size_t len)
+ 	ret = fputws(text, stream);
  	if (ret < 0)
  		return ret;
- 	return len;
 +#endif
+ 	return len;
  }
  
- int printf_utf8(const char *format, ...)
+-- 
+2.26.0.windows.1
+
