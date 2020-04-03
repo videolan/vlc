@@ -282,6 +282,24 @@ static vlc_fourcc_t MapSurfaceChroma(cudaVideoChromaFormat chroma, unsigned bitD
     }
 }
 
+static vlc_fourcc_t MapSurfaceOpaqueChroma(cudaVideoChromaFormat chroma, unsigned bitDepth)
+{
+    switch (chroma) {
+        case cudaVideoChromaFormat_420:
+            if (bitDepth <= 8)
+                return VLC_CODEC_NVDEC_OPAQUE;
+            if (bitDepth <= 10)
+                return VLC_CODEC_NVDEC_OPAQUE_10B;
+            return VLC_CODEC_NVDEC_OPAQUE_16B;
+        case cudaVideoChromaFormat_444:
+            if (bitDepth <= 8)
+                return VLC_CODEC_NVDEC_OPAQUE_444;
+            return VLC_CODEC_NVDEC_OPAQUE_444_16B;
+        default:
+            return 0;
+    }
+}
+
 static cudaVideoSurfaceFormat MapSurfaceFmt(int i_vlc_fourcc)
 {
     switch (i_vlc_fourcc) {
@@ -1022,23 +1040,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     vlc_fourcc_t output_chromas[3];
     size_t chroma_idx = 0;
-    if (cudaChroma == cudaVideoChromaFormat_420)
-    {
-        if (i_depth_luma >= 16)
-            output_chromas[chroma_idx++] = VLC_CODEC_NVDEC_OPAQUE_16B;
-        else if (i_depth_luma > 8)
-            output_chromas[chroma_idx++] = VLC_CODEC_NVDEC_OPAQUE_10B;
-        else
-            output_chromas[chroma_idx++] = VLC_CODEC_NVDEC_OPAQUE;
-    }
-    else if (cudaChroma == cudaVideoChromaFormat_444)
-    {
-        if (i_depth_luma > 8)
-            output_chromas[chroma_idx++] = VLC_CODEC_NVDEC_OPAQUE_444_16B;
-        else
-            output_chromas[chroma_idx++] = VLC_CODEC_NVDEC_OPAQUE_444;
-    }
-
+    output_chromas[chroma_idx++] = MapSurfaceOpaqueChroma(cudaChroma, i_depth_luma);
     output_chromas[chroma_idx++] = MapSurfaceChroma(cudaChroma, i_depth_luma);
     output_chromas[chroma_idx++] = 0;
 
