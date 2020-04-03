@@ -327,7 +327,7 @@ static int CUtoFMT(video_format_t *fmt, const CUVIDEOFORMAT *p_format)
     unsigned int i_bpp = p_format->bit_depth_luma_minus8 + 8;
     vlc_fourcc_t i_chroma;
     if (is_nvdec_opaque(fmt->i_chroma))
-        i_chroma = fmt->i_chroma;
+        i_chroma = MapSurfaceOpaqueChroma(p_format->chroma_format, i_bpp);
     else
         i_chroma = MapSurfaceChroma(p_format->chroma_format, i_bpp);
     if (i_chroma == 0)
