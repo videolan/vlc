@@ -146,8 +146,6 @@ static void player_on_error_changed(vlc_player_t *,
                                     enum vlc_player_error, void *);
 static void player_on_rate_changed(vlc_player_t *, float, void *);
 static void player_on_capabilities_changed(vlc_player_t *, int, int, void *);
-static void player_on_position_changed(vlc_player_t *,
-                                       vlc_tick_t, float, void *);
 static void player_on_media_meta_changed(vlc_player_t *,
                                          input_item_t *, void *);
 
@@ -155,6 +153,8 @@ static void player_aout_on_volume_changed(audio_output_t *, float, void *);
 static void player_aout_on_mute_changed(audio_output_t *, bool, void *);
 
 static void player_vout_on_fullscreen_changed(vout_thread_t *, bool, void *);
+static void player_timer_on_discontinuity(vlc_tick_t system_dae, void *data);
+static void player_timer_on_update(const struct vlc_player_timer_point *, void *);
 
 /*****************************************************************************
  * Module descriptor
@@ -278,7 +278,6 @@ static int Open( vlc_object_t *p_this )
         .on_error_changed = player_on_error_changed,
         .on_rate_changed = player_on_rate_changed,
         .on_capabilities_changed = player_on_capabilities_changed,
-        .on_position_changed = player_on_position_changed,
         .on_media_meta_changed = player_on_media_meta_changed,
     };
     p_sys->player_listener =
@@ -305,6 +304,16 @@ static int Open( vlc_object_t *p_this )
     if (!p_sys->player_vout_listener)
         goto player_vout_listener_failure;
 
+    static struct vlc_player_timer_cbs const player_timer_cbs =
+    {
+        .on_update = player_timer_on_update,
+        .on_discontinuity = player_timer_on_discontinuity,
+    };
+    p_sys->player_timer =
+        vlc_player_AddTimer(player, VLC_TICK_INVALID, &player_timer_cbs, p_intf);
+    if (!p_sys->player_timer)
+        goto player_timer_failure;
+
     vlc_playlist_Unlock(playlist);
 
     if( !dbus_connection_set_timeout_functions( p_conn,
@@ -328,6 +337,8 @@ static int Open( vlc_object_t *p_this )
 
 late_failure:
     vlc_playlist_Lock(playlist);
+    vlc_player_RemoveTimer(player, p_sys->player_timer);
+player_timer_failure:
     vlc_player_vout_RemoveListener(player, p_sys->player_vout_listener);
 player_vout_listener_failure:
     vlc_player_aout_RemoveListener(player, p_sys->player_aout_listener);
@@ -368,6 +379,7 @@ static void Close   ( vlc_object_t *p_this )
 
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
     vlc_playlist_Lock(playlist);
+    vlc_player_RemoveTimer(player, p_sys->player_timer);
     vlc_player_vout_RemoveListener(player, p_sys->player_vout_listener);
     vlc_player_aout_RemoveListener(player, p_sys->player_aout_listener);
     vlc_player_RemoveListener(player, p_sys->player_listener);
@@ -1039,6 +1051,9 @@ player_on_state_changed(vlc_player_t *player, enum vlc_player_state state,
         case VLC_PLAYER_STATE_PAUSED:
             playing_state = PLAYBACK_STATE_PAUSED;
             break;
+        /* STOPPING is used to detect time discontinuities that are coming
+         * from stopping the playback in the vlc player timer callbacks. */
+        case VLC_PLAYER_STATE_STOPPING:
         case VLC_PLAYER_STATE_STOPPED:
         default:
             playing_state = PLAYBACK_STATE_STOPPED;
@@ -1094,41 +1109,6 @@ player_on_capabilities_changed(vlc_player_t *player, int old_caps, int new_caps,
 }
 
 static void
-player_on_position_changed(vlc_player_t *player, vlc_tick_t time, float pos,
-                           void *data)
-{
-    intf_thread_t *intf = data;
-    intf_sys_t *sys = intf->p_sys;
-    vlc_tick_t i_now = vlc_tick_now(), i_projected_pos, i_interval;
-    float f_current_rate;
-
-    /* Detect seeks: moved from 1857cab238c
-     * XXX: This is way more convoluted than it should be... */
-
-    if( !sys->i_last_input_pos_event ||
-        vlc_player_GetState(player) != VLC_PLAYER_STATE_PLAYING )
-    {
-        sys->i_last_input_pos_event = i_now;
-        sys->i_last_input_pos = pos;
-        return;
-    }
-
-    f_current_rate = vlc_player_GetRate(player);
-    i_interval = ( i_now - sys->i_last_input_pos_event );
-
-    i_projected_pos = sys->i_last_input_pos + ( i_interval * f_current_rate );
-
-    sys->i_last_input_pos_event = i_now;
-    sys->i_last_input_pos = pos;
-
-    if( llabs( pos - i_projected_pos ) < SEEK_THRESHOLD )
-        return;
-
-    add_event_signal(intf, &(callback_info_t){ .signal = SIGNAL_SEEK });
-    (void) time;
-}
-
-static void
 player_on_media_meta_changed(vlc_player_t *player,
                              input_item_t *item, void *data)
 {
@@ -1159,6 +1139,27 @@ player_vout_on_fullscreen_changed(vout_thread_t *vout, bool enabled,
 {
     add_event_signal(data, &(callback_info_t){ .signal = SIGNAL_FULLSCREEN });
     (void) vout; (void) enabled;
+}
+
+static void
+player_timer_on_update(const struct vlc_player_timer_point *value, void *data)
+{
+    /* The callback is not used by mandatory in the vlc_player_timer API */
+    VLC_UNUSED(value);
+    VLC_UNUSED(data);
+}
+
+static void
+player_timer_on_discontinuity(vlc_tick_t system_date, void *data)
+{
+    intf_thread_t *intf = data;
+    intf_sys_t *sys = intf->p_sys;
+
+    bool stopping = sys->i_playing_state == PLAYBACK_STATE_STOPPED;
+    bool paused = system_date != VLC_TICK_INVALID;
+
+    if( !paused && !stopping )
+        add_event_signal(intf, &(callback_info_t){ .signal = SIGNAL_SEEK });
 }
 
 /*****************************************************************************

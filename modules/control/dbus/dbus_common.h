@@ -96,6 +96,7 @@ struct intf_sys_t
     vlc_player_listener_id      *player_listener;
     vlc_player_aout_listener_id *player_aout_listener;
     vlc_player_vout_listener_id *player_vout_listener;
+    vlc_player_timer_id         *player_timer;
 
     DBusConnection *p_conn;
     bool            b_meta_read;
@@ -110,9 +111,6 @@ struct intf_sys_t
     vlc_mutex_t     lock;
     vlc_thread_t    thread;
     bool            has_input;
-
-    vlc_tick_t      i_last_input_pos; /* Only access from input thread */
-    vlc_tick_t      i_last_input_pos_event; /* Same as above */
 };
 
 enum
