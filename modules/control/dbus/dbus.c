@@ -328,14 +328,14 @@ static int Open( vlc_object_t *p_this )
 
 late_failure:
     vlc_playlist_Lock(playlist);
-player_vout_listener_failure:
     vlc_player_vout_RemoveListener(player, p_sys->player_vout_listener);
-player_aout_listener_failure:
+player_vout_listener_failure:
     vlc_player_aout_RemoveListener(player, p_sys->player_aout_listener);
-player_listener_failure:
+player_aout_listener_failure:
     vlc_player_RemoveListener(player, p_sys->player_listener);
-playlist_listener_failure:
+player_listener_failure:
     vlc_playlist_RemoveListener(playlist, p_sys->playlist_listener);
+playlist_listener_failure:
     vlc_playlist_Unlock(playlist);
 
     var_Destroy(vlc, "dbus-mpris-name");
