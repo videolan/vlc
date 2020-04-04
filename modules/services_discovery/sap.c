@@ -91,10 +91,6 @@
        "This enables actual parsing of the announces by the SAP module. " \
        "Otherwise, all announcements are parsed by the \"live555\" " \
        "(RTP/RTSP) module." )
-#define SAP_STRICT_TEXT N_( "SAP Strict mode" )
-#define SAP_STRICT_LONGTEXT N_( \
-       "When this is set, the SAP parser will discard some non-compliant " \
-       "announcements." )
 
 /* Callbacks */
     static int  Open ( vlc_object_t * );
@@ -118,8 +114,7 @@ vlc_module_begin ()
                  SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, true )
     add_bool( "sap-parse", true,
                SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, true )
-    add_bool( "sap-strict", false,
-               SAP_STRICT_TEXT,SAP_STRICT_LONGTEXT, true )
+    add_obsolete_bool( "sap-strict" ) /* since 4.0.0 */
     add_obsolete_bool( "sap-timeshift" ) /* Redumdant since 1.0.0 */
 
     set_capability( "services_discovery", 0 )
@@ -223,7 +218,6 @@ typedef struct
     struct sap_announce_t **pp_announces;
 
     /* Modes */
-    bool  b_strict;
     bool  b_parse;
 
     vlc_tick_t i_timeout;
@@ -300,7 +294,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->pi_fd = NULL;
     p_sys->i_fd = 0;
 
-    p_sys->b_strict = var_CreateGetBool( p_sd, "sap-strict");
     p_sys->b_parse = var_CreateGetBool( p_sd, "sap-parse" );
 
     p_sys->i_announces = 0;
@@ -683,11 +676,8 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
 
     uint16_t i_hash = U16_AT (buf + 2);
 
-    if( p_sys->b_strict && i_hash == 0 )
-    {
-        msg_Dbg( p_sd, "strict mode, discarding announce with null id hash");
+    if( i_hash == 0 )
         return VLC_EGENERIC;
-    }
 
     buf += 4;
     if( b_ipv6 )
