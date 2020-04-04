@@ -12251,7 +12251,7 @@ msgstr "EBU STL 字幕解碼器"
 #. languages using the Latin alphabet.
 #: modules/codec/subsdec.c:100
 msgid "Default (Windows-1252)"
-msgstr "預設(Windows-1252)"
+msgstr "預設(大五碼)"
 
 #: modules/codec/subsdec.c:101
 msgid "System codeset"
@@ -12403,7 +12403,7 @@ msgstr "韓文 (ISO-2022-KR)"
 
 #: modules/codec/subsdec.c:157
 msgid "Traditional Chinese (Big5)"
-msgstr "正體中文 (Big5)"
+msgstr "正體中文 (大五碼)"
 
 #: modules/codec/subsdec.c:158
 msgid "Traditional Chinese Unix (EUC-TW)"
@@ -12463,7 +12463,7 @@ msgstr "文字字幕解碼器"
 #: modules/codec/subsdec.c:291 modules/demux/avi/avi.c:97
 msgctxt "GetACP"
 msgid "CP1252"
-msgstr "CP1252"
+msgstr "Big5"
 
 #: modules/codec/subsusf.c:45
 msgid ""
