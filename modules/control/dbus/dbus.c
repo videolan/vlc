@@ -1371,5 +1371,3 @@ int AddProperty( intf_thread_t *p_intf,
 
 #undef ADD_META
 #undef ADD_VLC_META_STRING
-
-
