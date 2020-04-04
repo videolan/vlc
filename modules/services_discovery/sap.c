@@ -158,10 +158,6 @@ struct  sdp_t
 
     /* o field */
     char     username[64];
-    uint64_t session_id;
-    uint64_t session_version;
-    unsigned orig_ip_version;
-    char     orig_host[1024];
 
     /* s= field */
     char *psz_sessionname;
@@ -1241,18 +1237,13 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                     goto error;
                 }
 
-                if ((sscanf (data, "%63s %"SCNu64" %"SCNu64" IN IP%u %1023s",
-                             p_sdp->username, &p_sdp->session_id,
-                             &p_sdp->session_version, &p_sdp->orig_ip_version,
-                             p_sdp->orig_host) != 5)
-                 || ((p_sdp->orig_ip_version != 4)
-                  && (p_sdp->orig_ip_version != 6)))
+                if (sscanf(data, "%63s %*u %*u IN %*s %*s%n",
+                           p_sdp->username, &(int){ 0 }) != 2)
                 {
                     msg_Dbg (p_obj, "SDP origin not supported: %s", data);
                     /* Or maybe out-of-range, but this looks suspicious */
                     goto error;
                 }
-                EnsureUTF8 (p_sdp->orig_host);
                 break;
 
             case 'S':
