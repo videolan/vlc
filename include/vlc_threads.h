@@ -221,12 +221,15 @@ typedef pthread_key_t   vlc_threadvar_t;
  */
 typedef struct vlc_timer *vlc_timer_t;
 
+/* Thread priorities.
+ * No effect for POSIX threads
+ */
 # define VLC_THREAD_PRIORITY_LOW      0
-# define VLC_THREAD_PRIORITY_INPUT   10
-# define VLC_THREAD_PRIORITY_AUDIO    5
+# define VLC_THREAD_PRIORITY_INPUT    0
+# define VLC_THREAD_PRIORITY_AUDIO    0
 # define VLC_THREAD_PRIORITY_VIDEO    0
-# define VLC_THREAD_PRIORITY_OUTPUT  15
-# define VLC_THREAD_PRIORITY_HIGHEST 20
+# define VLC_THREAD_PRIORITY_OUTPUT   0
+# define VLC_THREAD_PRIORITY_HIGHEST  0
 
 #endif
 
