@@ -116,6 +116,7 @@ win64:
         - mkdir nightlies
         - for ext in 7z zip; do mv ${SHORTARCH}/vlc-*-debug.${ext} nightlies/$(basename ${SHORTARCH}/vlc-*-debug.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
         - for ext in exe msi 7z zip; do mv ${SHORTARCH}/vlc-*.${ext} nightlies/$(basename ${SHORTARCH}/vlc-*.${ext} | sed "s/\.${ext}/-${CI_COMMIT_SHORT_SHA}\.${ext}/"); done
+        - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
     artifacts:
         paths:
             - nightlies/*
@@ -210,6 +211,7 @@ nightly-snap:
         - echo $SNAP_LOGIN | base64 --decode | snapcraft login --with -
         - snapcraft push nightlies/vlc_*.snap --release beta
         - snapcraft logout
+        - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
     artifacts:
         paths:
            - nightlies/*
@@ -245,6 +247,7 @@ nightly-macos:
     after_script:
         - mkdir nightlies
         - mv build/vlc-*.dmg nightlies/$(basename build/vlc-*.dmg | sed "s/\.dmg/-${CI_COMMIT_SHORT_SHA}\.dmg/")
+        - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
     artifacts:
         paths:
             - nightlies/*
