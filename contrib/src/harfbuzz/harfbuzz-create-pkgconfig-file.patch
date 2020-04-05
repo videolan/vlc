@@ -20,7 +20,7 @@ diff -urN harfbuzz.bak/CMakeLists.txt harfbuzz/CMakeLists.txt
 +  find_library(COREFOUNDATION CoreFoundation)
 +  if (COREFOUNDATION)
 +    list(APPEND THIRD_PARTY_LIBS ${COREFOUNDATION})
-+    set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreText")
++    set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreFoundation")
 +  endif ()
 +  mark_as_advanced(COREFOUNDATION)
  
@@ -37,7 +37,7 @@ diff -urN harfbuzz.bak/CMakeLists.txt harfbuzz/CMakeLists.txt
 +  find_library(CORETEXT CoreText)
 +  if (CORETEXT)
 +    list(APPEND THIRD_PARTY_LIBS ${CORETEXT})
-+    set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreFoundation")
++    set(FRAMEWORK_FLAGS "${FRAMEWORK_FLAGS} -framework CoreText")
 +  endif ()
 +  mark_as_advanced(CORETEXT)
  
