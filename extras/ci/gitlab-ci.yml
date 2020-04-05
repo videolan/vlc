@@ -234,13 +234,14 @@ nightly-snap:
     except:
     after_script:
         - if [ "$CI_PROJECT_NAMESPACE" = "videolan" ]; then /bin/true; else exit 0; fi
-        - cd extras/package/snap
+        - mkdir nightlies
+        - mv extras/package/snap/vlc_*.snap nightlies/
         - echo $SNAP_LOGIN | base64 --decode | snapcraft login --with -
-        - snapcraft push vlc_*.snap --release edge
+        - snapcraft push nightlies/vlc_*.snap --release edge
         - snapcraft logout
     artifacts:
         paths:
-           - extras/package/snap/vlc_*.snap
+           - nightlies/*
 
 #
 # Raspbian
