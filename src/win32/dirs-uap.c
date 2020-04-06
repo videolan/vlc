@@ -213,6 +213,69 @@ end_appdata:
     return psz_dir;
 }
 
+static char *config_GetCacheDir (void)
+{
+#ifndef HAVE_IAPPLICATIONDATA2
+    return NULL;
+#else // HAVE_IAPPLICATIONDATA2
+    HRESULT hr;
+    IStorageFolder *folder = NULL;
+    IApplicationDataStatics *appDataStatics = NULL;
+    IApplicationData *appData = NULL;
+    IApplicationData2 *appData2 = NULL;
+    static const WCHAR *className = L"Windows.Storage.ApplicationData";
+    const UINT32 clen = wcslen(className);
+
+    HSTRING hClassName = NULL;
+    HSTRING_HEADER header;
+    hr = WindowsCreateStringReference(className, clen, &header, &hClassName);
+    if (FAILED(hr))
+        goto end_appdata;
+
+    hr = RoGetActivationFactory(hClassName, &IID_IApplicationDataStatics, (void**)&appDataStatics);
+
+    if (FAILED(hr))
+        goto end_appdata;
+
+    if (!appDataStatics) {
+        hr = E_FAIL;
+        goto end_appdata;
+    }
+
+    hr = IApplicationDataStatics_get_Current(appDataStatics, &appData);
+
+    if (FAILED(hr))
+        goto end_appdata;
+
+    if (!appData) {
+        hr = E_FAIL;
+        goto end_appdata;
+    }
+
+    IApplicationData_QueryInterface(appData, &IID_IApplicationData2, (void**)&appData2);
+    if (!appData2) {
+        hr = E_FAIL;
+        goto end_appdata;
+    }
+
+    hr = IApplicationData2_get_LocalCacheFolder(appData2, &folder);
+
+end_appdata:
+    WindowsDeleteString(hClassName);
+    if (appDataStatics)
+        IApplicationDataStatics_Release(appDataStatics);
+    if (appData2)
+        IApplicationData2_Release(appData2);
+    if (appData)
+        IApplicationData_Release(appData);
+
+    if( FAILED(hr) || folder == NULL )
+        return NULL;
+
+    return GetFolderName(folder);
+#endif // HAVE_IAPPLICATIONDATA2
+}
+
 char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
@@ -228,7 +291,7 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_USERDATA_DIR:
             return config_GetAppDir ();
         case VLC_CACHE_DIR:
-            return config_GetShellDir (VLC_CACHE_DIR);
+            return config_GetCacheDir ();
         case VLC_MUSIC_DIR:
             return config_GetShellDir (VLC_MUSIC_DIR);
         case VLC_PICTURES_DIR:
