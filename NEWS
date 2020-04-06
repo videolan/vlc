@@ -41,6 +41,8 @@ Decoder:
  * Fixed Hebrew teletext pages support in zvbi
  * Fixed Dav1d aborting decoding on corrupted picture
  * Extract and display of all CEA708 subtitles
+ * Update libfaad to 2.9.1
+ * Add DXVA support for VP9 Profile 2 (10 bits)
 
 Text renderer:
  * Fix crashes on macOS with SSA/ASS subtitles containing emoji
@@ -66,6 +68,9 @@ macOS:
  * Fix rare placement issues with fullscreen panel
  * Fix problem in audio output remembering the last device configuration
    in digital mode
+
+Service Discovery:
+ * Update libmicrodns to 0.1.2
 
 Misc:
  * Update YouTube, SoundCloud and Vocaroo scripts: this restores
