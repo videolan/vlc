@@ -33,39 +33,20 @@
 #endif
 #include <vlc_common.h>
 
-#ifdef __MINGW32__
-# include <w32api.h>
-#endif
-#include <direct.h>
-#include <shlobj.h>
-
-#include "../libvlc.h"
 #include <vlc_charset.h>
-#include <vlc_configuration.h>
-#include "config/configuration.h"
 
 #include <assert.h>
-#include <limits.h>
 
 #include <winstring.h>
 #include <windows.storage.h>
 #include <roapi.h>
 
-static HRESULT WinRTSHGetFolderPath(HWND hwnd, int csidl, HANDLE hToken, DWORD dwFlags, LPWSTR pszPath)
+static char *config_GetShellDir(vlc_userdir_t csidl)
 {
-    VLC_UNUSED(hwnd);
-    VLC_UNUSED(hToken);
-
     HRESULT hr;
-    IStorageFolder *folder;
+    IStorageFolder *folder = NULL;
 
-    if (dwFlags != SHGFP_TYPE_CURRENT)
-        return E_NOTIMPL;
-
-    folder = NULL;
-    csidl &= ~CSIDL_FLAG_CREATE;
-
-    if (csidl == CSIDL_APPDATA) {
+    if (csidl == VLC_USERDATA_DIR) {
         IApplicationDataStatics *appDataStatics = NULL;
         IApplicationData *appData = NULL;
         static const WCHAR *className = L"Windows.Storage.ApplicationData";
@@ -129,16 +110,16 @@ end_appdata:
         }
 
         switch (csidl) {
-        case CSIDL_PERSONAL:
+        case VLC_HOME_DIR:
             hr = IKnownFoldersStatics_get_DocumentsLibrary(knownFoldersStatics, &folder);
             break;
-        case CSIDL_MYMUSIC:
+        case VLC_MUSIC_DIR:
             hr = IKnownFoldersStatics_get_MusicLibrary(knownFoldersStatics, &folder);
             break;
-        case CSIDL_MYPICTURES:
+        case VLC_PICTURES_DIR:
             hr = IKnownFoldersStatics_get_PicturesLibrary(knownFoldersStatics, &folder);
             break;
-        case CSIDL_MYVIDEO:
+        case VLC_VIDEOS_DIR:
             hr = IKnownFoldersStatics_get_VideosLibrary(knownFoldersStatics, &folder);
             break;
         default:
@@ -151,6 +132,7 @@ end_other:
             IKnownFoldersStatics_Release(knownFoldersStatics);
     }
 
+    char *result = NULL;
     if( SUCCEEDED(hr) && folder != NULL )
     {
         HSTRING path = NULL;
@@ -163,7 +145,7 @@ end_other:
         if (FAILED(hr))
             goto end_folder;
         pszPathTemp = WindowsGetStringRawBuffer(path, NULL);
-        wcscpy(pszPath, pszPathTemp);
+        result = FromWide(pszPathTemp);
 end_folder:
         WindowsDeleteString(path);
         IStorageFolder_Release(folder);
@@ -171,9 +153,8 @@ end_folder:
             IStorageItem_Release(item);
     }
 
-    return hr;
+    return result;
 }
-#define SHGetFolderPathW WinRTSHGetFolderPath
 
 static char *config_GetDataDir(void)
 {
@@ -213,20 +194,10 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
     return path;
 }
 
-static char *config_GetShellDir (int csidl)
-{
-    wchar_t wdir[MAX_PATH];
-
-    if (SHGetFolderPathW (NULL, csidl | CSIDL_FLAG_CREATE,
-                          NULL, SHGFP_TYPE_CURRENT, wdir ) == S_OK)
-        return FromWide (wdir);
-    return NULL;
-}
-
 static char *config_GetAppDir (void)
 {
     char *psz_dir;
-    char *psz_parent = config_GetShellDir (CSIDL_APPDATA);
+    char *psz_parent = config_GetShellDir (VLC_USERDATA_DIR);
 
     if (psz_parent == NULL
      ||  asprintf (&psz_dir, "%s\\vlc", psz_parent) == -1)
@@ -235,31 +206,29 @@ static char *config_GetAppDir (void)
     return psz_dir;
 }
 
-#warning FIXME Use known folders on Vista and above
 char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
     {
         case VLC_HOME_DIR:
-            return config_GetShellDir (CSIDL_PERSONAL);
-        case VLC_CONFIG_DIR:
-        case VLC_USERDATA_DIR:
-            return config_GetAppDir ();
-        case VLC_CACHE_DIR:
-            return config_GetShellDir (CSIDL_LOCAL_APPDATA);
-
         case VLC_DESKTOP_DIR:
         case VLC_DOWNLOAD_DIR:
         case VLC_TEMPLATES_DIR:
         case VLC_PUBLICSHARE_DIR:
         case VLC_DOCUMENTS_DIR:
-            return config_GetUserDir(VLC_HOME_DIR);
+            return config_GetShellDir (VLC_HOME_DIR);
+        case VLC_CONFIG_DIR:
+        case VLC_USERDATA_DIR:
+            return config_GetAppDir ();
+        case VLC_CACHE_DIR:
+            return config_GetShellDir (VLC_CACHE_DIR);
         case VLC_MUSIC_DIR:
-            return config_GetShellDir (CSIDL_MYMUSIC);
+            return config_GetShellDir (VLC_MUSIC_DIR);
         case VLC_PICTURES_DIR:
-            return config_GetShellDir (CSIDL_MYPICTURES);
+            return config_GetShellDir (VLC_PICTURES_DIR);
         case VLC_VIDEOS_DIR:
-            return config_GetShellDir (CSIDL_MYVIDEO);
+            return config_GetShellDir (VLC_VIDEOS_DIR);
+        default:
+            vlc_assert_unreachable ();
     }
-    vlc_assert_unreachable ();
 }
