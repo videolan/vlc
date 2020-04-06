@@ -106,6 +106,7 @@ typedef struct
     struct wl_surface *cursor_surface;
 
     vlc_mutex_t lock;
+    vlc_cond_t cond_configured;
     vlc_thread_t thread;
 } vout_window_sys_t;
 
@@ -262,8 +263,10 @@ static int Enable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
     wl_display_flush(display);
 
 #ifdef XDG_SHELL
+    vlc_mutex_lock(&sys->lock);
     while (!sys->wm.configured)
-        wl_display_dispatch(display);
+        vlc_cond_wait(&sys->cond_configured, &sys->lock);
+    vlc_mutex_unlock(&sys->lock);
 #endif
 
     return VLC_SUCCESS;
@@ -339,7 +342,11 @@ static void xdg_surface_configure_cb(void *data, struct xdg_surface *surface,
         vout_window_ReportWindowed(wnd);
 
     xdg_surface_ack_configure(surface, serial);
+
+    vlc_mutex_lock(&sys->lock);
     sys->wm.configured = true;
+    vlc_cond_signal(&sys->cond_configured);
+    vlc_mutex_unlock(&sys->lock);
 }
 
 static const struct xdg_surface_listener xdg_surface_cbs =
@@ -617,6 +624,7 @@ static int Open(vout_window_t *wnd)
     sys->cursor_theme = NULL;
     sys->cursor_surface = NULL;
     vlc_mutex_init(&sys->lock);
+    vlc_cond_init(&sys->cond_configured);
     wnd->sys = sys;
     wnd->handle.wl = NULL;
 
