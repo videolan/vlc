@@ -28,11 +28,16 @@ endif
 # Feel free to add autodetection if you need to...
 PKGS += lua luac
 PKGS_ALL += luac
+ifeq ($(call need_pkg,"lua >= 5.1"),)
+PKGS_FOUND += lua luac
+else
 ifeq ($(call need_pkg,"lua5.2"),)
 PKGS_FOUND += lua luac
-endif
+else
 ifeq ($(call need_pkg,"lua5.1"),)
 PKGS_FOUND += lua luac
+endif
+endif
 endif
 
 $(TARBALLS)/lua-$(LUA_VERSION).tar.gz:
