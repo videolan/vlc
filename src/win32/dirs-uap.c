@@ -68,48 +68,6 @@ static char *config_GetShellDir(vlc_userdir_t csidl)
     HRESULT hr;
     IStorageFolder *folder = NULL;
 
-    if (csidl == VLC_USERDATA_DIR) {
-        IApplicationDataStatics *appDataStatics = NULL;
-        IApplicationData *appData = NULL;
-        static const WCHAR *className = L"Windows.Storage.ApplicationData";
-        const UINT32 clen = wcslen(className);
-
-        HSTRING hClassName = NULL;
-        HSTRING_HEADER header;
-        hr = WindowsCreateStringReference(className, clen, &header, &hClassName);
-        if (FAILED(hr))
-            goto end_appdata;
-
-        hr = RoGetActivationFactory(hClassName, &IID_IApplicationDataStatics, (void**)&appDataStatics);
-
-        if (FAILED(hr))
-            goto end_appdata;
-
-        if (!appDataStatics) {
-            hr = E_FAIL;
-            goto end_appdata;
-        }
-
-        hr = IApplicationDataStatics_get_Current(appDataStatics, &appData);
-
-        if (FAILED(hr))
-            goto end_appdata;
-
-        if (!appData) {
-            hr = E_FAIL;
-            goto end_appdata;
-        }
-
-        hr = IApplicationData_get_LocalFolder(appData, &folder);
-
-end_appdata:
-        WindowsDeleteString(hClassName);
-        if (appDataStatics)
-            IApplicationDataStatics_Release(appDataStatics);
-        if (appData)
-            IApplicationData_Release(appData);
-    }
-    else
     {
         IKnownFoldersStatics *knownFoldersStatics = NULL;
         static const WCHAR *className = L"Windows.Storage.KnownFolders";
@@ -200,13 +158,60 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
 
 static char *config_GetAppDir (void)
 {
-    char *psz_dir;
-    char *psz_parent = config_GetShellDir (VLC_USERDATA_DIR);
+    char *psz_dir = NULL;
 
-    if (psz_parent == NULL
-     ||  asprintf (&psz_dir, "%s\\vlc", psz_parent) == -1)
-        psz_dir = NULL;
-    free (psz_parent);
+    HRESULT hr;
+    IStorageFolder *folder = NULL;
+
+    IApplicationDataStatics *appDataStatics = NULL;
+    IApplicationData *appData = NULL;
+    static const WCHAR *className = L"Windows.Storage.ApplicationData";
+    const UINT32 clen = wcslen(className);
+
+    HSTRING hClassName = NULL;
+    HSTRING_HEADER header;
+    hr = WindowsCreateStringReference(className, clen, &header, &hClassName);
+    if (FAILED(hr))
+        goto end_appdata;
+
+    hr = RoGetActivationFactory(hClassName, &IID_IApplicationDataStatics, (void**)&appDataStatics);
+
+    if (FAILED(hr))
+        goto end_appdata;
+
+    if (!appDataStatics) {
+        hr = E_FAIL;
+        goto end_appdata;
+    }
+
+    hr = IApplicationDataStatics_get_Current(appDataStatics, &appData);
+
+    if (FAILED(hr))
+        goto end_appdata;
+
+    if (!appData) {
+        hr = E_FAIL;
+        goto end_appdata;
+    }
+
+    hr = IApplicationData_get_LocalFolder(appData, &folder);
+
+    if( SUCCEEDED(hr) && folder != NULL )
+    {
+        char *psz_parent = GetFolderName(folder);
+        if (psz_parent == NULL
+         || asprintf (&psz_dir, "%s\\vlc", psz_parent) == -1)
+            psz_dir = NULL;
+        free(psz_parent);
+    }
+
+end_appdata:
+    WindowsDeleteString(hClassName);
+    if (appDataStatics)
+        IApplicationDataStatics_Release(appDataStatics);
+    if (appData)
+        IApplicationData_Release(appData);
+
     return psz_dir;
 }
 
