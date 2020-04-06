@@ -41,6 +41,28 @@
 #include <windows.storage.h>
 #include <roapi.h>
 
+static char * GetFolderName(IStorageFolder *folder)
+{
+    HRESULT hr;
+    IStorageItem *item;
+    hr = IStorageFolder_QueryInterface(folder, &IID_IStorageItem, (void**)&item);
+    if (FAILED(hr))
+        return NULL;
+
+    char *result = NULL;
+    HSTRING path;
+    hr = IStorageItem_get_Path(item, &path);
+    if (SUCCEEDED(hr))
+    {
+        PCWSTR pszPathTemp = WindowsGetStringRawBuffer(path, NULL);
+        result = FromWide(pszPathTemp);
+        WindowsDeleteString(path);
+    }
+    IStorageItem_Release(item);
+    IStorageFolder_Release(folder);
+    return result;
+}
+
 static char *config_GetShellDir(vlc_userdir_t csidl)
 {
     HRESULT hr;
@@ -132,28 +154,10 @@ end_other:
             IKnownFoldersStatics_Release(knownFoldersStatics);
     }
 
-    char *result = NULL;
-    if( SUCCEEDED(hr) && folder != NULL )
-    {
-        HSTRING path = NULL;
-        IStorageItem *item = NULL;
-        PCWSTR pszPathTemp;
-        hr = IStorageFolder_QueryInterface(folder, &IID_IStorageItem, (void**)&item);
-        if (FAILED(hr))
-            goto end_folder;
-        hr = IStorageItem_get_Path(item, &path);
-        if (FAILED(hr))
-            goto end_folder;
-        pszPathTemp = WindowsGetStringRawBuffer(path, NULL);
-        result = FromWide(pszPathTemp);
-end_folder:
-        WindowsDeleteString(path);
-        IStorageFolder_Release(folder);
-        if (item)
-            IStorageItem_Release(item);
-    }
+    if( FAILED(hr) || folder == NULL )
+        return NULL;
 
-    return result;
+    return GetFolderName(folder);
 }
 
 static char *config_GetDataDir(void)
