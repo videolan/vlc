@@ -2745,6 +2745,12 @@ dnl
 AC_CHECK_HEADERS([dxgidebug.h dxgi1_6.h])
 
 dnl
+dnl IApplicationData2
+dnl
+have_iapplication_data2="no"
+AC_CHECK_TYPES([IApplicationData2],[],[],[#include <windows.storage.h>])
+
+dnl
 dnl  avformat demuxer/muxer plugin
 dnl
 
