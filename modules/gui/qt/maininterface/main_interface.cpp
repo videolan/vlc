@@ -98,6 +98,7 @@
 # include <X11/Xlib.h>
 #endif
 
+#include <QtGlobal>
 #include <QTimer>
 #include <QtQml/QQmlContext>
 #include <QtQuick/QQuickItem>
@@ -120,6 +121,22 @@ static int IntfBossCB( vlc_object_t *p_this, const char *psz_variable,
 static int IntfRaiseMainCB( vlc_object_t *p_this, const char *psz_variable,
                            vlc_value_t old_val, vlc_value_t new_val,
                            void *param );
+
+namespace {
+
+template<class T>
+void registerAnonymousType( const char *uri, int versionMajor )
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+    qmlRegisterAnonymousType<T>( uri, versionMajor );
+#else
+    qmlRegisterType<T>();
+    VLC_UNUSED( uri );
+    VLC_UNUSED( versionMajor );
+#endif
+}
+
+} // anonymous namespace
 
 const QEvent::Type MainInterface::ToolbarsNeedRebuild =
         (QEvent::Type)QEvent::registerEventType();
@@ -357,11 +374,11 @@ void MainInterface::createMainWidget( QSettings * )
         qmlRegisterType<MlFoldersModel>( "org.videolan.medialib", 0, 1, "MLFolderModel");
 
         //expose base object, they aren't instanciable from QML side
-        qmlRegisterType<MLAlbum>();
-        qmlRegisterType<MLArtist>();
-        qmlRegisterType<MLAlbumTrack>();
-        qmlRegisterType<MLGenre>();
-        qmlRegisterType<MLVideo>();
+        registerAnonymousType<MLAlbum>( "org.videolan.medialib", 1 );
+        registerAnonymousType<MLArtist>( "org.videolan.medialib", 1 );
+        registerAnonymousType<MLAlbumTrack>( "org.videolan.medialib", 1 );
+        registerAnonymousType<MLGenre>( "org.videolan.medialib", 1 );
+        registerAnonymousType<MLVideo>( "org.videolan.medialib", 1 );
     }
 
     qmlRegisterUncreatableType<NavigationHistory>("org.videolan.vlc", 0, 1, "History", "Type of global variable history" );
