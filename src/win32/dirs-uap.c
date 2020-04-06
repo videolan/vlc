@@ -213,11 +213,9 @@ end_appdata:
     return psz_dir;
 }
 
+#ifdef HAVE_IAPPLICATIONDATA2
 static char *config_GetCacheDir (void)
 {
-#ifndef HAVE_IAPPLICATIONDATA2
-    return NULL;
-#else // HAVE_IAPPLICATIONDATA2
     HRESULT hr;
     IStorageFolder *folder = NULL;
     IApplicationDataStatics *appDataStatics = NULL;
@@ -273,8 +271,8 @@ end_appdata:
         return NULL;
 
     return GetFolderName(folder);
-#endif // HAVE_IAPPLICATIONDATA2
 }
+#endif // HAVE_IAPPLICATIONDATA2
 
 char *config_GetUserDir (vlc_userdir_t type)
 {
@@ -291,7 +289,11 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_USERDATA_DIR:
             return config_GetAppDir ();
         case VLC_CACHE_DIR:
+#ifdef HAVE_IAPPLICATIONDATA2
             return config_GetCacheDir ();
+#else // !HAVE_IAPPLICATIONDATA2
+            return config_GetAppDir();
+#endif // !HAVE_IAPPLICATIONDATA2
         case VLC_MUSIC_DIR:
             return config_GetShellDir (VLC_MUSIC_DIR);
         case VLC_PICTURES_DIR:
