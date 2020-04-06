@@ -48,7 +48,7 @@
 # define lua_strlen(L,idx)         lua_rawlen(L,idx)
 #endif
 
-#if LUA_VERSION_NUM >= 503
+#if LUA_VERSION_NUM >= 502
 # undef luaL_register
 # define luaL_register(L, n, l) luaL_setfuncs(L, (l), 0)
 # define luaL_register_namespace(L, n, l) \
