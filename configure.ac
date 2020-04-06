@@ -1903,37 +1903,43 @@ AC_ARG_ENABLE([lua],
     [disable LUA scripting support (default enabled)]))
 if test "${enable_lua}" != "no"
 then
-  PKG_CHECK_MODULES(LUA, lua5.2,
-    [ have_lua=yes ],
-    [
-    AC_MSG_WARN([${LUA_PKG_ERRORS}, trying lua 5.1 instead])
+  PKG_CHECK_MODULES(LUA, lua5.2, [ have_lua=yes ], [:])
 
-    PKG_CHECK_MODULES(LUA, lua5.1,
-      [ have_lua=yes ],
-      [
-      AC_MSG_WARN([${LUA_PKG_ERRORS}, trying lua >= 5.1 instead])
-      PKG_CHECK_MODULES(LUA, lua >= 5.1,
-        [ have_lua=yes ],
-        [
-          AC_MSG_WARN([${LUA_PKG_ERRORS}, trying manual detection instead])
-          have_lua=yes
-          AC_CHECK_HEADERS([lua.h lauxlib.h lualib.h],
-            [],
-            [ have_lua=no ] )
-          AC_CHECK_LIB(  lua5.2 , luaL_newstate,
-            [LUA_LIBS="-llua5.2"],
-          AC_CHECK_LIB( lua5.1 , luaL_newstate,
-            [LUA_LIBS="-llua5.1"],
-            AC_CHECK_LIB( lua51 , luaL_newstate,
-              [LUA_LIBS="-llua51"],
-              AC_CHECK_LIB( lua , luaL_newstate,
-                [LUA_LIBS="-llua"],
-                [ have_lua=no
-                ], [-lm])
-            )))
-        ])
-      ])
-    ])
+  AS_IF([test "${have_lua}" != "yes"], [
+    AC_MSG_WARN([${LUA_PKG_ERRORS}, trying lua 5.1 instead])
+    PKG_CHECK_MODULES(LUA, lua5.1, [ have_lua=yes ], [:]) ])
+
+  AS_IF([test "${have_lua}" != "yes"], [
+    AC_MSG_WARN([${LUA_PKG_ERRORS}, trying lua >= 5.1 instead])
+    PKG_CHECK_MODULES(LUA, lua >= 5.1, [ have_lua=yes ], [:]) ])
+
+  AS_IF([test "${have_lua}" != "yes"], [
+     AC_MSG_WARN([${LUA_PKG_ERRORS}, trying manual detection instead])
+     have_lua_lib=no
+     AC_CHECK_LIB( lua5.2 , luaL_newstate, [
+       LUA_LIBS="-llua5.2"
+       have_lua_lib=yes], [])
+
+     AS_IF([test "${have_lua_lib}" != "yes"], [
+       AC_CHECK_LIB( lua5.1 , luaL_newstate, [
+         LUA_LIBS="-llua5.1"
+         have_lua_lib=yes], [] ) ])
+
+     AS_IF([test "${have_lua_lib}" != "yes"], [
+       AC_CHECK_LIB( lua51 , luaL_newstate, [
+         LUA_LIBS="-llua51"
+         have_lua_lib=yes], [] ) ])
+
+     AS_IF([test "${have_lua_lib}" != "yes"], [
+       AC_CHECK_LIB( lua , luaL_newstate,
+         [LUA_LIBS="-llua"],
+         [ have_lua=no ], [-lm] ) ])
+
+     dnl If we found any lib, check that we have the headers too
+     AS_IF([test "${have_lua_lib}" = "yes"], [
+       AC_CHECK_HEADERS([lua.h lauxlib.h lualib.h], [ have_lua=yes ], []) ])
+  ])
+
   if test "x${have_lua}" != "xyes" ;  then
       AC_MSG_ERROR([Could not find lua. Lua is needed for some interfaces (rc, telnet, http) as well as many other custom scripts. Use --disable-lua to ignore this error.])
   fi
