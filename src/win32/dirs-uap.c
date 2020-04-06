@@ -68,49 +68,46 @@ static char *config_GetShellDir(vlc_userdir_t csidl)
     HRESULT hr;
     IStorageFolder *folder = NULL;
 
-    {
-        IKnownFoldersStatics *knownFoldersStatics = NULL;
-        static const WCHAR *className = L"Windows.Storage.KnownFolders";
-        const UINT32 clen = wcslen(className);
+    IKnownFoldersStatics *knownFoldersStatics = NULL;
+    static const WCHAR *className = L"Windows.Storage.KnownFolders";
+    const UINT32 clen = wcslen(className);
 
-        HSTRING hClassName = NULL;
-        HSTRING_HEADER header;
-        hr = WindowsCreateStringReference(className, clen, &header, &hClassName);
-        if (FAILED(hr))
-            goto end_other;
+    HSTRING hClassName = NULL;
+    HSTRING_HEADER header;
+    hr = WindowsCreateStringReference(className, clen, &header, &hClassName);
+    if (FAILED(hr))
+        goto end_other;
 
-        hr = RoGetActivationFactory(hClassName, &IID_IKnownFoldersStatics, (void**)&knownFoldersStatics);
+    hr = RoGetActivationFactory(hClassName, &IID_IKnownFoldersStatics, (void**)&knownFoldersStatics);
 
-        if (FAILED(hr))
-            goto end_other;
+    if (FAILED(hr))
+        goto end_other;
 
-        if (!knownFoldersStatics) {
-            hr = E_FAIL;
-            goto end_other;
-        }
+    if (!knownFoldersStatics) {
+        hr = E_FAIL;
+        goto end_other;
+    }
 
-        switch (csidl) {
-        case VLC_HOME_DIR:
-            hr = IKnownFoldersStatics_get_DocumentsLibrary(knownFoldersStatics, &folder);
-            break;
-        case VLC_MUSIC_DIR:
-            hr = IKnownFoldersStatics_get_MusicLibrary(knownFoldersStatics, &folder);
-            break;
-        case VLC_PICTURES_DIR:
-            hr = IKnownFoldersStatics_get_PicturesLibrary(knownFoldersStatics, &folder);
-            break;
-        case VLC_VIDEOS_DIR:
-            hr = IKnownFoldersStatics_get_VideosLibrary(knownFoldersStatics, &folder);
-            break;
-        default:
-            hr = E_NOTIMPL;
-        }
+    switch (csidl) {
+    case VLC_HOME_DIR:
+        hr = IKnownFoldersStatics_get_DocumentsLibrary(knownFoldersStatics, &folder);
+        break;
+    case VLC_MUSIC_DIR:
+        hr = IKnownFoldersStatics_get_MusicLibrary(knownFoldersStatics, &folder);
+        break;
+    case VLC_PICTURES_DIR:
+        hr = IKnownFoldersStatics_get_PicturesLibrary(knownFoldersStatics, &folder);
+        break;
+    case VLC_VIDEOS_DIR:
+        hr = IKnownFoldersStatics_get_VideosLibrary(knownFoldersStatics, &folder);
+        break;
+    default: vlc_assert_unreachable();
+    }
 
 end_other:
-        WindowsDeleteString(hClassName);
-        if (knownFoldersStatics)
-            IKnownFoldersStatics_Release(knownFoldersStatics);
-    }
+    WindowsDeleteString(hClassName);
+    if (knownFoldersStatics)
+        IKnownFoldersStatics_Release(knownFoldersStatics);
 
     if( FAILED(hr) || folder == NULL )
         return NULL;
