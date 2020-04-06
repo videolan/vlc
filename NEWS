@@ -10,6 +10,7 @@ Access:
  * Fixed dvdread commands/data sequence inversion in some cases causing
    unwanted glitches
  * Better handling of authored as corrupted DVD
+ * Added libsmb2 support for SMB2/3 shares
 
 Demux:
  * Fix TTML entities not passed to decoder
@@ -43,6 +44,17 @@ Decoder:
  * Extract and display of all CEA708 subtitles
  * Update libfaad to 2.9.1
  * Add DXVA support for VP9 Profile 2 (10 bits)
+ * Mediacodec wspect ratio with Amazon devices
+
+Audio output:
+ * Added support for iOS audiounit audio above 48KHz
+ * Added support for amem audio up to 384KHz
+
+Video output:
+ * Fix for opengl glitches in some drivers
+ * Fix GMA950 opengl support on macOS
+ * YUV to RGB StretchRect fixes with NVIDIA drivers
+ * Use libpacebo new tone mapping desaturation algorithm
 
 Text renderer:
  * Fix crashes on macOS with SSA/ASS subtitles containing emoji
@@ -76,6 +88,7 @@ Misc:
  * Update YouTube, SoundCloud and Vocaroo scripts: this restores
    playback of YouTube URLs.
  * Add missing .wpl & .zpl file associations on Windows
+ * Improved chromecast audio quality
 
 Changes between 3.0.7.1 and 3.0.8:
 ----------------------------------
