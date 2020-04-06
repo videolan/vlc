@@ -132,10 +132,8 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
             break;
         case VLC_PKG_LIB_DIR:
         case VLC_PKG_LIBEXEC_DIR:
-            dir = NULL;
-            break;
         case VLC_SYSDATA_DIR:
-            break;
+            return NULL;
         case VLC_LOCALE_DIR:
             dir = config_GetSysPath(VLC_PKG_DATA_DIR, "locale");
             break;
@@ -143,7 +141,10 @@ char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
             vlc_assert_unreachable();
     }
 
-    if (filename == NULL || unlikely(dir == NULL))
+    if (unlikely(dir == NULL))
+        return NULL;
+
+    if (filename == NULL)
         return dir;
 
     char *path;
