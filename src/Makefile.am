@@ -397,7 +397,6 @@ libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 
 if HAVE_WIN32
 libvlccore_la_SOURCES += \
-	win32/dirs.c \
 	win32/error.c \
 	win32/filesystem.c \
 	win32/netconf.c \
@@ -407,9 +406,9 @@ libvlccore_la_SOURCES += \
 	win32/thread.c \
 	win32/winsock.c
 if HAVE_WINSTORE
-libvlccore_la_SOURCES += posix/timer.c
+libvlccore_la_SOURCES += posix/timer.c win32/dirs-uap.c
 else
-libvlccore_la_SOURCES += win32/timer.c
+libvlccore_la_SOURCES += win32/timer.c win32/dirs.c
 endif
 endif
 
@@ -612,7 +611,7 @@ test_mrl_helpers_SOURCES = test/mrl_helpers.c
 test_arrays_SOURCES = test/arrays.c
 test_vector_SOURCES = test/vector.c
 test_shared_data_ptr_SOURCES = test/shared_data_ptr.cpp
-test_extensions_SOURCES = test/extensions.c 
+test_extensions_SOURCES = test/extensions.c
 test_playlist_SOURCES = playlist/test.c \
 	playlist/content.c \
 	playlist/control.c \

@@ -25,9 +25,6 @@
 # include "config.h"
 #endif
 
-#define COBJMACROS
-#define INITGUID
-
 #ifndef UNICODE
 #define UNICODE
 #endif
@@ -47,141 +44,9 @@
 #include <assert.h>
 #include <limits.h>
 
-#if VLC_WINSTORE_APP
-#include <winstring.h>
-#include <windows.storage.h>
-#include <roapi.h>
-
-static HRESULT WinRTSHGetFolderPath(HWND hwnd, int csidl, HANDLE hToken, DWORD dwFlags, LPWSTR pszPath)
-{
-    VLC_UNUSED(hwnd);
-    VLC_UNUSED(hToken);
-
-    HRESULT hr;
-    IStorageFolder *folder;
-
-    if (dwFlags != SHGFP_TYPE_CURRENT)
-        return E_NOTIMPL;
-
-    folder = NULL;
-    csidl &= ~CSIDL_FLAG_MASK;
-
-    if (csidl == CSIDL_APPDATA) {
-        IApplicationDataStatics *appDataStatics = NULL;
-        IApplicationData *appData = NULL;
-        static const WCHAR *className = L"Windows.Storage.ApplicationData";
-        const UINT32 clen = wcslen(className);
-
-        HSTRING hClassName = NULL;
-        HSTRING_HEADER header;
-        hr = WindowsCreateStringReference(className, clen, &header, &hClassName);
-        if (FAILED(hr))
-            goto end_appdata;
-
-        hr = RoGetActivationFactory(hClassName, &IID_IApplicationDataStatics, (void**)&appDataStatics);
-
-        if (FAILED(hr))
-            goto end_appdata;
-
-        if (!appDataStatics) {
-            hr = E_FAIL;
-            goto end_appdata;
-        }
-
-        hr = IApplicationDataStatics_get_Current(appDataStatics, &appData);
-
-        if (FAILED(hr))
-            goto end_appdata;
-
-        if (!appData) {
-            hr = E_FAIL;
-            goto end_appdata;
-        }
-
-        hr = IApplicationData_get_LocalFolder(appData, &folder);
-
-end_appdata:
-        WindowsDeleteString(hClassName);
-        if (appDataStatics)
-            IApplicationDataStatics_Release(appDataStatics);
-        if (appData)
-            IApplicationData_Release(appData);
-    }
-    else
-    {
-        IKnownFoldersStatics *knownFoldersStatics = NULL;
-        static const WCHAR *className = L"Windows.Storage.KnownFolders";
-        const UINT32 clen = wcslen(className);
-
-        HSTRING hClassName = NULL;
-        HSTRING_HEADER header;
-        hr = WindowsCreateStringReference(className, clen, &header, &hClassName);
-        if (FAILED(hr))
-            goto end_other;
-
-        hr = RoGetActivationFactory(hClassName, &IID_IKnownFoldersStatics, (void**)&knownFoldersStatics);
-
-        if (FAILED(hr))
-            goto end_other;
-
-        if (!knownFoldersStatics) {
-            hr = E_FAIL;
-            goto end_other;
-        }
-
-        switch (csidl) {
-        case CSIDL_PERSONAL:
-            hr = IKnownFoldersStatics_get_DocumentsLibrary(knownFoldersStatics, &folder);
-            break;
-        case CSIDL_MYMUSIC:
-            hr = IKnownFoldersStatics_get_MusicLibrary(knownFoldersStatics, &folder);
-            break;
-        case CSIDL_MYPICTURES:
-            hr = IKnownFoldersStatics_get_PicturesLibrary(knownFoldersStatics, &folder);
-            break;
-        case CSIDL_MYVIDEO:
-            hr = IKnownFoldersStatics_get_VideosLibrary(knownFoldersStatics, &folder);
-            break;
-        default:
-            hr = E_NOTIMPL;
-        }
-
-end_other:
-        WindowsDeleteString(hClassName);
-        if (knownFoldersStatics)
-            IKnownFoldersStatics_Release(knownFoldersStatics);
-    }
-
-    if( SUCCEEDED(hr) && folder != NULL )
-    {
-        HSTRING path = NULL;
-        IStorageItem *item = NULL;
-        PCWSTR pszPathTemp;
-        hr = IStorageFolder_QueryInterface(folder, &IID_IStorageItem, (void**)&item);
-        if (FAILED(hr))
-            goto end_folder;
-        hr = IStorageItem_get_Path(item, &path);
-        if (FAILED(hr))
-            goto end_folder;
-        pszPathTemp = WindowsGetStringRawBuffer(path, NULL);
-        wcscpy(pszPath, pszPathTemp);
-end_folder:
-        WindowsDeleteString(path);
-        IStorageFolder_Release(folder);
-        if (item)
-            IStorageItem_Release(item);
-    }
-
-    return hr;
-}
-#define SHGetFolderPathW WinRTSHGetFolderPath
-#endif
 
 char *config_GetLibDir (void)
 {
-#if VLC_WINSTORE_APP
-    return NULL;
-#else
     /* Get our full path */
     MEMORY_BASIC_INFORMATION mbi;
     if (!VirtualQuery (config_GetLibDir, &mbi, sizeof(mbi)))
@@ -199,7 +64,6 @@ char *config_GetLibDir (void)
     return FromWide (wpath);
 error:
     abort ();
-#endif
 }
 
 static char *config_GetDataDir(void)
@@ -252,7 +116,6 @@ static char *config_GetShellDir (int csidl)
 
 static char *config_GetAppDir (void)
 {
-#if !VLC_WINSTORE_APP
     /* if portable directory exists, use it */
     WCHAR path[MAX_PATH];
     if (GetModuleFileName (NULL, path, MAX_PATH))
@@ -267,7 +130,6 @@ static char *config_GetAppDir (void)
                 return FromWide (path);
         }
     }
-#endif
 
     char *psz_dir;
     char *psz_parent = config_GetShellDir (CSIDL_APPDATA);
@@ -290,12 +152,7 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_USERDATA_DIR:
             return config_GetAppDir ();
         case VLC_CACHE_DIR:
-#if !VLC_WINSTORE_APP
             return config_GetAppDir ();
-#else
-            return config_GetShellDir (CSIDL_LOCAL_APPDATA);
-#endif
-
         case VLC_DESKTOP_DIR:
         case VLC_DOWNLOAD_DIR:
         case VLC_TEMPLATES_DIR:
