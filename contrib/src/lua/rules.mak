@@ -80,9 +80,9 @@ endif
 	cd $< && $(HOSTVARS) $(MAKE) install INSTALL_TOP="$(PREFIX)"
 ifdef HAVE_WIN32
 	cd $< && $(RANLIB) "$(PREFIX)/lib/liblua.a"
-	mkdir -p -- "$(PREFIX)/lib/pkgconfig"
-	cp $</etc/lua.pc "$(PREFIX)/lib/pkgconfig/"
 endif
+	mkdir -p -- "$(PREFIX)/lib/pkgconfig"
+	sed "s#^prefix=.*#prefix=$(PREFIX)#" $</etc/lua.pc > "$(PREFIX)/lib/pkgconfig/lua.pc"
 	touch $@
 
 .sum-luac: .sum-lua
