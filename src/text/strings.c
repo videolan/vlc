@@ -346,6 +346,16 @@ char *vlc_xml_encode (const char *str)
     return stream.ptr;
 }
 
+/* Hex encoding */
+void vlc_hex_encode_binary(const void *input, size_t size, char *output)
+{
+    const unsigned char *buffer = input;
+
+    for (size_t i = 0; i < size; i++) {
+        sprintf(&output[i * 2], "%02hhx", buffer[i]);
+    }
+}
+
 /* Base64 encoding */
 char *vlc_b64_encode_binary(const void *src, size_t length)
 {

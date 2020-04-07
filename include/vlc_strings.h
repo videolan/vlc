@@ -119,6 +119,18 @@ VLC_API void vlc_xml_decode(char *st);
 VLC_API char *vlc_xml_encode(const char *str) VLC_MALLOC;
 
 /**
+ * Encode binary data as hex string
+ *
+ * Writes a given data buffer to the output buffer as a null terminated
+ * string in hexadecimal representation.
+ *
+ * \param      input    Input buffer
+ * \param      size     Input buffer size
+ * \param[out] output   Output buffer to write the string to
+ */
+VLC_API void vlc_hex_encode_binary(const void *input, size_t size, char *output);
+
+/**
  * Base64 encoding.
  *
  * Encodes a buffer into base64 as a (nul-terminated) string.
