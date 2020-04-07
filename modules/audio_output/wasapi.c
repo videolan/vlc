@@ -91,7 +91,7 @@ static msftime_t GetQPC(void)
 typedef struct aout_stream_sys
 {
     IAudioClient *client;
-    HANDLE hTimer;
+    vlc_timer_t timer;
 
 #define STARTED_STATE_INIT 0
 #define STARTED_STATE_OK 1
@@ -112,11 +112,7 @@ typedef struct aout_stream_sys
 static void ResetTimer(aout_stream_t *s)
 {
     aout_stream_sys_t *sys = s->sys;
-    if (sys->hTimer != NULL)
-    {
-        DeleteTimerQueueTimer(NULL, sys->hTimer, INVALID_HANDLE_VALUE);
-        sys->hTimer = NULL;
-    }
+    vlc_timer_disarm(sys->timer);
 }
 
 /*** VLC audio output callbacks ***/
@@ -160,7 +156,7 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
     return hr;
 }
 
-static void CALLBACK StartDeferredCallback(void *val, BOOLEAN timeout)
+static void StartDeferredCallback(void *val)
 {
     aout_stream_t *s = val;
     aout_stream_sys_t *sys = s->sys;
@@ -168,7 +164,6 @@ static void CALLBACK StartDeferredCallback(void *val, BOOLEAN timeout)
     HRESULT hr = IAudioClient_Start(sys->client);
     atomic_store(&sys->started_state,
                  SUCCEEDED(hr) ? STARTED_STATE_OK : STARTED_STATE_ERROR);
-    (void) timeout;
 }
 
 static HRESULT StartDeferred(aout_stream_t *s, vlc_tick_t date)
@@ -176,22 +171,13 @@ static HRESULT StartDeferred(aout_stream_t *s, vlc_tick_t date)
     aout_stream_sys_t *sys = s->sys;
     vlc_tick_t written = vlc_tick_from_frac(sys->written, sys->rate);
     vlc_tick_t start_delay = date - vlc_tick_now() - written;
-    DWORD start_delay_ms = start_delay > 0 ? MS_FROM_VLC_TICK(start_delay) : 0;
     BOOL timer_updated = false;
 
     /* Create or update the current timer */
-    if (start_delay_ms > 0)
+    if (start_delay > 0)
     {
-        if (sys->hTimer == NULL)
-            timer_updated =
-                CreateTimerQueueTimer(&sys->hTimer, NULL, StartDeferredCallback,
-                                      s, start_delay_ms, 0,
-                                      WT_EXECUTEDEFAULT | WT_EXECUTEONLYONCE);
-        else
-            timer_updated =
-                ChangeTimerQueueTimer(NULL, sys->hTimer, start_delay_ms, 0);
-        if (!timer_updated)
-            msg_Warn(s, "timer update failed, starting now");
+        vlc_timer_schedule( sys->timer, false, start_delay, 0);
+        timer_updated = true;
     }
     else
         ResetTimer(s);
@@ -585,6 +571,7 @@ static void Stop(aout_stream_t *s)
 
     IAudioClient_Release(sys->client);
 
+    vlc_timer_destroy(sys->timer);
     free(sys);
 }
 
@@ -747,8 +734,13 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
     if (unlikely(sys == NULL))
         return E_OUTOFMEMORY;
     sys->client = NULL;
-    sys->hTimer = NULL;
     atomic_init(&sys->started_state, STARTED_STATE_INIT);
+    if (unlikely(vlc_timer_create( &sys->timer, StartDeferredCallback, s ) != 0))
+    {
+        msg_Err(s, "failed to create the delayed start timer");
+        free(sys);
+        return E_UNEXPECTED;
+    }
 
     /* Configure audio stream */
     WAVEFORMATEXTENSIBLE_IEC61937 wf_iec61937;
@@ -900,6 +892,7 @@ error:
     CoTaskMemFree(pwf_mix);
     if (sys->client != NULL)
         IAudioClient_Release(sys->client);
+    vlc_timer_destroy(sys->timer);
     free(sys);
     return hr;
 }
