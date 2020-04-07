@@ -337,8 +337,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->selectPlaneCb       = LocalSwapchainSelectPlane;
     }
 
+#if !VLC_WINSTORE_APP
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
+#endif // !VLC_WINSTORE_APP
 
     if (Direct3D11Open(vd, fmtp, context)) {
         msg_Err(vd, "Direct3D11 could not be opened");
@@ -378,8 +380,8 @@ static void Close(vout_display_t *vd)
 {
     D3D11_ReleaseShaders(&vd->sys->shaders);
     Direct3D11Close(vd);
-    UnhookWindowsSensors(vd->sys->p_sensors);
 #if !VLC_WINSTORE_APP
+    UnhookWindowsSensors(vd->sys->p_sensors);
     CommonWindowClean(VLC_OBJECT(vd), &vd->sys->sys);
 #endif
 }
