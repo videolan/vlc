@@ -536,7 +536,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
      * crashes totally the device */
     if (codec_id == AV_CODEC_ID_H264 &&
         (fmt->i_width > 2304 || fmt->i_height > 2304) &&
-        isXboxHardware(&sys->d3d_dev))
+        isXboxHardware(sys->d3d_dev))
     {
         msg_Warn(va, "%dx%d resolution not supported by your hardware", fmt->i_width, fmt->i_height);
         return VLC_EGENERIC;
