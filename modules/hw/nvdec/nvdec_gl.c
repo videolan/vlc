@@ -212,7 +212,7 @@ static int Open(vlc_object_t *obj)
     int ret = opengl_interop_init(interop, GL_TEXTURE_2D, render_chroma, interop->fmt.space);
     if (ret != VLC_SUCCESS)
     {
-        Close(obj);
+        vlc_decoder_device_Release(device);
         return ret;
     }
 
