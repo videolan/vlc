@@ -353,11 +353,11 @@ static bool UpdateSwapchain( struct d3d11_local_swapchain *display, const libvlc
 
     const d3d_format_t *newPixelFormat = NULL;
 #if VLC_WINSTORE_APP
-    display->dxgiswapChain = var_InheritInteger(display->obj, "winrt-swapchain");
+    display->dxgiswapChain = (void*)(uintptr_t)var_InheritInteger(display->obj, "winrt-swapchain");
     if (display->dxgiswapChain != NULL)
     {
         DXGI_SWAP_CHAIN_DESC1 scd;
-        if (SUCCEEDED(IDXGISwapChain1_GetDesc(display->dxgiswapChain, &scd)))
+        if (SUCCEEDED(IDXGISwapChain1_GetDesc1(display->dxgiswapChain, &scd)))
         {
             for (const d3d_format_t *output_format = GetRenderFormatList();
                  output_format->name != NULL; ++output_format)
@@ -486,32 +486,31 @@ bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_cfg_t *
     return true;
 }
 
+bool LocalSwapchainWinstoreSize( void *opaque, uint32_t *width, uint32_t *height )
+{
+#if VLC_WINSTORE_APP
+    struct d3d11_local_swapchain *display = opaque;
+    /* legacy UWP mode, the width/height was set in GUID_SWAPCHAIN_WIDTH/HEIGHT */
+    UINT dataSize = sizeof(*width);
+    HRESULT hr = IDXGISwapChain_GetPrivateData(display->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, width);
+    if (SUCCEEDED(hr)) {
+        dataSize = sizeof(*height);
+        hr = IDXGISwapChain_GetPrivateData(display->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, height);
+        return SUCCEEDED(hr);
+    }
+#else
+    VLC_UNUSED(opaque); VLC_UNUSED(width); VLC_UNUSED(height);
+#endif
+    return false;
+}
+
 bool LocalSwapchainStartEndRendering( void *opaque, bool enter )
 {
     struct d3d11_local_swapchain *display = opaque;
 
     if ( enter )
-    {
-#if VLC_WINSTORE_APP
-        /* legacy UWP mode, the width/height was set in GUID_SWAPCHAIN_WIDTH/HEIGHT */
-        uint32_t i_width;
-        uint32_t i_height;
-        UINT dataSize = sizeof(i_width);
-        HRESULT hr = IDXGISwapChain_GetPrivateData(display->dxgiswapChain, &GUID_SWAPCHAIN_WIDTH, &dataSize, &i_width);
-        if (SUCCEEDED(hr)) {
-            dataSize = sizeof(i_height);
-            hr = IDXGISwapChain_GetPrivateData(display->dxgiswapChain, &GUID_SWAPCHAIN_HEIGHT, &dataSize, &i_height);
-            if (SUCCEEDED(hr)) {
-                if (i_width != sys->area.vdcfg.display.width || i_height != sys->area.vdcfg.display.height)
-                {
-                    vout_display_SetSize(vd, i_width, i_height);
-                }
-            }
-        }
-#endif
-
         D3D11_ClearRenderTargets( display->d3d_dev, display->pixelFormat, display->swapchainTargetView );
-    }
+
     return true;
 }
 
@@ -565,7 +564,9 @@ void *CreateLocalSwapchainHandle(vlc_object_t *o, HWND hwnd, d3d11_device_t *d3d
     display->obj = o;
 #if !VLC_WINSTORE_APP
     display->swapchainHwnd = hwnd;
-#endif /* !VLC_WINSTORE_APP */
+#else // VLC_WINSTORE_APP
+    VLC_UNUSED(hwnd);
+#endif // VLC_WINSTORE_APP
     display->d3d_dev = d3d_dev;
 
     return display;

@@ -36,5 +36,6 @@ bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_cfg_t *
 bool LocalSwapchainStartEndRendering( void *opaque, bool enter );
 void LocalSwapchainSetMetadata( void *opaque, libvlc_video_metadata_type_t, const void * );
 bool LocalSwapchainSelectPlane( void *opaque, size_t plane );
+bool LocalSwapchainWinstoreSize( void *opaque, uint32_t *, uint32_t * );
 
 #endif /* VLC_D3D11_SWAPCHAIN_H */

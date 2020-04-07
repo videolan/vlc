@@ -672,6 +672,19 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     VLC_UNUSED(date);
 
     d3d11_device_lock( sys->d3d_dev );
+#if VLC_WINSTORE_APP
+    if ( sys->swapCb == LocalSwapchainSwap )
+    {
+        /* legacy UWP mode, the width/height was set in GUID_SWAPCHAIN_WIDTH/HEIGHT */
+        uint32_t i_width;
+        uint32_t i_height;
+        if (LocalSwapchainWinstoreSize( sys->outside_opaque, &i_width, &i_height ))
+        {
+            if (i_width != sys->area.vdcfg.display.width || i_height != sys->area.vdcfg.display.height)
+                vout_display_SetSize(vd, i_width, i_height);
+        }
+    }
+#endif
     if ( sys->startEndRenderingCb( sys->outside_opaque, true ))
     {
         if ( sys->sendMetadataCb && picture->format.mastering.max_luminance )
