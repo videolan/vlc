@@ -88,7 +88,7 @@ static int VolumeSet(audio_output_t *aout, float vol)
 
     aout_GainRequest(aout, gain);
 
-    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pc_AudioVolume);
+    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, (void**)&pc_AudioVolume);
     if (FAILED(hr))
     {
         msg_Err(aout, "cannot get volume service (error 0x%lX)", hr);
@@ -116,7 +116,7 @@ static int MuteSet(audio_output_t *aout, bool mute)
     HRESULT hr;
     ISimpleAudioVolume *pc_AudioVolume = NULL;
 
-    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, &pc_AudioVolume);
+    hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, (void**)&pc_AudioVolume);
     if (FAILED(hr))
     {
         msg_Err(aout, "cannot get volume service (error 0x%lX)", hr);
@@ -157,7 +157,7 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
         return;
 
     EnterMTA();
-    HRESULT hr = aout_stream_Play(sys->stream, block);
+    HRESULT hr = aout_stream_Play(sys->stream, block, date);
     LeaveMTA();
 
     vlc_FromHR(aout, hr);
