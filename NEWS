@@ -1,3 +1,15 @@
+Changes between 3.0.9.1 and 3.0.9.2:
+----------------------------------
+
+Misc:
+ * Properly bump the version in configure.ac
+
+Changes between 3.0.9 and 3.0.9.1:
+----------------------------------
+
+Misc:
+ * Fix VLSub returning 401 for earch request
+
 Changes between 3.0.8 and 3.0.9:
 ----------------------------------
 
