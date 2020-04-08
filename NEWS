@@ -44,7 +44,7 @@ Decoder:
  * Extract and display of all CEA708 subtitles
  * Update libfaad to 2.9.1
  * Add DXVA support for VP9 Profile 2 (10 bits)
- * Mediacodec wspect ratio with Amazon devices
+ * Mediacodec aspect ratio with Amazon devices
 
 Audio output:
  * Added support for iOS audiounit audio above 48KHz
