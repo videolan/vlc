@@ -113,7 +113,7 @@ typedef struct
 
     /* general data */
     bool b_init;
-    int32_t  i_planes;
+    size_t   i_planes;
     int32_t *i_height;
     int32_t *i_width;
     int32_t *i_visible_pitch;
@@ -320,7 +320,7 @@ static int oldmovie_allocate_data( filter_t *p_filter, picture_t *p_pic_in ) {
         return VLC_ENOMEM;
     }
 
-    for (int32_t i_p=0; i_p < p_sys->i_planes; i_p++) {
+    for (size_t i_p=0; i_p < p_sys->i_planes; i_p++) {
         p_sys->i_visible_pitch [i_p] = (int) p_pic_in->p[i_p].i_visible_pitch;
         p_sys->i_height[i_p]         = (int) p_pic_in->p[i_p].i_visible_lines;
         p_sys->i_width [i_p]         = (int) p_pic_in->p[i_p].i_visible_pitch
@@ -335,13 +335,13 @@ static int oldmovie_allocate_data( filter_t *p_filter, picture_t *p_pic_in ) {
 static void oldmovie_free_allocated_data( filter_t *p_filter ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    for ( uint32_t i_s = 0; i_s < MAX_SCRATCH; i_s++ )
+    for ( size_t i_s = 0; i_s < MAX_SCRATCH; i_s++ )
         FREENULL(p_sys->p_scratch[i_s]);
 
-    for ( uint32_t i_h = 0; i_h < MAX_HAIR; i_h++ )
+    for ( size_t i_h = 0; i_h < MAX_HAIR; i_h++ )
         FREENULL(p_sys->p_hair[i_h]);
 
-    for ( uint32_t i_d = 0; i_d < MAX_DUST; i_d++ )
+    for ( size_t i_d = 0; i_d < MAX_DUST; i_d++ )
         FREENULL(p_sys->p_dust[i_d]);
 
     p_sys->i_planes = 0;
@@ -455,10 +455,12 @@ static int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_
         if ( abs(p_sys->i_sliding_speed) < 50 )
             p_sys->i_sliding_speed += 5;
 
-        /* check if offset is close to 0 and then ready to stop */
-        if ( abs( p_sys->i_sliding_ofs ) < abs( p_sys->i_sliding_speed
+        long long i_position = p_sys->i_sliding_speed
              * p_sys->i_height[Y_PLANE]
-             * SEC_FROM_VLC_TICK( p_sys->i_cur_time - p_sys->i_last_time ) )
+             * SEC_FROM_VLC_TICK( p_sys->i_cur_time - p_sys->i_last_time );
+
+        /* check if offset is close to 0 and then ready to stop */
+        if ( abs( p_sys->i_sliding_ofs ) < llabs( i_position )
              ||  abs( p_sys->i_sliding_ofs ) < p_sys->i_height[Y_PLANE] * 100 / 20 ) {
 
             /* reset sliding parameters */
@@ -485,7 +487,10 @@ static int oldmovie_sliding_offset_apply( filter_t *p_filter, picture_t *p_pic_o
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    for ( uint8_t i_p = 0; i_p < p_pic_out->i_planes; i_p++ ) {
+    assert(p_pic_out->i_planes > 0);
+    size_t i_planes = p_pic_out->i_planes;
+
+    for ( size_t i_p = 0; i_p < i_planes; i_p++ ) {
         /* first allocate temporary buffer for swap operation */
         uint8_t *p_temp_buf = calloc( p_pic_out->p[i_p].i_lines * p_pic_out->p[i_p].i_pitch,
                                       sizeof(uint8_t) );
@@ -495,15 +500,17 @@ static int oldmovie_sliding_offset_apply( filter_t *p_filter, picture_t *p_pic_o
                 p_pic_out->p[i_p].i_lines * p_pic_out->p[i_p].i_pitch );
 
         /* copy lines to output_pic */
-        for ( int32_t i_y = 0; i_y < p_pic_out->p[i_p].i_visible_lines; i_y++ ) {
-            int32_t i_ofs = MOD( ( p_sys->i_offset_ofs + p_sys->i_sliding_ofs )
+        assert(p_pic_out->p[i_p].i_visible_lines > 0);
+        size_t i_visible_lines = p_pic_out->p[i_p].i_visible_lines;
+        for ( size_t i_y = 0; i_y < i_visible_lines; i_y++ ) {
+            size_t i_ofs = MOD( ( p_sys->i_offset_ofs + p_sys->i_sliding_ofs )
                                  /100,
                                  p_sys->i_height[Y_PLANE] );
-            i_ofs *= p_pic_out->p[i_p].i_visible_lines;
+            i_ofs *= i_visible_lines;
             i_ofs /= p_sys->i_height[Y_PLANE];
 
             memcpy( &p_pic_out->p[i_p].p_pixels[ i_y * p_pic_out->p[i_p].i_pitch ],
-                    &p_temp_buf[ ( ( i_y + i_ofs ) % p_pic_out->p[i_p].i_visible_lines ) * p_pic_out->p[i_p].i_pitch ],
+                    &p_temp_buf[ ( ( i_y + i_ofs ) % i_visible_lines ) * p_pic_out->p[i_p].i_pitch ],
                     p_pic_out->p[i_p].i_visible_pitch);
         }
         free( p_temp_buf );
@@ -517,11 +524,15 @@ static int oldmovie_sliding_offset_apply( filter_t *p_filter, picture_t *p_pic_o
  */
 static void oldmovie_black_n_white_effect( picture_t *p_pic_out )
 {
-    for ( int32_t i_y = 0; i_y < p_pic_out->p[Y_PLANE].i_visible_lines; i_y++ )
-        for ( int32_t i_x = 0; i_x < p_pic_out->p[Y_PLANE].i_visible_pitch;
-              i_x += p_pic_out->p[Y_PLANE].i_pixel_pitch ) {
+    assert(p_pic_out->p[Y_PLANE].i_visible_lines > 0);
+    assert(p_pic_out->p[Y_PLANE].i_visible_pitch > 0);
+    size_t i_visible_lines = p_pic_out->p[Y_PLANE].i_visible_lines;
+    size_t i_visible_pitch = p_pic_out->p[Y_PLANE].i_visible_pitch;
+    size_t i_pixel_pitch   = p_pic_out->p[Y_PLANE].i_pixel_pitch;
 
-            uint32_t i_pix_ofs = i_x+i_y*p_pic_out->p[Y_PLANE].i_pitch;
+    for ( size_t i_y = 0; i_y < i_visible_lines; i_y++ )
+        for ( size_t i_x = 0; i_x < i_visible_pitch; i_x += i_pixel_pitch ) {
+            size_t i_pix_ofs = i_x + i_y * p_pic_out->p[Y_PLANE].i_pitch;
             p_pic_out->p[Y_PLANE].p_pixels[i_pix_ofs] -= p_pic_out->p[Y_PLANE].p_pixels[i_pix_ofs] >> 2;
             p_pic_out->p[Y_PLANE].p_pixels[i_pix_ofs] += 30;
         }
