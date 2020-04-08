@@ -289,7 +289,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/menus/menus.moc.cpp \
 	gui/qt/network/networkdevicemodel.moc.cpp \
 	gui/qt/network/networkmediamodel.moc.cpp \
-	gui/qt/network/networksourcelistener.moc.cpp \
 	gui/qt/player/input_models.moc.cpp \
 	gui/qt/player/player_controller.moc.cpp \
 	gui/qt/player/playercontrolbarmodel.moc.cpp \
