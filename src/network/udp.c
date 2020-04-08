@@ -291,7 +291,7 @@ static int net_SetMcastOut (vlc_object_t *p_this, int fd, int family,
 }
 
 
-#ifdef MCAST_JOIN_GROUP
+#if defined(MCAST_JOIN_GROUP) && !defined (__APPLE__)
 static unsigned var_GetIfIndex (vlc_object_t *obj)
 {
     char *ifname = var_InheritString (obj, "miface");
