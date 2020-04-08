@@ -2414,7 +2414,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     es_out_es_props_t *p_esprops = GetPropsByCat( p_sys, es->fmt.i_cat );
 
-    if( !p_sys->b_active ||
+    if( !p_esprops || !p_sys->b_active ||
         ( !b_force && es->fmt.i_priority < ES_PRIORITY_SELECTABLE_MIN ) ||
         !es->p_pgrm )
     {
