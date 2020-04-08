@@ -19,7 +19,9 @@
  *****************************************************************************/
 
 #include "dialogs/fingerprint/fingerprintdialog.hpp"
-#include "dialogs/fingerprint/ui_fingerprintdialog.h"
+
+/* Auto-generated from .ui files */
+#include "ui_fingerprintdialog.h"
 
 #include "dialogs/fingerprint/chromaprint.hpp"
 #include <vlc_url.h>

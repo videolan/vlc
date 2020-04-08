@@ -31,9 +31,11 @@
 #include <vlc_common.h>
 
 #include "qt.hpp"
-#include "dialogs/extended/ui_equalizer.h"
-#include "dialogs/extended/ui_video_effects.h"
 #include "util/variables.hpp"
+
+/* Auto-generated from .ui files */
+#include "ui_equalizer.h"
+#include "ui_video_effects.h"
 
 #include <QTabWidget>
 

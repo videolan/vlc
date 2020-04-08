@@ -29,7 +29,9 @@
 
 #include <vlc_common.h> /* Gettext functions */
 
-#include "dialogs/sout/ui_sout.h"
+/* Auto-generated from .ui files */
+#include "ui_sout.h"
+
 #include "widgets/native/qvlcframe.hpp"
 #include "util/soutchain.hpp"
 

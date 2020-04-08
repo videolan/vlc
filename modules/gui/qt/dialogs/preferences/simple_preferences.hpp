@@ -30,11 +30,12 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 
-#include "dialogs/preferences/ui_sprefs_input.h"
-#include "dialogs/preferences/ui_sprefs_audio.h"
-#include "dialogs/preferences/ui_sprefs_video.h"
-#include "dialogs/preferences/ui_sprefs_subtitles.h"
-#include "dialogs/preferences/ui_sprefs_interface.h"
+/* Auto-generated from .ui files */
+#include "ui_sprefs_input.h"
+#include "ui_sprefs_audio.h"
+#include "ui_sprefs_video.h"
+#include "ui_sprefs_subtitles.h"
+#include "ui_sprefs_interface.h"
 
 #include <vlc_media_library.h>
 #include <QDialogButtonBox>

@@ -31,7 +31,9 @@
 
 #include "widgets/native/qvlcframe.hpp"
 #include "util/soutchain.hpp"
-#include "dialogs/sout/ui_profiles.h"
+
+/* Auto-generated from .ui files */
+#include "ui_profiles.h"
 
 class QComboBox;
 

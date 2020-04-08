@@ -14,7 +14,17 @@
 SUFFIXES += .ui .h .hpp .moc.cpp .qml
 
 libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt/ -I$(builddir)/gui/qt/ui
+	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt/ \
+	-I$(builddir)/gui/qt/dialogs/extended \
+	-I$(builddir)/gui/qt/dialogs/fingerprint \
+	-I$(builddir)/gui/qt/dialogs/help \
+	-I$(builddir)/gui/qt/dialogs/messages \
+	-I$(builddir)/gui/qt/dialogs/open \
+	-I$(builddir)/gui/qt/dialogs/podcast \
+	-I$(builddir)/gui/qt/dialogs/preferences \
+	-I$(builddir)/gui/qt/dialogs/sout \
+	-I$(builddir)/gui/qt/dialogs/vlm
+
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
 libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)
 libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)'

@@ -31,8 +31,10 @@
 
 #include "widgets/native/qvlcframe.hpp"
 #include "util/singleton.hpp"
-#include "dialogs/help/ui_about.h"
-#include "dialogs/help/ui_update.h"
+
+/* Auto-generated from .ui files */
+#include "ui_about.h"
+#include "ui_update.h"
 
 class QEvent;
 

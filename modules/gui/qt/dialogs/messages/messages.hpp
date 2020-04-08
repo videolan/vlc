@@ -25,7 +25,10 @@
 
 #include "widgets/native/qvlcframe.hpp"
 #include "util/singleton.hpp"
-#include "dialogs/messages/ui_messages_panel.h"
+
+/* Auto-generated from .ui files */
+#include "ui_messages_panel.h"
+
 #include <stdarg.h>
 #include <QMutex>
 #include <atomic>
