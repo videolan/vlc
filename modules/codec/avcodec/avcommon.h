@@ -109,6 +109,7 @@ static inline void vlc_init_avutil(vlc_object_t *obj)
 
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 # include <libavformat/avformat.h>
+# include <libavformat/version.h>
 static inline void vlc_init_avformat(vlc_object_t *obj)
 {
     vlc_avcodec_lock();
@@ -117,7 +118,9 @@ static inline void vlc_init_avformat(vlc_object_t *obj)
 
     avformat_network_init();
 
+#if (LIBAVFORMAT_VERSION_MICRO >= 100) && (LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100))
     av_register_all();
+#endif
 
     vlc_avcodec_unlock();
 }
@@ -125,13 +128,16 @@ static inline void vlc_init_avformat(vlc_object_t *obj)
 
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
 # include <libavcodec/avcodec.h>
+# include <libavcodec/version.h>
 static inline void vlc_init_avcodec(vlc_object_t *obj)
 {
     vlc_avcodec_lock();
 
     vlc_init_avutil(obj);
 
+#if (LIBAVFORMAT_VERSION_MICRO >= 100) && (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100))
     avcodec_register_all();
+#endif
 
     vlc_avcodec_unlock();
 }
