@@ -30,6 +30,6 @@ endif
 
 .harfbuzz: harfbuzz
 	$(RECONF)
-	cd $< && $(HOSTVARS_PIC) ./configure $(HOSTCONF) $(HARFBUZZ_CONF)
+	cd $< && $(HOSTVARS_PIC) ./configure $(HOSTCONF) $(HARFBUZZ_CONF) ICU_CONFIG=false
 	cd $< && $(MAKE) install
 	touch $@
