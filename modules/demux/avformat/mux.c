@@ -90,9 +90,12 @@ int avformat_OpenMux( vlc_object_t *p_this )
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     bool dummy = !strcmp( p_mux->p_access->psz_access, "dummy");
 
+#if ( (LIBAVFORMAT_VERSION_MICRO >= 100) \
+      && (LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 7, 100)) )
     if( dummy && strlen(p_mux->p_access->psz_path)
                               >= sizeof (((AVFormatContext *)NULL)->filename) )
         return VLC_EGENERIC;
+#endif
 
     msg_Dbg( p_mux, "using %s %s", AVPROVIDER(LIBAVFORMAT), LIBAVFORMAT_IDENT );
 
@@ -127,7 +130,12 @@ int avformat_OpenMux( vlc_object_t *p_this )
     p_sys->oc->oformat = file_oformat;
     /* If we use dummy access, let avformat write output */
     if( dummy )
+#if ( (LIBAVFORMAT_VERSION_MICRO >= 100) \
+      && (LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 7, 100)) )
+        p_sys->oc->url = av_strdup(p_mux->p_access->psz_path);
+#else
         strcpy( p_sys->oc->filename, p_mux->p_access->psz_path );
+#endif
 
     /* Create I/O wrapper */
     p_sys->io_buffer_size = 10 * 1024 * 1024;  /* FIXME */
