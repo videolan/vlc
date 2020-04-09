@@ -14,7 +14,7 @@ ifdef HAVE_WINSTORE
 SQLITE_CFLAGS += -DSQLITE_OS_WINRT=1
 endif
 
-SQLITE_CONF = $(HOSTCONF) --disable-readline
+SQLITE_CONF = $(HOSTCONF) --disable-readline --disable-shell
 
 $(TARBALLS)/sqlite-autoconf-$(SQLITE_VERSION).tar.gz:
 	$(call download_pkg,$(SQLITE_URL),sqlite)
@@ -23,10 +23,12 @@ $(TARBALLS)/sqlite-autoconf-$(SQLITE_VERSION).tar.gz:
 
 sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz .sum-sqlite
 	$(UNPACK)
+	$(APPLY) $(SRC)/sqlite/sqlite-no-shell.patch
 	$(call pkg_static, "sqlite3.pc.in")
 	$(MOVE)
 
 .sqlite: sqlite
+	$(RECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(SQLITE_CFLAGS)" ./configure $(SQLITE_CONF)
 	cd $< && $(MAKE) && $(MAKE) install
 	touch $@

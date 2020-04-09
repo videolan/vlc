@@ -1,0 +1,31 @@
+--- sqlite/configure.ac.noshell	2020-04-09 10:07:14.127078500 +0200
++++ sqlite/configure.ac	2020-04-09 10:03:50.435193500 +0200
+@@ -203,6 +203,16 @@ fi
+ AC_SUBST(EXTRA_SHELL_OBJ)
+ #-----------------------------------------------------------------------
+ 
++#-----------------------------------------------------------------------
++#   --disable-shell
++#
++AC_ARG_ENABLE(shell, [AS_HELP_STRING(
++  [--enable-shell], 
++  [build the shell tool [default=yes]])], 
++  [], [enable_shell=yes])
++AM_CONDITIONAL([BUILD_SHELL], [test x"$enable_shell" = "xyes"])
++#-----------------------------------------------------------------------
++
+ AC_CHECK_FUNCS(posix_fallocate)
+ AC_CHECK_HEADERS(zlib.h,[
+   AC_SEARCH_LIBS(deflate,z,[BUILD_CFLAGS="$BUILD_CFLAGS -DSQLITE_HAVE_ZLIB"])
+--- sqlite/Makefile.am.noshell	2020-04-09 10:07:10.055569100 +0200
++++ sqlite/Makefile.am	2020-04-09 10:04:00.028577700 +0200
+@@ -4,7 +4,9 @@ lib_LTLIBRARIES = libsqlite3.la
+ libsqlite3_la_SOURCES = sqlite3.c
+ libsqlite3_la_LDFLAGS = -no-undefined -version-info 8:6:8
+ 
++if BUILD_SHELL
+ bin_PROGRAMS = sqlite3
++endif
+ sqlite3_SOURCES = shell.c sqlite3.h
+ EXTRA_sqlite3_SOURCES = sqlite3.c
+ sqlite3_LDADD = @EXTRA_SHELL_OBJ@ @READLINE_LIBS@
