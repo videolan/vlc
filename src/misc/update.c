@@ -728,9 +728,11 @@ static void* update_DownloadReal( void *obj )
                                            psz_msg );
     if(answer == 1)
     {
+#ifndef VLC_WINSTORE_APP
         wchar_t psz_wdestfile[MAX_PATH];
         MultiByteToWideChar( CP_UTF8, 0, psz_destfile, -1, psz_wdestfile, MAX_PATH );
         answer = (int)ShellExecuteW( NULL, L"open", psz_wdestfile, NULL, NULL, SW_SHOW);
+#endif
         if(answer > 32)
             libvlc_Quit(p_udt->obj.libvlc);
     }
