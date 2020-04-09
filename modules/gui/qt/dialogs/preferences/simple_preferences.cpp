@@ -1571,4 +1571,3 @@ void SPrefsPanel::MLdrawControls( ) {
 
   mlTableView->horizontalHeader()->setFixedHeight( 24 );
 }
-
