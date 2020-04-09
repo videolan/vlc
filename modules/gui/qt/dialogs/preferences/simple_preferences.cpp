@@ -704,7 +704,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #ifndef _WIN32
             ui.langBox->hide();
 #else
-            for( int i = 0; i < ARRAY_SIZE( language_map ); i++)
+            for( size_t i = 0; i < ARRAY_SIZE( language_map ); i++)
                 ui.langCombo->addItem( qfu( language_map[i].name ), language_map[i].iso );
             CONNECT( ui.langCombo, currentIndexChanged( int ), this, langChanged( int ) );
 
