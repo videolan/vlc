@@ -4,6 +4,7 @@ librtp_plugin_la_SOURCES = \
 	access/rtp/input.c \
 	access/rtp/session.c \
 	access/rtp/xiph.c \
+	access/rtp/sdp.c access/rtp/sdp.h \
 	access/rtp/rtp.c access/rtp/rtp.h
 librtp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/access/rtp
 librtp_plugin_la_CFLAGS = $(AM_CFLAGS)
