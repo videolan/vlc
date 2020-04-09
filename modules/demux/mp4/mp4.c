@@ -324,11 +324,12 @@ static MP4_Box_t * MP4_GetTrafByTrackID( MP4_Box_t *p_moof, const uint32_t i_id 
     return p_traf;
 }
 
-static es_out_id_t * MP4_AddTrackES( es_out_t *out, mp4_track_t *p_track )
+static es_out_id_t * MP4_CreateES( es_out_t *out, const es_format_t *p_fmt,
+                                   bool b_forced_spu )
 {
-    es_out_id_t *p_es = es_out_Add( out, &p_track->fmt );
+    es_out_id_t *p_es = es_out_Add( out, p_fmt );
     /* Force SPU which isn't selected/defaulted */
-    if( p_track->fmt.i_cat == SPU_ES && p_es && p_track->b_forced_spu )
+    if( p_fmt->i_cat == SPU_ES && p_es && b_forced_spu )
         es_out_Control( out, ES_OUT_SET_ES_DEFAULT, p_es );
 
     return p_es;
@@ -2783,6 +2784,67 @@ static void TrackGetESSampleRate( demux_t *p_demux,
                      UINT16_MAX);
 }
 
+static void TrackConfigInit( track_config_t *p_cfg )
+{
+    memset( p_cfg, 0, sizeof(*p_cfg) );
+}
+
+static void TrackConfigApply( const track_config_t *p_cfg,
+                              mp4_track_t *p_track )
+{
+    if( p_cfg->i_timescale_override )
+        p_track->i_timescale = p_cfg->i_timescale_override;
+     if( p_cfg->i_sample_size_override )
+        p_track->i_sample_size = p_cfg->i_sample_size_override;
+     p_track->p_asf = p_cfg->p_asf;
+     memcpy( p_track->rgi_chans_reordering, p_cfg->rgi_chans_reordering,
+             AOUT_CHAN_MAX * sizeof(p_cfg->rgi_chans_reordering[0]) );
+     p_track->b_chans_reorder = p_cfg->b_chans_reorder;
+     p_track->b_forced_spu = p_cfg->b_forced_spu;
+     p_track->i_block_flags = p_cfg->i_block_flags;
+}
+
+static int TrackFillConfig( demux_t *p_demux, const mp4_track_t *p_track,
+                            const MP4_Box_t *p_sample,unsigned i_chunk,
+                            es_format_t *p_fmt, track_config_t *p_cfg )
+{
+    /* */
+    switch( p_track->fmt.i_cat )
+    {
+    case VIDEO_ES:
+        if ( p_sample->i_handler != ATOM_vide ||
+             !SetupVideoES( p_demux, p_track, p_sample, p_fmt, p_cfg ) )
+            return VLC_EGENERIC;
+
+        /* Set frame rate */
+        TrackGetESSampleRate( p_demux,
+                              &p_fmt->video.i_frame_rate,
+                              &p_fmt->video.i_frame_rate_base,
+                              p_track, p_sample->i_index, i_chunk );
+        break;
+
+    case AUDIO_ES:
+        if ( p_sample->i_handler != ATOM_soun ||
+             !SetupAudioES( p_demux, p_track, p_sample, p_fmt, p_cfg ) )
+            return VLC_EGENERIC;
+        break;
+
+    case SPU_ES:
+        if ( ( p_sample->i_handler != ATOM_text &&
+               p_sample->i_handler != ATOM_subt &&
+               p_sample->i_handler != ATOM_sbtl &&
+               p_sample->i_handler != ATOM_clcp ) ||
+             !SetupSpuES( p_demux, p_track, p_sample, p_fmt, p_cfg ) )
+           return VLC_EGENERIC;
+        break;
+
+    default:
+        break;
+    }
+
+    return VLC_SUCCESS;
+}
+
 /*
  * TrackCreateES:
  * Create ES and PES to init decoder if needed, for a track starting at i_chunk
@@ -2809,9 +2871,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         return VLC_EGENERIC;
     }
 
-    MP4_Box_t *p_sample = MP4_BoxGet(  p_track->p_stsd, "[%d]",
-                            i_sample_description_index - 1 );
-
+    const MP4_Box_t *p_sample = MP4_BoxGet( p_track->p_stsd, "[%d]",
+                                            i_sample_description_index - 1 );
     if( !p_sample ||
         ( !p_sample->data.p_payload && p_track->fmt.i_cat != SPU_ES ) )
     {
@@ -2820,75 +2881,54 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         return VLC_EGENERIC;
     }
 
-    MP4_Box_t   *p_frma;
-    if( ( p_frma = MP4_BoxGet( p_sample, "sinf/frma" ) ) && p_frma->data.p_frma )
-    {
-        msg_Warn( p_demux, "Original Format Box: %4.4s", (char *)&p_frma->data.p_frma->i_type );
+    track_config_t cfg;
+    TrackConfigInit( &cfg );
+    es_format_t *p_fmt = &p_track->fmt;
 
-        p_sample->i_type = p_frma->data.p_frma->i_type;
+    p_track->fmt.i_id = p_track->i_track_ID;
+
+    if( TrackFillConfig( p_demux, p_track, p_sample, i_chunk,
+                         p_fmt, &cfg ) != VLC_SUCCESS )
+    {
+        return VLC_EGENERIC;
+    }
+
+    TrackConfigApply( &cfg, p_track );
+
+    switch( p_fmt->i_cat )
+    {
+        case VIDEO_ES:
+            p_sys->f_fps = (float)p_fmt->video.i_frame_rate /
+                    (float)p_fmt->video.i_frame_rate_base;
+            break;
+        case AUDIO_ES:
+            if( p_sys->p_meta )
+            {
+                audio_replay_gain_t *p_arg = &p_fmt->audio_replay_gain;
+                const char *psz_meta = vlc_meta_GetExtra( p_sys->p_meta, "replaygain_track_gain" );
+                if( psz_meta )
+                {
+                    double f_gain = us_atof( psz_meta );
+                    p_arg->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = f_gain;
+                    p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = f_gain != 0;
+                }
+                psz_meta = vlc_meta_GetExtra( p_sys->p_meta, "replaygain_track_peak" );
+                if( psz_meta )
+                {
+                    double f_gain = us_atof( psz_meta );
+                    p_arg->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain;
+                    p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain > 0;
+                }
+            }
+            break;
+        default:
+            break;
     }
 
     p_track->p_sample = p_sample;
-    p_track->fmt.i_id = p_track->i_track_ID;
-
-    /* */
-    switch( p_track->fmt.i_cat )
-    {
-    case VIDEO_ES:
-        if ( p_sample->i_handler != ATOM_vide ||
-             !SetupVideoES( p_demux, p_track, p_sample ) )
-            return VLC_EGENERIC;
-
-        /* Set frame rate */
-        TrackGetESSampleRate( p_demux,
-                              &p_track->fmt.video.i_frame_rate,
-                              &p_track->fmt.video.i_frame_rate_base,
-                              p_track, i_sample_description_index, i_chunk );
-
-        p_sys->f_fps = (float)p_track->fmt.video.i_frame_rate /
-                       (float)p_track->fmt.video.i_frame_rate_base;
-
-        break;
-
-    case AUDIO_ES:
-        if ( p_sample->i_handler != ATOM_soun ||
-             !SetupAudioES( p_demux, p_track, p_sample ) )
-            return VLC_EGENERIC;
-        if( p_sys->p_meta )
-        {
-            audio_replay_gain_t *p_arg = &p_track->fmt.audio_replay_gain;
-            const char *psz_meta = vlc_meta_GetExtra( p_sys->p_meta, "replaygain_track_gain" );
-            if( psz_meta )
-            {
-                double f_gain = us_atof( psz_meta );
-                p_arg->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = f_gain;
-                p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = f_gain != 0;
-            }
-            psz_meta = vlc_meta_GetExtra( p_sys->p_meta, "replaygain_track_peak" );
-            if( psz_meta )
-            {
-                double f_gain = us_atof( psz_meta );
-                p_arg->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain;
-                p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain > 0;
-            }
-        }
-        break;
-
-    case SPU_ES:
-        if ( ( p_sample->i_handler != ATOM_text &&
-               p_sample->i_handler != ATOM_subt &&
-               p_sample->i_handler != ATOM_sbtl &&
-               p_sample->i_handler != ATOM_clcp ) ||
-             !SetupSpuES( p_demux, p_track, p_sample ) )
-           return VLC_EGENERIC;
-        break;
-
-    default:
-        break;
-    }
 
     if( pp_es )
-        *pp_es = MP4_AddTrackES( p_demux->out, p_track );
+        *pp_es = MP4_CreateES( p_demux->out, p_fmt, p_track->b_forced_spu );
 
     return ( !pp_es || *pp_es ) ? VLC_SUCCESS : VLC_EGENERIC;
 }
@@ -3320,7 +3360,6 @@ static void MP4_TrackSetup( demux_t *p_demux, mp4_track_t *p_track,
                 msg_Warn( p_demux, "Malformed track SDP message: %s", sdp_media_type );
                 return;
             }
-            p_track->p_sdp = p_sdp;
             break;
 
         case( ATOM_tx3g ):

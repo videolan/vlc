@@ -80,6 +80,19 @@ enum
     USEAS_TIMECODE = 1 << 1,
 };
 
+typedef struct
+{
+    uint32_t i_timescale_override;
+    uint32_t i_sample_size_override;
+    const MP4_Box_t *p_asf;
+    uint8_t     rgi_chans_reordering[AOUT_CHAN_MAX];
+    bool        b_chans_reorder;
+
+    bool b_forced_spu; /* forced track selection (never done by default/priority) */
+
+    uint32_t    i_block_flags;
+} track_config_t;
+
  /* Contain all needed information for read all track with vlc */
 typedef struct
 {
@@ -148,14 +161,6 @@ typedef struct
 
     stime_t i_time; // track scaled
 
-    /* rrtp reception hint track */
-    MP4_Box_t *p_sdp;                         /* parsed for codec and other info */
-    RTP_timstamp_synchronization_t sync_mode; /* whether track is already in sync */
-
-    /* First recorded RTP timestamp offset.
-     * Needed for rrtp synchronization */
-    int32_t         i_tsro_offset;
-
     struct
     {
         /* for moof parsing */
@@ -184,10 +189,12 @@ typedef struct
     asf_track_info_t asfinfo;
 } mp4_track_t;
 
-int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
-int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
-int SetupSpuES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
-int SetupCCES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample );
+int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track,
+                  const MP4_Box_t *p_sample, es_format_t *, track_config_t *);
+int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
+                  const MP4_Box_t *p_sample, es_format_t *, track_config_t * );
+int SetupSpuES( demux_t *p_demux, const mp4_track_t *p_track,
+                const MP4_Box_t *p_sample, es_format_t *, track_config_t * );
 void SetupMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_udta );
 
 /* format of RTP reception hint track sample constructor */
