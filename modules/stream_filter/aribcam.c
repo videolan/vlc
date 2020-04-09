@@ -197,7 +197,7 @@ static ssize_t Read( stream_t *p_stream, void *p_buf, size_t i_toread )
         else
         {
             if ( i_srcread < 0 )
-                msg_Err( p_stream, "Can't read %lu bytes from source stream: %d", i_toread, i_srcread );
+                msg_Err( p_stream, "Can't read %zu bytes from source stream: %d", i_toread, i_srcread );
             return 0;
         }
 
