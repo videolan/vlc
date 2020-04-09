@@ -3144,11 +3144,32 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
     return VLC_SUCCESS;
 }
 
-static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
-                                 unsigned int i_chunk, unsigned int i_sample )
+static bool FormatIsCompatible( const es_format_t *p_fmt1, const es_format_t *p_fmt2 )
 {
-    bool b_reselect = false;
+    if( p_fmt1->i_original_fourcc != p_fmt2->i_original_fourcc )
+        return false;
+    if( (p_fmt1->i_extra > 0) ^ (p_fmt2->i_extra > 0) )
+        return false;
 
+    if( p_fmt1->i_codec == p_fmt2->i_codec &&
+        p_fmt1->i_extra && p_fmt2->i_extra &&
+        p_fmt1->i_extra == p_fmt2->i_extra )
+    {
+       return !!memcmp( p_fmt1->p_extra, p_fmt2->p_extra, p_fmt1->i_extra );
+    }
+
+    if( p_fmt1->i_cat == AUDIO_ES )
+    {
+        /* Reject audio streams with different or unknown rates */
+        if( p_fmt1->audio.i_rate != p_fmt2->audio.i_rate || !p_fmt1->audio.i_rate )
+            return false;
+    }
+
+    return es_format_IsSimilar( p_fmt1, p_fmt2 );
+}
+
+static int TrackUpdateFormat( demux_t *p_demux, mp4_track_t *p_track, uint32_t i_chunk )
+{
     /* now see if actual es is ok */
     if( p_track->i_chunk >= p_track->i_chunk_count ||
         (p_track->chunk[p_track->i_chunk].i_sample_description_index !=
@@ -3157,29 +3178,65 @@ static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
         msg_Warn( p_demux, "recreate ES for track[Id 0x%x]",
                   p_track->i_track_ID );
 
-        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                        p_track->p_es, &b_reselect );
-
-        es_out_Del( p_demux->out, p_track->p_es );
-
-        p_track->p_es = NULL;
-
-        if( TrackCreateES( p_demux, p_track, i_chunk, &p_track->p_es ) )
+        const MP4_Box_t *p_newsample = MP4_BoxGet( p_track->p_stsd, "[%d]",
+                                                   p_track->chunk[i_chunk].i_sample_description_index - 1 );
+        if( p_newsample == NULL )
         {
-            msg_Err( p_demux, "cannot create es for track[Id 0x%x]",
-                     p_track->i_track_ID );
-
-            p_track->b_ok       = false;
+            msg_Err( p_demux, "Can't change track[Id 0x%x] format for sample desc %" PRIu32,
+                     p_track->i_track_ID, p_track->chunk[i_chunk].i_sample_description_index );
+            p_track->b_ok = false;
             p_track->b_selected = false;
             return VLC_EGENERIC;
         }
+
+        track_config_t cfg;
+        TrackConfigInit( &cfg );
+        es_format_t tmpfmt;
+        es_format_Init( &tmpfmt, p_track->fmt.i_cat, 0 );
+        tmpfmt.i_id = p_track->i_track_ID;
+        if( TrackFillConfig( p_demux, p_track, p_newsample, i_chunk, &tmpfmt, &cfg ) == VLC_SUCCESS &&
+            !FormatIsCompatible( &p_track->fmt, &tmpfmt ) )
+        {
+            bool b_reselect = false;
+
+            es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
+                            p_track->p_es, &b_reselect );
+
+            es_out_Del( p_demux->out, p_track->p_es );
+
+            p_track->p_es = MP4_CreateES( p_demux->out, &tmpfmt, cfg.b_forced_spu );
+            if( !p_track->p_es )
+            {
+                msg_Err( p_demux, "cannot create es for track[Id 0x%x]",
+                         p_track->i_track_ID );
+
+                p_track->b_ok       = false;
+                p_track->b_selected = false;
+                es_format_Clean( &tmpfmt );
+                return VLC_EGENERIC;
+            }
+
+            /* select again the new decoder */
+            if( b_reselect )
+                es_out_Control( p_demux->out, ES_OUT_SET_ES, p_track->p_es );
+
+            TrackConfigApply( &cfg, p_track );
+            es_format_Clean( &p_track->fmt );
+            es_format_Init( &p_track->fmt, tmpfmt.i_cat, tmpfmt.i_codec );
+            es_format_Copy( &p_track->fmt, &tmpfmt );
+            p_track->p_sample = p_newsample;
+        }
+        es_format_Clean( &tmpfmt );
     }
 
-    /* select again the new decoder */
-    if( b_reselect )
-    {
-        es_out_Control( p_demux->out, ES_OUT_SET_ES, p_track->p_es );
-    }
+    return VLC_SUCCESS;
+}
+
+static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
+                                 uint32_t i_chunk, uint32_t i_sample )
+{
+    if( TrackUpdateFormat( p_demux, p_track, i_chunk ) != VLC_SUCCESS )
+        return VLC_EGENERIC;
 
     p_track->i_chunk    = i_chunk;
     p_track->chunk[i_chunk].i_sample = i_sample - p_track->chunk[i_chunk].i_sample_first;
@@ -3187,73 +3244,7 @@ static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
 
     return p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC;
 }
-#if 0
-static void MP4_TrackRestart( demux_t *p_demux, mp4_track_t *p_track,
-                              MP4_Box_t *p_params_box )
-{
-    bool b_reselect = false;
-    if( p_track->p_es )
-    {
-        es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE,
-                        p_track->p_es, &b_reselect );
-    }
 
-    /* Save previous fragmented pos */
-    uint32_t i_sample_pos_backup = p_track->i_sample;
-    vlc_tick_t time_backup = p_track->i_time;
-    uint32_t timescale_backup = p_track->i_timescale;
-
-    /* Save previous format and ES */
-    es_format_t fmtbackup;
-    es_out_id_t *p_es_backup = p_track->p_es;
-    p_track->p_es = NULL;
-    es_format_Copy( &fmtbackup, &p_track->fmt );
-    es_format_Clean( &p_track->fmt );
-
-
-    /* do the cleanup and recycle track / restart */
-    MP4_TrackDestroy( p_demux, p_track );
-    memset( p_track, 0, sizeof(*p_track) );
-
-    assert(p_params_box->i_type == ATOM_trak);
-    MP4_TrackCreate( p_demux, p_track, p_params_box, false, true );
-
-    if( p_track->b_ok )
-    {
-        if( !es_format_IsSimilar( &fmtbackup, &p_track->fmt ) ||
-            fmtbackup.i_extra != p_track->fmt.i_extra ||
-            memcmp( fmtbackup.p_extra, p_track->fmt.p_extra, fmtbackup.i_extra ) )
-        {
-            if( p_es_backup )
-                es_out_Del( p_demux->out, p_es_backup );
-
-            if( !p_track->b_chapters_source )
-            {
-                p_track->p_es = MP4_AddTrackES( p_demux->out, p_track );
-                p_track->b_ok = !!p_track->p_es;
-            }
-        }
-        else
-        {
-            p_track->p_es = p_es_backup;
-        }
-    }
-    else if( p_es_backup )
-    {
-        es_out_Del( p_demux->out, p_es_backup );
-    }
-
-    /* select again the new decoder */
-    if( b_reselect && p_track->p_es )
-        es_out_Control( p_demux->out, ES_OUT_SET_ES, p_track->p_es );
-
-    es_format_Clean( &fmtbackup );
-
-    /* Restore fragmented pos */
-    p_track->i_sample = i_sample_pos_backup;
-    p_track->i_time = MP4_rescale( time_backup, timescale_backup, p_track->i_timescale );
-}
-#endif
 /****************************************************************************
  * MP4_TrackSetup:
  ****************************************************************************
