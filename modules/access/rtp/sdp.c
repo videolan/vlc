@@ -75,7 +75,7 @@ bad:
     c->addr[addrlen] = '\0';
 
     if (len >= 7 && memcmp(net_type, "IN ", 3) == 0) {
-        int offset, val;
+        int offset, val = -1;
 
         if (memcmp(addr_type, "IP4 ", 4) == 0) {
             /* IPv4 */

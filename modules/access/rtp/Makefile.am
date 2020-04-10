@@ -10,6 +10,10 @@ librtp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/access/rtp
 librtp_plugin_la_CFLAGS = $(AM_CFLAGS)
 librtp_plugin_la_LIBADD = $(SOCKET_LIBS)
 
+sdp_parse_test_SOURCES = access/rtp/sdp_test.c access/rtp/sdp.c
+check_PROGRAMS += sdp_parse_test
+TESTS += sdp_parse_test
+
 # Secure RTP library
 libvlc_srtp_la_SOURCES = access/rtp/srtp.c access/rtp/srtp.h
 libvlc_srtp_la_CPPFLAGS = -I$(srcdir)/access/rtp
