@@ -793,7 +793,11 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         }
     }
 
-    CreateAnnounce( p_sd, i_source, i_hash, p_sdp, uri );
+    sap_announce_t *sap = CreateAnnounce(p_sd, i_source, i_hash, p_sdp, uri);
+
+    if (sap != NULL)
+        TAB_APPEND(p_sys->i_announces, p_sys->pp_announces, sap);
+
     free(uri);
     free (decomp);
     return VLC_SUCCESS;
@@ -809,11 +813,8 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, 
     const char *psz_value;
     sap_announce_t *p_sap = (sap_announce_t *)malloc(
                                         sizeof(sap_announce_t ) );
-    services_discovery_sys_t *p_sys;
     if( p_sap == NULL )
         return NULL;
-
-    p_sys = p_sd->p_sys;
 
     p_sap->i_last = vlc_tick_now();
     p_sap->i_period = 0;
@@ -881,8 +882,6 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, 
                                  p_sap->p_sdp->i_attributes, "x-plgroup");
         services_discovery_AddItemCat(p_sd, p_input, psz_value);
     }
-
-    TAB_APPEND( p_sys->i_announces, p_sys->pp_announces, p_sap );
 
     return p_sap;
 }
