@@ -965,8 +965,10 @@ typedef struct sap_announce_t
     input_item_t * p_item;
 } sap_announce_t;
 
-sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, uint16_t i_hash,
-                                sdp_t *p_sdp, const char *uri )
+static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
+                                      const uint32_t *i_source,
+                                      uint16_t i_hash,
+                                      sdp_t *p_sdp, const char *uri)
 {
     input_item_t *p_input;
     const char *psz_value;
