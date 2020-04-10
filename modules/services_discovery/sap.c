@@ -960,15 +960,32 @@ typedef struct sap_announce_t
     input_item_t * p_item;
 } sap_announce_t;
 
-static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
+static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd, bool parse,
                                       const uint32_t *i_source,
-                                      uint16_t i_hash,
-                                      const sdp_t *p_sdp, const char *uri)
+                                      uint16_t i_hash, const char *psz_sdp)
 {
+    /* Parse SDP info */
+    sdp_t *p_sdp = ParseSDP(VLC_OBJECT(p_sd), psz_sdp);
+    if (p_sdp == NULL)
+        return NULL;
+
+    char *uri = NULL;
+
+    /* Decide whether we should add a playlist item for this SDP */
+    /* Parse connection information (c= & m= ) */
+    if (parse)
+        uri = ParseConnection(VLC_OBJECT(p_sd), p_sdp);
+
+    /* Multi-media or no-parse -> pass to LIVE.COM */
+    if (uri == NULL && asprintf(&uri, "sdp://%s", psz_sdp) == -1)
+    {
+        FreeSDP(p_sdp);
+        return NULL;
+    }
+
     input_item_t *p_input;
     const char *psz_value;
-    sap_announce_t *p_sap = (sap_announce_t *)malloc(
-                                        sizeof(sap_announce_t ) );
+    sap_announce_t *p_sap = malloc(sizeof (*p_sap));
     if( p_sap == NULL )
         return NULL;
 
@@ -1037,6 +1054,7 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
         services_discovery_AddItemCat(p_sd, p_input, psz_value);
     }
 
+    FreeSDP(p_sdp);
     return p_sap;
 }
 
@@ -1095,7 +1113,6 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     services_discovery_sys_t *p_sys = p_sd->p_sys;
     const char          *psz_sdp;
     const uint8_t *end = buf + len;
-    sdp_t               *p_sdp;
     uint32_t            i_source[4];
 
     assert (buf[len] == '\0');
@@ -1187,30 +1204,6 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         psz_sdp += clen;
     }
 
-    /* Parse SDP info */
-    p_sdp = ParseSDP( VLC_OBJECT(p_sd), psz_sdp );
-
-    if( p_sdp == NULL )
-        goto error;
-
-    /* Decide whether we should add a playlist item for this SDP */
-    /* Parse connection information (c= & m= ) */
-    char *uri = ParseConnection( VLC_OBJECT(p_sd), p_sdp );
-
-    /* Multi-media or no-parse -> pass to LIVE.COM */
-    if( !p_sys->b_parse )
-    {
-        free(uri);
-        if (asprintf(&uri, "sdp://%s", psz_sdp) == -1)
-            uri = NULL;
-    }
-
-    if (uri == NULL)
-    {
-        FreeSDP( p_sdp );
-        goto error;
-    }
-
     for( int i = 0 ; i < p_sys->i_announces ; i++ )
     {
         sap_announce_t * p_announce = p_sys->pp_announces[i];
@@ -1239,20 +1232,16 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
                 p_announce->i_period = ( p_announce->i_period * (p_announce->i_period_trust-1) + (now - p_announce->i_last) ) / p_announce->i_period_trust;
                 p_announce->i_last = now;
             }
-            FreeSDP( p_sdp );
-            free(uri);
             free (decomp);
             return VLC_SUCCESS;
         }
     }
 
-    sap_announce_t *sap = CreateAnnounce(p_sd, i_source, i_hash, p_sdp, uri);
-
+    sap_announce_t *sap = CreateAnnounce(p_sd, p_sys->b_parse, i_source,
+                                         i_hash, psz_sdp);
     if (sap != NULL)
         TAB_APPEND(p_sys->i_announces, p_sys->pp_announces, sap);
 
-    free(uri);
-    FreeSDP(p_sdp);
     free (decomp);
     return VLC_SUCCESS;
 error:
