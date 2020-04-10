@@ -131,9 +131,6 @@ typedef struct sdp_t
     /* i= field */
     char *psz_sessioninfo;
 
-    /* old cruft */
-    unsigned rtcp_port;
-
     /* a= global attributes */
     int           i_attributes;
     attribute_t  **pp_attributes;
@@ -155,7 +152,8 @@ static const char *FindAttribute (const sdp_t *sdp, unsigned media,
 }
 
 /* Compute URI */
-static char *ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
+static char *ParseConnection(vlc_object_t *p_obj, const sdp_t *p_sdp,
+                             unsigned *rtcp_port)
 {
     char *uri;
 
@@ -257,17 +255,17 @@ static char *ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     }
 
     if (!strcmp (vlc_proto, "udp") || FindAttribute (p_sdp, 0, "rtcp-mux"))
-        p_sdp->rtcp_port = 0;
+        *rtcp_port = 0;
     else
     {
         const char *rtcp = FindAttribute (p_sdp, 0, "rtcp");
         if (rtcp)
-            p_sdp->rtcp_port = atoi (rtcp);
+            *rtcp_port = atoi(rtcp);
         else
         if (port & 1) /* odd port -> RTCP; next even port -> RTP */
-            p_sdp->rtcp_port = port++;
+            *rtcp_port = port++;
         else /* even port -> RTP; next odd port -> RTCP */
-            p_sdp->rtcp_port = port + 1;
+            *rtcp_port = port + 1;
     }
 
     if (flags & 1)
@@ -805,6 +803,7 @@ typedef struct
     sdp_t *p_sdp;
     /* "computed" URI */
     char *uri;
+    unsigned rtcp_port;
 } demux_sys_t;
 
 /**********************************************************************
@@ -825,10 +824,10 @@ static int Demux( demux_t *p_demux )
 
     input_item_SetURI(p_parent_input, p_sys->uri);
     input_item_SetName( p_parent_input, p_sdp->psz_sessionname );
-    if( p_sdp->rtcp_port )
+    if( p_sys->rtcp_port )
     {
         char *rtcp;
-        if( asprintf( &rtcp, ":rtcp-port=%u", p_sdp->rtcp_port ) != -1 )
+        if( asprintf( &rtcp, ":rtcp-port=%u", p_sys->rtcp_port ) != -1 )
         {
             input_item_AddOption( p_parent_input, rtcp, VLC_INPUT_OPTION_TRUSTED );
             free( rtcp );
@@ -912,7 +911,8 @@ static int OpenDemux( vlc_object_t *p_this )
         goto error;
     }
 
-    char *uri = ParseConnection(VLC_OBJECT(p_demux), p_sdp);
+    unsigned rtcp_port;
+    char *uri = ParseConnection(VLC_OBJECT(p_demux), p_sdp, &rtcp_port);
     if (uri == NULL)
         goto error;
 
@@ -921,6 +921,7 @@ static int OpenDemux( vlc_object_t *p_this )
         goto error;
     p_sys->p_sdp = p_sdp;
     p_sys->uri = uri;
+    p_sys->rtcp_port = rtcp_port;
     p_demux->p_sys = p_sys;
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
@@ -970,11 +971,12 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd, bool parse,
         return NULL;
 
     char *uri = NULL;
+    unsigned rtcp_port;
 
     /* Decide whether we should add a playlist item for this SDP */
     /* Parse connection information (c= & m= ) */
     if (parse)
-        uri = ParseConnection(VLC_OBJECT(p_sd), p_sdp);
+        uri = ParseConnection(VLC_OBJECT(p_sd), p_sdp, &rtcp_port);
 
     /* Multi-media or no-parse -> pass to LIVE.COM */
     if (uri == NULL && asprintf(&uri, "sdp://%s", psz_sdp) == -1)
@@ -1012,10 +1014,10 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd, bool parse,
         p_input->p_meta = p_meta;
     }
 
-    if( p_sdp->rtcp_port )
+    if( rtcp_port )
     {
         char *rtcp;
-        if( asprintf( &rtcp, ":rtcp-port=%u", p_sdp->rtcp_port ) != -1 )
+        if( asprintf( &rtcp, ":rtcp-port=%u", rtcp_port ) != -1 )
         {
             input_item_AddOption( p_input, rtcp, VLC_INPUT_OPTION_TRUSTED );
             free( rtcp );
