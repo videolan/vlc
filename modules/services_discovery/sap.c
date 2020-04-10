@@ -959,16 +959,13 @@ typedef struct sap_announce_t
     uint16_t    i_hash;
     uint32_t    i_source[4];
 
-    /* SAP annnounces must only contain one SDP */
-    sdp_t       *p_sdp;
-
     input_item_t * p_item;
 } sap_announce_t;
 
 static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
                                       const uint32_t *i_source,
                                       uint16_t i_hash,
-                                      sdp_t *p_sdp, const char *uri)
+                                      const sdp_t *p_sdp, const char *uri)
 {
     input_item_t *p_input;
     const char *psz_value;
@@ -982,7 +979,6 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
     p_sap->i_period_trust = 0;
     p_sap->i_hash = i_hash;
     memcpy (p_sap->i_source, i_source, sizeof(p_sap->i_source));
-    p_sap->p_sdp = p_sdp;
 
     /* Released in RemoveAnnounce */
     p_input = input_item_NewStream(uri, p_sdp->psz_sessionname,
@@ -1011,7 +1007,7 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
         }
     }
 
-    psz_value = GetAttribute( p_sap->p_sdp->pp_attributes, p_sap->p_sdp->i_attributes, "tool" );
+    psz_value = GetAttribute(p_sdp->pp_attributes, p_sdp->i_attributes, "tool");
     if( psz_value != NULL )
     {
         input_item_AddInfo( p_input, _("Session"), _("Tool"), "%s", psz_value );
@@ -1023,8 +1019,7 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
     }
 
     /* Handle category */
-    psz_value = GetAttribute(p_sap->p_sdp->pp_attributes,
-                             p_sap->p_sdp->i_attributes, "cat");
+    psz_value = GetAttribute(p_sdp->pp_attributes, p_sdp->i_attributes, "cat");
     if (psz_value != NULL)
     {
         /* a=cat provides a dot-separated hierarchy.
@@ -1039,8 +1034,8 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
     else
     {
         /* backward compatibility with VLC 0.7.3-2.0.0 senders */
-        psz_value = GetAttribute(p_sap->p_sdp->pp_attributes,
-                                 p_sap->p_sdp->i_attributes, "x-plgroup");
+        psz_value = GetAttribute(p_sdp->pp_attributes,
+                                 p_sdp->i_attributes, "x-plgroup");
         services_discovery_AddItemCat(p_sd, p_input, psz_value);
     }
 
@@ -1068,12 +1063,6 @@ typedef struct
 static int RemoveAnnounce( services_discovery_t *p_sd,
                            sap_announce_t *p_announce )
 {
-    if( p_announce->p_sdp )
-    {
-        FreeSDP( p_announce->p_sdp );
-        p_announce->p_sdp = NULL;
-    }
-
     if( p_announce->p_item )
     {
         services_discovery_RemoveItem( p_sd, p_announce->p_item );
@@ -1267,6 +1256,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         TAB_APPEND(p_sys->i_announces, p_sys->pp_announces, sap);
 
     free(uri);
+    FreeSDP(p_sdp);
     free (decomp);
     return VLC_SUCCESS;
 error:
