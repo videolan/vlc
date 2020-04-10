@@ -122,8 +122,6 @@ struct sdp_media_t
 /* The structure that contains sdp information */
 typedef struct sdp_t
 {
-    const char *psz_sdp;
-
     /* o field */
     char     username[64];
 
@@ -1195,8 +1193,6 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     if( p_sdp == NULL )
         goto error;
 
-    p_sdp->psz_sdp = psz_sdp;
-
     /* Decide whether we should add a playlist item for this SDP */
     /* Parse connection information (c= & m= ) */
     char *uri = ParseConnection( VLC_OBJECT(p_sd), p_sdp );
@@ -1205,7 +1201,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
     if( !p_sys->b_parse )
     {
         free(uri);
-        if (asprintf(&uri, "sdp://%s", p_sdp->psz_sdp) == -1)
+        if (asprintf(&uri, "sdp://%s", psz_sdp) == -1)
             uri = NULL;
     }
 
