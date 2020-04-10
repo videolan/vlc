@@ -57,6 +57,8 @@
 #   include <net/if.h>
 #endif
 
+#include "access/rtp/sdp.h"
+
 /************************************************************************
  * Macros and definitions
  ************************************************************************/
@@ -74,12 +76,6 @@
 /* Link-local SAP address */
 #define SAP_V4_LINK_ADDRESS     "224.0.0.255"
 #define ADD_SESSION 1
-
-typedef struct attribute_t
-{
-    const char *value;
-    char name[];
-} attribute_t;
 
 static bool IsWellKnownPayload (int type)
 {
@@ -99,128 +95,44 @@ static bool IsWellKnownPayload (int type)
    return false;
 }
 
-static const char *GetAttribute (attribute_t **tab, unsigned n,
-                                 const char *name)
-{
-    for (unsigned i = 0; i < n; i++)
-        if (strcasecmp (tab[i]->name, name) == 0)
-            return tab[i]->value;
-    return NULL;
-}
-
-struct sdp_media_t
-{
-    struct sdp_t           *parent;
-    char                   *fmt;
-    struct sockaddr_storage addr;
-    socklen_t               addrlen;
-    unsigned                n_addr;
-    int           i_attributes;
-    attribute_t  **pp_attributes;
-};
-
-/* The structure that contains sdp information */
-typedef struct sdp_t
-{
-    /* o field */
-    char     username[64];
-
-    /* s= field */
-    char *psz_sessionname;
-
-    /* i= field */
-    char *psz_sessioninfo;
-
-    /* a= global attributes */
-    int           i_attributes;
-    attribute_t  **pp_attributes;
-
-    /* medias (well, we only support one atm) */
-    unsigned            mediac;
-    struct sdp_media_t *mediav;
-} sdp_t;
-
-static const char *FindAttribute (const sdp_t *sdp, unsigned media,
-                                  const char *name)
-{
-    /* Look for media attribute, and fallback to session */
-    const char *attr = GetAttribute (sdp->mediav[media].pp_attributes,
-                                     sdp->mediav[media].i_attributes, name);
-    if (attr == NULL)
-        attr = GetAttribute (sdp->pp_attributes, sdp->i_attributes, name);
-    return attr;
-}
-
 /* Compute URI */
-static char *ParseConnection(vlc_object_t *p_obj, const sdp_t *p_sdp,
+static char *ParseConnection(vlc_object_t *p_obj, const struct vlc_sdp *p_sdp,
                              unsigned *rtcp_port)
 {
+    const struct vlc_sdp_media *m = p_sdp->media;
     char *uri;
 
-    if (p_sdp->mediac == 0)
+    if (m == NULL)
     {
         msg_Dbg (p_obj, "Ignoring SDP with no media");
         return NULL;
     }
 
-    for (unsigned i = 1; i < p_sdp->mediac; i++)
-    {
-        if ((p_sdp->mediav[i].n_addr != p_sdp->mediav->n_addr)
-         || (p_sdp->mediav[i].addrlen != p_sdp->mediav->addrlen)
-         || memcmp (&p_sdp->mediav[i].addr, &p_sdp->mediav->addr,
-                    p_sdp->mediav->addrlen))
-        {
-            msg_Dbg (p_obj, "Multiple media ports not supported -> live555");
-            return NULL;
-        }
-    }
+    const struct vlc_sdp_conn *c = vlc_sdp_media_conn(m);
 
-    if (p_sdp->mediav->n_addr != 1)
+    if (m->next != NULL || c == NULL || c->next != NULL || m->port_count != 1)
     {
-        msg_Dbg (p_obj, "Layered encoding not supported -> live555");
+        msg_Dbg (p_obj, "Multiple media ports not supported -> live555");
         return NULL;
     }
 
-    char psz_uri[1026];
-    const char *host;
-    int port;
+    char host[1026];
+    unsigned port = m->port;
 
-    psz_uri[0] = '[';
-    if (vlc_getnameinfo ((struct sockaddr *)&(p_sdp->mediav->addr),
-                         p_sdp->mediav->addrlen, psz_uri + 1,
-                         sizeof (psz_uri) - 2, &port, NI_NUMERICHOST))
-        return NULL;
-
-    if (strchr (psz_uri + 1, ':'))
-    {
-        host = psz_uri;
-        strcat (psz_uri, "]");
-    }
+    if (strchr(c->addr, ':') != NULL)
+        snprintf(host, sizeof (host), "[%s]", c->addr);
     else
-        host = psz_uri + 1;
+        snprintf(host, sizeof (host), "%s", c->addr);
 
     /* Parse m= field */
-    char *sdp_proto = strdup (p_sdp->mediav[0].fmt);
-    if (sdp_proto == NULL)
-        return NULL;
+    const char *sdp_proto = m->proto;
+    const char *subtype = m->format;
 
-    char *subtype = strchr (sdp_proto, ' ');
-    if (subtype == NULL)
-    {
-        msg_Dbg (p_obj, "missing SDP media subtype: %s", sdp_proto);
-        free (sdp_proto);
-        return NULL;
-    }
-
-    *subtype++ = '\0';
     /* FIXME: check for multiple payload types in RTP/AVP case.
      * FIXME: check for "mpeg" subtype in raw udp case. */
     if (strcasecmp(sdp_proto, "udp") != 0
      && !IsWellKnownPayload(atoi(subtype)))
-    {
-        free(sdp_proto);
         return NULL;
-    }
 
     /* RTP protocol, nul, VLC shortcut, nul, flags byte as follow:
      * 0x1: Connection-Oriented media. */
@@ -246,19 +158,18 @@ static char *ParseConnection(vlc_object_t *p_obj, const sdp_t *p_sdp,
         proto += strlen (proto) + 2;
     }
 
-    free (sdp_proto);
     if (vlc_proto == NULL)
     {
-        msg_Dbg (p_obj, "unknown SDP media protocol: %s",
-                 p_sdp->mediav[0].fmt);
+        msg_Dbg (p_obj, "unknown SDP media protocol: %s", sdp_proto);
         return NULL;
     }
 
-    if (!strcmp (vlc_proto, "udp") || FindAttribute (p_sdp, 0, "rtcp-mux"))
+    if (!strcmp (vlc_proto, "udp")
+     || vlc_sdp_media_attr_present(m, "rtcp-mux"))
         *rtcp_port = 0;
     else
     {
-        const char *rtcp = FindAttribute (p_sdp, 0, "rtcp");
+        const char *rtcp = vlc_sdp_media_attr_value(m, "rtcp");
         if (rtcp)
             *rtcp_port = atoi(rtcp);
         else
@@ -271,7 +182,9 @@ static char *ParseConnection(vlc_object_t *p_obj, const sdp_t *p_sdp,
     if (flags & 1)
     {
         /* Connection-oriented media */
-        const char *setup = FindAttribute (p_sdp, 0, "setup");
+        const char *setup = vlc_sdp_media_attr_value(m, "setup");
+        if (setup == NULL)
+            setup = vlc_sdp_attr_value(p_sdp, "setup");
         if (setup == NULL)
             setup = "active"; /* default value */
 
@@ -288,7 +201,9 @@ static char *ParseConnection(vlc_object_t *p_obj, const sdp_t *p_sdp,
     {
         /* Non-connected (normally multicast) media */
         char psz_source[258] = "";
-        const char *sfilter = FindAttribute (p_sdp, 0, "source-filter");
+        const char *sfilter = vlc_sdp_media_attr_value(m, "source-filter");
+        if (sfilter == NULL)
+            sfilter = vlc_sdp_attr_value(p_sdp, "source-filter");
         if (sfilter != NULL)
         {
             char psz_source_ip[256];
@@ -334,420 +249,6 @@ static char *ParseConnection(vlc_object_t *p_obj, const sdp_t *p_sdp,
     }
 
     return uri;
-}
-
-static int ParseSDPConnection (const char *str, struct sockaddr_storage *addr,
-                               socklen_t *addrlen, unsigned *number)
-{
-    char host[60];
-    unsigned fam, n1, n2;
-
-    int res = sscanf (str, "IN IP%u %59[^/]/%u/%u", &fam, host, &n1, &n2);
-    if (res < 2)
-        return -1;
-
-    switch (fam)
-    {
-#ifdef AF_INET6
-        case 6:
-            addr->ss_family = AF_INET6;
-# ifdef HAVE_SA_LEN
-            addr->ss_len =
-# endif
-           *addrlen = sizeof (struct sockaddr_in6);
-
-            if (inet_pton (AF_INET6, host,
-                           &((struct sockaddr_in6 *)addr)->sin6_addr) <= 0)
-                return -1;
-
-            *number = (res >= 3) ? n1 : 1;
-            break;
-#endif
-
-        case 4:
-            addr->ss_family = AF_INET;
-# ifdef HAVE_SA_LEN
-            addr->ss_len =
-# endif
-           *addrlen = sizeof (struct sockaddr_in);
-
-            if (inet_pton (AF_INET, host,
-                           &((struct sockaddr_in *)addr)->sin_addr) <= 0)
-                return -1;
-
-            *number = (res >= 4) ? n2 : 1;
-            break;
-
-        default:
-            return -1;
-    }
-    return 0;
-}
-
-static void net_SetPort(struct sockaddr *addr, uint16_t port)
-{
-    switch (addr->sa_family)
-    {
-#ifdef AF_INET6
-        case AF_INET6:
-            ((struct sockaddr_in6 *)addr)->sin6_port = port;
-        break;
-#endif
-        case AF_INET:
-            ((struct sockaddr_in *)addr)->sin_port = port;
-        break;
-    }
-}
-
-static inline void FreeAttribute (attribute_t *a)
-{
-    free (a);
-}
-
-static void FreeSDP( sdp_t *p_sdp )
-{
-    free( p_sdp->psz_sessionname );
-    free( p_sdp->psz_sessioninfo );
-
-    for (unsigned j = 0; j < p_sdp->mediac; j++)
-    {
-        free (p_sdp->mediav[j].fmt);
-        for (int i = 0; i < p_sdp->mediav[j].i_attributes; i++)
-            FreeAttribute (p_sdp->mediav[j].pp_attributes[i]);
-        free (p_sdp->mediav[j].pp_attributes);
-    }
-    free (p_sdp->mediav);
-
-    for (int i = 0; i < p_sdp->i_attributes; i++)
-        FreeAttribute (p_sdp->pp_attributes[i]);
-
-    free (p_sdp->pp_attributes);
-    free (p_sdp);
-}
-
-static inline attribute_t *MakeAttribute (const char *str)
-{
-    attribute_t *a = malloc (sizeof (*a) + strlen (str) + 1);
-    if (a == NULL)
-        return NULL;
-
-    strcpy (a->name, str);
-    EnsureUTF8 (a->name);
-    char *value = strchr (a->name, ':');
-    if (value != NULL)
-    {
-        *value++ = '\0';
-        a->value = value;
-    }
-    else
-        a->value = "";
-    return a;
-}
-
-/***********************************************************************
- * ParseSDP : SDP parsing
- * *********************************************************************
- * Validate SDP and parse all fields
- ***********************************************************************/
-static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
-{
-    if( psz_sdp == NULL )
-        return NULL;
-
-    sdp_t *p_sdp = calloc (1, sizeof (*p_sdp));
-    if (p_sdp == NULL)
-        return NULL;
-
-    char expect = 'V';
-    struct sockaddr_storage glob_addr;
-    memset (&glob_addr, 0, sizeof (glob_addr));
-    socklen_t glob_len = 0;
-    unsigned glob_count = 1;
-    int port = 0;
-
-    /* TODO: use iconv and charset attribute instead of EnsureUTF8 */
-    while (*psz_sdp)
-    {
-        /* Extract one line */
-        size_t linelen = strcspn(psz_sdp, "\n");
-        if (psz_sdp[linelen] == '\0')
-            goto error;
-
-        char line[linelen + 1];
-        memcpy (line, psz_sdp, linelen);
-        line[linelen] = '\0';
-
-        psz_sdp += linelen + 1;
-
-        /* Remove carriage return if present */
-        char *eol = strchr (line, '\r');
-        if (eol != NULL)
-        {
-            linelen = eol - line;
-            line[linelen] = '\0';
-        }
-
-        /* Validate line */
-        char cat = line[0], *data = line + 2;
-        if (!cat || (strchr ("vosiuepcbtrzkam", cat) == NULL))
-        {
-            /* MUST ignore SDP with unknown line type */
-            msg_Dbg (p_obj, "unknown SDP line type: 0x%02x", (int)cat);
-            goto error;
-        }
-        if (line[1] != '=')
-        {
-            msg_Dbg (p_obj, "invalid SDP line: %s", line);
-            goto error;
-        }
-
-        assert (linelen >= 2);
-
-        /* SDP parsing state machine
-         * We INTERNALLY use uppercase for session, lowercase for media
-         */
-        switch (expect)
-        {
-            /* Session description */
-            case 'V':
-                expect = 'O';
-                if (cat != 'v')
-                {
-                    msg_Dbg (p_obj, "missing SDP version");
-                    goto error;
-                }
-                if (strcmp (data, "0"))
-                {
-                    msg_Dbg (p_obj, "unknown SDP version: %s", data);
-                    goto error;
-                }
-                break;
-
-            case 'O':
-                expect = 'S';
-                if (cat != 'o')
-                {
-                    msg_Dbg (p_obj, "missing SDP originator");
-                    goto error;
-                }
-
-                if (sscanf(data, "%63s %*u %*u IN %*s %*s%n",
-                           p_sdp->username, &(int){ 0 }) != 2)
-                {
-                    msg_Dbg (p_obj, "SDP origin not supported: %s", data);
-                    /* Or maybe out-of-range, but this looks suspicious */
-                    goto error;
-                }
-                break;
-
-            case 'S':
-                expect = 'I';
-                if ((cat != 's') || !*data)
-                {
-                    /* MUST be present AND non-empty */
-                    msg_Dbg (p_obj, "missing SDP session name");
-                    goto error;
-                }
-                assert (p_sdp->psz_sessionname == NULL); // no memleak here
-                p_sdp->psz_sessionname = strdup (data);
-                if (p_sdp->psz_sessionname == NULL)
-                    goto error;
-                EnsureUTF8 (p_sdp->psz_sessionname);
-                break;
-
-            case 'I':
-                expect = 'U';
-                /* optional (and may be empty) */
-                if (cat == 'i')
-                {
-                    assert (p_sdp->psz_sessioninfo == NULL);
-                    p_sdp->psz_sessioninfo = strdup (data);
-                    if (p_sdp->psz_sessioninfo == NULL)
-                        goto error;
-                    EnsureUTF8 (p_sdp->psz_sessioninfo);
-                    break;
-                }
-                /* fall through */
-
-            case 'U':
-                expect = 'E';
-                if (cat == 'u')
-                    break;
-                /* fall through */
-            case 'E':
-                expect = 'E';
-                if (cat == 'e')
-                    break;
-                /* fall through */
-            case 'P':
-                expect = 'P';
-                if (cat == 'p')
-                    break;
-                /* fall through */
-            case 'C':
-                expect = 'B';
-                if (cat == 'c')
-                {
-                    if (ParseSDPConnection (data, &glob_addr, &glob_len,
-                                            &glob_count))
-                    {
-                        msg_Dbg (p_obj, "SDP connection infos not supported: "
-                                 "%s", data);
-                        goto error;
-                    }
-                    break;
-                }
-                /* fall through */
-            case 'B':
-                assert (expect == 'B');
-                if (cat == 'b')
-                    break;
-                /* fall through */
-            case 'T':
-                expect = 'R';
-                if (cat != 't')
-                {
-                    msg_Dbg (p_obj, "missing SDP time description");
-                    goto error;
-                }
-                break;
-
-            case 'R':
-                if ((cat == 't') || (cat == 'r'))
-                    break;
-                /* fall through */
-            case 'Z':
-                expect = 'K';
-                if (cat == 'z')
-                    break;
-                /* fall through */
-            case 'K':
-                expect = 'A';
-                if (cat == 'k')
-                    break;
-                /* fall through */
-            case 'A':
-                //expect = 'A';
-                if (cat == 'a')
-                {
-                    attribute_t *p_attr = MakeAttribute (data);
-                    TAB_APPEND( p_sdp->i_attributes, p_sdp->pp_attributes, p_attr );
-                    break;
-                }
-                /* fall through */
-
-            /* Media description */
-            case 'm':
-            media:
-            {
-                expect = 'i';
-                if (cat != 'm')
-                {
-                    msg_Dbg (p_obj, "missing SDP media description");
-                    goto error;
-                }
-                struct sdp_media_t *m;
-                m = realloc (p_sdp->mediav, (p_sdp->mediac + 1) * sizeof (*m));
-                if (m == NULL)
-                    goto error;
-
-                p_sdp->mediav = m;
-                m += p_sdp->mediac;
-                p_sdp->mediac++;
-
-                memset (m, 0, sizeof (*m));
-                memcpy (&m->addr, &glob_addr, m->addrlen = glob_len);
-                m->n_addr = glob_count;
-
-                /* TODO: remember media type (if we need multiple medias) */
-                data = strchr (data, ' ');
-                if (data == NULL)
-                {
-                    msg_Dbg (p_obj, "missing SDP media port");
-                    goto error;
-                }
-                port = atoi (++data);
-                if (port <= 0 || port >= 65536)
-                {
-                    msg_Dbg (p_obj, "invalid transport port %d", port);
-                    goto error;
-                }
-                net_SetPort ((struct sockaddr *)&m->addr, htons (port));
-
-                data = strchr (data, ' ');
-                if (data == NULL)
-                {
-                    msg_Dbg (p_obj, "missing SDP media format");
-                    goto error;
-                }
-                m->fmt = strdup (++data);
-                if (m->fmt == NULL)
-                    goto error;
-
-                break;
-            }
-
-            case 'i':
-                expect = 'c';
-                if (cat == 'i')
-                    break;
-                /* fall through */
-            case 'c':
-                expect = 'b';
-                if (cat == 'c')
-                {
-                    struct sdp_media_t *m = p_sdp->mediav + p_sdp->mediac - 1;
-                    if (ParseSDPConnection (data, &m->addr, &m->addrlen,
-                                            &m->n_addr))
-                    {
-                        msg_Dbg (p_obj, "SDP connection infos not supported: "
-                                 "%s", data);
-                        goto error;
-                    }
-                    net_SetPort ((struct sockaddr *)&m->addr, htons (port));
-                    break;
-                }
-                /* fall through */
-            case 'b':
-                expect = 'b';
-                if (cat == 'b')
-                    break;
-                /* fall through */
-            case 'k':
-                expect = 'a';
-                if (cat == 'k')
-                    break;
-                /* fall through */
-            case 'a':
-                assert (expect == 'a');
-                if (cat == 'a')
-                {
-                    attribute_t *p_attr = MakeAttribute (data);
-                    if (p_attr == NULL)
-                        goto error;
-
-                    TAB_APPEND (p_sdp->mediav[p_sdp->mediac - 1].i_attributes,
-                                p_sdp->mediav[p_sdp->mediac - 1].pp_attributes, p_attr);
-                    break;
-                }
-
-                if (cat == 'm')
-                    goto media;
-
-                msg_Dbg (p_obj, "unexpected SDP line: 0x%02x", (int)cat);
-                goto error;
-
-            default:
-                msg_Err (p_obj, "*** BUG in SDP parser! ***");
-                goto error;
-        }
-    }
-
-    return p_sdp;
-
-error:
-    FreeSDP (p_sdp);
-    return NULL;
 }
 
 static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i_len )
@@ -800,7 +301,7 @@ static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i
 
 typedef struct
 {
-    sdp_t *p_sdp;
+    struct vlc_sdp *p_sdp;
     /* "computed" URI */
     char *uri;
     unsigned rtcp_port;
@@ -813,7 +314,7 @@ typedef struct
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    sdp_t *p_sdp = p_sys->p_sdp;
+    struct vlc_sdp *p_sdp = p_sys->p_sdp;
     input_item_t *p_parent_input = p_demux->p_input_item;
 
     if( !p_parent_input )
@@ -823,7 +324,7 @@ static int Demux( demux_t *p_demux )
     }
 
     input_item_SetURI(p_parent_input, p_sys->uri);
-    input_item_SetName( p_parent_input, p_sdp->psz_sessionname );
+    input_item_SetName(p_parent_input, p_sdp->name);
     if( p_sys->rtcp_port )
     {
         char *rtcp;
@@ -857,7 +358,7 @@ static int OpenDemux( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     const uint8_t *p_peek;
     char *psz_sdp = NULL;
-    sdp_t *p_sdp = NULL;
+    struct vlc_sdp *p_sdp = NULL;
     int errval = VLC_EGENERIC;
     size_t i_len;
 
@@ -903,7 +404,7 @@ static int OpenDemux( vlc_object_t *p_this )
             break; // EOF
     }
 
-    p_sdp = ParseSDP( VLC_OBJECT(p_demux), psz_sdp );
+    p_sdp = vlc_sdp_parse(psz_sdp, i_len);
 
     if( !p_sdp )
     {
@@ -931,7 +432,8 @@ static int OpenDemux( vlc_object_t *p_this )
 
 error:
     FREENULL( psz_sdp );
-    if( p_sdp ) FreeSDP( p_sdp );
+    if (p_sdp != NULL)
+        vlc_sdp_free(p_sdp);
     return errval;
 }
 
@@ -944,7 +446,7 @@ static void CloseDemux( vlc_object_t *p_this )
     demux_sys_t *sys = p_demux->p_sys;
 
     if( sys->p_sdp )
-        FreeSDP( sys->p_sdp );
+        vlc_sdp_free(sys->p_sdp);
     free(sys->uri);
     free( sys );
 }
@@ -966,7 +468,7 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
                                       uint16_t i_hash, const char *psz_sdp)
 {
     /* Parse SDP info */
-    sdp_t *p_sdp = ParseSDP(VLC_OBJECT(p_sd), psz_sdp);
+    struct vlc_sdp *p_sdp = vlc_sdp_parse(psz_sdp, strlen(psz_sdp));
     if (p_sdp == NULL)
         return NULL;
 
@@ -974,7 +476,7 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
 
     if (asprintf(&uri, "sdp://%s", psz_sdp) == -1)
     {
-        FreeSDP(p_sdp);
+        vlc_sdp_free(p_sdp);
         return NULL;
     }
 
@@ -991,7 +493,7 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
     memcpy (p_sap->i_source, i_source, sizeof(p_sap->i_source));
 
     /* Released in RemoveAnnounce */
-    p_input = input_item_NewStream(uri, p_sdp->psz_sessionname,
+    p_input = input_item_NewStream(uri, p_sdp->name,
                                    INPUT_DURATION_INDEFINITE);
     if( unlikely(p_input == NULL) )
     {
@@ -1003,23 +505,18 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
     vlc_meta_t *p_meta = vlc_meta_New();
     if( likely(p_meta != NULL) )
     {
-        vlc_meta_Set( p_meta, vlc_meta_Description, p_sdp->psz_sessioninfo );
+        vlc_meta_Set(p_meta, vlc_meta_Description, p_sdp->info);
         p_input->p_meta = p_meta;
     }
 
-    psz_value = GetAttribute(p_sdp->pp_attributes, p_sdp->i_attributes, "tool");
+    psz_value = vlc_sdp_attr_value(p_sdp, "tool");
     if( psz_value != NULL )
     {
         input_item_AddInfo( p_input, _("Session"), _("Tool"), "%s", psz_value );
     }
-    if( strcmp( p_sdp->username, "-" ) )
-    {
-        input_item_AddInfo( p_input, _("Session"), _("User"), "%s",
-                           p_sdp->username );
-    }
 
     /* Handle category */
-    psz_value = GetAttribute(p_sdp->pp_attributes, p_sdp->i_attributes, "cat");
+    psz_value = vlc_sdp_attr_value(p_sdp, "cat");
     if (psz_value != NULL)
     {
         /* a=cat provides a dot-separated hierarchy.
@@ -1034,12 +531,11 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
     else
     {
         /* backward compatibility with VLC 0.7.3-2.0.0 senders */
-        psz_value = GetAttribute(p_sdp->pp_attributes,
-                                 p_sdp->i_attributes, "x-plgroup");
+        psz_value = vlc_sdp_attr_value(p_sdp, "x-plgroup");
         services_discovery_AddItemCat(p_sd, p_input, psz_value);
     }
 
-    FreeSDP(p_sdp);
+    vlc_sdp_free(p_sdp);
     return p_sap;
 }
 
