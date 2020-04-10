@@ -961,7 +961,7 @@ typedef struct sap_announce_t
     input_item_t * p_item;
 } sap_announce_t;
 
-static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd, bool parse,
+static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd,
                                       const uint32_t *i_source,
                                       uint16_t i_hash, const char *psz_sdp)
 {
@@ -971,15 +971,8 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd, bool parse,
         return NULL;
 
     char *uri = NULL;
-    unsigned rtcp_port;
 
-    /* Decide whether we should add a playlist item for this SDP */
-    /* Parse connection information (c= & m= ) */
-    if (parse)
-        uri = ParseConnection(VLC_OBJECT(p_sd), p_sdp, &rtcp_port);
-
-    /* Multi-media or no-parse -> pass to LIVE.COM */
-    if (uri == NULL && asprintf(&uri, "sdp://%s", psz_sdp) == -1)
+    if (asprintf(&uri, "sdp://%s", psz_sdp) == -1)
     {
         FreeSDP(p_sdp);
         return NULL;
@@ -1012,16 +1005,6 @@ static sap_announce_t *CreateAnnounce(services_discovery_t *p_sd, bool parse,
     {
         vlc_meta_Set( p_meta, vlc_meta_Description, p_sdp->psz_sessioninfo );
         p_input->p_meta = p_meta;
-    }
-
-    if( rtcp_port )
-    {
-        char *rtcp;
-        if( asprintf( &rtcp, ":rtcp-port=%u", rtcp_port ) != -1 )
-        {
-            input_item_AddOption( p_input, rtcp, VLC_INPUT_OPTION_TRUSTED );
-            free( rtcp );
-        }
     }
 
     psz_value = GetAttribute(p_sdp->pp_attributes, p_sdp->i_attributes, "tool");
@@ -1071,9 +1054,6 @@ typedef struct
     /* Table of announces */
     int i_announces;
     struct sap_announce_t **pp_announces;
-
-    /* Modes */
-    bool  b_parse;
 
     vlc_tick_t i_timeout;
 } services_discovery_sys_t;
@@ -1239,8 +1219,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         }
     }
 
-    sap_announce_t *sap = CreateAnnounce(p_sd, p_sys->b_parse, i_source,
-                                         i_hash, psz_sdp);
+    sap_announce_t *sap = CreateAnnounce(p_sd, i_source, i_hash, psz_sdp);
     if (sap != NULL)
         TAB_APPEND(p_sys->i_announces, p_sys->pp_announces, sap);
 
@@ -1428,8 +1407,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->pi_fd = NULL;
     p_sys->i_fd = 0;
-
-    p_sys->b_parse = var_CreateGetBool( p_sd, "sap-parse" );
 
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;
