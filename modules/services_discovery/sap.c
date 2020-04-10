@@ -368,10 +368,8 @@ static int OpenDemux( vlc_object_t *p_this )
     if( ParseConnection( VLC_OBJECT( p_demux ), p_sdp ) )
     {
         p_sdp->psz_uri = NULL;
-    }
-    if (!IsWellKnownPayload (p_sdp->i_media_type))
         goto error;
-    if( p_sdp->psz_uri == NULL ) goto error;
+    }
 
     demux_sys_t *p_sys = malloc( sizeof(*p_sys) );
     if( unlikely(p_sys == NULL) )
@@ -749,7 +747,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         p_sdp->psz_uri = NULL;
 
     /* Multi-media or no-parse -> pass to LIVE.COM */
-    if( !IsWellKnownPayload( p_sdp->i_media_type ) || !p_sys->b_parse )
+    if( !p_sys->b_parse )
     {
         free( p_sdp->psz_uri );
         if (asprintf( &p_sdp->psz_uri, "sdp://%s", p_sdp->psz_sdp ) == -1)
@@ -1081,6 +1079,12 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         if (asprintf (&p_sdp->psz_uri, "%s://%s@%s:%i", vlc_proto, psz_source,
                      host, port) == -1)
             return VLC_ENOMEM;
+    }
+
+    if (!IsWellKnownPayload(p_sdp->i_media_type))
+    {
+        free(p_sdp->psz_uri);
+        return VLC_EGENERIC;
     }
 
     return VLC_SUCCESS;
