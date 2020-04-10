@@ -166,8 +166,6 @@ struct  sdp_t
     char *psz_sessioninfo;
 
     /* old cruft */
-    /* "computed" URI */
-    char *psz_uri;
     unsigned rtcp_port;
 
     /* a= global attributes */
@@ -221,6 +219,8 @@ typedef struct
 typedef struct
 {
     sdp_t *p_sdp;
+    /* "computed" URI */
+    char *uri;
 } demux_sys_t;
 
 /*****************************************************************************
@@ -234,10 +234,10 @@ typedef struct
     static void *Run  ( void *p_sd );
 
 /* Main parsing functions */
-    static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp );
+static char *ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp );
     static int ParseSAP( services_discovery_t *p_sd, const uint8_t *p_buffer, size_t i_read );
     static sdp_t *ParseSDP (vlc_object_t *p_sd, const char *psz_sdp);
-    static sap_announce_t *CreateAnnounce( services_discovery_t *, uint32_t *, uint16_t, sdp_t * );
+static sap_announce_t *CreateAnnounce( services_discovery_t *, uint32_t *, uint16_t, sdp_t *, const char * );
     static int RemoveAnnounce( services_discovery_t *p_sd, sap_announce_t *p_announce );
 
 /* Helper functions */
@@ -364,16 +364,15 @@ static int OpenDemux( vlc_object_t *p_this )
         goto error;
     }
 
-    if( ParseConnection( VLC_OBJECT( p_demux ), p_sdp ) )
-    {
-        p_sdp->psz_uri = NULL;
+    char *uri = ParseConnection(VLC_OBJECT(p_demux), p_sdp);
+    if (uri == NULL)
         goto error;
-    }
 
     demux_sys_t *p_sys = malloc( sizeof(*p_sys) );
     if( unlikely(p_sys == NULL) )
         goto error;
     p_sys->p_sdp = p_sdp;
+    p_sys->uri = uri;
     p_demux->p_sys = p_sys;
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
@@ -424,6 +423,7 @@ static void CloseDemux( vlc_object_t *p_this )
 
     if( sys->p_sdp )
         FreeSDP( sys->p_sdp );
+    free(sys->uri);
     free( sys );
 }
 
@@ -602,7 +602,7 @@ static int Demux( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    input_item_SetURI( p_parent_input, p_sdp->psz_uri );
+    input_item_SetURI(p_parent_input, p_sys->uri);
     input_item_SetName( p_parent_input, p_sdp->psz_sessionname );
     if( p_sdp->rtcp_port )
     {
@@ -742,18 +742,17 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
 
     /* Decide whether we should add a playlist item for this SDP */
     /* Parse connection information (c= & m= ) */
-    if( ParseConnection( VLC_OBJECT(p_sd), p_sdp ) )
-        p_sdp->psz_uri = NULL;
+    char *uri = ParseConnection( VLC_OBJECT(p_sd), p_sdp );
 
     /* Multi-media or no-parse -> pass to LIVE.COM */
     if( !p_sys->b_parse )
     {
-        free( p_sdp->psz_uri );
-        if (asprintf( &p_sdp->psz_uri, "sdp://%s", p_sdp->psz_sdp ) == -1)
-            p_sdp->psz_uri = NULL;
+        free(uri);
+        if (asprintf(&uri, "sdp://%s", p_sdp->psz_sdp) == -1)
+            uri = NULL;
     }
 
-    if( p_sdp->psz_uri == NULL )
+    if (uri == NULL)
     {
         FreeSDP( p_sdp );
         goto error;
@@ -788,13 +787,14 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
                 p_announce->i_last = now;
             }
             FreeSDP( p_sdp );
+            free(uri);
             free (decomp);
             return VLC_SUCCESS;
         }
     }
 
-    CreateAnnounce( p_sd, i_source, i_hash, p_sdp );
-
+    CreateAnnounce( p_sd, i_source, i_hash, p_sdp, uri );
+    free(uri);
     free (decomp);
     return VLC_SUCCESS;
 error:
@@ -803,7 +803,7 @@ error:
 }
 
 sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, uint16_t i_hash,
-                                sdp_t *p_sdp )
+                                sdp_t *p_sdp, const char *uri )
 {
     input_item_t *p_input;
     const char *psz_value;
@@ -823,8 +823,8 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, 
     p_sap->p_sdp = p_sdp;
 
     /* Released in RemoveAnnounce */
-    p_input = input_item_NewStream( p_sap->p_sdp->psz_uri, p_sdp->psz_sessionname,
-                                    INPUT_DURATION_INDEFINITE );
+    p_input = input_item_NewStream(uri, p_sdp->psz_sessionname,
+                                   INPUT_DURATION_INDEFINITE);
     if( unlikely(p_input == NULL) )
     {
         free( p_sap );
@@ -900,13 +900,15 @@ static const char *FindAttribute (const sdp_t *sdp, unsigned media,
 }
 
 
-/* Fill p_sdp->psz_uri */
-static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
+/* Compute URI */
+static char *ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
 {
+    char *uri;
+
     if (p_sdp->mediac == 0)
     {
         msg_Dbg (p_obj, "Ignoring SDP with no media");
-        return VLC_EGENERIC;
+        return NULL;
     }
 
     for (unsigned i = 1; i < p_sdp->mediac; i++)
@@ -917,14 +919,14 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
                     p_sdp->mediav->addrlen))
         {
             msg_Dbg (p_obj, "Multiple media ports not supported -> live555");
-            return VLC_EGENERIC;
+            return NULL;
         }
     }
 
     if (p_sdp->mediav->n_addr != 1)
     {
         msg_Dbg (p_obj, "Layered encoding not supported -> live555");
-        return VLC_EGENERIC;
+        return NULL;
     }
 
     char psz_uri[1026];
@@ -935,7 +937,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     if (vlc_getnameinfo ((struct sockaddr *)&(p_sdp->mediav->addr),
                          p_sdp->mediav->addrlen, psz_uri + 1,
                          sizeof (psz_uri) - 2, &port, NI_NUMERICHOST))
-        return VLC_EGENERIC;
+        return NULL;
 
     if (strchr (psz_uri + 1, ':'))
     {
@@ -948,14 +950,14 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     /* Parse m= field */
     char *sdp_proto = strdup (p_sdp->mediav[0].fmt);
     if (sdp_proto == NULL)
-        return VLC_ENOMEM;
+        return NULL;
 
     char *subtype = strchr (sdp_proto, ' ');
     if (subtype == NULL)
     {
         msg_Dbg (p_obj, "missing SDP media subtype: %s", sdp_proto);
         free (sdp_proto);
-        return VLC_EGENERIC;
+        return NULL;
     }
 
     *subtype++ = '\0';
@@ -965,7 +967,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
      && !IsWellKnownPayload(atoi(subtype)))
     {
         free(sdp_proto);
-        return VLC_EGENERIC;
+        return NULL;
     }
 
     /* RTP protocol, nul, VLC shortcut, nul, flags byte as follow:
@@ -997,7 +999,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     {
         msg_Dbg (p_obj, "unknown SDP media protocol: %s",
                  p_sdp->mediav[0].fmt);
-        return VLC_EGENERIC;
+        return NULL;
     }
 
     if (!strcmp (vlc_proto, "udp") || FindAttribute (p_sdp, 0, "rtcp-mux"))
@@ -1024,12 +1026,11 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         if (strcmp (setup, "actpass") && strcmp (setup, "passive"))
         {
             msg_Dbg (p_obj, "unsupported COMEDIA mode: %s", setup);
-            return VLC_EGENERIC;
+            return NULL;
         }
 
-        if (asprintf (&p_sdp->psz_uri, "%s://%s:%d", vlc_proto,
-                      host, port) == -1)
-            return VLC_ENOMEM;
+        if (asprintf(&uri, "%s://%s:%d", vlc_proto, host, port) == -1)
+            return NULL;
     }
     else
     {
@@ -1075,12 +1076,12 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
             }
         }
 
-        if (asprintf (&p_sdp->psz_uri, "%s://%s@%s:%i", vlc_proto, psz_source,
+        if (asprintf(&uri, "%s://%s@%s:%i", vlc_proto, psz_source,
                      host, port) == -1)
-            return VLC_ENOMEM;
+            return NULL;
     }
 
-    return VLC_SUCCESS;
+    return uri;
 }
 
 
@@ -1519,7 +1520,6 @@ static void FreeSDP( sdp_t *p_sdp )
 {
     free( p_sdp->psz_sessionname );
     free( p_sdp->psz_sessioninfo );
-    free( p_sdp->psz_uri );
 
     for (unsigned j = 0; j < p_sdp->mediac; j++)
     {
