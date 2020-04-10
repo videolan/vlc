@@ -168,7 +168,6 @@ struct  sdp_t
     /* old cruft */
     /* "computed" URI */
     char *psz_uri;
-    int           i_media_type;
     unsigned rtcp_port;
 
     /* a= global attributes */
@@ -958,15 +957,15 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         free (sdp_proto);
         return VLC_EGENERIC;
     }
-    else
+
+    *subtype++ = '\0';
+    /* FIXME: check for multiple payload types in RTP/AVP case.
+     * FIXME: check for "mpeg" subtype in raw udp case. */
+    if (strcasecmp(sdp_proto, "udp") != 0
+     && !IsWellKnownPayload(atoi(subtype)))
     {
-        *subtype++ = '\0';
-        /* FIXME: check for multiple payload types in RTP/AVP case.
-         * FIXME: check for "mpeg" subtype in raw udp case. */
-        if (!strcasecmp (sdp_proto, "udp"))
-            p_sdp->i_media_type = 33;
-        else
-            p_sdp->i_media_type = atoi (subtype);
+        free(sdp_proto);
+        return VLC_EGENERIC;
     }
 
     /* RTP protocol, nul, VLC shortcut, nul, flags byte as follow:
@@ -1079,12 +1078,6 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         if (asprintf (&p_sdp->psz_uri, "%s://%s@%s:%i", vlc_proto, psz_source,
                      host, port) == -1)
             return VLC_ENOMEM;
-    }
-
-    if (!IsWellKnownPayload(p_sdp->i_media_type))
-    {
-        free(p_sdp->psz_uri);
-        return VLC_EGENERIC;
     }
 
     return VLC_SUCCESS;
