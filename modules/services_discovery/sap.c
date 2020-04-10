@@ -76,61 +76,6 @@
 #define ADD_SESSION 1
 
 /*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-#define SAP_ADDR_TEXT N_( "SAP multicast address" )
-#define SAP_ADDR_LONGTEXT N_( "The SAP module normally chooses itself the " \
-                              "right addresses to listen to. However, you " \
-                              "can specify a specific address." )
-#define SAP_TIMEOUT_TEXT N_( "SAP timeout (seconds)" )
-#define SAP_TIMEOUT_LONGTEXT N_( \
-       "Delay after which SAP items get deleted if no new announcement " \
-       "is received." )
-#define SAP_PARSE_TEXT N_( "Try to parse the announce" )
-#define SAP_PARSE_LONGTEXT N_( \
-       "This enables actual parsing of the announces by the SAP module. " \
-       "Otherwise, all announcements are parsed by the \"live555\" " \
-       "(RTP/RTSP) module." )
-
-/* Callbacks */
-    static int  Open ( vlc_object_t * );
-    static void Close( vlc_object_t * );
-    static int  OpenDemux ( vlc_object_t * );
-    static void CloseDemux ( vlc_object_t * );
-
-VLC_SD_PROBE_HELPER("sap", N_("Network streams (SAP)"), SD_CAT_LAN)
-
-vlc_module_begin ()
-    set_shortname( N_("SAP"))
-    set_description( N_("Network streams (SAP)") )
-    set_category( CAT_PLAYLIST )
-    set_subcategory( SUBCAT_PLAYLIST_SD )
-
-    add_string( "sap-addr", NULL,
-                SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, true )
-    add_obsolete_bool( "sap-ipv4" ) /* since 2.0.0 */
-    add_obsolete_bool( "sap-ipv6" ) /* since 2.0.0 */
-    add_integer( "sap-timeout", 1800,
-                 SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, true )
-    add_bool( "sap-parse", true,
-               SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, true )
-    add_obsolete_bool( "sap-strict" ) /* since 4.0.0 */
-    add_obsolete_bool( "sap-timeshift" ) /* Redumdant since 1.0.0 */
-
-    set_capability( "services_discovery", 0 )
-    set_callbacks( Open, Close )
-
-    VLC_SD_PROBE_SUBMODULE
-
-    add_submodule ()
-        set_description( N_("SDP Descriptions parser") )
-        add_shortcut( "sdp" )
-        set_capability( "demux", 51 )
-        set_callbacks( OpenDemux, CloseDemux )
-vlc_module_end ()
-
-
-/*****************************************************************************
  * Local structures
  *****************************************************************************/
 
@@ -1593,3 +1538,50 @@ static inline void FreeAttribute (attribute_t *a)
 {
     free (a);
 }
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define SAP_ADDR_TEXT N_( "SAP multicast address" )
+#define SAP_ADDR_LONGTEXT N_( "The SAP module normally chooses itself the " \
+                              "right addresses to listen to. However, you " \
+                              "can specify a specific address." )
+#define SAP_TIMEOUT_TEXT N_( "SAP timeout (seconds)" )
+#define SAP_TIMEOUT_LONGTEXT N_( \
+       "Delay after which SAP items get deleted if no new announcement " \
+       "is received." )
+#define SAP_PARSE_TEXT N_( "Try to parse the announce" )
+#define SAP_PARSE_LONGTEXT N_( \
+       "This enables actual parsing of the announces by the SAP module. " \
+       "Otherwise, all announcements are parsed by the \"live555\" " \
+       "(RTP/RTSP) module." )
+
+VLC_SD_PROBE_HELPER("sap", N_("Network streams (SAP)"), SD_CAT_LAN)
+
+vlc_module_begin()
+    set_shortname(N_("SAP"))
+    set_description(N_("Network streams (SAP)") )
+    set_category(CAT_PLAYLIST)
+    set_subcategory(SUBCAT_PLAYLIST_SD)
+
+    add_string("sap-addr", NULL, SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, true)
+    add_obsolete_bool("sap-ipv4") /* since 2.0.0 */
+    add_obsolete_bool("sap-ipv6") /* since 2.0.0 */
+    add_integer("sap-timeout", 1800,
+                SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, true)
+    add_bool("sap-parse", true,
+             SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, true)
+    add_obsolete_bool("sap-strict") /* since 4.0.0 */
+    add_obsolete_bool("sap-timeshift") /* Redumdant since 1.0.0 */
+
+    set_capability("services_discovery", 0)
+    set_callbacks(Open, Close)
+
+    VLC_SD_PROBE_SUBMODULE
+
+    add_submodule()
+        set_description(N_("SDP Descriptions parser"))
+        add_shortcut("sdp")
+        set_capability("demux", 51)
+        set_callbacks(OpenDemux, CloseDemux)
+vlc_module_end()
