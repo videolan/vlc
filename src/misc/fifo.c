@@ -71,11 +71,6 @@ void vlc_fifo_WaitCond(vlc_fifo_t *fifo, vlc_cond_t *condvar)
     vlc_cond_wait(condvar, &fifo->lock);
 }
 
-int vlc_fifo_TimedWaitCond(vlc_fifo_t *fifo, vlc_cond_t *condvar, vlc_tick_t deadline)
-{
-    return vlc_cond_timedwait(condvar, &fifo->lock, deadline);
-}
-
 size_t vlc_fifo_GetCount(const vlc_fifo_t *fifo)
 {
     vlc_mutex_assert(&fifo->lock);

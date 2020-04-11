@@ -547,14 +547,6 @@ VLC_API void vlc_fifo_Wait(vlc_fifo_t *);
 VLC_API void vlc_fifo_WaitCond(vlc_fifo_t *, vlc_cond_t *);
 
 /**
- * Timed variant of vlc_fifo_WaitCond().
- *
- * Atomically unlocks the FIFO and waits until one thread signals the FIFO up
- * to a certain date, then locks the FIFO again. See vlc_fifo_Wait().
- */
-int vlc_fifo_TimedWaitCond(vlc_fifo_t *, vlc_cond_t *, vlc_tick_t);
-
-/**
  * Queues a linked-list of blocks into a locked FIFO.
  *
  * @param block the head of the list of blocks
