@@ -25,9 +25,9 @@
 # define VLC_URL_H
 
 /**
- * \file
- * This file defines functions for manipulating URL in vlc
- *
+ * \file vlc_url.h
+ * \ingroup url
+ * \defgroup url Uniform Resource Locator (URL)
  * \ingroup strings
  * @{
  */

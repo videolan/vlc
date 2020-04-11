@@ -25,9 +25,9 @@
 #define VLC_CHARSET_H 1
 
 /**
- * \file
- * Characters sets handling
- *
+ * \file vlc_charset.h
+ * \ingroup charset
+ * \defgroup charset Character sets
  * \ingroup strings
  * @{
  */
@@ -128,12 +128,20 @@ static inline char *EnsureUTF8(char *str)
     return ret;
 }
 
-/* iconv wrappers (defined in src/extras/libc.c) */
+/**
+ * \defgroup iconv iconv wrappers
+ *
+ * (defined in src/extras/libc.c)
+ * @{
+ */
+
 #define VLC_ICONV_ERR ((size_t) -1)
 typedef void *vlc_iconv_t;
 VLC_API vlc_iconv_t vlc_iconv_open( const char *, const char * ) VLC_USED;
 VLC_API size_t vlc_iconv( vlc_iconv_t, const char **, size_t *, char **, size_t * ) VLC_USED;
 VLC_API int vlc_iconv_close( vlc_iconv_t );
+
+/** @} */
 
 #include <stdarg.h>
 
@@ -337,12 +345,16 @@ static inline char *FromLatin1 (const char *latin)
     return utf8 ? utf8 : str;
 }
 
-/** @} */
-
+/**
+ * \defgroup c_locale C/POSIX locale functions
+ * @{
+ */
 VLC_API double us_strtod( const char *, char ** ) VLC_USED;
 VLC_API float us_strtof( const char *, char ** ) VLC_USED;
 VLC_API double us_atof( const char * ) VLC_USED;
 VLC_API int us_vasprintf( char **, const char *, va_list );
 VLC_API int us_asprintf( char **, const char *, ... ) VLC_USED;
+/** @} */
+/** @} */
 
 #endif
