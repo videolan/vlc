@@ -31,11 +31,8 @@ aout_FiltersAdjustResampling
 aout_Hold
 aout_Release
 block_Alloc
-block_FifoCount
-block_FifoEmpty
 block_FifoGet
 block_FifoNew
-block_FifoPut
 block_FifoRelease
 block_FifoShow
 block_File
@@ -666,11 +663,6 @@ vlc_epg_Delete
 vlc_epg_Duplicate
 vlc_epg_AddEvent
 vlc_epg_SetCurrent
-vlc_fifo_Lock
-vlc_fifo_Unlock
-vlc_fifo_Signal
-vlc_fifo_Wait
-vlc_fifo_WaitCond
 vlc_fifo_QueueUnlocked
 vlc_fifo_DequeueUnlocked
 vlc_fifo_DequeueAllUnlocked

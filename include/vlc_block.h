@@ -458,19 +458,6 @@ VLC_API block_fifo_t *block_FifoNew(void) VLC_USED VLC_MALLOC;
 VLC_API void block_FifoRelease(block_fifo_t *);
 
 /**
- * Clears all blocks in a FIFO.
- */
-VLC_API void block_FifoEmpty(block_fifo_t *);
-
-/**
- * Immediately queue one block at the end of a FIFO.
- *
- * @param fifo queue
- * @param block head of a block list to queue (may be NULL)
- */
-VLC_API void block_FifoPut(block_fifo_t *fifo, block_t *block);
-
-/**
  * Dequeue the first block from the FIFO. If necessary, wait until there is
  * one block in the queue. This function is (always) cancellation point.
  *
@@ -490,9 +477,6 @@ VLC_API block_t *block_FifoGet(block_fifo_t *) VLC_USED;
  * @return a valid block.
  */
 VLC_API block_t *block_FifoShow(block_fifo_t *);
-
-size_t block_FifoSize(block_fifo_t *) VLC_USED VLC_DEPRECATED;
-VLC_API size_t block_FifoCount(block_fifo_t *) VLC_USED VLC_DEPRECATED;
 
 typedef struct block_fifo_t vlc_fifo_t;
 
@@ -628,6 +612,56 @@ static inline void vlc_fifo_Cleanup(void *fifo)
     vlc_fifo_Unlock((vlc_fifo_t *)fifo);
 }
 #define vlc_fifo_CleanupPush(fifo) vlc_cleanup_push(vlc_fifo_Cleanup, fifo)
+
+/**
+ * Clears all blocks in a FIFO.
+ */
+static inline void block_FifoEmpty(block_fifo_t *fifo)
+{
+    block_t *block;
+
+    vlc_fifo_Lock(fifo);
+    block = vlc_fifo_DequeueAllUnlocked(fifo);
+    vlc_fifo_Unlock(fifo);
+    block_ChainRelease(block);
+}
+
+/**
+ * Immediately queue one block at the end of a FIFO.
+ *
+ * @param fifo queue
+ * @param block head of a block list to queue (may be NULL)
+ */
+static inline void block_FifoPut(block_fifo_t *fifo, block_t *block)
+{
+    vlc_fifo_Lock(fifo);
+    vlc_fifo_QueueUnlocked(fifo, block);
+    vlc_fifo_Unlock(fifo);
+}
+
+/* FIXME: not (really) thread-safe */
+VLC_USED VLC_DEPRECATED
+static inline size_t block_FifoSize (block_fifo_t *fifo)
+{
+    size_t size;
+
+    vlc_fifo_Lock(fifo);
+    size = vlc_fifo_GetBytes(fifo);
+    vlc_fifo_Unlock(fifo);
+    return size;
+}
+
+/* FIXME: not (really) thread-safe */
+VLC_USED VLC_DEPRECATED
+static inline size_t block_FifoCount (block_fifo_t *fifo)
+{
+    size_t depth;
+
+    vlc_fifo_Lock(fifo);
+    depth = vlc_fifo_GetCount(fifo);
+    vlc_fifo_Unlock(fifo);
+    return depth;
+}
 
 /** @} */
 

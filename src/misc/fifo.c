@@ -159,23 +159,6 @@ void block_FifoRelease( block_fifo_t *p_fifo )
     free( p_fifo );
 }
 
-void block_FifoEmpty(block_fifo_t *fifo)
-{
-    block_t *block;
-
-    vlc_fifo_Lock(fifo);
-    block = vlc_fifo_DequeueAllUnlocked(fifo);
-    vlc_fifo_Unlock(fifo);
-    block_ChainRelease(block);
-}
-
-void block_FifoPut(block_fifo_t *fifo, block_t *block)
-{
-    vlc_fifo_Lock(fifo);
-    vlc_fifo_QueueUnlocked(fifo, block);
-    vlc_fifo_Unlock(fifo);
-}
-
 block_t *block_FifoGet(block_fifo_t *fifo)
 {
     block_t *block;
@@ -205,26 +188,4 @@ block_t *block_FifoShow( block_fifo_t *p_fifo )
     vlc_fifo_Unlock(p_fifo);
 
     return b;
-}
-
-/* FIXME: not (really) thread-safe */
-size_t block_FifoSize (block_fifo_t *fifo)
-{
-    size_t size;
-
-    vlc_fifo_Lock(fifo);
-    size = vlc_fifo_GetBytes(fifo);
-    vlc_fifo_Unlock(fifo);
-    return size;
-}
-
-/* FIXME: not (really) thread-safe */
-size_t block_FifoCount (block_fifo_t *fifo)
-{
-    size_t depth;
-
-    vlc_fifo_Lock(fifo);
-    depth = vlc_fifo_GetCount(fifo);
-    vlc_fifo_Unlock(fifo);
-    return depth;
 }
