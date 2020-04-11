@@ -29,11 +29,12 @@
 # include "config.h"
 #endif
 
-#include <stdnoreturn.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <vlc_common.h>
-#include <vlc_block.h>
+#include <vlc_queue.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #if !defined(_WIN32) && !defined(__APPLE__)
@@ -51,7 +52,8 @@ struct vout_display_sys_t {
     caca_display_t *dp;
     cucul_dither_t *dither;
 
-    block_fifo_t *fifo;
+    bool dead;
+    vlc_queue_t q;
     vlc_thread_t thread;
     vout_window_t *window;
     vout_display_place_t place;
@@ -60,31 +62,32 @@ struct vout_display_sys_t {
     vlc_tick_t cursor_deadline;
 };
 
-noreturn static void *VoutDisplayEventKeyDispatch(void *data)
+typedef struct vlc_caca_event {
+    struct vlc_caca_event *next;
+    int key;
+} vlc_caca_event_t;
+
+static void *VoutDisplayEventKeyDispatch(void *data)
 {
     vout_display_t *vd = data;
     vout_display_sys_t *sys = vd->sys;
-    block_fifo_t *fifo = sys->fifo;
+    vlc_caca_event_t *event;
 
-    for (;;) {
-        block_t *event = block_FifoGet(fifo);
-
-        int cancel = vlc_savecancel();
-        int key;
-
-        memcpy(&key, event->p_buffer, sizeof (key));
-        block_Release(event);
-        vout_window_ReportKeyPress(sys->window, key);
-        vlc_restorecancel(cancel);
+    while ((event = vlc_queue_DequeueKillable(&sys->q, &sys->dead)) != NULL) {
+        vout_window_ReportKeyPress(sys->window, event->key);
+        free(event);
     }
+
+    return NULL;
 }
 
 static void VoutDisplayEventKey(vout_display_sys_t *sys, int key)
 {
-    block_t *event = block_Alloc(sizeof (key));
+    vlc_caca_event_t *event = malloc(sizeof (*event));
+
     if (likely(event != NULL)) {
-        memcpy(event->p_buffer, &key, sizeof (key));
-        block_FifoPut(sys->fifo, event);
+        event->key = key;
+        vlc_queue_Enqueue(&sys->q, event);
     }
 }
 
@@ -356,11 +359,9 @@ static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->fifo != NULL) {
-        vlc_cancel(sys->thread);
-        vlc_join(sys->thread, NULL);
-        block_FifoRelease(sys->fifo);
-    }
+    vlc_queue_Kill(&sys->q, &sys->dead);
+    vlc_join(sys->thread, NULL);
+
     if (sys->dither)
         cucul_free_dither(sys->dither);
     caca_free_display(sys->dp);
@@ -470,16 +471,12 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         (title != NULL) ? title : VOUT_TITLE "(Colour AsCii Art)");
     free(title);
 
-    block_fifo_t *fifo = block_FifoNew();
-    if (likely(fifo != NULL)) {
-        sys->fifo = fifo;
+    sys->dead = false;
+    vlc_queue_Init(&sys->q, offsetof (vlc_caca_event_t, next));
 
-        if (vlc_clone(&sys->thread, VoutDisplayEventKeyDispatch, vd,
-                      VLC_THREAD_PRIORITY_LOW)) {
-            block_FifoRelease(fifo);
-            sys->fifo = NULL;
-        }
-    }
+    if (vlc_clone(&sys->thread, VoutDisplayEventKeyDispatch, vd,
+                  VLC_THREAD_PRIORITY_LOW))
+        goto error;
 
     sys->cursor_timeout = VLC_TICK_FROM_MS( var_InheritInteger(vd, "mouse-hide-timeout") );
     sys->cursor_deadline = INVALID_DEADLINE;
