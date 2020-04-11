@@ -213,5 +213,46 @@ VLC_API void *vlc_queue_Dequeue(vlc_queue_t *) VLC_USED;
  */
 VLC_API void *vlc_queue_DequeueAll(vlc_queue_t *) VLC_USED;
 
+/**
+ * @defgroup queue_killable Killable queues
+ *
+ * Thread-safe queues with an end flag.
+ *
+ * @{
+ */
+
+/**
+ * Marks a queue ended.
+ */
+static inline void vlc_queue_Kill(vlc_queue_t *q,
+                                  bool *restrict tombstone)
+{
+    vlc_queue_Lock(q);
+    *tombstone = true;
+    vlc_queue_Signal(q);
+    vlc_queue_Unlock(q);
+}
+
+/**
+ * Dequeues one entry from a killable queue.
+ *
+ * @return an entry, or NULL if the queue is empty and has been ended.
+ */
+static inline void *vlc_queue_DequeueKillable(vlc_queue_t *q,
+                                              bool *restrict tombstone)
+{
+    void *entry;
+
+    vlc_queue_Lock(q);
+    while (vlc_queue_IsEmpty(q) && !*tombstone)
+        vlc_queue_Wait(q);
+
+    entry = vlc_queue_DequeueUnlocked(q);
+    vlc_queue_Unlock(q);
+    return entry;
+}
+
+/** @} */
+
 /** @} */
 #endif
