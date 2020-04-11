@@ -155,7 +155,7 @@ block_fifo_t *block_FifoNew( void )
 
 void block_FifoRelease( block_fifo_t *p_fifo )
 {
-    block_ChainRelease( p_fifo->p_first );
+    block_FifoEmpty(p_fifo);
     free( p_fifo );
 }
 
@@ -199,10 +199,10 @@ block_t *block_FifoShow( block_fifo_t *p_fifo )
 {
     block_t *b;
 
-    vlc_mutex_lock( &p_fifo->lock );
+    vlc_fifo_Lock(p_fifo);
     assert(p_fifo->p_first != NULL);
     b = p_fifo->p_first;
-    vlc_mutex_unlock( &p_fifo->lock );
+    vlc_fifo_Unlock(p_fifo);
 
     return b;
 }
@@ -212,9 +212,9 @@ size_t block_FifoSize (block_fifo_t *fifo)
 {
     size_t size;
 
-    vlc_mutex_lock (&fifo->lock);
-    size = fifo->i_size;
-    vlc_mutex_unlock (&fifo->lock);
+    vlc_fifo_Lock(fifo);
+    size = vlc_fifo_GetBytes(fifo);
+    vlc_fifo_Unlock(fifo);
     return size;
 }
 
@@ -223,8 +223,8 @@ size_t block_FifoCount (block_fifo_t *fifo)
 {
     size_t depth;
 
-    vlc_mutex_lock (&fifo->lock);
-    depth = fifo->i_depth;
-    vlc_mutex_unlock (&fifo->lock);
+    vlc_fifo_Lock(fifo);
+    depth = vlc_fifo_GetCount(fifo);
+    vlc_fifo_Unlock(fifo);
     return depth;
 }
