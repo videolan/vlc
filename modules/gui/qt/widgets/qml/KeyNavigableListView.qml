@@ -60,6 +60,8 @@ NavigableFocusScope {
 
     property int highlightMargin: VLCStyle.margin_large
 
+    property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
+
     Accessible.role: Accessible.List
 
     function nextPage() {

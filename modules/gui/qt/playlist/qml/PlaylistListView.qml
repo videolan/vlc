@@ -159,7 +159,7 @@ Widgets.NavigableFocusScope {
             width: root.width
 
             leftPadding: root.leftPadding
-            rightPadding: root.rightPadding
+            rightPadding: root.rightPadding + view.scrollBarWidth
 
             onItemClicked : {
                 /* to receive keys events */
