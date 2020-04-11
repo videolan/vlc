@@ -438,6 +438,8 @@ static inline block_t *block_ChainGather( block_t *p_list )
  * @{
  */
 
+#include <vlc_queue.h>
+
 /**
  * Creates a thread-safe FIFO queue of blocks.
  *
@@ -480,6 +482,11 @@ VLC_API block_t *block_FifoShow(block_fifo_t *);
 
 typedef struct block_fifo_t vlc_fifo_t;
 
+static inline vlc_queue_t *vlc_fifo_queue(const vlc_fifo_t *fifo)
+{
+    return (vlc_queue_t *)fifo;
+}
+
 /**
  * Locks a block FIFO.
  *
@@ -493,7 +500,10 @@ typedef struct block_fifo_t vlc_fifo_t;
  * @warning Recursively locking a single FIFO is undefined. Locking more than
  * one FIFO at a time may lead to lock inversion; mind the locking order.
  */
-VLC_API void vlc_fifo_Lock(vlc_fifo_t *);
+static inline void vlc_fifo_Lock(vlc_fifo_t *fifo)
+{
+    vlc_queue_Lock(vlc_fifo_queue(fifo));
+}
 
 /**
  * Unlocks a block FIFO.
@@ -503,7 +513,10 @@ VLC_API void vlc_fifo_Lock(vlc_fifo_t *);
  *
  * @note This function is not a cancellation point.
  */
-VLC_API void vlc_fifo_Unlock(vlc_fifo_t *);
+static inline void vlc_fifo_Unlock(vlc_fifo_t *fifo)
+{
+    vlc_queue_Unlock(vlc_fifo_queue(fifo));
+}
 
 /**
  * Wakes up one thread waiting on the FIFO, if any.
@@ -513,7 +526,10 @@ VLC_API void vlc_fifo_Unlock(vlc_fifo_t *);
  * @warning For race-free operations, the FIFO should be locked by the calling
  * thread. The function can be called on a unlocked FIFO however.
  */
-VLC_API void vlc_fifo_Signal(vlc_fifo_t *);
+static inline void vlc_fifo_Signal(vlc_fifo_t *fifo)
+{
+    vlc_queue_Signal(vlc_fifo_queue(fifo));
+}
 
 /**
  * Waits on the FIFO.
@@ -526,9 +542,17 @@ VLC_API void vlc_fifo_Signal(vlc_fifo_t *);
  * @note This function is a cancellation point. In case of cancellation, the
  * the FIFO will be locked before cancellation cleanup handlers are processed.
  */
-VLC_API void vlc_fifo_Wait(vlc_fifo_t *);
+static inline void vlc_fifo_Wait(vlc_fifo_t *fifo)
+{
+    vlc_queue_Wait(vlc_fifo_queue(fifo));
+}
 
-VLC_API void vlc_fifo_WaitCond(vlc_fifo_t *, vlc_cond_t *);
+static inline void vlc_fifo_WaitCond(vlc_fifo_t *fifo, vlc_cond_t *condvar)
+{
+    vlc_queue_t *q = vlc_fifo_queue(fifo);
+
+    vlc_cond_wait(condvar, &q->lock);
+}
 
 /**
  * Queues a linked-list of blocks into a locked FIFO.
@@ -541,7 +565,7 @@ VLC_API void vlc_fifo_WaitCond(vlc_fifo_t *, vlc_cond_t *);
  * @warning The FIFO must be locked by the calling thread using
  * vlc_fifo_Lock(). Otherwise behaviour is undefined.
  */
-VLC_API void vlc_fifo_QueueUnlocked(vlc_fifo_t *, block_t *);
+VLC_API void vlc_fifo_QueueUnlocked(vlc_fifo_t *fifo, block_t *);
 
 /**
  * Dequeues the first block from a locked FIFO, if any.
@@ -604,7 +628,7 @@ VLC_API size_t vlc_fifo_GetBytes(const vlc_fifo_t *) VLC_USED;
 
 VLC_USED static inline bool vlc_fifo_IsEmpty(const vlc_fifo_t *fifo)
 {
-    return vlc_fifo_GetCount(fifo) == 0;
+    return vlc_queue_IsEmpty(vlc_fifo_queue(fifo));
 }
 
 static inline void vlc_fifo_Cleanup(void *fifo)
@@ -618,12 +642,7 @@ static inline void vlc_fifo_Cleanup(void *fifo)
  */
 static inline void block_FifoEmpty(block_fifo_t *fifo)
 {
-    block_t *block;
-
-    vlc_fifo_Lock(fifo);
-    block = vlc_fifo_DequeueAllUnlocked(fifo);
-    vlc_fifo_Unlock(fifo);
-    block_ChainRelease(block);
+    block_ChainRelease((block_t *)vlc_queue_DequeueAll(vlc_fifo_queue(fifo)));
 }
 
 /**
