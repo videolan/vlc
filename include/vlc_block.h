@@ -313,7 +313,7 @@ static inline void block_Cleanup (void *block)
 #define block_cleanup_push( block ) vlc_cleanup_push (block_Cleanup, block)
 
 /**
- * \defgroup block_fifo Block chain
+ * \defgroup block_chain Block chain
  * @{
  */
 
@@ -433,7 +433,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
 
 /**
  * @}
- * \defgroup fifo Block FIFO
+ * \defgroup block_fifo Block FIFO
  * Thread-safe block queue functions
  * @{
  */
