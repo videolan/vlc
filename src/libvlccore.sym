@@ -668,6 +668,13 @@ vlc_fifo_DequeueUnlocked
 vlc_fifo_DequeueAllUnlocked
 vlc_fifo_GetCount
 vlc_fifo_GetBytes
+vlc_queue_Init
+vlc_queue_EnqueueUnlocked
+vlc_queue_DequeueUnlocked
+vlc_queue_DequeueAllUnlocked
+vlc_queue_Enqueue
+vlc_queue_Dequeue
+vlc_queue_DequeueAll
 vlc_gl_Create
 vlc_gl_Release
 vlc_gl_Hold

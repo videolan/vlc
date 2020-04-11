@@ -83,6 +83,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_playlist_export.h \
 	../include/vlc_plugin.h \
 	../include/vlc_probe.h \
+	../include/vlc_queue.h \
 	../include/vlc_rand.h \
 	../include/vlc_services_discovery.h \
 	../include/vlc_fingerprinter.h \
@@ -376,6 +377,7 @@ libvlccore_la_SOURCES = \
 	misc/mime.c \
 	misc/objects.c \
 	misc/objres.c \
+	misc/queue.c \
 	misc/variables.h \
 	misc/variables.c \
 	misc/xml.c \
