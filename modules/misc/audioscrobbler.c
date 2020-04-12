@@ -812,7 +812,7 @@ static void *Run(void *data)
         vlc_mutex_unlock(&p_sys->lock);
 
         if (vlc_memstream_close(&payload))
-            goto out;
+            break;
 
         vlc_memstream_open(&req);
         vlc_memstream_printf(&req, "POST %s HTTP/1.1\r\n", url->psz_path);
@@ -831,7 +831,7 @@ static void *Run(void *data)
         free(payload.ptr);
 
         if (vlc_memstream_close(&req)) /* Out of memory */
-            goto out;
+            break;
 
         vlc_tls_t *sock = vlc_tls_SocketOpenTCP(VLC_OBJECT(p_intf),
                                                 url->psz_host, url->i_port);
