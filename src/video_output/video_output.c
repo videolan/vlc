@@ -634,9 +634,10 @@ void vout_ChangeViewpoint(vout_thread_t *vout,
     /* no window size update here */
     vlc_mutex_unlock(&sys->window_lock);
 
-    vout_control_cmd_Init(&cmd, VOUT_CONTROL_VIEWPOINT);
-    cmd.viewpoint = *p_viewpoint;
-    vout_control_Push(&sys->control, &cmd);
+    vlc_mutex_lock(&sys->display_lock);
+    if (sys->display != NULL)
+        vout_SetDisplayViewpoint(sys->display, p_viewpoint);
+    vlc_mutex_unlock(&sys->display_lock);
 }
 
 /* */
@@ -1678,11 +1679,6 @@ static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         break;
     case VOUT_CONTROL_MOUSE_STATE:
         ThreadProcessMouseState(vout, &cmd.mouse);
-        break;
-    case VOUT_CONTROL_VIEWPOINT:
-        vlc_mutex_lock(&vout->p->display_lock);
-        vout_SetDisplayViewpoint(vout->p->display, &cmd.viewpoint);
-        vlc_mutex_unlock(&vout->p->display_lock);
         break;
     default:
         break;

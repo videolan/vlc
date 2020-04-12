@@ -31,8 +31,6 @@ enum {
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
 
     VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
-
-    VOUT_CONTROL_VIEWPOINT,             /* viewpoint */
 };
 
 typedef struct {
@@ -42,7 +40,6 @@ typedef struct {
         bool    boolean;
         char    *string;
         vlc_mouse_t mouse;
-        vlc_viewpoint_t viewpoint;
     };
 } vout_control_cmd_t;
 
