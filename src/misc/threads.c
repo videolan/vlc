@@ -534,6 +534,20 @@ int vlc_sem_timedwait(vlc_sem_t *sem, vlc_tick_t deadline)
     return 0;
 }
 
+int vlc_sem_trywait(vlc_sem_t *sem)
+{
+    unsigned exp = atomic_load_explicit(&sem->value, memory_order_relaxed);
+
+    do
+        if (exp == 0)
+            return EAGAIN;
+    while (!atomic_compare_exchange_weak_explicit(&sem->value, &exp, exp - 1,
+                                                  memory_order_acquire,
+                                                  memory_order_relaxed));
+
+    return 0;
+}
+
 enum { VLC_ONCE_UNDONE, VLC_ONCE_DOING, VLC_ONCE_CONTEND, VLC_ONCE_DONE };
 
 static_assert (VLC_ONCE_DONE == 3, "Check vlc_once in header file");

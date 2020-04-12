@@ -509,6 +509,18 @@ VLC_API int vlc_sem_post(vlc_sem_t *);
 VLC_API void vlc_sem_wait(vlc_sem_t *);
 
 /**
+ * Tries to decrement a semaphore.
+ *
+ * This function decrements the semaphore if its value is not zero.
+ *
+ * \param sem semaphore to decrement
+ *
+ * \retval 0 the semaphore was decremented
+ * \retval EAGAIN the semaphore was zero and could not be decremented
+ */
+VLC_API int vlc_sem_trywait(vlc_sem_t *sem) VLC_USED;
+
+/**
  * Waits on a semaphore within a deadline.
  *
  * This function waits for the semaphore just like vlc_sem_wait(), but only

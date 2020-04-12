@@ -519,6 +519,7 @@ vlc_sem_init
 vlc_sem_post
 vlc_sem_wait
 vlc_sem_timedwait
+vlc_sem_trywait
 vlc_control_cancel
 vlc_GetCPUCount
 vlc_CPU
