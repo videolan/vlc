@@ -117,11 +117,12 @@ const GLfloat lightZeroPosition[] = {0.0f, 3.0f, 10.0f, 0.0f};
 static int Open(vlc_object_t * p_this)
 {
     filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys;
+    filter_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
 
-    p_sys = p_filter->p_sys = (filter_sys_t*)malloc(sizeof(*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
+
+    p_filter->p_sys = p_sys;
 
     /* Create the object for the thread */
     p_sys->i_channels = aout_FormatNbChannels(&p_filter->fmt_in.audio);
@@ -137,7 +138,7 @@ static int Open(vlc_object_t * p_this)
     /* Create the FIFO for the audio data. */
     p_sys->fifo = block_FifoNew();
     if (p_sys->fifo == NULL)
-        goto error;
+        return VLC_ENOMEM;
 
     /* Create the openGL provider */
     vout_window_cfg_t cfg = {
@@ -149,7 +150,7 @@ static int Open(vlc_object_t * p_this)
     if (p_sys->gl == NULL)
     {
         block_FifoRelease(p_sys->fifo);
-        goto error;
+        return VLC_EGENERIC;
     }
 
     /* Create the thread */
@@ -157,7 +158,7 @@ static int Open(vlc_object_t * p_this)
                   VLC_THREAD_PRIORITY_VIDEO)) {
         vlc_gl_surface_Destroy(p_sys->gl);
         block_FifoRelease(p_sys->fifo);
-        goto error;
+        return VLC_ENOMEM;
     }
 
     p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
@@ -165,10 +166,6 @@ static int Open(vlc_object_t * p_this)
     p_filter->pf_audio_filter = DoWork;
 
     return VLC_SUCCESS;
-
-error:
-    free(p_sys);
-    return VLC_EGENERIC;
 }
 
 
@@ -189,7 +186,6 @@ static void Close(vlc_object_t *p_this)
     vlc_gl_surface_Destroy(p_sys->gl);
     block_FifoRelease(p_sys->fifo);
     free(p_sys->p_prev_s16_buff);
-    free(p_sys);
 }
 
 
