@@ -30,6 +30,7 @@
 #include <vlc_interrupt.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
+#include <vlc_queue.h>
 #include <vlc_threads.h>
 #include <vlc_network.h>
 #include <vlc_block.h>
@@ -90,7 +91,8 @@ typedef struct
     bool             b_sendblindnacks;
     bool             b_disablenacks;
     bool             b_flag_discontinuity;
-    block_fifo_t     *p_fifo;
+    bool             dead;
+    vlc_queue_t      queue;
     vlc_mutex_t      lock;
     uint64_t         last_message;
     uint64_t         last_reset;
@@ -404,7 +406,7 @@ static void send_nacks(stream_t *p_access, struct rist_flow *flow)
         {
             memcpy(pkt_nacks->p_buffer, nacks, nacks_len * 2);
             pkt_nacks->i_buffer = nacks_len * 2;
-            block_FifoPut( p_sys->p_fifo, pkt_nacks );
+            vlc_queue_Enqueue(&p_sys->queue, pkt_nacks);
         }
     }
 }
@@ -774,14 +776,12 @@ static void *rist_thread(void *data)
 {
     stream_t *p_access = data;
     stream_sys_t *p_sys = p_access->p_sys;
+    block_t *pkt_nacks;
 
     /* Process nacks every 5ms */
     /* We only ask for the relevant ones */
-    for (;;) {
-        block_t *pkt_nacks = block_FifoGet(p_sys->p_fifo);
-
-        int canc = vlc_savecancel();
-
+    while ((pkt_nacks = vlc_queue_DequeueKillable(&p_sys->queue,
+                                                  &p_sys->dead)) != NULL) {
         /* there are two bytes per nack */
         uint16_t nack_count = (uint16_t)pkt_nacks->i_buffer/2;
         switch(p_sys->nack_type) {
@@ -796,8 +796,6 @@ static void *rist_thread(void *data)
         if (nack_count > 1)
             msg_Dbg(p_access, "Sent %u NACKs !!!", nack_count);
         block_Release(pkt_nacks);
-
-        vlc_restorecancel (canc);
     }
 
     return NULL;
@@ -1014,9 +1012,6 @@ static void Clean( stream_t *p_access )
 {
     stream_sys_t *p_sys = p_access->p_sys;
 
-    if( likely(p_sys->p_fifo != NULL) )
-        block_FifoRelease( p_sys->p_fifo );
-
     if (p_sys->flow)
     {
         if (p_sys->flow->fd_in >= 0)
@@ -1042,7 +1037,7 @@ static void Close(vlc_object_t *p_this)
     stream_t     *p_access = (stream_t*)p_this;
     stream_sys_t *p_sys = p_access->p_sys;
 
-    vlc_cancel(p_sys->thread);
+    vlc_queue_Kill(&p_sys->queue, &p_sys->dead);
     vlc_join(p_sys->thread, NULL);
 
     Clean( p_access );
@@ -1104,9 +1099,8 @@ static int Open(vlc_object_t *p_this)
     p_sys->flow->retry_interval = rtp_get_ts(VLC_TICK_FROM_MS(p_sys->flow->retry_interval));
     p_sys->flow->reorder_buffer = rtp_get_ts(VLC_TICK_FROM_MS(p_sys->flow->reorder_buffer));
 
-    p_sys->p_fifo = block_FifoNew();
-    if( unlikely(p_sys->p_fifo == NULL) )
-        goto failed;
+    p_sys->dead = false;
+    vlc_queue_Init(&p_sys->queue, offsetof (block_t, p_next));
 
     /* This extra thread is for sending feedback/nack packets even when no data comes in */
     if (vlc_clone(&p_sys->thread, rist_thread, p_access, VLC_THREAD_PRIORITY_INPUT))
