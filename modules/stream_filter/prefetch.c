@@ -66,7 +66,6 @@ struct stream_sys_t
 static ssize_t ThreadRead(stream_t *stream, void *buf, size_t length)
 {
     stream_sys_t *sys = stream->p_sys;
-    int canc = vlc_savecancel();
 
     vlc_mutex_unlock(&sys->lock);
     assert(length > 0);
@@ -74,14 +73,12 @@ static ssize_t ThreadRead(stream_t *stream, void *buf, size_t length)
     ssize_t val = vlc_stream_ReadPartial(stream->p_source, buf, length);
 
     vlc_mutex_lock(&sys->lock);
-    vlc_restorecancel(canc);
     return val;
 }
 
 static int ThreadSeek(stream_t *stream, uint64_t seek_offset)
 {
     stream_sys_t *sys = stream->p_sys;
-    int canc = vlc_savecancel();
 
     vlc_mutex_unlock(&sys->lock);
 
@@ -90,7 +87,6 @@ static int ThreadSeek(stream_t *stream, uint64_t seek_offset)
         msg_Err(stream, "cannot seek (to offset %"PRIu64")", seek_offset);
 
     vlc_mutex_lock(&sys->lock);
-    vlc_restorecancel(canc);
 
     return (val == VLC_SUCCESS) ? 0 : -1;
 }
@@ -98,7 +94,6 @@ static int ThreadSeek(stream_t *stream, uint64_t seek_offset)
 static int ThreadControl(stream_t *stream, int query, ...)
 {
     stream_sys_t *sys = stream->p_sys;
-    int canc = vlc_savecancel();
 
     vlc_mutex_unlock(&sys->lock);
 
@@ -110,7 +105,6 @@ static int ThreadControl(stream_t *stream, int query, ...)
     va_end(ap);
 
     vlc_mutex_lock(&sys->lock);
-    vlc_restorecancel(canc);
     return ret;
 }
 
@@ -126,8 +120,7 @@ static void *Thread(void *data)
     vlc_interrupt_set(sys->interrupt);
 
     vlc_mutex_lock(&sys->lock);
-    mutex_cleanup_push(&sys->lock);
-    for (;;)
+    while (!vlc_killed())
     {
         if (sys->paused != paused)
         {   /* Update pause state */
@@ -254,8 +247,10 @@ static void *Thread(void *data)
         //        sys->buffer_size);
         vlc_cond_signal(&sys->wait_data);
     }
-    vlc_assert_unreachable();
-    vlc_cleanup_pop();
+
+    sys->error = true;
+    vlc_cond_signal(&sys->wait_data);
+    vlc_mutex_unlock(&sys->lock);
     return NULL;
 }
 
@@ -511,8 +506,11 @@ static void Close (vlc_object_t *obj)
     stream_t *stream = (stream_t *)obj;
     stream_sys_t *sys = stream->p_sys;
 
-    vlc_cancel(sys->thread);
+    vlc_mutex_lock(&sys->lock);
     vlc_interrupt_kill(sys->interrupt);
+    vlc_cond_signal(&sys->wait_space);
+    vlc_mutex_unlock(&sys->lock);
+
     vlc_join(sys->thread, NULL);
     vlc_interrupt_destroy(sys->interrupt);
     vlc_cond_destroy(&sys->wait_space);
