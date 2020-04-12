@@ -97,7 +97,7 @@ typedef struct
 static void *Run( void * );
 static int Request( vlc_object_t *, char const *, vlc_value_t,
                        vlc_value_t, void * );
-static void ParseRequest( services_discovery_t *p_sd );
+static void ParseRequest( services_discovery_t *p_sd, char * );
 static void ParseUrls( services_discovery_t *p_sd, char *psz_urls );
 static void SaveUrls( services_discovery_t *p_sd );
 
@@ -175,9 +175,7 @@ noreturn static void *Run( void *data )
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
     int canc;
 
-    vlc_mutex_lock( &p_sys->lock );
     mutex_cleanup_push( &p_sys->lock );
-
     canc = vlc_savecancel();
     {
         char *psz_urls = var_GetNonEmptyString( vlc_object_parent(p_sd),
@@ -189,12 +187,19 @@ noreturn static void *Run( void *data )
 
     for( ;; )
     {
-        while( p_sys->psz_request == NULL )
+        char *request;
+
+        vlc_mutex_lock( &p_sys->lock );
+
+        while ((request = p_sys->psz_request) == NULL)
             vlc_cond_wait( &p_sys->wait, &p_sys->lock );
+
+        p_sys->psz_request = NULL;
+        vlc_mutex_unlock( &p_sys->lock );
 
         canc = vlc_savecancel();
         msg_Dbg( p_sd, "Update required" );
-        ParseRequest( p_sd );
+        ParseRequest(p_sd, request);
         vlc_restorecancel (canc);
     }
     vlc_cleanup_pop();
@@ -287,11 +292,9 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
     p_sys->i_items = i_new_items;
 }
 
-static void ParseRequest( services_discovery_t *p_sd )
+static void ParseRequest( services_discovery_t *p_sd, char *psz_request )
 {
     services_discovery_sys_t *p_sys = p_sd->p_sys;
-
-    char *psz_request = p_sys->psz_request;
 
     int i;
 
@@ -336,7 +339,6 @@ static void ParseRequest( services_discovery_t *p_sd )
     }
 
     free( p_sys->psz_request );
-    p_sys->psz_request = NULL;
 }
 
 static void SaveUrls( services_discovery_t *p_sd )
