@@ -154,8 +154,11 @@ static int Open(vlc_object_t * p_this)
 
     /* Create the thread */
     if (vlc_clone(&p_sys->thread, Thread, p_filter,
-                  VLC_THREAD_PRIORITY_VIDEO))
+                  VLC_THREAD_PRIORITY_VIDEO)) {
+        vlc_gl_surface_Destroy(p_sys->gl);
+        block_FifoRelease(p_sys->fifo);
         goto error;
+    }
 
     p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
