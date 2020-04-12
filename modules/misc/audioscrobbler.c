@@ -83,6 +83,7 @@ struct intf_sys_t
 
     vlc_mutex_t             lock;               /**< p_sys mutex            */
     vlc_cond_t              wait;               /**< song to submit event   */
+    vlc_sem_t               dead;
     vlc_thread_t            thread;             /**< thread to submit song  */
 
     /* submission of played songs */
@@ -407,6 +408,7 @@ static int Open(vlc_object_t *p_this)
 
     vlc_mutex_init(&p_sys->lock);
     vlc_cond_init(&p_sys->wait);
+    vlc_sem_init(&p_sys->dead, 0);
 
     if (vlc_clone(&p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW))
     {
@@ -439,7 +441,10 @@ static void Close(vlc_object_t *p_this)
     intf_sys_t *p_sys = p_intf->p_sys;
     vlc_playlist_t *playlist = p_sys->playlist;
 
-    vlc_cancel(p_sys->thread);
+    vlc_mutex_lock(&p_sys->lock);
+    vlc_sem_post(&p_sys->dead);
+    vlc_cond_signal(&p_sys->wait);
+    vlc_mutex_unlock(&p_sys->lock);
     vlc_join(p_sys->thread, NULL);
 
     int i;
@@ -667,7 +672,6 @@ static void *Run(void *data)
 {
     intf_thread_t          *p_intf = data;
     uint8_t                 p_buffer[1024];
-    int                     canc = vlc_savecancel();
     bool                    b_handshaked = false;
     bool                    b_nowp_submission_ongoing = false;
 
@@ -680,19 +684,24 @@ static void *Run(void *data)
     /* main loop */
     for (;;)
     {
-        vlc_restorecancel(canc);
-        if (next_exchange != VLC_TICK_INVALID)
-            vlc_tick_wait(next_exchange);
+        if (next_exchange != VLC_TICK_INVALID
+         && vlc_sem_timedwait(&p_sys->dead, next_exchange) == 0)
+            break;
 
         vlc_mutex_lock(&p_sys->lock);
-        mutex_cleanup_push(&p_sys->lock);
 
         while (p_sys->i_songs == 0 && p_sys->b_submit_nowp == false)
-            vlc_cond_wait(&p_sys->wait, &p_sys->lock);
+        {
+            if (vlc_sem_trywait(&p_sys->dead) == 0)
+            {
+                vlc_mutex_unlock(&p_sys->lock);
+                break;
+            }
 
-        vlc_cleanup_pop();
+            vlc_cond_wait(&p_sys->wait, &p_sys->lock);
+        }
+
         vlc_mutex_unlock(&p_sys->lock);
-        canc = vlc_savecancel();
 
         /* handshake if needed */
         if (!b_handshaked)
@@ -897,6 +906,5 @@ static void *Run(void *data)
         }
     }
 out:
-    vlc_restorecancel(canc);
     return NULL;
 }
