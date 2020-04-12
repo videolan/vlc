@@ -87,7 +87,6 @@ struct httpd_host_t
 
     vlc_thread_t thread;
     vlc_mutex_t lock;
-    vlc_cond_t  wait;
 
     /* all registered url (becarefull that 2 httpd_url_t could point at the same url)
      * This will slow down the url research but make my live easier
@@ -953,7 +952,6 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
         goto error;
 
     vlc_mutex_init(&host->lock);
-    vlc_cond_init(&host->wait);
     atomic_init(&host->ref, 1);
 
     char *hostname = var_InheritString(p_this, hostvar);
@@ -1077,7 +1075,6 @@ httpd_url_t *httpd_UrlNew(httpd_host_t *host, const char *psz_url,
     }
 
     vlc_list_append(&url->node, &host->urls);
-    vlc_cond_signal(&host->wait);
     vlc_mutex_unlock(&host->lock);
 
     return url;
@@ -1711,12 +1708,6 @@ static void httpdLoop(httpd_host_t *host)
 
     vlc_mutex_lock(&host->lock);
     /* add all socket that should be read/write and close dead connection */
-    while (vlc_list_is_empty(&host->urls)) {
-        mutex_cleanup_push(&host->lock);
-        vlc_cond_wait(&host->wait, &host->lock);
-        vlc_cleanup_pop();
-    }
-
     vlc_tick_t now = vlc_tick_now();
     bool b_low_delay = false;
     httpd_client_t *cl;
