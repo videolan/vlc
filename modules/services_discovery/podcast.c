@@ -35,7 +35,6 @@
 #include <vlc_network.h>
 
 #include <assert.h>
-#include <stdnoreturn.h>
 #include <unistd.h>
 
 /************************************************************************
@@ -88,6 +87,7 @@ typedef struct
     vlc_thread_t thread;
     vlc_mutex_t lock;
     vlc_cond_t  wait;
+    bool dead;
     char *psz_request;
 } services_discovery_sys_t;
 
@@ -120,6 +120,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_items = 0;
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->wait );
+    p_sys->dead = false;
     p_sys->psz_request = NULL;
 
     p_sd->p_sys  = p_sys;
@@ -149,10 +150,13 @@ static void Close( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys = p_sd->p_sys;
     vlc_object_t *pl = vlc_object_parent(p_sd);
 
-    vlc_cancel (p_sys->thread);
-    vlc_join (p_sys->thread, NULL);
-
     var_DelCallback( pl, "podcast-request", Request, p_sys );
+
+    vlc_mutex_lock(&p_sys->lock);
+    p_sys->dead = true;
+    vlc_cond_signal(&p_sys->wait);
+    vlc_mutex_unlock(&p_sys->lock);
+    vlc_join (p_sys->thread, NULL);
 
     for( int i = 0; i < p_sys->i_urls; i++ )
          free( p_sys->ppsz_urls[i] );
@@ -162,28 +166,21 @@ static void Close( vlc_object_t *p_this )
          input_item_Release( p_sys->pp_items[i] );
     free( p_sys->pp_items );
 
-    free( p_sys->psz_request );
     free( p_sys );
 }
 
 /*****************************************************************************
  * Run: main thread
  *****************************************************************************/
-noreturn static void *Run( void *data )
+static void *Run( void *data )
 {
     services_discovery_t *p_sd = data;
     services_discovery_sys_t *p_sys  = p_sd->p_sys;
-    int canc;
 
-    mutex_cleanup_push( &p_sys->lock );
-    canc = vlc_savecancel();
-    {
-        char *psz_urls = var_GetNonEmptyString( vlc_object_parent(p_sd),
-                                                "podcast-urls" );
-        ParseUrls( p_sd, psz_urls );
-        free( psz_urls );
-    }
-    vlc_restorecancel(canc);
+    char *psz_urls = var_GetNonEmptyString( vlc_object_parent(p_sd),
+                                            "podcast-urls" );
+    ParseUrls( p_sd, psz_urls );
+    free( psz_urls );
 
     for( ;; )
     {
@@ -191,19 +188,20 @@ noreturn static void *Run( void *data )
 
         vlc_mutex_lock( &p_sys->lock );
 
-        while ((request = p_sys->psz_request) == NULL)
+        while ((request = p_sys->psz_request) == NULL && !p_sys->dead)
             vlc_cond_wait( &p_sys->wait, &p_sys->lock );
 
         p_sys->psz_request = NULL;
         vlc_mutex_unlock( &p_sys->lock );
 
-        canc = vlc_savecancel();
+        if (request == NULL)
+            break;
+
         msg_Dbg( p_sd, "Update required" );
         ParseRequest(p_sd, request);
-        vlc_restorecancel (canc);
     }
-    vlc_cleanup_pop();
-    vlc_assert_unreachable(); /* dead code */
+
+    return NULL;
 }
 
 static int Request( vlc_object_t *p_this, char const *psz_var,
