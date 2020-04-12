@@ -33,6 +33,7 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_network.h>
+#include <vlc_queue.h>
 #include <vlc_threads.h>
 #include <vlc_rand.h>
 #ifdef HAVE_POLL
@@ -92,7 +93,8 @@ typedef struct
     block_t      *p_pktbuffer;
     uint64_t     i_ticks_caching;
     uint32_t     ssrc;
-    block_fifo_t *p_fifo;
+    bool         dead;
+    vlc_queue_t  queue;
     /* stats variables */
     uint64_t     i_last_stat;
     uint32_t     i_retransmit_packets;
@@ -488,20 +490,18 @@ static void* ThreadSend( void *data )
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     vlc_tick_t i_caching = p_sys->i_ticks_caching;
     struct rist_flow *flow = p_sys->flow;
+    block_t *out;
 
-    for (;;)
+    while ((out = vlc_queue_DequeueKillable(&p_sys->queue,
+                                            &p_sys->dead)) != NULL)
     {
         ssize_t len = 0;
         uint16_t seq = 0;
         uint32_t pkt_ts = 0;
-        block_t *out = block_FifoGet( p_sys->p_fifo );
 
-        block_cleanup_push( out );
         vlc_tick_wait (out->i_dts + i_caching);
-        vlc_cleanup_pop();
 
         len = out->i_buffer;
-        int canc = vlc_savecancel();
 
         seq = rtp_get_seqnum(out->p_buffer);
         pkt_ts = rtp_get_timestamp(out->p_buffer);
@@ -571,8 +571,6 @@ static void* ThreadSend( void *data )
             p_sys->i_total_packets = 0;
         }
         p_sys->i_total_packets++;
-
-        vlc_restorecancel (canc);
     }
     return NULL;
 }
@@ -591,8 +589,7 @@ static void SendtoFIFO( sout_access_out_t *p_access, block_t *buffer )
     uint32_t pkt_ts = rtp_get_ts(buffer->i_dts);
     rtp_set_timestamp(bufhdr, pkt_ts);
 
-    block_t *pkt = block_Duplicate(buffer);
-    block_FifoPut( p_sys->p_fifo, pkt );
+    vlc_queue_Enqueue(&p_sys->queue, block_Duplicate(buffer));
 }
 
 static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
@@ -688,9 +685,6 @@ static void Clean( sout_access_out_t *p_access )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
 
-    if( likely(p_sys->p_fifo != NULL) )
-        block_FifoRelease( p_sys->p_fifo );
-
     if ( p_sys->flow )
     {
         if (p_sys->flow->fd_out >= 0) {
@@ -724,7 +718,7 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_sys_t *p_sys = p_access->p_sys;
 
     vlc_cancel(p_sys->ristthread);
-    vlc_cancel(p_sys->senderthread);
+    vlc_queue_Kill(&p_sys->queue, &p_sys->dead);
 
     vlc_join(p_sys->ristthread, NULL);
     vlc_join(p_sys->senderthread, NULL);
@@ -794,9 +788,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_ticks_caching = VLC_TICK_FROM_MS(var_InheritInteger( p_access, 
         SOUT_CFG_PREFIX "caching"));
     p_sys->i_packet_size = var_InheritInteger(p_access, SOUT_CFG_PREFIX "packet-size" );
-    p_sys->p_fifo = block_FifoNew();
-    if( unlikely(p_sys->p_fifo == NULL) )
-        goto failed;
+    p_sys->dead = false;
+    vlc_queue_Init(&p_sys->queue, offsetof (block_t, p_next));
     p_sys->p_pktbuffer = block_Alloc( p_sys->i_packet_size );
     if( unlikely(p_sys->p_pktbuffer == NULL) )
         goto failed;
@@ -814,7 +807,7 @@ static int Open( vlc_object_t *p_this )
     if (vlc_clone(&p_sys->ristthread, rist_thread, p_access, VLC_THREAD_PRIORITY_INPUT))
     {
         msg_Err(p_access, "Failed to create worker thread.");
-        vlc_cancel(p_sys->senderthread);
+        vlc_queue_Kill(&p_sys->queue, &p_sys->dead);
         vlc_join(p_sys->senderthread, NULL);
         goto failed;
     }
