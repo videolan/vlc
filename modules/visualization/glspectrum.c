@@ -32,6 +32,7 @@
 #include <vlc_vout_window.h>
 #include <vlc_opengl.h>
 #include <vlc_filter.h>
+#include <vlc_queue.h>
 #include <vlc_rand.h>
 
 #ifdef __APPLE__
@@ -81,8 +82,9 @@ typedef struct
     vlc_thread_t thread;
 
     /* Audio data */
+    vlc_queue_t queue;
+    bool dead;
     unsigned i_channels;
-    block_fifo_t    *fifo;
     unsigned i_prev_nb_samples;
     int16_t *p_prev_s16_buff;
 
@@ -136,9 +138,8 @@ static int Open(vlc_object_t * p_this)
     window_get_param( VLC_OBJECT( p_filter ), &p_sys->wind_param );
 
     /* Create the FIFO for the audio data. */
-    p_sys->fifo = block_FifoNew();
-    if (p_sys->fifo == NULL)
-        return VLC_ENOMEM;
+    vlc_queue_Init(&p_sys->queue, offsetof (block_t, p_next));
+    p_sys->dead = false;
 
     /* Create the openGL provider */
     vout_window_cfg_t cfg = {
@@ -148,16 +149,12 @@ static int Open(vlc_object_t * p_this)
 
     p_sys->gl = vlc_gl_surface_Create(p_this, &cfg, NULL);
     if (p_sys->gl == NULL)
-    {
-        block_FifoRelease(p_sys->fifo);
         return VLC_EGENERIC;
-    }
 
     /* Create the thread */
     if (vlc_clone(&p_sys->thread, Thread, p_filter,
                   VLC_THREAD_PRIORITY_VIDEO)) {
         vlc_gl_surface_Destroy(p_sys->gl);
-        block_FifoRelease(p_sys->fifo);
         return VLC_ENOMEM;
     }
 
@@ -179,12 +176,11 @@ static void Close(vlc_object_t *p_this)
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* Terminate the thread. */
-    vlc_cancel(p_sys->thread);
+    vlc_queue_Kill(&p_sys->queue, &p_sys->dead);
     vlc_join(p_sys->thread, NULL);
 
     /* Free the ressources */
     vlc_gl_surface_Destroy(p_sys->gl);
-    block_FifoRelease(p_sys->fifo);
     free(p_sys->p_prev_s16_buff);
 }
 
@@ -196,10 +192,9 @@ static void Close(vlc_object_t *p_this)
  */
 static block_t *DoWork(filter_t *p_filter, block_t *p_in_buf)
 {
-    block_t *block = block_Duplicate(p_in_buf);
     filter_sys_t *p_sys = p_filter->p_sys;
-    if (likely(block != NULL))
-        block_FifoPut(p_sys->fifo, block);
+
+    vlc_queue_Enqueue(&p_sys->queue, block_Duplicate(p_in_buf));
     return p_in_buf;
 }
 
@@ -348,6 +343,7 @@ static void *Thread( void *p_data )
     filter_t  *p_filter = (filter_t*)p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
     vlc_gl_t *gl = p_sys->gl;
+    block_t *block;
 
     if (vlc_gl_MakeCurrent(gl) != VLC_SUCCESS)
     {
@@ -359,11 +355,8 @@ static void *Thread( void *p_data )
 
     float height[NB_BANDS] = {0};
 
-    while (1)
+    while ((block = vlc_queue_DequeueKillable(&p_sys->queue, &p_sys->dead)))
     {
-        block_t *block = block_FifoGet(p_sys->fifo);
-
-        int canc = vlc_savecancel();
         unsigned win_width, win_height;
 
         vlc_gl_MakeCurrent(gl);
@@ -494,8 +487,7 @@ release:
         fft_close(p_state);
         vlc_gl_ReleaseCurrent(gl);
         block_Release(block);
-        vlc_restorecancel(canc);
     }
 
-    vlc_assert_unreachable();
+    return NULL;
 }
