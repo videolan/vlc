@@ -143,7 +143,7 @@ static int vlclua_var_inherit( lua_State *L )
 
     lua_pop( L, 2 );
     vlclua_pushvalue( L, i_type, val );
-    if( i_type == VLC_VAR_STRING )
+    if( (i_type & VLC_VAR_CLASS) == VLC_VAR_STRING )
         free( val.psz_string );
     return 1;
 }
@@ -160,7 +160,7 @@ static int vlclua_var_get( lua_State *L )
 
     lua_pop( L, 2 );
     vlclua_pushvalue( L, i_type, val );
-    if( i_type == VLC_VAR_STRING )
+    if( (i_type & VLC_VAR_CLASS) == VLC_VAR_STRING )
         free( val.psz_string );
     return 1;
 }
