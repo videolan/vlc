@@ -57,9 +57,6 @@
 static int satip_open(vlc_object_t *);
 static void satip_close(vlc_object_t *);
 
-#define BUFFER_TEXT N_("Receive buffer")
-#define BUFFER_LONGTEXT N_("UDP receive buffer size (bytes)")
-
 #define MULTICAST_TEXT N_("Request multicast stream")
 #define MULTICAST_LONGTEXT N_("Request server to send stream as multicast")
 
@@ -72,7 +69,7 @@ vlc_module_begin()
     set_callbacks(satip_open, satip_close)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
-    add_integer("satip-buffer", 0x400000, BUFFER_TEXT, BUFFER_LONGTEXT, true)
+    add_obsolete_integer("satip-buffer") /* obsolete since 4.0.0 */
     add_bool("satip-multicast", false, MULTICAST_TEXT, MULTICAST_LONGTEXT, true)
     add_string("satip-host", "", SATIP_HOST_TEXT, SATIP_HOST_TEXT, true)
     change_safe()
@@ -110,7 +107,6 @@ typedef struct
     enum rtsp_state state;
     int cseq;
 
-    size_t fifo_size;
     block_fifo_t *fifo;
     vlc_thread_t thread;
     uint16_t last_seq_nr;
@@ -791,7 +787,6 @@ static int satip_open(vlc_object_t *obj)
         msg_Err(access, "Failed to allocate block fifo.");
         goto error;
     }
-    sys->fifo_size = var_InheritInteger(access, "satip-buffer");
 
     if (vlc_clone(&sys->thread, satip_thread, access, VLC_THREAD_PRIORITY_INPUT)) {
         msg_Err(access, "Failed to create worker thread.");
