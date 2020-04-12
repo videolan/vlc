@@ -88,7 +88,6 @@ typedef struct
     vlc_thread_t thread;
     vlc_mutex_t lock;
     vlc_cond_t  wait;
-    bool b_update;
     char *psz_request;
 } services_discovery_sys_t;
 
@@ -121,7 +120,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_items = 0;
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->wait );
-    p_sys->b_update = false;
     p_sys->psz_request = NULL;
 
     p_sd->p_sys  = p_sys;
@@ -191,13 +189,12 @@ noreturn static void *Run( void *data )
 
     for( ;; )
     {
-        while( !p_sys->b_update )
+        while( p_sys->psz_request == NULL )
             vlc_cond_wait( &p_sys->wait, &p_sys->lock );
 
         canc = vlc_savecancel();
         msg_Dbg( p_sd, "Update required" );
         ParseRequest( p_sd );
-        p_sys->b_update = false;
         vlc_restorecancel (canc);
     }
     vlc_cleanup_pop();
@@ -212,12 +209,10 @@ static int Request( vlc_object_t *p_this, char const *psz_var,
     services_discovery_sys_t *p_sys = (services_discovery_sys_t *)p_data;
 
     vlc_mutex_lock( &p_sys->lock );
-    free( p_sys->psz_request );
-    p_sys->psz_request = NULL;
     if( newval.psz_string && *newval.psz_string ) {
-      p_sys->psz_request = strdup( newval.psz_string );
-      p_sys->b_update = true;
-      vlc_cond_signal( &p_sys->wait );
+        free( p_sys->psz_request );
+        p_sys->psz_request = strdup( newval.psz_string );
+        vlc_cond_signal( &p_sys->wait );
     }
     vlc_mutex_unlock( &p_sys->lock );
     return VLC_SUCCESS;
