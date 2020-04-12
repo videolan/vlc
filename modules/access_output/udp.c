@@ -36,6 +36,7 @@
 #include <assert.h>
 #include <errno.h>
 
+#include <vlc_queue.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
 
@@ -112,9 +113,10 @@ typedef struct
     vlc_tick_t    i_caching;
     int           i_handle;
     bool          b_mtu_warning;
+    bool          dead;
     size_t        i_mtu;
 
-    block_fifo_t *p_fifo;
+    vlc_queue_t   queue;
     block_t      *p_buffer;
 
     vlc_thread_t  thread;
@@ -206,14 +208,14 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_handle = i_handle;
     p_sys->i_mtu = var_CreateGetInteger( p_this, "mtu" );
     p_sys->b_mtu_warning = false;
-    p_sys->p_fifo = block_FifoNew();
+    p_sys->dead = false;
+    vlc_queue_Init(&p_sys->queue, offsetof (block_t, p_next));
     p_sys->p_buffer = NULL;
 
     if( vlc_clone( &p_sys->thread, ThreadWrite, p_access,
                            VLC_THREAD_PRIORITY_HIGHEST ) )
     {
         msg_Err( p_access, "cannot spawn sout access thread" );
-        block_FifoRelease( p_sys->p_fifo );
         net_Close (i_handle);
         free (p_sys);
         return VLC_EGENERIC;
@@ -233,9 +235,8 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_t     *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
 
-    vlc_cancel( p_sys->thread );
+    vlc_queue_Kill(&p_sys->queue, &p_sys->dead);
     vlc_join( p_sys->thread, NULL );
-    block_FifoRelease( p_sys->p_fifo );
 
     if( p_sys->p_buffer ) block_Release( p_sys->p_buffer );
 
@@ -290,7 +291,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
                          now - p_sys->p_buffer->i_dts
                           - p_sys->i_caching );
             }
-            block_FifoPut( p_sys->p_fifo, p_sys->p_buffer );
+            vlc_queue_Enqueue(&p_sys->queue, p_sys->p_buffer);
             p_sys->p_buffer = NULL;
         }
 
@@ -332,7 +333,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
                              vlc_tick_now() - p_sys->p_buffer->i_dts
                               - p_sys->i_caching );
                 }
-                block_FifoPut( p_sys->p_fifo, p_sys->p_buffer );
+                vlc_queue_Enqueue(&p_sys->queue, p_sys->p_buffer);
                 p_sys->p_buffer = NULL;
             }
         }
@@ -357,10 +358,11 @@ static void* ThreadWrite( void *data )
                                              SOUT_CFG_PREFIX "group" );
     int i_to_send = i_group;
     unsigned i_dropped_packets = 0;
+    block_t *p_pk;
 
-    for (;;)
+    while ((p_pk = vlc_queue_DequeueKillable(&p_sys->queue,
+                                             &p_sys->dead)) != NULL)
     {
-        block_t *p_pk = block_FifoGet( p_sys->p_fifo );
         vlc_tick_t    i_date;
 
         i_date = p_sys->i_caching + p_pk->i_dts;
@@ -386,7 +388,6 @@ static void* ThreadWrite( void *data )
             }
         }
 
-        block_cleanup_push( p_pk );
         i_to_send--;
         if( !i_to_send || (p_pk->i_flags & BLOCK_FLAG_CLOCK) )
         {
@@ -395,7 +396,6 @@ static void* ThreadWrite( void *data )
         }
         if ( send( p_sys->i_handle, p_pk->p_buffer, p_pk->i_buffer, 0 ) == -1 )
             msg_Warn( p_access, "send error: %s", vlc_strerror_c(errno) );
-        vlc_cleanup_pop();
 
         if( i_dropped_packets )
         {
