@@ -77,11 +77,6 @@ vlc_module_end ()
  * Local structures
  *****************************************************************************/
 
-enum {
-  UPDATE_URLS,
-  UPDATE_REQUEST
-}; /* FIXME Temporary. Updating by compound urls string to be removed later. */
-
 typedef struct
 {
     char **ppsz_urls;
@@ -95,15 +90,12 @@ typedef struct
     vlc_cond_t  wait;
     bool b_update;
     char *psz_request;
-    int update_type;
 } services_discovery_sys_t;
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static void *Run( void * );
-static int UrlsChange( vlc_object_t *, char const *, vlc_value_t,
-                       vlc_value_t, void * );
 static int Request( vlc_object_t *, char const *, vlc_value_t,
                        vlc_value_t, void * );
 static void ParseRequest( services_discovery_t *p_sd );
@@ -131,15 +123,12 @@ static int Open( vlc_object_t *p_this )
     vlc_cond_init( &p_sys->wait );
     p_sys->b_update = false;
     p_sys->psz_request = NULL;
-    p_sys->update_type = UPDATE_URLS;
 
     p_sd->p_sys  = p_sys;
     p_sd->description = _("Podcasts");
 
     /* Launch the callback associated with this variable */
     vlc_object_t *pl = vlc_object_parent(p_sd);
-    var_Create( pl, "podcast-urls", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_AddCallback( pl, "podcast-urls", UrlsChange, p_sys );
 
     var_Create( pl, "podcast-request", VLC_VAR_STRING );
     var_AddCallback( pl, "podcast-request", Request, p_sys );
@@ -147,7 +136,6 @@ static int Open( vlc_object_t *p_this )
     if (vlc_clone (&p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW))
     {
         var_DelCallback( pl, "podcast-request", Request, p_sys );
-        var_DelCallback( pl, "podcast-urls", UrlsChange, p_sys );
         free (p_sys);
         return VLC_EGENERIC;
     }
@@ -166,7 +154,6 @@ static void Close( vlc_object_t *p_this )
     vlc_cancel (p_sys->thread);
     vlc_join (p_sys->thread, NULL);
 
-    var_DelCallback( pl, "podcast-urls", UrlsChange, p_sys );
     var_DelCallback( pl, "podcast-request", Request, p_sys );
 
     for( int i = 0; i < p_sys->i_urls; i++ )
@@ -209,39 +196,12 @@ noreturn static void *Run( void *data )
 
         canc = vlc_savecancel();
         msg_Dbg( p_sd, "Update required" );
-
-        if( p_sys->update_type == UPDATE_URLS )
-        {
-            char *psz_urls = var_GetNonEmptyString( vlc_object_parent(p_sd),
-                                                    "podcast-urls" );
-            ParseUrls( p_sd, psz_urls );
-            free( psz_urls );
-        }
-        else if( p_sys->update_type == UPDATE_REQUEST )
-            ParseRequest( p_sd );
-
+        ParseRequest( p_sd );
         p_sys->b_update = false;
-
         vlc_restorecancel (canc);
     }
     vlc_cleanup_pop();
     vlc_assert_unreachable(); /* dead code */
-}
-
-static int UrlsChange( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval,
-                       void *p_data )
-{
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
-    VLC_UNUSED(newval);
-    services_discovery_sys_t *p_sys  = (services_discovery_sys_t *)p_data;
-
-    vlc_mutex_lock( &p_sys->lock );
-    p_sys->b_update = true;
-    p_sys->update_type = UPDATE_URLS;
-    vlc_cond_signal( &p_sys->wait );
-    vlc_mutex_unlock( &p_sys->lock );
-    return VLC_SUCCESS;
 }
 
 static int Request( vlc_object_t *p_this, char const *psz_var,
@@ -257,7 +217,6 @@ static int Request( vlc_object_t *p_this, char const *psz_var,
     if( newval.psz_string && *newval.psz_string ) {
       p_sys->psz_request = strdup( newval.psz_string );
       p_sys->b_update = true;
-      p_sys->update_type = UPDATE_REQUEST;
       vlc_cond_signal( &p_sys->wait );
     }
     vlc_mutex_unlock( &p_sys->lock );
