@@ -41,14 +41,6 @@ typedef struct {
     union {
         bool    boolean;
         char    *string;
-        struct {
-            int channel;
-            float value;
-        } spu_rate;
-        struct {
-            int channel;
-            vlc_tick_t value;
-        } spu_delay;
         vlc_mouse_t mouse;
         vlc_viewpoint_t viewpoint;
     };
