@@ -124,6 +124,7 @@ struct spu_private_t {
         video_format_t  fmtsrc;
         video_format_t  fmtdst;
         vlc_fourcc_t    chroma_list[SPU_CHROMALIST_COUNT+1];
+        bool            live;
     } prerender;
 
     /* */
@@ -1502,42 +1503,25 @@ static void spu_PrerenderText(spu_t *spu, subpicture_t *p_subpic,
     }
 }
 
-struct spu_prerender_ctx_s
-{
-    video_format_t fmtsrc;
-    video_format_t fmtdst;
-    vlc_fourcc_t chroma_list[SPU_CHROMALIST_COUNT+1];
-    vlc_mutex_t *cleanuplock;
-    subpicture_t **pp_processed;
-};
-
-static void spu_prerender_cleanup_routine(void *priv)
-{
-    struct spu_prerender_ctx_s *ctx = priv;
-    video_format_Clean(&ctx->fmtdst);
-    video_format_Clean(&ctx->fmtsrc);
-    *ctx->pp_processed = NULL;
-    vlc_mutex_unlock(ctx->cleanuplock);
-}
-
 static void * spu_PrerenderThread(void *priv)
 {
     spu_t *spu = priv;
     spu_private_t *sys = spu->p;
+    vlc_fourcc_t chroma_list[SPU_CHROMALIST_COUNT+1];
 
-    struct spu_prerender_ctx_s ctx;
-    ctx.cleanuplock = &sys->prerender.lock;
-    ctx.chroma_list[SPU_CHROMALIST_COUNT] = 0;
-    video_format_Init(&ctx.fmtsrc, 0);
-    video_format_Init(&ctx.fmtdst, 0);
-    ctx.pp_processed = &sys->prerender.p_processed;
+    chroma_list[SPU_CHROMALIST_COUNT] = 0;
 
     vlc_mutex_lock(&sys->prerender.lock);
-    for( ;; )
+    while (sys->prerender.live)
     {
-        vlc_cleanup_push(spu_prerender_cleanup_routine, &ctx);
-        while(!sys->prerender.vector.size || !sys->prerender.chroma_list[0])
+        video_format_t fmtsrc;
+        video_format_t fmtdst;
+
+        if (!sys->prerender.vector.size || !sys->prerender.chroma_list[0])
+        {
             vlc_cond_wait(&sys->prerender.cond, &sys->prerender.lock);
+            continue;
+        }
 
         size_t i_idx = 0;
         sys->prerender.p_processed = sys->prerender.vector.data[0];
@@ -1550,25 +1534,24 @@ static void * spu_PrerenderThread(void *priv)
              }
         }
         vlc_vector_remove(&sys->prerender.vector, i_idx);
-        memcpy(&ctx.chroma_list, sys->prerender.chroma_list, SPU_CHROMALIST_COUNT);
-        video_format_Clean(&ctx.fmtdst);
-        video_format_Clean(&ctx.fmtsrc);
-        video_format_Copy(&ctx.fmtdst, &sys->prerender.fmtdst);
-        video_format_Copy(&ctx.fmtsrc, &sys->prerender.fmtsrc);
+        memcpy(chroma_list, sys->prerender.chroma_list, SPU_CHROMALIST_COUNT);
+        video_format_Copy(&fmtdst, &sys->prerender.fmtdst);
+        video_format_Copy(&fmtsrc, &sys->prerender.fmtsrc);
 
         vlc_mutex_unlock(&sys->prerender.lock);
-        vlc_cleanup_pop();
 
-        int canc = vlc_savecancel();
         spu_PrerenderText(spu, sys->prerender.p_processed,
-                          &ctx.fmtsrc, &ctx.fmtdst, ctx.chroma_list);
-        vlc_restorecancel(canc);
+                          &fmtsrc, &fmtdst, chroma_list);
+
+        video_format_Clean(&fmtdst);
+        video_format_Clean(&fmtsrc);
 
         vlc_mutex_lock(&sys->prerender.lock);
         sys->prerender.p_processed = NULL;
         vlc_cond_signal(&sys->prerender.output_cond);
     }
 
+    vlc_mutex_unlock(&sys->prerender.lock);
     return NULL;
 }
 
@@ -1623,7 +1606,10 @@ void spu_Destroy(spu_t *spu)
 {
     spu_private_t *sys = spu->p;
     /* stop prerendering */
-    vlc_cancel(sys->prerender.thread);
+    vlc_mutex_lock(&sys->prerender.lock);
+    sys->prerender.live = false;
+    vlc_cond_signal(&sys->prerender.cond);
+    vlc_mutex_unlock(&sys->prerender.lock);
     vlc_join(sys->prerender.thread, NULL);
     /* delete filters and free resources */
     spu_Cleanup(spu);
@@ -1684,6 +1670,7 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
     sys->prerender.p_processed = NULL;
     sys->prerender.chroma_list[0] = 0;
     sys->prerender.chroma_list[SPU_CHROMALIST_COUNT] = 0;
+    sys->prerender.live = true;
 
     /* Load text and scale module */
     sys->text = SpuRenderCreateAndLoadText(spu);
