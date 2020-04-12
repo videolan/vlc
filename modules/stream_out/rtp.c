@@ -40,6 +40,7 @@
 #include <vlc_url.h>
 #include <vlc_network.h>
 #include <vlc_fs.h>
+#include <vlc_queue.h>
 #include <vlc_rand.h>
 #include <vlc_memstream.h>
 #ifdef HAVE_SRTP
@@ -338,6 +339,8 @@ struct sout_stream_id_sys_t
     /* Packets sinks */
     vlc_thread_t      thread;
     vlc_mutex_t       lock_sink;
+    vlc_queue_t       queue;
+    bool              dead;
     int               sinkc;
     rtp_sink_t       *sinkv;
     rtsp_stream_id_t *rtsp_id;
@@ -346,7 +349,6 @@ struct sout_stream_id_sys_t
         vlc_thread_t  thread;
     } listen;
 
-    block_fifo_t     *p_fifo;
     vlc_tick_t        i_caching;
 };
 
@@ -914,7 +916,8 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     id->sinkc = 0;
     id->sinkv = NULL;
     id->rtsp_id = NULL;
-    id->p_fifo = NULL;
+    vlc_queue_Init(&id->queue, offsetof (block_t, p_next));
+    id->dead = true;
     id->listen.fd = NULL;
 
     id->b_first_packet = true;
@@ -1099,13 +1102,10 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         id->rtsp_id = RtspAddId( p_sys->rtsp, id, GetDWBE( id->ssrc ),
                                  id->rtp_fmt.clock_rate, mcast_fd );
 
-    id->p_fifo = block_FifoNew();
-    if( unlikely(id->p_fifo == NULL) )
-        goto error;
+    id->dead = false;
     if( vlc_clone( &id->thread, ThreadSend, id, VLC_THREAD_PRIORITY_HIGHEST ) )
     {
-        block_FifoRelease( id->p_fifo );
-        id->p_fifo = NULL;
+        id->dead = true;
         goto error;
     }
 
@@ -1143,13 +1143,11 @@ static void Del( sout_stream_t *p_stream, void *_id )
     TAB_REMOVE( p_sys->i_es, p_sys->es, id );
     vlc_mutex_unlock( &p_sys->lock_es );
 
-    if( likely(id->p_fifo != NULL) )
+    if (!id->dead)
     {
-        vlc_cancel( id->thread );
+        vlc_queue_Kill(&id->queue, &id->dead);
         vlc_join( id->thread, NULL );
-        block_FifoRelease( id->p_fifo );
-    }
-
+     }
     free( id->rtp_fmt.fmtp );
 
     if( id->rtsp_id )
@@ -1314,12 +1312,10 @@ static void* ThreadSend( void *data )
 #endif
     sout_stream_id_sys_t *id = data;
     vlc_tick_t i_caching = id->i_caching;
+    block_t *out;
 
-    for (;;)
+    while ((out = vlc_queue_DequeueKillable(&id->queue, &id->dead)) != NULL)
     {
-        block_t *out = block_FifoGet( id->p_fifo );
-        block_cleanup_push (out);
-
 #ifdef HAVE_SRTP
         if( id->srtp )
         {   /* FIXME: this is awfully inefficient */
@@ -1327,31 +1323,20 @@ static void* ThreadSend( void *data )
             out = block_Realloc( out, 0, len + 10 );
             out->i_buffer = len;
 
-            int canc = vlc_savecancel ();
             int val = srtp_send( id->srtp, out->p_buffer, &len, len + 10 );
-            vlc_restorecancel (canc);
             if( val )
             {
                 msg_Dbg( id->p_stream, "SRTP sending error: %s",
                          vlc_strerror_c(val) );
                 block_Release( out );
-                out = NULL;
+                continue;
             }
-            else
-                out->i_buffer = len;
+            out->i_buffer = len;
         }
-        if (out)
-            vlc_tick_wait (out->i_dts + i_caching);
-        vlc_cleanup_pop ();
-        if (out == NULL)
-            continue;
-#else
-        vlc_tick_wait (out->i_dts + i_caching);
-        vlc_cleanup_pop ();
 #endif
+        vlc_tick_wait (out->i_dts + i_caching);
 
         ssize_t len = out->i_buffer;
-        int canc = vlc_savecancel ();
 
         vlc_mutex_lock( &id->lock_sink );
         unsigned deadc = 0; /* How many dead sockets? */
@@ -1388,7 +1373,6 @@ static void* ThreadSend( void *data )
             msg_Dbg( id->p_stream, "removing socket %d", deadv[i] );
             rtp_del_sink( id, deadv[i] );
         }
-        vlc_restorecancel (canc);
     }
     return NULL;
 }
@@ -1549,7 +1533,7 @@ uint16_t rtp_get_extended_sequence( sout_stream_id_sys_t *id )
 
 void rtp_packetize_send( sout_stream_id_sys_t *id, block_t *out )
 {
-    block_FifoPut( id->p_fifo, out );
+    vlc_queue_Enqueue(&id->queue, out);
 }
 
 /**
