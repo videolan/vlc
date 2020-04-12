@@ -36,6 +36,7 @@
 #include <vlc_access.h>
 #include <vlc_network.h>
 #include <vlc_block.h>
+#include <vlc_queue.h>
 #include <vlc_rand.h>
 #include <vlc_url.h>
 #include <vlc_interrupt.h>
@@ -107,7 +108,7 @@ typedef struct
     enum rtsp_state state;
     int cseq;
 
-    block_fifo_t *fifo;
+    vlc_queue_t queue;
     vlc_thread_t thread;
     uint16_t last_seq_nr;
 
@@ -491,7 +492,7 @@ static void *satip_thread(void *data) {
 
             block->p_buffer += RTP_HEADER_SIZE;
             block->i_buffer = len - RTP_HEADER_SIZE;
-            block_FifoPut(sys->fifo, block);
+            vlc_queue_Enqueue(&sys->queue, block);
             input_blocks[i] = NULL;
         }
 #else
@@ -520,7 +521,7 @@ static void *satip_thread(void *data) {
         last_recv = vlc_tick_now();
         block->p_buffer += RTP_HEADER_SIZE;
         block->i_buffer = len - RTP_HEADER_SIZE;
-        block_FifoPut(sys->fifo, block);
+        vlc_queue_Enqueue(&sys->queue, block);
 #endif
 
         if (sys->keepalive_interval > 0 && vlc_tick_now() > next_keepalive) {
@@ -540,30 +541,16 @@ static void *satip_thread(void *data) {
     satip_cleanup_blocks(input_blocks);
 #endif
     msg_Dbg(access, "timed out waiting for data...");
-    vlc_fifo_Lock(sys->fifo);
-    sys->woken = true;
-    vlc_fifo_Signal(sys->fifo);
-    vlc_fifo_Unlock(sys->fifo);
-
+    vlc_queue_Kill(&sys->queue, &sys->woken);
     return NULL;
 }
 
 static block_t* satip_block(stream_t *access, bool *restrict eof) {
     access_sys_t *sys = access->p_sys;
-    block_t *block;
+    block_t *block = vlc_queue_DequeueKillable(&sys->queue, &sys->woken);
 
-    vlc_fifo_Lock(sys->fifo);
-
-    while (vlc_fifo_IsEmpty(sys->fifo)) {
-        if (sys->woken)
-            break;
-        vlc_fifo_Wait(sys->fifo);
-    }
-
-    if ((block = vlc_fifo_DequeueUnlocked(sys->fifo)) == NULL)
+    if (block == NULL)
         *eof = true;
-    sys->woken = false;
-    vlc_fifo_Unlock(sys->fifo);
 
     return block;
 }
@@ -782,11 +769,7 @@ static int satip_open(vlc_object_t *obj)
         goto error;
     }
 
-    sys->fifo = block_FifoNew();
-    if (!sys->fifo) {
-        msg_Err(access, "Failed to allocate block fifo.");
-        goto error;
-    }
+    vlc_queue_Init(&sys->queue, offsetof (block_t, p_next));
 
     if (vlc_clone(&sys->thread, satip_thread, access, VLC_THREAD_PRIORITY_INPUT)) {
         msg_Err(access, "Failed to create worker thread.");
@@ -807,8 +790,6 @@ error:
 
     satip_teardown(access);
 
-    if (sys->fifo)
-        block_FifoRelease(sys->fifo);
     if (sys->udp_sock >= 0)
         net_Close(sys->udp_sock);
     if (sys->rtcp_sock >= 0)
@@ -831,7 +812,7 @@ static void satip_close(vlc_object_t *obj)
 
     satip_teardown(access);
 
-    block_FifoRelease(sys->fifo);
+    block_ChainRelease(vlc_queue_DequeueAll(&sys->queue));
     net_Close(sys->udp_sock);
     net_Close(sys->rtcp_sock);
     net_Close(sys->tcp_sock);
