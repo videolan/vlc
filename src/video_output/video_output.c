@@ -627,7 +627,6 @@ void vout_ChangeViewpoint(vout_thread_t *vout,
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
-    vout_control_cmd_t cmd;
 
     vlc_mutex_lock(&sys->window_lock);
     sys->display_cfg.viewpoint = *p_viewpoint;
