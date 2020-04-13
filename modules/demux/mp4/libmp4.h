@@ -706,10 +706,23 @@ typedef struct
     uint16_t i_ccw_degrees;
 } MP4_Box_data_irot_t;
 
-typedef struct MP4_Box_data_sample_soun_s
+#define SAMPLE_DESC_COMMON_HEADER \
+    uint8_t  i_reserved1[6];\
+    uint16_t i_data_reference_index
+
+#define READ_SAMPLE_DESC_COMMON_8BYTES_HEADER \
+    do\
+    {\
+        if( i_read < 8 )\
+            MP4_READBOX_EXIT( 0 );\
+        for( unsigned i = 0; i < 6 ; i++ )\
+            MP4_GET1BYTE( p_box->data.p_sample_gen->i_reserved1[i] );\
+        MP4_GET2BYTES( p_box->data.p_sample_gen->i_data_reference_index );\
+    } while(0)
+
+typedef struct
 {
-    uint8_t  i_reserved1[6];
-    uint16_t i_data_reference_index;
+    SAMPLE_DESC_COMMON_HEADER;
 
     //uint32_t i_reserved2[2];
     uint16_t i_qt_version;
@@ -741,10 +754,9 @@ typedef struct MP4_Box_data_sample_soun_s
 
 } MP4_Box_data_sample_soun_t;
 
-typedef struct MP4_Box_data_sample_vide_s
+typedef struct
 {
-    uint8_t  i_reserved1[6];
-    uint16_t i_data_reference_index;
+    SAMPLE_DESC_COMMON_HEADER;
 
     uint16_t i_qt_version;
     uint16_t i_qt_revision_level;
@@ -794,31 +806,12 @@ typedef struct MP4_Box_data_sample_vide_s
 
 typedef struct
 {
-    uint32_t i_reserved1;
-    uint16_t i_reserved2;
-
-    uint16_t i_data_reference_index;
+    SAMPLE_DESC_COMMON_HEADER;
 
     uint8_t *p_data;
     size_t   i_data;
 
-} MP4_Box_data_sample_text_t;
-
-typedef struct
-{
-    uint8_t  i_reserved1[6];
-    uint16_t i_data_reference_index;
-
-} MP4_Box_data_sample_clcp_t;
-
-typedef struct MP4_Box_data_sample_hint_s
-{
-    uint8_t  i_reserved1[6];
-    uint16_t i_data_reference_index;
-
-    uint8_t *p_data;
-
-} MP4_Box_data_sample_hint_t;
+} MP4_Box_data_sample_generic_t;
 
 typedef struct MP4_Box_data_rrtp_sample_s
 {
@@ -1733,9 +1726,7 @@ typedef union MP4_Box_data_s
 
     MP4_Box_data_sample_vide_t *p_sample_vide;
     MP4_Box_data_sample_soun_t *p_sample_soun;
-    MP4_Box_data_sample_text_t *p_sample_text;
-    MP4_Box_data_sample_clcp_t *p_sample_clcp;
-    MP4_Box_data_sample_hint_t *p_sample_hint;
+    MP4_Box_data_sample_generic_t *p_sample_gen;
 
     MP4_Box_data_esds_t *p_esds;
     MP4_Box_data_av1C_t *p_av1C;

@@ -1250,7 +1250,7 @@ int SetupSpuES( demux_t *p_demux, const mp4_track_t *p_track,
         case( VLC_FOURCC( 't', 'e', 'x', 't' ) ):
         case( VLC_FOURCC( 't', 'x', '3', 'g' ) ):
         {
-            const MP4_Box_data_sample_text_t *p_text = p_sample->data.p_sample_text;
+            const MP4_Box_data_sample_generic_t *p_text = p_sample->data.p_sample_gen;
             if(!p_text)
                 return 0;
 
