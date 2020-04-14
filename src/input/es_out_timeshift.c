@@ -204,6 +204,7 @@ typedef struct
     /* Lock for all following fields */
     vlc_mutex_t    lock;
     vlc_cond_t     wait;
+    vlc_sem_t      done;
 
     /* */
     bool           b_paused;
@@ -284,7 +285,6 @@ static void         TsStoragePushCmd( ts_storage_t *, const ts_cmd_t *p_cmd, boo
 static void         TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd, bool b_flush );
 
 static void CmdClean( ts_cmd_t * );
-static void cmd_cleanup_routine( void *p ) { CmdClean( p ); }
 
 static int  CmdInitAdd    ( ts_cmd_t *, input_source_t *, es_out_id_t *, const es_format_t *, bool b_copy );
 static void CmdInitSend   ( ts_cmd_t *, es_out_id_t *, block_t * );
@@ -882,6 +882,7 @@ static int TsStart( es_out_t *p_out )
     p_ts->p_out = p_sys->p_out;
     vlc_mutex_init( &p_ts->lock );
     vlc_cond_init( &p_ts->wait );
+    vlc_sem_init( &p_ts->done, 0 );
     p_ts->b_paused = p_sys->b_input_paused && !p_sys->b_input_paused_source;
     p_ts->i_pause_date = p_ts->b_paused ? vlc_tick_now() : -1;
     p_ts->rate_source = p_sys->input_rate_source;
@@ -920,7 +921,10 @@ static void TsAutoStop( es_out_t *p_out )
 }
 static void TsStop( ts_thread_t *p_ts )
 {
-    vlc_cancel( p_ts->thread );
+    vlc_mutex_lock( &p_ts->lock );
+    vlc_sem_post( &p_ts->done );
+    vlc_cond_signal( &p_ts->wait );
+    vlc_mutex_unlock( &p_ts->lock );
     vlc_join( p_ts->thread, NULL );
 
     vlc_mutex_lock( &p_ts->lock );
@@ -1073,29 +1077,20 @@ static void *TsRun( void *p_data )
     ts_thread_t *p_ts = p_data;
     vlc_tick_t i_buffering_date = -1;
 
-    for( ;; )
+    vlc_mutex_lock( &p_ts->lock );
+    while( vlc_sem_trywait( &p_ts->done ) != 0 )
     {
         ts_cmd_t cmd;
         vlc_tick_t  i_deadline;
-        bool b_buffering;
 
         /* Pop a command to execute */
-        vlc_mutex_lock( &p_ts->lock );
-        mutex_cleanup_push( &p_ts->lock );
+        bool b_buffering = es_out_GetBuffering( p_ts->p_out );
 
-        for( ;; )
+        if( ( p_ts->b_paused && !b_buffering )
+         || TsPopCmdLocked( p_ts, &cmd, false ) )
         {
-            const int canc = vlc_savecancel();
-            b_buffering = es_out_GetBuffering( p_ts->p_out );
-
-            if( ( !p_ts->b_paused || b_buffering ) && !TsPopCmdLocked( p_ts, &cmd, false ) )
-            {
-                vlc_restorecancel( canc );
-                break;
-            }
-            vlc_restorecancel( canc );
-
             vlc_cond_wait( &p_ts->wait, &p_ts->lock );
+            continue;
         }
 
         if( b_buffering && i_buffering_date < 0 )
@@ -1122,8 +1117,6 @@ static void *TsRun( void *p_data )
         }
         if( p_ts->i_cmd_delay + p_ts->i_rate_delay + p_ts->i_buffering_delay < 0 && p_ts->rate != p_ts->rate_source )
         {
-            const int canc = vlc_savecancel();
-
             /* Auto reset to rate 1.0 */
             msg_Warn( p_ts->p_input, "es out timeshift: auto reset rate to %f", p_ts->rate_source );
 
@@ -1142,24 +1135,20 @@ static void *TsRun( void *p_data )
                  * rate change requested by user */
                 input_ControlPushHelper( p_ts->p_input, INPUT_CONTROL_SET_RATE, &val );
             }
-
-            vlc_restorecancel( canc );
         }
         i_deadline = cmd.i_date + p_ts->i_cmd_delay + p_ts->i_rate_delay + p_ts->i_buffering_delay;
 
-        vlc_cleanup_pop();
         vlc_mutex_unlock( &p_ts->lock );
 
         /* Regulate the speed of command processing to the same one than
          * reading  */
-        vlc_cleanup_push( cmd_cleanup_routine, &cmd );
-
-        vlc_tick_wait( i_deadline );
-
-        vlc_cleanup_pop();
+        if( vlc_sem_timedwait( &p_ts->done, i_deadline ) == 0 )
+        {
+            CmdClean( &cmd );
+            return NULL;
+        }
 
         /* Execute the command  */
-        const int canc = vlc_savecancel();
         switch( cmd.i_type )
         {
         case C_ADD:
@@ -1181,9 +1170,9 @@ static void *TsRun( void *p_data )
             vlc_assert_unreachable();
             break;
         }
-        vlc_restorecancel( canc );
+        vlc_mutex_lock( &p_ts->lock );
     }
-
+    vlc_mutex_unlock( &p_ts->lock );
     return NULL;
 }
 
