@@ -55,16 +55,13 @@ static int vlc_umtx_wait(void *addr, unsigned val, const struct timespec *ts)
         ._flags = UMTX_ABSTIME,
         ._clockid = CLOCK_MONOTONIC,
     };
-    int ret, type;
+    int type;
     /* "the uaddr value [...] must be equal to the size of the structure
      * pointed to by uaddr2, casted to uintptr_t."
      */
     void *uaddr = (void *)sizeof (to);
 
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &type);
-    ret = _umtx_op(addr, UMTX_OP_WAIT_UINT_PRIVATE, val, uaddr, &to);
-    pthread_setcanceltype(type, NULL);
-    return ret;
+    return _umtx_op(addr, UMTX_OP_WAIT_UINT_PRIVATE, val, uaddr, &to);
 }
 
 void vlc_atomic_notify_one(void *addr)
