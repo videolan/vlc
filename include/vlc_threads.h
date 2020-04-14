@@ -412,19 +412,14 @@ VLC_API void vlc_cond_broadcast(vlc_cond_t *);
  * The canonical way to use a condition variable to wait for event foobar is:
  @code
    vlc_mutex_lock(&lock);
-   mutex_cleanup_push(&lock); // release the mutex in case of cancellation
 
    while (!foobar)
        vlc_cond_wait(&wait, &lock);
 
    // -- foobar is now true, do something about it here --
 
-   vlc_cleanup_pop();
    vlc_mutex_unlock(&lock);
   @endcode
- *
- * \note This function is a cancellation point. In case of thread cancellation,
- * the mutex is always locked before cancellation proceeds.
  *
  * \param cond condition variable to wait on
  * \param mutex mutex which is unlocked while waiting,
@@ -438,9 +433,6 @@ VLC_API void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex);
  * This works like vlc_cond_wait() but with an additional time-out.
  * The time-out is expressed as an absolute timestamp using the same arbitrary
  * time reference as the vlc_tick_now() and vlc_tick_wait() functions.
- *
- * \note This function is a cancellation point. In case of thread cancellation,
- * the mutex is always locked before cancellation proceeds.
  *
  * \param cond condition variable to wait on
  * \param mutex mutex which is unlocked while waiting,

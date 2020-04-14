@@ -243,8 +243,6 @@ void vlc_cond_init(vlc_cond_t *cond)
 struct vlc_cond_waiter {
     struct vlc_cond_waiter **pprev, *next;
     atomic_uint value;
-    vlc_cond_t *cond;
-    vlc_mutex_t *mutex;
 };
 
 static void vlc_cond_signal_waiter(struct vlc_cond_waiter *waiter)
@@ -308,8 +306,6 @@ static void vlc_cond_wait_prepare(struct vlc_cond_waiter *waiter,
 
     waiter->pprev = &cond->head;
     atomic_init(&waiter->value, 0);
-    waiter->cond = cond;
-    waiter->mutex = mutex;
 
     vlc_mutex_lock(&cond->lock);
     next = cond->head;
@@ -320,7 +316,6 @@ static void vlc_cond_wait_prepare(struct vlc_cond_waiter *waiter,
         next->pprev = &waiter->next;
 
     vlc_mutex_unlock(&cond->lock);
-    vlc_cancel_addr_prepare(&waiter->value);
     vlc_mutex_unlock(mutex);
 }
 
@@ -343,14 +338,6 @@ static void vlc_cond_wait_finish(struct vlc_cond_waiter *waiter,
 
     /* Lock the caller's mutex as required by condition variable semantics. */
     vlc_mutex_lock(mutex);
-    vlc_cancel_addr_finish(&waiter->value);
-}
-
-static void vlc_cond_wait_cleanup(void *data)
-{
-    struct vlc_cond_waiter *waiter = data;
-
-    vlc_cond_wait_finish(waiter, waiter->cond, waiter->mutex);
 }
 
 void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
@@ -358,10 +345,8 @@ void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
     struct vlc_cond_waiter waiter;
 
     vlc_cond_wait_prepare(&waiter, cond, mutex);
-    vlc_cleanup_push(vlc_cond_wait_cleanup, &waiter);
     vlc_atomic_wait(&waiter.value, 0);
-    vlc_cleanup_pop();
-    vlc_cond_wait_cleanup(&waiter);
+    vlc_cond_wait_finish(&waiter, cond, mutex);
 }
 
 int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex,
@@ -371,10 +356,8 @@ int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex,
     int ret;
 
     vlc_cond_wait_prepare(&waiter, cond, mutex);
-    vlc_cleanup_push(vlc_cond_wait_cleanup, &waiter);
     ret = vlc_atomic_timedwait(&waiter.value, 0, deadline);
-    vlc_cleanup_pop();
-    vlc_cond_wait_cleanup(&waiter);
+    vlc_cond_wait_finish(&waiter, cond, mutex);
 
     return ret;
 }
@@ -386,10 +369,8 @@ int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
     int ret;
 
     vlc_cond_wait_prepare(&waiter, cond, mutex);
-    vlc_cleanup_push(vlc_cond_wait_cleanup, &waiter);
     ret = vlc_atomic_timedwait_daytime(&waiter.value, 0, deadline);
-    vlc_cleanup_pop();
-    vlc_cond_wait_cleanup(&waiter);
+    vlc_cond_wait_finish(&waiter, cond, mutex);
 
     return ret;
 }
