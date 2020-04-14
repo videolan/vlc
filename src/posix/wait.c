@@ -66,10 +66,8 @@ static struct wait_bucket *wait_bucket_enter(atomic_uint *addr)
     return bucket;
 }
 
-static void wait_bucket_leave(void *data)
+static void wait_bucket_leave(struct wait_bucket *bucket)
 {
-    struct wait_bucket *bucket = data;
-
     bucket->waiters--;
     pthread_mutex_unlock(&bucket->lock);
 }
@@ -79,14 +77,15 @@ void vlc_atomic_wait(void *addr, unsigned value)
     atomic_uint *futex = addr;
     struct wait_bucket *bucket = wait_bucket_enter(futex);
 
-    pthread_cleanup_push(wait_bucket_leave, bucket);
+    if (value == atomic_load_explicit(futex, memory_order_relaxed)) {
+        int canc;
 
-    if (value == atomic_load_explicit(futex, memory_order_relaxed))
+        pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &canc);
         pthread_cond_wait(&bucket->wait, &bucket->lock);
-    else
-        pthread_testcancel();
+        pthread_setcancelstate(canc, NULL);
+    }
 
-    pthread_cleanup_pop(1);
+    wait_bucket_leave(bucket);
 }
 
 static int vlc_atomic_timedwait_timespec(void *addr, unsigned value,
@@ -96,14 +95,15 @@ static int vlc_atomic_timedwait_timespec(void *addr, unsigned value,
     struct wait_bucket *bucket = wait_bucket_enter(futex);
     int ret = 0;
 
-    pthread_cleanup_push(wait_bucket_leave, bucket);
+    if (value == atomic_load_explicit(futex, memory_order_relaxed)) {
+        int canc;
 
-    if (value == atomic_load_explicit(futex, memory_order_relaxed))
+        pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &canc);
         ret = pthread_cond_timedwait(&bucket->wait, &bucket->lock, ts);
-    else
-        pthread_testcancel();
+        pthread_setcancelstate(canc, NULL);
+    }
 
-    pthread_cleanup_pop(1);
+    wait_bucket_leave(bucket);
     return ret;
 }
 
