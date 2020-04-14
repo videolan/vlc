@@ -568,13 +568,11 @@ VLC_API void vlc_rwlock_destroy(vlc_rwlock_t *);
  * Acquires a read/write lock for reading.
  *
  * \note Recursion is allowed.
- * \note This function may be a point of cancellation.
  */
 VLC_API void vlc_rwlock_rdlock(vlc_rwlock_t *);
 
 /**
  * Acquires a read/write lock for writing. Recursion is not allowed.
- * \note This function may be a point of cancellation.
  */
 VLC_API void vlc_rwlock_wrlock(vlc_rwlock_t *);
 
