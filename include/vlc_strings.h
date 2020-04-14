@@ -171,14 +171,56 @@ VLC_API char *vlc_strftime( const char * );
 /**
  * Formats input meta-data.
  *
- * Formats input and input item meta-informations into a heap-allocated string.
+ * Formats input and input item meta-informations into a heap-allocated string
+ * according to the given player format string.
+ *
+ * The player format string contains of replacement specifiers, each specifier begins
+ * with the dollar character (`$`) followed by one of the following letters:
+ *
+ * Char  | Replacement
+ * ----- | -------------------------------
+ *  `a`  | Artist metadata
+ *  `b`  | Album title metadata
+ *  `c`  | Copyright infromation metadata
+ *  `d`  | Description metadata
+ *  `e`  | 'Encoded by' metadata
+ *  `f`  | Displayed output frame (`-` if not available)
+ *  `g`  | Genre metadata
+ *  `l`  | Language metadata
+ *  `n`  | Current Track number metadata
+ *  `o`  | Total Track number metadata
+ *  `p`  | Now playing metadata (i.e. currently playing title for livestreams)
+ *  `r`  | Rating metadata
+ *  `s`  | Selected subtitle language (`-` if not available)
+ *  `t`  | Title metadata
+ *  `u`  | URL metadata
+ *  `A`  | Date metadata
+ *  `B`  | Selected audio track bitrate (`-` if not available)
+ *  `C`  | Current chapter index (`-` if not available)
+ *  `D`  | Item duration (`--:--:--` if not available)
+ *  `F`  | Item URI
+ *  `I`  | Current title index (`-` if not available)
+ *  `L`  | Item remaining time (`--:--:--` if not available)
+ *  `N`  | Item name
+ *  `O`  | Current audio track language (`-` if not available)
+ *  `P`  | Current playback position (0.0 to 1.0, `--.-%` if not available)
+ *  `R`  | Current playback speed (1.0 is normal speed, `-` if not available)
+ *  `S`  | Current audio track samplerate (`-` if not available)
+ *  `T`  | Current playback time (`--:--:--` if not available)
+ *  `U`  | Publisher metadata
+ *  `V`  | Volume (0 to 256, `---` if not available)
+ *  `Z`  | Now playing or Artist/Title metadata depending what is available
+ *  `_`  | Newline (`\n`)
+ *
+ * Additionally characters can be prepended with a whitespace (e.g. `$ T`), which will
+ * cause a replacement with nothing, when not available, instead of the placeholders
+ * documented above.
  *
  * @param player a locked player instance or NULL (player and item can't be
  * both NULL)
  * @param item a valid item or NULL (player and item can't be both NULL)
  * @param fmt format string
- * @return the formated string, or NULL in case of error, the string need to be
- * freed with ()
+ * @return an allocated formatted string (must be free()'d), or NULL in case of error
  */
 VLC_API char *vlc_strfplayer( vlc_player_t *player, input_item_t *item,
                               const char *fmt );
