@@ -63,18 +63,8 @@ static int vlc_futex_wake(void *addr, int nr)
 static int vlc_futex_wait(void *addr, unsigned flags,
                           unsigned val, const struct timespec *to)
 {
-    int ret;
-
-#ifndef __ANDROID__
-    int type;
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &type);
-#endif
-    ret = sys_futex(addr, FUTEX_WAIT_BITSET_PRIVATE | flags, val, to, NULL,
-                    FUTEX_BITSET_MATCH_ANY);
-#ifndef __ANDROID__
-    pthread_setcanceltype(type, NULL);
-#endif
-    return ret;
+    return sys_futex(addr, FUTEX_WAIT_BITSET_PRIVATE | flags, val, to, NULL,
+                     FUTEX_BITSET_MATCH_ANY);
 }
 
 void vlc_atomic_notify_one(void *addr)
