@@ -338,7 +338,7 @@ static void rist_rtcp_recv(sout_access_out_t *p_access, struct rist_flow *flow, 
                     if (p_sys->b_ismulticast == false)
                     {
                         int8_t name_length = rtcp_sdes_get_name_length(pkt);
-                        if (name_length > bytes_left)
+                        if (name_length > bytes_left || name_length >= MAX_CNAME )
                         {
                             /* check for a sane number of bytes */
                             msg_Err(p_access, "Malformed SDES packet, wrong cname len %u, got a " \
