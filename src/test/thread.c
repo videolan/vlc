@@ -156,7 +156,6 @@ static void test__thread_cancelation_with_cleanup()
 /*
  * - Test broadcasting a condition, waking several threads
  * - Test waiting on condition
- * - Test thread cancelling/cleanup while its waiting on condition
  */
 static void *thread_func_cond(void *ptr)
 {
@@ -234,28 +233,6 @@ static void test__cond_wait()
 
     // Wait for thread to exit
     TEST_THREAD_JOIN_MAGIC(th);
-}
-
-static void test__cond_wait_cancelation_with_cleanup()
-{
-    struct cond_data data;
-    cond_data_init(&data, 1);
-
-    vlc_thread_t th;
-    TEST_THREAD_CLONE(&th, thread_func_cond, &data);
-
-    // Wait for thread to start
-    vlc_mutex_lock(&data.mutex);
-    while(data.state != 0) {
-        vlc_cond_wait(&data.cond_started, &data.mutex);
-    }
-    vlc_mutex_unlock(&data.mutex);
-
-    // Never signal that the thread may end, on purpose
-    // as thread should be waiting while we cancel it
-
-    // Cancel thread
-    TEST_THREAD_CANCEL_JOIN(th);
 }
 
 
@@ -356,7 +333,6 @@ int main(void)
     test__thread_cancelation();
     test__thread_cancelation_with_cleanup();
     test__cond_wait();
-    test__cond_wait_cancelation_with_cleanup();
     test__cond_wait_timeout();
     test__cond_broadcast();
     test__vlc_tick_sleep_cancelation();
