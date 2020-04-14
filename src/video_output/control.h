@@ -27,6 +27,7 @@
 
 /* */
 enum {
+    VOUT_CONTROL_TERMINATE,
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
 

@@ -144,7 +144,6 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
                      vlc_tick_t deadline)
 {
     vlc_mutex_lock(&ctrl->lock);
-    mutex_cleanup_push(&ctrl->lock);
 
     if (ctrl->cmd.i_size <= 0) {
         /* Spurious wakeups are perfectly fine */
@@ -158,7 +157,6 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
 
     while (ctrl->is_held)
         vlc_cond_wait(&ctrl->wait_available, &ctrl->lock);
-    vlc_cleanup_pop();
 
     bool has_cmd;
     if (ctrl->cmd.i_size > 0) {

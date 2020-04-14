@@ -33,8 +33,6 @@
 # include "config.h"
 #endif
 
-#include <stdnoreturn.h>
-
 #include <vlc_common.h>
 
 #include <math.h>
@@ -1674,7 +1672,7 @@ error:
  * terminated. It handles the pictures arriving in the video heap and the
  * display device events.
  *****************************************************************************/
-noreturn static void *Thread(void *object)
+static void *Thread(void *object)
 {
     vout_thread_t *vout = object;
     vout_thread_sys_t *sys = vout->p;
@@ -1692,10 +1690,11 @@ noreturn static void *Thread(void *object)
         } else {
             deadline = VLC_TICK_INVALID;
         }
-        while (!vout_control_Pop(&sys->control, &cmd, deadline)) {
-            int canc = vlc_savecancel();
 
+        while (!vout_control_Pop(&sys->control, &cmd, deadline)) {
             switch(cmd.type) {
+                case VOUT_CONTROL_TERMINATE:
+                    return NULL; /* no need to clean &cmd */
                 case VOUT_CONTROL_CHANGE_FILTERS:
                     ThreadChangeFilters(vout, cmd.string, NULL, false);
                     break;
@@ -1707,17 +1706,14 @@ noreturn static void *Thread(void *object)
                     break;
             }
             vout_control_cmd_Clean(&cmd);
-            vlc_restorecancel(canc);
         }
 
-        int canc = vlc_savecancel();
         deadline = VLC_TICK_INVALID;
         wait = ThreadDisplayPicture(vout, &deadline) != VLC_SUCCESS;
 
         const bool picture_interlaced = sys->displayed.is_interlaced;
 
         vout_SetInterlacingState(vout, picture_interlaced);
-        vlc_restorecancel(canc);
     }
 }
 
@@ -1772,7 +1768,7 @@ void vout_StopDisplay(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
 
-    vlc_cancel(sys->thread);
+    vout_control_PushVoid(&sys->control, VOUT_CONTROL_TERMINATE);
     vlc_join(sys->thread, NULL);
 
     vout_ReleaseDisplay(vout);
