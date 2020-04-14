@@ -1,3 +1,5 @@
+LTLIBVLCGL = $(top_builddir)/modules/libvlc_opengl.la
+
 OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
        video_output/opengl/filter.c \
        video_output/opengl/filter.h \
@@ -85,6 +87,31 @@ libglfilter_mock_plugin_la_LIBADD += libvlc_opengles.la $(GLES2_LIBS)
 libglfilter_mock_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 noinst_LTLIBRARIES += libglfilter_mock_plugin.la
 endif
+
+libglfilter_yadif_plugin_la_SOURCES = video_output/opengl/filters/yadif.c
+libglfilter_yadif_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS) $(OPENGL_FILTERS_CFLAGS)
+
+if HAVE_LINUX
+if HAVE_ANDROID
+libglfilter_yadif_plugin_la_LIBADD = libvlc_opengles.la
+libglfilter_yadif_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
+else
+libglfilter_yadif_plugin_la_LIBADD = libvlc_opengl.la
+endif
+vout_LTLIBRARIES += libglfilter_yadif_plugin.la
+endif
+
+if HAVE_IOS
+libglfilter_yadif_plugin_la_LIBADD = libvlc_opengles.la
+libglfilter_yadif_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
+vout_LTLIBRARIES += libglfilter_yadif_plugin.la
+endif
+
+if HAVE_OSX
+libglfilter_yadif_plugin_la_LIBADD = libvlc_opengl.la
+vout_LTLIBRARIES += libglfilter_yadif_plugin.la
+endif
+
 
 if HAVE_GL
 vout_LTLIBRARIES += libgl_plugin.la
