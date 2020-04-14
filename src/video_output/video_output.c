@@ -1667,24 +1667,6 @@ error:
     return VLC_EGENERIC;
 }
 
-static void ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
-{
-    switch(cmd.type) {
-    case VOUT_CONTROL_CHANGE_FILTERS:
-        ThreadChangeFilters(vout, cmd.string, NULL, false);
-        break;
-    case VOUT_CONTROL_CHANGE_INTERLACE:
-        ThreadChangeFilters(vout, NULL, &cmd.boolean, false);
-        break;
-    case VOUT_CONTROL_MOUSE_STATE:
-        ThreadProcessMouseState(vout, &cmd.mouse);
-        break;
-    default:
-        break;
-    }
-    vout_control_cmd_Clean(&cmd);
-}
-
 /*****************************************************************************
  * Thread: video output thread
  *****************************************************************************
@@ -1712,7 +1694,19 @@ noreturn static void *Thread(void *object)
         }
         while (!vout_control_Pop(&sys->control, &cmd, deadline)) {
             int canc = vlc_savecancel();
-            ThreadControl(vout, cmd);
+
+            switch(cmd.type) {
+                case VOUT_CONTROL_CHANGE_FILTERS:
+                    ThreadChangeFilters(vout, cmd.string, NULL, false);
+                    break;
+                case VOUT_CONTROL_CHANGE_INTERLACE:
+                    ThreadChangeFilters(vout, NULL, &cmd.boolean, false);
+                    break;
+                case VOUT_CONTROL_MOUSE_STATE:
+                    ThreadProcessMouseState(vout, &cmd.mouse);
+                    break;
+            }
+            vout_control_cmd_Clean(&cmd);
             vlc_restorecancel(canc);
         }
 
