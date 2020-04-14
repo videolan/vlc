@@ -163,8 +163,8 @@ VLC_API char * vlc_b64_decode( const char *psz_src );
  *
  * Formats the current time into a heap-allocated string.
  *
- * @param tformat time format (as with C strftime())
- * @return an allocated string (must be free()'d), or NULL on memory error.
+ * \param tformat time format (as with C strftime())
+ * \return an allocated string (must be free()'d), or NULL on memory error.
  */
 VLC_API char *vlc_strftime( const char * );
 
@@ -216,11 +216,11 @@ VLC_API char *vlc_strftime( const char * );
  * cause a replacement with nothing, when not available, instead of the placeholders
  * documented above.
  *
- * @param player a locked player instance or NULL (player and item can't be
+ * \param player a locked player instance or NULL (player and item can't be
  * both NULL)
- * @param item a valid item or NULL (player and item can't be both NULL)
- * @param fmt format string
- * @return an allocated formatted string (must be free()'d), or NULL in case of error
+ * \param item a valid item or NULL (player and item can't be both NULL)
+ * \param fmt format string
+ * \return an allocated formatted string (must be free()'d), or NULL in case of error
  */
 VLC_API char *vlc_strfplayer( vlc_player_t *player, input_item_t *item,
                               const char *fmt );
