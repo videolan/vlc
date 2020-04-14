@@ -118,7 +118,7 @@ static inline void vlc_init_avformat(vlc_object_t *obj)
 
     avformat_network_init();
 
-#if (LIBAVFORMAT_VERSION_MICRO >= 100) && (LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100))
+#if (LIBAVFORMAT_VERSION_MICRO < 100) || (LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 9, 100))
     av_register_all();
 #endif
 
@@ -135,7 +135,7 @@ static inline void vlc_init_avcodec(vlc_object_t *obj)
 
     vlc_init_avutil(obj);
 
-#if (LIBAVFORMAT_VERSION_MICRO >= 100) && (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100))
+#if (LIBAVFORMAT_VERSION_MICRO < 100) || (LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 10, 100))
     avcodec_register_all();
 #endif
 
