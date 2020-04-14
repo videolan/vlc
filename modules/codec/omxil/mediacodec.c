@@ -998,7 +998,7 @@ static void AbortDecoderLocked(decoder_t *p_dec)
     if (!p_sys->b_aborted)
     {
         p_sys->b_aborted = true;
-        vlc_cancel(p_sys->out_thread);
+        vlc_cond_broadcast(&p_sys->cond);
     }
 }
 
@@ -1352,14 +1352,15 @@ static void *OutThread(void *data)
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     vlc_mutex_lock(&p_sys->lock);
-    mutex_cleanup_push(&p_sys->lock);
-    for (;;)
+    while (!p_sys->b_aborted)
     {
         int i_index;
 
         /* Wait for output ready */
-        while (!p_sys->b_flush_out && !p_sys->b_output_ready)
+        if (!p_sys->b_flush_out && !p_sys->b_output_ready) {
             vlc_cond_wait(&p_sys->cond, &p_sys->lock);
+            continue;
+        }
 
         if (p_sys->b_flush_out)
         {
@@ -1368,8 +1369,6 @@ static void *OutThread(void *data)
             vlc_cond_broadcast(&p_sys->dec_cond);
             continue;
         }
-
-        int canc = vlc_savecancel();
 
         vlc_mutex_unlock(&p_sys->lock);
 
@@ -1390,10 +1389,7 @@ static void *OutThread(void *data)
             /* Parse output format/buffers even when we are flushing */
             if (i_index != MC_API_INFO_OUTPUT_FORMAT_CHANGED
              && i_index != MC_API_INFO_OUTPUT_BUFFERS_CHANGED)
-            {
-                vlc_restorecancel(canc);
                 continue;
-            }
         }
 
         /* Process output returned by dequeue_out */
@@ -1412,7 +1408,6 @@ static void *OutThread(void *data)
                                              &p_block) == -1 && !out.b_eos)
                 {
                     msg_Err(p_dec, "pf_process_output failed");
-                    vlc_restorecancel(canc);
                     break;
                 }
                 if (p_pic)
@@ -1429,24 +1424,17 @@ static void *OutThread(void *data)
             } else if (i_ret != 0)
             {
                 msg_Err(p_dec, "get_out failed");
-                vlc_restorecancel(canc);
                 break;
             }
         }
         else
-        {
-            vlc_restorecancel(canc);
             break;
-        }
-        vlc_restorecancel(canc);
     }
     msg_Warn(p_dec, "OutThread stopped");
 
     /* Signal DecoderFlush that the output thread aborted */
     p_sys->b_aborted = true;
     vlc_cond_signal(&p_sys->dec_cond);
-
-    vlc_cleanup_pop();
     vlc_mutex_unlock(&p_sys->lock);
 
     return NULL;
