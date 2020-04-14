@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Gonçalo Cordeiro <gzcordeiro@gmail.com>, 2013, 2014, 2018
+# Gonçalo Cordeiro <gzcordeiro@gmail.com>, 2013,2014,2018
 # Iván Seoane Pardo <ivam.sp@gmail.com>, 2008
 # Paula Iglesias <localizacion@tagenata.com>, 2009
 # antiparvos  <marcoslansgarza@gmail.com>, 2018-2019

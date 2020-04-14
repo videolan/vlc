@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Chandrakant Dhutadmal <chandrakantd@cdac.in>
+# Chandrakant Dhutadmal <cpdhutadmal@yahoo.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"

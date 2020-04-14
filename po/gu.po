@@ -3,9 +3,9 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# geniushkg <geniushkg@gmail.com>, 2011
+# Hardik Kishorpuri Goswami <geniushkg@gmail.com>, 2011
 # Kartik Mistry <kartik.mistry@gmail.com>, 2013
-# pardava rajnik <nilurajnik@gmail.com>, 2013
+# Pardava Rajnik <nilurajnik@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"

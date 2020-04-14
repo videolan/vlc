@@ -10,7 +10,7 @@
 # Nicolai Nystrup-Eriksen <nicolain-e@hotmail.dk>, 2014
 # Peter Jespersen <flywheel@illogical.dk>, 2013
 # Mikkel Scheike <scheike@outlook.com>, 2018
-# scootergrisen, 2015-2018
+# scootergrisen <scootergrisen@gmail.com>, 2015-2018
 # Sejani, 2013
 # Ulrik Johansen, 2013-2018
 # Jonas Larsen <jonas@vrt.dk>

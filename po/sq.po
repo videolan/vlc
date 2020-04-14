@@ -5,7 +5,6 @@
 # Translators:
 # Ardit Dani <ardit.dani@gmail.com>, 2014
 # Emmanuel Malaj <emmanuelmalaj@outlook.com>, 2015
-# Erion _Mulaj <inactive+erion@transifex.com>, 2013
 # Rigels Gordani <rgordani@gmail.com>, 2014
 msgid ""
 msgstr ""

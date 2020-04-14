@@ -8,7 +8,7 @@
 # Kiril Kirilov <cybercop_montana@abv.bg>, 2013
 # Yordanka Peteva <danie.peteva@gmail.com>, 2014
 # Evgeni Danailov <genidanailov@gmail.com>, 2015
-# Ivo Ivanov, 2008,2010,2013
+# Ivo Ivanov <bestran@mail.bg>, 2008,2010,2013
 # Kaloyan Nikolov <kotipuka01@gmail.com>, 2016
 # Tihomir Hristov <killera124@gmail.com>, 2014-2015
 # Lachezar Yotov <yotov.ls@gmail.com>, 2015

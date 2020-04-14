@@ -4,7 +4,7 @@
 #
 # Translators:
 # Abduqadir Abliz <sahran.ug@gmail.com>, 2015
-# eltikinuyghur <eltikinuyghur@hotmail.com>, 2015
+# eltikinuyghur <eltikinuyghur@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"

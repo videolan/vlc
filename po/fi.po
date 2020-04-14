@@ -5,7 +5,7 @@
 # Translators:
 # Ahto Simakuutio <simakuutio@gmail.com>, 2016
 # Jouni Kähkönen, 2007
-# Juha Jeronen 2011, 2012
+# Juha Jeronen <juha.jeronen@jyu.fi>, 2011,2012
 # joni.maatta <maatta.joni1@gmail.com>, 2014
 # Otto Kekäläinen, 2008-2010
 # Marko <marko.sahakangas@gmail.com>, 2015

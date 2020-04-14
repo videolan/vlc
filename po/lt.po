@@ -5,7 +5,7 @@
 # Translators:
 # Tomas <jawnuolis@gmail.com>, 2013
 # Karolis Runas <karolis.runas@yahoo.com>, 2014
-# Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2009-2020
+# Mindaugas Baranauskas <opensuse.lietuviu.kalba@gmail.com>, 2009-2020
 # Vaidotas Kalvelis <vaidotaskal@gmail.com>, 2016
 msgid ""
 msgstr ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
 "PO-Revision-Date: 2020-03-28 10:50+0100\n"
-"Last-Translator: Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2020\n"
+"Last-Translator: Mindaugas Baranauskas <opensuse.lietuviu.kalba@gmail.com>, 2020\n"
 "Language-Team: Lithuanian (https://www.transifex.com/yaron/teams/16553/lt/)\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"

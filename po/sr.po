@@ -4,8 +4,7 @@
 #
 # Translators:
 # DakSrbija <vlabotami@gmail.com>, 2013
-# mukzy, 2016
-# Rancher <djordje.vasiljevich@gmail.com>, 2013-2015
+# George Vasiljevich <djordje.vasiljevich@gmail.com>, 2013-2015
 # Gorana Milicevic <gorana.milicevic@gmail.com>, 2008
 # Marko Uskokovic <uskokovic@etf.bg.ac.yu>, 2007-2008
 # Milan Tair <milan.tair@gmail.com>, 2014

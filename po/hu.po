@@ -5,7 +5,7 @@
 # Translators:
 # Balázs Meskó <meskobalazs@gmail.com>, 2017-2020
 # Dávid Eredics <mail@davideredics.com>, 2015,2020
-# Gabor Kelemen <kelemeng@ubuntu.com>, 2005-2015
+# Gabor Kelemen <kelemeng@gnome.huubuntu.com>, 2005-2015
 # iskr <iscreamd@gmail.com>, 2013
 # Schafer Gergő <gergoschafer@gmail.com>, 2017
 msgid ""

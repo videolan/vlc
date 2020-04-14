@@ -5,7 +5,7 @@
 # Translators:
 # alfalb_mansil, 2014
 # André Filipe Sobral de Matos Gomes <andre.filipe.gomez@gmail.com>, 2013
-# Bruno Queiros <bqueiros@gmail.com>, 2014-2019
+# Bruno Queirós <bqueiros@gmail.com>, 2014-2019
 # enVide neFelibata <info@envidenefelibata.com>, 2014
 # Gonçalo Matos , 2015-2017
 # Gonçalo Silva, 2013-2016

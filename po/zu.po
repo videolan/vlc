@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Sipho <sipho@translate.org.za>, 2011
+# Sipho Sibiya <sipho@translate.org.za>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"

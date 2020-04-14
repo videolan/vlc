@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Michael Bauer, 2014-2015
+# Michael Bauer <fios@akerbeltz.org>, 2014-2015
 # GunChleoc, 2018
 msgid ""
 msgstr ""

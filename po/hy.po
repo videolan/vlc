@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Eduard <edo248@gmail.com>, 2010
+# Eduard Babayan <edo248@gmail.com>, 2010
 # Վահե Գրիգորյան <vahe@keemail.me>, 2017
 msgid ""
 msgstr ""

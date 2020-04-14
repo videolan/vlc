@@ -9,7 +9,7 @@
 # Christophe Lherieau <skimpax@gmail.com>, 2013
 # Damien Erambert <damien.erambert@me.com>, 2013
 # Emmanuel Simond <emmanuel.simond@gmail.com>, 2013
-# Eric Lassauge <lassauge@users.sourceforge.net>, 2013-2015,2018
+# Éric Lassauge <lassauge@users.sourceforge.net>, 2013-2015,2018
 # Freddydelanuit Dec <fred.dec@free.fr>, 2014
 # Hugo Beauzée-Luyssen <hugo@beauzee.fr>, 2015
 # Irriep Nala Novram <allannkorh@yahoo.fr>, 2018
