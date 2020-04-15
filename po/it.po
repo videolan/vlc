@@ -39,7 +39,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-25 12:16+0100\n"
+"PO-Revision-Date: 2020-04-15 06:48+0200\n"
 "Last-Translator: Vincenzo Reale <vinx.reale@gmail.com>, 2020\n"
 "Language-Team: Italian (https://www.transifex.com/yaron/teams/16553/it/)\n"
 "Language: it\n"
@@ -1239,7 +1239,7 @@ msgstr "In basso al centro"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
-msgstr ""
+msgstr "Posizione di crominanza"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
@@ -8681,6 +8681,8 @@ msgstr "Dimensione blocchi SRT (byte)"
 #: modules/access/srt.c:394 modules/access_output/srt.c:444
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
 msgstr ""
+"Tempo di attesa per ritorno dopo tempo scaduto in millisecondi (-1 = "
+"infinito)"
 
 #: modules/access/srt.c:395 modules/access_output/srt.c:445
 msgid "SRT latency (ms)"
@@ -9949,7 +9951,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:65
 msgid "Ambisonics renderer and binauralizer"
-msgstr ""
+msgstr "Generatore Ambisonics e binauralizzatore"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:77
 msgid "Binauralizer"
@@ -10429,7 +10431,7 @@ msgstr "Campionatore audio Nearest-neighbor"
 
 #: modules/audio_filter/scaletempo.c:52
 msgid "Pitch Shifter"
-msgstr ""
+msgstr "Modificatore di tonalità"
 
 #: modules/audio_filter/scaletempo.c:53
 msgid "Audio pitch changer"
@@ -10473,7 +10475,7 @@ msgstr ""
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch Shift"
-msgstr ""
+msgstr "Modifica tonalità"
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch shift in semitones."
@@ -10997,11 +10999,11 @@ msgstr "Ignora ruby (furigana) nei sottotitoli."
 
 #: modules/codec/arib/aribsub.c:48
 msgid "Use Core Text renderer"
-msgstr ""
+msgstr "Usa generatore Core Text"
 
 #: modules/codec/arib/aribsub.c:49
 msgid "Use Core Text renderer in the subtitle."
-msgstr ""
+msgstr "Usa generatore Core Text nel sottotitolo."
 
 #: modules/codec/arib/aribsub.c:53
 msgid "ARIB subtitles decoder"
@@ -15615,7 +15617,7 @@ msgstr "Importazione cartella"
 
 #: modules/demux/filter/noseek.c:79
 msgid "Seek prevention demux filter"
-msgstr ""
+msgstr "Filtro demux di prevenzione del posizionamento"
 
 #: modules/demux/flac.c:51
 msgid "FLAC demuxer"
@@ -20724,7 +20726,7 @@ msgstr "Regolazioni ed effetti"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
 msgid "Stereo Widener"
-msgstr ""
+msgstr "Allargamento stereo"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -22249,7 +22251,7 @@ msgstr "Schermo vuoto sotto al video."
 
 #: modules/hw/mmal/vout.c:55
 msgid "Render blank screen below video. Increases VideoCore load."
-msgstr ""
+msgstr "Genera schermo vuoto sotto al video. Aumenta il carico di VideoCore."
 
 #: modules/hw/mmal/vout.c:59 modules/hw/mmal/vout.c:60
 msgid "Adjust HDMI refresh rate to the video."
@@ -22346,7 +22348,7 @@ msgstr "Filtro video di accentuazione VDPAU"
 
 #: modules/keystore/file.c:54
 msgid "File keystore (plaintext)"
-msgstr ""
+msgstr "Archivio delle chiavi su file (testo semplice)"
 
 #: modules/keystore/file.c:55
 msgid "Secrets are stored on a file without any encryption"
@@ -22424,7 +22426,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:109
 msgid "Keychain keystore"
-msgstr ""
+msgstr "Archivio chiavi Keychain"
 
 #: modules/keystore/keychain.m:110
 msgid "Keystore for iOS, Mac OS X and tvOS"
@@ -24147,7 +24149,7 @@ msgstr "Servizi Zeroconf"
 
 #: modules/services_discovery/avahi.c:69
 msgid "Avahi Renderer Discovery"
-msgstr ""
+msgstr "Rilevamento del generatore Avahi"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
@@ -25208,7 +25210,7 @@ msgstr "Filtro di decompressione zlib"
 
 #: modules/stream_filter/prefetch.c:531
 msgid "Stream prefetch filter"
-msgstr ""
+msgstr "Filtro di pre-caricamento del flusso"
 
 #: modules/stream_filter/prefetch.c:534
 msgid "Buffer size"
@@ -25224,7 +25226,7 @@ msgstr "Dimensioni di lettura"
 
 #: modules/stream_filter/prefetch.c:538
 msgid "Prefetch background read size (bytes)"
-msgstr ""
+msgstr "Dimensione di lettura di pre-caricamento sullo sfondo (byte)"
 
 #: modules/stream_filter/prefetch.c:540
 msgid "Seek threshold"
