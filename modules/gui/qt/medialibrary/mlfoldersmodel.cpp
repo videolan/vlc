@@ -190,4 +190,3 @@ void MlFoldersModel::onMlEvent( void* data , const vlc_ml_event_t* event )
      }
      return QVariant();
  }
-
