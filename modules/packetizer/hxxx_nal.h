@@ -221,7 +221,7 @@ static inline uint8_t *hxxx_bsfw_ep3b_to_rbsp( uint8_t *p, uint8_t *end, void *p
             if( (*pi_prev & 0x06) == 0x06 )
             {
                 ++p;
-                *pi_prev = ((*pi_prev >> 1) << 1) | (!*p);
+                *pi_prev = !*p;
             }
         }
     }
