@@ -1251,10 +1251,10 @@ static inline size_t vlc_ml_count_shows( vlc_medialibrary_t* p_ml, const vlc_ml_
     return count;
 }
 
-static inline vlc_ml_media_list_t* vlc_ml_list_genre_artists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params, int64_t i_genre_id )
+static inline vlc_ml_artist_list_t* vlc_ml_list_genre_artists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params, int64_t i_genre_id )
 {
     vlc_assert( p_ml != NULL );
-    vlc_ml_media_list_t* res;
+    vlc_ml_artist_list_t* res;
     if ( vlc_ml_list( p_ml, VLC_ML_LIST_GENRE_ARTISTS, params, i_genre_id, &res ) != VLC_SUCCESS )
         return NULL;
     return res;
