@@ -124,6 +124,8 @@ void MlFoldersModel::update()
     for ( unsigned int i=0 ; i<entrypoints->i_nb_items ; i++ )
         m_mrls.emplace_back( entrypoints->p_items[i] );
 
+    vlc_ml_release(entrypoints);
+
     endResetModel();
 }
 
