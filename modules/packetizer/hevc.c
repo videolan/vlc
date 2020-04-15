@@ -151,7 +151,9 @@ static block_t * OutputQueues(decoder_sys_t *p_sys, bool b_valid)
                 p_au->p_next = NULL;
                 block_ChainLastAppend(&pp_output_last, p_au);
             }
-            block_ChainLastAppend(&pp_output_last, GetXPSCopy(p_sys));
+            block_t *p_xps = GetXPSCopy(p_sys);
+            if(p_xps)
+                block_ChainLastAppend(&pp_output_last, p_xps);
         }
         if(p_sys->pre.p_chain)
             block_ChainLastAppend(&pp_output_last, p_sys->pre.p_chain);
