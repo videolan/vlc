@@ -100,6 +100,7 @@ static char *GenerateCnonce()
     vlc_hash_md5_Update( &md5, ps_random, sizeof( ps_random ) );
 
     vlc_hash_FinishHex( &md5, md5_hex );
+    return md5_hex;
 }
 
 static char *AuthDigest( vlc_object_t *p_this, vlc_http_auth_t *p_auth,
