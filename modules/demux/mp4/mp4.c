@@ -989,6 +989,25 @@ static int Open( vlc_object_t * p_this )
     }
     msg_Dbg( p_demux, "found %u track%c", i_tracks, i_tracks ? 's':' ' );
 
+    /* reject old monolithically embedded mpeg */
+    if( i_tracks == 1 )
+    {
+        const MP4_Box_t *p_hdlr = MP4_BoxGet( p_sys->p_root, "/moov/trak/mdia/hdlr" );
+        if( p_hdlr && BOXDATA(p_hdlr) )
+        {
+            switch( BOXDATA(p_hdlr)->i_handler_type )
+            {
+                case HANDLER_m1v:
+                case HANDLER_m1s:
+                case HANDLER_mpeg:
+                    msg_Dbg( p_demux, "Raw MPEG/PS not supported, passing to ps demux" );
+                    goto error;
+                default:
+                    break;
+            }
+        }
+    }
+
     if( CreateTracks( p_demux, i_tracks ) != VLC_SUCCESS )
         goto error;
 

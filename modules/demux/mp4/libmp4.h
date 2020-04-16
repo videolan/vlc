@@ -446,6 +446,11 @@ typedef int64_t stime_t;
 #define ATOM_mpod VLC_FOURCC( 'm', 'p', 'o', 'd' )
 #define ATOM_cdsc VLC_FOURCC( 'c', 'd', 's', 'c' )
 
+/* mpeg or mpeg PS m1v, m1s */
+#define HANDLER_m1v  VLC_FOURCC('m', '1', 'v', ' ')
+#define HANDLER_m1s  VLC_FOURCC('m', '1', 's', ' ')
+#define HANDLER_mpeg VLC_FOURCC('M', 'P', 'E', 'G')
+
 /* HEIF Specific */
 #define HANDLER_pict VLC_FOURCC('p', 'i', 'c', 't')
 
