@@ -369,8 +369,7 @@ static int MP4_PeekBoxHeader( stream_t *p_stream, MP4_Box_t *p_box )
  * on success, position is past read box or EOF
  *****************************************************************************/
 static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father,
-                                         const uint32_t onlytypes[], const uint32_t nottypes[],
-                                         bool *pb_restrictionhit )
+                                         const uint32_t stopbefore[], bool *pb_restrictionhit )
 {
     MP4_Box_t peekbox = { 0 };
     if ( !MP4_PeekBoxHeader( p_stream, &peekbox ) )
@@ -383,18 +382,9 @@ static MP4_Box_t *MP4_ReadBoxRestricted( stream_t *p_stream, MP4_Box_t *p_father
         return NULL;
     }
 
-    for( size_t i=0; nottypes && nottypes[i]; i++ )
+    for( size_t i=0; stopbefore && stopbefore[i]; i++ )
     {
-        if( nottypes[i] == peekbox.i_type )
-        {
-            *pb_restrictionhit = true;
-            return NULL;
-        }
-    }
-
-    for( size_t i=0; onlytypes && onlytypes[i]; i++ )
-    {
-        if( onlytypes[i] != peekbox.i_type )
+        if( stopbefore[i] == peekbox.i_type )
         {
             *pb_restrictionhit = true;
             return NULL;
@@ -493,7 +483,7 @@ static int MP4_ReadBoxContainerChildrenIndexed( stream_t *p_stream,
             i_index = GetDWBE(&read[4]);
         }
         b_onexclude = false; /* If stopped due exclude list */
-        if( (p_box = MP4_ReadBoxRestricted( p_stream, p_container, NULL, excludelist, &b_onexclude )) )
+        if( (p_box = MP4_ReadBoxRestricted( p_stream, p_container, excludelist, &b_onexclude )) )
         {
             b_continue = true;
             p_box->i_index = i_index;
