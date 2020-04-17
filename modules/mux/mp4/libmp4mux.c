@@ -1104,6 +1104,14 @@ static bo_t *GetUdtaTag(mp4mux_handle_t *muxh)
     return udta;
 }
 
+static bo_t *GetSratBox(uint32_t i_sample_rate)
+{
+    bo_t *srat = box_full_new("srat", 0, 0);
+    if(srat)
+        bo_add_32be(srat, i_sample_rate);
+    return srat;
+}
+
 static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b_mov)
 {
     VLC_UNUSED(p_obj);
@@ -1114,6 +1122,7 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     char fcc[4];
     bo_t *specificbox = NULL;
     uint16_t i_qt_version = 1;
+    bo_t *srat = NULL;
 
     /* codec specific extradata */
     const uint8_t *p_extradata = p_track->fmt.p_extra;
@@ -1194,8 +1203,18 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     else
         bo_add_16be(soun, -2);
     bo_add_16be(soun, 0);         // packet size (0)
-    bo_add_16be(soun, p_track->fmt.audio.i_rate); // sampleratehi
-    bo_add_16be(soun, 0);                         // sampleratelo
+
+    if(!b_mov && i_qt_version > 0 &&
+       p_track->fmt.audio.i_rate >= (1<<16))
+    {
+        bo_add_32be(soun, 1<<16);
+        srat = GetSratBox(p_track->fmt.audio.i_rate);
+    }
+    else
+    {
+        bo_add_16be(soun, p_track->fmt.audio.i_rate); // sampleratehi
+        bo_add_16be(soun, 0);                         // sampleratelo
+    }
 
     /* Extended data for SoundDescription V1 */
     if (i_qt_version == 1)
@@ -1214,6 +1233,8 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     /* Add an ES Descriptor */
     if (b_descr)
        box_gather(soun, GetESDS(p_track));
+
+    box_gather(soun, srat);
 
     return soun;
 }
