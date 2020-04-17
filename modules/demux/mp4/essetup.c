@@ -1021,7 +1021,7 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
             p_fmt->i_original_fourcc = p_fmt->i_codec;
 
             /* Buggy files workaround */
-            if( (p_track->i_timescale != p_soun->i_sampleratehi) )
+            if( p_track->i_timescale != p_soun->i_sampleratehi && p_soun->i_qt_version == 0 )
             {
                 msg_Warn( p_demux, "i_timescale (%"PRId32") != i_sampleratehi "
                           "(%u), making both equal (report any problem).",
