@@ -22,6 +22,7 @@
 #endif
 
 #include <assert.h>
+#include <stdatomic.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -44,6 +45,8 @@ struct fingerprinter_sys_t
     vlc_thread_t thread;
     vlc_player_t *player;
     vlc_player_listener_id *listener_id;
+
+    atomic_bool abort;
 
     struct
     {
@@ -248,6 +251,7 @@ static int Open(vlc_object_t *p_this)
         return VLC_ENOMEM;
     }
 
+    atomic_init( &p_sys->abort, false );
     vlc_array_init( &p_sys->incoming.queue );
     vlc_mutex_init( &p_sys->incoming.lock );
     vlc_cond_init( &p_sys->incoming_cond );
@@ -286,7 +290,10 @@ static void Close(vlc_object_t *p_this)
     fingerprinter_thread_t   *p_fingerprinter = (fingerprinter_thread_t*) p_this;
     fingerprinter_sys_t *p_sys = p_fingerprinter->p_sys;
 
-    vlc_cancel( p_sys->thread );
+    vlc_mutex_lock( &p_sys->incoming.lock );
+    atomic_store_explicit( &p_sys->abort, true, memory_order_relaxed );
+    vlc_cond_signal( &p_sys->incoming_cond );
+    vlc_mutex_unlock( &p_sys->incoming.lock );
     vlc_join( p_sys->thread, NULL );
 
     CleanSys( p_sys );
@@ -346,20 +353,24 @@ static void *Run( void *opaque )
     for (;;)
     {
         vlc_mutex_lock( &p_sys->incoming.lock );
-        mutex_cleanup_push( &p_sys->incoming.lock );
 
         while( vlc_array_count( &p_sys->incoming.queue ) == 0 )
+        {
+            if( atomic_load_explicit( &p_sys->abort, memory_order_relaxed ) )
+            {
+                vlc_mutex_unlock( &p_sys->incoming.lock );
+                return NULL;
+            }
             vlc_cond_wait( &p_sys->incoming_cond, &p_sys->incoming.lock );
+        }
 
         QueueIncomingRequests( p_sys );
 
-        vlc_cleanup_pop();
         vlc_mutex_unlock( &p_sys->incoming.lock );
 
         bool results_available = false;
         while( vlc_array_count( &p_sys->processing.queue ) )
         {
-            int canc = vlc_savecancel();
             fingerprint_request_t *p_data = vlc_array_item_at_index( &p_sys->processing.queue, 0 );
 
             char *psz_uri = input_item_GetURI( p_data->p_item );
@@ -385,7 +396,6 @@ static void *Run( void *opaque )
                     free( acoustid_print.results.p_results );
                 free( acoustid_print.psz_fingerprint );
             }
-            vlc_restorecancel(canc);
 
             /* copy results */
             vlc_mutex_lock( &p_sys->results.lock );
@@ -400,7 +410,8 @@ static void *Run( void *opaque )
             // cancellation, so remove it immediately
             vlc_array_remove( &p_sys->processing.queue, 0 );
 
-            vlc_testcancel();
+            if( atomic_load_explicit( &p_sys->abort, memory_order_relaxed ) )
+                return NULL;
         }
 
         if ( results_available )
