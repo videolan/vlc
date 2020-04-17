@@ -2338,6 +2338,21 @@ static int MP4_ReadBox_stsdext_chan( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_stsdext_srat( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( MP4_Box_data_srat_t, NULL );
+    MP4_Box_data_srat_t *p_srat = p_box->data.p_srat;
+    if ( i_read != 8 )
+        MP4_READBOX_EXIT( 0 );
+
+    uint32_t i_dummy;
+    VLC_UNUSED( i_dummy );
+    MP4_GET4BYTES( i_dummy ); /* version flags */
+    MP4_GET4BYTES( p_srat->i_sample_rate );
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_dec3( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_dec3_t, NULL );
@@ -4916,6 +4931,7 @@ static const struct
 
     /* Sound extensions */
     { ATOM_chan,    MP4_ReadBox_stsdext_chan, 0 },
+    { ATOM_srat,    MP4_ReadBox_stsdext_srat, 0 },
     { ATOM_WMA2,    MP4_ReadBox_WMA2,         ATOM_wave }, /* flip4mac */
     { ATOM_dOps,    MP4_ReadBox_Binary,       ATOM_Opus },
     { ATOM_wfex,    MP4_ReadBox_WMA2,         ATOM_wma  }, /* ismv formatex */
