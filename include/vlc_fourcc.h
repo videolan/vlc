@@ -470,7 +470,7 @@
 #define VLC_CODEC_WMAS                       VLC_FOURCC('W','M','A','S')
 #define VLC_CODEC_FLAC                       VLC_FOURCC('f','l','a','c')
 #define VLC_CODEC_MLP                        VLC_FOURCC('m','l','p',' ')
-#define VLC_CODEC_TRUEHD                     VLC_FOURCC('t','r','h','d')
+#define VLC_CODEC_TRUEHD                     VLC_FOURCC('m','l','p','a')
 #define VLC_CODEC_DVAUDIO                    VLC_FOURCC('d','v','a','u')
 #define VLC_CODEC_SPEEX                      VLC_FOURCC('s','p','x',' ')
 #define VLC_CODEC_OPUS                       VLC_FOURCC('O','p','u','s')
