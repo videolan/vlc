@@ -120,7 +120,6 @@ src/network/udp.c
 src/player/osd.c
 src/player/player.c
 src/stream_output/sap.c
-src/stream_output/sdp.c
 src/stream_output/stream_output.c
 src/stream_output/stream_output.h
 src/text/iso-639_def.h

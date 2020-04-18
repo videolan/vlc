@@ -273,16 +273,6 @@ VLC_API void sout_AnnounceUnRegister(vlc_object_t *,session_descriptor_t* );
 #define sout_AnnounceUnRegister(o, a) \
         sout_AnnounceUnRegister(VLC_OBJECT (o), a)
 
-/** SDP */
-
-struct sockaddr;
-struct vlc_memstream;
-
-VLC_API int vlc_sdp_Start(struct vlc_memstream *, vlc_object_t *obj,
-                          const char *cfgpref,
-                          const struct sockaddr *src, size_t slen,
-                          const struct sockaddr *addr, size_t alen) VLC_USED;
-
 /** @} */
 
 #ifdef __cplusplus

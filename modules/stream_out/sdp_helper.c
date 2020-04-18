@@ -22,18 +22,14 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-
-#include <stddef.h>
 #include <string.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <assert.h>
-#include <vlc_network.h>
+
+#include <vlc_common.h>
 #include <vlc_charset.h>
+#include <vlc_network.h>
 #include <vlc_memstream.h>
 
-#include "stream_output.h"
+#include "sdp_helper.h"
 
 #define MAXSDPADDRESS 47
 

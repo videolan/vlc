@@ -34,6 +34,7 @@
 #include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_memstream.h>
+#include "sdp_helper.h"
 
 /*****************************************************************************
  * Module descriptor

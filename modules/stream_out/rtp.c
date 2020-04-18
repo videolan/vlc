@@ -50,6 +50,7 @@
 #endif
 
 #include "rtp.h"
+#include "sdp_helper.h"
 
 #include <sys/types.h>
 #include <unistd.h>

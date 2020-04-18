@@ -4,7 +4,8 @@ libstream_out_dummy_plugin_la_SOURCES = stream_out/dummy.c
 libstream_out_cycle_plugin_la_SOURCES = stream_out/cycle.c
 libstream_out_delay_plugin_la_SOURCES = stream_out/delay.c
 libstream_out_stats_plugin_la_SOURCES = stream_out/stats.c
-libstream_out_standard_plugin_la_SOURCES = stream_out/standard.c
+libstream_out_standard_plugin_la_SOURCES = stream_out/standard.c \
+	stream_out/sdp_helper.c stream_out/sdp_helper.h
 libstream_out_standard_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_access_output_srt)
 libstream_out_standard_plugin_la_LIBADD = $(SOCKET_LIBS)
 libstream_out_duplicate_plugin_la_SOURCES = stream_out/duplicate.c
@@ -77,6 +78,7 @@ endif
 # RTP plugin
 sout_LTLIBRARIES += libstream_out_rtp_plugin.la
 libstream_out_rtp_plugin_la_SOURCES = \
+	stream_out/sdp_helper.c stream_out/sdp_helper.h \
 	stream_out/rtp.c stream_out/rtp.h stream_out/rtpfmt.c \
 	stream_out/rtcp.c stream_out/rtsp.c
 libstream_out_rtp_plugin_la_CFLAGS = $(AM_CFLAGS)
