@@ -124,9 +124,10 @@ static int Send( sout_stream_t *p_stream, void *_p_es, block_t *p_buffer )
 static int Open( vlc_object_t *p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys;
+    sout_stream_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
 
-    p_sys          = malloc( sizeof( sout_stream_sys_t ) );
+    if (unlikely(p_sys == NULL))
+        return VLC_ENOMEM;
 
     p_sys->pp_es = NULL;
     p_sys->i_es_num = 0;
@@ -140,14 +141,6 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static void Close( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
-
-    free( p_sys );
-}
-
 #define SOUT_CFG_PREFIX "sout-autodel-"
 
 vlc_module_begin()
@@ -155,5 +148,5 @@ vlc_module_begin()
     set_description(N_("Automatically add/delete input streams"))
     set_capability("sout filter", 50)
     add_shortcut("autodel")
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
