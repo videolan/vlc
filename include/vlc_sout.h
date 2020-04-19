@@ -188,6 +188,14 @@ enum sout_stream_query_e {
     SOUT_STREAM_ID_SPU_HIGHLIGHT,  /* arg1=void *, arg2=const vlc_spu_highlight_t *, res=can fail */
 };
 
+struct sout_stream_operations {
+    void *(*add)(sout_stream_t *, const es_format_t *);
+    void (*del)(sout_stream_t *, void *);
+    int (*send)(sout_stream_t *, void *, block_t *);
+    int (*control)( sout_stream_t *, int, va_list );
+    void (*flush)( sout_stream_t *, void *);
+};
+
 struct sout_stream_t
 {
     struct vlc_object_t obj;
@@ -198,6 +206,8 @@ struct sout_stream_t
     char              *psz_name;
     config_chain_t    *p_cfg;
     sout_stream_t     *p_next;
+
+    const struct sout_stream_operations *ops;
 
     /* add, remove a stream */
     void             *(*pf_add)( sout_stream_t *, const es_format_t * );
@@ -218,31 +228,51 @@ VLC_API sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout,
 static inline void *sout_StreamIdAdd( sout_stream_t *s,
                                       const es_format_t *fmt )
 {
-    return s->pf_add( s, fmt );
+    if (s->ops == NULL)
+        return s->pf_add(s, fmt);
+    return s->ops->add(s, fmt);
 }
 
 static inline void sout_StreamIdDel( sout_stream_t *s,
                                      void *id )
 {
-    s->pf_del( s, id );
+    if (s->ops == NULL) {
+        s->pf_del(s, id);
+        return;
+    }
+    s->ops->del(s, id);
 }
 
 static inline int sout_StreamIdSend( sout_stream_t *s,
                                      void *id, block_t *b )
 {
-    return s->pf_send( s, id, b );
+    if (s->ops == NULL)
+        return s->pf_send(s, id, b);
+    return s->ops->send(s, id, b);
 }
 
 static inline void sout_StreamFlush( sout_stream_t *s,
                                      void *id )
 {
-    if (s->pf_flush)
-        s->pf_flush( s, id );
+    if (s->ops == NULL) {
+        if (s->pf_flush != NULL)
+            s->pf_flush(s, id);
+        return;
+   }
+   if (s->ops->flush != NULL)
+        s->ops->flush(s, id);
 }
 
 static inline int sout_StreamControlVa( sout_stream_t *s, int i_query, va_list args )
 {
-    return s->pf_control ? s->pf_control( s, i_query, args ) : VLC_EGENERIC;
+    if (s->ops == NULL) {
+        if (s->pf_control == NULL)
+            return VLC_EGENERIC;
+        return s->pf_control(s, i_query, args);
+    }
+    if (s->ops->control == NULL)
+        return VLC_EGENERIC;
+    return s->ops->control(s, i_query, args);
 }
 
 static inline int sout_StreamControl( sout_stream_t *s, int i_query, ... )
