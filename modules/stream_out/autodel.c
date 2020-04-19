@@ -117,6 +117,10 @@ static int Send( sout_stream_t *p_stream, void *_p_es, block_t *p_buffer )
     return VLC_SUCCESS;
 }
 
+static const struct sout_stream_operations ops = {
+    Add, Del, Send, NULL, NULL,
+};
+
 static int Open( vlc_object_t *p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
@@ -128,11 +132,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->pp_es = NULL;
     p_sys->i_es_num = 0;
 
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
-
-    p_stream->p_sys     = p_sys;
+    p_stream->ops = &ops;
+    p_stream->p_sys = p_sys;
 
     return VLC_SUCCESS;
 }
