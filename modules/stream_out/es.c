@@ -34,94 +34,6 @@
 #include <vlc_dialog.h>
 #include <vlc_memstream.h>
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-#define ACCESS_TEXT N_("Output access method")
-#define ACCESS_LONGTEXT N_( \
-    "This is the default output access method that will be used." )
-
-#define ACCESSA_TEXT N_("Audio output access method")
-#define ACCESSA_LONGTEXT N_( \
-    "This is the output access method that will be used for audio." )
-#define ACCESSV_TEXT N_("Video output access method")
-#define ACCESSV_LONGTEXT N_( \
-    "This is the output access method that will be used for video." )
-
-#define MUX_TEXT N_("Output muxer")
-#define MUX_LONGTEXT N_( \
-    "This is the default muxer method that will be used." )
-#define MUXA_TEXT N_("Audio output muxer")
-#define MUXA_LONGTEXT N_( \
-    "This is the muxer that will be used for audio." )
-#define MUXV_TEXT N_("Video output muxer")
-#define MUXV_LONGTEXT N_( \
-    "This is the muxer that will be used for video." )
-
-#define DEST_TEXT N_("Output URL")
-#define DEST_LONGTEXT N_( \
-    "This is the default output URI." )
-#define DESTA_TEXT N_("Audio output URL")
-#define DESTA_LONGTEXT N_( \
-    "This is the output URI that will be used for audio." )
-#define DESTV_TEXT N_("Video output URL")
-#define DESTV_LONGTEXT N_( \
-    "This is the output URI that will be used for video." )
-
-static int      Open    ( vlc_object_t * );
-static void     Close   ( vlc_object_t * );
-
-#define SOUT_CFG_PREFIX "sout-es-"
-
-vlc_module_begin ()
-    set_shortname( "ES" )
-    set_description( N_("Elementary stream output") )
-    set_capability( "sout output", 50 )
-    add_shortcut( "es" )
-    set_category( CAT_SOUT )
-    set_subcategory( SUBCAT_SOUT_STREAM )
-
-    set_section( N_("Generic"), NULL )
-    add_string( SOUT_CFG_PREFIX "access", "", ACCESS_TEXT,
-                ACCESS_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "mux", "", MUX_TEXT,
-                MUX_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "dst", "", DEST_TEXT,
-                DEST_LONGTEXT, true )
-
-    set_section( N_("Audio"), NULL )
-    add_string( SOUT_CFG_PREFIX "access-audio", "", ACCESSA_TEXT,
-                ACCESSA_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "mux-audio", "", MUXA_TEXT,
-                MUXA_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "dst-audio", "", DESTA_TEXT,
-                DESTA_LONGTEXT, true )
-
-    set_section( N_("Video"), NULL )
-    add_string( SOUT_CFG_PREFIX "access-video", "", ACCESSV_TEXT,
-                ACCESSV_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "mux-video", "", MUXV_TEXT,
-                MUXV_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "dst-video", "", DESTV_TEXT,
-                DESTV_LONGTEXT, true )
-
-    set_callbacks( Open, Close )
-vlc_module_end ()
-
-/*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-static const char *const ppsz_sout_options[] = {
-    "access", "access-audio", "access-video",
-    "mux", "mux-audio", "mux-video",
-    "dst", "dst-audio", "dst-video",
-    NULL
-};
-
-static void *Add( sout_stream_t *, const es_format_t * );
-static void  Del( sout_stream_t *, void * );
-static int   Send( sout_stream_t *, void *, block_t * );
-
 typedef struct
 {
     int  i_count_audio;
@@ -140,66 +52,6 @@ typedef struct
     char *psz_dst_audio;
     char *psz_dst_video;
 } sout_stream_sys_t;
-
-/*****************************************************************************
- * Open:
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
-{
-    sout_stream_t       *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t   *p_sys;
-
-    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
-    p_sys                   = malloc( sizeof( sout_stream_sys_t ) );
-
-    p_sys->i_count          = 0;
-    p_sys->i_count_audio    = 0;
-    p_sys->i_count_video    = 0;
-
-    p_sys->psz_access = var_GetString( p_stream, SOUT_CFG_PREFIX "access" );
-    p_sys->psz_access_audio = var_GetString( p_stream, SOUT_CFG_PREFIX "access-audio" );
-    p_sys->psz_access_video = var_GetString( p_stream, SOUT_CFG_PREFIX "access-video" );
-
-    p_sys->psz_mux = var_GetString( p_stream, SOUT_CFG_PREFIX "mux" );
-    p_sys->psz_mux_audio = var_GetString( p_stream, SOUT_CFG_PREFIX "mux-audio" );
-    p_sys->psz_mux_video = var_GetString( p_stream, SOUT_CFG_PREFIX "mux-video" );
-
-    p_sys->psz_dst       = var_GetString( p_stream, SOUT_CFG_PREFIX "dst" );
-    p_sys->psz_dst_audio = var_GetString( p_stream, SOUT_CFG_PREFIX "dst-audio" );
-    p_sys->psz_dst_video = var_GetString( p_stream, SOUT_CFG_PREFIX "dst-video" );
-
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
-
-    p_stream->p_sys     = p_sys;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close:
- *****************************************************************************/
-
-static void Close( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    free( p_sys->psz_access );
-    free( p_sys->psz_access_audio );
-    free( p_sys->psz_access_video );
-
-    free( p_sys->psz_mux );
-    free( p_sys->psz_mux_audio );
-    free( p_sys->psz_mux_video );
-
-    free( p_sys->psz_dst );
-    free( p_sys->psz_dst_audio );
-    free( p_sys->psz_dst_video );
-
-    free( p_sys );
-}
 
 typedef struct
 {
@@ -414,3 +266,137 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     return sout_MuxSendBuffer( id->p_mux, id->p_input, p_buffer );
 }
 
+#define SOUT_CFG_PREFIX "sout-es-"
+
+static const char *const ppsz_sout_options[] = {
+    "access", "access-audio", "access-video",
+    "mux", "mux-audio", "mux-video",
+    "dst", "dst-audio", "dst-video",
+    NULL
+};
+
+/*****************************************************************************
+ * Open:
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
+{
+    sout_stream_t       *p_stream = (sout_stream_t*)p_this;
+    sout_stream_sys_t   *p_sys;
+
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
+    p_sys                   = malloc( sizeof( sout_stream_sys_t ) );
+
+    p_sys->i_count          = 0;
+    p_sys->i_count_audio    = 0;
+    p_sys->i_count_video    = 0;
+
+    p_sys->psz_access = var_GetString( p_stream, SOUT_CFG_PREFIX "access" );
+    p_sys->psz_access_audio = var_GetString( p_stream, SOUT_CFG_PREFIX "access-audio" );
+    p_sys->psz_access_video = var_GetString( p_stream, SOUT_CFG_PREFIX "access-video" );
+
+    p_sys->psz_mux = var_GetString( p_stream, SOUT_CFG_PREFIX "mux" );
+    p_sys->psz_mux_audio = var_GetString( p_stream, SOUT_CFG_PREFIX "mux-audio" );
+    p_sys->psz_mux_video = var_GetString( p_stream, SOUT_CFG_PREFIX "mux-video" );
+
+    p_sys->psz_dst       = var_GetString( p_stream, SOUT_CFG_PREFIX "dst" );
+    p_sys->psz_dst_audio = var_GetString( p_stream, SOUT_CFG_PREFIX "dst-audio" );
+    p_sys->psz_dst_video = var_GetString( p_stream, SOUT_CFG_PREFIX "dst-video" );
+
+    p_stream->pf_add    = Add;
+    p_stream->pf_del    = Del;
+    p_stream->pf_send   = Send;
+
+    p_stream->p_sys     = p_sys;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close:
+ *****************************************************************************/
+
+static void Close( vlc_object_t * p_this )
+{
+    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    free( p_sys->psz_access );
+    free( p_sys->psz_access_audio );
+    free( p_sys->psz_access_video );
+
+    free( p_sys->psz_mux );
+    free( p_sys->psz_mux_audio );
+    free( p_sys->psz_mux_video );
+
+    free( p_sys->psz_dst );
+    free( p_sys->psz_dst_audio );
+    free( p_sys->psz_dst_video );
+
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define ACCESS_TEXT N_("Output access method")
+#define ACCESS_LONGTEXT N_( \
+    "This is the default output access method that will be used." )
+
+#define ACCESSA_TEXT N_("Audio output access method")
+#define ACCESSA_LONGTEXT N_( \
+    "This is the output access method that will be used for audio." )
+#define ACCESSV_TEXT N_("Video output access method")
+#define ACCESSV_LONGTEXT N_( \
+    "This is the output access method that will be used for video." )
+
+#define MUX_TEXT N_("Output muxer")
+#define MUX_LONGTEXT N_( \
+    "This is the default muxer method that will be used." )
+#define MUXA_TEXT N_("Audio output muxer")
+#define MUXA_LONGTEXT N_( \
+    "This is the muxer that will be used for audio." )
+#define MUXV_TEXT N_("Video output muxer")
+#define MUXV_LONGTEXT N_( \
+    "This is the muxer that will be used for video." )
+
+#define DEST_TEXT N_("Output URL")
+#define DEST_LONGTEXT N_( \
+    "This is the default output URI." )
+#define DESTA_TEXT N_("Audio output URL")
+#define DESTA_LONGTEXT N_( \
+    "This is the output URI that will be used for audio." )
+#define DESTV_TEXT N_("Video output URL")
+#define DESTV_LONGTEXT N_( \
+    "This is the output URI that will be used for video." )
+
+vlc_module_begin()
+    set_shortname("ES")
+    set_description(N_("Elementary stream output"))
+    set_capability("sout output", 50)
+    add_shortcut("es")
+    set_category(CAT_SOUT)
+    set_subcategory(SUBCAT_SOUT_STREAM)
+
+    set_section(N_("Generic"), NULL)
+    add_string(SOUT_CFG_PREFIX "access", "",
+               ACCESS_TEXT, ACCESS_LONGTEXT, true)
+    add_string(SOUT_CFG_PREFIX "mux", "", MUX_TEXT, MUX_LONGTEXT, true)
+    add_string(SOUT_CFG_PREFIX "dst", "", DEST_TEXT, DEST_LONGTEXT, true )
+
+    set_section(N_("Audio"), NULL)
+    add_string(SOUT_CFG_PREFIX "access-audio", "",
+               ACCESSA_TEXT, ACCESSA_LONGTEXT, true )
+    add_string(SOUT_CFG_PREFIX "mux-audio", "", MUXA_TEXT, MUXA_LONGTEXT, true)
+    add_string(SOUT_CFG_PREFIX "dst-audio", "",
+               DESTA_TEXT, DESTA_LONGTEXT, true)
+
+    set_section(N_("Video"), NULL)
+    add_string(SOUT_CFG_PREFIX "access-video", "", ACCESSV_TEXT,
+               ACCESSV_LONGTEXT, true)
+    add_string(SOUT_CFG_PREFIX "mux-video", "", MUXV_TEXT,
+               MUXV_LONGTEXT, true)
+    add_string(SOUT_CFG_PREFIX "dst-video", "", DESTV_TEXT,
+               DESTV_LONGTEXT, true)
+
+    set_callbacks(Open, Close)
+vlc_module_end()
