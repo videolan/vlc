@@ -39,96 +39,6 @@
 # include <vlc_gcrypt.h>
 #endif
 
-#define RTCP_PORT_TEXT N_("RTCP (local) port")
-#define RTCP_PORT_LONGTEXT N_( \
-    "RTCP packets will be received on this transport protocol port. " \
-    "If zero, multiplexed RTP/RTCP is used.")
-
-#define SRTP_KEY_TEXT N_("SRTP key (hexadecimal)")
-#define SRTP_KEY_LONGTEXT N_( \
-    "RTP packets will be authenticated and deciphered "\
-    "with this Secure RTP master shared secret key. "\
-    "This must be a 32-character-long hexadecimal string.")
-
-#define SRTP_SALT_TEXT N_("SRTP salt (hexadecimal)")
-#define SRTP_SALT_LONGTEXT N_( \
-    "Secure RTP requires a (non-secret) master salt value. " \
-    "This must be a 28-character-long hexadecimal string.")
-
-#define RTP_MAX_SRC_TEXT N_("Maximum RTP sources")
-#define RTP_MAX_SRC_LONGTEXT N_( \
-    "How many distinct active RTP sources are allowed at a time." )
-
-#define RTP_TIMEOUT_TEXT N_("RTP source timeout (sec)")
-#define RTP_TIMEOUT_LONGTEXT N_( \
-    "How long to wait for any packet before a source is expired.")
-
-#define RTP_MAX_DROPOUT_TEXT N_("Maximum RTP sequence number dropout")
-#define RTP_MAX_DROPOUT_LONGTEXT N_( \
-    "RTP packets will be discarded if they are too much ahead (i.e. in the " \
-    "future) by this many packets from the last received packet." )
-
-#define RTP_MAX_MISORDER_TEXT N_("Maximum RTP sequence number misordering")
-#define RTP_MAX_MISORDER_LONGTEXT N_( \
-    "RTP packets will be discarded if they are too far behind (i.e. in the " \
-    "past) by this many packets from the last received packet." )
-
-#define RTP_DYNAMIC_PT_TEXT N_("RTP payload format assumed for dynamic " \
-                               "payloads")
-#define RTP_DYNAMIC_PT_LONGTEXT N_( \
-    "This payload format will be assumed for dynamic payload types " \
-    "(between 96 and 127) if it can't be determined otherwise with " \
-    "out-of-band mappings (SDP)" )
-
-static const char *const dynamic_pt_list[] = { "theora" };
-static const char *const dynamic_pt_list_text[] = { "Theora Encoded Video" };
-
-static int  Open (vlc_object_t *);
-static void Close (vlc_object_t *);
-
-/*
- * Module descriptor
- */
-vlc_module_begin ()
-    set_shortname (N_("RTP"))
-    set_description (N_("Real-Time Protocol (RTP) input"))
-    set_category (CAT_INPUT)
-    set_subcategory (SUBCAT_INPUT_DEMUX)
-    set_capability ("access", 0)
-    set_callbacks (Open, Close)
-
-    add_integer ("rtcp-port", 0, RTCP_PORT_TEXT,
-                 RTCP_PORT_LONGTEXT, false)
-        change_integer_range (0, 65535)
-        change_safe ()
-#ifdef HAVE_SRTP
-    add_string ("srtp-key", "",
-                SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false)
-        change_safe ()
-    add_string ("srtp-salt", "",
-                SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false)
-        change_safe ()
-#endif
-    add_integer ("rtp-max-src", 1, RTP_MAX_SRC_TEXT,
-                 RTP_MAX_SRC_LONGTEXT, true)
-        change_integer_range (1, 255)
-    add_integer ("rtp-timeout", 5, RTP_TIMEOUT_TEXT,
-                 RTP_TIMEOUT_LONGTEXT, true)
-    add_integer ("rtp-max-dropout", 3000, RTP_MAX_DROPOUT_TEXT,
-                 RTP_MAX_DROPOUT_LONGTEXT, true)
-        change_integer_range (0, 32767)
-    add_integer ("rtp-max-misorder", 100, RTP_MAX_MISORDER_TEXT,
-                 RTP_MAX_MISORDER_LONGTEXT, true)
-        change_integer_range (0, 32767)
-    add_string ("rtp-dynamic-pt", NULL, RTP_DYNAMIC_PT_TEXT,
-                RTP_DYNAMIC_PT_LONGTEXT, true)
-        change_string_list (dynamic_pt_list, dynamic_pt_list_text)
-
-    /*add_shortcut ("sctp")*/
-    add_shortcut ("dccp", "rtptcp", /* "tcp" is already taken :( */
-                  "rtp", "udplite")
-vlc_module_end ()
-
 /*
  * TODO: so much stuff
  * - send RTCP-RR and RTCP-BYE
@@ -145,12 +55,107 @@ vlc_module_end ()
 # define IPPROTO_UDPLITE 136 /* from IANA */
 #endif
 
-
-/*
- * Local prototypes
+/**
+ * Extracts port number from "[host]:port" or "host:port" strings,
+ * and remove brackets from the host name.
+ * @param phost pointer to the string upon entry,
+ * pointer to the hostname upon return.
+ * @return port number, 0 if missing.
  */
-static int Control (demux_t *, int i_query, va_list args);
-static int extract_port (char **phost);
+static int extract_port (char **phost)
+{
+    char *host = *phost, *port;
+
+    if (host[0] == '[')
+    {
+        host = ++*phost; /* skip '[' */
+        port = strchr (host, ']');
+        if (port)
+            *port++ = '\0'; /* skip ']' */
+    }
+    else
+        port = strchr (host, ':');
+
+    if (port == NULL)
+        return 0;
+    *port++ = '\0'; /* skip ':' */
+    return atoi (port);
+}
+
+/**
+ * Control callback
+ */
+static int Control (demux_t *demux, int query, va_list args)
+{
+    demux_sys_t *sys = demux->p_sys;
+
+    switch (query)
+    {
+        case DEMUX_GET_PTS_DELAY:
+        {
+            *va_arg (args, vlc_tick_t *) =
+                VLC_TICK_FROM_MS( var_InheritInteger (demux, "network-caching") );
+            return VLC_SUCCESS;
+        }
+
+        case DEMUX_CAN_PAUSE:
+        case DEMUX_CAN_SEEK:
+        case DEMUX_CAN_CONTROL_PACE:
+        {
+            bool *v = va_arg( args, bool * );
+            *v = false;
+            return VLC_SUCCESS;
+        }
+    }
+
+    if (sys->chained_demux != NULL)
+        return vlc_demux_chained_ControlVa (sys->chained_demux, query, args);
+
+    switch (query)
+    {
+        case DEMUX_GET_POSITION:
+        {
+            float *v = va_arg (args, float *);
+            *v = 0.;
+            return VLC_SUCCESS;
+        }
+
+        case DEMUX_GET_LENGTH:
+        case DEMUX_GET_TIME:
+        {
+            *va_arg (args, vlc_tick_t *) = 0;
+            return VLC_SUCCESS;
+        }
+    }
+
+    return VLC_EGENERIC;
+}
+
+/**
+ * Releases resources
+ */
+static void Close (vlc_object_t *obj)
+{
+    demux_t *demux = (demux_t *)obj;
+    demux_sys_t *p_sys = demux->p_sys;
+
+    if (p_sys->thread_ready)
+    {
+        vlc_cancel (p_sys->thread);
+        vlc_join (p_sys->thread, NULL);
+    }
+
+#ifdef HAVE_SRTP
+    if (p_sys->srtp)
+        srtp_destroy (p_sys->srtp);
+#endif
+    if (p_sys->session)
+        rtp_session_destroy (demux, p_sys->session);
+    if (p_sys->rtcp_fd != -1)
+        net_Close (p_sys->rtcp_fd);
+    net_Close (p_sys->fd);
+    free (p_sys);
+}
 
 /**
  * Probes and initializes.
@@ -313,107 +318,89 @@ error:
     return VLC_EGENERIC;
 }
 
+#define RTCP_PORT_TEXT N_("RTCP (local) port")
+#define RTCP_PORT_LONGTEXT N_( \
+    "RTCP packets will be received on this transport protocol port. " \
+    "If zero, multiplexed RTP/RTCP is used.")
 
-/**
- * Releases resources
+#define SRTP_KEY_TEXT N_("SRTP key (hexadecimal)")
+#define SRTP_KEY_LONGTEXT N_( \
+    "RTP packets will be authenticated and deciphered "\
+    "with this Secure RTP master shared secret key. "\
+    "This must be a 32-character-long hexadecimal string.")
+
+#define SRTP_SALT_TEXT N_("SRTP salt (hexadecimal)")
+#define SRTP_SALT_LONGTEXT N_( \
+    "Secure RTP requires a (non-secret) master salt value. " \
+    "This must be a 28-character-long hexadecimal string.")
+
+#define RTP_MAX_SRC_TEXT N_("Maximum RTP sources")
+#define RTP_MAX_SRC_LONGTEXT N_( \
+    "How many distinct active RTP sources are allowed at a time." )
+
+#define RTP_TIMEOUT_TEXT N_("RTP source timeout (sec)")
+#define RTP_TIMEOUT_LONGTEXT N_( \
+    "How long to wait for any packet before a source is expired.")
+
+#define RTP_MAX_DROPOUT_TEXT N_("Maximum RTP sequence number dropout")
+#define RTP_MAX_DROPOUT_LONGTEXT N_( \
+    "RTP packets will be discarded if they are too much ahead (i.e. in the " \
+    "future) by this many packets from the last received packet." )
+
+#define RTP_MAX_MISORDER_TEXT N_("Maximum RTP sequence number misordering")
+#define RTP_MAX_MISORDER_LONGTEXT N_( \
+    "RTP packets will be discarded if they are too far behind (i.e. in the " \
+    "past) by this many packets from the last received packet." )
+
+#define RTP_DYNAMIC_PT_TEXT N_("RTP payload format assumed for dynamic " \
+                               "payloads")
+#define RTP_DYNAMIC_PT_LONGTEXT N_( \
+    "This payload format will be assumed for dynamic payload types " \
+    "(between 96 and 127) if it can't be determined otherwise with " \
+    "out-of-band mappings (SDP)" )
+
+static const char *const dynamic_pt_list[] = { "theora" };
+static const char *const dynamic_pt_list_text[] = { "Theora Encoded Video" };
+
+/*
+ * Module descriptor
  */
-static void Close (vlc_object_t *obj)
-{
-    demux_t *demux = (demux_t *)obj;
-    demux_sys_t *p_sys = demux->p_sys;
+vlc_module_begin()
+    set_shortname(N_("RTP"))
+    set_description(N_("Real-Time Protocol (RTP) input"))
+    set_category(CAT_INPUT)
+    set_subcategory(SUBCAT_INPUT_DEMUX)
+    set_capability("access", 0)
+    set_callbacks(Open, Close)
 
-    if (p_sys->thread_ready)
-    {
-        vlc_cancel (p_sys->thread);
-        vlc_join (p_sys->thread, NULL);
-    }
-
+    add_integer("rtcp-port", 0, RTCP_PORT_TEXT,
+                 RTCP_PORT_LONGTEXT, false)
+        change_integer_range(0, 65535)
+        change_safe()
 #ifdef HAVE_SRTP
-    if (p_sys->srtp)
-        srtp_destroy (p_sys->srtp);
+    add_string ("srtp-key", "",
+                SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false)
+        change_safe ()
+    add_string("srtp-salt", "",
+               SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false)
+        change_safe()
 #endif
-    if (p_sys->session)
-        rtp_session_destroy (demux, p_sys->session);
-    if (p_sys->rtcp_fd != -1)
-        net_Close (p_sys->rtcp_fd);
-    net_Close (p_sys->fd);
-    free (p_sys);
-}
+    add_integer("rtp-max-src", 1, RTP_MAX_SRC_TEXT,
+                RTP_MAX_SRC_LONGTEXT, true)
+        change_integer_range (1, 255)
+    add_integer("rtp-timeout", 5, RTP_TIMEOUT_TEXT,
+                RTP_TIMEOUT_LONGTEXT, true)
+    add_integer("rtp-max-dropout", 3000, RTP_MAX_DROPOUT_TEXT,
+                RTP_MAX_DROPOUT_LONGTEXT, true)
+        change_integer_range (0, 32767)
+    add_integer("rtp-max-misorder", 100, RTP_MAX_MISORDER_TEXT,
+                RTP_MAX_MISORDER_LONGTEXT, true)
+        change_integer_range (0, 32767)
+    add_string("rtp-dynamic-pt", NULL, RTP_DYNAMIC_PT_TEXT,
+               RTP_DYNAMIC_PT_LONGTEXT, true)
+        change_string_list(dynamic_pt_list, dynamic_pt_list_text)
 
-
-/**
- * Extracts port number from "[host]:port" or "host:port" strings,
- * and remove brackets from the host name.
- * @param phost pointer to the string upon entry,
- * pointer to the hostname upon return.
- * @return port number, 0 if missing.
- */
-static int extract_port (char **phost)
-{
-    char *host = *phost, *port;
-
-    if (host[0] == '[')
-    {
-        host = ++*phost; /* skip '[' */
-        port = strchr (host, ']');
-        if (port)
-            *port++ = '\0'; /* skip ']' */
-    }
-    else
-        port = strchr (host, ':');
-
-    if (port == NULL)
-        return 0;
-    *port++ = '\0'; /* skip ':' */
-    return atoi (port);
-}
-
-
-/**
- * Control callback
- */
-static int Control (demux_t *demux, int query, va_list args)
-{
-    demux_sys_t *sys = demux->p_sys;
-
-    switch (query)
-    {
-        case DEMUX_GET_PTS_DELAY:
-        {
-            *va_arg (args, vlc_tick_t *) =
-                VLC_TICK_FROM_MS( var_InheritInteger (demux, "network-caching") );
-            return VLC_SUCCESS;
-        }
-
-        case DEMUX_CAN_PAUSE:
-        case DEMUX_CAN_SEEK:
-        case DEMUX_CAN_CONTROL_PACE:
-        {
-            bool *v = va_arg( args, bool * );
-            *v = false;
-            return VLC_SUCCESS;
-        }
-    }
-
-    if (sys->chained_demux != NULL)
-        return vlc_demux_chained_ControlVa (sys->chained_demux, query, args);
-
-    switch (query)
-    {
-        case DEMUX_GET_POSITION:
-        {
-            float *v = va_arg (args, float *);
-            *v = 0.;
-            return VLC_SUCCESS;
-        }
-
-        case DEMUX_GET_LENGTH:
-        case DEMUX_GET_TIME:
-        {
-            *va_arg (args, vlc_tick_t *) = 0;
-            return VLC_SUCCESS;
-        }
-    }
-
-    return VLC_EGENERIC;
-}
+    /*add_shortcut ("sctp")*/
+    add_shortcut("dccp", "rtptcp", /* "tcp" is already taken :( */
+                 "rtp", "udplite")
+vlc_module_end()
