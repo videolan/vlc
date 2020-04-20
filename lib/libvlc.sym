@@ -248,6 +248,7 @@ libvlc_video_set_mouse_input
 libvlc_video_set_scale
 libvlc_video_set_spu
 libvlc_video_set_spu_delay
+libvlc_video_set_spu_text_scale
 libvlc_video_set_teletext
 libvlc_video_set_track
 libvlc_video_take_snapshot

@@ -368,6 +368,17 @@ int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi,
     return 0;
 }
 
+void libvlc_video_set_spu_text_scale( libvlc_media_player_t *p_mi,
+                                      float f_scale )
+{
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    vlc_player_SetSubtitleTextScale(player, lroundf(f_scale * 100.f));
+
+    vlc_player_Unlock(player);
+}
+
 static void libvlc_video_set_crop(libvlc_media_player_t *mp,
                                   const char *geometry)
 {

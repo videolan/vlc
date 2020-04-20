@@ -1545,6 +1545,25 @@ LIBVLC_API int libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu );
 LIBVLC_API int64_t libvlc_video_get_spu_delay( libvlc_media_player_t *p_mi );
 
 /**
+ * Set the subtitle text scale.
+ *
+ * The scale factor is expressed as a percentage of the default size, where
+ * 1.0 represents 100 percent.
+ *
+ * A value of 0.5 would result in text half the normal size, and a value of 2.0
+ * would result in text twice the normal size.
+ *
+ * The minimum acceptable value for the scale factor is 0.1.
+ *
+ * The maximum is 5.0 (five times normal size).
+ *
+ * \param p_mi media player
+ * \param f_scale scale factor in the range [0.1;5.0] (default: 1.0)
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API void libvlc_video_set_spu_text_scale( libvlc_media_player_t *p_mi, float f_scale );
+
+/**
  * Set the subtitle delay. This affects the timing of when the subtitle will
  * be displayed. Positive values result in subtitles being displayed later,
  * while negative values will result in subtitles being displayed earlier.
