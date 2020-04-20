@@ -18,6 +18,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import "qrc:///util/KeyHelper.js" as KeyHelper
+import "qrc:///style/"
 
 NavigableFocusScope {
     id: root
@@ -30,6 +31,12 @@ NavigableFocusScope {
     //margin to apply
     property int marginBottom: root.cellHeight / 2
     property int marginTop: root.cellHeight / 3
+
+    property int horizontalSpacing: VLCStyle.margin_normal
+    property int verticalSpacing: VLCStyle.margin_normal
+
+    readonly property int _effectiveCellWidth: cellWidth + horizontalSpacing
+    readonly property int _effectiveCellHeight: cellHeight + verticalSpacing
 
     property variant delegateModel
     property variant model
@@ -86,7 +93,7 @@ NavigableFocusScope {
     }
 
     function getNbItemsPerRow() {
-        return Math.max(Math.floor(width / root.cellWidth), 1)
+        return Math.max(Math.floor((width + root.horizontalSpacing) / root._effectiveCellWidth), 1)
     }
 
     function getItemRowCol(id) {
@@ -98,9 +105,9 @@ NavigableFocusScope {
 
     function getItemPos(id) {
         var colCount = root.getNbItemsPerRow()
-        var remainingSpace = flickable.width - colCount * root.cellWidth
+        var remainingSpace = flickable.width - (colCount * root._effectiveCellWidth) + root.horizontalSpacing
         var rowCol = getItemRowCol(id)
-        return [(rowCol[0] * root.cellWidth) + (remainingSpace / 2), rowCol[1] * root.cellHeight + headerHeight]
+        return [(rowCol[0] * root._effectiveCellWidth) + (remainingSpace / 2), rowCol[1] * root._effectiveCellHeight + headerHeight]
     }
 
     //use the same signature as Gridview.positionViewAtIndex(index, PositionMode mode)
@@ -119,7 +126,7 @@ NavigableFocusScope {
         var newContentY = flickable.contentY
 
         var itemTopY = root.getItemPos(index)[1]
-        var itemBottomY = itemTopY + root.cellHeight
+        var itemBottomY = itemTopY + root._effectiveCellHeight
 
         var viewTopY = flickable.contentY
         var viewBottomY = viewTopY + flickable.height
@@ -185,10 +192,10 @@ NavigableFocusScope {
             heightWithoutExpand -= expandDisplayedHeight
         }
 
-        var rowId = Math.floor(contentYWithoutExpand / root.cellHeight)
+        var rowId = Math.floor(contentYWithoutExpand / root._effectiveCellHeight)
         var firstId = Math.max(rowId * root.getNbItemsPerRow(), 0)
 
-        rowId = Math.ceil((contentYWithoutExpand + heightWithoutExpand) / root.cellHeight)
+        rowId = Math.ceil((contentYWithoutExpand + heightWithoutExpand) / root._effectiveCellHeight)
         var lastId = Math.min(rowId * root.getNbItemsPerRow(), delegateModel.count)
 
         return [firstId, lastId]
@@ -218,7 +225,7 @@ NavigableFocusScope {
         Loader {
             id: headerItemLoader
             //load the header early (when the first row is visible)
-            visible: flickable.contentY < root.headerHeight + root.cellHeight
+            visible: flickable.contentY < root.headerHeight + root._effectiveCellHeight
             sourceComponent: headerDelegate
             focus: item.focus
             onFocusChanged: {
@@ -356,11 +363,11 @@ NavigableFocusScope {
             }
 
             // Calculate and set the contentHeight
-            var newContentHeight = root.getItemPos(delegateModel.count - 1)[1] + root.cellHeight
+            var newContentHeight = root.getItemPos(delegateModel.count - 1)[1] + root._effectiveCellHeight
             if (root._expandIndex !== -1)
                 newContentHeight += expandItem.height
             contentHeight = newContentHeight
-            contentWidth = root.cellWidth * root.getNbItemsPerRow()
+            contentWidth = root._effectiveCellWidth * root.getNbItemsPerRow() - root.horizontalSpacing
 
             _updateSelected()
         }
@@ -390,7 +397,7 @@ NavigableFocusScope {
             }
             onCurrentItemYChanged: {
                 var newContentY = flickable.contentY;
-                var currentItemYPos = root.getItemPos(currentIndex)[1] + cellHeight + expandItem.currentItemY
+                var currentItemYPos = root.getItemPos(currentIndex)[1] + _effectiveCellHeight + expandItem.currentItemY
                 if (currentItemYPos + expandItem.currentItemHeight > flickable.contentY + flickable.height) {
                     //move viewport to see current item bottom
                     newContentY = Math.min(
@@ -432,7 +439,7 @@ NavigableFocusScope {
 
             // Sliding animation
             var currentItemYPos = root.getItemPos(_expandIndex)[1]
-            currentItemYPos += root.cellHeight / 2
+            currentItemYPos += root._effectiveCellHeight / 2
             animateFlickableContentY(currentItemYPos)
         }
 
