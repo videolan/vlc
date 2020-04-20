@@ -274,7 +274,13 @@ int libvlc_video_update_viewpoint( libvlc_media_player_t *p_mi,
 
     enum vlc_player_whence whence = b_absolute ? VLC_PLAYER_WHENCE_ABSOLUTE
                                                : VLC_PLAYER_WHENCE_RELATIVE;
-    vlc_player_UpdateViewpoint(p_mi->player, &update, whence);
+
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    vlc_player_UpdateViewpoint(player, &update, whence);
+
+    vlc_player_Unlock(player);
 
     /* may not fail anymore, keep int not to break the API */
     return 0;
