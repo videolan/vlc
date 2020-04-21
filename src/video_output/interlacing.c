@@ -38,7 +38,7 @@
  * You can use the non vout filter if and only if the video properties stay the
  * same (width/height/chroma/fps), at least for now.
  */
-static const char deinterlace_modes[][9]= {
+static const char *const deinterlace_modes[] = {
     "auto",
     "discard",
     "blend",
