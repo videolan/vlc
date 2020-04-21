@@ -390,8 +390,16 @@ void X11Loop::handleX11Event()
                 return;
             }
             pDnd->dndSelectionNotify( );
+            break;
         }
+        case ReparentNotify:
+        case UnmapNotify:
+        case ConfigureNotify: // We don't care
+            break;
 
+        case DestroyNotify:
+            pWin->onDestroyed();
+            break;
     }
 }
 

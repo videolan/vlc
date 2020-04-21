@@ -124,6 +124,9 @@ public:
     /// Get the OS window
     OSWindow *getOSWindow() const { return m_pOsWindow; }
 
+    /// Method called when the window is destroyed by the WM
+    virtual void onDestroyed() { m_pVarVisible->set(false); }
+
 protected:
 
     /// These methods do not need to be public since they are accessed

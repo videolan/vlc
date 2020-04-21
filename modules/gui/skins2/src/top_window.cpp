@@ -561,3 +561,9 @@ void TopWindow::setLastHit( CtrlGeneric *pNewHitControl )
     m_pLastHitControl = pNewHitControl;
 }
 
+void TopWindow::onDestroyed()
+{
+    GenericWindow::onDestroyed();
+
+    m_rWindowManager.onWindowHidden();
+}

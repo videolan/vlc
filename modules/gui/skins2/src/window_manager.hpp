@@ -168,6 +168,9 @@ public:
     bool isOpacityNeeded() const
     { return (m_opacityEnabled && (m_alpha != 255 || m_moveAlpha != 255 )); }
 
+    /// Once a window is hidden, check if there are any left
+    void onWindowHidden();
+
 private:
     /// Some useful typedefs for lazy people like me
     typedef std::set<TopWindow*> WinSet_t;

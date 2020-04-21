@@ -86,6 +86,9 @@ public:
     /// Get the initial visibility status
     bool getInitialVisibility() const { return m_initialVisibility; }
 
+    /// When the window is killed by the window manager
+    virtual void onDestroyed();
+
 protected:
     /// Actually show the window
     virtual void innerShow();

@@ -635,3 +635,20 @@ void WindowManager::setActiveLayout( TopWindow &rWindow,
     // Rebuild the dependencies
     stopMove();
 }
+
+void WindowManager::onWindowHidden()
+{
+    WinSet_t::const_iterator it;
+    for( it = m_allWindows.begin(); it != m_allWindows.end(); ++it )
+    {
+        if( (*it)->getType() != GenericWindow::TopWindow) {
+            continue;
+        }
+        if( (*it)->getVisibleVar().get() ) {
+            return;
+        }
+    }
+
+    // Last window closed
+    libvlc_Quit( vlc_object_instance(getIntf()) );
+}
