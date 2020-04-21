@@ -373,7 +373,7 @@ static struct filter_mode_t filter_mode [] = {
  * @param mode Desired method. See mode_list for available choices.
  * @see mode_list
  */
-static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
+static int SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -388,25 +388,23 @@ static void SetFilterMethod( filter_t *p_filter, const char *mode, bool pack )
             {
                 msg_Err( p_filter, "unknown or incompatible deinterlace mode \"%s\""
                         " for packed format", mode );
-                SetFilterMethod( p_filter, "blend", pack );
-                return;
+                return SetFilterMethod( p_filter, "blend", pack );
             }
             if( p_sys->chroma->pixel_size > 1 && !filter_mode[i].b_high_bit_depth )
             {
                 msg_Err( p_filter, "unknown or incompatible deinterlace mode \"%s\""
                         " for high depth format", mode );
-                SetFilterMethod( p_filter, "blend", pack );
-                return;
+                return SetFilterMethod( p_filter, "blend", pack );
             }
 
             msg_Dbg( p_filter, "using %s deinterlace method", mode );
             p_sys->context.settings = filter_mode[i].settings;
             p_sys->context.pf_render_ordered = filter_mode[i].pf_render_ordered;
-            return;
+            return VLC_SUCCESS;
         }
     }
 
-    msg_Err( p_filter, "unknown deinterlace mode \"%s\"", mode );
+    return VLC_EGENERIC;
 }
 
 /**
@@ -541,7 +539,13 @@ notsupp:
     config_ChainParse( p_filter, FILTER_CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
     char *psz_mode = var_InheritString( p_filter, FILTER_CFG_PREFIX "mode" );
-    SetFilterMethod( p_filter, psz_mode, packed );
+    int ret = SetFilterMethod( p_filter, psz_mode, packed );
+    if (ret != VLC_SUCCESS)
+    {
+        free(psz_mode);
+        free(p_sys);
+        return ret;
+    }
 
     IVTCClearState( p_filter );
 
