@@ -70,6 +70,12 @@ struct sys {
 
     struct plane planes[PICTURE_PLANE_MAX];
     unsigned next; /* next texture index */
+
+    /* In theory, 3 frames are needed.
+     * If we only received the first frame, 2 are missing.
+     * If we only received the two first frames, 1 is missing.
+     */
+    unsigned missing_frames;
 };
 
 static void
@@ -478,6 +484,16 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
     if (meta->plane == 2) {
         /* This was the last plane */
         sys->next = prev; /* rotate */
+
+        if (sys->missing_frames)
+        {
+            if (sys->missing_frames == 2)
+                /* cur is missing */
+                cur = next;
+            /* prev is missing */
+            prev = cur;
+            --sys->missing_frames;
+        }
     }
 
     return VLC_SUCCESS;
@@ -496,6 +512,9 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
         return VLC_EGENERIC;
 
     sys->next = 0;
+    /* The first call to Draw will provide the "next" frame. The "prev" and
+     * "cur" frames are missing. */
+    sys->missing_frames = 2;
 
     static const struct vlc_gl_filter_ops ops = {
         .draw = Draw,
