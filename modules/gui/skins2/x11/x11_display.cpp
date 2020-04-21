@@ -267,13 +267,21 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
                              mask, ShapeSet );
         XDestroyRegion( mask );
 
+        // test EWMH capabilities
+        testEWMH();
+
+        // Try to avoid tiling window managers treating us like a normal window
+        if( m_net_wm_window_type != None )
+        {
+            XChangeProperty( m_pDisplay, m_mainWindow, m_net_wm_window_type,
+                    XA_ATOM, 32, PropModeReplace,
+                    (unsigned char *)&m_net_wm_window_type_utility, 1 );
+        }
+
         XMapWindow( m_pDisplay, m_mainWindow);
 
         // Move it outside the screen to avoid seeing it in workspace selector
         XMoveWindow( m_pDisplay, m_mainWindow, -10, -10 );
-
-        // test EWMH capabilities
-        testEWMH();
 
         // Force _NET_WM_PID whatever the WM _NET_SUPPORTED says
         m_net_wm_pid = XInternAtom( m_pDisplay, "_NET_WM_PID" , False );
@@ -331,6 +339,7 @@ void X11Display::testEWMH()
 
     TEST_EWMH( m_net_wm_window_type, "_NET_WM_WINDOW_TYPE" )
     TEST_EWMH( m_net_wm_window_type_normal, "_NET_WM_WINDOW_TYPE_NORMAL" )
+    TEST_EWMH( m_net_wm_window_type_utility, "_NET_WM_WINDOW_TYPE_UTILITY" )
 
     TEST_EWMH( m_net_wm_state, "_NET_WM_STATE" )
     TEST_EWMH( m_net_wm_state_fullscreen, "_NET_WM_STATE_FULLSCREEN" )

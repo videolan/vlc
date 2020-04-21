@@ -90,6 +90,7 @@ public:
 
     Atom m_net_wm_window_type;
     Atom m_net_wm_window_type_normal;
+    Atom m_net_wm_window_type_utility;
 
     Atom m_net_wm_state;
     Atom m_net_wm_state_above;
