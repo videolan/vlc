@@ -1113,8 +1113,8 @@ openSub = {
         return {
           { value={ string=openSub.option.os_username } },
           { value={ string=openSub.option.os_password } },
-          { value={ string=openSub.conf.useragent } },
           { value={ string=openSub.movie.sublanguageid } },
+          { value={ string=openSub.conf.useragent } }
         }
       end,
       callback = function(resp)
