@@ -292,30 +292,37 @@ endif
 HOSTTOOLS := \
 	CC="$(CC)" CXX="$(CXX)" LD="$(LD)" \
 	AR="$(AR)" CCAS="$(CCAS)" RANLIB="$(RANLIB)" STRIP="$(STRIP)" \
-	PATH="$(PREFIX)/bin:$(PATH)"
-HOSTVARS := \
-	CPPFLAGS="$(CPPFLAGS)" \
-	CFLAGS="$(CFLAGS) $(DBGOPTIMFLAGS)" \
-	CXXFLAGS="$(CXXFLAGS) $(DBGOPTIMFLAGS)" \
-	LDFLAGS="$(LDFLAGS)"
-HOSTVARS_PIC := $(HOSTTOOLS) \
-	CPPFLAGS="$(CPPFLAGS) $(PIC)" \
-	CFLAGS="$(CFLAGS) $(DBGOPTIMFLAGS) $(PIC)" \
-	CXXFLAGS="$(CXXFLAGS) $(DBGOPTIMFLAGS) $(PIC)" \
-	LDFLAGS="$(LDFLAGS)"
+	PATH="$(PREFIX)/bin:$(PATH)" \
+	PKG_CONFIG="$(PKG_CONFIG)"
 
-# Keep a version of HOSTVARS without the tools, since meson requires the
-# tools variables to point to the native ones
-ifdef HAVE_CROSS_COMPILE
-HOSTVARS_MESON := PATH="$(PREFIX)/bin:$(PATH)"
-else
 HOSTVARS_MESON := $(HOSTTOOLS) \
 	CPPFLAGS="$(CPPFLAGS)" \
 	CFLAGS="$(CFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS)" \
 	LDFLAGS="$(LDFLAGS)"
+
+# Add these flags after Meson consumed the CFLAGS/CXXFLAGS
+# as when setting those for Meson, it would apply to tests
+# and cause the check if symbols have underscore prefix to
+# incorrectly report they have not, even if they have.
+ifndef WITH_OPTIMIZATION
+CFLAGS := $(CFLAGS) -g -O0
+CXXFLAGS := $(CXXFLAGS) -g -O0
+else
+CFLAGS := $(CFLAGS) -g -O2
+CXXFLAGS := $(CXXFLAGS) -g -O2
 endif
-HOSTVARS := $(HOSTTOOLS) $(HOSTVARS)
+
+HOSTVARS := $(HOSTTOOLS) \
+	CPPFLAGS="$(CPPFLAGS)" \
+	CFLAGS="$(CFLAGS)" \
+	CXXFLAGS="$(CXXFLAGS)" \
+	LDFLAGS="$(LDFLAGS)"
+HOSTVARS_PIC := $(HOSTTOOLS) \
+	CPPFLAGS="$(CPPFLAGS) $(PIC)" \
+	CFLAGS="$(CFLAGS) $(PIC)" \
+	CXXFLAGS="$(CXXFLAGS) $(PIC)" \
+	LDFLAGS="$(LDFLAGS)"
 
 download_git = \
 	rm -Rf -- "$(@:.tar.xz=)" && \
@@ -371,16 +378,30 @@ RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX) $(CMAKE_GENERATOR)
 
-MESON = meson --default-library static --prefix "$(PREFIX)" --backend ninja \
+MESONFLAGS = --default-library static --prefix "$(PREFIX)" --backend ninja \
 	-Dlibdir=lib
 ifndef WITH_OPTIMIZATION
-MESON += --buildtype debug
+MESONFLAGS += --buildtype debug
 else
-MESON += --buildtype release
+MESONFLAGS += --buildtype release
 endif
 
 ifdef HAVE_CROSS_COMPILE
-MESON += --cross-file $(abspath crossfile.meson)
+# When cross-compiling meson uses the env vars like
+# CC, CXX, etc. and CFLAGS, CXXFLAGS, etc. for the
+# build machine compiler and not like most other
+# buildsystems for the host compilation. Therefore
+# we clear the enviornment variables using the env
+# command, except PATH, which is needed.
+# The values of the mentioned relevant env variables
+# are passed for the host compilation using the
+# generated crossfile, so everything should work as
+# expected.
+MESONFLAGS += --cross-file $(abspath crossfile.meson)
+MESON = env -i PATH="$(PREFIX)/bin:$(PATH)" PKG_CONFIG_LIBDIR="$(PKG_CONFIG_LIBDIR)" \
+	PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" meson $(MESONFLAGS)
+else
+MESON = meson $(MESONFLAGS)
 endif
 
 ifdef GPL
@@ -546,21 +567,29 @@ else
 ifdef HAVE_DARWIN_OS
 	MESON_SYSTEM_NAME = darwin
 else
+ifdef HAVE_ANDROID
+	MESON_SYSTEM_NAME = android
+else
 ifdef HAVE_LINUX
 	# android has also system = linux and defines HAVE_LINUX
 	MESON_SYSTEM_NAME = linux
+else
+	$(error "No meson system name known for this target")
+endif
 endif
 endif
 endif
 
+
 crossfile.meson: $(SRC)/gen-meson-crossfile.py
-	$(HOSTVARS) \
+	$(HOSTVARS_MESON) \
 	WINDRES="$(WINDRES)" \
 	PKG_CONFIG="$(PKG_CONFIG)" \
 	HOST_SYSTEM="$(MESON_SYSTEM_NAME)" \
 	HOST_ARCH="$(subst i386,x86,$(ARCH))" \
 	HOST="$(HOST)" \
 	$(SRC)/gen-meson-crossfile.py $@
+	cat $@
 
 # Default pattern rules
 .sum-%: $(SRC)/%/SHA512SUMS
