@@ -50,6 +50,7 @@ static const char *const deinterlace_modes[] = {
     "yadif2x",
     "phosphor",
     "ivtc",
+    "gl_yadif",
 };
 
 static bool DeinterlaceIsModeValid(const char *mode)
