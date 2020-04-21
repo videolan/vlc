@@ -231,6 +231,9 @@ void on_player_titles_changed( vlc_player_t *player,
     vlc_player_title_list *titles, void *data)
 {
     (void)player;
+    if (!titles) {
+        return;
+    }
     bool isDvd = vlc_player_title_list_GetCount( titles ) > 0;
     vlc_value_t val = { .b_bool = isDvd };
     VlcProc::onGenericCallback( "isDvd", val, data );
