@@ -32,14 +32,14 @@
 static ssize_t Read (stream_t *access, void *buf, size_t len)
 {
     const char **inp = access->p_sys, *in = *inp;
-    unsigned char *out = buf;
-    size_t i;
+    size_t avail = strnlen(in, len);
 
-    for (i = 0; i < len && *in != '\0'; i++)
-        *(out++) = *(in++);
+    if (len > avail)
+        len = avail;
 
-    *inp = in;
-    return i;
+    memcpy(buf, in, len);
+    *inp += len;
+    return len;
 }
 
 static int Seek (stream_t *access, uint64_t position)
