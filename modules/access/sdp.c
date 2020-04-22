@@ -31,24 +31,26 @@
 
 static ssize_t Read (stream_t *access, void *buf, size_t len)
 {
-    char *in = access->p_sys, *out = buf;
+    const char **inp = access->p_sys, *in = *inp;
+    unsigned char *out = buf;
     size_t i;
 
     for (i = 0; i < len && *in != '\0'; i++)
         *(out++) = *(in++);
 
-    access->p_sys = in;
+    *inp = in;
     return i;
 }
 
 static int Seek (stream_t *access, uint64_t position)
 {
+    const char **inp = access->p_sys;
+
 #if (UINT64_MAX > SIZE_MAX)
     if (unlikely(position > SIZE_MAX))
         position = SIZE_MAX;
 #endif
-    access->p_sys = (char *)access->psz_location
-                    + strnlen(access->psz_location, position);
+    *inp = access->psz_location + strnlen(access->psz_location, position);
     return VLC_SUCCESS;
 }
 
@@ -84,11 +86,17 @@ static int Open (vlc_object_t *obj)
 {
     stream_t *access = (stream_t *)obj;
 
+    const char **sys = vlc_obj_malloc(obj, sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
+
+    *sys = access->psz_location;
+
     access->pf_read = Read;
     access->pf_block = NULL;
     access->pf_seek = Seek;
     access->pf_control = Control;
-    access->p_sys = (char *)access->psz_location;
+    access->p_sys = sys;
 
     return VLC_SUCCESS;
 }
