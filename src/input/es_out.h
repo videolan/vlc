@@ -38,7 +38,7 @@ enum es_out_mode_e
 enum es_out_query_private_e
 {
     /* set/get mode */
-    ES_OUT_PRIV_SET_MODE,                           /* arg1= int */
+    ES_OUT_PRIV_SET_MODE = ES_OUT_PRIVATE_START, /* arg1= int */
 
     /* Same than ES_OUT_SET_ES/ES_OUT_UNSET_ES/ES_OUT_RESTART_ES, but with vlc_es_id_t * */
     ES_OUT_PRIV_SET_ES,      /* arg1= vlc_es_id_t*                   */
