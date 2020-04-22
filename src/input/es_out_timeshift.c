@@ -187,10 +187,10 @@ struct ts_storage_t
     FILE    *p_filer;   /* FILE handle for data reading */
 
     /* */
-    int      i_cmd_r;
-    int      i_cmd_w;
-    int      i_cmd_max;
-    ts_cmd_t *p_cmd;
+    uint8_t *p_cmd_r;
+    uint8_t *p_cmd_w;
+    uint8_t *p_cmd_buf;
+    size_t   i_cmd_buf;
 };
 
 typedef struct
@@ -1179,6 +1179,9 @@ static void *TsRun( void *p_data )
 /*****************************************************************************
  *
  *****************************************************************************/
+#define MAX_COMMAND_SIZE sizeof(ts_cmd_t)
+#define TS_STORAGE_COMMAND_PREALLOC 30000
+
 static ts_storage_t *TsStorageNew( const char *psz_tmp_path, int64_t i_tmp_size_max )
 {
     ts_storage_t *p_storage = malloc( sizeof (*p_storage) );
@@ -1222,13 +1225,13 @@ static ts_storage_t *TsStorageNew( const char *psz_tmp_path, int64_t i_tmp_size_
     p_storage->i_file_size = 0;
 
     /* */
-    p_storage->i_cmd_w = 0;
-    p_storage->i_cmd_r = 0;
-    p_storage->i_cmd_max = 30000;
-    p_storage->p_cmd = vlc_alloc( p_storage->i_cmd_max, sizeof(*p_storage->p_cmd) );
+    p_storage->p_cmd_buf = vlc_alloc( TS_STORAGE_COMMAND_PREALLOC, MAX_COMMAND_SIZE );
+    p_storage->i_cmd_buf = TS_STORAGE_COMMAND_PREALLOC * MAX_COMMAND_SIZE;
+    p_storage->p_cmd_w = p_storage->p_cmd_buf;
+    p_storage->p_cmd_r = p_storage->p_cmd_buf;
     //fprintf( stderr, "\nSTORAGE name=%s size=%d KiB\n", p_storage->psz_file, p_storage->i_cmd_max * sizeof(*p_storage->p_cmd) /1024 );
 
-    if( !p_storage->p_cmd )
+    if( !p_storage->p_cmd_buf )
     {
         TsStorageDelete( p_storage );
         return NULL;
@@ -1242,7 +1245,7 @@ error:
 
 static void TsStorageDelete( ts_storage_t *p_storage )
 {
-    while( p_storage->i_cmd_r < p_storage->i_cmd_w )
+    while( p_storage->p_cmd_r < p_storage->p_cmd_w )
     {
         ts_cmd_t cmd;
 
@@ -1250,7 +1253,7 @@ static void TsStorageDelete( ts_storage_t *p_storage )
 
         CmdClean( &cmd );
     }
-    free( p_storage->p_cmd );
+    free( p_storage->p_cmd_buf );
 
     fclose( p_storage->p_filer );
     fclose( p_storage->p_filew );
@@ -1264,30 +1267,37 @@ static void TsStorageDelete( ts_storage_t *p_storage )
 static void TsStoragePack( ts_storage_t *p_storage )
 {
     /* Try to release a bit of memory */
-    if( p_storage->i_cmd_w >= p_storage->i_cmd_max )
+    if( (size_t)(p_storage->p_cmd_w - p_storage->p_cmd_buf) == p_storage->i_cmd_buf )
         return;
 
-    p_storage->i_cmd_max = __MAX( p_storage->i_cmd_w, 1 );
-
-    ts_cmd_t *p_new = realloc( p_storage->p_cmd, p_storage->i_cmd_max * sizeof(*p_storage->p_cmd) );
-    if( p_new )
-        p_storage->p_cmd = p_new;
+    size_t i_realloc = p_storage->p_cmd_w - p_storage->p_cmd_buf;
+    uint8_t *p_realloc = realloc( p_storage->p_cmd_buf, i_realloc );
+    if( p_realloc )
+    {
+        p_storage->p_cmd_r = p_realloc + (p_storage->p_cmd_r - p_storage->p_cmd_buf);
+        p_storage->p_cmd_w = p_realloc + i_realloc;
+        p_storage->i_cmd_buf = i_realloc;
+        p_storage->p_cmd_buf = p_realloc;
+    }
 }
+
 static bool TsStorageIsFull( ts_storage_t *p_storage, const ts_cmd_t *p_cmd )
 {
-    if( p_cmd && p_cmd->i_type == C_SEND && p_storage->i_cmd_w > 0 )
+    if( p_cmd && p_cmd->i_type == C_SEND && p_storage->p_cmd_w )
     {
         size_t i_size = sizeof(*p_cmd->u.send.p_block) + p_cmd->u.send.p_block->i_buffer;
 
         if( p_storage->i_file_size + i_size >= p_storage->i_file_max )
             return true;
     }
-    return p_storage->i_cmd_w >= p_storage->i_cmd_max;
+    return (size_t)(p_storage->p_cmd_w - p_storage->p_cmd_buf) > p_storage->i_cmd_buf - MAX_COMMAND_SIZE;
 }
+
 static bool TsStorageIsEmpty( ts_storage_t *p_storage )
 {
-    return !p_storage || p_storage->i_cmd_r >= p_storage->i_cmd_w;
+    return !p_storage || p_storage->p_cmd_r >= p_storage->p_cmd_w;
 }
+
 static void TsStoragePushCmd( ts_storage_t *p_storage, const ts_cmd_t *p_cmd, bool b_flush )
 {
     ts_cmd_t cmd = *p_cmd;
@@ -1321,13 +1331,18 @@ static void TsStoragePushCmd( ts_storage_t *p_storage, const ts_cmd_t *p_cmd, bo
         if( b_flush )
             fflush( p_storage->p_filew );
     }
-    p_storage->p_cmd[p_storage->i_cmd_w++] = cmd;
+
+    memcpy( p_storage->p_cmd_w, &cmd, sizeof(cmd) );
+    p_storage->p_cmd_w += sizeof(cmd);
 }
+
 static void TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd, bool b_flush )
 {
     assert( !TsStorageIsEmpty( p_storage ) );
 
-    *p_cmd = p_storage->p_cmd[p_storage->i_cmd_r++];
+    memcpy(p_cmd, p_storage->p_cmd_r, sizeof(ts_cmd_t));
+    p_storage->p_cmd_r += sizeof(ts_cmd_t);
+
     if( p_cmd->i_type == C_SEND )
     {
         block_t block;
