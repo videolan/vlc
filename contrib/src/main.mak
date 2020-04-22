@@ -175,12 +175,6 @@ CFLAGS := $(CFLAGS) $(EXTRA_CFLAGS)
 CXXFLAGS := $(CXXFLAGS) $(EXTRA_CFLAGS) $(EXTRA_CXXFLAGS)
 LDFLAGS := $(LDFLAGS) -L$(PREFIX)/lib $(EXTRA_LDFLAGS)
 
-ifndef WITH_OPTIMIZATION
-DBGOPTIMFLAGS = -g -O0
-else
-DBGOPTIMFLAGS = -g -O2
-endif
-
 # Do not export those! Use HOSTVARS.
 
 # Do the FPU detection, after we have figured out our compilers and flags.
