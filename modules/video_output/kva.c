@@ -154,7 +154,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic, vl
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, NULL, NULL,
+    Close, Prepare, Display, Control, NULL, NULL, NULL,
 };
 
 static void PMThread( void *arg )

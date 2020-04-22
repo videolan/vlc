@@ -841,6 +841,34 @@ typedef struct {
     config_chain_t *cfg;
 } vout_filter_t;
 
+static int
+ThreadRequestVoutUpdateFormat(vout_thread_sys_t *sys, const video_format_t *fmt,
+                              vlc_video_context *vctx, video_format_t *target)
+{
+    vout_display_t *vd = sys->display;
+
+    video_format_t vout_fmt;
+    int ret = video_format_Copy(&vout_fmt, fmt);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    vlc_mutex_lock(&sys->display_lock);
+    ret = VoutUpdateFormat(vd, &vout_fmt, vctx);
+    vlc_mutex_unlock(&sys->display_lock);
+
+    if (ret != VLC_SUCCESS)
+    {
+        video_format_Clean(&vout_fmt);
+        return ret;
+    }
+
+    /* Move vout_fmt to *target */
+    video_format_Clean(target);
+    memcpy(target, &vout_fmt, sizeof(*target));
+
+    return ret;
+}
+
 static void ThreadChangeFilters(vout_thread_sys_t *vout)
 {
     vout_thread_sys_t *sys = vout;
@@ -932,13 +960,28 @@ static void ThreadChangeFilters(vout_thread_sys_t *vout)
     }
 
     if (!es_format_IsSimilar(p_fmt_current, &fmt_target)) {
-        msg_Dbg(&vout->obj, "Adding a filter to compensate for format changes");
-        if (filter_chain_AppendConverter(sys->filter.chain_interactive,
-                                         &fmt_target) != 0) {
-            msg_Err(&vout->obj, "Failed to compensate for the format changes, removing all filters");
-            ThreadDelAllFilterCallbacks(vout);
-            filter_chain_Reset(sys->filter.chain_static,      &fmt_target, vctx_target, &fmt_target);
-            filter_chain_Reset(sys->filter.chain_interactive, &fmt_target, vctx_target, &fmt_target);
+        msg_Dbg(&vout->obj, "Changing vout format to %4.4s",
+                            (const char *) &p_fmt_current->video.i_chroma);
+
+        int ret = ThreadRequestVoutUpdateFormat(vout, &p_fmt_current->video,
+                                                vctx_current,
+                                                &fmt_target.video);
+        if (ret == VLC_SUCCESS)
+            fmt_target.i_codec = fmt_target.video.i_chroma;
+        else
+            msg_Dbg(&vout->obj, "Changing vout format to %4.4s failed",
+                                (const char *) &p_fmt_current->video.i_chroma);
+
+        if (!es_format_IsSimilar(p_fmt_current, &fmt_target))
+        {
+            msg_Dbg(&vout->obj, "Adding a filter to compensate for format changes");
+            if (filter_chain_AppendConverter(sys->filter.chain_interactive,
+                                             &fmt_target) != 0) {
+                msg_Err(&vout->obj, "Failed to compensate for the format changes, removing all filters");
+                ThreadDelAllFilterCallbacks(vout);
+                filter_chain_Reset(sys->filter.chain_static,      &fmt_target, vctx_target, &fmt_target);
+                filter_chain_Reset(sys->filter.chain_interactive, &fmt_target, vctx_target, &fmt_target);
+            }
         }
     }
 

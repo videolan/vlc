@@ -161,7 +161,7 @@ static void ClearScreen(vout_display_sys_t *sys)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, NULL, Display, Control, NULL, NULL,
+    Close, NULL, Display, Control, NULL, NULL, NULL,
 };
 
 /**

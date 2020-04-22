@@ -310,6 +310,17 @@ struct vlc_display_operations
      * \param vp viewpoint to use on the next render
      */
     int        (*set_viewpoint)(vout_display_t *, const vlc_viewpoint_t *vp);
+
+    /**
+     * Notifies a change in the input format.
+     *
+     * \param fmt the requested input format, could be modified by the display
+     *            module to report the actual format
+     * \param ctx the video context
+     * \return VLC_SUCCESS on success, another value on error
+     */
+    int (*update_format)(vout_display_t *, video_format_t *fmt,
+                         vlc_video_context *ctx);
 };
 
 struct vout_display_t {

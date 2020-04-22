@@ -77,7 +77,7 @@ static void Close(vout_display_t *);
 static void UpdateParams(vout_display_t *);
 
 static const struct vlc_display_operations ops = {
-    Close, PictureRender, PictureDisplay, Control, NULL, NULL,
+    Close, PictureRender, PictureDisplay, Control, NULL, NULL, NULL,
 };
 
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,

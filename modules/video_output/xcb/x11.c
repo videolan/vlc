@@ -251,7 +251,7 @@ static xcb_visualid_t ScreenToFormat(const xcb_setup_t *setup,
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, ResetPictures, NULL,
+    Close, Prepare, Display, Control, ResetPictures, NULL, NULL,
 };
 
 /**

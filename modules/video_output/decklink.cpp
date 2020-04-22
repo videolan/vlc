@@ -762,7 +762,7 @@ static int ControlVideo(vout_display_t *vd, int query)
 }
 
 static const struct vlc_display_operations ops = {
-    CloseVideo, PrepareVideo, NULL, ControlVideo, NULL, NULL,
+    CloseVideo, PrepareVideo, NULL, ControlVideo, NULL, NULL, NULL,
 };
 
 static int OpenVideo(vout_display_t *vd, const vout_display_cfg_t *cfg,

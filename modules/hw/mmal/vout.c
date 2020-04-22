@@ -1085,7 +1085,7 @@ static int find_display_num(const char * name)
 }
 
 static const struct vlc_display_operations ops = {
-    CloseMmalVout, vd_prepare, vd_display, vd_control, vd_reset_pictures, NULL,
+    CloseMmalVout, vd_prepare, vd_display, vd_control, vd_reset_pictures, NULL, NULL,
 };
 
 static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,

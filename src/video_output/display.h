@@ -24,3 +24,5 @@
 
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *, const vlc_rational_t *forced_dar);
 void VoutFixFormatAR(video_format_t *);
+int VoutUpdateFormat(vout_display_t *vd, video_format_t *fmt,
+                     vlc_video_context *ctx);
