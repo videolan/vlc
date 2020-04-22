@@ -92,8 +92,10 @@ typedef struct attribute_packed
 {
     ts_cmd_header_t header;
     es_out_id_t *p_es;
-    block_t *p_block;
-    int     i_offset;  /* We do not use file > INT_MAX */
+    union{
+        block_t *p_block;
+        int     i_offset;  /* We do not use file > INT_MAX */
+    };
 } ts_cmd_send_t;
 
 typedef struct attribute_packed
