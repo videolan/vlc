@@ -639,6 +639,30 @@ void vout_SetDisplayIccProfile(vout_display_t *vd,
         vd->ops->set_icc_profile(vd, profile);
 }
 
+int vout_SetDisplayFormat(vout_display_t *vd, const video_format_t *fmt,
+                          vlc_video_context *vctx)
+{
+    if (!vd->ops->update_format)
+        return VLC_EGENERIC;
+
+    int ret = vd->ops->update_format(vd, fmt, vctx);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+
+    /* Update source format */
+    assert(!fmt->p_palette);
+    video_format_Clean(&osys->source);
+    osys->source = *fmt;
+
+    /* On update_format success, the vout display accepts the target format, so
+     * no display converters are needed. */
+    filter_chain_Clear(osys->converters);
+
+    return VLC_SUCCESS;
+}
+
 vout_display_t *vout_display_New(vlc_object_t *parent,
                                  const video_format_t *source,
                                  vlc_video_context *vctx,
