@@ -320,6 +320,18 @@ struct vlc_display_operations
      * \param prof new ICC profile associated with display, or NULL for none
      */
     void       (*set_icc_profile)(vout_display_t *, const vlc_icc_profile_t *prof);
+
+    /**
+     * Notifies a change in the input format.
+     *
+     * The format size is not expected to change.
+     *
+     * \param fmt the requested input format
+     * \param ctx the video context
+     * \return VLC_SUCCESS on success, another value on error
+     */
+    int (*update_format)(vout_display_t *, const video_format_t *fmt,
+                         vlc_video_context *ctx);
 };
 
 struct vout_display_t {

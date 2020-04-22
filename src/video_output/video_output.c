@@ -869,13 +869,24 @@ static void ChangeFilters(vout_thread_sys_t *vout)
     }
 
     if (!es_format_IsSimilar(p_fmt_current, &fmt_target)) {
-        msg_Dbg(&vout->obj, "Adding a filter to compensate for format changes");
-        if (filter_chain_AppendConverter(sys->filter.chain_interactive,
-                                         &fmt_target) != 0) {
-            msg_Err(&vout->obj, "Failed to compensate for the format changes, removing all filters");
-            DelAllFilterCallbacks(vout);
-            filter_chain_Reset(sys->filter.chain_static,      &fmt_target, vctx_target, &fmt_target);
-            filter_chain_Reset(sys->filter.chain_interactive, &fmt_target, vctx_target, &fmt_target);
+        msg_Dbg(&vout->obj, "Changing vout format to %4.4s",
+                            (const char *) &p_fmt_current->video.i_chroma);
+
+        int ret = vout_SetDisplayFormat(sys->display, &p_fmt_current->video,
+                                        vctx_current);
+        if (ret != VLC_SUCCESS)
+        {
+            msg_Dbg(&vout->obj, "Changing vout format to %4.4s failed",
+                                (const char *) &p_fmt_current->video.i_chroma);
+
+            msg_Dbg(&vout->obj, "Adding a filter to compensate for format changes");
+            if (filter_chain_AppendConverter(sys->filter.chain_interactive,
+                                             &fmt_target) != 0) {
+                msg_Err(&vout->obj, "Failed to compensate for the format changes, removing all filters");
+                DelAllFilterCallbacks(vout);
+                filter_chain_Reset(sys->filter.chain_static,      &fmt_target, vctx_target, &fmt_target);
+                filter_chain_Reset(sys->filter.chain_interactive, &fmt_target, vctx_target, &fmt_target);
+            }
         }
     }
 
