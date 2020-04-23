@@ -101,6 +101,23 @@ libvlc_int_t * libvlc_InternalCreate( void )
     return p_libvlc;
 }
 
+static void libvlc_AddInterfaces(libvlc_int_t *libvlc, const char *varname)
+{
+    char *str = var_InheritString(libvlc, varname);
+    if (str == NULL)
+        return;
+
+    char *state;
+    char *intf = strtok_r(str, ":", &state);
+
+    while (intf != NULL) {
+        libvlc_InternalAddIntf(libvlc, intf);
+        intf = strtok_r(NULL, ":", &state);
+    }
+
+    free(str);
+}
+
 /**
  * Initialize a libvlc instance
  * This function initializes a previously allocated libvlc instance:
@@ -113,9 +130,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                          const char *ppsz_argv[] )
 {
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
-    char *       psz_modules = NULL;
     char *       psz_parser = NULL;
-    char *       psz_control = NULL;
     char        *psz_val;
     int          i_ret = VLC_EGENERIC;
 
@@ -262,39 +277,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Load background interfaces
      */
-    psz_modules = var_InheritString( p_libvlc, "extraintf" );
-    psz_control = var_InheritString( p_libvlc, "control" );
-
-    if( psz_modules && psz_control )
-    {
-        char* psz_tmp;
-        if( asprintf( &psz_tmp, "%s:%s", psz_modules, psz_control ) != -1 )
-        {
-            free( psz_modules );
-            psz_modules = psz_tmp;
-        }
-    }
-    else if( psz_control )
-    {
-        free( psz_modules );
-        psz_modules = strdup( psz_control );
-    }
-
-    psz_parser = psz_modules;
-    while ( psz_parser && *psz_parser )
-    {
-        char *psz_module;
-        psz_module = psz_parser;
-        psz_parser = strchr( psz_module, ':' );
-        if ( psz_parser )
-        {
-            *psz_parser = '\0';
-            psz_parser++;
-        }
-        libvlc_InternalAddIntf( p_libvlc, psz_module );
-    }
-    free( psz_modules );
-    free( psz_control );
+    libvlc_AddInterfaces(p_libvlc, "extraintf");
+    libvlc_AddInterfaces(p_libvlc, "control");
 
     if( var_InheritBool( p_libvlc, "network-synchronisation") )
         libvlc_InternalAddIntf( p_libvlc, "netsync,none" );
