@@ -17,6 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#ifndef VLC_DEMUX_COREAUDIO_H
+#define VLC_DEMUX_COREAUDIO_H
 #include <vlc_aout.h>
 
 struct CoreAudio_layout_s
@@ -44,20 +46,29 @@ enum
     CoreAudio_Bitmap_RIGHT                = (1<<1),
     CoreAudio_Bitmap_CENTER               = (1<<2),
     CoreAudio_Bitmap_LFESCREEN            = (1<<3),
-    CoreAudio_Bitmap_BACKLEFT             = (1<<4),
-    CoreAudio_Bitmap_BACKRIGHT            = (1<<5),
+    CoreAudio_Bitmap_LEFTSURROUND         = (1<<4),
+    CoreAudio_Bitmap_RIGHTSURROUND        = (1<<5),
     CoreAudio_Bitmap_LEFTCENTER           = (1<<6),
     CoreAudio_Bitmap_RIGHTCENTER          = (1<<7),
-    CoreAudio_Bitmap_BACKCENTER           = (1<<8),
-    CoreAudio_Bitmap_SIDELEFT             = (1<<9),
-    CoreAudio_Bitmap_SIDERIGHT            = (1<<10),
-    CoreAudio_Bitmap_TOPCENTER            = (1<<11),
-    CoreAudio_Bitmap_TOPFRONTLEFT         = (1<<12),
-    CoreAudio_Bitmap_TOPFRONTENTER        = (1<<13),
-    CoreAudio_Bitmap_TOPFRONTRIGHT        = (1<<14),
+    CoreAudio_Bitmap_CENTERSURROUND       = (1<<8),
+    CoreAudio_Bitmap_LEFTSURROUNDDIRECT   = (1<<9),
+    CoreAudio_Bitmap_RIGHTSURROUNDDIRECT  = (1<<10),
+    CoreAudio_Bitmap_TOPCENTERSURROUND    = (1<<11),
+    CoreAudio_Bitmap_VHEIGHTLEFT          = (1<<12),
+    CoreAudio_Bitmap_VHEIGHTCENTER        = (1<<13),
+    CoreAudio_Bitmap_VHEIGHTRIGHT         = (1<<14),
     CoreAudio_Bitmap_TOPBACKLEFT          = (1<<15),
     CoreAudio_Bitmap_TOPBACKCENTER        = (1<<16),
     CoreAudio_Bitmap_TOPBACKRIGHT         = (1<<17),
+    CoreAudio_Bitmap_LEFTTOPFRONT         = CoreAudio_Bitmap_VHEIGHTLEFT,
+    CoreAudio_Bitmap_CENTERTOPFRONT       = CoreAudio_Bitmap_VHEIGHTCENTER,
+    CoreAudio_Bitmap_RIGHTTOPFRONT        = CoreAudio_Bitmap_VHEIGHTRIGHT,
+    CoreAudio_Bitmap_LEFTTOPMIDDLE        = (1<<21),
+    CoreAudio_Bitmap_CENTERTOPMIDDLE      = CoreAudio_Bitmap_TOPCENTERSURROUND,
+    CoreAudio_Bitmap_RIGHTTOPMIDDLE       = (1<<23),
+    CoreAudio_Bitmap_LEFTTOPREAR          = (1<<24),
+    CoreAudio_Bitmap_CENTERTOPREAR        = (1<<25),
+    CoreAudio_Bitmap_RIGHTTOPREAR         = (1<<26),
 };
 
 static const uint32_t pi_vlc_chan_order_CoreAudio[] =
@@ -79,20 +90,29 @@ static const struct
     { CoreAudio_Bitmap_RIGHT,        AOUT_CHAN_RIGHT },
     { CoreAudio_Bitmap_CENTER,       AOUT_CHAN_CENTER },
     { CoreAudio_Bitmap_LFESCREEN,    AOUT_CHAN_LFE },
-    { CoreAudio_Bitmap_BACKLEFT,     AOUT_CHAN_REARLEFT },
-    { CoreAudio_Bitmap_BACKRIGHT,    AOUT_CHAN_REARRIGHT },
+    { CoreAudio_Bitmap_LEFTSURROUND,     AOUT_CHAN_REARLEFT },
+    { CoreAudio_Bitmap_RIGHTSURROUND,    AOUT_CHAN_REARRIGHT },
     { CoreAudio_Bitmap_LEFTCENTER,   AOUT_CHAN_LEFT },
     { CoreAudio_Bitmap_RIGHTCENTER,  AOUT_CHAN_RIGHT },
-    { CoreAudio_Bitmap_BACKCENTER,   AOUT_CHAN_REARCENTER },
-    { CoreAudio_Bitmap_SIDELEFT,     AOUT_CHAN_MIDDLELEFT },
-    { CoreAudio_Bitmap_SIDERIGHT,    AOUT_CHAN_MIDDLERIGHT },
-    { CoreAudio_Bitmap_TOPCENTER,    0 },
-    { CoreAudio_Bitmap_TOPFRONTLEFT, 0 },
-    { CoreAudio_Bitmap_TOPFRONTENTER,0 },
-    { CoreAudio_Bitmap_TOPFRONTRIGHT,0 },
+    { CoreAudio_Bitmap_CENTERSURROUND,   AOUT_CHAN_REARCENTER },
+    { CoreAudio_Bitmap_LEFTSURROUNDDIRECT,     AOUT_CHAN_MIDDLELEFT },
+    { CoreAudio_Bitmap_RIGHTSURROUNDDIRECT,    AOUT_CHAN_MIDDLERIGHT },
+    { CoreAudio_Bitmap_TOPCENTERSURROUND,    0 },
+    { CoreAudio_Bitmap_VHEIGHTLEFT, 0 },
+    { CoreAudio_Bitmap_VHEIGHTCENTER,0 },
+    { CoreAudio_Bitmap_VHEIGHTRIGHT,0 },
     { CoreAudio_Bitmap_TOPBACKLEFT,  0 },
     { CoreAudio_Bitmap_TOPBACKCENTER,0 },
     { CoreAudio_Bitmap_TOPBACKRIGHT, 0 },
+    // CoreAudio_Bitmap_LEFTTOPFRONT
+    // CoreAudio_Bitmap_CENTERTOPFRONT
+    // CoreAudio_Bitmap_RIGHTTOPFRONT
+    { CoreAudio_Bitmap_LEFTTOPMIDDLE, 0 },
+    // CoreAudio_Bitmap_CENTERTOPMIDDLE
+    { CoreAudio_Bitmap_RIGHTTOPMIDDLE, 0 },
+    { CoreAudio_Bitmap_LEFTTOPREAR, 0 },
+    { CoreAudio_Bitmap_CENTERTOPREAR, 0 },
+    { CoreAudio_Bitmap_RIGHTTOPREAR, 0 },
 };
 
 enum CoreAudio_Layout
@@ -238,6 +258,24 @@ enum CoreAudio_Layout
     CoreAudio_Layout_DTS_8_1_B          = (181<<16) | 9,// Lc C Rc L R Ls Cs Rs LFE
     CoreAudio_Layout_DTS_6_1_D          = (182<<16) | 7,// C L R Ls Rs LFE Cs
 
+    CoreAudio_Layout_WAVE_2_1           = CoreAudio_Layout_DVD_4,
+    CoreAudio_Layout_WAVE_3_0           = CoreAudio_Layout_MPEG_3_0_A,
+    CoreAudio_Layout_WAVE_4_0_A         = CoreAudio_Layout_ITU_2_2,
+    CoreAudio_Layout_WAVE_4_0_B         = (185<<16) | 4,// L R Ls Rs
+    CoreAudio_Layout_WAVE_5_0_A         = CoreAudio_Layout_MPEG_5_0_A,
+    CoreAudio_Layout_WAVE_5_0_B         = (186<<16) | 5,// L R C Ls Rs
+    CoreAudio_Layout_WAVE_5_1_A         = CoreAudio_Layout_MPEG_5_1_A,
+    CoreAudio_Layout_WAVE_5_1_B         = (187<<16) | 6,// L R C LFE Ls Rs
+    CoreAudio_Layout_WAVE_6_1           = (188<<16) | 7,// L R C LFE Cs Ls Rs
+    CoreAudio_Layout_WAVE_7_1           = (189<<16) | 8,// L R C LFE Rls Rrs Ls Rs
+
+    CoreAudio_Layout_HOA_ACN_SN3D       = (190<<16) | 0,// Ambisonics SN3D
+    CoreAudio_Layout_HOA_ACN_N3D        = (191<<16) | 0,// Ambisonics N3D
+
+    CoreAudio_Layout_Atmos_7_1_4        = (192<<16) | 12, // L R C LFE Ls Rs Rls Rrs Vhl VHr Ltr Rtr
+    CoreAudio_Layout_Atmos_9_1_6        = (193<<16) | 16, // L R C LFE Ls Rs Rls Rrs Lw Rw Vhl VHr Ltm Rtm Ltr Rtr
+    CoreAudio_Layout_Atmos_5_1_2        = (194<<16) | 8,  // L R C LFE Ls Rs Ltm Rtm
+
     CoreAudio_Layout_DiscreteInOrder    = (147<<16) | 0,
     CoreAudio_Layout_Unknown            = 0xFFFF0000
 };
@@ -318,7 +356,17 @@ static const uint32_t pi_vlc_chan_order_DTS_C[] = {
     0
 };
 
-static const struct
+static const uint32_t pi_vlc_chan_order_Atmos[] = {
+    AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,
+    AOUT_CHAN_LFE,
+    AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+    /* Lw, Rw, VHl, VHr */
+    AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
+    /* Ltr, Rtr */
+    0
+};
+
+static const struct CoreAudioTableEntry
 {
     enum CoreAudio_Layout layout;
     const uint32_t *p_chans_order;
@@ -415,6 +463,24 @@ static const struct
     //{ CoreAudio_Layout_DTS_8_1_A
     //{ CoreAudio_Layout_DTS_8_1_B          = (181<<16) | 9,// Lc C Rc L R Ls Cs Rs LFE
     //{ CoreAudio_Layout_DTS_6_1_D          = (182<<16) | 7,// C L R Ls Rs LFE Cs
+
+    // { CoreAudio_Layout_WAVE_2_1           = CoreAudio_Layout_DVD_4,
+    // { CoreAudio_Layout_WAVE_3_0           = CoreAudio_Layout_MPEG_3_0_A,
+    // { CoreAudio_Layout_WAVE_4_0_A         = CoreAudio_Layout_ITU_2_2,
+    { CoreAudio_Layout_WAVE_4_0_B,                pi_vlc_chan_order_B, AOUT_CHANS_FRONT | AOUT_CHANS_MIDDLE },
+    // { CoreAudio_Layout_WAVE_5_0_A         = CoreAudio_Layout_MPEG_5_0_A,
+    { CoreAudio_Layout_WAVE_5_0_B,                pi_vlc_chan_order_B, AOUT_CHANS_FRONT | AOUT_CHAN_CENTER | AOUT_CHANS_MIDDLE },
+    // { CoreAudio_Layout_WAVE_5_1_A         = CoreAudio_Layout_MPEG_5_1_A,
+    { CoreAudio_Layout_WAVE_5_1_B,                pi_vlc_chan_order_B, AOUT_CHANS_FRONT | AOUT_CHAN_CENTER | AOUT_CHAN_LFE | AOUT_CHANS_MIDDLE  },
+    //{ CoreAudio_Layout_WAVE_6_1,          pi_vlc_chan_order_CoreAudio, 0 },// L R C LFE Cs Ls Rs
+    { CoreAudio_Layout_WAVE_7_1,          pi_vlc_chan_order_CoreAudio, AOUT_CHANS_7_0 | AOUT_CHAN_LFE },
+
+    // { CoreAudio_Layout_HOA_ACN_SN3D       = (190<<16) | 0,// Ambisonics SN3D
+    // { CoreAudio_Layout_HOA_ACN_N3D        = (191<<16) | 0,// Ambisonics N3D
+
+    // { CoreAudio_Layout_Atmos_7_1_4        = (192<<16) | 12, // L R C LFE Ls Rs Rls Rrs Vhl VHr Ltr Rtr
+    // { CoreAudio_Layout_Atmos_9_1_6        = (193<<16) | 16, // L R C LFE Ls Rs Rls Rrs Lw Rw Vhl VHr Ltm Rtm Ltr Rtr
+    { CoreAudio_Layout_Atmos_5_1_2,           pi_vlc_chan_order_Atmos,  AOUT_CHANS_7_1 }, // L R C LFE Ls Rs Ltm Rtm
 };
 
 static inline int CoreAudio_Layout_to_vlc( const struct CoreAudio_layout_s *c,
@@ -437,3 +503,4 @@ static inline int CoreAudio_Layout_to_vlc( const struct CoreAudio_layout_s *c,
     }
     return VLC_SUCCESS;
 }
+#endif
