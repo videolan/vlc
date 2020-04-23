@@ -29,6 +29,8 @@ ifeq ($(ARCH),mips64el)
 	$(APPLY) $(SRC)/gcrypt/clang-mips64.patch
 endif
 endif
+	# Ensure we can compile the assembly code in cipher, for armv7 ios builds
+	$(APPLY) $(SRC)/gcrypt/0001-cipher-Makefile.am-force-tag-CC-for-.S-files.patch
 	$(MOVE)
 
 DEPS_gcrypt = gpg-error

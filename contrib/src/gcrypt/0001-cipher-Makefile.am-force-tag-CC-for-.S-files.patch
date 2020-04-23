@@ -1,0 +1,29 @@
+From e09d5f889ce7c00e9ebe6ef0173aa7a27b975646 Mon Sep 17 00:00:00 2001
+From: Alexandre Janniaux <ajanni@videolabs.io>
+Date: Fri, 24 Apr 2020 10:26:25 +0200
+Subject: [PATCH] cipher: Makefile.am: force --tag=CC for .S files
+
+When building the library for armv7 on iOS, the following error prevents
+the success of the compilation:
+
+libtool: compile: unable to infer tagged configuration
+libtool:   error: specify a tag with '--tag'
+---
+ cipher/Makefile.am | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/cipher/Makefile.am b/cipher/Makefile.am
+index ac0ec58e..a2cb409c 100644
+--- a/cipher/Makefile.am
++++ b/cipher/Makefile.am
+@@ -125,3 +125,8 @@ tiger.o: $(srcdir)/tiger.c
+
+ tiger.lo: $(srcdir)/tiger.c
+ 	`echo $(LTCOMPILE) -c $(srcdir)/tiger.c | $(o_flag_munging) `
++
++SUFFIXES = .S
++
++.S.lo:
++	$(LIBTOOL) --mode compile --tag=CC $(CC) $(CFLAGS) $(CPPFLAGS) -c -I ../ "$<" -o "$@"
+--
+2.26.1
