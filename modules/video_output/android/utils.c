@@ -57,20 +57,6 @@ struct AWindowHandler
     } stex;
 };
 
-struct SurfaceTexture
-{
-    JavaVM *p_jvm;
-
-    void *p_anw_dl;
-    ptr_ANativeWindow_fromSurface pf_winFromSurface;
-    ptr_ANativeWindow_release pf_winRelease;
-
-    jobject thiz;
-    jobject jsurface;
-    ANativeWindow *p_anw;
-
-};
-
 static struct
 {
     struct {
