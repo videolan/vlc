@@ -62,6 +62,22 @@ struct vout_display_opengl_t {
 
     struct vlc_gl_interop *sub_interop;
     struct vlc_gl_sub_renderer *sub_renderer;
+
+    /*
+     * Some states are applied on subcomponents (like the renderer). When these
+     * components are recreated, the state must be re-applied on the new
+     * instance.
+     */
+    struct {
+        vlc_viewpoint_t viewpoint;
+        float window_aspect_ratio;
+        struct {
+            int x;
+            int y;
+            unsigned width;
+            unsigned height;
+        } viewport;
+    } memory;
 };
 
 static const vlc_fourcc_t gl_subpicture_chromas[] = {
@@ -241,18 +257,24 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
                                      const vlc_viewpoint_t *p_vp)
 {
+    vgl->memory.viewpoint = *p_vp;
     return vlc_gl_renderer_SetViewpoint(vgl->renderer, p_vp);
 }
 
 void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
                                               float f_sar)
 {
+    vgl->memory.window_aspect_ratio = f_sar;
     vlc_gl_renderer_SetWindowAspectRatio(vgl->renderer, f_sar);
 }
 
 void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
                                   unsigned width, unsigned height)
 {
+    vgl->memory.viewport.x = x;
+    vgl->memory.viewport.y = y;
+    vgl->memory.viewport.width = width;
+    vgl->memory.viewport.height = height;
     vlc_gl_filters_SetViewport(vgl->filters, x, y, width, height);
 }
 
