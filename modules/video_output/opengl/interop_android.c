@@ -72,7 +72,7 @@ tc_anop_update(const struct vlc_gl_interop *interop, GLuint *textures,
     if (!priv->avctx->render(pic->context))
         return VLC_SUCCESS; /* already rendered */
 
-    if (SurfaceTexture_waitAndUpdateTexImage(priv->awh, &priv->transform_mtx)
+    if (SurfaceTexture_updateTexImage(priv->awh, &priv->transform_mtx)
         != VLC_SUCCESS)
     {
         priv->transform_mtx = NULL;
