@@ -34,6 +34,7 @@
 #include <vlc_common.h>
 
 typedef struct AWindowHandler AWindowHandler;
+typedef struct ASurfaceTexture ASurfaceTexture;
 
 enum AWindow_ID {
     AWindow_Video,

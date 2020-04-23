@@ -30,6 +30,37 @@ typedef ANativeWindow* (*ptr_ANativeWindow_fromSurface)(JNIEnv*, jobject);
 typedef ANativeWindow* (*ptr_ANativeWindow_fromSurfaceTexture)(JNIEnv*, jobject);
 typedef void (*ptr_ANativeWindow_release)(ANativeWindow*);
 
+typedef void (*ptr_ASurfaceTexture_getTransformMatrix)
+                                        (ASurfaceTexture *st, float mtx[16]);
+typedef ASurfaceTexture* (*ptr_ASurfaceTexture_fromSurfaceTexture)
+                                        (JNIEnv* env, jobject surfacetexture);
+typedef ANativeWindow* (*ptr_ASurfaceTexture_acquireANativeWindow)
+                                        (ASurfaceTexture *st);
+typedef jobject (*ptr_ANativeWindow_toSurface)
+                                        (JNIEnv *env, ANativeWindow *window);
+typedef int (*ptr_ASurfaceTexture_attachToGLContext)
+                                        (ASurfaceTexture *st, uint32_t texName);
+typedef int (*ptr_ASurfaceTexture_updateTexImage)(ASurfaceTexture* st);
+typedef int (*ptr_ASurfaceTexture_detachFromGLContext)(ASurfaceTexture *st);
+typedef void (*ptr_ASurfaceTexture_release)(ASurfaceTexture *st);
+
+struct ASurfaceTextureAPI
+{
+    float   transMat[16];
+
+    jobject surfacetexture;
+    ASurfaceTexture *p_ast;
+
+    ptr_ASurfaceTexture_updateTexImage pf_updateTexImage;
+    ptr_ASurfaceTexture_fromSurfaceTexture pf_astFromst;
+    ptr_ASurfaceTexture_attachToGLContext pf_attachToGL;
+    ptr_ASurfaceTexture_detachFromGLContext pf_detachFromGL;
+    ptr_ASurfaceTexture_getTransformMatrix pf_getTransMatrix;
+    ptr_ASurfaceTexture_release pf_releaseAst;
+    ptr_ASurfaceTexture_acquireANativeWindow pf_acquireAnw;
+    ptr_ANativeWindow_toSurface pf_anwToSurface;
+};
+
 struct AWindowHandler
 {
     JavaVM *p_jvm;
@@ -45,6 +76,8 @@ struct AWindowHandler
     ptr_ANativeWindow_fromSurface pf_winFromSurface;
     ptr_ANativeWindow_release pf_winRelease;
     native_window_api_t anw_api;
+
+    struct ASurfaceTextureAPI ndk_ast_api;
 
     struct {
         awh_events_t cb;
@@ -71,6 +104,10 @@ static struct
         jmethodID waitAndUpdateTexImage;
         jmethodID getSurface;
     } AWindow;
+    struct {
+          jclass clazz;
+          jmethodID constructor;
+    } SurfaceTexture;
 } jfields;
 
 /*
@@ -247,11 +284,72 @@ LoadNativeSurfaceAPI(AWindowHandler *p_awh)
 }
 
 /*
+ * Android ASurfaceTexture Android NDK
+ */
+
+static int
+LoadNDKSurfaceTextureAPI(AWindowHandler *p_awh, void *p_library, JNIEnv *p_env)
+{
+    p_awh->ndk_ast_api.pf_astFromst = (ptr_ASurfaceTexture_fromSurfaceTexture)
+        dlsym(p_library, "ASurfaceTexture_fromSurfaceTexture");
+    if (p_awh->ndk_ast_api.pf_astFromst == NULL) return VLC_EGENERIC;
+
+    p_awh->ndk_ast_api.pf_updateTexImage = (ptr_ASurfaceTexture_updateTexImage)
+        dlsym(p_library, "ASurfaceTexture_updateTexImage");
+    if (p_awh->ndk_ast_api.pf_updateTexImage == NULL) return VLC_EGENERIC;
+
+    p_awh->ndk_ast_api.pf_attachToGL = (ptr_ASurfaceTexture_attachToGLContext)
+        dlsym(p_library, "ASurfaceTexture_attachToGLContext");
+    if (p_awh->ndk_ast_api.pf_attachToGL == NULL) return VLC_EGENERIC;
+
+    p_awh->ndk_ast_api.pf_detachFromGL = (ptr_ASurfaceTexture_detachFromGLContext)
+        dlsym(p_library, "ASurfaceTexture_detachFromGLContext");
+    if (p_awh->ndk_ast_api.pf_detachFromGL == NULL) return VLC_EGENERIC;
+
+    p_awh->ndk_ast_api.pf_getTransMatrix = (ptr_ASurfaceTexture_getTransformMatrix)
+        dlsym(p_library, "ASurfaceTexture_getTransformMatrix");
+    if (p_awh->ndk_ast_api.pf_getTransMatrix == NULL) return VLC_EGENERIC;
+
+    p_awh->ndk_ast_api.pf_releaseAst = (ptr_ASurfaceTexture_release)
+        dlsym(p_library, "ASurfaceTexture_release");
+    if (p_awh->ndk_ast_api.pf_releaseAst == NULL) return VLC_EGENERIC;
+
+    p_awh->ndk_ast_api.pf_acquireAnw = (ptr_ASurfaceTexture_acquireANativeWindow)
+        dlsym(p_library, "ASurfaceTexture_acquireANativeWindow");
+    if (p_awh->ndk_ast_api.pf_acquireAnw == NULL) return VLC_EGENERIC;
+
+    p_awh->ndk_ast_api.pf_anwToSurface = (ptr_ANativeWindow_toSurface)
+        dlsym(p_library, "ANativeWindow_toSurface");
+    if (p_awh->ndk_ast_api.pf_anwToSurface == NULL) return VLC_EGENERIC;
+
+    jclass surfacetexture_class = (*p_env)->FindClass(p_env,
+                                            "android/graphics/SurfaceTexture");
+    if (!surfacetexture_class)
+        return VLC_EGENERIC;
+
+    jfields.SurfaceTexture.clazz = (*p_env)->NewGlobalRef(p_env,
+                                                         surfacetexture_class);
+    (*p_env)->DeleteLocalRef(p_env, surfacetexture_class);
+    if (!jfields.SurfaceTexture.clazz)
+        return VLC_EGENERIC;
+
+    jfields.SurfaceTexture.constructor = (*p_env)->GetMethodID(p_env,
+                               jfields.SurfaceTexture.clazz, "<init>", "(Z)V");
+    if (!jfields.SurfaceTexture.constructor)
+    {
+        (*p_env)->DeleteGlobalRef(p_env, jfields.SurfaceTexture.clazz);
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*
  * Android NativeWindow (post android 2.3)
  */
 
 static void
-LoadNativeWindowAPI(AWindowHandler *p_awh)
+LoadNativeWindowAPI(AWindowHandler *p_awh, JNIEnv *p_env)
 {
     void *p_library = dlopen("libandroid.so", RTLD_NOW);
     if (!p_library)
@@ -270,6 +368,7 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
      && p_awh->anw_api.winLock && p_awh->anw_api.unlockAndPost
      && p_awh->anw_api.setBuffersGeometry)
     {
+        LoadNDKSurfaceTextureAPI(p_awh, p_library, p_env);
         p_awh->p_anw_dl = p_library;
     }
     else
@@ -516,7 +615,7 @@ AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
         free(p_awh);
         return NULL;
     }
-    LoadNativeWindowAPI(p_awh);
+    LoadNativeWindowAPI(p_awh, p_env);
 
     p_awh->b_has_video_layout_listener =
         flags & AWINDOW_REGISTER_FLAGS_HAS_VIDEO_LAYOUT_LISTENER;
