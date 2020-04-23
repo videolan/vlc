@@ -283,7 +283,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     psz_parser = psz_modules;
     while ( psz_parser && *psz_parser )
     {
-        char *psz_module, *psz_temp;
+        char *psz_module;
         psz_module = psz_parser;
         psz_parser = strchr( psz_module, ':' );
         if ( psz_parser )
@@ -291,11 +291,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             *psz_parser = '\0';
             psz_parser++;
         }
-        if( asprintf( &psz_temp, "%s,none", psz_module ) != -1)
-        {
-            libvlc_InternalAddIntf( p_libvlc, psz_temp );
-            free( psz_temp );
-        }
+        libvlc_InternalAddIntf( p_libvlc, psz_module );
     }
     free( psz_modules );
     free( psz_control );
