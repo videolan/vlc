@@ -96,6 +96,7 @@ namespace adaptive
                 enum RequestStatus parseReply();
                 std::string readLine();
                 std::string useragent;
+                std::string referer;
 
                 AuthStorage        *authStorage;
                 ConnectionParams    locationparams;

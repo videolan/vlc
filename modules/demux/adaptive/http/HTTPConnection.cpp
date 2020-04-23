@@ -29,6 +29,7 @@
 
 #include <cstdio>
 #include <sstream>
+#include <algorithm>
 #include <vlc_stream.h>
 
 using namespace adaptive::http;
@@ -73,9 +74,11 @@ HTTPConnection::HTTPConnection(vlc_object_t *p_object_, AuthStorage *auth,
     char *psz_useragent = var_InheritString(p_object_, "http-user-agent");
     useragent = psz_useragent ? std::string(psz_useragent) : std::string("");
     free(psz_useragent);
-    for(std::string::iterator it = useragent.begin(); it != useragent.end(); ++it)
-        if(!std::isprint(*it))
-            *it = ' ';
+    char *psz_referer = var_InheritString(p_object_, "http-referrer");
+    referer = psz_referer ? std::string(psz_referer) : std::string("");
+    free(psz_referer);
+    std::replace_if(useragent.begin(), useragent.end(), [](const char &c){return !::isprint(c);}, ' ');
+    std::replace_if(referer.begin(), referer.end(), [](const char &c){return !::isprint(c);}, ' ');
     queryOk = false;
     retries = 0;
     authStorage = auth;
@@ -443,8 +446,11 @@ std::string HTTPConnection::buildRequestHeader(const std::string &path) const
         if(!cookie.empty())
             req << "Cookie: " << cookie << "\r\n";
     }
-    req << "Cache-Control: no-cache" << "\r\n" <<
-           "User-Agent: " << useragent << "\r\n";
+    req << "Cache-Control: no-cache" << "\r\n";
+    if(!useragent.empty())
+        req << "User-Agent: " << useragent << "\r\n";
+    if(!referer.empty())
+        req << "Referer: " << referer << "\r\n";
     req << extraRequestHeaders();
     return req.str();
 }
