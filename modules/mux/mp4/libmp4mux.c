@@ -1106,12 +1106,14 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 {
     VLC_UNUSED(p_obj);
 
-    bool b_descr = true;
+    bool b_descr = false;
     const vlc_fourcc_t codec = p_track->fmt.i_codec;
     const audio_format_t *afmt = &p_track->fmt.audio;
     char fcc[4];
     bo_t *specificbox = NULL;
     uint16_t i_qt_version = 1;
+    uint16_t i_compression_id = -2;
+    uint32_t i_uncompressed_bps = 0;
     bo_t *srat = NULL;
 
     /* codec specific extradata */
@@ -1128,20 +1130,38 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         case VLC_CODEC_A52:
             memcpy(fcc, "ac-3", 4);
             if(i_extradata >= 3)
+            {
                 specificbox = GetxxxxTag(p_extradata, i_extradata, "dac3");
+                if(b_mov)
+                    specificbox = GetWaveTag(fcc, &specificbox, 1);
+            }
             break;
         case VLC_CODEC_AMR_NB:
+            memcpy(fcc, "samr", 4);
             specificbox = GetDamrTag(&p_track->fmt);
+            if(b_mov)
+                specificbox = GetWaveTag(fcc, &specificbox, 1);
             break;
         case VLC_CODEC_DTS:
-            memcpy(fcc, "DTS ", 4);
+            if(b_mov)
+            {
+                memcpy(fcc, "dtsc", 4);
+            } else {
+                memcpy(fcc, "mp4a", 4);
+                b_descr = true;
+            }
             break;
         case VLC_CODEC_EAC3:
             memcpy(fcc, "ec-3", 4);
             if(i_extradata >= 5)
+            {
                 specificbox = GetxxxxTag(p_extradata, i_extradata, "dec3");
+                if(b_mov)
+                    specificbox = GetWaveTag(fcc, &specificbox, 1);
+            }
             break;
         case VLC_CODEC_MP4A:
+            memcpy(fcc, "mp4a", 4);
             if(b_mov)
             {
                 bo_t *extraboxes[2] = {NULL};
@@ -1150,17 +1170,18 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
                     bo_add_32be(extraboxes[0], 0);
                 extraboxes[1] = GetESDS(p_track);
                 specificbox = GetWaveTag("mp4a", extraboxes, 2);
-                b_descr = false;
-            }
+            } else b_descr = true;
             break;
         case VLC_CODEC_MPGA:
         case VLC_CODEC_MP3:
             if (b_mov) {
-                b_descr = false; /* mpeg audio in mov */
+                /* mpeg audio in mov */
                 memcpy(fcc, ".mp3", 4);
                 i_qt_version = 0;
-            } else
+            } else {
                 memcpy(fcc, "mp4a", 4);
+                b_descr = true;
+            }
             break;
         case VLC_CODEC_WMAP:
             memcpy(fcc, "wma ", 4);
@@ -1168,6 +1189,9 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
             break;
         default:
             vlc_fourcc_to_char(codec, fcc);
+            i_uncompressed_bps = aout_BitsPerSample(codec);
+            if(i_uncompressed_bps > 0 && i_uncompressed_bps <= 16)
+                i_qt_version = 0;
             break;
     }
 
@@ -1188,15 +1212,15 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     else
         bo_add_16be(soun, 2);
     // sample size
-    /*if(i_qt_version == 0 && raw/twos)
-        bo_add_16be(soun, 8..16);
-    else */
-    bo_add_16be(soun, 16);
+    if(i_qt_version == 0 && i_uncompressed_bps == 8)
+        bo_add_16be(soun, 8);
+    else
+        bo_add_16be(soun, 16);
     // compression id
-    if(i_qt_version == 0)
+    if(!b_mov)
         bo_add_16be(soun, 0);
     else
-        bo_add_16be(soun, -2);
+        bo_add_16be(soun, i_compression_id);
     bo_add_16be(soun, 0);         // packet size (0)
 
     if(!b_mov && i_qt_version > 0 &&
@@ -1214,10 +1238,13 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     /* Extended data for SoundDescription V1 */
     if (i_qt_version == 1)
     {
+        const uint32_t i_samples_per_packet = (i_uncompressed_bps && i_uncompressed_bps < 16)
+                                            ? 1
+                                            : afmt->i_frame_length;
         const uint32_t i_bytes_per_packet = afmt->i_channels
                                           ? afmt->i_frame_length / afmt->i_channels
                                           : 0;
-        bo_add_32be(soun, afmt->i_frame_length); /* samples per packet */
+        bo_add_32be(soun, i_samples_per_packet);
         bo_add_32be(soun, i_bytes_per_packet);
         bo_add_32be(soun, p_track->fmt.audio.i_bytes_per_frame); /* bytes per frame */
         bo_add_32be(soun, 2); /* bytes per sample */
