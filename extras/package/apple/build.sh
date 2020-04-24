@@ -106,6 +106,7 @@ VLC_HOST_LD="$(xcrun --find ld)"
 VLC_HOST_AR="$(xcrun --find ar)"
 VLC_HOST_STRIP="$(xcrun --find strip)"
 VLC_HOST_RANLIB="$(xcrun --find ranlib)"
+VLC_HOST_NM="$(xcrun --find nm)"
 
 ##########################################################
 #                    Helper functions                    #
@@ -321,6 +322,7 @@ hostenv()
     AR="${VLC_HOST_AR}" \
     STRIP="${VLC_HOST_STRIP}" \
     RANLIB="${VLC_HOST_RANLIB}" \
+    NM="${VLC_HOST_NM}" \
     "$@"
 }
 
@@ -363,6 +365,7 @@ write_config_mak()
     printf '%s := %s\n' "AR" "${VLC_HOST_AR}" >&3
     printf '%s := %s\n' "STRIP" "${VLC_HOST_STRIP}" >&3
     printf '%s := %s\n' "RANLIB" "${VLC_HOST_RANLIB}" >&3
+    printf '%s := %s\n' "NM" "${VLC_HOST_NM}" >&3
 }
 
 # Generate the source file with the needed array for
@@ -702,7 +705,7 @@ VLC_PLUGINS_SYMBOL_LIST=()
 # Find all static plugins in build dir
 while IFS=  read -r -d $'\0' plugin_path; do
     # Get module entry point symbol name (_vlc_entry__MODULEFULLNAME)
-    nm_symbol_output=( $(nm "$plugin_path" | grep _vlc_entry__) ) \
+    nm_symbol_output=( $(${VLC_HOST_NM} "$plugin_path" | grep _vlc_entry__) ) \
       || abort_err "Failed to find module entry function in '$plugin_path'"
 
     symbol_name="${nm_symbol_output[2]:1}"
