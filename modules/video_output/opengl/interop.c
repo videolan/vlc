@@ -34,14 +34,6 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
                    vlc_video_context *context, const video_format_t *fmt,
                    bool subpics)
 {
-    const char *glexts = (const char *) api->vt.GetString(GL_EXTENSIONS);
-    assert(glexts);
-    if (!glexts)
-    {
-        msg_Err(gl, "glGetString returned NULL");
-        return NULL;
-    }
-
     struct vlc_gl_interop *interop = vlc_object_create(gl, sizeof(*interop));
     if (!interop)
         return NULL;
