@@ -199,7 +199,7 @@ case "${host_os}" in
     AX_APPEND_FLAG([-Wl,-headerpad_max_install_names], [LDFLAGS])
 
     VLC_ADD_LIBS([libvlc vlc],[-Wl,-undefined,dynamic_lookup,-framework,AppKit])
-    VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation,-framework,CoreServices])
+    VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreFoundation])
 
     AC_EGREP_CPP(yes,
             [#import <TargetConditionals.h>
@@ -219,6 +219,8 @@ case "${host_os}" in
              HAVE_OSX="0"
              ac_cv_func_fork=no
              ],)
+
+    AS_IF([test "${HAVE_OSX}" = "1"],[VLC_ADD_LIBS([libvlccore],[-Wl,-framework,CoreServices])])
 
     dnl
     dnl  Handle Mac OS X SDK flags
