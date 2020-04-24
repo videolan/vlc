@@ -270,6 +270,51 @@ free_vgl:
     return NULL;
 }
 
+int vout_display_opengl_UpdateFormat(vout_display_opengl_t *vgl,
+                                     video_format_t *fmt,
+                                     vlc_video_context *ctx)
+{
+    /* If the format can't be changed, the state must stay valid to accept the
+     * initial format. */
+
+    vlc_gl_t *gl = vgl->gl;
+    const struct vlc_gl_api *api = &vgl->api;
+
+    struct vlc_gl_interop *interop = CreateInterop(gl, api, ctx, fmt);
+    if (!interop)
+        return VLC_EGENERIC;
+
+    struct vlc_gl_renderer *renderer;
+    struct vlc_gl_filters *filters = CreateFilters(gl, api, interop, &renderer);
+    if (!filters)
+    {
+        vlc_gl_interop_Delete(interop);
+        return VLC_EGENERIC;
+    }
+
+    /* re-assign the state to the new filters and renderer instances */
+    vlc_gl_filters_SetViewport(filters, vgl->memory.viewport.x,
+                                        vgl->memory.viewport.y,
+                                        vgl->memory.viewport.width,
+                                        vgl->memory.viewport.height);
+
+    vlc_gl_renderer_SetWindowAspectRatio(renderer,
+                                         vgl->memory.window_aspect_ratio);
+
+    vlc_gl_renderer_SetViewpoint(renderer, &vgl->memory.viewpoint);
+
+    /* We created everything necessary, it worked, now the old ones could be
+     * replaced. */
+    vlc_gl_filters_Delete(vgl->filters);
+    vlc_gl_interop_Delete(vgl->interop);
+
+    vgl->interop = interop;
+    vgl->filters = filters;
+    vgl->renderer = renderer;
+
+    return VLC_SUCCESS;
+}
+
 void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 {
     const opengl_vtable_t *vt = &vgl->api.vt;

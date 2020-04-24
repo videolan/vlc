@@ -93,8 +93,24 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
     return vout_display_opengl_SetViewpoint (sys->vgl, vp);
 }
 
+static int
+UpdateFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_context *ctx)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    int ret = vlc_gl_MakeCurrent(sys->gl);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    ret = vout_display_opengl_UpdateFormat(sys->vgl, fmt, ctx);
+
+    vlc_gl_ReleaseCurrent(sys->gl);
+
+    return ret;
+}
+
 static const struct vlc_display_operations ops = {
-    Close, PictureRender, PictureDisplay, Control, NULL, SetViewpoint, NULL,
+    Close, PictureRender, PictureDisplay, Control, NULL, SetViewpoint, UpdateFormat,
 };
 
 static void
