@@ -97,6 +97,16 @@ VLC_DISABLE_DEBUG=0
 # whether to compile with bitcode or not
 VLC_USE_BITCODE=0
 
+# Tools to be used
+VLC_HOST_CC="$(xcrun --find clang)"
+VLC_HOST_CPP="$(xcrun --find clang) -E"
+VLC_HOST_CXX="$(xcrun --find clang++)"
+VLC_HOST_OBJC="$(xcrun --find clang)"
+VLC_HOST_LD="$(xcrun --find ld)"
+VLC_HOST_AR="$(xcrun --find ar)"
+VLC_HOST_STRIP="$(xcrun --find strip)"
+VLC_HOST_RANLIB="$(xcrun --find ranlib)"
+
 ##########################################################
 #                    Helper functions                    #
 ##########################################################
@@ -208,7 +218,7 @@ validate_architecture()
 #   Architecture string
 set_host_triplet()
 {
-    local triplet_arch=$(${CC:-cc} -arch "$1" -dumpmachine | cut -d- -f 1)
+    local triplet_arch=$(${VLC_HOST_CC:-cc} -arch "$1" -dumpmachine | cut -d- -f 1)
     # We can not directly use the compiler value here as when building for
     # x86_64 iOS Simulator the triplet will match the build machine triplet
     # exactly, which will cause autoconf to assume we are not cross-compiling.
@@ -299,16 +309,19 @@ set_host_envvars()
     export OBJCFLAGS="$clike_flags"
 
     export LDFLAGS="$VLC_DEPLOYMENT_TARGET_LDFLAG -arch $VLC_HOST_ARCH"
+}
 
-    # Tools to be used
-    export CC="clang"
-    export CPP="clang -E"
-    export CXX="clang++"
-    export OBJC="clang"
-    export LD="ld"
-    export AR="ar"
-    export STRIP="strip"
-    export RANLIB="ranlib"
+hostenv()
+{
+    CC="${VLC_HOST_CC}" \
+    CPP="${VLC_HOST_CPP}" \
+    CXX="${VLC_HOST_CXX}" \
+    OBJC="${VLC_HOST_OBJC}" \
+    LD="${VLC_HOST_LD}" \
+    AR="${VLC_HOST_AR}" \
+    STRIP="${VLC_HOST_STRIP}" \
+    RANLIB="${VLC_HOST_RANLIB}" \
+    "$@"
 }
 
 # Write config.mak for contribs
@@ -342,14 +355,14 @@ write_config_mak()
     printf '%s := %s\n' "CXXFLAGS" "${vlc_cxxflags}" >&3
     printf '%s := %s\n' "OBJCFLAGS" "${vlc_objcflags}" >&3
     printf '%s := %s\n' "LDFLAGS" "${vlc_ldflags}" >&3
-    printf '%s := %s\n' "CC" "clang" >&3
-    printf '%s := %s\n' "CPP" "clang -E" >&3
-    printf '%s := %s\n' "CXX" "clang++" >&3
-    printf '%s := %s\n' "OBJC" "clang" >&3
-    printf '%s := %s\n' "LD" "ld" >&3
-    printf '%s := %s\n' "AR" "ar" >&3
-    printf '%s := %s\n' "STRIP" "strip" >&3
-    printf '%s := %s\n' "RANLIB" "ranlib" >&3
+    printf '%s := %s\n' "CC" "${VLC_HOST_CC}" >&3
+    printf '%s := %s\n' "CPP" "${VLC_HOST_CPP}" >&3
+    printf '%s := %s\n' "CXX" "${VLC_HOST_CXX}" >&3
+    printf '%s := %s\n' "OBJC" "${VLC_HOST_OBJC}" >&3
+    printf '%s := %s\n' "LD" "${VLC_HOST_LD}" >&3
+    printf '%s := %s\n' "AR" "${VLC_HOST_AR}" >&3
+    printf '%s := %s\n' "STRIP" "${VLC_HOST_STRIP}" >&3
+    printf '%s := %s\n' "RANLIB" "${VLC_HOST_RANLIB}" >&3
 }
 
 # Generate the source file with the needed array for
@@ -630,7 +643,7 @@ cd "${VLC_BUILD_DIR}/build" || abort_err "Failed cd to VLC build dir"
 # Create VLC install dir if it does not already exist
 mkdir -p "$VLC_INSTALL_DIR"
 
-../../configure \
+hostenv ../../configure \
     --with-contrib="$VLC_CONTRIB_INSTALL_DIR" \
     --host="$VLC_HOST_TRIPLET" \
     --prefix="$VLC_INSTALL_DIR" \
@@ -704,7 +717,7 @@ VLC_STATIC_MODULELIST_NAME="static-module-list"
 rm -f "${VLC_STATIC_MODULELIST_NAME}.c" "${VLC_STATIC_MODULELIST_NAME}.o"
 gen_vlc_static_module_list "${VLC_STATIC_MODULELIST_NAME}.c" "${VLC_PLUGINS_SYMBOL_LIST[@]}"
 
-${CC:-cc} -c  ${CFLAGS} "${VLC_STATIC_MODULELIST_NAME}.c" \
+${VLC_HOST_CC:-cc} -c  ${CFLAGS} "${VLC_STATIC_MODULELIST_NAME}.c" \
   || abort_err "Compiling module list file failed"
 
 echo "${VLC_BUILD_DIR}/static-lib/${VLC_STATIC_MODULELIST_NAME}.o" \
