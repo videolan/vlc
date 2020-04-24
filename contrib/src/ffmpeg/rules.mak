@@ -222,7 +222,7 @@ ifeq ($(call need_pkg,"libavcodec >= $(FFMPEG_LAVC_MIN) libavformat >= 53.21.0 l
 PKGS_FOUND += ffmpeg
 endif
 
-FFMPEGCONF += --nm="$(NM)" --ar="$(AR)"
+FFMPEGCONF += --nm="$(NM)" --ar="$(AR)" --ranlib="$(RANLIB)"
 
 $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
 	$(call download_git,$(FFMPEG_GITURL),,$(FFMPEG_HASH))
