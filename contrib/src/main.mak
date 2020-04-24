@@ -70,6 +70,7 @@ endif
 ifneq ($(findstring $(origin AR),undefined default),)
 AR := ar
 endif
+NM ?= nm
 RANLIB ?= ranlib
 STRIP ?= strip
 WIDL ?= widl
@@ -88,6 +89,7 @@ endif
 ifneq ($(findstring $(origin AR),undefined default),)
 AR := $(HOST)-ar
 endif
+NM ?= $(HOST)-nm
 RANLIB ?= $(HOST)-ranlib
 STRIP ?= $(HOST)-strip
 WIDL ?= $(HOST)-widl
