@@ -114,6 +114,70 @@ ResizeFormatToGLMaxTexSize(video_format_t *fmt, unsigned int max_tex_size)
     }
 }
 
+static struct vlc_gl_interop *
+CreateInterop(vlc_gl_t *gl, const struct vlc_gl_api *api,
+              vlc_video_context *context, video_format_t *fmt)
+{
+    const opengl_vtable_t *vt = &api->vt;
+
+    /* Resize the format if it is greater than the maximum texture size
+     * supported by the hardware */
+    GLint max_tex_size;
+    vt->GetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_size);
+
+    if ((GLint)fmt->i_width > max_tex_size ||
+        (GLint)fmt->i_height > max_tex_size)
+        ResizeFormatToGLMaxTexSize(fmt, max_tex_size);
+
+    struct vlc_gl_interop *interop = vlc_gl_interop_New(gl, api, context, fmt);
+    if (!interop)
+    {
+        msg_Err(gl, "Could not create interop");
+        return NULL;
+    }
+
+    return interop;
+}
+
+static struct vlc_gl_filters *
+CreateFilters(vlc_gl_t *gl, const struct vlc_gl_api *api,
+              struct vlc_gl_interop *interop,
+              struct vlc_gl_renderer **out_renderer)
+{
+    struct vlc_gl_filters *filters = vlc_gl_filters_New(gl, api, interop);
+    if (!filters)
+    {
+        msg_Err(gl, "Could not create filters");
+        return NULL;
+    }
+
+    /* The renderer is the only filter, for now */
+    struct vlc_gl_filter *renderer_filter =
+        vlc_gl_filters_Append(filters, "renderer", NULL);
+    if (!renderer_filter)
+    {
+        msg_Warn(gl, "Could not create renderer for %4.4s",
+                 (const char *) &interop->fmt_out.i_chroma);
+        goto error;
+    }
+
+    /* The renderer is a special filter: we need its concrete instance to
+     * forward SetViewpoint() */
+    *out_renderer = renderer_filter->sys;
+
+    int ret = vlc_gl_filters_InitFramebuffers(filters);
+    if (ret != VLC_SUCCESS)
+    {
+        msg_Err(gl, "Could not init filters framebuffers");
+        goto error;
+    }
+
+    return filters;
+error:
+    vlc_gl_filters_Delete(filters);
+    return NULL;
+}
+
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                const vlc_fourcc_t **subpicture_chromas,
                                                vlc_gl_t *gl,
@@ -152,40 +216,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         (GLint)fmt->i_height > max_tex_size)
         ResizeFormatToGLMaxTexSize(fmt, max_tex_size);
 
-    vgl->interop = vlc_gl_interop_New(gl, api, context, fmt);
+    vgl->interop = CreateInterop(gl, api, context, fmt);
     if (!vgl->interop)
-    {
-        msg_Err(gl, "Could not create interop");
         goto free_vgl;
-    }
 
-    vgl->filters = vlc_gl_filters_New(gl, api, vgl->interop);
+    vgl->filters = CreateFilters(gl, api, vgl->interop, &vgl->renderer);
     if (!vgl->filters)
-    {
-        msg_Err(gl, "Could not create filters");
         goto delete_interop;
-    }
-
-    /* The renderer is the only filter, for now */
-    struct vlc_gl_filter *renderer_filter =
-        vlc_gl_filters_Append(vgl->filters, "renderer", NULL);
-    if (!renderer_filter)
-    {
-        msg_Warn(gl, "Could not create renderer for %4.4s",
-                 (const char *) &fmt->i_chroma);
-        goto delete_filters;
-    }
-
-    /* The renderer is a special filter: we need its concrete instance to
-     * forward SetViewpoint() */
-    vgl->renderer = renderer_filter->sys;
-
-    ret = vlc_gl_filters_InitFramebuffers(vgl->filters);
-    if (ret != VLC_SUCCESS)
-    {
-        msg_Err(gl, "Could not init filters framebuffers");
-        goto delete_filters;
-    }
 
     vgl->sub_interop = vlc_gl_interop_NewForSubpictures(gl, api);
     if (!vgl->sub_interop)
