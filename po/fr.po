@@ -26,8 +26,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-26 11:04+0100\n"
-"Last-Translator: JeanDeLaMouche <urgau@numericable.fr>, 2020\n"
+"PO-Revision-Date: 2020-04-24 22:11+0200\n"
+"Last-Translator: Yann Ricquebourg <yann.ricquebourg@gmail.com>, 2020\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/16553/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -1363,7 +1363,7 @@ msgstr "URL"
 
 #: src/input/meta.c:67 src/input/meta.c:68 modules/notify/notify.c:314
 msgid "Now Playing"
-msgstr "En lecture"
+msgstr "Lecture en cours"
 
 #: src/input/meta.c:69 modules/demux/mp4/meta.c:96
 msgid "Publisher"
@@ -2922,9 +2922,9 @@ msgid ""
 "Track num<br>$p: Now playing<br>$A: Date<br>$D: Duration<br>$Z: \"Now playing"
 "\" (Fall back on Title - Artist)"
 msgstr ""
-"Cette option permet de choisr le titre en fonction de ce qui est lut <br>"
-"$a : Artiste<br>$b : Album<br>$c : Copyright<br>$t : Titre<br>$g : Genre<br>"
-"$n : num de piste<br>$p : en cours de lecture<br>$A : Date<br>$D : Durée<br>"
+"Cette option permet de choisr le titre en fonction de ce qui est lu<br>$a : "
+"Artiste<br>$b : Album<br>$c : Droit de copie<br>$t : Titre<br>$g : Genre<br>"
+"$n : N° de piste<br>$p : En cours de lecture<br>$A : Date<br>$D : Durée<br>"
 "$Z : « En cours de lecture » (par défaut vaut Titre - Artiste)"
 
 #: src/libvlc-module.c:695
@@ -3886,7 +3886,7 @@ msgstr "Répéter l'élément actuel"
 
 #: src/libvlc-module.c:1166
 msgid "VLC will keep playing the current playlist item."
-msgstr "Jouer en boucle l'élément actuel de la liste de lecture."
+msgstr "VLC lira en boucle l'élément actuel de la liste de lecture."
 
 #: src/libvlc-module.c:1168
 msgid "Play and stop"
@@ -4999,7 +4999,7 @@ msgstr ""
 
 #: src/libvlc-module.c:2761
 msgid "ask for extra verbosity when displaying help"
-msgstr "Afficher plus de détails dans l'aide"
+msgstr "demande à afficher plus de détails dans l'aide"
 
 #: src/libvlc-module.c:2763
 msgid "print a list of available modules"
@@ -15095,15 +15095,15 @@ msgstr "| rewind . . . . . . . . . . . . . . . . .  rembobiner"
 
 #: modules/control/oldrc.c:812
 msgid "| faster . . . . . . . . . .  faster playing of stream"
-msgstr "| faster . . . . . . . . . . . . . . . jouer plus vite"
+msgstr "| faster . . . . . . . . . . . . . . . lire plus vite"
 
 #: modules/control/oldrc.c:813
 msgid "| slower . . . . . . . . . .  slower playing of stream"
-msgstr "| slower . . . . . . . . . . . .  jouer plus lentement"
+msgstr "| slower . . . . . . . . . . . .  lire plus lentement"
 
 #: modules/control/oldrc.c:814
 msgid "| normal . . . . . . . . . .  normal playing of stream"
-msgstr "| normal . . . . . . . . . . . jouer à vitesse normale"
+msgstr "| normal . . . . . . . . . . . lire à vitesse normale"
 
 #: modules/control/oldrc.c:815
 msgid "| frame. . . . . . . . . .  play frame by frame"
@@ -15127,7 +15127,7 @@ msgstr "| get_time . .  temps parcouru depuis le début du flux"
 
 #: modules/control/oldrc.c:820
 msgid "| is_playing . . . .  1 if a stream plays, 0 otherwise"
-msgstr "| is_playing . . . . 1 si un élément est joué, 0 sinon"
+msgstr "| is_playing . . . . 1 si un flux est lu, 0 sinon"
 
 #: modules/control/oldrc.c:821
 msgid "| get_title . . . . .  the title of the current stream"
@@ -18012,7 +18012,7 @@ msgid ""
 msgstr ""
 "VLC peut rechercher en ligne des images et métadonnées relatives à l'album "
 "afin d'enrichir l'expérience, par ex. en fournissant des informations sur "
-"les pistes des CD audio jouées. Pour proposer cette fonctionnalité, VLC "
+"les pistes des CD audio lues. Pour proposer cette fonctionnalité, VLC "
 "enverra des informations sur les contenus à des services de confiance, de "
 "façon anonyme."
 
@@ -19398,7 +19398,7 @@ msgstr "[Liste de lecture]"
 
 #: modules/gui/ncurses.c:901
 msgid " r                      Toggle Random playing"
-msgstr "     r           Commuter le lecture aléatoire"
+msgstr "     r           Commuter la lecture aléatoire"
 
 #: modules/gui/ncurses.c:902
 msgid " l                      Toggle Loop Playlist"
@@ -19418,7 +19418,7 @@ msgstr "     O           Trier la liste de lecture par titre (inversé)"
 
 #: modules/gui/ncurses.c:906
 msgid " g                      Go to the current playing item"
-msgstr "     g           Aller à l'élément courant"
+msgstr "     g           Aller à l'élément en cours de lecture"
 
 #: modules/gui/ncurses.c:907
 msgid " /                      Look for an item"
@@ -19742,7 +19742,7 @@ msgid ""
 "Controls will automatically appear here."
 msgstr ""
 "Pas d'instance de v4l2.\n"
-"Vérifier que le périphérique a été ouvert avec VLC et fonctionne.\n"
+"Vérifier que le périphérique a été ouvert avec VLC et est en lecture.\n"
 "\n"
 "Les contrôles apparaîtront automatiquement ici."
 
@@ -21886,8 +21886,8 @@ msgid ""
 "Display background cone or current album art when not playing. Can be "
 "disabled to prevent burning screen."
 msgstr ""
-"Afficher le cône ou la pochette de l'album en cours pendant la pause. Peut "
-"être inhibé pour éviter d'abimer l'écran."
+"Afficher le cône ou la jaquette de l'album en cours pendant la pause. Peut "
+"être désactivé pour éviter d'abîmer l'écran."
 
 #: modules/gui/qt/qt.cpp:168
 msgid "Expanding background cone or art"
@@ -22656,7 +22656,7 @@ msgstr "Art Lua"
 
 #: modules/lua/vlc.c:155
 msgid "Fetch artwork using lua scripts"
-msgstr "Récupère des artworks en utilisant des scripts lua"
+msgstr "Récupère des illustrations en utilisant des scripts lua"
 
 #: modules/lua/vlc.c:160 modules/lua/vlc.c:161
 msgid "Lua Extension"
@@ -23964,7 +23964,7 @@ msgstr "Nouvelle entrée en lecture"
 
 #: modules/notify/osx_notifications.m:377
 msgid "Now playing"
-msgstr "En lecture"
+msgstr "Lecture en cours"
 
 #: modules/notify/osx_notifications.m:402
 msgid "Skip"
@@ -29140,9 +29140,9 @@ msgid ""
 "item, the first selected item from the <i>Library</i> will be the subject of "
 "the stream."
 msgstr ""
-"Le média en cours de lecture sera diffusé. S'il n'y a pas d'élément en cours "
-"de lecture, le premier sélectionné dans la <i>Bibliothèque</i> sera utilisé "
-"pour la diffusion."
+"L'élément en cours de lecture sera diffusé. S'il n'y a pas d'élément en "
+"cours de lecture, le premier sélectionné dans la <i>Bibliothèque</i> sera "
+"utilisé pour la diffusion."
 
 #: share/lua/http/index.html:275
 msgid ""
