@@ -462,22 +462,6 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
 }
 
 /**
- * Dequeues all RTP packets and pass them to decoder. Not cancellation-safe(?).
- * This function can be used when the packet source is known not to reorder.
- */
-void rtp_dequeue_force (demux_t *demux, const rtp_session_t *session)
-{
-    for (unsigned i = 0, max = session->srcc; i < max; i++)
-    {
-        rtp_source_t *src = session->srcv[i];
-        block_t *block;
-
-        while (((block = src->blocks)) != NULL)
-            rtp_decode (demux, session, src);
-    }
-}
-
-/**
  * Decodes one RTP packet.
  */
 static void

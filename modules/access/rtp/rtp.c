@@ -335,9 +335,6 @@ static int OpenURL(vlc_object_t *obj)
     if (!strcasecmp(demux->psz_name, "dccp"))
         tp = IPPROTO_DCCP;
     else
-    if (!strcasecmp(demux->psz_name, "rtptcp"))
-        tp = IPPROTO_TCP;
-    else
     if (!strcasecmp(demux->psz_name, "rtp"))
         tp = IPPROTO_UDP;
     else
@@ -401,10 +398,6 @@ static int OpenURL(vlc_object_t *obj)
 #else
             msg_Err (obj, "DCCP support not included");
 #endif
-            break;
-
-        case IPPROTO_TCP:
-            fd = net_Connect (obj, dhost, dport, SOCK_STREAM, tp);
             break;
     }
 
@@ -470,8 +463,7 @@ static int OpenURL(vlc_object_t *obj)
     }
 #endif
 
-    if (vlc_clone (&p_sys->thread,
-                   (tp != IPPROTO_TCP) ? rtp_dgram_thread : rtp_stream_thread,
+    if (vlc_clone (&p_sys->thread, rtp_dgram_thread,
                    demux, VLC_THREAD_PRIORITY_INPUT))
         goto error;
     p_sys->thread_ready = true;
@@ -569,6 +561,5 @@ vlc_module_begin()
         change_string_list(dynamic_pt_list, dynamic_pt_list_text)
 
     /*add_shortcut ("sctp")*/
-    add_shortcut("dccp", "rtptcp", /* "tcp" is already taken :( */
-                 "rtp", "udplite")
+    add_shortcut("dccp", "rtp", "udplite")
 vlc_module_end()
