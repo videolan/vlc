@@ -401,8 +401,11 @@ static int OpenURL(vlc_object_t *obj)
     }
 
     free (tmp);
-    if (fd == -1)
+    if (fd == -1) {
+        if (rtcp_fd != -1)
+            net_Close(rtcp_fd);
         return VLC_EGENERIC;
+    }
     net_SetCSCov (fd, -1, 12);
 
     /* Initializes demux */
