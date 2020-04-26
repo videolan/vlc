@@ -155,7 +155,6 @@ static void Close (vlc_object_t *obj)
     if (p_sys->rtcp_fd != -1)
         net_Close (p_sys->rtcp_fd);
     net_Close (p_sys->fd);
-    free (p_sys);
 }
 
 static int OpenSDP(vlc_object_t *obj)
@@ -180,6 +179,10 @@ static int OpenSDP(vlc_object_t *obj)
     ssize_t sdplen = vlc_stream_Peek(demux->s, &peek, size);
     if (sdplen < 0)
         return sdplen;
+
+    demux_sys_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return VLC_ENOMEM;
 
     struct vlc_sdp *sdp = vlc_sdp_parse((const char *)peek, sdplen);
     if (sdp == NULL) {
@@ -280,15 +283,6 @@ static int OpenSDP(vlc_object_t *obj)
 
     vlc_sdp_free(sdp);
 
-    demux_sys_t *sys = malloc(sizeof (*sys));
-    if (sys == NULL)
-    {
-        net_Close(fd);
-        if (rtcp_fd != -1)
-            net_Close(rtcp_fd);
-        return VLC_EGENERIC;
-    }
-
     sys->chained_demux = NULL;
 #ifdef HAVE_SRTP
     sys->srtp = NULL;
@@ -342,6 +336,10 @@ static int OpenURL(vlc_object_t *obj)
         tp = IPPROTO_UDPLITE;
     else
         return VLC_EGENERIC;
+
+    demux_sys_t *p_sys = vlc_obj_malloc(obj, sizeof (*p_sys));
+    if (unlikely(p_sys == NULL))
+        return VLC_ENOMEM;
 
     char *tmp = strdup (demux->psz_location);
     if (tmp == NULL)
@@ -407,15 +405,6 @@ static int OpenURL(vlc_object_t *obj)
     net_SetCSCov (fd, -1, 12);
 
     /* Initializes demux */
-    demux_sys_t *p_sys = malloc (sizeof (*p_sys));
-    if (p_sys == NULL)
-    {
-        net_Close (fd);
-        if (rtcp_fd != -1)
-            net_Close (rtcp_fd);
-        return VLC_EGENERIC;
-    }
-
     p_sys->chained_demux = NULL;
 #ifdef HAVE_SRTP
     p_sys->srtp         = NULL;
