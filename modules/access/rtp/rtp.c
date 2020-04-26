@@ -312,6 +312,7 @@ static int OpenSDP(vlc_object_t *obj)
 
 error:
     Close (obj);
+    vlc_sdp_free(sdp);
     return VLC_EGENERIC;
 }
 
