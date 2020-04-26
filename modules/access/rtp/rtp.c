@@ -184,6 +184,14 @@ static int OpenSDP(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
+    sys->fd = -1;
+    sys->rtcp_fd = -1;
+    sys->session = NULL;
+#ifdef HAVE_SRTP
+    sys->srtp = NULL;
+#endif
+    sys->thread_ready = false;
+
     struct vlc_sdp *sdp = vlc_sdp_parse((const char *)peek, sdplen);
     if (sdp == NULL) {
         msg_Err(obj, "SDP description parse error");
@@ -284,16 +292,12 @@ static int OpenSDP(vlc_object_t *obj)
     vlc_sdp_free(sdp);
 
     sys->chained_demux = NULL;
-#ifdef HAVE_SRTP
-    sys->srtp = NULL;
-#endif
     sys->fd = fd;
     sys->rtcp_fd = rtcp_fd;
     sys->max_src = var_InheritInteger(obj, "rtp-max-src");
     sys->timeout = vlc_tick_from_sec(var_InheritInteger(obj, "rtp-timeout"));
     sys->max_dropout  = var_InheritInteger(obj, "rtp-max-dropout");
     sys->max_misorder = var_InheritInteger(obj, "rtp-max-misorder");
-    sys->thread_ready = false;
     sys->autodetect = true;
 
     demux->pf_demux = NULL;
