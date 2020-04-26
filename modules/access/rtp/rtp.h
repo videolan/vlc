@@ -75,7 +75,6 @@ typedef struct
     uint16_t      max_dropout; /**< Max packet forward misordering */
     uint16_t      max_misorder; /**< Max packet backward misordering */
     uint8_t       max_src; /**< Max simultaneous RTP sources */
-    bool          thread_ready;
     bool          autodetect; /**< Payload type autodetection pending */
 } demux_sys_t;
 

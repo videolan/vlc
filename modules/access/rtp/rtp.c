@@ -141,12 +141,8 @@ static void Close (vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *p_sys = demux->p_sys;
 
-    if (p_sys->thread_ready)
-    {
-        vlc_cancel (p_sys->thread);
-        vlc_join (p_sys->thread, NULL);
-    }
-
+    vlc_cancel(p_sys->thread);
+    vlc_join(p_sys->thread, NULL);
 #ifdef HAVE_SRTP
     if (p_sys->srtp)
         srtp_destroy (p_sys->srtp);
@@ -190,7 +186,6 @@ static int OpenSDP(vlc_object_t *obj)
 #ifdef HAVE_SRTP
     sys->srtp = NULL;
 #endif
-    sys->thread_ready = false;
 
     struct vlc_sdp *sdp = vlc_sdp_parse((const char *)peek, sdplen);
     if (sdp == NULL) {
@@ -322,8 +317,6 @@ static int OpenSDP(vlc_object_t *obj)
         rtp_session_destroy(demux, sys->session);
         goto error;
     }
-
-    sys->thread_ready = true;
     return VLC_SUCCESS;
 
 error:
@@ -447,7 +440,6 @@ static int OpenURL(vlc_object_t *obj)
     p_sys->timeout      = vlc_tick_from_sec( var_CreateGetInteger (obj, "rtp-timeout") );
     p_sys->max_dropout  = var_CreateGetInteger (obj, "rtp-max-dropout");
     p_sys->max_misorder = var_CreateGetInteger (obj, "rtp-max-misorder");
-    p_sys->thread_ready = false;
     p_sys->autodetect   = true;
 
     demux->pf_demux   = NULL;
@@ -487,7 +479,6 @@ static int OpenURL(vlc_object_t *obj)
     if (vlc_clone (&p_sys->thread, rtp_dgram_thread,
                    demux, VLC_THREAD_PRIORITY_INPUT))
         goto error;
-    p_sys->thread_ready = true;
     return VLC_SUCCESS;
 
 error:
