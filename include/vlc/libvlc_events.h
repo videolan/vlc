@@ -104,8 +104,8 @@ enum libvlc_event_e {
     libvlc_MediaPlayerPositionChanged,
     libvlc_MediaPlayerSeekableChanged,
     libvlc_MediaPlayerPausableChanged,
-    libvlc_MediaPlayerTitleChanged,
-    libvlc_MediaPlayerSnapshotTaken,
+    /* libvlc_MediaPlayerTitleChanged, */
+    libvlc_MediaPlayerSnapshotTaken = libvlc_MediaPlayerPausableChanged + 2,
     libvlc_MediaPlayerLengthChanged,
     libvlc_MediaPlayerVout,
     libvlc_MediaPlayerScrambledChanged,
@@ -118,6 +118,7 @@ enum libvlc_event_e {
     libvlc_MediaPlayerUnmuted,
     libvlc_MediaPlayerAudioVolume,
     libvlc_MediaPlayerAudioDevice,
+    libvlc_MediaPlayerTitleSelectionChanged,
     libvlc_MediaPlayerChapterChanged,
 
     /**
@@ -266,7 +267,7 @@ typedef struct libvlc_event_t
         struct
         {
             int new_title;
-        } media_player_title_changed;
+        } media_player_title_selection_changed;
         struct
         {
             int new_seekable;

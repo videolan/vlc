@@ -343,8 +343,8 @@ on_title_selection_changed(vlc_player_t *player,
     libvlc_media_player_t *mp = data;
 
     libvlc_event_t event;
-    event.type = libvlc_MediaPlayerTitleChanged;
-    event.u.media_player_title_changed.new_title = new_idx;
+    event.type = libvlc_MediaPlayerTitleSelectionChanged;
+    event.u.media_player_title_selection_changed.new_title = new_idx;
 
     libvlc_event_send(&mp->event_manager, &event);
 }
