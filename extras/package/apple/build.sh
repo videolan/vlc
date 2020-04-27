@@ -309,7 +309,8 @@ set_host_envvars()
     export CXXFLAGS="$clike_flags"
     export OBJCFLAGS="$clike_flags"
 
-    export LDFLAGS="$VLC_DEPLOYMENT_TARGET_LDFLAG -arch $VLC_HOST_ARCH"
+    # Vanilla clang doesn't use VLC_DEPLOYMENT_TAGET_LDFLAGS but only the CFLAGS variant
+    export LDFLAGS="$VLC_DEPLOYMENT_TARGET_LDFLAG $VLC_DEPLOYMENT_TARGET_CFLAG -arch $VLC_HOST_ARCH"
 }
 
 hostenv()
@@ -345,7 +346,8 @@ write_config_mak()
     local vlc_cxxflags="$clike_flags"
     local vlc_objcflags="$clike_flags"
 
-    local vlc_ldflags="$VLC_DEPLOYMENT_TARGET_LDFLAG -arch $VLC_HOST_ARCH"
+    # Vanilla clang doesn't use VLC_DEPLOYMENT_TAGET_LDFLAGS but only the CFLAGS variant
+    local vlc_ldflags="$VLC_DEPLOYMENT_TARGET_LDFLAG $VLC_DEPLOYMENT_TARGET_CFLAG  -arch $VLC_HOST_ARCH"
 
     echo "Creating makefile..."
     test -e config.mak && unlink config.mak
