@@ -1,11 +1,19 @@
---- libgpg-error-1.27_orig/src/mkheader.c	2017-02-28 13:32:33.000000000 +0100
-+++ libgpg-error-1.27/src/mkheader.c	2020-01-23 11:36:50.000000000 +0100
-@@ -107,7 +107,21 @@
-           return xstrdup (lastalias);
-         }
-     }
--  return xstrdup (triplet);
-+  /* Darwin triplet de-versioning */
+diff --git a/src/mkheader.c b/src/mkheader.c
+index 5aeb1e7..121d029 100644
+--- a/src/mkheader.c
++++ b/src/mkheader.c
+@@ -91,23 +91,41 @@ canon_host_triplet (const char *triplet)
+     {"armv5-unknown-linux-musleabi"   },
+     {"armv6-unknown-linux-musleabihf" },
+
++    {"armv7-apple-darwin", "arm-apple-darwin"},
++
+     { NULL }
+   };
+   int i;
+   const char *lastalias = NULL;
+
++    /* Darwin triplet de-versioning */
 +  char *res_triplet = xstrdup (triplet);
 +
 +  char *triplet_last = strrchr(res_triplet, '-');
@@ -19,7 +27,20 @@
 +    triplet_last[6] = '\0';
 +  }
 +
+   for (i=0; tbl[i].name; i++)
+     {
+       if (tbl[i].alias)
+         lastalias = tbl[i].alias;
+-      if (!strcmp (tbl[i].name, triplet))
++      if (!strcmp (tbl[i].name, res_triplet))
+         {
+           if (!lastalias)
+             break; /* Ooops: first entry has no alias.  */
++          free(res_triplet);
+           return xstrdup (lastalias);
+         }
+     }
+-  return xstrdup (triplet);
++
 +  return res_triplet;
  }
- 
- 
