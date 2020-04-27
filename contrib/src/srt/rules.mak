@@ -4,7 +4,11 @@ SRT_VERSION := 1.3.1
 SRT_URL := $(GITHUB)/Haivision/srt/archive/v$(SRT_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
+# Nettle is GPLv3 and is required by GnuTLS, which is a
+# dependency of srt
+ifdef HAVE_GNUV3
 PKGS += srt
+endif
 endif
 
 ifeq ($(call need_pkg,"srt >= 1.3.1"),)
