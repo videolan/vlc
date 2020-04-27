@@ -19,6 +19,7 @@
  *****************************************************************************/
 #include <vlc_common.h>
 
+#define FLAC_HEADER_SIZE_MIN 9
 #define FLAC_HEADER_SIZE_MAX 16
 #define FLAC_STREAMINFO_SIZE 34
 #define FLAC_FRAME_SIZE_MIN ((48+(8 + 4 + 1*4)+FLAC_HEADER_SIZE_MAX)/8)
@@ -64,12 +65,15 @@ static inline void FLAC_ParseStreamInfo( const uint8_t *p_buf,
 }
 
 /* Will return INT64_MAX for an invalid utf-8 sequence */
-static inline int64_t read_utf8(const uint8_t *p_buf, int *pi_read)
+static inline int64_t read_utf8(const uint8_t *p_buf, unsigned i_buf, int *pi_read)
 {
     /* Max coding bits is 56 - 8 */
     /* Value max precision is 36 bits */
     int64_t i_result = 0;
     unsigned i;
+
+    if(i_buf < 1)
+        return INT64_MAX;
 
     if (!(p_buf[0] & 0x80)) { /* 0xxxxxxx */
         i_result = p_buf[0];
@@ -96,6 +100,9 @@ static inline int64_t read_utf8(const uint8_t *p_buf, int *pi_read)
         return INT64_MAX;
     }
 
+    if(i_buf < i + 1)
+        return INT64_MAX;
+
     for (unsigned j = 1; j <= i; j++) {
         if (!(p_buf[j] & 0x80) || (p_buf[j] & 0x40)) { /* 10xxxxxx */
             return INT64_MAX;
@@ -114,12 +121,15 @@ static inline int64_t read_utf8(const uint8_t *p_buf, int *pi_read)
  * - pf_crc8 can be NULL to skip crc check
  * Returns: 1 on success, 0 on failure, and -1 if could be incorrect
  *****************************************************************************/
-static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf,
+static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf, unsigned i_buf,
                                      const struct flac_stream_info *stream_info,
                                      uint8_t(*pf_crc8)(const uint8_t *, size_t),
                                      struct flac_header_info *h)
 {
     bool b_guessing = false;
+
+    if(unlikely(i_buf < FLAC_HEADER_SIZE_MIN))
+        return 0;
 
     /* Check syncword */
     if (p_buf[0] != 0xFF || (p_buf[1] & 0xFE) != 0xF8)
@@ -205,11 +215,13 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf,
         return 0;
 
     /* End of fixed size header */
-    int i_header = 4;
+    unsigned i_header = 4;
+
+    /* > FLAC_HEADER_SIZE_MIN checks start here */
 
     /* Check Sample/Frame number */
     int i_read;
-    int64_t i_fsnumber = read_utf8(&p_buf[i_header++], &i_read);
+    int64_t i_fsnumber = read_utf8(&p_buf[i_header++], i_buf - 4, &i_read);
     if ( i_fsnumber == INT64_MAX )
         return 0;
 
@@ -217,6 +229,8 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf,
 
     /* Read blocksize */
     if (blocksize_hint) {
+        if(i_header == i_buf)
+            return 0;
         blocksize = p_buf[i_header++];
         if (blocksize_hint == 7) {
             blocksize <<= 8;
@@ -227,8 +241,12 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf,
 
     /* Read sample rate */
     if (samplerate == 0) {
+        if(i_header == i_buf)
+            return 0;
         samplerate = p_buf[i_header++];
         if (samplerate_hint != 12) { /* 16 bits */
+            if(i_header == i_buf)
+                return 0;
             samplerate <<= 8;
             samplerate |= p_buf[i_header++];
         }
@@ -240,6 +258,9 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf,
     }
 
     if ( !samplerate )
+        return 0;
+
+    if(i_header == i_buf) /* no crc space */
         return 0;
 
     /* Check the CRC-8 byte */
