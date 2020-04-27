@@ -441,6 +441,9 @@ do
         VLC_PREBUILT_CONTRIBS_URL=*)
             VLC_PREBUILT_CONTRIBS_URL="${1#VLC_PREBUILT_CONTRIBS_URL=}"
             ;;
+        -j*)
+            VLC_USE_NUMBER_OF_CORES=${1#-j}
+            ;;
         *)
             echo >&2 "ERROR: Unrecognized option '$1'"
             usage
