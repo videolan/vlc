@@ -408,7 +408,7 @@ MESONFLAGS = --default-library static --prefix "$(PREFIX)" --backend ninja \
 ifndef WITH_OPTIMIZATION
 MESONFLAGS += --buildtype debug
 else
-MESONFLAGS += --buildtype release
+MESONFLAGS += --buildtype debugoptimized
 endif
 
 ifdef HAVE_CROSS_COMPILE
@@ -565,7 +565,7 @@ toolchain.cmake:
 ifndef WITH_OPTIMIZATION
 	echo "set(CMAKE_BUILD_TYPE Debug)" >> $@
 else
-	echo "set(CMAKE_BUILD_TYPE Release)" >> $@
+	echo "set(CMAKE_BUILD_TYPE RelWithDebInfo)" >> $@
 endif
 	echo "set(CMAKE_SYSTEM_PROCESSOR $(ARCH))" >> $@
 	if test -n "$(CMAKE_SYSTEM_NAME)"; then \
