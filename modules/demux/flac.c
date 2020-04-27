@@ -393,7 +393,8 @@ static int Demux( demux_t *p_demux )
             if( unlikely(p_sys->i_pts == VLC_TICK_INVALID) )
                 es_out_SetPCR( p_demux->out, __MAX(p_block_out->i_dts - 1, VLC_TICK_0) );
 
-            p_sys->i_pts = p_block_out->i_dts;
+            if(p_block_out->i_dts != VLC_TICK_INVALID)
+                p_sys->i_pts = p_block_out->i_dts;
 
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
