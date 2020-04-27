@@ -715,13 +715,6 @@ static bo_t *GetWaveTag(const char *fcc, bo_t *extraboxes[], size_t i_extraboxes
         for(size_t i=0; i<i_extraboxes; i++)
             box_gather(wave, extraboxes[i]);
 
-        box = box_new("srcq");
-        if(box)
-        {
-            bo_add_32be(box, 0x40);
-            box_gather(wave, box);
-        }
-
         /* The last atom in the siDecompressionParam atom must be a terminator atom. */
         bo_add_32be(wave, 8); /* new empty box */
         bo_add_32be(wave, 0); /* box label */
