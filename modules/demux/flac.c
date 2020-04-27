@@ -38,6 +38,7 @@
 #include <vlc_charset.h>              /* EnsureUTF8 */
 
 #include <assert.h>
+#include <limits.h>
 #include "xiph_metadata.h"            /* vorbis comments */
 #include "../packetizer/flac.h"
 
@@ -224,10 +225,11 @@ static block_t *GetPacketizedBlock( decoder_t *p_packetizer,
     block_t *p_block = p_packetizer->pf_packetize( p_packetizer, pp_current_block );
     if( p_block )
     {
-        if( p_block->i_buffer >= FLAC_HEADER_SIZE_MAX )
+        if( p_block->i_buffer >= FLAC_HEADER_SIZE_MIN && p_block->i_buffer < INT_MAX )
         {
-            struct flac_header_info headerinfo;
-            int i_ret = FLAC_ParseSyncInfo( p_block->p_buffer, streaminfo, NULL, &headerinfo );
+            struct flac_header_info headerinfo = { .i_pts = VLC_TS_INVALID };
+            int i_ret = FLAC_ParseSyncInfo( p_block->p_buffer, p_block->i_buffer,
+                                            streaminfo, NULL, &headerinfo );
             assert( i_ret != 0 ); /* Same as packetizer */
             /* Use Frame PTS, not the interpolated one */
             p_block->i_dts = p_block->i_pts = headerinfo.i_pts;

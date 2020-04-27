@@ -366,7 +366,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             return NULL; /* Need more data */
 
         /* Check if frame is valid and get frame info */
-        int i_ret = FLAC_ParseSyncInfo(p_header,
+        int i_ret = FLAC_ParseSyncInfo(p_header, FLAC_HEADER_SIZE_MAX,
                              p_sys->b_stream_info ? &p_sys->stream_info : NULL,
                              flac_crc8, &p_sys->headerinfo);
         if (!i_ret) {
@@ -413,7 +413,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
 
         struct flac_header_info dummy;
         /* Check if frame is valid and get frame info */
-        if(FLAC_ParseSyncInfo(nextheader,
+        if(FLAC_ParseSyncInfo(nextheader, FLAC_HEADER_SIZE_MAX,
                               p_sys->b_stream_info ? &p_sys->stream_info : NULL,
                               NULL, &dummy) == 0)
         {
