@@ -595,7 +595,9 @@ libqsv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libdmo_plugin_la_LIBADD = $(LIBM)
 if HAVE_WIN32
 libdmo_plugin_la_LIBADD += $(LIBCOM) -luuid
+if !HAVE_WINSTORE
 codec_LTLIBRARIES += libdmo_plugin.la
+endif
 endif
 
 libmft_plugin_la_SOURCES = codec/mft.c packetizer/h264_nal.c packetizer/h264_nal.h
