@@ -693,7 +693,15 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
     return esds;
 }
 
-static bo_t *GetWaveTag(mp4mux_trackinfo_t *p_track)
+static bo_t *GetFrmaTag(const char format[4])
+{
+    bo_t *frma = box_new("frma");
+    if(frma)
+        bo_add_mem(frma, 4, format);
+    return frma;
+}
+
+static bo_t *GetWaveTag(const char *fcc, bo_t *extraboxes[], size_t i_extraboxes)
 {
     bo_t *wave;
     bo_t *box;
@@ -701,22 +709,11 @@ static bo_t *GetWaveTag(mp4mux_trackinfo_t *p_track)
     wave = box_new("wave");
     if(wave)
     {
-        box = box_new("frma");
-        if(box)
-        {
-            bo_add_fourcc(box, "mp4a");
-            box_gather(wave, box);
-        }
-
-        box = box_new("mp4a");
-        if(box)
-        {
-            bo_add_32be(box, 0);
-            box_gather(wave, box);
-        }
-
-        box = GetESDS(p_track);
+        box = GetFrmaTag(fcc);
         box_gather(wave, box);
+
+        for(size_t i=0; i<i_extraboxes; i++)
+            box_gather(wave, extraboxes[i]);
 
         box = box_new("srcq");
         if(box)
@@ -1154,7 +1151,12 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         case VLC_CODEC_MP4A:
             if(b_mov)
             {
-                specificbox = GetWaveTag(p_track);
+                bo_t *extraboxes[2] = {NULL};
+                extraboxes[0] = box_new("mp4a");
+                if(extraboxes[0])
+                    bo_add_32be(extraboxes[0], 0);
+                extraboxes[1] = GetESDS(p_track);
+                specificbox = GetWaveTag("mp4a", extraboxes, 2);
                 b_descr = false;
             }
             break;
