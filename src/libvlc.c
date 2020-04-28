@@ -130,7 +130,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                          const char *ppsz_argv[] )
 {
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
-    char *       psz_parser = NULL;
     char        *psz_val;
     int          i_ret = VLC_EGENERIC;
 
@@ -264,7 +263,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
 #ifdef ENABLE_VLM
     /* Initialize VLM if vlm-conf is specified */
-    psz_parser = var_InheritString( p_libvlc, "vlm-conf" );
+    char *psz_parser = var_InheritString( p_libvlc, "vlm-conf" );
     if( psz_parser )
     {
         priv->p_vlm = vlm_New( p_libvlc, psz_parser );
