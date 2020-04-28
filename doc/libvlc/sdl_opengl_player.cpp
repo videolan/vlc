@@ -142,7 +142,7 @@ public:
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
         if (status != GL_FRAMEBUFFER_COMPLETE) {
-            return;
+            return false;
         }
 
         that->m_width = cfg->width;
@@ -163,9 +163,9 @@ public:
     static bool setup(void** data, const libvlc_video_setup_device_cfg_t *cfg,
                       libvlc_video_setup_device_info_t *out)
     {
-        VLCVideo** that = static_cast<VLCVideo**>(data);
-        (*that)->m_width = 0;
-        (*that)->m_height = 0;
+        VLCVideo* that = static_cast<VLCVideo*>(*data);
+        that->m_width = 0;
+        that->m_height = 0;
         return true;
     }
 
