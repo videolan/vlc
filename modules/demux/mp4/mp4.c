@@ -3822,7 +3822,7 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
             if( i_max_v0_samples > i_chunk_remaining_samples )
                 i_max_v0_samples = i_chunk_remaining_samples;
 
-            if( i_samples_per_frame && i_bytes_per_frame )
+            if( i_samples_per_frame && i_bytes_per_frame && p_track->i_sample_size != 16 )
             {
                 /* GSM, ADPCM,  */
                 if( i_samples_per_frame > 64 &&
@@ -3895,7 +3895,7 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
             MP4_Box_data_sample_soun_t *p_soun =
                 p_track->p_sample->data.p_sample_soun;
 
-            if( p_soun->i_compressionid != 0xFFFE )
+            if( p_soun->i_compressionid != 0xFFFE && p_track->i_sample_size != 16 )
             {
                 uint32_t i_bytes_per_frame;
                 uint32_t i_samples_per_frame = MP4_GetAudioFrameInfo( p_track, p_soun, &i_bytes_per_frame );
