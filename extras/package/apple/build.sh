@@ -26,7 +26,7 @@
 #        shared: Shared libraries and modules
 
 # Dir of this script
-readonly VLC_SCRIPT_DIR="${BASH_SOURCE%/*}"
+readonly VLC_SCRIPT_DIR="$(cd "${BASH_SOURCE%/*}"; pwd)"
 
 # Verify script run location
 [ ! -f "$(pwd)/../src/libvlc.h" ] \
