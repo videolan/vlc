@@ -34,6 +34,7 @@ extern "C" {
 # endif
 
 typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
+typedef struct libvlc_title_description_t libvlc_title_description_t;
 
 /**
  * \ingroup libvlc_event
@@ -118,6 +119,10 @@ enum libvlc_event_e {
     libvlc_MediaPlayerUnmuted,
     libvlc_MediaPlayerAudioVolume,
     libvlc_MediaPlayerAudioDevice,
+    /**
+     * The title selection changed, cf media_player_title_selection_changed in
+     * \ref libvlc_event_t.u
+     */
     libvlc_MediaPlayerTitleSelectionChanged,
     libvlc_MediaPlayerChapterChanged,
 
@@ -266,7 +271,8 @@ typedef struct libvlc_event_t
         } media_player_time_changed;
         struct
         {
-            int new_title;
+            const libvlc_title_description_t *title;
+            int index;
         } media_player_title_selection_changed;
         struct
         {
