@@ -461,7 +461,13 @@ static void vlc_thread_destroy(vlc_thread_t th)
     free(th);
 }
 
-static unsigned __stdcall vlc_entry (void *p)
+static
+#if VLC_WINSTORE_APP
+DWORD
+#else // !VLC_WINSTORE_APP
+unsigned
+#endif // !VLC_WINSTORE_APP
+__stdcall vlc_entry (void *p)
 {
     struct vlc_thread *th = p;
 
@@ -489,11 +495,16 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
     th->wait.addr = NULL;
     InitializeCriticalSection(&th->wait.lock);
 
+    HANDLE h;
+#if VLC_WINSTORE_APP
+    h = CreateThread(NULL, 0, vlc_entry, th, 0, NULL);
+#else // !VLC_WINSTORE_APP
     /* When using the MSVCRT C library you have to use the _beginthreadex
      * function instead of CreateThread, otherwise you'll end up with
      * memory leaks and the signal functions not working (see Microsoft
      * Knowledge Base, article 104641) */
-    uintptr_t h = _beginthreadex (NULL, 0, vlc_entry, th, 0, NULL);
+    h = (HANDLE)(uintptr_t) _beginthreadex (NULL, 0, vlc_entry, th, 0, NULL);
+#endif // !VLC_WINSTORE_APP
     if (h == 0)
     {
         int err = errno;
@@ -503,11 +514,11 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
 
     if (detached)
     {
-        CloseHandle((HANDLE)h);
+        CloseHandle(h);
         th->id = NULL;
     }
     else
-        th->id = (HANDLE)h;
+        th->id = h;
 
     if (p_handle != NULL)
         *p_handle = th;
@@ -637,7 +648,11 @@ void vlc_testcancel (void)
     th->data = NULL; /* TODO: special value? */
     if (th->id == NULL) /* Detached thread */
         vlc_thread_destroy(th);
+#if VLC_WINSTORE_APP
+    ExitThread(0);
+#else // !VLC_WINSTORE_APP
     _endthreadex(0);
+#endif // !VLC_WINSTORE_APP
 }
 
 void vlc_control_cancel (int cmd, ...)
