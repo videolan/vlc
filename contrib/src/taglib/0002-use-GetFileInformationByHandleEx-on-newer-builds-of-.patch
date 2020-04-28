@@ -1,0 +1,39 @@
+From 9c02a2c245bed1d70dbd80b0e63abbcdecb74761 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 15 May 2020 09:29:55 +0200
+Subject: [PATCH 2/3] use GetFileInformationByHandleEx on newer builds of
+ Windows
+
+It's available since Vista and UWP builds that don't have GetFileSize.
+
+See https://docs.microsoft.com/en-us/uwp/win32-and-com/win32-apis
+---
+ taglib/toolkit/tfilestream.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/taglib/toolkit/tfilestream.cpp b/taglib/toolkit/tfilestream.cpp
+index 4b448271..ad4443ea 100644
+--- a/taglib/toolkit/tfilestream.cpp
++++ b/taglib/toolkit/tfilestream.cpp
+@@ -441,10 +441,18 @@ long FileStream::length()
+ #ifdef _WIN32
+ 
+   SetLastError(NO_ERROR);
++#if _WIN32_WINNT < _WIN32_WINNT_VISTA
+   const DWORD fileSize = GetFileSize(d->file, NULL);
+   if(GetLastError() == NO_ERROR) {
+     return static_cast<long>(fileSize);
+   }
++#else // _WIN32_WINNT_VISTA
++  FILE_STANDARD_INFO fStdInfo;
++  BOOL success = GetFileInformationByHandleEx(d->file, FileStandardInfo, (LPVOID)&fStdInfo, sizeof(FILE_STANDARD_INFO));
++  if(success) {
++    return static_cast<long>(fStdInfo.EndOfFile.LowPart);
++  }
++#endif // _WIN32_WINNT_VISTA
+   else {
+     debug("FileStream::length() -- Failed to get the file size.");
+     return 0;
+-- 
+2.26.0.windows.1
+
