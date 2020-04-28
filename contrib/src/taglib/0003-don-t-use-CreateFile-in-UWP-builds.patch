@@ -1,0 +1,43 @@
+From a9024bd18ce20653616e04702b5e220de56b6b2c Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 15 May 2020 09:32:21 +0200
+Subject: [PATCH 3/3] don't use CreateFile in UWP builds
+
+CreateFile2 is available for such builds with more internal restrictions.
+
+See https://docs.microsoft.com/en-us/uwp/win32-and-com/win32-apis
+https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfile2
+---
+ taglib/toolkit/tfilestream.cpp | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/taglib/toolkit/tfilestream.cpp b/taglib/toolkit/tfilestream.cpp
+index ad4443ea..10cd8d56 100644
+--- a/taglib/toolkit/tfilestream.cpp
++++ b/taglib/toolkit/tfilestream.cpp
+@@ -52,9 +52,22 @@ namespace
+     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
+ 
+     if(!path.wstr().empty())
++#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++    {
++      CREATEFILE2_EXTENDED_PARAMETERS createExParams;
++      createExParams.dwSize = sizeof(createExParams);
++      createExParams.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
++      createExParams.dwFileFlags = 0;
++      createExParams.dwSecurityQosFlags = 0;
++      createExParams.lpSecurityAttributes = NULL;
++      createExParams.hTemplateFile = NULL;
++      return CreateFile2(path.wstr().c_str(), access, FILE_SHARE_READ, OPEN_EXISTING, &createExParams);
++    }
++#else // WINAPI_PARTITION_DESKTOP
+       return CreateFileW(path.wstr().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+     else if(!path.str().empty())
+       return CreateFileA(path.str().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
++#endif // WINAPI_PARTITION_DESKTOP
+     else
+       return InvalidFileHandle;
+   }
+-- 
+2.26.0.windows.1
+
