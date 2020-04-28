@@ -120,6 +120,11 @@ enum libvlc_event_e {
     libvlc_MediaPlayerAudioVolume,
     libvlc_MediaPlayerAudioDevice,
     /**
+     * The title list changed, call
+     * libvlc_media_player_get_full_title_descriptions() to get the new list.
+     */
+    libvlc_MediaPlayerTitleListChanged,
+    /**
      * The title selection changed, cf media_player_title_selection_changed in
      * \ref libvlc_event_t.u
      */

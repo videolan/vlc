@@ -333,6 +333,21 @@ on_program_selection_changed(vlc_player_t *player, int unselected_id,
 }
 
 static void
+on_titles_changed(vlc_player_t *player,
+                  vlc_player_title_list *titles, void *data)
+{
+    (void) player;
+    (void) titles;
+
+    libvlc_media_player_t *mp = data;
+
+    libvlc_event_t event;
+    event.type = libvlc_MediaPlayerTitleListChanged;
+
+    libvlc_event_send(&mp->event_manager, &event);
+}
+
+static void
 on_title_selection_changed(vlc_player_t *player,
                            const struct vlc_player_title *new_title,
                            size_t new_idx, void *data)
@@ -490,6 +505,7 @@ static const struct vlc_player_cbs vlc_player_cbs = {
     .on_track_selection_changed = on_track_selection_changed,
     .on_program_list_changed = on_program_list_changed,
     .on_program_selection_changed = on_program_selection_changed,
+    .on_titles_changed = on_titles_changed,
     .on_title_selection_changed = on_title_selection_changed,
     .on_chapter_selection_changed = on_chapter_selection_changed,
     .on_media_subitems_changed = on_media_subitems_changed,
