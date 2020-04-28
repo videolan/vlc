@@ -100,24 +100,245 @@ appleOS:
  * Improved proxy configuration handling
 
 
+Changes between 3.0.9.2 and 3.0.10:
+----------------------------------
+
+Misc:
+ * Update Twitch & VLSub scripts
+
+
+Changes between 3.0.9.1 and 3.0.9.2:
+----------------------------------
+
+Misc:
+ * Properly bump the version in configure.ac
+
+
+Changes between 3.0.9 and 3.0.9.1:
+----------------------------------
+
+Misc:
+ * Fix VLSub returning 401 for earch request
+
+
+Changes between 3.0.8 and 3.0.9:
+----------------------------------
+
+Core:
+ * Work around busy looping when playing an invalid item through VLM
+
+Access:
+ * Multiple dvdread and dvdnav crashs fixes
+ * Fixed DVD glitches on clip change
+ * Fixed dvdread commands/data sequence inversion in some cases causing
+   unwanted glitches
+ * Better handling of authored as corrupted DVD
+ * Added libsmb2 support for SMB2/3 shares
+
+Demux:
+ * Fix TTML entities not passed to decoder
+ * Fixed some WebVTT styling tags being not applied
+ * Misc raw H264/HEVC frame rate fixes
+ * Fix adaptive regression on TS format change (mostly HLS)
+ * Fixed MP4 regression with twos/sowt PCM audio
+ * Fixed some MP4 raw quicktime and ms-PCM audio
+ * Fixed MP4 interlacing handling
+ * Multiple adaptive stack (DASH/HLS/Smooth) fixes
+ * Enabled Live seeking for HLS
+ * Fixed seeking in some cases for HLS
+ * Improved Live playback for Smooth and DASH
+ * Fixed adaptive unwanted end of stream in some cases
+ * Faster adaptive start and new buffering control options
+
+Packetizers:
+ * Fixes H264/HEVC incomplete draining in some cases
+ * packetizer_helper: Fix potential trailing junk on last packet
+ * Added missing drain in packetizers that was causing missing
+   last frame or audio
+ * Improved check to prevent fLAC synchronization drops
+
+Decoder:
+ * avcodec: revector video decoder to fix incomplete drain
+ * spudec: implemented palette updates, fixing missing subtitles
+   on some DVD
+ * Fixed WebVTT CSS styling not being applied on Windows/macOS
+ * Fixed Hebrew teletext pages support in zvbi
+ * Fixed Dav1d aborting decoding on corrupted picture
+ * Extract and display of all CEA708 subtitles
+ * Update libfaad to 2.9.1
+ * Add DXVA support for VP9 Profile 2 (10 bits)
+ * Mediacodec aspect ratio with Amazon devices
+
+Audio output:
+ * Added support for iOS audiounit audio above 48KHz
+ * Added support for amem audio up to 384KHz
+
+Video output:
+ * Fix for opengl glitches in some drivers
+ * Fix GMA950 opengl support on macOS
+ * YUV to RGB StretchRect fixes with NVIDIA drivers
+ * Use libpacebo new tone mapping desaturation algorithm
+
+Text renderer:
+ * Fix crashes on macOS with SSA/ASS subtitles containing emoji
+ * Fixed unwanted growing background in Freetype rendering and Y padding
+
+Mux:
+ * Fixed some YUV mappings
+
+macOS:
+ * Use a layer based video output on 10.14 and higher, which should
+   fix various rendering issues where the vout would glitch between
+   a wrong size and the correct size.
+   Additionally this works around OpenGL issues with Macs that have a
+   dedicated NVIDIA GPU, which caused rendering artifacts in the whole
+   OS, especially when the "Reduce transparency" accessibility option
+   is used
+ * Remove qtsound module and add avaudiocapture module as replacement
+ * Fix audio capture on macOS Catalina by using avaudiocapture
+ * Inform the user in case OS permissions are missing for certain actions
+ * Fix Apple Remote support on macOS Catalina
+ * Add support for pausing Apple Music on macOS Catalina
+ * Fix UPnP discovery crash without an active network interface
+ * Fix rare placement issues with fullscreen panel
+ * Fix problem in audio output remembering the last device configuration
+   in digital mode
+
+Service Discovery:
+ * Update libmicrodns to 0.1.2
+
+Misc:
+ * Update YouTube, SoundCloud and Vocaroo scripts: this restores
+   playback of YouTube URLs.
+ * Add missing .wpl & .zpl file associations on Windows
+ * Improved chromecast audio quality
+
+
+Changes between 3.0.7.1 and 3.0.8:
+----------------------------------
+
+Core:
+ * Fix stuttering for low framerate videos
+
+Demux:
+ * Fix channel ordering in some MP4 files
+ * Fix glitches in TS over HLS
+ * Add real probing of HLS streams
+ * Fix HLS MIME type fallback
+
+Decoder:
+ * Fix WebVTT subtitles rendering
+
+Stream filter:
+ * Improve network buffering
+
+Misc:
+ * Update Youtube script
+
+Audio Output:
+ * macOS/iOS: Fix stuttering or blank audio when starting or seeking when using
+   external audio devices (bluetooth for example)
+ * macOS: Fix AV synchronization when using external audio devices
+
+Video Output:
+ * Direct3D11: Fix hardware acceleration for some AMD drivers
+
+Stream output:
+ * Fix transcoding when the decoder does not set the chroma
+
+Security:
+ * Fix a buffer overflow in the MKV demuxer (CVE-2019-14970)
+ * Fix a read buffer overflow in the avcodec decoder (CVE-2019-13962)
+ * Fix a read buffer overflow in the FAAD decoder
+ * Fix a read buffer overflow in the OGG demuxer (CVE-2019-14437, CVE-2019-14438)
+ * Fix a read buffer overflow in the ASF demuxer (CVE-2019-14776)
+ * Fix a use after free in the MKV demuxer (CVE-2019-14777, CVE-2019-14778)
+ * Fix a use after free in the ASF demuxer (CVE-2019-14533)
+ * Fix a couple of integer underflows in the MP4 demuxer (CVE-2019-13602)
+ * Fix a null dereference in the dvdnav demuxer
+ * Fix a null dereference in the ASF demuxer (CVE-2019-14534)
+ * Fix a null dereference in the AVI demuxer
+ * Fix a division by zero in the CAF demuxer (CVE-2019-14498)
+ * Fix a division by zero in the ASF demuxer (CVE-2019-14535)
+
+Contribs:
+ * Update to a newer libmodplug version (0.8.9.0)
+
+
+Changes between 3.0.7 and 3.0.7.1:
+----------------------------------
+
+Access:
+ * Update libbluray to 1.1.2
+
+macOS:
+ * Fix bluray java menu playback regression in 3.0.7
+
+Video Output:
+ * Fix hardware acceleration with some AMD drivers
+ * Improve direct3d11 HDR support
+
+
 Changes between 3.0.6 and 3.0.7:
 --------------------------------
 
 Access:
  * Improve Blu-ray support
+ * Fix sftp module build with libssh >= 1.8.1
 
 Audio output:
  * Fix pass-through on Android-23
+ * Fix DirectSound drain
+
+Demux:
+ * Improve MP4 support
 
 Video Output:
  * Fix 12 bits sources playback with Direct3D11
  * Fix crash on iOS
+ * Fix midstream aspect-ratio changes when Windows hardware decoding is on
+ * Fix HLG display with Direct3D11
 
 Stream Output:
  * Improve Chromecast support with new ChromeCast apps
 
+macOS:
+ * Fix UPNP service discovery, services are discovered on the highest priority
+   active network interface now
+ * Fix video distortion on macOS Mojave
+
 Misc:
- * Update Youtube, Dailymotion, Vimeo scripts
+ * Update Youtube, Dailymotion, Vimeo, Soundcloud scripts
+ * Work around busy looping when playing an invalid item with loop enabled
+
+Translations:
+ * Update of most translations
+
+Security:
+ * Fix multiple buffer overflows in the ps demuxer
+ * Fix a buffer overflow when copying a biplanar YUV image
+ * Fix multiple buffer overflows in the faad decoder
+ * Fix buffer overflow in the svcdsub decoder
+ * Fix buffer overflows in the ogg muxer & demuxer
+ * Fix buffer overflows in libavformat demuxer
+ * Fix multiple buffer overflows in the MKV demuxer
+ * Fix a buffer overflow in the MP4 demuxer
+ * Fix a buffer overflow in the textst decoder
+ * Fix a buffer overflow in the webvtt decoder
+ * Fix a buffer overflow in the ASF demux
+ * Fix a buffer overflow in the UPNP SD
+ * Fix use after free in the ogg demuxer
+ * Fix multiple use after free in the MKV demuxer
+ * Fix multiple use after free in the DMO decoder
+ * Fix integer underflow in the MKV demuxer
+ * Fix an updater NULL pointer dereference on invalid signing keys
+ * Fix NULL pointer dereference in the MKV demuxer
+ * Fix an integer overflow in the spudec decoder
+ * Fix an integer overflow in the nsc demuxer
+ * Fix an integer overflow in the avi demuxer
+ * Fix reads of uninitialized pointers in the MKV demuxer
+ * Fix a floating point exception in the MKV demuxer
+ * Fix an infinite loop in the flac packetizer
 
 
 Changes between 3.0.5 and 3.0.6:
