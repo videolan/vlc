@@ -66,13 +66,11 @@ static struct
         jmethodID registerNative;
         jmethodID unregisterNative;
         jmethodID setVideoLayout;
-    } AndroidNativeWindow;
-    struct {
         jmethodID attachToGLContext;
         jmethodID detachFromGLContext;
         jmethodID waitAndUpdateTexImage;
         jmethodID getSurface;
-    } SurfaceTexture;
+    } AWindow;
 } jfields;
 
 /*
@@ -401,25 +399,25 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
 
     clazz = (*env)->GetObjectClass(env, jobj);
     CHECK_EXCEPTION("AndroidNativeWindow clazz", true);
-    GET_METHOD(AndroidNativeWindow.getVideoSurface,
+    GET_METHOD(AWindow.getVideoSurface,
                "getVideoSurface", "()Landroid/view/Surface;", true);
-    GET_METHOD(AndroidNativeWindow.getSubtitlesSurface,
+    GET_METHOD(AWindow.getSubtitlesSurface,
                "getSubtitlesSurface", "()Landroid/view/Surface;", true);
-    GET_METHOD(AndroidNativeWindow.registerNative,
+    GET_METHOD(AWindow.registerNative,
                "registerNative", "(J)I", true);
-    GET_METHOD(AndroidNativeWindow.unregisterNative,
+    GET_METHOD(AWindow.unregisterNative,
                "unregisterNative", "()V", true);
-    GET_METHOD(AndroidNativeWindow.setVideoLayout,
+    GET_METHOD(AWindow.setVideoLayout,
                "setVideoLayout", "(IIIIII)V", true);
 
-    GET_METHOD(SurfaceTexture.attachToGLContext,
+    GET_METHOD(AWindow.attachToGLContext,
                "SurfaceTexture_attachToGLContext", "(I)Z", true);
-    GET_METHOD(SurfaceTexture.detachFromGLContext,
+    GET_METHOD(AWindow.detachFromGLContext,
                "SurfaceTexture_detachFromGLContext", "()V", true);
-    GET_METHOD(SurfaceTexture.waitAndUpdateTexImage,
+    GET_METHOD(AWindow.waitAndUpdateTexImage,
                "SurfaceTexture_waitAndUpdateTexImage", "([F)Z",
                true);
-    GET_METHOD(SurfaceTexture.getSurface,
+    GET_METHOD(AWindow.getSurface,
                "SurfaceTexture_getSurface", "()Landroid/view/Surface;", true);
 
     if ((*env)->RegisterNatives(env, clazz, jni_callbacks, 2) < 0)
@@ -428,7 +426,7 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
         i_init_state = 0;
         goto end;
     }
-    jfields.AndroidNativeWindow.clazz = (*env)->NewGlobalRef(env, clazz);
+    jfields.AWindow.clazz = (*env)->NewGlobalRef(env, clazz);
     (*env)->DeleteLocalRef(env, clazz);
 
 #undef GET_METHOD
@@ -446,9 +444,9 @@ end:
 #define JNI_CALL(what, obj, method, ...) \
     (*p_env)->what(p_env, obj, jfields.method, ##__VA_ARGS__)
 #define JNI_ANWCALL(what, method, ...) \
-    (*p_env)->what(p_env, p_awh->jobj, jfields.AndroidNativeWindow.method, ##__VA_ARGS__)
+    (*p_env)->what(p_env, p_awh->jobj, jfields.AWindow.method, ##__VA_ARGS__)
 #define JNI_STEXCALL(what, method, ...) \
-    (*p_env)->what(p_env, p_awh->jobj, jfields.SurfaceTexture.method, ##__VA_ARGS__)
+    (*p_env)->what(p_env, p_awh->jobj, jfields.AWindow.method, ##__VA_ARGS__)
 
 static JNIEnv*
 AWindowHandler_getEnv(AWindowHandler *p_awh)
