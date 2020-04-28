@@ -3834,7 +3834,7 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *p_track, uint32_t *pi_nb_samp
                 else
                 {
                     /* Regular cases */
-                    uint32_t i_frames = i_max_v0_samples / i_samples_per_frame;
+                    uint32_t i_frames = __MAX(i_max_v0_samples / i_samples_per_frame, 1);
                     *pi_nb_samples = i_frames * i_samples_per_frame;
                     i_size = i_frames * i_bytes_per_frame;
                 }
