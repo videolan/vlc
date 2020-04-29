@@ -127,12 +127,18 @@ info "Building in \"$builddir\""
 
 TRIPLET=$ARCH-apple-darwin$OSX_KERNELVERSION
 
+python3Path=$(echo /Library/Frameworks/Python.framework/Versions/3.*/bin | awk '{print $1;}')
+if [ ! -d "$python3Path" ]; then
+	python3Path=""
+fi
+
 export CC="`xcrun --find clang`"
 export CXX="`xcrun --find clang++`"
 export OBJC="`xcrun --find clang`"
 export OSX_VERSION
 export SDKROOT
-export PATH="${vlcroot}/extras/tools/build/bin:${vlcroot}/contrib/${TRIPLET}/bin:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
+export PATH="${vlcroot}/extras/tools/build/bin:${vlcroot}/contrib/${TRIPLET}/bin:$python3Path:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
+
 
 # Select avcodec flavor to compile contribs with
 export USE_FFMPEG=1
