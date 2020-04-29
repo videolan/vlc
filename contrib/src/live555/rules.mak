@@ -87,7 +87,7 @@ ifdef HAVE_ANDROID
 	# Don't use unavailable off64_t functions
 	$(APPLY) $(SRC)/live555/file-offset-bits-64.patch
 endif
-
+	cd $(UNPACK_DIR) && sed -i.orig "s,LIBRARY_LINK =.*,LIBRARY_LINK = $(AR) cr ,g" config.macosx
 	mv live.$(LIVE555_VERSION) $@ && touch $@
 
 SUBDIRS=groupsock liveMedia UsageEnvironment BasicUsageEnvironment
