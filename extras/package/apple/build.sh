@@ -731,7 +731,7 @@ $APPL_LIBTOOL -static \
     -no_warning_for_no_symbols \
     -filelist "$VLC_STATIC_FILELIST_NAME" \
     -o "libvlc-full-static.a" \
-  || abort_err "Faile running Apple libtool to combine static libraries together"
+  || abort_err "Failed running Apple libtool to combine static libraries together"
 
 echo ""
 echo "Build succeeded!"
