@@ -21,6 +21,9 @@ ifdef HAVE_ANDROID
 	cp "${ANDROID_NDK}"/sources/android/cpufeatures/cpu-features.c $(UNPACK_DIR)/vpx_ports
 	cp "${ANDROID_NDK}"/sources/android/cpufeatures/cpu-features.h $(UNPACK_DIR)
 endif
+	# Disable automatic addition of -fembed-bitcode for iOS
+	# as it is enabled through --extra-cflags if necessary.
+	$(APPLY) $(SRC)/vpx/libvpx-remove-bitcode.patch
 	$(MOVE)
 
 DEPS_vpx =
