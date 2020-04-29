@@ -542,7 +542,10 @@ echo "Building needed tools (if missing)"
 cd "$VLC_SRC_DIR/extras/tools" || abort_err "Failed cd to tools dir"
 ./bootstrap || abort_err "Bootstrapping tools failed"
 $MAKE -j$VLC_USE_NUMBER_OF_CORES || abort_err "Building tools failed"
-
+if [ $VLC_HOST_ARCH = "armv7" ]; then
+$MAKE -j$VLC_USE_NUMBER_OF_CORES .buildgas \
+    || abort_err "Building gas-preprocessor tool failed"
+fi
 echo ""
 
 ##########################################################
