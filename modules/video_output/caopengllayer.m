@@ -602,7 +602,7 @@ shouldInheritContentsScale:(CGFloat)newScale
 
 - (BOOL)mouseDownCanMoveWindow
 {
-    return NO;
+    return YES;
 }
 
 
