@@ -51,6 +51,11 @@ struct vlc_gl_filter_ops {
                 const struct vlc_gl_input_meta *meta);
 
     /**
+     * Discard any internal state
+     */
+    void (*flush)(struct vlc_gl_filter *filter);
+
+    /**
      * Free filter resources
      */
     void (*close)(struct vlc_gl_filter *filter);

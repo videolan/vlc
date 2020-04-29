@@ -645,6 +645,26 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
 }
 
 void
+vlc_gl_filters_Flush(struct vlc_gl_filters *filters)
+{
+    struct vlc_gl_filter_priv *priv;
+    vlc_list_foreach(priv, &filters->list, node)
+    {
+        struct vlc_gl_filter *filter = &priv->filter;
+        if (filter->ops->flush)
+            filter->ops->flush(filter);
+
+        struct vlc_gl_filter_priv *subfilter_priv;
+        vlc_list_foreach(subfilter_priv, &priv->blend_subfilters, node)
+        {
+            struct vlc_gl_filter *subfilter = &priv->filter;
+            if (subfilter->ops->flush)
+                subfilter->ops->flush(subfilter);
+        }
+    }
+}
+
+void
 vlc_gl_filters_SetViewport(struct vlc_gl_filters *filters, int x, int y,
                            unsigned width, unsigned height)
 {
