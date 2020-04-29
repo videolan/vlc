@@ -66,7 +66,7 @@ Widgets.NavigableFocusScope {
 
 
             Text {
-                text: (rootWindow.showRemainingTime && player.remainingTime.valid())
+                text: (mainInterface.showRemainingTime && player.remainingTime.valid())
                       ? "-" + player.remainingTime.toString()
                       : player.length.toString()
                 color: VLCStyle.colors.playerFg
@@ -75,7 +75,7 @@ Widgets.NavigableFocusScope {
                 Layout.alignment: Qt.AlignRight
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: rootWindow.showRemainingTime = !rootWindow.showRemainingTime
+                    onClicked: mainInterface.showRemainingTime = !mainInterface.showRemainingTime
                 }
             }
 
@@ -115,7 +115,7 @@ Widgets.NavigableFocusScope {
 
     }
     Connections{
-        target: rootWindow
+        target: mainInterface
         onToolBarConfUpdated: playerControlBarModel.reloadModel()
     }
 

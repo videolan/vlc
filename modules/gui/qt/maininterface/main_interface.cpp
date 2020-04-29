@@ -420,7 +420,7 @@ void MainInterface::createMainWidget( QSettings * )
     rootCtx->setContextProperty( "i18n", i18n );
     rootCtx->setContextProperty( "mainctx", mainCtx);
     rootCtx->setContextProperty( "rootQMLView", mediacenterView);
-    rootCtx->setContextProperty( "rootWindow", this);
+    rootCtx->setContextProperty( "mainInterface", this);
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
     rootCtx->setContextProperty( "recentsMedias",  new VLCRecentMediaModel( p_intf, this ));
     rootCtx->setContextProperty( "settings",  new Settings( p_intf, this ));

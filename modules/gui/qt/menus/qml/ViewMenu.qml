@@ -25,26 +25,26 @@ Widgets.MenuExt {
     id: viewMenu
     Action {
         text: i18n.qtr("Play&list")
-        onTriggered: rootWindow.playlistVisible = !rootWindow.playlistVisible
+        onTriggered: mainInterface.playlistVisible = !mainInterface.playlistVisible
     }
     Action {
         text: i18n.qtr("Docked Playlist")
         checkable: true
-        checked: rootWindow.playlistDocked
-        onTriggered: rootWindow.playlistDocked = !rootWindow.playlistDocked
+        checked: mainInterface.playlistDocked
+        onTriggered: mainInterface.playlistDocked = !mainInterface.playlistDocked
     }
     Action {
         text: i18n.qtr("&Always on Top")
         checkable: true
-        checked: rootWindow.interfaceAlwaysOnTop
-        onTriggered: rootWindow.interfaceAlwaysOnTop = !rootWindow.interfaceAlwaysOnTop
+        checked: mainInterface.interfaceAlwaysOnTop
+        onTriggered: mainInterface.interfaceAlwaysOnTop = !mainInterface.interfaceAlwaysOnTop
     }
 
     Action {
         text: i18n.qtr("&Fullscreen Interface")
         checkable: true
-        checked: rootWindow.interfaceFullScreen
-        onTriggered: rootWindow.interfaceFullScreen = !rootWindow.interfaceFullScreen
+        checked: mainInterface.interfaceFullScreen
+        onTriggered: mainInterface.interfaceFullScreen = !mainInterface.interfaceFullScreen
     }
 
     Loader {
@@ -74,7 +74,7 @@ Widgets.MenuExt {
 
     CheckableModelSubMenu{
         title: i18n.qtr("Add Interface")
-        model: rootWindow.extraInterfaces
+        model: mainInterface.extraInterfaces
     }
 
     /* FIXME unimplemented

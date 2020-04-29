@@ -80,7 +80,7 @@ Widgets.NavigableFocusScope {
         }
         //unhandled keys are forwarded as hotkeys
         if (!event.accepted)
-            rootWindow.sendHotkey(event.key, event.modifiers);
+            mainInterface.sendHotkey(event.key, event.modifiers);
     }
 
     readonly property var pageModel: [
@@ -186,7 +186,7 @@ Widgets.NavigableFocusScope {
                             left: parent.left
                             bottom: parent.bottom
                             right: playlist.visible ? playlist.left : parent.right
-                            rightMargin: (rootWindow.playlistDocked && rootWindow.playlistVisible)
+                            rightMargin: (mainInterface.playlistDocked && mainInterface.playlistVisible)
                                          ? 0
                                          : VLCStyle.applicationHorizontalMargin
                             leftMargin: VLCStyle.applicationHorizontalMargin
@@ -209,7 +209,7 @@ Widgets.NavigableFocusScope {
                         id: playlist
                         focus: true
                         width: root.width/4
-                        visible: rootWindow.playlistDocked && rootWindow.playlistVisible
+                        visible: mainInterface.playlistDocked && mainInterface.playlistVisible
                         anchors {
                             top: parent.top
                             right: parent.right
@@ -223,7 +223,7 @@ Widgets.NavigableFocusScope {
                         navigationUpItem: sourcesBanner
                         navigationDownItem: miniPlayer.expanded ? miniPlayer : undefined
                         navigationCancel: function() {
-                            rootWindow.playlistVisible = false
+                            mainInterface.playlistVisible = false
                             stackView.forceActiveFocus()
                         }
 

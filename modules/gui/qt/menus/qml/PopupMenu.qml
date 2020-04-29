@@ -36,7 +36,7 @@ Widgets.MenuExt {
     Action { text: i18n.qtr("Record");   enabled: player.isPlaying ; onTriggered: player.toggleRecord();         icon.source: "qrc:/toolbar/record.svg";     }
 
     MenuSeparator {}
-    Action { text: i18n.qtr("&Fullscreen Interface"); checkable: true; checked: rootWindow.interfaceFullScreen;  onTriggered: rootWindow.interfaceFullScreen = !rootWindow.interfaceFullScreen }
+    Action { text: i18n.qtr("&Fullscreen Interface"); checkable: true; checked: mainInterface.interfaceFullScreen;  onTriggered: mainInterface.interfaceFullScreen = !mainInterface.interfaceFullScreen }
 
     MenuSeparator {}
     AudioMenu { title: i18n.qtr("&Audio") }

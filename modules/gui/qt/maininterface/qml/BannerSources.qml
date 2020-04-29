@@ -303,7 +303,7 @@ Widgets.NavigableFocusScope {
                             iconText: VLCIcons.playlist
                             text: i18n.qtr("Playlist")
 
-                            onClicked:  rootWindow.playlistVisible = !rootWindow.playlistVisible
+                            onClicked:  mainInterface.playlistVisible = !mainInterface.playlistVisible
                         }
                     }
 

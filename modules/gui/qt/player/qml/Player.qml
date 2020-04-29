@@ -47,7 +47,7 @@ Widgets.NavigableFocusScope {
 
         //unhandled keys are forwarded as hotkeys
         if (!event.accepted || controlBarView.state !== "visible")
-            rootWindow.sendHotkey(event.key, event.modifiers);
+            mainInterface.sendHotkey(event.key, event.modifiers);
     }
 
     Keys.onReleased: {
@@ -61,7 +61,7 @@ Widgets.NavigableFocusScope {
     }
 
     navigationCancel: function() {
-        if (rootWindow.hasEmbededVideo && controlBarView.state === "visible") {
+        if (mainInterface.hasEmbededVideo && controlBarView.state === "visible") {
             toolbarAutoHide._setVisibleControlBar(false)
         } else {
             if (player.hasVideoOutput) {
@@ -111,10 +111,10 @@ Widgets.NavigableFocusScope {
                     lockAutoHide: playlistpopup.state === "visible"
 
                     onTogglePlaylistVisiblity:  {
-                        if (rootWindow.playlistDocked)
+                        if (mainInterface.playlistDocked)
                             playlistpopup.showPlaylist = !playlistpopup.showPlaylist
                         else
-                            rootWindow.playlistVisible = !rootWindow.playlistVisible
+                            mainInterface.playlistVisible = !mainInterface.playlistVisible
                     }
 
                     title: mainPlaylistController.currentItem.title
@@ -151,7 +151,7 @@ Widgets.NavigableFocusScope {
                 spacing: VLCStyle.margin_small
 
 
-                visible: !rootWindow.hasEmbededVideo
+                visible: !mainInterface.hasEmbededVideo
 
                 Item {
                     Layout.fillHeight: true
@@ -239,7 +239,7 @@ Widgets.NavigableFocusScope {
                 property var previousFocus: undefined
                 focus: false
                 edge: Widgets.DrawerExt.Edges.Right
-                state: showPlaylist && rootWindow.playlistDocked ? "visible" : "hidden"
+                state: showPlaylist && mainInterface.playlistDocked ? "visible" : "hidden"
                 component: Rectangle {
                     color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
                     width: rootPlayer.width/4
@@ -310,7 +310,7 @@ Widgets.NavigableFocusScope {
 
                         lockAutoHide: playlistpopup.state === "visible"
                             || !player.hasVideoOutput
-                            || !rootWindow.hasEmbededVideo
+                            || !mainInterface.hasEmbededVideo
                             || controllerMouseArea.containsMouse
                         onAutoHideChanged: {
                             if (autoHide)
@@ -328,7 +328,7 @@ Widgets.NavigableFocusScope {
 
     //center image
     Rectangle {
-        visible: !rootWindow.hasEmbededVideo
+        visible: !mainInterface.hasEmbededVideo
         focus: false
         color: VLCStyle.colors.bg
         anchors.fill: parent
@@ -359,7 +359,7 @@ Widgets.NavigableFocusScope {
         z: 0
 
         ctx: mainctx
-        visible: rootWindow.hasEmbededVideo
+        visible: mainInterface.hasEmbededVideo
         anchors.fill: parent
 
         property point mousePosition: Qt.point(0,0)
@@ -429,7 +429,7 @@ Widgets.NavigableFocusScope {
     }
 
     Connections {
-        target: rootWindow
+        target: mainInterface
         onAskShow: {
             toolbarAutoHide.toggleForceVisible()
         }

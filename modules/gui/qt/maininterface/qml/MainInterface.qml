@@ -38,12 +38,12 @@ Rectangle {
 
     Loader {
         id: playlistWindowLoader
-        active: !rootWindow.playlistDocked && rootWindow.playlistVisible
+        active: !mainInterface.playlistDocked && mainInterface.playlistVisible
         sourceComponent: Window {
             visible: true
             title: i18n.qtr("Playlist")
             color: VLCStyle.colors.bg
-            onClosing: rootWindow.playlistVisible = false
+            onClosing: mainInterface.playlistVisible = false
             PL.PlaylistListView {
                 id: playlistView
                 focus: true

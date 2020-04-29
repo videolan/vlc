@@ -147,7 +147,7 @@ Widgets.NavigableFocusScope {
         }
 
         Connections{
-            target: rootWindow
+            target: mainInterface
             onToolBarConfUpdated: {
                 miniPlayerModel.reloadModel()
             }
@@ -167,7 +167,7 @@ Widgets.NavigableFocusScope {
             if (!event.accepted)
                 defaultKeyAction(event, 0)
             if (!event.accepted)
-                rootWindow.sendHotkey(event.key, event.modifiers);
+                mainInterface.sendHotkey(event.key, event.modifiers);
         }
 
     }
