@@ -290,7 +290,6 @@ modules/codec/cc.c
 modules/codec/cdg.c
 modules/codec/cea708.c
 modules/codec/cea708.h
-modules/codec/crystalhd.c
 modules/codec/cvdsub.c
 modules/codec/daala.c
 modules/codec/dca.c

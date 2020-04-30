@@ -2456,35 +2456,6 @@ then
 fi
 
 dnl
-dnl CrystalHD codec plugin
-dnl
-AC_ARG_ENABLE([crystalhd],
-  AS_HELP_STRING([--enable-crystalhd], [crystalhd codec plugin (default auto)]))
-if test "${enable_crystalhd}" != "no"; then
-    AC_CHECK_HEADER(libcrystalhd/libcrystalhd_if.h, [
-      VLC_ADD_PLUGIN([crystalhd])
-      VLC_ADD_LIBS([crystalhd], [-lcrystalhd])
-    ],[
-      if test "${SYS}" = "mingw32" ; then
-        AC_CHECK_HEADERS([libcrystalhd/bc_dts_defs.h], [
-          VLC_ADD_PLUGIN([crystalhd])
-          AC_CHECK_HEADERS([libcrystalhd/bc_drv_if.h], [
-            VLC_ADD_LIBS([crystalhd], [-lbcmDIL])
-            ])
-        ],[
-          AS_IF([test x"${enable_crystalhd}" = "xyes"],
-                [AC_MSG_ERROR("Could not find CrystalHD development headers")],
-                [AC_MSG_WARN("Could not find CrystalHD development headers")])
-        ],[#define __LINUX_USER__
-               #include <libcrystalhd/bc_dts_types.h>
-        ])
-      fi
-    ],[
-       #include <libcrystalhd/bc_dts_types.h>
-      ])
-fi
-
-dnl
 dnl  mad plugin
 dnl
 have_mad="no"
