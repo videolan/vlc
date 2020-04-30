@@ -400,69 +400,78 @@
                             <constraint firstAttribute="bottom" secondItem="MQH-bI-Zdh" secondAttribute="bottom" id="lBe-S3-sJr"/>
                         </constraints>
                     </customView>
-                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8iI-b7-Eag">
-                        <rect key="frame" x="212" y="297" width="56" height="24"/>
-                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="j8T-nk-7Ny">
-                            <font key="font" metaFont="system"/>
-                            <segments>
-                                <segment/>
-                                <segment selected="YES" tag="1"/>
-                                <segment/>
-                            </segments>
-                        </segmentedCell>
-                    </segmentedControl>
-                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lIg-5J-C5F">
-                        <rect key="frame" x="9" y="297" width="67" height="24"/>
-                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="jcw-1T-HPS">
-                            <font key="font" metaFont="system"/>
-                            <segments>
-                                <segment image="NSIconViewTemplate"/>
-                                <segment image="NSListViewTemplate" selected="YES" tag="1"/>
-                            </segments>
-                        </segmentedCell>
-                    </segmentedControl>
-                    <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Rja-6g-wNZ">
-                        <rect key="frame" x="76" y="292" width="57" height="32"/>
-                        <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSTextRulerLineHeightIncrease" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PIW-C4-naY">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="sortLibrary:" target="QvC-M9-y7g" id="VJd-p4-owD"/>
-                        </connections>
-                    </button>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IaO-se-D0g">
-                        <rect key="frame" x="428" y="296" width="34" height="24"/>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="6gW-0d-ymm" userLabel="Option Bar">
+                        <rect key="frame" x="0.0" y="294" width="480" height="33"/>
+                        <subviews>
+                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lIg-5J-C5F">
+                                <rect key="frame" x="6" y="3" width="67" height="24"/>
+                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="jcw-1T-HPS">
+                                    <font key="font" metaFont="system"/>
+                                    <segments>
+                                        <segment image="NSIconViewTemplate"/>
+                                        <segment image="NSListViewTemplate" selected="YES" tag="1"/>
+                                    </segments>
+                                </segmentedCell>
+                            </segmentedControl>
+                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8iI-b7-Eag">
+                                <rect key="frame" x="212" y="3" width="56" height="24"/>
+                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="j8T-nk-7Ny">
+                                    <font key="font" metaFont="system"/>
+                                    <segments>
+                                        <segment/>
+                                        <segment selected="YES" tag="1"/>
+                                        <segment/>
+                                    </segments>
+                                </segmentedCell>
+                            </segmentedControl>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IaO-se-D0g">
+                                <rect key="frame" x="438" y="4" width="34" height="23"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="3VZ-cS-NXX"/>
+                                </constraints>
+                                <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="NSPrivateChaptersTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YeZ-La-h4h">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="showAndHidePlaylist:" target="QvC-M9-y7g" id="1LE-KG-zjk"/>
+                                </connections>
+                            </button>
+                            <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Rja-6g-wNZ">
+                                <rect key="frame" x="80" y="-2" width="57" height="32"/>
+                                <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSTextRulerLineHeightIncrease" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PIW-C4-naY">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="sortLibrary:" target="QvC-M9-y7g" id="VJd-p4-owD"/>
+                                </connections>
+                            </button>
+                        </subviews>
                         <constraints>
-                            <constraint firstAttribute="width" constant="30" id="3VZ-cS-NXX"/>
+                            <constraint firstAttribute="trailing" secondItem="IaO-se-D0g" secondAttribute="trailing" constant="10" id="1Ko-NP-e00"/>
+                            <constraint firstItem="Rja-6g-wNZ" firstAttribute="leading" secondItem="lIg-5J-C5F" secondAttribute="trailing" constant="15" id="2Kl-u8-t8J"/>
+                            <constraint firstItem="lIg-5J-C5F" firstAttribute="leading" secondItem="6gW-0d-ymm" secondAttribute="leading" constant="8" id="O1U-3y-kGr"/>
                         </constraints>
-                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="NSPrivateChaptersTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YeZ-La-h4h">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="showAndHidePlaylist:" target="QvC-M9-y7g" id="1LE-KG-zjk"/>
-                        </connections>
-                    </button>
+                    </customView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="lIg-5J-C5F" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="43" id="5Q0-67-G0N"/>
-                    <constraint firstItem="u8g-jy-S4e" firstAttribute="top" secondItem="8iI-b7-Eag" secondAttribute="bottom" constant="6" id="DZr-o9-iHo"/>
-                    <constraint firstItem="IaO-se-D0g" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="45" id="Et8-n4-2W9"/>
+                    <constraint firstItem="8iI-b7-Eag" firstAttribute="centerX" secondItem="u8g-jy-S4e" secondAttribute="centerX" id="3Cz-JU-IpN"/>
+                    <constraint firstItem="dus-WQ-AmE" firstAttribute="top" secondItem="6gW-0d-ymm" secondAttribute="bottom" constant="1" id="CUx-YB-cyf"/>
+                    <constraint firstItem="dus-WQ-AmE" firstAttribute="top" secondItem="IaO-se-D0g" secondAttribute="bottom" constant="8" id="GEx-4E-MfR"/>
                     <constraint firstItem="vUy-jt-gjY" firstAttribute="top" secondItem="u8g-jy-S4e" secondAttribute="bottom" id="QH8-mU-6ZP"/>
+                    <constraint firstItem="iSp-bV-w6B" firstAttribute="top" secondItem="lIg-5J-C5F" secondAttribute="bottom" constant="6" id="Roa-qV-bEC"/>
                     <constraint firstItem="vUy-jt-gjY" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="Sse-bx-ewr"/>
-                    <constraint firstItem="IaO-se-D0g" firstAttribute="bottom" secondItem="8iI-b7-Eag" secondAttribute="bottom" id="Vhb-RA-Uq8"/>
-                    <constraint firstItem="lIg-5J-C5F" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="11" id="Wj8-za-J3p"/>
                     <constraint firstAttribute="trailing" secondItem="vUy-jt-gjY" secondAttribute="trailing" id="amK-mR-Fvr"/>
-                    <constraint firstItem="Rja-6g-wNZ" firstAttribute="leading" secondItem="lIg-5J-C5F" secondAttribute="trailing" constant="8" symbolic="YES" id="dDQ-E4-Mha"/>
-                    <constraint firstItem="8iI-b7-Eag" firstAttribute="centerX" secondItem="EiT-Mj-1SZ" secondAttribute="centerX" id="fnd-vq-xxU"/>
+                    <constraint firstItem="iSp-bV-w6B" firstAttribute="top" secondItem="Rja-6g-wNZ" secondAttribute="bottom" constant="6" id="bT9-YA-byc"/>
+                    <constraint firstItem="iSp-bV-w6B" firstAttribute="top" secondItem="8iI-b7-Eag" secondAttribute="bottom" constant="6" id="d0E-jO-PPV"/>
+                    <constraint firstItem="6gW-0d-ymm" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="hhP-vd-jJJ"/>
                     <constraint firstItem="u8g-jy-S4e" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="70" id="im9-CS-OPY"/>
-                    <constraint firstItem="iSp-bV-w6B" firstAttribute="top" secondItem="Rja-6g-wNZ" secondAttribute="bottom" constant="6" id="kZ9-Ol-BTy"/>
                     <constraint firstAttribute="trailing" secondItem="u8g-jy-S4e" secondAttribute="trailing" id="lEc-Vr-8M9"/>
-                    <constraint firstItem="8iI-b7-Eag" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="43" id="no4-cb-IAg"/>
+                    <constraint firstItem="6gW-0d-ymm" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="36" id="ov5-H0-WRT"/>
                     <constraint firstItem="u8g-jy-S4e" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="s58-Wr-5SV"/>
                     <constraint firstAttribute="bottom" secondItem="vUy-jt-gjY" secondAttribute="bottom" id="vMr-VQ-r4P"/>
-                    <constraint firstAttribute="trailing" secondItem="IaO-se-D0g" secondAttribute="trailing" constant="20" symbolic="YES" id="wTS-05-MXf"/>
+                    <constraint firstItem="6gW-0d-ymm" firstAttribute="trailing" secondItem="u8g-jy-S4e" secondAttribute="trailing" id="yMd-qC-rOW"/>
                 </constraints>
             </view>
             <toolbar key="toolbar" implicitIdentifier="CAE4F278-DC20-4A58-B07E-1580E7B14C87" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="regular" id="pr3-TD-J2z">
