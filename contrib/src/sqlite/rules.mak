@@ -28,5 +28,5 @@ sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz .sum-sqlite
 
 .sqlite: sqlite
 	cd $< && $(HOSTVARS) CFLAGS="$(SQLITE_CFLAGS)" ./configure $(SQLITE_CONF)
-	cd $< && $(MAKE) install-libLTLIBRARIES
+	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
