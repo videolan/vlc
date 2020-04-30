@@ -2803,25 +2803,25 @@ fi
 dnl
 dnl  faad decoder plugin
 dnl
-AC_ARG_ENABLE([faad],
-AS_HELP_STRING([--enable-faad], [faad codec (default auto)]))
-have_faad="no"
-AS_IF([test "${enable_faad}" != "no"], [
-  AC_CHECK_HEADERS([neaacdec.h], [
-    AC_CHECK_LIB([faad], [NeAACDecOpen], [have_faad="yes"],, [$LIBM])
-
-    AS_IF([test "${have_faad}" = "yes"], [
-      VLC_ADD_PLUGIN([faad])
-      VLC_ADD_LIBS([faad],[-lfaad])
-    ], [
-      AS_IF([test "${enable_faad}" = "yes"], [
-        AC_MSG_ERROR([cannot find FAAD library])
-      ], [
-        AC_MSG_WARN([cannot find FAAD library])
-      ])
+PKG_WITH_MODULES([FAAD],[faad2],
+  VLC_ADD_PLUGIN(faad)
+  VLC_ADD_CFLAGS(faad, [$FAAD_CFLAGS])
+  VLC_ADD_LIBS(faad,[$FAAD_LIBS]),
+  AS_IF([test "x${enable_faad}" != "xno"],[
+    AC_CHECK_HEADERS([neaacdec.h], [
+      AC_CHECK_LIB([faad], [NeAACDecOpen],[
+                      VLC_ADD_PLUGIN([faad])
+                      VLC_ADD_LIBS([faad],[-lfaad])
+                      found_faad="yes"
+                   ],[], [$LIBM])
     ])
-  ])
-])
+    AS_IF([test "x${found_faad}" != "xyes"],
+        AS_IF([test "x${enable_faad}" == "xyes"],
+            AC_MSG_ERROR([${FAAD_PKG_ERRORS}.]),
+            AC_MSG_WARN([${FAAD_PKG_ERRORS}.]))
+    )
+  ]),
+[faad AAC audio decoder])
 
 dnl
 dnl  AOM decoder plugin

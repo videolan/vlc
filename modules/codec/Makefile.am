@@ -41,7 +41,7 @@ libaraw_plugin_la_LIBADD = $(LIBM)
 codec_LTLIBRARIES += libaraw_plugin.la
 
 libfaad_plugin_la_SOURCES = codec/faad.c packetizer/mpeg4audio.h
-libfaad_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_faad)
+libfaad_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CFLAGS_faad)
 libfaad_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libfaad_plugin_la_LIBADD = $(LIBS_faad) $(LIBM)
 EXTRA_LTLIBRARIES += libfaad_plugin.la
