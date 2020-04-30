@@ -1,0 +1,30 @@
+From 838958b93cea04466bb4d745e62b54f9dad595b6 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 30 Apr 2020 15:15:51 +0200
+Subject: [PATCH] compat: provide a getpid replacement that works on Windows
+ XP+
+
+GetCurrentProcessId() is available since Windows XP
+
+getpid() is not allowed in UCRT builds.
+https://docs.microsoft.com/en-us/cpp/cppcx/crt-functions-not-supported-in-universal-windows-platform-apps
+---
+ compat/getpid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/compat/getpid.c b/compat/getpid.c
+index 032387c3..eb0a4899 100644
+--- a/compat/getpid.c
++++ b/compat/getpid.c
+@@ -14,7 +14,7 @@
+ #include <config.h>
+ #endif
+ 
+-#ifdef HAVE_W32CE_SYSTEM
++#ifdef _WIN32
+ #include <windows.h>
+ #include <sys/types.h>
+ 
+-- 
+2.26.0.windows.1
+
