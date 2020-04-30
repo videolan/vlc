@@ -146,9 +146,14 @@ ifneq ($(filter i386 x86_64,$(ARCH)),)
 VPX_CONF += --disable-mmx
 endif
 
-ifndef WITH_OPTIMIZATION
-VPX_CONF += --enable-debug --disable-optimizations
+ifdef WITH_OPTIMIZATION
+VPX_CFLAGS += -DNDEBUG
+else
+VPX_CONF += --disable-optimizations
 endif
+
+# Always enable debug symbols, we strip in the final executables if needed
+VPX_CONF += --enable-debug
 
 ifdef HAVE_ANDROID
 # Starting NDK19, standalone toolchains are deprecated and gcc is not shipped.
@@ -164,7 +169,7 @@ endif
 	rm -rf $(PREFIX)/include/vpx
 	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) ./configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
-	cd $< && $(MAKE)
+	cd $< && CONFIG_DEBUG=1 $(MAKE)
 	$(call pkg_static,"vpx.pc")
-	cd $< && $(MAKE) install
+	cd $< && CONFIG_DEBUG=1 $(MAKE) install
 	touch $@
