@@ -31,7 +31,6 @@
 #endif
 
 #include <errno.h>                                                 /* ENOMEM */
-#include <signal.h>
 #include <assert.h>
 #include <math.h>
 
