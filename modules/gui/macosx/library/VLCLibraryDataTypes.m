@@ -187,6 +187,9 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         return nil;
     }
     vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
+    if (!p_mediaLibrary) {
+        return nil;
+    }
     vlc_ml_artist_t *p_artist = vlc_ml_get_artist(p_mediaLibrary, artistID);
     VLCMediaLibraryArtist *artist = nil;
     if (p_artist) {
@@ -238,6 +241,9 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         return @[];
     }
     vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
+    if (!p_mediaLibrary) {
+        return @[];
+    }
     vlc_ml_media_list_t *p_mediaList = vlc_ml_list_album_tracks(p_mediaLibrary, NULL, _albumID);
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:p_mediaList->i_nb_items];
     for (size_t x = 0; x < p_mediaList->i_nb_items; x++) {
@@ -300,6 +306,9 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         return nil;
     }
     vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
+    if (!p_mediaLibrary) {
+        return nil;
+    }
     vlc_ml_media_t *p_mediaItem = vlc_ml_get_media(p_mediaLibrary, libraryID);
     VLCMediaLibraryMediaItem *returnValue = nil;
     if (p_mediaItem) {
@@ -315,6 +324,9 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         return nil;
     }
     vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
+    if (!p_mediaLibrary) {
+        return nil;
+    }
     vlc_ml_media_t *p_mediaItem = vlc_ml_get_media_by_mrl(p_mediaLibrary,
                                                           [[url absoluteString] UTF8String]);
     VLCMediaLibraryMediaItem *returnValue = nil;
@@ -331,6 +343,9 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         return nil;
     }
     vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
+    if (!p_mediaLibrary) {
+        return nil;
+    }
     if (p_mediaItem != NULL && p_mediaLibrary != NULL) {
         return [self initWithMediaItem:p_mediaItem library:p_mediaLibrary];
     }
@@ -409,6 +424,9 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         return nil;
     }
     vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
+    if (!p_mediaLibrary) {
+        return nil;
+    }
     vlc_ml_media_t *p_media = vlc_ml_new_external_media(p_mediaLibrary, urlString.UTF8String);
     if (p_media) {
         self = [self initWithMediaItem:p_media library:p_mediaLibrary];
@@ -429,6 +447,9 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         return nil;
     }
     vlc_medialibrary_t *p_mediaLibrary = vlc_ml_instance_get(p_intf);
+    if (!p_mediaLibrary) {
+        return nil;
+    }
     vlc_ml_media_t *p_media = vlc_ml_new_stream(p_mediaLibrary, urlString.UTF8String);
     if (p_media) {
         self = [self initWithMediaItem:p_media library:p_mediaLibrary];
