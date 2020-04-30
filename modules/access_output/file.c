@@ -30,7 +30,6 @@
 #endif
 
 #include <assert.h>
-#include <signal.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <errno.h>
