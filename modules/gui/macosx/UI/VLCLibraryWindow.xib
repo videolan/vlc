@@ -563,15 +563,20 @@
                 <outlet property="mediaSourcePathControl" destination="Rjk-Q6-FYy" id="G63-NM-Ekn"/>
                 <outlet property="mediaSourceTableView" destination="vpJ-Oz-Ebz" id="Hbo-Qw-JQd"/>
                 <outlet property="mediaSourceView" destination="eHd-Q9-F8D" id="gfU-Jp-eFr"/>
+                <outlet property="mediaToolBar" destination="pr3-TD-J2z" id="Chi-03-Fgd"/>
                 <outlet property="openMediaButton" destination="SWh-4E-Qtf" id="sIZ-xo-GLA"/>
+                <outlet property="optionBar" destination="6gW-0d-ymm" id="rkK-gK-uY0"/>
+                <outlet property="playQueueToggle" destination="IaO-se-D0g" id="tqY-YM-KQC"/>
                 <outlet property="playlistCounterTextField" destination="mbV-My-cm7" id="ZYU-Jq-Z8R"/>
                 <outlet property="playlistDragDropView" destination="VFI-oW-dMZ" id="gVc-mu-f8T"/>
                 <outlet property="playlistTableView" destination="Fr1-af-8gb" id="yaB-Ab-jrx"/>
                 <outlet property="playlistView" destination="dus-WQ-AmE" id="fTF-HP-Chb"/>
+                <outlet property="playqueue" destination="IaO-se-D0g" id="NMT-lQ-7x7"/>
                 <outlet property="recentVideoLibraryCollectionView" destination="hnE-Hj-MZo" id="Fko-5v-1bC"/>
                 <outlet property="repeatPlaylistButton" destination="8zF-Wo-H79" id="6bH-HF-arx"/>
                 <outlet property="segmentedTitleControl" destination="W1M-0o-qYG" id="Gw1-T6-78k"/>
                 <outlet property="shufflePlaylistButton" destination="jg5-33-vH0" id="FV2-36-3lG"/>
+                <outlet property="test" destination="IaO-se-D0g" id="7nK-TX-QPm"/>
                 <outlet property="upNextLabel" destination="TET-5r-zHx" id="3oI-LK-NDP"/>
                 <outlet property="upNextSeparator" destination="qmL-Ar-cj1" id="GRX-ZE-2UG"/>
                 <outlet property="videoLibraryCollectionView" destination="B8x-e8-7zp" id="u1I-gn-IU1"/>
