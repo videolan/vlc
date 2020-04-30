@@ -690,56 +690,6 @@ dnl Check for max_align_t
 AC_CHECK_TYPES([max_align_t],,,
 [#include <stddef.h>])
 
-dnl Checks for socket stuff
-VLC_SAVE_FLAGS
-SOCKET_LIBS=""
-AC_SEARCH_LIBS(connect, [socket], [
-  AS_IF([test "$ac_cv_search_connect" != "none required"], [
-    SOCKET_LIBS="$ac_cv_search_connect"
-  ])
-], [
-  AS_IF([test "${SYS}" = "mingw32"], [
-    SOCKET_LIBS="-lws2_32 -liphlpapi"
-  ])
-])
-
-AC_SEARCH_LIBS([inet_pton], [nsl], [
- AS_IF([test "$ac_cv_search_inet_pton" != "none required"], [
-    SOCKET_LIBS="$ac_cv_search_inet_pton $SOCKET_LIBS"
-  ])
-],, [${SOCKET_LIBS}])
-
-LIBS="${LIBS} ${SOCKET_LIBS}"
-CFLAGS="${CFLAGS} -Werror-implicit-function-declaration"
-AC_LINK_IFELSE([
-    AC_LANG_PROGRAM([#ifdef _WIN32
-        #include <ws2tcpip.h>
-        #include <windows.h>
-        # if _WIN32_WINNT < 0x600
-        #  error Needs vista+
-        # endif
-        #else
-        #include <sys/socket.h>
-        #include <arpa/inet.h>
-        #endif], [
-        char dst[[sizeof(struct in_addr)]];
-        inet_pton(AF_INET, "127.0.0.1", dst);
-    ])],[AC_DEFINE([HAVE_INET_PTON],[1],[Define to 1 if you have inet_pton function])],[AC_LIBOBJ([inet_pton])])
-AC_LINK_IFELSE([
-    AC_LANG_PROGRAM([#ifdef _WIN32
-        #include <iphlpapi.h>
-        #else
-        #include <sys/types.h>
-        #include <sys/socket.h>
-        #include <net/if.h>
-        #endif], [
-        if_nametoindex("");
-    ])],[AC_DEFINE([HAVE_IF_NAMETOINDEX],[1],[Define to 1 if you have if_nametoindex function])])
-AC_CHECK_TYPES([struct if_nameindex],,,[#include <net/if.h>])
-AC_CHECK_FUNCS([if_nameindex])
-VLC_RESTORE_FLAGS
-AC_SUBST(SOCKET_LIBS)
-
 dnl Check for socklen_t
 AH_TEMPLATE(socklen_t, [Define to `int' if <sys/socket.h> does not define.])
 AC_CACHE_CHECK([for socklen_t in sys/socket.h], dnl ` (fix VIM syntax highlight
@@ -1007,8 +957,59 @@ dnl
 AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wvolatile-register-var -Wformat -Wformat-security], [CFLAGS])
 AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wvolatile-register-var -Wformat -Wformat-security], [CXXFLAGS])
 
+dnl -Werror-implicit-function-declaration is used for the if_nametoindex detection with winstore
 AX_APPEND_COMPILE_FLAGS([-Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Werror-implicit-function-declaration -Winit-self -Wlogical-op -Wshadow=local], [CFLAGS])
 AX_APPEND_COMPILE_FLAGS([-pipe], [CFLAGS])
+
+dnl Checks for socket stuff
+VLC_SAVE_FLAGS
+SOCKET_LIBS=""
+AC_SEARCH_LIBS(connect, [socket], [
+  AS_IF([test "$ac_cv_search_connect" != "none required"], [
+    SOCKET_LIBS="$ac_cv_search_connect"
+  ])
+], [
+  AS_IF([test "${SYS}" = "mingw32"], [
+    SOCKET_LIBS="-lws2_32 -liphlpapi"
+  ])
+])
+
+AC_SEARCH_LIBS([inet_pton], [nsl], [
+ AS_IF([test "$ac_cv_search_inet_pton" != "none required"], [
+    SOCKET_LIBS="$ac_cv_search_inet_pton $SOCKET_LIBS"
+  ])
+],, [${SOCKET_LIBS}])
+
+LIBS="${LIBS} ${SOCKET_LIBS}"
+CFLAGS="${CFLAGS} -Werror-implicit-function-declaration"
+AC_LINK_IFELSE([
+    AC_LANG_PROGRAM([#ifdef _WIN32
+        #include <ws2tcpip.h>
+        #include <windows.h>
+        # if _WIN32_WINNT < 0x600
+        #  error Needs vista+
+        # endif
+        #else
+        #include <sys/socket.h>
+        #include <arpa/inet.h>
+        #endif], [
+        char dst[[sizeof(struct in_addr)]];
+        inet_pton(AF_INET, "127.0.0.1", dst);
+    ])],[AC_DEFINE([HAVE_INET_PTON],[1],[Define to 1 if you have inet_pton function])],[AC_LIBOBJ([inet_pton])])
+AC_LINK_IFELSE([
+    AC_LANG_PROGRAM([#ifdef _WIN32
+        #include <iphlpapi.h>
+        #else
+        #include <sys/types.h>
+        #include <sys/socket.h>
+        #include <net/if.h>
+        #endif], [
+        if_nametoindex("");
+    ])],[AC_DEFINE([HAVE_IF_NAMETOINDEX],[1],[Define to 1 if you have if_nametoindex function])])
+AC_CHECK_TYPES([struct if_nameindex],,,[#include <net/if.h>])
+AC_CHECK_FUNCS([if_nameindex])
+VLC_RESTORE_FLAGS
+AC_SUBST(SOCKET_LIBS)
 
 dnl
 dnl  Debugging mode
