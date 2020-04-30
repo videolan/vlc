@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCPlaybackContinuityController.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2015-2019 VLC authors and VideoLAN
+ * Copyright (C) 2015-2020 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne # videolan.org>
  *          David Fuhrmann <dfuhrmann # videolan.org>
@@ -36,6 +36,8 @@ static const float MinimumStorePercent = 0.05;
 static const float MaximumStorePercent = 0.95;
 static const int64_t MinimumStoreTime = 60 * 1000;
 static const int64_t MinimumStoreRemainingTime = 60 * 1000;
+static NSString *VLCRecentlyPlayedMediaKey = @"recentlyPlayedMedia";
+static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
 
 @interface VLCPlaybackContinuityController()
 {
@@ -50,8 +52,8 @@ static const int64_t MinimumStoreRemainingTime = 60 * 1000;
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 [NSArray array], @"recentlyPlayedMediaList",
-                                 [NSDictionary dictionary], @"recentlyPlayedMedia", nil];
+                                 [NSArray array], VLCRecentlyPlayedMediaListKey,
+                                 [NSDictionary dictionary], VLCRecentlyPlayedMediaKey, nil];
 
     [defaults registerDefaults:appDefaults];
 }
@@ -218,7 +220,7 @@ static const int64_t MinimumStoreRemainingTime = 60 * 1000;
                                              ask:(BOOL)ask
                                           player:(VLCPlayerController *)playerController
 {
-    NSDictionary *recentlyPlayedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"recentlyPlayedMedia"];
+    NSDictionary *recentlyPlayedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:VLCRecentlyPlayedMediaKey];
     if (!recentlyPlayedFiles)
         return;
 
@@ -301,13 +303,13 @@ BOOL ShouldStorePlaybackPosition(float position, int64_t duration)
                                      withPlayer:(VLCPlayerController *)playerController
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
+    NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:VLCRecentlyPlayedMediaKey]];
 
     float relativePos = playerController.position;
     long long pos = SEC_FROM_VLC_TICK(playerController.time);
     long long dur = SEC_FROM_VLC_TICK(inputItem.duration);
 
-    NSMutableArray *mediaList = [[defaults objectForKey:@"recentlyPlayedMediaList"] mutableCopy];
+    NSMutableArray *mediaList = [[defaults objectForKey:VLCRecentlyPlayedMediaListKey] mutableCopy];
     NSString *mrl = inputItem.MRL;
 
     if (ShouldStorePlaybackPosition(relativePos, dur*1000)) {
@@ -327,8 +329,8 @@ BOOL ShouldStorePlaybackPosition(float position, int64_t duration)
         [mutDict removeObjectForKey:mrl];
         [mediaList removeObject:mrl];
     }
-    [defaults setObject:mutDict forKey:@"recentlyPlayedMedia"];
-    [defaults setObject:mediaList forKey:@"recentlyPlayedMediaList"];
+    [defaults setObject:mutDict forKey:VLCRecentlyPlayedMediaKey];
+    [defaults setObject:mediaList forKey:VLCRecentlyPlayedMediaListKey];
 }
 
 @end
