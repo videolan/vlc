@@ -1048,8 +1048,27 @@ dnl
 AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wvolatile-register-var -Wformat -Wformat-security -Wduplicated-branches -Wduplicated-cond], [CFLAGS])
 AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wvolatile-register-var -Wformat -Wformat-security -Wduplicated-branches -Wduplicated-cond], [CXXFLAGS])
 
+dnl -Werror-implicit-function-declaration is used for the if_nametoindex detection with winstore
 AX_APPEND_COMPILE_FLAGS([-Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Werror-implicit-function-declaration -Winit-self -Wlogical-op -Wshadow=local -Wmultistatement-macros], [CFLAGS])
 AX_APPEND_COMPILE_FLAGS([-pipe], [CFLAGS])
+
+dnl UWP forbidden checks
+AS_IF([test "${SYS}" = "mingw32"], [
+  AC_MSG_CHECKING(for if_nametoindex availability)
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+      [[#include <windows.h>
+        #include <iphlpapi.h>
+        static void test (void) {
+          if_nametoindex("");
+        }
+      ]],[[;]])
+    ],[
+      AC_MSG_RESULT([present])
+      AC_DEFINE([HAVE_IF_NAMETOINDEX], [1], [Define to 1 if you have if_nametoindex function])
+    ],[
+      AC_MSG_RESULT([not present])
+    ])
+])
 
 dnl
 dnl  Debugging mode

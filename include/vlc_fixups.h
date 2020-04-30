@@ -454,6 +454,14 @@ struct msghdr
     size_t        msg_controllen;
     int           msg_flags;
 };
+
+# ifndef HAVE_IF_NAMETOINDEX
+#  include <stdlib.h> /* a define may change from the real atoi declaration */
+static inline int if_nametoindex(const char *name)
+{
+    return atoi(name);
+}
+# endif
 #endif
 
 #ifdef _NEWLIB_VERSION
