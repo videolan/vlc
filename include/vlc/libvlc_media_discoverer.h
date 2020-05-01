@@ -78,7 +78,6 @@ typedef struct libvlc_media_discoverer_t libvlc_media_discoverer_t;
  * discovery.
  *
  * \see libvlc_media_discoverer_media_list
- * \see libvlc_media_discoverer_event_manager
  * \see libvlc_media_discoverer_start
  *
  * \param p_inst libvlc instance
