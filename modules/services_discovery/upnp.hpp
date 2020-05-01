@@ -112,7 +112,7 @@ private:
     bool addContainer( IXML_Element* containerElement );
     bool addItem( IXML_Element* itemElement );
 
-    IXML_Document* _browseAction(const char*, const char*,
+    IXML_Document* _browseAction(const char*, const char*, const char*,
             const char*, const char*, const char* );
     static int sendActionCb( Upnp_EventType, UpnpEventPtr, void *);
 
