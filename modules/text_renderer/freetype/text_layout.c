@@ -1827,4 +1827,3 @@ int LayoutTextBlock( filter_t *p_filter,
     *p_bbox = bbox;
     return VLC_SUCCESS;
 }
-
