@@ -50,7 +50,7 @@ ${LangFileString} Reinstall_HeadlineMaintenance "Seleccione la opción de manten
 ${LangFileString} Reinstall_MessageOlder "Está instalada una versión más antigua de VLC en su sistema. Seleccione la operación que quiere realizar y pulse Siguiente para continuar."
 ${LangFileString} Reinstall_MessageNewer "Está instalada una versión más reciente de VLC. No se recomienda que desactualice a una versión más antigua. Seleccione la operación que quiere realizar y pulse Siguiente para continuar."
 ${LangFileString} Reinstall_MessageSame "VLC ${VERSION} ya está instalado. Seleccione la operación que quiere realizar y pulse Siguiente para continuar."
-${LangFileString} Reinstall_OptionUpgrade "Actualizar VLC usando las preferencias siguientes (recomendado)"
+${LangFileString} Reinstall_OptionUpgrade "Actualizar VLC usando las preferencias anteriores (recomendado)"
 ${LangFileString} Reinstall_OptionDowngrade "Desactualizar VLC usando las preferencias anteriores (recomendado)"
 ${LangFileString} Reinstall_OptionComponents "Añadir/Eliminar/Reinstalar componentes"
 ${LangFileString} Reinstall_OptionAdvanced "Cambiar preferencias (avanzado)"
