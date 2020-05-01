@@ -1232,12 +1232,12 @@ static int LayoutLine( filter_t *p_filter,
         if( p_ch->p_style->i_style_flags & (STYLE_UNDERLINE | STYLE_STRIKEOUT) )
         {
             i_line_offset =
-                abs( FT_FLOOR( FT_MulFix( p_face->underline_position,
-                                          p_face->size->metrics.y_scale ) ) );
+                labs( FT_FLOOR( FT_MulFix( p_face->underline_position,
+                                           p_face->size->metrics.y_scale ) ) );
 
             i_line_thickness =
-                abs( FT_CEIL( FT_MulFix( p_face->underline_thickness,
-                                         p_face->size->metrics.y_scale ) ) );
+                labs( FT_CEIL( FT_MulFix( p_face->underline_thickness,
+                                          p_face->size->metrics.y_scale ) ) );
 
             if( p_ch->p_style->i_style_flags & STYLE_STRIKEOUT )
             {
@@ -1245,8 +1245,8 @@ static int LayoutLine( filter_t *p_filter,
                  * underline. That means that strikethrough takes precedence
                  */
                 i_line_offset -=
-                    abs( FT_FLOOR( FT_MulFix( p_face->descender * 2,
-                                              p_face->size->metrics.y_scale ) ) );
+                    labs( FT_FLOOR( FT_MulFix( p_face->descender * 2,
+                                               p_face->size->metrics.y_scale ) ) );
                 p_bitmaps->glyph_bbox.yMax =
                     __MAX( p_bitmaps->glyph_bbox.yMax,
                            - i_line_offset );
@@ -1291,7 +1291,7 @@ static int LayoutLine( filter_t *p_filter,
         /* Get max advance for grid mode */
         if( b_grid && i_font_max_advance_y == 0 && p_face )
         {
-            i_font_max_advance_y = abs( FT_FLOOR( FT_MulFix( p_face->max_advance_height,
+            i_font_max_advance_y = labs( FT_FLOOR( FT_MulFix( p_face->max_advance_height,
                                       p_face->size->metrics.y_scale ) ) );
         }
 
