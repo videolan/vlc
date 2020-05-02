@@ -82,9 +82,6 @@ variable. The build system will then skip building this package:
 	PKGS_FOUND += foo
 	endif
 
-Note: The need_pkg function always return 1 during cross-compilation.
-This is a known bug.
-
 
 Dependencies
 -------------
