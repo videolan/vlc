@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Alexander Gabilondo <alexgabi@openmailbox.org>, 2016
+# Alexander Gabilondo <alexgabi@disroot.org>, 2016,2020
 # Gorka Azkarate Zubiaur <gorkaazkarate@gmail.com>, 2013
 # Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>, 2011
 # Ixiar Iza <i.iza@elhuyar.com>, 2015
@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-04-01 15:34+0200\n"
-"Last-Translator: Osoitz <oelkoro@gmail.com>, 2020\n"
+"PO-Revision-Date: 2020-05-03 22:42+0200\n"
+"Last-Translator: Alexander Gabilondo <alexgabi@disroot.org>, 2020\n"
 "Language-Team: Basque (https://www.transifex.com/yaron/teams/16553/eu/)\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -1110,7 +1110,7 @@ msgstr "Buffer tamaina"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:164
 #: modules/video_filter/fps.c:42
 msgid "Frame rate"
-msgstr "Marko-emaria"
+msgstr "Fotograma-emaria"
 
 #: src/input/es_out.c:3194
 msgid "Decoded format"
@@ -2441,26 +2441,26 @@ msgstr ""
 
 #: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:307
 msgid "Skip frames"
-msgstr "Saltatu markoak"
+msgstr "Saltatu fotogramak"
 
 #: src/libvlc-module.c:470
 msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
-"MPEG2 transmisio jarraituetan marko-bazterketa gaitzen du. Marko-bazterketa "
+"MPEG2 transmisioan fotograma jaregitea gaitzen du. Fotograma jaregitea "
 "ordenagailuak behar adina ahalmen ez daukanean gertatzen da"
 
 #: src/libvlc-module.c:473
 msgid "Drop late frames"
-msgstr "Baztertu atzeratutako markoak"
+msgstr "Jaregin berandututako fotogramak"
 
 #: src/libvlc-module.c:475
 msgid ""
 "This drops frames that are late (arrive to the video output after their "
 "intended display date)."
 msgstr ""
-"Honen bidez, atzeratutako markoak baztertu egingo dira (bideo-irteerara "
+"Honen bidez, berandututako fotogramak jaregingo dira (bideo-irteerara "
 "bistaratze-data baino beranduago iristen direnak)."
 
 #: src/libvlc-module.c:478
@@ -3971,7 +3971,7 @@ msgstr "Erreproduzitu eta pausarazi"
 
 #: src/libvlc-module.c:1178
 msgid "Pause each item in the playlist on the last frame."
-msgstr "Pausarazi erreprodukzio-zerrendako elementu bakoitza azken markoan."
+msgstr "Pausarazi erreprodukzio-zerrendako elementu bakoitza azken fotograman."
 
 #: src/libvlc-module.c:1180
 msgid "Start paused"
@@ -3979,7 +3979,8 @@ msgstr "Hasi pausarazita"
 
 #: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
-msgstr "Pausarazi erreprodukzio-zerrendako elementu bakoitza lehen markoan."
+msgstr ""
+"Pausarazi erreprodukzio-zerrendako elementu bakoitza lehenengo fotograman."
 
 #: src/libvlc-module.c:1184
 msgid "Auto start"
@@ -4275,11 +4276,11 @@ msgstr "Hautatu aurreranzko jauzi luzea egiteko laster-tekla."
 
 #: src/libvlc-module.c:1280 modules/control/hotkeys.c:599
 msgid "Next frame"
-msgstr "Hurrengo markoa"
+msgstr "Hurrengo fotograma"
 
 #: src/libvlc-module.c:1282
 msgid "Select the hotkey to got to the next video frame."
-msgstr "Hautatu hurrengo bideo-markora joateko laster-tekla."
+msgstr "Hautatu hurrengo bideo-fotogramara joateko laster-tekla."
 
 #: src/libvlc-module.c:1284
 msgid "Very short jump length"
@@ -5213,7 +5214,7 @@ msgstr "Multimedia menua"
 
 #: src/misc/actions.c:86
 msgid "Media Next Frame"
-msgstr "Multimedia hurrengo markoa"
+msgstr "Multimedia hurrengo fotograma"
 
 #: src/misc/actions.c:87
 msgid "Media Next Track"
@@ -5225,7 +5226,7 @@ msgstr "Multimedia erreproduzitu pausatu"
 
 #: src/misc/actions.c:89
 msgid "Media Prev Frame"
-msgstr "Multimedia aurreko markoa"
+msgstr "Multimedia aurreko fotograma"
 
 #: src/misc/actions.c:90
 msgid "Media Prev Track"
@@ -6754,14 +6755,14 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:151
 msgid "Video input frame rate"
-msgstr "Bideo-sarreraren marko-emaria"
+msgstr "Bideo-sarreraren fotograma-emaria"
 
 #: modules/access/dshow/dshow.cpp:153
 msgid ""
 "Force the DirectShow video input to use a specific frame rate (eg. 0 means "
 "default, 25, 29.97, 50, 59.94, etc.)"
 msgstr ""
-"Behartu DirectShow bideo-sarrerak marko-emaria jakin bat erabiltzea "
+"Behartu DirectShow bideo-sarrerari fotograma-emaria zehatz bat erabiltzea "
 "(adibidez, 0 lehenetsia da, 25, 29.97, 50, 59.94, etab.)"
 
 #: modules/access/dshow/dshow.cpp:155
@@ -7868,7 +7869,7 @@ msgstr ""
 
 #: modules/access/imem.c:95
 msgid "Frame rate of a video elementary stream"
-msgstr "Bideoaren oinarrizko transmisio jarraitu baten marko-emaria"
+msgstr "Bideoaren oinarrizko transmisio baten fotograma-emaria"
 
 #: modules/access/imem.c:97
 msgid "Callback cookie string"
@@ -8082,7 +8083,7 @@ msgid ""
 "broken pictures due to too small buffer."
 msgstr ""
 "Real Time Streaming Protocol-aren, RTSPren, bideo-pistaren hasierako "
-"fotograma buffer tamaina, handitu egin daiteke irudi hautsiak baldin badaude "
+"framebuffer tamaina, handitu egin daiteke irudi hautsiak baldin badaude "
 "buffer txikiegiaren ondorioz."
 
 #: modules/access/live555.cpp:97
@@ -8434,7 +8435,7 @@ msgstr "SAT>IP hargailu plugina"
 #: modules/access/screen/screen.c:45
 #: modules/gui/qt/components/open_panels.cpp:1109
 msgid "Desired frame rate for the capture."
-msgstr "Kapturarako nahi den marko-abiadura."
+msgstr "Kapturarako nahi den fotograma-emaria."
 
 #: modules/access/screen/screen.c:48
 msgid "Capture fragment size"
@@ -8593,7 +8594,8 @@ msgstr "Framebufferraren altuera"
 
 #: modules/access/shm.c:56
 msgid "Pixel height of the frame buffer (ignored for XWD file)"
-msgstr "Framebufferraren pixel-altuera (ez ikusi egingo da XWD fitxategirako)"
+msgstr ""
+"Fotograma bufferraren pixel-altuera (ez ikusi egingo da XWD fitxategirako)"
 
 #: modules/access/shm.c:58
 msgid "Frame buffer segment ID"
@@ -8613,7 +8615,7 @@ msgstr "Framebufferraren fitxategia"
 
 #: modules/access/shm.c:65
 msgid "Path of the memory mapped file of the frame buffer"
-msgstr "Framebufferraren  fitxategi-mapeatuko memoriaren bidea"
+msgstr "Framebufferraren mapeatutako fitxategiaren memoriaren bidea"
 
 #: modules/access/shm.c:75
 msgid "XWD file (autodetect)"
@@ -8792,7 +8794,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:71
 msgid "Maximum frame rate to use (0 = no limits)."
-msgstr "Erabili beharreko gehienezko marko-emaria (0 = limiterik gabe)."
+msgstr "Erabili beharreko gehienezko fotograma-emaria (0 = mugarik gabe)."
 
 #: modules/access/v4l2/v4l2.c:73
 msgid "Radio device"
@@ -9250,7 +9252,7 @@ msgstr "Mugitu kapitulu guztiak. Balioa milisegundoetan ezarri beharko da."
 
 #: modules/access/vdr.c:80
 msgid "Default frame rate for chapter import."
-msgstr "Lehenetsitako fotograma ratioa kapituluak inportatzeko."
+msgstr "Lehenetsitako fotograma-emaria kapituluak inportatzeko."
 
 #: modules/access/vdr.c:84
 msgid "VDR"
@@ -9458,8 +9460,8 @@ msgstr "Bereizi segmentuak edonon"
 msgid ""
 "Don't require a keyframe before splitting a segment. Needed for audio only."
 msgstr ""
-"Marko-gako bat ez da beharrezkoa segmentu bat zatitu aurretik. Audiorako da "
-"soilik beharrezkoa."
+"Fotograma-gakorik ez da beharrezkoa segmentu bat zatitu aurretik. Audiorako "
+"da soilik beharrezkoa."
 
 #: modules/access_output/livehttp.c:74
 msgid "Number of segments"
@@ -11083,11 +11085,11 @@ msgstr "Zuzeneko errendatzea"
 
 #: modules/codec/avcodec/avcodec.h:59
 msgid "Show corrupted frames"
-msgstr "Erakutsi hondatutako markoak"
+msgstr "Erakutsi hondatutako fotogramak"
 
 #: modules/codec/avcodec/avcodec.h:60
 msgid "Prefer visual artifacts instead of missing frames"
-msgstr "Hobetsi produktu bisualak falta diren markoen ordez"
+msgstr "Hobetsi produktu bisualak falta diren fotogramen ordez"
 
 #: modules/codec/avcodec/avcodec.h:62
 msgid "Error resilience"
@@ -11144,9 +11146,9 @@ msgid ""
 "The decoder can partially decode or skip frame(s) when there is not enough "
 "time. It's useful with low CPU power but it can produce distorted pictures."
 msgstr ""
-"Deskodetzaileak partzialki deskodetu edo saltatu ditzake markoak behar adina "
-"denborarik ez dagoenean. Erabilgarria da PUZ ahalmen gutxi dagoenean, baina "
-"irudi distortsionatuak sor ditzake."
+"Deskodetzaileak partzialki deskodetu edo saltatu ditzake fotogramak behar "
+"adina denborarik ez dagoenean. Erabilgarria da PUZ ahalmen gutxi dagoenean, "
+"baina irudi distortsionatuak sor ditzake."
 
 #: modules/codec/avcodec/avcodec.h:88
 msgid "Allow speed tricks"
@@ -11161,15 +11163,16 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:92
 msgid "Skip frame (default=0)"
-msgstr "Saltatu markoa (lehenetsia=0)"
+msgstr "Saltatu fotograma (lehenetsia=0)"
 
 #: modules/codec/avcodec/avcodec.h:94
 msgid ""
 "Force skipping of frames to speed up decoding (-1=None, 0=Default, 1=B-"
 "frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
-"Behartu markoak saltatzea deskodeketa bizkortzeko (-1=Bat ere ez, "
-"0=Lehenetsia, 1=B markoak, 2=P markoak, 3=B+P markoak, 4=marko guztiak)."
+"Behartu fotogramak saltatzea deskodeketa bizkortzeko (-1=Bat ere ez, "
+"0=Lehenetsia, 1=B fotogramak, 2=P fotogramak, 3=B+P fotogramak, 4=fotograma "
+"guztiak)."
 
 #: modules/codec/avcodec/avcodec.h:97
 msgid "Skip idct (default=0)"
@@ -11180,8 +11183,9 @@ msgid ""
 "Force skipping of idct to speed up decoding for frame types (-1=None, "
 "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
-"Behartu idct saltatzea marko motak deskodeketa bizkortzeko (-1=Bat ere ez, "
-"0=Lehenetsia, 1=B markoak, 2=P markoak, 3=B+P markoak, 4=marko guztiak)."
+"Behartu idct saltatzea fotograma motak deskodeketa bizkortzeko (-1=Bat ere "
+"ez, 0=Lehenetsia, 1=B fotogramak, 2=P fotogramak, 3=B+P fotogramak, "
+"4=fotograma guztiak)."
 
 #: modules/codec/avcodec/avcodec.h:102
 msgid "Debug mask"
@@ -11232,19 +11236,20 @@ msgstr "Deskodetzeko erabilitako hari kopurua; 0-k automatikoa esan nahi du"
 
 #: modules/codec/avcodec/avcodec.h:124
 msgid "Ratio of key frames"
-msgstr "Gako-markoen erlazioa"
+msgstr "Gako-fotogramen emaria"
 
 #: modules/codec/avcodec/avcodec.h:125
 msgid "Number of frames that will be coded for one key frame."
-msgstr "Gako-marko baterako kodetuko diren markoen kopurua."
+msgstr "Gako-fotograma baterako kodetuko diren fotogramen kopurua."
 
 #: modules/codec/avcodec/avcodec.h:128
 msgid "Ratio of B frames"
-msgstr "B markoen erlazioa"
+msgstr "B fotogramen emaria"
 
 #: modules/codec/avcodec/avcodec.h:129
 msgid "Number of B frames that will be coded between two reference frames."
-msgstr "Erreferentziako bi markoren artean kodetuko diren B markoen kopurua."
+msgstr ""
+"Erreferentziako bi fotogramen artean kodetuko diren B fotogramen kopurua."
 
 #: modules/codec/avcodec/avcodec.h:132
 msgid "Video bitrate tolerance"
@@ -11260,7 +11265,7 @@ msgstr "Kodeketa gurutzelarkatua"
 
 #: modules/codec/avcodec/avcodec.h:136
 msgid "Enable dedicated algorithms for interlaced frames."
-msgstr "Gaitu dedikatutako algoritmoak gurutzelarkatutako markoetarako."
+msgstr "Gaitu dedikatutako algoritmoak gurutzelarkatutako fotogrametarako."
 
 #: modules/codec/avcodec/avcodec.h:139
 msgid "Interlaced motion estimation"
@@ -11310,8 +11315,8 @@ msgid ""
 "Quantization factor of I frames, compared with P frames (for instance 1.0 => "
 "same qscale for I and P frames)."
 msgstr ""
-"I markoren kuantizazio-faktorea, P markorekin alderatuta (adibidez, 1.0 => "
-"qscale bera I eta P markoetarako)."
+"I fotogramen kuantizazio-faktorea, P fotogramekin alderatuta (adibidez, 1.0 "
+"=> qscale bera I eta P fotogrametarako)."
 
 #: modules/codec/avcodec/avcodec.h:161 modules/codec/x264.c:363
 #: modules/demux/mod.c:79
@@ -11324,7 +11329,7 @@ msgid ""
 "bitrate, at the expense of lower quality frames."
 msgstr ""
 "Gaitu zarata-murrizketako algoritmo soil bat, kodeketaren luzera eta bit-"
-"emaria murrizteko, kalitate gutxiagoko markoak edukitzearen truke."
+"emaria murrizteko, kalitate gutxiagoko fotogramak edukitzearen truke."
 
 #: modules/codec/avcodec/avcodec.h:166
 msgid "MPEG4 quantization matrix"
@@ -11449,7 +11454,7 @@ msgid ""
 "Raise the quantizer for macroblocks at the border of the frame (default: "
 "0.0)."
 msgstr ""
-"Igo kuantizatzailea markoaren ertzeko makroblokeetarako (lehenetsia: 0.0)."
+"Igo kuantizatzailea fotogramaren ertzeko makroblokeetarako (lehenetsia: 0.0)."
 
 #: modules/codec/avcodec/avcodec.h:220
 msgid "Luminance elimination"
@@ -11599,11 +11604,11 @@ msgstr "Behartu 0 (galerarik gabea) eta 511 (okerrena) arteko kalitatea."
 
 #: modules/codec/daala.c:112
 msgid "Keyframe interval"
-msgstr "Marko-gakoaren tartea"
+msgstr "Gako-fotogramen tartea"
 
 #: modules/codec/daala.c:114
 msgid "Enforce a keyframe interval between 1 and 1000."
-msgstr "Behartu 1 eta 1000 arteko marko-gakoaren tarte bat."
+msgstr "Behartu 1 eta 1000 arteko gako-fotogramen tarte bat."
 
 #: modules/codec/daala.c:120
 msgid "Daala video decoder"
@@ -12332,8 +12337,8 @@ msgid ""
 "frames are used."
 msgstr ""
 "Irudi kopurua uneko GOParen (irudien taldea) barruan; GopPicSize=0 bada, "
-"GOParen tamaina zehaztu gabea izango da. GopPicSize=1 bada, I-markoak soilik "
-"erabiliko dira."
+"GOParen tamaina zehaztu gabea izango da. GopPicSize=1 bada, I-fotogramak "
+"soilik erabiliko dira."
 
 #: modules/codec/qsv.c:79
 msgid "Group of Picture Reference Distance"
@@ -12344,8 +12349,8 @@ msgid ""
 "Distance between I- or P- key frames; if it is zero, the GOP structure is "
 "unspecified. Note: If GopRefDist = 1, there are no B-frames used."
 msgstr ""
-" I- edo P- gako markoen arteko distantzia; zero bada, GOParen egitura "
-"zehaztu gabea izango da. Oharra: GopRefDist = 1 bada, B-markoak ez dira "
+" I- edo P- gako-fotogramen arteko distantzia; zero bada, GOParen egitura "
+"zehaztu gabea izango da. Oharra: GopRefDist = 1 bada, B-fotogramak ez dira "
 "erabiliko."
 
 #: modules/codec/qsv.c:85
@@ -12374,14 +12379,14 @@ msgid ""
 "the sequence header before every Nth I-frame. If IdrInterval=0 (default), "
 "SDK inserts the sequence header once at the beginning of the stream."
 msgstr ""
-"H.264-rako, IdrInterval-ek IDR-marko tartea zehazten du I-markoen "
-"terminoetan;  IdrInterval=0 bada, I-marko bakoitza IDR-marko bat izango da. "
-"IdrInterval=1 bada, beste I-marko bakoitza IDR-marko bat izango da, eta "
-"abar. MPEG2-rako,  IdrInterval-ek sekuentzia goiburu-tarteak I-markoen "
-"terminoetan zehazten ditu. IdrInterval=N bada, SDK-k N. I-marko bakoitzaren "
-"aurretik sekuentzia-goiburua txertatuko du. IdrInterval=0 bada (lehenetsia), "
-"SDK-k transmisio jarraituaren hasieran sekuentzia-goiburua behin txertatuko "
-"du."
+"H.264-rako, IdrInterval-ek IDR-fotograma tartea zehazten du I-fotogramen "
+"terminoetan;  IdrInterval=0 bada, I-fotograma bakoitza IDR-fotograma bat "
+"izango da. IdrInterval=1 bada, beste I-fotograma bakoitza IDR-fotograma bat "
+"izango da, eta abar. MPEG2-rako,  IdrInterval-ek sekuentzia goiburu-tarteak "
+"I-fotogramen terminoetan zehazten ditu. IdrInterval=N bada, SDK-k N. I-"
+"fotograma bakoitzaren aurretik sekuentzia-goiburua txertatuko du. "
+"IdrInterval=0 bada (lehenetsia), SDK-k transmisioaren hasieran sekuentzia-"
+"goiburua behin txertatuko du."
 
 #: modules/codec/qsv.c:100
 msgid "Rate Control Method"
@@ -12405,33 +12410,33 @@ msgid ""
 "qpp and qpb. It has less precedence than the forementionned parameters. Used "
 "only if rc_method is 'qp'."
 msgstr ""
-"Kuantizazio-parametroa marko mota guztietarako. Parametro honek qpi, qpp eta "
-"qpp ezartzen ditu. Aipatutako parametroak baino lehentasun gutxiago du. "
+"Kuantizazio-parametroa fotograma mota guztietarako. Parametro honek qpi, qpp "
+"eta qpp ezartzen ditu. Aipatutako parametroak baino lehentasun gutxiago du. "
 "Erabili soilik rc_method 'qp' bada."
 
 #: modules/codec/qsv.c:110
 msgid "Quantization parameter for I-frames"
-msgstr "Kuantizazio-parametroa I-markoetarako"
+msgstr "Kuantizazio-parametroa I-fotogramretarako"
 
 #: modules/codec/qsv.c:111
 msgid ""
 "Quantization parameter for I-frames. This parameter overrides any qp set "
 "globally. Used only if rc_method is 'qp'."
 msgstr ""
-"Kuantizazio-parametroa I-markoetarako. Parametro honek orokorrean ezarritako "
-"edozein qp gainidazten du. Erabili soilik rc_method 'qp' bada."
+"Kuantizazio-parametroa I-fotogrametarako. Parametro honek orokorrean "
+"ezarritako edozein qp gainidazten du. Erabili soilik rc_method 'qp' bada."
 
 #: modules/codec/qsv.c:114
 msgid "Quantization parameter for P-frames"
-msgstr "Kuantizazio-parametroa P-markoetarako"
+msgstr "Kuantizazio-parametroa P-fotogrametarako"
 
 #: modules/codec/qsv.c:115
 msgid ""
 "Quantization parameter for P-frames. This parameter overrides any qp set "
 "globally. Used only if rc_method is 'qp'."
 msgstr ""
-"Kuantizazio-parametroa P-markoetarako. Parametro honek orokorrean ezarritako "
-"edozein qp gainidazten du. Erabili soilik rc_method 'qp' bada."
+"Kuantizazio-parametroa P-fotogrametarako. Parametro honek orokorrean "
+"ezarritako edozein qp gainidazten du. Erabili soilik rc_method 'qp' bada."
 
 #: modules/codec/qsv.c:118
 msgid "Quantization parameter for B-frames"
@@ -12442,8 +12447,8 @@ msgid ""
 "Quantization parameter for B-frames. This parameter overrides any qp set "
 "globally. Used only if rc_method is 'qp'."
 msgstr ""
-"Kuantizazio-parametroa B-markoetarako. Parametro honek orokorrean ezarritako "
-"edozein qp gainidazten du. Erabili soilik rc_method 'qp' bada."
+"Kuantizazio-parametroa B-fotogrametarako. Parametro honek orokorrean "
+"ezarritako edozein qp gainidazten du. Erabili soilik rc_method 'qp' bada."
 
 #: modules/codec/qsv.c:122
 msgid "Maximum Bitrate"
@@ -12485,7 +12490,7 @@ msgid ""
 "Number of 100 frames before the 'avbr' rate control method reaches the "
 "requested bitrate with the requested accuracy. See the accuracy parameter."
 msgstr ""
-"100 markoko kopurua, 'avbr' emari-kontrol metodoak eskatutako bit-emarira "
+"100 fotogramen kopurua, 'avbr' emari-kontrol metodoak eskatutako bit-emarira "
 "eskatuko zehaztasunarekin heldu aurretik. Ikus zehaztasun parametroa."
 
 #: modules/codec/qsv.c:139
@@ -12498,13 +12503,13 @@ msgid ""
 "block rows. If numslice is not set, the encoder may choose any slice "
 "partitioning allowed by the codec standard."
 msgstr ""
-"Atal kopurua bideo marko bakoitzean; atal bakoitzak makro-bloke errenkada "
-"bat edo gehiago dauka. Ez bada atal kopurua zehazten, kodetzaileak kodek "
-"estandarrak onartzen duen edozein atal-partizio aukeratuko du."
+"Atal kopurua bideo fotograma bakoitzean; atal bakoitzak makro-bloke "
+"errenkada bat edo gehiago dauka. Ez bada atal kopurua zehazten, kodetzaileak "
+"kodek estandarrak onartzen duen edozein atal-partizio aukeratuko du."
 
 #: modules/codec/qsv.c:145 modules/codec/qsv.c:146 modules/codec/x264.c:137
 msgid "Number of reference frames"
-msgstr "Erreferentzia-markoen kopurua"
+msgstr "Erreferentzia-fotogramen kopurua"
 
 #: modules/codec/qsv.c:148
 msgid "Number of parallel operations"
@@ -12603,7 +12608,7 @@ msgstr ""
 
 #: modules/codec/schroedinger.c:101
 msgid "I-frame only sequence"
-msgstr "I-marko sekuentzia soilik"
+msgstr "I-fotograma sekuentzia soilik"
 
 #: modules/codec/schroedinger.c:102 modules/codec/schroedinger.c:103
 msgid "Inter pictures refere to previous pictures only"
@@ -12716,8 +12721,8 @@ msgid ""
 "Field coding is where interlaced fields are coded separately as opposed to a "
 "pseudo-progressive frame"
 msgstr ""
-"Eremu-kodeketan, gurutzelarkatutako eremuak bereizita kodetzen dira, marko "
-"sasiprogresiboetan ez bezala"
+"Eremu-kodeketan, gurutzelarkatutako eremuak bereizita kodetzen dira, "
+"fotograma sasiprogresiboetan ez bezala"
 
 #: modules/codec/schroedinger.c:166
 msgid "auto - let encoder decide based upon input (Best)"
@@ -12726,11 +12731,11 @@ msgstr ""
 
 #: modules/codec/schroedinger.c:167
 msgid "force coding frame as single picture"
-msgstr "behartu kodeketa-markoa irudi soil gisa"
+msgstr "behartu kodeketa-fotograma irudi soil gisa"
 
 #: modules/codec/schroedinger.c:168
 msgid "force coding frame as separate interlaced fields"
-msgstr "behartu markoa bereizitako eremu gurutzelarkatu gisa kodetzea"
+msgstr "behartu fotograma bereizitako eremu gurutzelarkatu gisa kodetzea"
 
 #: modules/codec/schroedinger.c:173
 msgid "Size of motion compensation blocks"
@@ -13593,9 +13598,9 @@ msgid ""
 "improving quality for a given bitrate at the cost of seeking precision. Use "
 "-1 for infinite."
 msgstr ""
-"IDR markoen arteko gehienezko bitartea ezartzen du. Balio handiagoek bitak "
-"aurrezten dituzte eta, beraz, bit-emari jakin baten kalitatea hobetu egiten "
-"dute, bilaketa-zehaztasunaren truke. Erabili -1 infiniturako."
+"IDR fotogramen arteko gehienezko bitartea ezartzen du. Balio handiagoek "
+"bitak aurrezten dituzte eta, beraz, bit-emari jakin baten kalitatea hobetu "
+"egiten dute, bilaketa-zehaztasunaren truke. Erabili -1 infiniturako."
 
 #: modules/codec/x264.c:76
 msgid "Minimum GOP size"
@@ -13612,13 +13617,14 @@ msgid ""
 "If scenecuts appear within this interval, they are still encoded as I-"
 "frames, but do not start a new GOP."
 msgstr ""
-"IDR markoen arteko gutxieneko bitartea ezartzen du. H.264, I markoek ez "
-"zaizkie nahitaez  itxitako GOP bati lotzen, P markoek aurreragoko hainbat "
-"markotatik aurresateko aukera ematen baitute, ez justu aurreko markotik "
-"bakarrik (ikus erreferentzia-markoaren aukera ere). Beraz, I markoak ez dira "
-"nahitaez bilagarriak. IDR markoek eragotzi egiten dute ondorengo P markoek "
-"IDR markoaren aurreko edozein markori erreferentzia egitea. \n"
-"Bitarte horretan eszena-mozketak agertzen badira, l marko gisa kodetuta "
+"IDR fotogramen arteko gutxieneko bitartea ezartzen du. H.264, I fotogramek "
+"ez zaizkie nahitaez  itxitako GOP bati lotzen, P fotogramek aurreragoko "
+"hainbat fotogramatatik aurresateko aukera ematen baitute, ez justu aurreko "
+"fotogramatik bakarrik (ikus erreferentzia-fotogramaren aukera ere). Beraz, I "
+"fotogramak ez dira nahitaez bilagarriak. IDR fotogramek eragotzi egiten dute "
+"ondorengo P fotogramek IDR fotogramaren aurreko edozein fotogramari "
+"erreferentzia egitea. \n"
+"Bitarte horretan eszena-mozketak agertzen badira, l fotograma gisa kodetuta "
 "daude, baina ez dute GOP berria hasten."
 
 #: modules/codec/x264.c:86
@@ -13642,12 +13648,12 @@ msgid ""
 "e.g. resolution, framerate, level"
 msgstr ""
 "Gaitu komandoak Blu-ray-ren laguntzarako, honek ez ditu Blu-ray-ren "
-"bateragarritasun alor guztiak behartzen, adib. bereizmena, marko-emaria, "
+"bateragarritasun alor guztiak behartzen, adib. bereizmena, fotograma-emaria, "
 "maila"
 
 #: modules/codec/x264.c:93
 msgid "Extra I-frames aggressivity"
-msgstr "I marko gehigarrien oldarkortasuna"
+msgstr "I fotograma gehigarrien oldarkortasuna"
 
 #: modules/codec/x264.c:94
 msgid ""
@@ -13659,53 +13665,54 @@ msgid ""
 "other keyint frames, which probably leads to ugly encoding artifacts. Range "
 "1 to 100."
 msgstr ""
-"Eszena-mozketen detekzioa. I marko gehigarriak zenbateko oldarkortasunaz "
+"Eszena-mozketen detekzioa. I fotograma gehigarriak zenbateko oldarkortasunaz "
 "txertatu behar diren kontrolatzen du. Eszena-mozketen balio txikiekin, "
-"kodekak sarri I marko bat behartu behar du keyint gaindituko badu. Eszena-"
-"mozketen balio egokiek kokaleku hobea aurki dezakete l markoarentzat. Balio "
-"handiek behar baino l marko gehiago erabil ditzakete eta, ondorioz, bitak "
-"alferrik gal ditzakete. -1 balioak eszena-mozketen detekzioa desgaitzen du "
-"eta, beraz, I markoak bi keyint markoz behin bakarrik txertatzen dira; "
-"horrek ziurrenik kodetze-efektu itsusiak eragingo ditu. Barrutia:1etik "
-"100era."
+"kodekak sarri I fotograma bat behartu behar du keyint gaindituko badu. "
+"Eszena-mozketen balio egokiek kokaleku hobea aurki dezakete l "
+"fotogramarentzat. Balio handiek behar baino l fotograma gehiago erabil "
+"ditzakete eta, ondorioz, bitak alferrik gal ditzakete. -1 balioak eszena-"
+"mozketen detekzioa desgaitzen du eta, beraz, I fotogramak bi keyint "
+"fotogramaz behin bakarrik txertatzen dira; horrek ziurrenik kodetze-efektu "
+"itsusiak eragingo ditu. Barrutia:1etik 100era."
 
 #: modules/codec/x264.c:105
 msgid "B-frames between I and P"
-msgstr "I eta P arteko B markoak"
+msgstr "I eta P arteko B fotogramak"
 
 #: modules/codec/x264.c:106
 msgid "Number of consecutive B-frames between I and P-frames. Range 1 to 16."
 msgstr ""
-"I eta P marko arteko elkarren segidako B markoen kopurua. Barrutia:1etik "
-"16ra."
+"I eta P fotograma arteko elkarren segidako B fotogramen kopurua. "
+"Barrutia:1etik 16ra."
 
 #: modules/codec/x264.c:109
 msgid "Adaptive B-frame decision"
-msgstr "B marko moldagarrien erabakia"
+msgstr "B fotograma moldagarrien erabakia"
 
 #: modules/codec/x264.c:110
 msgid ""
 "Force the specified number of consecutive B-frames to be used, except "
 "possibly before an I-frame. Range 0 to 2."
 msgstr ""
-"Behartu erabili beharreko elkarren segidako B markoen zehaztutako kopurua, I "
-"markoen aurretik izan ezik. 0 eta 2 arteko barrutia."
+"Behartu erabili beharreko elkarren segidako B fotogramen zehaztutako "
+"kopurua, I fotogramen aurretik izan ezik. 0 eta 2 arteko barrutia."
 
 #: modules/codec/x264.c:114
 msgid "Influence (bias) B-frames usage"
-msgstr "Eragin (bias) B markoen erabilerari"
+msgstr "Eragin (bias) B fotogramen erabilerari"
 
 #: modules/codec/x264.c:115
 msgid ""
 "Bias the choice to use B-frames. Positive values cause more B-frames, "
 "negative values cause less B-frames."
 msgstr ""
-"Eragin (bias) B markoak erabiltzeko aukerari. Balio positiboek B marko "
-"gehiago sorrarazten dituzte, eta balio negatiboek B marko gutxiago."
+"Eragin (bias) B fotogramak erabiltzeko aukerari. Balio positiboek B "
+"fotograma gehiago sorrarazten dituzte, eta balio negatiboek B fotograma "
+"gutxiago."
 
 #: modules/codec/x264.c:119
 msgid "Keep some B-frames as references"
-msgstr "Mantendu B marko batzuk erreferentzia gisa"
+msgstr "Mantendu B fotograma batzuk erreferentzia gisa"
 
 #: modules/codec/x264.c:120
 msgid ""
@@ -13716,9 +13723,10 @@ msgid ""
 " - strict: Strictly hierarchical pyramid\n"
 " - normal: Non-strict (not Blu-ray compatible)\n"
 msgstr ""
-"B markoak erreferentzia gisa erabiltzeko aukera ematen du, beste marko "
-"batzuk aurresateko. Elkarren segidako 2+ B markoen erdia erreferentzia gisa "
-"hartzen du, eta markoa behar bezala berrantolatzen du.\n"
+"B fotogramak erreferentzia gisa erabiltzeko aukera ematen du, beste "
+"fotograma batzuk aurresateko. Elkarren segidako 2+ B fotogramen erdia "
+"erreferentzia gisa hartzen du, eta fotograma behar bezala berrantolatzen "
+"du.\n"
 " - bat ere ez: desgaituta\n"
 " - zorrotza: Piramide hierarkiko zorrotza\n"
 " - normala: Ez-zorrotza (Blu-ray-rekin bateragarria)\n"
@@ -13754,10 +13762,10 @@ msgid ""
 "but seems to make little difference in live-action source material. Some "
 "decoders are unable to deal with large frameref values. Range 1 to 16."
 msgstr ""
-"Aurresateko erabili diren aurreko markoen kopurua. Hau eraginkorra da Anime-"
-"n, baina ez dirudi alde handirik egiten duenik zuzeneko ekintzen iturburu-"
-"materialetan. Deskodetzaile batzuek ezin dituzte frameref balio handiak "
-"kudeatu. Barrutia:1etik 16ra."
+"Aurresateko erabili diren aurreko fotogramen kopurua. Hau eraginkorra da "
+"Anime-n, baina ez dirudi alde handirik egiten duenik zuzeneko ekintzen "
+"iturburu-materialetan. Deskodetzaile batzuek ezin dituzte frameref balio "
+"handiak kudeatu. Barrutia:1etik 16ra."
 
 #: modules/codec/x264.c:143
 msgid "Skip loop filter"
@@ -13816,7 +13824,7 @@ msgstr "Gurutzelarkatze puruaren modua."
 
 #: modules/codec/x264.c:167
 msgid "Frame packing"
-msgstr "Marko paketatzea"
+msgstr "Fotograma paketatzea"
 
 #: modules/codec/x264.c:168
 msgid ""
@@ -13828,13 +13836,13 @@ msgid ""
 " 4: top bottom - L is on top, R on bottom\n"
 " 5: frame alternation - one view per frame"
 msgstr ""
-"Bideo estereoskopikoentzako marko-eraketa zehazten du:\n"
+"Bideo estereoskopikoentzako fotograma-eraketa zehazten du:\n"
 " 0: xake-taula - pixelak L eta R-tik tartekatzen dira\n"
 " 1: zutabe alternantzia - L eta R zutabeak elkarlotzen ditu\n"
 " 2: errenkada alternantzia - L eta R errenkadak elkarlotzen ditu\n"
 " 3: alboz abo - L ezkerrean, R eskuinean\n"
 " 4: Goialdea - L goian, R behean\n"
-" 5: marko alternantzia - behin ikusi marko bakoitzeko"
+" 5: fotograma alternantzia - behin ikusi fotograma bakoitzeko"
 
 #: modules/codec/x264.c:176
 msgid "Use Periodic Intra Refresh"
@@ -13842,7 +13850,7 @@ msgstr "Erabili barruko freskatze periodikoa"
 
 #: modules/codec/x264.c:177
 msgid "Use Periodic Intra Refresh instead of IDR frames"
-msgstr "Erabili barruko freskatze periodikoa IDR markoen ordez"
+msgstr "Erabili barruko freskatze periodikoa IDR fotogramen ordez"
 
 #: modules/codec/x264.c:179
 msgid "Use mb-tree ratecontrol"
@@ -13855,7 +13863,7 @@ msgstr ""
 
 #: modules/codec/x264.c:182
 msgid "Force number of slices per frame"
-msgstr "Behartu marko bakoitzeko zatien kopurua"
+msgstr "Behartu fotograma bakoitzeko zatien kopurua"
 
 #: modules/codec/x264.c:183
 msgid "Force rectangular slices and is overridden by other slicing options"
@@ -13923,7 +13931,7 @@ msgstr "Geh KP urratsa"
 
 #: modules/codec/x264.c:208
 msgid "Max QP step between frames."
-msgstr "Marko arteko gehienezko KP urratsa."
+msgstr "Fotogramen arteko gehienezko KP urratsa."
 
 #: modules/codec/x264.c:210
 msgid "Average bitrate tolerance"
@@ -13976,7 +13984,7 @@ msgstr ""
 "AQ-rako bit-banaketako modua definitzen du, lehenespena 1\n"
 " - 0: desgaituta\n"
 " - 1: uneko x264 modu lehenetsia\n"
-" - 2: log(var)^2 erabiltzen du log(var) erabili beharrean, eta marko "
+" - 2: log(var)^2 erabiltzen du log(var) erabili beharrean, eta fotograma "
 "bakoitzeko indarra moldatzen saiatzen da"
 
 #: modules/codec/x264.c:231
@@ -14108,15 +14116,15 @@ msgstr ""
 
 #: modules/codec/x264.c:285
 msgid "Weighted prediction for B-frames"
-msgstr "B markoetarako iragarpen haztatua"
+msgstr "B-fotogrametarako iragarpen haztatua"
 
 #: modules/codec/x264.c:286
 msgid "Weighted prediction for B-frames."
-msgstr "B markoetarako iragarpen haztatua."
+msgstr "B fotogrametarako iragarpen haztatua."
 
 #: modules/codec/x264.c:288
 msgid "Weighted prediction for P-frames"
-msgstr "P markoetarako iragarpen haztatua"
+msgstr "P fotogrametarako iragarpen haztatua"
 
 #: modules/codec/x264.c:289
 msgid ""
@@ -14125,7 +14133,7 @@ msgid ""
 " - 1: Blind offset\n"
 " - 2: Smart analysis\n"
 msgstr ""
-" P markoetarako iragarpen haztatua:\n"
+" P fotogrametarako iragarpen haztatua:\n"
 " - 0: Desgaituta\n"
 " - 1: Desplazamendu itsua\n"
 " - 2: Analisi adimentsua\n"
@@ -14220,7 +14228,7 @@ msgstr ""
 #: modules/codec/x264.c:327
 msgid "RD based mode decision for B-frames. This requires subme 6 (or higher)."
 msgstr ""
-"RD oinarritzat duen modu-erabakitzea B markoetarako. Horretarako subme 6 "
+"RD oinarritzat duen modu-erabakitzea B fotogrametarako. Horretarako subme 6 "
 "behar da (edo handiagoa)."
 
 #: modules/codec/x264.c:330
@@ -14232,7 +14240,7 @@ msgid ""
 "Allows each 8x8 or 16x8 partition to independently select a reference frame, "
 "as opposed to only one ref per macroblock."
 msgstr ""
-"8x8 edo 16x8 partizio bakoitzak bere aldetik erreferentzia-marko bat "
+"8x8 edo 16x8 partizio bakoitzak bere aldetik erreferentzia-fotograma bat "
 "hautatzeko aukera ematen du, makrobloke bakoitzeko erreferentzia bakarra "
 "hautatu beharrean."
 
@@ -14244,7 +14252,7 @@ msgstr "Krominantzia mugimendu-zenbatespenean"
 msgid "Chroma ME for subpel and mode decision in P-frames."
 msgstr ""
 "Mugimendu-zenbatespenerako krominantzia subpel-erako eta modu-erabakitzea P "
-"markoetan."
+"fotogrametan."
 
 #: modules/codec/x264.c:339
 msgid "Joint bidirectional motion refinement."
@@ -14280,23 +14288,23 @@ msgstr ""
 
 #: modules/codec/x264.c:352
 msgid "Early SKIP detection on P-frames"
-msgstr "SKIP detekzio goiztiarra P markoetan"
+msgstr "SKIP detekzio goiztiarra P fotogrametan"
 
 #: modules/codec/x264.c:353
 msgid "Early SKIP detection on P-frames."
-msgstr "SKIP detekzio goiztiarra P markoetan."
+msgstr "SKIP detekzio goiztiarra P fotogrametan."
 
 #: modules/codec/x264.c:355
 msgid "Coefficient thresholding on P-frames"
-msgstr "Koefiziente-atalasea P markoetan"
+msgstr "Koefiziente-atalasea P fotogrametan"
 
 #: modules/codec/x264.c:356
 msgid ""
 "Coefficient thresholding on P-frames. Eliminate dct blocks containing only a "
 "small single coefficient."
 msgstr ""
-"Koefiziente-atalasea P markoetan. Ezabatu koefiziente txiki bakarra bakarrik "
-"daukaten dct blokeak."
+"Koefiziente-atalasea P fotogrametan. Ezabatu koefiziente txiki bakarra "
+"bakarrik daukaten dct blokeak."
 
 #: modules/codec/x264.c:359
 msgid "Use Psy-optimizations"
@@ -14395,7 +14403,7 @@ msgstr "Estatistikak"
 
 #: modules/codec/x264.c:398
 msgid "Print stats for each frame."
-msgstr "Inprimatu marko bakoitzaren estatistikak."
+msgstr "Inprimatu fotograma bakoitzaren estatistikak."
 
 #: modules/codec/x264.c:400
 msgid "SPS and PPS id numbers"
@@ -14419,15 +14427,15 @@ msgstr "Sortu atzipen-unitateen bereizlearen NAL unitateak."
 
 #: modules/codec/x264.c:407
 msgid "Framecount to use on frametype lookahead"
-msgstr "Lookahead marko motatan erabili beharreko marko-kontaketa"
+msgstr "Lookahead fotograma motatan erabili beharreko fotograma-kontaketa"
 
 #: modules/codec/x264.c:408
 msgid ""
 "Framecount to use on frametype lookahead. Currently default can cause sync-"
 "issues on unmuxable output, like rtsp-output without ts-mux"
 msgstr ""
-"Lookahead marko motatan erabili beharreko marko-kontaketa. Une honetan "
-"lehenetsia sinkronizazio arazoak sor ditzake multiplexaziorik gabeko "
+"Lookahead fotograma motatan erabili beharreko fotograma-kontaketa. Une "
+"honetan lehenetsia sinkronizazio arazoak sor ditzake multiplexaziorik gabeko "
 "irteeratan, adibidez rtsp-irteera ts-multiplexaziorik gabe"
 
 #: modules/codec/x264.c:411
@@ -15184,7 +15192,7 @@ msgstr ""
 
 #: modules/control/oldrc.c:815
 msgid "| frame. . . . . . . . . .  play frame by frame"
-msgstr "| frame. . . . . . . . . .  erreproduzitu markoz marko"
+msgstr "| fotograma. . . . . . . . . .  erreproduzitu fotogramaz fotograma"
 
 #: modules/control/oldrc.c:816
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
@@ -15351,12 +15359,12 @@ msgstr "| deskodetutako bideoa    :    %5<PRIi64>"
 #: modules/control/oldrc.c:1756 modules/gui/ncurses.c:826
 #, c-format
 msgid "| frames displayed :    %5<PRIi64>"
-msgstr "| bistaratutako markoak :    %5<PRIi64>"
+msgstr "| bistaratutako fotogramak :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1758 modules/gui/ncurses.c:828
 #, c-format
 msgid "| frames lost      :    %5<PRIi64>"
-msgstr "| galdutako markoak     :    %5<PRIi64>"
+msgstr "| galdutako fotogramak     :    %5<PRIi64>"
 
 #: modules/control/oldrc.c:1762 modules/gui/ncurses.c:834
 msgid "+-[Audio Decoding]"
@@ -15667,7 +15675,7 @@ msgstr ""
 
 #: modules/demux/image.c:68
 msgid "Frame rate of the elementary stream produced."
-msgstr "Sortutako oinarrizko transmisio-jarraitu baten marko-emaria."
+msgstr "Sortutako oinarrizko transmisio baten fotograma-emaria."
 
 #: modules/demux/image.c:70
 msgid "Real-time"
@@ -15694,14 +15702,14 @@ msgstr "Irudia"
 #: modules/demux/subtitle.c:77 modules/demux/vc1.c:43
 #: modules/gui/macosx/VLCOpenWindowController.m:208
 msgid "Frames per Second"
-msgstr "Marko segundoko"
+msgstr "Fotograma segundoko"
 
 #: modules/demux/mjpeg.c:47
 msgid ""
 "This is the desired frame rate when playing MJPEG from a file. Use 0 (this "
 "is the default value) for a live stream (from a camera)."
 msgstr ""
-"Hau da marko-emaria egokiena MJPEG fitxategi batetik erreproduzitzean. "
+"Hau da fotograma-emaria egokiena MJPEG fitxategi batetik erreproduzitzean. "
 "Erabili 0 (hau da balio lehenetsia) zuzeneko transmisio jarraituetarako "
 "(kamera batetik)."
 
@@ -16033,7 +16041,7 @@ msgid ""
 "streams."
 msgstr ""
 "Hau MPEG bideoen oinarrizko transmisio jarraituak erreproduzitzean ordezko "
-"gisa erabiltzen den marko-emaria da."
+"gisa erabiltzen den fotograma-emaria da."
 
 #: modules/demux/mpeg/es.c:60
 msgid "MPEG-I/II/4 / A52 / DTS / MLP audio"
@@ -16049,7 +16057,7 @@ msgstr "MPEG-4 bideoa"
 
 #: modules/demux/mpeg/h26x.c:47
 msgid "Desired frame rate for the stream."
-msgstr "Transmisio jarraiturako nahi den marko-emaria."
+msgstr "Transmisiorako nahi den fotograma-emaria."
 
 #: modules/demux/mpeg/h26x.c:53 modules/demux/mpeg/h26x.c:55
 msgid "H264 video demuxer"
@@ -16471,8 +16479,8 @@ msgid ""
 "This is the desired frame rate when playing raw video streams. In the form "
 "30000/1001 or 29.97"
 msgstr ""
-"Hau da raw bideo transmisio jarraituak erreproduzitzen direnean nahi den "
-"marko-emaria. Forma honekin: 30000/1001 edo 29.97"
+"Hau da raw bideo transmisiok erreproduzitzen direnean nahi den fotograma-"
+"emaria. Forma honekin: 30000/1001 edo 29.97"
 
 #: modules/demux/rawvid.c:48
 msgid "This specifies the width in pixels of the raw video stream."
@@ -16525,8 +16533,8 @@ msgid ""
 "Override the normal frames per second settings. This will only work with "
 "MicroDVD and SubRIP (SRT) subtitles."
 msgstr ""
-"Gainidatzi marko/segundoko ezarpen normalak. Hori MicroDVD eta SubRIP (SRT) "
-"azpitituluekin bakarrik egin daiteke."
+"Gainidatzi fotograma segundoko ezarpen normalak. Hori MicroDVD eta SubRIP "
+"(SRT) azpitituluekin bakarrik egin daiteke."
 
 #: modules/demux/subtitle.c:58
 msgid ""
@@ -16582,7 +16590,7 @@ msgstr "Itxitako epigrafeak 4"
 
 #: modules/demux/vc1.c:44
 msgid "Desired frame rate for the VC-1 stream."
-msgstr "VC-1 transmisio jarraiturako nahi den marko-emaria."
+msgstr "VC-1 transmisiorako nahi den fotograma-emaria."
 
 #: modules/demux/vc1.c:50
 msgid "VC1 video demuxer"
@@ -18511,11 +18519,11 @@ msgstr "Deskodetutako blokeak"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:88
 msgid "Displayed frames"
-msgstr "Bistaratutako markoak"
+msgstr "Bistaratutako fotogramak"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:89
 msgid "Lost frames"
-msgstr "Galdutako markoak"
+msgstr "Galdutako fotogramak"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:93
 msgid "Played buffers"
@@ -19676,7 +19684,7 @@ msgstr "Panel hedatua"
 
 #: modules/gui/qt/components/controller.hpp:110
 msgid "Frame By Frame"
-msgstr "Markoz marko"
+msgstr "Fotogramaz fotograma"
 
 #: modules/gui/qt/components/controller.hpp:110
 msgid "Trickplay Reverse"
@@ -19750,7 +19758,7 @@ msgstr "Egin begizta A puntutik B puntura etengabe."
 
 #: modules/gui/qt/components/controller.hpp:122
 msgid "Frame by frame"
-msgstr "Markoz marko"
+msgstr "Fotogramaz fotograma"
 
 #: modules/gui/qt/components/controller.hpp:123
 msgid "Reverse"
@@ -20050,7 +20058,7 @@ msgstr "Bistaratuak"
 #: modules/gui/qt/components/info_panels.cpp:593
 #: modules/gui/qt/components/info_panels.cpp:595
 msgid "frames"
-msgstr "marko"
+msgstr "fotograma"
 
 #: modules/gui/qt/components/info_panels.cpp:594
 #: modules/gui/qt/components/info_panels.cpp:601
@@ -22239,14 +22247,14 @@ msgstr "Direct3D9 doitze-iragazkia"
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr ""
-"Deskodetze-markoak zuzenean RPI VideoCore-n, memoria-ostalarian beharrean."
+"Deskodetu fotogramak zuzenean RPI VideoCore-n, memoria-ostalarian beharrean."
 
 #: modules/hw/mmal/codec.c:52
 msgid ""
 "Decode frames directly into RPI VideoCore instead of host memory. This "
 "option must only be used with the MMAL video output plugin."
 msgstr ""
-"Deskodetze-markoak zuzenean RPI VideoCore-n, memoria-ostalarian beharrean. "
+"Deskodetu fotogramak zuzenean RPI VideoCore-n, memoria-ostalarian beharrean. "
 "Aukera hau soilik MMAL bideo irteera-pluginarekin erabili behar da."
 
 #: modules/hw/mmal/codec.c:58
@@ -23937,11 +23945,11 @@ msgid ""
 msgstr ""
 "Moztu transmisio jarraitua adierazitako iraupena duten zatitan, eta ziurtatu "
 "bit-emaria konstantea dagoela bi mugen artean. Horrela, bit-emarian ez da "
-"erpin izugarririk sortuko, batez ere erreferentziako markoetan."
+"erpin izugarririk sortuko, batez ere erreferentziako fotogrametan."
 
 #: modules/mux/mpeg/ts.c:143
 msgid "Use keyframes"
-msgstr "Erabili marko-gakoak"
+msgstr "Erabili gako-fotogramak"
 
 #: modules/mux/mpeg/ts.c:144
 msgid ""
@@ -23954,8 +23962,8 @@ msgstr ""
 "Gaituta badago, eta \"shaping\" zehaztuta badago, TS multiplexadoreak mugak "
 "I irudien amaieran kokatuko ditu. Kasu horretan, erabiltzaileak adierazitako "
 "shaping-aren iraupena kasurik txarrenean erabiliko da, hots, erreferentziako "
-"markorik erabilgarri ez dagoenean. Horrek shaping-algoritmoaren "
-"eraginkortasuna hobetzen du, I markoak transmisio jarraituko markorik "
+"fotogramarik erabilgarri ez dagoenean. Horrek shaping-algoritmoaren "
+"eraginkortasuna hobetzen du, I fotogramak transmisio jarraituko fotogramarik "
 "handienak izaten baitira."
 
 #: modules/mux/mpeg/ts.c:151
@@ -24156,16 +24164,16 @@ msgstr "MPEG audio layer I/II/III paketatzailea"
 
 #: modules/packetizer/mpegvideo.c:60
 msgid "Sync on Intra Frame"
-msgstr "Sinkronizatu barruko markoan"
+msgstr "Sinkronizatu barruko fotograman"
 
 #: modules/packetizer/mpegvideo.c:61
 msgid ""
 "Normally the packetizer would sync on the next full frame. This flags "
 "instructs the packetizer to sync on the first Intra Frame found."
 msgstr ""
-"Normalean, paketatzaileak hurrengo marko osoan sinkronizatzen du. Marka "
-"hauek paketatzaileari aurkitzen duen lehen barruko markoan sinkronizatzeko "
-"adierazten diote."
+"Normalean, paketatzaileak hurrengo fotograma osoan sinkronizatzen du. Marka "
+"hauek paketatzaileari aurkitzen duen lehen barruko fotograman "
+"sinkronizatzeko adierazten diote."
 
 #: modules/packetizer/mpegvideo.c:74
 msgid "MPEG-I/II video packetizer"
@@ -25377,7 +25385,7 @@ msgstr "Ordezkora jo aurretiko atzerapena (ms-tan)."
 
 #: modules/stream_out/bridge.c:76
 msgid "Wait for I frame before toggling placeholder"
-msgstr "Itxsron I markoa, leku-marka txandakatu aurretik"
+msgstr "Itxaron I fotograma leku-marka txandakatu aurretik"
 
 #: modules/stream_out/bridge.c:78
 msgid ""
@@ -25386,10 +25394,10 @@ msgid ""
 "the expense of a slightly longer delay, depending on the frequence of I "
 "frames in the streams."
 msgstr ""
-"Gaituta badago, I markoetan bakarrik txandakatu ahal izango dira ordezko "
+"Gaituta badago, I fotogrametan bakarrik txandakatu ahal izango dira ordezko "
 "transmisio jarraitua eta normala. Honek transmisio jarraituak txandakatzean "
 "akatsak gertatzea eragotziko du, baina atzerapena pixka bat luzatuko da, "
-"transmisio jarraituetako I markoen maiztasunaren arabera."
+"transmisio jarraituetako I fotogramen maiztasunaren arabera."
 
 #: modules/stream_out/bridge.c:92
 msgid "Bridge"
@@ -26149,11 +26157,11 @@ msgstr "Transkodetzean bideoari aplikatu beharreko eskala-faktorea (ad.: 0.25)"
 
 #: modules/stream_out/transcode/transcode.c:58
 msgid "Video frame-rate"
-msgstr "Bideoaren marko-emaria"
+msgstr "Bideoaren fotograma-emaria"
 
 #: modules/stream_out/transcode/transcode.c:60
 msgid "Target output frame rate for the video stream."
-msgstr "Bideo-transmisio jarraiturako helburuko irteerako marko-emaria."
+msgstr "Bideo-transmisiorako helburuko irteerako fotograma-emaria."
 
 #: modules/stream_out/transcode/transcode.c:61
 msgid "Deinterlace video"
@@ -26703,7 +26711,7 @@ msgstr "Bolaren abiadura"
 #: modules/video_filter/ball.c:104
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
-"Ezarri bolaren abiadura, mugimenduaren balioa marko bakoitzeko pixel "
+"Ezarri bolaren abiadura, mugimenduaren balioa fotograma bakoitzeko pixel "
 "kopuruan adierazita."
 
 #: modules/video_filter/ball.c:107
@@ -27109,7 +27117,7 @@ msgid ""
 "Upconvert: output in 4:2:2 format (independent chroma for each field). Best "
 "simulation, but requires more CPU and memory bandwidth."
 msgstr ""
-"Aukeratu koloreentzako kudeaketa, irteera-markoetako mugetan erortzen "
+"Aukeratu koloreentzako kudeaketa, irteera-fotogrametako mugetan erortzen "
 "direnak. \n"
 "\n"
 "Azkena: hartu krominantzia (argia) eremu berritik soilik. Ona elkarlotutako "
@@ -27137,8 +27145,8 @@ msgid ""
 "Default: Low."
 msgstr ""
 "Honek iluntasun iragazkiaren indarra kontrolatzen du, CRT TB phosphor "
-"argitasun galera simulatzen du eremu zaharrerako Phosphor fotograma "
-"maiztasun bikoizlean . Lehenetsia: Txikia."
+"argitasun galera simulatzen du eremu zaharrerako Phosphor fotograma-emari "
+"bikoizlean . Lehenetsia: txikia."
 
 #: modules/video_filter/deinterlace/deinterlace.c:299
 msgid "Deinterlacing video filter"
@@ -27154,7 +27162,7 @@ msgstr "Ertzen detekzioa"
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
-msgstr "Ertzak atzematen ditu markoan eta zuriz nabarmentzen ditu."
+msgstr "Ertzak atzematen ditu fotograman eta zuriz nabarmentzen ditu."
 
 #: modules/video_filter/erase.c:56
 msgid "Image mask. Pixels with an alpha value greater than 50% will be erased."
@@ -28524,7 +28532,8 @@ msgstr "gailua, fifo edo fitxategi-izena"
 
 #: modules/video_output/yuv.c:42
 msgid "device, fifo or filename to write yuv frames too."
-msgstr "yuv markoak idazteko erabiliko den gailua, fifo edo fitxategi-izena."
+msgstr ""
+"yuv fotogramak idazteko erabiliko den gailua, fifo edo fitxategi-izena."
 
 #: modules/video_output/yuv.c:44
 msgid "Chroma used"
@@ -29857,7 +29866,7 @@ msgstr "Erreprodukzio-zerrenda eta instantziak"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
 msgid "Pause on the last frame of a video"
-msgstr "Pausatu bideo baten azken markoan"
+msgstr "Pausatu bideo baten azken fotograman"
 
 #: modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Allow only one instance"
