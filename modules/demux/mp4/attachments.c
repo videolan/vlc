@@ -316,7 +316,7 @@ int MP4_GetAttachments( const MP4_Box_t *p_root, input_attachment_t ***ppp_attac
             {
                 char rgz_path[14];
                 snprintf( rgz_path, 14,
-                         "/%4.4s[%"PRIu16"]",
+                         "/%4.4s[%u]",
                          (const char *) &p_pnot->data.p_pnot->i_type,
                          p_pnot->data.p_pnot->i_index - 1 );
                 const MP4_Box_t *p_pict = MP4_BoxGet( p_root, rgz_path );
