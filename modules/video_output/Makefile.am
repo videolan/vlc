@@ -41,7 +41,9 @@ endif
 
 libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.c \
 	video_output/opengl/interop.h
-libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+libglinterop_cvpx_plugin_la_SOURCES += codec/vt_utils.c codec/vt_utils.h
+libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
+	-Wl,-framework,Foundation,-framework,CoreVideo
 
 if HAVE_OSX
 libvout_macosx_plugin_la_SOURCES = video_output/macosx.m $(OPENGL_COMMONSOURCES)
@@ -56,9 +58,7 @@ libcaopengllayer_plugin_la_LIBADD = $(OPENGL_COMMONLIBS)
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
 
-libglinterop_cvpx_plugin_la_SOURCES += codec/vt_utils.c codec/vt_utils.h
-libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface \
-	-Wl,-framework,Foundation,-framework,CoreVideo,-framework,OpenGL
+libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,IOSurface,-framework,OpenGL
 vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la \
 	libglinterop_cvpx_plugin.la
 endif
