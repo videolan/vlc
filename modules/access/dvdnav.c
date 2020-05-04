@@ -65,6 +65,8 @@ dvdnav_status_t dvdnav_jump_to_sector_by_time(dvdnav_t *, uint64_t, int32_t);
 #include "../demux/mpeg/ps.h"
 #include "../demux/timestamps_filter.h"
 
+#include "disc_helper.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -414,6 +416,9 @@ static int AccessDemuxOpen ( vlc_object_t *p_this )
     if( !forced && ProbeDVD( psz_file ) != VLC_SUCCESS )
         goto bailout;
 
+    if( forced && DiscProbeMacOSPermission( p_this, psz_file ) != VLC_SUCCESS )
+        goto bailout;
+
     /* Open dvdnav */
     psz_path = ToLocale( psz_file );
 #if DVDNAV_VERSION >= 60100
@@ -425,13 +430,6 @@ static int AccessDemuxOpen ( vlc_object_t *p_this )
 #endif
     {
         msg_Warn( p_demux, "cannot open DVD (%s)", psz_file);
-
-#ifdef __APPLE__
-        vlc_dialog_display_error( p_demux, _("Problem accessing a system resource"),
-            _("Potentially, macOS blocks access to your disc. "
-              "Please open \"System Preferences\" -> \"Security & Privacy\" "
-              "and allow VLC to access your external media in \"Files and Folders\" section."));
-#endif
         goto bailout;
     }
 

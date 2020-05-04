@@ -159,6 +159,7 @@ modules/access/concat.c
 modules/access/dc1394.c
 modules/access/dcp/dcp.cpp
 modules/access/decklink.cpp
+modules/access/disc_helper.h
 modules/access/dshow/dshow.cpp
 modules/access/dsm/access.c
 modules/access/dsm/sd.c
