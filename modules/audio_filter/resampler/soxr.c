@@ -317,7 +317,7 @@ Resample( filter_t *p_filter, block_t *p_in )
         if( f_ratio != p_sys->f_fixed_ratio )
         {
             /* using variable resampler */
-            soxr_set_io_ratio( p_sys->vr_soxr, 1 / f_ratio, i_olen );
+            soxr_set_io_ratio( p_sys->vr_soxr, 1 / f_ratio, 0 /* instant change */ );
             soxr = p_sys->vr_soxr;
         }
         else if( f_ratio == 1.0f )
