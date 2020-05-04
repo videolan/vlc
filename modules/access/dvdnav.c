@@ -228,6 +228,14 @@ static int MenuIDToSeekpoint( DVDMenuID_t menuid, int *seekpoint )
     return VLC_EGENERIC;
 }
 
+static int SeekpointToMenuID( int seekpoint, DVDMenuID_t *id )
+{
+    if( (size_t) seekpoint >= ARRAY_SIZE(menus_id_mapping) )
+        return VLC_EGENERIC;
+    *id = menus_id_mapping[seekpoint].dvdnav_id;
+    return VLC_SUCCESS;
+}
+
 static int CallRootTitleMenu( dvdnav_t *p_dvdnav,
                               int *pi_title, int *pi_seekpoint )
 {
@@ -704,7 +712,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             p_sys->updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
             p_sys->cur_title = i;
-            p_sys->cur_seekpoint = 0;
+            if( i != 0 )
+                p_sys->cur_seekpoint = 0;
+            else
+                MenuIDToSeekpoint( DVD_MENU_Root, &p_sys->cur_seekpoint );
             RandomAccessCleanup( p_sys );
             return VLC_SUCCESS;
 
@@ -712,18 +723,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i = va_arg( args, int );
             if( p_sys->cur_title == 0 )
             {
-                static const int argtab[] = {
-                    DVD_MENU_Escape,
-                    DVD_MENU_Root,
-                    DVD_MENU_Title,
-                    DVD_MENU_Part,
-                    DVD_MENU_Subpicture,
-                    DVD_MENU_Audio,
-                    DVD_MENU_Angle
-                };
-                enum { numargs = sizeof(argtab)/sizeof(int) };
-                if( (unsigned)i >= numargs || DVDNAV_STATUS_OK !=
-                           dvdnav_menu_call(p_sys->dvdnav,argtab[i]) )
+                DVDMenuID_t menuid;
+                if( SeekpointToMenuID(i, &menuid) ||
+                    dvdnav_menu_call(p_sys->dvdnav, menuid) != DVDNAV_STATUS_OK )
                     return VLC_EGENERIC;
             }
             else if( dvdnav_part_play( p_sys->dvdnav, p_sys->cur_title,
@@ -1069,8 +1071,8 @@ static int Demux( demux_t *p_demux )
 
     case DVDNAV_CELL_CHANGE:
     {
-        int32_t i_title = 0;
-        int32_t i_part  = 0;
+        int32_t i_nav_title = 0;
+        int32_t i_nav_part  = 0;
 
         dvdnav_cell_change_event_t *event =
             (dvdnav_cell_change_event_t*)packet;
@@ -1092,20 +1094,30 @@ static int Demux( demux_t *p_demux )
             p_sys->tk[i].i_next_block_flags |= BLOCK_FLAG_CELL_DISCONTINUITY;
 
         /* FIXME is it correct or there is better way to know chapter change */
-        if( dvdnav_current_title_info( p_sys->dvdnav, &i_title,
-                                       &i_part ) == DVDNAV_STATUS_OK )
+        if( dvdnav_current_title_info( p_sys->dvdnav, &i_nav_title,
+                                       &i_nav_part ) == DVDNAV_STATUS_OK )
         {
-            if( i_title >= 0 && i_title < p_sys->i_title )
+            const int i_title = p_sys->cur_title;
+            const int i_seekpoint = p_sys->cur_seekpoint;
+            if( i_nav_title > 0 && i_nav_title < p_sys->i_title )
             {
-                p_sys->updates |= INPUT_UPDATE_TITLE;
-                p_sys->cur_title = i_title;
-
-                if( i_part >= 1 && i_part <= p_sys->title[i_title]->i_seekpoint )
-                {
-                    p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
-                    p_sys->cur_seekpoint = i_part - 1;
-                }
+                p_sys->cur_title = i_nav_title;
+                if( i_nav_part > 0 &&
+                    i_nav_part <= p_sys->title[i_nav_title]->i_seekpoint )
+                    p_sys->cur_seekpoint = i_nav_part - 1;
+                else p_sys->cur_seekpoint = 0;
             }
+            else if( i_nav_title == 0 ) /* in menus, i_part == menu id */
+            {
+                if( MenuIDToSeekpoint( i_nav_part, &p_sys->cur_seekpoint ) )
+                    p_sys->cur_seekpoint = 0; /* non standard menu number, can't map back */
+                else
+                    p_sys->cur_title = 0;
+            }
+            if( i_title != p_sys->cur_title )
+                p_sys->updates |= INPUT_UPDATE_TITLE;
+            if( i_seekpoint != p_sys->cur_seekpoint )
+                p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
         }
         break;
     }
