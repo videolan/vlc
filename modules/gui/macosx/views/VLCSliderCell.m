@@ -223,7 +223,10 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
     // Empty Track Drawing
     NSBezierPath* emptyTrackPath = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:3 yRadius:3];
-    [_trackGradient drawInBezierPath:emptyTrackPath angle:-90];
+
+    // Drawing a gradient into an empty bezier path will cause an exception, prevent that
+    if (![emptyTrackPath isEmpty])
+        [_trackGradient drawInBezierPath:emptyTrackPath angle:-90];
 
     if (_isKnobHidden) {
         [_trackStrokeColor setStroke];
