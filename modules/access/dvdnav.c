@@ -215,6 +215,36 @@ static const struct
     { DVD_MENU_Angle,      "Angle" },
 };
 
+static int MenuIDToSeekpoint( DVDMenuID_t menuid, int *seekpoint )
+{
+    for( size_t i=0; i<ARRAY_SIZE(menus_id_mapping); i++ )
+    {
+        if( menus_id_mapping[i].dvdnav_id == menuid )
+        {
+            *seekpoint = i;
+            return VLC_SUCCESS;
+        }
+    }
+    return VLC_EGENERIC;
+}
+
+static int CallRootTitleMenu( dvdnav_t *p_dvdnav,
+                              int *pi_title, int *pi_seekpoint )
+{
+    const DVDMenuID_t menuids[2] = { DVD_MENU_Title, DVD_MENU_Root };
+    for( int i=0; i<2; i++ )
+    {
+        if( dvdnav_menu_call( p_dvdnav, menuids[i] )
+            == DVDNAV_STATUS_OK )
+        {
+            *pi_title = 0;
+            MenuIDToSeekpoint( menuids[i], pi_seekpoint );
+            return VLC_SUCCESS;
+        }
+    }
+    return VLC_EGENERIC;
+}
+
 /*****************************************************************************
  * CommonOpen:
  *****************************************************************************/
@@ -311,14 +341,9 @@ static int CommonOpen( vlc_object_t *p_this,
             return VLC_EGENERIC;
         }
 
-        if( dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Title ) !=
-            DVDNAV_STATUS_OK )
-        {
-            /* Try going to menu root */
-            if( dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Root ) !=
-                DVDNAV_STATUS_OK )
-                    msg_Warn( p_demux, "cannot go to dvd menu" );
-        }
+        if( CallRootTitleMenu( p_sys->dvdnav, &p_sys->cur_title,
+                                              &p_sys->cur_seekpoint ) )
+            msg_Warn( p_demux, "cannot go to dvd menu" );
     }
 
     i_angle = var_CreateGetInteger( p_demux, "dvdnav-angle" );
@@ -797,20 +822,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_NAV_MENU:
         {
-            if( dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Title )
-                != DVDNAV_STATUS_OK )
+            if( CallRootTitleMenu( p_sys->dvdnav, &p_sys->cur_title,
+                                                  &p_sys->cur_seekpoint ) )
             {
-                msg_Warn( p_demux, "cannot select Title menu" );
-                if( dvdnav_menu_call( p_sys->dvdnav, DVD_MENU_Root )
-                    != DVDNAV_STATUS_OK )
-                {
-                    msg_Warn( p_demux, "cannot select Root menu" );
-                    return VLC_EGENERIC;
-                }
+                msg_Warn( p_demux, "cannot select Title/Root menu" );
+                return VLC_EGENERIC;
             }
             p_sys->updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
-            p_sys->cur_title = 0;
-            p_sys->cur_seekpoint = 2;
             break;
         }
 
