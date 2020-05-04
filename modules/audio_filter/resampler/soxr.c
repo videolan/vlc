@@ -246,7 +246,11 @@ SoXR_Resample( filter_t *p_filter, soxr_t soxr, block_t *p_in, size_t i_olen )
         p_out = p_in;
     }
     else
+    {
         p_out = block_Alloc( i_olen * i_oframesize );
+        if( p_out == NULL )
+            goto error;
+    }
 
     soxr_error_t error = soxr_process( soxr, p_in ? p_in->p_buffer : NULL,
                                        i_ilen, &i_idone, p_out->p_buffer,
