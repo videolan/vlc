@@ -123,15 +123,21 @@
 
     NSRect barRect = self.bounds;
 
+    if (NSIsEmptyRect(barRect))
+        return;
+
     [[NSColor clearColor] setFill];
     NSRectFill(barRect);
 
-    if (_isDark) {
-        [_darkGradient drawInBezierPath:_rectanglePath angle:270.0];
-        [_darkStroke setStroke];
-    } else {
-        [_lightGradient drawInBezierPath:_rectanglePath angle:270.0];
-        [_lightStroke setStroke];
+    // Drawing a gradient into an empty bezier path will cause an exception, prevent that
+    if (![_rectanglePath isEmpty]) {
+        if (_isDark) {
+            [_darkGradient drawInBezierPath:_rectanglePath angle:270.0];
+            [_darkStroke setStroke];
+        } else {
+            [_lightGradient drawInBezierPath:_rectanglePath angle:270.0];
+            [_lightStroke setStroke];
+        }
     }
 
     [_separatorPath stroke];
