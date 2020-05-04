@@ -116,6 +116,13 @@ BreakpadRef initBreakpad()
  *****************************************************************************/
 int main(int i_argc, const char *ppsz_argv[])
 {
+#ifdef HAVE_BREAKPAD
+    BreakpadRef breakpad = NULL;
+
+    if (!getenv("VLC_DISABLE_BREAKPAD"))
+        breakpad = initBreakpad();
+#endif
+
     /* The so-called POSIX-compliant MacOS X reportedly processes SIGPIPE even
      * if it is blocked in all thread.
      * Note: this is NOT an excuse for not protecting against SIGPIPE. If
@@ -279,10 +286,6 @@ int main(int i_argc, const char *ppsz_argv[])
      * runloop is used. Otherwise, [NSApp run] needs to be called, which setups more stuff
      * before actually starting the loop.
      */
-#ifdef HAVE_BREAKPAD
-    BreakpadRef breakpad;
-    breakpad = initBreakpad();
-#endif
     @autoreleasepool {
         if(NSApp == nil) {
             CFRunLoopRun();
@@ -302,7 +305,8 @@ out:
     libvlc_release(vlc);
 
 #ifdef HAVE_BREAKPAD
-    BreakpadRelease(breakpad);
+    if (breakpad)
+        BreakpadRelease(breakpad);
 #endif
 
     return ret;
