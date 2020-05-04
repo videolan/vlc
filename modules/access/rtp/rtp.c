@@ -171,7 +171,7 @@ static int OpenSDP(vlc_object_t *obj)
     if (vlc_stream_GetSize(demux->s, &size))
         size = 65536;
     else if (size > 65536) {
-        msg_Err(obj, "SDP description too large: %zu bytes", size);
+        msg_Err(obj, "SDP description too large: %" PRIu64 " bytes", size);
         return VLC_EGENERIC;
     }
 
