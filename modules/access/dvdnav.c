@@ -199,6 +199,23 @@ static void DvdNavLog( void *foo, dvdnav_logger_level_t i, const char *p, va_lis
 #endif
 
 /*****************************************************************************
+ *
+ *****************************************************************************/
+static const struct
+{
+    DVDMenuID_t dvdnav_id;
+    const char *psz_name;
+} menus_id_mapping[] = {
+    { DVD_MENU_Escape,     "Resume" },
+    { DVD_MENU_Root,       "Root" },
+    { DVD_MENU_Title,      "Title" },
+    { DVD_MENU_Part,       "Chapter" },
+    { DVD_MENU_Subpicture, "Subtitle" },
+    { DVD_MENU_Audio,      "Audio" },
+    { DVD_MENU_Angle,      "Angle" },
+};
+
+/*****************************************************************************
  * CommonOpen:
  *****************************************************************************/
 static int CommonOpen( vlc_object_t *p_this,
@@ -1220,33 +1237,14 @@ static void DemuxTitles( demux_t *p_demux )
     t->i_flags = INPUT_TITLE_MENU | INPUT_TITLE_INTERACTIVE;
     t->psz_name = strdup( "DVD Menu" );
 
-    s = vlc_seekpoint_New();
-    s->psz_name = strdup( "Resume" );
-    TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
-
-    s = vlc_seekpoint_New();
-    s->psz_name = strdup( "Root" );
-    TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
-
-    s = vlc_seekpoint_New();
-    s->psz_name = strdup( "Title" );
-    TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
-
-    s = vlc_seekpoint_New();
-    s->psz_name = strdup( "Chapter" );
-    TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
-
-    s = vlc_seekpoint_New();
-    s->psz_name = strdup( "Subtitle" );
-    TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
-
-    s = vlc_seekpoint_New();
-    s->psz_name = strdup( "Audio" );
-    TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
-
-    s = vlc_seekpoint_New();
-    s->psz_name = strdup( "Angle" );
-    TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
+    for( size_t i=0; i<ARRAY_SIZE(menus_id_mapping); i++ )
+    {
+        s = vlc_seekpoint_New();
+        if(!s)
+            break;
+        s->psz_name = strdup( menus_id_mapping[i].psz_name );
+        TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
+    }
 
     TAB_APPEND( p_sys->i_title, p_sys->title, t );
 
