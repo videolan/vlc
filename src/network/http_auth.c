@@ -125,7 +125,7 @@ static char *AuthDigest( vlc_object_t *p_this, vlc_http_auth_t *p_auth,
     /* H(A1) */
     if ( p_auth->psz_HA1 )
     {
-        strncpy( psz_HA1, p_auth->psz_HA1, sizeof(psz_HA1) );
+        memcpy( psz_HA1, p_auth->psz_HA1, sizeof(psz_HA1) );
     }
     else
     {
