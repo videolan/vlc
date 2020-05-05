@@ -239,6 +239,7 @@ static void on_current_media_changed(vlc_player_t *player,
         GError *p_error = NULL;
         pix = gdk_pixbuf_new_from_file_at_scale( psz_arturl,
                                                  72, 72, TRUE, &p_error );
+        free( psz_arturl );
     }
     else /* else we show state-of-the art logo */
     {
@@ -259,8 +260,6 @@ static void on_current_media_changed(vlc_player_t *player,
             }
         }
     }
-
-    free( psz_arturl );
 
     /* we need to replace '&' with '&amp;' because '&' is a keyword of
      * notification-daemon parser */
