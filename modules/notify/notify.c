@@ -35,9 +35,15 @@
 #include <vlc_playlist.h>
 #include <vlc_url.h>
 
-#include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <libnotify/notify.h>
+
+typedef struct GtkIconTheme GtkIconTheme;
+enum GtkIconLookupFlags { dummy = 0x7fffffff };
+
+VLC_WEAK GtkIconTheme *gtk_icon_theme_get_default(void);
+VLC_WEAK GdkPixbuf *gtk_icon_theme_load_icon(GtkIconTheme *,
+    const char *icon_name, int size, enum GtkIconLookupFlags, GError **);
 
 #ifndef NOTIFY_CHECK_VERSION
 # define NOTIFY_CHECK_VERSION(x,y,z) 0
@@ -241,23 +247,24 @@ static void on_current_media_changed(vlc_player_t *player,
                                                  72, 72, TRUE, &p_error );
         free( psz_arturl );
     }
-    else /* else we show state-of-the art logo */
+    else
+    /* else we show state-of-the art logo */
+    if( gtk_icon_theme_get_default != NULL
+     && gtk_icon_theme_load_icon != NULL )
     {
         /* First try to get an icon from the current theme. */
         GtkIconTheme* p_theme = gtk_icon_theme_get_default();
         pix = gtk_icon_theme_load_icon( p_theme, "vlc", 72, 0, NULL);
-
-        if( !pix )
-        {
-        /* Load icon from share/ */
-            GError *p_error = NULL;
-            char *psz_pixbuf = config_GetSysPath(VLC_SYSDATA_DIR,
+    }
+    else
+    {   /* Load icon from share/ */
+        GError *p_error = NULL;
+        char *psz_pixbuf = config_GetSysPath(VLC_SYSDATA_DIR,
                                      "icons/hicolor/48x48/"PACKAGE_NAME".png");
-            if (psz_pixbuf != NULL)
-            {
-                pix = gdk_pixbuf_new_from_file( psz_pixbuf, &p_error );
-                free( psz_pixbuf );
-            }
+        if (psz_pixbuf != NULL)
+        {
+            pix = gdk_pixbuf_new_from_file( psz_pixbuf, &p_error );
+            free( psz_pixbuf );
         }
     }
 
