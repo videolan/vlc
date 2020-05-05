@@ -1331,7 +1331,9 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
     if( !p_sys->spu_es )
         return;
 
-    dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
+    if( dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part )
+            != DVDNAV_STATUS_OK )
+        return;
 
     dvdnav_highlight_area_t hl;
     int32_t i_button;
@@ -1404,8 +1406,9 @@ static void ESSubtitleUpdate( demux_t *p_demux )
     ButtonUpdate( p_demux, false );
     vlc_mutex_unlock(&p_sys->event_lock);
 
-    dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
-    if( i_title > 0 ) return;
+    if( dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part )
+            != DVDNAV_STATUS_OK || i_title > 0 )
+        return;
 
     /* dvdnav_get_active_spu_stream sets (in)visibility flag as 0xF0 */
     if( i_spu >= 0 && i_spu <= 0x1f )
@@ -1632,8 +1635,8 @@ static void ESNew( demux_t *p_demux, int i_id )
                 16 * sizeof( uint32_t ) );
 
         /* We select only when we are not in the menu */
-        dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
-        if( i_title > 0 &&
+        if( dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part ) == DVDNAV_STATUS_OK &&
+            i_title > 0 &&
             dvdnav_get_active_spu_stream( p_sys->dvdnav ) == (i_id&0x1f) )
         {
             b_select = true;
