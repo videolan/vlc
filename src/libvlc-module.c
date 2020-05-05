@@ -365,12 +365,12 @@ static const char * const  ppsz_deinterlace_text[] = {
 static const char * const ppsz_deinterlace_mode[] = {
     "auto", "discard", "blend", "mean", "bob",
     "linear", "x", "yadif", "yadif2x", "phosphor",
-    "ivtc", "gl_yadif",
+    "ivtc", "gl_yadif", "gl_yadif2x",
 };
 static const char * const ppsz_deinterlace_mode_text[] = {
     N_("Auto"), N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"),
     N_("Linear"), "X", "Yadif", "Yadif (2x)", N_("Phosphor"),
-    N_("Film NTSC (IVTC)"), N_("OpenGL Yadif"),
+    N_("Film NTSC (IVTC)"), N_("OpenGL Yadif"), N_("OpenGL Yadif (2x)"),
 };
 
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };

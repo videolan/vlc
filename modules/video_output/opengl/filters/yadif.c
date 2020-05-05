@@ -55,6 +55,8 @@ struct program_yadif {
         GLint next;
         GLint width;
         GLint height;
+        GLint order;
+        GLint field;
     } loc;
 };
 
@@ -77,6 +79,9 @@ struct sys {
      * If we only received the two first frames, 1 is missing.
      */
     unsigned missing_frames;
+
+    bool is_yadif2x;
+    unsigned order;
 };
 
 static void
@@ -204,6 +209,8 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
         "uniform sampler2D next;\n"
         "uniform float width;\n"
         "uniform float height;\n"
+        "uniform int order;\n"
+        "uniform int field;\n"
         "\n"
         "float pix(sampler2D sampler, float x, float y) {\n"
         "  return texture2D(sampler, vec2(x / width, y / height)).x;\n"
@@ -219,15 +226,26 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
         "  return (pix(cur, x+j, y+1.0) + pix(cur, x-j, y-1.0)) / 2.0;"
         "}\n"
         "\n"
-        "float filter(float x, float y) {\n"
+        "float filter_internal(float x, float y,\n"
+        "                      sampler2D prev2, sampler2D next2) {\n"
         "  float prev_pix = pix(prev, x, y);\n"
         "  float cur_pix = pix(cur, x, y);\n"
         "  float next_pix = pix(next, x, y);\n"
         "\n"
+        "  float prev2_pix;\n"
+        "  float next2_pix;\n"
+        "  if (order == 0) {\n"
+        "    prev2_pix = prev_pix;\n"
+        "    next2_pix = cur_pix;\n"
+        "  } else {\n"
+        "    prev2_pix = cur_pix;\n"
+        "    next2_pix = next_pix;\n"
+        "  }\n"
+        "\n"
         "  float c = pix(cur, x, y+1.0);\n"
-        "  float d = (prev_pix + cur_pix) / 2.0;\n"
+        "  float d = (prev2_pix + next2_pix) / 2.0;\n"
         "  float e = pix(cur, x, y-1.0);\n"
-        "  float temporal_diff0 = abs(prev_pix - cur_pix) / 2.0;\n"
+        "  float temporal_diff0 = abs(prev2_pix - next2_pix) / 2.0;\n"
         "  float temporal_diff1 = (abs(pix(prev, x, y+1.0) - c)\n"
         "                        + abs(pix(prev, x, y-1.0) - e)) / 2.0;\n"
         "  float temporal_diff2 = (abs(pix(next, x, y+1.0) - c)\n"
@@ -262,8 +280,8 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
         "  }\n"
         "\n"
            // if mode < 2
-        "  float b = (pix(prev, x, y+2.0) + pix(cur, x, y+2.0)) / 2.0;\n"
-        "  float f = (pix(prev, x, y-2.0) + pix(cur, x, y-2.0)) / 2.0;\n"
+        "  float b = (pix(prev2, x, y+2.0) + pix(next2, x, y+2.0)) / 2.0;\n"
+        "  float f = (pix(prev2, x, y-2.0) + pix(next2, x, y-2.0)) / 2.0;\n"
         "  float vmax = max(max(d-e, d-c),\n"
         "                   min(b-c, f-e));\n"
         "  float vmin = min(min(d-e, d-c),\n"
@@ -276,6 +294,13 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
         "  return spatial_pred;\n"
         "}\n"
         "\n"
+        "float filter(float x, float y) {\n"
+        "  if (order == 0) {\n"
+        "    return filter_internal(x, y, prev, cur);\n"
+        "  }\n"
+        "  return filter_internal(x, y, cur, next);\n"
+        "}\n"
+        "\n"
         "void main() {\n"
            /* bottom-left is (0.5, 0.5)
               top-right is (width-0.5, height-0.5) */
@@ -285,7 +310,7 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
         "  float line = floor(height - y);\n"
         "\n"
         "  float result;\n"
-        "  if (mod(line, 2.0) == 0.0) {\n"
+        "  if (int(mod(line, 2.0)) == field) {\n"
         "    result = pix(cur, x, y);\n"
         "  } else {\n"
         "    result = filter(x, y);\n"
@@ -332,6 +357,12 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
 
     prog->loc.height = vt->GetUniformLocation(program_id, "height");
     assert(prog->loc.height != -1);
+
+    prog->loc.order = vt->GetUniformLocation(program_id, "order");
+    assert(prog->loc.order != -1);
+
+    prog->loc.field = vt->GetUniformLocation(program_id, "field");
+    assert(prog->loc.field != -1);
 
     vt->GenBuffers(1, &prog->vbo);
 
@@ -475,6 +506,20 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
     GLsizei width = sampler->tex_widths[meta->plane];
     GLsizei height = sampler->tex_heights[meta->plane];
 
+    assert(sys->order == 0 || sys->order == 1);
+    vt->Uniform1i(prog->loc.order, sys->order);
+
+    /**
+     * order == 0 &&  top_field_first  ==>  field = 0
+     * order == 0 && !top_field_first  ==>  field = 1
+     * order == 1 &&  top_field_first  ==>  field = 1
+     * order == 1 && !top_field_first  ==>  field = 0
+     */
+    unsigned field = sys->order ^ !meta->top_field_first;
+    assert(field == 0 || field == 1);
+
+    vt->Uniform1i(prog->loc.field, field);
+
     vt->Uniform1f(prog->loc.width, width);
     vt->Uniform1f(prog->loc.height, height);
 
@@ -498,8 +543,11 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
     vt->Clear(GL_COLOR_BUFFER_BIT);
     vt->DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    if (meta->plane == 2) {
-        /* This was the last plane */
+    if (sys->is_yadif2x)
+        sys->order ^= 1; /* alternate between 0 and 1 */
+
+    if (meta->plane == 2 && sys->order == 0) {
+        /* This was the last pass of the last plane */
         sys->next = prev; /* rotate */
 
         if (sys->missing_frames)
@@ -516,10 +564,9 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
     return VLC_SUCCESS;
 }
 
-static vlc_gl_filter_open_fn Open;
 static int
 Open(struct vlc_gl_filter *filter, const config_chain_t *config,
-     struct vlc_gl_tex_size *size_out)
+     struct vlc_gl_tex_size *size_out, bool is_yadif2x)
 {
     (void) config;
     (void) size_out;
@@ -532,6 +579,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     /* The first call to Draw will provide the "next" frame. The "prev" and
      * "cur" frames are missing. */
     sys->missing_frames = 2;
+    sys->order = 0;
 
     static const struct vlc_gl_filter_ops ops = {
         .draw = Draw,
@@ -540,6 +588,8 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
     };
     filter->ops = &ops;
     filter->config.filter_planes = true;
+
+    sys->is_yadif2x = is_yadif2x;
 
     sys->sampler = vlc_gl_filter_GetSampler(filter);
     assert(sys->sampler);
@@ -582,6 +632,24 @@ error1:
     return VLC_EGENERIC;
 }
 
+/* Ensure callback have the correct prototype */
+static vlc_gl_filter_open_fn OpenYadif;
+static vlc_gl_filter_open_fn OpenYadif2x;
+
+static int
+OpenYadif(struct vlc_gl_filter *filter, const config_chain_t *config,
+          struct vlc_gl_tex_size *size_out)
+{
+    return Open(filter, config, size_out, false);
+}
+
+static int
+OpenYadif2x(struct vlc_gl_filter *filter, const config_chain_t *config,
+          struct vlc_gl_tex_size *size_out)
+{
+    return Open(filter, config, size_out, true);
+}
+
 static int OpenVideoFilter(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t*)obj;
@@ -607,12 +675,24 @@ vlc_module_begin()
     set_description("OpenGL yadif deinterlace filter")
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_capability("opengl filter", 0)
-    set_callback(Open)
-    add_shortcut("yadif")
+
+    add_submodule()
+        set_capability("opengl filter", 0)
+        set_callback(OpenYadif)
+        add_shortcut("yadif")
+
+    add_submodule()
+        set_capability("opengl filter", 0)
+        set_callback(OpenYadif2x)
+        add_shortcut("yadif2x")
 
     add_submodule()
         set_capability("video filter", 1)
         set_callback(OpenVideoFilter)
         add_shortcut("deinterlace", "gl_yadif")
+
+    add_submodule()
+        set_capability("video filter", 1)
+        set_callback(OpenVideoFilter)
+        add_shortcut("deinterlace", "gl_yadif2x")
 vlc_module_end()
