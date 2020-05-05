@@ -1,0 +1,105 @@
+From 69105728ea5e1ce289498865b81e5ffeacebd840 Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Sun, 25 Nov 2018 02:10:44 +0100
+Subject: [PATCH 1/2] libasprintf: On mingw, really use our vasprintf function,
+ not mingw_vasprintf.
+
+mingw now has a definition of 'vasprintf' in <stdio.h> that redirects to
+mingw_vasprintf, which does not support argument reordering (i.e.
+HAVE_POSIX_PRINTF is not defined). Make sure to avoid this function and use
+the one defined in our lib-asprintf.c instead.
+
+* gettext-runtime/libasprintf/lib-asprintf.h (asprintf): Define as macro
+redirecting to libasprintf_asprintf.
+(vasprintf): Define as macro redirecting to libasprintf_vasprintf.
+* gettext-runtime/libasprintf/lib-asprintf.c: Define also libasprintf_asprintf
+and libasprintf_vasprintf.
+* gettext-runtime/libasprintf/autosprintf.cc: Include lib-asprintf.h last.
+
+(cherry picked from commit 63295aac24c693d2d902eadd272259b7bdd7eae3)
+---
+ gettext-runtime/libasprintf/autosprintf.cc |  5 ++++-
+ gettext-runtime/libasprintf/lib-asprintf.c | 13 ++++++++++++-
+ gettext-runtime/libasprintf/lib-asprintf.h |  7 ++++++-
+ 3 files changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/gettext-runtime/libasprintf/autosprintf.cc b/gettext-runtime/libasprintf/autosprintf.cc
+index 0c8bff1f1..57295aebd 100644
+--- a/gettext-runtime/libasprintf/autosprintf.cc
++++ b/gettext-runtime/libasprintf/autosprintf.cc
+@@ -28,7 +28,6 @@
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include "lib-asprintf.h"
+ 
+ /* std::swap() is in <utility> since C++11.  */
+ #if __cplusplus >= 201103L
+@@ -37,6 +36,10 @@
+ # include <algorithm>
+ #endif
+ 
++/* This include must come last, since it contains overrides of functions that
++   the system may provide (namely, vasprintf).  */
++#include "lib-asprintf.h"
++
+ namespace gnu
+ {
+ 
+diff --git a/gettext-runtime/libasprintf/lib-asprintf.c b/gettext-runtime/libasprintf/lib-asprintf.c
+index afa04dda8..927fe7779 100644
+--- a/gettext-runtime/libasprintf/lib-asprintf.c
++++ b/gettext-runtime/libasprintf/lib-asprintf.c
+@@ -1,5 +1,5 @@
+ /* Library functions for class autosprintf.
+-   Copyright (C) 2002-2003, 2006, 2015-2016 Free Software Foundation, Inc.
++   Copyright (C) 2002-2003, 2006, 2018 Free Software Foundation, Inc.
+    Written by Bruno Haible <bruno@clisp.org>, 2002.
+ 
+    This program is free software: you can redistribute it and/or modify
+@@ -31,8 +31,19 @@
+ #include "vasnprintf.c"
+ #include "asnprintf.c"
+ 
++/* Define to the same symbols as in lib-asprintf.h.  */
++#define asprintf libasprintf_asprintf
++#define vasprintf libasprintf_vasprintf
++
+ /* Define functions declared in "vasprintf.h".  */
+ #include "vasprintf.c"
+ #include "asprintf.c"
+ 
++/* Define the same functions also without the 'libasprintf_' prefix,
++   for binary backward-compatibility.  */
++#undef asprintf
++#undef vasprintf
++#include "vasprintf.c"
++#include "asprintf.c"
++
+ #endif
+diff --git a/gettext-runtime/libasprintf/lib-asprintf.h b/gettext-runtime/libasprintf/lib-asprintf.h
+index 22874f289..c55c988c8 100644
+--- a/gettext-runtime/libasprintf/lib-asprintf.h
++++ b/gettext-runtime/libasprintf/lib-asprintf.h
+@@ -1,5 +1,5 @@
+ /* Library functions for class autosprintf.
+-   Copyright (C) 2002-2003, 2015-2016 Free Software Foundation, Inc.
++   Copyright (C) 2002-2003, 2018 Free Software Foundation, Inc.
+    Written by Bruno Haible <bruno@clisp.org>, 2002.
+ 
+    This program is free software: you can redistribute it and/or modify
+@@ -26,6 +26,11 @@
+ 
+ #else
+ 
++/* Define to symbols that are guaranteed to not be defined by the system
++   header files.  */
++#define asprintf libasprintf_asprintf
++#define vasprintf libasprintf_vasprintf
++
+ /* Get asprintf(), vasprintf() declarations.  */
+ #include "vasprintf.h"
+ 
+-- 
+2.17.1
+
