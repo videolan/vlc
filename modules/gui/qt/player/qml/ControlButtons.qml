@@ -417,8 +417,9 @@ Item{
         Widgets.IconToolButton{
             id: fullScreenBtn
             size: VLCStyle.icon_medium
-            iconText: mainInterface.interfaceFullScreen ?VLCIcons.defullscreen :VLCIcons.fullscreen
-            onClicked: mainInterface.interfaceFullScreen = !mainInterface.interfaceFullScreen
+            enabled: !paintOnly && player.hasVideoOutput
+            iconText: player.fullscreen ? VLCIcons.defullscreen :VLCIcons.fullscreen
+            onClicked: player.fullscreen = !player.fullscreen
             property bool acceptFocus: true
             text: i18n.qtr("fullscreen")
         }
