@@ -584,7 +584,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     RECT wr = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
     AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
 
-    Context.hWnd = CreateWindowEx(NULL,
+    Context.hWnd = CreateWindowEx(0,
                           "WindowClass",
                           "libvlc Demo app",
                           WS_OVERLAPPEDWINDOW,
