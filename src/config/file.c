@@ -102,7 +102,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
                 /* Old config file found. We want to write it at the
                  * new location now. */
                 msg_Info( p_obj, "Found old config file at %s. "
-                          "VLC will now use %s.", psz_old, psz_filename );
+                          "now using %s.", psz_old, psz_filename );
                 char *psz_readme;
                 if( asprintf(&psz_readme,"%s/.vlc/README",
                              home ) != -1 )
