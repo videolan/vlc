@@ -577,14 +577,18 @@ static void FindMountPoint(char **file)
     if (!stat (device, &st) && S_ISBLK (st.st_mode)) {
         int fs_count = getfsstat (NULL, 0, MNT_NOWAIT);
         if (fs_count > 0) {
-            struct statfs mbuf[128];
-            getfsstat (mbuf, fs_count * sizeof(mbuf[0]), MNT_NOWAIT);
+            int bufSize = fs_count * sizeof (struct statfs);
+            struct statfs* mbuf = malloc(bufSize);
+            getfsstat (mbuf, bufSize, MNT_NOWAIT);
             for (int i = 0; i < fs_count; ++i)
                 if (!strcmp (mbuf[i].f_mntfromname, device)) {
                     free(device);
                     *file = strdup(mbuf[i].f_mntonname);
+                    free(mbuf);
                     return;
                 }
+
+            free(mbuf);
         }
     }
 #else
