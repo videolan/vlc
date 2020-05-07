@@ -58,13 +58,13 @@ vlc_module_end ()
 /* Keep a list of busy drawables, so we don't overlap videos if there are
  * more than one video track in the stream. */
 static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
-static uintptr_t *used = NULL;
+static HWND *used = NULL;
 
 static const struct vout_window_operations ops = {
     .destroy = Close,
 };
 
-static void RemoveDrawable(uintptr_t val)
+static void RemoveDrawable(HWND val)
 {
     size_t n = 0;
 
@@ -93,11 +93,12 @@ static void RemoveDrawable(uintptr_t val)
  */
 static int Open(vout_window_t *wnd)
 {
-    uintptr_t val = var_InheritInteger (wnd, "drawable-hwnd");
-    if (val == 0)
+    uintptr_t drawable = var_InheritInteger (wnd, "drawable-hwnd");
+    if (drawable == 0)
         return VLC_EGENERIC;
+    HWND val = (HWND)drawable;
 
-    uintptr_t *tab;
+    HWND *tab;
     size_t n = 0;
 
     vlc_mutex_lock (&serializer);
@@ -105,7 +106,7 @@ static int Open(vout_window_t *wnd)
         for (/*n = 0*/; used[n]; n++)
             if (used[n] == val)
             {
-                msg_Warn (wnd, "HWND 0x%" PRIXPTR " is busy", val);
+                msg_Warn (wnd, "HWND 0x%p is busy", val);
                 val = 0;
                 goto skip;
             }
@@ -137,7 +138,7 @@ skip:
  */
 static void Close (vout_window_t *wnd)
 {
-    uintptr_t val = (uintptr_t)wnd->sys;
+    HWND val = (HWND) wnd->handle.hwnd;
 
     RemoveDrawable(val);
 }
