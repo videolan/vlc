@@ -9,6 +9,10 @@
 #define PLAYER
 
 #include <QtGui>
+#include <QMainWindow>
+#include <QPushButton>
+#include <QSlider>
+#include <QWidget>
 #include <vlc/vlc.h>
 
 class Mwindow : public QMainWindow {

@@ -11,6 +11,12 @@
 #define qtu( i ) ((i).toUtf8().constData())
 
 #include <QtGui>
+#include <QMessageBox>
+#include <QMenuBar>
+#include <QAction>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QFileDialog>
 
 Mwindow::Mwindow() {
     vlcPlayer = NULL;
@@ -142,7 +148,7 @@ void Mwindow::openFile() {
 #elif defined(Q_OS_UNIX)
     libvlc_media_player_set_xwindow(vlcPlayer, videoWidget->winId());
 #elif defined(Q_OS_WIN)
-    libvlc_media_player_set_hwnd(vlcPlayer, videoWidget->winId());
+    libvlc_media_player_set_hwnd(vlcPlayer, (HWND)videoWidget->winId());
 #endif
 
     /* And start playback */
