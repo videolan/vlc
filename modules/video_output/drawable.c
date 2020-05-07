@@ -107,24 +107,20 @@ static int Open(vout_window_t *wnd)
             if (used[n] == val)
             {
                 msg_Warn (wnd, "HWND 0x%p is busy", val);
-                val = 0;
-                goto skip;
+                vlc_mutex_unlock (&serializer);
+                return VLC_EGENERIC;
             }
 
     tab = realloc (used, sizeof (*used) * (n + 2));
-    if (likely(tab != NULL))
-    {
-        used = tab;
-        used[n] = val;
-        used[n + 1] = 0;
+    if (unlikely(tab == NULL)) {
+        vlc_mutex_unlock (&serializer);
+        return VLC_ENOMEM;
     }
-    else
-        val = 0;
-skip:
-    vlc_mutex_unlock (&serializer);
+    used = tab;
+    used[n] = val;
+    used[n + 1] = 0;
 
-    if (val == 0)
-        return VLC_EGENERIC;
+    vlc_mutex_unlock (&serializer);
 
     wnd->type = VOUT_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = (void *)val;
