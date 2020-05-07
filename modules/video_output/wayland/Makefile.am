@@ -73,6 +73,14 @@ libegl_wl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_WAYLAND=1
 libegl_wl_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) $(WAYLAND_EGL_CFLAGS)
 libegl_wl_plugin_la_LIBADD = $(EGL_LIBS) $(WAYLAND_EGL_LIBS)
 
+libvk_wl_plugin_la_SOURCES = \
+	video_output/vulkan/platform.h \
+	video_output/wayland/vulkan.c
+libvk_wl_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(WAYLAND_CFLAGS) $(VULKAN_COMMONCFLAGS) \
+	-DVK_USE_PLATFORM_WAYLAND_KHR
+libvk_wl_plugin_la_LIBADD = $(VULKAN_COMMONLIBS) $(WAYLAND_LIBS)
+
 if HAVE_WAYLAND
 BUILT_SOURCES += $(nodist_libwl_shm_plugin_la_SOURCES)
 vout_LTLIBRARIES += libwl_shm_plugin.la
@@ -81,5 +89,8 @@ BUILT_SOURCES += $(nodist_libxdg_shell_plugin_la_SOURCES)
 vout_LTLIBRARIES += libxdg_shell_plugin.la
 if HAVE_EGL
 vout_LTLIBRARIES += libegl_wl_plugin.la
+endif
+if HAVE_VULKAN
+vout_LTLIBRARIES += libvk_wl_plugin.la
 endif
 endif
