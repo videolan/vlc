@@ -11,6 +11,7 @@
 # Harald H. <haarektrans@gmail.com>, 2014-2015
 # Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2018
 # Kim Malmo <berencamlost@msn.com>, 2018
+# Kjell Cato Heskjestad <cato@heskjestad.xyz>, 2020
 # Kristoffer Berge <kristoffer.berge@gmail.com>, 2015
 # Kurt-Håkon Eilertsen <kurt@kheds.com>, 2014,2016
 # Mathias Stang <mathias.stang@gmail.com>, 2015
@@ -25,8 +26,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-09-01 20:45+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2019\n"
+"PO-Revision-Date: 2020-05-07 04:17+0200\n"
+"Last-Translator: Kjell Cato Heskjestad <cato@heskjestad.xyz>, 2020\n"
 "Language-Team: Norwegian Bokmål (Norway) (https://www.transifex.com/yaron/"
 "teams/16553/nb_NO/)\n"
 "Language: nb\n"
@@ -2892,7 +2893,7 @@ msgstr ""
 
 #: src/libvlc-module.c:695
 msgid "Disable all lua plugins"
-msgstr ""
+msgstr "Slå av alle lua-tillegg"
 
 #: src/libvlc-module.c:699
 msgid ""
@@ -2920,7 +2921,7 @@ msgstr ""
 
 #: src/libvlc-module.c:710
 msgid "Subtitles text scaling factor"
-msgstr ""
+msgstr "Skaleringsfaktor for undertekst"
 
 #: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
@@ -4335,19 +4336,19 @@ msgstr "Velg hurtigtasten for å minske forsinkelsen til undertekster."
 
 #: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
-msgstr ""
+msgstr "Tilbakestill skalering av undertekst"
 
 #: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
-msgstr ""
+msgstr "Skaler opp undertekst"
 
 #: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "Skaler ned undertekst"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
-msgstr ""
+msgstr "Velg hurtigtasten for å endre skalering av undertekst"
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4574,11 +4575,11 @@ msgstr "Bytt mellom de tilgjengelige lydsporene (språk)."
 
 #: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
-msgstr ""
+msgstr "Bytt mellom undertekster i omvendt rekkefølge"
 
 #: src/libvlc-module.c:1392
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr ""
+msgstr "Bytt mellom de tilgjengelige undertekstene i omvendt rekkefølge."
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
@@ -6130,9 +6131,8 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "Problemdetaljer og systemoppsett"
+msgstr "Det oppstod et problem ved tilgang til en systemressurs"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
@@ -6141,14 +6141,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "AVFoundation videoopptak"
+msgstr ""
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "AVFoundation videoopptaksmodus"
+msgstr ""
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -7429,7 +7427,7 @@ msgstr "List opp spesielle filer"
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
-msgstr ""
+msgstr "Inkluder enheter og rør ved opplisting av mappeinnhold"
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:84
 #: modules/access/rdp.c:65 modules/access/sftp.c:55
@@ -7447,7 +7445,7 @@ msgstr "Brukernavn"
 msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
-msgstr ""
+msgstr "Brukernavn for tilkoblingen, hvis det mangler i nettadressen."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:87
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7468,6 +7466,7 @@ msgid ""
 "Password that will be used for the connection, if no username or password "
 "are set in URL."
 msgstr ""
+"Passord for tilkoblingen, hvis brukernavn og passord mangler i nettadressen."
 
 #: modules/access/ftp.c:74
 msgid "FTP account"
@@ -23697,9 +23696,8 @@ msgid "Zeroconf services"
 msgstr ""
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "Opptegneroppdagelse på"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
