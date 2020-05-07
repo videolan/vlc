@@ -440,7 +440,7 @@ static HRESULT CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
             /* we can work with legacy levels but only if forced */
             if ( obj->force || out->feature_level >= D3D_FEATURE_LEVEL_11_0 )
                 break;
-            msg_Dbg(obj, "Incompatible feature level %x", out->feature_level);
+            msg_Warn(obj, "Incompatible feature level %x", out->feature_level);
             ID3D11DeviceContext_Release(out->d3dcontext);
             ID3D11Device_Release(out->d3ddevice);
             out->d3dcontext = NULL;
