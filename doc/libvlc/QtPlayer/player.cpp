@@ -11,6 +11,12 @@
 #define qtu( i ) ((i).toUtf8().constData())
 
 #include <QtGui>
+#include <QMessageBox>
+#include <QMenuBar>
+#include <QAction>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QFileDialog>
 
 Mwindow::Mwindow() {
     vlcPlayer = NULL;
@@ -142,7 +148,7 @@ void Mwindow::openFile() {
 #elif defined(Q_OS_UNIX)
     libvlc_media_player_set_xwindow(vlcPlayer, videoWidget->winId());
 #elif defined(Q_OS_WIN)
-    libvlc_media_player_set_hwnd(vlcPlayer, videoWidget->winId());
+    libvlc_media_player_set_hwnd(vlcPlayer, (HWND)videoWidget->winId());
 #endif
 
     /* And start playback */
@@ -181,7 +187,7 @@ int Mwindow::changeVolume(int vol) { /* Called on volume slider change */
 void Mwindow::changePosition(int pos) { /* Called on position slider change */
 
     if (vlcPlayer)
-        libvlc_media_player_set_position(vlcPlayer, (float)pos/1000.0);
+        libvlc_media_player_set_position(vlcPlayer, (float)pos/1000.0, true);
 }
 
 void Mwindow::updateInterface() { //Update interface and check if song is finished
