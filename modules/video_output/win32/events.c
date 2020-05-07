@@ -245,8 +245,6 @@ static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
         return DefWindowProc(hwnd, message, wParam, lParam);
     event_thread_t *p_event = (event_thread_t *)p_user_data;
 
-    /* Let windows handle the message */
-    return DefWindowProc(hwnd, message, wParam, lParam);
     switch( message )
     {
     /* the user wants to close the window */
@@ -277,6 +275,7 @@ static long FAR PASCAL VideoEventProc( HWND hwnd, UINT message,
         ValidateRect(hwnd, NULL);
         // fall through
     default:
+        /* Let windows handle the message */
         return DefWindowProc(hwnd, message, wParam, lParam);
     }
 }
