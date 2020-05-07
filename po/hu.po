@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-25 09:44+0100\n"
+"PO-Revision-Date: 2020-05-07 09:59+0200\n"
 "Last-Translator: Balázs Meskó <meskobalazs@gmail.com>, 2020\n"
 "Language-Team: Hungarian (https://www.transifex.com/yaron/teams/16553/hu/)\n"
 "Language: hu\n"
@@ -25225,7 +25225,7 @@ msgstr "Teljesítmény figyelmeztetés megjelenítése átkódoláskor"
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Enable Audio passthrough"
-msgstr "Hang áteresztés engedélyezése"
+msgstr "Hangáteresztés engedélyezése"
 
 #: modules/stream_out/chromecast/cast.cpp:195
 msgid "Disable if your receiver does not support Dolby®."
