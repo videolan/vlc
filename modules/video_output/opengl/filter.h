@@ -35,6 +35,7 @@ struct vlc_gl_tex_size {
 
 struct vlc_gl_input_meta {
     vlc_tick_t pts;
+    bool top_field_first;
     unsigned plane;
 };
 
