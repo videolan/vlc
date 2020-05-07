@@ -80,7 +80,7 @@ static void RemoveDrawable(uintptr_t val)
         used[n] = used[n + 1];
     while (used[++n] != 0);
 
-    if (n == 0)
+    if (n == 1)
     {
         free (used);
         used = NULL;
