@@ -228,4 +228,14 @@ vlc_vaapi_IsChromaOpaque(int i_vlc_chroma)
         || i_vlc_chroma == VLC_CODEC_VAAPI_420_10BPP;
 }
 
+#if VA_CHECK_VERSION(1, 1, 0)
+int
+vlc_vaapi_ExportSurfaceHandle(vlc_object_t *o,
+                              VADisplay dpy,
+                              VASurfaceID surface,
+                              uint32_t mem_type,
+                              uint32_t flags,
+                              void *descriptor);
+#endif
+
 #endif /* VLC_VAAPI_H */

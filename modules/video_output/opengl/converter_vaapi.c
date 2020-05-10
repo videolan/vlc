@@ -47,6 +47,14 @@
 # include <fcntl.h>
 #endif
 
+#define DRM_FORMAT_MOD_VENDOR_NONE    0
+#define DRM_FORMAT_RESERVED           ((1ULL << 56) - 1)
+
+#define fourcc_mod_code(vendor, val) \
+        ((((EGLuint64KHR)DRM_FORMAT_MOD_VENDOR_## vendor) << 56) | ((val) & 0x00ffffffffffffffULL))
+
+#define DRM_FORMAT_MOD_INVALID  fourcc_mod_code(NONE, DRM_FORMAT_RESERVED)
+
 struct priv
 {
     struct vlc_vaapi_instance *vainst;
@@ -58,16 +66,23 @@ struct priv
     EGLint drm_fourccs[3];
 
     struct {
-        picture_t *  pic;
-        VAImage      va_image;
-        VABufferInfo va_buffer_info;
-        void *       egl_images[3];
+        picture_t *                 pic;
+#if VA_CHECK_VERSION(1, 1, 0)
+        /* VADRMPRIMESurfaceDescriptor carries modifier information
+         * (GPU tiling, compression, etc...) */
+        VADRMPRIMESurfaceDescriptor va_surface_descriptor;
+#else
+        VABufferInfo                va_buffer_info;
+#endif
+        VAImage                     va_image;
+        void *                      egl_images[3];
     } last;
 };
 
 static EGLImageKHR
 vaegl_image_create(const opengl_tex_converter_t *tc, EGLint w, EGLint h,
-                   EGLint fourcc, EGLint fd, EGLint offset, EGLint pitch)
+                   EGLint fourcc, EGLint fd, EGLint offset, EGLint pitch,
+                   EGLuint64KHR modifier)
 {
     EGLint attribs[] = {
         EGL_WIDTH, w,
@@ -76,6 +91,8 @@ vaegl_image_create(const opengl_tex_converter_t *tc, EGLint w, EGLint h,
         EGL_DMA_BUF_PLANE0_FD_EXT, fd,
         EGL_DMA_BUF_PLANE0_OFFSET_EXT, offset,
         EGL_DMA_BUF_PLANE0_PITCH_EXT, pitch,
+        EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT, modifier & 0xffffffff,
+        EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT, modifier >> 32,
         EGL_NONE
     };
 
@@ -97,7 +114,12 @@ vaegl_release_last_pic(const opengl_tex_converter_t *tc, struct priv *priv)
     for (unsigned i = 0; i < priv->last.va_image.num_planes; ++i)
         vaegl_image_destroy(tc, priv->last.egl_images[i]);
 
+#if VA_CHECK_VERSION(1, 1, 0)
+    for (unsigned i = 0; i < priv->last.va_surface_descriptor.num_objects; ++i)
+        close(priv->last.va_surface_descriptor.objects[i].fd);
+#else
     vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, priv->last.va_image.buf);
+#endif
 
     vlc_vaapi_DestroyImage(o, priv->vadpy, priv->last.va_image.image_id);
 
@@ -161,14 +183,20 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
     struct priv *priv = tc->priv;
     vlc_object_t *o = VLC_OBJECT(tc->gl);
     VAImage va_image;
+#if VA_CHECK_VERSION(1, 1, 0)
+    VADRMPRIMESurfaceDescriptor va_surface_descriptor;
+#else
     VABufferInfo va_buffer_info;
+#endif
     EGLImageKHR egl_images[3] = { };
     bool release_image = false, release_buffer_info = false;
 
     if (pic == priv->last.pic)
     {
         va_image = priv->last.va_image;
-        va_buffer_info = priv->last.va_buffer_info;
+#if VA_CHECK_VERSION(1, 1, 0)
+        va_surface_descriptor = priv->last.va_surface_descriptor;
+#endif
         for (unsigned i = 0; i < priv->last.va_image.num_planes; ++i)
             egl_images[i] = priv->last.egl_images[i];
     }
@@ -181,21 +209,40 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
         assert(va_image.format.fourcc == priv->fourcc);
 
+#if VA_CHECK_VERSION(1, 1, 0)
+        if (vlc_vaapi_ExportSurfaceHandle(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
+                                          VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2, 0,
+                                          &va_surface_descriptor))
+            goto error;
+#else
         va_buffer_info = (VABufferInfo) {
             .mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME
         };
         if (vlc_vaapi_AcquireBufferHandle(o, priv->vadpy, va_image.buf,
                                           &va_buffer_info))
             goto error;
+#endif
         release_buffer_info = true;
     }
 
-    for (unsigned i = 0; i < va_image.num_planes; ++i)
+#if VA_CHECK_VERSION(1, 1, 0)
+    for (unsigned i = 0; i < va_surface_descriptor.num_layers; ++i)
     {
+        unsigned obj_idx = va_surface_descriptor.layers[i].object_index[0];
+
+        /* Since we don't ask for composite object through
+         * vaExportSurfaceHandle, we shouldn't get any multiplane
+         * layer. */
+        if (va_surface_descriptor.layers[i].num_planes > 1)
+          goto error;
+
         egl_images[i] =
             vaegl_image_create(tc, tex_width[i], tex_height[i],
-                               priv->drm_fourccs[i], va_buffer_info.handle,
-                               va_image.offsets[i], va_image.pitches[i]);
+                               priv->drm_fourccs[i],
+                               va_surface_descriptor.objects[obj_idx].fd,
+                               va_surface_descriptor.layers[i].offset[0],
+                               va_surface_descriptor.layers[i].pitch[0],
+                               va_surface_descriptor.objects[obj_idx].drm_format_modifier);
         if (egl_images[i] == NULL)
             goto error;
 
@@ -203,6 +250,22 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
         priv->glEGLImageTargetTexture2DOES(tc->tex_target, egl_images[i]);
     }
+#else
+    for (unsigned i = 0; i < va_image.num_planes; ++i)
+    {
+        egl_images[i] =
+            vaegl_image_create(tc, tex_width[i], tex_height[i],
+                               priv->drm_fourccs[i], va_buffer_info.handle,
+                               va_image.offsets[i], va_image.pitches[i],
+                               DRM_FORMAT_MOD_INVALID);
+        if (egl_images[i] == NULL)
+            goto error;
+
+        tc->vt->BindTexture(tc->tex_target, textures[i]);
+
+        priv->glEGLImageTargetTexture2DOES(tc->tex_target, egl_images[i]);
+    }
+#endif
 
     if (pic != priv->last.pic)
     {
@@ -210,7 +273,12 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
             vaegl_release_last_pic(tc, priv);
         priv->last.pic = picture_Hold(pic);
         priv->last.va_image = va_image;
+#if VA_CHECK_VERSION(1, 1, 0)
+        priv->last.va_surface_descriptor = va_surface_descriptor;
+#else
         priv->last.va_buffer_info = va_buffer_info;
+#endif
+
         for (unsigned i = 0; i < va_image.num_planes; ++i)
             priv->last.egl_images[i] = egl_images[i];
     }
@@ -221,7 +289,14 @@ error:
     if (release_image)
     {
         if (release_buffer_info)
+        {
+#if VA_CHECK_VERSION(1, 1, 0)
+            for (unsigned i = 0; i < va_surface_descriptor.num_objects; ++i)
+                close(va_surface_descriptor.objects[i].fd);
+#else
             vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, va_image.buf);
+#endif
+        }
 
         for (unsigned i = 0; i < 3 && egl_images[i] != NULL; ++i)
             vaegl_image_destroy(tc, egl_images[i]);
@@ -267,7 +342,8 @@ tc_vaegl_get_pool(const opengl_tex_converter_t *tc, unsigned requested_count)
         EGLint h = (va_image.height * tc->texs[i].h.num) / tc->texs[i].h.den;
         EGLImageKHR egl_image =
             vaegl_image_create(tc, w, h, priv->drm_fourccs[i], va_buffer_info.handle,
-                               va_image.offsets[i], va_image.pitches[i]);
+                               va_image.offsets[i], va_image.pitches[i],
+                               DRM_FORMAT_MOD_INVALID);
         if (egl_image == NULL)
         {
             msg_Warn(o, "Can't create Image KHR: kernel too old ?");
