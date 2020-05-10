@@ -66,5 +66,6 @@ static inline ssize_t vlc_dtls_Send(struct vlc_dtls *dgs, const void *buf,
 }
 
 struct vlc_dtls *vlc_datagram_CreateFD(int fd);
+struct vlc_dtls *vlc_dccp_CreateFD(int fd);
 
 #endif

@@ -22,7 +22,9 @@
 # include "config.h"
 #endif
 
+#include <errno.h>
 #include <stdlib.h>
+#include <poll.h>
 
 #include <vlc_common.h>
 #include <vlc_network.h>
@@ -95,6 +97,57 @@ struct vlc_dtls *vlc_datagram_CreateFD(int fd)
     if (likely(s != NULL)) {
         s->fd = fd;
         s->s.ops = &vlc_datagram_ops;
+    }
+
+    return &s->s;
+}
+
+static ssize_t vlc_dccp_Recv(struct vlc_dtls *dgs, struct iovec *iov,
+                             unsigned iovlen, bool *truncated)
+{
+    ssize_t ret = vlc_datagram_Recv(dgs, iov, iovlen, truncated);
+
+    if (unlikely(ret == 0)) {
+        int fd = container_of(dgs, struct vlc_dgram_sock, s)->fd;
+        struct pollfd ufd = { .fd = fd, };
+
+        /* On a connection-oriented datagram socket, recv() can return zero
+         * when a zero-bytes packet was received or when the other end closed
+         * the connection. We need to distinguish the two, so check if the
+         * socket is hung up or not.
+         *
+         * Note that this test can only be done *after* the zero read. The HUP
+         * flag is not set by the IP stack until then.
+         */
+        poll(&ufd, 1, 0);
+
+        if (ufd.revents & POLLHUP) {
+            /* We need a distinct error code. EPIPE is normally only used on
+             * send(), so there are no ambiguities and it is somewhat
+             * descriptive of the connection having been closed.
+             */
+            errno = EPIPE;
+            ret = -1;
+        }
+    }
+
+    return ret;
+}
+
+static const struct vlc_dtls_operations vlc_dccp_ops = {
+    vlc_datagram_Close,
+    vlc_datagram_GetPollFD,
+    vlc_dccp_Recv,
+    vlc_datagram_Send,
+};
+
+struct vlc_dtls *vlc_dccp_CreateFD(int fd)
+{
+    struct vlc_dgram_sock *s = malloc(sizeof (*s));
+
+    if (likely(s != NULL)) {
+        s->fd = fd;
+        s->s.ops = &vlc_dccp_ops;
     }
 
     return &s->s;
