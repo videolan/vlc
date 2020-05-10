@@ -132,7 +132,7 @@ tdestroy(vrootp, freefct)
 void *
 tfind(vkey, vrootp, compar)
 	const void *vkey;		/* key to be found */
-	const void **vrootp;		/* address of the tree root */
+	void * const *vrootp;		/* address of the tree root */
 	int (*compar) (const void *, const void *);
 {
 	node_t * const *rootp = (node_t * const*)vrootp;
