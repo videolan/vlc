@@ -27,17 +27,17 @@
 #include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_block.h>
-#include <vlc_network.h>
 
 #include <limits.h>
 #include <errno.h>
-#include <unistd.h>
 #ifdef HAVE_POLL
 # include <poll.h>
 #endif
 #ifdef HAVE_SYS_UIO_H
 # include <sys/uio.h>
 #endif
+
+#include <vlc_dtls.h>
 
 #include "rtp.h"
 #ifdef HAVE_SRTP
@@ -108,29 +108,15 @@ void *rtp_dgram_thread (void *opaque)
     demux_t *demux = opaque;
     demux_sys_t *sys = demux->p_sys;
     vlc_tick_t deadline = VLC_TICK_INVALID;
-    int rtp_fd = sys->fd;
-#ifdef __linux__
-    const int trunc_flag = MSG_TRUNC;
-#else
-    const int trunc_flag = 0;
-#endif
-
-    struct iovec iov =
-    {
-        .iov_len = DEFAULT_MRU,
-    };
-    struct msghdr msg =
-    {
-        .msg_iov = &iov,
-        .msg_iovlen = 1,
-    };
-
-    struct pollfd ufd[1];
-    ufd[0].fd = rtp_fd;
-    ufd[0].events = POLLIN;
+    struct vlc_dtls *rtp_sock = sys->rtp_sock;
 
     for (;;)
     {
+        struct pollfd ufd[1];
+
+        ufd[0].events = POLLIN;
+        ufd[0].fd = vlc_dtls_GetPollFD(rtp_sock, &ufd[0].events);
+
         int n = poll (ufd, 1, rtp_timeout (deadline));
         if (n == -1)
             continue;
@@ -141,31 +127,18 @@ void *rtp_dgram_thread (void *opaque)
 
         if (ufd[0].revents)
         {
-            n--;
-            if (unlikely(ufd[0].revents & POLLHUP))
-                break; /* RTP socket dead (DCCP only) */
-
-            block_t *block = block_Alloc (iov.iov_len);
+            block_t *block = block_Alloc(DEFAULT_MRU);
             if (unlikely(block == NULL))
-            {
-                if (iov.iov_len == DEFAULT_MRU)
-                    break; /* we are totallly screwed */
-                iov.iov_len = DEFAULT_MRU;
-                continue; /* retry with shrunk MRU */
-            }
+                break; /* we are totallly screwed */
 
-            iov.iov_base = block->p_buffer;
-            msg.msg_flags = trunc_flag;
-
-            ssize_t len = recvmsg (rtp_fd, &msg, trunc_flag);
-            if (len != -1)
-            {
-                if (msg.msg_flags & trunc_flag)
-                {
-                    msg_Err(demux, "%zd bytes packet truncated (MRU was %zu)",
-                            len, iov.iov_len);
+            bool truncated;
+            ssize_t len = vlc_dtls_Recv(rtp_sock, block->p_buffer,
+                                       block->i_buffer, &truncated);
+            if (len >= 0) {
+                if (truncated) {
+                    msg_Err(demux, "packet truncated (MRU was %zu)",
+                            block->i_buffer);
                     block->i_flags |= BLOCK_FLAG_CORRUPTED;
-                    iov.iov_len = len;
                 }
                 else
                     block->i_buffer = len;
@@ -174,10 +147,14 @@ void *rtp_dgram_thread (void *opaque)
             }
             else
             {
+                if (errno == EPIPE)
+                    break; /* connection terminated */
                 msg_Warn (demux, "RTP network error: %s",
                           vlc_strerror_c(errno));
                 block_Release (block);
             }
+
+            n--;
         }
 
     dequeue:

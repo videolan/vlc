@@ -67,8 +67,8 @@ typedef struct
 #ifdef HAVE_SRTP
     struct srtp_session_t *srtp;
 #endif
-    int           fd;
-    int           rtcp_fd;
+    struct vlc_dtls *rtp_sock;
+    struct vlc_dtls *rtcp_sock;
     vlc_thread_t  thread;
 
     vlc_tick_t    timeout;

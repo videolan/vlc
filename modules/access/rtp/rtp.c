@@ -31,6 +31,7 @@
 #include <vlc_demux.h>
 #include <vlc_network.h>
 #include <vlc_plugin.h>
+#include <vlc_dtls.h>
 
 #include "rtp.h"
 #ifdef HAVE_SRTP
@@ -150,11 +151,10 @@ static void Close (vlc_object_t *obj)
     if (p_sys->srtp)
         srtp_destroy (p_sys->srtp);
 #endif
-    if (p_sys->session)
-        rtp_session_destroy (demux, p_sys->session);
-    if (p_sys->rtcp_fd != -1)
-        net_Close (p_sys->rtcp_fd);
-    net_Close (p_sys->fd);
+    rtp_session_destroy (demux, p_sys->session);
+    if (p_sys->rtcp_sock != NULL)
+        vlc_dtls_Close(p_sys->rtcp_sock);
+    vlc_dtls_Close(p_sys->rtp_sock);
 }
 
 static int OpenSDP(vlc_object_t *obj)
@@ -184,8 +184,8 @@ static int OpenSDP(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    sys->fd = -1;
-    sys->rtcp_fd = -1;
+    sys->rtp_sock = NULL;
+    sys->rtcp_sock = NULL;
     sys->session = NULL;
 #ifdef HAVE_SRTP
     sys->srtp = NULL;
@@ -281,19 +281,28 @@ static int OpenSDP(vlc_object_t *obj)
     if (fd == -1)
         goto error;
 
-    int rtcp_fd = -1;
+    sys->rtp_sock = vlc_datagram_CreateFD(fd);
+    if (unlikely(sys->rtp_sock == NULL)) {
+        net_Close(fd);
+        goto error;
+    }
+
     if (rtcp_port > 0) {
-        rtcp_fd = net_OpenDgram(obj, conn->addr, rtcp_port, src, 0,
-                                IPPROTO_UDP);
-        if (rtcp_fd == -1)
+        fd = net_OpenDgram(obj, conn->addr, rtcp_port, src, 0, IPPROTO_UDP);
+        if (fd == -1)
             goto error;
+
+        sys->rtcp_sock = vlc_datagram_CreateFD(fd);
+        if (unlikely(sys->rtcp_sock == NULL)) {
+            net_Close(fd);
+            goto error;
+        }
     }
 
     vlc_sdp_free(sdp);
+    sdp = NULL;
 
     sys->chained_demux = NULL;
-    sys->fd = fd;
-    sys->rtcp_fd = rtcp_fd;
     sys->max_src = var_InheritInteger(obj, "rtp-max-src");
     sys->timeout = vlc_tick_from_sec(var_InheritInteger(obj, "rtp-timeout"));
     sys->max_dropout  = var_InheritInteger(obj, "rtp-max-dropout");
@@ -309,14 +318,21 @@ static int OpenSDP(vlc_object_t *obj)
         goto error;
 
     if (vlc_clone(&sys->thread, rtp_dgram_thread, demux,
-                  VLC_THREAD_PRIORITY_INPUT))
+                  VLC_THREAD_PRIORITY_INPUT)) {
+        rtp_session_destroy(demux, sys->session);
         goto error;
+    }
+
     sys->thread_ready = true;
     return VLC_SUCCESS;
 
 error:
-    Close (obj);
-    vlc_sdp_free(sdp);
+    if (sys->rtcp_sock != NULL)
+        vlc_dtls_Close(sys->rtcp_sock);
+    if (sys->rtp_sock != NULL)
+        vlc_dtls_Close(sys->rtp_sock);
+    if (sdp != NULL)
+        vlc_sdp_free(sdp);
     return VLC_EGENERIC;
 }
 
@@ -376,6 +392,7 @@ static int OpenURL(vlc_object_t *obj)
 
     /* Try to connect */
     int fd = -1, rtcp_fd = -1;
+    bool co = false;
 
     switch (tp)
     {
@@ -398,6 +415,7 @@ static int OpenURL(vlc_object_t *obj)
             var_Create (obj, "dccp-service", VLC_VAR_STRING);
             var_SetString (obj, "dccp-service", "RTPV"); /* FIXME: RTPA? */
             fd = net_Connect (obj, dhost, dport, SOCK_DCCP, tp);
+            co = true;
 #else
             msg_Err (obj, "DCCP support not included");
 #endif
@@ -405,20 +423,26 @@ static int OpenURL(vlc_object_t *obj)
     }
 
     free (tmp);
-    if (fd == -1) {
+    p_sys->rtp_sock = (co ? vlc_dccp_CreateFD : vlc_datagram_CreateFD)(fd);
+    if (p_sys->rtcp_sock == NULL) {
         if (rtcp_fd != -1)
             net_Close(rtcp_fd);
         return VLC_EGENERIC;
     }
     net_SetCSCov (fd, -1, 12);
 
+    if (rtcp_fd != -1) {
+        p_sys->rtcp_sock = vlc_datagram_CreateFD(rtcp_fd);
+        if (p_sys->rtcp_sock == NULL)
+            net_Close (rtcp_fd);
+    } else
+        p_sys->rtcp_sock = NULL;
+
     /* Initializes demux */
     p_sys->chained_demux = NULL;
 #ifdef HAVE_SRTP
     p_sys->srtp         = NULL;
 #endif
-    p_sys->fd           = fd;
-    p_sys->rtcp_fd      = rtcp_fd;
     p_sys->max_src      = var_CreateGetInteger (obj, "rtp-max-src");
     p_sys->timeout      = vlc_tick_from_sec( var_CreateGetInteger (obj, "rtp-timeout") );
     p_sys->max_dropout  = var_CreateGetInteger (obj, "rtp-max-dropout");
@@ -467,7 +491,13 @@ static int OpenURL(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
-    Close (obj);
+    if (p_sys->srtp != NULL)
+        srtp_destroy(p_sys->srtp);
+    if (p_sys->session != NULL)
+        rtp_session_destroy(demux, p_sys->session);
+    if (p_sys->rtcp_sock != NULL)
+        vlc_dtls_Close(p_sys->rtcp_sock);
+    vlc_dtls_Close(p_sys->rtp_sock);
     return VLC_EGENERIC;
 }
 
