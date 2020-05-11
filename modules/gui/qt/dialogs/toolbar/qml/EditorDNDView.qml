@@ -46,7 +46,7 @@ ListView {
         property bool dropVisible: false
         Rectangle {
             z: 2
-            width: 2 * scale
+            width: VLCStyle.dp(2)
             height: parent.height
             anchors {
                 left: parent.left

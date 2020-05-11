@@ -44,13 +44,13 @@ Slider {
         property real location: 0
         property real position: location/control.width
 
-        y: -35 * VLCStyle.scale
+        y: VLCStyle.dp(-35)
         x: location - (timeIndicatorRect.width / 2)
         visible: control.hovered
 
         Rectangle {
-            width: 10 * VLCStyle.scale
-            height: 10 * VLCStyle.scale
+            width: VLCStyle.dp(10)
+            height: VLCStyle.dp(10)
 
             anchors.horizontalCenter: timeIndicatorRect.horizontalCenter
             anchors.verticalCenter: timeIndicatorRect.bottom
@@ -62,7 +62,7 @@ Slider {
         Rectangle {
             id: timeIndicatorRect
             width: childrenRect.width
-            height: 20 * VLCStyle.scale
+            height: VLCStyle.dp(20)
             color: VLCStyle.colors.bgAlt
 
             Text {
@@ -142,7 +142,7 @@ Slider {
 
         Rectangle {
             id: bufferRect
-            property int bufferAnimWidth: 100 * VLCStyle.scale
+            property int bufferAnimWidth: VLCStyle.dp(100)
             property int bufferAnimPosition: 0
             property int bufferFrames: 1000
             property alias animateLoading: loadingAnim.running
@@ -225,7 +225,7 @@ Slider {
                     property real position: model.position === undefined ? 0.0 : model.position
 
                     color: VLCStyle.colors.seekpoint
-                    width: 1 * VLCStyle.scale
+                    width: VLCStyle.dp(1)
                     height: control.barHeight
                     x: sliderRect.width * seekpointsRect.position
                 }

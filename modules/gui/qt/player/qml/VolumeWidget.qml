@@ -62,10 +62,10 @@ FocusScope{
         Slider
         {
             id: volControl
-            width: 100 * VLCStyle.scale
+            width: VLCStyle.dp(100)
             height: parent.height
 
-            anchors.margins: 5 * VLCStyle.scale
+            anchors.margins: VLCStyle.dp(5)
             from: 0
             to: maxvolpos
             stepSize: 0.05
@@ -118,10 +118,10 @@ FocusScope{
                 x: volControl.leftPadding
                 y: volControl.topPadding + volControl.availableHeight / 2 - height / 2
                 implicitWidth: parent.width
-                implicitHeight: 4 * VLCStyle.scale
+                implicitHeight: VLCStyle.dp(4)
                 height: implicitHeight
                 width: volControl.availableWidth
-                radius: 4 * VLCStyle.scale
+                radius: VLCStyle.dp(4)
                 color: VLCStyle.colors.volsliderbg
 
                 MouseArea {
@@ -129,7 +129,7 @@ FocusScope{
                     property bool isEntered: false
 
                     width: parent.width
-                    height: parent.height + 60
+                    height: parent.height + VLCStyle.dp(60)
                     anchors.verticalCenter: parent.verticalCenter
                     hoverEnabled: true
 
@@ -152,7 +152,7 @@ FocusScope{
                     id: filled
                     width: volControl.visualPosition * sliderBg.width
                     height: parent.height
-                    radius: 4 * VLCStyle.scale
+                    radius: VLCStyle.dp(4)
                     color: widgetfscope.color
                     layer.enabled: (volControl.hovered || volControl.activeFocus)
                     layer.effect: LinearGradient {
@@ -169,9 +169,9 @@ FocusScope{
                 Rectangle{
                     id: tickmark
                     x : parent.width * volControl.fullvolpos
-                    width: 1 * VLCStyle.scale
+                    width: VLCStyle.dp(1)
                     height: parent.height
-                    radius: 2 * VLCStyle.scale
+                    radius: VLCStyle.dp(2)
                     color: widgetfscope.color
                 }
             }
@@ -180,7 +180,7 @@ FocusScope{
                 x: volControl.leftPadding + volControl.visualPosition * (volControl.availableWidth - width)
                 y: volControl.topPadding + volControl.availableHeight / 2 - height / 2
 
-                implicitWidth: 8 * VLCStyle.scale
+                implicitWidth: VLCStyle.dp(8)
                 implicitHeight: implicitWidth
                 radius: width * 0.5
                 visible: (volControl.hovered || volControl.activeFocus)

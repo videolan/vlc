@@ -222,7 +222,7 @@ Widgets.NavigableFocusScope {
                     Rectangle {
                         z: 2
                         anchors.fill: parent
-                        border.width: 2 * VLCStyle.scale
+                        border.width: VLCStyle.dp(2)
                         border.color: VLCStyle.colors.accent
                         color: "transparent"
                         visible: infoPanel.activeFocus

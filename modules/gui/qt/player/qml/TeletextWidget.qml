@@ -42,7 +42,7 @@ FocusScope{
 
     RowLayout{
         id: teleWidget
-        width: autohide ? 0 : VLCStyle.widthTeletext * scale
+        width: autohide ? 0 : VLCStyle.widthTeletext
 
         spacing: 0
 
