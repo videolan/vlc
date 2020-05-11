@@ -1207,7 +1207,6 @@ modules/video_output/android/window.c
 modules/video_output/caca.c
 modules/video_output/caopengllayer.m
 modules/video_output/decklink.cpp
-modules/video_output/drawable.c
 modules/video_output/fb.c
 modules/video_output/glx.c
 modules/video_output/ios.m
@@ -1219,6 +1218,7 @@ modules/video_output/opengl/vout_helper.h
 modules/video_output/vulkan/display.c
 modules/video_output/win32/direct3d9.c
 modules/video_output/win32/direct3d11.c
+modules/video_output/win32/drawable.c
 modules/video_output/win32/events.c
 modules/video_output/win32/glwin32.c
 modules/video_output/win32/window.c

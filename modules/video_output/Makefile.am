@@ -220,7 +220,7 @@ vout_LTLIBRARIES += libegl_win32_plugin.la
 endif
 endif
 
-libdrawable_plugin_la_SOURCES = video_output/drawable.c
+libdrawable_plugin_la_SOURCES = video_output/win32/drawable.c
 if HAVE_WIN32
 vout_LTLIBRARIES += libdrawable_plugin.la
 endif
