@@ -69,6 +69,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(bool hasEmbededVideo READ hasEmbededVideo NOTIFY hasEmbededVideoChanged)
     Q_PROPERTY(bool showRemainingTime READ isShowRemainingTime WRITE setShowRemainingTime NOTIFY showRemainingTimeChanged)
     Q_PROPERTY(VLCVarChoiceModel* extraInterfaces READ getExtraInterfaces CONSTANT)
+    Q_PROPERTY(float intfScaleFactor READ getIntfScaleFactor NOTIFY intfScaleFactorChanged)
 
 public:
     /* tors */
@@ -105,6 +106,7 @@ public:
     bool isPlaylistVisible() { return playlistVisible; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
+    inline float getIntfScaleFactor() const { return m_intfScaleFactor; }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -157,6 +159,8 @@ protected:
     QMap<QWidget *, QSize> stackWidgetsSizes;
 
     /* Flags */
+    float                m_intfUserScaleFactor;
+    float                m_intfScaleFactor;
     unsigned             i_notificationSetting; /// Systray Notifications
     bool                 b_autoresize;          ///< persistent resizable window
     bool                 b_videoFullScreen;     ///< --fullscreen
@@ -215,6 +219,7 @@ protected slots:
     void setRaise();
     void setFullScreen( bool );
     void onInputChanged( bool );
+    void updateIntfScaleFactor();
 
     void sendHotkey(Qt::Key key, Qt::KeyboardModifiers modifiers );
 
@@ -238,6 +243,8 @@ signals:
     void hasEmbededVideoChanged(bool);
     void toolBarConfUpdated();
     void showRemainingTimeChanged(bool);
+
+    void intfScaleFactorChanged();
 };
 
 #endif

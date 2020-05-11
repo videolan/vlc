@@ -78,6 +78,8 @@
 #include <vlc_actions.h>                    /* Wheel event */
 #include <vlc_vout_window.h>                /* VOUT_ events */
 
+#define VLC_REFERENCE_SCALE_FACTOR 96.
+
 using  namespace vlc::playlist;
 
 // #define DEBUG_INTF
@@ -128,6 +130,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf )
 
     /* */
     b_pauseOnMinimize = var_InheritBool( p_intf, "qt-pause-minimized" );
+
+    m_intfUserScaleFactor = var_InheritFloat(p_intf, "qt-interface-scale");
+    winId(); //force window creation
+    QWindow* window = windowHandle();
+    if (window)
+        connect(window, &QWindow::screenChanged, this, &MainInterface::updateIntfScaleFactor);
+    updateIntfScaleFactor();
 
     /* Get the available interfaces */
     m_extraInterfaces = new VLCVarChoiceModel(p_intf, "intf-add", this);
@@ -300,6 +309,22 @@ void MainInterface::sendHotkey(Qt::Key key , Qt::KeyboardModifiers modifiers)
     QKeyEvent event(QEvent::KeyPress, key, modifiers );
     int vlckey = qtEventToVLCKey(&event);
     var_SetInteger(vlc_object_instance(p_intf), "key-pressed", vlckey);
+}
+
+void MainInterface::updateIntfScaleFactor()
+{
+    QWindow* window = windowHandle();
+    m_intfScaleFactor = m_intfUserScaleFactor;
+    if (window)
+    {
+        QScreen* screen = window->screen();
+        if (screen)
+        {
+            qreal dpi = screen->logicalDotsPerInch();
+            m_intfScaleFactor = m_intfUserScaleFactor * dpi / VLC_REFERENCE_SCALE_FACTOR;
+        }
+    }
+    emit intfScaleFactorChanged();
 }
 
 inline void MainInterface::initSystray()
