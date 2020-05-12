@@ -1406,6 +1406,30 @@ if test "${ac_cv_c_attribute_packed}" != "no"; then
   AC_DEFINE(HAVE_ATTRIBUTE_PACKED, 1, Support for __attribute__((packed)) for structs)
 fi
 
+WIN32_PATH_CMD=
+AS_IF([test "${SYS}" = "mingw32"], [
+    AC_MSG_CHECKING([how to transform windows pathes])
+    win32_path_cmd=no
+    for win_path in "cygpath" "wslpath" "wine winepath"
+    do
+      ac_try="$win_path -u c: >/dev/null"
+      (eval "$ac_try") 2>&5
+      ac_status=$?
+      if test $ac_status = 0; then
+        win32_path_cmd=$win_path
+        break
+      fi
+    done
+    AS_IF([test "x${win32_path_cmd}" != "xno"],[
+      WIN32_PATH_CMD=${win32_path_cmd}
+      AC_MSG_RESULT([using '${win32_path_cmd}'])
+    ],[
+      AC_MSG_RESULT([not possible])
+    ])
+])
+
+AC_SUBST([WIN32_PATH_CMD])
+
 dnl
 dnl  Check the CPU
 dnl
