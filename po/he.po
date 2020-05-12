@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-02-21 05:35+0100\n"
+"PO-Revision-Date: 2020-05-12 06:17+0200\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2020\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/16553/he/)\n"
 "Language: he\n"
@@ -472,7 +472,7 @@ msgstr "על &אודות"
 #: modules/gui/qt/components/controller.hpp:107
 #: modules/gui/qt/dialogs/vlm.cpp:538 modules/gui/qt/ui/open.h:258
 msgid "Play"
-msgstr "נגן"
+msgstr "נגינה"
 
 #: include/vlc_intf_strings.h:66
 msgid "Remove Selected"
@@ -630,7 +630,7 @@ msgstr "הושג מספר המסננים המרבי (%u)."
 #: src/libvlc-module.c:540 modules/gui/macosx/VLCMainMenu.m:243
 #: modules/gui/macosx/VLCMainWindow.m:1039 modules/video_filter/postproc.c:235
 msgid "Disable"
-msgstr "נטרול"
+msgstr "השבתה"
 
 #: src/audio_output/output.c:266 modules/visualization/visual/visual.c:142
 msgid "Spectrometer"
@@ -1065,7 +1065,7 @@ msgstr "רזולוציית וידאו"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
-msgstr "ממדי האוגרים"
+msgstr "ממדי המכלאים"
 
 #: src/input/es_out.c:3183 src/input/es_out.c:3186 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1075,7 +1075,7 @@ msgstr "ממדי האוגרים"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:164
 #: modules/video_filter/fps.c:42
 msgid "Frame rate"
-msgstr "קצב שקופיות"
+msgstr "קצב תמוניות"
 
 #: src/input/es_out.c:3194
 msgid "Decoded format"
@@ -1190,7 +1190,7 @@ msgstr "למטה במרכז"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
-msgstr ""
+msgstr "מיקום כרומה"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
@@ -1216,7 +1216,7 @@ msgstr ""
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "גובה הצליל"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
@@ -1629,7 +1629,7 @@ msgstr "תפקיד (נגן) מדיה למדיניות מערכת ההפעלה."
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:273
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:407
 msgid "Enable audio"
-msgstr "אפשר שמע"
+msgstr "לאפשר שמע"
 
 #: src/libvlc-module.c:134
 msgid ""
@@ -1741,6 +1741,10 @@ msgid ""
 "actually encoded with Dolby Surround, turning on this option might enhance "
 "your experience, especially when combined with the Headphone Channel Mixer."
 msgstr ""
+"יש להשתמש באפשרות הזאת כאשר ידוע לך שהתזרים שלך מקודד (או שלא) עם Dolby "
+"Surround אבל הוא לא מזוהה כך. אפילו אם התזרים לא מקודד עם Dolby Surround, "
+"הפעלת האפשרות הזאת עשויה לשפר את החוויה שלך, במיוחד בשילוב עם מערבל ערוצי "
+"האוזניות."
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/subsdec.c:167
@@ -1828,7 +1832,7 @@ msgstr ""
 msgid ""
 "This allows playing audio at lower or higher speed without affecting the "
 "audio pitch"
-msgstr ""
+msgstr "מאפשר לנגן שמע במהירות גבוהה או נמוכה יותר מבלי להשפיע על גובה הצליל"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
 #: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:109
@@ -1854,6 +1858,10 @@ msgid ""
 "\"video filters\" modules section. You can also set many miscellaneous video "
 "options."
 msgstr ""
+"אפשרויות אלו מאפשרות לך לשנות את התנהגות תת־מערכת פלט הווידאו. ניתן למשל "
+"להפעיל מסנני וידאו (ביטול שזירה, התאמת תמונה וכו׳). את המסננים האלה ניתן "
+"להפעיל כאן ולהגדיר אותם בסעיף המודולים „מסנני וידאו”. אפשר גם להגדיר מגוון "
+"אפשרויות וידאו שונות."
 
 #: src/libvlc-module.c:253
 msgid "Video output module"
@@ -2104,18 +2112,18 @@ msgstr "הסתרת סמן העכבר ואת פקד המסך המלא לאחר n 
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
 msgid "Deinterlace"
-msgstr "יישור פסים"
+msgstr "ביטול שזירה"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:445 modules/gui/macosx/VLCMainMenu.m:446
 #: modules/gui/macosx/VLCSimplePrefsController.m:379
 #: modules/video_filter/deinterlace/deinterlace.c:256
 msgid "Deinterlace mode"
-msgstr "מצב יישור פסים"
+msgstr "מצב ביטול שזירה"
 
 #: src/libvlc-module.c:354
 msgid "Deinterlace method to use for video processing."
-msgstr "שיטת יישור הפסים שתשמש לעיבוד הווידאו."
+msgstr "שיטת ביטול השזירה שתשמש לעיבוד הווידאו."
 
 #: src/libvlc-module.c:361 modules/video_filter/deinterlace/deinterlace.h:58
 msgid "Discard"
@@ -2145,7 +2153,7 @@ msgstr ""
 
 #: src/libvlc-module.c:371
 msgid "Disable screensaver"
-msgstr "נטרול שומר המסך"
+msgstr "השבתת שומר המסך"
 
 #: src/libvlc-module.c:372
 msgid "Disable the screensaver during video playback."
@@ -2161,7 +2169,7 @@ msgid ""
 "VLC can avoid creating window caption, frames, etc... around the video, "
 "giving a \"minimal\" window."
 msgstr ""
-"ניתן להגדיר את VLC כך שלא יופעלו מסביב כותרת חלון, שקופיות וכו׳, כך שנוצר "
+"ניתן להגדיר את VLC כך שלא יופעלו מסביב כותרת חלון, תמוניות וכו׳, כך שנוצר "
 "חלון „נקי”"
 
 #: src/libvlc-module.c:379
@@ -2181,8 +2189,8 @@ msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or distort the video."
 msgstr ""
-"אפשרות זו מוסיפה מסננים שלאחר העיבוד כדי לשפר את איכות התמונה, למשל: יישור "
-"פסים או עיוות הווידאו."
+"אפשרות זו מוסיפה מסננים שלאחר העיבוד כדי לשפר את איכות התמונה, למשל: ביטול "
+"שזירה או עיוות הווידאו."
 
 #: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
@@ -2254,6 +2262,8 @@ msgid ""
 "This forces the cropping of the source video. Accepted formats are x:y (4:3, "
 "16:9, etc.) expressing the global image aspect."
 msgstr ""
+"מאלץ חיתוך של הווידאו במקור. התצורות המקובלות הן x:y ‏(4:3, 16:9 וכו׳) "
+"המבטאים את יחס התמונה הגלובלי."
 
 #: src/libvlc-module.c:427
 msgid "Source aspect ratio"
@@ -2270,7 +2280,7 @@ msgstr ""
 
 #: src/libvlc-module.c:436
 msgid "Video Auto Scaling"
-msgstr ""
+msgstr "התאמת יחס וידאו אוטומטית"
 
 #: src/libvlc-module.c:438
 msgid "Let the video scale to fit a given window or fullscreen."
@@ -2278,13 +2288,15 @@ msgstr "מתן האפשרות לווידאו לשנות את גודלו כדי �
 
 #: src/libvlc-module.c:440
 msgid "Video scaling factor"
-msgstr ""
+msgstr "מקדם יחס וידאו"
 
 #: src/libvlc-module.c:442
 msgid ""
 "Scaling factor used when Auto Scaling is disabled.\n"
 "Default value is 1.0 (original video size)."
 msgstr ""
+"במקדם יחס וידאו נעשה שימוש כאשר התאמה אוטומטית מושבתת.\n"
+"ערך בררת המחדל הוא 1.0 (גודל הווידאו המקורי)."
 
 #: src/libvlc-module.c:445
 msgid "Custom crop ratios list"
@@ -2318,6 +2330,9 @@ msgid ""
 "incorrectly sets height to 1088 lines. You should only disable this option "
 "if your video has a non-standard format requiring all 1088 lines."
 msgstr ""
+"מאפשר טיפול הולם בתצורת וידאו HDTV-1080 אפילו אם מקודד פגום מגדיר את הגובה ל־"
+"1088 שורות בטעות. עליך לבטל את האפשרות הזאת רק אם לווידאו שלך יש תצורה בלתי "
+"תקנית שדורשת 1088 שורות."
 
 #: src/libvlc-module.c:462
 msgid "Monitor pixel aspect ratio"
@@ -2334,24 +2349,26 @@ msgstr ""
 
 #: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:307
 msgid "Skip frames"
-msgstr "דילוג על שקופיות"
+msgstr "דילוג על תמוניות"
 
 #: src/libvlc-module.c:470
 msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
+"הפעלת השמטת תמוניות על תזרים MPEG2. השמטת תמוניות מתרחשת כשהמחשב אינו חזק "
+"מספיק"
 
 #: src/libvlc-module.c:473
 msgid "Drop late frames"
-msgstr "השמטת השקופיות המאחרות"
+msgstr "השמטת התמוניות המאחרות"
 
 #: src/libvlc-module.c:475
 msgid ""
 "This drops frames that are late (arrive to the video output after their "
 "intended display date)."
 msgstr ""
-"אפשרות זו משמיטה את השקופיות שמאחרות (מגיעות אל פלט הווידאו לאחר מועד ההצגה "
+"אפשרות זו משמיטה את התמוניות שמאחרות (מגיעות אל פלט הווידאו לאחר מועד ההצגה "
 "המיועד שלהן)."
 
 #: src/libvlc-module.c:478
@@ -2510,7 +2527,7 @@ msgstr "זהו גודל המנה המירבי שניתן להעביר בשכבת
 
 #: src/libvlc-module.c:549 modules/stream_out/rtp.c:124
 msgid "Hop limit (TTL)"
-msgstr ""
+msgstr "מגבלת דילוגים (TTL)"
 
 #: src/libvlc-module.c:551 modules/stream_out/rtp.c:126
 msgid ""
@@ -2518,14 +2535,17 @@ msgid ""
 "multicast packets sent by the stream output (-1 = use operating system built-"
 "in default)."
 msgstr ""
+"זו מגבלת הדילוגים (מוכרת גם בשם „Time-To-Live” או TTL) של מנות השידור הרוחבי "
+"(multicast) שנשלחות על ידי פלט התזרים (‎-1 = להשתמש בבררת המחדל המובנית של "
+"המערכת)."
 
 #: src/libvlc-module.c:555
 msgid "Multicast output interface"
-msgstr ""
+msgstr "מנשק פלט שידור רוחבי (multicast)"
 
 #: src/libvlc-module.c:557
 msgid "Default multicast interface. This overrides the routing table."
-msgstr ""
+msgstr "מנשק פלט השידור הרוחבי (multicast). עוקף את טבלת הניתוב."
 
 #: src/libvlc-module.c:559
 msgid "DiffServ Code Point"
@@ -3317,11 +3337,11 @@ msgstr "זוהי רשומה ישנה שמאפשרת לך להגדיר מודול
 
 #: src/libvlc-module.c:978
 msgid "Access output module"
-msgstr ""
+msgstr "מודול פלט גישה"
 
 #: src/libvlc-module.c:980
 msgid "This is a legacy entry to let you configure access output modules"
-msgstr ""
+msgstr "זו רשומה ותיקה כדי לאפשר לך להגדיר מודולים של פלט גישה"
 
 #: src/libvlc-module.c:983
 msgid ""
@@ -3541,11 +3561,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1104
 msgid "Expose media player via D-Bus"
-msgstr ""
+msgstr "חשיפת נגן המדיה דרך D-Bus"
 
 #: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
-msgstr ""
+msgstr "לאפשר ליישומים אחרים לשלוח ב־VLC דרך פרוטוקול MPRIS על גבי D-Bus."
 
 #: src/libvlc-module.c:1114
 msgid ""
@@ -3575,7 +3595,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:562
 msgid "Allow metadata network access"
-msgstr ""
+msgstr "לאפשר גישה לרשת לקבלת נתוני על"
 
 #: src/libvlc-module.c:1131
 msgid "Collapse"
@@ -3658,7 +3678,7 @@ msgstr "VLC ימשיך לנגן את רשימת הנגינה הנוכחית."
 
 #: src/libvlc-module.c:1168
 msgid "Play and stop"
-msgstr "נגן והפסק"
+msgstr "לנגן ולהפסיק"
 
 #: src/libvlc-module.c:1170
 msgid "Stop the playlist after each played playlist item."
@@ -3678,7 +3698,7 @@ msgstr "נגינה והשהיה"
 
 #: src/libvlc-module.c:1178
 msgid "Pause each item in the playlist on the last frame."
-msgstr "השהיית כל אחד מהפריטים ברשימת הנגינה על השקף האחרון."
+msgstr "השהיית כל אחד מהפריטים ברשימת הנגינה על התמונית האחרונה."
 
 #: src/libvlc-module.c:1180
 msgid "Start paused"
@@ -3686,7 +3706,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
-msgstr ""
+msgstr "השהיית כל פריט ברשימת הנגינה על התמונית האחרונה."
 
 #: src/libvlc-module.c:1184
 msgid "Auto start"
@@ -3792,7 +3812,7 @@ msgstr "נא לבחור את מקש הקיצור לשימוש ליציאה ממ�
 
 #: src/libvlc-module.c:1230 modules/gui/macosx/VLCFSPanelController.m:110
 msgid "Play/Pause"
-msgstr "נגן/השהה"
+msgstr "ניגון/השהיה"
 
 #: src/libvlc-module.c:1231
 msgid "Select the hotkey to use to swap paused state."
@@ -3970,11 +3990,11 @@ msgstr "נא לבחור את מקש הקיצור לביצוע קפיצה ארו�
 
 #: src/libvlc-module.c:1280 modules/control/hotkeys.c:599
 msgid "Next frame"
-msgstr "השקופית הבאה"
+msgstr "התמונית הבאה"
 
 #: src/libvlc-module.c:1282
 msgid "Select the hotkey to got to the next video frame."
-msgstr "יש לבחור את מקש הקיצור כדי לעבור לשקופית הווידאו הבאה."
+msgstr "יש לבחור את מקש הקיצור כדי לעבור לתמונית הווידאו הבאה."
 
 #: src/libvlc-module.c:1284
 msgid "Very short jump length"
@@ -4438,7 +4458,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1405
 msgid "Toggle autoscaling"
-msgstr ""
+msgstr "החלפת מצב שינוי גודל אוטומטי"
 
 #: src/libvlc-module.c:1406
 msgid "Activate or deactivate autoscaling."
@@ -4446,27 +4466,27 @@ msgstr ""
 
 #: src/libvlc-module.c:1407
 msgid "Increase scale factor"
-msgstr ""
+msgstr "הגדלת מקדם יחס"
 
 #: src/libvlc-module.c:1409
 msgid "Decrease scale factor"
-msgstr ""
+msgstr "הקטנת מקדם יחס"
 
 #: src/libvlc-module.c:1411
 msgid "Toggle deinterlacing"
-msgstr ""
+msgstr "החלפת מצב ביטול שזירה"
 
 #: src/libvlc-module.c:1412
 msgid "Activate or deactivate deinterlacing."
-msgstr ""
+msgstr "הפעלה או השבתה של ביטול שזירה."
 
 #: src/libvlc-module.c:1413
 msgid "Cycle deinterlace modes"
-msgstr "מעבר בין מצבי יישור פסים"
+msgstr "מעבר בין מצבי ביטול שזירה"
 
 #: src/libvlc-module.c:1414
 msgid "Cycle through available deinterlace modes."
-msgstr ""
+msgstr "החלפה בין מצבי ביטול השזירה הזמינים."
 
 #: src/libvlc-module.c:1415
 msgid "Show controller in fullscreen"
@@ -5940,14 +5960,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "לכידת שמע"
+msgstr ""
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "מודול פלט שמע"
+msgstr ""
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6375,14 +6393,14 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:151
 msgid "Video input frame rate"
-msgstr "קצב התמונות של קלט הווידאו"
+msgstr "קצב התמוניות של קלט הווידאו"
 
 #: modules/access/dshow/dshow.cpp:153
 msgid ""
 "Force the DirectShow video input to use a specific frame rate (eg. 0 means "
 "default, 25, 29.97, 50, 59.94, etc.)"
 msgstr ""
-"אילוץ DirectShow להשתמש בקצב תמונות מסוים עבור קלט הווידאו (לדוגמה 0 היא "
+"אילוץ DirectShow להשתמש בקצב תמוניות מסוים עבור קלט הווידאו (לדוגמה 0 היא "
 "בררת המחדל, 25, 29.97, 50, 59.94 וכו׳)"
 
 #: modules/access/dshow/dshow.cpp:155
@@ -6487,6 +6505,8 @@ msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
+"מצב מתנד AM. יכול להיות כל אחד מבין בררת מחדל (0), טלוויזיה (1), רדיו AM ‏"
+"(2), רדיו FM ‏(3) או DSS ‏(4)."
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -7413,7 +7433,7 @@ msgstr ""
 
 #: modules/access/imem.c:95
 msgid "Frame rate of a video elementary stream"
-msgstr ""
+msgstr "קצב תמוניות לתזרים היסודי של הווידאו"
 
 #: modules/access/imem.c:97
 msgid "Callback cookie string"
@@ -7598,7 +7618,7 @@ msgstr "הגדרת הססמה עבור החיבור, במידה שלא צוינ�
 
 #: modules/access/live555.cpp:90
 msgid "RTSP frame buffer size"
-msgstr ""
+msgstr "גודל מכלא תמונית RTSP"
 
 #: modules/access/live555.cpp:91
 msgid ""
@@ -8275,7 +8295,7 @@ msgstr "התקן רדיו"
 
 #: modules/access/v4l2/v4l2.c:74
 msgid "Radio tuner device node."
-msgstr ""
+msgstr "מפרק התקן מתנד רדיו."
 
 #: modules/access/v4l2/v4l2.c:75 modules/gui/qt/components/open_panels.cpp:1079
 msgid "Frequency"
@@ -8339,7 +8359,7 @@ msgstr "רוויה"
 
 #: modules/access/v4l2/v4l2.c:92
 msgid "Picture saturation or chroma gain."
-msgstr ""
+msgstr "הגברת רוויה או כרומה של תמונה."
 
 #: modules/access/v4l2/v4l2.c:93
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:204
@@ -8383,7 +8403,7 @@ msgstr "איזון אדום"
 
 #: modules/access/v4l2/v4l2.c:107
 msgid "Red chroma balance."
-msgstr "איזון הצביעה האדומה."
+msgstr "איזון הכרומה האדומה."
 
 #: modules/access/v4l2/v4l2.c:108
 msgid "Blue balance"
@@ -8391,7 +8411,7 @@ msgstr "איזון כחול"
 
 #: modules/access/v4l2/v4l2.c:110
 msgid "Blue chroma balance."
-msgstr "איזון הצביעה הכחולה."
+msgstr "איזון הכרומה הכחולה."
 
 #: modules/access/v4l2/v4l2.c:111
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:209
@@ -8429,19 +8449,19 @@ msgstr "התאמת מסנן חדות."
 
 #: modules/access/v4l2/v4l2.c:122
 msgid "Chroma gain"
-msgstr ""
+msgstr "הגברת כרומה"
 
 #: modules/access/v4l2/v4l2.c:123
 msgid "Chroma gain control."
-msgstr ""
+msgstr "בקרת הגברת כרומה."
 
 #: modules/access/v4l2/v4l2.c:124
 msgid "Automatic chroma gain"
-msgstr ""
+msgstr "הגברת כרומה אוטומטית"
 
 #: modules/access/v4l2/v4l2.c:126
 msgid "Automatically control the chroma gain."
-msgstr ""
+msgstr "שליטה אוטומטית בהגברת הכרומה."
 
 #: modules/access/v4l2/v4l2.c:127
 msgid "Power line frequency"
@@ -8686,7 +8706,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:431
 msgid "Video4Linux radio tuner"
-msgstr ""
+msgstr "מתנד רדיו Video4Linux"
 
 #: modules/access/vcd/vcd.c:47
 msgid "VCD"
@@ -9682,7 +9702,7 @@ msgstr "מסנן קריוקי פשו"
 
 #: modules/audio_filter/normvol.c:65
 msgid "Number of audio buffers"
-msgstr "מספר חוצצי השמע"
+msgstr "מספר מכלאי השמע"
 
 #: modules/audio_filter/normvol.c:66
 msgid ""
@@ -10553,19 +10573,19 @@ msgstr "מספר תת־התהליכים בהם נעשה שימוש לפענוח,
 
 #: modules/codec/avcodec/avcodec.h:124
 msgid "Ratio of key frames"
-msgstr "יחס שקופיות המפתח"
+msgstr "יחס תמוניות המפתח"
 
 #: modules/codec/avcodec/avcodec.h:125
 msgid "Number of frames that will be coded for one key frame."
-msgstr "מספר השקופיות שיקודדו בתור שקופית מפתח אחת."
+msgstr "מספר התמוניות שתקודדנה בתור תמונית מפתח אחת."
 
 #: modules/codec/avcodec/avcodec.h:128
 msgid "Ratio of B frames"
-msgstr "יחס של שקופיות B"
+msgstr "יחס של תמוניות B"
 
 #: modules/codec/avcodec/avcodec.h:129
 msgid "Number of B frames that will be coded between two reference frames."
-msgstr "מספר שקופיות B שיקודדו בין שתי שקופיות סימוכין."
+msgstr "מספר תמוניות B שיקודדו בין שתי תמוניות סימוכין."
 
 #: modules/codec/avcodec/avcodec.h:132
 msgid "Video bitrate tolerance"
@@ -10626,6 +10646,8 @@ msgid ""
 "Quantization factor of I frames, compared with P frames (for instance 1.0 => "
 "same qscale for I and P frames)."
 msgstr ""
+"מקדם כימות של תמוניות I, בהשוואה לתמוניות P (למשל 1.0 => אותו qscale - מדד "
+"איכות וידאו, עבור תמוניות I ו־P)."
 
 #: modules/codec/avcodec/avcodec.h:161 modules/codec/x264.c:363
 #: modules/demux/mod.c:79
@@ -12500,11 +12522,11 @@ msgstr ""
 
 #: modules/codec/svg.c:54
 msgid "Scale factor"
-msgstr "מקדם קנה המידה"
+msgstr "מקדם יחס"
 
 #: modules/codec/svg.c:55
 msgid "Scale factor to apply to image"
-msgstr ""
+msgstr "מקדם יחס להחיל על התמונה"
 
 #: modules/codec/svg.c:63
 msgid "SVG video decoder"
@@ -13001,7 +13023,7 @@ msgstr ""
 
 #: modules/codec/x264.c:217
 msgid "VBV buffer"
-msgstr "אוגר VBV"
+msgstr "מכלא VBV"
 
 #: modules/codec/x264.c:218
 msgid "Averaging period for the maximum local bitrate (in kbits)."
@@ -13459,7 +13481,7 @@ msgstr "אט"
 
 #: modules/codec/x264.c:434
 msgid "Spatial"
-msgstr ""
+msgstr "מרחבי"
 
 #: modules/codec/x264.c:434 modules/hw/vdpau/chroma.c:883
 msgid "Temporal"
@@ -13487,11 +13509,11 @@ msgstr "עליון תחתון"
 
 #: modules/codec/x264.c:439
 msgid "frame alternation"
-msgstr "החלפת שקופיות"
+msgstr "החלפת תמוניות"
 
 #: modules/codec/x264.c:439
 msgid "2D"
-msgstr ""
+msgstr "דו־ממדי"
 
 #: modules/codec/x264.c:443
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
@@ -13519,7 +13541,7 @@ msgstr "עמוד טלטקסט"
 
 #: modules/codec/zvbi.c:62
 msgid "Open the indicated Teletext page. Default page is index 100."
-msgstr ""
+msgstr "פתיחת עמוד הטלטקסט שצוין. עמוד בררת המחדל הוא באינדקס 100."
 
 #: modules/codec/zvbi.c:69
 msgid "Teletext alignment"
@@ -13531,6 +13553,8 @@ msgid ""
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg. "
 "6 = top-right)."
 msgstr ""
+"ניתן לקבע את מיקום הטלטקסט על הווידאו (0=מרכז, 1=שמאל, 2=ימין, 4=למעלה, "
+"8=למטה, ניתן להשתמש בשילוב של הערכים האלה, למשל 6 = למעלה מימין)."
 
 #: modules/codec/zvbi.c:75
 msgid "Teletext text subtitles"
@@ -13773,11 +13797,11 @@ msgstr "מצב תקריב: %s"
 
 #: modules/control/hotkeys.c:1237 modules/control/hotkeys.c:1294
 msgid "Deinterlace off"
-msgstr "יישור פסים כבוי"
+msgstr "ביטול שזירה כבוי"
 
 #: modules/control/hotkeys.c:1256 modules/control/hotkeys.c:1289
 msgid "Deinterlace on"
-msgstr "יישור פסים פעיל"
+msgstr "ביטול שזירה פעיל"
 
 #: modules/control/hotkeys.c:1319
 msgid "Subtitle position: no active subtitle"
@@ -13843,38 +13867,40 @@ msgstr ""
 
 #: modules/control/netsync.c:56
 msgid "Network master clock"
-msgstr ""
+msgstr "שעון רשת ראשי"
 
 #: modules/control/netsync.c:57
 msgid ""
 "When set, this VLC instance will act as the master clock for synchronization "
 "for clients listening"
 msgstr ""
+"כאשר אפשרות זו מוגדרת, עותק זה של VLC יכהן בתור השעון הראשי לטובת סנכרון מול "
+"לקוחות מאזינים"
 
 #: modules/control/netsync.c:61
 msgid "Master server IP address"
-msgstr ""
+msgstr "כתובת IP של השרת הראשי"
 
 #: modules/control/netsync.c:62
 msgid ""
 "The IP address of the network master clock to use for clock synchronization."
-msgstr ""
+msgstr "כתובת ה־IP של שעון הרשת הראשי לטובת סנכרון שעון."
 
 #: modules/control/netsync.c:65
 msgid "UDP timeout (in ms)"
-msgstr ""
+msgstr "תפוגת זמן UDP (במילישניות)"
 
 #: modules/control/netsync.c:66
 msgid "Length of time (in ms) until aborting data reception."
-msgstr ""
+msgstr "משך הזמן במילישניות עד לביטול קבלת נתונים."
 
 #: modules/control/netsync.c:70
 msgid "Network Sync"
-msgstr ""
+msgstr "סנכרון רשת"
 
 #: modules/control/netsync.c:71
 msgid "Network synchronization"
-msgstr ""
+msgstr "סנכרון דרך הרשת"
 
 #: modules/control/ntservice.c:46
 msgid "Install Windows Service"
@@ -14439,7 +14465,7 @@ msgstr ""
 
 #: modules/demux/avi/avi.c:66
 msgid "Ask for action"
-msgstr "הצגת שאלה"
+msgstr "בקשת פעולה"
 
 #: modules/demux/avi/avi.c:67
 msgid "Always fix"
@@ -14578,7 +14604,7 @@ msgstr ""
 
 #: modules/demux/image.c:68
 msgid "Frame rate of the elementary stream produced."
-msgstr "קצב השקופיות של התזרים הבסיסי שנוצר."
+msgstr "קצב התמוניות של התזרים הבסיסי שנוצר."
 
 #: modules/demux/image.c:70
 msgid "Real-time"
@@ -14604,7 +14630,7 @@ msgstr "תמונה"
 #: modules/demux/subtitle.c:77 modules/demux/vc1.c:43
 #: modules/gui/macosx/VLCOpenWindowController.m:208
 msgid "Frames per Second"
-msgstr "פריימים לשנייה"
+msgstr "תמוניות לשנייה"
 
 #: modules/demux/mjpeg.c:47
 msgid ""
@@ -16294,13 +16320,15 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:82
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 msgid "Display VLC status menu icon"
-msgstr ""
+msgstr "הצגת סמל תפריט מצב VLC"
 
 #: modules/gui/macosx/macosx.m:83
 msgid ""
 "By default, VLC will show the statusbar icon menu. However, you can choose "
 "to disable it (restart required)."
 msgstr ""
+"כבררת מחדל, יציג VLC את תפריט סמל שורת המצב. עם זאת, ניתן לבחור להשבית אותו "
+"(נדרשת הפעלה מחדש)."
 
 #: modules/gui/macosx/macosx.m:85
 msgid "Control playlist items with the Apple Remote"
@@ -16463,7 +16491,7 @@ msgstr ""
 
 #: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:206
 msgid "Ask"
-msgstr "שאל"
+msgstr "לשאול"
 
 #: modules/gui/macosx/macosx.m:142 modules/gui/qt/qt.cpp:200
 #: modules/gui/qt/qt.cpp:206 modules/keystore/keychain.m:50
@@ -17309,19 +17337,19 @@ msgstr "פענוח מקטעים"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:88
 msgid "Displayed frames"
-msgstr "שקופיות שהוצגו"
+msgstr "תמוניות שהוצגו"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:89
 msgid "Lost frames"
-msgstr "שקופיות שאבדו"
+msgstr "תמוניות שאבדו"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:93
 msgid "Played buffers"
-msgstr "אוגרים שהתנגנו"
+msgstr "מכלאים שהתנגנו"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:94
 msgid "Lost buffers"
-msgstr "אוגרים שאבדו"
+msgstr "מכלאים שאבדו"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:335
 msgid "Error while saving meta"
@@ -17458,6 +17486,7 @@ msgid ""
 "Use the complete preferences to configure custom caching values for each "
 "access module."
 msgstr ""
+"יש להשתמש בהגדרות המלאות כדי להגדיר ערכי שמירה במטמון עבור כל מודול גישה."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:301
 msgid "Codecs / Muxers"
@@ -18443,7 +18472,7 @@ msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:110
 msgid "Frame By Frame"
-msgstr "שקופית אחרי שקופית"
+msgstr "תמונית אחרי תמונית"
 
 #: modules/gui/qt/components/controller.hpp:110
 msgid "Trickplay Reverse"
@@ -18513,7 +18542,7 @@ msgstr "לולאה מנקודה א׳ לנקודה ב׳ במחזוריות"
 
 #: modules/gui/qt/components/controller.hpp:122
 msgid "Frame by frame"
-msgstr "שקופית אחר שקופית"
+msgstr "תמונית אחר תמונית"
 
 #: modules/gui/qt/components/controller.hpp:123
 msgid "Reverse"
@@ -18800,7 +18829,7 @@ msgstr ""
 #: modules/gui/qt/components/info_panels.cpp:593
 #: modules/gui/qt/components/info_panels.cpp:595
 msgid "frames"
-msgstr "שקופיות"
+msgstr "תמוניות"
 
 #: modules/gui/qt/components/info_panels.cpp:594
 #: modules/gui/qt/components/info_panels.cpp:601
@@ -18814,7 +18843,7 @@ msgstr ""
 #: modules/gui/qt/components/info_panels.cpp:600
 #: modules/gui/qt/components/info_panels.cpp:601
 msgid "buffers"
-msgstr "אוגרים"
+msgstr "מכלאים"
 
 #: modules/gui/qt/components/info_panels.cpp:622
 msgid "Last 60 seconds"
@@ -20386,11 +20415,11 @@ msgstr "&חיתוך"
 
 #: modules/gui/qt/menus.cpp:693
 msgid "&Deinterlace"
-msgstr "יישור &פסים"
+msgstr "ביטול &שזירה"
 
 #: modules/gui/qt/menus.cpp:694
 msgid "&Deinterlace mode"
-msgstr "מ&צב יישור פסים"
+msgstr "מ&צב ביטול שזירה"
 
 #: modules/gui/qt/menus.cpp:698
 msgid "Take &Snapshot"
@@ -20891,12 +20920,15 @@ msgstr ""
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
 msgstr ""
+"פענוח תמוניות ישירות ל־VideoCore של ראספברי פאי במקום בזיכרון של המארח."
 
 #: modules/hw/mmal/codec.c:52
 msgid ""
 "Decode frames directly into RPI VideoCore instead of host memory. This "
 "option must only be used with the MMAL video output plugin."
 msgstr ""
+"פענוח תמוניות ישירות ל־VideoCore של ראספברי פאי במקום בזיכרון של המארח. יש "
+"להשתמש באפשרות זו רק עם תוסף פלט הווידאו MMAL."
 
 #: modules/hw/mmal/codec.c:58
 msgid "MMAL decoder"
@@ -20909,19 +20941,22 @@ msgstr ""
 #: modules/hw/mmal/deinterlace.c:45
 msgid "Use QPUs for advanced HD deinterlacing."
 msgstr ""
+"להשתמש בעדכוני סבירות עץ רביעים (QPUs) לביטול שזירה מתקדם באיכות גבוהה."
 
 #: modules/hw/mmal/deinterlace.c:46
 msgid ""
 "Make use of the QPUs to allow higher quality deinterlacing of HD content."
 msgstr ""
+"להשתמש בעדכוני סבירות עץ רביעים (QPUs) כדי לאפשר ביטול שזירה מתקדם על תוכן "
+"באיכות גבוהה."
 
 #: modules/hw/mmal/deinterlace.c:52
 msgid "MMAL deinterlace"
-msgstr ""
+msgstr "ביטול שזירה MMAL"
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
-msgstr ""
+msgstr "תוסף מסנן ביטול שזירה מבוסס MMAL"
 
 #: modules/hw/mmal/vout.c:50
 msgid "VideoCore layer where the video is displayed."
@@ -20993,7 +21028,7 @@ msgstr ""
 
 #: modules/hw/vdpau/chroma.c:896
 msgid "Deinterlacing algorithm"
-msgstr ""
+msgstr "אלגוריתם ביטול שזירה"
 
 #: modules/hw/vdpau/chroma.c:899
 msgid "Inverse telecine"
@@ -21001,11 +21036,11 @@ msgstr ""
 
 #: modules/hw/vdpau/chroma.c:901
 msgid "Deinterlace chroma skip"
-msgstr ""
+msgstr "ביטול שזירה דילוג כרומה"
 
 #: modules/hw/vdpau/chroma.c:902
 msgid "Whether temporal deinterlacing applies to luma only"
-msgstr ""
+msgstr "האם ביטול שזירה זמני חל על תאורה (luma) בלבד"
 
 #: modules/hw/vdpau/chroma.c:904
 msgid "Noise reduction level"
@@ -21021,7 +21056,7 @@ msgstr ""
 
 #: modules/hw/vdpau/deinterlace.c:134
 msgid "VDPAU deinterlacing filter"
-msgstr ""
+msgstr "מסנן ביטול שזירה VDPAU"
 
 #: modules/hw/vdpau/display.c:46
 msgid "VDPAU output"
@@ -22149,11 +22184,11 @@ msgstr ""
 
 #: modules/misc/inhibit/dbus.c:232
 msgid "D-Bus screensaver"
-msgstr ""
+msgstr "שומר מסך D-Bus"
 
 #: modules/misc/inhibit/dbus.c:233
 msgid "D-Bus screen saver inhibition"
-msgstr ""
+msgstr "מניעת שומר מסך D-Bus"
 
 #: modules/misc/inhibit/xdg.c:37
 msgid "XDG-screensaver"
@@ -22494,7 +22529,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:143
 msgid "Use keyframes"
-msgstr ""
+msgstr "להשתמש בתמוניות מפתח"
 
 #: modules/mux/mpeg/ts.c:144
 msgid ""
@@ -22718,9 +22753,8 @@ msgid "Zeroconf services"
 msgstr "שירותי Zeroconf"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "איתור מפענחים דרך mDNS"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
@@ -23685,7 +23719,7 @@ msgstr ""
 
 #: modules/stream_filter/prefetch.c:534
 msgid "Buffer size"
-msgstr "גודל חוצץ"
+msgstr "גודל מכלא"
 
 #: modules/stream_filter/prefetch.c:535
 msgid "Prefetch buffer size (KiB)"
@@ -23788,7 +23822,7 @@ msgstr ""
 
 #: modules/stream_out/bridge.c:76
 msgid "Wait for I frame before toggling placeholder"
-msgstr ""
+msgstr "יש להמתין לתמונית I בטרם החלפת מצב ממלא מקום"
 
 #: modules/stream_out/bridge.c:78
 msgid ""
@@ -24490,31 +24524,31 @@ msgstr "התאמת יחס וידאו"
 
 #: modules/stream_out/transcode/transcode.c:57
 msgid "Scale factor to apply to the video while transcoding (eg: 0.25)"
-msgstr ""
+msgstr "מקדם יחס להחיל על הסרטון בזמן הקידוד (למשל: 0.25)"
 
 #: modules/stream_out/transcode/transcode.c:58
 msgid "Video frame-rate"
-msgstr "קצב התמונות של הווידאו"
+msgstr "קצב התמוניות של הווידאו"
 
 #: modules/stream_out/transcode/transcode.c:60
 msgid "Target output frame rate for the video stream."
-msgstr ""
+msgstr "יעד קצב תמוניות של הפלט לתזרים הווידאו."
 
 #: modules/stream_out/transcode/transcode.c:61
 msgid "Deinterlace video"
-msgstr ""
+msgstr "ביטול שזירת וידאו"
 
 #: modules/stream_out/transcode/transcode.c:63
 msgid "Deinterlace the video before encoding."
-msgstr ""
+msgstr "ביטול שזירת הווידאו בטרם ההצפנה."
 
 #: modules/stream_out/transcode/transcode.c:64
 msgid "Deinterlace module"
-msgstr ""
+msgstr "מודול ביטול שזירה"
 
 #: modules/stream_out/transcode/transcode.c:66
 msgid "Specify the deinterlace module to use."
-msgstr ""
+msgstr "נא לציין את מודול ביטול השזירה לשימוש."
 
 #: modules/stream_out/transcode/transcode.c:73
 msgid "Maximum video width"
@@ -24978,7 +25012,7 @@ msgstr "גודל חלון"
 
 #: modules/video_filter/antiflicker.c:52
 msgid "Number of frames (0 to 100)"
-msgstr "מספר השקופיות (0 עד 100)"
+msgstr "מספר התמוניות (0 עד 100)"
 
 #: modules/video_filter/antiflicker.c:54
 msgid "Softening value"
@@ -24986,7 +25020,7 @@ msgstr "ערך ריכוך"
 
 #: modules/video_filter/antiflicker.c:55
 msgid "Number of frames consider for smoothening (0 to 30)"
-msgstr "מספר השקופיות שייכללו לטובת ריכוך (0 עד 30)"
+msgstr "מספר התמוניות שייכללו לטובת ריכוך (0 עד 30)"
 
 #: modules/video_filter/antiflicker.c:67
 msgid "antiflicker video filter"
@@ -25362,11 +25396,11 @@ msgstr ""
 
 #: modules/video_filter/deinterlace/deinterlace.c:258
 msgid "Streaming deinterlace mode"
-msgstr ""
+msgstr "מצב ביטול שזירה לתזרים"
 
 #: modules/video_filter/deinterlace/deinterlace.c:259
 msgid "Deinterlace method to use for streaming."
-msgstr ""
+msgstr "שיטת ביטול שזירה לשימוש על תזרימים."
 
 #: modules/video_filter/deinterlace/deinterlace.c:268
 msgid "Phosphor chroma mode for 4:2:0 input"
@@ -25403,7 +25437,7 @@ msgstr ""
 
 #: modules/video_filter/deinterlace/deinterlace.c:299
 msgid "Deinterlacing video filter"
-msgstr ""
+msgstr "מסנן וידאו ביטול שזירה"
 
 #: modules/video_filter/edgedetection.c:39
 msgid "Edge detection video filter"
@@ -25415,7 +25449,7 @@ msgstr "זיהוי קצוות"
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
-msgstr "זיהוי קצוות בשקופית והדגשתם בלבן."
+msgstr "זיהוי קצוות בתמונית והדגשתם בלבן."
 
 #: modules/video_filter/erase.c:56
 msgid "Image mask. Pixels with an alpha value greater than 50% will be erased."
@@ -25588,7 +25622,7 @@ msgstr ""
 
 #: modules/video_filter/hqdn3d.c:58
 msgid "Spatial chroma strength (0-254)"
-msgstr ""
+msgstr "עצמת כרומה מרחבית (0-254)"
 
 #: modules/video_filter/hqdn3d.c:59
 msgid "Temporal luma strength (0-254)"
@@ -25596,7 +25630,7 @@ msgstr ""
 
 #: modules/video_filter/hqdn3d.c:60
 msgid "Temporal chroma strength (0-254)"
-msgstr ""
+msgstr "עצמת כרומה זמנית (0-254)"
 
 #: modules/video_filter/hqdn3d.c:63
 msgid "HQ Denoiser 3D"
@@ -25709,7 +25743,7 @@ msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:61
 msgid "Use input chroma unaltered"
-msgstr ""
+msgstr "להשתמש בכרומה על הקלט ללא שינוי"
 
 #: modules/video_filter/opencv_wrapper.c:62
 msgid "I420 - first plane is grayscale"
@@ -25763,12 +25797,12 @@ msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:85
 msgid "OpenCV filter chroma"
-msgstr ""
+msgstr "כרומה ממסנן של OpenCV"
 
 #: modules/video_filter/opencv_wrapper.c:86
 msgid ""
 "Chroma to convert picture to before sending it to the internal OpenCV filter"
-msgstr ""
+msgstr "כרומה להמרת התמונה אליה בטרם שליחת למסנן ה־OpenCV הפנימי"
 
 #: modules/video_filter/opencv_wrapper.c:89
 msgid "Wrapper filter output"
@@ -26220,7 +26254,7 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:241
 msgid "DeckLink General Options"
-msgstr ""
+msgstr "אפשרויות כלליות של DeckLink"
 
 #: modules/video_output/decklink.cpp:246
 msgid "DeckLink Video Output module"
@@ -26258,11 +26292,11 @@ msgstr ""
 
 #: modules/video_output/fb.c:56
 msgid "Framebuffer device"
-msgstr ""
+msgstr "התקן מכלא חוזי"
 
 #: modules/video_output/fb.c:58
 msgid "Framebuffer device to use for rendering (usually /dev/fb0)."
-msgstr ""
+msgstr "מתקן מכלא חוזי לשימוש לטובת עיבוד (בדרך כלל ‎/dev/fb0)."
 
 #: modules/video_output/fb.c:60
 msgid "Run fb on current tty"
@@ -26273,20 +26307,24 @@ msgid ""
 "Run framebuffer on current TTY device (default enabled). (disable tty "
 "handling with caution)"
 msgstr ""
+"הפעלת מכלא החוזי על התקן ה־TTY הנוכחי (פעיל כבררת מחדל). (יש להשבית טיפול ב־"
+"tty בזהירות רבה)"
 
 #: modules/video_output/fb.c:65
 msgid "Framebuffer resolution to use"
-msgstr ""
+msgstr "רזולוציית מכלא חוזי לשימוש"
 
 #: modules/video_output/fb.c:67
 msgid ""
 "Select the resolution for the framebuffer. Currently it supports the values "
 "0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (default 4=auto)"
 msgstr ""
+"נא לבחור את רזולוציית מכלא החוזי. נכון לעכשיו יש תמיכה בערכים ‎0=QCIF‏ ‎1=CIF‏ ‎"
+"2=NTSC‏ ‎3=PAL,‏ ‎4=auto (בררת מחדל 4=auto)"
 
 #: modules/video_output/fb.c:70
 msgid "Framebuffer uses hw acceleration"
-msgstr ""
+msgstr "מכלא החוזי משתמש בהאצת חומרה"
 
 #: modules/video_output/fb.c:71
 msgid "Disable for double buffering in software."
@@ -26304,7 +26342,7 @@ msgstr ""
 
 #: modules/video_output/fb.c:92
 msgid "GNU/Linux framebuffer video output"
-msgstr ""
+msgstr "פלט וידאו דרך מכלא חוזי של GNU/Linux"
 
 #: modules/video_output/glx.c:271
 msgid "GLX"
@@ -26564,12 +26602,12 @@ msgstr ""
 
 #: modules/video_output/vmem.c:51
 msgid "Chroma"
-msgstr ""
+msgstr "כרומה"
 
 #: modules/video_output/vmem.c:52
 msgid ""
 "Output chroma for the memory image as a 4-character string, eg. \"RV32\"."
-msgstr ""
+msgstr "הכרומה של הפלט עבור תמונת הזיכרון כמחרוזת באורך 4 תווים, למשל „RV32”"
 
 #: modules/video_output/vmem.c:59
 msgid "Video memory output"
@@ -26703,15 +26741,15 @@ msgstr ""
 
 #: modules/video_output/yuv.c:42
 msgid "device, fifo or filename to write yuv frames too."
-msgstr ""
+msgstr "התקן, fifo או שם קובץ לכתוב אליו תמוניות yuv בנוסף."
 
 #: modules/video_output/yuv.c:44
 msgid "Chroma used"
-msgstr ""
+msgstr "כרומה בשימוש"
 
 #: modules/video_output/yuv.c:46
 msgid "Force use of a specific chroma for output."
-msgstr ""
+msgstr "אילוץ שימוש בכרומה מסוימת לפלט."
 
 #: modules/video_output/yuv.c:48
 msgid "Add a YUV4MPEG2 header"
@@ -27591,7 +27629,7 @@ msgstr "SVCD/VCD"
 
 #: modules/gui/qt/ui/open_disk.h:300
 msgid "Disable Disc Menus"
-msgstr "נטרול תפריטי הדיסק"
+msgstr "השבתת תפריטי התקליטור"
 
 #: modules/gui/qt/ui/open_disk.h:302
 msgid "No disc menus"
@@ -27755,7 +27793,7 @@ msgstr "משתני הצפנה"
 
 #: modules/gui/qt/ui/profiles.h:740
 msgid "Frame size"
-msgstr "גודל השקופית"
+msgstr "גודל התמונית"
 
 #: modules/gui/qt/ui/profiles.h:743 modules/gui/qt/ui/profiles.h:746
 msgid "px"
@@ -28001,7 +28039,7 @@ msgstr "רשימת נגינה ומופעים"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
 msgid "Pause on the last frame of a video"
-msgstr "השהייה בעת הצגת השקף האחרון של הווידאו"
+msgstr "השהייה בעת הצגת התמונית האחרונה של הווידאו"
 
 #: modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Allow only one instance"
@@ -28097,7 +28135,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:324
 msgid "Deinterlacing"
-msgstr "יישור פסים"
+msgstr "ביטול שזירה"
 
 #: modules/gui/qt/ui/sprefs_video.h:326
 msgid "Force Aspect Ratio"
@@ -28251,11 +28289,11 @@ msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1301
 msgid "Spatial chroma strength"
-msgstr ""
+msgstr "עצמת כרומה מרחבית"
 
 #: modules/gui/qt/ui/video_effects.h:1302
 msgid "Temporal chroma strength"
-msgstr ""
+msgstr "עצת כרומה זמנית"
 
 #: modules/gui/qt/ui/vlm.h:283
 msgid "VLM configurator"
