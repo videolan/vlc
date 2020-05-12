@@ -31,9 +31,6 @@ LIBVLC_ABI_MAJOR=12
 LIBVLC_ABI_MINOR=0
 LIBVLC_ABI_MICRO=0
 
-PKGDIR="vlc"
-AC_SUBST([PKGDIR])
-
 CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
 CODENAME="Otto Chriek"
 COPYRIGHT_YEARS="1996-2026"
