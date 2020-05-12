@@ -3,15 +3,15 @@ BUILT_SOURCES_distclean += \
 	extras/package/win32/msi/config.wxi
 endif
 
-WIXPATH=`wine winepath -u 'C:\\Program Files (x86)\\Windows Installer XML v3.5\\bin'`
+WIXPATH=`$(WIN32_PATH_CMD) -u 'C:\Program Files (x86)\Windows Installer XML v3.5\bin'`
 HEAT=$(MSIDIR)/msi-heat.py
 CANDLE=wine "$(WIXPATH)/candle.exe"
 LIGHT=wine "$(WIXPATH)/light.exe"
 VLCDIR=@PACKAGE_DIR@
 MSIDIR=$(abs_srcdir)/extras/package/win32/msi
-W_MSIDIR=`wine winepath -w '$(MSIDIR)'`
+W_MSIDIR=`$(WIN32_PATH_CMD) -w '$(MSIDIR)'`
 MSIBUILDDIR=$(abs_top_builddir)/extras/package/win32/msi
-W_MSIBUILDDIR=`wine winepath -w '$(MSIBUILDDIR)'`
+W_MSIBUILDDIR=`$(WIN32_PATH_CMD) -w '$(MSIBUILDDIR)'`
 if HAVE_WIN64
 MSIOUTFILE=vlc-$(VERSION)-win64.msi
 else
