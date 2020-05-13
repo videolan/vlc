@@ -1,0 +1,11 @@
+--- libvpx/configure.old	2020-05-13 21:15:06.000000000 +0200
++++ libvpx/configure	2020-05-13 21:15:28.000000000 +0200
+@@ -758,8 +758,6 @@
+ EOF
+         ;;
+     esac
+-    # libwebm needs to be linked with C++ standard library
+-    enabled webm_io && LD=${CXX}
+ 
+     # append any user defined extra cflags
+     if [ -n "${extra_cflags}" ] ; then

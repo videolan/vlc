@@ -21,6 +21,9 @@ ifdef HAVE_ANDROID
 	cp "${ANDROID_NDK}"/sources/android/cpufeatures/cpu-features.c $(UNPACK_DIR)/vpx_ports
 	cp "${ANDROID_NDK}"/sources/android/cpufeatures/cpu-features.h $(UNPACK_DIR)
 endif
+ifdef HAVE_MACOSX
+	$(APPLY) $(SRC)/vpx/darwin-do-not-overwrite-ld.patch
+endif
 	$(MOVE)
 
 DEPS_vpx =
