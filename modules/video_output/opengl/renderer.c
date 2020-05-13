@@ -464,7 +464,14 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     renderer->pl_ctx = vlc_placebo_Create(VLC_OBJECT(gl));
     if (renderer->pl_ctx) {
 #   if PL_API_VER >= 20
-        renderer->pl_sh = pl_shader_alloc(renderer->pl_ctx, NULL);
+        renderer->pl_sh = pl_shader_alloc(renderer->pl_ctx, &(struct pl_shader_params) {
+            .glsl = {
+                .version = renderer->glsl_version,
+#       ifdef USE_OPENGL_ES2
+                .gles = true,
+#       endif
+            },
+        });
 #   elif PL_API_VER >= 6
         renderer->pl_sh = pl_shader_alloc(renderer->pl_ctx, NULL, 0);
 #   else
