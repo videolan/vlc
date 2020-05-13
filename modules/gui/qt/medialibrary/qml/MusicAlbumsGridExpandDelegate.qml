@@ -146,6 +146,8 @@ Widgets.NavigableFocusScope {
             MusicTrackListDisplay {
                 id: expand_track_id
 
+                readonly property int _nbCols: VLCStyle.gridColumnsForWidth(expand_track_id.width)
+
                 section.property: ""
 
                 Layout.fillWidth: true
@@ -165,9 +167,9 @@ Widgets.NavigableFocusScope {
                 }
 
                 sortModel: [
-                    { criteria: "track_number",  width:0.10, visible: true, text: i18n.qtr("#"), showSection: "" },
-                    { isPrimary: true, criteria: "title",         width:0.70, visible: true, text: i18n.qtr("Title"), showSection: "" },
-                    { criteria: "duration",      width:0.20, visible: true, text: i18n.qtr("Duration"), showSection: "" },
+                    { criteria: "track_number",           width: VLCStyle.colWidth(1), visible: true, text: i18n.qtr("#"), showSection: "" },
+                    { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(Math.max(expand_track_id._nbCols - 2, 1)), visible: true, text: i18n.qtr("Title"), showSection: "" },
+                    { criteria: "duration",               width: VLCStyle.colWidth(1), visible: true, text: i18n.qtr("Duration"), showSection: "" },
                 ]
 
                 navigationParent: root

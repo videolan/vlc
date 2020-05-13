@@ -52,6 +52,7 @@ NavigableFocusScope {
     property alias selectionModel: selectionModel
     property real rowHeight: VLCStyle.fontHeight_normal + VLCStyle.margin_large
     property alias spacing: view.spacing
+    property int horizontalSpacing: VLCStyle.column_margin_width
 
     Accessible.role: Accessible.Table
 
@@ -88,14 +89,15 @@ NavigableFocusScope {
 
                 Row {
                     x: VLCStyle.margin_normal
-                    width: childrenRect.width - 2 * VLCStyle.margin_normal
+                    anchors.horizontalCenter: parent.horizontalCenter
                     height: childrenRect.height + VLCStyle.margin_xxsmall
+                    spacing: VLCStyle.column_margin_width
 
                     Repeater {
                         model: sortModel
                         MouseArea {
                             height: VLCStyle.fontHeight_normal
-                            width: modelData.width * view.width
+                            width: modelData.width || 1
                             //Layout.alignment: Qt.AlignVCenter
 
                             Text {
@@ -184,21 +186,33 @@ NavigableFocusScope {
                         bottomMargin: VLCStyle.margin_xxsmall
                         leftMargin: VLCStyle.margin_xxxsmall
                         rightMargin: VLCStyle.margin_xxxsmall
-                        fill: parent
+                        horizontalCenter: parent.horizontalCenter
+                        top: parent.top
+                        bottom: parent.bottom
                     }
+
+                    spacing: root.horizontalSpacing
+
                     Repeater {
                         model: sortModel
 
                         Item {
                             height: parent.height
-                            width: modelData.width * view.width
+                            width: modelData.width || 1
                             Layout.alignment: Qt.AlignVCenter
+
+                            SmoothedAnimation on width {
+                                duration: 256
+                                easing.type: Easing.OutCubic
+                            }
+
                             Loader{
+                                property var rowModel: lineView.rowModel
+                                property var colModel: modelData
+
                                 anchors.fill: parent
                                 sourceComponent: colDelegate
 
-                                property var rowModel: lineView.rowModel
-                                property var colModel: modelData
                             }
                         }
                     }

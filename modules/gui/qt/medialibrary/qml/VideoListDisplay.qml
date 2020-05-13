@@ -29,12 +29,30 @@ Widgets.KeyNavigableTableView {
     model: MLVideoModel {
         ml: medialib
     }
-    sortModel: [
-        { type: "image", criteria: "thumbnail",   width:0.2, text: i18n.qtr("Thumbnail"), showSection: "" },
-        { criteria: "duration",    width:0.1, text: i18n.qtr("Duration"), showSection: "" },
-        { isPrimary: true, criteria: "title",       width:0.6, text: i18n.qtr("Title"),    showSection: "title" },
-        { type: "contextButton",   width:0.1, },
+
+    property var sortModelSmall: [
+        { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), text: i18n.qtr("Thumbnail"), showSection: "" },
+        { isPrimary: true, criteria: "title",   width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title" },
+        { type: "contextButton",                width: VLCStyle.colWidth(1)  }
     ]
+
+    property var sortModelMedium:  [
+        { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), text: i18n.qtr("Thumbnail"), showSection: "" },
+        { criteria: "duration",                 width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "" },
+        { isPrimary: true, criteria: "title",   width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title" },
+        { type: "contextButton",                width: VLCStyle.colWidth(1)  }
+    ]
+
+    property var sortModelLarge:  [
+        { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), text: i18n.qtr("Thumbnail"), showSection: "" },
+        { criteria: "duration",                 width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "" },
+        { isPrimary: true, criteria: "title",   width: VLCStyle.colWidth(4), text: i18n.qtr("Title"),    showSection: "title" },
+        { type: "contextButton",                width: VLCStyle.colWidth(1) }
+    ]
+
+
+    sortModel: ( width < VLCStyle.colWidth(6) ) ? sortModelSmall
+                                                : ( width < VLCStyle.colWidth(7) ) ? sortModelMedium : sortModelLarge
     section.property: "title_first_symbol"
 
     rowHeight: VLCStyle.video_small_height + VLCStyle.margin_normal

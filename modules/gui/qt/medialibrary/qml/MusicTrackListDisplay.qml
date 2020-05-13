@@ -28,15 +28,32 @@ import "qrc:///style/"
 Widgets.KeyNavigableTableView {
     id: root
 
-    sortModel: [
-        { isPrimary: true, criteria: "title",       width:0.44, text: i18n.qtr("Title"),    showSection: "title" },
-        { criteria: "album_title", width:0.25, text: i18n.qtr("Album"),    showSection: "album_title" },
-        { criteria: "main_artist", width:0.15, text: i18n.qtr("Artist"),   showSection: "main_artist" },
-        { criteria: "duration",    width:0.06, text: i18n.qtr("Duration"), showSection: "" },
-        { criteria: "track_number",width:0.05, text: i18n.qtr("Track"), showSection: "" },
-        { criteria: "disc_number", width:0.05, text: i18n.qtr("Disc"),  showSection: "" },
+    property var sortModelSmall: [
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(1), text: i18n.qtr("Title"),    showSection: "title" },
+        { criteria: "album_title", width: VLCStyle.colWidth(1), text: i18n.qtr("Album"),    showSection: "album_title" },
+        { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
+        { criteria: "duration",    width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "" },
     ]
 
+    property var sortModelMedium: [
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title" },
+        { criteria: "album_title", width: VLCStyle.colWidth(2), text: i18n.qtr("Album"),    showSection: "album_title" },
+        { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
+        { criteria: "duration",    width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "" },
+    ]
+
+    property var sortModelLarge: [
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title" },
+        { criteria: "album_title", width: VLCStyle.colWidth(2), text: i18n.qtr("Album"),    showSection: "album_title" },
+        { criteria: "main_artist", width: VLCStyle.colWidth(2), text: i18n.qtr("Artist"),   showSection: "main_artist" },
+        { criteria: "duration",    width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "" },
+        { criteria: "track_number",width: VLCStyle.colWidth(1), text: i18n.qtr("Track"), showSection: "" },
+        { criteria: "disc_number", width: VLCStyle.colWidth(1), text: i18n.qtr("Disc"),  showSection: "" },
+
+    ]
+
+    sortModel: ( width < VLCStyle.colWidth(6) ) ? sortModelSmall
+                                                : ( width < VLCStyle.colWidth(9) ) ? sortModelMedium : sortModelLarge
     section.property: "title_first_symbol"
 
     headerColor: VLCStyle.colors.bg
