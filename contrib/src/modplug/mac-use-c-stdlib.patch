@@ -1,0 +1,9 @@
+--- libmodplug-0.8.9.0/libmodplug.pc.in.old	2020-04-29 21:39:14.000000000 +0200
++++ libmodplug-0.8.9.0/libmodplug.pc.in	2020-04-29 21:40:06.000000000 +0200
+@@ -8,5 +8,5 @@
+ Version: @VERSION@
+ Requires: 
+ Libs: -L${libdir} -lmodplug 
+-Libs.private: -lstdc++ -lm
++Libs.private: -lc++ -lm
+ Cflags: -I${includedir} -DMODPLUG_STATIC
