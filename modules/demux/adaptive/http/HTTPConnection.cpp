@@ -498,9 +498,13 @@ void StreamUrlConnection::reset()
     bytesRange = BytesRange();
 }
 
-bool StreamUrlConnection::canReuse(const ConnectionParams &params) const
+bool StreamUrlConnection::canReuse(const ConnectionParams &params_) const
 {
-    return available && params.usesAccess();
+    if( !available || !params_.usesAccess() )
+        return false;
+    return (params.getHostname() == params_.getHostname() &&
+            params.getScheme() == params_.getScheme() &&
+            params.getPort() == params_.getPort());
 }
 
 enum RequestStatus
