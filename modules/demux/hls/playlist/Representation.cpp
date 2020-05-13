@@ -100,13 +100,18 @@ void Representation::debug(vlc_object_t *obj, int indent) const
     }
 }
 
-void Representation::scheduleNextUpdate(uint64_t number)
+void Representation::scheduleNextUpdate(uint64_t number, bool b_updated)
 {
-    const AbstractPlaylist *playlist = getPlaylist();
-    const mtime_t now = mdate();
+    if(!isLive())
+        return;
+
+    if(!b_updated && nextUpdateTime > 0)
+        return;
 
     /* Compute new update time */
     mtime_t minbuffer = getMinAheadTime(number);
+    const AbstractPlaylist *playlist = getPlaylist();
+    const mtime_t now = mdate();
 
     /* Update frequency must always be at least targetDuration (if any)
      * but we need to update before reaching that last segment, thus -1 */
@@ -135,7 +140,9 @@ void Representation::scheduleNextUpdate(uint64_t number)
 
 bool Representation::needsUpdate() const
 {
-    return !b_failed && (!b_loaded || (isLive() && nextUpdateTime < mdate()));
+    return !b_failed && (!b_loaded || (isLive() &&
+                                       nextUpdateTime != 0 &&
+                                       nextUpdateTime < mdate()));
 }
 
 bool Representation::runLocalUpdates(SharedResources *res)
