@@ -33,6 +33,7 @@
 #include "../../adaptive/playlist/SegmentList.h"
 
 #include <ctime>
+#include <cassert>
 
 using namespace hls;
 using namespace hls::playlist;
@@ -139,19 +140,13 @@ bool Representation::needsUpdate() const
 
 bool Representation::runLocalUpdates(SharedResources *res)
 {
-    const time_t now = time(NULL);
     AbstractPlaylist *playlist = getPlaylist();
-    if(!b_loaded || (isLive() && nextUpdateTime < now))
-    {
-        M3U8Parser parser(res);
-        if(!parser.appendSegmentsFromPlaylistURI(playlist->getVLCObject(), this))
-            b_failed = true;
-        else
-            b_loaded = true;
-
-        return true;
-    }
-
+    assert(needsUpdate());
+    M3U8Parser parser(res);
+    if(!parser.appendSegmentsFromPlaylistURI(playlist->getVLCObject(), this))
+        b_failed = true;
+    else
+        b_loaded = true;
     return true;
 }
 
