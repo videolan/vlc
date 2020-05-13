@@ -98,7 +98,7 @@ bool BaseRepresentation::runLocalUpdates(SharedResources *)
     return false;
 }
 
-void BaseRepresentation::scheduleNextUpdate(uint64_t)
+void BaseRepresentation::scheduleNextUpdate(uint64_t, bool)
 {
 
 }

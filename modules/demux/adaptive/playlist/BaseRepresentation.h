@@ -67,7 +67,7 @@ namespace adaptive
                 virtual vlc_tick_t  getMinAheadTime         (uint64_t) const;
                 virtual bool        needsUpdate             () const;
                 virtual bool        runLocalUpdates         (SharedResources *);
-                virtual void        scheduleNextUpdate      (uint64_t);
+                virtual void        scheduleNextUpdate      (uint64_t, bool);
 
                 virtual void        debug                   (vlc_object_t *,int = 0) const;
 

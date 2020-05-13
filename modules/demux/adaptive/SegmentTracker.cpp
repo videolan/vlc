@@ -227,8 +227,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
         next = rep->translateSegmentNumber(next, prevRep);
     }
 
-    if(b_updated)
-        curRepresentation->scheduleNextUpdate(next);
+    curRepresentation->scheduleNextUpdate(next, b_updated);
 
     if(rep->getStreamFormat() != format)
     {
@@ -423,8 +422,8 @@ void SegmentTracker::updateSelected()
 {
     if(curRepresentation && curRepresentation->needsUpdate())
     {
-        curRepresentation->runLocalUpdates(resources);
-        curRepresentation->scheduleNextUpdate(curNumber);
+        bool b_updated = curRepresentation->runLocalUpdates(resources);
+        curRepresentation->scheduleNextUpdate(curNumber, b_updated);
     }
 }
 
