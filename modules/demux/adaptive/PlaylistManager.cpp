@@ -38,6 +38,9 @@
 #include "logic/NearOptimalAdaptationLogic.hpp"
 #include "logic/BufferingLogic.hpp"
 #include "tools/Debug.hpp"
+#ifdef ADAPTIVE_DEBUGGING_LOGIC
+# include "logic/RoundRobinLogic.hpp"
+#endif
 #include <vlc_stream.h>
 #include <vlc_demux.h>
 #include <vlc_threads.h>
@@ -800,6 +803,11 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
             break;
         }
         case AbstractAdaptationLogic::Default:
+#ifdef ADAPTIVE_DEBUGGING_LOGIC
+            logic = new (std::nothrow) RoundRobinLogic(obj);
+            msg_Warn(p_demux, "using RoundRobinLogic every %u", RoundRobinLogic::QUANTUM);
+            break;
+#endif
         case AbstractAdaptationLogic::NearOptimal:
         {
             NearOptimalAdaptationLogic *noplogic =

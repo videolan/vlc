@@ -353,6 +353,8 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/logic/RateBasedAdaptationLogic.cpp \
     demux/adaptive/logic/Representationselectors.hpp \
     demux/adaptive/logic/Representationselectors.cpp \
+    demux/adaptive/logic/RoundRobinLogic.cpp \
+    demux/adaptive/logic/RoundRobinLogic.hpp \
     demux/adaptive/mp4/AtomsReader.cpp \
     demux/adaptive/mp4/AtomsReader.hpp \
     demux/adaptive/http/AuthStorage.cpp \
