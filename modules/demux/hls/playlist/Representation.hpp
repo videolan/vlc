@@ -58,7 +58,7 @@ namespace hls
                 bool b_live;
                 bool b_loaded;
                 bool b_failed;
-                time_t nextUpdateTime;
+                mtime_t nextUpdateTime;
                 time_t targetDuration;
                 Url playlistUrl;
         };

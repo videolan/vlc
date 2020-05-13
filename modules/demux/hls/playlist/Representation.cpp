@@ -103,7 +103,7 @@ void Representation::debug(vlc_object_t *obj, int indent) const
 void Representation::scheduleNextUpdate(uint64_t number)
 {
     const AbstractPlaylist *playlist = getPlaylist();
-    const time_t now = time(NULL);
+    const mtime_t now = mdate();
 
     /* Compute new update time */
     mtime_t minbuffer = getMinAheadTime(number);
@@ -125,17 +125,17 @@ void Representation::scheduleNextUpdate(uint64_t number)
             minbuffer /= 2;
     }
 
-    nextUpdateTime = now + minbuffer / CLOCK_FREQ;
+    nextUpdateTime = now + minbuffer;
 
     msg_Dbg(playlist->getVLCObject(), "Updated playlist ID %s, next update in %" PRId64 "s",
-            getID().str().c_str(), (mtime_t) nextUpdateTime - now);
+            getID().str().c_str(), (nextUpdateTime - now)/CLOCK_FREQ);
 
     debug(playlist->getVLCObject(), 0);
 }
 
 bool Representation::needsUpdate() const
 {
-    return !b_failed && (!b_loaded || (isLive() && nextUpdateTime < time(NULL)));
+    return !b_failed && (!b_loaded || (isLive() && nextUpdateTime < mdate()));
 }
 
 bool Representation::runLocalUpdates(SharedResources *res)
