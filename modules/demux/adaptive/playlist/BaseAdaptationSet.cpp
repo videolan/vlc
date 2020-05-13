@@ -113,7 +113,7 @@ void BaseAdaptationSet::setBitswitchAble(bool b)
 
 bool BaseAdaptationSet::isSegmentAligned() const
 {
-    return segmentAligned.isSet() && segmentAligned.value();
+    return !segmentAligned.isSet() || segmentAligned.value();
 }
 
 bool BaseAdaptationSet::isBitSwitchable() const
