@@ -25,8 +25,9 @@ endif
 	$(APPLY) $(SRC)/pthreads/arm64.patch
 	$(MOVE)
 
+PTHREADS_W32_CONF := LFLAGS="$(LDFLAGS)" PTW32_FLAGS="$(CFLAGS)"
 ifdef HAVE_CROSS_COMPILE
-PTHREADS_W32_CONF := CROSS="$(HOST)-"
+PTHREADS_W32_CONF += CROSS="$(HOST)-"
 endif
 
 .pthreads: pthreads
