@@ -165,7 +165,8 @@ uint64_t Representation::translateSegmentNumber(uint64_t num, const SegmentInfor
     HLSSegment *fromHlsSeg = dynamic_cast<HLSSegment *>(fromSeg);
     if(!fromHlsSeg)
         return 1;
-    const mtime_t utcTime = fromHlsSeg->getUTCTime();
+    const mtime_t utcTime = fromHlsSeg->getUTCTime() +
+                               getTimescale().ToTime(fromHlsSeg->duration.Get()) / 2;
 
     std::vector<ISegment *> list;
     std::vector<ISegment *>::const_iterator it;
