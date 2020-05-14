@@ -1,3 +1,30 @@
+Changes between 3.0.10 and 3.0.11:
+----------------------------------
+
+Access:
+ * rtp descriptor leak on error fix
+
+Demux:
+ * Fixed regression with some encrypted HLS streams
+ * Live HLS delay until first update fix
+ * HLS rendition switch regression fix
+
+Decoder:
+ * Fixed missing captions with some capture cards
+
+Audio filters:
+ * soxr resampling fixes
+
+Contribs:
+ * Updated libfaad to 2.9.2 (Parametric Stereo regression)
+ * Updated libarchive to 3.4.2
+
+MacOS:
+ * Fixed moving video window with mouse
+ * Added optical devices insufficient permissions warning
+ * Fixed stack buffer overflow listing bluray mount points
+
+
 Changes between 3.0.9.2 and 3.0.10:
 ----------------------------------
 
