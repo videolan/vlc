@@ -399,8 +399,8 @@ void config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                 val.b_bool = b_yes;
                 break;
             case VLC_VAR_INTEGER:
-                val.i_int = strtol( cfg->psz_value ? cfg->psz_value : "0",
-                                    NULL, 0 );
+                val.i_int = strtoll( cfg->psz_value ? cfg->psz_value : "0",
+                                     NULL, 0 );
                 break;
             case VLC_VAR_FLOAT:
                 val.f_float = us_atof( cfg->psz_value ? cfg->psz_value : "0" );
