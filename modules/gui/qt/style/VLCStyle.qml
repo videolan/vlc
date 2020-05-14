@@ -145,6 +145,8 @@ Item {
     property int gridItem_video_height: VLCStyle.video_normal_height + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small  + VLCStyle.margin_xxsmall * 4
     property int gridItem_video_width: VLCStyle.video_normal_width + VLCStyle.margin_xxsmall * 4
 
+    property int column_width: 114 * scale
+    property int column_margin_width: 32 * scale
 
     //global application margin "safe area"
     property int applicationHorizontalMargin: 0
@@ -164,5 +166,13 @@ Item {
     property url noArtArtist: "qrc:///noart_artist.svg";
     property url noArtArtistSmall: "qrc:///noart_artist_small.svg";
 
+    function colWidth(nb) {
+      return nb * VLCStyle.column_width + ( nb - 1 ) * VLCStyle.column_margin_width;
+    }
+
+    //Returns the number columns fitting in given width
+    function gridColumnsForWidth(width) {
+        return Math.floor((width + column_margin_width) / (column_width + column_margin_width))
+    }
 
 }
