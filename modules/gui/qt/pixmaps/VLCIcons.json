@@ -144,6 +144,8 @@
 		{"key":"close", "path": "./close.svg"},
 		{"key":"ellipsis", "path": "./ellipsis.svg"},
 		{"key":"grid", "path": "./topbar/grid.svg"},
-		{"key":"list", "path": "./topbar/list.svg"}
+		{"key":"list", "path": "./topbar/list.svg"},
+		{"key":"album_cover", "path": "./album_cover.svg"},
+		{"key":"time", "path": "./time.svg"}
 	]
 }

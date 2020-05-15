@@ -569,7 +569,9 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/ellipsis.svg \
 	gui/qt/pixmaps/topbar/grid.svg \
 	gui/qt/pixmaps/topbar/list.svg \
-	gui/qt/pixmaps/cone.svg
+	gui/qt/pixmaps/cone.svg \
+	gui/qt/pixmaps/album_cover.svg \
+	gui/qt/pixmaps/time.svg
 
 #QML and JS resources
 libqt_plugin_la_QML = \
