@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-27 08:45+0100\n"
+"PO-Revision-Date: 2020-05-15 10:45+0200\n"
 "Last-Translator: picodotdev <pico.dev@gmail.com>, 2020\n"
 "Language-Team: Spanish (https://www.transifex.com/yaron/teams/16553/es/)\n"
 "Language: es\n"
@@ -29722,7 +29722,7 @@ msgstr "Asociaciones de archivo"
 
 #: modules/gui/qt/ui/sprefs_interface.h:565
 msgid "Set up associations..."
-msgstr "Estabablecer asociaciones de archivo..."
+msgstr "Establecer asociaciones de archivo..."
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:288
 msgid "Enable On Screen Display (OSD)"
