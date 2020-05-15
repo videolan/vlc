@@ -29,28 +29,65 @@ Widgets.KeyNavigableTableView {
     id: root
 
     property var sortModelSmall: [
-        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(1), text: i18n.qtr("Title"),    showSection: "title" },
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(1), text: i18n.qtr("Title"),    showSection: "title", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(1), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
         { criteria: "duration",    width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "" },
     ]
 
     property var sortModelMedium: [
-        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title" },
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(2), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
         { criteria: "duration",    width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "" },
     ]
 
     property var sortModelLarge: [
-        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title" },
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(2), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(2), text: i18n.qtr("Artist"),   showSection: "main_artist" },
         { criteria: "duration",    width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "" },
         { criteria: "track_number",width: VLCStyle.colWidth(1), text: i18n.qtr("Track"), showSection: "" },
         { criteria: "disc_number", width: VLCStyle.colWidth(1), text: i18n.qtr("Disc"),  showSection: "" },
-
     ]
+
+    property Component titleDelegate: RowLayout {
+        property var rowModel: parent.rowModel
+        property var model: parent.colModel
+
+        anchors.fill: parent
+        spacing: VLCStyle.margin_normal
+
+        Image {
+            source: !rowModel ? VLCStyle.noArtCover : (rowModel.cover || VLCStyle.noArtCover)
+            mipmap: true // this widget can down scale the source a lot, so for better visuals we use mipmap
+
+            Layout.preferredHeight: VLCStyle.heightAlbumCover_xsmall
+            Layout.preferredWidth: VLCStyle.heightAlbumCover_xsmall
+        }
+
+        Widgets.ListLabel {
+            text: !rowModel ? "" : (rowModel[model.criteria] || "")
+
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+        }
+    }
+
+    property Component titleHeaderDelegate: Row {
+        spacing: VLCStyle.margin_normal
+
+        Widgets.IconLabel {
+            width: VLCStyle.heightAlbumCover_xsmall
+            horizontalAlignment: Text.AlignHCenter
+            text: VLCIcons.album_cover
+            color: VLCStyle.colors.caption
+        }
+
+        Widgets.CaptionLabel {
+            text: model.text || ""
+        }
+    }
 
     sortModel: ( width < VLCStyle.colWidth(6) ) ? sortModelSmall
                                                 : ( width < VLCStyle.colWidth(9) ) ? sortModelMedium : sortModelLarge
