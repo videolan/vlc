@@ -165,6 +165,7 @@ void FormatNamespace::Parse(vlc_fourcc_t fcc, const std::vector<std::string> &el
         case MP4RA("dtsh"):
         case MP4RA("ac-3"):
         case MP4RA("ec-3"):
+        case MP4RA("ac-4"):
         case MP4RA("opus"):
             es_format_Change(&fmt, AUDIO_ES, vlc_fourcc_GetCodec(AUDIO_ES, fcc));
             break;
