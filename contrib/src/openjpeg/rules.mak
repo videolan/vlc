@@ -31,7 +31,7 @@ endif
 
 .openjpeg: openjpeg toolchain.cmake
 	cd $< && $(HOSTVARS) CFLAGS="$(OPENJPEG_CFLAGS)" CXXFLAGS="$(OPENJPEG_CXXFLAGS)" $(CMAKE) \
-		-DBUILD_SHARED_LIBS:bool=OFF -DBUILD_PKGCONFIG_FILES=ON \
+		-DBUILD_PKGCONFIG_FILES=ON \
 			-DBUILD_CODEC:bool=OFF \
 		.
 	cd $< && $(MAKE) install

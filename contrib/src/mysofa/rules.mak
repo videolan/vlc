@@ -29,7 +29,7 @@ mysofa: libmysofa-$(MYSOFA_VERSION).tar.gz .sum-mysofa
 
 .mysofa: mysofa toolchain.cmake
 	cd $< && rm -f CMakeCache.txt
-	cd $< && $(HOSTVARS) CFLAGS="$(MYSOFA_CFLAGS)" CXXFLAGS="$(MYSOFA_CXXFLAGS)" $(CMAKE) -DBUILD_TESTS=OFF -DBUILD_SHARED_LIBS=OFF
+	cd $< && $(HOSTVARS) CFLAGS="$(MYSOFA_CFLAGS)" CXXFLAGS="$(MYSOFA_CXXFLAGS)" $(CMAKE) -DBUILD_TESTS=OFF
 	cd $< && $(MAKE) install
 	touch $@
 

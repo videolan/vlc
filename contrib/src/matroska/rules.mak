@@ -27,6 +27,6 @@ MATROSKA_CXXFLAGS +=  -O2
 endif
 
 .matroska: libmatroska toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) CXXFLAGS="$(MATROSKA_CXXFLAGS)" $(CMAKE) -DBUILD_SHARED_LIBS=OFF
+	cd $< && $(HOSTVARS_PIC) CXXFLAGS="$(MATROSKA_CXXFLAGS)" $(CMAKE)
 	cd $< && $(MAKE) install
 	touch $@
