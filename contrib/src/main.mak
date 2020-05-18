@@ -313,8 +313,12 @@ CXXFLAGS := $(CXXFLAGS) -g -O2
 endif
 
 ifdef ENABLE_PDB
+ifdef HAVE_CLANG
+ifneq ($(findstring $(ARCH),i686 x86_64),)
 CFLAGS := $(CFLAGS) -gcodeview
 CXXFLAGS := $(CXXFLAGS) -gcodeview
+endif
+endif
 endif
 
 HOSTVARS := $(HOSTTOOLS) \
