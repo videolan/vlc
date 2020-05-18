@@ -21,6 +21,7 @@ import QtQml.Models 2.2
 DelegateModel {
     id: delegateModel
 
+    property int currentIndex: -1
     property int shiftIndex: -1
     property alias selectedGroup: selectedGroup
     readonly property bool hasSelection: selectedGroup.count > 0

@@ -24,6 +24,7 @@ import QtQml 2.11
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
+import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -31,6 +32,9 @@ Widgets.NavigableFocusScope {
     id: root
 
     property alias tree: providerModel.tree
+    readonly property var currentIndex: delegateModelId.currentIndex
+    //the index to "go to" when the view is loaded
+    property var initialIndex: 0
 
     NetworkMediaModel {
         id: providerModel
@@ -38,19 +42,33 @@ Widgets.NavigableFocusScope {
         tree: undefined
     }
 
-    NetworksSectionSelectableDM{
+    Util.SelectableDelegateModel{
         id: delegateModelId
         model: providerModel
         onCountChanged: resetFocus()
     }
 
     function resetFocus() {
-        if (providerModel.count > 0 && !delegateModelId.hasSelection) {
-            var initialIndex = 0
-            if (delegateModelId.currentIndex !== -1)
-                initialIndex = delegateModelId.currentIndex
-            delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
-            delegateModelId.currentIndex = initialIndex
+        var initialIndex = root.initialIndex
+        if (initialIndex >= providerModel.count)
+            initialIndex = 0
+        delegateModelId.select(initialIndex, ItemSelectionModel.ClearAndSelect)
+        view.currentItem.currentIndex = initialIndex
+        view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+    }
+
+
+    function _actionAtIndex(index) {
+        if ( delegateModelId.selectedIndexes().length > 1 ) {
+            providerModel.addAndPlay( delegateModelId.selectedIndexes() )
+        } else {
+            var data = providerModel.getDataAt(index)
+            if (data.type === NetworkMediaModel.TYPE_DIRECTORY
+                    || data.type === NetworkMediaModel.TYPE_NODE)  {
+                history.push(["mc", "network", { tree: data.tree }]);
+            } else {
+                providerModel.addAndPlay( delegateModelId.selectedIndexes() )
+            }
         }
     }
 

@@ -216,7 +216,7 @@
     </qresource>
     <qresource prefix="/network">
         <file alias="NetworkDisplay.qml">network/qml/NetworkDisplay.qml</file>
-        <file alias="NetworksSectionSelectableDM.qml">network/qml/NetworksSectionSelectableDM.qml</file>
+        <file alias="NetworkHomeDeviceListView.qml">network/qml/NetworkHomeDeviceListView.qml</file>
         <file alias="NetworkHomeDisplay.qml">network/qml/NetworkHomeDisplay.qml</file>
         <file alias="NetworkBrowseDisplay.qml">network/qml/NetworkBrowseDisplay.qml</file>
         <file alias="NetworkGridItem.qml">network/qml/NetworkGridItem.qml</file>
