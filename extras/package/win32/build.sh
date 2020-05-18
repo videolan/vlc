@@ -29,11 +29,12 @@ OPTIONS:
    -b <url>      Enable breakpad support and send crash reports to this URL
    -d            Create PDB files during the build
    -x            Add extra checks when compiling
+   -z            Build without GUI (libvlc only)
 EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:sb:dx" OPTION
+while getopts "hra:pcli:sb:dxz" OPTION
 do
      case $OPTION in
          h)
@@ -70,6 +71,9 @@ do
          ;;
          x)
              EXTRA_CHECKS="yes"
+         ;;
+         z)
+             DISABLEGUI="yes"
          ;;
      esac
 done
@@ -156,6 +160,9 @@ fi
 if [ "$RELEASE" != "yes" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --disable-optim"
 fi
+if [ ! -z "$DISABLEGUI" ]; then
+    CONTRIBFLAGS="$CONTRIBFLAGS --disable-qt --disable-qtsvg --disable-qtdeclarative --disable-qtgraphicaleffects --disable-qtquickcontrols2"
+fi
 ${SCRIPT_PATH}/../../../contrib/bootstrap --host=$TRIPLET $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
@@ -215,6 +222,11 @@ fi
 if [ ! -z "$EXTRA_CHECKS" ]; then
     CFLAGS="$CFLAGS -Werror=incompatible-pointer-types -Werror=missing-field-initializers"
     CXXFLAGS="$CXXFLAGS -Werror=missing-field-initializers"
+fi
+if [ ! -z "$DISABLEGUI" ]; then
+    CONFIGFLAGS="$CONFIGFLAGS --disable-vlc --disable-qt --disable-skins2"
+else
+    CONFIGFLAGS="$CONFIGFLAGS --enable-qt --enable-skins2"
 fi
 
 ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$TRIPLET $CONFIGFLAGS

@@ -17,8 +17,6 @@ OPTIONS="
       --enable-shout
       --enable-goom
       --enable-caca
-      --enable-qt
-      --enable-skins2
       --enable-sse --enable-mmx
       --enable-libcddb
       --enable-zvbi --disable-telx
