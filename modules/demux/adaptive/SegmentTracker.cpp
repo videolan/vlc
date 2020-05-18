@@ -389,7 +389,9 @@ mtime_t SegmentTracker::getMinAheadTime() const
         if(rep->needsUpdate())
             (void) rep->runLocalUpdates(resources);
 
-        uint64_t startnumber = bufferingLogic->getStartSegmentNumber(rep);
+        uint64_t startnumber = curNumber;
+        if(startnumber == std::numeric_limits<uint64_t>::max())
+            startnumber = bufferingLogic->getStartSegmentNumber(rep);
         if(startnumber != std::numeric_limits<uint64_t>::max())
             return rep->getMinAheadTime(startnumber);
     }
