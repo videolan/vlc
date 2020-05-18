@@ -106,6 +106,18 @@ QHash<int, QByteArray> NetworkMediaModel::roleNames() const
     };
 }
 
+
+QMap<QString, QVariant> NetworkMediaModel::getDataAt(int idx)
+{
+    QMap<QString, QVariant> dataDict;
+    QHash<int,QByteArray> roles = roleNames();
+    for (auto role: roles.keys()) {
+        dataDict[roles[role]] = data(index(idx), role);
+    }
+    return dataDict;
+}
+
+
 int NetworkMediaModel::rowCount(const QModelIndex& parent) const
 {
     if ( parent.isValid() )

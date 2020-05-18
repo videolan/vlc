@@ -89,6 +89,8 @@ public:
     Q_INVOKABLE bool addAndPlay(const QVariantList& itemIdList);
     Q_INVOKABLE bool addAndPlay(const QModelIndexList& itemIdList);
 
+    Q_INVOKABLE QMap<QString, QVariant> getDataAt(int index);
+
 signals:
     void ctxChanged();
     void sdSourceChanged();

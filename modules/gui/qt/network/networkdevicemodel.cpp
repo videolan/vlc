@@ -204,6 +204,16 @@ bool NetworkDeviceModel::addAndPlay(const QModelIndexList& itemIdList)
     return ret;
 }
 
+QMap<QString, QVariant> NetworkDeviceModel::getDataAt(int idx)
+{
+    QMap<QString, QVariant> dataDict;
+    QHash<int,QByteArray> roles = roleNames();
+    for (auto role: roles.keys()) {
+        dataDict[roles[role]] = data(index(idx), role);
+    }
+    return dataDict;
+}
+
 bool NetworkDeviceModel::initializeMediaSources()
 {
     auto libvlc = vlc_object_instance(m_ctx->getIntf());

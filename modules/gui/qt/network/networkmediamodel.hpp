@@ -124,6 +124,8 @@ public:
     inline bool getParsingPending() const { return m_parsingPending; }
     int getCount() const;
 
+    Q_INVOKABLE QMap<QString, QVariant> getDataAt(int idx);
+
     Q_INVOKABLE bool addToPlaylist( int index );
     Q_INVOKABLE bool addToPlaylist(const QVariantList& itemIdList);
     Q_INVOKABLE bool addToPlaylist(const QModelIndexList& itemIdList);
