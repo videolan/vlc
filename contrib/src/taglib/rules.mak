@@ -15,6 +15,7 @@ $(TARBALLS)/taglib-$(TAGLIB_VERSION).tar.gz:
 
 taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(UNPACK)
+	$(APPLY) $(SRC)/taglib/0001-use-SetFilePointerEx-instead-of-SetFilePointer.patch
 	$(APPLY) $(SRC)/taglib/0002-use-GetFileInformationByHandleEx-on-newer-builds-of-.patch
 	$(APPLY) $(SRC)/taglib/0003-don-t-use-CreateFile-in-UWP-builds.patch
 	$(APPLY) $(SRC)/taglib/use_resolvers_on_streams.patch
