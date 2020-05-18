@@ -58,14 +58,15 @@ Widgets.KeyNavigableTableView {
     rowHeight: VLCStyle.video_small_height + VLCStyle.margin_normal
 
     property bool isFocusOnContextButton: false
+
     colDelegate: Item {
         id: colDel
-        anchors.fill: parent
-        anchors.leftMargin: VLCStyle.margin_normal
-        anchors.rightMargin: VLCStyle.margin_normal
 
         property var rowModel: parent.rowModel
         property var model: parent.colModel
+
+        anchors.fill: parent
+
         FocusScope{
             anchors.fill: parent
             focus: isFocusOnContextButton && colDel.rowModel.index === currentIndex
@@ -132,19 +133,10 @@ Widgets.KeyNavigableTableView {
             Loader{
                 anchors.fill:parent
                 active: model.type !== "image"
-                sourceComponent: Text {
+                sourceComponent: Widgets.ListLabel {
+                    anchors.fill: parent
+                    anchors.rightMargin: VLCStyle.margin_xxxsmall // without this text is not initially visible
                     text: !rowModel ? "" : rowModel[model.criteria] || ""
-                    elide: Text.ElideRight
-                    font.pixelSize: VLCStyle.fontSize_normal
-                    color: (model.isPrimary)? VLCStyle.colors.text : VLCStyle.colors.textDisabled
-
-                    anchors {
-                        fill: parent
-                        leftMargin: VLCStyle.margin_xsmall
-                        rightMargin: VLCStyle.margin_xsmall
-                    }
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignLeft
                 }
             }
         }

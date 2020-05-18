@@ -34,7 +34,17 @@ NavigableFocusScope {
     signal rightClick(Item menuParent, var menuModel)
 
     property var sortModel: []
-    property Component colDelegate: Item { }
+    property Component colDelegate: Widgets.ListLabel {
+        property var rowModel: parent.rowModel
+        property var model: parent.colModel
+
+        anchors.fill: parent
+        text: !rowModel ? "" : (rowModel[model.criteria] || "")
+    }
+    property Component headerDelegate: Widgets.CaptionLabel {
+        text: model.text || ""
+    }
+
     property alias model: view.model
 
     property alias contentHeight: view.contentHeight
@@ -88,32 +98,26 @@ NavigableFocusScope {
                 height: childrenRect.height
 
                 Row {
-                    x: VLCStyle.margin_normal
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors {
+                        leftMargin: VLCStyle.margin_xxxsmall
+                        rightMargin: VLCStyle.margin_xxxsmall
+                        horizontalCenter: parent.horizontalCenter
+                    }
                     height: childrenRect.height + VLCStyle.margin_xxsmall
-                    spacing: VLCStyle.column_margin_width
+                    topPadding: VLCStyle.margin_xxsmall
+                    spacing: root.horizontalSpacing
 
                     Repeater {
                         model: sortModel
                         MouseArea {
-                            height: VLCStyle.fontHeight_normal
+                            height: childrenRect.height
                             width: modelData.width || 1
                             //Layout.alignment: Qt.AlignVCenter
 
-                            Text {
-                                text: modelData.text || ""
-                                elide: Text.ElideRight
-                                font {
-                                    pixelSize: VLCStyle.fontSize_normal
+                            Loader {
+                                property var model: modelData
 
-                                }
-                                color: VLCStyle.colors.buttonText
-                                horizontalAlignment: Text.AlignLeft
-                                anchors {
-                                    fill: parent
-                                    leftMargin: VLCStyle.margin_xsmall
-                                    rightMargin: VLCStyle.margin_xsmall
-                                }
+                                sourceComponent: model.headerDelegate || root.headerDelegate
                             }
 
                             Text {
@@ -211,7 +215,7 @@ NavigableFocusScope {
                                 property var colModel: modelData
 
                                 anchors.fill: parent
-                                sourceComponent: colDelegate
+                                sourceComponent: colModel.colDelegate || root.colDelegate
 
                             }
                         }
