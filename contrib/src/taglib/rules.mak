@@ -22,8 +22,6 @@ taglib: taglib-$(TAGLIB_VERSION).tar.gz .sum-taglib
 	$(MOVE)
 
 .taglib: taglib toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
-		-DBUILD_SHARED_LIBS:BOOL=OFF \
-		.
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) .
 	cd $< && $(MAKE) install
 	touch $@
