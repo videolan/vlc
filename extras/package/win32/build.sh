@@ -30,12 +30,13 @@ OPTIONS:
    -d            Create PDB files during the build
    -x            Add extra checks when compiling
    -u            Use the Universal C Runtime (instead of msvcrt)
+   -w            Restrict to Windows Store APIs
    -z            Build without GUI (libvlc only)
 EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:sb:dxuz" OPTION
+while getopts "hra:pcli:sb:dxuwz" OPTION
 do
      case $OPTION in
          h)
@@ -75,6 +76,9 @@ do
          ;;
          u)
              BUILD_UCRT="yes"
+         ;;
+         w)
+             WINSTORE="yes"
          ;;
          z)
              DISABLEGUI="yes"
@@ -155,7 +159,34 @@ cd ../../
 
 CONTRIB_PREFIX=$TRIPLET
 if [ ! -z "$BUILD_UCRT" ]; then
+    if [ ! -z "$WINSTORE" ]; then
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-disc --disable-srt --disable-sdl --disable-SDL_image --disable-caca"
+        # modplug uses GlobalAlloc/Free and lstrcpyA/wsprintfA/lstrcpynA
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-modplug"
+        # x265 uses too many forbidden APIs
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-x265"
+        # aribb25 uses ANSI strings in WIDE APIs
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-aribb25"
+        # gettext uses sys/socket.h improperly
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-gettext"
+        # fontconfig uses GetWindowsDirectory and SHGetFolderPath
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-fontconfig"
+        # asdcplib uses some fordbidden SetErrorModes, GetModuleFileName in fileio.cpp
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-asdcplib"
+        # projectM is openGL based
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-projectM"
+        # gpg-error doesn't know minwg32uwp
+        # CONTRIBFLAGS="$CONTRIBFLAGS --disable-gpg-error"
+        # x264 build system claims it needs MSVC to build for WinRT
+        CONTRIBFLAGS="$CONTRIBFLAGS --disable-x264"
+
+        # libdsm is not enabled by default
+        CONTRIBFLAGS="$CONTRIBFLAGS --enable-libdsm"
+
+        CONTRIB_PREFIX="${CONTRIB_PREFIX}uwp"
+    else
         CONTRIB_PREFIX="${CONTRIB_PREFIX}ucrt"
+    fi
 fi
 
 export USE_FFMPEG=1
@@ -173,7 +204,18 @@ if [ ! -z "$BUILD_UCRT" ]; then
     WIDL=${TRIPLET}-widl
     CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -D_UCRT"
 
+    if [ ! -z "$WINSTORE" ]; then
+        SHORTARCH="$SHORTARCH-uwp"
+        CPPFLAGS="$CPPFLAGS -DWINAPI_FAMILY=WINAPI_FAMILY_APP -D_UNICODE -DUNICODE"
+
+        # WinstoreCompat: hopefully can go away someday
+        LDFLAGS="$LDFLAGS -lwindowsapp -lwinstorecompat"
+        CFLAGS="$CFLAGS -Wl,-lwindowsapp,-lwinstorecompat"
+        CXXFLAGS="$CXXFLAGS -Wl,-lwindowsapp,-lwinstorecompat"
+        CPPFLAGS="$CPPFLAGS -DWINSTORECOMPAT"
+    else
         SHORTARCH="$SHORTARCH-ucrt"
+    fi
 
     LDFLAGS="$LDFLAGS -lucrtbase -lucrt"
     if [ ! "$COMPILING_WITH_CLANG" -gt 0 ]; then
@@ -181,6 +223,13 @@ if [ ! -z "$BUILD_UCRT" ]; then
         CFLAGS="$CFLAGS -mcrtdll=ucrtbase -mcrtdll=ucrt"
         CXXFLAGS="$CXXFLAGS -mcrtdll=ucrtbase -mcrtdll=ucrt"
         LDFLAGS="$LDFLAGS -mcrtdll=ucrtbase -mcrtdll=ucrt"
+
+        if [ ! -z "$WINSTORE" ]; then
+            # trick to provide these libraries before -ladvapi32 -lshell32 -luser32 -lkernel32
+            CFLAGS="$CFLAGS -mcrtdll=windowsapp -mcrtdll=winstorecompat"
+            CXXFLAGS="$CXXFLAGS -mcrtdll=windowsapp -mcrtdll=winstorecompat"
+            LDFLAGS="$LDFLAGS -mcrtdll=windowsapp -mcrtdll=winstorecompat"
+        fi
     else
         CFLAGS="$CFLAGS -Wl,-lucrtbase,-lucrt"
         CXXFLAGS="$CXXFLAGS -Wl,-lucrtbase,-lucrt"
@@ -208,6 +257,10 @@ if [ "$RELEASE" != "yes" ]; then
 fi
 if [ ! -z "$DISABLEGUI" ]; then
     CONTRIBFLAGS="$CONTRIBFLAGS --disable-qt --disable-qtsvg --disable-qtdeclarative --disable-qtgraphicaleffects --disable-qtquickcontrols2"
+fi
+if [ ! -z "$WINSTORE" ]; then
+    # we don't use a special toolchain to trigger the detection in contribs so force it manually
+    export HAVE_WINSTORE=1
 fi
 ${SCRIPT_PATH}/../../../contrib/bootstrap --host=$TRIPLET --prefix=../$CONTRIB_PREFIX $CONTRIBFLAGS
 
@@ -278,6 +331,18 @@ if [ ! -z "$DISABLEGUI" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --disable-vlc --disable-qt --disable-skins2"
 else
     CONFIGFLAGS="$CONFIGFLAGS --enable-qt --enable-skins2"
+fi
+if [ ! -z "$WINSTORE" ]; then
+    CONFIGFLAGS="$CONFIGFLAGS --enable-winstore-app"
+    # uses CreateFile to access files/drives outside of the app
+    CONFIGFLAGS="$CONFIGFLAGS --disable-vcd"
+    # OpenGL is not supported in UWP
+    CONFIGFLAGS="$CONFIGFLAGS --disable-gl"
+    # other modules that were disabled in the old UWP builds
+    CONFIGFLAGS="$CONFIGFLAGS --disable-crystalhd --disable-dxva2"
+
+else
+    CONFIGFLAGS="$CONFIGFLAGS --enable-dvdread --enable-caca"
 fi
 
 ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX $CONFIGFLAGS
