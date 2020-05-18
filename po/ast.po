@@ -5,6 +5,7 @@
 # Translators:
 # enolp <enolp@softastur.org>, 2015
 # Iñigo Varela <ivarela@softastur.org>, 2012,2014
+# Javi A <yonarede@gmail.com>, 2020
 # Ḷḷumex03 <tornes@opmbx.org>, 2014
 # tebanpb <esteban@softastur.org>, 2014
 # Xuacu Saturio <xuacusk8@gmail.com>, 2010
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2020-05-18 23:18+0200\n"
+"Last-Translator: Javi A <yonarede@gmail.com>, 2020\n"
 "Language-Team: Asturian (https://www.transifex.com/yaron/teams/16553/ast/)\n"
 "Language: ast\n"
 "MIME-Version: 1.0\n"
@@ -651,7 +652,7 @@ msgstr "Espectru"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "Vúmetru"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -673,7 +674,7 @@ msgstr "Monu"
 
 #: src/audio_output/output.c:425
 msgid "Original"
-msgstr ""
+msgstr "Orixinal"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -1064,11 +1065,11 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "Resolución de videu"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "Dimensiones del búfer"
 
 #: src/input/es_out.c:3183 src/input/es_out.c:3186 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1118,7 +1119,7 @@ msgstr ""
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "Orientación"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
@@ -1162,7 +1163,7 @@ msgstr ""
 
 #: src/input/es_out.c:3255
 msgid "Full"
-msgstr ""
+msgstr "Lleno"
 
 #: src/input/es_out.c:3262 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1229,7 +1230,7 @@ msgstr ""
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "Campu de visión"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
@@ -1646,7 +1647,7 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "Música"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
@@ -1658,19 +1659,19 @@ msgstr "Xuegu"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "Notificación"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
-msgstr ""
+msgstr "Animación"
 
 #: src/libvlc-module.c:143
 msgid "Production"
-msgstr ""
+msgstr "Producción"
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
-msgstr ""
+msgstr "Accesibilidá"
 
 #: src/libvlc-module.c:144
 msgid "Test"
@@ -2917,7 +2918,7 @@ msgstr ""
 
 #: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
-msgstr ""
+msgstr "Camuda'l tamañu de los sotítulos cuando ye dable"
 
 #: src/libvlc-module.c:713
 msgid "Enable sub-pictures"
@@ -3763,11 +3764,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1147
 msgid "Show hidden files"
-msgstr ""
+msgstr "Amuesa archivos ocultos"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
-msgstr ""
+msgstr "Inora los archivos qu'entamen con '.'"
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
@@ -3894,11 +3895,11 @@ msgstr "Inorar"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr ""
+msgstr "Control de volume"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr ""
+msgstr "Control d'allugamientu"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
@@ -3938,7 +3939,7 @@ msgstr "Escueyi'l tayo de tecláu pa camudar l'estáu de pantalla completa."
 
 #: src/libvlc-module.c:1228
 msgid "Exit fullscreen"
-msgstr ""
+msgstr "Sal de pantalla completa"
 
 #: src/libvlc-module.c:1229
 msgid "Select the hotkey to use to exit fullscreen state."
@@ -5310,6 +5311,7 @@ msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
 msgstr ""
+"La nueva versión foi descarga con éxitu. ¿Quies zarrar VLC y instalala agora?"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:200
 msgid "Install"
@@ -6193,7 +6195,7 @@ msgstr ""
 
 #: modules/access/bluray.c:866
 msgid "Blu-ray Disc is corrupted."
-msgstr ""
+msgstr "El discu Blu-ray ta toriáu."
 
 #: modules/access/bluray.c:868
 msgid "Missing AACS configuration file!"
@@ -6229,7 +6231,7 @@ msgstr ""
 
 #: modules/access/bluray.c:922
 msgid "Java required"
-msgstr ""
+msgstr "Ríquese Java"
 
 #: modules/access/bluray.c:923
 #, c-format
@@ -6240,7 +6242,7 @@ msgstr ""
 
 #: modules/access/bluray.c:924
 msgid "Java was not found on your system."
-msgstr ""
+msgstr "Nun s'alcuentra Java nel to sistema."
 
 #: modules/access/bluray.c:947
 msgid "Failed to start bluray playback. Please try without menu support."
@@ -6295,7 +6297,7 @@ msgstr "Puertu del Sirvidor CDDB a usar."
 
 #: modules/access/concat.c:303
 msgid "Inputs list"
-msgstr ""
+msgstr "Llista d'entraes"
 
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
@@ -6319,7 +6321,7 @@ msgstr "IIDC Digital Camera (FireWire) input"
 
 #: modules/access/dcp/dcp.cpp:43
 msgid "KDM file"
-msgstr ""
+msgstr "Archivu KDM"
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -7439,11 +7441,11 @@ msgstr "Afitar un nome d'usuariu y contraseña válidu pal dominiu %s."
 
 #: modules/access/http/access.c:288
 msgid "HTTPS input"
-msgstr ""
+msgstr "Entrada HTTPS"
 
 #: modules/access/http/access.c:289
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -8974,7 +8976,7 @@ msgstr ""
 
 #: modules/access/vnc.c:61
 msgid "Compression level"
-msgstr ""
+msgstr "Nivel de compresión"
 
 #: modules/access/vnc.c:62
 msgid "Transfer compression level from 0 (none) to 9 (max)"
@@ -8982,7 +8984,7 @@ msgstr ""
 
 #: modules/access/vnc.c:63
 msgid "Image quality"
-msgstr ""
+msgstr "Calidá de la imaxe"
 
 #: modules/access/vnc.c:64
 msgid "Image quality 1 to 9 (max)"
@@ -9886,7 +9888,7 @@ msgstr ""
 
 #: modules/audio_filter/gain.c:63
 msgid "Gain control filter"
-msgstr ""
+msgstr "Filtru de control d'entrada"
 
 #: modules/audio_filter/karaoke.c:33 modules/demux/xiph_metadata.h:51
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:260
@@ -10575,15 +10577,15 @@ msgstr "Codificador d'audio en brutu"
 
 #: modules/codec/audiotoolbox_midi.c:47 modules/codec/fluidsynth.c:47
 msgid "SoundFont file"
-msgstr ""
+msgstr "Archivu SoundFont"
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
 msgid "SoundFont file to use for software synthesis."
-msgstr ""
+msgstr "Archivu SoundFont pa la síntesis de software."
 
 #: modules/codec/audiotoolbox_midi.c:57
 msgid "AudioToolbox MIDI synthesizer"
-msgstr ""
+msgstr "Sintetizador MIDI AudioToolbox"
 
 #: modules/codec/audiotoolbox_midi.c:59
 msgid "AUMIDI"
@@ -11384,16 +11386,20 @@ msgid ""
 "This gain is applied to synthesis output. High values may cause saturation "
 "when many notes are played at a time."
 msgstr ""
+"Esta entrada aplícase a la salida de síntesis. Los valores altos puen causar "
+"saturación cuando se toquen muches notes al empar."
 
 #: modules/codec/fluidsynth.c:57
 msgid "Polyphony"
-msgstr ""
+msgstr "Polifonía"
 
 #: modules/codec/fluidsynth.c:59
 msgid ""
 "The polyphony defines how many voices can be played at a time. Larger values "
 "require more processing power."
 msgstr ""
+"La polifonía afita cuántes voces puen sonar al empar. Los valores más "
+"grandes riquen más capacidá de procesamientu."
 
 #: modules/codec/fluidsynth.c:62 modules/demux/mod.c:82
 msgid "Reverb"
@@ -11453,11 +11459,11 @@ msgstr ""
 
 #: modules/codec/jpeg.c:111
 msgid "JPEG image decoder"
-msgstr ""
+msgstr "Descodificador d'imaxe JPG"
 
 #: modules/codec/jpeg.c:120
 msgid "JPEG image encoder"
-msgstr ""
+msgstr "Codificador d'imaxe JPG"
 
 #: modules/codec/kate.c:191 modules/codec/subsusf.c:44
 msgid "Formatted Subtitles"
@@ -11978,7 +11984,7 @@ msgstr "Númberu de fotogrames referencia"
 
 #: modules/codec/qsv.c:148
 msgid "Number of parallel operations"
-msgstr ""
+msgstr "Númberu d'operaciones paraleles"
 
 #: modules/codec/qsv.c:149
 msgid ""
@@ -12886,15 +12892,15 @@ msgstr "Codificador de videu Theora"
 
 #: modules/codec/ttml/ttml.c:45
 msgid "TTML decoder"
-msgstr ""
+msgstr "Descodificador TTML"
 
 #: modules/codec/ttml/ttml.c:46
 msgid "TTML subtitles decoder"
-msgstr ""
+msgstr "Descodificador de sotítulos TTML"
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
-msgstr ""
+msgstr "TTML"
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
@@ -14862,6 +14868,10 @@ msgid ""
 "This step might take a long time on a large file.\n"
 "What do you want to do?"
 msgstr ""
+"Por mor de que l'archivu indexáu ta rotu o nun s'alcuentra, la busca nun "
+"funcionará correutamente. VLC nun va iguar el to archivu pero pue "
+"temporalmente resalvar esti problema creando un índiz na memoria. Esti pasu "
+"va vagate nun archivu grande. ¿Qué quies facer?"
 
 #: modules/demux/avi/avi.c:884
 msgid "Do not play"
