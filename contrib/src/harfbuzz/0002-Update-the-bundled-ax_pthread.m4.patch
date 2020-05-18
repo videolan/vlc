@@ -1,5 +1,20 @@
---- harfbuzz/m4/ax_pthread.m4.orig	2020-04-08 14:31:17.385627420 +0300
-+++ harfbuzz/m4/ax_pthread.m4	2020-04-08 14:31:42.361091349 +0300
+From dc5815a2cc756a29c01a85081e16e43131f18411 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Fri, 15 May 2020 09:16:42 +0200
+Subject: [PATCH 2/3] Update the bundled ax_pthread.m4
+
+This fixes building for Windows with clang, where the bundled
+version of ax_pthread.m4 assumes that Clang doesn't need the
+pthread option in LDFLAGS (assuming that a system that Clang
+supports doesn't need an external library for pthreads).
+---
+ m4/ax_pthread.m4 | 224 ++++++++++++++++++++++++++---------------------
+ 1 file changed, 123 insertions(+), 101 deletions(-)
+
+diff --git a/m4/ax_pthread.m4 b/m4/ax_pthread.m4
+index 5fbf9fe0..1598d077 100644
+--- a/m4/ax_pthread.m4
++++ b/m4/ax_pthread.m4
 @@ -55,6 +55,7 @@
  #
  #   Copyright (c) 2008 Steven G. Johnson <stevenj@alum.mit.edu>
@@ -17,7 +32,7 @@
  
  AU_ALIAS([ACX_PTHREAD], [AX_PTHREAD])
  AC_DEFUN([AX_PTHREAD], [
-@@ -123,10 +124,12 @@
+@@ -123,10 +124,12 @@ fi
  # (e.g. DEC) have both -lpthread and -lpthreads, where one of the
  # libraries is broken (non-POSIX).
  
@@ -34,7 +49,7 @@
  
  ax_pthread_flags="pthreads none -Kthread -pthread -pthreads -mthreads pthread --thread-safe -mt pthread-config"
  
-@@ -194,14 +197,47 @@
+@@ -194,14 +197,47 @@ case $host_os in
          # that too in a future libc.)  So we'll check first for the
          # standard Solaris way of linking pthreads (-mt -lpthread).
  
@@ -84,7 +99,7 @@
  
  # The presence of a feature test macro requesting re-entrant function
  # definitions is, on some systems, a strong hint that pthreads support is
-@@ -224,25 +260,86 @@
+@@ -224,25 +260,86 @@ AS_IF([test "x$ax_pthread_check_macro" = "x--"],
        [ax_pthread_check_cond=0],
        [ax_pthread_check_cond="!defined($ax_pthread_check_macro)"])
  
@@ -188,7 +203,7 @@
  
  # Clang needs special handling, because older versions handle the -pthread
  # option in a rather... idiosyncratic way
-@@ -261,11 +358,6 @@
+@@ -261,11 +358,6 @@ if test "x$ax_pthread_clang" = "xyes"; then
          # -pthread does define _REENTRANT, and while the Darwin headers
          # ignore this macro, third-party headers might not.)
  
@@ -200,7 +215,7 @@
          # However, older versions of Clang make a point of warning the user
          # that, in an invocation where only linking and no compilation is
          # taking place, the -pthread option has no effect ("argument unused
-@@ -320,78 +412,7 @@
+@@ -320,78 +412,7 @@ if test "x$ax_pthread_clang" = "xyes"; then
  
  fi # $ax_pthread_clang = yes
  
@@ -279,7 +294,7 @@
  
  # Various other checks:
  if test "x$ax_pthread_ok" = "xyes"; then
-@@ -438,7 +459,8 @@
+@@ -438,7 +459,8 @@ if test "x$ax_pthread_ok" = "xyes"; then
          AC_CACHE_CHECK([for PTHREAD_PRIO_INHERIT],
              [ax_cv_PTHREAD_PRIO_INHERIT],
              [AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <pthread.h>]],
@@ -289,3 +304,6 @@
                              [ax_cv_PTHREAD_PRIO_INHERIT=yes],
                              [ax_cv_PTHREAD_PRIO_INHERIT=no])
              ])
+-- 
+2.26.0.windows.1
+

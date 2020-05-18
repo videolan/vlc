@@ -14,8 +14,8 @@ $(TARBALLS)/harfbuzz-$(HARFBUZZ_VERSION).tar.xz:
 
 harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.xz .sum-harfbuzz
 	$(UNPACK)
-	$(APPLY) $(SRC)/harfbuzz/harfbuzz-aarch64.patch
-	$(APPLY) $(SRC)/harfbuzz/update-ax_pthread.m4.patch
+	$(APPLY) $(SRC)/harfbuzz/0001-fix-OSAtomic-calls-for-AArch64.patch
+	$(APPLY) $(SRC)/harfbuzz/0002-Update-the-bundled-ax_pthread.m4.patch
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
