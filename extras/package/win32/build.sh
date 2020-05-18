@@ -29,12 +29,13 @@ OPTIONS:
    -b <url>      Enable breakpad support and send crash reports to this URL
    -d            Create PDB files during the build
    -x            Add extra checks when compiling
+   -u            Use the Universal C Runtime (instead of msvcrt)
    -z            Build without GUI (libvlc only)
 EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:sb:dxz" OPTION
+while getopts "hra:pcli:sb:dxuz" OPTION
 do
      case $OPTION in
          h)
@@ -71,6 +72,9 @@ do
          ;;
          x)
              EXTRA_CHECKS="yes"
+         ;;
+         u)
+             BUILD_UCRT="yes"
          ;;
          z)
              DISABLEGUI="yes"
@@ -149,8 +153,13 @@ fi
 
 cd ../../
 
+CONTRIB_PREFIX=$TRIPLET
+if [ ! -z "$BUILD_UCRT" ]; then
+        CONTRIB_PREFIX="${CONTRIB_PREFIX}ucrt"
+fi
+
 export USE_FFMPEG=1
-export PATH="$PWD/contrib/$TRIPLET/bin":"$PATH"
+export PATH="$PWD/contrib/$CONTRIB_PREFIX/bin":"$PATH"
 
 if [ "$INTERACTIVE" = "yes" ]; then
 if [ "x$SHELL" != "x" ]; then
@@ -158,6 +167,30 @@ if [ "x$SHELL" != "x" ]; then
 else
     exec /bin/sh
 fi
+fi
+
+if [ ! -z "$BUILD_UCRT" ]; then
+    WIDL=${TRIPLET}-widl
+    CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -D_UCRT"
+
+        SHORTARCH="$SHORTARCH-ucrt"
+
+    LDFLAGS="$LDFLAGS -lucrtbase -lucrt"
+    if [ ! "$COMPILING_WITH_CLANG" -gt 0 ]; then
+        # tell gcc to replace msvcrt with ucrtbase+ucrt
+        CFLAGS="$CFLAGS -mcrtdll=ucrtbase -mcrtdll=ucrt"
+        CXXFLAGS="$CXXFLAGS -mcrtdll=ucrtbase -mcrtdll=ucrt"
+        LDFLAGS="$LDFLAGS -mcrtdll=ucrtbase -mcrtdll=ucrt"
+    else
+        CFLAGS="$CFLAGS -Wl,-lucrtbase,-lucrt"
+        CXXFLAGS="$CXXFLAGS -Wl,-lucrtbase,-lucrt"
+    fi
+    CFLAGS="$CPPFLAGS $CFLAGS"
+    CXXFLAGS="$CPPFLAGS $CXXFLAGS"
+
+    # the values are not passed to the makefiles/configures
+    export LDFLAGS
+    export CPPFLAGS
 fi
 
 info "Building contribs"
@@ -176,7 +209,7 @@ fi
 if [ ! -z "$DISABLEGUI" ]; then
     CONTRIBFLAGS="$CONTRIBFLAGS --disable-qt --disable-qtsvg --disable-qtdeclarative --disable-qtgraphicaleffects --disable-qtquickcontrols2"
 fi
-${SCRIPT_PATH}/../../../contrib/bootstrap --host=$TRIPLET $CONTRIBFLAGS
+${SCRIPT_PATH}/../../../contrib/bootstrap --host=$TRIPLET --prefix=../$CONTRIB_PREFIX $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
 if [ "$PREBUILT" != "yes" ]; then
@@ -247,7 +280,7 @@ else
     CONFIGFLAGS="$CONFIGFLAGS --enable-qt --enable-skins2"
 fi
 
-${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$TRIPLET $CONFIGFLAGS
+${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX $CONFIGFLAGS
 
 info "Compiling"
 make -j$JOBS
