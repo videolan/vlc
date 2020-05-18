@@ -190,8 +190,12 @@ CXXFLAGS := $(CXXFLAGS) $(EXTRA_CFLAGS) $(EXTRA_CXXFLAGS)
 LDFLAGS := $(LDFLAGS) -L$(PREFIX)/lib $(EXTRA_LDFLAGS)
 
 ifdef ENABLE_PDB
+ifdef HAVE_CLANG
+ifneq ($(findstring $(ARCH),i686 x86_64),)
 CFLAGS := $(CFLAGS) -gcodeview
 CXXFLAGS := $(CXXFLAGS) -gcodeview
+endif
+endif
 endif
 
 # Do not export those! Use HOSTVARS.
