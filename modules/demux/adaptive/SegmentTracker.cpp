@@ -416,7 +416,7 @@ void SegmentTracker::registerListener(SegmentTrackerListenerInterface *listener)
 bool SegmentTracker::bufferingAvailable() const
 {
     if(adaptationSet->getPlaylist()->isLive())
-        return bufferingLogic->getMinBuffering(adaptationSet->getPlaylist()) <= getMinAheadTime();
+        return getMinAheadTime() > 0;
     return true;
 }
 
