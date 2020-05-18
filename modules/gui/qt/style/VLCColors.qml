@@ -48,6 +48,8 @@ Item {
     property color textInactive: systemPalette.textInactive;
     property color textDisabled: systemPalette.textDisabled;
 
+    property color caption: setColorAlpha(text, .4)
+
     property color bg: systemPalette.base;
     property color bgInactive: systemPalette.baseInactive;
 

@@ -209,6 +209,7 @@
         <file alias="NavigableRow.qml">widgets/qml/NavigableRow.qml</file>
         <file alias="TabButtonExt.qml">widgets/qml/TabButtonExt.qml</file>
         <file alias="ScrollingText.qml">widgets/qml/ScrollingText.qml</file>
+        <file alias="CaptionLabel.qml">widgets/qml/CaptionLabel.qml</file>
     </qresource>
     <qresource prefix="/util">
         <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>
