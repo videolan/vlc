@@ -1,0 +1,111 @@
+From 57f80070ccd8461a224cc84b255844539ab72a8d Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Sat, 30 May 2020 11:04:02 +0200
+Subject: [PATCH] Don't assume that UNICODE is not defined.
+
+Many Windows API functions are defined differently (redirecting to a
+function with suffix 'W') if the application defines the macro UNICODE
+than by default (redirecting to a function with suffix 'A').
+
+* gnutls/gl/clean-temp.c (OSVERSIONINFO, GetVersionEx): Redirect to the
+variant with suffix 'A'.
+* gnutls/gl/dirent-private.h (WIN32_FIND_DATA): Likewise.
+* gnutls/gl/gc-gnulib.c (CryptAcquireContext): Likewise.
+* gnutls/gl/getaddrinfo.c (GetModuleHandle): Likewise.
+* gnutls/gl/getlogin.c (GetUserName): Likewise.
+* gnutls/gl/getlogin_r.c (GetUserName): Likewise.
+* gnutls/gl/gettimeofday.c (LoadLibrary): Likewise.
+* gnutls/gl/isatty.c (LoadLibrary, QueryFullProcessImageName): Likewise.
+* gnutls/gl/link.c (GetModuleHandle, CreateHardLink): Likewise.
+* gnutls/gl/localename.c (GetLocaleInfo, EnumSystemLocales): Likewise.
+* gnutls/gl/mountlist.c (GetDriveType): Likewise.
+* gnutls/gl/nonblocking.c (GetNamedPipeHandleState): Likewise.
+* gnutls/gl/opendir.c (WIN32_FIND_DATA, GetFullPathName, FindFirstFile):
+Likewise.
+* gnutls/gl/physmem.c (GetModuleHandle): Likewise.
+* gnutls/gl/poll.c (GetModuleHandle, PeekConsoleInput, CreateEvent,
+PeekMessage, DispatchMessage): Likewise.
+* gnutls/gl/progreloc.c (GetModuleFileName): Likewise.
+* gnutls/gl/putenv.c (SetEnvironmentVariable): Likewise.
+* gnutls/gl/read.c (GetNamedPipeHandleState): Likewise.
+* gnutls/gl/readdir.c (FindNextFile): Likewise.
+* gnutls/gl/relocatable.c (GetModuleFileName): Likewise.
+* gnutls/gl/rename.c (MoveFileEx): Likewise.
+* gnutls/gl/rewinddir.c (FindFirstFile): Likewise.
+* gnutls/gl/select.c (GetModuleHandle, PeekConsoleInput, CreateEvent,
+PeekMessage, DispatchMessage): Likewise.
+* gnutls/gl/sethostname.c (GetComputerNameEx, SetComputerNameEx): Likewise.
+* gnutls/gl/socket.c (WSASocket): Likewise.
+* gnutls/gl/stat-w32.c (LoadLibrary, GetFinalPathNameByHandle): Likewise.
+* gnutls/gl/stat.c (WIN32_FIND_DATA, CreateFile, FindFirstFile): Likewise.
+* gnutls/gl/stdio-read.c (GetNamedPipeHandleState): Likewise.
+* gnutls/gl/stdio-write.c (GetNamedPipeHandleState): Likewise.
+* gnutls/gl/tmpdir.c (GetTempPath): Likewise.
+* gnutls/gl/tmpfile.c (OSVERSIONINFO, GetVersionEx, GetTempPath): Likewise.
+* gnutls/gl/uname.c (OSVERSIONINFO, GetVersionEx): Likewise.
+* gnutls/gl/utime.c (CreateFile, GetFileAttributes): Likewise.
+* gnutls/gl/windows-cond.c (CreateEvent): Likewise.
+* gnutls/gl/windows-rwlock.c (CreateEvent): Likewise.
+* gnutls/gl/windows-timedmutex.c (CreateEvent): Likewise.
+* gnutls/gl/windows-timedrecmutex.c (CreateEvent): Likewise.
+* gnutls/gl/windows-timedrwlock.c (CreateEvent): Likewise.
+* gnutls/gl/write.c (GetNamedPipeHandleState): Likewise.
+---
+ gnutls/gl/gettimeofday.c          |  4 +++
+ gnutls/gl/stat-w32.c              |  6 +++++
+ gnutls/gl/stat.c                  |  7 ++++++
+ 40 files changed, 279 insertions(+), 27 deletions(-)
+
+diff --git gnutls/gl/gettimeofday.c gnutls/gl/gettimeofday.c
+index 93914ba92..305ab984e 100644
+--- gnutls/gl/gettimeofday.c
++++ gnutls/gl/gettimeofday.c
+@@ -33,6 +33,10 @@
+
+ #ifdef WINDOWS_NATIVE
+
++/* Don't assume that UNICODE is not defined.  */
++# undef LoadLibrary
++# define LoadLibrary LoadLibraryA
++
+ # if !(_WIN32_WINNT >= _WIN32_WINNT_WIN8)
+
+ /* Avoid warnings from gcc -Wcast-function-type.  */
+diff --git gnutls/gl/stat-w32.c gnutls/gl/stat-w32.c
+index cca12dd9c..19bdfaa37 100644
+--- gnutls/gl/stat-w32.c
++++ gnutls/gl/stat-w32.c
+@@ -40,6 +40,12 @@
+ #include "pathmax.h"
+ #include "verify.h"
+
++/* Don't assume that UNICODE is not defined.  */
++#undef LoadLibrary
++#define LoadLibrary LoadLibraryA
++#undef GetFinalPathNameByHandle
++#define GetFinalPathNameByHandle GetFinalPathNameByHandleA
++
+ #if !(_WIN32_WINNT >= _WIN32_WINNT_VISTA)
+
+ /* Avoid warnings from gcc -Wcast-function-type.  */
+diff --git gnutls/gl/stat.c gnutls/gl/stat.c
+index e074e6a0a..9d3965d3c 100644
+--- gnutls/gl/stat.c
++++ gnutls/gl/stat.c
+@@ -65,6 +65,13 @@ orig_stat (const char *filename, struct stat *buf)
+ # define WIN32_LEAN_AND_MEAN
+ # include <windows.h>
+ # include "stat-w32.h"
++/* Don't assume that UNICODE is not defined.  */
++# undef WIN32_FIND_DATA
++# define WIN32_FIND_DATA WIN32_FIND_DATAA
++# undef CreateFile
++# define CreateFile CreateFileA
++# undef FindFirstFile
++# define FindFirstFile FindFirstFileA
+ #endif
+
+ #ifdef WINDOWS_NATIVE
+--
+2.26.0.windows.1
+
