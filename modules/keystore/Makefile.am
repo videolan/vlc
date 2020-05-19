@@ -30,10 +30,6 @@ libkeychain_plugin_la_SOURCES = keystore/keychain.m keystore/list_util.c keystor
 libkeychain_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libkeychain_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(keystoredir)' -Wl,-framework,Foundation -Wl,-framework,Security
 
-if HAVE_OSX
-libkeychain_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
-endif
-
 if HAVE_DARWIN
 keystore_LTLIBRARIES += libkeychain_plugin.la
 endif

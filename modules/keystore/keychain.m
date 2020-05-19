@@ -32,12 +32,7 @@
 
 #include <TargetConditionals.h>
 
-#if TARGET_OS_IPHONE
-  #import <Foundation/Foundation.h>
-#else
-  #import <Cocoa/Cocoa.h>
-#endif
-
+#import <Foundation/Foundation.h>
 #import <Security/Security.h>
 
 // Marker to recognize changed format in vlc 4: secret does not have \0 cut off anymore.
