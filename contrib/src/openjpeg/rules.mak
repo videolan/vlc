@@ -22,6 +22,7 @@ endif
 	$(APPLY) $(SRC)/openjpeg/install.patch
 	$(APPLY) $(SRC)/openjpeg/pic.patch
 	$(APPLY) $(SRC)/openjpeg/openjp2_pthread.patch
+	$(APPLY) $(SRC)/openjpeg/emscripten.patch
 	$(call pkg_static,"./src/lib/openjp2/libopenjp2.pc.cmake.in")
 	$(MOVE)
 
