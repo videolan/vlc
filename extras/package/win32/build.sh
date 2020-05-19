@@ -192,7 +192,7 @@ if [ -z "$PKG_CONFIG" ]; then
         fi
     else
         # $TRIPLET-pkg-config WORKs
-        export PKG_CONFIG="pkg-config"
+        export PKG_CONFIG="$TRIPLET-pkg-config"
     fi
 fi
 
