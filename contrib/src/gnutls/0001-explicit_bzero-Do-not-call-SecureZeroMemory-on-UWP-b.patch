@@ -1,0 +1,43 @@
+From 3c950e27a8d20603f100bf21d402f74355a495c1 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 8 Jun 2020 16:07:59 +0200
+Subject: [PATCH] explicit_bzero: Do not call SecureZeroMemory on UWP builds
+
+The call is forbidden:
+https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/aa366877(v=vs.85)
+
+It's considered a legacy API and is implemented as an always inline function.
+
+There is no good replacement API that is available in UWP.
+
+Signed-off-by: Steve Lhomme <robux4@ycbcr.xyz>
+---
+ gnutls/gl/explicit_bzero.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git gnutls/gl/explicit_bzero.c gnutls/gl/explicit_bzero.c
+index b1df418e5..3b8cc4ea4 100644
+--- gnutls/gl/explicit_bzero.c
++++ gnutls/gl/explicit_bzero.c
+@@ -35,6 +35,9 @@
+ #if defined _WIN32 && !defined __CYGWIN__
+ # define  WIN32_LEAN_AND_MEAN
+ # include <windows.h>
++# if !defined WINAPI_FAMILY || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
++#  define USE_SECURE_ZERO_MEMORY
++# endif
+ #endif
+ 
+ #if _LIBC
+@@ -48,7 +51,7 @@
+ void
+ explicit_bzero (void *s, size_t len)
+ {
+-#if defined _WIN32 && !defined __CYGWIN__
++#if defined USE_SECURE_ZERO_MEMORY
+   (void) SecureZeroMemory (s, len);
+ #elif HAVE_EXPLICIT_MEMSET
+   explicit_memset (s, '\0', len);
+-- 
+2.26.0.windows.1
+
