@@ -3,7 +3,6 @@
 OPTIONS="
       --enable-update-check
       --enable-lua
-      --enable-faad
       --enable-flac
       --enable-theora
       --enable-avcodec --enable-merge-ffmpeg
