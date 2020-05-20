@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-05-15 10:45+0200\n"
+"PO-Revision-Date: 2020-05-20 10:37+0200\n"
 "Last-Translator: picodotdev <pico.dev@gmail.com>, 2020\n"
 "Language-Team: Spanish (https://www.transifex.com/yaron/teams/16553/es/)\n"
 "Language: es\n"
@@ -16908,7 +16908,7 @@ msgstr "Buscar hacia atrás"
 #: modules/gui/macosx/VLCControlsBarCommon.m:185
 #: modules/gui/macosx/VLCFSPanelController.m:119
 msgid "Forward"
-msgstr "Avance"
+msgstr "Avanzar"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:89
 #: modules/gui/macosx/VLCControlsBarCommon.m:186
