@@ -223,7 +223,7 @@ if HAVE_DCOMP
 libqt_plugin_la_SOURCES += \
 	gui/qt/maininterface/compositor_dcomp.cpp \
 	gui/qt/maininterface/compositor_dcomp.hpp \
-	gui/qt/maininterface/compositor_error.hpp \
+	gui/qt/maininterface/compositor_dcomp_error.hpp \
 	gui/qt/maininterface/compositor_dcomp_uisurface.cpp \
 	gui/qt/maininterface/compositor_dcomp_uisurface.hpp
 endif
