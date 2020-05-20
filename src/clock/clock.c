@@ -132,12 +132,12 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
         if (main_clock->offset != VLC_TICK_INVALID
          && ts != main_clock->last.stream)
         {
-            /* We have a reference so we can update coeff */
-            double instant_coeff = (system_now - main_clock->last.system)
-                                 / (double)(ts - main_clock->last.stream);
             if (rate == main_clock->rate)
             {
-                instant_coeff *= rate;
+                /* We have a reference so we can update coeff */
+                double instant_coeff = (system_now - main_clock->last.system)
+                                     / (double)(ts - main_clock->last.stream)
+                                     * rate;
                 AvgUpdate(&main_clock->coeff_avg, instant_coeff);
                 main_clock->coeff = AvgGet(&main_clock->coeff_avg);
             }
