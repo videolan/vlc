@@ -229,10 +229,10 @@ CompositorDCompositionUISurface::~CompositorDCompositionUISurface()
         delete m_uiOffscreenSurface;
     if (m_context)
         delete m_context;
-    if (m_qmlEngine)
-        delete m_qmlEngine;
     if (m_rootItem)
         delete m_rootItem;
+    if (m_qmlEngine)
+        delete m_qmlEngine;
     releaseSharedTexture();
 }
 

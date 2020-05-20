@@ -104,19 +104,19 @@ bool MainUI::setup(QQmlEngine* engine)
 
     QQmlContext *rootCtx = engine->rootContext();
 
-    rootCtx->setContextProperty( "history", new NavigationHistory(engine) );
+    rootCtx->setContextProperty( "history", new NavigationHistory(this) );
     rootCtx->setContextProperty( "player", m_intf->p_sys->p_mainPlayerController );
-    rootCtx->setContextProperty( "i18n", new I18n(engine) );
-    rootCtx->setContextProperty( "mainctx", new QmlMainContext(m_intf, m_mainInterface, engine));
+    rootCtx->setContextProperty( "i18n", new I18n(this) );
+    rootCtx->setContextProperty( "mainctx", new QmlMainContext(m_intf, m_mainInterface, this));
     rootCtx->setContextProperty( "mainInterface", m_mainInterface);
     rootCtx->setContextProperty( "topWindow", m_mainInterface->windowHandle());
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
-    rootCtx->setContextProperty( "recentsMedias",  new VLCRecentMediaModel( m_intf, engine ));
-    rootCtx->setContextProperty( "settings",  new Settings( m_intf, engine ));
-    rootCtx->setContextProperty( "systemPalette", new SystemPalette(engine));
+    rootCtx->setContextProperty( "recentsMedias",  new VLCRecentMediaModel( m_intf, this ));
+    rootCtx->setContextProperty( "settings",  new Settings( m_intf, this ));
+    rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));
 
     if (m_hasMedialibrary)
-        rootCtx->setContextProperty( "medialib", new MediaLib(m_intf, engine) );
+        rootCtx->setContextProperty( "medialib", new MediaLib(m_intf, this) );
     else
         rootCtx->setContextProperty( "medialib", nullptr );
 
