@@ -504,5 +504,6 @@ void config_ResetAll(void)
             }
         }
     }
+    config_dirty = true;
     vlc_rwlock_unlock (&config_lock);
 }
