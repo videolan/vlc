@@ -136,10 +136,10 @@ int DirRead (stream_t *access, input_item_node_t *node)
         if (fstatat(dirfd(sys->dir), entry, &st, 0))
             continue;
 #else
-        char path[PATH_MAX];
+        char *path;
 
-        if (snprintf(path, PATH_MAX, "%s"DIR_SEP"%s", access->psz_filepath,
-                     entry) >= PATH_MAX || vlc_stat(path, &st))
+        if (asprintf(&path, "%s"DIR_SEP"%s", access->psz_filepath, entry) == -1
+         || (type = vlc_stat(path, &st), free(path), type))
             continue;
 #endif
         switch (st.st_mode & S_IFMT)
