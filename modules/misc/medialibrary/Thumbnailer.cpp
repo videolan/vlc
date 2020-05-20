@@ -30,6 +30,8 @@
 #include <vlc_url.h>
 #include <vlc_cxx_helpers.hpp>
 
+#include <stdexcept>
+
 Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
     : m_ml( ml )
     , m_currentContext( nullptr )
