@@ -145,7 +145,7 @@ private:
     //Shared texture D3D side
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_d3dInterimTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_textureShaderInput;
-    HANDLE m_sharedTextureHandled;
+    HANDLE m_sharedTextureHandled = nullptr;
 
     //Shared texture D3D side
     Microsoft::WRL::ComPtr<ID3D11Device> m_qtd3dDevice;

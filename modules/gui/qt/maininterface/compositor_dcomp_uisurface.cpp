@@ -409,9 +409,13 @@ void CompositorDCompositionUISurface::resizeSwapchain(int width, int height)
 void CompositorDCompositionUISurface::releaseSharedTexture()
 {
     if (m_eglInterimTextureQt)
+    {
         eglDestroySurface(m_eglDisplay, m_eglInterimTextureQt);
+        m_eglInterimTextureQt = 0;
+    }
     if (m_sharedTextureHandled) {
         CloseHandle(m_sharedTextureHandled);
+        m_sharedTextureHandled = nullptr;
     }
     m_d3dInterimTexture.Reset();
     m_textureShaderInput.Reset();
