@@ -26,7 +26,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-05-07 04:17+0200\n"
+"PO-Revision-Date: 2020-05-21 05:17+0200\n"
 "Last-Translator: Kjell Cato Heskjestad <cato@heskjestad.xyz>, 2020\n"
 "Language-Team: Norwegian Bokmål (Norway) (https://www.transifex.com/yaron/"
 "teams/16553/nb_NO/)\n"
@@ -2789,7 +2789,7 @@ msgstr "Hurtigspoling"
 
 #: src/libvlc-module.c:648
 msgid "Favor speed over precision while seeking"
-msgstr ""
+msgstr "Foretrekk fart fremfor nøyaktighet ved spoling"
 
 #: src/libvlc-module.c:650
 msgid "Playback speed"
