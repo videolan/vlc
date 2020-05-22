@@ -560,7 +560,7 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
 
             fakeEsOut()->resetTimestamps();
 
-            mtime_t seekMediaTime = segmentTracker->getPlaybackTime();
+            mtime_t seekMediaTime = segmentTracker->getPlaybackTime(true);
             fakeEsOut()->setExpectedTimestamp(seekMediaTime);
             if( !restartDemux() )
             {
