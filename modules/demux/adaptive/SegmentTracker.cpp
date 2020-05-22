@@ -354,7 +354,7 @@ void SegmentTracker::setPositionByNumber(uint64_t segnumber, bool restarted)
     curNumber = next = segnumber;
 }
 
-vlc_tick_t SegmentTracker::getPlaybackTime() const
+vlc_tick_t SegmentTracker::getPlaybackTime(bool b_next) const
 {
     vlc_tick_t time, duration;
 
@@ -363,7 +363,7 @@ vlc_tick_t SegmentTracker::getPlaybackTime() const
         rep = logic->getNextRepresentation(adaptationSet, NULL);
 
     if(rep &&
-       rep->getPlaybackTimeDurationBySegmentNumber(next, &time, &duration))
+       rep->getPlaybackTimeDurationBySegmentNumber(b_next ? next : curNumber, &time, &duration))
     {
         return time;
     }

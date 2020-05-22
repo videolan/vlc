@@ -558,7 +558,7 @@ bool AbstractStream::setPosition(vlc_tick_t time, bool tryonly)
 
             fakeEsOut()->resetTimestamps();
 
-            vlc_tick_t seekMediaTime = segmentTracker->getPlaybackTime();
+            vlc_tick_t seekMediaTime = segmentTracker->getPlaybackTime(true);
             fakeEsOut()->setExpectedTimestamp(seekMediaTime);
             if( !restartDemux() )
             {
