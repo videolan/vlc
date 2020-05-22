@@ -375,6 +375,9 @@ bool SegmentInformation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     SegmentList *segList;
     MediaSegmentTemplate *mediaTemplate;
 
+    if(number == std::numeric_limits<uint64_t>::max())
+        return false;
+
     if( (mediaTemplate = inheritSegmentTemplate()) )
     {
         const Timescale timescale = mediaTemplate->inheritTimescale();
