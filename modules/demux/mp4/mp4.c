@@ -1659,7 +1659,6 @@ static int FragSeekToTime( demux_t *p_demux, mtime_t i_nztime, bool b_accurate )
     uint32_t i_segment_type = ATOM_moof;
     stime_t  i_segment_time = INT64_MAX;
     mtime_t i_sync_time = i_nztime;
-    bool b_iframesync = false;
 
     const uint64_t i_duration = __MAX(p_sys->i_duration, p_sys->i_cumulated_duration);
     if ( !p_sys->i_timescale || !i_duration || !p_sys->b_seekable )
@@ -1694,7 +1693,6 @@ static int FragSeekToTime( demux_t *p_demux, mtime_t i_nztime, bool b_accurate )
         {
             /* Does only provide segment position and a sync sample time */
             msg_Dbg( p_demux, "seeking to sync point %" PRId64, i_sync_time );
-            b_iframesync = true;
         }
         else if( !p_sys->b_fragments_probed )
         {
@@ -1748,7 +1746,7 @@ static int FragSeekToTime( demux_t *p_demux, mtime_t i_nztime, bool b_accurate )
             p_sys->i_nztime = i_sync_time;
             p_sys->i_pcr  = VLC_TS_INVALID;
         }
-        else if( b_iframesync )
+        else
         {
             stime_t i_tst = MP4_rescale( i_sync_time, CLOCK_FREQ, p_sys->track[i].i_timescale );
             FragTrunSeekToTime( &p_sys->track[i], i_tst );
@@ -1758,7 +1756,7 @@ static int FragSeekToTime( demux_t *p_demux, mtime_t i_nztime, bool b_accurate )
 
     MP4ASF_ResetFrames( p_sys );
     /* And set next display time in that trun/fragment */
-    if( b_iframesync && b_accurate )
+    if( b_accurate )
         es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + i_nztime );
     return VLC_SUCCESS;
 }
