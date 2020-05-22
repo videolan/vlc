@@ -155,7 +155,13 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
         vlc_sem_post(&p_sys->flush_sem);
     }
 
-    if (p_sys->b_paused || unlikely(p_sys->i_first_render_host_time == 0))
+    if (p_sys->b_paused)
+    {
+        p_sys->i_render_host_time = i_host_time;
+        goto drop;
+    }
+
+    if (unlikely(p_sys->i_first_render_host_time == 0))
         goto drop;
 
     /* Start deferred: write silence (zeros) until we reach the first render
