@@ -225,12 +225,10 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
     struct pl_render_target target;
     pl_render_target_from_swapchain(&target, &frame);
-    target.dst_rect = (struct pl_rect2d) {
-        .x0 = sys->place.x,
-        .y0 = sys->place.y,
-        .x1 = sys->place.x + sys->place.width,
-        .y1 = sys->place.y + sys->place.height,
-    };
+    target.dst_rect.x0 = sys->place.x;
+    target.dst_rect.y0 = sys->place.y;
+    target.dst_rect.x1 = sys->place.x + sys->place.width;
+    target.dst_rect.y1 = sys->place.y + sys->place.height;
 
     // Override the target colorimetry only if the user requests it
     if (sys->target.primaries)
