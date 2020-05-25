@@ -99,3 +99,8 @@ mtime_t BasePeriod::getPeriodStart() const
 {
     return startTime.Get();
 }
+
+mtime_t BasePeriod::getPeriodDuration() const
+{
+    return duration.Get();
+}

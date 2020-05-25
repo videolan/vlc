@@ -52,6 +52,7 @@ namespace adaptive
                 virtual ~SegmentInformation();
 
                 virtual mtime_t getPeriodStart() const;
+                virtual mtime_t getPeriodDuration() const;
                 virtual AbstractPlaylist *getPlaylist() const;
 
                 class SplitPoint
