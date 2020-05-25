@@ -654,6 +654,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/ExpandGridView.qml \
 	gui/qt/widgets/qml/FocusBackground.qml \
 	gui/qt/widgets/qml/GridItem.qml \
+	gui/qt/widgets/qml/IconLabel.qml \
 	gui/qt/widgets/qml/IconToolButton.qml \
 	gui/qt/widgets/qml/ImageToolButton.qml \
 	gui/qt/widgets/qml/KeyNavigableGridView.qml \
