@@ -1,11 +1,15 @@
 # mpg123
-MPG123_VERSION := 1.25.10
+MPG123_VERSION := 1.26.0
 MPG123_URL := $(SF)/mpg123/mpg123/$(MPG123_VERSION)/mpg123-$(MPG123_VERSION).tar.bz2
 
 PKGS += mpg123
 ifeq ($(call need_pkg,"libmpg123"),)
 PKGS_FOUND += mpg123
 endif
+
+MPG123_CFLAGS := $(CFLAGS)
+# Same forced value as in VLC
+MPG123_CFLAGS += -D_FILE_OFFSET_BITS=64
 
 MPG123CONF = $(HOSTCONF)
 MPG123CONF += --with-default-audio=dummy --enable-buffer=no --enable-modules=no --disable-network
@@ -37,21 +41,19 @@ $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
 
 mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(UNPACK)
-	$(APPLY) $(SRC)/mpg123/no-programs.patch
-	$(APPLY) $(SRC)/mpg123/mpg123-libm.patch
+	$(APPLY) $(SRC)/mpg123/0001-configure-detect-WINDOWS_UWP-for-mingw-as-well.patch
+	$(APPLY) $(SRC)/mpg123/0002-configure-don-t-error-on-GetThreadErrorMode-if-we-re.patch
 ifdef HAVE_ANDROID
-	$(APPLY) $(SRC)/mpg123/mpg123_android_off_t.patch
+	$(APPLY) $(SRC)/mpg123/0003-fix-lfs_alias_t-type-for-Android.patch
 endif
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/mpg123/mpg123-win32.patch
-endif
-ifdef HAVE_WINSTORE
-	$(APPLY) $(SRC)/mpg123/winstore.patch
-endif
+	# remove generated file from the source package
+	cd $(UNPACK_DIR) && rm -rf src/libsyn123/syn123.h
+	$(APPLY) $(SRC)/mpg123/no-programs.patch
+	$(call pkg_static,"libmpg123.pc.in")
 	$(MOVE)
 
 .mpg123: mpg123
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(MPG123CONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(MPG123_CFLAGS)" ./configure $(MPG123CONF)
 	cd $< && $(MAKE) install
 	touch $@
