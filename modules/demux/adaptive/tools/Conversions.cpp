@@ -35,10 +35,10 @@
 
   Exemple input string: "PT0H9M56.46S"
  */
-static time_t str_duration( const char *psz_duration )
+static vlc_tick_t str_duration( const char *psz_duration )
 {
     bool        timeDesignatorReached = false;
-    time_t      res = 0;
+    vlc_tick_t  res = 0;
     char*       end_ptr;
 
     if ( psz_duration == NULL )
@@ -79,7 +79,7 @@ static time_t str_duration( const char *psz_duration )
             default:
                 break ;
         }
-        res += (time_t)(mul * number);
+        res += vlc_tick_from_sec(mul * number);
         if ( *psz_duration )
             psz_duration++;
     } while ( *psz_duration );
@@ -88,7 +88,7 @@ static time_t str_duration( const char *psz_duration )
 
 IsoTime::IsoTime(const std::string &str)
 {
-    time = vlc_tick_from_sec(str_duration(str.c_str()));
+    time = str_duration(str.c_str());
 }
 
 IsoTime::operator vlc_tick_t () const
