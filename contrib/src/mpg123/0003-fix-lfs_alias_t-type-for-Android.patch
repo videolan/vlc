@@ -1,0 +1,51 @@
+From 29604faf999056eb1c5e8e934ef9ceee472c78de Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 25 May 2020 12:46:56 +0200
+Subject: [PATCH 3/3] fix lfs_alias_t type for Android
+
+---
+ configure.ac                   | 5 +++--
+ ports/cmake/src/CMakeLists.txt | 4 ++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c494221..f22047e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1158,6 +1158,7 @@ AC_CHECK_TYPE(uint16_t, unsigned short)
+ AC_CHECK_SIZEOF(size_t,4)
+ AC_CHECK_SIZEOF(ssize_t,4)
+ AC_CHECK_SIZEOF(off_t,4)
++AC_CHECK_SIZEOF(off64_t,8)
+ AC_CHECK_SIZEOF(int32_t)
+ AC_CHECK_SIZEOF(long,4)
+ 
+@@ -1168,8 +1169,8 @@ if test "x$largefile_sensitive" = xyes; then
+   lfs_alias_type=long
+   lfs_alias_size=$ac_cv_sizeof_long
+ else
+-  lfs_alias_type=off_t
+-  lfs_alias_size=$ac_cv_sizeof_off_t
++  lfs_alias_type=off64_t
++  lfs_alias_size=$ac_cv_sizeof_off64_t
+ fi
+ 
+ if test "x$lfs_alias_size" = "x"; then 
+diff --git a/ports/cmake/src/CMakeLists.txt b/ports/cmake/src/CMakeLists.txt
+index 7ea2282..4b7b931 100644
+--- a/ports/cmake/src/CMakeLists.txt
++++ b/ports/cmake/src/CMakeLists.txt
+@@ -109,6 +109,10 @@ check_type_size(off_t SIZEOF_OFF_T)
+ if(LFS_SENSITIVE)
+     set(LFS_ALIAS_TYPE long)
+     math(EXPR LFS_ALIAS_BITS "${SIZEOF_LONG} * 8")
++elseif(CMAKE_ANDROID_ARCH_ABI)
++    check_type_size(off64_t SIZEOF_OFF64_T)
++    set(LFS_ALIAS_TYPE off64_t)
++    math(EXPR LFS_ALIAS_BITS "${SIZEOF_OFF64_T} * 8")
+ else()
+     set(LFS_ALIAS_TYPE off_t)
+     math(EXPR LFS_ALIAS_BITS "${SIZEOF_OFF_T} * 8")
+-- 
+2.26.0.windows.1
+

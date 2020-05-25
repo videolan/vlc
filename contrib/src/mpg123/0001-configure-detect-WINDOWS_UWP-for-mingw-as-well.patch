@@ -1,0 +1,64 @@
+From 099787a99e7214f068aa61d63befaced516ce254 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 25 May 2020 10:43:34 +0200
+Subject: [PATCH 1/3] configure: detect WINDOWS_UWP for mingw as well
+
+It is supported as well as with MSVC.
+
+We need to include winapifamily.h to detect UWP builds.
+The official way is to use the WINAPI_FAMILY_PARTITION macro which is compatible between MSVC and mingw.
+
+In UWP build we should use UNICODE API.
+---
+ configure.ac | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 4dfe617..917d251 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -162,6 +162,23 @@ AC_CHECK_HEADERS([windows.h])
+ case "$host" in
+ 	*-*-mingw*)
+ 		win32=yes
++		AC_MSG_CHECKING([if this is a UWP build])
++			AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
++			  [[#include <winapifamily.h>
++			   #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++			   # error Win32 Desktop build
++			   #endif
++			  ]],[[;]])
++			],[
++				uwp_build=yes
++				AC_MSG_RESULT([yes])
++			],[
++				uwp_build=no
++				AC_MSG_RESULT([no])
++			])
++		if test x"$uwp_build" = xyes; then
++		  AC_DEFINE( [WINDOWS_UWP], 1, [Windows UWP build] )
++		fi
+ 	;;
+ 	*)
+ 		win32=no
+@@ -2284,6 +2301,9 @@ dnl We do not support non-unicode Windows.
+ if test "x$win32_specific_codes" = xenabled; then
+ #### Check for Wide functions
+   AC_CHECK_FUNC([_wopen], [win32_unicode=enabled],[win32_unicode=disabled])
++  if test "x$uwp_build" = xyes; then
++    AC_DEFINE([WANT_WIN32_UNICODE], [1], [ Define to use Unicode for Windows ])
++  else
+   AC_MSG_CHECKING([if we want Unicode File Open for Win32])
+   if test "x$win32_unicode" = xenabled; then
+     dnl We need to include the header for PathCombineW checking as
+@@ -2331,6 +2351,7 @@ if test "x$win32_specific_codes" = xenabled; then
+   else
+     AC_MSG_ERROR([Unicode File Open for Win32 not available])
+   fi
++  fi
+ 
+ #### Check for Network functions
+   AC_CHECK_HEADERS([ws2tcpip.h], [win32_sockets=enabled], [AC_MSG_WARN([Please update your headers to support winsock 2.2.])])
+-- 
+2.26.0.windows.1
+
