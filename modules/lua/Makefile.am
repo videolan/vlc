@@ -31,7 +31,8 @@ liblua_plugin_la_SOURCES = \
 	lua/libs/xml.c \
 	lua/libs/io.c \
 	lua/libs/errno.c \
-	lua/libs/rand.c
+	lua/libs/rand.c \
+	lua/libs/renderers.c
 
 if HAVE_WIN32
 liblua_plugin_la_SOURCES += lua/libs/win.c
