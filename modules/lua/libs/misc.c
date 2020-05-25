@@ -79,6 +79,12 @@ vlc_object_t * vlclua_get_this( lua_State *L )
     return vlclua_get_object( L, vlclua_set_this );
 }
 
+vlc_player_t *vlclua_get_player_internal( lua_State *L )
+{
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    return vlc_playlist_GetPlayer(playlist);
+}
+
 /*****************************************************************************
  * VLC error code translation
  *****************************************************************************/

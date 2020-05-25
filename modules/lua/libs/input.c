@@ -45,11 +45,6 @@
 #include "../libs.h"
 #include "../extension.h"
 
-vlc_player_t *vlclua_get_player_internal(lua_State *L) {
-    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
-    return vlc_playlist_GetPlayer(playlist);
-}
-
 vout_thread_t *vlclua_get_vout_internal(lua_State *L)
 {
     vlc_player_t *player = vlclua_get_player_internal(L);
