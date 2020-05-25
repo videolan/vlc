@@ -238,7 +238,11 @@ local printXmlKeyValue = function (k,v,indent)
     print("\n")
     for i=1,indent do print(" ") end
     if (k) then
-        print("<"..k..">")
+        if not tonumber(k) then
+            print("<"..k..">")
+        else
+            print("<entry_"..k..">")
+        end
     end
 
     if (type(v)=="table") then
@@ -251,10 +255,12 @@ local printXmlKeyValue = function (k,v,indent)
         xs=xmlString(k)
         space_loc=string.find(xs," ")
         if space_loc == nil then
+            xs=string.sub(xs,1,space_loc)
+        end
+        if not tonumber(xs) then
             print("</"..xs..">")
         else
-            xs=string.sub(xs,1,space_loc)
-            print("</"..xs..">")
+            print("</entry_"..xs..">")
         end
     end
 end
