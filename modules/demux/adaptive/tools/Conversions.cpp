@@ -35,10 +35,10 @@
 
   Exemple input string: "PT0H9M56.46S"
  */
-static time_t str_duration( const char *psz_duration )
+static mtime_t str_duration( const char *psz_duration )
 {
     bool        timeDesignatorReached = false;
-    time_t      res = 0;
+    mtime_t  res = 0;
     char*       end_ptr;
 
     if ( psz_duration == NULL )
@@ -79,7 +79,7 @@ static time_t str_duration( const char *psz_duration )
             default:
                 break ;
         }
-        res += (time_t)(mul * number);
+        res += mul * number * CLOCK_FREQ;
         if ( *psz_duration )
             psz_duration++;
     } while ( *psz_duration );
@@ -88,7 +88,7 @@ static time_t str_duration( const char *psz_duration )
 
 IsoTime::IsoTime(const std::string &str)
 {
-    time = str_duration(str.c_str()) * CLOCK_FREQ;
+    time = str_duration(str.c_str());
 }
 
 IsoTime::operator mtime_t () const
