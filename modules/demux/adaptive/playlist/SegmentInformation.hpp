@@ -52,6 +52,7 @@ namespace adaptive
                 virtual ~SegmentInformation();
 
                 virtual vlc_tick_t getPeriodStart() const;
+                virtual vlc_tick_t getPeriodDuration() const;
                 virtual AbstractPlaylist *getPlaylist() const;
 
                 class SplitPoint

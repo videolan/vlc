@@ -258,6 +258,25 @@ ISegment * SegmentInformation::getNextSegment(SegmentInfoType type, uint64_t i_p
                 }
                 else
                 {
+                    /* check template upper bound */
+                    if(!getPlaylist()->isLive())
+                    {
+                        const Timescale timescale = templ->inheritTimescale();
+                        const stime_t segmentduration = templ->inheritDuration();
+                        vlc_tick_t totalduration = getPeriodDuration();
+                        if(totalduration == 0)
+                            totalduration = getPlaylist()->duration.Get();
+                        if(totalduration && segmentduration)
+                        {
+                            uint64_t endnum = templ->inheritStartNumber() +
+                                    (timescale.ToScaled(totalduration) + segmentduration - 1) / segmentduration;
+                            if(i_pos >= endnum)
+                            {
+                                *pi_newpos = i_pos;
+                                return NULL;
+                            }
+                        }
+                    }
                     *pi_newpos = i_pos;
                     /* start number */
                     *pi_newpos = std::max(templ->inheritStartNumber(), i_pos);
@@ -513,6 +532,14 @@ vlc_tick_t SegmentInformation::getPeriodStart() const
 {
     if(parent)
         return parent->getPeriodStart();
+    else
+        return 0;
+}
+
+vlc_tick_t SegmentInformation::getPeriodDuration() const
+{
+    if(parent)
+        return parent->getPeriodDuration();
     else
         return 0;
 }

@@ -99,3 +99,8 @@ vlc_tick_t BasePeriod::getPeriodStart() const
 {
     return startTime.Get();
 }
+
+vlc_tick_t BasePeriod::getPeriodDuration() const
+{
+    return duration.Get();
+}
