@@ -187,6 +187,14 @@ processcommands = function ()
         vlc.player.toggle_video_track(val)
     elseif command == "subtitle_track" then
         vlc.player.toggle_spu_track(val)
+    elseif command == "set_renderer" then
+        local rd = get_renderer_discovery()
+        if not rd then
+            return
+        end
+        rd:select(id)
+    elseif command == "unset_renderer" then
+        rd:select(-1)
     end
 
     local input = nil
@@ -426,7 +434,7 @@ getstatus = function (includecategories)
     local s ={}
 
     --update api version when new data/commands added
-    s.apiversion=3
+    s.apiversion=4
     s.version=vlc.misc.version()
     s.volume=vlc.volume.get()
 
@@ -516,3 +524,10 @@ getstatus = function (includecategories)
     return s
 end
 
+get_renderers = function()
+    local rd = get_renderer_discovery()
+    if not rd then
+        return {}
+    end
+    return rd:list()
+end

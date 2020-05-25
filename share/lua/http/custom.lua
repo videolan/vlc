@@ -18,3 +18,13 @@ _G.dialogs = function(...)
 end
 
 _G.vlm = vlc.vlm()
+
+local _rd = nil
+
+_G.get_renderer_discovery = function()
+    if not _rd then
+        _rd = vlc.rd.create("mdns_renderer")
+    end
+    return _rd
+end
+
