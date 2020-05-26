@@ -121,3 +121,13 @@ libegl_pbuffer_filter_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2=1
 vout_LTLIBRARIES += libegl_pbuffer_filter_plugin.la
 endif
 endif
+
+libegl_surfacetexture_plugin_la_SOURCES = video_filter/egl_surfacetexture.c
+libegl_surfacetexture_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_OPENGL_ES2
+libegl_surfacetexture_plugin_la_LIBADD = $(EGL_LIBS)
+
+if HAVE_ANDROID
+if HAVE_EGL
+vout_LTLIBRARIES += libegl_surfacetexture_plugin.la
+endif
+endif

@@ -96,7 +96,7 @@ tc_anop_update(struct vlc_gl_interop *interop, GLuint *textures,
         priv->previous_texture = texture;
     }
 
-    if (!avctx->render(pic->context))
+    if (avctx->render && !avctx->render(pic->context))
         goto success; /* already rendered */
 
     /* Release previous image */
