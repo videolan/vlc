@@ -438,18 +438,21 @@ picture_t *picture_InternalClone(picture_t *picture,
     picture_t *clone = picture_NewFromResource(&picture->format, &res);
     if (likely(clone != NULL)) {
         ((picture_priv_t *)clone)->gc.opaque = opaque;
+
+        /* The picture context is responsible for potentially holding the
+         * video context attached to the picture if needed. */
+        if (picture->context != NULL)
+            clone->context = picture->context->copy(picture->context);
+
         picture_Hold(picture);
     }
+
     return clone;
 }
 
 picture_t *picture_Clone(picture_t *picture)
 {
     picture_t *clone = picture_InternalClone(picture, picture_DestroyClone, picture);
-    if (likely(clone != NULL)) {
-        if (picture->context != NULL)
-            clone->context = picture->context->copy(picture->context);
-    }
     return clone;
 }
 
