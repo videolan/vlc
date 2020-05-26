@@ -273,10 +273,17 @@ libglinterop_android_plugin_la_SOURCES = video_output/opengl/interop_android.c \
 	video_output/opengl/interop.h
 libglinterop_android_plugin_la_CFLAGS = $(AM_CFLAGS) -DUSE_OPENGL_ES2
 
+libegl_surfacetexture_plugin_la_SOURCES = video_output/android/egl_surfacetexture.c
+libegl_surfacetexture_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_OPENGL_ES2
+libegl_surfacetexture_plugin_la_LIBADD = $(EGL_LIBS)
+
 if HAVE_ANDROID
 vout_LTLIBRARIES += libandroid_window_plugin.la libandroid_display_plugin.la
 if HAVE_EGL
-vout_LTLIBRARIES += libegl_android_plugin.la libglinterop_android_plugin.la
+vout_LTLIBRARIES += \
+	libegl_android_plugin.la \
+	libglinterop_android_plugin.la \
+	libegl_surfacetexture_plugin.la
 endif
 endif
 
