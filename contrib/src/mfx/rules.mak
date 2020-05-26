@@ -7,7 +7,7 @@ ifeq ($(call need_pkg,"mfx"),)
 PKGS_FOUND += mfx
 endif
 ifdef HAVE_WIN32
-ifneq ($(filter arm aarch64, $(ARCH)),)
+ifeq ($(filter arm aarch64, $(ARCH)),)
 PKGS += mfx
 endif
 endif
