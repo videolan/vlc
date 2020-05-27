@@ -540,7 +540,7 @@ void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
 EasterEggBackgroundWidget::EasterEggBackgroundWidget( intf_thread_t *p_intf )
     : BackgroundWidget( p_intf )
 {
-    flakes = new QLinkedList<flake *>();
+    flakes = new std::list<flake *>();
     i_rate = 2;
     i_speed = 1;
     b_enabled = false;
@@ -593,7 +593,7 @@ void EasterEggBackgroundWidget::spawnFlakes()
 
     int i_spawn = ( (double) qrand() / RAND_MAX ) * i_rate;
 
-    QLinkedList<flake *>::iterator it = flakes->begin();
+    auto it = flakes->begin();
     while( it != flakes->end() )
     {
         flake *current = *it;
@@ -613,15 +613,16 @@ void EasterEggBackgroundWidget::spawnFlakes()
         flake *f = new flake;
         f->point.setX( qrand() * w );
         f->b_fat = ( qrand() < ( RAND_MAX * .33 ) );
-        flakes->append( f );
+        flakes->push_back( f );
     }
     update();
 }
 
 void EasterEggBackgroundWidget::reset()
 {
-    while ( !flakes->isEmpty() )
-        delete flakes->takeFirst();
+    for(flake* f: *flakes)
+        delete f;
+    flakes->clear();
 }
 
 void EasterEggBackgroundWidget::paintEvent( QPaintEvent *e )
@@ -631,8 +632,8 @@ void EasterEggBackgroundWidget::paintEvent( QPaintEvent *e )
     painter.setBrush( QBrush( QColor(Qt::white) ) );
     painter.setPen( QPen(Qt::white) );
 
-    QLinkedList<flake *>::const_iterator it = flakes->constBegin();
-    while( it != flakes->constEnd() )
+    auto it = flakes->cbegin();
+    while( it != flakes->cend() )
     {
         const flake * const f = *(it++);
         if ( f->b_fat )
