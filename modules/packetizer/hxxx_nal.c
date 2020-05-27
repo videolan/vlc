@@ -122,16 +122,16 @@ block_t *hxxx_AnnexB_to_xVC( block_t *p_block, uint8_t i_nal_length_size )
 
     if( p_list[i_nalcount - 1].move != 0 || i_nal_length_size != 4 )  /* We'll need to grow or shrink */
     {
-            block_t *p_newblock = block_Alloc( i_dest );
-            if( unlikely(!p_newblock) )
-                goto error;
+        block_t *p_newblock = block_Alloc( i_dest );
+        if( unlikely(!p_newblock) )
+            goto error;
 
-            p_release = p_block; /* Will be released after use */
-            p_source = p_release->p_buffer;
-            p_sourceend = &p_release->p_buffer[p_release->i_buffer];
+        p_release = p_block; /* Will be released after use */
+        p_source = p_release->p_buffer;
+        p_sourceend = &p_release->p_buffer[p_release->i_buffer];
 
-            p_block = p_newblock;
-            p_dest = p_newblock->p_buffer;
+        p_block = p_newblock;
+        p_dest = p_newblock->p_buffer;
     }
     else
     {
