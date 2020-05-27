@@ -357,7 +357,7 @@ index 38e4a839..8178aaf5 100644
  }
 +#else
 +int
-+__archive_mktemp(const char *tmpdir)
++__archive_mktempx(const char *tmpdir, wchar_t *template)
 +{
 +    return -1;
 +}
