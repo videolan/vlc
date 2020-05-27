@@ -502,8 +502,10 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     /* Wait for the interface to be ready. This prevents the main
      * LibVLC thread from starting video playback before we can create
      * an embedded video window. */
+#ifndef Q_OS_MAC
     while (open_state == OPEN_STATE_INIT)
         wait_ready.wait(lock);
+#endif
 
     if (open_state == OPEN_STATE_ERROR)
     {
@@ -717,14 +719,14 @@ static void *Thread( void *obj )
     /* Explain how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;
 
+#ifndef Q_OS_MAC
     /* Tell the main LibVLC thread we are ready */
     {
         vlc::threads::mutex_locker locker (lock);
         open_state = OPEN_STATE_OPENED;
         wait_ready.signal();
     }
-
-#ifdef Q_OS_MAC
+#else
     /* We took over main thread, register and start here */
     if( !p_sys->b_isDialogProvider )
     {
@@ -765,11 +767,15 @@ static void *ThreadCleanup( intf_thread_t *p_intf, bool error )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     {
+#ifndef Q_OS_MAC
         vlc::threads::mutex_locker locker (lock);
+#endif
         if( error )
         {
             open_state = OPEN_STATE_ERROR;
+#ifndef Q_OS_MAC
             wait_ready.signal();
+#endif
         }
         else
             open_state = OPEN_STATE_INIT;
