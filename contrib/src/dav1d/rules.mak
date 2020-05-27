@@ -21,6 +21,7 @@ $(TARBALLS)/dav1d-$(DAV1D_VERSION).tar.xz:
 
 dav1d: dav1d-$(DAV1D_VERSION).tar.xz .sum-dav1d
 	$(UNPACK)
+	$(APPLY) $(SRC)/dav1d/0001-meson-favor-_aligned_malloc-over-posix_memalign.patch
 	$(MOVE)
 
 .dav1d: dav1d crossfile.meson
