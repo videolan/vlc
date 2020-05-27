@@ -43,7 +43,6 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPropertyAnimation>
-#include <QLinkedList>
 
 class QMenu;
 class QSlider;
@@ -151,7 +150,7 @@ private:
         bool b_fat;
     };
     QTimer *timer;
-    QLinkedList<flake *> *flakes;
+    std::list<flake *> *flakes;
     int i_rate;
     int i_speed;
     bool b_enabled;
