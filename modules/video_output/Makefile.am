@@ -226,7 +226,7 @@ endif
 endif
 
 libdrawable_plugin_la_SOURCES = video_output/win32/drawable.c
-if HAVE_WIN32
+if HAVE_WIN32_DESKTOP
 vout_LTLIBRARIES += libdrawable_plugin.la
 endif
 
