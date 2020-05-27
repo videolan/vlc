@@ -122,20 +122,6 @@ block_t *hxxx_AnnexB_to_xVC( block_t *p_block, uint8_t i_nal_length_size )
 
     if( p_list[i_nalcount - 1].move != 0 || i_nal_length_size != 4 )  /* We'll need to grow or shrink */
     {
-        /* If we grow in size, try using realloc to avoid memcpy */
-        if( p_list[i_nalcount - 1].move > 0 && block_WillRealloc( p_block, 0, i_dest ) )
-        {
-            uint32_t i_sizebackup = p_block->i_buffer;
-            block_t *p_newblock = block_Realloc( p_block, 0, i_dest );
-            if( unlikely(!p_newblock) )
-                goto error;
-
-            p_block = p_newblock;
-            p_sourceend = &p_block->p_buffer[i_sizebackup];
-            p_source = p_dest = p_block->p_buffer;
-        }
-        else
-        {
             block_t *p_newblock = block_Alloc( i_dest );
             if( unlikely(!p_newblock) )
                 goto error;
@@ -146,7 +132,6 @@ block_t *hxxx_AnnexB_to_xVC( block_t *p_block, uint8_t i_nal_length_size )
 
             p_block = p_newblock;
             p_dest = p_newblock->p_buffer;
-        }
     }
     else
     {
