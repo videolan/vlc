@@ -1732,19 +1732,16 @@ static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         vlc_tick_t i_max_diff = i_new_dts - p_ts->i_dts;
         vlc_tick_t i_cut_dts = p_ts->i_dts;
 
-        p_ts = BufferChainPeek( p_chain_ts );
-        i++;
-        i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
-        while ( p_ts != NULL && i_new_dts - p_ts->i_dts >= i_max_diff )
+        while( (p_ts = BufferChainPeek( p_chain_ts )) )
         {
+            i_new_dts = i_pcr_dts + i_pcr_length * i++ / i_packet_count;
+            if( p_ts->i_dts >= i_pcr_dts &&
+                i_new_dts - p_ts->i_dts >= i_max_diff )
+               break;
             p_ts = BufferChainGet( p_chain_ts );
+            BufferChainAppend( &new_chain, p_ts );
             i_max_diff = i_new_dts - p_ts->i_dts;
             i_cut_dts = p_ts->i_dts;
-            BufferChainAppend( &new_chain, p_ts );
-
-            p_ts = BufferChainPeek( p_chain_ts );
-            i++;
-            i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
         }
         msg_Dbg( p_mux, "adjusting rate at %"PRId64"/%"PRId64" (%d/%d)",
                  i_cut_dts - i_pcr_dts, i_pcr_length, new_chain.i_depth,
