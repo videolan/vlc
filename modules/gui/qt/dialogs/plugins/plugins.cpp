@@ -65,6 +65,7 @@
 #include <QSplitter>
 #include <QToolButton>
 #include <QStackedWidget>
+#include <QPainterPath>
 
 //match the image source (width/height)
 #define SCORE_ICON_WIDTH_SCALE 4
