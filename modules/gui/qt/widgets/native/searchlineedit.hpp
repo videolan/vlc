@@ -26,11 +26,7 @@
 #ifndef VLC_QT_SEARCHLINEEDIT_HPP_
 #define VLC_QT_SEARCHLINEEDIT_HPP_
 
-#ifdef __APPLE__
-#include "../qt.hpp"
-#else
 #include "qt.hpp"
-#endif
 #include <QLineEdit>
 
 class ClickLineEdit : public QLineEdit
