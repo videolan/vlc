@@ -1,0 +1,26 @@
+From 2ac516186cd23213f7ef290c7aab9a16c7bdceba Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 3 Apr 2020 15:09:35 +0200
+Subject: [PATCH] use GetFullPathNameW for the wide char API
+
+Fixes the build with mingw64 in winrt mode.
+---
+ src/utils/Directory.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/utils/Directory.cpp b/src/utils/Directory.cpp
+index b34fab28..fdfd6e66 100644
+--- a/src/utils/Directory.cpp
++++ b/src/utils/Directory.cpp
+@@ -91,7 +91,7 @@ std::string toAbsolute( const std::string& path )
+ #else
+     wchar_t buff[MAX_PATH];
+     auto wpath = charset::ToWide( path.c_str() );
+-    if ( GetFullPathName( wpath.get(), MAX_PATH, buff, nullptr ) == 0 )
++    if ( GetFullPathNameW( wpath.get(), MAX_PATH, buff, nullptr ) == 0 )
+     {
+         LOG_ERROR( "Failed to convert ", path, " to absolute path" );
+         throw errors::System{ GetLastError(), "Failed to convert to absolute path" };
+-- 
+2.26.0.windows.1
+

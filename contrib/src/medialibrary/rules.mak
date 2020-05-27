@@ -21,6 +21,7 @@ medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.xz .sum-medialibrary
 	mkdir -p $@-$(MEDIALIBRARY_VERSION)
 	tar xvf "$<" --strip-components=1 -C $@-$(MEDIALIBRARY_VERSION)
 	$(APPLY) $(SRC)/medialibrary/0001-include-medialibrary-IDeviceLister.h-Include-string.patch
+	$(APPLY) $(SRC)/medialibrary/0001-use-GetFullPathNameW-for-the-wide-char-API.patch
 	$(call pkg_static, "medialibrary.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
