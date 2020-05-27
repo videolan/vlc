@@ -338,13 +338,7 @@ EXTRA_LTLIBRARIES += liboggspots_plugin.la
 codec_LTLIBRARIES += $(LTLIBoggspots)
 
 libvideotoolbox_plugin_la_SOURCES = \
-	codec/vt_utils.c codec/vt_utils.h \
-	codec/videotoolbox.c codec/hxxx_helper.c codec/hxxx_helper.h \
-	packetizer/hxxx_nal.h packetizer/hxxx_nal.c \
-	packetizer/hxxx_sei.h packetizer/hxxx_sei.c \
-	packetizer/h264_slice.c packetizer/h264_slice.h \
-	packetizer/h264_nal.c packetizer/h264_nal.h \
-	packetizer/hevc_nal.c packetizer/hevc_nal.h
+	codec/vt_utils.c codec/vt_utils.h codec/videotoolbox.c
 libvideotoolbox_plugin_la_CFLAGS = $(AM_CFLAGS)
 if HAVE_IOS
 libvideotoolbox_plugin_la_CFLAGS += -miphoneos-version-min=9.0
@@ -352,7 +346,7 @@ endif
 if HAVE_TVOS
 libvideotoolbox_plugin_la_CFLAGS += -mtvos-version-min=10.2
 endif
-libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la
+libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la
 libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 EXTRA_LTLIBRARIES += libvideotoolbox_plugin.la
 codec_LTLIBRARIES += $(LTLIBvideotoolbox)
@@ -475,12 +469,8 @@ libmediacodec_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/codec/omxil
 libmediacodec_plugin_la_SOURCES = codec/omxil/mediacodec.c codec/omxil/mediacodec.h \
 	codec/omxil/mediacodec_jni.c codec/omxil/mediacodec_ndk.c codec/omxil/utils.c \
 	codec/omxil/omxil_utils.h codec/omxil/qcom.c codec/omxil/qcom.h \
-	video_output/android/utils.c video_output/android/utils.h \
-	codec/hxxx_helper.c codec/hxxx_helper.h \
-	packetizer/hxxx_nal.h packetizer/hxxx_nal.c \
-	packetizer/h264_nal.c packetizer/h264_nal.h \
-	packetizer/hevc_nal.c packetizer/hevc_nal.h
-libmediacodec_plugin_la_LIBADD = libchroma_copy.la
+	video_output/android/utils.c video_output/android/utils.h
+libmediacodec_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la
 codec_LTLIBRARIES += $(LTLIBomxil)
 EXTRA_LTLIBRARIES += libomxil_plugin.la
 if HAVE_ANDROID
@@ -612,3 +602,14 @@ libgstdecode_plugin_la_LIBADD = $(GST_VIDEO_LIBS) $(GST_APP_LIBS)
 if HAVE_GST_DECODE
 codec_LTLIBRARIES += libgstdecode_plugin.la
 endif
+
+libvlc_hxxxhelper_la_SOURCES = \
+	codec/hxxx_helper.c codec/hxxx_helper.h \
+	packetizer/hxxx_nal.h packetizer/hxxx_nal.c \
+	packetizer/hxxx_sei.h packetizer/hxxx_sei.c \
+	packetizer/h264_slice.c packetizer/h264_slice.h \
+	packetizer/h264_nal.c packetizer/h264_nal.h \
+	packetizer/hevc_nal.c packetizer/hevc_nal.h
+libvlc_hxxxhelper_la_CPPFLAGS = -Dneedsomethinghere
+libvlc_hxxxhelper_la_LDFLAGS = -static
+EXTRA_LTLIBRARIES += libvlc_hxxxhelper.la
