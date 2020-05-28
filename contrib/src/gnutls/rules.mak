@@ -1,6 +1,6 @@
 # GnuTLS
 
-GNUTLS_VERSION := 3.6.7.1
+GNUTLS_VERSION := 3.6.14
 GNUTLS_URL := https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-$(GNUTLS_VERSION).tar.xz
 
 ifdef BUILD_NETWORK
@@ -17,19 +17,14 @@ $(TARBALLS)/gnutls-$(GNUTLS_VERSION).tar.xz:
 
 .sum-gnutls: gnutls-$(GNUTLS_VERSION).tar.xz
 
-# gnutls 3.6.7.1 unpacks into a dir named 3.6.7
-gnutls: UNPACK_DIR=gnutls-3.6.7
 gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	$(UNPACK)
-ifdef HAVE_WIN32
-	cd $(UNPACK_DIR) && sed -i.orig -e s/"@INET_PTON_LIB@ @LIBPTHREAD@"/"@INET_PTON_LIB@ -lcrypt32 @LIBPTHREAD@"/g lib/gnutls.pc.in
+	$(APPLY) $(SRC)/gnutls/gnutls-fix-mangling.patch
 	# disable the dllimport in static linking (pkg-config --static doesn't handle Cflags.private)
 	cd $(UNPACK_DIR) && sed -i.orig -e s/"_SYM_EXPORT __declspec(dllimport)"/"_SYM_EXPORT"/g lib/includes/gnutls/gnutls.h.in
-endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/gnutls/no-create-time-h.patch
 endif
-	cd $(UNPACK_DIR) && sed -i.orig -e 's/@LIBATOMIC_LIBS@/@LIBATOMIC_LIBS@ @HOGWEED_LIBS@ @NETTLE_LIBS@/' lib/gnutls.pc.in
 	$(call pkg_static,"lib/gnutls.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)

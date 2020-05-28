@@ -1,0 +1,11 @@
+--- gnutls/lib/nettle/ecc/ecc-internal.h.ecc_random	2020-06-03 15:05:27.000000000 +0200
++++ gnutls/lib/nettle/ecc/ecc-internal.h	2020-06-04 16:31:00.523456500 +0200
+@@ -71,6 +71,8 @@
+ #define ecc_mul_g_eh _gnutls_nettle_ecc_ecc_mul_g_eh
+ #define ecc_mul_a_eh _gnutls_nettle_ecc_ecc_mul_a_eh
+ #define ecc_mul_m _gnutls_nettle_ecc_ecc_mul_m
++#undef ecc_scalar_random
++#define ecc_scalar_random _gnutls_nettle_ecc_scalar_random
+ #define cnd_copy _gnutls_nettle_ecc_cnd_copy
+ #define sec_add_1 _gnutls_nettle_ecc_sec_add_1
+ #define sec_sub_1 _gnutls_nettle_ecc_sec_sub_1
