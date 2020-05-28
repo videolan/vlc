@@ -45,6 +45,7 @@ GNUTLS_CONF := \
 	--disable-nls \
 	--without-libintl-prefix \
 	--disable-doc \
+	--disable-tools \
 	--disable-tests \
 	--with-included-libtasn1 \
 	--with-included-unistring \
