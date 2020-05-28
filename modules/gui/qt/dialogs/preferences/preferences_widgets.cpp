@@ -1201,7 +1201,7 @@ void KeySelectorControl::finish()
 
     p_config = module_config_get (p_main, &confsize);
 
-    QMap<QString, QString> global_keys;
+    QMultiMap<QString, QString> global_keys;
     for (size_t i = 0; i < confsize; i++)
     {
         module_config_t *p_config_item = p_config + i;
@@ -1236,7 +1236,7 @@ void KeySelectorControl::finish()
          && !EMPTY_STR( p_config_item->psz_text )
          && !EMPTY_STR( p_config_item->value.psz ) )
         {
-            global_keys.insertMulti( qtr( p_config_item->psz_text ), qfu( p_config_item->value.psz ) );
+            global_keys.insert( qtr( p_config_item->psz_text ), qfu( p_config_item->value.psz ) );
         }
     }
 

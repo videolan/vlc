@@ -55,7 +55,9 @@ static void pushListRec(QVariantMap& itemMap, QVariantList::const_iterator it, Q
     }
     else if ( it->canConvert<QVariantMap>() )
     {
-        itemMap.unite( it->toMap() );
+        QVariantMap varMap = it->toMap();
+        for (auto kv = varMap.constBegin(); kv != varMap.constEnd(); ++kv )
+            itemMap[kv.key()] = kv.value();
         pushListRec(itemMap, ++it, end);
     }
 }
