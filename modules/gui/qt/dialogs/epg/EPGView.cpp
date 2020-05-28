@@ -94,9 +94,9 @@ EPGView::EPGView( QWidget *parent ) : QGraphicsView( parent )
 void EPGView::setScale( double scaleFactor )
 {
     m_scaleFactor = scaleFactor;
-    QMatrix matrix;
+    QTransform matrix;
     matrix.scale( scaleFactor, 1 );
-    setMatrix( matrix );
+    setTransform( matrix );
 }
 
 const QDateTime& EPGView::startTime() const
