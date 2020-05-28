@@ -23,6 +23,7 @@ smb2: libsmb2-$(SMB2_VERSION).tar.gz .sum-smb2
 	$(APPLY) $(SRC)/smb2/0003-Fix-getlogin-usage.patch
 	$(APPLY) $(SRC)/smb2/0004-smb2_destroy_context-fix-possible-null-deref.patch
 	$(APPLY) $(SRC)/smb2/0005-smb2_connect_share_async-don-t-return-ENOMEM-if-conn.patch
+	$(APPLY) $(SRC)/smb2/0006-IPv6-is-available-on-all-platforms.patch
 	$(MOVE)
 
 .smb2: smb2

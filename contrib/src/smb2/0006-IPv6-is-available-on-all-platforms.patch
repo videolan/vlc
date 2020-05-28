@@ -1,0 +1,46 @@
+From 0ddce21e13cd032adba26260f977b54d395f98c7 Mon Sep 17 00:00:00 2001
+From: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Date: Thu, 20 Feb 2020 13:39:27 +1000
+Subject: [PATCH] IPv6 is available on all platforms. No need to check for it
+
+We weren't even checking for this in configure.ac anyway.
+
+Signed-off-by: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+---
+ CMakeLists.txt | 2 +-
+ lib/socket.c   | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index adc5060..f96c713 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -38,7 +38,7 @@ set(core_DEPENDS ${GSSAPI_LIBRARIES} CACHE STRING "" FORCE)
+ 
+ if(CMAKE_SYSTEM_NAME MATCHES Windows)
+   list(APPEND CORE_LIBRARIES ws2_32.lib)
+-  add_definitions(-DWIN32_LEAN_AND_MEAN -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -DHAVE_SOCKADDR_IN6)
++  add_definitions(-DWIN32_LEAN_AND_MEAN -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS)
+   include_directories(include/msvc)
+ elseif(CMAKE_SYSTEM_NAME STREQUAL Solaris)
+   find_library(SOCKET_LIBRARY socket)
+diff --git a/lib/socket.c b/lib/socket.c
+index 3cdecef..6340788 100644
+--- a/lib/socket.c
++++ b/lib/socket.c
+@@ -744,7 +744,6 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
+                 ((struct sockaddr_in *)&ss)->sin_len = socksize;
+ #endif
+                 break;
+-#ifdef HAVE_SOCKADDR_IN6
+         case AF_INET6:
+                 socksize = sizeof(struct sockaddr_in6);
+                 memcpy(&ss, ai->ai_addr, socksize);
+@@ -752,7 +751,6 @@ smb2_connect_async(struct smb2_context *smb2, const char *server,
+                 ((struct sockaddr_in6 *)&ss)->sin6_len = socksize;
+ #endif
+                 break;
+-#endif
+         default:
+                 smb2_set_error(smb2, "Unknown address family :%d. "
+                                 "Only IPv4/IPv6 supported so far.",
