@@ -73,4 +73,21 @@ libvlc_track_type_to_escat( libvlc_track_type_t i_type )
     }
 }
 
+typedef struct libvlc_media_trackpriv_t
+{
+    libvlc_media_track_t t;
+    union {
+        libvlc_audio_track_t audio;
+        libvlc_video_track_t video;
+        libvlc_subtitle_track_t subtitle;
+    };
+} libvlc_media_trackpriv_t;
+
+void
+libvlc_media_trackpriv_from_es( libvlc_media_trackpriv_t *trackpriv,
+                                const es_format_t *es  );
+
+void
+libvlc_media_track_clean( libvlc_media_track_t *track );
+
 #endif

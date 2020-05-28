@@ -47,6 +47,7 @@ libvlc_la_SOURCES = \
 	audio.c \
 	event.c \
 	media.c \
+	media_track.c \
 	media_player.c \
 	media_list.c \
 	media_list_path.h \
