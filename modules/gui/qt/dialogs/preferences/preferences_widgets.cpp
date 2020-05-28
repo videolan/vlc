@@ -270,7 +270,7 @@ void FileConfigControl::fillGrid( QGridLayout *l, int line )
     textAndButton->setMargin( 0 );
     textAndButton->addWidget( text, 2 );
     textAndButton->addWidget( browse, 0 );
-    l->addLayout( textAndButton, line, LAST_COLUMN, 0 );
+    l->addLayout( textAndButton, line, LAST_COLUMN );
 }
 
 FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
@@ -514,7 +514,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
 void ModuleConfigControl::fillGrid( QGridLayout *l, int line )
 {
     l->addWidget( label, line, 0 );
-    l->addWidget( combo, line, LAST_COLUMN, 0 );
+    l->addWidget( combo, line, LAST_COLUMN );
 }
 
 ModuleConfigControl::ModuleConfigControl( vlc_object_t *_p_this,
@@ -933,7 +933,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
 
 void BoolConfigControl::fillGrid( QGridLayout *l, int line )
 {
-    l->addWidget( checkbox, line, 0, 1, -1, 0 );
+    l->addWidget( checkbox, line, 0, 1, -1 );
 }
 
 BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
