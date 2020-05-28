@@ -1,0 +1,25 @@
+From c14938692b313b5ba953543fd94fd1cad0eeef18 Mon Sep 17 00:00:00 2001
+From: Yuudai Yamashigi <yyamashigi@videolan.org>
+Date: Tue, 6 Feb 2018 23:37:48 +0100
+Subject: [PATCH 2/2] fix libs include
+
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index ee4d508..0cf8e51 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -6,7 +6,7 @@ libaribb25_la_SOURCES = src/arib_std_b25.c src/b_cas_card.c src/multi2.c \
+         src/b_cas_card_error_code.h src/multi2_error_code.h \
+         src/ts_section_parser_error_code.h src/arib_std_b25.h src/b_cas_card.h \
+         src/multi2.h src/ts_common_types.h src/ts_section_parser.h src/aribb25api.h
+-libaribb25_la_LIBADD = $(AM_LIBS) $(pcsclite_CFLAGS) $(PCSC_LIBS)
++libaribb25_la_LIBADD = $(AM_LIBS) $(pcsclite_LIBS) $(PCSC_LIBS)
+ libaribb25_la_CFLAGS = $(AM_CFLAGS) -Wall -Werror -fvisibility=hidden $(pcsclite_CFLAGS)
+ 
+ pkginclude_HEADERS = src/arib_std_b25_error_code.h src/b_cas_card_error_code.h \
+-- 
+2.26.0.windows.1
+
