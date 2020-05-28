@@ -548,7 +548,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
      QLabel *topLabel = new QLabel( qtr( "Current"
                  " media / stream " "statistics") );
      topLabel->setWordWrap( true );
-     layout->addWidget( topLabel, 0, 0 );
+     layout->addWidget( topLabel, 0 );
 
      StatsTree = new QTreeWidget(this);
      StatsTree->setColumnCount( 3 );
@@ -611,7 +611,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent ): QWidget( parent )
     StatsTree->resizeColumnToContents( 0 );
     StatsTree->setColumnWidth( 1 , 200 );
 
-    layout->addWidget(StatsTree, 4, 0 );
+    layout->addWidget(StatsTree, 4 );
 
     statsView = new VLCStatsView( this );
     statsView->setFrameStyle( QFrame::NoFrame );
