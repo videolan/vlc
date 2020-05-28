@@ -13,10 +13,10 @@ $(TARBALLS)/goom-$(GOOM_VERSION)-src.tar.gz:
 
 .sum-goom: goom-$(GOOM_VERSION)-src.tar.gz
 
+# goom2k4-0-src unpacks into a dir named goom2k4-0
+goom: UNPACK_DIR=goom2k4-0
 goom: goom-$(GOOM_VERSION)-src.tar.gz .sum-goom
-	-$(RM) -rf goom-2k4-0-src
 	$(UNPACK)
-	mv goom2k4-0 goom-2k4-0-src
 	$(APPLY) $(SRC)/goom/goom2k4-0-memleaks.patch
 	$(APPLY) $(SRC)/goom/goom2k4-autotools.patch
 	$(APPLY) $(SRC)/goom/goom2k4-noxmmx.patch
