@@ -1042,7 +1042,7 @@ static vlc_decoder_device * VoutHoldDecoderDevice(vlc_object_t *o, void *opaque)
 {
     VLC_UNUSED(o);
     vout_thread_sys_t *sys = opaque;
-    return sys->dec_device ? vlc_decoder_device_Hold( sys->dec_device ) : NULL;
+    return vout_GetDevice(&sys->obj);
 }
 
 static const struct filter_video_callbacks vout_video_cbs = {
