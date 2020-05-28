@@ -1,0 +1,70 @@
+From 1fb7ec239b4ef7bf05f824af9b3ddef7f5601685 Mon Sep 17 00:00:00 2001
+From: midchildan <midchildan+git@gmail.com>
+Date: Sun, 4 Feb 2018 23:00:27 +0900
+Subject: [PATCH 1/2] fix build script
+
+Signed-off-by: Yuudai Yamashigi <yyamashigi@videolan.org>
+---
+ Makefile.am  | 7 ++++++-
+ configure.ac | 1 +
+ src/td.c     | 3 ++-
+ 4 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index b95a569..ee4d508 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = -I m4
+ lib_LTLIBRARIES = libaribb25.la
+ libaribb25_la_SOURCES = src/arib_std_b25.c src/b_cas_card.c src/multi2.c \
+         src/portable.h src/ts_section_parser.c src/arib_std_b25_error_code.h \
+-        src/b_cas_card_error_code.h src/multi2_error_code.h src/td.c \
++        src/b_cas_card_error_code.h src/multi2_error_code.h \
+         src/ts_section_parser_error_code.h src/arib_std_b25.h src/b_cas_card.h \
+         src/multi2.h src/ts_common_types.h src/ts_section_parser.h src/aribb25api.h
+ libaribb25_la_LIBADD = $(AM_LIBS) $(pcsclite_CFLAGS) $(PCSC_LIBS)
+@@ -17,4 +17,9 @@ pkginclude_HEADERS = src/arib_std_b25_error_code.h src/b_cas_card_error_code.h \
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = src/aribb25.pc
+
++bin_PROGRAMS = b25
++b25_SOURCES = src/td.c
++b25_CFLAGS = $(AM_CFLAGS) -Wall -Werror $(pcsclite_CFLAGS)
++b25_LDADD = libaribb25.la $(pcsclite_LIBS) $(PCSC_LIBS)
++
+ dist_doc_DATA = README.jp.txt README.md LICENCE
+diff --git a/configure.ac b/configure.ac
+index ec1d35f..baa856e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -82,5 +82,6 @@ AS_IF([test "$SYS" = mingw32],[
+   ], [AC_MSG_ERROR([${pcsclite_PKG_ERRORS}.])])
+ ])
+
++AC_CONFIG_HEADERS([src/config.h])
+ AC_CONFIG_FILES([Makefile src/aribb25.pc])
+ AC_OUTPUT
+diff --git a/src/td.c b/src/td.c
+index c27201f..288aa5a 100644
+--- a/src/td.c
++++ b/src/td.c
+@@ -37,6 +37,7 @@ PERFORMANCE OF THIS SOFTWARE.
+
+ #include "arib_std_b25.h"
+ #include "b_cas_card.h"
++#include "config.h"
+
+ typedef struct {
+ 	int32_t round;
+@@ -85,7 +86,7 @@ int main(int argc, char **argv)
+
+ static void show_usage()
+ {
+-	fprintf(stderr, "b25 - ARIB STD-B25 test program ver. 0.2.5 (2012, 2/13)\n");
++	fprintf(stderr, "%s\n", PACKAGE_STRING);
+ 	fprintf(stderr, "usage: b25 [options] src.m2t dst.m2t [more pair ..]\n");
+ 	fprintf(stderr, "options:\n");
+ 	fprintf(stderr, "  -r round (integer, default=4)\n");
+--
+2.26.0.windows.1
+
