@@ -92,7 +92,6 @@ cmake-$(CMAKE_VERSION).tar.gz:
 
 cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(UNPACK)
-	$(APPLY) $(TOOLS)/cmake-msys-FindPkg.patch
 	$(MOVE)
 
 .buildcmake: cmake
