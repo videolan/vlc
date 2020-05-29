@@ -326,7 +326,10 @@ vlc_smb2_get_url(vlc_url_t *url, const char *file)
     /* smb2://<psz_host><psz_path><file>?<psz_option> */
     struct vlc_memstream buf;
     vlc_memstream_open(&buf);
-    vlc_memstream_printf(&buf, "smb://%s", url->psz_host);
+    if (strchr(url->psz_host, ':') != NULL)
+        vlc_memstream_printf(&buf, "smb://[%s]", url->psz_host);
+    else
+        vlc_memstream_printf(&buf, "smb://%s", url->psz_host);
 
     if (url->psz_path != NULL)
     {
