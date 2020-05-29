@@ -1,4 +1,4 @@
-From 94ba8ee876206364cf45a9bc08b8db5a52cb9543 Mon Sep 17 00:00:00 2001
+From f0a66adc8862622ef65830dc7f3c154c211e22e8 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Krzysztof=20Kosi=C5=84ski?= <krzysio@google.com>
 Date: Wed, 24 Apr 2019 17:44:46 -0700
 Subject: [PATCH] Add KHRONOS_STATIC to allow static linking on Windows.
@@ -7,12 +7,17 @@ I have encountered multiple situations where it is desirable to
 statically link against a software implementation of EGL on Windows.
 Add the preprocessor constant KHRONOS_STATIC that disables the
 annotation of EGL entry points as DLL-imported.
+
+This is squashed from commits 94ba8ee876206364cf45a9bc08b8db5a52cb9543
+and f636b23410dd4db5055dffbe499f4754013759d5 from
+https://github.com/KhronosGroup/EGL-Registry, applied on the qtbase
+repo.
 ---
- src/3rdparty/angle/include/KHR/khrplatform.h | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ src/3rdparty/angle/include/KHR/khrplatform.h | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/src/3rdparty/angle/include/KHR/khrplatform.h b/src/3rdparty/angle/include/KHR/khrplatform.h
-index 975bbff..5b55ea2 100644
+index 975bbff..dd22d92 100644
 --- a/src/3rdparty/angle/include/KHR/khrplatform.h
 +++ b/src/3rdparty/angle/include/KHR/khrplatform.h
 @@ -90,12 +90,20 @@
@@ -37,12 +42,6 @@ index 975bbff..5b55ea2 100644
  #   define KHRONOS_APICALL __declspec(dllimport)
  #elif defined (__SYMBIAN32__)
  #   define KHRONOS_APICALL IMPORT_C
-@@ -111,7 +119,7 @@
-  * This follows the return type of the function  and precedes the function
-  * name in the function prototype.
-  */
--#if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__SCITECH_SNAP__)
-+#if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(KHRONOS_STATIC)
-     /* Win32 but not WinCE */
- #   define KHRONOS_APIENTRY __stdcall
- #else
+-- 
+2.17.1
+
