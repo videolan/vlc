@@ -19,6 +19,9 @@
 # include "config.h"
 #endif
 
+#undef WINAPI_FAMILY
+#define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
+
 #include "dcomp_wrapper.h"
 #include <dcomp.h>
 
