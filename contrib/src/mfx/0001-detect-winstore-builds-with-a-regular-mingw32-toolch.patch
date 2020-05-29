@@ -1,0 +1,40 @@
+From c51a54c15f51579804030c70592c0a26065f1242 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 28 May 2020 13:26:18 +0200
+Subject: [PATCH] detect winstore builds with a regular mingw32 toolchain
+
+It's trigerred with a mingw32winrt or mingw32uwp toolchain.
+
+Forcing the WINAPI_FAMILY should be enough to trigger the winstore mode.
+---
+ configure.ac | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 490432a..c6f07cb 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -35,6 +35,20 @@ AS_CASE([${host_os}],
+         AM_CONDITIONAL([WINDOWS_STORE], [true])
+         DLLIB="$(DLLIB) -ldxgi"
+     ],
++    [mingw32], [
++        AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
++          [[#include <winapifamily.h>
++           #if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++           # error Win32 Desktop build
++           #endif
++          ]],[[;]])
++        ],[
++            AM_CONDITIONAL([WINDOWS_STORE], [true])
++            DLLIB="$(DLLIB) -ldxgi"
++        ],[
++            AM_CONDITIONAL([WINDOWS_STORE], [false])
++        ])
++    ],
+     [
+         AM_CONDITIONAL([WINDOWS_STORE], [false])
+     ]
+-- 
+2.26.0.windows.1
+
