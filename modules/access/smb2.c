@@ -400,10 +400,13 @@ FileControl(stream_t *access, int i_query, va_list args)
 static char *
 vlc_smb2_get_url(vlc_url_t *url, const char *file)
 {
-    /* smb2://<psz_host><psz_path><file>?<psz_option> */
+    /* smb2://<psz_host><i_port><psz_path><file>?<psz_option> */
     struct vlc_memstream buf;
     vlc_memstream_open(&buf);
     vlc_memstream_printf(&buf, "smb://%s", url->psz_host);
+
+    if (url->i_port != 0)
+        vlc_memstream_printf(&buf, ":%d", url->i_port);
 
     if (url->psz_path != NULL)
     {
