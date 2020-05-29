@@ -81,8 +81,30 @@ FocusScope{
             editable: true
             textColor: widgetfscope.color
             bgColor: widgetfscope.bgColor
-            onValueChanged: player.teletextPage = value
             KeyNavigation.right: indexKeyBtn
+
+            //only update the player teletext page when the user change the value manually
+            property bool inhibitPageUpdate: true
+
+            onValueChanged: {
+                if (inhibitPageUpdate)
+                    return
+                player.teletextPage = value
+            }
+
+            Component.onCompleted: {
+                value = player.teletextPage
+                inhibitPageUpdate = false
+            }
+
+            Connections {
+                target: player
+                onTeletextPageChanged: {
+                    telePageNumber.inhibitPageUpdate = true
+                    telePageNumber.value = player.teletextPage
+                    telePageNumber.inhibitPageUpdate = false
+                }
+            }
         }
 
         Widgets.IconToolButton{
