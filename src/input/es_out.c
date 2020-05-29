@@ -2321,7 +2321,7 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es, bool b_force )
         if( vbi_page >= 0 )
         {
             input_SendEventVbiPage( p_input, vbi_page );
-            input_SendEventVbiTransparency( p_input, vbi_opaque );
+            input_SendEventVbiTransparency( p_input, !vbi_opaque );
         }
     }
 }
@@ -3733,10 +3733,10 @@ static int EsOutVaPrivControlLocked( es_out_t *out, int query, va_list args )
         }
         else
         {
-            bool opaque = va_arg( args, int );
-            ret = vlc_input_decoder_SetVbiOpaque( es->p_dec, opaque );
+            bool transp = va_arg( args, int );
+            ret = vlc_input_decoder_SetVbiOpaque( es->p_dec, !transp );
             if( ret == VLC_SUCCESS )
-                input_SendEventVbiTransparency( p_sys->p_input, opaque );
+                input_SendEventVbiTransparency( p_sys->p_input, transp );
         }
         return ret;
     }
