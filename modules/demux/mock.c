@@ -81,39 +81,79 @@ var_InheritFourcc(vlc_object_t *obj, const char *name)
     return fourcc;
 }
 
+#define OPTIONS_AUDIO(Y) \
+    Y(audio, channels, unsigned, add_integer, Unsigned, 2) \
+    Y(audio, format, vlc_fourcc_t, add_string, Fourcc, "u8") \
+    Y(audio, rate, unsigned, add_integer, Unsigned, 44100) \
+    Y(audio, packetized, bool, add_bool, Bool, true) \
+    Y(audio, sample_length, vlc_tick_t, add_integer, Integer, VLC_TICK_FROM_MS(40) )
+
+#define OPTIONS_VIDEO(Y) \
+    Y(video, chroma, vlc_fourcc_t, add_string, Fourcc, "I420") \
+    Y(video, width, unsigned, add_integer, Unsigned, 640) \
+    Y(video, height, unsigned, add_integer, Unsigned, 480) \
+    Y(video, frame_rate, unsigned, add_integer, Unsigned, 25) \
+    Y(video, frame_rate_base, unsigned, add_integer, Unsigned, 1) \
+    Y(video, packetized, bool, add_bool, Bool, true)
+
+#define OPTIONS_SUB(Y) \
+    Y(sub, packetized, bool, add_bool, Bool, true)
+
 /* var_name, type, module_header_type, getter, default_value */
-#define LIST_OPTIONS \
-    X(length, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_FROM_MS(5000)) \
-    X(audio_track_count, ssize_t, add_integer, var_InheritSsize, 0) \
-    X(audio_channels, unsigned, add_integer, var_InheritUnsigned, 2) \
-    X(audio_format, vlc_fourcc_t, add_string, var_InheritFourcc, "u8") \
-    X(audio_rate, unsigned, add_integer, var_InheritUnsigned, 44100) \
-    X(audio_packetized, bool, add_bool, var_InheritBool, true) \
-    X(audio_sample_length, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_FROM_MS(40) ) \
-    X(video_track_count, ssize_t, add_integer, var_InheritSsize, 0) \
-    X(video_chroma, vlc_fourcc_t, add_string, var_InheritFourcc, "I420") \
-    X(video_width, unsigned, add_integer, var_InheritUnsigned, 640) \
-    X(video_height, unsigned, add_integer, var_InheritUnsigned, 480) \
-    X(video_frame_rate, unsigned, add_integer, var_InheritUnsigned, 25) \
-    X(video_frame_rate_base, unsigned, add_integer, var_InheritUnsigned, 1) \
-    X(video_packetized, bool, add_bool, var_InheritBool, true) \
-    X(input_sample_length, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_FROM_MS(40) ) \
-    X(sub_track_count, ssize_t, add_integer, var_InheritSsize, 0) \
-    X(sub_packetized, bool, add_bool, var_InheritBool, true) \
-    X(title_count, ssize_t, add_integer, var_InheritSsize, 0 ) \
-    X(chapter_count, ssize_t, add_integer, var_InheritSsize, 0) \
-    X(null_names, bool, add_bool, var_InheritBool, false) \
-    X(program_count, ssize_t, add_integer, var_InheritSsize, 0) \
-    X(can_seek, bool, add_bool, var_InheritBool, true) \
-    X(can_pause, bool, add_bool, var_InheritBool, true) \
-    X(can_control_pace, bool, add_bool, var_InheritBool, true) \
-    X(can_control_rate, bool, add_bool, var_InheritBool, true) \
-    X(can_record, bool, add_bool, var_InheritBool, true) \
-    X(error, bool, add_bool, var_InheritBool, false) \
-    X(pts_delay, unsigned, add_integer, var_InheritUnsigned, MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY)) \
-    X(add_video_track_at, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_INVALID ) \
-    X(add_audio_track_at, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_INVALID ) \
-    X(add_spu_track_at, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_INVALID ) \
+#define OPTIONS_GLOBAL(X) \
+    X(length, vlc_tick_t, add_integer, Integer, VLC_TICK_FROM_MS(5000)) \
+    X(audio_track_count, ssize_t, add_integer, Ssize, 0) \
+    X(video_track_count, ssize_t, add_integer, Ssize, 0) \
+    X(sub_track_count, ssize_t, add_integer, Ssize, 0) \
+    X(input_sample_length, vlc_tick_t, add_integer, Integer, VLC_TICK_FROM_MS(40) ) \
+    X(title_count, ssize_t, add_integer, Ssize, 0 ) \
+    X(chapter_count, ssize_t, add_integer, Ssize, 0) \
+    X(null_names, bool, add_bool, Bool, false) \
+    X(program_count, ssize_t, add_integer, Ssize, 0) \
+    X(can_seek, bool, add_bool, Bool, true) \
+    X(can_pause, bool, add_bool, Bool, true) \
+    X(can_control_pace, bool, add_bool, Bool, true) \
+    X(can_control_rate, bool, add_bool, Bool, true) \
+    X(can_record, bool, add_bool, Bool, true) \
+    X(error, bool, add_bool, Bool, false) \
+    X(pts_delay, unsigned, add_integer, Unsigned, MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY)) \
+    X(add_video_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID ) \
+    X(add_audio_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID ) \
+    X(add_spu_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID ) \
+    X(config, char *, add_string, String, NULL )
+
+#define DECLARE_OPTION(var_name, type, module_header_type, getter, default_value)\
+    type var_name;
+#define DECLARE_SUBOPTION(a,b,c,d,e,f) DECLARE_OPTION(b,c,d,e,f)
+
+#define READ(var_name, member_name, getter) \
+    sys->member_name = var_Inherit##getter(obj, "mock-"#var_name);
+#define READ_OPTION(var_name, type, module_header_type, getter, default_value) \
+    READ(var_name, var_name, getter)
+#define READ_SUBOPTION(group_name, var_name, type, module_header_type, getter, default_value) \
+    READ(group_name##_##var_name, group_name.var_name, getter)
+
+#define DECLARE_MODULE_OPTIONS(var_name, type, module_header_type, getter, default_value) \
+    module_header_type("mock-"#var_name, default_value, NULL, NULL, true) \
+    change_volatile() \
+    change_safe()
+#define DECLARE_MODULE_SUBOPTIONS(a,b,c,d,e,f) \
+    DECLARE_MODULE_OPTIONS(a##_##b,c,d,e,f)
+
+struct mock_video_options
+{
+    OPTIONS_VIDEO(DECLARE_SUBOPTION)
+};
+
+struct mock_audio_options
+{
+    OPTIONS_AUDIO(DECLARE_SUBOPTION)
+};
+
+struct mock_sub_options
+{
+    OPTIONS_SUB(DECLARE_SUBOPTION)
+};
 
 struct demux_sys
 {
@@ -126,12 +166,12 @@ struct demux_sys
     vlc_tick_t chapter_gap;
 
     unsigned int updates;
-
-#define X(var_name, type, module_header_type, getter, default_value) \
-    type var_name;
-    LIST_OPTIONS
-#undef X
+    OPTIONS_GLOBAL(DECLARE_OPTION)
+    struct mock_video_options video;
+    struct mock_audio_options audio;
+    struct mock_sub_options sub;
 };
+#undef X
 
 static input_title_t *
 CreateTitle(demux_t *demux, size_t idx)
@@ -456,19 +496,19 @@ InitVideoTracks(demux_t *demux, int group, size_t count)
         return VLC_SUCCESS;
 
     const vlc_chroma_description_t *desc =
-        vlc_fourcc_GetChromaDescription(sys->video_chroma);
+        vlc_fourcc_GetChromaDescription(sys->video.chroma);
     if (!desc || desc->plane_count == 0)
-        sys->video_chroma = 0;
+        sys->video.chroma = 0;
 
     const bool frame_rate_ok =
-        sys->video_frame_rate != 0 && sys->video_frame_rate != UINT_MAX &&
-        sys->video_frame_rate_base != 0 && sys->video_frame_rate_base != UINT_MAX;
-    const bool chroma_ok = sys->video_chroma != 0;
-    const bool size_ok = sys->video_width != UINT_MAX &&
-                         sys->video_height != UINT_MAX;
+        sys->video.frame_rate != 0 && sys->video.frame_rate != UINT_MAX &&
+        sys->video.frame_rate_base != 0 && sys->video.frame_rate_base != UINT_MAX;
+    const bool chroma_ok = sys->video.chroma != 0;
+    const bool size_ok = sys->video.width != UINT_MAX &&
+                         sys->video.height != UINT_MAX;
 
-    if (sys->video_frame_rate == 0 || sys->video_frame_rate_base == 0
-     || sys->video_chroma == 0)
+    if (sys->video.frame_rate == 0 || sys->video.frame_rate_base == 0
+     || sys->video.chroma == 0)
     if (!frame_rate_ok || !chroma_ok || !size_ok)
     {
         if (!frame_rate_ok)
@@ -483,14 +523,14 @@ InitVideoTracks(demux_t *demux, int group, size_t count)
     for (size_t i = 0; i < count; ++i)
     {
         es_format_t fmt;
-        es_format_Init(&fmt, VIDEO_ES, sys->video_chroma);
+        es_format_Init(&fmt, VIDEO_ES, sys->video.chroma);
         fmt.video.i_chroma = fmt.i_codec;
-        fmt.video.i_width = fmt.video.i_visible_width = sys->video_width;
-        fmt.video.i_height = fmt.video.i_visible_height = sys->video_height;
-        fmt.video.i_frame_rate = sys->video_frame_rate;
-        fmt.video.i_frame_rate_base = sys->video_frame_rate_base;
+        fmt.video.i_width = fmt.video.i_visible_width = sys->video.width;
+        fmt.video.i_height = fmt.video.i_visible_height = sys->video.height;
+        fmt.video.i_frame_rate = sys->video.frame_rate;
+        fmt.video.i_frame_rate_base = sys->video.frame_rate_base;
 
-        if (AppendMockTrack(demux, &fmt, i, group, sys->video_packetized))
+        if (AppendMockTrack(demux, &fmt, i, group, sys->video.packetized))
             return VLC_ENOMEM;
     }
     return VLC_SUCCESS;
@@ -504,10 +544,10 @@ InitAudioTracks(demux_t *demux, int group, size_t count)
     if (count == 0)
         return VLC_SUCCESS;
 
-    const bool rate_ok = sys->audio_rate > 0 && sys->audio_rate != UINT_MAX;
-    const bool format_ok = aout_BitsPerSample(sys->audio_format) != 0;
-    const bool channels_ok = sys->audio_channels > 0 &&
-                             sys->audio_channels <= AOUT_CHAN_MAX;
+    const bool rate_ok = sys->audio.rate > 0 && sys->audio.rate != UINT_MAX;
+    const bool format_ok = aout_BitsPerSample(sys->audio.format) != 0;
+    const bool channels_ok = sys->audio.channels > 0 &&
+                             sys->audio.channels <= AOUT_CHAN_MAX;
 
     if (!rate_ok || !format_ok || !channels_ok)
     {
@@ -521,7 +561,7 @@ InitAudioTracks(demux_t *demux, int group, size_t count)
     }
 
     uint16_t physical_channels = 0;
-    switch (sys->audio_channels)
+    switch (sys->audio.channels)
     {
         case 1: physical_channels = AOUT_CHAN_CENTER; break;
         case 2: physical_channels = AOUT_CHANS_2_0; break;
@@ -538,13 +578,13 @@ InitAudioTracks(demux_t *demux, int group, size_t count)
     for (size_t i = 0; i < count; ++i)
     {
         es_format_t fmt;
-        es_format_Init(&fmt, AUDIO_ES, sys->audio_format);
+        es_format_Init(&fmt, AUDIO_ES, sys->audio.format);
         fmt.audio.i_format = fmt.i_codec;
-        fmt.audio.i_rate = sys->audio_rate;
+        fmt.audio.i_rate = sys->audio.rate;
         fmt.audio.i_physical_channels = physical_channels;
         aout_FormatPrepare(&fmt.audio);
 
-        if (AppendMockTrack(demux, &fmt, i, group, sys->audio_packetized))
+        if (AppendMockTrack(demux, &fmt, i, group, sys->audio.packetized))
             return VLC_ENOMEM;
     }
 
@@ -564,7 +604,7 @@ InitSubTracks(demux_t *demux, int group, size_t count)
         es_format_t fmt;
         es_format_Init(&fmt, SPU_ES, VLC_CODEC_SUBT);
 
-        if (AppendMockTrack(demux, &fmt, i, group, sys->sub_packetized))
+        if (AppendMockTrack(demux, &fmt, i, group, sys->sub.packetized))
             return VLC_ENOMEM;
     }
 
@@ -664,11 +704,11 @@ Demux(demux_t *demux)
 
     const vlc_tick_t video_step_length =
         (sys->video_track_count > 0 || sys->sub_track_count > 0) ?
-         VLC_TICK_FROM_SEC(1) * sys->video_frame_rate_base
-                              / sys->video_frame_rate : 0;
+         VLC_TICK_FROM_SEC(1) * sys->video.frame_rate_base
+                              / sys->video.frame_rate : 0;
 
     const vlc_tick_t audio_step_length =
-        sys->audio_track_count > 0 ? sys->audio_sample_length : 0;
+        sys->audio_track_count > 0 ? sys->audio.sample_length : 0;
 
     const vlc_tick_t step_length = __MAX(audio_step_length, video_step_length);
 
@@ -777,10 +817,10 @@ Open(vlc_object_t *obj)
     if (var_LocationParse(obj, demux->psz_location, "mock-") != VLC_SUCCESS)
         return VLC_ENOMEM;
 
-#define X(var_name, type, module_header_type, getter, default_value) \
-    sys->var_name = getter(obj, "mock-"#var_name);
-    LIST_OPTIONS
-#undef X
+    OPTIONS_GLOBAL(READ_OPTION)
+    OPTIONS_AUDIO(READ_SUBOPTION)
+    OPTIONS_VIDEO(READ_SUBOPTION)
+    OPTIONS_SUB(READ_SUBOPTION)
 
     if (sys->chapter_count > 0 && sys->title_count == 0)
         sys->title_count++;
@@ -853,18 +893,16 @@ error:
     return ret;
 }
 
-#define X(var_name, type, module_header_type, getter, default_value) \
-    module_header_type("mock-"#var_name, default_value, NULL, NULL, true) \
-    change_volatile() \
-    change_safe()
-
 vlc_module_begin()
     set_description("mock access demux")
     set_capability("access", 0)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACCESS)
     set_callbacks(Open, Close)
-    LIST_OPTIONS
+    OPTIONS_GLOBAL(DECLARE_MODULE_OPTIONS)
+    OPTIONS_AUDIO(DECLARE_MODULE_SUBOPTIONS)
+    OPTIONS_VIDEO(DECLARE_MODULE_SUBOPTIONS)
+    OPTIONS_SUB(DECLARE_MODULE_SUBOPTIONS)
     add_shortcut("mock")
 vlc_module_end()
 
