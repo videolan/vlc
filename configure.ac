@@ -389,7 +389,7 @@ AS_IF([test "${SYS}" = "mingw32"],[
     AX_APPEND_FLAG([-DWINSTORECOMPAT],[CFLAGS])
     AX_APPEND_FLAG([-DWINSTORECOMPAT],[CPPFLAGS])
     AX_APPEND_FLAG([-DWINSTORECOMPAT],[CXXFLAGS])
-    AX_APPEND_FLAG([-lwinstorecompat], [LDFLAGS])
+    LDFLAGS="${LDFLAGS} -lwindowsappcompat"
     VLC_ADD_LIBS([libvlccore], [-lruntimeobject])
     AC_LIBOBJ([gai_strerror])
   ],[])

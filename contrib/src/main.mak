@@ -174,7 +174,7 @@ endif
 
 ifdef HAVE_WINSTORE
 EXTRA_CFLAGS += -DWINSTORECOMPAT
-EXTRA_LDFLAGS += -lwinstorecompat
+EXTRA_LDFLAGS += -lwindowsappcompat
 endif
 
 ifneq ($(findstring clang, $(shell $(CC) --version 2>/dev/null)),)

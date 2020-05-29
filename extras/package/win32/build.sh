@@ -209,9 +209,9 @@ if [ ! -z "$BUILD_UCRT" ]; then
         CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DWINAPI_FAMILY=WINAPI_FAMILY_APP -D_UNICODE -DUNICODE"
 
         # WinstoreCompat: hopefully can go away someday
-        LDFLAGS="$LDFLAGS -lwindowsapp -lwinstorecompat"
-        CFLAGS="$CFLAGS -Wl,-lwindowsapp,-lwinstorecompat"
-        CXXFLAGS="$CXXFLAGS -Wl,-lwindowsapp,-lwinstorecompat"
+        LDFLAGS="$LDFLAGS -lwindowsapp -lwindowsappcompat"
+        CFLAGS="$CFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
+        CXXFLAGS="$CXXFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
         CPPFLAGS="$CPPFLAGS -DWINSTORECOMPAT"
         EXTRA_CRUNTIME="vcruntime140_app"
     else
@@ -234,7 +234,7 @@ if [ ! -z "$BUILD_UCRT" ]; then
 
         if [ ! -z "$WINSTORE" ]; then
             # trick to provide these libraries instead of -ladvapi32 -lshell32 -luser32 -lkernel32
-            sed -i -e "s/-ladvapi32/-lwindowsapp -lwinstorecompat/" $NEWSPECFILE
+            sed -i -e "s/-ladvapi32/-lwindowsapp -lwindowsappcompat/" $NEWSPECFILE
             sed -i -e "s/-lshell32//" $NEWSPECFILE
             sed -i -e "s/-luser32//" $NEWSPECFILE
             sed -i -e "s/-lkernel32//" $NEWSPECFILE
