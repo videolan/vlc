@@ -79,9 +79,6 @@ endif
 libmicrodns_plugin_la_SOURCES = services_discovery/microdns.c
 libmicrodns_plugin_la_CFLAGS = $(AM_CFLAGS) $(MICRODNS_CFLAGS)
 libmicrodns_plugin_la_LIBADD = $(SOCKET_LIBS) $(MICRODNS_LIBS)
-if HAVE_WIN32
-libmicrodns_plugin_la_LIBADD += -liphlpapi
-endif
 libmicrodns_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)'
 sd_LTLIBRARIES += $(LTLIBmicrodns)
 EXTRA_LTLIBRARIES += libmicrodns_plugin.la
