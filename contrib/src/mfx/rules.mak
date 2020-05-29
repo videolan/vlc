@@ -1,7 +1,7 @@
 # mfx (Media SDK)
 
 mfx_GITURL := https://github.com/lu-zero/mfx_dispatch.git
-MFX_GITHASH := c51a54c15f51579804030c70592c0a26065f1242
+MFX_GITHASH := 7efc7505465bc1f16fbd1da3d24aa5bd9d46c5ca
 
 ifeq ($(call need_pkg,"mfx"),)
 PKGS_FOUND += mfx
@@ -29,6 +29,7 @@ $(TARBALLS)/mfx-$(MFX_GITHASH).tar.xz:
 
 mfx: mfx-$(MFX_GITHASH).tar.xz .sum-mfx
 	$(UNPACK)
+	$(APPLY) $(SRC)/mfx/0001-detect-winstore-builds-with-a-regular-mingw32-toolch.patch
 	cd $(UNPACK_DIR) && autoreconf -ivf
 	$(MOVE)
 
