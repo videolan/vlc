@@ -97,68 +97,6 @@ private slots:
     void hideCursor();
 };
 
-/******************** Background Widget ****************/
-class BackgroundWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    BackgroundWidget( intf_thread_t * );
-    void setExpandstoHeight( bool b_expand ) { b_expandPixmap = b_expand; }
-    void setWithArt( bool b_withart_ ) { b_withart = b_withart_; };
-private:
-    intf_thread_t *p_intf;
-    QString pixmapUrl;
-    bool b_expandPixmap;
-    bool b_withart;
-    QPropertyAnimation *fadeAnimation;
-    void contextMenuEvent( QContextMenuEvent *event ) Q_DECL_OVERRIDE;
-protected:
-    void paintEvent( QPaintEvent *e ) Q_DECL_OVERRIDE;
-    void showEvent( QShowEvent * e ) Q_DECL_OVERRIDE;
-    void updateDefaultArt( const QString& );
-    static const int MARGIN = 5;
-    QString defaultArt;
-public slots:
-    void toggle(){ isVisible() ? hide() : show(); }
-    void updateArt( const QString& );
-    void titleUpdated( const QString& );
-};
-
-class EasterEggBackgroundWidget : public BackgroundWidget
-{
-    Q_OBJECT
-
-public:
-    EasterEggBackgroundWidget( intf_thread_t * );
-    virtual ~EasterEggBackgroundWidget();
-
-public slots:
-    void animate();
-
-protected:
-    void paintEvent( QPaintEvent *e ) Q_DECL_OVERRIDE;
-    void showEvent( QShowEvent *e ) Q_DECL_OVERRIDE;
-    void hideEvent( QHideEvent * ) Q_DECL_OVERRIDE;
-    void resizeEvent( QResizeEvent * ) Q_DECL_OVERRIDE;
-
-private slots:
-    void spawnFlakes();
-    void reset();
-
-private:
-    struct flake
-    {
-        QPoint point;
-        bool b_fat;
-    };
-    QTimer *timer;
-    std::list<flake *> *flakes;
-    int i_rate;
-    int i_speed;
-    bool b_enabled;
-    static const int MAX_FLAKES = 1000;
-};
-
 class CoverArtLabel : public QLabel
 {
     Q_OBJECT
