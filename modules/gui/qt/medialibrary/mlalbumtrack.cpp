@@ -52,6 +52,13 @@ MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data,
             break;
         }
 
+    for( const vlc_ml_thumbnail_t& thumbnail: _data->thumbnails )
+        if( thumbnail.b_generated )
+        {
+            m_cover = QString::fromUtf8(thumbnail.psz_mrl);
+            break;
+        }
+
     if ( _data->album_track.i_album_id != 0 )
     {
         ml_unique_ptr<vlc_ml_album_t> album(vlc_ml_get_album(_ml, _data->album_track.i_album_id));
