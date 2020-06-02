@@ -33,14 +33,6 @@
 #include <vlc_input.h>
 #include <vlc_vector.h>
 
-
-struct mock_track
-{
-    es_format_t fmt;
-    es_out_id_t *id;
-};
-typedef struct VLC_VECTOR(struct mock_track *) mock_track_vector;
-
 static ssize_t
 var_InheritSsize(vlc_object_t *obj, const char *name)
 {
@@ -82,22 +74,25 @@ var_InheritFourcc(vlc_object_t *obj, const char *name)
 }
 
 #define OPTIONS_AUDIO(Y) \
+    Y(audio, packetized, bool, add_bool, Bool, true) \
+    Y(audio, add_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID) \
     Y(audio, channels, unsigned, add_integer, Unsigned, 2) \
     Y(audio, format, vlc_fourcc_t, add_string, Fourcc, "u8") \
     Y(audio, rate, unsigned, add_integer, Unsigned, 44100) \
-    Y(audio, packetized, bool, add_bool, Bool, true) \
     Y(audio, sample_length, vlc_tick_t, add_integer, Integer, VLC_TICK_FROM_MS(40) )
 
 #define OPTIONS_VIDEO(Y) \
+    Y(video, packetized, bool, add_bool, Bool, true)\
+    Y(video, add_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID) \
     Y(video, chroma, vlc_fourcc_t, add_string, Fourcc, "I420") \
     Y(video, width, unsigned, add_integer, Unsigned, 640) \
     Y(video, height, unsigned, add_integer, Unsigned, 480) \
     Y(video, frame_rate, unsigned, add_integer, Unsigned, 25) \
-    Y(video, frame_rate_base, unsigned, add_integer, Unsigned, 1) \
-    Y(video, packetized, bool, add_bool, Bool, true)
+    Y(video, frame_rate_base, unsigned, add_integer, Unsigned, 1)
 
 #define OPTIONS_SUB(Y) \
-    Y(sub, packetized, bool, add_bool, Bool, true)
+    Y(sub, packetized, bool, add_bool, Bool, true)\
+    Y(sub, add_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID)
 
 /* var_name, type, module_header_type, getter, default_value */
 #define OPTIONS_GLOBAL(X) \
@@ -117,9 +112,6 @@ var_InheritFourcc(vlc_object_t *obj, const char *name)
     X(can_record, bool, add_bool, Bool, true) \
     X(error, bool, add_bool, Bool, false) \
     X(pts_delay, unsigned, add_integer, Unsigned, MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY)) \
-    X(add_video_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID ) \
-    X(add_audio_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID ) \
-    X(add_spu_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID ) \
     X(config, char *, add_string, String, NULL )
 
 #define DECLARE_OPTION(var_name, type, module_header_type, getter, default_value)\
@@ -154,6 +146,24 @@ struct mock_sub_options
 {
     OPTIONS_SUB(DECLARE_SUBOPTION)
 };
+
+struct mock_track
+{
+    es_format_t fmt;
+    es_out_id_t *id;
+    union
+    {
+        struct mock_video_options video;
+        struct mock_audio_options audio;
+        struct mock_sub_options sub;
+    };
+};
+typedef struct VLC_VECTOR(struct mock_track *) mock_track_vector;
+/* Ensure common members have same location */
+static_assert(offsetof(struct mock_video_options, add_track_at) ==
+              offsetof(struct mock_audio_options, add_track_at), "inconsistent offset");
+static_assert(offsetof(struct mock_video_options, add_track_at) ==
+              offsetof(struct mock_sub_options, add_track_at), "inconsistent offset");
 
 struct demux_sys
 {
@@ -465,50 +475,85 @@ CreateSubBlock(demux_t *demux, struct mock_track *track)
 }
 
 static int
-AppendMockTrack(demux_t *demux, const es_format_t *fmt, int id, int group,
-                bool packetized)
+CheckAndCreateTracksEs(demux_t *demux, vlc_tick_t pts, bool *created)
 {
     struct demux_sys *sys = demux->p_sys;
-    struct mock_track *mock_track = malloc(sizeof(*mock_track));
-    if (!mock_track)
-        return VLC_EGENERIC;
-    mock_track->fmt = *fmt;
-    mock_track->fmt.i_id = id;
-    mock_track->fmt.i_group = group;
-    mock_track->fmt.b_packetized = packetized;
-    mock_track->id = es_out_Add(demux->out, & mock_track->fmt);
-    if (!mock_track->id)
+    *created = false;
+
+    struct mock_track *track;
+    vlc_vector_foreach(track, &sys->tracks)
     {
-        free(mock_track);
-        return VLC_ENOMEM;
+        if (track->id ||
+           (track->video.add_track_at != VLC_TICK_INVALID &&
+            pts < track->video.add_track_at))
+            continue;
+        track->id = es_out_Add(demux->out, & track->fmt);
+        if (!track->id)
+            return VLC_EGENERIC;
+        *created = true;
     }
-    bool success = vlc_vector_push(&sys->tracks, mock_track);
-    assert(success); (void) success; /* checked by reserve() */
+
     return VLC_SUCCESS;
 }
 
-static int
-InitVideoTracks(demux_t *demux, int group, size_t count)
+static void
+DeleteTrack(demux_t *demux, struct mock_track *track)
+{
+    if (track->id)
+        es_out_Del(demux->out, track->id);
+    es_format_Clean(&track->fmt);
+    free(track);
+}
+
+static struct mock_track *
+CreateTrack(demux_t *demux, int i_cat, int id, int group)
 {
     struct demux_sys *sys = demux->p_sys;
+    struct mock_track *track =  calloc(1, sizeof(*track));
+    if (!track)
+        return NULL;
 
-    if (count == 0)
-        return VLC_SUCCESS;
+    es_format_Init(&track->fmt, i_cat, 0);
+    switch (i_cat)
+    {
+        case AUDIO_ES:
+            track->audio = sys->audio;
+            break;
+        case VIDEO_ES:
+            track->video = sys->video;
+            break;
+        case SPU_ES:
+            track->sub = sys->sub;
+            break;
+        default:
+            vlc_assert_unreachable();
+            return NULL;
+    }
 
+    track->fmt.i_group = group;
+    track->fmt.i_id = id;
+
+    return track;
+}
+
+static int
+ConfigureVideoTrack(demux_t *demux,
+                    const struct mock_video_options *options,
+                    es_format_t *fmt)
+{
+    vlc_fourcc_t chroma = options->chroma;
     const vlc_chroma_description_t *desc =
-        vlc_fourcc_GetChromaDescription(sys->video.chroma);
+        vlc_fourcc_GetChromaDescription(chroma);
     if (!desc || desc->plane_count == 0)
-        sys->video.chroma = 0;
+        chroma = 0;
 
     const bool frame_rate_ok =
-        sys->video.frame_rate != 0 && sys->video.frame_rate != UINT_MAX &&
-        sys->video.frame_rate_base != 0 && sys->video.frame_rate_base != UINT_MAX;
-    const bool chroma_ok = sys->video.chroma != 0;
-    const bool size_ok = sys->video.width != UINT_MAX &&
-                         sys->video.height != UINT_MAX;
+        options->frame_rate != 0 && options->frame_rate != UINT_MAX &&
+        options->frame_rate_base != 0 && options->frame_rate_base != UINT_MAX;
+    const bool chroma_ok = chroma != 0;
+    const bool size_ok = options->width != UINT_MAX &&
+                         options->height != UINT_MAX;
 
-    if (sys->video.frame_rate == 0 || sys->video.frame_rate_base == 0
-     || sys->video.chroma == 0)
     if (!frame_rate_ok || !chroma_ok || !size_ok)
     {
         if (!frame_rate_ok)
@@ -520,34 +565,27 @@ InitVideoTracks(demux_t *demux, int group, size_t count)
         return VLC_EGENERIC;
     }
 
-    for (size_t i = 0; i < count; ++i)
-    {
-        es_format_t fmt;
-        es_format_Init(&fmt, VIDEO_ES, sys->video.chroma);
-        fmt.video.i_chroma = fmt.i_codec;
-        fmt.video.i_width = fmt.video.i_visible_width = sys->video.width;
-        fmt.video.i_height = fmt.video.i_visible_height = sys->video.height;
-        fmt.video.i_frame_rate = sys->video.frame_rate;
-        fmt.video.i_frame_rate_base = sys->video.frame_rate_base;
+    fmt->i_codec = chroma;
+    fmt->video.i_chroma = chroma;
+    fmt->video.i_width = fmt->video.i_visible_width = options->width;
+    fmt->video.i_height = fmt->video.i_visible_height = options->height;
+    fmt->video.i_frame_rate = options->frame_rate;
+    fmt->video.i_frame_rate_base = options->frame_rate_base;
 
-        if (AppendMockTrack(demux, &fmt, i, group, sys->video.packetized))
-            return VLC_ENOMEM;
-    }
+    fmt->b_packetized = options->packetized;
+
     return VLC_SUCCESS;
 }
 
 static int
-InitAudioTracks(demux_t *demux, int group, size_t count)
+ConfigureAudioTrack(demux_t *demux,
+                    const struct mock_audio_options *options,
+                    es_format_t *fmt)
 {
-    struct demux_sys *sys = demux->p_sys;
-
-    if (count == 0)
-        return VLC_SUCCESS;
-
-    const bool rate_ok = sys->audio.rate > 0 && sys->audio.rate != UINT_MAX;
-    const bool format_ok = aout_BitsPerSample(sys->audio.format) != 0;
-    const bool channels_ok = sys->audio.channels > 0 &&
-                             sys->audio.channels <= AOUT_CHAN_MAX;
+    const bool rate_ok = options->rate > 0 && options->rate != UINT_MAX;
+    const bool format_ok = aout_BitsPerSample(options->format) != 0;
+    const bool channels_ok = options->channels > 0 &&
+                             options->channels <= AOUT_CHAN_MAX;
 
     if (!rate_ok || !format_ok || !channels_ok)
     {
@@ -561,7 +599,7 @@ InitAudioTracks(demux_t *demux, int group, size_t count)
     }
 
     uint16_t physical_channels = 0;
-    switch (sys->audio.channels)
+    switch (options->channels)
     {
         case 1: physical_channels = AOUT_CHAN_CENTER; break;
         case 2: physical_channels = AOUT_CHANS_2_0; break;
@@ -575,38 +613,27 @@ InitAudioTracks(demux_t *demux, int group, size_t count)
         default: vlc_assert_unreachable();
     }
 
-    for (size_t i = 0; i < count; ++i)
-    {
-        es_format_t fmt;
-        es_format_Init(&fmt, AUDIO_ES, sys->audio.format);
-        fmt.audio.i_format = fmt.i_codec;
-        fmt.audio.i_rate = sys->audio.rate;
-        fmt.audio.i_physical_channels = physical_channels;
-        aout_FormatPrepare(&fmt.audio);
+    fmt->i_codec = options->format;
+    fmt->audio.i_format = options->format;
+    fmt->audio.i_rate = options->rate;
+    fmt->audio.i_physical_channels = physical_channels;
+    aout_FormatPrepare(&fmt->audio);
 
-        if (AppendMockTrack(demux, &fmt, i, group, sys->audio.packetized))
-            return VLC_ENOMEM;
-    }
+    fmt->b_packetized = options->packetized;
 
     return VLC_SUCCESS;
 }
 
 static int
-InitSubTracks(demux_t *demux, int group, size_t count)
+ConfigureSubTrack(demux_t *demux,
+                  const struct mock_sub_options *options,
+                  es_format_t *fmt)
 {
-    struct demux_sys *sys = demux->p_sys;
+    VLC_UNUSED(demux);
 
-    if (count == 0)
-        return VLC_SUCCESS;
+    fmt->i_codec = VLC_CODEC_SUBT;
 
-    for (size_t i = 0; i < count; ++i)
-    {
-        es_format_t fmt;
-        es_format_Init(&fmt, SPU_ES, VLC_CODEC_SUBT);
-
-        if (AppendMockTrack(demux, &fmt, i, group, sys->sub.packetized))
-            return VLC_ENOMEM;
-    }
+    fmt->b_packetized = options->packetized;
 
     return VLC_SUCCESS;
 }
@@ -621,6 +648,8 @@ DemuxAudio(demux_t *demux, vlc_tick_t step_length, vlc_tick_t end_pts)
         struct mock_track *track;
         vlc_vector_foreach(track, &sys->tracks)
         {
+            if (!track->id)
+                continue;
             block_t *block;
             switch (track->fmt.i_cat)
             {
@@ -655,6 +684,8 @@ DemuxVideo(demux_t *demux, vlc_tick_t step_length, vlc_tick_t end_pts)
         struct mock_track *track;
         vlc_vector_foreach(track, &sys->tracks)
         {
+            if (!track->id)
+                continue;
             block_t *block;
             switch (track->fmt.i_cat)
             {
@@ -686,8 +717,15 @@ static int
 Demux(demux_t *demux)
 {
     struct demux_sys *sys = demux->p_sys;
+    int ret = VLC_SUCCESS;
 
     if (sys->error)
+        return VLC_DEMUXER_EGENERIC;
+
+    /* Add late tracks if any */
+    bool created;
+    ret = CheckAndCreateTracksEs(demux, sys->pts, &created);
+    if (ret != VLC_SUCCESS)
         return VLC_DEMUXER_EGENERIC;
 
     if (sys->audio_track_count > 0
@@ -712,14 +750,13 @@ Demux(demux_t *demux)
 
     const vlc_tick_t step_length = __MAX(audio_step_length, video_step_length);
 
-    int ret = VLC_SUCCESS;
-    bool audio_eof = true, video_eof = true, input_eof = true;
+    bool eof = !created;
     if (sys->audio_track_count > 0)
     {
         ret = DemuxAudio(demux, audio_step_length,
                          __MIN(step_length + sys->audio_pts, sys->length));
         if (sys->audio_pts + audio_step_length < sys->length)
-            audio_eof = false;
+            eof = false;
     }
 
     if (ret == VLC_SUCCESS
@@ -728,7 +765,7 @@ Demux(demux_t *demux)
         ret = DemuxVideo(demux, video_step_length,
                          __MIN(step_length + sys->video_pts, sys->length));
         if (sys->video_pts + video_step_length < sys->length)
-            video_eof = false;
+            eof = false;
     }
 
     /* No audio/video/sub: simulate that we read some inputs */
@@ -736,54 +773,13 @@ Demux(demux_t *demux)
     {
         sys->pts += sys->input_sample_length;
         if (sys->pts + sys->input_sample_length < sys->length)
-            input_eof = false;
+            eof = false;
     }
 
     if (ret != VLC_SUCCESS)
         return VLC_DEMUXER_EGENERIC;
 
-    /* Add late tracks if any */
-    if (sys->add_video_track_at != VLC_TICK_INVALID &&
-        sys->add_video_track_at <= sys->pts)
-    {
-        sys->add_video_track_at = VLC_TICK_INVALID;
-
-        ret = InitVideoTracks(demux, 0, 1);
-        if (ret != VLC_SUCCESS)
-            return VLC_DEMUXER_EGENERIC;
-        sys->video_track_count++;
-        sys->video_pts = sys->pts;
-        video_eof = false;
-    }
-
-    if (sys->add_audio_track_at != VLC_TICK_INVALID &&
-        sys->add_audio_track_at <= sys->pts)
-    {
-        sys->add_audio_track_at = VLC_TICK_INVALID;
-
-        ret = InitAudioTracks(demux, 0, 1);
-        if (ret != VLC_SUCCESS)
-            return VLC_DEMUXER_EGENERIC;
-        sys->audio_track_count++;
-        sys->audio_pts = sys->pts;
-        audio_eof = false;
-    }
-
-    if (sys->add_spu_track_at != VLC_TICK_INVALID &&
-        sys->add_spu_track_at <= sys->pts)
-    {
-        sys->add_spu_track_at = VLC_TICK_INVALID;
-
-        ret = InitSubTracks(demux, 0, 1);
-        if (ret != VLC_SUCCESS)
-            return VLC_DEMUXER_EGENERIC;
-        sys->sub_track_count++;
-        sys->video_pts = sys->pts;
-        video_eof = false;
-    }
-
-    return audio_eof && video_eof && input_eof ? VLC_DEMUXER_EOF
-                                               : VLC_DEMUXER_SUCCESS;
+    return eof ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
 }
 
 static void
@@ -795,8 +791,7 @@ Close(vlc_object_t *obj)
     struct mock_track *track;
     vlc_vector_foreach(track, &sys->tracks)
     {
-        es_out_Del(demux->out, track->id);
-        free(track);
+        DeleteTrack(demux, track);
     }
     vlc_vector_clear(&sys->tracks);
 }
@@ -805,6 +800,7 @@ static int
 Open(vlc_object_t *obj)
 {
     demux_t *demux = (demux_t*)obj;
+    int ret = VLC_EGENERIC;
 
     if (demux->out == NULL)
         return VLC_EGENERIC;
@@ -860,22 +856,63 @@ Open(vlc_object_t *obj)
             return VLC_ENOMEM;
     }
 
-    int ret;
+    struct
+    {
+        int cat;
+        ssize_t count;
+    } trackscountmap[3] = {
+        { AUDIO_ES, sys->audio_track_count },
+        { VIDEO_ES, sys->video_track_count },
+        { SPU_ES,   sys->sub_track_count   },
+    };
+
     for (ssize_t i = 0; i < sys->program_count; ++i)
     {
-        ret = InitVideoTracks(demux, i, sys->video_track_count);
-        if (ret != VLC_SUCCESS)
-            goto error;
+        for (size_t j=0; j<3; ++j)
+        {
+            for (ssize_t k=0; k<trackscountmap[j].count; ++k)
+            {
+                struct mock_track *track = CreateTrack(demux,
+                                                       trackscountmap[j].cat,
+                                                       (i << 10) + k, i);
+                if (!track || !vlc_vector_push(&sys->tracks, track))
+                {
+                    if (track)
+                        DeleteTrack(demux, track);
+                    goto error;
+                }
+            }
+        }
+    }
+    assert(track_count == sys->tracks.size);
 
-        ret = InitAudioTracks(demux, i, sys->audio_track_count);
-        if (ret != VLC_SUCCESS)
-            goto error;
 
-        ret = InitSubTracks(demux, i, sys->sub_track_count);
+    struct mock_track *track;
+    vlc_vector_foreach(track, &sys->tracks)
+    {
+        switch(track->fmt.i_cat)
+        {
+            case AUDIO_ES:
+                ret = ConfigureAudioTrack(demux, &track->audio, &track->fmt);
+                break;
+            case VIDEO_ES:
+                ret = ConfigureVideoTrack(demux, &track->video, &track->fmt);
+                break;
+            case SPU_ES:
+                ret = ConfigureSubTrack(demux, &track->sub, &track->fmt);
+                break;
+            default:
+                vlc_assert_unreachable();
+                ret = VLC_EGENERIC;
+                break;
+        }
         if (ret != VLC_SUCCESS)
             goto error;
     }
 
+    bool created;
+    if (CheckAndCreateTracksEs(demux, VLC_TICK_0, &created) != VLC_SUCCESS)
+        goto error;
 
     sys->pts = sys->audio_pts = sys->video_pts = VLC_TICK_0;
     sys->current_title = 0;

@@ -55,7 +55,7 @@ const struct
     /* Take a thumbnail of a file without video, which should timeout. */
     { 0, 1, VLC_TICK_INVALID, VLC_TICK_FROM_SEC( 60 ), .0f, false, true, VLC_TICK_FROM_MS( 100 ), false },
     /* Take a thumbnail of a file with a video track starting later */
-    { 0, 1, VLC_TICK_FROM_SEC( 120 ), VLC_TICK_FROM_SEC( 60 ), .0f, false, true,
+    { 1, 1, VLC_TICK_FROM_SEC( 120 ), VLC_TICK_FROM_SEC( 60 ), .0f, false, true,
         VLC_TICK_FROM_SEC( 2 ), true },
 };
 
@@ -123,7 +123,7 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         ctx.b_done = false;
 
         if ( asprintf( &psz_mrl, "mock://video_track_count=%u;audio_track_count=%u"
-                       ";length=%" PRId64 ";video_chroma=ARGB;add_video_track_at=%" PRId64,
+                       ";length=%" PRId64 ";video_chroma=ARGB;video_add_track_at=%" PRId64,
                        test_params[i].i_nb_video_tracks,
                        test_params[i].i_nb_audio_tracks, MOCK_DURATION,
                        test_params[i].i_add_video_track_at ) < 0 )
