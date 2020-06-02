@@ -390,6 +390,7 @@ Filter(filter_t *filter, picture_t *src)
     {
         picture_Release(dst);
         picture_Release(src);
+        CVPixelBufferRelease(dst_cvpx);
         return NULL;
     }
 
@@ -397,6 +398,7 @@ Filter(filter_t *filter, picture_t *src)
 
     picture_CopyProperties(dst, src);
     picture_Release(src);
+    CVPixelBufferRelease(dst_cvpx);
     return dst;
 }
 
