@@ -141,6 +141,49 @@ typedef struct libvlc_media_track_t
 
 } libvlc_media_track_t;
 
+/**
+ * Opaque struct containing a list of tracks
+ */
+typedef struct libvlc_media_tracklist_t libvlc_media_tracklist_t;
+
+/**
+ * Get the number of tracks in a tracklist
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \param list valid tracklist
+ *
+ * \return number of tracks, or 0 if the list is empty
+ */
+LIBVLC_API size_t
+libvlc_media_tracklist_count( const libvlc_media_tracklist_t *list );
+
+/**
+ * Get a track at a specific index
+ *
+ * \warning The behaviour is undefined if the index is not valid.
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \param list valid tracklist
+ * \param index valid index in the range [0; count[
+ *
+ * \return a valid track (can't be NULL if libvlc_media_tracklist_count()
+ * returned a valid count)
+ */
+LIBVLC_API libvlc_media_track_t *
+libvlc_media_tracklist_at( libvlc_media_tracklist_t *list, size_t index );
+
+/**
+ * Release a tracklist
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \param list valid tracklist
+ */
+LIBVLC_API void
+libvlc_media_tracklist_delete( libvlc_media_tracklist_t *list );
+
 /** @}*/
 
 # ifdef __cplusplus

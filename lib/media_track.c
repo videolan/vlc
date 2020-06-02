@@ -33,6 +33,12 @@
 #include "libvlc_internal.h"
 #include "media_internal.h"
 
+struct libvlc_media_tracklist_t
+{
+    size_t count;
+    libvlc_media_trackpriv_t tracks[];
+};
+
 void
 libvlc_media_trackpriv_from_es( libvlc_media_trackpriv_t *trackpriv,
                                 const es_format_t *es  )
@@ -117,4 +123,28 @@ libvlc_media_track_clean( libvlc_media_track_t *track )
     default:
         break;
     }
+}
+
+size_t
+libvlc_media_tracklist_count( const libvlc_media_tracklist_t *list )
+{
+    return list->count;
+}
+
+libvlc_media_track_t *
+libvlc_media_tracklist_at( libvlc_media_tracklist_t *list, size_t idx )
+{
+    assert( idx < list->count );
+    return &list->tracks[idx].t;
+}
+
+void
+libvlc_media_tracklist_delete( libvlc_media_tracklist_t *list )
+{
+    for( size_t i = 0; i < list->count; ++i )
+    {
+        libvlc_media_trackpriv_t *trackpriv = &list->tracks[i];
+        libvlc_media_track_clean( &trackpriv->t );
+    }
+    free( list );
 }
