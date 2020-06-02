@@ -87,6 +87,11 @@ void
 libvlc_media_trackpriv_from_es( libvlc_media_trackpriv_t *trackpriv,
                                 const es_format_t *es  );
 
+libvlc_media_tracklist_t *
+libvlc_media_tracklist_from_es_array( es_format_t **es_array,
+                                      size_t es_count,
+                                      libvlc_track_type_t type );
+
 void
 libvlc_media_track_clean( libvlc_media_track_t *track );
 

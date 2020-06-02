@@ -125,6 +125,53 @@ libvlc_media_track_clean( libvlc_media_track_t *track )
     }
 }
 
+static libvlc_media_tracklist_t *
+libvlc_media_tracklist_alloc( size_t count )
+{
+    size_t size;
+    if( mul_overflow( count, sizeof(libvlc_media_trackpriv_t), &size) )
+        return NULL;
+    if( add_overflow( size, sizeof(libvlc_media_tracklist_t), &size) )
+        return NULL;
+
+    libvlc_media_tracklist_t *list = malloc( size );
+    if( list == NULL )
+        return NULL;
+
+    list->count = count;
+    return list;
+}
+
+libvlc_media_tracklist_t *
+libvlc_media_tracklist_from_es_array( es_format_t **es_array,
+                                      size_t es_count,
+                                      libvlc_track_type_t type )
+{
+    size_t count = 0;
+    const enum es_format_category_e cat = libvlc_track_type_to_escat( type );
+
+    for( size_t i = 0; i < es_count; ++i )
+    {
+        if( es_array[i]->i_cat == cat )
+            count++;
+    }
+
+    libvlc_media_tracklist_t *list = libvlc_media_tracklist_alloc( count );
+
+    if( count == 0 )
+        return list;
+
+    count = 0;
+    for( size_t i = 0; i < es_count; ++i )
+    {
+        if( es_array[i]->i_cat == cat )
+            libvlc_media_trackpriv_from_es( &list->tracks[count++],
+                                            es_array[i] );
+    }
+
+    return list;
+}
+
 size_t
 libvlc_media_tracklist_count( const libvlc_media_tracklist_t *list )
 {

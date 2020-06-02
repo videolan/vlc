@@ -573,7 +573,7 @@ LIBVLC_API libvlc_time_t
  *
  * \see libvlc_MediaParsedChanged
  * \see libvlc_media_get_meta
- * \see libvlc_media_tracks_get
+ * \see libvlc_media_get_tracklist
  * \see libvlc_media_get_parsed_status
  * \see libvlc_media_parse_flag_t
  *
@@ -660,6 +660,29 @@ LIBVLC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
 LIBVLC_API
 unsigned libvlc_media_tracks_get( libvlc_media_t *p_md,
                                   libvlc_media_track_t ***tracks );
+
+/**
+ * Get the track list for one type
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \note You need to call libvlc_media_parse_with_options() or play the media
+ * at least once before calling this function.  Not doing this will result in
+ * an empty list.
+ *
+ * \see libvlc_media_parse_with_options
+ * \see libvlc_media_tracklist_count
+ * \see libvlc_media_tracklist_at
+ *
+ * \param p_md media descriptor object
+ * \param type type of the track list to request
+ *
+ * \return a valid libvlc_media_tracklist_t or NULL in case of error, if there
+ * is no track for a category, the returned list will have a size of 0, delete
+ * with libvlc_media_tracklist_delete()
+ */
+LIBVLC_API libvlc_media_tracklist_t *
+libvlc_media_get_tracklist( libvlc_media_t *p_md, libvlc_track_type_t type );
 
 /**
  * Get codec description from media elementary stream

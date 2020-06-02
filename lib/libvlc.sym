@@ -77,6 +77,7 @@ libvlc_media_get_meta
 libvlc_media_get_mrl
 libvlc_media_get_state
 libvlc_media_get_stats
+libvlc_media_get_tracklist
 libvlc_media_get_type
 libvlc_media_get_user_data
 libvlc_media_is_parsed

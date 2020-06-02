@@ -895,6 +895,22 @@ libvlc_media_tracks_get( libvlc_media_t *p_md, libvlc_media_track_t *** pp_es )
     return i_es;
 }
 
+libvlc_media_tracklist_t *
+libvlc_media_get_tracklist( libvlc_media_t *p_md, libvlc_track_type_t type )
+{
+    assert( p_md );
+
+    input_item_t *p_input_item = p_md->p_input_item;
+
+    vlc_mutex_lock( &p_input_item->lock );
+    libvlc_media_tracklist_t *list =
+        libvlc_media_tracklist_from_es_array( p_input_item->es,
+                                              p_input_item->i_es, type );
+    vlc_mutex_unlock( &p_input_item->lock );
+
+    return list;
+}
+
 // Get codec description from media elementary stream
 const char *
 libvlc_media_get_codec_description( libvlc_track_type_t i_type,
