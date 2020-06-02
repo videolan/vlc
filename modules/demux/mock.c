@@ -73,6 +73,45 @@ var_InheritFourcc(vlc_object_t *obj, const char *name)
     return fourcc;
 }
 
+static vlc_fourcc_t
+var_Read_vlc_fourcc_t(const char *psz)
+{
+    char fourcc[5] = { 0 };
+    if (psz)
+    {
+        strncpy(fourcc, psz, 4);
+        return VLC_FOURCC(fourcc[0], fourcc[1],fourcc[2],fourcc[3]);
+    }
+    return 0;
+}
+
+static bool
+var_Read_bool(const char *psz)
+{
+    if (!psz)
+        return false;
+    char *endptr;
+    long long int value = strtoll(psz, &endptr, 0);
+    if (endptr == psz) /* Not an integer */
+        return strcasecmp(psz, "true") == 0
+            || strcasecmp(psz, "yes") == 0;
+    return !!value;
+}
+
+static int64_t
+var_Read_integer(const char *psz)
+{
+    return psz ? strtoll(psz, NULL, 0) : 0;
+}
+#define var_Read_vlc_tick_t var_Read_integer
+
+static unsigned
+var_Read_unsigned(const char *psz)
+{
+    int64_t value = var_Read_integer(psz);
+    return value >= 0 && value < UINT_MAX ? value : UINT_MAX;
+}
+
 #define OPTIONS_AUDIO(Y) \
     Y(audio, packetized, bool, add_bool, Bool, true) \
     Y(audio, add_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID) \
@@ -117,6 +156,13 @@ var_InheritFourcc(vlc_object_t *obj, const char *name)
 #define DECLARE_OPTION(var_name, type, module_header_type, getter, default_value)\
     type var_name;
 #define DECLARE_SUBOPTION(a,b,c,d,e,f) DECLARE_OPTION(b,c,d,e,f)
+
+#define OVERRIDE_OPTION(group_name, var_name, type, module_header_type, getter, default_value) \
+    if (!strcmp(""#var_name, config_chain->psz_name)) \
+    { \
+        track->group_name.var_name = var_Read_ ## type(config_chain->psz_value); \
+        break; \
+    }
 
 #define READ(var_name, member_name, getter) \
     sys->member_name = var_Inherit##getter(obj, "mock-"#var_name);
@@ -168,6 +214,7 @@ static_assert(offsetof(struct mock_video_options, add_track_at) ==
 struct demux_sys
 {
     mock_track_vector tracks;
+
     vlc_tick_t pts;
     vlc_tick_t audio_pts;
     vlc_tick_t video_pts;
@@ -638,6 +685,80 @@ ConfigureSubTrack(demux_t *demux,
     return VLC_SUCCESS;
 }
 
+static struct mock_track *
+GetMockTrackByID(struct demux_sys *sys,
+                 enum es_format_category_e cat, unsigned id)
+{
+    unsigned current=0;
+    struct mock_track *track;
+    vlc_vector_foreach(track, &sys->tracks)
+    {
+        if (track->fmt.i_cat != cat)
+            continue;
+        if (id == current++)
+            return track;
+    }
+    return NULL;
+}
+
+static int
+OverrideTrackOptions(const config_chain_t *config_chain,
+                     struct mock_track *track)
+{
+    for (; config_chain ; config_chain = config_chain->p_next)
+    {
+        switch (track->fmt.i_cat)
+        {
+            case VIDEO_ES:
+                OPTIONS_VIDEO(OVERRIDE_OPTION)
+                        break;
+            case AUDIO_ES:
+                OPTIONS_AUDIO(OVERRIDE_OPTION)
+                        break;
+            case SPU_ES:
+                OPTIONS_SUB(OVERRIDE_OPTION)
+                        break;
+            default:
+                vlc_assert_unreachable();
+                break;
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+static int
+UpdateTrackConfiguration(demux_t *demux,
+                         const char *config_name,
+                         const config_chain_t *config_chain)
+{
+    struct demux_sys *sys = demux->p_sys;
+
+    const struct
+    {
+        const char *name;
+        const int cat;
+    } chain_names[3] = {
+        { "audio[%u]", AUDIO_ES },
+        { "video[%u]", VIDEO_ES },
+        { "sub[%u]",   SPU_ES   },
+    };
+
+    for (int i=0; i<3; i++)
+    {
+        unsigned trackid;
+        struct mock_track *track;
+        if (sscanf(config_name, chain_names[i].name, &trackid) == 1)
+        {
+            if (!(track = GetMockTrackByID(sys, chain_names[i].cat, trackid)))
+                return VLC_EGENERIC;
+            OverrideTrackOptions(config_chain, track);
+            return VLC_SUCCESS;
+        }
+    }
+    msg_Warn(demux, "ignoring %s", config_name);
+    return VLC_SUCCESS;
+}
+
 static int
 DemuxAudio(demux_t *demux, vlc_tick_t step_length, vlc_tick_t end_pts)
 {
@@ -849,6 +970,7 @@ Open(vlc_object_t *obj)
     size_t track_count = (sys->video_track_count + sys->audio_track_count +
                           sys->sub_track_count) * sys->program_count;
     vlc_vector_init(&sys->tracks);
+
     if (track_count > 0)
     {
         bool success = vlc_vector_reserve(&sys->tracks, track_count);
@@ -886,6 +1008,27 @@ Open(vlc_object_t *obj)
     }
     assert(track_count == sys->tracks.size);
 
+    /* Convert config to config chain separators (collides with parselocation) */
+    if (sys->config)
+    {
+        for (int i=0; sys->config[i]; i++)
+            if (sys->config[i] == '+')
+                sys->config[i] = ':';
+    }
+
+    /* Read per track config chain */
+    for (char *psz_in = sys->config; psz_in;)
+    {
+        config_chain_t *chain = NULL;
+        char *name;
+        char *psz_next = config_ChainCreate(&name, &chain, psz_in);
+        if (name)
+            UpdateTrackConfiguration(demux, name, chain);
+        config_ChainDestroy(chain);
+        if (sys->config != psz_in)
+            free(psz_in);
+        psz_in = psz_next;
+    };
 
     struct mock_track *track;
     vlc_vector_foreach(track, &sys->tracks)
