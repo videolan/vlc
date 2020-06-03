@@ -22,6 +22,7 @@
 
 #import "VLCSliderCell.h"
 
+#import "extensions/NSGradient+VLCAdditions.h"
 #import "main/CompatibilityFixes.h"
 
 @interface VLCSliderCell () {
@@ -224,9 +225,7 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     // Empty Track Drawing
     NSBezierPath* emptyTrackPath = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:3 yRadius:3];
 
-    // Drawing a gradient into an empty bezier path will cause an exception, prevent that
-    if (![emptyTrackPath isEmpty])
-        [_trackGradient drawInBezierPath:emptyTrackPath angle:-90];
+    [_trackGradient vlc_safeDrawInBezierPath:emptyTrackPath angle:-90];
 
     if (_isKnobHidden) {
         [_trackStrokeColor setStroke];

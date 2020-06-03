@@ -24,6 +24,7 @@
 #import "VLCBottomBarView.h"
 
 #import "extensions/NSView+VLCAdditions.h"
+#import "extensions/NSGradient+VLCAdditions.h"
 
 @interface VLCBottomBarView () {
     NSBezierPath *_rectanglePath;
@@ -126,15 +127,12 @@
     [[NSColor clearColor] setFill];
     NSRectFill(barRect);
 
-    // Drawing a gradient into an empty bezier path will cause an exception, prevent that
-    if (![_rectanglePath isEmpty]) {
-        if (_isDark) {
-            [_darkGradient drawInBezierPath:_rectanglePath angle:270.0];
-            [_darkStroke setStroke];
-        } else {
-            [_lightGradient drawInBezierPath:_rectanglePath angle:270.0];
-            [_lightStroke setStroke];
-        }
+    if (_isDark) {
+        [_darkGradient vlc_safeDrawInBezierPath:_rectanglePath angle:270.0];
+        [_darkStroke setStroke];
+    } else {
+        [_lightGradient vlc_safeDrawInBezierPath:_rectanglePath angle:270.0];
+        [_lightStroke setStroke];
     }
 
     [_separatorPath stroke];
