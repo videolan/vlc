@@ -23,6 +23,7 @@
 
 #import "VLCVolumeSliderCell.h"
 #import "CompatibilityFixes.h"
+#import "NSGradient+VLCAdditions.h"
 
 @interface VLCVolumeSliderCell () {
     BOOL _isRTL;
@@ -145,16 +146,14 @@
     // Draw knob
     NSBezierPath* knobPath = [NSBezierPath bezierPathWithOvalInRect:NSInsetRect(knobRect, 1.0, 1.0)];
     if (self.isHighlighted) {
-        // Drawing a gradient into an empty bezier path will cause an exception, prevent that
-        if (_knobGradient && ![knobPath isEmpty]) {
-            [_knobGradient drawInBezierPath:knobPath angle:_knobGradientAngleHighlighted];
+        if (_knobGradient) {
+            [_knobGradient vlc_safeDrawInBezierPath:knobPath angle:_knobGradientAngleHighlighted];
         } else {
             [_activeKnobFillColor setFill];
         }
     } else {
-        // Drawing a gradient into an empty bezier path will cause an exception, prevent that
-        if (_knobGradient && ![knobPath isEmpty]) {
-            [_knobGradient drawInBezierPath:knobPath angle:_knobGradientAngle];
+        if (_knobGradient) {
+            [_knobGradient vlc_safeDrawInBezierPath:knobPath angle:_knobGradientAngle];
         } else {
             [_knobFillColor setFill];
         }
@@ -203,14 +202,10 @@
         [emptyTrackPath fill];
 
         // Filled part drawing
-        // Drawing a gradient into an empty bezier path will cause an exception, prevent that
-        if (![leadingTrackPath isEmpty])
-            [_trackGradient drawInBezierPath:leadingTrackPath angle:-90];
+        [_trackGradient vlc_safeDrawInBezierPath:leadingTrackPath angle:-90];
     } else {
         // Empty part drawing
-        // Drawing a gradient into an empty bezier path will cause an exception, prevent that
-        if (![emptyTrackPath isEmpty])
-            [_trackGradient drawInBezierPath:emptyTrackPath angle:-90];
+        [_trackGradient vlc_safeDrawInBezierPath:emptyTrackPath angle:-90];
 
         // Filled part drawing
         [_filledTrackColor setFill];
