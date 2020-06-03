@@ -34,6 +34,7 @@
 
 #import "VLCHUDSegmentedCell.h"
 #import "CompatibilityFixes.h"
+#import "NSGradient+VLCAdditions.h"
 
 @interface NSSegmentedCell (Private)
 
@@ -156,7 +157,7 @@
         [fillPath fill];
     }
     [NSGraphicsContext restoreGraphicsState];
-    [gradient drawInBezierPath:fillPath angle:90];
+    [gradient vlc_safeDrawInBezierPath:fillPath angle:90];
 }
 
 - (void)drawDividerForSegment:(NSInteger)segment inFrame:(NSRect)frame

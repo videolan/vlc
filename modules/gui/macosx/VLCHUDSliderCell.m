@@ -34,6 +34,7 @@
 
 #import "VLCHUDSliderCell.h"
 #import "CompatibilityFixes.h"
+#import "NSGradient+VLCAdditions.h"
 
 @implementation VLCHUDSliderCell
 
@@ -139,11 +140,11 @@ NSAffineTransform* RotationTransform(const CGFloat angle, const NSPoint point)
 
     // Draw the knobs background
     if (self.isEnabled && self.isHighlighted) {
-        [_knobGradient drawInBezierPath:path angle:270.0f];
+        [_knobGradient vlc_safeDrawInBezierPath:path angle:270.0f];
     } else if (self.isEnabled) {
-        [_knobGradient drawInBezierPath:path angle:90.0f];
+        [_knobGradient vlc_safeDrawInBezierPath:path angle:90.0f];
     } else {
-        [_disableKnobGradient drawInBezierPath:path angle:90.0f];
+        [_disableKnobGradient vlc_safeDrawInBezierPath:path angle:90.0f];
     }
 
     // Draw white stroke around the knob

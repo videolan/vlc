@@ -34,6 +34,7 @@
 
 #import "VLCHUDCheckboxCell.h"
 #import "CompatibilityFixes.h"
+#import "NSGradient+VLCAdditions.h"
 
 @implementation VLCHUDCheckboxCell
 
@@ -100,9 +101,9 @@
     // Draw background and stroke
     if([self isEnabled]) {
         if ([self isHighlighted]) {
-            [_highlightGradient drawInBezierPath:backgroundPath angle:90.0];
+            [_highlightGradient vlc_safeDrawInBezierPath:backgroundPath angle:90.0];
         } else {
-            [_normalGradient drawInBezierPath:backgroundPath angle:90.0];
+            [_normalGradient vlc_safeDrawInBezierPath:backgroundPath angle:90.0];
         }
         [_strokeColor setStroke];
     } else {

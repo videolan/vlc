@@ -34,6 +34,7 @@
 
 #import "VLCHUDButtonCell.h"
 #import "CompatibilityFixes.h"
+#import "NSGradient+VLCAdditions.h"
 
 @implementation VLCHUDButtonCell
 
@@ -111,11 +112,11 @@
         path = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:8.0 yRadius:8.0];
     }
     if (self.highlighted) {
-        [_pushedGradient drawInBezierPath:path angle:90.0f];
+        [_pushedGradient vlc_safeDrawInBezierPath:path angle:90.0f];
     } else if (!self.enabled) {
-        [_disabledGradient drawInBezierPath:path angle:90.0f];
+        [_disabledGradient vlc_safeDrawInBezierPath:path angle:90.0f];
     } else {
-        [_normalGradient drawInBezierPath:path angle:90.0f];
+        [_normalGradient vlc_safeDrawInBezierPath:path angle:90.0f];
     }
     [[NSColor colorWithCalibratedWhite:1.0 alpha:1.0] setStroke];
     [path setLineWidth:1.0];

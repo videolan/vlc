@@ -34,6 +34,7 @@
 
 #import "VLCHUDPopUpButtonCell.h"
 #import "CompatibilityFixes.h"
+#import "NSGradient+VLCAdditions.h"
 
 @implementation VLCHUDPopUpButtonCell
 
@@ -120,10 +121,10 @@
         [NSGraphicsContext restoreGraphicsState];
 
         if ([self isEnabled]) {
-            [_normalGradient drawInBezierPath: path angle: 90];
+            [_normalGradient vlc_safeDrawInBezierPath: path angle: 90];
             [_strokeColor set];
         } else {
-            [_disabledNormalGradient drawInBezierPath: path angle: 90];
+            [_disabledNormalGradient vlc_safeDrawInBezierPath: path angle: 90];
             [_disabledStrokeColor set];
         }
 

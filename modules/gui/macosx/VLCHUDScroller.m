@@ -37,6 +37,7 @@
 
 #import "VLCHUDScroller.h"
 #import "CompatibilityFixes.h"
+#import "NSGradient+VLCAdditions.h"
 
 @implementation VLCHUDScroller
 
@@ -137,7 +138,7 @@
                                      startAngle:0
                                        endAngle:180];
 
-        [_scrollerKnobGradient drawInBezierPath:knob angle:0];
+        [_scrollerKnobGradient vlc_safeDrawInBezierPath:knob angle:0];
 
     } else {
 
@@ -175,7 +176,7 @@
                                      startAngle:270
                                        endAngle:90];
 
-        [_scrollerKnobGradient drawInBezierPath:knob angle:90];
+        [_scrollerKnobGradient vlc_safeDrawInBezierPath:knob angle:90];
 
     }
 }
@@ -238,7 +239,7 @@
 
             [path appendBezierPathWithPoints:basePoints count:4];
 
-            [_scrollerArrowNormalGradient drawInBezierPath:path angle:0];
+            [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:0];
 
         } else if ([arrowPosition isEqualToString:@"None"]) {
 
@@ -263,7 +264,7 @@
 
             [path appendBezierPathWithPoints:basePoints count:4];
 
-            [_scrollerArrowNormalGradient drawInBezierPath:path angle:0];
+            [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:0];
 
 
             // Draw Decrement Button
@@ -288,7 +289,7 @@
             // Add Points to Path
             [path appendBezierPathWithPoints:basePoints count:4];
 
-            [_scrollerArrowNormalGradient drawInBezierPath:path angle:0];
+            [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:0];
         }
     } else {
 
@@ -317,7 +318,7 @@
 
             [path appendBezierPathWithPoints:basePoints count:4];
 
-            [_scrollerArrowNormalGradient drawInBezierPath:path angle:0];
+            [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:0];
         } else if ([arrowPosition isEqualToString:@"None"]) {
 
             // Adjust rect height for top base
@@ -341,7 +342,7 @@
 
             [path appendBezierPathWithPoints:basePoints count:4];
 
-            [_scrollerArrowNormalGradient drawInBezierPath:path angle:0];
+            [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:0];
 
             // Bottom Base
             // Draw Decrement Button
@@ -366,7 +367,7 @@
             // Add Points to Path
             [path appendBezierPathWithPoints:basePoints count:4];
 
-            [_scrollerArrowNormalGradient drawInBezierPath:path angle:90];
+            [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:90];
         }
     }
 }
@@ -399,9 +400,9 @@
 
             // Fill Path
             if (!highlighted) {
-                [_scrollerArrowNormalGradient drawInBezierPath:path angle:0];
+                [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:0];
             } else {
-                [_scrollerArrowPushedGradient drawInBezierPath:path angle:0];
+                [_scrollerArrowPushedGradient vlc_safeDrawInBezierPath:path angle:0];
             }
 
             // Create Arrow Glyph
@@ -445,10 +446,10 @@
 
             // Fill Path
             if (!highlighted) {
-                [_scrollerArrowNormalGradient drawInBezierPath:path angle:0];
+                [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:0];
             } else {
 
-                [_scrollerArrowPushedGradient drawInBezierPath:path angle:0];
+                [_scrollerArrowPushedGradient vlc_safeDrawInBezierPath:path angle:0];
             }
 
             // Create Arrow Glyph
@@ -490,9 +491,9 @@
 
             // Fill Path
             if (!highlighted) {
-                [_scrollerArrowNormalGradient drawInBezierPath:path angle:90];
+                [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:90];
             } else {
-                [_scrollerArrowPushedGradient drawInBezierPath:path angle:90];
+                [_scrollerArrowPushedGradient vlc_safeDrawInBezierPath:path angle:90];
             }
 
             // Create Arrow Glyph
@@ -536,9 +537,9 @@
 
             // Fill Path
             if (!highlighted) {
-                [_scrollerArrowNormalGradient drawInBezierPath:path angle:90];
+                [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:90];
             } else {
-                [_scrollerArrowPushedGradient drawInBezierPath:path angle:90];
+                [_scrollerArrowPushedGradient vlc_safeDrawInBezierPath:path angle:90];
             }
 
             // Create Arrow Glyph
@@ -610,9 +611,9 @@
 
             // Fill Path
             if (!highlighted) {
-                [_scrollerArrowNormalGradient drawInBezierPath:path angle:0];
+                [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:0];
             } else {
-                [_scrollerArrowPushedGradient drawInBezierPath:path angle:0];
+                [_scrollerArrowPushedGradient vlc_safeDrawInBezierPath:path angle:0];
             }
 
             // Create Arrow Glyph
@@ -677,9 +678,9 @@
 
             // Fill Path
             if (!highlighted) {
-                [_scrollerArrowNormalGradient drawInBezierPath:path angle:0];
+                [_scrollerArrowNormalGradient vlc_safeDrawInBezierPath:path angle:0];
             } else {
-                [_scrollerArrowPushedGradient drawInBezierPath:path angle:0];
+                [_scrollerArrowPushedGradient vlc_safeDrawInBezierPath:path angle:0];
             }
 
             // Create Arrow Glyph

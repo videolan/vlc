@@ -34,6 +34,7 @@
 
 #import "VLCHUDStepperCell.h"
 #import "CompatibilityFixes.h"
+#import "NSGradient+VLCAdditions.h"
 
 @interface VLCHUDStepperCell () {
     int topButtonFlag;
@@ -210,11 +211,11 @@
 
     if([self isEnabled]) {
 
-        [_normalGradient drawInBezierPath:path relativeCenterPosition:NSZeroPoint];
+        [_normalGradient vlc_safeDrawInBezierPath:path relativeCenterPosition:NSZeroPoint];
 
     } else {
 
-        [_disabledNormalComplexGradient drawInBezierPath:path relativeCenterPosition:NSZeroPoint];
+        [_disabledNormalComplexGradient vlc_safeDrawInBezierPath:path relativeCenterPosition:NSZeroPoint];
     }
 
 
