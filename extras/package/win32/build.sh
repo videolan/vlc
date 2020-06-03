@@ -210,16 +210,19 @@ if [ ! -z "$BUILD_UCRT" ]; then
 
     LDFLAGS="$LDFLAGS -l$EXTRA_CRUNTIME -lucrt"
     if [ ! "$COMPILING_WITH_CLANG" -gt 0 ]; then
-        # tell gcc to replace msvcrt with $EXTRA_CRUNTIME+ucrt
-        CFLAGS="$CFLAGS -mcrtdll=$EXTRA_CRUNTIME -mcrtdll=ucrt"
-        CXXFLAGS="$CXXFLAGS -mcrtdll=$EXTRA_CRUNTIME -mcrtdll=ucrt"
-        LDFLAGS="$LDFLAGS -mcrtdll=$EXTRA_CRUNTIME -mcrtdll=ucrt"
+        # assume gcc
+        NEWSPECFILE="`pwd`/specfile-$SHORTARCH"
+        # tell gcc to replace msvcrt with ucrtbase+ucrt
+        $CC -dumpspecs | sed -e "s/-lmsvcrt/-l$EXTRA_CRUNTIME -lucrt/" > $NEWSPECFILE
+        CFLAGS="$CFLAGS -specs=$NEWSPECFILE"
+        CXXFLAGS="$CXXFLAGS -specs=$NEWSPECFILE"
 
         if [ ! -z "$WINSTORE" ]; then
-            # trick to provide these libraries before -ladvapi32 -lshell32 -luser32 -lkernel32
-            CFLAGS="$CFLAGS -mcrtdll=windowsapp -mcrtdll=winstorecompat"
-            CXXFLAGS="$CXXFLAGS -mcrtdll=windowsapp -mcrtdll=winstorecompat"
-            LDFLAGS="$LDFLAGS -mcrtdll=windowsapp -mcrtdll=winstorecompat"
+            # trick to provide these libraries instead of -ladvapi32 -lshell32 -luser32 -lkernel32
+            sed -i -e "s/-ladvapi32/-lwindowsapp -lwinstorecompat/" $NEWSPECFILE
+            sed -i -e "s/-lshell32//" $NEWSPECFILE
+            sed -i -e "s/-luser32//" $NEWSPECFILE
+            sed -i -e "s/-lkernel32//" $NEWSPECFILE
         fi
     else
         CFLAGS="$CFLAGS -Wl,-l$EXTRA_CRUNTIME,-lucrt"
