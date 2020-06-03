@@ -25,6 +25,7 @@ enum Role {
     VIDEO_TITLE,
     VIDEO_THUMBNAIL,
     VIDEO_DURATION,
+    VIDEO_DURATION_SHORT,
     VIDEO_PROGRESS,
     VIDEO_PLAYCOUNT,
     VIDEO_RESOLUTION,
@@ -66,6 +67,8 @@ QVariant MLVideoModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue( video->getThumbnail() );
         case VIDEO_DURATION:
             return QVariant::fromValue( video->getDuration() );
+        case VIDEO_DURATION_SHORT:
+            return QVariant::fromValue( video->getDurationShort() );
         case VIDEO_PROGRESS:
             return QVariant::fromValue( video->getProgress() );
         case VIDEO_PLAYCOUNT:
@@ -97,6 +100,7 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
         { VIDEO_TITLE, "title" },
         { VIDEO_THUMBNAIL, "thumbnail" },
         { VIDEO_DURATION, "duration" },
+        { VIDEO_DURATION_SHORT, "durationShort" },
         { VIDEO_PROGRESS, "progress" },
         { VIDEO_PLAYCOUNT, "playcount" },
         { VIDEO_RESOLUTION, "resolution_name" },

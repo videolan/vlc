@@ -43,6 +43,7 @@ class MLAlbumTrack : public QObject
     Q_PROPERTY(unsigned int track_number READ getTrackNumber CONSTANT)
     Q_PROPERTY(unsigned int disc_number READ getDiscNumber CONSTANT)
     Q_PROPERTY(QString duration READ getDuration CONSTANT)
+    Q_PROPERTY(QString durationShort READ getDurationShort CONSTANT)
     Q_PROPERTY(QString mrl READ getMRL CONSTANT)
 
 public:
@@ -56,6 +57,7 @@ public:
     unsigned int getTrackNumber() const;
     unsigned int getDiscNumber() const;
     QString getDuration() const;
+    QString getDurationShort() const;
     QString getMRL() const;
 
     MLAlbumTrack* clone(QObject *parent = nullptr) const;
@@ -71,6 +73,7 @@ private:
     unsigned int m_trackNumber;
     unsigned int m_discNumber;
     QString m_duration;
+    QString m_durationShort;
     QString m_mrl;
 
    ml_unique_ptr<vlc_ml_media_t> m_data;

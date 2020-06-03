@@ -24,7 +24,7 @@
 
 namespace
 {
-QString MsToString( int64_t time )
+QString MsToString( int64_t time , bool doShort = false )
 {
     if (time < 0)
         return "--:--";
@@ -37,6 +37,10 @@ QString MsToString( int64_t time )
         return QString("%1:%2")
                 .arg(min, 2, 10, QChar('0'))
                 .arg(sec, 2, 10, QChar('0'));
+    else if ( doShort )
+        return QString("%1h%2")
+                .arg(hour)
+                .arg(min, 2, 10, QChar('0'));
     else
         return QString("%1:%2:%3")
                 .arg(hour, 2, 10, QChar('0'))
@@ -179,6 +183,11 @@ QString MLVideo::getThumbnail()
 QString MLVideo::getDuration() const
 {
     return MsToString( m_duration );
+}
+
+QString MLVideo::getDurationShort() const
+{
+    return MsToString( m_duration, true );
 }
 
 QString MLVideo::getMRL() const

@@ -27,6 +27,7 @@ enum Role {
     TRACK_NUMBER,
     TRACK_DISC_NUMBER,
     TRACK_DURATION,
+    TRACK_DURATION_SHORT,
     TRACK_ALBUM,
     TRACK_ARTIST,
 
@@ -76,6 +77,8 @@ QVariant MLAlbumTrackModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue( ml_track->getDiscNumber() );
     case TRACK_DURATION :
         return QVariant::fromValue( ml_track->getDuration() );
+    case TRACK_DURATION_SHORT :
+        return QVariant::fromValue( ml_track->getDurationShort() );
     case TRACK_ALBUM:
         return QVariant::fromValue( ml_track->getAlbumTitle() );
     case TRACK_ARTIST:
@@ -100,6 +103,7 @@ QHash<int, QByteArray> MLAlbumTrackModel::roleNames() const
         { TRACK_NUMBER, "track_number" },
         { TRACK_DISC_NUMBER, "disc_number" },
         { TRACK_DURATION, "duration" },
+        { TRACK_DURATION_SHORT, "durationShort" },
         { TRACK_ALBUM, "album_title"},
         { TRACK_ARTIST, "main_artist"},
         { TRACK_TITLE_FIRST_SYMBOL, "title_first_symbol"},
@@ -142,6 +146,7 @@ vlc_ml_sorting_criteria_t MLAlbumTrackModel::roleToCriteria(int role) const
     case TRACK_NUMBER :
         return VLC_ML_SORTING_TRACKNUMBER;
     case TRACK_DURATION :
+    case TRACK_DURATION_SHORT :
         return VLC_ML_SORTING_DURATION;
     default:
         return VLC_ML_SORTING_DEFAULT;
