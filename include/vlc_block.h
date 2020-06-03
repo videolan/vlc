@@ -642,7 +642,12 @@ static inline void vlc_fifo_Cleanup(void *fifo)
  */
 static inline void block_FifoEmpty(block_fifo_t *fifo)
 {
-    block_ChainRelease((block_t *)vlc_queue_DequeueAll(vlc_fifo_queue(fifo)));
+    block_t *block;
+
+    vlc_fifo_Lock(fifo);
+    block = vlc_fifo_DequeueAllUnlocked(fifo);
+    vlc_fifo_Unlock(fifo);
+    block_ChainRelease(block);
 }
 
 /**
