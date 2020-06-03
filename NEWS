@@ -19,14 +19,14 @@ Contribs:
  * Updated libfaad to 2.9.2 (Parametric Stereo regression)
  * Updated libarchive to 3.4.2
 
-MacOS:
+macOS:
  * Fixed moving video window with mouse
  * Fixed UI issue showing "permissions warning" unnecessarily often
  * Fixed stack buffer overflow listing bluray mount points
  * Fixed potential crashes at startup
 
 Audio Output:
- * Fix sound not coming back after a pause with CoreAudio
+ * Fix sound not coming back after a pause with CoreAudio (macOS/iOS)
 
 Misc:
  * Update Youtube script
