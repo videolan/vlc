@@ -60,7 +60,7 @@ void vlc_fifo_QueueUnlocked(block_fifo_t *fifo, block_t *block)
 {
     for (block_t *b = block; b != NULL; b = b->p_next) {
         fifo->i_depth++;
-        fifo->i_size += block->i_buffer;
+        fifo->i_size += b->i_buffer;
     }
 
     vlc_queue_EnqueueUnlocked(&fifo->q, block);
