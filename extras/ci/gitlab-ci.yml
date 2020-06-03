@@ -12,8 +12,8 @@ default:
         - mv contrib/vlc-contrib-*.tar.bz2 contrib/vlc-contrib-${TRIPLET}-${VLC_CONTRIB_SHA}.tar.bz2 2>/dev/null || true
 
 variables:
-    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20190416165205
-    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20190416180622
+    VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32:20200602191827
+    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64:20200602185103
     VLC_WIN_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-mingw:20190621125349
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20200229201904
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20190717134531
