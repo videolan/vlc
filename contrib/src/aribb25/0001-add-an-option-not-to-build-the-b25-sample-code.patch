@@ -1,0 +1,44 @@
+From 3d18150434e374d1e7f3b2ff9973ff24c993dc36 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 3 Jun 2020 11:34:26 +0200
+Subject: [PATCH] add an option not to build the b25 sample code
+
+Given it's built with -Werror it may fail in many cases.
+---
+ Makefile.am  | 2 ++
+ configure.ac | 5 +++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 0cf8e51..dd9ddc8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -17,7 +17,9 @@ pkginclude_HEADERS = src/arib_std_b25_error_code.h src/b_cas_card_error_code.h \
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = src/aribb25.pc
+ 
++if BUILD_B25
+ bin_PROGRAMS = b25
++endif
+ b25_SOURCES = src/td.c
+ b25_CFLAGS = $(AM_CFLAGS) -Wall -Werror $(pcsclite_CFLAGS)
+ b25_LDADD = libaribb25.la $(pcsclite_LIBS) $(PCSC_LIBS)
+diff --git a/configure.ac b/configure.ac
+index baa856e..292a748 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -82,6 +82,11 @@ AS_IF([test "$SYS" = mingw32],[
+   ], [AC_MSG_ERROR([${pcsclite_PKG_ERRORS}.])])
+ ])
+ 
++AC_ARG_ENABLE([b25],
++  AS_HELP_STRING([--disable-b25], [don't build the b25 sample app]))
++AM_CONDITIONAL([BUILD_B25], [test "${enable_b25}" != "no"])
++
++
+ AC_CONFIG_HEADERS([src/config.h])
+ AC_CONFIG_FILES([Makefile src/aribb25.pc])
+ AC_OUTPUT
+-- 
+2.26.0.windows.1
+
