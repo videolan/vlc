@@ -32,4 +32,12 @@
     [self drawInBezierPath:path angle:angle];
 }
 
+- (void)vlc_safeDrawInBezierPath:(NSBezierPath *)path
+          relativeCenterPosition:(NSPoint)relativeCenterPosition
+{
+    if ([path isEmpty])
+        return;
+    [self drawInBezierPath:path relativeCenterPosition:relativeCenterPosition];
+}
+
 @end

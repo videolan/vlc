@@ -27,7 +27,13 @@
 /* Safe alternative to drawInBezierPath:angle: which will throw an
  * exception when trying to draw into an empty NSBezierPath.
  */
-- (void)vlc_safeDrawInBezierPath:(NSBezierPath *)path 
+- (void)vlc_safeDrawInBezierPath:(NSBezierPath *)path
                            angle:(CGFloat)angle;
+
+/* Safe alternative to drawInBezierPath:relativeCenterPosition: which
+ * will throw an exception when trying to draw into an empty NSBezierPath.
+ */
+- (void)vlc_safeDrawInBezierPath:(NSBezierPath *)path
+          relativeCenterPosition:(NSPoint)relativeCenterPosition;
 
 @end
