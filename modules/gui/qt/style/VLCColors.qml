@@ -79,6 +79,8 @@ Item {
     property color playerBg: "black"
     property color playerBorder: "#222222"
 
+    property color separator: blendColors(bg, text, .95)
+
     //vlc orange
     property color accent: "#FFFF950D";
 
@@ -121,6 +123,7 @@ Item {
 
                 accent: "#ff950d";
                 alert: "#ff0000";
+                separator: "#ededed"
             }
         },
         State {
@@ -144,6 +147,7 @@ Item {
                 bannerHover: "#3daee9"
                 accent: "#ff950d"
                 alert: "#ff0000"
+                separator: "#2d2d2d"
             }
         },
         State {
@@ -171,6 +175,8 @@ Item {
                 textActiveSource: accent
                 banner: systemPalette.window
                 bannerHover: systemPalette.highlight
+
+                separator: blendColors(bg, text, .95)
             }
         }
     ]
