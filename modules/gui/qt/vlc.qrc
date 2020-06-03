@@ -186,6 +186,7 @@
         <file alias="ToolTipArea.qml">widgets/qml/ToolTipArea.qml</file>
         <file alias="DNDLabel.qml">widgets/qml/DNDLabel.qml</file>
         <file alias="KeyNavigableTableView.qml">widgets/qml/KeyNavigableTableView.qml</file>
+        <file alias="TableColumns.qml">widgets/qml/TableColumns.qml</file>
         <file alias="NavigableFocusScope.qml">widgets/qml/NavigableFocusScope.qml</file>
         <file alias="FocusBackground.qml">widgets/qml/FocusBackground.qml</file>
         <file alias="ImageToolButton.qml">widgets/qml/ImageToolButton.qml</file>
