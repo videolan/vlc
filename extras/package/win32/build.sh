@@ -213,16 +213,20 @@ if [ ! -z "$BUILD_UCRT" ]; then
         CFLAGS="$CFLAGS -Wl,-lwindowsapp,-lwinstorecompat"
         CXXFLAGS="$CXXFLAGS -Wl,-lwindowsapp,-lwinstorecompat"
         CPPFLAGS="$CPPFLAGS -DWINSTORECOMPAT"
+        EXTRA_CRUNTIME="vcruntime140_app"
     else
         SHORTARCH="$SHORTARCH-ucrt"
+        # this library doesn't exist yet, so use ucrt twice as a placeholder
+        # EXTRA_CRUNTIME="vcruntime140"
+        EXTRA_CRUNTIME="ucrt"
     fi
 
-    LDFLAGS="$LDFLAGS -lucrtbase -lucrt"
+    LDFLAGS="$LDFLAGS -l$EXTRA_CRUNTIME -lucrt"
     if [ ! "$COMPILING_WITH_CLANG" -gt 0 ]; then
-        # tell gcc to replace msvcrt with ucrtbase+ucrt
-        CFLAGS="$CFLAGS -mcrtdll=ucrtbase -mcrtdll=ucrt"
-        CXXFLAGS="$CXXFLAGS -mcrtdll=ucrtbase -mcrtdll=ucrt"
-        LDFLAGS="$LDFLAGS -mcrtdll=ucrtbase -mcrtdll=ucrt"
+        # tell gcc to replace msvcrt with $EXTRA_CRUNTIME+ucrt
+        CFLAGS="$CFLAGS -mcrtdll=$EXTRA_CRUNTIME -mcrtdll=ucrt"
+        CXXFLAGS="$CXXFLAGS -mcrtdll=$EXTRA_CRUNTIME -mcrtdll=ucrt"
+        LDFLAGS="$LDFLAGS -mcrtdll=$EXTRA_CRUNTIME -mcrtdll=ucrt"
 
         if [ ! -z "$WINSTORE" ]; then
             # trick to provide these libraries before -ladvapi32 -lshell32 -luser32 -lkernel32
@@ -231,8 +235,8 @@ if [ ! -z "$BUILD_UCRT" ]; then
             LDFLAGS="$LDFLAGS -mcrtdll=windowsapp -mcrtdll=winstorecompat"
         fi
     else
-        CFLAGS="$CFLAGS -Wl,-lucrtbase,-lucrt"
-        CXXFLAGS="$CXXFLAGS -Wl,-lucrtbase,-lucrt"
+        CFLAGS="$CFLAGS -Wl,-l$EXTRA_CRUNTIME,-lucrt"
+        CXXFLAGS="$CXXFLAGS -Wl,-l$EXTRA_CRUNTIME,-lucrt"
     fi
 
     # the values are not passed to the makefiles/configures
