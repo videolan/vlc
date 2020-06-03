@@ -141,6 +141,9 @@ Item {
     property int button_width_normal: dp(96, scale)
     property int button_width_large: dp(128, scale)
 
+    property int table_section_width: dp(32, scale)
+    property int table_section_text_margin: dp(10, scale)
+
     //GridItem
     property int gridItem_network_height: VLCStyle.network_normal + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small + VLCStyle.margin_xxsmall * 4
     property int gridItem_network_width: VLCStyle.network_normal + VLCStyle.margin_xxsmall * 4
