@@ -87,6 +87,10 @@ NavigableFocusScope {
         headerPositioning: ListView.OverlayHeader
 
         header: Rectangle {
+
+            readonly property alias contentX: row.x
+            readonly property alias contentWidth: row.width
+
             width: parent.width
             height: childrenRect.height
             color: headerColor
@@ -98,6 +102,8 @@ NavigableFocusScope {
                 height: childrenRect.height
 
                 Row {
+                    id: row
+
                     anchors {
                         leftMargin: VLCStyle.margin_xxxsmall
                         rightMargin: VLCStyle.margin_xxxsmall
@@ -147,6 +153,16 @@ NavigableFocusScope {
                     color: VLCStyle.colors.textInactive
                 }
             }
+        }
+
+        section.delegate: Text {
+            x: headerItem.contentX - VLCStyle.table_section_width
+            topPadding: VLCStyle.margin_xsmall
+            bottomPadding: VLCStyle.margin_xxsmall
+            leftPadding: VLCStyle.table_section_text_margin
+            text: section
+            font.pixelSize: VLCStyle.fontHeight_normal
+            color: VLCStyle.colors.accent
         }
 
         delegate:Rectangle {
