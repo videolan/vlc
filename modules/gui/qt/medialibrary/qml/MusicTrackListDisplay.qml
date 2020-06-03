@@ -32,21 +32,21 @@ Widgets.KeyNavigableTableView {
         { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(1), text: i18n.qtr("Title"),    showSection: "title", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(1), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
-        { criteria: "duration",    width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "" },
+        { criteria: "durationShort", width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
     ]
 
     property var sortModelMedium: [
         { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(2), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
-        { criteria: "duration",    width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "" },
+        { criteria: "durationShort", width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
     ]
 
     property var sortModelLarge: [
         { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(2), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(2), text: i18n.qtr("Artist"),   showSection: "main_artist" },
-        { criteria: "duration",    width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "" },
+        { criteria: "durationShort", width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
         { criteria: "track_number",width: VLCStyle.colWidth(1), text: i18n.qtr("Track"), showSection: "" },
         { criteria: "disc_number", width: VLCStyle.colWidth(1), text: i18n.qtr("Disc"),  showSection: "" },
     ]
@@ -148,4 +148,8 @@ Widgets.KeyNavigableTableView {
     }
 
     onActionForSelection:  medialib.addAndPlay(model.getIdsForIndexes( selection ))
+
+    Widgets.TableColumns {
+        id: tableColumns
+    }
 }
