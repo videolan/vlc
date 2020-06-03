@@ -38,6 +38,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCMainMenu.h gui/macosx/VLCMainMenu.m \
 	gui/macosx/VLCMainWindowTitleView.h gui/macosx/VLCMainWindowTitleView.m \
 	gui/macosx/misc.h gui/macosx/misc.m \
+	gui/macosx/NSGradient+VLCAdditions.h gui/macosx/NSGradient+VLCAdditions.m \
 	gui/macosx/NSSound+VLCAdditions.h gui/macosx/NSSound+VLCAdditions.m \
 	gui/macosx/NSScreen+VLCAdditions.h gui/macosx/NSScreen+VLCAdditions.m \
 	gui/macosx/VLCOpenWindowController.h gui/macosx/VLCOpenWindowController.m \
