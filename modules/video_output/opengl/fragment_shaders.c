@@ -680,6 +680,9 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     else
     {
         ADD(" tex_coords = (TexCoordsMap0 * pic_hcoords).st;\n");
+        if (tex_target == GL_TEXTURE_RECTANGLE)
+            ADD(" tex_coords *= TexSize0;\n");
+
         ADDF(" vec4 result = %s(Texture0, tex_coords);\n", lookup);
         color_count = 1;
     }
