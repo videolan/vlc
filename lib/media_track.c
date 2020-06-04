@@ -129,6 +129,15 @@ libvlc_media_track_clean( libvlc_media_track_t *track )
     }
 }
 
+void
+libvlc_media_track_delete( libvlc_media_track_t *track )
+{
+    libvlc_media_trackpriv_t *trackpriv =
+        container_of( track, libvlc_media_trackpriv_t, t );
+    libvlc_media_track_clean( track );
+    free( trackpriv );
+}
+
 static libvlc_media_tracklist_t *
 libvlc_media_tracklist_alloc( size_t count )
 {

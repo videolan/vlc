@@ -199,6 +199,18 @@ libvlc_media_tracklist_at( libvlc_media_tracklist_t *list, size_t index );
 LIBVLC_API void
 libvlc_media_tracklist_delete( libvlc_media_tracklist_t *list );
 
+/**
+ * Release a single track
+ *
+ * \version LibVLC 4.0.0 and later.
+ * \warning Don't release tracks from a tracklist with this function. Tracks
+ * from a tracklist are released alongside the list with
+ * libvlc_media_tracklist_delete()
+ *
+ * \param track valid track
+ */
+LIBVLC_API void
+libvlc_media_track_delete( libvlc_media_track_t *track );
 /** @}*/
 
 # ifdef __cplusplus
