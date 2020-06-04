@@ -277,5 +277,6 @@ QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintN
 
 void VideoSurface::onSurfaceSizeChanged()
 {
-    emit surfaceSizeChanged(size() * this->window()->effectiveDevicePixelRatio());
+    if (isEnabled())
+        emit surfaceSizeChanged(size() * this->window()->effectiveDevicePixelRatio());
 }
