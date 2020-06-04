@@ -45,6 +45,8 @@ libvlc_media_trackpriv_from_es( libvlc_media_trackpriv_t *trackpriv,
 {
     libvlc_media_track_t *track = &trackpriv->t;
 
+    trackpriv->es_id = NULL;
+
     track->i_codec = es->i_codec;
     track->i_original_fourcc = es->i_original_fourcc;
     track->i_id = es->i_id;
@@ -56,6 +58,7 @@ libvlc_media_trackpriv_from_es( libvlc_media_trackpriv_t *trackpriv,
     track->psz_language = es->psz_language != NULL ? strdup(es->psz_language) : NULL;
     track->psz_description = es->psz_description != NULL ? strdup(es->psz_description) : NULL;
     track->psz_id = NULL;
+    track->id_stable = false;
     track->psz_name = NULL;
     track->selected = false;
 
@@ -135,6 +138,8 @@ libvlc_media_track_delete( libvlc_media_track_t *track )
     libvlc_media_trackpriv_t *trackpriv =
         container_of( track, libvlc_media_trackpriv_t, t );
     libvlc_media_track_clean( track );
+    if( trackpriv->es_id )
+        vlc_es_id_Release( trackpriv->es_id );
     free( trackpriv );
 }
 
@@ -185,6 +190,52 @@ libvlc_media_tracklist_from_es_array( es_format_t **es_array,
     return list;
 }
 
+void
+libvlc_media_trackpriv_from_player_track( libvlc_media_trackpriv_t *trackpriv,
+                                          const struct vlc_player_track *track )
+{
+    libvlc_media_trackpriv_from_es( trackpriv, &track->fmt );
+
+    trackpriv->es_id = vlc_es_id_Hold( track->es_id );
+
+    trackpriv->t.psz_id = vlc_es_id_GetStrId( track->es_id );
+    trackpriv->t.id_stable = vlc_es_id_IsStrIdStable( track->es_id );
+    trackpriv->t.psz_name = strdup( track->name );
+    trackpriv->t.selected = track->selected;
+}
+
+libvlc_media_track_t *
+libvlc_media_track_create_from_player_track( const struct vlc_player_track *track )
+{
+    libvlc_media_trackpriv_t *trackpriv = malloc( sizeof(*trackpriv) );
+    if( trackpriv == NULL )
+        return NULL;
+    libvlc_media_trackpriv_from_player_track( trackpriv, track );
+    return &trackpriv->t;
+}
+
+libvlc_media_tracklist_t *
+libvlc_media_tracklist_from_player( vlc_player_t *player,
+                                    libvlc_track_type_t type )
+{
+    const enum es_format_category_e cat = libvlc_track_type_to_escat( type );
+
+    size_t count = vlc_player_GetTrackCount( player, cat );
+    libvlc_media_tracklist_t *list = libvlc_media_tracklist_alloc( count );
+
+    for( size_t i = 0; i < count; ++i )
+    {
+        const struct vlc_player_track *track =
+            vlc_player_GetTrackAt( player, cat, i );
+        assert( track );
+
+        libvlc_media_trackpriv_t *trackpriv = &list->tracks[i];
+        libvlc_media_trackpriv_from_player_track( trackpriv, track );
+    }
+
+    return list;
+}
+
 size_t
 libvlc_media_tracklist_count( const libvlc_media_tracklist_t *list )
 {
@@ -205,6 +256,9 @@ libvlc_media_tracklist_delete( libvlc_media_tracklist_t *list )
     {
         libvlc_media_trackpriv_t *trackpriv = &list->tracks[i];
         libvlc_media_track_clean( &trackpriv->t );
+
+        if( trackpriv->es_id != NULL )
+            vlc_es_id_Release( trackpriv->es_id );
     }
     free( list );
 }

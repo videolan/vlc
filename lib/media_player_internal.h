@@ -33,6 +33,7 @@
 #include <vlc_input.h>
 #include <vlc_player.h>
 #include <vlc_viewpoint.h>
+#include "media_internal.h"
 
 #include "../modules/audio_filter/equalizer_presets.h"
 
