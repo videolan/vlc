@@ -8,6 +8,7 @@ Demux:
  * Fixed regression with some encrypted HLS streams
  * Live HLS delay until first update fix
  * HLS rendition switch regression fix
+ * Fix imprecise m4a seek
 
 Decoder:
  * Fixed missing captions with some capture cards
