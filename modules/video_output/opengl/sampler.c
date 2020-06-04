@@ -48,17 +48,17 @@ struct vlc_gl_sampler_priv {
 
     struct {
         GLfloat OrientationMatrix[4*4];
-        GLfloat TexCoordsMap[PICTURE_PLANE_MAX][3*3];
+        GLfloat TexCoordsMaps[PICTURE_PLANE_MAX][3*3];
     } var;
     struct {
-        GLint Texture[PICTURE_PLANE_MAX];
-        GLint TexSize[PICTURE_PLANE_MAX]; /* for GL_TEXTURE_RECTANGLE */
+        GLint Textures[PICTURE_PLANE_MAX];
+        GLint TexSizes[PICTURE_PLANE_MAX]; /* for GL_TEXTURE_RECTANGLE */
         GLint ConvMatrix;
         GLint *pl_vars; /* for pl_sh_res */
 
         GLint TransformMatrix;
         GLint OrientationMatrix;
-        GLint TexCoordsMap[PICTURE_PLANE_MAX];
+        GLint TexCoordsMaps[PICTURE_PLANE_MAX];
     } uloc;
 
     bool yuv_color;
@@ -69,8 +69,8 @@ struct vlc_gl_sampler_priv {
     struct pl_shader *pl_sh;
     const struct pl_shader_res *pl_sh_res;
 
-    GLsizei tex_width[PICTURE_PLANE_MAX];
-    GLsizei tex_height[PICTURE_PLANE_MAX];
+    GLsizei tex_widths[PICTURE_PLANE_MAX];
+    GLsizei tex_heights[PICTURE_PLANE_MAX];
 
     GLuint textures[PICTURE_PLANE_MAX];
 
@@ -280,18 +280,18 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         char name[sizeof("TexCoordsMapX")];
 
         snprintf(name, sizeof(name), "Texture%1u", i);
-        priv->uloc.Texture[i] = vt->GetUniformLocation(program, name);
-        assert(priv->uloc.Texture[i] != -1);
+        priv->uloc.Textures[i] = vt->GetUniformLocation(program, name);
+        assert(priv->uloc.Textures[i] != -1);
 
         snprintf(name, sizeof(name), "TexCoordsMap%1u", i);
-        priv->uloc.TexCoordsMap[i] = vt->GetUniformLocation(program, name);
-        assert(priv->uloc.TexCoordsMap[i] != -1);
+        priv->uloc.TexCoordsMaps[i] = vt->GetUniformLocation(program, name);
+        assert(priv->uloc.TexCoordsMaps[i] != -1);
 
         if (interop->tex_target == GL_TEXTURE_RECTANGLE)
         {
             snprintf(name, sizeof(name), "TexSize%1u", i);
-            priv->uloc.TexSize[i] = vt->GetUniformLocation(program, name);
-            assert(priv->uloc.TexSize[i] != -1);
+            priv->uloc.TexSizes[i] = vt->GetUniformLocation(program, name);
+            assert(priv->uloc.TexSizes[i] != -1);
         }
     }
 
@@ -329,14 +329,14 @@ sampler_base_load(const struct vlc_gl_sampler *sampler)
 
     for (unsigned i = 0; i < interop->tex_count; ++i)
     {
-        vt->Uniform1i(priv->uloc.Texture[i], i);
+        vt->Uniform1i(priv->uloc.Textures[i], i);
 
         assert(priv->textures[i] != 0);
         vt->ActiveTexture(GL_TEXTURE0 + i);
         vt->BindTexture(interop->tex_target, priv->textures[i]);
 
-        vt->UniformMatrix3fv(priv->uloc.TexCoordsMap[i], 1, GL_FALSE,
-                             priv->var.TexCoordsMap[i]);
+        vt->UniformMatrix3fv(priv->uloc.TexCoordsMaps[i], 1, GL_FALSE,
+                             priv->var.TexCoordsMaps[i]);
     }
 
     const GLfloat *tm = GetTransformMatrix(interop);
@@ -348,8 +348,8 @@ sampler_base_load(const struct vlc_gl_sampler *sampler)
     if (interop->tex_target == GL_TEXTURE_RECTANGLE)
     {
         for (unsigned i = 0; i < interop->tex_count; ++i)
-            vt->Uniform2f(priv->uloc.TexSize[i], priv->tex_width[i],
-                          priv->tex_height[i]);
+            vt->Uniform2f(priv->uloc.TexSizes[i], priv->tex_widths[i],
+                          priv->tex_heights[i]);
     }
 
 #ifdef HAVE_LIBPLACEBO
@@ -392,8 +392,8 @@ sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
     const opengl_vtable_t *vt = priv->vt;
 
-    priv->uloc.Texture[0] = vt->GetUniformLocation(program, "Texture0");
-    assert(priv->uloc.Texture[0] != -1);
+    priv->uloc.Textures[0] = vt->GetUniformLocation(program, "Texture0");
+    assert(priv->uloc.Textures[0] != -1);
 
     priv->uloc.TransformMatrix =
         vt->GetUniformLocation(program, "TransformMatrix");
@@ -403,9 +403,9 @@ sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         vt->GetUniformLocation(program, "OrientationMatrix");
     assert(priv->uloc.OrientationMatrix != -1);
 
-    priv->uloc.TexCoordsMap[0] =
+    priv->uloc.TexCoordsMaps[0] =
         vt->GetUniformLocation(program, "TexCoordsMap0");
-    assert(priv->uloc.TexCoordsMap[0] != -1);
+    assert(priv->uloc.TexCoordsMaps[0] != -1);
 }
 
 static void
@@ -415,14 +415,14 @@ sampler_xyz12_load(const struct vlc_gl_sampler *sampler)
     const struct vlc_gl_interop *interop = priv->interop;
     const opengl_vtable_t *vt = priv->vt;
 
-    vt->Uniform1i(priv->uloc.Texture[0], 0);
+    vt->Uniform1i(priv->uloc.Textures[0], 0);
 
     assert(priv->textures[0] != 0);
     vt->ActiveTexture(GL_TEXTURE0);
     vt->BindTexture(interop->tex_target, priv->textures[0]);
 
-    vt->UniformMatrix3fv(priv->uloc.TexCoordsMap[0], 1, GL_FALSE,
-                         priv->var.TexCoordsMap[0]);
+    vt->UniformMatrix3fv(priv->uloc.TexCoordsMaps[0], 1, GL_FALSE,
+                         priv->var.TexCoordsMaps[0]);
 
     const GLfloat *tm = GetTransformMatrix(interop);
     vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
@@ -909,18 +909,18 @@ vlc_gl_sampler_New(struct vlc_gl_interop *interop)
         const GLsizei h = interop->fmt.i_visible_height * interop->texs[j].h.num
                         / interop->texs[j].h.den;
         if (interop->api->supports_npot) {
-            priv->tex_width[j]  = w;
-            priv->tex_height[j] = h;
+            priv->tex_widths[j]  = w;
+            priv->tex_heights[j] = h;
         } else {
-            priv->tex_width[j]  = vlc_align_pot(w);
-            priv->tex_height[j] = vlc_align_pot(h);
+            priv->tex_widths[j]  = vlc_align_pot(w);
+            priv->tex_heights[j] = vlc_align_pot(h);
         }
     }
 
     if (!interop->handle_texs_gen)
     {
-        ret = vlc_gl_interop_GenerateTextures(interop, priv->tex_width,
-                                              priv->tex_height,
+        ret = vlc_gl_interop_GenerateTextures(interop, priv->tex_widths,
+                                              priv->tex_heights,
                                               priv->textures);
         if (ret != VLC_SUCCESS)
         {
@@ -968,14 +968,13 @@ vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler, picture_t *picture)
      || source->i_visible_width != priv->last_source.i_visible_width
      || source->i_visible_height != priv->last_source.i_visible_height)
     {
-        memset(priv->var.TexCoordsMap, 0,
-               sizeof(priv->var.TexCoordsMap));
+        memset(priv->var.TexCoordsMaps, 0, sizeof(priv->var.TexCoordsMaps));
         for (unsigned j = 0; j < interop->tex_count; j++)
         {
             float scale_w = (float)interop->texs[j].w.num / interop->texs[j].w.den
-                          / priv->tex_width[j];
+                          / priv->tex_widths[j];
             float scale_h = (float)interop->texs[j].h.num / interop->texs[j].h.den
-                          / priv->tex_height[j];
+                          / priv->tex_heights[j];
 
             /* Warning: if NPOT is not supported a larger texture is
                allocated. This will cause right and bottom coordinates to
@@ -1026,7 +1025,7 @@ vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler, picture_t *picture)
              *
              * It is stored in column-major order.
              */
-            GLfloat *matrix = priv->var.TexCoordsMap[j];
+            GLfloat *matrix = priv->var.TexCoordsMaps[j];
 #define COL(x) (x*3)
 #define ROW(x) (x)
             matrix[COL(0) + ROW(0)] = right - left;
@@ -1046,6 +1045,6 @@ vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler, picture_t *picture)
 
     /* Update the texture */
     return interop->ops->update_textures(interop, priv->textures,
-                                         priv->tex_width, priv->tex_height,
+                                         priv->tex_widths, priv->tex_heights,
                                          picture, NULL);
 }
