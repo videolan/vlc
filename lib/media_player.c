@@ -251,17 +251,19 @@ on_track_list_changed(vlc_player_t *player, enum vlc_player_list_action action,
     libvlc_media_player_t *mp = data;
 
     libvlc_event_t event;
-    if (action == VLC_PLAYER_LIST_ADDED)
-        event.type = libvlc_MediaPlayerESAdded;
-    else if (action == VLC_PLAYER_LIST_REMOVED)
-        event.type = libvlc_MediaPlayerESDeleted;
-    else
-        /* no event to forward */
-        return;
+    switch (action)
+    {
+        case VLC_PLAYER_LIST_ADDED:
+            event.type = libvlc_MediaPlayerESAdded; break;
+        case VLC_PLAYER_LIST_REMOVED:
+            event.type = libvlc_MediaPlayerESDeleted; break;
+        case VLC_PLAYER_LIST_UPDATED:
+            event.type = libvlc_MediaPlayerESUpdated; break;
+    }
 
     event.u.media_player_es_changed.i_type =
         track_type_from_cat(track->fmt.i_cat);
-    event.u.media_player_es_changed.i_id = vlc_es_id_GetInputId(track->es_id);
+    event.u.media_player_es_changed.psz_id = vlc_es_id_GetStrId(track->es_id);
 
     libvlc_event_send(&mp->event_manager, &event);
 }
@@ -278,14 +280,24 @@ on_track_selection_changed(vlc_player_t *player, vlc_es_id_t *unselected_id,
     libvlc_event_t event;
     event.type = libvlc_MediaPlayerESSelected;
 
+    if (unselected_id)
+    {
+        enum es_format_category_e cat = vlc_es_id_GetCat(unselected_id);
+        event.u.media_player_es_selection_changed.i_type = track_type_from_cat(cat);
+    }
     if (selected_id)
     {
         enum es_format_category_e cat = vlc_es_id_GetCat(selected_id);
-        event.u.media_player_es_changed.i_type = track_type_from_cat(cat);
-        event.u.media_player_es_changed.i_id =
-            vlc_es_id_GetInputId(selected_id);
-        libvlc_event_send(&mp->event_manager, &event);
+        event.u.media_player_es_selection_changed.i_type = track_type_from_cat(cat);
     }
+
+    event.u.media_player_es_selection_changed.psz_unselected_id =
+        unselected_id ? vlc_es_id_GetStrId(unselected_id) : NULL;
+
+    event.u.media_player_es_selection_changed.psz_selected_id =
+        selected_id ? vlc_es_id_GetStrId(selected_id) : NULL;
+
+    libvlc_event_send(&mp->event_manager, &event);
 }
 
 static void

@@ -110,8 +110,15 @@ enum libvlc_event_e {
     libvlc_MediaPlayerLengthChanged,
     libvlc_MediaPlayerVout,
     libvlc_MediaPlayerScrambledChanged,
+    /** A track was added, cf. media_player_es_changed in \ref libvlc_event_t.u
+     * to get the id of the new track. */
     libvlc_MediaPlayerESAdded,
+    /** A track was removed, cf. media_player_es_changed in \ref
+     * libvlc_event_t.u to get the id of the removed track. */
     libvlc_MediaPlayerESDeleted,
+    /** Tracks were selected or unselected, cf.
+     * media_player_es_selection_changed in \ref libvlc_event_t.u to get the
+     * unselected and/or the selected track ids. */
     libvlc_MediaPlayerESSelected,
     libvlc_MediaPlayerCorked,
     libvlc_MediaPlayerUncorked,
@@ -119,6 +126,9 @@ enum libvlc_event_e {
     libvlc_MediaPlayerUnmuted,
     libvlc_MediaPlayerAudioVolume,
     libvlc_MediaPlayerAudioDevice,
+    /** A track was updated, cf. media_player_es_changed in \ref
+     * libvlc_event_t.u to get the id of the updated track. */
+    libvlc_MediaPlayerESUpdated,
     /**
      * The title list changed, call
      * libvlc_media_player_get_full_title_descriptions() to get the new list.
@@ -342,11 +352,22 @@ typedef struct libvlc_event_t
             libvlc_media_t * new_media;
         } media_player_media_changed;
 
+        /* ESAdded, ESDeleted, ESUpdated */
         struct
         {
             libvlc_track_type_t i_type;
-            int                 i_id;
+            /** Call libvlc_media_player_get_track_from_id() to get the track
+             * description. */
+            const char *psz_id;
         } media_player_es_changed;
+
+        /* ESSelected */
+        struct
+        {
+            libvlc_track_type_t i_type;
+            const char *psz_unselected_id;
+            const char *psz_selected_id;
+        } media_player_es_selection_changed;
 
         struct
         {
