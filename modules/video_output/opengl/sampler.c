@@ -22,10 +22,9 @@
 # include "config.h"
 #endif
 
-#include "sampler.h"
+#include "sampler_priv.h"
 
 #include <vlc_common.h>
-#include <vlc_es.h>
 #include <vlc_memstream.h>
 #include <vlc_opengl.h>
 
@@ -40,6 +39,52 @@
 #include "gl_util.h"
 #include "internal.h"
 #include "interop.h"
+
+struct vlc_gl_sampler_priv {
+    struct vlc_gl_sampler sampler;
+
+    struct vlc_gl_t *gl;
+    const opengl_vtable_t *vt;
+
+    struct {
+        GLfloat OrientationMatrix[4*4];
+        GLfloat TexCoordsMap[PICTURE_PLANE_MAX][3*3];
+    } var;
+    struct {
+        GLint Texture[PICTURE_PLANE_MAX];
+        GLint TexSize[PICTURE_PLANE_MAX]; /* for GL_TEXTURE_RECTANGLE */
+        GLint ConvMatrix;
+        GLint *pl_vars; /* for pl_sh_res */
+
+        GLint TransformMatrix;
+        GLint OrientationMatrix;
+        GLint TexCoordsMap[PICTURE_PLANE_MAX];
+    } uloc;
+
+    bool yuv_color;
+    GLfloat conv_matrix[4*4];
+
+    /* libplacebo context */
+    struct pl_context *pl_ctx;
+    struct pl_shader *pl_sh;
+    const struct pl_shader_res *pl_sh_res;
+
+    GLsizei tex_width[PICTURE_PLANE_MAX];
+    GLsizei tex_height[PICTURE_PLANE_MAX];
+
+    GLuint textures[PICTURE_PLANE_MAX];
+
+    struct {
+        unsigned int i_x_offset;
+        unsigned int i_y_offset;
+        unsigned int i_visible_width;
+        unsigned int i_visible_height;
+    } last_source;
+
+    struct vlc_gl_interop *interop;
+};
+
+#define PRIV(sampler) container_of(sampler, struct vlc_gl_sampler_priv, sampler)
 
 static const float MATRIX_COLOR_RANGE_LIMITED[4*3] = {
     255.0/219,         0,         0, -255.0/219 *  16.0/255,
@@ -136,9 +181,11 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler, vlc_fourcc_t chroma,
                       const vlc_chroma_description_t *desc,
                       video_color_space_t yuv_space)
 {
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+
     /* The current implementation always converts from limited to full range. */
     const video_color_range_t range = COLOR_RANGE_LIMITED;
-    float *matrix = sampler->conv_matrix;
+    float *matrix = priv->conv_matrix;
     init_conv_matrix(matrix, yuv_space, range);
 
     if (desc->pixel_size == 2)
@@ -171,7 +218,7 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler, vlc_fourcc_t chroma,
         }
     }
 
-    sampler->yuv_color = true;
+    priv->yuv_color = true;
 
     /* Some formats require to swap the U and V components.
      *
@@ -208,25 +255,26 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler, vlc_fourcc_t chroma,
 static int
 sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 {
-    struct vlc_gl_interop *interop = sampler->interop;
-    const opengl_vtable_t *vt = sampler->vt;
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
-    if (sampler->yuv_color)
+    struct vlc_gl_interop *interop = priv->interop;
+    const opengl_vtable_t *vt = priv->vt;
+
+    if (priv->yuv_color)
     {
-        sampler->uloc.ConvMatrix = vt->GetUniformLocation(program,
-                                                          "ConvMatrix");
-        if (sampler->uloc.ConvMatrix == -1)
+        priv->uloc.ConvMatrix = vt->GetUniformLocation(program, "ConvMatrix");
+        if (priv->uloc.ConvMatrix == -1)
             return VLC_EGENERIC;
     }
 
-    sampler->uloc.TransformMatrix =
+    priv->uloc.TransformMatrix =
         vt->GetUniformLocation(program, "TransformMatrix");
-    if (sampler->uloc.TransformMatrix == -1)
+    if (priv->uloc.TransformMatrix == -1)
         return VLC_EGENERIC;
 
-    sampler->uloc.OrientationMatrix =
+    priv->uloc.OrientationMatrix =
         vt->GetUniformLocation(program, "OrientationMatrix");
-    if (sampler->uloc.OrientationMatrix == -1)
+    if (priv->uloc.OrientationMatrix == -1)
         return VLC_EGENERIC;
 
     assert(interop->tex_count < 10); /* to guarantee variable names length */
@@ -235,29 +283,29 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         char name[sizeof("TexCoordsMapX")];
 
         snprintf(name, sizeof(name), "Texture%1u", i);
-        sampler->uloc.Texture[i] = vt->GetUniformLocation(program, name);
-        if (sampler->uloc.Texture[i] == -1)
+        priv->uloc.Texture[i] = vt->GetUniformLocation(program, name);
+        if (priv->uloc.Texture[i] == -1)
             return VLC_EGENERIC;
 
         snprintf(name, sizeof(name), "TexCoordsMap%1u", i);
-        sampler->uloc.TexCoordsMap[i] = vt->GetUniformLocation(program, name);
-        if (sampler->uloc.TexCoordsMap[i] == -1)
+        priv->uloc.TexCoordsMap[i] = vt->GetUniformLocation(program, name);
+        if (priv->uloc.TexCoordsMap[i] == -1)
             return VLC_EGENERIC;
 
         if (interop->tex_target == GL_TEXTURE_RECTANGLE)
         {
             snprintf(name, sizeof(name), "TexSize%1u", i);
-            sampler->uloc.TexSize[i] = vt->GetUniformLocation(program, name);
-            if (sampler->uloc.TexSize[i] == -1)
+            priv->uloc.TexSize[i] = vt->GetUniformLocation(program, name);
+            if (priv->uloc.TexSize[i] == -1)
                 return VLC_EGENERIC;
         }
     }
 
 #ifdef HAVE_LIBPLACEBO
-    const struct pl_shader_res *res = sampler->pl_sh_res;
+    const struct pl_shader_res *res = priv->pl_sh_res;
     for (int i = 0; res && i < res->num_variables; i++) {
         struct pl_shader_var sv = res->variables[i];
-        sampler->uloc.pl_vars[i] = vt->GetUniformLocation(program, sv.var.name);
+        priv->uloc.pl_vars[i] = vt->GetUniformLocation(program, sv.var.name);
     }
 #endif
 
@@ -278,42 +326,44 @@ GetTransformMatrix(const struct vlc_gl_interop *interop)
 static void
 sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler)
 {
-    const struct vlc_gl_interop *interop = sampler->interop;
-    const opengl_vtable_t *vt = sampler->vt;
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
-    if (sampler->yuv_color)
-        vt->UniformMatrix4fv(sampler->uloc.ConvMatrix, 1, GL_FALSE,
-                             sampler->conv_matrix);
+    const struct vlc_gl_interop *interop = priv->interop;
+    const opengl_vtable_t *vt = priv->vt;
+
+    if (priv->yuv_color)
+        vt->UniformMatrix4fv(priv->uloc.ConvMatrix, 1, GL_FALSE,
+                             priv->conv_matrix);
 
     for (unsigned i = 0; i < interop->tex_count; ++i)
     {
-        vt->Uniform1i(sampler->uloc.Texture[i], i);
+        vt->Uniform1i(priv->uloc.Texture[i], i);
 
-        assert(sampler->textures[i] != 0);
+        assert(priv->textures[i] != 0);
         vt->ActiveTexture(GL_TEXTURE0 + i);
-        vt->BindTexture(interop->tex_target, sampler->textures[i]);
+        vt->BindTexture(interop->tex_target, priv->textures[i]);
 
-        vt->UniformMatrix3fv(sampler->uloc.TexCoordsMap[i], 1, GL_FALSE,
-                             sampler->var.TexCoordsMap[i]);
+        vt->UniformMatrix3fv(priv->uloc.TexCoordsMap[i], 1, GL_FALSE,
+                             priv->var.TexCoordsMap[i]);
     }
 
     const GLfloat *tm = GetTransformMatrix(interop);
-    vt->UniformMatrix4fv(sampler->uloc.TransformMatrix, 1, GL_FALSE, tm);
+    vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
-    vt->UniformMatrix4fv(sampler->uloc.OrientationMatrix, 1, GL_FALSE,
-                         sampler->var.OrientationMatrix);
+    vt->UniformMatrix4fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
+                         priv->var.OrientationMatrix);
 
     if (interop->tex_target == GL_TEXTURE_RECTANGLE)
     {
         for (unsigned i = 0; i < interop->tex_count; ++i)
-            vt->Uniform2f(sampler->uloc.TexSize[i], sampler->tex_width[i],
-                          sampler->tex_height[i]);
+            vt->Uniform2f(priv->uloc.TexSize[i], priv->tex_width[i],
+                          priv->tex_height[i]);
     }
 
 #ifdef HAVE_LIBPLACEBO
-    const struct pl_shader_res *res = sampler->pl_sh_res;
+    const struct pl_shader_res *res = priv->pl_sh_res;
     for (int i = 0; res && i < res->num_variables; i++) {
-        GLint loc = sampler->uloc.pl_vars[i];
+        GLint loc = priv->uloc.pl_vars[i];
         if (loc == -1) // uniform optimized out
             continue;
 
@@ -347,25 +397,26 @@ sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler)
 static int
 sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 {
-    const opengl_vtable_t *vt = sampler->vt;
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    const opengl_vtable_t *vt = priv->vt;
 
-    sampler->uloc.Texture[0] = vt->GetUniformLocation(program, "Texture0");
-    if (sampler->uloc.Texture[0] == -1)
+    priv->uloc.Texture[0] = vt->GetUniformLocation(program, "Texture0");
+    if (priv->uloc.Texture[0] == -1)
         return VLC_EGENERIC;
 
-    sampler->uloc.TransformMatrix =
+    priv->uloc.TransformMatrix =
         vt->GetUniformLocation(program, "TransformMatrix");
-    if (sampler->uloc.TransformMatrix == -1)
+    if (priv->uloc.TransformMatrix == -1)
         return VLC_EGENERIC;
 
-    sampler->uloc.OrientationMatrix =
+    priv->uloc.OrientationMatrix =
         vt->GetUniformLocation(program, "OrientationMatrix");
-    if (sampler->uloc.OrientationMatrix == -1)
+    if (priv->uloc.OrientationMatrix == -1)
         return VLC_EGENERIC;
 
-    sampler->uloc.TexCoordsMap[0] =
+    priv->uloc.TexCoordsMap[0] =
         vt->GetUniformLocation(program, "TexCoordsMap0");
-    if (sampler->uloc.TexCoordsMap[0] == -1)
+    if (priv->uloc.TexCoordsMap[0] == -1)
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
@@ -374,23 +425,24 @@ sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 static void
 sampler_xyz12_prepare_shader(const struct vlc_gl_sampler *sampler)
 {
-    const struct vlc_gl_interop *interop = sampler->interop;
-    const opengl_vtable_t *vt = sampler->vt;
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    const struct vlc_gl_interop *interop = priv->interop;
+    const opengl_vtable_t *vt = priv->vt;
 
-    vt->Uniform1i(sampler->uloc.Texture[0], 0);
+    vt->Uniform1i(priv->uloc.Texture[0], 0);
 
-    assert(sampler->textures[0] != 0);
+    assert(priv->textures[0] != 0);
     vt->ActiveTexture(GL_TEXTURE0);
-    vt->BindTexture(interop->tex_target, sampler->textures[0]);
+    vt->BindTexture(interop->tex_target, priv->textures[0]);
 
-    vt->UniformMatrix3fv(sampler->uloc.TexCoordsMap[0], 1, GL_FALSE,
-                         sampler->var.TexCoordsMap[0]);
+    vt->UniformMatrix3fv(priv->uloc.TexCoordsMap[0], 1, GL_FALSE,
+                         priv->var.TexCoordsMap[0]);
 
     const GLfloat *tm = GetTransformMatrix(interop);
-    vt->UniformMatrix4fv(sampler->uloc.TransformMatrix, 1, GL_FALSE, tm);
+    vt->UniformMatrix4fv(priv->uloc.TransformMatrix, 1, GL_FALSE, tm);
 
-    vt->UniformMatrix4fv(sampler->uloc.OrientationMatrix, 1, GL_FALSE,
-                         sampler->var.OrientationMatrix);
+    vt->UniformMatrix4fv(priv->uloc.OrientationMatrix, 1, GL_FALSE,
+                         priv->var.OrientationMatrix);
 }
 
 static int
@@ -572,7 +624,9 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
                             vlc_fourcc_t chroma, video_color_space_t yuv_space,
                             video_orientation_t orientation)
 {
-    struct vlc_gl_interop *interop = sampler->interop;
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+
+    struct vlc_gl_interop *interop = priv->interop;
 
     const char *swizzle_per_tex[PICTURE_PLANE_MAX] = { NULL, };
     const bool is_yuv = vlc_fourcc_IsYUV(chroma);
@@ -582,7 +636,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     if (desc == NULL)
         return VLC_EGENERIC;
 
-    InitOrientationMatrix(sampler->var.OrientationMatrix, orientation);
+    InitOrientationMatrix(priv->var.OrientationMatrix, orientation);
 
     if (chroma == VLC_CODEC_XYZ12)
         return xyz12_shader_init(sampler);
@@ -630,42 +684,42 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
              "uniform mat3 TexCoordsMap%u;\n", glsl_sampler, i, i);
 
 #ifdef HAVE_LIBPLACEBO
-    if (sampler->pl_sh) {
-        struct pl_shader *sh = sampler->pl_sh;
+    if (priv->pl_sh) {
+        struct pl_shader *sh = priv->pl_sh;
         struct pl_color_map_params color_params = pl_color_map_default_params;
-        color_params.intent = var_InheritInteger(sampler->gl, "rendering-intent");
-        color_params.tone_mapping_algo = var_InheritInteger(sampler->gl, "tone-mapping");
-        color_params.tone_mapping_param = var_InheritFloat(sampler->gl, "tone-mapping-param");
+        color_params.intent = var_InheritInteger(priv->gl, "rendering-intent");
+        color_params.tone_mapping_algo = var_InheritInteger(priv->gl, "tone-mapping");
+        color_params.tone_mapping_param = var_InheritFloat(priv->gl, "tone-mapping-param");
 #    if PL_API_VER >= 10
-        color_params.desaturation_strength = var_InheritFloat(sampler->gl, "desat-strength");
-        color_params.desaturation_exponent = var_InheritFloat(sampler->gl, "desat-exponent");
-        color_params.desaturation_base = var_InheritFloat(sampler->gl, "desat-base");
+        color_params.desaturation_strength = var_InheritFloat(priv->gl, "desat-strength");
+        color_params.desaturation_exponent = var_InheritFloat(priv->gl, "desat-exponent");
+        color_params.desaturation_base = var_InheritFloat(priv->gl, "desat-base");
 #    else
-        color_params.tone_mapping_desaturate = var_InheritFloat(sampler->gl, "tone-mapping-desat");
+        color_params.tone_mapping_desaturate = var_InheritFloat(priv->gl, "tone-mapping-desat");
 #    endif
-        color_params.gamut_warning = var_InheritBool(sampler->gl, "tone-mapping-warn");
+        color_params.gamut_warning = var_InheritBool(priv->gl, "tone-mapping-warn");
 
         struct pl_color_space dst_space = pl_color_space_unknown;
-        dst_space.primaries = var_InheritInteger(sampler->gl, "target-prim");
-        dst_space.transfer = var_InheritInteger(sampler->gl, "target-trc");
+        dst_space.primaries = var_InheritInteger(priv->gl, "target-prim");
+        dst_space.transfer = var_InheritInteger(priv->gl, "target-trc");
 
         pl_shader_color_map(sh, &color_params,
                 vlc_placebo_ColorSpace(&interop->fmt),
                 dst_space, NULL, false);
 
         struct pl_shader_obj *dither_state = NULL;
-        int method = var_InheritInteger(sampler->gl, "dither-algo");
+        int method = var_InheritInteger(priv->gl, "dither-algo");
         if (method >= 0) {
 
             unsigned out_bits = 0;
-            int override = var_InheritInteger(sampler->gl, "dither-depth");
+            int override = var_InheritInteger(priv->gl, "dither-depth");
             if (override > 0)
                 out_bits = override;
             else
             {
                 GLint fb_depth = 0;
 #if !defined(USE_OPENGL_ES2)
-                const opengl_vtable_t *vt = sampler->vt;
+                const opengl_vtable_t *vt = priv->vt;
                 /* fetch framebuffer depth (we are already bound to the default one). */
                 if (vt->GetFramebufferAttachmentParameteriv != NULL)
                     vt->GetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_BACK_LEFT,
@@ -683,11 +737,11 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
             });
         }
 
-        const struct pl_shader_res *res = sampler->pl_sh_res = pl_shader_finalize(sh);
+        const struct pl_shader_res *res = priv->pl_sh_res = pl_shader_finalize(sh);
         pl_shader_obj_destroy(&dither_state);
 
-        FREENULL(sampler->uloc.pl_vars);
-        sampler->uloc.pl_vars = calloc(res->num_variables, sizeof(GLint));
+        FREENULL(priv->uloc.pl_vars);
+        priv->uloc.pl_vars = calloc(res->num_variables, sizeof(GLint));
         for (int i = 0; i < res->num_variables; i++) {
             struct pl_shader_var sv = res->variables[i];
             const char *glsl_type_name = pl_var_glsl_type_name(sv.var);
@@ -705,7 +759,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         interop->fmt.primaries == COLOR_PRIMARIES_BT2020)
     {
         // no warning for HLG because it's more or less backwards-compatible
-        msg_Warn(sampler->gl, "VLC needs to be built with support for libplacebo "
+        msg_Warn(priv->gl, "VLC needs to be built with support for libplacebo "
                  "in order to display wide gamut or HDR signals correctly.");
     }
 #endif
@@ -764,8 +818,8 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
 
 #ifdef HAVE_LIBPLACEBO
-    if (sampler->pl_sh_res) {
-        const struct pl_shader_res *res = sampler->pl_sh_res;
+    if (priv->pl_sh_res) {
+        const struct pl_shader_res *res = priv->pl_sh_res;
         assert(res->input  == PL_SHADER_SIG_COLOR);
         assert(res->output == PL_SHADER_SIG_COLOR);
         ADDF(" result = %s(result);\n", res->name);
@@ -802,18 +856,20 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 struct vlc_gl_sampler *
 vlc_gl_sampler_New(struct vlc_gl_interop *interop)
 {
-    struct vlc_gl_sampler *sampler = calloc(1, sizeof(*sampler));
-    if (!sampler)
+    struct vlc_gl_sampler_priv *priv = calloc(1, sizeof(*priv));
+    if (!priv)
         return NULL;
 
-    sampler->uloc.pl_vars = NULL;
-    sampler->pl_ctx = NULL;
-    sampler->pl_sh = NULL;
-    sampler->pl_sh_res = NULL;
+    struct vlc_gl_sampler *sampler = &priv->sampler;
 
-    sampler->interop = interop;
-    sampler->gl = interop->gl;
-    sampler->vt = interop->vt;
+    priv->uloc.pl_vars = NULL;
+    priv->pl_ctx = NULL;
+    priv->pl_sh = NULL;
+    priv->pl_sh_res = NULL;
+
+    priv->interop = interop;
+    priv->gl = interop->gl;
+    priv->vt = interop->vt;
 
     sampler->fmt = &interop->sw_fmt;
 
@@ -822,10 +878,10 @@ vlc_gl_sampler_New(struct vlc_gl_interop *interop)
 
 #ifdef HAVE_LIBPLACEBO
     // Create the main libplacebo context
-    sampler->pl_ctx = vlc_placebo_Create(VLC_OBJECT(interop->gl));
-    if (sampler->pl_ctx) {
+    priv->pl_ctx = vlc_placebo_Create(VLC_OBJECT(interop->gl));
+    if (priv->pl_ctx) {
 #   if PL_API_VER >= 20
-        sampler->pl_sh = pl_shader_alloc(sampler->pl_ctx, &(struct pl_shader_params) {
+        priv->pl_sh = pl_shader_alloc(priv->pl_ctx, &(struct pl_shader_params) {
             .glsl = {
 #       ifdef USE_OPENGL_ES2
                 .version = 100,
@@ -836,9 +892,9 @@ vlc_gl_sampler_New(struct vlc_gl_interop *interop)
             },
         });
 #   elif PL_API_VER >= 6
-        sampler->pl_sh = pl_shader_alloc(sampler->pl_ctx, NULL, 0);
+        priv->pl_sh = pl_shader_alloc(priv->pl_ctx, NULL, 0);
 #   else
-        sampler->pl_sh = pl_shader_alloc(sampler->pl_ctx, NULL, 0, 0);
+        priv->pl_sh = pl_shader_alloc(priv->pl_ctx, NULL, 0, 0);
 #   endif
     }
 #endif
@@ -861,19 +917,19 @@ vlc_gl_sampler_New(struct vlc_gl_interop *interop)
         const GLsizei h = interop->fmt.i_visible_height * interop->texs[j].h.num
                         / interop->texs[j].h.den;
         if (interop->api->supports_npot) {
-            sampler->tex_width[j]  = w;
-            sampler->tex_height[j] = h;
+            priv->tex_width[j]  = w;
+            priv->tex_height[j] = h;
         } else {
-            sampler->tex_width[j]  = vlc_align_pot(w);
-            sampler->tex_height[j] = vlc_align_pot(h);
+            priv->tex_width[j]  = vlc_align_pot(w);
+            priv->tex_height[j] = vlc_align_pot(h);
         }
     }
 
     if (!interop->handle_texs_gen)
     {
-        ret = vlc_gl_interop_GenerateTextures(interop, sampler->tex_width,
-                                              sampler->tex_height,
-                                              sampler->textures);
+        ret = vlc_gl_interop_GenerateTextures(interop, priv->tex_width,
+                                              priv->tex_height,
+                                              priv->textures);
         if (ret != VLC_SUCCESS)
         {
             free(sampler);
@@ -887,43 +943,47 @@ vlc_gl_sampler_New(struct vlc_gl_interop *interop)
 void
 vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 {
-    struct vlc_gl_interop *interop = sampler->interop;
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+
+    struct vlc_gl_interop *interop = priv->interop;
     const opengl_vtable_t *vt = interop->vt;
 
     if (!interop->handle_texs_gen)
-        vt->DeleteTextures(interop->tex_count, sampler->textures);
+        vt->DeleteTextures(interop->tex_count, priv->textures);
 
 #ifdef HAVE_LIBPLACEBO
-    FREENULL(sampler->uloc.pl_vars);
-    if (sampler->pl_ctx)
-        pl_context_destroy(&sampler->pl_ctx);
+    FREENULL(priv->uloc.pl_vars);
+    if (priv->pl_ctx)
+        pl_context_destroy(&priv->pl_ctx);
 #endif
 
     free(sampler->shader.extensions);
     free(sampler->shader.body);
 
-    free(sampler);
+    free(priv);
 }
 
 int
 vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler, picture_t *picture)
 {
-    const struct vlc_gl_interop *interop = sampler->interop;
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+
+    const struct vlc_gl_interop *interop = priv->interop;
     const video_format_t *source = &picture->format;
 
-    if (source->i_x_offset != sampler->last_source.i_x_offset
-     || source->i_y_offset != sampler->last_source.i_y_offset
-     || source->i_visible_width != sampler->last_source.i_visible_width
-     || source->i_visible_height != sampler->last_source.i_visible_height)
+    if (source->i_x_offset != priv->last_source.i_x_offset
+     || source->i_y_offset != priv->last_source.i_y_offset
+     || source->i_visible_width != priv->last_source.i_visible_width
+     || source->i_visible_height != priv->last_source.i_visible_height)
     {
-        memset(sampler->var.TexCoordsMap, 0,
-               sizeof(sampler->var.TexCoordsMap));
+        memset(priv->var.TexCoordsMap, 0,
+               sizeof(priv->var.TexCoordsMap));
         for (unsigned j = 0; j < interop->tex_count; j++)
         {
             float scale_w = (float)interop->texs[j].w.num / interop->texs[j].w.den
-                          / sampler->tex_width[j];
+                          / priv->tex_width[j];
             float scale_h = (float)interop->texs[j].h.num / interop->texs[j].h.den
-                          / sampler->tex_height[j];
+                          / priv->tex_height[j];
 
             /* Warning: if NPOT is not supported a larger texture is
                allocated. This will cause right and bottom coordinates to
@@ -974,7 +1034,7 @@ vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler, picture_t *picture)
              *
              * It is stored in column-major order.
              */
-            GLfloat *matrix = sampler->var.TexCoordsMap[j];
+            GLfloat *matrix = priv->var.TexCoordsMap[j];
 #define COL(x) (x*3)
 #define ROW(x) (x)
             matrix[COL(0) + ROW(0)] = right - left;
@@ -986,15 +1046,14 @@ vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler, picture_t *picture)
 #undef ROW
         }
 
-        sampler->last_source.i_x_offset = source->i_x_offset;
-        sampler->last_source.i_y_offset = source->i_y_offset;
-        sampler->last_source.i_visible_width = source->i_visible_width;
-        sampler->last_source.i_visible_height = source->i_visible_height;
+        priv->last_source.i_x_offset = source->i_x_offset;
+        priv->last_source.i_y_offset = source->i_y_offset;
+        priv->last_source.i_visible_width = source->i_visible_width;
+        priv->last_source.i_visible_height = source->i_visible_height;
     }
 
     /* Update the texture */
-    return interop->ops->update_textures(interop, sampler->textures,
-                                         sampler->tex_width,
-                                         sampler->tex_height, picture,
-                                         NULL);
+    return interop->ops->update_textures(interop, priv->textures,
+                                         priv->tex_width, priv->tex_height,
+                                         picture, NULL);
 }

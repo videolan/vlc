@@ -17,6 +17,7 @@ OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
 	video_output/opengl/renderer.h \
 	video_output/opengl/sampler.c \
 	video_output/opengl/sampler.h \
+	video_output/opengl/sampler_priv.h \
 	video_output/opengl/sub_renderer.c \
 	video_output/opengl/sub_renderer.h
 if HAVE_LIBPLACEBO
