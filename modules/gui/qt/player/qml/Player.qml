@@ -34,6 +34,8 @@ Widgets.NavigableFocusScope {
     //menu/overlay to dismiss
     property var _menu: undefined
 
+    property bool hasEmbededVideo: mainInterface.hasEmbededVideo
+
     function dismiss() {
         if (_menu)
             _menu.dismiss()
@@ -61,7 +63,7 @@ Widgets.NavigableFocusScope {
     }
 
     navigationCancel: function() {
-        if (mainInterface.hasEmbededVideo && controlBarView.state === "visible") {
+        if (rootPlayer.hasEmbededVideo && controlBarView.state === "visible") {
             toolbarAutoHide._setVisibleControlBar(false)
         } else {
             if (player.hasVideoOutput) {
@@ -151,7 +153,7 @@ Widgets.NavigableFocusScope {
                 spacing: VLCStyle.margin_small
 
 
-                visible: !mainInterface.hasEmbededVideo
+                visible: !rootPlayer.hasEmbededVideo
 
                 Item {
                     Layout.fillHeight: true
@@ -311,7 +313,7 @@ Widgets.NavigableFocusScope {
 
                         lockAutoHide: playlistpopup.state === "visible"
                             || !player.hasVideoOutput
-                            || !mainInterface.hasEmbededVideo
+                            || !rootPlayer.hasEmbededVideo
                             || controllerMouseArea.containsMouse
                         onAutoHideChanged: {
                             if (autoHide)
@@ -329,7 +331,7 @@ Widgets.NavigableFocusScope {
 
     //center image
     Rectangle {
-        visible: !mainInterface.hasEmbededVideo
+        visible: !rootPlayer.hasEmbededVideo
         focus: false
         color: VLCStyle.colors.bg
         anchors.fill: parent
@@ -360,7 +362,8 @@ Widgets.NavigableFocusScope {
         z: 0
 
         ctx: mainctx
-        visible: mainInterface.hasEmbededVideo
+        visible: rootPlayer.hasEmbededVideo
+        enabled: rootPlayer.hasEmbededVideo
         anchors.fill: parent
 
         property point mousePosition: Qt.point(0,0)

@@ -31,7 +31,7 @@ Widgets.NavigableFocusScope{
     implicitHeight: topcontrolContent.implicitHeight
 
     property bool autoHide: player.hasVideoOutput
-                            && mainInterface.hasEmbededVideo
+                            && rootPlayer.hasEmbededVideo
                             && !topcontrollerMouseArea.containsMouse
                             && !lockAutoHide
 
