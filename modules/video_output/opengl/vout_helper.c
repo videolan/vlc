@@ -135,8 +135,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         (GLint)fmt->i_height > max_tex_size)
         ResizeFormatToGLMaxTexSize(fmt, max_tex_size);
 
-    bool b_dump_shaders = var_InheritInteger(gl, "verbose") >= 4;
-
     vgl->interop = vlc_gl_interop_New(gl, &vgl->api, context, fmt, false);
     if (!vgl->interop)
     {
@@ -154,8 +152,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         return NULL;
     }
 
-    vgl->renderer =
-        vlc_gl_renderer_New(gl, &vgl->api, vgl->sampler, b_dump_shaders);
+    vgl->renderer = vlc_gl_renderer_New(gl, &vgl->api, vgl->sampler);
     if (!vgl->renderer)
     {
         msg_Warn(gl, "Could not create renderer for %4.4s",

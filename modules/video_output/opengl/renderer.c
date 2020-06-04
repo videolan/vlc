@@ -192,7 +192,7 @@ BuildVertexShader(const struct vlc_gl_renderer *renderer)
     if (asprintf(&code, template, renderer->glsl_version) < 0)
         return NULL;
 
-    if (renderer->b_dump_shaders)
+    if (renderer->dump_shaders)
         msg_Dbg(renderer->gl, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
                 (const char *) &renderer->sampler->fmt->i_chroma, code);
     return code;
@@ -222,7 +222,7 @@ BuildFragmentShader(struct vlc_gl_renderer *renderer)
     if (ret < 0)
         return NULL;
 
-    if (renderer->b_dump_shaders)
+    if (renderer->dump_shaders)
         msg_Dbg(renderer->gl, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
                               (const char *) &sampler->fmt->i_chroma,
                               sampler->fmt->space, code);
@@ -318,7 +318,7 @@ static int SetupCoords(struct vlc_gl_renderer *renderer);
 
 struct vlc_gl_renderer *
 vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
-                    struct vlc_gl_sampler *sampler, bool b_dump_shaders)
+                    struct vlc_gl_sampler *sampler)
 {
     const opengl_vtable_t *vt = &api->vt;
     const video_format_t *fmt = sampler->fmt;
@@ -332,7 +332,7 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     renderer->gl = gl;
     renderer->api = api;
     renderer->vt = vt;
-    renderer->b_dump_shaders = b_dump_shaders;
+    renderer->dump_shaders = var_InheritInteger(gl, "verbose") >= 4;
 #if defined(USE_OPENGL_ES2)
     renderer->glsl_version = 100;
     renderer->glsl_precision_header = "precision highp float;\n";

@@ -47,8 +47,8 @@ struct vlc_gl_renderer
     const struct vlc_gl_api *api;
     const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
 
-    /* True to dump shaders, set by the caller */
-    bool b_dump_shaders;
+    /* True to dump shaders */
+    bool dump_shaders;
 
     /* GLSL version, set by the caller. 100 for GLSL ES, 120 for desktop GLSL */
     unsigned glsl_version;
@@ -103,11 +103,10 @@ struct vlc_gl_renderer
  * \param gl the GL context
  * \param api the OpenGL API
  * \param sampler the OpenGL sampler
- * \param dump_shaders indicate if the shaders must be dumped in logs
  */
 struct vlc_gl_renderer *
 vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
-                    struct vlc_gl_sampler *sampler, bool dump_shaders);
+                    struct vlc_gl_sampler *sampler);
 
 /**
  * Delete a renderer
