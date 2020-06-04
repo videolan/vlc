@@ -38,15 +38,15 @@ Widgets.KeyNavigableTableView {
 
     property var sortModelMedium:  [
         { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), text: i18n.qtr("Thumbnail"), showSection: "" },
-        { criteria: "durationShort",            width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
         { isPrimary: true, criteria: "title",   width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title" },
+        { criteria: "durationShort",            width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
         { type: "contextButton",                width: VLCStyle.colWidth(1)  }
     ]
 
     property var sortModelLarge:  [
         { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), text: i18n.qtr("Thumbnail"), showSection: "" },
-        { criteria: "durationShort",            width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
         { isPrimary: true, criteria: "title",   width: VLCStyle.colWidth(4), text: i18n.qtr("Title"),    showSection: "title" },
+        { criteria: "durationShort",            width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
         { type: "contextButton",                width: VLCStyle.colWidth(1) }
     ]
 
