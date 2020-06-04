@@ -735,12 +735,16 @@ static int SetupCoords(struct vlc_gl_renderer *renderer)
     return VLC_SUCCESS;
 }
 
-static void DrawWithShaders(struct vlc_gl_renderer *renderer)
+int
+vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer)
 {
-    struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
 
-    vlc_gl_sampler_PrepareShader(sampler);
+    vt->Clear(GL_COLOR_BUFFER_BIT);
+
+    vt->UseProgram(renderer->program_id);
+
+    vlc_gl_sampler_PrepareShader(renderer->sampler);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
     assert(renderer->aloc.PicCoordsIn != -1);
@@ -762,18 +766,6 @@ static void DrawWithShaders(struct vlc_gl_renderer *renderer)
                          renderer->var.ZoomMatrix);
 
     vt->DrawElements(GL_TRIANGLES, renderer->nb_indices, GL_UNSIGNED_SHORT, 0);
-}
-
-int
-vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer)
-{
-    const opengl_vtable_t *vt = renderer->vt;
-
-    vt->Clear(GL_COLOR_BUFFER_BIT);
-
-    vt->UseProgram(renderer->program_id);
-
-    DrawWithShaders(renderer);
 
     return VLC_SUCCESS;
 }
