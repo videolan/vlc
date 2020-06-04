@@ -94,7 +94,7 @@ struct vlc_gl_sampler_ops {
     (*fetch_locations)(struct vlc_gl_sampler *sampler, GLuint program);
 
     /**
-     * Callback to prepare the fragment shader
+     * Callback to load sampler data
      *
      * This function pointer cannot be NULL. This callback can be used to
      * specify values of uniform variables.
@@ -102,7 +102,7 @@ struct vlc_gl_sampler_ops {
      * \param sampler the sampler
      */
     void
-    (*prepare_shader)(const struct vlc_gl_sampler *sampler);
+    (*load)(const struct vlc_gl_sampler *sampler);
 };
 
 static inline void
@@ -112,9 +112,9 @@ vlc_gl_sampler_FetchLocations(struct vlc_gl_sampler *sampler, GLuint program)
 }
 
 static inline void
-vlc_gl_sampler_PrepareShader(const struct vlc_gl_sampler *sampler)
+vlc_gl_sampler_Load(const struct vlc_gl_sampler *sampler)
 {
-    sampler->ops->prepare_shader(sampler);
+    sampler->ops->load(sampler);
 }
 
 #endif

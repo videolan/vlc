@@ -316,7 +316,7 @@ GetTransformMatrix(const struct vlc_gl_interop *interop)
 }
 
 static void
-sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler)
+sampler_base_load(const struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
 
@@ -409,7 +409,7 @@ sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 }
 
 static void
-sampler_xyz12_prepare_shader(const struct vlc_gl_sampler *sampler)
+sampler_xyz12_load(const struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
     const struct vlc_gl_interop *interop = priv->interop;
@@ -436,7 +436,7 @@ xyz12_shader_init(struct vlc_gl_sampler *sampler)
 {
     static const struct vlc_gl_sampler_ops ops = {
         .fetch_locations = sampler_xyz12_fetch_locations,
-        .prepare_shader = sampler_xyz12_prepare_shader,
+        .load = sampler_xyz12_load,
     };
     sampler->ops = &ops;
 
@@ -838,7 +838,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 
     static const struct vlc_gl_sampler_ops ops = {
         .fetch_locations = sampler_base_fetch_locations,
-        .prepare_shader = sampler_base_prepare_shader,
+        .load = sampler_base_load,
     };
     sampler->ops = &ops;
 

@@ -249,7 +249,7 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
 
     assert(sampler->ops &&
            sampler->ops->fetch_locations &&
-           sampler->ops->prepare_shader);
+           sampler->ops->load);
 
     GLuint program_id =
         vlc_gl_BuildProgram(VLC_OBJECT(renderer->gl), vt,
@@ -739,7 +739,7 @@ vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer)
 
     vt->UseProgram(renderer->program_id);
 
-    vlc_gl_sampler_PrepareShader(renderer->sampler);
+    vlc_gl_sampler_Load(renderer->sampler);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, renderer->texture_buffer_object);
     assert(renderer->aloc.PicCoordsIn != -1);
