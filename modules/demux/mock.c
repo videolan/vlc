@@ -132,7 +132,8 @@ var_Read_unsigned(const char *psz)
 #define OPTIONS_SUB(Y) \
     Y(sub, packetized, bool, add_bool, Bool, true)\
     Y(sub, add_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID) \
-    Y(sub, format, vlc_fourcc_t, add_string, Fourcc, "subt")
+    Y(sub, format, vlc_fourcc_t, add_string, Fourcc, "subt") \
+    Y(sub, page, unsigned, add_integer, Integer, 0)
 
 /* var_name, type, module_header_type, getter, default_value */
 #define OPTIONS_GLOBAL(X) \
@@ -680,6 +681,9 @@ ConfigureSubTrack(demux_t *demux,
     VLC_UNUSED(demux);
 
     fmt->i_codec = options->format;
+    fmt->subs.teletext.i_magazine = options->page / 100 % 10;
+    fmt->subs.teletext.i_page = (((options->page / 10) % 10) << 4) +
+                                (options->page % 10);
 
     fmt->b_packetized = options->packetized;
 
