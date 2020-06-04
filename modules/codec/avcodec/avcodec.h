@@ -84,10 +84,6 @@ int ffmpeg_OpenCodec( decoder_t *p_dec, AVCodecContext *, const AVCodec * );
     "when there is not enough time. It's useful with low CPU power " \
     "but it can produce distorted pictures.")
 
-#define FAST_TEXT N_("Allow speed tricks")
-#define FAST_LONGTEXT N_( \
-    "Allow non specification compliant speedup tricks. Faster but error-prone.")
-
 #define SKIP_FRAME_TEXT N_("Skip frame (default=0)")
 #define SKIP_FRAME_LONGTEXT N_( \
     "Force skipping of frames to speed up decoding " \

@@ -118,7 +118,7 @@ vlc_module_begin ()
     add_obsolete_integer( "avcodec-vismv" ) /* removed since 3.0.0 */
     add_obsolete_integer ( "ffmpeg-lowres" ) /* removed since 2.1.0 */
     add_obsolete_bool( "ffmpeg-fast" ) /* removed since 2.1.0 */
-    add_bool( "avcodec-fast", false, FAST_TEXT, FAST_LONGTEXT, false )
+    add_obsolete_bool( "avcodec-fast" ) /* removed since 4.0.0 */
     add_obsolete_integer ( "ffmpeg-skiploopfilter" ) /* removed since 2.1.0 */
     add_integer ( "avcodec-skiploopfilter", 0, SKIPLOOPF_TEXT,
                   SKIPLOOPF_LONGTEXT, false)

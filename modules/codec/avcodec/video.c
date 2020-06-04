@@ -573,9 +573,6 @@ int InitVideoDec( vlc_object_t *obj )
     else if( i_val == 1 ) p_context->skip_loop_filter = AVDISCARD_NONREF;
     else p_context->skip_loop_filter = AVDISCARD_DEFAULT;
 
-    if( var_CreateGetBool( p_dec, "avcodec-fast" ) )
-        p_context->flags2 |= AV_CODEC_FLAG2_FAST;
-
     /* ***** libavcodec frame skipping ***** */
     p_sys->b_hurry_up = var_CreateGetBool( p_dec, "avcodec-hurry-up" );
     p_sys->b_show_corrupted = var_CreateGetBool( p_dec, "avcodec-corrupted" );
