@@ -247,8 +247,9 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
         return VLC_EGENERIC;
     }
 
-    assert(sampler->pf_fetch_locations != NULL &&
-           sampler->pf_prepare_shader != NULL);
+    assert(sampler->ops &&
+           sampler->ops->fetch_locations &&
+           sampler->ops->prepare_shader);
 
     GLuint program_id =
         vlc_gl_BuildProgram(VLC_OBJECT(renderer->gl), vt,

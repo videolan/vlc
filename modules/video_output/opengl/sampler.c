@@ -434,8 +434,11 @@ sampler_xyz12_prepare_shader(const struct vlc_gl_sampler *sampler)
 static int
 xyz12_shader_init(struct vlc_gl_sampler *sampler)
 {
-    sampler->pf_fetch_locations = sampler_xyz12_fetch_locations;
-    sampler->pf_prepare_shader = sampler_xyz12_prepare_shader;
+    static const struct vlc_gl_sampler_ops ops = {
+        .fetch_locations = sampler_xyz12_fetch_locations,
+        .prepare_shader = sampler_xyz12_prepare_shader,
+    };
+    sampler->ops = &ops;
 
     /* Shader for XYZ to RGB correction
      * 3 steps :
@@ -833,8 +836,11 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     }
     sampler->shader.body = ms.ptr;
 
-    sampler->pf_fetch_locations = sampler_base_fetch_locations;
-    sampler->pf_prepare_shader = sampler_base_prepare_shader;
+    static const struct vlc_gl_sampler_ops ops = {
+        .fetch_locations = sampler_base_fetch_locations,
+        .prepare_shader = sampler_base_prepare_shader,
+    };
+    sampler->ops = &ops;
 
     return VLC_SUCCESS;
 }

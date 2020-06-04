@@ -77,6 +77,10 @@ struct vlc_gl_sampler {
         char *body;
     } shader;
 
+    const struct vlc_gl_sampler_ops *ops;
+};
+
+struct vlc_gl_sampler_ops {
     /**
      * Callback to fetch locations of uniform or attributes variables
      *
@@ -86,7 +90,8 @@ struct vlc_gl_sampler {
      * \param sampler the sampler
      * \param program linked program that will be used by this sampler
      */
-    void (*pf_fetch_locations)(struct vlc_gl_sampler *sampler, GLuint program);
+    void
+    (*fetch_locations)(struct vlc_gl_sampler *sampler, GLuint program);
 
     /**
      * Callback to prepare the fragment shader
@@ -96,19 +101,20 @@ struct vlc_gl_sampler {
      *
      * \param sampler the sampler
      */
-    void (*pf_prepare_shader)(const struct vlc_gl_sampler *sampler);
+    void
+    (*prepare_shader)(const struct vlc_gl_sampler *sampler);
 };
 
 static inline void
 vlc_gl_sampler_FetchLocations(struct vlc_gl_sampler *sampler, GLuint program)
 {
-    sampler->pf_fetch_locations(sampler, program);
+    sampler->ops->fetch_locations(sampler, program);
 }
 
 static inline void
 vlc_gl_sampler_PrepareShader(const struct vlc_gl_sampler *sampler)
 {
-    sampler->pf_prepare_shader(sampler);
+    sampler->ops->prepare_shader(sampler);
 }
 
 #endif
