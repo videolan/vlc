@@ -762,6 +762,7 @@ vlc_es_id_Release
 vlc_es_id_GetInputId
 vlc_es_id_GetCat
 vlc_es_id_GetStrId
+vlc_es_id_IsStrIdStable
 vlc_thumbnailer_Create
 vlc_thumbnailer_RequestByTime
 vlc_thumbnailer_RequestByPos
