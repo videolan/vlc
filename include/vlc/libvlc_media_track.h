@@ -139,6 +139,21 @@ typedef struct libvlc_media_track_t
     char *psz_language;
     char *psz_description;
 
+    /** String identifier of track, can be used to save the track preference
+     * from an other LibVLC run, only valid when the track is fetch from a
+     * media_player */
+    const char *psz_id;
+    /** A string identifier is stable when it is certified to be the same
+     * across different playback instances for the same track, only valid when
+     * the track is fetch from a media_player */
+    bool id_stable;
+    /** Name of the track, only valid when the track is fetch from a
+     * media_player */
+    char *psz_name;
+    /** true if the track is selected, only valid when the track is fetch from
+     * a media_player */
+    bool selected;
+
 } libvlc_media_track_t;
 
 /**

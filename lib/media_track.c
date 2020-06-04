@@ -55,6 +55,9 @@ libvlc_media_trackpriv_from_es( libvlc_media_trackpriv_t *trackpriv,
     track->i_bitrate = es->i_bitrate;
     track->psz_language = es->psz_language != NULL ? strdup(es->psz_language) : NULL;
     track->psz_description = es->psz_description != NULL ? strdup(es->psz_description) : NULL;
+    track->psz_id = NULL;
+    track->psz_name = NULL;
+    track->selected = false;
 
     switch( es->i_cat )
     {
@@ -110,6 +113,7 @@ libvlc_media_track_clean( libvlc_media_track_t *track )
 {
     free( track->psz_language );
     free( track->psz_description );
+    free( track->psz_name );
     switch( track->i_type )
     {
     case libvlc_track_audio:
