@@ -11,7 +11,7 @@ OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
 	video_output/opengl/gl_util.h \
 	video_output/opengl/interop.h \
 	video_output/opengl/vout_helper.h \
-	video_output/opengl/internal.h video_output/opengl/fragment_shaders.c \
+	video_output/opengl/internal.h \
 	video_output/opengl/interop.c video_output/opengl/interop_sw.c \
 	video_output/opengl/renderer.c \
 	video_output/opengl/renderer.h \
