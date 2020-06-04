@@ -123,30 +123,6 @@ Widgets.KeyNavigableTableView {
 
     property alias parentId: rootmodel.parentId
 
-    colDelegate: Item {
-        anchors.fill: parent
-
-        property var rowModel: parent.rowModel
-        property var model: parent.colModel
-
-        Text {
-            anchors.fill:parent
-
-            text: !rowModel ? "" : (rowModel[model.criteria] || "")
-            elide: Text.ElideRight
-            font.pixelSize: VLCStyle.fontSize_normal
-            color: (model.isPrimary)? VLCStyle.colors.text : VLCStyle.colors.textDisabled
-
-            anchors {
-                fill: parent
-                leftMargin: VLCStyle.margin_xsmall
-                rightMargin: VLCStyle.margin_xsmall
-            }
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignLeft
-        }
-    }
-
     onActionForSelection:  medialib.addAndPlay(model.getIdsForIndexes( selection ))
 
     Widgets.TableColumns {
