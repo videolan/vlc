@@ -281,13 +281,7 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
 #undef GET_ULOC
 #undef GET_ALOC
 
-    int ret = vlc_gl_sampler_FetchLocations(sampler, program_id);
-    assert(ret == VLC_SUCCESS);
-    if (ret != VLC_SUCCESS)
-    {
-        msg_Err(renderer->gl, "Unable to get locations from tex_conv");
-        goto error;
-    }
+    vlc_gl_sampler_FetchLocations(sampler, program_id);
 
     renderer->program_id = program_id;
 

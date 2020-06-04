@@ -252,7 +252,7 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler, vlc_fourcc_t chroma,
     return VLC_SUCCESS;
 }
 
-static int
+static void
 sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
@@ -263,19 +263,16 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
     if (priv->yuv_color)
     {
         priv->uloc.ConvMatrix = vt->GetUniformLocation(program, "ConvMatrix");
-        if (priv->uloc.ConvMatrix == -1)
-            return VLC_EGENERIC;
+        assert(priv->uloc.ConvMatrix != -1);
     }
 
     priv->uloc.TransformMatrix =
         vt->GetUniformLocation(program, "TransformMatrix");
-    if (priv->uloc.TransformMatrix == -1)
-        return VLC_EGENERIC;
+    assert(priv->uloc.TransformMatrix != -1);
 
     priv->uloc.OrientationMatrix =
         vt->GetUniformLocation(program, "OrientationMatrix");
-    if (priv->uloc.OrientationMatrix == -1)
-        return VLC_EGENERIC;
+    assert(priv->uloc.OrientationMatrix != -1);
 
     assert(interop->tex_count < 10); /* to guarantee variable names length */
     for (unsigned int i = 0; i < interop->tex_count; ++i)
@@ -284,20 +281,17 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 
         snprintf(name, sizeof(name), "Texture%1u", i);
         priv->uloc.Texture[i] = vt->GetUniformLocation(program, name);
-        if (priv->uloc.Texture[i] == -1)
-            return VLC_EGENERIC;
+        assert(priv->uloc.Texture[i] != -1);
 
         snprintf(name, sizeof(name), "TexCoordsMap%1u", i);
         priv->uloc.TexCoordsMap[i] = vt->GetUniformLocation(program, name);
-        if (priv->uloc.TexCoordsMap[i] == -1)
-            return VLC_EGENERIC;
+        assert(priv->uloc.TexCoordsMap[i] != -1);
 
         if (interop->tex_target == GL_TEXTURE_RECTANGLE)
         {
             snprintf(name, sizeof(name), "TexSize%1u", i);
             priv->uloc.TexSize[i] = vt->GetUniformLocation(program, name);
-            if (priv->uloc.TexSize[i] == -1)
-                return VLC_EGENERIC;
+            assert(priv->uloc.TexSize[i] != -1);
         }
     }
 
@@ -308,8 +302,6 @@ sampler_base_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
         priv->uloc.pl_vars[i] = vt->GetUniformLocation(program, sv.var.name);
     }
 #endif
-
-    return VLC_SUCCESS;
 }
 
 static const GLfloat *
@@ -394,32 +386,26 @@ sampler_base_prepare_shader(const struct vlc_gl_sampler *sampler)
 #endif
 }
 
-static int
+static void
 sampler_xyz12_fetch_locations(struct vlc_gl_sampler *sampler, GLuint program)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
     const opengl_vtable_t *vt = priv->vt;
 
     priv->uloc.Texture[0] = vt->GetUniformLocation(program, "Texture0");
-    if (priv->uloc.Texture[0] == -1)
-        return VLC_EGENERIC;
+    assert(priv->uloc.Texture[0] != -1);
 
     priv->uloc.TransformMatrix =
         vt->GetUniformLocation(program, "TransformMatrix");
-    if (priv->uloc.TransformMatrix == -1)
-        return VLC_EGENERIC;
+    assert(priv->uloc.TransformMatrix != -1);
 
     priv->uloc.OrientationMatrix =
         vt->GetUniformLocation(program, "OrientationMatrix");
-    if (priv->uloc.OrientationMatrix == -1)
-        return VLC_EGENERIC;
+    assert(priv->uloc.OrientationMatrix != -1);
 
     priv->uloc.TexCoordsMap[0] =
         vt->GetUniformLocation(program, "TexCoordsMap0");
-    if (priv->uloc.TexCoordsMap[0] == -1)
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
+    assert(priv->uloc.TexCoordsMap[0] != -1);
 }
 
 static void

@@ -85,9 +85,8 @@ struct vlc_gl_sampler {
      *
      * \param sampler the sampler
      * \param program linked program that will be used by this sampler
-     * \return VLC_SUCCESS or a VLC error
      */
-    int (*pf_fetch_locations)(struct vlc_gl_sampler *sampler, GLuint program);
+    void (*pf_fetch_locations)(struct vlc_gl_sampler *sampler, GLuint program);
 
     /**
      * Callback to prepare the fragment shader
@@ -100,10 +99,10 @@ struct vlc_gl_sampler {
     void (*pf_prepare_shader)(const struct vlc_gl_sampler *sampler);
 };
 
-static inline int
+static inline void
 vlc_gl_sampler_FetchLocations(struct vlc_gl_sampler *sampler, GLuint program)
 {
-    return sampler->pf_fetch_locations(sampler, program);
+    sampler->pf_fetch_locations(sampler, program);
 }
 
 static inline void
