@@ -109,10 +109,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     int ret = vlc_gl_api_Init(&vgl->api, gl);
     if (ret != VLC_SUCCESS)
-    {
-        free(vgl);
-        return NULL;
-    }
+        goto free_vgl;
 
     const opengl_vtable_t *vt = &vgl->api.vt;
 
@@ -122,8 +119,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (!supports_shaders)
     {
         msg_Err(gl, "shaders not supported, bailing out");
-        free(vgl);
-        return NULL;
+        goto free_vgl;
     }
 #endif
 
@@ -140,17 +136,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (!vgl->interop)
     {
         msg_Err(gl, "Could not create interop");
-        free(vgl);
-        return NULL;
+        goto free_vgl;
     }
 
     vgl->sampler = vlc_gl_sampler_New(vgl->interop);
     if (!vgl->sampler)
     {
         msg_Err(gl, "Could not create sampler");
-        vlc_gl_interop_Delete(vgl->interop);
-        free(vgl);
-        return NULL;
+        goto delete_interop;
     }
 
     vgl->renderer = vlc_gl_renderer_New(gl, &vgl->api, vgl->sampler);
@@ -158,10 +151,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     {
         msg_Warn(gl, "Could not create renderer for %4.4s",
                  (const char *) &fmt->i_chroma);
-        vlc_gl_sampler_Delete(vgl->sampler);
-        vlc_gl_interop_Delete(vgl->interop);
-        free(vgl);
-        return NULL;
+        goto delete_sampler;
     }
 
     GL_ASSERT_NOERROR(vt);
@@ -170,11 +160,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (!vgl->sub_interop)
     {
         msg_Err(gl, "Could not create sub interop");
-        vlc_gl_renderer_Delete(vgl->renderer);
-        vlc_gl_sampler_Delete(vgl->sampler);
-        vlc_gl_interop_Delete(vgl->interop);
-        free(vgl);
-        return NULL;
+        goto delete_renderer;
     }
 
     vgl->sub_renderer =
@@ -182,22 +168,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     if (!vgl->sub_renderer)
     {
         msg_Err(gl, "Could not create sub renderer");
-        vlc_gl_interop_Delete(vgl->sub_interop);
-        vlc_gl_renderer_Delete(vgl->renderer);
-        vlc_gl_sampler_Delete(vgl->sampler);
-        vlc_gl_interop_Delete(vgl->interop);
-        free(vgl);
-        return NULL;
+        goto delete_sub_interop;
     }
 
     GL_ASSERT_NOERROR(vt);
 
     if (fmt->projection_mode != PROJECTION_MODE_RECTANGULAR
      && vout_display_opengl_SetViewpoint(vgl, viewpoint) != VLC_SUCCESS)
-    {
-        vout_display_opengl_Delete(vgl);
-        return NULL;
-    }
+        goto delete_sub_renderer;
 
     video_orientation_t orientation = fmt->orientation;
     *fmt = vgl->interop->fmt;
@@ -211,6 +189,21 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GL_ASSERT_NOERROR(vt);
     return vgl;
+
+delete_sub_renderer:
+    vlc_gl_sub_renderer_Delete(vgl->sub_renderer);
+delete_sub_interop:
+    vlc_gl_interop_Delete(vgl->sub_interop);
+delete_renderer:
+    vlc_gl_renderer_Delete(vgl->renderer);
+delete_sampler:
+    vlc_gl_sampler_Delete(vgl->sampler);
+delete_interop:
+    vlc_gl_interop_Delete(vgl->interop);
+free_vgl:
+    free(vgl);
+
+    return NULL;
 }
 
 void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
