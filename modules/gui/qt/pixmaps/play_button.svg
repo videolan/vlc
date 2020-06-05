@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="48" height="48"
+   viewBox="0 0 48 48"
+   version="1.1"
+   id="svg8">
+  <g transform="translate(0,-186.18266)">
+    <path
+       style="fill:#ffffff;fill-opacity:0.5;stroke:#ffffff;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 24.0009,232.68268 C 11.574837,232.68319 1.5009784,222.61057 1.4999822,210.18456 1.4989847,197.75854 11.571225,187.68432 23.997288,187.68283 c 12.42606,-0.002 22.500726,10.0703 22.50272,22.49812 0,12.42781 -10.073046,22.50122 -22.499108,22.50173 z"/>
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:4.0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 19.256804,201.93287 11.99988,8.24988 -11.99988,8.24988 z"/>
+  </g>
+</svg>

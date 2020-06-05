@@ -449,6 +449,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/noart_artist_small.svg \
 	gui/qt/pixmaps/pause.svg \
 	gui/qt/pixmaps/play.svg \
+	gui/qt/pixmaps/play_button.svg \
 	gui/qt/pixmaps/playlist/add.svg \
 	gui/qt/pixmaps/playlist/playlist.svg \
 	gui/qt/pixmaps/playlist/remove.svg \
@@ -670,6 +671,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/NavigableCol.qml \
 	gui/qt/widgets/qml/NavigableFocusScope.qml \
 	gui/qt/widgets/qml/NavigableRow.qml \
+	gui/qt/widgets/qml/PlayCover.qml \
 	gui/qt/widgets/qml/RoundButton.qml \
 	gui/qt/widgets/qml/RoundImage.qml \
 	gui/qt/widgets/qml/ScanProgressBar.qml \
