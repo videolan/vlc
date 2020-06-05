@@ -5,13 +5,14 @@
 # Translators:
 # Kerimbekov Galym <kegalym2@mail.ru>, 2015-2016
 # Kypchak Kypchak <kypchak@gmail.com>, 2009
+# Murat Karibay <d2vsd1@mail.ru>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2020-06-05 13:25+0200\n"
+"Last-Translator: Murat Karibay <d2vsd1@mail.ru>, 2020\n"
 "Language-Team: Kazakh (https://www.transifex.com/yaron/teams/16553/kk/)\n"
 "Language: kk\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +30,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
-msgstr "VLC бапталымдары"
+msgstr "VLC баптаулары"
 
 #: include/vlc_config_cat.h:35
 msgid "Select \"Advanced Options\" to see all options."
@@ -1030,7 +1031,7 @@ msgstr "Албом қайталау күшеюі"
 #: src/input/es_out.c:3158
 #, c-format
 msgid "%.2f dB"
-msgstr "%.2f dB"
+msgstr "%.2f дБ"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
@@ -1227,7 +1228,7 @@ msgstr ""
 
 #: src/input/es_out.c:3354 modules/access/imem.c:64
 msgid "Subtitle"
-msgstr "Субтитрі"
+msgstr "Субтитр"
 
 #: src/input/input.c:1821 modules/control/hotkeys.c:1512
 #, c-format
@@ -1782,7 +1783,7 @@ msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
 msgstr ""
-"Қайталануы күшейтілген жөнінде мәліметі бар ағынның (89 dB) әдепкі нысаналық "
+"Қайталануы күшейтілген жөнінде мәліметі бар ағынның (89 дБ) әдепкі нысаналық "
 "деңгейін өзгертуге мүмкіндік береді."
 
 #: src/libvlc-module.c:221
@@ -4707,55 +4708,55 @@ msgstr "Енгізу"
 
 #: src/misc/actions.c:66
 msgid "Esc"
-msgstr ""
+msgstr "Esc"
 
 #: src/misc/actions.c:67
 msgid "F1"
-msgstr ""
+msgstr "F1"
 
 #: src/misc/actions.c:68
 msgid "F10"
-msgstr ""
+msgstr "F10"
 
 #: src/misc/actions.c:69
 msgid "F11"
-msgstr ""
+msgstr "F11"
 
 #: src/misc/actions.c:70
 msgid "F12"
-msgstr ""
+msgstr "F12"
 
 #: src/misc/actions.c:71
 msgid "F2"
-msgstr ""
+msgstr "F2"
 
 #: src/misc/actions.c:72
 msgid "F3"
-msgstr ""
+msgstr "F3"
 
 #: src/misc/actions.c:73
 msgid "F4"
-msgstr ""
+msgstr "F4"
 
 #: src/misc/actions.c:74
 msgid "F5"
-msgstr ""
+msgstr "F5"
 
 #: src/misc/actions.c:75
 msgid "F6"
-msgstr ""
+msgstr "F6"
 
 #: src/misc/actions.c:76
 msgid "F7"
-msgstr ""
+msgstr "F7"
 
 #: src/misc/actions.c:77
 msgid "F8"
-msgstr ""
+msgstr "F8"
 
 #: src/misc/actions.c:78
 msgid "F9"
-msgstr ""
+msgstr "F9"
 
 #: src/misc/actions.c:79
 msgid "Home"
@@ -4913,15 +4914,15 @@ msgstr "Кішірейту"
 
 #: src/misc/actions.c:246
 msgid "Ctrl+"
-msgstr ""
+msgstr "Ctrl+"
 
 #: src/misc/actions.c:247
 msgid "Alt+"
-msgstr ""
+msgstr "Alt+"
 
 #: src/misc/actions.c:248
 msgid "Shift+"
-msgstr ""
+msgstr "Shift+"
 
 #: src/misc/actions.c:249
 msgid "Meta+"
@@ -4934,23 +4935,23 @@ msgstr ""
 #: src/misc/update.c:482
 #, c-format
 msgid "%.1f GiB"
-msgstr ""
+msgstr "%.1f ГиБ"
 
 #: src/misc/update.c:484
 #, c-format
 msgid "%.1f MiB"
-msgstr ""
+msgstr "%.1f МиБ"
 
 #: src/misc/update.c:486 modules/gui/macosx/VLCPlaylistInfo.m:138
 #: modules/gui/macosx/VLCPlaylistInfo.m:140
 #, c-format
 msgid "%.1f KiB"
-msgstr ""
+msgstr "%.1f КиБ"
 
 #: src/misc/update.c:488
 #, c-format
 msgid "%<PRIu64> B"
-msgstr ""
+msgstr "%<PRIu64> Б"
 
 #: src/misc/update.c:580
 msgid "Saving file failed"
@@ -5054,7 +5055,7 @@ msgstr ""
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:200
 msgid "Install"
-msgstr ""
+msgstr "Орнату"
 
 #: src/misc/update.c:727
 msgid "Update VLC media player"
@@ -5073,27 +5074,27 @@ msgstr ""
 
 #: src/text/iso-639_def.h:41
 msgid "Abkhazian"
-msgstr ""
+msgstr "Абхаз тілі"
 
 #: src/text/iso-639_def.h:42
 msgid "Afrikaans"
-msgstr ""
+msgstr "Африкаанс тілі"
 
 #: src/text/iso-639_def.h:43
 msgid "Albanian"
-msgstr ""
+msgstr "Албан тілі"
 
 #: src/text/iso-639_def.h:44
 msgid "Amharic"
-msgstr ""
+msgstr "Амхарик тілі"
 
 #: src/text/iso-639_def.h:45
 msgid "Arabic"
-msgstr ""
+msgstr "Араб тілі"
 
 #: src/text/iso-639_def.h:46
 msgid "Armenian"
-msgstr ""
+msgstr "Армян тілі"
 
 #: src/text/iso-639_def.h:47
 msgid "Assamese"
@@ -5109,11 +5110,11 @@ msgstr ""
 
 #: src/text/iso-639_def.h:50
 msgid "Azerbaijani"
-msgstr ""
+msgstr "Әзірбайжан тілі"
 
 #: src/text/iso-639_def.h:51
 msgid "Bashkir"
-msgstr ""
+msgstr "Башқұрт тілі"
 
 #: src/text/iso-639_def.h:52
 msgid "Basque"
@@ -5121,7 +5122,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:53
 msgid "Belarusian"
-msgstr ""
+msgstr "Беларус тілі"
 
 #: src/text/iso-639_def.h:54
 msgid "Bengali"
@@ -5153,7 +5154,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:61
 msgid "Catalan"
-msgstr ""
+msgstr "Каталан тілі"
 
 #: src/text/iso-639_def.h:62
 msgid "Chamorro"
@@ -5161,11 +5162,11 @@ msgstr ""
 
 #: src/text/iso-639_def.h:63
 msgid "Chechen"
-msgstr ""
+msgstr "Шешен тілі"
 
 #: src/text/iso-639_def.h:64
 msgid "Chinese"
-msgstr ""
+msgstr "Қытай тілі"
 
 #: src/text/iso-639_def.h:65
 msgid "Church Slavic"
@@ -5173,7 +5174,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:66
 msgid "Chuvash"
-msgstr ""
+msgstr "Шуаш тілі"
 
 #: src/text/iso-639_def.h:67
 msgid "Cornish"
@@ -5185,7 +5186,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:69
 msgid "Czech"
-msgstr ""
+msgstr "Чех тілі"
 
 #: src/text/iso-639_def.h:70
 msgid "Danish"
@@ -5201,7 +5202,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:73
 msgid "English"
-msgstr ""
+msgstr "Ағылшын тілі"
 
 #: src/text/iso-639_def.h:74
 msgid "Esperanto"
@@ -5209,7 +5210,7 @@ msgstr "Эсперанто (Latin-3)"
 
 #: src/text/iso-639_def.h:75
 msgid "Estonian"
-msgstr ""
+msgstr "Эстон тілі"
 
 #: src/text/iso-639_def.h:76
 msgid "Faroese"
@@ -5221,11 +5222,11 @@ msgstr ""
 
 #: src/text/iso-639_def.h:78
 msgid "Finnish"
-msgstr ""
+msgstr "Фин тілі"
 
 #: src/text/iso-639_def.h:79
 msgid "French"
-msgstr ""
+msgstr "Француз тілі"
 
 #: src/text/iso-639_def.h:80
 msgid "Frisian"
@@ -5233,11 +5234,11 @@ msgstr ""
 
 #: src/text/iso-639_def.h:81
 msgid "Georgian"
-msgstr ""
+msgstr "Грузин тілі"
 
 #: src/text/iso-639_def.h:82
 msgid "German"
-msgstr ""
+msgstr "Неміс тілі"
 
 #: src/text/iso-639_def.h:83
 msgid "Gaelic (Scots)"
@@ -5257,7 +5258,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:87
 msgid "Greek, Modern"
-msgstr ""
+msgstr "Грек тілі"
 
 #: src/text/iso-639_def.h:88
 msgid "Guarani"
@@ -5285,7 +5286,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:94
 msgid "Hungarian"
-msgstr ""
+msgstr "Мажар тілі"
 
 #: src/text/iso-639_def.h:95
 msgid "Icelandic"
@@ -5321,7 +5322,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:103
 msgid "Japanese"
-msgstr ""
+msgstr "Жапон тілі"
 
 #: src/text/iso-639_def.h:104
 msgid "Greenlandic, Kalaallisut"
@@ -5337,7 +5338,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:107
 msgid "Kazakh"
-msgstr ""
+msgstr "Қазақ тілі"
 
 #: src/text/iso-639_def.h:108
 msgid "Khmer"
@@ -5353,7 +5354,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:111
 msgid "Kirghiz"
-msgstr ""
+msgstr "Қырғыз тілі"
 
 #: src/text/iso-639_def.h:112
 msgid "Komi"
@@ -5377,7 +5378,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:117 modules/meta_engine/ID3Genres.h:119
 msgid "Latin"
-msgstr ""
+msgstr "Латын тілі"
 
 #: src/text/iso-639_def.h:118
 msgid "Latvian"
@@ -5433,7 +5434,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:131
 msgid "Mongolian"
-msgstr ""
+msgstr "Моңғол тілі"
 
 #: src/text/iso-639_def.h:132
 msgid "Nauru"
@@ -5497,7 +5498,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:148
 msgid "Persian"
-msgstr ""
+msgstr "Парсы тілі"
 
 #: src/text/iso-639_def.h:149
 msgid "Pali"
@@ -5505,7 +5506,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:150
 msgid "Polish"
-msgstr ""
+msgstr "Поляк тілі"
 
 #: src/text/iso-639_def.h:151
 msgid "Portuguese"
@@ -5537,7 +5538,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:158
 msgid "Russian"
-msgstr ""
+msgstr "Орыс тілі"
 
 #: src/text/iso-639_def.h:159
 msgid "Sango"
@@ -5593,7 +5594,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:172
 msgid "Spanish"
-msgstr ""
+msgstr "Испан тілі"
 
 #: src/text/iso-639_def.h:173
 msgid "Sardinian"
@@ -5625,7 +5626,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:180
 msgid "Tatar"
-msgstr ""
+msgstr "Татар тілі"
 
 #: src/text/iso-639_def.h:181
 msgid "Telugu"
@@ -5633,7 +5634,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:182
 msgid "Tajik"
-msgstr ""
+msgstr "Тәжік тілі"
 
 #: src/text/iso-639_def.h:183
 msgid "Tagalog"
@@ -5665,11 +5666,11 @@ msgstr ""
 
 #: src/text/iso-639_def.h:190
 msgid "Turkish"
-msgstr ""
+msgstr "Түрік тілі"
 
 #: src/text/iso-639_def.h:191
 msgid "Turkmen"
-msgstr ""
+msgstr "Түркімен тілі"
 
 #: src/text/iso-639_def.h:192
 msgid "Twi"
@@ -5677,11 +5678,11 @@ msgstr ""
 
 #: src/text/iso-639_def.h:193
 msgid "Uighur"
-msgstr ""
+msgstr "Ұйғыр тілі"
 
 #: src/text/iso-639_def.h:194
 msgid "Ukrainian"
-msgstr ""
+msgstr "Украин тілі"
 
 #: src/text/iso-639_def.h:195
 msgid "Urdu"
@@ -5689,7 +5690,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:196
 msgid "Uzbek"
-msgstr ""
+msgstr "Өзбек тілі"
 
 #: src/text/iso-639_def.h:197
 msgid "Vietnamese"
@@ -9576,7 +9577,7 @@ msgstr "Төменгі жиілік (Hz)"
 
 #: modules/audio_filter/param_eq.c:60
 msgid "Low freq gain (dB)"
-msgstr "Төменгі жиіліктер күшею (dB)"
+msgstr "Төменгі жиіліктер күшею (дБ)"
 
 #: modules/audio_filter/param_eq.c:61
 msgid "High freq (Hz)"
@@ -9584,7 +9585,7 @@ msgstr "Жоғарғы жиілік (Hz)"
 
 #: modules/audio_filter/param_eq.c:63
 msgid "High freq gain (dB)"
-msgstr "Жоғарғы жиіліктер күшею (dB)"
+msgstr "Жоғарғы жиіліктер күшею (дБ)"
 
 #: modules/audio_filter/param_eq.c:64
 msgid "Freq 1 (Hz)"
@@ -9592,7 +9593,7 @@ msgstr "Жиілік 1 (Hz)"
 
 #: modules/audio_filter/param_eq.c:66
 msgid "Freq 1 gain (dB)"
-msgstr "Жиілік күшеюі 1 (dB)"
+msgstr "Жиілік күшеюі 1 (дБ)"
 
 #: modules/audio_filter/param_eq.c:68
 msgid "Freq 1 Q"
@@ -9604,7 +9605,7 @@ msgstr "Жиілік 2 (Hz)"
 
 #: modules/audio_filter/param_eq.c:71
 msgid "Freq 2 gain (dB)"
-msgstr "Жиілік 2 күшеюі (dB)"
+msgstr "Жиілік күшеюі 2 (дБ)"
 
 #: modules/audio_filter/param_eq.c:73
 msgid "Freq 2 Q"
@@ -9616,7 +9617,7 @@ msgstr "Жиілік 3 (Hz)"
 
 #: modules/audio_filter/param_eq.c:76
 msgid "Freq 3 gain (dB)"
-msgstr "Жиілік 3 күшеюі (dB)"
+msgstr "Жиілік күшеюі 3 (дБ)"
 
 #: modules/audio_filter/param_eq.c:78
 msgid "Freq 3 Q"
@@ -10651,11 +10652,11 @@ msgstr ""
 
 #: modules/codec/avcodec/encoder.c:892
 msgid "unknown"
-msgstr ""
+msgstr "белгісіз"
 
 #: modules/codec/avcodec/encoder.c:892
 msgid "video"
-msgstr ""
+msgstr "бейне"
 
 #: modules/codec/avcodec/encoder.c:893
 msgid "audio"
@@ -10904,27 +10905,27 @@ msgstr ""
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LC"
-msgstr ""
+msgstr "AAC-LC"
 
 #: modules/codec/fdkaac.c:97
 msgid "HE-AAC"
-msgstr ""
+msgstr "HE-AAC"
 
 #: modules/codec/fdkaac.c:97
 msgid "HE-AAC-v2"
-msgstr ""
+msgstr "HE-AAC-v2"
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LD"
-msgstr ""
+msgstr "AAC-LD"
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-ELD"
-msgstr ""
+msgstr "AAC-ELD"
 
 #: modules/codec/fdkaac.c:100
 msgid "FDKAAC"
-msgstr ""
+msgstr "FDKAAC"
 
 #: modules/codec/fdkaac.c:101
 msgid "FDK-AAC Audio encoder"
@@ -16524,7 +16525,7 @@ msgstr "Кейіңгі өңдету"
 
 #: modules/gui/macosx/VLCMainMenu.m:451
 msgid "Add Subtitle File..."
-msgstr ""
+msgstr "Субтитр файлын қосу..."
 
 #: modules/gui/macosx/VLCMainMenu.m:452 modules/gui/macosx/VLCMainMenu.m:453
 msgid "Subtitles Track"
@@ -16931,7 +16932,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:344
 msgid "Add Subtitle File:"
-msgstr ""
+msgstr "Субтитр файлын қосу:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:349
 msgid "Setup subtitle playback details"
@@ -18418,82 +18419,82 @@ msgstr ""
 #: modules/gui/qt/components/extended_panels.cpp:1300
 #: modules/gui/qt/components/extended_panels.cpp:1301
 msgid "dB"
-msgstr "dB"
+msgstr "дБ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1108
 msgid "170 Hz"
-msgstr ""
+msgstr "170 Гц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1109
 msgid "310 Hz"
-msgstr ""
+msgstr "310 Гц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1110
 msgid "600 Hz"
-msgstr ""
+msgstr "600 Гц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1111
 #: modules/gui/qt/components/extended_panels.cpp:1125
 msgid "1 KHz"
-msgstr ""
+msgstr "1 КГц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1112
 msgid "3 KHz"
-msgstr ""
+msgstr "3 КГц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1113
 msgid "6 KHz"
-msgstr ""
+msgstr "6 КГц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1114
 msgid "12 KHz"
-msgstr ""
+msgstr "12 КГц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1115
 msgid "14 KHz"
-msgstr ""
+msgstr "14 КГц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1116
 #: modules/gui/qt/components/extended_panels.cpp:1129
 msgid "16 KHz"
-msgstr ""
+msgstr "16 КГц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1120
 msgid "31 Hz"
-msgstr ""
+msgstr "31 Гц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1121
 msgid "63 Hz"
-msgstr ""
+msgstr "63 Гц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1122
 msgid "125 Hz"
-msgstr ""
+msgstr "125 Гц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1123
 msgid "250 Hz"
-msgstr ""
+msgstr "250 Гц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1124
 msgid "500 Hz"
-msgstr ""
+msgstr "500 Гц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1126
 msgid "2 KHz"
-msgstr ""
+msgstr "2 КГц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1127
 msgid "4 KHz"
-msgstr ""
+msgstr "4 КГц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1128
 msgid "8 KHz"
-msgstr ""
+msgstr "8 КГц"
 
 #: modules/gui/qt/components/extended_panels.cpp:1296
 #: modules/gui/qt/components/extended_panels.cpp:1297
 msgid "ms"
-msgstr ""
+msgstr "мс"
 
 #: modules/gui/qt/components/extended_panels.cpp:1300
 msgid ""
@@ -20124,11 +20125,11 @@ msgstr "Көрнекі бейнелер"
 
 #: modules/gui/qt/menus.cpp:653
 msgid "Add &Subtitle File..."
-msgstr ""
+msgstr "Субтитр &файлын қосу..."
 
 #: modules/gui/qt/menus.cpp:655
 msgid "Sub &Track"
-msgstr ""
+msgstr "Субтитрлер &тізімі"
 
 #: modules/gui/qt/menus.cpp:677
 msgid "Video &Track"
@@ -27097,7 +27098,7 @@ msgstr ""
 
 #: share/lua/http/dialogs/stream_window.html:65
 msgid "Time:"
-msgstr ""
+msgstr "Уақыт:"
 
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
@@ -27213,7 +27214,7 @@ msgstr "Дайындама"
 
 #: modules/gui/qt/ui/equalizer.h:134
 msgid "0.00 dB"
-msgstr ""
+msgstr "0.00 дБ"
 
 #: modules/gui/qt/ui/messages_panel.h:137
 msgid "&Verbosity:"
@@ -27281,7 +27282,7 @@ msgstr "Тасушы ойнатуының басталу уақытын ауыс
 
 #: modules/gui/qt/ui/open.h:283 modules/gui/qt/ui/open.h:287
 msgid "HH'H':mm'm':ss's'.zzz"
-msgstr ""
+msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:285
 msgid "Change the stop time for the media"
@@ -27382,11 +27383,11 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:700
 msgid "FLAC"
-msgstr ""
+msgstr "FLAC"
 
 #: modules/gui/qt/ui/profiles.h:701
 msgid "MP&4/MOV"
-msgstr ""
+msgstr "MP&4/MOV"
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "Ogg/Ogm"
@@ -27394,11 +27395,11 @@ msgstr "Ogg/Ogm"
 
 #: modules/gui/qt/ui/profiles.h:703
 msgid "M&KV"
-msgstr ""
+msgstr "M&KV"
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "M&JPEG"
-msgstr ""
+msgstr "M&JPEG"
 
 #: modules/gui/qt/ui/profiles.h:705
 msgid "MPEG-PS"
@@ -27406,11 +27407,11 @@ msgstr "MPEG-PS"
 
 #: modules/gui/qt/ui/profiles.h:706
 msgid "F&LV"
-msgstr ""
+msgstr "F&LV"
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "&MPEG-TS"
-msgstr ""
+msgstr "&MPEG-TS"
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "RAW"
@@ -27422,11 +27423,11 @@ msgstr "WAV"
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "Webm"
-msgstr ""
+msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:711
 msgid "MPEG &1"
-msgstr ""
+msgstr "MPEG &1"
 
 #: modules/gui/qt/ui/profiles.h:712
 msgid "AVI"
@@ -27438,7 +27439,7 @@ msgstr "ASF/WMV"
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "MP&3"
-msgstr ""
+msgstr "MP&3"
 
 #: modules/gui/qt/ui/profiles.h:715
 msgid "Features"
@@ -27474,7 +27475,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid "&Quality"
-msgstr ""
+msgstr "&Сапа"
 
 #: modules/gui/qt/ui/profiles.h:734 modules/gui/qt/ui/profiles.h:735
 msgid "Not Used"
@@ -27607,7 +27608,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Password:"
-msgstr ""
+msgstr "Құпиясөз:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:425
 msgid "Username:"
@@ -27619,7 +27620,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:354
 msgid "Codecs"
-msgstr ""
+msgstr "Кодектер"
 
 #: modules/gui/qt/ui/sprefs_input.h:355
 msgid "x264 profile and level selection"
@@ -27659,7 +27660,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:370
 msgid "HTTP (default)"
-msgstr ""
+msgstr "HTTP (әдепкі)"
 
 #: modules/gui/qt/ui/sprefs_input.h:371
 msgid "RTP over RTSP (TCP)"
@@ -27799,7 +27800,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:301
 msgid "Add a shadow"
-msgstr ""
+msgstr "Көлеңке қосу"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:303
 #: modules/gui/qt/ui/video_effects.h:1227
@@ -27920,7 +27921,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1253
 msgid "Colors"
-msgstr ""
+msgstr "Түстер"
 
 #: modules/gui/qt/ui/video_effects.h:1254
 msgid "Interactive Zoom"
@@ -27933,7 +27934,7 @@ msgstr "Бұрыш"
 #: modules/gui/qt/ui/video_effects.h:1267
 #: modules/gui/qt/ui/video_effects.h:1284
 msgid "..."
-msgstr ""
+msgstr "..."
 
 #: modules/gui/qt/ui/video_effects.h:1272
 msgid "full"
