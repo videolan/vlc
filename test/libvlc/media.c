@@ -41,14 +41,28 @@ static void media_parse_ended(const libvlc_event_t *event, void *user_data)
 
 static void print_media(libvlc_media_t *media)
 {
-    libvlc_media_track_t **pp_tracks;
-    unsigned i_count = libvlc_media_tracks_get(media, &pp_tracks);
-    if (i_count > 0)
+    static const libvlc_track_type_t types[] =
+        { libvlc_track_audio, libvlc_track_video, libvlc_track_text,
+          libvlc_track_unknown };
+    size_t nb_tracks = 0;
+
+    for (size_t i = 0; i < ARRAY_SIZE(types); ++i)
     {
-        for (unsigned i = 0; i < i_count; ++i)
+        const libvlc_track_type_t type = types[i];
+        libvlc_media_tracklist_t *tracklist =
+            libvlc_media_get_tracklist(media, type);
+        assert(tracklist);
+
+        for (size_t j = 0; j < libvlc_media_tracklist_count(tracklist); ++j)
         {
-            libvlc_media_track_t *p_track = pp_tracks[i];
-            test_log("\ttrack(%d/%d): codec: %4.4s/%4.4s, ", i, p_track->i_id,
+            const libvlc_media_track_t *p_track =
+                libvlc_media_tracklist_at(tracklist, j);
+
+            assert(p_track);
+            assert(p_track->i_type == type);
+            nb_tracks ++;
+
+            test_log("\ttrack(%zu/%d): codec: %4.4s/%4.4s, ", j, p_track->i_id,
                 (const char *)&p_track->i_codec,
                 (const char *)&p_track->i_original_fourcc);
             switch (p_track->i_type)
@@ -73,9 +87,10 @@ static void print_media(libvlc_media_t *media)
                 vlc_assert_unreachable();
             }
         }
-        libvlc_media_tracks_release(pp_tracks, i_count);
+        libvlc_media_tracklist_delete(tracklist);
     }
-    else
+
+    if (nb_tracks == 0)
         test_log("\tmedia doesn't have any tracks\n");
 
     for (enum libvlc_meta_t i = libvlc_meta_Title;
