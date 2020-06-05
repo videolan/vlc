@@ -612,7 +612,7 @@ libvlc_hxxxhelper_la_SOURCES = \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h
 libvlc_hxxxhelper_la_CPPFLAGS = -Dneedsomethinghere
 libvlc_hxxxhelper_la_LDFLAGS = -static
-EXTRA_LTLIBRARIES += libvlc_hxxxhelper.la
+noinst_LTLIBRARIES += libvlc_hxxxhelper.la
 
 libhxxxhelper_testdec_plugin_la_SOURCES = codec/hxxx_helper_testdec.c
 libhxxxhelper_testdec_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
