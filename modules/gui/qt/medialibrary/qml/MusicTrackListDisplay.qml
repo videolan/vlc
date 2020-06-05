@@ -54,6 +54,8 @@ Widgets.KeyNavigableTableView {
     property Component titleDelegate: RowLayout {
         property var rowModel: parent.rowModel
         property var model: parent.colModel
+        readonly property bool containsMouse: parent.containsMouse
+        readonly property bool currentlyFocused: parent.currentlyFocused
 
         anchors.fill: parent
         spacing: VLCStyle.margin_normal
@@ -64,6 +66,14 @@ Widgets.KeyNavigableTableView {
 
             Layout.preferredHeight: VLCStyle.heightAlbumCover_xsmall
             Layout.preferredWidth: VLCStyle.heightAlbumCover_xsmall
+
+            Widgets.PlayCover {
+                anchors.fill: parent
+                iconSize: VLCStyle.play_cover_small
+                visible: currentlyFocused || containsMouse
+
+                onIconClicked: medialib.addAndPlay( rowModel.id )
+            }
         }
 
         Widgets.ListLabel {
