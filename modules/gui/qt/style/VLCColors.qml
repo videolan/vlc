@@ -107,7 +107,7 @@ Item {
                 bgAlt: "#eff0f1"
                 bgAltInactive: "#eff0f1"
 
-                bgHover: "#3daee9"
+                bgHover: "#ededed"
                 bgHoverInactive: "#3daee9"
 
                 button: "#eff0f1";
@@ -134,7 +134,7 @@ Item {
                 bgInactive: "#232629"
                 bgAlt: "#31363b"
                 bgAltInactive: "#31363b"
-                bgHover: "#3daee9"
+                bgHover: "#2d2d2d"
                 bgHoverInactive: "#3daee9"
                 button: "#31363b"
                 buttonText: "#eff0f1"
