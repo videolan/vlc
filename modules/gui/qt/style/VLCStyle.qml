@@ -66,6 +66,11 @@ Item {
     property int heightAlbumCover_large: 255 * scale;
     property int heightAlbumCover_xlarge: 512 * scale;
 
+    property int listAlbumCover_height: 32 * scale
+    property int listAlbumCover_width: listAlbumCover_height * 16.0/9
+    property int trackListAlbumCover_width: 32 * scale
+    property int trackListAlbumCover_heigth: 32 * scale
+
     property int icon_xsmall: 8 * scale;
     property int icon_small: 16 * scale;
     property int icon_normal: 32 * scale;
