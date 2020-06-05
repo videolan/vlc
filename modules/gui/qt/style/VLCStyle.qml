@@ -75,6 +75,8 @@ Item {
 
     property int icon_topbar: 38 * scale
 
+    property int play_cover_small: 24 * scale
+
     property int cover_xxsmall: 32 * scale;
     property int cover_xsmall: 64 * scale;
     property int cover_small: 96 * scale;
@@ -134,7 +136,6 @@ Item {
     property int button_width_normal: 96 * scale
     property int button_width_large: 128 * scale
 
-
     //GridItem
     property int gridItem_network_height: VLCStyle.network_normal + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small + VLCStyle.margin_xxsmall * 4
     property int gridItem_network_width: VLCStyle.network_normal + VLCStyle.margin_xxsmall * 4
@@ -147,6 +148,8 @@ Item {
 
     property int column_width: 114 * scale
     property int column_margin_width: 32 * scale
+
+    property int table_cover_border: 2 * scale
 
     //global application margin "safe area"
     property int applicationHorizontalMargin: 0
