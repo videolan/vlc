@@ -152,12 +152,13 @@ NavigableFocusScope {
         delegate:Rectangle {
             id: lineView
 
-            width: view.width
-            height: root.rowHeight
-            color: VLCStyle.colors.getBgColor(selected, hoverArea.containsMouse, lineView.activeFocus)
-
             property var rowModel: model
             property bool selected: selectionModel.isSelected(root.model.index(index, 0))
+            readonly property bool highlighted: selected || hoverArea.containsMouse || activeFocus
+
+            width: view.width
+            height: root.rowHeight
+            color: highlighted ? VLCStyle.colors.bgHover : "transparent"
 
             Connections {
                 target: selectionModel
