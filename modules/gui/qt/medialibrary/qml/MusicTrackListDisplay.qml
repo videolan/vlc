@@ -64,8 +64,8 @@ Widgets.KeyNavigableTableView {
             source: !rowModel ? VLCStyle.noArtCover : (rowModel.cover || VLCStyle.noArtCover)
             mipmap: true // this widget can down scale the source a lot, so for better visuals we use mipmap
 
-            Layout.preferredHeight: VLCStyle.heightAlbumCover_xsmall
-            Layout.preferredWidth: VLCStyle.heightAlbumCover_xsmall
+            Layout.preferredHeight: VLCStyle.trackListAlbumCover_heigth
+            Layout.preferredWidth: VLCStyle.trackListAlbumCover_width
 
             Widgets.PlayCover {
                 anchors.fill: parent

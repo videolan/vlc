@@ -55,7 +55,7 @@ Widgets.KeyNavigableTableView {
                                                 : ( width < VLCStyle.colWidth(7) ) ? sortModelMedium : sortModelLarge
     section.property: "title_first_symbol"
 
-    rowHeight: VLCStyle.video_small_height + VLCStyle.margin_normal
+    rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
 
     property bool isFocusOnContextButton: false
 
@@ -81,8 +81,8 @@ Widgets.KeyNavigableTableView {
                 active: model.type === "image"
                 sourceComponent: Widgets.RoundImage{
                     id: cover
-                    height: VLCStyle.video_small_height
-                    width: VLCStyle.video_small_width
+                    height: VLCStyle.listAlbumCover_height
+                    width: VLCStyle.listAlbumCover_width
                     source: !rowModel ? "" : rowModel[model.criteria]
 
                     Widgets.VideoQualityLabel {
@@ -154,7 +154,6 @@ Widgets.KeyNavigableTableView {
     }
 
     headerColor: VLCStyle.colors.bg
-    spacing: VLCStyle.margin_small
 
     onActionForSelection: medialib.addAndPlay(model.getIdsForIndexes( selection ))
 
