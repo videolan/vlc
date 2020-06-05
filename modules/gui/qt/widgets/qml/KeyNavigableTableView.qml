@@ -158,6 +158,7 @@ NavigableFocusScope {
 
             property var rowModel: model
             property bool selected: selectionModel.isSelected(root.model.index(index, 0))
+
             Connections {
                 target: selectionModel
                 onSelectionChanged: lineView.selected = selectionModel.isSelected(root.model.index(index, 0))
@@ -213,6 +214,8 @@ NavigableFocusScope {
                             Loader{
                                 property var rowModel: lineView.rowModel
                                 property var colModel: modelData
+                                readonly property bool currentlyFocused: lineView.activeFocus
+                                readonly property bool containsMouse: hoverArea.containsMouse
 
                                 anchors.fill: parent
                                 sourceComponent: colModel.colDelegate || root.colDelegate
