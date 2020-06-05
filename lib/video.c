@@ -155,25 +155,25 @@ libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, unsigned num,
     return 0;
 }
 
-int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned num,
+int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned ignored,
                            unsigned *restrict px, unsigned *restrict py )
 {
+    (void) ignored;
     if (p_mi->p_md == NULL)
         return -1;
 
-    libvlc_media_track_t **tracks;
-    unsigned count = libvlc_media_tracks_get(p_mi->p_md, &tracks);
     int ret = -1;
+    libvlc_media_track_t *track =
+        libvlc_media_player_get_selected_track( p_mi, libvlc_track_video );
 
-    for (unsigned i = 0; i < count; i++)
-        if (tracks[i]->i_type == libvlc_track_video && num-- == 0) {
-            *px = tracks[i]->video->i_width;
-            *py = tracks[i]->video->i_height;
-            ret = 0;
-            break;
-        }
+    if (track)
+    {
+        *px = track->video->i_width;
+        *py = track->video->i_height;
+        ret = 0;
+    }
 
-    libvlc_media_tracks_release(tracks, count);
+    libvlc_media_track_delete(track);
     return ret;
 }
 
