@@ -64,6 +64,8 @@ Widgets.KeyNavigableTableView {
 
         property var rowModel: parent.rowModel
         property var model: parent.colModel
+        readonly property bool currentlyFocused: parent.currentlyFocused
+        readonly property bool containsMouse: parent.containsMouse
 
         anchors.fill: parent
 
@@ -106,7 +108,7 @@ Widgets.KeyNavigableTableView {
                     }
                     Widgets.VideoProgressBar {
                         value: !rowModel ? 0 : rowModel.progress
-                        visible: value > 0
+                        visible: !playCover.visible && value > 0
                         anchors {
                             bottom: parent.bottom
                             left: parent.left
@@ -114,6 +116,15 @@ Widgets.KeyNavigableTableView {
                         }
                     }
 
+                    Widgets.PlayCover {
+                        id: playCover
+
+                        anchors.fill: parent
+                        iconSize: VLCStyle.play_cover_small
+                        visible: colDel.currentlyFocused || colDel.containsMouse
+
+                        onIconClicked: medialib.addAndPlay( rowModel.id )
+                    }
                 }
             }
             Loader{
