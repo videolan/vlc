@@ -151,7 +151,7 @@ static char* GetLine( demux_t *p_demux, int *p_pos )
     {
         i--;
     }
-    p_line = malloc( i + 1 );
+    p_line = vlc_obj_malloc( p_demux, i + 1 );
     if( unlikely( p_line == NULL ) )
         return NULL;
     strncpy ( p_line, (char*)p_buf, i );
@@ -214,7 +214,7 @@ static bool CheckMimeHeader( demux_t *p_demux, int *p_header_size )
                 msg_Warn( p_demux, "separator %s does not match %s", psz_line,
                           p_sys->psz_separator );
             }
-            free( psz_line );
+            vlc_obj_free( p_demux, psz_line );
         }
     }
 
@@ -239,7 +239,7 @@ static bool CheckMimeHeader( demux_t *p_demux, int *p_header_size )
         {
             msg_Dbg( p_demux, "discard MIME header: %s", psz_line );
         }
-        free( psz_line );
+        vlc_obj_free( p_demux, psz_line );
         psz_line = GetLine( p_demux, &i_pos );
     }
 
@@ -249,7 +249,7 @@ static bool CheckMimeHeader( demux_t *p_demux, int *p_header_size )
         return false;
     }
 
-    free( psz_line );
+    vlc_obj_free( p_demux, psz_line );
 
     *p_header_size = i_pos;
     return b_jpeg;
