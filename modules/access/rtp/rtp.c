@@ -482,8 +482,10 @@ static int OpenURL(vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
+#ifdef HAVE_SRTP
     if (p_sys->srtp != NULL)
         srtp_destroy(p_sys->srtp);
+#endif
     if (p_sys->session != NULL)
         rtp_session_destroy(demux, p_sys->session);
     if (p_sys->rtcp_sock != NULL)
