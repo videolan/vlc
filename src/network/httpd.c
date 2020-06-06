@@ -1727,6 +1727,21 @@ static void httpdLoop(httpd_host_t *host)
 
     int canc = vlc_savecancel();
     vlc_list_foreach(cl, &host->clients, node) {
+        int val = -1;
+
+        switch (cl->i_state) {
+            case HTTPD_CLIENT_RECEIVING:
+                val = httpd_ClientRecv(cl);
+                break;
+            case HTTPD_CLIENT_SENDING:
+                val = httpd_ClientSend(cl);
+                break;
+            case HTTPD_CLIENT_TLS_HS_IN:
+            case HTTPD_CLIENT_TLS_HS_OUT:
+                httpd_ClientTlsHandshake(host, cl);
+                break;
+        }
+
         if (cl->i_state == HTTPD_CLIENT_DEAD
          || (cl->i_activity_timeout > 0
           && cl->i_activity_date + cl->i_activity_timeout < now)) {
@@ -1734,6 +1749,9 @@ static void httpdLoop(httpd_host_t *host)
             httpd_ClientDestroy(cl);
             continue;
         }
+
+        if (val == 0)
+            cl->i_activity_date = now;
 
         struct pollfd *pufd = ufd + nfd;
         assert (pufd < ufd + ARRAY_SIZE (ufd));
@@ -1983,35 +2001,6 @@ static void httpdLoop(httpd_host_t *host)
     /* Handle client sockets */
     now = vlc_tick_now();
     nfd = host->nfd;
-
-    vlc_list_foreach(cl, &host->clients, node) {
-        const struct pollfd *pufd = &ufd[nfd];
-        int val = -1;
-
-        assert(pufd < &ufd[ARRAY_SIZE(ufd)]);
-
-        if (vlc_tls_GetFD(cl->sock) != pufd->fd)
-            continue; // we were not waiting for this client
-        ++nfd;
-        if (pufd->revents == 0)
-            continue; // no event received
-
-        switch (cl->i_state) {
-            case HTTPD_CLIENT_RECEIVING:
-                val = httpd_ClientRecv(cl);
-                break;
-            case HTTPD_CLIENT_SENDING:
-                val = httpd_ClientSend(cl);
-                break;
-            case HTTPD_CLIENT_TLS_HS_IN:
-            case HTTPD_CLIENT_TLS_HS_OUT:
-                httpd_ClientTlsHandshake(host, cl);
-                break;
-        }
-
-        if (val == 0)
-            cl->i_activity_date = now;
-    }
 
     /* Handle server sockets (accept new connections) */
     for (nfd = 0; nfd < host->nfd; nfd++) {
