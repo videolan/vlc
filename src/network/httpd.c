@@ -1720,8 +1720,6 @@ static void httpdLoop(httpd_host_t *host)
 
     int canc = vlc_savecancel();
     vlc_list_foreach(cl, &host->clients, node) {
-        int64_t i_offset;
-
         if (cl->i_state == HTTPD_CLIENT_DEAD
          || (cl->i_activity_timeout > 0
           && cl->i_activity_date + cl->i_activity_timeout < now)) {
@@ -1921,7 +1919,7 @@ static void httpdLoop(httpd_host_t *host)
                         cl->i_state = HTTPD_CLIENT_DEAD;
                     httpd_MsgClean(&cl->answer);
                 } else {
-                    i_offset = cl->answer.i_body_offset;
+                    int64_t i_offset = cl->answer.i_body_offset;
                     httpd_MsgClean(&cl->answer);
 
                     cl->answer.i_body_offset = i_offset;
@@ -1934,8 +1932,8 @@ static void httpdLoop(httpd_host_t *host)
                 }
                 break;
 
-            case HTTPD_CLIENT_WAITING:
-                i_offset = cl->answer.i_body_offset;
+            case HTTPD_CLIENT_WAITING: {
+                int64_t i_offset = cl->answer.i_body_offset;
                 int i_msg = cl->query.i_type;
 
                 httpd_MsgInit(&cl->answer);
@@ -1952,6 +1950,7 @@ static void httpdLoop(httpd_host_t *host)
                     cl->answer.i_body = 0;
                     cl->i_state = HTTPD_CLIENT_SENDING;
                 }
+            }
         }
 
         pufd->fd = vlc_tls_GetPollFD(cl->sock, &pufd->events);
