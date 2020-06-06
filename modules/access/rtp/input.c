@@ -24,10 +24,6 @@
 # include <config.h>
 #endif
 
-#include <vlc_common.h>
-#include <vlc_demux.h>
-#include <vlc_block.h>
-
 #include <limits.h>
 #include <errno.h>
 #ifdef HAVE_POLL
@@ -36,7 +32,13 @@
 #ifdef HAVE_SYS_UIO_H
 # include <sys/uio.h>
 #endif
+#ifdef _WIN32
+# include <winsock2.h>
+#endif
 
+#include <vlc_common.h>
+#include <vlc_demux.h>
+#include <vlc_block.h>
 #include <vlc_dtls.h>
 
 #include "rtp.h"
