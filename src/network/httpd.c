@@ -51,7 +51,7 @@
 # include <sys/uio.h>
 #endif
 
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 # include <poll.h>
 #endif
 

@@ -41,7 +41,7 @@
 #include <vlc_url.h>
 #include <vlc_interrupt.h>
 
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 #include <poll.h>
 #endif
 #include <fcntl.h>

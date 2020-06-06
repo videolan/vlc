@@ -35,7 +35,7 @@ typedef xcb_atom_t Atom;
 #ifdef HAVE_SEARCH_H
 # include <search.h>
 #endif
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 # include <poll.h>
 #endif
 #ifdef _WIN32

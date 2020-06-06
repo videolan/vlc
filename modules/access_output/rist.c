@@ -36,7 +36,7 @@
 #include <vlc_queue.h>
 #include <vlc_threads.h>
 #include <vlc_rand.h>
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 #include <poll.h>
 #endif
 #include <sys/time.h>

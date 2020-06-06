@@ -26,7 +26,7 @@
 
 #include <stdarg.h>
 #include <assert.h>
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 # include <poll.h>
 #endif
 #include <unistd.h> /* gethostname() and sysconf() */

@@ -58,7 +58,7 @@
 #endif
 
 #include <errno.h>
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 # include <poll.h>
 #endif
 

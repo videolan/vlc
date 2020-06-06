@@ -732,7 +732,7 @@ AH_BOTTOM([#include <vlc_fixups.h>])
 dnl Check for struct pollfd
 AC_CHECK_TYPES([struct pollfd],,,
 [#include <sys/types.h>
-#if HAVE_POLL
+#if HAVE_POLL_H
 # include <poll.h>
 #elif defined (_WIN32)
 # include <winsock2.h>
@@ -953,7 +953,7 @@ dnl Check for headers
 dnl
 
 dnl  POSIX
-AC_CHECK_HEADERS([arpa/inet.h pthread.h search.h sys/shm.h sys/socket.h sys/uio.h])
+AC_CHECK_HEADERS([arpa/inet.h poll.h pthread.h search.h sys/shm.h sys/socket.h sys/uio.h])
 AC_CHECK_HEADERS([net/if.h], [], [],
 [
 #include <sys/types.h>

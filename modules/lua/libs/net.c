@@ -32,7 +32,7 @@
 #ifdef _WIN32
 #include <io.h>
 #endif
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 #include <poll.h>       /* poll structures and defines */
 #endif
 #include <sys/stat.h>

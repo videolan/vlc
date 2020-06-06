@@ -26,7 +26,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <stdlib.h>
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 # include <poll.h>
 #endif
 #ifdef HAVE_SYS_UIO_H

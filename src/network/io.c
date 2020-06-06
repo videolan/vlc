@@ -38,7 +38,7 @@
 #include <assert.h>
 
 #include <unistd.h>
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 # include <poll.h>
 #endif
 #ifdef HAVE_LINUX_DCCP_H

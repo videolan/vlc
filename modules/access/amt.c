@@ -58,7 +58,7 @@
 #include <vlc_interrupt.h>
 #include <vlc_url.h>
 
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
  #include <poll.h>
 #endif
 #ifdef HAVE_SYS_UIO_H
