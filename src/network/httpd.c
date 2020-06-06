@@ -1279,7 +1279,6 @@ msg_type[] =
     { "GET",           HTTPD_MSG_GET,          HTTPD_PROTO_HTTP },
     { "HEAD",          HTTPD_MSG_HEAD,         HTTPD_PROTO_HTTP },
     { "POST",          HTTPD_MSG_POST,         HTTPD_PROTO_HTTP },
-    { "",              HTTPD_MSG_NONE,         HTTPD_PROTO_NONE }
 };
 
 
@@ -1423,7 +1422,7 @@ static void httpd_ClientRecv(httpd_client_t *cl)
                 p = NULL;
                 cl->query.i_type = HTTPD_MSG_NONE;
 
-                for (unsigned i = 0; msg_type[i].name[0]; i++)
+                for (unsigned i = 0; i < ARRAY_SIZE(msg_type); i++)
                     if (!strncmp((char *)cl->p_buffer, msg_type[i].name,
                                 strlen(msg_type[i].name))) {
                         p = (char *)&cl->p_buffer[strlen(msg_type[i].name) + 1 ];
