@@ -1540,13 +1540,7 @@ static void httpd_ClientRecv(httpd_client_t *cl)
         }
     }
 
-    /* check if the client is to be set to dead */
-#if defined(_WIN32)
-    if ((i_len < 0 && WSAGetLastError() != WSAEWOULDBLOCK) || (i_len == 0))
-#else
-    if ((i_len < 0 && errno != EAGAIN) || (i_len == 0))
-#endif
-    {
+    if (i_len == 0) {
         if (cl->query.i_proto != HTTPD_PROTO_NONE && cl->query.i_type != HTTPD_MSG_NONE) {
             /* connection closed -> end of data */
             if (cl->query.i_body > 0)
@@ -1554,7 +1548,19 @@ static void httpd_ClientRecv(httpd_client_t *cl)
             cl->i_state = HTTPD_CLIENT_RECEIVE_DONE;
         }
         else
-            cl->i_state = HTTPD_CLIENT_DEAD;
+            cl->i_state = HTTPD_CLIENT_DEAD; /* connection failed */
+        return;
+    }
+
+    /* check if the client is to be set to dead */
+    if (i_len < 0) {
+#if defined(_WIN32)
+        if (WSAGetLastError() != WSAEWOULDBLOCK)
+#else
+        if (errno != EAGAIN)
+#endif
+            cl->i_state = HTTPD_CLIENT_DEAD; /* connection failed */
+        return;
     }
 
     /* XXX: for QT I have to disable timeout. Try to find why */
