@@ -1594,44 +1594,49 @@ static void httpd_ClientSend(httpd_client_t *cl)
 
     i_len = httpd_NetSend(cl, &cl->p_buffer[cl->i_buffer],
                            cl->i_buffer_size - cl->i_buffer);
-    if (i_len >= 0) {
-        cl->i_buffer += i_len;
 
-        if (cl->i_buffer >= cl->i_buffer_size) {
-            if (cl->answer.i_body == 0  && cl->answer.i_body_offset > 0) {
-                /* catch more body data */
-                int     i_msg = cl->query.i_type;
-                int64_t i_offset = cl->answer.i_body_offset;
+    if (i_len == 0) {
+        cl->i_state = HTTPD_CLIENT_DEAD; /* connection closed */
+        return;
+    }
 
-                httpd_MsgClean(&cl->answer);
-                cl->answer.i_body_offset = i_offset;
-
-                cl->url->catch[i_msg].cb(cl->url->catch[i_msg].p_sys, cl,
-                                          &cl->answer, &cl->query);
-            }
-
-            if (cl->answer.i_body > 0) {
-                /* send the body data */
-                free(cl->p_buffer);
-                cl->p_buffer = cl->answer.p_body;
-                cl->i_buffer_size = cl->answer.i_body;
-                cl->i_buffer = 0;
-
-                cl->answer.i_body = 0;
-                cl->answer.p_body = NULL;
-            } else /* send finished */
-                cl->i_state = HTTPD_CLIENT_SEND_DONE;
-        }
-    } else {
+    if (i_len < 0) {
 #if defined(_WIN32)
-        if ((i_len < 0 && WSAGetLastError() != WSAEWOULDBLOCK) || (i_len == 0))
+        if (WSAGetLastError() != WSAEWOULDBLOCK)
 #else
-        if ((i_len < 0 && errno != EAGAIN) || (i_len == 0))
+        if (errno != EAGAIN)
 #endif
-        {
-            /* error */
+            /* Connection failed, or hung up (EPIPE) */
             cl->i_state = HTTPD_CLIENT_DEAD;
+        return;
+    }
+
+    cl->i_buffer += i_len;
+
+    if (cl->i_buffer >= cl->i_buffer_size) {
+        if (cl->answer.i_body == 0  && cl->answer.i_body_offset > 0) {
+            /* catch more body data */
+            int     i_msg = cl->query.i_type;
+            int64_t i_offset = cl->answer.i_body_offset;
+
+            httpd_MsgClean(&cl->answer);
+            cl->answer.i_body_offset = i_offset;
+
+            cl->url->catch[i_msg].cb(cl->url->catch[i_msg].p_sys, cl,
+                                     &cl->answer, &cl->query);
         }
+
+        if (cl->answer.i_body > 0) {
+            /* send the body data */
+            free(cl->p_buffer);
+            cl->p_buffer = cl->answer.p_body;
+            cl->i_buffer_size = cl->answer.i_body;
+            cl->i_buffer = 0;
+
+            cl->answer.i_body = 0;
+            cl->answer.p_body = NULL;
+        } else /* send finished */
+            cl->i_state = HTTPD_CLIENT_SEND_DONE;
     }
 }
 
