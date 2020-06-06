@@ -772,14 +772,12 @@ static const char *const priorities_values[] = {
     "NORMAL",
     "SECURE128",
     "SECURE256",
-    "EXPORT",
 };
 static const char *const priorities_text[] = {
     N_("Performance (prioritize faster ciphers)"),
     N_("Normal"),
     N_("Secure 128-bits (exclude 256-bits ciphers)"),
     N_("Secure 256-bits (prioritize 256-bits ciphers)"),
-    N_("Export (include insecure ciphers)"),
 };
 
 vlc_module_begin ()
