@@ -1983,6 +1983,7 @@ static void httpdLoop(httpd_host_t *host)
     for (int i_client = 0; i_client < host->i_client; i_client++) {
         httpd_client_t *cl = host->client[i_client];
         const struct pollfd *pufd = &ufd[nfd];
+        int val = -1;
 
         assert(pufd < &ufd[sizeof(ufd) / sizeof(ufd[0])]);
 
@@ -1992,16 +1993,21 @@ static void httpdLoop(httpd_host_t *host)
         if (pufd->revents == 0)
             continue; // no event received
 
-        cl->i_activity_date = now;
-
         switch (cl->i_state) {
-            case HTTPD_CLIENT_RECEIVING: httpd_ClientRecv(cl); break;
-            case HTTPD_CLIENT_SENDING:   httpd_ClientSend(cl); break;
+            case HTTPD_CLIENT_RECEIVING:
+                val = httpd_ClientRecv(cl);
+                break;
+            case HTTPD_CLIENT_SENDING:
+                val = httpd_ClientSend(cl);
+                break;
             case HTTPD_CLIENT_TLS_HS_IN:
             case HTTPD_CLIENT_TLS_HS_OUT:
                 httpd_ClientTlsHandshake(host, cl);
                 break;
         }
+
+        if (val == 0)
+            cl->i_activity_date = now;
     }
 
     /* Handle server sockets (accept new connections) */
