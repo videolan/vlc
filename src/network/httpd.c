@@ -1423,15 +1423,11 @@ static void httpd_ClientRecv(httpd_client_t *cl)
                 cl->query.i_type = HTTPD_MSG_NONE;
 
                 for (unsigned i = 0; i < ARRAY_SIZE(msg_type); i++)
-                    if (!strncmp((char *)cl->p_buffer, msg_type[i].name,
-                                strlen(msg_type[i].name))) {
+                    if (cl->query.i_proto == msg_type[i].i_proto
+                     && strncmp((char *)cl->p_buffer, msg_type[i].name,
+                                strlen(msg_type[i].name)) == 0) {
                         p = (char *)&cl->p_buffer[strlen(msg_type[i].name) + 1 ];
                         cl->query.i_type = msg_type[i].i_type;
-                        if (cl->query.i_proto != msg_type[i].i_proto) {
-                            p = NULL;
-                            cl->query.i_proto = HTTPD_PROTO_NONE;
-                            cl->query.i_type = HTTPD_MSG_NONE;
-                        }
                         break;
                     }
 
