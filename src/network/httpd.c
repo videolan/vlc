@@ -1721,6 +1721,21 @@ static void httpdLoop(httpd_host_t *host)
     int canc = vlc_savecancel();
     for (int i_client = 0; i_client < host->i_client; i_client++) {
         httpd_client_t *cl = host->client[i_client];
+        int val = -1;
+
+        switch (cl->i_state) {
+            case HTTPD_CLIENT_RECEIVING:
+                val = httpd_ClientRecv(cl);
+                break;
+            case HTTPD_CLIENT_SENDING:
+                val = httpd_ClientSend(cl);
+                break;
+            case HTTPD_CLIENT_TLS_HS_IN:
+            case HTTPD_CLIENT_TLS_HS_OUT:
+                httpd_ClientTlsHandshake(host, cl);
+                break;
+        }
+
         if (cl->i_ref < 0 || (cl->i_ref == 0 &&
                     (cl->i_state == HTTPD_CLIENT_DEAD ||
                       (cl->i_activity_timeout > 0 &&
@@ -1730,6 +1745,9 @@ static void httpdLoop(httpd_host_t *host)
             httpd_ClientDestroy(cl);
             continue;
         }
+
+        if (val == 0)
+            cl->i_activity_date = now;
 
         struct pollfd *pufd = ufd + nfd;
         assert (pufd < ufd + (sizeof (ufd) / sizeof (ufd[0])));
@@ -1976,39 +1994,7 @@ static void httpdLoop(httpd_host_t *host)
     canc = vlc_savecancel();
     vlc_mutex_lock(&host->lock);
 
-    /* Handle client sockets */
     now = mdate();
-    nfd = host->nfd;
-
-    for (int i_client = 0; i_client < host->i_client; i_client++) {
-        httpd_client_t *cl = host->client[i_client];
-        const struct pollfd *pufd = &ufd[nfd];
-        int val = -1;
-
-        assert(pufd < &ufd[sizeof(ufd) / sizeof(ufd[0])]);
-
-        if (vlc_tls_GetFD(cl->sock) != pufd->fd)
-            continue; // we were not waiting for this client
-        ++nfd;
-        if (pufd->revents == 0)
-            continue; // no event received
-
-        switch (cl->i_state) {
-            case HTTPD_CLIENT_RECEIVING:
-                val = httpd_ClientRecv(cl);
-                break;
-            case HTTPD_CLIENT_SENDING:
-                val = httpd_ClientSend(cl);
-                break;
-            case HTTPD_CLIENT_TLS_HS_IN:
-            case HTTPD_CLIENT_TLS_HS_OUT:
-                httpd_ClientTlsHandshake(host, cl);
-                break;
-        }
-
-        if (val == 0)
-            cl->i_activity_date = now;
-    }
 
     /* Handle server sockets (accept new connections) */
     for (nfd = 0; nfd < host->nfd; nfd++) {
