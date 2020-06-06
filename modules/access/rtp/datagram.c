@@ -24,7 +24,9 @@
 
 #include <errno.h>
 #include <stdlib.h>
+#ifdef HAVE_POLL
 #include <poll.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_network.h>
