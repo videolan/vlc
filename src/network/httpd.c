@@ -1722,7 +1722,7 @@ static void httpdLoop(httpd_host_t *host)
     vlc_mutex_lock(&host->lock);
     /* add all socket that should be read/write and close dead connection */
     vlc_tick_t now = vlc_tick_now();
-    bool b_low_delay = false;
+    int delay = -1;
     httpd_client_t *cl;
 
     int canc = vlc_savecancel();
@@ -1750,8 +1750,10 @@ static void httpdLoop(httpd_host_t *host)
             continue;
         }
 
-        if (val == 0)
+        if (val == 0) {
             cl->i_activity_date = now;
+            delay = 0;
+        }
 
         struct pollfd *pufd = ufd + nfd;
         assert (pufd < ufd + ARRAY_SIZE (ufd));
@@ -1982,14 +1984,14 @@ static void httpdLoop(httpd_host_t *host)
 
         if (pufd->events != 0)
             nfd++;
-        else
-            b_low_delay = true;
+        /* we will wait 20ms (not too big) if HTTPD_CLIENT_WAITING */
+        else if (delay != 0)
+            delay = 20;
     }
     vlc_mutex_unlock(&host->lock);
     vlc_restorecancel(canc);
 
-    /* we will wait 20ms (not too big) if HTTPD_CLIENT_WAITING */
-    while (poll(ufd, nfd, b_low_delay ? 20 : -1) < 0)
+    while (poll(ufd, nfd, delay) < 0)
     {
         if (errno != EINTR)
             msg_Err(host, "polling error: %s", vlc_strerror_c(errno));
