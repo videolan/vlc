@@ -1267,7 +1267,7 @@ msg_type[] =
 };
 
 
-static void httpd_ClientRecv(httpd_client_t *cl)
+static int httpd_ClientRecv(httpd_client_t *cl)
 {
     int i_len;
 
@@ -1538,26 +1538,30 @@ static void httpd_ClientRecv(httpd_client_t *cl)
         }
         else
             cl->i_state = HTTPD_CLIENT_DEAD; /* connection failed */
-        return;
+        return 0;
     }
 
     /* check if the client is to be set to dead */
     if (i_len < 0) {
 #if defined(_WIN32)
-        if (WSAGetLastError() != WSAEWOULDBLOCK)
+        if (WSAGetLastError() == WSAEWOULDBLOCK)
 #else
-        if (errno != EAGAIN)
+        if (errno == EAGAIN)
 #endif
-            cl->i_state = HTTPD_CLIENT_DEAD; /* connection failed */
-        return;
+            return -1;
+
+        cl->i_state = HTTPD_CLIENT_DEAD; /* connection failed */
+        return 0;
     }
 
     /* XXX: for QT I have to disable timeout. Try to find why */
     if (cl->query.i_proto == HTTPD_PROTO_RTSP)
         cl->i_activity_timeout = 0;
+
+    return 0;
 }
 
-static void httpd_ClientSend(httpd_client_t *cl)
+static int httpd_ClientSend(httpd_client_t *cl)
 {
     int i_len;
 
@@ -1597,18 +1601,20 @@ static void httpd_ClientSend(httpd_client_t *cl)
 
     if (i_len == 0) {
         cl->i_state = HTTPD_CLIENT_DEAD; /* connection closed */
-        return;
+        return 0;
     }
 
     if (i_len < 0) {
 #if defined(_WIN32)
-        if (WSAGetLastError() != WSAEWOULDBLOCK)
+        if (WSAGetLastError() == WSAEWOULDBLOCK)
 #else
-        if (errno != EAGAIN)
+        if (errno == EAGAIN)
 #endif
-            /* Connection failed, or hung up (EPIPE) */
-            cl->i_state = HTTPD_CLIENT_DEAD;
-        return;
+            return -1;
+
+        /* Connection failed, or hung up (EPIPE) */
+        cl->i_state = HTTPD_CLIENT_DEAD;
+        return 0;
     }
 
     cl->i_buffer += i_len;
@@ -1638,6 +1644,7 @@ static void httpd_ClientSend(httpd_client_t *cl)
         } else /* send finished */
             cl->i_state = HTTPD_CLIENT_SEND_DONE;
     }
+    return 0;
 }
 
 static void httpd_ClientTlsHandshake(httpd_host_t *host, httpd_client_t *cl)
