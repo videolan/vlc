@@ -32,6 +32,10 @@
 #include <vlc_network.h>
 #include "vlc_dtls.h"
 
+#ifndef MSG_TRUNC
+#define MSG_TRUNC 0
+#endif
+
 struct vlc_dgram_sock
 {
     int fd;
