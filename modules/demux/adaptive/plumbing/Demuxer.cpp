@@ -114,18 +114,20 @@ bool MimeDemuxer::create()
         return false;
 
     StreamFormat format(StreamFormat::UNKNOWN);
-    char *type = stream_ContentType(p_newstream);
-    if(type)
-    {
-        format = StreamFormat(std::string(type));
-        free(type);
-    }
+
     /* Try to probe */
+    const uint8_t *p_peek;
+    size_t i_peek = sourcestream->Peek(&p_peek, StreamFormat::PEEK_SIZE);
+    format = StreamFormat(reinterpret_cast<const void *>(p_peek), i_peek);
+
     if(format == StreamFormat(StreamFormat::UNKNOWN))
     {
-        const uint8_t *p_peek;
-        size_t i_peek = sourcestream->Peek(&p_peek, StreamFormat::PEEK_SIZE);
-        format = StreamFormat(reinterpret_cast<const void *>(p_peek), i_peek);
+        char *type = stream_ContentType(p_newstream);
+        if(type)
+        {
+            format = StreamFormat(std::string(type));
+            free(type);
+        }
     }
 
     if(format != StreamFormat(StreamFormat::UNKNOWN))
