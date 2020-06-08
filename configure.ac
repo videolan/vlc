@@ -729,16 +729,6 @@ esac
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 
-dnl Check for struct pollfd
-AC_CHECK_TYPES([struct pollfd],,,
-[#include <sys/types.h>
-#if HAVE_POLL_H
-# include <poll.h>
-#elif defined (_WIN32)
-# include <winsock2.h>
-#endif
-])
-
 dnl Check for struct timespec
 AC_CHECK_TYPES([struct timespec],,,
 [#include <time.h>])
@@ -970,6 +960,16 @@ AC_CHECK_HEADERS([features.h getopt.h linux/dccp.h linux/magic.h sys/eventfd.h])
 
 dnl  MacOS
 AC_CHECK_HEADERS([xlocale.h])
+
+dnl Check for struct pollfd
+AC_CHECK_TYPES([struct pollfd],,,
+[#include <sys/types.h>
+#if HAVE_POLL_H
+# include <poll.h>
+#elif defined (_WIN32)
+# include <winsock2.h>
+#endif
+])
 
 dnl Check if C++ headers define locale_t
 AC_LANG_PUSH(C++)
