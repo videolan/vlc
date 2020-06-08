@@ -202,11 +202,11 @@ fi
 
 if [ ! -z "$BUILD_UCRT" ]; then
     WIDL=${TRIPLET}-widl
-    CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -D__MSVCRT_VERSION__=0xE00"
+    CPPFLAGS="$CPPFLAGS -D__MSVCRT_VERSION__=0xE00"
 
     if [ ! -z "$WINSTORE" ]; then
         SHORTARCH="$SHORTARCH-uwp"
-        CPPFLAGS="$CPPFLAGS -DWINAPI_FAMILY=WINAPI_FAMILY_APP -D_UNICODE -DUNICODE"
+        CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 -DWINAPI_FAMILY=WINAPI_FAMILY_APP -D_UNICODE -DUNICODE"
 
         # WinstoreCompat: hopefully can go away someday
         LDFLAGS="$LDFLAGS -lwindowsapp -lwinstorecompat"
@@ -216,6 +216,8 @@ if [ ! -z "$BUILD_UCRT" ]; then
         EXTRA_CRUNTIME="vcruntime140_app"
     else
         SHORTARCH="$SHORTARCH-ucrt"
+        # The current minimum for VLC is Windows 7
+        CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=0x0601 -DWINVER=0x0601"
         # this library doesn't exist yet, so use ucrt twice as a placeholder
         # EXTRA_CRUNTIME="vcruntime140"
         EXTRA_CRUNTIME="ucrt"
