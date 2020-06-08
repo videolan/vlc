@@ -279,10 +279,12 @@ static int get_address( stream_t *p_access )
         struct addrinfo *p_info = NULL;
 
         /* Is this a netbios name on this LAN ? */
+        uint32_t ip4_addr;
         if( netbios_ns_resolve( p_sys->p_ns, p_sys->url.psz_host,
                                 NETBIOS_FILESERVER,
-                                &p_sys->addr.s_addr) == 0 )
+                                &ip4_addr) == 0 )
         {
+            p_sys->addr.s_addr = ip4_addr;
             strlcpy( p_sys->netbios_name, p_sys->url.psz_host, 16);
             return VLC_SUCCESS;
         }
