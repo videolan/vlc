@@ -17,11 +17,60 @@
  *****************************************************************************/
 import QtQuick 2.11
 import QtQuick.Controls 2.4
+import QtQuick.Layouts 1.4
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 Item {
+
+    property Component titleDelegate: RowLayout {
+        property var rowModel: parent.rowModel
+        property var model: parent.colModel
+        readonly property bool containsMouse: parent.containsMouse
+        readonly property bool currentlyFocused: parent.currentlyFocused
+
+        anchors.fill: parent
+        spacing: VLCStyle.margin_normal
+
+        Image {
+            source: !rowModel ? VLCStyle.noArtCover : (rowModel.cover || VLCStyle.noArtCover)
+            mipmap: true // this widget can down scale the source a lot, so for better visuals we use mipmap
+
+            Layout.preferredHeight: VLCStyle.trackListAlbumCover_heigth
+            Layout.preferredWidth: VLCStyle.trackListAlbumCover_width
+
+            Widgets.PlayCover {
+                anchors.fill: parent
+                iconSize: VLCStyle.play_cover_small
+                visible: currentlyFocused || containsMouse
+
+                onIconClicked: medialib.addAndPlay( rowModel.id )
+            }
+        }
+
+        Widgets.ListLabel {
+            text: !rowModel ? "" : (rowModel[model.criteria] || "")
+
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+        }
+    }
+
+    property Component titleHeaderDelegate: Row {
+        spacing: VLCStyle.margin_normal
+
+        Widgets.IconLabel {
+            width: VLCStyle.heightAlbumCover_xsmall
+            horizontalAlignment: Text.AlignHCenter
+            text: VLCIcons.album_cover
+            color: VLCStyle.colors.caption
+        }
+
+        Widgets.CaptionLabel {
+            text: model.text || ""
+        }
+    }
 
     property Component timeHeaderDelegate: Widgets.IconLabel {
         width: timeTextMetric.width

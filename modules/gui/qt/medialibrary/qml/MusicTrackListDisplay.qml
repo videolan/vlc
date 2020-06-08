@@ -29,75 +29,27 @@ Widgets.KeyNavigableTableView {
     id: root
 
     property var sortModelSmall: [
-        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(1), text: i18n.qtr("Title"),    showSection: "title", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(1), text: i18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(1), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
         { criteria: "durationShort", width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
     ]
 
     property var sortModelMedium: [
-        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(2), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
         { criteria: "durationShort", width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
     ]
 
     property var sortModelLarge: [
-        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
+        { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(2), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(2), text: i18n.qtr("Artist"),   showSection: "main_artist" },
         { criteria: "durationShort", width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
         { criteria: "track_number",width: VLCStyle.colWidth(1), text: i18n.qtr("Track"), showSection: "" },
         { criteria: "disc_number", width: VLCStyle.colWidth(1), text: i18n.qtr("Disc"),  showSection: "" },
     ]
-
-    property Component titleDelegate: RowLayout {
-        property var rowModel: parent.rowModel
-        property var model: parent.colModel
-        readonly property bool containsMouse: parent.containsMouse
-        readonly property bool currentlyFocused: parent.currentlyFocused
-
-        anchors.fill: parent
-        spacing: VLCStyle.margin_normal
-
-        Image {
-            source: !rowModel ? VLCStyle.noArtCover : (rowModel.cover || VLCStyle.noArtCover)
-            mipmap: true // this widget can down scale the source a lot, so for better visuals we use mipmap
-
-            Layout.preferredHeight: VLCStyle.trackListAlbumCover_heigth
-            Layout.preferredWidth: VLCStyle.trackListAlbumCover_width
-
-            Widgets.PlayCover {
-                anchors.fill: parent
-                iconSize: VLCStyle.play_cover_small
-                visible: currentlyFocused || containsMouse
-
-                onIconClicked: medialib.addAndPlay( rowModel.id )
-            }
-        }
-
-        Widgets.ListLabel {
-            text: !rowModel ? "" : (rowModel[model.criteria] || "")
-
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-        }
-    }
-
-    property Component titleHeaderDelegate: Row {
-        spacing: VLCStyle.margin_normal
-
-        Widgets.IconLabel {
-            width: VLCStyle.heightAlbumCover_xsmall
-            horizontalAlignment: Text.AlignHCenter
-            text: VLCIcons.album_cover
-            color: VLCStyle.colors.caption
-        }
-
-        Widgets.CaptionLabel {
-            text: model.text || ""
-        }
-    }
 
     sortModel: ( availableRowWidth < VLCStyle.colWidth(6) ) ? sortModelSmall
                                                             : ( availableRowWidth < VLCStyle.colWidth(9) )
