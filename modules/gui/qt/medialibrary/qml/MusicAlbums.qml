@@ -151,58 +151,78 @@ Widgets.NavigableFocusScope {
         }
     }
 
+    Widgets.MenuExt {
+        id: contextMenu
+        property var model: ({})
+        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
+
+        Widgets.MenuItemExt {
+            id: playMenuItem
+            text: "Play from start"
+            onTriggered: {
+                medialib.addAndPlay( contextMenu.model.id )
+                history.push(["player"])
+            }
+        }
+
+        Widgets.MenuItemExt {
+            text: "Enqueue"
+            onTriggered: medialib.addToPlaylist( contextMenu.model.id )
+        }
+
+        onClosed: contextMenu.parent.forceActiveFocus()
+
+    }
+
     Component {
-        id: listComponent
-        /* ListView */
-        Widgets.KeyNavigableListView {
-            id: listView_id
+        id: tableComponent
 
-            header: root.header
+        Widgets.KeyNavigableTableView {
+            id: tableView_id
 
-            spacing: VLCStyle.margin_xxxsmall
+            readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
 
             model: albumModelId
-
-            delegate: Widgets.ListItem {
-                id: listDelegate
-
-                width: root.width
-                height: VLCStyle.icon_normal + VLCStyle.margin_small
-
-                selected: selectionModel.isSelected(root.model.index(index, 0))
-                Connections {
-                   target: selectionModel
-                   onSelectionChanged: listDelegate.selected = selectionModel.isSelected(root.model.index(index, 0))
-                }
-
-                cover: Image {
-                    id: cover_obj
-                    fillMode: Image.PreserveAspectFit
-                    source: model.cover || VLCStyle.noArtAlbum
-                    sourceSize: Qt.size(width, height)
-                }
-                line1: (model.title || i18n.qtr("Unknown title"))+" ["+model.duration+"]"
-                line2: model.main_artist || i18n.qtr("Unknown artist")
-
-                onItemClicked : {
-                    selectionModel.updateSelection( modifier, view.currentItem.currentIndex, index )
-                    view.currentItem.currentIndex = index
-                    this.forceActiveFocus()
-                }
-                onPlayClicked: medialib.addAndPlay( model.id )
-                onAddToPlaylistClicked : medialib.addToPlaylist( model.id )
-            }
-
-            onActionAtIndex: _actionAtIndex(index)
-            onSelectAll: selectionModel.selectAll()
-            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
-
+            headerColor: VLCStyle.colors.bg
+            onActionForSelection: _actionAtIndex(index)
             navigationParent: root
+            section.property: "title_first_symbol"
+            header: root.header
+
+            sortModel:  [
+                { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: i18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
+                { criteria: "main_artist", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)), text: i18n.qtr("Artist") },
+                { criteria: "durationShort", width:VLCStyle.colWidth(1), showSection: "", headerDelegate: tableColumns.timeHeaderDelegate, colDelegate: tableColumns.timeColDelegate },
+            ]
+
             navigationCancel: function() {
-                if (listView_id.currentIndex <= 0)
+                if (tableView_id.currentIndex <= 0)
                     defaultNavigationCancel()
                 else
-                    listView_id.currentIndex = 0;
+                    tableView_id.currentIndex = 0;
+            }
+
+            onContextMenuButtonClicked: {
+                contextMenu.model = menuModel
+                contextMenu.popup(menuParent)
+            }
+
+            Widgets.TableColumns {
+                id: tableColumns
+            }
+
+            Connections {
+                target: albumModelId
+                onSortCriteriaChanged: {
+                    switch (albumModelId.sortCriteria) {
+                    case "title":
+                    case "main_artist":
+                        tableView_id.section.property = albumModelId.sortCriteria + "_first_symbol"
+                        break;
+                    default:
+                        tableView_id.section.property = ""
+                    }
+                }
             }
         }
     }
@@ -213,7 +233,7 @@ Widgets.NavigableFocusScope {
         anchors.fill: parent
         focus: albumModelId.count !== 0
 
-        initialItem: medialib.gridView ? gridComponent : listComponent
+        initialItem: medialib.gridView ? gridComponent : tableComponent
 
         Connections {
             target: medialib
@@ -221,7 +241,7 @@ Widgets.NavigableFocusScope {
                 if (medialib.gridView)
                     view.replace(gridComponent)
                 else
-                    view.replace(listComponent)
+                    view.replace(tableComponent)
             }
         }
 

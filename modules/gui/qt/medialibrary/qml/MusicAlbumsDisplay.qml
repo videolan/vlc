@@ -26,11 +26,6 @@ import "qrc:///widgets/" as Widgets
 MusicAlbums {
     id: root
 
-    header: Widgets.LabelSeparator {
-        text: i18n.qtr("Albums")
-        width: root.width
-    }
-
     onCurrentIndexChanged: {
         history.update(["mc","music", "albums", {"initialIndex": currentIndex}])
     }
