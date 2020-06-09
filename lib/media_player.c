@@ -335,7 +335,9 @@ on_program_selection_changed(vlc_player_t *player, int unselected_id,
 
     const struct vlc_player_program *program =
         vlc_player_GetSelectedProgram(player);
-    assert(program);
+
+    if (unlikely(program == NULL)) /* can happen when the player is stopping */
+        return;
 
     libvlc_event_t event;
     event.type = libvlc_MediaPlayerScrambledChanged;
