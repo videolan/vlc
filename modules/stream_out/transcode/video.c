@@ -141,10 +141,9 @@ static picture_t *video_new_buffer_encoder( transcode_encoder_t *p_enc )
 
 static picture_t *transcode_video_filter_buffer_new( filter_t *p_filter )
 {
-    p_filter->fmt_out.video.i_chroma = p_filter->fmt_out.i_codec;
+    assert(p_filter->fmt_out.video.i_chroma == p_filter->fmt_out.i_codec);
     return picture_NewFromFormat( &p_filter->fmt_out.video );
 }
-
 
 static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 {
