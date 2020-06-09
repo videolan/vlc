@@ -2014,7 +2014,8 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         int i_format_tag;
 
                         st->sh.audio.channels = GetWLE( &oggpacket.packet[1+44] );
-                        st->sh.audio.blockalign = GetWLE( &oggpacket.packet[1+48] );
+                        /* seems totally bogus
+                        st->sh.audio.blockalign = GetWLE( &oggpacket.packet[1+48] );*/
                         st->sh.audio.avgbytespersec = GetDWLE( &oggpacket.packet[1+52] );
 
                         es_format_Change( &p_stream->fmt, AUDIO_ES, 0 );
