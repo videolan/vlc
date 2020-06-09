@@ -385,7 +385,7 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
 
     if( b_master_sync )
     {
-        filter_chain_AppendFilter( id->p_f_chain, "fps", NULL, p_dst );
+        filter_chain_AppendFilter( id->p_f_chain, "fps", NULL, p_src );
         p_src = filter_chain_GetFmtOut( id->p_f_chain );
         src_ctx = filter_chain_GetVideoCtxOut( id->p_f_chain );
     }
