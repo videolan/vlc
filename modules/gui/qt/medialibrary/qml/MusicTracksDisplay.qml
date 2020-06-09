@@ -27,6 +27,29 @@ Widgets.NavigableFocusScope {
     property alias sortModel: tracklistdisplay_id.sortModel
     property alias model: tracklistdisplay_id.model
 
+    Widgets.MenuExt {
+        id: contextMenu
+        property var model: ({})
+        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
+
+        Widgets.MenuItemExt {
+            id: playMenuItem
+            text: "Play from start"
+            onTriggered: {
+                medialib.addAndPlay( contextMenu.model.id )
+                history.push(["player"])
+            }
+        }
+
+        Widgets.MenuItemExt {
+            text: "Enqueue"
+            onTriggered: medialib.addToPlaylist( contextMenu.model.id )
+        }
+
+        onClosed: contextMenu.parent.forceActiveFocus()
+
+    }
+
     MusicTrackListDisplay {
         id: tracklistdisplay_id
         anchors.fill: parent
@@ -38,6 +61,11 @@ Widgets.NavigableFocusScope {
                 defaultNavigationCancel()
             else
                 tracklistdisplay_id.currentIndex = 0;
+        }
+
+        onContextMenuButtonClicked: {
+            contextMenu.model = menuModel
+            contextMenu.popup(menuParent)
         }
     }
 
