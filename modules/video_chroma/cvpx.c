@@ -414,6 +414,12 @@ Open_CVPX_to_CVPX(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
 
+    /* Avoid conversion to self if we're not resizing */
+    if (filter->fmt_in.video.i_chroma == filter->fmt_out.video.i_chroma &&
+        filter->fmt_in.video.i_visible_width == filter->fmt_out.video.i_visible_width &&
+        filter->fmt_in.video.i_visible_height == filter->fmt_out.video.i_visible_height)
+        return VLC_EGENERIC;
+
     if (filter->vctx_in == NULL ||
         vlc_video_context_GetType(filter->vctx_in) != VLC_VIDEO_CONTEXT_CVPX)
         return VLC_EGENERIC;
