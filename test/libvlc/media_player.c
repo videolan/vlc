@@ -59,20 +59,17 @@ static void pause_and_wait(libvlc_media_player_t *mp)
     int res;
     res = libvlc_event_attach(em, libvlc_MediaPlayerPaused, on_event, &sem);
     assert(!res);
-    res = libvlc_event_attach(em, libvlc_MediaPlayerEndReached, on_event, &sem);
-    assert(!res);
+
+    assert(libvlc_media_player_get_state(mp) == libvlc_Playing);
 
     libvlc_media_player_set_pause(mp, true);
 
-    /* the end may have been already reached before attaching the event */
-    if (libvlc_media_player_get_state(mp) == libvlc_Playing)
-    {
-        test_log("Waiting for pause\n");
-        vlc_sem_wait(&sem);
-    }
+    test_log("Waiting for pause\n");
+    vlc_sem_wait(&sem);
+
+    assert(libvlc_media_player_get_state(mp) == libvlc_Paused);
 
     libvlc_event_detach(em, libvlc_MediaPlayerPaused, on_event, &sem);
-    libvlc_event_detach(em, libvlc_MediaPlayerEndReached, on_event, &sem);
 }
 
 /* Test a bunch of A/V properties. This most does nothing since the current
