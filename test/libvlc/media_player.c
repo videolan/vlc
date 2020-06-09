@@ -129,7 +129,7 @@ static void test_media_player_set_media(const char** argv, int argc)
     libvlc_instance_t *vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    libvlc_media_t *md = libvlc_media_new_path (vlc, file);
+    libvlc_media_t *md = libvlc_media_new_location (vlc, file);
     assert (md != NULL);
 
     libvlc_media_player_t *mp = libvlc_media_player_new (vlc);
@@ -158,7 +158,7 @@ static void test_media_player_play_stop(const char** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    md = libvlc_media_new_path (vlc, file);
+    md = libvlc_media_new_location (vlc, file);
     assert (md != NULL);
 
     mi = libvlc_media_player_new_from_media (md);
@@ -185,7 +185,7 @@ static void test_media_player_pause_stop(const char** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    md = libvlc_media_new_path (vlc, file);
+    md = libvlc_media_new_location (vlc, file);
     assert (md != NULL);
 
     mi = libvlc_media_player_new_from_media (md);
@@ -217,6 +217,7 @@ int main (void)
     test_media_player_set_media (test_defaults_args, test_defaults_nargs);
     test_media_player_play_stop (test_defaults_args, test_defaults_nargs);
     test_media_player_pause_stop (test_defaults_args, test_defaults_nargs);
+//    test_media_player_tracks (test_defaults_args, test_defaults_nargs);
 
     return 0;
 }
