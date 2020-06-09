@@ -1008,7 +1008,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
                            ogg_packet *p_oggpacket )
 {
     demux_sys_t *p_ogg = p_demux->p_sys;
-    p_stream->i_end_trim = 0;
+    p_stream->i_end_length = 0;
 
     /* Convert the granulepos into a pcr */
     if ( p_oggpacket->granulepos == 0 )
@@ -1040,14 +1040,17 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
         {
             ogg_int64_t sample = p_stream->i_previous_granulepos;
 
-            if( p_stream->fmt.i_codec == VLC_CODEC_OPUS && p_oggpacket->e_o_s )
+            if( p_oggpacket->e_o_s &&
+                (p_stream->fmt.i_codec == VLC_CODEC_OPUS ||
+                 p_stream->fmt.i_codec == VLC_CODEC_VORBIS) )
             {
                 unsigned duration = Ogg_OpusPacketDuration( p_oggpacket );
-                if( duration > 0 )
+                if( duration > 0 && p_stream->f_rate &&
+                    p_oggpacket->granulepos > sample )
                 {
-                    ogg_int64_t end_sample = p_oggpacket->granulepos;
-                    if( end_sample < ( sample + duration ) )
-                        p_stream->i_end_trim = sample + duration - end_sample;
+                    ogg_int64_t samples = p_oggpacket->granulepos - sample;
+                    if( samples < duration )
+                        p_stream->i_end_length = samples * CLOCK_FREQ / p_stream->f_rate;
                 }
             }
 
@@ -1477,8 +1480,9 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             msleep(10000);
         }
 
-        /* Blatant abuse of the i_length field. */
-        p_block->i_length = p_stream->i_end_trim;
+        /* Handle explicit packet duration truncation */
+        if( p_stream->i_end_length )
+            p_block->i_length = p_stream->i_end_length;
         p_block->i_dts = p_stream->i_pcr;
         p_block->i_pts = p_stream->b_interpolation_failed ? VLC_TS_INVALID : p_stream->i_pcr;
     }

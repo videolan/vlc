@@ -95,7 +95,7 @@ typedef struct logical_stream_s
     /* Opus has a starting offset in the headers. */
     int i_pre_skip;
     /* Vorbis and Opus can trim the end of a stream using granule positions. */
-    int i_end_trim;
+    mtime_t i_end_length;
 
     /* offset of first keyframe for theora; can be 0 or 1 depending on version number */
     int8_t i_keyframe_offset;

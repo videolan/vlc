@@ -161,7 +161,7 @@ static int  ProcessHeaders( decoder_t * );
 static int  ProcessInitialHeader ( decoder_t *, ogg_packet * );
 static block_t *ProcessPacket( decoder_t *, ogg_packet *, block_t * );
 
-static block_t *DecodePacket( decoder_t *, ogg_packet *, int, int );
+static block_t *DecodePacket( decoder_t *, ogg_packet *, int, mtime_t );
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -423,7 +423,7 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 
     block_t *p_aout_buffer = DecodePacket( p_dec, p_oggpacket,
                                            p_block->i_nb_samples,
-                                           (int)p_block->i_length );
+                                           p_block->i_length );
 
     block_Release( p_block );
     return p_aout_buffer;
@@ -433,7 +433,7 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
  * DecodePacket: decodes a Opus packet.
  *****************************************************************************/
 static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
-                              int i_nb_samples, int i_end_trim )
+                              int i_nb_samples, mtime_t i_duration )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -449,6 +449,17 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
      * use the packet's sample number */
     if(!i_nb_samples)
         i_nb_samples = spp;
+
+    int i_duration_samples = ((i_duration + (CLOCK_FREQ / 48000)) * 48000)
+                             / CLOCK_FREQ;
+    int i_end_trim;
+    if(i_duration_samples && i_duration_samples < i_nb_samples)
+    {
+        i_end_trim = spp - i_duration_samples;
+        msg_Dbg(p_dec, "truncating %d off %d samples", i_end_trim, i_nb_samples);
+    }
+    else
+        i_end_trim = 0;
 
     if( decoder_UpdateAudioFormat( p_dec ) )
         return NULL;
