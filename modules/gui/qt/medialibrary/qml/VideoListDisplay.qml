@@ -26,133 +26,53 @@ import "qrc:///style/"
 
 Widgets.KeyNavigableTableView {
     id: listView_id
+
     model: MLVideoModel {
         ml: medialib
     }
 
-    property var sortModelSmall: [
-        { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), text: i18n.qtr("Thumbnail"), showSection: "" },
-        { isPrimary: true, criteria: "title",   width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title" },
-        { type: "contextButton",                width: VLCStyle.colWidth(1)  }
-    ]
+    property Component thumbnailHeader: Item {
+        Widgets.IconLabel {
+            height: VLCStyle.listAlbumCover_height
+            width: VLCStyle.listAlbumCover_width
+            horizontalAlignment: Text.AlignHCenter
+            text: VLCIcons.album_cover
+            color: VLCStyle.colors.caption
+        }
+    }
 
-    property var sortModelMedium:  [
-        { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), text: i18n.qtr("Thumbnail"), showSection: "" },
-        { isPrimary: true, criteria: "title",   width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title" },
-        { criteria: "durationShort",            width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
-        { type: "contextButton",                width: VLCStyle.colWidth(1)  }
-    ]
-
-    property var sortModelLarge:  [
-        { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), text: i18n.qtr("Thumbnail"), showSection: "" },
-        { isPrimary: true, criteria: "title",   width: VLCStyle.colWidth(4), text: i18n.qtr("Title"),    showSection: "title" },
-        { criteria: "durationShort",            width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
-        { type: "contextButton",                width: VLCStyle.colWidth(1) }
-    ]
-
-
-    sortModel: ( availableRowWidth < VLCStyle.colWidth(6) ) ? sortModelSmall
-                                                            : ( availableRowWidth < VLCStyle.colWidth(7) )
-                                                              ? sortModelMedium : sortModelLarge
-    section.property: "title_first_symbol"
-
-    rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
-
-    property bool isFocusOnContextButton: false
-
-    colDelegate: Item {
-        id: colDel
+    property Component thumbnailColumn: Item {
 
         property var rowModel: parent.rowModel
         property var model: parent.colModel
         readonly property bool currentlyFocused: parent.currentlyFocused
         readonly property bool containsMouse: parent.containsMouse
 
-        anchors.fill: parent
-
-        FocusScope{
-            anchors.fill: parent
-            focus: isFocusOnContextButton && colDel.rowModel.index === currentIndex
-            onFocusChanged: focus && contextButtonLoader.forceActiveFocus()
-
-            Loader{
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                active: model.type === "image"
-                sourceComponent: Widgets.RoundImage{
-                    id: cover
-                    height: VLCStyle.listAlbumCover_height
-                    width: VLCStyle.listAlbumCover_width
-                    source: !rowModel ? "" : rowModel[model.criteria]
-
-                    Widgets.VideoQualityLabel {
-                        id: resolutionLabel
-                        anchors {
-                            top: cover.top
-                            left: cover.left
-                            topMargin: VLCStyle.margin_xxsmall
-                            leftMargin: VLCStyle.margin_xxsmall
-                        }
-                        text: !rowModel ? "" : rowModel.resolution_name
-                    }
-                    Widgets.VideoQualityLabel {
-                        anchors {
-                            top: cover.top
-                            left: resolutionLabel.right
-                            topMargin: VLCStyle.margin_xxsmall
-                            leftMargin: VLCStyle.margin_xxxsmall
-                        }
-                        visible: !rowModel ? "" : rowModel.channel.length > 0
-                        text: !rowModel ? "" : rowModel.channel
-                        color: "limegreen"
-                    }
-                    Widgets.VideoProgressBar {
-                        value: !rowModel ? 0 : rowModel.progress
-                        visible: !playCover.visible && value > 0
-                        anchors {
-                            bottom: parent.bottom
-                            left: parent.left
-                            right: parent.right
-                        }
-                    }
-
-                    Widgets.PlayCover {
-                        id: playCover
-
-                        anchors.fill: parent
-                        iconSize: VLCStyle.play_cover_small
-                        visible: colDel.currentlyFocused || colDel.containsMouse
-
-                        onIconClicked: medialib.addAndPlay( rowModel.id )
-                    }
-                }
-            }
-            Loader{
-                id: contextButtonLoader
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.right
-                anchors.rightMargin: VLCStyle.margin_xxsmall
-                active: model.type === "contextButton"
-                sourceComponent: Widgets.ContextButton{
-                    backgroundColor: hovered || activeFocus ?
-                                         VLCStyle.colors.getBgColor( root.isSelected, hovered,
-                                                                    root.activeFocus) : "transparent"
-                    focus: contextButtonLoader.focus
-                    onClicked: listView_id.contextMenuButtonClicked(this,rowModel)
-                }
-            }
-            Loader{
-                anchors.fill:parent
-                active: model.type !== "image"
-                sourceComponent: Widgets.ListLabel {
-                    anchors.fill: parent
-                    anchors.rightMargin: VLCStyle.margin_xxxsmall // without this text is not initially visible
-                    text: !rowModel ? "" : rowModel[model.criteria] || ""
-                }
-            }
+        Widgets.MediaCover {
+            anchors.verticalCenter: parent.verticalCenter
+            source: !rowModel ? "" : rowModel[model.criteria]
+            playCoverVisible: currentlyFocused || containsMouse
+            playIconSize: VLCStyle.play_cover_small
+            onPlayIconClicked:  medialib.addAndPlay( rowModel.id )
+            labels: [
+                !rowModel ? "" : rowModel.resolution_name,
+                !rowModel ? "" : rowModel.channel
+            ].filter(function(a) { return a !== "" } )
         }
+
     }
+
+    readonly property int _nbCols: VLCStyle.gridColumnsForWidth(listView_id.availableRowWidth)
+
+    sortModel: [
+        { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), showSection: "", colDelegate: thumbnailColumn, headerDelegate: thumbnailHeader },
+        { isPrimary: true, criteria: "title",   width: VLCStyle.colWidth(Math.max(listView_id._nbCols - 2, 1)), text: i18n.qtr("Title"),    showSection: "title" },
+        { criteria: "durationShort",            width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate, showContextButton: true },
+    ]
+
+    section.property: "title_first_symbol"
+
+    rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
 
     headerColor: VLCStyle.colors.bg
 
