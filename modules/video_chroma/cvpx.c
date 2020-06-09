@@ -348,6 +348,7 @@ static int Open(vlc_object_t *obj)
             return VLC_EGENERIC;
     }
 
+    p_filter->fmt_out.i_codec = p_filter->fmt_out.video.i_chroma;
     return VLC_SUCCESS;
 error:
     Close(obj);
@@ -451,6 +452,7 @@ Open_CVPX_to_CVPX(vlc_object_t *obj)
 
     filter->pf_video_filter = Filter;
     filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
+    filter->fmt_out.i_codec = filter->fmt_out.video.i_chroma;
     return VLC_SUCCESS;
 }
 
