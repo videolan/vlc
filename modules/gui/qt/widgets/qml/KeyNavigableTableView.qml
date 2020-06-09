@@ -263,6 +263,18 @@ NavigableFocusScope {
                         }
                     }
                 }
+
+                Widgets.ContextButton {
+                    anchors.right: content.right
+                    anchors.top: content.top
+                    anchors.bottom: content.bottom
+                    backgroundColor: hovered || activeFocus ?
+                                         VLCStyle.colors.getBgColor( lineView.selected, hovered,
+                                                                     activeFocus ) : "transparent"
+
+                    onClicked: root.contextMenuButtonClicked(this,  lineView.rowModel)
+                    visible: hoverArea.containsMouse
+                }
             }
         }
 
