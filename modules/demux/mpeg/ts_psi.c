@@ -1417,7 +1417,10 @@ static void PIDFillFormat( demux_t *p_demux, ts_stream_t *p_pes,
         break;
     case 0x11:  /* MPEG4 (audio) LATM */
         es_format_Change( fmt, AUDIO_ES, VLC_CODEC_MP4A );
-        fmt->i_original_fourcc = VLC_FOURCC('L','A','T','M');
+        /* https://trac.ffmpeg.org/ticket/320
+         * Haivision's Makito encoder violates mapping by putting ADTS
+           instead of LOAS, we can only hint that's not raw AAC */
+        fmt->i_original_fourcc = VLC_FOURCC('H','E','A','D');
         break;
     case 0x1B:  /* H264 <- check transport syntax/needed descriptor */
         es_format_Change( fmt, VIDEO_ES, VLC_CODEC_H264 );
