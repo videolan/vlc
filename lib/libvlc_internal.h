@@ -33,6 +33,7 @@
 #include <vlc/libvlc_picture.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_events.h>
+#include <vlc_atomic.h>
 
 #include <vlc_common.h>
 
@@ -60,7 +61,7 @@ VLC_API void libvlc_SetExitHandler( libvlc_int_t *, void (*) (void *), void * );
 struct libvlc_instance_t
 {
     libvlc_int_t *p_libvlc_int;
-    unsigned      ref_count;
+    vlc_atomic_rc_t ref_count;
     vlc_mutex_t   instance_lock;
     struct libvlc_callback_entry_list_t *p_callback_list;
     struct

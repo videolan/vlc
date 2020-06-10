@@ -60,7 +60,7 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
     }
 
     p_new->p_libvlc_int = p_libvlc_int;
-    p_new->ref_count = 1;
+    vlc_atomic_rc_init( &p_new->ref_count );
     p_new->p_callback_list = NULL;
     vlc_mutex_init(&p_new->instance_lock);
     return p_new;
@@ -74,24 +74,13 @@ error:
 void libvlc_retain( libvlc_instance_t *p_instance )
 {
     assert( p_instance != NULL );
-    assert( p_instance->ref_count < UINT_MAX );
 
-    vlc_mutex_lock( &p_instance->instance_lock );
-    p_instance->ref_count++;
-    vlc_mutex_unlock( &p_instance->instance_lock );
+    vlc_atomic_rc_inc( &p_instance->ref_count );
 }
 
 void libvlc_release( libvlc_instance_t *p_instance )
 {
-    vlc_mutex_t *lock = &p_instance->instance_lock;
-    int refs;
-
-    vlc_mutex_lock( lock );
-    assert( p_instance->ref_count > 0 );
-    refs = --p_instance->ref_count;
-    vlc_mutex_unlock( lock );
-
-    if( refs == 0 )
+    if(vlc_atomic_rc_dec( &p_instance->ref_count ))
     {
         libvlc_Quit( p_instance->p_libvlc_int );
         libvlc_InternalCleanup( p_instance->p_libvlc_int );
