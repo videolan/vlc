@@ -836,11 +836,16 @@ static int LatmReadStreamMuxConfiguration(latm_mux_t *m, bs_t *s)
         if (i_mux_version == 1)
             LatmGetValue(s); /* taraBufferFullness */
 
+    if(bs_remain(s) < 11)
+        return -1;
+
     m->b_same_time_framing = bs_read1(s);
     m->i_sub_frames = 1 + bs_read(s, 6);
     m->i_programs = 1 + bs_read(s, 4);
 
     for (uint8_t i_program = 0; i_program < m->i_programs; i_program++) {
+        if(bs_remain(s) < 3)
+            return -1;
         m->pi_layers[i_program] = 1+bs_read(s, 3);
 
         for (uint8_t i_layer = 0; i_layer < m->pi_layers[i_program]; i_layer++) {
@@ -900,6 +905,9 @@ static int LatmReadStreamMuxConfiguration(latm_mux_t *m, bs_t *s)
             m->i_streams++;
         }
     }
+
+    if(bs_remain(s) < 2)
+        return -1;
 
     /* other data */
     if (bs_read1(s)) {
@@ -980,6 +988,9 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
         else return 0;
     }
 
+    if(bs_remain(&s) == 0 && i_buffer)
+        goto truncated;
+
     /* FIXME do we need to split the subframe into independent packet ? */
     if (p_sys->latm.i_sub_frames > 1)
         msg_Err(p_dec, "latm sub frames not yet supported, please send a sample");
@@ -1022,6 +1033,9 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
 
                     if (pi_payload[i_program][i_layer] <= 0)
                         continue;
+
+                    if(pi_payload[i_program][i_layer] > (bs_remain(&s) >> 3))
+                        goto truncated;
 
                     /* FIXME that's slow (and a bit ugly to write in place) */
                     for (unsigned i = 0; i < pi_payload[i_program][i_layer]; i++) {
@@ -1087,6 +1101,10 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
     bs_align(&s);
 
     return i_accumulated;
+
+truncated:
+    msg_Warn(p_dec,"Truncated LAOS packet. Wrong format ?");
+    return 0;
 }
 
 /*****************************************************************************
