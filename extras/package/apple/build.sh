@@ -89,8 +89,8 @@ VLC_USE_PREBUILT_CONTRIBS=0
 # User-provided URL from where to fetch contribs, empty
 # for the default chosen by contrib system
 VLC_PREBUILT_CONTRIBS_URL=${VLC_PREBUILT_CONTRIBS_URL:-""}
-# The number of cores to compile on
-CORE_COUNT=$(sysctl -n machdep.cpu.core_count)
+# The number of cores to compile on, or 0 + 1 if not darwin
+CORE_COUNT=$(sysctl -n machdep.cpu.core_count || echo 0)
 let VLC_USE_NUMBER_OF_CORES=$CORE_COUNT+1
 # whether to disable debug mode (the default) or not
 VLC_DISABLE_DEBUG=0
