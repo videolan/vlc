@@ -41,7 +41,7 @@ NavigableFocusScope {
         anchors.fill: parent
         text: !rowModel ? "" : (rowModel[model.criteria] || "")
     }
-    property Component headerDelegate: Widgets.CaptionLabel {
+    property Component tableHeaderDelegate: Widgets.CaptionLabel {
         text: model.text || ""
     }
 
@@ -56,7 +56,9 @@ NavigableFocusScope {
     property alias currentIndex: view.currentIndex
     property alias currentItem: view.currentItem
 
-    property alias headerItem: view.headerItem
+    property Component header: undefined
+    property var headerItem: view.headerItem.loadedHeader
+    property alias tableHeaderItem: view.headerItem
     property color headerColor
 
     property alias selectionModel: selectionModel
@@ -91,6 +93,7 @@ NavigableFocusScope {
 
             readonly property alias contentX: row.x
             readonly property alias contentWidth: row.width
+            property alias loadedHeader: headerLoader.item
 
             width: parent.width
             height: childrenRect.height
@@ -101,6 +104,12 @@ NavigableFocusScope {
             Column {
                 width: parent.width
                 height: childrenRect.height
+
+                Loader {
+                    id: headerLoader
+
+                    sourceComponent: root.header
+                }
 
                 Row {
                     id: row
@@ -124,7 +133,7 @@ NavigableFocusScope {
                             Loader {
                                 property var model: modelData
 
-                                sourceComponent: model.headerDelegate || root.headerDelegate
+                                sourceComponent: model.headerDelegate || root.tableHeaderDelegate
                             }
 
                             Text {
@@ -157,7 +166,7 @@ NavigableFocusScope {
         }
 
         section.delegate: Text {
-            x: headerItem.contentX - VLCStyle.table_section_width
+            x: view.headerItem.contentX - VLCStyle.table_section_width
             topPadding: VLCStyle.margin_xsmall
             bottomPadding: VLCStyle.margin_xxsmall
             leftPadding: VLCStyle.table_section_text_margin
