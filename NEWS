@@ -9,6 +9,7 @@ Platform support changes:
      - Android 4.1.x or later (API-16)
      - GCC 5.0 or Clang 3.4 (or equivalent)
  * Windows on ARM is now supported
+ * Universal Windows is only supported for Windows 10 (not Windows 8 anymore)
 
 Core:
  * New output clock (internal):
@@ -59,7 +60,7 @@ Access:
  * Enable SMB2 / SMB3 support on mobile ports with libsmb2
  * Added support for the RIST (Reliable Internet Stream Transport) Protocol
  * Added support for the AMT (Automatic Multicast Tunneling) Protocol
- * Added support for the Gopher Protocol 
+ * Added support for the Gopher Protocol
  * Added avaudiocapture module as a replacement for qtsound, which is removed now
  * Audio CD data tracks are now correctly detected and skipped
  * Deprecates Audio CD CDDB lookups in favor of more accurate Musicbrainz
