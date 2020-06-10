@@ -23,41 +23,82 @@
 #include "test.h"
 #include <vlc_common.h>
 
+struct event_ctx
+{
+    vlc_sem_t sem_ev;
+    vlc_sem_t sem_done;
+    const struct libvlc_event_t *ev;
+};
+
+static void event_ctx_init(struct event_ctx *ctx)
+{
+    vlc_sem_init(&ctx->sem_ev, 0);
+    vlc_sem_init(&ctx->sem_done, 0);
+    ctx->ev = NULL;
+}
+
+static const struct libvlc_event_t *even_ctx_wait_event(struct event_ctx *ctx)
+{
+    vlc_sem_wait(&ctx->sem_ev);
+    assert(ctx->ev != NULL);
+    return ctx->ev;
+}
+
+static void event_ctx_release(struct event_ctx *ctx)
+{
+    assert(ctx->ev != NULL);
+    ctx->ev = NULL;
+    vlc_sem_post(&ctx->sem_done);
+}
+
+static void even_ctx_wait(struct event_ctx *ctx)
+{
+    even_ctx_wait_event(ctx);
+    event_ctx_release(ctx);
+}
+
 static void on_event(const struct libvlc_event_t *event, void *data)
 {
-    (void) event;
-    vlc_sem_t *sem = data;
-    vlc_sem_post(sem);
+    struct event_ctx *ctx = data;
+
+    assert(ctx->ev == NULL);
+    ctx->ev = event;
+
+    vlc_sem_post(&ctx->sem_ev);
+
+    vlc_sem_wait(&ctx->sem_done);
+
+    assert(ctx->ev == NULL);
 }
 
 static void play_and_wait(libvlc_media_player_t *mp)
 {
     libvlc_event_manager_t *em = libvlc_media_player_event_manager(mp);
 
-    vlc_sem_t sem;
-    vlc_sem_init(&sem, 0);
+    struct event_ctx ctx;
+    event_ctx_init(&ctx);
 
     int res;
-    res = libvlc_event_attach(em, libvlc_MediaPlayerPlaying, on_event, &sem);
+    res = libvlc_event_attach(em, libvlc_MediaPlayerPlaying, on_event, &ctx);
     assert(!res);
 
     libvlc_media_player_play(mp);
 
     test_log("Waiting for playing\n");
-    vlc_sem_wait(&sem);
+    even_ctx_wait(&ctx);
 
-    libvlc_event_detach(em, libvlc_MediaPlayerPlaying, on_event, &sem);
+    libvlc_event_detach(em, libvlc_MediaPlayerPlaying, on_event, &ctx);
 }
 
 static void pause_and_wait(libvlc_media_player_t *mp)
 {
     libvlc_event_manager_t *em = libvlc_media_player_event_manager(mp);
 
-    vlc_sem_t sem;
-    vlc_sem_init(&sem, 0);
+    struct event_ctx ctx;
+    event_ctx_init(&ctx);
 
     int res;
-    res = libvlc_event_attach(em, libvlc_MediaPlayerPaused, on_event, &sem);
+    res = libvlc_event_attach(em, libvlc_MediaPlayerPaused, on_event, &ctx);
     assert(!res);
 
     assert(libvlc_media_player_get_state(mp) == libvlc_Playing);
@@ -65,11 +106,11 @@ static void pause_and_wait(libvlc_media_player_t *mp)
     libvlc_media_player_set_pause(mp, true);
 
     test_log("Waiting for pause\n");
-    vlc_sem_wait(&sem);
+    even_ctx_wait(&ctx);
 
     assert(libvlc_media_player_get_state(mp) == libvlc_Paused);
 
-    libvlc_event_detach(em, libvlc_MediaPlayerPaused, on_event, &sem);
+    libvlc_event_detach(em, libvlc_MediaPlayerPaused, on_event, &ctx);
 }
 
 /* Test a bunch of A/V properties. This most does nothing since the current
