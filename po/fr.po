@@ -26,7 +26,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-04-24 22:11+0200\n"
+"PO-Revision-Date: 2020-06-11 00:50+0200\n"
 "Last-Translator: Yann Ricquebourg <yann.ricquebourg@gmail.com>, 2020\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/16553/fr/)\n"
 "Language: fr\n"
@@ -7514,8 +7514,8 @@ msgid ""
 "external media in \"Files and Folders\" section."
 msgstr ""
 "Potentiellement, macOS bloque l'accès à votre disque. Veuillez ouvrir "
-"\"Préférences système\" -> \"Sécurité et confidentialité\" et autoriser VLC "
-"à accéder à vos médias externes dans la section \"Fichiers et dossiers\"."
+"« Préférences système » -> « Sécurité et confidentialité » et autoriser VLC "
+"à accéder à vos médias externes dans la section « Fichiers et dossiers »."
 
 #: modules/access/dvdread.c:77
 msgid "DVD without menus"
@@ -19679,7 +19679,7 @@ msgstr "Ouvrir un fichier de sous-titres"
 
 #: modules/gui/qt/components/controller.hpp:127
 msgid "Dock/undock fullscreen controller to/from bottom of screen"
-msgstr "Attacher/détacher le contrôleur plein écran du haut/bas de l'écran"
+msgstr "Attacher/détacher le contrôleur plein écran au bas de l'écran"
 
 #: modules/gui/qt/components/controller_widget.cpp:136
 msgctxt "Tooltip|Unmute"
@@ -25676,7 +25676,7 @@ msgid ""
 "This allows you to give a contact mail address for the stream, that will be "
 "announced in the SDP (Session Descriptor)."
 msgstr ""
-"Adresse email de contact pour le flux qui sera annoncé dans le SDP "
+"Adresse de courriel de contact pour le flux qui sera annoncé dans le SDP "
 "(Descripteur de Session)."
 
 #: modules/stream_out/rtp.c:116
