@@ -59,6 +59,10 @@ QVariant MLAlbumModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue( ml_item->getNbTracks() );
     case ALBUM_DURATION:
         return QVariant::fromValue( ml_item->getDuration() );
+    case ALBUM_TITLE_FIRST_SYMBOL:
+        return QVariant::fromValue( getFirstSymbol( ml_item->getTitle() ) );
+    case ALBUM_MAIN_ARTIST_FIRST_SYMBOL:
+        return QVariant::fromValue( getFirstSymbol( ml_item->getArtist() ) );
     default:
         return QVariant();
     }
@@ -74,7 +78,9 @@ QHash<int, QByteArray> MLAlbumModel::roleNames() const
         {ALBUM_COVER, "cover"},
         {ALBUM_MAIN_ARTIST, "main_artist"},
         {ALBUM_NB_TRACKS, "nb_tracks"},
-        {ALBUM_DURATION, "duration"}
+        {ALBUM_DURATION, "duration"},
+        {ALBUM_TITLE_FIRST_SYMBOL, "title_first_symbol"},
+        {ALBUM_MAIN_ARTIST_FIRST_SYMBOL, "main_artist_first_symbol"}
     };
 }
 
