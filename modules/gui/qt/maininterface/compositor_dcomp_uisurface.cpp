@@ -152,6 +152,7 @@ CompositorDCompositionUISurface::CompositorDCompositionUISurface(intf_thread_t* 
 bool CompositorDCompositionUISurface::init()
 {
     EGLBoolean eglRet;
+    bool ret;
 
     QSurfaceFormat format;
     // Qt Quick may need a depth and stencil buffer. Always make sure these are available.
@@ -202,7 +203,9 @@ bool CompositorDCompositionUISurface::init()
     m_d3dCompiler->init(VLC_OBJECT(m_intf));
 
     qreal dpr = m_rootWindow->devicePixelRatio();
-    initialiseD3DSwapchain(dpr * m_rootWindow->width(), dpr * m_rootWindow->height());
+    ret = initialiseD3DSwapchain(dpr * m_rootWindow->width(), dpr * m_rootWindow->height());
+    if (!ret)
+        return false;
 
     HR(m_dcUiVisual->SetContent(m_d3dSwapChain.Get()), "fail to create surface");
 
@@ -236,7 +239,7 @@ CompositorDCompositionUISurface::~CompositorDCompositionUISurface()
     releaseSharedTexture();
 }
 
-void CompositorDCompositionUISurface::initialiseD3DSwapchain(int width, int height)
+bool CompositorDCompositionUISurface::initialiseD3DSwapchain(int width, int height)
 {
     HRESULT hr;
     UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT
@@ -301,7 +304,7 @@ void CompositorDCompositionUISurface::initialiseD3DSwapchain(int width, int heig
     {
         char* err = pErrBlob ? (char*)pErrBlob->GetBufferPointer() : nullptr;
         msg_Err(m_intf, "fail to compile vertex shader (0x%lX) : %s", hr, err);
-        return;
+        return false;
     }
 
     hr = m_d3dCompiler->compile(shaderStr, strlen(shaderStr), nullptr, nullptr, nullptr, "PShader", "ps_4_0", 0, 0, &PS, &pErrBlob);
@@ -309,7 +312,7 @@ void CompositorDCompositionUISurface::initialiseD3DSwapchain(int width, int heig
     {
         char* err = pErrBlob ? (char*)pErrBlob->GetBufferPointer() : nullptr;
         msg_Err(m_intf, "fail to compile pixel shader (0x%lX) : %s", hr, err);
-        return;
+        return false;
     }
 
     HR(m_d3dDevice->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), nullptr, &m_VS), "CreateVertexShader");
@@ -384,7 +387,7 @@ void CompositorDCompositionUISurface::initialiseD3DSwapchain(int width, int heig
     HR(m_d3dDevice->CreateSamplerState(&sampDesc, &m_samplerState));
     m_d3dContext->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
 
-    updateSharedTexture(width, height);
+    return updateSharedTexture(width, height);
 }
 
 void CompositorDCompositionUISurface::resizeSwapchain(int width, int height)
@@ -422,7 +425,7 @@ void CompositorDCompositionUISurface::releaseSharedTexture()
     m_d3dInterimTextureQt.Reset();
 }
 
-void CompositorDCompositionUISurface::updateSharedTexture(int width, int height)
+bool CompositorDCompositionUISurface::updateSharedTexture(int width, int height)
 {
     try
     {
@@ -471,10 +474,12 @@ void CompositorDCompositionUISurface::updateSharedTexture(int width, int height)
         };
 
         m_eglInterimTextureQt = eglCreatePbufferFromClientBuffer(m_eglDisplay, EGL_D3D_TEXTURE_ANGLE, buffer, m_eglConfig, pBufferAttributes);
+        return true;
     }
     catch (const DXError& err)
     {
         msg_Warn(m_intf, "failed to update shared texture: %s, code 0x%lX", err.what(), err.code());
+        return false;
     }
 }
 
