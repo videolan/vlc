@@ -62,7 +62,6 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
     p_new->p_libvlc_int = p_libvlc_int;
     vlc_atomic_rc_init( &p_new->ref_count );
     p_new->p_callback_list = NULL;
-    vlc_mutex_init(&p_new->instance_lock);
     return p_new;
 
 error:

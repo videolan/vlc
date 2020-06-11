@@ -121,7 +121,6 @@ libvlc_dialog_set_callbacks(libvlc_instance_t *p_instance,
 {
     libvlc_int_t *p_libvlc = p_instance->p_libvlc_int;
 
-    vlc_mutex_lock(&p_instance->instance_lock);
     if (p_cbs != NULL)
     {
         const vlc_dialog_cbs dialog_cbs = {
@@ -145,7 +144,6 @@ libvlc_dialog_set_callbacks(libvlc_instance_t *p_instance,
     }
     else
         vlc_dialog_provider_set_callbacks(p_libvlc, NULL, NULL);
-    vlc_mutex_unlock(&p_instance->instance_lock);
 }
 
 void

@@ -62,7 +62,6 @@ struct libvlc_instance_t
 {
     libvlc_int_t *p_libvlc_int;
     vlc_atomic_rc_t ref_count;
-    vlc_mutex_t   instance_lock;
     struct libvlc_callback_entry_list_t *p_callback_list;
     struct
     {
