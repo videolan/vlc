@@ -430,6 +430,10 @@ bool CompositorDCompositionUISurface::updateSharedTexture(int width, int height)
     try
     {
         releaseSharedTexture();
+
+        D3D11_FEATURE_DATA_D3D11_OPTIONS d3d11Options;
+        HRESULT checkFeatureHR = m_d3dDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &d3d11Options, sizeof(d3d11Options));
+
         /* interim texture */
         D3D11_TEXTURE2D_DESC texDesc = { };
         texDesc.MipLevels = 1;
@@ -442,7 +446,10 @@ bool CompositorDCompositionUISurface::updateSharedTexture(int width, int height)
         texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         texDesc.Height = height;
         texDesc.Width  = width;
-        texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+        if (SUCCEEDED(checkFeatureHR) && d3d11Options.ExtendedResourceSharing) //D3D11.1 feature
+            texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+        else
+            texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED;
 
         HR(m_d3dDevice->CreateTexture2D( &texDesc, NULL, &m_d3dInterimTexture ), "create texture");
 
