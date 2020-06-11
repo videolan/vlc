@@ -92,6 +92,7 @@ cmake-$(CMAKE_VERSION).tar.gz:
 
 cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(UNPACK)
+	$(APPLY) $(TOOLS)/cmake-enable-ALPN-support-on-macOS-10.14.patch
 	$(MOVE)
 
 .buildcmake: cmake
