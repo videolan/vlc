@@ -2549,12 +2549,14 @@ static void AVI_IndexLoad( demux_t *p_demux )
         if( p_idx_indx[i].i_size > p_idx_idx1[i].i_size )
         {
             msg_Dbg( p_demux, "selected ODML index for stream[%u]", i );
+            free(p_sys->track[i]->idx.p_entry);
             p_sys->track[i]->idx = p_idx_indx[i];
             avi_index_Clean( &p_idx_idx1[i] );
         }
         else
         {
             msg_Dbg( p_demux, "selected standard index for stream[%u]", i );
+            free(p_sys->track[i]->idx.p_entry);
             p_sys->track[i]->idx = p_idx_idx1[i];
             avi_index_Clean( &p_idx_indx[i] );
         }
