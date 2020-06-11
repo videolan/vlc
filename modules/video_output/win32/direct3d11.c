@@ -979,7 +979,7 @@ static void Direct3D11Close(vout_display_t *vd)
     if ( sys->swapCb == LocalSwapchainSwap )
         LocalSwapchainCleanupDevice( sys->outside_opaque );
 
-    if (sys->d3d_dev == &sys->local_d3d_dev->d3d_dev)
+    if (sys->d3d_dev && sys->d3d_dev == &sys->local_d3d_dev->d3d_dev)
         D3D11_ReleaseDevice( sys->local_d3d_dev );
 
     msg_Dbg(vd, "Direct3D11 display adapter closed");
