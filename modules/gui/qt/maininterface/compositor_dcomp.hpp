@@ -59,9 +59,9 @@ private:
     static void window_unset_fullscreen(struct vout_window_t *);
     static void window_set_fullscreen(struct vout_window_t *, const char *id);
 
-    intf_thread_t *m_intf;
+    intf_thread_t *m_intf = nullptr;
 
-    MainInterface* m_rootWindow;
+    MainInterface* m_rootWindow = nullptr;
     std::unique_ptr<CompositorDCompositionUISurface> m_uiSurface;
     vout_window_t *m_window = nullptr;
     std::unique_ptr<MainUI> m_ui;
