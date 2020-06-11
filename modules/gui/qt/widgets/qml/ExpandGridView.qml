@@ -32,8 +32,8 @@ NavigableFocusScope {
     property int marginBottom: root.cellHeight / 2
     property int marginTop: root.cellHeight / 3
 
-    property int horizontalSpacing: VLCStyle.margin_normal
-    property int verticalSpacing: VLCStyle.margin_normal
+    property int horizontalSpacing: VLCStyle.column_margin_width
+    property int verticalSpacing: VLCStyle.column_margin_width
 
     readonly property int _effectiveCellWidth: cellWidth + horizontalSpacing
     readonly property int _effectiveCellHeight: cellHeight + verticalSpacing
