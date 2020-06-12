@@ -2400,6 +2400,55 @@ static void EsOutUnselectEs( es_out_t *out, es_out_id_t *es, bool b_update )
     EsOutSendEsEvent(out, es, VLC_INPUT_ES_UNSELECTED, false);
 }
 
+static bool EsOutSelectMatchPrioritized( const es_out_es_props_t *p_esprops,
+                                         const es_out_id_t *es )
+{
+    /* If demux has specified a default track */
+    if( p_esprops->i_demux_id >= 0 )
+    {
+        return ( es->fmt.i_id == p_esprops->i_demux_id );
+    }
+    /* Otherwise, fallback by priority */
+    else if( p_esprops->p_main_es != NULL )
+    {
+        return ( es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority );
+    }
+
+    return false;
+}
+
+static bool EsOutSelectMatchExplicitParams( const es_out_es_props_t *p_esprops,
+                                            const es_out_id_t *es )
+{
+    /* user designated by ID ES have higher prio than everything */
+    if( p_esprops->str_ids )
+    {
+        char *saveptr, *str_ids = strdup( p_esprops->str_ids );
+        if( str_ids )
+        {
+            for( const char *str_id = strtok_r( str_ids, ",", &saveptr );
+                 str_id != NULL ;
+                 str_id = strtok_r( NULL, ",", &saveptr ) )
+            {
+                if( strcmp( str_id, es->id.str_id ) == 0 )
+                {
+                    free( str_ids );
+                    return true;
+                }
+            }
+        }
+        free( str_ids );
+    }
+
+    /* then channel index */
+    if( p_esprops->i_channel >= 0 )
+    {
+        return ( es->i_channel == p_esprops->i_channel );
+    }
+
+    return false;
+}
+
 /**
  * Select an ES given the current mode
  * XXX: you need to take a the lock before (stream.stream_lock)
@@ -2471,30 +2520,13 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
     {
         const es_out_id_t *wanted_es = NULL;
 
-        if( es->p_pgrm != p_sys->p_pgrm || !p_esprops )
+        if( es->p_pgrm != p_sys->p_pgrm )
             return;
 
-        /* user designated by ID ES have higher prio than everything */
-        if ( p_esprops->str_ids )
+        if( wanted_es != es &&
+            EsOutSelectMatchExplicitParams( p_esprops, es ) )
         {
-            char *saveptr, *str_ids = strdup( p_esprops->str_ids );
-            if( str_ids )
-            {
-                for( const char *str_id = strtok_r( str_ids, ",", &saveptr );
-                     str_id != NULL && wanted_es != es;
-                     str_id = strtok_r( NULL, ",", &saveptr ) )
-                {
-                    if( strcmp( str_id, es->id.str_id ) == 0 )
-                        wanted_es = es;
-                }
-            }
-            free( str_ids );
-        }
-        /* then per pos */
-        else if( p_esprops->i_channel >= 0 )
-        {
-            if( p_esprops->i_channel == es->i_channel )
-                wanted_es = es;
+            wanted_es = es;
         }
         else if( p_esprops->ppsz_language )
         {
@@ -2524,17 +2556,10 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                     /* Select if asked by demuxer */
                     if( current_es_idx < 0 ) /* No es is currently selected by lang pref */
                     {
-                        /* If demux has specified a track */
-                        if( p_esprops->i_demux_id >= 0 && es->fmt.i_id == p_esprops->i_demux_id )
+                        if( b_auto_selected &&
+                            EsOutSelectMatchPrioritized( p_esprops, es ) )
                         {
                             wanted_es = es;
-                        }
-                        /* Otherwise, fallback by priority */
-                        else if( p_esprops->p_main_es == NULL ||
-                                 es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority )
-                        {
-                            if( b_auto_selected )
-                                wanted_es = es;
                         }
                     }
                 }
@@ -2543,15 +2568,10 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
         }
         /* If there is no user preference, select the default subtitle
          * or adapt by ES priority */
-        else if( p_esprops->i_demux_id >= 0 && es->fmt.i_id == p_esprops->i_demux_id )
+        else if( b_auto_selected &&
+                 EsOutSelectMatchPrioritized( p_esprops, es ) )
         {
             wanted_es = es;
-        }
-        else if( p_esprops->p_main_es == NULL ||
-                 es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority )
-        {
-            if( b_auto_selected )
-                wanted_es = es;
         }
 
         if( wanted_es == es && !EsIsSelected( es ) )
