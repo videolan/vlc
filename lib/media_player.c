@@ -263,6 +263,7 @@ on_track_list_changed(vlc_player_t *player, enum vlc_player_list_action action,
 
     event.u.media_player_es_changed.i_type =
         track_type_from_cat(track->fmt.i_cat);
+    event.u.media_player_es_changed.i_id = vlc_es_id_GetInputId(track->es_id);
     event.u.media_player_es_changed.psz_id = vlc_es_id_GetStrId(track->es_id);
 
     libvlc_event_send(&mp->event_manager, &event);

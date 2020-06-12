@@ -356,6 +356,7 @@ typedef struct libvlc_event_t
         struct
         {
             libvlc_track_type_t i_type;
+            int i_id; /**< Deprecated, use psz_id */
             /** Call libvlc_media_player_get_track_from_id() to get the track
              * description. */
             const char *psz_id;
