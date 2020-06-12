@@ -2413,8 +2413,10 @@ static bool EsOutSelectMatchPrioritized( const es_out_es_props_t *p_esprops,
     {
         return ( es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority );
     }
-
-    return false;
+    else
+    {
+        return ( es->fmt.i_priority > ES_PRIORITY_NOT_DEFAULTABLE );
+    }
 }
 
 static bool EsOutSelectMatchExplicitParams( const es_out_es_props_t *p_esprops,
@@ -2462,10 +2464,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     es_out_es_props_t *p_esprops = GetPropsByCat( p_sys, es->fmt.i_cat );
-
-    if( !p_esprops || !p_sys->b_active ||
-        ( !b_force && es->fmt.i_priority < ES_PRIORITY_SELECTABLE_MIN ) ||
-        !es->p_pgrm )
+    if( !p_esprops || !p_sys->b_active || !es->p_pgrm )
     {
         return;
     }
