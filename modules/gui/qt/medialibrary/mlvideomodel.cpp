@@ -177,11 +177,3 @@ void MLVideoModel::thumbnailUpdated(int idx)
 {
     emit dataChanged(index(idx), index(idx), {VIDEO_THUMBNAIL});
 }
-
-QString MLVideoModel::getFirstSymbol( const QString& str )
-{
-    QString ret("#");
-    if ( str.length() > 0 && str[0].isLetter() )
-        ret = str[0].toUpper();
-    return ret;
-}

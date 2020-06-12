@@ -92,6 +92,14 @@ void MLBaseModel::onVlcMlEvent(const vlc_ml_event_t* event)
     }
 }
 
+QString MLBaseModel::getFirstSymbol(QString str)
+{
+    QString ret("#");
+    if ( str.length() > 0 && str[0].isLetter() )
+        ret = str[0].toUpper();
+    return ret;
+}
+
 void MLBaseModel::onVlcMlEvent(void* data, const vlc_ml_event_t* event)
 {
     auto self = static_cast<MLBaseModel*>(data);

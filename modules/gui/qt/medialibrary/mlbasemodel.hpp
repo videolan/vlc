@@ -75,6 +75,7 @@ private:
 protected:
     virtual void clear() = 0;
     virtual vlc_ml_sorting_criteria_t roleToCriteria(int role) const = 0;
+    static QString getFirstSymbol(QString str);
     virtual vlc_ml_sorting_criteria_t nameToCriteria(QByteArray) const {
         return VLC_ML_SORTING_DEFAULT;
     }

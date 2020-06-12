@@ -49,7 +49,5 @@ private:
     virtual void onVlcMlEvent( const vlc_ml_event_t* event ) override;
 
     static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
-
-    static QString getFirstSymbol( const QString& str );
 };
 #endif // MLTRACKMODEL_HPP

@@ -195,11 +195,3 @@ void MLAlbumTrackModel::onVlcMlEvent(const vlc_ml_event_t* event)
     }
     MLBaseModel::onVlcMlEvent( event );
 }
-
-QString MLAlbumTrackModel::getFirstSymbol( const QString& str )
-{
-    QString ret("#");
-    if ( str.length() > 0 && str[0].isLetter() )
-        ret = str[0].toUpper();
-    return ret;
-}
