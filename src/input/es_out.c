@@ -2419,6 +2419,11 @@ static bool EsOutSelectMatchPrioritized( const es_out_es_props_t *p_esprops,
     }
 }
 
+static bool EsOutSelectHasExplicitParams( const es_out_es_props_t *p_esprops )
+{
+    return p_esprops->str_ids || p_esprops->i_channel >= 0;
+}
+
 static bool EsOutSelectMatchExplicitParams( const es_out_es_props_t *p_esprops,
                                             const es_out_id_t *es )
 {
@@ -2505,7 +2510,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                   prgm != NULL;
                   prgm = strtok_r( NULL, ",", &buf ) )
             {
-                if( atoi( prgm ) == es->p_pgrm->i_id || b_force )
+                if( atoi( prgm ) == es->p_pgrm->i_id )
                 {
                     if( !EsIsSelected( es ) )
                         EsOutSelectEs( out, es, b_force );
@@ -2522,57 +2527,52 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
         if( es->p_pgrm != p_sys->p_pgrm )
             return;
 
-        if( wanted_es != es &&
-            EsOutSelectMatchExplicitParams( p_esprops, es ) )
+        if( EsOutSelectHasExplicitParams( p_esprops ) )
         {
-            wanted_es = es;
+            b_auto_selected = false;
+            if( EsOutSelectMatchExplicitParams( p_esprops, es ) )
+            {
+                wanted_es = es;
+            }
         }
         else if( p_esprops->ppsz_language )
         {
             /* If not deactivated */
             const int i_stop_idx = LanguageArrayIndex( p_esprops->ppsz_language, "none" );
+            const int current_es_idx = ( p_esprops->p_main_es == NULL ) ? -1 :
+                                    LanguageArrayIndex( p_esprops->ppsz_language,
+                                                        p_esprops->p_main_es->psz_language_code );
+            const int es_idx = LanguageArrayIndex( p_esprops->ppsz_language,
+                                                   es->psz_language_code );
+            if( es_idx >= 0 && (i_stop_idx < 0 || i_stop_idx > es_idx) )
             {
-                int current_es_idx = ( p_esprops->p_main_es == NULL ) ? -1 :
-                        LanguageArrayIndex( p_esprops->ppsz_language,
-                                            p_esprops->p_main_es->psz_language_code );
-                int es_idx = LanguageArrayIndex( p_esprops->ppsz_language,
-                                                 es->psz_language_code );
-                if( es_idx >= 0 && (i_stop_idx < 0 || i_stop_idx > es_idx) )
+                /* Only select the language if it's in the list */
+                if( current_es_idx < 0 || /* current es was not selected by lang prefs */
+                    es_idx < current_es_idx || /* current es has lower lang prio */
+                    ( es_idx == current_es_idx && /* lang is same, but es has higher prio */
+                      p_esprops->p_main_es->fmt.i_priority < es->fmt.i_priority ) )
                 {
-                    /* Only select the language if it's in the list */
-                    if( p_esprops->p_main_es == NULL ||
-                        current_es_idx < 0 || /* current es was not selected by lang prefs */
-                        es_idx < current_es_idx || /* current es has lower lang prio */
-                        (  es_idx == current_es_idx && /* lang is same, but es has higher prio */
-                           p_esprops->p_main_es->fmt.i_priority < es->fmt.i_priority ) )
-                    {
-                        wanted_es = es;
-                    }
-                }
-                /* We did not find a language matching our prefs */
-                else if( i_stop_idx < 0 ) /* If not fallback disabled by 'none' */
-                {
-                    /* Select if asked by demuxer */
-                    if( current_es_idx < 0 ) /* No es is currently selected by lang pref */
-                    {
-                        if( b_auto_selected &&
-                            EsOutSelectMatchPrioritized( p_esprops, es ) )
-                        {
-                            wanted_es = es;
-                        }
-                    }
+                    wanted_es = es;
                 }
             }
 
+            if( wanted_es || /* We did find a language matching our prefs */
+                i_stop_idx >= 0 || /* If fallback disabled by 'none' */
+                current_es_idx >= 0 ) /* Is currently selected by lang pref */
+            {
+                b_auto_selected = false; /* do not perform other selection rules */
+            }
         }
-        /* If there is no user preference, select the default subtitle
+
+        /* If there is no user preference, select the default track
          * or adapt by ES priority */
-        else if( b_auto_selected &&
-                 EsOutSelectMatchPrioritized( p_esprops, es ) )
+        if( b_auto_selected && wanted_es == NULL &&
+            EsOutSelectMatchPrioritized( p_esprops, es ) )
         {
             wanted_es = es;
         }
 
+        /* Do ES activation/deactivation */
         if( wanted_es == es && !EsIsSelected( es ) )
         {
             if( b_auto_unselect )
