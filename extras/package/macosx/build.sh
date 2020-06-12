@@ -183,6 +183,9 @@ export ac_cv_func_openat=no
 export ac_cv_func_fstatat=no
 export ac_cv_func_readlinkat=no
 
+# Added symbols between 10.7 and 10.9
+export ac_cv_func_memset_s=no
+
 # libnetwork does not exist yet on 10.7 (used by libcddb)
 export ac_cv_lib_network_connect=no
 
