@@ -177,7 +177,7 @@ libvlc_media_tracklist_from_es_array( es_format_t **es_array,
 
     libvlc_media_tracklist_t *list = libvlc_media_tracklist_alloc( count );
 
-    if( count == 0 )
+    if( count == 0 || list == NULL )
         return list;
 
     count = 0;
@@ -231,6 +231,9 @@ libvlc_media_tracklist_from_player( vlc_player_t *player,
 
     size_t count = vlc_player_GetTrackCount( player, cat );
     libvlc_media_tracklist_t *list = libvlc_media_tracklist_alloc( count );
+
+    if( !list )
+        return NULL;
 
     for( size_t i = 0; i < count; ++i )
     {
