@@ -222,7 +222,7 @@ libvlc_media_tracklist_from_es_array( es_format_t **es_array,
     return list;
 }
 
-void
+static void
 libvlc_media_trackpriv_from_player_track( libvlc_media_trackpriv_t *trackpriv,
                                           const struct vlc_player_track *track )
 {

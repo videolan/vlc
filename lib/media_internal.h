@@ -97,10 +97,6 @@ void
 libvlc_media_trackpriv_from_es( libvlc_media_trackpriv_t *trackpriv,
                                 const es_format_t *es  );
 
-void
-libvlc_media_trackpriv_from_player_track( libvlc_media_trackpriv_t *trackpriv,
-                                          const struct vlc_player_track *track );
-
 libvlc_media_track_t *
 libvlc_media_track_create_from_player_track( const struct vlc_player_track *track );
 
