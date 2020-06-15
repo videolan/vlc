@@ -547,59 +547,151 @@ InitOrientationMatrix(GLfloat matrix[static 4*4],
 {
     memcpy(matrix, MATRIX4_IDENTITY, sizeof(MATRIX4_IDENTITY));
 
-    const int k_cos_pi = -1;
-    const int k_cos_pi_2 = 0;
-    const int k_cos_n_pi_2 = 0;
+/**
+ * / C0R0  C1R0     0  C3R0 \
+ * | C0R1  C1R1     0  C3R1 |
+ * |    0     0     1     0 |  <-- keep the z coordinate unchanged
+ * \    0     0     0     1 /
+ *                  ^
+ *                  |
+ *                  z never impacts the orientation
+ *
+ * (note that in memory, the matrix is stored in column-major order)
+ */
+#define MATRIX_SET(C0R0, C1R0, C3R0, \
+                   C0R1, C1R1, C3R1) \
+    matrix[0*4 + 0] = C0R0; \
+    matrix[1*4 + 0] = C1R0; \
+    matrix[3*4 + 0] = C3R0; \
+    matrix[0*4 + 1] = C0R1; \
+    matrix[1*4 + 1] = C1R1; \
+    matrix[3*4 + 1] = C3R1;
 
-    const int k_sin_pi = 0;
-    const int k_sin_pi_2 = 1;
-    const int k_sin_n_pi_2 = -1;
+    /**
+     * The following schemas show how the video picture is oriented in the
+     * texture, according to the "orientation" value:
+     *
+     *     video         texture
+     *    picture        storage
+     *
+     *     1---2          2---3
+     *     |   |   --->   |   |
+     *     4---3          1---4
+     *
+     * In addition, they show how the orientation transforms video picture
+     * coordinates axis (x,y) into texture axis (X,Y):
+     *
+     *   y         --->         X
+     *   |                      |
+     *   +---x              Y---+
+     *
+     * The resulting coordinates undergo the reverse of the transformation
+     * applied to the axis, so expressing (x,y) in terms of (X,Y) gives the
+     * orientation matrix coefficients.
+     */
 
     switch (orientation) {
-
         case ORIENT_ROTATED_90:
-            matrix[0 * 4 + 0] = k_cos_pi_2;
-            matrix[0 * 4 + 1] = k_sin_pi_2;
-            matrix[1 * 4 + 0] = -k_sin_pi_2;
-            matrix[1 * 4 + 1] = k_cos_pi_2;
-            matrix[3 * 4 + 0] = 1;
+            /**
+             *     1---2          2---3
+             *   y |   |   --->   |   | X
+             *   | 4---3          1---4 |
+             *   +---x              Y---+
+             *
+             *          x = 1-Y
+             *          y = X
+             */
+                     /* X  Y  1 */
+            MATRIX_SET( 0,-1, 1, /* 1-Y */
+                        1, 0, 0) /* X */
             break;
         case ORIENT_ROTATED_180:
-            matrix[0 * 4 + 0] = k_cos_pi;
-            matrix[0 * 4 + 1] = k_sin_pi;
-            matrix[1 * 4 + 0] = -k_sin_pi;
-            matrix[1 * 4 + 1] = k_cos_pi;
-            matrix[3 * 4 + 0] = 1;
-            matrix[3 * 4 + 1] = 1;
+            /**
+             *                      X---+
+             *     1---2          3---4 |
+             *   y |   |   --->   |   | Y
+             *   | 4---3          2---1
+             *   +---x
+             *
+             *          x = 1-X
+             *          y = 1-Y
+             */
+                     /* X  Y  1 */
+            MATRIX_SET(-1, 0, 1, /* 1-X */
+                        0,-1, 1) /* 1-Y */
             break;
         case ORIENT_ROTATED_270:
-            matrix[0 * 4 + 0] = k_cos_n_pi_2;
-            matrix[0 * 4 + 1] = k_sin_n_pi_2;
-            matrix[1 * 4 + 0] = -k_sin_n_pi_2;
-            matrix[1 * 4 + 1] = k_cos_n_pi_2;
-            matrix[3 * 4 + 1] = 1;
+            /**
+             *                    +---Y
+             *     1---2          | 4---1
+             *   y |   |   --->   X |   |
+             *   | 4---3            3---2
+             *   +---x
+             *
+             *          x = Y
+             *          y = 1-X
+             */
+                     /* X  Y  1 */
+            MATRIX_SET( 0, 1, 0, /* Y */
+                       -1, 0, 1) /* 1-X */
             break;
         case ORIENT_HFLIPPED:
-            matrix[0 * 4 + 0] = -1;
-            matrix[3 * 4 + 0] = 1;
+            /**
+             *     1---2          2---1
+             *   y |   |   --->   |   | Y
+             *   | 4---3          3---4 |
+             *   +---x              X---+
+             *
+             *          x = 1-X
+             *          y = Y
+             */
+                     /* X  Y  1 */
+            MATRIX_SET(-1, 0, 1, /* 1-X */
+                        0, 1, 0) /* Y */
             break;
         case ORIENT_VFLIPPED:
-            matrix[1 * 4 + 1] = -1;
-            matrix[3 * 4 + 1] = 1;
+            /**
+             *                    +---X
+             *     1---2          | 4---3
+             *   y |   |   --->   Y |   |
+             *   | 4---3            1---2
+             *   +---x
+             *
+             *          x = X
+             *          y = 1-Y
+             */
+                     /* X  Y  1 */
+            MATRIX_SET( 1, 0, 0, /* X */
+                        0,-1, 1) /* 1-Y */
             break;
         case ORIENT_TRANSPOSED:
-            matrix[0 * 4 + 0] = 0;
-            matrix[1 * 4 + 1] = 0;
-            matrix[0 * 4 + 1] = -1;
-            matrix[1 * 4 + 0] = -1;
-            matrix[3 * 4 + 0] = 1;
-            matrix[3 * 4 + 1] = 1;
+            /**
+             *                      Y---+
+             *     1---2          1---4 |
+             *   y |   |   --->   |   | X
+             *   | 4---3          2---3
+             *   +---x
+             *
+             *          x = 1-Y
+             *          y = 1-X
+             */
+                     /* X  Y  1 */
+            MATRIX_SET( 0,-1, 1, /* 1-Y */
+                       -1, 0, 1) /* 1-X */
             break;
         case ORIENT_ANTI_TRANSPOSED:
-            matrix[0 * 4 + 0] = 0;
-            matrix[1 * 4 + 1] = 0;
-            matrix[0 * 4 + 1] = -1;
-            matrix[1 * 4 + 0] = -1;
+            /**
+             *     1---2            3---2
+             *   y |   |   --->   X |   |
+             *   | 4---3          | 4---1
+             *   +---x            +---Y
+             *
+             *          x = Y
+             *          y = X
+             */
+                     /* X  Y  1 */
+            MATRIX_SET( 0, 1, 0, /* Y */
+                        1, 0, 0) /* X */
             break;
         default:
             break;
