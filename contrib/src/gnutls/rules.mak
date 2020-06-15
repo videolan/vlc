@@ -33,6 +33,9 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 
 	# disable the dllimport in static linking (pkg-config --static doesn't handle Cflags.private)
 	cd $(UNPACK_DIR) && sed -i.orig -e s/"_SYM_EXPORT __declspec(dllimport)"/"_SYM_EXPORT"/g lib/includes/gnutls/gnutls.h.in
+
+	# don't use connectx on macOS versions where it's not available
+	$(APPLY) $(SRC)/gnutls/0001-fix-connectx-not-available-on-older-macOS-SDK.patch
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/gnutls/no-create-time-h.patch
 endif
