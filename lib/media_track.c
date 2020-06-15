@@ -36,7 +36,7 @@
 struct libvlc_media_tracklist_t
 {
     size_t count;
-    libvlc_media_trackpriv_t tracks[];
+    libvlc_media_trackpriv_t *tracks[];
 };
 
 void
@@ -44,8 +44,6 @@ libvlc_media_trackpriv_from_es( libvlc_media_trackpriv_t *trackpriv,
                                 const es_format_t *es  )
 {
     libvlc_media_track_t *track = &trackpriv->t;
-
-    trackpriv->es_id = NULL;
 
     track->i_codec = es->i_codec;
     track->i_original_fourcc = es->i_original_fourcc;
@@ -111,6 +109,19 @@ libvlc_media_trackpriv_from_es( libvlc_media_trackpriv_t *trackpriv,
     }
 }
 
+static libvlc_media_trackpriv_t *
+libvlc_media_trackpriv_new( void )
+{
+    libvlc_media_trackpriv_t *trackpriv =
+        malloc( sizeof (libvlc_media_trackpriv_t ) );
+
+    if( trackpriv == NULL )
+        return NULL;
+
+    trackpriv->es_id = NULL;
+    return trackpriv;
+}
+
 void
 libvlc_media_track_clean( libvlc_media_track_t *track )
 {
@@ -147,7 +158,7 @@ static libvlc_media_tracklist_t *
 libvlc_media_tracklist_alloc( size_t count )
 {
     size_t size;
-    if( mul_overflow( count, sizeof(libvlc_media_trackpriv_t), &size) )
+    if( mul_overflow( count, sizeof(libvlc_media_trackpriv_t *), &size) )
         return NULL;
     if( add_overflow( size, sizeof(libvlc_media_tracklist_t), &size) )
         return NULL;
@@ -156,7 +167,7 @@ libvlc_media_tracklist_alloc( size_t count )
     if( list == NULL )
         return NULL;
 
-    list->count = count;
+    list->count = 0;
     return list;
 }
 
@@ -179,12 +190,19 @@ libvlc_media_tracklist_from_es_array( es_format_t **es_array,
     if( count == 0 || list == NULL )
         return list;
 
-    count = 0;
     for( size_t i = 0; i < es_count; ++i )
     {
         if( es_array[i]->i_cat == cat )
-            libvlc_media_trackpriv_from_es( &list->tracks[count++],
-                                            es_array[i] );
+        {
+            libvlc_media_trackpriv_t *trackpriv = libvlc_media_trackpriv_new();
+            if( trackpriv == NULL )
+            {
+                libvlc_media_tracklist_delete( list );
+                return NULL;
+            }
+            list->tracks[list->count++] = trackpriv;
+            libvlc_media_trackpriv_from_es( trackpriv, es_array[i] );
+        }
     }
 
     return list;
@@ -207,7 +225,7 @@ libvlc_media_trackpriv_from_player_track( libvlc_media_trackpriv_t *trackpriv,
 libvlc_media_track_t *
 libvlc_media_track_create_from_player_track( const struct vlc_player_track *track )
 {
-    libvlc_media_trackpriv_t *trackpriv = malloc( sizeof(*trackpriv) );
+    libvlc_media_trackpriv_t *trackpriv = libvlc_media_trackpriv_new();
     if( trackpriv == NULL )
         return NULL;
     libvlc_media_trackpriv_from_player_track( trackpriv, track );
@@ -223,7 +241,7 @@ libvlc_media_tracklist_from_player( vlc_player_t *player,
     size_t count = vlc_player_GetTrackCount( player, cat );
     libvlc_media_tracklist_t *list = libvlc_media_tracklist_alloc( count );
 
-    if( !list )
+    if( count == 0 || list == NULL )
         return NULL;
 
     for( size_t i = 0; i < count; ++i )
@@ -232,7 +250,13 @@ libvlc_media_tracklist_from_player( vlc_player_t *player,
             vlc_player_GetTrackAt( player, cat, i );
         assert( track );
 
-        libvlc_media_trackpriv_t *trackpriv = &list->tracks[i];
+        libvlc_media_trackpriv_t *trackpriv = libvlc_media_trackpriv_new();
+        if( trackpriv == NULL )
+        {
+            libvlc_media_tracklist_delete( list );
+            return NULL;
+        }
+        list->tracks[list->count++] = trackpriv;
         libvlc_media_trackpriv_from_player_track( trackpriv, track );
     }
 
@@ -249,7 +273,7 @@ libvlc_media_track_t *
 libvlc_media_tracklist_at( libvlc_media_tracklist_t *list, size_t idx )
 {
     assert( idx < list->count );
-    return &list->tracks[idx].t;
+    return &list->tracks[idx]->t;
 }
 
 void
@@ -257,11 +281,13 @@ libvlc_media_tracklist_delete( libvlc_media_tracklist_t *list )
 {
     for( size_t i = 0; i < list->count; ++i )
     {
-        libvlc_media_trackpriv_t *trackpriv = &list->tracks[i];
+        libvlc_media_trackpriv_t *trackpriv = list->tracks[i];
         libvlc_media_track_clean( &trackpriv->t );
 
         if( trackpriv->es_id != NULL )
             vlc_es_id_Release( trackpriv->es_id );
+
+        free( trackpriv );
     }
     free( list );
 }
