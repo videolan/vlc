@@ -95,7 +95,7 @@ parts:
           --disable-wayland \
           --enable-merge-ffmpeg
       make -j $(getconf _NPROCESSORS_ONLN)
-      echo $(git describe HEAD) > $SNAPCRAFT_STAGE/version
+      echo $(git describe --always HEAD) > $SNAPCRAFT_STAGE/version
       make install
       sed -i 's|Icon=vlc|Icon=/usr/share/icons/hicolor/256x256/apps/vlc\.png|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/vlc.desktop
       sed -i 's|TryExec=.*|TryExec=/snap/bin/vlc|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/vlc.desktop
