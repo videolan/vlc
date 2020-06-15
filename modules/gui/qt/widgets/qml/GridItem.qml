@@ -29,7 +29,7 @@ Item {
     id: root
 
     property url image
-    property string title: ""
+    property alias title: titleLabel.text
     property string subtitle: ""
     property bool selected: false
 
@@ -178,17 +178,22 @@ Item {
                 }
 
                 Widgets.ScrollingText {
-                    id: textTitleRect
+                    id: titleTextRect
 
-                    Layout.preferredHeight: childrenRect.height
+                    label: titleLabel
+                    scroll: _zoomed
+
+                    Layout.preferredHeight: titleLabel.contentHeight
+                    Layout.topMargin: VLCStyle.margin_xxsmall
                     Layout.fillWidth: true
-                    Layout.maximumWidth: _picWidth
+                    Layout.maximumWidth: pictureWidth
 
-                    text: root.title
-                    color: VLCStyle.colors.text
-                    font.pixelSize: VLCStyle.fontSize_normal
+                    Widgets.MenuLabel {
+                        id: titleLabel
 
-                    scroll: _zoomed || selected
+                        elide: Text.ElideNone
+                        width: pictureWidth
+                    }
                 }
 
                 Text {

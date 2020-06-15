@@ -22,51 +22,46 @@ Item {
     id: control
 
     clip: true
-    property alias color: label.color
-    property alias font: label.font
-    property alias text: label.text
 
+    property Text label: undefined
     property bool scroll: false
 
-    readonly property bool _needsToScroll: (control.width < label.width)
+    readonly property bool _needsToScroll: (label.width < label.contentWidth)
 
-    Label {
-        id: label
+    SequentialAnimation {
+        id: scrollAnimation
 
-        SequentialAnimation {
-            id: scrollAnimation
+        running: control.scroll && control._needsToScroll
+        loops: Animation.Infinite
 
-            running: control.scroll && control._needsToScroll
-            loops: Animation.Infinite
+        onStopped: {
+            label.x = 0
+        }
 
-            onStopped: {
-                label.x = 0
-            }
+        PauseAnimation {
+            duration: 1000
+        }
 
-            PauseAnimation {
-                duration: 1000
-            }
+        SmoothedAnimation {
+            target: label
+            property: "x"
+            from: 0
+            to: label.width - label.contentWidth
 
-            SmoothedAnimation {
-                target: label
-                property: "x"
-                from: 0
-                to: control.width - label.width
+            maximumEasingTime: 0
+            velocity: 20
+        }
 
-                maximumEasingTime: 0
-                velocity: 20
-            }
+        PauseAnimation {
+            duration: 1000
+        }
 
-            PauseAnimation {
-                duration: 1000
-            }
-
-            PropertyAction {
-                target: label
-                property: "x"
-                value: 0
-            }
+        PropertyAction {
+            target: label
+            property: "x"
+            value: 0
         }
     }
+
 }
 
