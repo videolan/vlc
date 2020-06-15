@@ -217,7 +217,7 @@ libvlc_media_tracklist_delete( libvlc_media_tracklist_t *list );
  * \param track valid track
  */
 LIBVLC_API void
-libvlc_media_track_delete( libvlc_media_track_t *track );
+libvlc_media_track_release( libvlc_media_track_t *track );
 /** @}*/
 
 # ifdef __cplusplus

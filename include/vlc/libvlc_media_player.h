@@ -1325,7 +1325,7 @@ libvlc_media_player_get_tracklist( libvlc_media_player_t *p_mi,
  * \param type type of the selected track
  *
  * \return a valid track or NULL if there is no selected tracks for this type,
- * release it with libvlc_media_track_delete().
+ * release it with libvlc_media_track_release().
  */
 LIBVLC_API libvlc_media_track_t *
 libvlc_media_player_get_selected_track( libvlc_media_player_t *p_mi,
@@ -1343,7 +1343,7 @@ libvlc_media_player_get_selected_track( libvlc_media_player_t *p_mi,
  * libvlc_media_track_t)
  *
  * \return a valid track or NULL if there is currently no tracks identified by
- * the string id, release it with libvlc_media_track_delete().
+ * the string id, release it with libvlc_media_track_release().
  */
 LIBVLC_API libvlc_media_track_t *
 libvlc_media_player_get_track_from_id( libvlc_media_player_t *p_mi,

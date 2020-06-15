@@ -443,7 +443,7 @@ static void test_media_player_tracks(const char** argv, int argc)
     libtrack = libvlc_media_player_get_track_from_id(mp, "audio/0");
     assert(libtrack);
     libvlc_media_player_select_track(mp, libvlc_track_audio, libtrack);
-    libvlc_media_track_delete(libtrack);
+    libvlc_media_track_release(libtrack);
     atracks[0].toselect = true;
     atracks[2].toselect = false;
 

@@ -173,7 +173,7 @@ int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned ignored,
         ret = 0;
     }
 
-    libvlc_media_track_delete(track);
+    libvlc_media_track_release(track);
     return ret;
 }
 
