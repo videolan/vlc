@@ -1,0 +1,46 @@
+From 3faffe77fd5cb15cb132ebaf4bfef6dc579f25e2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 19 Jun 2020 15:11:00 +0200
+Subject: [PATCH] fix connectx not available on older macOS SDK
+
+Fixes this compilation error:
+system/fastopen.c:134:9: error: 'connectx' is only available on macOS 10.11 or newer [-Werror,-Wunguarded-availability]
+                ret = connectx(fd, &endpoints, SAE_ASSOCID_ANY, CONNECT_RESUME_ON_READ_WRITE | CONNECT_DATA_IDEMPOTENT, NULL, 0, NULL, NULL);
+                      ^~~~~~~~
+/Applications/Xcode9.2.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk/usr/include/sys/socket.h:713:5: note: 'connectx' has been marked as being introduced in macOS 10.11 here, but the deployment target is macOS 10.7.0
+
+The detection is the same as found in curl [1].
+
+If HAVE_BUILTIN_AVAILABLE is not available we fallback to the code without
+TCP_FASTOPEN_OSX.
+
+[1] https://github.com/curl/curl/commit/870d849d48a26b8eeb0d4bb1f4655367a4a191ca
+---
+ lib/system/fastopen.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/lib/system/fastopen.c b/lib/system/fastopen.c
+index 8d8409e48..b816decff 100644
+--- a/lib/system/fastopen.c
++++ b/lib/system/fastopen.c
+@@ -129,9 +129,15 @@ tfo_writev(gnutls_transport_ptr_t ptr, const giovec_t * iovec, int iovec_cnt)
+ 	}
+ # elif defined(TCP_FASTOPEN_OSX)
+ 	{
+-		sa_endpoints_t endpoints = { .sae_dstaddr = (struct sockaddr*)&p->connect_addr, .sae_dstaddrlen = p->connect_addrlen };
++		if(__builtin_available(macOS 10.11, iOS 9.0, tvOS 9.0, watchOS 2.0, *)) {
++			sa_endpoints_t endpoints = { .sae_dstaddr = (struct sockaddr*)&p->connect_addr, .sae_dstaddrlen = p->connect_addrlen };
+ 
+-		ret = connectx(fd, &endpoints, SAE_ASSOCID_ANY, CONNECT_RESUME_ON_READ_WRITE | CONNECT_DATA_IDEMPOTENT, NULL, 0, NULL, NULL);
++			ret = connectx(fd, &endpoints, SAE_ASSOCID_ANY, CONNECT_RESUME_ON_READ_WRITE | CONNECT_DATA_IDEMPOTENT, NULL, 0, NULL, NULL);
++		}
++		else
++		{
++			ret = connect(fd, (struct sockaddr*)&p->connect_addr, p->connect_addrlen);
++		}
+ 		if (errno == ENOTCONN || errno == EINPROGRESS) {
+ 			gnutls_assert();
+ 			errno = EAGAIN;
+-- 
+2.26.0.windows.1
+
