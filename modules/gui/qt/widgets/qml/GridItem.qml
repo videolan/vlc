@@ -58,6 +58,44 @@ Item {
 
     readonly property int _selectedBorderWidth: VLCStyle.column_margin_width - ( VLCStyle.margin_small * 2 )
 
+    property alias _primaryShadowVerticalOffset: primaryShadow.verticalOffset
+    property alias _primaryShadowRadius: primaryShadow.radius
+    property alias _secondaryShadowVerticalOffset: secondaryShadow.verticalOffset
+    property alias _secondaryShadowRadius: secondaryShadow.radius
+
+    states: [
+        State {
+            name: "unselected"
+            when: !root._highlighted
+            PropertyChanges {
+                target: root
+                _primaryShadowVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
+                _primaryShadowRadius: VLCStyle.dp(14, VLCStyle.scale)
+                _secondaryShadowVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
+                _secondaryShadowRadius: VLCStyle.dp(3, VLCStyle.scale)
+            }
+        },
+        State {
+            name: "selected"
+            when: root._highlighted
+            PropertyChanges {
+                target: root
+                _primaryShadowVerticalOffset: VLCStyle.dp(32, VLCStyle.scale)
+                _primaryShadowRadius: VLCStyle.dp(72, VLCStyle.scale)
+                _secondaryShadowVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
+                _secondaryShadowRadius: VLCStyle.dp(8, VLCStyle.scale)
+            }
+        }
+    ]
+
+    transitions: Transition {
+        to: "*"
+        SmoothedAnimation {
+          duration: 64
+          properties: "_primaryShadowVerticalOffset,_primaryShadowRadius,_secondaryShadowVerticalOffset,_secondaryShadowRadius"
+       }
+    }
+
     MouseArea {
         id: mouseArea
         hoverEnabled: true
@@ -98,6 +136,43 @@ Item {
                 height:  layout.implicitHeight + ( root._selectedBorderWidth * 2 )
                 color: VLCStyle.colors.bgAlt
                 visible: root.selected || root._highlighted
+            }
+
+            Rectangle {
+                id: baseRect
+
+                x: 1 // this rect is set such that it hides behind picture component
+                y: 1
+                width: pictureWidth - 2
+                height: pictureHeight - 2
+                radius: picture.radius
+                color: VLCStyle.colors.bg
+            }
+
+            DropShadow {
+                id: primaryShadow
+
+                anchors.fill: baseRect
+                source: baseRect
+                horizontalOffset: 0
+                verticalOffset: VLCStyle.dp(6, VLCStyle.scale)
+                radius: VLCStyle.dp(14, scale)
+                spread: 0
+                samples: ( radius * 2 ) + 1
+                color: Qt.rgba(0, 0, 0, .22)
+            }
+
+            DropShadow {
+                id: secondaryShadow
+
+                anchors.fill: baseRect
+                source: baseRect
+                horizontalOffset: 0
+                verticalOffset: VLCStyle.dp(1, VLCStyle.scale)
+                radius: VLCStyle.dp(3, VLCStyle.scale)
+                spread: 0
+                samples: ( radius * 2 ) + 1
+                color: Qt.rgba(0, 0, 0, .18)
             }
 
             ColumnLayout {
