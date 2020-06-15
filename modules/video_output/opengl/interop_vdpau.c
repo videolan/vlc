@@ -176,6 +176,9 @@ Open(vlc_object_t *obj)
 
     INTEROP_CALL(glVDPAUInitNV, (void *)(uintptr_t)device, vdp_gpa);
 
+    /* The pictures are uploaded upside-down */
+    video_format_TransformBy(&interop->fmt, TRANSFORM_VFLIP);
+
     int ret = opengl_interop_init(interop, GL_TEXTURE_2D, VLC_CODEC_RGB32,
                                   COLOR_SPACE_UNDEF);
     if (ret != VLC_SUCCESS)

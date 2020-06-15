@@ -488,7 +488,8 @@ static int BuildSphere(GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *
 
             unsigned off2 = (lat * (nbLonBands + 1) + lon) * 2;
             float u = (float)lon / nbLonBands;
-            float v = (float)lat / nbLatBands;
+            /* In OpenGL, the texture coordinates start at bottom left */
+            float v = 1.0f - (float)lat / nbLatBands;
             (*textureCoord)[off2] = u;
             (*textureCoord)[off2 + 1] = v;
         }
@@ -577,35 +578,35 @@ static int BuildCube(float padW, float padH,
     float row[] = {0.f, 1.f/2, 1.0};
 
     const GLfloat tex[] = {
-        col[1] + padW, row[1] + padH, // front
-        col[1] + padW, row[2] - padH,
-        col[2] - padW, row[1] + padH,
-        col[2] - padW, row[2] - padH,
-
-        col[3] - padW, row[1] + padH, // back
-        col[3] - padW, row[2] - padH,
-        col[2] + padW, row[1] + padH,
-        col[2] + padW, row[2] - padH,
-
-        col[2] - padW, row[0] + padH, // left
-        col[2] - padW, row[1] - padH,
+        col[1] + padW, row[1] - padH, // front
         col[1] + padW, row[0] + padH,
-        col[1] + padW, row[1] - padH,
+        col[2] - padW, row[1] - padH,
+        col[2] - padW, row[0] + padH,
 
-        col[0] + padW, row[0] + padH, // right
-        col[0] + padW, row[1] - padH,
-        col[1] - padW, row[0] + padH,
-        col[1] - padW, row[1] - padH,
+        col[3] - padW, row[1] - padH, // back
+        col[3] - padW, row[0] + padH,
+        col[2] + padW, row[1] - padH,
+        col[2] + padW, row[0] + padH,
 
-        col[0] + padW, row[2] - padH, // bottom
+        col[2] - padW, row[2] - padH, // left
+        col[2] - padW, row[1] + padH,
+        col[1] + padW, row[2] - padH,
+        col[1] + padW, row[1] + padH,
+
+        col[0] + padW, row[2] - padH, // right
         col[0] + padW, row[1] + padH,
         col[1] - padW, row[2] - padH,
         col[1] - padW, row[1] + padH,
 
-        col[2] + padW, row[0] + padH, // top
-        col[2] + padW, row[1] - padH,
-        col[3] - padW, row[0] + padH,
-        col[3] - padW, row[1] - padH,
+        col[0] + padW, row[0] + padH, // bottom
+        col[0] + padW, row[1] - padH,
+        col[1] - padW, row[0] + padH,
+        col[1] - padW, row[1] - padH,
+
+        col[2] + padW, row[2] - padH, // top
+        col[2] + padW, row[1] + padH,
+        col[3] - padW, row[2] - padH,
+        col[3] - padW, row[1] + padH,
     };
 
     memcpy(*textureCoord, tex,
@@ -658,10 +659,10 @@ static int BuildRectangle(GLfloat **vertexCoord, GLfloat **textureCoord, unsigne
     memcpy(*vertexCoord, coord, *nbVertices * 3 * sizeof(GLfloat));
 
     static const GLfloat tex[] = {
-        0.0, 0.0,
         0.0, 1.0,
-        1.0, 0.0,
+        0.0, 0.0,
         1.0, 1.0,
+        1.0, 0.0,
     };
 
     memcpy(*textureCoord, tex, *nbVertices * 2 * sizeof(GLfloat));

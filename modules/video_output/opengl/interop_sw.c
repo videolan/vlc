@@ -321,6 +321,9 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         space = COLOR_SPACE_UNDEF;
     }
 
+    /* The pictures are uploaded upside-down */
+    video_format_TransformBy(&interop->fmt, TRANSFORM_VFLIP);
+
     int ret = VLC_EGENERIC;
     while (*list)
     {

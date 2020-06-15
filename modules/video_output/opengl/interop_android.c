@@ -137,37 +137,6 @@ Open(vlc_object_t *obj)
     };
     interop->ops = &ops;
 
-    /* The transform Matrix (uSTMatrix) given by the SurfaceTexture is not
-     * using the same origin than us. Ask the caller to rotate textures
-     * coordinates, via the vertex shader, by forcing an orientation. */
-    switch (interop->fmt.orientation)
-    {
-        case ORIENT_TOP_LEFT:
-            interop->fmt.orientation = ORIENT_BOTTOM_LEFT;
-            break;
-        case ORIENT_TOP_RIGHT:
-            interop->fmt.orientation = ORIENT_BOTTOM_RIGHT;
-            break;
-        case ORIENT_BOTTOM_LEFT:
-            interop->fmt.orientation = ORIENT_TOP_LEFT;
-            break;
-        case ORIENT_BOTTOM_RIGHT:
-            interop->fmt.orientation = ORIENT_TOP_RIGHT;
-            break;
-        case ORIENT_LEFT_TOP:
-            interop->fmt.orientation = ORIENT_RIGHT_TOP;
-            break;
-        case ORIENT_LEFT_BOTTOM:
-            interop->fmt.orientation = ORIENT_RIGHT_BOTTOM;
-            break;
-        case ORIENT_RIGHT_TOP:
-            interop->fmt.orientation = ORIENT_LEFT_TOP;
-            break;
-        case ORIENT_RIGHT_BOTTOM:
-            interop->fmt.orientation = ORIENT_LEFT_BOTTOM;
-            break;
-    }
-
     int ret = opengl_interop_init(interop, GL_TEXTURE_EXTERNAL_OES,
                                   VLC_CODEC_RGB32,
                                   COLOR_SPACE_UNDEF);

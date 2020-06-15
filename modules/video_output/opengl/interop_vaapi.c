@@ -482,6 +482,9 @@ Open(vlc_object_t *obj)
     if (tc_va_check_derive_image(interop))
         goto error;
 
+    /* The pictures are uploaded upside-down */
+    video_format_TransformBy(&interop->fmt, TRANSFORM_VFLIP);
+
     int ret = opengl_interop_init(interop, GL_TEXTURE_2D, vlc_sw_chroma,
                                   interop->fmt.space);
     if (ret != VLC_SUCCESS)

@@ -173,6 +173,9 @@ Open(vlc_object_t *obj)
      && interop->fmt.i_chroma != VLC_CODEC_CVPX_P010)
         return VLC_EGENERIC;
 
+    /* The pictures are uploaded upside-down */
+    video_format_TransformBy(&interop->fmt, TRANSFORM_VFLIP);
+
     struct priv *priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
         return VLC_ENOMEM;
@@ -210,6 +213,9 @@ Open(vlc_object_t *obj)
         }
     }
 #endif
+
+    /* The pictures are uploaded upside-down */
+    video_format_TransformBy(&interop->fmt, TRANSFORM_VFLIP);
 
     int ret;
     switch (interop->fmt.i_chroma)
