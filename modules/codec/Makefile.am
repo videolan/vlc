@@ -412,7 +412,7 @@ libdxva2_plugin_la_SOURCES = \
 	codec/avcodec/va_surface.c codec/avcodec/va_surface.h \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h \
-	codec/avcodec/dxva_blacklist.c
+	codec/avcodec/dxva_blocklist.c
 libdxva2_plugin_la_LIBADD = libd3d9_common.la $(LIBCOM) -lshlwapi -luuid
 if !HAVE_WINSTORE
 if HAVE_AVCODEC_DXVA2
@@ -432,7 +432,7 @@ libd3d11va_plugin_la_SOURCES = \
         codec/avcodec/va_surface.c codec/avcodec/va_surface.h \
 	packetizer/h264_nal.c packetizer/h264_nal.h \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h \
-	codec/avcodec/dxva_blacklist.c
+	codec/avcodec/dxva_blocklist.c
 libd3d11va_plugin_la_LIBADD = libd3d11_common.la $(LIBCOM) -luuid
 if HAVE_WINSTORE
 libd3d11va_plugin_la_LIBADD += -ld3d11
