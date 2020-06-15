@@ -423,10 +423,16 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     /* If there is a page or sub to render, then we do that here */
     /* Create the subpicture unit */
     p_spu = Subpicture( p_dec, &fmt, p_sys->b_text,
-                        p_page.columns, i_num_rows,
+                        p_page.columns, __MAX(i_num_rows, 1),
                         i_align, p_block->i_pts );
     if( !p_spu )
         goto error;
+
+    if( !p_sys->b_text && i_num_rows == 0 )
+    {
+        p_spu->b_ephemer = false;
+        p_spu->i_stop = p_spu->i_start + 1;
+    }
 
     if( p_sys->b_text )
     {
