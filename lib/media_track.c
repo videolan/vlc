@@ -119,6 +119,7 @@ libvlc_media_trackpriv_new( void )
         return NULL;
 
     trackpriv->es_id = NULL;
+    vlc_atomic_rc_init( &trackpriv->rc );
     return trackpriv;
 }
 
@@ -143,15 +144,28 @@ libvlc_media_track_clean( libvlc_media_track_t *track )
     }
 }
 
+libvlc_media_track_t *
+libvlc_media_track_hold( libvlc_media_track_t *track )
+{
+    libvlc_media_trackpriv_t *trackpriv =
+        container_of( track, libvlc_media_trackpriv_t, t );
+    vlc_atomic_rc_inc( &trackpriv->rc );
+    return track;
+}
+
 void
 libvlc_media_track_release( libvlc_media_track_t *track )
 {
     libvlc_media_trackpriv_t *trackpriv =
         container_of( track, libvlc_media_trackpriv_t, t );
-    libvlc_media_track_clean( track );
-    if( trackpriv->es_id )
-        vlc_es_id_Release( trackpriv->es_id );
-    free( trackpriv );
+
+    if( vlc_atomic_rc_dec( &trackpriv->rc ) )
+    {
+        libvlc_media_track_clean( track );
+        if( trackpriv->es_id )
+            vlc_es_id_Release( trackpriv->es_id );
+        free( trackpriv );
+    }
 }
 
 static libvlc_media_tracklist_t *
@@ -282,12 +296,7 @@ libvlc_media_tracklist_delete( libvlc_media_tracklist_t *list )
     for( size_t i = 0; i < list->count; ++i )
     {
         libvlc_media_trackpriv_t *trackpriv = list->tracks[i];
-        libvlc_media_track_clean( &trackpriv->t );
-
-        if( trackpriv->es_id != NULL )
-            vlc_es_id_Release( trackpriv->es_id );
-
-        free( trackpriv );
+        libvlc_media_track_release( &trackpriv->t );
     }
     free( list );
 }

@@ -202,17 +202,33 @@ libvlc_media_tracklist_at( libvlc_media_tracklist_t *list, size_t index );
 LIBVLC_API void
 libvlc_media_tracklist_delete( libvlc_media_tracklist_t *list );
 
+
+/**
+ * Hold a single track reference
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * This function can be used to hold a track from a tracklist. In that case,
+ * the track can outlive its tracklist.
+ *
+ * \param track valid track
+ * \return the same track, need to be released with libvlc_media_track_release()
+ */
+LIBVLC_API libvlc_media_track_t *
+libvlc_media_track_hold( libvlc_media_track_t * );
+
 /**
  * Release a single track
  *
  * \version LibVLC 4.0.0 and later.
  *
- * \warning Don't release tracks from a tracklist with this function. Tracks
- * from a tracklist are released alongside the list with
- * libvlc_media_tracklist_delete()
+ * \warning Tracks from a tracklist are released alongside the list with
+ * libvlc_media_tracklist_delete().
  *
- * \see libvlc_media_player_get_selected_track
- * \see libvlc_media_player_get_track_from_id
+ * \note You only need to release tracks previously held with
+ * libvlc_media_track_hold() or returned by
+ * libvlc_media_player_get_selected_track() and
+ * libvlc_media_player_get_track_from_id()
  *
  * \param track valid track
  */

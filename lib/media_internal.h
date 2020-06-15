@@ -30,6 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_input.h>
 #include <vlc_player.h>
+#include <vlc_atomic.h>
 
 struct libvlc_media_t
 {
@@ -83,6 +84,7 @@ typedef struct libvlc_media_trackpriv_t
         libvlc_subtitle_track_t subtitle;
     };
     vlc_es_id_t *es_id;
+    vlc_atomic_rc_t rc;
 } libvlc_media_trackpriv_t;
 
 static inline const libvlc_media_trackpriv_t *
