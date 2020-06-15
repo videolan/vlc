@@ -83,9 +83,6 @@ typedef struct libvlc_media_trackpriv_t
         libvlc_subtitle_track_t subtitle;
     };
     vlc_es_id_t *es_id;
-#ifndef NDEBUG
-    bool from_list; /* true if the track is allocated from a tracklist */
-#endif
 } libvlc_media_trackpriv_t;
 
 static inline const libvlc_media_trackpriv_t *

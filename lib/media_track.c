@@ -137,7 +137,6 @@ libvlc_media_track_release( libvlc_media_track_t *track )
 {
     libvlc_media_trackpriv_t *trackpriv =
         container_of( track, libvlc_media_trackpriv_t, t );
-    assert( !trackpriv->from_list );
     libvlc_media_track_clean( track );
     if( trackpriv->es_id )
         vlc_es_id_Release( trackpriv->es_id );
@@ -184,13 +183,8 @@ libvlc_media_tracklist_from_es_array( es_format_t **es_array,
     for( size_t i = 0; i < es_count; ++i )
     {
         if( es_array[i]->i_cat == cat )
-        {
-            libvlc_media_trackpriv_t *trackpriv = &list->tracks[count++];
-            libvlc_media_trackpriv_from_es( trackpriv, es_array[i] );
-#ifndef NDEBUG
-            trackpriv->from_list = true;
-#endif
-        }
+            libvlc_media_trackpriv_from_es( &list->tracks[count++],
+                                            es_array[i] );
     }
 
     return list;
@@ -217,9 +211,6 @@ libvlc_media_track_create_from_player_track( const struct vlc_player_track *trac
     if( trackpriv == NULL )
         return NULL;
     libvlc_media_trackpriv_from_player_track( trackpriv, track );
-#ifndef NDEBUG
-    trackpriv->from_list = false;
-#endif
     return &trackpriv->t;
 }
 
@@ -243,9 +234,6 @@ libvlc_media_tracklist_from_player( vlc_player_t *player,
 
         libvlc_media_trackpriv_t *trackpriv = &list->tracks[i];
         libvlc_media_trackpriv_from_player_track( trackpriv, track );
-#ifndef NDEBUG
-        trackpriv->from_list = true;
-#endif
     }
 
     return list;
@@ -270,7 +258,6 @@ libvlc_media_tracklist_delete( libvlc_media_tracklist_t *list )
     for( size_t i = 0; i < list->count; ++i )
     {
         libvlc_media_trackpriv_t *trackpriv = &list->tracks[i];
-        assert( trackpriv->from_list );
         libvlc_media_track_clean( &trackpriv->t );
 
         if( trackpriv->es_id != NULL )
