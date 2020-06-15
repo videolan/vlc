@@ -1,0 +1,20 @@
+--- pthreads/ptw32_MCS_lock.c.inline	2020-06-15 13:42:20.071125700 +0200
++++ pthreads/ptw32_MCS_lock.c	2020-06-15 15:38:28.630658800 +0200
+@@ -99,7 +99,7 @@
+  * Set event if an event handle has been stored in the flag, and
+  * set flag to -1 otherwise. Note that -1 cannot be a valid handle value.
+  */
+-INLINE void 
++static INLINE void 
+ ptw32_mcs_flag_set (HANDLE * flag)
+ {
+   HANDLE e = (HANDLE)(PTW32_INTERLOCKED_SIZE)PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE(
+@@ -119,7 +119,7 @@ ptw32_mcs_flag_set (HANDLE * flag)
+  * Store an event handle in the flag and wait on it if the flag has not been
+  * set, and proceed without creating an event otherwise.
+  */
+-INLINE void 
++static INLINE void 
+ ptw32_mcs_flag_wait (HANDLE * flag)
+ {
+   if ((PTW32_INTERLOCKED_LONG)0 ==

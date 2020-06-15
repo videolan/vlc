@@ -24,6 +24,7 @@ endif
 	$(APPLY) $(SRC)/pthreads/x86-inline-asm.patch
 	$(APPLY) $(SRC)/pthreads/arm64.patch
 	$(APPLY) $(SRC)/pthreads/pthreads-fix-mode_t.patch
+	$(APPLY) $(SRC)/pthreads/pthread-fix-inline.patch
 	$(MOVE)
 
 PTHREADS_W32_CONF := LFLAGS="$(LDFLAGS)" PTW32_FLAGS="$(CFLAGS)"
