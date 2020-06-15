@@ -35,23 +35,14 @@
 #include <vector>
 
 namespace {
-  namespace detail {
-    template<class T>
-    static std::type_info const* typeid_ptr () {
-      static std::type_info const& ti = typeid (T);
-      return &ti;
-    }
-  }
-
   struct EbmlProcessorEntry {
     typedef void (*EbmlProcessor) (EbmlElement*, void*);
 
     EbmlId         const* p_ebmlid;
-    std::type_info const* p_typeid;
     EbmlProcessor         callback;
 
-    EbmlProcessorEntry (EbmlId const& id, std::type_info const* ti, EbmlProcessor cb)
-      : p_ebmlid (&id), p_typeid (ti), callback (cb)
+    EbmlProcessorEntry (EbmlId const& id, EbmlProcessor cb)
+      : p_ebmlid (&id), callback (cb)
     { }
 
   };
@@ -85,7 +76,7 @@ namespace {
             return false;
 
         EbmlProcessorEntry eb = EbmlProcessorEntry (
-          static_cast<EbmlId const&> (*element), NULL, NULL
+          static_cast<EbmlId const&> (*element), NULL
         );
 
         // --------------------------------------------------------------
@@ -99,26 +90,9 @@ namespace {
 
         if (cit != cit_end)
         {
-          // --------------------------------------------------------------
-          // normally we only need to compare the addresses of the EbmlId
-          // since libebml returns a reference to a _static_ instance.
-          // --------------------------------------------------------------
-
-          while (cit != cit_end && (cit->p_ebmlid == eb.p_ebmlid || (*cit->p_ebmlid == *eb.p_ebmlid))) {
-            std::type_info const& ti = typeid (*element);
-
-            // --------------------------------------------------------------
-            // even though the EbmlId are equivalent, we still need to make
-            // sure that the typeid also matches.
-            // --------------------------------------------------------------
-
-            if (*(cit->p_typeid) == ti) {
-              cit->callback (element, payload);
-              return true;
-            }
-
-            ++cit;
-          }
+            assert(cit->p_ebmlid == eb.p_ebmlid || (*cit->p_ebmlid == *eb.p_ebmlid));
+            cit->callback (element, payload);
+            return true;
         }
 
         if (_default_handler == NULL)
@@ -139,18 +113,9 @@ namespace {
       InitializationExpr_, static_cast<EbmlType_&> (*data)                            \
     )
 
-// -----------------------------------------------------------------------------------
-// The use of `detail::typeid_ptr` below is so that we do not have to invoke "typeid"
-// every time we are requested to do a lookup. `std::type_info` cannot be copied, so
-// we cannot pass it by value.
-//
-// In C++11 you could use the hash value present inside std::type_info to do lookup,
-// but we are stuck in C++03 and have to use the below instead.
-// -----------------------------------------------------------------------------------
-
 #define E_CASE(EbmlType_, VariableName_)            \
     EBML_ELEMENT_CASE_DEF(EbmlType_, EbmlType_, VariableName_, \
-      (dispatcher.insert( EbmlProcessorEntry( EbmlType_ ::ClassInfos.ClassId(), detail::typeid_ptr<EbmlType_>(), &EbmlType_ ## _callback) ) ) \
+      (dispatcher.insert( EbmlProcessorEntry( EbmlType_ ::ClassInfos.ClassId(), &EbmlType_ ## _callback) ) ) \
     )
 
 #define E_CASE_DEFAULT(VariableName_)                    \
