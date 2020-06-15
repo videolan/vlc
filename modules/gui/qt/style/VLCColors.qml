@@ -51,6 +51,7 @@ Item {
     property color textDisabled: systemPalette.textDisabled;
 
     property color caption: setColorAlpha(text, .4)
+    property color menuCaption: setColorAlpha(text, .6)
 
     property color bg: systemPalette.base;
     property color bgInactive: systemPalette.baseInactive;

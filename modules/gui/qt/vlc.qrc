@@ -216,6 +216,7 @@
         <file alias="ListLabel.qml">widgets/qml/ListLabel.qml</file>
         <file alias="SubtitleLabel.qml">widgets/qml/SubtitleLabel.qml</file>
         <file alias="PlayCover.qml">widgets/qml/PlayCover.qml</file>
+        <file alias="MenuCaption.qml">widgets/qml/MenuCaption.qml</file>
         <file alias="MediaCover.qml">widgets/qml/MediaCover.qml</file>
     </qresource>
     <qresource prefix="/util">
