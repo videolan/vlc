@@ -559,25 +559,25 @@ InitOrientationMatrix(GLfloat matrix[static 4*4],
 
         case ORIENT_ROTATED_90:
             matrix[0 * 4 + 0] = k_cos_pi_2;
-            matrix[0 * 4 + 1] = -k_sin_pi_2;
-            matrix[1 * 4 + 0] = k_sin_pi_2;
+            matrix[0 * 4 + 1] = k_sin_pi_2;
+            matrix[1 * 4 + 0] = -k_sin_pi_2;
             matrix[1 * 4 + 1] = k_cos_pi_2;
-            matrix[3 * 4 + 1] = 1;
+            matrix[3 * 4 + 0] = 1;
             break;
         case ORIENT_ROTATED_180:
             matrix[0 * 4 + 0] = k_cos_pi;
-            matrix[0 * 4 + 1] = -k_sin_pi;
-            matrix[1 * 4 + 0] = k_sin_pi;
+            matrix[0 * 4 + 1] = k_sin_pi;
+            matrix[1 * 4 + 0] = -k_sin_pi;
             matrix[1 * 4 + 1] = k_cos_pi;
             matrix[3 * 4 + 0] = 1;
             matrix[3 * 4 + 1] = 1;
             break;
         case ORIENT_ROTATED_270:
             matrix[0 * 4 + 0] = k_cos_n_pi_2;
-            matrix[0 * 4 + 1] = -k_sin_n_pi_2;
-            matrix[1 * 4 + 0] = k_sin_n_pi_2;
+            matrix[0 * 4 + 1] = k_sin_n_pi_2;
+            matrix[1 * 4 + 0] = -k_sin_n_pi_2;
             matrix[1 * 4 + 1] = k_cos_n_pi_2;
-            matrix[3 * 4 + 0] = 1;
+            matrix[3 * 4 + 1] = 1;
             break;
         case ORIENT_HFLIPPED:
             matrix[0 * 4 + 0] = -1;
@@ -590,18 +590,16 @@ InitOrientationMatrix(GLfloat matrix[static 4*4],
         case ORIENT_TRANSPOSED:
             matrix[0 * 4 + 0] = 0;
             matrix[1 * 4 + 1] = 0;
-            matrix[2 * 4 + 2] = -1;
-            matrix[0 * 4 + 1] = 1;
-            matrix[1 * 4 + 0] = 1;
-            break;
-        case ORIENT_ANTI_TRANSPOSED:
-            matrix[0 * 4 + 0] = 0;
-            matrix[1 * 4 + 1] = 0;
-            matrix[2 * 4 + 2] = -1;
             matrix[0 * 4 + 1] = -1;
             matrix[1 * 4 + 0] = -1;
             matrix[3 * 4 + 0] = 1;
             matrix[3 * 4 + 1] = 1;
+            break;
+        case ORIENT_ANTI_TRANSPOSED:
+            matrix[0 * 4 + 0] = 0;
+            matrix[1 * 4 + 1] = 0;
+            matrix[0 * 4 + 1] = -1;
+            matrix[1 * 4 + 0] = -1;
             break;
         default:
             break;
