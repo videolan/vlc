@@ -451,12 +451,24 @@ static void test_media_player_tracks(const char** argv, int argc)
     libvlc_media_tracklist_t *tracklist =
         libvlc_media_player_get_tracklist(mp, libvlc_track_video);
     assert(tracklist);
-    libtrack = libvlc_media_tracklist_at(tracklist, 2);
-    assert(libtrack && !libtrack->selected);
-    libtrack->selected = true;
-    libvlc_media_player_update_tracklist(mp, libvlc_track_video, tracklist);
+
+    libvlc_media_track_t *vtrack1 =
+        libvlc_media_track_hold(libvlc_media_tracklist_at(tracklist, 1));
+    libvlc_media_track_t *vtrack2 =
+        libvlc_media_track_hold(libvlc_media_tracklist_at(tracklist, 2));
     libvlc_media_tracklist_delete(tracklist);
+
+    const libvlc_media_track_t *selecttracks[] = {
+        vtrack1, vtrack2,
+    };
+    assert(vtrack1->selected); /* video/1 already selected */
+    assert(!vtrack2->selected); /* select video/2 */
+
+    libvlc_media_player_select_tracks(mp, libvlc_track_video, selecttracks, 2);
     vtracks[2].toselect = true;
+
+    libvlc_media_track_release(vtrack1);
+    libvlc_media_track_release(vtrack2);
 
     /* Unselect all spu tracks */
     libvlc_media_player_select_track(mp, libvlc_track_text, NULL);

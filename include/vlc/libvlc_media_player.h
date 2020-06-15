@@ -1355,8 +1355,7 @@ libvlc_media_player_get_track_from_id( libvlc_media_player_t *p_mi,
  *
  * \version LibVLC 4.0.0 and later.
  *
- * \note Use libvlc_media_player_update_tracklist() for finer track selection
- * control.
+ * \note Use libvlc_media_player_select_tracks() for multiple selection
  *
  * \param p_mi the media player
  * \param type type of the selected track
@@ -1366,6 +1365,27 @@ LIBVLC_API void
 libvlc_media_player_select_track( libvlc_media_player_t *p_mi,
                                   libvlc_track_type_t type,
                                   const libvlc_media_track_t *track );
+
+/**
+ * Select multiple tracks for one type
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \note The internal track list can change between the calls of
+ * libvlc_media_player_get_tracklist() and
+ * libvlc_media_player_set_tracks(). If a track selection change but the
+ * track is not present anymore, the player will just ignore it.
+ *
+ * \param p_mi the media player
+ * \param type type of the selected track
+ * \param tracks pointer to the track array
+ * \param track_count number of tracks in the track array
+ */
+LIBVLC_API void
+libvlc_media_player_select_tracks( libvlc_media_player_t *p_mi,
+                                   libvlc_track_type_t type,
+                                   const libvlc_media_track_t **tracks,
+                                   size_t track_count );
 
 /**
  * Select tracks by their string identifier
@@ -1399,28 +1419,6 @@ LIBVLC_API void
 libvlc_media_player_select_tracks_by_ids( libvlc_media_player_t *p_mi,
                                           libvlc_track_type_t type,
                                           const char *psz_ids );
-
-/**
- * Update the track selection for one type
- *
- * This function allow to select or unselect multiple tracks using the
- * track list returned by libvlc_media_player_get_tracklist(). The user can
- * iterate on all or few libvlc_media_track_t from this list and change the
- * 'selected' boolean before calling this function.
- *
- * \note The internal track list can change between the calls of
- * libvlc_media_player_get_tracklist() and
- * libvlc_media_player_update_tracklist(). If a track selection change but the
- * track is not present anymore, the player will just ignore it.
- *
- * \param p_mi the media player
- * \param type type of the selected track
- * \param list list returned by libvlc_media_player_get_tracklist()
- */
-LIBVLC_API void
-libvlc_media_player_update_tracklist( libvlc_media_player_t *p_mi,
-                                      libvlc_track_type_t type,
-                                      libvlc_media_tracklist_t *list );
 
 /**
  * Add a slave to the current media player.

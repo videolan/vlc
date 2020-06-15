@@ -1919,6 +1919,40 @@ libvlc_media_player_select_track(libvlc_media_player_t *p_mi,
 }
 
 void
+libvlc_media_player_select_tracks(libvlc_media_player_t *p_mi,
+                                  libvlc_track_type_t type,
+                                  const libvlc_media_track_t **tracks,
+                                  size_t track_count)
+{
+    vlc_player_t *player = p_mi->player;
+
+    vlc_es_id_t **es_id_list = vlc_alloc(track_count + 1, sizeof(vlc_es_id_t *));
+    size_t es_id_idx = 0;
+
+    if (es_id_list == NULL)
+        return;
+
+    const enum es_format_category_e cat = libvlc_track_type_to_escat(type);
+
+    vlc_player_Lock(player);
+
+    for (size_t i = 0; i < track_count; ++i)
+    {
+        const libvlc_media_track_t *track = tracks[i];
+        const libvlc_media_trackpriv_t *trackpriv =
+            libvlc_media_track_to_priv(track);
+
+        es_id_list[es_id_idx++] = trackpriv->es_id;
+    }
+    es_id_list[es_id_idx++] = NULL;
+    vlc_player_SelectEsIdList(player, cat, es_id_list);
+
+    vlc_player_Unlock(player);
+
+    free(es_id_list);
+}
+
+void
 libvlc_media_player_select_tracks_by_ids( libvlc_media_player_t *p_mi,
                                           libvlc_track_type_t type,
                                           const char *psz_ids )
@@ -1933,43 +1967,6 @@ libvlc_media_player_select_tracks_by_ids( libvlc_media_player_t *p_mi,
 
     vlc_player_Unlock(player);
 }
-
-void
-libvlc_media_player_update_tracklist(libvlc_media_player_t *p_mi,
-                                     libvlc_track_type_t type,
-                                     libvlc_media_tracklist_t *list)
-{
-    vlc_player_t *player = p_mi->player;
-
-    size_t count = libvlc_media_tracklist_count(list);
-    vlc_es_id_t **es_id_list = vlc_alloc(count + 1, sizeof(vlc_es_id_t *));
-    size_t es_id_idx = 0;
-
-    if (es_id_list == NULL)
-        return;
-
-    const enum es_format_category_e cat = libvlc_track_type_to_escat(type);
-
-    vlc_player_Lock(player);
-
-    for (size_t i = 0; i < count; ++i)
-    {
-        const libvlc_media_track_t *track = libvlc_media_tracklist_at(list, i);
-        if (track->selected)
-        {
-            const libvlc_media_trackpriv_t *trackpriv =
-                libvlc_media_track_to_priv(track);
-            es_id_list[es_id_idx++] = trackpriv->es_id;
-        }
-    }
-    es_id_list[es_id_idx++] = NULL;
-    vlc_player_SelectEsIdList(player, cat, es_id_list);
-
-    vlc_player_Unlock(player);
-
-    free(es_id_list);
-}
-
 
 int libvlc_media_player_add_slave( libvlc_media_player_t *p_mi,
                                    libvlc_media_slave_type_t i_type,
