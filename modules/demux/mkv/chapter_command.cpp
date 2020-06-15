@@ -32,7 +32,7 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
     uint32 codec_time = uint32(-1);
     for( size_t i = 0; i < command.ListSize(); i++ )
     {
-        if( MKV_CHECKED_PTR_DECL( p_cpt, KaxChapterProcessTime const, command[i] ) )
+        if( MKV_CHECKED_PTR_DECL_CONST( p_cpt, KaxChapterProcessTime, command[i] ) )
         {
             codec_time = static_cast<uint32>( *p_cpt );
             break;
@@ -41,7 +41,7 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
 
     for( size_t i = 0; i < command.ListSize(); i++ )
     {
-        if( MKV_CHECKED_PTR_DECL( p_cpd, KaxChapterProcessData const, command[i] ) )
+        if( MKV_CHECKED_PTR_DECL_CONST( p_cpd, KaxChapterProcessData, command[i] ) )
         {
             std::vector<KaxChapterProcessData*> *containers[] = {
                 &during_cmds, /* codec_time = 0 */
