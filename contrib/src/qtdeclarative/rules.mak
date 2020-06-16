@@ -29,8 +29,8 @@ QT_DECLARATIVE_CONFIG := \
 
 .qtdeclarative: qtdeclarative
 	# Generate Makefile & src/Makefile
-	cd $< && $(PREFIX)/bin/qmake -- $(QT_DECLARATIVE_CONFIG)
-	cd $</src && $(PREFIX)/bin/qmake -o Makefile src.pro
+	cd $< && $(PREFIX)/lib/qt5/bin/qmake -- $(QT_DECLARATIVE_CONFIG)
+	cd $</src && $(PREFIX)/lib/qt5/bin/qmake -o Makefile src.pro
 	# Build & install only what we require
 	# Invoke the build rules one at a time as some rule dependencies seem to be broken
 	cd $< && $(MAKE) -C src sub-quick-make_first-ordered

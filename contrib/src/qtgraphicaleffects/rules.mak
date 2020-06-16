@@ -24,7 +24,7 @@ qtgraphicaleffects: qtgraphicaleffects-everywhere-src-$(QTGE_VERSION).tar.xz .su
 	$(MOVE)
 
 .qtgraphicaleffects: qtgraphicaleffects
-	cd $< && $(PREFIX)/bin/qmake
+	cd $< && $(PREFIX)/lib/qt5/bin/qmake
 	# Make && Install libraries
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C src sub-effects-install_subtargets

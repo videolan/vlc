@@ -25,7 +25,7 @@ qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	$(MOVE)
 
 .qtsvg: qtsvg
-	cd $< && $(PREFIX)/bin/qmake
+	cd $< && $(PREFIX)/lib/qt5/bin/qmake
 	# Make && Install libraries
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C src sub-plugins-install_subtargets sub-svg-install_subtargets

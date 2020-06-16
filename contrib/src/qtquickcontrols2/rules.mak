@@ -31,7 +31,7 @@ QUICK_CONTROL_CONFIG := \
     -no-feature-quickcontrols2-imagine
 
 .qtquickcontrols2: qtquickcontrols2
-	cd $< && $(PREFIX)/bin/qmake -- $(QUICK_CONTROL_CONFIG)
+	cd $< && $(PREFIX)/lib/qt5/bin/qmake -- $(QUICK_CONTROL_CONFIG)
 	# Make && Install libraries
 	cd $< && $(MAKE) sub-src-qmake_all
 ifndef HAVE_CROSS_COMPILE
