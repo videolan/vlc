@@ -1376,6 +1376,8 @@ libvlc_media_player_select_track( libvlc_media_player_t *p_mi,
  * libvlc_media_player_set_tracks(). If a track selection change but the
  * track is not present anymore, the player will just ignore it.
  *
+ * \note selecting multiple audio tracks is currently not supported.
+ *
  * \param p_mi the media player
  * \param type type of the selected track
  * \param tracks pointer to the track array
@@ -1410,6 +1412,8 @@ libvlc_media_player_select_tracks( libvlc_media_player_t *p_mi,
  *
  * \note The string identifier of a track can be found via psz_id from \ref
  * libvlc_media_track_t
+ *
+ * \note selecting multiple audio tracks is currently not supported.
  *
  * \param p_mi the media player
  * \param type type to select
