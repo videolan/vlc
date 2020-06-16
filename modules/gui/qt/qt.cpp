@@ -85,6 +85,10 @@ extern "C" char **environ;
   Q_IMPORT_PLUGIN(QtGraphicalEffectsPlugin)
   Q_IMPORT_PLUGIN(QtGraphicalEffectsPrivatePlugin)
 
+  #if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+   Q_IMPORT_PLUGIN(QtQmlPlugin)
+  #endif
+
   #if !HAS_QT56
    Q_IMPORT_PLUGIN(AccessibleFactory)
   #endif
@@ -577,6 +581,9 @@ static void *Thread( void *obj )
     QApplication::setAttribute( Qt::AA_UseHighDpiPixmaps );
 #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+    QApplication::setHighDpiScaleFactorRoundingPolicy( Qt::HighDpiScaleFactorRoundingPolicy::RoundPreferFloor );
+#endif
     // at the moment, the vout is created in another thread than the rendering thread
     QApplication::setAttribute( Qt::AA_DontCheckOpenGLContextThreadAffinity );
     QQuickWindow::setDefaultAlphaBuffer(true);

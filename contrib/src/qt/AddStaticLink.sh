@@ -33,7 +33,7 @@ fi
 
 # Get the links flags necessary to use the plugin from the installed PRL file of the plugin
 # replace hardcoded pathes by {libdir}
-LIBS=$(sed -e "/QMAKE_PRL_LIBS/ { \
+LIBS=$(sed -e "/QMAKE_PRL_LIBS =/ { \
              s/QMAKE_PRL_LIBS =//; \
              s@$PREFIX/lib@\${libdir}@g; \
              s@\$\$\[QT_INSTALL_LIBS\]@\${libdir}@g;" -e "p" \

@@ -15,8 +15,8 @@
  #endif
  Q_CORE_EXPORT void qDetectCpuFeatures();
  
--#if defined(Q_PROCESSOR_X86) && QT_COMPILER_SUPPORTS_HERE(RDRND)
-+#if defined(Q_PROCESSOR_X86) && QT_COMPILER_SUPPORTS_HERE(RDRND) && 0 // mingw32 32-bits crash
- Q_CORE_EXPORT qsizetype qRandomCpu(void *, qsizetype) Q_DECL_NOTHROW;
+-#if defined(Q_PROCESSOR_X86) && QT_COMPILER_SUPPORTS_HERE(RDRND) && !defined(QT_BOOTSTRAPPED)
++#if defined(Q_PROCESSOR_X86) && QT_COMPILER_SUPPORTS_HERE(RDRND) && !defined(QT_BOOTSTRAPPED) && 0 // mingw32 32-bits crash
+ Q_CORE_EXPORT qsizetype qRandomCpu(void *, qsizetype) noexcept;
  #else
- static inline qsizetype qRandomCpu(void *, qsizetype) Q_DECL_NOTHROW
+ static inline qsizetype qRandomCpu(void *, qsizetype) noexcept

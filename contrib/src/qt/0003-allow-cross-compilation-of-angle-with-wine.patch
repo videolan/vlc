@@ -30,8 +30,8 @@ index 44140bc..53f4984 100644
          "angle": {
              "label": "ANGLE",
              "autoDetect": "features.opengles2 || features.opengl-dynamic",
--            "condition": "features.dxguid && tests.fxc && (features.direct3d9 || (config.winrt && features.direct3d11 && libs.d3dcompiler))",
-+            "condition": "features.dxguid && tests.fxc && (features.direct3d9 || (features.direct3d11 && libs.d3dcompiler))",
+-            "condition": "!features.opengl-desktop && features.dxguid && tests.fxc && (features.direct3d9 || (config.winrt && features.direct3d11 && libs.d3dcompiler))",
++            "condition": "!features.opengl-desktop && features.dxguid && tests.fxc && (features.direct3d9 || (features.direct3d11 && libs.d3dcompiler))",
              "output": [
                  "publicFeature",
                  { "type": "define", "name": "QT_OPENGL_ES_2_ANGLE" },

@@ -1,7 +1,7 @@
 # Qt
 
-QT_VERSION_MAJOR := 5.12
-QT_VERSION := $(QT_VERSION_MAJOR).7
+QT_VERSION_MAJOR := 5.15
+QT_VERSION := $(QT_VERSION_MAJOR).1
 # Insert potential -betaX suffix here:
 QT_VERSION_FULL := $(QT_VERSION)
 QT_URL := https://download.qt.io/official_releases/qt/$(QT_VERSION_MAJOR)/$(QT_VERSION_FULL)/submodules/qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz
@@ -30,7 +30,6 @@ qt: qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz .sum-qt
 	$(UNPACK)
 	$(APPLY) $(SRC)/qt/0001-allow-to-pass-user-defined-compilation-flags-to-qt.patch
 ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/qt/0001-Windows-QPA-prefer-lower-value-when-rounding-fractio.patch
 	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Disable-systray-notification-sounds.patch
 ifndef HAVE_WIN64
 	$(APPLY) $(SRC)/qt/0001-disable-qt_random_cpu.patch
@@ -39,10 +38,12 @@ endif
 	$(APPLY) $(SRC)/qt/0007-ANGLE-remove-static-assert-that-can-t-be-evaluated-b.patch
 	$(APPLY) $(SRC)/qt/0008-ANGLE-disable-ANGLE_STD_ASYNC_WORKERS-when-compiling.patch
 	$(APPLY) $(SRC)/qt/0009-Add-KHRONOS_STATIC-to-allow-static-linking-on-Windows.patch
-	$(APPLY) $(SRC)/qt/fix-mingw-pkgconfig-file-and-dependency-naming.patch
 
 ifdef HAVE_CROSS_COMPILE
 	$(APPLY) $(SRC)/qt/0003-allow-cross-compilation-of-angle-with-wine.patch
+ifndef HAVE_CLANG
+	$(APPLY) $(SRC)/qt/0010-Windows-QPA-Fix-build-with-mingw64-Win32-threading.patch
+endif
 else
 	$(APPLY) $(SRC)/qt/qt-fix-msys-long-pathes.patch
 	$(APPLY) $(SRC)/qt/0003-fix-angle-compilation.patch
@@ -87,8 +88,8 @@ QT_PLATFORM += -device-option VLC_EXTRA_CFLAGS="-isystem $(PREFIX)/include" \
 
 QT_CONFIG := -static -no-shared -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl $(QT_OPENGL) -no-dbus \
-	-no-vulkan -no-sql-odbc -no-pch \
-	-no-compile-examples -nomake examples -nomake tests -qt-zlib
+	-no-vulkan -no-sql-odbc -no-pch -no-feature-testlib \
+	-no-compile-examples -nomake examples -nomake tests  -qt-zlib
 
 QT_CONFIG += -skip qtsql
 QT_CONFIG += -release
@@ -109,7 +110,7 @@ ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
 	+cd $< && $(ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -hostprefix $(PREFIX)/lib/qt5
 	# Make && Install libraries
 	cd $< && $(ENV_VARS) $(MAKE)
-	cd $< && $(MAKE) -C src sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-zlib-install_subtargets sub-bootstrap-install_subtargets sub-network-install_subtargets sub-testlib-install_subtargets
+	cd $< && $(MAKE) -C src sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-zlib-install_subtargets sub-bootstrap-install_subtargets sub-network-install_subtargets
 	# Install tools
 	cd $< && $(MAKE) -C src sub-moc-install_subtargets sub-rcc-install_subtargets sub-uic-install_subtargets sub-qlalr-install_subtargets
 	# Install plugins

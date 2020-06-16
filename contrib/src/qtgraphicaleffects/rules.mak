@@ -1,7 +1,7 @@
 # QtGraphicalEffects
 
-QTGE_VERSION_MAJOR := 5.12
-QTGE_VERSION := $(QTGE_VERSION_MAJOR).7
+QTGE_VERSION_MAJOR := 5.15
+QTGE_VERSION := $(QTGE_VERSION_MAJOR).1
 QTGE_URL := http://download.qt.io/official_releases/qt/$(QTGE_VERSION_MAJOR)/$(QTGE_VERSION)/submodules/qtgraphicaleffects-everywhere-src-$(QTGE_VERSION).tar.xz
 
 DEPS_qtgraphicaleffects += qtdeclarative $(DEPS_qtdeclarative)
