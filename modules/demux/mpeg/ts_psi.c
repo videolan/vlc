@@ -739,8 +739,8 @@ static void SetupTTMLExtendedDescriptor( demux_t *p_demux,
     {
         if( i_data <= 1U || i_data <= 1U + p_data[0] )
             goto end;
-        p_data += 1 + p_data[0];
         i_data -= 1 + p_data[0];
+        p_data += 1 + p_data[0];
     }
 
     /* text... finally */
