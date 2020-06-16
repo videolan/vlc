@@ -1,0 +1,42 @@
+--- pthreads/sched_getscheduler.c.uwpmingw7	2020-06-16 15:09:45.975803600 +0200
++++ pthreads/sched_getscheduler.c	2020-06-16 15:09:54.479850300 +0200
+@@ -52,6 +52,7 @@ sched_getscheduler (pid_t pid)
+
+       if (pid != selfPid)
+ 	{
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || !defined(__MINGW64_VERSION_MAJOR) || __MINGW64_VERSION_MAJOR > 7
+ 	  HANDLE h =
+ 	    OpenProcess (PROCESS_QUERY_INFORMATION, PTW32_FALSE, (DWORD) pid);
+
+@@ -64,6 +65,10 @@ sched_getscheduler (pid_t pid)
+ 	    }
+ 	  else
+ 	    CloseHandle(h);
++#else
++	  errno = EPERM;
++	  return -1;
++#endif
+ 	}
+     }
+
+--- pthreads/sched_setscheduler.c.uwpmingw7	2020-06-16 15:09:43.567989900 +0200
++++ pthreads/sched_setscheduler.c	2020-06-16 15:09:59.727891200 +0200
+@@ -54,6 +54,7 @@ sched_setscheduler (pid_t pid, int polic
+
+       if (pid != selfPid)
+ 	{
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) || !defined(__MINGW64_VERSION_MAJOR) || __MINGW64_VERSION_MAJOR > 7
+ 	  HANDLE h =
+ 	    OpenProcess (PROCESS_SET_INFORMATION, PTW32_FALSE, (DWORD) pid);
+
+@@ -66,6 +67,10 @@ sched_setscheduler (pid_t pid, int polic
+ 	    }
+ 	  else
+ 	    CloseHandle(h);
++#else
++	  errno = EPERM;
++	  return -1;
++#endif
+ 	}
+     }
+

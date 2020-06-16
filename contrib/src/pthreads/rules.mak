@@ -25,6 +25,7 @@ endif
 	$(APPLY) $(SRC)/pthreads/arm64.patch
 	$(APPLY) $(SRC)/pthreads/pthreads-fix-mode_t.patch
 	$(APPLY) $(SRC)/pthreads/pthread-fix-inline.patch
+	$(APPLY) $(SRC)/pthreads/pthreads-fix-old-mingw.patch
 	$(MOVE)
 
 PTHREADS_W32_CONF := LFLAGS="$(LDFLAGS)" PTW32_FLAGS="$(CFLAGS)"
