@@ -146,7 +146,7 @@ Widgets.NavigableFocusScope {
             MusicTrackListDisplay {
                 id: expand_track_id
 
-                readonly property int _nbCols: VLCStyle.gridColumnsForWidth(expand_track_id.width)
+                readonly property int _nbCols: VLCStyle.gridColumnsForWidth(expand_track_id.availableRowWidth)
 
                 section.property: ""
 

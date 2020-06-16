@@ -61,6 +61,7 @@ NavigableFocusScope {
 
     property alias selectionModel: selectionModel
     property real rowHeight: VLCStyle.fontHeight_normal + VLCStyle.margin_large
+    readonly property real availableRowWidth: width - ( VLCStyle.table_section_width * 2 )
     property alias spacing: view.spacing
     property int horizontalSpacing: VLCStyle.column_margin_width
 

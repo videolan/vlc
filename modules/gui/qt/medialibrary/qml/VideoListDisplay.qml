@@ -51,8 +51,9 @@ Widgets.KeyNavigableTableView {
     ]
 
 
-    sortModel: ( width < VLCStyle.colWidth(6) ) ? sortModelSmall
-                                                : ( width < VLCStyle.colWidth(7) ) ? sortModelMedium : sortModelLarge
+    sortModel: ( availableRowWidth < VLCStyle.colWidth(6) ) ? sortModelSmall
+                                                            : ( availableRowWidth < VLCStyle.colWidth(7) )
+                                                              ? sortModelMedium : sortModelLarge
     section.property: "title_first_symbol"
 
     rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2

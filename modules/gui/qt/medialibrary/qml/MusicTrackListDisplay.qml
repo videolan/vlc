@@ -99,8 +99,9 @@ Widgets.KeyNavigableTableView {
         }
     }
 
-    sortModel: ( width < VLCStyle.colWidth(6) ) ? sortModelSmall
-                                                : ( width < VLCStyle.colWidth(9) ) ? sortModelMedium : sortModelLarge
+    sortModel: ( availableRowWidth < VLCStyle.colWidth(6) ) ? sortModelSmall
+                                                            : ( availableRowWidth < VLCStyle.colWidth(9) )
+                                                              ? sortModelMedium : sortModelLarge
     section.property: "title_first_symbol"
 
     headerColor: VLCStyle.colors.bg
