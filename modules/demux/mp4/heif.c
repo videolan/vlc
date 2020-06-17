@@ -256,15 +256,27 @@ static block_t *ReadItemExtents( demux_t *p_demux, uint32_t i_item_id,
 
             if( BOXDATA(p_iloc)->p_items[i].i_construction_method < 2 )
             {
-                /* Extents are in 1:file, 2:idat */
+                /* Extents are in 0:file, 1:idat */
                 if( BOXDATA(p_iloc)->p_items[i].i_construction_method == 1 )
                 {
                     MP4_Box_t *idat = MP4_BoxGet( p_sys->p_root, "meta/idat" );
                     if(!idat)
                         break;
                     i_offset += idat->i_pos + mp4_box_headersize(idat);
+                    if( i_length == 0 ) /* Entire container */
+                        i_length = idat->i_size - mp4_box_headersize(idat);
                 }
-
+                else
+                {
+                    if( i_length == 0 ) /* Entire container == file */
+                    {
+                        if( vlc_stream_GetSize( p_demux->s, &i_length )
+                                == VLC_SUCCESS && i_length > i_offset )
+                            i_length -= i_offset;
+                        else
+                            i_length = 0;
+                    }
+                }
                 if( vlc_stream_Seek( p_demux->s, i_offset ) != VLC_SUCCESS )
                     break;
                 *pp_append = vlc_stream_Block( p_demux->s, i_length );
