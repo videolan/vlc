@@ -4492,20 +4492,20 @@ static int MP4_ReadBox_iloc( stream_t *p_stream, MP4_Box_t *p_box )
                 {
                     case 4: MP4_GET4BYTES( p_data->p_items[i].p_extents[j].i_extent_index ); break;
                     case 8: MP4_GET8BYTES( p_data->p_items[i].p_extents[j].i_extent_index ); break;
-                    default: break;
+                    default: p_data->p_items[i].p_extents[j].i_extent_index = 0 ; break;
                 }
             }
             switch( p_data->i_offset_size )
             {
                 case 4: MP4_GET4BYTES( p_data->p_items[i].p_extents[j].i_extent_offset ); break;
                 case 8: MP4_GET8BYTES( p_data->p_items[i].p_extents[j].i_extent_offset ); break;
-                default: break;
+                default: p_data->p_items[i].p_extents[j].i_extent_offset = 0; break;
             }
             switch( p_data->i_length_size )
             {
                 case 4: MP4_GET4BYTES( p_data->p_items[i].p_extents[j].i_extent_length ); break;
                 case 8: MP4_GET8BYTES( p_data->p_items[i].p_extents[j].i_extent_length ); break;
-                default: break;
+                default: p_data->p_items[i].p_extents[j].i_extent_length = 0; break;
             }
         }
     }
