@@ -27,10 +27,12 @@
 #include <vlc_player.h>
 #include <vlc_vector.h>
 
-#ifdef ZVBI_COMPILED
-# define TELETEXT_DECODER "zvbi"
+#if defined(ZVBI_COMPILED)
+# define TELETEXT_DECODER "zvbi,"
+#elif defined(TELX_COMPILED)
+# define TELETEXT_DECODER "telx,"
 #else
-# define TELETEXT_DECODER "telx"
+# define TELETEXT_DECODER ""
 #endif
 
 struct report_capabilities
@@ -2076,7 +2078,7 @@ ctx_init(struct ctx *ctx, bool use_outputs)
         "--no-media-library",
         "--no-drop-late-frames",
         /* Avoid leaks from various dlopen... */
-        "--codec=araw,rawvideo,subsdec,"TELETEXT_DECODER",none",
+        "--codec=araw,rawvideo,subsdec,"TELETEXT_DECODER"none",
         "--dec-dev=none",
         use_outputs ? "--vout=dummy" : "--vout=none",
         use_outputs ? "--aout=dummy" : "--aout=none",
@@ -2478,7 +2480,9 @@ test_timers(struct ctx *ctx)
 static void
 test_teletext(struct ctx *ctx)
 {
-    test_log("teletext\n");
+#if defined(ZVBI_COMPILED) || defined(TELX_COMPILED)
+    test_log("teletext with "TELETEXT_DECODER"\n");
+
     vlc_player_t *player = ctx->player;
     const struct vlc_player_track *track;
 
@@ -2714,6 +2718,10 @@ test_teletext(struct ctx *ctx)
     }
 
     test_end(ctx);
+#else
+    VLC_UNUSED(ctx);
+    test_log("teletext skipped\n");
+#endif
 }
 
 int

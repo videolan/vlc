@@ -270,9 +270,10 @@ libvlc_demux_dec_run_la_LIBADD += \
 	../modules/libtextst_plugin.la \
 	../modules/libsubstx3g_plugin.la
 endif
-if WITH_ZVBI
+if HAVE_ZVBI
 libvlc_demux_dec_run_la_LIBADD += ../modules/libzvbi_plugin.la
-else
+endif
+if HAVE_TELX
 libvlc_demux_dec_run_la_LIBADD += ../modules/libtelx_plugin.la
 endif
 EXTRA_LTLIBRARIES += libvlc_demux_dec_run.la

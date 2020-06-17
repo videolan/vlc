@@ -3171,6 +3171,7 @@ AS_IF( [test "${enable_zvbi}" != "no"],[
         [
           VLC_ADD_PLUGIN([zvbi])
           AC_DEFINE(ZVBI_COMPILED, 1, [Define if the zvbi module is built])
+          have_zvbi="yes"
           AS_IF( [test "${enable_telx}" = "yes"],[
                   AC_MSG_WARN([The zvbi and telx modules are incompatible. Using zvbi.])
                   ])
@@ -3178,9 +3179,14 @@ AS_IF( [test "${enable_zvbi}" != "no"],[
           AC_MSG_WARN([${ZVBI_PKG_ERRORS}. Enabling the telx module instead.])
         ])
     ])
+AM_CONDITIONAL([HAVE_ZVBI], [test "x${have_zvbi}" = x"yes"])
+
 AS_IF( [test "${enable_telx}" != "no" ],[
   VLC_ADD_PLUGIN([telx])
+  have_telx="yes"
+  AC_DEFINE(TELX_COMPILED, 1, [Define if the telx module is built])
   ])
+AM_CONDITIONAL([HAVE_TELX], [test "x${have_telx}" = x"yes"])
 
 dnl
 dnl ARIB subtitles rendering module
