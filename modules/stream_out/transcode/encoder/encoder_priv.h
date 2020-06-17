@@ -21,6 +21,7 @@
 struct transcode_encoder_t
 {
     encoder_t       *p_encoder;
+    decoder_t       *p_packetizer;
     vlc_thread_t    thread;
     vlc_mutex_t     lock_out;
     bool            b_abort;
@@ -31,6 +32,7 @@ struct transcode_encoder_t
     /* output buffers */
     block_t         *p_buffers;
     bool b_threaded;
+    bool b_firstblock;
 };
 
 int transcode_encoder_audio_open( transcode_encoder_t *p_enc,

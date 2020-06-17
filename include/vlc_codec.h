@@ -262,6 +262,7 @@ struct encoder_t
     int i_iframes;               /* One I frame per i_iframes */
     int i_bframes;               /* One B frame per i_bframes */
     int i_tolerance;             /* Bitrate tolerance */
+    bool b_packetized;
 
     /* Encoder config */
     config_chain_t *p_cfg;

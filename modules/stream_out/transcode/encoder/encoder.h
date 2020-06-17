@@ -103,4 +103,3 @@ void transcode_video_sar_apply( const video_format_t *p_src,
 int transcode_encoder_audio_configure( const transcode_encoder_config_t *p_cfg,
                                        const audio_format_t *p_dec_out,
                                        transcode_encoder_t *p_enc, bool );
-

@@ -72,6 +72,7 @@ struct sout_stream_id_sys_t
 {
     bool            b_transcode;
     bool            b_error;
+    bool            b_added;
 
     /* id of the out stream */
     void *downstream_id;

@@ -83,6 +83,7 @@ transcode_encoder_t * transcode_encoder_new( encoder_t *p_encoder,
 
     p_enc->p_encoder = p_encoder;
     p_enc->p_encoder->p_module = NULL;
+    p_enc->p_packetizer = NULL;
 
     /* Create destination format */
     es_format_Init( &p_enc->p_encoder->fmt_in, p_fmt->i_cat, 0 );
@@ -121,7 +122,13 @@ const es_format_t *transcode_encoder_format_in( const transcode_encoder_t *p_enc
 
 const es_format_t *transcode_encoder_format_out( const transcode_encoder_t *p_enc )
 {
-    return &p_enc->p_encoder->fmt_out;
+    if (p_enc->p_encoder->b_packetized)
+        return &p_enc->p_encoder->fmt_out;
+
+    if (p_enc->p_packetizer == NULL || !p_enc->b_firstblock)
+        return NULL;
+
+    return &p_enc->p_packetizer->fmt_out;
 }
 
 void transcode_encoder_update_format_in( transcode_encoder_t *p_enc, const es_format_t *fmt,
@@ -197,6 +204,7 @@ void transcode_encoder_close( transcode_encoder_t *p_enc )
 int transcode_encoder_open( transcode_encoder_t *p_enc,
                             const transcode_encoder_config_t *p_cfg )
 {
+    p_enc->b_firstblock = false;
     switch( p_enc->p_encoder->fmt_in.i_cat )
     {
         case SPU_ES:
