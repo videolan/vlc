@@ -869,7 +869,7 @@ static void ChangeFilters(vout_thread_sys_t *vout)
         vlc_array_clear(array);
     }
 
-    if (!es_format_IsSimilar(p_fmt_current, &fmt_target)) {
+    if (!es_format_IsSimilar(p_fmt_current, &fmt_target) || vctx_current != vctx_target) {
         msg_Dbg(&vout->obj, "Changing vout format to %4.4s",
                             (const char *) &p_fmt_current->video.i_chroma);
 
