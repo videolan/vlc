@@ -43,12 +43,6 @@ variables:
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-w64-mingw32
 
-.variables-win64-llvm: &variables-win64-llvm
-        SHORTARCH: win64
-        HOST_ARCH: x86_64
-        TRIPLET: $HOST_ARCH-w64-mingw32
-        WINE_SDK_PATH: /usr/include/wine/wine/windows/
-
 .variables-macos: &variables-macos
         VLC_PATH: /Users/videolanci/sandbox/bin
         VLC_FORCE_KERNELVERSION: 18
@@ -135,7 +129,9 @@ win64-llvm:
     extends: .win-common
     image:
         name: $VLC_WIN_LLVM_IMAGE
-    variables: *variables-win64-llvm
+    variables:
+        <<: *variables-win64
+        WINE_SDK_PATH: /usr/include/wine/wine/windows/
 
 uwp64-libvlc-llvm:
     extends: .win-common
@@ -176,7 +172,9 @@ nightly-win64-llvm:
     extends: .nightly-win-common
     image:
         name: $VLC_WIN_LLVM_IMAGE
-    variables: *variables-win64-llvm
+    variables:
+        <<: *variables-win64
+        WINE_SDK_PATH: /usr/include/wine/wine/windows/
 
 #
 # Debian
