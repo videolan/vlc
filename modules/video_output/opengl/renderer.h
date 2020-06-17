@@ -79,8 +79,6 @@ struct vlc_gl_renderer
 
     struct vlc_gl_sampler *sampler;
 
-    video_format_t fmt;
-
     unsigned nb_indices;
     GLuint vertex_buffer_object;
     GLuint index_buffer_object;
