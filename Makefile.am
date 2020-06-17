@@ -65,6 +65,7 @@ EXTRA_DIST += \
 	extras/tools/bison-macOS-c41f233c.patch \
 	extras/tools/libtool-2.4.2-bitcode.patch \
 	extras/tools/libtool-2.4.2-san.patch \
+	extras/tools/libtool-2.4.6-clang-libs.patch \
 	extras/tools/ragel-6.8-javacodegen.patch
 
 ###############################################################################
