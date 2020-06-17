@@ -83,7 +83,7 @@ FFMPEGCONF += --enable-thumb
 endif
 endif
 else
-FFMPEGCONF += --optflags=-O0
+FFMPEGCONF += --optflags=-Og
 endif
 
 ifdef HAVE_CROSS_COMPILE
