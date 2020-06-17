@@ -1,3 +1,9 @@
+Changes between 3.0.11 and 3.0.12:
+----------------------------------
+
+macOS:
+ * Fix automatic playback resume with "Music" app
+
 Changes between 3.0.10 and 3.0.11:
 ----------------------------------
 
