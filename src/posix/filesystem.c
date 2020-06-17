@@ -365,5 +365,5 @@ ssize_t vlc_sendto(int fd, const void *buf, size_t len, int flags,
 
 ssize_t vlc_sendmsg(int fd, const struct msghdr *msg, int flags)
 {
-    return sendmsg(fd, msg, flags | MSG_NOSIGNAL);
+    return (sendmsg)(fd, msg, flags | MSG_NOSIGNAL);
 }
