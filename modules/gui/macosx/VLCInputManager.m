@@ -376,7 +376,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             if ([iTunesApp playerState] == iTunesEPlSPlaying) {
                 msg_Dbg(p_intf, "pausing Apple Music");
                 [iTunesApp pause];
-                b_has_itunes_paused = YES;
+                b_has_applemusic_paused = YES;
             }
         }
     }
