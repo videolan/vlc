@@ -153,8 +153,11 @@ struct vlc_gl_interop {
 
 struct vlc_gl_interop *
 vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
-                   vlc_video_context *context, const video_format_t *fmt,
-                   bool subpics);
+                   vlc_video_context *context, const video_format_t *fmt);
+
+struct vlc_gl_interop *
+vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl,
+                                 const struct vlc_gl_api *api);
 
 void
 vlc_gl_interop_Delete(struct vlc_gl_interop *interop);

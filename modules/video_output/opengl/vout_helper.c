@@ -133,7 +133,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         (GLint)fmt->i_height > max_tex_size)
         ResizeFormatToGLMaxTexSize(fmt, max_tex_size);
 
-    vgl->interop = vlc_gl_interop_New(gl, api, context, fmt, false);
+    vgl->interop = vlc_gl_interop_New(gl, api, context, fmt);
     if (!vgl->interop)
     {
         msg_Err(gl, "Could not create interop");
@@ -157,7 +157,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GL_ASSERT_NOERROR(vt);
 
-    vgl->sub_interop = vlc_gl_interop_New(gl, api, NULL, fmt, true);
+    vgl->sub_interop = vlc_gl_interop_NewForSubpictures(gl, api);
     if (!vgl->sub_interop)
     {
         msg_Err(gl, "Could not create sub interop");
