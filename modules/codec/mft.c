@@ -199,9 +199,6 @@ static const pair_format_guid d3d_format_table[] = {
     { 0, NULL }
 };
 
-#if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 4
-DEFINE_GUID(MFAudioFormat_Dolby_AC3, 0xe06d802c, 0xdb46, 0x11cf, 0xb4, 0xd1, 0x00, 0x80, 0x5f, 0x6c, 0xbb, 0xea);
-#endif
 /*
  * We cannot use the FOURCC code for audio either since the
  * WAVE_FORMAT value is used to create the GUID.
