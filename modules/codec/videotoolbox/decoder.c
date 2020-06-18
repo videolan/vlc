@@ -2196,10 +2196,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
 
         picture_t *p_pic = decoder_NewPicture(p_dec);
         if (!p_pic)
-        {
-            vlc_mutex_lock(&p_sys->lock);
-            goto end;
-        }
+            goto unlocked_end;
 
         p_info->p_picture = p_pic;
 
@@ -2216,8 +2213,8 @@ static void DecoderCallback(void *decompressionOutputRefCon,
         if (cvpxpic_attach(p_pic, imageBuffer, p_sys->vctx,
                            video_context_OnPicReleased) != VLC_SUCCESS)
         {
-            vlc_mutex_lock(&p_sys->lock);
-            goto end;
+            picture_Release(p_pic);
+            goto unlocked_end;
         }
 
         /* VT is not pacing frame allocation. If we are not fast enough to
@@ -2243,8 +2240,9 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     }
 
 end:
-    free(p_info);
     vlc_mutex_unlock(&p_sys->lock);
+unlocked_end:
+    free(p_info);
     return;
 }
 
