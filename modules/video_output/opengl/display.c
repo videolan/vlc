@@ -206,6 +206,16 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
     }
 }
 
+static void
+FlipVerticalAlign(vout_display_cfg_t *cfg)
+{
+    /* Reverse vertical alignment as the GL tex are Y inverted */
+    if (cfg->align.vertical == VLC_VIDEO_ALIGN_TOP)
+        cfg->align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+    else if (cfg->align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+        cfg->align.vertical = VLC_VIDEO_ALIGN_TOP;
+}
+
 static int Control (vout_display_t *vd, int query, va_list ap)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -221,27 +231,25 @@ static int Control (vout_display_t *vd, int query, va_list ap)
       case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
       case VOUT_DISPLAY_CHANGE_ZOOM:
       {
-        vout_display_cfg_t c = *va_arg (ap, const vout_display_cfg_t *);
+        vout_display_cfg_t cfg = *va_arg(ap, const vout_display_cfg_t *);
         const video_format_t *src = &vd->source;
 
-        /* Reverse vertical alignment as the GL tex are Y inverted */
-        if (c.align.vertical == VLC_VIDEO_ALIGN_TOP)
-            c.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-        else if (c.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-            c.align.vertical = VLC_VIDEO_ALIGN_TOP;
+        FlipVerticalAlign(&cfg);
 
-        vout_display_PlacePicture(&sys->place, src, &c);
+        vout_display_PlacePicture(&sys->place, src, &cfg);
         sys->place_changed = true;
-        vlc_gl_Resize (sys->gl, c.display.width, c.display.height);
+        vlc_gl_Resize (sys->gl, cfg.display.width, cfg.display.height);
         return VLC_SUCCESS;
       }
 
       case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
       case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
       {
-        const vout_display_cfg_t *cfg = va_arg (ap, const vout_display_cfg_t *);
+        vout_display_cfg_t cfg = *va_arg(ap, const vout_display_cfg_t *);
 
-        vout_display_PlacePicture(&sys->place, &vd->source, cfg);
+        FlipVerticalAlign(&cfg);
+
+        vout_display_PlacePicture(&sys->place, &vd->source, &cfg);
         sys->place_changed = true;
         return VLC_SUCCESS;
       }
