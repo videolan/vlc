@@ -367,6 +367,16 @@ if HAVE_DARWIN
 codec_PLUGINS += libvideotoolbox_plugin.la
 endif
 
+libvideotoolbox_enc_plugin_la_SOURCES = codec/videotoolbox/encoder.c
+libvideotoolbox_enc_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) # Trigger MODULE_NAME declaration
+libvideotoolbox_enc_plugin_la_LIBADD = libvlc_hxxxhelper.la libvlc_vtutils.la
+libvideotoolbox_enc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
+if HAVE_DARWIN
+if ENABLE_SOUT
+codec_LTLIBRARIES += libvideotoolbox_enc_plugin.la
+endif
+endif
+
 ### FFmpeg/libav ###
 libavcodec_common_la_SOURCES = codec/avcodec/fourcc.c codec/avcodec/avcommon.h \
 	codec/avcodec/chroma.c codec/avcodec/chroma.h \
