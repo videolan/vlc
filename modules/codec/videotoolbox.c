@@ -32,6 +32,7 @@
 #import "hxxx_helper.h"
 #import <vlc_bits.h>
 #import <vlc_boxes.h>
+#import <vlc_threads.h>
 #import "vt_utils.h"
 #import "../packetizer/h264_nal.h"
 #import "../packetizer/h264_slice.h"
@@ -42,6 +43,8 @@
 #import <VideoToolbox/VTErrors.h>
 
 #import <CoreFoundation/CoreFoundation.h>
+#import <CoreVideo/CoreVideo.h>
+#import <CoreMedia/CMTime.h>
 #import <TargetConditionals.h>
 
 #import <sys/types.h>
@@ -2260,6 +2263,360 @@ OpenDecDevice(vlc_decoder_device *device, vout_window_t *window)
     return VLC_SUCCESS;
 }
 
+#pragma mark Encoder submodule
+
+typedef struct encoder_sys_t
+{
+    VTCompressionSessionRef session;
+    CMTime lastDate;
+    bool isDraining;
+    vlc_fifo_t *fifo;
+    bool header;
+} encoder_sys_t;
+
+static block_t *EncodeCallback(encoder_t *enc, picture_t *pic)
+{
+    encoder_sys_t *sys = enc->p_sys;
+
+    /* If we're draining, we have nothing to push. */
+    sys->isDraining |= pic == NULL;
+    if (!pic)
+        goto return_block;
+
+    picture_Hold(pic);
+    msg_Dbg(enc, "Encoding picture %p at date %"PRId64, pic, pic->date);
+
+
+    CVPixelBufferRef buffer = cvpxpic_get_ref(pic);
+    CMTime pts = CMTimeMake(pic->date, CLOCK_FREQ);
+    CMTime duration = kCMTimeInvalid;
+    CFDictionaryRef frameProperties = cfdict_create(0);
+    VTEncodeInfoFlags infoFlags;
+
+    OSStatus ret = VTCompressionSessionEncodeFrame(sys->session,
+        buffer, pts, duration,
+        frameProperties,
+        pic,
+        &infoFlags);
+
+    /* This is async so some sync magic has to happen here I guess...
+       Note that a call to VTCompressionSessionEncodeFrame does not
+       guarantee to return only once a frame has encoded, it might
+       be necessary to feed the encoder multiple input blocks before
+       it produces output.
+    */
+    if (ret != noErr) {
+        /* Oh noes! Output something useful about what happened. */
+        return NULL;
+    }
+
+return_block:
+    /* If we're draining, we wait for the encoder to output every other
+     * block and gather them together before returning. */
+    if (sys->isDraining)
+        VTCompressionSessionCompleteFrames(sys->session, sys->lastDate);
+
+    vlc_fifo_Lock(sys->fifo);
+    /* Dequeue all available block. */
+    block_t *block = vlc_fifo_DequeueUnlocked(sys->fifo);
+    vlc_fifo_Unlock(sys->fifo);
+
+    if (pic)
+        sys->lastDate = CMTimeMake(pic->date, CLOCK_FREQ);
+
+    int count;
+    size_t size;
+    vlc_tick_t length;
+
+    block_ChainProperties(block, &count, &size, &length);
+    msg_Info(enc, " + Pushing %d blocks, total size: %zu, total length: %" PRId64,
+             count, size, length);
+
+    return block;
+}
+
+struct vlc_block_vt
+{
+    block_t             block;
+    CMBlockBufferRef    buffer;
+};
+
+static void FreeVTBlock(block_t *block)
+{
+    struct vlc_block_vt *handle =
+        container_of(block, struct vlc_block_vt, block);
+
+    CFRelease(handle->buffer);
+    free(handle);
+}
+
+static vlc_tick_t vlc_CMTime_to_tick(CMTime timestamp)
+{
+    CMTime scaled = CMTimeConvertScale(
+            timestamp, CLOCK_FREQ,
+            kCMTimeRoundingMethod_Default);
+
+    return VLC_TICK_0 + scaled.value;
+}
+
+static int PushBlockUnlocked(encoder_t *enc, CMSampleBufferRef sampleBuffer)
+{
+    encoder_sys_t *sys = enc->p_sys;
+
+    CMTime pts = CMSampleBufferGetOutputPresentationTimeStamp(sampleBuffer);
+    CMTime dts = CMSampleBufferGetOutputDecodeTimeStamp(sampleBuffer);
+
+    vlc_tick_t vlc_pts = vlc_CMTime_to_tick(pts);
+    vlc_tick_t vlc_dts = vlc_CMTime_to_tick(dts);
+
+    //CFShow(sampleBuffer);
+    CMBlockBufferRef buffer = CMSampleBufferGetDataBuffer(sampleBuffer);
+
+    size_t length = CMBlockBufferGetDataLength(buffer);
+    size_t read;
+    size_t offset = 0;
+    char *cursor;
+
+    CFArrayRef attachments = CMSampleBufferGetSampleAttachmentsArray(sampleBuffer, 0);
+    CFDictionaryRef properties = nil;
+
+    /* Frames are considered to be IDR frames by default:
+     * https://developer.apple.com/documentation/coremedia/kcmsampleattachmentkey_notsync?language=objc
+     */
+    Boolean isIDR = true;
+
+    /* We need this to extract metadata */
+    if (CFArrayGetCount(attachments) == 0)
+        goto parse_block;
+
+    /* Metadata parsing:
+     * We need to check whether the frame is an IDR frame or not
+     * in order to know whether we need to inject the SPS/PPS
+     * NAL units in the stream. */
+    properties = CFArrayGetValueAtIndex(attachments, 0);
+
+    CFBooleanRef isNotSync;
+    if (CFDictionaryGetValueIfPresent(properties,
+                                      kCMSampleAttachmentKey_NotSync,
+                                      &isNotSync))
+    {
+        /* If the attachment signal that it's not a sync frame,
+         * it means that it's not an IDR frame. */
+        isIDR = isNotSync != kCFBooleanTrue;
+    }
+
+    if (isIDR)
+    {
+        CMFormatDescriptionRef description =
+            CMSampleBufferGetFormatDescription(sampleBuffer);
+
+        const uint8_t *sps, *pps;
+        size_t sps_length, pps_length;
+        // > 10.9
+        OSStatus status;
+        status = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(description,
+                0, &sps, &sps_length, NULL, NULL);
+        status = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(description,
+                1, &pps, &pps_length, NULL, NULL);
+
+        assert(status == noErr);
+        assert(sps && pps);
+
+        assert(sps_length < (1 << 16));
+        assert(pps_length < (1 << 16));
+
+        block_t *block = block_Alloc(2*4 + sps_length + pps_length);
+        //TODO
+        block->i_pts = vlc_pts;
+        block->i_dts = vlc_dts;
+
+        const uint8_t startcode[] = { 0x00, 0x00, 0x00, 0x01 };
+
+        size_t hdroffset = 0;
+        memcpy(&block->p_buffer[hdroffset], startcode, sizeof startcode);
+        hdroffset += sizeof startcode;
+
+        memcpy(&block->p_buffer[hdroffset], sps, sps_length);
+        hdroffset += sps_length;
+
+        memcpy(&block->p_buffer[hdroffset], startcode, sizeof startcode);
+        hdroffset += sizeof startcode;
+
+        memcpy(&block->p_buffer[hdroffset], pps, pps_length);
+        hdroffset += pps_length;
+
+        vlc_fifo_QueueUnlocked(sys->fifo, block);
+        sys->header = true;
+    }
+
+parse_block:
+
+    while (offset != length)
+    {
+        OSStatus status;
+        status = CMBlockBufferGetDataPointer(buffer, offset, &read, NULL, &cursor);
+
+        if (status != kCMBlockBufferNoErr)
+        {
+            /* TODO */
+            assert(false);
+            break;
+        }
+
+        /* callbacks for block_t wrapping the startcode */
+        //static const struct vlc_block_callbacks startblock_cbs =
+        //    { .free = FreeStartBlock };
+
+        static const uint8_t startcode[] = {0x00, 0x00, 0x00, 0x01};
+        block_t *startblock = block_Alloc(sizeof startcode);
+        //if (startblock == NULL) { /* TODO */ }
+        memcpy(startblock->p_buffer, startcode, sizeof startcode);
+
+        /* callbacks for block_t wrapping a CMBlockBuffer */
+        //static const struct vlc_block_callbacks block_cbs =
+        //    { .free = FreeVTBlock };
+
+        //struct vlc_block_vt *block = malloc(sizeof *block);
+        //if (block == NULL) { /* TODO */ }
+
+        //block->buffer = (CMBlockBufferRef)CFRetain(buffer);
+
+        msg_Info(enc, " + block buffer size %zu", read);
+        offset += read;
+
+        while (read > 0)
+        {
+            /* Extract the avcC block size */
+            uint32_t size_avcc;
+            memcpy(&size_avcc, cursor, sizeof size_avcc);
+            size_avcc = CFSwapInt32BigToHost(size_avcc);
+
+            // TODO: real check? The encoder must pass correct buffers
+            msg_Info(enc, "     - packet size %"PRIu32, size_avcc);
+            assert(size_avcc <= read - sizeof size_avcc);
+
+            block_t *block = block_Alloc(sizeof startcode + size_avcc);
+            //block_Init(&block->block, &block_cbs, cursor + sizeof size_avcc , read);
+            memcpy(block->p_buffer, startcode, sizeof startcode);
+            memcpy(&block->p_buffer[sizeof startcode], &cursor[sizeof size_avcc], size_avcc);
+
+            block->i_pts = vlc_pts;
+            block->i_dts = vlc_dts;
+
+            block->i_dts = __MIN(block->i_dts, block->i_pts); // ROUNDING ISSUES
+            block->i_length = enc->fmt_in.video.i_frame_rate * CLOCK_FREQ / enc->fmt_in.video.i_frame_rate_base;
+            block->i_flags = isIDR ? BLOCK_FLAG_TYPE_I : 0;
+            msg_Info(enc, "IDR keyframe = %d", (int)isIDR);
+
+            read -= size_avcc + sizeof startcode;
+            cursor += size_avcc + sizeof startcode;
+
+            if (read == 0)
+            {
+                /* Signal that the block is a complete AU */
+                block->i_flags |= BLOCK_FLAG_AU_END;
+            }
+            vlc_fifo_QueueUnlocked(sys->fifo, block);
+        }
+
+        //block_CopyProperties(startblock, &block->block);
+
+        //vlc_fifo_QueueUnlocked(sys->fifo, startblock);
+    }
+
+    return VLC_SUCCESS;
+}
+
+static void EncoderOutputCallback(void *cookie,
+    void *sourceFrameRefCon, OSStatus status,
+    VTEncodeInfoFlags infoFlags, CMSampleBufferRef sampleBuffer)
+{
+    VLC_UNUSED(infoFlags);
+
+    encoder_t *encoder = cookie;
+    encoder_sys_t *sys = encoder->p_sys;
+
+    if (status != noErr) {
+        /* Oh noes! Handle this! */
+    }
+
+    picture_t *pic = sourceFrameRefCon;
+    msg_Info(encoder, "-> encoded %p with date %"PRId64,
+             pic, pic->date);
+
+    picture_Release(pic);
+    vlc_fifo_Lock(sys->fifo);
+    PushBlockUnlocked(encoder, sampleBuffer);
+    vlc_fifo_Unlock(sys->fifo);
+}
+
+static int OpenEncoder(vlc_object_t *obj)
+{
+    encoder_t *enc = (encoder_t *)obj;
+    encoder_sys_t *sys;
+
+    msg_Info(obj, "OPENING VT ENCODER, codec=%4.4s, chroma=%4.4s",
+             (const char *)&enc->fmt_in.i_codec,
+             (const char *)&enc->fmt_in.video.i_chroma);
+
+    sys = vlc_obj_malloc(obj, sizeof *sys);
+    if (sys == NULL)
+        return VLC_ENOMEM;
+
+    OSStatus ret = VTCompressionSessionCreate(NULL,
+        enc->fmt_in.video.i_visible_width,
+        enc->fmt_in.video.i_visible_height,
+        kCMVideoCodecType_H264,
+        NULL,
+        NULL,
+        NULL,
+        EncoderOutputCallback,
+        enc,
+        &sys->session);
+
+    if (ret != noErr) {
+        /* Oh noes! Output something useful about what happened. */
+        msg_Info(obj, "ERROR OPENING VTOOLBOX");
+        return VLC_EGENERIC;
+    }
+
+    sys->fifo = block_FifoNew();
+    sys->lastDate = CMTimeMake(0, CLOCK_FREQ);
+    sys->header = false;
+
+    enc->p_sys = sys;
+    enc->pf_encode_video = EncodeCallback;
+    enc->pf_encode_audio = NULL;
+    enc->fmt_in.i_codec = VLC_CODEC_CVPX_NV12;
+    enc->b_packetized = false;
+
+    video_format_Copy(&enc->fmt_out.video, &enc->fmt_in.video);
+    enc->fmt_out.b_packetized = false;
+    enc->fmt_out.video.i_frame_rate =
+        enc->fmt_in.video.i_frame_rate;
+    enc->fmt_out.video.i_frame_rate_base =
+        enc->fmt_in.video.i_frame_rate_base;
+    enc->fmt_out.i_codec = VLC_CODEC_H264;
+
+    video_format_Print(&enc->obj, "Input format:", &enc->fmt_in.video);
+    video_format_Print(&enc->obj, "output format:", &enc->fmt_in.video);
+
+    msg_Info(enc, "FRAMERATE: %d/%d",
+            enc->fmt_out.video.i_frame_rate,
+            enc->fmt_out.video.i_frame_rate_base);
+
+
+    return VLC_SUCCESS;
+}
+
+static void CloseEncoder(vlc_object_t *obj)
+{
+    /* Probably drain the encoder? */
+    //VTCompressionSessionCompleteFrames();
+
+    /* TODO: Cleanup */
+}
+
 #pragma mark - Module descriptor
 
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
@@ -2302,6 +2659,12 @@ vlc_module_begin()
     /* Deprecated options */
     add_obsolete_bool("videotoolbox-temporal-deinterlacing") // Since 4.0.0
     add_obsolete_bool("videotoolbox") // Since 4.0.0
+
+    add_submodule()
+        set_section(N_("Encoding") , NULL)
+        set_description(N_("VideoToolbox video encoder"))
+        set_capability("encoder", 1000)
+        set_callbacks(OpenEncoder, CloseEncoder)
 
     add_submodule()
         set_callback_dec_device(OpenDecDevice, 1)
