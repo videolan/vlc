@@ -88,9 +88,11 @@ namespace {
             _processors.begin(), cit_end, eb
         );
 
-        if (cit != cit_end)
+        /* Check that the processor is valid and unique. */
+        if (cit != cit_end &&
+            cit->p_ebmlid == eb.p_ebmlid &&
+            (*cit->p_ebmlid == *eb.p_ebmlid))
         {
-            assert(cit->p_ebmlid == eb.p_ebmlid || (*cit->p_ebmlid == *eb.p_ebmlid));
             cit->callback (element, payload);
             return true;
         }
