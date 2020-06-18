@@ -50,10 +50,6 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
 
 #define THREAD_NAME "mediacodec_ndk"
 
-/* Not in NdkMedia API but we need it since we send config data via input
- * buffers and not via "csd-*" buffers from AMediaFormat */
-#define AMEDIACODEC_FLAG_CODEC_CONFIG 2
-
 /*****************************************************************************
  * NdkMediaError.h
  *****************************************************************************/
@@ -104,6 +100,11 @@ struct AMediaCodecBufferInfo {
 typedef struct AMediaCodecBufferInfo AMediaCodecBufferInfo;
 
 enum {
+    AMEDIACODEC_BUFFER_FLAG_KEY_FRAME = 1,
+    /* Not in NdkMedia API but we need it since we send config data via input
+     * buffers and not via "csd-*" buffers from AMediaFormat */
+    AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG = 2,
+
     AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM = 4,
     AMEDIACODEC_CONFIGURE_FLAG_ENCODE = 1,
     AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED = -3,
@@ -450,7 +451,7 @@ static int QueueInput(mc_api *api, int i_index, const void *p_buf,
     mc_api_sys *p_sys = api->p_sys;
     uint8_t *p_mc_buf;
     size_t i_mc_size;
-    int i_flags = (b_config ? AMEDIACODEC_FLAG_CODEC_CONFIG : 0)
+    int i_flags = (b_config ? AMEDIACODEC_BUFFER_FLAG_CODEC_CONFIG : 0)
                 | (p_buf == NULL ? AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM : 0);
 
     assert(i_index >= 0);

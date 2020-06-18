@@ -43,6 +43,7 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
 
 #define THREAD_NAME "mediacodec_jni"
 
+#define BUFFER_FLAG_KEY_FRAME     1
 #define BUFFER_FLAG_CODEC_CONFIG  2
 #define BUFFER_FLAG_END_OF_STREAM 4
 #define INFO_OUTPUT_BUFFERS_CHANGED -3
