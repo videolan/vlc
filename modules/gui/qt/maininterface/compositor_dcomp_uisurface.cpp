@@ -114,12 +114,12 @@ public:
         compile = nullptr;
     }
 
-    int init(vlc_object_t *obj)
+    bool init(vlc_object_t *obj)
     {
         m_compiler_dll = Direct3D11LoadShaderLibrary();
         if (!m_compiler_dll) {
             msg_Err(obj, "cannot load d3dcompiler.dll, aborting");
-            return VLC_EGENERIC;
+            return false;
         }
 
         compile = (pD3DCompile)GetProcAddress(m_compiler_dll, "D3DCompile");
@@ -127,9 +127,9 @@ public:
             msg_Err(obj, "Cannot locate reference to D3DCompile in d3dcompiler DLL");
             FreeLibrary(m_compiler_dll);
             m_compiler_dll = nullptr;
-            return VLC_EGENERIC;
+            return false;
         }
-        return VLC_SUCCESS;
+        return true;
     }
 
     pD3DCompile               compile = nullptr;
@@ -200,7 +200,11 @@ bool CompositorDCompositionUISurface::init()
     m_uiWindow->setClearBeforeRendering(false);
 
     m_d3dCompiler = std::make_shared<OurD3DCompiler>();
-    m_d3dCompiler->init(VLC_OBJECT(m_intf));
+    ret = m_d3dCompiler->init(VLC_OBJECT(m_intf));
+    if (!ret) {
+        msg_Err(m_intf, "failed to initialize D3D compiler");
+        return false;
+    }
 
     qreal dpr = m_rootWindow->devicePixelRatio();
     ret = initialiseD3DSwapchain(dpr * m_rootWindow->width(), dpr * m_rootWindow->height());
