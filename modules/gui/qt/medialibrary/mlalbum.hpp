@@ -43,6 +43,7 @@ class MLAlbum : public QObject
     Q_PROPERTY(QString artist READ getArtist CONSTANT)
     Q_PROPERTY(unsigned int nbtracks READ getNbTracks CONSTANT)
     Q_PROPERTY(QString duration READ getDuration CONSTANT)
+    Q_PROPERTY(QString durationShort READ getDuration CONSTANT)
 
 public:
     MLAlbum(vlc_medialibrary_t* _ml, const vlc_ml_album_t *_data, QObject *_parent = nullptr);
@@ -55,6 +56,7 @@ public:
     QString getArtist() const;
     unsigned int getNbTracks() const;
     QString getDuration() const;
+    QString getDurationShort() const;
 
     MLAlbum* clone(QObject *parent = nullptr) const;
 
@@ -77,4 +79,5 @@ private:
     QList<QString> m_otherArtists;
     unsigned int m_nbTracks;
     QString m_duration;
+    QString m_durationShort;
 };

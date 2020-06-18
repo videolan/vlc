@@ -37,14 +37,22 @@ MLAlbum::MLAlbum(vlc_medialibrary_t* _ml, const vlc_ml_album_t *_data, QObject *
     int min = (t_sec / 60) % 60;
     int hour = t_sec / 3600;
     if (hour == 0)
+    {
         m_duration = QString("%1:%2")
                 .arg(min, 2, 10, QChar('0'))
                 .arg(sec, 2, 10, QChar('0'));
+        m_durationShort = m_duration;
+    }
     else
+    {
         m_duration = QString("%1:%2:%3")
                 .arg(hour, 2, 10, QChar('0'))
                 .arg(min, 2, 10, QChar('0'))
                 .arg(sec, 2, 10, QChar('0'));
+        m_durationShort = QString("%1h%2")
+                .arg(hour)
+                .arg(min, 2, 10, QChar('0'));
+    }
 }
 
 //private ctor for cloning
@@ -101,6 +109,11 @@ unsigned int MLAlbum::getNbTracks() const
 QString MLAlbum::getDuration() const
 {
     return m_duration;
+}
+
+QString MLAlbum::getDurationShort() const
+{
+    return m_durationShort;
 }
 
 MLAlbum *MLAlbum::clone(QObject *parent) const
