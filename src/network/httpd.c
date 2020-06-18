@@ -1610,11 +1610,6 @@ static int httpd_ClientSend(httpd_client_t *cl)
     i_len = httpd_NetSend(cl, &cl->p_buffer[cl->i_buffer],
                            cl->i_buffer_size - cl->i_buffer);
 
-    if (i_len == 0) {
-        cl->i_state = HTTPD_CLIENT_DEAD; /* connection closed */
-        return 0;
-    }
-
     if (i_len < 0) {
 #if defined(_WIN32)
         if (WSAGetLastError() == WSAEWOULDBLOCK)
