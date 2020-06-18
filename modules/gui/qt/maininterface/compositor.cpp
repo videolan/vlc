@@ -23,6 +23,7 @@
 #ifdef HAVE_DCOMP_H
 #  include "compositor_dcomp.hpp"
 #endif
+#  include "compositor_win7.hpp"
 #endif
 
 namespace vlc {
@@ -37,9 +38,14 @@ Compositor* Compositor::createCompositor(intf_thread_t *p_intf)
     ret = dcomp_compositor->init();
     if (ret)
         return dcomp_compositor;
-    else
-        delete dcomp_compositor;
+    delete dcomp_compositor;
+    msg_Dbg(p_intf, "failed to create DirectComposition backend, use fallback");
 #endif
+    CompositorWin7* win7_compositor = new CompositorWin7(p_intf);
+    if (win7_compositor->init())
+        return win7_compositor;
+    delete win7_compositor;
+    msg_Dbg(p_intf, "failed to create Win7 compositor backend, use fallback");
 #endif
     return new CompositorDummy(p_intf);
 }

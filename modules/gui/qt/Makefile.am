@@ -224,7 +224,9 @@ libqt_plugin_la_SOURCES = \
 if HAVE_WIN32
 libqt_plugin_la_SOURCES += \
 	gui/qt/maininterface/main_interface_win32.cpp \
-	gui/qt/maininterface/main_interface_win32.hpp
+	gui/qt/maininterface/main_interface_win32.hpp \
+	gui/qt/maininterface/compositor_win7.cpp \
+	gui/qt/maininterface/compositor_win7.hpp
 
 if HAVE_DCOMP
 libqt_plugin_la_SOURCES += \
@@ -343,7 +345,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/widgets/native/searchlineedit.moc.cpp
 
 if HAVE_WIN32
-nodist_libqt_plugin_la_SOURCES += gui/qt/maininterface/main_interface_win32.moc.cpp
+nodist_libqt_plugin_la_SOURCES += gui/qt/maininterface/main_interface_win32.moc.cpp \
+	gui/qt/maininterface/compositor_win7.moc.cpp
 
 if HAVE_DCOMP
 nodist_libqt_plugin_la_SOURCES += \
