@@ -157,13 +157,18 @@ bool CompositorDirectComposition::init()
         //| D3D11_CREATE_DEVICE_DEBUG
             ;
 
+    D3D_FEATURE_LEVEL requestedFeatureLevels[] = {
+        D3D_FEATURE_LEVEL_11_1,
+        D3D_FEATURE_LEVEL_11_0,
+    };
+
     hr = D3D11CreateDevice(
         nullptr,    // Adapter
         D3D_DRIVER_TYPE_HARDWARE,
         nullptr,    // Module
         creationFlags,
-        nullptr,
-        0, // Highest available feature level
+        requestedFeatureLevels,
+        ARRAY_SIZE(requestedFeatureLevels),
         D3D11_SDK_VERSION,
         m_d3d11Device.GetAddressOf(),
         nullptr,    // Actual feature level
