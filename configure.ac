@@ -1069,6 +1069,9 @@ AS_IF([test "${SYS}" = "mingw32"], [
   AC_MSG_CHECKING(for if_nametoindex availability)
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
       [[#include <windows.h>
+        #if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 6
+        # include <wincrypt.h>
+        #endif
         #include <iphlpapi.h>
         static void test (void) {
           if_nametoindex("");

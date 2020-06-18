@@ -40,7 +40,9 @@
 #ifdef _WIN32
 #   undef EAFNOSUPPORT
 #   define EAFNOSUPPORT WSAEAFNOSUPPORT
-#   include <wincrypt.h>
+#   if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 6
+#    include <wincrypt.h>
+#   endif
 #   include <iphlpapi.h>
 #else
 #   include <unistd.h>
