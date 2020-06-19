@@ -63,6 +63,8 @@ public:
     /* access only from the UI thread */
     QVector<PlaylistItem> m_items;
     ssize_t m_current = -1;
+
+    vlc_tick_t m_duration = 0;
 };
 
 } //namespace playlist
