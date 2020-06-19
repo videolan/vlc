@@ -77,7 +77,8 @@ static encoder_t *CreateEncoder( vlc_object_t *, const video_format_t *,
                                  const video_format_t * );
 static void DeleteEncoder( encoder_t * );
 static filter_t *CreateConverter( vlc_object_t *, const es_format_t *,
-                               const video_format_t * );
+                                  struct vlc_video_context *,
+                                  const video_format_t * );
 static void DeleteConverter( filter_t * );
 
 vlc_fourcc_t image_Type2Fourcc( const char * );
@@ -252,7 +253,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         {
             p_image->p_converter =
                 CreateConverter( p_image->p_parent, &p_image->p_dec->fmt_out,
-                              p_fmt_out );
+                                 picture_GetVideoContext(p_pic), p_fmt_out );
 
             if( !p_image->p_converter )
             {
@@ -414,7 +415,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 
             p_image->p_converter =
                 CreateConverter( p_image->p_parent, &fmt_in,
-                              &p_image->p_enc->fmt_in.video );
+                                 picture_GetVideoContext(p_pic), &p_image->p_enc->fmt_in.video );
 
             if( !p_image->p_converter )
             {
@@ -549,7 +550,8 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         fmt_in.video = *p_fmt_in;
 
         p_image->p_converter =
-            CreateConverter( p_image->p_parent, &fmt_in, p_fmt_out );
+            CreateConverter( p_image->p_parent, &fmt_in,
+                             picture_GetVideoContext(p_pic), p_fmt_out );
 
         if( !p_image->p_converter )
         {
@@ -779,8 +781,10 @@ static void DeleteEncoder( encoder_t * p_enc )
     vlc_object_delete(p_enc);
 }
 
-static filter_t *CreateConverter( vlc_object_t *p_this, const es_format_t *p_fmt_in,
-                               const video_format_t *p_fmt_out )
+static filter_t *CreateConverter( vlc_object_t *p_this,
+                                  const es_format_t *p_fmt_in,
+                                  struct vlc_video_context *p_vctx_in,
+                                  const video_format_t *p_fmt_out )
 {
     filter_t *p_filter;
 
@@ -795,6 +799,7 @@ static filter_t *CreateConverter( vlc_object_t *p_this, const es_format_t *p_fmt
     p_filter->fmt_out.video.i_y_offset = 0;
 
     p_filter->fmt_out.i_codec = p_fmt_out->i_chroma;
+    p_filter->vctx_in = p_vctx_in;
     p_filter->p_module = module_need( p_filter, "video converter", NULL, false );
 
     if( !p_filter->p_module )
