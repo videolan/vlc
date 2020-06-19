@@ -47,6 +47,7 @@ QString VLCTick::toString() const
     int sec = t_sec % 60;
     int min = (t_sec / 60) % 60;
     int hour = t_sec / 3600;
+
     if (hour == 0)
         return QString("%1:%2")
                 .arg(min, 2, 10, QChar('0'))
@@ -61,4 +62,31 @@ QString VLCTick::toString() const
 VLCTick VLCTick::scale(float scalar) const
 {
     return VLCTick(m_ticks*scalar);
+}
+
+int VLCTick::toSeconds() const
+{
+    if (m_ticks == VLC_TICK_INVALID)
+        return 0;
+
+    int64_t t_sec = SEC_FROM_VLC_TICK(m_ticks);
+    return t_sec;
+}
+
+int VLCTick::toMinutes() const
+{
+    if (m_ticks == VLC_TICK_INVALID)
+        return 0;
+
+    int64_t t_sec = SEC_FROM_VLC_TICK(m_ticks);
+    return (t_sec / 60);
+}
+
+int VLCTick::toHours() const
+{
+    if (m_ticks == VLC_TICK_INVALID)
+        return 0;
+
+    int64_t t_sec = SEC_FROM_VLC_TICK(m_ticks);
+    return (t_sec / 3600);
 }
