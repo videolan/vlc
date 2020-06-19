@@ -1,0 +1,158 @@
+From 95cc768cce8de579d0414830fe1d93c15f9594a7 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 19 Jun 2020 10:40:06 +0200
+Subject: [PATCH 7/9] random: don't use API's that are forbidden in UWP apps to
+ init the random generator
+
+---
+ random/rndw32.c | 29 +++++++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/random/rndw32.c b/random/rndw32.c
+index aefc7275..45d1e7e7 100644
+--- a/random/rndw32.c
++++ b/random/rndw32.c
+@@ -337,6 +337,7 @@ read_mbm_data (void (*add)(const void*, size_t, enum random_origins),
+   HANDLE hMBMData;
+   SharedData *mbmDataPtr;
+ 
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   hMBMData = OpenFileMapping (FILE_MAP_READ, FALSE, "$M$B$M$5$S$D$" );
+   if (hMBMData)
+     {
+@@ -351,6 +352,7 @@ read_mbm_data (void (*add)(const void*, size_t, enum random_origins),
+         }
+       CloseHandle (hMBMData);
+     }
++#endif /* WINAPI_PARTITION_DESKTOP */
+ }
+ 
+ 
+@@ -359,6 +361,7 @@ static void
+ registry_poll (void (*add)(const void*, size_t, enum random_origins),
+                enum random_origins requester)
+ {
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   static int cbPerfData = PERFORMANCE_BUFFER_SIZE;
+   int iterations;
+   DWORD dwSize, status;
+@@ -478,6 +481,7 @@ registry_poll (void (*add)(const void*, size_t, enum random_origins),
+      isn't done then any system components which provide performance data
+      can't be removed or changed while the handle remains active.  */
+   RegCloseKey (HKEY_PERFORMANCE_DATA);
++#endif /* WINAPI_PARTITION_DESKTOP */
+ }
+ 
+ 
+@@ -496,6 +500,7 @@ slow_gatherer ( void (*add)(const void*, size_t, enum random_origins),
+ 
+   if ( !is_initialized )
+     {
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+       HKEY hKey;
+ 
+       if ( debug_me )
+@@ -565,6 +570,10 @@ slow_gatherer ( void (*add)(const void*, size_t, enum random_origins),
+           if (!pNtQuerySystemInformation || !pNtQueryInformationProcess)
+             hNTAPI = NULL;
+         }
++#else /* !WINAPI_PARTITION_DESKTOP */
++      hNetAPI32 = NULL;
++      hNTAPI = NULL;
++#endif /* !WINAPI_PARTITION_DESKTOP */
+ 
+ 
+       is_initialized = 1;
+@@ -594,6 +603,7 @@ slow_gatherer ( void (*add)(const void*, size_t, enum random_origins),
+       }
+   }
+ 
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   /* Get disk I/O statistics for all the hard drives.  100 is an
+      arbitrary failsafe limit.  */
+   for (drive_no = 0; drive_no < 100 ; drive_no++)
+@@ -628,6 +638,7 @@ slow_gatherer ( void (*add)(const void*, size_t, enum random_origins),
+         }
+       CloseHandle (hDevice);
+     }
++#endif /* WINAPI_PARTITION_DESKTOP */
+ 
+   /* In theory we should be using the Win32 performance query API to obtain
+      unpredictable data from the system, however this is so unreliable (see
+@@ -786,12 +797,16 @@ _gcry_rndw32_gather_random (void (*add)(const void*, size_t,
+ 
+   if (!is_initialized)
+     {
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+       OSVERSIONINFO osvi = { sizeof( osvi ) };
+ 
+       GetVersionEx( &osvi );
+       if (osvi.dwPlatformId != VER_PLATFORM_WIN32_NT)
+         log_fatal ("can only run on a Windows NT platform\n" );
+       system_is_w2000 = (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0);
++#else /* !WINAPI_PARTITION_DESKTOP */
++      system_is_w2000 = 0;
++#endif /* !WINAPI_PARTITION_DESKTOP */
+       init_system_rng ();
+       is_initialized = 1;
+     }
+@@ -842,14 +857,11 @@ _gcry_rndw32_gather_random_fast (void (*add)(const void*, size_t,
+                         ADDINT((SIZE_T)aptr);                      \
+                       } while (0)
+ 
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+     ADDPTR ( GetActiveWindow ());
+     ADDPTR ( GetCapture ());
+     ADDPTR ( GetClipboardOwner ());
+     ADDPTR ( GetClipboardViewer ());
+-    ADDPTR ( GetCurrentProcess ());
+-    ADDINT ( GetCurrentProcessId ());
+-    ADDPTR ( GetCurrentThread ());
+-    ADDINT ( GetCurrentThreadId ());
+     ADDPTR ( GetDesktopWindow ());
+     ADDPTR ( GetFocus ());
+     ADDINT ( GetInputState ());
+@@ -858,6 +870,11 @@ _gcry_rndw32_gather_random_fast (void (*add)(const void*, size_t,
+     ADDPTR ( GetOpenClipboardWindow ());
+     ADDPTR ( GetProcessHeap ());
+     ADDPTR ( GetProcessWindowStation ());
++#endif /* WINAPI_PARTITION_DESKTOP */
++    ADDPTR ( GetCurrentProcess ());
++    ADDINT ( GetCurrentProcessId ());
++    ADDPTR ( GetCurrentThread ());
++    ADDINT ( GetCurrentThreadId ());
+     /* Following function in some cases stops returning events, and cannot
+        be used as an entropy source.  */
+     /*ADDINT ( GetQueueStatus (QS_ALLEVENTS));*/
+@@ -871,6 +888,7 @@ _gcry_rndw32_gather_random_fast (void (*add)(const void*, size_t,
+ 
+   /* Get multiword system information: Current caret position, current
+      mouse cursor position.  */
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   {
+     POINT point;
+ 
+@@ -922,10 +940,12 @@ _gcry_rndw32_gather_random_fast (void (*add)(const void*, size_t,
+     (*add) ( &minimumWorkingSetSize, sizeof (int), origin );
+     (*add) ( &maximumWorkingSetSize, sizeof (int), origin );
+   }
++#endif /* WINAPI_PARTITION_DESKTOP */
+ 
+ 
+   /* The following are fixed for the lifetime of the process so we only
+    * add them once */
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+   if (!addedFixedItems)
+     {
+       STARTUPINFO startupInfo;
+@@ -938,6 +958,7 @@ _gcry_rndw32_gather_random_fast (void (*add)(const void*, size_t,
+       (*add) ( &startupInfo, sizeof (STARTUPINFO), origin );
+       addedFixedItems = 1;
+     }
++#endif /* WINAPI_PARTITION_DESKTOP */
+ 
+   /* The performance of QPC varies depending on the architecture it's
+      running on and on the OS, the MS documentation is vague about the
+-- 
+2.26.0.windows.1
+

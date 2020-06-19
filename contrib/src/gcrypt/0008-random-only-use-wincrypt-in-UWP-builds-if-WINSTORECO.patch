@@ -1,0 +1,75 @@
+From 1b09aa078628e93c0f95f0d5e20e708f81068bf5 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 19 Jun 2020 10:37:50 +0200
+Subject: [PATCH 8/9] random: only use wincrypt in UWP builds if WINSTORECOMPAT
+ is set
+
+This is a compatibility library to use older APIs that are forbidden in UWP apps.
+
+bcrypt is supposed to be used instead of wincrypt but is only available since
+Vista.
+---
+ random/rndw32.c | 17 +++++++++++++++++
+ src/Makefile.am |  4 +++-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/random/rndw32.c b/random/rndw32.c
+index 45d1e7e7..8b0a38fa 100644
+--- a/random/rndw32.c
++++ b/random/rndw32.c
+@@ -98,6 +98,9 @@
+ 
+ /* We don't include wincrypt.h so define it here.  */
+ #define HCRYPTPROV  HANDLE
++#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && defined(WINSTORECOMPAT)
++#include <wincrypt.h>
++#endif
+ 
+ 
+ /* When we query the performance counters, we allocate an initial buffer and
+@@ -259,6 +262,7 @@ init_system_rng (void)
+   system_rng_available = 0;
+   hRNGProv = NULL;
+ 
++#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+   hAdvAPI32 = GetModuleHandle ("AdvAPI32.dll");
+   if (!hAdvAPI32)
+     return;
+@@ -274,6 +278,19 @@ init_system_rng (void)
+      This isn't exported by name, so we have to get it by ordinal.  */
+   pRtlGenRandom = (RTLGENRANDOM)
+     GetProcAddress (hAdvAPI32, "SystemFunction036");
++#elif defined(WINSTORECOMPAT)
++  hAdvAPI32 = NULL;
++  pCryptAcquireContext = CryptAcquireContextA;
++  pCryptGenRandom = CryptGenRandom;
++  pCryptReleaseContext = CryptReleaseContext;
++  pRtlGenRandom = NULL;
++#else /* !WINAPI_PARTITION_DESKTOP && !WINSTORECOMPAT */
++  hAdvAPI32 = NULL;
++  pCryptAcquireContext = NULL;
++  pCryptGenRandom = NULL;
++  pCryptReleaseContext = NULL;
++  pRtlGenRandom = NULL;
++#endif /* WINSTORECOMPAT */
+ 
+   /* Try and connect to the PIII RNG CSP.  The AMD 768 southbridge (from
+      the 760 MP chipset) also has a hardware RNG, but there doesn't appear
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 3cc4a552..a22acd41 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -123,7 +123,9 @@ libgcrypt_la_LIBADD = $(gcrypt_res) \
+ 	../random/librandom.la \
+ 	../mpi/libmpi.la \
+ 	../compat/libcompat.la  $(GPG_ERROR_LIBS)
+-
++if HAVE_W32_SYSTEM
++libgcrypt_la_LIBADD += -lbcrypt
++endif
+ 
+ dumpsexp_SOURCES = dumpsexp.c
+ dumpsexp_CFLAGS = $(arch_gpg_error_cflags)
+-- 
+2.26.0.windows.1
+
