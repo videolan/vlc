@@ -1006,28 +1006,24 @@ static void FillDefaultStyles( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
+#ifdef HAVE_GET_FONT_BY_FAMILY_NAME
     p_sys->p_default_style->psz_fontname = var_InheritString( p_filter, "freetype-font" );
+#endif
     /* Set default psz_fontname */
     if( !p_sys->p_default_style->psz_fontname || !*p_sys->p_default_style->psz_fontname )
     {
         free( p_sys->p_default_style->psz_fontname );
-#ifdef HAVE_GET_FONT_BY_FAMILY_NAME
         p_sys->p_default_style->psz_fontname = strdup( DEFAULT_FAMILY );
-#else
-        p_sys->p_default_style->psz_fontname = File_Select( DEFAULT_FONT_FILE );
-#endif
     }
 
+#ifdef HAVE_GET_FONT_BY_FAMILY_NAME
     p_sys->p_default_style->psz_monofontname = var_InheritString( p_filter, "freetype-monofont" );
+#endif
     /* set default psz_monofontname */
     if( !p_sys->p_default_style->psz_monofontname || !*p_sys->p_default_style->psz_monofontname )
     {
         free( p_sys->p_default_style->psz_monofontname );
-#ifdef HAVE_GET_FONT_BY_FAMILY_NAME
         p_sys->p_default_style->psz_monofontname = strdup( DEFAULT_MONOSPACE_FAMILY );
-#else
-        p_sys->p_default_style->psz_monofontname = File_Select( DEFAULT_MONOSPACE_FONT_FILE );
-#endif
     }
 
     UpdateDefaultLiveStyles( p_filter );
@@ -1235,7 +1231,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     /*
      * Update the default face to reflect changes in video size or text scaling
      */
-    p_sys->p_face = SelectAndLoadFace( p_filter, p_sys->p_default_style, 0 );
+    p_sys->p_face = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
     if( !p_sys->p_face )
     {
         msg_Err( p_filter, "Render(): Error loading default face" );
@@ -1465,6 +1461,11 @@ static int Create( vlc_object_t *p_this )
     if(unlikely(!p_sys->p_forced_style))
         goto error;
 
+#ifndef HAVE_GET_FONT_BY_FAMILY_NAME
+    p_sys->psz_fontfile = var_InheritString( p_filter, "freetype-font" );
+    p_sys->psz_monofontfile = var_InheritString( p_filter, "freetype-monofont" );
+#endif
+
     /* fills default and forced style */
     FillDefaultStyles( p_filter );
 
@@ -1485,14 +1486,12 @@ static int Create( vlc_object_t *p_this )
         goto error;
 
 #ifdef HAVE_FONTCONFIG
-    p_sys->pf_select = Generic_Select;
     p_sys->pf_get_family = FontConfig_GetFamily;
     p_sys->pf_get_fallbacks = FontConfig_GetFallbacks;
     if( FontConfig_Prepare( p_filter ) )
         goto error;
 
 #elif defined( __APPLE__ )
-    p_sys->pf_select = Generic_Select;
     p_sys->pf_get_family = CoreText_GetFamily;
     p_sys->pf_get_fallbacks = CoreText_GetFallbacks;
 #elif defined( _WIN32 )
@@ -1500,7 +1499,6 @@ static int Create( vlc_object_t *p_this )
     {
         p_sys->pf_get_family = DWrite_GetFamily;
         p_sys->pf_get_fallbacks = DWrite_GetFallbacks;
-        p_sys->pf_select = Generic_Select;
     }
     else
     {
@@ -1513,7 +1511,6 @@ static int Create( vlc_object_t *p_this )
             { "Tahoma", "FangSong", "SimHei", "KaiTi" };
         p_sys->pf_get_family = Win32_GetFamily;
         p_sys->pf_get_fallbacks = Win32_GetFallbacks;
-        p_sys->pf_select = Generic_Select;
         InitDefaultList( p_filter, ppsz_win32_default,
                          sizeof( ppsz_win32_default ) / sizeof( *ppsz_win32_default ) );
 #endif
@@ -1521,18 +1518,24 @@ static int Create( vlc_object_t *p_this )
 #elif defined( __ANDROID__ )
     p_sys->pf_get_family = Android_GetFamily;
     p_sys->pf_get_fallbacks = Android_GetFallbacks;
-    p_sys->pf_select = Generic_Select;
 
     if( Android_Prepare( p_filter ) == VLC_ENOMEM )
         goto error;
 #else
-    p_sys->pf_select = Dummy_Select;
+    p_sys->pf_get_family = StaticMap_GetFamily;
+    p_sys->pf_get_fallbacks = NULL;
+    /* The default static fonts are also fallback fonts */
+    const char *const ppsz_default[] =
+        { DEFAULT_FAMILY, DEFAULT_MONOSPACE_FAMILY };
+    InitDefaultList( p_filter, ppsz_default,
+                     sizeof( ppsz_default ) / sizeof( *ppsz_default ) );
 #endif
 
-    p_sys->p_face = SelectAndLoadFace( p_filter, p_sys->p_default_style, 0 );
+    p_sys->p_face = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
     if( !p_sys->p_face )
     {
-        msg_Err( p_filter, "Error loading default face" );
+        msg_Err( p_filter, "Error loading default face %s",
+                 p_sys->p_default_style->psz_fontname );
 #ifdef HAVE_FONTCONFIG
         FontConfig_Unprepare();
 #endif
@@ -1572,6 +1575,9 @@ static void Destroy( vlc_object_t *p_this )
     msg_Dbg( p_filter, "-------------------" );
     DumpDictionary( p_filter, &p_sys->fallback_map, true, -1 );
 #endif
+
+    free( p_sys->psz_fontfile );
+    free( p_sys->psz_monofontfile );
 
     /* Text styles */
     text_style_Delete( p_sys->p_default_style );

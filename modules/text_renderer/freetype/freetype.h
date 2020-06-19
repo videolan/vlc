@@ -81,6 +81,9 @@ typedef struct
     text_style_t  *p_default_style;
     text_style_t  *p_forced_style;  /* Renderer overridings */
 
+    char *psz_fontfile;
+    char *psz_monofontfile;
+
     /* More styles... */
     float          f_shadow_vector_x;
     float          f_shadow_vector_y;
@@ -114,13 +117,6 @@ typedef struct
 
     /* Current scaling of the text, default is 100 (%) */
     int               i_scale;
-
-    /**
-     * Select a font, based on the family, the styles and the codepoint
-     */
-    char * (*pf_select) (filter_t *, const char* family,
-                         bool bold, bool italic,
-                         int *index, uni_char_t codepoint);
 
     /**
      * Get a pointer to the vlc_family_t in the master list that matches \p psz_family.

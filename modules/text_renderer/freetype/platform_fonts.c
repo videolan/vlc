@@ -471,61 +471,29 @@ int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style )
     return i_font_size;
 }
 
-FT_Face SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style,
-                           uni_char_t codepoint )
+static char * SelectFontWithFamilyFallback( filter_t *p_filter, const char *psz_name,
+                      const text_style_t *p_style,
+                      int *pi_idx, uni_char_t codepoint )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    const char *psz_fontname = (p_style->i_style_flags & STYLE_MONOSPACED)
-                               ? p_style->psz_monofontname : p_style->psz_fontname;
-
-    bool b_bold = p_style->i_style_flags & STYLE_BOLD;
-    bool b_italic = p_style->i_style_flags & STYLE_ITALIC;
-
-    FT_Face p_face = NULL;
-
-
-    int  i_idx = 0;
-    char *psz_fontfile = NULL;
-    if( p_sys->pf_select )
-        psz_fontfile = p_sys->pf_select( p_filter, psz_fontname, b_bold, b_italic,
-                                         &i_idx, codepoint );
-    else
-        psz_fontfile = NULL;
-
-    if( !psz_fontfile || *psz_fontfile == '\0' )
-    {
-        msg_Warn( p_filter,
-                  "SelectAndLoadFace: no font found for family: %s, codepoint: 0x%x",
-                  psz_fontname, codepoint );
-        free( psz_fontfile );
-        return NULL;
-    }
-
-    p_face = LoadFace( p_filter, psz_fontfile, i_idx, p_style );
-
-    free( psz_fontfile );
-    return p_face;
-}
-char* Generic_Select( filter_t *p_filter, const char* psz_family,
-                      bool b_bold, bool b_italic,
-                      int *i_idx, uni_char_t codepoint )
-{
-
-    filter_sys_t *p_sys = p_filter->p_sys;
+    const bool b_bold = p_style->i_style_flags & STYLE_BOLD;
+    const bool b_italic = p_style->i_style_flags & STYLE_ITALIC;
     const vlc_family_t *p_family = NULL;
-    vlc_family_t *p_fallbacks = NULL;
 
     if( codepoint )
     {
+        vlc_family_t *p_fallbacks;
         /*
          * Try regular face of the same family first.
          * It usually has the best coverage.
          */
-        const vlc_family_t *p_temp = p_sys->pf_get_family( p_filter, psz_family );
-        if( p_temp && p_temp->p_fonts &&
-            GetFace( p_filter, p_temp->p_fonts, codepoint ) )
-                p_family = p_temp;
+        p_family = p_sys->pf_get_family( p_filter, psz_name );
+        if( p_family && p_family->p_fonts &&
+            !GetFace( p_filter, p_temp->p_fonts, codepoint ) )
+        {
+            p_family = NULL;
+        }
 
         /* Try font attachments */
         if( !p_family )
@@ -537,9 +505,10 @@ char* Generic_Select( filter_t *p_filter, const char* psz_family,
         }
 
         /* Try system fallbacks */
+        if( p_sys->pf_get_fallbacks )
         if( !p_family )
         {
-            p_fallbacks = p_sys->pf_get_fallbacks( p_filter, psz_family, codepoint );
+            p_fallbacks = p_sys->pf_get_fallbacks( p_filter, psz_name, codepoint );
             if( p_fallbacks )
                 p_family = SearchFallbacks( p_filter, p_fallbacks, codepoint );
         }
@@ -557,9 +526,6 @@ char* Generic_Select( filter_t *p_filter, const char* psz_family,
             return NULL;
     }
 
-    if( !p_family )
-        p_family = p_sys->pf_get_family( p_filter, psz_family );
-
     if( !p_family || !p_family->p_fonts )
         p_family = p_sys->pf_get_family( p_filter, DEFAULT_FAMILY );
 
@@ -567,26 +533,110 @@ char* Generic_Select( filter_t *p_filter, const char* psz_family,
     if( p_family && ( p_font = GetBestFont( p_filter, p_family, b_bold,
                                             b_italic, codepoint ) ) )
     {
-        *i_idx = p_font->i_index;
+        *pi_idx = p_font->i_index;
         return strdup( p_font->psz_fontfile );
     }
 
-    return File_Select( DEFAULT_FONT_FILE );
+    return NULL;
 }
 
+FT_Face SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style,
+                           uni_char_t codepoint )
+{
+    const char *psz_family = (p_style->i_style_flags & STYLE_MONOSPACED)
+                           ? p_style->psz_monofontname : p_style->psz_fontname;
+    FT_Face p_face = NULL;
+    int  i_idx = 0;
+
+    char *psz_fontfile =
+            SelectFontWithFamilyFallback( p_filter, psz_family, p_style,
+                                          &i_idx, codepoint );
+    if( !psz_fontfile || *psz_fontfile == '\0' )
+    {
+        msg_Warn( p_filter,
+                  "SelectAndLoadFace: no font found for family: %s, codepoint: 0x%x",
+                  psz_family, codepoint );
+        goto end;
+    }
+
+    p_face = LoadFace( p_filter, psz_fontfile, i_idx, p_style );
+
+end:
+    free( psz_fontfile );
+    return p_face;
+}
+
+#ifndef HAVE_GET_FONT_BY_FAMILY_NAME
+const vlc_family_t * StaticMap_GetFamily( filter_t *p_filter,
+                                          const char *psz_family )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    char *psz_lc = ToLower( psz_family );
+
+    if( unlikely( !psz_lc ) )
+        return NULL;
+
+    vlc_family_t *p_family =
+        vlc_dictionary_value_for_key( &p_sys->family_map, psz_lc );
+    if( p_family )
+    {
+        free( psz_lc );
+        return p_family;
+    }
+
+    const char *psz_file = NULL;
+    if( !strcasecmp( psz_family, DEFAULT_FAMILY ) )
+    {
+        psz_file = p_sys->psz_fontfile ? p_sys->psz_fontfile
+                                       : DEFAULT_FONT_FILE;
+    }
+    else if( !strcasecmp( psz_family, DEFAULT_MONOSPACE_FAMILY ) )
+    {
+        psz_file = p_sys->psz_monofontfile ? p_sys->psz_monofontfile
+                                           : DEFAULT_MONOSPACE_FONT_FILE;
+    }
+
+    if( !psz_file )
+    {
+        free( psz_lc );
+        return NULL;
+    }
+
+    /* Create new entry */
+    p_family = NewFamily( p_filter, psz_lc, &p_sys->p_families,
+                          &p_sys->family_map, psz_lc );
+
+    free( psz_lc );
+
+    if( unlikely( !p_family ) )
+        return NULL;
+
+    char *psz_font_file = MakeFilePath( p_filter, psz_file );
+    if( psz_font_file )
+        NewFont( psz_font_file, 0, false, false, p_family );
+
+    return p_family;
+}
+#endif
+
 #if !defined(_WIN32) || VLC_WINSTORE_APP
-char* Dummy_Select( filter_t *p_filter, const char* psz_font,
-                    bool b_bold, bool b_italic,
-                    int *i_idx, uni_char_t codepoint )
+
+char * MakeFilePath( filter_t *p_filter, const char *psz_filename )
 {
     VLC_UNUSED(p_filter);
-    VLC_UNUSED(b_bold);
-    VLC_UNUSED(b_italic);
-    VLC_UNUSED(codepoint);
-    VLC_UNUSED(i_idx);
 
-    char *psz_fontname = strdup( psz_font );
+    if( !psz_filename )
+        return NULL;
 
-    return psz_fontname;
+    /* Handle the case where the user redefined *_FILE using FQN */
+    if( psz_filename[0] == DIR_SEP_CHAR )
+        return strdup( psz_filename );
+
+    char *psz_filepath;
+    if( asprintf( &psz_filepath, "%s" DIR_SEP "%s",
+                  SYSTEM_FONT_PATH, psz_filename ) == -1 )
+        psz_filepath = NULL;
+
+    return psz_filepath;
 }
 #endif

@@ -87,8 +87,7 @@ extern "C" {
 #endif
 
 #ifndef DEFAULT_FONT_FILE
-# define DEFAULT_FONT_FILE \
-    SYSTEM_FONT_PATH DIR_SEP SYSTEM_DEFAULT_FONT_FILE
+# define DEFAULT_FONT_FILE SYSTEM_DEFAULT_FONT_FILE
 #endif
 
 #ifndef DEFAULT_FAMILY
@@ -96,8 +95,7 @@ extern "C" {
 #endif
 
 #ifndef DEFAULT_MONOSPACE_FONT_FILE
-# define DEFAULT_MONOSPACE_FONT_FILE \
-    SYSTEM_FONT_PATH DIR_SEP SYSTEM_DEFAULT_MONOSPACE_FONT_FILE
+# define DEFAULT_MONOSPACE_FONT_FILE SYSTEM_DEFAULT_MONOSPACE_FONT_FILE
 #endif
 
 #ifndef DEFAULT_MONOSPACE_FAMILY
@@ -184,16 +182,7 @@ vlc_family_t *Android_GetFallbacks( filter_t *p_filter, const char *psz_family,
 int Android_Prepare( filter_t *p_filter );
 #endif /* __ANDROID__ */
 
-char* Dummy_Select( filter_t *p_filter, const char* family,
-                    bool b_bold, bool b_italic,
-                    int *i_idx, uni_char_t codepoint );
-
-#define File_Select(a) Dummy_Select(NULL, a, 0, 0, NULL, 0)
-
-char* Generic_Select( filter_t *p_filter, const char* family,
-                      bool b_bold, bool b_italic,
-                      int *i_idx, uni_char_t codepoint );
-
+const vlc_family_t * StaticMap_GetFamily( filter_t *p_filter, const char *psz_family );
 
 /* ******************
  * Family and fonts *
@@ -298,6 +287,8 @@ int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );
 vlc_family_t *SearchFallbacks( filter_t *p_filter, vlc_family_t *p_fallbacks,
                                       uni_char_t codepoint );
 FT_Face GetFace( filter_t *p_filter, vlc_font_t *p_font, uni_char_t codepoint );
+
+char * MakeFilePath( filter_t *p_filter, const char *psz_filename );
 
 #ifdef __cplusplus
 }
