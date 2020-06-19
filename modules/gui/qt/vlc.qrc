@@ -215,6 +215,7 @@
         <file alias="IconLabel.qml">widgets/qml/IconLabel.qml</file>
         <file alias="ListLabel.qml">widgets/qml/ListLabel.qml</file>
         <file alias="PlayCover.qml">widgets/qml/PlayCover.qml</file>
+        <file alias="MediaCover.qml">widgets/qml/MediaCover.qml</file>
     </qresource>
     <qresource prefix="/util">
         <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>
