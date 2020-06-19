@@ -253,6 +253,7 @@ debian:
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
             make prebuilt PREBUILT_URL="${VLC_PREBUILT_CONTRIBS_URL}"
         else
+            make list
             make -j$NCPU --output-sync=recurse fetch
             make -j$NCPU --output-sync=recurse
             make package
