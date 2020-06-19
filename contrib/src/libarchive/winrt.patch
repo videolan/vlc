@@ -1,27 +1,30 @@
-From 48367c03f82ab2787fc167099f98677f2693fee3 Mon Sep 17 00:00:00 2001
+From d9977d44529aa1a2d34c6d646ef6aa2c3fcac017 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 27 Mar 2020 16:25:36 +0100
-Subject: [PATCH 4/4] WIP fix compilation for Universal Windows
+Subject: [PATCH] WIP fix compilation for Universal Windows
 
 ---
- libarchive/archive_check_magic.c                 |  3 ++-
- libarchive/archive_entry.h                       |  2 +-
- libarchive/archive_read_support_filter_bzip2.c   |  4 ++++
- libarchive/archive_read_support_filter_grzip.c   |  4 ++++
- libarchive/archive_read_support_filter_lrzip.c   |  4 ++++
- libarchive/archive_read_support_filter_lz4.c     |  4 ++++
- libarchive/archive_read_support_filter_lzop.c    |  4 ++++
- libarchive/archive_read_support_filter_program.c | 14 +++++++++-----
- libarchive/archive_read_support_filter_xz.c      | 12 ++++++++++++
- libarchive/archive_read_support_filter_zstd.c    |  4 ++++
- libarchive/archive_read_support_format_mtree.c   | 10 ++++++++++
- libarchive/archive_string.c                      |  2 +-
- libarchive/archive_util.c                        |  9 ++++++++-
- libarchive/archive_windows.h                     |  6 ++++++
- 14 files changed, 73 insertions(+), 9 deletions(-)
+ libarchive/archive_check_magic.c              |  3 +-
+ libarchive/archive_entry.h                    |  2 +-
+ libarchive/archive_read_disk_windows.c        |  9 ++++++
+ .../archive_read_support_filter_bzip2.c       |  4 +++
+ .../archive_read_support_filter_grzip.c       |  4 +++
+ .../archive_read_support_filter_lrzip.c       |  4 +++
+ libarchive/archive_read_support_filter_lz4.c  |  4 +++
+ libarchive/archive_read_support_filter_lzop.c |  4 +++
+ .../archive_read_support_filter_program.c     | 14 ++++++---
+ libarchive/archive_read_support_filter_xz.c   | 12 +++++++
+ libarchive/archive_read_support_filter_zstd.c |  4 +++
+ .../archive_read_support_format_mtree.c       | 10 ++++++
+ libarchive/archive_string.c                   |  2 +-
+ libarchive/archive_util.c                     |  9 +++++-
+ libarchive/archive_windows.c                  | 31 ++++++++++++++++++-
+ libarchive/archive_windows.h                  |  6 ++++
+ libarchive/filter_fork_windows.c              |  8 +++++
+ 17 files changed, 120 insertions(+), 10 deletions(-)
 
 diff --git a/libarchive/archive_check_magic.c b/libarchive/archive_check_magic.c
-index 288ce233..d209ed0f 100644
+index 288ce233..3b3b9bc7 100644
 --- a/libarchive/archive_check_magic.c
 +++ b/libarchive/archive_check_magic.c
 @@ -43,6 +43,7 @@ __FBSDID("$FreeBSD: head/lib/libarchive/archive_check_magic.c 201089 2009-12-28
@@ -37,12 +40,12 @@ index 288ce233..d209ed0f 100644
  diediedie(void)
  {
 -#if defined(_WIN32) && !defined(__CYGWIN__) && defined(_DEBUG)
-+#if defined(_WIN32) && !defined(__CYGWIN__) && defined(_DEBUG) && !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_APP)
++#if defined(_WIN32) && !defined(__CYGWIN__) && defined(_DEBUG) && WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
  	/* Cause a breakpoint exception  */
  	DebugBreak();
  #endif
 diff --git a/libarchive/archive_entry.h b/libarchive/archive_entry.h
-index 71cc6365..34da3226 100644
+index 42af2086..cff6e55a 100644
 --- a/libarchive/archive_entry.h
 +++ b/libarchive/archive_entry.h
 @@ -303,7 +303,7 @@ __LA_DECL int archive_entry_is_encrypted(struct archive_entry *);
@@ -54,6 +57,35 @@ index 71cc6365..34da3226 100644
  __LA_DECL void archive_entry_copy_bhfi(struct archive_entry *, BY_HANDLE_FILE_INFORMATION *);
  #endif
  __LA_DECL void	archive_entry_set_birthtime(struct archive_entry *, time_t, long);
+diff --git a/libarchive/archive_read_disk_windows.c b/libarchive/archive_read_disk_windows.c
+index fdd376f9..85215326 100644
+--- a/libarchive/archive_read_disk_windows.c
++++ b/libarchive/archive_read_disk_windows.c
+@@ -715,7 +715,11 @@ start_next_async_read(struct archive_read_disk *a, struct tree *t)
+ 	if (olp->buff == NULL) {
+ 		void *p;
+ 		size_t s = (size_t)align_num_per_sector(t, READ_BUFFER_SIZE);
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+ 		p = VirtualAlloc(NULL, s, MEM_COMMIT, PAGE_READWRITE);
++#else /* !WINAPI_PARTITION_DESKTOP */
++		p = VirtualAllocFromApp(NULL, s, MEM_COMMIT, PAGE_READWRITE);
++#endif /* !WINAPI_PARTITION_DESKTOP */
+ 		if (p == NULL) {
+ 			archive_set_error(&a->archive, ENOMEM,
+ 			    "Couldn't allocate memory");
+@@ -1512,7 +1516,12 @@ setup_current_filesystem(struct archive_read_disk *a)
+ 
+ 	t->current_filesystem->synthetic = -1;/* Not supported */
+ 	path = safe_path_for_statfs(t);
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+ 	if (!GetVolumePathNameW(path, vol, sizeof(vol)/sizeof(vol[0]))) {
++#else /* !WINAPI_PARTITION_DESKTOP */
++	DWORD MaximumComponentLength, FileSystemFlags;
++	if (!GetVolumeInformationW(path, vol, sizeof(vol)/sizeof(vol[0]), NULL, &MaximumComponentLength, &FileSystemFlags, NULL, 0)) {
++#endif
+ 		free(path);
+ 		t->current_filesystem->remote = -1;
+ 		t->current_filesystem->bytesPerSector = 0;
 diff --git a/libarchive/archive_read_support_filter_bzip2.c b/libarchive/archive_read_support_filter_bzip2.c
 index 3885a7cf..d2e8b001 100644
 --- a/libarchive/archive_read_support_filter_bzip2.c
@@ -117,7 +149,7 @@ index c82a8e2f..b4100b9a 100644
 +#endif
  }
 diff --git a/libarchive/archive_read_support_filter_lz4.c b/libarchive/archive_read_support_filter_lz4.c
-index 147f5027..b6d361aa 100644
+index 43ee6c2b..5d3baf91 100644
 --- a/libarchive/archive_read_support_filter_lz4.c
 +++ b/libarchive/archive_read_support_filter_lz4.c
 @@ -204,6 +204,7 @@ lz4_reader_bid(struct archive_read_filter_bidder *self,
@@ -301,7 +333,7 @@ index c8bb36be..84859211 100644
  
  #else
 diff --git a/libarchive/archive_read_support_format_mtree.c b/libarchive/archive_read_support_format_mtree.c
-index a7331a26..92528619 100644
+index 332944ac..8c647131 100644
 --- a/libarchive/archive_read_support_format_mtree.c
 +++ b/libarchive/archive_read_support_format_mtree.c
 @@ -57,6 +57,8 @@ __FBSDID("$FreeBSD: head/lib/libarchive/archive_read_support_format_mtree.c 2011
@@ -313,7 +345,7 @@ index a7331a26..92528619 100644
  #ifndef O_BINARY
  #define	O_BINARY 0
  #endif
-@@ -2022,3 +2024,11 @@ readline(struct archive_read *a, struct mtree *mtree, char **start,
+@@ -2023,3 +2025,11 @@ readline(struct archive_read *a, struct mtree *mtree, char **start,
  		find_off = u - mtree->line.s;
  	}
  }
@@ -326,10 +358,10 @@ index a7331a26..92528619 100644
 +}
 +#endif
 diff --git a/libarchive/archive_string.c b/libarchive/archive_string.c
-index 76a16240..8edafb33 100644
+index c77dcf52..7942ff8b 100644
 --- a/libarchive/archive_string.c
 +++ b/libarchive/archive_string.c
-@@ -1312,7 +1312,7 @@ free_sconv_object(struct archive_string_conv *sc)
+@@ -1323,7 +1323,7 @@ free_sconv_object(struct archive_string_conv *sc)
  	free(sc);
  }
  
@@ -339,7 +371,7 @@ index 76a16240..8edafb33 100644
  my_atoi(const char *p)
  {
 diff --git a/libarchive/archive_util.c b/libarchive/archive_util.c
-index 38e4a839..8178aaf5 100644
+index 659665a8..d526497f 100644
 --- a/libarchive/archive_util.c
 +++ b/libarchive/archive_util.c
 @@ -209,7 +209,7 @@ __archive_errx(int retvalue, const char *msg)
@@ -351,8 +383,8 @@ index 38e4a839..8178aaf5 100644
  /*
   * Do not use Windows tmpfile() function.
   * It will make a temporary file under the root directory
-@@ -361,6 +361,13 @@ exit_tmpfile:
- 	archive_wstring_free(&temp_name);
+@@ -378,6 +378,13 @@ exit_tmpfile:
+ 		archive_wstring_free(&temp_name);
  	return (fd);
  }
 +#else
@@ -363,10 +395,73 @@ index 38e4a839..8178aaf5 100644
 +}
 +#endif
  
- #else
+ int
+ __archive_mktemp(const char *tmpdir)
+diff --git a/libarchive/archive_windows.c b/libarchive/archive_windows.c
+index 624e2700..828a8543 100644
+--- a/libarchive/archive_windows.c
++++ b/libarchive/archive_windows.c
+@@ -235,6 +235,7 @@ la_CreateFile(const char *path, DWORD dwDesiredAccess, DWORD dwShareMode,
+ 	wchar_t *wpath;
+ 	HANDLE handle;
  
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+ 	handle = CreateFileA(path, dwDesiredAccess, dwShareMode,
+ 	    lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes,
+ 	    hTemplateFile);
+@@ -249,6 +250,20 @@ la_CreateFile(const char *path, DWORD dwDesiredAccess, DWORD dwShareMode,
+ 	    lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes,
+ 	    hTemplateFile);
+ 	free(wpath);
++#else /* !WINAPI_PARTITION_DESKTOP */
++	wpath = __la_win_permissive_name(path);
++	if (wpath == NULL)
++		return (handle);
++	CREATEFILE2_EXTENDED_PARAMETERS createExParams;
++	createExParams.dwSize = sizeof(CREATEFILE2_EXTENDED_PARAMETERS);
++	createExParams.dwFileAttributes = dwFlagsAndAttributes & 0xFFFF;
++	createExParams.dwFileFlags = dwFlagsAndAttributes & 0xFFF00000;
++	createExParams.dwSecurityQosFlags = dwFlagsAndAttributes & 0x000F00000;
++	createExParams.lpSecurityAttributes = lpSecurityAttributes;
++	createExParams.hTemplateFile = hTemplateFile;
++	handle = CreateFile2(wpath, dwDesiredAccess, dwShareMode, dwCreationDisposition, &createExParams);
++	free(wpath);
++#endif /* !WINAPI_PARTITION_DESKTOP */
+ 	return (handle);
+ }
+ 
+@@ -320,7 +335,7 @@ __la_open(const char *path, int flags, ...)
+ 		}
+ 		if (attr & FILE_ATTRIBUTE_DIRECTORY) {
+ 			HANDLE handle;
+-
++#if WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
+ 			if (ws != NULL)
+ 				handle = CreateFileW(ws, 0, 0, NULL,
+ 				    OPEN_EXISTING,
+@@ -333,6 +348,20 @@ __la_open(const char *path, int flags, ...)
+ 				    FILE_FLAG_BACKUP_SEMANTICS |
+ 				    FILE_ATTRIBUTE_READONLY,
+ 					NULL);
++#else /* !WINAPI_PARTITION_DESKTOP */
++			if (ws != NULL) {
++			    CREATEFILE2_EXTENDED_PARAMETERS createExParams;
++			    createExParams.dwSize = sizeof(CREATEFILE2_EXTENDED_PARAMETERS);
++			    createExParams.dwFileAttributes = FILE_ATTRIBUTE_READONLY;
++			    createExParams.dwFileFlags = FILE_FLAG_BACKUP_SEMANTICS;
++			    createExParams.dwSecurityQosFlags = 0;
++			    createExParams.lpSecurityAttributes = NULL;
++			    createExParams.hTemplateFile = NULL;
++			    handle = CreateFile2(ws, 0, 0, OPEN_EXISTING, &createExParams);
++			}
++			else
++			    handle = INVALID_HANDLE_VALUE;
++#endif /* !WINAPI_PARTITION_DESKTOP */
+ 			free(ws);
+ 			if (handle == INVALID_HANDLE_VALUE) {
+ 				la_dosmaperr(GetLastError());
 diff --git a/libarchive/archive_windows.h b/libarchive/archive_windows.h
-index 87d8c891..eb79930e 100644
+index 47b7cb8e..9743f310 100644
 --- a/libarchive/archive_windows.h
 +++ b/libarchive/archive_windows.h
 @@ -106,9 +106,11 @@
@@ -403,6 +498,32 @@ index 87d8c891..eb79930e 100644
  /* for status returned by la_waitpid */
  #define WIFEXITED(sts)		((sts & 0x100) == 0)
  #define WEXITSTATUS(sts)	(sts & 0x0FF)
+diff --git a/libarchive/filter_fork_windows.c b/libarchive/filter_fork_windows.c
+index ad271fe6..0414d6f4 100644
+--- a/libarchive/filter_fork_windows.c
++++ b/libarchive/filter_fork_windows.c
+@@ -31,6 +31,13 @@
+ 
+ #include "filter_fork.h"
+ 
++#if !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP)
++pid_t
++__archive_create_child(const char *cmd, int *child_stdin, int *child_stdout)
++{
++	return (-1);
++}
++#else /* WINAPI_PARTITION_DESKTOP */
+ pid_t
+ __archive_create_child(const char *cmd, int *child_stdin, int *child_stdout)
+ {
+@@ -178,6 +185,7 @@ fail:
+ 	__archive_cmdline_free(acmd);
+ 	return (-1);
+ }
++#endif /* WINAPI_PARTITION_DESKTOP */
+ 
+ void
+ __archive_check_child(int in, int out)
 -- 
 2.26.0.windows.1
 
