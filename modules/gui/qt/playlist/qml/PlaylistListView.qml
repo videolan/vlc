@@ -116,6 +116,23 @@ Widgets.NavigableFocusScope {
     ColumnLayout {
         anchors.fill: parent
 
+    Row {
+        width: root.width
+        leftPadding: VLCStyle.margin_normal
+        topPadding: VLCStyle.margin_normal
+        bottomPadding: VLCStyle.margin_large
+
+        ColumnLayout {
+            Widgets.SubtitleLabel {
+                text: i18n.qtr("Playqueue")
+            }
+
+            Widgets.CaptionLabel {
+                anchors.topMargin: VLCStyle.margin_small
+                text: i18n.qtr("%1 elements, %2 min").arg(root.plmodel.count).arg(plmodel.duration.toMinutes())
+            }
+        }
+    }
 
     Widgets.KeyNavigableListView {
         id: view
