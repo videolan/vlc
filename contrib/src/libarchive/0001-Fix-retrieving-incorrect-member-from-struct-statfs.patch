@@ -1,0 +1,26 @@
+From 9b9e4ff23fa528d831f22d62d072db990b862a62 Mon Sep 17 00:00:00 2001
+From: Martin Matuska <martin@matuska.org>
+Date: Thu, 30 Apr 2020 03:46:05 +0200
+Subject: [PATCH] Fix retrieving incorrect member from struct statfs
+
+Fixes #1355
+---
+ libarchive/archive_read_disk_posix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libarchive/archive_read_disk_posix.c b/libarchive/archive_read_disk_posix.c
+index 52fec7bb..95a8087a 100644
+--- a/libarchive/archive_read_disk_posix.c
++++ b/libarchive/archive_read_disk_posix.c
+@@ -1840,7 +1840,7 @@ setup_current_filesystem(struct archive_read_disk *a)
+ #if defined(HAVE_STATVFS)
+ 	if (svfs.f_flag & ST_NOATIME)
+ #else
+-	if (sfs.f_flag & ST_NOATIME)
++	if (sfs.f_flags & ST_NOATIME)
+ #endif
+ 		t->current_filesystem->noatime = 1;
+ 	else
+-- 
+2.26.0.windows.1
+
