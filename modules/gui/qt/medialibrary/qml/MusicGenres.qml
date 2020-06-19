@@ -51,7 +51,7 @@ Widgets.NavigableFocusScope {
         if (medialib.gridView) {
             view.replace(gridComponent)
         } else {
-            view.replace(listComponent)
+            view.replace(tableComponent)
         }
     }
 
@@ -90,6 +90,27 @@ Widgets.NavigableFocusScope {
             if (genreModel.count > 0 && !selectionModel.hasSelection) {
                 root.resetFocus()
             }
+        }
+    }
+
+    Widgets.MenuExt {
+        id: contextMenu
+        property var model: ({})
+        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
+        onClosed: contextMenu.parent.forceActiveFocus()
+
+        Widgets.MenuItemExt {
+            id: playMenuItem
+            text: "Play from start"
+            onTriggered: {
+                medialib.addAndPlay( contextMenu.model.id )
+                history.push(["player"])
+            }
+        }
+
+        Widgets.MenuItemExt {
+            text: "Enqueue"
+            onTriggered: medialib.addToPlaylist( contextMenu.model.id )
         }
     }
 
@@ -164,59 +185,36 @@ Widgets.NavigableFocusScope {
     }
 
     Component {
-        id: listComponent
-        /* List View */
-        Widgets.KeyNavigableListView {
-            id: listView_id
+        id: tableComponent
+        /* Table View */
+        Widgets.KeyNavigableTableView {
+            id: tableView_id
+
+            readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
 
             model: genreModel
-
             header: headerComponent
-
+            headerColor: VLCStyle.colors.bg
             focus: true
-            spacing: VLCStyle.margin_xxxsmall
-
-            onSelectAll: selectionModel.selectAll()
-            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: _actionAtIndex(index)
-
+            onActionForSelection: _actionAtIndex(index)
             navigationParent: root
 
-            delegate: Widgets.ListItem {
-                id: listDelegate
+            sortModel:  [
+                { isPrimary: true, criteria: "name", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 1, 1)), text: i18n.qtr("Name"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
+                { criteria: "nb_tracks", width: VLCStyle.colWidth(1), text: i18n.qtr("Tracks") }
+            ]
 
-                width: root.width
-                height: VLCStyle.icon_normal + VLCStyle.margin_small
-                selected: selectionModel.isSelected(genreModel.index(index, 0))
-                Connections {
-                   target: selectionModel
-                   onSelectionChanged: listDelegate.selected = selectionModel.isSelected(genreModel.index(index, 0))
-                }
+            onItemDoubleClicked: {
+                root.showAlbumView(model)
+            }
 
+            onContextMenuButtonClicked: {
+                contextMenu.model = menuModel
+                contextMenu.popup(menuParent)
+            }
 
-                cover: Image {
-                    id: cover_obj
-                    fillMode: Image.PreserveAspectFit
-                    source: model.cover || VLCStyle.noArtAlbum
-                    sourceSize: Qt.size(width, height)
-                }
-
-                line1: (model.name || "Unknown genre")+" - "+model.nb_tracks+" tracks"
-
-                onItemClicked: {
-                    selectionModel.updateSelection( modifier, view.currentItem.currentIndex, index )
-                    view.currentItem.currentIndex = index
-                    this.forceActiveFocus()
-                }
-                onPlayClicked: {
-                    medialib.addAndPlay( model.id )
-                }
-                onItemDoubleClicked: {
-                    root.showAlbumView(model)
-                }
-                onAddToPlaylistClicked: {
-                    medialib.addToPlaylist( model.id );
-                }
+            Widgets.TableColumns {
+                id: tableColumns
             }
         }
     }
@@ -224,7 +222,7 @@ Widgets.NavigableFocusScope {
     Widgets.StackViewExt {
         id: view
 
-        initialItem: medialib.gridView ? gridComponent : listComponent
+        initialItem: medialib.gridView ? gridComponent : tableComponent
 
         anchors.fill: parent
         focus: genreModel.count !== 0
