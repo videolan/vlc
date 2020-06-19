@@ -107,18 +107,19 @@ Widgets.NavigableFocusScope {
                         anchors.verticalCenter: parent.verticalCenter
                         leftPadding: VLCStyle.margin_normal
 
-                        Text {
+                        Widgets.MenuLabel {
                             id: titleLabel
                             text: mainPlaylistController.currentItem.title
-                            font.pixelSize: VLCStyle.fontSize_large
-                            color: VLCStyle.colors.text
                         }
 
-                        Text {
+                        Widgets.MenuCaption {
                             id: artistLabel
                             text: mainPlaylistController.currentItem.artist
-                            font.pixelSize: VLCStyle.fontSize_normal
-                            color: VLCStyle.colors.textInactive
+                        }
+
+                        Widgets.MenuCaption {
+                            id: progressIndicator
+                            text: player.time.toString() + " / " + player.length.toString()
                         }
                     }
                 }
