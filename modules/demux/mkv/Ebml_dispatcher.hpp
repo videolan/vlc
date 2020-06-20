@@ -74,18 +74,14 @@ namespace {
         if ( element == nullptr )
             return false;
 
-        EbmlProcessorEntry eb = EbmlProcessorEntry (
-          static_cast<EbmlId const&> (*element), NULL
-        );
+        EbmlProcessorEntry eb(static_cast<EbmlId const&> (*element), NULL);
 
         // --------------------------------------------------------------
         // Find the appropriate callback for the received EbmlElement
         // --------------------------------------------------------------
 
-        ProcessorContainer::const_iterator cit_end = _processors.end();
-        ProcessorContainer::const_iterator cit     = std::lower_bound (
-            _processors.begin(), cit_end, eb
-        );
+        auto cit_end = _processors.cend();
+        auto cit     = std::lower_bound(_processors.cbegin(), cit_end, eb);
 
         /* Check that the processor is valid and unique. */
         if (cit != cit_end &&
