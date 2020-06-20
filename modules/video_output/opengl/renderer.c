@@ -356,7 +356,6 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     vt->DepthMask(GL_FALSE);
     vt->Enable(GL_CULL_FACE);
     vt->ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    vt->Clear(GL_COLOR_BUFFER_BIT);
 
     vt->GenBuffers(1, &renderer->vertex_buffer_object);
     vt->GenBuffers(1, &renderer->index_buffer_object);
