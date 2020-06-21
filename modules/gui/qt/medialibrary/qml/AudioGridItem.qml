@@ -27,7 +27,6 @@ Widgets.GridItem {
     image: model.cover || VLCStyle.noArtAlbum
     title: model.title || i18n.qtr("Unknown title")
     subtitle: model.main_artist || i18n.qtr("Unknown artist")
-    isVideo: false
     pictureWidth: VLCStyle.cover_normal
     pictureHeight: VLCStyle.cover_normal
 }

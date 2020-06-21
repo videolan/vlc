@@ -26,13 +26,11 @@ Widgets.GridItem {
     property var model: ({})
     image: model.thumbnail || VLCStyle.noArtCover
     title: model.title || i18n.qtr("Unknown title")
-    infoLeft: model.duration || ""
+    subtitle: model.duration || ""
     labels: [
         model.resolution_name || "",
         model.channel || ""
     ].filter(function(a) { return a !== "" } )
-    isVideo: true
-    isNew: model.playcount < 1
     progress: model.progress > 0 ? model.progress : 0
     pictureWidth: VLCStyle.video_normal_width
     pictureHeight: VLCStyle.video_normal_height

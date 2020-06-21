@@ -33,13 +33,10 @@ Item {
     property string subtitle: ""
     property bool selected: false
 
-    property string infoLeft: ""
-    property bool isVideo: false
-    property bool isNew: false
     property double progress: 0
     property var labels: []
-    property real pictureWidth: isVideo ? VLCStyle.video_normal_width : VLCStyle.cover_small
-    property real pictureHeight: isVideo ? VLCStyle.video_normal_height : VLCStyle.cover_small
+    property real pictureWidth: VLCStyle.colWidth(1)
+    property real pictureHeight: ( pictureWidth * 10 ) / 16
 
     //space use for zoom
     readonly property real outterMargin: VLCStyle.margin_xxsmall
@@ -171,7 +168,7 @@ Item {
 
                     VideoProgressBar {
                         value: root.progress
-                        visible: isVideo && root.progress > 0
+                        visible: root.progress > 0
                         anchors {
                             bottom: parent.bottom
                             left: parent.left
@@ -209,30 +206,6 @@ Item {
                     font.pixelSize: VLCStyle.fontSize_small
                     color: VLCStyle.colors.textInactive
 
-                }
-
-                RowLayout {
-                    visible: isVideo
-
-                    Layout.preferredHeight: implicitHeight
-                    Layout.fillWidth: true
-                    Layout.maximumWidth: _picWidth
-
-                    Text {
-                        Layout.alignment: Qt.AlignLeft
-                        Layout.fillWidth: true
-                        font.pixelSize: VLCStyle.fontSize_small
-                        color: VLCStyle.colors.textInactive
-                        text: infoLeft
-                    }
-                    Text {
-                        visible: root.isNew
-                        Layout.alignment: Qt.AlignRight
-                        font.pixelSize: VLCStyle.fontSize_small
-                        color: root.activeFocus ? VLCStyle.colors.text : VLCStyle.colors.accent
-                        text: "NEW"
-                        font.bold: true
-                    }
                 }
 
                 Item {
