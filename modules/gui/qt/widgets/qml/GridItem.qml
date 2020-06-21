@@ -28,20 +28,17 @@ import "qrc:///style/"
 Item {
     id: root
 
-    property url image
+    property alias image: picture.source
     property alias title: titleLabel.text
-    property string subtitle: ""
+    property alias subtitle: subtitleTxt.text
+    property alias playCoverBorder: picture.playCoverBorder
     property bool selected: false
 
-    property double progress: 0
-    property var labels: []
+    property alias progress: picture.progress
+    property alias labels: picture.labels
     property real pictureWidth: VLCStyle.colWidth(1)
-    property real pictureHeight: ( pictureWidth * 10 ) / 16
-
-    //space use for zoom
-    readonly property real outterMargin: VLCStyle.margin_xxsmall
-    //margin wihtin the tile
-    readonly property real innerMargin: VLCStyle.margin_xxsmall
+    property real pictureHeight: pictureWidth
+    property int titleMargin: VLCStyle.margin_xsmall
 
     signal playClicked
     signal addToPlaylistClicked
@@ -57,18 +54,17 @@ Item {
     implicitWidth: mouseArea.implicitWidth
     implicitHeight: mouseArea.implicitHeight
 
-    property bool _zoomed: mouseArea.containsMouse || root.activeFocus
-    property real _picWidth: pictureWidth + (_zoomed ? 2*outterMargin : 0)
-    property real _picHeight: pictureHeight + (_zoomed ? 2*outterMargin : 0)
+    readonly property bool _highlighted: mouseArea.containsMouse || content.activeFocus
 
+    readonly property int _selectedBorderWidth: VLCStyle.column_margin_width - ( VLCStyle.margin_small * 2 )
 
     MouseArea {
         id: mouseArea
         hoverEnabled: true
 
         anchors.fill: parent
-        implicitWidth: zoomArea.implicitWidth + (_zoomed ? 0 : 2*outterMargin)
-        implicitHeight: zoomArea.implicitHeight + (_zoomed ? 0 : 2*outterMargin)
+        implicitWidth: content.implicitWidth
+        implicitHeight: content.implicitHeight
 
         acceptedButtons: Qt.RightButton | Qt.LeftButton
         Keys.onMenuPressed: root.contextMenuButtonClicked(picture)
@@ -86,102 +82,47 @@ Item {
                 root.itemDoubleClicked(picture,mouse.buttons, mouse.modifiers)
         }
 
-        FocusBackground {
-            id: zoomArea
+        FocusScope {
+            id: content
 
             anchors.fill: parent
-            anchors.margins: outterMargin
+            implicitWidth: layout.implicitWidth
+            implicitHeight: layout.implicitHeight
+            focus: root.activeFocus
 
-            implicitWidth: layout.implicitWidth + 2*innerMargin
-            implicitHeight: layout.implicitHeight + 2*innerMargin
-
-            active: root.activeFocus
-            selected: root.selected || mouseArea.containsMouse
-
-            states: [
-                State {
-                    name: "visiblebig"
-                    PropertyChanges {
-                        target: zoomArea
-                        anchors.margins: 0
-                    }
-                    when: _zoomed
-                },
-                State {
-                    name: "hiddensmall"
-                    PropertyChanges {
-                        target: zoomArea
-                        anchors.margins: VLCStyle.margin_xxsmall
-                    }
-                    when: !_zoomed
-                }
-            ]
-
-            Behavior on anchors.margins {
-                SmoothedAnimation {
-                    duration: 100
-                }
+            /* background visible when selected */
+            Rectangle {
+                x: - root._selectedBorderWidth
+                y: - root._selectedBorderWidth
+                width: layout.implicitWidth + ( root._selectedBorderWidth * 2 )
+                height:  layout.implicitHeight + ( root._selectedBorderWidth * 2 )
+                color: VLCStyle.colors.bgAlt
+                visible: root.selected || root._highlighted
             }
 
             ColumnLayout {
                 id: layout
-                anchors.fill: parent
-                anchors.margins: innerMargin
 
+                anchors.fill: parent
                 spacing: 0
 
-                Widgets.RoundImage {
+                Widgets.MediaCover {
                     id: picture
-                    width: _picWidth
-                    height: _picHeight
-                    Layout.preferredWidth: _picWidth
-                    Layout.preferredHeight: _picHeight
-                    Layout.alignment: Qt.AlignHCenter
 
-                    source: image
+                    width: pictureWidth
+                    height: pictureHeight
+                    playCoverVisible: root._highlighted
+                    onPlayIconClicked: root.playClicked()
 
-                    RowLayout {
-                        anchors {
-                            top: parent.top
-                            left: parent.left
-                            right: parent.right
-                            topMargin: VLCStyle.margin_xxsmall
-                            leftMargin: VLCStyle.margin_xxsmall
-                            rightMargin: VLCStyle.margin_xxsmall
-                        }
-
-                        spacing: VLCStyle.margin_xxsmall
-
-                        Repeater {
-                            model: labels
-                            VideoQualityLabel {
-                                Layout.preferredWidth: implicitWidth
-                                Layout.preferredHeight: implicitHeight
-                                text: modelData
-                            }
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
-                        }
-                    }
-
-                    VideoProgressBar {
-                        value: root.progress
-                        visible: root.progress > 0
-                        anchors {
-                            bottom: parent.bottom
-                            left: parent.left
-                            right: parent.right
-                        }
-                    }
+                    Layout.preferredWidth: pictureWidth
+                    Layout.preferredHeight: pictureHeight
                 }
 
                 Widgets.ScrollingText {
                     id: titleTextRect
 
                     label: titleLabel
-                    scroll: _zoomed
+                    scroll: _highlighted
 
                     Layout.preferredHeight: titleLabel.contentHeight
                     Layout.topMargin: VLCStyle.margin_xxsmall
@@ -196,21 +137,15 @@ Item {
                     }
                 }
 
-                Text {
+                Widgets.MenuCaption {
                     id: subtitleTxt
 
-                    Layout.preferredHeight: implicitHeight
-                    Layout.maximumWidth: _picWidth
-                    Layout.fillWidth: true
-
                     visible: text !== ""
-
                     text: root.subtitle
-                    font.weight: Font.Light
-                    elide: Text.ElideRight
-                    font.pixelSize: VLCStyle.fontSize_small
-                    color: VLCStyle.colors.textInactive
 
+                    Layout.preferredHeight: implicitHeight
+                    Layout.maximumWidth: pictureWidth
+                    Layout.fillWidth: true
                 }
 
                 Item {
