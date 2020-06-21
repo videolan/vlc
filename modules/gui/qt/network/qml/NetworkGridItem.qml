@@ -31,8 +31,8 @@ Widgets.GridItem {
     width: VLCStyle.gridItem_network_width
     height: VLCStyle.gridItem_network_height
 
-    pictureWidth: VLCStyle.network_normal
-    pictureHeight: VLCStyle.network_normal
+    pictureWidth: VLCStyle.gridCover_network_width
+    pictureHeight: VLCStyle.gridCover_network_height
 
     image: {
         if (model.artwork && model.artwork.toString() !== "") {

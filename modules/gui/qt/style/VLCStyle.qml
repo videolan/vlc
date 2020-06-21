@@ -114,12 +114,6 @@ Item {
     property int scrollbarHeight: dp(100, scale);
 
     property int selectedBorder: 2
-    property real video_normal_height: dp(90, scale);
-    property real video_large_height:  dp(120, scale);
-    property real video_small_height:  dp(70, scale);
-    property real video_normal_width: video_normal_height * (16/10);
-    property real video_large_width: video_large_height * (16/10);
-    property real video_small_width: video_small_height * (16/10);
 
     property real network_normal: dp(100, scale)
 
@@ -144,15 +138,27 @@ Item {
     property int table_section_width: dp(32, scale)
     property int table_section_text_margin: dp(10, scale)
 
+    property int gridCover_network_width: colWidth(1)
+    property int gridCover_network_height: gridCover_network_width
+    property int gridCover_network_border: dp(2, scale)
+
+    property int gridCover_music_width: colWidth(1)
+    property int gridCover_music_height: gridCover_music_width
+    property int gridCover_music_border: dp(2, scale)
+
+    property int gridCover_video_width: colWidth(2)
+    property int gridCover_video_height: ( gridCover_video_width * 10.0 ) / 16
+    property int gridCover_video_border: dp(3, scale)
+
     //GridItem
-    property int gridItem_network_height: VLCStyle.network_normal + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small + VLCStyle.margin_xxsmall * 4
-    property int gridItem_network_width: VLCStyle.network_normal + VLCStyle.margin_xxsmall * 4
+    property int gridItem_network_width: VLCStyle.gridCover_network_width
+    property int gridItem_network_height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small
 
-    property int gridItem_music_height: VLCStyle.cover_normal + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small + VLCStyle.margin_xxsmall * 4
-    property int gridItem_music_width: VLCStyle.cover_normal + VLCStyle.margin_xxsmall * 4
+    property int gridItem_music_width: VLCStyle.gridCover_music_width
+    property int gridItem_music_height: VLCStyle.gridCover_music_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small
 
-    property int gridItem_video_height: VLCStyle.video_normal_height + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small  + VLCStyle.margin_xxsmall * 4
-    property int gridItem_video_width: VLCStyle.video_normal_width + VLCStyle.margin_xxsmall * 4
+    property int gridItem_video_width: VLCStyle.gridCover_video_width
+    property int gridItem_video_height: VLCStyle.gridCover_video_height + VLCStyle.margin_xxsmall + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small
 
     property int column_width: dp(114, scale)
     property int column_margin_width: dp(32, scale)
