@@ -30,6 +30,7 @@ Widgets.RoundImage {
     property alias progress: progressBar.value
     property alias playCoverVisible: playCover.visible
     property alias playIconSize: playCover.iconSize
+    property alias playCoverBorder: playCover.border
     signal playIconClicked
 
     height: VLCStyle.listAlbumCover_height
