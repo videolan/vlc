@@ -29,4 +29,5 @@ Widgets.GridItem {
     subtitle: model.main_artist || i18n.qtr("Unknown artist")
     pictureWidth: VLCStyle.gridCover_music_width
     pictureHeight: VLCStyle.gridCover_music_height
+    playCoverBorder.width: VLCStyle.gridCover_music_border
 }
