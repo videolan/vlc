@@ -176,7 +176,7 @@ Widgets.NavigableFocusScope {
                 plmodel: root.plmodel
                 width: root.width
 
-                leftPadding: root.leftPadding
+                leftPadding: root.leftPadding + VLCStyle.margin_normal
                 rightPadding: root.rightPadding + view.scrollBarWidth
 
                 onItemClicked : {
