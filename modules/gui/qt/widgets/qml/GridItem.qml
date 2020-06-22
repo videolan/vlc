@@ -36,6 +36,7 @@ Item {
 
     property alias progress: picture.progress
     property alias labels: picture.labels
+    property bool showNewIndicator: false
     property real pictureWidth: VLCStyle.colWidth(1)
     property real pictureHeight: pictureWidth
     property int titleMargin: VLCStyle.margin_xsmall
@@ -63,6 +64,8 @@ Item {
     property alias _secondaryShadowVerticalOffset: secondaryShadow.verticalOffset
     property alias _secondaryShadowRadius: secondaryShadow.radius
 
+    property int _newIndicatorMedian: VLCStyle.margin_xsmall
+
     states: [
         State {
             name: "unselected"
@@ -73,6 +76,7 @@ Item {
                 _primaryShadowRadius: VLCStyle.dp(14, VLCStyle.scale)
                 _secondaryShadowVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
                 _secondaryShadowRadius: VLCStyle.dp(3, VLCStyle.scale)
+                _newIndicatorMedian: VLCStyle.margin_xsmall
             }
         },
         State {
@@ -84,6 +88,7 @@ Item {
                 _primaryShadowRadius: VLCStyle.dp(72, VLCStyle.scale)
                 _secondaryShadowVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
                 _secondaryShadowRadius: VLCStyle.dp(8, VLCStyle.scale)
+                _newIndicatorMedian: VLCStyle.margin_small
             }
         }
     ]
@@ -92,7 +97,7 @@ Item {
         to: "*"
         SmoothedAnimation {
           duration: 64
-          properties: "_primaryShadowVerticalOffset,_primaryShadowRadius,_secondaryShadowVerticalOffset,_secondaryShadowRadius"
+          properties: "_primaryShadowVerticalOffset,_primaryShadowRadius,_secondaryShadowVerticalOffset,_secondaryShadowRadius,_newIndicatorMedian"
        }
     }
 
@@ -191,6 +196,22 @@ Item {
 
                     Layout.preferredWidth: pictureWidth
                     Layout.preferredHeight: pictureHeight
+
+                    /* new indicator (triangle at top-left of cover)*/
+                    Rectangle {
+                        id: newIndicator
+
+                        // consider this Rectangle as a triangle, then following property is its median length
+                        property alias median: root._newIndicatorMedian
+
+                        x: parent.width - median
+                        y: - median
+                        width: 2 * median
+                        height: 2 * median
+                        color: VLCStyle.colors.accent
+                        rotation: 45
+                        visible: root.showNewIndicator && root.progress === 0
+                    }
                 }
 
                 Widgets.ScrollingText {

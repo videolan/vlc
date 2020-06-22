@@ -36,6 +36,7 @@ Widgets.GridItem {
     pictureHeight: VLCStyle.gridCover_video_height
     playCoverBorder.width: VLCStyle.gridCover_video_border
     titleMargin: VLCStyle.margin_xxsmall
+    showNewIndicator: true
     onItemDoubleClicked: {
         if ( model.id !== undefined ) {
             medialib.addAndPlay( model.id )
