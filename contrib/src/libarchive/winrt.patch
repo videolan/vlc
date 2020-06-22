@@ -1,4 +1,4 @@
-From d9977d44529aa1a2d34c6d646ef6aa2c3fcac017 Mon Sep 17 00:00:00 2001
+From 54904e02380cd05191458f4b99bef92308ca12c7 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Fri, 27 Mar 2020 16:25:36 +0100
 Subject: [PATCH] WIP fix compilation for Universal Windows
@@ -6,6 +6,7 @@ Subject: [PATCH] WIP fix compilation for Universal Windows
 ---
  libarchive/archive_check_magic.c              |  3 +-
  libarchive/archive_entry.h                    |  2 +-
+ libarchive/archive_entry_copy_bhfi.c          |  2 +-
  libarchive/archive_read_disk_windows.c        |  9 ++++++
  .../archive_read_support_filter_bzip2.c       |  4 +++
  .../archive_read_support_filter_grzip.c       |  4 +++
@@ -21,7 +22,7 @@ Subject: [PATCH] WIP fix compilation for Universal Windows
  libarchive/archive_windows.c                  | 31 ++++++++++++++++++-
  libarchive/archive_windows.h                  |  6 ++++
  libarchive/filter_fork_windows.c              |  8 +++++
- 17 files changed, 120 insertions(+), 10 deletions(-)
+ 18 files changed, 121 insertions(+), 11 deletions(-)
 
 diff --git a/libarchive/archive_check_magic.c b/libarchive/archive_check_magic.c
 index 288ce233..3b3b9bc7 100644
@@ -57,6 +58,19 @@ index 42af2086..cff6e55a 100644
  __LA_DECL void archive_entry_copy_bhfi(struct archive_entry *, BY_HANDLE_FILE_INFORMATION *);
  #endif
  __LA_DECL void	archive_entry_set_birthtime(struct archive_entry *, time_t, long);
+diff --git a/libarchive/archive_entry_copy_bhfi.c b/libarchive/archive_entry_copy_bhfi.c
+index 77bf38e4..22f9702c 100644
+--- a/libarchive/archive_entry_copy_bhfi.c
++++ b/libarchive/archive_entry_copy_bhfi.c
+@@ -29,7 +29,7 @@ __FBSDID("$FreeBSD$");
+ #include "archive_private.h"
+ #include "archive_entry.h"
+ 
+-#if defined(_WIN32) && !defined(__CYGWIN__)
++#if defined(_WIN32) && !defined(__CYGWIN__) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+ 
+ #define EPOC_TIME ARCHIVE_LITERAL_ULL(116444736000000000)
+ 
 diff --git a/libarchive/archive_read_disk_windows.c b/libarchive/archive_read_disk_windows.c
 index fdd376f9..85215326 100644
 --- a/libarchive/archive_read_disk_windows.c
