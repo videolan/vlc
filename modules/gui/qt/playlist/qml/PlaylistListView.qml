@@ -165,59 +165,68 @@ Widgets.NavigableFocusScope {
             onMoveAtEnd: root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
         }
 
-        delegate: PLItem {
-            /*
-             * implicit variables:
-             *  - model: gives access to the values associated to PlaylistListModel roles
-             *  - index: the index of this item in the list
-             */
-            id: plitem
-            plmodel: root.plmodel
-            width: root.width
+        delegate: Column {
+            PLItem {
+                /*
+                 * implicit variables:
+                 *  - model: gives access to the values associated to PlaylistListModel roles
+                 *  - index: the index of this item in the list
+                 */
+                id: plitem
+                plmodel: root.plmodel
+                width: root.width
 
-            leftPadding: root.leftPadding
-            rightPadding: root.rightPadding + view.scrollBarWidth
+                leftPadding: root.leftPadding
+                rightPadding: root.rightPadding + view.scrollBarWidth
 
-            onItemClicked : {
-                /* to receive keys events */
-                view.forceActiveFocus()
-                if (view.mode == "move") {
-                    var selectedIndexes = root.plmodel.getSelection()
-                    if (selectedIndexes.length === 0)
-                        return
-                    var preTarget = index
-                    /* move to _above_ the clicked item if move up, but
-                     * _below_ the clicked item if move down */
-                    if (preTarget > selectedIndexes[0])
-                        preTarget++
-                    view.currentIndex = selectedIndexes[0]
-                    root.plmodel.moveItemsPre(selectedIndexes, preTarget)
-                } else if (view.mode == "select") {
-                } else {
-                    view.updateSelection(modifier, view.currentIndex, index)
-                    view.currentIndex = index
+                onItemClicked : {
+                    /* to receive keys events */
+                    view.forceActiveFocus()
+                    if (view.mode == "move") {
+                        var selectedIndexes = root.plmodel.getSelection()
+                        if (selectedIndexes.length === 0)
+                            return
+                        var preTarget = index
+                        /* move to _above_ the clicked item if move up, but
+                         * _below_ the clicked item if move down */
+                        if (preTarget > selectedIndexes[0])
+                            preTarget++
+                        view.currentIndex = selectedIndexes[0]
+                        root.plmodel.moveItemsPre(selectedIndexes, preTarget)
+                    } else if (view.mode == "select") {
+                    } else {
+                        view.updateSelection(modifier, view.currentIndex, index)
+                        view.currentIndex = index
+                    }
+                }
+                onItemDoubleClicked: mainPlaylistController.goTo(index, true)
+                color: VLCStyle.colors.getBgColor(model.selected, plitem.hovered, plitem.activeFocus)
+
+                onDragStarting: {
+                    if (!root.plmodel.isSelected(index)) {
+                        /* the dragged item is not in the selection, replace the selection */
+                        root.plmodel.setSelection([index])
+                    }
+                }
+
+                onDropedMovedAt: {
+                    if (drop.hasUrls) {
+                        //force conversion to an actual list
+                        var urlList = []
+                        for ( var url in drop.urls)
+                            urlList.push(drop.urls[url])
+                        mainPlaylistController.insert(target, urlList)
+                    } else {
+                        root.plmodel.moveItemsPre(root.plmodel.getSelection(), target)
+                    }
                 }
             }
-            onItemDoubleClicked: mainPlaylistController.goTo(index, true)
-            color: VLCStyle.colors.getBgColor(model.selected, plitem.hovered, plitem.activeFocus)
 
-            onDragStarting: {
-                if (!root.plmodel.isSelected(index)) {
-                    /* the dragged item is not in the selection, replace the selection */
-                    root.plmodel.setSelection([index])
-                }
-            }
-
-            onDropedMovedAt: {
-                if (drop.hasUrls) {
-                    //force conversion to an actual list
-                    var urlList = []
-                    for ( var url in drop.urls)
-                        urlList.push(drop.urls[url])
-                    mainPlaylistController.insert(target, urlList)
-                } else {
-                    root.plmodel.moveItemsPre(root.plmodel.getSelection(), target)
-                }
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: VLCStyle.colors.white
+                opacity: VLCStyle.colors.isThemeDark ? 0.05 : 1.0
             }
         }
 
