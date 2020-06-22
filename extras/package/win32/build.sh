@@ -320,7 +320,6 @@ fi
 mkdir -p $SHORTARCH
 cd $SHORTARCH
 
-CONFIGFLAGS=""
 if [ "$RELEASE" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --enable-debug"
 else
