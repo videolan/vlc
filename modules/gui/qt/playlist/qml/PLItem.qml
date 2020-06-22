@@ -122,16 +122,26 @@ Rectangle {
                 source:  "qrc:///toolbar/play_b.svg"
             }
 
-            Text {
-                id: textInfo
+            Column {
                 Layout.fillWidth: true
                 Layout.leftMargin: VLCStyle.margin_small
 
-                font.pixelSize: VLCStyle.fontSize_normal
-                elide: Text.ElideRight
+                Widgets.ListLabel {
+                    id: textInfo
 
-                text: model.title
-                color: VLCStyle.colors.text
+                    font.pixelSize: VLCStyle.fontSize_normal
+                    elide: Text.ElideRight
+
+                    text: model.title
+                    color: VLCStyle.colors.text
+                }
+
+                Widgets.CaptionLabel {
+                    id: textArtist
+
+                    font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
+                    text: (model.artist ? model.artist : i18n.qtr("Unknown Artist"))
+                }
             }
 
             Text {
