@@ -62,7 +62,7 @@ endif
 libmmdevice_plugin_la_SOURCES = audio_output/mmdevice.c audio_output/mmdevice.h
 libmmdevice_plugin_la_LIBADD = $(LIBCOM) $(LIBM)
 libwinstore_plugin_la_SOURCES = audio_output/winstore.c audio_output/mmdevice.h
-libwinstore_plugin_la_LIBADD = $(LIBCOM)
+libwinstore_plugin_la_LIBADD = $(LIBCOM) -lmmdevapi
 libwasapi_plugin_la_SOURCES = audio_output/wasapi.c
 libwasapi_plugin_la_LIBADD = $(LIBCOM) -lksuser
 if HAVE_WASAPI
