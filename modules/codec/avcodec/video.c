@@ -1483,16 +1483,13 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
     if (pic == NULL)
         return -1;
 
+    /* data[3] will contains the format-specific surface handle. */
     if (vlc_va_Get(va, pic, &frame->data[0]))
     {
         msg_Err(dec, "hardware acceleration picture allocation failed");
         picture_Release(pic);
         return -1;
     }
-    assert(frame->data[0] != NULL);
-    /* data[0] must be non-NULL for libavcodec internal checks.
-     * data[3] actually contains the format-specific surface handle. */
-    frame->data[3] = frame->data[0];
 
     frame->buf[0] = av_buffer_create(frame->data[0], 0, lavc_ReleaseFrame, pic, 0);
     if (unlikely(frame->buf[0] == NULL))

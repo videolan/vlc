@@ -238,7 +238,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
         va_surface_Release(va_surface);
         return VLC_ENOITEM;
     }
-    *data = (uint8_t*)DXVA2_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.surface;
+    data[3] = (uint8_t*)DXVA2_PICCONTEXT_FROM_PICCTX(pic->context)->ctx.picsys.surface;
     return VLC_SUCCESS;
 }
 

@@ -170,7 +170,7 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
     vaapi_ctx->ctx.va_dpy = sys->hw_ctx.display;
     vaapi_ctx->va_surface = va_surface;
     vlc_vaapi_PicSetContext(pic, &vaapi_ctx->ctx);
-    *data = (void *) (uintptr_t) vaapi_ctx->ctx.surface;
+    data[3] = (void *) (uintptr_t) vaapi_ctx->ctx.surface;
 
     return VLC_SUCCESS;
 }
