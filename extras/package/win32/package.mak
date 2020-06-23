@@ -26,6 +26,11 @@ package-win-install:
 	$(MAKE) install
 	cp '$(DESTDIR)$(libdir)/libvlc.dll.a' '$(DESTDIR)$(libdir)/libvlc.lib'
 	cp '$(DESTDIR)$(libdir)/libvlccore.dll.a' '$(DESTDIR)$(libdir)/libvlccore.lib'
+if ENABLE_PDB
+	cp lib/.libs/libvlc.pdb '$(DESTDIR)$(bindir)'
+	cp src/.libs/libvlccore.pdb '$(DESTDIR)$(bindir)'
+	find '$(DESTDIR)$(libdir)/vlc/plugins' -name "*.dll" -exec sh -c "echo {} | sed -e 's@$(DESTDIR)$(libdir)/vlc/plugins/\(.*\)/\(.*\).dll@modules/.libs/\2.pdb $(DESTDIR)$(libdir)/vlc/plugins/\1@' | xargs -t cp " \;
+endif
 	touch $@
 
 package-win-sdk: package-win-install
