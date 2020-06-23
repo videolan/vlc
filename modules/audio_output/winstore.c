@@ -24,14 +24,19 @@
 
 #define INITGUID
 #define COBJMACROS
+#define CONST_VTABLE
 
 #include <audiopolicy.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_charset.h> // ToWide
 #include <vlc_modules.h>
 #include "audio_output/mmdevice.h"
+
+#include <audioclient.h>
+#include <mmdeviceapi.h>
 
 DEFINE_GUID (GUID_VLC_AUD_OUT, 0x4533f59d, 0x59ee, 0x00c6,
    0xad, 0xb2, 0xc6, 0x8b, 0x50, 0x1a, 0x66, 0x55);
@@ -53,16 +58,210 @@ typedef struct
     aout_stream_t *stream; /**< Underlying audio output stream */
     module_t *module;
     IAudioClient *client;
+    wchar_t* acquired_device;
+    wchar_t* requested_device;
+    wchar_t* default_device; // read once on open
+
+    // IActivateAudioInterfaceCompletionHandler interface
+    IActivateAudioInterfaceCompletionHandler client_locator;
+    vlc_sem_t async_completed;
+    LONG refs;
+    CRITICAL_SECTION lock;
 } aout_sys_t;
+
+
+/* MMDeviceLocator IUnknown methods */
+static STDMETHODIMP_(ULONG) MMDeviceLocator_AddRef(IActivateAudioInterfaceCompletionHandler *This)
+{
+    aout_sys_t *sys = container_of(This, aout_sys_t, client_locator);
+    return InterlockedIncrement(&sys->refs);
+}
+
+static STDMETHODIMP_(ULONG) MMDeviceLocator_Release(IActivateAudioInterfaceCompletionHandler *This)
+{
+    aout_sys_t *sys = container_of(This, aout_sys_t, client_locator);
+    return InterlockedDecrement(&sys->refs);
+}
+
+static STDMETHODIMP MMDeviceLocator_QueryInterface(IActivateAudioInterfaceCompletionHandler *This,
+                                                   REFIID riid, void **ppv)
+{
+    if( IsEqualIID(riid, &IID_IUnknown) ||
+        IsEqualIID(riid, &IID_IActivateAudioInterfaceCompletionHandler) )
+    {
+        MMDeviceLocator_AddRef(This);
+        *ppv = This;
+        return S_OK;
+    }
+    *ppv = NULL;
+    if( IsEqualIID(riid, &IID_IAgileObject) )
+    {
+        return S_OK;
+    }
+    return ResultFromScode( E_NOINTERFACE );
+}
+
+/* MMDeviceLocator IActivateAudioInterfaceCompletionHandler methods */
+static HRESULT MMDeviceLocator_ActivateCompleted(IActivateAudioInterfaceCompletionHandler *This,
+                                                 IActivateAudioInterfaceAsyncOperation *operation)
+{
+    (void)operation;
+    aout_sys_t *sys = container_of(This, aout_sys_t, client_locator);
+    vlc_sem_post( &sys->async_completed );
+    return S_OK;
+}
+
+/* MMDeviceLocator vtable */
+static const struct IActivateAudioInterfaceCompletionHandlerVtbl MMDeviceLocator_vtable =
+{
+    MMDeviceLocator_QueryInterface,
+    MMDeviceLocator_AddRef,
+    MMDeviceLocator_Release,
+
+    MMDeviceLocator_ActivateCompleted,
+};
+
+static void WaitForAudioClient(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    IActivateAudioInterfaceAsyncOperation* asyncOp = NULL;
+
+    const wchar_t* devId = sys->requested_device ? sys->requested_device : sys->default_device;
+
+    assert(sys->refs == 0);
+    sys->refs = 0;
+    assert(sys->client == NULL);
+    sys->client = NULL;
+    free(sys->acquired_device);
+    sys->acquired_device = NULL;
+    ActivateAudioInterfaceAsync(devId, &IID_IAudioClient, NULL, &sys->client_locator, &asyncOp);
+
+    vlc_sem_wait( &sys->async_completed );
+
+    if (asyncOp)
+    {
+        HRESULT hr;
+        HRESULT hrActivateResult;
+        IUnknown *audioInterface;
+
+        hr = IActivateAudioInterfaceAsyncOperation_GetActivateResult(asyncOp, &hrActivateResult, &audioInterface);
+        IActivateAudioInterfaceAsyncOperation_Release(asyncOp);
+        if (unlikely(FAILED(hr)))
+            msg_Dbg(aout, "Failed to get the activation result. (hr=0x%lX)", hr);
+        else if (FAILED(hrActivateResult))
+            msg_Dbg(aout, "Failed to activate the device. (hr=0x%lX)", hr);
+        else if (unlikely(audioInterface == NULL))
+            msg_Dbg(aout, "Failed to get the device instance.");
+        else
+        {
+            hr = IUnknown_QueryInterface(audioInterface, &IID_IAudioClient, (void**)&sys->client);
+            IUnknown_Release(audioInterface);
+            if (unlikely(FAILED(hr)))
+                msg_Warn(aout, "The received interface is not a IAudioClient. (hr=0x%lX)", hr);
+            else
+            {
+                sys->acquired_device = wcsdup(devId);
+
+                IAudioClient2 *audioClient2;
+                if (SUCCEEDED(IAudioClient_QueryInterface(sys->client, &IID_IAudioClient2, (void**)&audioClient2))
+                    && audioClient2)
+                {
+                    // "BackgroundCapableMedia" does not work in UWP
+                    AudioClientProperties props = (AudioClientProperties) {
+                        .cbSize = sizeof(props),
+                        .bIsOffload = FALSE,
+                        .eCategory = AudioCategory_Movie,
+                        .Options = AUDCLNT_STREAMOPTIONS_NONE
+                    };
+                    if (FAILED(IAudioClient2_SetClientProperties(audioClient2, &props))) {
+                        msg_Dbg(aout, "Failed to set audio client properties");
+                    }
+                    IAudioClient2_Release(audioClient2);
+                }
+            }
+        }
+    }
+}
+
+static bool SetRequestedDevice(audio_output_t *aout, wchar_t *id)
+{
+    aout_sys_t* sys = aout->sys;
+    if (sys->requested_device != id)
+    {
+        if (sys->requested_device != sys->default_device)
+            free(sys->requested_device);
+        sys->requested_device = id;
+        return true;
+    }
+    return false;
+}
+
+static int DeviceRequestLocked(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+    assert(sys->requested_device);
+
+    WaitForAudioClient(aout);
+
+    if (sys->stream != NULL && sys->client != NULL)
+        /* Request restart of stream with the new device */
+        aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
+    return (sys->client != NULL) ? 0 : -1;
+}
+
+static int DeviceRestartLocked(audio_output_t *aout)
+{
+    aout_sys_t *sys = aout->sys;
+
+    if (sys->client)
+    {
+        assert(sys->acquired_device);
+        free(sys->acquired_device);
+        sys->acquired_device = NULL;
+        IAudioClient_Release(sys->client);
+        sys->client = NULL;
+    }
+
+    return DeviceRequestLocked(aout);
+}
+
+static int DeviceSelectLocked(audio_output_t *aout, const char* id)
+{
+    aout_sys_t *sys = aout->sys;
+    bool changed;
+    if( id == NULL )
+    {
+        changed = SetRequestedDevice(aout, sys->default_device);
+    }
+    else
+    {
+        wchar_t *requested_device = ToWide(id);
+        if (unlikely(requested_device == NULL))
+            return VLC_ENOMEM;
+        changed = SetRequestedDevice(aout, requested_device);
+    }
+    if (!changed)
+        return VLC_EGENERIC;
+    return DeviceRestartLocked(aout);
+}
+
+static int DeviceSelect(audio_output_t *aout, const char* id)
+{
+    aout_sys_t *sys = aout->sys;
+    EnterCriticalSection(&sys->lock);
+    int ret = DeviceSelectLocked(aout, id);
+    LeaveCriticalSection(&sys->lock);
+    return ret;
+}
 
 static void ResetInvalidatedClient(audio_output_t *aout, HRESULT hr)
 {
-    aout_sys_t* sys = aout->sys;
     /* Select the default device (and restart) on unplug */
     if (unlikely(hr == AUDCLNT_E_DEVICE_INVALIDATED ||
                  hr == AUDCLNT_E_RESOURCES_INVALIDATED))
     {
-        sys->client = NULL;
+        // Select the default device (and restart) on unplug
+        DeviceSelect(aout, NULL);
     }
 }
 
@@ -198,7 +397,7 @@ static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
     if (actparms != NULL || client == NULL )
         return E_INVALIDARG;
 
-    IAudioClient_AddRef(client);
+    IAudioClient_AddRef(client); // as would IMMDevice_Activate do
     *pv = opaque;
 
     return S_OK;
@@ -225,18 +424,71 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     if (unlikely(s == NULL))
         return -1;
 
-    s->owner.device = sys->client;
-    s->owner.activate = ActivateDevice;
+    if (sys->requested_device != NULL)
+    {
+        if (sys->acquired_device == NULL || wcscmp(sys->acquired_device, sys->requested_device))
+        {
+            // we have a pending request for a new device
+            DeviceRestartLocked(aout);
+            if (sys->client == NULL)
+            {
+                vlc_object_delete(&s->obj);
+                return -1;
+            }
+        }
+    }
 
+    // Load the "out stream" for the requested device
     EnterMTA();
-    sys->module = vlc_module_load(s, "aout stream", NULL, false,
-                                  aout_stream_Start, s, fmt, &hr);
+    EnterCriticalSection(&sys->lock);
+
+    s->owner.activate = ActivateDevice;
+    for (;;)
+    {
+        s->owner.device = sys->client;
+        sys->module = vlc_module_load(s, "aout stream", NULL, false,
+                                      aout_stream_Start, s, fmt, &hr);
+
+        int ret = -1;
+        if (hr == AUDCLNT_E_DEVICE_INVALIDATED)
+        {
+            // the requested device is not usable, try the default device
+            ret = DeviceSelectLocked(aout, NULL);
+        }
+        else if (hr == AUDCLNT_E_ALREADY_INITIALIZED)
+        {
+            /* From MSDN: "If the initial call to Initialize fails, subsequent
+             * Initialize calls might fail and return error code
+             * E_ALREADY_INITIALIZED, even though the interface has not been
+             * initialized. If this occurs, release the IAudioClient interface
+             * and obtain a new IAudioClient interface from the MMDevice API
+             * before calling Initialize again."
+             *
+             * Therefore, request to MMThread the same device and try again. */
+
+            ret = DeviceRestartLocked(aout);
+        }
+        if (ret != VLC_SUCCESS)
+            break;
+
+        if (sys->client == NULL || sys->module != NULL)
+            break;
+    }
+
+    LeaveCriticalSection(&sys->lock);
     LeaveMTA();
 
     if (sys->module == NULL)
     {
         vlc_object_delete(s);
         return -1;
+    }
+
+    if (sys->client)
+    {
+        // the requested device has been used, reset it
+        // we keep the corresponding sys->client until a new request is started
+        SetRequestedDevice(aout, NULL);
     }
 
     assert (sys->stream == NULL);
@@ -258,23 +510,6 @@ static void Stop(audio_output_t *aout)
     sys->stream = NULL;
 }
 
-static int DeviceSelect(audio_output_t *aout, const char* psz_device)
-{
-    if( psz_device == NULL )
-        return VLC_EGENERIC;
-    char* psz_end;
-    aout_sys_t* sys = aout->sys;
-    intptr_t ptr = strtoll( psz_device, &psz_end, 16 );
-    if ( *psz_end != 0 )
-        return VLC_EGENERIC;
-    if (sys->client == (IAudioClient*)ptr)
-        return VLC_SUCCESS;
-    sys->client = (IAudioClient*)ptr;
-    var_SetAddress( vlc_object_parent(aout), "winstore-client", sys->client );
-    aout_RestartRequest( aout, AOUT_RESTART_OUTPUT );
-    return VLC_SUCCESS;
-}
-
 static int Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
@@ -283,11 +518,24 @@ static int Open(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
+    if (unlikely(FAILED(StringFromIID(&DEVINTERFACE_AUDIO_RENDER, &sys->default_device))))
+    {
+        msg_Dbg(obj, "Failed to get the default renderer string");
+        free(sys);
+        return VLC_EGENERIC;
+    }
+
+    InitializeCriticalSection(&sys->lock);
+
+    vlc_sem_init(&sys->async_completed, 0);
+    sys->refs = 0;
+    sys->requested_device = sys->default_device;
+    sys->acquired_device = NULL;
+    sys->client_locator = (IActivateAudioInterfaceCompletionHandler) { &MMDeviceLocator_vtable };
+
     aout->sys = sys;
     sys->stream = NULL;
-    sys->client = var_CreateGetAddress( vlc_object_parent(aout), "winstore-client" );
-    if (sys->client != NULL)
-        msg_Dbg( aout, "Reusing previous client: %p", sys->client );
+    sys->client = NULL;
     aout->start = Start;
     aout->stop = Stop;
     aout->time_get = TimeGet;
@@ -304,6 +552,16 @@ static void Close(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
+
+    if(sys->client != NULL)
+        IAudioClient_Release(sys->client);
+
+    assert(sys->refs == 0);
+
+    free(sys->acquired_device);
+    free(sys->requested_device);
+    CoTaskMemFree(sys->default_device);
+    DeleteCriticalSection(&sys->lock);
 
     free(sys);
 }
