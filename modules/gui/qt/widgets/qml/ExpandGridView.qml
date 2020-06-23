@@ -54,6 +54,14 @@ NavigableFocusScope {
     /// the id of the item to be expanded
     property int expandIndex: -1
     property int _newExpandIndex: -1
+    property int _expandItemVerticalSpace: 0
+    on_ExpandItemVerticalSpaceChanged: {
+        if (expandItem) {
+            expandItem.visible = root._expandItemVerticalSpace - root.verticalSpacing > 0
+            expandItem.height = Math.max(root._expandItemVerticalSpace - root.verticalSpacing, 0)
+        }
+        flickable.layout(true)
+    }
 
     //delegate to display the extended item
     property Component delegate: Item{}
@@ -183,13 +191,13 @@ NavigableFocusScope {
         var contentYWithoutExpand = myContentY
         var heightWithoutExpand = flickable.height
         if (root.expandIndex !== -1) {
-            if (myContentY >= expandItem.y && myContentY < expandItem.y + expandItem.height)
+            if (myContentY >= expandItem.y && myContentY < expandItem.y + _expandItemVerticalSpace)
                 contentYWithoutExpand = expandItem.y
-            if (myContentY >= expandItem.y + expandItem.height)
-                contentYWithoutExpand = myContentY - expandItem.height
+            if (myContentY >= expandItem.y + _expandItemVerticalSpace)
+                contentYWithoutExpand = myContentY - _expandItemVerticalSpace
 
             var expandYStart = Math.max(myContentY, expandItem.y)
-            var expandYEnd = Math.min(myContentY + height, expandItem.y + expandItem.height)
+            var expandYEnd = Math.min(myContentY + height, expandItem.y + _expandItemVerticalSpace)
             var expandDisplayedHeight = Math.max(expandYEnd - expandYStart, 0)
             heightWithoutExpand -= expandDisplayedHeight
         }
@@ -277,6 +285,7 @@ NavigableFocusScope {
 
         // Hide the expandItem with no animation
         expandIndex = -1
+        _expandItemVerticalSpace = 0
 
         // Regenerate the gridview layout
         flickable.layout(true)
@@ -399,20 +408,23 @@ NavigableFocusScope {
                 _setupChild(i,  0)
             }
 
-            if (root.expandIndex !== -1)
-                expandItem.y = root.getItemPos(expandItemGridId)[1]
+            if (root.expandIndex !== -1) {
+                var expandItemPos = root.getItemPos(expandItemGridId)
+                expandItem.x = expandItemPos[0]
+                expandItem.y = expandItemPos[1]
+
+                expandItem.width = root.getNbItemsPerRow() * root._effectiveCellWidth - root.horizontalSpacing
+            }
 
             // Place the delegates after the expandItem
             for (i = topGridEndId; i < lastId; ++i) {
                 if (!forceRelayout && i in _idChildrenMap)
                     continue
-                 _setupChild(i, expandItem.height)
+                 _setupChild(i, _expandItemVerticalSpace)
             }
 
             // Calculate and set the contentHeight
-            var newContentHeight = root.getItemPos(_count - 1)[1] + root._effectiveCellHeight
-            if (root._expandIndex !== -1)
-                newContentHeight += expandItem.height
+            var newContentHeight = root.getItemPos(_count - 1)[1] + root._effectiveCellHeight + _expandItemVerticalSpace
             contentHeight = newContentHeight
             contentWidth = root._effectiveCellWidth * root.getNbItemsPerRow() - root.horizontalSpacing
 
@@ -421,9 +433,6 @@ NavigableFocusScope {
 
         Connections {
             target: expandItem
-            onHeightChanged: {
-                flickable.layout(true)
-            }
             onImplicitHeightChanged: {
                 /* This is the only event we have after the expandItem height content was resized.
                    We can trigger here the expand animation with the right final height. */
@@ -462,13 +471,14 @@ NavigableFocusScope {
             if (expandIndex === -1)
                 return
 
-            var expandItemHeight = expandItem.implicitHeight;
+            var expandItemHeight = expandItem.implicitHeight + root.verticalSpacing
 
             // Expand animation
 
             expandItem.focus = true
             // The animation may have already been triggered, we must stop it.
             animateExpandItem.stop()
+            animateExpandItem.from = root._expandItemVerticalSpace
             animateExpandItem.to = expandItemHeight
             animateExpandItem.start()
 
@@ -484,8 +494,8 @@ NavigableFocusScope {
 
         NumberAnimation {
             id: animateRetractItem;
-            target: expandItem;
-            properties: "height"
+            target: root;
+            properties: "_expandItemVerticalSpace"
             easing.type: Easing.OutQuad
             duration: 250
             to: 0
@@ -500,8 +510,8 @@ NavigableFocusScope {
 
         NumberAnimation {
             id: animateExpandItem;
-            target: expandItem;
-            properties: "height"
+            target: root;
+            properties: "_expandItemVerticalSpace"
             easing.type: Easing.InQuad
             duration: 250
             from: 0
