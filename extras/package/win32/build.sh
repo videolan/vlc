@@ -32,11 +32,12 @@ OPTIONS:
    -u            Use the Universal C Runtime (instead of msvcrt)
    -w            Restrict to Windows Store APIs
    -z            Build without GUI (libvlc only)
+   -o <path>     Install the built binaries in the absolute path
 EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:sb:dxuwz" OPTION
+while getopts "hra:pcli:sb:dxuwzo:" OPTION
 do
      case $OPTION in
          h)
@@ -82,6 +83,9 @@ do
          ;;
          z)
              DISABLEGUI="yes"
+         ;;
+         o)
+             INSTALL_PATH=$OPTARG
          ;;
      esac
 done
@@ -355,6 +359,9 @@ if [ ! -z "$WINSTORE" ]; then
 else
     CONFIGFLAGS="$CONFIGFLAGS --enable-dvdread --enable-caca"
 fi
+if [ ! -z "$INSTALL_PATH" ]; then
+    CONFIGFLAGS="$CONFIGFLAGS --prefix=$INSTALL_PATH"
+fi
 
 ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX $CONFIGFLAGS
 
@@ -370,4 +377,6 @@ make package-win32-release
 sha512sum vlc-*-release.7z
 elif [ "$INSTALLER" = "m" ]; then
 make package-msi
+elif [ ! -z "$INSTALL_PATH" ]; then
+make package-win-install
 fi
