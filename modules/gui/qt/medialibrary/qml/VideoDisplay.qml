@@ -69,6 +69,7 @@ Widgets.NavigableFocusScope {
     Widgets.MenuExt {
         id: contextMenu
         property var model: ({})
+        property int itemIndex: -1
         closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
 
         Widgets.MenuItemExt {
@@ -95,7 +96,7 @@ Widgets.NavigableFocusScope {
             enabled: medialib.gridView
             text: "Information"
             onTriggered: {
-                view.currentItem.switchExpandItem(contextMenu.model.index)
+                view.currentItem.switchExpandItem(contextMenu.itemIndex)
             }
         }
         Widgets.MenuItemExt {
@@ -155,6 +156,7 @@ Widgets.NavigableFocusScope {
 
                 onContextMenuButtonClicked: {
                     contextMenu.model = videoGridItem.model
+                    contextMenu.itemIndex = index
                     contextMenu.popup()
                 }
 
