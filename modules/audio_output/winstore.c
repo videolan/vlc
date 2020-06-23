@@ -1,5 +1,5 @@
 /*****************************************************************************
- * mmdevice.c : Windows Multimedia Device API audio output plugin for VLC
+ * winstore.c : Windows Multimedia Device API audio output plugin for VLC
  *****************************************************************************
  * Copyright (C) 2012 Rémi Denis-Courmont
  *
@@ -25,8 +25,6 @@
 #define INITGUID
 #define COBJMACROS
 
-#include <stdlib.h>
-#include <assert.h>
 #include <audiopolicy.h>
 
 #include <vlc_common.h>
@@ -57,7 +55,7 @@ struct aout_sys_t
     IAudioClient *client;
 };
 
-static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
+static void ResetInvalidatedClient(audio_output_t *aout, HRESULT hr)
 {
     aout_sys_t* sys = aout->sys;
     /* Select the default device (and restart) on unplug */
@@ -66,7 +64,6 @@ static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
     {
         sys->client = NULL;
     }
-    return SUCCEEDED(hr) ? 0 : -1;
 }
 
 static int VolumeSet(audio_output_t *aout, float vol)
@@ -160,7 +157,7 @@ static void Play(audio_output_t *aout, block_t *block)
     HRESULT hr = aout_stream_Play(sys->stream, block);
     LeaveMTA();
 
-    vlc_FromHR(aout, hr);
+    ResetInvalidatedClient(aout, hr);
 }
 
 static void Pause(audio_output_t *aout, bool paused, mtime_t date)
@@ -174,7 +171,7 @@ static void Pause(audio_output_t *aout, bool paused, mtime_t date)
     LeaveMTA();
 
     (void) date;
-    vlc_FromHR(aout, hr);
+    ResetInvalidatedClient(aout, hr);
 }
 
 static void Flush(audio_output_t *aout, bool wait)
@@ -187,7 +184,7 @@ static void Flush(audio_output_t *aout, bool wait)
     HRESULT hr = aout_stream_Flush(sys->stream, wait);
     LeaveMTA();
 
-    vlc_FromHR(aout, hr);
+    ResetInvalidatedClient(aout, hr);
 }
 
 static HRESULT ActivateDevice(void *opaque, REFIID iid, PROPVARIANT *actparms,
