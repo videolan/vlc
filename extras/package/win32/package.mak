@@ -24,6 +24,8 @@ endif
 
 package-win-install:
 	$(MAKE) install
+	cp '$(DESTDIR)$(libdir)/libvlc.dll.a' '$(DESTDIR)$(libdir)/libvlc.lib'
+	cp '$(DESTDIR)$(libdir)/libvlccore.dll.a' '$(DESTDIR)$(libdir)/libvlccore.lib'
 	touch $@
 
 package-win-sdk: package-win-install
