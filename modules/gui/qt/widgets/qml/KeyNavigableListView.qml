@@ -219,17 +219,6 @@ NavigableFocusScope {
                 actionAtIndex(currentIndex)
             }
         }
-
-        Rectangle {
-            anchors { bottom: parent.bottom; left: parent.left;  right: parent.right }
-            z: 1
-            visible: orientation === ListView.Vertical && !view.atYEnd
-            height: highlightMargin * 2
-            gradient: Gradient{
-                GradientStop { position: 0.0; color: "transparent" }
-                GradientStop { position: 1.0; color: VLCStyle.colors.bg }
-            }
-        }
     }
 
     RoundButton{
