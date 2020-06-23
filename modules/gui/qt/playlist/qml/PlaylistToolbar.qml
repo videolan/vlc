@@ -62,6 +62,7 @@ Widgets.NavigableFocusScope {
                 id: shuffle
                 Layout.alignment: Qt.AlignHCenter
                 //Layout.minimumWidth: VLCStyle.icon_normal * 2
+                enabled: !mainPlaylistController.empty
                 size: VLCStyle.icon_normal
                 iconText: VLCIcons.shuffle_on
                 onClicked: mainPlaylistController.shuffle()
