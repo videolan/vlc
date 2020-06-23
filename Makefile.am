@@ -124,7 +124,9 @@ doc:
 ###############################################################################
 
 ALL_ALIASES = cvlc rvlc svlc qvlc nvlc
+if BUILD_VLC
 bin_SCRIPTS = $(ALIASES)
+endif
 CLEANFILES += $(ALIASES) $(noinst_SCRIPTS)
 EXTRA_SCRIPTS = $(ALL_ALIASES)
 
