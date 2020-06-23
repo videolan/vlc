@@ -68,20 +68,6 @@ Widgets.NavigableFocusScope {
                 focusPolicy: Qt.NoFocus
             }
 
-            Label {
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
-                horizontalAlignment: Text.AlignHCenter
-                text: (view.mode === "select")
-                        ? i18n.qtr("Select tracks (%1)").arg(plmodel.selectedCount)
-                    : (view.mode === "move")
-                        ? i18n.qtr("Move tracks (%1)").arg(plmodel.selectedCount)
-                    : i18n.qtr("%1 tracks").arg(plmodel.count)
-                font.pixelSize: VLCStyle.fontSize_normal
-                color: VLCStyle.colors.text
-                elide: Text.ElideRight
-            }
-
             Widgets.SortControl {
                 id: sort
                 Layout.alignment: Qt.AlignHCenter
