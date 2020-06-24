@@ -389,20 +389,84 @@ LoadNativeSurfaceAPI(AWindowHandler *p_awh)
  */
 
 static int
-NDKSurfaceTexture_attachToGLContext(AWindowHandler *p_awh, uint32_t texName);
-static int
-NDKSurfaceTexture_updateTexImage(AWindowHandler *p_awh,
-                                            const float **pp_transform_mtx);
+NDKSurfaceTexture_attachToGLContext(AWindowHandler *p_awh, uint32_t texName)
+{
+    return p_awh->ndk_ast_api.pf_attachToGL(p_awh->ndk_ast_api.p_ast, texName);
+}
+
 static void
-NDKSurfaceTexture_detachFromGLContext(AWindowHandler *p_awh, JNIEnv *p_env);
+NDKSurfaceTexture_detachFromGLContext(AWindowHandler *p_awh, JNIEnv *p_env)
+{
+    (void)p_env;
+    p_awh->ndk_ast_api.pf_detachFromGL(p_awh->ndk_ast_api.p_ast);
+}
+
+static int
+NDKSurfaceTexture_updateTexImage(AWindowHandler *p_awh, const float **pp_transform_mtx)
+{
+    if (p_awh->ndk_ast_api.pf_updateTexImage(p_awh->ndk_ast_api.p_ast))
+        return VLC_EGENERIC;
+
+    p_awh->ndk_ast_api.pf_getTransMatrix(p_awh->ndk_ast_api.p_ast,
+                                                 p_awh->ndk_ast_api.transMat);
+    *pp_transform_mtx = p_awh->ndk_ast_api.transMat;
+    return VLC_SUCCESS;
+}
+
+static int
+JNISurfaceTexture_attachToGLContext(AWindowHandler *p_awh, uint32_t tex_name)
+{
+    JNIEnv *p_env = android_getEnvCommon(NULL, p_awh->p_jvm, "SurfaceTexture");
+    if (!p_env)
+        return VLC_EGENERIC;
+
+    return JNI_STEXCALL(CallBooleanMethod, attachToGLContext, tex_name) ?
+           VLC_SUCCESS : VLC_EGENERIC;
+}
+
+static void
+JNISurfaceTexture_detachFromGLContext(AWindowHandler *p_awh, JNIEnv *p_env)
+{
+    JNI_STEXCALL(CallVoidMethod, detachFromGLContext);
+
+    if (p_awh->stex.jtransform_mtx != NULL)
+    {
+        (*p_env)->ReleaseFloatArrayElements(p_env, p_awh->stex.jtransform_mtx_array,
+                                            p_awh->stex.jtransform_mtx,
+                                            JNI_ABORT);
+        p_awh->stex.jtransform_mtx = NULL;
+    }
+}
 
 static int
 JNISurfaceTexture_waitAndUpdateTexImage(AWindowHandler *p_awh,
-                                            const float **pp_transform_mtx);
-static void
-JNISurfaceTexture_detachFromGLContext(AWindowHandler *p_awh, JNIEnv *p_env);
-static int
-JNISurfaceTexture_attachToGLContext(AWindowHandler *p_awh, uint32_t tex_name);
+                                            const float **pp_transform_mtx)
+{
+    JNIEnv *p_env = android_getEnvCommon(NULL, p_awh->p_jvm, "SurfaceTexture");
+    if (!p_env)
+        return VLC_EGENERIC;
+
+    if (p_awh->stex.jtransform_mtx != NULL)
+        (*p_env)->ReleaseFloatArrayElements(p_env, p_awh->stex.jtransform_mtx_array,
+                                            p_awh->stex.jtransform_mtx,
+                                            JNI_ABORT);
+
+    bool ret = JNI_STEXCALL(CallBooleanMethod, waitAndUpdateTexImage,
+                            p_awh->stex.jtransform_mtx_array);
+    if (ret)
+    {
+        p_awh->stex.jtransform_mtx = (*p_env)->GetFloatArrayElements(p_env,
+                                            p_awh->stex.jtransform_mtx_array, NULL);
+        *pp_transform_mtx = p_awh->stex.jtransform_mtx;
+        return VLC_SUCCESS;
+    }
+    else
+    {
+        p_awh->stex.jtransform_mtx = NULL;
+        return VLC_EGENERIC;
+    }
+}
+
 
 static int
 LoadNDKSurfaceTextureAPI(AWindowHandler *p_awh, void *p_library, JNIEnv *p_env)
@@ -907,48 +971,10 @@ AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
     return VLC_SUCCESS;
 }
 
-static int
-NDKSurfaceTexture_attachToGLContext(AWindowHandler *p_awh, uint32_t texName)
-{
-    return p_awh->ndk_ast_api.pf_attachToGL(p_awh->ndk_ast_api.p_ast, texName);
-}
-
-static int
-JNISurfaceTexture_attachToGLContext(AWindowHandler *p_awh, uint32_t tex_name)
-{
-    JNIEnv *p_env = android_getEnvCommon(NULL, p_awh->p_jvm, "SurfaceTexture");
-    if (!p_env)
-        return VLC_EGENERIC;
-
-    return JNI_STEXCALL(CallBooleanMethod, attachToGLContext, tex_name) ?
-           VLC_SUCCESS : VLC_EGENERIC;
-}
-
 int
 SurfaceTexture_attachToGLContext(AWindowHandler *p_awh, uint32_t tex_name)
 {
     return p_awh->st.pf_attachToGL(p_awh, tex_name);
-}
-
-static void
-NDKSurfaceTexture_detachFromGLContext(AWindowHandler *p_awh, JNIEnv *p_env)
-{
-    (void)p_env;
-    p_awh->ndk_ast_api.pf_detachFromGL(p_awh->ndk_ast_api.p_ast);
-}
-
-static void
-JNISurfaceTexture_detachFromGLContext(AWindowHandler *p_awh, JNIEnv *p_env)
-{
-    JNI_STEXCALL(CallVoidMethod, detachFromGLContext);
-
-    if (p_awh->stex.jtransform_mtx != NULL)
-    {
-        (*p_env)->ReleaseFloatArrayElements(p_env, p_awh->stex.jtransform_mtx_array,
-                                            p_awh->stex.jtransform_mtx,
-                                            JNI_ABORT);
-        p_awh->stex.jtransform_mtx = NULL;
-    }
 }
 
 void
@@ -961,47 +987,6 @@ SurfaceTexture_detachFromGLContext(AWindowHandler *p_awh)
 
     p_awh->st.pf_detachFromGL(p_awh, p_env);
     AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_SurfaceTexture);
-}
-
-static int
-NDKSurfaceTexture_updateTexImage(AWindowHandler *p_awh, const float **pp_transform_mtx)
-{
-    if (p_awh->ndk_ast_api.pf_updateTexImage(p_awh->ndk_ast_api.p_ast))
-        return VLC_EGENERIC;
-
-    p_awh->ndk_ast_api.pf_getTransMatrix(p_awh->ndk_ast_api.p_ast,
-                                                 p_awh->ndk_ast_api.transMat);
-    *pp_transform_mtx = p_awh->ndk_ast_api.transMat;
-    return VLC_SUCCESS;
-}
-
-static int
-JNISurfaceTexture_waitAndUpdateTexImage(AWindowHandler *p_awh,
-                                            const float **pp_transform_mtx)
-{
-    JNIEnv *p_env = android_getEnvCommon(NULL, p_awh->p_jvm, "SurfaceTexture");
-    if (!p_env)
-        return VLC_EGENERIC;
-
-    if (p_awh->stex.jtransform_mtx != NULL)
-        (*p_env)->ReleaseFloatArrayElements(p_env, p_awh->stex.jtransform_mtx_array,
-                                            p_awh->stex.jtransform_mtx,
-                                            JNI_ABORT);
-
-    bool ret = JNI_STEXCALL(CallBooleanMethod, waitAndUpdateTexImage,
-                            p_awh->stex.jtransform_mtx_array);
-    if (ret)
-    {
-        p_awh->stex.jtransform_mtx = (*p_env)->GetFloatArrayElements(p_env,
-                                            p_awh->stex.jtransform_mtx_array, NULL);
-        *pp_transform_mtx = p_awh->stex.jtransform_mtx;
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        p_awh->stex.jtransform_mtx = NULL;
-        return VLC_EGENERIC;
-    }
 }
 
 int
