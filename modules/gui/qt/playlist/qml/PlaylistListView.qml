@@ -121,6 +121,7 @@ Widgets.NavigableFocusScope {
 
         ColumnLayout {
             anchors.fill: parent
+            anchors.bottomMargin: VLCStyle.margin_normal
 
         Row {
             width: root.width
