@@ -462,6 +462,7 @@ static void NDKSurfaceTexture_destroy(
     handle->awh->ndk_ast_api.pf_releaseAst(handle->texture);
     (*p_env)->DeleteGlobalRef(p_env, handle->jtexture);
 
+    handle->awh->st = NULL;
     free(handle);
 }
 
@@ -562,6 +563,7 @@ static void JNISurfaceTexture_destroy(
     if (handle->surface.jsurface)
         (*p_env)->DeleteGlobalRef(p_env, handle->surface.jsurface);
 
+    handle->awh->st = NULL;
     free(handle);
 }
 
@@ -1147,6 +1149,22 @@ error:
 
     free(handle);
     return NULL;
+}
+
+struct vlc_asurfacetexture *
+vlc_asurfacetexture_New(AWindowHandler *p_awh)
+{
+    if (p_awh->st == NULL)
+    {
+        JNIEnv *p_env = android_getEnvCommon(NULL, p_awh->p_jvm, "SurfaceTexture");
+        struct vlc_asurfacetexture_priv *surfacetexture =
+            CreateSurfaceTexture(p_awh, p_env);
+        if (surfacetexture == NULL)
+            return NULL;
+        return &surfacetexture->surface;
+    }
+
+    return p_awh->st;
 }
 
 static int

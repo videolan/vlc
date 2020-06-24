@@ -193,6 +193,25 @@ void
 SurfaceTexture_detachFromGLContext(AWindowHandler *p_awh);
 
 /**
+ * Create a new SurfaceTexture object.
+ *
+ * See Android SurfaceTexture
+ */
+struct vlc_asurfacetexture *
+vlc_asurfacetexture_New(AWindowHandler *p_awh);
+
+/**
+ * Delete a SurfaceTexture object created with SurfaceTexture_New.
+ */
+static inline void
+vlc_asurfacetexture_Delete(struct vlc_asurfacetexture *st)
+{
+    if (st->ops->destroy)
+        st->ops->destroy(st);
+}
+
+
+/**
  * Get a Java Surface from the attached SurfaceTexture
  *
  * This object can be used with mediacodec_jni.
