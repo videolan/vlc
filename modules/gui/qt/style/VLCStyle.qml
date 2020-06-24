@@ -150,6 +150,9 @@ Item {
     property int gridCover_video_height: ( gridCover_video_width * 10.0 ) / 16
     property int gridCover_video_border: dp(3, scale)
 
+    property int expandCover_music_height: dp(171, scale)
+    property int expandCover_music_width: dp(171, scale)
+
     //GridItem
     property int gridItem_network_width: VLCStyle.gridCover_network_width
     property int gridItem_network_height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small
