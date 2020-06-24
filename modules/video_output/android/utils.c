@@ -129,7 +129,9 @@ static struct
     } AWindow;
     struct {
           jclass clazz;
-          jmethodID constructor;
+          jmethodID init_i;
+          jmethodID init_iz;
+          jmethodID init_z;
     } SurfaceTexture;
 } jfields;
 
@@ -563,7 +565,7 @@ static const struct vlc_asurfacetexture_operations JNISurfaceAPI =
 
 
 static int
-LoadNDKSurfaceTextureAPI(AWindowHandler *p_awh, void *p_library, JNIEnv *p_env)
+LoadNDKSurfaceTextureAPI(AWindowHandler *p_awh, void *p_library)
 {
     p_awh->ndk_ast_api.pf_astFromst = (ptr_ASurfaceTexture_fromSurfaceTexture)
         dlsym(p_library, "ASurfaceTexture_fromSurfaceTexture");
@@ -597,25 +599,6 @@ LoadNDKSurfaceTextureAPI(AWindowHandler *p_awh, void *p_library, JNIEnv *p_env)
         dlsym(p_library, "ANativeWindow_toSurface");
     if (p_awh->ndk_ast_api.pf_anwToSurface == NULL) return VLC_EGENERIC;
 
-    jclass surfacetexture_class = (*p_env)->FindClass(p_env,
-                                            "android/graphics/SurfaceTexture");
-    if (!surfacetexture_class)
-        return VLC_EGENERIC;
-
-    jfields.SurfaceTexture.clazz = (*p_env)->NewGlobalRef(p_env,
-                                                         surfacetexture_class);
-    (*p_env)->DeleteLocalRef(p_env, surfacetexture_class);
-    if (!jfields.SurfaceTexture.clazz)
-        return VLC_EGENERIC;
-
-    jfields.SurfaceTexture.constructor = (*p_env)->GetMethodID(p_env,
-                               jfields.SurfaceTexture.clazz, "<init>", "(Z)V");
-    if (!jfields.SurfaceTexture.constructor)
-    {
-        (*p_env)->DeleteGlobalRef(p_env, jfields.SurfaceTexture.clazz);
-        return VLC_EGENERIC;
-    }
-
     return VLC_SUCCESS;
 }
 
@@ -624,7 +607,7 @@ LoadNDKSurfaceTextureAPI(AWindowHandler *p_awh, void *p_library, JNIEnv *p_env)
  */
 
 static void
-LoadNativeWindowAPI(AWindowHandler *p_awh, JNIEnv *p_env)
+LoadNativeWindowAPI(AWindowHandler *p_awh)
 {
     void *p_library = dlopen("libandroid.so", RTLD_NOW);
     if (!p_library)
@@ -643,7 +626,7 @@ LoadNativeWindowAPI(AWindowHandler *p_awh, JNIEnv *p_env)
      && p_awh->anw_api.winLock && p_awh->anw_api.unlockAndPost
      && p_awh->anw_api.setBuffersGeometry)
     {
-        p_awh->b_has_ndk_ast_api = !LoadNDKSurfaceTextureAPI(p_awh, p_library, p_env);
+        p_awh->b_has_ndk_ast_api = !LoadNDKSurfaceTextureAPI(p_awh, p_library);
         p_awh->p_anw_dl = p_library;
     }
     else
@@ -729,6 +712,28 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
         goto end;
     }
 
+    jfields.SurfaceTexture.clazz = NULL;
+
+    jclass surfacetexture_class =
+        (*env)->FindClass(env, "android/graphics/SurfaceTexture");
+    CHECK_EXCEPTION("SurfaceTexture clazz", true);
+    jfields.SurfaceTexture.clazz =
+        (*env)->NewGlobalRef(env, surfacetexture_class);
+    (*env)->DeleteLocalRef(env, surfacetexture_class);
+    if (jfields.SurfaceTexture.clazz == NULL)
+        goto end;
+
+    GET_METHOD(SurfaceTexture, init_i, "<init>", "(I)V", false);
+    GET_METHOD(SurfaceTexture, init_iz, "<init>", "(IZ)V", false);
+    GET_METHOD(SurfaceTexture, init_z, "<init>", "(Z)V", false);
+
+    /* We cannot create any SurfaceTexture if we cannot load the SurfaceTexture
+     * methods. */
+    if (!jfields.SurfaceTexture.init_i &&
+        !jfields.SurfaceTexture.init_iz &&
+        !jfields.SurfaceTexture.init_z)
+        goto error;
+
 #undef GET_METHOD
 #undef CHECK_EXCEPTION
 
@@ -739,6 +744,16 @@ end:
         msg_Err(p_obj, "AndroidNativeWindow jni init failed" );
     vlc_mutex_unlock(&lock);
     return ret;
+
+error:
+    i_init_state = 0;
+    if (jfields.SurfaceTexture.clazz)
+        (*env)->DeleteGlobalRef(env, jfields.SurfaceTexture.clazz);
+    jfields.SurfaceTexture.clazz = NULL;
+
+    vlc_mutex_unlock(&lock);
+    msg_Err(p_obj, "Failed to load jfields table");
+    return VLC_EGENERIC;
 }
 
 static JNIEnv*
@@ -809,7 +824,7 @@ AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
         free(p_awh);
         return NULL;
     }
-    LoadNativeWindowAPI(p_awh, p_env);
+    LoadNativeWindowAPI(p_awh);
 
     p_awh->b_has_video_layout_listener =
         flags & AWINDOW_REGISTER_FLAGS_HAS_VIDEO_LAYOUT_LISTENER;
@@ -886,8 +901,12 @@ AWindowHandler_getANativeWindowAPI(AWindowHandler *p_awh)
 static jobject InitNDKSurfaceTexture(AWindowHandler *p_awh, JNIEnv *p_env,
         enum AWindow_ID id)
 {
+    /* This API should be available if using NDK SurfaceTexture API */
+    if (!jfields.SurfaceTexture.init_z)
+        return NULL;
+
     jobject surfacetexture = (*p_env)->NewObject(p_env,
-      jfields.SurfaceTexture.clazz, jfields.SurfaceTexture.constructor, false);
+      jfields.SurfaceTexture.clazz, jfields.SurfaceTexture.init_z, false);
 
     if (surfacetexture == NULL)
         goto error;
