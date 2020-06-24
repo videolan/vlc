@@ -132,6 +132,10 @@ static struct
           jmethodID init_i;
           jmethodID init_iz;
           jmethodID init_z;
+          jmethodID updateTexImage;
+          jmethodID getTransformMatrix;
+          jmethodID detachFromGLContext;
+          jmethodID attachToGLContext;
     } SurfaceTexture;
     struct {
         jclass clazz;
@@ -731,6 +735,19 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
     GET_METHOD(SurfaceTexture, init_i, "<init>", "(I)V", false);
     GET_METHOD(SurfaceTexture, init_iz, "<init>", "(IZ)V", false);
     GET_METHOD(SurfaceTexture, init_z, "<init>", "(Z)V", false);
+
+    GET_METHOD(SurfaceTexture, updateTexImage,
+               "updateTexImage", "()V", true);
+
+    GET_METHOD(SurfaceTexture, getTransformMatrix,
+               "getTransformMatrix", "([F)V", true);
+
+    GET_METHOD(SurfaceTexture, attachToGLContext,
+               "attachToGLContext", "(I)V", true);
+
+    GET_METHOD(SurfaceTexture, detachFromGLContext,
+               "detachFromGLContext", "()V", true);
+
 
     /* We cannot create any SurfaceTexture if we cannot load the SurfaceTexture
      * methods. */
