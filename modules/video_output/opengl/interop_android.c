@@ -46,7 +46,8 @@ tc_anop_allocate_textures(const struct vlc_gl_interop *interop, GLuint *textures
     (void) tex_width; (void) tex_height;
     struct priv *priv = interop->priv;
     assert(textures[0] != 0);
-    if (SurfaceTexture_attachToGLContext(priv->awh, textures[0]) != 0)
+
+    if (SurfaceTexture_attachToGLContext(priv->avctx->texture, textures[0]) != 0)
     {
         msg_Err(interop->gl, "SurfaceTexture_attachToGLContext failed");
         return VLC_EGENERIC;
@@ -72,7 +73,7 @@ tc_anop_update(const struct vlc_gl_interop *interop, GLuint *textures,
     if (!priv->avctx->render(pic->context))
         return VLC_SUCCESS; /* already rendered */
 
-    if (SurfaceTexture_updateTexImage(priv->awh, &priv->transform_mtx)
+    if (SurfaceTexture_updateTexImage(priv->avctx->texture, &priv->transform_mtx)
         != VLC_SUCCESS)
     {
         priv->transform_mtx = NULL;
@@ -98,7 +99,7 @@ Close(struct vlc_gl_interop *interop)
     struct priv *priv = interop->priv;
 
     if (priv->stex_attached)
-        SurfaceTexture_detachFromGLContext(priv->awh);
+        SurfaceTexture_detachFromGLContext(priv->avctx->texture);
 
     free(priv);
 }

@@ -1309,24 +1309,19 @@ AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
 }
 
 int
-SurfaceTexture_attachToGLContext(AWindowHandler *p_awh, uint32_t tex_name)
+SurfaceTexture_attachToGLContext(struct vlc_asurfacetexture *st, uint32_t tex_name)
 {
-    return p_awh->st->ops->attach_to_gl_context(p_awh->st, tex_name);
+    return st->ops->attach_to_gl_context(st, tex_name);
 }
 
 void
-SurfaceTexture_detachFromGLContext(AWindowHandler *p_awh)
+SurfaceTexture_detachFromGLContext(struct vlc_asurfacetexture *st)
 {
-    JNIEnv *p_env = android_getEnvCommon(NULL, p_awh->p_jvm, "SurfaceTexture");
-
-    if (!p_env)
-        return;
-
-    p_awh->st->ops->detach_from_gl_context(p_awh->st);
+    st->ops->detach_from_gl_context(st);
 }
 
 int
-SurfaceTexture_updateTexImage(AWindowHandler *p_awh, const float **pp_transform_mtx)
+SurfaceTexture_updateTexImage(struct vlc_asurfacetexture *st, const float **pp_transform_mtx)
 {
-    return p_awh->st->ops->update_tex_image(p_awh->st, pp_transform_mtx);
+    return st->ops->update_tex_image(st, pp_transform_mtx);
 }

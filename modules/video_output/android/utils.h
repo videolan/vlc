@@ -184,14 +184,14 @@ int AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
  * \return 0 on success, -1 on error.
  */
 int
-SurfaceTexture_attachToGLContext(AWindowHandler *p_awh, uint32_t tex_name);
+SurfaceTexture_attachToGLContext(struct vlc_asurfacetexture *st, uint32_t tex_name);
 
 /**
  * Detach a SurfaceTexture from the OpenGL ES context that owns the OpenGL ES
  * texture object.
  */
 void
-SurfaceTexture_detachFromGLContext(AWindowHandler *p_awh);
+SurfaceTexture_detachFromGLContext(struct vlc_asurfacetexture *st);
 
 /**
  * Create a new SurfaceTexture object.
@@ -243,4 +243,4 @@ SurfaceTexture_getANativeWindow(AWindowHandler *p_awh)
  * \return VLC_SUCCESS or a VLC error
  */
 int
-SurfaceTexture_updateTexImage(AWindowHandler *p_awh, const float **pp_transform_mtx);
+SurfaceTexture_updateTexImage(struct vlc_asurfacetexture *st, const float **pp_transform_mtx);
