@@ -689,42 +689,45 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
         } \
     } \
 } while( 0 )
-#define GET_METHOD(id, str, args, critical) do { \
-    jfields.id = (*env)->GetMethodID(env, clazz, (str), (args)); \
+#define GET_METHOD(id_clazz, id, str, args, critical) do { \
+    jfields.id_clazz.id = (*env)->GetMethodID(\
+            env, jfields.id_clazz.clazz, (str), (args)); \
     CHECK_EXCEPTION("GetMethodID("str")", critical); \
 } while( 0 )
 
     clazz = (*env)->GetObjectClass(env, jobj);
     CHECK_EXCEPTION("AndroidNativeWindow clazz", true);
-    GET_METHOD(AWindow.getVideoSurface,
+
+    jfields.AWindow.clazz = (*env)->NewGlobalRef(env, clazz);
+    (*env)->DeleteLocalRef(env, clazz);
+
+    GET_METHOD(AWindow, getVideoSurface,
                "getVideoSurface", "()Landroid/view/Surface;", true);
-    GET_METHOD(AWindow.getSubtitlesSurface,
+    GET_METHOD(AWindow, getSubtitlesSurface,
                "getSubtitlesSurface", "()Landroid/view/Surface;", true);
-    GET_METHOD(AWindow.registerNative,
+    GET_METHOD(AWindow, registerNative,
                "registerNative", "(J)I", true);
-    GET_METHOD(AWindow.unregisterNative,
+    GET_METHOD(AWindow, unregisterNative,
                "unregisterNative", "()V", true);
-    GET_METHOD(AWindow.setVideoLayout,
+    GET_METHOD(AWindow, setVideoLayout,
                "setVideoLayout", "(IIIIII)V", true);
 
-    GET_METHOD(AWindow.attachToGLContext,
+    GET_METHOD(AWindow, attachToGLContext,
                "SurfaceTexture_attachToGLContext", "(I)Z", true);
-    GET_METHOD(AWindow.detachFromGLContext,
+    GET_METHOD(AWindow, detachFromGLContext,
                "SurfaceTexture_detachFromGLContext", "()V", true);
-    GET_METHOD(AWindow.waitAndUpdateTexImage,
+    GET_METHOD(AWindow, waitAndUpdateTexImage,
                "SurfaceTexture_waitAndUpdateTexImage", "([F)Z",
                true);
-    GET_METHOD(AWindow.getSurface,
+    GET_METHOD(AWindow, getSurface,
                "SurfaceTexture_getSurface", "()Landroid/view/Surface;", true);
 
-    if ((*env)->RegisterNatives(env, clazz, jni_callbacks, 2) < 0)
+    if ((*env)->RegisterNatives(env, jfields.AWindow.clazz, jni_callbacks, 2) < 0)
     {
         msg_Err(p_obj, "RegisterNatives failed");
         i_init_state = 0;
         goto end;
     }
-    jfields.AWindow.clazz = (*env)->NewGlobalRef(env, clazz);
-    (*env)->DeleteLocalRef(env, clazz);
 
 #undef GET_METHOD
 #undef CHECK_EXCEPTION
