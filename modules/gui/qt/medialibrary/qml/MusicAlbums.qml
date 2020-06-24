@@ -113,6 +113,8 @@ Widgets.NavigableFocusScope {
             delegate: AudioGridItem {
                 id: audioGridItem
 
+                opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
+
                 onItemClicked : {
                     selectionModel.updateSelection( modifier , root.currentIndex, index)
                     gridView_id.currentIndex = index
@@ -122,19 +124,22 @@ Widgets.NavigableFocusScope {
                 onItemDoubleClicked: {
                     if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
                 }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 100
+                    }
+                }
             }
 
             expandDelegate: MusicAlbumsGridExpandDelegate {
                 id: expandDelegateId
-                width: root.width
 
-                implicitHeight: gridView_id.height - gridView_id.cellHeight
-
+                onRetract: gridView_id.retract()
                 navigationParent: root
                 navigationCancel:  function() {  gridView_id.retract() }
                 navigationUp: function() {  gridView_id.retract() }
                 navigationDown: function() {}
-
             }
 
             onActionAtIndex: {
