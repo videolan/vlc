@@ -131,6 +131,7 @@ typedef struct
             struct hxxx_helper hh;
             timestamp_fifo_t *timestamp_fifo;
             int i_mpeg_dar_num, i_mpeg_dar_den;
+            struct vlc_asurfacetexture *surfacetexture;
         } video;
         struct {
             date_t i_end_date;
@@ -650,12 +651,24 @@ CreateVideoContext(decoder_t *p_dec)
     else
         id = AWindow_Video;
 
-    p_sys->video.p_surface = AWindowHandler_getANativeWindow(awh, id);
-    p_sys->video.p_jsurface = AWindowHandler_getSurface(awh, id);
-    if (!p_sys->video.p_surface)
+    if (id == AWindow_SurfaceTexture)
     {
-        msg_Err(p_dec, "Could not find a valid ANativeWindow");
-        return VLC_EGENERIC;
+        p_sys->video.surfacetexture = vlc_asurfacetexture_New(awh);
+        if (p_sys->video.surfacetexture == NULL)
+            goto error;
+        p_sys->video.p_surface = p_sys->video.surfacetexture->window;
+        p_sys->video.p_jsurface = p_sys->video.surfacetexture->jsurface;
+    }
+    else
+    {
+        p_sys->video.p_surface = AWindowHandler_getANativeWindow(awh, id);
+        p_sys->video.p_jsurface = AWindowHandler_getSurface(awh, id);
+        assert (p_sys->video.p_surface);
+        if (!p_sys->video.p_surface)
+        {
+            msg_Err(p_dec, "Could not find a valid ANativeWindow");
+            goto error;
+        }
     }
 
     static const struct vlc_video_context_operations ops =
@@ -673,6 +686,7 @@ CreateVideoContext(decoder_t *p_dec)
     android_video_context_t *avctx =
         vlc_video_context_GetPrivate(p_sys->video.ctx, VLC_VIDEO_CONTEXT_AWINDOW);
     avctx->id = id;
+    avctx->texture = p_sys->video.surfacetexture;
     avctx->dec_opaque = p_dec->p_sys;
     avctx->render = PictureContextRenderPic;
     avctx->render_ts = p_sys->api.release_out_ts ? PictureContextRenderPicTs : NULL;
@@ -690,6 +704,10 @@ CreateVideoContext(decoder_t *p_dec)
     }
 
     return VLC_SUCCESS;
+
+error:
+    vlc_decoder_device_Release(dec_dev);
+    return VLC_EGENERIC;
 }
 
 static void CleanInputVideo(decoder_t *p_dec)
@@ -811,6 +829,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     p_sys->api.psz_mime = mime;
     p_sys->video.i_mpeg_dar_num = 0;
     p_sys->video.i_mpeg_dar_den = 0;
+    p_sys->video.surfacetexture = NULL;
 
     if (pf_init(&p_sys->api) != 0)
     {
@@ -1008,6 +1027,9 @@ static void CleanDecoder(decoder_sys_t *p_sys)
 
     CSDFree(p_sys);
     p_sys->api.clean(&p_sys->api);
+
+    if (p_sys->video.surfacetexture)
+        vlc_asurfacetexture_Delete(p_sys->video.surfacetexture);
 
     free(p_sys);
 }
