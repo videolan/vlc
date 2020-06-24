@@ -102,6 +102,7 @@ Widgets.NavigableFocusScope {
                 Layout.alignment: Qt.AlignHCenter
                 //Layout.minimumWidth: VLCStyle.icon_normal * 2
                 size: VLCStyle.icon_normal
+                enabled: !mainPlaylistController.empty
                 iconText: VLCIcons.playlist_clear
                 onClicked: mainPlaylistController.clear()
                 focusPolicy: Qt.NoFocus
