@@ -634,7 +634,6 @@ CreateVideoContext(decoder_t *p_dec)
 
     assert(dec_dev->opaque);
     AWindowHandler *awh = dec_dev->opaque;
-    enum AWindow_ID id;
 
     const bool has_subtitle_surface =
         AWindowHandler_getANativeWindow(awh, AWindow_Subtitles) != NULL;
@@ -643,15 +642,13 @@ CreateVideoContext(decoder_t *p_dec)
      * projection or an orientation to handle, if the Surface owner is not able
      * to modify its layout, or if there is no external subtitle surfaces. */
 
-    if (p_dec->fmt_out.video.projection_mode != PROJECTION_MODE_RECTANGULAR
+    bool use_surfacetexture =
+        p_dec->fmt_out.video.projection_mode != PROJECTION_MODE_RECTANGULAR
      || (!p_sys->api.b_support_rotation && p_dec->fmt_out.video.orientation != ORIENT_NORMAL)
      || !AWindowHandler_canSetVideoLayout(awh)
-     || !has_subtitle_surface)
-        id = AWindow_SurfaceTexture;
-    else
-        id = AWindow_Video;
+     || !has_subtitle_surface;
 
-    if (id == AWindow_SurfaceTexture)
+    if (use_surfacetexture)
     {
         p_sys->video.surfacetexture = vlc_asurfacetexture_New(awh);
         if (p_sys->video.surfacetexture == NULL)
@@ -661,8 +658,8 @@ CreateVideoContext(decoder_t *p_dec)
     }
     else
     {
-        p_sys->video.p_surface = AWindowHandler_getANativeWindow(awh, id);
-        p_sys->video.p_jsurface = AWindowHandler_getSurface(awh, id);
+        p_sys->video.p_surface = AWindowHandler_getANativeWindow(awh, AWindow_Video);
+        p_sys->video.p_jsurface = AWindowHandler_getSurface(awh, AWindow_Video);
         assert (p_sys->video.p_surface);
         if (!p_sys->video.p_surface)
         {
@@ -685,7 +682,6 @@ CreateVideoContext(decoder_t *p_dec)
 
     android_video_context_t *avctx =
         vlc_video_context_GetPrivate(p_sys->video.ctx, VLC_VIDEO_CONTEXT_AWINDOW);
-    avctx->id = id;
     avctx->texture = p_sys->video.surfacetexture;
     avctx->dec_opaque = p_dec->p_sys;
     avctx->render = PictureContextRenderPic;
@@ -910,7 +906,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
                 vlc_video_context_GetPrivate(p_sys->video.ctx,
                                              VLC_VIDEO_CONTEXT_AWINDOW);
 
-            if (p_sys->api.b_support_rotation && avctx->id == AWindow_Video)
+            if (p_sys->api.b_support_rotation && avctx->texture == NULL)
             {
                 switch (p_dec->fmt_in.video.orientation)
                 {

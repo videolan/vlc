@@ -39,7 +39,6 @@ typedef struct ASurfaceTexture ASurfaceTexture;
 enum AWindow_ID {
     AWindow_Video,
     AWindow_Subtitles,
-    AWindow_SurfaceTexture,
     AWindow_Max,
 };
 
@@ -73,7 +72,6 @@ typedef struct android_video_context_t android_video_context_t;
 
 struct android_video_context_t
 {
-    enum AWindow_ID id;
     struct vlc_asurfacetexture *texture;
     void *dec_opaque;
     bool (*render)(struct picture_context_t *ctx);
@@ -209,29 +207,6 @@ vlc_asurfacetexture_Delete(struct vlc_asurfacetexture *st)
 {
     if (st->ops->destroy)
         st->ops->destroy(st);
-}
-
-
-/**
- * Get a Java Surface from the attached SurfaceTexture
- *
- * This object can be used with mediacodec_jni.
- */
-static inline jobject
-SurfaceTexture_getSurface(AWindowHandler *p_awh)
-{
-    return AWindowHandler_getSurface(p_awh, AWindow_SurfaceTexture);
-}
-
-/**
- * Get a ANativeWindow from the attached SurfaceTexture
- *
- * This pointer can be used with mediacodec_ndk.
- */
-static inline ANativeWindow *
-SurfaceTexture_getANativeWindow(AWindowHandler *p_awh)
-{
-    return AWindowHandler_getANativeWindow(p_awh, AWindow_SurfaceTexture);
 }
 
 /**

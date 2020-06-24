@@ -34,7 +34,6 @@
 struct priv
 {
     android_video_context_t *avctx;
-    AWindowHandler *awh;
     const float *transform_mtx;
     bool stex_attached;
 };
@@ -117,7 +116,7 @@ Open(vlc_object_t *obj)
     android_video_context_t *avctx =
         vlc_video_context_GetPrivate(interop->vctx, VLC_VIDEO_CONTEXT_AWINDOW);
 
-    if (avctx->id != AWindow_SurfaceTexture)
+    if (avctx == NULL || avctx->texture == NULL)
         return VLC_EGENERIC;
 
     interop->priv = malloc(sizeof(struct priv));
@@ -126,7 +125,6 @@ Open(vlc_object_t *obj)
 
     struct priv *priv = interop->priv;
     priv->avctx = avctx;
-    priv->awh = interop->gl->surface->handle.anativewindow;
     priv->transform_mtx = NULL;
     priv->stex_attached = false;
 

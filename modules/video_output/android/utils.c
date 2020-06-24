@@ -100,9 +100,6 @@ struct AWindowHandler
     ptr_ANativeWindow_release pf_winRelease;
     native_window_api_t anw_api;
 
-    /* Store the surfacetexture that AWindowHandler will use. */
-    struct vlc_asurfacetexture *st;
-
     struct ASurfaceTextureAPI ndk_ast_api;
     bool b_has_ndk_ast_api;
 
@@ -458,7 +455,6 @@ static void NDKSurfaceTexture_destroy(
     handle->awh->ndk_ast_api.pf_releaseAst(handle->texture);
     (*p_env)->DeleteGlobalRef(p_env, handle->jtexture);
 
-    handle->awh->st = NULL;
     free(handle);
 }
 
@@ -559,7 +555,6 @@ static void JNISurfaceTexture_destroy(
     if (handle->surface.jsurface)
         (*p_env)->DeleteGlobalRef(p_env, handle->surface.jsurface);
 
-    handle->awh->st = NULL;
     free(handle);
 }
 
@@ -859,8 +854,7 @@ AWindowHandler_new(vout_window_t *wnd, awh_events_t *p_events)
     {
         /* XXX: HACK: force mediacodec to setup an OpenGL surface when the vout
          * is forced to gles2. Indeed, setting b_has_video_layout_listener to
-         * false will result in mediacodec using the AWindow_SurfaceTexture
-         * surface.
+         * false will result in mediacodec using a SurfaceTexture for output.
          */
         char *vout_modules = var_InheritString(wnd, "vout");
         if (vout_modules
@@ -899,9 +893,6 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
 
     if (p_env)
     {
-        if (p_awh->st)
-            p_awh->st->ops->destroy(p_awh->st);
-
         if (jfields.SurfaceTexture.clazz)
             (*p_env)->DeleteGlobalRef(p_env, jfields.SurfaceTexture.clazz);
 
@@ -1140,17 +1131,12 @@ error:
 struct vlc_asurfacetexture *
 vlc_asurfacetexture_New(AWindowHandler *p_awh)
 {
-    if (p_awh->st == NULL)
-    {
-        JNIEnv *p_env = android_getEnvCommon(NULL, p_awh->p_jvm, "SurfaceTexture");
-        struct vlc_asurfacetexture_priv *surfacetexture =
-            CreateSurfaceTexture(p_awh, p_env);
-        if (surfacetexture == NULL)
-            return NULL;
-        return &surfacetexture->surface;
-    }
-
-    return p_awh->st;
+    JNIEnv *p_env = android_getEnvCommon(NULL, p_awh->p_jvm, "SurfaceTexture");
+    struct vlc_asurfacetexture_priv *surfacetexture =
+        CreateSurfaceTexture(p_awh, p_env);
+    if (surfacetexture == NULL)
+        return NULL;
+    return &surfacetexture->surface;
 }
 
 static int
@@ -1167,27 +1153,6 @@ WindowHandler_NewSurfaceEnv(AWindowHandler *p_awh, JNIEnv *p_env,
         case AWindow_Subtitles:
             jsurface = JNI_ANWCALL(CallObjectMethod, getSubtitlesSurface);
             break;
-        case AWindow_SurfaceTexture:
-        {
-            struct vlc_asurfacetexture_priv *surfacetexture =
-                CreateSurfaceTexture(p_awh, p_env);
-
-            if (surfacetexture == NULL)
-                return VLC_EGENERIC;
-
-            p_awh->views[id].p_anw = surfacetexture->surface.window;
-            p_awh->views[id].jsurface = surfacetexture->surface.jsurface;
-            p_awh->ndk_ast_api.p_ast = surfacetexture->texture;
-            p_awh->ndk_ast_api.surfacetexture = surfacetexture->jtexture;
-
-            assert(surfacetexture->surface.window);
-            assert(surfacetexture->surface.jsurface);
-
-            /* Store the vlc_asurfacetexture pointer for current AWH wrapper */
-            p_awh->st = &surfacetexture->surface;
-            return VLC_SUCCESS;
-
-        }
         default:
             vlc_assert_unreachable();
     }

@@ -538,7 +538,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
             goto error;
         sys->avctx = vlc_video_context_GetPrivate(context, VLC_VIDEO_CONTEXT_AWINDOW);
         assert(sys->avctx);
-        if (sys->avctx->id != AWindow_Video)
+        if (sys->avctx->texture != NULL)
         {
             /* video context configured for opengl */
             goto error;
