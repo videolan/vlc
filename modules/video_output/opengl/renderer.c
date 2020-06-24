@@ -169,12 +169,23 @@ InitStereoMatrix(GLfloat matrix_out[static 3*3],
 #undef ROW
 }
 
+/* https://en.wikipedia.org/wiki/OpenGL_Shading_Language#Versions */
+#ifdef USE_OPENGL_ES2
+# define SHADER_VERSION "#version 100\n"
+  /* In OpenGL ES, the fragment language has no default precision qualifier for
+   * floating point types. */
+# define FRAGMENT_SHADER_PRECISION "precision highp float;\n"
+#else
+# define SHADER_VERSION "#version 120\n"
+# define FRAGMENT_SHADER_PRECISION
+#endif
+
 static char *
 BuildVertexShader(const struct vlc_gl_renderer *renderer)
 {
     /* Basic vertex shader */
     static const char *template =
-        "#version %u\n"
+        SHADER_VERSION
         "attribute vec2 PicCoordsIn;\n"
         "varying vec2 PicCoords;\n"
         "attribute vec3 VertexPosition;\n"
@@ -188,8 +199,8 @@ BuildVertexShader(const struct vlc_gl_renderer *renderer)
         "               * vec4(VertexPosition, 1.0);\n"
         "}";
 
-    char *code;
-    if (asprintf(&code, template, renderer->glsl_version) < 0)
+    char *code = strdup(template);
+    if (!code)
         return NULL;
 
     if (renderer->dump_shaders)
@@ -204,9 +215,9 @@ BuildFragmentShader(struct vlc_gl_renderer *renderer)
     struct vlc_gl_sampler *sampler = renderer->sampler;
 
     static const char *template =
-        "#version %u\n"
+        SHADER_VERSION
         "%s" /* extensions */
-        "%s" /* precision header */
+        FRAGMENT_SHADER_PRECISION
         "%s" /* vlc_texture definition */
         "varying vec2 PicCoords;\n"
         "void main() {\n"
@@ -217,8 +228,7 @@ BuildFragmentShader(struct vlc_gl_renderer *renderer)
                            ? sampler->shader.extensions : "";
 
     char *code;
-    int ret = asprintf(&code, template, renderer->glsl_version, extensions,
-                       renderer->glsl_precision_header, sampler->shader.body);
+    int ret = asprintf(&code, template, extensions, sampler->shader.body);
     if (ret < 0)
         return NULL;
 
@@ -328,13 +338,6 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     renderer->api = api;
     renderer->vt = vt;
     renderer->dump_shaders = var_InheritInteger(gl, "verbose") >= 4;
-#if defined(USE_OPENGL_ES2)
-    renderer->glsl_version = 100;
-    renderer->glsl_precision_header = "precision highp float;\n";
-#else
-    renderer->glsl_version = 120;
-    renderer->glsl_precision_header = "";
-#endif
 
     int ret = opengl_link_program(renderer);
     if (ret != VLC_SUCCESS)

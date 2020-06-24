@@ -50,12 +50,6 @@ struct vlc_gl_renderer
     /* True to dump shaders */
     bool dump_shaders;
 
-    /* GLSL version, set by the caller. 100 for GLSL ES, 120 for desktop GLSL */
-    unsigned glsl_version;
-    /* Precision header, set by the caller. In OpenGLES, the fragment language
-     * has no default precision qualifier for floating point types. */
-    const char *glsl_precision_header;
-
     GLuint program_id;
 
     struct {
