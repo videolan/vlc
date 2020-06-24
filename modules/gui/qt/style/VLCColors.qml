@@ -82,6 +82,9 @@ Item {
     property color playerBorder: "#222222"
 
     property color separator: blendColors(bg, text, .95)
+    
+    property color black: "black"
+    property color glowColor: setColorAlpha(blendColors(bg, black, 0.8), 0.35)
 
     //vlc orange
     property color accent: "#FFFF950D";
