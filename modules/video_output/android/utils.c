@@ -126,10 +126,6 @@ static struct
         jmethodID registerNative;
         jmethodID unregisterNative;
         jmethodID setVideoLayout;
-        jmethodID attachToGLContext;
-        jmethodID detachFromGLContext;
-        jmethodID waitAndUpdateTexImage;
-        jmethodID getSurface;
     } AWindow;
     struct {
           jclass clazz;
@@ -705,16 +701,6 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
                "unregisterNative", "()V", true);
     GET_METHOD(AWindow, setVideoLayout,
                "setVideoLayout", "(IIIIII)V", true);
-
-    GET_METHOD(AWindow, attachToGLContext,
-               "SurfaceTexture_attachToGLContext", "(I)Z", true);
-    GET_METHOD(AWindow, detachFromGLContext,
-               "SurfaceTexture_detachFromGLContext", "()V", true);
-    GET_METHOD(AWindow, waitAndUpdateTexImage,
-               "SurfaceTexture_waitAndUpdateTexImage", "([F)Z",
-               true);
-    GET_METHOD(AWindow, getSurface,
-               "SurfaceTexture_getSurface", "()Landroid/view/Surface;", true);
 
     if ((*env)->RegisterNatives(env, jfields.AWindow.clazz, jni_callbacks, 2) < 0)
     {
