@@ -208,8 +208,46 @@ Widgets.NavigableFocusScope {
                     PL.PlaylistListView {
                         id: playlist
                         focus: true
-                        width: root.width/4
-                        visible: mainInterface.playlistDocked && mainInterface.playlistVisible
+                        width: root.width / 4
+                        visible: false
+
+                        property bool expanded: mainInterface.playlistDocked && mainInterface.playlistVisible
+
+                        onExpandedChanged: {
+                            if (expanded) {
+                                animateExpand.start()
+                            }
+                            else {
+                                animateRetract.start()
+                            }
+                        }
+
+                        PropertyAnimation {
+                            id: animateExpand;
+                            easing.type: Easing.InSine
+                            target: playlist;
+                            properties: "width"
+                            duration: 150
+                            from: 0
+                            to: root.width / 4
+                            onStarted: {
+                                playlist.visible = true
+                            }
+                        }
+
+                        PropertyAnimation {
+                            id: animateRetract;
+                            easing.type: Easing.OutSine
+                            target: playlist;
+                            properties: "width"
+                            duration: 150
+                            from: root.width / 4
+                            to: 0
+                            onStopped: {
+                                playlist.visible = false
+                            }
+                        }
+
                         anchors {
                             top: parent.top
                             right: parent.right
