@@ -79,6 +79,36 @@ struct android_video_context_t
     bool (*render_ts)(struct picture_context_t *ctx, vlc_tick_t ts);
 };
 
+struct vlc_asurfacetexture
+{
+    struct ANativeWindow *window;
+    jobject              *jsurface;
+
+    const struct vlc_asurfacetexture_operations *ops;
+};
+
+/**
+ * Wrapper structure for Android SurfaceTexture object.
+ *
+ * It can use either the NDK API or JNI API.
+ */
+struct vlc_asurfacetexture_operations
+{
+    int (*attach_to_gl_context)(
+            struct vlc_asurfacetexture *surface,
+            uint32_t tex_name);
+
+    void (*detach_from_gl_context)(
+            struct vlc_asurfacetexture *surface);
+
+    int (*update_tex_image)(
+            struct vlc_asurfacetexture *surface,
+            const float **pp_transform_mtx);
+
+    void (*destroy)(
+            struct vlc_asurfacetexture *surface);
+};
+
 /**
  * Attach or get a JNIEnv*
  *
