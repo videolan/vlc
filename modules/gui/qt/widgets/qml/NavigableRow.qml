@@ -24,6 +24,7 @@ NavigableFocusScope {
 
     property alias model: rowRepeater.model
     property alias delegate: rowRepeater.delegate
+    property alias spacing: row.spacing
 
     width: row.width
     height: row.height
