@@ -18,6 +18,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtGraphicalEffects 1.0
 import org.videolan.medialib 0.1
 import org.videolan.vlc 0.1
 
@@ -265,14 +266,16 @@ Widgets.NavigableFocusScope {
                             stackView.forceActiveFocus()
                         }
 
-                        Rectangle {
+                        RectangularGlow {
                             anchors {
                                 top: parent.top
                                 left: parent.left
                                 bottom: parent.bottom
                             }
                             width: VLCStyle.margin_xxsmall
-                            color: VLCStyle.colors.banner
+
+                            glowRadius: VLCStyle.dp(8)
+                            color: VLCStyle.colors.glowColor
                         }
                     }
                 }
