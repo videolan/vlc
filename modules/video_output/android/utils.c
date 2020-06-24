@@ -133,6 +133,10 @@ static struct
           jmethodID init_iz;
           jmethodID init_z;
     } SurfaceTexture;
+    struct {
+        jclass clazz;
+        jmethodID init_st;
+    } Surface;
 } jfields;
 
 #define JNI_CALL(what, obj, method, ...) \
@@ -713,6 +717,7 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
     }
 
     jfields.SurfaceTexture.clazz = NULL;
+    jfields.Surface.clazz = NULL;
 
     jclass surfacetexture_class =
         (*env)->FindClass(env, "android/graphics/SurfaceTexture");
@@ -734,6 +739,17 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj)
         !jfields.SurfaceTexture.init_z)
         goto error;
 
+    jclass surface_class = (*env)->FindClass(env, "android/view/Surface");
+    CHECK_EXCEPTION("android/view/Surface class", true);
+
+    jfields.Surface.clazz = (*env)->NewGlobalRef(env, surface_class);
+    (*env)->DeleteLocalRef(env, surface_class);
+    if (jfields.Surface.clazz == NULL)
+        goto error;
+
+    GET_METHOD(Surface, init_st, "<init>",
+               "(Landroid/graphics/SurfaceTexture;)V", true);
+
 #undef GET_METHOD
 #undef CHECK_EXCEPTION
 
@@ -750,6 +766,10 @@ error:
     if (jfields.SurfaceTexture.clazz)
         (*env)->DeleteGlobalRef(env, jfields.SurfaceTexture.clazz);
     jfields.SurfaceTexture.clazz = NULL;
+
+    if (jfields.Surface.clazz)
+        (*env)->DeleteGlobalRef(env, jfields.Surface.clazz);
+    jfields.Surface.clazz = NULL;
 
     vlc_mutex_unlock(&lock);
     msg_Err(p_obj, "Failed to load jfields table");
@@ -878,6 +898,9 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
 
         if (jfields.SurfaceTexture.clazz)
             (*p_env)->DeleteGlobalRef(p_env, jfields.SurfaceTexture.clazz);
+
+        if (jfields.Surface.clazz)
+            (*p_env)->DeleteGlobalRef(p_env, jfields.Surface.clazz);
 
         JNI_ANWCALL(CallVoidMethod, unregisterNative);
         AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video);
