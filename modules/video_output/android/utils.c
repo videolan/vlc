@@ -31,6 +31,10 @@
 #include <pthread.h>
 #include <assert.h>
 
+#include <EGL/egl.h>
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+
 typedef ANativeWindow* (*ptr_ANativeWindow_fromSurface)(JNIEnv*, jobject);
 typedef ANativeWindow* (*ptr_ANativeWindow_fromSurfaceTexture)(JNIEnv*, jobject);
 typedef void (*ptr_ANativeWindow_release)(ANativeWindow*);
@@ -481,10 +485,11 @@ JNISurfaceTexture_attachToGLContext(
     if (!p_env)
         return VLC_EGENERIC;
 
-    AWindowHandler *p_awh = handle->awh;
+    (*p_env)->CallVoidMethod(p_env, handle->jtexture,
+                             jfields.SurfaceTexture.attachToGLContext,
+                             tex_name);
 
-    return JNI_STEXCALL(CallBooleanMethod, attachToGLContext, tex_name) ?
-           VLC_SUCCESS : VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 static void
@@ -499,7 +504,8 @@ JNISurfaceTexture_detachFromGLContext(
     if (!p_env)
         return;
 
-    JNI_STEXCALL(CallVoidMethod, detachFromGLContext);
+    (*p_env)->CallVoidMethod(p_env, handle->jtexture,
+                             jfields.SurfaceTexture.detachFromGLContext);
 
     if (handle->awh->stex.jtransform_mtx != NULL)
     {
@@ -511,7 +517,7 @@ JNISurfaceTexture_detachFromGLContext(
 }
 
 static int
-JNISurfaceTexture_waitAndUpdateTexImage(
+JNISurfaceTexture_updateTexImage(
         struct vlc_asurfacetexture *surface,
         const float **pp_transform_mtx)
 {
@@ -523,26 +529,22 @@ JNISurfaceTexture_waitAndUpdateTexImage(
     if (!p_env)
         return VLC_EGENERIC;
 
-
     if (handle->awh->stex.jtransform_mtx != NULL)
         (*p_env)->ReleaseFloatArrayElements(p_env, handle->awh->stex.jtransform_mtx_array,
                                             handle->awh->stex.jtransform_mtx,
                                             JNI_ABORT);
 
-    bool ret = JNI_STEXCALL(CallBooleanMethod, waitAndUpdateTexImage,
-                            handle->awh->stex.jtransform_mtx_array);
-    if (ret)
-    {
-        handle->awh->stex.jtransform_mtx = (*p_env)->GetFloatArrayElements(p_env,
-                                            handle->awh->stex.jtransform_mtx_array, NULL);
-        *pp_transform_mtx = handle->awh->stex.jtransform_mtx;
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        handle->awh->stex.jtransform_mtx = NULL;
-        return VLC_EGENERIC;
-    }
+    (*p_env)->CallVoidMethod(p_env, handle->jtexture,
+                             jfields.SurfaceTexture.updateTexImage);
+
+    (*p_env)->CallVoidMethod(p_env, handle->jtexture,
+                             jfields.SurfaceTexture.getTransformMatrix,
+                             handle->awh->stex.jtransform_mtx_array);
+    handle->awh->stex.jtransform_mtx = (*p_env)->GetFloatArrayElements(p_env,
+                                        handle->awh->stex.jtransform_mtx_array, NULL);
+
+    *pp_transform_mtx = handle->awh->stex.jtransform_mtx;
+    return VLC_SUCCESS;
 }
 
 static void JNISurfaceTexture_destroy(
@@ -566,11 +568,10 @@ static void JNISurfaceTexture_destroy(
 static const struct vlc_asurfacetexture_operations JNISurfaceAPI =
 {
     .attach_to_gl_context = JNISurfaceTexture_attachToGLContext,
-    .update_tex_image = JNISurfaceTexture_waitAndUpdateTexImage,
+    .update_tex_image = JNISurfaceTexture_updateTexImage,
     .detach_from_gl_context = JNISurfaceTexture_detachFromGLContext,
     .destroy = JNISurfaceTexture_destroy,
 };
-
 
 static int
 LoadNDKSurfaceTextureAPI(AWindowHandler *p_awh, void *p_library)
@@ -941,6 +942,14 @@ AWindowHandler_getANativeWindowAPI(AWindowHandler *p_awh)
 static struct vlc_asurfacetexture_priv* CreateSurfaceTexture(
         AWindowHandler *p_awh, JNIEnv *p_env)
 {
+    /* Needed in case of old API, see comments below. */
+    EGLDisplay display = EGL_NO_DISPLAY;
+    EGLSurface surface = EGL_NO_SURFACE;
+    EGLContext context = EGL_NO_CONTEXT;
+
+    EGLContext current_context = EGL_NO_CONTEXT;
+    EGLContext current_surface = EGL_NO_SURFACE;
+
     jobject surfacetexture;
 
     struct vlc_asurfacetexture_priv *handle = malloc(sizeof *handle);
@@ -956,7 +965,7 @@ static struct vlc_asurfacetexture_priv* CreateSurfaceTexture(
 
     /* API 26 */
     if (jfields.SurfaceTexture.init_z == NULL)
-        goto error;
+        goto init_iz;
 
     msg_Info(p_awh->wnd, "Using SurfaceTexture constructor init_z");
 
@@ -966,6 +975,92 @@ static struct vlc_asurfacetexture_priv* CreateSurfaceTexture(
 
     if (surfacetexture == NULL)
         goto error;
+
+    goto success;
+
+init_iz:
+    msg_Info(p_awh->wnd, "Initializing OpenGL context to create SurfaceTexture");
+    /* Old Android APIs are constructing SurfaceTexture in an attached state
+     * so we need a dummy context before detaching it, for any other
+     * constructor than the previous one. That's crap.
+     * At least, Android EGL display are using reference counting so we don't
+     * need to care about display lifecycle. */
+    display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    EGLint major, minor;
+    if (eglInitialize(display, &major, &minor) != EGL_TRUE)
+        goto error;
+
+    current_context = eglGetCurrentContext();
+    current_surface = eglGetCurrentSurface(EGL_READ);
+
+    static const EGLint conf_attr[] = {
+        EGL_RED_SIZE, 5,
+        EGL_GREEN_SIZE, 5,
+        EGL_BLUE_SIZE, 5,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        EGL_NONE
+    };
+    EGLConfig cfgv[1];
+    EGLint cfgc;
+
+    if (eglChooseConfig(display, conf_attr, cfgv, 1, &cfgc) != EGL_TRUE
+     || cfgc == 0)
+    {
+        goto error;
+    }
+
+    static const EGLint surface_attr[] =
+    {
+        EGL_WIDTH, 1,
+        EGL_HEIGHT, 1,
+        EGL_NONE,
+    };
+
+    surface = eglCreatePbufferSurface(display, cfgv[0], surface_attr);
+    if (surface == EGL_NO_SURFACE)
+        goto error;
+
+    static const EGLint context_attr[] =
+    {
+        EGL_CONTEXT_CLIENT_VERSION, 2,
+        EGL_NONE,
+    };
+
+    context = eglCreateContext(display, cfgv[0], EGL_NO_CONTEXT,
+                               context_attr);
+
+    eglMakeCurrent(display, surface, surface, context);
+
+    /* We'll need to reserve a name in the opengl context */
+    GLuint texture;
+    glGenTextures(1, &texture);
+
+    /* API 19 */
+    if (jfields.SurfaceTexture.init_iz == NULL)
+        goto init_i;
+
+    msg_Info(p_awh->wnd, "Using SurfaceTexture constructor init_iz");
+    surfacetexture = (*p_env)->NewObject(p_env,
+      jfields.SurfaceTexture.clazz, jfields.SurfaceTexture.init_iz, texture, false);
+
+    if (surfacetexture == NULL)
+        goto error;
+
+    goto success;
+
+init_i:
+    /* We can't get here without this constructor being loaded. */
+    assert(jfields.SurfaceTexture.init_i != NULL);
+    msg_Info(p_awh->wnd, "Using SurfaceTexture constructor init_i");
+
+    surfacetexture = (*p_env)->NewObject(p_env,
+      jfields.SurfaceTexture.clazz, jfields.SurfaceTexture.init_i, texture);
+
+    if (surfacetexture == NULL)
+        goto error;
+
+    /* fall-through success */
+success:
 
     msg_Info(p_awh->wnd, "Adding reference to surfacetexture");
     handle->jtexture = (*p_env)->NewGlobalRef(p_env, surfacetexture);
@@ -1012,9 +1107,31 @@ static struct vlc_asurfacetexture_priv* CreateSurfaceTexture(
 
     msg_Info(p_awh->wnd, "Successfully initialized SurfaceTexture");
 
+    if (display != EGL_NO_DISPLAY)
+    {
+        handle->surface.ops->detach_from_gl_context(&handle->surface);
+        glDeleteTextures(1, &texture);
+        eglMakeCurrent(display, current_surface, current_surface, current_context);
+        eglDestroyContext(display, context);
+        eglDestroySurface(display, surface);
+        eglTerminate(display);
+    }
+
     return handle;
 
 error:
+    if (context != EGL_NO_CONTEXT)
+    {
+        glDeleteTextures(1, &texture);
+        eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+        eglDestroyContext(display, context);
+    }
+
+    if (surface != EGL_NO_SURFACE)
+        eglDestroySurface(display, surface);
+
+    if (display != EGL_NO_DISPLAY)
+        eglTerminate(display);
 
     if (handle->surface.window != NULL)
         p_awh->pf_winRelease(handle->surface.window);
@@ -1048,49 +1165,16 @@ WindowHandler_NewSurfaceEnv(AWindowHandler *p_awh, JNIEnv *p_env,
             break;
         case AWindow_SurfaceTexture:
         {
-            struct vlc_asurfacetexture_priv *surfacetexture = NULL;
+            struct vlc_asurfacetexture_priv *surfacetexture =
+                CreateSurfaceTexture(p_awh, p_env);
 
-            if (p_awh->b_has_ndk_ast_api)
-            {
-                surfacetexture = CreateSurfaceTexture(p_awh, p_env);
-                if (surfacetexture == NULL)
-                    return VLC_EGENERIC;
-
-                surfacetexture->surface.ops = &NDKSurfaceAPI;
-                p_awh->ndk_ast_api.p_ast = surfacetexture->texture;
-                p_awh->ndk_ast_api.surfacetexture = surfacetexture->jtexture;
-            }
-            else
-            {
-                surfacetexture = malloc(sizeof *surfacetexture);
-                if (surfacetexture == NULL)
-                    return VLC_EGENERIC;
-
-                surfacetexture->surface.jsurface = NULL;
-                surfacetexture->surface.window = NULL;
-                surfacetexture->jtexture = NULL;
-                surfacetexture->texture = NULL;
-                surfacetexture->surface.ops = &JNISurfaceAPI;
-                surfacetexture->awh = p_awh;
-
-               /* We use AWindow wrapper functions for SurfaceTexture. */
-                jsurface = JNI_STEXCALL(CallObjectMethod, getSurface);
-                if (jsurface == NULL)
-                    goto error;
-
-                surfacetexture->surface.jsurface = (*p_env)->NewGlobalRef(p_env, jsurface);
-                (*p_env)->DeleteLocalRef(p_env, jsurface);
-                if (surfacetexture->surface.jsurface == NULL)
-                    goto error;
-
-                surfacetexture->surface.window
-                    = p_awh->pf_winFromSurface(p_env, surfacetexture->surface.jsurface);
-                if (surfacetexture->surface.window == NULL)
-                    goto error;
-            }
+            if (surfacetexture == NULL)
+                return VLC_EGENERIC;
 
             p_awh->views[id].p_anw = surfacetexture->surface.window;
             p_awh->views[id].jsurface = surfacetexture->surface.jsurface;
+            p_awh->ndk_ast_api.p_ast = surfacetexture->texture;
+            p_awh->ndk_ast_api.surfacetexture = surfacetexture->jtexture;
 
             assert(surfacetexture->surface.window);
             assert(surfacetexture->surface.jsurface);
@@ -1098,10 +1182,6 @@ WindowHandler_NewSurfaceEnv(AWindowHandler *p_awh, JNIEnv *p_env,
             /* Store the vlc_asurfacetexture pointer for current AWH wrapper */
             p_awh->st = &surfacetexture->surface;
             return VLC_SUCCESS;
-
-error:
-            surfacetexture->surface.ops->destroy(&surfacetexture->surface);
-            return VLC_EGENERIC;
 
         }
         default:
@@ -1136,8 +1216,6 @@ AWindowHandler_getANativeWindow(AWindowHandler *p_awh, enum AWindow_ID id)
     if (!p_awh->views[id].p_anw)
         p_awh->views[id].p_anw = p_awh->pf_winFromSurface(p_env,
                                                     p_awh->views[id].jsurface);
-    else
-        assert(p_awh->b_has_ndk_ast_api && id == AWindow_SurfaceTexture);
 
     return p_awh->views[id].p_anw;
 }

@@ -215,12 +215,7 @@ SurfaceTexture_getANativeWindow(AWindowHandler *p_awh)
 }
 
 /**
- * Wait for a new frame and update it
- *
- * This function must be called from the OpenGL thread. This is an helper that
- * waits for a new frame via the Java SurfaceTexture.OnFrameAvailableListener
- * listener and update the frame via the SurfaceTexture.updateTexImage()
- * method.
+ * Update the SurfaceTexture to the most recent frame.
  *
  * \param pp_transform_mtx the transform matrix fetched from
  * SurfaceTexture.getTransformMatrix() after the
