@@ -70,7 +70,7 @@ pbo_picture_create(const struct vlc_gl_interop *interop)
         .p_sys = picsys,
         .pf_destroy = pbo_picture_destroy,
     };
-    picture_t *pic = picture_NewFromResource(&interop->fmt, &rsc);
+    picture_t *pic = picture_NewFromResource(&interop->fmt_out, &rsc);
     if (pic == NULL)
     {
         free(picsys);
@@ -81,7 +81,7 @@ pbo_picture_create(const struct vlc_gl_interop *interop)
     picsys->DeleteBuffers = interop->vt->DeleteBuffers;
 
     /* XXX: needed since picture_NewFromResource override pic planes */
-    if (picture_Setup(pic, &interop->fmt))
+    if (picture_Setup(pic, &interop->fmt_out))
     {
         picture_Release(pic);
         return NULL;
@@ -299,17 +299,17 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
     video_color_space_t space;
     const vlc_fourcc_t *list;
 
-    if (vlc_fourcc_IsYUV(interop->fmt.i_chroma))
+    if (vlc_fourcc_IsYUV(interop->fmt_in.i_chroma))
     {
         GLint max_texture_units = 0;
         interop->vt->GetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_units);
         if (max_texture_units < 3)
             return VLC_EGENERIC;
 
-        list = vlc_fourcc_GetYUVFallback(interop->fmt.i_chroma);
-        space = interop->fmt.space;
+        list = vlc_fourcc_GetYUVFallback(interop->fmt_in.i_chroma);
+        space = interop->fmt_in.space;
     }
-    else if (interop->fmt.i_chroma == VLC_CODEC_XYZ12)
+    else if (interop->fmt_in.i_chroma == VLC_CODEC_XYZ12)
     {
         static const vlc_fourcc_t xyz12_list[] = { VLC_CODEC_XYZ12, 0 };
         list = xyz12_list;
@@ -317,12 +317,12 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
     }
     else
     {
-        list = vlc_fourcc_GetRGBFallback(interop->fmt.i_chroma);
+        list = vlc_fourcc_GetRGBFallback(interop->fmt_in.i_chroma);
         space = COLOR_SPACE_UNDEF;
     }
 
     /* The pictures are uploaded upside-down */
-    video_format_TransformBy(&interop->fmt, TRANSFORM_VFLIP);
+    video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
 
     int ret = VLC_EGENERIC;
     while (*list)
@@ -330,20 +330,20 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         ret = opengl_interop_init(interop, GL_TEXTURE_2D, *list, space);
         if (ret == VLC_SUCCESS)
         {
-            interop->fmt.i_chroma = *list;
+            interop->fmt_out.i_chroma = *list;
 
-            if (interop->fmt.i_chroma == VLC_CODEC_RGB32)
+            if (interop->fmt_out.i_chroma == VLC_CODEC_RGB32)
             {
 #if defined(WORDS_BIGENDIAN)
-                interop->fmt.i_rmask  = 0xff000000;
-                interop->fmt.i_gmask  = 0x00ff0000;
-                interop->fmt.i_bmask  = 0x0000ff00;
+                interop->fmt_out.i_rmask  = 0xff000000;
+                interop->fmt_out.i_gmask  = 0x00ff0000;
+                interop->fmt_out.i_bmask  = 0x0000ff00;
 #else
-                interop->fmt.i_rmask  = 0x000000ff;
-                interop->fmt.i_gmask  = 0x0000ff00;
-                interop->fmt.i_bmask  = 0x00ff0000;
+                interop->fmt_out.i_rmask  = 0x000000ff;
+                interop->fmt_out.i_gmask  = 0x0000ff00;
+                interop->fmt_out.i_bmask  = 0x00ff0000;
 #endif
-                video_format_FixRgb(&interop->fmt);
+                video_format_FixRgb(&interop->fmt_out);
             }
             break;
         }

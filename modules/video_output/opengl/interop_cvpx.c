@@ -166,15 +166,15 @@ Open(vlc_object_t *obj)
 {
     struct vlc_gl_interop *interop = (void *) obj;
 
-    if (interop->fmt.i_chroma != VLC_CODEC_CVPX_UYVY
-     && interop->fmt.i_chroma != VLC_CODEC_CVPX_NV12
-     && interop->fmt.i_chroma != VLC_CODEC_CVPX_I420
-     && interop->fmt.i_chroma != VLC_CODEC_CVPX_BGRA
-     && interop->fmt.i_chroma != VLC_CODEC_CVPX_P010)
+    if (interop->fmt_in.i_chroma != VLC_CODEC_CVPX_UYVY
+     && interop->fmt_in.i_chroma != VLC_CODEC_CVPX_NV12
+     && interop->fmt_in.i_chroma != VLC_CODEC_CVPX_I420
+     && interop->fmt_in.i_chroma != VLC_CODEC_CVPX_BGRA
+     && interop->fmt_in.i_chroma != VLC_CODEC_CVPX_P010)
         return VLC_EGENERIC;
 
     /* The pictures are uploaded upside-down */
-    video_format_TransformBy(&interop->fmt, TRANSFORM_VFLIP);
+    video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
 
     struct priv *priv = calloc(1, sizeof(struct priv));
     if (unlikely(priv == NULL))
@@ -215,10 +215,10 @@ Open(vlc_object_t *obj)
 #endif
 
     /* The pictures are uploaded upside-down */
-    video_format_TransformBy(&interop->fmt, TRANSFORM_VFLIP);
+    video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
 
     int ret;
-    switch (interop->fmt.i_chroma)
+    switch (interop->fmt_in.i_chroma)
     {
         case VLC_CODEC_CVPX_UYVY:
             /* Generate a VLC_CODEC_VYUY shader in order to use the "gbr"
@@ -228,7 +228,7 @@ Open(vlc_object_t *obj)
              * extenstion. */
 
             ret = opengl_interop_init(interop, tex_target, VLC_CODEC_VYUY,
-                                      interop->fmt.space);
+                                      interop->fmt_in.space);
             if (ret != VLC_SUCCESS)
                 goto error;
 
@@ -240,7 +240,7 @@ Open(vlc_object_t *obj)
         case VLC_CODEC_CVPX_NV12:
         {
             ret = opengl_interop_init(interop, tex_target, VLC_CODEC_NV12,
-                                      interop->fmt.space);
+                                      interop->fmt_in.space);
             if (ret != VLC_SUCCESS)
                 goto error;
             break;
@@ -248,7 +248,7 @@ Open(vlc_object_t *obj)
         case VLC_CODEC_CVPX_P010:
         {
             ret = opengl_interop_init(interop, tex_target, VLC_CODEC_P010,
-                                      interop->fmt.space);
+                                      interop->fmt_in.space);
             if (ret != VLC_SUCCESS)
                 goto error;
 
@@ -256,7 +256,7 @@ Open(vlc_object_t *obj)
         }
         case VLC_CODEC_CVPX_I420:
             ret = opengl_interop_init(interop, tex_target, VLC_CODEC_I420,
-                                      interop->fmt.space);
+                                      interop->fmt_in.space);
             if (ret != VLC_SUCCESS)
                 goto error;
 

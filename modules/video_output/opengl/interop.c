@@ -39,9 +39,9 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
 
     interop->init = opengl_interop_init_impl;
     interop->ops = NULL;
-    interop->fmt = *fmt;
+    interop->fmt_out = interop->fmt_in = *fmt;
     /* this is the only allocated field, and we don't need it */
-    interop->fmt.p_palette = NULL;
+    interop->fmt_out.p_palette = interop->fmt_in.p_palette = NULL;
 
     interop->gl = gl;
     interop->api = api;
@@ -95,7 +95,8 @@ vlc_gl_interop_NewForSubpictures(struct vlc_gl_t *gl,
     interop->api = api;
     interop->vt = &api->vt;
 
-    video_format_Init(&interop->fmt, VLC_CODEC_RGB32);
+    video_format_Init(&interop->fmt_in, VLC_CODEC_RGB32);
+    interop->fmt_out = interop->fmt_in;
 
     int ret = opengl_interop_generic_init(interop, false);
     if (ret != VLC_SUCCESS)
@@ -355,10 +356,9 @@ opengl_interop_init_impl(struct vlc_gl_interop *interop, GLenum tex_target,
     if (!desc)
         return VLC_EGENERIC;
 
-    assert(!interop->fmt.p_palette);
-    interop->sw_fmt = interop->fmt;
-    interop->sw_fmt.i_chroma = chroma;
-    interop->sw_fmt.space = yuv_space;
+    assert(!interop->fmt_out.p_palette);
+    interop->fmt_out.i_chroma = chroma;
+    interop->fmt_out.space = yuv_space;
     interop->tex_target = tex_target;
 
     if (chroma == VLC_CODEC_XYZ12)

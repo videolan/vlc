@@ -783,7 +783,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         dst_space.transfer = var_InheritInteger(priv->gl, "target-trc");
 
         pl_shader_color_map(sh, &color_params,
-                vlc_placebo_ColorSpace(&interop->fmt),
+                vlc_placebo_ColorSpace(&interop->fmt_out),
                 dst_space, NULL, false);
 
         struct pl_shader_obj *dither_state = NULL;
@@ -834,8 +834,8 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         ADD(res->glsl);
     }
 #else
-    if (interop->fmt.transfer == TRANSFER_FUNC_SMPTE_ST2084 ||
-        interop->fmt.primaries == COLOR_PRIMARIES_BT2020)
+    if (interop->fmt_out.transfer == TRANSFER_FUNC_SMPTE_ST2084 ||
+        interop->fmt_out.primaries == COLOR_PRIMARIES_BT2020)
     {
         // no warning for HLG because it's more or less backwards-compatible
         msg_Warn(priv->gl, "VLC needs to be built with support for libplacebo "
@@ -953,7 +953,7 @@ vlc_gl_sampler_New(struct vlc_gl_interop *interop)
     priv->gl = interop->gl;
     priv->vt = interop->vt;
 
-    sampler->fmt = &interop->sw_fmt;
+    sampler->fmt = &interop->fmt_out;
 
     sampler->shader.extensions = NULL;
     sampler->shader.body = NULL;
@@ -983,9 +983,9 @@ vlc_gl_sampler_New(struct vlc_gl_interop *interop)
 
     int ret =
         opengl_fragment_shader_init(sampler, interop->tex_target,
-                                    interop->sw_fmt.i_chroma,
-                                    interop->sw_fmt.space,
-                                    interop->sw_fmt.orientation);
+                                    interop->fmt_out.i_chroma,
+                                    interop->fmt_out.space,
+                                    interop->fmt_out.orientation);
     if (ret != VLC_SUCCESS)
     {
         free(sampler);
@@ -994,9 +994,9 @@ vlc_gl_sampler_New(struct vlc_gl_interop *interop)
 
     /* Texture size */
     for (unsigned j = 0; j < interop->tex_count; j++) {
-        const GLsizei w = interop->fmt.i_visible_width  * interop->texs[j].w.num
+        const GLsizei w = interop->fmt_out.i_visible_width  * interop->texs[j].w.num
                         / interop->texs[j].w.den;
-        const GLsizei h = interop->fmt.i_visible_height * interop->texs[j].h.num
+        const GLsizei h = interop->fmt_out.i_visible_height * interop->texs[j].h.num
                         / interop->texs[j].h.den;
         if (interop->api->supports_npot) {
             priv->tex_widths[j]  = w;

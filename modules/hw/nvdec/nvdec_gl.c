@@ -133,7 +133,7 @@ tc_nvdec_gl_update(const struct vlc_gl_interop *interop, GLuint textures[],
             .WidthInBytes = tex_widths[0],
             .Height = tex_heights[i],
         };
-        if (interop->fmt.i_chroma != VLC_CODEC_NVDEC_OPAQUE && interop->fmt.i_chroma != VLC_CODEC_NVDEC_OPAQUE_444)
+        if (interop->fmt_in.i_chroma != VLC_CODEC_NVDEC_OPAQUE && interop->fmt_in.i_chroma != VLC_CODEC_NVDEC_OPAQUE_444)
             cu_cpy.WidthInBytes *= 2;
         result = CALL_CUDA(cuMemcpy2DAsync, &cu_cpy, 0);
         if (result != VLC_SUCCESS)
@@ -156,7 +156,7 @@ static void Close(vlc_object_t *obj)
 static int Open(vlc_object_t *obj)
 {
     struct vlc_gl_interop *interop = (void *) obj;
-    if (!is_nvdec_opaque(interop->fmt.i_chroma))
+    if (!is_nvdec_opaque(interop->fmt_in.i_chroma))
         return VLC_EGENERIC;
 
     vlc_decoder_device *device = vlc_video_context_HoldDevice(interop->vctx);
@@ -199,7 +199,7 @@ static int Open(vlc_object_t *obj)
     }
 
     vlc_fourcc_t render_chroma;
-    switch (interop->fmt.i_chroma)
+    switch (interop->fmt_in.i_chroma)
     {
         case VLC_CODEC_NVDEC_OPAQUE_10B: render_chroma = VLC_CODEC_P010; break;
         case VLC_CODEC_NVDEC_OPAQUE_16B: render_chroma = VLC_CODEC_P016; break;
@@ -209,7 +209,7 @@ static int Open(vlc_object_t *obj)
         default:                         render_chroma = VLC_CODEC_NV12; break;
     }
 
-    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, render_chroma, interop->fmt.space);
+    int ret = opengl_interop_init(interop, GL_TEXTURE_2D, render_chroma, interop->fmt_in.space);
     if (ret != VLC_SUCCESS)
     {
         vlc_decoder_device_Release(device);

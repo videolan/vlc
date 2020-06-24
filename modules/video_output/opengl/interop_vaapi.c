@@ -356,7 +356,8 @@ tc_va_check_derive_image(const struct vlc_gl_interop *interop)
     VASurfaceID *va_surface_ids;
 
     picture_pool_t *pool = vlc_vaapi_PoolNew(o, interop->vctx, priv->vadpy, 1,
-                                             &va_surface_ids, &interop->fmt);
+                                             &va_surface_ids,
+                                             &interop->fmt_out);
     if (!pool)
         return VLC_EGENERIC;
 
@@ -422,7 +423,7 @@ Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(interop->vctx);
     if (dec_device->type != VLC_DECODER_DEVICE_VAAPI
-     || !vlc_vaapi_IsChromaOpaque(interop->fmt.i_chroma)
+     || !vlc_vaapi_IsChromaOpaque(interop->fmt_in.i_chroma)
      || interop->gl->ext != VLC_GL_EXT_EGL
      || interop->gl->egl.createImageKHR == NULL
      || interop->gl->egl.destroyImageKHR == NULL)
@@ -451,7 +452,7 @@ Open(vlc_object_t *obj)
 
     int va_fourcc;
     int vlc_sw_chroma;
-    switch (interop->fmt.i_chroma)
+    switch (interop->fmt_in.i_chroma)
     {
         case VLC_CODEC_VAAPI_420:
             va_fourcc = VA_FOURCC_NV12;
@@ -483,10 +484,10 @@ Open(vlc_object_t *obj)
         goto error;
 
     /* The pictures are uploaded upside-down */
-    video_format_TransformBy(&interop->fmt, TRANSFORM_VFLIP);
+    video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
 
     int ret = opengl_interop_init(interop, GL_TEXTURE_2D, vlc_sw_chroma,
-                                  interop->fmt.space);
+                                  interop->fmt_in.space);
     if (ret != VLC_SUCCESS)
         goto error;
 

@@ -178,6 +178,10 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
      && vout_display_opengl_SetViewpoint(vgl, viewpoint) != VLC_SUCCESS)
         goto delete_sub_renderer;
 
+    /* Forward to the core the changes to the input format requested by the
+     * interop */
+    *fmt = vgl->interop->fmt_in;
+
     if (subpicture_chromas) {
         *subpicture_chromas = gl_subpicture_chromas;
     }

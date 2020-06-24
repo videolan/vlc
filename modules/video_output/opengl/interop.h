@@ -113,11 +113,26 @@ struct vlc_gl_interop {
     const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
     GLenum tex_target;
 
-    /* Can only be changed from the module open function */
-    video_format_t fmt;
+    /* Input format
+     *
+     * This is the format of the pictures received from the core.
+     *
+     * It can be modified from the module open function to request changes from
+     * the core.
+     */
+    video_format_t fmt_in;
 
-    /* Software format (useful if fmt only exposes opaque chroma) */
-    video_format_t sw_fmt;
+    /* Output format
+     *
+     * This is the format of the pictures exposed by the interop to the sampler.
+     *
+     * It may differ from the input format:
+     *  - the orientation may be vertically flipped
+     *  - the chroma contains the "software" chroma if the input chroma is opaque
+     *  - the chroma may also be changed internally to a fallback (see
+     *    opengl_interop_generic_init())
+     */
+    video_format_t fmt_out;
 
     /* Pointer to decoder video context, set by the caller (can be NULL) */
     vlc_video_context *vctx;

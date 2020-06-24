@@ -122,9 +122,9 @@ Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     vlc_decoder_device *dec_device = vlc_video_context_HoldDevice(interop->vctx);
     if (GetVDPAUOpaqueDevice(dec_device) == NULL
-     || (interop->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
-      && interop->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
-      && interop->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
+     || (interop->fmt_in.i_chroma != VLC_CODEC_VDPAU_VIDEO_420
+      && interop->fmt_in.i_chroma != VLC_CODEC_VDPAU_VIDEO_422
+      && interop->fmt_in.i_chroma != VLC_CODEC_VDPAU_VIDEO_444)
      || !vlc_gl_StrHasToken(interop->api->extensions, "GL_NV_vdpau_interop")
      || interop->gl->surface->type != VOUT_WINDOW_TYPE_XID)
     {
@@ -140,7 +140,8 @@ Open(vlc_object_t *obj)
     }
     sys->dec_device = dec_device;
 
-    interop->fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
+    /* Request to change the input chroma to the core */
+    interop->fmt_in.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
 
     VdpDevice device;
     vdpau_decoder_device_t *vdpau_dev = GetVDPAUOpaqueDevice(dec_device);
@@ -177,7 +178,7 @@ Open(vlc_object_t *obj)
     INTEROP_CALL(glVDPAUInitNV, (void *)(uintptr_t)device, vdp_gpa);
 
     /* The pictures are uploaded upside-down */
-    video_format_TransformBy(&interop->fmt, TRANSFORM_VFLIP);
+    video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
 
     int ret = opengl_interop_init(interop, GL_TEXTURE_2D, VLC_CODEC_RGB32,
                                   COLOR_SPACE_UNDEF);

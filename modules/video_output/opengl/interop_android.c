@@ -108,7 +108,7 @@ Open(vlc_object_t *obj)
 {
     struct vlc_gl_interop *interop = (void *) obj;
 
-    if (interop->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
+    if (interop->fmt_in.i_chroma != VLC_CODEC_ANDROID_OPAQUE
      || !interop->gl->surface->handle.anativewindow
      || !interop->vctx)
         return VLC_EGENERIC;

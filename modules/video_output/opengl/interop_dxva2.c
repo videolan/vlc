@@ -235,10 +235,10 @@ static void SetupProcessorInput(struct vlc_gl_interop *interop, const video_form
     DXVAHD_STREAM_STATE_SOURCE_RECT_DATA srcRect;
     srcRect.Enable = TRUE;
     srcRect.SourceRect = (RECT) {
-        .left   = interop->fmt.i_x_offset,
-        .right  = interop->fmt.i_x_offset + interop->fmt.i_visible_width,
-        .top    = interop->fmt.i_y_offset,
-        .bottom = interop->fmt.i_y_offset + interop->fmt.i_visible_height,
+        .left   = interop->fmt_in.i_x_offset,
+        .right  = interop->fmt_in.i_x_offset + interop->fmt_in.i_visible_width,
+        .top    = interop->fmt_in.i_y_offset,
+        .bottom = interop->fmt_in.i_y_offset + interop->fmt_in.i_visible_height,
     };;
     hr = IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_SOURCE_RECT, sizeof(srcRect), &srcRect );
 
@@ -246,9 +246,9 @@ static void SetupProcessorInput(struct vlc_gl_interop *interop, const video_form
     dstRect.Enable = TRUE;
     dstRect.TargetRect = (RECT) {
         .left   = 0,
-        .right  = interop->fmt.i_visible_width,
+        .right  = interop->fmt_in.i_visible_width,
         .top    = 0,
-        .bottom = interop->fmt.i_visible_height,
+        .bottom = interop->fmt_in.i_visible_height,
     };
     hr = IDXVAHD_VideoProcessor_SetVideoProcessBltState( sys->processor.proc, DXVAHD_BLT_STATE_TARGET_RECT, sizeof(dstRect), &dstRect);
 }
@@ -294,12 +294,12 @@ static int InitRangeProcessor(struct vlc_gl_interop *interop, IDirect3DDevice9Ex
 
     DXVAHD_CONTENT_DESC desc;
     desc.InputFrameFormat = DXVAHD_FRAME_FORMAT_PROGRESSIVE;
-    GetFrameRate( &desc.InputFrameRate, &interop->fmt );
-    desc.InputWidth       = interop->fmt.i_visible_width;
-    desc.InputHeight      = interop->fmt.i_visible_height;
+    GetFrameRate( &desc.InputFrameRate, &interop->fmt_in );
+    desc.InputWidth       = interop->fmt_in.i_visible_width;
+    desc.InputHeight      = interop->fmt_in.i_visible_height;
     desc.OutputFrameRate  = desc.InputFrameRate;
-    desc.OutputWidth      = interop->fmt.i_visible_width;
-    desc.OutputHeight     = interop->fmt.i_visible_height;
+    desc.OutputWidth      = interop->fmt_in.i_visible_width;
+    desc.OutputHeight     = interop->fmt_in.i_visible_height;
 
     hr = CreateDevice(devex, &desc, DXVAHD_DEVICE_USAGE_PLAYBACK_NORMAL, NULL, &hd_device);
     if (FAILED(hr))
@@ -382,7 +382,7 @@ static int InitRangeProcessor(struct vlc_gl_interop *interop, IDirect3DDevice9Ex
     }
     IDXVAHD_Device_Release( hd_device );
 
-    SetupProcessorInput(interop, &interop->fmt, src_format);
+    SetupProcessorInput(interop, &interop->fmt_in, src_format);
 
     DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA colorspace;
     colorspace.Usage = 0; // playback
@@ -407,8 +407,8 @@ GLConvOpen(vlc_object_t *obj)
 {
     struct vlc_gl_interop *interop = (void *) obj;
 
-    if (interop->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE
-     && interop->fmt.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)
+    if (interop->fmt_in.i_chroma != VLC_CODEC_D3D9_OPAQUE
+     && interop->fmt_in.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B)
         return VLC_EGENERIC;
 
     d3d9_video_context_t *vctx_sys = GetD3D9ContextPrivate( interop->vctx );
@@ -456,7 +456,7 @@ GLConvOpen(vlc_object_t *obj)
 
     HRESULT hr;
     bool force_dxva_hd = var_InheritBool(interop, "direct3d9-dxvahd");
-    if (force_dxva_hd || (interop->fmt.color_range != COLOR_RANGE_FULL &&
+    if (force_dxva_hd || (interop->fmt_in.color_range != COLOR_RANGE_FULL &&
                           d3d9_decoder->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA))
     {
         // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
@@ -482,8 +482,8 @@ GLConvOpen(vlc_object_t *obj)
 
     HANDLE shared_handle = NULL;
     hr = IDirect3DDevice9Ex_CreateRenderTarget(d3d9_decoder->d3ddev.devex,
-                                               interop->fmt.i_visible_width,
-                                               interop->fmt.i_visible_height,
+                                               interop->fmt_in.i_visible_width,
+                                               interop->fmt_in.i_visible_height,
                                                priv->OutputFormat,
                                                D3DMULTISAMPLE_NONE, 0, FALSE,
                                                &priv->dx_render, &shared_handle);
@@ -510,7 +510,7 @@ GLConvOpen(vlc_object_t *obj)
     interop->ops = &ops;
 
     /* The pictures are uploaded upside-down */
-    video_format_TransformBy(&interop->fmt, TRANSFORM_VFLIP);
+    video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
 
     int ret = opengl_interop_init(interop, GL_TEXTURE_2D, VLC_CODEC_RGB32,
                                   COLOR_SPACE_UNDEF);
