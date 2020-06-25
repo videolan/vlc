@@ -577,4 +577,3 @@ static void EsFormatMergeSize( es_format_t *p_dst,
     p_dst->video.i_sar_num = p_size->video.i_sar_num;
     p_dst->video.i_sar_den = p_size->video.i_sar_den;
 }
-
