@@ -115,6 +115,7 @@ filter_chain_Clear
 filter_chain_SubFilter
 filter_chain_VideoFilter
 filter_chain_VideoFlush
+filter_chain_ForEach
 filter_ConfigureBlend
 filter_DeleteBlend
 filter_NewBlend

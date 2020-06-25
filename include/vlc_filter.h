@@ -510,7 +510,7 @@ VLC_API subpicture_t *filter_chain_SubFilter(filter_chain_t *chain,
 VLC_API int filter_chain_MouseFilter( filter_chain_t *, struct vlc_mouse_t *,
                                       const struct vlc_mouse_t * );
 
-int filter_chain_ForEach( filter_chain_t *chain,
+VLC_API int filter_chain_ForEach( filter_chain_t *chain,
                           int (*cb)( filter_t *, void * ), void *opaque );
 
 /** @} */
