@@ -55,34 +55,40 @@ extern "C" {
 
 /* Default fonts */
 #ifdef __APPLE__
-# define SYSTEM_DEFAULT_FONT_FILE "/System/Library/Fonts/HelveticaNeue.dfont"
-# define SYSTEM_DEFAULT_FAMILY "Helvetica Neue"
-# define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "/System/Library/Fonts/Monaco.dfont"
-# define SYSTEM_DEFAULT_MONOSPACE_FAMILY "Monaco"
+# define SYSTEM_FONT_PATH                   "/System/Library/Fonts"
+# define SYSTEM_DEFAULT_FONT_FILE           "HelveticaNeue.dfont"
+# define SYSTEM_DEFAULT_FAMILY              "Helvetica Neue"
+# define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "Monaco.dfont"
+# define SYSTEM_DEFAULT_MONOSPACE_FAMILY    "Monaco"
 #elif defined( _WIN32 )
-# define SYSTEM_DEFAULT_FONT_FILE "arial.ttf" /* Default path font found at run-time */
-# define SYSTEM_DEFAULT_FAMILY "Arial"
+# define SYSTEM_FONT_PATH                   "" /* Default path font found at run-time */
+# define SYSTEM_DEFAULT_FONT_FILE           "arial.ttf"
+# define SYSTEM_DEFAULT_FAMILY              "Arial"
 # define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "cour.ttf"
-# define SYSTEM_DEFAULT_MONOSPACE_FAMILY "Courier New"
+# define SYSTEM_DEFAULT_MONOSPACE_FAMILY    "Courier New"
 #elif defined( __OS2__ )
-# define SYSTEM_DEFAULT_FONT_FILE "/psfonts/tnrwt_k.ttf"
-# define SYSTEM_DEFAULT_FAMILY "Times New Roman WT K"
-# define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "/psfonts/mtsansdk.ttf"
-# define SYSTEM_DEFAULT_MONOSPACE_FAMILY "Monotype Sans Duospace WT K"
+# define SYSTEM_FONT_PATH                   "/psfonts"
+# define SYSTEM_DEFAULT_FONT_FILE           "tnrwt_k.ttf"
+# define SYSTEM_DEFAULT_FAMILY              "Times New Roman WT K"
+# define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "mtsansdk.ttf"
+# define SYSTEM_DEFAULT_MONOSPACE_FAMILY    "Monotype Sans Duospace WT K"
 #elif defined( __ANDROID__ )
-# define SYSTEM_DEFAULT_FONT_FILE "/system/fonts/Roboto-Regular.ttf"
-# define SYSTEM_DEFAULT_FAMILY "sans-serif"
-# define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "/system/fonts/DroidSansMono.ttf"
-# define SYSTEM_DEFAULT_MONOSPACE_FAMILY "Monospace"
+# define SYSTEM_FONT_PATH                   "/system/fonts"
+# define SYSTEM_DEFAULT_FONT_FILE           "Roboto-Regular.ttf"
+# define SYSTEM_DEFAULT_FAMILY              "sans-serif"
+# define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "DroidSansMono.ttf"
+# define SYSTEM_DEFAULT_MONOSPACE_FAMILY    "Monospace"
 #else
-# define SYSTEM_DEFAULT_FONT_FILE "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
-# define SYSTEM_DEFAULT_FAMILY "Serif Bold"
-# define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "/usr/share/fonts/truetype/freefont/FreeMono.ttf"
-# define SYSTEM_DEFAULT_MONOSPACE_FAMILY "Monospace"
+# define SYSTEM_FONT_PATH                   "/usr/share/fonts/truetype/freefont"
+# define SYSTEM_DEFAULT_FONT_FILE           "FreeSerifBold.ttf"
+# define SYSTEM_DEFAULT_FAMILY              "Serif Bold"
+# define SYSTEM_DEFAULT_MONOSPACE_FONT_FILE "FreeMono.ttf"
+# define SYSTEM_DEFAULT_MONOSPACE_FAMILY    "Monospace"
 #endif
 
 #ifndef DEFAULT_FONT_FILE
-# define DEFAULT_FONT_FILE SYSTEM_DEFAULT_FONT_FILE
+# define DEFAULT_FONT_FILE \
+    SYSTEM_FONT_PATH DIR_SEP SYSTEM_DEFAULT_FONT_FILE
 #endif
 
 #ifndef DEFAULT_FAMILY
@@ -90,7 +96,8 @@ extern "C" {
 #endif
 
 #ifndef DEFAULT_MONOSPACE_FONT_FILE
-# define DEFAULT_MONOSPACE_FONT_FILE SYSTEM_DEFAULT_MONOSPACE_FONT_FILE
+# define DEFAULT_MONOSPACE_FONT_FILE \
+    SYSTEM_FONT_PATH DIR_SEP SYSTEM_DEFAULT_MONOSPACE_FONT_FILE
 #endif
 
 #ifndef DEFAULT_MONOSPACE_FAMILY

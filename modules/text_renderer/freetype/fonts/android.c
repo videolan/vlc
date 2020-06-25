@@ -45,7 +45,6 @@
 #define ANDROID_SYSTEM_FONTS_LEGACY  "file:///system/etc/system_fonts.xml"
 #define ANDROID_FALLBACK_FONTS       "file:///system/etc/fallback_fonts.xml"
 #define ANDROID_VENDOR_FONTS         "file:///vendor/etc/fallback_fonts.xml"
-#define ANDROID_FONT_PATH            "/system/fonts"
 
 static int Android_ParseFont( filter_t *p_filter, xml_reader_t *p_xml,
                               vlc_family_t *p_family )
@@ -83,7 +82,7 @@ static int Android_ParseFont( filter_t *p_filter, xml_reader_t *p_xml,
      * We don't need all font weights. Only 400 (regular) and 700 (bold)
      */
     if( i_weight == 400 || i_weight == 700 )
-        if( asprintf( &psz_fontfile, "%s/%s", ANDROID_FONT_PATH, psz_val ) < 0
+        if( asprintf( &psz_fontfile, "%s/%s", SYSTEM_FONT_PATH, psz_val ) < 0
          || !NewFont( psz_fontfile, 0, b_bold, b_italic, p_family ) )
             return VLC_ENOMEM;
 
@@ -327,7 +326,7 @@ static int Android_Legacy_ParseFamily( filter_t *p_filter, xml_reader_t *p_xml )
                 }
 
                 char *psz_fontfile = NULL;
-                if( asprintf( &psz_fontfile, "%s/%s", ANDROID_FONT_PATH, p_node ) < 0
+                if( asprintf( &psz_fontfile, "%s/%s", SYSTEM_FONT_PATH, p_node ) < 0
                  || !NewFont( psz_fontfile, 0, b_bold, b_italic, p_family ) )
                     return VLC_ENOMEM;
 
