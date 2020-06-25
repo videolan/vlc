@@ -226,13 +226,8 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
 
     struct encoder_owner *p_enc_owner = (struct encoder_owner*)sout_EncoderCreate(p_stream, sizeof(struct encoder_owner));
     if ( unlikely(p_enc_owner == NULL))
-    {
-        module_unneed( id->p_decoder, id->p_decoder->p_module );
-        id->p_decoder->p_module = NULL;
-        es_format_Clean( &id->decoder_out );
-        es_format_Clean( &encoder_tested_fmt_in );
-        return VLC_EGENERIC;
-    }
+       goto error;
+
     p_enc_owner->id = id;
     p_enc_owner->enc.cbs = &encoder_video_transcode_cbs;
 
@@ -241,33 +236,16 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
                                 &id->p_decoder->fmt_in,
                                 id->p_decoder->fmt_out.i_codec,
                                 &encoder_tested_fmt_in ) )
-    {
-        module_unneed( id->p_decoder, id->p_decoder->p_module );
-        id->p_decoder->p_module = NULL;
-        es_format_Clean( &id->decoder_out );
-        es_format_Clean( &encoder_tested_fmt_in );
-        return VLC_EGENERIC;
-    }
+       goto error;
 
     p_enc_owner = (struct encoder_owner *)sout_EncoderCreate(p_stream, sizeof(struct encoder_owner));
     if ( unlikely(p_enc_owner == NULL))
-    {
-        module_unneed( id->p_decoder, id->p_decoder->p_module );
-        id->p_decoder->p_module = NULL;
-        es_format_Clean( &encoder_tested_fmt_in );
-        es_format_Clean( &id->decoder_out );
-        return VLC_EGENERIC;
-    }
+       goto error;
 
     id->encoder = transcode_encoder_new( &p_enc_owner->enc, &encoder_tested_fmt_in );
     if( !id->encoder )
-    {
-        module_unneed( id->p_decoder, id->p_decoder->p_module );
-        id->p_decoder->p_module = NULL;
-        es_format_Clean( &encoder_tested_fmt_in );
-        es_format_Clean( &id->decoder_out );
-        return VLC_EGENERIC;
-    }
+       goto error;
+
     p_enc_owner->id = id;
     p_enc_owner->enc.cbs = &encoder_video_transcode_cbs;
 
@@ -277,6 +255,13 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     es_format_Clean( &encoder_tested_fmt_in );
 
     return VLC_SUCCESS;
+
+error:
+    module_unneed( id->p_decoder, id->p_decoder->p_module );
+    id->p_decoder->p_module = NULL;
+    es_format_Clean( &encoder_tested_fmt_in );
+    es_format_Clean( &id->decoder_out );
+    return VLC_EGENERIC;
 }
 
 static const struct filter_video_callbacks transcode_filter_video_cbs =
