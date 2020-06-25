@@ -167,10 +167,10 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->gl = vlc_object_create(vd, sizeof(*sys->gl));
         if (unlikely(!sys->gl))
             goto bailout;
-        sys->gl->makeCurrent = OpenglLock;
-        sys->gl->releaseCurrent = OpenglUnlock;
+        sys->gl->make_current = OpenglLock;
+        sys->gl->release_current = OpenglUnlock;
         sys->gl->swap = OpenglSwap;
-        sys->gl->getProcAddress = OurGetProcAddress;
+        sys->gl->get_proc_address = OurGetProcAddress;
 
         struct gl_sys *glsys = sys->gl->sys = malloc(sizeof(*glsys));
         if (!sys->gl->sys)

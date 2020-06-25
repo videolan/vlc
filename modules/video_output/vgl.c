@@ -141,11 +141,11 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     SET_CALLBACK_ADDR(sys->makeCurrentCb, "vout-cb-make-current");
     SET_CALLBACK_ADDR(sys->getProcAddressCb, "vout-cb-get-proc-address");
 
-    gl->makeCurrent = MakeCurrent;
-    gl->releaseCurrent = ReleaseCurrent;
+    gl->make_current = MakeCurrent;
+    gl->release_current = ReleaseCurrent;
     gl->resize = Resize;
     gl->swap = VglSwapBuffers;
-    gl->getProcAddress = OurGetProcAddress;
+    gl->get_proc_address = OurGetProcAddress;
     gl->destroy = Close;
 
     if( sys->setupCb )

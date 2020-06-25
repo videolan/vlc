@@ -377,11 +377,11 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api,
 
     /* Initialize OpenGL callbacks */
     gl->ext = VLC_GL_EXT_EGL;
-    gl->makeCurrent = MakeCurrent;
-    gl->releaseCurrent = ReleaseCurrent;
+    gl->make_current = MakeCurrent;
+    gl->release_current = ReleaseCurrent;
     gl->resize = Resize;
     gl->swap = SwapBuffers;
-    gl->getProcAddress = GetSymbol;
+    gl->get_proc_address = GetSymbol;
     gl->destroy = Close;
     gl->egl.queryString = QueryString;
 

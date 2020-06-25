@@ -46,11 +46,11 @@ struct vlc_gl_t
     module_t *module;
     void *sys;
 
-    int  (*makeCurrent)(vlc_gl_t *);
-    void (*releaseCurrent)(vlc_gl_t *);
+    int  (*make_current)(vlc_gl_t *);
+    void (*release_current)(vlc_gl_t *);
     void (*resize)(vlc_gl_t *, unsigned, unsigned);
     void (*swap)(vlc_gl_t *);
-    void*(*getProcAddress)(vlc_gl_t *, const char *);
+    void*(*get_proc_address)(vlc_gl_t *, const char *);
     void (*destroy)(vlc_gl_t *);
 
     enum {
@@ -101,12 +101,12 @@ VLC_API void vlc_gl_Hold(vlc_gl_t *);
 
 static inline int vlc_gl_MakeCurrent(vlc_gl_t *gl)
 {
-    return gl->makeCurrent(gl);
+    return gl->make_current(gl);
 }
 
 static inline void vlc_gl_ReleaseCurrent(vlc_gl_t *gl)
 {
-    gl->releaseCurrent(gl);
+    gl->release_current(gl);
 }
 
 static inline void vlc_gl_Resize(vlc_gl_t *gl, unsigned w, unsigned h)
@@ -122,7 +122,7 @@ static inline void vlc_gl_Swap(vlc_gl_t *gl)
 
 static inline void *vlc_gl_GetProcAddress(vlc_gl_t *gl, const char *name)
 {
-    return gl->getProcAddress(gl, name);
+    return gl->get_proc_address(gl, name);
 }
 
 VLC_API vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *,

@@ -84,8 +84,8 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
         vlc_object_delete(gl);
         return NULL;
     }
-    assert(gl->makeCurrent && gl->releaseCurrent && gl->swap
-        && gl->getProcAddress);
+    assert(gl->make_current && gl->release_current && gl->swap
+        && gl->get_proc_address);
     vlc_atomic_rc_init(&glpriv->rc);
 
     return &glpriv->gl;

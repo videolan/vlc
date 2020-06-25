@@ -185,10 +185,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         glsys->renderBuffer = glsys->frameBuffer = 0;
 
         /* Initialize common OpenGL video display */
-        sys->gl->makeCurrent = GLESMakeCurrent;
-        sys->gl->releaseCurrent = GLESReleaseCurrent;
+        sys->gl->make_current = GLESMakeCurrent;
+        sys->gl->release_current = GLESReleaseCurrent;
         sys->gl->swap = GLESSwap;
-        sys->gl->getProcAddress = OurGetProcAddress;
+        sys->gl->get_proc_address = OurGetProcAddress;
 
         if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
             goto bailout;

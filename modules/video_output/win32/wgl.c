@@ -230,11 +230,11 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
     wglMakeCurrent(sys->hGLDC, NULL);
 
     gl->ext = VLC_GL_EXT_WGL;
-    gl->makeCurrent = MakeCurrent;
-    gl->releaseCurrent = ReleaseCurrent;
+    gl->make_current = MakeCurrent;
+    gl->release_current = ReleaseCurrent;
     gl->resize = NULL;
     gl->swap = Swap;
-    gl->getProcAddress = OurGetProcAddress;
+    gl->get_proc_address = OurGetProcAddress;
     gl->destroy = Close;
 
     if (sys->exts.GetExtensionsStringEXT || sys->exts.GetExtensionsStringARB)

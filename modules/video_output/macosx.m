@@ -210,10 +210,10 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         }
         glsys->locked_ctx = NULL;
         glsys->glView = sys->glView;
-        sys->gl->makeCurrent = OpenglLock;
-        sys->gl->releaseCurrent = OpenglUnlock;
+        sys->gl->make_current = OpenglLock;
+        sys->gl->release_current = OpenglUnlock;
         sys->gl->swap = OpenglSwap;
-        sys->gl->getProcAddress = OurGetProcAddress;
+        sys->gl->get_proc_address = OurGetProcAddress;
 
         var_SetAddress(vlc_object_parent(vd), "macosx-glcontext",
                        [[sys->glView openGLContext] CGLContextObj]);

@@ -214,11 +214,11 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 
     /* Initialize OpenGL callbacks */
     gl->sys = sys;
-    gl->makeCurrent = MakeCurrent;
-    gl->releaseCurrent = ReleaseCurrent;
+    gl->make_current = MakeCurrent;
+    gl->release_current = ReleaseCurrent;
     gl->resize = NULL;
     gl->swap = SwapBuffers;
-    gl->getProcAddress = GetSymbol;
+    gl->get_proc_address = GetSymbol;
     gl->destroy = Close;
 
     bool is_swap_interval_set = false;
