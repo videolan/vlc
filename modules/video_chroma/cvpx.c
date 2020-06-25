@@ -43,6 +43,9 @@ static void Close(vlc_object_t *);
 #if !TARGET_OS_IPHONE
 static int Open_CVPX_to_CVPX(vlc_object_t *);
 static void Close_CVPX_to_CVPX(vlc_object_t *);
+
+static int Open_chain_CVPX(vlc_object_t *);
+static void Close_chain_CVPX(vlc_object_t *);
 #endif
 
 typedef struct
@@ -69,6 +72,12 @@ vlc_module_begin ()
     add_submodule()
     set_description("Conversions between CoreVideo buffers")
     set_callbacks(Open_CVPX_to_CVPX, Close_CVPX_to_CVPX)
+    set_capability("video converter", 10)
+
+    add_submodule()
+    set_description("Fast CoreVideo resize+conversion")
+    set_callbacks(Open_chain_CVPX, Close_chain_CVPX)
+    set_capability("video converter", 11)
 #endif
 vlc_module_end ()
 
@@ -473,6 +482,187 @@ Close_CVPX_to_CVPX(vlc_object_t *obj)
     CVPixelBufferPoolRelease(p_sys->pool);
     vlc_video_context_Release(filter->vctx_out);
     free(filter->p_sys);
+}
+
+static picture_t*
+chain_CVPX_Filter(filter_t *filter, picture_t *pic)
+{
+    filter_chain_t *chain = filter->p_sys;
+    return filter_chain_VideoFilter(chain, pic);
+}
+
+static void
+chain_CVPX_Flush(filter_t *filter)
+{
+    filter_chain_t *chain = filter->p_sys;
+    filter_chain_VideoFlush(chain);
+}
+
+static vlc_fourcc_t
+GetIntermediateChroma(input_chroma, output_chroma)
+{
+    vlc_fourcc_t chromas[2] = { input_chroma, output_chroma };
+
+    for(size_t i=0; i<ARRAY_SIZE(chromas); ++i)
+    {
+        switch (chromas[i])
+        {
+            case VLC_CODEC_I420: return VLC_CODEC_CVPX_I420;
+            case VLC_CODEC_BGRA: return VLC_CODEC_CVPX_BGRA;
+            case VLC_CODEC_NV12: return VLC_CODEC_CVPX_NV12;
+            case VLC_CODEC_UYVY: return VLC_CODEC_CVPX_UYVY;
+            case VLC_CODEC_P010: return VLC_CODEC_CVPX_P010;
+            default: break;
+        }
+    }
+
+    vlc_assert_unreachable();
+}
+
+static int
+PrintConversionChain(filter_t *filter, void *opaque)
+{
+    VLC_UNUSED(opaque);
+    msg_Dbg(filter, " - conversion %4.4s (%dx%d) -> %4.4s (%dx%d)",
+             (const char*)&filter->fmt_in.video.i_chroma,
+             filter->fmt_in.video.i_visible_width,
+             filter->fmt_in.video.i_visible_height,
+             (const char*)&filter->fmt_out.video.i_chroma,
+             filter->fmt_out.video.i_visible_width,
+             filter->fmt_out.video.i_visible_height);
+    return VLC_SUCCESS;
+}
+
+static const vlc_fourcc_t supported_sw_chromas[] = {
+    VLC_CODEC_I420, VLC_CODEC_BGRA, VLC_CODEC_NV12,
+    VLC_CODEC_UYVY, VLC_CODEC_P010,
+};
+
+static int
+Open_chain_CVPX(vlc_object_t *obj)
+{
+    filter_t *filter = (filter_t *)obj;
+
+    bool is_input_valid = false;
+    bool is_output_valid = false;
+
+    /* Check whether we're already in a CVPX chain or not, to avoid
+     * looping on the same conversion. */
+    vlc_value_t is_in_chain;
+    int ret = var_GetChecked(vlc_object_parent(filter), "cvpx-chroma-chain",
+                             VLC_VAR_BOOL, &is_in_chain);
+
+    if (ret == VLC_SUCCESS && is_in_chain.b_bool )
+        return VLC_EGENERIC;
+
+    vlc_fourcc_t input_chroma = filter->fmt_in.video.i_chroma;
+    vlc_fourcc_t output_chroma = filter->fmt_out.video.i_chroma;
+
+    for (size_t i=0; i<ARRAY_SIZE(supported_chromas); ++i)
+    {
+        is_input_valid |= supported_chromas[i] == input_chroma;
+        is_output_valid |= supported_chromas[i] == output_chroma;
+    }
+
+    /* If we don't convert from or to CVPX chroma, we don't need to use
+     * this filter at all. */
+    if (!is_input_valid && !is_output_valid)
+        return VLC_EGENERIC;
+
+    /* If we convert from CVPX to CVPX, we can directly use the filter
+     * above without this one. */
+    if (is_input_valid && is_output_valid)
+        return VLC_EGENERIC;
+
+    /* Store which side was in CVPixelBuffer chroma */
+    bool is_input_cvpx = is_input_valid;
+
+    if (is_input_cvpx)
+    {
+        /* CVPX conversion needs a CVPX context */
+        if (filter->vctx_in == NULL)
+            return VLC_EGENERIC;
+
+        if (vlc_video_context_GetType(filter->vctx_in)
+                != VLC_VIDEO_CONTEXT_CVPX)
+            return VLC_EGENERIC;
+    }
+
+    /* Check whether the other software chroma is supported. */
+    for (size_t i=0; i<ARRAY_SIZE(supported_sw_chromas); ++i)
+    {
+        is_input_valid |= supported_sw_chromas[i] == input_chroma;
+        is_output_valid |= supported_sw_chromas[i] == output_chroma;
+    }
+
+    /* If one of the side is not true yet, it means we didn't found a matching
+     * software chroma and hardware chroma for this side. */
+    if (!is_input_valid || !is_output_valid)
+        return VLC_EGENERIC;
+
+    msg_Dbg(obj, "Starting CVPX conversion chain %4.4s -> %4.4s",
+             (const char *)&input_chroma,
+             (const char *)&output_chroma);
+
+    /* We create a filter chain to encapsulate the two converters. */
+    filter_chain_t *chain =
+        filter_chain_NewVideo(filter, false, &filter->owner);
+    if (chain == NULL)
+        return VLC_ENOMEM;
+
+    filter_chain_Reset(chain, &filter->fmt_in, filter->vctx_in, &filter->fmt_out);
+
+    /* Check whether we need to resize before or after the
+     * first conversion. */
+    es_format_t fmt_out;
+    if (is_input_cvpx)
+        es_format_Copy(&fmt_out, &filter->fmt_out);
+    else
+        es_format_Copy(&fmt_out, &filter->fmt_in);
+
+    fmt_out.video.i_chroma
+        = fmt_out.i_codec
+        = GetIntermediateChroma(input_chroma, output_chroma);
+
+    var_Create(filter, "cvpx-chroma-chain", VLC_VAR_BOOL);
+    var_SetBool(filter, "cvpx-chroma-chain", true);
+
+    /* Append intermediate CVPX chroma */
+    ret = filter_chain_AppendConverter(chain, &fmt_out);
+    if (ret != 0)
+        goto error;
+    /* Append final chroma, either CVPX or software. */
+    ret = filter_chain_AppendConverter(chain, NULL);
+    if (ret != 0)
+        goto error;
+
+    struct vlc_video_context *vctx_out =
+        filter_chain_GetVideoCtxOut(chain);
+
+    filter->vctx_out = vctx_out;
+    filter->p_sys = chain;
+    filter->pf_flush = chain_CVPX_Flush;
+    filter->pf_video_filter = chain_CVPX_Filter;
+
+    /* Display the current conversion chain in the logs. */
+    msg_Dbg(filter, "CVPX conversion chain:");
+    filter_chain_ForEach(chain, PrintConversionChain, NULL);
+
+    return VLC_SUCCESS;
+error:
+    msg_Err(filter, "Failed to insert converter for CVPX chain");
+    filter_chain_Delete(chain);
+    var_Destroy(filter, "cvpx-chroma-chain");
+    return VLC_EGENERIC;
+}
+
+static void
+Close_chain_CVPX(vlc_object_t *obj)
+{
+    filter_t *filter = (filter_t*)obj;
+    filter_chain_t *chain = filter->p_sys;
+    filter_chain_Delete(chain);
+    var_Destroy(filter, "cvpx-chroma-chain");
 }
 
 #endif
