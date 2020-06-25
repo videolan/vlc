@@ -268,6 +268,27 @@ static FT_Vector GetAlignedOffset( const line_desc_t *p_line,
     return offsets;
 }
 
+static bool IsSupportedAttachment( const char *psz_mime )
+{
+    static const char * fontMimeTypes[] =
+    {
+        "application/x-truetype-font", // TTF
+        "application/x-font-otf",  // OTF
+        "application/font-sfnt",
+        "font/ttf",
+        "font/otf",
+        "font/sfnt",
+    };
+
+    for( size_t i=0; i<ARRAY_SIZE(fontMimeTypes); ++i )
+    {
+        if( !strcmp( psz_mime, fontMimeTypes[i] ) )
+            return true;
+    }
+
+    return false;
+}
+
 /*****************************************************************************
  * Make any TTF/OTF fonts present in the attachments of the media file
  * and store them for later use by the FreeType Engine
@@ -298,9 +319,8 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
     {
         input_attachment_t *p_attach = pp_attachments[k];
 
-        if( ( !strcmp( p_attach->psz_mime, "application/x-truetype-font" ) || // TTF
-              !strcmp( p_attach->psz_mime, "application/x-font-otf" ) ) &&    // OTF
-            p_attach->i_data > 0 && p_attach->p_data )
+        if( p_attach->i_data > 0 && p_attach->p_data &&
+            IsSupportedAttachment( p_attach->psz_mime ) )
         {
             p_sys->pp_font_attachments[ p_sys->i_font_attachments++ ] = p_attach;
 
