@@ -18,6 +18,7 @@ $(TARBALLS)/dav1d-$(DAV1D_VERSION).tar.xz:
 
 dav1d: dav1d-$(DAV1D_VERSION).tar.xz .sum-dav1d
 	$(UNPACK)
+	$(APPLY) $(SRC)/dav1d/0001-SSE2-PIC-464ca6c2.patch
 	$(MOVE)
 
 .dav1d: dav1d crossfile.meson
