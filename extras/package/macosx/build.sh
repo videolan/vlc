@@ -52,7 +52,7 @@ spopd()
     popd > /dev/null
 }
 
-while getopts "hvrcdpi:k:a:j:C:b:" OPTION
+while getopts "qhvrcdpi:k:a:j:C:b:" OPTION
 do
      case $OPTION in
          h)
