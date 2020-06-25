@@ -565,7 +565,7 @@ char* Generic_Select( filter_t *p_filter, const char* psz_family,
         p_family = p_sys->pf_get_family( p_filter, psz_family );
 
     if( !p_family || !p_family->p_fonts )
-        p_family = p_sys->pf_get_family( p_filter, SYSTEM_DEFAULT_FAMILY );
+        p_family = p_sys->pf_get_family( p_filter, DEFAULT_FAMILY );
 
     vlc_font_t *p_font;
     if( p_family && ( p_font = GetBestFont( p_filter, p_family, b_bold,
@@ -575,7 +575,7 @@ char* Generic_Select( filter_t *p_filter, const char* psz_family,
         return strdup( p_font->psz_fontfile );
     }
 
-    return File_Select( SYSTEM_DEFAULT_FONT_FILE );
+    return File_Select( DEFAULT_FONT_FILE );
 }
 
 #if !defined(_WIN32) || VLC_WINSTORE_APP
