@@ -90,6 +90,8 @@ class SystemPalette : public QObject
     Q_PROPERTY(QColor mid       READ mid      NOTIFY paletteChanged)
     Q_PROPERTY(QColor shadow    READ shadow   NOTIFY paletteChanged)
 
+    Q_PROPERTY(bool isDark READ isDark NOTIFY paletteChanged)
+
 public:
     SystemPalette(QObject* parent = nullptr);
 
@@ -154,6 +156,8 @@ public:
     QColor dark() const;
     QColor mid() const;
     QColor shadow() const;
+
+    bool isDark() const;
 
 signals:
     void paletteChanged();

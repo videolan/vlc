@@ -78,3 +78,7 @@ QColor SystemPalette::shadow() const
     return m_palette.color(QPalette::Normal, QPalette::Shadow);
 }
 
+bool SystemPalette::isDark() const
+{
+    return base().lightness() < text().lightness();
+}
