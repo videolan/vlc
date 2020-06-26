@@ -521,6 +521,16 @@ new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
             free( psz_uri );
             break;
         }
+        if( p_srv->renderer.psz_model != NULL )
+        {
+            char* psz_name;
+            if ( asprintf( &psz_name, "%s (%s)", p_srv->psz_device_name,
+                           p_srv->renderer.psz_model ) > 0 )
+            {
+                free( p_srv->psz_device_name );
+                p_srv->psz_device_name = psz_name;
+            }
+        }
 
         if( strcmp( p_srv->psz_protocol, "chromecast" ) == 0)
             psz_demux_filter = "cc_demux";
