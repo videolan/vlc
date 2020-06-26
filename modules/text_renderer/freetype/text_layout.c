@@ -578,8 +578,6 @@ static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
     FT_Face pp_faces[ MAX_FACES ] = {0};
     FT_Face p_face = NULL;
 
-    pp_faces[ 0 ] = SelectAndLoadFace( p_filter, p_style, 0 );
-
     for( int i = i_start_offset; i < i_end_offset; ++i )
     {
         int i_index = 0;
@@ -627,7 +625,8 @@ static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
         if( i == i_end_offset
          || p_paragraph->pp_faces[ i_run_start ] != p_paragraph->pp_faces[ i ] )
         {
-            if( AddRun( p_filter, p_paragraph, i_run_start, i,
+            if( p_paragraph->pp_faces[ i_run_start ] &&
+                AddRun( p_filter, p_paragraph, i_run_start, i,
                         p_paragraph->pp_faces[ i_run_start ], NULL ) )
                 return VLC_EGENERIC;
 
