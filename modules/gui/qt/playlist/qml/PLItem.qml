@@ -104,6 +104,12 @@ Rectangle {
             dragItem.updatePos(pos.x, pos.y)
         }
 
+        Rectangle {
+            color: VLCStyle.colors.bg
+            anchors.fill: parent
+            visible: model.isCurrent && !root.hovered && !model.selected
+        }
+
         RowLayout {
             id: content
             anchors {
