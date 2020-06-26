@@ -20,6 +20,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -111,24 +112,28 @@ Rectangle {
                 rightMargin: root.rightPadding
             }
 
-            /* Cover of the associated album */
-            Image {
-                id: cover
-
+            Item {
                 Layout.preferredHeight: VLCStyle.icon_normal
                 Layout.preferredWidth: VLCStyle.icon_normal
                 Layout.leftMargin: VLCStyle.margin_xsmall
 
-                fillMode: Image.PreserveAspectFit
-                source: (model.artwork && model.artwork.toString()) ? model.artwork : VLCStyle.noArtCover
-            }
+                Image {
+                    id: artwork
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectFit
+                    source: (model.artwork && model.artwork.toString()) ? model.artwork : VLCStyle.noArtCover
+                    visible: !statusIcon.visible
+                }
 
-            Image {
-                id: isVisible
-                visible: model.isCurrent
-                Layout.preferredHeight: VLCStyle.icon_small
-                Layout.preferredWidth: VLCStyle.icon_small
-                source:  "qrc:///toolbar/play_b.svg"
+                Image {
+                    id: statusIcon
+                    anchors.centerIn: parent
+                    visible: (model.isCurrent && source !== "")
+                    width: VLCStyle.play_cover_small
+                    height: VLCStyle.play_cover_small
+                    source: player.playingState === PlayerController.PLAYING_STATE_PLAYING ? "qrc:///toolbar/play_b.svg" :
+                                                        player.playingState === PlayerController.PLAYING_STATE_PAUSED ? "qrc:///toolbar/pause_b.svg" : ""
+                }
             }
 
             Column {
