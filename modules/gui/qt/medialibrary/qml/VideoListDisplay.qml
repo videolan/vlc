@@ -50,7 +50,7 @@ Widgets.KeyNavigableTableView {
 
         Widgets.MediaCover {
             anchors.verticalCenter: parent.verticalCenter
-            source: !rowModel ? "" : rowModel[model.criteria]
+            source: ( !rowModel ? undefined : rowModel[model.criteria] ) || VLCStyle.noArtCover
             playCoverVisible: currentlyFocused || containsMouse
             playIconSize: VLCStyle.play_cover_small
             onPlayIconClicked:  medialib.addAndPlay( rowModel.id )
