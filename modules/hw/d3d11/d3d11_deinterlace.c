@@ -226,14 +226,7 @@ picture_t *AllocPicture( filter_t *p_filter )
     if (unlikely(cfg == NULL))
         return NULL;
 
-    picture_t *pic = D3D11_AllocPicture(VLC_OBJECT(p_filter), &p_filter->fmt_out.video, p_filter->vctx_out, cfg);
-    if (unlikely(pic == NULL))
-        return NULL;
-
-    struct d3d11_pic_context *pic_ctx = container_of(pic->context, struct d3d11_pic_context, s);
-    D3D11_AllocateResourceView(p_filter, p_sys->d3d_dev->d3ddevice, cfg, pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc);
-
-    return pic;
+    return D3D11_AllocPicture(VLC_OBJECT(p_filter), &p_filter->fmt_out.video, p_filter->vctx_out, cfg);
 }
 
 int D3D11OpenDeinterlace(vlc_object_t *obj)
