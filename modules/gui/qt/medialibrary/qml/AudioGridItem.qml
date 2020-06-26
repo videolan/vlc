@@ -30,4 +30,9 @@ Widgets.GridItem {
     pictureWidth: VLCStyle.gridCover_music_width
     pictureHeight: VLCStyle.gridCover_music_height
     playCoverBorder.width: VLCStyle.gridCover_music_border
+    onPlayClicked: {
+        if ( model.id !== undefined ) {
+            medialib.addAndPlay( model.id )
+        }
+    }
 }

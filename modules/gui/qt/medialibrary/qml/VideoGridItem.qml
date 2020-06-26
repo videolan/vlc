@@ -43,4 +43,10 @@ Widgets.GridItem {
             history.push(["player"])
         }
     }
+    onPlayClicked: {
+        if ( model.id !== undefined ) {
+            medialib.addAndPlay( model.id )
+            history.push(["player"])
+        }
+    }
 }
