@@ -19,6 +19,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 
@@ -122,6 +123,17 @@ Rectangle {
                 Layout.preferredHeight: VLCStyle.icon_normal
                 Layout.preferredWidth: VLCStyle.icon_normal
                 Layout.leftMargin: VLCStyle.margin_xsmall
+
+                DropShadow {
+                    id: effect
+                    anchors.fill: artwork
+                    source: artwork
+                    radius: 8
+                    samples: 17
+                    color: VLCStyle.colors.glowColorBanner
+                    visible: artwork.visible
+                    spread: 0.1
+                }
 
                 Image {
                     id: artwork
