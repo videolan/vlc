@@ -22,33 +22,39 @@ import "qrc:///style/"
 Rectangle {
     id: root
 
-    property alias iconSize: cover.width
+    property alias iconSize: icon.width
+    property bool onlyBorders: false
     signal iconClicked()
 
     border.color: VLCStyle.colors.accent
     border.width: VLCStyle.table_cover_border
 
     opacity: visible ? 1 : 0
-
-    gradient: Gradient {
-        GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, .5) }
-        GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, .7) }
-    }
+    gradient: !onlyBorders ? background : undefined
+    color: 'transparent'
 
     Behavior on opacity {
         NumberAnimation { duration: 150; easing.type: Easing.OutQuad }
     }
 
     Image {
-        id: cover
+        id: icon
 
         anchors.centerIn: parent
         fillMode: Image.PreserveAspectFit
         source: "qrc:/play_button.svg"
+        visible: !root.onlyBorders
 
         MouseArea {
             anchors.fill: parent
             onClicked: root.iconClicked()
         }
+    }
+
+    Gradient {
+        id: background
+
+        GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, .5) }
+        GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, .7) }
     }
 }

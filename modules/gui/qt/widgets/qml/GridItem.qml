@@ -32,6 +32,7 @@ Item {
     property alias title: titleLabel.text
     property alias subtitle: subtitleTxt.text
     property alias playCoverBorder: picture.playCoverBorder
+    property alias playCoverOnlyBorders: picture.playCoverOnlyBorders
     property bool selected: false
 
     property alias progress: picture.progress
