@@ -162,6 +162,13 @@ static void WaitForAudioClient(audio_output_t *aout)
             {
                 sys->acquired_device = wcsdup(devId);
 
+                char *report = FromWide(devId);
+                if (likely(report))
+                {
+                    aout_DeviceReport(aout, report);
+                    free(report);
+                }
+
                 IAudioClient2 *audioClient2;
                 if (SUCCEEDED(IAudioClient_QueryInterface(sys->client, &IID_IAudioClient2, (void**)&audioClient2))
                     && audioClient2)
