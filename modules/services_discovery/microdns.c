@@ -269,6 +269,13 @@ items_clear( struct discovery_sys *p_sys )
     vlc_array_clear( &p_sys->items );
 }
 
+static void clear_srvs( struct srv *p_srvs, unsigned int i_nb_srv )
+{
+    for( unsigned int i = 0; i < i_nb_srv; ++i )
+        free( p_srvs[i].psz_device_name );
+    free( p_srvs );
+}
+
 static int
 parse_entries( const struct rr_entry *p_entries, bool b_renderer,
                struct srv **pp_srvs, unsigned int *p_nb_srv,
@@ -356,9 +363,7 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
     }
     if( psz_ip == NULL || i_nb_srv == 0 )
     {
-        for( unsigned int i = 0; i < i_nb_srv; ++i )
-            free( p_srvs[i].psz_device_name );
-        free( p_srvs );
+        clear_srvs( p_srvs, i_nb_srv );
         return VLC_EGENERIC;
     }
 
@@ -416,9 +421,7 @@ new_entries_sd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
         items_add_input( p_sys, p_sd, psz_uri, p_srv->psz_device_name );
     }
 
-    for( unsigned int i = 0; i < i_nb_srv; ++i )
-        free( p_srvs[i].psz_device_name );
-    free( p_srvs );
+    clear_srvs( p_srvs, i_nb_srv );
 }
 
 
@@ -529,9 +532,7 @@ new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
         free(psz_icon_uri);
     }
 
-    for( unsigned int i = 0; i < i_nb_srv; ++i )
-        free( p_srvs[i].psz_device_name );
-    free( p_srvs );
+    clear_srvs( p_srvs, i_nb_srv );
 }
 
 static bool
