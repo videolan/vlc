@@ -44,6 +44,8 @@ Item {
             return "transparent"
     }
 
+    property bool  isThemeDark: false
+
     property color text: systemPalette.text;
     property color textInactive: systemPalette.textInactive;
     property color textDisabled: systemPalette.textDisabled;
@@ -123,7 +125,9 @@ Item {
 
                 accent: "#ff950d";
                 alert: "#ff0000";
-                separator: "#ededed"
+                separator: "#ededed";
+
+                isThemeDark: false;
             }
         },
         State {
@@ -148,6 +152,7 @@ Item {
                 accent: "#ff950d"
                 alert: "#ff0000"
                 separator: "#2d2d2d"
+                isThemeDark: true
             }
         },
         State {
@@ -177,6 +182,8 @@ Item {
                 bannerHover: systemPalette.highlight
 
                 separator: blendColors(bg, text, .95)
+
+                isThemeDark: systemPalette.isDark
             }
         }
     ]
