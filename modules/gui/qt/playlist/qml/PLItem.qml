@@ -50,7 +50,7 @@ Rectangle {
     // This item will become the parent of the dragged item during the drag operation
     //property alias draggedItemParent: draggable_item.draggedItemParent
 
-    height: Math.max( VLCStyle.fontHeight_normal, VLCStyle.icon_normal ) + VLCStyle.margin_xxsmall
+    height: Math.max( VLCStyle.fontHeight_normal, VLCStyle.icon_normal ) + VLCStyle.margin_xsmall
 
     property bool dropVisible: false
 
