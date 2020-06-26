@@ -109,6 +109,8 @@ struct srv
 {
     const char *psz_protocol;
     char *      psz_device_name;
+    char *      psz_model;
+    char *      psz_icon;
     uint16_t    i_port;
     int         i_renderer_flags;
 };
@@ -272,7 +274,11 @@ items_clear( struct discovery_sys *p_sys )
 static void clear_srvs( struct srv *p_srvs, unsigned int i_nb_srv )
 {
     for( unsigned int i = 0; i < i_nb_srv; ++i )
+    {
         free( p_srvs[i].psz_device_name );
+        free( p_srvs[i].psz_model );
+        free( p_srvs[i].psz_icon );
+    }
     free( p_srvs );
 }
 
@@ -356,6 +362,16 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
                             p_srv->i_renderer_flags |= VLC_RENDERER_CAN_VIDEO;
                         if ( ( ca & 0x04 ) != 0 )
                             p_srv->i_renderer_flags |= VLC_RENDERER_CAN_AUDIO;
+                    }
+                    else if( !strncmp("md=", p_txt->txt, 3) )
+                    {
+                        free( p_srv->psz_model );
+                        p_srv->psz_model = strdup( p_txt->txt + 3 );
+                    }
+                    else if( !strncmp("ic=", p_txt->txt, 3) )
+                    {
+                        free( p_srv->psz_icon );
+                        p_srv->psz_icon = strdup( p_txt->txt + 3 );
                     }
                 }
             }
@@ -477,26 +493,6 @@ new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
                        &psz_ip, &b_ipv6 ) != VLC_SUCCESS )
         return;
 
-    const char *psz_model = NULL;
-    const char *psz_icon = NULL;
-    for( const struct rr_entry *p_entry = p_entries;
-         p_entry != NULL && ( psz_model == NULL || psz_icon == NULL );
-         p_entry = p_entry->next )
-    {
-        if( p_entry->type == RR_TXT )
-        {
-            const struct rr_data_txt *p_txt = p_entry->data.TXT;
-            while( p_txt && ( psz_model == NULL || psz_icon == NULL ) )
-            {
-                if( !strncmp("md=", p_txt->txt, 3) )
-                    psz_model = p_txt->txt + 3;
-                else if( !strncmp("ic=", p_txt->txt, 3) )
-                    psz_icon = p_txt->txt + 3;
-                p_txt = p_txt->next;
-            }
-        }
-    }
-
     /* send new input items (if they don't already exist) */
     for( unsigned int i = 0; i < i_nb_srv; ++i )
     {
@@ -515,8 +511,8 @@ new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries 
             continue;
         }
 
-        if( psz_icon != NULL
-         && asprintf( &psz_icon_uri, "http://%s:8008%s", psz_ip, psz_icon )
+        if( p_srv->psz_icon != NULL
+         && asprintf( &psz_icon_uri, "http://%s:8008%s", psz_ip, p_srv->psz_icon )
                       == -1 )
         {
             free( psz_uri );
