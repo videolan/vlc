@@ -136,6 +136,7 @@ static void add_renderer( const char *psz_protocol, const char *psz_name,
     char *friendly_name = NULL;
     char *icon_uri = NULL;
     char *uri = NULL;
+    char *model = NULL;
     const char *demux = NULL;
     const char *extra_uri = NULL;
     int renderer_flags = 0;
@@ -174,11 +175,23 @@ static void add_renderer( const char *psz_protocol, const char *psz_name,
             free( icon_raw );
         }
 
+        model = get_string_list_value( txt, "md" );
+
         if( asprintf( &uri, "%s://%s:%u", psz_protocol, psz_addr, i_port ) < 0 )
             goto error;
 
         extra_uri = renderer_flags & VLC_RENDERER_CAN_VIDEO ? NULL : "no-video";
         demux = "cc_demux";
+    }
+
+    if ( friendly_name && model ) {
+        char* combined;
+        if ( asprintf( &combined, "%s (%s)", friendly_name, model ) == -1 )
+            combined = NULL;
+        if ( combined != NULL ) {
+            free(friendly_name);
+            friendly_name = combined;
+        }
     }
 
     vlc_renderer_item_t *p_renderer_item =
@@ -195,6 +208,7 @@ error:
     free( friendly_name );
     free( icon_uri );
     free( uri );
+    free( model );
 }
 
 /*****************************************************************************
