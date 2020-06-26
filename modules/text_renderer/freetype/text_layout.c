@@ -552,7 +552,6 @@ static int AddRun( filter_t *p_filter,
     return VLC_SUCCESS;
 }
 
-#ifdef HAVE_FONT_FALLBACK
 /**
  * Add a run with font fallback, possibly breaking the run further
  * into runs of glyphs that end up having the same font face.
@@ -636,7 +635,6 @@ static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
 
     return VLC_SUCCESS;
 }
-#endif
 
 static bool FaceStyleEquals( filter_t *p_filter, const text_style_t *p_style1,
                              const text_style_t *p_style2 )
@@ -692,12 +690,7 @@ static int ItemizeParagraph( filter_t *p_filter, paragraph_t *p_paragraph )
 #endif
             || !FaceStyleEquals( p_filter, p_last_style, p_paragraph->pp_styles[ i ] ) )
         {
-            int i_ret;
-#ifdef HAVE_FONT_FALLBACK
-            i_ret = AddRunWithFallback( p_filter, p_paragraph, i_last_run_start, i );
-#else
-            i_ret = AddRun( p_filter, p_paragraph, i_last_run_start, i, NULL, NULL );
-#endif
+            int i_ret = AddRunWithFallback( p_filter, p_paragraph, i_last_run_start, i );
             if( i_ret )
                 return i_ret;
 
