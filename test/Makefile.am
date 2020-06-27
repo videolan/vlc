@@ -294,3 +294,12 @@ vlc_demux_dec_libfuzzer_LDADD = libvlc_demux_dec_run.la
 if HAVE_LIBFUZZER
 noinst_PROGRAMS += vlc-demux-libfuzzer vlc-demux-dec-libfuzzer vlc-demux-run vlc-demux-dec-run
 endif
+
+vlc_ios_SOURCES = iosvlc.m
+vlc_ios_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,Foundation,-framework,UIKit
+vlc_ios_LDFLAGS += -Xlinker -rpath -Xlinker "$(libdir)"
+vlc_ios_CFLAGS = -fobjc-arc
+vlc_ios_LDADD = ../lib/libvlc.la ../src/libvlccore.la
+if HAVE_IOS
+noinst_PROGRAMS += vlc-ios
+endif
