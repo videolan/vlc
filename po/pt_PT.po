@@ -14,7 +14,7 @@
 # José Góis <joseldgois@hotmail.com>, 2013
 # Leandro Sousa <leandrorlsousa@gmail.com>, 2013
 # Luis Neves <luisjneves@gmail.com>, 2014
-# Manuela Silva <manuelarodsilva@gmail.com>, 2014-2018
+# Manuela Silva <manuelarodsilva@gmail.com>, 2014-2018,2020
 # Miguel Sousa <migueljorgesousa@sapo.pt>, 2012
 # Drew Melim <nokostya.translation@gmail.com>, 2014
 # Pedro Ivo, 2015
@@ -29,8 +29,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-05-04 14:54+0200\n"
-"Last-Translator: Hugo Carvalho <hugokarvalho@hotmail.com>, 2020\n"
+"PO-Revision-Date: 2020-06-28 18:50+0200\n"
+"Last-Translator: Manuela Silva <manuelarodsilva@gmail.com>, 2020\n"
 "Language-Team: Portuguese (Portugal) (https://www.transifex.com/yaron/"
 "teams/16553/pt_PT/)\n"
 "Language: pt_PT\n"
@@ -248,12 +248,12 @@ msgstr ""
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
-msgstr "Desmultiplexador"
+msgstr "Desmultiplicador (Separador de Transmissão)"
 
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
 msgstr ""
-"Os desmultiplexadores são utilizados para separar transmissões de áudio e de "
+"Os desmultiplicadores são utilizados para separar transmissões de áudio e de "
 "vídeo."
 
 #: include/vlc_config_cat.h:115
@@ -629,31 +629,32 @@ msgid ""
 msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
 "charset=utf-8\" /></head><body><h2>Bem-vindo à Ajuda do VLC media player</"
-"h2><h3>Documentação</h3><p>Pode encontrar a documentação do VLC na <a href="
-"\"http://wiki.videolan.org\">wiki</a>.</p><p>Se for um principiante no VLC "
-"media player, por favor, leia a <br><a href=\"http://wiki.videolan.org/"
-"Documentation:VLC_for_dummies\"><em>Introdução do VLC media player</em></a>."
-"</p><p>Irá encontrar mais informação sobre como utilizar o reprodutor no "
-"documento <br>\"<a href=\"http://wiki.videolan.org/Documentation:Play_HowTo"
-"\"><em>Como reproduzir ficheiros com o VLC media player</em></a>\".</"
-"p><p>Para todas as tarefas de gravação, conversão, codificação, "
-"multiplexagem e transmissão, pode encontrar informação útil na <a href="
-"\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Documentação de "
-"Transmissão</a>.</p><p>Se não tiver a certeza sobre a terminologia, consulte "
-"a <a href=\"http://wiki.videolan.org/Knowledge_Base\">base de dados de "
+"h2><h3>Documentação</h3><p>Pode encontrar a documentação do VLC no ''site'' "
+"da Web da <a href=\"http://wiki.videolan.org\">wiki</a> do VideoLAN.</"
+"p><p>Se for um principiante no VLC media player, por favor, leia a <br><a "
+"href=\"http://wiki.videolan.org/Documentation:VLC_for_dummies"
+"\"><em>Introdução ao VLC media player</em></a>.</p><p>Irá encontrar mais "
+"informação sobre como utilizar o reprodutor no documento <br>*<a href="
+"\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>Como reproduzir "
+"ficheiros com o VLC media player</em></a>*.</p><p>Para todas as tarefas de "
+"gravação, conversão, codificação, descodificação, codificação, e "
+"transmissão, deverá encontrar informação útil na <a href=\"http://wiki."
+"videolan.org/Documentation:Streaming_HowTo\">Documentação de Transmissão</a>."
+"</p><p>Se não tiver a certeza sobre a terminologia, por favor, consulte a <a "
+"href=\"http://wiki.videolan.org/Knowledge_Base\">base de dados de "
 "conhecimentos</a>.</p><p>Para compreender as teclas de atalho principais, "
-"leia a nossa página de <a href=\"https://wiki.videolan.org/Hotkeys"
-"\">atalhos</a>.</p><h3>Ajuda</h3><p>Antes de colocar quaisquer perguntas, "
-"por favor, consulte as <a href=\"http://www.videolan.org/support/faq.html"
-"\">Perguntas mais frequentes (FAQs)</a>.</p><p>Depois poderá querer obter (e "
-"dar) ajuda nos <a href=\"http://forum.videolan.org\">Fóruns</a>, <a href="
-"\"http://www.videolan.org/vlc/lists.html\">listas de discussão</a> ou no "
-"nosso canal IRC (<em>#videolan</em> no irc.freenode.net).</p><h3>Contribua "
-"para o projeto</h3><p>Pode ajudar o projeto VideoLAN contribuindo com algum "
-"do seu tempo livre para ajudar a comunidade, para desenhar temas, traduzir a "
-"documentação e o programa, testar e desenvolver o código. Também pode dar um "
-"donativo e material para nos ajudar. E claro que, pode <b>promover</b> o VLC "
-"media player.</p></body></html>"
+"leia a página de <a href=\"http://wiki.videolan.org/Hotkeys\">atalhos</a>.</"
+"p><h3>Ajuda</h3><p>Antes de colocar quaisquer perguntas, por favor, consulte "
+"as <a href=\"http://www.videolan.org/support/faq.html\">Perguntas Mais "
+"Frequentes (FAQs)</a>.</p><p>Depois poderá querer obter (e dar) ajuda nos <a "
+"href=\"http://forum.videolan.org\">Fóruns</a>, <a href=\"http://www.videolan."
+"org/vlc/lists.html\">listas de discussão</a> ou no nosso canal de IRC "
+"(<em>#videolan</em> no irc.freenode.net).</p><h3>Colabore no projeto</"
+"h3><p>Pode ajudar no projeto VideoLAN contribuindo com algum do seu tempo "
+"livre para ajudar a comunidade, para desenhar temas, traduzir a documentação "
+"e o programa, testar e desenvolver o código. Também pode efetuar uma doação "
+"e material para nos ajudar. E claro que, pode <b>promover</b> o VLC media "
+"player.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -3610,10 +3611,10 @@ msgid ""
 "automatically detected. You should not set this as a global option unless "
 "you really know what you are doing."
 msgstr ""
-"Os desmultiplexadores são usados para separar as transmissões \"primárias"
-"\" (como as transmissões de áudio e vídeo). Pode usar usar esta opção se o "
-"desmultiplexador correto não for identificado automaticamente. Não configure "
-"esta opção como uma opção global, a não ser que saiba o que está fazendo."
+"Os desmultiplicadores são utilizados para separar as transmissões \"primárias"
+"\" (tal como as transmissões de áudio e de vídeo). Pode utilizar esta opção "
+"se o desmultiplicador correto não é detetado automaticamente. Não deveria "
+"definir isto como uma opção global, a não ser que saiba o que está a fazer."
 
 #: src/libvlc-module.c:1022
 msgid "VoD server module"
@@ -3715,7 +3716,7 @@ msgstr "Executar como um processo em segundo plano"
 
 #: src/libvlc-module.c:1068
 msgid "Runs VLC as a background daemon process."
-msgstr "Executar o VLC como um processo \"daemon\" em segundo plano."
+msgstr "Executa o VLC como um processo \"daemon\" em segundo plano."
 
 #: src/libvlc-module.c:1070
 msgid "Write process id to file"
@@ -4028,7 +4029,7 @@ msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
-"O botão de roda central do rato (cima / baixo) pode controlar o volume, "
+"O botão da roda central do rato (cima / baixo) pode controlar o volume, "
 "posição ou ser ignorado."
 
 #: src/libvlc-module.c:1222
@@ -5249,7 +5250,7 @@ msgstr "Roda do rato para cima"
 
 #: src/misc/actions.c:105
 msgid "Page Down"
-msgstr "Page Down"
+msgstr "Página para Baixo"
 
 #: src/misc/actions.c:106
 msgid "Page Up"
@@ -5283,7 +5284,7 @@ msgstr "Cima"
 
 #: src/misc/actions.c:114 modules/gui/macosx/VLCMainMenu.m:509
 msgid "Volume Down"
-msgstr "Diminuir volume"
+msgstr "Diminuir Volume"
 
 #: src/misc/actions.c:115
 msgid "Volume Mute"
@@ -7482,7 +7483,7 @@ msgstr "Entrada DVDnav"
 
 #: modules/access/dvdnav.c:104
 msgid "DVDnav demuxer"
-msgstr "Desmultiplexador DVDnav"
+msgstr "Desmultiplicador de DVDnav"
 
 #: modules/access/dvdnav.c:275 modules/access/dvdread.c:208
 #: modules/access/dvdread.c:225 modules/access/dvdread.c:484
@@ -8039,7 +8040,7 @@ msgstr ""
 
 #: modules/access/live555.cpp:97
 msgid "RTP/RTSP/SDP demuxer (using Live555)"
-msgstr "Desmultiplexador RTP/RTSP/SDP (utilizando Live555)"
+msgstr "Desmultiplicador de RTP/RTSP/SDP (utilizando Live555)"
 
 #: modules/access/live555.cpp:106
 msgid "RTSP/RTP access and demux"
@@ -9538,7 +9539,7 @@ msgstr "Descrição do conteúdo de transmissão ou informação sobre o canal."
 
 #: modules/access_output/shout.c:72
 msgid "Stream MP3"
-msgstr "Transmissão MP3"
+msgstr "transmissões de MP3"
 
 #: modules/access_output/shout.c:73
 msgid ""
@@ -9546,9 +9547,9 @@ msgid ""
 "possible to stream MP3 instead, so you can forward MP3 streams to the "
 "shoutcast/icecast server."
 msgstr ""
-"Normalmente deve alimentar o módulo shoutcast com transmissões Ogg. É "
-"possível também usar transmissões MP3, portanto pode repassar transmissões "
-"MP3 para o servidor shoutcast / icecast."
+"Normalmente deve alimentar o módulo \"shoutcast\" com transmissões Ogg. "
+"Também é possível utilizar transmissões de MP3, por isso pode encaminhar "
+"transmissões de MP3 para o servidor shoutcast / icecast."
 
 #: modules/access_output/shout.c:82
 msgid "Genre description"
@@ -10576,9 +10577,9 @@ msgid ""
 "output, it will be down-mixed. This parameter is ignored when digital pass-"
 "through is active."
 msgstr ""
-"Canais disponíveis para saída de áudio. Se a entrada tiver mais canais que a "
-"saída, a entrada será reduzida a dois canais. Este parâmetro é ignorado "
-"quando a passagem digital está ativa."
+"Canais disponíveis para a saída de áudio. Se a entrada tiver mais canais do "
+"que a saída, esta será reduzida. Este parâmetro é ignorado quando a passagem "
+"digital está ativa."
 
 #: modules/audio_output/alsa.c:76
 msgid "Surround 4.0"
@@ -11000,9 +11001,9 @@ msgid ""
 "This includes (MS)MPEG4, DivX, SV1,H261, H263, H264, WMV, WMA, AAC, AMR, DV, "
 "MJPEG and other codecs"
 msgstr ""
-"Vários codificadores/descodificadores de áudio e vídeo disponibilizados pela "
-"biblioteca FFmpeg. Isto inclui (Microsoft) MPEG4, DivX, SV1,H261, H263, "
-"H264, WMV, WMA, AAC, AMR, VD, MJPEG e outros codecs"
+"Vários codificadores / descodificadores de áudio e vídeo disponibilizados "
+"pela biblioteca FFmpeg. Isto inclui (MS)MPEG4, DivX, SV1,H261, H263, H264, "
+"WMV, WMA, AAC, AMR, VD, MJPEG e outros ''codecs''"
 
 #: modules/codec/avcodec/avcodec.c:80
 msgid "FFmpeg audio/video decoder"
@@ -13382,7 +13383,7 @@ msgstr "TTML"
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
-msgstr "Desmultiplexador TML"
+msgstr "Desmultiplicador de TML"
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -13674,9 +13675,9 @@ msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
 msgstr ""
-"CABAC (Context-Adaptive Binary Arithmetic Coding - codificação aritmética "
-"binária adaptativa ao contexto). Torna mais lenta ligeiramente a codificação "
-"e descodificação, mas deve poupar 10 a 15% de taxa de bits."
+"CABAC (Codificação Aritmética Binária Adaptativa de Contexto). Abranda "
+"ligeiramente a codificação e descodificação, mas deveria poupar 10 a 15% de "
+"taxa de bits."
 
 #: modules/codec/x264.c:138
 msgid ""
@@ -15360,7 +15361,7 @@ msgstr "Desmultiplexador AIFF"
 
 #: modules/demux/asf/asf.c:62
 msgid "ASF/WMV demuxer"
-msgstr "Desmultiplexador ASF/WMV"
+msgstr "Desmultiplicador de ASF/WMV"
 
 #: modules/demux/asf/asf.c:267 modules/demux/asf/asf.c:821
 msgid "Could not demux ASF stream"
@@ -15372,11 +15373,11 @@ msgstr "VLC falhou ao carregar o cabeçalho ASF."
 
 #: modules/demux/au.c:51
 msgid "AU demuxer"
-msgstr "Desmultiplexador AU"
+msgstr "Desmultiplicador de AU"
 
 #: modules/demux/avformat/avformat.c:41
 msgid "Avformat demuxer"
-msgstr "Desmultiplexador Avformat"
+msgstr "Desmultiplicador de Avformat"
 
 #: modules/demux/avformat/avformat.c:42
 msgid "Avformat"
@@ -15384,7 +15385,7 @@ msgstr "Avformat"
 
 #: modules/demux/avformat/avformat.c:45
 msgid "Demuxer"
-msgstr "Desmultiplexador"
+msgstr "Desmultiplicador"
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
@@ -15444,7 +15445,7 @@ msgstr "Corrigir se necessário"
 
 #: modules/demux/avi/avi.c:73
 msgid "AVI demuxer"
-msgstr "Desmultiplexador AVI"
+msgstr "Desmultiplicador de AVI"
 
 #: modules/demux/avi/avi.c:876 modules/demux/mp4/mp4.c:4256
 msgid ""
@@ -15488,7 +15489,7 @@ msgstr "A corrigir o índice do AVI..."
 
 #: modules/demux/caf.c:53
 msgid "CAF demuxer"
-msgstr "Desmultiplexador CAF"
+msgstr "Desmultiplicador de CAF"
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
@@ -15536,7 +15537,7 @@ msgstr "Filtro de desmultiplexar de prevenção de procura"
 
 #: modules/demux/flac.c:51
 msgid "FLAC demuxer"
-msgstr "Desmultiplexador FLAC"
+msgstr "Desmultiplicador de FLAC"
 
 #: modules/demux/image.c:44
 msgid "ES ID"
@@ -15548,7 +15549,7 @@ msgstr "Descodificar"
 
 #: modules/demux/image.c:54
 msgid "Decode at the demuxer stage"
-msgstr "Descodificar no estágio de desmultiplexador"
+msgstr "Descodificar no estágio de desmultiplicador"
 
 #: modules/demux/image.c:56
 msgid "Forced chroma"
@@ -15592,7 +15593,7 @@ msgstr ""
 
 #: modules/demux/image.c:76
 msgid "Image demuxer"
-msgstr "Desmultiplexador de imagem"
+msgstr "Desmultiplicador de imagem"
 
 #: modules/demux/image.c:77
 msgid "Image"
@@ -15615,11 +15616,11 @@ msgstr ""
 
 #: modules/demux/mjpeg.c:53
 msgid "M-JPEG camera demuxer"
-msgstr "Desmultiplexador de câmara M-JPEG"
+msgstr "Desmultiplicador de câmara M-JPEG"
 
 #: modules/demux/mkv/mkv.cpp:53
 msgid "Matroska stream demuxer"
-msgstr "Desmultiplexador de transmissão Matroska"
+msgstr "Desmultiplicador de transmissão Matroska"
 
 #: modules/demux/mkv/mkv.cpp:60
 msgid "Respect ordered chapters"
@@ -15722,7 +15723,7 @@ msgstr "Atraso do efeito espacial, em ms. São valores comuns de 5 a 40ms."
 
 #: modules/demux/mod.c:74
 msgid "MOD demuxer (libmodplug)"
-msgstr "Desmultiplexador MOD (libmodplug)"
+msgstr "Desmultiplicador de MOD (libmodplug)"
 
 #: modules/demux/mod.c:85
 msgid "Reverberation level"
@@ -15917,7 +15918,7 @@ msgstr "Ignorar faixas não-áudio de ficheiros  do iTunes"
 
 #: modules/demux/mp4/mp4.c:56
 msgid "MP4 stream demuxer"
-msgstr "Desmultiplexador de transmissão MP4"
+msgstr "Desmultiplicador de transmissão de MP4"
 
 #: modules/demux/mp4/mp4.c:57
 msgid "MP4"
@@ -15933,7 +15934,7 @@ msgstr "Construir índice"
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
-msgstr "Desmultiplexador MusePack"
+msgstr "Desmultiplicador de MusePack"
 
 #: modules/demux/mpeg/es.c:54
 msgid ""
@@ -15961,15 +15962,15 @@ msgstr "Taxa de fotogramas pretendida para a transmissão."
 
 #: modules/demux/mpeg/h26x.c:53 modules/demux/mpeg/h26x.c:55
 msgid "H264 video demuxer"
-msgstr "Desmultiplexador vídeo H264"
+msgstr "Desmultiplicador de vídeo H264"
 
 #: modules/demux/mpeg/h26x.c:64 modules/demux/mpeg/h26x.c:66
 msgid "HEVC/H.265 video demuxer"
-msgstr "Desmultiplexador de vídeo HEVC/H.265"
+msgstr "Desmultiplicador de vídeo HEVC/H.265"
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
-msgstr "Desmultiplexador vídeo MPEG-I/II"
+msgstr "Desmultiplicador de vídeo MPEG-I/II"
 
 #: modules/demux/mpeg/ps.c:44
 msgid "Trust MPEG timestamps"
@@ -15987,7 +15988,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ps.c:62 modules/demux/mpeg/ps.c:75
 msgid "MPEG-PS demuxer"
-msgstr "Desmultiplexador MPEG-PS"
+msgstr "Desmultiplicador de MPEG-PS"
 
 #: modules/demux/mpeg/ps.c:63
 msgid "PS"
@@ -16095,7 +16096,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:135
 msgid "MPEG Transport Stream demuxer"
-msgstr "Desmultiplexador de transmissão de transporte MPEG"
+msgstr "Desmultiplicador de Transmissão de Transporte MPEG"
 
 #: modules/demux/mpeg/ts_psi.c:422
 msgid "Main audio"
@@ -16156,7 +16157,7 @@ msgstr "Desmultiplexador de metadados do Windows Media NSC"
 
 #: modules/demux/nsv.c:49
 msgid "NullSoft demuxer"
-msgstr "Desmultiplexador NullSoft"
+msgstr "Desmultiplicador de NullSoft"
 
 #: modules/demux/nuv.c:50
 msgid "Nuv demuxer"
@@ -16164,7 +16165,7 @@ msgstr "Desmultiplexador NUV"
 
 #: modules/demux/ogg.c:57
 msgid "OGG demuxer"
-msgstr "Desmultiplexador OGG"
+msgstr "Desmultiplicador de OGG"
 
 #: modules/demux/playlist/playlist.c:46
 msgid "Show shoutcast adult content"
@@ -16321,7 +16322,7 @@ msgstr "Duração total"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
-msgstr "Desmultiplexador PVA"
+msgstr "Desmultiplicador de PVA"
 
 #: modules/demux/rawaud.c:44
 msgid "Audio sample rate in Hertz. Default is 48000 Hz."
@@ -16359,18 +16360,17 @@ msgstr ""
 
 #: modules/demux/rawaud.c:64
 msgid "Raw audio demuxer"
-msgstr "Desmultiplexador de áudio raw"
+msgstr "Desmultiplicador de áudio Raw"
 
 #: modules/demux/rawdv.c:43
 msgid ""
 "The demuxer will advance timestamps if the input can't keep up with the rate."
 msgstr ""
-"O desmultiplexador avançará no tempo da média se a entrada não puder manter "
-"a taxa."
+"O desmultiplicador irá avançar no tempo se a entrada não puder manter a taxa."
 
 #: modules/demux/rawdv.c:51
 msgid "DV (Digital Video) demuxer"
-msgstr "Desmultiplexador DV (vídeo vigital)"
+msgstr "Desmultiplicador de DV (vídeo vigital)"
 
 #: modules/demux/rawvid.c:44
 msgid ""
@@ -16398,19 +16398,19 @@ msgstr "Força o croma. Isto é uma expressão de 4 caracteres."
 
 #: modules/demux/rawvid.c:64
 msgid "Raw video demuxer"
-msgstr "Desmultiplexador de vídeo raw"
+msgstr "Desmultiplicador de vídeo raw"
 
 #: modules/demux/real.c:71
 msgid "Real demuxer"
-msgstr "Desmultiplexador Real"
+msgstr "Desmultiplicador Real"
 
 #: modules/demux/sid.cpp:53
 msgid "C64 sid demuxer"
-msgstr "Desmultiplexador sid C64"
+msgstr "Desmultiplicador de sid C64"
 
 #: modules/demux/smf.c:725
 msgid "SMF demuxer"
-msgstr "Desmultiplexador SMF"
+msgstr "Desmultiplicador de SMF"
 
 #: modules/demux/stl.c:43
 msgid "EBU STL subtitles parser"
@@ -16488,7 +16488,7 @@ msgstr "Taxa de fotogramas pretendida para a transmissão VC-1."
 
 #: modules/demux/vc1.c:50
 msgid "VC1 video demuxer"
-msgstr "Desmultiplexador vídeo VC1"
+msgstr "Desmultiplicador de vídeo VC1"
 
 #: modules/demux/vobsub.c:51
 msgid "Vobsub subtitles parser"
@@ -16496,15 +16496,15 @@ msgstr "Analisar legendas Vobsub"
 
 #: modules/demux/voc.c:43
 msgid "VOC demuxer"
-msgstr "Desmultiplexador VOC"
+msgstr "Desmultiplicador de VOC"
 
 #: modules/demux/wav.c:52
 msgid "WAV demuxer"
-msgstr "Desmultiplexador WAV"
+msgstr "Desmultiplicador de WAV"
 
 #: modules/demux/xa.c:44
 msgid "XA demuxer"
-msgstr "Desmultiplexador XA"
+msgstr "Desmultiplicador de XA"
 
 #: modules/demux/xiph_metadata.c:588
 msgid "Unknown category"
@@ -16591,16 +16591,15 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC media player é um reprodutor de multimédia, codificador e "
-"transmissor, de código aberto e gratuito, desenvolvido pelos voluntários da "
-"comunidade da <a href=\"https://www.videolan.org/\"><span style=\" text-"
-"decoration: underline; color:#0057ae;\">VideoLAN</span></a>.</p><p>VLC "
-"utiliza os próprios codecs internos, funciona em praticamente todas as "
-"plataformas populares, e pode ler quase todos os ficheiros, CDs, DVDs, "
-"transmissões em rede, dispositivos de captura e outros formatos de "
-"multimédia!</p><p><a href=\"https://www.videolan.org/contribute/\"><span "
-"style=\" text-decoration: underline; color:#0057ae;\">Ajude e junte-se a nós!"
-"</span></a>"
+"<p>VLC media player é um reprodutor de multimédia, codificador e transmissor "
+"de código aberto e gratuito, desenvolvido pelos voluntários da comunidade do "
+"<a href=\"https://www.videolan.org/\"><span style=\" text-decoration: "
+"underline; color:#0057ae;\">VideoLAN</span></a>.</p><p>VLC utiliza os "
+"próprios ''codecs'' internos, funciona em praticamente todas as plataformas "
+"populares, e pode ler quase todos os ficheiros, CDs, DVDs, transmissões em "
+"rede, dispositivos de captura e outros formatos de multimédia!</p><p><a href="
+"\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
+"underline; color:#0057ae;\">Ajude e junte-se a nós!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
@@ -19353,7 +19352,7 @@ msgstr " <left>,<right>         Procurar -/+ 1%%"
 
 #: modules/gui/ncurses.c:888
 msgid " a, z                   Volume Up/Down"
-msgstr " a, z                   Aumentar / diminuir volume"
+msgstr " a, z                   Aumentar / Diminuir Volume"
 
 #: modules/gui/ncurses.c:889
 msgid " m                      Mute"
@@ -20347,11 +20346,11 @@ msgstr "Latência mais alta"
 
 #: modules/gui/qt/components/simple_preferences.cpp:745
 msgid "This is VLC's skinnable interface. You can download other skins at"
-msgstr "Esta é a interface de temas do VLC. Pode transferir mais temas do"
+msgstr "Esta é a interface de temas do VLC. Pode transferir mais temas em"
 
 #: modules/gui/qt/components/simple_preferences.cpp:747
 msgid "VLC skins website"
-msgstr "Site de temas do VLC"
+msgstr "Site da Web de temas do VLC"
 
 #: modules/gui/qt/components/simple_preferences.cpp:771
 msgid "System's default"
@@ -20560,7 +20559,7 @@ msgstr "Converter"
 
 #: modules/gui/qt/dialogs/convert.cpp:61
 msgid "Multiple files selected."
-msgstr "Vários ficheiros selecionados."
+msgstr "Selecionados múltiplos ficheiros."
 
 #: modules/gui/qt/dialogs/convert.cpp:68 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -20721,16 +20720,15 @@ msgid ""
 "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC media player é um reprodutor de multimédia, codificador e "
-"transmissor, de código aberto e gratuito, desenvolvido pelos voluntários da "
-"comunidade da <a href=\"http://www.videolan.org/\"><span style=\" text-"
-"decoration: underline; color:#0057ae;\">VideoLAN.VLC</span></a>.</p><p>VLC "
-"utiliza os próprios codecs internos, funciona em praticamente todas as "
-"plataformas populares, e pode ler quase todos os ficheiros, CDs, DVDs, "
-"transmissões em rede, dispositivos de captura e outros formatos de "
-"multimédia!</p><p><a href=\"http://www.videolan.org/contribute/\"><span "
-"style=\" text-decoration: underline; color:#0057ae;\">Ajude e junte-se a nós!"
-"</span></a>"
+"<p>VLC media player é um reprodutor de multimédia, codificador e transmissor "
+"de código aberto e gratuito, desenvolvido pelos voluntários da comunidade do "
+"<a href=\"http://www.videolan.org/\"><span style=\" text-decoration: "
+"underline; color:#0057ae;\">VideoLAN.VLC</span></a>.</p><p>VLC utiliza os "
+"próprios ''codecs'' internos, funciona em praticamente todas as plataformas "
+"populares, e pode ler quase todos os ficheiros, CDs, DVDs, transmissões em "
+"rede, dispositivos de captura e outros formatos de multimédia!</p><p><a href="
+"\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
+"underline; color:#0057ae;\">Ajude e junte-se a nós!</span></a>"
 
 #: modules/gui/qt/dialogs/help.cpp:214
 msgid "&Recheck version"
@@ -21393,7 +21391,7 @@ msgstr "Abrir &ficheiro..."
 
 #: modules/gui/qt/menus.cpp:359
 msgid "&Open Multiple Files..."
-msgstr "Abrir vári&os ficheiros..."
+msgstr "Abrir &Múltiplos Ficheiros..."
 
 #: modules/gui/qt/menus.cpp:363 modules/gui/qt/menus.cpp:939
 msgid "Open &Disc..."
@@ -21768,8 +21766,8 @@ msgid ""
 "Activate the automatic notification of new versions of the software. It runs "
 "once every two weeks."
 msgstr ""
-"Notifica caso existam novas versões do VLC. A verificação é feita a cada 2 "
-"semanas."
+"Ative a notificação automática das novas versões do ''software''. Esta é "
+"executada bissemanalmente."
 
 #: modules/gui/qt/qt.cpp:128
 msgid "Number of days between two update checks"
@@ -22026,7 +22024,7 @@ msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:536
 msgid "Skinnable Interface"
-msgstr "Interface com temas"
+msgstr "Interface com Temas"
 
 #: modules/gui/skins2/src/theme_repository.cpp:58
 msgid "Select skin"
@@ -23640,7 +23638,7 @@ msgid ""
 "downloads and allow the user to start previewing the file while it is "
 "downloading."
 msgstr ""
-"Cria ficheiros de \"arranque rápido\". Estes ficheiros são otimizados para "
+"Cria ficheiros de \"Arranque Rápido\". Estes ficheiros são otimizados para "
 "transferências e permitem que o utilizador inicie a pré-visualização do "
 "ficheiro enquanto este é transferido."
 
@@ -26155,7 +26153,7 @@ msgstr "Prioridade alta"
 msgid ""
 "Runs the optional encoder thread at the OUTPUT priority instead of VIDEO."
 msgstr ""
-"Executa o thread de codificação opicional na prioridade de SAÍDA em vez de "
+"Executa o processo de codificação opcional na prioridade de SAÍDA em vez de "
 "VÍDEO."
 
 #: modules/stream_out/transcode/transcode.c:130
@@ -27214,7 +27212,7 @@ msgstr "Ampliar"
 
 #: modules/video_filter/mirror.c:64
 msgid "Mirror orientation"
-msgstr "Orientação do espelhamento"
+msgstr "Orientação do ''site'' replicador"
 
 #: modules/video_filter/mirror.c:65
 msgid ""
@@ -27535,7 +27533,7 @@ msgstr "0/90/180/270"
 
 #: modules/video_filter/puzzle.c:77
 msgid "0/90/180/270/mirror"
-msgstr "0/90/180/270/espelho"
+msgstr "0/90/180/270/replicador (mirror)"
 
 #: modules/video_filter/puzzle.c:85
 msgid "Puzzle interactive game video filter"
@@ -29932,7 +29930,7 @@ msgstr "3D anaglífico"
 
 #: modules/gui/qt/ui/video_effects.h:1287
 msgid "Mirror"
-msgstr "Espelho"
+msgstr "Replicador (Mirror)"
 
 #: modules/gui/qt/ui/video_effects.h:1291
 msgid "Motion detect"
