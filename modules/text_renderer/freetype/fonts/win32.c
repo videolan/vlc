@@ -380,16 +380,10 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
         psz_fontfile = psz_filename;
     else
     {
-        /* Get Windows Font folder */
-        char *psz_win_fonts_path = GetWindowsFontPath();
-        if( asprintf( &psz_fontfile, "%s\\%s", psz_win_fonts_path, psz_filename ) == -1 )
-        {
-            free( psz_filename );
-            free( psz_win_fonts_path );
-            return 1;
-        }
+        psz_fontfile = MakeFilePath( ctx->p_filter, psz_filename );
         free( psz_filename );
-        free( psz_win_fonts_path );
+        if( !psz_fontfile )
+            return 1;
     }
 
     NewFont( psz_fontfile, i_index, b_bold, b_italic, p_family );
