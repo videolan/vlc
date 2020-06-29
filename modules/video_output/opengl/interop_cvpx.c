@@ -214,9 +214,6 @@ Open(vlc_object_t *obj)
     }
 #endif
 
-    /* The pictures are uploaded upside-down */
-    video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
-
     int ret;
     switch (interop->fmt_in.i_chroma)
     {
