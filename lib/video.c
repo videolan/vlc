@@ -171,9 +171,9 @@ int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned ignored,
         *px = track->video->i_width;
         *py = track->video->i_height;
         ret = 0;
+        libvlc_media_track_release(track);
     }
 
-    libvlc_media_track_release(track);
     return ret;
 }
 
