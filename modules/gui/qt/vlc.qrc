@@ -111,6 +111,7 @@
         <file alias="noart_artist.svg">pixmaps/noart_artist.svg</file>
         <file alias="noart_artist_small.svg">pixmaps/noart_artist_small.svg</file>
         <file alias="play_button.svg">pixmaps/play_button.svg</file>
+        <file alias="back.svg">pixmaps/back.svg</file>
     </qresource>
     <qresource prefix="/prefsmenu">
         <file alias="cone_audio_64.png">pixmaps/prefs/spref_cone_Audio_64.png</file>

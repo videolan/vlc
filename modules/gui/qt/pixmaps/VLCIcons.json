@@ -148,6 +148,7 @@
 		{"key":"album_cover", "path": "./album_cover.svg"},
 		{"key":"time", "path": "./time.svg"},
 		{"key":"play_outline", "path": "./play_outline.svg"},
-		{"key":"enqueue", "path": "./enqueue.svg"}
+		{"key":"enqueue", "path": "./enqueue.svg"},
+		{"key":"back", "path": "./back.svg"}
 	]
 }
