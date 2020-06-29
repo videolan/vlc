@@ -154,6 +154,8 @@ char *vlc_tls_GetLine(vlc_tls_t *session)
 
     if (linelen >= 2 && line[linelen - 2] == '\r')
         line[linelen - 2] = '\0';
+    else
+        line[linelen - 1] = '\0';
     return line;
 
 error:
