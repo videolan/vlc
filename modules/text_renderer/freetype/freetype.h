@@ -40,6 +40,7 @@
 
 #include <vlc_text_style.h>                             /* text_style_t */
 #include <vlc_arrays.h>                                 /* vlc_dictionary_t */
+#include <vlc_vector.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -71,6 +72,7 @@ typedef uint32_t uni_char_t;
  * This structure is part of the video output thread descriptor.
  * It describes the freetype specific properties of an output thread.
  *****************************************************************************/
+typedef struct VLC_VECTOR(char *) fontfamilies_t;
 typedef struct vlc_family_t vlc_family_t;
 typedef struct
 {

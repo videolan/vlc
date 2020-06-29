@@ -218,6 +218,21 @@ vlc_family_t *SearchFallbacks( filter_t *p_filter, vlc_family_t *p_fallbacks,
     return p_family;
 }
 
+static vlc_family_t *SearchFontByFamilyName( filter_t *p_filter,
+                                             vlc_family_t *p_list,
+                                             const char *psz_familyname,
+                                             uni_char_t codepoint )
+{
+    for( vlc_family_t *p = p_list; p; p = p->p_next )
+    {
+        if( !strcasecmp( p->psz_name, psz_familyname ) &&
+            p->p_fonts &&
+            GetFace( p_filter, p->p_fonts, codepoint ) )
+            return p;
+    }
+    return NULL;
+}
+
 static inline void AppendFont( vlc_font_t **pp_list, vlc_font_t *p_font )
 {
     while( *pp_list )
@@ -471,9 +486,56 @@ int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style )
     return i_font_size;
 }
 
-static char * SelectFontWithFamilyFallback( filter_t *p_filter, const char *psz_name,
-                      const text_style_t *p_style,
-                      int *pi_idx, uni_char_t codepoint )
+static void TrimWhiteSpace( const char **pp, const char **ppend )
+{
+    for( ; *pp < *ppend ; ++(*pp) )
+        if( **pp != ' ' && **pp != '\t' )
+            break;
+    for( ; *ppend > *pp ; --(*ppend) )
+        if( *((*ppend)- 1) != ' ' && *((*ppend)- 1) != '\t' )
+            break;
+}
+
+static void AddSingleFamily( const char *psz_start,
+                             const char *psz_end,
+                             fontfamilies_t *families )
+{
+    TrimWhiteSpace( &psz_start, &psz_end );
+    /* basic unquote */
+    if( psz_end > psz_start &&
+        *psz_start == '"' && psz_end[-1] == '"' )
+    {
+        ++psz_start;
+        --psz_end;
+    }
+    if( psz_end > psz_start )
+    {
+        char *psz = strndup( psz_start, psz_end - psz_start );
+        if( psz )
+            vlc_vector_push( families, psz );
+    }
+}
+
+static void SplitIntoSingleFamily( const char *psz_spec, fontfamilies_t *families )
+{
+    if( !psz_spec )
+        return;
+
+    char *dup = strdup( psz_spec );
+    char *p_savetpr;
+    for ( const char *psz = strtok_r( dup, ",", &p_savetpr );
+          psz != NULL;
+          psz = strtok_r( NULL, ",", &p_savetpr ) )
+    {
+        AddSingleFamily( psz, psz + strlen( psz ), families );
+    }
+    free( dup );
+}
+
+static char* SelectFontWithFamilyFallback( filter_t *p_filter,
+                                    const fontfamilies_t *families,
+                                    const text_style_t *p_style,
+                                    int *pi_idx, uni_char_t codepoint )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -484,18 +546,34 @@ static char * SelectFontWithFamilyFallback( filter_t *p_filter, const char *psz_
     if( codepoint )
     {
         vlc_family_t *p_fallbacks;
+        const char *psz_name;
         /*
          * Try regular face of the same family first.
          * It usually has the best coverage.
          */
-        p_family = p_sys->pf_get_family( p_filter, psz_name );
-        if( p_family && p_family->p_fonts &&
-            !GetFace( p_filter, p_temp->p_fonts, codepoint ) )
+        vlc_vector_foreach( psz_name, families )
         {
+            p_fallbacks = vlc_dictionary_value_for_key( &p_sys->fallback_map,
+                                                        FB_LIST_ATTACHMENTS );
+            if( p_fallbacks )
+            {
+                p_family = SearchFontByFamilyName( p_filter, p_fallbacks,
+                                                   psz_name, codepoint );
+                if( p_family )
+                    break;
+            }
+
+            p_family = p_sys->pf_get_family( p_filter, psz_name );
+            if( p_family && p_family->p_fonts &&
+                GetFace( p_filter, p_family->p_fonts, codepoint ) )
+            {
+                break;
+            }
+
             p_family = NULL;
         }
 
-        /* Try font attachments */
+        /* Try font attachments if not available locally */
         if( !p_family )
         {
             p_fallbacks = vlc_dictionary_value_for_key( &p_sys->fallback_map,
@@ -505,12 +583,19 @@ static char * SelectFontWithFamilyFallback( filter_t *p_filter, const char *psz_
         }
 
         /* Try system fallbacks */
-        if( p_sys->pf_get_fallbacks )
-        if( !p_family )
+        if( !p_family && p_sys->pf_get_fallbacks )
         {
-            p_fallbacks = p_sys->pf_get_fallbacks( p_filter, psz_name, codepoint );
-            if( p_fallbacks )
-                p_family = SearchFallbacks( p_filter, p_fallbacks, codepoint );
+            vlc_vector_foreach( psz_name, families )
+            {
+                p_fallbacks = p_sys->pf_get_fallbacks( p_filter, psz_name, codepoint );
+                if( p_fallbacks )
+                {
+                    p_family = SearchFallbacks( p_filter, p_fallbacks, codepoint );
+                    if( p_family && p_family->p_fonts )
+                        break;
+                }
+                p_family = NULL;
+            }
         }
 
         /* Try the default fallback list, if any */
@@ -543,25 +628,39 @@ static char * SelectFontWithFamilyFallback( filter_t *p_filter, const char *psz_
 FT_Face SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style,
                            uni_char_t codepoint )
 {
-    const char *psz_family = (p_style->i_style_flags & STYLE_MONOSPACED)
-                           ? p_style->psz_monofontname : p_style->psz_fontname;
-    FT_Face p_face = NULL;
-    int  i_idx = 0;
+    const char *psz_fontname = (p_style->i_style_flags & STYLE_MONOSPACED)
+                               ? p_style->psz_monofontname : p_style->psz_fontname;
 
+    fontfamilies_t families;
+    vlc_vector_init( &families );
+    SplitIntoSingleFamily( psz_fontname, &families );
+    if( families.size == 0 )
+    {
+        vlc_vector_clear( &families );
+        return NULL;
+    }
+
+    FT_Face p_face = NULL;
+
+    int  i_idx = 0;
     char *psz_fontfile =
-            SelectFontWithFamilyFallback( p_filter, psz_family, p_style,
+            SelectFontWithFamilyFallback( p_filter, &families, p_style,
                                           &i_idx, codepoint );
-    if( !psz_fontfile || *psz_fontfile == '\0' )
+    if( psz_fontfile && *psz_fontfile != '\0' )
+    {
+        p_face = LoadFace( p_filter, psz_fontfile, i_idx, p_style );
+    }
+    else
     {
         msg_Warn( p_filter,
                   "SelectAndLoadFace: no font found for family: %s, codepoint: 0x%x",
-                  psz_family, codepoint );
-        goto end;
+                  psz_fontname, codepoint );
     }
 
-    p_face = LoadFace( p_filter, psz_fontfile, i_idx, p_style );
-
-end:
+    char *psz_temp;
+    vlc_vector_foreach( psz_temp, &families )
+        free( psz_temp );
+    vlc_vector_clear( &families );
     free( psz_fontfile );
     return p_face;
 }
