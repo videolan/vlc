@@ -19,6 +19,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 import QtQml.Models 2.2
+import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 
@@ -437,6 +438,44 @@ Widgets.NavigableFocusScope {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
                 padding: VLCStyle.margin_small
+            }
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
+            height: VLCStyle.heightBar_normal
+            visible: !(infoText.text === "")
+
+            RectangularGlow {
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                width: infoText.width + VLCStyle.dp(18)
+                height: infoText.height + VLCStyle.dp(12)
+
+                glowRadius: 2
+                cornerRadius: 10
+                spread: 0.1
+                color: VLCStyle.colors.glowColorBanner
+            }
+
+            Label {
+                id: infoText
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.centerIn: parent
+                horizontalAlignment: Text.AlignHCenter
+
+                text: (view.mode === "select")
+                        ? i18n.qtr("Select tracks (%1)").arg(plmodel.selectedCount)
+                    : (view.mode === "move")
+                        ? i18n.qtr("Move tracks (%1)").arg(plmodel.selectedCount)
+                    : ""
+                font.pixelSize: VLCStyle.fontSize_large
+                color: VLCStyle.colors.text
+                elide: Text.ElideRight
             }
         }
 
