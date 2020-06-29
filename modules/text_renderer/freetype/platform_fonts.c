@@ -553,6 +553,8 @@ static char* SelectFontWithFamilyFallback( filter_t *p_filter,
          */
         vlc_vector_foreach( psz_name, families )
         {
+            Debug( p_filter, "Looking for family \"%s\"", psz_name );
+
             p_fallbacks = vlc_dictionary_value_for_key( &p_sys->fallback_map,
                                                         FB_LIST_ATTACHMENTS );
             if( p_fallbacks )
@@ -567,6 +569,8 @@ static char* SelectFontWithFamilyFallback( filter_t *p_filter,
             if( p_family && p_family->p_fonts &&
                 GetFace( p_filter, p_family->p_fonts, codepoint ) )
             {
+                Debug( p_filter, "Found family \"%s\" for codepoint %x",
+                       psz_name, codepoint );
                 break;
             }
 
@@ -576,10 +580,18 @@ static char* SelectFontWithFamilyFallback( filter_t *p_filter,
         /* Try font attachments if not available locally */
         if( !p_family )
         {
+            Debug( p_filter, "Looking for family \"%s\" in attachments", psz_name );
+
             p_fallbacks = vlc_dictionary_value_for_key( &p_sys->fallback_map,
                                                         FB_LIST_ATTACHMENTS );
             if( p_fallbacks )
                 p_family = SearchFallbacks( p_filter, p_fallbacks, codepoint );
+
+            if( p_family && p_family->p_fonts )
+            {
+                Debug( p_filter, "Selected family \"%s\" in attachments",
+                       p_family->psz_name );
+            }
         }
 
         /* Try system fallbacks */
@@ -587,12 +599,17 @@ static char* SelectFontWithFamilyFallback( filter_t *p_filter,
         {
             vlc_vector_foreach( psz_name, families )
             {
+                Debug( p_filter, "Looking for family \"%s\" in system fallbacks", psz_name );
                 p_fallbacks = p_sys->pf_get_fallbacks( p_filter, psz_name, codepoint );
                 if( p_fallbacks )
                 {
                     p_family = SearchFallbacks( p_filter, p_fallbacks, codepoint );
                     if( p_family && p_family->p_fonts )
+                    {
+                        Debug( p_filter, "Selected family \"%s\" in system fallbacks",
+                               p_family->psz_name );
                         break;
+                    }
                 }
                 p_family = NULL;
             }
@@ -605,6 +622,9 @@ static char* SelectFontWithFamilyFallback( filter_t *p_filter,
                                                         FB_LIST_DEFAULT );
             if( p_fallbacks )
                 p_family = SearchFallbacks( p_filter, p_fallbacks, codepoint );
+            if( p_family )
+                Debug( p_filter, "Selected family \"%s\" in default fallback list",
+                       p_family->psz_name );
         }
 
         if( !p_family )
@@ -612,15 +632,21 @@ static char* SelectFontWithFamilyFallback( filter_t *p_filter,
     }
 
     if( !p_family || !p_family->p_fonts )
+    {
+        Debug( p_filter, "Looking for DEFAULT_FAMILY \"%s\" as a last resort", DEFAULT_FAMILY );
         p_family = p_sys->pf_get_family( p_filter, DEFAULT_FAMILY );
+    }
 
     vlc_font_t *p_font;
     if( p_family && ( p_font = GetBestFont( p_filter, p_family, b_bold,
                                             b_italic, codepoint ) ) )
     {
+        Debug( p_filter, "Selected best font file \"%s\"", p_font->psz_fontfile );
         *pi_idx = p_font->i_index;
         return strdup( p_font->psz_fontfile );
     }
+
+    Debug( p_filter, "Could not match any family or font : that should not happen" );
 
     return NULL;
 }

@@ -47,6 +47,12 @@
 /* Debug Stuff */
 //#define DEBUG_PLATFORM_FONTS
 
+#ifdef DEBUG_PLATFORM_FONTS
+  #define Debug(...) msg_Dbg(__VA_ARGS__)
+#else
+  #define Debug(...)
+#endif
+
 #include "freetype.h"
 
 #ifdef __cplusplus
