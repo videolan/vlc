@@ -154,6 +154,8 @@ Widgets.NavigableFocusScope {
             delegate: VideoGridItem {
                 id: videoGridItem
 
+                opacity: videosGV.expandIndex !== -1 && videosGV.expandIndex !== videoGridItem.index ? .7 : 1
+
                 onContextMenuButtonClicked: {
                     contextMenu.model = videoGridItem.model
                     contextMenu.itemIndex = index
@@ -165,16 +167,16 @@ Widgets.NavigableFocusScope {
                     videosGV.currentIndex = index
                     videosGV.forceActiveFocus()
                 }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 100
+                    }
+                }
             }
 
             expandDelegate: VideoInfoExpandPanel {
-                visible: !videosGV.isAnimating
-
-                implicitHeight: videosGV.height - videosGV.cellHeight
-                width: videosGV.width
-
                 onRetract: videosGV.retract()
-                notchPosition: videosGV.getItemPos(videosGV._expandIndex)[0] + (videosGV.cellWidth / 2)
 
                 navigationParent: videosGV
                 navigationCancel:  function() {  videosGV.retract() }
