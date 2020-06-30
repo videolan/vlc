@@ -1430,7 +1430,6 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
 void vout_NextPicture(vout_thread_t *vout, vlc_tick_t *duration)
 {
     assert(!vout->p->dummy);
-    assert(vout->p->display);
     *duration = 0;
 
     vout_control_Hold(&vout->p->control);
