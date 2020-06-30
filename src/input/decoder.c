@@ -1999,14 +1999,15 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner )
         case VIDEO_ES: {
             vout_thread_t *vout = p_owner->p_vout;
 
+            if (p_owner->out_pool)
+                picture_pool_Cancel( p_owner->out_pool, false );
+
             if (vout != NULL)
             {
                 if( p_owner->vout_thread_started)
                 {
                     /* Reset the cancel state that was set before joining the
                      * decoder thread */
-                    if (p_owner->out_pool)
-                        picture_pool_Cancel( p_owner->out_pool, false );
                     vout_StopDisplay(vout);
                     p_owner->vout_thread_started = false;
                     decoder_Notify(p_owner, on_vout_stopped, vout);
