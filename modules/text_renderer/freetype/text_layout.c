@@ -172,7 +172,7 @@ static void FreeLine( line_desc_t *p_line )
         FT_Done_Glyph( (FT_Glyph)ch->p_glyph );
         if( ch->p_outline )
             FT_Done_Glyph( (FT_Glyph)ch->p_outline );
-        if( ch->p_shadow )
+        if( ch->p_shadow && ch->p_shadow != ch->p_glyph )
             FT_Done_Glyph( (FT_Glyph)ch->p_shadow );
     }
 
@@ -1187,7 +1187,7 @@ static int LayoutLine( filter_t *p_filter,
                 FT_Done_Glyph( p_bitmaps->p_glyph );
                 if( p_bitmaps->p_outline )
                     FT_Done_Glyph( p_bitmaps->p_outline );
-                if( p_bitmaps->p_shadow )
+                if( p_bitmaps->p_shadow != p_bitmaps->p_glyph )
                     FT_Done_Glyph( p_bitmaps->p_shadow );
                 --i_line_index;
                 continue;
