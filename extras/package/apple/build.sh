@@ -96,6 +96,8 @@ let VLC_USE_NUMBER_OF_CORES=$CORE_COUNT+1
 VLC_DISABLE_DEBUG=0
 # whether to compile with bitcode or not
 VLC_USE_BITCODE=0
+# whether to build static or dynamic plugins
+VLC_BUILD_DYNAMIC=0
 
 # Tools to be used
 VLC_HOST_CC="$(xcrun --find clang)"
@@ -128,6 +130,7 @@ usage()
     echo " --package-contribs        Create a prebuilt contrib package"
     echo " --with-prebuilt-contribs  Use prebuilt contribs instead of building"
     echo "                           them from source"
+    echo " --enable-shared           Build dynamic libraries and plugins"
     echo "Environment variables:"
     echo " VLC_PREBUILT_CONTRIBS_URL  URL to fetch the prebuilt contrib archive"
     echo "                            from when --with-prebuilt-contribs is used"
@@ -438,6 +441,9 @@ do
         --with-prebuilt-contribs)
             VLC_USE_PREBUILT_CONTRIBS=1
             ;;
+        --enable-shared)
+            VLC_BUILD_DYNAMIC=1
+            ;;
         VLC_PREBUILT_CONTRIBS_URL=*)
             VLC_PREBUILT_CONTRIBS_URL="${1#VLC_PREBUILT_CONTRIBS_URL=}"
             ;;
@@ -640,6 +646,12 @@ if [ "$VLC_DISABLE_DEBUG" -gt "0" ]; then
     VLC_CONFIG_OPTIONS+=( "--disable-debug" )
 fi
 
+if [ "$VLC_BUILD_DYNAMIC" -gt "0" ]; then
+    VLC_CONFIG_OPTIONS+=( "--enable-shared" )
+else
+    VLC_CONFIG_OPTIONS+=( "--disable-shared" "--enable-static" )
+fi
+
 # Bootstrap VLC
 cd "$VLC_SRC_DIR" || abort_err "Failed cd to VLC source dir"
 if ! [ -e configure ]; then
@@ -666,6 +678,11 @@ $MAKE -j$VLC_USE_NUMBER_OF_CORES || abort_err "Building VLC failed"
 $MAKE install || abort_err "Installing VLC failed"
 
 echo ""
+# Shortcut the build of the static bundle when using the dynamic loader
+if [ "$VLC_BUILD_DYNAMIC" -gt "0" ]; then
+    echo "Build succeeded!"
+    exit 0
+fi
 
 ##########################################################
 #                 Remove unused modules                  #
