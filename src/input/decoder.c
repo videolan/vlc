@@ -404,16 +404,14 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
     return 0;
 }
 
-static int CreateVoutIfNeeded(vlc_input_decoder_t *, vout_thread_t **, enum vlc_vout_order *, vlc_decoder_device **);
+static int CreateVoutIfNeeded(vlc_input_decoder_t *);
 
 
 static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *vctx )
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
 
-    enum vlc_vout_order vout_order;
-    vout_thread_t *p_vout = NULL;
-    int created_vout = CreateVoutIfNeeded(p_owner, &p_vout, &vout_order, NULL);
+    int created_vout = CreateVoutIfNeeded(p_owner);
     if (created_vout == -1)
         return -1; // error
     if (created_vout == 0)
@@ -422,6 +420,8 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         if (vctx != NULL && p_owner->vctx == vctx)
             return 0;
     }
+    assert(p_owner->p_vout);
+
     if (p_owner->vctx)
         vlc_video_context_Release(p_owner->vctx);
     p_owner->vctx = vctx ? vlc_video_context_Hold(vctx) : NULL;
@@ -465,29 +465,28 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
     }
     if (p_owner->vout_thread_started)
     {
-        int res = vout_ChangeSource(p_vout, &p_dec->fmt_out.video);
+        int res = vout_ChangeSource(p_owner->p_vout, &p_dec->fmt_out.video);
         if (res == 0)
             // the display/thread is started and can handle the new source format
             return 0;
     }
 
     vout_configuration_t cfg = {
-        .vout = p_vout, .clock = p_owner->p_clock, .fmt = &p_dec->fmt_out.video,
+        .vout = p_owner->p_vout, .clock = p_owner->p_clock, .fmt = &p_dec->fmt_out.video,
         .mouse_event = MouseEvent, .mouse_opaque = p_dec,
     };
-    p_vout = input_resource_RequestVout( p_owner->p_resource, vctx, &cfg, NULL);
+    vout_thread_t *p_vout =
+        input_resource_RequestVout(p_owner->p_resource, vctx, &cfg, NULL);
     if (p_vout != NULL)
     {
         p_owner->vout_thread_started = true;
-        decoder_Notify(p_owner, on_vout_started, p_vout, vout_order);
+        decoder_Notify(p_owner, on_vout_started, p_vout, p_owner->vout_order);
         return 0;
     }
     return -1;
 }
 
-static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner,
-                              vout_thread_t **pp_vout, enum vlc_vout_order *order,
-                              vlc_decoder_device **pp_dec_dev)
+static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner)
 {
     decoder_t *p_dec = &p_owner->dec;
     bool need_vout = false;
@@ -534,17 +533,7 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner,
     }
 
     if( !need_vout )
-    {
-        if (pp_vout || pp_dec_dev)
-        {
-            if ( pp_vout )
-                *pp_vout = p_owner->p_vout;
-            if ( pp_dec_dev )
-                *pp_dec_dev = vout_GetDevice(p_owner->p_vout);
-            *order = p_owner->vout_order;
-        }
         return 0; // vout unchanged
-    }
 
     vlc_mutex_lock( &p_owner->lock );
 
@@ -552,16 +541,13 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner,
     p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
     vlc_mutex_unlock( &p_owner->lock );
 
-    if ( pp_dec_dev )
-        *pp_dec_dev = NULL;
+    enum vlc_vout_order order;
     const vout_configuration_t cfg = { .vout = p_vout, .fmt = NULL };
-    p_vout = input_resource_RequestVout( p_owner->p_resource, NULL, &cfg, order );
-    if (pp_vout)
-        *pp_vout = p_vout;
+    p_vout = input_resource_RequestVout( p_owner->p_resource, NULL, &cfg, &order );
 
     vlc_mutex_lock( &p_owner->lock );
     p_owner->p_vout = p_vout;
-    p_owner->vout_order = *order;
+    p_owner->vout_order = order;
 
     DecoderUpdateFormatLocked( p_owner );
     p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
@@ -579,9 +565,6 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner,
         return -1;
     }
 
-    if (pp_dec_dev != NULL)
-        *pp_dec_dev = vout_GetDevice(p_owner->p_vout);
-
     vlc_fifo_Lock( p_owner->p_fifo );
     p_owner->reset_out_state = true;
     vlc_fifo_Unlock( p_owner->p_fifo );
@@ -597,19 +580,14 @@ static vlc_decoder_device * ModuleThread_GetDecoderDevice( decoder_t *p_dec )
     if( !var_InheritBool( p_dec, "hw-dec" ) )
         return NULL;
 
-    enum vlc_vout_order vout_order;
-    vlc_decoder_device *dec_device = NULL;
-    int created_vout = CreateVoutIfNeeded(p_owner, NULL, &vout_order, &dec_device);
+    int created_vout = CreateVoutIfNeeded(p_owner);
     if (created_vout == -1)
-    {
-        if ( dec_device )
-            vlc_decoder_device_Release( dec_device );
         return NULL;  // error
-    }
+
+    assert(p_owner->p_vout);
+    vlc_decoder_device *dec_device = vout_GetDevice(p_owner->p_vout);
     if (created_vout == 1)
-    {
         return dec_device; // new vout was created with a decoder device
-    }
 
     bool need_format_update = false;
     if ( memcmp( &p_dec->fmt_out.video.mastering,
