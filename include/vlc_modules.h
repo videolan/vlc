@@ -36,6 +36,27 @@ struct vlc_logger;
  *****************************************************************************/
 
 /**
+ * Finds the candidate modules for given criteria.
+ *
+ * All candidates modules having the specified capability and name will be
+ * sorted in decreasing order of priority and returned in a heap-allocated
+ * table.
+ *
+ * \param capability capability, i.e. class of module
+ * \param names string of comma-separated requested module shortcut names
+ * \param strict whether to exclude modules with no unmatching shortcut names
+ * \param modules storage location for the base address of a sorted table
+ *                of candidate modules [OUT]
+ * \param strict_matches storage location for the count of strictly matched
+ *                       modules [OUT]
+ * \return number of modules found or a strictly negative value on error
+ */
+VLC_API
+ssize_t vlc_module_match(const char *capability, const char *names,
+                         bool strict, module_t ***restrict modules,
+                         size_t *restrict strict_matches);
+
+/**
  * Finds and instantiates the best module of a certain type.
  * All candidates modules having the specified capability and name will be
  * sorted in decreasing order of priority. Then the probe callback will be
