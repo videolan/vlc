@@ -251,14 +251,8 @@ error:
 static ssize_t config_ListModules (const char *cap, char ***restrict values,
                                    char ***restrict texts)
 {
-    module_t **list;
-    ssize_t n = module_list_cap (&list, cap);
-    if (unlikely(n < 0))
-    {
-        *values = *texts = NULL;
-        return n;
-    }
-
+    module_t *const *list;
+    size_t n = module_list_cap(&list, cap);
     char **vals = malloc ((n + 2) * sizeof (*vals));
     char **txts = malloc ((n + 2) * sizeof (*txts));
     if (!vals || !txts)
@@ -269,7 +263,7 @@ static ssize_t config_ListModules (const char *cap, char ***restrict values,
         return -1;
     }
 
-    ssize_t i = 0;
+    size_t i = 0;
 
     vals[i] = strdup ("any");
     txts[i] = strdup (_("Automatic"));
@@ -292,18 +286,16 @@ static ssize_t config_ListModules (const char *cap, char ***restrict values,
 
     *values = vals;
     *texts = txts;
-    module_list_free (list);
     return i + 1;
 
 error:
-    for (ssize_t j = 0; j <= i; ++j)
+    for (size_t j = 0; j <= i; ++j)
     {
         free (vals[j]);
         free (txts[j]);
     }
     free(vals);
     free(txts);
-    module_list_free (list);
     *values = *texts = NULL;
     return -1;
 }

@@ -154,17 +154,22 @@ module_t *(vlc_module_load)(struct vlc_logger *log, const char *capability,
         name = "any";
 
     /* Find matching modules */
-    module_t **mods;
-    ssize_t total = module_list_cap (&mods, capability);
+    module_t *const *tab;
+    size_t total = module_list_cap(&tab, capability);
 
-    vlc_debug(log, "looking for %s module matching \"%s\": %zd candidates",
+    vlc_debug(log, "looking for %s module matching \"%s\": %zu candidates",
               capability, name, total);
-    if (total <= 0)
+    if (total == 0)
     {
-        module_list_free (mods);
         vlc_debug(log, "no %s modules", capability);
         return NULL;
     }
+
+    module_t **mods = malloc(total * sizeof (*mods));
+    if (unlikely(mods == NULL))
+        return NULL;
+
+    memcpy(mods, tab, total * sizeof (*mods));
 
     module_t *module = NULL;
     va_list args;
@@ -182,7 +187,7 @@ module_t *(vlc_module_load)(struct vlc_logger *log, const char *capability,
             goto done;
 
         bool force = strict && strcasecmp ("any", shortcut);
-        for (ssize_t i = 0; i < total; i++)
+        for (size_t i = 0; i < total; i++)
         {
             module_t *cand = mods[i];
             if (cand == NULL)
@@ -206,7 +211,7 @@ module_t *(vlc_module_load)(struct vlc_logger *log, const char *capability,
     /* None of the shortcuts matched, fall back to any module */
     if (!strict)
     {
-        for (ssize_t i = 0; i < total; i++)
+        for (size_t i = 0; i < total; i++)
         {
             module_t *cand = mods[i];
             if (cand == NULL || module_get_score (cand) <= 0)
@@ -225,7 +230,7 @@ module_t *(vlc_module_load)(struct vlc_logger *log, const char *capability,
     }
 done:
     va_end (args);
-    module_list_free (mods);
+    free(mods);
 
     if (module != NULL)
         vlc_debug(log, "using %s module \"%s\"", capability,

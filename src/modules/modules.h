@@ -113,7 +113,16 @@ void module_EndBank (bool);
 int module_Map(struct vlc_logger *, vlc_plugin_t *);
 void *module_Symbol(struct vlc_logger *, vlc_plugin_t *, const char *name);
 
-ssize_t module_list_cap (module_t ***, const char *);
+/**
+ * Lists of all VLC modules with a given capability.
+ *
+ * The list is sorted by decreasing module score.
+ *
+ * @param list pointer to the table of modules [OUT]
+ * @param name name of capability of modules to look for
+ * @return the number of modules in the list (possibly zero)
+ */
+size_t module_list_cap(module_t *const **, const char *);
 
 int vlc_bindtextdomain (const char *);
 
