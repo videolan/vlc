@@ -326,13 +326,10 @@ static void input_resource_PutVoutLocked(input_resource_t *p_resource,
                                          vout_thread_t *vout)
 {
     assert(vout != NULL);
-    vlc_mutex_lock(&p_resource->lock_hold);
     assert( p_resource->i_vout > 0 );
 
     if (p_resource->pp_vout[0] == vout)
     {
-        vlc_mutex_unlock(&p_resource->lock_hold);
-
         assert(p_resource->p_vout_free == NULL || p_resource->p_vout_free == vout);
         msg_Dbg(p_resource->p_parent, "saving a free vout");
         p_resource->p_vout_free = vout;
@@ -348,6 +345,7 @@ static void input_resource_PutVoutLocked(input_resource_t *p_resource,
         }
 #endif
 
+        vlc_mutex_lock(&p_resource->lock_hold);
         TAB_REMOVE(p_resource->i_vout, p_resource->pp_vout, vout);
         vlc_mutex_unlock(&p_resource->lock_hold);
         vout_Stop(vout);
@@ -399,14 +397,12 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
     }
     else
     {
-        vlc_mutex_lock(&p_resource->lock_hold);
         assert(p_resource->i_vout > 0);
         *order = p_resource->pp_vout[0] == cfg_vout ? VLC_VOUT_ORDER_PRIMARY
                                                      : VLC_VOUT_ORDER_SECONDARY;
         /* the caller is going to reuse the free vout, it's not free anymore */
         if (p_resource->p_vout_free == cfg_vout)
             p_resource->p_vout_free = NULL;
-        vlc_mutex_unlock(&p_resource->lock_hold);
     }
 
 #ifndef NDEBUG
