@@ -463,10 +463,9 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
             return -1;
         }
     }
-    int res;
     if (p_owner->vout_thread_started)
     {
-        res = vout_ChangeSource(p_vout, &p_dec->fmt_out.video);
+        int res = vout_ChangeSource(p_vout, &p_dec->fmt_out.video);
         if (res == 0)
             // the display/thread is started and can handle the new source format
             return 0;
@@ -476,13 +475,14 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
         .vout = p_vout, .clock = p_owner->p_clock, .fmt = &p_dec->fmt_out.video,
         .mouse_event = MouseEvent, .mouse_opaque = p_dec,
     };
-    res = input_resource_StartVout( p_owner->p_resource, vctx, &cfg);
-    if (res == 0)
+    p_vout = input_resource_RequestVout( p_owner->p_resource, vctx, &cfg, NULL);
+    if (p_vout != NULL)
     {
         p_owner->vout_thread_started = true;
         decoder_Notify(p_owner, on_vout_started, p_vout, vout_order);
+        return 0;
     }
-    return res;
+    return -1;
 }
 
 static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner,
@@ -537,15 +537,11 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner,
     {
         if (pp_vout || pp_dec_dev)
         {
-            vlc_mutex_lock( &p_owner->lock );
             if ( pp_vout )
                 *pp_vout = p_owner->p_vout;
             if ( pp_dec_dev )
-                *pp_dec_dev = NULL;
-            input_resource_GetVoutDecoderDevice( p_owner->p_resource,
-                                                 p_owner->p_vout, order, pp_dec_dev );
+                *pp_dec_dev = vout_GetDevice(p_owner->p_vout);
             *order = p_owner->vout_order;
-            vlc_mutex_unlock( &p_owner->lock );
         }
         return 0; // vout unchanged
     }
@@ -556,24 +552,16 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner,
     p_owner->p_vout = NULL; // the DecoderThread should not use the old vout anymore
     vlc_mutex_unlock( &p_owner->lock );
 
-    if ( pp_dec_dev ) *pp_dec_dev = NULL;
-    p_vout = input_resource_GetVoutDecoderDevice( p_owner->p_resource,
-                                                  p_vout, order, pp_dec_dev );
-
+    if ( pp_dec_dev )
+        *pp_dec_dev = NULL;
+    const vout_configuration_t cfg = { .vout = p_vout, .fmt = NULL };
+    p_vout = input_resource_RequestVout( p_owner->p_resource, NULL, &cfg, order );
     if (pp_vout)
         *pp_vout = p_vout;
 
     vlc_mutex_lock( &p_owner->lock );
     p_owner->p_vout = p_vout;
     p_owner->vout_order = *order;
-    if ( pp_dec_dev )
-    {
-        if( p_vout == NULL && *pp_dec_dev != NULL )
-        {
-            vlc_decoder_device_Release( *pp_dec_dev );
-            *pp_dec_dev = NULL;
-        }
-    }
 
     DecoderUpdateFormatLocked( p_owner );
     p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
@@ -590,6 +578,9 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner,
         msg_Err( p_dec, "failed to create video output" );
         return -1;
     }
+
+    if (pp_dec_dev != NULL)
+        *pp_dec_dev = vout_GetDevice(p_owner->p_vout);
 
     vlc_fifo_Lock( p_owner->p_fifo );
     p_owner->reset_out_state = true;

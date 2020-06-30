@@ -37,11 +37,9 @@ void input_resource_SetInput( input_resource_t *, input_thread_t * );
  */
 sout_instance_t *input_resource_RequestSout( input_resource_t *, sout_instance_t *, const char *psz_sout );
 
-vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *,
-                                      vout_thread_t *cfg_vout,
-                                      enum vlc_vout_order *order,
-                                      vlc_decoder_device **);
-int input_resource_StartVout(input_resource_t *, vlc_video_context *, const vout_configuration_t *);
+vout_thread_t *input_resource_RequestVout(input_resource_t *, vlc_video_context *,
+                                         const vout_configuration_t *,
+                                         enum vlc_vout_order *order);
 void input_resource_PutVout(input_resource_t *, vout_thread_t *);
 
 /**

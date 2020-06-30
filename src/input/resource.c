@@ -410,16 +410,11 @@ void input_resource_PutVout(input_resource_t *p_resource,
     vlc_mutex_unlock( &p_resource->lock );
 }
 
-vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
-                                      vout_thread_t *cfg_vout,
-                                      enum vlc_vout_order *order,
-                                      vlc_decoder_device **pp_dec_dev)
+static struct vout_resource *
+RequestVoutRsc(input_resource_t *p_resource)
 {
-    vout_thread_t *vout;
     struct vout_resource *vout_rsc = NULL;
-    vlc_mutex_lock( &p_resource->lock );
 
-    if (cfg_vout == NULL) {
         if( p_resource->vout_rsc_free != NULL )
         {
             /* The free vout is always the first one */
@@ -427,7 +422,6 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
 
             vout_rsc = p_resource->vout_rsc_free;
             p_resource->vout_rsc_free = NULL;
-            cfg_vout = vout_rsc->vout;
         }
         else
         {
@@ -436,16 +430,15 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
              * pre-configured on this dummy vout. */
             vlc_object_t *parent = vlc_list_is_empty( &p_resource->vout_rscs ) ?
                 VLC_OBJECT(p_resource->p_vout_dummy) : p_resource->p_parent;
-            cfg_vout = vout = vout_Create(parent);
+            vout_thread_t *vout = vout_Create(parent);
             if (vout == NULL)
-                goto out;
+                return NULL;
 
             vout_rsc = vout_resource_Create(vout);
             if (vout_rsc == NULL)
             {
                 vout_Close(vout);
-                cfg_vout = vout = NULL;
-                goto out;
+                return NULL;
             }
 
             vout_rsc->order = vlc_list_is_empty( &p_resource->vout_rscs ) ?
@@ -455,10 +448,32 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
             vout_resource_Add(vout_rsc, p_resource);
             vlc_mutex_unlock(&p_resource->lock_hold);
         }
+
+    return vout_rsc;
+}
+
+vout_thread_t *input_resource_RequestVout(input_resource_t *p_resource,
+                                          vlc_video_context *vctx,
+                                          const vout_configuration_t *cfg,
+                                          enum vlc_vout_order *order)
+{
+    vlc_mutex_lock( &p_resource->lock );
+    struct vout_resource *vout_rsc = NULL;
+
+    vout_configuration_t dcfg = *cfg;
+    if (dcfg.vout == NULL)
+    {
+        vout_rsc = RequestVoutRsc(p_resource);
+        if (vout_rsc == NULL)
+        {
+            vlc_mutex_unlock( &p_resource->lock );
+            return NULL;
+        }
+        dcfg.vout = vout_rsc->vout;
     }
     else
     {
-        vout_rsc = resource_GetVoutRsc(p_resource, cfg_vout);
+        vout_rsc = resource_GetVoutRsc(p_resource, dcfg.vout);
         assert(vout_rsc != NULL);
 
         /* the caller is going to reuse the free vout, it's not free anymore */
@@ -466,27 +481,21 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
             p_resource->vout_rsc_free = NULL;
     }
 
-    if (pp_dec_dev)
-        *pp_dec_dev = vout_GetDevice(cfg_vout);
+    if (order != NULL)
+        *order = vout_rsc->order;
 
-    *order = vout_rsc->order;
-
-    vout = cfg_vout;
-
-out:
-    vlc_mutex_unlock( &p_resource->lock );
-    return vout;
-}
-
-int input_resource_StartVout(input_resource_t *p_resource,
-                              vlc_video_context *vctx,
-                              const vout_configuration_t *cfg)
-{
-    vlc_mutex_lock( &p_resource->lock );
-    if (vout_Request(cfg, vctx, p_resource->p_input)) {
-        input_resource_PutVoutLocked(p_resource, cfg->vout);
+    if (dcfg.fmt == NULL)
+    {
+        /* A NULL fmt means that only the vout creation is requested, do not
+         * start it with vout_Request(). */
         vlc_mutex_unlock(&p_resource->lock);
-        return -1;
+        return dcfg.vout;
+    }
+
+    if (vout_Request(&dcfg, vctx, p_resource->p_input)) {
+        input_resource_PutVoutLocked(p_resource, dcfg.vout);
+        vlc_mutex_unlock(&p_resource->lock);
+        return NULL;
     }
 
     DisplayVoutTitle(p_resource, cfg->vout);
@@ -499,7 +508,7 @@ int input_resource_StartVout(input_resource_t *p_resource,
                           &param);
     }
     vlc_mutex_unlock( &p_resource->lock );
-    return 0;
+    return dcfg.vout;
 }
 
 vout_thread_t *input_resource_HoldVout( input_resource_t *p_resource )
