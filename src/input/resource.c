@@ -415,39 +415,39 @@ RequestVoutRsc(input_resource_t *p_resource)
 {
     struct vout_resource *vout_rsc = NULL;
 
-        if( p_resource->vout_rsc_free != NULL )
+    if( p_resource->vout_rsc_free != NULL )
+    {
+        /* The free vout is always the first one */
+        msg_Dbg(p_resource->p_parent, "trying to reuse free vout");
+
+        vout_rsc = p_resource->vout_rsc_free;
+        p_resource->vout_rsc_free = NULL;
+    }
+    else
+    {
+        /* Use the dummy vout as the parent of the future main vout. This
+         * will allow the future vout to inherit all parameters
+         * pre-configured on this dummy vout. */
+        vlc_object_t *parent = vlc_list_is_empty( &p_resource->vout_rscs ) ?
+            VLC_OBJECT(p_resource->p_vout_dummy) : p_resource->p_parent;
+        vout_thread_t *vout = vout_Create(parent);
+        if (vout == NULL)
+            return NULL;
+
+        vout_rsc = vout_resource_Create(vout);
+        if (vout_rsc == NULL)
         {
-            /* The free vout is always the first one */
-            msg_Dbg(p_resource->p_parent, "trying to reuse free vout");
-
-            vout_rsc = p_resource->vout_rsc_free;
-            p_resource->vout_rsc_free = NULL;
+            vout_Close(vout);
+            return NULL;
         }
-        else
-        {
-            /* Use the dummy vout as the parent of the future main vout. This
-             * will allow the future vout to inherit all parameters
-             * pre-configured on this dummy vout. */
-            vlc_object_t *parent = vlc_list_is_empty( &p_resource->vout_rscs ) ?
-                VLC_OBJECT(p_resource->p_vout_dummy) : p_resource->p_parent;
-            vout_thread_t *vout = vout_Create(parent);
-            if (vout == NULL)
-                return NULL;
 
-            vout_rsc = vout_resource_Create(vout);
-            if (vout_rsc == NULL)
-            {
-                vout_Close(vout);
-                return NULL;
-            }
+        vout_rsc->order = vlc_list_is_empty( &p_resource->vout_rscs ) ?
+            VLC_VOUT_ORDER_PRIMARY : VLC_VOUT_ORDER_SECONDARY;
 
-            vout_rsc->order = vlc_list_is_empty( &p_resource->vout_rscs ) ?
-                VLC_VOUT_ORDER_PRIMARY : VLC_VOUT_ORDER_SECONDARY;
-
-            vlc_mutex_lock(&p_resource->lock_hold);
-            vout_resource_Add(vout_rsc, p_resource);
-            vlc_mutex_unlock(&p_resource->lock_hold);
-        }
+        vlc_mutex_lock(&p_resource->lock_hold);
+        vout_resource_Add(vout_rsc, p_resource);
+        vlc_mutex_unlock(&p_resource->lock_hold);
+    }
 
     return vout_rsc;
 }
