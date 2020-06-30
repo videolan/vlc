@@ -242,7 +242,6 @@ Widgets.NavigableFocusScope {
                             target: playlist;
                             properties: "width"
                             duration: 150
-                            from: root.width / 4
                             to: 0
                             onStopped: {
                                 playlist.visible = false
@@ -266,7 +265,8 @@ Widgets.NavigableFocusScope {
                             stackView.forceActiveFocus()
                         }
 
-                        RectangularGlow {
+                        Item
+                        {
                             anchors {
                                 top: parent.top
                                 left: parent.left
@@ -274,8 +274,37 @@ Widgets.NavigableFocusScope {
                             }
                             width: VLCStyle.margin_xxsmall
 
-                            glowRadius: VLCStyle.dp(8)
-                            color: VLCStyle.colors.glowColor
+                            RectangularGlow {
+                                anchors.fill: parent
+
+                                glowRadius: VLCStyle.dp(8)
+                                color: VLCStyle.colors.glowColor
+                            }
+
+                            MouseArea {
+                                id: dragArea
+                                anchors {
+                                    top: parent.top
+                                    bottom: parent.bottom
+                                    horizontalCenter: parent.horizontalCenter
+                                }
+                                width: VLCStyle.dp(8)
+                                property var _initialPos : playlist.x
+                                drag { target: parent; axis: Drag.XAxis }
+                                onPositionChanged: {
+                                    if(drag.active){
+                                        var delta = mouseX - _initialPos
+                                        var newWidth = playlist.width - delta
+
+                                        if (newWidth < root.width / 2 && newWidth > root.width / 8)
+                                            playlist.width -= delta
+                                    }
+                                }
+                                onPressed: {
+                                    dragArea._initialPos = mouseX
+                                }
+                                cursorShape: Qt.SizeHorCursor
+                            }
                         }
                     }
                 }
