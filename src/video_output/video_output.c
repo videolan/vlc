@@ -1465,7 +1465,6 @@ void vout_ChangeRate(vout_thread_t *vout, float rate)
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
-    assert(sys->display);
 
     vout_control_Hold(&sys->control);
     sys->rate = rate;
