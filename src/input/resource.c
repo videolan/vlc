@@ -47,6 +47,7 @@
 struct vout_resource
 {
     vout_thread_t *vout;
+    enum vlc_vout_order order;
 
     struct vlc_list node;
 };
@@ -421,11 +422,15 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
     if (cfg_vout == NULL) {
         if( p_resource->vout_rsc_free != NULL )
         {
-            cfg_vout = p_resource->vout_rsc_free->vout;
-            p_resource->vout_rsc_free = NULL;
-        }
+            /* The free vout is always the first one */
+            msg_Dbg(p_resource->p_parent, "trying to reuse free vout");
 
-        if (cfg_vout == NULL) {
+            vout_rsc = p_resource->vout_rsc_free;
+            p_resource->vout_rsc_free = NULL;
+            cfg_vout = vout_rsc->vout;
+        }
+        else
+        {
             /* Use the dummy vout as the parent of the future main vout. This
              * will allow the future vout to inherit all parameters
              * pre-configured on this dummy vout. */
@@ -443,26 +448,18 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
                 goto out;
             }
 
-            *order = vlc_list_is_empty( &p_resource->vout_rscs ) ?
+            vout_rsc->order = vlc_list_is_empty( &p_resource->vout_rscs ) ?
                 VLC_VOUT_ORDER_PRIMARY : VLC_VOUT_ORDER_SECONDARY;
 
             vlc_mutex_lock(&p_resource->lock_hold);
             vout_resource_Add(vout_rsc, p_resource);
             vlc_mutex_unlock(&p_resource->lock_hold);
-        } else
-        {
-            /* The free vout is always the first one */
-            *order = VLC_VOUT_ORDER_PRIMARY;
-            msg_Dbg(p_resource->p_parent, "trying to reuse free vout");
         }
     }
     else
     {
         vout_rsc = resource_GetVoutRsc(p_resource, cfg_vout);
         assert(vout_rsc != NULL);
-
-        *order = resource_GetFirstVoutRsc( p_resource ) == vout_rsc ?
-                VLC_VOUT_ORDER_PRIMARY : VLC_VOUT_ORDER_SECONDARY;
 
         /* the caller is going to reuse the free vout, it's not free anymore */
         if (p_resource->vout_rsc_free == vout_rsc)
@@ -471,6 +468,8 @@ vout_thread_t *input_resource_GetVoutDecoderDevice(input_resource_t *p_resource,
 
     if (pp_dec_dev)
         *pp_dec_dev = vout_GetDevice(cfg_vout);
+
+    *order = vout_rsc->order;
 
     vout = cfg_vout;
 
