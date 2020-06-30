@@ -1405,20 +1405,22 @@ static void vout_FlushUnlocked(vout_thread_t *vout, bool below,
 
     picture_fifo_Flush(sys->decoder_fifo, date, below);
 
-    assert(sys->display != NULL);
     vlc_mutex_lock(&sys->display_lock);
-    vout_FilterFlush(sys->display);
+    if (sys->display != NULL)
+        vout_FilterFlush(sys->display);
     vlc_mutex_unlock(&sys->display_lock);
 
-    vlc_clock_Reset(sys->clock);
-    vlc_clock_SetDelay(sys->clock, sys->delay);
+    if (sys->clock != NULL)
+    {
+        vlc_clock_Reset(sys->clock);
+        vlc_clock_SetDelay(sys->clock, sys->delay);
+    }
 }
 
 void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
-    assert(sys->display);
 
     vout_control_Hold(&sys->control);
     vout_FlushUnlocked(vout, false, date);
