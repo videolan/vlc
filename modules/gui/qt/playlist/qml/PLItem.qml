@@ -30,9 +30,10 @@ Rectangle {
 
     property var plmodel
 
-    signal itemClicked(int keys, int modifier)
+    signal itemClicked(int button, int modifier)
     signal itemDoubleClicked(int keys, int modifier)
     signal dragStarting()
+
     property alias hovered: mouse.containsMouse
 
     property var dragitem: null
@@ -67,17 +68,23 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
 
+        acceptedButtons: acceptedButtons | Qt.RightButton
 
         onClicked:{
-            root.itemClicked(mouse.buttons, mouse.modifiers);
+            root.itemClicked(mouse.button, mouse.modifiers);
         }
-        onDoubleClicked:  root.itemDoubleClicked(mouse.buttons, mouse.modifiers);
+        onDoubleClicked: {
+            if (mouse.button !== Qt.RightButton)
+                root.itemDoubleClicked(mouse.buttons, mouse.modifiers);
+        }
 
         drag.target: dragItem
 
         Connections {
             target: mouse.drag
             onActiveChanged: {
+                if (mouse.button === Qt.RightButton)
+                    return
                 if (target.active) {
                     root.dragStarting()
                     dragItem.count = plmodel.getSelection().length
@@ -90,6 +97,8 @@ Rectangle {
         }
 
         onPressed:  {
+            if (mouse.button === Qt.RightButton)
+                return
             var pos = this.mapToGlobal( mouseX, mouseY)
             dragItem.updatePos(pos.x, pos.y)
         }

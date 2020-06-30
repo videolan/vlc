@@ -36,6 +36,7 @@ Widgets.NavigableFocusScope {
     property int leftPadding: 0
     property int rightPadding: 0
     property alias backgroundColor: parentRect.color
+    property alias mediaLibAvailable: contextMenu.medialibAvailable
 
     Rectangle {
         id: parentRect
@@ -117,6 +118,74 @@ Widgets.NavigableFocusScope {
                     ]
                 }
             }
+        }
+
+        Widgets.MenuExt {
+            id: contextMenu
+            property var model: ({})
+            property bool medialibAvailable: false
+            closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Play")
+                icon.source: "qrc:/toolbar/play_b.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
+                onTriggered: {
+                    mainPlaylistController.goTo(contextMenu.model.getSelection()[0], true)
+                }
+            }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Information...")
+                onTriggered: {
+                    // not implemented
+                }
+            }
+
+            MenuSeparator { }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Show Containing Directory...")
+                onTriggered: {
+                    // not implemented
+                }
+            }
+
+            MenuSeparator { }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Save Playlist to File...")
+                onTriggered: {
+                    dialogProvider.savePlayingToPlaylist();
+                }
+            }
+
+            MenuSeparator { }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Remove Selected")
+                icon.source: "qrc:/buttons/playlist/playlist_remove.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
+                onTriggered: {
+                    contextMenu.model.removeItems(contextMenu.model.getSelection())
+                }
+            }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Clear the playlist")
+                icon.source: "qrc:/toolbar/clear.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
+                onTriggered: {
+                    mainPlaylistController.clear()
+                }
+            }
+
+            MenuSeparator { }
+
+            onClosed: contextMenu.parent.forceActiveFocus()
         }
 
         ColumnLayout {
@@ -201,10 +270,17 @@ Widgets.NavigableFocusScope {
                                 preTarget++
                             view.currentIndex = selectedIndexes[0]
                             root.plmodel.moveItemsPre(selectedIndexes, preTarget)
+                            return
                         } else if (view.mode == "select") {
-                        } else {
+                        } else if (!(root.plmodel.isSelected(index) && button === Qt.RightButton)) {
                             view.updateSelection(modifier, view.currentIndex, index)
                             view.currentIndex = index
+                        }
+
+                        if (button === Qt.RightButton)
+                        {
+                            contextMenu.model = root.plmodel
+                            contextMenu.popup()
                         }
                     }
                     onItemDoubleClicked: mainPlaylistController.goTo(index, true)
