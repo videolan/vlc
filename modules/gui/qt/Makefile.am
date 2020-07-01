@@ -124,6 +124,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/maininterface/mainui.hpp \
 	gui/qt/maininterface/videosurface.cpp \
 	gui/qt/maininterface/videosurface.hpp \
+	gui/qt/maininterface/video_window_handler.cpp \
+	gui/qt/maininterface/video_window_handler.hpp \
 	gui/qt/medialibrary/medialib.cpp \
 	gui/qt/medialibrary/medialib.hpp \
 	gui/qt/medialibrary/mlalbum.cpp \
@@ -289,6 +291,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/maininterface/main_interface.moc.cpp \
 	gui/qt/maininterface/mainui.moc.cpp \
 	gui/qt/maininterface/videosurface.moc.cpp \
+	gui/qt/maininterface/video_window_handler.moc.cpp \
 	gui/qt/medialibrary/medialib.moc.cpp \
 	gui/qt/medialibrary/mlalbum.moc.cpp \
 	gui/qt/medialibrary/mlalbummodel.moc.cpp \
