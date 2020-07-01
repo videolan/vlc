@@ -315,6 +315,15 @@ Widgets.NavigableFocusScope {
                 }
             }
 
+            add: Transition {
+                NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 200 }
+            }
+
+            displaced: Transition {
+                NumberAnimation { properties: "x,y"; duration: 200; easing.type: Easing.OutSine }
+                NumberAnimation { property: "opacity"; to: 1.0 }
+            }
+
             onSelectAll: root.plmodel.selectAll()
             onSelectionUpdated: {
                 if (view.mode === "select") {

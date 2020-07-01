@@ -58,6 +58,9 @@ NavigableFocusScope {
     property alias section: view.section
     property alias orientation: view.orientation
 
+    property alias add: view.add
+    property alias displaced: view.displaced
+
     property int highlightMargin: VLCStyle.margin_large
 
     property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
