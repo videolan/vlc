@@ -172,7 +172,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     VLCMediaLibraryTrack *videoTrack = _representedMediaItem.firstVideoTrack;
     [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth andHeight:videoTrack.videoHeight];
 
-    CGFloat position = _representedMediaItem.lastPlaybackPosition;
+    CGFloat position = _representedMediaItem.progress;
     if (position > VLCLibraryCollectionViewItemMinimalDisplayedProgress && position < VLCLibraryCollectionViewItemMaximumDisplayedProgress) {
         _progressIndicator.progress = position;
         _progressIndicator.hidden = NO;

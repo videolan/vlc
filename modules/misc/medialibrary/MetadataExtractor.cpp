@@ -131,7 +131,8 @@ void MetadataExtractor::addSubtree( ParseContext& ctx, input_item_node_t *root )
     for ( auto i = 0; i < root->i_children; ++i )
     {
         auto it = root->pp_children[i]->p_item;
-        auto& subItem = ctx.item.createSubItem( it->psz_uri, i );
+        auto& subItem = ctx.item.createLinkedItem( it->psz_uri,
+                                                   medialibrary::IFile::Type::Main, i );
         populateItem( subItem, it );
     }
 }
@@ -184,7 +185,7 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
         return medialibrary::parser::Status::Fatal;
 
     if ( item.fileType() == medialibrary::IFile::Type::Playlist &&
-         item.nbSubItems() == 0 )
+         item.nbLinkedItems() == 0 )
         return medialibrary::parser::Status::Fatal;
 
     populateItem( item, ctx.inputItem.get() );

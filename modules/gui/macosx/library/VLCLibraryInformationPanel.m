@@ -56,7 +56,7 @@
     [textContent appendFormat:@"Duration: %@\n", [NSString stringWithTime:_representedMediaItem.duration / VLCMediaLibraryMediaItemDurationDenominator]];
     [textContent appendFormat:@"Play count: %u, last played: %@\n", _representedMediaItem.playCount, [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:_representedMediaItem.lastPlayedDate] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterShortStyle]];
     [textContent appendFormat:@"Small artwork generated? %@\n", _representedMediaItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No")];
-    [textContent appendFormat:@"Favorited? %@, Playback progress: %2.f%%\n", _representedMediaItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No"), _representedMediaItem.lastPlaybackPosition * 100.];
+    [textContent appendFormat:@"Favorited? %@, Playback progress: %2.f%%\n", _representedMediaItem.smallArtworkGenerated == YES ? _NS("Yes") : _NS("No"), _representedMediaItem.progress * 100.];
 
     NSArray *array = _representedMediaItem.files;
     NSUInteger count = array.count;

@@ -53,7 +53,6 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input, bool force_pos)
         vlc_ml_release(media);
         return;
     }
-    vlc_ml_release(media);
 
     input->ml.restore = (restore_pos == VLC_PLAYER_RESTORE_PLAYBACK_POS_ALWAYS) ?
                             VLC_RESTOREPOINT_TITLE : VLC_RESTOREPOINT_NONE;
@@ -64,11 +63,16 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input, bool force_pos)
      */
     if (restore_pos == VLC_PLAYER_RESTORE_PLAYBACK_POS_ALWAYS &&
             input->ml.states.current_title == -1 &&
-            input->ml.states.progress > .0f)
-        input_SetPosition(input->thread, input->ml.states.progress, false);
+            media->f_progress > .0f)
+        input_SetPosition(input->thread, media->f_progress, false);
     else if (restore_pos == VLC_PLAYER_RESTORE_PLAYBACK_POS_ASK &&
-             input->ml.states.progress > .0f)
+             media->f_progress > .0f)
+    {
         input->ml.delay_restore = true;
+        input->ml.pos = media->f_progress;
+    }
+
+    vlc_ml_release(media);
 
     if (!restore_states)
         return;
@@ -117,26 +121,6 @@ vlc_player_input_RestoreMlStates(struct vlc_player_input* input, bool force_pos)
             var_SetString(vout, "video-filter", NULL);
         vout_Release(vout);
     }
-}
-
-static const float beginning_of_media_percent = .05f;
-static const int64_t beginning_of_media_sec = 60;
-
-static int
-beginning_of_media(struct vlc_player_input *input)
-{
-    return input->position <= beginning_of_media_percent &&
-        input->time < VLC_TICK_FROM_SEC(beginning_of_media_sec);
-}
-
-static const float end_of_media_percent = .95f;
-static const int64_t end_of_media_sec = 60;
-
-static int
-end_of_media(struct vlc_player_input *input)
-{
-    return input->position >= end_of_media_percent &&
-        input->length - input->time < VLC_TICK_FROM_SEC(end_of_media_sec);
 }
 
 static bool
@@ -214,24 +198,7 @@ vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
     }
     assert(media->i_type != VLC_ML_MEDIA_TYPE_UNKNOWN);
 
-    /* If we reached end of the media, bump the play count & the media in the
-     * history */
-    if (end_of_media(input))
-        vlc_ml_media_increase_playcount(ml, media->i_id);
-
-    if (beginning_of_media(input) || end_of_media(input))
-    {
-        /* Ensure we remove any previously saved position to allow the playback
-         * of this media to restart from the begining */
-        if (input->ml.states.progress >= .0f )
-        {
-            vlc_ml_media_set_playback_state(ml, media->i_id,
-                                            VLC_ML_PLAYBACK_STATE_PROGRESS, NULL );
-            input->ml.states.progress = -1.f;
-        }
-    }
-    else
-        input->ml.states.progress = input->position;
+    vlc_ml_media_update_progress( ml, media->i_id, input->position );
 
     /* If the value changed during the playback, update it in the medialibrary.
      * If not, set each state to their "unset" values, so that they aren't saved

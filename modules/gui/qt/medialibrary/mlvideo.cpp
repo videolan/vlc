@@ -80,7 +80,7 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
     , m_id( data->i_id, VLC_ML_PARENT_UNKNOWN )
     , m_title( QString::fromUtf8( data->psz_title ) )
     , m_thumbnail( QString::fromUtf8( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
-    , m_progress( -1.f )
+    , m_progress( data->f_progress )
     , m_playCount( data->i_playcount )
     , m_thumbnailGenerated( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].b_generated )
     , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
@@ -99,13 +99,6 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
             m_mrl = QUrl::fromEncoded(file.psz_mrl);
             break;
         }
-    char *psz_progress;
-    if ( vlc_ml_media_get_playback_state( ml, data->i_id, VLC_ML_PLAYBACK_STATE_PROGRESS,
-                                    &psz_progress ) == VLC_SUCCESS && psz_progress != NULL )
-    {
-        m_progress = atof( psz_progress );
-        free( psz_progress );
-    }
 
     unsigned int numChannel = 0 , maxWidth = 0 , maxHeight = 0;
     for( const vlc_ml_media_track_t& track: ml_range_iterate<vlc_ml_media_track_t>( data->p_tracks ) ) {

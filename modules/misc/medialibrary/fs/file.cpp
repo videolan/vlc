@@ -65,5 +65,15 @@ SDFile::size() const
     return 0;
 }
 
+IFile::LinkedFileType SDFile::linkedType() const
+{
+    return IFile::LinkedFileType::None;
+}
+
+const std::string &SDFile::linkedWith() const
+{
+    return m_linkedFile;
+}
+
   } /* namespace medialibrary */
 } /* namespace vlc */

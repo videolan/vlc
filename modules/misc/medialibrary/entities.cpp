@@ -236,6 +236,7 @@ bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output )
     output.i_duration = input->duration();
     output.b_is_favorite = input->isFavorite();
     output.i_playcount = input->playCount();
+    output.f_progress = input->progress();
     output.i_last_played_date = input->lastPlayedDate();
 
     output.psz_title = strdup( input->title().c_str() );

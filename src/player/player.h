@@ -114,6 +114,7 @@ struct vlc_player_input
             VLC_RESTOREPOINT_POSITION,
             VLC_RESTOREPOINT_NONE,
         } restore;
+        float pos;
         bool restore_states;
         bool delay_restore;
     } ml;

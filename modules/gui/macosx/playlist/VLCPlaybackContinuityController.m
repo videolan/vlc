@@ -187,7 +187,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
                                               ask:(BOOL)ask
                                            player:(VLCPlayerController *)playerController
 {
-    float lastPlaybackPosition = libraryMediaItem.lastPlaybackPosition;
+    float lastPlaybackPosition = libraryMediaItem.progress;
     int64_t duration = libraryMediaItem.duration;
 
     if (lastPlaybackPosition < MinimumStorePercent || duration < MinimumDuration) {
@@ -292,10 +292,6 @@ BOOL ShouldStorePlaybackPosition(float position, int64_t duration)
     if (!libraryMediaItem) {
         // input item isn't part of the library
         [self storeLegacyPlaybackPositionForInputItem:inputItem withPlayer:playerController];
-    }
-
-    if (ShouldStorePlaybackPosition(playerController.position, libraryMediaItem.duration)) {
-        libraryMediaItem.lastPlaybackPosition = playerController.position;
     }
 }
 

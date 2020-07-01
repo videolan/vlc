@@ -201,6 +201,7 @@ typedef struct vlc_ml_media_t
     /* Duration in milliseconds */
     int64_t i_duration;
     uint32_t i_playcount;
+    float f_progress;
     time_t i_last_played_date;
     char* psz_title;
 
@@ -471,7 +472,7 @@ enum vlc_ml_control
     VLC_ML_NEW_STREAM,              /**< arg1: const char*; arg2(out): vlc_ml_media_t** */
 
     /* Media management */
-    VLC_ML_MEDIA_INCREASE_PLAY_COUNT,       /**< arg1: media id; can fail */
+    VLC_ML_MEDIA_UPDATE_PROGRESS,           /**< arg1: media id; arg2: playback position; can fail */
     VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE,  /**< arg1: media id; arg2: vlc_ml_playback_state; arg3: char**; */
     VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_STATE,  /**< arg1: media id; arg2: vlc_ml_playback_state; arg3: const char*; */
     VLC_ML_MEDIA_GET_ALL_MEDIA_PLAYBACK_STATES, /**< arg1: media id; arg2(out): vlc_ml_playback_states_all* */
@@ -499,7 +500,6 @@ enum vlc_ml_control
 enum vlc_ml_playback_state
 {
     VLC_ML_PLAYBACK_STATE_RATING,
-    VLC_ML_PLAYBACK_STATE_PROGRESS,
     VLC_ML_PLAYBACK_STATE_SPEED,
     VLC_ML_PLAYBACK_STATE_TITLE,
     VLC_ML_PLAYBACK_STATE_CHAPTER,
@@ -521,7 +521,6 @@ enum vlc_ml_playback_state
 
 typedef struct vlc_ml_playback_states_all
 {
-    float progress;
     float rate;
     float zoom;
     int current_title;
@@ -932,9 +931,10 @@ static inline vlc_ml_media_t* vlc_ml_new_stream( vlc_medialibrary_t* p_ml, const
     return res;
 }
 
-static inline int vlc_ml_media_increase_playcount( vlc_medialibrary_t* p_ml, int64_t i_media_id )
+static inline int vlc_ml_media_update_progress( vlc_medialibrary_t* p_ml, int64_t i_media_id,
+                                                double progress )
 {
-    return vlc_ml_control( p_ml, VLC_ML_MEDIA_INCREASE_PLAY_COUNT, i_media_id );
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_UPDATE_PROGRESS, i_media_id, progress );
 }
 
 static inline int vlc_ml_media_get_playback_state( vlc_medialibrary_t* p_ml, int64_t i_media_id, int i_state, char** ppsz_result )

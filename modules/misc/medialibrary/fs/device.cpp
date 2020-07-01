@@ -62,10 +62,13 @@ bool SDDevice::isNetwork() const
     return m_isNetwork;
 }
 
-const
-std::string &SDDevice::mountpoint() const
+std::vector<std::string> SDDevice::mountpoints() const
 {
-    return m_mountpoints[0].mrl;
+    std::vector<std::string> res;
+    res.reserve( m_mountpoints.size() );
+    for ( const auto& m : m_mountpoints )
+        res.push_back( m.mrl );
+    return res;
 }
 
 void SDDevice::addMountpoint( std::string mrl )
