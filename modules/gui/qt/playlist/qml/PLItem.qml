@@ -123,7 +123,6 @@ Rectangle {
             Item {
                 Layout.preferredHeight: VLCStyle.icon_normal
                 Layout.preferredWidth: VLCStyle.icon_normal
-                Layout.leftMargin: VLCStyle.margin_xsmall
 
                 DropShadow {
                     id: effect
@@ -160,7 +159,7 @@ Rectangle {
 
             Column {
                 Layout.fillWidth: true
-                Layout.leftMargin: VLCStyle.margin_small
+                Layout.leftMargin: VLCStyle.margin_large
 
                 Widgets.ListLabel {
                     id: textInfo
