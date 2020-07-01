@@ -123,7 +123,7 @@ static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
     field->context.vctx = vlc_video_context_Hold(sys->vctx);
 
     pic->context = &field->context;
-    *data = (void *)(uintptr_t)field->frame->surface;
+    data[3] = (void *)(uintptr_t)field->frame->surface;
     return VLC_SUCCESS;
 }
 
