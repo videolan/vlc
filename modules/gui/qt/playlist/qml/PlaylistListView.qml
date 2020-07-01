@@ -285,6 +285,16 @@ Widgets.NavigableFocusScope {
 
             delegate: Column {
 
+                Loader {
+                    active: (index === 0) // load only for the first element to prevent overlapping
+                    width: parent.width
+                    height: 1
+                    sourceComponent: Rectangle {
+                        color: VLCStyle.colors.playlistSeparator
+                        opacity: VLCStyle.colors.isThemeDark ? 0.05 : 1.0
+                    }
+                }
+
                 PLItem {
                     /*
                      * implicit variables:
