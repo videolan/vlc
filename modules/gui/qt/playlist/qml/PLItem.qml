@@ -89,6 +89,7 @@ Rectangle {
                     return
                 if (target.active) {
                     root.dragStarting()
+                    dragItem.model = model
                     dragItem.count = plmodel.getSelection().length
                     dragItem.visible = true
                 } else {
