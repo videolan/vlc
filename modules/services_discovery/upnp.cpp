@@ -1602,9 +1602,39 @@ inline char *getPreferedAdapter()
 }
 #else
 
-static char *getPreferedAdapter()
+inline bool necessaryFlagsSetOnInterface(struct ifaddrs *anInterface)
 {
-    return NULL;
+    unsigned int flags = anInterface->ifa_flags;
+    if( (flags & IFF_UP) && (flags & IFF_RUNNING) && !(flags & IFF_LOOPBACK) && !(flags & IFF_POINTOPOINT) ) {
+        return true;
+    }
+    return false;
+}
+
+inline char *getPreferedAdapter()
+{
+    struct ifaddrs *listOfInterfaces;
+    struct ifaddrs *anInterface;
+    int ret = getifaddrs(&listOfInterfaces);
+    char *adapterName = NULL;
+
+    if (ret != 0) {
+        return NULL;
+    }
+
+    anInterface = listOfInterfaces;
+    while (anInterface != NULL) {
+        bool ret = necessaryFlagsSetOnInterface(anInterface);
+        if (ret) {
+            adapterName = strdup(anInterface->ifa_name);
+            break;
+        }
+
+        anInterface = anInterface->ifa_next;
+    }
+    freeifaddrs(listOfInterfaces);
+
+    return adapterName;
 }
 
 #endif
