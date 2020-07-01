@@ -179,8 +179,16 @@ Rectangle {
             Widgets.ListLabel {
                 id: textDuration
                 Layout.rightMargin: VLCStyle.margin_xsmall
-
+                Layout.preferredWidth: durationMetric.width
                 text: model.duration
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                TextMetrics {
+                    id: durationMetric
+                    font.pixelSize: VLCStyle.fontSize_normal
+                    text: "-00:00-"
+                }
             }
 
         }
