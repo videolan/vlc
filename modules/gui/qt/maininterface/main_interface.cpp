@@ -120,9 +120,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf )
      *  Pre-building of interface
      **/
 
-    /* Does the interface resize to video size or the opposite */
-    b_autoresize = var_InheritBool( p_intf, "qt-video-autoresize" );
-
     /* Are we in the enhanced always-video mode or not ? */
     b_minimalView = var_InheritBool( p_intf, "qt-minimal-view" );
 
@@ -200,9 +197,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf )
     /* END CONNECTS ON IM */
 
     /* VideoWidget connects for asynchronous calls */
-    b_videoFullScreen = false;
-    connect( this, &MainInterface::askVideoToResize, this, &MainInterface::setVideoSize, Qt::QueuedConnection );
-    connect( this, &MainInterface::askVideoSetFullScreen, this, &MainInterface::setVideoFullScreen, Qt::QueuedConnection );
     connect( this, &MainInterface::askToQuit, THEDP, &DialogsProvider::quit, Qt::QueuedConnection  );
     connect( this, &MainInterface::askBoss, this, &MainInterface::setBoss, Qt::QueuedConnection  );
     connect( this, &MainInterface::askRaise, this, &MainInterface::setRaise, Qt::QueuedConnection  );
@@ -353,86 +347,6 @@ inline void MainInterface::initSystray()
 }
 
 
-/****************************************************************************
- * Video Handling
- ****************************************************************************/
-
-void MainInterface::setVideoFullScreen( bool fs )
-{
-    b_videoFullScreen = fs;
-    if( fs )
-    {
-        int numscreen = var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
-
-        if ( numscreen >= 0 && numscreen < QApplication::desktop()->screenCount() )
-        {
-            QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
-            lastWinScreen = windowHandle()->screen();
-#ifdef QT5_HAS_WAYLAND
-            if( !b_hasWayland )
-                windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
-#else
-            windowHandle()->setScreen(QGuiApplication::screens()[numscreen]);
-#endif
-
-            /* To be sure window is on proper-screen in xinerama */
-            if( !screenres.contains( pos() ) )
-            {
-                lastWinPosition = pos();
-                lastWinSize = size();
-                msg_Dbg( p_intf, "Moving video to correct position");
-                move( QPoint( screenres.x(), screenres.y() ) );
-            }
-        }
-
-        setFullScreen( true );
-    }
-    else
-    {
-        setFullScreen( b_interfaceFullScreen );
-#ifdef QT5_HAS_WAYLAND
-        if( lastWinScreen != NULL && !b_hasWayland )
-            windowHandle()->setScreen(lastWinScreen);
-#else
-        if( lastWinScreen != NULL )
-            windowHandle()->setScreen(lastWinScreen);
-#endif
-        if( lastWinPosition.isNull() == false )
-        {
-            move( lastWinPosition );
-            lastWinPosition = QPoint();
-            if( !pendingResize.isValid() )
-            {
-                resizeWindow( lastWinSize.width(), lastWinSize.height() );
-                lastWinSize = QSize();
-            }
-        }
-
-    }
-}
-
-
-/* Slot to change the video always-on-top flag.
- * Emit askVideoOnTop() to invoke this from other thread. */
-void MainInterface::setVideoOnTop( bool on_top )
-{
-    //don't apply changes if user has already sets its interface on top
-    if ( b_interfaceOnTop )
-        return;
-
-    Qt::WindowFlags oldflags = windowFlags(), newflags;
-
-    if( on_top )
-        newflags = oldflags | Qt::WindowStaysOnTopHint;
-    else
-        newflags = oldflags & ~Qt::WindowStaysOnTopHint;
-    if( newflags != oldflags && !b_videoFullScreen )
-    {
-        setWindowFlags( newflags );
-        show(); /* necessary to apply window flags */
-    }
-}
-
 void MainInterface::setPlaylistDocked( bool docked )
 {
     b_playlistDocked = docked;
@@ -471,35 +385,13 @@ void MainInterface::setInterfaceAlwaysOnTop( bool on_top )
         newflags = oldflags | Qt::WindowStaysOnTopHint;
     else
         newflags = oldflags & ~Qt::WindowStaysOnTopHint;
-    if( newflags != oldflags && !b_videoFullScreen )
+    if( newflags != oldflags ) //FIXME  &&  !b_videoFullScreen )
     {
         setWindowFlags( newflags );
         show(); /* necessary to apply window flags */
     }
     emit interfaceAlwaysOnTopChanged(on_top);
 }
-
-void MainInterface::requestResizeVideo( unsigned i_width, unsigned i_height )
-{
-    emit askVideoToResize( i_width, i_height );
-}
-
-void MainInterface::requestVideoWindowed( )
-{
-   emit askVideoSetFullScreen( false );
-}
-
-void MainInterface::requestVideoFullScreen(const char * )
-{
-    emit askVideoSetFullScreen( true );
-}
-
-void MainInterface::requestVideoState(  unsigned i_arg )
-{
-    bool on_top = (i_arg & VOUT_WINDOW_STATE_ABOVE) != 0;
-    emit askVideoOnTop( on_top );
-}
-
 
 bool MainInterface::hasEmbededVideo() const
 {
@@ -536,37 +428,6 @@ void MainInterface::showBuffering( float f_cache )
 {
     QString amount = QString("Buffering: %1%").arg( (int)(100*f_cache) );
     statusBar()->showMessage( amount, 1000 );
-}
-
-void MainInterface::setVideoSize(unsigned int w, unsigned int h)
-{
-    if (!isFullScreen() && !isMaximized() )
-    {
-        /* Resize video widget to video size, or keep it at the same
-         * size. Call setSize() either way so that vout_window_ReportSize
-         * will always get called.
-         * If the video size is too large for the screen, resize it
-         * to the screen size.
-         */
-        if (b_autoresize)
-        {
-            QRect screen = QApplication::desktop()->availableGeometry();
-            float factor = devicePixelRatioF();
-            if( (float)h / factor > screen.height() )
-            {
-                w = screen.width();
-                h = screen.height();
-            }
-            else
-            {
-                // Convert the size in logical pixels
-                w = qRound( (float)w / factor );
-                h = qRound( (float)h / factor );
-                msg_Dbg( p_intf, "Logical video size: %ux%u", w, h );
-            }
-            resize(w, h);
-        }
-    }
 }
 
 /*****************************************************************************
@@ -606,32 +467,6 @@ void MainInterface::createSystray()
 void MainInterface::toggleUpdateSystrayMenuWhenVisible()
 {
     hide();
-}
-
-void MainInterface::resizeWindow(int w, int h)
-{
-#if ! HAS_QT510 && defined(QT5_HAS_X11)
-    if( QX11Info::isPlatformX11() )
-    {
-#if HAS_QT56
-        qreal dpr = devicePixelRatioF();
-#else
-        qreal dpr = devicePixelRatio();
-#endif
-        QSize size(w, h);
-        size = size.boundedTo(maximumSize()).expandedTo(minimumSize());
-        /* X11 window managers are not required to accept geometry changes on
-         * the top-level window.  Unfortunately, Qt < 5.10 assumes that the
-         * change will succeed, and resizes all sub-windows unconditionally.
-         * By calling XMoveResizeWindow directly, Qt will not see our change
-         * request until the ConfigureNotify event on success
-         * and not at all if it is rejected. */
-        XResizeWindow( QX11Info::display(), winId(),
-                       (unsigned int)size.width() * dpr, (unsigned int)size.height() * dpr);
-        return;
-    }
-#endif
-    resize(w, h);
 }
 
 /**
@@ -753,8 +588,7 @@ void MainInterface::changeEvent(QEvent *event)
             b_maximizedView = true;
 
         if( !( newState & Qt::WindowMaximized ) &&
-            oldState & Qt::WindowMaximized &&
-            !b_videoFullScreen )
+            oldState & Qt::WindowMaximized ) //FIXME && !b_videoFullScreen )
             b_maximizedView = false;
 
         if( !( newState & Qt::WindowFullScreen ) &&

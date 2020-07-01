@@ -315,9 +315,8 @@ bool MainInterfaceWin32::winEvent ( MSG * msg, long * result )
     return false;
 }
 
-void MainInterfaceWin32::setVideoFullScreen( bool fs )
+void MainInterfaceWin32::onVideoFullscreenChanged( bool fs )
 {
-    MainInterface::setVideoFullScreen( fs );
     if( !fs )
         changeThumbbarButtons( THEMIM->getPlayingState() );
 }

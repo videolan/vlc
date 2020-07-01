@@ -80,12 +80,6 @@ public:
     static const QEvent::Type ToolbarsNeedRebuild;
 
 public:
-    void requestResizeVideo( unsigned, unsigned );
-    void requestVideoState( unsigned );
-    void requestVideoWindowed( );
-    void requestVideoFullScreen( const char * );
-
-public:
     /* Getters */
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu; }
@@ -123,7 +117,6 @@ protected:
     void dragLeaveEvent( QDragLeaveEvent * ) Q_DECL_OVERRIDE;
     void closeEvent( QCloseEvent *) Q_DECL_OVERRIDE;
     virtual void toggleUpdateSystrayMenuWhenVisible();
-    void resizeWindow(int width, int height);
 
 protected:
     /* Systray */
@@ -164,8 +157,6 @@ protected:
     float                m_intfUserScaleFactor;
     float                m_intfScaleFactor;
     unsigned             i_notificationSetting; /// Systray Notifications
-    bool                 b_autoresize;          ///< persistent resizable window
-    bool                 b_videoFullScreen;     ///< --fullscreen
     bool                 b_hideAfterCreation;
     bool                 b_minimalView;         ///< Minimal video
     bool                 b_playlistDocked;
@@ -215,10 +206,6 @@ protected slots:
 
     void showBuffering( float );
 
-    /* Manage the Video Functions from the vout threads */
-    void setVideoSize(unsigned int w, unsigned int h);
-    virtual void setVideoFullScreen( bool );
-    void setVideoOnTop( bool );
     void setBoss();
     void setRaise();
     void setFullScreen( bool );
@@ -228,9 +215,6 @@ protected slots:
     void sendHotkey(Qt::Key key, Qt::KeyboardModifiers modifiers );
 
 signals:
-    void askVideoToResize( unsigned int, unsigned int );
-    void askVideoSetFullScreen( bool );
-    void askVideoOnTop( bool );
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
     void askToQuit();

@@ -55,7 +55,7 @@ private slots:
     void changeThumbbarButtons(PlayerController::PlayingState );
     void playlistItemCountChanged( size_t itemId );
     virtual void reloadPrefs() Q_DECL_OVERRIDE;
-    virtual void setVideoFullScreen( bool fs ) Q_DECL_OVERRIDE;
+    virtual void onVideoFullscreenChanged( bool fs );
 };
 
 #endif // MAIN_INTERFACE_WIN32_HPP
