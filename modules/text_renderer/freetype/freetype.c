@@ -1489,7 +1489,10 @@ static int Create( vlc_object_t *p_this )
     p_sys->pf_get_family = FontConfig_GetFamily;
     p_sys->pf_get_fallbacks = FontConfig_GetFallbacks;
     if( FontConfig_Prepare( p_filter ) )
+    {
+        p_sys->pf_get_family = NULL;
         goto error;
+    }
 
 #elif defined( __APPLE__ )
     p_sys->pf_get_family = CoreText_GetFamily;
@@ -1536,9 +1539,6 @@ static int Create( vlc_object_t *p_this )
     {
         msg_Err( p_filter, "Error loading default face %s",
                  p_sys->p_default_style->psz_fontname );
-#ifdef HAVE_FONTCONFIG
-        FontConfig_Unprepare();
-#endif
         goto error;
     }
 
@@ -1600,7 +1600,7 @@ static void Destroy( vlc_object_t *p_this )
     }
 
 #ifdef HAVE_FONTCONFIG
-    if( p_sys->p_face != NULL )
+    if( p_sys->pf_get_family == FontConfig_GetFamily )
         FontConfig_Unprepare();
 
 #elif defined( _WIN32 )
