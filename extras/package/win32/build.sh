@@ -155,7 +155,8 @@ then
     then
         echo "Using wsl.exe to replace wine"
         echo "#!/bin/sh" > build/bin/wine
-        echo "wsl.exe \"\$@\"" >> build/bin/wine
+        echo "\"\$@\"" >> build/bin/wine
+        chmod +x build/bin/wine
     fi
 fi
 
