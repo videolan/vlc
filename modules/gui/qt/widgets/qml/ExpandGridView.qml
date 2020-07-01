@@ -52,7 +52,7 @@ NavigableFocusScope {
     property bool _isInitialised: false
 
     /// the id of the item to be expanded
-    property int _expandIndex: -1
+    property int expandIndex: -1
     property int _newExpandIndex: -1
 
     //delegate to display the extended item
@@ -78,12 +78,12 @@ NavigableFocusScope {
         if (_count === 0)
             return
 
-        if (index === _expandIndex)
+        if (index === expandIndex)
             _newExpandIndex = -1
         else
             _newExpandIndex = index
 
-        if (_expandIndex !== -1)
+        if (expandIndex !== -1)
             flickable.retract()
         else
             flickable.expand()
@@ -182,7 +182,7 @@ NavigableFocusScope {
 
         var contentYWithoutExpand = myContentY
         var heightWithoutExpand = flickable.height
-        if (root._expandIndex !== -1) {
+        if (root.expandIndex !== -1) {
             if (myContentY >= expandItem.y && myContentY < expandItem.y + expandItem.height)
                 contentYWithoutExpand = expandItem.y
             if (myContentY >= expandItem.y + expandItem.height)
@@ -215,7 +215,7 @@ NavigableFocusScope {
             if (item === undefined)
                 throw "wrong child: " + id
             //theses properties are always defined in Item
-            item.focus = (id === root.currentIndex) && (root._expandIndex === -1)
+            item.focus = (id === root.currentIndex) && (root.expandIndex === -1)
             item.x = pos[0]
             item.y = pos[1] + ydelta
 
@@ -229,7 +229,7 @@ NavigableFocusScope {
             _defineObjProperty(item, "index", id)
             item.model = model.getDataAt(id)
 
-            item.focus = (id === root.currentIndex) && (root._expandIndex === -1)
+            item.focus = (id === root.currentIndex) && (root.expandIndex === -1)
             item.x = pos[0]
             item.y = pos[1] + ydelta
             item.visible = true
@@ -241,7 +241,7 @@ NavigableFocusScope {
 
             item = root.delegate.createObject( flickable.contentItem, {
                             model: model.getDataAt(id),
-                            focus: (id === root.currentIndex) && (root._expandIndex === -1),
+                            focus: (id === root.currentIndex) && (root.expandIndex === -1),
                             x: pos[0],
                             y: pos[1] + ydelta,
                             visible: true
@@ -276,7 +276,7 @@ NavigableFocusScope {
             return
 
         // Hide the expandItem with no animation
-        _expandIndex = -1
+        expandIndex = -1
 
         // Regenerate the gridview layout
         flickable.layout(true)
@@ -335,7 +335,7 @@ NavigableFocusScope {
         Loader {
             id: expandItemLoader
             sourceComponent: expandDelegate
-            active: root._expandIndex !== -1
+            active: root.expandIndex !== -1
             focus: active
             onLoaded: item.height = 0
         }
@@ -348,8 +348,8 @@ NavigableFocusScope {
 
         function getExpandItemGridId() {
             var ret
-            if (root._expandIndex !== -1) {
-                var rowCol = root.getItemRowCol(root._expandIndex)
+            if (root.expandIndex !== -1) {
+                var rowCol = root.getItemRowCol(root.expandIndex)
                 var rowId = rowCol[1] + 1
                 ret = rowId * root.getNbItemsPerRow()
             } else {
@@ -399,7 +399,7 @@ NavigableFocusScope {
                 _setupChild(i,  0)
             }
 
-            if (root._expandIndex !== -1)
+            if (root.expandIndex !== -1)
                 expandItem.y = root.getItemPos(expandItemGridId)[1]
 
             // Place the delegates after the expandItem
@@ -427,7 +427,7 @@ NavigableFocusScope {
             onImplicitHeightChanged: {
                 /* This is the only event we have after the expandItem height content was resized.
                    We can trigger here the expand animation with the right final height. */
-                if (root._expandIndex !== -1)
+                if (root.expandIndex !== -1)
                     flickable.expandAnimation()
             }
             onCurrentItemYChanged: {
@@ -449,17 +449,17 @@ NavigableFocusScope {
         }
 
         function expand() {
-            _expandIndex = _newExpandIndex
-            if (_expandIndex === -1)
+            expandIndex = _newExpandIndex
+            if (expandIndex === -1)
                 return
-            expandItem.model = model.getDataAt(_expandIndex)
+            expandItem.model = model.getDataAt(expandIndex)
             /* We must also start the expand animation here since the expandItem implicitHeight is not
                changed if it had the same height at previous opening. */
             expandAnimation()
         }
 
         function expandAnimation() {
-            if (_expandIndex === -1)
+            if (expandIndex === -1)
                 return
 
             var expandItemHeight = expandItem.implicitHeight;
@@ -473,7 +473,7 @@ NavigableFocusScope {
             animateExpandItem.start()
 
             // Sliding animation
-            var currentItemYPos = root.getItemPos(_expandIndex)[1]
+            var currentItemYPos = root.getItemPos(expandIndex)[1]
             currentItemYPos += root._effectiveCellHeight / 2
             animateFlickableContentY(currentItemYPos)
         }
@@ -490,7 +490,7 @@ NavigableFocusScope {
             duration: 250
             to: 0
             onStopped: {
-                _expandIndex = -1
+                expandIndex = -1
                 flickable.setCurrentItemFocus()
                 root.positionViewAtIndex(root.currentIndex, ItemView.Contain)
                 if (_newExpandIndex !== -1)
@@ -508,7 +508,7 @@ NavigableFocusScope {
         }
 
         function setCurrentItemFocus() {
-            if (_expandIndex !== -1)
+            if (expandIndex !== -1)
                 return
             var child
             if (currentIndex in _idChildrenMap)
@@ -532,7 +532,7 @@ NavigableFocusScope {
     }
 
     onCurrentIndexChanged: {
-        if (_expandIndex !== -1)
+        if (expandIndex !== -1)
             retract()
         flickable.setCurrentItemFocus()
         _updateSelected()
