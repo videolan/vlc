@@ -42,28 +42,6 @@
 #include <vlc_text_style.h>                                   /* text_style_t*/
 #include <vlc_charset.h>
 
-/* apple stuff */
-#ifdef __APPLE__
-# undef HAVE_FONTCONFIG
-# define HAVE_GET_FONT_BY_FAMILY_NAME
-#endif
-
-/* Win32 */
-#ifdef _WIN32
-# undef HAVE_FONTCONFIG
-# define HAVE_GET_FONT_BY_FAMILY_NAME
-#endif
-
-/* FontConfig */
-#ifdef HAVE_FONTCONFIG
-# define HAVE_GET_FONT_BY_FAMILY_NAME
-#endif
-
-/* Android */
-#ifdef __ANDROID__
-# define HAVE_GET_FONT_BY_FAMILY_NAME
-#endif
-
 #include <assert.h>
 
 #include "platform_fonts.h"
@@ -299,7 +277,6 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
     input_attachment_t  **pp_attachments;
     int                   i_attachments_cnt;
     FT_Face               p_face = NULL;
-    char                 *psz_lc = NULL;
 
     if( filter_GetInputAttachments( p_filter, &pp_attachments, &i_attachments_cnt ) )
         return VLC_EGENERIC;
@@ -336,30 +313,9 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
                 bool b_bold = p_face->style_flags & FT_STYLE_FLAG_BOLD;
                 bool b_italic = p_face->style_flags & FT_STYLE_FLAG_ITALIC;
 
-                if( p_face->family_name )
-                    psz_lc = ToLower( p_face->family_name );
-                else
-                    if( asprintf( &psz_lc, FB_NAME"-%04d",
-                                  p_sys->i_fallback_counter++ ) < 0 )
-                        psz_lc = NULL;
-
-                if( unlikely( !psz_lc ) )
+                vlc_family_t *p_family = DeclareNewFamily( p_sys->fs, p_face->family_name );
+                if( unlikely( !p_family ) )
                     goto error;
-
-                vlc_family_t *p_family =
-                    vlc_dictionary_value_for_key( &p_sys->family_map, psz_lc );
-
-                if( p_family == kVLCDictionaryNotFound )
-                {
-                    p_family = NewFamily( p_filter, psz_lc, &p_sys->p_families,
-                                          &p_sys->family_map, psz_lc );
-
-                    if( unlikely( !p_family ) )
-                        goto error;
-                }
-
-                free( psz_lc );
-                psz_lc = NULL;
 
                 char *psz_fontfile;
                 if( asprintf( &psz_fontfile, ":/%d",
@@ -369,6 +325,9 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
 
                 FT_Done_Face( p_face );
                 p_face = NULL;
+
+                /* Add font attachment to the "attachments" fallback list */
+                DeclareFamilyAsAttachMenFallback( p_sys->fs, p_family );
 
                 i_font_idx++;
             }
@@ -381,35 +340,11 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
 
     free( pp_attachments );
 
-    /* Add font attachments to the "attachments" fallback list */
-    vlc_family_t *p_attachments = NULL;
-
-    for( vlc_family_t *p_family = p_sys->p_families; p_family;
-         p_family = p_family->p_next )
-    {
-        vlc_family_t *p_temp = NewFamily( p_filter, p_family->psz_name, &p_attachments,
-                                          NULL, NULL );
-        if( unlikely( !p_temp ) )
-        {
-            if( p_attachments )
-                FreeFamilies( p_attachments, NULL );
-            return VLC_ENOMEM;
-        }
-        else
-            p_temp->p_fonts = p_family->p_fonts;
-    }
-
-    if( p_attachments )
-        vlc_dictionary_insert( &p_sys->fallback_map, FB_LIST_ATTACHMENTS, p_attachments );
-
     return VLC_SUCCESS;
 
 error:
     if( p_face )
         FT_Done_Face( p_face );
-
-    if( psz_lc )
-        free( psz_lc );
 
     for( int i = k + 1; i < i_attachments_cnt; ++i )
         vlc_input_attachment_Delete( pp_attachments[ i ] );
@@ -1444,10 +1379,8 @@ static int Create( vlc_object_t *p_this )
         p_sys->p_stroker = NULL;
     }
 
-    /* Dictionnaries for fonts and families */
+    /* Dictionnaries for fonts */
     vlc_dictionary_init( &p_sys->face_map, 50 );
-    vlc_dictionary_init( &p_sys->family_map, 50 );
-    vlc_dictionary_init( &p_sys->fallback_map, 20 );
 
     p_sys->i_scale = 100;
 
@@ -1482,57 +1415,12 @@ static int Create( vlc_object_t *p_this )
     p_sys->f_shadow_vector_x   = f_shadow_distance * cosf((float)(2. * M_PI) * f_shadow_angle / 360);
     p_sys->f_shadow_vector_y   = f_shadow_distance * sinf((float)(2. * M_PI) * f_shadow_angle / 360);
 
+    p_sys->fs = FontSelectNew( p_filter  );
+    if( !p_sys->fs )
+        goto error;
+
     if( LoadFontsFromAttachments( p_filter ) == VLC_ENOMEM )
         goto error;
-
-#ifdef HAVE_FONTCONFIG
-    p_sys->pf_get_family = FontConfig_GetFamily;
-    p_sys->pf_get_fallbacks = FontConfig_GetFallbacks;
-    if( FontConfig_Prepare( p_filter ) )
-    {
-        p_sys->pf_get_family = NULL;
-        goto error;
-    }
-
-#elif defined( __APPLE__ )
-    p_sys->pf_get_family = CoreText_GetFamily;
-    p_sys->pf_get_fallbacks = CoreText_GetFallbacks;
-#elif defined( _WIN32 )
-    if( InitDWrite( p_filter ) == VLC_SUCCESS )
-    {
-        p_sys->pf_get_family = DWrite_GetFamily;
-        p_sys->pf_get_fallbacks = DWrite_GetFallbacks;
-    }
-    else
-    {
-#if VLC_WINSTORE_APP
-        msg_Err( p_filter, "Error initializing DirectWrite" );
-        goto error;
-#else
-        msg_Warn( p_filter, "DirectWrite initialization failed. Falling back to GDI/Uniscribe" );
-        const char *const ppsz_win32_default[] =
-            { "Tahoma", "FangSong", "SimHei", "KaiTi" };
-        p_sys->pf_get_family = Win32_GetFamily;
-        p_sys->pf_get_fallbacks = Win32_GetFallbacks;
-        InitDefaultList( p_filter, ppsz_win32_default,
-                         sizeof( ppsz_win32_default ) / sizeof( *ppsz_win32_default ) );
-#endif
-    }
-#elif defined( __ANDROID__ )
-    p_sys->pf_get_family = Android_GetFamily;
-    p_sys->pf_get_fallbacks = Android_GetFallbacks;
-
-    if( Android_Prepare( p_filter ) == VLC_ENOMEM )
-        goto error;
-#else
-    p_sys->pf_get_family = StaticMap_GetFamily;
-    p_sys->pf_get_fallbacks = NULL;
-    /* The default static fonts are also fallback fonts */
-    const char *const ppsz_default[] =
-        { DEFAULT_FAMILY, DEFAULT_MONOSPACE_FAMILY };
-    InitDefaultList( p_filter, ppsz_default,
-                     sizeof( ppsz_default ) / sizeof( *ppsz_default ) );
-#endif
 
     p_sys->p_face = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
     if( !p_sys->p_face )
@@ -1562,18 +1450,7 @@ static void Destroy( vlc_object_t *p_this )
     filter_sys_t *p_sys = p_filter->p_sys;
 
 #ifdef DEBUG_PLATFORM_FONTS
-    msg_Dbg( p_filter, "------------------" );
-    msg_Dbg( p_filter, "p_sys->p_families:" );
-    msg_Dbg( p_filter, "------------------" );
-    DumpFamily( p_filter, p_sys->p_families, true, -1 );
-    msg_Dbg( p_filter, "-----------------" );
-    msg_Dbg( p_filter, "p_sys->family_map" );
-    msg_Dbg( p_filter, "-----------------" );
-    DumpDictionary( p_filter, &p_sys->family_map, false, 1 );
-    msg_Dbg( p_filter, "-------------------" );
-    msg_Dbg( p_filter, "p_sys->fallback_map" );
-    msg_Dbg( p_filter, "-------------------" );
-    DumpDictionary( p_filter, &p_sys->fallback_map, true, -1 );
+    DumpFamilies( p_sys->fs );
 #endif
 
     free( p_sys->psz_fontfile );
@@ -1584,11 +1461,7 @@ static void Destroy( vlc_object_t *p_this )
     text_style_Delete( p_sys->p_forced_style );
 
     /* Fonts dicts */
-    vlc_dictionary_clear( &p_sys->fallback_map, FreeFamilies, p_filter );
     vlc_dictionary_clear( &p_sys->face_map, FreeFace, p_filter );
-    vlc_dictionary_clear( &p_sys->family_map, NULL, NULL );
-    if( p_sys->p_families )
-        FreeFamiliesAndFonts( p_sys->p_families );
 
     /* Attachments */
     if( p_sys->pp_font_attachments )
@@ -1599,14 +1472,7 @@ static void Destroy( vlc_object_t *p_this )
         free( p_sys->pp_font_attachments );
     }
 
-#ifdef HAVE_FONTCONFIG
-    if( p_sys->pf_get_family == FontConfig_GetFamily )
-        FontConfig_Unprepare();
-
-#elif defined( _WIN32 )
-    if( p_sys->pf_get_family == DWrite_GetFamily )
-        ReleaseDWrite( p_filter );
-#endif
+    FontSelectDelete( p_sys->fs );
 
     /* Freetype */
     if( p_sys->p_stroker )

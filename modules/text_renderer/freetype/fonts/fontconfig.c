@@ -43,12 +43,13 @@
 #include <fontconfig/fontconfig.h>
 
 #include "../platform_fonts.h"
+#include "backends.h"
 
 static FcConfig *config;
 static uintptr_t refs;
 static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
-int FontConfig_Prepare( filter_t *p_filter )
+int FontConfig_Prepare( vlc_font_select_t *fs )
 {
     vlc_tick_t ts;
 
@@ -59,7 +60,7 @@ int FontConfig_Prepare( filter_t *p_filter )
         return VLC_SUCCESS;
     }
 
-    msg_Dbg( p_filter, "Building font databases.");
+    msg_Dbg( fs->p_obj, "Building font databases.");
     ts = vlc_tick_now();
 
 #ifndef _WIN32
@@ -73,7 +74,7 @@ int FontConfig_Prepare( filter_t *p_filter )
     config = FcInitLoadConfig();
 
     int i_ret =
-        vlc_dialog_display_progress( p_filter, true, 0.0, NULL,
+        vlc_dialog_display_progress( fs->p_obj, true, 0.0, NULL,
                                      _("Building font cache"),
                                      _("Please wait while your font cache is rebuilt.\n"
                                      "This should take less than a few minutes.") );
@@ -84,18 +85,19 @@ int FontConfig_Prepare( filter_t *p_filter )
         return VLC_ENOMEM;
 
     if( i_dialog_id != 0 )
-        vlc_dialog_cancel( p_filter, i_dialog_id );
+        vlc_dialog_cancel( fs->p_obj, i_dialog_id );
 
 #endif
 
     vlc_mutex_unlock( &lock );
-    msg_Dbg( p_filter, "Took %" PRId64 " microseconds", vlc_tick_now() - ts );
+    msg_Dbg( fs->p_obj, "Took %" PRId64 " microseconds", vlc_tick_now() - ts );
 
     return (config != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-void FontConfig_Unprepare(void)
+void FontConfig_Unprepare( vlc_font_select_t *fs )
 {
+    VLC_UNUSED(fs);
     vlc_mutex_lock( &lock );
     assert( refs > 0 );
     if( --refs == 0 )
@@ -104,17 +106,15 @@ void FontConfig_Unprepare(void)
     vlc_mutex_unlock( &lock );
 }
 
-const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_family )
+const vlc_family_t *FontConfig_GetFamily( vlc_font_select_t *fs, const char *psz_family )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
-
     char *psz_lc = ToLower( psz_family );
 
     if( unlikely( !psz_lc ) )
         return NULL;
 
     vlc_family_t *p_family =
-            vlc_dictionary_value_for_key( &p_sys->family_map, psz_lc );
+            vlc_dictionary_value_for_key( &fs->family_map, psz_lc );
 
     if( p_family != kVLCDictionaryNotFound )
     {
@@ -122,8 +122,8 @@ const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_fa
         return p_family;
     }
 
-    p_family = NewFamily( p_filter, psz_lc, &p_sys->p_families,
-                          &p_sys->family_map, psz_lc );
+    p_family = NewFamily( fs, psz_lc, &fs->p_families,
+                          &fs->family_map, psz_lc );
 
     free( psz_lc );
     if( !p_family )
@@ -171,6 +171,7 @@ const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_fa
             FcPatternDestroy( p_pat );
             continue;
         }
+
         if( FcResultMatch != FcPatternGetInteger( p_pat, FC_INDEX, 0, &i_index ) )
         {
             i_index = 0;
@@ -196,21 +197,20 @@ const vlc_family_t *FontConfig_GetFamily( filter_t *p_filter, const char *psz_fa
     return p_family;
 }
 
-vlc_family_t *FontConfig_GetFallbacks( filter_t *p_filter, const char *psz_family,
+vlc_family_t *FontConfig_GetFallbacks( vlc_font_select_t *fs, const char *psz_family,
                                        uni_char_t codepoint )
 {
 
     VLC_UNUSED( codepoint );
 
     vlc_family_t *p_family = NULL;
-    filter_sys_t *p_sys    = p_filter->p_sys;
 
     char *psz_lc = ToLower( psz_family );
 
     if( unlikely( !psz_lc ) )
         return NULL;
 
-    p_family = vlc_dictionary_value_for_key( &p_sys->fallback_map, psz_lc );
+    p_family = vlc_dictionary_value_for_key( &fs->fallback_map, psz_lc );
 
     if( p_family != kVLCDictionaryNotFound )
     {
@@ -242,7 +242,7 @@ vlc_family_t *FontConfig_GetFallbacks( filter_t *p_filter, const char *psz_famil
                 /* Avoid duplicate family names */
                 if( strcasecmp( psz_last_name, psz_name ) )
                 {
-                    vlc_family_t *p_temp = NewFamily( p_filter, psz_name,
+                    vlc_family_t *p_temp = NewFamily( fs, psz_name,
                                                       &p_family, NULL, NULL );
 
                     if( unlikely( !p_temp ) )
@@ -264,7 +264,7 @@ vlc_family_t *FontConfig_GetFallbacks( filter_t *p_filter, const char *psz_famil
     FcPatternDestroy( p_pattern );
 
     if( p_family )
-        vlc_dictionary_insert( &p_sys->fallback_map, psz_lc, p_family );
+        vlc_dictionary_insert( &fs->fallback_map, psz_lc, p_family );
 
     free( psz_lc );
     return p_family;

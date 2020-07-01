@@ -55,6 +55,7 @@
 #endif
 
 #include "../platform_fonts.h"
+#include "backends.h"
 
 #if !VLC_WINSTORE_APP
 #define FONT_DIR_NT  TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts")
@@ -331,7 +332,7 @@ done:
 
 struct enumFontCallbackContext
 {
-    filter_t *p_filter;
+    vlc_font_select_t *fs;
     vlc_family_t *p_family;
 };
 
@@ -380,7 +381,7 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
         psz_fontfile = psz_filename;
     else
     {
-        psz_fontfile = MakeFilePath( ctx->p_filter, psz_filename );
+        psz_fontfile = MakeFilePath( ctx->fs, psz_filename );
         free( psz_filename );
         if( !psz_fontfile )
             return 1;
@@ -391,24 +392,23 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     return 1;
 }
 
-const vlc_family_t *Win32_GetFamily( filter_t *p_filter, const char *psz_family )
+const vlc_family_t *Win32_GetFamily( vlc_font_select_t *fs, const char *psz_family )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     char *psz_lc = ToLower( psz_family );
 
     if( unlikely( !psz_lc ) )
         return NULL;
 
     vlc_family_t *p_family =
-        vlc_dictionary_value_for_key( &p_sys->family_map, psz_lc );
+        vlc_dictionary_value_for_key( &fs->family_map, psz_lc );
 
     free( psz_lc );
 
     if( p_family )
         return p_family;
 
-    p_family = NewFamily( p_filter, psz_family, &p_sys->p_families,
-                          &p_sys->family_map, psz_family );
+    p_family = NewFamily( fs, psz_family, &fs->p_families,
+                          &fs->family_map, psz_family );
 
     if( unlikely( !p_family ) )
         return NULL;
@@ -423,7 +423,7 @@ const vlc_family_t *Win32_GetFamily( filter_t *p_filter, const char *psz_family 
     /* */
     HDC hDC = GetDC( NULL );
     struct enumFontCallbackContext ctx;
-    ctx.p_filter = p_filter;
+    ctx.fs = fs;
     ctx.p_family = NULL;
     EnumFontFamiliesEx(hDC, &lf, (FONTENUMPROC)&EnumFontCallback, (LPARAM)&ctx, 0);
     ReleaseDC(NULL, hDC);
@@ -520,12 +520,11 @@ error:
     return NULL;
 }
 
-vlc_family_t *Win32_GetFallbacks( filter_t *p_filter, const char *psz_family,
+vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_family,
                                   uni_char_t codepoint )
 {
     vlc_family_t  *p_family      = NULL;
     vlc_family_t  *p_fallbacks   = NULL;
-    filter_sys_t  *p_sys         = p_filter->p_sys;
     char          *psz_uniscribe = NULL;
 
 
@@ -534,10 +533,10 @@ vlc_family_t *Win32_GetFallbacks( filter_t *p_filter, const char *psz_family,
     if( unlikely( !psz_lc ) )
         return NULL;
 
-    p_fallbacks = vlc_dictionary_value_for_key( &p_sys->fallback_map, psz_lc );
+    p_fallbacks = vlc_dictionary_value_for_key( &fs->fallback_map, psz_lc );
 
     if( p_fallbacks )
-        p_family = SearchFallbacks( p_filter, p_fallbacks, codepoint );
+        p_family = SearchFallbacks( fs, p_fallbacks, codepoint );
 
     /*
      * If the fallback list of psz_family has no family which contains the requested
@@ -552,14 +551,14 @@ vlc_family_t *Win32_GetFallbacks( filter_t *p_filter, const char *psz_family,
         if( !psz_uniscribe )
             goto done;
 
-        const vlc_family_t *p_uniscribe = Win32_GetFamily( p_filter, psz_uniscribe );
+        const vlc_family_t *p_uniscribe = Win32_GetFamily( fs, psz_uniscribe );
         if( !p_uniscribe || !p_uniscribe->p_fonts )
             goto done;
 
-        if( !GetFace( p_filter, p_uniscribe->p_fonts, codepoint ) );
+        if( !GetFace( fs, p_uniscribe->p_fonts, codepoint ) )
             goto done;
 
-        p_family = NewFamily( p_filter, psz_uniscribe, NULL, NULL, NULL );
+        p_family = NewFamily( fs, psz_uniscribe, NULL, NULL, NULL );
 
         if( unlikely( !p_family ) )
             goto done;
@@ -569,7 +568,7 @@ vlc_family_t *Win32_GetFallbacks( filter_t *p_filter, const char *psz_family,
         if( p_fallbacks )
             AppendFamily( &p_fallbacks, p_family );
         else
-            vlc_dictionary_insert( &p_sys->fallback_map,
+            vlc_dictionary_insert( &fs->fallback_map,
                                    psz_lc, p_family );
     }
 
@@ -579,9 +578,9 @@ done:
     return p_family;
 }
 
-char * MakeFilePath( filter_t *p_filter, const char *psz_filename )
+char * MakeFilePath( vlc_font_select_t *fs, const char *psz_filename )
 {
-    VLC_UNUSED(p_filter);
+    VLC_UNUSED(fs);
 
     if( !psz_filename )
         return NULL;
