@@ -117,6 +117,7 @@ esac
 #####
 
 SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
+VLC_ROOT_PATH="$( cd "${SCRIPT_PATH}/../../.." ; pwd -P )"
 
 : ${JOBS:=$(getconf _NPROCESSORS_ONLN 2>&1)}
 TRIPLET=$ARCH-w64-mingw32
@@ -143,7 +144,7 @@ if [ "$COMPILING_WITH_CLANG" -gt 0 ] && [ ! -d "libtool" ]; then
 fi
 # bootstrap only if needed in interactive mode
 if [ "$INTERACTIVE" != "yes" ] || [ ! -f ./Makefile ]; then
-    NEEDED="$FORCED_TOOLS" ${SCRIPT_PATH}/../../tools/bootstrap
+    NEEDED="$FORCED_TOOLS" ${VLC_ROOT_PATH}/extras/tools/bootstrap
 fi
 make -j$JOBS
 
@@ -279,7 +280,7 @@ if [ ! -z "$WINSTORE" ]; then
     # we don't use a special toolchain to trigger the detection in contribs so force it manually
     export HAVE_WINSTORE=1
 fi
-${SCRIPT_PATH}/../../../contrib/bootstrap --host=$TRIPLET --prefix=../$CONTRIB_PREFIX $CONTRIBFLAGS
+${VLC_ROOT_PATH}/contrib/bootstrap --host=$TRIPLET --prefix=../$CONTRIB_PREFIX $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
 if [ "$PREBUILT" != "yes" ]; then
@@ -300,9 +301,9 @@ cd ../..
 
 info "Bootstrapping"
 
-if ! [ -e ${SCRIPT_PATH}/../../../configure ]; then
+if ! [ -e ${VLC_ROOT_PATH}/configure ]; then
     echo "Bootstraping vlc"
-    ${SCRIPT_PATH}/../../../bootstrap
+    ${VLC_ROOT_PATH}/bootstrap
 fi
 
 info "Configuring VLC"
