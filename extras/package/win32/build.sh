@@ -28,6 +28,8 @@ OPTIONS:
    -s            Interactive shell (get correct environment variables for build)
    -b <url>      Enable breakpad support and send crash reports to this URL
    -d            Create PDB files during the build
+   -D <win_path> Create PDB files during the build, map the VLC sources to <win_path>
+                 e.g.: -D c:/sources/vlc
    -x            Add extra checks when compiling
    -u            Use the Universal C Runtime (instead of msvcrt)
    -w            Restrict to Windows Store APIs
@@ -37,7 +39,7 @@ EOF
 }
 
 ARCH="x86_64"
-while getopts "hra:pcli:sb:dxuwzo:" OPTION
+while getopts "hra:pcli:sb:dD:xuwzo:" OPTION
 do
      case $OPTION in
          h)
@@ -71,6 +73,10 @@ do
          ;;
          d)
              WITH_PDB="yes"
+         ;;
+         D)
+             WITH_PDB="yes"
+             PDB_MAP=$OPTARG
          ;;
          x)
              EXTRA_CHECKS="yes"
@@ -266,6 +272,10 @@ echo $PATH
 mkdir -p contrib/contrib-$SHORTARCH && cd contrib/contrib-$SHORTARCH
 if [ ! -z "$WITH_PDB" ]; then
     CONTRIBFLAGS="$CONTRIBFLAGS --enable-pdb"
+    if [ ! -z "$PDB_MAP" ]; then
+        CFLAGS="$CFLAGS -fdebug-prefix-map='$VLC_ROOT_PATH'='$PDB_MAP'"
+        CXXFLAGS="$CXXFLAGS -fdebug-prefix-map='$VLC_ROOT_PATH'='$PDB_MAP'"
+    fi
 fi
 if [ ! -z "$BREAKPAD" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --enable-breakpad"
@@ -280,6 +290,10 @@ if [ ! -z "$WINSTORE" ]; then
     # we don't use a special toolchain to trigger the detection in contribs so force it manually
     export HAVE_WINSTORE=1
 fi
+
+export CFLAGS
+export CXXFLAGS
+
 ${VLC_ROOT_PATH}/contrib/bootstrap --host=$TRIPLET --prefix=../$CONTRIB_PREFIX $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
