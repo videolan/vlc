@@ -186,6 +186,8 @@ SDDirectory::read() const
 
     std::vector<InputItemPtr> children;
 
+    input_item_AddOption( media.get(), "show-hiddenfiles", VLC_INPUT_OPTION_TRUSTED );
+    input_item_AddOption( media.get(), "ignore-filetypes=''", VLC_INPUT_OPTION_TRUSTED );
     auto status = request_metadata_sync( m_fs.libvlc(), media.get(), &children);
 
     if ( status == false )
