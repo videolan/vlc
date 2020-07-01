@@ -306,7 +306,7 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
     return scale;
 }
 
-static void SpuRenderText(spu_t *spu,
+static int SpuRenderText(spu_t *spu,
                           subpicture_region_t *region,
                           int i_original_width,
                           int i_original_height,
@@ -317,29 +317,33 @@ static void SpuRenderText(spu_t *spu,
 
     vlc_mutex_lock(&sys->textlock);
     filter_t *text = sys->text;
-    if(text)
+    if(!text)
     {
-        // assume rendered text is in sRGB if nothing is set
-        if (region->fmt.transfer == TRANSFER_FUNC_UNDEF)
-            region->fmt.transfer = TRANSFER_FUNC_SRGB;
-        if (region->fmt.primaries == COLOR_PRIMARIES_UNDEF)
-            region->fmt.primaries = COLOR_PRIMARIES_SRGB;
-        if (region->fmt.space == COLOR_SPACE_UNDEF)
-            region->fmt.space = COLOR_SPACE_SRGB;
-        if (region->fmt.color_range == COLOR_RANGE_UNDEF)
-            region->fmt.color_range = COLOR_RANGE_FULL;
-
-        /* FIXME aspect ratio ? */
-        text->fmt_out.video.i_width          =
-        text->fmt_out.video.i_visible_width  = i_original_width;
-
-        text->fmt_out.video.i_height         =
-        text->fmt_out.video.i_visible_height = i_original_height;
-
-        if ( region->p_text )
-            text->pf_render(text, region, region, chroma_list);
+        vlc_mutex_unlock(&sys->textlock);
+        return VLC_EGENERIC;
     }
+
+    // assume rendered text is in sRGB if nothing is set
+    if (region->fmt.transfer == TRANSFER_FUNC_UNDEF)
+        region->fmt.transfer = TRANSFER_FUNC_SRGB;
+    if (region->fmt.primaries == COLOR_PRIMARIES_UNDEF)
+        region->fmt.primaries = COLOR_PRIMARIES_SRGB;
+    if (region->fmt.space == COLOR_SPACE_UNDEF)
+        region->fmt.space = COLOR_SPACE_SRGB;
+    if (region->fmt.color_range == COLOR_RANGE_UNDEF)
+        region->fmt.color_range = COLOR_RANGE_FULL;
+
+    /* FIXME aspect ratio ? */
+    text->fmt_out.video.i_width =
+    text->fmt_out.video.i_visible_width  = i_original_width;
+
+    text->fmt_out.video.i_height =
+    text->fmt_out.video.i_visible_height = i_original_height;
+
+    int i_ret = text->pf_render(text, region, region, chroma_list);
+
     vlc_mutex_unlock(&sys->textlock);
+    return i_ret;
 }
 
 /**
@@ -802,12 +806,11 @@ static void SpuRenderRegion(spu_t *spu,
     /* Render text region */
     if (region->fmt.i_chroma == VLC_CODEC_TEXT)
     {
-        SpuRenderText(spu, region,
+        if(SpuRenderText(spu, region,
                       i_original_width, i_original_height,
-                      chroma_list);
-        /* Check if the rendering has failed ... */
-        if (region->fmt.i_chroma == VLC_CODEC_TEXT)
+                      chroma_list) != VLC_SUCCESS)
             return;
+        assert(region->fmt.i_chroma != VLC_CODEC_TEXT);
     }
 
     video_format_AdjustColorSpace(&region->fmt);
