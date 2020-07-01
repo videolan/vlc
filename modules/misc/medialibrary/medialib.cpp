@@ -381,8 +381,8 @@ MediaLibrary::MediaLibrary( vlc_medialibrary_module_t* ml )
     m_ml.reset( NewMediaLibrary() );
 
     m_logger.reset( new Logger( VLC_OBJECT( m_vlc_ml ) ) );
-    m_ml->setVerbosity( var_InheritInteger( VLC_OBJECT( m_vlc_ml ), "verbose" ) >= 4 ?
-                          medialibrary::LogLevel::Debug : medialibrary::LogLevel::Info );
+    m_ml->setVerbosity( var_InheritBool( VLC_OBJECT( m_vlc_ml ), "ml-verbose" ) ?
+                          medialibrary::LogLevel::Debug : medialibrary::LogLevel::Warning );
     m_ml->setLogger( m_logger.get() );
 }
 
@@ -1713,6 +1713,8 @@ static void Close( vlc_object_t* obj )
 #define ML_FOLDER_LONGTEXT _( "Semicolon separated list of folders to discover " \
                               "media from" )
 
+#define ML_VERBOSE _( "Extra verbose media library logs" )
+
 vlc_module_begin()
     set_shortname(N_("media library"))
     set_description(N_( "Organize your media" ))
@@ -1721,4 +1723,5 @@ vlc_module_begin()
     set_capability("medialibrary", 100)
     set_callbacks(Open, Close)
     add_string( "ml-folders", nullptr, ML_FOLDER_TEXT, ML_FOLDER_LONGTEXT, false )
+    add_bool( "ml-verbose", false, ML_VERBOSE, ML_VERBOSE, false )
 vlc_module_end()
