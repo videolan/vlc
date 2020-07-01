@@ -313,10 +313,10 @@ static void SpuRenderText(spu_t *spu,
                           const vlc_fourcc_t *chroma_list)
 {
     spu_private_t *sys = spu->p;
-    filter_t *text = sys->text;
     assert(region->fmt.i_chroma == VLC_CODEC_TEXT);
 
     vlc_mutex_lock(&sys->textlock);
+    filter_t *text = sys->text;
     if(text)
     {
         // assume rendered text is in sRGB if nothing is set
