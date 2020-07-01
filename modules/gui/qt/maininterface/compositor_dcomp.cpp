@@ -75,8 +75,7 @@ void CompositorDirectComposition::window_disable(struct vout_window_t * p_wnd)
     try
     {
         that->m_qmlVideoSurfaceProvider->disable();
-        that->m_rootWindow->askVideoOnTop(false);
-        that->m_rootWindow->askVideoSetFullScreen(false);
+        that->m_videoWindowHandler->disable();
         msg_Dbg(that->m_intf, "window_disable");
         HR(that->m_rootVisual->RemoveVisual(that->m_videoVisual.Get()), "remove video visual from root");
         HR(that->m_dcompDevice->Commit(), "commit");
@@ -91,7 +90,7 @@ void CompositorDirectComposition::window_resize(struct vout_window_t * p_wnd, un
 {
     CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
     msg_Dbg(that->m_intf, "window_resize %ux%u", width, height);
-    that->m_rootWindow->requestResizeVideo(width, height);
+    that->m_videoWindowHandler->requestResizeVideo(width, height);
 }
 
 void CompositorDirectComposition::window_destroy(struct vout_window_t * p_wnd)
@@ -106,21 +105,21 @@ void CompositorDirectComposition::window_set_state(struct vout_window_t * p_wnd,
 {
     CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
     msg_Dbg(that->m_intf, "window_set_state");
-    that->m_rootWindow->requestVideoState(static_cast<vout_window_state>(state));
+    that->m_videoWindowHandler->requestVideoState(static_cast<vout_window_state>(state));
 }
 
 void CompositorDirectComposition::window_unset_fullscreen(struct vout_window_t * p_wnd)
 {
     CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
     msg_Dbg(that->m_intf, "window_unset_fullscreen");
-    that->m_rootWindow->requestVideoWindowed();
+    that->m_videoWindowHandler->requestVideoWindowed();
 }
 
 void CompositorDirectComposition::window_set_fullscreen(struct vout_window_t * p_wnd, const char *id)
 {
     CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
     msg_Dbg(that->m_intf, "window_set_fullscreen");
-    that->m_rootWindow->requestVideoFullScreen(id);
+    that->m_videoWindowHandler->requestVideoFullScreen(id);
 }
 
 CompositorDirectComposition::CompositorDirectComposition( intf_thread_t* p_intf,  QObject *parent)
@@ -201,6 +200,9 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         m_rootWindow->setAttribute(Qt::WA_TranslucentBackground);
         m_rootWindow->winId();
         m_rootWindow->show();
+
+        m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf, m_rootWindow);
+        m_videoWindowHandler->setWindow( m_rootWindow->windowHandle() );
 
         m_qmlVideoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
         m_rootWindow->setVideoSurfaceProvider(m_qmlVideoSurfaceProvider.get());
