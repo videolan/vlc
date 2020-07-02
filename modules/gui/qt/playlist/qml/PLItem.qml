@@ -143,6 +143,7 @@ Rectangle {
                 Widgets.ListLabel {
                     id: textInfo
 
+                    font.weight: model.isCurrent ? Font.Bold : Font.Normal
                     font.pixelSize: VLCStyle.fontSize_normal
                     elide: Text.ElideRight
 
