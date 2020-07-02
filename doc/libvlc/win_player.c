@@ -8,12 +8,50 @@
 #define SCREEN_WIDTH  1500
 #define SCREEN_HEIGHT  900
 
+struct vlc_context
+{
+    libvlc_instance_t     *p_libvlc;
+    libvlc_media_player_t *p_mediaplayer;
+};
+
+
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    if( message == WM_CREATE )
+    {
+        /* Store p_mediaplayer for future use */
+        CREATESTRUCT *c = (CREATESTRUCT *)lParam;
+        SetWindowLongPtr( hWnd, GWLP_USERDATA, (LONG_PTR)c->lpCreateParams );
+        return 0;
+    }
+
+    LONG_PTR p_user_data = GetWindowLongPtr( hWnd, GWLP_USERDATA );
+    if( p_user_data == 0 )
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    struct vlc_context *ctx = (struct vlc_context *)p_user_data;
+
     switch(message)
     {
         case WM_DESTROY:
             PostQuitMessage(0);
+            return 0;
+        case WM_DROPFILES:
+            {
+                HDROP hDrop = (HDROP)wParam;
+                char file_path[MAX_PATH];
+                libvlc_media_player_stop_async( ctx->p_mediaplayer );
+
+                if (DragQueryFile(hDrop, 0, file_path, sizeof(file_path)))
+                {
+                    libvlc_media_t *p_media = libvlc_media_new_path( ctx->p_libvlc, file_path );
+                    libvlc_media_t *p_old_media = libvlc_media_player_get_media( ctx->p_mediaplayer );
+                    libvlc_media_player_set_media( ctx->p_mediaplayer, p_media );
+                    libvlc_media_release( p_old_media );
+
+                    libvlc_media_player_play( ctx->p_mediaplayer );
+                }
+                DragFinish(hDrop);
+            }
             return 0;
     }
 
@@ -27,9 +65,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 {
     WNDCLASSEX wc;
     char *file_path;
-    libvlc_instance_t *p_libvlc;
+    struct vlc_context Context;
     libvlc_media_t *p_media;
-    libvlc_media_player_t *p_mp;
     (void)hPrevInstance;
     HWND hWnd;
 
@@ -43,10 +80,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
     else
         file_path = strdup( lpCmdLine );
 
-    p_libvlc = libvlc_new( 0, NULL );
-    p_media = libvlc_media_new_path( p_libvlc, file_path );
+    Context.p_libvlc = libvlc_new( 0, NULL );
+    p_media = libvlc_media_new_path( Context.p_libvlc, file_path );
     free( file_path );
-    p_mp = libvlc_media_player_new_from_media( p_media );
+    Context.p_mediaplayer = libvlc_media_player_new_from_media( p_media );
 
     ZeroMemory(&wc, sizeof(WNDCLASSEX));
 
@@ -72,13 +109,14 @@ int WINAPI WinMain(HINSTANCE hInstance,
                           NULL,
                           NULL,
                           hInstance,
-                          NULL);
+                          &Context);
+    DragAcceptFiles(hWnd, TRUE);
 
-    libvlc_media_player_set_hwnd(p_mp, hWnd);
+    libvlc_media_player_set_hwnd(Context.p_mediaplayer, hWnd);
 
     ShowWindow(hWnd, nCmdShow);
 
-    libvlc_media_player_play( p_mp );
+    libvlc_media_player_play( Context.p_mediaplayer );
 
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
@@ -90,11 +128,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
             break;
     }
 
-    libvlc_media_player_stop_async( p_mp );
+    libvlc_media_player_stop_async( Context.p_mediaplayer );
 
-    libvlc_media_player_release( p_mp );
-    libvlc_media_release( p_media );
-    libvlc_release( p_libvlc );
+    libvlc_media_release( libvlc_media_player_get_media( Context.p_mediaplayer ) );
+    libvlc_media_player_release( Context.p_mediaplayer );
+    libvlc_release( Context.p_libvlc );
 
     return msg.wParam;
 }
