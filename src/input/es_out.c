@@ -2403,13 +2403,8 @@ static void EsOutUnselectEs( es_out_t *out, es_out_id_t *es, bool b_update )
 static bool EsOutSelectMatchPrioritized( const es_out_es_props_t *p_esprops,
                                          const es_out_id_t *es )
 {
-    /* If demux has specified a default track */
-    if( p_esprops->i_demux_id >= 0 )
-    {
-        return ( es->fmt.i_id == p_esprops->i_demux_id );
-    }
     /* Otherwise, fallback by priority */
-    else if( p_esprops->p_main_es != NULL )
+    if( p_esprops->p_main_es != NULL )
     {
         return ( es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority );
     }
@@ -2562,6 +2557,14 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
             {
                 b_auto_selected = false; /* do not perform other selection rules */
             }
+        }
+
+        /* If demux has specified a default active track */
+        if( wanted_es == NULL &&
+            p_esprops->i_demux_id >= 0 &&
+            p_esprops->i_demux_id == es->fmt.i_id )
+        {
+            wanted_es = es;
         }
 
         /* If there is no user preference, select the default track
