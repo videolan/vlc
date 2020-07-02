@@ -1871,7 +1871,7 @@ libvlc_media_player_get_track_from_id( libvlc_media_player_t *p_mi,
     for (size_t i = 0; i < ARRAY_SIZE(cats); ++i)
     {
         enum es_format_category_e cat = cats[i];
-        size_t count = vlc_player_GetTrackCount(player, VIDEO_ES);
+        size_t count = vlc_player_GetTrackCount(player, cat);
 
         for (size_t j = 0; j < count; ++j)
         {
