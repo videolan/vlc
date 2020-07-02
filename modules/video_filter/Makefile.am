@@ -263,3 +263,24 @@ libgladjust_plugin_la_LIBADD = libvlc_opengles.la
 libgladjust_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
 video_filter_LTLIBRARIES += libgladjust_plugin.la
 endif
+
+libglsharpen_plugin_la_SOURCES = video_filter/glsharpen.c
+libglsharpen_plugin_la_CFLAGS = $(AM_CFLAGS)
+if HAVE_GL
+libglsharpen_plugin_la_LIBADD = libvlc_opengl.la
+video_filter_LTLIBRARIES += libglsharpen_plugin.la
+endif
+if HAVE_DARWIN
+if HAVE_OSX
+libglsharpen_plugin_la_LIBADD = libvlc_opengl.la
+else
+libglsharpen_plugin_la_LIBADD = libvlc_opengles.la
+libglsharpen_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
+endif
+video_filter_LTLIBRARIES += libglsharpen_plugin.la
+endif
+if HAVE_ANDROID
+libglsharpen_plugin_la_LIBADD = libvlc_opengles.la
+libglsharpen_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
+video_filter_LTLIBRARIES += libglsharpen_plugin.la
+endif
