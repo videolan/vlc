@@ -15,6 +15,7 @@ LIBVLC_SAMPLES = \
 	libvlc/wx_player.cpp \
 	libvlc/d3d11_player.cpp \
 	libvlc/d3d9_player.c \
+	libvlc/win_player.c \
 	$(NULL)
 
 nobase_doc_DATA = $(LIBVLC_SAMPLES)
