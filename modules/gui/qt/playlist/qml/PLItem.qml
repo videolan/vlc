@@ -143,14 +143,17 @@ Rectangle {
                     visible: !statusIcon.visible
                 }
 
-                Image {
+                Widgets.IconLabel {
                     id: statusIcon
-                    anchors.centerIn: parent
-                    visible: (model.isCurrent && source !== "")
-                    width: VLCStyle.play_cover_small
-                    height: VLCStyle.play_cover_small
-                    source: player.playingState === PlayerController.PLAYING_STATE_PLAYING ? "qrc:///toolbar/play_b.svg" :
-                                                        player.playingState === PlayerController.PLAYING_STATE_PAUSED ? "qrc:///toolbar/pause_b.svg" : ""
+                    anchors.fill: parent
+                    visible: (model.isCurrent && text !== "")
+                    width: height
+                    height: VLCStyle.icon_normal
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    color: VLCStyle.colors.accent
+                    text: player.playingState === PlayerController.PLAYING_STATE_PLAYING ? VLCIcons.volume_high :
+                                                    player.playingState === PlayerController.PLAYING_STATE_PAUSED ? VLCIcons.pause : ""
                 }
             }
 
