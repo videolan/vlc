@@ -193,24 +193,64 @@ Widgets.NavigableFocusScope {
             anchors.fill: parent
             anchors.bottomMargin: VLCStyle.margin_normal
 
-        Row {
-            width: root.width
-            leftPadding: VLCStyle.margin_normal
-            topPadding: VLCStyle.margin_normal
-            bottomPadding: VLCStyle.margin_large
+        ColumnLayout {
+            id: headerTextLayout
+            Layout.fillWidth: true
+            Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
+            Layout.topMargin: VLCStyle.margin_normal
 
-            ColumnLayout {
-                Widgets.SubtitleLabel {
-                    text: i18n.qtr("Playqueue")
-                }
+            Widgets.SubtitleLabel {
+                text: i18n.qtr("Playqueue")
+            }
 
-                Widgets.CaptionLabel {
-                    anchors.topMargin: VLCStyle.margin_small
-                    text: i18n.qtr("%1 elements, %2 min").arg(root.plmodel.count).arg(plmodel.duration.toMinutes())
-                }
+            Widgets.CaptionLabel {
+                anchors.topMargin: VLCStyle.margin_small
+                text: i18n.qtr("%1 elements, %2 min").arg(root.plmodel.count).arg(plmodel.duration.toMinutes())
             }
         }
 
+
+        RowLayout {
+            id: content
+            anchors {
+                bottom: view.top
+            }
+
+            Layout.preferredHeight: VLCStyle.icon_normal
+            Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
+            Layout.rightMargin: root.rightPadding + view.scrollBarWidth
+
+            Widgets.IconLabel {
+                Layout.preferredWidth: VLCStyle.icon_normal
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                text: VLCIcons.album_cover
+                color: VLCStyle.colors.caption
+            }
+
+            Widgets.CaptionLabel {
+                Layout.fillWidth: true
+                Layout.leftMargin: VLCStyle.margin_large
+                verticalAlignment: Text.AlignVCenter
+                text: i18n.qtr("Title")
+            }
+
+            Widgets.IconLabel {
+                Layout.rightMargin: VLCStyle.margin_xsmall
+                Layout.preferredWidth: durationMetric.width
+
+                text: VLCIcons.time
+                color: VLCStyle.colors.caption
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                TextMetrics {
+                    id: durationMetric
+                    font.pixelSize: VLCStyle.fontSize_normal
+                    text: "-00:00"
+                }
+            }
+        }
 
         Widgets.KeyNavigableListView {
             id: view
@@ -244,6 +284,7 @@ Widgets.NavigableFocusScope {
             }
 
             delegate: Column {
+
                 PLItem {
                     /*
                      * implicit variables:
@@ -341,7 +382,7 @@ Widgets.NavigableFocusScope {
                         /* move up */
                         target--
                     }
-    
+
                     view.currentIndex = selectedIndexes[0]
                     /* the target is the position _after_ the move is applied */
                     root.plmodel.moveItemsPost(selectedIndexes, target)
@@ -496,8 +537,7 @@ Widgets.NavigableFocusScope {
             navigationParent: root
             navigationUpItem: view
         }
-
-        }
+    }
     }
 
     Keys.priority: Keys.AfterItem
