@@ -10,6 +10,7 @@ LIBVLC_SAMPLES = \
 	libvlc/QtPlayer/QtVLC.pro \
 	libvlc/vlc-thumb.c \
 	libvlc/wx_player.cpp \
+	libvlc/win_player.c \
 	$(NULL)
 
 nobase_doc_DATA = $(LIBVLC_SAMPLES)
