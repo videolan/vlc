@@ -2524,11 +2524,9 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
 
         if( EsOutSelectHasExplicitParams( p_esprops ) )
         {
-            b_auto_selected = false;
-            if( EsOutSelectMatchExplicitParams( p_esprops, es ) )
-            {
-                wanted_es = es;
-            }
+            if( !EsOutSelectMatchExplicitParams( p_esprops, es ) )
+                return;
+            wanted_es = es;
         }
         else if( p_esprops->ppsz_language )
         {
