@@ -242,3 +242,24 @@ libopencv_example_plugin_la_LIBADD = $(OPENCV_LIBS)
 libopencv_example_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(video_filter_RPATH)
 video_filter_PLUGINS += $(LTLIBopencv_example)
 EXTRA_LTLIBRARIES += libopencv_example_plugin.la
+
+libgladjust_plugin_la_SOURCES = video_filter/gladjust.c
+libgladjust_plugin_la_CFLAGS = $(AM_CFLAGS)
+if HAVE_GL
+libgladjust_plugin_la_LIBADD = libvlc_opengl.la
+video_filter_LTLIBRARIES += libgladjust_plugin.la
+endif
+if HAVE_DARWIN
+if HAVE_OSX
+libgladjust_plugin_la_LIBADD = libvlc_opengl.la
+else
+libgladjust_plugin_la_LIBADD = libvlc_opengles.la
+libgladjust_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
+endif
+video_filter_LTLIBRARIES += libgladjust_plugin.la
+endif
+if HAVE_ANDROID
+libgladjust_plugin_la_LIBADD = libvlc_opengles.la
+libgladjust_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
+video_filter_LTLIBRARIES += libgladjust_plugin.la
+endif
