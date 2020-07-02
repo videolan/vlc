@@ -165,14 +165,10 @@ Rectangle {
                     id: textInfo
 
                     font.weight: model.isCurrent ? Font.Bold : Font.Normal
-                    font.pixelSize: VLCStyle.fontSize_normal
-                    elide: Text.ElideRight
-
                     text: model.title
-                    color: VLCStyle.colors.text
                 }
 
-                Widgets.CaptionLabel {
+                Widgets.ListSubtitleLabel {
                     id: textArtist
 
                     font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
@@ -180,14 +176,11 @@ Rectangle {
                 }
             }
 
-            Text {
+            Widgets.ListLabel {
                 id: textDuration
-
                 Layout.rightMargin: VLCStyle.margin_xsmall
-                font.pixelSize: VLCStyle.fontSize_normal
 
                 text: model.duration
-                color: VLCStyle.colors.text
             }
 
         }
