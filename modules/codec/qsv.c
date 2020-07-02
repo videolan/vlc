@@ -467,7 +467,8 @@ static int Open(vlc_object_t *this)
     sys->params.mfx.FrameInfo.BitDepthLuma   = 8; /* for VLC_CODEC_NV12 */
 
     /* Parsing options common to all RC methods and codecs */
-    sys->params.IOPattern       = MFX_IOPATTERN_IN_SYSTEM_MEMORY;
+    sys->params.IOPattern = MFX_IOPATTERN_OUT_SYSTEM_MEMORY;
+    sys->params.IOPattern |= MFX_IOPATTERN_IN_SYSTEM_MEMORY;
     sys->params.AsyncDepth      = var_InheritInteger(enc, SOUT_CFG_PREFIX "async-depth");
     sys->params.mfx.GopOptFlag  = 1; /* TODO */
     sys->params.mfx.GopPicSize  = var_InheritInteger(enc, SOUT_CFG_PREFIX "gop-size");
