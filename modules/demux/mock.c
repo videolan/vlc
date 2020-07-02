@@ -914,6 +914,8 @@ Close(vlc_object_t *obj)
     demux_t *demux = (demux_t*)obj;
     struct demux_sys *sys = demux->p_sys;
 
+    free( sys->config );
+
     struct mock_track *track;
     vlc_vector_foreach(track, &sys->tracks)
     {
@@ -1028,7 +1030,10 @@ Open(vlc_object_t *obj)
         char *name;
         char *psz_next = config_ChainCreate(&name, &chain, psz_in);
         if (name)
+        {
             UpdateTrackConfiguration(demux, name, chain);
+            free(name);
+        }
         config_ChainDestroy(chain);
         if (sys->config != psz_in)
             free(psz_in);
