@@ -1627,11 +1627,11 @@ static int ConfigureVout(decoder_t *p_dec)
 static CFMutableDictionaryRef ExtradataInfoCreate(CFStringRef name,
                                                   void *p_data, size_t i_data)
 {
-    CFMutableDictionaryRef extradataInfo = cfdict_create(1);
-    if (extradataInfo == NULL)
+    if (p_data == NULL)
         return NULL;
 
-    if (p_data == NULL)
+    CFMutableDictionaryRef extradataInfo = cfdict_create(1);
+    if (extradataInfo == NULL)
         return NULL;
 
     CFDataRef extradata = CFDataCreate(kCFAllocatorDefault, p_data, i_data);
