@@ -270,9 +270,17 @@ QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintN
         connect(this, &VideoSurface::keyPressed, m_provider, &VideoSurfaceProvider::onKeyPressed);
         connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged);
 
+        connect(m_provider, &VideoSurfaceProvider::hasVideoChanged, this, &VideoSurface::onProviderVideoChanged);
+
         onSurfaceSizeChanged();
     }
     return node;
+}
+
+void VideoSurface::onProviderVideoChanged(bool hasVideo)
+{
+    if (hasVideo)
+        emit surfaceSizeChanged(size() * this->window()->effectiveDevicePixelRatio());
 }
 
 void VideoSurface::onSurfaceSizeChanged()
