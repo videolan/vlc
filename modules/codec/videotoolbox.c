@@ -136,7 +136,7 @@ typedef struct decoder_sys_t
     enum vtsession_status       vtsession_status;
     unsigned                    i_restart_count;
 
-    int                         i_cvpx_format;
+    OSType                      i_cvpx_format;
     bool                        b_cvpx_format_forced;
 
     h264_poc_context_t          h264_pocctx;
@@ -1200,7 +1200,7 @@ static int StartVideoToolbox(decoder_t *p_dec)
 
     if (p_sys->i_cvpx_format != 0)
     {
-        int chroma = htonl(p_sys->i_cvpx_format);
+        OSType chroma = htonl(p_sys->i_cvpx_format);
         msg_Warn(p_dec, "forcing CVPX format: %4.4s", (const char *) &chroma);
         cfdict_set_int32(destinationPixelBufferAttributes,
                          kCVPixelBufferPixelFormatTypeKey,
@@ -2013,9 +2013,9 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
         }
     }
 
-    uint32_t cvfmt = CVPixelBufferGetPixelFormatType(imageBuffer);
+    OSType cvfmt = CVPixelBufferGetPixelFormatType(imageBuffer);
     msg_Info(p_dec, "vt cvpx chroma: %4.4s",
-             (const char *)&(uint32_t) { htonl(cvfmt) });
+             (const char *)&(OSType) { htonl(cvfmt) });
     switch (cvfmt)
     {
         case kCVPixelFormatType_422YpCbCr8:
