@@ -59,9 +59,10 @@ static int OpenDecDevice(vlc_decoder_device *device, vout_window_t *window);
 
 #define VT_ENABLE_TEXT N_("Enable hardware acceleration")
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
-#define VT_FORCE_CVPX_CHROMA "Force the VT decoder CVPX chroma"
-#define VT_FORCE_CVPX_CHROMA_LONG "Values can be 'BGRA', 'y420', '420f', '420v', '2vuy'. \
-    By Default, the best chroma is choosen by the VT decoder."
+#define VT_FORCE_CVPX_CHROMA "Force the VideoToolbox output chroma"
+#define VT_FORCE_CVPX_CHROMA_LONG "Force the VideoToolbox decoder to output \
+    CVPixelBuffers in the specified pixel format instead of the default. \
+    By Default, the best chroma is choosen by the VideoToolbox decoder."
 
 static const char *const chroma_list_values[] =
     {
