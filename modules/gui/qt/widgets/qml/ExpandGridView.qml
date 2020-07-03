@@ -439,22 +439,6 @@ NavigableFocusScope {
                 if (root.expandIndex !== -1)
                     flickable.expandAnimation()
             }
-            onCurrentItemYChanged: {
-                var newContentY = flickable.contentY;
-                var currentItemYPos = root.getItemPos(currentIndex)[1] + _effectiveCellHeight + expandItem.currentItemY
-                if (currentItemYPos + expandItem.currentItemHeight > flickable.contentY + flickable.height) {
-                    //move viewport to see current item bottom
-                    newContentY = Math.min(
-                                currentItemYPos + expandItem.currentItemHeight - flickable.height,
-                                flickable.contentHeight - flickable.height)
-                } else if (currentItemYPos < flickable.contentY) {
-                    //move viewport to see current item top
-                    newContentY = Math.max(currentItemYPos, 0)
-                }
-
-                if (newContentY !== flickable.contentY)
-                    animateFlickableContentY(newContentY)
-            }
         }
 
         function expand() {

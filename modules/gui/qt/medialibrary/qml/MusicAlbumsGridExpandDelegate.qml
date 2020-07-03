@@ -35,9 +35,6 @@ Widgets.NavigableFocusScope {
 
     clip: true
 
-    property int currentItemY
-    property int currentItemHeight
-
     Rectangle {
         anchors.fill: parent
         color: VLCStyle.colors.bgAlt
@@ -202,12 +199,6 @@ Widgets.NavigableFocusScope {
                 parentId : root.model.id
                 onParentIdChanged: {
                     currentIndex = 0
-                }
-
-                onCurrentItemChanged: {
-                    if (currentItem != undefined) {
-                        root.currentItemHeight = currentItem.height
-                    }
                 }
 
                 sortModel: [

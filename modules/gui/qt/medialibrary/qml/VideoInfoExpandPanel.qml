@@ -31,8 +31,6 @@ Widgets.NavigableFocusScope {
 
     property int currentId: -1
     property var model : ({})
-    property alias currentItemY: expandRect.y
-    property alias currentItemHeight: expandRect.height
     property bool _showMoreInfo: false
     signal retract()
 
