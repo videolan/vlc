@@ -2015,8 +2015,8 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
     }
 
     OSType cvfmt = CVPixelBufferGetPixelFormatType(imageBuffer);
-    msg_Info(p_dec, "output chroma (kCVPixelFormatType): %4.4s",
-             (const char *)&(OSType) { htonl(cvfmt) });
+    msg_Dbg(p_dec, "output chroma (kCVPixelFormatType): %4.4s",
+        (const char *)&(OSType) { htonl(cvfmt) });
     switch (cvfmt)
     {
         case kCVPixelFormatType_422YpCbCr8:
