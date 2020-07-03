@@ -140,7 +140,7 @@ typedef struct decoder_sys_t
     bool                        (*pf_need_restart)(decoder_t *,
                                                    VTDecompressionSessionRef);
     bool                        (*pf_configure_vout)(decoder_t *);
-    CFDictionaryRef             (*pf_get_extradata)(decoder_t *);
+    CFDictionaryRef             (*pf_copy_extradata)(decoder_t *);
     bool                        (*pf_fill_reorder_info)(decoder_t *, const block_t *,
                                                         frame_info_t *);
     /* !Codec specific callbacks */
@@ -377,7 +377,7 @@ static void CleanH264(decoder_t *p_dec)
     hxxx_helper_clean(&p_sys->hh);
 }
 
-static CFDictionaryRef GetDecoderExtradataH264(decoder_t *p_dec)
+static CFDictionaryRef CopyDecoderExtradataH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -727,7 +727,7 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
     return false;
 }
 
-static CFDictionaryRef GetDecoderExtradataHEVC(decoder_t *p_dec)
+static CFDictionaryRef CopyDecoderExtradataHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -776,7 +776,7 @@ static bool CodecSupportedHEVC(decoder_t *p_dec)
 #define ProcessBlockHEVC ProcessBlockH264
 #define VideoToolboxNeedsToRestartHEVC VideoToolboxNeedsToRestartH264
 
-static CFDictionaryRef GetDecoderExtradataMPEG4(decoder_t *p_dec)
+static CFDictionaryRef CopyDecoderExtradataMPEG4(decoder_t *p_dec)
 {
     if (p_dec->fmt_in.i_extra)
         return ESDSExtradataInfoCreate(p_dec, p_dec->fmt_in.p_extra,
@@ -785,7 +785,7 @@ static CFDictionaryRef GetDecoderExtradataMPEG4(decoder_t *p_dec)
         return NULL; /* MPEG4 without esds ? */
 }
 
-static CFDictionaryRef GetDecoderExtradataDefault(decoder_t *p_dec)
+static CFDictionaryRef CopyDecoderExtradataDefault(decoder_t *p_dec)
 {
     VLC_UNUSED(p_dec);
     return ExtradataInfoCreate(NULL, NULL, 0); /* Empty Needed ? */
@@ -1071,8 +1071,8 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
     if (decoderConfiguration == NULL)
         return NULL;
 
-    CFDictionaryRef extradata = p_sys->pf_get_extradata
-                                ? p_sys->pf_get_extradata(p_dec) : NULL;
+    CFDictionaryRef extradata = p_sys->pf_copy_extradata
+                                ? p_sys->pf_copy_extradata(p_dec) : NULL;
     if(extradata)
     {
         /* then decoder will also fail if required, no need to handle it */
@@ -1430,7 +1430,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_sys->pf_process_block = ProcessBlockH264;
             p_sys->pf_need_restart = VideoToolboxNeedsToRestartH264;
             p_sys->pf_configure_vout = ConfigureVoutH264;
-            p_sys->pf_get_extradata = GetDecoderExtradataH264;
+            p_sys->pf_copy_extradata = CopyDecoderExtradataH264;
             p_sys->pf_fill_reorder_info = FillReorderInfoH264;
             p_sys->b_poc_based_reorder = true;
             p_sys->b_vt_need_keyframe = true;
@@ -1444,18 +1444,18 @@ static int OpenDecoder(vlc_object_t *p_this)
             p_sys->pf_process_block = ProcessBlockHEVC;
             p_sys->pf_need_restart = VideoToolboxNeedsToRestartHEVC;
             p_sys->pf_configure_vout = ConfigureVoutHEVC;
-            p_sys->pf_get_extradata = GetDecoderExtradataHEVC;
+            p_sys->pf_copy_extradata = CopyDecoderExtradataHEVC;
             p_sys->pf_fill_reorder_info = FillReorderInfoHEVC;
             p_sys->b_poc_based_reorder = true;
             p_sys->b_vt_need_keyframe = true;
             break;
 
         case kCMVideoCodecType_MPEG4Video:
-            p_sys->pf_get_extradata = GetDecoderExtradataMPEG4;
+            p_sys->pf_copy_extradata = CopyDecoderExtradataMPEG4;
             break;
 
         default:
-            p_sys->pf_get_extradata = GetDecoderExtradataDefault;
+            p_sys->pf_copy_extradata = CopyDecoderExtradataDefault;
             break;
     }
 
