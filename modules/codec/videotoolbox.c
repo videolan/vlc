@@ -184,7 +184,7 @@ static void HXXXGetBestChroma(decoder_t *p_dec)
         /* Not for iOS since there is no 10bits textures with the old iOS
          * openGLES version, and therefore no P010 shaders */
         else if (i_depth_luma == 10 && i_depth_chroma == 10 && deviceSupportsHEVC())
-            p_sys->i_cvpx_format = 'x420'; /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
+            p_sys->i_cvpx_format = kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange;
 #endif
     }
 }
@@ -1714,10 +1714,7 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
         VTERRCASE(kVTFrameSiloInvalidTimeRangeErr)
         VTERRCASE(kVTCouldNotFindTemporalFilterErr)
         VTERRCASE(kVTPixelTransferNotPermittedErr)
-        case -12219:
-            msg_Warn(p_dec, "vt session error: "
-                     "'kVTColorCorrectionImageRotationFailedErr'");
-            break;
+        VTERRCASE(kVTColorCorrectionImageRotationFailedErr)
         default:
             msg_Warn(p_dec, "unknown vt session error (%i)", (int)status);
     }
@@ -2031,8 +2028,8 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_NV12;
             assert(CVPixelBufferIsPlanar(imageBuffer) == true);
             break;
-        case 'xf20': /* kCVPixelFormatType_420YpCbCr10BiPlanarFullRange */
-        case 'x420': /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
+        case kCVPixelFormatType_420YpCbCr10BiPlanarFullRange:
+        case kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange:
             p_dec->fmt_out.i_codec = VLC_CODEC_CVPX_P010;
             assert(CVPixelBufferIsPlanar(imageBuffer) == true);
             break;
