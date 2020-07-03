@@ -1201,7 +1201,8 @@ static int StartVideoToolbox(decoder_t *p_dec)
     if (p_sys->i_cvpx_format != 0)
     {
         OSType chroma = htonl(p_sys->i_cvpx_format);
-        msg_Warn(p_dec, "forcing CVPX format: %4.4s", (const char *) &chroma);
+        msg_Warn(p_dec, "forcing output chroma (kCVPixelFormatType): %4.4s",
+            (const char *) &chroma);
         cfdict_set_int32(destinationPixelBufferAttributes,
                          kCVPixelBufferPixelFormatTypeKey,
                          p_sys->i_cvpx_format);
@@ -2014,7 +2015,7 @@ static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
     }
 
     OSType cvfmt = CVPixelBufferGetPixelFormatType(imageBuffer);
-    msg_Info(p_dec, "vt cvpx chroma: %4.4s",
+    msg_Info(p_dec, "output chroma (kCVPixelFormatType): %4.4s",
              (const char *)&(OSType) { htonl(cvfmt) });
     switch (cvfmt)
     {
