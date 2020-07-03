@@ -89,8 +89,8 @@ enum vtsession_status
 };
 
 static int ConfigureVout(decoder_t *);
-static CFMutableDictionaryRef ESDSExtradataInfoCreate(decoder_t *, uint8_t *, uint32_t);
-static CFMutableDictionaryRef ExtradataInfoCreate(CFStringRef, void *, size_t);
+static CFDictionaryRef ESDSExtradataInfoCreate(decoder_t *, uint8_t *, uint32_t);
+static CFDictionaryRef ExtradataInfoCreate(CFStringRef, void *, size_t);
 static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *, unsigned, unsigned);
 static int HandleVTStatus(decoder_t *, OSStatus, enum vtsession_status *);
 static int DecodeBlock(decoder_t *, block_t *);
@@ -140,7 +140,7 @@ typedef struct decoder_sys_t
     bool                        (*pf_need_restart)(decoder_t *,
                                                    VTDecompressionSessionRef);
     bool                        (*pf_configure_vout)(decoder_t *);
-    CFMutableDictionaryRef      (*pf_get_extradata)(decoder_t *);
+    CFDictionaryRef             (*pf_get_extradata)(decoder_t *);
     bool                        (*pf_fill_reorder_info)(decoder_t *, const block_t *,
                                                         frame_info_t *);
     /* !Codec specific callbacks */
@@ -377,11 +377,11 @@ static void CleanH264(decoder_t *p_dec)
     hxxx_helper_clean(&p_sys->hh);
 }
 
-static CFMutableDictionaryRef GetDecoderExtradataH264(decoder_t *p_dec)
+static CFDictionaryRef GetDecoderExtradataH264(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    CFMutableDictionaryRef extradata = NULL;
+    CFDictionaryRef extradata = NULL;
     if (p_dec->fmt_in.i_extra && p_sys->hh.b_is_xvcC)
     {
         /* copy DecoderConfiguration */
@@ -727,11 +727,11 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
     return false;
 }
 
-static CFMutableDictionaryRef GetDecoderExtradataHEVC(decoder_t *p_dec)
+static CFDictionaryRef GetDecoderExtradataHEVC(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    CFMutableDictionaryRef extradata = NULL;
+    CFDictionaryRef extradata = NULL;
     if (p_dec->fmt_in.i_extra && p_sys->hh.b_is_xvcC)
     {
         /* copy DecoderConfiguration */
@@ -776,7 +776,7 @@ static bool CodecSupportedHEVC(decoder_t *p_dec)
 #define ProcessBlockHEVC ProcessBlockH264
 #define VideoToolboxNeedsToRestartHEVC VideoToolboxNeedsToRestartH264
 
-static CFMutableDictionaryRef GetDecoderExtradataMPEG4(decoder_t *p_dec)
+static CFDictionaryRef GetDecoderExtradataMPEG4(decoder_t *p_dec)
 {
     if (p_dec->fmt_in.i_extra)
         return ESDSExtradataInfoCreate(p_dec, p_dec->fmt_in.p_extra,
@@ -785,7 +785,7 @@ static CFMutableDictionaryRef GetDecoderExtradataMPEG4(decoder_t *p_dec)
         return NULL; /* MPEG4 without esds ? */
 }
 
-static CFMutableDictionaryRef GetDecoderExtradataDefault(decoder_t *p_dec)
+static CFDictionaryRef GetDecoderExtradataDefault(decoder_t *p_dec)
 {
     VLC_UNUSED(p_dec);
     return ExtradataInfoCreate(NULL, NULL, 0); /* Empty Needed ? */
@@ -1071,8 +1071,8 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
     if (decoderConfiguration == NULL)
         return NULL;
 
-    CFMutableDictionaryRef extradata = p_sys->pf_get_extradata
-                                     ? p_sys->pf_get_extradata(p_dec) : NULL;
+    CFDictionaryRef extradata = p_sys->pf_get_extradata
+                                ? p_sys->pf_get_extradata(p_dec) : NULL;
     if(extradata)
     {
         /* then decoder will also fail if required, no need to handle it */
@@ -1557,9 +1557,9 @@ static inline void bo_add_mp4_tag_descr(bo_t *p_bo, uint8_t tag, uint32_t size)
     bo_add_8(p_bo, size & 0x7F);
 }
 
-static CFMutableDictionaryRef ESDSExtradataInfoCreate(decoder_t *p_dec,
-                                                      uint8_t *p_buf,
-                                                      uint32_t i_buf_size)
+static CFDictionaryRef ESDSExtradataInfoCreate(decoder_t *p_dec,
+                                               uint8_t *p_buf,
+                                               uint32_t i_buf_size)
 {
     VLC_UNUSED(p_dec);
     int full_size = 3 + 5 +13 + 5 + i_buf_size + 3;
@@ -1595,7 +1595,7 @@ static CFMutableDictionaryRef ESDSExtradataInfoCreate(decoder_t *p_dec,
     bo_add_8(&bo, 0x01);    // length
     bo_add_8(&bo, 0x02);    // no SL
 
-    CFMutableDictionaryRef extradataInfo =
+    CFDictionaryRef extradataInfo =
         ExtradataInfoCreate(CFSTR("esds"), bo.b->p_buffer, bo.b->i_buffer);
     bo_deinit(&bo);
     return extradataInfo;
@@ -1624,23 +1624,23 @@ static int ConfigureVout(decoder_t *p_dec)
     return VLC_SUCCESS;
 }
 
-static CFMutableDictionaryRef ExtradataInfoCreate(CFStringRef name,
+static CFDictionaryRef ExtradataInfoCreate(CFStringRef name,
                                                   void *p_data, size_t i_data)
 {
     if (p_data == NULL)
         return NULL;
 
-    CFMutableDictionaryRef extradataInfo = cfdict_create(1);
-    if (extradataInfo == NULL)
-        return NULL;
-
     CFDataRef extradata = CFDataCreate(kCFAllocatorDefault, p_data, i_data);
     if (extradata == NULL)
-    {
-        CFRelease(extradataInfo);
         return NULL;
-    }
-    CFDictionarySetValue(extradataInfo, name, extradata);
+
+    CFDictionaryRef extradataInfo = CFDictionaryCreate(kCFAllocatorDefault,
+        &(CFTypeRef){ name },
+        &(CFTypeRef){ extradata },
+        1,
+        &kCFTypeDictionaryKeyCallBacks,
+        &kCFTypeDictionaryValueCallBacks);
+
     CFRelease(extradata);
     return extradataInfo;
 }
