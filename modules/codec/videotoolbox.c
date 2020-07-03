@@ -785,12 +785,6 @@ static CFDictionaryRef CopyDecoderExtradataMPEG4(decoder_t *p_dec)
         return NULL; /* MPEG4 without esds ? */
 }
 
-static CFDictionaryRef CopyDecoderExtradataDefault(decoder_t *p_dec)
-{
-    VLC_UNUSED(p_dec);
-    return ExtradataInfoCreate(NULL, NULL, 0); /* Empty Needed ? */
-}
-
 /* !Codec Specific */
 
 static void InsertIntoDPB(decoder_sys_t *p_sys, frame_info_t *p_info)
@@ -1455,7 +1449,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             break;
 
         default:
-            p_sys->pf_copy_extradata = CopyDecoderExtradataDefault;
+            p_sys->pf_copy_extradata = NULL;
             break;
     }
 
