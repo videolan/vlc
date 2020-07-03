@@ -63,6 +63,26 @@ static int OpenDecDevice(vlc_decoder_device *device, vout_window_t *window);
 #define VT_FORCE_CVPX_CHROMA_LONG "Values can be 'BGRA', 'y420', '420f', '420v', '2vuy'. \
     By Default, the best chroma is choosen by the VT decoder."
 
+static const char *const chroma_list_values[] =
+    {
+        "",
+        "BGRA",
+        "y420",
+        "420f",
+        "420v",
+        "2vuy",
+    };
+
+static const char *const chroma_list_names[] =
+    {
+        "Auto",
+        "BGRA 8-bit",
+        "Y'CbCr 8-bit 4:2:0 (Planar)",
+        "Y'CbCr 8-bit 4:2:0 (Bi-Planar, Full Range)",
+        "Y'CbCr 8-bit 4:2:0 (Bi-Planar)",
+        "Y'CbCr 8-bit 4:2:2",
+    };
+
 vlc_module_begin()
 set_category(CAT_INPUT)
 set_subcategory(SUBCAT_INPUT_VCODEC)
@@ -74,6 +94,7 @@ add_obsolete_bool("videotoolbox-temporal-deinterlacing")
 add_obsolete_bool("videotoolbox")
 add_bool("videotoolbox-hw-decoder-only", true, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC, false)
 add_string("videotoolbox-cvpx-chroma", "", VT_FORCE_CVPX_CHROMA, VT_FORCE_CVPX_CHROMA_LONG, true);
+    change_string_list(chroma_list_values, chroma_list_names)
 add_submodule ()
     set_callback_dec_device(OpenDecDevice, 1)
 vlc_module_end()
