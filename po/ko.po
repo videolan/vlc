@@ -6,19 +6,18 @@
 # airplanez <airplanez@gmail.com>, 2012
 # Changkyoon Kim <ocnblu@gmail.com>, 2014
 # Han HoJoong <0demon0@paran.com>, 2005
+# Jay Oh <theanswer.jay@gmail.com>, 2018-2020
 # Kang Jeong-Hee <keizie@gmail.com>, 2007
 # Namhyung Kim <namhyung@gmail.com>, 2007
 # Potato <sheppaul@naver.com>, 2013-2018
 # Seongki Shin <skshin@gmail.com>, 2013
-# Jay Oh <theanswer.jay@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-06-02 00:01+0200\n"
-"Last-Translator: Jonathan Joseph Chiarella <jonathan.chiarella@gmail.com>, "
-"2019\n"
+"PO-Revision-Date: 2020-07-04 06:08+0200\n"
+"Last-Translator: Jay Oh <theanswer.jay@gmail.com>, 2020\n"
 "Language-Team: Korean (https://www.transifex.com/yaron/teams/16553/ko/)\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -6063,25 +6062,24 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "문제 내역 및 시스템 환경"
+msgstr "시스템 리소스 접근중에 문제가 생겼습니다"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"VLC에서 마이크를 활용하시려면 \"시스템 설정\"의 \"보안 & 개인정보\"로 들어가"
+"서 마이크를 활성화시키세요"
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "AVFoundation 비디오 캡처"
+msgstr "AVFoundation 오디오 캡처"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "AVFoundation 비디오 캡처 모듈."
+msgstr "AVFoundation 오디오 캡처 모듈."
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6116,6 +6114,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"VLC에서 카메라를 활용하시려면 \"시스템 설정\"의 \"보안 & 개인정보\"로 들어가"
+"서 카메라를 활성화시키세요"
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -7293,6 +7293,8 @@ msgid ""
 "Preferences\" -> \"Security & Privacy\" and allow VLC to access your "
 "external media in \"Files and Folders\" section."
 msgstr ""
+"맥OS에서는 디스크 접근 문제가 발생했다면 \"시스템 설정\"의 \"보안 & 개인정보"
+"\"안에 있는 \"파일과 폴더\"에서 외부 미디어를 활성하시키세요"
 
 #: modules/access/dvdread.c:77
 msgid "DVD without menus"
@@ -23550,9 +23552,8 @@ msgid "Zeroconf services"
 msgstr "Zeroconf 서비스"
 
 #: modules/services_discovery/avahi.c:69
-#, fuzzy
 msgid "Avahi Renderer Discovery"
-msgstr "mDNS 렌더러 검색"
+msgstr "Avahi 렌더러 검색"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
