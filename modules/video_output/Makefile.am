@@ -111,17 +111,6 @@ include video_output/xcb/Makefile.am
 ### Vulkan ###
 include video_output/vulkan/Makefile.am
 
-libegl_gbm_plugin_la_SOURCES = video_output/opengl/egl.c
-libegl_gbm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_GBM=1
-libegl_gbm_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS)
-libegl_gbm_plugin_la_LIBADD = $(EGL_GBM_LIBS)
-
-if HAVE_LINUX
-if !HAVE_ANDROID
-vout_LTLIBRARIES += libegl_gbm_plugin.la
-endif
-endif
-
 ### Wayland ###
 include video_output/wayland/Makefile.am
 

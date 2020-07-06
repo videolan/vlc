@@ -64,7 +64,6 @@ enum vout_window_type {
     VOUT_WINDOW_TYPE_ANDROID_NATIVE /**< Android native window */,
     VOUT_WINDOW_TYPE_WAYLAND /**< Wayland surface */,
     VOUT_WINDOW_TYPE_DCOMP /**< Win32 DirectComposition */,
-    VOUT_WINDOW_TYPE_GBM /**< GBM surface */,
 };
 
 /**
@@ -379,7 +378,6 @@ typedef struct vout_window_t {
         void     *anativewindow; /**< Android native window */
         struct wl_surface *wl;   /**< Wayland surface (client pointer) */
         void     *dcomp_visual;  /**<  Win32 direct composition visual */
-        struct gbm_surface *gbm; /**< Gbm surface */
     } handle;
 
     /** Display server (mandatory)
@@ -394,7 +392,6 @@ typedef struct vout_window_t {
         char     *x11; /**< X11 display string (NULL = use default) */
         struct wl_display *wl; /**< Wayland display (client pointer) */
         void* dcomp_device; /**< DirectComposition device */
-        struct gbm_device *gbm; /**< Gbm pseudo display */
     } display;
 
     const struct vout_window_operations *ops; /**< operations handled by the

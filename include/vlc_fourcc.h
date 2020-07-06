@@ -666,8 +666,6 @@
 #define VLC_CODEC_MP2       VLC_FOURCC('m','p','2',' ')
 /* MPEG-I/II layer 3 audio */
 #define VLC_CODEC_MP3       VLC_FOURCC('m','p','3',' ')
-/* GBM offscreen video */
-#define VLC_CODEC_GBM       VLC_FOURCC('G','B','M','0')
 
 /**
  * It returns the codec associated to a fourcc within an ES category.
