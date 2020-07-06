@@ -279,6 +279,7 @@ Widgets.NavigableFocusScope {
                 }
 
                 footer: PLItemFooter {
+                    z: 2
                     onDropURLAtEnd: mainPlaylistController.insert(root.plmodel.count, urlList)
                     onMoveAtEnd: root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
                 }

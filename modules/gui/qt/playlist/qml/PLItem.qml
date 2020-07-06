@@ -57,6 +57,7 @@ Rectangle {
 
 
     Rectangle {
+        z: 2
         width: parent.width
         height: 2
         anchors.top: parent.top
