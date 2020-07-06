@@ -337,8 +337,7 @@ liboggspots_plugin_la_LIBADD = $(OGGSPOTS_LIBS)
 EXTRA_LTLIBRARIES += liboggspots_plugin.la
 codec_LTLIBRARIES += $(LTLIBoggspots)
 
-libvideotoolbox_plugin_la_SOURCES = \
-	codec/vt_utils.c codec/vt_utils.h codec/videotoolbox.c
+libvideotoolbox_plugin_la_SOURCES = codec/videotoolbox.c
 libvideotoolbox_plugin_la_CFLAGS = $(AM_CFLAGS)
 if HAVE_IOS
 libvideotoolbox_plugin_la_CFLAGS += -miphoneos-version-min=9.0
@@ -346,7 +345,7 @@ endif
 if HAVE_TVOS
 libvideotoolbox_plugin_la_CFLAGS += -mtvos-version-min=10.2
 endif
-libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la
+libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la libvlc_vtutils.la
 libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 EXTRA_LTLIBRARIES += libvideotoolbox_plugin.la
 codec_LTLIBRARIES += $(LTLIBvideotoolbox)
@@ -618,3 +617,7 @@ libhxxxhelper_testdec_plugin_la_SOURCES = codec/hxxx_helper_testdec.c
 libhxxxhelper_testdec_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libhxxxhelper_testdec_plugin_la_LIBADD = libvlc_hxxxhelper.la
 noinst_LTLIBRARIES += libhxxxhelper_testdec_plugin.la
+
+libvlc_vtutils_la_SOURCES = codec/vt_utils.c codec/vt_utils.h
+libvlc_vtutils_la_LDFLAGS = -static -no-undefined
+EXTRA_LTLIBRARIES += libvlc_vtutils.la
