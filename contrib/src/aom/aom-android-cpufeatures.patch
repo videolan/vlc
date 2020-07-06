@@ -1,5 +1,5 @@
 diff --git a/aom_ports/aom_ports.cmake b/aom_ports/aom_ports.cmake
-index 6272fc0..2d795f8 100644
+index d57989654..11d4b5550 100644
 --- a/aom_ports/aom_ports.cmake
 +++ b/aom_ports/aom_ports.cmake
 @@ -30,7 +30,8 @@ list(APPEND AOM_PORTS_ASM_X86 "${AOM_ROOT}/aom_ports/emms.asm")
@@ -13,15 +13,15 @@ index 6272fc0..2d795f8 100644
  list(APPEND AOM_PORTS_SOURCES_PPC "${AOM_ROOT}/aom_ports/ppc.h"
              "${AOM_ROOT}/aom_ports/ppc_cpudetect.c")
 diff --git a/aom_ports/arm_cpudetect.c b/aom_ports/arm_cpudetect.c
-index 70efee9..86efb8e 100644
+index 5a75bb348..bd5e1cb93 100644
 --- a/aom_ports/arm_cpudetect.c
 +++ b/aom_ports/arm_cpudetect.c
-@@ -88,7 +88,7 @@ int arm_cpu_caps(void) {
+@@ -88,7 +88,7 @@ int aom_arm_cpu_caps(void) {
  }
  
  #elif defined(__ANDROID__) /* end _MSC_VER */
 -#include <cpu-features.h>
 +#include "cpu-features.h"
  
- int arm_cpu_caps(void) {
+ int aom_arm_cpu_caps(void) {
    int flags;
