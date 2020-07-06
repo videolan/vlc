@@ -29,8 +29,8 @@ NavigableFocusScope {
     property int cellHeight: 100
 
     //margin to apply
-    property int marginBottom: root.cellHeight / 2
-    property int marginTop: root.cellHeight / 3
+    property int marginBottom: 0
+    property int marginTop: 0
 
     property int horizontalSpacing: VLCStyle.column_margin_width
     property int verticalSpacing: VLCStyle.column_margin_width
@@ -117,7 +117,7 @@ NavigableFocusScope {
         var colCount = root.getNbItemsPerRow()
         var remainingSpace = flickable.width - (colCount * root._effectiveCellWidth) + root.horizontalSpacing
         var rowCol = getItemRowCol(id)
-        return [(rowCol[0] * root._effectiveCellWidth) + (remainingSpace / 2), rowCol[1] * root._effectiveCellHeight + headerHeight]
+        return [(rowCol[0] * root._effectiveCellWidth) + (remainingSpace / 2), rowCol[1] * root._effectiveCellHeight + headerHeight + marginTop]
     }
 
     //use the same signature as Gridview.positionViewAtIndex(index, PositionMode mode)
@@ -186,7 +186,7 @@ NavigableFocusScope {
     }
 
     function _getFirstAndLastInstanciatedItemIds() {
-        var myContentY = flickable.contentY - root.headerHeight
+        var myContentY = flickable.contentY - root.headerHeight - marginTop
 
         var contentYWithoutExpand = myContentY
         var heightWithoutExpand = flickable.height
@@ -322,7 +322,7 @@ NavigableFocusScope {
         Loader {
             id: headerItemLoader
             //load the header early (when the first row is visible)
-            visible: flickable.contentY < root.headerHeight + root._effectiveCellHeight
+            visible: flickable.contentY < (root.headerHeight + root._effectiveCellHeight + root.marginTop)
             sourceComponent: headerDelegate
             focus: item.focus
             onFocusChanged: {
@@ -336,7 +336,7 @@ NavigableFocusScope {
             }
             onLoaded: {
                 item.x = 0
-                item.y = 0
+                item.y = root.marginTop
             }
         }
 
@@ -425,7 +425,7 @@ NavigableFocusScope {
 
             // Calculate and set the contentHeight
             var newContentHeight = root.getItemPos(_count - 1)[1] + root._effectiveCellHeight + _expandItemVerticalSpace
-            contentHeight = newContentHeight
+            contentHeight = newContentHeight + root.marginBottom // marginTop is included from root.getItemPos
             contentWidth = root._effectiveCellWidth * root.getNbItemsPerRow() - root.horizontalSpacing
 
             _updateSelected()

@@ -41,7 +41,7 @@ Widgets.NavigableFocusScope {
     readonly property var currentIndex: view.currentItem.currentIndex
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
-
+    property int gridViewMarginTop: VLCStyle.margin_large
 
     navigationCancel: function() {
         if (view.currentItem.currentIndex <= 0) {
@@ -101,7 +101,7 @@ Widgets.NavigableFocusScope {
             id: gridView_id
 
             activeFocusOnTab:true
-
+            marginTop: root.gridViewMarginTop
             cellWidth: VLCStyle.gridItem_music_width
             cellHeight: VLCStyle.gridItem_music_height
 
