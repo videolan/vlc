@@ -219,11 +219,8 @@ Widgets.NavigableFocusScope {
 
             RowLayout {
                 id: content
-                anchors {
-                    bottom: view.top
-                }
 
-                Layout.preferredHeight: VLCStyle.icon_normal
+                Layout.topMargin: VLCStyle.margin_normal
                 Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
                 Layout.rightMargin: root.rightPadding + view.scrollBarWidth
 
