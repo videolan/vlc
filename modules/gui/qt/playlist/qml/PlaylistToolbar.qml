@@ -32,9 +32,11 @@ Widgets.NavigableFocusScope {
     property int rightPadding: 0
     height: VLCStyle.heightBar_normal
 
+    property VLCColors _colors: VLCStyle.colors
+
     Rectangle {
         anchors.fill: parent
-        color: VLCStyle.colors.banner
+        color: _colors.banner
 
         RowLayout {
             anchors {
@@ -56,6 +58,9 @@ Widgets.NavigableFocusScope {
                 checked: mainPlaylistController.repeatMode !== PlaylistControllerModel.PLAYBACK_REPEAT_NONE
                 onClicked: mainPlaylistController.toggleRepeatMode()
                 focusPolicy: Qt.NoFocus
+
+                color: _colors.buttonText
+                colorDisabled: _colors.textInactive
             }
 
             Widgets.IconToolButton {
@@ -67,6 +72,9 @@ Widgets.NavigableFocusScope {
                 iconText: VLCIcons.shuffle_on
                 onClicked: mainPlaylistController.shuffle()
                 focusPolicy: Qt.NoFocus
+
+                color: _colors.buttonText
+                colorDisabled: _colors.textInactive
             }
 
             Widgets.SortControl {
@@ -96,6 +104,8 @@ Widgets.NavigableFocusScope {
                 Keys.priority: Keys.AfterItem
                 Keys.onPressed: defaultKeyAction(event, 0)
                 navigationParent: playlistToolbar
+
+                _colors: playlistToolbar._colors
             }
 
             Widgets.IconToolButton {
@@ -107,6 +117,9 @@ Widgets.NavigableFocusScope {
                 iconText: VLCIcons.playlist_clear
                 onClicked: mainPlaylistController.clear()
                 focusPolicy: Qt.NoFocus
+
+                color: _colors.buttonText
+                colorDisabled: _colors.textInactive
             }
         }
     }
