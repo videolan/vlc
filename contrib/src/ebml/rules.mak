@@ -1,6 +1,6 @@
 # ebml
 
-EBML_VERSION := 1.3.10
+EBML_VERSION := 1.4.0
 EBML_URL := http://dl.matroska.org/downloads/libebml/libebml-$(EBML_VERSION).tar.xz
 
 ifeq ($(call need_pkg,"libebml >= 1.3.8"),)
@@ -17,7 +17,7 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(MOVE)
 
 # libebml requires exceptions
-EBML_CXXFLAGS := $(CXXFLAGS) $(PIC) -fexceptions -fvisibility=hidden
+EBML_CXXFLAGS := $(CXXFLAGS) $(PIC) -fexceptions
 
 .ebml: ebml toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) CXXFLAGS="$(EBML_CXXFLAGS)" $(CMAKE) -DENABLE_WIN32_IO=OFF
