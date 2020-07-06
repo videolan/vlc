@@ -310,7 +310,7 @@ Widgets.NavigableFocusScope {
                 Rectangle {
                     width: parent.width
                     height: 1
-                    color: VLCStyle.colors.white
+                    color: VLCStyle.colors.playlistSeparator
                     opacity: VLCStyle.colors.isThemeDark ? 0.05 : 1.0
                 }
             }
