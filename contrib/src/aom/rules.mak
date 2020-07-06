@@ -1,7 +1,6 @@
 # aom
-AOM_HASH := add4b15580e410c00c927ee366fa65545045a5d9
-AOM_VERSION := v1.0.0.errata.1
-AOM_GITURL := https://aomedia.googlesource.com/aom/+archive/$(AOM_HASH).tar.gz
+AOM_VERSION := v2.0.0
+AOM_GITURL := https://aomedia.googlesource.com/aom/+archive/$(AOM_VERSION).tar.gz
 
 PKGS += aom
 ifeq ($(call need_pkg,"aom"),)
@@ -19,7 +18,6 @@ aom: aom-$(AOM_VERSION).tar.gz .sum-aom
 	rm -Rf $(UNPACK_DIR) $@
 	mkdir -p $(UNPACK_DIR)
 	tar xvzfo "$<" -C $(UNPACK_DIR)
-	$(APPLY) $(SRC)/aom/aom-target-cpu.patch
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/aom/aom-android-pthreads.patch
 	$(APPLY) $(SRC)/aom/aom-android-cpufeatures.patch
