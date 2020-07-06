@@ -17,9 +17,7 @@ $(TARBALLS)/glslang-$(GLSLANG_BASENAME).tar.xz:
 	touch $@
 
 glslang: glslang-$(GLSLANG_BASENAME).tar.xz .sum-glslang
-	rm -Rf $@ $@-$(GLSLANG_BASENAME)
-	mkdir -p $@-$(GLSLANG_BASENAME)
-	tar xvJf "$<" --strip-components=1 -C $@-$(GLSLANG_BASENAME)
+	$(UNPACK)
 	$(APPLY) $(SRC)/glslang/glslang-win32.patch
 	$(APPLY) $(SRC)/glslang/remove-broken-code.patch
 	$(MOVE)

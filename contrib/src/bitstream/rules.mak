@@ -12,9 +12,7 @@ $(TARBALLS)/bitstream-$(BITSTREAM_VERSION).tar.xz:
 	touch $@
 
 bitstream: bitstream-$(BITSTREAM_VERSION).tar.xz .sum-bitstream
-	rm -rf $@-$(BITSTREAM_VERSION) $@
-	mkdir -p $@-$(BITSTREAM_VERSION)
-	tar xvf "$<" --strip-components=1 -C $@-$(BITSTREAM_VERSION)
+	$(UNPACK)
 	$(MOVE)
 
 .bitstream: bitstream

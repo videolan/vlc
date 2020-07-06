@@ -69,9 +69,7 @@ $(TARBALLS)/$(X264_BASENAME):
 .sum-x264: $(X264_BASENAME)
 
 x264 x26410b: %: $(X264_BASENAME) .sum-%
-	rm -Rf $(UNPACK_DIR)
-	mkdir -p $(UNPACK_DIR)
-	tar xvjfo "$<" --strip-components=1 -C $(UNPACK_DIR)
+	$(UNPACK)
 	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/x264/x264-winstore.patch
 	$(MOVE)

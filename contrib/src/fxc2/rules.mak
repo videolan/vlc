@@ -14,9 +14,7 @@ $(TARBALLS)/fxc2-$(FXC2_VERSION).tar.xz:
 	touch $@
 
 fxc2: fxc2-$(FXC2_VERSION).tar.xz .sum-fxc2
-	rm -rf $@-$(FXC2_VERSION) $@
-	mkdir -p $@-$(FXC2_VERSION)
-	tar xvf "$<" --strip-components=1 -C $@-$(FXC2_VERSION)
+	$(UNPACK)
 	$(APPLY) $(SRC)/fxc2/0001-make-Vn-argument-as-optional-and-provide-default-var.patch
 	$(APPLY) $(SRC)/fxc2/0002-accept-windows-style-flags-and-splitted-argument-val.patch
 	$(APPLY) $(SRC)/fxc2/0004-Revert-Fix-narrowing-conversion-from-int-to-BYTE.patch
