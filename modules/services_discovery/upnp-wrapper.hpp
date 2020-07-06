@@ -337,7 +337,6 @@ done:
 
 #ifdef __APPLE__
 #include <TargetConditionals.h>
-#endif
 
 #if defined(TARGET_OS_OSX) && TARGET_OS_OSX
 #include <SystemConfiguration/SystemConfiguration.h>
@@ -364,7 +363,45 @@ inline char *getPreferedAdapter()
     return returnValue;
 }
 
-#else
+#else /* iOS and tvOS */
+
+inline bool necessaryFlagsSetOnInterface(struct ifaddrs *anInterface)
+{
+    unsigned int flags = anInterface->ifa_flags;
+    if( (flags & IFF_UP) && (flags & IFF_RUNNING) && !(flags & IFF_LOOPBACK) && !(flags & IFF_POINTOPOINT) ) {
+        return true;
+    }
+    return false;
+}
+
+inline char *getPreferedAdapter()
+{
+    struct ifaddrs *listOfInterfaces;
+    struct ifaddrs *anInterface;
+    int ret = getifaddrs(&listOfInterfaces);
+    char *adapterName = NULL;
+
+    if (ret != 0) {
+        return NULL;
+    }
+
+    anInterface = listOfInterfaces;
+    while (anInterface != NULL) {
+        bool ret = necessaryFlagsSetOnInterface(anInterface);
+        if (ret) {
+            adapterName = strdup(anInterface->ifa_name);
+            break;
+        }
+
+        anInterface = anInterface->ifa_next;
+    }
+    freeifaddrs(listOfInterfaces);
+
+    return adapterName;
+}
+#endif
+
+#else /* *nix and Android */
 
 inline char *getPreferedAdapter()
 {
