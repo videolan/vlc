@@ -7,8 +7,6 @@ else
 IDL_INCLUDES = -I/`echo $(MSYSTEM) | tr A-Z a-z`/$(BUILD)/include
 endif
 
-DST_DXVAHD_H = $(PREFIX)/include/dxvahd.h
-
 ifdef HAVE_WIN32
 PKGS += dxvahd
 endif
@@ -18,9 +16,12 @@ endif
 $(TARBALLS)/dxvahd.idl: $(SRC)/dxvahd/dxvahd.idl
 	cp $< $@
 
-$(DST_DXVAHD_H): $(TARBALLS)/dxvahd.idl .sum-dxvahd
-	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -I$(PREFIX)/include $(IDL_INCLUDES) -h -o $@ $<
+dxvahd: $(TARBALLS)/dxvahd.idl .sum-dxvahd
+	mkdir -p $@
+	cp $(TARBALLS)/dxvahd.idl $@
 
-.dxvahd: $(DST_DXVAHD_H)
+.dxvahd: dxvahd
+	cd $< && $(WIDL) -DBOOL=WINBOOL -I$(PREFIX)/include $(IDL_INCLUDES) -h -o dxvahd.h dxvahd.idl
+	mkdir -p -- "$(PREFIX)/include/"
+	cd $< && cp dxvahd.h "$(PREFIX)/include/"
 	touch $@
