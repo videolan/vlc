@@ -15,6 +15,9 @@ PKGS += winrt_headers
 PKGS_ALL += winrt_headers
 endif
 endif
+ifeq ($(HAVE_MINGW64_V8),true)
+PKGS_FOUND += winrt_headers
+endif
 
 $(TARBALLS)/mingw-w64-$(WINPTHREADS_HASH).tar.xz:
 	$(call download_git,$(WINPTHREADS_GITURL),,$(WINPTHREADS_HASH))
