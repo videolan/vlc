@@ -156,17 +156,6 @@ NavigableFocusScope {
             animateFlickableContentY(newContentY)
     }
 
-
-    function _defineObjProperty( obj, prop, value )
-    {
-        Object.defineProperty(obj, prop, {
-            "enumerable": true,
-            "configurable": false,
-            "value": value,
-            "writable": true,
-        })
-    }
-
     function _updateSelected() {
         for (var id in _idChildrenMap) {
             var item = _idChildrenMap[id]
@@ -234,7 +223,7 @@ NavigableFocusScope {
             if (item === undefined)
                 throw "wrong toRecycle child " + id + ", len " + toUse.length
 
-            _defineObjProperty(item, "index", id)
+            item.index = id
             item.model = model.getDataAt(id)
 
             item.focus = (id === root.currentIndex) && (root.expandIndex === -1)
@@ -248,6 +237,7 @@ NavigableFocusScope {
             //instanciate a new item
 
             item = root.delegate.createObject( flickable.contentItem, {
+                            index: id,
                             model: model.getDataAt(id),
                             focus: (id === root.currentIndex) && (root.expandIndex === -1),
                             x: pos[0],
@@ -256,7 +246,6 @@ NavigableFocusScope {
                         });
             if (item === undefined)
                 throw "wrong unable to instantiate child " + id
-            _defineObjProperty(item, "index", id)
             _idChildrenMap[id] = item
         }
         return item
