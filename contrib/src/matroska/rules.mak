@@ -21,12 +21,7 @@ matroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 	$(call pkg_static,"libmatroska.pc.in")
 	$(MOVE)
 
-# O2 optimization due to iOS issue https://code.videolan.org/videolan/vlc-ios/issues/248
-ifdef HAVE_IOS
-MATROSKA_CXXFLAGS +=  -O2
-endif
-
 .matroska: matroska toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) CXXFLAGS="$(MATROSKA_CXXFLAGS)" $(CMAKE)
+	cd $< && $(HOSTVARS_PIC) $(CMAKE)
 	cd $< && $(MAKE) install
 	touch $@
