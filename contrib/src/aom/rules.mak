@@ -16,9 +16,9 @@ $(TARBALLS)/aom-$(AOM_VERSION).tar.gz:
 	touch $@
 
 aom: aom-$(AOM_VERSION).tar.gz .sum-aom
-	rm -Rf $@-$(AOM_VERSION) $@
-	mkdir -p $@-$(AOM_VERSION)
-	tar xvzfo "$<" -C $@-$(AOM_VERSION)
+	rm -Rf $(UNPACK_DIR) $@
+	mkdir -p $(UNPACK_DIR)
+	tar xvzfo "$<" -C $(UNPACK_DIR)
 	$(APPLY) $(SRC)/aom/aom-target-cpu.patch
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/aom/aom-android-pthreads.patch
