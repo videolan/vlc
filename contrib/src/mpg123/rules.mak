@@ -1,5 +1,5 @@
 # mpg123
-MPG123_VERSION := 1.26.0
+MPG123_VERSION := 1.26.2
 MPG123_URL := $(SF)/mpg123/mpg123/$(MPG123_VERSION)/mpg123-$(MPG123_VERSION).tar.bz2
 
 PKGS += mpg123
@@ -37,11 +37,6 @@ $(TARBALLS)/mpg123-$(MPG123_VERSION).tar.bz2:
 
 mpg123: mpg123-$(MPG123_VERSION).tar.bz2 .sum-mpg123
 	$(UNPACK)
-	$(APPLY) $(SRC)/mpg123/0001-configure-detect-WINDOWS_UWP-for-mingw-as-well.patch
-	$(APPLY) $(SRC)/mpg123/0002-configure-don-t-error-on-GetThreadErrorMode-if-we-re.patch
-ifdef HAVE_ANDROID
-	$(APPLY) $(SRC)/mpg123/0003-fix-lfs_alias_t-type-for-Android.patch
-endif
 	# remove generated file from the source package
 	cd $(UNPACK_DIR) && rm -rf src/libsyn123/syn123.h
 	$(APPLY) $(SRC)/mpg123/no-programs.patch
