@@ -239,9 +239,7 @@ $(TARBALLS)/ffmpeg-$(FFMPEG_VERSION).tar.xz:
 .sum-ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz
 
 ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
-	rm -Rf $@ $@-$(FFMPEG_VERSION)
-	mkdir -p $@-$(FFMPEG_VERSION)
-	tar xvJfo "$<" --strip-components=1 -C $@-$(FFMPEG_VERSION)
+	$(UNPACK)
 ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
 	$(APPLY) $(SRC)/ffmpeg/dxva_vc1_crash.patch
