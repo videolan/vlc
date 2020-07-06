@@ -44,6 +44,7 @@ Rectangle {
     property int leftPadding: 0
     property int rightPadding: 0
 
+    property VLCColors _colors: VLCStyle.colors
 
     // Should the cover be displayed
     //property alias showCover: cover.visible
@@ -63,7 +64,7 @@ Rectangle {
         anchors.top: parent.top
         antialiasing: true
         visible: dropVisible
-        color: VLCStyle.colors.accent
+        color: _colors.accent
     }
 
     MouseArea {
@@ -108,7 +109,7 @@ Rectangle {
         }
 
         Rectangle {
-            color: VLCStyle.colors.bg
+            color: _colors.bg
             anchors.fill: parent
             visible: model.isCurrent && !root.hovered && !model.selected
         }
@@ -131,7 +132,7 @@ Rectangle {
                     source: artwork
                     radius: 8
                     samples: 17
-                    color: VLCStyle.colors.glowColorBanner
+                    color: _colors.glowColorBanner
                     visible: artwork.visible
                     spread: 0.1
                 }
@@ -152,7 +153,7 @@ Rectangle {
                     height: VLCStyle.icon_normal
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
-                    color: VLCStyle.colors.accent
+                    color: _colors.accent
                     text: player.playingState === PlayerController.PLAYING_STATE_PLAYING ? VLCIcons.volume_high :
                                                     player.playingState === PlayerController.PLAYING_STATE_PAUSED ? VLCIcons.pause : ""
                 }
@@ -167,6 +168,7 @@ Rectangle {
 
                     font.weight: model.isCurrent ? Font.Bold : Font.Normal
                     text: model.title
+                    color: _colors.text
                 }
 
                 Widgets.ListSubtitleLabel {
@@ -174,6 +176,7 @@ Rectangle {
 
                     font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
                     text: (model.artist ? model.artist : i18n.qtr("Unknown Artist"))
+                    color: _colors.text
                 }
             }
 
@@ -184,6 +187,7 @@ Rectangle {
                 text: model.duration
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
+                color: _colors.text
 
                 TextMetrics {
                     id: durationMetric
