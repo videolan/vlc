@@ -10,6 +10,9 @@ endif
 ifdef HAVE_WIN32
 PKGS += dxvahd
 endif
+ifeq ($(HAVE_MINGW64_V8),true)
+PKGS_FOUND += dxvahd
+endif
 
 .sum-dxvahd: $(TARBALLS)/dxvahd.idl
 
