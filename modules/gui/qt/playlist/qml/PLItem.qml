@@ -201,11 +201,24 @@ Rectangle {
         DropArea {
             anchors { fill: parent }
             onEntered: {
+                var delta = drag.source.model.index - model.index
+                if(delta === 0 || delta === -1)
+                    return
+
                 dropVisible = true
-                return true
             }
-            onExited: dropVisible = false
+            onExited: {
+                var delta = drag.source.model.index - model.index
+                if(delta === 0 || delta === -1)
+                    return
+
+                dropVisible = false
+            }
             onDropped: {
+                var delta = drag.source.model.index - model.index
+                if(delta === 0 || delta === -1)
+                    return
+
                 root.dropedMovedAt(model.index, drop)
                 dropVisible = false
             }

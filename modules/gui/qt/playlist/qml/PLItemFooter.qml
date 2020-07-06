@@ -22,6 +22,8 @@ import "qrc:///style/"
 Item {
     id: foot
 
+    property int listCount
+
     signal dropURLAtEnd(var urlList)
     signal moveAtEnd()
 
@@ -42,11 +44,21 @@ Item {
     DropArea {
         anchors { fill: parent }
         onEntered: {
+            if(drag.source.model.index === foot.listCount - 1)
+                return
+
             foot._dropVisible = true
-            return true
         }
-        onExited: foot._dropVisible = false
+        onExited: {
+            if(drag.source.model.index === foot.listCount - 1)
+                return
+
+            foot._dropVisible = false
+        }
         onDropped: {
+            if(drag.source.model.index === foot.listCount - 1)
+                return
+
             if (drop.hasUrls) {
                 //force conversion to an actual list
                 var urlList = []
