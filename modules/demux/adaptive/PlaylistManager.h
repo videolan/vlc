@@ -77,6 +77,7 @@ namespace adaptive
             virtual bool    setPosition(vlc_tick_t);
             vlc_tick_t getResumeTime() const;
             vlc_tick_t getFirstDTS() const;
+            unsigned getActiveStreamsCount() const;
 
             virtual vlc_tick_t getFirstPlaybackTime() const;
             vlc_tick_t getCurrentDemuxTime() const;

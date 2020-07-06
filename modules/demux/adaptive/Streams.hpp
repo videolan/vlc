@@ -82,7 +82,7 @@ namespace adaptive
             buffering_ongoing,
             buffering_lessthanmin,
         } buffering_status;
-        buffering_status bufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t);
+        buffering_status bufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t, bool = false);
         buffering_status getLastBufferStatus() const;
         vlc_tick_t getDemuxedAmount() const;
         status dequeue(vlc_tick_t, vlc_tick_t *);
@@ -137,7 +137,7 @@ namespace adaptive
 
     private:
         void declaredCodecs();
-        buffering_status doBufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t);
+        buffering_status doBufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t, bool);
         buffering_status last_buffer_status;
         bool valid;
         bool disabled;

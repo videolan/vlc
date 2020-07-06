@@ -252,7 +252,10 @@ AbstractStream::buffering_status PlaylistManager::bufferize(vlc_tick_t i_nzdeadl
             /* initial */
         }
 
-        AbstractStream::buffering_status i_ret = st->bufferize(i_nzdeadline, i_min_buffering, i_extra_buffering);
+        AbstractStream::buffering_status i_ret = st->bufferize(i_nzdeadline,
+                                                               i_min_buffering,
+                                                               i_extra_buffering,
+                                                               getActiveStreamsCount() <= 1);
         if(i_return != AbstractStream::buffering_ongoing) /* Buffering streams need to keep going */
         {
             if(i_ret > i_return)
@@ -341,6 +344,18 @@ vlc_tick_t PlaylistManager::getFirstDTS() const
             mindts = std::min(mindts, dts);
     }
     return mindts;
+}
+
+unsigned PlaylistManager::getActiveStreamsCount() const
+{
+    unsigned count = 0;
+    std::vector<AbstractStream *>::const_iterator it;
+    for(it=streams.begin(); it!=streams.end(); ++it)
+    {
+        if((*it)->isValid() && !(*it)->isDisabled())
+            count++;
+    }
+    return count;
 }
 
 bool PlaylistManager::setPosition(vlc_tick_t time)
