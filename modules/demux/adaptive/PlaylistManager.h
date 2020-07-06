@@ -77,6 +77,7 @@ namespace adaptive
             virtual bool    setPosition(mtime_t);
             mtime_t getResumeTime() const;
             mtime_t getFirstDTS() const;
+            unsigned getActiveStreamsCount() const;
 
             virtual mtime_t getFirstPlaybackTime() const;
             mtime_t getCurrentDemuxTime() const;

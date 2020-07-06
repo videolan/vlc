@@ -304,14 +304,18 @@ mtime_t AbstractStream::getDemuxedAmount(mtime_t from) const
 }
 
 AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
-                                                           unsigned i_min_buffering, unsigned i_extra_buffering)
+                                                           mtime_t i_min_buffering,
+                                                           mtime_t i_extra_buffering,
+                                                           bool b_keep_alive)
 {
-    last_buffer_status = doBufferize(nz_deadline, i_min_buffering, i_extra_buffering);
+    last_buffer_status = doBufferize(nz_deadline, i_min_buffering, i_extra_buffering, b_keep_alive);
     return last_buffer_status;
 }
 
 AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline,
-                                                             mtime_t i_min_buffering, mtime_t i_extra_buffering)
+                                                             mtime_t i_min_buffering,
+                                                             mtime_t i_extra_buffering,
+                                                             bool b_keep_alive)
 {
     vlc_mutex_lock(&lock);
 
@@ -323,7 +327,7 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
     }
 
     /* Disable streams that are not selected (alternate streams) */
-    if(esCount() && !isSelected() && !fakeEsOut()->restarting())
+    if(esCount() && !isSelected() && !fakeEsOut()->restarting() && !b_keep_alive)
     {
         setDisabled(true);
         segmentTracker->reset();
