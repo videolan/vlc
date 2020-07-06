@@ -297,7 +297,7 @@ int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );
 /* Only for fonts implementors */
 vlc_family_t *SearchFallbacks( filter_t *p_filter, vlc_family_t *p_fallbacks,
                                       uni_char_t codepoint );
-FT_Face GetFace( filter_t *p_filter, vlc_font_t *p_font );
+FT_Face GetFace( filter_t *p_filter, vlc_font_t *p_font, uni_char_t codepoint );
 
 #ifdef __cplusplus
 }

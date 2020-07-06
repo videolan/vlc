@@ -136,17 +136,20 @@ done:
     return p_face;
 }
 
-FT_Face GetFace( filter_t *p_filter, vlc_font_t *p_font )
+FT_Face GetFace( filter_t *p_filter, vlc_font_t *p_font, uni_char_t codepoint )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_font->p_face )
+    if( !p_font->p_face )
+        p_font->p_face = LoadFace( p_filter, p_font->psz_fontfile,
+                                   p_font->i_index,
+                                   p_sys->p_default_style );
+
+    if( p_font->p_face &&
+        FT_Get_Char_Index( p_font->p_face, codepoint ) )
         return p_font->p_face;
-
-    p_font->p_face = LoadFace( p_filter, p_font->psz_fontfile, p_font->i_index,
-                               p_sys->p_default_style );
-
-    return p_font->p_face;
+    else
+        return NULL;
 }
 
 /**
@@ -169,12 +172,8 @@ static vlc_font_t *GetBestFont( filter_t *p_filter, const vlc_family_t *p_family
     {
         int i_score = 0;
 
-        if( codepoint )
-        {
-            FT_Face p_face = GetFace( p_filter, p_font );
-            if( p_face && FT_Get_Char_Index( p_face, codepoint ) )
-                i_score += 1000;
-        }
+        if( codepoint && GetFace( p_filter, p_font, codepoint ) )
+            i_score += 1000;
 
         if( !!p_font->b_bold == !!b_bold )
             i_score += 100;
@@ -209,9 +208,9 @@ vlc_family_t *SearchFallbacks( filter_t *p_filter, vlc_family_t *p_fallbacks,
             p_fallback->p_fonts = p_temp->p_fonts;
         }
 
-        FT_Face p_face = GetFace( p_filter, p_fallback->p_fonts );
-        if( !p_face || !FT_Get_Char_Index( p_face, codepoint ) )
+        if( !GetFace( p_filter, p_fallback->p_fonts, codepoint ) )
             continue;
+
         p_family = p_fallback;
         break;
     }
@@ -524,12 +523,9 @@ char* Generic_Select( filter_t *p_filter, const char* psz_family,
          * It usually has the best coverage.
          */
         const vlc_family_t *p_temp = p_sys->pf_get_family( p_filter, psz_family );
-        if( p_temp && p_temp->p_fonts )
-        {
-            FT_Face p_face = GetFace( p_filter, p_temp->p_fonts );
-            if( p_face && FT_Get_Char_Index( p_face, codepoint ) )
+        if( p_temp && p_temp->p_fonts &&
+            GetFace( p_filter, p_temp->p_fonts, codepoint ) )
                 p_family = p_temp;
-        }
 
         /* Try font attachments */
         if( !p_family )

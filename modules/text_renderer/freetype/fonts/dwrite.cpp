@@ -793,9 +793,7 @@ extern "C" vlc_family_t *DWrite_GetFallbacks( filter_t *p_filter, const char *ps
         if( !p_fallback || !p_fallback->p_fonts )
             goto done;
 
-        FT_Face p_face = GetFace( p_filter, p_fallback->p_fonts );
-
-        if( !p_face || !FT_Get_Char_Index( p_face, codepoint ) )
+        if( !GetFace( p_filter, p_fallback->p_fonts, codepoint ) )
             goto done;
 
         p_family = NewFamily( p_filter, psz_fallback, NULL, NULL, NULL );

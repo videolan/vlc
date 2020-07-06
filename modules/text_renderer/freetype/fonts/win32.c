@@ -552,9 +552,7 @@ vlc_family_t *Win32_GetFallbacks( filter_t *p_filter, const char *psz_family,
         if( !p_uniscribe || !p_uniscribe->p_fonts )
             goto done;
 
-        FT_Face p_face = GetFace( p_filter, p_uniscribe->p_fonts );
-
-        if( !p_face || !FT_Get_Char_Index( p_face, codepoint ) )
+        if( !GetFace( p_filter, p_uniscribe->p_fonts, codepoint ) );
             goto done;
 
         p_family = NewFamily( p_filter, psz_uniscribe, NULL, NULL, NULL );
