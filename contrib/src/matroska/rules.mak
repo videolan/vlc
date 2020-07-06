@@ -1,6 +1,6 @@
 # matroska
 
-MATROSKA_VERSION := 1.5.2
+MATROSKA_VERSION := 1.6.0
 MATROSKA_URL := http://dl.matroska.org/downloads/libmatroska/libmatroska-$(MATROSKA_VERSION).tar.xz
 
 PKGS += matroska
@@ -16,17 +16,17 @@ $(TARBALLS)/libmatroska-$(MATROSKA_VERSION).tar.xz:
 
 .sum-matroska: libmatroska-$(MATROSKA_VERSION).tar.xz
 
-libmatroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
+matroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 	$(UNPACK)
 	$(call pkg_static,"libmatroska.pc.in")
 	$(MOVE)
 
-MATROSKA_CXXFLAGS := $(CXXFLAGS) $(PIC) -fvisibility=hidden
+# O2 optimization due to iOS issue https://code.videolan.org/videolan/vlc-ios/issues/248
 ifdef HAVE_IOS
 MATROSKA_CXXFLAGS +=  -O2
 endif
 
-.matroska: libmatroska toolchain.cmake
+.matroska: matroska toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) CXXFLAGS="$(MATROSKA_CXXFLAGS)" $(CMAKE)
 	cd $< && $(MAKE) install
 	touch $@
