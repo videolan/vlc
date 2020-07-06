@@ -16,10 +16,7 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(UNPACK)
 	$(MOVE)
 
-# libebml requires exceptions
-EBML_CXXFLAGS := $(CXXFLAGS) $(PIC) -fexceptions
-
 .ebml: ebml toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) CXXFLAGS="$(EBML_CXXFLAGS)" $(CMAKE) -DENABLE_WIN32_IO=OFF
+	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DENABLE_WIN32_IO=OFF
 	cd $< && $(MAKE) install
 	touch $@
