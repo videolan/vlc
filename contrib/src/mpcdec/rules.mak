@@ -34,13 +34,12 @@ endif
 	sed -i.orig \
 		-e 's,^add_subdirectory(mpcgain),,g' \
 		-e 's,^add_subdirectory(mpcchap),,g' \
-		$@_src_r$(MUSE_REV)/CMakeLists.txt
+		$(UNPACK_DIR)/CMakeLists.txt
 ifdef HAVE_MACOSX
-	cd musepack_src_r$(MUSE_REV) && \
+	cd $(UNPACK_DIR) && \
 	sed -e 's%-O3 -Wall%-O3 -Wall $(CFLAGS)%' CMakeLists.txt
 endif
-	mv $@_src_r$(MUSE_REV) $@
-	touch $@
+	$(MOVE)
 
 .mpcdec: musepack toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DSHARED=OFF .
