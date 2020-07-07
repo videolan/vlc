@@ -163,9 +163,41 @@ void webvtt_FillStyleFromCssDeclaration( const vlc_css_declaration_t *p_decl, te
     }
     else if( !strcasecmp( p_decl->psz_property, "font-family" ) )
     {
+        vlc_css_term_t *term;
         if( term0.type >= TYPE_STRING )
         {
-            char *psz_font = NULL;
+            size_t i_total = 1 + (p_decl->expr->i_count - 1) * 2;
+            for( size_t i=0; i<p_decl->expr->i_count; i++ )
+            {
+                term = &p_decl->expr->seq[i].term;
+                if( term->type < TYPE_STRING )
+                    continue;
+                i_total += strlen( term->psz );
+                if( term->type == TYPE_STRING )
+                    i_total += 2;
+            }
+            char *psz = malloc( i_total );
+            if( psz )
+            {
+                *psz = 0;
+                for( size_t i=0; i<p_decl->expr->i_count; i++ )
+                {
+                    term = &p_decl->expr->seq[i].term;
+                    if( term->type < TYPE_STRING )
+                        continue;
+                    if( i > 0 )
+                        strcat( psz, ", " );
+                    i_total += strlen( term->psz );
+                    if( term->type == TYPE_STRING )
+                        strcat( psz, "\"" );
+                    strcat( psz, term->psz );
+                    if( term->type == TYPE_STRING )
+                        strcat( psz, "\"" );
+                }
+                free( p_style->psz_fontname );
+                p_style->psz_fontname = psz;
+            }
+            /*char *psz_font = NULL;
             const char *psz = strchr( term0.psz, ',' );
             if( psz )
                 psz_font = strndup( term0.psz, psz - term0.psz + 1 );
@@ -173,7 +205,7 @@ void webvtt_FillStyleFromCssDeclaration( const vlc_css_declaration_t *p_decl, te
                 psz_font = strdup( term0.psz );
             free( p_style->psz_fontname );
             p_style->psz_fontname = vlc_css_unquoted( psz_font );
-            free( psz_font );
+            free( psz_font );*/
         }
     }
     else if( !strcasecmp( p_decl->psz_property, "font-style" ) )
