@@ -83,14 +83,25 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
 
     struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
 
-    bool first_filter = vlc_list_is_empty(&filters->list);
-    if (first_filter)
+    struct vlc_gl_tex_size size_in;
+
+    struct vlc_gl_filter_priv *prev_filter =
+        vlc_list_last_entry_or_null(&filters->list, struct vlc_gl_filter_priv,
+                                    node);
+    if (!prev_filter)
+    {
+        size_in.width = filters->interop->fmt_out.i_visible_width;
+        size_in.height = filters->interop->fmt_out.i_visible_height;
         priv->sampler = vlc_gl_sampler_NewFromInterop(filters->interop);
+    }
     else
     {
+        size_in = prev_filter->size_out;
+
         video_format_t fmt;
         video_format_Init(&fmt, VLC_CODEC_RGBA);
-        // TODO set format width/height
+        fmt.i_width = fmt.i_visible_width = size_in.width;
+        fmt.i_height = fmt.i_visible_height = size_in.height;
 
         priv->sampler =
             vlc_gl_sampler_NewFromTexture2D(filters->gl, filters->api, &fmt);
@@ -102,8 +113,12 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
         return NULL;
     }
 
+    /* By default, the output size is the same as the input size. The filter
+     * may change it during its Open(). */
+    priv->size_out = size_in;
+
     int ret = vlc_gl_filter_LoadModule(filters->gl, name, filter, config,
-                                       priv->sampler);
+                                       &priv->size_out, priv->sampler);
     if (ret != VLC_SUCCESS)
     {
         /* Creation failed, do not call close() */

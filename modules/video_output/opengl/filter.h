@@ -26,9 +26,15 @@
 
 struct vlc_gl_filter;
 
+struct vlc_gl_tex_size {
+    unsigned width;
+    unsigned height;
+};
+
 typedef int
 vlc_gl_filter_open_fn(struct vlc_gl_filter *filter,
                       const config_chain_t *config,
+                      struct vlc_gl_tex_size *size_out,
                       struct vlc_gl_sampler *sampler);
 
 struct vlc_gl_filter_ops {
