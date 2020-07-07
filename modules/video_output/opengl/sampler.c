@@ -953,7 +953,11 @@ vlc_gl_sampler_New(struct vlc_gl_interop *interop)
     priv->gl = interop->gl;
     priv->vt = interop->vt;
 
-    sampler->fmt = &interop->fmt_out;
+    /* Formats with palette are not supported. This also allows to copy
+     * video_format_t without possibility of failure. */
+    assert(!sampler->fmt.p_palette);
+
+    sampler->fmt = interop->fmt_out;
 
     sampler->shader.extensions = NULL;
     sampler->shader.body = NULL;

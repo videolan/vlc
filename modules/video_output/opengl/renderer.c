@@ -208,7 +208,7 @@ BuildVertexShader(struct vlc_gl_filter *filter)
 
     if (renderer->dump_shaders)
         msg_Dbg(filter, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
-                (const char *) &renderer->sampler->fmt->i_chroma, code);
+                (const char *) &renderer->sampler->fmt.i_chroma, code);
     return code;
 }
 
@@ -238,8 +238,8 @@ BuildFragmentShader(struct vlc_gl_filter *filter)
 
     if (renderer->dump_shaders)
         msg_Dbg(filter, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
-                        (const char *) &sampler->fmt->i_chroma,
-                        sampler->fmt->space, code);
+                        (const char *) &sampler->fmt.i_chroma,
+                        sampler->fmt.space, code);
 
     return code;
 }
@@ -338,7 +338,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     (void) config;
 
     const opengl_vtable_t *vt = &filter->api->vt;
-    const video_format_t *fmt = sampler->fmt;
+    const video_format_t *fmt = &sampler->fmt;
 
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
@@ -439,7 +439,7 @@ vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,
         UpdateFOVy(renderer);
         UpdateZ(renderer);
     }
-    const video_format_t *fmt = renderer->sampler->fmt;
+    const video_format_t *fmt = &renderer->sampler->fmt;
     getViewpointMatrixes(renderer, fmt->projection_mode);
 
     return VLC_SUCCESS;
@@ -456,7 +456,7 @@ vlc_gl_renderer_SetWindowAspectRatio(struct vlc_gl_renderer *renderer,
     UpdateFOVy(renderer);
     UpdateZ(renderer);
 
-    const video_format_t *fmt = renderer->sampler->fmt;
+    const video_format_t *fmt = &renderer->sampler->fmt;
     getViewpointMatrixes(renderer, fmt->projection_mode);
 }
 
@@ -697,7 +697,7 @@ static int BuildRectangle(GLfloat **vertexCoord, GLfloat **textureCoord, unsigne
 static int SetupCoords(struct vlc_gl_renderer *renderer)
 {
     const opengl_vtable_t *vt = renderer->vt;
-    const video_format_t *fmt = renderer->sampler->fmt;
+    const video_format_t *fmt = &renderer->sampler->fmt;
 
     GLfloat *vertexCoord, *textureCoord;
     GLushort *indices;

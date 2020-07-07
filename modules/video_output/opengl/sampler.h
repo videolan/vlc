@@ -51,7 +51,7 @@
  */
 struct vlc_gl_sampler {
     /* Input format */
-    const video_format_t *fmt;
+    video_format_t fmt;
 
     struct {
         /**
