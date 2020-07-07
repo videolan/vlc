@@ -124,6 +124,12 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     GET_PROC_ADDR_OPTIONAL(BindFramebuffer);
     GET_PROC_ADDR_OPTIONAL(FramebufferTexture2D);
     GET_PROC_ADDR_OPTIONAL(CheckFramebufferStatus);
+    GET_PROC_ADDR_OPTIONAL(GenRenderbuffers);
+    GET_PROC_ADDR_OPTIONAL(DeleteRenderbuffers);
+    GET_PROC_ADDR_OPTIONAL(BindRenderbuffer);
+    GET_PROC_ADDR_OPTIONAL(RenderbufferStorageMultisample);
+    GET_PROC_ADDR_OPTIONAL(FramebufferRenderbuffer);
+    GET_PROC_ADDR_OPTIONAL(BlitFramebuffer);
 
     GET_PROC_ADDR_OPTIONAL(BufferSubData);
     GET_PROC_ADDR_OPTIONAL(BufferStorage);
