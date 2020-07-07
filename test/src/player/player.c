@@ -720,7 +720,6 @@ create_mock_media(const char *name, const struct media_params *params)
         params->can_seek, params->can_pause, params->error, params->null_names,
         params->config ? params->config : "");
     assert(ret != -1);
-printf("MOCK %s\n", url);
     input_item_t *item = input_item_New(url, name);
     assert(item);
     free(url);
