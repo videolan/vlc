@@ -45,6 +45,7 @@
 #import <vlc_vout_display.h>
 #import <vlc_opengl.h>
 #import <vlc_dialog.h>
+#import "opengl/filter_draw.h"
 #import "opengl/renderer.h"
 #import "opengl/vout_helper.h"
 
@@ -79,6 +80,7 @@ vlc_module_begin ()
     add_glopts()
 
     add_opengl_submodule_renderer()
+    add_opengl_submodule_draw()
 vlc_module_end ()
 
 @interface VLCOpenGLES2VideoView : UIView {

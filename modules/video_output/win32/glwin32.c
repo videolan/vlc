@@ -34,6 +34,7 @@
 #include <versionhelpers.h>
 
 #define GLEW_STATIC
+#include "../opengl/filter_draw.h"
 #include "../opengl/renderer.h"
 #include "../opengl/vout_helper.h"
 
@@ -56,6 +57,7 @@ vlc_module_begin()
     add_glopts()
 
     add_opengl_submodule_renderer()
+    add_opengl_submodule_draw()
 vlc_module_end()
 
 /*****************************************************************************
