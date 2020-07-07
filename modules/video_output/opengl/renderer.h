@@ -26,6 +26,7 @@
 #include <vlc_opengl.h>
 #include <vlc_plugin.h>
 
+#include "filter.h"
 #include "gl_api.h"
 #include "gl_common.h"
 #include "interop.h"
@@ -46,6 +47,9 @@ struct vlc_gl_renderer
     /* Set by the caller */
     const struct vlc_gl_api *api;
     const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
+
+    /* vlc_gl_renderer "extends" vlc_gl_filter */
+    struct vlc_gl_filter filter;
 
     /* True to dump shaders */
     bool dump_shaders;
@@ -107,14 +111,6 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
  */
 void
 vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer);
-
-/**
- * Draw the prepared picture
- *
- * \param sr the renderer
- */
-int
-vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer);
 
 int
 vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,

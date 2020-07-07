@@ -37,6 +37,7 @@
 #include <vlc_es.h>
 #include <vlc_picture.h>
 
+#include "filter.h"
 #include "gl_util.h"
 #include "internal.h"
 #include "vout_helper.h"
@@ -321,6 +322,9 @@ vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
 
 static int SetupCoords(struct vlc_gl_renderer *renderer);
 
+static int
+Draw(struct vlc_gl_filter *filter);
+
 struct vlc_gl_renderer *
 vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
                     struct vlc_gl_sampler *sampler)
@@ -331,6 +335,12 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
         return NULL;
+
+    static const struct vlc_gl_filter_ops filter_ops = {
+        .draw = Draw,
+    };
+    renderer->filter.ops = &filter_ops;
+    renderer->filter.sys = renderer;
 
     renderer->sampler = sampler;
 
@@ -731,9 +741,11 @@ static int SetupCoords(struct vlc_gl_renderer *renderer)
     return VLC_SUCCESS;
 }
 
-int
-vlc_gl_renderer_Draw(struct vlc_gl_renderer *renderer)
+static int
+Draw(struct vlc_gl_filter *filter)
 {
+    struct vlc_gl_renderer *renderer = filter->sys;
+
     const opengl_vtable_t *vt = renderer->vt;
 
     vt->Clear(GL_COLOR_BUFFER_BIT);
