@@ -162,12 +162,30 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
         return NULL;
     }
 
-    if (prev_filter)
+    /* A blend filter may not change its output size. */
+    assert(!filter->config.blend
+           || (priv->size_out.width == size_in.width
+            && priv->size_out.height == size_in.height));
+
+    if (filter->config.blend && !prev_filter)
     {
-        /* It was the last filter before we append this one */
+        /* We cannot blend with nothing, so insert a "draw" filter to draw the
+         * input picture to blend with. */
+        struct vlc_gl_filter *draw =
+            vlc_gl_filters_Append(filters, "draw", NULL);
+        if (!draw)
+        {
+            vlc_gl_filter_Delete(filter);
+            return NULL;
+        }
+    }
+    else if (!filter->config.blend && prev_filter)
+    {
+        /* It was the last non-blend filter before we append this one */
         assert(!prev_filter->has_framebuffer_out);
 
-        /* Every non-last filter needs its own framebuffer */
+        /* Every non-blend filter needs its own framebuffer, except the last
+         * one */
         ret = InitFramebufferOut(prev_filter);
         if (ret != VLC_SUCCESS)
         {
@@ -176,7 +194,18 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
         }
     }
 
-    vlc_list_append(&priv->node, &filters->list);
+    if (filter->config.blend)
+    {
+        /* Append as a subfilter of a non-blend filter */
+        struct vlc_gl_filter_priv *last_filter =
+            vlc_list_last_entry_or_null(&filters->list,
+                                        struct vlc_gl_filter_priv, node);
+        assert(last_filter);
+        vlc_list_append(&priv->node, &last_filter->blend_subfilters);
+    }
+    else
+        /* Append to the main filter list */
+        vlc_list_append(&priv->node, &filters->list);
 
     return filter;
 }
@@ -234,6 +263,20 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
         int ret = filter->ops->draw(filter);
         if (ret != VLC_SUCCESS)
             return ret;
+
+        /* Draw blend subfilters */
+        struct vlc_gl_filter_priv *subfilter_priv;
+        vlc_list_foreach(subfilter_priv, &priv->blend_subfilters, node)
+        {
+            /* Reset the draw buffer, in case it has been changed from a filter
+             * draw() callback */
+            vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
+
+            struct vlc_gl_filter *subfilter = &subfilter_priv->filter;
+            ret = subfilter->ops->draw(subfilter);
+            if (ret != VLC_SUCCESS)
+                return ret;
+        }
     }
 
     return VLC_SUCCESS;

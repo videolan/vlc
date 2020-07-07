@@ -58,6 +58,15 @@ struct vlc_gl_filter {
 
     const struct vlc_gl_api *api;
 
+    struct {
+        /**
+         * A blend filter draws over the input picture (without reading it).
+         *
+         * This flag must be set by the filter module (default is false).
+         */
+        bool blend;
+    } config;
+
     const struct vlc_gl_filter_ops *ops;
     void *sys;
 };

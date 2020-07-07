@@ -49,9 +49,12 @@ vlc_gl_filter_New(vlc_object_t *parent, const struct vlc_gl_api *api)
 
     struct vlc_gl_filter *filter = &priv->filter;
     filter->api = api;
+    filter->config.blend = false;
     filter->ops = NULL;
     filter->sys = NULL;
     filter->module = NULL;
+
+    vlc_list_init(&priv->blend_subfilters);
 
     return filter;
 }
@@ -97,6 +100,13 @@ vlc_gl_filter_Delete(struct vlc_gl_filter *filter)
         module_unneed(filter, filter->module);
 
     struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
+
+    struct vlc_gl_filter_priv *subfilter_priv;
+    vlc_list_foreach(subfilter_priv, &priv->blend_subfilters, node)
+    {
+        struct vlc_gl_filter *subfilter = &subfilter_priv->filter;
+        vlc_gl_filter_Delete(subfilter);
+    }
 
     if (priv->sampler)
         vlc_gl_sampler_Delete(priv->sampler);
