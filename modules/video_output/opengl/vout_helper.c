@@ -33,12 +33,14 @@
 #include <math.h>
 
 #include <vlc_common.h>
+#include <vlc_list.h>
 #include <vlc_subpicture.h>
 #include <vlc_opengl.h>
 #include <vlc_modules.h>
 #include <vlc_vout.h>
 #include <vlc_viewpoint.h>
 
+#include "filters.h"
 #include "gl_api.h"
 #include "gl_util.h"
 #include "vout_helper.h"
@@ -56,6 +58,8 @@ struct vout_display_opengl_t {
     struct vlc_gl_interop *interop;
     struct vlc_gl_sampler *sampler;
     struct vlc_gl_renderer *renderer;
+
+    struct vlc_gl_filters *filters;
 
     struct vlc_gl_interop *sub_interop;
     struct vlc_gl_sub_renderer *sub_renderer;
@@ -157,11 +161,24 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GL_ASSERT_NOERROR(vt);
 
+    vgl->filters = vlc_gl_filters_New();
+    if (!vgl->filters)
+    {
+        msg_Err(gl, "Could not create filters");
+        goto delete_renderer;
+    }
+
+    /* Retrieve the "super-class" (renderer "extends" filter) */
+    struct vlc_gl_filter *renderer_filter = vgl->renderer->filter;
+
+    /* The renderer is the only filter, for now */
+    vlc_gl_filters_Append(vgl->filters, renderer_filter);
+
     vgl->sub_interop = vlc_gl_interop_NewForSubpictures(gl, api);
     if (!vgl->sub_interop)
     {
         msg_Err(gl, "Could not create sub interop");
-        goto delete_renderer;
+        goto delete_filters;
     }
 
     vgl->sub_renderer =
@@ -193,6 +210,8 @@ delete_sub_renderer:
     vlc_gl_sub_renderer_Delete(vgl->sub_renderer);
 delete_sub_interop:
     vlc_gl_interop_Delete(vgl->sub_interop);
+delete_filters:
+    vlc_gl_filters_Delete(vgl->filters);
 delete_renderer:
     vlc_gl_renderer_Delete(vgl->renderer);
 delete_sampler:
@@ -218,6 +237,7 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vlc_gl_sub_renderer_Delete(vgl->sub_renderer);
     vlc_gl_interop_Delete(vgl->sub_interop);
 
+    vlc_gl_filters_Delete(vgl->filters);
     vlc_gl_renderer_Delete(vgl->renderer);
     vlc_gl_sampler_Delete(vgl->sampler);
     vlc_gl_interop_Delete(vgl->interop);
@@ -267,9 +287,7 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl)
        OpenGL providers can call vout_display_opengl_Display to force redraw.
        Currently, the OS X provider uses it to get a smooth window resizing */
 
-    /* Retrieve the "super-class" (renderer "extends" filter) */
-    struct vlc_gl_filter *renderer_filter = vgl->renderer->filter;
-    int ret = renderer_filter->ops->draw(renderer_filter);
+    int ret = vlc_gl_filters_Draw(vgl->filters);
     if (ret != VLC_SUCCESS)
         return ret;
 

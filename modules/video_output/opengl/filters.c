@@ -1,5 +1,5 @@
 /*****************************************************************************
- * filter_priv.h
+ * filters.c
  *****************************************************************************
  * Copyright (C) 2020 VLC authors and VideoLAN
  * Copyright (C) 2020 Videolabs
@@ -19,27 +19,57 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_GL_FILTER_PRIV_H
-#define VLC_GL_FILTER_PRIV_H
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include "filters.h"
 
 #include <vlc_common.h>
 #include <vlc_list.h>
 
-#include "filter.h"
+#include "filter_priv.h"
 
-struct vlc_gl_filter_priv {
-    struct vlc_gl_filter filter;
-
-    struct vlc_list node; /**< node of vlc_gl_filters.list */
+struct vlc_gl_filters {
+    struct vlc_list list; /**< list of vlc_gl_filter.node */
 };
 
-#define vlc_gl_filter_PRIV(filter) \
-    container_of(filter, struct vlc_gl_filter_priv, filter)
+struct vlc_gl_filters *
+vlc_gl_filters_New(void)
+{
+    struct vlc_gl_filters *filters = malloc(sizeof(*filters));
+    if (!filters)
+        return NULL;
 
-struct vlc_gl_filter *
-vlc_gl_filter_New(void);
+    vlc_list_init(&filters->list);
+    return filters;
+}
 
 void
-vlc_gl_filter_Delete(struct vlc_gl_filter *filter);
+vlc_gl_filters_Delete(struct vlc_gl_filters *filters)
+{
+    free(filters);
+}
 
-#endif
+void
+vlc_gl_filters_Append(struct vlc_gl_filters *filters,
+                      struct vlc_gl_filter *filter)
+{
+    struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
+    vlc_list_append(&priv->node, &filters->list);
+}
+
+int
+vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
+{
+    struct vlc_gl_filter_priv *priv;
+    vlc_list_foreach(priv, &filters->list, node)
+    {
+        struct vlc_gl_filter *filter = &priv->filter;
+        int ret = filter->ops->draw(filter);
+        if (ret != VLC_SUCCESS)
+            return ret;
+    }
+
+    return VLC_SUCCESS;
+}

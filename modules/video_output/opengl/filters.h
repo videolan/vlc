@@ -1,5 +1,5 @@
 /*****************************************************************************
- * filter_priv.h
+ * filters.h
  *****************************************************************************
  * Copyright (C) 2020 VLC authors and VideoLAN
  * Copyright (C) 2020 Videolabs
@@ -19,27 +19,47 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_GL_FILTER_PRIV_H
-#define VLC_GL_FILTER_PRIV_H
+#ifndef VLC_GL_FILTERS_H
+#define VLC_GL_FILTERS_H
 
 #include <vlc_common.h>
 #include <vlc_list.h>
 
 #include "filter.h"
 
-struct vlc_gl_filter_priv {
-    struct vlc_gl_filter filter;
+struct vlc_gl_filters;
 
-    struct vlc_list node; /**< node of vlc_gl_filters.list */
-};
+/**
+ * Create a new OpenGL filter chain
+ */
+struct vlc_gl_filters *
+vlc_gl_filters_New(void);
 
-#define vlc_gl_filter_PRIV(filter) \
-    container_of(filter, struct vlc_gl_filter_priv, filter)
-
-struct vlc_gl_filter *
-vlc_gl_filter_New(void);
-
+/**
+ * Delete the OpenGL filter chain
+ *
+ * \param filters the filter chain
+ */
 void
-vlc_gl_filter_Delete(struct vlc_gl_filter *filter);
+vlc_gl_filters_Delete(struct vlc_gl_filters *filters);
+
+/**
+ * Append a filter to the filter chain
+ *
+ * \param filters the filter chain
+ * \param filter the filter to append
+ */
+void
+vlc_gl_filters_Append(struct vlc_gl_filters *filters,
+                      struct vlc_gl_filter *filter);
+
+/**
+ * Draw by executing all the filters
+ *
+ * \param filters the filter chain
+ * \return VLC_SUCCESS on success, another value on error
+ */
+int
+vlc_gl_filters_Draw(struct vlc_gl_filters *filters);
 
 #endif
