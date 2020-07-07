@@ -37,7 +37,16 @@ struct vlc_gl_filter_priv {
     container_of(filter, struct vlc_gl_filter_priv, filter)
 
 struct vlc_gl_filter *
-vlc_gl_filter_New(void);
+vlc_gl_filter_New(vlc_object_t *parent, const struct vlc_gl_api *api);
+#define vlc_gl_filter_New(o, a) vlc_gl_filter_New(VLC_OBJECT(o), a)
+
+int
+vlc_gl_filter_LoadModule(vlc_object_t *parent, const char *name,
+                         struct vlc_gl_filter *filter,
+                         const config_chain_t *config,
+                         struct vlc_gl_sampler *sampler);
+#define vlc_gl_filter_LoadModule(o, a, b, c, d) \
+    vlc_gl_filter_LoadModule(VLC_OBJECT(o), a, b, c, d)
 
 void
 vlc_gl_filter_Delete(struct vlc_gl_filter *filter);

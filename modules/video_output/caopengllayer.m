@@ -40,6 +40,7 @@
 #import <OpenGL/OpenGL.h>
 #import <dlfcn.h>               /* dlsym */
 
+#include "opengl/renderer.h"
 #include "opengl/vout_helper.h"
 
 #define OSX_SIERRA_AND_HIGHER (NSAppKitVersionNumber >= 1485)
@@ -56,6 +57,8 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_callback_display(Open, 0)
+
+    add_opengl_submodule_renderer()
 vlc_module_end()
 
 static void PictureRender   (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,

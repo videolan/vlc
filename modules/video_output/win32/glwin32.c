@@ -34,6 +34,7 @@
 #include <versionhelpers.h>
 
 #define GLEW_STATIC
+#include "../opengl/renderer.h"
 #include "../opengl/vout_helper.h"
 
 #include "common.h"
@@ -53,6 +54,8 @@ vlc_module_begin()
     add_shortcut("glwin32", "opengl")
     set_callback_display(Open, 275)
     add_glopts()
+
+    add_opengl_submodule_renderer()
 vlc_module_end()
 
 /*****************************************************************************

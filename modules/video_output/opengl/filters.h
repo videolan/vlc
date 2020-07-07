@@ -24,16 +24,22 @@
 
 #include <vlc_common.h>
 #include <vlc_list.h>
+#include <vlc_opengl.h>
 
 #include "filter.h"
+#include "gl_api.h"
+#include "sampler.h"
 
 struct vlc_gl_filters;
 
 /**
  * Create a new OpenGL filter chain
+ *
+ * \param gl the OpenGL context
+ * \param api the OpenGL api
  */
 struct vlc_gl_filters *
-vlc_gl_filters_New(void);
+vlc_gl_filters_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api);
 
 /**
  * Delete the OpenGL filter chain
@@ -44,14 +50,20 @@ void
 vlc_gl_filters_Delete(struct vlc_gl_filters *filters);
 
 /**
- * Append a filter to the filter chain
+ * Create and append a filter loaded from a module to the filter chain
+ *
+ * The created filter is owned by the filter chain.
  *
  * \param filters the filter chain
- * \param filter the filter to append
+ * \param name the module name
+ * \param config the module configuration
+ * \param sampler the OpenGL sampler to use from the filter
+ * \return a weak reference to the filter (NULL on error)
  */
-void
-vlc_gl_filters_Append(struct vlc_gl_filters *filters,
-                      struct vlc_gl_filter *filter);
+struct vlc_gl_filter *
+vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
+                      const config_chain_t *config,
+                      struct vlc_gl_sampler *sampler);
 
 /**
  * Draw by executing all the filters

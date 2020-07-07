@@ -37,7 +37,7 @@
 #include <vlc_es.h>
 #include <vlc_picture.h>
 
-#include "filter_priv.h"
+#include "filter.h"
 #include "gl_util.h"
 #include "internal.h"
 #include "vout_helper.h"
@@ -182,8 +182,10 @@ InitStereoMatrix(GLfloat matrix_out[static 3*3],
 #endif
 
 static char *
-BuildVertexShader(const struct vlc_gl_renderer *renderer)
+BuildVertexShader(struct vlc_gl_filter *filter)
 {
+    struct vlc_gl_renderer *renderer = filter->sys;
+
     /* Basic vertex shader */
     static const char *template =
         SHADER_VERSION
@@ -205,14 +207,15 @@ BuildVertexShader(const struct vlc_gl_renderer *renderer)
         return NULL;
 
     if (renderer->dump_shaders)
-        msg_Dbg(renderer->gl, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
+        msg_Dbg(filter, "\n=== Vertex shader for fourcc: %4.4s ===\n%s\n",
                 (const char *) &renderer->sampler->fmt->i_chroma, code);
     return code;
 }
 
 static char *
-BuildFragmentShader(struct vlc_gl_renderer *renderer)
+BuildFragmentShader(struct vlc_gl_filter *filter)
 {
+    struct vlc_gl_renderer *renderer = filter->sys;
     struct vlc_gl_sampler *sampler = renderer->sampler;
 
     static const char *template =
@@ -234,24 +237,25 @@ BuildFragmentShader(struct vlc_gl_renderer *renderer)
         return NULL;
 
     if (renderer->dump_shaders)
-        msg_Dbg(renderer->gl, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
-                              (const char *) &sampler->fmt->i_chroma,
-                              sampler->fmt->space, code);
+        msg_Dbg(filter, "\n=== Fragment shader for fourcc: %4.4s, colorspace: %d ===\n%s\n",
+                        (const char *) &sampler->fmt->i_chroma,
+                        sampler->fmt->space, code);
 
     return code;
 }
 
 static int
-opengl_link_program(struct vlc_gl_renderer *renderer)
+opengl_link_program(struct vlc_gl_filter *filter)
 {
+    struct vlc_gl_renderer *renderer = filter->sys;
     struct vlc_gl_sampler *sampler = renderer->sampler;
     const opengl_vtable_t *vt = renderer->vt;
 
-    char *vertex_shader = BuildVertexShader(renderer);
+    char *vertex_shader = BuildVertexShader(filter);
     if (!vertex_shader)
         return VLC_EGENERIC;
 
-    char *fragment_shader = BuildFragmentShader(renderer);
+    char *fragment_shader = BuildFragmentShader(filter);
     if (!fragment_shader)
     {
         free(vertex_shader);
@@ -263,7 +267,7 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
            sampler->ops->load);
 
     GLuint program_id =
-        vlc_gl_BuildProgram(VLC_OBJECT(renderer->gl), vt,
+        vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
                             1, (const char **) &vertex_shader,
                             1, (const char **) &fragment_shader);
     free(vertex_shader);
@@ -276,7 +280,7 @@ opengl_link_program(struct vlc_gl_renderer *renderer)
     x = vt->Get##type##Location(program_id, str); \
     assert(x != -1); \
     if (x == -1) { \
-        msg_Err(renderer->gl, "Unable to Get"#type"Location(%s)", str); \
+        msg_Err(filter, "Unable to Get"#type"Location(%s)", str); \
         goto error; \
     } \
 } while (0)
@@ -305,12 +309,11 @@ error:
     return VLC_EGENERIC;
 }
 
-void
-vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
+static void
+Close(struct vlc_gl_filter *filter)
 {
+    struct vlc_gl_renderer *renderer = filter->sys;
     const opengl_vtable_t *vt = renderer->vt;
-
-    vlc_gl_filter_Delete(renderer->filter);
 
     vt->DeleteBuffers(1, &renderer->vertex_buffer_object);
     vt->DeleteBuffers(1, &renderer->index_buffer_object);
@@ -327,43 +330,38 @@ static int SetupCoords(struct vlc_gl_renderer *renderer);
 static int
 Draw(struct vlc_gl_filter *filter);
 
-struct vlc_gl_renderer *
-vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
-                    struct vlc_gl_sampler *sampler)
+int
+vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
+                     const config_chain_t *config,
+                     struct vlc_gl_sampler *sampler)
 {
-    const opengl_vtable_t *vt = &api->vt;
+    (void) config;
+
+    const opengl_vtable_t *vt = &filter->api->vt;
     const video_format_t *fmt = sampler->fmt;
 
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
-        return NULL;
-
-    struct vlc_gl_filter *filter = vlc_gl_filter_New();
-    if (!filter)
-    {
-        free(renderer);
-        return NULL;
-    }
+        return VLC_EGENERIC;
 
     static const struct vlc_gl_filter_ops filter_ops = {
         .draw = Draw,
+        .close = Close,
     };
     filter->ops = &filter_ops;
     filter->sys = renderer;
 
-    renderer->filter = filter;
     renderer->sampler = sampler;
 
-    renderer->gl = gl;
-    renderer->api = api;
+    renderer->api = filter->api;
     renderer->vt = vt;
-    renderer->dump_shaders = var_InheritInteger(gl, "verbose") >= 4;
+    renderer->dump_shaders = var_InheritInteger(filter, "verbose") >= 4;
 
-    int ret = opengl_link_program(renderer);
+    int ret = opengl_link_program(filter);
     if (ret != VLC_SUCCESS)
     {
-        vlc_gl_renderer_Delete(renderer);
-        return NULL;
+        free(renderer);
+        return ret;
     }
 
     InitStereoMatrix(renderer->var.StereoMatrix, fmt->multiview_mode);
@@ -384,11 +382,11 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     ret = SetupCoords(renderer);
     if (ret != VLC_SUCCESS)
     {
-        vlc_gl_renderer_Delete(renderer);
-        return NULL;
+        Close(filter);
+        return ret;
     }
 
-    return renderer;
+    return VLC_SUCCESS;
 }
 
 static void UpdateZ(struct vlc_gl_renderer *renderer)

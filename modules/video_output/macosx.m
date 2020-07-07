@@ -46,6 +46,7 @@
 #include <vlc_vout_display.h>
 #include <vlc_opengl.h>
 #include <vlc_dialog.h>
+#include "opengl/renderer.h"
 #include "opengl/vout_helper.h"
 
 /**
@@ -78,6 +79,8 @@ vlc_module_begin ()
     set_callback_display(Open, 300)
     add_shortcut ("macosx", "vout_macosx")
     add_glopts ()
+
+    add_opengl_submodule_renderer()
 vlc_module_end ()
 
 /**

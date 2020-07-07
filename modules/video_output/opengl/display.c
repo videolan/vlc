@@ -33,6 +33,8 @@
 #include <vlc_opengl.h>
 #include "vout_helper.h"
 
+#include "renderer.h"
+
 /* Plugin callbacks */
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context);
@@ -66,6 +68,8 @@ vlc_module_begin ()
     add_module("gl", "opengl", NULL, GL_TEXT, PROVIDER_LONGTEXT)
 #endif
     add_glopts ()
+
+    add_opengl_submodule_renderer()
 vlc_module_end ()
 
 struct vout_display_sys_t

@@ -57,7 +57,7 @@ struct vout_display_opengl_t {
 
     struct vlc_gl_interop *interop;
     struct vlc_gl_sampler *sampler;
-    struct vlc_gl_renderer *renderer;
+    struct vlc_gl_renderer *renderer; /**< weak reference */
 
     struct vlc_gl_filters *filters;
 
@@ -151,28 +151,26 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         goto delete_interop;
     }
 
-    vgl->renderer = vlc_gl_renderer_New(gl, api, vgl->sampler);
-    if (!vgl->renderer)
-    {
-        msg_Warn(gl, "Could not create renderer for %4.4s",
-                 (const char *) &fmt->i_chroma);
-        goto delete_sampler;
-    }
-
-    GL_ASSERT_NOERROR(vt);
-
-    vgl->filters = vlc_gl_filters_New();
+    vgl->filters = vlc_gl_filters_New(gl, api);
     if (!vgl->filters)
     {
         msg_Err(gl, "Could not create filters");
-        goto delete_renderer;
+        goto delete_sampler;
     }
 
-    /* Retrieve the "super-class" (renderer "extends" filter) */
-    struct vlc_gl_filter *renderer_filter = vgl->renderer->filter;
-
     /* The renderer is the only filter, for now */
-    vlc_gl_filters_Append(vgl->filters, renderer_filter);
+    struct vlc_gl_filter *renderer_filter =
+        vlc_gl_filters_Append(vgl->filters, "renderer", NULL, vgl->sampler);
+    if (!renderer_filter)
+    {
+        msg_Warn(gl, "Could not create renderer for %4.4s",
+                 (const char *) &fmt->i_chroma);
+        goto delete_filters;
+    }
+
+    /* The renderer is a special filter: we need its concrete instance to
+     * forward SetViewpoint() */
+    vgl->renderer = renderer_filter->sys;
 
     vgl->sub_interop = vlc_gl_interop_NewForSubpictures(gl, api);
     if (!vgl->sub_interop)
@@ -212,8 +210,6 @@ delete_sub_interop:
     vlc_gl_interop_Delete(vgl->sub_interop);
 delete_filters:
     vlc_gl_filters_Delete(vgl->filters);
-delete_renderer:
-    vlc_gl_renderer_Delete(vgl->renderer);
 delete_sampler:
     vlc_gl_sampler_Delete(vgl->sampler);
 delete_interop:
@@ -238,7 +234,6 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vlc_gl_interop_Delete(vgl->sub_interop);
 
     vlc_gl_filters_Delete(vgl->filters);
-    vlc_gl_renderer_Delete(vgl->renderer);
     vlc_gl_sampler_Delete(vgl->sampler);
     vlc_gl_interop_Delete(vgl->interop);
 

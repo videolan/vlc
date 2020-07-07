@@ -36,20 +36,21 @@ struct pl_context;
 struct pl_shader;
 struct pl_shader_res;
 
+#define add_opengl_submodule_renderer() \
+    add_submodule() \
+    add_shortcut("renderer") \
+    set_shortname("renderer") \
+    set_capability("opengl filter", 0) \
+    set_callback(vlc_gl_renderer_Open)
+
 /**
  * OpenGL picture renderer
  */
 struct vlc_gl_renderer
 {
-    /* Pointer to object gl, set by the caller */
-    vlc_gl_t *gl;
-
     /* Set by the caller */
     const struct vlc_gl_api *api;
     const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
-
-    /* vlc_gl_renderer "extends" vlc_gl_filter */
-    struct vlc_gl_filter *filter;
 
     /* True to dump shaders */
     bool dump_shaders;
@@ -93,24 +94,7 @@ struct vlc_gl_renderer
     float f_sar;
 };
 
-/**
- * Create a new renderer
- *
- * \param gl the GL context
- * \param api the OpenGL API
- * \param sampler the OpenGL sampler
- */
-struct vlc_gl_renderer *
-vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
-                    struct vlc_gl_sampler *sampler);
-
-/**
- * Delete a renderer
- *
- * \param renderer the renderer
- */
-void
-vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer);
+vlc_gl_filter_open_fn vlc_gl_renderer_Open;
 
 int
 vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,
