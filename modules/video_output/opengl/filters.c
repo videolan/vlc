@@ -73,6 +73,41 @@ vlc_gl_filters_Delete(struct vlc_gl_filters *filters)
     free(filters);
 }
 
+static int
+InitFramebufferOut(struct vlc_gl_filter_priv *priv)
+{
+    assert(priv->size_out.width > 0 && priv->size_out.height > 0);
+
+    const opengl_vtable_t *vt = &priv->filter.api->vt;
+
+    /* Create a texture having the expected size */
+    vt->GenTextures(1, &priv->texture_out);
+    vt->BindTexture(GL_TEXTURE_2D, priv->texture_out);
+    vt->TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, priv->size_out.width,
+                   priv->size_out.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    /* iOS needs GL_CLAMP_TO_EDGE or power-of-two textures */
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    /* Create a framebuffer and attach the texture */
+    vt->GenFramebuffers(1, &priv->framebuffer_out);
+    vt->BindFramebuffer(GL_FRAMEBUFFER, priv->framebuffer_out);
+    vt->FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                             GL_TEXTURE_2D, priv->texture_out, 0);
+
+    priv->has_framebuffer_out = true;
+
+    GLenum status = vt->CheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+        return VLC_EGENERIC;
+
+    vt->BindFramebuffer(GL_FRAMEBUFFER, 0);
+    return VLC_SUCCESS;
+}
+
 struct vlc_gl_filter *
 vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
                       const config_chain_t *config)
@@ -127,6 +162,20 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
         return NULL;
     }
 
+    if (prev_filter)
+    {
+        /* It was the last filter before we append this one */
+        assert(!prev_filter->has_framebuffer_out);
+
+        /* Every non-last filter needs its own framebuffer */
+        ret = InitFramebufferOut(prev_filter);
+        if (ret != VLC_SUCCESS)
+        {
+            vlc_gl_filter_Delete(filter);
+            return NULL;
+        }
+    }
+
     vlc_list_append(&priv->node, &filters->list);
 
     return filter;
@@ -150,9 +199,32 @@ vlc_gl_filters_UpdatePicture(struct vlc_gl_filters *filters,
 int
 vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
 {
+    const opengl_vtable_t *vt = &filters->api->vt;
+
     struct vlc_gl_filter_priv *priv;
     vlc_list_foreach(priv, &filters->list, node)
     {
+        struct vlc_gl_filter_priv *previous =
+            vlc_list_prev_entry_or_null(&filters->list, priv,
+                                        struct vlc_gl_filter_priv, node);
+        if (previous)
+        {
+            /* Read from the output of the previous filter */
+            int ret = vlc_gl_sampler_UpdateTexture(priv->sampler,
+                                                   previous->texture_out,
+                                                   previous->size_out.width,
+                                                   previous->size_out.height);
+            if (ret != VLC_SUCCESS)
+            {
+                msg_Err(filters->gl, "Could not update sampler texture");
+                return ret;
+            }
+        }
+
+        GLuint draw_fb = priv->has_framebuffer_out ? priv->framebuffer_out : 0;
+
+        vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
+
         struct vlc_gl_filter *filter = &priv->filter;
         int ret = filter->ops->draw(filter);
         if (ret != VLC_SUCCESS)

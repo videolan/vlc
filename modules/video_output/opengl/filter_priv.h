@@ -33,6 +33,10 @@ struct vlc_gl_filter_priv {
     struct vlc_gl_tex_size size_out;
     struct vlc_gl_sampler *sampler; /* owned */
 
+    bool has_framebuffer_out;
+    GLuint framebuffer_out; /* owned (this filter must delete it) */
+    GLuint texture_out; /* owned (attached to framebuffer_out) */
+
     struct vlc_list node; /**< node of vlc_gl_filters.list */
 };
 

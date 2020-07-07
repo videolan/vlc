@@ -30,6 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_modules.h>
 
+#include "gl_api.h"
 #include "sampler_priv.h"
 
 #undef vlc_gl_filter_New
@@ -43,6 +44,8 @@ vlc_gl_filter_New(vlc_object_t *parent, const struct vlc_gl_api *api)
     priv->sampler = NULL;
     priv->size_out.width = 0;
     priv->size_out.height = 0;
+
+    priv->has_framebuffer_out = false;
 
     struct vlc_gl_filter *filter = &priv->filter;
     filter->api = api;
@@ -94,8 +97,16 @@ vlc_gl_filter_Delete(struct vlc_gl_filter *filter)
         module_unneed(filter, filter->module);
 
     struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
+
     if (priv->sampler)
         vlc_gl_sampler_Delete(priv->sampler);
+
+    if (priv->has_framebuffer_out)
+    {
+        const opengl_vtable_t *vt = &filter->api->vt;
+        vt->DeleteFramebuffers(1, &priv->framebuffer_out);
+        vt->DeleteTextures(1, &priv->texture_out);
+    }
 
     vlc_object_delete(&filter->obj);
 }
