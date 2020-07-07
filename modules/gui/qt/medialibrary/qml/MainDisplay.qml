@@ -215,6 +215,7 @@ Widgets.NavigableFocusScope {
                         }
                         width: root.width / 4
                         visible: false
+                        focus: false
 
                         property bool expanded: mainInterface.playlistDocked && mainInterface.playlistVisible
 
@@ -252,15 +253,6 @@ Widgets.NavigableFocusScope {
                             }
                         }
 
-                        navigationParent: medialibId
-                        navigationLeftItem: stackView
-                        navigationUpItem: sourcesBanner
-                        navigationDownItem: miniPlayer.expanded ? miniPlayer : undefined
-                        navigationCancel: function() {
-                            mainInterface.playlistVisible = false
-                            stackView.forceActiveFocus()
-                        }
-
                         ColumnLayout {
                             anchors.fill: parent
                             spacing: 0
@@ -289,6 +281,15 @@ Widgets.NavigableFocusScope {
                                 focus: true
 
                                 rightPadding: VLCStyle.applicationHorizontalMargin
+
+                                navigationParent: medialibId
+                                navigationLeftItem: stackView
+                                navigationUpItem: sourcesBanner
+                                navigationDownItem: miniPlayer.expanded ? miniPlayer : undefined
+                                navigationCancel: function() {
+                                    mainInterface.playlistVisible = false
+                                    stackView.forceActiveFocus()
+                                }
 
                                 Item
                                 {
