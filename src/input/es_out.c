@@ -112,7 +112,6 @@ struct es_out_id_t
 
     /* */
     bool b_scrambled;
-    bool b_forced; /* if true, bypass variables when selecting this track */
 
     /* Channel in the track type */
     int         i_channel;
@@ -2048,7 +2047,6 @@ static es_out_id_t *EsOutAddLocked( es_out_t *out, input_source_t *source,
     es_format_Init( &es->fmt_out, UNKNOWN_ES, 0 );
 
     es->b_scrambled = false;
-    es->b_forced = false;
     es->b_terminated = false;
 
     switch( es->fmt.i_cat )
@@ -2270,7 +2268,7 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es, bool b_force )
         const bool b_sout = input_priv(p_input)->p_sout != NULL;
         /* If b_forced, the ES is specifically requested by the user, so bypass
          * the following vars check. */
-        if( !es->b_forced )
+        if( !b_force )
         {
             if( es->fmt.i_cat == VIDEO_ES || es->fmt.i_cat == SPU_ES )
             {
