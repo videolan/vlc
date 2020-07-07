@@ -49,7 +49,7 @@ struct vlc_gl_renderer
     const opengl_vtable_t *vt; /* for convenience, same as &api->vt */
 
     /* vlc_gl_renderer "extends" vlc_gl_filter */
-    struct vlc_gl_filter filter;
+    struct vlc_gl_filter *filter;
 
     /* True to dump shaders */
     bool dump_shaders;

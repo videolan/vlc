@@ -37,7 +37,7 @@
 #include <vlc_es.h>
 #include <vlc_picture.h>
 
-#include "filter.h"
+#include "filter_priv.h"
 #include "gl_util.h"
 #include "internal.h"
 #include "vout_helper.h"
@@ -310,6 +310,8 @@ vlc_gl_renderer_Delete(struct vlc_gl_renderer *renderer)
 {
     const opengl_vtable_t *vt = renderer->vt;
 
+    vlc_gl_filter_Delete(renderer->filter);
+
     vt->DeleteBuffers(1, &renderer->vertex_buffer_object);
     vt->DeleteBuffers(1, &renderer->index_buffer_object);
     vt->DeleteBuffers(1, &renderer->texture_buffer_object);
@@ -336,12 +338,20 @@ vlc_gl_renderer_New(vlc_gl_t *gl, const struct vlc_gl_api *api,
     if (!renderer)
         return NULL;
 
+    struct vlc_gl_filter *filter = vlc_gl_filter_New();
+    if (!filter)
+    {
+        free(renderer);
+        return NULL;
+    }
+
     static const struct vlc_gl_filter_ops filter_ops = {
         .draw = Draw,
     };
-    renderer->filter.ops = &filter_ops;
-    renderer->filter.sys = renderer;
+    filter->ops = &filter_ops;
+    filter->sys = renderer;
 
+    renderer->filter = filter;
     renderer->sampler = sampler;
 
     renderer->gl = gl;
