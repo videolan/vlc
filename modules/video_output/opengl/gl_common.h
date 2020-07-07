@@ -51,6 +51,14 @@
 
 #define VLCGL_PICTURE_MAX 128
 
+#if !defined(GL_MAJOR_VERSION)
+# define GL_MAJOR_VERSION 0x821B
+#endif
+
+#if !defined(GL_MINOR_VERSION)
+# define GL_MINOR_VERSION 0x821C
+#endif
+
 #ifndef GL_TEXTURE_RECTANGLE
 # define GL_TEXTURE_RECTANGLE 0x84F5
 #endif

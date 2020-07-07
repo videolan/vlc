@@ -86,6 +86,18 @@ struct vlc_gl_filter {
          * This flag must be set by the filter module (default is false).
          */
         bool blend;
+
+        /**
+         * Request MSAA level.
+         *
+         * This value must be set by the filter module (default is 0, which
+         * means disabled).
+         *
+         * The actual MSAA level may be overwritten to 0 if multisampling is
+         * not supported, or to a higher value if another filter rendering on
+         * the same framebuffer requested a higher MSAA level.
+         */
+        unsigned msaa_level;
     } config;
 
     const struct vlc_gl_filter_ops *ops;

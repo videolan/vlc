@@ -50,6 +50,7 @@ vlc_gl_filter_New(vlc_object_t *parent, const struct vlc_gl_api *api)
     struct vlc_gl_filter *filter = &priv->filter;
     filter->api = api;
     filter->config.blend = false;
+    filter->config.msaa_level = 0;
     filter->ops = NULL;
     filter->sys = NULL;
     filter->module = NULL;
@@ -109,11 +110,18 @@ vlc_gl_filter_Delete(struct vlc_gl_filter *filter)
     if (priv->sampler)
         vlc_gl_sampler_Delete(priv->sampler);
 
+    const opengl_vtable_t *vt = &filter->api->vt;
+
     if (priv->has_framebuffer_out)
     {
-        const opengl_vtable_t *vt = &filter->api->vt;
         vt->DeleteFramebuffers(1, &priv->framebuffer_out);
         vt->DeleteTextures(1, &priv->texture_out);
+    }
+
+    if (filter->config.msaa_level)
+    {
+        vt->DeleteFramebuffers(1, &priv->framebuffer_msaa);
+        vt->DeleteRenderbuffers(1, &priv->renderbuffer_msaa);
     }
 
     vlc_object_delete(&filter->obj);
