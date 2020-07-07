@@ -201,6 +201,10 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
 {
     const opengl_vtable_t *vt = &filters->api->vt;
 
+    GLint value;
+    vt->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &value);
+    GLuint draw_framebuffer = value; /* as GLuint */
+
     struct vlc_gl_filter_priv *priv;
     vlc_list_foreach(priv, &filters->list, node)
     {
@@ -221,7 +225,8 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
             }
         }
 
-        GLuint draw_fb = priv->has_framebuffer_out ? priv->framebuffer_out : 0;
+        GLuint draw_fb = priv->has_framebuffer_out ? priv->framebuffer_out
+                                                   : draw_framebuffer;
 
         vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
 
