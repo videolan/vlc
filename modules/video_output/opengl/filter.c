@@ -67,9 +67,8 @@ ActivateGLFilter(void *func, bool forced, va_list args)
     struct vlc_gl_filter *filter = va_arg(args, struct vlc_gl_filter *);
     const config_chain_t *config = va_arg(args, config_chain_t *);
     struct vlc_gl_tex_size *size_out = va_arg(args, struct vlc_gl_tex_size *);
-    struct vlc_gl_sampler *sampler = va_arg(args, struct vlc_gl_sampler *);
 
-    return activate(filter, config, size_out, sampler);
+    return activate(filter, config, size_out);
 }
 
 #undef vlc_gl_filter_LoadModule
@@ -77,12 +76,11 @@ int
 vlc_gl_filter_LoadModule(vlc_object_t *parent, const char *name,
                          struct vlc_gl_filter *filter,
                          const config_chain_t *config,
-                         struct vlc_gl_tex_size *size_out,
-                         struct vlc_gl_sampler *sampler)
+                         struct vlc_gl_tex_size *size_out)
 {
     filter->module = vlc_module_load(parent, "opengl filter", name, true,
-                                     ActivateGLFilter, filter, config, size_out,
-                                     sampler);
+                                     ActivateGLFilter, filter, config,
+                                     size_out);
     if (!filter->module)
         return VLC_EGENERIC;
 

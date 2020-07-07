@@ -108,6 +108,36 @@ InitFramebufferOut(struct vlc_gl_filter_priv *priv)
     return VLC_SUCCESS;
 }
 
+static struct vlc_gl_sampler *
+GetSampler(struct vlc_gl_filter *filter)
+{
+    struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
+    if (priv->sampler)
+        /* already initialized */
+        return priv->sampler;
+
+    struct vlc_gl_filters *filters = priv->filters;
+    struct vlc_gl_filter_priv *prev_filter = priv->prev_filter;
+
+    struct vlc_gl_sampler *sampler;
+    if (!priv->prev_filter)
+        sampler = vlc_gl_sampler_NewFromInterop(filters->interop);
+    else
+    {
+        video_format_t fmt;
+        video_format_Init(&fmt, VLC_CODEC_RGBA);
+        fmt.i_width = fmt.i_visible_width = prev_filter->size_out.width;
+        fmt.i_height = fmt.i_visible_height = prev_filter->size_out.height;
+
+        sampler =
+            vlc_gl_sampler_NewFromTexture2D(filters->gl, filters->api, &fmt);
+    }
+
+    priv->sampler = sampler;
+
+    return sampler;
+}
+
 struct vlc_gl_filter *
 vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
                       const config_chain_t *config)
@@ -127,33 +157,26 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     {
         size_in.width = filters->interop->fmt_out.i_visible_width;
         size_in.height = filters->interop->fmt_out.i_visible_height;
-        priv->sampler = vlc_gl_sampler_NewFromInterop(filters->interop);
     }
     else
     {
         size_in = prev_filter->size_out;
-
-        video_format_t fmt;
-        video_format_Init(&fmt, VLC_CODEC_RGBA);
-        fmt.i_width = fmt.i_visible_width = size_in.width;
-        fmt.i_height = fmt.i_visible_height = size_in.height;
-
-        priv->sampler =
-            vlc_gl_sampler_NewFromTexture2D(filters->gl, filters->api, &fmt);
     }
 
-    if (!priv->sampler)
-    {
-        vlc_gl_filter_Delete(filter);
-        return NULL;
-    }
+    priv->filters = filters;
+    priv->prev_filter = prev_filter;
+
+    static const struct vlc_gl_filter_owner_ops owner_ops = {
+        .get_sampler = GetSampler,
+    };
+    filter->owner_ops = &owner_ops;
 
     /* By default, the output size is the same as the input size. The filter
      * may change it during its Open(). */
     priv->size_out = size_in;
 
     int ret = vlc_gl_filter_LoadModule(filters->gl, name, filter, config,
-                                       &priv->size_out, priv->sampler);
+                                       &priv->size_out);
     if (ret != VLC_SUCCESS)
     {
         /* Creation failed, do not call close() */
@@ -166,6 +189,15 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     assert(!filter->config.blend
            || (priv->size_out.width == size_in.width
             && priv->size_out.height == size_in.height));
+
+    /* A blend filter may not read its input, so it is an error if a sampler
+     * has been requested.
+     *
+     * We assert it here instead of in vlc_gl_filter_GetSampler() because the
+     * filter implementation may set the "blend" flag after it get the sampler
+     * in its Open() function.
+     */
+    assert(!filter->config.blend || !priv->sampler);
 
     if (filter->config.blend && !prev_filter)
     {
@@ -204,8 +236,18 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
         vlc_list_append(&priv->node, &last_filter->blend_subfilters);
     }
     else
+    {
+        /* Make sure the sampler of non-blend filters is initialized */
+        struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
+        if (!sampler)
+        {
+            vlc_gl_filter_Delete(filter);
+            return NULL;
+        }
+
         /* Append to the main filter list */
         vlc_list_append(&priv->node, &filters->list);
+    }
 
     return filter;
 }
