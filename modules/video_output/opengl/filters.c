@@ -215,35 +215,21 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
      */
     assert(!filter->config.blend || !priv->sampler);
 
-    if (filter->config.blend && !prev_filter)
-    {
-        /* We cannot blend with nothing, so insert a "draw" filter to draw the
-         * input picture to blend with. */
-        struct vlc_gl_filter *draw =
-            vlc_gl_filters_Append(filters, "draw", NULL);
-        if (!draw)
-        {
-            vlc_gl_filter_Delete(filter);
-            return NULL;
-        }
-    }
-    else if (!filter->config.blend && prev_filter)
-    {
-        /* It was the last non-blend filter before we append this one */
-        assert(!prev_filter->has_framebuffer_out);
-
-        /* Every non-blend filter needs its own framebuffer, except the last
-         * one */
-        ret = InitFramebufferOut(prev_filter);
-        if (ret != VLC_SUCCESS)
-        {
-            vlc_gl_filter_Delete(filter);
-            return NULL;
-        }
-    }
-
     if (filter->config.blend)
     {
+        if (!prev_filter)
+        {
+            /* We cannot blend with nothing, so insert a "draw" filter to draw
+             * the input picture to blend with. */
+            struct vlc_gl_filter *draw =
+                vlc_gl_filters_Append(filters, "draw", NULL);
+            if (!draw)
+            {
+                vlc_gl_filter_Delete(filter);
+                return NULL;
+            }
+        }
+
         /* Append as a subfilter of a non-blend filter */
         struct vlc_gl_filter_priv *last_filter =
             vlc_list_last_entry_or_null(&filters->list,
@@ -266,6 +252,29 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     }
 
     return filter;
+}
+
+int
+vlc_gl_filters_InitFramebuffers(struct vlc_gl_filters *filters)
+{
+    struct vlc_gl_filter_priv *priv;
+    vlc_list_foreach(priv, &filters->list, node)
+    {
+        bool is_last = vlc_list_is_last(&priv->node, &filters->list);
+        if (!is_last)
+        {
+            /* It was the last non-blend filter before we append this one */
+            assert(!priv->has_framebuffer_out);
+
+            /* Every non-blend filter needs its own framebuffer, except the last
+             * one */
+            int ret = InitFramebufferOut(priv);
+            if (ret != VLC_SUCCESS)
+                return ret;
+        }
+    }
+
+    return VLC_SUCCESS;
 }
 
 int

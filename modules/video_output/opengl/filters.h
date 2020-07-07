@@ -68,6 +68,18 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
                       const config_chain_t *config);
 
 /**
+ * Init the framebuffers for the appended filters.
+ *
+ * This function must be called once after all filters have been appended. It
+ * is an error to call vlc_gl_filters_Append() after this function.
+ *
+ * \param filters the filter chain
+ * \return VLC_SUCCESS on success, another value on error
+ */
+int
+vlc_gl_filters_InitFramebuffers(struct vlc_gl_filters *filters);
+
+/**
  * Update the input picture to pass to the first filter
  *
  * \param filters the filter chain
