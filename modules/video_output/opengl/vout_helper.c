@@ -56,7 +56,6 @@ struct vout_display_opengl_t {
     struct vlc_gl_api api;
 
     struct vlc_gl_interop *interop;
-    struct vlc_gl_sampler *sampler;
     struct vlc_gl_renderer *renderer; /**< weak reference */
 
     struct vlc_gl_filters *filters;
@@ -144,23 +143,16 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         goto free_vgl;
     }
 
-    vgl->sampler = vlc_gl_sampler_NewFromInterop(vgl->interop);
-    if (!vgl->sampler)
-    {
-        msg_Err(gl, "Could not create sampler");
-        goto delete_interop;
-    }
-
-    vgl->filters = vlc_gl_filters_New(gl, api);
+    vgl->filters = vlc_gl_filters_New(gl, api, vgl->interop);
     if (!vgl->filters)
     {
         msg_Err(gl, "Could not create filters");
-        goto delete_sampler;
+        goto delete_interop;
     }
 
     /* The renderer is the only filter, for now */
     struct vlc_gl_filter *renderer_filter =
-        vlc_gl_filters_Append(vgl->filters, "renderer", NULL, vgl->sampler);
+        vlc_gl_filters_Append(vgl->filters, "renderer", NULL);
     if (!renderer_filter)
     {
         msg_Warn(gl, "Could not create renderer for %4.4s",
@@ -210,8 +202,6 @@ delete_sub_interop:
     vlc_gl_interop_Delete(vgl->sub_interop);
 delete_filters:
     vlc_gl_filters_Delete(vgl->filters);
-delete_sampler:
-    vlc_gl_sampler_Delete(vgl->sampler);
 delete_interop:
     vlc_gl_interop_Delete(vgl->interop);
 free_vgl:
@@ -234,7 +224,6 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     vlc_gl_interop_Delete(vgl->sub_interop);
 
     vlc_gl_filters_Delete(vgl->filters);
-    vlc_gl_sampler_Delete(vgl->sampler);
     vlc_gl_interop_Delete(vgl->interop);
 
     GL_ASSERT_NOERROR(vt);
@@ -266,7 +255,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 {
     GL_ASSERT_NOERROR(&vgl->api.vt);
 
-    int ret = vlc_gl_sampler_UpdatePicture(vgl->sampler, picture);
+    int ret = vlc_gl_filters_UpdatePicture(vgl->filters, picture);
     if (ret != VLC_SUCCESS)
         return ret;
 

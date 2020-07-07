@@ -28,6 +28,7 @@
 
 #include "filter.h"
 #include "gl_api.h"
+#include "interop.h"
 #include "sampler.h"
 
 struct vlc_gl_filters;
@@ -37,9 +38,11 @@ struct vlc_gl_filters;
  *
  * \param gl the OpenGL context
  * \param api the OpenGL api
+ * \param interop the interop to use for the sampler of the first filter
  */
 struct vlc_gl_filters *
-vlc_gl_filters_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api);
+vlc_gl_filters_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
+                   struct vlc_gl_interop *interop);
 
 /**
  * Delete the OpenGL filter chain
@@ -57,13 +60,22 @@ vlc_gl_filters_Delete(struct vlc_gl_filters *filters);
  * \param filters the filter chain
  * \param name the module name
  * \param config the module configuration
- * \param sampler the OpenGL sampler to use from the filter
  * \return a weak reference to the filter (NULL on error)
  */
 struct vlc_gl_filter *
 vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
-                      const config_chain_t *config,
-                      struct vlc_gl_sampler *sampler);
+                      const config_chain_t *config);
+
+/**
+ * Update the input picture to pass to the first filter
+ *
+ * \param filters the filter chain
+ * \param picture the new input picture
+ * \return VLC_SUCCESS on success, another value on error
+ */
+int
+vlc_gl_filters_UpdatePicture(struct vlc_gl_filters *filters,
+                             picture_t *picture);
 
 /**
  * Draw by executing all the filters

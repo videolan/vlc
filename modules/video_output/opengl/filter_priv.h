@@ -26,9 +26,11 @@
 #include <vlc_list.h>
 
 #include "filter.h"
+#include "sampler.h"
 
 struct vlc_gl_filter_priv {
     struct vlc_gl_filter filter;
+    struct vlc_gl_sampler *sampler; /* owned */
 
     struct vlc_list node; /**< node of vlc_gl_filters.list */
 };
