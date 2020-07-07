@@ -23,17 +23,36 @@
 
 #include <vlc_common.h>
 
+#include "gl_api.h"
 #include "sampler.h"
 
 struct vlc_gl_interop;
 
 /**
- * Create a new sampler
+ * Create a new sampler from an interop
+ *
+ * It receives input pictures from `picture_t`, and uses the interop to
+ * uploaded them to OpenGL textures.
  *
  * \param interop the interop
  */
 struct vlc_gl_sampler *
-vlc_gl_sampler_New(struct vlc_gl_interop *interop);
+vlc_gl_sampler_NewFromInterop(struct vlc_gl_interop *interop);
+
+/**
+ * Create a new direct sampler
+ *
+ * It receives input textures directly (typically the output of a previous
+ * filter), with target GL_TEXTURE_2D.
+ *
+ * \param gl the OpenGL context
+ * \param api the OpenGL API
+ * \param fmt the input format
+ */
+struct vlc_gl_sampler *
+vlc_gl_sampler_NewFromTexture2D(struct vlc_gl_t *gl,
+                                const struct vlc_gl_api *api,
+                                const video_format_t *fmt);
 
 /**
  * Delete a sampler
@@ -48,10 +67,27 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler);
  *
  * This changes the current input picture, available from the fragment shader.
  *
+ * Warning: only call on sampler created by vlc_gl_sampler_NewFromInterop().
+ *
  * \param sampler the sampler
  * \param picture the new picture
  */
 int
-vlc_gl_sampler_Update(struct vlc_gl_sampler *sampler, picture_t *picture);
+vlc_gl_sampler_UpdatePicture(struct vlc_gl_sampler *sampler,
+                             picture_t *picture);
+
+/**
+ * Update the input texture
+ *
+ * Warning: only call on sampler created by vlc_gl_sampler_NewFromTexture2D().
+ *
+ * \param sampler the sampler
+ * \param texture the new texture, with target GL_TEXTURE_2D
+ * \param tex_width the texture width
+ * \param tex_height the texture height
+ */
+int
+vlc_gl_sampler_UpdateTexture(struct vlc_gl_sampler *sampler, GLuint texture,
+                             GLsizei tex_width, GLsizei tex_height);
 
 #endif

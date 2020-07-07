@@ -144,7 +144,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         goto free_vgl;
     }
 
-    vgl->sampler = vlc_gl_sampler_New(vgl->interop);
+    vgl->sampler = vlc_gl_sampler_NewFromInterop(vgl->interop);
     if (!vgl->sampler)
     {
         msg_Err(gl, "Could not create sampler");
@@ -266,7 +266,7 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 {
     GL_ASSERT_NOERROR(&vgl->api.vt);
 
-    int ret = vlc_gl_sampler_Update(vgl->sampler, picture);
+    int ret = vlc_gl_sampler_UpdatePicture(vgl->sampler, picture);
     if (ret != VLC_SUCCESS)
         return ret;
 
