@@ -497,15 +497,42 @@ Widgets.NavigableFocusScope {
                     }
                 }
 
-                Label {
-                    anchors.fill: parent
+                Column {
+                    anchors.centerIn: parent
                     visible: plmodel.count === 0
-                    font.pixelSize: VLCStyle.fontHeight_xxlarge
-                    color: view.activeFocus ? _colors.accent : _colors.text
-                    text: i18n.qtr("playlist\nis\nempty")
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    padding: VLCStyle.margin_small
+
+                    Widgets.IconLabel {
+                        font.pixelSize: VLCStyle.dp(48)
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        text: VLCIcons.playlist
+                        color: view.activeFocus ? _colors.accent : _colors.text
+                        opacity: 0.3
+                    }
+
+                    // ToDo: Use TitleLabel
+                    Label {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.topMargin: VLCStyle.margin_xlarge
+                        text: i18n.qtr("No content yet")
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pixelSize: VLCStyle.fontSize_xxlarge
+                        color: view.activeFocus ? _colors.accent : _colors.text
+                        opacity: 0.4
+                    }
+
+                    // ToDo: Use BodyLabel
+                    Label {
+                        anchors.topMargin: VLCStyle.margin_normal
+                        text: i18n.qtr("Drag & Drop some content here!")
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pixelSize: VLCStyle.fontSize_large
+                        color: view.activeFocus ? _colors.accent : _colors.text
+                        opacity: 0.4
+                    }
                 }
             }
 
