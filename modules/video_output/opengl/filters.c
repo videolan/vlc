@@ -32,6 +32,86 @@
 #include "renderer.h"
 #include "sampler_priv.h"
 
+/* The filter chain contains the sequential list of filters.
+ *
+ * There are two types of filters:
+ *  - blend filters just draw over the provided framebuffer (containing the
+ *    result of the previous filter), without reading the input picture.
+ *  - non-blend filters read their input picture and draw whatever they want to
+ *    their own output framebuffer.
+ *
+ * For convenience, the filter chain does not store the filters as a single
+ * sequential list, but as a list of non-blend filters, each containing the
+ * list of their associated blend filters.
+ *
+ * For example, given the following sequence of filters:
+ *    - draw
+ *    - logo (a blend filter drawing a logo)
+ *    - mask (a non-blend-filter applying a mask)
+ *    - logo2 (another logo)
+ *    - logo3 (yet another logo)
+ *    - renderer
+ *
+ * the filter chain stores the filters as follow:
+ *
+ *     +- draw               (non-blend)
+ *     |  +- logo            (blend)
+ *     +- mask               (non-blend)
+ *     |  +- logo2           (blend)
+ *     |  +- logo3           (blend)
+ *     +- renderer           (non-blend)
+ *
+ * An output framebuffer is created for each non-blend filters. It is used as
+ * draw framebuffer for that filter and all its associated blend filters.
+ *
+ * If the first filter is a blend filter, then a "draw" filter is automatically
+ * inserted.
+ *
+ *
+ * ## Multisample anti-aliasing (MSAA)
+ *
+ * Each filter may also request multisample anti-aliasing, by providing a MSAA
+ * level during its Open(), for example:
+ *
+ *     filter->config.msaa_level = 4;
+ *
+ * For example:
+ *
+ *     +- draw               msaa_level=0
+ *     |  +- logo_msaa4      msaa_level=4
+ *     |  +- logo_msaa2      msaa_level=2
+ *     +- renderer           msaa_level=0
+ *
+ * Among a "group" of one non-blend filter and its associated blend filters,
+ * the highest MSAA level (or 0 if multisampling is not supported) is assigned
+ * both to the non-blend filter, to configure its MSAA framebuffer, and to the
+ * blend filters, just for information and consistency:
+ *
+ *     +- draw               msaa_level=4
+ *     |  +- logo_msaa4      msaa_level=4
+ *     |  +- logo_msaa2      msaa_level=4
+ *     +- renderer           msaa_level=0
+ *
+ * Some platforms (Android) do not support resolving multisample to the default
+ * framebuffer. Therefore, the msaa_level must always be 0 on the last filter.
+ * If this is not the case, a "draw" filter is automatically appended.
+ *
+ * For example:
+ *
+ *     +- draw               msaa_level=0
+ *     |  +- logo_msaa4      msaa_level=4
+ *     +- renderer           msaa_level=0
+ *        +- logo_msaa2      msaa_level=2
+ *
+ * will become:
+ *
+ *     +- draw               msaa_level=4
+ *     |  +- logo_msaa4      msaa_level=4
+ *     +- renderer           msaa_level=2
+ *     |  +- logo_msaa2      msaa_level=2
+ *     +- draw               msaa_level=0
+ */
+
 struct vlc_gl_filters {
     struct vlc_gl_t *gl;
     const struct vlc_gl_api *api;
