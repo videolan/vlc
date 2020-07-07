@@ -2067,8 +2067,14 @@ REPORT_LIST
     libvlc_release(ctx->vlc);
 }
 
+enum ctx_flags
+{
+    DISABLE_VIDEO_OUTPUT = 1 << 0,
+    DISABLE_AUDIO_OUTPUT = 1 << 1,
+};
+
 static void
-ctx_init(struct ctx *ctx, bool use_outputs)
+ctx_init(struct ctx *ctx, enum ctx_flags flags)
 {
     const char * argv[] = {
         "-v",
@@ -2079,8 +2085,8 @@ ctx_init(struct ctx *ctx, bool use_outputs)
         /* Avoid leaks from various dlopen... */
         "--codec=araw,rawvideo,subsdec,"TELETEXT_DECODER"none",
         "--dec-dev=none",
-        use_outputs ? "--vout=dummy" : "--vout=none",
-        use_outputs ? "--aout=dummy" : "--aout=none",
+        (flags & DISABLE_VIDEO_OUTPUT) ? "--vout=none" : "--vout=dummy",
+        (flags & DISABLE_AUDIO_OUTPUT) ? "--aout=none" : "--aout=dummy",
         "--text-renderer=tdummy",
     };
     libvlc_instance_t *vlc = libvlc_new(ARRAY_SIZE(argv), argv);
@@ -2732,10 +2738,10 @@ main(void)
     struct ctx ctx;
 
     /* Test with --aout=none --vout=none */
-    ctx_init(&ctx, false);
+    ctx_init(&ctx, DISABLE_VIDEO_OUTPUT | DISABLE_AUDIO_OUTPUT);
     test_no_outputs(&ctx);
     ctx_destroy(&ctx);
-    ctx_init(&ctx, true);
+    ctx_init(&ctx, 0);
 
     test_outputs(&ctx); /* Must be the first test */
 
