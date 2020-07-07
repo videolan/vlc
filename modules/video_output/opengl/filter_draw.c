@@ -46,8 +46,10 @@ struct sys {
 };
 
 static int
-Draw(struct vlc_gl_filter *filter)
+Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
 {
+    (void) meta;
+
     struct sys *sys = filter->sys;
 
     const opengl_vtable_t *vt = &filter->api->vt;

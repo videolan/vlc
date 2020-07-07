@@ -328,7 +328,7 @@ Close(struct vlc_gl_filter *filter)
 static int SetupCoords(struct vlc_gl_renderer *renderer);
 
 static int
-Draw(struct vlc_gl_filter *filter);
+Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta);
 
 int
 vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
@@ -752,8 +752,10 @@ static int SetupCoords(struct vlc_gl_renderer *renderer)
 }
 
 static int
-Draw(struct vlc_gl_filter *filter)
+Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
 {
+    (void) meta;
+
     struct vlc_gl_renderer *renderer = filter->sys;
 
     const opengl_vtable_t *vt = renderer->vt;
