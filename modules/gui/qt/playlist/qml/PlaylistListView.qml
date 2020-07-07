@@ -211,14 +211,15 @@ Widgets.NavigableFocusScope {
 
                 Widgets.CaptionLabel {
                     anchors.topMargin: VLCStyle.margin_small
+                    visible: plmodel.count !== 0
                     text: i18n.qtr("%1 elements, %2 min").arg(root.plmodel.count).arg(plmodel.duration.toMinutes())
                     color: _colors.caption
                 }
             }
 
-
             RowLayout {
                 id: content
+                visible: plmodel.count !== 0
 
                 Layout.topMargin: VLCStyle.margin_normal
                 Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
