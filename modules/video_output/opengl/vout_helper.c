@@ -246,8 +246,7 @@ void vout_display_opengl_SetWindowAspectRatio(vout_display_opengl_t *vgl,
 void vout_display_opengl_Viewport(vout_display_opengl_t *vgl, int x, int y,
                                   unsigned width, unsigned height)
 {
-    const opengl_vtable_t *vt = &vgl->api.vt;
-    vt->Viewport(x, y, width, height);
+    vlc_gl_filters_SetViewport(vgl->filters, x, y, width, height);
 }
 
 int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,

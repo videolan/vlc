@@ -43,6 +43,13 @@ struct vlc_gl_filters {
     struct vlc_gl_interop *interop;
 
     struct vlc_list list; /**< list of vlc_gl_filter.node */
+
+    struct vlc_gl_filters_viewport {
+        int x;
+        int y;
+        unsigned width;
+        unsigned height;
+    } viewport;
 };
 
 struct vlc_gl_filters *
@@ -57,6 +64,9 @@ vlc_gl_filters_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     filters->api = api;
     filters->interop = interop;
     vlc_list_init(&filters->list);
+
+    memset(&filters->viewport, 0, sizeof(filters->viewport));
+
     return filters;
 }
 
@@ -301,6 +311,15 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
 
         vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
 
+        if (vlc_list_is_last(&priv->node, &filters->list))
+        {
+            /* The output viewport must be applied on the last filter */
+            struct vlc_gl_filters_viewport *vp = &filters->viewport;
+            vt->Viewport(vp->x, vp->y, vp->width, vp->height);
+        }
+        else
+            vt->Viewport(0, 0, priv->size_out.width, priv->size_out.height);
+
         struct vlc_gl_filter *filter = &priv->filter;
         int ret = filter->ops->draw(filter);
         if (ret != VLC_SUCCESS)
@@ -322,4 +341,14 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
     }
 
     return VLC_SUCCESS;
+}
+
+void
+vlc_gl_filters_SetViewport(struct vlc_gl_filters *filters, int x, int y,
+                           unsigned width, unsigned height)
+{
+    filters->viewport.x = x;
+    filters->viewport.y = y;
+    filters->viewport.width = width;
+    filters->viewport.height = height;
 }

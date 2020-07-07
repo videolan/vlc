@@ -86,4 +86,11 @@ vlc_gl_filters_UpdatePicture(struct vlc_gl_filters *filters,
 int
 vlc_gl_filters_Draw(struct vlc_gl_filters *filters);
 
+/**
+ * Set the viewport.
+ */
+void
+vlc_gl_filters_SetViewport(struct vlc_gl_filters *filters, int x, int y,
+                           unsigned width, unsigned height);
+
 #endif
