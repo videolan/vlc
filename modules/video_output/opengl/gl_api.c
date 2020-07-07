@@ -119,6 +119,11 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
     GET_PROC_ADDR(DeleteBuffers);
 
     GET_PROC_ADDR_OPTIONAL(GetFramebufferAttachmentParameteriv);
+    GET_PROC_ADDR_OPTIONAL(GenFramebuffers);
+    GET_PROC_ADDR_OPTIONAL(DeleteFramebuffers);
+    GET_PROC_ADDR_OPTIONAL(BindFramebuffer);
+    GET_PROC_ADDR_OPTIONAL(FramebufferTexture2D);
+    GET_PROC_ADDR_OPTIONAL(CheckFramebufferStatus);
 
     GET_PROC_ADDR_OPTIONAL(BufferSubData);
     GET_PROC_ADDR_OPTIONAL(BufferStorage);
