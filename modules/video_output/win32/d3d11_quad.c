@@ -462,37 +462,29 @@ static void SetupQuadSphere(d3d_vertex_t *dst_data, const RECT *output,
 static void SetupQuadCube(d3d_vertex_t *dst_data, const RECT *output,
                           const d3d_quad_t *quad, WORD *triangle_pos)
 {
+#define CUBEFACE(swap, value) \
+    swap(value, -1.f,  1.f), \
+    swap(value, -1.f, -1.f), \
+    swap(value,  1.f,  1.f), \
+    swap(value,  1.f, -1.f)
+
+#define X_FACE(v, a, b) (v), (b), (a)
+#define Y_FACE(v, a, b) (a), (v), (b)
+#define Z_FACE(v, a, b) (a), (b), (v)
+
     static const float coord[] = {
-        -1.0,    1.0,    -1.0f, // front
-        -1.0,    -1.0,   -1.0f,
-        1.0,     1.0,    -1.0f,
-        1.0,     -1.0,   -1.0f,
-
-        -1.0,    1.0,    1.0f, // back
-        -1.0,    -1.0,   1.0f,
-        1.0,     1.0,    1.0f,
-        1.0,     -1.0,   1.0f,
-
-        -1.0,    1.0,    -1.0f, // left
-        -1.0,    -1.0,   -1.0f,
-        -1.0,     1.0,    1.0f,
-        -1.0,     -1.0,   1.0f,
-
-        1.0f,    1.0,    -1.0f, // right
-        1.0f,   -1.0,    -1.0f,
-        1.0f,   1.0,     1.0f,
-        1.0f,   -1.0,    1.0f,
-
-        -1.0,    -1.0,    1.0f, // bottom
-        -1.0,    -1.0,   -1.0f,
-        1.0,     -1.0,    1.0f,
-        1.0,     -1.0,   -1.0f,
-
-        -1.0,    1.0,    1.0f, // top
-        -1.0,    1.0,   -1.0f,
-        1.0,     1.0,    1.0f,
-        1.0,     1.0,   -1.0f,
+        CUBEFACE(Z_FACE, -1.f), // FRONT
+        CUBEFACE(Z_FACE, +1.f), // BACK
+        CUBEFACE(X_FACE, -1.f), // LEFT
+        CUBEFACE(X_FACE, +1.f), // RIGHT
+        CUBEFACE(Y_FACE, -1.f), // BOTTOM
+        CUBEFACE(Y_FACE, +1.f), // TOP
     };
+
+#undef X_FACE
+#undef Y_FACE
+#undef Z_FACE
+#undef CUBEFACE
 
     const float scaleX = (float)(output->right - output->left) / quad->i_width;
     const float scaleY = (float)(output->bottom - output->top) / quad->i_height;
