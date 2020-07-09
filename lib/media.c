@@ -377,7 +377,7 @@ static void uninstall_input_item_observer( libvlc_media_t *p_md )
 /**
  * \internal
  * Create a new media descriptor object from an input_item (Private)
- * 
+ *
  * That's the generic constructor
  */
 libvlc_media_t * libvlc_media_new_from_input_item(
