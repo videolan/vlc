@@ -37,6 +37,7 @@ T.TabButton {
 
     property string iconTxt: ""
     property bool selected: false
+    property color color: VLCStyle.colors.text
 
     font.pixelSize: VLCStyle.fontSize_normal
 
@@ -73,7 +74,7 @@ T.TabButton {
                     verticalAlignment: Text.AlignVCenter
 
                     text: control.iconTxt
-                    color: VLCStyle.colors.buttonText
+                    color: control.color
 
                     font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_topbar)
                 }
@@ -82,7 +83,7 @@ T.TabButton {
 
             Widgets.MenuCaption {
                 text: control.text
-                color: VLCStyle.colors.text
+                color: control.color
             }
         }
 
