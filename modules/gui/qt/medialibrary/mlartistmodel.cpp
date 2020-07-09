@@ -25,7 +25,8 @@ namespace {
         ARTIST_NAME,
         ARTIST_SHORT_BIO,
         ARTIST_COVER,
-        ARTIST_NB_ALBUMS
+        ARTIST_NB_ALBUMS,
+        ARTIST_NB_TRACKS
     };
 }
 
@@ -59,6 +60,8 @@ QVariant MLArtistModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue( ml_artist->getCover() );
     case ARTIST_NB_ALBUMS :
         return QVariant::fromValue( ml_artist->getNbAlbums() );
+    case ARTIST_NB_TRACKS :
+        return QVariant::fromValue( ml_artist->getNbTracks() );
     default :
         return QVariant();
     }
@@ -72,6 +75,7 @@ QHash<int, QByteArray> MLArtistModel::roleNames() const
         { ARTIST_SHORT_BIO, "short_bio" },
         { ARTIST_COVER, "cover" },
         { ARTIST_NB_ALBUMS, "nb_albums" },
+        { ARTIST_NB_TRACKS, "nb_tracks" }
     };
 }
 
