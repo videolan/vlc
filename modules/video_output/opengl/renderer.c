@@ -548,15 +548,15 @@ static int BuildCube(float padW, float padH,
     swap(value,  1.f,  1.f), \
     swap(value,  1.f, -1.f)
 
-#define X_FACE(v, a, b) (v), (b), (a)
+#define X_FACE(v, a, b) (v), (a), (b)
 #define Y_FACE(v, a, b) (a), (v), (b)
 #define Z_FACE(v, a, b) (a), (b), (v)
 
     static const GLfloat coord[] = {
-        CUBEFACE(Z_FACE, -1.f), // FRONT
-        CUBEFACE(Z_FACE, +1.f), // BACK
-        CUBEFACE(X_FACE, -1.f), // LEFT
-        CUBEFACE(X_FACE, +1.f), // RIGHT
+        CUBEFACE(X_FACE, -1.f), // FRONT
+        CUBEFACE(X_FACE, +1.f), // BACK
+        CUBEFACE(Z_FACE, +1.f), // LEFT
+        CUBEFACE(Z_FACE, -1.f), // RIGHT
         CUBEFACE(Y_FACE, -1.f), // BOTTOM
         CUBEFACE(Y_FACE, +1.f), // TOP
     };
@@ -572,15 +572,15 @@ static int BuildCube(float padW, float padH,
     float row[] = {0.f, 1.f/2, 1.0};
 
     const GLfloat tex[] = {
-        col[1] + padW, row[1] - padH, // front
-        col[1] + padW, row[0] + padH,
-        col[2] - padW, row[1] - padH,
-        col[2] - padW, row[0] + padH,
-
-        col[3] - padW, row[1] - padH, // back
-        col[3] - padW, row[0] + padH,
-        col[2] + padW, row[1] - padH,
+        col[1] + padW, row[0] - padH, // front
         col[2] + padW, row[0] + padH,
+        col[1] - padW, row[1] - padH,
+        col[2] - padW, row[1] + padH,
+
+        col[3] - padW, row[0] - padH, // back
+        col[2] - padW, row[0] + padH,
+        col[3] + padW, row[1] - padH,
+        col[2] + padW, row[1] + padH,
 
         col[2] - padW, row[2] - padH, // left
         col[2] - padW, row[1] + padH,
@@ -592,15 +592,15 @@ static int BuildCube(float padW, float padH,
         col[1] - padW, row[2] - padH,
         col[1] - padW, row[1] + padH,
 
-        col[0] + padW, row[0] + padH, // bottom
-        col[0] + padW, row[1] - padH,
-        col[1] - padW, row[0] + padH,
-        col[1] - padW, row[1] - padH,
+        col[0] + padW, row[1] + padH, // bottom
+        col[1] + padW, row[1] - padH,
+        col[0] - padW, row[0] + padH,
+        col[1] - padW, row[0] - padH,
 
-        col[2] + padW, row[2] - padH, // top
-        col[2] + padW, row[1] + padH,
-        col[3] - padW, row[2] - padH,
-        col[3] - padW, row[1] + padH,
+        col[2] + padW, row[1] - padH, // top
+        col[3] + padW, row[1] + padH,
+        col[2] - padW, row[2] - padH,
+        col[3] - padW, row[2] + padH,
     };
 
     memcpy(*textureCoord, tex,
