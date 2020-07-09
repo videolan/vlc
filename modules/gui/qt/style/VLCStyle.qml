@@ -42,6 +42,7 @@ Item {
     property double margin_normal: dp(16, scale);
     property double margin_large: dp(24, scale);
     property double margin_xlarge: dp(32, scale);
+    property double margin_xxlarge: dp(36, scale);
 
     property int fontSize_xsmall: fontMetrics_xsmall.font.pixelSize
     property int fontSize_small:  fontMetrics_small.font.pixelSize
