@@ -2081,6 +2081,7 @@ ctx_init(struct ctx *ctx, bool use_outputs)
         "--dec-dev=none",
         use_outputs ? "--vout=dummy" : "--vout=none",
         use_outputs ? "--aout=dummy" : "--aout=none",
+        "--text-renderer=tdummy",
     };
     libvlc_instance_t *vlc = libvlc_new(ARRAY_SIZE(argv), argv);
     assert(vlc);
