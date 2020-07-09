@@ -912,10 +912,6 @@ void libvlc_media_player_set_media(
 
     vlc_player_SetCurrentMedia(p_mi->player, p_md->p_input_item);
 
-    /* The policy here is to ignore that we were created using a different
-     * libvlc_instance, because we don't really care */
-    p_mi->p_libvlc_instance = p_md->p_libvlc_instance;
-
     vlc_player_Unlock(p_mi->player);
 }
 
