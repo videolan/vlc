@@ -535,6 +535,34 @@ static void test_media_player_tracks(const char** argv, int argc)
     libvlc_release (vlc);
 }
 
+/* Regression test when having multiple libvlc instances */
+static void test_media_player_multiple_instance(const char** argv, int argc)
+{
+    /* When multiple libvlc instance exist */
+    libvlc_instance_t *instance1 = libvlc_new(argc, argv);
+    libvlc_instance_t *instance2 = libvlc_new(argc, argv);
+
+    /* ...with the media and the player being on different instances */
+    libvlc_media_t *media1 = libvlc_media_new_path(instance2, "foo");
+    libvlc_media_player_t *player1 = libvlc_media_player_new(instance1);
+    libvlc_media_player_set_media(player1, media1);
+
+    /* ...and both being released */
+    libvlc_media_release(media1);
+    libvlc_media_player_release(player1);
+
+    /* There is no use-after-free when creating a player on the media instance,
+     * meaning that the player1 did release the correct libvlc instance.*/
+    libvlc_media_player_t *player2 = libvlc_media_player_new(instance2);
+
+    /* And the libvlc nstances can be released without breaking the
+     * instance inside the player. */
+    libvlc_release(instance2);
+    libvlc_release(instance1);
+
+    libvlc_media_player_release(player2);
+}
+
 int main (void)
 {
     test_init();
@@ -543,6 +571,7 @@ int main (void)
     test_media_player_play_stop (test_defaults_args, test_defaults_nargs);
     test_media_player_pause_stop (test_defaults_args, test_defaults_nargs);
     test_media_player_tracks (test_defaults_args, test_defaults_nargs);
+    test_media_player_multiple_instance (test_defaults_args, test_defaults_nargs);
 
     return 0;
 }
