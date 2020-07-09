@@ -1539,7 +1539,6 @@ done:
 
 #ifdef __APPLE__
 #include <TargetConditionals.h>
-#endif
 
 #if defined(TARGET_OS_OSX) && TARGET_OS_OSX
 #include <CoreFoundation/CoreFoundation.h>
@@ -1600,7 +1599,8 @@ inline char *getPreferedAdapter()
 
     return returnValue;
 }
-#else
+
+#else /* iOS and tvOS */
 
 inline bool necessaryFlagsSetOnInterface(struct ifaddrs *anInterface)
 {
@@ -1635,6 +1635,15 @@ inline char *getPreferedAdapter()
     freeifaddrs(listOfInterfaces);
 
     return adapterName;
+}
+
+#endif
+
+#else /* *nix and Android */
+
+inline char *getPreferedAdapter()
+{
+    return NULL;
 }
 
 #endif
