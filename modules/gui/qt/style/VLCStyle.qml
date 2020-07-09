@@ -169,6 +169,8 @@ Item {
 
     property int table_cover_border: dp(2, scale)
 
+    property int artistBanner_height: dp(200, scale)
+
     //global application margin "safe area"
     property int applicationHorizontalMargin: 0
     property int applicationVerticalMargin: 0
