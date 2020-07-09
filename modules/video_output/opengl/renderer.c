@@ -526,22 +526,21 @@ static int BuildCube(float padW, float padH,
     *nbVertices = 4 * 6;
     *nbIndices = 6 * 6;
 
+    *vertexCoord = NULL;
+    *textureCoord = NULL;
+    *indices = NULL;
+
     *vertexCoord = vlc_alloc(*nbVertices * 3, sizeof(GLfloat));
     if (*vertexCoord == NULL)
-        return VLC_ENOMEM;
+        goto error;
+
     *textureCoord = vlc_alloc(*nbVertices * 2, sizeof(GLfloat));
     if (*textureCoord == NULL)
-    {
-        free(*vertexCoord);
-        return VLC_ENOMEM;
-    }
+        goto error;
+
     *indices = vlc_alloc(*nbIndices, sizeof(GLushort));
     if (*indices == NULL)
-    {
-        free(*textureCoord);
-        free(*vertexCoord);
-        return VLC_ENOMEM;
-    }
+        goto error;
 
 #define CUBEFACE(swap, value) \
     swap(value, -1.f,  1.f), \
@@ -619,6 +618,11 @@ static int BuildCube(float padW, float padH,
     memcpy(*indices, ind, *nbIndices * sizeof(GLushort));
 
     return VLC_SUCCESS;
+
+error:
+    free(*vertexCoord);
+    free(*textureCoord);
+    return VLC_ENOMEM;
 }
 
 static int BuildRectangle(GLfloat **vertexCoord, GLfloat **textureCoord, unsigned *nbVertices,
