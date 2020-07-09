@@ -918,7 +918,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         {
             /* Direct rendering: Request a valid OPAQUE Vout in order to get
              * the surface attached to it */
-            p_dec->fmt_out.i_codec = VLC_CODEC_ANDROID_OPAQUE;
+            p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma = VLC_CODEC_ANDROID_OPAQUE;
 
             p_dec->fmt_out.video = p_dec->fmt_in.video;
             if (p_dec->fmt_out.video.i_sar_num * p_dec->fmt_out.video.i_sar_den == 0)
