@@ -38,8 +38,6 @@
 
 #include "avcodec.h"
 
-#define MAX_GET_RETRIES  ((VLC_TICK_FROM_SEC(1) + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP)
-
 struct vlc_va_surface_t {
     size_t               index;
     atomic_uintptr_t     refcount; // 1 ref for the surface existance, 1 per surface/clone in-flight
@@ -136,7 +134,6 @@ static vlc_va_surface_t *GetSurface(va_pool_t *va_pool)
 
 vlc_va_surface_t *va_pool_Get(va_pool_t *va_pool)
 {
-    unsigned tries = MAX_GET_RETRIES;
     vlc_va_surface_t *surface;
 
     if (va_pool->surface_count == 0)
@@ -144,8 +141,6 @@ vlc_va_surface_t *va_pool_Get(va_pool_t *va_pool)
 
     while ((surface = GetSurface(va_pool)) == NULL)
     {
-        if (--tries == 0)
-            return NULL;
         /* Pool empty. Wait for some time as in src/input/decoder.c.
          * XXX: Both this and the core should use a semaphore or a CV. */
         vlc_tick_sleep(VOUT_OUTMEM_SLEEP);
