@@ -901,10 +901,6 @@ void libvlc_media_player_set_media(
     libvlc_media_retain( p_md );
     p_mi->p_md = p_md;
 
-    /* The policy here is to ignore that we were created using a different
-     * libvlc_instance, because we don't really care */
-    p_mi->p_libvlc_instance = p_md->p_libvlc_instance;
-
     unlock(p_mi);
 
     /* Send an event for the newly available media */
