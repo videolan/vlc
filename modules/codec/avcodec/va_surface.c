@@ -56,6 +56,7 @@ struct va_pool_t
     struct va_pool_cfg callbacks;
 
     atomic_uintptr_t  poolrefs; // 1 ref for the pool creator, 1 ref per surface alive
+    vlc_sem_t    available_surfaces;
 };
 
 static void va_pool_AddRef(va_pool_t *va_pool)
@@ -102,6 +103,8 @@ int va_pool_SetupDecoder(vlc_va_t *va, va_pool_t *va_pool, AVCodecContext *avctx
     va_pool->surface_height = fmt->i_height;
     va_pool->surface_count = count;
 
+    vlc_sem_init(&va_pool->available_surfaces, count);
+
     for (size_t i = 0; i < va_pool->surface_count; i++) {
         vlc_va_surface_t *surface = &va_pool->surface[i];
         atomic_init(&surface->refcount, 1);
@@ -139,12 +142,9 @@ vlc_va_surface_t *va_pool_Get(va_pool_t *va_pool)
     if (va_pool->surface_count == 0)
         return NULL;
 
-    while ((surface = GetSurface(va_pool)) == NULL)
-    {
-        /* Pool empty. Wait for some time as in src/input/decoder.c.
-         * XXX: Both this and the core should use a semaphore or a CV. */
-        vlc_tick_sleep(VOUT_OUTMEM_SLEEP);
-    }
+    vlc_sem_wait(&va_pool->available_surfaces);
+    surface = GetSurface(va_pool);
+    assert(surface != NULL);
     return surface;
 }
 
@@ -155,10 +155,17 @@ void va_surface_AddRef(vlc_va_surface_t *surface)
 
 void va_surface_Release(vlc_va_surface_t *surface)
 {
-    if (atomic_fetch_sub(&surface->refcount, 1) != 1)
-        return;
-
-    va_pool_Release(surface->va_pool);
+    uintptr_t had_refcount = atomic_fetch_sub(&surface->refcount, 1);
+    if (had_refcount == 2)
+    {
+        // the surface is not used anymore
+        vlc_sem_post(&surface->va_pool->available_surfaces);
+    }
+    else if (had_refcount == 1)
+    {
+        // the surface has been released
+        va_pool_Release(surface->va_pool);
+    }
 }
 
 size_t va_surface_GetIndex(const vlc_va_surface_t *surface)
