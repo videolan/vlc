@@ -80,11 +80,46 @@ static void addNewFontToFamily(vlc_font_select_t *fs, CTFontDescriptorRef iter, 
     CFRelease(fontTraits);
 }
 
+const struct
+{
+    const char *psz_generic;
+    const char *psz_local;
+}
+CoreTextGenericMapping[] =
+{
+    { "cursive",   "Apple Chancery" },
+//    { "emoji",     "" },
+//    { "fangsong",     "" },
+    { "fantasy",   "Papyrus" },
+    { "monospace", "Courier" },
+    { "sans",      "Helvetica" },
+    { "sans-serif","Helvetica" },
+    { "serif",     "Times" },
+    { "system-ui", ".AppleSystemUIFont" },
+//    { "math",     "" },
+//    { "ui-monospace",     "" },
+//    { "ui-rounded",     "" },
+//    { "ui-serif",     "" },
+//    { "ui-sans-serif",     "" },
+};
+
+const char *CoreText_TranslateGenericFamily(const char *psz_family)
+{
+    for( size_t i=0; i<ARRAY_SIZE(CoreTextGenericMapping); i++ )
+    {
+        if( !strcasecmp( CoreTextGenericMapping[i].psz_generic, psz_family ) )
+            return CoreTextGenericMapping[i].psz_local;
+    }
+    return psz_family;
+}
+
 const vlc_family_t *CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_family)
 {
     if (unlikely(psz_family == NULL)) {
         return NULL;
     }
+
+    psz_family = CoreText_TranslateGenericFamily(psz_family);
 
     char *psz_lc = ToLower(psz_family);
     if (unlikely(!psz_lc)) {
@@ -188,6 +223,8 @@ vlc_family_t *CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_famil
     if (unlikely(psz_family == NULL)) {
         return NULL;
     }
+
+    psz_family = CoreText_TranslateGenericFamily(psz_family);
 
     vlc_family_t *p_family = NULL;
     CFStringRef postScriptFallbackFontname = NULL;
