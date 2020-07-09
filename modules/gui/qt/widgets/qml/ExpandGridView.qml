@@ -34,6 +34,7 @@ NavigableFocusScope {
     property int leftMargin: VLCStyle.margin_normal
     property int rightMargin: VLCStyle.margin_normal
 
+    property int rowX: 0
     property int horizontalSpacing: VLCStyle.column_margin_width
     property int verticalSpacing: VLCStyle.column_margin_width
 
@@ -370,6 +371,8 @@ NavigableFocusScope {
                 return
             else if (!root._isInitialised)
                 root._initialize()
+
+            root.rowX = getItemPos(0)[0]
 
             var i
             var expandItemGridId = getExpandItemGridId()
