@@ -47,7 +47,7 @@
  */
 
 static const char * test_defaults_args[] = {
-    "-v", "--vout=vdummy",
+    "-v", "--vout=vdummy", "--aout=adummy", "--text-renderer=tdummy",
 };
 
 static const int test_defaults_nargs =
