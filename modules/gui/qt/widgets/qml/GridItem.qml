@@ -222,7 +222,7 @@ Item {
                     scroll: _highlighted
 
                     Layout.preferredHeight: titleLabel.contentHeight
-                    Layout.topMargin: VLCStyle.margin_xxsmall
+                    Layout.topMargin: root.titleMargin
                     Layout.fillWidth: true
                     Layout.maximumWidth: pictureWidth
 
