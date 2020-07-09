@@ -718,19 +718,11 @@ static void Flush( decoder_t *p_dec )
     p_sys->framedrop = FRAMEDROP_NONE;
     cc_Flush( &p_sys->cc );
 
-    /* Abort pictures in order to unblock all avcodec workers threads waiting
-     * for a picture. This will avoid a deadlock between avcodec_flush_buffers
-     * and workers threads */
-    decoder_AbortPictures( p_dec, true );
-
     /* do not flush buffers if codec hasn't been opened (theora/vorbis/VC1) */
     if( avcodec_is_open( p_context ) )
         avcodec_flush_buffers( p_context );
 
     date_Set(&p_sys->pts, VLC_TICK_INVALID); /* To make sure we recover properly */
-
-    /* Reset cancel state to false */
-    decoder_AbortPictures( p_dec, false );
 }
 
 static block_t * filter_earlydropped_blocks( decoder_t *p_dec, block_t *block )
