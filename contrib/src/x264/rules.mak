@@ -2,8 +2,6 @@
 
 X264_GITURL := git://git.videolan.org/x264.git
 X264_SNAPURL := http://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180324-2245.tar.bz2
-X262_GITURL := git://git.videolan.org/x262.git
-X262_HASH := bb887aa4c0a4da955524aa220b62998c3b50504e
 X264_BASENAME := $(notdir $(X264_SNAPURL))
 
 ifdef BUILD_ENCODERS
@@ -19,10 +17,6 @@ endif
 ifeq ($(call need_pkg,"x264 >= 0.153"),)
 PKGS_FOUND += x26410b
 endif
-
-#ifeq ($(call need_pkg,"x262"),)
-#PKGS_FOUND += x262
-#endif
 
 PKGS_ALL += x26410b
 
@@ -63,9 +57,6 @@ endif
 endif
 endif
 
-$(TARBALLS)/x262-git.tar.xz:
-	$(call download_git,$(X262_GITURL),,$(X262_HASH))
-
 $(TARBALLS)/x264-git.tar.xz:
 	$(call download_git,$(X264_GITURL))
 
@@ -77,10 +68,6 @@ $(TARBALLS)/$(X264_BASENAME):
 
 .sum-x264: $(X264_BASENAME)
 
-.sum-x262: $(TARBALLS)/x262-git.tar.xz
-	$(call check_githash,$(X262_HASH))
-	touch $@
-
 x264 x26410b: %: $(X264_BASENAME) .sum-%
 	rm -Rf $(UNPACK_DIR)
 	mkdir -p $(UNPACK_DIR)
@@ -89,12 +76,6 @@ x264 x26410b: %: $(X264_BASENAME) .sum-%
 	$(APPLY) $(SRC)/x264/x264-winstore.patch
 	$(MOVE)
 
-x262: $(TARBALLS)/x262-git.tar.xz .sum-x262
-	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
-	$(MOVE)
-
-
 .x264: x264
 	$(REQUIRE_GPL)
 	cd $< && $(HOSTVARS) $(X264_AS) ./configure $(X264CONF)
@@ -102,16 +83,4 @@ x262: $(TARBALLS)/x262-git.tar.xz .sum-x262
 	touch $@
 
 .x26410b: .x264
-	touch $@
-
-.x262: x262
-	$(REQUIRE_GPL)
-	cd $< && sed -i -e 's/x264/x262/g' configure
-	cd $< && sed -i -e 's/x264_config/x262_config/g' *.h Makefile *.c
-	cd $< && $(HOSTVARS) ./configure $(X264CONF)
-	cd $< && sed -i -e 's/x264.pc/x262.pc/g' Makefile
-	cd $< && sed -i -e 's/x264.h/x262.h/g' Makefile
-	cd $< && $(MAKE)
-	cd $< && cp x264.h x262.h
-	cd $< && $(MAKE) install
 	touch $@
