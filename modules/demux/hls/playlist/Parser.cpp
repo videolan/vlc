@@ -258,16 +258,15 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                 segment->setSourceUrl(uritag->getValue().value);
 
                 /* Need to use EXTXTARGETDURATION as default as some can't properly set segment one */
-                double duration = rep->targetDuration;
+                mtime_t nzDuration = CLOCK_FREQ * rep->targetDuration;
                 if(ctx_extinf)
                 {
                     const Attribute *durAttribute = ctx_extinf->getAttributeByName("DURATION");
                     if(durAttribute)
-                        duration = durAttribute->floatingPoint();
+                        nzDuration = CLOCK_FREQ * durAttribute->floatingPoint();
                     ctx_extinf = NULL;
                 }
-                const mtime_t nzDuration = CLOCK_FREQ * duration;
-                segment->duration.Set(duration * (uint64_t) rep->getTimescale());
+                segment->duration.Set(rep->getTimescale().ToScaled(nzDuration));
                 segment->startTime.Set(rep->getTimescale().ToScaled(nzStartTime));
                 nzStartTime += nzDuration;
                 totalduration += nzDuration;
