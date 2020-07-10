@@ -117,7 +117,7 @@ StreamFormat SegmentTracker::getCurrentFormat() const
     if(rep)
     {
         /* Ensure ephemere content is updated/loaded */
-        if(rep->needsUpdate())
+        if(rep->needsUpdate(next))
             (void) rep->runLocalUpdates(resources);
         return rep->getStreamFormat();
     }
@@ -199,7 +199,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
 
     bool b_updated = false;
     /* Ensure ephemere content is updated/loaded */
-    if(rep->needsUpdate())
+    if(rep->needsUpdate(next))
         b_updated = rep->runLocalUpdates(resources);
 
     if(curNumber == std::numeric_limits<uint64_t>::max())
@@ -313,7 +313,7 @@ bool SegmentTracker::setPositionByTime(vlc_tick_t time, bool restarted, bool try
         rep = logic->getNextRepresentation(adaptationSet, NULL);
 
     /* Stream might not have been loaded at all (HLS) or expired */
-    if(rep && rep->needsUpdate() && !rep->runLocalUpdates(resources))
+    if(rep && rep->needsUpdate(next) && !rep->runLocalUpdates(resources))
     {
         msg_Err(rep->getAdaptationSet()->getPlaylist()->getVLCObject(),
                 "Failed to update Representation %s", rep->getID().str().c_str());
@@ -373,7 +373,7 @@ vlc_tick_t SegmentTracker::getMinAheadTime() const
     if(rep)
     {
         /* Ensure ephemere content is updated/loaded */
-        if(rep->needsUpdate())
+        if(rep->needsUpdate(next))
             (void) rep->runLocalUpdates(resources);
 
         uint64_t startnumber = curNumber;
@@ -409,7 +409,7 @@ bool SegmentTracker::bufferingAvailable() const
 
 void SegmentTracker::updateSelected()
 {
-    if(curRepresentation && curRepresentation->needsUpdate())
+    if(curRepresentation && curRepresentation->needsUpdate(next))
     {
         bool b_updated = curRepresentation->runLocalUpdates(resources);
         curRepresentation->scheduleNextUpdate(curNumber, b_updated);
