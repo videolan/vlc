@@ -65,7 +65,7 @@ namespace adaptive
                 virtual void        pruneByPlaybackTime     (mtime_t);
 
                 virtual mtime_t     getMinAheadTime         (uint64_t) const;
-                virtual bool        needsUpdate             () const;
+                virtual bool        needsUpdate             (uint64_t) const;
                 virtual bool        runLocalUpdates         (SharedResources *);
                 virtual void        scheduleNextUpdate      (uint64_t, bool);
 

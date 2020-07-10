@@ -33,6 +33,7 @@
 #include "../../adaptive/playlist/SegmentList.h"
 
 #include <ctime>
+#include <limits>
 #include <cassert>
 
 using namespace hls;
@@ -44,7 +45,7 @@ Representation::Representation  ( BaseAdaptationSet *set ) :
     b_live = true;
     b_loaded = false;
     b_failed = false;
-    nextUpdateTime = 0;
+    lastUpdateTime = 0;
     targetDuration = 0;
     streamFormat = StreamFormat::UNKNOWN;
 }
@@ -100,55 +101,58 @@ void Representation::debug(vlc_object_t *obj, int indent) const
     }
 }
 
-void Representation::scheduleNextUpdate(uint64_t number, bool b_updated)
+void Representation::scheduleNextUpdate(uint64_t, bool b_updated)
 {
     if(!isLive())
         return;
 
-    if(!b_updated && nextUpdateTime > 0)
+    if(!b_updated)
+    {
+        /* Ensure we don't update-loop if it failed */
+        //lastUpdateTime = vlc_tick_now();
         return;
+    }
 
-    /* Compute new update time */
-    mtime_t minbuffer = getMinAheadTime(number);
-    const AbstractPlaylist *playlist = getPlaylist();
     const mtime_t now = mdate();
+    const AbstractPlaylist *playlist = getPlaylist();
 
-    /* Update frequency must always be at least targetDuration (if any)
-     * but we need to update before reaching that last segment, thus -1 */
-    if(targetDuration)
-    {
-        if(minbuffer > CLOCK_FREQ * ( 2 * targetDuration + 1 ))
-            minbuffer -= CLOCK_FREQ * ( targetDuration + 1 );
-        else
-            minbuffer = CLOCK_FREQ * ( targetDuration - 1 );
-    }
-    else
-    {
-        if(minbuffer < 10 * CLOCK_FREQ)
-            minbuffer = 4 * CLOCK_FREQ;
-        else
-            minbuffer /= 2;
-    }
+    msg_Dbg(playlist->getVLCObject(), "Updated playlist ID %s, after %" PRId64 "s",
+            getID().str().c_str(),
+            lastUpdateTime ? (now - lastUpdateTime)/CLOCK_FREQ : 0);
 
-    nextUpdateTime = now + minbuffer;
-
-    msg_Dbg(playlist->getVLCObject(), "Updated playlist ID %s, next update in %" PRId64 "s",
-            getID().str().c_str(), (nextUpdateTime - now)/CLOCK_FREQ);
+    lastUpdateTime = now;
 
     debug(playlist->getVLCObject(), 0);
 }
 
-bool Representation::needsUpdate() const
+bool Representation::needsUpdate(uint64_t number) const
 {
-    return !b_failed && (!b_loaded || (isLive() &&
-                                       nextUpdateTime != 0 &&
-                                       nextUpdateTime < mdate()));
+    if(b_failed)
+        return false;
+    if(!b_loaded)
+        return true;
+    if(isLive())
+    {
+        const mtime_t now = mdate();
+        const mtime_t elapsed = now - lastUpdateTime;
+        const mtime_t duration = targetDuration
+                                  ? CLOCK_FREQ * targetDuration
+                                  : CLOCK_FREQ * 2;
+        if(elapsed < duration)
+            return false;
+
+        if(number != std::numeric_limits<uint64_t>::max())
+        {
+            mtime_t minbuffer = getMinAheadTime(number);
+            return ( minbuffer < duration );
+        }
+    }
+    return false;
 }
 
 bool Representation::runLocalUpdates(SharedResources *res)
 {
     AbstractPlaylist *playlist = getPlaylist();
-    assert(needsUpdate());
     M3U8Parser parser(res);
     if(!parser.appendSegmentsFromPlaylistURI(playlist->getVLCObject(), this))
         b_failed = true;

@@ -88,7 +88,7 @@ void BaseRepresentation::addCodecs(const std::string &s)
     }
 }
 
-bool BaseRepresentation::needsUpdate() const
+bool BaseRepresentation::needsUpdate(uint64_t) const
 {
     return false;
 }
