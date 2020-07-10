@@ -140,7 +140,6 @@ struct sout_stream_id_sys_t
 
     /* only rw from pf_*_format_update() */
     es_format_t decoder_out;
-    vlc_video_context *decoder_vctx_out;
 
     const sout_filters_config_t *p_filterscfg;
 
