@@ -533,7 +533,11 @@ M3U8 * M3U8Parser::parse(vlc_object_t *p_object, stream_t *p_stream, const std::
             tag->addAttribute(new Attribute("URI", playlisturl));
             createAndFillRepresentation(p_object, adaptSet, tag, tagslist);
             if(!adaptSet->getRepresentations().empty())
+            {
+                adaptSet->getRepresentations().front()->
+                    scheduleNextUpdate(std::numeric_limits<uint64_t>::max(), true);
                 period->addAdaptationSet(adaptSet);
+            }
             else
                 delete adaptSet;
             delete tag;
