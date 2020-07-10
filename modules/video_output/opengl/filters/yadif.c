@@ -27,6 +27,7 @@
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
 #include <vlc_opengl.h>
+#include <vlc_filter.h>
 
 #include "../filter.h"
 #include "../gl_api.h"
@@ -560,6 +561,23 @@ error1:
     return VLC_EGENERIC;
 }
 
+static int OpenVideoFilter(vlc_object_t *obj)
+{
+    filter_t *filter = (filter_t*)obj;
+    /* TODO: parse options */
+    config_chain_t *prev_chain = filter->p_cfg;
+    config_chain_t chain = {
+        .psz_name = "opengl-filter",
+        .psz_value = MODULE_STRING,
+    };
+
+    filter->p_cfg = &chain;
+    module_t *module = module_need(obj, "video filter", "opengl", true);
+    filter->p_cfg = prev_chain;
+
+    return module == NULL ? VLC_EGENERIC : VLC_SUCCESS;
+}
+
 vlc_module_begin()
     set_shortname("yadif")
     set_description("OpenGL yadif deinterlace filter")
@@ -568,4 +586,9 @@ vlc_module_begin()
     set_capability("opengl filter", 0)
     set_callback(Open)
     add_shortcut("yadif")
+
+    add_submodule()
+        set_capability("video filter", 1)
+        set_callback(OpenVideoFilter)
+        add_shortcut("deinterlace", "gl_yadif")
 vlc_module_end()
