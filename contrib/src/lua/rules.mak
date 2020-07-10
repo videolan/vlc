@@ -99,13 +99,13 @@ ifdef HAVE_CROSS_COMPILE
 LUACVARS+=CFLAGS="" CPPFLAGS="" LDFLAGS=""
 endif
 
+# DO NOT use the same intermediate directory as the lua target
+luac: UNPACK_DIR=luac-$(LUA_VERSION)
 luac: lua-$(LUA_VERSION).tar.gz .sum-luac
-	# DO NOT use the same intermediate directory as the lua target
-	rm -Rf -- $@-$(LUA_VERSION) $@
-	mkdir -- $@-$(LUA_VERSION)
-	tar -x -v -z -o -C $@-$(LUA_VERSION) --strip-components=1 -f $<
-	(cd luac-$(LUA_VERSION) && patch -p1) < $(SRC)/lua/luac-32bits.patch
-	mv luac-$(LUA_VERSION) luac
+	$(RM) -Rf $@ $(UNPACK_DIR) && mkdir -p $(UNPACK_DIR)
+	tar xvzfo $< -C $(UNPACK_DIR) --strip-components=1
+	$(APPLY) $(SRC)/lua/luac-32bits.patch
+	$(MOVE)
 
 .luac: luac
 	cd $< && $(LUACVARS) $(MAKE) generic
