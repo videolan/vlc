@@ -3,6 +3,7 @@
 X264_GITURL := git://git.videolan.org/x264.git
 X264_SNAPURL := http://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180324-2245.tar.bz2
 X262_GITURL := git://git.videolan.org/x262.git
+X262_HASH := bb887aa4c0a4da955524aa220b62998c3b50504e
 X264_BASENAME := $(notdir $(X264_SNAPURL))
 
 ifdef BUILD_ENCODERS
@@ -63,10 +64,7 @@ endif
 endif
 
 $(TARBALLS)/x262-git.tar.xz:
-	$(call download_git,$(X262_GITURL))
-
-$(TARBALLS)/x262-git.tar.gz:
-	$(call download,$(X262_SNAPURL))
+	$(call download_git,$(X262_GITURL),,$(X262_HASH))
 
 $(TARBALLS)/x264-git.tar.xz:
 	$(call download_git,$(X264_GITURL))
@@ -74,14 +72,14 @@ $(TARBALLS)/x264-git.tar.xz:
 $(TARBALLS)/$(X264_BASENAME):
 	$(call download,$(X264_SNAPURL))
 
-.sum-x262: x262-git.tar.gz
-	$(warning $@ not implemented)
-	touch $@
-
 .sum-x26410b: .sum-x264
 	touch $@
 
 .sum-x264: $(X264_BASENAME)
+
+.sum-x262: $(TARBALLS)/x262-git.tar.xz
+	$(call check_githash,$(X262_HASH))
+	touch $@
 
 x264 x26410b: %: $(X264_BASENAME) .sum-%
 	rm -Rf $(UNPACK_DIR)
@@ -91,10 +89,8 @@ x264 x26410b: %: $(X264_BASENAME) .sum-%
 	$(APPLY) $(SRC)/x264/x264-winstore.patch
 	$(MOVE)
 
-x262: x262-git.tar.gz .sum-x262
-	rm -Rf $@-git
-	mkdir -p $@-git
-	tar xvzfo "$<" --strip-components=1 -C $@-git
+x262: $(TARBALLS)/x262-git.tar.xz .sum-x262
+	$(UNPACK)
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
