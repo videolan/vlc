@@ -271,6 +271,8 @@ Widgets.NavigableFocusScope {
                 model: root.plmodel
                 modelCount: root.plmodel.count
 
+                fadeColor: root.backgroundColor
+
                 property int shiftIndex: -1
                 property string mode: "normal"
 
@@ -283,6 +285,26 @@ Widgets.NavigableFocusScope {
                     onModelReset: {
                         if (view.currentIndex == -1 &&  root.plmodel.count > 0)
                             view.currentIndex = 0
+                    }
+                    onSelectedCountChanged: {
+                        var selectedIndexes = root.plmodel.getSelection()
+                        var modelCount = root.plmodel.count
+
+                        if (modelCount === 0 || selectedIndexes.length === 0)
+                            return
+
+                        var bottomItemIndex = view.listView.indexAt(view.listView.contentX, (view.listView.contentY + view.height) - 2)
+                        var topItemIndex    = view.listView.indexAt(view.listView.contentX, view.listView.contentY + 2)
+
+                        if (topItemIndex !== -1 && (root.plmodel.isSelected(topItemIndex) || (modelCount >= 2 && root.plmodel.isSelected(topItemIndex + 1))))
+                            view.fadeRectTopHovered = true
+                        else
+                            view.fadeRectTopHovered = false
+
+                        if (bottomItemIndex !== -1 && (root.plmodel.isSelected(bottomItemIndex) || (root.plmodel.isSelected(bottomItemIndex - 1))))
+                            view.fadeRectBottomHovered = true
+                        else
+                            view.fadeRectBottomHovered = false
                     }
                 }
 
@@ -392,6 +414,20 @@ Widgets.NavigableFocusScope {
                                 mainPlaylistController.insert(target, urlList)
                             } else {
                                 root.plmodel.moveItemsPre(root.plmodel.getSelection(), target)
+                            }
+                        }
+
+                        onHoveredChanged: {
+                            var bottomItemIndex = view.listView.indexAt(plitem.width / 2, (view.listView.contentY + view.height) - 2)
+                            var topItemIndex = view.listView.indexAt(plitem.width / 2, view.listView.contentY + 2)
+
+                            if(bottomItemIndex !== -1 && model.index >= bottomItemIndex - 1)
+                            {
+                                view.fadeRectBottomHovered = plitem.hovered
+                            }
+                            if(topItemIndex !== -1 && model.index <= topItemIndex + 1)
+                            {
+                                view.fadeRectTopHovered = plitem.hovered
                             }
                         }
                     }
