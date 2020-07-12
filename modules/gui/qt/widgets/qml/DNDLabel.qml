@@ -18,6 +18,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtGraphicalEffects 1.0
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -25,12 +26,15 @@ import "qrc:///style/"
 Rectangle {
     property alias text: label.text
     property alias model: plitem.model
+    property VLCColors _colors: VLCStyle.colors
 
     z: 1
-    width:  plitem.visible ? plitem.implicitWidth : label.implicitWidth
-    height: plitem.visible ? plitem.implicitHeight : label.implicitHeight
-    color: VLCStyle.colors.button
-    border.color : VLCStyle.colors.buttonBorder
+    width:  plitem.visible ? plitem.width : label.width
+    height: plitem.visible ? plitem.height : label.height
+    color: _colors.button
+    border.color : _colors.buttonBorder
+    radius: 6
+    opacity: 0.75
     visible: false
 
     Drag.active: visible
@@ -43,24 +47,38 @@ Rectangle {
         dragItem.y = pos.y
     }
 
+    RectangularGlow {
+        anchors.fill: parent
+        glowRadius: VLCStyle.dp(8)
+        color: _colors.glowColor
+        spread: 0.2
+    }
+
     Text {
         id: label
+        width: implicitWidth + VLCStyle.dp(10)
+        height: implicitHeight + VLCStyle.dp(10)
         font.pixelSize: VLCStyle.fontSize_normal
-        color: VLCStyle.colors.text
+        color: _colors.text
         text: i18n.qtr("%1 tracks selected").arg(count)
         visible: count > 1 || !model
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
     }
 
     Item {
         id: plitem
-        opacity: 0.7
         visible: count === 1 && model
+        width: childrenRect.width
+        height: childrenRect.height
 
         property var model
 
         RowLayout {
             id: content
-            anchors.fill: parent
+            width: implicitWidth + VLCStyle.dp(10)
+            height: implicitHeight + VLCStyle.dp(10)
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
             Item {
                 Layout.preferredHeight: VLCStyle.icon_normal
@@ -83,7 +101,7 @@ Rectangle {
                     height: VLCStyle.icon_normal
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
-                    color: VLCStyle.colors.accent
+                    color: _colors.accent
                     text: player.playingState === PlayerController.PLAYING_STATE_PLAYING ? VLCIcons.volume_high :
                                                     player.playingState === PlayerController.PLAYING_STATE_PAUSED ? VLCIcons.pause :
                                                         player.playingState === PlayerController.PLAYING_STATE_STOPPED ? VLCIcons.stop : ""
@@ -93,20 +111,20 @@ Rectangle {
             Column {
                 Widgets.ListLabel {
                     id: textInfo
-                    Layout.fillWidth: true
                     Layout.leftMargin: VLCStyle.margin_small
 
                     font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
                     text: model.title
+                    color: _colors.text
                 }
 
                 Widgets.ListSubtitleLabel {
                     id: textArtist
-                    Layout.fillWidth: true
                     Layout.leftMargin: VLCStyle.margin_small
 
                     font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
                     text: (model.artist ? model.artist : i18n.qtr("Unknown Artist"))
+                    color: _colors.text
                 }
             }
 
@@ -115,6 +133,7 @@ Rectangle {
                 Layout.rightMargin: VLCStyle.margin_xsmall
 
                 text: model.duration
+                color: _colors.text
             }
         }
     }

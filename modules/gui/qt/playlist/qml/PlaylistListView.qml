@@ -54,6 +54,8 @@ Widgets.NavigableFocusScope {
         //label for DnD
         Widgets.DNDLabel {
             id: dragItem
+            _colors: root._colors
+            color: parent.color
         }
 
         PlaylistMenu {
