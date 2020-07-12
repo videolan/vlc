@@ -350,6 +350,7 @@ Widgets.NavigableFocusScope {
                         active: (index === 0) // load only for the first element to prevent overlapping
                         width: parent.width
                         height: 1
+                        z: 0
                         sourceComponent: Rectangle {
                             color: _colors.playlistSeparator
                             opacity: _colors.isThemeDark ? 0.05 : 1.0
@@ -365,7 +366,7 @@ Widgets.NavigableFocusScope {
                         id: plitem
                         plmodel: root.plmodel
                         width: root.width
-
+                        z: 1
                         leftPadding: root.leftPadding + VLCStyle.margin_normal
                         rightPadding: root.rightPadding + view.scrollBarWidth
 
@@ -437,6 +438,7 @@ Widgets.NavigableFocusScope {
                     Rectangle {
                         width: parent.width
                         height: 1
+                        z: 0
                         color: _colors.playlistSeparator
                         opacity: _colors.isThemeDark ? 0.05 : 1.0
                     }
