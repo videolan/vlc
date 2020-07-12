@@ -1,5 +1,6 @@
 /*****************************************************************************
- * cvpx_gl_filter.m: iOS OpenGL ES filter engine baked by CVPX buffer
+ * cvpx_gl.m: iOS OpenGL ES offscreen provider baked by CVPX buffer
+ *            supporting both iOS and MacOSX
  *****************************************************************************
  * Copyright (C) 2020 Videolabs
  *

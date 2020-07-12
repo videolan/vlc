@@ -567,13 +567,16 @@ static int OpenVideoFilter(vlc_object_t *obj)
     /* TODO: parse options */
     config_chain_t *prev_chain = filter->p_cfg;
     config_chain_t chain = {
-        .psz_name = "opengl-filter",
-        .psz_value = MODULE_STRING,
+        .psz_name = strdup("filter"),
+        .psz_value = strdup(MODULE_STRING),
     };
 
     filter->p_cfg = &chain;
     module_t *module = module_need(obj, "video filter", "opengl", true);
     filter->p_cfg = prev_chain;
+
+    free(chain.psz_name);
+    free(chain.psz_value);
 
     return module == NULL ? VLC_EGENERIC : VLC_SUCCESS;
 }
