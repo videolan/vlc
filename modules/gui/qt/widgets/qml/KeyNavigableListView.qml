@@ -30,6 +30,8 @@ NavigableFocusScope {
     signal selectAll()
     signal actionAtIndex( int index )
 
+    property alias listView: view
+
     //forward view properties
     property alias spacing: view.spacing
     property alias interactive: view.interactive
@@ -67,6 +69,9 @@ NavigableFocusScope {
     property alias displaced: view.displaced
 
     property int highlightMargin: VLCStyle.margin_large
+    property var fadeColor: undefined
+    property alias fadeRectBottomHovered: fadeRectBottom.isHovered
+    property alias fadeRectTopHovered: fadeRectTop.isHovered
 
     property int scrollBarWidth: scroll_id.visible ? scroll_id.width : 0
 
@@ -225,6 +230,97 @@ NavigableFocusScope {
             } else if ( KeyHelper.matchOk(event) ) { //enter/return/space
                 event.accepted = true
                 actionAtIndex(currentIndex)
+            }
+        }
+
+        Rectangle {
+            id: fadeRectTop
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+                topMargin: headerItem && (headerPositioning === ListView.OverlayHeader) ? headerItem.height : 0
+            }
+            height: highlightMargin * 2
+            visible: !!fadeColor && fadeRectTop.opacity !== 0.0
+
+            property bool isHovered: false
+            property bool _stateVisible: ((orientation === ListView.Vertical && !view.atYBeginning)
+                                        && !isHovered)
+
+            states: [
+                State {
+                    when: fadeRectTop._stateVisible;
+                    PropertyChanges {
+                        target: fadeRectTop
+                        opacity: 1.0
+                    }
+                },
+                State {
+                    when: !fadeRectTop._stateVisible;
+                    PropertyChanges {
+                        target: fadeRectTop
+                        opacity: 0.0
+                    }
+                }
+            ]
+
+            transitions: Transition {
+                NumberAnimation {
+                    property: "opacity"
+                    duration: 150
+                    easing.type: Easing.InOutSine
+                }
+            }
+
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: fadeColor }
+                GradientStop { position: 1.0; color: "transparent" }
+            }
+        }
+
+        Rectangle {
+            id: fadeRectBottom
+            anchors {
+                bottom: parent.bottom
+                left: parent.left
+                right: parent.right
+            }
+            height: highlightMargin * 2
+            visible: !!fadeColor && fadeRectBottom.opacity !== 0.0
+
+            property bool isHovered: false
+            property bool _stateVisible: ((orientation === ListView.Vertical && !view.atYEnd)
+                                        && !isHovered)
+
+            states: [
+                State {
+                    when: fadeRectBottom._stateVisible;
+                    PropertyChanges {
+                        target: fadeRectBottom
+                        opacity: 1.0
+                    }
+                },
+                State {
+                    when: !fadeRectBottom._stateVisible;
+                    PropertyChanges {
+                        target: fadeRectBottom
+                        opacity: 0.0
+                    }
+                }
+            ]
+
+            transitions: Transition {
+                NumberAnimation {
+                    property: "opacity"
+                    duration: 150
+                    easing.type: Easing.InOutSine
+                }
+            }
+
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "transparent" }
+                GradientStop { position: 1.0; color: fadeColor }
             }
         }
     }

@@ -69,6 +69,13 @@ NavigableFocusScope {
     property alias spacing: view.spacing
     property int horizontalSpacing: VLCStyle.column_margin_width
 
+    property alias fadeColor:             view.fadeColor
+    property alias fadeRectBottomHovered: view.fadeRectBottomHovered
+    property alias fadeRectTopHovered:    view.fadeRectTopHovered
+
+    property alias add:       view.add
+    property alias displaced: view.displaced
+
     Accessible.role: Accessible.Table
 
     function positionViewAtIndex(index, mode) {
