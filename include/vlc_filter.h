@@ -58,6 +58,11 @@ typedef struct filter_owner_t
         const struct filter_video_callbacks *video;
         const struct filter_subpicture_callbacks *sub;
     };
+
+    /* Input attachments
+     * XXX use filter_GetInputAttachments */
+    int (*pf_get_attachments)( filter_t *, input_attachment_t ***, int * );
+
     void *sys;
 } filter_owner_t;
 
@@ -147,10 +152,6 @@ struct filter_t
                                const struct vlc_mouse_t *p_old,
                                const struct vlc_mouse_t *p_new );
     };
-
-    /* Input attachments
-     * XXX use filter_GetInputAttachments */
-    int (*pf_get_attachments)( filter_t *, input_attachment_t ***, int * );
 
     /** Private structure for the owner of the filter */
     filter_owner_t      owner;
@@ -260,10 +261,10 @@ static inline int filter_GetInputAttachments( filter_t *p_filter,
                                               input_attachment_t ***ppp_attachment,
                                               int *pi_attachment )
 {
-    if( !p_filter->pf_get_attachments )
+    if( !p_filter->owner.pf_get_attachments )
         return VLC_EGENERIC;
-    return p_filter->pf_get_attachments( p_filter,
-                                         ppp_attachment, pi_attachment );
+    return p_filter->owner.pf_get_attachments( p_filter,
+                                               ppp_attachment, pi_attachment );
 }
 
 /**

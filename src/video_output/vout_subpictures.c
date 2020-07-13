@@ -251,8 +251,6 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
     if (!text)
         return NULL;
 
-    text->owner.sys = spu;
-
     es_format_Init(&text->fmt_in, VIDEO_ES, 0);
 
     es_format_Init(&text->fmt_out, VIDEO_ES, 0);
@@ -261,7 +259,10 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
     text->fmt_out.video.i_height         =
     text->fmt_out.video.i_visible_height = 32;
 
-    text->pf_get_attachments = spu_get_attachments;
+    text->owner = (const struct filter_owner_t) {
+        .pf_get_attachments = spu_get_attachments,
+        .sys = spu
+    };
 
     text->p_module = module_need_var(text, "text renderer", "text-renderer");
     if (!text->p_module)
