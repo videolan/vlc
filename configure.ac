@@ -565,7 +565,7 @@ dnl Add extras/tools to the PATH
 TOOLS_DIR="${srcdir}/extras/tools/build/bin"
 AS_IF([test -d "${TOOLS_DIR}"], [
     TOOLS_DIR=`cd "${TOOLS_DIR}" && pwd`
-    export PATH="${TOOLS_DIR}":$PATH
+    export PATH="${TOOLS_DIR}:$PATH"
 ])
 
 dnl
