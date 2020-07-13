@@ -209,4 +209,3 @@ void video_splitter_Delete( video_splitter_t *p_splitter )
     video_format_Clean( &p_splitter->fmt );
     vlc_object_delete(p_splitter);
 }
-
