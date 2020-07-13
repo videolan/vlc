@@ -63,6 +63,12 @@ variables:
         MAKEFLAGS: -j4
         SDKNAME: iphoneos
 
+.variables-ios-simulator-x86_64: &variables-ios-simulator-x86_64
+        VLC_PATH: /Users/videolanci/sandbox/bin
+        HOST_ARCH: x86_64
+        TRIPLET: $HOST_ARCH-apple-iphonesimulator
+        SDKNAME: iphonesimulator
+
 .variables-android-arm: &variables-android-arm
         ANDROID_ARCH: arm
         TRIPLET: arm-linux-androideabi
@@ -337,6 +343,10 @@ ios-arm64:
 ios-armv7:
     extends: .apple-os-common
     variables: *variables-ios-armv7
+
+ios-simulator-x86_64:
+    extends: .apple-os-common
+    variables: *variables-ios-simulator-x86_64
 
 #
 # Android
