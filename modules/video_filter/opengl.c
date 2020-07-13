@@ -145,6 +145,13 @@ LoadFilters(filter_sys_t *sys, const char *glfilters_config)
     return VLC_SUCCESS;
 }
 
+static void
+Flush(filter_t *filter)
+{
+    filter_sys_t *sys = filter->p_sys;
+    vlc_gl_filters_Flush(sys->filters);
+}
+
 static void Close( filter_t *filter )
 {
     filter_sys_t *sys = filter->p_sys;
