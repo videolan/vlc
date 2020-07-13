@@ -583,7 +583,7 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
   PKG_CONFIG_PATH="${CONTRIB_DIR}/lib/pkgconfig:${CONTRIB_DIR}/share/pkgconfig:${PKG_CONFIG_PATH}"
   case "${build_os}" in
       mingw32)
-          export PKG_CONFIG_PATH=`cygpath -mp ${PKG_CONFIG_PATH}`
+          export PKG_CONFIG_PATH="$(cygpath -mp "${PKG_CONFIG_PATH}")"
       ;;
       *)
           export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}"
@@ -615,8 +615,8 @@ AC_SUBST([CONTRIB_DIR])
 dnl Add extras/tools to the PATH
 TOOLS_DIR="${srcdir}/extras/tools/build/bin"
 AS_IF([test -d "${TOOLS_DIR}"], [
-    TOOLS_DIR=`cd "${TOOLS_DIR}" && pwd`
-    export PATH="${TOOLS_DIR}":$PATH
+    TOOLS_DIR="$(cd "${TOOLS_DIR}" && pwd)"
+    export PATH="${TOOLS_DIR}:$PATH"
 ])
 
 dnl
