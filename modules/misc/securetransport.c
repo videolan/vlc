@@ -760,7 +760,7 @@ static vlc_tls_t *st_ClientSessionOpen(vlc_tls_client_t *crd, vlc_tls_t *sock,
 
             OSStatus ret = SSLSetALPNProtocols(sys->p_context, alpnValues);
             if (ret != noErr){
-                msg_Err(crd, "failed setting ALPN protocols (%i)", ret);
+                msg_Err(crd, "failed setting ALPN protocols (%i)", (int)ret);
             }
             CFRelease(alpnValues);
         } else {
