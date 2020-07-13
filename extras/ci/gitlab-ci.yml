@@ -69,6 +69,12 @@ variables:
         TRIPLET: $HOST_ARCH-apple-iphonesimulator
         SDKNAME: iphonesimulator
 
+.variables-tvos-arm64: &variables-tvos-arm64
+        VLC_PATH: /Users/videolanci/sandbox/bin
+        HOST_ARCH: arm64
+        TRIPLET: $HOST_ARCH-apple-appletvos
+        SDKNAME: appletvos
+
 .variables-android-arm: &variables-android-arm
         ANDROID_ARCH: arm
         TRIPLET: arm-linux-androideabi
@@ -347,6 +353,10 @@ ios-armv7:
 ios-simulator-x86_64:
     extends: .apple-os-common
     variables: *variables-ios-simulator-x86_64
+
+tvos-arm64:
+    extends: .apple-os-common
+    variables: *variables-tvos-arm64
 
 #
 # Android
