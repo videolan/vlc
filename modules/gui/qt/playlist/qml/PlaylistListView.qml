@@ -166,6 +166,38 @@ Widgets.NavigableFocusScope {
             MenuSeparator { }
 
             Widgets.MenuItemExt {
+                text: i18n.qtr("Add File...")
+                icon.source: "qrc:/buttons/playlist/playlist_add.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
+                onTriggered: {
+                    dialogProvider.simpleOpenDialog(false)
+                }
+            }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Add Directory...")
+                icon.source: "qrc:/buttons/playlist/playlist_add.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
+                onTriggered: {
+                    dialogProvider.PLAppendDir()
+                }
+            }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Advanced Open...")
+                icon.source: "qrc:/buttons/playlist/playlist_add.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
+                onTriggered: {
+                    dialogProvider.PLAppendDialog()
+                }
+            }
+
+            MenuSeparator { }
+
+            Widgets.MenuItemExt {
                 text: i18n.qtr("Save Playlist to File...")
                 onTriggered: {
                     dialogProvider.savePlayingToPlaylist();
