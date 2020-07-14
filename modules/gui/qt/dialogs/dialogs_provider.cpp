@@ -486,11 +486,11 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
     return res;
 }
 
-void DialogsProvider::simpleOpenDialog()
+void DialogsProvider::simpleOpenDialog(bool start)
 {
     QStringList urls = DialogsProvider::showSimpleOpen();
 
-    bool first = true;
+    bool first = start;
     urls.sort();
     foreach( const QString &url, urls )
     {

@@ -144,7 +144,7 @@ public slots:
 
     void openFileGenericDialog( intf_dialog_args_t * );
 
-    void simpleOpenDialog();
+    void simpleOpenDialog( bool start = true );
 
     void openDialog();
     void openDiscDialog();
