@@ -133,6 +133,7 @@ Widgets.NavigableFocusScope {
         Widgets.MenuExt {
             id: contextMenu
             property alias model: root.plmodel
+            property int itemIndex: -1
             property bool medialibAvailable: false
             closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
 
@@ -142,7 +143,7 @@ Widgets.NavigableFocusScope {
                 icon.width: VLCStyle.icon_small
                 icon.height: VLCStyle.icon_small
                 onTriggered: {
-                    mainPlaylistController.goTo(contextMenu.model.getSelection()[0], true)
+                    mainPlaylistController.goTo(contextMenu.itemIndex, true)
                 }
             }
 
@@ -323,6 +324,7 @@ Widgets.NavigableFocusScope {
                             {
                                 view.forceActiveFocus()
                                 root.plmodel.deselectAll()
+                                contextMenu.itemIndex = -1
                                 contextMenu.popup()
                             }
                             else if ( mouse.button === Qt.LeftButton )
@@ -415,6 +417,7 @@ Widgets.NavigableFocusScope {
 
                             if (button === Qt.RightButton)
                             {
+                                contextMenu.itemIndex = index
                                 contextMenu.popup()
                             }
                         }
