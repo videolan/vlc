@@ -132,7 +132,7 @@ Widgets.NavigableFocusScope {
 
         Widgets.MenuExt {
             id: contextMenu
-            property var model: ({})
+            property alias model: root.plmodel
             property bool medialibAvailable: false
             closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
 
@@ -323,7 +323,6 @@ Widgets.NavigableFocusScope {
                             {
                                 view.forceActiveFocus()
                                 root.plmodel.deselectAll()
-                                contextMenu.model = root.plmodel
                                 contextMenu.popup()
                             }
                             else if ( mouse.button === Qt.LeftButton )
@@ -416,7 +415,6 @@ Widgets.NavigableFocusScope {
 
                             if (button === Qt.RightButton)
                             {
-                                contextMenu.model = root.plmodel
                                 contextMenu.popup()
                             }
                         }
