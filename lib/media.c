@@ -181,19 +181,90 @@ static libvlc_media_t *input_item_add_subitem( libvlc_media_t *p_md,
     return p_md_child;
 }
 
-static void input_item_add_subnode( libvlc_media_t *md,
-                                    input_item_node_t *node )
+struct vlc_item_list
 {
-    for( int i = 0; i < node->i_children; i++ )
-    {
-        input_item_node_t *child = node->pp_children[i];
-        libvlc_media_t *md_child = input_item_add_subitem( md, child->p_item );
+    struct vlc_list node;
+    input_item_node_t *item;
+    libvlc_media_t *media;
+};
 
-        if( md_child != NULL )
+static struct vlc_item_list *
+wrap_item_in_list( libvlc_media_t *media, input_item_node_t *item )
+{
+    struct vlc_item_list *node = malloc( sizeof *node );
+    if( node == NULL )
+        return NULL;
+    node->item = item;
+    node->media = media;
+    return node;
+}
+
+static void input_item_add_subnode( libvlc_media_t *md,
+                                    input_item_node_t *root )
+{
+    struct vlc_list list;
+    vlc_list_init( &list );
+
+    /* Retain the media because we don't want the search algorithm to release
+     * it when its subitems get parsed. */
+    libvlc_media_retain(md);
+
+    struct vlc_item_list *node_root = wrap_item_in_list( md, root );
+    if( node_root == NULL )
+    {
+        libvlc_media_release(md);
+        goto error;
+    }
+
+    /* This is a depth-first search algorithm, so stash the root of the tree
+     * first, then stash its children and loop back on the last item in the
+     * list until the full subtree is parsed, and eventually the full tree is
+     * parsed. */
+    vlc_list_append( &node_root->node, &list );
+
+    while( !vlc_list_is_empty( &list ) )
+    {
+        /* Pop last item in the list. */
+        struct vlc_item_list *node =
+            vlc_list_last_entry_or_null( &list, struct vlc_item_list, node );
+        vlc_list_remove(&node->node);
+
+        for( int i = 0; i < node->item->i_children; i++ )
         {
-            input_item_add_subnode( md_child, child );
-            libvlc_media_release( md_child );
+            input_item_node_t *child = node->item->pp_children[i];
+
+            /* The media will be released when its children will be added to
+             * the list. */
+            libvlc_media_t *md_child = input_item_add_subitem( node->media, child->p_item );
+            if( md_child == NULL )
+                goto error;
+
+            struct vlc_item_list *submedia =
+                wrap_item_in_list( md_child, child );
+            if (submedia == NULL)
+            {
+                libvlc_media_release( md_child );
+                goto error;
+            }
+
+            /* Stash a request to parse this subtree. */
+            vlc_list_append( &submedia->node, &list );
         }
+
+        libvlc_media_release( node->media );
+        free( node );
+    }
+    return;
+
+error:
+    libvlc_printerr( "Not enough memory" );
+
+    struct vlc_item_list *node;
+    vlc_list_foreach( node, &list, node )
+    {
+        if( node->media != NULL )
+            libvlc_media_release( node->media );
+        free( node );
     }
 }
 
@@ -212,10 +283,6 @@ static void input_item_subtree_added(input_item_t *item,
 
 void libvlc_media_add_subtree(libvlc_media_t *p_md, input_item_node_t *node)
 {
-    /* FIXME FIXME FIXME
-     * Recursive function calls seem much simpler for this. But playlists are
-     * untrusted and can be arbitrarily deep (e.g. with XSPF). So recursion can
-     * potentially lead to plain old stack overflow. */
     input_item_add_subnode( p_md, node );
 
     /* Construct the event */
