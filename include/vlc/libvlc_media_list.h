@@ -40,11 +40,9 @@ typedef struct libvlc_media_list_t libvlc_media_list_t;
 /**
  * Create an empty media list.
  *
- * \param p_instance libvlc instance
  * \return empty media list, or NULL on error
  */
-LIBVLC_API libvlc_media_list_t *
-    libvlc_media_list_new( libvlc_instance_t *p_instance );
+LIBVLC_API libvlc_media_list_t *libvlc_media_list_new(void);
 
 /**
  * Release media list created with libvlc_media_list_new().

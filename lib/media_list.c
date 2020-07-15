@@ -146,8 +146,7 @@ bool mlist_is_writable( libvlc_media_list_t *p_mlist )
  *
  * Init an object.
  **************************************************************************/
-libvlc_media_list_t *
-libvlc_media_list_new( libvlc_instance_t * p_inst )
+libvlc_media_list_t *libvlc_media_list_new(void)
 {
     libvlc_media_list_t * p_mlist;
 
@@ -158,7 +157,6 @@ libvlc_media_list_new( libvlc_instance_t * p_inst )
         return NULL;
     }
 
-    p_mlist->p_libvlc_instance = p_inst;
     libvlc_event_manager_init( &p_mlist->event_manager, p_mlist );
     p_mlist->b_read_only = false;
 
@@ -171,7 +169,6 @@ libvlc_media_list_new( libvlc_instance_t * p_inst )
     p_mlist->p_md = NULL;
     p_mlist->p_internal_md = NULL;
 
-    libvlc_retain( p_inst );
     return p_mlist;
 }
 
@@ -204,7 +201,6 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
 
     vlc_array_clear( &p_mlist->items );
 
-    libvlc_release( p_mlist->p_libvlc_instance );
     free( p_mlist );
 }
 

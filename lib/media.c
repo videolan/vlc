@@ -141,7 +141,7 @@ static libvlc_media_list_t *media_get_subitems( libvlc_media_t * p_md,
     vlc_mutex_lock( &p_md->subitems_lock );
     if( p_md->p_subitems == NULL && b_create )
     {
-        p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance );
+        p_md->p_subitems = libvlc_media_list_new();
         if( p_md->p_subitems != NULL )
         {
             p_md->p_subitems->b_read_only = true;

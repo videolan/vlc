@@ -34,7 +34,7 @@ static void test_media_list (const char ** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    ml = libvlc_media_list_new (vlc);
+    ml = libvlc_media_list_new();
     assert (ml != NULL);
 
     md1 = libvlc_media_new_path (vlc, "/dev/null");
