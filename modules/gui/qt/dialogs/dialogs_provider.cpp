@@ -734,6 +734,20 @@ void DialogsProvider::streamingDialog( QWidget *parent,
     }
 }
 
+void DialogsProvider::streamingDialog(const QList<QUrl> &urls, bool b_stream )
+{
+    if(urls.isEmpty())
+        return;
+
+    QStringList _urls;
+    std::transform(urls.begin(),
+                   urls.end(),
+                   std::back_inserter(_urls),
+                   [](const QUrl& url){ return url.toString(); });
+
+    streamingDialog(nullptr, _urls, b_stream);
+}
+
 void DialogsProvider::openAndStreamingDialogs()
 {
     OpenDialog::getInstance( p_intf->p_sys->p_mi, p_intf, false, OPEN_AND_STREAM )

@@ -164,6 +164,7 @@ public slots:
 
     void streamingDialog( QWidget *parent, const QStringList& mrls, bool b_stream = true,
                           QStringList options = QStringList("") );
+    void streamingDialog( const QList<QUrl>& urls, bool b_stream = true );
     void openAndStreamingDialogs();
     void openAndTranscodingDialogs();
 
