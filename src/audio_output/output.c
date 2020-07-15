@@ -482,9 +482,13 @@ static void aout_UpdateStereoMode(audio_output_t *aout, int mode,
             break;
         case AOUT_VAR_CHAN_LEFT:
             filters_cfg->remap[AOUT_CHANIDX_RIGHT] = AOUT_CHANIDX_DISABLE;
+            fmt->i_physical_channels = AOUT_CHAN_CENTER;
+            aout_FormatPrepare (fmt);
             break;
         case AOUT_VAR_CHAN_RIGHT:
             filters_cfg->remap[AOUT_CHANIDX_LEFT] = AOUT_CHANIDX_DISABLE;
+            fmt->i_physical_channels = AOUT_CHAN_CENTER;
+            aout_FormatPrepare (fmt);
             break;
         case AOUT_VAR_CHAN_DOLBYS:
             fmt->i_chan_mode = AOUT_CHANMODE_DOLBYSTEREO;
@@ -692,11 +696,6 @@ int aout_OutputNew (audio_output_t *aout)
         /* Try to stay in integer domain if possible for no/slow FPU. */
         fmt->i_format = (fmt->i_bitspersample > 16) ? VLC_CODEC_FL32
                                                     : VLC_CODEC_S16N;
-
-        if (fmt->i_physical_channels == AOUT_CHANS_STEREO
-         && (owner->requested_stereo_mode == AOUT_VAR_CHAN_LEFT
-          || owner->requested_stereo_mode == AOUT_VAR_CHAN_RIGHT))
-            fmt->i_physical_channels = AOUT_CHAN_CENTER;
 
         aout_SetupMixModeChoices(aout, fmt);
 
