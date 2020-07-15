@@ -786,6 +786,7 @@ static int Demux( demux_t *p_demux)
             if( es_out_SetPCR( p_demux->out, i_pcr ) )
             {
                 msg_Err( p_demux, "ES_OUT_SET_PCR failed, aborting." );
+                delete block;
                 return 0;
             }
 
