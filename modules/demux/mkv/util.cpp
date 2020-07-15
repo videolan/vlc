@@ -24,6 +24,7 @@
 #include "mkv.hpp"
 #include "util.hpp"
 #include "demux.hpp"
+#include "../../codec/webvtt/helpers.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -240,6 +241,55 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, m
         p_sys->i_subpacket = 0;
         p_sys->i_subpackets = 0;
     }
+}
+
+block_t *WEBVTT_Repack_Sample(block_t *p_block, bool b_webm)
+{
+    struct webvtt_cueelements_s els;
+    memset(&els, 0, sizeof(els));
+    /* Repack to ISOBMFF samples format */
+    if( !b_webm ) /* S_TEXT/WEBVTT */
+    {
+        p_block = block_Realloc( p_block, 16, p_block->i_buffer );
+        if( !p_block )
+            return NULL;
+        SetDWBE( p_block->p_buffer, p_block->i_buffer );
+        memcpy(  &p_block->p_buffer[ 4], "vttc", 4 );
+        SetDWBE( &p_block->p_buffer[ 8], p_block->i_buffer - 8 );
+        memcpy(  &p_block->p_buffer[12], "payl", 4 );
+    }
+    else /* deprecated D_WEBVTT/ */
+    {
+        const uint8_t *start = p_block->p_buffer;
+        const uint8_t *end = p_block->p_buffer + p_block->i_buffer;
+        const uint8_t *sttg =
+                reinterpret_cast<const uint8_t *>(std::memchr( start, '\n', p_block->i_buffer ));
+        if( !sttg || ++sttg == end )
+            goto error;
+        const uint8_t *payl =
+                reinterpret_cast<const uint8_t *>(std::memchr( sttg, '\n', end - sttg ));
+        if( !payl || ++payl == end )
+            goto error;
+        els.iden.p_data = start;
+        els.iden.i_data = &sttg[-1] - start;
+        els.sttg.p_data = sttg;
+        els.sttg.i_data = &payl[-1] - sttg;
+        els.payl.p_data = payl;
+        els.payl.i_data = end - payl;
+        size_t newsize = WEBVTT_Pack_CueElementsGetNewSize( &els );
+        block_t *newblock = block_Alloc( newsize );
+        if( !newblock )
+            goto error;
+        WEBVTT_Pack_CueElements( &els, newblock->p_buffer );
+        block_CopyProperties( newblock, p_block );
+        block_Release( p_block );
+        return newblock;
+    }
+    return p_block;
+
+error:
+    block_Release( p_block );
+    return NULL;
 }
 
 void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsigned int i_number_frames, mtime_t i_duration )

@@ -192,7 +192,7 @@ libmkv_plugin_la_SOURCES = \
 	demux/mkv/stream_io_callback.hpp demux/mkv/stream_io_callback.cpp \
 	demux/mp4/libmp4.c demux/vobsub.h \
 	demux/mkv/mkv.hpp demux/mkv/mkv.cpp \
-        demux/av1_unpack.h \
+        demux/av1_unpack.h codec/webvtt/helpers.h \
 	demux/windows_audio_commons.h
 libmkv_plugin_la_SOURCES += packetizer/dts_header.h packetizer/dts_header.c
 libmkv_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CFLAGS_mkv)
