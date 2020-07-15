@@ -152,8 +152,7 @@ static filter_t *TryFormat (vlc_object_t *obj, vlc_fourcc_t codec,
 static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
                                       unsigned *count, unsigned max,
                                  const audio_sample_format_t *restrict infmt,
-                                 const audio_sample_format_t *restrict outfmt,
-                                 bool headphones)
+                                 const audio_sample_format_t *restrict outfmt)
 {
     aout_FormatsPrint (obj, "conversion:", infmt, outfmt);
     max -= *count;
@@ -207,13 +206,8 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
             infmt->channel_type != outfmt->channel_type ?
             "audio renderer" : "audio converter";
 
-        config_chain_t *cfg = NULL;
-        if (headphones)
-            config_ChainParseOptions(&cfg, "{headphones=true}");
         filter_t *f = aout_filter_Create(obj, NULL, filter_type, NULL,
-                                         &input, &output, cfg, true);
-        if (cfg)
-            config_ChainDestroy(cfg);
+                                         &input, &output, NULL, true);
 
         if (f == NULL)
         {
@@ -430,7 +424,7 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
 
     /* convert to the filter input format if necessary */
     if (aout_FiltersPipelineCreate (obj, filters->tab, &filters->count,
-                                    max - 1, infmt, &filter->fmt_in.audio, false))
+                                    max - 1, infmt, &filter->fmt_in.audio))
     {
         msg_Err (filter, "cannot add user %s \"%s\" (skipped)", type, name);
         filter_Close( filter );
@@ -552,8 +546,7 @@ aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *obj, const vlc_clock_t *c
         /* convert to the output format (minus resampling) if necessary */
         output_format.i_rate = input_format.i_rate;
         if (aout_FiltersPipelineCreate (obj, filters->tab, &filters->count,
-                                  AOUT_MAX_FILTERS, &input_format, &output_format,
-                                  cfg->headphones))
+                                  AOUT_MAX_FILTERS, &input_format, &output_format))
         {
             msg_Warn (obj, "cannot setup audio renderer pipeline");
             /* Fallback to bitmap without any conversions */
@@ -597,14 +590,8 @@ aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *obj, const vlc_clock_t *c
     }
 
     if (cfg != NULL)
-    {
         AppendRemapFilter(obj, filters, &input_format, &output_format,
                           cfg->remap);
-
-        if (input_format.i_channels > 2 && cfg->headphones)
-            AppendFilter(obj, "audio filter", "binauralizer", filters,
-                         &input_format, &output_format, NULL);
-    }
 
     /* Now add user filters */
     char *str = var_InheritString (obj, "audio-filter");
@@ -628,7 +615,7 @@ aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *obj, const vlc_clock_t *c
     /* convert to the output format (minus resampling) if necessary */
     output_format.i_rate = input_format.i_rate;
     if (aout_FiltersPipelineCreate (obj, filters->tab, &filters->count,
-                              AOUT_MAX_FILTERS, &input_format, &output_format, false))
+                              AOUT_MAX_FILTERS, &input_format, &output_format))
     {
         msg_Err (obj, "cannot setup filtering pipeline");
         goto error;

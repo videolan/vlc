@@ -170,6 +170,7 @@ static const uint16_t vlc_chan_maps[] =
 /* Values available for i_chan_mode only */
 #define AOUT_CHANMODE_DUALMONO    0x1
 #define AOUT_CHANMODE_DOLBYSTEREO 0x2
+#define AOUT_CHANMODE_BINAURAL    0x4
 
 /**
  * Picture orientation.

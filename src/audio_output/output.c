@@ -618,8 +618,7 @@ static bool aout_HasMixModeChoice(audio_output_t *aout, int mode)
 
 
 static void aout_UpdateMixMode(audio_output_t *aout, int mode,
-                               audio_sample_format_t *restrict fmt,
-                               aout_filters_cfg_t *filters_cfg)
+                               audio_sample_format_t *restrict fmt)
 {
     /* The user may have selected a different channels configuration. */
     switch (mode)
@@ -628,7 +627,7 @@ static void aout_UpdateMixMode(audio_output_t *aout, int mode,
             break;
         case AOUT_MIX_MODE_BINAURAL:
             fmt->i_physical_channels = AOUT_CHANS_STEREO;
-            filters_cfg->headphones = true;
+            fmt->i_chan_mode = AOUT_CHANMODE_BINAURAL;
             break;
         case AOUT_MIX_MODE_STEREO:
             fmt->i_physical_channels = AOUT_CHANS_STEREO;
@@ -702,7 +701,7 @@ int aout_OutputNew (audio_output_t *aout)
         /* Prefer the user requested mode if available, otherwise, use the
          * default one */
         if (aout_HasMixModeChoice(aout, owner->requested_mix_mode))
-            aout_UpdateMixMode(aout, owner->requested_mix_mode, fmt, filters_cfg);
+            aout_UpdateMixMode(aout, owner->requested_mix_mode, fmt);
 
         aout_FormatPrepare (fmt);
         assert (aout_FormatNbChannels(fmt) > 0);
@@ -769,7 +768,7 @@ int aout_OutputNew (audio_output_t *aout)
     {
         assert(fmt->i_physical_channels == AOUT_CHANS_STEREO);
         assert(stereo_mode == AOUT_VAR_CHAN_UNSET);
-        aout_UpdateMixMode(aout, AOUT_MIX_MODE_BINAURAL, fmt, filters_cfg);
+        aout_UpdateMixMode(aout, AOUT_MIX_MODE_BINAURAL, fmt);
     }
 
     aout_FormatPrepare (fmt);
