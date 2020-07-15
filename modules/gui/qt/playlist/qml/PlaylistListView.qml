@@ -186,8 +186,11 @@ Widgets.NavigableFocusScope {
 
             Widgets.MenuItemExt {
                 text: i18n.qtr("Show Containing Directory...")
+                icon.source: "qrc:/type/folder-grey.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
                 onTriggered: {
-                    // not implemented
+                    mainPlaylistController.explore(contextMenu.model.itemAt(contextMenu.itemIndex))
                 }
             }
 
