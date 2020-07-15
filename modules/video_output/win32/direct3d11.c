@@ -325,7 +325,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 #if !VLC_WINSTORE_APP
         if (cfg->window->type == VOUT_WINDOW_TYPE_HWND)
         {
-            if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys,
+            if (CommonWindowInit(vd, &sys->area, &sys->sys,
                        vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
                 goto error;
         }
@@ -492,7 +492,7 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
-    int res = CommonControl( VLC_OBJECT(vd), &sys->area, &sys->sys, query, args );
+    int res = CommonControl( vd, &sys->area, &sys->sys, query, args );
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
     {
@@ -619,7 +619,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 sys->texture_fmt.i_width  = sys->picQuad.i_height = texDesc.Height;
                 sys->texture_fmt.i_height = sys->picQuad.i_width = texDesc.Width;
 
-                CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
+                CommonPlacePicture(vd, &sys->area, &sys->sys);
                 UpdateSize(vd);
             }
         }
@@ -825,7 +825,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     sys->texture_fmt.i_width  = sys->picQuad.i_width;
     sys->texture_fmt.i_height = sys->picQuad.i_height;
 
-    CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
+    CommonPlacePicture(vd, &sys->area, &sys->sys);
 
     err = QueryDisplayFormat(vd, &fmt);
     if (err != VLC_SUCCESS) {

@@ -1707,7 +1707,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return VLC_SUCCESS;
     }
     default:
-        return CommonControl(VLC_OBJECT(vd), &sys->area, &sys->sys, query, args);
+        return CommonControl(vd, &sys->area, &sys->sys, query, args);
     }
 }
 
@@ -1815,7 +1815,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
         /* use our own callbacks, since there isn't any external ones */
-        if (CommonWindowInit(VLC_OBJECT(vd), &sys->area, &sys->sys, false))
+        if (CommonWindowInit(vd, &sys->area, &sys->sys, false))
             goto error;
 
         sys->outside_opaque = vd;
@@ -1853,7 +1853,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     if (sys->swapCb == LocalSwapchainSwap)
-        CommonPlacePicture(VLC_OBJECT(vd), &sys->area, &sys->sys);
+        CommonPlacePicture(vd, &sys->area, &sys->sys);
 
     sys->hxdll = Direct3D9LoadShaderLibrary();
     if (!sys->hxdll)

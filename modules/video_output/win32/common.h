@@ -36,8 +36,6 @@ typedef struct display_win32_area_t
     vout_display_place_t  place;
     bool                  place_changed;
 
-    video_format_t        texture_source;
-
     vout_display_cfg_t    vdcfg;
 } display_win32_area_t;
 
@@ -69,13 +67,13 @@ typedef struct vout_display_sys_win32_t
  * Prototypes from common.c
  *****************************************************************************/
 #if !VLC_WINSTORE_APP
-int  CommonWindowInit(vlc_object_t *, display_win32_area_t *, vout_display_sys_win32_t *,
+int  CommonWindowInit(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *,
                       bool projection_gestures);
 void CommonWindowClean(vlc_object_t *, vout_display_sys_win32_t *);
 #endif /* !VLC_WINSTORE_APP */
-int  CommonControl(vlc_object_t *, display_win32_area_t *, vout_display_sys_win32_t *, int , va_list );
+int  CommonControl(vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *, int , va_list );
 
-void CommonPlacePicture (vlc_object_t *, display_win32_area_t *, vout_display_sys_win32_t *);
+void CommonPlacePicture (vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *);
 
 void CommonInit(vout_display_t *, display_win32_area_t *, const vout_display_cfg_t *);
 

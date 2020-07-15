@@ -49,8 +49,6 @@ void CommonInit(vout_display_t *vd, display_win32_area_t *area, const vout_displ
     area->place_changed = false;
     area->vdcfg = *vdcfg;
 
-    area->texture_source = vd->source;
-
     var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 }
 
@@ -58,7 +56,7 @@ void CommonInit(vout_display_t *vd, display_win32_area_t *area, const vout_displ
 static void CommonChangeThumbnailClip(vlc_object_t *, vout_display_sys_win32_t *, bool show);
 
 /* */
-int CommonWindowInit(vlc_object_t *obj, display_win32_area_t *area,
+int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
                      vout_display_sys_win32_t *sys, bool projection_gestures)
 {
     if (unlikely(area->vdcfg.window == NULL))
@@ -72,7 +70,7 @@ int CommonWindowInit(vlc_object_t *obj, display_win32_area_t *area,
     sys->hparent   = NULL;
 
     /* */
-    sys->event = EventThreadCreate(obj, area->vdcfg.window);
+    sys->event = EventThreadCreate(VLC_OBJECT(vd), area->vdcfg.window);
     if (!sys->event)
         return VLC_EGENERIC;
 
@@ -90,7 +88,7 @@ int CommonWindowInit(vlc_object_t *obj, display_win32_area_t *area,
     sys->hparent       = hwnd.hparent;
     sys->hvideownd     = hwnd.hvideownd;
 
-    CommonPlacePicture(obj, area, sys);
+    CommonPlacePicture(vd, area, sys);
 
     return VLC_SUCCESS;
 }
@@ -103,7 +101,7 @@ int CommonWindowInit(vlc_object_t *obj, display_win32_area_t *area,
 * its job is to update the source and destination RECTs used to display the
 * picture.
 *****************************************************************************/
-void CommonPlacePicture(vlc_object_t *obj, display_win32_area_t *area, vout_display_sys_win32_t *sys)
+void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
 {
     /* Update the window position and size */
     vout_display_cfg_t place_cfg = area->vdcfg;
@@ -117,7 +115,7 @@ void CommonPlacePicture(vlc_object_t *obj, display_win32_area_t *area, vout_disp
 #endif
 
     vout_display_place_t before_place = area->place;
-    vout_display_PlacePicture(&area->place, &area->texture_source, &place_cfg);
+    vout_display_PlacePicture(&area->place, &vd->source, &place_cfg);
 
     /* Signal the change in size/position */
     if (!vout_display_PlaceEquals(&before_place, &area->place))
@@ -125,18 +123,18 @@ void CommonPlacePicture(vlc_object_t *obj, display_win32_area_t *area, vout_disp
         area->place_changed |= true;
 
 #ifndef NDEBUG
-        msg_Dbg(obj, "UpdateRects source offset: %i,%i visible: %ix%i decoded: %ix%i",
-            area->texture_source.i_x_offset, area->texture_source.i_y_offset,
-            area->texture_source.i_visible_width, area->texture_source.i_visible_height,
-            area->texture_source.i_width, area->texture_source.i_height);
-        msg_Dbg(obj, "UpdateRects image_dst coords: %i,%i %ix%i",
+        msg_Dbg(vd, "UpdateRects source offset: %i,%i visible: %ix%i decoded: %ix%i",
+            vd->source.i_x_offset, vd->source.i_y_offset,
+            vd->source.i_visible_width, vd->source.i_visible_height,
+            vd->source.i_width, vd->source.i_height);
+        msg_Dbg(vd, "UpdateRects image_dst coords: %i,%i %ix%i",
             area->place.x, area->place.y, area->place.width, area->place.height);
 #endif
 
 #if !VLC_WINSTORE_APP
         if (sys->event != NULL)
         {
-            CommonChangeThumbnailClip(obj, sys, true);
+            CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
         }
 #endif
     }
@@ -200,7 +198,7 @@ static void CommonChangeThumbnailClip(vlc_object_t *obj, vout_display_sys_win32_
 }
 #endif /* !VLC_WINSTORE_APP */
 
-int CommonControl(vlc_object_t *obj, display_win32_area_t *area, vout_display_sys_win32_t *sys, int query, va_list args)
+int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys, int query, va_list args)
 {
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED: /* const vout_display_cfg_t *p_cfg */
@@ -208,7 +206,7 @@ int CommonControl(vlc_object_t *obj, display_win32_area_t *area, vout_display_sy
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {
         area->vdcfg = *va_arg(args, const vout_display_cfg_t *);
-        CommonPlacePicture(obj, area, sys);
+        CommonPlacePicture(vd, area, sys);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg */
@@ -227,7 +225,7 @@ int CommonControl(vlc_object_t *obj, display_win32_area_t *area, vout_display_sy
                          area->vdcfg.display.height, SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE);
         }
 #endif /* !VLC_WINSTORE_APP */
-        CommonPlacePicture(obj, area, sys);
+        CommonPlacePicture(vd, area, sys);
         return VLC_SUCCESS;
     }
 
