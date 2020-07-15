@@ -397,25 +397,22 @@ void aout_Release(audio_output_t *aout)
     vlc_object_delete(VLC_OBJECT(aout));
 }
 
-static void aout_PrepareStereoMode (audio_output_t *aout,
-                                    audio_sample_format_t *restrict fmt,
-                                    aout_filters_cfg_t *filters_cfg,
-                                    audio_channel_type_t input_chan_type,
-                                    unsigned i_nb_input_channels)
+static int aout_PrepareStereoMode(audio_output_t *aout,
+                                  const audio_sample_format_t *restrict fmt,
+                                  audio_channel_type_t input_chan_type,
+                                  unsigned i_nb_input_channels)
 {
     aout_owner_t *owner = aout_owner (aout);
 
     /* Fill Stereo mode choices */
-    var_Change(aout, "stereo-mode", VLC_VAR_CLEARCHOICES);
     vlc_value_t val;
     const char *txt;
     val.i_int = 0;
 
     if (!AOUT_FMT_LINEAR(fmt) || i_nb_input_channels == 1)
-        return;
+        return AOUT_VAR_CHAN_UNSET;
 
-    int i_output_mode = owner->requested_stereo_mode;
-    int i_default_mode = AOUT_VAR_CHAN_UNSET;
+    int i_default_mode = owner->requested_stereo_mode;
 
     val.i_int = AOUT_VAR_CHAN_MONO;
     var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, _("Mono"));
@@ -465,25 +462,15 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
             i_default_mode = AOUT_VAR_CHAN_HEADPHONES;
     }
 
-    bool mode_available = false;
-    vlc_value_t *vals;
-    size_t count;
+    return i_default_mode;
+}
 
-    if (!var_Change(aout, "stereo-mode", VLC_VAR_GETCHOICES,
-                    &count, &vals, (char ***)NULL))
-    {
-        for (size_t i = 0; !mode_available && i < count; ++i)
-        {
-            if (vals[i].i_int == i_output_mode)
-                mode_available = true;
-        }
-        free(vals);
-    }
-    if (!mode_available)
-        i_output_mode = i_default_mode;
-
+static void aout_UpdateStereoMode(audio_output_t *aout, int mode,
+                                  audio_sample_format_t *restrict fmt,
+                                  aout_filters_cfg_t *filters_cfg)
+{
     /* The user may have selected a different channels configuration. */
-    switch (i_output_mode)
+    switch (mode)
     {
         case AOUT_VAR_CHAN_RSTEREO:
             filters_cfg->remap[AOUT_CHANIDX_LEFT] = AOUT_CHANIDX_RIGHT;
@@ -513,7 +500,26 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
     }
 
     var_Change(aout, "stereo-mode", VLC_VAR_SETVALUE,
-               (vlc_value_t) { .i_int = i_output_mode });
+               (vlc_value_t) { .i_int = mode});
+}
+
+static bool aout_HasStereoMode(audio_output_t *aout, int mode)
+{
+    bool mode_available = false;
+    vlc_value_t *vals;
+    size_t count;
+
+    if (!var_Change(aout, "stereo-mode", VLC_VAR_GETCHOICES,
+                    &count, &vals, (char ***)NULL))
+    {
+        for (size_t i = 0; !mode_available && i < count; ++i)
+        {
+            if (vals[i].i_int == mode)
+                mode_available = true;
+        }
+        free(vals);
+    }
+    return mode_available;
 }
 
 /**
@@ -534,6 +540,8 @@ int aout_OutputNew (audio_output_t *aout)
     vlc_fourcc_t formats[] = {
         fmt->i_format, 0, 0
     };
+
+    var_Change(aout, "stereo-mode", VLC_VAR_CLEARCHOICES);
 
     /* Ideally, the audio filters would be created before the audio output,
      * and the ideal audio format would be the output of the filters chain.
@@ -615,8 +623,13 @@ int aout_OutputNew (audio_output_t *aout)
     }
     assert(aout->flush && aout->play && aout->time_get && aout->pause);
 
-    aout_PrepareStereoMode (aout, fmt, filters_cfg, input_chan_type,
-                            i_nb_input_channels);
+    int stereo_mode =
+        aout_PrepareStereoMode(aout, fmt, input_chan_type,
+                               i_nb_input_channels);
+
+    if (stereo_mode != AOUT_VAR_CHAN_UNSET
+     && aout_HasStereoMode(aout, stereo_mode))
+        aout_UpdateStereoMode(aout, stereo_mode, fmt, filters_cfg);
 
     aout_FormatPrepare (fmt);
     assert (fmt->i_bytes_per_frame > 0 && fmt->i_frame_length > 0);
