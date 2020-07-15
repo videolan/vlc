@@ -149,8 +149,11 @@ Widgets.NavigableFocusScope {
 
             Widgets.MenuItemExt {
                 text: i18n.qtr("Information...")
+                icon.source: "qrc:/menu/info.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
                 onTriggered: {
-                    // not implemented
+                    dialogProvider.mediaInfoDialog(contextMenu.model.itemAt(contextMenu.itemIndex))
                 }
             }
 
