@@ -33,6 +33,9 @@
 #include "qt.hpp"
 
 #include "dialogs/open/open.hpp"
+
+#include "playlist/playlist_item.hpp"
+
 #include <QObject>
 #include <QStringList>
 
@@ -119,7 +122,8 @@ private:
 
 public slots:
     void bookmarksDialog();
-    void mediaInfoDialog();
+    void mediaInfoDialog( void );
+    void mediaInfoDialog( const PlaylistItem& pItem );
     void mediaCodecDialog();
     void prefsDialog();
     void extendedDialog();

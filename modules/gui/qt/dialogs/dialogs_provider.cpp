@@ -284,13 +284,32 @@ void DialogsProvider::aboutDialog()
     AboutDialog::getInstance( p_intf )->toggleVisible();
 }
 
-void DialogsProvider::mediaInfoDialog()
+void DialogsProvider::mediaInfoDialog( void )
 {
     MediaInfoDialog *dialog = MediaInfoDialog::getInstance( p_intf );
     if( !dialog->isVisible() || dialog->currentTab() != MediaInfoDialog::META_PANEL )
         dialog->showTab( MediaInfoDialog::META_PANEL );
     else
         dialog->hide();
+}
+
+void DialogsProvider::mediaInfoDialog( const PlaylistItem& pItem )
+{
+    input_item_t *p_input = nullptr;
+
+    vlc_playlist_item_t * const playlistItem = pItem.raw();
+
+    if( playlistItem )
+    {
+        p_input = vlc_playlist_item_GetMedia(playlistItem);
+    }
+
+    if( p_input )
+    {
+        MediaInfoDialog * const mid = new MediaInfoDialog( p_intf, p_input );
+        mid->setParent( p_intf->p_sys->p_mi, Qt::Dialog );
+        mid->showTab( MediaInfoDialog::META_PANEL );
+    }
 }
 
 void DialogsProvider::mediaCodecDialog()
