@@ -1250,7 +1250,8 @@ static bool EsOutIsProgramVisible( es_out_t *out, input_source_t *source, int i_
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     return p_sys->i_group_id == 0
-        || (p_sys->i_group_id == i_group && p_sys->p_pgrm->source == source);
+        || (p_sys->i_group_id == i_group &&
+            p_sys->p_pgrm && p_sys->p_pgrm->source == source);
 }
 
 /* EsOutProgramSelect:
