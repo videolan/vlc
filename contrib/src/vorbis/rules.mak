@@ -6,15 +6,18 @@ VORBIS_URL := $(XIPH)/vorbis/libvorbis-$(VORBIS_VERSION).tar.xz
 ifdef HAVE_FPU
 PKGS += vorbis
 endif
+ifdef BUILD_ENCODERS
+PKGS += vorbis
+endif
+
 ifeq ($(call need_pkg,"vorbis >= 1.1"),)
+ifdef BUILD_ENCODERS
+ifeq ($(call need_pkg,"vorbisenc >= 1.1"),)
 PKGS_FOUND += vorbis
 endif
-PKGS_ALL += vorbisenc
-ifdef BUILD_ENCODERS
-PKGS += vorbisenc
+else
+PKGS_FOUND += vorbis
 endif
-ifeq ($(call need_pkg,"vorbisenc >= 1.1"),)
-PKGS_FOUND += vorbisenc
 endif
 
 $(TARBALLS)/libvorbis-$(VORBIS_VERSION).tar.xz:
@@ -40,12 +43,4 @@ VORBIS_CONF := --disable-docs --disable-examples --disable-oggtest
 	$(RECONF) -Im4
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(VORBIS_CONF)
 	$(MAKE) -C $< install
-	touch $@
-
-.sum-vorbisenc: .sum-vorbis
-	touch $@
-
-DEPS_vorbisenc = vorbis $(DEPS_vorbis)
-
-.vorbisenc:
 	touch $@
