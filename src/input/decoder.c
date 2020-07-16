@@ -49,6 +49,7 @@
 #include "../clock/clock.h"
 #include "decoder.h"
 #include "resource.h"
+#include "libvlc.h"
 
 #include "../video_output/vout_internal.h"
 
