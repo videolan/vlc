@@ -552,6 +552,15 @@ libvlccore_la_LIBADD += libvlccore_objc.la
 libvlccore_la_LDFLAGS +=  -Wl,-framework,Foundation -Xlinker -install_name -Xlinker @rpath/libvlccore.dylib -Wl,-U,_vlc_static_modules
 endif
 
+# iOS and tvOS applications cannot install global shared libraries and
+# dylibs must be in frameworks so there's no need for libtool versionning.
+if HAVE_IOS
+libvlccore_la_LDFLAGS += -avoid-version
+endif
+if HAVE_TVOS
+libvlccore_la_LDFLAGS += -avoid-version
+endif
+
 libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc $(top_srcdir)/extras/package/win32/libvlc.dll.manifest
 	$(WINDRES) --include-dir $(top_srcdir)/share --include-dir $(top_srcdir)/extras/package/win32 -i $< -o $@
 
