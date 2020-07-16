@@ -244,20 +244,38 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, v
     }
 }
 
-block_t *WEBVTT_Repack_Sample(block_t *p_block, bool b_webm)
+block_t *WEBVTT_Repack_Sample(block_t *p_block, bool b_webm,
+                              const uint8_t *p_add, size_t i_add)
 {
     struct webvtt_cueelements_s els;
     memset(&els, 0, sizeof(els));
+    size_t newsize = 0;
+    block_t *newblock = nullptr;
     /* Repack to ISOBMFF samples format */
     if( !b_webm ) /* S_TEXT/WEBVTT */
     {
-        p_block = block_Realloc( p_block, 16, p_block->i_buffer );
-        if( !p_block )
-            return NULL;
-        SetDWBE( p_block->p_buffer, p_block->i_buffer );
-        memcpy(  &p_block->p_buffer[ 4], "vttc", 4 );
-        SetDWBE( &p_block->p_buffer[ 8], p_block->i_buffer - 8 );
-        memcpy(  &p_block->p_buffer[12], "payl", 4 );
+        /* process addition fields */
+        if( i_add )
+        {
+            const uint8_t *end = p_add + i_add;
+            const uint8_t *iden =
+                    reinterpret_cast<const uint8_t *>(std::memchr( p_add, '\n', i_add ));
+            if( iden && ++iden != end )
+            {
+                els.sttg.p_data = p_add;
+                els.sttg.i_data = &iden[-1] - p_add;
+                const uint8_t *comm =
+                        reinterpret_cast<const uint8_t *>(std::memchr( iden, '\n', end - iden ));
+                els.iden.p_data = iden;
+                if( comm )
+                    els.iden.i_data = comm - iden;
+                else
+                    els.iden.i_data = end - iden;
+            }
+        }
+        /* the payload being in the block */
+        els.payl.p_data = p_block->p_buffer;
+        els.payl.i_data = p_block->i_buffer;
     }
     else /* deprecated D_WEBVTT/ */
     {
@@ -277,16 +295,16 @@ block_t *WEBVTT_Repack_Sample(block_t *p_block, bool b_webm)
         els.sttg.i_data = &payl[-1] - sttg;
         els.payl.p_data = payl;
         els.payl.i_data = end - payl;
-        size_t newsize = WEBVTT_Pack_CueElementsGetNewSize( &els );
-        block_t *newblock = block_Alloc( newsize );
-        if( !newblock )
-            goto error;
-        WEBVTT_Pack_CueElements( &els, newblock->p_buffer );
-        block_CopyProperties( newblock, p_block );
-        block_Release( p_block );
-        return newblock;
     }
-    return p_block;
+
+    newsize = WEBVTT_Pack_CueElementsGetNewSize( &els );
+    newblock = block_Alloc( newsize );
+    if( !newblock )
+        goto error;
+    WEBVTT_Pack_CueElements( &els, newblock->p_buffer );
+    block_CopyProperties( newblock, p_block );
+    block_Release( p_block );
+    return newblock;
 
 error:
     block_Release( p_block );
