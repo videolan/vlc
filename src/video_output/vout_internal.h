@@ -33,6 +33,7 @@
 #include "chrono.h"
 #include "../clock/clock.h"
 #include "../input/input_internal.h"
+#include "vout_private.h"
 
 /* It should be high enough to absorbe jitter due to difficult picture(s)
  * to decode but not too high as memory is not that cheap.
@@ -54,18 +55,14 @@ typedef struct {
 } vout_configuration_t;
 #include "control.h"
 
-struct vout_snapshot;
-
-enum vout_crop_mode {
-    VOUT_CROP_NONE, VOUT_CROP_RATIO, VOUT_CROP_WINDOW, VOUT_CROP_BORDER,
-};
-
 /**
  * Video output thread private structure
  */
 typedef struct vout_thread_sys_t vout_thread_sys_t;
 struct vout_thread_sys_t
 {
+    vout_thread_private_t private;
+
     bool dummy;
 
     /* Splitter module if used */
@@ -146,12 +143,6 @@ struct vout_thread_sys_t
         int         position;
     } title;
 
-    struct {
-        bool        is_interlaced;
-        bool        has_deint;
-        vlc_tick_t  date;
-    } interlacing;
-
     /* */
     bool            is_late_dropped;
 
@@ -182,8 +173,6 @@ struct vout_thread_sys_t
     vout_display_t *display;
     vlc_mutex_t     display_lock;
 
-    picture_pool_t  *private_pool;
-    picture_pool_t  *display_pool;
     picture_fifo_t  *decoder_fifo;
     vout_chrono_t   render;           /**< picture render time estimator */
 
@@ -265,11 +254,6 @@ void vout_CreateVars( vout_thread_t * );
 void vout_IntfInit( vout_thread_t * );
 void vout_IntfReinit( vout_thread_t * );
 void vout_IntfDeinit(vlc_object_t *);
-
-/* */
-vout_display_t *vout_OpenWrapper(vout_thread_t *, const char *,
-                    const vout_display_cfg_t *, video_format_t *, vlc_video_context *);
-void vout_CloseWrapper(vout_thread_t *, vout_display_t *vd);
 
 /* */
 ssize_t vout_RegisterSubpictureChannelInternal( vout_thread_t *,

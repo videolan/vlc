@@ -51,7 +51,6 @@
 
 #include <libvlc.h>
 #include "vout_internal.h"
-#include "interlacing.h"
 #include "display.h"
 #include "snapshot.h"
 #include "window.h"
@@ -336,7 +335,7 @@ picture_t *vout_GetPicture(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
     assert(!sys->dummy);
-    picture_t *picture = picture_pool_Wait(sys->display_pool);
+    picture_t *picture = picture_pool_Wait(sys->private.display_pool);
     if (likely(picture != NULL)) {
         picture_Reset(picture);
         video_format_CopyCropAr(&picture->format, &sys->original);
@@ -728,7 +727,7 @@ static picture_t *VoutVideoFilterInteractiveNewPicture(filter_t *filter)
     vout_thread_t *vout = filter->owner.sys;
     vout_thread_sys_t *sys = vout->p;
 
-    picture_t *picture = picture_pool_Get(sys->private_pool);
+    picture_t *picture = picture_pool_Get(sys->private.private_pool);
     if (picture) {
         picture_Reset(picture);
         video_format_CopyCropAr(&picture->format, &filter->fmt_out.video);
@@ -794,9 +793,9 @@ static void ThreadChangeFilters(vout_thread_t *vout,
     vlc_array_init(&array_interactive);
 
     if (new_deinterlace != NULL)
-        sys->interlacing.has_deint = *new_deinterlace;
+        sys->private.interlacing.has_deint = *new_deinterlace;
 
-    if (sys->interlacing.has_deint)
+    if (sys->private.interlacing.has_deint)
     {
         vout_filter_t *e = malloc(sizeof(*e));
 
@@ -1182,7 +1181,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     picture_t *snap_pic = todisplay;
     if (do_early_spu && subpic) {
         if (sys->spu_blend) {
-            picture_t *blent = picture_pool_Get(sys->private_pool);
+            picture_t *blent = picture_pool_Get(sys->private.private_pool);
             if (blent) {
                 video_format_CopyCropAr(&blent->format, &filtered->format);
                 picture_Copy(blent, filtered);
@@ -1578,8 +1577,8 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
     vlc_mouse_Init(&sys->mouse);
 
     sys->decoder_fifo = picture_fifo_New();
-    sys->display_pool = NULL;
-    sys->private_pool = NULL;
+    sys->private.display_pool = NULL;
+    sys->private.private_pool = NULL;
 
     sys->filter.configuration = NULL;
     video_format_Copy(&sys->filter.src_fmt, &sys->original);
@@ -1647,7 +1646,8 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
     dcfg.window_props.width = sys->window_width;
     dcfg.window_props.height = sys->window_height;
 
-    sys->display = vout_OpenWrapper(vout, sys->splitter_name, &dcfg, &sys->original, vctx);
+    sys->display = vout_OpenWrapper(vout, &sys->private, sys->splitter_name, &dcfg,
+                                    &sys->original, vctx);
     if (sys->display == NULL) {
         vlc_mutex_unlock(&sys->display_lock);
         goto error;
@@ -1659,7 +1659,7 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
         vout_SetDisplayAspect(sys->display, num, den);
     vlc_mutex_unlock(&sys->display_lock);
 
-    assert(sys->display_pool != NULL && sys->private_pool != NULL);
+    assert(sys->private.display_pool != NULL && sys->private.private_pool != NULL);
 
     sys->displayed.current       = NULL;
     sys->displayed.next          = NULL;
@@ -1749,7 +1749,7 @@ static void *Thread(void *object)
 
         const bool picture_interlaced = sys->displayed.is_interlaced;
 
-        vout_SetInterlacingState(vout, picture_interlaced);
+        vout_SetInterlacingState(vout, &sys->private, picture_interlaced);
     }
 }
 
@@ -1763,11 +1763,11 @@ static void vout_ReleaseDisplay(vout_thread_t *vout)
         filter_DeleteBlend(sys->spu_blend);
 
     /* Destroy the rendering display */
-    if (sys->display_pool != NULL)
+    if (sys->private.display_pool != NULL)
         vout_FlushUnlocked(vout, true, INT64_MAX);
 
     vlc_mutex_lock(&sys->display_lock);
-    vout_CloseWrapper(vout, sys->display);
+    vout_CloseWrapper(vout, &sys->private, sys->display);
     sys->display = NULL;
     vlc_mutex_unlock(&sys->display_lock);
 
@@ -1788,7 +1788,7 @@ static void vout_ReleaseDisplay(vout_thread_t *vout)
         picture_fifo_Delete(sys->decoder_fifo);
         sys->decoder_fifo = NULL;
     }
-    assert(sys->display_pool == NULL);
+    assert(sys->private.display_pool == NULL);
 
     if (sys->mouse_event)
         sys->mouse_event(NULL, sys->mouse_opaque);
@@ -1956,7 +1956,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     sys->title.timeout  = var_InheritInteger(vout, "video-title-timeout");
     sys->title.position = var_InheritInteger(vout, "video-title-position");
 
-    vout_InitInterlacingSupport(vout);
+    vout_InitInterlacingSupport(vout, &sys->private);
 
     sys->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
 
@@ -2082,7 +2082,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     if (sys->display != NULL)
         vout_StopDisplay(vout);
 
-    vout_ReinitInterlacingSupport(vout);
+    vout_ReinitInterlacingSupport(vout, &sys->private);
 
     sys->original = original;
 

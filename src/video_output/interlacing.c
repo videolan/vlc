@@ -28,7 +28,6 @@
 #include <vlc_common.h>
 #include <vlc_vout.h>
 
-#include "interlacing.h"
 #include "vout_internal.h"
 
 /*****************************************************************************
@@ -90,10 +89,9 @@ static int DeinterlaceCallback(vlc_object_t *object, char const *cmd,
     return VLC_SUCCESS;
 }
 
-void vout_InitInterlacingSupport(vout_thread_t *vout)
+void vout_InitInterlacingSupport(vout_thread_t *vout, vout_thread_private_t *sys)
 {
     vlc_value_t val;
-    vout_thread_sys_t *sys = vout->p;
 
     msg_Dbg(vout, "Deinterlacing available");
 
@@ -158,17 +156,15 @@ void vout_InitInterlacingSupport(vout_thread_t *vout)
     sys->interlacing.is_interlaced = false;
 }
 
-void vout_ReinitInterlacingSupport(vout_thread_t *vout)
+void vout_ReinitInterlacingSupport(vout_thread_t *vout, vout_thread_private_t *sys)
 {
-    vout_thread_sys_t *sys = vout->p;
     sys->interlacing.is_interlaced = false;
     var_SetBool(vout, "deinterlace-needed", false);
 }
 
-void vout_SetInterlacingState(vout_thread_t *vout, bool is_interlaced)
+void vout_SetInterlacingState(vout_thread_t *vout, vout_thread_private_t *sys, bool is_interlaced)
 {
-    vout_thread_sys_t *sys = vout->p;
-     /* Wait 30s before quiting interlacing mode */
+    /* Wait 30s before quiting interlacing mode */
     const int interlacing_change = (!!is_interlaced)
                                  - (!!sys->interlacing.is_interlaced);
     if (interlacing_change == 1 ||
