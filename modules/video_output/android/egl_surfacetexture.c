@@ -33,6 +33,7 @@
 #include <EGL/eglext.h>
 
 #include "../video_output/android/utils.h"
+#include "../opengl/gl_api.h"
 
 #define BUFFER_COUNT 3
 
@@ -52,6 +53,8 @@ struct vlc_gl_surfacetexture
     video_format_t          fmt_out;
 
     size_t                  current_flip;
+
+    struct vlc_gl_api api;
 
     EGLDisplay display;
     EGLContext context;
