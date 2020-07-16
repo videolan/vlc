@@ -285,8 +285,8 @@ noinst_LTLIBRARIES += libandroid_utils.la
 endif
 
 libegl_android_plugin_la_SOURCES = video_output/opengl/egl.c
-libegl_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_PLATFORM_ANDROID=1
-libegl_android_plugin_la_LIBADD = $(EGL_LIBS) libandroid_utils.la
+libegl_android_plugin_la_CFLAGS = $(AM_CFLAGS) $(EGL_CFLAGS) -DUSE_PLATFORM_ANDROID=1 -DUSE_OPENGL_ES2
+libegl_android_plugin_la_LIBADD = $(EGL_LIBS)
 
 libandroid_window_plugin_la_SOURCES = video_output/android/window.c \
 	video_output/wasync_resize_compressor.h
