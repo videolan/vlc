@@ -498,6 +498,11 @@ echo "  Platform:         $VLC_HOST_PLATFORM"
 echo "  Architecture:     $VLC_HOST_ARCH"
 echo "  SDK Version:      $VLC_APPLE_SDK_VERSION"
 echo "  Number of Cores:  $VLC_USE_NUMBER_OF_CORES"
+if [ "$VLC_USE_BITCODE" -gt 0 ]; then
+echo "  Bitcode:          enabled"
+else
+echo "  Bitcode:          disabled"
+fi
 echo ""
 
 ##########################################################
