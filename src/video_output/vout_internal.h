@@ -233,15 +233,6 @@ void vout_Stop(vout_thread_t *);
 void vout_StopDisplay(vout_thread_t *);
 
 /**
- * Destroys a vout.
- *
- * This function closes and releases a vout created by vout_Create().
- *
- * \param p_vout the vout to close
- */
-void vout_Close( vout_thread_t *p_vout );
-
-/**
  * Set the new source format for a started vout
  *
  * \retval 0 on success
