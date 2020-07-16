@@ -96,7 +96,7 @@ void vout_InitInterlacingSupport(vout_thread_t *vout)
 
     msg_Dbg(vout, "Deinterlacing available");
 
-    vout->p->filter.has_deint = false;
+    vout->p->interlacing.has_deint = false;
 
     /* Create the configuration variables */
     /* */
@@ -139,7 +139,7 @@ void vout_InitInterlacingSupport(vout_thread_t *vout)
 
     /* Override the initial value from filters if present */
     char *filter_mode = NULL;
-    if (vout->p->filter.has_deint)
+    if (vout->p->interlacing.has_deint)
         filter_mode = var_CreateGetNonEmptyString(vout, "sout-deinterlace-mode");
     if (filter_mode) {
         deinterlace_state = 1;

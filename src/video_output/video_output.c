@@ -771,9 +771,9 @@ static void ThreadChangeFilters(vout_thread_t *vout,
     vlc_array_init(&array_interactive);
 
     if (new_deinterlace != NULL)
-        vout->p->filter.has_deint = *new_deinterlace;
+        vout->p->interlacing.has_deint = *new_deinterlace;
 
-    if (vout->p->filter.has_deint)
+    if (vout->p->interlacing.has_deint)
     {
         vout_filter_t *e = malloc(sizeof(*e));
 

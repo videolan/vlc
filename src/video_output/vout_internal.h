@@ -145,6 +145,7 @@ struct vout_thread_sys_t
 
     struct {
         bool        is_interlaced;
+        bool        has_deint;
         vlc_tick_t  date;
     } interlacing;
 
@@ -159,7 +160,6 @@ struct vout_thread_sys_t
         vlc_video_context *src_vctx;
         struct filter_chain_t *chain_static;
         struct filter_chain_t *chain_interactive;
-        bool            has_deint;
     } filter;
 
     /* */
