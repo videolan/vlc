@@ -148,6 +148,12 @@ libopengl_filter_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 video_filter_LTLIBRARIES += libopengl_filter_plugin.la
 endif
 
+if HAVE_TVOS
+libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
+libopengl_filter_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
+video_filter_LTLIBRARIES += libopengl_filter_plugin.la
+endif
+
 if HAVE_OSX
 libopengl_filter_plugin_la_LIBADD = libvlc_opengl.la
 video_filter_LTLIBRARIES += libopengl_filter_plugin.la
