@@ -75,6 +75,15 @@ if HAVE_DARWIN
 libvlc_la_LDFLAGS += -Xlinker -install_name -Xlinker @rpath/libvlc.dylib
 endif
 
+# iOS and tvOS applications cannot install global shared libraries and
+# dylibs must be in frameworks so there's no need for libtool versionning.
+if HAVE_IOS
+libvlc_la_LDFLAGS += -avoid-version
+endif
+if HAVE_TVOS
+libvlc_la_LDFLAGS += -avoid-version
+endif
+
 pkgconfig_DATA = libvlc.pc
 
 libvlc.pc: libvlc.pc.in $(top_builddir)/config.status
