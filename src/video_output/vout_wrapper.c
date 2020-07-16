@@ -31,6 +31,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 #include <assert.h>
+#include "vout_private.h"
 #include "vout_internal.h"
 #include "display.h"
 

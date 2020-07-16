@@ -53,9 +53,6 @@
  */
 struct vout_thread_t {
     struct vlc_object_t obj;
-
-    /* Private vout_thread data */
-    void *p;
 };
 
 /* Alignment flags */

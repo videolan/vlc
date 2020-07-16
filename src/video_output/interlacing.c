@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_vout.h>
 
+#include "vout_private.h"
 #include "vout_internal.h"
 
 /*****************************************************************************
