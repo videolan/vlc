@@ -515,6 +515,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_mk_date, double f_percent, virtu
 
 /* Needed by matroska_segment::Seek() and Seek */
 void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
+                  KaxBlockAdditions *additions,
                   vlc_tick_t i_pts, int64_t i_duration, bool b_key_picture,
                   bool b_discardable_picture )
 {
@@ -733,11 +734,13 @@ static int Demux( demux_t *p_demux)
 
     KaxBlock *block;
     KaxSimpleBlock *simpleblock;
+    KaxBlockAdditions *additions;
     int64_t i_block_duration = 0;
     bool b_key_picture;
     bool b_discardable_picture;
 
-    if( p_segment->BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
+    if( p_segment->BlockGet( block, simpleblock, additions,
+                             &b_key_picture, &b_discardable_picture, &i_block_duration ) )
     {
         if ( p_vsegment->CurrentEdition() && p_vsegment->CurrentEdition()->b_ordered )
         {
@@ -769,6 +772,7 @@ static int Demux( demux_t *p_demux)
         {
             msg_Err( p_demux, "invalid track number" );
             delete block;
+            delete additions;
             return VLC_DEMUXER_EGENERIC;
         }
 
@@ -782,6 +786,7 @@ static int Demux( demux_t *p_demux)
             if ( track.i_skip_until_fpos > block_fpos )
             {
                 delete block;
+                delete additions;
                 return VLC_DEMUXER_SUCCESS; // this block shall be ignored
             }
         }
@@ -815,6 +820,7 @@ static int Demux( demux_t *p_demux)
             {
                 msg_Err( p_demux, "ES_OUT_SET_PCR failed, aborting." );
                 delete block;
+                delete additions;
                 return VLC_DEMUXER_EGENERIC;
             }
 
@@ -834,12 +840,15 @@ static int Demux( demux_t *p_demux)
     {
         /* nothing left to read in this ordered edition */
         delete block;
+        delete additions;
         return VLC_DEMUXER_EOF;
     }
 
-    BlockDecode( p_demux, block, simpleblock, p_sys->i_pts, i_block_duration, b_key_picture, b_discardable_picture );
+    BlockDecode( p_demux, block, simpleblock, additions,
+                 p_sys->i_pts, i_block_duration, b_key_picture, b_discardable_picture );
 
     delete block;
+    delete additions;
 
     return VLC_DEMUXER_SUCCESS;
 }

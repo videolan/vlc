@@ -120,6 +120,7 @@ enum
 using namespace LIBMATROSKA_NAMESPACE;
 
 void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
+                  KaxBlockAdditions *additions,
                   vlc_tick_t i_pts, vlc_tick_t i_duration, bool b_key_picture,
                   bool b_discardable_picture );
 
