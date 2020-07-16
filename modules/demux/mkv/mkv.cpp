@@ -607,8 +607,24 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 
          case VLC_CODEC_WEBVTT:
             {
+                const uint8_t *p_addition = NULL;
+                size_t i_addition = 0;
+                if(additions)
+                {
+                    KaxBlockMore *blockmore = FindChild<KaxBlockMore>(*additions);
+                    if(blockmore)
+                    {
+                        KaxBlockAdditional *addition = FindChild<KaxBlockAdditional>(*blockmore);
+                        if(addition)
+                        {
+                            i_addition = static_cast<std::string::size_type>(addition->GetSize());
+                            p_addition = reinterpret_cast<const uint8_t *>(addition->GetBuffer());
+                        }
+                    }
+                }
                 p_block = WEBVTT_Repack_Sample( p_block, /* D_WEBVTT -> webm */
-                                         !p_track->codec.compare( 0, 1, "D" ) );
+                                                !p_track->codec.compare( 0, 1, "D" ),
+                                                p_addition, i_addition );
                 if( !p_block )
                     continue;
             }
