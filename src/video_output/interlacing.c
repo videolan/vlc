@@ -82,12 +82,7 @@ static int DeinterlaceCallback(vlc_object_t *object, char const *cmd,
     var_SetString(vout, "sout-deinterlace-mode", mode);
 
     msg_Dbg(vout, "deinterlace %d, mode %s, is_needed %d", deinterlace_state, mode, is_needed);
-    if (deinterlace_state == 0 || (deinterlace_state < 0 && !is_needed))
-        vout_control_PushBool(&vout->p->control,
-                              VOUT_CONTROL_CHANGE_INTERLACE, false);
-    else
-        vout_control_PushBool(&vout->p->control,
-                              VOUT_CONTROL_CHANGE_INTERLACE, true);
+    vout_ControlChangeInterlacing(vout, deinterlace_state != 0 && (is_needed || deinterlace_state >= 0));
 
     /* */
     free(old);

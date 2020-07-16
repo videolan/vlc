@@ -598,6 +598,12 @@ void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
                             filters);
 }
 
+void vout_ControlChangeInterlacing(vout_thread_t *vout, bool set)
+{
+    assert(!vout->p->dummy);
+    vout_control_PushBool(&vout->p->control, VOUT_CONTROL_CHANGE_INTERLACE, set);
+}
+
 void vout_ControlChangeSubSources(vout_thread_t *vout, const char *filters)
 {
     assert(!vout->p->dummy);

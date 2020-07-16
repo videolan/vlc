@@ -251,6 +251,7 @@ void vout_ChangeCropRatio(vout_thread_t *, unsigned num, unsigned den);
 void vout_ChangeCropWindow(vout_thread_t *, int x, int y, int width, int height);
 void vout_ChangeCropBorder(vout_thread_t *, int left, int top, int right, int bottom);
 void vout_ControlChangeFilters(vout_thread_t *, const char *);
+void vout_ControlChangeInterlacing(vout_thread_t *, bool);
 void vout_ControlChangeSubSources(vout_thread_t *, const char *);
 void vout_ControlChangeSubFilters(vout_thread_t *, const char *);
 void vout_ChangeSpuChannelMargin(vout_thread_t *, enum vlc_vout_order order, int);
