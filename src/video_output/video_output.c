@@ -1617,7 +1617,7 @@ static int vout_Start(vout_thread_t *vout, vlc_video_context *vctx, const vout_c
     dcfg.window_props.width = sys->window_width;
     dcfg.window_props.height = sys->window_height;
 
-    sys->display = vout_OpenWrapper(vout, sys->splitter_name, &dcfg, vctx);
+    sys->display = vout_OpenWrapper(vout, sys->splitter_name, &dcfg, &sys->original, vctx);
     if (sys->display == NULL) {
         vlc_mutex_unlock(&sys->display_lock);
         goto error;

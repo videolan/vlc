@@ -265,7 +265,7 @@ void vout_IntfDeinit(vlc_object_t *);
 
 /* */
 vout_display_t *vout_OpenWrapper(vout_thread_t *, const char *,
-                     const vout_display_cfg_t *, vlc_video_context *);
+                    const vout_display_cfg_t *, video_format_t *, vlc_video_context *);
 void vout_CloseWrapper(vout_thread_t *, vout_display_t *vd);
 
 /* */
