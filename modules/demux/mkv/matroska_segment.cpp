@@ -1175,10 +1175,14 @@ void matroska_segment_c::ESDestroy( )
     }
 }
 
-int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_simpleblock, bool *pb_key_picture, bool *pb_discardable_picture, int64_t *pi_duration )
+int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_simpleblock,
+                                  KaxBlockAdditions * & pp_additions,
+                                  bool *pb_key_picture, bool *pb_discardable_picture,
+                                  int64_t *pi_duration )
 {
     pp_simpleblock = NULL;
     pp_block = NULL;
+    pp_additions = NULL;
 
     *pb_key_picture         = true;
     *pb_discardable_picture = false;
@@ -1190,6 +1194,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         demux_t            * const p_demuxer;
         KaxBlock          *& block;
         KaxSimpleBlock    *& simpleblock;
+        KaxBlockAdditions *& additions;
 
         int64_t            & i_duration;
         bool               & b_key_picture;
@@ -1197,7 +1202,7 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         bool                 b_cluster_timecode;
 
     } payload = {
-        this, &ep, &sys.demuxer, pp_block, pp_simpleblock,
+        this, &ep, &sys.demuxer, pp_block, pp_simpleblock, pp_additions,
         *pi_duration, *pb_key_picture, *pb_discardable_picture, true
     };
 
@@ -1284,6 +1289,17 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
             }
 
             vars.ep->Keep ();
+        }
+        E_CASE( KaxBlockAdditions, kadditions )
+        {
+            EbmlElement *el;
+            int i_upper_level = 0;
+            try
+            {
+                kadditions.Read( vars.obj->es, EBML_CONTEXT(&kadditions), i_upper_level, el, false );
+                vars.additions = &kadditions;
+                vars.ep->Keep ();
+            } catch (...) {}
         }
         E_CASE( KaxBlockDuration, kduration )
         {

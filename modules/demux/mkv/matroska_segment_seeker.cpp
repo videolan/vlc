@@ -352,13 +352,15 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
     {
         KaxBlock * block;
         KaxSimpleBlock * simpleblock;
+        KaxBlockAdditions *additions;
 
         bool     b_key_picture;
         bool     b_discardable_picture;
         int64_t  i_block_duration;
         track_id_t track_id;
 
-        if( ms.BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
+        if( ms.BlockGet( block, simpleblock, additions,
+                         &b_key_picture, &b_discardable_picture, &i_block_duration ) )
             break;
 
         if( simpleblock ) {

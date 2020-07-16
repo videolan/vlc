@@ -487,7 +487,8 @@ static int Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual_
 
 /* Needed by matroska_segment::Seek() and Seek */
 void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
-                  mtime_t i_pts, mtime_t i_duration, bool b_key_picture,
+                  KaxBlockAdditions *additions,
+                  mtime_t i_pts, int64_t i_duration, bool b_key_picture,
                   bool b_discardable_picture )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
@@ -703,11 +704,13 @@ static int Demux( demux_t *p_demux)
 
     KaxBlock *block;
     KaxSimpleBlock *simpleblock;
+    KaxBlockAdditions *additions;
     int64_t i_block_duration = 0;
     bool b_key_picture;
     bool b_discardable_picture;
 
-    if( p_segment->BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
+    if( p_segment->BlockGet( block, simpleblock, additions,
+                             &b_key_picture, &b_discardable_picture, &i_block_duration ) )
     {
         if ( p_vsegment->CurrentEdition() && p_vsegment->CurrentEdition()->b_ordered )
         {
@@ -735,6 +738,7 @@ static int Demux( demux_t *p_demux)
         {
             msg_Err( p_demux, "invalid track number" );
             delete block;
+            delete additions;
             return 0;
         }
 
@@ -751,7 +755,8 @@ static int Demux( demux_t *p_demux)
             if ( track.i_skip_until_fpos > block_fpos )
             {
                 delete block;
-                return 1; // this block shall be ignored
+                delete additions;
+	        return 1; // this block shall be ignored
             }
         }
     }
@@ -784,6 +789,7 @@ static int Demux( demux_t *p_demux)
             {
                 msg_Err( p_demux, "ES_OUT_SET_PCR failed, aborting." );
                 delete block;
+                delete additions;
                 return 0;
             }
 
@@ -805,12 +811,15 @@ static int Demux( demux_t *p_demux)
     {
         /* nothing left to read in this ordered edition */
         delete block;
+        delete additions;
         return 0;
     }
 
-    BlockDecode( p_demux, block, simpleblock, p_sys->i_pts, i_block_duration, b_key_picture, b_discardable_picture );
+    BlockDecode( p_demux, block, simpleblock, additions,
+                 p_sys->i_pts, i_block_duration, b_key_picture, b_discardable_picture );
 
     delete block;
+    delete additions;
 
     return 1;
 }
