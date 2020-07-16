@@ -109,7 +109,6 @@ struct vout_thread_sys_t
     vout_statistic_t statistic;
 
     /* Subpicture unit */
-    vlc_mutex_t     spu_lock;
     spu_t           *spu;
     vlc_fourcc_t    spu_blend_chroma;
     vlc_blender_t   *spu_blend;
