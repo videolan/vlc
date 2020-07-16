@@ -60,7 +60,10 @@ enum vout_crop_mode {
     VOUT_CROP_NONE, VOUT_CROP_RATIO, VOUT_CROP_WINDOW, VOUT_CROP_BORDER,
 };
 
-/* */
+/**
+ * Video output thread private structure
+ */
+typedef struct vout_thread_sys_t vout_thread_sys_t;
 struct vout_thread_sys_t
 {
     bool dummy;

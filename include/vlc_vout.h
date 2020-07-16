@@ -45,11 +45,6 @@
  */
 
 /**
- * Video output thread private structure
- */
-typedef struct vout_thread_sys_t vout_thread_sys_t;
-
-/**
  * Video output thread descriptor
  *
  * Any independent video output device, such as an X11 window or a GGI device,
@@ -60,7 +55,7 @@ struct vout_thread_t {
     struct vlc_object_t obj;
 
     /* Private vout_thread data */
-    vout_thread_sys_t *p;
+    void *p;
 };
 
 /* Alignment flags */
