@@ -107,6 +107,12 @@ libglfilter_yadif_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
 vout_LTLIBRARIES += libglfilter_yadif_plugin.la
 endif
 
+if HAVE_TVOS
+libglfilter_yadif_plugin_la_LIBADD = libvlc_opengles.la
+libglfilter_yadif_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
+vout_LTLIBRARIES += libglfilter_yadif_plugin.la
+endif
+
 if HAVE_OSX
 libglfilter_yadif_plugin_la_LIBADD = libvlc_opengl.la
 vout_LTLIBRARIES += libglfilter_yadif_plugin.la
