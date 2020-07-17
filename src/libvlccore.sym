@@ -75,7 +75,6 @@ decoder_NewPicture
 decoder_Init
 decoder_Clean
 decoder_Destroy
-decoder_AbortPictures
 decoder_NewAudioBuffer
 decoder_UpdateVideoFormat
 decoder_UpdateVideoOutput
