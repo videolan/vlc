@@ -174,6 +174,12 @@ libcvpx_gl_plugin_la_LIBADD = libvlc_opengles.la
 video_filter_LTLIBRARIES += libcvpx_gl_plugin.la
 endif
 
+if HAVE_TVOS
+libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
+libcvpx_gl_plugin_la_LIBADD = libvlc_opengles.la
+video_filter_LTLIBRARIES += libcvpx_gl_plugin.la
+endif
+
 if HAVE_OSX
 libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
 libcvpx_gl_plugin_la_LIBADD = libvlc_opengl.la
