@@ -340,6 +340,8 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
         return AbstractStream::buffering_suspended;
     }
 
+    segmentTracker->setStartPosition();
+
     /* Reached end of live playlist */
     if(!segmentTracker->bufferingAvailable())
     {

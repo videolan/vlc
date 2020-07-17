@@ -145,6 +145,7 @@ namespace adaptive
             SegmentChunk* getNextChunk(bool, AbstractConnectionManager *);
             bool setPositionByTime(mtime_t, bool, bool);
             void setPosition(const Position &, bool);
+            bool setStartPosition();
             Position getStartPosition();
             mtime_t getPlaybackTime(bool = false) const; /* Current segment start time if selected */
             bool getMediaPlaybackRange(mtime_t *, mtime_t *, mtime_t *) const;
