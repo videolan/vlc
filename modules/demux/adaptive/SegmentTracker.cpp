@@ -404,6 +404,19 @@ SegmentTracker::Position SegmentTracker::getStartPosition()
     return pos;
 }
 
+bool SegmentTracker::setStartPosition()
+{
+    if(next.isValid())
+        return true;
+
+    Position pos = getStartPosition();
+    if(!pos.isValid())
+        return false;
+
+    next = pos;
+    return true;
+}
+
 vlc_tick_t SegmentTracker::getPlaybackTime(bool b_next) const
 {
     vlc_tick_t time, duration;

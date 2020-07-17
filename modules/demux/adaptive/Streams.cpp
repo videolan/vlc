@@ -342,6 +342,8 @@ AbstractStream::buffering_status AbstractStream::doBufferize(vlc_tick_t nz_deadl
         return AbstractStream::buffering_suspended;
     }
 
+    segmentTracker->setStartPosition();
+
     /* Reached end of live playlist */
     if(!segmentTracker->bufferingAvailable())
     {
