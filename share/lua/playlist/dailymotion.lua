@@ -2,7 +2,7 @@
     Translate Dailymotion video webpages URLs to corresponding
     video stream URLs.
 
- Copyright © 2007-2019 the VideoLAN team
+ Copyright © 2007-2020 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ function parse()
 		if string.match( line, "<meta property=\"og:title\"" ) then
 			_,_,name = string.find( line, "content=\"(.-)\"" )
 			name = vlc.strings.resolve_xml_special_chars( name )
-			name = string.gsub( name, " %- Vidéo dailymotion$", "" )
+			name = string.gsub( name, " %- [Vv]id..?o [Dd]ailymotion$", "" )
 		end
 		if string.match( line, "<meta name=\"description\"" ) then
 			_,_,description = string.find( line, "content=\"(.-)\"" )
