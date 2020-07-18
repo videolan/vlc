@@ -64,6 +64,9 @@ function parse()
 
             local streams = string.match( line, "\"qualities\":{(.-%])}" )
             if streams then
+                -- Most of this has become unused, as in practice Dailymotion
+                -- has currently stopped offering progressive download and
+                -- been offering only adaptive streaming for a while now.
                 local prefres = vlc.var.inherit(nil, "preferred-resolution")
                 local file = nil
                 local live = nil
