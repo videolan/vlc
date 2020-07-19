@@ -1,8 +1,18 @@
 Changes between 3.0.11 and 3.0.12:
 ----------------------------------
 
+Service Discovery:
+ * Fix listing of media on certain Panasonic recorders discovered via UPnP
+
 macOS:
  * Fix automatic playback resume with "Music" app
+ * Fix possible freeze after pause, seek, unpause
+
+Contribs:
+ * Updated gnutls to 3.6.14
+ * Updated libebml to 1.4.0
+ * Updated libmatroska to 1.6.0
+ * Updated mpg123 to 1.26.2
 
 Changes between 3.0.10 and 3.0.11:
 ----------------------------------
