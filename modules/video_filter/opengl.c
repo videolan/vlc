@@ -50,6 +50,8 @@ typedef struct
 static picture_t *Filter(filter_t *filter, picture_t *input)
 {
     filter_sys_t *sys = filter->p_sys;
+    picture_t *head = NULL;
+    picture_t *tail = NULL;
 
     if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
         return NULL;
@@ -61,12 +63,12 @@ static picture_t *Filter(filter_t *filter, picture_t *input)
         goto end;
     }
 
-    picture_t *head = NULL;
-    picture_t *tail = NULL;
-
     while (vlc_gl_filters_WillUpdate(sys->filters, head == NULL))
     {
-        ret = vlc_gl_filters_Draw(sys->filters);
+        /* Will store the information of the output frame */
+        struct vlc_gl_input_meta meta;
+
+        ret = vlc_gl_filters_Draw(sys->filters, &meta);
         if (ret != VLC_SUCCESS)
         {
             vlc_gl_ReleaseCurrent(sys->gl);
@@ -84,7 +86,7 @@ static picture_t *Filter(filter_t *filter, picture_t *input)
             tail->p_next = output;
         tail = output;
 
-        output->date = input->date;
+        output->date = meta.pts;
         output->b_force = input->b_force;
         output->b_still = input->b_still;
 
@@ -288,6 +290,7 @@ static int Open( vlc_object_t *obj )
 
     static const struct vlc_filter_operations ops = {
         .filter_video = Filter,
+        .flush = Flush,
         .close = Close,
     };
     filter->ops = &ops;
