@@ -325,9 +325,16 @@ function parse()
             end
 
             if not description then
-                description = string.match( line, "<p id=\"eow%-description\"[^>]*>(.-)</p>" )
+                -- FIXME: there is another version of this available,
+                -- without the double JSON string encoding, but we're
+                -- unlikely to access it due to #24957
+                description = string.match( line, '\\"shortDescription\\":\\"(.-[^\\])\\"')
                 if description then
-                    description = vlc.strings.resolve_xml_special_chars( description )
+                    -- FIXME: do this properly
+                    description = string.gsub( description, '\\(["\\/])', '%1' )
+                    description = string.gsub( description, '\\(["\\/])', '%1' )
+                    description = string.gsub( description, '\\n', '\n' )
+                    description = string.gsub( description, "\\u0026", "&" )
                 end
             end
 
@@ -478,6 +485,16 @@ function parse()
             -- FIXME: do this properly
             title = string.gsub( title, "\\u0026", "&" )
         end
+        -- FIXME: description gets truncated if it contains a double quote
+        local description = string.match( line, "%%22shortDescription%%22%%3A%%22(.-)%%22" )
+        if description then
+            description = string.gsub( description, "+", " " )
+            description = vlc.strings.decode_uri( description )
+            -- FIXME: do this properly
+            description = string.gsub( description, '\\(["\\/])', '%1' )
+            description = string.gsub( description, '\\n', '\n' )
+            description = string.gsub( description, "\\u0026", "&" )
+        end
         local artist = string.match( line, "%%22author%%22%%3A%%22(.-)%%22" )
         if artist then
             artist = string.gsub( artist, "+", " " )
@@ -490,7 +507,7 @@ function parse()
             arturl = vlc.strings.decode_uri( arturl )
         end
 
-        return { { path = path, title = title, artist = artist, arturl = arturl } }
+        return { { path = path, title = title, description = description, artist = artist, arturl = arturl } }
 
     else -- Other supported URL formats
         local video_id = string.match( vlc.path, "/[^/]+/([^?]*)" )
