@@ -650,24 +650,84 @@ OpenYadif2x(struct vlc_gl_filter *filter, const config_chain_t *config,
     return Open(filter, config, size_out, true);
 }
 
-static int OpenVideoFilter(vlc_object_t *obj)
+static int OpenVideoFilter(vlc_object_t *obj, const char *name)
 {
     filter_t *filter = (filter_t*)obj;
-    /* TODO: parse options */
-    config_chain_t *prev_chain = filter->p_cfg;
-    config_chain_t chain = {
-        .psz_name = strdup("filter"),
-        .psz_value = strdup(MODULE_STRING),
-    };
 
-    filter->p_cfg = &chain;
+    char *mode = var_InheritString(obj, "deinterlace-mode");
+    if (mode && strcmp(mode, "auto") && strcmp(mode, name))
+        return VLC_EGENERIC;
+
+    config_chain_t *prev_chain = filter->p_cfg;
+    var_Create(filter, "opengl-filter", VLC_VAR_STRING);
+    var_SetString(filter, "opengl-filter", name);
+
+    filter->p_cfg = NULL;
     module_t *module = module_need(obj, "video filter", "opengl", true);
     filter->p_cfg = prev_chain;
 
-    free(chain.psz_name);
-    free(chain.psz_value);
+    var_Destroy(filter, "opengl-filter");
 
     return module == NULL ? VLC_EGENERIC : VLC_SUCCESS;
+}
+
+static int OpenVideoFilterYadif(vlc_object_t *obj)
+{
+    return OpenVideoFilter(obj, "gl_yadif");
+}
+
+static int OpenVideoFilterYadif2x(vlc_object_t *obj)
+{
+    int ret = OpenVideoFilter(obj, "gl_yadif2x");
+
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    filter_t *filter = (filter_t*)obj;
+    filter->fmt_out.video.i_frame_rate *= 2;
+
+    // TODO
+    //if (sys->is_yadif2x)
+    //{
+    //    vlc_tick_t last_pts = sys->yadif2x.last_pts;
+    //    sys->yadif2x.last_pts = pic->date;
+
+    //    ret = vlc_gl_filters_Draw(sys->filters);
+    //    if (ret != VLC_SUCCESS)
+    //        goto end;
+
+    //    picture_t *second = vlc_gl_Swap(sys->gl);
+    //    if (second)
+    //    {
+    //        if (last_pts != VLC_TICK_INVALID)
+    //        {
+    //            /*
+    //             *                       dup->date
+    //             *                       v
+    //             *        |----.----|----.----|
+    //             *        ^         ^
+    //             * last_pts       pic->date
+    //             */
+    //            second->date = (3 * pic->date - last_pts) / 2;
+    //        }
+    //        else if (filter->fmt_in.video.i_frame_rate != 0)
+    //        {
+    //            video_format_t *fmt = &filter->fmt_in.video;
+    //            vlc_tick_t interval =
+    //                vlc_tick_from_samples(fmt->i_frame_rate_base, fmt->i_frame_rate);
+    //            second->date = pic->date + interval;
+    //        }
+    //        else
+    //        {
+    //            /* What could we do? */
+    //            second->date = pic->date + 1;
+    //        }
+
+    //        output->p_next = second;
+    //    }
+    //}
+
+    return VLC_SUCCESS;
 }
 
 vlc_module_begin()
@@ -679,20 +739,20 @@ vlc_module_begin()
     add_submodule()
         set_capability("opengl filter", 0)
         set_callback(OpenYadif)
-        add_shortcut("yadif")
+        add_shortcut("gl_yadif")
 
     add_submodule()
         set_capability("opengl filter", 0)
         set_callback(OpenYadif2x)
-        add_shortcut("yadif2x")
+        add_shortcut("gl_yadif2x")
 
     add_submodule()
         set_capability("video filter", 1)
-        set_callback(OpenVideoFilter)
+        set_callback(OpenVideoFilterYadif)
         add_shortcut("deinterlace", "gl_yadif")
 
     add_submodule()
         set_capability("video filter", 1)
-        set_callback(OpenVideoFilter)
+        set_callback(OpenVideoFilterYadif2x)
         add_shortcut("deinterlace", "gl_yadif2x")
 vlc_module_end()
