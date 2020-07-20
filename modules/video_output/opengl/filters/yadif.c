@@ -82,6 +82,8 @@ struct sys {
 
     bool is_yadif2x;
     unsigned order;
+
+    vlc_tick_t last_pts;
 };
 
 static void
@@ -482,14 +484,15 @@ static bool
 WillUpdate(struct vlc_gl_filter *filter, bool new_frame)
 {
     struct sys *sys = filter->sys;
-    if (sys->is_yadif2x)
+
+    if (!sys->is_yadif2x)
         return new_frame;
 
     return new_frame || sys->order == 1;
 }
 
 static int
-Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
+Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
 {
     struct sys *sys = filter->sys;
     const opengl_vtable_t *vt = &filter->api->vt;
@@ -569,7 +572,31 @@ Draw(struct vlc_gl_filter *filter, const struct vlc_gl_input_meta *meta)
             prev = cur;
             --sys->missing_frames;
         }
+
+        if (sys->last_pts != VLC_TICK_INVALID)
+        {
+            /*
+             *                       dup->date
+             *                       v
+             *        |----.----|----.----|
+             *        ^         ^
+             * last_pts       pic->date
+             */
+            meta->pts = (3 * meta->pts - sys->last_pts) / 2;
+        }
+        else if (meta->framerate.den != 0)
+        {
+            vlc_tick_t interval =
+                vlc_tick_from_samples(meta->framerate.den, meta->framerate.num);
+            meta->pts += interval;
+        }
+        else
+        {
+            /* What could we do? */
+            meta->pts += 1;
+        }
     }
+    sys->last_pts = meta->pts;
 
     return VLC_SUCCESS;
 }
@@ -590,6 +617,7 @@ Open(struct vlc_gl_filter *filter, const config_chain_t *config,
      * "cur" frames are missing. */
     sys->missing_frames = 2;
     sys->order = 0;
+    sys->last_pts = VLC_TICK_INVALID;
 
     static const struct vlc_gl_filter_ops ops = {
         .will_update = WillUpdate,
