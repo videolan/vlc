@@ -193,361 +193,361 @@ Widgets.NavigableFocusScope {
             anchors.fill: parent
             anchors.bottomMargin: VLCStyle.margin_normal
 
-        ColumnLayout {
-            id: headerTextLayout
-            Layout.fillWidth: true
-            Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
-            Layout.topMargin: VLCStyle.margin_normal
-
-            Widgets.SubtitleLabel {
-                text: i18n.qtr("Playqueue")
-            }
-
-            Widgets.CaptionLabel {
-                anchors.topMargin: VLCStyle.margin_small
-                text: i18n.qtr("%1 elements, %2 min").arg(root.plmodel.count).arg(plmodel.duration.toMinutes())
-            }
-        }
-
-
-        RowLayout {
-            id: content
-            anchors {
-                bottom: view.top
-            }
-
-            Layout.preferredHeight: VLCStyle.icon_normal
-            Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
-            Layout.rightMargin: root.rightPadding + view.scrollBarWidth
-
-            Widgets.IconLabel {
-                Layout.preferredWidth: VLCStyle.icon_normal
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                text: VLCIcons.album_cover
-                color: VLCStyle.colors.caption
-            }
-
-            Widgets.CaptionLabel {
+            ColumnLayout {
+                id: headerTextLayout
                 Layout.fillWidth: true
-                Layout.leftMargin: VLCStyle.margin_large
-                verticalAlignment: Text.AlignVCenter
-                text: i18n.qtr("Title")
-            }
+                Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
+                Layout.topMargin: VLCStyle.margin_normal
 
-            Widgets.IconLabel {
-                Layout.rightMargin: VLCStyle.margin_xsmall
-                Layout.preferredWidth: durationMetric.width
-
-                text: VLCIcons.time
-                color: VLCStyle.colors.caption
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                TextMetrics {
-                    id: durationMetric
-                    font.pixelSize: VLCStyle.fontSize_normal
-                    text: "-00:00-"
+                Widgets.SubtitleLabel {
+                    text: i18n.qtr("Playqueue")
                 }
-            }
-        }
 
-        Widgets.KeyNavigableListView {
-            id: view
-
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            focus: true
-
-            model: root.plmodel
-            modelCount: root.plmodel.count
-
-            property int shiftIndex: -1
-            property string mode: "normal"
-
-            Connections {
-                target: root.plmodel
-                onRowsInserted: {
-                    if (view.currentIndex == -1)
-                        view.currentIndex = 0
-                }
-                onModelReset: {
-                    if (view.currentIndex == -1 &&  root.plmodel.count > 0)
-                        view.currentIndex = 0
+                Widgets.CaptionLabel {
+                    anchors.topMargin: VLCStyle.margin_small
+                    text: i18n.qtr("%1 elements, %2 min").arg(root.plmodel.count).arg(plmodel.duration.toMinutes())
                 }
             }
 
-            footer: PLItemFooter {
-                onDropURLAtEnd: mainPlaylistController.insert(root.plmodel.count, urlList)
-                onMoveAtEnd: root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
+
+            RowLayout {
+                id: content
+                anchors {
+                    bottom: view.top
+                }
+
+                Layout.preferredHeight: VLCStyle.icon_normal
+                Layout.leftMargin: root.leftPadding + VLCStyle.margin_normal
+                Layout.rightMargin: root.rightPadding + view.scrollBarWidth
+
+                Widgets.IconLabel {
+                    Layout.preferredWidth: VLCStyle.icon_normal
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    text: VLCIcons.album_cover
+                    color: VLCStyle.colors.caption
+                }
+
+                Widgets.CaptionLabel {
+                    Layout.fillWidth: true
+                    Layout.leftMargin: VLCStyle.margin_large
+                    verticalAlignment: Text.AlignVCenter
+                    text: i18n.qtr("Title")
+                }
+
+                Widgets.IconLabel {
+                    Layout.rightMargin: VLCStyle.margin_xsmall
+                    Layout.preferredWidth: durationMetric.width
+
+                    text: VLCIcons.time
+                    color: VLCStyle.colors.caption
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    TextMetrics {
+                        id: durationMetric
+                        font.pixelSize: VLCStyle.fontSize_normal
+                        text: "-00:00-"
+                    }
+                }
             }
 
-            delegate: Column {
+            Widgets.KeyNavigableListView {
+                id: view
 
-                Loader {
-                    active: (index === 0) // load only for the first element to prevent overlapping
-                    width: parent.width
-                    height: 1
-                    sourceComponent: Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                focus: true
+
+                model: root.plmodel
+                modelCount: root.plmodel.count
+
+                property int shiftIndex: -1
+                property string mode: "normal"
+
+                Connections {
+                    target: root.plmodel
+                    onRowsInserted: {
+                        if (view.currentIndex == -1)
+                            view.currentIndex = 0
+                    }
+                    onModelReset: {
+                        if (view.currentIndex == -1 &&  root.plmodel.count > 0)
+                            view.currentIndex = 0
+                    }
+                }
+
+                footer: PLItemFooter {
+                    onDropURLAtEnd: mainPlaylistController.insert(root.plmodel.count, urlList)
+                    onMoveAtEnd: root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
+                }
+
+                delegate: Column {
+
+                    Loader {
+                        active: (index === 0) // load only for the first element to prevent overlapping
+                        width: parent.width
+                        height: 1
+                        sourceComponent: Rectangle {
+                            color: VLCStyle.colors.playlistSeparator
+                            opacity: VLCStyle.colors.isThemeDark ? 0.05 : 1.0
+                        }
+                    }
+
+                    PLItem {
+                        /*
+                         * implicit variables:
+                         *  - model: gives access to the values associated to PlaylistListModel roles
+                         *  - index: the index of this item in the list
+                         */
+                        id: plitem
+                        plmodel: root.plmodel
+                        width: root.width
+
+                        leftPadding: root.leftPadding + VLCStyle.margin_normal
+                        rightPadding: root.rightPadding + view.scrollBarWidth
+
+                        onItemClicked : {
+                            /* to receive keys events */
+                            view.forceActiveFocus()
+                            if (view.mode == "move") {
+                                var selectedIndexes = root.plmodel.getSelection()
+                                if (selectedIndexes.length === 0)
+                                    return
+                                var preTarget = index
+                                /* move to _above_ the clicked item if move up, but
+                                 * _below_ the clicked item if move down */
+                                if (preTarget > selectedIndexes[0])
+                                    preTarget++
+                                view.currentIndex = selectedIndexes[0]
+                                root.plmodel.moveItemsPre(selectedIndexes, preTarget)
+                                return
+                            } else if (view.mode == "select") {
+                            } else if (!(root.plmodel.isSelected(index) && button === Qt.RightButton)) {
+                                view.updateSelection(modifier, view.currentIndex, index)
+                                view.currentIndex = index
+                            }
+
+                            if (button === Qt.RightButton)
+                            {
+                                contextMenu.model = root.plmodel
+                                contextMenu.popup()
+                            }
+                        }
+                        onItemDoubleClicked: mainPlaylistController.goTo(index, true)
+                        color: VLCStyle.colors.getBgColor(model.selected, plitem.hovered, plitem.activeFocus)
+
+                        onDragStarting: {
+                            if (!root.plmodel.isSelected(index)) {
+                                /* the dragged item is not in the selection, replace the selection */
+                                root.plmodel.setSelection([index])
+                            }
+                        }
+
+                        onDropedMovedAt: {
+                            if (drop.hasUrls) {
+                                //force conversion to an actual list
+                                var urlList = []
+                                for ( var url in drop.urls)
+                                    urlList.push(drop.urls[url])
+                                mainPlaylistController.insert(target, urlList)
+                            } else {
+                                root.plmodel.moveItemsPre(root.plmodel.getSelection(), target)
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        width: parent.width
+                        height: 1
                         color: VLCStyle.colors.playlistSeparator
                         opacity: VLCStyle.colors.isThemeDark ? 0.05 : 1.0
                     }
                 }
 
-                PLItem {
-                    /*
-                     * implicit variables:
-                     *  - model: gives access to the values associated to PlaylistListModel roles
-                     *  - index: the index of this item in the list
-                     */
-                    id: plitem
-                    plmodel: root.plmodel
-                    width: root.width
+                add: Transition {
+                    NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 200 }
+                }
 
-                    leftPadding: root.leftPadding + VLCStyle.margin_normal
-                    rightPadding: root.rightPadding + view.scrollBarWidth
+                displaced: Transition {
+                    NumberAnimation { properties: "x,y"; duration: 200; easing.type: Easing.OutSine }
+                    NumberAnimation { property: "opacity"; to: 1.0 }
+                }
 
-                    onItemClicked : {
-                        /* to receive keys events */
-                        view.forceActiveFocus()
-                        if (view.mode == "move") {
-                            var selectedIndexes = root.plmodel.getSelection()
-                            if (selectedIndexes.length === 0)
-                                return
-                            var preTarget = index
-                            /* move to _above_ the clicked item if move up, but
-                             * _below_ the clicked item if move down */
-                            if (preTarget > selectedIndexes[0])
-                                preTarget++
-                            view.currentIndex = selectedIndexes[0]
-                            root.plmodel.moveItemsPre(selectedIndexes, preTarget)
+                onSelectAll: root.plmodel.selectAll()
+                onSelectionUpdated: {
+                    if (view.mode === "select") {
+                        console.log("update selection select")
+                    } else if (mode == "move") {
+                        var selectedIndexes = root.plmodel.getSelection()
+                        if (selectedIndexes.length === 0)
                             return
-                        } else if (view.mode == "select") {
-                        } else if (!(root.plmodel.isSelected(index) && button === Qt.RightButton)) {
-                            view.updateSelection(modifier, view.currentIndex, index)
-                            view.currentIndex = index
+                        /* always move relative to the first item of the selection */
+                        var target = selectedIndexes[0];
+                        if (newIndex > oldIndex) {
+                            /* move down */
+                            target++
+                        } else if (newIndex < oldIndex && target > 0) {
+                            /* move up */
+                            target--
                         }
 
-                        if (button === Qt.RightButton)
-                        {
-                            contextMenu.model = root.plmodel
-                            contextMenu.popup()
-                        }
-                    }
-                    onItemDoubleClicked: mainPlaylistController.goTo(index, true)
-                    color: VLCStyle.colors.getBgColor(model.selected, plitem.hovered, plitem.activeFocus)
-
-                    onDragStarting: {
-                        if (!root.plmodel.isSelected(index)) {
-                            /* the dragged item is not in the selection, replace the selection */
-                            root.plmodel.setSelection([index])
-                        }
-                    }
-
-                    onDropedMovedAt: {
-                        if (drop.hasUrls) {
-                            //force conversion to an actual list
-                            var urlList = []
-                            for ( var url in drop.urls)
-                                urlList.push(drop.urls[url])
-                            mainPlaylistController.insert(target, urlList)
-                        } else {
-                            root.plmodel.moveItemsPre(root.plmodel.getSelection(), target)
-                        }
+                        view.currentIndex = selectedIndexes[0]
+                        /* the target is the position _after_ the move is applied */
+                        root.plmodel.moveItemsPost(selectedIndexes, target)
+                    } else { // normal
+                        updateSelection(keyModifiers, oldIndex, newIndex);
                     }
                 }
 
-                Rectangle {
-                    width: parent.width
-                    height: 1
-                    color: VLCStyle.colors.playlistSeparator
-                    opacity: VLCStyle.colors.isThemeDark ? 0.05 : 1.0
+                Keys.onDeletePressed: onDelete()
+                Keys.onMenuPressed: overlayMenu.open()
+
+                navigationParent: root
+                navigationRight: function(index) {
+                    overlayMenu.open()
                 }
-            }
-
-            add: Transition {
-                NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 200 }
-            }
-
-            displaced: Transition {
-                NumberAnimation { properties: "x,y"; duration: 200; easing.type: Easing.OutSine }
-                NumberAnimation { property: "opacity"; to: 1.0 }
-            }
-
-            onSelectAll: root.plmodel.selectAll()
-            onSelectionUpdated: {
-                if (view.mode === "select") {
-                    console.log("update selection select")
-                } else if (mode == "move") {
-                    var selectedIndexes = root.plmodel.getSelection()
-                    if (selectedIndexes.length === 0)
-                        return
-                    /* always move relative to the first item of the selection */
-                    var target = selectedIndexes[0];
-                    if (newIndex > oldIndex) {
-                        /* move down */
-                        target++
-                    } else if (newIndex < oldIndex && target > 0) {
-                        /* move up */
-                        target--
-                    }
-
-                    view.currentIndex = selectedIndexes[0]
-                    /* the target is the position _after_ the move is applied */
-                    root.plmodel.moveItemsPost(selectedIndexes, target)
-                } else { // normal
-                    updateSelection(keyModifiers, oldIndex, newIndex);
-                }
-            }
-
-            Keys.onDeletePressed: onDelete()
-            Keys.onMenuPressed: overlayMenu.open()
-
-            navigationParent: root
-            navigationRight: function(index) {
-                overlayMenu.open()
-            }
-            navigationLeft: function(index) {
-                if (mode === "normal") {
-                    root.navigationLeft(index)
-                } else {
-                    mode = "normal"
-                }
-            }
-            navigationCancel: function(index) {
-                if (mode === "normal") {
-                    root.navigationCancel(index)
-                } else {
-                    mode = "normal"
-                }
-            }
-
-            onActionAtIndex: {
-                if (index < 0)
-                    return
-
-                if (mode === "select")
-                    root.plmodel.toggleSelected(index)
-                else //normal
-                    // play
-                    mainPlaylistController.goTo(index, true)
-            }
-
-            function onPlay() {
-                let selection = root.plmodel.getSelection()
-                if (selection.length === 0)
-                    return
-                mainPlaylistController.goTo(selection[0], true)
-            }
-
-            function onDelete() {
-                let selection = root.plmodel.getSelection()
-                if (selection.length === 0)
-                    return
-                root.plmodel.removeItems(selection)
-            }
-
-            function _addRange(from, to) {
-                root.plmodel.setRangeSelected(from, to - from + 1, true)
-            }
-
-            function _delRange(from, to) {
-                root.plmodel.setRangeSelected(from, to - from + 1, false)
-            }
-
-            // copied from SelectableDelegateModel, which is intended to be removed
-            function updateSelection( keymodifiers, oldIndex, newIndex ) {
-                if ((keymodifiers & Qt.ShiftModifier)) {
-                    if ( shiftIndex === oldIndex) {
-                        if ( newIndex > shiftIndex )
-                            _addRange(shiftIndex, newIndex)
-                        else
-                            _addRange(newIndex, shiftIndex)
-                    } else if (shiftIndex <= newIndex && newIndex < oldIndex) {
-                        _delRange(newIndex + 1, oldIndex )
-                    } else if ( shiftIndex < oldIndex && oldIndex < newIndex ) {
-                        _addRange(oldIndex, newIndex)
-                    } else if ( newIndex < shiftIndex && shiftIndex < oldIndex ) {
-                        _delRange(shiftIndex, oldIndex)
-                        _addRange(newIndex, shiftIndex)
-                    } else if ( newIndex < oldIndex && oldIndex < shiftIndex  ) {
-                        _addRange(newIndex, oldIndex)
-                    } else if ( oldIndex <= shiftIndex && shiftIndex < newIndex ) {
-                        _delRange(oldIndex, shiftIndex)
-                        _addRange(shiftIndex, newIndex)
-                    } else if ( oldIndex < newIndex && newIndex <= shiftIndex  ) {
-                        _delRange(oldIndex, newIndex - 1)
-                    }
-                } else {
-                    shiftIndex = newIndex
-                    if (keymodifiers & Qt.ControlModifier) {
-                        root.plmodel.toggleSelected(newIndex)
+                navigationLeft: function(index) {
+                    if (mode === "normal") {
+                        root.navigationLeft(index)
                     } else {
-                        root.plmodel.setSelection([newIndex])
+                        mode = "normal"
                     }
+                }
+                navigationCancel: function(index) {
+                    if (mode === "normal") {
+                        root.navigationCancel(index)
+                    } else {
+                        mode = "normal"
+                    }
+                }
+
+                onActionAtIndex: {
+                    if (index < 0)
+                        return
+
+                    if (mode === "select")
+                        root.plmodel.toggleSelected(index)
+                    else //normal
+                        // play
+                        mainPlaylistController.goTo(index, true)
+                }
+
+                function onPlay() {
+                    let selection = root.plmodel.getSelection()
+                    if (selection.length === 0)
+                        return
+                    mainPlaylistController.goTo(selection[0], true)
+                }
+
+                function onDelete() {
+                    let selection = root.plmodel.getSelection()
+                    if (selection.length === 0)
+                        return
+                    root.plmodel.removeItems(selection)
+                }
+
+                function _addRange(from, to) {
+                    root.plmodel.setRangeSelected(from, to - from + 1, true)
+                }
+
+                function _delRange(from, to) {
+                    root.plmodel.setRangeSelected(from, to - from + 1, false)
+                }
+
+                // copied from SelectableDelegateModel, which is intended to be removed
+                function updateSelection( keymodifiers, oldIndex, newIndex ) {
+                    if ((keymodifiers & Qt.ShiftModifier)) {
+                        if ( shiftIndex === oldIndex) {
+                            if ( newIndex > shiftIndex )
+                                _addRange(shiftIndex, newIndex)
+                            else
+                                _addRange(newIndex, shiftIndex)
+                        } else if (shiftIndex <= newIndex && newIndex < oldIndex) {
+                            _delRange(newIndex + 1, oldIndex )
+                        } else if ( shiftIndex < oldIndex && oldIndex < newIndex ) {
+                            _addRange(oldIndex, newIndex)
+                        } else if ( newIndex < shiftIndex && shiftIndex < oldIndex ) {
+                            _delRange(shiftIndex, oldIndex)
+                            _addRange(newIndex, shiftIndex)
+                        } else if ( newIndex < oldIndex && oldIndex < shiftIndex  ) {
+                            _addRange(newIndex, oldIndex)
+                        } else if ( oldIndex <= shiftIndex && shiftIndex < newIndex ) {
+                            _delRange(oldIndex, shiftIndex)
+                            _addRange(shiftIndex, newIndex)
+                        } else if ( oldIndex < newIndex && newIndex <= shiftIndex  ) {
+                            _delRange(oldIndex, newIndex - 1)
+                        }
+                    } else {
+                        shiftIndex = newIndex
+                        if (keymodifiers & Qt.ControlModifier) {
+                            root.plmodel.toggleSelected(newIndex)
+                        } else {
+                            root.plmodel.setSelection([newIndex])
+                        }
+                    }
+                }
+
+                Label {
+                    anchors.fill: parent
+                    visible: plmodel.count === 0
+                    font.pixelSize: VLCStyle.fontHeight_xxlarge
+                    color: view.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
+                    text: i18n.qtr("playlist\nis\nempty")
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    padding: VLCStyle.margin_small
                 }
             }
 
-            Label {
-                anchors.fill: parent
-                visible: plmodel.count === 0
-                font.pixelSize: VLCStyle.fontHeight_xxlarge
-                color: view.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-                text: i18n.qtr("playlist\nis\nempty")
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
-                padding: VLCStyle.margin_small
+            Item {
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
+                height: VLCStyle.heightBar_normal
+                visible: !(infoText.text === "")
+
+	            RectangularGlow {
+	                anchors.top: parent.top
+	                anchors.bottom: parent.bottom
+	                anchors.horizontalCenter: parent.horizontalCenter
+
+	                width: infoText.width + VLCStyle.dp(18)
+	                height: infoText.height + VLCStyle.dp(12)
+
+	                glowRadius: 2
+	                cornerRadius: 10
+	                spread: 0.1
+	                color: VLCStyle.colors.glowColorBanner
+	            }
+
+                Label {
+                    id: infoText
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.centerIn: parent
+                    horizontalAlignment: Text.AlignHCenter
+
+                    text: (view.mode === "select")
+                            ? i18n.qtr("Select tracks (%1)").arg(plmodel.selectedCount)
+                        : (view.mode === "move")
+                            ? i18n.qtr("Move tracks (%1)").arg(plmodel.selectedCount)
+                        : ""
+                    font.pixelSize: VLCStyle.fontSize_large
+                    color: VLCStyle.colors.text
+                    elide: Text.ElideRight
+                }
+            }
+
+            PlaylistToolbar {
+                Layout.fillWidth: true
+
+                leftPadding: root.leftPadding
+                rightPadding: root.rightPadding
+                navigationParent: root
+                navigationUpItem: view
             }
         }
-
-        Item {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHCenter
-            height: VLCStyle.heightBar_normal
-            visible: !(infoText.text === "")
-
-            RectangularGlow {
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                width: infoText.width + VLCStyle.dp(18)
-                height: infoText.height + VLCStyle.dp(12)
-
-                glowRadius: 2
-                cornerRadius: 10
-                spread: 0.1
-                color: VLCStyle.colors.glowColorBanner
-            }
-
-            Label {
-                id: infoText
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.centerIn: parent
-                horizontalAlignment: Text.AlignHCenter
-
-                text: (view.mode === "select")
-                        ? i18n.qtr("Select tracks (%1)").arg(plmodel.selectedCount)
-                    : (view.mode === "move")
-                        ? i18n.qtr("Move tracks (%1)").arg(plmodel.selectedCount)
-                    : ""
-                font.pixelSize: VLCStyle.fontSize_large
-                color: VLCStyle.colors.text
-                elide: Text.ElideRight
-            }
-        }
-
-        PlaylistToolbar {
-            Layout.fillWidth: true
-
-            leftPadding: root.leftPadding
-            rightPadding: root.rightPadding
-            navigationParent: root
-            navigationUpItem: view
-        }
-    }
     }
 
     Keys.priority: Keys.AfterItem
