@@ -375,12 +375,6 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
     segmentTracker->notifyBufferingLevel(i_min_buffering, i_demuxed, i_total_buffering);
     if(i_demuxed < i_total_buffering) /* not already demuxed */
     {
-        if(!segmentTracker->segmentsListReady()) /* Live Streams */
-        {
-            vlc_mutex_unlock(&lock);
-            return AbstractStream::buffering_suspended;
-        }
-
         mtime_t nz_extdeadline = fakeEsOut()->commandsQueue()->getBufferingLevel() +
                                     (i_total_buffering - i_demuxed) / 4;
         nz_deadline = std::max(nz_deadline, nz_extdeadline);
