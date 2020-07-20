@@ -39,10 +39,15 @@ Widgets.NavigableFocusScope {
     property alias backgroundColor: parentRect.color
     property alias mediaLibAvailable: contextMenu.medialibAvailable
 
+    property bool forceDark: false
+    property VLCColors _colors: forceDark ? vlcNightColors : VLCStyle.colors
+
+    VLCColors {id: vlcNightColors; state: "night"}
+
     Rectangle {
         id: parentRect
         anchors.fill: parent
-        color: VLCStyle.colors.banner
+        color: _colors.banner
 
         //label for DnD
         Widgets.DNDLabel {
@@ -201,11 +206,13 @@ Widgets.NavigableFocusScope {
 
                 Widgets.SubtitleLabel {
                     text: i18n.qtr("Playqueue")
+                    color: _colors.text
                 }
 
                 Widgets.CaptionLabel {
                     anchors.topMargin: VLCStyle.margin_small
                     text: i18n.qtr("%1 elements, %2 min").arg(root.plmodel.count).arg(plmodel.duration.toMinutes())
+                    color: _colors.caption
                 }
             }
 
@@ -225,7 +232,7 @@ Widgets.NavigableFocusScope {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     text: VLCIcons.album_cover
-                    color: VLCStyle.colors.caption
+                    color: _colors.caption
                 }
 
                 Widgets.CaptionLabel {
@@ -233,6 +240,7 @@ Widgets.NavigableFocusScope {
                     Layout.leftMargin: VLCStyle.margin_large
                     verticalAlignment: Text.AlignVCenter
                     text: i18n.qtr("Title")
+                    color: _colors.caption
                 }
 
                 Widgets.IconLabel {
@@ -240,7 +248,7 @@ Widgets.NavigableFocusScope {
                     Layout.preferredWidth: durationMetric.width
 
                     text: VLCIcons.time
-                    color: VLCStyle.colors.caption
+                    color: _colors.caption
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
@@ -291,8 +299,8 @@ Widgets.NavigableFocusScope {
                         width: parent.width
                         height: 1
                         sourceComponent: Rectangle {
-                            color: VLCStyle.colors.playlistSeparator
-                            opacity: VLCStyle.colors.isThemeDark ? 0.05 : 1.0
+                            color: _colors.playlistSeparator
+                            opacity: _colors.isThemeDark ? 0.05 : 1.0
                         }
                     }
 
@@ -337,7 +345,8 @@ Widgets.NavigableFocusScope {
                             }
                         }
                         onItemDoubleClicked: mainPlaylistController.goTo(index, true)
-                        color: VLCStyle.colors.getBgColor(model.selected, plitem.hovered, plitem.activeFocus)
+                        color: _colors.getBgColor(model.selected, plitem.hovered, plitem.activeFocus)
+                        _colors: root._colors
 
                         onDragStarting: {
                             if (!root.plmodel.isSelected(index)) {
@@ -362,8 +371,8 @@ Widgets.NavigableFocusScope {
                     Rectangle {
                         width: parent.width
                         height: 1
-                        color: VLCStyle.colors.playlistSeparator
-                        opacity: VLCStyle.colors.isThemeDark ? 0.05 : 1.0
+                        color: _colors.playlistSeparator
+                        opacity: _colors.isThemeDark ? 0.05 : 1.0
                     }
                 }
 
@@ -494,7 +503,7 @@ Widgets.NavigableFocusScope {
                     anchors.fill: parent
                     visible: plmodel.count === 0
                     font.pixelSize: VLCStyle.fontHeight_xxlarge
-                    color: view.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
+                    color: view.activeFocus ? _colors.accent : _colors.text
                     text: i18n.qtr("playlist\nis\nempty")
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
@@ -519,7 +528,7 @@ Widgets.NavigableFocusScope {
 	                glowRadius: 2
 	                cornerRadius: 10
 	                spread: 0.1
-	                color: VLCStyle.colors.glowColorBanner
+	                color: _colors.glowColorBanner
 	            }
 
                 Label {
@@ -535,7 +544,7 @@ Widgets.NavigableFocusScope {
                             ? i18n.qtr("Move tracks (%1)").arg(plmodel.selectedCount)
                         : ""
                     font.pixelSize: VLCStyle.fontSize_large
-                    color: VLCStyle.colors.text
+                    color: _colors.text
                     elide: Text.ElideRight
                 }
             }
@@ -547,6 +556,8 @@ Widgets.NavigableFocusScope {
                 rightPadding: root.rightPadding
                 navigationParent: root
                 navigationUpItem: view
+
+                _colors: root._colors
             }
         }
     }
