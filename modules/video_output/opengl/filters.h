@@ -100,7 +100,8 @@ vlc_gl_filters_WillUpdate(struct vlc_gl_filters *filters, bool new_picture);
  * \return VLC_SUCCESS on success, another value on error
  */
 int
-vlc_gl_filters_Draw(struct vlc_gl_filters *filters);
+vlc_gl_filters_Draw(struct vlc_gl_filters *filters,
+                    struct vlc_gl_input_meta *output_meta);
 
 /**
  * Flush all filters

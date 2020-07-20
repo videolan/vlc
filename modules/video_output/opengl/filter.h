@@ -37,6 +37,7 @@ struct vlc_gl_input_meta {
     vlc_tick_t pts;
     bool top_field_first;
     unsigned plane;
+    vlc_rational_t framerate;
 };
 
 typedef int
@@ -54,7 +55,7 @@ struct vlc_gl_filter_ops {
      * Draw the result of the filter to the current framebuffer
      */
     int (*draw)(struct vlc_gl_filter *filter,
-                const struct vlc_gl_input_meta *meta);
+                struct vlc_gl_input_meta *meta);
 
     /**
      * Discard any internal state

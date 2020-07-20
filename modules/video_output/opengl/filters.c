@@ -548,7 +548,8 @@ vlc_gl_filters_WillUpdate(struct vlc_gl_filters *filters, bool new_picture)
 }
 
 int
-vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
+vlc_gl_filters_Draw(struct vlc_gl_filters *filters,
+                    struct vlc_gl_input_meta *output_meta)
 {
     const opengl_vtable_t *vt = &filters->api->vt;
 
@@ -664,6 +665,9 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters)
             }
         }
     }
+
+    if (output_meta)
+        *output_meta = meta;
 
     return VLC_SUCCESS;
 }
