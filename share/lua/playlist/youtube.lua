@@ -356,7 +356,7 @@ function parse()
                     js_url = string.gsub( js_url, "^//", vlc.access.."://" )
                 end
 
-                -- Classic parameters
+                -- Classic parameters - out of use since early 2020
                 if not fmt then
                     fmt_list = string.match( line, "\"fmt_list\": *\"(.-)\"" )
                     if fmt_list then
@@ -423,7 +423,7 @@ function parse()
     elseif string.match( vlc.path, "/get_video_info%?" ) then -- video info API
         local line = vlc.readline() -- data is on one line only
 
-        -- Classic parameters
+        -- Classic parameters - out of use since early 2020
         local fmt = get_url_param( vlc.path, "fmt" )
         if not fmt then
             local fmt_list = string.match( line, "&fmt_list=([^&]*)" )
