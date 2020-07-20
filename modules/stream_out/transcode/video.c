@@ -593,8 +593,13 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         for ( picture_t *p_in = p_pic; ; p_in = NULL /* drain second time */ )
         {
             /* Run filter chain */
-            if( id->p_f_chain )
-                p_in = filter_chain_VideoFilter( id->p_f_chain, p_in );
+            filter_chain_t * primary_chains[] = { id->p_f_chain };
+            for( size_t i=0; i<ARRAY_SIZE(primary_chains); i++ )
+            {
+                if( !primary_chains[i] )
+                    continue;
+                p_in = filter_chain_VideoFilter( primary_chains[i], p_in );
+            }
 
             if( !p_in )
                 break;
