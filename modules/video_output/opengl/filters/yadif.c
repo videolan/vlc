@@ -573,7 +573,7 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
             --sys->missing_frames;
         }
 
-        if (sys->last_pts != VLC_TICK_INVALID)
+        if (false && sys->last_pts != VLC_TICK_INVALID)
         {
             /*
              *                       dup->date
@@ -587,7 +587,7 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
         else if (meta->framerate.den != 0)
         {
             vlc_tick_t interval =
-                vlc_tick_from_samples(meta->framerate.den, meta->framerate.num);
+                vlc_tick_from_samples(meta->framerate.den, meta->framerate.num * 2);
             meta->pts += interval;
         }
         else

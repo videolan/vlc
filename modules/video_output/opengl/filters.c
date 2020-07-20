@@ -135,6 +135,7 @@ struct vlc_gl_filters {
         /** Last updated picture PTS */
         vlc_tick_t pts;
         bool top_field_first;
+        vlc_rational_t framerate;
     } pic;
 };
 
@@ -523,6 +524,10 @@ vlc_gl_filters_UpdatePicture(struct vlc_gl_filters *filters,
 
     filters->pic.pts = picture->date;
     filters->pic.top_field_first = picture->b_top_field_first;
+    filters->pic.framerate = (vlc_rational_t) {
+        picture->format.i_frame_rate,
+        picture->format.i_frame_rate_base
+    };
 
     return vlc_gl_sampler_UpdatePicture(first_filter->sampler, picture);
 }
@@ -561,6 +566,7 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters,
         .pts = filters->pic.pts,
         .top_field_first = filters->pic.top_field_first,
         .plane = 0,
+        .framerate = filters->pic.framerate,
     };
 
     struct vlc_gl_filter_priv *priv;
