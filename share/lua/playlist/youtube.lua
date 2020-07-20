@@ -339,6 +339,10 @@ function parse()
 
             if not artist then
                 artist = string.match(line, '\\"author\\":\\"(.-)\\"')
+                if artist then
+                    -- FIXME: do this properly
+                    artist = string.gsub( artist, "\\u0026", "&" )
+                end
             end
 
             -- JSON parameters, also formerly known as "swfConfig",
@@ -378,8 +382,8 @@ function parse()
                     local stream_map = string.match( line, '\\"formats\\":%[(.-)%]' )
                     if stream_map then
                         vlc.msg.dbg( "Found new-style parameters for youtube video stream, parsing..." )
-                        stream_map = string.gsub( stream_map, '\\(["\\/])', '%1' )
                         -- FIXME: do this properly
+                        stream_map = string.gsub( stream_map, '\\(["\\/])', '%1' )
                         stream_map = string.gsub( stream_map, "\\u0026", "&" )
                         path = pick_stream( stream_map, js_url )
                     end
@@ -471,11 +475,15 @@ function parse()
         if title then
             title = string.gsub( title, "+", " " )
             title = vlc.strings.decode_uri( title )
+            -- FIXME: do this properly
+            title = string.gsub( title, "\\u0026", "&" )
         end
         local artist = string.match( line, "%%22author%%22%%3A%%22(.-)%%22" )
         if artist then
             artist = string.gsub( artist, "+", " " )
             artist = vlc.strings.decode_uri( artist )
+            -- FIXME: do this properly
+            artist = string.gsub( artist, "\\u0026", "&" )
         end
         local arturl = string.match( line, "%%22playerMicroformatRenderer%%22%%3A%%7B%%22thumbnail%%22%%3A%%7B%%22thumbnails%%22%%3A%%5B%%7B%%22url%%22%%3A%%22(.-)%%22" )
         if arturl then
