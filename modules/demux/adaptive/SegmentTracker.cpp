@@ -149,19 +149,6 @@ const Role & SegmentTracker::getStreamRole() const
     return adaptationSet->getRole();
 }
 
-bool SegmentTracker::segmentsListReady() const
-{
-    BaseRepresentation *rep = curRepresentation;
-    if(!rep)
-        rep = logic->getNextRepresentation(adaptationSet, NULL);
-    if(rep && rep->getPlaylist()->isLive())
-    {
-        assert(curNumber != std::numeric_limits<uint64_t>::max());
-        return rep->getMinAheadTime(curNumber) > 0;
-    }
-    return true;
-}
-
 void SegmentTracker::reset()
 {
     notify(SegmentTrackerEvent(curRepresentation, NULL));

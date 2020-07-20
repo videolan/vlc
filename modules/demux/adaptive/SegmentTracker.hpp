@@ -127,7 +127,6 @@ namespace adaptive
             const std::string & getStreamDescription() const;
             const std::string & getStreamLanguage() const;
             const Role & getStreamRole() const;
-            bool segmentsListReady() const;
             void reset();
             SegmentChunk* getNextChunk(bool, AbstractConnectionManager *);
             bool setPositionByTime(vlc_tick_t, bool, bool);
