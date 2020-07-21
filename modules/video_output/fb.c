@@ -596,22 +596,17 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         return VLC_EGENERIC;
     }
 
-    picture_resource_t rsc = {
-       .p = {
-           [0] = {
-               .p_pixels = sys->video_ptr,
-               .i_lines = sys->var_info.yres,
-               .i_pitch = fix_info.line_length,
-           },
-       },
-    };
+    picture_resource_t rsc = { 0 };
 
     sys->picture = picture_NewFromResource(&vd->fmt, &rsc);
     if (unlikely(sys->picture == NULL)) {
-        munmap(rsc.p[0].p_pixels, sys->video_size);
+        munmap(sys->video_ptr, sys->video_size);
         ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
         return VLC_ENOMEM;
     }
+    sys->picture->p[0].p_pixels = sys->video_ptr;
+    sys->picture->p[0].i_lines = sys->var_info.yres;
+    sys->picture->p[0].i_pitch = fix_info.line_length;
 
     ClearScreen(sys);
 
