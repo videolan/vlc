@@ -433,6 +433,8 @@ static int OpenEncoder(vlc_object_t *p_this)
 
     struct aom_codec_enc_cfg enccfg = { 0 };
     aom_codec_enc_config_default(iface, &enccfg, 0);
+    /* TODO: implement 2-pass */
+    enccfg.g_pass = AOM_RC_ONE_PASS;
     enccfg.g_timebase.num = p_enc->fmt_in.video.i_frame_rate_base;
     enccfg.g_timebase.den = p_enc->fmt_in.video.i_frame_rate;
     enccfg.g_threads = __MIN(vlc_GetCPUCount(), 4);
