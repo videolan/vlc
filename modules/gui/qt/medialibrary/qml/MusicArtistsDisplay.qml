@@ -61,7 +61,7 @@ Widgets.NavigableFocusScope {
     }
 
     function _actionAtIndex(index) {
-        view.forceActiveFocus()
+        albumSubView.forceActiveFocus()
     }
 
     MLArtistModel {
@@ -114,7 +114,7 @@ Widgets.NavigableFocusScope {
             }
 
             navigationParent: root
-            navigationRightItem: view
+            navigationRightItem: albumSubView
             navigationCancel: function() {
                 if (artistList.currentIndex <= 0)
                     defaultNavigationCancel()
@@ -156,54 +156,45 @@ Widgets.NavigableFocusScope {
                     if (keys === Qt.RightButton)
                         medialib.addAndPlay( model.id )
                     else
-                        view.forceActiveFocus()
+                        albumSubView.forceActiveFocus()
                 }
             }
 
         }
 
-        FocusScope {
-            id: view
-            width: parent.width * 0.75
+
+        MusicAlbums {
+            id: albumSubView
+
             height: parent.height
+            width: parent.width * .75
+            gridViewMarginTop: 0
+            focus: true
+            parentId: root.artistId
+            initialIndex: root.initialAlbumIndex
+            navigationParent: root
+            navigationUpItem: albumSubView.headerItem
+            navigationLeftItem: artistList
 
-            property alias currentIndex: albumSubView.currentIndex
-            property alias initialIndex: albumSubView.initialIndex
-
-            MusicAlbums {
-                id: albumSubView
-
-                anchors.fill: parent
-                gridViewMarginTop: 0
-
-                header: ArtistTopBanner {
-                    id: artistBanner
-                    width: albumSubView.width
-                    artist: (artistList.currentIndex >= 0)
-                            ? artistModel.getDataAt(artistList.currentIndex)
-                            : ({})
-                    navigationParent: root
-                    navigationLeftItem: artistList
-                    navigationDown: function() {
-                        artistBanner.focus = false
-                        view.forceActiveFocus()
-                    }
-                }
-
-                focus: true
-                parentId: artistId
-                initialIndex: root.initialAlbumIndex
-
+            header: ArtistTopBanner {
+                id: artistBanner
+                width: albumSubView.width
+                artist: (artistList.currentIndex >= 0)
+                        ? artistModel.getDataAt(artistList.currentIndex)
+                        : ({})
                 navigationParent: root
-                navigationUpItem: albumSubView.headerItem
                 navigationLeftItem: artistList
-
-                onCurrentIndexChanged: {
-                    history.update(["mc", "music", "artists", {"initialIndex" : root.currentIndex, "initialAlbumIndex": albumSubView.currentIndex  }])
+                navigationDown: function() {
+                    artistBanner.focus = false
+                    view.forceActiveFocus()
                 }
             }
 
+            onCurrentIndexChanged: {
+                history.update(["mc", "music", "artists", {"initialIndex" : root.currentIndex, "initialAlbumIndex": albumSubView.currentIndex  }])
+            }
         }
+
     }
     }
 
