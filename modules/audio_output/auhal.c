@@ -978,8 +978,8 @@ RenderCallbackSPDIF(AudioDeviceID inDevice, const AudioTimeStamp * inNow,
     uint8_t *p_output = outOutputData->mBuffers[p_sys->i_stream_index].mData;
     size_t i_size = outOutputData->mBuffers[p_sys->i_stream_index].mDataByteSize;
 
-    uint64_t i_host_time = (inNow->mFlags & kAudioTimeStampHostTimeValid)
-                         ? inNow->mHostTime : 0;
+    uint64_t i_host_time = (inOutputTime->mFlags & kAudioTimeStampHostTimeValid)
+                         ? inOutputTime->mHostTime : 0;
 
     ca_Render(p_aout, 0, i_host_time, p_output, i_size);
 
