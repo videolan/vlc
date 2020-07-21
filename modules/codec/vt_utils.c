@@ -159,22 +159,6 @@ cvpxpic_create_mapped(const video_format_t *fmt, CVPixelBufferRef cvpx,
     assert(CVPixelBufferGetPlaneCount(cvpx) == planes_count);
 #endif
 
-    if (planes_count == 0)
-    {
-        rsc.p[0].p_pixels = CVPixelBufferGetBaseAddress(cvpx);
-        rsc.p[0].i_lines = CVPixelBufferGetHeight(cvpx);
-        rsc.p[0].i_pitch = CVPixelBufferGetBytesPerRow(cvpx);
-    }
-    else
-    {
-        for (unsigned i = 0; i < planes_count; ++i)
-        {
-            rsc.p[i].p_pixels = CVPixelBufferGetBaseAddressOfPlane(cvpx, i);
-            rsc.p[i].i_lines = CVPixelBufferGetHeightOfPlane(cvpx, i);
-            rsc.p[i].i_pitch = CVPixelBufferGetBytesPerRowOfPlane(cvpx, i);
-        }
-    }
-
     void (*pf_destroy)(picture_context_t *) = readonly ?
         cvpxpic_destroy_mapped_ro_cb : cvpxpic_destroy_mapped_rw_cb;
 
@@ -185,6 +169,23 @@ cvpxpic_create_mapped(const video_format_t *fmt, CVPixelBufferRef cvpx,
         CVPixelBufferUnlockBaseAddress(cvpx, lock);
         return NULL;
     }
+
+    if (planes_count == 0)
+    {
+        pic->p[0].p_pixels = CVPixelBufferGetBaseAddress(cvpx);
+        pic->p[0].i_lines = CVPixelBufferGetHeight(cvpx);
+        pic->p[0].i_pitch = CVPixelBufferGetBytesPerRow(cvpx);
+    }
+    else
+    {
+        for (unsigned i = 0; i < planes_count; ++i)
+        {
+            pic->p[i].p_pixels = CVPixelBufferGetBaseAddressOfPlane(cvpx, i);
+            pic->p[i].i_lines = CVPixelBufferGetHeightOfPlane(cvpx, i);
+            pic->p[i].i_pitch = CVPixelBufferGetBytesPerRowOfPlane(cvpx, i);
+        }
+    }
+
     return pic;
 }
 
