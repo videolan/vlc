@@ -578,16 +578,16 @@ static int OpenDisplay(vout_display_t *vd)
 
     picture_resource_t rsc = { 0 };
 
-    for (size_t i = 0; i < PICTURE_PLANE_MAX; i++) {
-        rsc.p[i].p_pixels = sys->map[0] + sys->offsets[i];
-        rsc.p[i].i_lines  = sys->height;
-        rsc.p[i].i_pitch  = sys->stride;
-    }
-
     sys->picture = picture_NewFromResource(&vd->fmt, &rsc);
 
     if (!sys->picture)
         goto err_out;
+
+    for (size_t i = 0; i < PICTURE_PLANE_MAX; i++) {
+        sys->picture->p[i].p_pixels = sys->map[0] + sys->offsets[i];
+        sys->picture->p[i].i_lines  = sys->height;
+        sys->picture->p[i].i_pitch  = sys->stride;
+    }
 
     return VLC_SUCCESS;
 err_out:
