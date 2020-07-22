@@ -820,10 +820,8 @@ static int GenericProbe( demux_t *p_demux, uint64_t *pi_offset,
     const ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_probe );
 
     if( i_peek < 0 || (size_t)i_peek < i_skip + i_check_size )
-    {
-        msg_Dbg( p_demux, "cannot peek" );
         return VLC_EGENERIC;
-    }
+
     for( ;; )
     {
         if( i_skip + i_check_size > i_peek )
@@ -1270,10 +1268,8 @@ static int AacProbe( demux_t *p_demux, uint64_t *pi_offset )
 
     /* peek the begining (10 is for adts header) */
     if( vlc_stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
-    {
-        msg_Dbg( p_demux, "cannot peek" );
         return VLC_EGENERIC;
-    }
+
     if( !strncmp( (char *)p_peek, "ADIF", 4 ) )
     {
         msg_Err( p_demux, "ADIF file. Not yet supported. (Please report)" );

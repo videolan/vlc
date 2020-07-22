@@ -229,10 +229,7 @@ static int avformat_ProbeDemux( vlc_object_t *p_this,
     /* Init Probe data */
     pd.buf_size = vlc_stream_Peek( p_demux->s, &peek, 2048 + 213 );
     if( pd.buf_size <= 0 )
-    {
-        msg_Warn( p_demux, "cannot peek" );
         return VLC_EGENERIC;
-    }
 
     pd.buf = malloc( pd.buf_size + AVPROBE_PADDING_SIZE );
     if( unlikely(pd.buf == NULL) )
