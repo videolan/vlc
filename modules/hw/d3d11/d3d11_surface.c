@@ -587,10 +587,9 @@ VIDEO_FILTER_WRAPPER (D3D11_NV12)
 VIDEO_FILTER_WRAPPER (D3D11_YUY2)
 VIDEO_FILTER_WRAPPER (D3D11_RGBA)
 
-static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
+static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter, filter_sys_t *p_sys)
 {
     video_format_t fmt_staging;
-    filter_sys_t *p_sys = p_filter->p_sys;
 
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate( p_filter->vctx_out );
 
@@ -646,7 +645,7 @@ done:
 
 static picture_t *NV12_D3D11_Filter( filter_t *p_filter, picture_t *p_pic )
 {
-    picture_t *p_outpic = AllocateCPUtoGPUTexture( p_filter );
+    picture_t *p_outpic = AllocateCPUtoGPUTexture( p_filter, p_filter->p_sys );
     if( p_outpic )
     {
         NV12_D3D11( p_filter, p_pic, p_outpic );
@@ -801,7 +800,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
 
     if ( p_filter->fmt_in.video.i_chroma != d3d_fourcc )
     {
-        p_sys->staging_pic = AllocateCPUtoGPUTexture(p_filter);
+        p_sys->staging_pic = AllocateCPUtoGPUTexture(p_filter, p_sys);
         if (p_sys->staging_pic == NULL)
             goto done;
 
@@ -813,6 +812,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         }
     }
 
+    p_filter->p_sys = p_sys;
     err = VLC_SUCCESS;
 
 done:
