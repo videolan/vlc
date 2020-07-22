@@ -69,4 +69,6 @@ void input_resource_StopFreeVout( input_resource_t * );
  */
 input_resource_t *input_resource_Hold( input_resource_t * );
 
+void input_resource_ResetAout( input_resource_t * );
+
 #endif
