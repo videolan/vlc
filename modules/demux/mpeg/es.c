@@ -817,8 +817,9 @@ static int GenericProbe( demux_t *p_demux, uint64_t *pi_offset,
      * We will accept probing 0.5s of data in this case.
      */
     const size_t i_probe = i_skip + i_check_size + i_base_probing + ( b_wav ? i_wav_extra_probing : 0);
-    const size_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_probe );
-    if( i_peek < i_skip + i_check_size )
+    const ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_probe );
+
+    if( i_peek < 0 || (size_t)i_peek < i_skip + i_check_size )
     {
         msg_Dbg( p_demux, "cannot peek" );
         return VLC_EGENERIC;
