@@ -359,8 +359,8 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
             ssize_t i_return = vlc_stream_Peek( p_demux->s, &pkt->p_peek, pkt->left );
             if ( i_return <= 0 || (size_t) i_return < pkt->left )
             {
-            msg_Warn( p_demux, "cannot peek, EOF ?" );
-            return -1;
+                msg_Warn( p_demux, "unexpected end of file" );
+                return -1;
             }
         }
 
@@ -388,7 +388,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     ssize_t i_return = vlc_stream_Peek( p_demux->s, &p_peek,i_data_packet_min );
     if( i_return <= 0 || (size_t) i_return < i_data_packet_min )
     {
-        msg_Warn( p_demux, "cannot peek while getting new packet, EOF ?" );
+        msg_Warn( p_demux, "unexpected end of file" );
         return 0;
     }
     unsigned int i_skip = 0;
@@ -455,7 +455,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     i_return = vlc_stream_Peek( p_demux->s, &p_peek, pkt.length );
     if( i_return <= 0 || pkt.length == 0 || (size_t)i_return < pkt.length )
     {
-        msg_Warn( p_demux, "cannot peek, EOF ?" );
+        msg_Warn( p_demux, "unexpected end of file" );
         return 0;
     }
 
