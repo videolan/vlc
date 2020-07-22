@@ -1,5 +1,5 @@
 /*****************************************************************************
- * aom.c: libaom decoder (AV1) module
+ * aom.c: libaom encoder and decoder (AV1) module
  *****************************************************************************
  * Copyright (C) 2016 VLC authors and VideoLAN
  *
@@ -36,7 +36,7 @@
 #include <aom/aomdx.h>
 
 #ifdef ENABLE_SOUT
-#include <aom/aom_encoder.h>
+# include <aom/aom_encoder.h>
 # include <aom/aomcx.h>
 # include <aom/aom_image.h>
 # define SOUT_CFG_PREFIX "sout-aom-"
