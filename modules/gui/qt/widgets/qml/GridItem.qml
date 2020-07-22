@@ -31,6 +31,7 @@ Item {
     property alias image: picture.source
     property alias title: titleLabel.text
     property alias subtitle: subtitleTxt.text
+    property alias textHorizontalAlignment: subtitleTxt.horizontalAlignment
     property alias playCoverBorder: picture.playCoverBorder
     property alias playCoverOnlyBorders: picture.playCoverOnlyBorders
     property bool selected: false
@@ -231,6 +232,7 @@ Item {
 
                         elide: Text.ElideNone
                         width: pictureWidth
+                        horizontalAlignment: root.textHorizontalAlignment
                     }
                 }
 
