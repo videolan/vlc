@@ -2211,6 +2211,17 @@ VLC_API audio_output_t *
 vlc_player_aout_Hold(vlc_player_t *player);
 
 /**
+ * Reset the main audio output
+ *
+ * @warning The main aout can only by reset if it is not currently used by any
+ * decoders (before any play).
+ *
+ * @param player player instance
+ */
+VLC_API void
+vlc_player_aout_Reset(vlc_player_t *player);
+
+/**
  * Add a listener callback for audio output events
  *
  * @note The player instance doesn't need to be locked for vlc_player_aout_*()

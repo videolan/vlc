@@ -237,3 +237,14 @@ vlc_player_aout_Deinit(vlc_player_t *player)
 {
     vlc_player_aout_DelCallbacks(player);
 }
+
+void
+vlc_player_aout_Reset(vlc_player_t *player)
+{
+    vlc_player_aout_Deinit(player);
+
+    input_resource_ResetAout(player->resource);
+
+    vlc_player_aout_Init(player);
+}
+

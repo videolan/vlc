@@ -779,6 +779,7 @@ vlc_player_aout_AddListener
 vlc_player_aout_EnableFilter
 vlc_player_aout_GetVolume
 vlc_player_aout_Hold
+vlc_player_aout_Reset
 vlc_player_aout_IncrementVolume
 vlc_player_aout_IsMuted
 vlc_player_aout_Mute
