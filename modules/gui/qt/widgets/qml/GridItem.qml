@@ -58,7 +58,7 @@ Item {
 
     readonly property bool _highlighted: mouseArea.containsMouse || content.activeFocus
 
-    readonly property int _selectedBorderWidth: VLCStyle.column_margin_width - ( VLCStyle.margin_small * 2 )
+    readonly property int selectedBorderWidth: VLCStyle.column_margin_width - ( VLCStyle.margin_small * 2 )
 
     property alias _primaryShadowVerticalOffset: primaryShadow.verticalOffset
     property alias _primaryShadowRadius: primaryShadow.radius
@@ -136,10 +136,10 @@ Item {
 
             /* background visible when selected */
             Rectangle {
-                x: - root._selectedBorderWidth
-                y: - root._selectedBorderWidth
-                width: layout.implicitWidth + ( root._selectedBorderWidth * 2 )
-                height:  layout.implicitHeight + ( root._selectedBorderWidth * 2 )
+                x: - root.selectedBorderWidth
+                y: - root.selectedBorderWidth
+                width: layout.implicitWidth + ( root.selectedBorderWidth * 2 )
+                height:  layout.implicitHeight + ( root.selectedBorderWidth * 2 )
                 color: VLCStyle.colors.bgAlt
                 visible: root.selected || root._highlighted
             }
