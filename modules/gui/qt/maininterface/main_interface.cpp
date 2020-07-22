@@ -98,8 +98,8 @@ static int IntfRaiseMainCB( vlc_object_t *p_this, const char *psz_variable,
 const QEvent::Type MainInterface::ToolbarsNeedRebuild =
         (QEvent::Type)QEvent::registerEventType();
 
-MainInterface::MainInterface( intf_thread_t *_p_intf )
-    : QVLCMW( _p_intf )
+MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::WindowFlags flags)
+    : QVLCMW( _p_intf, parent, flags )
 {
     /* Variables initialisation */
     lastWinScreen        = NULL;

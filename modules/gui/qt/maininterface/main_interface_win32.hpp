@@ -31,7 +31,7 @@ class MainInterfaceWin32 : public MainInterface
     Q_OBJECT
 
 public:
-    MainInterfaceWin32( intf_thread_t *p_intf );
+    MainInterfaceWin32( intf_thread_t *p_intf, QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags() );
     virtual ~MainInterfaceWin32();
 
 private:

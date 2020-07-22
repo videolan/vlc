@@ -80,8 +80,8 @@
 #define GET_FLAGS_LPARAM(lParam)      (LOWORD(lParam))
 #define GET_KEYSTATE_LPARAM(lParam)   GET_FLAGS_LPARAM(lParam)
 
-MainInterfaceWin32::MainInterfaceWin32( intf_thread_t *_p_intf )
-    : MainInterface( _p_intf )
+MainInterfaceWin32::MainInterfaceWin32(intf_thread_t *_p_intf , QWidget* parent, Qt::WindowFlags flags)
+    : MainInterface( _p_intf, parent, flags )
     , himl( NULL )
     , p_taskbl( NULL )
 {
