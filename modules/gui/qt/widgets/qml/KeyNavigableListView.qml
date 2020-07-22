@@ -36,6 +36,11 @@ NavigableFocusScope {
     property alias model: view.model
     property alias delegate: view.delegate
 
+    property alias leftMargin: view.leftMargin
+    property alias rightMargin: view.rightMargin
+    property alias topMargin: view.topMargin
+    property alias bottomMargin: view.bottomMargin
+
     property alias originX: view.originX
     property alias originY: view.originY
 
