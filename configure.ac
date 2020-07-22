@@ -2871,9 +2871,9 @@ PKG_WITH_MODULES([FAAD],[faad2],
 [faad AAC audio decoder])
 
 dnl
-dnl  AOM decoder plugin
+dnl  AOM encoder/decoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([AOM], [], [aom], [experimental AV1 codec (default auto)])
+PKG_ENABLE_MODULES_VLC([AOM], [], [aom], [libaom AV1 encoder and decoder (default auto)])
 
 dnl
 dnl  Dav1d decoder plugin
