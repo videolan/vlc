@@ -122,6 +122,13 @@ Widgets.NavigableFocusScope {
                     artistList.currentIndex = 0;
             }
 
+            header: Widgets.SubtitleLabel {
+                text: i18n.qtr("Artists")
+                leftPadding: VLCStyle.margin_normal
+                bottomPadding: VLCStyle.margin_normal
+                topPadding: VLCStyle.margin_normal
+            }
+
             delegate: Widgets.ListItem {
                 height: VLCStyle.icon_normal + VLCStyle.margin_small
                 width: artistList.width
