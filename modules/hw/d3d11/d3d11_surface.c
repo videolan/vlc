@@ -614,7 +614,8 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter, filter_sys_t *p_sy
     video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
     fmt_staging.i_chroma = cfg->fourcc;
 
-    picture_t *p_dst = picture_NewFromFormat(&fmt_staging);
+    picture_resource_t dummy_res = {};
+    picture_t *p_dst = picture_NewFromResource(&fmt_staging, &dummy_res);
     if (p_dst == NULL) {
         msg_Err(p_filter, "Failed to map create the temporary picture.");
         goto done;
