@@ -403,6 +403,10 @@ static void CloseDecoder(vlc_object_t *p_this)
 
 #ifdef ENABLE_SOUT
 
+#ifndef AOM_USAGE_REALTIME
+# define AOM_USAGE_REALTIME 1
+#endif
+
 /*****************************************************************************
  * encoder_sys_t: libaom encoder descriptor
  *****************************************************************************/
