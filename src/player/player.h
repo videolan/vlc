@@ -467,11 +467,11 @@ vlc_player_vout_DelCallbacks(vlc_player_t *player, vout_thread_t *vout);
  * player_aout.c
  */
 
-void
-vlc_player_aout_AddCallbacks(vlc_player_t *player);
+audio_output_t *
+vlc_player_aout_Init(vlc_player_t *player);
 
 void
-vlc_player_aout_DelCallbacks(vlc_player_t *player);
+vlc_player_aout_Deinit(vlc_player_t *player);
 
 /*
  * player_osd.c

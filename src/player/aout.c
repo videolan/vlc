@@ -192,7 +192,7 @@ vlc_player_aout_EnableFilter(vlc_player_t *player, const char *name, bool add)
 }
 
 
-void
+static void
 vlc_player_aout_AddCallbacks(vlc_player_t *player)
 {
     audio_output_t *aout = vlc_player_aout_Hold(player);
@@ -206,7 +206,7 @@ vlc_player_aout_AddCallbacks(vlc_player_t *player)
     aout_Release(aout);
 }
 
-void
+static void
 vlc_player_aout_DelCallbacks(vlc_player_t *player)
 {
     audio_output_t *aout = vlc_player_aout_Hold(player);
@@ -218,4 +218,22 @@ vlc_player_aout_DelCallbacks(vlc_player_t *player)
     var_DelCallback(aout, "device", vlc_player_AoutCallback, player);
 
     aout_Release(aout);
+}
+
+audio_output_t *
+vlc_player_aout_Init(vlc_player_t *player)
+{
+    audio_output_t *aout = input_resource_GetAout(player->resource);
+    if (aout != NULL)
+    {
+        vlc_player_aout_AddCallbacks(player);
+        input_resource_PutAout(player->resource, aout);
+    }
+    return aout;
+}
+
+void
+vlc_player_aout_Deinit(vlc_player_t *player)
+{
+    vlc_player_aout_DelCallbacks(player);
 }

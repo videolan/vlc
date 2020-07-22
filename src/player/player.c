@@ -1909,7 +1909,7 @@ vlc_player_Delete(vlc_player_t *player)
 
     vlc_player_DestroyTimer(player);
 
-    vlc_player_aout_DelCallbacks(player);
+    vlc_player_aout_Deinit(player);
     var_DelCallback(player, "corks", vlc_player_CorkCallback, player);
 
     input_resource_Release(player->resource);
@@ -1998,12 +1998,7 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
         goto error;
 
     /* Ensure the player has a valid aout */
-    aout = input_resource_GetAout(player->resource);
-    if (aout != NULL)
-    {
-        vlc_player_aout_AddCallbacks(player);
-        input_resource_PutAout(player->resource, aout);
-    }
+    aout = vlc_player_aout_Init(player);
     var_AddCallback(player, "corks", vlc_player_CorkCallback, player);
 
     player->deleting = false;
@@ -2021,7 +2016,7 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
 
 error:
     if (aout)
-        vlc_player_aout_DelCallbacks(player);
+        vlc_player_aout_Deinit(player);
     var_DelCallback(player, "corks", vlc_player_CorkCallback, player);
     if (player->resource)
         input_resource_Release(player->resource);
