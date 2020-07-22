@@ -49,27 +49,12 @@
 #include "freetype.h"
 #include "fonts/backends.h"
 
-static FT_Face LoadFace( filter_t *p_filter, const char *psz_fontfile, int i_idx,
-                  const text_style_t *p_style )
+FT_Face doLoadFace( void *ctx, const char *psz_fontfile, int i_idx )
 {
+    filter_t *p_filter = ctx;
     filter_sys_t *p_sys = p_filter->p_sys;
-    char *psz_key = NULL;
 
-    int i_font_size  = ConvertToLiveSize( p_filter, p_style );
-    int i_font_width = i_font_size;
-    if( p_style->i_style_flags & STYLE_HALFWIDTH )
-        i_font_width /= 2;
-    else if( p_style->i_style_flags & STYLE_DOUBLEWIDTH )
-        i_font_width *= 2;
-
-    if( asprintf( &psz_key, "%s - %d - %d - %d",
-                  psz_fontfile, i_idx,
-                  i_font_size, i_font_width ) < 0 )
-        return NULL;
-
-    FT_Face p_face = vlc_dictionary_value_for_key( &p_sys->face_map, psz_key );
-    if( p_face != NULL )
-        goto done;
+    FT_Face p_face = NULL;
 
     if( psz_fontfile[0] == ':' && psz_fontfile[1] == '/' )
     {
@@ -81,76 +66,48 @@ static FT_Face LoadFace( filter_t *p_filter, const char *psz_fontfile, int i_idx
             input_attachment_t *p_attach = p_sys->pp_font_attachments[ i_attach ];
             if( FT_New_Memory_Face( p_sys->p_library, p_attach->p_data,
                                     p_attach->i_data, i_idx, &p_face ) )
-                msg_Err( p_filter, "LoadFace: Error creating face for %s", psz_key );
+                return NULL;
         }
     }
-
 #if defined( _WIN32 )
     else if( !memcmp( psz_fontfile, ":dw/", 4 ) )
     {
         int i_index = atoi( psz_fontfile + 4 );
-        FT_Stream p_stream;
-        if( DWrite_GetFontStream( p_sys->fs, i_index, &p_stream ) != VLC_SUCCESS )
-            msg_Err( p_filter, "LoadFace: Invalid font stream index" );
-        else
+        FT_Open_Args args = {0};
+        args.flags = FT_OPEN_STREAM;
+        if( DWrite_GetFontStream( p_sys->fs, i_index, &args.stream ) != VLC_SUCCESS ||
+            FT_Open_Face( p_sys->p_library, &args, i_idx, &p_face ) )
         {
-            FT_Open_Args args = {0};
-            args.flags = FT_OPEN_STREAM;
-            args.stream = p_stream;
-            if( FT_Open_Face( p_sys->p_library, &args, i_idx, &p_face ) )
-                msg_Err( p_filter, "LoadFace: Error creating face for %s", psz_key );
+            msg_Err( p_filter, "LoadFace: Invalid font stream index" );
+            return NULL;
         }
     }
 #endif
 
     else
         if( FT_New_Face( p_sys->p_library, psz_fontfile, i_idx, &p_face ) )
-            msg_Err( p_filter, "LoadFace: Error creating face for %s", psz_key );
+            return NULL;
 
-    if( !p_face )
-        goto done;
-
-    if( FT_Select_Charmap( p_face, ft_encoding_unicode ) )
-    {
-        /* We've loaded a font face which is unhelpful for actually
-         * rendering text - fallback to the default one.
-         */
-        msg_Err( p_filter, "LoadFace: Error selecting charmap for %s", psz_key );
-        FT_Done_Face( p_face );
-        p_face = NULL;
-        goto done;
-    }
-
-    if( FT_Set_Pixel_Sizes( p_face, i_font_width, i_font_size ) )
-    {
-        msg_Err( p_filter,
-                 "LoadFace: Failed to set font size for %s", psz_key );
-        FT_Done_Face( p_face );
-        p_face = NULL;
-        goto done;
-    }
-
-    vlc_dictionary_insert( &p_sys->face_map, psz_key, p_face );
-
-done:
-    free( psz_key );
     return p_face;
 }
 
-FT_Face GetFace( vlc_font_select_t *fs, vlc_font_t *p_font, uni_char_t codepoint )
+bool CheckFace( vlc_font_select_t *fs, vlc_font_t *p_font, uni_char_t codepoint )
 {
     filter_sys_t *p_sys = fs->p_filter->p_sys;
 
-    if( !p_font->p_face )
-        p_font->p_face = LoadFace( fs->p_filter, p_font->psz_fontfile,
-                                   p_font->i_index,
-                                   p_sys->p_default_style );
+    vlc_face_id_t *faceid = p_font->faceid;
+    if( !faceid )
+    {
+        faceid = vlc_ftcache_GetFaceID( p_sys->ftcache,
+                                        p_font->psz_fontfile,
+                                        p_font->i_index );
+        p_font->faceid = faceid;
+    }
 
-    if( p_font->p_face &&
-        FT_Get_Char_Index( p_font->p_face, codepoint ) )
-        return p_font->p_face;
-    else
-        return NULL;
+    if( !faceid || vlc_ftcache_LoadFaceByIDNoSize( p_sys->ftcache, faceid ) )
+        return false;
+
+    return vlc_ftcache_LookupCMapIndex( p_sys->ftcache, faceid, codepoint );
 }
 
 /**
@@ -173,7 +130,7 @@ static vlc_font_t *GetBestFont( vlc_font_select_t *fs, const vlc_family_t *p_fam
     {
         int i_score = 0;
 
-        if( codepoint && GetFace( fs, p_font, codepoint ) )
+        if( codepoint && CheckFace( fs, p_font, codepoint ) )
             i_score += 1000;
 
         if( !!p_font->b_bold == !!b_bold )
@@ -207,7 +164,7 @@ vlc_family_t *SearchFallbacks( vlc_font_select_t *fs, vlc_family_t *p_fallbacks,
             p_fallback->p_fonts = p_temp->p_fonts;
         }
 
-        if( !GetFace( fs, p_fallback->p_fonts, codepoint ) )
+        if( !CheckFace( fs, p_fallback->p_fonts, codepoint ) )
             continue;
 
         p_family = p_fallback;
@@ -226,7 +183,7 @@ static vlc_family_t *SearchFontByFamilyName( vlc_font_select_t *fs,
     {
         if( !strcasecmp( p->psz_name, psz_familyname ) &&
             p->p_fonts &&
-            GetFace( fs, p->p_fonts, codepoint ) )
+            CheckFace( fs, p->p_fonts, codepoint ) )
             return p;
     }
     return NULL;
@@ -603,7 +560,7 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
     const bool b_italic = p_style->i_style_flags & STYLE_ITALIC;
     const vlc_family_t *p_family = NULL;
 
-    if( codepoint )
+    if( codepoint && !p_family )
     {
         vlc_family_t *p_fallbacks;
         const char *psz_name;
@@ -628,7 +585,7 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
             p_family = FontSelectGetFamily( fs, psz_name );
             if( p_family && p_family->p_fonts )
             {
-                if( GetFace( fs, p_family->p_fonts, codepoint ) )
+                if( CheckFace( fs, p_family->p_fonts, codepoint ) )
                 {
                     Debug( fs->p_obj, "Found family \"%s\" for codepoint %x",
                            psz_name, codepoint );
@@ -642,7 +599,7 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
         /* Try font attachments if not available locally */
         if( !p_family )
         {
-            Debug( fs->p_obj, "Looking for family \"%s\" in attachments", psz_name );
+            Debug( fs->p_obj, "Looking for family \"%s\" in attachments cp %x", psz_name, codepoint );
             p_fallbacks = vlc_dictionary_value_for_key( &fs->fallback_map,
                                                         FB_LIST_ATTACHMENTS );
             if( p_fallbacks )
@@ -661,7 +618,7 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
         {
             vlc_vector_foreach( psz_name, families )
             {
-                Debug( fs->p_obj, "Looking for family \"%s\" in system fallbacks", psz_name );
+                Debug( fs->p_obj, "Looking for family \"%s\" in system fallbacks cp %x", psz_name, codepoint );
                 p_fallbacks = FontSelectGetFallbacks( fs, psz_name, codepoint );
                 if( p_fallbacks )
                 {
@@ -715,8 +672,8 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
     return NULL;
 }
 
-FT_Face SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style,
-                           uni_char_t codepoint )
+vlc_face_id_t *
+SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style, uni_char_t codepoint )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     const char *psz_fontname = (p_style->i_style_flags & STYLE_MONOSPACED)
@@ -731,17 +688,27 @@ FT_Face SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style,
         return NULL;
     }
 
-    FT_Face p_face = NULL;
+    vlc_face_id_t *p_faceid = NULL;
 
     int  i_idx = 0;
     char *psz_fontfile =
             SelectFontWithFamilyFallback( p_sys->fs, &families, p_style,
                                           &i_idx, codepoint );
+
     if( psz_fontfile && *psz_fontfile != '\0' )
     {
-        p_face = LoadFace( p_filter, psz_fontfile, i_idx, p_style );
+        p_faceid  = vlc_ftcache_GetFaceID( p_sys->ftcache, psz_fontfile, i_idx );
+        if( p_faceid )
+        {
+            vlc_ftcache_metrics_t metrics;
+            metrics.height_px = ConvertToLiveSize( p_filter, p_style );
+            metrics.width_px = GetFontWidthForStyle( p_style, metrics.height_px );
+            if( !vlc_ftcache_LoadFaceByID( p_sys->ftcache, p_faceid, &metrics ) )
+                p_faceid = NULL;
+        }
     }
-    else
+
+    if( !p_faceid )
     {
         msg_Warn( p_filter,
                   "SelectAndLoadFace: no font found for family: %s, codepoint: 0x%x",
@@ -753,7 +720,8 @@ FT_Face SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style,
         free( psz_temp );
     vlc_vector_clear( &families );
     free( psz_fontfile );
-    return p_face;
+
+    return p_faceid;
 }
 
 #ifndef HAVE_GET_FONT_BY_FAMILY_NAME

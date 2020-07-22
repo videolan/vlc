@@ -790,7 +790,7 @@ extern "C" vlc_family_t *DWrite_GetFallbacks( vlc_font_select_t *fs, const char 
         if( !p_fallback || !p_fallback->p_fonts )
             goto done;
 
-        if( !GetFace( fs, p_fallback->p_fonts, codepoint ) )
+        if( !CheckFace( fs, p_fallback->p_fonts, codepoint ) )
             goto done;
 
         p_family = NewFamily( fs, psz_fallback, NULL, NULL, NULL );

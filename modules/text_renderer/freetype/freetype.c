@@ -83,6 +83,8 @@ static void Destroy( vlc_object_t * );
 #define SHADOW_COLOR_TEXT N_("Shadow color")
 #define SHADOW_ANGLE_TEXT N_("Shadow angle")
 #define SHADOW_DISTANCE_TEXT N_("Shadow distance")
+#define CACHE_SIZE_TEXT N_("Cache size")
+#define CACHE_SIZE_LONGTEXT N_("Cache size in kBytes")
 
 #define TEXT_DIRECTION_TEXT N_("Text direction")
 #define TEXT_DIRECTION_LONGTEXT N_("Paragraph base direction for the Unicode bi-directional algorithm.")
@@ -180,6 +182,10 @@ vlc_module_begin ()
         change_safe()
     add_float_with_range( "freetype-shadow-distance", 0.06, 0.0, 1.0,
                           SHADOW_DISTANCE_TEXT, NULL, false )
+        change_safe()
+
+    add_integer_with_range( "freetype-cache-size", 200, 25, (UINT32_MAX >> 10),
+                            CACHE_SIZE_TEXT, CACHE_SIZE_LONGTEXT, true )
         change_safe()
 
     add_obsolete_integer( "freetype-fontsize" );
@@ -1168,11 +1174,11 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     UpdateDefaultLiveStyles( p_filter );
 
     int i_font_default_size = ConvertToLiveSize( p_filter, p_sys->p_default_style );
-    if( !p_sys->p_face || i_font_default_size != p_sys->i_font_default_size )
+    if( !p_sys->p_faceid || i_font_default_size != p_sys->i_font_default_size )
     {
         /* Update the default face to reflect changes in video size or text scaling */
-        p_sys->p_face = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
-        if( !p_sys->p_face )
+        p_sys->p_faceid = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
+        if( !p_sys->p_faceid )
         {
             msg_Err( p_filter, "Render(): Error loading default face" );
             return VLC_EGENERIC;
@@ -1353,13 +1359,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     return rv;
 }
 
-static void FreeFace( void *p_face, void *p_obj )
-{
-    VLC_UNUSED( p_obj );
-
-    FT_Done_Face( ( FT_Face ) p_face );
-}
-
 /*****************************************************************************
  * Create: allocates osd-text video thread output method
  *****************************************************************************
@@ -1389,8 +1388,10 @@ static int Create( vlc_object_t *p_this )
         p_sys->p_stroker = NULL;
     }
 
-    /* Dictionnaries for fonts */
-    vlc_dictionary_init( &p_sys->face_map, 50 );
+    p_sys->ftcache = vlc_ftcache_New( p_this, p_sys->p_library,
+                            var_InheritInteger( p_this, "freetype-cache-size" ) );
+    if( !p_sys->ftcache )
+        goto error;
 
     p_sys->i_scale = 100;
 
@@ -1432,8 +1433,8 @@ static int Create( vlc_object_t *p_this )
     if( LoadFontsFromAttachments( p_filter ) == VLC_ENOMEM )
         goto error;
 
-    p_sys->p_face = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
-    if( !p_sys->p_face )
+    p_sys->p_faceid = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
+    if( !p_sys->p_faceid )
     {
         msg_Err( p_filter, "Error loading default face %s",
                  p_sys->p_default_style->psz_fontname );
@@ -1471,9 +1472,6 @@ static void Destroy( vlc_object_t *p_this )
     text_style_Delete( p_sys->p_default_style );
     text_style_Delete( p_sys->p_forced_style );
 
-    /* Fonts dicts */
-    vlc_dictionary_clear( &p_sys->face_map, FreeFace, p_filter );
-
     /* Attachments */
     if( p_sys->pp_font_attachments )
     {
@@ -1489,6 +1487,9 @@ static void Destroy( vlc_object_t *p_this )
     /* Freetype */
     if( p_sys->p_stroker )
         FT_Stroker_Done( p_sys->p_stroker );
+
+    if( p_sys->ftcache )
+        vlc_ftcache_Delete( p_sys->ftcache );
 
     FT_Done_FreeType( p_sys->p_library );
 

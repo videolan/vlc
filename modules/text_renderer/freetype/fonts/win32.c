@@ -555,7 +555,7 @@ vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_family,
         if( !p_uniscribe || !p_uniscribe->p_fonts )
             goto done;
 
-        if( !GetFace( fs, p_uniscribe->p_fonts, codepoint ) )
+        if( !CheckFace( fs, p_uniscribe->p_fonts, codepoint ) )
             goto done;
 
         p_family = NewFamily( fs, psz_uniscribe, NULL, NULL, NULL );

@@ -132,7 +132,7 @@ struct vlc_font_t
     int         i_index;   /**< index of the font in the font file, starts at 0 */
     bool        b_bold;    /**< if the font is a bold version */
     bool        b_italic;  /**< if the font is an italic version */
-    FT_Face     p_face;    /**< the freetype structure for the font */
+    void       *faceid;    /* fontloader ref to font */
 };
 
 /**
@@ -277,11 +277,11 @@ char* ToLower( const char *psz_src );
 /* Size helper, depending on the scaling factor */
 int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );
 
-
 /* Only for fonts implementors */
 vlc_family_t *SearchFallbacks( vlc_font_select_t *, vlc_family_t *p_fallbacks,
                                       uni_char_t codepoint );
-FT_Face GetFace( vlc_font_select_t *, vlc_font_t *p_font, uni_char_t codepoint );
+bool CheckFace( vlc_font_select_t *fs, vlc_font_t *p_font, uni_char_t codepoint );
+FT_Face doLoadFace( void *, const char *psz_fontfile, int i_idx );
 
 char * MakeFilePath( vlc_font_select_t *, const char *psz_filename );
 

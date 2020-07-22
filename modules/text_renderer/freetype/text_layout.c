@@ -101,7 +101,7 @@ typedef struct run_desc_t
 {
     int                         i_start_offset;
     int                         i_end_offset;
-    FT_Face                     p_face;
+    vlc_face_id_t              *p_faceid;
     const text_style_t         *p_style;
 
 #ifdef HAVE_HARFBUZZ
@@ -117,7 +117,7 @@ typedef struct run_desc_t
  */
 typedef struct glyph_bitmaps_t
 {
-    FT_Glyph p_glyph;
+    vlc_ftcache_glyph_t cglyph;
     FT_Glyph p_outline;
     FT_Glyph p_shadow;
     FT_BBox  glyph_bbox;
@@ -134,8 +134,8 @@ typedef struct paragraph_t
     uni_char_t          *p_code_points;    /**< Unicode code points */
     int                 *pi_glyph_indices; /**< Glyph index values within the run's font face */
     text_style_t       **pp_styles;
-    ruby_block_t      **pp_ruby;
-    FT_Face             *pp_faces;         /**< Used to determine run boundaries when performing font fallback */
+    ruby_block_t       **pp_ruby;
+    vlc_face_id_t      **pp_facesidx;      /**< Used to determine run boundaries when performing font fallback */
     int                 *pi_run_ids;       /**< The run to which each glyph belongs */
     glyph_bitmaps_t     *p_glyph_bitmaps;
     int                  i_size;
@@ -290,7 +290,7 @@ static void FreeParagraph( paragraph_t *p_paragraph )
     free( p_paragraph->pi_glyph_indices );
     free( p_paragraph->p_glyph_bitmaps );
     free( p_paragraph->pi_run_ids );
-    free( p_paragraph->pp_faces );
+    free( p_paragraph->pp_facesidx );
     free( p_paragraph->pp_ruby );
     free( p_paragraph->pp_styles );
     free( p_paragraph->p_code_points );
@@ -329,8 +329,8 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
             vlc_alloc( i_size, sizeof( *p_paragraph->pi_glyph_indices ) );
     p_paragraph->pp_styles =
             vlc_alloc( i_size, sizeof( *p_paragraph->pp_styles ) );
-    p_paragraph->pp_faces =
-            calloc( i_size, sizeof( *p_paragraph->pp_faces ) );
+    p_paragraph->pp_facesidx =
+            calloc( i_size, sizeof( *p_paragraph->pp_facesidx ) );
     p_paragraph->pi_run_ids =
             calloc( i_size, sizeof( *p_paragraph->pi_run_ids ) );
     p_paragraph->p_glyph_bitmaps =
@@ -343,7 +343,7 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
     p_paragraph->i_runs_count = 0;
 
     if( !p_paragraph->p_code_points || !p_paragraph->pi_glyph_indices
-     || !p_paragraph->pp_styles || !p_paragraph->pp_faces
+     || !p_paragraph->pp_styles || !p_paragraph->pp_facesidx
      || !p_paragraph->pi_run_ids|| !p_paragraph->p_glyph_bitmaps
      || !p_paragraph->p_runs )
         goto error;
@@ -471,7 +471,7 @@ static int AddRun( filter_t *p_filter,
                    paragraph_t *p_paragraph,
                    int i_start_offset,
                    int i_end_offset,
-                   FT_Face p_face,
+                   vlc_face_id_t *p_faceid,
                    const text_style_t *p_style )
 {
     if( i_start_offset >= i_end_offset
@@ -504,7 +504,7 @@ static int AddRun( filter_t *p_filter,
     run_desc_t *p_run = p_paragraph->p_runs + p_paragraph->i_runs_count++;
     p_run->i_start_offset = i_start_offset;
     p_run->i_end_offset = i_end_offset;
-    p_run->p_face = p_face;
+    p_run->p_faceid = p_faceid;
 
     if( p_style )
         p_run->p_style = p_style;
@@ -530,6 +530,8 @@ static int AddRun( filter_t *p_filter,
 static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
                                int i_start_offset, int i_end_offset )
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
+
     if( i_start_offset >= i_end_offset
      || i_start_offset < 0 || i_start_offset >= p_paragraph->i_size
      || i_end_offset <= 0  || i_end_offset > p_paragraph->i_size )
@@ -545,8 +547,8 @@ static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
 
     /* Maximum number of faces to try for each run */
     #define MAX_FACES 5
-    FT_Face pp_faces[ MAX_FACES ] = {0};
-    FT_Face p_face = NULL;
+    vlc_face_id_t *pp_facesidx[ MAX_FACES ] = {0};
+    vlc_face_id_t *p_faceidx = NULL;
 
     for( int i = i_start_offset; i < i_end_offset; ++i )
     {
@@ -558,33 +560,32 @@ static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
          * For white space, punctuation and neutral characters, try to use
          * the font of the previous character, if any. See #20466.
          */
-        if( p_face &&
+        if( p_faceidx &&
             ( p_paragraph->p_types[ i ] == FRIBIDI_TYPE_WS
            || p_paragraph->p_types[ i ] == FRIBIDI_TYPE_CS
            || p_paragraph->p_types[ i ] == FRIBIDI_TYPE_ON ) )
         {
-            i_glyph_index = FT_Get_Char_Index( p_face,
-                                               p_paragraph->p_code_points[ i ] );
+            i_glyph_index = vlc_ftcache_LookupCMapIndex( p_sys->ftcache, p_faceidx,
+                                                         p_paragraph->p_code_points[ i ] );
             if( i_glyph_index )
             {
-                p_paragraph->pp_faces[ i ] = p_face;
+                p_paragraph->pp_facesidx[ i ] = p_faceidx;
                 continue;
             }
         }
 #endif
 
         do {
-            p_face = pp_faces[ i_index ];
-            if( !p_face )
-                p_face = pp_faces[ i_index ] =
-                     SelectAndLoadFace( p_filter, p_style,
-                                        p_paragraph->p_code_points[ i ] );
-            if( !p_face )
+            p_faceidx = pp_facesidx[ i_index ];
+            if( !p_faceidx )
+                p_faceidx = pp_facesidx[ i_index ] =
+                     SelectAndLoadFace( p_filter, p_style, p_paragraph->p_code_points[ i ] );
+            if( !p_faceidx )
                 continue;
-            i_glyph_index = FT_Get_Char_Index( p_face,
-                                               p_paragraph->p_code_points[ i ] );
+            i_glyph_index = vlc_ftcache_LookupCMapIndex( p_sys->ftcache, p_faceidx,
+                                             p_paragraph->p_code_points[ i ] );
             if( i_glyph_index )
-                p_paragraph->pp_faces[ i ] = p_face;
+                p_paragraph->pp_facesidx[ i ] = p_faceidx;
 
         } while( i_glyph_index == 0 && ++i_index < MAX_FACES );
     }
@@ -593,11 +594,11 @@ static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
     for( int i = i_start_offset; i <= i_end_offset; ++i )
     {
         if( i == i_end_offset
-         || p_paragraph->pp_faces[ i_run_start ] != p_paragraph->pp_faces[ i ] )
+         || p_paragraph->pp_facesidx[ i_run_start ] != p_paragraph->pp_facesidx[ i ] )
         {
-            if( p_paragraph->pp_faces[ i_run_start ] &&
+            if( p_paragraph->pp_facesidx[ i_run_start ] &&
                 AddRun( p_filter, p_paragraph, i_run_start, i,
-                        p_paragraph->pp_faces[ i_run_start ], NULL ) )
+                        p_paragraph->pp_facesidx[ i_run_start ], NULL ) )
                 return VLC_EGENERIC;
 
             i_run_start = i;
@@ -707,7 +708,6 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
     for( int i = 0; i < p_paragraph->i_runs_count; ++i )
     {
         run_desc_t *p_run = p_paragraph->p_runs + i;
-        const text_style_t *p_style = p_run->p_style;
 
         /*
          * With HarfBuzz and no font fallback, this is where font faces
@@ -718,21 +718,30 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
          * loaded in AddRunWithFallback(), except for runs of codepoints
          * for which no font could be found.
          */
-        FT_Face p_face = 0;
-        if( !p_run->p_face )
+        if( !p_run->p_faceid )
         {
-            p_face = SelectAndLoadFace( p_filter, p_style,
-                                         p_paragraph->p_code_points[p_run->i_start_offset] );
-            if( !p_face )
+            p_run->p_faceid = SelectAndLoadFace( p_filter, p_run->p_style,
+                                                 p_paragraph->p_code_points[p_run->i_start_offset] );
+            if( !p_run->p_faceid )
             {
-                p_face = p_sys->p_face;
-                p_style = p_sys->p_default_style;
-                p_run->p_style = p_style;
+                p_run->p_faceid = p_sys->p_faceid;
+                p_run->p_style = p_sys->p_default_style;
             }
-            p_run->p_face = p_face;
         }
-        else
-            p_face = p_run->p_face;
+
+        vlc_face_id_t *p_faceid = p_run->p_faceid;
+        const text_style_t *p_style = p_run->p_style;
+
+        if(!p_faceid)
+            goto error;
+
+        vlc_ftcache_metrics_t metrics;
+        metrics.height_px = ConvertToLiveSize( p_filter, p_style );
+        metrics.width_px = GetFontWidthForStyle( p_style, metrics.height_px );
+
+        FT_Face p_face = vlc_ftcache_LoadFaceByID( p_sys->ftcache, p_faceid, &metrics );
+        if(!p_face)
+            goto error;
 
         hb_font_t *p_hb_font = hb_ft_font_create( p_face, 0 );
         if( !p_hb_font )
@@ -767,6 +776,7 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
         hb_shape( p_hb_font, p_run->p_buffer, 0, 0 );
 
         hb_font_destroy( p_hb_font );
+        p_hb_font = 0;
 
         const unsigned length = hb_buffer_get_length( p_run->p_buffer );
         if( length == 0 )
@@ -844,7 +854,7 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
             ++i_index;
         }
         if( AddRun( p_filter, p_new_paragraph, i_index - i_glyph_count,
-                    i_index, p_run->p_face, p_run->p_style ) )
+                    i_index, p_run->p_faceid, p_run->p_style ) )
             goto error;
     }
 
@@ -916,8 +926,9 @@ static int ShapeParagraphFriBidi( filter_t *p_filter, paragraph_t *p_paragraph )
  * inserted when shaping with FriBidi, when it performs glyph substitution for
  * ligatures.
  */
-static int RemoveZeroWidthCharacters( paragraph_t *p_paragraph )
+static int RemoveZeroWidthCharacters( filter_t *p_filter, paragraph_t *p_paragraph )
 {
+    filter_sys_t *p_sys = p_filter->p_sys;
     for( int i = 0; i < p_paragraph->i_size; ++i )
     {
         uni_char_t ch = p_paragraph->p_code_points[ i ];
@@ -928,11 +939,9 @@ static int RemoveZeroWidthCharacters( paragraph_t *p_paragraph )
          || ( ch >= 0x200b && ch <= 0x200f ) )
         {
             glyph_bitmaps_t *p_bitmaps = p_paragraph->p_glyph_bitmaps + i;
-            if( p_bitmaps->p_glyph )
-                FT_Done_Glyph( p_bitmaps->p_glyph );
             if( p_bitmaps->p_outline )
                 FT_Done_Glyph( p_bitmaps->p_outline );
-            p_bitmaps->p_glyph = 0;
+            vlc_ftcache_Glyph_Release( p_sys->ftcache, &p_bitmaps->cglyph );
             p_bitmaps->p_outline = 0;
             p_bitmaps->p_shadow = 0;
             p_bitmaps->i_x_advance = 0;
@@ -961,6 +970,18 @@ static int ZeroNsmAdvance( paragraph_t *p_paragraph )
 #endif
 #endif
 
+static void ReleaseGlyphBitMaps(filter_t *p_filter, glyph_bitmaps_t *p_bitmaps)
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    if( p_bitmaps->p_shadow &&
+        p_bitmaps->p_shadow != p_bitmaps->cglyph.p_glyph &&
+        p_bitmaps->p_shadow != p_bitmaps->p_outline )
+        FT_Done_Glyph( p_bitmaps->p_shadow );
+    if( p_bitmaps->p_outline )
+        FT_Done_Glyph( p_bitmaps->p_outline );
+    vlc_ftcache_Glyph_Release( p_sys->ftcache, &p_bitmaps->cglyph );
+}
+
 /**
  * Load the glyphs of a paragraph. When shaping with HarfBuzz the glyph indices
  * have already been determined at this point, as well as the advance values.
@@ -984,30 +1005,33 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
     {
         run_desc_t *p_run = p_paragraph->p_runs + i;
         const text_style_t *p_style = p_run->p_style;
-        const int i_live_size = ConvertToLiveSize( p_filter, p_style );
+        vlc_ftcache_metrics_t metrics;
 
-        FT_Face p_face = 0;
-        if( !p_run->p_face )
+        if( p_run->p_faceid )
         {
-            p_face = SelectAndLoadFace( p_filter, p_style,
-                                        p_paragraph->p_code_points[p_run->i_start_offset] );
-            if( !p_face )
-            {
-                /* Uses the default font and style */
-                p_face = p_sys->p_face;
-                p_style = p_sys->p_default_style;
-                p_run->p_style = p_style;
-            }
-            p_run->p_face = p_face;
+            metrics.height_px = ConvertToLiveSize( p_filter, p_style );
+            metrics.width_px = GetFontWidthForStyle( p_style, metrics.height_px );
+            if(! vlc_ftcache_LoadFaceByID( p_sys->ftcache, p_run->p_faceid, &metrics ) )
+                p_run->p_faceid = NULL;
         }
-        else
-            p_face = p_run->p_face;
+
+        if( !p_run->p_faceid ) /* Fallback on default font and style */
+        {
+            metrics.height_px = ConvertToLiveSize( p_filter, p_sys->p_default_style );
+            metrics.width_px = GetFontWidthForStyle( p_sys->p_default_style, metrics.height_px );
+            if( vlc_ftcache_LoadFaceByID( p_sys->ftcache, p_sys->p_faceid, &metrics ) )
+            {
+                p_run->p_faceid = p_sys->p_faceid;
+                p_run->p_style = p_style = p_sys->p_default_style;
+            }
+            else continue; /* can't do much from now */
+        }
 
         if( p_sys->p_stroker && (p_style->i_style_flags & STYLE_OUTLINE) )
         {
             double f_outline_thickness = p_sys->i_outline_thickness / 100.0;
             f_outline_thickness = VLC_CLIP( f_outline_thickness, 0.0, 0.5 );
-            int i_radius = ( i_live_size << 6 ) * f_outline_thickness;
+            int i_radius = ( metrics.height_px << 6 ) * f_outline_thickness;
             FT_Stroker_Set( p_sys->p_stroker,
                             i_radius,
                             FT_STROKER_LINECAP_ROUND,
@@ -1020,14 +1044,16 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
             if( b_use_glyph_indices )
                 i_glyph_index = p_paragraph->pi_glyph_indices[ j ];
             else
-                i_glyph_index =
-                    FT_Get_Char_Index( p_face, p_paragraph->p_code_points[ j ] );
+            {
+                i_glyph_index = vlc_ftcache_LookupCMapIndex( p_sys->ftcache, p_run->p_faceid,
+                                                 p_paragraph->p_code_points[ j ] );
+            }
 
             glyph_bitmaps_t *p_bitmaps = p_paragraph->p_glyph_bitmaps + j;
 
 #define SKIP_GLYPH( p_bitmaps ) \
     { \
-        p_bitmaps->p_glyph = 0; \
+        vlc_ftcache_Glyph_Init( &p_bitmaps->cglyph );\
         p_bitmaps->p_outline = 0; \
         p_bitmaps->p_shadow = 0; \
         p_bitmaps->i_x_advance = 0; \
@@ -1064,26 +1090,45 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                     SKIP_GLYPH( p_bitmaps )
             }
 
-            if( FT_Load_Glyph( p_face, i_glyph_index,
-                               FT_LOAD_NO_BITMAP | FT_LOAD_DEFAULT )
-             && FT_Load_Glyph( p_face, i_glyph_index, FT_LOAD_DEFAULT ) )
-                SKIP_GLYPH( p_bitmaps )
 
-            if( ( p_style->i_style_flags & STYLE_BOLD )
-                  && !( p_face->style_flags & FT_STYLE_FLAG_BOLD ) )
-                FT_GlyphSlot_Embolden( p_face->glyph );
-            if( ( p_style->i_style_flags & STYLE_ITALIC )
-                  && !( p_face->style_flags & FT_STYLE_FLAG_ITALIC ) )
-                FT_GlyphSlot_Oblique( p_face->glyph );
-
-            if( FT_Get_Glyph( p_face->glyph, &p_bitmaps->p_glyph ) )
-                SKIP_GLYPH( p_bitmaps )
+            FT_Long style_flags;
+            if( vlc_ftcache_GetGlyphForCurrentFace( p_sys->ftcache,
+                                                    i_glyph_index,
+                                                    &p_bitmaps->cglyph,
+                                                    &style_flags ) )
+                SKIP_GLYPH( p_bitmaps );
 
 #undef SKIP_GLYPH
 
+            const bool b_embolden = ( p_style->i_style_flags & STYLE_BOLD ) &&
+                                   !( style_flags & FT_STYLE_FLAG_BOLD );
+            const bool b_oblique = ( p_style->i_style_flags & STYLE_ITALIC ) &&
+                                   !( style_flags & FT_STYLE_FLAG_ITALIC );
+            /* Apply missing style by modifying the outline */
+            if( (b_embolden || b_oblique) &&
+                p_bitmaps->cglyph.p_glyph->format == FT_GLYPH_FORMAT_OUTLINE )
+            {
+                FT_Glyph transformed;
+                if( !FT_Glyph_Copy( p_bitmaps->cglyph.p_glyph, &transformed ) )
+                {
+                    /* using a copy from now */
+                    if( b_oblique )
+                    {
+                        FT_Matrix matrix = { .xx = 0x10000L, .xy = 0.12 * 0x10000L,
+                                             .yy = 0x10000L, .yx = 0 };
+                        FT_Glyph_Transform( transformed, &matrix, 0 );
+                    }
+                    if( b_embolden )
+                        FT_Outline_Embolden( &((FT_OutlineGlyph)transformed)->outline, 1<<6 );
+                    vlc_ftcache_Glyph_Release( p_sys->ftcache, &p_bitmaps->cglyph );
+                    p_bitmaps->cglyph.p_glyph = transformed;
+                }
+            }
+
+            /* !warn: style STYLE_OUTLINE != glyph FORMAT_OUTLINE */
             if( p_sys->p_stroker && (p_style->i_style_flags & STYLE_OUTLINE) )
             {
-                p_bitmaps->p_outline = p_bitmaps->p_glyph;
+                p_bitmaps->p_outline = p_bitmaps->cglyph.p_glyph;
                 if( FT_Glyph_StrokeBorder( &p_bitmaps->p_outline,
                                            p_sys->p_stroker, 0, 0 ) )
                     p_bitmaps->p_outline = 0;
@@ -1091,12 +1136,12 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
 
             if( p_style->i_shadow_alpha != STYLE_ALPHA_TRANSPARENT )
                 p_bitmaps->p_shadow = p_bitmaps->p_outline ?
-                                      p_bitmaps->p_outline : p_bitmaps->p_glyph;
+                                      p_bitmaps->p_outline : p_bitmaps->cglyph.p_glyph;
 
             if( b_overwrite_advance )
             {
-                p_bitmaps->i_x_advance = p_face->glyph->advance.x;
-                p_bitmaps->i_y_advance = p_face->glyph->advance.y;
+                p_bitmaps->i_x_advance = p_bitmaps->cglyph.p_glyph->advance.x >> 10;
+                p_bitmaps->i_y_advance = p_bitmaps->cglyph.p_glyph->advance.y >> 10;
             }
 
             unsigned i_x_advance = FT_FLOOR( abs( p_bitmaps->i_x_advance ) );
@@ -1134,8 +1179,7 @@ static int LayoutLine( filter_t *p_filter,
     FT_Face p_face = 0;
     FT_Vector pen = { .x = 0, .y = 0 };
 
-    int i_font_size = 0;
-    int i_font_width = 0;
+    vlc_ftcache_metrics_t metrics = { 0 };
     int i_font_max_advance_y = 0;
     int i_ul_offset = 0;
     int i_ul_thickness = 0;
@@ -1172,7 +1216,7 @@ static int LayoutLine( filter_t *p_filter,
         glyph_bitmaps_t *p_bitmaps =
                 p_paragraph->p_glyph_bitmaps + i_paragraph_index;
 
-        if( !p_bitmaps->p_glyph )
+        if( !p_bitmaps->cglyph.p_glyph )
         {
             BBoxInit( &p_ch->bbox );
             continue;
@@ -1183,13 +1227,11 @@ static int LayoutLine( filter_t *p_filter,
             i_last_run = p_paragraph->pi_run_ids[ i_paragraph_index ];
             p_run = p_paragraph->p_runs + i_last_run;
             p_style = p_run->p_style;
-            p_face = p_run->p_face;
 
-            i_font_width = i_font_size = ConvertToLiveSize( p_filter, p_style );
-            if( p_style->i_style_flags & STYLE_HALFWIDTH )
-                i_font_width /= 2;
-            else if( p_style->i_style_flags & STYLE_DOUBLEWIDTH )
-                i_font_width *= 2;
+            metrics.height_px = ConvertToLiveSize( p_filter, p_style );
+            metrics.width_px = GetFontWidthForStyle( p_style, metrics.height_px );
+
+            p_face = vlc_ftcache_LoadFaceByID( p_sys->ftcache, p_run->p_faceid, &metrics );
         }
 
         FT_Vector pen_new = {
@@ -1197,59 +1239,61 @@ static int LayoutLine( filter_t *p_filter,
             .y = pen.y + p_paragraph->p_glyph_bitmaps[ i_paragraph_index ].i_y_offset
         };
         FT_Vector pen_shadow = {
-            .x = pen_new.x + p_sys->f_shadow_vector_x * ( i_font_width << 6 ),
-            .y = pen_new.y + p_sys->f_shadow_vector_y * ( i_font_size << 6 )
+            .x = pen_new.x + p_sys->f_shadow_vector_x * ( metrics.width_px << 6 ),
+            .y = pen_new.y + p_sys->f_shadow_vector_y * ( metrics.height_px << 6 )
         };
 
-        if( p_bitmaps->p_shadow )
+        /* Shadow being a reference to main glyph, it must be processed first */
+        if( p_bitmaps->p_shadow &&
+            FT_Glyph_To_Bitmap( &p_bitmaps->p_shadow, FT_RENDER_MODE_NORMAL,
+                                &pen_shadow, 0 ) )
         {
-            if( FT_Glyph_To_Bitmap( &p_bitmaps->p_shadow, FT_RENDER_MODE_NORMAL,
-                                    &pen_shadow, 0 ) )
-                p_bitmaps->p_shadow = 0;
-            else
-                FT_Glyph_Get_CBox( p_bitmaps->p_shadow, FT_GLYPH_BBOX_PIXELS,
-                                   &p_bitmaps->shadow_bbox );
-        }
-        if( p_bitmaps->p_glyph )
-        {
-            if( FT_Glyph_To_Bitmap( &p_bitmaps->p_glyph, FT_RENDER_MODE_NORMAL,
-                                    &pen_new, 1 ) )
-            {
-                FT_Done_Glyph( p_bitmaps->p_glyph );
-                if( p_bitmaps->p_outline )
-                    FT_Done_Glyph( p_bitmaps->p_outline );
-                if( p_bitmaps->p_shadow != p_bitmaps->p_glyph )
-                    FT_Done_Glyph( p_bitmaps->p_shadow );
-                continue;
-            }
-            else
-                FT_Glyph_Get_CBox( p_bitmaps->p_glyph, FT_GLYPH_BBOX_PIXELS,
-                                   &p_bitmaps->glyph_bbox );
-        }
-        if( p_bitmaps->p_outline )
-        {
-            if( FT_Glyph_To_Bitmap( &p_bitmaps->p_outline, FT_RENDER_MODE_NORMAL,
-                                    &pen_new, 1 ) )
-            {
-                FT_Done_Glyph( p_bitmaps->p_outline );
-                p_bitmaps->p_outline = 0;
-            }
-            else
-                FT_Glyph_Get_CBox( p_bitmaps->p_outline, FT_GLYPH_BBOX_PIXELS,
-                                   &p_bitmaps->outline_bbox );
+            p_bitmaps->p_shadow = 0;
         }
 
-        FixGlyph( p_bitmaps->p_glyph, &p_bitmaps->glyph_bbox,
+        /* Ensure we don't release reference */
+        FT_Glyph bitmapglyph = p_bitmaps->cglyph.p_glyph;
+        if( FT_Glyph_To_Bitmap( &bitmapglyph,
+                                FT_RENDER_MODE_NORMAL,
+                                &pen_new, 0 ) )
+        {
+            ReleaseGlyphBitMaps( p_filter, p_bitmaps );
+            continue;
+        }
+
+        /* release the source glyph or reference */
+        vlc_ftcache_Glyph_Release( p_sys->ftcache, &p_bitmaps->cglyph );
+        p_bitmaps->cglyph.p_glyph = bitmapglyph;
+
+        if( p_bitmaps->p_outline &&
+            FT_Glyph_To_Bitmap( &p_bitmaps->p_outline, FT_RENDER_MODE_NORMAL,
+                                &pen_new, 1 ) )
+        {
+            FT_Done_Glyph( p_bitmaps->p_outline );
+            p_bitmaps->p_outline = 0;
+        }
+
+        FT_Glyph_Get_CBox( p_bitmaps->cglyph.p_glyph, FT_GLYPH_BBOX_PIXELS,
+                           &p_bitmaps->glyph_bbox );
+        FixGlyph( p_bitmaps->cglyph.p_glyph, &p_bitmaps->glyph_bbox,
                   p_bitmaps->i_x_advance, p_bitmaps->i_y_advance,
                   &pen_new );
         if( p_bitmaps->p_outline )
+        {
+            FT_Glyph_Get_CBox( p_bitmaps->p_outline, FT_GLYPH_BBOX_PIXELS,
+                               &p_bitmaps->outline_bbox );
             FixGlyph( p_bitmaps->p_outline, &p_bitmaps->outline_bbox,
                       p_bitmaps->i_x_advance, p_bitmaps->i_y_advance,
                       &pen_new );
+        }
         if( p_bitmaps->p_shadow )
+        {
+            FT_Glyph_Get_CBox( p_bitmaps->p_shadow, FT_GLYPH_BBOX_PIXELS,
+                               &p_bitmaps->shadow_bbox );
             FixGlyph( p_bitmaps->p_shadow, &p_bitmaps->shadow_bbox,
                       p_bitmaps->i_x_advance, p_bitmaps->i_y_advance,
                       &pen_shadow );
+        }
 
         int i_line_offset    = 0;
         int i_line_thickness = 0;
@@ -1293,7 +1337,7 @@ static int LayoutLine( filter_t *p_filter,
             }
         }
 
-        p_ch->p_glyph = ( FT_BitmapGlyph ) p_bitmaps->p_glyph;
+        p_ch->p_glyph = ( FT_BitmapGlyph ) p_bitmaps->cglyph.p_glyph;
         p_ch->p_outline = ( FT_BitmapGlyph ) p_bitmaps->p_outline;
         p_ch->p_shadow = ( FT_BitmapGlyph ) p_bitmaps->p_shadow;
 
@@ -1392,14 +1436,6 @@ static int LayoutLine( filter_t *p_filter,
     return VLC_SUCCESS;
 }
 
-static inline void ReleaseGlyphBitMaps(glyph_bitmaps_t *p_bitmaps)
-{
-    if( p_bitmaps->p_glyph )
-        FT_Done_Glyph( p_bitmaps->p_glyph );
-    if( p_bitmaps->p_outline )
-        FT_Done_Glyph( p_bitmaps->p_outline );
-}
-
 static inline bool IsWhitespaceAt( paragraph_t *p_paragraph, size_t i )
 {
     return ( p_paragraph->p_code_points[ i ] == ' '
@@ -1456,7 +1492,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
     if( i_total_width == 0 )
     {
         for( int i=0; i < p_paragraph->i_size; ++i )
-            ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i ] );
+            ReleaseGlyphBitMaps( p_filter, &p_paragraph->p_glyph_bitmaps[ i ] );
         return VLC_SUCCESS;
     }
 
@@ -1503,7 +1539,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
                  * At this point p_shadow points to either p_glyph or p_outline,
                  * so we should not free it explicitly.
                  */
-                ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i ] );
+                ReleaseGlyphBitMaps( p_filter, &p_paragraph->p_glyph_bitmaps[ i ] );
                 i_line_start = i + 1;
                 continue;
             }
@@ -1531,7 +1567,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
                  *  Not wrapping, that can't be rendered anymore. */
                 msg_Dbg( p_filter, "LayoutParagraph(): First glyph width in line exceeds maximum, skipping" );
                 for( ; i < p_paragraph->i_size; ++i )
-                    ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i ] );
+                    ReleaseGlyphBitMaps( p_filter, &p_paragraph->p_glyph_bitmaps[ i ] );
                 return VLC_SUCCESS;
             }
 
@@ -1550,7 +1586,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             if( p_run->p_style->e_wrapinfo == STYLE_WRAP_NONE )
             {
                 for( ; i < p_paragraph->i_size; ++i )
-                    ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i ] );
+                    ReleaseGlyphBitMaps( p_filter, &p_paragraph->p_glyph_bitmaps[ i ] );
                 break;
             }
 
@@ -1564,7 +1600,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
                 if( i_newline_start + 1 < p_paragraph->i_size )
                 {
                     i_line_start = i_newline_start + 1;
-                    ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i_newline_start ] );
+                    ReleaseGlyphBitMaps( p_filter, &p_paragraph->p_glyph_bitmaps[ i_newline_start ] );
                 }
                 else
                     i_line_start = i_newline_start; // == i
@@ -1584,7 +1620,7 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
 
 error:
     for( int i = i_line_start; i < p_paragraph->i_size; ++i )
-        ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i ] );
+        ReleaseGlyphBitMaps( p_filter, &p_paragraph->p_glyph_bitmaps[ i ] );
     if( p_first_line )
         FreeLines( p_first_line );
     return VLC_EGENERIC;
@@ -1626,7 +1662,7 @@ static paragraph_t * BuildParagraph( filter_t *p_filter,
         goto error;
     if( LoadGlyphs( p_filter, p_paragraph, false, true, pi_max_advance_x ) )
         goto error;
-    if( RemoveZeroWidthCharacters( p_paragraph ) )
+    if( RemoveZeroWidthCharacters( p_filter, p_paragraph ) )
         goto error;
     if( ZeroNsmAdvance( p_paragraph ) )
         goto error;
