@@ -205,8 +205,6 @@ typedef struct
 
 /**
  * This function will create a new picture using the provided resource.
- *
- * If the resource is NULL then a plain picture_NewFromFormat is returned.
  */
 VLC_API picture_t * picture_NewFromResource( const video_format_t *, const picture_resource_t * ) VLC_USED;
 
