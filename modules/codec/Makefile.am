@@ -544,6 +544,14 @@ libaom_plugin_la_LIBADD = $(AOM_LIBS)
 EXTRA_LTLIBRARIES += libaom_plugin.la
 codec_LTLIBRARIES += $(LTLIBaom)
 
+librav1e_plugin_la_SOURCES = codec/rav1e.c
+librav1e_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+librav1e_plugin_la_CFLAGS = $(AM_CFLAGS) $(RAV1E_CFLAGS)
+librav1e_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+librav1e_plugin_la_LIBADD = $(RAV1E_LIBS)
+EXTRA_LTLIBRARIES += librav1e_plugin.la
+codec_LTLIBRARIES += $(LTLIBrav1e)
+
 libtwolame_plugin_la_SOURCES = codec/twolame.c
 libtwolame_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DLIBTWOLAME_STATIC
 libtwolame_plugin_la_CFLAGS = $(AM_CFLAGS) $(TWOLAME_CFLAGS)

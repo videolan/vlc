@@ -2883,6 +2883,11 @@ dnl
 PKG_ENABLE_MODULES_VLC([AOM], [], [aom], [libaom AV1 encoder and decoder (default auto)])
 
 dnl
+dnl  Rav1e encoder plugin
+dnl
+PKG_ENABLE_MODULES_VLC([RAV1E], [], [rav1e], [rav1e encoder module codec (default auto)])
+
+dnl
 dnl  Dav1d decoder plugin
 dnl
 PKG_ENABLE_MODULES_VLC([DAV1D], [], [dav1d >= 0.5.0], [AV1 decoder (default auto)])
