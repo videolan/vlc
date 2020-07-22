@@ -158,7 +158,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
     }
     if( vlc_stream_Peek( s, &p_peek, 12 ) < 12 )
     {
-        msg_Warn( (vlc_object_t*)s, "cannot peek while reading list chunk" );
+        msg_Warn( (vlc_object_t*)s, "unexpected end of file while reading list chunk" );
         return VLC_EGENERIC;
     }
 
