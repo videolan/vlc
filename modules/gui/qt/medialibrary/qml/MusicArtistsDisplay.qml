@@ -162,33 +162,19 @@ Widgets.NavigableFocusScope {
 
         }
 
-
-        MusicAlbums {
+        MusicArtist {
             id: albumSubView
 
             height: parent.height
             width: parent.width * .75
-            gridViewMarginTop: 0
             focus: true
             parentId: root.artistId
             initialIndex: root.initialAlbumIndex
             navigationParent: root
-            navigationUpItem: albumSubView.headerItem
             navigationLeftItem: artistList
-
-            header: ArtistTopBanner {
-                id: artistBanner
-                width: albumSubView.width
-                artist: (artistList.currentIndex >= 0)
-                        ? artistModel.getDataAt(artistList.currentIndex)
-                        : ({})
-                navigationParent: root
-                navigationLeftItem: artistList
-                navigationDown: function() {
-                    artistBanner.focus = false
-                    view.forceActiveFocus()
-                }
-            }
+            artist: (artistList.currentIndex >= 0)
+                    ? artistModel.getDataAt(artistList.currentIndex)
+                    : ({})
 
             onCurrentIndexChanged: {
                 history.update(["mc", "music", "artists", {"initialIndex" : root.currentIndex, "initialAlbumIndex": albumSubView.currentIndex  }])
