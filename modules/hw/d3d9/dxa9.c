@@ -347,12 +347,12 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter)
     video_format_Copy(&fmt_staging, &p_filter->fmt_out.video);
     fmt_staging.i_chroma = format;
 
-    picture_t *p_dst = picture_NewFromFormat(&fmt_staging);
+    picture_resource_t dummy_res = {};
+    picture_t *p_dst = picture_NewFromResource(&fmt_staging, &dummy_res);
     if (p_dst == NULL) {
         msg_Err(p_filter, "Failed to map create the temporary picture.");
         goto done;
     }
-    picture_Setup(p_dst, &p_dst->format);
     pic_ctx->picsys.surface = texture;
     p_dst->context = &pic_ctx->s;
     return p_dst;
