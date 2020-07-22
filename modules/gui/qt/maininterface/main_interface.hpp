@@ -148,6 +148,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(bool showRemainingTime READ isShowRemainingTime WRITE setShowRemainingTime NOTIFY showRemainingTimeChanged)
     Q_PROPERTY(VLCVarChoiceModel* extraInterfaces READ getExtraInterfaces CONSTANT)
     Q_PROPERTY(float intfScaleFactor READ getIntfScaleFactor NOTIFY intfScaleFactorChanged)
+    Q_PROPERTY(bool mediaLibraryAvailable READ hasMediaLibrary CONSTANT)
 
 public:
     /* tors */
@@ -181,6 +182,7 @@ public:
     inline bool isHideAfterCreation() const { return b_hideAfterCreation; }
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
     inline float getIntfScaleFactor() const { return m_intfScaleFactor; }
+    inline bool hasMediaLibrary() const { return b_hasMedialibrary; }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;

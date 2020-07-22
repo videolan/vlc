@@ -68,19 +68,6 @@ MainUI::MainUI(intf_thread_t *p_intf, MainInterface *mainInterface,  QObject *pa
     assert(m_intf);
     assert(m_mainInterface);
 
-    m_settings = getSettings();
-
-    m_hasMedialibrary = (vlc_ml_instance_get( p_intf ) != NULL);
-
-    /* Get the available interfaces */
-    m_extraInterfaces = new VLCVarChoiceModel(p_intf, "intf-add", this);
-
-    /* playlist settings */
-    m_playlistDocked   = m_settings->value( "MainWindow/pl-dock-status", true ).toBool();
-    m_playlistVisible  = m_settings->value( "MainWindow/playlist-visible", false ).toBool();
-
-    m_showRemainingTime = m_settings->value( "MainWindow/ShowRemainingTime", false ).toBool();
-
     registerQMLTypes();
 }
 
@@ -107,7 +94,7 @@ bool MainUI::setup(QQmlEngine* engine)
     rootCtx->setContextProperty( "settings",  new Settings( m_intf, this ));
     rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));
 
-    if (m_hasMedialibrary)
+    if (m_mainInterface->hasMediaLibrary())
         rootCtx->setContextProperty( "medialib", new MediaLib(m_intf, this) );
     else
         rootCtx->setContextProperty( "medialib", nullptr );
@@ -166,7 +153,7 @@ void MainUI::registerQMLTypes()
 
     qmlRegisterType<VideoSurface>("org.videolan.vlc", 0, 1, "VideoSurface");
 
-    if (m_hasMedialibrary)
+    if (m_mainInterface->hasMediaLibrary())
     {
         qRegisterMetaType<MLParentId>();
         qmlRegisterType<MLAlbumModel>( "org.videolan.medialib", 0, 1, "MLAlbumModel" );
@@ -218,24 +205,4 @@ void MainUI::onQmlWarning(const QList<QQmlError>& qmlErrors)
     {
         msg_Warn( m_intf, "qml error %s:%i %s", qtu(error.url().toString()), error.line(), qtu(error.description()) );
     }
-}
-
-void MainUI::setPlaylistDocked( bool docked )
-{
-    m_playlistDocked = docked;
-
-    emit playlistDockedChanged(docked);
-}
-
-void MainUI::setPlaylistVisible( bool visible )
-{
-    m_playlistVisible = visible;
-
-    emit playlistVisibleChanged(visible);
-}
-
-void MainUI::setShowRemainingTime( bool show )
-{
-    m_showRemainingTime = show;
-    emit showRemainingTimeChanged(show);
 }

@@ -48,6 +48,8 @@
 
 #include "menus/menus.hpp"                            // Menu creation
 
+#include "vlc_media_library.h"
+
 #include <QCloseEvent>
 #include <QKeyEvent>
 
@@ -135,6 +137,8 @@ MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::Windo
 
     /* Get the available interfaces */
     m_extraInterfaces = new VLCVarChoiceModel(p_intf, "intf-add", this);
+
+    b_hasMedialibrary = (vlc_ml_instance_get( p_intf ) != NULL);
 
     /* Set the other interface settings */
     settings = getSettings();
