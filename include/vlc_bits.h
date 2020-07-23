@@ -35,10 +35,9 @@ typedef struct bs_s bs_t;
 
 typedef struct
 {
-    /* forward read modifier (p_start, p_end, p_fwpriv, count, pos, remain) */
+    /* forward read modifier (p_start, p_end, p_fwpriv, count, pos) */
     size_t (*pf_byte_forward)(bs_t *, size_t);
     size_t (*pf_byte_pos)(const bs_t *);
-    size_t (*pf_byte_remain)(const bs_t *);
 } bs_byte_callbacks_t;
 
 typedef struct bs_s
@@ -72,14 +71,6 @@ static size_t bs_impl_bytes_forward( bs_t *s, size_t i_count )
     return i_count;
 }
 
-static size_t bs_impl_bytes_remain( const bs_t *s )
-{
-    if( s->p )
-        return s->p < s->p_end ? s->p_end - s->p - 1: 0;
-    else
-        return s->p_end - s->p_start;
-}
-
 static size_t bs_impl_bytes_pos( const bs_t *s )
 {
     if( s->p )
@@ -106,7 +97,6 @@ static inline void bs_init( bs_t *s, const void *p_data, size_t i_data )
     bs_byte_callbacks_t cb = {
         bs_impl_bytes_forward,
         bs_impl_bytes_pos,
-        bs_impl_bytes_remain,
     };
     bs_init_custom( s, p_data, i_data, &cb, NULL );
 }
@@ -143,11 +133,6 @@ static inline bool bs_eof( bs_t *s )
 static inline size_t bs_pos( const bs_t *s )
 {
     return 8 * s->cb.pf_byte_pos( s ) - s->i_left;
-}
-
-static inline size_t bs_remain( const bs_t *s )
-{
-    return 8 * s->cb.pf_byte_remain( s ) + s->i_left;
 }
 
 static inline void bs_skip( bs_t *s, size_t i_count )
