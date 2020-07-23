@@ -117,10 +117,11 @@ NavigableFocusScope {
                     anchors.fill: parent
                     anchors.rightMargin: VLCStyle.margin_xxsmall
                     Item {
-                        Layout.preferredWidth: VLCStyle.icon_normal
-                        Layout.preferredHeight: VLCStyle.icon_normal
+                        Layout.preferredWidth: coverLoader.item.width
+                        Layout.preferredHeight: coverLoader.item.height
                         Loader {
-                            anchors.fill: parent
+                            id: coverLoader
+
                             sourceComponent: root.cover
                         }
                         Text {
