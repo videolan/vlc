@@ -310,37 +310,60 @@ Widgets.NavigableFocusScope {
                     }
                 }
 
-                footer: DropArea {
+                footer: Item {
                     width: parent.width
                     height: Math.max(VLCStyle.icon_normal, view.height - y)
 
-                    onEntered: {
-                        if(drag.source.model.index === root.plmodel.count - 1)
-                            return
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.RightButton | Qt.LeftButton
 
-                        root.setItemDropIndicatorVisible(view.modelCount - 1, true, false);
-                    }
-                    onExited: {
-                        if(drag.source.model.index === root.plmodel.count - 1)
-                            return
-
-                        root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
-                    }
-                    onDropped: {
-                        if(drag.source.model.index === root.plmodel.count - 1)
-                            return
-
-                        if (drop.hasUrls) {
-                            //force conversion to an actual list
-                            var urlList = []
-                            for ( var url in drop.urls)
-                                urlList.push(drop.urls[url])
-                            mainPlaylistController.insert(root.plmodel.count, urlList)
-                        } else {
-                            root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
+                        onClicked: {
+                            if( mouse.button === Qt.RightButton )
+                            {
+                                view.forceActiveFocus()
+                                root.plmodel.deselectAll()
+                                contextMenu.model = root.plmodel
+                                contextMenu.popup()
+                            }
+                            else if ( mouse.button === Qt.LeftButton )
+                            {
+                                view.forceActiveFocus()
+                                root.plmodel.deselectAll()
+                            }
                         }
-                        root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
-                        drop.accept()
+                    }
+
+                    DropArea {
+                        anchors.fill: parent
+                        onEntered: {
+                            if(drag.source.model.index === root.plmodel.count - 1)
+                                return
+
+                            root.setItemDropIndicatorVisible(view.modelCount - 1, true, false);
+                        }
+                        onExited: {
+                            if(drag.source.model.index === root.plmodel.count - 1)
+                                return
+
+                            root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
+                        }
+                        onDropped: {
+                            if(drag.source.model.index === root.plmodel.count - 1)
+                                return
+
+                            if (drop.hasUrls) {
+                                //force conversion to an actual list
+                                var urlList = []
+                                for ( var url in drop.urls)
+                                    urlList.push(drop.urls[url])
+                                mainPlaylistController.insert(root.plmodel.count, urlList)
+                            } else {
+                                root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
+                            }
+                            root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
+                            drop.accept()
+                        }
                     }
                 }
 
