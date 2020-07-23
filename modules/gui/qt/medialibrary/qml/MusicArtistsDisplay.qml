@@ -130,7 +130,7 @@ Widgets.NavigableFocusScope {
             }
 
             delegate: Widgets.ListItem {
-                height: VLCStyle.icon_normal + VLCStyle.margin_small
+                height: VLCStyle.play_cover_small + (VLCStyle.margin_xsmall * 2)
                 width: artistList.width
 
                 property bool selected: selectionModel.isSelected(artistModel.index(index, 0))
@@ -143,9 +143,9 @@ Widgets.NavigableFocusScope {
 
                 cover: Widgets.RoundImage {
                     source: model.cover || VLCStyle.noArtArtistSmall
-                    height: VLCStyle.icon_normal
-                    width: VLCStyle.icon_normal
-                    radius: VLCStyle.icon_normal
+                    height: VLCStyle.play_cover_small
+                    width: VLCStyle.play_cover_small
+                    radius: VLCStyle.play_cover_small
                 }
 
                 line1: model.name || i18n.qtr("Unknown artist")
