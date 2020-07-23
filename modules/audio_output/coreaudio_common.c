@@ -170,7 +170,7 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
         const vlc_tick_t i_silence_us =
             HostTimeToTick(p_sys, p_sys->i_first_render_host_time - i_host_time);
 
-        const uint64_t i_silence_bytes =
+        const size_t i_silence_bytes =
             FramesToBytes(p_sys, UsToFrames(p_sys, i_silence_us));
         assert(i_silence_bytes <= i_requested);
         memset(p_output, 0, i_silence_bytes);
