@@ -530,6 +530,11 @@ VLC_API void     aout_FiltersChangeViewpoint(aout_filters_t *, const vlc_viewpoi
 
 VLC_API vout_thread_t *aout_filter_GetVout(filter_t *, const video_format_t *);
 
+static inline int aout_TimeGet(audio_output_t *aout, vlc_tick_t *delay)
+{
+    return aout->time_get(aout, delay);
+}
+
 /** @} */
 
 #endif /* VLC_AOUT_H */

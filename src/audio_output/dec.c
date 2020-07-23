@@ -45,7 +45,7 @@ static void aout_Drain(audio_output_t *aout)
     else
     {
         vlc_tick_t delay;
-        if (aout->time_get(aout, &delay) == 0)
+        if (aout_TimeGet(aout, &delay) == 0)
             vlc_tick_sleep(delay);
     }
 }
@@ -283,7 +283,7 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t system_now,
     aout_owner_t *owner = aout_owner (aout);
     vlc_tick_t delay;
 
-    if (aout->time_get(aout, &delay) != 0)
+    if (aout_TimeGet(aout, &delay) != 0)
         return; /* nothing can be done if timing is unknown */
 
     if (owner->sync.discontinuity)
@@ -304,7 +304,7 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t system_now,
         if (jitter > 0)
         {
             aout_DecSilence (aout, jitter, dec_pts - delay);
-            if (aout->time_get(aout, &delay) != 0)
+            if (aout_TimeGet(aout, &delay) != 0)
                 return;
         }
     }
