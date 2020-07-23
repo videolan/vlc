@@ -754,8 +754,12 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
         if( p_data )
         {
             /* store converted data */
-            for( i_data = 0; i_data<i_size && bs_remain( &s ) >= 16 /* trailing 0x80 flush byte */; i_data++ )
+            for( i_data = 0; i_data + 1 /* trailing 0x80 flush byte */<i_size; i_data++ )
+            {
                 p_data[i_data] = bs_read( &s, 8 );
+                if( bs_error(&s) )
+                    break;
+            }
 
             /* TS 101 154 Auxiliary Data and VC-1 video */
             static const uint8_t p_DVB1_user_identifier[] = {

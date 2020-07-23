@@ -1025,10 +1025,12 @@ static uint64_t SeekByMlltTable( demux_t *p_demux, vlc_tick_t *pi_time )
         bs_init(&p_cur->br, p_sys->mllt.p_bits, p_sys->mllt.i_bits);
     }
 
-    while(bs_remain(&p_cur->br) >= p_sys->mllt.i_bits_per_bytes_dev + p_sys->mllt.i_bits_per_ms_dev)
+    while(!bs_eof(&p_cur->br))
     {
         const uint32_t i_bytesdev = bs_read(&p_cur->br, p_sys->mllt.i_bits_per_bytes_dev);
         const uint32_t i_msdev = bs_read(&p_cur->br, p_sys->mllt.i_bits_per_ms_dev);
+        if(bs_error(&p_cur->br))
+            break;
         const vlc_tick_t i_deltatime = VLC_TICK_FROM_MS(p_sys->mllt.i_ms_btw_refs + i_msdev);
         if( p_cur->i_time + i_deltatime > *pi_time )
             break;

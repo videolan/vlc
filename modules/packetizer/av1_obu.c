@@ -70,8 +70,6 @@ static bool av1_read_header(bs_t *p_bs, struct av1_header_info_s *p_hdr)
         return false;
     if(obu_extension_flag)
     {
-        if(bs_remain(p_bs) < 8)
-            return false;
         p_hdr->temporal_id = bs_read(p_bs, 3);
         p_hdr->spatial_id = bs_read(p_bs, 2);
         bs_skip(p_bs, 3);
@@ -80,8 +78,6 @@ static bool av1_read_header(bs_t *p_bs, struct av1_header_info_s *p_hdr)
     {
         for (uint8_t i = 0; i < 8; i++)
         {
-            if(bs_remain(p_bs) < 8)
-                return false;
             uint8_t v = bs_read(p_bs, 8);
             if (!(v & 0x80))
                 break;
@@ -89,7 +85,7 @@ static bool av1_read_header(bs_t *p_bs, struct av1_header_info_s *p_hdr)
                 return false;
         }
     }
-    return true;
+    return !bs_error(p_bs);
 }
 
 /*
@@ -394,11 +390,13 @@ av1_OBU_sequence_header_t *
     p_seq->enable_cdef = bs_read1(&bs);
     p_seq->enable_restoration = bs_read1(&bs);
     av1_parse_color_config(&bs, &p_seq->color_config, p_seq->seq_profile);
-    if(bs_remain(&bs) < 1)
+
+    if(bs_error(&bs))
     {
         AV1_release_sequence_header(p_seq);
         return NULL;
     }
+
     p_seq->film_grain_params_present = bs_read1(&bs);
 
     return p_seq;

@@ -506,11 +506,11 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
                 bs_read( p_bs, 4 );
                 for( uint32_t j = 0; j < count; j++ )
                 {
-                    if( bs_remain( p_bs ) < 23 )
-                        return false;
                     bs_read_ue( p_bs );
                     bs_read_ue( p_bs );
                     bs_read( p_bs, 1 );
+                    if( bs_error( p_bs ) )
+                        return false;
                 }
                 bs_read( p_bs, 5 );
                 p_sps->vui.i_cpb_removal_delay_length_minus1 = bs_read( p_bs, 5 );
@@ -538,7 +538,7 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         }
     }
 
-    return true;
+    return !bs_error( p_bs );
 }
 
 void h264_release_pps( h264_picture_parameter_set_t *p_pps )
