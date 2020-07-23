@@ -134,6 +134,8 @@ Widgets.NavigableFocusScope {
                 width: artistList.width
 
                 property bool selected: selectionModel.isSelected(artistModel.index(index, 0))
+                property bool _highlighted: selected || this.hovered || this.activeFocus
+
                 Connections {
                    target: selectionModel
                    onSelectionChanged: selected = selectionModel.isSelected(artistModel.index(index, 0))
@@ -141,11 +143,27 @@ Widgets.NavigableFocusScope {
 
                 color: VLCStyle.colors.getBgColor(selected, this.hovered, this.activeFocus)
 
-                cover: Widgets.RoundImage {
-                    source: model.cover || VLCStyle.noArtArtistSmall
-                    height: VLCStyle.play_cover_small
+                cover: Item {
+
                     width: VLCStyle.play_cover_small
-                    radius: VLCStyle.play_cover_small
+                    height: VLCStyle.play_cover_small
+
+                    Widgets.RoundImage {
+                        source: model.cover || VLCStyle.noArtArtistSmall
+                        height: VLCStyle.play_cover_small
+                        width: VLCStyle.play_cover_small
+                        radius: VLCStyle.play_cover_small
+                        mipmap: true
+                    }
+
+                    Rectangle {
+                        height: VLCStyle.play_cover_small
+                        width: VLCStyle.play_cover_small
+                        radius: VLCStyle.play_cover_small
+                        color: 'transparent'
+                        border.width: VLCStyle.dp(1, scale)
+                        border.color: !_highlighted ? VLCStyle.colors.roundPlayCoverBorder : VLCStyle.colors.accent
+                    }
                 }
 
                 line1: model.name || i18n.qtr("Unknown artist")
