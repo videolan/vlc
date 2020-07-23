@@ -46,16 +46,17 @@ FramesToBytes(struct aout_sys_common *p_sys, uint64_t i_frames)
 static inline uint64_t
 UsToFrames(struct aout_sys_common *p_sys, vlc_tick_t i_us)
 {
+    assert(i_us > 0);
     return samples_from_vlc_tick(i_us, p_sys->i_rate);
 }
 
 static inline vlc_tick_t
-HostTimeToTick(struct aout_sys_common *p_sys, uint64_t i_host_time)
+HostTimeToTick(struct aout_sys_common *p_sys, int64_t i_host_time)
 {
     return VLC_TICK_FROM_NS(i_host_time * p_sys->tinfo.numer / p_sys->tinfo.denom);
 }
 
-static inline uint64_t
+static inline int64_t
 TickToHostTime(struct aout_sys_common *p_sys, vlc_tick_t i_us)
 {
     return NS_FROM_VLC_TICK(i_us * p_sys->tinfo.denom / p_sys->tinfo.numer);
@@ -157,7 +158,7 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
          * */
         const size_t i_requested_us =
             FramesToUs(p_sys, BytesToFrames(p_sys, i_requested));
-        const uint64_t i_requested_host_time =
+        const int64_t i_requested_host_time =
             TickToHostTime(p_sys, i_requested_us);
         if (p_sys->i_first_render_host_time >= i_host_time + i_requested_host_time)
         {
@@ -249,8 +250,8 @@ ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
         return -1;
     }
 
-    uint64_t i_render_delay_host_time = p_sys->i_render_host_time
-                                      - mach_absolute_time();
+    int64_t i_render_delay_host_time = p_sys->i_render_host_time
+                                     - mach_absolute_time();
     const vlc_tick_t i_render_delay =
         HostTimeToTick(p_sys, i_render_delay_host_time);
 
