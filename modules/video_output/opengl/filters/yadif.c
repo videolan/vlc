@@ -694,7 +694,14 @@ static int OpenVideoFilter(vlc_object_t *obj, const char *name)
     filter_t *filter = (filter_t*)obj;
 
     char *mode = var_InheritString(obj, "deinterlace-mode");
-    if (mode && strcmp(mode, "auto") && strcmp(mode, name))
+    bool is_supported =
+        mode == NULL ||
+        strcmp(mode, "auto") == 0 ||
+        strcmp(mode, name) == 0;
+
+    free(mode);
+
+    if (!is_supported)
         return VLC_EGENERIC;
 
     config_chain_t *prev_chain = filter->p_cfg;
