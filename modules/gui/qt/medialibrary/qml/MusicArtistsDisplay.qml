@@ -103,8 +103,6 @@ Widgets.NavigableFocusScope {
 
             focus: true
 
-            onSelectAll: selectionModel.selectAll()
-            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onCurrentIndexChanged: {
                 if (artistList.currentIndex < artistModel.count) {
                     root.artistId =  artistModel.getIdForIndex(artistList.currentIndex)
@@ -133,13 +131,8 @@ Widgets.NavigableFocusScope {
                 height: VLCStyle.play_cover_small + (VLCStyle.margin_xsmall * 2)
                 width: artistList.width
 
-                property bool selected: selectionModel.isSelected(artistModel.index(index, 0))
+                property bool selected: artistList.currentIndex === index
                 property bool _highlighted: selected || this.hovered || this.activeFocus
-
-                Connections {
-                   target: selectionModel
-                   onSelectionChanged: selected = selectionModel.isSelected(artistModel.index(index, 0))
-                }
 
                 color: VLCStyle.colors.getBgColor(selected, this.hovered, this.activeFocus)
 
