@@ -410,32 +410,101 @@ bool MainInterfaceWin32::nativeEvent(const QByteArray &eventType, void *message,
     return false;
 }
 
-void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
+InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(intf_thread_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent)
+    : InterfaceWindowHandler(_p_intf, mainInterface, window, parent)
 {
-    /* check if any visible window is above vlc in the z-order,
-     * but ignore the ones always on top
-     * and the ones which can't be activated */
-    HWND winId = WinId(this->windowHandle());
-
-    WINDOWINFO wi;
-    HWND hwnd;
-    wi.cbSize = sizeof( WINDOWINFO );
-    for( hwnd = GetNextWindow( winId, GW_HWNDPREV );
-            hwnd && ( !IsWindowVisible( hwnd ) || ( GetWindowInfo( hwnd, &wi ) &&
-                                                    ( wi.dwExStyle&WS_EX_NOACTIVATE ) ) );
-            hwnd = GetNextWindow( hwnd, GW_HWNDPREV ) )
-    {
-    }
-    if( !hwnd || !GetWindowInfo( hwnd, &wi ) || (wi.dwExStyle&WS_EX_TOPMOST) )
-        hide();
-    else
-        activateWindow();
 }
-
-
 
 void MainInterfaceWin32::reloadPrefs()
 {
     p_intf->p_sys->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
     MainInterface::reloadPrefs();
+}
+
+
+void InterfaceWindowHandlerWin32::toggleWindowVisiblity()
+{
+
+    switch ( m_window->visibility() )
+    {
+    case QWindow::Hidden:
+        /* If hidden, show it */
+        m_window->show();
+        m_window->requestActivate();
+        break;
+    case QWindow::Minimized:
+        m_window->showNormal();
+        m_window->requestActivate();
+        break;
+    default:
+        {
+            /* check if any visible window is above vlc in the z-order,
+             * but ignore the ones always on top
+             * and the ones which can't be activated */
+            HWND winId = WinId(m_window);
+
+            WINDOWINFO wi;
+            HWND hwnd;
+            wi.cbSize = sizeof( WINDOWINFO );
+            for( hwnd = GetNextWindow( winId, GW_HWNDPREV );
+                    hwnd && ( !IsWindowVisible( hwnd ) || ( GetWindowInfo( hwnd, &wi ) &&
+                                                            ( wi.dwExStyle&WS_EX_NOACTIVATE ) ) );
+                    hwnd = GetNextWindow( hwnd, GW_HWNDPREV ) )
+            {
+            }
+            if( !hwnd || !GetWindowInfo( hwnd, &wi ) || (wi.dwExStyle&WS_EX_TOPMOST) )
+                m_window->hide();
+            else
+                m_window->requestActivate();
+        }
+        break;
+    }
+
+}
+
+
+bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
+{
+    bool ret = InterfaceWindowHandler::eventFilter(obj, ev);
+    if (ret)
+        return ret;
+
+    if (ev->type() == QEvent::Resize)
+    {
+        /*
+         * Detects if window placement is not in its normal position (ex: win7 aero snap)
+         * This function compares the normal position (non snapped) to the current position.
+         * The current position is translated from screen referential to workspace referential
+         * to workspace referential
+         */
+        m_isWindowTiled = false;
+        HWND winHwnd = WinId( m_window );
+
+        WINDOWPLACEMENT windowPlacement;
+        windowPlacement.length = sizeof( windowPlacement );
+        if ( GetWindowPlacement( winHwnd, &windowPlacement ) == 0 )
+            return ret;
+
+        if ( windowPlacement.showCmd != SW_SHOWNORMAL )
+            return ret;
+
+        HMONITOR monitor = MonitorFromWindow( winHwnd, MONITOR_DEFAULTTONEAREST );
+
+        MONITORINFO monitorInfo;
+        monitorInfo.cbSize = sizeof( monitorInfo );
+        if ( GetMonitorInfo( monitor, &monitorInfo )  == 0 )
+            return ret;
+
+        RECT windowRect;
+        if ( GetWindowRect( winHwnd, &windowRect ) == 0 )
+            return ret;
+
+        OffsetRect( &windowRect,
+                    monitorInfo.rcMonitor.left - monitorInfo.rcWork.left ,
+                    monitorInfo.rcMonitor.top - monitorInfo.rcWork.top );
+
+        m_isWindowTiled = ( EqualRect( &windowPlacement.rcNormalPosition, &windowRect ) == 0 );
+    }
+
+    return ret;
 }

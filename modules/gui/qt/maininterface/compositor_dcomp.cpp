@@ -36,7 +36,7 @@
 
 #include <qpa/qplatformnativeinterface.h>
 #include "compositor_dcomp_error.hpp"
-
+#include "maininterface/interface_window_handler.hpp"
 
 namespace vlc {
 
@@ -207,8 +207,14 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf, m_rootWindow);
         m_videoWindowHandler->setWindow( m_rootWindow->windowHandle() );
 
+        m_interfaceWindowHandler = new InterfaceWindowHandlerWin32(m_intf, m_rootWindow, m_rootWindow->windowHandle(), m_rootWindow);
+
         m_qmlVideoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
         m_rootWindow->setVideoSurfaceProvider(m_qmlVideoSurfaceProvider.get());
+
+        connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::hasVideoChanged,
+                m_interfaceWindowHandler, &InterfaceWindowHandlerWin32::onVideoEmbedChanged);
+
 
         HR(m_dcompDevice->CreateTargetForHwnd((HWND)m_rootWindow->windowHandle()->winId(), TRUE, &m_dcompTarget), "create target");
         HR(m_dcompDevice->CreateVisual(&m_rootVisual), "create root visual");

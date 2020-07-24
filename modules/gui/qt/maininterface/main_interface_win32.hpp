@@ -25,6 +25,7 @@
 #define MAIN_INTERFACE_WIN32_HPP
 
 #include "maininterface/main_interface.hpp"
+#include "interface_window_handler.hpp"
 #include <QAbstractNativeEventFilter>
 
 class WinTaskbarWidget : public QObject, public QAbstractNativeEventFilter
@@ -63,11 +64,21 @@ public:
 
 private:
     virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
-    virtual void toggleUpdateSystrayMenuWhenVisible() override;
 
 public slots:
     virtual void reloadPrefs() override;
 
+};
+
+class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler
+{
+    Q_OBJECT
+public:
+    explicit InterfaceWindowHandlerWin32(intf_thread_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent = nullptr);
+    virtual ~InterfaceWindowHandlerWin32() = default;
+    virtual void toggleWindowVisiblity() override;
+
+    virtual bool eventFilter(QObject*, QEvent* event) override;
 };
 
 #endif // MAIN_INTERFACE_WIN32_HPP

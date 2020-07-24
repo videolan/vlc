@@ -118,6 +118,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/maininterface/compositor.cpp \
 	gui/qt/maininterface/compositor_dummy.hpp \
 	gui/qt/maininterface/compositor_dummy.cpp \
+	gui/qt/maininterface/interface_window_handler.cpp \
+	gui/qt/maininterface/interface_window_handler.hpp \
 	gui/qt/maininterface/main_interface.cpp \
 	gui/qt/maininterface/main_interface.hpp \
 	gui/qt/maininterface/mainui.cpp \
@@ -288,6 +290,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/sout/sout_widgets.moc.cpp \
 	gui/qt/dialogs/toolbar/toolbareditor.moc.cpp \
 	gui/qt/maininterface/compositor_dummy.moc.cpp \
+	gui/qt/maininterface/interface_window_handler.moc.cpp \
 	gui/qt/maininterface/main_interface.moc.cpp \
 	gui/qt/maininterface/mainui.moc.cpp \
 	gui/qt/maininterface/videosurface.moc.cpp \

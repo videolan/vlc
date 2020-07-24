@@ -41,7 +41,20 @@ VideoWindowHandler::VideoWindowHandler(intf_thread_t* intf, MainInterface* mainI
 
 void VideoWindowHandler::setWindow(QWindow* window)
 {
+    if (m_window == window)
+        return;
+    if (m_window)
+    {
+        WindowStateHolder::holdOnTop(m_window, WindowStateHolder::VIDEO, false);
+        WindowStateHolder::holdFullscreen(m_window, WindowStateHolder::VIDEO, false);
+    }
     m_window = window;
+    if (m_window)
+    {
+        m_lastWinGeometry = m_window->geometry();
+    }
+    else
+        m_lastWinGeometry = QRect{};
 }
 
 void VideoWindowHandler::disable()
@@ -110,8 +123,6 @@ void VideoWindowHandler::setVideoFullScreen( bool fs )
     if (!m_window)
         return;
     m_videoFullScreen = fs;
-
-    Qt::WindowStates states = m_window->windowStates();
     if( fs )
     {
         int numscreen = var_InheritInteger( m_intf, "qt-fullscreen-screennumber" );
@@ -131,18 +142,15 @@ void VideoWindowHandler::setVideoFullScreen( bool fs )
             if( !screenres.contains( m_window->position() ) )
             {
                 m_lastWinGeometry = m_window->geometry();
-                msg_Dbg( m_intf, "Moving video to correct position");
                 m_window->setPosition(screenres.x(), screenres.y() );
             }
         }
-        m_window->setWindowStates(states | Qt::WindowFullScreen);
+        WindowStateHolder::holdFullscreen(m_window,  WindowStateHolder::VIDEO, true);
     }
     else
     {
-        if (m_interface->isInterfaceFullScreen())
-            m_window->setWindowStates(states | Qt::WindowFullScreen);
-        else
-            m_window->setWindowStates(states & ~Qt::WindowFullScreen);
+        bool hold = WindowStateHolder::holdFullscreen(m_window,  WindowStateHolder::VIDEO, false);
+
 #ifdef QT5_HAS_WAYLAND
         if( m_lastWinScreen != NULL && !m_hasWayland )
             m_window->setScreen(m_lastWinScreen);
@@ -150,8 +158,7 @@ void VideoWindowHandler::setVideoFullScreen( bool fs )
         if( m_lastWinScreen != NULL )
             m_window->setScreen(m_lastWinScreen);
 #endif
-        //FIXME m_interface->restorePosition();
-        if( m_lastWinGeometry.isNull() == false )
+        if( !hold && m_lastWinGeometry.isNull() == false )
         {
             m_window->setGeometry( m_lastWinGeometry );
             m_lastWinGeometry = QRect();
@@ -166,20 +173,5 @@ void VideoWindowHandler::setVideoOnTop( bool on_top )
 {
     if (!m_window)
         return;
-    //don't apply changes if user has already sets its interface on top
-    if ( m_interface->isInterfaceAlwaysOnTop() )
-        return;
-
-    Qt::WindowFlags oldflags = m_window->flags();
-    Qt::WindowFlags newflags;
-
-    if( on_top )
-        newflags = oldflags | Qt::WindowStaysOnTopHint;
-    else
-        newflags = oldflags & ~Qt::WindowStaysOnTopHint;
-    if( newflags != oldflags && !m_videoFullScreen )
-    {
-        m_window->setFlags( newflags );
-        m_window->show(); /* necessary to apply window flags */
-    }
+    WindowStateHolder::holdOnTop(m_window, WindowStateHolder::VIDEO, on_top);
 }

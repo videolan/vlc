@@ -58,6 +58,83 @@ class StandardPLPanel;
 struct vout_window_t;
 class VideoSurfaceProvider;
 
+class WindowStateHolder : public QObject
+{
+public:
+    enum Source {
+        INTERFACE = 1,
+        VIDEO = 2,
+    };
+
+    static bool holdFullscreen( QWindow* window, Source source, bool hold )
+    {
+        QVariant prop = window->property("__windowFullScreen");
+        bool ok = false;
+        unsigned fullscreenCounter = prop.toUInt(&ok);
+        if (!ok)
+            fullscreenCounter = 0;
+
+        if (hold)
+            fullscreenCounter |= source;
+        else
+            fullscreenCounter &= ~source;
+
+        Qt::WindowStates oldflags = window->windowStates();
+        Qt::WindowStates newflags;
+
+        if( fullscreenCounter != 0 )
+            newflags = oldflags | Qt::WindowFullScreen;
+        else
+            newflags = oldflags & ~Qt::WindowFullScreen;
+
+        if( newflags != oldflags )
+        {
+            window->setWindowStates( newflags );
+        }
+
+        window->setProperty("__windowFullScreen", QVariant::fromValue(fullscreenCounter));
+
+        return fullscreenCounter != 0;
+    }
+
+
+    static bool holdOnTop( QWindow* window, Source source, bool hold )
+    {
+        QVariant prop = window->property("__windowOnTop");
+        bool ok = false;
+        unsigned onTopCounter = prop.toUInt(&ok);
+        if (!ok)
+            onTopCounter = 0;
+
+        if (hold)
+            onTopCounter |= source;
+        else
+            onTopCounter &= ~source;
+
+        Qt::WindowStates oldStates = window->windowStates();
+        Qt::WindowFlags oldflags = window->flags();
+        Qt::WindowFlags newflags;
+
+        if( onTopCounter != 0 )
+            newflags = oldflags | Qt::WindowStaysOnTopHint;
+        else
+            newflags = oldflags & ~Qt::WindowStaysOnTopHint;
+        if( newflags != oldflags )
+        {
+
+            window->setFlags( newflags );
+            window->show(); /* necessary to apply window flags */
+            //workaround: removing onTop state might drop fullscreen state
+            window->setWindowStates(oldStates);
+        }
+
+        window->setProperty("__windowOnTop", QVariant::fromValue(onTopCounter));
+
+        return onTopCounter != 0;
+    }
+
+};
+
 class MainInterface : public QVLCMW
 {
     Q_OBJECT
@@ -101,6 +178,7 @@ public:
     bool isPlaylistVisible() { return playlistVisible; }
     inline double getPlaylistWidthFactor() const { return playlistWidthFactor; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
+    inline bool isHideAfterCreation() const { return b_hideAfterCreation; }
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
     inline float getIntfScaleFactor() const { return m_intfScaleFactor; }
 
@@ -110,13 +188,11 @@ public:
 
 protected:
     void dropEventPlay( QDropEvent* event, bool b_play );
-    void changeEvent( QEvent * ) Q_DECL_OVERRIDE;
     void dropEvent( QDropEvent *) Q_DECL_OVERRIDE;
     void dragEnterEvent( QDragEnterEvent * ) Q_DECL_OVERRIDE;
     void dragMoveEvent( QDragMoveEvent * ) Q_DECL_OVERRIDE;
     void dragLeaveEvent( QDragLeaveEvent * ) Q_DECL_OVERRIDE;
     void closeEvent( QCloseEvent *) Q_DECL_OVERRIDE;
-    virtual void toggleUpdateSystrayMenuWhenVisible();
 
 protected:
     /* Systray */
@@ -162,9 +238,6 @@ protected:
     bool                 b_playlistDocked;
     bool                 b_interfaceFullScreen;
     bool                 b_interfaceOnTop;      ///keep UI on top
-    bool                 b_pauseOnMinimize;
-    bool                 b_maximizedView;
-    bool                 b_isWindowTiled;
 #ifdef QT5_HAS_WAYLAND
     bool                 b_hasWayland;
 #endif
@@ -172,8 +245,6 @@ protected:
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
     double               playlistWidthFactor;   ///< playlist size: root.width / playlistScaleFactor
-
-    bool                 b_hasPausedWhenMinimized;
 
     static const Qt::Key kc[10]; /* easter eggs */
     int i_kc_offset;
@@ -206,9 +277,6 @@ protected slots:
 
     void showBuffering( float );
 
-    void setBoss();
-    void setRaise();
-    void setFullScreen( bool );
     void onInputChanged( bool );
     void updateIntfScaleFactor();
 
@@ -217,6 +285,8 @@ protected slots:
 signals:
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
+    void setInterfaceVisibible(bool );
+    void toggleWindowVisibility();
     void askToQuit();
     void askShow();
     void askBoss();
