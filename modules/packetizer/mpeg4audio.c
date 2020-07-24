@@ -796,7 +796,7 @@ static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_with
             ppsz_otype[p_cfg->i_object_type], p_cfg->i_object_type,
             p_cfg->i_samplerate, p_cfg->i_channel, p_cfg->i_sbr);
 #endif
-    return bs_error(&s) ? VLC_EGENERIC : VLC_SUCCESS;
+    return bs_error(s) ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 static uint32_t LatmGetValue(bs_t *s)
