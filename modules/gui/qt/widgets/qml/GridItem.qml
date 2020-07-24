@@ -143,8 +143,8 @@ Item {
 
                 x: - root.selectedBorderWidth
                 y: - root.selectedBorderWidth
-                width: layout.implicitWidth + ( root.selectedBorderWidth * 2 )
-                height:  layout.implicitHeight + ( root.selectedBorderWidth * 2 )
+                width: root.width + ( root.selectedBorderWidth * 2 )
+                height:  root.height + ( root.selectedBorderWidth * 2 )
                 color: VLCStyle.colors.bgAlt
                 visible: root.selected || root._highlighted
             }
@@ -152,8 +152,8 @@ Item {
             Rectangle {
                 id: baseRect
 
-                x: 1 // this rect is set such that it hides behind picture component
-                y: 1
+                x: layout.x + 1 // this rect is set such that it hides behind picture component
+                y: layout.y + 1
                 width: pictureWidth - 2
                 height: pictureHeight - 2
                 radius: picture.radius
@@ -189,7 +189,7 @@ Item {
             ColumnLayout {
                 id: layout
 
-                anchors.fill: parent
+                anchors.centerIn: parent
                 spacing: 0
 
                 Widgets.MediaCover {
@@ -202,6 +202,7 @@ Item {
 
                     Layout.preferredWidth: pictureWidth
                     Layout.preferredHeight: pictureHeight
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
                     /* new indicator (triangle at top-left of cover)*/
                     Rectangle {
