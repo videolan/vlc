@@ -34,6 +34,8 @@ Item {
     property alias textHorizontalAlignment: subtitleTxt.horizontalAlignment
     property alias playCoverBorder: picture.playCoverBorder
     property alias playCoverOnlyBorders: picture.playCoverOnlyBorders
+    property alias playIconSize: picture.playIconSize
+    property alias pictureRadius: picture.radius
     property bool selected: false
 
     property alias progress: picture.progress
@@ -137,6 +139,8 @@ Item {
 
             /* background visible when selected */
             Rectangle {
+                id: selectionRect
+
                 x: - root.selectedBorderWidth
                 y: - root.selectedBorderWidth
                 width: layout.implicitWidth + ( root.selectedBorderWidth * 2 )
