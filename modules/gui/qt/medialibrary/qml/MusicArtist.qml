@@ -320,6 +320,7 @@ Widgets.NavigableFocusScope {
             }
             navigationParent: root
             header: root.header
+            headerPositioning: ListView.InlineHeader
 
             sortModel:  [
                 { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: i18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
