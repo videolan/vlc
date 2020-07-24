@@ -101,7 +101,7 @@ Widgets.NavigableFocusScope {
             id: gridView_id
 
             activeFocusOnTab:true
-            marginTop: root.gridViewMarginTop
+            topMargin: root.gridViewMarginTop
             cellWidth: VLCStyle.gridItem_music_width
             cellHeight: VLCStyle.gridItem_music_height
 

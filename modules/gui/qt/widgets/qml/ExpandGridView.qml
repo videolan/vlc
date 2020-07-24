@@ -29,8 +29,10 @@ NavigableFocusScope {
     property int cellHeight: 100
 
     //margin to apply
-    property int marginBottom: 0
-    property int marginTop: 0
+    property int bottomMargin: 0
+    property int topMargin: 0
+    property int leftMargin: VLCStyle.margin_normal
+    property int rightMargin: VLCStyle.margin_normal
 
     property int horizontalSpacing: VLCStyle.column_margin_width
     property int verticalSpacing: VLCStyle.column_margin_width
@@ -103,7 +105,7 @@ NavigableFocusScope {
     }
 
     function getNbItemsPerRow() {
-        return Math.max(Math.floor((width + root.horizontalSpacing) / root._effectiveCellWidth), 1)
+        return Math.max(Math.floor(((width - root.rightMargin - root.leftMargin) + root.horizontalSpacing) / root._effectiveCellWidth), 1)
     }
 
     function getItemRowCol(id) {
@@ -115,9 +117,9 @@ NavigableFocusScope {
 
     function getItemPos(id) {
         var colCount = root.getNbItemsPerRow()
-        var remainingSpace = flickable.width - (colCount * root._effectiveCellWidth) + root.horizontalSpacing
+        var remainingSpace = (flickable.width - root.rightMargin - root.leftMargin) - (colCount * root._effectiveCellWidth) + root.horizontalSpacing
         var rowCol = getItemRowCol(id)
-        return [(rowCol[0] * root._effectiveCellWidth) + (remainingSpace / 2), rowCol[1] * root._effectiveCellHeight + headerHeight + marginTop]
+        return [(rowCol[0] * root._effectiveCellWidth) + (remainingSpace / 2) + root.leftMargin, rowCol[1] * root._effectiveCellHeight + headerHeight + topMargin]
     }
 
     //use the same signature as Gridview.positionViewAtIndex(index, PositionMode mode)
@@ -146,10 +148,10 @@ NavigableFocusScope {
             newContentY = 0
         } else if ( itemTopY < viewTopY ) {
             //item above view
-            newContentY = itemTopY - marginTop
+            newContentY = itemTopY - topMargin
         } else if (itemBottomY > viewBottomY) {
             //item below view
-            newContentY = itemBottomY + marginBottom - flickable.height
+            newContentY = itemBottomY + bottomMargin - flickable.height
         }
 
         if (newContentY !== flickable.contentY)
@@ -175,7 +177,7 @@ NavigableFocusScope {
     }
 
     function _getFirstAndLastInstanciatedItemIds() {
-        var myContentY = flickable.contentY - root.headerHeight - marginTop
+        var myContentY = flickable.contentY - root.headerHeight - topMargin
 
         var contentYWithoutExpand = myContentY
         var heightWithoutExpand = flickable.height
@@ -311,7 +313,7 @@ NavigableFocusScope {
         Loader {
             id: headerItemLoader
             //load the header early (when the first row is visible)
-            visible: flickable.contentY < (root.headerHeight + root._effectiveCellHeight + root.marginTop)
+            visible: flickable.contentY < (root.headerHeight + root._effectiveCellHeight + root.topMargin)
             sourceComponent: headerDelegate
             focus: item.focus
             onFocusChanged: {
@@ -325,7 +327,7 @@ NavigableFocusScope {
             }
             onLoaded: {
                 item.x = 0
-                item.y = root.marginTop
+                item.y = root.topMargin
             }
         }
 
@@ -414,7 +416,7 @@ NavigableFocusScope {
 
             // Calculate and set the contentHeight
             var newContentHeight = root.getItemPos(_count - 1)[1] + root._effectiveCellHeight + _expandItemVerticalSpace
-            contentHeight = newContentHeight + root.marginBottom // marginTop is included from root.getItemPos
+            contentHeight = newContentHeight + root.bottomMargin // topMargin is included from root.getItemPos
             contentWidth = root._effectiveCellWidth * root.getNbItemsPerRow() - root.horizontalSpacing
 
             _updateSelected()
