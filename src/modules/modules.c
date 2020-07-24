@@ -275,10 +275,11 @@ module_t *(vlc_module_load)(struct vlc_logger *log, const char *capability,
         }
     }
 
+done:
     va_end (args);
 
     if (module == NULL)
-done:   vlc_debug(log, "no %s modules matched", capability);
+        vlc_debug(log, "no %s modules matched", capability);
 
     free(mods);
     return module;
