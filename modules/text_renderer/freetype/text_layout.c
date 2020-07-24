@@ -108,9 +108,6 @@ typedef struct run_desc_t
     hb_script_t                 script;
     hb_direction_t              direction;
     hb_buffer_t                *p_buffer;
-    hb_glyph_info_t            *p_glyph_infos;
-    hb_glyph_position_t        *p_glyph_positions;
-    unsigned int                i_glyph_count;
 #endif
 
 } run_desc_t;
@@ -793,21 +790,18 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
                              p_run->i_end_offset - p_run->i_start_offset );
 #endif
         hb_shape( p_hb_font, p_run->p_buffer, 0, 0 );
-        p_run->p_glyph_infos =
-            hb_buffer_get_glyph_infos( p_run->p_buffer, &p_run->i_glyph_count );
-        p_run->p_glyph_positions =
-            hb_buffer_get_glyph_positions( p_run->p_buffer, &p_run->i_glyph_count );
 
         hb_font_destroy( p_hb_font );
 
-        if( p_run->i_glyph_count <= 0 )
+        const unsigned length = hb_buffer_get_length( p_run->p_buffer );
+        if( length == 0 )
         {
             msg_Err( p_filter,
                      "ShapeParagraphHarfBuzz() invalid glyph count in shaped run" );
             goto error;
         }
 
-        i_total_glyphs += p_run->i_glyph_count;
+        i_total_glyphs += length;
     }
 
     p_new_paragraph = NewParagraph( p_filter, i_total_glyphs,
@@ -830,9 +824,12 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
     for( int i = 0; i < p_paragraph->i_runs_count; ++i )
     {
         run_desc_t *p_run = p_paragraph->p_runs + i;
-        hb_glyph_info_t *p_infos = p_run->p_glyph_infos;
-        hb_glyph_position_t *p_positions = p_run->p_glyph_positions;
-        for( unsigned int j = 0; j < p_run->i_glyph_count; ++j )
+        unsigned int i_glyph_count;
+        const hb_glyph_info_t *p_infos =
+                hb_buffer_get_glyph_infos( p_run->p_buffer, &i_glyph_count );;
+        const hb_glyph_position_t *p_positions =
+                hb_buffer_get_glyph_positions( p_run->p_buffer, &i_glyph_count );
+        for( unsigned int j = 0; j < i_glyph_count; ++j )
         {
             /*
              * HarfBuzz reverses the order of glyphs in RTL runs. We reverse
@@ -842,7 +839,7 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
              * place.
              */
             int i_run_index = p_run->direction == HB_DIRECTION_LTR ?
-                    j : p_run->i_glyph_count - 1 - j;
+                    j : i_glyph_count - 1 - j;
             int i_source_index =
                     p_infos[ i_run_index ].cluster + p_run->i_start_offset;
 
@@ -871,7 +868,7 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
 
             ++i_index;
         }
-        if( AddRun( p_filter, p_new_paragraph, i_index - p_run->i_glyph_count,
+        if( AddRun( p_filter, p_new_paragraph, i_index - i_glyph_count,
                     i_index, p_run->p_face, p_run->p_style ) )
             goto error;
     }
