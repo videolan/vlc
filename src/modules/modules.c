@@ -279,7 +279,7 @@ done:
     va_end (args);
 
     if (module == NULL)
-        vlc_debug(log, "no %s modules matched", capability);
+        vlc_debug(log, "no %s modules matched with name %s", capability, name);
 
     free(mods);
     return module;
