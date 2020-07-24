@@ -107,7 +107,6 @@ typedef struct run_desc_t
 #ifdef HAVE_HARFBUZZ
     hb_script_t                 script;
     hb_direction_t              direction;
-    hb_font_t                  *p_hb_font;
     hb_buffer_t                *p_buffer;
     hb_glyph_info_t            *p_glyph_infos;
     hb_glyph_position_t        *p_glyph_positions;
@@ -763,8 +762,8 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
         else
             p_face = p_run->p_face;
 
-        p_run->p_hb_font = hb_ft_font_create( p_face, 0 );
-        if( !p_run->p_hb_font )
+        hb_font_t *p_hb_font = hb_ft_font_create( p_face, 0 );
+        if( !p_hb_font )
         {
             msg_Err( p_filter,
                      "ShapeParagraphHarfBuzz(): hb_ft_font_create() error" );
@@ -776,6 +775,7 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
         {
             msg_Err( p_filter,
                      "ShapeParagraphHarfBuzz(): hb_buffer_create() error" );
+            hb_font_destroy( p_hb_font );
             goto error;
         }
 
@@ -792,11 +792,13 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
                              p_run->i_end_offset - p_run->i_start_offset, 0,
                              p_run->i_end_offset - p_run->i_start_offset );
 #endif
-        hb_shape( p_run->p_hb_font, p_run->p_buffer, 0, 0 );
+        hb_shape( p_hb_font, p_run->p_buffer, 0, 0 );
         p_run->p_glyph_infos =
             hb_buffer_get_glyph_infos( p_run->p_buffer, &p_run->i_glyph_count );
         p_run->p_glyph_positions =
             hb_buffer_get_glyph_positions( p_run->p_buffer, &p_run->i_glyph_count );
+
+        hb_font_destroy( p_hb_font );
 
         if( p_run->i_glyph_count <= 0 )
         {
@@ -876,7 +878,6 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
 
     for( int i = 0; i < p_paragraph->i_runs_count; ++i )
     {
-        hb_font_destroy( p_paragraph->p_runs[ i ].p_hb_font );
         hb_buffer_destroy( p_paragraph->p_runs[ i ].p_buffer );
     }
     FreeParagraph( *p_old_paragraph );
@@ -887,8 +888,6 @@ static int ShapeParagraphHarfBuzz( filter_t *p_filter,
 error:
     for( int i = 0; i < p_paragraph->i_runs_count; ++i )
     {
-        if( p_paragraph->p_runs[ i ].p_hb_font )
-            hb_font_destroy( p_paragraph->p_runs[ i ].p_hb_font );
         if( p_paragraph->p_runs[ i ].p_buffer )
             hb_buffer_destroy( p_paragraph->p_runs[ i ].p_buffer );
     }
