@@ -590,7 +590,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
                 .dstMemoryType  = CU_MEMORYTYPE_HOST,
                 .dstHost        = plane.p_pixels,
                 .dstPitch       = plane.i_pitch,
-                .WidthInBytes   = i_pitch,
+                .WidthInBytes   = __MIN(i_pitch, (unsigned)plane.i_pitch),
                 .Height         = plane.i_visible_lines,
             };
             result = CALL_CUDA_DEC(cuMemcpy2DAsync, &cu_cpy, 0);
