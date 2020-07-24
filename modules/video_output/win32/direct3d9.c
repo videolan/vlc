@@ -1624,7 +1624,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
      * typically support more formats than textures */
     const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, &vd->source, vctx);
     if (!d3dfmt) {
-        msg_Err(vd, "unsupported source pixel format %4.4s", &vd->source.i_chroma);
+        msg_Err(vd, "unsupported source pixel format %4.4s", (const char*)&vd->source.i_chroma);
         goto error;
     }
     msg_Dbg(vd, "found input surface format %s for source %4.4s", d3dfmt->name, (const char *)&vd->source.i_chroma);
