@@ -201,6 +201,9 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         m_rootWindow->winId();
         m_rootWindow->show();
 
+        WinTaskbarWidget* taskbarWidget = new WinTaskbarWidget(m_intf, m_rootWindow->windowHandle(), this);
+        qApp->installNativeEventFilter(taskbarWidget);
+
         m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf, m_rootWindow);
         m_videoWindowHandler->setWindow( m_rootWindow->windowHandle() );
 

@@ -80,34 +80,43 @@
 #define GET_FLAGS_LPARAM(lParam)      (LOWORD(lParam))
 #define GET_KEYSTATE_LPARAM(lParam)   GET_FLAGS_LPARAM(lParam)
 
-MainInterfaceWin32::MainInterfaceWin32(intf_thread_t *_p_intf , QWidget* parent, Qt::WindowFlags flags)
-    : MainInterface( _p_intf, parent, flags )
-    , himl( NULL )
-    , p_taskbl( NULL )
+using namespace vlc::playlist;
+
+namespace  {
+
+HWND WinId( QWindow *windowHandle )
 {
-    /* Volume keys */
-    _p_intf->p_sys->disable_volume_keys = var_InheritBool( _p_intf, "qt-disable-volume-keys" );
+    if( windowHandle )
+        return static_cast<HWND>(QGuiApplication::platformNativeInterface()->
+            nativeResourceForWindow("handle", windowHandle));
+    else
+        return 0;
+}
+
+}
+
+WinTaskbarWidget::WinTaskbarWidget(intf_thread_t *_p_intf, QWindow* windowHandle, QObject* parent)
+    : QObject(parent)
+    , p_intf(_p_intf)
+    , m_window(windowHandle)
+{
     taskbar_wmsg = RegisterWindowMessage(TEXT("TaskbarButtonCreated"));
     if (taskbar_wmsg == 0)
         msg_Warn( p_intf, "Failed to register TaskbarButtonCreated message" );
+    connect(THEMPL, &PlaylistControllerModel::countChanged,
+            this, &WinTaskbarWidget::playlistItemCountChanged);
+    connect(THEMIM, &PlayerController::fullscreenChanged,
+            this, &WinTaskbarWidget::onVideoFullscreenChanged);
+    msg_Info(p_intf, "WinTaskbarWidget::WinTaskbarWidget");
 }
 
-MainInterfaceWin32::~MainInterfaceWin32()
+WinTaskbarWidget::~WinTaskbarWidget()
 {
     if( himl )
         ImageList_Destroy( himl );
     if(p_taskbl)
         p_taskbl->Release();
     CoUninitialize();
-}
-
-HWND MainInterfaceWin32::WinId( QWidget *w )
-{
-    if( w && w->windowHandle() )
-        return static_cast<HWND>(QGuiApplication::platformNativeInterface()->
-            nativeResourceForWindow("handle", w->windowHandle()));
-    else
-        return 0;
 }
 
 Q_GUI_EXPORT HBITMAP qt_pixmapToWinHBITMAP(const QPixmap &p, int hbitmapFormat = 0);
@@ -119,7 +128,7 @@ enum HBitmapFormat
     Alpha
 };
 
-void MainInterfaceWin32::createTaskBarButtons()
+void WinTaskbarWidget::createTaskBarButtons()
 {
     /*Here is the code for the taskbar thumb buttons
     FIXME:We need pretty buttons in 16x16 px that are handled correctly by masks in Qt
@@ -193,39 +202,34 @@ void MainInterfaceWin32::createTaskBarButtons()
     thbButtons[2].iBitmap = 3;
     thbButtons[2].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
 
-    hr = p_taskbl->ThumbBarSetImageList( WinId(this), himl );
+    hr = p_taskbl->ThumbBarSetImageList( WinId(m_window), himl );
     if( FAILED(hr) )
         msg_Err( p_intf, "%s failed with error %08lx", "ThumbBarSetImageList",
                  hr );
     else
     {
-        hr = p_taskbl->ThumbBarAddButtons( WinId(this), 3, thbButtons);
+        hr = p_taskbl->ThumbBarAddButtons( WinId(m_window), 3, thbButtons);
         if( FAILED(hr) )
             msg_Err( p_intf, "%s failed with error %08lx",
                      "ThumbBarAddButtons", hr );
     }
     connect( THEMIM, &PlayerController::playingStateChanged,
-             this, &MainInterfaceWin32::changeThumbbarButtons);
+             this, &WinTaskbarWidget::changeThumbbarButtons);
     connect( THEMPL, &vlc::playlist::PlaylistControllerModel::countChanged,
-            this, &MainInterfaceWin32::playlistItemCountChanged );
+            this, &WinTaskbarWidget::playlistItemCountChanged );
     if( THEMIM->getPlayingState() == PlayerController::PLAYING_STATE_PLAYING )
         changeThumbbarButtons( THEMIM->getPlayingState() );
 }
 
-bool MainInterfaceWin32::nativeEvent(const QByteArray &, void *message, long *result)
+bool WinTaskbarWidget::nativeEventFilter(const QByteArray &, void *message, long* /* result */)
 {
-    return winEvent( static_cast<MSG*>( message ), result );
-}
-
-bool MainInterfaceWin32::winEvent ( MSG * msg, long * result )
-{
+    MSG * msg = static_cast<MSG*>( message );
     if (msg->message == taskbar_wmsg)
     {
         //We received the taskbarbuttoncreated, now we can really create the buttons
         createTaskBarButtons();
     }
 
-    short cmd;
     switch( msg->message )
     {
         case WM_COMMAND:
@@ -245,6 +249,97 @@ bool MainInterfaceWin32::winEvent ( MSG * msg, long * result )
                 }
             }
             break;
+    }
+    return false;
+}
+
+void WinTaskbarWidget::playlistItemCountChanged( size_t  )
+{
+    changeThumbbarButtons( THEMIM->getPlayingState() );
+}
+
+void WinTaskbarWidget::onVideoFullscreenChanged( bool fs )
+{
+    if( !fs )
+        changeThumbbarButtons( THEMIM->getPlayingState() );
+}
+
+void WinTaskbarWidget::changeThumbbarButtons( PlayerController::PlayingState i_status )
+{
+    if( p_taskbl == NULL )
+        return;
+
+    // Define an array of three buttons. These buttons provide images through an
+    // image list and also provide tooltips.
+    THUMBBUTTONMASK dwMask = THUMBBUTTONMASK(THB_BITMAP | THB_FLAGS);
+
+    THUMBBUTTON thbButtons[3];
+    //prev
+    thbButtons[0].dwMask = dwMask;
+    thbButtons[0].iId = 0;
+    thbButtons[0].iBitmap = 0;
+    thbButtons[0].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
+
+    //play/pause
+    thbButtons[1].dwMask = dwMask;
+    thbButtons[1].iId = 1;
+    thbButtons[1].dwFlags = THBF_ENABLED;
+
+    //next
+    thbButtons[2].dwMask = dwMask;
+    thbButtons[2].iId = 2;
+    thbButtons[2].iBitmap = 3;
+    thbButtons[2].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
+
+    switch( i_status )
+    {
+        case PlayerController::PLAYING_STATE_PLAYING:
+            {
+                thbButtons[1].iBitmap = 1;
+                break;
+            }
+        case PlayerController::PLAYING_STATE_STARTED:
+        case PlayerController::PLAYING_STATE_PAUSED:
+        case PlayerController::PLAYING_STATE_STOPPING:
+        case PlayerController::PLAYING_STATE_STOPPED:
+            {
+                thbButtons[1].iBitmap = 2;
+                break;
+            }
+        default:
+            return;
+    }
+
+    HRESULT hr =  p_taskbl->ThumbBarUpdateButtons(WinId(m_window), 3, thbButtons);
+
+    if(S_OK != hr)
+        msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08lx", hr );
+
+    // If a video is playing, let the vout handle the thumbnail.
+    if( !THEMIM->hasVideoOutput() )
+    {
+        hr = p_taskbl->SetThumbnailClip(WinId(m_window), NULL);
+        if(S_OK != hr)
+            msg_Err( p_intf, "SetThumbnailClip failed with error %08lx", hr );
+    }
+}
+
+
+MainInterfaceWin32::MainInterfaceWin32(intf_thread_t * _p_intf, QWidget *parent, Qt::WindowFlags flags )
+    : MainInterface( _p_intf, parent, flags )
+{
+    /* Volume keys */
+    p_intf->p_sys->disable_volume_keys = var_InheritBool( _p_intf, "qt-disable-volume-keys" );
+}
+
+
+bool MainInterfaceWin32::nativeEvent(const QByteArray &eventType, void *message, long *result)
+{
+    MSG* msg = static_cast<MSG*>( message );
+
+    short cmd;
+    switch( msg->message )
+    {
         case WM_APPCOMMAND:
             cmd = GET_APPCOMMAND_LPARAM(msg->lParam);
 
@@ -315,20 +410,12 @@ bool MainInterfaceWin32::winEvent ( MSG * msg, long * result )
     return false;
 }
 
-void MainInterfaceWin32::onVideoFullscreenChanged( bool fs )
-{
-    if( !fs )
-        changeThumbbarButtons( THEMIM->getPlayingState() );
-}
-
 void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
 {
     /* check if any visible window is above vlc in the z-order,
      * but ignore the ones always on top
      * and the ones which can't be activated */
-    HWND winId;
-    QWindow *window = windowHandle();
-    winId = static_cast<HWND>(QGuiApplication::platformNativeInterface()->nativeResourceForWindow("handle", window));
+    HWND winId = WinId(this->windowHandle());
 
     WINDOWINFO wi;
     HWND hwnd;
@@ -346,112 +433,9 @@ void MainInterfaceWin32::toggleUpdateSystrayMenuWhenVisible()
 }
 
 
-void MainInterfaceWin32::resizeEvent(QResizeEvent *event)
-{
-    MainInterface::resizeEvent(event);
-
-    /*
-     * Detects if window placement is not in its normal position (ex: win7 aero snap)
-     * This function compares the normal position (non snapped) to the current position.
-     * The current position is translated from screen referential to workspace referential
-     * to workspace referential
-     */
-    b_isWindowTiled = false;
-    HWND winHwnd = WinId( this );
-
-    WINDOWPLACEMENT windowPlacement;
-    windowPlacement.length = sizeof( windowPlacement );
-    if ( GetWindowPlacement( winHwnd, &windowPlacement ) == 0 )
-        return;
-
-    if ( windowPlacement.showCmd != SW_SHOWNORMAL )
-        return;
-
-    HMONITOR monitor = MonitorFromWindow( winHwnd, MONITOR_DEFAULTTONEAREST );
-
-    MONITORINFO monitorInfo;
-    monitorInfo.cbSize = sizeof( monitorInfo );
-    if ( GetMonitorInfo( monitor, &monitorInfo )  == 0 )
-        return;
-
-    RECT windowRect;
-    if ( GetWindowRect( winHwnd, &windowRect ) == 0 )
-        return;
-
-    OffsetRect( &windowRect,
-                monitorInfo.rcMonitor.left - monitorInfo.rcWork.left ,
-                monitorInfo.rcMonitor.top - monitorInfo.rcWork.top );
-
-    b_isWindowTiled = ( EqualRect( &windowPlacement.rcNormalPosition, &windowRect ) == 0 );
-}
 
 void MainInterfaceWin32::reloadPrefs()
 {
     p_intf->p_sys->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
     MainInterface::reloadPrefs();
-}
-
-void MainInterfaceWin32::playlistItemCountChanged( size_t  )
-{
-    changeThumbbarButtons( THEMIM->getPlayingState() );
-}
-
-void MainInterfaceWin32::changeThumbbarButtons( PlayerController::PlayingState i_status )
-{
-    if( p_taskbl == NULL )
-        return;
-
-    // Define an array of three buttons. These buttons provide images through an
-    // image list and also provide tooltips.
-    THUMBBUTTONMASK dwMask = THUMBBUTTONMASK(THB_BITMAP | THB_FLAGS);
-
-    THUMBBUTTON thbButtons[3];
-    //prev
-    thbButtons[0].dwMask = dwMask;
-    thbButtons[0].iId = 0;
-    thbButtons[0].iBitmap = 0;
-    thbButtons[0].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
-
-    //play/pause
-    thbButtons[1].dwMask = dwMask;
-    thbButtons[1].iId = 1;
-    thbButtons[1].dwFlags = THBF_ENABLED;
-
-    //next
-    thbButtons[2].dwMask = dwMask;
-    thbButtons[2].iId = 2;
-    thbButtons[2].iBitmap = 3;
-    thbButtons[2].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
-
-    switch( i_status )
-    {
-        case PlayerController::PLAYING_STATE_PLAYING:
-            {
-                thbButtons[1].iBitmap = 1;
-                break;
-            }
-        case PlayerController::PLAYING_STATE_STARTED:
-        case PlayerController::PLAYING_STATE_PAUSED:
-        case PlayerController::PLAYING_STATE_STOPPING:
-        case PlayerController::PLAYING_STATE_STOPPED:
-            {
-                thbButtons[1].iBitmap = 2;
-                break;
-            }
-        default:
-            return;
-    }
-
-    HRESULT hr =  p_taskbl->ThumbBarUpdateButtons(WinId(this), 3, thbButtons);
-
-    if(S_OK != hr)
-        msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08lx", hr );
-
-    // If a video is playing, let the vout handle the thumbnail.
-    //if( !videoWidget || !THEMIM->hasVideoOutput() )
-    //{
-    //    hr = p_taskbl->SetThumbnailClip(WinId(this), NULL);
-    //    if(S_OK != hr)
-    //        msg_Err( p_intf, "SetThumbnailClip failed with error %08lx", hr );
-    //}
 }
