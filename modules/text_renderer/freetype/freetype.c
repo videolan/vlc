@@ -1332,6 +1332,10 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                 break;
         }
     }
+    else
+    {
+        rv = VLC_EGENERIC;
+    }
 
     FreeLines( text_block.p_laid );
 
