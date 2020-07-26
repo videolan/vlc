@@ -594,10 +594,12 @@ static void ActivateSets(decoder_t *p_dec,
             {
                 p_dec->fmt_out.video.i_frame_rate = num;
                 p_dec->fmt_out.video.i_frame_rate_base = den;
-                if(p_sys->dts.i_divider_den != den &&
-                   p_sys->dts.i_divider_num != 2 * num &&
-                   num <= UINT_MAX / 2)
+                if(num <= UINT_MAX / 2 &&
+                   (p_sys->dts.i_divider_den != den ||
+                    p_sys->dts.i_divider_num != 2 * num))
+                {
                     date_Change(&p_sys->dts, 2 * num, den);
+                }
             }
             p_dec->fmt_out.video.i_frame_rate = p_sys->dts.i_divider_num >> 1;
             p_dec->fmt_out.video.i_frame_rate_base = p_sys->dts.i_divider_den;
