@@ -63,6 +63,8 @@
 
 #define RTCP_PT_RTPFR             204
 
+#define RIST_TICK_FROM_MS(ms) ((CLOCK_FREQ / INT64_C(1000)) * (ms))
+
 struct rtp_pkt {
     uint32_t rtp_ts;
     struct block_t *buffer;
@@ -172,7 +174,7 @@ static inline void populate_cname(int fd, char *identifier)
     }
 }
 
-static inline uint32_t rtp_get_ts( vlc_tick_t i_pts )
+static inline uint32_t rtp_get_ts( int64_t i_pts )
 {
     unsigned i_clock_rate = 90000;
     /* This is an overflow-proof way of doing:
@@ -185,10 +187,10 @@ static inline uint32_t rtp_get_ts( vlc_tick_t i_pts )
           + q.rem * (int64_t)i_clock_rate / CLOCK_FREQ;
 }
 
-static inline vlc_tick_t ts_get_from_rtp( uint32_t i_rtp_ts )
+static inline int64_t ts_get_from_rtp( uint32_t i_rtp_ts )
 {
     unsigned i_clock_rate = 90000;
-    return (vlc_tick_t)i_rtp_ts * (vlc_tick_t)(CLOCK_FREQ/i_clock_rate);
+    return (int64_t)i_rtp_ts * (int64_t)(CLOCK_FREQ/i_clock_rate);
 }
 
 static inline ssize_t rist_ReadFrom_i11e(int fd, void *buf, size_t len, struct sockaddr *peer, 

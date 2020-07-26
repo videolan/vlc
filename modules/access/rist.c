@@ -2,7 +2,7 @@
  * rist.c: RIST (Reliable Internet Stream Transport) input module
  *****************************************************************************
  * Copyright (C) 2018, DVEO, the Broadcast Division of Computer Modules, Inc.
- * Copyright (C) 2018, SipRadius LLC
+ * Copyright (C) 2018-2020, SipRadius LLC
  *
  * Authors: Sergio Ammirata <sergio@ammirata.net>
  *          Daniele Lacamera <root@danielinux.net>
@@ -30,14 +30,11 @@
 #include <vlc_interrupt.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
-#include <vlc_queue.h>
 #include <vlc_threads.h>
 #include <vlc_network.h>
 #include <vlc_block.h>
 #include <vlc_url.h>
-#ifdef HAVE_POLL_H
 #include <poll.h>
-#endif
 #include <bitstream/ietf/rtcp_rr.h>
 #include <bitstream/ietf/rtcp_sdes.h>
 #include <bitstream/ietf/rtcp_fb.h>
@@ -75,7 +72,7 @@ enum NACK_TYPE {
     NACK_FMT_BITMASK
 };
 
-typedef struct
+struct stream_sys_t
 {
     struct rist_flow *flow;
     char             sender_name[MAX_CNAME];
@@ -91,8 +88,7 @@ typedef struct
     bool             b_sendblindnacks;
     bool             b_disablenacks;
     bool             b_flag_discontinuity;
-    bool             dead;
-    vlc_queue_t      queue;
+    block_fifo_t     *p_fifo;
     vlc_mutex_t      lock;
     uint64_t         last_message;
     uint64_t         last_reset;
@@ -107,7 +103,7 @@ typedef struct
     uint32_t         i_recovered_packets;
     uint32_t         i_reordered_packets;
     uint32_t         i_total_packets;
-} stream_sys_t;
+};
 
 static int Control(stream_t *p_access, int i_query, va_list args)
 {
@@ -121,7 +117,7 @@ static int Control(stream_t *p_access, int i_query, va_list args)
             break;
 
         case STREAM_GET_PTS_DELAY:
-            *va_arg( args, vlc_tick_t * ) = VLC_TICK_FROM_MS(
+            *va_arg( args, int64_t * ) = RIST_TICK_FROM_MS(
                    var_InheritInteger(p_access, "network-caching") );
             break;
 
@@ -406,7 +402,7 @@ static void send_nacks(stream_t *p_access, struct rist_flow *flow)
         {
             memcpy(pkt_nacks->p_buffer, nacks, nacks_len * 2);
             pkt_nacks->i_buffer = nacks_len * 2;
-            vlc_queue_Enqueue(&p_sys->queue, pkt_nacks);
+            block_FifoPut( p_sys->p_fifo, pkt_nacks );
         }
     }
 }
@@ -675,7 +671,7 @@ static bool rist_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf,
     pkt->buffer->i_buffer = len;
     memcpy(pkt->buffer->p_buffer, buf, len);
     pkt->rtp_ts = pkt_ts;
-    p_sys->last_data_rx = vlc_tick_now();
+    p_sys->last_data_rx = mdate();
     /* Reset the try counter regardless of wether it was a retransmit or not */
     flow->nacks_retries[idx] = 0;
 
@@ -776,12 +772,14 @@ static void *rist_thread(void *data)
 {
     stream_t *p_access = data;
     stream_sys_t *p_sys = p_access->p_sys;
-    block_t *pkt_nacks;
 
     /* Process nacks every 5ms */
     /* We only ask for the relevant ones */
-    while ((pkt_nacks = vlc_queue_DequeueKillable(&p_sys->queue,
-                                                  &p_sys->dead)) != NULL) {
+    for (;;) {
+        block_t *pkt_nacks = block_FifoGet(p_sys->p_fifo);
+
+        int canc = vlc_savecancel();
+
         /* there are two bytes per nack */
         uint16_t nack_count = (uint16_t)pkt_nacks->i_buffer/2;
         switch(p_sys->nack_type) {
@@ -796,6 +794,8 @@ static void *rist_thread(void *data)
         if (nack_count > 1)
             msg_Dbg(p_access, "Sent %u NACKs !!!", nack_count);
         block_Release(pkt_nacks);
+
+        vlc_restorecancel (canc);
     }
 
     return NULL;
@@ -917,12 +917,12 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
         buf = NULL;
     }
 
-    now = vlc_tick_now();
+    now = mdate();
 
     /* Process stats and print them out */
     /* We need to measure some items every 70ms */
     uint64_t interval = (now - flow->feedback_time);
-    if ( interval > VLC_TICK_FROM_MS(RTCP_INTERVAL) )
+    if ( interval > RIST_TICK_FROM_MS(RTCP_INTERVAL) )
     {
         if (p_sys->i_poll_timeout_nonzero_count > 0)
         {
@@ -941,7 +941,7 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
     }
     /* We print out the stats once per second */
     interval = (now - p_sys->i_last_stat);
-    if ( interval > VLC_TICK_FROM_MS(STATS_INTERVAL) )
+    if ( interval >  RIST_TICK_FROM_MS(STATS_INTERVAL) )
     {
         if ( p_sys->i_lost_packets > 0)
             msg_Err(p_access, "We have %d lost packets", p_sys->i_lost_packets);
@@ -969,17 +969,17 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
 
     /* Send rtcp feedback every RTCP_INTERVAL */
     interval = (now - flow->feedback_time);
-    if ( interval > VLC_TICK_FROM_MS(RTCP_INTERVAL) )
+    if ( interval > RIST_TICK_FROM_MS(RTCP_INTERVAL) )
     {
         /* msg_Dbg(p_access, "Calling RTCP Feedback %lu<%d ms using timer", interval,
-        VLC_TICK_FROM_MS(RTCP_INTERVAL)); */
+        RIST_TICK_FROM_MS(RTCP_INTERVAL)); */
         send_rtcp_feedback(p_access, flow);
         flow->feedback_time = now;
     }
 
     /* Send nacks every NACK_INTERVAL (only the ones that have matured, if any) */
     interval = (now - p_sys->last_nack_tx);
-    if ( interval > VLC_TICK_FROM_MS(NACK_INTERVAL) )
+    if ( interval > RIST_TICK_FROM_MS(NACK_INTERVAL) )
     {
         send_nacks(p_access, p_sys->flow);
         p_sys->last_nack_tx = now;
@@ -987,8 +987,8 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
 
     /* Safety check for when the input stream stalls */
     if ( p_sys->last_data_rx > 0 && now > p_sys->last_data_rx &&
-        (uint64_t)(now - p_sys->last_data_rx) >  (uint64_t)VLC_TICK_FROM_MS(flow->latency) &&
-        (uint64_t)(now - p_sys->last_reset) > (uint64_t)VLC_TICK_FROM_MS(flow->latency) )
+        (uint64_t)(now - p_sys->last_data_rx) >  (uint64_t)RIST_TICK_FROM_MS(flow->latency) &&
+        (uint64_t)(now - p_sys->last_reset) > (uint64_t)RIST_TICK_FROM_MS(flow->latency) )
     {
         msg_Err(p_access, "No data received for %"PRId64" ms, resetting buffers",
             (int64_t)(now - p_sys->last_data_rx)/1000);
@@ -1011,6 +1011,9 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
 static void Clean( stream_t *p_access )
 {
     stream_sys_t *p_sys = p_access->p_sys;
+
+    if( likely(p_sys->p_fifo != NULL) )
+        block_FifoRelease( p_sys->p_fifo );
 
     if (p_sys->flow)
     {
@@ -1037,7 +1040,7 @@ static void Close(vlc_object_t *p_this)
     stream_t     *p_access = (stream_t*)p_this;
     stream_sys_t *p_sys = p_access->p_sys;
 
-    vlc_queue_Kill(&p_sys->queue, &p_sys->dead);
+    vlc_cancel(p_sys->thread);
     vlc_join(p_sys->thread, NULL);
 
     Clean( p_access );
@@ -1095,12 +1098,13 @@ static int Open(vlc_object_t *p_this)
     msg_Info(p_access, "Setting queue latency to %d ms", p_sys->flow->latency);
 
     /* Convert to rtp times */
-    p_sys->flow->rtp_latency = rtp_get_ts(VLC_TICK_FROM_MS(p_sys->flow->latency));
-    p_sys->flow->retry_interval = rtp_get_ts(VLC_TICK_FROM_MS(p_sys->flow->retry_interval));
-    p_sys->flow->reorder_buffer = rtp_get_ts(VLC_TICK_FROM_MS(p_sys->flow->reorder_buffer));
+    p_sys->flow->rtp_latency = rtp_get_ts(RIST_TICK_FROM_MS(p_sys->flow->latency));
+    p_sys->flow->retry_interval = rtp_get_ts(RIST_TICK_FROM_MS(p_sys->flow->retry_interval));
+    p_sys->flow->reorder_buffer = rtp_get_ts(RIST_TICK_FROM_MS(p_sys->flow->reorder_buffer));
 
-    p_sys->dead = false;
-    vlc_queue_Init(&p_sys->queue, offsetof (block_t, p_next));
+    p_sys->p_fifo = block_FifoNew();
+    if( unlikely(p_sys->p_fifo == NULL) )
+        goto failed;
 
     /* This extra thread is for sending feedback/nack packets even when no data comes in */
     if (vlc_clone(&p_sys->thread, rist_thread, p_access, VLC_THREAD_PRIORITY_INPUT))
