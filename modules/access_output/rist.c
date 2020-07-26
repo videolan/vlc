@@ -2,7 +2,7 @@
  *  * rist.c: RIST (Reliable Internet Stream Transport) output module
  *****************************************************************************
  * Copyright (C) 2018, DVEO, the Broadcast Division of Computer Modules, Inc.
- * Copyright (C) 2018, SipRadius LLC
+ * Copyright (C) 2018-2020, SipRadius LLC
  *
  * Authors: Sergio Ammirata <sergio@ammirata.net>
  *          Daniele Lacamera <root@danielinux.net>
@@ -33,16 +33,11 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_network.h>
-#include <vlc_queue.h>
 #include <vlc_threads.h>
 #include <vlc_rand.h>
-#ifdef HAVE_POLL_H
 #include <poll.h>
-#endif
 #include <sys/time.h>
-#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
-#endif
 #include <bitstream/ietf/rtcp_rr.h>
 #include <bitstream/ietf/rtcp_sr.h>
 #include <bitstream/ietf/rtcp_fb.h>
@@ -77,7 +72,7 @@ static const char *const ppsz_sout_options[] = {
     NULL
 };
 
-typedef struct
+struct sout_access_out_sys_t
 {
     struct       rist_flow *flow;
     uint16_t     rtp_counter;
@@ -93,13 +88,12 @@ typedef struct
     block_t      *p_pktbuffer;
     uint64_t     i_ticks_caching;
     uint32_t     ssrc;
-    bool         dead;
-    vlc_queue_t  queue;
+    block_fifo_t *p_fifo;
     /* stats variables */
     uint64_t     i_last_stat;
     uint32_t     i_retransmit_packets;
     uint32_t     i_total_packets;
-} sout_access_out_sys_t;
+};
 
 static struct rist_flow *rist_init_tx()
 {
@@ -386,7 +380,7 @@ static void rist_rtcp_send(sout_access_out_t *p_access)
     fractions <<= 32ULL;
     fractions /= 1000000ULL;
     rtcp_sr_set_ntp_time_lsw(p_sr, (uint32_t)fractions);
-    rtcp_sr_set_rtp_time(p_sr, rtp_get_ts(vlc_tick_now()));
+    rtcp_sr_set_rtp_time(p_sr, rtp_get_ts(mdate()));
     vlc_mutex_lock( &p_sys->lock );
     rtcp_sr_set_packet_count(p_sr, flow->packets_count);
     rtcp_sr_set_octet_count(p_sr, flow->bytes_count);
@@ -469,8 +463,8 @@ static void *rist_thread(void *data)
         }
 
         /* And, in any case: */
-        now = vlc_tick_now();
-        if ((now - p_sys->last_rtcp_tx) > VLC_TICK_FROM_MS(RTCP_INTERVAL))
+        now = mdate();
+        if ((now - p_sys->last_rtcp_tx) > RIST_TICK_FROM_MS(RTCP_INTERVAL))
         {
             rist_rtcp_send(p_access);
             p_sys->last_rtcp_tx = now;
@@ -488,20 +482,22 @@ static void* ThreadSend( void *data )
 {
     sout_access_out_t *p_access = data;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    vlc_tick_t i_caching = p_sys->i_ticks_caching;
+    uint64_t i_caching = p_sys->i_ticks_caching;
     struct rist_flow *flow = p_sys->flow;
-    block_t *out;
 
-    while ((out = vlc_queue_DequeueKillable(&p_sys->queue,
-                                            &p_sys->dead)) != NULL)
+    for (;;)
     {
         ssize_t len = 0;
         uint16_t seq = 0;
         uint32_t pkt_ts = 0;
+        block_t *out = block_FifoGet( p_sys->p_fifo );
 
-        vlc_tick_wait (out->i_dts + i_caching);
+        block_cleanup_push( out );
+        mwait (out->i_dts + (mtime_t)i_caching);
+        vlc_cleanup_pop();
 
         len = out->i_buffer;
+        int canc = vlc_savecancel();
 
         seq = rtp_get_seqnum(out->p_buffer);
         pkt_ts = rtp_get_timestamp(out->p_buffer);
@@ -553,9 +549,9 @@ static void* ThreadSend( void *data )
         vlc_mutex_unlock( &p_sys->lock );
 
         /* We print out the stats once per second */
-        uint64_t now = vlc_tick_now();
+        uint64_t now = mdate();
         uint64_t interval = (now - p_sys->i_last_stat);
-        if ( interval > VLC_TICK_FROM_MS(STATS_INTERVAL) )
+        if ( interval > RIST_TICK_FROM_MS(STATS_INTERVAL) )
         {
             if (p_sys->i_retransmit_packets > 0)
             {
@@ -571,6 +567,8 @@ static void* ThreadSend( void *data )
             p_sys->i_total_packets = 0;
         }
         p_sys->i_total_packets++;
+
+        vlc_restorecancel (canc);
     }
     return NULL;
 }
@@ -589,7 +587,8 @@ static void SendtoFIFO( sout_access_out_t *p_access, block_t *buffer )
     uint32_t pkt_ts = rtp_get_ts(buffer->i_dts);
     rtp_set_timestamp(bufhdr, pkt_ts);
 
-    vlc_queue_Enqueue(&p_sys->queue, block_Duplicate(buffer));
+    block_t *pkt = block_Duplicate(buffer);
+    block_FifoPut( p_sys->p_fifo, pkt );
 }
 
 static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
@@ -685,6 +684,9 @@ static void Clean( sout_access_out_t *p_access )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
 
+    if( likely(p_sys->p_fifo != NULL) )
+        block_FifoRelease( p_sys->p_fifo );
+
     if ( p_sys->flow )
     {
         if (p_sys->flow->fd_out >= 0) {
@@ -718,7 +720,7 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_sys_t *p_sys = p_access->p_sys;
 
     vlc_cancel(p_sys->ristthread);
-    vlc_queue_Kill(&p_sys->queue, &p_sys->dead);
+    vlc_cancel(p_sys->senderthread);
 
     vlc_join(p_sys->ristthread, NULL);
     vlc_join(p_sys->senderthread, NULL);
@@ -776,7 +778,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->flow = flow;
     flow->latency = var_InheritInteger(p_access, SOUT_CFG_PREFIX "buffer-size");
-    flow->rtp_latency = rtp_get_ts(VLC_TICK_FROM_MS(flow->latency));
+    flow->rtp_latency = rtp_get_ts(RIST_TICK_FROM_MS(flow->latency));
     p_sys->ssrc = var_InheritInteger(p_access, SOUT_CFG_PREFIX "ssrc");
     if (p_sys->ssrc == 0) {
         vlc_rand_bytes(&p_sys->ssrc, 4);
@@ -785,11 +787,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->ssrc &= ~(1 << 0);
 
     msg_Info(p_access, "SSRC: 0x%08X", p_sys->ssrc);
-    p_sys->i_ticks_caching = VLC_TICK_FROM_MS(var_InheritInteger( p_access, 
+    p_sys->i_ticks_caching = RIST_TICK_FROM_MS(var_InheritInteger( p_access, 
         SOUT_CFG_PREFIX "caching"));
     p_sys->i_packet_size = var_InheritInteger(p_access, SOUT_CFG_PREFIX "packet-size" );
-    p_sys->dead = false;
-    vlc_queue_Init(&p_sys->queue, offsetof (block_t, p_next));
+    p_sys->p_fifo = block_FifoNew();
+    if( unlikely(p_sys->p_fifo == NULL) )
+        goto failed;
     p_sys->p_pktbuffer = block_Alloc( p_sys->i_packet_size );
     if( unlikely(p_sys->p_pktbuffer == NULL) )
         goto failed;
@@ -807,7 +810,7 @@ static int Open( vlc_object_t *p_this )
     if (vlc_clone(&p_sys->ristthread, rist_thread, p_access, VLC_THREAD_PRIORITY_INPUT))
     {
         msg_Err(p_access, "Failed to create worker thread.");
-        vlc_queue_Kill(&p_sys->queue, &p_sys->dead);
+        vlc_cancel(p_sys->senderthread);
         vlc_join(p_sys->senderthread, NULL);
         goto failed;
     }
