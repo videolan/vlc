@@ -76,7 +76,9 @@ Slider {
             id: timeIndicatorRect
             width: timeMetrics.width + VLCStyle.dp(10)
             height: timeMetrics.height + VLCStyle.dp(5)
+
             color: VLCStyle.colors.bgAlt
+            radius: VLCStyle.dp(6)
 
             Text {
                 anchors.fill: parent
