@@ -36,6 +36,7 @@ Rectangle {
     property bool _interfaceReady: false
     property bool _playlistReady: false
 
+    property alias mainInterfaceRect: root
 
     Binding {
         target: VLCStyle.self

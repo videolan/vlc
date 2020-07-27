@@ -45,8 +45,31 @@ Slider {
         property real location: sliderRectMouseArea.mouseX
         property real position: location/control.width
 
+        width: childrenRect.width
+        height: childrenRect.height
+
+        function getX() {
+            var x = location - (timeTooltip.width / 2)
+            var diff = (x + timeTooltip.width) - (VLCStyle.appWidth)
+            var sliderRealX = mainInterfaceRect.mapFromItem(sliderRectMouseArea, sliderRectMouseArea.x, sliderRectMouseArea.y).x
+
+            if (x < -sliderRealX) {
+                arrow.diff = x
+                x = -sliderRealX
+            }
+            else if (diff > 0) {
+                arrow.diff = diff
+                x -= (diff)
+            }
+            else {
+                arrow.diff = 0
+            }
+
+            return x
+        }
+
         y: -(childrenRect.height)
-        x: location - (timeIndicatorRect.width / 2)
+        x: getX()
         visible: control.hovered
 
         Item {
@@ -66,6 +89,9 @@ Slider {
 
                 anchors.centerIn: parent
                 anchors.verticalCenterOffset: -(parent.height / 2)
+                anchors.horizontalCenterOffset: diff
+
+                property int diff: 0
 
                 color: VLCStyle.colors.bgAlt
 
