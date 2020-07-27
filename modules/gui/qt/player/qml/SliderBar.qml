@@ -18,6 +18,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtGraphicalEffects 1.0
 
 import "qrc:///style/"
 
@@ -69,6 +70,13 @@ Slider {
                 color: VLCStyle.colors.bgAlt
 
                 rotation: 45
+
+                RectangularGlow {
+                    anchors.fill: parent
+                    glowRadius: VLCStyle.dp(2)
+                    spread: 0.2
+                    color: VLCStyle.colors.glowColor
+                }
             }
         }
 
@@ -79,6 +87,16 @@ Slider {
 
             color: VLCStyle.colors.bgAlt
             radius: VLCStyle.dp(6)
+
+            RectangularGlow {
+                anchors.fill: parent
+
+                glowRadius: VLCStyle.dp(2)
+                cornerRadius: parent.radius
+                spread: 0.2
+
+                color: VLCStyle.colors.glowColor
+            }
 
             Text {
                 anchors.fill: parent
