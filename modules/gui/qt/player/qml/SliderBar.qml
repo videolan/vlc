@@ -44,32 +44,54 @@ Slider {
         property real location: sliderRectMouseArea.mouseX
         property real position: location/control.width
 
-        y: VLCStyle.dp(-35)
+        y: -(childrenRect.height)
         x: location - (timeIndicatorRect.width / 2)
         visible: control.hovered
 
-        Rectangle {
-            width: VLCStyle.dp(10)
-            height: VLCStyle.dp(10)
+        Item {
+            height: childrenRect.height * Math.sqrt(2)
+            width: timeIndicatorRect.width
 
             anchors.horizontalCenter: timeIndicatorRect.horizontalCenter
             anchors.verticalCenter: timeIndicatorRect.bottom
+            anchors.verticalCenterOffset: height / 2
 
-            rotation: 45
-            color: VLCStyle.colors.bgAlt
+            clip: true
+
+            Rectangle {
+                id: arrow
+                width: VLCStyle.dp(10)
+                height: VLCStyle.dp(10)
+
+                anchors.centerIn: parent
+                anchors.verticalCenterOffset: -(parent.height / 2)
+
+                color: VLCStyle.colors.bgAlt
+
+                rotation: 45
+            }
         }
 
         Rectangle {
             id: timeIndicatorRect
-            width: childrenRect.width
-            height: VLCStyle.dp(20)
+            width: timeMetrics.width + VLCStyle.dp(10)
+            height: timeMetrics.height + VLCStyle.dp(5)
             color: VLCStyle.colors.bgAlt
 
             Text {
-                text: player.length.scale(timeTooltip.position).toString() +
-                      (player.hasChapters ?
-                           " - " + player.chapters.getNameAtPosition(timeTooltip.position) : "")
+                anchors.fill: parent
+                text: timeMetrics.text
                 color: VLCStyle.colors.text
+
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                TextMetrics {
+                    id: timeMetrics
+                    text: player.length.scale(timeTooltip.position).toString() +
+                          (player.hasChapters ?
+                               " - " + player.chapters.getNameAtPosition(timeTooltip.position) : "")
+                }
             }
         }
     }
