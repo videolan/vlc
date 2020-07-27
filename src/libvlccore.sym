@@ -311,7 +311,6 @@ picture_NewFromFormat
 picture_NewFromResource
 picture_pool_Release
 picture_pool_Get
-picture_pool_GetSize
 picture_pool_New
 picture_pool_NewFromFormat
 picture_pool_Reserve

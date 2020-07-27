@@ -134,7 +134,7 @@ VLC_USED;
  * @return the total number of pictures in the given pool
  * @note This function is thread-safe.
  */
-VLC_API unsigned picture_pool_GetSize(const picture_pool_t *);
+unsigned picture_pool_GetSize(const picture_pool_t *);
 
 
 #endif /* VLC_PICTURE_POOL_H */
