@@ -1,6 +1,18 @@
 Changes between 3.0.11 and 3.0.11.1:
 ----------------------------------
 
+Demux:
+ * Fixed HLS playlist update mechanism, unable to start
+   in some cases.
+ * Because of broken HLS servers, adaptive no longer
+   considers Content-Type as authoritative.
+ * Fixed handling of WEBM WebVTT subtitles
+ * Workaround invalid ADTS in TS from Makito encoders
+ * Fixed Opus when using avformat demuxer
+
+Decoders:
+ * Fixed inverted explicit start/end positioning
+
 Service Discovery:
  * Fix listing of media on certain Panasonic recorders discovered via UPnP
 
