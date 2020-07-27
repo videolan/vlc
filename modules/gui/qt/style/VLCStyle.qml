@@ -198,7 +198,14 @@ Item {
     function dp(px, scale) {
         if (typeof scale === "undefined")
             scale = mainInterface.intfScaleFactor
-        return Math.max(1, Math.round(px * scale))
+
+        var scaledPx = Math.round(px * scale)
+        if (scaledPx < 0)
+            return Math.min(-1, scaledPx)
+        else if (scaledPx > 0)
+            return Math.max(1, scaledPx)
+        else // scaledPx == 0
+            return 0
     }
 
     function colWidth(nb) {
