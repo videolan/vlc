@@ -41,7 +41,7 @@ Slider {
 
     Item {
         id: timeTooltip
-        property real location: 0
+        property real location: sliderRectMouseArea.mouseX
         property real position: location/control.width
 
         y: VLCStyle.dp(-35)
@@ -120,7 +120,6 @@ Slider {
                     control.value = event.x / control.width
                     player.position = control.value
                 }
-                timeTooltip.location = event.x
             }
             onEntered: {
                 if(player.hasChapters)
