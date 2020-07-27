@@ -65,7 +65,7 @@ void picture_pool_Release(picture_pool_t *pool)
     picture_pool_Destroy(pool);
 }
 
-static void picture_pool_ReleasePicture(picture_t *clone)
+static void picture_pool_ReleaseClone(picture_t *clone)
 {
     picture_priv_t *priv = (picture_priv_t *)clone;
     uintptr_t sys = (uintptr_t)priv->gc.opaque;
@@ -90,7 +90,7 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
     picture_t *picture = pool->picture[offset];
     uintptr_t sys = ((uintptr_t)pool) + offset;
 
-    return picture_InternalClone(picture, picture_pool_ReleasePicture,
+    return picture_InternalClone(picture, picture_pool_ReleaseClone,
                                  (void*)sys);
 }
 
