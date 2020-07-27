@@ -156,9 +156,9 @@ static void Close(vlc_gl_t *gl)
         (__bridge NSString*)kCVPixelBufferIOSurfacePropertiesKey: @{},
 
 #if TARGET_OS_IPHONE
-        (__bridge NSString*)kCVPixelBufferOpenGLESCompatibilityKey : @YES,
-        (__bridge NSString*)kCVPixelBufferIOSurfaceOpenGLESFBOCompatibilityKey: @YES,
-        (__bridge NSString*)kCVPixelBufferIOSurfaceOpenGLESTextureCompatibilityKey: @YES,
+        //(__bridge NSString*)kCVPixelBufferOpenGLESCompatibilityKey : @YES,
+        //(__bridge NSString*)kCVPixelBufferIOSurfaceOpenGLESFBOCompatibilityKey: @YES,
+        //(__bridge NSString*)kCVPixelBufferIOSurfaceOpenGLESTextureCompatibilityKey: @YES,
 #endif
 
     };
