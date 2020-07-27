@@ -51,6 +51,9 @@ GCRYPT_EXTRA_CFLAGS =
 endif
 ifdef HAVE_MACOSX
 GCRYPT_CONF += --disable-aesni-support
+ifeq ($(ARCH),aarch64)
+GCRYPT_CONF += --disable-asm --disable-arm-crypto-support
+endif
 else
 ifdef HAVE_BSD
 GCRYPT_CONF += --disable-asm --disable-aesni-support
