@@ -38,7 +38,8 @@ Widgets.NavigableFocusScope {
         id: animateExpand;
         target: root;
         properties: "implicitHeight"
-        duration: 250
+        duration: 200
+        easing.type: Easing.InSine
         to: root.childrenRect.height
     }
 
@@ -46,7 +47,8 @@ Widgets.NavigableFocusScope {
         id: animateRetract;
         target: root;
         properties: "implicitHeight"
-        duration: 250
+        duration: 200
+        easing.type: Easing.OutSine
         to: 0
     }
 
