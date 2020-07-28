@@ -1,6 +1,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 
@@ -118,17 +119,37 @@ Widgets.NavigableFocusScope {
 
                         leftPadding: VLCStyle.margin_normal
 
-                        Image {
-                            id: cover
+                        Item {
                             anchors.verticalCenter: parent.verticalCenter
+                            implicitHeight: childrenRect.height
+                            implicitWidth:  childrenRect.width
 
-                            source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
-                                    ? mainPlaylistController.currentItem.artwork
-                                    : VLCStyle.noArtAlbum
-                            fillMode: Image.PreserveAspectFit
+                            Rectangle {
+                                id: coverRect
+                                anchors.fill: cover
+                                color: VLCStyle.colors.bg
+                            }
 
-                            width: VLCStyle.dp(60)
-                            height: VLCStyle.dp(60)
+                            DropShadow {
+                                anchors.fill: coverRect
+                                source: coverRect
+                                radius: 8
+                                samples: 17
+                                color: VLCStyle.colors.glowColorBanner
+                                spread: 0.2
+                            }
+
+                            Image {
+                                id: cover
+
+                                source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
+                                        ? mainPlaylistController.currentItem.artwork
+                                        : VLCStyle.noArtAlbum
+                                fillMode: Image.PreserveAspectFit
+
+                                width: VLCStyle.dp(60)
+                                height: VLCStyle.dp(60)
+                            }
                         }
 
                         Column {
