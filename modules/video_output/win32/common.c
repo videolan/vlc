@@ -37,9 +37,6 @@
 #include <windows.h>
 #include <assert.h>
 
-#define COBJMACROS
-#include <shobjidl.h>
-
 #include "events.h"
 #include "common.h"
 #include "../../video_chroma/copy.h"
@@ -53,8 +50,6 @@ void CommonInit(vout_display_t *vd, display_win32_area_t *area, const vout_displ
 }
 
 #if !VLC_WINSTORE_APP
-static void CommonChangeThumbnailClip(vlc_object_t *, vout_display_sys_win32_t *, bool show);
-
 /* */
 int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
                      vout_display_sys_win32_t *sys, bool projection_gestures)
@@ -130,13 +125,6 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area, vout_dis
         msg_Dbg(vd, "UpdateRects image_dst coords: %i,%i %ix%i",
             area->place.x, area->place.y, area->place.width, area->place.height);
 #endif
-
-#if !VLC_WINSTORE_APP
-        if (sys->event != NULL)
-        {
-            CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
-        }
-#endif
     }
 }
 
@@ -145,56 +133,9 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area, vout_dis
 void CommonWindowClean(vlc_object_t *obj, vout_display_sys_win32_t *sys)
 {
     if (sys->event) {
-        CommonChangeThumbnailClip(obj, sys, false);
         EventThreadStop(sys->event);
         EventThreadDestroy(sys->event);
     }
-}
-
-/* */
-static void CommonChangeThumbnailClip(vlc_object_t *obj, vout_display_sys_win32_t *sys, bool show)
-{
-    /* Windows 7 taskbar thumbnail code */
-    OSVERSIONINFO winVer;
-    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if (!GetVersionEx(&winVer) || winVer.dwMajorVersion <= 5)
-        return;
-
-    if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)) )
-        vlc_assert_unreachable();
-
-    void *ptr;
-    if (S_OK == CoCreateInstance(&CLSID_TaskbarList,
-                                 NULL, CLSCTX_INPROC_SERVER,
-                                 &IID_ITaskbarList3,
-                                 &ptr)) {
-        ITaskbarList3 *taskbl = ptr;
-        taskbl->lpVtbl->HrInit(taskbl);
-
-        HWND hroot = GetAncestor(sys->hvideownd, GA_ROOT);
-        RECT video;
-        if (show) {
-            GetWindowRect(sys->hparent, &video);
-            POINT client = {video.left, video.top};
-            if (ScreenToClient(hroot, &client))
-            {
-                unsigned int width = RECTWidth(video);
-                unsigned int height = RECTHeight(video);
-                video.left = client.x;
-                video.top = client.y;
-                video.right = video.left + width;
-                video.bottom = video.top + height;
-            }
-        }
-        HRESULT hr;
-        hr = taskbl->lpVtbl->SetThumbnailClip(taskbl, hroot,
-                                                 show ? &video : NULL);
-        if ( hr != S_OK )
-            msg_Err(obj, "SetThumbNailClip failed: 0x%lX", hr);
-
-        taskbl->lpVtbl->Release(taskbl);
-    }
-    CoUninitialize();
 }
 #endif /* !VLC_WINSTORE_APP */
 
