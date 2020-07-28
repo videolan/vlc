@@ -24,11 +24,13 @@ import "qrc:///style/"
 
 Slider {
     id: control
-    property int barHeight: 5
+
+    property int barHeight: isMiniplayer ? VLCStyle.dp(3) : VLCStyle.dp(5)
     property bool _isHold: false
     property bool _isSeekPointsShown: true
-    
-    anchors.margins: VLCStyle.margin_xxsmall
+    property bool isMiniplayer: false
+
+    anchors.margins: isMiniplayer ? 0 : VLCStyle.margin_xxsmall
 
     Keys.onRightPressed: player.jumpFwd()
     Keys.onLeftPressed: player.jumpBwd()
@@ -203,7 +205,7 @@ Slider {
             id: progressRect
             width: control.visualPosition * parent.width
             height: control.barHeight
-            color: control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.bgHover
+            color: (control.activeFocus || control.isMiniplayer) ? VLCStyle.colors.accent : VLCStyle.colors.bgHover
             radius: control.barHeight
         }
 
