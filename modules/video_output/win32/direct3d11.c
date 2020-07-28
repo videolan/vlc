@@ -89,7 +89,6 @@ struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
     display_win32_area_t     area;
-    video_format_t           texture_fmt;
 
     /* Sensors */
     void *p_sensors;
@@ -298,7 +297,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
 
     CommonInit(vd, &sys->area, cfg);
-    sys->texture_fmt = vd->source;
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
@@ -616,8 +614,8 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             {
                 /* the decoder produced different sizes than the vout, we need to
                  * adjust the vertex */
-                sys->texture_fmt.i_width  = sys->picQuad.i_height = texDesc.Height;
-                sys->texture_fmt.i_height = sys->picQuad.i_width = texDesc.Width;
+                sys->picQuad.i_height = texDesc.Height;
+                sys->picQuad.i_width = texDesc.Width;
 
                 CommonPlacePicture(vd, &sys->area, &sys->sys);
                 UpdateSize(vd);
@@ -815,9 +813,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
         sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
-
-    sys->texture_fmt.i_width  = sys->picQuad.i_width;
-    sys->texture_fmt.i_height = sys->picQuad.i_height;
 
     CommonPlacePicture(vd, &sys->area, &sys->sys);
 
@@ -1113,10 +1108,13 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     {
         /* we need a staging texture */
         ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
+        video_format_t texture_fmt = vd->source;
+        texture_fmt.i_width  = sys->picQuad.i_width;
+        texture_fmt.i_height = sys->picQuad.i_height;
         if (!is_d3d11_opaque(fmt->i_chroma))
-            sys->texture_fmt.i_chroma = sys->picQuad.textureFormat->fourcc;
+            texture_fmt.i_chroma = sys->picQuad.textureFormat->fourcc;
 
-        if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.textureFormat, &sys->texture_fmt, 1, textures, sys->stagingPlanes))
+        if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.textureFormat, &texture_fmt, 1, textures, sys->stagingPlanes))
         {
             msg_Err(vd, "Failed to allocate the staging texture");
             return VLC_EGENERIC;
