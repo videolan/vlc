@@ -314,6 +314,8 @@ Slider {
     }
 
     handle: Rectangle {
+        id: sliderHandle
+
         visible: control.activeFocus
         x: (control.visualPosition * control.availableWidth) - width / 2
         y: (control.barHeight - width) / 2
@@ -321,5 +323,24 @@ Slider {
         implicitHeight: VLCStyle.margin_small
         radius: VLCStyle.margin_small
         color: VLCStyle.colors.accent
+
+        transitions: [
+            Transition {
+                to: "hidden"
+                SequentialAnimation {
+                    NumberAnimation { target: sliderHandle; properties: "implicitWidth,implicitHeight"; to: 0; duration: 150; easing.type: Easing.OutSine}
+                    PropertyAction { target: sliderHandle; property: "visible"; value: false; }
+                }
+            },
+            Transition {
+                to: "visible"
+                SequentialAnimation {
+                    PropertyAction { target: sliderHandle; property: "visible"; value: true; }
+                    NumberAnimation { target: sliderHandle; properties: "implicitWidth,implicitHeight"; to: VLCStyle.margin_small; duration: 150; easing.type: Easing.InSine}
+                }
+            }
+        ]
+
+        state: isMiniplayer ? (control.hovered ? "visible" : "hidden") : undefined
     }
 }
