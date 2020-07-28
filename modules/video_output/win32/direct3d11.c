@@ -809,12 +809,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     /* adjust the decoder sizes to have proper padding */
     sys->picQuad.i_width  = fmt.i_width;
     sys->picQuad.i_height = fmt.i_height;
-    if (!sys->legacy_shader && is_d3d11_opaque(fmt.i_chroma))
-    {
-        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x7F) & ~0x7F;
-        sys->picQuad.i_height = (sys->picQuad.i_height + 0x7F) & ~0x7F;
-    }
-    else
     if ( sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
          sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
     {
