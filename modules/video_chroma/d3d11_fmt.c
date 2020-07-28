@@ -737,7 +737,7 @@ const d3d_format_t *(FindD3D11Format)(vlc_object_t *o,
 #undef AllocateTextures
 int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
                       const d3d_format_t *cfg, const video_format_t *fmt,
-                      unsigned pool_size, ID3D11Texture2D *textures[],
+                      ID3D11Texture2D *textures[],
                       plane_t out_planes[] )
 {
     plane_t planes[PICTURE_PLANE_MAX];
@@ -750,6 +750,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
     texDesc.SampleDesc.Count = 1;
     texDesc.MiscFlags = 0; //D3D11_RESOURCE_MISC_SHARED;
     texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    texDesc.ArraySize = 1;
     if (is_d3d11_opaque(fmt->i_chroma)) {
         texDesc.BindFlags |= D3D11_BIND_DECODER;
         texDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -758,7 +759,6 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
         texDesc.Usage = D3D11_USAGE_DYNAMIC;
         texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     }
-    texDesc.ArraySize = pool_size;
 
     const vlc_chroma_description_t *p_chroma_desc = vlc_fourcc_GetChromaDescription( fmt->i_chroma );
     if( !p_chroma_desc )
@@ -785,7 +785,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
 
         hr = ID3D11Device_CreateTexture2D( d3d_dev->d3ddevice, &texDesc, NULL, &slicedTexture );
         if (FAILED(hr)) {
-            msg_Err(obj, "CreateTexture2D failed for the %d pool. (hr=0x%lX)", pool_size, hr);
+            msg_Err(obj, "CreateTexture2D failed. (hr=0x%lX)", hr);
             goto error;
         }
     }
@@ -800,18 +800,17 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
         p->i_pixel_pitch   = p_chroma_desc->pixel_size;
     }
 
-    for (unsigned picture_count = 0; picture_count < pool_size; picture_count++) {
         for (plane = 0; plane < plane_count; plane++)
         {
             if (slicedTexture) {
-                textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] = slicedTexture;
+                textures[plane] = slicedTexture;
                 ID3D11Texture2D_AddRef(slicedTexture);
             } else {
                 texDesc.Height = planes[plane].i_lines;
                 texDesc.Width  = planes[plane].i_pitch;
-                hr = ID3D11Device_CreateTexture2D( d3d_dev->d3ddevice, &texDesc, NULL, &textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] );
+                hr = ID3D11Device_CreateTexture2D( d3d_dev->d3ddevice, &texDesc, NULL, &textures[plane] );
                 if (FAILED(hr)) {
-                    msg_Err(obj, "CreateTexture2D failed for the %d pool. (hr=0x%lX)", pool_size, hr);
+                    msg_Err(obj, "CreateTexture2D failed for plane %d. (hr=0x%lX)", plane, hr);
                     goto error;
                 }
             }
@@ -823,14 +822,13 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
             }
         for (; plane < D3D11_MAX_SHADER_VIEW; plane++) {
             if (!cfg->resourceFormat[plane])
-                textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] = NULL;
+                textures[plane] = NULL;
             else
             {
-                textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] = textures[picture_count * D3D11_MAX_SHADER_VIEW];
-                ID3D11Texture2D_AddRef(textures[picture_count * D3D11_MAX_SHADER_VIEW + plane]);
+                textures[plane] = textures[0];
+                ID3D11Texture2D_AddRef(textures[plane]);
             }
         }
-    }
 
     if (slicedTexture)
         ID3D11Texture2D_Release(slicedTexture);
@@ -910,7 +908,7 @@ picture_t *D3D11_AllocPicture(vlc_object_t *obj,
 
     d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext(vctx_out);
     if (AllocateTextures(obj, &dev_sys->d3d_dev, cfg,
-                         fmt, 1, pic_ctx->picsys.texture, NULL) != VLC_SUCCESS)
+                         fmt, pic_ctx->picsys.texture, NULL) != VLC_SUCCESS)
     {
         picture_Release(pic);
         free(pic_ctx);

@@ -622,7 +622,7 @@ static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter, filter_sys_t *p_sy
     }
 
     if (AllocateTextures(p_filter, p_sys->d3d_dev, cfg,
-                         &p_dst->format, 1, pic_ctx->picsys.texture, p_dst->p) != VLC_SUCCESS)
+                         &p_dst->format, pic_ctx->picsys.texture, p_dst->p) != VLC_SUCCESS)
         goto done;
 
     if (unlikely(D3D11_AllocateResourceView(p_filter, p_sys->d3d_dev->d3ddevice, cfg,

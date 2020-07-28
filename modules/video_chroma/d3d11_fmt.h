@@ -170,9 +170,9 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *,
     FindD3D11Format(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 
 int AllocateTextures(vlc_object_t *, d3d11_device_t *, const d3d_format_t *,
-                     const video_format_t *, unsigned pool_size, ID3D11Texture2D *textures[],
+                     const video_format_t *, ID3D11Texture2D *textures[],
                      plane_t planes[]);
-#define AllocateTextures(a,b,c,d,e,f,g)  AllocateTextures(VLC_OBJECT(a),b,c,d,e,f,g)
+#define AllocateTextures(a,b,c,d,e,f)  AllocateTextures(VLC_OBJECT(a),b,c,d,e,f)
 
 static inline void d3d11_device_lock(d3d11_device_t *d3d_dev)
 {
