@@ -1094,7 +1094,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         .top    = vd->source.i_y_offset,
         .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
     };
-    if (D3D11_SetupQuad( vd, sys->d3d_dev, &sys->texture_fmt, &sys->picQuad, &sys->display,
+    if (D3D11_SetupQuad( vd, sys->d3d_dev, &vd->source, &sys->picQuad, &sys->display,
                          &source_rect,
                          vd->source.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
