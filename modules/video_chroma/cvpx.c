@@ -458,7 +458,7 @@ Open_CVPX_to_CVPX(vlc_object_t *obj)
     CHECK_CHROMA(filter->fmt_out.video.i_chroma)
 #undef CHECK_CHROMA
 
-    filter_sys_t *p_sys  = filter->p_sys = calloc(1, sizeof(filter_sys_t));
+    filter_sys_t *p_sys  = calloc(1, sizeof(filter_sys_t));
     if (!p_sys)
         return VLC_ENOMEM;
 
@@ -477,6 +477,7 @@ Open_CVPX_to_CVPX(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
+    filter->p_sys = p_sys;
     filter->pf_video_filter = Filter;
     filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
     filter->fmt_out.i_codec = filter->fmt_out.video.i_chroma;
