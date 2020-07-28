@@ -334,6 +334,7 @@ static int Open(vlc_object_t *obj)
         if (dec_dev == NULL)
         {
             msg_Err(p_filter, "Missing decoder device");
+            ret = VLC_EGENERIC;
             goto error;
         }
         const static struct vlc_video_context_operations vt_vctx_ops = {
@@ -344,24 +345,35 @@ static int Open(vlc_object_t *obj)
                                          0, &vt_vctx_ops);
         vlc_decoder_device_Release(dec_dev);
         if (!p_filter->vctx_out)
+        {
+            ret = VLC_ENOMEM;
             goto error;
+        }
 
         p_sys->pool = cvpxpool_create(&p_filter->fmt_out.video, 3);
         if (p_sys->pool == NULL)
+        {
+            ret = VLC_ENOMEM;
             goto error;
+        }
     }
     else
     {
         if (p_filter->vctx_in == NULL ||
             vlc_video_context_GetType(p_filter->vctx_in) != VLC_VIDEO_CONTEXT_CVPX)
-            return VLC_EGENERIC;
+        ret = VLC_EGENERIC;
+        goto error;
     }
 
     p_filter->fmt_out.i_codec = p_filter->fmt_out.video.i_chroma;
     return VLC_SUCCESS;
 error:
     Close(obj);
+    p_filter->p_sys = NULL;
+
+    assert(ret != VLC_SUCCESS);
     return ret;
+
 #undef CASE_CVPX_INPUT
 #undef CASE_CVPX_OUTPUT
 }
