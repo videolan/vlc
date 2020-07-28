@@ -800,35 +800,35 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
         p->i_pixel_pitch   = p_chroma_desc->pixel_size;
     }
 
-        for (plane = 0; plane < plane_count; plane++)
+    for (plane = 0; plane < plane_count; plane++)
+    {
+        if (slicedTexture) {
+            textures[plane] = slicedTexture;
+            ID3D11Texture2D_AddRef(slicedTexture);
+        } else {
+            texDesc.Height = planes[plane].i_lines;
+            texDesc.Width  = planes[plane].i_pitch;
+            hr = ID3D11Device_CreateTexture2D( d3d_dev->d3ddevice, &texDesc, NULL, &textures[plane] );
+            if (FAILED(hr)) {
+                msg_Err(obj, "CreateTexture2D failed for plane %d. (hr=0x%lX)", plane, hr);
+                goto error;
+            }
+        }
+    }
+    if (out_planes)
+        for (plane = 0; plane < p_chroma_desc->plane_count; plane++)
         {
-            if (slicedTexture) {
-                textures[plane] = slicedTexture;
-                ID3D11Texture2D_AddRef(slicedTexture);
-            } else {
-                texDesc.Height = planes[plane].i_lines;
-                texDesc.Width  = planes[plane].i_pitch;
-                hr = ID3D11Device_CreateTexture2D( d3d_dev->d3ddevice, &texDesc, NULL, &textures[plane] );
-                if (FAILED(hr)) {
-                    msg_Err(obj, "CreateTexture2D failed for plane %d. (hr=0x%lX)", plane, hr);
-                    goto error;
-                }
-            }
+            out_planes[plane] = planes[plane];
         }
-        if (out_planes)
-            for (plane = 0; plane < p_chroma_desc->plane_count; plane++)
-            {
-                out_planes[plane] = planes[plane];
-            }
-        for (; plane < D3D11_MAX_SHADER_VIEW; plane++) {
-            if (!cfg->resourceFormat[plane])
-                textures[plane] = NULL;
-            else
-            {
-                textures[plane] = textures[0];
-                ID3D11Texture2D_AddRef(textures[plane]);
-            }
+    for (; plane < D3D11_MAX_SHADER_VIEW; plane++) {
+        if (!cfg->resourceFormat[plane])
+            textures[plane] = NULL;
+        else
+        {
+            textures[plane] = textures[0];
+            ID3D11Texture2D_AddRef(textures[plane]);
         }
+    }
 
     if (slicedTexture)
         ID3D11Texture2D_Release(slicedTexture);
