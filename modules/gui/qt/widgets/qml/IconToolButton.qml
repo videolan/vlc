@@ -34,6 +34,7 @@ ToolButton {
     property color colorOverlay: "transparent"
     property string textOverlay: ""
     property bool borderEnabled: false
+    property bool backgroundVisible: focusBackground.active
 
     enabled: !paintOnly
 
@@ -91,6 +92,7 @@ ToolButton {
     }
 
     background: FocusBackground {
+        id: focusBackground
         active: control.activeFocus || control.hovered || control.highlighted
         implicitHeight: control.size
         implicitWidth: control.size
