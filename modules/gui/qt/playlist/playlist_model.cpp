@@ -325,7 +325,7 @@ PlaylistListModel::getDuration() const
     return VLCTick(d->m_duration);
 }
 
-const PlaylistItem &
+PlaylistItem
 PlaylistListModel::itemAt(int index) const
 {
     Q_D(const PlaylistListModel);
