@@ -304,6 +304,7 @@ Widgets.NavigableFocusScope {
                             text: i18n.qtr("Playlist")
 
                             onClicked:  mainInterface.playlistVisible = !mainInterface.playlistVisible
+                            color: mainInterface.playlistVisible && !playlist_btn.backgroundVisible ? VLCStyle.colors.accent : VLCStyle.colors.buttonText
                         }
                     }
 
