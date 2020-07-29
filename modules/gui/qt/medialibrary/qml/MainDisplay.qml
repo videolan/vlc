@@ -47,12 +47,12 @@ Widgets.NavigableFocusScope {
     }
 
     /// playlist width properties used for binding after resize:
-    // This binding allows playlist to scale when root width changes *even after playlist is resized*
-    // New supposed width of the playlist = root.width / 4
-    // Playlist width difference after playlist resize event: (playlistColumn.__newWidth - playlistColumn.__oldRootWidth / 4)
-    // Scaling factor of the width difference for root width changes: (root.width / playlistColumn.__oldRootWidth)
-    readonly property real playlistDefaultWidth: root.width / 4
-    readonly property real playlistBindingWidth: playlistDefaultWidth + ((playlistColumn.__newWidth - playlistColumn.__oldRootWidth / 4) * root.width / playlistColumn.__oldRootWidth)
+    // Binding allows playlist to scale when root width changes *even after playlist is resized*
+    // New supposed width of the playlist = root.width / playlistColumn.__widthFactor
+    // Playlist width difference after playlist resize event: (playlistColumn.__newWidth - playlistColumn.__oldRootWidth / playlistColumn.__widthFactor)
+    // Width factor of the width difference for root width changes: (root.width / playlistColumn.__oldRootWidth)
+    readonly property real playlistDefaultWidth: root.width / playlistColumn.__widthFactor
+    readonly property real playlistBindingWidth: playlistDefaultWidth + ((playlistColumn.__newWidth - playlistColumn.__oldRootWidth / playlistColumn.__widthFactor) * root.width / playlistColumn.__oldRootWidth)
     readonly property real playlistMinWidth: VLCStyle.dp(225)
     readonly property real playlistMaxWidth: root.width / 2
 
@@ -223,12 +223,13 @@ Widgets.NavigableFocusScope {
                             right: parent.right
                             bottom: parent.bottom
                         }
-                        width: root.width / 4
+                        width: root.width / __widthFactor
                         visible: false
                         focus: false
 
                         property bool expanded: mainInterface.playlistDocked && mainInterface.playlistVisible
-                        property int __newWidth : root.width / 4
+                        property double __widthFactor : mainInterface.playlistWidthFactor ? mainInterface.playlistWidthFactor : 4.0
+                        property int __newWidth : root.width / __widthFactor
                         property int __oldRootWidth : root.width
 
                         onExpandedChanged: {
@@ -367,6 +368,7 @@ Widgets.NavigableFocusScope {
                                                 else
                                                     return playlistBindingWidth
                                             })
+                                            mainInterface.setPlaylistWidthFactor(root.width / playlistColumn.width)
                                         }
                                         cursorShape: Qt.SizeHorCursor
                                     }
