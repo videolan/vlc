@@ -84,17 +84,7 @@ MainUI::MainUI(intf_thread_t *p_intf, MainInterface *mainInterface,  QObject *pa
 
 MainUI::~MainUI()
 {
-    /* Save states */
 
-    m_settings->beginGroup("MainWindow");
-    m_settings->setValue( "pl-dock-status", m_playlistDocked );
-    m_settings->setValue( "ShowRemainingTime", m_showRemainingTime );
-
-    /* Save playlist state */
-    m_settings->setValue( "playlist-visible", m_playlistVisible );
-
-    /* Save the stackCentralW sizes */
-    m_settings->endGroup();
 }
 
 bool MainUI::setup(QQmlEngine* engine)
