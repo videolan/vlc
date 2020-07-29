@@ -84,10 +84,12 @@ Rectangle {
 
         drag.target: dragItem
 
+        property bool __rightButton : false
+
         Connections {
             target: mouse.drag
             onActiveChanged: {
-                if (mouse.button === Qt.RightButton)
+                if (mouse.__rightButton)
                     return
                 if (target.active) {
                     root.dragStarting()
@@ -103,7 +105,13 @@ Rectangle {
 
         onPressed:  {
             if (mouse.button === Qt.RightButton)
+            {
+                __rightButton = true
                 return
+            }
+            else
+                __rightButton = false
+
             var pos = this.mapToGlobal( mouseX, mouseY)
             dragItem.updatePos(pos.x, pos.y)
         }
