@@ -234,9 +234,11 @@ Widgets.NavigableFocusScope {
                         onExpandedChanged: {
                             if (expanded) {
                                 animateExpand.start()
+                                playlistColumn.forceActiveFocus()
                             }
                             else {
                                 animateRetract.start()
+                                stackView.forceActiveFocus()
                             }
                         }
 
