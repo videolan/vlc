@@ -216,6 +216,15 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.leftMargin: VLCStyle.margin_large
 
+                ToolTip {
+                    id: textInfoExtendTooltip
+                    text: textArtistHider.visible ? (textInfoHider.visible ? textInfo.text + '\n' + textArtist.text : textArtist.text) : textInfo.text
+                    visible: (root.hovered || model.selected) && (textArtistHider.visible || textInfoHider.visible)
+                    opacity: 0.75
+                    delay: 1000
+                    timeout: 2000
+                }
+
                 Widgets.ListLabel {
                     id: textInfo
 
