@@ -75,13 +75,6 @@ Widgets.NavigableFocusScope {
         onGridViewChanged: loadView()
     }
 
-    Component {
-        id: headerComponent
-        Widgets.LabelSeparator {
-            text: i18n.qtr("Genres")
-            width: root.width
-        }
-    }
     MLGenreModel {
         id: genreModel
         ml: medialib
@@ -152,8 +145,7 @@ Widgets.NavigableFocusScope {
 
             delegateModel: selectionModel
             model: genreModel
-
-            headerDelegate: headerComponent
+            topMargin: VLCStyle.margin_large
 
             delegate: AudioGridItem {
                 id: gridItem
@@ -193,7 +185,6 @@ Widgets.NavigableFocusScope {
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
 
             model: genreModel
-            header: headerComponent
             headerColor: VLCStyle.colors.bg
             focus: true
             onActionForSelection: _actionAtIndex(index)
