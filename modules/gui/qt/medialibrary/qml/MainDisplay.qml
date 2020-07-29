@@ -46,6 +46,16 @@ Widgets.NavigableFocusScope {
         medialib.reload()
     }
 
+    /// playlist width properties used for binding after resize:
+    // This binding allows playlist to scale when root width changes *even after playlist is resized*
+    // New supposed width of the playlist = root.width / 4
+    // Playlist width difference after playlist resize event: (playlistColumn.__newWidth - playlistColumn.__oldRootWidth / 4)
+    // Scaling factor of the width difference for root width changes: (root.width / playlistColumn.__oldRootWidth)
+    readonly property real playlistDefaultWidth: root.width / 4
+    readonly property real playlistBindingWidth: playlistDefaultWidth + ((playlistColumn.__newWidth - playlistColumn.__oldRootWidth / 4) * root.width / playlistColumn.__oldRootWidth)
+    readonly property real playlistMinWidth: VLCStyle.dp(225)
+    readonly property real playlistMaxWidth: root.width / 2
+
     function loadView() {
         var found = stackView.loadView(root.pageModel, root.view, root.viewProperties)
 
@@ -218,6 +228,8 @@ Widgets.NavigableFocusScope {
                         focus: false
 
                         property bool expanded: mainInterface.playlistDocked && mainInterface.playlistVisible
+                        property int __newWidth : root.width / 4
+                        property int __oldRootWidth : root.width
 
                         onExpandedChanged: {
                             if (expanded) {
@@ -235,9 +247,20 @@ Widgets.NavigableFocusScope {
                             properties: "width"
                             duration: 150
                             from: 0
-                            to: root.width / 4
+                            to: playlistBindingWidth
                             onStarted: {
                                 playlistColumn.visible = true
+                            }
+
+                            onStopped: {
+                                playlistColumn.width = Qt.binding(function() {
+                                    if (playlistBindingWidth < playlistMinWidth)
+                                        return playlistMinWidth
+                                    else if (playlistBindingWidth > playlistMaxWidth)
+                                        return playlistMaxWidth
+                                    else
+                                        return playlistBindingWidth
+                                })
                             }
                         }
 
@@ -321,13 +344,27 @@ Widgets.NavigableFocusScope {
                                             if(drag.active){
                                                 var delta = mouseX - _initialPos
                                                 var newWidth = playlistColumn.width - delta
-
-                                                if (newWidth < root.width / 2 && newWidth > root.width / 8)
+                                                if (newWidth < playlistMaxWidth && newWidth > playlistMinWidth)
                                                     playlistColumn.width -= delta
                                             }
                                         }
                                         onPressed: {
+                                            // This is needed to break binding upon resizing, otherwise sizing glitches occur.
+                                            playlistColumn.width = Number(playlistColumn.width)
+
                                             dragArea._initialPos = mouseX
+                                            playlistColumn.__oldRootWidth = root.width
+                                        }
+                                        onReleased: {
+                                            playlistColumn.__newWidth = playlistColumn.width
+                                            playlistColumn.width = Qt.binding(function() {
+                                                if (playlistBindingWidth < playlistMinWidth)
+                                                    return playlistMinWidth
+                                                else if (playlistBindingWidth > playlistMaxWidth)
+                                                    return playlistMaxWidth
+                                                else
+                                                    return playlistBindingWidth
+                                            })
                                         }
                                         cursorShape: Qt.SizeHorCursor
                                     }
