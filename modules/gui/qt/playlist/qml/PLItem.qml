@@ -62,11 +62,21 @@ Rectangle {
         onSetItemDropIndicatorVisible: {
             if (index === model.index)
             {
-                dropVisible = isVisible
+                if (top)
+                {
+                    // show top drop indicator bar
+                    dropVisible = isVisible
+                }
+                else
+                {
+                    // show bottom drop indicator bar
+                    bottomDropIndicator.visible = isVisible
+                }
             }
         }
     }
 
+    // top drop indicator bar
     Rectangle {
         z: 2
         width: parent.width
@@ -75,6 +85,24 @@ Rectangle {
         antialiasing: true
         visible: dropVisible
         color: _colors.accent
+    }
+
+    // bottom drop indicator bar
+    // only active when the item is the last item in the list
+    Loader {
+        id: bottomDropIndicator
+        active: model.index === root.plmodel.count - 1
+        visible: false
+
+        z: 2
+        width: parent.width
+        height: 1
+        anchors.top: parent.bottom
+        antialiasing: true
+
+        sourceComponent: Rectangle {
+            color: _colors.accent
+        }
     }
 
     MouseArea {
@@ -258,45 +286,63 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                // not visible on the last item since PLItemFooter handles it
-                visible: model.index !== plitem.plmodel.count - 1
+                property bool _isLastItem : model.index === plitem.plmodel.count - 1
 
                 onEntered: {
                     var delta = drag.source.model.index - model.index
                     if(delta === 0 || delta === 1)
                         return
 
-
-                    root.setItemDropIndicatorVisible(model.index + 1, true, true);
+                    if (_isLastItem)
+                    {
+                        root.setItemDropIndicatorVisible(model.index, true, false);
+                    }
+                    else
+                    {
+                        root.setItemDropIndicatorVisible(model.index + 1, true, true);
+                    }
                 }
                 onExited: {
                     var delta = drag.source.model.index - model.index
                     if(delta === 0 || delta === 1)
                         return
 
-                    root.setItemDropIndicatorVisible(model.index + 1, false, true);
+                    if (_isLastItem)
+                    {
+                        root.setItemDropIndicatorVisible(model.index, false, false);
+                    }
+                    else
+                    {
+                        root.setItemDropIndicatorVisible(model.index + 1, false, true);
+                    }
                 }
                 onDropped: {
                     var delta = drag.source.model.index - model.index
                     if(delta === 0 || delta === 1)
                         return
 
-                    plitem.dropedMovedAt(model.index + 1, drop)
-                    root.setItemDropIndicatorVisible(model.index + 1, false, true);
+                    if (_isLastItem)
+                    {
+                        if (drop.hasUrls) {
+                            //force conversion to an actual list
+                            var urlList = []
+                            for ( var url in drop.urls)
+                                urlList.push(drop.urls[url])
+                            mainPlaylistController.insert(root.plmodel.count, urlList)
+                        } else {
+                            root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
+                        }
+                        root.setItemDropIndicatorVisible(model.index, false, false);
+                        drop.accept()
+                    }
+                    else
+                    {
+                        plitem.dropedMovedAt(model.index + 1, drop)
+                        root.setItemDropIndicatorVisible(model.index + 1, false, true);
+                    }
                 }
             }
 
-            PLItemFooter {
-               Layout.fillWidth: true
-               Layout.fillHeight: true
-
-               visible: !lowerDropArea.visible
-
-               dropIndicatorBottom: true
-               onDropURLAtEnd: mainPlaylistController.insert(plitem.plmodel.count, urlList)
-               onMoveAtEnd: plitem.plmodel.moveItemsPost(plitem.plmodel.getSelection(), plitem.plmodel.count - 1)
-               listCount: plitem.plmodel.count
-            }
         }
     }
 }
