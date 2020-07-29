@@ -28,17 +28,22 @@ Item {
     signal moveAtEnd()
 
     property bool _dropVisible: false
+    property bool dropIndicatorBottom: false
 
     width: parent.width
     height: Math.max(VLCStyle.icon_normal, view.height - y)
 
-    Rectangle {
+    Loader {
+        active: !dropIndicatorBottom
         width: parent.width
         anchors.top: parent.top
         antialiasing: true
-        height: 2
+        height: 1
         visible: foot._dropVisible
-        color: VLCStyle.colors.accent
+
+        sourceComponent: Rectangle {
+            color: VLCStyle.colors.accent
+        }
     }
 
     DropArea {
@@ -70,6 +75,19 @@ Item {
             }
             drop.accept()
             foot._dropVisible = false
+        }
+    }
+
+    Loader {
+        active: dropIndicatorBottom
+        width: parent.width
+        anchors.top: parent.bottom
+        antialiasing: true
+        height: 1
+        visible: foot._dropVisible
+
+        sourceComponent: Rectangle {
+            color: VLCStyle.colors.accent
         }
     }
 }

@@ -42,6 +42,8 @@ Widgets.NavigableFocusScope {
     property bool forceDark: false
     property VLCColors _colors: forceDark ? vlcNightColors : VLCStyle.colors
 
+    signal setItemDropIndicatorVisible(int index, bool isVisible)
+
     VLCColors {id: vlcNightColors; state: "night"}
 
     Rectangle {

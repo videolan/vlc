@@ -28,7 +28,7 @@ import "qrc:///style/"
 
 
 Rectangle {
-    id: root
+    id: plitem
 
     property var plmodel
 
@@ -56,6 +56,16 @@ Rectangle {
 
     property bool dropVisible: false
 
+    Connections {
+        target: root
+
+        onSetItemDropIndicatorVisible: {
+            if (index === model.index)
+            {
+                dropVisible = isVisible
+            }
+        }
+    }
 
     Rectangle {
         z: 2
@@ -75,11 +85,11 @@ Rectangle {
         acceptedButtons: acceptedButtons | Qt.RightButton
 
         onClicked:{
-            root.itemClicked(mouse.button, mouse.modifiers);
+            plitem.itemClicked(mouse.button, mouse.modifiers);
         }
         onDoubleClicked: {
             if (mouse.button !== Qt.RightButton)
-                root.itemDoubleClicked(mouse.buttons, mouse.modifiers);
+                plitem.itemDoubleClicked(mouse.buttons, mouse.modifiers);
         }
 
         drag.target: dragItem
@@ -92,7 +102,7 @@ Rectangle {
                 if (mouse.__rightButton)
                     return
                 if (target.active) {
-                    root.dragStarting()
+                    plitem.dragStarting()
                     dragItem.model = model
                     dragItem.count = plmodel.getSelection().length
                     dragItem.visible = true
@@ -124,15 +134,15 @@ Rectangle {
         Rectangle {
             color: _colors.bg
             anchors.fill: parent
-            visible: model.isCurrent && !root.hovered && !model.selected
+            visible: model.isCurrent && !plitem.hovered && !model.selected
         }
 
         RowLayout {
             id: content
             anchors {
                 fill: parent
-                leftMargin: root.leftPadding
-                rightMargin: root.rightPadding
+                leftMargin: plitem.leftPadding
+                rightMargin: plitem.rightPadding
             }
 
             Item {
@@ -208,32 +218,84 @@ Rectangle {
                     text: "-00:00-"
                 }
             }
-
         }
 
-        DropArea {
-            anchors { fill: parent }
-            onEntered: {
-                var delta = drag.source.model.index - model.index
-                if(delta === 0 || delta === -1)
-                    return
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 0
 
-                dropVisible = true
+            DropArea {
+                id: higherDropArea
+                Layout.fillWidth: true
+                Layout.preferredHeight: parent.height / 2
+
+                onEntered: {
+                    var delta = drag.source.model.index - model.index
+                    if(delta === 0 || delta === -1)
+                        return
+
+                    dropVisible = true
+                }
+                onExited: {
+                    var delta = drag.source.model.index - model.index
+                    if(delta === 0 || delta === -1)
+                        return
+
+                    dropVisible = false
+                }
+                onDropped: {
+                    var delta = drag.source.model.index - model.index
+                    if(delta === 0 || delta === -1)
+                        return
+
+                    plitem.dropedMovedAt(model.index, drop)
+                    dropVisible = false
+                }
             }
-            onExited: {
-                var delta = drag.source.model.index - model.index
-                if(delta === 0 || delta === -1)
-                    return
 
-                dropVisible = false
+            DropArea {
+                id: lowerDropArea
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                // not visible on the last item since PLItemFooter handles it
+                visible: model.index !== plitem.plmodel.count - 1
+
+                onEntered: {
+                    var delta = drag.source.model.index - model.index
+                    if(delta === 0 || delta === 1)
+                        return
+
+
+                    root.setItemDropIndicatorVisible(model.index + 1, true, true);
+                }
+                onExited: {
+                    var delta = drag.source.model.index - model.index
+                    if(delta === 0 || delta === 1)
+                        return
+
+                    root.setItemDropIndicatorVisible(model.index + 1, false, true);
+                }
+                onDropped: {
+                    var delta = drag.source.model.index - model.index
+                    if(delta === 0 || delta === 1)
+                        return
+
+                    plitem.dropedMovedAt(model.index + 1, drop)
+                    root.setItemDropIndicatorVisible(model.index + 1, false, true);
+                }
             }
-            onDropped: {
-                var delta = drag.source.model.index - model.index
-                if(delta === 0 || delta === -1)
-                    return
 
-                root.dropedMovedAt(model.index, drop)
-                dropVisible = false
+            PLItemFooter {
+               Layout.fillWidth: true
+               Layout.fillHeight: true
+
+               visible: !lowerDropArea.visible
+
+               dropIndicatorBottom: true
+               onDropURLAtEnd: mainPlaylistController.insert(plitem.plmodel.count, urlList)
+               onMoveAtEnd: plitem.plmodel.moveItemsPost(plitem.plmodel.getSelection(), plitem.plmodel.count - 1)
+               listCount: plitem.plmodel.count
             }
         }
     }
