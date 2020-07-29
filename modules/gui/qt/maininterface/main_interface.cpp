@@ -144,8 +144,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf )
     /* Set the other interface settings */
     settings = getSettings();
 
-    /* */
+    /* playlist settings */
     b_playlistDocked = getSettings()->value( "MainWindow/pl-dock-status", true ).toBool();
+    playlistVisible  = getSettings()->value( "MainWindow/playlist-visible", false ).toBool();
+
     m_showRemainingTime = getSettings()->value( "MainWindow/ShowRemainingTime", false ).toBool();
 
     /* Should the UI stays on top of other windows */
