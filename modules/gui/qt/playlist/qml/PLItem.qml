@@ -250,6 +250,9 @@ Rectangle {
 
         ColumnLayout {
             anchors.fill: parent
+            // exceed bottom boundary by the height of item separator to prevent drop indicator bar visible glitch
+            anchors.bottomMargin: -1
+
             spacing: 0
 
             DropArea {
