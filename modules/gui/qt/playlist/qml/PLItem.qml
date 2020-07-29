@@ -160,6 +160,7 @@ Rectangle {
         }
 
         Rectangle {
+            id: selectedBackground
             color: _colors.bg
             anchors.fill: parent
             visible: model.isCurrent && !plitem.hovered && !model.selected
@@ -211,6 +212,7 @@ Rectangle {
             }
 
             Column {
+                id: textInfoColumn
                 Layout.fillWidth: true
                 Layout.leftMargin: VLCStyle.margin_large
 
@@ -220,6 +222,25 @@ Rectangle {
                     font.weight: model.isCurrent ? Font.Bold : Font.Normal
                     text: model.title
                     color: _colors.text
+
+                    Item {
+                        id: textInfoHider
+                        anchors.fill: parent
+
+                        visible: textInfo.width + textInfoColumn.x > textDuration.x
+
+                        LinearGradient {
+                            anchors.fill: parent
+                            start: Qt.point(0, 0)
+                            end: Qt.point(parent.width - (textInfo.width + textInfoColumn.x - textDuration.x), 0)
+                            gradient: Gradient {
+                                GradientStop { position: 0.75; color: "transparent" }
+                                GradientStop { position: 1.0; color: selectedBackground.visible === true ? selectedBackground.color
+                                                                                                         : Qt.colorEqual(plitem.color, "transparent") ? _colors.banner
+                                                                                                         : plitem.color }
+                            }
+                        }
+                    }
                 }
 
                 Widgets.ListSubtitleLabel {
@@ -228,6 +249,25 @@ Rectangle {
                     font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
                     text: (model.artist ? model.artist : i18n.qtr("Unknown Artist"))
                     color: _colors.text
+
+                    Item {
+                        id: textArtistHider
+                        anchors.fill: parent
+
+                        visible: textArtist.width + textInfoColumn.x > textDuration.x
+
+                        LinearGradient {
+                            anchors.fill: parent
+                            start: Qt.point(0, 0)
+                            end: Qt.point(parent.width - (textArtist.width + textInfoColumn.x - textDuration.x), 0)
+                            gradient: Gradient {
+                                GradientStop { position: 0.75; color: "transparent" }
+                                GradientStop { position: 1.0; color: selectedBackground.visible === true ? selectedBackground.color
+                                                                                                         : Qt.colorEqual(plitem.color, "transparent") ? _colors.banner
+                                                                                                         : plitem.color }
+                            }
+                        }
+                    }
                 }
             }
 
