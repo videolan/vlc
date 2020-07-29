@@ -54,6 +54,7 @@ public:
     Q_PROPERTY(QString album READ getAlbum CONSTANT )
     Q_PROPERTY(QUrl artwork READ getArtwork CONSTANT )
     Q_PROPERTY(vlc_tick_t duration READ getDuration CONSTANT )
+    Q_PROPERTY(QUrl url READ getUrl CONSTANT )
 
     PlaylistItem(vlc_playlist_item_t *item = nullptr);
 
@@ -76,6 +77,8 @@ public:
 
     vlc_tick_t getDuration() const;
 
+    QUrl getUrl() const;
+
 
     void sync();
 
@@ -92,6 +95,8 @@ private:
         QUrl artwork;
 
         vlc_tick_t duration;
+
+        QUrl url;
     };
 
     QExplicitlySharedDataPointer<Data> d;
