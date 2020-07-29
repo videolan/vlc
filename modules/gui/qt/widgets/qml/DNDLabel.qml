@@ -39,8 +39,8 @@ Rectangle {
 
     function updatePos(x, y) {
         var pos = root.mapFromGlobal(x, y)
-        dragItem.x = pos.x + 10
-        dragItem.y = pos.y + 10
+        dragItem.x = pos.x
+        dragItem.y = pos.y
     }
 
     Text {

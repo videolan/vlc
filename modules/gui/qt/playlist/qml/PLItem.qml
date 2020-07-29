@@ -111,9 +111,14 @@ Rectangle {
             }
             else
                 __rightButton = false
+        }
 
-            var pos = this.mapToGlobal( mouseX, mouseY)
-            dragItem.updatePos(pos.x, pos.y)
+        onPositionChanged: {
+            if (dragItem.visible)
+            {
+                var pos = this.mapToGlobal( mouseX, mouseY)
+                dragItem.updatePos(pos.x + VLCStyle.dp(15), pos.y)
+            }
         }
 
         Rectangle {
