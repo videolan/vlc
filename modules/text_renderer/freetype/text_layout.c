@@ -118,7 +118,7 @@ typedef struct run_desc_t
 typedef struct glyph_bitmaps_t
 {
     vlc_ftcache_glyph_t cglyph;
-    FT_Glyph p_outline;
+    vlc_ftcache_custom_glyph_t coutline;
     FT_Glyph p_shadow;
     FT_BBox  glyph_bbox;
     FT_BBox  outline_bbox;
@@ -939,10 +939,8 @@ static int RemoveZeroWidthCharacters( filter_t *p_filter, paragraph_t *p_paragra
          || ( ch >= 0x200b && ch <= 0x200f ) )
         {
             glyph_bitmaps_t *p_bitmaps = p_paragraph->p_glyph_bitmaps + i;
-            if( p_bitmaps->p_outline )
-                FT_Done_Glyph( p_bitmaps->p_outline );
+            vlc_ftcache_Custom_Glyph_Release( &p_bitmaps->coutline );
             vlc_ftcache_Glyph_Release( p_sys->ftcache, &p_bitmaps->cglyph );
-            p_bitmaps->p_outline = 0;
             p_bitmaps->p_shadow = 0;
             p_bitmaps->i_x_advance = 0;
             p_bitmaps->i_y_advance = 0;
@@ -975,11 +973,20 @@ static void ReleaseGlyphBitMaps(filter_t *p_filter, glyph_bitmaps_t *p_bitmaps)
     filter_sys_t *p_sys = p_filter->p_sys;
     if( p_bitmaps->p_shadow &&
         p_bitmaps->p_shadow != p_bitmaps->cglyph.p_glyph &&
-        p_bitmaps->p_shadow != p_bitmaps->p_outline )
+        p_bitmaps->p_shadow != p_bitmaps->coutline.p_glyph )
         FT_Done_Glyph( p_bitmaps->p_shadow );
-    if( p_bitmaps->p_outline )
-        FT_Done_Glyph( p_bitmaps->p_outline );
+    vlc_ftcache_Custom_Glyph_Release( &p_bitmaps->coutline );
     vlc_ftcache_Glyph_Release( p_sys->ftcache, &p_bitmaps->cglyph );
+}
+
+static int CreateOutlinedGlyph( FT_Glyph src, FT_Glyph *dest, void *priv )
+{
+    filter_t *p_filter = priv;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    if(FT_Glyph_StrokeBorder( &src, p_sys->p_stroker, 0, 0 ))
+        return -1;
+    *dest = src;
+    return 0;
 }
 
 /**
@@ -1027,13 +1034,14 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
             else continue; /* can't do much from now */
         }
 
+        int i_stroker_radius = 0;
         if( p_sys->p_stroker && (p_style->i_style_flags & STYLE_OUTLINE) )
         {
             double f_outline_thickness = p_sys->i_outline_thickness / 100.0;
             f_outline_thickness = VLC_CLIP( f_outline_thickness, 0.0, 0.5 );
-            int i_radius = ( metrics.height_px << 6 ) * f_outline_thickness;
+            i_stroker_radius = ( metrics.height_px << 6 ) * f_outline_thickness;
             FT_Stroker_Set( p_sys->p_stroker,
-                            i_radius,
+                            i_stroker_radius,
                             FT_STROKER_LINECAP_ROUND,
                             FT_STROKER_LINEJOIN_ROUND, 0 );
         }
@@ -1054,7 +1062,7 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
 #define SKIP_GLYPH( p_bitmaps ) \
     { \
         vlc_ftcache_Glyph_Init( &p_bitmaps->cglyph );\
-        p_bitmaps->p_outline = 0; \
+        vlc_ftcache_Custom_Glyph_Init( &p_bitmaps->coutline ); \
         p_bitmaps->p_shadow = 0; \
         p_bitmaps->i_x_advance = 0; \
         p_bitmaps->i_y_advance = 0; \
@@ -1128,15 +1136,17 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
             /* !warn: style STYLE_OUTLINE != glyph FORMAT_OUTLINE */
             if( p_sys->p_stroker && (p_style->i_style_flags & STYLE_OUTLINE) )
             {
-                p_bitmaps->p_outline = p_bitmaps->cglyph.p_glyph;
-                if( FT_Glyph_StrokeBorder( &p_bitmaps->p_outline,
-                                           p_sys->p_stroker, 0, 0 ) )
-                    p_bitmaps->p_outline = 0;
+                p_bitmaps->coutline.p_glyph =
+                    vlc_ftcache_GetOutlinedGlyph( p_sys->ftcache, p_run->p_faceid, i_glyph_index,
+                                                  &metrics, style_flags, i_stroker_radius,
+                                                  p_bitmaps->cglyph.p_glyph,
+                                                  CreateOutlinedGlyph, p_filter,
+                                                  &p_bitmaps->coutline.ref );
             }
 
             if( p_style->i_shadow_alpha != STYLE_ALPHA_TRANSPARENT )
-                p_bitmaps->p_shadow = p_bitmaps->p_outline ?
-                                      p_bitmaps->p_outline : p_bitmaps->cglyph.p_glyph;
+                p_bitmaps->p_shadow = p_bitmaps->coutline.p_glyph ?
+                                      p_bitmaps->coutline.p_glyph : p_bitmaps->cglyph.p_glyph;
 
             if( b_overwrite_advance )
             {
@@ -1265,12 +1275,15 @@ static int LayoutLine( filter_t *p_filter,
         vlc_ftcache_Glyph_Release( p_sys->ftcache, &p_bitmaps->cglyph );
         p_bitmaps->cglyph.p_glyph = bitmapglyph;
 
-        if( p_bitmaps->p_outline &&
-            FT_Glyph_To_Bitmap( &p_bitmaps->p_outline, FT_RENDER_MODE_NORMAL,
-                                &pen_new, 1 ) )
+        if( p_bitmaps->coutline.p_glyph )
         {
-            FT_Done_Glyph( p_bitmaps->p_outline );
-            p_bitmaps->p_outline = 0;
+            bitmapglyph = p_bitmaps->coutline.p_glyph;
+            if( FT_Glyph_To_Bitmap( &bitmapglyph,
+                                    FT_RENDER_MODE_NORMAL,
+                                    &pen_new, 0 ) )
+                bitmapglyph = NULL;
+            vlc_ftcache_Custom_Glyph_Release( &p_bitmaps->coutline );
+            p_bitmaps->coutline.p_glyph = bitmapglyph;
         }
 
         FT_Glyph_Get_CBox( p_bitmaps->cglyph.p_glyph, FT_GLYPH_BBOX_PIXELS,
@@ -1278,11 +1291,11 @@ static int LayoutLine( filter_t *p_filter,
         FixGlyph( p_bitmaps->cglyph.p_glyph, &p_bitmaps->glyph_bbox,
                   p_bitmaps->i_x_advance, p_bitmaps->i_y_advance,
                   &pen_new );
-        if( p_bitmaps->p_outline )
+        if( p_bitmaps->coutline.p_glyph )
         {
-            FT_Glyph_Get_CBox( p_bitmaps->p_outline, FT_GLYPH_BBOX_PIXELS,
+            FT_Glyph_Get_CBox( p_bitmaps->coutline.p_glyph, FT_GLYPH_BBOX_PIXELS,
                                &p_bitmaps->outline_bbox );
-            FixGlyph( p_bitmaps->p_outline, &p_bitmaps->outline_bbox,
+            FixGlyph( p_bitmaps->coutline.p_glyph, &p_bitmaps->outline_bbox,
                       p_bitmaps->i_x_advance, p_bitmaps->i_y_advance,
                       &pen_new );
         }
@@ -1338,7 +1351,7 @@ static int LayoutLine( filter_t *p_filter,
         }
 
         p_ch->p_glyph = ( FT_BitmapGlyph ) p_bitmaps->cglyph.p_glyph;
-        p_ch->p_outline = ( FT_BitmapGlyph ) p_bitmaps->p_outline;
+        p_ch->p_outline = ( FT_BitmapGlyph ) p_bitmaps->coutline.p_glyph;
         p_ch->p_shadow = ( FT_BitmapGlyph ) p_bitmaps->p_shadow;
 
         p_ch->i_line_thickness = i_line_thickness;
@@ -1346,7 +1359,7 @@ static int LayoutLine( filter_t *p_filter,
 
         /* Compute bounding box for all glyphs */
         p_ch->bbox = p_bitmaps->glyph_bbox;
-        if( p_bitmaps->p_outline )
+        if( p_bitmaps->coutline.p_glyph )
             BBoxEnlarge( &p_ch->bbox, &p_bitmaps->outline_bbox );
         if( p_bitmaps->p_shadow )
             BBoxEnlarge( &p_ch->bbox, &p_bitmaps->shadow_bbox );

@@ -32,6 +32,7 @@
 
 #include "ftcache.h"
 #include "platform_fonts.h"
+#include "lru.h"
 
 struct vlc_ftcache_t
 {
@@ -42,8 +43,16 @@ struct vlc_ftcache_t
     FTC_Manager       cachemanager;
     FTC_ImageCache    image_cache;
     FTC_CMapCache     charmap_cache;
+    /* Derived glyph cache */
+    vlc_lru *         glyphs_lrucache;
     /* current face properties */
     FT_Long           style_flags;
+};
+
+struct vlc_ftcache_custom_glyph_ref_Rec_
+{
+    FT_Glyph glyph;
+    unsigned refcount;
 };
 
 vlc_face_id_t * vlc_ftcache_GetFaceID( vlc_ftcache_t *ftcache,
@@ -166,6 +175,17 @@ static FT_Error RequestFace( FTC_FaceID face_id, FT_Library library,
     return 0;
 }
 
+static void LRUGlyphRefRelease( void *v )
+{
+    vlc_ftcache_custom_glyph_ref_t ref = (vlc_ftcache_custom_glyph_ref_t) v;
+    assert(ref->refcount);
+    if( --ref->refcount == 0 )
+    {
+        FT_Done_Glyph( ref->glyph );
+        free( ref );
+    }
+}
+
 static void FreeFaceID( void *p_faceid, void *p_obj )
 {
     VLC_UNUSED(p_obj);
@@ -176,6 +196,9 @@ static void FreeFaceID( void *p_faceid, void *p_obj )
 
 void vlc_ftcache_Delete( vlc_ftcache_t *ftcache )
 {
+    if( ftcache->glyphs_lrucache )
+        vlc_lru_Release( ftcache->glyphs_lrucache );
+
     if( ftcache->cachemanager )
         FTC_Manager_Done( ftcache->cachemanager );
 
@@ -196,7 +219,10 @@ vlc_ftcache_t * vlc_ftcache_New( vlc_object_t *obj, FT_Library p_library,
     /* Dictionnaries for fonts */
     vlc_dictionary_init( &ftcache->face_ids, 50 );
 
-    if(FTC_Manager_New( p_library, 4, 8, maxkb << 10,
+    ftcache->glyphs_lrucache = vlc_lru_New( 128, LRUGlyphRefRelease );
+
+    if(!ftcache->glyphs_lrucache ||
+       FTC_Manager_New( p_library, 4, 8, maxkb << 10,
                         RequestFace, ftcache, &ftcache->cachemanager ) ||
        FTC_ImageCache_New( ftcache->cachemanager, &ftcache->image_cache ) ||
        FTC_CMapCache_New( ftcache->cachemanager, &ftcache->charmap_cache ))
@@ -231,4 +257,84 @@ void vlc_ftcache_Glyph_Init( vlc_ftcache_glyph_t *g )
 {
     g->p_glyph = NULL;
     g->ref = NULL;
+}
+
+static vlc_ftcache_custom_glyph_ref_t
+vlc_ftcache_GetCustomGlyph( vlc_ftcache_t *ftcache, const char *psz_key )
+{
+    vlc_ftcache_custom_glyph_ref_t ref = vlc_lru_Get( ftcache->glyphs_lrucache, psz_key );
+    if( ref )
+        ref->refcount++;
+    return ref;
+}
+
+static vlc_ftcache_custom_glyph_ref_t
+vlc_ftcache_AddCustomGlyph( vlc_ftcache_t *ftcache, const char *psz_key, FT_Glyph glyph )
+{
+    assert(!vlc_lru_Get( ftcache->glyphs_lrucache, psz_key ));
+    vlc_ftcache_custom_glyph_ref_t ref = malloc( sizeof(*ref) );
+    if( ref )
+    {
+        ref->refcount = 2;
+        ref->glyph = glyph;
+        vlc_lru_Insert( ftcache->glyphs_lrucache, psz_key, ref );
+    }
+    return ref;
+}
+
+void vlc_ftcache_Custom_Glyph_Release( vlc_ftcache_custom_glyph_t *g )
+{
+    if( g->ref )
+    {
+        assert(g->ref->refcount);
+        if( --g->ref->refcount == 0 )
+        {
+            FT_Done_Glyph( g->ref->glyph );
+            free( g->ref );
+        }
+        vlc_ftcache_Custom_Glyph_Init( g );
+    }
+}
+
+void vlc_ftcache_Custom_Glyph_Init( vlc_ftcache_custom_glyph_t *g )
+{
+    g->p_glyph = NULL;
+    g->ref = NULL;
+}
+
+FT_Glyph vlc_ftcache_GetOutlinedGlyph( vlc_ftcache_t *ftcache, const vlc_face_id_t *faceid,
+                                       FT_UInt index, const vlc_ftcache_metrics_t *metrics,
+                                       FT_Long style, int radius, const FT_Glyph sourceglyph,
+                                       int(*createOutline)(FT_Glyph, FT_Glyph *, void *),
+                                       void *priv,
+                                       vlc_ftcache_custom_glyph_ref_t *p_ref )
+{
+    char *psz_key;
+    if( asprintf( &psz_key, "%s#%d#%d#%d,%d,%d,%lx,%d",
+                  faceid->psz_filename, faceid->idx,
+                  faceid->charmap_index, index,
+                  metrics->width_px, metrics->height_px, style, radius ) < 0 )
+    {
+        *p_ref = NULL;
+        return NULL;
+    }
+
+    FT_Glyph glyph = NULL;
+    *p_ref = vlc_ftcache_GetCustomGlyph( ftcache, psz_key );
+    if( *p_ref )
+    {
+        glyph = (*p_ref)->glyph;
+    }
+    else
+    {
+        if( !createOutline( sourceglyph, &glyph, priv ) )
+            *p_ref = vlc_ftcache_AddCustomGlyph( ftcache, psz_key, glyph );
+        if( !*p_ref )
+        {
+            FT_Done_Glyph( glyph );
+            return NULL;
+        }
+    }
+    free( psz_key );
+    return glyph;
 }
