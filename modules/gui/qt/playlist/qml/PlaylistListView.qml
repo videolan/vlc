@@ -162,6 +162,17 @@ Widgets.NavigableFocusScope {
             }
 
             Widgets.MenuItemExt {
+                text: i18n.qtr("Save")
+                onTriggered: {
+                    var selection = contextMenu.model.getSelection()
+                    if (selection.length === 0)
+                        return
+
+                    dialogProvider.streamingDialog(selection.map(function(i) { return contextMenu.model.itemAt(i).url; }))
+                }
+            }
+
+            Widgets.MenuItemExt {
                 text: i18n.qtr("Information...")
                 icon.source: "qrc:/menu/info.svg"
                 icon.width: VLCStyle.icon_small
