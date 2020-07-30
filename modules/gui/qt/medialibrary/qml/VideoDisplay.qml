@@ -145,10 +145,12 @@ Widgets.NavigableFocusScope {
             delegateModel: selectionModel
             model: videoModel
 
-            headerDelegate: Widgets.LabelSeparator {
-                id: videosSeparator
-                width: videosGV.width
+            headerDelegate: Widgets.SubtitleLabel {
                 text: i18n.qtr("Videos")
+                leftPadding: videosGV.rowX
+                topPadding: VLCStyle.margin_large
+                bottomPadding: VLCStyle.margin_normal
+                width: root.width
             }
 
             delegate: VideoGridItem {
