@@ -42,6 +42,7 @@ Widgets.NavigableFocusScope {
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
     property int gridViewMarginTop: VLCStyle.margin_large
+    property var gridViewRowX: medialib.gridView ? view.currentItem.rowX : undefined
 
     navigationCancel: function() {
         if (view.currentItem.currentIndex <= 0) {

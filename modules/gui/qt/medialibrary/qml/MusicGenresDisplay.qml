@@ -88,10 +88,17 @@ Widgets.NavigableFocusScope {
         id: albumGenreComponent
         /* List View */
         MusicAlbums {
+            id: albumsView
+
             property string genreName: ""
 
-            header: Widgets.LabelSeparator {
+            gridViewMarginTop: 0
+
+            header: Widgets.SubtitleLabel {
                 text: i18n.qtr("Genres - %1").arg(genreName)
+                leftPadding: (albumsView.gridViewRowX || VLCStyle.margin_large)
+                topPadding: VLCStyle.margin_large
+                bottomPadding: VLCStyle.margin_normal
                 width: root.width
             }
 
