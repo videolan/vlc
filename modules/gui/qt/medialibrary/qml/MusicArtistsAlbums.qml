@@ -85,6 +85,13 @@ Widgets.NavigableFocusScope {
         focus: visible
         anchors.fill: parent
 
+    Rectangle {
+        width: parent.width * 0.25
+        height: parent.height
+        color: VLCStyle.colors.bgAlt
+        opacity: .8
+    }
+
     Row {
         anchors.fill: parent
 
