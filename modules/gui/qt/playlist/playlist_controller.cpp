@@ -23,8 +23,10 @@
 #include "playlist_controller.hpp"
 #include "playlist_controller_p.hpp"
 #include "vlc_player.h"
+#include "vlc_url.h"
 #include <algorithm>
 #include <QVariant>
+#include <QDesktopServices>
 
 namespace vlc {
   namespace playlist {
@@ -459,6 +461,32 @@ void PlaylistControllerModel::sort(PlaylistControllerModel::SortKey key, Playlis
     };
     QVector<vlc_playlist_sort_criterion> criteria { crit };
     sort( criteria );
+}
+
+void PlaylistControllerModel::explore(const PlaylistItem& pItem)
+{
+    vlc_playlist_item_t * const playlistItem = pItem.raw();
+    if( playlistItem )
+    {
+        input_item_t * const p_input = vlc_playlist_item_GetMedia(playlistItem);
+        char * const uri = input_item_GetURI(p_input);
+
+        if( uri && uri[0] != '\0')
+        {
+            char * const path = vlc_uri2path( uri );
+
+            if( !path )
+                return;
+
+            QUrl file = QUrl::fromLocalFile( QFileInfo(path).absolutePath() );
+            free( path );
+
+            if( !file.isLocalFile() )
+                return;
+
+            QDesktopServices::openUrl( file );
+        }
+    }
 }
 
 void PlaylistControllerModel::play()
