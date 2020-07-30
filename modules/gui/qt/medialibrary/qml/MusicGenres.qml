@@ -219,7 +219,7 @@ Widgets.NavigableFocusScope {
             model: genreModel
             headerColor: VLCStyle.colors.bg
             focus: true
-            onActionForSelection: _actionAtIndex(index)
+            onActionForSelection: _actionAtIndex(selection)
             navigationParent: root
 
             sortModel:  [
