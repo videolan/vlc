@@ -147,26 +147,58 @@ Widgets.NavigableFocusScope {
             model: genreModel
             topMargin: VLCStyle.margin_large
 
-            delegate: AudioGridItem {
-                id: gridItem
+            delegate: Widgets.GridItem {
+                id: item
 
+                property var model: ({})
+                property int index: -1
+
+                width: VLCStyle.colWidth(2)
+                height: width / 2
+                pictureWidth: width
+                pictureHeight: height
                 image: model.cover || VLCStyle.noArtAlbum
-                title: model.name || "Unknown genre"
-                subtitle: ""
+                playCoverBorder.width: VLCStyle.dp(3, VLCStyle.scale)
 
+                onItemDoubleClicked: root.showAlbumView(model)
                 onItemClicked: {
                     selectionModel.updateSelection( modifier , view.currentItem.currentIndex, index)
                     view.currentItem.currentIndex = index
                     view.currentItem.forceActiveFocus()
                 }
+                onPlayClicked: {
+                    if (model.id)
+                        medialib.addAndPlay(model.id)
+                }
 
-                onItemDoubleClicked: root.showAlbumView(model)
+                Column {
+                    anchors.centerIn: parent
+                    opacity: item._highlighted ? .3 : 1
+
+                    Label {
+                         width: item.width
+                         elide: Text.ElideRight
+                         font.pixelSize: VLCStyle.fontSize_large
+                         font.weight: Font.DemiBold
+                         text: model.name
+                         color: "white"
+                         horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Widgets.CaptionLabel {
+                        width: item.width
+                        text: model.nb_tracks > 1 ? i18n.qtr("%1 Tracks").arg(model.nb_tracks) : i18n.qtr("%1 Track").arg(model.nb_tracks)
+                        opacity: .7
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                }
             }
 
             focus: true
 
-            cellWidth: VLCStyle.gridItem_music_width
-            cellHeight: VLCStyle.gridItem_music_height
+            cellWidth: VLCStyle.colWidth(2)
+            cellHeight: cellWidth / 2
 
             onSelectAll: selectionModel.selectAll()
             onSelectionUpdated:  selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
