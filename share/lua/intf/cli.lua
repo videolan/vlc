@@ -498,11 +498,11 @@ function volume(name,client,value)
 end
 
 function rate(name,client,value)
-    local input = vlc.object.input()
+    local playlist = vlc.object.playlist()
     if name == "rate" then
-        vlc.var.set(input, "rate", common.us_tonumber(value))
+        vlc.var.set(playlist, "rate", common.us_tonumber(value))
     elseif name == "normal" then
-        vlc.var.set(input,"rate",1)
+        vlc.var.set(playlist,"rate",1)
     end
 end
 
