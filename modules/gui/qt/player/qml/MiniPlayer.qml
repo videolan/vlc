@@ -96,6 +96,7 @@ Widgets.NavigableFocusScope {
                     Layout.preferredWidth: playingItemInfoRow.implicitWidth
                     width: childrenRect.width
                     focus: true
+                    Layout.leftMargin: VLCStyle.margin_normal
 
                     MouseArea {
                         anchors.fill: parent
@@ -118,8 +119,6 @@ Widgets.NavigableFocusScope {
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
                         anchors.verticalCenter: parent.verticalCenter
-
-                        leftPadding: VLCStyle.margin_normal
 
                         Item {
                             anchors.verticalCenter: parent.verticalCenter
@@ -189,9 +188,10 @@ Widgets.NavigableFocusScope {
                     defaultSize: VLCStyle.icon_normal
 
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.rightMargin: VLCStyle.margin_normal
-                    Layout.preferredWidth: buttonrow.implicitWidth
+                    Layout.fillWidth: true
                     Layout.preferredHeight: buttonrow.implicitHeight
+                    Layout.leftMargin: VLCStyle.margin_normal
+                    Layout.rightMargin: VLCStyle.margin_normal
 
                     navigationParent: root
                     navigationLeftItem: playingItemInfo
