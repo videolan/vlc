@@ -1233,7 +1233,7 @@ static int LayoutLine( filter_t *p_filter,
                                     &pen_shadow, 0 ) )
                 p_bitmaps->p_shadow = 0;
             else
-                FT_Glyph_Get_CBox( p_bitmaps->p_shadow, ft_glyph_bbox_pixels,
+                FT_Glyph_Get_CBox( p_bitmaps->p_shadow, FT_GLYPH_BBOX_PIXELS,
                                    &p_bitmaps->shadow_bbox );
         }
         if( p_bitmaps->p_glyph )
@@ -1249,7 +1249,7 @@ static int LayoutLine( filter_t *p_filter,
                 continue;
             }
             else
-                FT_Glyph_Get_CBox( p_bitmaps->p_glyph, ft_glyph_bbox_pixels,
+                FT_Glyph_Get_CBox( p_bitmaps->p_glyph, FT_GLYPH_BBOX_PIXELS,
                                    &p_bitmaps->glyph_bbox );
         }
         if( p_bitmaps->p_outline )
@@ -1261,7 +1261,7 @@ static int LayoutLine( filter_t *p_filter,
                 p_bitmaps->p_outline = 0;
             }
             else
-                FT_Glyph_Get_CBox( p_bitmaps->p_outline, ft_glyph_bbox_pixels,
+                FT_Glyph_Get_CBox( p_bitmaps->p_outline, FT_GLYPH_BBOX_PIXELS,
                                    &p_bitmaps->outline_bbox );
         }
 

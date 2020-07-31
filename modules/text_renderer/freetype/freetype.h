@@ -48,6 +48,8 @@
 #include FT_STROKER_H
 
 /* Consistency between Freetype versions and platforms */
+#define MAKE_VERSION(a,b,c)     (a*0x100 | b * 0x10 | c)
+#define FREETYPE_VERSION        MAKE_VERSION(FREETYPE_MAJOR, FREETYPE_MINOR, FREETYPE_PATCH)
 #define FT_FLOOR(X)     ((X & -64) >> 6)
 #define FT_CEIL(X)      (((X + 63) & -64) >> 6)
 #ifndef FT_MulFix
@@ -64,6 +66,14 @@ typedef uint32_t uni_char_t;
 # else
 #  define FREETYPE_TO_UCS   "UCS-4LE"
 # endif
+#endif
+
+#if FREETYPE_VERSION < MAKE_VERSION(2,1,5)
+  #define FT_GLYPH_BBOX_UNSCALED    ft_glyph_bbox_unscaled
+  #define FT_GLYPH_BBOX_SUBPIXELS   ft_glyph_bbox_subpixels
+  #define FT_GLYPH_BBOX_GRIDFIT     ft_glyph_bbox_gridfit
+  #define FT_GLYPH_BBOX_TRUNCATE    ft_glyph_bbox_truncate
+  #define FT_GLYPH_BBOX_PIXELS      ft_glyph_bbox_pixels
 #endif
 
 typedef struct vlc_font_select_t vlc_font_select_t;
