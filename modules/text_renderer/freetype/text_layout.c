@@ -1588,7 +1588,10 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
             {
                 i_width = i_width - i_last_space_width;
                 if( i_newline_start + 1 < p_paragraph->i_size )
+                {
                     i_line_start = i_newline_start + 1;
+                    ReleaseGlyphBitMaps( &p_paragraph->p_glyph_bitmaps[ i_newline_start ] );
+                }
                 else
                     i_line_start = i_newline_start; // == i
             }
