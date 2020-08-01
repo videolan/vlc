@@ -37,7 +37,7 @@ local function print_table(name,t)
   if #t ~= 0 then
     for _,v in ipairs(t) do
       print("<"..name..">")
-        print(v)
+        print(vlc.strings.convert_xml_special_chars(v))
       print("</"..name..">")
     end
   end
@@ -68,7 +68,7 @@ local function print_media(m)
         for _, d in ipairs(c.children) do
           local instance = "<instance "
           for _,e in ipairs(d.children) do
-            instance = instance .. e.name .. "=\"" .. e.value .. "\" "
+            instance = instance .. vlc.strings.convert_xml_special_chars(e.name) .. "=\"" .. vlc.strings.convert_xml_special_chars(e.value) .. "\" "
           end
           instance = instance .. "/>"
           table.insert(instances,instance)
@@ -76,8 +76,8 @@ local function print_media(m)
       end
     end
   end
-  print("<"..type_.." name=\""..name.."\" enabled=\""..enabled.."\" loop=\""..loop.."\">\n")
-  print("<output>"..output.."</output>\n")
+  print("<"..type_.." name=\""..vlc.strings.convert_xml_special_chars(name).."\" enabled=\""..vlc.strings.convert_xml_special_chars(enabled).."\" loop=\""..vlc.strings.convert_xml_special_chars(loop).."\">\n")
+  print("<output>"..vlc.strings.convert_xml_special_chars(output).."</output>\n")
   print_table("input",inputs)
   print_table("option",options)
   print "<instances>\n"
@@ -105,7 +105,7 @@ local function print_schedule(m)
       insert_children(c,commands)
     end
   end
-  print("<schedule name=\""..name.."\" enabled=\""..enabled.."\" period=\""..period.."\" repeat=\""..repeat_.."\">\n")
+  print("<schedule name=\""..vlc.strings.convert_xml_special_chars(name).."\" enabled=\""..vlc.strings.convert_xml_special_chars(enabled).."\" period=\""..vlc.strings.convert_xml_special_chars(period).."\" repeat=\""..vlc.strings.convert_xml_special_chars(repeat_).."\">\n")
   print_table("command",commands)
   print("</schedule>\n")
 end
