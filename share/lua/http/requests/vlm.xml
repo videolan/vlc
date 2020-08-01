@@ -130,21 +130,7 @@ local function print_xml(m)
   print "</vlm>"
 end
 
-local function print_msg(m)
-  if not m then return end
-  print("<"..m.name..">\n")
-  if m.children then
-    for _, child in ipairs(m.children) do
-      print_msg(child)
-    end
-  elseif m.value then
-    print(m.value)
-  end
-  print("</"..m.name..">\n")
-end
-
 local msg = vlm:execute_command("show")
 print_xml(msg)
---print_msg(msg)
 
 ?>
