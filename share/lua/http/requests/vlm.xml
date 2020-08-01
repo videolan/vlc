@@ -26,16 +26,9 @@ vim:syntax=lua
 ]]
 
 local function insert_children(c,t)
-  print(c.children)
     if c.children then
       for _, d in ipairs(c.children) do
         table.insert(t,d.value or d.name)
-        if d.value then
-        print("V"..d.value.."|")
-        end
-        if d.name then
-        print("N"..d.name.."|")
-        end
       end
     end
 end
