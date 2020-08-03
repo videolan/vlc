@@ -168,7 +168,7 @@ Slider {
         width: control.availableWidth
         implicitHeight: control.implicitHeight
         height: implicitHeight
-        color:  VLCStyle.colors.setColorAlpha( VLCStyle.colors.playerFg, 0.7 )
+        color:  isMiniplayer ? (VLCStyle.colors.sliderBarMiniplayerBgColor) : VLCStyle.colors.setColorAlpha( VLCStyle.colors.playerFg, 0.7 )
         radius: implicitHeight
 
         MouseArea {
