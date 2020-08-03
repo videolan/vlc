@@ -90,6 +90,8 @@ Widgets.NavigableFocusScope {
                     bottomMargin: VLCStyle.applicationVerticalMargin
                 }
 
+                spacing: VLCStyle.margin_normal
+
                 Widgets.FocusBackground {
                     id: playingItemInfo
                     Layout.fillHeight: true

@@ -47,6 +47,8 @@ RowLayout{
 
     anchors.fill: parent
 
+    spacing: VLCStyle.margin_normal
+
     Repeater{
         id: buttonsRepeater
 
