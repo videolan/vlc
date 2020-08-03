@@ -19,6 +19,7 @@
 import QtQuick 2.11
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.4
+import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 
@@ -138,19 +139,89 @@ Item{
 
     Component{
         id:playBtnDelegate
-        Widgets.IconToolButton {
+
+        Button {
             id: playBtn
-            size: VLCStyle.icon_medium
-            iconText: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
-                   && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
-                  ? VLCIcons.pause
-                  : VLCIcons.play
-            onClicked: mainPlaylistController.togglePlayPause()
+            width: VLCStyle.icon_medium
+            height: width
+
+            // TODO: Bind videoOverlays (set 'true' below) to player property which indicates if video is rendered over player controls
+            property bool videoOverlays: !isMiniplayer && true
+
+            property color color: VLCStyle.colors.buttonText
+            property color colorDisabled: VLCStyle.colors.textInactive
+
             property bool acceptFocus: true
-            text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
-                   && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
-                  ? i18n.qtr("Pause")
-                  : i18n.qtr("Play")
+
+            property bool paintOnly: false
+            enabled: !paintOnly
+
+            onClicked: mainPlaylistController.togglePlayPause()
+
+            contentItem: Label {
+                color: videoOverlays ? (playBtn.enabled ? playBtn.color : playBtn.colorDisabled)
+                                     : (playBtn.enabled ? "#303030" : "#7f8c8d")
+
+                text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
+                       && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
+                      ? VLCIcons.pause
+                      : VLCIcons.play
+
+                font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_normal)
+                font.family: VLCIcons.fontFamily
+
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            background: Item {
+
+                Rectangle {
+                    radius: (width * 0.5)
+                    anchors.fill: parent
+                    anchors.margins: VLCStyle.dp(1)
+
+                    color: VLCStyle.colors.white
+                    opacity: playBtn.videoOverlays ? 0.4 : 1.0
+                }
+
+                Rectangle {
+                    id: outerRect
+                    radius: (width * 0.5)
+                    anchors.fill: parent
+
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: "#f89a06" }
+                        GradientStop { position: 1.0; color: "#e25b01" }
+                    }
+
+                    visible: !opacityMask.visible
+
+                    antialiasing: true
+                }
+
+                Rectangle {
+                    id: innerRect
+                    anchors.fill: parent
+
+                    radius: (width * 0.5)
+                    border.width: VLCStyle.dp(2)
+
+                    color: "transparent"
+                    visible: false
+                }
+
+                OpacityMask {
+                    id: opacityMask
+                    anchors.fill: parent
+
+                    source: outerRect
+                    maskSource: innerRect
+
+                    visible: !(playBtn.activeFocus || playBtn.hovered || playBtn.highlighted)
+                    antialiasing: true
+                }
+            }
         }
     }
 
