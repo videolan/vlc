@@ -97,6 +97,7 @@ static int Android_Nougat_ParseFamily( vlc_font_select_t *fs, xml_reader_t *p_xm
     const char       *psz_val     = NULL;
     const char       *psz_attr    = NULL;
     const char       *psz_name    = NULL;
+    char             *psz_lc      = NULL;
     int               i_type      = 0;
 
     while( ( psz_attr = xml_ReaderNextAttr( p_xml, &psz_val ) ) )
@@ -114,13 +115,11 @@ static int Android_Nougat_ParseFamily( vlc_font_select_t *fs, xml_reader_t *p_xm
          * Family has a name. See if we have that name already.
          * If the name already exists, it's one of the font attachments.
          */
-        char *psz_lc = ToLower( psz_name );
+        psz_lc = LowercaseDup( psz_name );
         if( unlikely( !psz_lc ) )
             return VLC_ENOMEM;
 
         p_family = vlc_dictionary_value_for_key( p_dict, psz_lc );
-
-        free( psz_lc );
     }
 
     if( p_family == NULL )
@@ -132,12 +131,14 @@ static int Android_Nougat_ParseFamily( vlc_font_select_t *fs, xml_reader_t *p_xm
          * Create a new family with the given name or, if psz_name is NULL,
          * with the name fallback-xxxx
          */
-        p_family = NewFamily( fs, psz_name, &fs->p_families,
+        p_family = NewFamilyFromMixedCase( fs, psz_lc, &fs->p_families,
                               &fs->family_map, NULL );
-
-        if( unlikely( !p_family ) )
-            return VLC_ENOMEM;
     }
+
+    free( psz_lc );
+
+    if( unlikely( !p_family ) )
+        return VLC_ENOMEM;
 
     while( ( i_type = xml_ReaderNextNode( p_xml, &psz_val ) ) > 0 )
     {
@@ -194,9 +195,9 @@ static int Android_ParseAlias( vlc_font_select_t *fs, xml_reader_t *p_xml )
         if( !strcasecmp( "weight", psz_attr ) && psz_val && *psz_val )
             i_weight = atoi( psz_val );
         else if( !strcasecmp( "to", psz_attr ) && psz_val && *psz_val )
-            psz_dest = ToLower( psz_val );
+            psz_dest = LowercaseDup( psz_val );
         else if( !strcasecmp( "name", psz_attr ) && psz_val && *psz_val )
-            psz_name = ToLower( psz_val );
+            psz_name = LowercaseDup( psz_val );
     }
 
     if( !psz_dest || !psz_name )
@@ -252,7 +253,7 @@ static int Android_Legacy_ParseFamily( vlc_font_select_t *fs, xml_reader_t *p_xm
                     continue;
                 }
 
-                psz_lc = ToLower( p_node );
+                psz_lc = LowercaseDup( p_node );
                 if( unlikely( !psz_lc ) )
                     return VLC_ENOMEM;
 
@@ -425,16 +426,10 @@ int Android_Prepare( vlc_font_select_t *fs )
     return VLC_SUCCESS;
 }
 
-const vlc_family_t *Android_GetFamily( vlc_font_select_t *fs, const char *psz_family )
+const vlc_family_t *Android_GetFamily( vlc_font_select_t *fs, const char *psz_lcname )
 {
-    char *psz_lc = ToLower( psz_family );
-    if( unlikely( !psz_lc ) )
-        return NULL;
-
     vlc_family_t *p_family =
-            vlc_dictionary_value_for_key( &fs->family_map, psz_lc );
-
-    free( psz_lc );
+            vlc_dictionary_value_for_key( &fs->family_map, psz_lcname );
 
     if( p_family == kVLCDictionaryNotFound )
         return NULL;
@@ -442,19 +437,13 @@ const vlc_family_t *Android_GetFamily( vlc_font_select_t *fs, const char *psz_fa
     return p_family;
 }
 
-vlc_family_t *Android_GetFallbacks( vlc_font_select_t *fs, const char *psz_family,
+vlc_family_t *Android_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
                                     uni_char_t codepoint )
 {
     VLC_UNUSED( codepoint );
 
-    vlc_family_t *p_fallbacks = NULL;
-    char *psz_lc = ToLower( psz_family );
-    if( unlikely( !psz_lc ) )
-        return NULL;
-
-    p_fallbacks = vlc_dictionary_value_for_key( &fs->fallback_map, psz_lc );
-
-    free( psz_lc );
+    vlc_family_t *p_fallbacks =
+                vlc_dictionary_value_for_key( &fs->fallback_map, psz_lcname );
 
     if( p_fallbacks == kVLCDictionaryNotFound )
         return NULL;

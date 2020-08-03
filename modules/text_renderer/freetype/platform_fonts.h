@@ -203,6 +203,9 @@ vlc_family_t * FontSelectGetFallbacks( vlc_font_select_t *, const char *psz_fami
 vlc_family_t *NewFamily( vlc_font_select_t *, const char *psz_family,
                          vlc_family_t **pp_list, vlc_dictionary_t *p_dict,
                          const char *psz_key );
+vlc_family_t *NewFamilyFromMixedCase( vlc_font_select_t *, const char *psz_family,
+                                      vlc_family_t **pp_list, vlc_dictionary_t *p_dict,
+                                      const char *psz_key );
 
 vlc_family_t * DeclareNewFamily( vlc_font_select_t *, const char *psz_family );
 int DeclareFamilyAsAttachMenFallback( vlc_font_select_t *, vlc_family_t * );
@@ -272,7 +275,10 @@ void DumpFamilies( vlc_font_select_t * );
 #endif
 
 /* String helpers */
-char* ToLower( const char *psz_src );
+char* LowercaseDup( const char *psz_src );
+
+bool IsLowercase( const char *psz_src );
+void LowercaseTransform( char *psz );
 
 /* Size helper, depending on the scaling factor */
 int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );

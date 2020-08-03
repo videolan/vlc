@@ -205,7 +205,27 @@ static inline void AppendFamily( vlc_family_t **pp_list, vlc_family_t *p_family 
     *pp_list = p_family;
 }
 
-vlc_family_t *NewFamily( vlc_font_select_t *fs, const char *psz_family,
+vlc_family_t *NewFamilyFromMixedCase( vlc_font_select_t *fs, const char *psz_family,
+                                      vlc_family_t **pp_list, vlc_dictionary_t *p_dict,
+                                      const char *psz_key )
+{
+    char *psz_alloc = NULL;
+    char *psz_alloc_key = NULL;
+    if( psz_family && *psz_family )
+        psz_family = psz_alloc = LowercaseDup( psz_family );
+
+    if( psz_key && p_dict )
+        psz_key = psz_alloc_key = LowercaseDup( psz_key );
+
+    vlc_family_t *ret = NewFamily( fs, psz_family, pp_list, p_dict, psz_key );
+
+    free( psz_alloc );
+    free( psz_alloc_key );
+
+    return ret;
+}
+
+vlc_family_t *NewFamily( vlc_font_select_t *fs, const char *psz_lcname,
                          vlc_family_t **pp_list, vlc_dictionary_t *p_dict,
                          const char *psz_key )
 {
@@ -213,44 +233,40 @@ vlc_family_t *NewFamily( vlc_font_select_t *fs, const char *psz_family,
     if( unlikely(!p_family) )
         return NULL;
 
-    char *psz_name;
-    if( psz_family && *psz_family )
-        psz_name = ToLower( psz_family );
-    else
-        psz_name = CreateUniqueFamilyKey( fs );
+    assert(!psz_lcname || IsLowercase(psz_lcname));
 
-    char *psz_lc = NULL;
-    if( likely( psz_name ) )
-    {
-        if( !psz_key )
-            psz_lc = strdup( psz_name );
-        else
-            psz_lc = ToLower( psz_key );
-    }
-
-    if( unlikely( !p_family || !psz_name || !psz_lc ) )
+    char *psz_alloc = NULL;
+    if( !psz_lcname || !*psz_lcname )
+        psz_lcname = psz_alloc = CreateUniqueFamilyKey( fs );
+    if( unlikely( !psz_lcname ) )
     {
         free( p_family );
-        free( psz_name );
-        free( psz_lc );
         return NULL;
     }
 
-    p_family->psz_name = psz_name;
+    p_family->psz_name = strdup( psz_lcname );
+    if( unlikely(!p_family->psz_name) )
+    {
+        free( psz_alloc );
+        free( p_family );
+        return NULL;
+    }
 
     if( pp_list )
         AppendFamily( pp_list, p_family );
 
     if( p_dict )
     {
-        vlc_family_t *p_root = vlc_dictionary_value_for_key( p_dict, psz_lc );
+        if( !psz_key )
+            psz_key = psz_lcname;
+        vlc_family_t *p_root = vlc_dictionary_value_for_key( p_dict, psz_key );
         if( p_root )
             AppendFamily( &p_root, p_family );
         else
-            vlc_dictionary_insert( p_dict, psz_lc, p_family );
+            vlc_dictionary_insert( p_dict, psz_key, p_family );
     }
 
-    free( psz_lc );
+    free( psz_alloc );
     return p_family;
 }
 
@@ -268,7 +284,7 @@ vlc_family_t * DeclareNewFamily( vlc_font_select_t *fs, const char *psz_family )
     char *psz_lc;
 
     if( psz_family )
-        psz_lc = ToLower( psz_family );
+        psz_lc = LowercaseDup( psz_family );
     else
         psz_lc = CreateUniqueFamilyKey( fs );
 
@@ -376,18 +392,26 @@ vlc_family_t *InitDefaultList( vlc_font_select_t *fs, const char *const *ppsz_de
 
     for( int i = 0; i < i_size; ++i )
     {
-        const vlc_family_t *p_family = FontSelectGetFamily( fs, ppsz_default[ i ] );
+        char *psz_lc = LowercaseDup( ppsz_default[ i ] );
+        if( !psz_lc )
+            continue;
 
+        const vlc_family_t *p_family = FontSelectGetFamily( fs, psz_lc );
         if( p_family )
         {
             vlc_family_t *p_temp =
-                NewFamily( fs, ppsz_default[ i ], &p_default, NULL, NULL );
+                NewFamily( fs, psz_lc, &p_default, NULL, NULL );
 
             if( unlikely( !p_temp ) )
+            {
+                free( psz_lc );
                 goto error;
+            }
 
             p_temp->p_fonts = p_family->p_fonts;
         }
+
+        free( psz_lc );
     }
 
     if( p_default )
@@ -471,7 +495,27 @@ void DumpFamilies( vlc_font_select_t *fs )
 }
 #endif
 
-char* ToLower( const char *psz_src )
+bool IsLowercase( const char *psz_src )
+{
+    size_t i_size=strlen(psz_src);
+    for(size_t i = 0; i < i_size; ++i )
+    {
+        if( psz_src[ i ] != (char)tolower( psz_src[ i ] ) )
+            return false;
+    }
+    return true;
+}
+
+void LowercaseTransform( char *psz )
+{
+    if( !psz )
+        return;
+    size_t i_size = strlen( psz );
+    for( size_t i = 0; i < i_size; ++i )
+        psz[ i ] = tolower( psz[ i ] );
+}
+
+char* LowercaseDup( const char *psz_src )
 {
     int i_size = strlen( psz_src ) + 1;
     char *psz_buffer = malloc( i_size );
@@ -563,32 +607,33 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
     if( codepoint && !p_family )
     {
         vlc_family_t *p_fallbacks;
-        const char *psz_name;
+        const char *psz_lcname;
         /*
          * Try regular face of the same family first.
          * It usually has the best coverage.
          */
-        vlc_vector_foreach( psz_name, families )
+        vlc_vector_foreach( psz_lcname, families )
         {
-            Debug( fs->p_obj, "Looking for family \"%s\"", psz_name );
+            assert(IsLowercase(psz_lcname));
+            Debug( fs->p_obj, "Looking for family \"%s\"", psz_lcname );
 
             p_fallbacks = vlc_dictionary_value_for_key( &fs->fallback_map,
                                                         FB_LIST_ATTACHMENTS );
             if( p_fallbacks )
             {
                 p_family = SearchFontByFamilyName( fs, p_fallbacks,
-                                                   psz_name, codepoint );
+                                                   psz_lcname, codepoint );
                 if( p_family )
                     break;
             }
 
-            p_family = FontSelectGetFamily( fs, psz_name );
+            p_family = FontSelectGetFamily( fs, psz_lcname );
             if( p_family && p_family->p_fonts )
             {
                 if( CheckFace( fs, p_family->p_fonts, codepoint ) )
                 {
                     Debug( fs->p_obj, "Found family \"%s\" for codepoint %x",
-                           psz_name, codepoint );
+                           psz_lcname, codepoint );
                     break;
                 }
             }
@@ -599,7 +644,7 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
         /* Try font attachments if not available locally */
         if( !p_family )
         {
-            Debug( fs->p_obj, "Looking for family \"%s\" in attachments cp %x", psz_name, codepoint );
+            Debug( fs->p_obj, "Looking for family \"%s\" in attachments cp %x", psz_lcname, codepoint );
             p_fallbacks = vlc_dictionary_value_for_key( &fs->fallback_map,
                                                         FB_LIST_ATTACHMENTS );
             if( p_fallbacks )
@@ -616,10 +661,10 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
         /* Try system fallbacks */
         if( !p_family )
         {
-            vlc_vector_foreach( psz_name, families )
+            vlc_vector_foreach( psz_lcname, families )
             {
-                Debug( fs->p_obj, "Looking for family \"%s\" in system fallbacks cp %x", psz_name, codepoint );
-                p_fallbacks = FontSelectGetFallbacks( fs, psz_name, codepoint );
+                Debug( fs->p_obj, "Looking for family \"%s\" in system fallbacks cp %x", psz_lcname, codepoint );
+                p_fallbacks = FontSelectGetFallbacks( fs, psz_lcname, codepoint );
                 if( p_fallbacks )
                 {
                     p_family = SearchFallbacks( fs, p_fallbacks, codepoint );
@@ -655,7 +700,9 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
     if( !p_family || !p_family->p_fonts )
     {
         Debug( fs->p_obj, "Looking for DEFAULT_FAMILY \"%s\" as a last resort", DEFAULT_FAMILY );
-        p_family = FontSelectGetFamily( fs, DEFAULT_FAMILY );
+        char *lc = LowercaseDup(DEFAULT_FAMILY);
+        p_family = FontSelectGetFamily( fs, lc );
+        free(lc);
     }
 
     vlc_font_t *p_font;
@@ -679,12 +726,17 @@ SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style, uni_char_t c
     const char *psz_fontname = (p_style->i_style_flags & STYLE_MONOSPACED)
                                ? p_style->psz_monofontname : p_style->psz_fontname;
 
+    char *psz_alloc = !IsLowercase(psz_fontname) ? LowercaseDup(psz_fontname) : NULL;
+    if( psz_alloc )
+        psz_fontname = psz_alloc;
+
     fontfamilies_t families;
     vlc_vector_init( &families );
     SplitIntoSingleFamily( psz_fontname, &families );
     if( families.size == 0 )
     {
         vlc_vector_clear( &families );
+        free(psz_alloc);
         return NULL;
     }
 
@@ -720,53 +772,41 @@ SelectAndLoadFace( filter_t *p_filter, const text_style_t *p_style, uni_char_t c
         free( psz_temp );
     vlc_vector_clear( &families );
     free( psz_fontfile );
+    free(psz_alloc);
 
     return p_faceid;
 }
 
 #ifndef HAVE_GET_FONT_BY_FAMILY_NAME
 static const vlc_family_t * StaticMap_GetFamily( vlc_font_select_t *fs,
-                                                 const char *psz_family )
+                                                 const char *psz_lcname )
 {
     filter_t *p_filter = fs->p_filter;
     filter_sys_t *p_sys = p_filter->p_sys;
-    char *psz_lc = ToLower( psz_family );
-
-    if( unlikely( !psz_lc ) )
-        return NULL;
 
     vlc_family_t *p_family =
-        vlc_dictionary_value_for_key( &fs->family_map, psz_lc );
-
+            vlc_dictionary_value_for_key( &fs->family_map, psz_lcname );
     if( p_family )
-    {
-        free( psz_lc );
         return p_family;
-    }
 
     const char *psz_file = NULL;
-    if( !strcasecmp( psz_family, DEFAULT_FAMILY ) )
+    if( !strcasecmp( psz_lcname, DEFAULT_FAMILY ) )
     {
         psz_file = p_sys->psz_fontfile ? p_sys->psz_fontfile
                                        : DEFAULT_FONT_FILE;
     }
-    else if( !strcasecmp( psz_family, DEFAULT_MONOSPACE_FAMILY ) )
+    else if( !strcasecmp( psz_lcname, DEFAULT_MONOSPACE_FAMILY ) )
     {
         psz_file = p_sys->psz_monofontfile ? p_sys->psz_monofontfile
                                            : DEFAULT_MONOSPACE_FONT_FILE;
     }
 
     if( !psz_file )
-    {
-        free( psz_lc );
         return NULL;
-    }
 
     /* Create new entry */
-    p_family = NewFamily( fs, psz_lc, &fs->p_families,
-                          &fs->family_map, psz_lc );
-
-    free( psz_lc );
+    p_family = NewFamily( fs, psz_lcname, &fs->p_families,
+                          &fs->family_map, psz_lcname );
 
     if( unlikely( !p_family ) )
         return NULL;
@@ -840,7 +880,7 @@ vlc_font_select_t * FontSelectNew( filter_t *p_filter )
 #else
         msg_Warn( p_filter, "DirectWrite initialization failed. Falling back to GDI/Uniscribe" );
         const char *const ppsz_default[] =
-            { "Tahoma", "FangSong", "SimHei", "KaiTi" };
+            { "tahoma", "fangsong", "simhei", "kaiti" };
         fs->pf_get_family = Win32_GetFamily;
         fs->pf_get_fallbacks = Win32_GetFallbacks;
         if( InitDefaultList( fs, ppsz_default, ARRAY_SIZE(ppsz_default) ) == NULL )
@@ -890,9 +930,9 @@ void FontSelectDelete( vlc_font_select_t *fs )
     free( fs );
 }
 
-const vlc_family_t * FontSelectGetFamily( vlc_font_select_t *fs, const char *psz_family )
+const vlc_family_t * FontSelectGetFamily( vlc_font_select_t *fs, const char *psz_lcname )
 {
-    return fs->pf_get_family ? fs->pf_get_family( fs, psz_family ) : NULL;
+    return fs->pf_get_family ? fs->pf_get_family( fs, psz_lcname ) : NULL;
 }
 
 vlc_family_t * FontSelectGetFallbacks( vlc_font_select_t *fs, const char *psz_family,

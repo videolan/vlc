@@ -106,26 +106,14 @@ void FontConfig_Unprepare( vlc_font_select_t *fs )
     vlc_mutex_unlock( &lock );
 }
 
-const vlc_family_t *FontConfig_GetFamily( vlc_font_select_t *fs, const char *psz_family )
+const vlc_family_t *FontConfig_GetFamily( vlc_font_select_t *fs, const char *psz_lcname )
 {
-    char *psz_lc = ToLower( psz_family );
-
-    if( unlikely( !psz_lc ) )
-        return NULL;
-
-    vlc_family_t *p_family =
-            vlc_dictionary_value_for_key( &fs->family_map, psz_lc );
-
+    vlc_family_t *p_family = vlc_dictionary_value_for_key( &fs->family_map, psz_lcname );
     if( p_family != kVLCDictionaryNotFound )
-    {
-        free( psz_lc );
         return p_family;
-    }
 
-    p_family = NewFamily( fs, psz_lc, &fs->p_families,
-                          &fs->family_map, psz_lc );
-
-    free( psz_lc );
+    p_family = NewFamily( fs, psz_lcname, &fs->p_families,
+                          &fs->family_map, psz_lcname );
     if( !p_family )
         return NULL;
 
@@ -146,7 +134,7 @@ const vlc_family_t *FontConfig_GetFamily( vlc_font_select_t *fs, const char *psz
         if (!pat) continue;
 
         /* */
-        FcPatternAddString( pat, FC_FAMILY, (const FcChar8*) psz_family );
+        FcPatternAddString( pat, FC_FAMILY, (const FcChar8*) psz_lcname );
         FcPatternAddBool( pat, FC_OUTLINE, FcTrue );
         FcPatternAddInteger( pat, FC_SLANT, b_italic ? FC_SLANT_ITALIC : FC_SLANT_ROMAN );
         FcPatternAddInteger( pat, FC_WEIGHT, b_bold ? FC_WEIGHT_EXTRABOLD : FC_WEIGHT_NORMAL );
@@ -197,26 +185,16 @@ const vlc_family_t *FontConfig_GetFamily( vlc_font_select_t *fs, const char *psz
     return p_family;
 }
 
-vlc_family_t *FontConfig_GetFallbacks( vlc_font_select_t *fs, const char *psz_family,
+vlc_family_t *FontConfig_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
                                        uni_char_t codepoint )
 {
 
     VLC_UNUSED( codepoint );
 
-    vlc_family_t *p_family = NULL;
-
-    char *psz_lc = ToLower( psz_family );
-
-    if( unlikely( !psz_lc ) )
-        return NULL;
-
-    p_family = vlc_dictionary_value_for_key( &fs->fallback_map, psz_lc );
-
+    vlc_family_t *p_family =
+            vlc_dictionary_value_for_key( &fs->fallback_map, psz_lcname );
     if( p_family != kVLCDictionaryNotFound )
-    {
-        free( psz_lc );
         return p_family;
-    }
     else
         p_family = NULL;
 
@@ -224,7 +202,7 @@ vlc_family_t *FontConfig_GetFallbacks( vlc_font_select_t *fs, const char *psz_fa
     FcPattern  *p_pattern = FcPatternCreate();
     FcValue     family;
     family.type = FcTypeString;
-    family.u.s = ( const FcChar8* ) psz_family;
+    family.u.s = ( const FcChar8* ) psz_lcname;
     FcPatternAdd( p_pattern, FC_FAMILY, family, FcFalse );
     if( FcConfigSubstitute( config, p_pattern, FcMatchPattern ) == FcTrue )
     {
@@ -242,7 +220,7 @@ vlc_family_t *FontConfig_GetFallbacks( vlc_font_select_t *fs, const char *psz_fa
                 /* Avoid duplicate family names */
                 if( strcasecmp( psz_last_name, psz_name ) )
                 {
-                    vlc_family_t *p_temp = NewFamily( fs, psz_name,
+                    vlc_family_t *p_temp = NewFamilyFromMixedCase( fs, psz_name,
                                                       &p_family, NULL, NULL );
 
                     if( unlikely( !p_temp ) )
@@ -251,7 +229,6 @@ vlc_family_t *FontConfig_GetFallbacks( vlc_font_select_t *fs, const char *psz_fa
                         FcPatternDestroy( p_pattern );
                         if( p_family )
                             FreeFamilies( p_family, NULL );
-                        free( psz_lc );
                         return NULL;
                     }
 
@@ -264,8 +241,7 @@ vlc_family_t *FontConfig_GetFallbacks( vlc_font_select_t *fs, const char *psz_fa
     FcPatternDestroy( p_pattern );
 
     if( p_family )
-        vlc_dictionary_insert( &fs->fallback_map, psz_lc, p_family );
+        vlc_dictionary_insert( &fs->fallback_map, psz_lcname, p_family );
 
-    free( psz_lc );
     return p_family;
 }

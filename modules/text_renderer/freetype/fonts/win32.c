@@ -392,23 +392,16 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     return 1;
 }
 
-const vlc_family_t *Win32_GetFamily( vlc_font_select_t *fs, const char *psz_family )
+const vlc_family_t *Win32_GetFamily( vlc_font_select_t *fs, const char *psz_lcname )
 {
-    char *psz_lc = ToLower( psz_family );
-
-    if( unlikely( !psz_lc ) )
-        return NULL;
-
     vlc_family_t *p_family =
-        vlc_dictionary_value_for_key( &fs->family_map, psz_lc );
-
-    free( psz_lc );
+        vlc_dictionary_value_for_key( &fs->family_map, psz_lcname );
 
     if( p_family )
         return p_family;
 
-    p_family = NewFamily( fs, psz_family, &fs->p_families,
-                          &fs->family_map, psz_family );
+    p_family = NewFamily( fs, psz_lcname, &fs->p_families,
+                          &fs->family_map, psz_lcname );
 
     if( unlikely( !p_family ) )
         return NULL;
@@ -416,7 +409,7 @@ const vlc_family_t *Win32_GetFamily( vlc_font_select_t *fs, const char *psz_fami
     LOGFONT lf;
     lf.lfCharSet = DEFAULT_CHARSET;
 
-    LPTSTR psz_fbuffer = ToWide( psz_family );
+    LPTSTR psz_fbuffer = ToWide( psz_lcname );
     wcsncpy( (LPTSTR)&lf.lfFaceName, psz_fbuffer, LF_FACESIZE );
     free( psz_fbuffer );
 
@@ -453,7 +446,7 @@ static int CALLBACK MetaFileEnumProc( HDC hdc, HANDLETABLE* table,
  * This is a hack used by Chrome and WebKit to expose the fallback font used
  * by Uniscribe for some given text for use with custom shapers / font engines.
  */
-static char *UniscribeFallback( const char *psz_family, uni_char_t codepoint )
+static char *UniscribeFallback( const char *psz_lcname, uni_char_t codepoint )
 {
     HDC          hdc          = NULL;
     HDC          meta_file_dc = NULL;
@@ -471,7 +464,7 @@ static char *UniscribeFallback( const char *psz_family, uni_char_t codepoint )
     LOGFONT lf;
     memset( &lf, 0, sizeof( lf ) );
 
-    wchar_t *psz_fbuffer = ToWide( psz_family );
+    wchar_t *psz_fbuffer = ToWide( psz_lcname );
     if( !psz_fbuffer )
         goto error;
     wcsncpy( ( LPTSTR ) &lf.lfFaceName, psz_fbuffer, LF_FACESIZE );
@@ -507,7 +500,10 @@ static char *UniscribeFallback( const char *psz_family, uni_char_t codepoint )
         log_font.lfFaceName[ 0 ] = 0;
         EnumEnhMetaFile( 0, meta_file, MetaFileEnumProc, &log_font, NULL );
         if( log_font.lfFaceName[ 0 ] )
+        {
             psz_result = FromWide( log_font.lfFaceName );
+            LowercaseTransform( psz_result );
+        }
     }
 
     DeleteEnhMetaFile(meta_file);
@@ -520,20 +516,14 @@ error:
     return NULL;
 }
 
-vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_family,
+vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
                                   uni_char_t codepoint )
 {
     vlc_family_t  *p_family      = NULL;
     vlc_family_t  *p_fallbacks   = NULL;
     char          *psz_uniscribe = NULL;
 
-
-    char *psz_lc = ToLower( psz_family );
-
-    if( unlikely( !psz_lc ) )
-        return NULL;
-
-    p_fallbacks = vlc_dictionary_value_for_key( &fs->fallback_map, psz_lc );
+    p_fallbacks = vlc_dictionary_value_for_key( &fs->fallback_map, psz_lcname );
 
     if( p_fallbacks )
         p_family = SearchFallbacks( fs, p_fallbacks, codepoint );
@@ -546,7 +536,7 @@ vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_family,
      */
     if( !p_family )
     {
-        psz_uniscribe = UniscribeFallback( psz_lc, codepoint );
+        psz_uniscribe = UniscribeFallback( psz_lcname, codepoint );
 
         if( !psz_uniscribe )
             goto done;
@@ -569,11 +559,10 @@ vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_family,
             AppendFamily( &p_fallbacks, p_family );
         else
             vlc_dictionary_insert( &fs->fallback_map,
-                                   psz_lc, p_family );
+                                   psz_lcname, p_family );
     }
 
 done:
-    free( psz_lc );
     free( psz_uniscribe );
     return p_family;
 }
