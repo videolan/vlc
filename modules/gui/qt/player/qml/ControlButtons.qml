@@ -27,6 +27,8 @@ import "qrc:///menus/" as Menus
 import "qrc:///style/"
 
 Item{
+    property bool isMiniplayer: false
+
     property var buttonL: [
         { id:  PlayerControlBarModel.PLAY_BUTTON, label: VLCIcons.play, text: i18n.qtr("Play")},
         { id:  PlayerControlBarModel.STOP_BUTTON, label: VLCIcons.stop, text: i18n.qtr("Stop")},

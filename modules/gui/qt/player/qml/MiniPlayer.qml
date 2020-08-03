@@ -213,6 +213,8 @@ Widgets.NavigableFocusScope {
 
             ControlButtons {
                 id: controlmodelbuttons
+
+                isMiniplayer: true
             }
 
             Keys.onPressed: {
