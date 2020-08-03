@@ -211,9 +211,10 @@ Widgets.NavigableFocusScope {
                         anchors {
                             top: parent.top
                             right: parent.right
-                            bottom: parent.bottom
                         }
                         focus: false
+
+                        height: parent.height - miniPlayer.implicitHeight
 
                         property bool expanded: mainInterface.playlistDocked && mainInterface.playlistVisible
 
@@ -352,20 +353,24 @@ Widgets.NavigableFocusScope {
                         }
                     }
                 }
+            }
 
-                Player.MiniPlayer {
-                    id: miniPlayer
-                    z: 2
-                    navigationParent: medialibId
-                    navigationUpItem: stackView
-                    navigationCancelItem:sourcesBanner
-                    onExpandedChanged: {
-                        if (!expanded && miniPlayer.activeFocus)
-                            stackView.forceActiveFocus()
-                    }
+            Player.MiniPlayer {
+                id: miniPlayer
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+
+                z: 2
+                navigationParent: medialibId
+                navigationUpItem: stackView
+                navigationCancelItem:sourcesBanner
+                onExpandedChanged: {
+                    if (!expanded && miniPlayer.activeFocus)
+                        stackView.forceActiveFocus()
                 }
             }
         }
-
     }
 }

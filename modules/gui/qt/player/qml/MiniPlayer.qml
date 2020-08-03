@@ -13,8 +13,6 @@ Widgets.NavigableFocusScope {
 
     id: root
 
-    Layout.fillWidth: true
-
     readonly property bool expanded: root.implicitHeight === root.childrenRect.height
 
     Component.onCompleted : {
@@ -50,6 +48,13 @@ Widgets.NavigableFocusScope {
         duration: 200
         easing.type: Easing.OutSine
         to: 0
+    }
+
+    // this MouseArea prevents mouse events to be sent below miniplayer
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        acceptedButtons: Qt.AllButtons
     }
 
     Column {
