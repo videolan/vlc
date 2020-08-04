@@ -84,6 +84,13 @@ NavigableFocusScope {
 
     Accessible.role: Accessible.Table
 
+    function setCurrentItemFocus() {
+        if (!model || model.count === 0 || currentIndex === -1)
+            return
+        positionViewAtIndex(currentIndex, ItemView.Contain)
+        flickable.setCurrentItemFocus()
+    }
+
     function switchExpandItem(index) {
         if (_count === 0)
             return
