@@ -156,7 +156,7 @@ Item{
             property bool paintOnly: false
             enabled: !paintOnly
 
-            onClicked: mainPlaylistController.togglePlayPause()
+            property bool realHovered: false
 
             contentItem: Label {
                 color: videoOverlays ? (playBtn.enabled ? playBtn.color : playBtn.colorDisabled)
@@ -175,6 +175,43 @@ Item{
             }
 
             background: Item {
+
+                MouseArea {
+                    id: playBtnMouseArea
+
+                    anchors.fill: parent
+                    anchors.margins: VLCStyle.dp(1)
+
+                    hoverEnabled: true
+
+                    readonly property int radius: playBtnMouseArea.width / 2
+
+                    function distance2D(x0, y0, x1, y1) {
+                        return Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0))
+                    }
+
+                    onPositionChanged: {
+                        if (distance2D(playBtnMouseArea.mouseX, playBtnMouseArea.mouseY, playBtnMouseArea.width / 2, playBtnMouseArea.height / 2) < radius) {
+                            // mouse is inside of the round button
+                            playBtn.realHovered = true
+                        }
+                        else {
+                            // mouse is outside
+                            playBtn.realHovered = false
+                        }
+                    }
+
+                    onHoveredChanged: {
+                        if (!playBtnMouseArea.containsMouse)
+                            playBtn.realHovered = false
+                    }
+
+                    onClicked: {
+                        if (playBtn.realHovered)
+                            mainPlaylistController.togglePlayPause()
+                    }
+
+                }
 
                 Rectangle {
                     radius: (width * 0.5)
@@ -218,7 +255,7 @@ Item{
                     source: outerRect
                     maskSource: innerRect
 
-                    visible: !(playBtn.activeFocus || playBtn.hovered || playBtn.highlighted)
+                    visible: !(playBtn.activeFocus || playBtn.realHovered || playBtn.highlighted)
                     antialiasing: true
                 }
             }
