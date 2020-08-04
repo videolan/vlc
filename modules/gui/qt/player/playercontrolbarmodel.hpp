@@ -109,9 +109,9 @@ protected:
 private:
     QVector<IconToolButton> mButtons;
     QString configName;
-    QString defaultConfig;
 
-    void parseAndAdd(QString& config);
+    void parseAndAdd(const QString& config);
+    void parseDefault(const IconToolButton* config, const size_t config_size);
 
     bool setButtonAt(int index, const IconToolButton &button);
     void addProfiles();
