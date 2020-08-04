@@ -71,8 +71,7 @@ ListView {
             onDropped: {
                 if (drag.source.objectName == "buttonsList"){
                     playerBtnDND.model.insert(playerBtnDND.count,
-                                             {"id" : drag.source.mIndex,
-                                                 "size": PlayerControlBarModel.WIDGET_NORMAL})
+                                             {"id" : drag.source.mIndex})
                 }
                 else
                     playerBtnDND.model.move(
