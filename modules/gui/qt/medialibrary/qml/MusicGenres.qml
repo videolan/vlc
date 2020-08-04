@@ -214,7 +214,35 @@ Widgets.NavigableFocusScope {
         Widgets.KeyNavigableTableView {
             id: tableView_id
 
-            readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
+            readonly property int _nameColSpan: Math.max(
+                                                    VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth - VLCStyle.listAlbumCover_width - VLCStyle.column_margin_width) - 1
+                                                    , 1)
+
+            property Component thumbnailHeader: Item {
+                Widgets.IconLabel {
+                    height: VLCStyle.listAlbumCover_height
+                    width: VLCStyle.listAlbumCover_width
+                    horizontalAlignment: Text.AlignHCenter
+                    text: VLCIcons.album_cover
+                    color: VLCStyle.colors.caption
+                }
+            }
+
+            property Component thumbnailColumn: Item {
+
+                property var rowModel: parent.rowModel
+                property var model: parent.colModel
+                readonly property bool currentlyFocused: parent.currentlyFocused
+                readonly property bool containsMouse: parent.containsMouse
+
+                Widgets.MediaCover {
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: ( !rowModel ? undefined : rowModel[model.criteria] ) || VLCStyle.noArtCover
+                    playCoverVisible: currentlyFocused || containsMouse
+                    playIconSize: VLCStyle.play_cover_small
+                    onPlayIconClicked:  medialib.addAndPlay( rowModel.id )
+                }
+            }
 
             model: genreModel
             headerColor: VLCStyle.colors.bg
@@ -223,7 +251,8 @@ Widgets.NavigableFocusScope {
             navigationParent: root
 
             sortModel:  [
-                { isPrimary: true, criteria: "name", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 1, 1)), text: i18n.qtr("Name"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
+                { isPrimary: true, criteria: "cover", width: VLCStyle.listAlbumCover_width, headerDelegate: thumbnailHeader, colDelegate: thumbnailColumn },
+                { criteria: "name", width: VLCStyle.colWidth(tableView_id._nameColSpan), text: i18n.qtr("Name") },
                 { criteria: "nb_tracks", width: VLCStyle.colWidth(1), text: i18n.qtr("Tracks") }
             ]
 
@@ -234,10 +263,6 @@ Widgets.NavigableFocusScope {
             onContextMenuButtonClicked: {
                 contextMenu.model = menuModel
                 contextMenu.popup(menuParent)
-            }
-
-            Widgets.TableColumns {
-                id: tableColumns
             }
         }
     }
