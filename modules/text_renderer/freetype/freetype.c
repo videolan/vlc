@@ -1154,7 +1154,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                          subpicture_region_t *p_region_in,
                          const vlc_fourcc_t *p_chroma_list )
 {
-    if( !p_region_in )
+    if( !p_region_in || !p_region_in->p_text )
         return VLC_EGENERIC;
 
     filter_sys_t *p_sys = p_filter->p_sys;
