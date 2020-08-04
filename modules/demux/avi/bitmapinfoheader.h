@@ -26,10 +26,15 @@
 #include <limits.h>
 
 /* biCompression / Others are FourCC */
-#define BI_RGB              0x0000
-#define BI_RLE8             0x0001
-#define BI_RLE4             0x0002
-#define BI_BITFIELDS        0x0003
+#ifndef BI_RGB
+ #define BI_RGB             0x0000
+ #define BI_RLE8            0x0001
+ #define BI_RLE4            0x0002
+ #define BI_BITFIELDS       0x0003
+ #define BI_JPEG            0x0004
+ #define BI_PNG             0x0005
+#endif
+#define BI_ALPHAFIELDS      0x0006
 #define BI_CMYK             0x000B
 #define BI_CMYKRLE8         0x000C
 #define BI_CMYKRLE4         0x000D
