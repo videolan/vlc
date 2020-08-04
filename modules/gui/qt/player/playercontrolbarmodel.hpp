@@ -35,11 +35,9 @@ public:
     struct IconToolButton
     {
         int id;
-        int size;
     };
     enum{
-        ID_ROLE,
-        SIZE_ROLE
+        ID_ROLE
     };
     enum ButtonType_e
     {
@@ -82,12 +80,6 @@ public:
     };
     Q_ENUM(ButtonType_e)
 
-    enum ButtonSize
-    {
-        WIDGET_NORMAL = 0x0,
-        WIDGET_BIG    = 0x2,
-    };
-    Q_ENUM(ButtonSize)
     // Basic functionality:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 

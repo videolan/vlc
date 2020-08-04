@@ -20,7 +20,7 @@
 #include "qt.hpp"
 #include "playercontrolbarmodel.hpp"
 
-#define MAIN_TB1_DEFAULT "20;21;65;17;3;0-2;1-2;4;18;65;33;7"
+#define MAIN_TB1_DEFAULT "20;21;65;17;3;0;1;4;18;65;33;7"
 #define MINI_TB_DEFAULT "65;17;3;0;1;4;18;65;33;7"
 
 PlayerControlBarModel::PlayerControlBarModel(QObject *_parent) : QAbstractListModel(_parent)
@@ -39,8 +39,6 @@ QString PlayerControlBarModel::getConfig()
     QString config="";
     for (IconToolButton it: mButtons) {
         config += QString::number(it.id);
-        if(it.size != WIDGET_NORMAL)
-            config += "-" + QString::number(it.size);
         config += ";";
     }
     return config;
@@ -78,7 +76,6 @@ void PlayerControlBarModel::parseAndAdd(QString &config)
             continue;
         }
         bool ok;
-        int i_option = WIDGET_NORMAL;
         ButtonType_e i_type = static_cast<ButtonType_e>(list2.at( 0 ).toInt( &ok ));
         if( !ok )
         {
@@ -86,17 +83,8 @@ void PlayerControlBarModel::parseAndAdd(QString &config)
             continue;
         }
 
-        if( list2.count() > 1 )
-        {
-            i_option = list2.at( 1 ).toInt( &ok );
-            if( !ok )
-            {
-                msg_Warn( p_intf, "Parsing error 3. Please, report this." );
-                continue;
-            }
-        }
-
-        mButtons.append({ i_type , i_option});
+        IconToolButton itButton = {i_type};
+        mButtons.append(itButton);
     }
 
     endInsertRows();
@@ -120,9 +108,6 @@ QVariant PlayerControlBarModel::data(const QModelIndex &index, int role) const
     switch (role) {
     case ID_ROLE:
         return QVariant(button.id);
-
-    case SIZE_ROLE:
-        return QVariant(button.size);
     }
     return QVariant();
 }
@@ -134,8 +119,6 @@ bool PlayerControlBarModel::setData(const QModelIndex &index, const QVariant &va
     case ID_ROLE:
         button.id = value.toInt();
         break;
-    case SIZE_ROLE:
-        button.size = value.toInt();
     }
 
     if (setButtonAt(index.row(),button)) {
@@ -158,7 +141,6 @@ QHash<int, QByteArray> PlayerControlBarModel::roleNames() const
     QHash<int, QByteArray> names;
 
     names[ID_ROLE] = "id";
-    names[SIZE_ROLE] = "size";
 
     return names;
 }
@@ -168,7 +150,7 @@ bool PlayerControlBarModel::setButtonAt(int index, const IconToolButton &button)
         return false;
     const IconToolButton &oldButton = mButtons.at(index);
 
-    if (button.size == oldButton.size && button.id == oldButton.id)
+    if (button.id == oldButton.id)
         return false;
 
     mButtons[index] = button;
@@ -203,7 +185,7 @@ void PlayerControlBarModel::setConfigName(QString name)
 void PlayerControlBarModel::insert(int index, QVariantMap bdata)
 {
     beginInsertRows(QModelIndex(),index,index);
-    mButtons.insert(index,{bdata.value("id").toInt(),bdata.value("size").toInt()});
+    mButtons.insert(index, { bdata.value("id").toInt() });
     endInsertRows();
 }
 void PlayerControlBarModel::move(int src, int dest)
