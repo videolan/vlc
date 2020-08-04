@@ -61,7 +61,7 @@ ${LangFileString} Action_OnArrivalBluray "Afspil Blu-ray"
 
 ${LangFileString} License_NextText "Nu kender du dine rettigheder. Klik på Næste for at fortsætte."
 
-${LangFileString} Detail_CheckProcesses "Tjekker processer..."
+${LangFileString} Detail_CheckProcesses "Tjekker processer ..."
 ${LangFileString} MessageBox_VLCRunning "VLC ser ud til at køre og vil nu blive lukket."
 ${LangFileString} MessageBox_VLCUnableToClose "Installationsprogrammet kunne ikke lukke VLC - gør det venligst manuelt."
 ${LangFileString} MessageBox_InstallAborted "Installationen blev afbrudt!"
