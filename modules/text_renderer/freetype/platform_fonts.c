@@ -718,7 +718,7 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
     if( p_family && ( p_font = GetBestFont( fs, p_family, b_bold,
                                             b_italic, codepoint ) ) )
     {
-        Debug( fs->p_obj, "Selected best font file \"%s\"", p_font->psz_fontfile );
+        Debug( fs->p_obj, "Selected best font file \"%s\" %d %d", p_font->psz_fontfile, b_bold, b_italic );
         *pi_idx = p_font->i_index;
         return strdup( p_font->psz_fontfile );
     }

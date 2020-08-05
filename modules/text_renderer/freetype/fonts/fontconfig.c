@@ -106,97 +106,140 @@ void FontConfig_Unprepare( vlc_font_select_t *fs )
     vlc_mutex_unlock( &lock );
 }
 
+static void FontConfig_AddFromFcPattern( FcPattern *p_pat,  vlc_family_t *p_family )
+{
+    int bold;
+    int italic;
+    FcChar8* val_s;
+    int i_index = 0;
+    char *psz_fontfile = NULL;
+
+    if( FcResultMatch != FcPatternGetInteger( p_pat, FC_INDEX, 0, &i_index ) )
+        i_index = 0;
+
+    if( FcResultMatch != FcPatternGetInteger( p_pat, FC_WEIGHT, 0, &bold ) )
+        bold = FC_WEIGHT_NORMAL;
+    if( bold < FC_WEIGHT_NORMAL )
+        return;
+
+    if( FcResultMatch != FcPatternGetInteger( p_pat, FC_SLANT, 0, &italic ) )
+        italic = FC_SLANT_ROMAN;
+
+    if( FcResultMatch != FcPatternGetString( p_pat, FC_FILE, 0, &val_s ) )
+        return;
+
+    psz_fontfile = strdup( (const char*)val_s );
+    if( psz_fontfile )
+        NewFont( psz_fontfile, i_index,
+                 bold > FC_WEIGHT_NORMAL,
+                 italic != FC_SLANT_ROMAN,
+                 p_family );
+}
+
+static void FontConfig_FillFaces( vlc_family_t *p_family )
+{
+    FcPattern *pat = FcPatternCreate();
+    if ( !pat )
+        return;
+
+    FcObjectSet *os = FcObjectSetBuild ( FC_FILE, FC_SLANT, FC_WEIGHT,
+                                         FC_INDEX, FC_WIDTH, (char *) 0 );
+    if( os )
+    {
+        FcPatternAddString( pat, FC_FAMILY, (const FcChar8 *) p_family->psz_name );
+        FcPatternAddBool( pat, FC_OUTLINE, FcTrue );
+
+        FcFontSet *fs = FcFontList( 0, pat, os );
+        FcObjectSetDestroy( os );
+        if( fs )
+        {
+            for( int pass=0; pass<2 && !p_family->p_fonts; pass++ )
+            {
+                for ( int i = 0; i < fs->nfont; i++ )
+                {
+                    int i_width = 0;
+                    FcPattern *p_pat = fs->fonts[i];
+
+                    /* we relax the WIDTH condition if we did not get any match */
+                    if( pass == 0 &&
+                        FcResultMatch == FcPatternGetInteger( p_pat, FC_WIDTH, 0, &i_width ) &&
+                        i_width != FC_WIDTH_NORMAL )
+                        continue;
+
+                    FontConfig_AddFromFcPattern( p_pat, p_family );
+                }
+            }
+            FcFontSetDestroy( fs );
+        }
+    }
+    FcPatternDestroy( pat );
+}
+
 int FontConfig_SelectAmongFamilies( vlc_font_select_t *fs, const fontfamilies_t *families,
                                     const vlc_family_t **pp_result )
 {
-    vlc_family_t *p_family = NULL;
+    FcResult result = FcResultMatch;
+    FcPattern *pat, *p_matchpat;
+    FcChar8* val_s;
 
-    for( int i = 0; i < 4; ++i ) /* Iterate through FC_{SLANT,WEIGHT} combos */
+    /* Create a pattern and fill it */
+    pat = FcPatternCreate();
+    if (!pat)
+        return VLC_EGENERIC;
+
+    /* */
+    const char *psz_lcname;
+    vlc_vector_foreach( psz_lcname, &families->vec )
+        FcPatternAddString( pat, FC_FAMILY, (const FcChar8*) psz_lcname );
+    FcPatternAddBool( pat, FC_OUTLINE, FcTrue );
+
+    /* */
+    FcDefaultSubstitute( pat );
+    if( !FcConfigSubstitute( config, pat, FcMatchPattern ) )
     {
-        bool const b_bold = i & 1;
-        bool const b_italic = i & 2;
-
-        int i_index = 0;
-        FcResult result = FcResultMatch;
-        FcPattern *pat, *p_pat;
-        FcChar8* val_s;
-        FcBool val_b;
-        char *psz_fontfile = NULL;
-
-        /* Create a pattern and fill it */
-        pat = FcPatternCreate();
-        if (!pat) continue;
-
-        /* */
-        const char *psz_lcname;
-        vlc_vector_foreach( psz_lcname, &families->vec )
-            FcPatternAddString( pat, FC_FAMILY, (const FcChar8*) psz_lcname );
-        FcPatternAddBool( pat, FC_OUTLINE, FcTrue );
-        FcPatternAddInteger( pat, FC_SLANT, b_italic ? FC_SLANT_ITALIC : FC_SLANT_ROMAN );
-        FcPatternAddInteger( pat, FC_WEIGHT, b_bold ? FC_WEIGHT_EXTRABOLD : FC_WEIGHT_NORMAL );
-
-        /* */
-        FcDefaultSubstitute( pat );
-        if( !FcConfigSubstitute( config, pat, FcMatchPattern ) )
-        {
-            FcPatternDestroy( pat );
-            continue;
-        }
-
-        /* Find the best font for the pattern, destroy the pattern */
-        p_pat = FcFontMatch( config, pat, &result );
         FcPatternDestroy( pat );
-        if( !p_pat || result == FcResultNoMatch ) continue;
-
-        if( FcResultMatch != FcPatternGetString( p_pat, FC_FAMILY, 0, &val_s ) )
-        {
-            FcPatternDestroy( p_pat );
-            continue;
-        }
-
-        if( !p_family )
-        {
-            char *psz_fnlc = LowercaseDup((const char *)val_s);
-            p_family = vlc_dictionary_value_for_key( &fs->family_map, psz_fnlc );
-            if( p_family == kVLCDictionaryNotFound )
-            {
-                p_family = NewFamily( fs, psz_fnlc, &fs->p_families,
-                                      &fs->family_map, psz_fnlc );
-                if( !p_family )
-                {
-                    free(psz_fnlc);
-                    FcPatternDestroy( pat );
-                    return VLC_ENOMEM;
-                }
-            }
-            free(psz_fnlc);
-        }
-
-        /* Check the new pattern */
-        if( ( FcResultMatch != FcPatternGetBool( p_pat, FC_OUTLINE, 0, &val_b ) )
-            || ( val_b != FcTrue ) )
-        {
-            FcPatternDestroy( p_pat );
-            continue;
-        }
-
-        if( FcResultMatch != FcPatternGetInteger( p_pat, FC_INDEX, 0, &i_index ) )
-        {
-            i_index = 0;
-        }
-
-        if( FcResultMatch == FcPatternGetString( p_pat, FC_FILE, 0, &val_s ) )
-            psz_fontfile = strdup( (const char*)val_s );
-
-        FcPatternDestroy( p_pat );
-
-        if( !psz_fontfile )
-            continue;
-
-        NewFont( psz_fontfile, i_index, b_bold, b_italic, p_family );
+        return VLC_EGENERIC;
     }
 
+    /* Find the best font for the pattern, destroy the pattern */
+    p_matchpat = FcFontMatch( config, pat, &result );
+    if( !p_matchpat )
+        return VLC_EGENERIC;
+    FcPatternDestroy( pat );
+    if( result == FcResultNoMatch )
+    {
+        *pp_result = NULL;
+        return VLC_SUCCESS;
+    }
+
+    if( FcResultMatch != FcPatternGetString( p_matchpat, FC_FAMILY, 0, &val_s ) )
+    {
+        FcPatternDestroy( p_matchpat );
+        return VLC_EGENERIC;
+    }
+
+    char *psz_fnlc = LowercaseDup((const char *)val_s);
+    vlc_family_t *p_family = vlc_dictionary_value_for_key( &fs->family_map, psz_fnlc );
+    if( p_family == kVLCDictionaryNotFound )
+    {
+        p_family = NewFamily( fs, psz_fnlc, &fs->p_families,
+                              &fs->family_map, psz_fnlc );
+        if( !p_family )
+        {
+            free( psz_fnlc );
+            FcPatternDestroy( p_matchpat );
+            return VLC_EGENERIC;
+        }
+    }
+
+    free(psz_fnlc);
+    FcPatternDestroy( p_matchpat );
+
+    if( p_family ) /* Populate with fonts */
+        FontConfig_FillFaces( p_family );
+
     *pp_result = p_family;
+
     return VLC_SUCCESS;
 }
 
