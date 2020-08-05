@@ -98,7 +98,7 @@ struct vout_display_sys_t
     d3d11_device_t           d3d_dev;
     d3d_quad_t               picQuad;
 
-    ID3D11Query              *prepareWait;
+    ID3D11Asynchronous       *prepareWait;
 
     picture_sys_t            stagingSys;
 
@@ -996,12 +996,18 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     if (sys->prepareWait)
     {
         int maxWait = 10;
-        ID3D11DeviceContext_End(sys->d3d_dev.d3dcontext, (ID3D11Asynchronous*)sys->prepareWait);
+        ID3D11DeviceContext_End(sys->d3d_dev.d3dcontext, sys->prepareWait);
 
         while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev.d3dcontext,
-                                                      (ID3D11Asynchronous*)sys->prepareWait, NULL, 0, 0)
+                                                      sys->prepareWait, NULL, 0, 0)
                && --maxWait)
+        {
+            if (is_d3d11_opaque(picture->format.i_chroma))
+                d3d11_device_unlock( &sys->d3d_dev );
             SleepEx(2, TRUE);
+            if (is_d3d11_opaque(picture->format.i_chroma))
+                d3d11_device_lock( &sys->d3d_dev );
+        }
     }
 
     if (is_d3d11_opaque(picture->format.i_chroma))
@@ -1600,7 +1606,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
 
     D3D11_QUERY_DESC query = { 0 };
     query.Query = D3D11_QUERY_EVENT;
-    hr = ID3D11Device_CreateQuery(sys->d3d_dev.d3ddevice, &query, &sys->prepareWait);
+    hr = ID3D11Device_CreateQuery(sys->d3d_dev.d3ddevice, &query, (ID3D11Query**)&sys->prepareWait);
 
     ID3D11BlendState *pSpuBlendState;
     D3D11_BLEND_DESC spuBlendDesc = { 0 };
