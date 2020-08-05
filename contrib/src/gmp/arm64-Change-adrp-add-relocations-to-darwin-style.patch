@@ -1,0 +1,28 @@
+From 056fbee0d76491b5f19f5741e9bf9178c03de7dc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Tue, 4 Aug 2020 13:12:49 +0300
+Subject: [PATCH 2/4] arm64: Change adrp/add relocations to darwin style
+
+---
+ mpn/arm64/invert_limb.asm | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mpn/arm64/invert_limb.asm b/mpn/arm64/invert_limb.asm
+index a94b0e961..bb876d97c 100644
+--- a/mpn/arm64/invert_limb.asm
++++ b/mpn/arm64/invert_limb.asm
+@@ -41,9 +41,9 @@ C Compiler generated, mildly edited.  Could surely be further optimised.
+ ASM_START()
+ PROLOGUE(mpn_invert_limb)
+ 	lsr	x2, x0, #54
+-	adrp	x1, approx_tab
++	adrp	x1, approx_tab@PAGE
+ 	and	x2, x2, #0x1fe
+-	add	x1, x1, :lo12:approx_tab
++	add	x1, x1, approx_tab@PAGEOFF
+ 	ldrh	w3, [x1,x2]
+ 	lsr	x4, x0, #24
+ 	add	x4, x4, #1
+-- 
+2.24.3 (Apple Git-128)
+
