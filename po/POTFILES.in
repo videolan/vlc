@@ -447,8 +447,6 @@ modules/gui/macosx/extensions/NSMenu+VLCAdditions.h
 modules/gui/macosx/extensions/NSMenu+VLCAdditions.m
 modules/gui/macosx/extensions/NSScreen+VLCAdditions.h
 modules/gui/macosx/extensions/NSScreen+VLCAdditions.m
-modules/gui/macosx/extensions/NSSound+VLCAdditions.h
-modules/gui/macosx/extensions/NSSound+VLCAdditions.m
 modules/gui/macosx/extensions/NSString+Helpers.h
 modules/gui/macosx/extensions/NSString+Helpers.m
 modules/gui/macosx/extensions/NSView+VLCAdditions.h

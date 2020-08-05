@@ -40,8 +40,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSMenu+VLCAdditions.m \
 	gui/macosx/extensions/NSScreen+VLCAdditions.h \
 	gui/macosx/extensions/NSScreen+VLCAdditions.m \
-	gui/macosx/extensions/NSSound+VLCAdditions.h \
-	gui/macosx/extensions/NSSound+VLCAdditions.m \
 	gui/macosx/extensions/NSString+Helpers.h \
 	gui/macosx/extensions/NSString+Helpers.m \
 	gui/macosx/extensions/NSView+VLCAdditions.h \
