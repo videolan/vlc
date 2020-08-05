@@ -131,14 +131,10 @@
 		7D903E0E22438F8F00917358 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 1C64E331223DB3B60046F895 /* error.c */; };
 		7D903E2222438F8F00917358 /* dirs.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C64E32E223DB3A90046F895 /* dirs.m */; };
 		7D903E4D22438F8F00917358 /* netconf.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C64E32D223DB3A90046F895 /* netconf.m */; };
-		7D903E6F22438F8F00917358 /* thread.c in Sources */ = {isa = PBXBuildFile; fileRef = 1C64E332223DB3B60046F895 /* thread.c */; };
 		7D903EA122438F8F00917358 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DB7F1ED20CC037100C2CAED /* Cocoa.framework */; };
 		7D903EA92243921000917358 /* darwinvlc.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CC25CA71B2C585D0003F994 /* darwinvlc.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		7D903EAB2243927300917358 /* mtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EAA2243927300917358 /* mtime.c */; };
 		7D903EAD2243928800917358 /* libvlc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D903EAC2243928800917358 /* libvlc.dylib */; };
-		7D903EAF224392B400917358 /* timespec_get.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EAE224392B400917358 /* timespec_get.c */; };
 		7D903EB6224394BE00917358 /* specific.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EB5224394BE00917358 /* specific.c */; };
-		7D903EB92243952100917358 /* threads.c in Sources */ = {isa = PBXBuildFile; fileRef = 7D903EB82243952100917358 /* threads.c */; };
 		7D92AF2123DDCA8D00D81EA3 /* VLCLibraryImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D92AF2023DDCA8D00D81EA3 /* VLCLibraryImageCache.m */; };
 		7D93D8FC2316C2DC001C0063 /* VLCCustomCropArWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D93D8FB2316C2DC001C0063 /* VLCCustomCropArWindowController.m */; };
 		7DB40D2A20CBCEB500F63173 /* VLCMainMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB40D2920CBCEB500F63173 /* VLCMainMenu.m */; };
@@ -200,7 +196,6 @@
 		1C64E32D223DB3A90046F895 /* netconf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = netconf.m; path = ../../../src/darwin/netconf.m; sourceTree = "<group>"; };
 		1C64E32E223DB3A90046F895 /* dirs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dirs.m; path = ../../../src/darwin/dirs.m; sourceTree = "<group>"; };
 		1C64E331223DB3B60046F895 /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = error.c; path = ../../../src/darwin/error.c; sourceTree = "<group>"; };
-		1C64E332223DB3B60046F895 /* thread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = thread.c; path = ../../../src/darwin/thread.c; sourceTree = "<group>"; };
 		1C67C8A31D58C0980079E1C1 /* VLCHelpWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHelpWindowController.h; sourceTree = "<group>"; };
 		1C67C8A41D58C0980079E1C1 /* VLCHelpWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHelpWindowController.m; sourceTree = "<group>"; };
 		1C67C8A61D58C0A40079E1C1 /* VLCAboutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCAboutWindowController.h; sourceTree = "<group>"; };
@@ -538,11 +533,8 @@
 		7D8BB0B318302AC000FAE9B7 /* VLCLogWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLogWindowController.h; sourceTree = "<group>"; };
 		7D8BB0B418302AC000FAE9B7 /* VLCLogWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLogWindowController.m; sourceTree = "<group>"; };
 		7D903EA622438F8F00917358 /* macOS core items.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "macOS core items.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		7D903EAA2243927300917358 /* mtime.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = mtime.c; path = ../../../../src/misc/mtime.c; sourceTree = "<group>"; };
 		7D903EAC2243928800917358 /* libvlc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvlc.dylib; path = ../../../build/vlc_install_dir/lib/libvlc.dylib; sourceTree = "<group>"; };
-		7D903EAE224392B400917358 /* timespec_get.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = timespec_get.c; path = ../../../../compat/timespec_get.c; sourceTree = "<group>"; };
 		7D903EB5224394BE00917358 /* specific.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = specific.c; path = ../../../src/darwin/specific.c; sourceTree = "<group>"; };
-		7D903EB82243952100917358 /* threads.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = threads.c; path = ../../../../src/misc/threads.c; sourceTree = "<group>"; };
 		7D92AF1F23DDCA8D00D81EA3 /* VLCLibraryImageCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryImageCache.h; sourceTree = "<group>"; };
 		7D92AF2023DDCA8D00D81EA3 /* VLCLibraryImageCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryImageCache.m; sourceTree = "<group>"; };
 		7D93D8F92316C142001C0063 /* VLCCustomCropARPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VLCCustomCropARPanel.xib; sourceTree = "<group>"; };
@@ -1430,16 +1422,6 @@
 			name = "Window Button Images";
 			sourceTree = "<group>";
 		};
-		7D903EB4224393C700917358 /* core dependencies */ = {
-			isa = PBXGroup;
-			children = (
-				7D903EAE224392B400917358 /* timespec_get.c */,
-				7D903EAA2243927300917358 /* mtime.c */,
-				7D903EB82243952100917358 /* threads.c */,
-			);
-			path = "core dependencies";
-			sourceTree = "<group>";
-		};
 		7DB7F1EA20CC036C00C2CAED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1565,9 +1547,7 @@
 				1C64E32D223DB3A90046F895 /* netconf.m */,
 				1CC25CA71B2C585D0003F994 /* darwinvlc.m */,
 				1C64E331223DB3B60046F895 /* error.c */,
-				1C64E332223DB3B60046F895 /* thread.c */,
 				7D903EB5224394BE00917358 /* specific.c */,
-				7D903EB4224393C700917358 /* core dependencies */,
 			);
 			name = core;
 			sourceTree = "<group>";
@@ -1858,10 +1838,6 @@
 				7D903E0E22438F8F00917358 /* error.c in Sources */,
 				7D903E2222438F8F00917358 /* dirs.m in Sources */,
 				7D903E4D22438F8F00917358 /* netconf.m in Sources */,
-				7D903E6F22438F8F00917358 /* thread.c in Sources */,
-				7D903EAB2243927300917358 /* mtime.c in Sources */,
-				7D903EAF224392B400917358 /* timespec_get.c in Sources */,
-				7D903EB92243952100917358 /* threads.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
