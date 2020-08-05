@@ -175,9 +175,10 @@ static FT_Error RequestFace( FTC_FaceID face_id, FT_Library library,
     return 0;
 }
 
-static void LRUGlyphRefRelease( void *v )
+static void LRUGlyphRefRelease( void *priv, void *v )
 {
     vlc_ftcache_custom_glyph_ref_t ref = (vlc_ftcache_custom_glyph_ref_t) v;
+    VLC_UNUSED(priv);
     assert(ref->refcount);
     if( --ref->refcount == 0 )
     {
@@ -219,7 +220,7 @@ vlc_ftcache_t * vlc_ftcache_New( vlc_object_t *obj, FT_Library p_library,
     /* Dictionnaries for fonts */
     vlc_dictionary_init( &ftcache->face_ids, 50 );
 
-    ftcache->glyphs_lrucache = vlc_lru_New( 128, LRUGlyphRefRelease );
+    ftcache->glyphs_lrucache = vlc_lru_New( 128, LRUGlyphRefRelease, ftcache );
 
     if(!ftcache->glyphs_lrucache ||
        FTC_Manager_New( p_library, 4, 8, maxkb << 10,

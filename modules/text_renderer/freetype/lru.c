@@ -34,7 +34,8 @@ struct vlc_lru_entry
 
 struct vlc_lru
 {
-    void (*releaseValue)(void *);
+    void (*releaseValue)(void *, void *);
+    void *priv;
     unsigned max;
     vlc_dictionary_t dict;
     struct vlc_list list;
@@ -46,15 +47,18 @@ static void vlc_lru_releaseentry( void *value, void *priv )
     struct vlc_lru_entry *entry = value;
     struct vlc_lru *lru = priv;
     free(entry->psz_key);
-    lru->releaseValue(entry->value);
+    if( lru->releaseValue )
+        lru->releaseValue( lru->priv, entry->value );
     free(entry);
 }
 
-vlc_lru * vlc_lru_New( unsigned max, void(*releaseValue)(void *) )
+vlc_lru * vlc_lru_New( unsigned max,
+                       void(*releaseValue)(void *, void *), void *priv )
 {
     vlc_lru *lru = malloc(sizeof(*lru));
     if( lru )
     {
+        lru->priv = priv;
         lru->max = max;
         vlc_dictionary_init( &lru->dict, max );
         vlc_list_init( &lru->list );
@@ -68,6 +72,11 @@ void vlc_lru_Release( vlc_lru *lru )
 {
     vlc_dictionary_clear( &lru->dict, vlc_lru_releaseentry, lru );
     free( lru );
+}
+
+bool vlc_lru_HasKey( vlc_lru *lru, const char *psz_key )
+{
+    return vlc_dictionary_has_key( &lru->dict, psz_key );
 }
 
 void * vlc_lru_Get( vlc_lru *lru, const char *psz_key )
@@ -94,13 +103,13 @@ void vlc_lru_Insert( vlc_lru *lru, const char *psz_key, void *value )
     struct vlc_lru_entry *entry = calloc(1, sizeof(*entry));
     if(!entry)
     {
-        lru->releaseValue(value);
+        lru->releaseValue(lru->priv, value);
         return;
     }
     entry->psz_key = strdup( psz_key );
     if(!entry->psz_key)
     {
-        lru->releaseValue(value);
+        lru->releaseValue(lru->priv, value);
         free(entry);
         return;
     }
@@ -120,4 +129,13 @@ void vlc_lru_Insert( vlc_lru *lru, const char *psz_key, void *value )
         vlc_dictionary_remove_value_for_key(&lru->dict, toremove->psz_key, NULL, NULL);
         vlc_lru_releaseentry(toremove, lru);
     }
+}
+
+void vlc_lru_Apply( vlc_lru *lru,
+                    void(*func)(void *, const char *, void *),
+                    void *priv )
+{
+    struct vlc_lru_entry *entry;
+    vlc_list_foreach( entry, &lru->list, node )
+        func( priv, entry->psz_key, entry->value );
 }

@@ -155,6 +155,12 @@ struct vlc_family_t
     vlc_font_t   *p_fonts; /**< fonts matching this family */
 };
 
+typedef struct
+{
+    const char *psz_key;
+    struct VLC_VECTOR(char *) vec;
+} fontfamilies_t;
+
 #define FB_LIST_ATTACHMENTS "attachments"
 #define FB_LIST_DEFAULT     "default"
 #define FB_NAME             "fallback"
@@ -166,17 +172,17 @@ void FontSelectDelete( vlc_font_select_t * );
  * Get a pointer to the vlc_family_t in the master list that matches \p psz_family.
  * Add this family to the list if it hasn't been added yet.
  */
-const vlc_family_t * FontSelectGetFamily( vlc_font_select_t *, const char *psz_family );
+const vlc_family_t * FontSelectFamily( vlc_font_select_t *, const char *psz_family );
+const vlc_family_t * FontSelectAmongFamilies( vlc_font_select_t *, const fontfamilies_t * );
 
 /**
- * Get the fallback list for \p psz_family from the system and cache
+ * Get the fallback list for \p fontfamilies_t from the system and cache
  * it in \ref fallback_map.
  * On Windows fallback lists are populated progressively as required
  * using Uniscribe, so we need the codepoint here.
  */
-vlc_family_t * FontSelectGetFallbacks( vlc_font_select_t *, const char *psz_family,
+vlc_family_t * FontFallbacksAmongFamilies( vlc_font_select_t *, const fontfamilies_t *,
                                        uni_char_t codepoint );
-
 
 /* ******************
  * Family and fonts *

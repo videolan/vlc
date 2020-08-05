@@ -571,7 +571,8 @@ static void DWrite_ParseFamily( vlc_font_select_t *fs, IDWriteFontFamily *p_dw_f
     }
 }
 
-extern "C" const vlc_family_t *DWrite_GetFamily( vlc_font_select_t *fs, const char *psz_lcname )
+extern "C" int DWrite_GetFamily( vlc_font_select_t *fs, const char *psz_lcname,
+                                 const vlc_family_t **pp_result )
 {
     dw_sys_t                     *p_dw_sys     = ( dw_sys_t * ) fs->p_dw_sys;
     ComPtr< IDWriteFontFamily >   p_dw_family;
@@ -583,13 +584,16 @@ extern "C" const vlc_family_t *DWrite_GetFamily( vlc_font_select_t *fs, const ch
         ( vlc_family_t * ) vlc_dictionary_value_for_key( &fs->family_map, psz_lcname );
 
     if( p_family )
-        return p_family;
+    {
+        *pp_result = p_family;
+        return VLC_SUCCESS;
+    }
 
     p_family = NewFamily( fs, psz_lcname, &fs->p_families,
                           &fs->family_map, psz_lcname );
 
     if( unlikely( !p_family ) )
-        return NULL;
+        return VLC_EGENERIC;
 
     msg_Dbg( fs->p_obj, "DWrite_GetFamily(): family name: %s", psz_lcname );
 
@@ -674,7 +678,8 @@ extern "C" const vlc_family_t *DWrite_GetFamily( vlc_font_select_t *fs, const ch
 
 done:
     free( pwsz_family );
-    return p_family;
+    *pp_result = p_family;
+    return VLC_SUCCESS;
 }
 
 static char *DWrite_Fallback( vlc_font_select_t *fs, const char *psz_lcname,
@@ -750,12 +755,13 @@ done:
     return psz_result;
 }
 
-extern "C" vlc_family_t *DWrite_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
-                                              uni_char_t codepoint )
+extern "C" int DWrite_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
+                                    uni_char_t codepoint, vlc_family_t **pp_result )
 {
     vlc_family_t  *p_family      = NULL;
     vlc_family_t  *p_fallbacks   = NULL;
     char          *psz_fallback  = NULL;
+    int            i_ret         = VLC_EGENERIC;
 
     p_fallbacks = ( vlc_family_t * ) vlc_dictionary_value_for_key( &fs->fallback_map, psz_lcname );
 
@@ -775,12 +781,16 @@ extern "C" vlc_family_t *DWrite_GetFallbacks( vlc_font_select_t *fs, const char 
         if( !psz_fallback )
             goto done;
 
-        const vlc_family_t *p_fallback = DWrite_GetFamily( fs, psz_fallback );
-        if( !p_fallback || !p_fallback->p_fonts )
+        const vlc_family_t *p_fallback = NULL;
+        if( DWrite_GetFamily( fs, psz_fallback, &p_fallback ) != VLC_SUCCESS )
             goto done;
 
-        if( !CheckFace( fs, p_fallback->p_fonts, codepoint ) )
+        if( !p_fallback || !p_fallback->p_fonts ||
+           !CheckFace( fs, p_fallback->p_fonts, codepoint ) )
+        {
+            i_ret = VLC_SUCCESS;
             goto done;
+        }
 
         p_family = NewFamily( fs, psz_fallback, NULL, NULL, NULL );
 
@@ -796,7 +806,11 @@ extern "C" vlc_family_t *DWrite_GetFallbacks( vlc_font_select_t *fs, const char 
                                    psz_lcname, p_family );
     }
 
+    i_ret = VLC_SUCCESS;
+
 done:
     free( psz_fallback );
-    return p_family;
+
+    *pp_result = p_family;
+    return i_ret;
 }

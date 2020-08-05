@@ -87,7 +87,6 @@ typedef struct vlc_font_select_t vlc_font_select_t;
  * This structure is part of the video output thread descriptor.
  * It describes the freetype specific properties of an output thread.
  *****************************************************************************/
-typedef struct VLC_VECTOR(char *) fontfamilies_t;
 typedef struct vlc_family_t vlc_family_t;
 typedef struct
 {

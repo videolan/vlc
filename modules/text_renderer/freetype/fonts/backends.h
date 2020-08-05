@@ -21,21 +21,32 @@
 extern "C" {
 #endif
 
+#include "../lru.h"
+
 struct vlc_font_select_t
 {
     vlc_object_t *p_obj;
     filter_t *p_filter;
 
-    const vlc_family_t * (*pf_get_family) ( vlc_font_select_t *, const char *psz_family );
+    /* If the callbacks return VLC_SUCCESS, this means the result is valid
+       (can still be no match/NULL), and if not, this is a temp error. */
+    int (*pf_select_family) ( vlc_font_select_t *, const char *psz_family,
+                              const vlc_family_t ** );
+    int (*pf_select_among_families)( vlc_font_select_t *, const fontfamilies_t *,
+                                     const vlc_family_t ** );
 
-    vlc_family_t * (*pf_get_fallbacks) ( vlc_font_select_t *, const char *psz_family,
-                     uni_char_t codepoint );
+    int (*pf_get_fallbacks) ( vlc_font_select_t *, const char *psz_family,
+                              uni_char_t codepoint, vlc_family_t ** );
+    int (*pf_get_fallbacks_among_families) ( vlc_font_select_t *, const fontfamilies_t *,
+                                             uni_char_t codepoint, vlc_family_t ** );
 
     /**
      * This is the master family list. It owns the lists of vlc_font_t's
      * and should be freed using FreeFamiliesAndFonts()
      */
     vlc_family_t      *p_families;
+    /* We need to limit caching of lookups as we do not control the names */
+    vlc_lru           *families_lookup_lru;
 
     /**
      * This maps a family name to a vlc_family_t within the master list
@@ -60,37 +71,40 @@ struct vlc_font_select_t
  * PLATFORM SPECIFIC SELECTORS
  **/
 #ifdef HAVE_FONTCONFIG
-vlc_family_t *FontConfig_GetFallbacks( vlc_font_select_t *, const char *psz_family,
-                                       uni_char_t codepoint );
-const vlc_family_t *FontConfig_GetFamily( vlc_font_select_t *, const char *psz_family );
+int FontConfig_GetFallbacksAmongFamilies( vlc_font_select_t *, const fontfamilies_t *,
+                                          uni_char_t codepoint, vlc_family_t **pp_result );
+int FontConfig_GetFamily( vlc_font_select_t *, const char *psz_family, const vlc_family_t ** );
+int FontConfig_SelectAmongFamilies( vlc_font_select_t *fs, const fontfamilies_t *families,
+                                    const vlc_family_t **pp_result );
 int FontConfig_Prepare( vlc_font_select_t * );
 void FontConfig_Unprepare( vlc_font_select_t * );
 #endif /* FONTCONFIG */
 
 #if defined( _WIN32 )
-const vlc_family_t *DWrite_GetFamily( vlc_font_select_t *, const char *psz_family );
-vlc_family_t *DWrite_GetFallbacks( vlc_font_select_t *, const char *psz_family,
-                                  uni_char_t codepoint );
+int DWrite_GetFamily( vlc_font_select_t *, const char *psz_family, const vlc_family_t ** );
+int DWrite_GetFallbacks( vlc_font_select_t *, const char *psz_family,
+                         uni_char_t codepoint, vlc_family_t ** );
 int InitDWrite( vlc_font_select_t * );
 int ReleaseDWrite( vlc_font_select_t * );
 int DWrite_GetFontStream( vlc_font_select_t *, int i_index, FT_Stream *pp_stream );
 #if !VLC_WINSTORE_APP
-vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *, const char *psz_family,
-                                  uni_char_t codepoint );
+int Win32_GetFallbacks( vlc_font_select_t *, const char *psz_family,
+                        uni_char_t codepoint, vlc_family_t ** );
 
-const vlc_family_t *Win32_GetFamily( vlc_font_select_t *, const char *psz_family );
+int Win32_GetFamily( vlc_font_select_t *, const char *psz_family, const vlc_family_t ** );
 #endif /* !VLC_WINSTORE_APP */
 #endif /* _WIN32 */
 
 #ifdef __APPLE__
-vlc_family_t *CoreText_GetFallbacks(vlc_font_select_t *, const char *psz_family, uni_char_t codepoint);
-const vlc_family_t *CoreText_GetFamily(vlc_font_select_t *, const char *psz_family);
+int CoreText_GetFallbacks(vlc_font_select_t *, const char *psz_family,
+                          uni_char_t codepoint, vlc_family_t **);
+int CoreText_GetFamily(vlc_font_select_t *, const char *psz_family, const vlc_family_t **);
 #endif /* __APPLE__ */
 
 #ifdef __ANDROID__
-const vlc_family_t *Android_GetFamily( vlc_font_select_t *, const char *psz_family );
-vlc_family_t *Android_GetFallbacks( vlc_font_select_t *, const char *psz_family,
-                                    uni_char_t codepoint );
+int Android_GetFamily( vlc_font_select_t *, const char *psz_family, const vlc_family_t ** );
+int Android_GetFallbacks( vlc_font_select_t *, const char *psz_family,
+                          uni_char_t codepoint, vlc_family_t ** );
 int Android_Prepare( vlc_font_select_t * );
 #endif /* __ANDROID__ */
 

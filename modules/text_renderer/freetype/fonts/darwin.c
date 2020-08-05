@@ -159,10 +159,13 @@ static CFComparisonResult SortCTFontMatchResults(CTFontDescriptorRef desc1,
         return kCFCompareGreaterThan;
 }
 
-const vlc_family_t *CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_lcname)
+int CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_lcname,
+                       const vlc_family_t **pp_result)
 {
+    int i_ret = VLC_EGENERIC;
+
     if (unlikely(psz_lcname == NULL)) {
-        return NULL;
+        return VLC_EGENERIC;
     }
 
     psz_lcname = CoreText_TranslateGenericFamily(psz_lcname);
@@ -170,7 +173,8 @@ const vlc_family_t *CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_lc
     /* let's double check if we have parsed this family already */
     vlc_family_t *p_family = vlc_dictionary_value_for_key(&fs->family_map, psz_lcname);
     if (p_family) {
-        return p_family;
+        *pp_result = p_family;
+        return VLC_SUCCESS;
     }
 
     CTFontCollectionRef coreTextFontCollection = NULL;
@@ -239,6 +243,8 @@ const vlc_family_t *CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_lc
         addNewFontToFamily(fs, iter, path, p_family);
     }
 
+    i_ret = VLC_SUCCESS;
+
 end:
     if (matchedFontDescriptions != NULL) {
         CFRelease(matchedFontDescriptions);
@@ -255,13 +261,16 @@ end:
     CFRelease(coreTextFontDescriptorsArray);
     CFRelease(familyName);
 
-    return p_family;
+    *pp_result = p_family;
+    return i_ret;
 }
 
-vlc_family_t *CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_lcname, uni_char_t codepoint)
+int CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_lcname,
+                          uni_char_t codepoint, vlc_family_t **pp_result)
 {
+    int i_ret = VLC_EGENERIC;
     if (unlikely(psz_lcname == NULL)) {
-        return NULL;
+        return VLC_EGENERIC;
     }
 
     psz_lcname = CoreText_TranslateGenericFamily(psz_lcname);
@@ -299,6 +308,7 @@ vlc_family_t *CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_lcnam
 
     p_family = vlc_dictionary_value_for_key(&fs->family_map, psz_lc_fallback);
     if (p_family) {
+        i_ret = VLC_SUCCESS;
         goto done;
     }
 
@@ -313,10 +323,13 @@ vlc_family_t *CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_lcnam
 
     /* check if the path is empty, which can happen in rare circumstances */
     if (psz_fontPath == NULL || *psz_fontPath == '\0') {
+        i_ret = VLC_SUCCESS;
         goto done;
     }
 
     addNewFontToFamily(fs, fallbackFontDescriptor, strdup(psz_fontPath), p_family);
+
+    i_ret = VLC_SUCCESS;
 
 done:
     CFRelease(familyName);
@@ -331,5 +344,7 @@ done:
         CFRelease(postScriptFallbackFontname);
     if (fallbackFontDescriptor != NULL)
         CFRelease(fallbackFontDescriptor);
-    return p_family;
+
+    *pp_result = p_family;
+    return i_ret;
 }

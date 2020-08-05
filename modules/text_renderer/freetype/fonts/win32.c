@@ -392,19 +392,22 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     return 1;
 }
 
-const vlc_family_t *Win32_GetFamily( vlc_font_select_t *fs, const char *psz_lcname )
+int Win32_GetFamily( vlc_font_select_t *fs, const char *psz_lcname, const vlc_family_t **pp_result )
 {
     vlc_family_t *p_family =
         vlc_dictionary_value_for_key( &fs->family_map, psz_lcname );
 
     if( p_family )
-        return p_family;
+    {
+        *pp_result = p_family;
+        return VLC_SUCCESS;
+    }
 
     p_family = NewFamily( fs, psz_lcname, &fs->p_families,
                           &fs->family_map, psz_lcname );
 
     if( unlikely( !p_family ) )
-        return NULL;
+        return VLC_EGENERIC;
 
     LOGFONT lf;
     lf.lfCharSet = DEFAULT_CHARSET;
@@ -421,7 +424,8 @@ const vlc_family_t *Win32_GetFamily( vlc_font_select_t *fs, const char *psz_lcna
     EnumFontFamiliesEx(hDC, &lf, (FONTENUMPROC)&EnumFontCallback, (LPARAM)&ctx, 0);
     ReleaseDC(NULL, hDC);
 
-    return p_family;
+    *pp_result = p_family;
+    return VLC_SUCCESS;
 }
 
 static int CALLBACK MetaFileEnumProc( HDC hdc, HANDLETABLE* table,
@@ -516,12 +520,13 @@ error:
     return NULL;
 }
 
-vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
-                                  uni_char_t codepoint )
+int Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
+                        uni_char_t codepoint, vlc_family_t **pp_result )
 {
     vlc_family_t  *p_family      = NULL;
     vlc_family_t  *p_fallbacks   = NULL;
     char          *psz_uniscribe = NULL;
+    int            i_ret         = VLC_EGENERIC;
 
     p_fallbacks = vlc_dictionary_value_for_key( &fs->fallback_map, psz_lcname );
 
@@ -537,16 +542,22 @@ vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
     if( !p_family )
     {
         psz_uniscribe = UniscribeFallback( psz_lcname, codepoint );
-
         if( !psz_uniscribe )
+        {
+            i_ret = VLC_SUCCESS;
+            goto done;
+        }
+
+        const vlc_family_t *p_uniscribe = NULL;
+        if( Win32_GetFamily( fs, psz_uniscribe, &p_uniscribe ) != VLC_SUCCESS )
             goto done;
 
-        const vlc_family_t *p_uniscribe = Win32_GetFamily( fs, psz_uniscribe );
-        if( !p_uniscribe || !p_uniscribe->p_fonts )
+        if( !p_uniscribe || !p_uniscribe->p_fonts ||
+            !CheckFace( fs, p_uniscribe->p_fonts, codepoint ) )
+        {
+            i_ret = VLC_SUCCESS;
             goto done;
-
-        if( !CheckFace( fs, p_uniscribe->p_fonts, codepoint ) )
-            goto done;
+        }
 
         p_family = NewFamily( fs, psz_uniscribe, NULL, NULL, NULL );
 
@@ -562,9 +573,12 @@ vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
                                    psz_lcname, p_family );
     }
 
+    i_ret = VLC_SUCCESS;
+
 done:
     free( psz_uniscribe );
-    return p_family;
+    *pp_result = p_family;
+    return i_ret;
 }
 
 char * MakeFilePath( vlc_font_select_t *fs, const char *psz_filename )

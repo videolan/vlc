@@ -426,27 +426,24 @@ int Android_Prepare( vlc_font_select_t *fs )
     return VLC_SUCCESS;
 }
 
-const vlc_family_t *Android_GetFamily( vlc_font_select_t *fs, const char *psz_lcname )
+int Android_GetFamily( vlc_font_select_t *fs, const char *psz_lcname,
+                       const vlc_family_t **pp_result )
 {
-    vlc_family_t *p_family =
-            vlc_dictionary_value_for_key( &fs->family_map, psz_lcname );
+    *pp_result = vlc_dictionary_value_for_key( &fs->family_map, psz_lcname );
+    if( *pp_result == kVLCDictionaryNotFound )
+        *pp_result = NULL;
 
-    if( p_family == kVLCDictionaryNotFound )
-        return NULL;
-
-    return p_family;
+    return VLC_SUCCESS;
 }
 
-vlc_family_t *Android_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
-                                    uni_char_t codepoint )
+int Android_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
+                          uni_char_t codepoint, vlc_family_t **pp_result )
 {
     VLC_UNUSED( codepoint );
 
-    vlc_family_t *p_fallbacks =
-                vlc_dictionary_value_for_key( &fs->fallback_map, psz_lcname );
+    *pp_result = vlc_dictionary_value_for_key( &fs->fallback_map, psz_lcname );
+    if( *pp_result == kVLCDictionaryNotFound )
+        *pp_result = NULL;
 
-    if( p_fallbacks == kVLCDictionaryNotFound )
-        return NULL;
-
-    return p_fallbacks;
+    return VLC_SUCCESS;
 }
