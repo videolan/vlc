@@ -1,0 +1,27 @@
+From 02ee915921172c416fe0ccf7c6322b77196cdaa1 Mon Sep 17 00:00:00 2001
+From: Marco Bodrato <bodrato@mail.dm.unipi.it>
+Date: Fri, 20 Sep 2019 20:35:11 +0200
+Subject: [PATCH 4/4] tests/mpn/t-sqrlo.c: Initialise scratch area.
+
+---
+ tests/mpn/t-sqrlo.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/tests/mpn/t-sqrlo.c b/tests/mpn/t-sqrlo.c
+index 96caddc6f..be2b1eeac 100644
+--- a/tests/mpn/t-sqrlo.c
++++ b/tests/mpn/t-sqrlo.c
+@@ -93,10 +93,8 @@ main (int argc, char **argv)
+       p_after = pp[n];
+ 
+       itch = mpn_sqrlo_itch (n);
+-#if 0
+       ASSERT_ALWAYS (itch <= mpn_sqrlo_itch (MAX_N));
+       mpn_random2 (scratch-1, itch+2);
+-#endif
+       s_before = scratch[-1];
+       s_after = scratch[itch];
+ 
+-- 
+2.24.3 (Apple Git-128)
+
