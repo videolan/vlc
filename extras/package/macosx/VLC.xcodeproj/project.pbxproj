@@ -1679,14 +1679,11 @@
 			};
 			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */;
 			compatibilityVersion = "Xcode 6.3";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 1;
 			knownRegions = (
-				English,
-				Japanese,
-				French,
-				German,
 				Base,
+				en,
 			);
 			mainGroup = 089C166AFE841209C02AAC07 /* vlc */;
 			projectDirPath = "";
