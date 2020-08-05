@@ -120,7 +120,7 @@ Item {
 
     property real network_normal: dp(100, scale)
 
-    property int miniPlayerHeight: dp(60, scale)
+    property int miniPlayerHeight: dp(76, scale)
 
     property int expandAlbumTracksHeight: dp(200, scale)
 

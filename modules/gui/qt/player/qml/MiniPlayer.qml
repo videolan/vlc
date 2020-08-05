@@ -49,127 +49,155 @@ Widgets.NavigableFocusScope {
         to: 0
     }
 
-    Rectangle {
-
+    Column {
         anchors.left: parent.left
         anchors.right: parent.right
 
-        height: VLCStyle.miniPlayerHeight
-        color: VLCStyle.colors.banner
+        spacing: VLCStyle.dp(-progressBar.height / 2)
 
-        RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: VLCStyle.applicationHorizontalMargin
-            anchors.rightMargin: VLCStyle.applicationHorizontalMargin
-            anchors.bottomMargin: VLCStyle.applicationVerticalMargin
+        SliderBar {
+            id: progressBar
+            value: player.position
+            visible: progressBar.value >= 0.0 && progressBar.value <= 1.0
+            z: 1
 
-            Widgets.FocusBackground {
-                id: playingItemInfo
-                Layout.fillHeight: true
-                Layout.preferredWidth: playingItemInfoRow.implicitWidth
-                width: childrenRect.width
-                focus: true
+            isMiniplayer: true
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: history.push(["player"])
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+        }
+
+        Rectangle {
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            z: 0
+            height: VLCStyle.miniPlayerHeight
+            color: VLCStyle.colors.banner
+
+            RowLayout {
+                anchors {
+                    fill: parent
+
+                    leftMargin: VLCStyle.applicationHorizontalMargin
+                    rightMargin: VLCStyle.applicationHorizontalMargin
+                    bottomMargin: VLCStyle.applicationVerticalMargin
                 }
 
-                Keys.onPressed: {
-                    if (KeyHelper.matchOk(event) ) {
-                        event.accepted = true
+                Widgets.FocusBackground {
+                    id: playingItemInfo
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: playingItemInfoRow.implicitWidth
+                    width: childrenRect.width
+                    focus: true
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: history.push(["player"])
                     }
-                }
-                Keys.onReleased: {
-                    if (!event.accepted && KeyHelper.matchOk(event))
-                        history.push(["player"])
-                }
 
-                Row {
-                    id: playingItemInfoRow
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
+                    Keys.onPressed: {
+                        if (KeyHelper.matchOk(event) ) {
+                            event.accepted = true
+                        }
+                    }
+                    Keys.onReleased: {
+                        if (!event.accepted && KeyHelper.matchOk(event))
+                            history.push(["player"])
+                    }
 
-                    rightPadding: VLCStyle.margin_normal
 
-                    Image {
-                        id: cover
-                        source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
-                                ? mainPlaylistController.currentItem.artwork
-                                : VLCStyle.noArtAlbum
-                        fillMode: Image.PreserveAspectFit
-
+                    Row {
+                        id: playingItemInfoRow
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
-                    }
-
-                    Column {
                         anchors.verticalCenter: parent.verticalCenter
+
                         leftPadding: VLCStyle.margin_normal
 
-                        Widgets.MenuLabel {
-                            id: titleLabel
-                            text: mainPlaylistController.currentItem.title
+                        Image {
+                            id: cover
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
+                                    ? mainPlaylistController.currentItem.artwork
+                                    : VLCStyle.noArtAlbum
+                            fillMode: Image.PreserveAspectFit
+
+                            width: VLCStyle.dp(60)
+                            height: VLCStyle.dp(60)
                         }
 
-                        Widgets.MenuCaption {
-                            id: artistLabel
-                            text: mainPlaylistController.currentItem.artist
-                        }
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            leftPadding: VLCStyle.margin_xsmall
 
-                        Widgets.MenuCaption {
-                            id: progressIndicator
-                            text: player.time.toString() + " / " + player.length.toString()
+                            Widgets.MenuLabel {
+                                id: titleLabel
+                                text: mainPlaylistController.currentItem.title
+                            }
+
+                            Widgets.MenuCaption {
+                                id: artistLabel
+                                text: mainPlaylistController.currentItem.artist
+                            }
+
+                            Widgets.MenuCaption {
+                                id: progressIndicator
+                                text: player.time.toString() + " / " + player.length.toString()
+                            }
                         }
                     }
+
+                    KeyNavigation.right: buttonrow
                 }
 
-                KeyNavigation.right: buttonrow
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                PlayerButtonsLayout {
+                    id: buttonrow
+
+                    model: miniPlayerModel
+                    defaultSize: VLCStyle.icon_normal
+
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.rightMargin: VLCStyle.margin_normal
+                    Layout.preferredWidth: buttonrow.implicitWidth
+                    Layout.preferredHeight: buttonrow.implicitHeight
+
+                    navigationParent: root
+                    navigationLeftItem: playingItemInfo
+                }
             }
 
-            Item {
-                Layout.fillWidth: true
+            Connections{
+                target: mainInterface
+                onToolBarConfUpdated: {
+                    miniPlayerModel.reloadModel()
+                }
             }
 
-            PlayerButtonsLayout {
-                id: buttonrow
+            PlayerControlBarModel {
+                id: miniPlayerModel
+                mainCtx: mainctx
+                configName: "MiniPlayerToolbar"
+            }
 
-                model: miniPlayerModel
-                defaultSize: VLCStyle.icon_normal
+            ControlButtons {
+                id: controlmodelbuttons
+            }
 
-                Layout.alignment: Qt.AlignVCenter
-                Layout.rightMargin: VLCStyle.margin_normal
-                Layout.preferredWidth: buttonrow.implicitWidth
-                Layout.preferredHeight: buttonrow.implicitHeight
-
-                navigationParent: root
-                navigationLeftItem: playingItemInfo
+            Keys.onPressed: {
+                if (!event.accepted)
+                    defaultKeyAction(event, 0)
+                if (!event.accepted)
+                    mainInterface.sendHotkey(event.key, event.modifiers);
             }
         }
-
-        Connections{
-            target: mainInterface
-            onToolBarConfUpdated: {
-                miniPlayerModel.reloadModel()
-            }
-        }
-
-        PlayerControlBarModel {
-            id: miniPlayerModel
-            mainCtx: mainctx
-            configName: "MiniPlayerToolbar"
-        }
-
-        ControlButtons {
-            id: controlmodelbuttons
-        }
-
-        Keys.onPressed: {
-            if (!event.accepted)
-                defaultKeyAction(event, 0)
-            if (!event.accepted)
-                mainInterface.sendHotkey(event.key, event.modifiers);
-        }
-
     }
 }
