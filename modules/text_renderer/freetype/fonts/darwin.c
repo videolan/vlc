@@ -71,7 +71,12 @@ static void addNewFontToFamily(vlc_font_select_t *fs, CTFontDescriptorRef iter, 
     b_italic = traitValue > 0.03;
 
 #ifndef NDEBUG
-    msg_Dbg(fs->p_obj, "New font: bold %i italic %i path '%s'", b_bold, b_italic, path);
+    CFStringRef name = CTFontDescriptorCopyAttribute(iter, kCTFontNameAttribute);
+    char *psz_name = name ? FromCFString(name, kCFStringEncodingUTF8) : 0;
+    msg_Dbg(fs->p_obj, "New font: (%s) bold %i italic %i path '%s'", psz_name, b_bold, b_italic, path);
+    free(psz_name);
+    if(name)
+        CFRelease(name);
 #else
     VLC_UNUSED(fs);
 #endif
