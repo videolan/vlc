@@ -46,7 +46,7 @@ static const PlayerControlBarModel::IconToolButton MINI_TB_DEFAULT[] = {
                                                                            {PlayerControlBarModel::LOOP_BUTTON},
                                                                            {PlayerControlBarModel::WIDGET_SPACER_EXTEND},
                                                                            {PlayerControlBarModel::VOLUME},
-                                                                           {PlayerControlBarModel::FULLSCREEN_BUTTON}
+                                                                           {PlayerControlBarModel::PLAYER_SWITCH_BUTTON}
                                                                        };
 
 

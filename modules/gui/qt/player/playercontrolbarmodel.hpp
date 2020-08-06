@@ -67,6 +67,7 @@ public:
         CHAPTER_PREVIOUS_BUTTON,
         CHAPTER_NEXT_BUTTON,
         BUTTON_MAX,
+        PLAYER_SWITCH_BUTTON,
 
         SPLITTER = 0x20,
         VOLUME,
