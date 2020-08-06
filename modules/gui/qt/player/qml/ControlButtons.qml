@@ -178,6 +178,12 @@ Item{
 
             background: Item {
 
+                Gradient {
+                    id: playBtnGradient
+                    GradientStop { position: 0.0; color: "#f89a06" }
+                    GradientStop { position: 1.0; color: "#e25b01" }
+                }
+
                 MouseArea {
                     id: playBtnMouseArea
 
@@ -229,12 +235,50 @@ Item{
                     radius: (width * 0.5)
                     anchors.fill: parent
 
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: "#f89a06" }
-                        GradientStop { position: 1.0; color: "#e25b01" }
-                    }
+                    gradient: playBtnGradient
 
-                    visible: !opacityMask.visible
+                    visible: false
+
+                    antialiasing: true
+                }
+
+                Rectangle {
+                    id: innerColorRect
+
+                    anchors.fill: parent
+                    radius: (width * 0.5)
+
+                    opacity: 0
+                    gradient: playBtnGradient
+
+                    state: "transparent"
+
+                    readonly property bool stateIndicator: (playBtn.activeFocus || playBtn.realHovered || playBtn.highlighted)
+                    states: [
+                        State {
+                            name: "opaque"
+                            when: innerColorRect.stateIndicator
+                        },
+                        State {
+                            name: "transparent"
+                            when: !innerColorRect.stateIndicator
+                        }
+                    ]
+
+                    transitions: [
+                        Transition {
+                            from: "opaque"
+                            to: "transparent"
+
+                            NumberAnimation { target: innerColorRect; properties: "opacity"; to: 0; duration: 75; easing.type: Easing.OutSine }
+                        },
+                        Transition {
+                            from: "transparent"
+                            to: "opaque"
+
+                            NumberAnimation { target: innerColorRect; properties: "opacity"; to: 1; duration: 75; easing.type: Easing.InSine }
+                        }
+                    ]
 
                     antialiasing: true
                 }
@@ -257,7 +301,7 @@ Item{
                     source: outerRect
                     maskSource: innerRect
 
-                    visible: !(playBtn.activeFocus || playBtn.realHovered || playBtn.highlighted)
+
                     antialiasing: true
                 }
             }
