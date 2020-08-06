@@ -85,7 +85,7 @@ static void addNewFontToFamily(vlc_font_select_t *fs, CTFontDescriptorRef iter, 
     CFRelease(fontTraits);
 }
 
-const struct
+static const struct
 {
     const char *psz_generic;
     const char *psz_local;
@@ -108,7 +108,7 @@ CoreTextGenericMapping[] =
 //    { "ui-sans-serif",     "" },
 };
 
-const char *CoreText_TranslateGenericFamily(const char *psz_family)
+static const char *CoreText_TranslateGenericFamily(const char *psz_family)
 {
     for( size_t i=0; i<ARRAY_SIZE(CoreTextGenericMapping); i++ )
     {
