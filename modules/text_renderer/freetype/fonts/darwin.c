@@ -118,6 +118,47 @@ static const char *CoreText_TranslateGenericFamily(const char *psz_family)
     return psz_family;
 }
 
+static float ScoreCTFontMatchResults(CTFontDescriptorRef desc)
+{
+    float score = 0.0;
+    float value;
+    CFDictionaryRef fontTraits = CTFontDescriptorCopyAttribute(desc, kCTFontTraitsAttribute);
+    if(fontTraits)
+    {
+        CFNumberRef trait = CFDictionaryGetValue(fontTraits, kCTFontWeightTrait);
+        if(trait)
+        {
+            CFNumberGetValue(trait, kCFNumberFloatType, &value);
+            if(value < 0)
+                score -= value;
+            else if(value > 0.23)
+                score += value - 0.23;
+        }
+
+        trait = CFDictionaryGetValue(fontTraits, kCTFontWidthTrait);
+        if(trait)
+        {
+            CFNumberGetValue(trait, kCFNumberFloatType, &value);
+            score += fabs(value);
+        }
+
+        CFRelease(fontTraits);
+    }
+    return score;
+}
+
+static CFComparisonResult SortCTFontMatchResults(CTFontDescriptorRef desc1,
+                                                 CTFontDescriptorRef desc2, void *ctx)
+{
+    VLC_UNUSED(ctx);
+    float score1 = ScoreCTFontMatchResults(desc1);
+    float score2 = ScoreCTFontMatchResults(desc2);
+    if(score1 <= score2)
+        return (score1 == score2) ? kCFCompareEqualTo : kCFCompareLessThan;
+    else
+        return kCFCompareGreaterThan;
+}
+
 const vlc_family_t *CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_family)
 {
     if (unlikely(psz_family == NULL)) {
@@ -174,7 +215,8 @@ const vlc_family_t *CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_fa
         goto end;
     }
 
-    matchedFontDescriptions = CTFontCollectionCreateMatchingFontDescriptors(coreTextFontCollection);
+    matchedFontDescriptions = CTFontCollectionCreateMatchingFontDescriptorsSortedWithCallback(
+          coreTextFontCollection, SortCTFontMatchResults, fs);
     if (matchedFontDescriptions == NULL) {
         msg_Warn(fs->p_obj, "CTFontCollectionCreateMatchingFontDescriptors (2) failed!");
         goto end;
