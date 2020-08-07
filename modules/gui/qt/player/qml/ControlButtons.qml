@@ -161,6 +161,7 @@ Item{
             property bool realHovered: false
 
             contentItem: Label {
+                id: contentLabel
                 color: videoOverlays ? (playBtn.enabled ? playBtn.color : playBtn.colorDisabled)
                                      : (playBtn.enabled ? "#303030" : "#7f8c8d")
 
@@ -168,6 +169,28 @@ Item{
                        && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
                       ? VLCIcons.pause
                       : VLCIcons.play
+
+                Behavior on text {
+                    SequentialAnimation {
+                        NumberAnimation {
+                            target: contentLabel
+                            property: "font.pixelSize"
+                            to: 0
+                            easing.type: Easing.OutSine
+                            duration: 75
+                        }
+
+                        PropertyAction { }
+
+                        NumberAnimation {
+                            target: contentLabel
+                            property: "font.pixelSize"
+                            to: VLCIcons.pixelSize(VLCStyle.icon_normal)
+                            easing.type: Easing.InSine
+                            duration: 75
+                        }
+                    }
+                }
 
                 font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_normal)
                 font.family: VLCIcons.fontFamily
