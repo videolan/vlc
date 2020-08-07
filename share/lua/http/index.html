@@ -168,7 +168,7 @@
 					modal: true,
 					buttons:{
 						"<?vlc gettext("Yes") ?>":function(){
-							var file			=	$('[current="current"]','#libraryTree').length>0 ? $('[current="current"]','#libraryTree').first().attr('uri') : ($('.jstree-clicked','#libraryTree').length>0 ? $('.jstree-clicked','#libraryTree').first().parents().first().attr('uri') : ($('#plid_'+current_id).attr('uri') ? $('#plid_'+current_id).attr('uri') : false));
+							var file			=	$('[current="current"]','#libraryTree').length>0 ? $('[current="current"]','#libraryTree').first().attr('uri') : ($('.jstree-clicked','#libraryTree').length>0 ? $('.jstree-clicked','#libraryTree').first().parents().first().attr('uri') : ($('#plid_'+current_playlist_id).attr('uri') ? $('#plid_'+current_playlist_id).attr('uri') : false));
 							if(file){
 								if($('#viewContainer').css('display')=='none'){
 									$('#buttonViewer').click();
