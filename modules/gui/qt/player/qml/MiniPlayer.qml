@@ -15,6 +15,8 @@ Widgets.NavigableFocusScope {
 
     readonly property bool expanded: root.implicitHeight === root.childrenRect.height
 
+    property var mainContent: undefined
+
     Component.onCompleted : {
         if (player.playingState === PlayerController.PLAYING_STATE_STOPPED)
             root.implicitHeight = 0;
@@ -77,14 +79,25 @@ Widgets.NavigableFocusScope {
             }
         }
 
-        Rectangle {
+
+        Item {
+            id: mainRect
+
             anchors {
                 left: parent.left
                 right: parent.right
             }
             z: 0
             height: VLCStyle.miniPlayerHeight
-            color: VLCStyle.colors.banner
+
+            Widgets.FrostedGlassEffect {
+                anchors.fill: parent
+
+                source: mainContent
+                sourceRect: Qt.rect(root.x, root.y, root.width, root.height)
+
+                tint: VLCStyle.colors.blendColors(VLCStyle.colors.bg, VLCStyle.colors.banner, 0.85)
+            }
 
             RowLayout {
                 anchors {

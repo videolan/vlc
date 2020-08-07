@@ -137,7 +137,7 @@ Widgets.NavigableFocusScope {
             navigationParent: root
 
             ColumnLayout {
-                id: column
+                id: mainColumn
                 anchors.fill: parent
 
                 Layout.minimumWidth: VLCStyle.minWindowWidth
@@ -370,6 +370,8 @@ Widgets.NavigableFocusScope {
                     if (!expanded && miniPlayer.activeFocus)
                         stackView.forceActiveFocus()
                 }
+
+                mainContent: mainColumn
             }
         }
     }
