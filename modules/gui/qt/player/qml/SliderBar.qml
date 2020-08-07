@@ -20,6 +20,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 import QtGraphicalEffects 1.0
 
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 Slider {
@@ -29,6 +30,8 @@ Slider {
     property bool _isHold: false
     property bool _isSeekPointsShown: true
     property bool isMiniplayer: false
+
+    property alias parentWindow: timeTooltip.parentWindow
 
     anchors.margins: isMiniplayer ? 0 : VLCStyle.margin_xxsmall
 
@@ -42,106 +45,16 @@ Slider {
         onTriggered: control._isSeekPointsShown = false
     }
 
-    Item {
+    Widgets.PointingTooltip {
         id: timeTooltip
-        property real location: sliderRectMouseArea.mouseX
-        property real position: location/control.width
 
-        width: childrenRect.width
-        height: childrenRect.height
-
-        function getX() {
-            var x = location - (timeTooltip.width / 2)
-            var diff = (x + timeTooltip.width) - (VLCStyle.appWidth)
-            var sliderRealX = mainInterfaceRect.mapFromItem(sliderRectMouseArea, sliderRectMouseArea.x, sliderRectMouseArea.y).x
-
-            if (x < -sliderRealX) {
-                arrow.diff = x
-                x = -sliderRealX
-            }
-            else if (diff > 0) {
-                arrow.diff = diff
-                x -= (diff)
-            }
-            else {
-                arrow.diff = 0
-            }
-
-            return x
-        }
-
-        y: -(childrenRect.height)
-        x: getX()
         visible: control.hovered
 
-        Item {
-            height: childrenRect.height * Math.sqrt(2)
-            width: timeIndicatorRect.width
+        text: player.length.scale(timeTooltip.position).toString() +
+              (player.hasChapters ?
+                   " - " + player.chapters.getNameAtPosition(timeTooltip.position) : "")
 
-            anchors.horizontalCenter: timeIndicatorRect.horizontalCenter
-            anchors.verticalCenter: timeIndicatorRect.bottom
-            anchors.verticalCenterOffset: height / 2
-
-            clip: true
-
-            Rectangle {
-                id: arrow
-                width: VLCStyle.dp(10)
-                height: VLCStyle.dp(10)
-
-                anchors.centerIn: parent
-                anchors.verticalCenterOffset: -(parent.height / 2)
-                anchors.horizontalCenterOffset: diff
-
-                property int diff: 0
-
-                color: VLCStyle.colors.bgAlt
-
-                rotation: 45
-
-                RectangularGlow {
-                    anchors.fill: parent
-                    glowRadius: VLCStyle.dp(2)
-                    spread: 0.2
-                    color: VLCStyle.colors.glowColor
-                }
-            }
-        }
-
-        Rectangle {
-            id: timeIndicatorRect
-            width: timeMetrics.width + VLCStyle.dp(10)
-            height: timeMetrics.height + VLCStyle.dp(5)
-
-            color: VLCStyle.colors.bgAlt
-            radius: VLCStyle.dp(6)
-
-            RectangularGlow {
-                anchors.fill: parent
-
-                glowRadius: VLCStyle.dp(2)
-                cornerRadius: parent.radius
-                spread: 0.2
-
-                color: VLCStyle.colors.glowColor
-            }
-
-            Text {
-                anchors.fill: parent
-                text: timeMetrics.text
-                color: VLCStyle.colors.text
-
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                TextMetrics {
-                    id: timeMetrics
-                    text: player.length.scale(timeTooltip.position).toString() +
-                          (player.hasChapters ?
-                               " - " + player.chapters.getNameAtPosition(timeTooltip.position) : "")
-                }
-            }
-        }
+        mouseArea: sliderRectMouseArea
     }
 
     Connections {    
