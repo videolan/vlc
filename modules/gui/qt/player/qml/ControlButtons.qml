@@ -242,6 +242,11 @@ Item{
                             mainPlaylistController.togglePlayPause()
                     }
 
+                    onPressAndHold: {
+                        if (playBtn.realHovered)
+                            mainPlaylistController.stop()
+                    }
+
                 }
 
                 Rectangle {
