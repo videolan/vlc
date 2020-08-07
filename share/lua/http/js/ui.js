@@ -61,7 +61,7 @@ $(function () {
         if ($(this).attr('state') == 'stopped') {
             switch (current_que) {
             case 'main':
-                var id = $('.jstree-clicked', '#libraryTree').length > 0 ? $('.jstree-clicked', '#libraryTree').first().parents().first().attr('id').substr(5) : current_id;
+                var id = $('.jstree-clicked', '#libraryTree').length > 0 ? $('.jstree-clicked', '#libraryTree').first().parents().first().attr('id').substr(5) : current_playlist_id;
                 sendCommand({
                     'command': 'pl_play',
                     'id': id
