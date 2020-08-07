@@ -8,7 +8,7 @@
 				"<?vlc gettext("Okay") ?>":function(){
 					$('#player').empty();
 					$('#player').attr('href',$('#stream_protocol').val()+'://'+$('#stream_host').val()+':'+$('#stream_port').val()+'/'+$('#stream_file').val());
-					flowplayer("player", "http://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
+					flowplayer("player", "https://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
 					$(this).dialog('close');
 				},
 				"<?vlc gettext("Cancel") ?>":function(){
