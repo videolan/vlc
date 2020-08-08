@@ -306,3 +306,6 @@ DIST_solid = \
 	solid/vlc-opencda.desktop \
 	solid/vlc-opendvd.desktop \
 	solid/vlc-openvcd.desktop
+
+EXTRA_DIST += \
+        hrtfs/dodeca_and_7channel_3DSL_HRTF.sofa
