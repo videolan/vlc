@@ -893,6 +893,7 @@ extern const CGFloat VLCVolumeDefault;
 
 /* Vout */
 @property (readonly) int64_t displayedPictures;
+@property (readonly) int64_t latePictures;
 @property (readonly) int64_t lostPictures;
 
 /* Aout */

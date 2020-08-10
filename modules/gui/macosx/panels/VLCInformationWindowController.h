@@ -84,6 +84,8 @@
 @property (readwrite, weak) IBOutlet NSTextField *videoDecodedTextField;
 @property (readwrite, weak) IBOutlet NSTextField *displayedLabel;
 @property (readwrite, weak) IBOutlet NSTextField *displayedTextField;
+@property (readwrite, weak) IBOutlet NSTextField *lateFramesLabel;
+@property (readwrite, weak) IBOutlet NSTextField *lateFramesTextField;
 @property (readwrite, weak) IBOutlet NSTextField *lostFramesLabel;
 @property (readwrite, weak) IBOutlet NSTextField *lostFramesTextField;
 @property (readwrite, weak) IBOutlet NSTextField *inputLabel;

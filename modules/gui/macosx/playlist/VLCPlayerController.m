@@ -1744,6 +1744,7 @@ static int BossCallback(vlc_object_t *p_this,
         _decodedVideo = p_stats->i_decoded_video;
 
         _displayedPictures = p_stats->i_displayed_pictures;
+        _latePictures = p_stats->i_late_pictures;
         _lostPictures = p_stats->i_lost_pictures;
 
         _playedAudioBuffers = p_stats->i_played_abuffers;

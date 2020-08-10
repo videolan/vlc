@@ -167,6 +167,7 @@
     [_videoDecodedLabel setStringValue: _NS("Decoded blocks")];
     [_displayedLabel setStringValue: _NS("Displayed frames")];
     [_lostFramesLabel setStringValue: _NS("Lost frames")];
+    [_lateFramesLabel setStringValue: _NS("Late frames")];
 
     [_audioLabel setStringValue: _NS("Audio")];
     [_audioDecodedLabel setStringValue: _NS("Decoded blocks")];
@@ -206,6 +207,7 @@
     //Initializing Video Variables
     [_videoDecodedTextField setIntValue:0];
     [_displayedTextField setIntValue:0];
+    [_lateFramesTextField setIntValue:0];
     [_lostFramesTextField setIntValue:0];
 
     //Initializing Audio Variables
@@ -264,6 +266,7 @@
     /* Video */
     [_videoDecodedTextField setIntegerValue: inputStats.decodedVideo];
     [_displayedTextField setIntegerValue: inputStats.displayedPictures];
+    [_lateFramesTextField setIntegerValue: inputStats.latePictures];
     [_lostFramesTextField setIntegerValue: inputStats.lostPictures];
 
     /* Audio */
