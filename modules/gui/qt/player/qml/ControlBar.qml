@@ -129,6 +129,8 @@ Widgets.NavigableFocusScope {
 
     ControlButtons{
         id:controlmodelbuttons
+
+        parentWindow: mainInterfaceRect
     }
 
 }

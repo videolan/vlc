@@ -28,7 +28,10 @@ import "qrc:///menus/" as Menus
 import "qrc:///style/"
 
 Item{
+    id: controlButtons
+
     property bool isMiniplayer: false
+    property var  parentWindow: undefined
 
     property var buttonL: [
         { id:  PlayerControlBarModel.PLAY_BUTTON, label: VLCIcons.play, text: i18n.qtr("Play")},
@@ -811,7 +814,7 @@ Item{
 
     Component{
         id: volumeBtnDelegate
-        VolumeWidget{}
+        VolumeWidget { parentWindow: controlButtons.parentWindow }
     }
 
     Component {
