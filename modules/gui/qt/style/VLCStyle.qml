@@ -177,6 +177,8 @@ Item {
     property int applicationHorizontalMargin: 0
     property int applicationVerticalMargin: 0
 
+    property int globalToolbar_height: dp(32, scale)
+    property int localToolbar_height: dp(40, scale)
 
     //timings
     property int delayToolTipAppear: 500;
