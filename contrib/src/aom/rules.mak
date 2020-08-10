@@ -65,7 +65,7 @@ AOM_CONF += -DAOM_ADS2GAS_REQUIRED=1 -DAOM_ADS2GAS=../build/make/ads2gas.pl -DAO
 endif
 endif
 
-ifdef HAVE_IOS
+ifdef HAVE_DARWIN_OS
 ifneq ($(filter arm aarch64, $(ARCH)),)
 # These targets don't have runtime cpu detection.
 AOM_CONF += -DCONFIG_RUNTIME_CPU_DETECT=0
