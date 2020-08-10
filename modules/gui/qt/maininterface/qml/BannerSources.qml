@@ -140,7 +140,7 @@ Widgets.NavigableFocusScope {
                     navigationRightItem: globalCtxGroup
                     navigationDownItem: localMenuGroup.visible ?  localMenuGroup : playlistGroup
 
-                    delegate: Widgets.TabButtonExt {
+                    delegate: Widgets.BannerTabButton {
                         iconTxt: model.icon
                         selected: model.index === selectedIndex
                         onClicked: root.itemClicked(model.index)
@@ -275,7 +275,7 @@ Widgets.NavigableFocusScope {
                         }
                     }
 
-                    delegate: Widgets.TabButtonExt {
+                    delegate: Widgets.BannerTabButton {
                         text: model.displayText
                         selected: model.index === subSelectedIndex
                         onClicked:  root.subItemClicked(model.index)
