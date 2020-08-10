@@ -33,7 +33,7 @@ Widgets.NavigableFocusScope {
     property var viewProperties: ({})
 
     property var sortModel
-    property var contentModel
+    property var model
 
     readonly property var pageModel: [{
         name: "all",
@@ -61,7 +61,7 @@ Widgets.NavigableFocusScope {
             stackView.replace(root.pageModel[0].component)
         stackView.currentItem.navigationParent = root
         sortModel = stackView.currentItem.sortModel
-        contentModel = stackView.currentItem.model
+        model = stackView.currentItem.model
     }
 
     function _updateGenresAllHistory(currentIndex) {
