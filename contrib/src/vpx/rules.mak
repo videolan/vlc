@@ -23,6 +23,9 @@ ifdef HAVE_ANDROID
 endif
 ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/vpx/darwin-do-not-overwrite-ld.patch
+ifeq ($(ARCH),aarch64)
+	$(APPLY) $(SRC)/vpx/libvpx-darwin-aarch64.patch
+endif
 endif
 	$(MOVE)
 

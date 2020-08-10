@@ -1,0 +1,20 @@
+--- ./build/make/configure.sh.original  2020-08-10 15:46:20.000000000 +0200
++++ ./build/make/configure.sh   2020-08-10 15:54:53.000000000 +0200
+@@ -996,7 +996,7 @@ EOF
+ 
+         darwin*)
+           if ! enabled external_build; then
+-            XCRUN_FIND="xcrun --sdk iphoneos --find"
++            XCRUN_FIND="xcrun --find"
+             CXX="$(${XCRUN_FIND} clang++)"
+             CC="$(${XCRUN_FIND} clang)"
+             AR="$(${XCRUN_FIND} ar)"
+@@ -1015,7 +1015,7 @@ EOF
+             add_cflags -arch ${tgt_isa}
+             add_ldflags -arch ${tgt_isa}
+ 
+-            alt_libc="$(show_darwin_sdk_path iphoneos)"
++            alt_libc="$(show_darwin_sdk_path macosx)"
+             if [ -d "${alt_libc}" ]; then
+               add_cflags -isysroot ${alt_libc}
+             fi
