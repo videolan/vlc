@@ -946,7 +946,14 @@ static int ReadMeta( vlc_object_t* p_this)
         p_stream = p_filter;
 
     VlcIostream s( p_stream );
-    f = FileRef( &s );
+#ifndef VLC_PATCHED_TAGLIB_ID3V2_READSTYLE
+    uint64_t dummy;
+    if( vlc_stream_GetSize( p_stream, &dummy ) != VLC_SUCCESS )
+        s.setMaxSequentialRead( 2048 );
+    else
+        s.setMaxSequentialRead( 1024 * 2048 );
+#endif
+    f = FileRef( &s, false, AudioProperties::ReadStyle::Fast );
 #else // !TAGLIB_VERSION_1_11
     char *psz_path = vlc_uri2path( psz_uri );
     free( psz_uri );
