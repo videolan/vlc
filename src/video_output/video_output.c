@@ -347,11 +347,11 @@ static void vout_UpdateWindowSizeLocked(vout_thread_sys_t *vout)
 
 /* */
 void vout_GetResetStatistic(vout_thread_t *vout, unsigned *restrict displayed,
-                            unsigned *restrict lost)
+                            unsigned *restrict lost, unsigned *restrict late)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
-    vout_statistic_GetReset( &sys->statistic, displayed, lost );
+    vout_statistic_GetReset( &sys->statistic, displayed, lost, late );
 }
 
 bool vout_IsEmpty(vout_thread_t *vout)
@@ -1083,6 +1083,7 @@ static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse,
                         continue;
                     } else if (late > 0) {
                         msg_Dbg(&vout->obj, "picture might be displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
+                        vout_statistic_AddLate(&sys->statistic, 1);
                     }
                 }
                 vlc_video_context *pic_vctx = picture_GetVideoContext(decoded);

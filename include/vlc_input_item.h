@@ -520,6 +520,7 @@ struct input_stats_t
 
     /* Vout */
     int64_t i_displayed_pictures;
+    int64_t i_late_pictures;
     int64_t i_lost_pictures;
 
     /* Aout */

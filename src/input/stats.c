@@ -66,6 +66,7 @@ struct input_stats *input_stats_Create(void)
     atomic_init(&stats->played_abuffers, 0);
     atomic_init(&stats->lost_abuffers, 0);
     atomic_init(&stats->displayed_pictures, 0);
+    atomic_init(&stats->late_pictures, 0);
     atomic_init(&stats->lost_pictures, 0);
     return stats;
 }
@@ -105,6 +106,8 @@ void input_stats_Compute(struct input_stats *stats, input_stats_t *st)
     st->i_decoded_video = atomic_load_explicit(&stats->decoded_video,
                                                memory_order_relaxed);
     st->i_displayed_pictures = atomic_load_explicit(&stats->displayed_pictures,
+                                                    memory_order_relaxed);
+    st->i_late_pictures = atomic_load_explicit(&stats->late_pictures,
                                                     memory_order_relaxed);
     st->i_lost_pictures = atomic_load_explicit(&stats->lost_pictures,
                                                memory_order_relaxed);

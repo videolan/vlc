@@ -729,6 +729,7 @@ struct input_stats {
     atomic_uintmax_t played_abuffers;
     atomic_uintmax_t lost_abuffers;
     atomic_uintmax_t displayed_pictures;
+    atomic_uintmax_t late_pictures;
     atomic_uintmax_t lost_pictures;
 };
 

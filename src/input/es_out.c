@@ -344,7 +344,7 @@ decoder_on_thumbnail_ready(vlc_input_decoder_t *decoder, picture_t *pic, void *u
 
 static void
 decoder_on_new_video_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsigned lost,
-                           unsigned displayed, void *userdata)
+                           unsigned displayed, unsigned late, void *userdata)
 {
     (void) decoder;
 
@@ -364,6 +364,8 @@ decoder_on_new_video_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsig
     atomic_fetch_add_explicit(&stats->lost_pictures, lost,
                               memory_order_relaxed);
     atomic_fetch_add_explicit(&stats->displayed_pictures, displayed,
+                              memory_order_relaxed);
+    atomic_fetch_add_explicit(&stats->late_pictures, late,
                               memory_order_relaxed);
 }
 
