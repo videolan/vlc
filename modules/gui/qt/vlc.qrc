@@ -178,6 +178,7 @@
         <file alias="MainInterface.qml">maininterface/qml/MainInterface.qml</file>
     </qresource>
     <qresource prefix="/widgets">
+        <file alias="BannerTabButton.qml">widgets/qml/BannerTabButton.qml</file>
         <file alias="BusyIndicatorExt.qml">widgets/qml/BusyIndicatorExt.qml</file>
         <file alias="GridItem.qml">widgets/qml/GridItem.qml</file>
         <file alias="ListItem.qml">widgets/qml/ListItem.qml</file>
