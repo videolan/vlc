@@ -995,16 +995,15 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     if (sys->prepareWait)
     {
-        int maxWait = 10;
         ID3D11DeviceContext_End(sys->d3d_dev.d3dcontext, sys->prepareWait);
 
         while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev.d3dcontext,
-                                                      sys->prepareWait, NULL, 0, 0)
-               && --maxWait)
+                                                      sys->prepareWait, NULL, 0, 0))
         {
+            const mtime_t render_wait = CLOCK_FREQ / 500; // 2ms
             if (is_d3d11_opaque(picture->format.i_chroma))
                 d3d11_device_unlock( &sys->d3d_dev );
-            SleepEx(2, TRUE);
+            msleep( render_wait );
             if (is_d3d11_opaque(picture->format.i_chroma))
                 d3d11_device_lock( &sys->d3d_dev );
         }
