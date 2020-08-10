@@ -710,6 +710,8 @@ static int DrawStats(intf_thread_t *intf)
                 p_stats->i_decoded_video);
         MainBoxWrite(sys, l++, _("| frames displayed :    %5"PRIi64),
                 p_stats->i_displayed_pictures);
+        MainBoxWrite(sys, l++, _("| frames late      :    %5"PRIi64),
+                p_stats->i_late_pictures);
         MainBoxWrite(sys, l++, _("| frames lost      :    %5"PRIi64),
                 p_stats->i_lost_pictures);
     }
