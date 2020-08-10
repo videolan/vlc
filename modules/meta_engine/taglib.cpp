@@ -189,6 +189,7 @@ public:
             return ByteVector::null;
         else if ((size_t)i_read != length)
             res.resize(i_read);
+        m_previousPos += i_read;
         return res;
     }
 
