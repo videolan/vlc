@@ -706,7 +706,8 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/ToolTipArea.qml \
 	gui/qt/widgets/qml/VideoProgressBar.qml \
 	gui/qt/widgets/qml/VideoQualityLabel.qml \
-	gui/qt/widgets/qml/ListSubtitleLabel.qml
+	gui/qt/widgets/qml/ListSubtitleLabel.qml \
+	gui/qt/widgets/qml/FrostedGlassEffect.qml
 
 EXTRA_DIST += gui/qt/vlc.qrc $(libqt_plugin_la_RES)
 
