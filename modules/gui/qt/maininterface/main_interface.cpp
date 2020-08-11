@@ -108,6 +108,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf )
 
     b_hideAfterCreation  = false; // --qt-start-minimized
     playlistVisible      = false;
+    playlistWidthFactor  = 4.0;
     b_interfaceFullScreen= false;
     b_hasPausedWhenMinimized = false;
     i_kc_offset          = false;
@@ -144,8 +145,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf )
     /* Set the other interface settings */
     settings = getSettings();
 
-    /* */
+    /* playlist settings */
     b_playlistDocked = getSettings()->value( "MainWindow/pl-dock-status", true ).toBool();
+    playlistVisible  = getSettings()->value( "MainWindow/playlist-visible", false ).toBool();
+    playlistWidthFactor = getSettings()->value( "MainWindow/playlist-width-factor", 4.0 ).toDouble();
+
     m_showRemainingTime = getSettings()->value( "MainWindow/ShowRemainingTime", false ).toBool();
 
     /* Should the UI stays on top of other windows */
@@ -247,6 +251,7 @@ MainInterface::~MainInterface()
 
     /* Save playlist state */
     settings->setValue( "playlist-visible", playlistVisible );
+    settings->setValue( "playlist-width-factor", playlistWidthFactor);
 
     /* Save the stackCentralW sizes */
     settings->endGroup();
@@ -440,6 +445,15 @@ void MainInterface::setPlaylistVisible( bool visible )
     playlistVisible = visible;
 
     emit playlistVisibleChanged(visible);
+}
+
+void MainInterface::setPlaylistWidthFactor( double factor )
+{
+    if (factor > 0.0)
+    {
+        playlistWidthFactor = factor;
+        emit playlistWidthFactorChanged(factor);
+    }
 }
 
 void MainInterface::setShowRemainingTime( bool show )

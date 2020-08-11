@@ -83,6 +83,8 @@ Item {
     property color playerBorder: "#222222"
 
     property color separator: blendColors(bg, text, .95)
+    
+    property color roundPlayCoverBorder: "#979797"
 
     property color playlistSeparator: colors_id.white
 

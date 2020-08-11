@@ -110,17 +110,20 @@ NavigableFocusScope {
             Item {
                 id: innerRect
                 anchors.fill: parent
-                anchors.margins: VLCStyle.margin_xxsmall
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: VLCStyle.margin_small
 
                 RowLayout {
                     anchors.fill: parent
                     anchors.rightMargin: VLCStyle.margin_xxsmall
+                    spacing: VLCStyle.margin_xsmall
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+
                     Item {
-                        Layout.preferredWidth: VLCStyle.icon_normal
-                        Layout.preferredHeight: VLCStyle.icon_normal
+                        Layout.preferredWidth: coverLoader.item.width
+                        Layout.preferredHeight: coverLoader.item.height
                         Loader {
-                            anchors.fill: parent
+                            id: coverLoader
+
                             sourceComponent: root.cover
                         }
                         Text {

@@ -26,6 +26,7 @@ MLArtist::MLArtist(const vlc_ml_artist_t* _data, QObject *_parent)
     , m_shortBio( QString::fromUtf8( _data->psz_shortbio ) )
     , m_cover   ( QString::fromUtf8( _data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
     , m_nbAlbums( _data->i_nb_album )
+    , m_nbTracks( _data->i_nb_tracks )
 {
     assert( _data );
 }
@@ -37,6 +38,7 @@ MLArtist::MLArtist(const MLArtist &artist, QObject *_parent)
     , m_shortBio( artist.m_shortBio )
     , m_cover   ( artist.m_cover )
     , m_nbAlbums( artist.m_nbAlbums )
+    , m_nbTracks( artist.m_nbTracks )
 {
 
 }

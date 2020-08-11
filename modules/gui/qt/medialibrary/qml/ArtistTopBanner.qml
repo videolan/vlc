@@ -28,101 +28,121 @@ import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
     id: root
+
     property var artist: ({})
 
-    height: col.implicitHeight
-
+    height: VLCStyle.artistBanner_height
 
     Image {
         id: background
 
-        anchors.fill: parent
-
+        width: parent.width
+        height: VLCStyle.artistBanner_height
         source: artist.cover || VLCStyle.noArtArtist
+        fillMode: artist.cover ? Image.PreserveAspectCrop : Image.Tile
 
-        fillMode: Image.PreserveAspectCrop
-        sourceSize.width: parent.width
-        sourceSize.height: parent.height
-
-        layer.enabled: true
-        layer.effect: OpacityMask {
-            maskSource: LinearGradient {
-                id: mask
-                width: background.width
-                height: background.height
-                gradient: Gradient {
-                    GradientStop { position: 0.2; color: "#88000000" }
-                    GradientStop { position: 0.9; color: "transparent" }
-                }
+        Rectangle {
+            anchors.fill: background
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, .5) }
+                GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, .7) }
             }
         }
     }
 
-    ColumnLayout {
+    GaussianBlur {
+        source: background
+        anchors.fill: background
+        radius: VLCStyle.dp(4, VLCStyle.scale)
+        samples: (radius * 2) + 1
+    }
+
+    RowLayout {
         id: col
-        anchors.fill: parent
-        RowLayout {
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            Layout.leftMargin: VLCStyle.margin_small
-            Layout.rightMargin: VLCStyle.margin_small
+
+        anchors.fill: background
+        anchors.topMargin: VLCStyle.margin_xxlarge
+        anchors.bottomMargin: VLCStyle.margin_xxlarge
+        anchors.leftMargin: VLCStyle.margin_xlarge
+        spacing: VLCStyle.margin_normal
+        clip: true
+
+        Item {
+            Layout.alignment: Qt.AlignVCenter
+            Layout.preferredHeight: VLCStyle.cover_normal
+            Layout.preferredWidth: VLCStyle.cover_normal
 
             Widgets.RoundImage {
                 source: artist.cover || VLCStyle.noArtArtist
-                height: VLCStyle.cover_xsmall
-                width: VLCStyle.cover_xsmall
-                radius: VLCStyle.cover_xsmall
+                height: VLCStyle.cover_normal
+                width: VLCStyle.cover_normal
+                radius: VLCStyle.cover_normal
 
-                Layout.alignment: Qt.AlignVCenter
-                Layout.preferredHeight: VLCStyle.cover_small
-                Layout.preferredWidth: VLCStyle.cover_small
             }
 
-            Text {
-                id: artistName
+            Rectangle {
+                height: VLCStyle.cover_normal
+                width: VLCStyle.cover_normal
+                radius: VLCStyle.cover_normal
+                color: "transparent"
+                border.width: VLCStyle.dp(1, VLCStyle.scale)
+                border.color: VLCStyle.colors.roundPlayCoverBorder
+            }
+        }
+
+        ColumnLayout {
+            spacing: 0
+
+            Layout.alignment: Qt.AlignVCenter
+            Layout.fillWidth: true
+
+            Widgets.SubtitleLabel {
                 text: artist.name || i18n.qtr("No artist")
+                color: "white"
+            }
 
-                Layout.alignment: Qt.AlignVCenter
-                Layout.leftMargin: VLCStyle.margin_small
-                Layout.rightMargin: VLCStyle.margin_small
+            Widgets.MenuCaption {
+                text: i18n.qtr("%1 Songs").arg(artist.nb_tracks)
+                color: "white"
+                opacity: .6
 
-                font.pixelSize: VLCStyle.fontSize_xxlarge
-                wrapMode: Text.WordWrap
-                maximumLineCount: 2
-                elide: Text.ElideRight
-                color: VLCStyle.colors.text
+                Layout.topMargin: VLCStyle.margin_xxxsmall
+            }
+
+            Widgets.NavigableRow {
+                id: actionButtons
+
+                focus: true
+                navigationParent: root
+                spacing: VLCStyle.margin_large
+
+                Layout.fillWidth: true
+                Layout.topMargin: VLCStyle.margin_large
+
+                model: ObjectModel {
+                    Widgets.TabButtonExt {
+                        id: playActionBtn
+                        iconTxt: VLCIcons.play
+                        text: i18n.qtr("Play all")
+                        color: "white"
+                        focus: true
+                        onClicked: medialib.addAndPlay( artist.id )
+                    }
+
+                    Widgets.TabButtonExt {
+                        id: enqueueActionBtn
+                        iconTxt: VLCIcons.enqueue
+                        text: i18n.qtr("Enqueue all")
+                        color: "white"
+                        onClicked: medialib.addToPlaylist( artist.id )
+                    }
+                }
             }
 
             Item {
                 Layout.fillWidth: true
             }
         }
-
-        Widgets.NavigableRow {
-            id: actionButtons
-
-            Layout.fillWidth: true
-
-            focus: true
-            navigationParent: root
-
-            model: ObjectModel {
-                Widgets.TabButtonExt {
-                    id: playActionBtn
-                    iconTxt: VLCIcons.play
-                    text: i18n.qtr("Play all")
-                    onClicked: medialib.addAndPlay( artist.id )
-                }
-
-                Widgets.TabButtonExt {
-                    id: enqueueActionBtn
-                    iconTxt: VLCIcons.add
-                    text: i18n.qtr("Enqueue all")
-                    onClicked: medialib.addToPlaylist( artist.id )
-                }
-            }
-        }
-
     }
 
 }

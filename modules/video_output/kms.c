@@ -101,11 +101,6 @@ struct vout_display_sys_t {
     int             drm_fd;
 };
 
-typedef struct {
-    vout_display_sys_t  *p_voutsys;
-} picture_sys_t;
-
-
 static void DestroyFB(vout_display_sys_t const *sys, uint32_t const buf)
 {
     struct drm_mode_destroy_dumb destroy_req = { .handle = sys->handle[buf] };
@@ -491,10 +486,8 @@ static bool ChromaNegotiation(vout_display_t *vd)
     return false;
 }
 
-static void CustomDestroyPicture(picture_t *p_picture)
+static void CustomDestroyPicture(vout_display_sys_t *sys)
 {
-    picture_sys_t *psys = (picture_sys_t*)p_picture->p_sys;
-    vout_display_sys_t *sys = (vout_display_sys_t *)psys->p_voutsys;
     int c;
 
     for (c = 0; c < MAXHWBUF; c++)
@@ -504,7 +497,6 @@ static void CustomDestroyPicture(picture_t *p_picture)
     drmDropMaster(sys->drm_fd);
     vlc_close(sys->drm_fd);
     sys->drm_fd = 0;
-    free(p_picture->p_sys);
 }
 
 static int OpenDisplay(vout_display_t *vd)
@@ -584,29 +576,17 @@ static int OpenDisplay(vout_display_t *vd)
     if (!found_connector)
         goto err_out;
 
-    picture_sys_t *psys = calloc(1, sizeof(*psys));
-    if (psys == NULL)
-        goto err_out;
-
-    picture_resource_t rsc = {
-        .p_sys = psys,
-        .pf_destroy = CustomDestroyPicture,
-    };
-
-    for (size_t i = 0; i < PICTURE_PLANE_MAX; i++) {
-        rsc.p[i].p_pixels = sys->map[0] + sys->offsets[i];
-        rsc.p[i].i_lines  = sys->height;
-        rsc.p[i].i_pitch  = sys->stride;
-    }
-
-    psys->p_voutsys = sys;
+    picture_resource_t rsc = { 0 };
 
     sys->picture = picture_NewFromResource(&vd->fmt, &rsc);
 
     if (!sys->picture)
-    {
-        free(psys);
         goto err_out;
+
+    for (size_t i = 0; i < PICTURE_PLANE_MAX; i++) {
+        sys->picture->p[i].p_pixels = sys->map[0] + sys->offsets[i];
+        sys->picture->p[i].i_lines  = sys->height;
+        sys->picture->p[i].i_pitch  = sys->stride;
     }
 
     return VLC_SUCCESS;
@@ -676,6 +656,7 @@ static void Close(vout_display_t *vd)
 
     if (sys->picture)
         picture_Release(sys->picture);
+    CustomDestroyPicture(sys);
 
     if (sys->drm_fd)
         drmDropMaster(sys->drm_fd);

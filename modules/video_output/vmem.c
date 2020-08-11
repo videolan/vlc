@@ -244,14 +244,14 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
 
     sys->pic_opaque = sys->lock(sys->opaque, planes);
 
-    for (unsigned i = 0; i < PICTURE_PLANE_MAX; i++) {
-        rsc.p[i].p_pixels = planes[i];
-        rsc.p[i].i_lines  = sys->lines[i];
-        rsc.p[i].i_pitch  = sys->pitches[i];
-    }
-
     picture_t *locked = picture_NewFromResource(&vd->fmt, &rsc);
     if (likely(locked != NULL)) {
+        for (unsigned i = 0; i < PICTURE_PLANE_MAX; i++) {
+            locked->p[i].p_pixels = planes[i];
+            locked->p[i].i_lines  = sys->lines[i];
+            locked->p[i].i_pitch  = sys->pitches[i];
+        }
+
         picture_CopyPixels(locked, pic);
         picture_Release(locked);
     }

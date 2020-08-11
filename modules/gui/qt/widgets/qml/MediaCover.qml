@@ -79,6 +79,7 @@ Widgets.RoundImage {
 
         anchors.fill: parent
         iconSize: VLCStyle.play_root_small
+        radius: root.radius
 
         onIconClicked: root.playIconClicked()
     }

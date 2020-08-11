@@ -42,6 +42,8 @@ Widgets.NavigableFocusScope {
     property bool forceDark: false
     property VLCColors _colors: forceDark ? vlcNightColors : VLCStyle.colors
 
+    signal setItemDropIndicatorVisible(int index, bool isVisible, bool top)
+
     VLCColors {id: vlcNightColors; state: "night"}
 
     Rectangle {
@@ -284,11 +286,38 @@ Widgets.NavigableFocusScope {
                     }
                 }
 
-                footer: PLItemFooter {
-                    z: 2
-                    onDropURLAtEnd: mainPlaylistController.insert(root.plmodel.count, urlList)
-                    onMoveAtEnd: root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
-                    listCount: view.modelCount
+                footer: DropArea {
+                    width: parent.width
+                    height: Math.max(VLCStyle.icon_normal, view.height - y)
+
+                    onEntered: {
+                        if(drag.source.model.index === root.plmodel.count - 1)
+                            return
+
+                        root.setItemDropIndicatorVisible(view.modelCount - 1, true, false);
+                    }
+                    onExited: {
+                        if(drag.source.model.index === root.plmodel.count - 1)
+                            return
+
+                        root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
+                    }
+                    onDropped: {
+                        if(drag.source.model.index === root.plmodel.count - 1)
+                            return
+
+                        if (drop.hasUrls) {
+                            //force conversion to an actual list
+                            var urlList = []
+                            for ( var url in drop.urls)
+                                urlList.push(drop.urls[url])
+                            mainPlaylistController.insert(root.plmodel.count, urlList)
+                        } else {
+                            root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
+                        }
+                        root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
+                        drop.accept()
+                    }
                 }
 
                 delegate: Column {

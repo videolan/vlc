@@ -31,8 +31,11 @@ Item {
     property alias image: picture.source
     property alias title: titleLabel.text
     property alias subtitle: subtitleTxt.text
+    property alias textHorizontalAlignment: subtitleTxt.horizontalAlignment
     property alias playCoverBorder: picture.playCoverBorder
     property alias playCoverOnlyBorders: picture.playCoverOnlyBorders
+    property alias playIconSize: picture.playIconSize
+    property alias pictureRadius: picture.radius
     property bool selected: false
 
     property alias progress: picture.progress
@@ -58,7 +61,7 @@ Item {
 
     readonly property bool _highlighted: mouseArea.containsMouse || content.activeFocus
 
-    readonly property int _selectedBorderWidth: VLCStyle.column_margin_width - ( VLCStyle.margin_small * 2 )
+    readonly property int selectedBorderWidth: VLCStyle.column_margin_width - ( VLCStyle.margin_small * 2 )
 
     property alias _primaryShadowVerticalOffset: primaryShadow.verticalOffset
     property alias _primaryShadowRadius: primaryShadow.radius
@@ -136,10 +139,12 @@ Item {
 
             /* background visible when selected */
             Rectangle {
-                x: - root._selectedBorderWidth
-                y: - root._selectedBorderWidth
-                width: layout.implicitWidth + ( root._selectedBorderWidth * 2 )
-                height:  layout.implicitHeight + ( root._selectedBorderWidth * 2 )
+                id: selectionRect
+
+                x: - root.selectedBorderWidth
+                y: - root.selectedBorderWidth
+                width: root.width + ( root.selectedBorderWidth * 2 )
+                height:  root.height + ( root.selectedBorderWidth * 2 )
                 color: VLCStyle.colors.bgAlt
                 visible: root.selected || root._highlighted
             }
@@ -147,8 +152,8 @@ Item {
             Rectangle {
                 id: baseRect
 
-                x: 1 // this rect is set such that it hides behind picture component
-                y: 1
+                x: layout.x + 1 // this rect is set such that it hides behind picture component
+                y: layout.y + 1
                 width: pictureWidth - 2
                 height: pictureHeight - 2
                 radius: picture.radius
@@ -184,7 +189,7 @@ Item {
             ColumnLayout {
                 id: layout
 
-                anchors.fill: parent
+                anchors.centerIn: parent
                 spacing: 0
 
                 Widgets.MediaCover {
@@ -197,6 +202,7 @@ Item {
 
                     Layout.preferredWidth: pictureWidth
                     Layout.preferredHeight: pictureHeight
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
                     /* new indicator (triangle at top-left of cover)*/
                     Rectangle {
@@ -222,7 +228,7 @@ Item {
                     scroll: _highlighted
 
                     Layout.preferredHeight: titleLabel.contentHeight
-                    Layout.topMargin: VLCStyle.margin_xxsmall
+                    Layout.topMargin: root.titleMargin
                     Layout.fillWidth: true
                     Layout.maximumWidth: pictureWidth
 
@@ -231,6 +237,7 @@ Item {
 
                         elide: Text.ElideNone
                         width: pictureWidth
+                        horizontalAlignment: root.textHorizontalAlignment
                     }
                 }
 

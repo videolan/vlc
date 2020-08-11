@@ -75,8 +75,10 @@ MainUI::MainUI(intf_thread_t *p_intf, MainInterface *mainInterface,  QObject *pa
     /* Get the available interfaces */
     m_extraInterfaces = new VLCVarChoiceModel(p_intf, "intf-add", this);
 
-    /* */
-    m_playlistDocked = m_settings->value( "MainWindow/pl-dock-status", true ).toBool();
+    /* playlist settings */
+    m_playlistDocked   = m_settings->value( "MainWindow/pl-dock-status", true ).toBool();
+    m_playlistVisible  = m_settings->value( "MainWindow/playlist-visible", false ).toBool();
+
     m_showRemainingTime = m_settings->value( "MainWindow/ShowRemainingTime", false ).toBool();
 
     registerQMLTypes();
@@ -84,17 +86,7 @@ MainUI::MainUI(intf_thread_t *p_intf, MainInterface *mainInterface,  QObject *pa
 
 MainUI::~MainUI()
 {
-    /* Save states */
 
-    m_settings->beginGroup("MainWindow");
-    m_settings->setValue( "pl-dock-status", m_playlistDocked );
-    m_settings->setValue( "ShowRemainingTime", m_showRemainingTime );
-
-    /* Save playlist state */
-    m_settings->setValue( "playlist-visible", m_playlistVisible );
-
-    /* Save the stackCentralW sizes */
-    m_settings->endGroup();
 }
 
 bool MainUI::setup(QQmlEngine* engine)

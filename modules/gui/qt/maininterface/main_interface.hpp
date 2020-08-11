@@ -64,6 +64,7 @@ class MainInterface : public QVLCMW
 
     Q_PROPERTY(bool playlistDocked READ isPlaylistDocked WRITE setPlaylistDocked NOTIFY playlistDockedChanged)
     Q_PROPERTY(bool playlistVisible READ isPlaylistVisible WRITE setPlaylistVisible NOTIFY playlistVisibleChanged)
+    Q_PROPERTY(double playlistWidthFactor READ getPlaylistWidthFactor WRITE setPlaylistWidthFactor NOTIFY playlistWidthFactorChanged)
     Q_PROPERTY(bool interfaceAlwaysOnTop READ isInterfaceAlwaysOnTop WRITE setInterfaceAlwaysOnTop NOTIFY interfaceAlwaysOnTopChanged)
     Q_PROPERTY(bool interfaceFullScreen READ isInterfaceFullScreen WRITE setInterfaceFullScreen NOTIFY interfaceFullScreenChanged)
     Q_PROPERTY(bool hasEmbededVideo READ hasEmbededVideo NOTIFY hasEmbededVideoChanged)
@@ -104,6 +105,7 @@ public:
     bool isInterfaceFullScreen() { return b_interfaceFullScreen; }
     bool isPlaylistDocked() { return b_playlistDocked; }
     bool isPlaylistVisible() { return playlistVisible; }
+    inline double getPlaylistWidthFactor() const { return playlistWidthFactor; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
     inline float getIntfScaleFactor() const { return m_intfScaleFactor; }
@@ -178,6 +180,7 @@ protected:
     bool                 b_hasMedialibrary = false;
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
+    double               playlistWidthFactor;   ///< playlist size: root.width / playlistScaleFactor
 
     bool                 b_hasPausedWhenMinimized;
 
@@ -193,6 +196,7 @@ public slots:
     void toggleInterfaceFullScreen();
     void setPlaylistDocked( bool );
     void setPlaylistVisible( bool );
+    void setPlaylistWidthFactor( double );
     void setInterfaceAlwaysOnTop( bool );
     void setShowRemainingTime( bool );
 
@@ -238,6 +242,7 @@ signals:
 
     void playlistDockedChanged(bool);
     void playlistVisibleChanged(bool);
+    void playlistWidthFactorChanged(double);
     void interfaceAlwaysOnTopChanged(bool);
     void interfaceFullScreenChanged(bool);
     void hasEmbededVideoChanged(bool);

@@ -26,192 +26,263 @@ import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
+
 Widgets.NavigableFocusScope {
     id: root
-    property alias model: artistModel
-    property var sortModel: [
-        { text: i18n.qtr("Alphabetic"),  criteria: "title" }
-    ]
 
-    property var artistId
+    //name and properties of the tab to be initially loaded
+    property string view: "all"
+    property var viewProperties: ({})
+    property var model
 
-    property alias currentIndex: artistList.currentIndex
-    property int initialIndex: 0
-    property int initialAlbumIndex: 0
+    readonly property var pageModel: [{
+        name: "all",
+        component: artistGridComponent
+    }, {
+        name: "albums",
+        component: artistAlbumsComponent
+    }]
 
-    onInitialAlbumIndexChanged: resetFocus()
-    onInitialIndexChanged: resetFocus()
+    Component.onCompleted: loadView()
+    onViewChanged: {
+        viewProperties = {}
+        loadView()
+    }
+    onViewPropertiesChanged: loadView()
 
-    onCurrentIndexChanged: {
-        history.update([ "mc", "music", "artists", {"initialIndex": currentIndex}])
+    function loadDefaultView() {
+        root.view = "all"
+        root.viewProperties= ({})
     }
 
-    function resetFocus() {
-        if (artistModel.count === 0) {
-            return
-        }
-        var initialIndex = root.initialIndex
-        if (initialIndex >= artistModel.count)
-            initialIndex = 0
-        if (initialIndex !== artistList.currentIndex) {
-            selectionModel.select(artistModel.index(initialIndex), ItemSelectionModel.ClearAndSelect)
-            artistList.currentIndex = initialIndex
-            artistList.positionViewAtIndex(initialIndex, ItemView.Contain)
-        }
+    function loadView() {
+        var found = stackView.loadView(root.pageModel, view, viewProperties)
+        if (!found)
+            stackView.replace(root.pageModel[0].component)
+        stackView.currentItem.navigationParent = root
+        model = stackView.currentItem.model
     }
 
-    function _actionAtIndex(index) {
-        view.forceActiveFocus()
+    function _updateArtistsAllHistory(currentIndex) {
+        history.update(["mc", "music", "artists", "all", { "initialIndex": currentIndex }])
     }
 
-    MLArtistModel {
-        id: artistModel
-        ml: medialib
+    function _updateArtistsAlbumsHistory(currentIndex, initialAlbumIndex) {
+        history.update(["mc","music", "artists", "albums", {
+            "initialIndex": currentIndex,
+            "initialAlbumIndex": initialAlbumIndex,
+        }])
+    }
 
-        onCountChanged: {
-            if (artistModel.count > 0 && !selectionModel.hasSelection) {
-                var initialIndex = root.initialIndex
+    Component {
+        id: artistGridComponent
+
+        Widgets.NavigableFocusScope {
+            id: artistAllView
+
+            readonly property int currentIndex: view.currentItem.currentIndex
+            property int initialIndex: 0
+            property alias model: artistModel
+
+            onCurrentIndexChanged: {
+                _updateArtistsAllHistory(currentIndex)
+            }
+
+            onInitialIndexChanged: resetFocus()
+
+            function showAlbumView() {
+                history.push([ "mc", "music", "artists", "albums", { initialIndex: artistAllView.currentIndex } ])
+            }
+
+            function resetFocus() {
+                if (artistModel.count === 0) {
+                    return
+                }
+                var initialIndex = artistAllView.initialIndex
                 if (initialIndex >= artistModel.count)
                     initialIndex = 0
-                artistList.currentIndex = initialIndex
+                selectionModel.select(artistModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
+                view.currentItem.currentIndex = initialIndex
+                view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
             }
-        }
-    }
 
-    Util.SelectableDelegateModel {
-        id: selectionModel
-        model: artistModel
-    }
+            MLArtistModel {
+                id: artistModel
+                ml: medialib
 
-    FocusScope {
-        visible: artistModel.count > 0
-        focus: visible
-        anchors.fill: parent
-
-    Row {
-        anchors.fill: parent
-
-        Widgets.KeyNavigableListView {
-            id: artistList
-
-            width: parent.width * 0.25
-            height: parent.height
-
-            spacing: 4
-            model: artistModel
-            currentIndex: -1
-
-            focus: true
-
-            onSelectAll: selectionModel.selectAll()
-            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onCurrentIndexChanged: {
-                if (artistList.currentIndex < artistModel.count) {
-                    root.artistId =  artistModel.getIdForIndex(artistList.currentIndex)
-                } else {
-                    root.artistId = undefined
+                onCountChanged: {
+                    if (artistModel.count > 0 && !selectionModel.hasSelection) {
+                        artistAllView.resetFocus()
+                    }
                 }
             }
 
-            navigationParent: root
-            navigationRightItem: view
-            navigationCancel: function() {
-                if (artistList.currentIndex <= 0)
-                    defaultNavigationCancel()
-                else
-                    artistList.currentIndex = 0;
+            Util.SelectableDelegateModel {
+                id: selectionModel
+                model: artistModel
             }
 
-            delegate: Widgets.ListItem {
-                height: VLCStyle.icon_normal + VLCStyle.margin_small
-                width: artistList.width
+            Widgets.MenuExt {
+                id: contextMenu
+                property var model: ({})
+                closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
 
-                property bool selected: selectionModel.isSelected(artistModel.index(index, 0))
-                Connections {
-                   target: selectionModel
-                   onSelectionChanged: selected = selectionModel.isSelected(artistModel.index(index, 0))
-                }
-
-                color: VLCStyle.colors.getBgColor(selected, this.hovered, this.activeFocus)
-
-                cover: Widgets.RoundImage {
-                    source: model.cover || VLCStyle.noArtArtistSmall
-                    height: VLCStyle.icon_normal
-                    width: VLCStyle.icon_normal
-                    radius: VLCStyle.icon_normal
-                }
-
-                line1: model.name || i18n.qtr("Unknown artist")
-
-                actionButtons: []
-
-                onItemClicked: {
-                    artistId = model.id
-                    selectionModel.updateSelection( modifier , artistList.currentIndex, index)
-                    artistList.currentIndex = index
-                    artistList.forceActiveFocus()
-                }
-
-                onItemDoubleClicked: {
-                    if (keys === Qt.RightButton)
-                        medialib.addAndPlay( model.id )
-                    else
-                        view.forceActiveFocus()
-                }
-            }
-
-        }
-
-        FocusScope {
-            id: view
-            width: parent.width * 0.75
-            height: parent.height
-
-            property alias currentIndex: albumSubView.currentIndex
-            property alias initialIndex: albumSubView.initialIndex
-
-            MusicAlbums {
-                id: albumSubView
-
-                anchors.fill: parent
-                gridViewMarginTop: 0
-
-                header: ArtistTopBanner {
-                    id: artistBanner
-                    width: albumSubView.width
-                    artist: (artistList.currentIndex >= 0)
-                            ? artistModel.getDataAt(artistList.currentIndex)
-                            : ({})
-                    navigationParent: root
-                    navigationLeftItem: artistList
-                    navigationDown: function() {
-                        artistBanner.focus = false
-                        view.forceActiveFocus()
+                Widgets.MenuItemExt {
+                    id: playMenuItem
+                    text: i18n.qtr("Play")
+                    onTriggered: {
+                        medialib.addAndPlay( contextMenu.model.id )
+                        history.push(["player"])
                     }
                 }
 
-                focus: true
-                parentId: artistId
-                initialIndex: root.initialAlbumIndex
+                Widgets.MenuItemExt {
+                    text: "Enqueue"
+                    onTriggered: medialib.addToPlaylist( contextMenu.model.id )
+                }
 
-                navigationParent: root
-                navigationUpItem: albumSubView.headerItem
-                navigationLeftItem: artistList
+                onClosed: contextMenu.parent.forceActiveFocus()
 
-                onCurrentIndexChanged: {
-                    history.update(["mc", "music", "artists", {"initialIndex" : root.currentIndex, "initialAlbumIndex": albumSubView.currentIndex  }])
+            }
+
+            Component {
+                id: gridComponent
+
+                Widgets.ExpandGridView {
+                    id: artistGrid
+
+                    anchors.fill: parent
+                    topMargin: VLCStyle.margin_large
+                    delegateModel: selectionModel
+                    model: artistModel
+                    focus: true
+                    cellWidth: VLCStyle.colWidth(1)
+                    cellHeight: VLCStyle.gridItem_music_height
+                    onSelectAll: selectionModel.selectAll()
+                    onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
+                    navigationParent: root
+
+                    onActionAtIndex: {
+                        if (selectionModel.selectedIndexes.length > 1) {
+                            medialib.addAndPlay( artistModel.getIdsForIndexes( selectionModel.selectedIndexes ) )
+                        } else {
+                            view.currentItem.currentIndex = index
+                            showAlbumView()
+                            medialib.addAndPlay( artistModel.getIdForIndex(index) )
+                        }
+                    }
+
+                    delegate: AudioGridItem {
+                        id: gridItem
+
+                        title: model.name
+                        subtitle: model.nb_tracks > 1 ? i18n.qtr("%1 songs").arg(model.nb_tracks) : i18n.qtr("%1 song").arg(model.nb_tracks)
+                        pictureRadius: VLCStyle.artistGridCover_radius
+                        pictureHeight: VLCStyle.artistGridCover_radius
+                        pictureWidth: VLCStyle.artistGridCover_radius
+                        playCoverBorder.width: VLCStyle.dp(3, VLCStyle.scale)
+                        titleMargin: VLCStyle.margin_xlarge
+                        playIconSize: VLCStyle.play_cover_small
+                        textHorizontalAlignment: Text.AlignHCenter
+                        width: VLCStyle.colWidth(1)
+
+                        onItemClicked: {
+                            selectionModel.updateSelection( modifier , view.currentItem.currentIndex, index )
+                            view.currentItem.currentIndex = index
+                            view.currentItem.forceActiveFocus()
+                        }
+
+                        onItemDoubleClicked: artistAllView.showAlbumView(model)
+                    }
                 }
             }
 
+
+
+            Component {
+                id: tableComponent
+
+                Widgets.KeyNavigableTableView {
+                    id: artistTable
+
+                    readonly property int _nbCols: VLCStyle.gridColumnsForWidth(artistTable.availableRowWidth)
+
+                    anchors.fill: parent
+                    model: artistModel
+                    focus: true
+                    headerColor: VLCStyle.colors.bg
+                    navigationParent: root
+
+                    onActionForSelection: {
+                        if (selection.length > 1) {
+                            medialib.addAndPlay( artistModel.getIdsForIndexes( selection ) )
+                        } else {
+                            showAlbumView()
+                            medialib.addAndPlay( artistModel.getIdForIndex(index) )
+                        }
+                    }
+
+                    sortModel:  [
+                        { isPrimary: true, criteria: "name", width: VLCStyle.colWidth(Math.max(artistTable._nbCols - 1, 1)), text: i18n.qtr("Name"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
+                        { criteria: "nb_tracks", width: VLCStyle.colWidth(1), text: i18n.qtr("Tracks") }
+                    ]
+
+                    onItemDoubleClicked: {
+                        artistAllView.showAlbumView(model)
+                    }
+
+                    onContextMenuButtonClicked: {
+                        contextMenu.model = menuModel
+                        contextMenu.popup(menuParent)
+                    }
+
+                    Widgets.TableColumns {
+                        id: tableColumns
+                    }
+                }
+            }
+
+            Widgets.StackViewExt {
+                id: view
+
+                anchors.fill: parent
+                focus: true
+                initialItem: medialib.gridView ? gridComponent : tableComponent
+            }
+
+            Connections {
+                target: medialib
+                onGridViewChanged: {
+                    if (medialib.gridView) {
+                        view.replace(gridComponent)
+                    } else {
+                        view.replace(tableComponent)
+                    }
+                }
+            }
+
+            EmptyLabel {
+                anchors.fill: parent
+                visible: artistModel.count === 0
+                text: i18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
+                navigationParent: root
+            }
         }
     }
+
+    Component {
+        id: artistAlbumsComponent
+        /* List View */
+        MusicArtistsAlbums {
+            onCurrentIndexChanged: _updateArtistsAlbumsHistory(currentIndex, currentAlbumIndex)
+            onCurrentAlbumIndexChanged: _updateArtistsAlbumsHistory(currentIndex, currentAlbumIndex)
+        }
     }
 
-    EmptyLabel {
+    Widgets.StackViewExt {
+        id: stackView
+
         anchors.fill: parent
-        visible: artistModel.count === 0
-        focus: visible
-        text: i18n.qtr("No artists found\nPlease try adding sources, by going to the Network tab")
-        navigationParent: root
+        focus: true
     }
 }

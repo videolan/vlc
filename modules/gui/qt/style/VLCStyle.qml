@@ -154,6 +154,8 @@ Item {
     property int expandCover_music_height: dp(171, scale)
     property int expandCover_music_width: dp(171, scale)
 
+    property int artistGridCover_radius: dp(90, scale)
+
     //GridItem
     property int gridItem_network_width: VLCStyle.gridCover_network_width
     property int gridItem_network_height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal + VLCStyle.fontHeight_small
@@ -168,6 +170,8 @@ Item {
     property int column_margin_width: dp(32, scale)
 
     property int table_cover_border: dp(2, scale)
+
+    property int artistBanner_height: dp(200, scale)
 
     //global application margin "safe area"
     property int applicationHorizontalMargin: 0

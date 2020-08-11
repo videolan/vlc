@@ -622,50 +622,50 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         E_CASE( KaxVideoPixelWidth, vwidth )
         {
             ONLY_FMT(VIDEO);
-            vars.tk->fmt.video.i_width += static_cast<uint16>( vwidth );
-            debug( vars, "width=%d", vars.tk->fmt.video.i_width );
+            vars.tk->fmt.video.i_width += static_cast<uint32>( vwidth );
+            debug( vars, "width=%u", vars.tk->fmt.video.i_width );
         }
         E_CASE( KaxVideoPixelHeight, vheight )
         {
             ONLY_FMT(VIDEO);
-            vars.tk->fmt.video.i_height += static_cast<uint16>( vheight );
-            debug( vars, "height=%d", vars.tk->fmt.video.i_height );
+            vars.tk->fmt.video.i_height += static_cast<uint32>( vheight );
+            debug( vars, "height=%u", vars.tk->fmt.video.i_height );
         }
         E_CASE( KaxVideoDisplayWidth, vwidth )
         {
             ONLY_FMT(VIDEO);
-            vars.track_video_info.i_display_width = static_cast<uint16>( vwidth );
-            debug( vars, "display width=%d", vars.track_video_info.i_display_width );
+            vars.track_video_info.i_display_width = static_cast<uint32>( vwidth );
+            debug( vars, "display width=%u", vars.track_video_info.i_display_width );
         }
         E_CASE( KaxVideoDisplayHeight, vheight )
         {
             ONLY_FMT(VIDEO);
-            vars.track_video_info.i_display_height = static_cast<uint16>( vheight );
-            debug( vars, "display height=%d", vars.track_video_info.i_display_height );
+            vars.track_video_info.i_display_height = static_cast<uint32>( vheight );
+            debug( vars, "display height=%u", vars.track_video_info.i_display_height );
         }
         E_CASE( KaxVideoPixelCropBottom, cropval )
         {
             ONLY_FMT(VIDEO);
-            vars.track_video_info.i_crop_bottom = static_cast<uint16>( cropval );
-            debug( vars, "crop pixel bottom=%d", vars.track_video_info.i_crop_bottom );
+            vars.track_video_info.i_crop_bottom = static_cast<uint32>( cropval );
+            debug( vars, "crop pixel bottom=%u", vars.track_video_info.i_crop_bottom );
         }
         E_CASE( KaxVideoPixelCropTop, cropval )
         {
             ONLY_FMT(VIDEO);
-            vars.track_video_info.i_crop_top = static_cast<uint16>( cropval );
-            debug( vars, "crop pixel top=%d", vars.track_video_info.i_crop_top );
+            vars.track_video_info.i_crop_top = static_cast<uint32>( cropval );
+            debug( vars, "crop pixel top=%u", vars.track_video_info.i_crop_top );
         }
         E_CASE( KaxVideoPixelCropRight, cropval )
         {
             ONLY_FMT(VIDEO);
-            vars.track_video_info.i_crop_right = static_cast<uint16>( cropval );
-            debug( vars, "crop pixel right=%d", vars.track_video_info.i_crop_right );
+            vars.track_video_info.i_crop_right = static_cast<uint32>( cropval );
+            debug( vars, "crop pixel right=%u", vars.track_video_info.i_crop_right );
         }
         E_CASE( KaxVideoPixelCropLeft, cropval )
         {
             ONLY_FMT(VIDEO);
-            vars.track_video_info.i_crop_left = static_cast<uint16>( cropval );
-            debug( vars, "crop pixel left=%d", vars.track_video_info.i_crop_left );
+            vars.track_video_info.i_crop_left = static_cast<uint32>( cropval );
+            debug( vars, "crop pixel left=%u", vars.track_video_info.i_crop_left );
         }
         E_CASE( KaxVideoDisplayUnit, vdmode )
         {
