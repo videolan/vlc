@@ -30,7 +30,7 @@ import "qrc:///menus/" as Menus
 Widgets.NavigableFocusScope {
     id: root
 
-    height: (VLCStyle.icon_normal + VLCStyle.margin_xxsmall) * 2 + VLCStyle.applicationVerticalMargin
+    height: VLCStyle.globalToolbar_height + VLCStyle.localToolbar_height + VLCStyle.applicationVerticalMargin
 
     property int selectedIndex: 0
     property int subSelectedIndex: 0
@@ -75,52 +75,29 @@ Widgets.NavigableFocusScope {
                 topMargin: VLCStyle.applicationVerticalMargin
             }
 
-            spacing: VLCStyle.margin_xxsmall
-
             Item {
                 id: globalToolbar
                 width: parent.width
-                height: VLCStyle.icon_normal
+                height: VLCStyle.globalToolbar_height
 
-                Widgets.NavigableRow {
-                    id: historyGroup
+                RowLayout {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: VLCStyle.margin_normal
+                    spacing: VLCStyle.margin_xxxsmall
 
-                    anchors {
-                        top: parent.top
-                        left: parent.left
-                        bottom: parent.bottom
+                    Image {
+                        sourceSize.width: VLCStyle.icon_small
+                        sourceSize.height: VLCStyle.icon_small
+                        source: "qrc:///logo/cone.svg"
+                        enabled: false
                     }
 
-                    model: ObjectModel {
-                        Image {
-                            sourceSize.width: VLCStyle.icon_normal
-                            sourceSize.height: VLCStyle.icon_normal
-                            source: "qrc:///logo/cone.svg"
-                            enabled: false
-                        }
-
-                        Widgets.IconToolButton {
-                            id: history_back
-                            size: VLCStyle.icon_normal
-                            iconText: VLCIcons.topbar_previous
-                            text: i18n.qtr("Previous")
-                            onClicked: history.previous()
-                            enabled: !history.previousEmpty
-                        }
-
-                        Widgets.IconToolButton {
-                            id: history_next
-                            size: VLCStyle.icon_normal
-                            iconText: VLCIcons.topbar_next
-                            text: i18n.qtr("Next")
-                            onClicked: history.next()
-                            enabled: !history.nextEmpty
-                        }
+                    Widgets.SubtitleLabel {
+                        text: "VLC"
+                        font.pixelSize: VLCStyle.fontSize_xxlarge
                     }
 
-                    navigationParent: root
-                    navigationRightItem: globalMenuGroup
-                    navigationDownItem: localContextGroup
                 }
 
                 /* Button for the sources */
@@ -136,63 +113,21 @@ Widgets.NavigableFocusScope {
                     focus: true
 
                     navigationParent: root
-                    navigationLeftItem: historyGroup
-                    navigationRightItem: globalCtxGroup
                     navigationDownItem: localMenuGroup.visible ?  localMenuGroup : playlistGroup
 
                     delegate: Widgets.BannerTabButton {
                         iconTxt: model.icon
                         selected: model.index === selectedIndex
                         onClicked: root.itemClicked(model.index)
+                        height: globalMenuGroup.height
                     }
-                }
-
-                Widgets.NavigableRow {
-                    id: globalCtxGroup
-
-                    anchors {
-                        top: parent.top
-                        right: parent.right
-                        bottom: parent.bottom
-                    }
-
-                    model: ObjectModel {
-                        Widgets.SearchBox {
-                            id: searchBox
-                            contentModel: root.contentModel
-                            visible: root.contentModel !== undefined
-                            enabled: visible
-                        }
-
-                        Widgets.IconToolButton {
-                            id: menu_selector
-
-                            size: VLCStyle.icon_normal
-                            iconText: VLCIcons.menu
-                            text: i18n.qtr("Menu")
-
-                            onClicked: mainMenu.openBelow(this)
-
-                            Menus.MainDropdownMenu {
-                                id: mainMenu
-                                onClosed: {
-                                    if (mainMenu.activeFocus)
-                                        menu_selector.forceActiveFocus()
-                                }
-                            }
-                        }
-                    }
-
-                    navigationParent: root
-                    navigationLeftItem: globalMenuGroup
-                    navigationDownItem: playlistGroup
                 }
             }
 
             Item {
                 id: localToolbar
                 width: parent.width
-                height: VLCStyle.icon_normal
+                height: VLCStyle.localToolbar_height
 
                 Widgets.NavigableRow {
                     id: localContextGroup
@@ -208,10 +143,31 @@ Widgets.NavigableFocusScope {
                         property int countExtra: 0
 
                         Widgets.IconToolButton {
+                             id: history_back
+                             size: VLCStyle.icon_normal
+                             iconText: VLCIcons.topbar_previous
+                             text: i18n.qtr("Previous")
+                             height: localToolbar.height
+                             onClicked: history.previous()
+                             enabled: !history.previousEmpty
+                         }
+
+                         Widgets.IconToolButton {
+                             id: history_next
+                             size: VLCStyle.icon_normal
+                             iconText: VLCIcons.topbar_next
+                             text: i18n.qtr("Next")
+                             height: localToolbar.height
+                             onClicked: history.next()
+                             enabled: !history.nextEmpty
+                        }
+
+                        Widgets.IconToolButton {
                             id: list_grid_btn
                             size: VLCStyle.icon_normal
                             iconText: medialib.gridView ? VLCIcons.list : VLCIcons.grid
                             text: i18n.qtr("List/Grid")
+                            height: localToolbar.height
                             onClicked: medialib.gridView = !medialib.gridView
                         }
 
@@ -220,6 +176,7 @@ Widgets.NavigableFocusScope {
 
                             textRole: "text"
                             listWidth: VLCStyle.widthSortBox
+                            height: localToolbar.height
 
                             popupAlignment: Qt.AlignLeft | Qt.AlignBottom
 
@@ -253,7 +210,7 @@ Widgets.NavigableFocusScope {
 
                     navigationParent: root
                     navigationRightItem: localMenuGroup
-                    navigationUpItem: historyGroup.navigable ? historyGroup : globalMenuGroup
+                    navigationUpItem: globalMenuGroup
                 }
 
                 Widgets.NavigableRow {
@@ -279,6 +236,7 @@ Widgets.NavigableFocusScope {
                         text: model.displayText
                         selected: model.index === subSelectedIndex
                         onClicked:  root.subItemClicked(model.index)
+                        height: localMenuGroup.height
                     }
 
                     navigationParent: root
@@ -294,14 +252,44 @@ Widgets.NavigableFocusScope {
                         right: parent.right
                         bottom: parent.bottom
                     }
+                    spacing: VLCStyle.margin_xxxsmall
 
                     model: ObjectModel {
+
+                        Widgets.SearchBox {
+                            id: searchBox
+                            contentModel: root.contentModel
+                            visible: root.contentModel !== undefined
+                            enabled: visible
+                            height: playlistGroup.height
+                        }
+
+                        Widgets.IconToolButton {
+                            id: menu_selector
+
+                            size: VLCStyle.icon_normal
+                            iconText: VLCIcons.menu
+                            text: i18n.qtr("Menu")
+                            height: playlistGroup.height
+
+                            onClicked: mainMenu.openBelow(this)
+
+                            Menus.MainDropdownMenu {
+                                id: mainMenu
+                                onClosed: {
+                                    if (mainMenu.activeFocus)
+                                        menu_selector.forceActiveFocus()
+                                }
+                            }
+                        }
+
                         Widgets.IconToolButton {
                             id: playlist_btn
 
                             size: VLCStyle.icon_normal
                             iconText: VLCIcons.playlist
                             text: i18n.qtr("Playlist")
+                            height: playlistGroup.height
 
                             onClicked:  mainInterface.playlistVisible = !mainInterface.playlistVisible
                             color: mainInterface.playlistVisible && !playlist_btn.backgroundVisible ? VLCStyle.colors.accent : VLCStyle.colors.buttonText
@@ -310,7 +298,7 @@ Widgets.NavigableFocusScope {
 
                     navigationParent: root
                     navigationLeftItem: localMenuGroup
-                    navigationUpItem: globalCtxGroup.navigable ? globalCtxGroup : globalMenuGroup
+                    navigationUpItem: globalMenuGroup
                 }
             }
         }
