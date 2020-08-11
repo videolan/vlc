@@ -270,7 +270,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
     /* It does not take the decoder latency into account but it is not really
      * the goal of the clock here */
     const vlc_tick_t i_system_expected = ClockStreamToSystem( cl, i_ck_stream + AvgGet( &cl->drift ) );
-    const vlc_tick_t i_late = ( i_ck_system - cl->i_pts_delay ) - i_system_expected;
+    const vlc_tick_t i_late = __MAX(0, ( i_ck_system - cl->i_pts_delay ) - i_system_expected);
     if( i_late > 0 )
     {
         cl->late.pi_value[cl->late.i_index] = i_late;
@@ -279,7 +279,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
 
     vlc_mutex_unlock( &cl->lock );
 
-    return i_late > 0 ? i_late : 0;
+    return i_late;
 }
 
 /*****************************************************************************
