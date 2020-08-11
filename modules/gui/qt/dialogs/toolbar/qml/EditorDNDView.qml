@@ -69,14 +69,19 @@ ListView {
             }
 
             onDropped: {
-                if (drag.source.objectName == "buttonsList"){
-                    playerBtnDND.model.insert(playerBtnDND.count,
-                                             {"id" : drag.source.mIndex})
+                if (drag.source.dndView === playerBtnDND) {
+                    // moving from same section
+                    playerBtnDND.model.move(drag.source.DelegateModel.itemsIndex, playerBtnDND.count - 1)
                 }
-                else
-                    playerBtnDND.model.move(
-                                drag.source.DelegateModel.itemsIndex,
-                                playerBtnDND.count-1)
+                else if (drag.source.objectName == "buttonsList"){
+                    // moving from buttonsList
+                    playerBtnDND.model.insert(playerBtnDND.count, {"id" : drag.source.mIndex})
+                }
+                else {
+                    // moving between sections
+                    playerBtnDND.model.insert(playerBtnDND.count, {"id" : drag.source.controlId})
+                }
+
                 dropVisible = false
             }
         }

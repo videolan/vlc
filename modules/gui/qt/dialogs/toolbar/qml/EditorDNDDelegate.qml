@@ -27,6 +27,7 @@ import "qrc:///style/"
 MouseArea {
     id: dragArea
 
+    property int controlId: model.id
     property bool held: false
     property bool dropVisible: false
     property var dndView: null
@@ -111,10 +112,8 @@ MouseArea {
         }
 
         onDropped: {
-            if (drag.source.objectName == "buttonsList")
-                dndView.model.insert(parent.DelegateModel.itemsIndex,
-                                            {"id" : drag.source.mIndex})
-            else{
+            if (drag.source.dndView === playerBtnDND) {
+                // moving from same section
                 var srcIndex = drag.source.DelegateModel.itemsIndex
                 var destIndex = parent.DelegateModel.itemsIndex
 
@@ -122,6 +121,15 @@ MouseArea {
                     destIndex -= 1
                 playerBtnDND.model.move(srcIndex,destIndex)
             }
+            else if (drag.source.objectName == "buttonsList"){
+                // moving from buttonsList
+                dndView.model.insert(parent.DelegateModel.itemsIndex, {"id" : drag.source.mIndex})
+            }
+            else {
+                // moving between sections
+                dndView.model.insert(parent.DelegateModel.itemsIndex, {"id" : drag.source.controlId})
+            }
+
             dropVisible = false
         }
     }
