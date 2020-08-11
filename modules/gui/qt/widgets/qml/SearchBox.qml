@@ -81,7 +81,7 @@ Widgets.NavigableFocusScope {
         Widgets.IconToolButton {
             id: icon
 
-            size: VLCStyle.icon_normal
+            size: VLCStyle.banner_icon_size
             iconText: VLCIcons.search
             text: i18n.qtr("Filter")
 

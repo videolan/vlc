@@ -144,7 +144,7 @@ Widgets.NavigableFocusScope {
 
                         Widgets.IconToolButton {
                              id: history_back
-                             size: VLCStyle.icon_normal
+                             size: VLCStyle.banner_icon_size
                              iconText: VLCIcons.topbar_previous
                              text: i18n.qtr("Previous")
                              height: localToolbar.height
@@ -154,11 +154,12 @@ Widgets.NavigableFocusScope {
 
                         Widgets.IconToolButton {
                             id: list_grid_btn
-                            size: VLCStyle.icon_normal
+                            size: VLCStyle.banner_icon_size
                             iconText: medialib.gridView ? VLCIcons.list : VLCIcons.grid
                             text: i18n.qtr("List/Grid")
                             height: localToolbar.height
                             onClicked: medialib.gridView = !medialib.gridView
+                            enabled: true
                         }
 
                         Widgets.SortControl {
@@ -257,7 +258,7 @@ Widgets.NavigableFocusScope {
                         Widgets.IconToolButton {
                             id: menu_selector
 
-                            size: VLCStyle.icon_normal
+                            size: VLCStyle.banner_icon_size
                             iconText: VLCIcons.menu
                             text: i18n.qtr("Menu")
                             height: playlistGroup.height
@@ -276,7 +277,7 @@ Widgets.NavigableFocusScope {
                         Widgets.IconToolButton {
                             id: playlist_btn
 
-                            size: VLCStyle.icon_normal
+                            size: VLCStyle.banner_icon_size
                             iconText: VLCIcons.playlist
                             text: i18n.qtr("Playlist")
                             height: playlistGroup.height

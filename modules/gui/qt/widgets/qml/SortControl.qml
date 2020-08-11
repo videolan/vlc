@@ -53,7 +53,7 @@ Widgets.NavigableFocusScope {
     Widgets.IconToolButton {
         id: button
 
-        size: VLCStyle.icon_normal
+        size: VLCStyle.banner_icon_size
         iconText: VLCIcons.topbar_sort
         text: i18n.qtr("Sort")
 
