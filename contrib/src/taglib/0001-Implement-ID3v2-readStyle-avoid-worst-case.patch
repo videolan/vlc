@@ -1,0 +1,148 @@
+From 94b8f426233e87c0b3783b743ad5e3ed458147b1 Mon Sep 17 00:00:00 2001
+From: Francois Cartegnie <fcvlcdev@free.fr>
+Date: Tue, 11 Aug 2020 10:53:31 +0200
+Subject: [PATCH] Implement ID3v2 readStyle, avoid worst case
+
+---
+ taglib/mpeg/mpegfile.cpp | 22 +++++++++++++---------
+ taglib/mpeg/mpegfile.h   | 13 ++++++++-----
+ taglib/toolkit/taglib.h  |  3 +++
+ 3 files changed, 24 insertions(+), 14 deletions(-)
+
+diff --git a/taglib/mpeg/mpegfile.cpp b/taglib/mpeg/mpegfile.cpp
+index af7253fa..59443027 100644
+--- a/taglib/mpeg/mpegfile.cpp
++++ b/taglib/mpeg/mpegfile.cpp
+@@ -80,30 +80,31 @@ public:
+ // public members
+ ////////////////////////////////////////////////////////////////////////////////
+ 
+-MPEG::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
++MPEG::File::File(FileName file,
++                 bool readProperties, Properties::ReadStyle readStyle) :
+   TagLib::File(file),
+   d(new FilePrivate())
+ {
+   if(isOpen())
+-    read(readProperties);
++    read(readProperties, readStyle);
+ }
+ 
+ MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
+-                 bool readProperties, Properties::ReadStyle) :
++                 bool readProperties, Properties::ReadStyle readStyle) :
+   TagLib::File(file),
+   d(new FilePrivate(frameFactory))
+ {
+   if(isOpen())
+-    read(readProperties);
++    read(readProperties, readStyle);
+ }
+ 
+ MPEG::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
+-                 bool readProperties, Properties::ReadStyle) :
++                 bool readProperties, Properties::ReadStyle readStyle) :
+   TagLib::File(stream),
+   d(new FilePrivate(frameFactory))
+ {
+   if(isOpen())
+-    read(readProperties);
++    read(readProperties, readStyle);
+ }
+ 
+ MPEG::File::~File()
+@@ -441,11 +442,11 @@ bool MPEG::File::hasAPETag() const
+ // private members
+ ////////////////////////////////////////////////////////////////////////////////
+ 
+-void MPEG::File::read(bool readProperties)
++void MPEG::File::read(bool readProperties, Properties::ReadStyle readStyle)
+ {
+   // Look for an ID3v2 tag
+ 
+-  d->ID3v2Location = findID3v2();
++  d->ID3v2Location = findID3v2(readStyle);
+ 
+   if(d->ID3v2Location >= 0) {
+     d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
+@@ -478,7 +479,7 @@ void MPEG::File::read(bool readProperties)
+   ID3v1Tag(true);
+ }
+ 
+-long MPEG::File::findID3v2()
++long MPEG::File::findID3v2(Properties::ReadStyle readStyle)
+ {
+   if(!isValid())
+     return -1;
+@@ -499,6 +500,9 @@ long MPEG::File::findID3v2()
+   if(firstSyncByte(data[0]) && secondSynchByte(data[1]))
+     return -1;
+ 
++  if(readStyle < Properties::ReadStyle::Accurate)
++    return -1;
++
+   // Look for the entire file, if neither an MEPG frame or ID3v2 tag was found
+   // at the beginning of the file.
+   // We don't care about the inefficiency of the code, since this is a seldom case.
+diff --git a/taglib/mpeg/mpegfile.h b/taglib/mpeg/mpegfile.h
+index e9e97387..fb04c625 100644
+--- a/taglib/mpeg/mpegfile.h
++++ b/taglib/mpeg/mpegfile.h
+@@ -74,7 +74,8 @@ namespace TagLib {
+        * Constructs an MPEG file from \a file.  If \a readProperties is true the
+        * file's audio properties will also be read.
+        *
+-       * \note In the current implementation, \a propertiesStyle is ignored.
++       * If \a propertiesStyle is Accurate, the file will be scanned
++       * completely if no ID3v2 tag or MPEG sync code is found at the start.
+        *
+        * \deprecated This constructor will be dropped in favor of the one below
+        * in a future version.
+@@ -89,7 +90,8 @@ namespace TagLib {
+        * If this file contains and ID3v2 tag the frames will be created using
+        * \a frameFactory.
+        *
+-       * \note In the current implementation, \a propertiesStyle is ignored.
++       * If \a propertiesStyle is Accurate, the file will be scanned
++       * completely if no ID3v2 tag or MPEG sync code is found at the start.
+        */
+       // BIC: merge with the above constructor
+       File(FileName file, ID3v2::FrameFactory *frameFactory,
+@@ -106,7 +108,8 @@ namespace TagLib {
+        * If this file contains and ID3v2 tag the frames will be created using
+        * \a frameFactory.
+        *
+-       * \note In the current implementation, \a propertiesStyle is ignored.
++       * If \a propertiesStyle is Accurate, the file will be scanned
++       * completely if no ID3v2 tag or MPEG sync code is found at the start.
+        */
+       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
+            bool readProperties = true,
+@@ -374,8 +377,8 @@ namespace TagLib {
+       File(const File &);
+       File &operator=(const File &);
+ 
+-      void read(bool readProperties);
+-      long findID3v2();
++      void read(bool readProperties, Properties::ReadStyle);
++      long findID3v2(Properties::ReadStyle);
+ 
+       class FilePrivate;
+       FilePrivate *d;
+diff --git a/taglib/toolkit/taglib.h b/taglib/toolkit/taglib.h
+index bd4886bd..dfabe3d4 100644
+--- a/taglib/toolkit/taglib.h
++++ b/taglib/toolkit/taglib.h
+@@ -44,6 +44,9 @@
+ #define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long>(x)
+ #endif
+ 
++/* VLC Specific patches implementations */
++#define VLC_PATCHED_TAGLIB_ID3V2_READSTYLE
++
+ #include <string>
+ 
+ //! A namespace for all TagLib related classes and functions
+-- 
+2.25.4
+
