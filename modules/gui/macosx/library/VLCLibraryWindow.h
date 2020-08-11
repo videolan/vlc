@@ -57,6 +57,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceCollectionViewScrollView;
 @property (readwrite, weak) IBOutlet NSView *libraryTargetView;
 @property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
+@property (readwrite, weak) IBOutlet NSView *mediaOptionBar;
+@property (readwrite, weak) IBOutlet NSToolbar *mediaToolBar;
 @property (readwrite, weak) IBOutlet NSTextField *upNextLabel;
 @property (readwrite, weak) IBOutlet VLCDragDropView *playlistDragDropView;
 @property (readwrite, weak) IBOutlet NSButton *openMediaButton;
@@ -67,6 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSButton *shufflePlaylistButton;
 @property (readwrite, weak) IBOutlet VLCRoundedCornerTextField *playlistCounterTextField;
 @property (readwrite, weak) IBOutlet NSButton *librarySortButton;
+@property (readwrite, weak) IBOutlet NSButton *playQueueToggle;
 
 @property (readonly) BOOL nativeFullscreenMode;
 @property (readwrite) BOOL nonembedded;

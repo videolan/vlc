@@ -122,6 +122,13 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
     self.videoView = [[VLCVoutView alloc] initWithFrame:self.mainSplitView.frame];
     self.videoView.hidden = YES;
+
+    [self.gridVsListSegmentedControl setToolTip: _NS("Grid View or List View")];
+     [self.librarySortButton setToolTip: _NS("Select Sorting Mode")];
+    [self.playQueueToggle setToolTip: _NS("Toggle Playqueue")];
+
+    [self.gridVsListSegmentedControl setHidden:NO];
+    [self.librarySortButton setHidden:NO];
     self.videoView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.videoView];
     [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.mainSplitView attribute:NSLayoutAttributeWidth multiplier:1. constant:1.]];
@@ -575,7 +582,8 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     [_audioLibraryView removeFromSuperviewWithoutNeedingDisplay];
 
     [self.videoView setHidden:NO];
-
+    [self.gridVsListSegmentedControl setHidden:YES];
+    [self.librarySortButton setHidden:YES];
     if (self.nativeFullscreenMode) {
         if ([self hasActiveVideo] && [self fullscreen]) {
             [self hideControlsBar];
@@ -610,6 +618,9 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
     [self setAlphaValue:1.0];
     [self.videoView setHidden:YES];
+    [self.gridVsListSegmentedControl setHidden:NO];
+    [self.librarySortButton setHidden:NO];
+
     [self segmentedControlAction:nil];
 
     if (self.nativeFullscreenMode) {

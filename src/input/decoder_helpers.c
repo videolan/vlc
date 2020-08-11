@@ -159,13 +159,6 @@ picture_t *decoder_NewPicture( decoder_t *dec )
     return dec->cbs->video.buffer_new( dec );
 }
 
-void decoder_AbortPictures(decoder_t *dec, bool abort)
-{
-    vlc_assert(dec->fmt_in.i_cat == VIDEO_ES && dec->cbs);
-    if (dec->cbs->video.abort_pictures)
-        dec->cbs->video.abort_pictures(dec, abort);
-}
-
 struct vlc_decoder_device_priv
 {
     struct vlc_decoder_device device;

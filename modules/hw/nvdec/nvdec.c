@@ -178,12 +178,10 @@ static nvdec_pool_t* nvdec_pool_Create(vlc_video_context *vctx,
         if (ret != CUDA_SUCCESS || pool->outputDevicePtr[i] == 0)
             goto free_pool;
 
-        picture_resource_t res = {
-            .p_sys = pool->outputDevicePtr[i],
-        };
-        pics[i] = picture_NewFromResource(fmt, &res);
+        pics[i] = picture_NewFromFormat(fmt);
         if (!pics[i])
             goto free_pool;
+        pics[i]->p_sys = (void*)(uintptr_t)pool->outputDevicePtr[i];
     }
 
     pool->picture_pool = picture_pool_New(ARRAY_SIZE(pool->outputDevicePtr), pics);
@@ -590,7 +588,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
                 .dstMemoryType  = CU_MEMORYTYPE_HOST,
                 .dstHost        = plane.p_pixels,
                 .dstPitch       = plane.i_pitch,
-                .WidthInBytes   = i_pitch,
+                .WidthInBytes   = __MIN(i_pitch, (unsigned)plane.i_pitch),
                 .Height         = plane.i_visible_lines,
             };
             result = CALL_CUDA_DEC(cuMemcpy2DAsync, &cu_cpy, 0);

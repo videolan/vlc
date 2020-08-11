@@ -1246,13 +1246,13 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
                 {
                     if (scale.h != SCALE_UNIT)
                     {
-                        (*output_last_ptr)->zoom_h.num = scale.h;
-                        (*output_last_ptr)->zoom_h.den = SCALE_UNIT;
+                        (*output_last_ptr)->zoom_v.num = scale.h;
+                        (*output_last_ptr)->zoom_v.den = SCALE_UNIT;
                     }
                     if (scale.w != SCALE_UNIT)
                     {
-                        (*output_last_ptr)->zoom_v.num = scale.w;
-                        (*output_last_ptr)->zoom_v.den = SCALE_UNIT;
+                        (*output_last_ptr)->zoom_h.num = scale.w;
+                        (*output_last_ptr)->zoom_h.den = SCALE_UNIT;
                     }
                 }
 

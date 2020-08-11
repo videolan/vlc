@@ -41,7 +41,7 @@ Widgets.NavigableFocusScope {
     readonly property var currentIndex: view.currentItem.currentIndex
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
-
+    property int gridViewMarginTop: VLCStyle.margin_large
 
     navigationCancel: function() {
         if (view.currentItem.currentIndex <= 0) {
@@ -101,7 +101,7 @@ Widgets.NavigableFocusScope {
             id: gridView_id
 
             activeFocusOnTab:true
-
+            marginTop: root.gridViewMarginTop
             cellWidth: VLCStyle.gridItem_music_width
             cellHeight: VLCStyle.gridItem_music_height
 
@@ -113,6 +113,8 @@ Widgets.NavigableFocusScope {
             delegate: AudioGridItem {
                 id: audioGridItem
 
+                opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
+
                 onItemClicked : {
                     selectionModel.updateSelection( modifier , root.currentIndex, index)
                     gridView_id.currentIndex = index
@@ -122,19 +124,22 @@ Widgets.NavigableFocusScope {
                 onItemDoubleClicked: {
                     if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
                 }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 100
+                    }
+                }
             }
 
             expandDelegate: MusicAlbumsGridExpandDelegate {
                 id: expandDelegateId
-                width: root.width
 
-                implicitHeight: gridView_id.height - gridView_id.cellHeight
-
+                onRetract: gridView_id.retract()
                 navigationParent: root
                 navigationCancel:  function() {  gridView_id.retract() }
                 navigationUp: function() {  gridView_id.retract() }
                 navigationDown: function() {}
-
             }
 
             onActionAtIndex: {

@@ -140,10 +140,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
 
     i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 16 );
     if( i_peek < 16 )
-    {
-        msg_Dbg( p_demux, "cannot peek" );
         return VLC_EGENERIC;
-    }
 
     if( !memcmp( p_peek, "PSMF", 4 ) &&
         (GetDWBE( &p_peek[4] ) & 0x30303030) == 0x30303030 )

@@ -89,7 +89,6 @@ struct vout_display_sys_t
 {
     vout_display_sys_win32_t sys;       /* only use if sys.event is not NULL */
     display_win32_area_t     area;
-    video_format_t           texture_fmt;
 
     /* Sensors */
     void *p_sensors;
@@ -298,7 +297,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
 
     CommonInit(vd, &sys->area, cfg);
-    sys->texture_fmt = vd->source;
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
@@ -616,8 +614,8 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             {
                 /* the decoder produced different sizes than the vout, we need to
                  * adjust the vertex */
-                sys->texture_fmt.i_width  = sys->picQuad.i_height = texDesc.Height;
-                sys->texture_fmt.i_height = sys->picQuad.i_width = texDesc.Width;
+                sys->picQuad.i_height = texDesc.Height;
+                sys->picQuad.i_width = texDesc.Width;
 
                 CommonPlacePicture(vd, &sys->area, &sys->sys);
                 UpdateSize(vd);
@@ -809,21 +807,12 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     /* adjust the decoder sizes to have proper padding */
     sys->picQuad.i_width  = fmt.i_width;
     sys->picQuad.i_height = fmt.i_height;
-    if (!sys->legacy_shader && is_d3d11_opaque(fmt.i_chroma))
-    {
-        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x7F) & ~0x7F;
-        sys->picQuad.i_height = (sys->picQuad.i_height + 0x7F) & ~0x7F;
-    }
-    else
     if ( sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
          sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
     {
         sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
-
-    sys->texture_fmt.i_width  = sys->picQuad.i_width;
-    sys->texture_fmt.i_height = sys->picQuad.i_height;
 
     CommonPlacePicture(vd, &sys->area, &sys->sys);
 
@@ -1094,7 +1083,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         .top    = vd->source.i_y_offset,
         .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
     };
-    if (D3D11_SetupQuad( vd, sys->d3d_dev, &sys->texture_fmt, &sys->picQuad, &sys->display,
+    if (D3D11_SetupQuad( vd, sys->d3d_dev, &vd->source, &sys->picQuad, &sys->display,
                          &source_rect,
                          vd->source.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
@@ -1119,10 +1108,13 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     {
         /* we need a staging texture */
         ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
+        video_format_t texture_fmt = vd->source;
+        texture_fmt.i_width  = sys->picQuad.i_width;
+        texture_fmt.i_height = sys->picQuad.i_height;
         if (!is_d3d11_opaque(fmt->i_chroma))
-            sys->texture_fmt.i_chroma = sys->picQuad.textureFormat->fourcc;
+            texture_fmt.i_chroma = sys->picQuad.textureFormat->fourcc;
 
-        if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.textureFormat, &sys->texture_fmt, 1, textures, sys->stagingPlanes))
+        if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.textureFormat, &texture_fmt, textures, sys->stagingPlanes))
         {
             msg_Err(vd, "Failed to allocate the staging texture");
             return VLC_EGENERIC;
@@ -1308,7 +1300,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
-            if (AllocateTextures(vd, sys->d3d_dev, sys->regionQuad.textureFormat, &r->p_picture->format, 1, d3dquad->picSys.texture, NULL)) {
+            if (AllocateTextures(vd, sys->d3d_dev, sys->regionQuad.textureFormat, &r->p_picture->format, d3dquad->picSys.texture, NULL)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 for (int j=0; j<D3D11_MAX_SHADER_VIEW; j++)

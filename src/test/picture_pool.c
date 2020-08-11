@@ -114,7 +114,6 @@ int main(void)
 
     pool = picture_pool_NewFromFormat(&fmt, PICTURES);
     assert(pool != NULL);
-    assert(picture_pool_GetSize(pool) == PICTURES);
 
     reserve = picture_pool_Reserve(pool, PICTURES / 2);
     assert(reserve != NULL);

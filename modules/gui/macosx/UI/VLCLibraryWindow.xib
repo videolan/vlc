@@ -25,7 +25,7 @@
                     <splitView autosaveName="librarywindowsplitview" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="u8g-jy-S4e">
                         <rect key="frame" x="0.0" y="36" width="480" height="257"/>
                         <subviews>
-                            <customView fixedFrame="YES" id="iSp-bV-w6B">
+                            <customView id="iSp-bV-w6B">
                                 <rect key="frame" x="0.0" y="0.0" width="242" height="257"/>
                                 <autoresizingMask key="autoresizingMask"/>
                             </customView>
@@ -82,9 +82,8 @@
                                                                     <rect key="frame" x="1" y="1" width="234" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
-                                                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dY4-Im-HRr">
+                                                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="dY4-Im-HRr">
                                                                             <rect key="frame" x="0.0" y="0.0" width="234" height="17"/>
-                                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="vlq-wz-y8v">
                                                                                 <font key="font" metaFont="message"/>
                                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -92,6 +91,11 @@
                                                                             </textFieldCell>
                                                                         </textField>
                                                                     </subviews>
+                                                                    <constraints>
+                                                                        <constraint firstItem="dY4-Im-HRr" firstAttribute="centerX" secondItem="3Pj-5C-4K4" secondAttribute="centerX" id="3YD-yA-xsI"/>
+                                                                        <constraint firstItem="dY4-Im-HRr" firstAttribute="leading" secondItem="3Pj-5C-4K4" secondAttribute="leading" constant="2" id="bQV-NS-PWH"/>
+                                                                        <constraint firstItem="dY4-Im-HRr" firstAttribute="centerY" secondItem="3Pj-5C-4K4" secondAttribute="centerY" id="cz5-mh-DWd"/>
+                                                                    </constraints>
                                                                     <connections>
                                                                         <outlet property="textField" destination="dY4-Im-HRr" id="KWv-rt-UK7"/>
                                                                     </connections>
@@ -396,67 +400,97 @@
                             <constraint firstAttribute="bottom" secondItem="MQH-bI-Zdh" secondAttribute="bottom" id="lBe-S3-sJr"/>
                         </constraints>
                     </customView>
-                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8iI-b7-Eag">
-                        <rect key="frame" x="212" y="297" width="56" height="24"/>
-                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="j8T-nk-7Ny">
-                            <font key="font" metaFont="system"/>
-                            <segments>
-                                <segment/>
-                                <segment selected="YES" tag="1"/>
-                                <segment>
-                                    <nil key="label"/>
-                                </segment>
-                            </segments>
-                        </segmentedCell>
-                    </segmentedControl>
-                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Rja-6g-wNZ">
-                        <rect key="frame" x="4" y="292" width="57" height="32"/>
-                        <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSTextRulerLineHeightIncrease" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PIW-C4-naY">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="sortLibrary:" target="QvC-M9-y7g" id="VJd-p4-owD"/>
-                        </connections>
-                    </button>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="6gW-0d-ymm" userLabel="Option Bar">
+                        <rect key="frame" x="0.0" y="294" width="480" height="33"/>
+                        <subviews>
+                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lIg-5J-C5F">
+                                <rect key="frame" x="6" y="3" width="67" height="24"/>
+                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="jcw-1T-HPS">
+                                    <font key="font" metaFont="system"/>
+                                    <segments>
+                                        <segment image="NSIconViewTemplate"/>
+                                        <segment image="NSListViewTemplate" selected="YES" tag="1"/>
+                                    </segments>
+                                </segmentedCell>
+                            </segmentedControl>
+                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8iI-b7-Eag">
+                                <rect key="frame" x="212" y="3" width="56" height="24"/>
+                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="j8T-nk-7Ny">
+                                    <font key="font" metaFont="system"/>
+                                    <segments>
+                                        <segment/>
+                                        <segment selected="YES" tag="1"/>
+                                        <segment/>
+                                    </segments>
+                                </segmentedCell>
+                            </segmentedControl>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="IaO-se-D0g">
+                                <rect key="frame" x="438" y="4" width="34" height="23"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="3VZ-cS-NXX"/>
+                                </constraints>
+                                <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="NSPrivateChaptersTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YeZ-La-h4h">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="showAndHidePlaylist:" target="QvC-M9-y7g" id="1LE-KG-zjk"/>
+                                </connections>
+                            </button>
+                            <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Rja-6g-wNZ">
+                                <rect key="frame" x="80" y="-2" width="57" height="32"/>
+                                <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSTextRulerLineHeightIncrease" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="PIW-C4-naY">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="sortLibrary:" target="QvC-M9-y7g" id="VJd-p4-owD"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="IaO-se-D0g" secondAttribute="trailing" constant="10" id="1Ko-NP-e00"/>
+                            <constraint firstItem="Rja-6g-wNZ" firstAttribute="leading" secondItem="lIg-5J-C5F" secondAttribute="trailing" constant="15" id="2Kl-u8-t8J"/>
+                            <constraint firstItem="lIg-5J-C5F" firstAttribute="leading" secondItem="6gW-0d-ymm" secondAttribute="leading" constant="8" id="O1U-3y-kGr"/>
+                        </constraints>
+                    </customView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="8iI-b7-Eag" firstAttribute="centerY" secondItem="Rja-6g-wNZ" secondAttribute="centerY" id="4gy-0U-jRa"/>
-                    <constraint firstItem="Rja-6g-wNZ" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="10" id="NEx-y8-ljp"/>
-                    <constraint firstItem="Rja-6g-wNZ" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="43" id="NY5-37-fei"/>
+                    <constraint firstItem="8iI-b7-Eag" firstAttribute="centerX" secondItem="u8g-jy-S4e" secondAttribute="centerX" id="3Cz-JU-IpN"/>
+                    <constraint firstItem="dus-WQ-AmE" firstAttribute="top" secondItem="6gW-0d-ymm" secondAttribute="bottom" constant="1" id="CUx-YB-cyf"/>
+                    <constraint firstItem="dus-WQ-AmE" firstAttribute="top" secondItem="IaO-se-D0g" secondAttribute="bottom" constant="8" id="GEx-4E-MfR"/>
                     <constraint firstItem="vUy-jt-gjY" firstAttribute="top" secondItem="u8g-jy-S4e" secondAttribute="bottom" id="QH8-mU-6ZP"/>
+                    <constraint firstItem="iSp-bV-w6B" firstAttribute="top" secondItem="lIg-5J-C5F" secondAttribute="bottom" constant="6" id="Roa-qV-bEC"/>
                     <constraint firstItem="vUy-jt-gjY" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="Sse-bx-ewr"/>
                     <constraint firstAttribute="trailing" secondItem="vUy-jt-gjY" secondAttribute="trailing" id="amK-mR-Fvr"/>
-                    <constraint firstItem="8iI-b7-Eag" firstAttribute="centerX" secondItem="EiT-Mj-1SZ" secondAttribute="centerX" id="fnd-vq-xxU"/>
+                    <constraint firstItem="iSp-bV-w6B" firstAttribute="top" secondItem="Rja-6g-wNZ" secondAttribute="bottom" constant="6" id="bT9-YA-byc"/>
+                    <constraint firstItem="iSp-bV-w6B" firstAttribute="top" secondItem="8iI-b7-Eag" secondAttribute="bottom" constant="6" id="d0E-jO-PPV"/>
+                    <constraint firstItem="6gW-0d-ymm" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="hhP-vd-jJJ"/>
                     <constraint firstItem="u8g-jy-S4e" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="70" id="im9-CS-OPY"/>
                     <constraint firstAttribute="trailing" secondItem="u8g-jy-S4e" secondAttribute="trailing" id="lEc-Vr-8M9"/>
+                    <constraint firstItem="6gW-0d-ymm" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="36" id="ov5-H0-WRT"/>
                     <constraint firstItem="u8g-jy-S4e" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="s58-Wr-5SV"/>
                     <constraint firstAttribute="bottom" secondItem="vUy-jt-gjY" secondAttribute="bottom" id="vMr-VQ-r4P"/>
+                    <constraint firstItem="6gW-0d-ymm" firstAttribute="trailing" secondItem="u8g-jy-S4e" secondAttribute="trailing" id="yMd-qC-rOW"/>
                 </constraints>
             </view>
             <toolbar key="toolbar" implicitIdentifier="CAE4F278-DC20-4A58-B07E-1580E7B14C87" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="regular" id="pr3-TD-J2z">
                 <allowedToolbarItems>
-                    <toolbarItem implicitItemIdentifier="991F0117-06E8-4278-8B11-1BF2680F9004" label="Custom View" paletteLabel="Push Button" image="NSLeftFacingTriangleTemplate" sizingBehavior="auto" id="kuB-Xg-HK2">
+                    <toolbarItem implicitItemIdentifier="82C1CE3D-FCE3-49CB-B910-14456BAA94A2" label="Custom View" paletteLabel="Custom View" sizingBehavior="auto" id="SXj-w1-2e4">
                         <nil key="toolTip"/>
-                        <button key="view" verticalHuggingPriority="750" id="Rhu-eh-ywm">
-                            <rect key="frame" x="13" y="14" width="45" height="32"/>
+                        <segmentedControl key="view" verticalHuggingPriority="750" id="Cd4-7b-wi1">
+                            <rect key="frame" x="4" y="14" width="68" height="27"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSLeftFacingTriangleTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iCT-DX-7zt">
-                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <segmentedCell key="cell" continuous="YES" refusesFirstResponder="YES" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="F1b-F8-QA5">
                                 <font key="font" metaFont="system"/>
-                            </buttonCell>
-                        </button>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="F10BB528-A031-47BE-815E-FBAF19961E99" label="Custom View" paletteLabel="Push Button " image="NSRightFacingTriangleTemplate" sizingBehavior="auto" id="sKK-5g-KuV">
-                        <nil key="toolTip"/>
-                        <button key="view" verticalHuggingPriority="750" id="ehX-wB-NgX">
-                            <rect key="frame" x="15" y="14" width="45" height="32"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <buttonCell key="cell" type="push" bezelStyle="rounded" image="NSRightFacingTriangleTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2fB-Bb-72z">
-                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                <font key="font" metaFont="system"/>
-                            </buttonCell>
-                        </button>
+                                <segments>
+                                    <segment image="NSLeftFacingTriangleTemplate" width="32"/>
+                                    <segment image="NSRightFacingTriangleTemplate" enabled="NO">
+                                        <nil key="label"/>
+                                    </segment>
+                                </segments>
+                            </segmentedCell>
+                        </segmentedControl>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="C6B452D8-BAA7-4410-A942-3096C5EBF6F7" label="Custom View" paletteLabel="Segmented Title Control" sizingBehavior="auto" id="KnW-Lr-R1d">
                         <nil key="toolTip"/>
@@ -472,23 +506,6 @@
                                 </segments>
                             </segmentedCell>
                         </segmentedControl>
-                    </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="11E2BE5A-FB0D-4217-A815-61041AD19262" label="Custom View" paletteLabel="Bevel Button" image="NSPrivateChaptersTemplate" sizingBehavior="auto" id="cNm-E1-gc8">
-                        <nil key="toolTip"/>
-                        <button key="view" verticalHuggingPriority="750" id="j4q-VF-mVm">
-                            <rect key="frame" x="18" y="14" width="38" height="27"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="34" id="0x1-bE-bd5"/>
-                            </constraints>
-                            <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="NSPrivateChaptersTemplate" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qZO-fT-bFY">
-                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                <font key="font" metaFont="system"/>
-                            </buttonCell>
-                            <connections>
-                                <action selector="showAndHidePlaylist:" target="QvC-M9-y7g" id="hRz-bm-JJi"/>
-                            </connections>
-                        </button>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="9B15C9C0-73AC-4190-803C-5AF14952E903" label="Custom View" paletteLabel="Search Field" sizingBehavior="auto" id="hnO-hn-Ad3">
                         <nil key="toolTip"/>
@@ -506,31 +523,22 @@
                             </searchFieldCell>
                         </searchField>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="0DCD6101-9B8A-4964-8AF2-C7EDAC12D3D4" label="Custom View" paletteLabel="Grid Vs List Segmented Control" sizingBehavior="auto" id="JUk-cJ-c9G">
-                        <nil key="toolTip"/>
-                        <segmentedControl key="view" verticalHuggingPriority="750" id="7K7-4r-Swk">
-                            <rect key="frame" x="53" y="14" width="67" height="24"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="Txm-sT-UX4">
-                                <font key="font" metaFont="system"/>
-                                <segments>
-                                    <segment image="NSIconViewTemplate"/>
-                                    <segment image="NSListViewTemplate" selected="YES" tag="1"/>
-                                </segments>
-                            </segmentedCell>
-                        </segmentedControl>
-                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="89f-AL-zuU"/>
+                    <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="hs0-cc-34q"/>
+                    <toolbarItem implicitItemIdentifier="FCCB897D-45D4-411A-91BF-302620882C8C" label="smallCone" paletteLabel="Toolbar Cone" tag="-1" image="VLC" id="L28-Xw-ydE">
+                        <size key="minSize" width="512" height="512"/>
+                        <size key="maxSize" width="512" height="512"/>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
-                    <toolbarItem reference="kuB-Xg-HK2"/>
-                    <toolbarItem reference="sKK-5g-KuV"/>
+                    <toolbarItem reference="SXj-w1-2e4"/>
                     <toolbarItem reference="89f-AL-zuU"/>
-                    <toolbarItem reference="89f-AL-zuU"/>
+                    <toolbarItem reference="hs0-cc-34q"/>
+                    <toolbarItem reference="hs0-cc-34q"/>
+                    <toolbarItem reference="L28-Xw-ydE"/>
                     <toolbarItem reference="KnW-Lr-R1d"/>
+                    <toolbarItem reference="hs0-cc-34q"/>
                     <toolbarItem reference="89f-AL-zuU"/>
-                    <toolbarItem reference="cNm-E1-gc8"/>
-                    <toolbarItem reference="JUk-cJ-c9G"/>
                     <toolbarItem reference="hnO-hn-Ad3"/>
                 </defaultToolbarItems>
             </toolbar>
@@ -545,7 +553,7 @@
                 <outlet property="clearPlaylistButton" destination="cih-xp-HmY" id="PoU-co-0kn"/>
                 <outlet property="clearPlaylistSeparator" destination="nAW-KH-ipk" id="Af9-fg-u7m"/>
                 <outlet property="controlsBar" destination="Uzf-Tf-H8x" id="n0G-92-F2Q"/>
-                <outlet property="gridVsListSegmentedControl" destination="7K7-4r-Swk" id="VoD-jF-46N"/>
+                <outlet property="gridVsListSegmentedControl" destination="lIg-5J-C5F" id="u6B-Zx-4mX"/>
                 <outlet property="librarySortButton" destination="Rja-6g-wNZ" id="FQ7-MU-hsk"/>
                 <outlet property="libraryTargetView" destination="iSp-bV-w6B" id="a94-ux-wUc"/>
                 <outlet property="mainSplitView" destination="u8g-jy-S4e" id="lI5-wR-kef"/>
@@ -555,15 +563,20 @@
                 <outlet property="mediaSourcePathControl" destination="Rjk-Q6-FYy" id="G63-NM-Ekn"/>
                 <outlet property="mediaSourceTableView" destination="vpJ-Oz-Ebz" id="Hbo-Qw-JQd"/>
                 <outlet property="mediaSourceView" destination="eHd-Q9-F8D" id="gfU-Jp-eFr"/>
+                <outlet property="mediaToolBar" destination="pr3-TD-J2z" id="Chi-03-Fgd"/>
                 <outlet property="openMediaButton" destination="SWh-4E-Qtf" id="sIZ-xo-GLA"/>
+                <outlet property="optionBar" destination="6gW-0d-ymm" id="rkK-gK-uY0"/>
+                <outlet property="playQueueToggle" destination="IaO-se-D0g" id="tqY-YM-KQC"/>
                 <outlet property="playlistCounterTextField" destination="mbV-My-cm7" id="ZYU-Jq-Z8R"/>
                 <outlet property="playlistDragDropView" destination="VFI-oW-dMZ" id="gVc-mu-f8T"/>
                 <outlet property="playlistTableView" destination="Fr1-af-8gb" id="yaB-Ab-jrx"/>
                 <outlet property="playlistView" destination="dus-WQ-AmE" id="fTF-HP-Chb"/>
+                <outlet property="playqueue" destination="IaO-se-D0g" id="NMT-lQ-7x7"/>
                 <outlet property="recentVideoLibraryCollectionView" destination="hnE-Hj-MZo" id="Fko-5v-1bC"/>
                 <outlet property="repeatPlaylistButton" destination="8zF-Wo-H79" id="6bH-HF-arx"/>
                 <outlet property="segmentedTitleControl" destination="W1M-0o-qYG" id="Gw1-T6-78k"/>
                 <outlet property="shufflePlaylistButton" destination="jg5-33-vH0" id="FV2-36-3lG"/>
+                <outlet property="test" destination="IaO-se-D0g" id="7nK-TX-QPm"/>
                 <outlet property="upNextLabel" destination="TET-5r-zHx" id="3oI-LK-NDP"/>
                 <outlet property="upNextSeparator" destination="qmL-Ar-cj1" id="GRX-ZE-2UG"/>
                 <outlet property="videoLibraryCollectionView" destination="B8x-e8-7zp" id="u1I-gn-IU1"/>
@@ -595,7 +608,7 @@
                     <rect key="frame" x="0.0" y="498" width="242" height="310"/>
                     <clipView key="contentView" copiesOnScroll="NO" id="J5s-sy-il6">
                         <rect key="frame" x="0.0" y="0.0" width="242" height="310"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <collectionView selectable="YES" id="hnE-Hj-MZo">
                                 <rect key="frame" x="0.0" y="0.0" width="242" height="310"/>
@@ -625,7 +638,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="242" height="498"/>
                     <clipView key="contentView" copiesOnScroll="NO" id="OKa-dt-1yY">
                         <rect key="frame" x="0.0" y="0.0" width="242" height="498"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <collectionView selectable="YES" id="B8x-e8-7zp">
                                 <rect key="frame" x="0.0" y="0.0" width="242" height="498"/>
@@ -676,7 +689,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="528" height="267"/>
                     <clipView key="contentView" id="5co-vI-cEn">
                         <rect key="frame" x="0.0" y="0.0" width="528" height="267"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" viewBased="YES" id="vpJ-Oz-Ebz">
                                 <rect key="frame" x="0.0" y="0.0" width="528" height="267"/>
@@ -735,7 +748,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="528" height="267"/>
                     <clipView key="contentView" id="tI4-x3-55j">
                         <rect key="frame" x="0.0" y="0.0" width="528" height="267"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <collectionView selectable="YES" id="r7v-GI-W1U">
                                 <rect key="frame" x="0.0" y="0.0" width="528" height="267"/>
@@ -972,6 +985,7 @@
         <image name="NSRightFacingTriangleTemplate" width="9" height="12"/>
         <image name="NSTextRulerLineHeightIncrease" width="21" height="14"/>
         <image name="NSTouchBarDeleteTemplate" width="15" height="30"/>
+        <image name="VLC" width="512" height="512"/>
         <image name="backward-3btns" width="29" height="23"/>
         <image name="backward-3btns-pressed" width="29" height="23"/>
         <image name="dropzone" width="112" height="112"/>

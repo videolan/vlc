@@ -111,10 +111,7 @@ static int Open( vlc_object_t * p_this )
     es_format_t  fmt;
 
     if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
-    {
-        msg_Dbg( p_demux, "cannot peek" );
         return VLC_EGENERIC;
-    }
 
     if( p_demux->obj.force )
         b_forced = true;

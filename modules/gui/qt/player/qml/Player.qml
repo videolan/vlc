@@ -250,6 +250,7 @@ Widgets.NavigableFocusScope {
                         focus: true
                         anchors.fill: parent
 
+                        forceDark: true
                         navigationParent: rootPlayer
                         navigationUpItem: topcontrolView
                         navigationDownItem: controlBarView

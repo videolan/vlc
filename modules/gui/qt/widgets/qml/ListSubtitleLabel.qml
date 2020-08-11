@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2020 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,26 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-import QtQuick 2.11
 
-import org.videolan.medialib 0.1
-
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
-
-Widgets.GridItem {
-    property var model: ({})
-    property int index: -1
-
-    image: model.cover || VLCStyle.noArtAlbum
-    title: model.title || i18n.qtr("Unknown title")
-    subtitle: model.main_artist || i18n.qtr("Unknown artist")
-    pictureWidth: VLCStyle.gridCover_music_width
-    pictureHeight: VLCStyle.gridCover_music_height
-    playCoverBorder.width: VLCStyle.gridCover_music_border
-    onPlayClicked: {
-        if ( model.id !== undefined ) {
-            medialib.addAndPlay( model.id )
-        }
-    }
+ListLabel {
+    opacity: 0.7
 }

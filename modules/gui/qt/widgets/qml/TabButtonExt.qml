@@ -21,6 +21,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Templates 2.4 as T
 import QtQuick.Layouts 1.3
 
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 T.TabButton {
@@ -35,7 +36,6 @@ T.TabButton {
     implicitHeight: contentItem.implicitHeight
 
     property string iconTxt: ""
-    property string bgColor: "transparent"
     property bool selected: false
 
     font.pixelSize: VLCStyle.fontSize_normal
@@ -65,7 +65,7 @@ T.TabButton {
                 implicitHeight: VLCStyle.fontHeight_normal
                 visible: control.iconTxt !== ""
 
-                Text {
+                Widgets.IconLabel {
                     id: icon
 
                     anchors.fill: parent
@@ -76,14 +76,12 @@ T.TabButton {
                     color: VLCStyle.colors.buttonText
 
                     font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_topbar)
-                    font.family: VLCIcons.fontFamily
                 }
             }
 
 
-            Label {
+            Widgets.MenuCaption {
                 text: control.text
-                font: control.font
                 color: VLCStyle.colors.text
             }
         }

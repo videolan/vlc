@@ -172,7 +172,9 @@ Widgets.NavigableFocusScope {
 
             MusicAlbums {
                 id: albumSubView
+
                 anchors.fill: parent
+                gridViewMarginTop: 0
 
                 header: ArtistTopBanner {
                     id: artistBanner

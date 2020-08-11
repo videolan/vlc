@@ -1332,6 +1332,10 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                 break;
         }
     }
+    else
+    {
+        rv = VLC_EGENERIC;
+    }
 
     FreeLines( text_block.p_laid );
 
@@ -1450,7 +1454,8 @@ static void Destroy( vlc_object_t *p_this )
     filter_sys_t *p_sys = p_filter->p_sys;
 
 #ifdef DEBUG_PLATFORM_FONTS
-    DumpFamilies( p_sys->fs );
+    if(p_sys->fs)
+        DumpFamilies( p_sys->fs );
 #endif
 
     free( p_sys->psz_fontfile );
@@ -1472,7 +1477,8 @@ static void Destroy( vlc_object_t *p_this )
         free( p_sys->pp_font_attachments );
     }
 
-    FontSelectDelete( p_sys->fs );
+    if(p_sys->fs)
+        FontSelectDelete( p_sys->fs );
 
     /* Freetype */
     if( p_sys->p_stroker )

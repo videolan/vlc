@@ -35,10 +35,9 @@ typedef struct bs_s bs_t;
 
 typedef struct
 {
-    /* forward read modifier (p_start, p_end, p_fwpriv, count, pos, remain) */
+    /* forward read modifier (p_start, p_end, p_fwpriv, count, pos) */
     size_t (*pf_byte_forward)(bs_t *, size_t);
     size_t (*pf_byte_pos)(const bs_t *);
-    size_t (*pf_byte_remain)(const bs_t *);
 } bs_byte_callbacks_t;
 
 typedef struct bs_s
@@ -49,6 +48,7 @@ typedef struct bs_s
 
     uint8_t  i_left;    /* i_count number of available bits */
     bool     b_read_only;
+    bool     b_error;
 
     bs_byte_callbacks_t cb;
     void    *p_priv;
@@ -71,14 +71,6 @@ static size_t bs_impl_bytes_forward( bs_t *s, size_t i_count )
     return i_count;
 }
 
-static size_t bs_impl_bytes_remain( const bs_t *s )
-{
-    if( s->p )
-        return s->p < s->p_end ? s->p_end - s->p - 1: 0;
-    else
-        return s->p_end - s->p_start;
-}
-
 static size_t bs_impl_bytes_pos( const bs_t *s )
 {
     if( s->p )
@@ -95,6 +87,7 @@ static inline void bs_init_custom( bs_t *s, const void *p_data, size_t i_data,
     s->p_end   = s->p_start + i_data;
     s->i_left  = 0;
     s->b_read_only = true;
+    s->b_error = false;
     s->p_priv = priv;
     s->cb = *cb;
 }
@@ -104,7 +97,6 @@ static inline void bs_init( bs_t *s, const void *p_data, size_t i_data )
     bs_byte_callbacks_t cb = {
         bs_impl_bytes_forward,
         bs_impl_bytes_pos,
-        bs_impl_bytes_remain,
     };
     bs_init_custom( s, p_data, i_data, &cb, NULL );
 }
@@ -128,6 +120,11 @@ static inline int bs_refill( bs_t *s )
     return s->i_left > 0 ? 0 : 1;
 }
 
+static inline bool bs_error( const bs_t *s )
+{
+    return s->b_error;
+}
+
 static inline bool bs_eof( bs_t *s )
 {
     return bs_refill( s ) != 0;
@@ -138,28 +135,35 @@ static inline size_t bs_pos( const bs_t *s )
     return 8 * s->cb.pf_byte_pos( s ) - s->i_left;
 }
 
-static inline size_t bs_remain( const bs_t *s )
-{
-    return 8 * s->cb.pf_byte_remain( s ) + s->i_left;
-}
-
 static inline void bs_skip( bs_t *s, size_t i_count )
 {
     if( i_count == 0 )
         return;
 
     if( bs_refill( s ) )
+    {
+        s->b_error = true;
         return;
+    }
 
     if( i_count > s->i_left )
     {
         i_count -= s->i_left;
         s->i_left = 0;
-        if( i_count / 8 )
-            s->cb.pf_byte_forward( s, i_count / 8 );
+        size_t bytes = i_count / 8;
+        if( bytes && s->cb.pf_byte_forward( s, bytes ) != bytes )
+        {
+            s->b_error = true;
+            return;
+        }
         i_count = i_count % 8;
-        if( i_count > 0 && !bs_refill( s ) )
-            s->i_left = 8 - i_count;
+        if( i_count > 0 )
+        {
+            if( !bs_refill( s ) )
+                s->i_left = 8 - i_count;
+            else
+                s->b_error = true;
+        }
     }
     else s->i_left -= i_count;
 }
@@ -178,7 +182,10 @@ static inline uint32_t bs_read( bs_t *s, uint8_t i_count )
     while( i_count > 0 )
     {
         if( bs_refill( s ) )
+        {
+            s->b_error = true;
             break;
+        }
 
         if( s->i_left > i_count )
         {
@@ -214,7 +221,10 @@ static inline uint32_t bs_read( bs_t *s, uint8_t i_count )
 static inline uint32_t bs_read1( bs_t *s )
 {
     if( bs_refill( s ) )
+    {
+        s->b_error = true;
         return 0;
+    }
     s->i_left--;
     return ( *s->p >> s->i_left )&0x01;
 }
@@ -227,7 +237,10 @@ static inline void bs_write( bs_t *s, uint8_t i_count, uint32_t i_bits )
     while( i_count > 0 )
     {
         if( bs_refill( s ) )
+        {
+            s->b_error = true;
             break;
+        }
 
         i_count--;
 
@@ -268,7 +281,9 @@ static inline uint_fast32_t bs_read_ue( bs_t * bs )
 {
     unsigned i = 0;
 
-    while( bs_read1( bs ) == 0 && bs->p < bs->p_end && i < 31 )
+    while( !bs->b_error &&
+           bs_read1( bs ) == 0 &&
+           bs->p < bs->p_end && i < 31 )
         i++;
 
     return (1U << i) - 1 + bs_read( bs, i );

@@ -19,6 +19,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 
@@ -43,6 +44,7 @@ Rectangle {
     property int leftPadding: 0
     property int rightPadding: 0
 
+    property VLCColors _colors: VLCStyle.colors
 
     // Should the cover be displayed
     //property alias showCover: cover.visible
@@ -56,12 +58,13 @@ Rectangle {
 
 
     Rectangle {
+        z: 2
         width: parent.width
         height: 2
         anchors.top: parent.top
         antialiasing: true
         visible: dropVisible
-        color: VLCStyle.colors.accent
+        color: _colors.accent
     }
 
     MouseArea {
@@ -88,6 +91,7 @@ Rectangle {
                     return
                 if (target.active) {
                     root.dragStarting()
+                    dragItem.model = model
                     dragItem.count = plmodel.getSelection().length
                     dragItem.visible = true
                 } else {
@@ -105,7 +109,7 @@ Rectangle {
         }
 
         Rectangle {
-            color: VLCStyle.colors.bg
+            color: _colors.bg
             anchors.fill: parent
             visible: model.isCurrent && !root.hovered && !model.selected
         }
@@ -121,7 +125,17 @@ Rectangle {
             Item {
                 Layout.preferredHeight: VLCStyle.icon_normal
                 Layout.preferredWidth: VLCStyle.icon_normal
-                Layout.leftMargin: VLCStyle.margin_xsmall
+
+                DropShadow {
+                    id: effect
+                    anchors.fill: artwork
+                    source: artwork
+                    radius: 8
+                    samples: 17
+                    color: _colors.glowColorBanner
+                    visible: artwork.visible
+                    spread: 0.1
+                }
 
                 Image {
                     id: artwork
@@ -131,48 +145,55 @@ Rectangle {
                     visible: !statusIcon.visible
                 }
 
-                Image {
+                Widgets.IconLabel {
                     id: statusIcon
-                    anchors.centerIn: parent
-                    visible: (model.isCurrent && source !== "")
-                    width: VLCStyle.play_cover_small
-                    height: VLCStyle.play_cover_small
-                    source: player.playingState === PlayerController.PLAYING_STATE_PLAYING ? "qrc:///toolbar/play_b.svg" :
-                                                        player.playingState === PlayerController.PLAYING_STATE_PAUSED ? "qrc:///toolbar/pause_b.svg" : ""
+                    anchors.fill: parent
+                    visible: (model.isCurrent && text !== "")
+                    width: height
+                    height: VLCStyle.icon_normal
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    color: _colors.accent
+                    text: player.playingState === PlayerController.PLAYING_STATE_PLAYING ? VLCIcons.volume_high :
+                                                    player.playingState === PlayerController.PLAYING_STATE_PAUSED ? VLCIcons.pause : ""
                 }
             }
 
             Column {
                 Layout.fillWidth: true
-                Layout.leftMargin: VLCStyle.margin_small
+                Layout.leftMargin: VLCStyle.margin_large
 
                 Widgets.ListLabel {
                     id: textInfo
 
                     font.weight: model.isCurrent ? Font.Bold : Font.Normal
-                    font.pixelSize: VLCStyle.fontSize_normal
-                    elide: Text.ElideRight
-
                     text: model.title
-                    color: VLCStyle.colors.text
+                    color: _colors.text
                 }
 
-                Widgets.CaptionLabel {
+                Widgets.ListSubtitleLabel {
                     id: textArtist
 
                     font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
                     text: (model.artist ? model.artist : i18n.qtr("Unknown Artist"))
+                    color: _colors.text
                 }
             }
 
-            Text {
+            Widgets.ListLabel {
                 id: textDuration
-
                 Layout.rightMargin: VLCStyle.margin_xsmall
-                font.pixelSize: VLCStyle.fontSize_normal
-
+                Layout.preferredWidth: durationMetric.width
                 text: model.duration
-                color: VLCStyle.colors.text
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                color: _colors.text
+
+                TextMetrics {
+                    id: durationMetric
+                    font.pixelSize: VLCStyle.fontSize_normal
+                    text: "-00:00-"
+                }
             }
 
         }
@@ -180,11 +201,24 @@ Rectangle {
         DropArea {
             anchors { fill: parent }
             onEntered: {
+                var delta = drag.source.model.index - model.index
+                if(delta === 0 || delta === -1)
+                    return
+
                 dropVisible = true
-                return true
             }
-            onExited: dropVisible = false
+            onExited: {
+                var delta = drag.source.model.index - model.index
+                if(delta === 0 || delta === -1)
+                    return
+
+                dropVisible = false
+            }
             onDropped: {
+                var delta = drag.source.model.index - model.index
+                if(delta === 0 || delta === -1)
+                    return
+
                 root.dropedMovedAt(model.index, drop)
                 dropVisible = false
             }

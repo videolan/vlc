@@ -31,60 +31,26 @@ Widgets.NavigableFocusScope {
 
     property int currentId: -1
     property var model : ({})
-    property alias currentItemY: expandRect.y
-    property alias currentItemHeight: expandRect.height
-    implicitHeight: arrowRect.implicitHeight + contentRect.implicitHeight
-    property int notchPosition: 0
+    property bool _showMoreInfo: false
     signal retract()
 
-    //arrow
-    Item {
-        id:arrowRect
-        y: -(width/2)
-        x: notchPosition  - (width/2)
-        clip: true
-        width: Math.sqrt(2) *VLCStyle.icon_normal
-        height: width/2
-        implicitHeight: width/2
-
-        Rectangle{
-            x: 0
-            y: parent.height
-            width: VLCStyle.icon_normal
-            height: VLCStyle.icon_normal
-            color: VLCStyle.colors.bgAlt
-            transformOrigin: Item.TopLeft
-            rotation: -45
-        }
-    }
-
+    implicitHeight: contentRect.implicitHeight
 
     Rectangle{
         id: contentRect
-        //height: implicitHeight
-        implicitHeight: contentLayout.implicitHeight + VLCStyle.margin_xsmall * 2
+
+        implicitHeight: contentLayout.implicitHeight + ( VLCStyle.margin_normal * 2 )
         width: parent.width
-
-        anchors {
-            bottom: parent.bottom
-            right: parent.right
-            left: parent.left
-            top: arrowRect.bottom
-        }
-        //height: parent.height - arrowRect.height
-
         clip: true
         color: VLCStyle.colors.bgAlt
 
         RowLayout {
             id: contentLayout
-            spacing: VLCStyle.margin_xsmall
-
-            anchors.margins: VLCStyle.margin_small
-
-            implicitHeight: artAndControl.implicitHeight
 
             anchors.fill: parent
+            anchors.margins: VLCStyle.margin_normal
+            implicitHeight: artAndControl.implicitHeight
+            spacing: VLCStyle.margin_normal
 
             FocusScope {
                 id: artAndControl
@@ -100,34 +66,31 @@ Widgets.NavigableFocusScope {
 
                 Column {
                     id: artAndControlLayout
-                    anchors.margins: VLCStyle.margin_small
-                    spacing: VLCStyle.margin_small
+
+                    spacing: VLCStyle.margin_normal
 
                     /* A bigger cover for the album */
                     Image {
                         id: expand_cover_id
 
-                        height: VLCStyle.video_large_height
-                        width: VLCStyle.video_large_width
+                        height: VLCStyle.gridCover_video_height
+                        width: VLCStyle.gridCover_video_width
                         source: model.thumbnail || VLCStyle.noArtCover
                         sourceSize: Qt.size(width, height)
                         fillMode: Image.PreserveAspectFit
                     }
 
-                    Widgets.NavigableCol {
+                    Widgets.NavigableRow {
                         id: actionButtons
 
                         focus: true
-
-                        width: expand_cover_id.width
+                        spacing: VLCStyle.margin_large
 
                         model: ObjectModel {
                             Widgets.TabButtonExt {
                                 id: playActionBtn
 
-                                width: actionButtons.width
-
-                                iconTxt: VLCIcons.play
+                                iconTxt: VLCIcons.play_outline
                                 text: i18n.qtr("Play")
                                 onClicked: medialib.addAndPlay( model.id )
                             }
@@ -135,9 +98,7 @@ Widgets.NavigableFocusScope {
                             Widgets.TabButtonExt {
                                 id: enqueueActionBtn
 
-                                width: actionButtons.width
-
-                                iconTxt: VLCIcons.add
+                                iconTxt: VLCIcons.enqueue
                                 text: i18n.qtr("Enqueue")
                                 onClicked: medialib.addToPlaylist( model.id )
                             }
@@ -150,83 +111,158 @@ Widgets.NavigableFocusScope {
             }
 
 
-            ColumnLayout {
+            Column {
                 id: expand_infos_id
 
-                Layout.fillWidth: true
+                spacing: 0
                 Layout.fillHeight: true
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
 
-                spacing: VLCStyle.margin_xsmall
-
-                Text {
-                    id: expand_infos_title_id
-
-                    Layout.preferredHeight: implicitHeight
-                    Layout.fillWidth: true
-
+                Widgets.SubtitleLabel {
                     text: model.title || i18n.qtr("Unknown title")
-                    font.pixelSize: VLCStyle.fontSize_xxlarge
-                    font.bold: true
-                    color: VLCStyle.colors.text
+                    width: parent.width
                 }
 
-                Widgets.NavigableFocusScope {
-                    id: infoPanel
+                Widgets.CaptionLabel {
+                    text: model.duration
+                    color: VLCStyle.colors.text
+                    topPadding: VLCStyle.margin_xxsmall
+                    width: parent.width
+                }
 
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
+                Row {
+                    width: parent.width
+                    topPadding: VLCStyle.margin_normal
+                    spacing: VLCStyle.margin_xlarge
 
-                    navigationParent: expandRect
-                    navigationLeftItem: actionButtons
+                    Column {
+                        width: audioTrackInfo.visible ? expand_infos_id.width / 2 : expand_infos_id.width
 
-                    ScrollView {
-                        id: infoPannelScrollView
+                        Widgets.MenuCaption {
+                            text: "<b>" + i18n.qtr("File Name:") + "</b> " + expandRect.model.title
+                            width: parent.width
+                        }
 
-                        contentHeight: infoInnerCol.height
+                        Widgets.MenuCaption {
+                            text: "<b>" + i18n.qtr("Path:") + "</b> " + expandRect.model.display_mrl
+                            topPadding: VLCStyle.margin_xsmall
+                            width: parent.width
+                        }
 
-                        anchors.fill: parent
-                        anchors.margins: VLCStyle.margin_xxsmall
+                        MouseArea {
+                            width: childrenRect.width
+                            height: childrenRect.height
 
-                        focus: true
-                        clip: true
+                            onClicked: _showMoreInfo = !_showMoreInfo
 
-                        ListView {
-                            id: infoInnerCol
-                            spacing: VLCStyle.margin_xsmall
-                            model: [
-                                {text: i18n.qtr("File Name"),    data: expandRect.model.title, bold: true},
-                                {text: i18n.qtr("Path"),         data: expandRect.model.display_mrl},
-                                {text: i18n.qtr("Length"),       data: expandRect.model.duration},
-                                {text: i18n.qtr("File size"),    data: ""},
-                                {text: i18n.qtr("Times played"), data: expandRect.model.playcount},
-                                {text: i18n.qtr("Video track"),  data: expandRect.model.videoDesc},
-                                {text: i18n.qtr("Audio track"),  data: expandRect.model.audioDesc},
-                            ]
-                            delegate: Label {
-                                font.bold: Boolean(modelData.bold)
-                                font.pixelSize: VLCStyle.fontSize_normal
-                                text: modelData.text + ": " + modelData.data
-                                color: VLCStyle.colors.text
-                                width: parent.width
-                                wrapMode: Label.Wrap
+                            Row {
+                                topPadding: VLCStyle.margin_large
+                                spacing: VLCStyle.margin_xsmall
+
+                                Widgets.IconLabel {
+                                    text: VLCIcons.back
+                                    rotation: _showMoreInfo ? 270 : 90
+
+                                    Behavior on rotation {
+                                        NumberAnimation {
+                                            duration: 100
+                                        }
+                                    }
+                                }
+
+                                Widgets.CaptionLabel {
+                                    text: _showMoreInfo ? i18n.qtr("View Less") : i18n.qtr("View More")
+                                    color: VLCStyle.colors.text
+                                }
                             }
                         }
-                        Keys.priority: Keys.BeforeItem
-                        Keys.onPressed: {
-                            if ( !KeyHelper.matchUp(event) && !KeyHelper.matchDown(event) ) {
-                                infoPanel.defaultKeyAction(event, 0)
+
+                        Column {
+                            topPadding: VLCStyle.margin_xxlarge
+                            visible: _showMoreInfo && expandRect.model.videoDesc.length > 0
+                            opacity: visible ? 1 : 0
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: 100
+                                }
+                            }
+
+                            Widgets.MenuCaption {
+                                text: i18n.qtr("Video track:")
+                                font.bold: true
+                                bottomPadding: VLCStyle.margin_small
+                            }
+
+                            Repeater {
+                                model: expandRect.model.videoDesc
+
+                                delegate: Repeater {
+                                    model: [
+                                        {text: i18n.qtr("Codec:"), data: modelData.codec },
+                                        {text: i18n.qtr("Language:"), data: modelData.language },
+                                        {text: i18n.qtr("FPS:"), data: modelData.fps }
+                                    ]
+
+                                    delegate: Widgets.MenuCaption {
+                                        text: modelData.text + " " + modelData.data
+                                        bottomPadding: VLCStyle.margin_xsmall
+                                    }
+
+                                }
                             }
                         }
                     }
 
-                    Rectangle {
-                        z: 2
-                        anchors.fill: parent
-                        border.width: VLCStyle.dp(2)
-                        border.color: VLCStyle.colors.accent
-                        color: "transparent"
-                        visible: infoPanel.activeFocus
+                    Column {
+                        id: audioTrackInfo
+
+                        visible: _showMoreInfo && expandRect.model.audioDesc.length > 0
+                        opacity: visible ? 1 : 0
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: 100
+                            }
+                        }
+
+                        Widgets.MenuCaption {
+                            text: i18n.qtr("Audio track:")
+                            font.bold: true
+                            bottomPadding: VLCStyle.margin_small
+                        }
+
+                        Repeater {
+                            model: expandRect.model.audioDesc
+
+                            delegate: Repeater {
+                                model: [
+                                    {text: i18n.qtr("Codec:"), data: modelData.codec },
+                                    {text: i18n.qtr("Language:"), data: modelData.language },
+                                    {text: i18n.qtr("Channel:"), data: modelData.nbchannels }
+                                ]
+
+                                delegate: Widgets.MenuCaption {
+                                    text: modelData.text + " " + modelData.data
+                                    bottomPadding: VLCStyle.margin_xsmall
+                                }
+                            }
+                        }
+
                     }
+                }
+            }
+
+            Widgets.IconLabel {
+                text: VLCIcons.close
+                color: VLCStyle.colors.caption
+
+                Layout.alignment: Qt.AlignTop
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: expandRect.retract()
                 }
             }
         }

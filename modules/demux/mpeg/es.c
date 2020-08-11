@@ -820,10 +820,8 @@ static int GenericProbe( demux_t *p_demux, uint64_t *pi_offset,
     const ssize_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_probe );
 
     if( i_peek < 0 || (size_t)i_peek < i_skip + i_check_size )
-    {
-        msg_Dbg( p_demux, "cannot peek" );
         return VLC_EGENERIC;
-    }
+
     for( ;; )
     {
         if( i_skip + i_check_size > i_peek )
@@ -1025,10 +1023,12 @@ static uint64_t SeekByMlltTable( demux_t *p_demux, vlc_tick_t *pi_time )
         bs_init(&p_cur->br, p_sys->mllt.p_bits, p_sys->mllt.i_bits);
     }
 
-    while(bs_remain(&p_cur->br) >= p_sys->mllt.i_bits_per_bytes_dev + p_sys->mllt.i_bits_per_ms_dev)
+    while(!bs_eof(&p_cur->br))
     {
         const uint32_t i_bytesdev = bs_read(&p_cur->br, p_sys->mllt.i_bits_per_bytes_dev);
         const uint32_t i_msdev = bs_read(&p_cur->br, p_sys->mllt.i_bits_per_ms_dev);
+        if(bs_error(&p_cur->br))
+            break;
         const vlc_tick_t i_deltatime = VLC_TICK_FROM_MS(p_sys->mllt.i_ms_btw_refs + i_msdev);
         if( p_cur->i_time + i_deltatime > *pi_time )
             break;
@@ -1268,10 +1268,8 @@ static int AacProbe( demux_t *p_demux, uint64_t *pi_offset )
 
     /* peek the begining (10 is for adts header) */
     if( vlc_stream_Peek( p_demux->s, &p_peek, 10 ) < 10 )
-    {
-        msg_Dbg( p_demux, "cannot peek" );
         return VLC_EGENERIC;
-    }
+
     if( !strncmp( (char *)p_peek, "ADIF", 4 ) )
     {
         msg_Err( p_demux, "ADIF file. Not yet supported. (Please report)" );

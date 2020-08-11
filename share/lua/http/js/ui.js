@@ -61,7 +61,7 @@ $(function () {
         if ($(this).attr('state') == 'stopped') {
             switch (current_que) {
             case 'main':
-                var id = $('.jstree-clicked', '#libraryTree').length > 0 ? $('.jstree-clicked', '#libraryTree').first().parents().first().attr('id').substr(5) : current_id;
+                var id = $('.jstree-clicked', '#libraryTree').length > 0 ? $('.jstree-clicked', '#libraryTree').first().parents().first().attr('id').substr(5) : current_playlist_id;
                 sendCommand({
                     'command': 'pl_play',
                     'id': id
@@ -69,7 +69,7 @@ $(function () {
                 break;
             case 'stream':
                 sendVLMCmd('control Current play');
-                flowplayer("player", "http://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
+                flowplayer("player", "https://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
                 break;
             }
         } else {
@@ -102,7 +102,7 @@ $(function () {
         }
         var urlimg = location.href + 'mobile.html';
         var codeimg = $('<img width="350" height="350" alt="qrcode"/>');
-        codeimg.attr('src', 'http://chart.apis.google.com/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=' + encodeURIComponent(urlimg));
+        codeimg.attr('src', 'https://chart.apis.google.com/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=' + encodeURIComponent(urlimg));
         codeimg.dialog({width: 350, height: 350, title: 'QR-Code'});
         return false;
     });

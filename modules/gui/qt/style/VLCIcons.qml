@@ -160,5 +160,8 @@ Item {
     property string list : "\ue08c"
     property string album_cover : "\ue08d"
     property string time : "\ue08e"
+    property string play_outline : "\ue08f"
+    property string enqueue : "\ue090"
+    property string back : "\ue091"
 
 }

@@ -787,16 +787,6 @@ static void RequestReload( vlc_input_decoder_t *p_owner )
     atomic_compare_exchange_strong( &p_owner->reload, &expected, RELOAD_DECODER );
 }
 
-static void DecoderThread_AbortPictures( decoder_t *p_dec, bool b_abort )
-{
-    vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
-
-    vlc_mutex_lock( &p_owner->lock ); // called in DecoderThread
-    if (p_owner->out_pool)
-        picture_pool_Cancel( p_owner->out_pool, b_abort );
-    vlc_mutex_unlock( &p_owner->lock );
-}
-
 static void DecoderWaitUnblock( vlc_input_decoder_t *p_owner )
 {
     vlc_mutex_assert( &p_owner->lock );
@@ -1723,7 +1713,6 @@ static const struct decoder_owner_callbacks dec_video_cbs =
         .get_device = ModuleThread_GetDecoderDevice,
         .format_update = ModuleThread_UpdateVideoFormat,
         .buffer_new = ModuleThread_NewVideoBuffer,
-        .abort_pictures = DecoderThread_AbortPictures,
         .queue = ModuleThread_QueueVideo,
         .queue_cc = ModuleThread_QueueCc,
         .get_display_date = ModuleThread_GetDisplayDate,

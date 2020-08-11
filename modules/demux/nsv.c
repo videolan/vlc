@@ -160,10 +160,7 @@ static int Demux( demux_t *p_demux )
     for( ;; )
     {
         if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
-        {
-            msg_Warn( p_demux, "cannot peek" );
             return VLC_DEMUXER_EOF;
-        }
 
         if( !memcmp( p_peek, "NSVf", 4 ) )
         {

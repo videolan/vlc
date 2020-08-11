@@ -36,6 +36,8 @@ Widgets.NavigableFocusScope {
     property alias currentIndex: list.currentIndex
     property alias focusPolicy: button.focusPolicy
 
+    property VLCColors _colors: VLCStyle.colors
+
     signal sortSelected(var modelData)
 
     onFocusChanged: {
@@ -56,6 +58,9 @@ Widgets.NavigableFocusScope {
         text: i18n.qtr("Sort")
 
         focus: true
+
+        color: _colors.buttonText
+        colorDisabled: _colors.textInactive
 
         onClicked: {
             if (popup.opened)
@@ -95,7 +100,7 @@ Widgets.NavigableFocusScope {
             spacing: 0
 
             highlight: Rectangle {
-                color: VLCStyle.colors.accent
+                color: _colors.accent
             }
 
             Rectangle {
@@ -103,7 +108,7 @@ Widgets.NavigableFocusScope {
                 width: parent.width
                 height: parent.height
                 color: "transparent"
-                border.color: VLCStyle.colors.accent
+                border.color: _colors.accent
             }
 
             ScrollIndicator.vertical: ScrollIndicator { }
@@ -121,7 +126,7 @@ Widgets.NavigableFocusScope {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: VLCStyle.colors.accent
+                        color: _colors.accent
                         visible: mouseArea.containsMouse
                     }
 
@@ -133,7 +138,7 @@ Widgets.NavigableFocusScope {
                         bottomPadding: VLCStyle.margin_xxsmall
                         leftPadding: VLCStyle.margin_xsmall
                         rightPadding: VLCStyle.margin_xsmall
-                        color: VLCStyle.colors.buttonText
+                        color: _colors.buttonText
                         elide: Text.ElideRight
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -155,8 +160,8 @@ Widgets.NavigableFocusScope {
         }
 
         background: Rectangle {
-            color: VLCStyle.colors.button
-            border.color: VLCStyle.colors.buttonBorder
+            color: _colors.button
+            border.color: _colors.buttonBorder
         }
     }
 }

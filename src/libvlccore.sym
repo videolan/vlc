@@ -75,7 +75,6 @@ decoder_NewPicture
 decoder_Init
 decoder_Clean
 decoder_Destroy
-decoder_AbortPictures
 decoder_NewAudioBuffer
 decoder_UpdateVideoFormat
 decoder_UpdateVideoOutput
@@ -312,7 +311,6 @@ picture_NewFromFormat
 picture_NewFromResource
 picture_pool_Release
 picture_pool_Get
-picture_pool_GetSize
 picture_pool_New
 picture_pool_NewFromFormat
 picture_pool_Reserve

@@ -142,11 +142,8 @@ static int Open( vlc_object_t * p_this )
 
     if( vlc_stream_Peek( p_demux->s, &p_peek, DV_PAL_FRAME_SIZE ) <
         DV_NTSC_FRAME_SIZE )
-    {
-        /* Stream too short ... */
-        msg_Err( p_demux, "cannot peek()" );
         return VLC_EGENERIC;
-    }
+
     p_peek_backup = p_peek;
 
     /* fill in the dv_id_t structure */

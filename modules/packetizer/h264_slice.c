@@ -144,9 +144,12 @@ bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
                 if( mod < 3 || ( b_mvc && (mod == 4 || mod == 5) ) )
                     bs_read_ue( &s ); /* abs_diff_pic_num_minus1, long_term_pic_num, abs_diff_view_idx_min1 */
             }
-            while( mod != 3 && bs_remain( &s ) );
+            while( mod != 3 && !bs_eof( &s ) );
         }
     }
+
+    if( bs_error( &s ) )
+        return false;
 
     /* pred_weight_table() */
     if( ( p_pps->weighted_pred_flag && ( i_slice_type == 0 || i_slice_type == 5 || /* P, SP */
@@ -210,7 +213,7 @@ bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
 
     /* If you need to store anything else than MMCO presence above, care of "Early END" cases */
 
-    return true;
+    return !bs_error( &s );
 }
 
 

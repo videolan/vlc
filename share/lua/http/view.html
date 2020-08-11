@@ -25,13 +25,14 @@
 <head>
 	<title><?vlc gettext("VLC media player - Flash Viewer") ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="referrer" content="no-referrer" />
 	<link href="favicon.ico" type="image/x-icon" rel="shortcut icon"/>
 	<link type="text/css" href="css/ui-lightness/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
 	<link type="text/css" href="css/main.css" rel="stylesheet" />
 	<script type="text/javascript" src="js/common.js"></script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="http://releases.flowplayer.org/js/flowplayer-3.2.6.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="https://releases.flowplayer.org/js/flowplayer-3.2.6.min.js"></script>
 	<script type="text/javascript">
 	//<![CDATA[
 	$(function(){
@@ -50,7 +51,7 @@
 		});
 		$('#player').empty();
 		$('#player').attr('href',$('#stream_protocol').val()+'://'+$('#stream_host').val()+':'+$('#stream_port').val()+'/'+$('#stream_file').val());
-		flowplayer("player", "http://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
+		flowplayer("player", "https://releases.flowplayer.org/swf/flowplayer-3.2.7.swf");
 	});
 	//]]>
 	</script>

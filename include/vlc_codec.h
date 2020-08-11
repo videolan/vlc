@@ -54,8 +54,6 @@ struct decoder_owner_callbacks
 
             /* cf. decoder_NewPicture, can be called from any decoder thread */
             picture_t*  (*buffer_new)( decoder_t * );
-            /* cf. decoder_AbortPictures */
-            void        (*abort_pictures)( decoder_t *, bool b_abort );
             /* cf.decoder_QueueVideo */
             void        (*queue)( decoder_t *, picture_t * );
             /* cf.decoder_QueueCC */
@@ -358,15 +356,6 @@ VLC_API int decoder_UpdateVideoFormat( decoder_t *dec );
  * \return a picture buffer on success, NULL on error
  */
 VLC_API picture_t *decoder_NewPicture( decoder_t *dec );
-
-/**
- * Abort any calls of decoder_NewPicture
- *
- * If b_abort is true, all pending and futures calls of decoder_NewPicture
- * will be aborted. This function can be used by asynchronous video decoders
- * to unblock a thread that is waiting for a picture.
- */
-VLC_API void decoder_AbortPictures( decoder_t *dec, bool b_abort );
 
 /**
  * Initialize a decoder structure before creating the decoder.

@@ -92,7 +92,7 @@ NavigableFocusScope {
         Transition {
             to: "hidden"
             SequentialAnimation {
-                NumberAnimation { target: container; property: toChange; duration: 200}
+                NumberAnimation { target: container; property: toChange; duration: 150; easing.type: Easing.InSine}
                 PropertyAction{ target: container; property: "visible" }
             }
         },
@@ -100,7 +100,7 @@ NavigableFocusScope {
             to: "visible"
             SequentialAnimation {
                 PropertyAction{ target: container; property: "visible" }
-                NumberAnimation { target: container; property: toChange; duration: 200 }
+                NumberAnimation { target: container; property: toChange; duration: 150; easing.type: Easing.OutSine}
             }
         }
     ]

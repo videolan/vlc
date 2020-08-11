@@ -58,44 +58,48 @@ static int run_tests( const struct testset *p_testsets,
     bs_t bs;
 
     bs_init( &bs, NULL, 0 );
-    test_assert( bs_remain(&bs), 0 );
     test_assert( bs_pos(&bs), 0 );
+    test_assert( bs_eof(&bs), true );
+    test_assert( bs_error(&bs), false );
 
     bs_init( &bs, p_testsets[TESTSET0].data, 0 );
-    test_assert( bs_remain(&bs), 0 );
     test_assert( bs_pos(&bs), 0 );
+    bs_skip( &bs, 3 );
+    test_assert( bs_error(&bs), true );
 
     bs_init( &bs, p_testsets[TESTSET0].data,
                   p_testsets[TESTSET0].count );
-    test_assert( bs_remain(&bs), 8 );
     test_assert( bs_pos(&bs), 0 );
+    test_assert( bs_eof(&bs), false );
+    test_assert( bs_error(&bs), false );
 
     bs_skip( &bs, 3 );
-    test_assert( bs_remain(&bs), 5 );
+    test_assert( bs_error(&bs), false );
     test_assert( bs_pos(&bs), 3 );
 
     bs_init( &bs, p_testsets[TESTSET1].data,
                   p_testsets[TESTSET1].count );
-    test_assert( bs_remain(&bs), 16 );
+    test_assert( bs_error(&bs), false );
 
     bs_write( &bs, 1, 0 );
-    test_assert( bs_remain(&bs), 16 );
+    test_assert( bs_error(&bs), false );
+    test_assert( bs_eof(&bs), false );
 
     bs_read1( &bs );
-    test_assert( bs_remain(&bs), 15 );
+    test_assert( bs_error(&bs), false );
+    test_assert( bs_eof(&bs), false );
     test_assert( bs_pos(&bs), 1 );
 
     bs_read( &bs, 7 );
-    test_assert( bs_remain(&bs), 8 );
     test_assert( bs_pos(&bs), 8 );
 
     bs_read1( &bs );
-    test_assert( bs_remain(&bs), 7 );
     test_assert( bs_pos(&bs), 9 );
+    test_assert( bs_error(&bs), false );
 
     bs_align( &bs );
-    test_assert( bs_remain(&bs), 0 );
     test_assert( bs_pos(&bs), 16 );
+    test_assert( bs_error(&bs), false );
 
     bs_init( &bs, p_testsets[TESTSET1].data,
                   p_testsets[TESTSET1].count );
@@ -105,10 +109,10 @@ static int run_tests( const struct testset *p_testsets,
     bs_init( &bs, p_testsets[TESTSET_EXPGOLOMB].data,
                   p_testsets[TESTSET_EXPGOLOMB].count );
     test_assert( bs_read_ue(&bs), 0x09 );
-    test_assert( bs_remain(&bs), 9 );
+    test_assert( bs_error(&bs), false );
     test_assert( bs_read1(&bs), 1 );
     test_assert( bs_read_se(&bs), 2 );
-    test_assert( bs_remain(&bs), 3 );
+    test_assert( bs_error(&bs), false );
     test_assert( bs_read_se(&bs), -1 );
     test_assert( bs_eof(&bs), !0 );
 
@@ -118,7 +122,7 @@ static int run_tests( const struct testset *p_testsets,
     test_assert( bs_read( &bs, 8 ), 0xDD );
     test_assert( bs_read( &bs, 4 ), 0x0E );
     test_assert( bs_read( &bs, 8 ), 0xEF );
-    test_assert( bs_remain( &bs ), 4 );
+    test_assert( bs_error(&bs), false );
 
     bs_init( &bs, p_testsets[TESTSET2].data,
                   p_testsets[TESTSET2].count );
@@ -131,7 +135,8 @@ static int run_tests( const struct testset *p_testsets,
     test_assert( bs_read( &bs, 8 ), 0xCD );
     test_assert( bs_read( &bs, 4 ), 0x0D );
     test_assert( bs_read( &bs, 8 ), 0xEE );
-    test_assert( bs_remain( &bs ), 8 );
+    test_assert( bs_error(&bs), false );
+    test_assert( bs_eof(&bs), false );
 
     /* */
     bs_init( &bs, p_testsets[TESTSET2].data,
@@ -139,9 +144,10 @@ static int run_tests( const struct testset *p_testsets,
     for( size_t i=0; i<6*8; i++ )
     {
         test_assert(bs_aligned( &bs ), !!(i%8 == 0));
-        test_assert(bs_remain( &bs ), 6*8 - i);
+        test_assert( bs_eof(&bs), false );
         test_assert(bs_pos( &bs ), i);
         bs_read( &bs, 1 );
+        test_assert( bs_error(&bs), false );
     }
     test_assert(bs_eof( &bs ), 1);
 
@@ -160,10 +166,11 @@ static int run_tests( const struct testset *p_testsets,
     for( size_t i=0, j=0; i<5*8; j++ )
     {
         test_assert(bs_aligned( &bs ), !!(i%8 == 0));
-        test_assert(bs_remain( &bs ), 5*8 - i);
+        test_assert( bs_eof(&bs), false );
         test_assert(bs_pos( &bs ), i);
         bs_write(&bs, j % 4, (i % 2) ? 0xFF >> (8 - (j % 4)) : 0 );
         i += j % 4;
+        test_assert( bs_error(&bs), i > 5*8 );
     }
     test_assert(bs_eof( &bs ), 1);
     test_assert(!memcmp(buf, bufok, 5), true);
@@ -183,20 +190,26 @@ static int run_tests( const struct testset *p_testsets,
     /* overflows */
     bs_init( &bs, p_testsets[TESTSET1].data, p_testsets[TESTSET1].count );
     bs_read( &bs, 42 );
-    test_assert(bs_remain( &bs ), 0);
+    test_assert( bs_error(&bs), true );
+    test_assert( bs_eof(&bs), true );
     test_assert(bs_pos( &bs ), 16);
 
     bs_init( &bs, p_testsets[TESTSET1].data, p_testsets[TESTSET1].count );
-    bs_skip( &bs, 42 );
-    test_assert(bs_remain( &bs ), 0);
+    bs_skip( &bs, 2 );
+    test_assert( bs_error(&bs), false );
+    test_assert( bs_eof(&bs), false );
+    bs_skip( &bs, 40 );
+    test_assert( bs_error(&bs), true );
+    test_assert( bs_eof(&bs), true );
     test_assert(bs_pos( &bs ), 16);
 
     bs_init( &bs, p_testsets[TESTSET1].data, p_testsets[TESTSET1].count );
     bs_skip( &bs, 8 );
-    test_assert(bs_remain( &bs ), 8);
+    test_assert( bs_error(&bs), false );
     test_assert(bs_pos( &bs ), 8);
-    test_assert(bs_read( &bs, 8 + 2 ), 0x55 << 2);
-    test_assert(bs_remain( &bs ), 0);
+    test_assert(bs_read( &bs, 8 + 2 ), 0x55 << 2); /* truncated read */
+    test_assert( bs_error(&bs), true );
+    test_assert( bs_eof(&bs), true );
     test_assert(bs_pos( &bs ), 16);
 
     return 0;
@@ -205,6 +218,9 @@ static int run_tests( const struct testset *p_testsets,
 
 static size_t bs_skipeven_bytes_forward( bs_t *s, size_t i_count )
 {
+    if( s->p_start == NULL || (s->p_start + 1) > s->p_end )
+        return 0;
+
     if( s->p == NULL )
     {
         s->p = s->p_start;
@@ -223,14 +239,6 @@ static size_t bs_skipeven_bytes_forward( bs_t *s, size_t i_count )
     }
 }
 
-static size_t bs_skipeven_bytes_remain( const bs_t *s )
-{
-    if( s->p )
-        return s->p < s->p_end ? (s->p_end - s->p + 1) / 2 - 1: 0;
-    else
-        return (s->p_end - s->p_start) / 2;
-}
-
 static size_t bs_skipeven_bytes_pos( const bs_t *s )
 {
     if( s->p )
@@ -242,7 +250,6 @@ static size_t bs_skipeven_bytes_pos( const bs_t *s )
 bs_byte_callbacks_t skipeven_cb = {
     bs_skipeven_bytes_forward,
     bs_skipeven_bytes_pos,
-    bs_skipeven_bytes_remain,
 };
 
 static int test_annexb( const char *psz_tag )
@@ -261,7 +268,6 @@ static int test_annexb( const char *psz_tag )
     for( size_t i=0; i<ARRAY_SIZE(unesc)*8; i++ )
     {
         test_assert(bs_aligned( &bs ), !!(i%8 == 0));
-        test_assert(bs_remain( &bs ), ARRAY_SIZE(unesc)*8 - i);
         test_assert(bs_pos( &bs ), i);
         bs_read( &bs, 1 );
     }
@@ -273,7 +279,6 @@ static int test_annexb( const char *psz_tag )
     bs.p_priv = &bsctx;
     for( size_t i=0; i<ARRAY_SIZE(unesc)*4; i++ )
     {
-        test_assert(bs_remain( &bs ), ARRAY_SIZE(unesc)*8 - i*2);
         test_assert(bs_pos( &bs ), i*2);
         bs_read( &bs, 2 );
     }
@@ -282,7 +287,6 @@ static int test_annexb( const char *psz_tag )
     /* overflows */
     bs_init( &bs, &annexb, ARRAY_SIZE(annexb) );
     bs_skip( &bs, (ARRAY_SIZE(annexb) + 1) * 8 );
-    test_assert(bs_remain( &bs ), 0);
     test_assert(bs_pos( &bs ), ARRAY_SIZE(annexb) * 8);
 
     /* real world vps */
@@ -297,7 +301,6 @@ static int test_annexb( const char *psz_tag )
     hxxx_bsfw_ep3b_ctx_init( &bsctx );
     bs.cb = hxxx_bsfw_ep3b_callbacks;
     bs.p_priv = &bsctx;
-    test_assert(bs_remain( &bs ), ARRAY_SIZE(vpsnalunesc) * 8);
     for(size_t i=0; i<ARRAY_SIZE(vpsnalunesc); i++)
         test_assert(bs_read(&bs, 8), vpsnalunesc[i]);
 
@@ -329,7 +332,6 @@ static int test_annexb( const char *psz_tag )
     hxxx_bsfw_ep3b_ctx_init( &bsctx );
     bs.cb = hxxx_bsfw_ep3b_callbacks;
     bs.p_priv = &bsctx;
-    test_assert(bs_remain( &bs ), ARRAY_SIZE(seinalunesc) * 8);
     for(size_t i=0; i<ARRAY_SIZE(seinalunesc); i++)
         test_assert(bs_read(&bs, 8), seinalunesc[i]);
 
