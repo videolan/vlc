@@ -2303,9 +2303,12 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, stime_t i_pcr)
         if( p_pes->gather.i_data_size != 0 )
             continue;
 
-        /* check only MPEG2, H.264 and VC-1 */
+        /* check only MPEG2, H.264, CAVS, AVS2 and VC-1 */
         if( p_es->fmt.i_codec != VLC_CODEC_MPGV &&
             p_es->fmt.i_codec != VLC_CODEC_H264 &&
+            p_es->fmt.i_codec != VLC_CODEC_CAVS &&
+            p_es->fmt.i_codec != VLC_CODEC_AVS2 &&
+            p_es->fmt.i_codec != VLC_CODEC_AVS3 &&
             p_es->fmt.i_codec != VLC_CODEC_VC1 )
             continue;
 

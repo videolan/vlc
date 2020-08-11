@@ -270,6 +270,10 @@ static const muxer_properties_t p_muxers[] = {
     M( "raw", "mpc", 1,         VLC_CODEC_MUSEPACK7, VLC_CODEC_MUSEPACK8 ),
     M( "raw", "ape", 1,         VLC_CODEC_APE ),
 
+    M( "raw", "avs2", 1,       VLC_CODEC_AVS2 ),
+    M( "raw", "avs3", 1,       VLC_CODEC_AVS3 ),
+    M( "raw", "cavs", 1,       VLC_CODEC_CAVS ),
+
     M( "wav", "wav", 1,         VLC_CODEC_U8,   VLC_CODEC_S16L,
                                 VLC_CODEC_S24L, VLC_CODEC_S32L, VLC_CODEC_FL32 ),
 
@@ -283,8 +287,8 @@ static const muxer_properties_t p_muxers[] = {
                                 VLC_CODEC_WMV1, VLC_CODEC_WMV2, VLC_CODEC_WMV3, VLC_CODEC_VC1 ),
 
     M( "mp4", "mp4", INT_MAX,   VLC_CODEC_MP4A, VLC_CODEC_A52, VLC_CODEC_EAC3, VLC_CODEC_DTS,
-                                VLC_CODEC_H264, VLC_CODEC_MP4V, VLC_CODEC_HEVC, VLC_CODEC_AV1,
-                                VLC_CODEC_SUBT, VLC_CODEC_QTXT, VLC_CODEC_TX3G ),
+                                VLC_CODEC_H264, VLC_CODEC_MP4V, VLC_CODEC_HEVC, VLC_CODEC_AV1,VLC_CODEC_CAVS, 
+                                VLC_CODEC_SUBT, VLC_CODEC_QTXT, VLC_CODEC_TX3G, VLC_CODEC_AVS2, VLC_CODEC_AVS3 ),
 
     M( "ps", "mpg", 16/* FIXME*/, VLC_CODEC_MPGV, VLC_CODEC_MP2V, VLC_CODEC_MP1V,
                                 VLC_CODEC_MPGA, VLC_CODEC_DVD_LPCM, VLC_CODEC_A52,
@@ -293,14 +297,14 @@ static const muxer_properties_t p_muxers[] = {
 
     M( "avi", "avi", 100,       VLC_CODEC_A52, VLC_CODEC_MPGA,
                                 VLC_CODEC_WMA1, VLC_CODEC_WMA2, VLC_CODEC_WMAP, VLC_CODEC_WMAL,
-                                VLC_CODEC_U8, VLC_CODEC_S16L, VLC_CODEC_S24L,
-                                VLC_CODEC_MP4V ),
+                                VLC_CODEC_U8, VLC_CODEC_S16L, VLC_CODEC_S24L,VLC_CODEC_CAVS,
+                                VLC_CODEC_MP4V, VLC_CODEC_AVS2, VLC_CODEC_AVS3 ),
 
     M( "ts", "ts", 8000,        VLC_CODEC_MPGV, VLC_CODEC_MP2V, VLC_CODEC_MP1V,
                                 VLC_CODEC_H264, VLC_CODEC_HEVC,
                                 VLC_CODEC_MPGA, VLC_CODEC_MP2, VLC_CODEC_MP3,
-                                VLC_CODEC_DVD_LPCM, VLC_CODEC_A52, VLC_CODEC_EAC3,
-                                VLC_CODEC_DTS,  VLC_CODEC_MP4A,
+                                VLC_CODEC_DVD_LPCM, VLC_CODEC_A52, VLC_CODEC_EAC3,VLC_CODEC_CAVS, 
+                                VLC_CODEC_DTS,  VLC_CODEC_MP4A, VLC_CODEC_AVS2,VLC_CODEC_AVS3,
                                 VLC_CODEC_DVBS, VLC_CODEC_TELETEXT ),
 
     M( "avformat{mux=webm}", "webm", 32,
@@ -308,8 +312,8 @@ static const muxer_properties_t p_muxers[] = {
                                 VLC_CODEC_VORBIS, VLC_CODEC_OPUS ),
 
     M( "mkv", "mkv", 32,        VLC_CODEC_H264, VLC_CODEC_HEVC, VLC_CODEC_MP4V,
-                                VLC_CODEC_A52, VLC_CODEC_EAC3, VLC_CODEC_DTS, VLC_CODEC_MP4A,
-                                VLC_CODEC_VORBIS, VLC_CODEC_FLAC ),
+                                VLC_CODEC_A52, VLC_CODEC_EAC3, VLC_CODEC_DTS, VLC_CODEC_MP4A,VLC_CODEC_CAVS, 
+                                VLC_CODEC_VORBIS, VLC_CODEC_FLAC, VLC_CODEC_AVS2, VLC_CODEC_AVS3),
 };
 #undef M
 

@@ -1744,6 +1744,15 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         S_CASE("V_MPEG4/MS/V3") {
             vars.p_fmt->i_codec = VLC_CODEC_DIV3;
         }
+        S_CASE("V_CAVS") {
+            vars.p_fmt->i_codec = VLC_CODEC_CAVS;
+        }
+        S_CASE("V_AVS2") {
+            vars.p_fmt->i_codec = VLC_CODEC_AVS2;
+        }
+        S_CASE("V_AVS3") {
+            vars.p_fmt->i_codec = VLC_CODEC_AVS3;
+        }
         S_CASE("V_MPEG4/ISO/AVC") {
             vars.p_fmt->i_codec = VLC_FOURCC( 'a','v','c','1' );
             fill_extra_data( vars.p_tk, 0 );

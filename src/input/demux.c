@@ -39,7 +39,7 @@
 typedef const struct
 {
     char const key[20];
-    char const name[8];
+    char const name[9];
 
 } demux_mapping;
 
@@ -86,6 +86,7 @@ static const char* DemuxNameFromExtension( char const* ext,
         { "asf",  "asf" },
         { "au",   "au" },
         { "avi",  "avi" },
+
         { "drc",  "dirac" },
         { "dv",   "dv" },
         { "flac", "flac" },

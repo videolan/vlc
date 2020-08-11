@@ -273,6 +273,7 @@ modules/audio_output/wasapi.c
 modules/audio_output/waveout.c
 modules/audio_output/windows_audio_common.h
 modules/audio_output/winstore.c
+modules/codec/davs2.c
 modules/codec/a52.c
 modules/codec/adpcm.c
 modules/codec/aes3.c

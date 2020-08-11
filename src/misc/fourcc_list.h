@@ -668,8 +668,7 @@ static const staticentry_t p_list_video[] = {
     /* Chinese AVS - Untested */
     B(VLC_CODEC_CAVS, "Chinese AVS"),
         A("CAVS"),
-        A("AVs2"),
-        A("avs2"),
+	A("cavs"),
 
     B(VLC_CODEC_AMV, "AMV"),
 
@@ -1121,6 +1120,16 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_MMVIDEO, "American Laser Games MM Video"),
 
     B(VLC_CODEC_AVS, "Creature Shock AVS"),
+
+    B(VLC_CODEC_AVS2, "Chinese AVS2 video coding standard."),
+        A("AVS2"),
+        A("AVs2"),
+        A("avs2"),
+
+    B(VLC_CODEC_AVS3, "Chinese AVS3 video coding standard."),
+        A("AVS3"),
+        A("AVs3"),
+        A("avs3"),
 
     B(VLC_CODEC_DSICINVIDEO, "Delphine CIN video"),
 

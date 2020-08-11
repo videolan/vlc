@@ -1526,6 +1526,9 @@ static bool PMTSetupEsRegistration( demux_t *p_demux, ts_es_t *p_es,
         { "BSSD", AUDIO_ES, VLC_CODEC_302M  },
         { "VC-1", VIDEO_ES, VLC_CODEC_VC1   },
         { "drac", VIDEO_ES, VLC_CODEC_DIRAC },
+        { "cavs", VIDEO_ES, VLC_CODEC_CAVS },
+        { "avs2", VIDEO_ES, VLC_CODEC_AVS2 },
+        { "avs3", VIDEO_ES, VLC_CODEC_AVS3 },
         { "", UNKNOWN_ES, 0 }
     };
     es_format_t *p_fmt = &p_es->fmt;
@@ -1590,6 +1593,13 @@ static void PIDFillFormat( demux_t *p_demux, ts_stream_t *p_pes,
         break;
     case 0x42:  /* CAVS (Chinese AVS) */
         es_format_Change( fmt, VIDEO_ES, VLC_CODEC_CAVS );
+        break;
+    case 0x43:  /* AVS2 (Chinese AVS2) */
+    case 0xd2:
+        es_format_Change( fmt, VIDEO_ES, VLC_CODEC_AVS2 );
+        break;
+    case 0xd4:  /* AVS3 (Chinese AVS3) */
+        es_format_Change( fmt, VIDEO_ES, VLC_CODEC_AVS3 );
         break;
 
     case 0x81:  /* A52 (audio) */

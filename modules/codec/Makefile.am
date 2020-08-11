@@ -570,6 +570,14 @@ libqsv_plugin_la_LIBADD = $(MFX_LIBS)
 EXTRA_LTLIBRARIES += libqsv_plugin.la
 codec_LTLIBRARIES += $(LTLIBqsv)
 
+### AVS2 Decoder Module ###
+
+libdavs2_plugin_la_SOURCES = codec/davs2.c
+libdavs2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
+libdavs2_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdavs2_plugin_la_LDFLAGS = $(AM_LDFLAGS)
+libdavs2_plugin_la_LIBADD = $(LIBM) -lpthread -ldavs2
+codec_LTLIBRARIES += libdavs2_plugin.la
 
 ### External frameworks ###
 

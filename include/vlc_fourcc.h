@@ -55,6 +55,8 @@
 #define VLC_CODEC_DIRAC           VLC_FOURCC('d','r','a','c')
 #define VLC_CODEC_OGGSPOTS        VLC_FOURCC('S','P','O','T')
 #define VLC_CODEC_CAVS            VLC_FOURCC('C','A','V','S')
+#define VLC_CODEC_AVS2            VLC_FOURCC('A','V','S','2')
+#define VLC_CODEC_AVS3            VLC_FOURCC('A','V','S','3')
 #define VLC_CODEC_NUV             VLC_FOURCC('N','J','P','G')
 #define VLC_CODEC_RV10            VLC_FOURCC('R','V','1','0')
 #define VLC_CODEC_RV13            VLC_FOURCC('R','V','1','3')
