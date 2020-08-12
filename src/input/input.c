@@ -397,6 +397,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     input_ConfigVarInit( p_input );
 
     priv->b_low_delay = var_InheritBool( p_input, "low-delay" );
+    priv->i_jitter_max = VLC_TICK_FROM_MS(var_InheritInteger( p_input, "clock-jitter" ));
 
     /* Remove 'Now playing' info as it is probably outdated */
     input_item_SetNowPlaying( p_item, NULL );

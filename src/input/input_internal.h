@@ -490,6 +490,7 @@ typedef struct input_thread_private_t
 
     /* Delays */
     bool        b_low_delay;
+    vlc_tick_t  i_jitter_max;
 
     /* Output */
     bool            b_out_pace_control; /* XXX Move it ot es_sout ? */
