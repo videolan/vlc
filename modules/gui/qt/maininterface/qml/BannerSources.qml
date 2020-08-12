@@ -259,7 +259,7 @@ Widgets.NavigableFocusScope {
                             id: menu_selector
 
                             size: VLCStyle.banner_icon_size
-                            iconText: VLCIcons.menu
+                            iconText: VLCIcons.ellipsis
                             text: i18n.qtr("Menu")
                             height: playlistGroup.height
 
