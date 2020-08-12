@@ -336,7 +336,7 @@ static vlc_tick_t vlc_clock_slave_set_delay(vlc_clock_t *clock, vlc_tick_t delay
     return 0;
 }
 
-int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
+void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
                    double rate, vlc_tick_t max_duration)
 {
     vlc_clock_main_t *main_clock = clock->owner;
@@ -353,13 +353,9 @@ int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
         deadline = __MIN(deadline, max_deadline);
 
         if (vlc_cond_timedwait(&main_clock->cond, &main_clock->lock, deadline))
-        {
-            vlc_mutex_unlock(&main_clock->lock);
-            return 0;
-        }
+            break;
     }
     vlc_mutex_unlock(&main_clock->lock);
-    return -1;
 }
 
 vlc_clock_main_t *vlc_clock_main_New(void)
