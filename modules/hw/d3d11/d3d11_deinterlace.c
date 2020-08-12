@@ -44,12 +44,6 @@ typedef struct
     d3d11_device_t                 *d3d_dev;
     d3d11_processor_t              d3d_proc;
 
-    union {
-        ID3D11Texture2D            *outTexture;
-        ID3D11Resource             *outResource;
-    };
-    ID3D11VideoProcessorOutputView *processorOutput;
-
     struct deinterlace_ctx         context;
 } filter_sys_t;
 
@@ -154,25 +148,11 @@ static int RenderPic( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic,
                                                          0, TRUE, &srcRect);
 
     hr = ID3D11VideoContext_VideoProcessorBlt(p_sys->d3d_proc.d3dvidctx, p_sys->d3d_proc.videoProcessor,
-                                              p_sys->processorOutput,
+                                              p_out_sys->processorOutput,
                                               0, 1, &stream);
     if (FAILED(hr))
         return VLC_EGENERIC;
 
-    D3D11_BOX box = {
-        .top = 0,
-        .bottom = p_outpic->format.i_height,
-        .left = 0,
-        .right = p_outpic->format.i_width,
-        .back = 1,
-    };
-
-    ID3D11DeviceContext_CopySubresourceRegion(p_sys->d3d_dev->d3dcontext,
-                                              p_out_sys->resource[KNOWN_DXGI_INDEX],
-                                              p_out_sys->slice_index,
-                                              0, 0, 0,
-                                              p_sys->outResource,
-                                              0, &box);
     return VLC_SUCCESS;
 }
 
@@ -226,7 +206,30 @@ picture_t *AllocPicture( filter_t *p_filter )
     if (unlikely(cfg == NULL))
         return NULL;
 
-    return D3D11_AllocPicture(VLC_OBJECT(p_filter), &p_filter->fmt_out.video, p_filter->vctx_out, cfg);
+    picture_t *pic = D3D11_AllocPicture(VLC_OBJECT(p_filter), &p_filter->fmt_out.video, p_filter->vctx_out, cfg);
+    if (pic == NULL)
+        return NULL;
+
+    picture_sys_d3d11_t *p_out_sys = ActiveD3D11PictureSys(pic);
+
+    D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc = {
+        .ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D,
+    };
+
+    HRESULT hr;
+    hr = ID3D11VideoDevice_CreateVideoProcessorOutputView(p_sys->d3d_proc.d3dviddev,
+                                                         p_out_sys->resource[0],
+                                                         p_sys->d3d_proc.procEnumerator,
+                                                         &outDesc,
+                                                         &p_out_sys->processorOutput);
+    if (FAILED(hr))
+    {
+        msg_Dbg(p_filter,"Failed to create processor output. (hr=0x%lX)", hr);
+        picture_Release(pic);
+        return NULL;
+    }
+
+    return pic;
 }
 
 int D3D11OpenDeinterlace(vlc_object_t *obj)
@@ -321,41 +324,6 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         goto error;
     }
 
-    D3D11_TEXTURE2D_DESC texDesc;
-    ZeroMemory(&texDesc, sizeof(texDesc));
-    texDesc.MipLevels = 1;
-    texDesc.SampleDesc.Count = 1;
-    texDesc.MiscFlags = 0; //D3D11_RESOURCE_MISC_SHARED;
-    texDesc.Usage = D3D11_USAGE_DEFAULT;
-    texDesc.CPUAccessFlags = 0;
-    texDesc.Format = vtcx_sys->format;
-    texDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
-    texDesc.Usage = D3D11_USAGE_DEFAULT;
-    texDesc.ArraySize = 1;
-    texDesc.Height = filter->fmt_out.video.i_height;
-    texDesc.Width  = filter->fmt_out.video.i_width;
-
-    hr = ID3D11Device_CreateTexture2D( sys->d3d_dev->d3ddevice, &texDesc, NULL, &sys->outTexture );
-    if (FAILED(hr)) {
-        msg_Err(filter, "CreateTexture2D failed. (hr=0x%lX)", hr);
-        goto error;
-    }
-
-    D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc = {
-        .ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D,
-    };
-
-    hr = ID3D11VideoDevice_CreateVideoProcessorOutputView(sys->d3d_proc.d3dviddev,
-                                                         sys->outResource,
-                                                         sys->d3d_proc.procEnumerator,
-                                                         &outDesc,
-                                                         &sys->processorOutput);
-    if (FAILED(hr))
-    {
-        msg_Dbg(filter,"Failed to create processor output. (hr=0x%lX)", hr);
-        goto error;
-    }
-
     InitDeinterlacingContext( &sys->context );
 
     sys->context.settings = p_mode->settings;
@@ -384,10 +352,6 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
 
     return VLC_SUCCESS;
 error:
-    if (sys->processorOutput)
-        ID3D11VideoProcessorOutputView_Release(sys->processorOutput);
-    if (sys->outTexture)
-        ID3D11Texture2D_Release(sys->outTexture);
     D3D11_ReleaseProcessor(&sys->d3d_proc);
     free(sys);
 
@@ -398,10 +362,6 @@ void D3D11CloseDeinterlace(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys = filter->p_sys;
-
-    if (likely(sys->processorOutput))
-        ID3D11VideoProcessorOutputView_Release(sys->processorOutput);
-    ID3D11Texture2D_Release(sys->outTexture);
     D3D11_ReleaseProcessor( &sys->d3d_proc );
     vlc_video_context_Release(filter->vctx_out);
 
