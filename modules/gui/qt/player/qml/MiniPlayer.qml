@@ -17,11 +17,9 @@ Widgets.NavigableFocusScope {
 
     property var mainContent: undefined
 
-    Component.onCompleted : {
-        if (player.playingState === PlayerController.PLAYING_STATE_STOPPED)
-            root.implicitHeight = 0;
-        else
-            root.implicitHeight = root.childrenRect.height;
+    Component.onCompleted: {
+        if (player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
+            root.implicitHeight = VLCStyle.miniPlayerHeight
     }
 
     Connections {
@@ -40,7 +38,7 @@ Widgets.NavigableFocusScope {
         properties: "implicitHeight"
         duration: 200
         easing.type: Easing.InSine
-        to: root.childrenRect.height
+        to: VLCStyle.miniPlayerHeight
     }
 
     PropertyAnimation {
