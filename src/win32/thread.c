@@ -275,7 +275,7 @@ static void WINAPI WakeByAddressFallback(void *addr)
 
 void vlc_atomic_wait(void *addr, unsigned val)
 {
-    WaitOnAddress(addr, &val, sizeof (val), -1);
+    WaitOnAddress(addr, &val, sizeof (val), INFINITE);
 }
 
 int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
