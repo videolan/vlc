@@ -20,31 +20,40 @@
 #include "qt.hpp"
 #include "playercontrolbarmodel.hpp"
 
+enum default_align {
+    LEFT = 0,
+    CENTER,
+    RIGHT,
+    SIZE
+};
 
-static const PlayerControlBarModel::IconToolButton MAIN_TB_DEFAULT[] = {
-                                                                           {PlayerControlBarModel::LANG_BUTTON},
-                                                                           {PlayerControlBarModel::MENU_BUTTON},
-                                                                           {PlayerControlBarModel::WIDGET_SPACER_EXTEND},
-                                                                           {PlayerControlBarModel::RANDOM_BUTTON},
-                                                                           {PlayerControlBarModel::PREVIOUS_BUTTON},
-                                                                           {PlayerControlBarModel::PLAY_BUTTON},
-                                                                           {PlayerControlBarModel::NEXT_BUTTON},
-                                                                           {PlayerControlBarModel::LOOP_BUTTON},
-                                                                           {PlayerControlBarModel::WIDGET_SPACER_EXTEND},
-                                                                           {PlayerControlBarModel::VOLUME},
-                                                                           {PlayerControlBarModel::FULLSCREEN_BUTTON}
+static const QVector<PlayerControlBarModel::IconToolButton> MAIN_TB_DEFAULT[default_align::SIZE] = {
+                                                                            // left
+                                                                            {{PlayerControlBarModel::LANG_BUTTON},
+                                                                            {PlayerControlBarModel::MENU_BUTTON}},
+                                                                            // center
+                                                                            {{PlayerControlBarModel::RANDOM_BUTTON},
+                                                                            {PlayerControlBarModel::PREVIOUS_BUTTON},
+                                                                            {PlayerControlBarModel::PLAY_BUTTON},
+                                                                            {PlayerControlBarModel::NEXT_BUTTON},
+                                                                            {PlayerControlBarModel::LOOP_BUTTON}},
+                                                                            // right
+                                                                            {{PlayerControlBarModel::VOLUME},
+                                                                            {PlayerControlBarModel::FULLSCREEN_BUTTON}}
                                                                        };
 
-static const PlayerControlBarModel::IconToolButton MINI_TB_DEFAULT[] = {
-                                                                           {PlayerControlBarModel::WIDGET_SPACER_EXTEND},
-                                                                           {PlayerControlBarModel::RANDOM_BUTTON},
+static const QVector<PlayerControlBarModel::IconToolButton> MINI_TB_DEFAULT[default_align::SIZE] = {
+                                                                           // left
+                                                                           {},
+                                                                           // center
+                                                                           {{PlayerControlBarModel::RANDOM_BUTTON},
                                                                            {PlayerControlBarModel::PREVIOUS_BUTTON},
                                                                            {PlayerControlBarModel::PLAY_BUTTON},
                                                                            {PlayerControlBarModel::NEXT_BUTTON},
-                                                                           {PlayerControlBarModel::LOOP_BUTTON},
-                                                                           {PlayerControlBarModel::WIDGET_SPACER_EXTEND},
-                                                                           {PlayerControlBarModel::VOLUME},
-                                                                           {PlayerControlBarModel::PLAYER_SWITCH_BUTTON}
+                                                                           {PlayerControlBarModel::LOOP_BUTTON}},
+                                                                           // right
+                                                                           {{PlayerControlBarModel::VOLUME},
+                                                                           {PlayerControlBarModel::PLAYER_SWITCH_BUTTON}}
                                                                        };
 
 
@@ -72,7 +81,8 @@ void PlayerControlBarModel::reloadConfig(QString config)
 {
     beginResetModel();
     mButtons.clear();
-    parseAndAdd(config);
+    if (!config.isEmpty())
+        parseAndAdd(config);
     endResetModel();
 }
 
@@ -85,19 +95,36 @@ void PlayerControlBarModel::reloadModel()
 
     if (!config.isNull() && config.canConvert<QString>())
         parseAndAdd(config.toString());
-    else if (configName == "MainPlayerToolbar")
-        parseDefault(MAIN_TB_DEFAULT, ARRAY_SIZE(MAIN_TB_DEFAULT));
     else
-        parseDefault(MINI_TB_DEFAULT, ARRAY_SIZE(MINI_TB_DEFAULT));
-    
+    {
+        QString alignment = configName.split("-").at(1);
+        if (configName.startsWith("MainPlayerToolbar"))
+        {
+            if (alignment == "left")
+                parseDefault(MAIN_TB_DEFAULT[default_align::LEFT]);
+            else if (alignment == "center")
+                parseDefault(MAIN_TB_DEFAULT[default_align::CENTER]);
+            else if (alignment == "right")
+                parseDefault(MAIN_TB_DEFAULT[default_align::RIGHT]);
+        }
+        else
+        {
+            if (alignment == "left")
+                parseDefault(MINI_TB_DEFAULT[default_align::LEFT]);
+            else if (alignment == "center")
+                parseDefault(MINI_TB_DEFAULT[default_align::CENTER]);
+            else if (alignment == "right")
+                parseDefault(MINI_TB_DEFAULT[default_align::RIGHT]);
+        }
+    }
     endResetModel();
 }
 
-void PlayerControlBarModel::parseDefault(const PlayerControlBarModel::IconToolButton* config, const size_t config_size)
+void PlayerControlBarModel::parseDefault(const QVector<PlayerControlBarModel::IconToolButton>& config)
 {
-    beginInsertRows(QModelIndex(),rowCount(),rowCount() + config_size);
-    for (size_t i = 0; i < config_size; i++)
-        mButtons.append(config[i]);
+    beginInsertRows(QModelIndex(),rowCount(),rowCount() + config.size());
+    for (const auto& i : config)
+        mButtons.append(i);
     endInsertRows();
 }
 
@@ -107,7 +134,7 @@ void PlayerControlBarModel::parseAndAdd(const QString &config)
 
     for (const QString& iconPropertyTxt : config.split( ";", QString::SkipEmptyParts ) )
     {
-        QStringList list2 = iconPropertyTxt.split( "-" );
+        QStringList list2 = iconPropertyTxt.trimmed().split( "-" );
 
         if( list2.count() < 1 )
         {

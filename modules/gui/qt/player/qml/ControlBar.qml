@@ -89,31 +89,79 @@ Widgets.NavigableFocusScope {
             parentWindow: mainInterfaceRect
         }
 
-
-        PlayerButtonsLayout {
-            id: buttons
-
-            model: playerControlBarModel
-            forceColors: true
-
-            Layout.fillHeight: true
+        RowLayout {
             Layout.fillWidth: true
+            Layout.bottomMargin: VLCStyle.margin_xsmall
 
-            focus: true
+            PlayerButtonsLayout {
+                id: buttons_left
 
-            navigationParent: root
-            navigationUp: function(index) {
-                if (trackPositionSlider.enabled)
-                    trackPositionSlider.focus = true
-                else
-                    root.navigationUp(index)
+                model: playerControlBarModel_left
+                forceColors: true
+
+                focus: true
+
+                navigationParent: root
+                navigationUp: function(index) {
+                    if (trackPositionSlider.enabled)
+                        trackPositionSlider.focus = true
+                    else
+                        root.navigationUp(index)
+                }
+
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: defaultKeyAction(event, 0)
             }
 
+            Item {
+                Layout.fillWidth: true
+            }
 
-            Keys.priority: Keys.AfterItem
-            Keys.onPressed: defaultKeyAction(event, 0)
+            PlayerButtonsLayout {
+                id: buttons_center
+
+                model: playerControlBarModel_center
+                forceColors: true
+
+                focus: true
+
+                navigationParent: root
+                navigationUp: function(index) {
+                    if (trackPositionSlider.enabled)
+                        trackPositionSlider.focus = true
+                    else
+                        root.navigationUp(index)
+                }
+
+
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: defaultKeyAction(event, 0)
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            PlayerButtonsLayout {
+                id: buttons_right
+
+                model: playerControlBarModel_right
+                forceColors: true
+
+                focus: true
+
+                navigationParent: root
+                navigationUp: function(index) {
+                    if (trackPositionSlider.enabled)
+                        trackPositionSlider.focus = true
+                    else
+                        root.navigationUp(index)
+                }
+
+                Keys.priority: Keys.AfterItem
+                Keys.onPressed: defaultKeyAction(event, 0)
+            }
         }
-
     }
     Connections{
         target: mainInterface
@@ -121,9 +169,21 @@ Widgets.NavigableFocusScope {
     }
 
     PlayerControlBarModel{
-        id:playerControlBarModel
+        id:playerControlBarModel_left
         mainCtx: mainctx
-        configName: "MainPlayerToolbar"
+        configName: "MainPlayerToolbar-left"
+    }
+
+    PlayerControlBarModel{
+        id:playerControlBarModel_center
+        mainCtx: mainctx
+        configName: "MainPlayerToolbar-center"
+    }
+
+    PlayerControlBarModel{
+        id:playerControlBarModel_right
+        mainCtx: mainctx
+        configName: "MainPlayerToolbar-right"
     }
 
     ControlButtons{

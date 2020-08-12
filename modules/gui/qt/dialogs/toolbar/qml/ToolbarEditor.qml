@@ -59,20 +59,181 @@ Rectangle{
                 anchors.fill: parent
                 currentIndex: bar.currentIndex
 
-                EditorDNDView {
-                    id : playerBtnDND
+                RowLayout {
                     Layout.preferredHeight: VLCStyle.heightBar_large
                     Layout.fillWidth: true
-                    model: playerControlBarModel
+
+                    spacing: VLCStyle.margin_xlarge
+
+                    TextMetrics {
+                        id: leftMetric
+                        text: i18n.qtr("L   E   F   T")
+                        font.pixelSize: VLCStyle.fontSize_xxlarge
+                    }
+
+                    TextMetrics {
+                        id: centerMetric
+                        text: i18n.qtr("C   E   N   T   E   R")
+                        font.pixelSize: VLCStyle.fontSize_xxlarge
+                    }
+
+                    TextMetrics {
+                        id: rightMetric
+                        text: i18n.qtr("R   I   G   H   T")
+                        font.pixelSize: VLCStyle.fontSize_xxlarge
+                    }
+
+                    EditorDNDView {
+                        id : playerBtnDND_left
+                        Layout.preferredHeight: VLCStyle.heightBar_large
+
+                        Layout.alignment: Qt.AlignLeft
+                        Layout.fillWidth: count > 0 || (playerBtnDND_left.count === 0 && playerBtnDND_center.count === 0 && playerBtnDND_right.count === 0)
+                        Layout.minimumWidth: leftMetric.width
+
+                        model: playerControlBarModel_left
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            height: parent.height
+                            width: parent.width / 2
+                            text: leftMetric.text
+                            verticalAlignment: Text.AlignVCenter
+                            font.pixelSize: VLCStyle.fontSize_xxlarge
+                            color: VLCStyle.colors.menuCaption
+                            horizontalAlignment: Text.AlignHCenter
+                            visible: (parent.count === 0)
+                        }
+                    }
+
+                    EditorDNDView {
+                        id : playerBtnDND_center
+                        Layout.preferredHeight: VLCStyle.heightBar_large
+
+                        Layout.alignment: Qt.AlignHCenter
+                        Layout.fillWidth: count > 0 || (playerBtnDND_left.count === 0 && playerBtnDND_center.count === 0 && playerBtnDND_right.count === 0)
+                        Layout.minimumWidth: centerMetric.width
+
+                        model: playerControlBarModel_center
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            height: parent.height
+                            width: parent.width / 2
+                            text: centerMetric.text
+                            verticalAlignment: Text.AlignVCenter
+                            font.pixelSize: VLCStyle.fontSize_xxlarge
+                            color: VLCStyle.colors.menuCaption
+                            horizontalAlignment: Text.AlignHCenter
+                            visible: (parent.count === 0)
+                        }
+                    }
+
+                    EditorDNDView {
+                        id : playerBtnDND_right
+                        Layout.preferredHeight: VLCStyle.heightBar_large
+
+                        Layout.alignment: Qt.AlignRight
+                        Layout.fillWidth: count > 0 || (playerBtnDND_left.count === 0 && playerBtnDND_center.count === 0 && playerBtnDND_right.count === 0)
+                        Layout.minimumWidth: rightMetric.width
+
+                        model: playerControlBarModel_right
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            height: parent.height
+                            width: parent.width / 2
+                            text: rightMetric.text
+                            verticalAlignment: Text.AlignVCenter
+                            font.pixelSize: VLCStyle.fontSize_xxlarge
+                            color: VLCStyle.colors.menuCaption
+                            horizontalAlignment: Text.AlignHCenter
+                            visible: (parent.count === 0)
+                        }
+                    }
                 }
 
-                EditorDNDView {
-                    id : miniPlayerBtnDND
+                RowLayout {
                     Layout.preferredHeight: VLCStyle.heightBar_large
                     Layout.fillWidth: true
-                    model: miniPlayerModel
-                }
 
+                    spacing: VLCStyle.margin_xlarge
+
+                    EditorDNDView {
+                        id : miniPlayerBtnDND_left
+                        Layout.preferredHeight: VLCStyle.heightBar_large
+
+                        Layout.alignment: Qt.AlignLeft
+                        Layout.fillWidth: count > 0 || (miniPlayerBtnDND_left.count === 0 && miniPlayerBtnDND_center.count === 0 && miniPlayerBtnDND_right.count === 0)
+                        Layout.minimumWidth: leftMetric.width
+
+                        model: miniPlayerModel_left
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            height: parent.height
+                            width: parent.width / 2
+                            text: leftMetric.text
+                            verticalAlignment: Text.AlignVCenter
+                            font.pixelSize: VLCStyle.fontSize_xxlarge
+                            color: VLCStyle.colors.menuCaption
+                            horizontalAlignment: Text.AlignHCenter
+                            visible: (parent.count === 0)
+                        }
+                    }
+
+                    EditorDNDView {
+                        id : miniPlayerBtnDND_center
+                        Layout.preferredHeight: VLCStyle.heightBar_large
+
+                        Layout.alignment: Qt.AlignHCenter
+                        Layout.fillWidth: count > 0 || (miniPlayerBtnDND_left.count === 0 && miniPlayerBtnDND_center.count === 0 && miniPlayerBtnDND_right.count === 0)
+                        Layout.minimumWidth: centerMetric.width
+
+                        model: miniPlayerModel_center
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            height: parent.height
+                            width: parent.width / 2
+                            text: centerMetric.text
+                            verticalAlignment: Text.AlignVCenter
+                            font.pixelSize: VLCStyle.fontSize_xxlarge
+                            color: VLCStyle.colors.menuCaption
+                            horizontalAlignment: Text.AlignHCenter
+                            visible: (parent.count === 0)
+                        }
+                    }
+
+                    EditorDNDView {
+                        id : miniPlayerBtnDND_right
+                        Layout.preferredHeight: VLCStyle.heightBar_large
+
+                        Layout.alignment: Qt.AlignRight
+                        Layout.fillWidth: count > 0 || (miniPlayerBtnDND_left.count === 0 && miniPlayerBtnDND_center.count === 0 && miniPlayerBtnDND_right.count === 0)
+                        Layout.minimumWidth: rightMetric.width
+
+                        model: miniPlayerModel_right
+
+                        Text {
+                            anchors.centerIn: parent
+
+                            height: parent.height
+                            width: parent.width / 2
+                            text: rightMetric.text
+                            verticalAlignment: Text.AlignVCenter
+                            font.pixelSize: VLCStyle.fontSize_xxlarge
+                            color: VLCStyle.colors.menuCaption
+                            horizontalAlignment: Text.AlignHCenter
+                            visible: (parent.count === 0)
+                        }
+                    }
+                }
             }
         }
 
@@ -100,40 +261,87 @@ Rectangle{
                 }
             }
         }
-
-
     }
 
     function getProfileConfig(){
-        return playerControlBarModel.getConfig() + "|" + miniPlayerModel.getConfig()
+        return "%1#%2#%3 | %4#%5#%6".arg(playerControlBarModel_left.getConfig())
+                                    .arg(playerControlBarModel_center.getConfig())
+                                    .arg(playerControlBarModel_right.getConfig())
+                                    .arg(miniPlayerModel_left.getConfig())
+                                    .arg(miniPlayerModel_center.getConfig())
+                                    .arg(miniPlayerModel_right.getConfig())
     }
 
     Connections{
         target: toolbareditor
         onUpdatePlayerModel: {
-            playerBtnDND.currentIndex = -1
-            miniPlayerBtnDND.currentIndex = -1
-            if (toolbarName == "MainPlayerToolbar")
-                playerControlBarModel.reloadConfig(config)
-            else
-                miniPlayerModel.reloadConfig(config)
+            playerBtnDND_left.currentIndex = -1
+            playerBtnDND_center.currentIndex = -1
+            playerBtnDND_right.currentIndex = -1
+
+            miniPlayerBtnDND_left.currentIndex = -1
+            miniPlayerBtnDND_center.currentIndex = -1
+            miniPlayerBtnDND_right.currentIndex = -1
+
+            if (toolbarName == "MainPlayerToolbar-left")
+                playerControlBarModel_left.reloadConfig(config)
+            else if (toolbarName == "MainPlayerToolbar-center")
+                playerControlBarModel_center.reloadConfig(config)
+            else if (toolbarName == "MainPlayerToolbar-right")
+                playerControlBarModel_right.reloadConfig(config)
+            else if (toolbarName == "MiniPlayerToolbar-left")
+                miniPlayerModel_left.reloadConfig(config)
+            else if (toolbarName == "MiniPlayerToolbar-center")
+                miniPlayerModel_center.reloadConfig(config)
+            else if (toolbarName == "MiniPlayerToolbar-right")
+                miniPlayerModel_right.reloadConfig(config)
         }
+
         onSaveConfig: {
-            miniPlayerModel.saveConfig()
-            playerControlBarModel.saveConfig()
+            miniPlayerModel_left.saveConfig()
+            miniPlayerModel_center.saveConfig()
+            miniPlayerModel_right.saveConfig()
+
+            playerControlBarModel_left.saveConfig()
+            playerControlBarModel_center.saveConfig()
+            playerControlBarModel_right.saveConfig()
         }
     }
 
     PlayerControlBarModel {
-        id: playerControlBarModel
+        id: playerControlBarModel_left
         mainCtx: mainctx
-        configName: "MainPlayerToolbar"
+        configName: "MainPlayerToolbar-left"
     }
 
     PlayerControlBarModel {
-        id: miniPlayerModel
+        id: playerControlBarModel_center
         mainCtx: mainctx
-        configName: "MiniPlayerToolbar"
+        configName: "MainPlayerToolbar-center"
+    }
+
+    PlayerControlBarModel {
+        id: playerControlBarModel_right
+        mainCtx: mainctx
+        configName: "MainPlayerToolbar-right"
+    }
+
+    PlayerControlBarModel {
+        id: miniPlayerModel_left
+        mainCtx: mainctx
+        configName: "MiniPlayerToolbar-left"
+    }
+
+    PlayerControlBarModel {
+        id: miniPlayerModel_center
+        mainCtx: mainctx
+        configName: "MiniPlayerToolbar-center"
+    }
+
+    PlayerControlBarModel {
+        id: miniPlayerModel_right
+        mainCtx: mainctx
+        configName: "MiniPlayerToolbar-right"
     }
 
     Player.ControlButtons{

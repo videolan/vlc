@@ -112,7 +112,7 @@ private:
     QString configName;
 
     void parseAndAdd(const QString& config);
-    void parseDefault(const IconToolButton* config, const size_t config_size);
+    void parseDefault(const QVector<IconToolButton>& config);
 
     bool setButtonAt(int index, const IconToolButton &button);
     void addProfiles();

@@ -55,15 +55,24 @@ GridView{
             held = true
             var pos = this.mapToGlobal( mouseX, mouseY)
             buttonDragItem.updatePos(pos.x, pos.y)
-            playerBtnDND.addBtn = true
-            miniPlayerBtnDND.addBtn = true
+            playerBtnDND_left.addBtn = true
+            playerBtnDND_center.addBtn = true
+            playerBtnDND_right.addBtn = true
+            miniPlayerBtnDND_left.addBtn = true
+            miniPlayerBtnDND_center.addBtn = true
+            miniPlayerBtnDND_right.addBtn = true
         }
 
         onReleased: {
             drag.target.Drag.drop()
             buttonDragItem.visible = false
             held = false
-            playerBtnDND.addBtn = false
+            playerBtnDND_left.addBtn = false
+            playerBtnDND_center.addBtn = false
+            playerBtnDND_right.addBtn = false
+            miniPlayerBtnDND_left.addBtn = false
+            miniPlayerBtnDND_center.addBtn = false
+            miniPlayerBtnDND_right.addBtn = false
         }
         onEntered: allButtonsView.currentIndex = index
 
