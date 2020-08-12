@@ -2782,9 +2782,10 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         bool pace = sout_instance_ControlsPace(input_priv(p_input)->p_sout);
 
         if( input_priv(p_input)->b_out_pace_control != pace )
+        {
             msg_Dbg( p_input, "switching to %ssync mode", pace ? "a" : "" );
-
-        input_priv(p_input)->b_out_pace_control = pace;
+            input_priv(p_input)->b_out_pace_control = pace;
+        }
     }
 #endif
 
