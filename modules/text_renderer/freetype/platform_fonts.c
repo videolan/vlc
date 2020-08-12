@@ -123,30 +123,27 @@ bool CheckFace( vlc_font_select_t *fs, vlc_font_t *p_font, uni_char_t codepoint 
 static vlc_font_t *GetBestFont( vlc_font_select_t *fs, const vlc_family_t *p_family,
                                 int i_flags, uni_char_t codepoint )
 {
-    int i_best_score = 0;
-    vlc_font_t *p_best_font = p_family->p_fonts;
-
-    for( vlc_font_t *p_font = p_family->p_fonts; p_font; p_font = p_font->p_next )
+    const int sameflagscheck[4] = {
+        VLC_FONT_FLAG_BOLD | VLC_FONT_FLAG_ITALIC,
+        VLC_FONT_FLAG_BOLD,
+        VLC_FONT_FLAG_ITALIC,
+        0
+    };
+    /* we do priority matching with different passes
+       so we don't have to load & check every face or do store/sorting */
+    for( int i=0; i<4; i++ )
     {
-        int i_score = 0;
-
-        if( codepoint && CheckFace( fs, p_font, codepoint ) )
-            i_score += 1000;
-
-        int i_sameflags = !(p_font->i_flags ^ i_flags);
-        if( i_sameflags & VLC_FONT_FLAG_BOLD )
-            i_score += 100;
-        if( i_sameflags & VLC_FONT_FLAG_ITALIC )
-            i_score += 10;
-
-        if( i_score > i_best_score )
+        for( vlc_font_t *p_font = p_family->p_fonts; p_font; p_font = p_font->p_next )
         {
-            p_best_font = p_font;
-            i_best_score = i_score;
+            int i_sameflags = !(p_font->i_flags ^ i_flags);
+            if( i_sameflags != sameflagscheck[i] )
+                continue;
+            if( !codepoint || CheckFace( fs, p_font, codepoint ) )
+                return p_font;
         }
     }
 
-    return p_best_font;
+    return p_family->p_fonts;
 }
 
 vlc_family_t *SearchFallbacks( vlc_font_select_t *fs, vlc_family_t *p_fallbacks,
