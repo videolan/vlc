@@ -50,8 +50,7 @@
 static int Android_ParseFont( vlc_font_select_t *fs, xml_reader_t *p_xml,
                               vlc_family_t *p_family )
 {
-    bool              b_bold      = false;
-    bool              b_italic    = false;
+    int               i_flags     = 0;
     const char       *psz_val     = NULL;
     const char       *psz_attr    = NULL;
     int               i_type      = 0;
@@ -63,11 +62,11 @@ static int Android_ParseFont( vlc_font_select_t *fs, xml_reader_t *p_xml,
             i_weight = atoi( psz_val );
         else if( !strcasecmp( "style", psz_attr ) && psz_val && *psz_val )
             if( !strcasecmp( "italic", psz_val ) )
-                b_italic = true;
+                i_flags |= VLC_FONT_FLAG_ITALIC;
     }
 
     if( i_weight == 700 )
-        b_bold = true;
+        i_flags |= VLC_FONT_FLAG_BOLD;
 
     i_type = xml_ReaderNextNode( p_xml, &psz_val );
 
@@ -84,7 +83,7 @@ static int Android_ParseFont( vlc_font_select_t *fs, xml_reader_t *p_xml,
      */
     if( i_weight == 400 || i_weight == 700 )
         if( asprintf( &psz_fontfile, "%s/%s", SYSTEM_FONT_PATH, psz_val ) < 0
-         || !NewFont( psz_fontfile, 0, b_bold, b_italic, p_family ) )
+         || !NewFont( psz_fontfile, 0, i_flags, p_family ) )
             return VLC_ENOMEM;
 
     return VLC_SUCCESS;
@@ -224,8 +223,6 @@ static int Android_Legacy_ParseFamily( vlc_font_select_t *fs, xml_reader_t *p_xm
     vlc_family_t     *p_family    = NULL;
     char             *psz_lc      = NULL;
     int               i_counter   = 0;
-    bool              b_bold      = false;
-    bool              b_italic    = false;
     const char       *p_node      = NULL;
     int               i_type      = 0;
 
@@ -301,23 +298,19 @@ static int Android_Legacy_ParseFamily( vlc_font_select_t *fs, xml_reader_t *p_xm
                 if( unlikely( !p_family ) )
                     return VLC_ENOMEM;
 
+                int i_flags = 0;
                 switch( i_counter )
                 {
                 case 0:
-                    b_bold = false;
-                    b_italic = false;
                     break;
                 case 1:
-                    b_bold = true;
-                    b_italic = false;
+                    i_flags = VLC_FONT_FLAG_BOLD;
                     break;
                 case 2:
-                    b_bold = false;
-                    b_italic = true;
+                    i_flags = VLC_FONT_FLAG_ITALIC;
                     break;
                 case 3:
-                    b_bold = true;
-                    b_italic = true;
+                    i_flags = VLC_FONT_FLAG_BOLD | VLC_FONT_FLAG_ITALIC;
                     break;
                 default:
                     msg_Warn( fs->p_obj, "Android_ParseFamily: too many files" );
@@ -326,7 +319,7 @@ static int Android_Legacy_ParseFamily( vlc_font_select_t *fs, xml_reader_t *p_xm
 
                 char *psz_fontfile = NULL;
                 if( asprintf( &psz_fontfile, "%s/%s", SYSTEM_FONT_PATH, p_node ) < 0
-                 || !NewFont( psz_fontfile, 0, b_bold, b_italic, p_family ) )
+                 || !NewFont( psz_fontfile, 0, i_flags, p_family ) )
                     return VLC_ENOMEM;
 
                 ++i_counter;

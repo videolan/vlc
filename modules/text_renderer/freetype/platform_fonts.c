@@ -121,7 +121,7 @@ bool CheckFace( vlc_font_select_t *fs, vlc_font_t *p_font, uni_char_t codepoint 
  * be returned, because the italic font of Arial has no Arabic support.
  */
 static vlc_font_t *GetBestFont( vlc_font_select_t *fs, const vlc_family_t *p_family,
-                                bool b_bold, bool b_italic, uni_char_t codepoint )
+                                int i_flags, uni_char_t codepoint )
 {
     int i_best_score = 0;
     vlc_font_t *p_best_font = p_family->p_fonts;
@@ -133,9 +133,10 @@ static vlc_font_t *GetBestFont( vlc_font_select_t *fs, const vlc_family_t *p_fam
         if( codepoint && CheckFace( fs, p_font, codepoint ) )
             i_score += 1000;
 
-        if( !!p_font->b_bold == !!b_bold )
+        int i_sameflags = !(p_font->i_flags ^ i_flags);
+        if( i_sameflags & VLC_FONT_FLAG_BOLD )
             i_score += 100;
-        if( !!p_font->b_italic == !!b_italic )
+        if( i_sameflags & VLC_FONT_FLAG_ITALIC )
             i_score += 10;
 
         if( i_score > i_best_score )
@@ -323,8 +324,7 @@ int DeclareFamilyAsAttachMenFallback( vlc_font_select_t *fs, vlc_family_t *p_fam
 }
 
 vlc_font_t *NewFont( char *psz_fontfile, int i_index,
-                     bool b_bold, bool b_italic,
-                     vlc_family_t *p_parent )
+                     int i_flags, vlc_family_t *p_parent )
 {
     vlc_font_t *p_font = calloc( 1, sizeof( *p_font ) );
 
@@ -336,15 +336,14 @@ vlc_font_t *NewFont( char *psz_fontfile, int i_index,
 
     p_font->psz_fontfile = psz_fontfile;
     p_font->i_index = i_index;
-    p_font->b_bold = b_bold;
-    p_font->b_italic = b_italic;
+    p_font->i_flags = i_flags;
 
     if( p_parent )
     {
         /* Keep regular faces first */
         if( p_parent->p_fonts
-         && ( p_parent->p_fonts->b_bold || p_parent->p_fonts->b_italic )
-         && !b_bold && !b_italic )
+         && p_parent->p_fonts->i_flags
+         && !i_flags )
         {
             p_font->p_next = p_parent->p_fonts;
             p_parent->p_fonts = p_font;
@@ -441,13 +440,13 @@ static void DumpFamily( vlc_object_t *p_obj, const vlc_family_t *p_family,
             for( vlc_font_t *p_font = p_family->p_fonts; p_font; p_font = p_font->p_next )
             {
                 const char *psz_style = NULL;
-                if( !p_font->b_bold && !p_font->b_italic )
+                if( p_font->i_flags == 0 )
                     psz_style = "Regular";
-                else if( p_font->b_bold && !p_font->b_italic )
+                else if( p_font->i_flags == VLC_FONT_FLAG_BOLD )
                     psz_style = "Bold";
-                else if( !p_font->b_bold && p_font->b_italic )
+                else if( p_font->i_flags == VLC_FONT_FLAG_ITALIC )
                     psz_style = "Italic";
-                else if( p_font->b_bold && p_font->b_italic )
+                else if( p_font->i_flags == (VLC_FONT_FLAG_ITALIC|VLC_FONT_FLAG_BOLD) )
                     psz_style = "Bold Italic";
 
                 msg_Dbg( p_obj, "\t\t[%p] (%s): %s - %d", (void *)p_font,
@@ -612,8 +611,6 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
                                     const text_style_t *p_style,
                                     int *pi_idx, uni_char_t codepoint )
 {
-    const bool b_bold = p_style->i_style_flags & STYLE_BOLD;
-    const bool b_italic = p_style->i_style_flags & STYLE_ITALIC;
     const vlc_family_t *p_family = NULL;
 
     if( codepoint && !p_family )
@@ -714,11 +711,16 @@ static char* SelectFontWithFamilyFallback( vlc_font_select_t *fs,
         free(lc);
     }
 
+    int i_flags = 0;
+    if( p_style->i_style_flags & STYLE_BOLD )
+        i_flags |= VLC_FONT_FLAG_BOLD;
+    if( p_style->i_style_flags & STYLE_ITALIC )
+        i_flags |= VLC_FONT_FLAG_ITALIC;
+
     vlc_font_t *p_font;
-    if( p_family && ( p_font = GetBestFont( fs, p_family, b_bold,
-                                            b_italic, codepoint ) ) )
+    if( p_family && ( p_font = GetBestFont( fs, p_family, i_flags, codepoint ) ) )
     {
-        Debug( fs->p_obj, "Selected best font file \"%s\" %d %d", p_font->psz_fontfile, b_bold, b_italic );
+        Debug( fs->p_obj, "Selected best font file \"%s\" %x", p_font->psz_fontfile, i_flags );
         *pi_idx = p_font->i_index;
         return strdup( p_font->psz_fontfile );
     }
@@ -829,7 +831,7 @@ static int StaticMap_GetFamily( vlc_font_select_t *fs, const char *psz_lcname,
 
     char *psz_font_file = MakeFilePath( fs, psz_file );
     if( psz_font_file )
-        NewFont( psz_font_file, 0, false, false, p_family );
+        NewFont( psz_font_file, 0, 0, p_family );
 
     *pp_result = p_family;
     return VLC_SUCCESS;

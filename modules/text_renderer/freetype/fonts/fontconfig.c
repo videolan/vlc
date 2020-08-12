@@ -131,8 +131,8 @@ static void FontConfig_AddFromFcPattern( FcPattern *p_pat,  vlc_family_t *p_fami
     psz_fontfile = strdup( (const char*)val_s );
     if( psz_fontfile )
         NewFont( psz_fontfile, i_index,
-                 bold > FC_WEIGHT_NORMAL,
-                 italic != FC_SLANT_ROMAN,
+                 ((bold > FC_WEIGHT_NORMAL) ? VLC_FONT_FLAG_BOLD : 0) |
+                 ((italic != FC_SLANT_ROMAN) ? VLC_FONT_FLAG_ITALIC : 0),
                  p_family );
 }
 

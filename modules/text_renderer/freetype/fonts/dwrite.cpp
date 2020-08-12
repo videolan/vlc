@@ -519,8 +519,11 @@ static void DWrite_ParseFamily( vlc_font_select_t *fs, IDWriteFontFamily *p_dw_f
         if( !p_dw_font )
             continue;
 
-        bool b_bold = i & 1;
-        bool b_italic = i & 2;
+        int i_flags = 0;
+        if( i & 1 )
+            i_flags |= VLC_FONT_FLAG_BOLD;
+        if( i & 2 )
+            i_flags |= VLC_FONT_FLAG_ITALIC;
 
         if( p_dw_font->CreateFontFace( p_dw_face.GetAddressOf() ) )
             throw runtime_error( "CreateFontFace() failed" );
@@ -567,7 +570,7 @@ static void DWrite_ParseFamily( vlc_font_select_t *fs, IDWriteFontFamily *p_dw_f
         if( asprintf( &psz_font_path, ":dw/%d", ( int ) streams.size() - 1 ) < 0 )
             throw bad_alloc();
 
-        NewFont( psz_font_path, i_font_index, b_bold, b_italic, p_family );
+        NewFont( psz_font_path, i_font_index, i_flags, p_family );
     }
 }
 

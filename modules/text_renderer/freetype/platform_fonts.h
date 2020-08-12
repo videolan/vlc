@@ -120,6 +120,11 @@ extern "C" {
 /**
  * Representation of the fonts (linked-list)
  */
+enum
+{
+    VLC_FONT_FLAG_BOLD    = 1 << 0,
+    VLC_FONT_FLAG_ITALIC  = 1 << 1,
+};
 typedef struct vlc_font_t vlc_font_t;
 struct vlc_font_t
 {
@@ -130,8 +135,7 @@ struct vlc_font_t
      */
     char       *psz_fontfile;
     int         i_index;   /**< index of the font in the font file, starts at 0 */
-    bool        b_bold;    /**< if the font is a bold version */
-    bool        b_italic;  /**< if the font is an italic version */
+    int         i_flags;
     void       *faceid;    /* fontloader ref to font */
 };
 
@@ -224,8 +228,7 @@ char *CreateUniqueFamilyKey( vlc_font_select_t * );
  * \param psz_fontfile font file, or ":/x" for font attachments, where x is the attachment index
  *        within \ref filter_sys_t::pp_font_attachments [IN]
  * \param i_index index of the font in the font file [IN]
- * \param b_bold is a bold font or not [IN]
- * \param b_bold is an italic or not [IN]
+ * \param i_flags is font style flags [IN]
  * \param p_parent parent family.
  *                 If not NULL, the font will be associated to this family, and
  *                 appended to the font list in that family [IN]
@@ -234,8 +237,7 @@ char *CreateUniqueFamilyKey( vlc_font_select_t * );
  * \return the new font
  */
 vlc_font_t *NewFont( char *psz_fontfile, int i_index,
-                     bool b_bold, bool b_italic,
-                     vlc_family_t *p_parent );
+                     int i_flags, vlc_family_t *p_parent );
 
 /**
  * Free families and fonts associated.

@@ -345,8 +345,11 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     struct enumFontCallbackContext *ctx = ( struct enumFontCallbackContext * ) lParam;
     vlc_family_t *p_family = ctx->p_family;
 
-    bool b_bold = ( lpelfe->elfLogFont.lfWeight == FW_BOLD );
-    bool b_italic = ( lpelfe->elfLogFont.lfItalic != 0 );
+    int i_flags = 0;
+    if( lpelfe->elfLogFont.lfWeight == FW_BOLD )
+        i_flags |= VLC_FONT_FLAG_BOLD;
+    if( lpelfe->elfLogFont.lfItalic != 0 )
+        i_flags |= VLC_FONT_FLAG_ITALIC;
 
     /*
      * This function will be called by Windows as many times for each font
@@ -354,7 +357,7 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
      * Check to avoid duplicates.
      */
     for( vlc_font_t *p_font = p_family->p_fonts; p_font; p_font = p_font->p_next )
-        if( !!p_font->b_bold == !!b_bold && !!p_font->b_italic == !!b_italic )
+        if( p_font->i_flags == i_flags )
             return 1;
 
     char *psz_filename = NULL;
@@ -387,7 +390,7 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
             return 1;
     }
 
-    NewFont( psz_fontfile, i_index, b_bold, b_italic, p_family );
+    NewFont( psz_fontfile, i_index, i_flags, p_family );
 
     return 1;
 }

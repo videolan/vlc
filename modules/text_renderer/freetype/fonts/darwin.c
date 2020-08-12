@@ -58,29 +58,30 @@ static char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
 
 static void addNewFontToFamily(vlc_font_select_t *fs, CTFontDescriptorRef iter, char *path, vlc_family_t *p_family)
 {
-    bool b_bold = false;
-    bool b_italic = false;
+    int i_flags = 0;
     CFDictionaryRef fontTraits = CTFontDescriptorCopyAttribute(iter, kCTFontTraitsAttribute);
     CFNumberRef trait = CFDictionaryGetValue(fontTraits, kCTFontWeightTrait);
     float traitValue = 0.;
     CFNumberGetValue(trait, kCFNumberFloatType, &traitValue);
-    b_bold = traitValue > 0.23;
+    if( traitValue > 0.23 )
+        i_flags |= VLC_FONT_FLAG_BOLD;
     trait = CFDictionaryGetValue(fontTraits, kCTFontSlantTrait);
     traitValue = 0.;
     CFNumberGetValue(trait, kCFNumberFloatType, &traitValue);
-    b_italic = traitValue > 0.03;
+    if( traitValue > 0.03 )
+        i_flags |= VLC_FONT_FLAG_ITALIC;
 
 #ifndef NDEBUG
     CFStringRef name = CTFontDescriptorCopyAttribute(iter, kCTFontNameAttribute);
     char *psz_name = name ? FromCFString(name, kCFStringEncodingUTF8) : 0;
-    msg_Dbg(fs->p_obj, "New font: (%s) bold %i italic %i path '%s'", psz_name, b_bold, b_italic, path);
+    msg_Dbg(fs->p_obj, "New font: (%s) %x path '%s'", psz_name, i_flags, path);
     free(psz_name);
     if(name)
         CFRelease(name);
 #else
     VLC_UNUSED(fs);
 #endif
-    NewFont(path, 0, b_bold, b_italic, p_family);
+    NewFont(path, 0, i_flags, p_family);
 
     CFRelease(fontTraits);
 }

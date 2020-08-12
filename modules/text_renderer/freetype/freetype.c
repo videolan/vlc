@@ -315,9 +315,11 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
                                             i_font_idx,
                                             &p_face ))
             {
-
-                bool b_bold = p_face->style_flags & FT_STYLE_FLAG_BOLD;
-                bool b_italic = p_face->style_flags & FT_STYLE_FLAG_ITALIC;
+                int i_flags = 0;
+                if( p_face->style_flags & FT_STYLE_FLAG_BOLD )
+                    i_flags |= VLC_FONT_FLAG_BOLD;
+                if( p_face->style_flags & FT_STYLE_FLAG_ITALIC )
+                    i_flags |= VLC_FONT_FLAG_ITALIC;
 
                 vlc_family_t *p_family = DeclareNewFamily( p_sys->fs, p_face->family_name );
                 if( unlikely( !p_family ) )
@@ -326,7 +328,7 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
                 char *psz_fontfile;
                 if( asprintf( &psz_fontfile, ":/%d",
                               p_sys->i_font_attachments - 1 ) < 0
-                 || !NewFont( psz_fontfile, i_font_idx, b_bold, b_italic, p_family ) )
+                 || !NewFont( psz_fontfile, i_font_idx, i_flags, p_family ) )
                     goto error;
 
                 FT_Done_Face( p_face );
