@@ -1485,6 +1485,9 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     }
     vlc_mutex_unlock(&sys->filter.lock);
 
+    if (deadline)
+        *deadline = VLC_TICK_INVALID;
+
     if (first)
         if (ThreadDisplayPreparePicture(vout, true, frame_by_frame, &paused)) /* FIXME not sure it is ok */
             return VLC_EGENERIC;
@@ -1899,7 +1902,6 @@ static void *Thread(void *object)
             }
         }
 
-        deadline = VLC_TICK_INVALID;
         wait = ThreadDisplayPicture(vout, &deadline) != VLC_SUCCESS;
 
         const bool picture_interlaced = sys->displayed.is_interlaced;
