@@ -31,12 +31,14 @@ int CompositorWin7::window_enable(struct vout_window_t * p_wnd, const vout_windo
     CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
     msg_Dbg(that->m_intf, "window_enable");
     that->m_qmlVideoSurfaceProvider->enable(p_wnd);
+    that->m_qmlVideoSurfaceProvider->setVideoEmbed(true);
     return VLC_SUCCESS;
 }
 
 void CompositorWin7::window_disable(struct vout_window_t * p_wnd)
 {
     CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
+    that->m_qmlVideoSurfaceProvider->setVideoEmbed(false);
     that->m_qmlVideoSurfaceProvider->disable();
     that->m_videoWindowHandler->disable();
     msg_Dbg(that->m_intf, "window_disable");

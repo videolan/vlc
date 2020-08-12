@@ -58,6 +58,7 @@ int CompositorDirectComposition::window_enable(struct vout_window_t * p_wnd, con
     try
     {
         that->m_qmlVideoSurfaceProvider->enable(p_wnd);
+        that->m_qmlVideoSurfaceProvider->setVideoEmbed(true);
         HR(that->m_rootVisual->AddVisual(that->m_videoVisual.Get(), FALSE, that->m_uiVisual.Get()), "add video visual to root");
         HR(that->m_dcompDevice->Commit(), "commit");
     }
@@ -74,6 +75,7 @@ void CompositorDirectComposition::window_disable(struct vout_window_t * p_wnd)
     CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
     try
     {
+        that->m_qmlVideoSurfaceProvider->setVideoEmbed(false);
         that->m_qmlVideoSurfaceProvider->disable();
         that->m_videoWindowHandler->disable();
         msg_Dbg(that->m_intf, "window_disable");
@@ -208,7 +210,6 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf, m_rootWindow);
         m_videoWindowHandler->setWindow( m_rootWindow->windowHandle() );
 
-
         HR(m_dcompDevice->CreateTargetForHwnd((HWND)m_rootWindow->windowHandle()->winId(), TRUE, &m_dcompTarget), "create target");
         HR(m_dcompDevice->CreateVisual(&m_rootVisual), "create root visual");
         HR(m_dcompTarget->SetRoot(m_rootVisual.Get()), "set root visual");
@@ -232,7 +233,7 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         m_qmlVideoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
         m_rootWindow->setVideoSurfaceProvider(m_qmlVideoSurfaceProvider.get());
 
-        connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::hasVideoChanged,
+        connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::hasVideoEmbedChanged,
                 m_interfaceWindowHandler, &InterfaceWindowHandlerWin32::onVideoEmbedChanged);
 
         connect(m_rootWindow, &MainInterface::requestInterfaceMaximized,

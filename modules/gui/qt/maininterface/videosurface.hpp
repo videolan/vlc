@@ -32,15 +32,17 @@ public:
     VideoSurfaceProvider(QObject* parent = nullptr);
     virtual ~VideoSurfaceProvider() {}
 
-    bool hasVideo();
-
     void enable(vout_window_t* voutWindow);
     void disable();
+    bool isEnabled();
 
+    void setVideoEmbed(bool embed);
+    bool hasVideoEmbed() const;
 
 signals:
     void ctxChanged(QmlMainContext*);
-    bool hasVideoChanged(bool);
+    bool videoEnabledChanged(bool);
+    bool hasVideoEmbedChanged(bool);
 
 public slots:
     void onWindowClosed();
@@ -55,6 +57,7 @@ public slots:
 protected:
     QMutex m_voutlock;
     vout_window_t* m_voutWindow = nullptr;
+    bool m_videoEmbed = false;
 };
 
 

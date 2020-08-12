@@ -416,19 +416,19 @@ void MainInterface::setInterfaceAlwaysOnTop( bool on_top )
 
 bool MainInterface::hasEmbededVideo() const
 {
-    return m_videoSurfaceProvider && m_videoSurfaceProvider->hasVideo();
+    return m_videoSurfaceProvider && m_videoSurfaceProvider->hasVideoEmbed();
 }
 
 void MainInterface::setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider)
 {
     if (m_videoSurfaceProvider)
-        disconnect(m_videoSurfaceProvider, &VideoSurfaceProvider::hasVideoChanged, this, &MainInterface::hasEmbededVideoChanged);
+        disconnect(m_videoSurfaceProvider, &VideoSurfaceProvider::hasVideoEmbedChanged, this, &MainInterface::hasEmbededVideoChanged);
     m_videoSurfaceProvider = videoSurfaceProvider;
     if (m_videoSurfaceProvider)
-        connect(m_videoSurfaceProvider, &VideoSurfaceProvider::hasVideoChanged,
+        connect(m_videoSurfaceProvider, &VideoSurfaceProvider::hasVideoEmbedChanged,
                 this, &MainInterface::hasEmbededVideoChanged,
                 Qt::QueuedConnection);
-    emit hasEmbededVideoChanged(m_videoSurfaceProvider && m_videoSurfaceProvider->hasVideo());
+    emit hasEmbededVideoChanged(m_videoSurfaceProvider && m_videoSurfaceProvider->hasVideoEmbed());
 }
 
 VideoSurfaceProvider* MainInterface::getVideoSurfaceProvider() const

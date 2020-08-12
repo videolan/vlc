@@ -25,10 +25,15 @@ VideoSurfaceProvider::VideoSurfaceProvider(QObject* parent)
 {
 }
 
-bool VideoSurfaceProvider::hasVideo()
+bool VideoSurfaceProvider::isEnabled()
 {
     QMutexLocker lock(&m_voutlock);
     return m_voutWindow != nullptr;
+}
+
+bool VideoSurfaceProvider::hasVideoEmbed() const
+{
+    return m_videoEmbed;
 }
 
 void VideoSurfaceProvider::enable(vout_window_t* voutWindow)
@@ -38,16 +43,23 @@ void VideoSurfaceProvider::enable(vout_window_t* voutWindow)
         QMutexLocker lock(&m_voutlock);
         m_voutWindow = voutWindow;
     }
-    emit hasVideoChanged(true);
+    emit videoEnabledChanged(true);
 }
 
 void VideoSurfaceProvider::disable()
 {
+    setVideoEmbed(false);
     {
         QMutexLocker lock(&m_voutlock);
         m_voutWindow = nullptr;
     }
-    emit hasVideoChanged(false);
+    emit videoEnabledChanged(false);
+}
+
+void VideoSurfaceProvider::setVideoEmbed(bool embed)
+{
+    m_videoEmbed = embed;
+    emit hasVideoEmbedChanged(embed);
 }
 
 void VideoSurfaceProvider::onWindowClosed()
@@ -270,7 +282,7 @@ QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintN
         connect(this, &VideoSurface::keyPressed, m_provider, &VideoSurfaceProvider::onKeyPressed);
         connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged);
 
-        connect(m_provider, &VideoSurfaceProvider::hasVideoChanged, this, &VideoSurface::onProviderVideoChanged);
+        connect(m_provider, &VideoSurfaceProvider::hasVideoEmbedChanged, this, &VideoSurface::onProviderVideoChanged);
 
         onSurfaceSizeChanged();
     }
