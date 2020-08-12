@@ -55,23 +55,25 @@ Widgets.NavigableFocusScope {
             expanded = false
     }
 
-    PropertyAnimation {
+    SmoothedAnimation {
         id: animateExpand;
         target: searchBox;
         properties: "width"
         duration: 200
         to: VLCStyle.widthSearchInput
+        easing.type: Easing.OutSine
         onStopped: {
             searchBox.placeholderText = i18n.qtr("filter")
         }
     }
 
-    PropertyAnimation {
+    SmoothedAnimation {
         id: animateRetract;
         target: searchBox;
         properties: "width"
         duration: 200
         to: 0
+        easing.type: Easing.OutSine
     }
 
 
