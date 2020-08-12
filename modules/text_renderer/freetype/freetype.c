@@ -1163,14 +1163,16 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     UpdateDefaultLiveStyles( p_filter );
 
-    /*
-     * Update the default face to reflect changes in video size or text scaling
-     */
-    p_sys->p_face = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
-    if( !p_sys->p_face )
+    int i_font_default_size = ConvertToLiveSize( p_filter, p_sys->p_default_style );
+    if( !p_sys->p_face || i_font_default_size != p_sys->i_font_default_size )
     {
-        msg_Err( p_filter, "Render(): Error loading default face" );
-        return VLC_EGENERIC;
+        /* Update the default face to reflect changes in video size or text scaling */
+        p_sys->p_face = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
+        if( !p_sys->p_face )
+        {
+            msg_Err( p_filter, "Render(): Error loading default face" );
+            return VLC_EGENERIC;
+        }
     }
 
     layout_text_block_t text_block = { 0 };
