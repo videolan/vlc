@@ -3927,6 +3927,11 @@ dnl
 PKG_ENABLE_MODULES_VLC([SOXR], [], [soxr >= 0.1.2], [SoX Resampler library], [auto])
 
 dnl
+dnl  libebur128 module
+dnl
+PKG_ENABLE_MODULES_VLC([EBUR128], [], [libebur128 >= 1.2.4], [EBU R 128 standard for loudness normalisation], [auto])
+
+dnl
 dnl  OS/2 KAI plugin
 dnl
 AC_ARG_ENABLE([kai],
