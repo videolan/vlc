@@ -58,9 +58,11 @@ static int Android_ParseFont( vlc_font_select_t *fs, xml_reader_t *p_xml,
 
     while( ( psz_attr = xml_ReaderNextAttr( p_xml, &psz_val ) ) )
     {
-        if( !strcasecmp( "weight", psz_attr ) && psz_val && *psz_val )
+        if( !psz_val || !*psz_val )
+            continue;
+        if( !strcasecmp( "weight", psz_attr ) )
             i_weight = atoi( psz_val );
-        else if( !strcasecmp( "style", psz_attr ) && psz_val && *psz_val )
+        else if( !strcasecmp( "style", psz_attr ) )
             if( !strcasecmp( "italic", psz_val ) )
                 i_flags |= VLC_FONT_FLAG_ITALIC;
     }
@@ -191,11 +193,13 @@ static int Android_ParseAlias( vlc_font_select_t *fs, xml_reader_t *p_xml )
 
     while( ( psz_attr = xml_ReaderNextAttr( p_xml, &psz_val ) ) )
     {
-        if( !strcasecmp( "weight", psz_attr ) && psz_val && *psz_val )
+        if( !psz_val || !*psz_val )
+            continue;
+        if( !strcasecmp( "weight", psz_attr ) )
             i_weight = atoi( psz_val );
-        else if( !strcasecmp( "to", psz_attr ) && psz_val && *psz_val )
+        else if( !strcasecmp( "to", psz_attr ) )
             psz_dest = LowercaseDup( psz_val );
-        else if( !strcasecmp( "name", psz_attr ) && psz_val && *psz_val )
+        else if( !strcasecmp( "name", psz_attr ) )
             psz_name = LowercaseDup( psz_val );
     }
 
@@ -382,21 +386,21 @@ static int Android_ParseSystemFonts( vlc_font_select_t *fs, const char *psz_path
     int i_type;
     while( ( i_type = xml_ReaderNextNode( p_xml, &p_node ) ) > 0 )
     {
-        if( i_type == XML_READER_STARTELEM && !strcasecmp( "family", p_node ) && b_new_format )
+        if( i_type != XML_READER_STARTELEM )
+            continue;
+        int i_ret = 0;
+        if( !strcasecmp( "family", p_node ) )
         {
-            if( ( i_ret = Android_Nougat_ParseFamily( fs, p_xml ) ) )
-                break;
+            i_ret = b_new_format
+                  ? Android_Nougat_ParseFamily( fs, p_xml )
+                  : Android_Legacy_ParseFamily( fs, p_xml );
         }
-        else if( i_type == XML_READER_STARTELEM && !strcasecmp( "family", p_node ) && !b_new_format )
+        else if( !strcasecmp( "alias", p_node ) && b_new_format )
         {
-            if( ( i_ret = Android_Legacy_ParseFamily( fs, p_xml ) ) )
-                break;
+            i_ret = Android_ParseAlias( fs, p_xml );
         }
-        else if( i_type == XML_READER_STARTELEM && !strcasecmp( "alias", p_node ) && b_new_format )
-        {
-            if( ( i_ret = Android_ParseAlias( fs, p_xml ) ) )
-                break;
-        }
+        if( i_ret )
+            break;
     }
 
     xml_ReaderDelete( p_xml );
