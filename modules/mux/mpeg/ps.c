@@ -490,7 +490,7 @@ static int Mux( sout_mux_t *p_mux )
                 if( p_sys->i_instant_size &&
                     i_dts - p_sys->i_instant_dts > VLC_TICK_FROM_SEC(1))
                 {
-                    int64_t i_instant_bitrate = p_sys->i_instant_size * 8000000 /
+                    int64_t i_instant_bitrate = p_sys->i_instant_size * 8 * CLOCK_FREQ /
                             ( i_dts - p_sys->i_instant_dts );
 
                     p_sys->i_instant_bitrate += i_instant_bitrate;
