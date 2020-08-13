@@ -303,6 +303,7 @@ libvlccore_la_SOURCES = \
 	audio_output/common.c \
 	audio_output/dec.c \
 	audio_output/filters.c \
+	audio_output/meter.c \
 	audio_output/output.c \
 	audio_output/volume.c \
 	video_output/chrono.h \

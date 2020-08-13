@@ -30,6 +30,7 @@
 #include <vlc_codec.h>
 
 typedef struct vlc_video_context  vlc_video_context;
+struct vlc_audio_loudness;
 
 /**
  * \defgroup filter Filters
@@ -46,6 +47,15 @@ struct filter_video_callbacks
     vlc_decoder_device * (*hold_device)(vlc_object_t *, void *sys);
 };
 
+struct filter_audio_callbacks
+{
+    struct
+    {
+        void (*on_changed)(filter_t *,
+                           const struct vlc_audio_loudness *loudness);
+    } meter_loudness;
+};
+
 struct filter_subpicture_callbacks
 {
     subpicture_t *(*buffer_new)(filter_t *);
@@ -56,6 +66,7 @@ typedef struct filter_owner_t
     union
     {
         const struct filter_video_callbacks *video;
+        const struct filter_audio_callbacks *audio;
         const struct filter_subpicture_callbacks *sub;
     };
 
@@ -232,6 +243,13 @@ static inline block_t *filter_DrainAudio( filter_t *p_filter )
         return p_filter->pf_audio_drain( p_filter );
     else
         return NULL;
+}
+
+static inline void filter_SendAudioLoudness(filter_t *filter,
+    const struct vlc_audio_loudness *loudness)
+{
+    assert(filter->owner.audio->meter_loudness.on_changed);
+    filter->owner.audio->meter_loudness.on_changed(filter, loudness);
 }
 
 /**

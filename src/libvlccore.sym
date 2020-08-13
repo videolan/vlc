@@ -29,6 +29,13 @@ aout_FiltersPlay
 aout_FiltersAdjustResampling
 aout_Hold
 aout_Release
+vlc_audio_meter_Init
+vlc_audio_meter_Destroy
+vlc_audio_meter_Reset
+vlc_audio_meter_AddPlugin
+vlc_audio_meter_RemovePlugin
+vlc_audio_meter_Process
+vlc_audio_meter_Flush
 block_Alloc
 block_FifoGet
 block_FifoNew
