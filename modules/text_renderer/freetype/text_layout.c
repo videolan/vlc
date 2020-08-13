@@ -1015,8 +1015,7 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
 
         if( p_sys->p_stroker && (p_style->i_style_flags & STYLE_OUTLINE) )
         {
-            double f_outline_thickness =
-                var_InheritInteger( p_filter, "freetype-outline-thickness" ) / 100.0;
+            double f_outline_thickness = p_sys->i_outline_thickness / 100.0;
             f_outline_thickness = VLC_CLIP( f_outline_thickness, 0.0, 0.5 );
             int i_radius = ( i_live_size << 6 ) * f_outline_thickness;
             FT_Stroker_Set( p_sys->p_stroker,

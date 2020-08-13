@@ -112,6 +112,7 @@ typedef struct
     /* Current scaling of the text, default is 100 (%) */
     int               i_scale;
     int               i_font_default_size;
+    int               i_outline_thickness;
 
     vlc_font_select_t *fs;
 
