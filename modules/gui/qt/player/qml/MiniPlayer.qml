@@ -103,113 +103,14 @@ Widgets.NavigableFocusScope {
                 tint: VLCStyle.colors.blendColors(VLCStyle.colors.bg, VLCStyle.colors.banner, 0.85)
             }
 
-            Widgets.FocusBackground {
-                id: playingItemInfo
-
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    left: parent.left
-
-                    leftMargin: VLCStyle.applicationHorizontalMargin + VLCStyle.margin_normal
-                    bottomMargin: VLCStyle.applicationVerticalMargin
-                }
-                width: playingItemInfoRow.width
-                focus: true
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: history.push(["player"])
-                }
-
-                Keys.onPressed: {
-                    if (KeyHelper.matchOk(event) ) {
-                        event.accepted = true
-                    }
-                }
-                Keys.onReleased: {
-                    if (!event.accepted && KeyHelper.matchOk(event))
-                        history.push(["player"])
-                }
-
-
-                Row {
-                    id: playingItemInfoRow
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    anchors.left: parent.left
-
-                    Item {
-                        anchors.verticalCenter: parent.verticalCenter
-                        implicitHeight: childrenRect.height
-                        implicitWidth:  childrenRect.width
-
-                        Rectangle {
-                            id: coverRect
-                            anchors.fill: cover
-                            color: VLCStyle.colors.bg
-                        }
-
-                        DropShadow {
-                            anchors.fill: coverRect
-                            source: coverRect
-                            radius: 8
-                            samples: 17
-                            color: VLCStyle.colors.glowColorBanner
-                            spread: 0.2
-                        }
-
-                        Image {
-                            id: cover
-
-                            source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
-                                    ? mainPlaylistController.currentItem.artwork
-                                    : VLCStyle.noArtAlbum
-                            fillMode: Image.PreserveAspectFit
-
-                            width: VLCStyle.dp(60, VLCStyle.scale)
-                            height: VLCStyle.dp(60, VLCStyle.scale)
-                        }
-                    }
-
-                    Column {
-                        anchors.verticalCenter: parent.verticalCenter
-                        leftPadding: VLCStyle.margin_xsmall
-
-                        Widgets.MenuLabel {
-                            id: titleLabel
-                            text: mainPlaylistController.currentItem.title
-                        }
-
-                        Widgets.MenuCaption {
-                            id: artistLabel
-                            text: mainPlaylistController.currentItem.artist
-                        }
-
-                        Widgets.MenuCaption {
-                            id: progressIndicator
-                            text: player.time.toString() + " / " + player.length.toString()
-                        }
-                    }
-                }
-
-                KeyNavigation.right: buttonrow_left
-            }
-
-
             RowLayout {
                 anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    left: playingItemInfo.right
-                    right: parent.right
+                    fill: parent
 
                     leftMargin: VLCStyle.applicationHorizontalMargin
                     rightMargin: VLCStyle.applicationHorizontalMargin
                     bottomMargin: VLCStyle.applicationVerticalMargin
                 }
-
-                spacing: VLCStyle.margin_large
 
                 PlayerButtonsLayout {
                     id: buttonrow_left
@@ -223,7 +124,6 @@ Widgets.NavigableFocusScope {
                     Layout.rightMargin: VLCStyle.margin_normal
 
                     navigationParent: root
-                    navigationLeftItem: playingItemInfo
                     navigationRightItem: buttonrow_center
                 }
 
@@ -240,7 +140,7 @@ Widgets.NavigableFocusScope {
 
                     navigationParent: root
                     navigationLeftItem: buttonrow_left
-                    navigationRightItem: buttonrow_center
+                    navigationRightItem: buttonrow_right
                 }
 
                 PlayerButtonsLayout {
@@ -258,7 +158,6 @@ Widgets.NavigableFocusScope {
                     navigationLeftItem: buttonrow_center
                 }
             }
-
 
             Connections{
                 target: mainInterface
