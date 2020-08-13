@@ -27,34 +27,48 @@ enum default_align {
     SIZE
 };
 
-static const QVector<PlayerControlBarModel::IconToolButton> MAIN_TB_DEFAULT[default_align::SIZE] = {
-                                                                            // left
-                                                                            {{PlayerControlBarModel::LANG_BUTTON},
-                                                                            {PlayerControlBarModel::MENU_BUTTON}},
-                                                                            // center
-                                                                            {{PlayerControlBarModel::RANDOM_BUTTON},
-                                                                            {PlayerControlBarModel::PREVIOUS_BUTTON},
-                                                                            {PlayerControlBarModel::PLAY_BUTTON},
-                                                                            {PlayerControlBarModel::NEXT_BUTTON},
-                                                                            {PlayerControlBarModel::LOOP_BUTTON}},
-                                                                            // right
-                                                                            {{PlayerControlBarModel::VOLUME},
-                                                                            {PlayerControlBarModel::FULLSCREEN_BUTTON}}
-                                                                       };
+static const QVector<PlayerControlBarModel::IconToolButton> MAIN_TB_DEFAULT[default_align::SIZE] =
+{
+    {
+        // left
+        {PlayerControlBarModel::LANG_BUTTON},
+        {PlayerControlBarModel::MENU_BUTTON}
+    },
+    {
+        // center
+        {PlayerControlBarModel::RANDOM_BUTTON},
+        {PlayerControlBarModel::PREVIOUS_BUTTON},
+        {PlayerControlBarModel::PLAY_BUTTON},
+        {PlayerControlBarModel::NEXT_BUTTON},
+        {PlayerControlBarModel::LOOP_BUTTON}
+    },
+    {
+        // right
+        {PlayerControlBarModel::VOLUME},
+        {PlayerControlBarModel::FULLSCREEN_BUTTON}
+    }
+};
 
-static const QVector<PlayerControlBarModel::IconToolButton> MINI_TB_DEFAULT[default_align::SIZE] = {
-                                                                           // left
-                                                                           {},
-                                                                           // center
-                                                                           {{PlayerControlBarModel::RANDOM_BUTTON},
-                                                                           {PlayerControlBarModel::PREVIOUS_BUTTON},
-                                                                           {PlayerControlBarModel::PLAY_BUTTON},
-                                                                           {PlayerControlBarModel::NEXT_BUTTON},
-                                                                           {PlayerControlBarModel::LOOP_BUTTON}},
-                                                                           // right
-                                                                           {{PlayerControlBarModel::VOLUME},
-                                                                           {PlayerControlBarModel::PLAYER_SWITCH_BUTTON}}
-                                                                       };
+static const QVector<PlayerControlBarModel::IconToolButton> MINI_TB_DEFAULT[default_align::SIZE] =
+{
+    {
+        // left
+        {PlayerControlBarModel::ARTWORK_INFO}
+    },
+    {
+        // center
+        {PlayerControlBarModel::RANDOM_BUTTON},
+        {PlayerControlBarModel::PREVIOUS_BUTTON},
+        {PlayerControlBarModel::PLAY_BUTTON},
+        {PlayerControlBarModel::NEXT_BUTTON},
+        {PlayerControlBarModel::LOOP_BUTTON}
+    },
+    {
+        // right
+        {PlayerControlBarModel::VOLUME},
+        {PlayerControlBarModel::PLAYER_SWITCH_BUTTON}
+    }
+};
 
 
 PlayerControlBarModel::PlayerControlBarModel(QObject *_parent) : QAbstractListModel(_parent)
