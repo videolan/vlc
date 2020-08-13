@@ -251,6 +251,8 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         return VLC_ENOMEM;
     memset(sys, 0, sizeof (*sys));
 
+    d3d11_device_lock(sys->d3d_dev);
+
     d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext( filter->vctx_in );
     sys->d3d_dev = &dev_sys->d3d_dev;
     if (D3D11_CreateProcessor(filter, sys->d3d_dev, D3D11_VIDEO_FRAME_FORMAT_INTERLACED_TOP_FIELD_FIRST,
@@ -343,6 +345,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
     {
        goto error;
     }
+    d3d11_device_unlock(sys->d3d_dev);
 
     filter->fmt_out.video   = out_fmt;
     filter->vctx_out        = vlc_video_context_Hold(filter->vctx_in);
@@ -353,6 +356,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
     return VLC_SUCCESS;
 error:
     D3D11_ReleaseProcessor(&sys->d3d_proc);
+    d3d11_device_unlock(sys->d3d_dev);
     free(sys);
 
     return VLC_EGENERIC;
