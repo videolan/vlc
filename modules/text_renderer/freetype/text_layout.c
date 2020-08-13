@@ -374,6 +374,7 @@ static void FreeParagraph( paragraph_t *p_paragraph )
 #ifdef HAVE_FRIBIDI
 static int AnalyzeParagraph( paragraph_t *p_paragraph )
 {
+    int i_max;
     fribidi_get_bidi_types(  p_paragraph->p_code_points,
                              p_paragraph->i_size,
                              p_paragraph->p_types );
@@ -382,17 +383,21 @@ static int AnalyzeParagraph( paragraph_t *p_paragraph )
                                p_paragraph->i_size,
                                p_paragraph->p_types,
                                p_paragraph->p_btypes );
-    fribidi_get_par_embedding_levels_ex( p_paragraph->p_types,
+    i_max = fribidi_get_par_embedding_levels_ex(
+                                      p_paragraph->p_types,
                                       p_paragraph->p_btypes,
                                       p_paragraph->i_size,
                                       &p_paragraph->paragraph_type,
                                       p_paragraph->p_levels );
 #else
-    fribidi_get_par_embedding_levels( p_paragraph->p_types,
+    i_max = fribidi_get_par_embedding_levels(
+                                      p_paragraph->p_types,
                                       p_paragraph->i_size,
                                       &p_paragraph->paragraph_type,
                                       p_paragraph->p_levels );
 #endif
+    if( i_max == 0 )
+        return VLC_EGENERIC;
 
 #ifdef HAVE_HARFBUZZ
     hb_unicode_funcs_t *p_funcs =
