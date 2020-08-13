@@ -127,7 +127,7 @@ void X11TimerLoop::waitNextTimer()
     {
         if( nextDate > curDate )
         {
-            if( this->sleep( (nextDate - curDate ) / 1000 ) )
+            if( this->sleep( MS_FROM_VLC_TICK(nextDate - curDate ) ) )
             {
                 // The sleep has been interrupted: stop here
                 return;
