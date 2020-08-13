@@ -318,10 +318,16 @@ void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
     aout_owner_t *owner = aout_owner (aout);
     float rate = owner->sync.rate;
     vlc_tick_t drift =
-        -vlc_clock_Update(owner->sync.clock, system_ts, audio_ts, rate);
+        vlc_clock_Update(owner->sync.clock, system_ts, audio_ts, rate);
 
     if (unlikely(drift == INT64_MAX) || owner->bitexact)
         return; /* cf. INT64_MAX comment in aout_DecPlay() */
+
+    /* Following calculations expect an opposite drift. Indeed,
+     * vlc_clock_Update() returns a positive relative time, corresponding to
+     * the time when audio_ts is expected to be played (in the future when not
+     * late). */
+    drift = -drift;
 
     /* Late audio output.
      * This can happen due to insufficient caching, scheduling jitter
