@@ -778,6 +778,7 @@ vlc_thumbnailer_Cancel
 vlc_thumbnailer_Release
 vlc_player_AddAssociatedMedia
 vlc_player_AddListener
+vlc_player_AddMetadataListener
 vlc_player_AddSmpteTimer
 vlc_player_AddTimer
 vlc_player_aout_AddListener
@@ -839,6 +840,7 @@ vlc_player_Pause
 vlc_player_program_Delete
 vlc_player_program_Dup
 vlc_player_RemoveListener
+vlc_player_RemoveMetadataListener
 vlc_player_RemoveTimer
 vlc_player_RestartEsId
 vlc_player_RestorePlaybackPos

@@ -127,6 +127,19 @@ struct vlc_player_listener_id
     struct vlc_list node;
 };
 
+struct vlc_player_metadata_listener_id
+{
+    const union vlc_player_metadata_cbs *cbs;
+    void *cbs_data;
+
+    enum vlc_player_metadata_option option;
+    union
+    {
+        vlc_audio_meter_plugin *audio_meter;
+    };
+    struct vlc_list node;
+};
+
 struct vlc_player_vout_listener_id
 {
     const struct vlc_player_vout_cbs *cbs;
@@ -210,6 +223,7 @@ struct vlc_player_t
 {
     struct vlc_object_t obj;
     vlc_mutex_t lock;
+    vlc_mutex_t metadata_listeners_lock;
     vlc_mutex_t aout_listeners_lock;
     vlc_mutex_t vout_listeners_lock;
     vlc_cond_t start_delay_cond;
@@ -224,6 +238,7 @@ struct vlc_player_t
     bool corked;
 
     struct vlc_list listeners;
+    struct vlc_list metadata_listeners;
     struct vlc_list aout_listeners;
     struct vlc_list vout_listeners;
 
