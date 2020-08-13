@@ -147,7 +147,7 @@ Item{
     Component{
         id:playBtnDelegate
 
-        Button {
+        ToolButton {
             id: playBtn
             width: VLCStyle.icon_medium
             height: width
@@ -164,6 +164,16 @@ Item{
             enabled: !paintOnly
 
             property bool realHovered: false
+
+            Keys.onPressed: {
+                if (KeyHelper.matchOk(event) ) {
+                    event.accepted = true
+                }
+            }
+            Keys.onReleased: {
+                if (!event.accepted && KeyHelper.matchOk(event))
+                    mainPlaylistController.togglePlayPause()
+            }
 
             contentItem: Label {
                 id: contentLabel

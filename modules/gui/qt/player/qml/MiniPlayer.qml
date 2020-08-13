@@ -81,6 +81,9 @@ Widgets.NavigableFocusScope {
                 left: parent.left
                 right: parent.right
             }
+
+            Keys.onDownPressed: buttonrow_left.focus = true
+            Keys.onUpPressed: root.navigationUpItem.focus = true
         }
 
 
@@ -125,6 +128,18 @@ Widgets.NavigableFocusScope {
 
                     navigationParent: root
                     navigationRightItem: buttonrow_center
+
+                    focus: true
+
+                    navigationUp: function(index) {
+                        if (progressBar.enabled)
+                            progressBar.focus = true
+                        else
+                            root.navigationUp(index)
+                    }
+
+                    Keys.priority: Keys.AfterItem
+                    Keys.onPressed: defaultKeyAction(event, 0)
                 }
 
                 PlayerButtonsLayout {
@@ -141,6 +156,16 @@ Widgets.NavigableFocusScope {
                     navigationParent: root
                     navigationLeftItem: buttonrow_left
                     navigationRightItem: buttonrow_right
+
+                    navigationUp: function(index) {
+                        if (progressBar.enabled)
+                            progressBar.focus = true
+                        else
+                            root.navigationUp(index)
+                    }
+
+                    Keys.priority: Keys.AfterItem
+                    Keys.onPressed: defaultKeyAction(event, 0)
                 }
 
                 PlayerButtonsLayout {
@@ -156,6 +181,16 @@ Widgets.NavigableFocusScope {
 
                     navigationParent: root
                     navigationLeftItem: buttonrow_center
+
+                    navigationUp: function(index) {
+                        if (progressBar.enabled)
+                            progressBar.focus = true
+                        else
+                            root.navigationUp(index)
+                    }
+
+                    Keys.priority: Keys.AfterItem
+                    Keys.onPressed: defaultKeyAction(event, 0)
                 }
             }
 
