@@ -510,4 +510,5 @@ demux_LTLIBRARIES += libnoseek_plugin.la
 
 libdemux_mock_plugin_la_SOURCES = demux/mock.c
 libdemux_mock_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
+libdemux_mock_plugin_la_LIBADD = $(LIBM)
 noinst_LTLIBRARIES += libdemux_mock_plugin.la
