@@ -32,6 +32,8 @@ Item {
     TextMetrics { id: fontMetrics_xxlarge;  font.pixelSize: dp(20, scale); text: "lq"}
     TextMetrics { id: fontMetrics_xxxlarge;  font.pixelSize: dp(30, scale); text: "lq"}
 
+    property alias self: vlc_style
+
     property VLCColors colors: VLCColors {}
 
     // Sizes
@@ -172,6 +174,10 @@ Item {
     property int table_cover_border: dp(2, scale)
 
     property int artistBanner_height: dp(200, scale)
+    
+    //global application size, updated by the root widget
+    property int appWidth: 0
+    property int appHeight: 0
 
     //global application margin "safe area"
     property int applicationHorizontalMargin: 0
