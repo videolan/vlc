@@ -232,8 +232,6 @@ audio_output_t *aout_New (vlc_object_t *parent)
     var_AddCallback (aout, "mute", var_Copy, parent);
     var_Create (aout, "device", VLC_VAR_STRING);
     var_AddCallback (aout, "device", var_CopyDevice, parent);
-    /* TODO: 3.0 HACK: only way to signal DTS_HD to aout modules. */
-    var_Create (aout, "dtshd", VLC_VAR_BOOL);
 
     aout->events = &aout_events;
 
