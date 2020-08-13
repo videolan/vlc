@@ -116,7 +116,7 @@ var_Read_unsigned(const char *psz)
     Y(audio, packetized, bool, add_bool, Bool, true) \
     Y(audio, add_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID) \
     Y(audio, channels, unsigned, add_integer, Unsigned, 2) \
-    Y(audio, format, vlc_fourcc_t, add_string, Fourcc, "u8") \
+    Y(audio, format, vlc_fourcc_t, add_string, Fourcc, "f32l") \
     Y(audio, rate, unsigned, add_integer, Unsigned, 44100) \
     Y(audio, sample_length, vlc_tick_t, add_integer, Integer, VLC_TICK_FROM_MS(40) )
 
