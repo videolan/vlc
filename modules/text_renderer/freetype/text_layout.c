@@ -294,6 +294,33 @@ static void FixGlyph( FT_Glyph glyph, FT_BBox *p_bbox,
     }
 }
 
+static void FreeParagraph( paragraph_t *p_paragraph )
+{
+    free( p_paragraph->p_runs );
+    free( p_paragraph->pi_glyph_indices );
+    free( p_paragraph->p_glyph_bitmaps );
+    free( p_paragraph->pi_run_ids );
+    free( p_paragraph->pp_faces );
+    free( p_paragraph->pp_ruby );
+    free( p_paragraph->pp_styles );
+    free( p_paragraph->p_code_points );
+
+#ifdef HAVE_HARFBUZZ
+    free( p_paragraph->p_scripts );
+#endif
+
+#ifdef HAVE_FRIBIDI
+    free( p_paragraph->pi_reordered_indices );
+    free( p_paragraph->p_types );
+#if FRIBIDI_MAJOR_VERSION >= 1
+    free( p_paragraph->p_btypes );
+#endif
+    free( p_paragraph->p_levels );
+#endif
+
+    free( p_paragraph );
+}
+
 static paragraph_t *NewParagraph( filter_t *p_filter,
                                   int i_size,
                                   const uni_char_t *p_code_points,
@@ -374,55 +401,8 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
     return p_paragraph;
 
 error:
-    if( p_paragraph->p_code_points ) free( p_paragraph->p_code_points );
-    if( p_paragraph->pi_glyph_indices ) free( p_paragraph->pi_glyph_indices );
-    if( p_paragraph->pp_styles ) free( p_paragraph->pp_styles );
-    if( p_paragraph->pp_ruby ) free( p_paragraph->pp_ruby );
-    if( p_paragraph->pp_faces ) free( p_paragraph->pp_faces );
-    if( p_paragraph->pi_run_ids ) free( p_paragraph->pi_run_ids );
-    if( p_paragraph->p_glyph_bitmaps ) free( p_paragraph->p_glyph_bitmaps );
-    if( p_paragraph->p_runs ) free( p_paragraph->p_runs );
-#ifdef HAVE_HARFBUZZ
-    if( p_paragraph->p_scripts ) free( p_paragraph->p_scripts );
-#endif
-#ifdef HAVE_FRIBIDI
-    if( p_paragraph->p_levels ) free( p_paragraph->p_levels );
-    if( p_paragraph->p_types ) free( p_paragraph->p_types );
-#if FRIBIDI_MAJOR_VERSION >= 1
-    if( p_paragraph->p_btypes ) free( p_paragraph->p_btypes );
-#endif
-    if( p_paragraph->pi_reordered_indices )
-        free( p_paragraph->pi_reordered_indices );
-#endif
-    free( p_paragraph );
+    FreeParagraph( p_paragraph );
     return 0;
-}
-
-static void FreeParagraph( paragraph_t *p_paragraph )
-{
-    free( p_paragraph->p_runs );
-    free( p_paragraph->pi_glyph_indices );
-    free( p_paragraph->p_glyph_bitmaps );
-    free( p_paragraph->pi_run_ids );
-    free( p_paragraph->pp_faces );
-    free( p_paragraph->pp_ruby );
-    free( p_paragraph->pp_styles );
-    free( p_paragraph->p_code_points );
-
-#ifdef HAVE_HARFBUZZ
-    free( p_paragraph->p_scripts );
-#endif
-
-#ifdef HAVE_FRIBIDI
-    free( p_paragraph->pi_reordered_indices );
-    free( p_paragraph->p_types );
-#if FRIBIDI_MAJOR_VERSION >= 1
-    free( p_paragraph->p_btypes );
-#endif
-    free( p_paragraph->p_levels );
-#endif
-
-    free( p_paragraph );
 }
 
 #ifdef HAVE_FRIBIDI
