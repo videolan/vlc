@@ -585,9 +585,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     {
         if( p_sys->i_bitrate_avg > 0 )
         {
-            int64_t i_time = INT64_C(8000000)
-                * ( vlc_stream_Tell(p_demux->s) - p_sys->i_stream_offset )
-                / p_sys->i_bitrate_avg;
+            vlc_tick_t i_time = vlc_tick_from_samples(
+                ( vlc_stream_Tell(p_demux->s) - p_sys->i_stream_offset ) * 8
+                , p_sys->i_bitrate_avg );
 
             /* Fix time_offset */
             if( i_time >= 0 )
