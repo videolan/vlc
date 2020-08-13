@@ -96,6 +96,15 @@ static int SetupProcessor(filter_t *p_filter, ID3D11Device *d3ddevice,
     if (unlikely(FAILED(hr)))
         goto error;
 
+    HANDLE context_lock = INVALID_HANDLE_VALUE;
+    UINT dataSize = sizeof(context_lock);
+    hr = ID3D11DeviceContext_GetPrivateData(sys->d3d_dev.d3dcontext, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
+    if (FAILED(hr))
+        msg_Warn(p_filter, "No mutex found to lock the decoder");
+    sys->d3d_dev.context_mutex = context_lock;
+
+    d3d11_device_lock(&sys->d3d_dev);
+
     const video_format_t *fmt = &p_filter->fmt_in.video;
     D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc = {
         .InputFrameFormat = D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,
@@ -156,6 +165,7 @@ static int SetupProcessor(filter_t *p_filter, ID3D11Device *d3ddevice,
             else
             {
                 sys->procEnumerator  = processorEnumerator;
+                d3d11_device_unlock(&sys->d3d_dev);
                 return VLC_SUCCESS;
             }
         }
@@ -173,6 +183,7 @@ error:
         ID3D11VideoContext_Release(sys->d3dvidctx);
     if (sys->d3dviddev)
         ID3D11VideoDevice_Release(sys->d3dviddev);
+    d3d11_device_unlock(&sys->d3d_dev);
     return VLC_EGENERIC;
 }
 #endif

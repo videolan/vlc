@@ -391,6 +391,8 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
         msg_Warn(filter, "No mutex found to lock the decoder");
     sys->d3d_dev.context_mutex = context_lock;
 
+    d3d11_device_lock(&sys->d3d_dev);
+
     const video_format_t *fmt = &filter->fmt_out.video;
 
     D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc = {
@@ -544,6 +546,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
     {
        goto error;
     }
+    d3d11_device_unlock(&sys->d3d_dev);
 
     sys->buffer_new = filter->owner.video.buffer_new;
     filter->owner.video.buffer_new = NewOutputPicture;
@@ -569,6 +572,7 @@ error:
     if (sys->d3d_dev.d3dcontext)
         D3D11_FilterReleaseInstance(&sys->d3d_dev);
     D3D11_Destroy(&sys->hd3d);
+    d3d11_device_unlock(&sys->d3d_dev);
     free(sys);
 
     return VLC_EGENERIC;
