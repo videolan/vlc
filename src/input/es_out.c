@@ -2966,7 +2966,7 @@ static vlc_tick_t EsOutGetTracksDelay(es_out_t *out)
         tracks_delay = __MIN(tracks_delay, p_sys->i_audio_delay);
     if (has_spu)
         tracks_delay = __MIN(tracks_delay, p_sys->i_spu_delay);
-    return tracks_delay < 0 ? -tracks_delay : 0;
+    return -tracks_delay;
 }
 
 /**
