@@ -474,7 +474,7 @@ static int next_timeout(intf_thread_t *intf)
             next_timeout = *expiry;
     }
 
-    if (next_timeout >= INT64_MAX)
+    if (next_timeout == INT64_MAX)
         return -1;
 
     next_timeout /= 1000;
