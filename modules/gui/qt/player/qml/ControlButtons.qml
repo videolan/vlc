@@ -25,6 +25,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
+import "qrc:///util/KeyHelper.js" as KeyHelper
 
 Item{
     id: controlButtons
@@ -63,7 +64,8 @@ Item{
         { id:  PlayerControlBarModel.ASPECT_RATIO_COMBOBOX, label: VLCIcons.aspect_ratio, text: i18n.qtr("Aspect Ratio")},
         { id:  PlayerControlBarModel.WIDGET_SPACER, label: VLCIcons.space, text: i18n.qtr("Spacer")},
         { id:  PlayerControlBarModel.WIDGET_SPACER_EXTEND, label: VLCIcons.space, text: i18n.qtr("Expanding Spacer")},
-        { id:  PlayerControlBarModel.PLAYER_SWITCH_BUTTON, label: VLCIcons.fullscreen, text: i18n.qtr("Switch Player")}
+        { id:  PlayerControlBarModel.PLAYER_SWITCH_BUTTON, label: VLCIcons.fullscreen, text: i18n.qtr("Switch Player")},
+        { id:  PlayerControlBarModel.ARTWORK_INFO, label: VLCIcons.info, text: i18n.qtr("Artwork Info")}
     ]
 
     function returnbuttondelegate(inpID){
@@ -99,6 +101,7 @@ Item{
         case PlayerControlBarModel.ASPECT_RATIO_COMBOBOX: return aspectRatioDelegate
         case PlayerControlBarModel.TELETEXT_BUTTONS: return teletextdelegate
         case PlayerControlBarModel.PLAYER_SWITCH_BUTTON: return playerSwitchBtnDelegate
+        case PlayerControlBarModel.ARTWORK_INFO: return artworkInfoDelegate
         }
         console.log("button delegate id " + inpID +  " doesn't exists")
         return spacerDelegate
@@ -759,6 +762,90 @@ Item{
 
             property bool acceptFocus: true
             text: i18n.qtr("Switch Player")
+        }
+    }
+
+    Component {
+        id: artworkInfoDelegate
+
+        Widgets.FocusBackground {
+            property bool paintOnly: false
+
+            implicitWidth: playingItemInfoRow.implicitWidth
+            implicitHeight: playingItemInfoRow.implicitHeight
+
+            Keys.onPressed: {
+                if (KeyHelper.matchOk(event) ) {
+                    event.accepted = true
+                }
+            }
+            Keys.onReleased: {
+                if (!event.accepted && KeyHelper.matchOk(event))
+                    history.push(["player"])
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                visible: !paintOnly
+                onClicked: history.push(["player"])
+            }
+
+            Row {
+                id: playingItemInfoRow
+
+                Item {
+                    anchors.verticalCenter: parent.verticalCenter
+                    implicitHeight: childrenRect.height
+                    implicitWidth:  childrenRect.width
+
+                    Rectangle {
+                        id: coverRect
+                        anchors.fill: cover
+                        color: VLCStyle.colors.bg
+                    }
+
+                    DropShadow {
+                        anchors.fill: coverRect
+                        source: coverRect
+                        radius: 8
+                        samples: 17
+                        color: VLCStyle.colors.glowColorBanner
+                        spread: 0.2
+                    }
+
+                    Image {
+                        id: cover
+
+                        source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
+                                ? mainPlaylistController.currentItem.artwork
+                                : VLCStyle.noArtAlbum
+                        fillMode: Image.PreserveAspectFit
+
+                        width: VLCStyle.dp(60)
+                        height: VLCStyle.dp(60)
+                    }
+                }
+
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    leftPadding: VLCStyle.margin_xsmall
+
+                    Widgets.MenuLabel {
+                        id: titleLabel
+                        text: mainPlaylistController.currentItem.title
+                    }
+
+                    Widgets.MenuCaption {
+                        id: artistLabel
+                        text: mainPlaylistController.currentItem.artist
+                    }
+
+                    Widgets.MenuCaption {
+                        id: progressIndicator
+                        text: player.time.toString() + " / " + player.length.toString()
+                    }
+                }
+            }
         }
     }
 }
