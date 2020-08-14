@@ -35,15 +35,25 @@
                 <outlet property="compressorResetButton" destination="621" id="B33-wI-ncD"/>
                 <outlet property="compressorView" destination="723" id="Lf1-bS-Ric"/>
                 <outlet property="equalizerBand10Slider" destination="216" id="XGb-IB-1IO"/>
+                <outlet property="equalizerBand10TextField" destination="111" id="4NH-3f-BCQ"/>
                 <outlet property="equalizerBand1Slider" destination="198" id="7rF-1A-pv4"/>
+                <outlet property="equalizerBand1TextField" destination="95" id="akP-MF-Ndm"/>
                 <outlet property="equalizerBand2Slider" destination="200" id="yRm-sh-ahX"/>
+                <outlet property="equalizerBand2TextField" destination="96" id="ara-Pz-sRL"/>
                 <outlet property="equalizerBand3Slider" destination="202" id="5OD-N2-BPy"/>
+                <outlet property="equalizerBand3TextField" destination="101" id="81b-Za-oun"/>
                 <outlet property="equalizerBand4Slider" destination="204" id="mW0-5k-BqH"/>
+                <outlet property="equalizerBand4TextField" destination="100" id="RTD-vn-ukR"/>
                 <outlet property="equalizerBand5Slider" destination="206" id="Ql0-VZ-G95"/>
+                <outlet property="equalizerBand5TextField" destination="102" id="Wfj-ky-8Lu"/>
                 <outlet property="equalizerBand6Slider" destination="208" id="5rp-16-qZS"/>
+                <outlet property="equalizerBand6TextField" destination="107" id="kFt-de-0Uo"/>
                 <outlet property="equalizerBand7Slider" destination="210" id="NX9-KD-cd8"/>
+                <outlet property="equalizerBand7TextField" destination="109" id="Lsa-7i-HKt"/>
                 <outlet property="equalizerBand8Slider" destination="212" id="X9a-hy-G3f"/>
+                <outlet property="equalizerBand8TextField" destination="104" id="r1J-uW-c4E"/>
                 <outlet property="equalizerBand9Slider" destination="214" id="UCy-aA-wav"/>
+                <outlet property="equalizerBand9TextField" destination="110" id="sMJ-Jm-Z7c"/>
                 <outlet property="equalizerEnableCheckbox" destination="192" id="eV2-Qt-hd1"/>
                 <outlet property="equalizerPreampLabel" destination="93" id="F5G-xX-9qX"/>
                 <outlet property="equalizerPreampSlider" destination="196" id="DFs-vD-QFY"/>
