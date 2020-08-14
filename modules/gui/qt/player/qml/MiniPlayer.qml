@@ -106,7 +106,7 @@ Widgets.NavigableFocusScope {
                 tint: VLCStyle.colors.blendColors(VLCStyle.colors.bg, VLCStyle.colors.banner, 0.85)
             }
 
-            RowLayout {
+            Item {
                 anchors {
                     fill: parent
 
@@ -121,10 +121,17 @@ Widgets.NavigableFocusScope {
                     model: miniPlayerModel_left
                     defaultSize: VLCStyle.icon_normal
 
-                    Layout.alignment: Qt.AlignLeft
-                    Layout.preferredHeight: buttonrow.implicitHeight
-                    Layout.leftMargin: VLCStyle.margin_normal
-                    Layout.rightMargin: VLCStyle.margin_normal
+                    implicitHeight: buttonrow.implicitHeight
+
+                    anchors {
+                        left: parent.left
+                        top: parent.top
+                        bottom: parent.bottom
+
+                        leftMargin: VLCStyle.margin_normal
+                    }
+
+                    visible: model.count > 0 && (miniPlayerModel_center.count > 0 ? ((x+width) < buttonrow_center.x) : true)
 
                     navigationParent: root
                     navigationRightItem: buttonrow_center
@@ -148,10 +155,9 @@ Widgets.NavigableFocusScope {
                     model: miniPlayerModel_center
                     defaultSize: VLCStyle.icon_normal
 
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredHeight: buttonrow.implicitHeight
-                    Layout.leftMargin: VLCStyle.margin_normal
-                    Layout.rightMargin: VLCStyle.margin_normal
+                    anchors {
+                        centerIn: parent
+                    }
 
                     navigationParent: root
                     navigationLeftItem: buttonrow_left
@@ -174,10 +180,16 @@ Widgets.NavigableFocusScope {
                     model: miniPlayerModel_right
                     defaultSize: VLCStyle.icon_normal
 
-                    Layout.alignment: Qt.AlignRight
-                    Layout.preferredHeight: buttonrow.implicitHeight
-                    Layout.leftMargin: VLCStyle.margin_normal
-                    Layout.rightMargin: VLCStyle.margin_normal
+                    anchors {
+                        right: parent.right
+                        top: parent.top
+                        bottom: parent.bottom
+
+                        rightMargin: VLCStyle.margin_normal
+                    }
+
+                    visible: model.count > 0 && (miniPlayerModel_center.count > 0 ? ((buttonrow_center.x + buttonrow_center.width) < x)
+                                                                                  : !(((buttonrow_left.x + buttonrow_left.width) > x) && miniPlayerModel_left.count > 0))
 
                     navigationParent: root
                     navigationLeftItem: buttonrow_center
