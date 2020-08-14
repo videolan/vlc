@@ -84,14 +84,15 @@ Widgets.NavigableFocusScope {
             Layout.alignment: Qt.AlignLeft | Qt.AlignTop
             Layout.fillWidth: true
             enabled: player.playingState == PlayerController.PLAYING_STATE_PLAYING || player.playingState == PlayerController.PLAYING_STATE_PAUSED
-            Keys.onDownPressed: buttons.focus = true
+            Keys.onDownPressed: buttons_left.focus = true
 
             parentWindow: mainInterfaceRect
         }
 
-        RowLayout {
+        Item {
             Layout.fillWidth: true
             Layout.bottomMargin: VLCStyle.margin_xsmall
+            Layout.preferredHeight: Math.max(buttons_left.implicitHeight, buttons_center.implicitHeight, buttons_right.implicitHeight)
 
             PlayerButtonsLayout {
                 id: buttons_left
@@ -101,6 +102,10 @@ Widgets.NavigableFocusScope {
 
                 focus: true
 
+                anchors.left: parent.left
+
+                visible: model.count > 0 && (playerControlBarModel_center.count > 0 ? ((x+width) < buttons_center.x) : true)
+
                 navigationParent: root
                 navigationUp: function(index) {
                     if (trackPositionSlider.enabled)
@@ -109,12 +114,10 @@ Widgets.NavigableFocusScope {
                         root.navigationUp(index)
                 }
 
+                navigationRightItem: buttons_center
+
                 Keys.priority: Keys.AfterItem
                 Keys.onPressed: defaultKeyAction(event, 0)
-            }
-
-            Item {
-                Layout.fillWidth: true
             }
 
             PlayerButtonsLayout {
@@ -125,6 +128,8 @@ Widgets.NavigableFocusScope {
 
                 focus: true
 
+                anchors.horizontalCenter: parent.horizontalCenter
+
                 navigationParent: root
                 navigationUp: function(index) {
                     if (trackPositionSlider.enabled)
@@ -133,6 +138,8 @@ Widgets.NavigableFocusScope {
                         root.navigationUp(index)
                 }
 
+                navigationLeftItem: buttons_left
+                navigationRightItem: buttons_right
 
                 Keys.priority: Keys.AfterItem
                 Keys.onPressed: defaultKeyAction(event, 0)
@@ -150,6 +157,11 @@ Widgets.NavigableFocusScope {
 
                 focus: true
 
+                anchors.right: parent.right
+
+                visible: model.count > 0 && (playerControlBarModel_center.count > 0 ? ((buttons_center.x + buttons_center.width) < x)
+                                                                              : !(((buttons_left.x + buttons_left.width) > x) && playerControlBarModel_left.count > 0))
+
                 navigationParent: root
                 navigationUp: function(index) {
                     if (trackPositionSlider.enabled)
@@ -157,6 +169,8 @@ Widgets.NavigableFocusScope {
                     else
                         root.navigationUp(index)
                 }
+
+                navigationLeftItem: buttons_center
 
                 Keys.priority: Keys.AfterItem
                 Keys.onPressed: defaultKeyAction(event, 0)
