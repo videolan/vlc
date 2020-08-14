@@ -19,6 +19,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtGraphicalEffects 1.0
 import org.videolan.vlc 0.1
 import QtQml.Models 2.11
 
@@ -55,6 +56,32 @@ Widgets.NavigableFocusScope {
     function search() {
         if (searchBox.visible)
             searchBox.expanded = true
+    }
+
+    DropShadow {
+        id: primaryShadow
+
+        anchors.fill: pLBannerSources
+        source: pLBannerSources
+        horizontalOffset: 0
+        verticalOffset: VLCStyle.dp(1, VLCStyle.scale)
+        radius: VLCStyle.dp(9, VLCStyle.scale)
+        spread: 0
+        samples: ( radius * 2 ) + 1
+        color: Qt.rgba(0, 0, 0, .22)
+    }
+
+    DropShadow {
+        id: secondaryShadow
+
+        anchors.fill: pLBannerSources
+        source: pLBannerSources
+        horizontalOffset: 0
+        verticalOffset: VLCStyle.dp(0, VLCStyle.scale)
+        radius: VLCStyle.dp(2, VLCStyle.scale)
+        spread: 0
+        samples: ( radius * 2 ) + 1
+        color: Qt.rgba(0, 0, 0, .18)
     }
 
     Rectangle {
