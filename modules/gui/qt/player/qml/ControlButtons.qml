@@ -779,10 +779,13 @@ Item{
         id: artworkInfoDelegate
 
         Widgets.FocusBackground {
+            id: artworkInfoItem
             property bool paintOnly: false
 
-            implicitWidth: playingItemInfoRow.implicitWidth
+            readonly property bool isClipped: implicitWidth < playingItemInfoRow.implicitWidth
+            implicitWidth: Math.min(playingItemInfoRow.implicitWidth, VLCStyle.artworkInfoMaxWidth)
             implicitHeight: playingItemInfoRow.implicitHeight
+            clip: isClipped
 
             Keys.onPressed: {
                 if (KeyHelper.matchOk(event) ) {
@@ -795,9 +798,11 @@ Item{
             }
 
             MouseArea {
+                id: artworkInfoMouseArea
                 anchors.fill: parent
                 visible: !paintOnly
                 onClicked: history.push(["player"])
+                hoverEnabled: true
             }
 
             Row {
@@ -839,6 +844,12 @@ Item{
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
                     leftPadding: VLCStyle.margin_xsmall
+
+                    ToolTip {
+                        text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
+                        visible: artworkInfoItem.isClipped && (artworkInfoMouseArea.containsMouse || artworkInfoItem.active)
+                        delay: 500
+                    }
 
                     Widgets.MenuLabel {
                         id: titleLabel
