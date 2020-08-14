@@ -29,6 +29,8 @@ class PlayerControlBarModel : public QAbstractListModel
     Q_OBJECT
     Q_PROPERTY(QmlMainContext* mainCtx READ getMainCtx WRITE setMainCtx NOTIFY ctxChanged)
     Q_PROPERTY(QString configName READ getConfigName WRITE setConfigName NOTIFY configNameChanged)
+    Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
+
 
 public:
     explicit PlayerControlBarModel(QObject *_parent = nullptr);
@@ -104,6 +106,7 @@ public:
 signals:
     void ctxChanged(QmlMainContext*);
     void configNameChanged(QString);
+    void countChanged();
 
 protected:
     intf_thread_t       *p_intf  = nullptr;

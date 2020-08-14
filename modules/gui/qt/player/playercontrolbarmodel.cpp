@@ -74,6 +74,10 @@ static const QVector<PlayerControlBarModel::IconToolButton> MINI_TB_DEFAULT[defa
 PlayerControlBarModel::PlayerControlBarModel(QObject *_parent) : QAbstractListModel(_parent)
 {
     configName = "MainPlayerToolbar";
+
+    connect(this, &QAbstractListModel::rowsInserted, this, &PlayerControlBarModel::countChanged);
+    connect(this, &QAbstractListModel::rowsRemoved, this, &PlayerControlBarModel::countChanged);
+    connect(this, &QAbstractListModel::modelReset, this, &PlayerControlBarModel::countChanged);
 }
 
 void PlayerControlBarModel::saveConfig()
