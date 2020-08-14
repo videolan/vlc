@@ -4,6 +4,10 @@ Changes between 3.0.11.1 and 3.0.12:
 Video Output:
  * Direct3D11: Fix some potential crashes when using video filters
 
+macOS:
+ * Fixed displaying EQ bands in the UI depending on which frequency
+   presets are set for the EQ in advanced preferences
+
 Changes between 3.0.11 and 3.0.11.1:
 ----------------------------------
 
