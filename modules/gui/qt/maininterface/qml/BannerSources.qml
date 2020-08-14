@@ -124,8 +124,10 @@ Widgets.NavigableFocusScope {
                 }
             }
 
-            Item {
+            Rectangle {
                 id: localToolbar
+
+                color: VLCStyle.colors.bg
                 width: parent.width
                 height: VLCStyle.localToolbar_height
 
@@ -228,6 +230,8 @@ Widgets.NavigableFocusScope {
                         selected: model.index === subSelectedIndex
                         onClicked:  root.subItemClicked(model.index)
                         height: localMenuGroup.height
+                        color: VLCStyle.colors.bg
+                        colorSelected: VLCStyle.colors.bg
                     }
 
                     navigationParent: root
