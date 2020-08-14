@@ -35,6 +35,8 @@ Widgets.NavigableFocusScope {
     implicitWidth: buttonrow.implicitWidth
     implicitHeight: buttonrow.implicitHeight
 
+    visible: model.count > 0
+
     Keys.priority: Keys.AfterItem
     Keys.onPressed: {
         if (!event.accepted)
