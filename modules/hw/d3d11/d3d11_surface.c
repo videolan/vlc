@@ -83,7 +83,7 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
     filter_sys_t *sys = p_filter->p_sys;
     HRESULT hr;
 
-    d3d11_device_lock(sys->d3d_dev);
+    d3d11_device_lock(d3d_dev);
 
     if (D3D11_CreateProcessor(p_filter, d3d_dev, D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,
                               &p_filter->fmt_in.video, &p_filter->fmt_out.video, &sys->d3d_proc) != VLC_SUCCESS)
@@ -125,7 +125,7 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
                 msg_Err(p_filter, "Failed to create the processor output. (hr=0x%lX)", hr);
             else
             {
-                d3d11_device_unlock(sys->d3d_dev);
+                d3d11_device_unlock(d3d_dev);
                 return VLC_SUCCESS;
             }
         }
@@ -138,7 +138,7 @@ static int SetupProcessor(filter_t *p_filter, d3d11_device_t *d3d_dev,
 
 error:
     D3D11_ReleaseProcessor(&sys->d3d_proc);
-    d3d11_device_unlock(sys->d3d_dev);
+    d3d11_device_unlock(d3d_dev);
     return VLC_EGENERIC;
 }
 #endif
