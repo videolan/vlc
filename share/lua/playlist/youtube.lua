@@ -330,7 +330,7 @@ function parse()
                 -- unlikely to access it due to #24957
                 description = string.match( line, '\\"shortDescription\\":\\"(.-[^\\])\\"')
                 if description then
-                    -- FIXME: do this properly
+                    -- FIXME: do this properly (see #24958)
                     description = string.gsub( description, '\\(["\\/])', '%1' )
                     description = string.gsub( description, '\\(["\\/])', '%1' )
                     description = string.gsub( description, '\\n', '\n' )
@@ -347,7 +347,7 @@ function parse()
             if not artist then
                 artist = string.match(line, '\\"author\\":\\"(.-)\\"')
                 if artist then
-                    -- FIXME: do this properly
+                    -- FIXME: do this properly (see #24958)
                     artist = string.gsub( artist, "\\/", "/" )
                     artist = string.gsub( artist, "\\u0026", "&" )
                 end
@@ -380,7 +380,7 @@ function parse()
                 url_map = string.match( line, "\"url_encoded_fmt_stream_map\": *\"(.-)\"" )
                 if url_map then
                     vlc.msg.dbg( "Found classic parameters for youtube video stream, parsing..." )
-                    -- FIXME: do this properly
+                    -- FIXME: do this properly (see #24958)
                     url_map = string.gsub( url_map, "\\u0026", "&" )
                     path = pick_url( url_map, fmt, js_url )
                 end
@@ -390,7 +390,7 @@ function parse()
                     local stream_map = string.match( line, '\\"formats\\":%[(.-)%]' )
                     if stream_map then
                         vlc.msg.dbg( "Found new-style parameters for youtube video stream, parsing..." )
-                        -- FIXME: do this properly
+                        -- FIXME: do this properly (see #24958)
                         stream_map = string.gsub( stream_map, '\\(["\\/])', '%1' )
                         stream_map = string.gsub( stream_map, "\\u0026", "&" )
                         path = pick_stream( stream_map, js_url )
@@ -458,7 +458,7 @@ function parse()
             if stream_map then
                 vlc.msg.dbg( "Found new-style parameters for youtube video stream, parsing..." )
                 stream_map = vlc.strings.decode_uri( stream_map )
-                -- FIXME: do this properly
+                -- FIXME: do this properly (see #24958)
                 stream_map = string.gsub( stream_map, "\\u0026", "&" )
                 path = pick_stream( stream_map )
             end
@@ -483,7 +483,7 @@ function parse()
         if title then
             title = string.gsub( title, "+", " " )
             title = vlc.strings.decode_uri( title )
-            -- FIXME: do this properly
+            -- FIXME: do this properly (see #24958)
             title = string.gsub( title, "\\u0026", "&" )
         end
         -- FIXME: description gets truncated if it contains a double quote
@@ -491,7 +491,7 @@ function parse()
         if description then
             description = string.gsub( description, "+", " " )
             description = vlc.strings.decode_uri( description )
-            -- FIXME: do this properly
+            -- FIXME: do this properly (see #24958)
             description = string.gsub( description, '\\(["\\/])', '%1' )
             description = string.gsub( description, '\\n', '\n' )
             description = string.gsub( description, "\\u0026", "&" )
@@ -500,7 +500,7 @@ function parse()
         if artist then
             artist = string.gsub( artist, "+", " " )
             artist = vlc.strings.decode_uri( artist )
-            -- FIXME: do this properly
+            -- FIXME: do this properly (see #24958)
             artist = string.gsub( artist, "\\u0026", "&" )
         end
         local arturl = string.match( line, "%%22playerMicroformatRenderer%%22%%3A%%7B%%22thumbnail%%22%%3A%%7B%%22thumbnails%%22%%3A%%5B%%7B%%22url%%22%%3A%%22(.-)%%22" )
