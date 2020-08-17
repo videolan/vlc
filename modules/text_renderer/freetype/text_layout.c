@@ -1670,6 +1670,8 @@ static int LayoutRubyText( filter_t *p_filter,
                     0, i_uchars - 1,
                     false, pp_line ) )
     {
+        for( int i = 0; i < p_paragraph->i_size; ++i )
+            ReleaseGlyphBitMaps( p_filter, &p_paragraph->p_glyph_bitmaps[ i ] );
         free( pp_styles );
         FreeParagraph( p_paragraph );
         return VLC_EGENERIC;
