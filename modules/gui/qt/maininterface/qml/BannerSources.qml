@@ -177,6 +177,7 @@ Widgets.NavigableFocusScope {
                              iconText: VLCIcons.topbar_previous
                              text: i18n.qtr("Previous")
                              height: localToolbar.height
+                             colorDisabled: VLCStyle.colors.textDisabled
                              onClicked: history.previous()
                              enabled: !history.previousEmpty
                          }
