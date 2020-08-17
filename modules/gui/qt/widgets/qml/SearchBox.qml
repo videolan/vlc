@@ -28,7 +28,6 @@ Widgets.NavigableFocusScope {
     id: root
 
     width: content.width
-    height: content.height
 
     property variant contentModel
 
@@ -86,6 +85,7 @@ Widgets.NavigableFocusScope {
             size: VLCStyle.banner_icon_size
             iconText: VLCIcons.search
             text: i18n.qtr("Filter")
+            height: root.height
 
             focus: true
 
