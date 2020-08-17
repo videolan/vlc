@@ -842,6 +842,8 @@ Item{
                 }
 
                 Column {
+                    id: rightPart
+
                     anchors.verticalCenter: parent.verticalCenter
                     leftPadding: VLCStyle.margin_xsmall
 
@@ -851,14 +853,64 @@ Item{
                         delay: 500
                     }
 
-                    Widgets.MenuLabel {
-                        id: titleLabel
-                        text: mainPlaylistController.currentItem.title
+                    Item {
+                        id: titleLabelItem
+                        implicitWidth: titleLabel.width
+                        implicitHeight: titleLabel.height
+
+                        readonly property point realWidth: Qt.point(artworkInfoItem.width - playingItemInfoRow.mapFromItem(rightPart, titleLabelItem.x, titleLabelItem.y).x, 0)
+                        readonly property bool  isTextClipped: titleLabelItem.implicitWidth > realWidth.x
+
+                        Widgets.MenuLabel {
+                            id: titleLabel
+                            text: mainPlaylistController.currentItem.title
+
+                            visible: !titleLabelItem.isTextClipped
+                        }
+
+                        LinearGradient  {
+                            anchors.fill: titleLabel
+                            source: titleLabel
+                            start: Qt.point(0, 0)
+                            end: titleLabelItem.realWidth
+
+                            visible: titleLabelItem.isTextClipped
+
+                            gradient: Gradient {
+                                GradientStop { position: 0.75; color: titleLabel.color }
+                                GradientStop { position: 1.00; color: "transparent" }
+                            }
+                        }
                     }
 
-                    Widgets.MenuCaption {
-                        id: artistLabel
-                        text: mainPlaylistController.currentItem.artist
+                    Item {
+                        id: artistLabelItem
+                        implicitWidth: artistLabel.width
+                        implicitHeight:  artistLabel.height
+
+                        readonly property point realWidth: Qt.point(artworkInfoItem.width - playingItemInfoRow.mapFromItem(rightPart, artistLabelItem.x, artistLabelItem.y).x, 0)
+                        readonly property bool  isTextClipped: artistLabelItem.implicitWidth > realWidth.x
+
+                        Widgets.MenuCaption {
+                            id: artistLabel
+                            text: mainPlaylistController.currentItem.artist
+
+                            visible: !artistLabelItem.isTextClipped
+                        }
+
+                        LinearGradient  {
+                            anchors.fill: artistLabel
+                            source: artistLabel
+                            start: Qt.point(0, 0)
+                            end: artistLabelItem.realWidth
+
+                            visible: artistLabelItem.isTextClipped
+
+                            gradient: Gradient {
+                                GradientStop { position: 0.75; color: titleLabel.color }
+                                GradientStop { position: 1.00; color: "transparent" }
+                            }
+                        }
                     }
 
                     Widgets.MenuCaption {
