@@ -173,6 +173,7 @@ typedef struct vout_thread_sys_t
     struct {
         vlc_mutex_t     lock;
         bool            changed;
+        bool            new_interlaced;
         char            *new_filters;
         char            *configuration;
         video_format_t    src_fmt;
@@ -795,7 +796,9 @@ void vout_ControlChangeInterlacing(vout_thread_t *vout, bool set)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
-    vout_control_PushBool(&sys->control, VOUT_CONTROL_CHANGE_INTERLACE, set);
+    vlc_mutex_lock(&sys->filter.lock);
+    sys->filter.new_interlaced = set;
+    vlc_mutex_unlock(&sys->filter.lock);
 }
 
 void vout_ControlChangeSubSources(vout_thread_t *vout, const char *filters)
@@ -1493,9 +1496,10 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     assert(sys->clock);
 
     vlc_mutex_lock(&sys->filter.lock);
-    if (sys->filter.changed)
+    if (sys->filter.changed ||
+        sys->private.interlacing.has_deint != sys->filter.new_interlaced)
     {
-        ThreadChangeFilters(vout, sys->filter.new_filters, NULL, true);
+        ThreadChangeFilters(vout, sys->filter.new_filters, &sys->filter.new_interlaced, true);
     }
     vlc_mutex_unlock(&sys->filter.lock);
 
@@ -1907,9 +1911,6 @@ static void *Thread(void *object)
             switch(cmd.type) {
                 case VOUT_CONTROL_TERMINATE:
                     return NULL; /* no need to clean &cmd */
-                case VOUT_CONTROL_CHANGE_INTERLACE:
-                    ThreadChangeFilters(vout, NULL, &cmd.boolean, false);
-                    break;
                 case VOUT_CONTROL_MOUSE_STATE:
                     ThreadProcessMouseState(vout, &cmd.mouse);
                     break;

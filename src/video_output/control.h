@@ -28,7 +28,6 @@
 /* */
 enum {
     VOUT_CONTROL_TERMINATE,
-    VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
 
     VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
 };
