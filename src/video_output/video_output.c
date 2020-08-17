@@ -172,6 +172,8 @@ typedef struct vout_thread_sys_t
     /* Video filter2 chain */
     struct {
         vlc_mutex_t     lock;
+        bool            changed;
+        char            *new_filters;
         char            *configuration;
         video_format_t    src_fmt;
         vlc_video_context *src_vctx;
@@ -771,8 +773,22 @@ void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
-    vout_control_PushString(&sys->control, VOUT_CONTROL_CHANGE_FILTERS,
-                            filters);
+    vlc_mutex_lock(&sys->filter.lock);
+    if (sys->filter.new_filters)
+    {
+        if (filters == NULL || strcmp(sys->filter.new_filters, filters))
+        {
+            free(sys->filter.new_filters);
+            sys->filter.new_filters = filters ? strdup(filters) : NULL;
+            sys->filter.changed = true;
+        }
+    }
+    else if (filters != NULL)
+    {
+        sys->filter.new_filters = strdup(filters);
+        sys->filter.changed = true;
+    }
+    vlc_mutex_unlock(&sys->filter.lock);
 }
 
 void vout_ControlChangeInterlacing(vout_thread_t *vout, bool set)
@@ -1058,6 +1074,8 @@ static void ThreadChangeFilters(vout_thread_sys_t *vout,
         free(sys->filter.configuration);
         sys->filter.configuration = filters ? strdup(filters) : NULL;
     }
+
+    sys->filter.changed = false;
 
     if (!is_locked)
         vlc_mutex_unlock(&sys->filter.lock);
@@ -1473,6 +1491,13 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     bool first = !sys->displayed.current;
 
     assert(sys->clock);
+
+    vlc_mutex_lock(&sys->filter.lock);
+    if (sys->filter.changed)
+    {
+        ThreadChangeFilters(vout, sys->filter.new_filters, NULL, true);
+    }
+    vlc_mutex_unlock(&sys->filter.lock);
 
     if (first)
         if (ThreadDisplayPreparePicture(vout, true, frame_by_frame, &paused)) /* FIXME not sure it is ok */
