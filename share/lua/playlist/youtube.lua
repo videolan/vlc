@@ -314,9 +314,11 @@ function parse()
         -- fmt is the format of the video
         -- (cf. http://en.wikipedia.org/wiki/YouTube#Quality_and_formats)
         fmt = get_url_param( vlc.path, "fmt" )
+        local lastline
         while true do
             local line = vlc.readline()
             if not line then break end
+            lastline = line
 
             -- Try to find the video's title
             if string.match( line, "<meta property=\"og:title\"" ) then
@@ -409,6 +411,10 @@ function parse()
             end
         end
 
+        if not path and lastline and string.match( lastline, '<div id="player%-api">' ) then
+            vlc.msg.err( "YouTube web page truncated at very long line, please check https://trac.videolan.org/vlc/ticket/24957 for updates to this issue" )
+        end
+
         if not path then
             local video_id = get_url_param( vlc.path, "v" )
             if video_id then
@@ -434,6 +440,10 @@ function parse()
 
     elseif string.match( vlc.path, "/get_video_info%?" ) then -- video info API
         local line = vlc.readline() -- data is on one line only
+        if not line then
+            vlc.msg.err( "YouTube API output missing: probably rejected as very long line, please check https://trac.videolan.org/vlc/ticket/24957 for updates to this issue" )
+            return { }
+        end
 
         -- Classic parameters - out of use since early 2020
         local fmt = get_url_param( vlc.path, "fmt" )
