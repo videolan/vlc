@@ -1667,7 +1667,7 @@ static int LayoutRubyText( filter_t *p_filter,
     }
 
     if( LayoutLine( p_filter, p_paragraph,
-                    0, i_uchars - 1,
+                    0, p_paragraph->i_size - 1,
                     false, pp_line ) )
     {
         for( int i = 0; i < p_paragraph->i_size; ++i )
