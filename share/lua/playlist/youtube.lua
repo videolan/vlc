@@ -315,9 +315,10 @@ function parse()
         -- (cf. http://en.wikipedia.org/wiki/YouTube#Quality_and_formats)
         fmt = get_url_param( vlc.path, "fmt" )
         while true do
-            -- Try to find the video's title
-            line = vlc.readline()
+            local line = vlc.readline()
             if not line then break end
+
+            -- Try to find the video's title
             if string.match( line, "<meta property=\"og:title\"" ) then
                 _,_,name = string.find( line, "content=\"(.-)\"" )
                 name = vlc.strings.resolve_xml_special_chars( name )
@@ -337,7 +338,6 @@ function parse()
                     description = string.gsub( description, "\\u0026", "&" )
                 end
             end
-
 
             if string.match( line, "<meta property=\"og:image\"" ) then
                 _,_,arturl = string.find( line, "content=\"(.-)\"" )
