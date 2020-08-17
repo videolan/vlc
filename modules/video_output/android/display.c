@@ -186,10 +186,9 @@ static picture_t *PictureAlloc(video_format_t *fmt)
         return NULL;
 
     picture_resource_t rsc = {
-        .p_sys = p_picsys
+        .p_sys = p_picsys,
+        .pf_destroy = AndroidPicture_Destroy,
     };
-
-    rsc.pf_destroy = AndroidPicture_Destroy;
 
     p_pic = picture_NewFromResource(fmt, &rsc);
     if (!p_pic)
