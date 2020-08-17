@@ -273,7 +273,7 @@ function pick_stream( stream_map, js_url )
     -- Either the "url" or the "signatureCipher" parameter is present,
     -- depending on whether the URL signature is scrambled.
     local cipher = string.match( pick, '"signatureCipher":"(.-)"' )
-        or string.match( pick, '"%a*[Cc]ipher":"(.-)"' )
+        or string.match( pick, '"[a-zA-Z]*[Cc]ipher":"(.-)"' )
     if cipher then
         -- Scrambled signature: some assembly required
         local url = stream_url( cipher, js_url )
