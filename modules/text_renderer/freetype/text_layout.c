@@ -198,7 +198,8 @@ line_desc_t *NewLine( int i_count )
     p_line->p_next = NULL;
     p_line->i_width = 0;
     p_line->i_height = 0;
-    p_line->i_base_line = 0;
+    p_line->origin.x = 0;
+    p_line->origin.y = 0;
     p_line->i_character_count = 0;
     p_line->i_first_visible_char_index = -1;
     p_line->i_last_visible_char_index = -2;
@@ -214,20 +215,8 @@ line_desc_t *NewLine( int i_count )
     return p_line;
 }
 
-static void ShiftGlyph( FT_BitmapGlyph g, int x, int y )
-{
-    if( g )
-    {
-        g->left += x;
-        g->top += y;
-    }
-}
-
 static void ShiftChar( line_character_t *c, int x, int y )
 {
-    ShiftGlyph( c->p_glyph, x, y );
-    ShiftGlyph( c->p_shadow, x, y );
-    ShiftGlyph( c->p_outline, x, y );
     c->bbox.yMin += y;
     c->bbox.yMax += y;
     c->bbox.xMin += x;
@@ -238,7 +227,8 @@ static void ShiftLine( line_desc_t *p_line, int x, int y )
 {
     for( int i=0; i<p_line->i_character_count; i++ )
         ShiftChar( &p_line->p_character[i], x, y );
-    p_line->i_base_line += y;
+    p_line->origin.y += y;
+    p_line->origin.x += x;
     p_line->bbox.yMin += y;
     p_line->bbox.yMax += y;
     p_line->bbox.xMin += x;
@@ -1790,7 +1780,7 @@ int LayoutTextBlock( filter_t *p_filter,
 
     for( line_desc_t *p_line = p_first_line; p_line; p_line = p_line->p_next )
     {
-        p_line->i_base_line = i_base_line;
+        p_line->origin.y = i_base_line;
         p_line->bbox.yMin -= i_base_line;
         p_line->bbox.yMax -= i_base_line;
         BBoxEnlarge( &bbox, &p_line->bbox );

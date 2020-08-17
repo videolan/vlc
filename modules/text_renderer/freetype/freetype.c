@@ -439,7 +439,7 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
             const line_character_t *ch = &p_line->p_character[i];
             FT_BitmapGlyph p_glyph = ch->p_glyph;
 
-            int i_glyph_y = offset.y + p_regionbbox->yMax - p_glyph->top + p_line->i_base_line;
+            int i_glyph_y = offset.y + p_regionbbox->yMax - p_glyph->top + p_line->origin.y;
             int i_glyph_x = offset.x + p_glyph->left - p_regionbbox->xMin;
 
             for( y = 0; y < p_glyph->bitmap.rows; y++ )
@@ -810,12 +810,14 @@ static void RenderCharAXYZ( filter_t *p_filter,
             break;
         }
 
-        if(ch->p_ruby && ch->p_ruby->p_laid)
+        const line_desc_t *p_rubydesc = ch->p_ruby ? ch->p_ruby->p_laid : NULL;
+        if(p_rubydesc)
         {
             RenderCharAXYZ( p_filter,
                             p_picture,
-                            ch->p_ruby->p_laid,
-                            i_offset_x, i_offset_y,
+                            p_rubydesc,
+                            i_offset_x + p_rubydesc->origin.x,
+                            i_offset_y - p_rubydesc->origin.y,
                             2,
                             ExtractComponents,
                             BlendPixel );
@@ -843,7 +845,7 @@ static void RenderCharAXYZ( filter_t *p_filter,
         /* underline/strikethrough are only rendered for the normal glyph */
         if( g == 2 && ch->i_line_thickness > 0 )
             BlendAXYZLine( p_picture,
-                           i_glyph_x, i_glyph_y + p_glyph->top,
+                           i_glyph_x, i_glyph_y + ch->bbox.yMax,
                            i_a, i_x, i_y, i_z,
                            &ch[0],
                            i + 1 < p_line->i_character_count ? &ch[1] : NULL,
@@ -914,7 +916,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
         {
             FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->i_text_align );
 
-            int i_glyph_offset_y = offset.y + p_regionbbox->yMax + p_line->i_base_line;
+            int i_glyph_offset_y = offset.y + p_regionbbox->yMax + p_line->origin.y;
             int i_glyph_offset_x = offset.x - p_regionbbox->xMin;
 
             RenderCharAXYZ( p_filter, p_picture, p_line,
