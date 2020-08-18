@@ -40,17 +40,18 @@
 #include "aout_internal.h"
 #include "../video_output/vout_internal.h" /* for vout_Request */
 
-static filter_t *CreateFilter(vlc_object_t *obj, vlc_clock_t *clock,
-                              const char *type, const char *name,
-                              const audio_sample_format_t *infmt,
-                              const audio_sample_format_t *outfmt,
-                              config_chain_t *cfg, bool const_fmt)
+filter_t *aout_filter_Create(vlc_object_t *obj, const filter_owner_t *restrict owner,
+                             const char *type, const char *name,
+                             const audio_sample_format_t *infmt,
+                             const audio_sample_format_t *outfmt,
+                             config_chain_t *cfg, bool const_fmt)
 {
     filter_t *filter = vlc_custom_create (obj, sizeof (*filter), type);
     if (unlikely(filter == NULL))
         return NULL;
 
-    filter->owner.sys = clock;
+    if (owner != NULL)
+        filter->owner = *owner;
     filter->p_cfg = cfg;
     filter->fmt_in.audio = *infmt;
     filter->fmt_in.i_codec = infmt->i_format;
@@ -91,8 +92,8 @@ static filter_t *FindConverter (vlc_object_t *obj,
                                 const audio_sample_format_t *infmt,
                                 const audio_sample_format_t *outfmt)
 {
-    return CreateFilter(obj, NULL, "audio converter", NULL, infmt, outfmt,
-                        NULL, true);
+    return aout_filter_Create(obj, NULL, "audio converter", NULL, infmt, outfmt,
+                              NULL, true);
 }
 
 static filter_t *FindResampler (vlc_object_t *obj,
@@ -100,8 +101,8 @@ static filter_t *FindResampler (vlc_object_t *obj,
                                 const audio_sample_format_t *outfmt)
 {
     char *modlist = var_InheritString(obj, "audio-resampler");
-    filter_t *filter = CreateFilter(obj, NULL, "audio resampler", modlist,
-                                    infmt, outfmt, NULL, true);
+    filter_t *filter = aout_filter_Create(obj, NULL, "audio resampler", modlist,
+                                          infmt, outfmt, NULL, true);
     free(modlist);
     return filter;
 }
@@ -206,8 +207,8 @@ static int aout_FiltersPipelineCreate(vlc_object_t *obj, filter_t **filters,
         config_chain_t *cfg = NULL;
         if (headphones)
             config_ChainParseOptions(&cfg, "{headphones=true}");
-        filter_t *f = CreateFilter(obj, NULL, filter_type, NULL,
-                                   &input, &output, cfg, true);
+        filter_t *f = aout_filter_Create(obj, NULL, filter_type, NULL,
+                                         &input, &output, cfg, true);
         if (cfg)
             config_ChainDestroy(cfg);
 
@@ -415,8 +416,9 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
         return -1;
     }
 
-    filter_t *filter = CreateFilter(obj, filters->clock, type, name,
-                                    infmt, outfmt, cfg, false);
+    const filter_owner_t owner = { .sys = filters->clock };
+    filter_t *filter = aout_filter_Create(obj, &owner, type, name,
+                                          infmt, outfmt, cfg, false);
     if (filter == NULL)
     {
         msg_Err (obj, "cannot add user %s \"%s\" (skipped)", type, name);
