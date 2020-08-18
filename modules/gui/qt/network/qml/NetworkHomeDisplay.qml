@@ -67,9 +67,9 @@ Widgets.NavigableFocusScope {
 
             spacing: VLCStyle.margin_normal
 
-            Widgets.LabelSeparator {
+            Widgets.SubtitleLabel {
                 id: deviceLabel
-                text: i18n.qtr("Devices")
+                text: i18n.qtr("My Machine")
                 width: flickable.width
                 visible: deviceSection.model.count !== 0
             }
@@ -92,9 +92,9 @@ Widgets.NavigableFocusScope {
                 }
             }
 
-            Widgets.LabelSeparator {
+            Widgets.SubtitleLabel {
                 id: lanLabel
-                text: i18n.qtr("LAN")
+                text: i18n.qtr("My LAN")
                 width: flickable.width
                 visible: lanSection.model.count !== 0
             }
