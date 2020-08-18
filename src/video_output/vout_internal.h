@@ -47,7 +47,6 @@ typedef struct {
     vlc_mouse_event      mouse_event;
     void                 *mouse_opaque;
 } vout_configuration_t;
-#include "control.h"
 
 /**
  * Creates a video output.
