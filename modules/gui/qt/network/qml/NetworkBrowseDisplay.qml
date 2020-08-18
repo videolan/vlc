@@ -171,6 +171,7 @@ Widgets.NavigableFocusScope {
                 id: delegateGrid
 
                 property var model: ({})
+                property int index: -1
 
                 subtitle: ""
 
