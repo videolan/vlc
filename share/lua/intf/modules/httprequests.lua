@@ -405,11 +405,10 @@ getbrowsetable = function ()
 
         for _,f in pairs(d) do
             if f == ".." or not string.match(f,"^%.") then
-                local df = common.realpath(dir..f)
-                local s = vlc.net.stat(df)
-                local path, name =  df, f
+                local path = common.realpath(dir..f)
                 local element={}
 
+                local s = vlc.net.stat(path)
                 if (s) then
                     for k,v in pairs(s) do
                         element[k]=v
@@ -418,15 +417,9 @@ getbrowsetable = function ()
                     element["type"]="unknown"
                 end
                 element["path"]=path
-                element["name"]=name
+                element["name"]=f
 
-                local uri=vlc.strings.make_uri(df)
-                --windows paths are returned with / separators, but make_uri expects \ for windows and returns nil
-                if not uri then
-                    --convert failed path to windows format and try again
-                    path=string.gsub(path,"/","\\")
-                    uri=vlc.strings.make_uri(df)
-                end
+                local uri=vlc.strings.make_uri(path)
                 element["uri"]=uri
 
                 table.insert(result.element._array,element)
