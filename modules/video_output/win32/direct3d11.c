@@ -666,9 +666,8 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev->d3dcontext,
                                                       sys->prepareWait, NULL, 0, 0))
         {
-            const vlc_tick_t render_wait = VLC_TICK_FROM_MS(2);
             d3d11_device_unlock( sys->d3d_dev );
-            vlc_tick_sleep(render_wait);
+            SleepEx(2, TRUE);
             d3d11_device_lock( sys->d3d_dev );
         }
     }
