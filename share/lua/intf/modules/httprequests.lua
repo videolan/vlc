@@ -380,6 +380,12 @@ getbrowsetable = function ()
     local d = vlc.net.opendir(dir)
     table.sort(d)
 
+    --FIXME: this is the wrong place to do this, but this still offers
+    --some useful mitigation: see #25021
+    if #d == 0 and dir ~= "" then
+        table.insert(d, "..")
+    end
+
     for _,f in pairs(d) do
         if f == ".." or not string.match(f,"^%.") then
             local path = dir..f
