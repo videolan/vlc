@@ -1465,6 +1465,12 @@ static void Destroy( vlc_object_t *p_this )
         DumpFamilies( p_sys->fs );
 #endif
 
+    if( p_sys->ftcache )
+        vlc_ftcache_Delete( p_sys->ftcache );
+
+    if( p_sys->fs )
+        FontSelectDelete( p_sys->fs );
+
     free( p_sys->psz_fontfile );
     free( p_sys->psz_monofontfile );
 
@@ -1481,15 +1487,9 @@ static void Destroy( vlc_object_t *p_this )
         free( p_sys->pp_font_attachments );
     }
 
-    if(p_sys->fs)
-        FontSelectDelete( p_sys->fs );
-
     /* Freetype */
     if( p_sys->p_stroker )
         FT_Stroker_Done( p_sys->p_stroker );
-
-    if( p_sys->ftcache )
-        vlc_ftcache_Delete( p_sys->ftcache );
 
     FT_Done_FreeType( p_sys->p_library );
 
