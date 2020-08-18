@@ -71,9 +71,10 @@ Widgets.NavigableFocusScope {
 
         currentIndex: root._currentIndex
 
-        implicitHeight: VLCStyle.gridItem_network_height
+        implicitHeight: VLCStyle.gridItem_network_height + VLCStyle.margin_xlarge
         orientation: ListView.Horizontal
         anchors.fill: parent
+        spacing: VLCStyle.column_margin_width
 
         header: Item {
             width: root.leftPadding
@@ -82,6 +83,8 @@ Widgets.NavigableFocusScope {
         model: deviceModel
         delegate: NetworkGridItem {
             focus: true
+            x: selectedBorderWidth
+            y: selectedBorderWidth
 
             onItemClicked : {
                 deviceSelection.updateSelection( modifier ,  deviceSelection.currentIndex, index)
