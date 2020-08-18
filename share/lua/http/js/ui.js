@@ -100,7 +100,7 @@ $(function () {
         {
              return true;
         }
-        var urlimg = location.href + 'mobile.html';
+        var urlimg = $('#mobileintflink').prop('href');
         var codeimg = $('<img width="350" height="350" alt="qrcode"/>');
         codeimg.attr('src', 'https://chart.apis.google.com/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=' + encodeURIComponent(urlimg));
         codeimg.dialog({width: 350, height: 350, title: 'QR-Code'});
