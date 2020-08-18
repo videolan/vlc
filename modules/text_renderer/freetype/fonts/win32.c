@@ -424,7 +424,7 @@ const vlc_family_t *Win32_GetFamily( vlc_font_select_t *fs, const char *psz_fami
     HDC hDC = GetDC( NULL );
     struct enumFontCallbackContext ctx;
     ctx.fs = fs;
-    ctx.p_family = NULL;
+    ctx.p_family = p_family;
     EnumFontFamiliesEx(hDC, &lf, (FONTENUMPROC)&EnumFontCallback, (LPARAM)&ctx, 0);
     ReleaseDC(NULL, hDC);
 
