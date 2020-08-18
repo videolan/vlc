@@ -1914,11 +1914,13 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     assert(sys->private.display_pool == NULL);
 
     if (sys->mouse_event)
+    {
         sys->mouse_event(NULL, sys->mouse_opaque);
+        sys->mouse_event = NULL;
+    }
 
     if (sys->spu)
         spu_Detach(sys->spu);
-    sys->mouse_event = NULL;
     sys->clock = NULL;
     video_format_Clean(&sys->original);
 }
