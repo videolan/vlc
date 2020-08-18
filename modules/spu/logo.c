@@ -515,6 +515,7 @@ exit:
 static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
                   const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
 {
+    VLC_UNUSED( p_mouse );
     filter_sys_t *p_sys = p_filter->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );
@@ -556,7 +557,6 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
     }
     vlc_mutex_unlock( &p_sys->lock );
 
-    *p_mouse = *p_new;
     return VLC_SUCCESS;
 }
 

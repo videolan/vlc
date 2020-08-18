@@ -225,6 +225,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
 static int freeze_mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
                   const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
 {
+    VLC_UNUSED(p_mouse);
     filter_sys_t *p_sys = p_filter->p_sys;
     const video_format_t  *p_fmt_in = &p_filter->fmt_in.video;
 
@@ -235,7 +236,6 @@ static int freeze_mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
 
     if ( unlikely(!p_sys->b_init) )
     {
-        *p_mouse = *p_new;
         return VLC_SUCCESS;
     }
 

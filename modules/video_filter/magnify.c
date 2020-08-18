@@ -415,7 +415,6 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse, const vlc_mouse_t *p
         return VLC_EGENERIC;
 
     /* */
-    *p_mouse = *p_new;
     p_mouse->i_x = p_sys->i_x + p_new->i_x * ZOOM_FACTOR / p_sys->i_zoom;
     p_mouse->i_y = p_sys->i_y + p_new->i_y * ZOOM_FACTOR / p_sys->i_zoom;
     return VLC_SUCCESS;

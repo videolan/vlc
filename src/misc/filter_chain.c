@@ -517,7 +517,7 @@ int filter_chain_MouseFilter( filter_chain_t *p_chain, vlc_mouse_t *p_dst, const
         if( p_filter->pf_video_mouse && p_mouse )
         {
             vlc_mouse_t old = *p_mouse;
-            vlc_mouse_t filtered;
+            vlc_mouse_t filtered = current;
 
             *p_mouse = current;
             if( p_filter->pf_video_mouse( p_filter, &filtered, &old, &current ) )
