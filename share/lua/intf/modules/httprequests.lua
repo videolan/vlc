@@ -339,63 +339,69 @@ end
 
 getbrowsetable = function ()
 
-    local dir = nil
-    local uri = _GET["uri"]
+    --paths are returned as an array of elements
+    local result = { element = { _array = {} } }
+
+    local dir
     --uri takes precedence, but fall back to dir
-    if uri then
-        if uri == "file://~" then
-            dir = uri
+    if _GET["uri"] then
+        if _GET["uri"] == "file://~" then
+            dir = "~"
         else
-            dir = vlc.strings.make_path(uri)
+            local uri = string.gsub(_GET["uri"], "[?#].*$", "")
+            if not string.match(uri, "/$") then
+                uri = uri.."/"
+            end
+            dir = vlc.strings.make_path(common.realpath(uri))
         end
     else
         dir = _GET["dir"]
-    end
 
-    --backwards compatibility with old format driveLetter:\\..
-    --this is forgiving with the slash type and number
-    if dir then
-        local position=string.find(dir, '%a:[\\/]*%.%.',0)
-        if position==1 then dir="" end
-    end
-
-    local result={}
-    --paths are returned as an array of elements
-    result.element={}
-    result.element._array={}
-
-    if dir then
-        if dir == "~" or dir == "file://~" then dir = vlc.config.homedir() end
-        -- FIXME: hack for Win32 drive list
-        if dir~="" then
-            dir = common.realpath(dir.."/")
+        -- "" dir means listing all drive letters e.g. "A:\", "C:\"...
+        --however the opendir() API won't resolve "X:\.." to that behavior,
+        --so we offer this resolution as "backwards compatibility"
+        if string.match(dir, '^[a-zA-Z]:[\\/]*%.%.$') or
+           string.match(dir, '^[a-zA-Z]:[\\/]*%.%.[\\/]') then
+            dir = ""
         end
 
-        local d = vlc.net.opendir(dir)
-        table.sort(d)
+        if dir ~= "" and dir ~= "~" then
+            dir = dir.."/" --luckily Windows accepts '/' as '\'
+        end
+    end
+    if not dir then
+        return result
+    end
 
-        for _,f in pairs(d) do
-            if f == ".." or not string.match(f,"^%.") then
-                local path = common.realpath(dir..f)
-                local element={}
+    if dir == "~" then
+        dir = vlc.config.homedir().."/"
+    end
 
-                local s = vlc.net.stat(path)
-                if (s) then
-                    for k,v in pairs(s) do
-                        element[k]=v
-                    end
-                else
-                    element["type"]="unknown"
+    local d = vlc.net.opendir(dir)
+    table.sort(d)
+
+    for _,f in pairs(d) do
+        if f == ".." or not string.match(f,"^%.") then
+            local path = dir..f
+            local element={}
+
+            local s = vlc.net.stat(path)
+            if (s) then
+                for k,v in pairs(s) do
+                    element[k]=v
                 end
-                element["path"]=path
-                element["name"]=f
+            else
+                element["type"]="unknown"
+            end
+            element["path"]=path
+            element["name"]=f
 
-                local uri=vlc.strings.make_uri(path)
-                element["uri"]=uri
-
-                table.insert(result.element._array,element)
+            local uri=vlc.strings.make_uri(path)
+            if uri then
+                element["uri"]=common.realpath(uri)
             end
 
+            table.insert(result.element._array,element)
         end
     end
 
