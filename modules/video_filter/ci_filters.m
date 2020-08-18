@@ -433,10 +433,9 @@ error:
 }
 
 static int
-Mouse(filter_t *filter, struct vlc_mouse_t *mouse,
-      const struct vlc_mouse_t *old, const struct vlc_mouse_t *new)
+Mouse(filter_t *filter, struct vlc_mouse_t *new,
+      const struct vlc_mouse_t *old)
 {
-    VLC_UNUSED(mouse);
     filter_sys_t *sys = filter->p_sys;
     sys->old_mouse = *old;
     sys->mouse = *new;

@@ -59,7 +59,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static picture_t *Filter( filter_t *, picture_t * );
-static int Mouse( filter_t *, vlc_mouse_t *, const vlc_mouse_t *, const vlc_mouse_t * );
+static int Mouse( filter_t *, vlc_mouse_t *, const vlc_mouse_t * );
 
 /* */
 static void DrawZoomStatus( uint8_t *, int i_pitch, int i_width, int i_height,
@@ -327,7 +327,7 @@ static void DrawRectangle( uint8_t *pb_dst, int i_pitch, int i_width, int i_heig
     memset( &pb_dst[(y+i_h-1) * i_pitch + x], 0xff, i_w );
 }
 
-static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse, const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+static int Mouse( filter_t *p_filter, vlc_mouse_t *p_new, const vlc_mouse_t *p_old )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     const video_format_t *p_fmt = &p_filter->fmt_in.video;
@@ -415,8 +415,8 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse, const vlc_mouse_t *p
         return VLC_EGENERIC;
 
     /* */
-    p_mouse->i_x = p_sys->i_x + p_new->i_x * ZOOM_FACTOR / p_sys->i_zoom;
-    p_mouse->i_y = p_sys->i_y + p_new->i_y * ZOOM_FACTOR / p_sys->i_zoom;
+    p_new->i_x = p_sys->i_x + p_new->i_x * ZOOM_FACTOR / p_sys->i_zoom;
+    p_new->i_y = p_sys->i_y + p_new->i_y * ZOOM_FACTOR / p_sys->i_zoom;
     return VLC_SUCCESS;
 }
 

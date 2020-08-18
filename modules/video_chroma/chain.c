@@ -362,11 +362,10 @@ static int BuildChromaChain( filter_t *p_filter )
 }
 
 static int ChainMouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
-                       const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+                       const vlc_mouse_t *p_old )
 {
-    (void) p_old;
     filter_sys_t *p_sys = p_filter->p_sys;
-    return filter_chain_MouseFilter( p_sys->p_chain, p_mouse, p_new );
+    return filter_chain_MouseFilter( p_sys->p_chain, p_mouse, p_old );
 }
 
 static int BuildFilterChain( filter_t *p_filter )

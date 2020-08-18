@@ -149,8 +149,7 @@ struct filter_t
          * If NULL, the mouse state is considered unchanged and will be
          * propagated. */
         int (*pf_video_mouse)( filter_t *, struct vlc_mouse_t *,
-                               const struct vlc_mouse_t *p_old,
-                               const struct vlc_mouse_t *p_new );
+                               const struct vlc_mouse_t *p_old);
     };
 
     /** Private structure for the owner of the filter */

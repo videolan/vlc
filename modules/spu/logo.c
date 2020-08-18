@@ -189,7 +189,7 @@ static int OpenCommon( vlc_object_t *, bool b_sub );
 static subpicture_t *FilterSub( filter_t *, vlc_tick_t );
 static picture_t    *FilterVideo( filter_t *, picture_t * );
 
-static int Mouse( filter_t *, vlc_mouse_t *, const vlc_mouse_t *, const vlc_mouse_t * );
+static int Mouse( filter_t *, vlc_mouse_t *, const vlc_mouse_t * );
 
 static int LogoCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
@@ -512,10 +512,9 @@ exit:
     return p_dst;
 }
 
-static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
-                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+static int Mouse( filter_t *p_filter, vlc_mouse_t *p_new,
+                  const vlc_mouse_t *p_old )
 {
-    VLC_UNUSED( p_mouse );
     filter_sys_t *p_sys = p_filter->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );

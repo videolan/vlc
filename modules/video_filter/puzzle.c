@@ -624,10 +624,9 @@ int puzzle_Callback( vlc_object_t *p_this, char const *psz_var,
 }
 
 /* mouse callback */
-int puzzle_mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
-                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+int puzzle_mouse( filter_t *p_filter, vlc_mouse_t *p_new,
+                  const vlc_mouse_t *p_old )
 {
-    VLC_UNUSED(p_mouse);
     filter_sys_t *p_sys = p_filter->p_sys;
     const video_format_t  *p_fmt_in = &p_filter->fmt_in.video;
 

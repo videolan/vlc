@@ -289,10 +289,9 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
 }
 
 static int Mouse(filter_t *filter, vlc_mouse_t *mouse,
-                 const vlc_mouse_t *mold, const vlc_mouse_t *mnew)
+                 const vlc_mouse_t *mold)
 {
     VLC_UNUSED( mold );
-    VLC_UNUSED( mnew );
 
     const video_format_t *fmt = &filter->fmt_out.video;
     const filter_sys_t   *sys = filter->p_sys;
