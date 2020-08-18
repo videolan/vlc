@@ -72,6 +72,7 @@ Widgets.NavigableFocusScope {
                 text: i18n.qtr("My Machine")
                 width: flickable.width
                 visible: deviceSection.model.count !== 0
+                leftPadding: VLCStyle.margin_xlarge
             }
 
             NetworkHomeDeviceListView {
@@ -97,6 +98,8 @@ Widgets.NavigableFocusScope {
                 text: i18n.qtr("My LAN")
                 width: flickable.width
                 visible: lanSection.model.count !== 0
+                leftPadding: VLCStyle.margin_xlarge
+                topPadding: deviceLabel.visible ? VLCStyle.margin_small : 0
             }
 
             NetworkHomeDeviceListView {

@@ -33,6 +33,7 @@ Widgets.NavigableFocusScope {
     property alias ctx: deviceModel.ctx
     property alias sd_source: deviceModel.sd_source
     property alias model: deviceModel
+    property int leftPadding: VLCStyle.margin_xlarge
 
     property int _currentIndex: -1
     on_CurrentIndexChanged: {
@@ -73,6 +74,10 @@ Widgets.NavigableFocusScope {
         implicitHeight: VLCStyle.gridItem_network_height
         orientation: ListView.Horizontal
         anchors.fill: parent
+
+        header: Item {
+            width: root.leftPadding
+        }
 
         model: deviceModel
         delegate: NetworkGridItem {
