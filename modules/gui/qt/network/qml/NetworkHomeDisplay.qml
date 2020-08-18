@@ -65,7 +65,8 @@ Widgets.NavigableFocusScope {
             width: parent.width
             height: implicitHeight
 
-            spacing: VLCStyle.margin_normal
+            topPadding: VLCStyle.margin_large
+            spacing: VLCStyle.margin_small
 
             Widgets.SubtitleLabel {
                 id: deviceLabel
