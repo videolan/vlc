@@ -43,7 +43,8 @@ static void StreamDelete(stream_t *s)
     struct vlc_stream_filter_private *priv = vlc_stream_Private(s);
 
     module_unneed(s, priv->module);
-    vlc_stream_Delete(s->s);
+    if( s->s != NULL )
+        vlc_stream_Delete(s->s);
     free(s->psz_filepath);
 }
 
