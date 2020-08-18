@@ -63,7 +63,7 @@ NavigableFocusScope {
     property alias tableHeaderItem: view.headerItem
     property color headerColor
 
-    property alias selectionModel: selectionModel
+    property var selectionDelegateModel
     property real rowHeight: VLCStyle.fontHeight_normal + VLCStyle.margin_large
     readonly property real availableRowWidth: width - ( VLCStyle.table_section_width * 2 )
     property alias spacing: view.spacing
@@ -81,13 +81,6 @@ NavigableFocusScope {
     function positionViewAtIndex(index, mode) {
         view.positionViewAtIndex(index, mode)
     }
-
-    Util.SelectableDelegateModel {
-        id: selectionModel
-
-        model: root.model
-    }
-
 
     KeyNavigableListView {
         id: view
@@ -188,7 +181,7 @@ NavigableFocusScope {
             id: lineView
 
             property var rowModel: model
-            property bool selected: selectionModel.isSelected(root.model.index(index, 0))
+            property bool selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
             property alias showSeparator: separator.visible
             readonly property bool highlighted: selected || hoverArea.containsMouse || activeFocus
 
@@ -204,8 +197,8 @@ NavigableFocusScope {
             }
 
             Connections {
-                target: selectionModel
-                onSelectionChanged: lineView.selected = selectionModel.isSelected(root.model.index(index, 0))
+                target: selectionDelegateModel
+                onSelectionChanged: lineView.selected = selectionDelegateModel.isSelected(root.model.index(index, 0))
             }
 
             MouseArea {
@@ -216,7 +209,7 @@ NavigableFocusScope {
                 acceptedButtons: Qt.RightButton | Qt.LeftButton
 
                 onClicked: {
-                    selectionModel.updateSelection( mouse.modifiers , view.currentIndex, index)
+                    selectionDelegateModel.updateSelection( mouse.modifiers , view.currentIndex, index)
                     view.currentIndex = rowModel.index
                     lineView.forceActiveFocus()
 
@@ -226,7 +219,7 @@ NavigableFocusScope {
                 }
 
                 onDoubleClicked: {
-                    actionForSelection(selectionModel.selectedIndexes)
+                    actionForSelection(selectionDelegateModel.selectedIndexes)
                     root.itemDoubleClicked(model)
                 }
 
@@ -297,9 +290,9 @@ NavigableFocusScope {
             }
         }
 
-        onSelectAll: selectionModel.selectAll()
-        onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
-        onActionAtIndex: root.actionForSelection( selectionModel.selectedIndexes )
+        onSelectAll: selectionDelegateModel.selectAll()
+        onSelectionUpdated: selectionDelegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+        onActionAtIndex: root.actionForSelection( selectionDelegateModel.selectedIndexes )
 
         navigationParent: root
     }
@@ -310,11 +303,11 @@ NavigableFocusScope {
      * selectedGroup update itself after this event
      */
     onActiveFocusChanged: {
-        if (activeFocus && view.count > 0 && !selectionModel.hasSelection) {
+        if (activeFocus && view.count > 0 && !selectionDelegateModel.hasSelection) {
             var initialIndex = 0
             if (view.currentIndex !== -1)
                 initialIndex = view.currentIndex
-            selectionModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
+            selectionDelegateModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
             view.currentIndex = initialIndex
         }
     }

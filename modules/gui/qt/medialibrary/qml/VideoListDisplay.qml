@@ -21,6 +21,7 @@ import QtQml.Models 2.2
 
 import org.videolan.medialib 0.1
 
+import "qrc:///util" as Util
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -29,6 +30,9 @@ Widgets.KeyNavigableTableView {
 
     model: MLVideoModel {
         ml: medialib
+    }
+    selectionDelegateModel: Util.SelectableDelegateModel {
+        model: listView_id.model
     }
 
     property Component thumbnailHeader: Item {

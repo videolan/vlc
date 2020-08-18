@@ -22,6 +22,7 @@ import QtQuick.Layouts 1.3
 
 import org.videolan.medialib 0.1
 
+import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -58,7 +59,18 @@ Widgets.KeyNavigableTableView {
 
     headerColor: VLCStyle.colors.bg
 
-    model: MLAlbumTrackModel {
+    model: rootmodel
+    selectionDelegateModel: selectionModel
+
+    property alias parentId: rootmodel.parentId
+
+    onActionForSelection:  medialib.addAndPlay(model.getIdsForIndexes( selection ))
+
+    Widgets.TableColumns {
+        id: tableColumns
+    }
+
+    MLAlbumTrackModel {
         id: rootmodel
         ml: medialib
         onSortCriteriaChanged: {
@@ -74,11 +86,9 @@ Widgets.KeyNavigableTableView {
         }
     }
 
-    property alias parentId: rootmodel.parentId
+    Util.SelectableDelegateModel {
+        id: selectionModel
 
-    onActionForSelection:  medialib.addAndPlay(model.getIdsForIndexes( selection ))
-
-    Widgets.TableColumns {
-        id: tableColumns
+        model: rootmodel
     }
 }

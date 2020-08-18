@@ -314,6 +314,7 @@ Widgets.NavigableFocusScope {
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
 
             model: trackModel
+            selectionDelegateModel: trackSelectionModel
             headerColor: VLCStyle.colors.bg
             onActionForSelection: {
                 medialib.addAndPlay( model.getIdsForIndexes( selection ) )
@@ -347,6 +348,12 @@ Widgets.NavigableFocusScope {
             function setCurrentItemFocus() {
                 positionViewAtIndex(currentIndex, ItemView.Contain)
                 currentItem.forceActiveFocus()
+            }
+
+            Util.SelectableDelegateModel {
+                id: trackSelectionModel
+
+                model: trackModel
             }
         }
     }

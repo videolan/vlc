@@ -245,6 +245,7 @@ Widgets.NavigableFocusScope {
             }
 
             model: genreModel
+            selectionDelegateModel: selectionModel
             headerColor: VLCStyle.colors.bg
             focus: true
             onActionForSelection: _actionAtIndex(selection)

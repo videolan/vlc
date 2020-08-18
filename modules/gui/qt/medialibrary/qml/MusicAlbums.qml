@@ -72,7 +72,7 @@ Widgets.NavigableFocusScope {
     }
 
     function _actionAtIndex(index) {
-        if (selectionModel.selectedGroup.count > 1) {
+        if (selectionModel.selectedIndexes.length > 1) {
             medialib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ) )
         } else {
             medialib.addAndPlay( model.getIdForIndex(index) )
@@ -189,8 +189,9 @@ Widgets.NavigableFocusScope {
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
 
             model: albumModelId
+            selectionDelegateModel: selectionModel
             headerColor: VLCStyle.colors.bg
-            onActionForSelection: _actionAtIndex(index)
+            onActionForSelection: _actionAtIndex(selection[0]);
             navigationParent: root
             section.property: "title_first_symbol"
             header: root.header
