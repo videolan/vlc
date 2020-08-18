@@ -18,6 +18,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQml.Models 2.2
+import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
@@ -35,27 +36,46 @@ Widgets.GridItem {
     pictureHeight: VLCStyle.gridCover_network_height
     playCoverBorder.width: VLCStyle.gridCover_network_border
     playCoverOnlyBorders: model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY
+    image: model.artwork && model.artwork.toString() !== "" ? model.artwork : ""
 
-    image: {
-        if (model.artwork && model.artwork.toString() !== "") {
-            return model.artwork
-        }
-
-        switch (model.type){
-        case NetworkMediaModel.TYPE_DISC:
-            return  "qrc:///type/disc.svg"
-        case NetworkMediaModel.TYPE_CARD:
-            return  "qrc:///type/capture-card.svg"
-        case NetworkMediaModel.TYPE_STREAM:
-            return  "qrc:///type/stream.svg"
-        case NetworkMediaModel.TYPE_PLAYLIST:
-            return  "qrc:///type/playlist.svg"
-        case NetworkMediaModel.TYPE_FILE:
-            return  "qrc:///type/file_black.svg"
-        default:
-            return "qrc:///type/directory_black.svg"
-        }
-    }
     subtitle: model.mrl || ""
     title: model.name || i18n.qtr("Unknown share")
+
+    Image {
+        id: custom_cover
+
+        x: (pictureWidth - this.width) / 2
+        y: (pictureHeight - this.height) / 2
+        width: VLCStyle.icon_normal
+        height: VLCStyle.icon_normal
+        opacity: item._highlighted && !item.playCoverOnlyBorders ? .1 : 1
+        visible: !model.artwork || model.artwork.toString() === ""
+        source: {
+            switch (model.type){
+            case NetworkMediaModel.TYPE_DISC:
+                return  "qrc:///type/disc.svg"
+            case NetworkMediaModel.TYPE_CARD:
+                return  "qrc:///type/capture-card.svg"
+            case NetworkMediaModel.TYPE_STREAM:
+                return  "qrc:///type/stream.svg"
+            case NetworkMediaModel.TYPE_PLAYLIST:
+                return  "qrc:///type/playlist.svg"
+            case NetworkMediaModel.TYPE_FILE:
+                return  "qrc:///type/file_black.svg"
+            default:
+                return "qrc:///type/directory_black.svg"
+            }
+        }
+    }
+
+    ColorOverlay {
+        anchors.fill: custom_cover
+        source: custom_cover
+        color: VLCStyle.colors.text
+        visible: custom_cover.visible
+                 && model.type !== NetworkMediaModel.TYPE_DISC
+                 && model.type !== NetworkMediaModel.TYPE_CARD
+                 && model.type !== NetworkMediaModel.TYPE_STREAM
+    }
+
 }
