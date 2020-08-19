@@ -229,6 +229,15 @@ static const char *const ppsz_filter_options[] = {
     "ttl", "images", "title", NULL
 };
 
+static void InitCurrentContext(filter_sys_t *p_sys)
+{
+    p_sys->i_cur_feed = 0;
+    p_sys->i_cur_item = p_sys->i_title == scroll_title ? -1 : 0;
+    /* Set current char to -1 such that it is increased to 0 in the first run
+     * for displaying text */
+    p_sys->i_cur_char = -1;
+}
+
 /*****************************************************************************
  * CreateFilter: allocates RSS video filter
  *****************************************************************************/
@@ -258,9 +267,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     /* Fill the p_sys structure with the configuration */
     p_sys->i_title = var_CreateGetInteger( p_filter, CFG_PREFIX "title" );
-    p_sys->i_cur_feed = 0;
-    p_sys->i_cur_item = p_sys->i_title == scroll_title ? -1 : 0;
-    p_sys->i_cur_char = 0;
+    InitCurrentContext(p_sys);
     p_sys->i_feeds = 0;
     p_sys->p_feeds = NULL;
     p_sys->i_speed = VLC_TICK_FROM_US( var_CreateGetInteger( p_filter, CFG_PREFIX "speed" ) );
@@ -364,7 +371,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     }
 
     if( p_sys->last_date
-       + ( p_sys->i_cur_char == 0 &&
+       + ( p_sys->i_cur_char <= 0 &&
            p_sys->i_cur_item == ( p_sys->i_title == scroll_title ? -1 : 0 ) ? 5 : 1 )
            /* ( ... ? 5 : 1 ) means "wait 5 times more for the 1st char" */
        * p_sys->i_speed > date )
@@ -999,9 +1006,7 @@ static void Fetch( void *p_data )
     p_sys->p_feeds = p_feeds;
     p_sys->b_fetched = true;
     /* Set all current info to the original values */
-    p_sys->i_cur_feed = 0;
-    p_sys->i_cur_item = p_sys->i_title == scroll_title ? -1 : 0;
-    p_sys->i_cur_char = 0;
+    InitCurrentContext(p_sys);
     vlc_mutex_unlock( &p_sys->lock );
 
     if( p_old_feeds )
