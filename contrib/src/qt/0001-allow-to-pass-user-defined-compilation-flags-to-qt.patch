@@ -1,0 +1,53 @@
+From 691cced4d252d3b76dce02963c18ca85d125bf09 Mon Sep 17 00:00:00 2001
+From: Pierre Lamot <pierre@videolabs.io>
+Date: Tue, 18 Aug 2020 16:06:06 +0200
+Subject: [PATCH] allow to pass user defined compilation flags to qt
+
+---
+ mkspecs/darwin-g++/qmake.conf      | 4 ++++
+ mkspecs/win32-clang-g++/qmake.conf | 4 ++++
+ mkspecs/win32-g++/qmake.conf       | 4 ++++
+ 3 files changed, 12 insertions(+)
+
+diff --git a/mkspecs/darwin-g++/qmake.conf b/mkspecs/darwin-g++/qmake.conf
+index 85955f7..8602b78 100644
+--- a/mkspecs/darwin-g++/qmake.conf
++++ b/mkspecs/darwin-g++/qmake.conf
+@@ -86,4 +86,8 @@ QMAKE_PCH_OUTPUT_EXT    = .gch
+ QMAKE_CXXFLAGS_PRECOMPILE += -x objective-c++-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}
+ QMAKE_CXXFLAGS_USE_PRECOMPILE = $$QMAKE_CFLAGS_USE_PRECOMPILE
+ 
++QMAKE_CFLAGS           += $${VLC_EXTRA_CFLAGS}
++QMAKE_CXXFLAGS         += $${VLC_EXTRA_CXXFLAGS}
++QMAKE_LDFLAGS          += $${VLC_EXTRA_LDFLAGS}
++
+ load(qt_config)
+diff --git a/mkspecs/win32-clang-g++/qmake.conf b/mkspecs/win32-clang-g++/qmake.conf
+index 4630ec4..149f779 100644
+--- a/mkspecs/win32-clang-g++/qmake.conf
++++ b/mkspecs/win32-clang-g++/qmake.conf
+@@ -24,4 +24,8 @@ QMAKE_CXXFLAGS_WARN_ON  = $$QMAKE_CFLAGS_WARN_ON
+ QMAKE_LINK              = $${CROSS_COMPILE}clang++
+ QMAKE_LINK_C            = $${CROSS_COMPILE}clang
+ 
++QMAKE_CFLAGS           += $${VLC_EXTRA_CFLAGS}
++QMAKE_CXXFLAGS         += $${VLC_EXTRA_CXXFLAGS}
++QMAKE_LDFLAGS          += $${VLC_EXTRA_LDFLAGS}
++
+ load(qt_config)
+diff --git a/mkspecs/win32-g++/qmake.conf b/mkspecs/win32-g++/qmake.conf
+index 5e99233..b22cbce 100644
+--- a/mkspecs/win32-g++/qmake.conf
++++ b/mkspecs/win32-g++/qmake.conf
+@@ -26,4 +26,8 @@ QMAKE_CFLAGS_LTCG       = -flto
+ QMAKE_CXXFLAGS_LTCG     = $$QMAKE_CFLAGS_LTCG
+ QMAKE_LFLAGS_LTCG       = $$QMAKE_CFLAGS_LTCG
+ 
++QMAKE_CFLAGS           += $${VLC_EXTRA_CFLAGS}
++QMAKE_CXXFLAGS         += $${VLC_EXTRA_CXXFLAGS}
++QMAKE_LDFLAGS          += $${VLC_EXTRA_LDFLAGS}
++
+ load(qt_config)
+-- 
+2.25.1
+

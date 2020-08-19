@@ -28,6 +28,7 @@ $(TARBALLS)/qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz:
 
 qt: qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz .sum-qt
 	$(UNPACK)
+	$(APPLY) $(SRC)/qt/0001-allow-to-pass-user-defined-compilation-flags-to-qt.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/qt/0001-Windows-QPA-prefer-lower-value-when-rounding-fractio.patch
 	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Disable-systray-notification-sounds.patch
@@ -81,6 +82,9 @@ endif
 
 endif
 
+QT_PLATFORM += -device-option VLC_EXTRA_CFLAGS="-isystem $(PREFIX)/include" \
+	-device-option VLC_EXTRA_CXXFLAGS="-isystem $(PREFIX)/include"
+
 QT_CONFIG := -static -no-shared -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl $(QT_OPENGL) -no-dbus \
 	-no-vulkan -no-sql-odbc -no-pch \
@@ -102,7 +106,7 @@ ENV_VARS := $(HOSTVARS) DXSDK_DIR=$(PREFIX)/bin
 .qt: qt
 	# Prevent all Qt contribs from generating and installing libtool .la files
 	cd $< && sed -i "/CONFIG/ s/ create_libtool/ -create_libtool/g" mkspecs/features/qt_module.prf
-	+cd $< && $(ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX) -I $(PREFIX)/include
+	+cd $< && $(ENV_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX)
 	# Make && Install libraries
 	cd $< && $(ENV_VARS) $(MAKE)
 	cd $< && $(MAKE) -C src sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-zlib-install_subtargets sub-bootstrap-install_subtargets sub-network-install_subtargets sub-testlib-install_subtargets
