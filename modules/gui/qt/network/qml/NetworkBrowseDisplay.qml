@@ -184,7 +184,7 @@ Widgets.NavigableFocusScope {
             }
 
             cellWidth: VLCStyle.gridItem_network_width
-            cellHeight: VLCStyle.gridItem_network_height
+            cellHeight: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
 
             delegate: NetworkGridItem {
                 id: delegateGrid
@@ -193,6 +193,7 @@ Widgets.NavigableFocusScope {
                 property int index: -1
 
                 subtitle: ""
+                height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
 
                 onPlayClicked: selectionModel.model.addAndPlay( index )
                 onItemClicked : {
