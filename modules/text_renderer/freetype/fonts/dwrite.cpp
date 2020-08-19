@@ -96,6 +96,32 @@ struct dw_sys_t
     }
 };
 
+static const struct
+{
+    const char *psz_generic;
+    const char *psz_local;
+}
+DWriteGenericMapping[] =
+{
+    { "cursive",   "comic sans ms" },
+    { "fantasy",   "impact" },
+    { "monospace", "courier new" },
+    { "sans",      "arial" },
+    { "sans-serif","arial" },
+    { "serif",     "times new roman" },
+    { "system-ui", "ms ui gothic" },
+};
+
+static const char *DWrite_TranslateGenericFamily( const char *psz_family )
+{
+    for( size_t i=0; i<ARRAY_SIZE(DWriteGenericMapping); i++ )
+    {
+        if( !strcasecmp( DWriteGenericMapping[i].psz_generic, psz_family ) )
+            return DWriteGenericMapping[i].psz_local;
+    }
+    return psz_family;
+}
+
 static inline void AppendFamily( vlc_family_t **pp_list, vlc_family_t *p_family )
 {
     while( *pp_list )
@@ -582,6 +608,8 @@ extern "C" int DWrite_GetFamily( vlc_font_select_t *fs, const char *psz_lcname,
 
     UINT32 i_index;
     BOOL b_exists = false;
+
+    psz_lcname = DWrite_TranslateGenericFamily( psz_lcname );
 
     vlc_family_t *p_family =
         ( vlc_family_t * ) vlc_dictionary_value_for_key( &fs->family_map, psz_lcname );
