@@ -36,8 +36,8 @@ Item {
     property bool fixedY: true
 
     readonly property real position: xPos / mouseArea.width
-    property real xPos: mouseArea.mouseX
-    property real yPos: mouseArea.mouseY
+    property real xPos: Math.max(Math.min(mouseArea.mouseX, mouseArea.width), 0.0)
+    property real yPos: Math.max(Math.min(mouseArea.mouseY, mouseArea.height), 0.0)
 
     width: childrenRect.width
     height: childrenRect.height
