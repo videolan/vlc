@@ -104,6 +104,8 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
         goto error;
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
+    vlc_audio_meter_Reset(&owner->meter, &owner->mixer_format);
+
     if (!owner->bitexact)
     {
         /* Create the audio filtering "input" pipeline */
@@ -114,6 +116,8 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
         if (owner->filters == NULL)
         {
             aout_OutputDelete (p_aout);
+            vlc_audio_meter_Reset(&owner->meter, NULL);
+
 error:
             aout_volume_Delete (owner->volume);
             owner->volume = NULL;
@@ -203,6 +207,10 @@ static int aout_CheckReady (audio_output_t *aout)
             }
             aout_FiltersSetClockDelay(owner->filters, owner->sync.delay);
         }
+
+        vlc_audio_meter_Reset(&owner->meter,
+                         owner->mixer_format.i_format ? &owner->mixer_format : NULL);
+
         /* TODO: This would be a good time to call clean up any video output
          * left over by an audio visualization:
         input_resource_TerminatVout(MAGIC HERE); */
@@ -492,6 +500,9 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
         play_date = system_now;
 
     }
+
+    vlc_audio_meter_Process(&owner->meter, block, play_date);
+
     /* Output */
     owner->sync.discontinuity = false;
     aout->play(aout, block, play_date);
@@ -550,6 +561,8 @@ void aout_DecFlush(audio_output_t *aout)
 
     if (owner->mixer_format.i_format)
     {
+        vlc_audio_meter_Flush(&owner->meter);
+
         if (owner->filters)
             aout_FiltersFlush (owner->filters);
 
