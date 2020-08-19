@@ -61,7 +61,10 @@ QString VLCTick::toString() const
 
 VLCTick VLCTick::scale(float scalar) const
 {
-    return VLCTick(m_ticks*scalar);
+    if (scalar == 0.0f)
+        return VLCTick(VLC_TICK_0); // to not decay to VLC_TICK_INVALID
+
+    return VLCTick(m_ticks * scalar);
 }
 
 int VLCTick::toSeconds() const
