@@ -99,7 +99,10 @@ Slider {
             }
             onReleased: control._isHold = false
             onPositionChanged: function (event) {
-                if (pressed && (event.x <= control.width)) {
+                if (pressed) {
+                    if (event.x < 0) event.x = 0;
+                    else if (event.x > control.width) event.x = control.width;
+
                     control.value = event.x / control.width
                     player.position = control.value
                 }
