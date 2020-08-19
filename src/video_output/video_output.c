@@ -957,8 +957,7 @@ typedef struct {
     config_chain_t *cfg;
 } vout_filter_t;
 
-static void ThreadChangeFilters(vout_thread_sys_t *vout,
-                                const bool *new_deinterlace)
+static void ThreadChangeFilters(vout_thread_sys_t *vout)
 {
     vout_thread_sys_t *sys = vout;
     ThreadFilterFlush(vout, true);
@@ -969,9 +968,6 @@ static void ThreadChangeFilters(vout_thread_sys_t *vout,
 
     vlc_array_init(&array_static);
     vlc_array_init(&array_interactive);
-
-    if (new_deinterlace != NULL)
-        sys->private.interlacing.has_deint = *new_deinterlace;
 
     if (sys->private.interlacing.has_deint)
     {
@@ -1134,7 +1130,7 @@ static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse,
                         vlc_video_context_Release(sys->filter.src_vctx);
                     sys->filter.src_vctx = pic_vctx ? vlc_video_context_Hold(pic_vctx) : NULL;
 
-                    ThreadChangeFilters(vout, NULL);
+                    ThreadChangeFilters(vout);
                 }
             }
         }
@@ -1484,7 +1480,8 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     if (sys->filter.changed ||
         sys->private.interlacing.has_deint != sys->filter.new_interlaced)
     {
-        ThreadChangeFilters(vout, &sys->filter.new_interlaced);
+        sys->private.interlacing.has_deint = sys->filter.new_interlaced;
+        ThreadChangeFilters(vout);
     }
     vlc_mutex_unlock(&sys->filter.lock);
 
