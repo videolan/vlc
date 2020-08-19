@@ -142,20 +142,38 @@ Widgets.NavigableFocusScope {
             delegateModel: selectionModel
             model: providerModel
 
-            headerDelegate: Widgets.LabelSeparator {
+            headerDelegate: Widgets.NavigableFocusScope {
                 width: view.width
-                text: providerModel.name
+                height: layout.implicitHeight + VLCStyle.margin_large + VLCStyle.margin_normal
+                navigable: btn.visible
 
-                navigable: inlineItem.visible
+                RowLayout {
+                    id: layout
 
-                inlineComponent: Widgets.TabButtonExt {
-                    focus: true
-                    iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
-                    text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
-                    visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
-                    onClicked: providerModel.indexed = !providerModel.indexed
+                    anchors.fill: parent
+                    anchors.topMargin: VLCStyle.margin_large
+                    anchors.bottomMargin: VLCStyle.margin_normal
+                    anchors.rightMargin: VLCStyle.margin_small
+
+                    Widgets.SubtitleLabel {
+                        text: providerModel.name
+                        leftPadding: gridView.rowX
+
+                        Layout.fillWidth: true
+                    }
+
+                    Widgets.TabButtonExt {
+                        id: btn
+
+                        focus: true
+                        iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
+                        text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
+                        visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
+                        onClicked: providerModel.indexed = !providerModel.indexed
+
+                        Layout.preferredWidth: implicitWidth
+                    }
                 }
-
 
                 Keys.onPressed: defaultKeyAction(event, 0)
                 navigationParent: root
@@ -321,18 +339,37 @@ Widgets.NavigableFocusScope {
 
             rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
 
-            header: Widgets.LabelSeparator {
-                text: providerModel.name
+            header: Widgets.NavigableFocusScope {
                 width: view.width
+                height: layout.implicitHeight + VLCStyle.margin_large + VLCStyle.margin_small
+                navigable: btn.visible
 
-                navigable: inlineItem.visible
+                RowLayout {
+                    id: layout
 
-                inlineComponent: Widgets.TabButtonExt {
-                    focus: true
-                    iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
-                    text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
-                    visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
-                    onClicked: providerModel.indexed = !providerModel.indexed
+                    anchors.fill: parent
+                    anchors.topMargin: VLCStyle.margin_large
+                    anchors.bottomMargin: VLCStyle.margin_small
+                    anchors.rightMargin: VLCStyle.margin_small
+
+                    Widgets.SubtitleLabel {
+                        text: providerModel.name
+                        leftPadding: VLCStyle.margin_large
+
+                        Layout.fillWidth: true
+                    }
+
+                    Widgets.TabButtonExt {
+                        id: btn
+
+                        focus: true
+                        iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
+                        text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
+                        visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
+                        onClicked: providerModel.indexed = !providerModel.indexed
+
+                        Layout.preferredWidth: implicitWidth
+                    }
                 }
 
                 Keys.onPressed: defaultKeyAction(event, 0)
