@@ -184,6 +184,7 @@ NavigableFocusScope {
             property bool selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
             property alias showSeparator: separator.visible
             readonly property bool highlighted: selected || hoverArea.containsMouse || activeFocus
+            readonly property int _index: index
 
             width: view.width
             height: root.rowHeight
@@ -267,6 +268,7 @@ NavigableFocusScope {
                                 property var colModel: modelData
                                 readonly property bool currentlyFocused: lineView.activeFocus
                                 readonly property bool containsMouse: hoverArea.containsMouse
+                                readonly property int index: lineView._index
 
                                 anchors.fill: parent
                                 sourceComponent: colModel.colDelegate || root.colDelegate
