@@ -92,6 +92,8 @@ Widgets.NavigableFocusScope {
                 forceActiveFocus()
             }
 
+            onPlayClicked: deviceModel.addAndPlay( index )
+
             onItemDoubleClicked: {
                 if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
                     history.push( ["mc", "network", { tree: model.tree } ])

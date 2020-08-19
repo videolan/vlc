@@ -176,6 +176,7 @@ Widgets.NavigableFocusScope {
 
                 subtitle: ""
 
+                onPlayClicked: selectionModel.model.addAndPlay( index )
                 onItemClicked : {
                     selectionModel.updateSelection( modifier ,  view.currentItem.currentIndex, index)
                     view.currentItem.currentIndex = index
