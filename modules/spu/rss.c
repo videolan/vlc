@@ -71,6 +71,8 @@ static const char *const ppsz_color_descriptions[] = {
                N_("Teal"), N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"),
                N_("Aqua") };
 
+static const char s_init_title[] = "";
+
 /*****************************************************************************
  * filter_sys_t: rss filter descriptor
  *****************************************************************************/
@@ -660,7 +662,7 @@ static int ParseUrls( filter_t *p_filter, char *psz_urls )
 
         p_feed->i_items = 0;
         p_feed->p_items = NULL;
-        p_feed->psz_title = NULL;
+        p_feed->psz_title = (char *)s_init_title;
         p_feed->psz_link = NULL;
         p_feed->psz_description = NULL;
         p_feed->psz_image = NULL;
@@ -711,7 +713,7 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
                 p_feed->i_items++;
                 p_feed->p_items = xrealloc( p_feed->p_items,
                                      p_feed->i_items * sizeof( rss_item_t ) );
-                p_feed->p_items[p_feed->i_items-1].psz_title = NULL;
+                p_feed->p_items[p_feed->i_items-1].psz_title = (char *)s_init_title;
                 p_feed->p_items[p_feed->i_items-1].psz_description = NULL;
                 p_feed->p_items[p_feed->i_items-1].psz_link = NULL;
             }
@@ -803,7 +805,7 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
             {
                 rss_item_t *p_item = p_feed->p_items+i_item;
                 /* rss/atom */
-                if( !strcmp( psz_eltname, "title" ) && !p_item->psz_title )
+                if( !strcmp( psz_eltname, "title" ) && p_item->psz_title == s_init_title )
                 {
                     p_item->psz_title = psz_eltvalue;
                 }
@@ -835,7 +837,7 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
             else
             {
                 /* rss/atom */
-                if( !strcmp( psz_eltname, "title" ) && !p_feed->psz_title )
+                if( !strcmp( psz_eltname, "title" ) && p_feed->psz_title == s_init_title )
                 {
                     p_feed->psz_title = psz_eltvalue;
                 }
@@ -904,7 +906,7 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
         rss_feed_t *p_old_feed = p_sys->p_feeds + i_feed;
 
         /* Initialize the structure */
-        p_feed->psz_title = NULL;
+        p_feed->psz_title = (char *)s_init_title;
         p_feed->psz_description = NULL;
         p_feed->psz_link = NULL;
         p_feed->psz_image = NULL;
@@ -970,12 +972,14 @@ static void FreeRSS( rss_feed_t *p_feeds, int i_feeds )
         for( int i_item = 0; i_item < p_feed->i_items; i_item++ )
         {
             rss_item_t *p_item = p_feed->p_items+i_item;
-            free( p_item->psz_title );
+            if( p_item->psz_title != s_init_title )
+                free( p_item->psz_title );
             free( p_item->psz_link );
             free( p_item->psz_description );
         }
         free( p_feed->p_items );
-        free( p_feed->psz_title);
+        if( p_feed->psz_title != s_init_title )
+            free( p_feed->psz_title );
         free( p_feed->psz_link );
         free( p_feed->psz_description );
         free( p_feed->psz_image );
