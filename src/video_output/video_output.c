@@ -174,7 +174,6 @@ typedef struct vout_thread_sys_t
         vlc_mutex_t     lock;
         bool            changed;
         bool            new_interlaced;
-        char            *new_filters;
         char            *configuration;
         video_format_t    src_fmt;
         vlc_video_context *src_vctx;
@@ -775,18 +774,18 @@ void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
     vlc_mutex_lock(&sys->filter.lock);
-    if (sys->filter.new_filters)
+    if (sys->filter.configuration)
     {
-        if (filters == NULL || strcmp(sys->filter.new_filters, filters))
+        if (filters == NULL || strcmp(sys->filter.configuration, filters))
         {
-            free(sys->filter.new_filters);
-            sys->filter.new_filters = filters ? strdup(filters) : NULL;
+            free(sys->filter.configuration);
+            sys->filter.configuration = filters ? strdup(filters) : NULL;
             sys->filter.changed = true;
         }
     }
     else if (filters != NULL)
     {
-        sys->filter.new_filters = strdup(filters);
+        sys->filter.configuration = strdup(filters);
         sys->filter.changed = true;
     }
     vlc_mutex_unlock(&sys->filter.lock);
@@ -959,7 +958,6 @@ typedef struct {
 } vout_filter_t;
 
 static void ThreadChangeFilters(vout_thread_sys_t *vout,
-                                const char *filters,
                                 const bool *new_deinterlace)
 {
     vout_thread_sys_t *sys = vout;
@@ -986,8 +984,7 @@ static void ThreadChangeFilters(vout_thread_sys_t *vout,
         }
     }
 
-    if (filters == NULL) filters = sys->filter.configuration;
-    char *current = filters ? strdup(filters) : NULL;
+    char *current = sys->filter.configuration ? strdup(sys->filter.configuration) : NULL;
     while (current) {
         config_chain_t *cfg;
         char *name;
@@ -1069,11 +1066,6 @@ static void ThreadChangeFilters(vout_thread_sys_t *vout,
 
     es_format_Clean(&fmt_target);
 
-    if (sys->filter.configuration != filters) {
-        free(sys->filter.configuration);
-        sys->filter.configuration = filters ? strdup(filters) : NULL;
-    }
-
     sys->filter.changed = false;
 }
 
@@ -1142,7 +1134,7 @@ static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse,
                         vlc_video_context_Release(sys->filter.src_vctx);
                     sys->filter.src_vctx = pic_vctx ? vlc_video_context_Hold(pic_vctx) : NULL;
 
-                    ThreadChangeFilters(vout, NULL, NULL);
+                    ThreadChangeFilters(vout, NULL);
                 }
             }
         }
@@ -1492,7 +1484,7 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     if (sys->filter.changed ||
         sys->private.interlacing.has_deint != sys->filter.new_interlaced)
     {
-        ThreadChangeFilters(vout, sys->filter.new_filters, &sys->filter.new_interlaced);
+        ThreadChangeFilters(vout, &sys->filter.new_interlaced);
     }
     vlc_mutex_unlock(&sys->filter.lock);
 
