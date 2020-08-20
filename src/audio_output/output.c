@@ -228,7 +228,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     /* Audio output module callbacks */
     var_Create (aout, "volume", VLC_VAR_FLOAT);
     var_AddCallback (aout, "volume", var_Copy, parent);
-    var_Create (aout, "mute", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_Create (aout, "mute", VLC_VAR_BOOL);
     var_AddCallback (aout, "mute", var_Copy, parent);
     var_Create (aout, "device", VLC_VAR_STRING);
     var_AddCallback (aout, "device", var_CopyDevice, parent);
