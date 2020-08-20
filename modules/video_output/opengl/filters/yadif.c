@@ -45,7 +45,7 @@ struct program_copy {
 };
 
 struct program_yadif {
-    GLuint id;
+    GLuint id[2];
     GLuint vbo;
 
     struct {
@@ -55,9 +55,8 @@ struct program_yadif {
         GLint next;
         GLint width;
         GLint height;
-        GLint order;
         GLint field;
-    } loc;
+    } loc_order[2];
 };
 
 struct plane {
@@ -211,7 +210,6 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
         "uniform sampler2D next;\n"
         "uniform float width;\n"
         "uniform float height;\n"
-        "uniform int order;\n"
         "uniform int field;\n"
         "\n"
         "float pix(sampler2D sampler, float x, float y) {\n"
@@ -236,13 +234,13 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
         "\n"
         "  float prev2_pix;\n"
         "  float next2_pix;\n"
-        "  if (order == 0) {\n"
+        "# if YADIF_ORDER == 0\n"
         "    prev2_pix = prev_pix;\n"
         "    next2_pix = cur_pix;\n"
-        "  } else {\n"
+        "# else\n"
         "    prev2_pix = cur_pix;\n"
         "    next2_pix = next_pix;\n"
-        "  }\n"
+        "# endif\n"
         "\n"
         "  float c = pix(cur, x, y+1.0);\n"
         "  float d = (prev2_pix + next2_pix) / 2.0;\n"
@@ -297,10 +295,11 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
         "}\n"
         "\n"
         "float filter(float x, float y) {\n"
-        "  if (order == 0) {\n"
-        "    return filter_internal(x, y, prev, cur);\n"
-        "  }\n"
+        "# if YADIF_ORDER == 0\n"
+        "  return filter_internal(x, y, prev, cur);\n"
+        "# else\n"
         "  return filter_internal(x, y, cur, next);\n"
+        "# endif\n"
         "}\n"
         "\n"
         "void main() {\n"
@@ -329,42 +328,57 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
     const char * const vertex_code[] =
         { shader_version, VERTEX_SHADER };
 
-    const char * const fragment_code[] =
-        { shader_version, shader_precision, FRAGMENT_SHADER };
+    const char * const fragment_code_order0[] =
+        { shader_version, shader_precision, "#define YADIF_ORDER 0\n", FRAGMENT_SHADER };
 
-    GLuint program_id =
+    const char * const fragment_code_order1[] =
+        { shader_version, shader_precision, "#define YADIF_ORDER 1\n", FRAGMENT_SHADER };
+
+    GLuint program_id;
+
+    program_id =
         vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
                             ARRAY_SIZE(vertex_code), vertex_code,
-                            ARRAY_SIZE(fragment_code), fragment_code);
+                            ARRAY_SIZE(fragment_code_order0), fragment_code_order0);
 
     if (!program_id)
         return VLC_EGENERIC;
 
-    prog->id = program_id;
+    prog->id[0] = program_id;
 
-    prog->loc.vertex_pos = vt->GetAttribLocation(program_id, "vertex_pos");
-    assert(prog->loc.vertex_pos != -1);
+    program_id =
+        vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
+                            ARRAY_SIZE(vertex_code), vertex_code,
+                            ARRAY_SIZE(fragment_code_order1), fragment_code_order1);
 
-    prog->loc.prev = vt->GetUniformLocation(program_id, "prev");
-    assert(prog->loc.prev != -1);
+    if (!program_id)
+        return VLC_EGENERIC;
 
-    prog->loc.cur = vt->GetUniformLocation(program_id, "cur");
-    assert(prog->loc.cur != -1);
+    prog->id[1] = program_id;
 
-    prog->loc.next = vt->GetUniformLocation(program_id, "next");
-    assert(prog->loc.next != -1);
+    for (size_t i=0; i<2; ++i)
+    {
+        prog->loc_order[i].vertex_pos = vt->GetAttribLocation(prog->id[i], "vertex_pos");
+        //assert(prog->loc_order[i].vertex_pos != -1);
 
-    prog->loc.width = vt->GetUniformLocation(program_id, "width");
-    assert(prog->loc.width != -1);
+        prog->loc_order[i].prev = vt->GetUniformLocation(prog->id[i], "prev");
+        //assert(prog->loc_order[i].prev != -1);
 
-    prog->loc.height = vt->GetUniformLocation(program_id, "height");
-    assert(prog->loc.height != -1);
+        prog->loc_order[i].cur = vt->GetUniformLocation(prog->id[i], "cur");
+        //assert(prog->loc_order[i].cur != -1);
 
-    prog->loc.order = vt->GetUniformLocation(program_id, "order");
-    assert(prog->loc.order != -1);
+        prog->loc_order[i].next = vt->GetUniformLocation(prog->id[i], "next");
+        //assert(prog->loc_order[i].next != -1);
 
-    prog->loc.field = vt->GetUniformLocation(program_id, "field");
-    assert(prog->loc.field != -1);
+        prog->loc_order[i].width = vt->GetUniformLocation(prog->id[i], "width");
+        //assert(prog->loc_order[i].width != -1);
+
+        prog->loc_order[i].height = vt->GetUniformLocation(prog->id[i], "height");
+        //assert(prog->loc_order[i].height != -1);
+
+        prog->loc_order[i].field = vt->GetUniformLocation(prog->id[i], "field");
+        //assert(prog->loc_order[i].field != -1);
+    }
 
     vt->GenBuffers(1, &prog->vbo);
 
@@ -447,7 +461,8 @@ DestroyProgramYadif(struct vlc_gl_filter *filter)
     struct sys *sys = filter->sys;
     struct program_yadif *prog = &sys->program_yadif;
     const opengl_vtable_t *vt = &filter->api->vt;
-    vt->DeleteProgram(prog->id);
+    vt->DeleteProgram(prog->id[0]);
+    vt->DeleteProgram(prog->id[1]);
     vt->DeleteBuffers(1, &prog->vbo);
 }
 
@@ -513,14 +528,12 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
 
     vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
 
-    vt->UseProgram(prog->id);
+    assert(sys->order == 0 || sys->order == 1);
+    vt->UseProgram(prog->id[sys->order]);
 
     struct vlc_gl_sampler *sampler = sys->sampler;
     GLsizei width = sampler->tex_widths[meta->plane];
     GLsizei height = sampler->tex_heights[meta->plane];
-
-    assert(sys->order == 0 || sys->order == 1);
-    vt->Uniform1i(prog->loc.order, sys->order);
 
     /**
      * order == 0 &&  top_field_first  ==>  field = 0
@@ -531,26 +544,26 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
     unsigned field = sys->order ^ !meta->top_field_first;
     assert(field == 0 || field == 1);
 
-    vt->Uniform1i(prog->loc.field, field);
+    vt->Uniform1i(prog->loc_order[sys->order].field, field);
 
-    vt->Uniform1f(prog->loc.width, width);
-    vt->Uniform1f(prog->loc.height, height);
+    vt->Uniform1f(prog->loc_order[sys->order].width, width);
+    vt->Uniform1f(prog->loc_order[sys->order].height, height);
 
     vt->ActiveTexture(GL_TEXTURE0);
     vt->BindTexture(GL_TEXTURE_2D, plane->textures[prev]);
-    vt->Uniform1i(prog->loc.prev, 0);
+    vt->Uniform1i(prog->loc_order[sys->order].prev, 0);
 
     vt->ActiveTexture(GL_TEXTURE1);
     vt->BindTexture(GL_TEXTURE_2D, plane->textures[cur]);
-    vt->Uniform1i(prog->loc.cur, 1);
+    vt->Uniform1i(prog->loc_order[sys->order].cur, 1);
 
     vt->ActiveTexture(GL_TEXTURE2);
     vt->BindTexture(GL_TEXTURE_2D, plane->textures[next]);
-    vt->Uniform1i(prog->loc.next, 2);
+    vt->Uniform1i(prog->loc_order[sys->order].next, 2);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, prog->vbo);
-    vt->EnableVertexAttribArray(prog->loc.vertex_pos);
-    vt->VertexAttribPointer(prog->loc.vertex_pos, 2, GL_FLOAT, GL_FALSE, 0,
+    vt->EnableVertexAttribArray(prog->loc_order[sys->order].vertex_pos);
+    vt->VertexAttribPointer(prog->loc_order[sys->order].vertex_pos, 2, GL_FLOAT, GL_FALSE, 0,
                             (const void *) 0);
 
     vt->Clear(GL_COLOR_BUFFER_BIT);
