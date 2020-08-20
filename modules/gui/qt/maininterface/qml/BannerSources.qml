@@ -152,16 +152,6 @@ Widgets.NavigableFocusScope {
                              enabled: !history.previousEmpty
                          }
 
-                         Widgets.IconToolButton {
-                             id: history_next
-                             size: VLCStyle.icon_normal
-                             iconText: VLCIcons.topbar_next
-                             text: i18n.qtr("Next")
-                             height: localToolbar.height
-                             onClicked: history.next()
-                             enabled: !history.nextEmpty
-                        }
-
                         Widgets.IconToolButton {
                             id: list_grid_btn
                             size: VLCStyle.icon_normal
