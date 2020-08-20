@@ -20,6 +20,7 @@ MODULE_NAME = $$(p="$@"; p=$$(echo "$$p"|sed 's/lib//g'); p="$${p%_plugin*}"; p=
 MODULE_FULLNAME = $$(p="$@"; p="$${p\#lib}"; p="$${p%_plugin*}"; p=$$(echo "$$p"|sed 's/[-\/]/_/g'); p="$${p%.lo}"; echo "$$p")
 
 AM_CPPFLAGS = -DMODULE_STRING=\"$(MODULE_STRING)\"
+AM_LDFLAGS =
 if HAVE_DYNAMIC_PLUGINS
 AM_CPPFLAGS += -D__PLUGIN__
 else
@@ -29,7 +30,7 @@ endif
 AM_CFLAGS =
 AM_CXXFLAGS =
 AM_OBJCFLAGS =
-AM_LDFLAGS = \
+AM_LDFLAGS += \
 	-avoid-version -module \
 	-export-symbols-regex ^vlc_entry \
 	-shrext $(LIBEXT) \
