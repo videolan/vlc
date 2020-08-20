@@ -92,8 +92,13 @@ void SDDevice::addMountpoint( std::string mrl )
     }
 }
 
-void SDDevice::removeMountpoint( const std::string& mrl )
+void SDDevice::removeMountpoint( const std::string& cmrl )
 {
+    std::string mrl;
+    if ( *cmrl.crbegin() != '/' )
+        mrl = cmrl + '/';
+    else
+        mrl = cmrl;
     auto it = std::find_if( begin( m_mountpoints ), end( m_mountpoints ),
                             [&mrl]( const Mountpoint& mp ) { return mp.mrl == mrl; } );
     if ( it != end( m_mountpoints ) )
