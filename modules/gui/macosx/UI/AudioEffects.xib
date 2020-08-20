@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17E199" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16097" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
-        <capability name="box content view" minToolsVersion="7.0"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCAudioEffectsWindowController">
@@ -95,12 +95,12 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="254" width="473" height="281"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="800"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="473" height="281"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jb1-f1-iF3">
+                    <segmentedControl verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jb1-f1-iF3">
                         <rect key="frame" x="72" y="254" width="330" height="24"/>
                         <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="ZdJ-0F-LWH">
                             <font key="font" metaFont="system"/>
@@ -134,7 +134,7 @@
                                             <rect key="frame" x="14" y="193" width="58" height="18"/>
                                             <buttonCell key="cell" type="check" title="Enable" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="193">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="equalizerEnable:" target="-2" id="dyP-pG-TZF"/>
@@ -144,7 +144,7 @@
                                             <rect key="frame" x="92" y="193" width="57" height="18"/>
                                             <buttonCell key="cell" type="check" title="2 Pass" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="195">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="equalizerTwoPass:" target="-2" id="3IO-c8-m0p"/>
@@ -154,7 +154,7 @@
                                             <rect key="frame" x="156" y="190" width="310" height="22"/>
                                             <popUpButtonCell key="cell" type="push" title="headphones" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="181" id="169">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                                 <menu key="menu" title="OtherViews" id="170">
                                                     <items>
                                                         <menuItem title="flat" id="174">
@@ -284,7 +284,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="101">
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="101">
                                                     <rect key="frame" x="146" y="14" width="25" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="310" id="147">
                                                         <font key="font" metaFont="miniSystem"/>
@@ -292,7 +292,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="102">
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="102">
                                                     <rect key="frame" x="207" y="14" width="19" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="1K" id="146">
                                                         <font key="font" metaFont="miniSystem"/>
@@ -300,7 +300,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="104">
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="104">
                                                     <rect key="frame" x="291" y="14" width="25" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="12K" id="144">
                                                         <font key="font" metaFont="miniSystem"/>
@@ -324,7 +324,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="110">
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="110">
                                                     <rect key="frame" x="320" y="14" width="25" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="14K" id="138">
                                                         <font key="font" metaFont="miniSystem"/>
@@ -332,7 +332,7 @@
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="111">
+                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" preferredMaxLayoutWidth="30" translatesAutoresizingMaskIntoConstraints="NO" id="111">
                                                     <rect key="frame" x="349" y="14" width="25" height="11"/>
                                                     <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title="16K" id="137">
                                                         <font key="font" metaFont="miniSystem"/>
@@ -505,7 +505,7 @@
                                             <rect key="frame" x="14" y="190" width="203" height="18"/>
                                             <buttonCell key="cell" type="check" title="Enable dynamic range compressor" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="219">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="compressorEnable:" target="-2" id="uHx-ux-eWT"/>
@@ -513,7 +513,7 @@
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="621">
                                             <rect key="frame" x="424" y="190" width="39" height="17"/>
-                                            <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="DBA9FF77-3F58-444F-902A-249EA5A23E3A" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622">
+                                            <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="buttonCell:622:image" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="622">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="miniSystem"/>
                                             </buttonCell>
@@ -792,7 +792,7 @@
                                             <rect key="frame" x="7" y="190" width="116" height="18"/>
                                             <buttonCell key="cell" type="check" title="Enable Spatializer" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="305">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="spatializerEnable:" target="-2" id="bpE-Et-UJk"/>
@@ -800,7 +800,7 @@
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="618">
                                             <rect key="frame" x="424" y="190" width="39" height="17"/>
-                                            <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="D57F690C-D42D-46B8-B0D9-BA04207B8D4D" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619">
+                                            <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="buttonCell:619:image" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="619">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="miniSystem"/>
                                             </buttonCell>
@@ -1021,28 +1021,28 @@
                                             <rect key="frame" x="14" y="179" width="135" height="18"/>
                                             <buttonCell key="cell" type="check" title="Volume normalization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="346">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="filterEnableVolumeNorm:" target="-2" id="TN6-b4-Vnj"/>
                                             </connections>
                                         </button>
-                                        <box title="Box" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="727">
+                                        <box borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="727">
                                             <rect key="frame" x="16" y="146" width="440" height="36"/>
                                             <view key="contentView" id="eB4-KX-Qdy">
-                                                <rect key="frame" x="1" y="1" width="438" height="34"/>
+                                                <rect key="frame" x="3" y="3" width="434" height="30"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="341">
-                                                        <rect key="frame" x="15" y="10" width="82" height="14"/>
+                                                        <rect key="frame" x="15" y="6" width="82" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Maximum level" usesSingleLineMode="YES" id="348">
-                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="342">
-                                                        <rect key="frame" x="110" y="9" width="310" height="15"/>
+                                                        <rect key="frame" x="110" y="5" width="310" height="15"/>
                                                         <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" minValue="0.10000000000000001" maxValue="10" doubleValue="5" tickMarkPosition="above" sliderType="linear" id="347"/>
                                                         <connections>
                                                             <action selector="filterVolumeNormSliderUpdated:" target="-2" id="YLf-gK-UkJ"/>
@@ -1063,7 +1063,7 @@
                                             <rect key="frame" x="14" y="126" width="65" height="18"/>
                                             <buttonCell key="cell" type="check" title="Karaoke" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="710">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="filterEnableKaraoke:" target="-2" id="xdG-5Z-pQZ"/>
@@ -1073,7 +1073,7 @@
                                             <rect key="frame" x="14" y="106" width="154" height="18"/>
                                             <buttonCell key="cell" type="check" title="Headphone virtualization" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="345">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="filterEnableHeadPhoneVirt:" target="-2" id="PHU-zj-xvf"/>
@@ -1083,7 +1083,7 @@
                                             <rect key="frame" x="14" y="86" width="84" height="18"/>
                                             <buttonCell key="cell" type="check" title="Scaletempo" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="9yB-r8-GZB">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="filterEnableScaleTempo:" target="-2" id="RyL-Bj-fSg"/>
@@ -1093,7 +1093,7 @@
                                             <rect key="frame" x="14" y="66" width="109" height="18"/>
                                             <buttonCell key="cell" type="check" title="Stereo Enhancer" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="kvM-H1-VS8">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="filterEnableStereoEnhancer:" target="-2" id="nQn-vb-PhK"/>
@@ -1126,11 +1126,11 @@
                             </tabViewItem>
                         </tabViewItems>
                     </tabView>
-                    <popUpButton verticalHuggingPriority="750" horizontalCompressionResistancePriority="400" translatesAutoresizingMaskIntoConstraints="NO" id="701">
+                    <popUpButton verticalHuggingPriority="750" horizontalCompressionResistancePriority="400" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="701">
                         <rect key="frame" x="17" y="6" width="175" height="22"/>
                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" id="702">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="smallSystem"/>
+                            <font key="font" metaFont="message" size="11"/>
                             <menu key="menu" title="OtherViews" id="703">
                                 <items>
                                     <menuItem title="Duplicate current profile ..." id="706"/>
@@ -1143,11 +1143,11 @@
                             <action selector="profileSelectorAction:" target="-2" id="uTq-Bz-2S2"/>
                         </connections>
                     </popUpButton>
-                    <button horizontalHuggingPriority="200" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="Dqv-cc-ZvK">
+                    <button horizontalHuggingPriority="200" misplaced="YES" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="Dqv-cc-ZvK">
                         <rect key="frame" x="197" y="8" width="258" height="18"/>
                         <buttonCell key="cell" type="check" title="Apply profile at launch" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fiO-IL-qum">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="smallSystem"/>
+                            <font key="font" metaFont="message" size="11"/>
                         </buttonCell>
                         <connections>
                             <action selector="applyProfileCheckboxChanged:" target="-1" id="i9T-ah-Bfc"/>
@@ -1178,86 +1178,88 @@
         <userDefaultsController representsSharedInstance="YES" id="350"/>
     </objects>
     <resources>
-        <image name="D57F690C-D42D-46B8-B0D9-BA04207B8D4D" width="1" height="1">
+        <image name="buttonCell:619:image" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
-YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
-GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
-c1dOU0NvbG9ygAKADRIgywAAgAOAC1Z7MSwgMX3SFQoWGFpOUy5vYmplY3RzoReABIAK0hUKGh2iGxyA
-BYAGgAkQANIgCiEiXxAUTlNUSUZGUmVwcmVzZW50YXRpb26AB4AITxEGTE1NACoAAAAKAAAAEAEAAAMA
-AAABAAEAAAEBAAMAAAABAAEAAAECAAMAAAACAAgACAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAEKAAMA
-AAABAAEAAAERAAQAAAABAAAACAESAAMAAAABAAEAAAEVAAMAAAABAAIAAAEWAAMAAAABAAEAAAEXAAQA
-AAABAAAAAgEcAAMAAAABAAEAAAEoAAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAACAAEAAYdzAAcA
-AAV8AAAA0AAAAAAAAAV8YXBwbAIgAABtbnRyR1JBWVhZWiAH0AACAA4ADAAAAABhY3NwQVBQTAAAAABu
-b25lAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVkZXNjAAAAwAAAAG9kc2NtAAABMAAAA+5jcHJ0AAAFIAAAADh3
-dHB0AAAFWAAAABRrVFJDAAAFbAAAAA5kZXNjAAAAAAAAABVHZW5lcmljIEdyYXkgUHJvZmlsZQAAAAAA
-AAAAAAAAFUdlbmVyaWMgR3JheSBQcm9maWxlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAAAAATAAAADHB0QlIAAAAqAAAA9GZyRlUAAAAqAAABHnpoVFcA
-AAAQAAABSGl0SVQAAAAuAAABWG5iTk8AAAAsAAABhmtvS1IAAAAYAAABsmRlREUAAAA6AAABynN2U0UA
-AAAuAAACBHpoQ04AAAAQAAACMmphSlAAAAAWAAACQnB0UE8AAAA4AAACWG5sTkwAAAAqAAACkGVzRVMA
-AAAoAAACumZpRkkAAAAsAAAC4nBsUEwAAAA2AAADDnJ1UlUAAAAmAAADRGFyRUcAAAAoAAADamVuVVMA
-AAAoAAADkmRhREsAAAA0AAADugBQAGUAcgBmAGkAbAAgAEMAaQBuAHoAYQAgAEcAZQBuAOkAcgBpAGMA
-bwBQAHIAbwBmAGkAbAAgAGcA6QBuAOkAcgBpAHEAdQBlACAAZwByAGkAc5AadShwcJaOgnJfaWPPj/AA
-UAByAG8AZgBpAGwAbwAgAGcAcgBpAGcAaQBvACAAZwBlAG4AZQByAGkAYwBvAEcAZQBuAGUAcgBpAHMA
-awAgAGcAcgDlAHQAbwBuAGUAcAByAG8AZgBpAGzHfLwYACAARwByAGEAeQAg1QS4XNMMx3wAQQBsAGwA
-ZwBlAG0AZQBpAG4AZQBzACAARwByAGEAdQBzAHQAdQBmAGUAbgAtAFAAcgBvAGYAaQBsAEcAZQBuAGUA
-cgBpAHMAawAgAGcAcgDlAHMAawBhAGwAZQBwAHIAbwBmAGkAbGZukBpwcF6mY8+P8GWHTvZOAIIsMLAw
-7DCkMNcw7TDVMKEwpDDrAFAAZQByAGYAaQBsACAAZwBlAG4A6QByAGkAYwBvACAAZABlACAAYwBpAG4A
-egBlAG4AdABvAHMAQQBsAGcAZQBtAGUAZQBuACAAZwByAGkAagBzAHAAcgBvAGYAaQBlAGwAUABlAHIA
-ZgBpAGwAIABnAHIAaQBzACAAZwBlAG4A6QByAGkAYwBvAFkAbABlAGkAbgBlAG4AIABoAGEAcgBtAGEA
-YQBwAHIAbwBmAGkAaQBsAGkAVQBuAGkAdwBlAHIAcwBhAGwAbgB5ACAAcAByAG8AZgBpAGwAIABzAHoA
-YQByAG8BWwBjAGkEHgQxBEkEOAQ5ACAEQQQ1BEAESwQ5ACAEPwRABD4ERAQ4BDsETAZFBkQGQQAgBioG
-OQYxBkoGQQAgAEcAcgBhAHkAIAYnBkQGOQYnBkUARwBlAG4AZQByAGkAYwAgAEcAcgBhAHkAIABQAHIA
-bwBmAGkAbABlAEcAZQBuAGUAcgBlAGwAIABnAHIA5QB0AG8AbgBlAGIAZQBzAGsAcgBpAHYAZQBsAHMA
-ZQAAdGV4dAAAAABDb3B5cmlnaHQgMjAwNyBBcHBsZSBJbmMuLCBhbGwgcmlnaHRzIHJlc2VydmVkLgBY
-WVogAAAAAAAA81EAAQAAAAEWzGN1cnYAAAAAAAAAAQHNAADSJSYnKFokY2xhc3NuYW1lWCRjbGFzc2Vz
-XxAQTlNCaXRtYXBJbWFnZVJlcKMnKSpaTlNJbWFnZVJlcFhOU09iamVjdNIlJiwtV05TQXJyYXmiLCrS
-JSYvMF5OU011dGFibGVBcnJheaMvLCrTMjMKNDU2V05TV2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AM
-0iUmODlXTlNDb2xvcqI4KtIlJjs8V05TSW1hZ2WiOypfEA9OU0tleWVkQXJjaGl2ZXLRP0BUcm9vdIAB
-AAgAEQAaACMALQAyADcARgBMAFcAXgBlAHIAeQCBAIMAhQCKAIwAjgCVAJoApQCnAKkAqwCwALMAtQC3
-ALkAuwDAANcA2QDbBysHMAc7B0QHVwdbB2YHbwd0B3wHfweEB5MHlweeB6YHswe4B7oHvAfBB8kHzAfR
-B9kH3AfuB/EH9gAAAAAAAAIBAAAAAAAAAEEAAAAAAAAAAAAAAAAAAAf4A
+YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T
+S2V5ZWRBcmNoaXZlctEICVRyb290gAGuCwwZGh8UJCgpMDM2PD9VJG51bGzWDQ4PEBESExQVFhcYVk5T
+U2l6ZV5OU1Jlc2l6aW5nTW9kZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVwc1dOU0NvbG9ygAIQAIAN
+EiDLAACAA4ALVnsxLCAxfdIbDxweWk5TLm9iamVjdHOhHYAEgArSGw8gI6IhIoAFgAaACdIlDyYnXxAU
+TlNUSUZGUmVwcmVzZW50YXRpb26AB4AITxEGTE1NACoAAAAKAAAAEAEAAAMAAAABAAEAAAEBAAMAAAAB
+AAEAAAECAAMAAAACAAgACAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAEKAAMAAAABAAEAAAERAAQAAAAB
+AAAACAESAAMAAAABAAEAAAEVAAMAAAABAAIAAAEWAAMAAAABAAEAAAEXAAQAAAABAAAAAgEcAAMAAAAB
+AAEAAAEoAAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAACAAEAAYdzAAcAAAV8AAAA0AAAAAAAAAV8
+YXBwbAIgAABtbnRyR1JBWVhZWiAH0AACAA4ADAAAAABhY3NwQVBQTAAAAABub25lAAAAAAAAAAAAAAAA
+AAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAVkZXNjAAAAwAAAAG9kc2NtAAABMAAAA+5jcHJ0AAAFIAAAADh3dHB0AAAFWAAAABRrVFJD
+AAAFbAAAAA5kZXNjAAAAAAAAABVHZW5lcmljIEdyYXkgUHJvZmlsZQAAAAAAAAAAAAAAFUdlbmVyaWMg
+R3JheSBQcm9maWxlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+bWx1YwAAAAAAAAATAAAADHB0QlIAAAAqAAAA9GZyRlUAAAAqAAABHnpoVFcAAAAQAAABSGl0SVQAAAAu
+AAABWG5iTk8AAAAsAAABhmtvS1IAAAAYAAABsmRlREUAAAA6AAABynN2U0UAAAAuAAACBHpoQ04AAAAQ
+AAACMmphSlAAAAAWAAACQnB0UE8AAAA4AAACWG5sTkwAAAAqAAACkGVzRVMAAAAoAAACumZpRkkAAAAs
+AAAC4nBsUEwAAAA2AAADDnJ1UlUAAAAmAAADRGFyRUcAAAAoAAADamVuVVMAAAAoAAADkmRhREsAAAA0
+AAADugBQAGUAcgBmAGkAbAAgAEMAaQBuAHoAYQAgAEcAZQBuAOkAcgBpAGMAbwBQAHIAbwBmAGkAbAAg
+AGcA6QBuAOkAcgBpAHEAdQBlACAAZwByAGkAc5AadShwcJaOgnJfaWPPj/AAUAByAG8AZgBpAGwAbwAg
+AGcAcgBpAGcAaQBvACAAZwBlAG4AZQByAGkAYwBvAEcAZQBuAGUAcgBpAHMAawAgAGcAcgDlAHQAbwBu
+AGUAcAByAG8AZgBpAGzHfLwYACAARwByAGEAeQAg1QS4XNMMx3wAQQBsAGwAZwBlAG0AZQBpAG4AZQBz
+ACAARwByAGEAdQBzAHQAdQBmAGUAbgAtAFAAcgBvAGYAaQBsAEcAZQBuAGUAcgBpAHMAawAgAGcAcgDl
+AHMAawBhAGwAZQBwAHIAbwBmAGkAbGZukBpwcF6mY8+P8GWHTvZOAIIsMLAw7DCkMNcw7TDVMKEwpDDr
+AFAAZQByAGYAaQBsACAAZwBlAG4A6QByAGkAYwBvACAAZABlACAAYwBpAG4AegBlAG4AdABvAHMAQQBs
+AGcAZQBtAGUAZQBuACAAZwByAGkAagBzAHAAcgBvAGYAaQBlAGwAUABlAHIAZgBpAGwAIABnAHIAaQBz
+ACAAZwBlAG4A6QByAGkAYwBvAFkAbABlAGkAbgBlAG4AIABoAGEAcgBtAGEAYQBwAHIAbwBmAGkAaQBs
+AGkAVQBuAGkAdwBlAHIAcwBhAGwAbgB5ACAAcAByAG8AZgBpAGwAIABzAHoAYQByAG8BWwBjAGkEHgQx
+BEkEOAQ5ACAEQQQ1BEAESwQ5ACAEPwRABD4ERAQ4BDsETAZFBkQGQQAgBioGOQYxBkoGQQAgAEcAcgBh
+AHkAIAYnBkQGOQYnBkUARwBlAG4AZQByAGkAYwAgAEcAcgBhAHkAIABQAHIAbwBmAGkAbABlAEcAZQBu
+AGUAcgBlAGwAIABnAHIA5QB0AG8AbgBlAGIAZQBzAGsAcgBpAHYAZQBsAHMAZQAAdGV4dAAAAABDb3B5
+cmlnaHQgMjAwNyBBcHBsZSBJbmMuLCBhbGwgcmlnaHRzIHJlc2VydmVkLgBYWVogAAAAAAAA81EAAQAA
+AAEWzGN1cnYAAAAAAAAAAQHNAADSKissLVokY2xhc3NuYW1lWCRjbGFzc2VzXxAQTlNCaXRtYXBJbWFn
+ZVJlcKMsLi9aTlNJbWFnZVJlcFhOU09iamVjdNIqKzEyV05TQXJyYXmiMS/SKis0NV5OU011dGFibGVB
+cnJheaM0MS/TNzgPOTo7V05TV2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AM0iorPT5XTlNDb2xvcqI9
+L9IqK0BBV05TSW1hZ2WiQC8ACAARABoAJAApADIANwBJAEwAUQBTAGIAaAB1AHwAiwCSAJ8ApgCuALAA
+sgC0ALkAuwC9AMQAyQDUANYA2ADaAN8A4gDkAOYA6ADtAQQBBgEIB1gHXQdoB3EHhAeIB5MHnAehB6kH
+rAexB8AHxAfLB9MH4AflB+cH6QfuB/YH+Qf+CAYAAAAAAAACAQAAAAAAAABCAAAAAAAAAAAAAAAAAAAI
+CQ
 </mutableData>
         </image>
-        <image name="DBA9FF77-3F58-444F-902A-249EA5A23E3A" width="1" height="1">
+        <image name="buttonCell:622:image" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
-YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
-GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
-c1dOU0NvbG9ygAKADRIgywAAgAOAC1Z7MSwgMX3SFQoWGFpOUy5vYmplY3RzoReABIAK0hUKGh2iGxyA
-BYAGgAkQANIgCiEiXxAUTlNUSUZGUmVwcmVzZW50YXRpb26AB4AITxEGTE1NACoAAAAKAAAAEAEAAAMA
-AAABAAEAAAEBAAMAAAABAAEAAAECAAMAAAACAAgACAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAEKAAMA
-AAABAAEAAAERAAQAAAABAAAACAESAAMAAAABAAEAAAEVAAMAAAABAAIAAAEWAAMAAAABAAEAAAEXAAQA
-AAABAAAAAgEcAAMAAAABAAEAAAEoAAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAACAAEAAYdzAAcA
-AAV8AAAA0AAAAAAAAAV8YXBwbAIgAABtbnRyR1JBWVhZWiAH0AACAA4ADAAAAABhY3NwQVBQTAAAAABu
-b25lAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVkZXNjAAAAwAAAAG9kc2NtAAABMAAAA+5jcHJ0AAAFIAAAADh3
-dHB0AAAFWAAAABRrVFJDAAAFbAAAAA5kZXNjAAAAAAAAABVHZW5lcmljIEdyYXkgUHJvZmlsZQAAAAAA
-AAAAAAAAFUdlbmVyaWMgR3JheSBQcm9maWxlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAAAAATAAAADHB0QlIAAAAqAAAA9GZyRlUAAAAqAAABHnpoVFcA
-AAAQAAABSGl0SVQAAAAuAAABWG5iTk8AAAAsAAABhmtvS1IAAAAYAAABsmRlREUAAAA6AAABynN2U0UA
-AAAuAAACBHpoQ04AAAAQAAACMmphSlAAAAAWAAACQnB0UE8AAAA4AAACWG5sTkwAAAAqAAACkGVzRVMA
-AAAoAAACumZpRkkAAAAsAAAC4nBsUEwAAAA2AAADDnJ1UlUAAAAmAAADRGFyRUcAAAAoAAADamVuVVMA
-AAAoAAADkmRhREsAAAA0AAADugBQAGUAcgBmAGkAbAAgAEMAaQBuAHoAYQAgAEcAZQBuAOkAcgBpAGMA
-bwBQAHIAbwBmAGkAbAAgAGcA6QBuAOkAcgBpAHEAdQBlACAAZwByAGkAc5AadShwcJaOgnJfaWPPj/AA
-UAByAG8AZgBpAGwAbwAgAGcAcgBpAGcAaQBvACAAZwBlAG4AZQByAGkAYwBvAEcAZQBuAGUAcgBpAHMA
-awAgAGcAcgDlAHQAbwBuAGUAcAByAG8AZgBpAGzHfLwYACAARwByAGEAeQAg1QS4XNMMx3wAQQBsAGwA
-ZwBlAG0AZQBpAG4AZQBzACAARwByAGEAdQBzAHQAdQBmAGUAbgAtAFAAcgBvAGYAaQBsAEcAZQBuAGUA
-cgBpAHMAawAgAGcAcgDlAHMAawBhAGwAZQBwAHIAbwBmAGkAbGZukBpwcF6mY8+P8GWHTvZOAIIsMLAw
-7DCkMNcw7TDVMKEwpDDrAFAAZQByAGYAaQBsACAAZwBlAG4A6QByAGkAYwBvACAAZABlACAAYwBpAG4A
-egBlAG4AdABvAHMAQQBsAGcAZQBtAGUAZQBuACAAZwByAGkAagBzAHAAcgBvAGYAaQBlAGwAUABlAHIA
-ZgBpAGwAIABnAHIAaQBzACAAZwBlAG4A6QByAGkAYwBvAFkAbABlAGkAbgBlAG4AIABoAGEAcgBtAGEA
-YQBwAHIAbwBmAGkAaQBsAGkAVQBuAGkAdwBlAHIAcwBhAGwAbgB5ACAAcAByAG8AZgBpAGwAIABzAHoA
-YQByAG8BWwBjAGkEHgQxBEkEOAQ5ACAEQQQ1BEAESwQ5ACAEPwRABD4ERAQ4BDsETAZFBkQGQQAgBioG
-OQYxBkoGQQAgAEcAcgBhAHkAIAYnBkQGOQYnBkUARwBlAG4AZQByAGkAYwAgAEcAcgBhAHkAIABQAHIA
-bwBmAGkAbABlAEcAZQBuAGUAcgBlAGwAIABnAHIA5QB0AG8AbgBlAGIAZQBzAGsAcgBpAHYAZQBsAHMA
-ZQAAdGV4dAAAAABDb3B5cmlnaHQgMjAwNyBBcHBsZSBJbmMuLCBhbGwgcmlnaHRzIHJlc2VydmVkLgBY
-WVogAAAAAAAA81EAAQAAAAEWzGN1cnYAAAAAAAAAAQHNAADSJSYnKFokY2xhc3NuYW1lWCRjbGFzc2Vz
-XxAQTlNCaXRtYXBJbWFnZVJlcKMnKSpaTlNJbWFnZVJlcFhOU09iamVjdNIlJiwtV05TQXJyYXmiLCrS
-JSYvMF5OU011dGFibGVBcnJheaMvLCrTMjMKNDU2V05TV2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AM
-0iUmODlXTlNDb2xvcqI4KtIlJjs8V05TSW1hZ2WiOypfEA9OU0tleWVkQXJjaGl2ZXLRP0BUcm9vdIAB
-AAgAEQAaACMALQAyADcARgBMAFcAXgBlAHIAeQCBAIMAhQCKAIwAjgCVAJoApQCnAKkAqwCwALMAtQC3
-ALkAuwDAANcA2QDbBysHMAc7B0QHVwdbB2YHbwd0B3wHfweEB5MHlweeB6YHswe4B7oHvAfBB8kHzAfR
-B9kH3AfuB/EH9gAAAAAAAAIBAAAAAAAAAEEAAAAAAAAAAAAAAAAAAAf4A
+YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T
+S2V5ZWRBcmNoaXZlctEICVRyb290gAGuCwwZGh8UJCgpMDM2PD9VJG51bGzWDQ4PEBESExQVFhcYVk5T
+U2l6ZV5OU1Jlc2l6aW5nTW9kZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVwc1dOU0NvbG9ygAIQAIAN
+EiDLAACAA4ALVnsxLCAxfdIbDxweWk5TLm9iamVjdHOhHYAEgArSGw8gI6IhIoAFgAaACdIlDyYnXxAU
+TlNUSUZGUmVwcmVzZW50YXRpb26AB4AITxEGTE1NACoAAAAKAAAAEAEAAAMAAAABAAEAAAEBAAMAAAAB
+AAEAAAECAAMAAAACAAgACAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAEKAAMAAAABAAEAAAERAAQAAAAB
+AAAACAESAAMAAAABAAEAAAEVAAMAAAABAAIAAAEWAAMAAAABAAEAAAEXAAQAAAABAAAAAgEcAAMAAAAB
+AAEAAAEoAAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAACAAEAAYdzAAcAAAV8AAAA0AAAAAAAAAV8
+YXBwbAIgAABtbnRyR1JBWVhZWiAH0AACAA4ADAAAAABhY3NwQVBQTAAAAABub25lAAAAAAAAAAAAAAAA
+AAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAVkZXNjAAAAwAAAAG9kc2NtAAABMAAAA+5jcHJ0AAAFIAAAADh3dHB0AAAFWAAAABRrVFJD
+AAAFbAAAAA5kZXNjAAAAAAAAABVHZW5lcmljIEdyYXkgUHJvZmlsZQAAAAAAAAAAAAAAFUdlbmVyaWMg
+R3JheSBQcm9maWxlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+bWx1YwAAAAAAAAATAAAADHB0QlIAAAAqAAAA9GZyRlUAAAAqAAABHnpoVFcAAAAQAAABSGl0SVQAAAAu
+AAABWG5iTk8AAAAsAAABhmtvS1IAAAAYAAABsmRlREUAAAA6AAABynN2U0UAAAAuAAACBHpoQ04AAAAQ
+AAACMmphSlAAAAAWAAACQnB0UE8AAAA4AAACWG5sTkwAAAAqAAACkGVzRVMAAAAoAAACumZpRkkAAAAs
+AAAC4nBsUEwAAAA2AAADDnJ1UlUAAAAmAAADRGFyRUcAAAAoAAADamVuVVMAAAAoAAADkmRhREsAAAA0
+AAADugBQAGUAcgBmAGkAbAAgAEMAaQBuAHoAYQAgAEcAZQBuAOkAcgBpAGMAbwBQAHIAbwBmAGkAbAAg
+AGcA6QBuAOkAcgBpAHEAdQBlACAAZwByAGkAc5AadShwcJaOgnJfaWPPj/AAUAByAG8AZgBpAGwAbwAg
+AGcAcgBpAGcAaQBvACAAZwBlAG4AZQByAGkAYwBvAEcAZQBuAGUAcgBpAHMAawAgAGcAcgDlAHQAbwBu
+AGUAcAByAG8AZgBpAGzHfLwYACAARwByAGEAeQAg1QS4XNMMx3wAQQBsAGwAZwBlAG0AZQBpAG4AZQBz
+ACAARwByAGEAdQBzAHQAdQBmAGUAbgAtAFAAcgBvAGYAaQBsAEcAZQBuAGUAcgBpAHMAawAgAGcAcgDl
+AHMAawBhAGwAZQBwAHIAbwBmAGkAbGZukBpwcF6mY8+P8GWHTvZOAIIsMLAw7DCkMNcw7TDVMKEwpDDr
+AFAAZQByAGYAaQBsACAAZwBlAG4A6QByAGkAYwBvACAAZABlACAAYwBpAG4AegBlAG4AdABvAHMAQQBs
+AGcAZQBtAGUAZQBuACAAZwByAGkAagBzAHAAcgBvAGYAaQBlAGwAUABlAHIAZgBpAGwAIABnAHIAaQBz
+ACAAZwBlAG4A6QByAGkAYwBvAFkAbABlAGkAbgBlAG4AIABoAGEAcgBtAGEAYQBwAHIAbwBmAGkAaQBs
+AGkAVQBuAGkAdwBlAHIAcwBhAGwAbgB5ACAAcAByAG8AZgBpAGwAIABzAHoAYQByAG8BWwBjAGkEHgQx
+BEkEOAQ5ACAEQQQ1BEAESwQ5ACAEPwRABD4ERAQ4BDsETAZFBkQGQQAgBioGOQYxBkoGQQAgAEcAcgBh
+AHkAIAYnBkQGOQYnBkUARwBlAG4AZQByAGkAYwAgAEcAcgBhAHkAIABQAHIAbwBmAGkAbABlAEcAZQBu
+AGUAcgBlAGwAIABnAHIA5QB0AG8AbgBlAGIAZQBzAGsAcgBpAHYAZQBsAHMAZQAAdGV4dAAAAABDb3B5
+cmlnaHQgMjAwNyBBcHBsZSBJbmMuLCBhbGwgcmlnaHRzIHJlc2VydmVkLgBYWVogAAAAAAAA81EAAQAA
+AAEWzGN1cnYAAAAAAAAAAQHNAADSKissLVokY2xhc3NuYW1lWCRjbGFzc2VzXxAQTlNCaXRtYXBJbWFn
+ZVJlcKMsLi9aTlNJbWFnZVJlcFhOU09iamVjdNIqKzEyV05TQXJyYXmiMS/SKis0NV5OU011dGFibGVB
+cnJheaM0MS/TNzgPOTo7V05TV2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AM0iorPT5XTlNDb2xvcqI9
+L9IqK0BBV05TSW1hZ2WiQC8ACAARABoAJAApADIANwBJAEwAUQBTAGIAaAB1AHwAiwCSAJ8ApgCuALAA
+sgC0ALkAuwC9AMQAyQDUANYA2ADaAN8A4gDkAOYA6ADtAQQBBgEIB1gHXQdoB3EHhAeIB5MHnAehB6kH
+rAexB8AHxAfLB9MH4AflB+cH6QfuB/YH+Qf+CAYAAAAAAAACAQAAAAAAAABCAAAAAAAAAAAAAAAAAAAI
+CQ
 </mutableData>
         </image>
     </resources>
