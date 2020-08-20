@@ -346,7 +346,7 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     vlc_family_t *p_family = ctx->p_family;
 
     int i_flags = 0;
-    if( lpelfe->elfLogFont.lfWeight == FW_BOLD )
+    if( lpelfe->elfLogFont.lfWeight >= FW_BOLD )
         i_flags |= VLC_FONT_FLAG_BOLD;
     if( lpelfe->elfLogFont.lfItalic != 0 )
         i_flags |= VLC_FONT_FLAG_ITALIC;
