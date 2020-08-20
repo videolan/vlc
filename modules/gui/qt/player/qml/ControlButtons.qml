@@ -60,7 +60,8 @@ Item{
         { id:  PlayerControlBarModel.TELETEXT_BUTTONS, label: VLCIcons.tvtelx, text: i18n.qtr("Teletext")},
         { id:  PlayerControlBarModel.ASPECT_RATIO_COMBOBOX, label: VLCIcons.aspect_ratio, text: i18n.qtr("Aspect Ratio")},
         { id:  PlayerControlBarModel.WIDGET_SPACER, label: VLCIcons.space, text: i18n.qtr("Spacer")},
-        { id:  PlayerControlBarModel.WIDGET_SPACER_EXTEND, label: VLCIcons.space, text: i18n.qtr("Expanding Spacer")}
+        { id:  PlayerControlBarModel.WIDGET_SPACER_EXTEND, label: VLCIcons.space, text: i18n.qtr("Expanding Spacer")},
+        { id:  PlayerControlBarModel.PLAYER_SWITCH_BUTTON, label: VLCIcons.fullscreen, text: i18n.qtr("Switch Player")}
     ]
 
     function returnbuttondelegate(inpID){
@@ -95,6 +96,7 @@ Item{
         case PlayerControlBarModel.VOLUME: return volumeBtnDelegate
         case PlayerControlBarModel.ASPECT_RATIO_COMBOBOX: return aspectRatioDelegate
         case PlayerControlBarModel.TELETEXT_BUTTONS: return teletextdelegate
+        case PlayerControlBarModel.PLAYER_SWITCH_BUTTON: return playerSwitchBtnDelegate
         }
         console.log("button delegate id " + inpID +  " doesn't exists")
         return spacerDelegate
@@ -738,5 +740,27 @@ Item{
     Component{
         id: volumeBtnDelegate
         VolumeWidget{}
+    }
+
+    Component {
+        id: playerSwitchBtnDelegate
+
+        Widgets.IconToolButton{
+            size: VLCStyle.icon_medium
+            enabled: !paintOnly
+            iconText: VLCIcons.fullscreen
+
+            onClicked: {
+                if (isMiniplayer) {
+                    history.push(["player"])
+                }
+                else {
+                    history.previous()
+                }
+            }
+
+            property bool acceptFocus: true
+            text: i18n.qtr("Switch Player")
+        }
     }
 }
