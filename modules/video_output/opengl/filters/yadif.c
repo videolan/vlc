@@ -512,6 +512,10 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
     struct sys *sys = filter->sys;
     const opengl_vtable_t *vt = &filter->api->vt;
 
+    vlc_tick_t pts_diff = meta->pts - sys->last_pts;
+    if (sys->last_pts != meta->pts)
+        sys->last_pts = meta->pts;
+
     struct plane *plane = &sys->planes[meta->plane];
 
     struct program_yadif *prog = &sys->program_yadif;
@@ -586,6 +590,11 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
             --sys->missing_frames;
         }
 
+        if ( true)
+        {
+            meta->pts += pts_diff / 2;
+        }
+        else
         if (false && sys->last_pts != VLC_TICK_INVALID)
         {
             /*
@@ -609,7 +618,7 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
             meta->pts += 1;
         }
     }
-    sys->last_pts = meta->pts;
+    // sys->last_pts = meta->pts;
 
     return VLC_SUCCESS;
 }
