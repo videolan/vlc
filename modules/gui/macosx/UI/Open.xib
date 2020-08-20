@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16097" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -144,7 +144,7 @@
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="162" y="354" width="602" height="426"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="800"/>
             <value key="minSize" type="size" width="530" height="107"/>
             <view key="contentView" id="637">
                 <rect key="frame" x="0.0" y="0.0" width="602" height="426"/>
@@ -157,7 +157,7 @@
                                 <attributedString key="userComments">
                                     <fragment content="Explicit height to fix animation with MRL">
                                         <attributes>
-                                            <font key="NSFont" metaFont="smallSystem"/>
+                                            <font key="NSFont" metaFont="message" size="11"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -177,49 +177,49 @@
                                                 <rect key="frame" x="3" y="3" width="548" height="41"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" misplaced="YES" preferredMaxLayoutWidth="96" translatesAutoresizingMaskIntoConstraints="NO" id="3477">
-                                                        <rect key="frame" x="438" y="10" width="96" height="19"/>
+                                                    <textField verticalHuggingPriority="750" preferredMaxLayoutWidth="96" translatesAutoresizingMaskIntoConstraints="NO" id="3477">
+                                                        <rect key="frame" x="436" y="10" width="96" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="96" id="HrV-me-zUS"/>
                                                         </constraints>
                                                         <textFieldCell key="cell" controlSize="small" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="3480">
-                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3478">
-                                                        <rect key="frame" x="377" y="13" width="55" height="14"/>
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3478">
+                                                        <rect key="frame" x="375" y="12" width="55" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" enabled="NO" sendsActionOnEndEditing="YES" alignment="right" title="Stop time" usesSingleLineMode="YES" id="3479">
-                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" misplaced="YES" preferredMaxLayoutWidth="96" translatesAutoresizingMaskIntoConstraints="NO" id="3473">
-                                                        <rect key="frame" x="276" y="10" width="96" height="19"/>
+                                                    <textField verticalHuggingPriority="750" preferredMaxLayoutWidth="96" translatesAutoresizingMaskIntoConstraints="NO" id="3473">
+                                                        <rect key="frame" x="274" y="10" width="96" height="19"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="96" id="LaV-0q-7Px"/>
                                                         </constraints>
                                                         <textFieldCell key="cell" controlSize="small" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="3474">
-                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3475">
-                                                        <rect key="frame" x="215" y="13" width="56" height="14"/>
+                                                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3475">
+                                                        <rect key="frame" x="213" y="12" width="56" height="14"/>
                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" enabled="NO" sendsActionOnEndEditing="YES" alignment="right" title="Start time" usesSingleLineMode="YES" id="3476">
-                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3485">
-                                                        <rect key="frame" x="15" y="11" width="113" height="18"/>
+                                                        <rect key="frame" x="15" y="10" width="113" height="18"/>
                                                         <buttonCell key="cell" type="check" title="Custom playback" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="3486">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <font key="font" metaFont="message" size="11"/>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="fileTimeCustomization:" target="-2" id="L9m-sN-HCz"/>
@@ -245,7 +245,7 @@
                                             </constraints>
                                         </box>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3342">
-                                            <rect key="frame" x="54" y="193" width="96" height="17"/>
+                                            <rect key="frame" x="54" y="193" width="96" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="bla bla bla.mov" usesSingleLineMode="YES" id="3343">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -253,7 +253,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3328">
-                                            <rect key="frame" x="54" y="193" width="83" height="17"/>
+                                            <rect key="frame" x="54" y="193" width="83" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Choose a file" usesSingleLineMode="YES" id="3329">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -270,7 +270,7 @@
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3334">
                                             <rect key="frame" x="60" y="121" width="479" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" title="&quot;Such Great Heights.txt&quot;" usesSingleLineMode="YES" id="3337">
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -290,7 +290,7 @@
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3008">
                                             <rect key="frame" x="60" y="69" width="479" height="14"/>
                                             <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" title="&quot;Such Great Heights.mp3&quot;" usesSingleLineMode="YES" id="3009">
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -339,7 +339,7 @@
                                             <rect key="frame" x="57" y="169" width="204" height="18"/>
                                             <buttonCell key="cell" type="check" title="Treat as a pipe rather than as a file" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="2882">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="openFileStreamChanged:" target="-2" id="6ig-pa-BOY"/>
@@ -415,7 +415,7 @@
                                             </constraints>
                                             <popUpButtonCell key="cell" type="push" title="GANGS_OF_NEW_YORK" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3169" id="3167">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="menu"/>
+                                                <font key="font" metaFont="system"/>
                                                 <menu key="menu" title="OtherViews" id="3168">
                                                     <items>
                                                         <menuItem title="GANGS_OF_NEW_YORK" state="on" id="3169"/>
@@ -461,7 +461,7 @@
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="2809" customClass="VLCWrappableTextField">
                                             <rect key="frame" x="17" y="149" width="521" height="28"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="2887">
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                                 <string key="title">To Open a usual network stream (HTTP, RTSP, MMS, FTP, etc.), just enter the URL in the field above. If you want to open a RTP or UDP stream, press the button below.</string>
                                                 <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -502,7 +502,7 @@
                                             <rect key="frame" x="216" y="198" width="124" height="26"/>
                                             <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="2889">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="menu"/>
+                                                <font key="font" metaFont="system"/>
                                                 <menu key="menu" title="OtherViews" id="2328">
                                                     <items>
                                                         <menuItem title="Screen" id="2330">
@@ -541,7 +541,7 @@ Gw
                                                                                     <rect key="frame" x="221" y="26" width="76" height="26"/>
                                                                                     <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3074" id="3072">
                                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                                        <font key="font" metaFont="menu"/>
+                                                                                        <font key="font" metaFont="system"/>
                                                                                         <menu key="menu" title="OtherViews" id="3073">
                                                                                             <items>
                                                                                                 <menuItem title="Item 1" state="on" id="3074"/>
@@ -587,7 +587,7 @@ Gw
                                                                                     <rect key="frame" x="221" y="26" width="76" height="26"/>
                                                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="3439">
                                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                                        <font key="font" metaFont="menu"/>
+                                                                                        <font key="font" metaFont="system"/>
                                                                                         <menu key="menu" title="OtherViews" id="3440">
                                                                                             <items>
                                                                                                 <menuItem title="Item 1" id="3443"/>
@@ -662,7 +662,7 @@ Gw
                                                                                 <real key="minimum" value="1"/>
                                                                                 <real key="maximum" value="60"/>
                                                                             </numberFormatter>
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -674,7 +674,7 @@ Gw
                                                                     <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2351">
                                                                         <rect key="frame" x="15" y="136" width="120" height="14"/>
                                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Frames per Second:" usesSingleLineMode="YES" id="2961">
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -689,7 +689,7 @@ Gw
                                                                     <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2492">
                                                                         <rect key="frame" x="140" y="107" width="43" height="19"/>
                                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="0" drawsBackground="YES" id="2963">
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -701,7 +701,7 @@ Gw
                                                                     <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2493">
                                                                         <rect key="frame" x="15" y="109" width="120" height="14"/>
                                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Subscreen left:" usesSingleLineMode="YES" id="2964">
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -709,7 +709,7 @@ Gw
                                                                     <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2494">
                                                                         <rect key="frame" x="140" y="78" width="43" height="19"/>
                                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="0" drawsBackground="YES" id="2965">
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -721,7 +721,7 @@ Gw
                                                                     <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2495">
                                                                         <rect key="frame" x="15" y="80" width="120" height="14"/>
                                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Subscreen top:" usesSingleLineMode="YES" id="2966">
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -729,7 +729,7 @@ Gw
                                                                     <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2496">
                                                                         <rect key="frame" x="322" y="107" width="43" height="19"/>
                                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="0" drawsBackground="YES" id="2967">
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -741,7 +741,7 @@ Gw
                                                                     <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2497">
                                                                         <rect key="frame" x="221" y="109" width="96" height="14"/>
                                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Subscreen width:" usesSingleLineMode="YES" id="2968">
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -749,7 +749,7 @@ Gw
                                                                     <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2498">
                                                                         <rect key="frame" x="322" y="78" width="43" height="19"/>
                                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="0" drawsBackground="YES" id="2969">
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -761,7 +761,7 @@ Gw
                                                                     <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2499">
                                                                         <rect key="frame" x="217" y="80" width="100" height="14"/>
                                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Subscreen height:" usesSingleLineMode="YES" id="2970">
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -770,7 +770,7 @@ Gw
                                                                         <rect key="frame" x="137" y="56" width="114" height="18"/>
                                                                         <buttonCell key="cell" type="check" title="Follow the mouse" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="2971">
                                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                         </buttonCell>
                                                                         <connections>
                                                                             <outlet property="nextKeyView" destination="2349" id="2770"/>
@@ -807,7 +807,7 @@ Gw
                                                                     <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3462">
                                                                         <rect key="frame" x="15" y="164" width="120" height="14"/>
                                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Screen:" usesSingleLineMode="YES" id="3467">
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                         </textFieldCell>
@@ -816,7 +816,7 @@ Gw
                                                                         <rect key="frame" x="137" y="159" width="251" height="22"/>
                                                                         <popUpButtonCell key="cell" type="push" title="-" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3466" id="3464">
                                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                            <font key="font" metaFont="smallSystem"/>
+                                                                            <font key="font" metaFont="message" size="11"/>
                                                                             <menu key="menu" title="OtherViews" id="3465">
                                                                                 <items>
                                                                                     <menuItem title="-" state="on" id="3466"/>
@@ -837,7 +837,7 @@ Gw
                                                                                     <rect key="frame" x="118" y="1" width="251" height="22"/>
                                                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="3507">
                                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                                        <font key="font" metaFont="smallSystem"/>
+                                                                                        <font key="font" metaFont="message" size="11"/>
                                                                                         <menu key="menu" title="OtherViews" id="3508">
                                                                                             <items>
                                                                                                 <menuItem title="Item 1" id="3511"/>
@@ -854,7 +854,7 @@ Gw
                                                                                     <rect key="frame" x="14" y="4" width="97" height="18"/>
                                                                                     <buttonCell key="cell" type="check" title="Capture Audio" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="3516">
                                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                        <font key="font" metaFont="smallSystem"/>
+                                                                                        <font key="font" metaFont="message" size="11"/>
                                                                                     </buttonCell>
                                                                                     <connections>
                                                                                         <action selector="screenAudioChanged:" target="-2" id="8zr-Js-FCB"/>
@@ -979,10 +979,10 @@ Gw
                                     <rect key="frame" x="3" y="3" width="532" height="39"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" preferredMaxLayoutWidth="474" translatesAutoresizingMaskIntoConstraints="NO" id="2840">
-                                            <rect key="frame" x="16" y="9" width="502" height="19"/>
+                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="474" translatesAutoresizingMaskIntoConstraints="NO" id="2840">
+                                            <rect key="frame" x="16" y="10" width="500" height="19"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="left" drawsBackground="YES" usesSingleLineMode="YES" id="2990">
-                                                <font key="font" metaFont="smallSystem"/>
+                                                <font key="font" metaFont="message" size="11"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -1056,7 +1056,7 @@ Gw
                         <rect key="frame" x="33" y="131" width="166" height="14"/>
                         <buttonCell key="cell" type="square" title="Media Resource Locator (MRL)" bezelStyle="shadowlessSquare" alignment="left" imageScaling="proportionallyDown" inset="2" id="VXw-Fk-qfp">
                             <behavior key="behavior" lightByContents="YES"/>
-                            <font key="font" metaFont="smallSystem"/>
+                            <font key="font" metaFont="message" size="11"/>
                         </buttonCell>
                         <connections>
                             <action selector="performClick:" target="2836" id="VaF-KC-MIR"/>
@@ -1093,20 +1093,20 @@ Gw
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="37" y="107" width="531" height="324"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="800"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="1264">
-                <rect key="frame" x="0.0" y="0.0" width="531" height="288"/>
+                <rect key="frame" x="0.0" y="0.0" width="531" height="289"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <box title="Subtitle File" translatesAutoresizingMaskIntoConstraints="NO" id="1267">
-                        <rect key="frame" x="17" y="157" width="497" height="111"/>
+                        <rect key="frame" x="17" y="158" width="497" height="111"/>
                         <view key="contentView" id="c0q-Fr-KVn">
-                            <rect key="frame" x="3" y="3" width="491" height="90"/>
+                            <rect key="frame" x="3" y="3" width="491" height="91"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1266">
-                                    <rect key="frame" x="384" y="45" width="96" height="32"/>
+                                    <rect key="frame" x="384" y="46" width="96" height="32"/>
                                     <buttonCell key="cell" type="push" title="Browse..." bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="2895">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -1116,7 +1116,7 @@ Gw
                                     </connections>
                                 </button>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1274">
-                                    <rect key="frame" x="353" y="15" width="24" height="17"/>
+                                    <rect key="frame" x="353" y="15" width="24" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="fps" usesSingleLineMode="YES" id="2896">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1124,7 +1124,7 @@ Gw
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1275">
-                                    <rect key="frame" x="382" y="12" width="70" height="22"/>
+                                    <rect key="frame" x="382" y="13" width="70" height="21"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0" drawsBackground="YES" id="2897">
                                         <numberFormatter key="formatter" formatterBehavior="custom10_4" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="Mlw-Rg-ocy">
                                             <real key="minimum" value="0.0"/>
@@ -1143,14 +1143,14 @@ Gw
                                     </connections>
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1276">
-                                    <rect key="frame" x="458" y="10" width="19" height="27"/>
+                                    <rect key="frame" x="458" y="9" width="19" height="28"/>
                                     <stepperCell key="cell" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="100" id="2898"/>
                                     <connections>
                                         <binding destination="-2" name="value" keyPath="self.fileSubFps" id="Tjy-DO-Rbd"/>
                                     </connections>
                                 </stepper>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1278">
-                                    <rect key="frame" x="214" y="15" width="37" height="17"/>
+                                    <rect key="frame" x="214" y="15" width="37" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="delay" usesSingleLineMode="YES" id="2899">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1158,7 +1158,7 @@ Gw
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1279">
-                                    <rect key="frame" x="256" y="12" width="70" height="22"/>
+                                    <rect key="frame" x="256" y="13" width="70" height="21"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="70" id="9an-Lk-17c"/>
                                     </constraints>
@@ -1180,7 +1180,7 @@ Gw
                                     </connections>
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="1280">
-                                    <rect key="frame" x="331" y="10" width="19" height="27"/>
+                                    <rect key="frame" x="331" y="9" width="19" height="28"/>
                                     <stepperCell key="cell" continuous="YES" alignment="left" increment="0.5" minValue="-10000" maxValue="10000" id="2901"/>
                                     <connections>
                                         <binding destination="-2" name="value" keyPath="self.fileSubDelay" id="Cpm-Ab-isP"/>
@@ -1197,7 +1197,7 @@ Gw
                                     </connections>
                                 </button>
                                 <imageView translatesAutoresizingMaskIntoConstraints="NO" id="3371">
-                                    <rect key="frame" x="17" y="47" width="32" height="32"/>
+                                    <rect key="frame" x="17" y="48" width="32" height="32"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="32" id="ZPL-jA-txx"/>
                                         <constraint firstAttribute="height" constant="32" id="ljP-vi-77k"/>
@@ -1205,7 +1205,7 @@ Gw
                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="generic" id="3376"/>
                                 </imageView>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3372">
-                                    <rect key="frame" x="54" y="54" width="83" height="17"/>
+                                    <rect key="frame" x="54" y="56" width="83" height="16"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Choose a file" id="3375">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -1213,7 +1213,7 @@ Gw
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3373">
-                                    <rect key="frame" x="54" y="54" width="278" height="17"/>
+                                    <rect key="frame" x="54" y="56" width="278" height="16"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="bla bla bla.movbla bla bla.movbla bla bla.mov" id="3374">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1271,11 +1271,11 @@ DQ
                     <box title="Font Properties" translatesAutoresizingMaskIntoConstraints="NO" id="2137">
                         <rect key="frame" x="17" y="52" width="497" height="101"/>
                         <view key="contentView" id="46J-Uu-Jvw">
-                            <rect key="frame" x="3" y="3" width="491" height="80"/>
+                            <rect key="frame" x="3" y="3" width="491" height="81"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2139">
-                                    <rect key="frame" x="20" y="18" width="144" height="17"/>
+                                    <rect key="frame" x="20" y="18" width="144" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Subtitles text encoding" usesSingleLineMode="YES" id="2904">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1283,18 +1283,21 @@ DQ
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2142">
-                                    <rect key="frame" x="20" y="50" width="125" height="17"/>
+                                    <rect key="frame" x="20" y="51" width="125" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Subtitle justification" usesSingleLineMode="YES" id="2905">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <popUpButton verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2153">
-                                    <rect key="frame" x="349" y="45" width="130" height="25"/>
+                                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2153">
+                                    <rect key="frame" x="349" y="45" width="130" height="26"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="125" id="CaP-RX-nlL"/>
+                                    </constraints>
                                     <popUpButtonCell key="cell" type="push" title="Left" bezelStyle="rounded" alignment="left" lineBreakMode="clipping" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2149" id="2906">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="menu"/>
+                                        <font key="font" metaFont="system"/>
                                         <menu key="menu" title="OtherViews" id="2150">
                                             <items>
                                                 <menuItem title="Left" state="on" id="2149"/>
@@ -1303,11 +1306,11 @@ DQ
                                         </menu>
                                     </popUpButtonCell>
                                 </popUpButton>
-                                <popUpButton verticalHuggingPriority="750" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2158">
-                                    <rect key="frame" x="349" y="13" width="130" height="25"/>
+                                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2158">
+                                    <rect key="frame" x="349" y="12" width="130" height="26"/>
                                     <popUpButtonCell key="cell" type="push" title="System Default" bezelStyle="rounded" alignment="left" lineBreakMode="clipping" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2154" id="2907">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="menu"/>
+                                        <font key="font" metaFont="system"/>
                                         <menu key="menu" title="OtherViews" id="2157">
                                             <items>
                                                 <menuItem title="System Default" state="on" id="2154"/>
@@ -1319,16 +1322,19 @@ DQ
                                 </popUpButton>
                             </subviews>
                             <constraints>
+                                <constraint firstItem="2153" firstAttribute="baseline" secondItem="2142" secondAttribute="firstBaseline" id="5qP-2y-XT4"/>
                                 <constraint firstItem="2142" firstAttribute="leading" secondItem="46J-Uu-Jvw" secondAttribute="leading" constant="22" id="8DY-bG-XH0"/>
                                 <constraint firstItem="2158" firstAttribute="top" secondItem="2153" secondAttribute="bottom" constant="11" id="BFf-NO-Ulg"/>
-                                <constraint firstItem="2158" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2139" secondAttribute="trailing" constant="17" id="Esv-Zf-CPt"/>
+                                <constraint firstItem="2153" firstAttribute="baseline" secondItem="2142" secondAttribute="baseline" id="CSQ-8M-8w9"/>
                                 <constraint firstItem="2153" firstAttribute="trailing" secondItem="2158" secondAttribute="trailing" id="SNf-m2-irH"/>
                                 <constraint firstItem="2153" firstAttribute="top" secondItem="46J-Uu-Jvw" secondAttribute="top" constant="11" id="b8T-Qz-AkA"/>
                                 <constraint firstItem="2153" firstAttribute="width" secondItem="2158" secondAttribute="width" id="dOj-Ut-MwR"/>
                                 <constraint firstItem="2139" firstAttribute="centerY" secondItem="2158" secondAttribute="centerY" id="dc8-pW-q9S"/>
                                 <constraint firstItem="2142" firstAttribute="centerY" secondItem="2153" secondAttribute="centerY" id="eeB-QN-lTD"/>
                                 <constraint firstItem="2142" firstAttribute="leading" secondItem="2139" secondAttribute="leading" id="fSQ-HN-EUP"/>
-                                <constraint firstItem="2153" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2142" secondAttribute="trailing" constant="17" id="nbe-Cw-1uC"/>
+                                <constraint firstItem="2158" firstAttribute="baseline" secondItem="2139" secondAttribute="firstBaseline" id="jw8-nU-6LE"/>
+                                <constraint firstItem="2158" firstAttribute="baseline" secondItem="2139" secondAttribute="baseline" id="n8F-HE-9tO"/>
+                                <constraint firstAttribute="trailing" secondItem="2153" secondAttribute="trailing" constant="15" id="sQA-8Z-Ce0"/>
                             </constraints>
                         </view>
                         <constraints>
@@ -1356,10 +1362,10 @@ DQ
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="246" y="437" width="696" height="250"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="800"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="2793">
-                <rect key="frame" x="0.0" y="0.0" width="696" height="250"/>
+                <rect key="frame" x="0.0" y="0.0" width="696" height="249"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2794">
@@ -1392,7 +1398,7 @@ DQ
                         </connections>
                     </matrix>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="800" translatesAutoresizingMaskIntoConstraints="NO" id="2797">
-                        <rect key="frame" x="377" y="185" width="30" height="17"/>
+                        <rect key="frame" x="377" y="186" width="30" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Port" usesSingleLineMode="YES" id="2976">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1400,7 +1406,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="800" translatesAutoresizingMaskIntoConstraints="NO" id="2798">
-                        <rect key="frame" x="338" y="156" width="69" height="17"/>
+                        <rect key="frame" x="338" y="158" width="69" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="IP Address" usesSingleLineMode="YES" id="2977">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1408,7 +1414,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2799" customClass="VLCOpenTextField">
-                        <rect key="frame" x="412" y="183" width="78" height="22"/>
+                        <rect key="frame" x="412" y="184" width="78" height="21"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="78" id="pW6-zg-Iah"/>
                         </constraints>
@@ -1422,14 +1428,14 @@ DQ
                         </connections>
                     </textField>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2800">
-                        <rect key="frame" x="495" y="180" width="19" height="27"/>
+                        <rect key="frame" x="495" y="180" width="19" height="28"/>
                         <stepperCell key="cell" continuous="YES" alignment="left" maxValue="65535" doubleValue="1234" valueWraps="YES" id="2979"/>
                         <connections>
                             <action selector="openNetStepperChanged:" target="-2" id="cOb-FE-uz7"/>
                         </connections>
                     </stepper>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2801" customClass="VLCOpenTextField">
-                        <rect key="frame" x="412" y="154" width="119" height="22"/>
+                        <rect key="frame" x="412" y="156" width="119" height="21"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="119" id="5hI-l9-myn"/>
                         </constraints>
@@ -1440,7 +1446,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="760" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="2802">
-                        <rect key="frame" x="543" y="156" width="49" height="17"/>
+                        <rect key="frame" x="543" y="158" width="49" height="16"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="45" id="DDD-Jw-3lI"/>
                         </constraints>
@@ -1451,7 +1457,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2803" customClass="VLCOpenTextField">
-                        <rect key="frame" x="597" y="154" width="58" height="22"/>
+                        <rect key="frame" x="597" y="156" width="58" height="21"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="58" id="LHb-P2-YuL"/>
                         </constraints>
@@ -1465,7 +1471,7 @@ DQ
                         </connections>
                     </textField>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="2804">
-                        <rect key="frame" x="660" y="151" width="19" height="27"/>
+                        <rect key="frame" x="660" y="152" width="19" height="28"/>
                         <stepperCell key="cell" continuous="YES" alignment="left" tag="1" maxValue="65535" doubleValue="1234" valueWraps="YES" id="2983"/>
                         <connections>
                             <action selector="openNetStepperChanged:" target="-2" id="TlS-ML-UbZ"/>
@@ -1500,7 +1506,7 @@ Gw
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="2811" customClass="VLCWrappableTextField">
                         <rect key="frame" x="17" y="57" width="662" height="70"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="2986">
-                            <font key="font" metaFont="smallSystem"/>
+                            <font key="font" metaFont="message" size="11"/>
                             <string key="title">If you want to open a multicast stream, enter the respective IP address given by the stream provider. In unicast mode, VLC uses your machine's IP automatically.
 
 To open a stream using a different protocol, just press Cancel to close this sheet.
@@ -1510,7 +1516,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2852">
-                        <rect key="frame" x="34" y="213" width="55" height="17"/>
+                        <rect key="frame" x="34" y="213" width="55" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Protocol" usesSingleLineMode="YES" id="2987">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -1518,7 +1524,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2853">
-                        <rect key="frame" x="166" y="213" width="124" height="17"/>
+                        <rect key="frame" x="166" y="213" width="124" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Mode" usesSingleLineMode="YES" id="2988">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -1526,7 +1532,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2854">
-                        <rect key="frame" x="353" y="213" width="54" height="17"/>
+                        <rect key="frame" x="353" y="213" width="54" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Address" usesSingleLineMode="YES" id="2989">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -1616,7 +1622,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3084">
-                    <rect key="frame" x="114" y="172" width="68" height="17"/>
+                    <rect key="frame" x="114" y="173" width="68" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="Audio CD" usesSingleLineMode="YES" id="3085">
                         <font key="font" metaFont="systemBold"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1624,9 +1630,9 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3104">
-                    <rect key="frame" x="118" y="156" width="59" height="14"/>
+                    <rect key="frame" x="118" y="157" width="59" height="14"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="%i tracks " usesSingleLineMode="YES" id="3105">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                         <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -1662,7 +1668,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3094">
-                    <rect key="frame" x="104" y="172" width="88" height="17"/>
+                    <rect key="frame" x="104" y="173" width="88" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="Insert a disc" usesSingleLineMode="YES" id="3101">
                         <font key="font" metaFont="systemBold"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1695,18 +1701,18 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <action selector="openSpecialMediaFolder:" target="-2" id="01G-06-mbK"/>
                     </connections>
                 </button>
-                <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3183">
-                    <rect key="frame" x="83" y="140" width="130" height="28"/>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3183">
+                    <rect key="frame" x="83" y="140" width="130" height="27"/>
                     <buttonCell key="cell" type="push" title="Disable DVD menus" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="3184">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                     </buttonCell>
                     <connections>
                         <action selector="dvdreadOptionChanged:" target="-2" id="1xF-jH-wsI"/>
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3110">
-                    <rect key="frame" x="109" y="172" width="78" height="17"/>
+                    <rect key="frame" x="109" y="172" width="78" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="DVD_TITLE" usesSingleLineMode="YES" id="3111">
                         <font key="font" metaFont="systemBold"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1728,34 +1734,35 @@ To open a stream using a different protocol, just press Cancel to close this she
                 <constraint firstItem="3108" firstAttribute="top" secondItem="3183" secondAttribute="bottom" constant="33" id="wON-yL-Z6w"/>
                 <constraint firstItem="3110" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="3106" secondAttribute="leading" constant="4" id="wS7-nw-t8F"/>
             </constraints>
+            <point key="canvasLocation" x="140" y="155"/>
         </customView>
         <customView id="3119" userLabel="DVD /o menus">
             <rect key="frame" x="0.0" y="0.0" width="295" height="205"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3148">
-                    <rect key="frame" x="54" y="89" width="47" height="14"/>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3148">
+                    <rect key="frame" x="54" y="91" width="47" height="14"/>
                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Chapter" usesSingleLineMode="YES" id="3159">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3149">
-                    <rect key="frame" x="73" y="119" width="28" height="14"/>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3149">
+                    <rect key="frame" x="73" y="121" width="28" height="14"/>
                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Title" usesSingleLineMode="YES" id="3158">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3150">
-                    <rect key="frame" x="106" y="117" width="152" height="19"/>
+                    <rect key="frame" x="106" y="118" width="152" height="19"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="152" id="P9Y-Jr-mkf"/>
                     </constraints>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="1" drawsBackground="YES" id="3157">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -1764,13 +1771,13 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3151">
-                    <rect key="frame" x="106" y="87" width="152" height="19"/>
+                    <rect key="frame" x="106" y="88" width="152" height="19"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="152" id="SfY-bP-G6B"/>
                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="152" id="WNu-Q2-wZw"/>
                     </constraints>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="1" drawsBackground="YES" id="3156">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -1779,18 +1786,18 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </connections>
                 </textField>
                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3152">
-                    <rect key="frame" x="263" y="115" width="15" height="22"/>
+                    <rect key="frame" x="263" y="116" width="15" height="22"/>
                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="999" doubleValue="1" valueWraps="YES" id="3155">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                     </stepperCell>
                     <connections>
                         <action selector="dvdreadOptionChanged:" target="-2" id="6lt-ib-YL6"/>
                     </connections>
                 </stepper>
                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="3153">
-                    <rect key="frame" x="263" y="85" width="15" height="22"/>
+                    <rect key="frame" x="263" y="86" width="15" height="22"/>
                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" tag="1" minValue="1" maxValue="999" doubleValue="1" valueWraps="YES" id="3154">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                     </stepperCell>
                     <connections>
                         <action selector="dvdreadOptionChanged:" target="-2" id="V7m-Hb-Gq3"/>
@@ -1806,18 +1813,18 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <action selector="openSpecialMediaFolder:" target="-2" id="9tN-Dx-V5C"/>
                     </connections>
                 </button>
-                <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3192">
-                    <rect key="frame" x="85" y="140" width="126" height="28"/>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3192">
+                    <rect key="frame" x="85" y="141" width="126" height="27"/>
                     <buttonCell key="cell" type="push" title="Enable DVD menus" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="3195">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                     </buttonCell>
                     <connections>
                         <action selector="dvdreadOptionChanged:" target="-2" id="QNN-GH-YXF"/>
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3193">
-                    <rect key="frame" x="109" y="172" width="78" height="17"/>
+                    <rect key="frame" x="109" y="173" width="78" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="DVD_TITLE" usesSingleLineMode="YES" id="3194">
                         <font key="font" metaFont="systemBold"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1859,26 +1866,26 @@ To open a stream using a different protocol, just press Cancel to close this she
             <rect key="frame" x="0.0" y="0.0" width="295" height="205"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3243">
-                    <rect key="frame" x="54" y="89" width="47" height="14"/>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3243">
+                    <rect key="frame" x="54" y="91" width="47" height="14"/>
                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Chapter" usesSingleLineMode="YES" id="3244">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3242">
-                    <rect key="frame" x="73" y="119" width="28" height="14"/>
+                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3242">
+                    <rect key="frame" x="73" y="121" width="28" height="14"/>
                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Title" usesSingleLineMode="YES" id="3245">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3241">
-                    <rect key="frame" x="106" y="117" width="152" height="19"/>
+                    <rect key="frame" x="106" y="118" width="152" height="19"/>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="1" drawsBackground="YES" id="3246">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -1887,12 +1894,12 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </connections>
                 </textField>
                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3240">
-                    <rect key="frame" x="106" y="87" width="152" height="19"/>
+                    <rect key="frame" x="106" y="88" width="152" height="19"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="152" id="mo1-bK-5VC"/>
                     </constraints>
                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="1" drawsBackground="YES" id="3247">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -1901,25 +1908,25 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </connections>
                 </textField>
                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3239">
-                    <rect key="frame" x="263" y="115" width="15" height="22"/>
+                    <rect key="frame" x="263" y="116" width="15" height="22"/>
                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" minValue="1" maxValue="999" doubleValue="1" valueWraps="YES" id="3248">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                     </stepperCell>
                     <connections>
                         <action selector="vcdOptionChanged:" target="-2" id="h2b-w4-mzR"/>
                     </connections>
                 </stepper>
                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="3238">
-                    <rect key="frame" x="263" y="85" width="15" height="22"/>
+                    <rect key="frame" x="263" y="86" width="15" height="22"/>
                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" tag="1" minValue="1" maxValue="999" doubleValue="1" valueWraps="YES" id="3249">
-                        <font key="font" metaFont="smallSystem"/>
+                        <font key="font" metaFont="message" size="11"/>
                     </stepperCell>
                     <connections>
                         <action selector="vcdOptionChanged:" target="-2" id="osf-DS-7Fj"/>
                     </connections>
                 </stepper>
                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3237">
-                    <rect key="frame" x="31" y="44" width="233" height="32"/>
+                    <rect key="frame" x="31" y="45" width="233" height="32"/>
                     <buttonCell key="cell" type="push" title="Open VIDEO_TS or BDMV folder" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="3250">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -1929,7 +1936,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3234">
-                    <rect key="frame" x="109" y="172" width="78" height="17"/>
+                    <rect key="frame" x="109" y="173" width="78" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="VCD_TITLE" usesSingleLineMode="YES" id="3253">
                         <font key="font" metaFont="systemBold"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1980,7 +1987,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3291">
-                    <rect key="frame" x="114" y="172" width="68" height="17"/>
+                    <rect key="frame" x="114" y="172" width="68" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="BD_TITLE" usesSingleLineMode="YES" id="3296">
                         <font key="font" metaFont="systemBold"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2004,54 +2011,54 @@ To open a stream using a different protocol, just press Cancel to close this she
     <resources>
         <image name="buttonCell:2893:image" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
-YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
-GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
-c1dOU0NvbG9ygAKADRIgwwAAgAOAC1Z7MSwgMX3SFQoWGFpOUy5vYmplY3RzoReABIAK0hUKGh2iGxyA
-BYAGgAkQANIgCiEiXxAUTlNUSUZGUmVwcmVzZW50YXRpb26AB4AITxEIxE1NACoAAAAKAAAAEAEAAAMA
-AAABAAEAAAEBAAMAAAABAAEAAAECAAMAAAACAAgACAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAEKAAMA
-AAABAAEAAAERAAQAAAABAAAACAESAAMAAAABAAEAAAEVAAMAAAABAAIAAAEWAAMAAAABAAEAAAEXAAQA
-AAABAAAAAgEcAAMAAAABAAEAAAEoAAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAACAAEAAYdzAAcA
-AAf0AAAA0AAAAAAAAAf0YXBwbAIgAABtbnRyR1JBWVhZWiAH0AACAA4ADAAAAABhY3NwQVBQTAAAAABu
-b25lAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVkZXNjAAAAwAAAAG9kc2NtAAABMAAABmZjcHJ0AAAHmAAAADh3
-dHB0AAAH0AAAABRrVFJDAAAH5AAAAA5kZXNjAAAAAAAAABVHZW5lcmljIEdyYXkgUHJvZmlsZQAAAAAA
-AAAAAAAAFUdlbmVyaWMgR3JheSBQcm9maWxlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAAAAAfAAAADHNrU0sAAAAqAAABhGVuVVMAAAAoAAABrmNhRVMA
-AAAsAAAB1nZpVk4AAAAsAAACAnB0QlIAAAAqAAACLnVrVUEAAAAsAAACWGZyRlUAAAAqAAAChGh1SFUA
-AAAuAAACrnpoVFcAAAAQAAAC3G5iTk8AAAAsAAAC7GtvS1IAAAAYAAADGGNzQ1oAAAAkAAADMGhlSUwA
-AAAgAAADVHJvUk8AAAAkAAADdGRlREUAAAA6AAADmGl0SVQAAAAuAAAD0nN2U0UAAAAuAAAEAHpoQ04A
-AAAQAAAELmphSlAAAAAWAAAEPmVsR1IAAAAkAAAEVHB0UE8AAAA4AAAEeG5sTkwAAAAqAAAEsGVzRVMA
-AAAoAAAE2nRoVEgAAAAkAAAFAnRyVFIAAAAiAAAFJmZpRkkAAAAsAAAFSGhySFIAAAA6AAAFdHBsUEwA
-AAA2AAAFrnJ1UlUAAAAmAAAF5GFyRUcAAAAoAAAGCmRhREsAAAA0AAAGMgBWAWEAZQBvAGIAZQBjAG4A
-/QAgAHMAaQB2AP0AIABwAHIAbwBmAGkAbABHAGUAbgBlAHIAaQBjACAARwByAGEAeQAgAFAAcgBvAGYA
-aQBsAGUAUABlAHIAZgBpAGwAIABkAGUAIABnAHIAaQBzACAAZwBlAG4A6AByAGkAYwBDHqUAdQAgAGgA
-7ABuAGgAIABNAOAAdQAgAHgA4QBtACAAQwBoAHUAbgBnAFAAZQByAGYAaQBsACAAQwBpAG4AegBhACAA
-RwBlAG4A6QByAGkAYwBvBBcEMAQzBDAEOwRMBD0EOAQ5ACAEPwRABD4ERAQwBDkEOwAgAEcAcgBhAHkA
-UAByAG8AZgBpAGwAIABnAOkAbgDpAHIAaQBxAHUAZQAgAGcAcgBpAHMAwQBsAHQAYQBsAOEAbgBvAHMA
-IABzAHoA/AByAGsAZQAgAHAAcgBvAGYAaQBskBp1KHBwlo6Ccl9pY8+P8ABHAGUAbgBlAHIAaQBzAGsA
-IABnAHIA5QB0AG8AbgBlAHAAcgBvAGYAaQBsx3y8GAAgAEcAcgBhAHkAINUEuFzTDMd8AE8AYgBlAGMA
-bgD9ACABYQBlAGQA/QAgAHAAcgBvAGYAaQBsBeQF6AXVBeQF2QXcACAARwByAGEAeQAgBdsF3AXcBdkA
-UAByAG8AZgBpAGwAIABnAHIAaQAgAGcAZQBuAGUAcgBpAGMAQQBsAGwAZwBlAG0AZQBpAG4AZQBzACAA
-RwByAGEAdQBzAHQAdQBmAGUAbgAtAFAAcgBvAGYAaQBsAFAAcgBvAGYAaQBsAG8AIABnAHIAaQBnAGkA
-bwAgAGcAZQBuAGUAcgBpAGMAbwBHAGUAbgBlAHIAaQBzAGsAIABnAHIA5QBzAGsAYQBsAGUAcAByAG8A
-ZgBpAGxmbpAacHBepmPPj/Blh072TgCCLDCwMOwwpDDXMO0w1TChMKQw6wOTA7UDvQO5A7oDzAAgA8AD
-wQO/A8YDrwO7ACADswO6A8EDuQBQAGUAcgBmAGkAbAAgAGcAZQBuAOkAcgBpAGMAbwAgAGQAZQAgAGMA
-aQBuAHoAZQBuAHQAbwBzAEEAbABnAGUAbQBlAGUAbgAgAGcAcgBpAGoAcwBwAHIAbwBmAGkAZQBsAFAA
-ZQByAGYAaQBsACAAZwByAGkAcwAgAGcAZQBuAOkAcgBpAGMAbw5CDhsOIw5EDh8OJQ5MDioONQ5ADhcO
-Mg4XDjEOSA4nDkQOGwBHAGUAbgBlAGwAIABHAHIAaQAgAFAAcgBvAGYAaQBsAGkAWQBsAGUAaQBuAGUA
-bgAgAGgAYQByAG0AYQBhAHAAcgBvAGYAaQBpAGwAaQBHAGUAbgBlAHIAaQENAGsAaQAgAHAAcgBvAGYA
-aQBsACAAcwBpAHYAaQBoACAAdABvAG4AbwB2AGEAVQBuAGkAdwBlAHIAcwBhAGwAbgB5ACAAcAByAG8A
-ZgBpAGwAIABzAHoAYQByAG8BWwBjAGkEHgQxBEkEOAQ5ACAEQQQ1BEAESwQ5ACAEPwRABD4ERAQ4BDsE
-TAZFBkQGQQAgBioGOQYxBkoGQQAgAEcAcgBhAHkAIAYnBkQGOQYnBkUARwBlAG4AZQByAGUAbAAgAGcA
-cgDlAHQAbwBuAGUAYgBlAHMAawByAGkAdgBlAGwAcwBlAAB0ZXh0AAAAAENvcHlyaWdodCAyMDA3IEFw
-cGxlIEluYy4sIGFsbCByaWdodHMgcmVzZXJ2ZWQuAFhZWiAAAAAAAADzUQABAAAAARbMY3VydgAAAAAA
-AAABAc0AANIlJicoWiRjbGFzc25hbWVYJGNsYXNzZXNfEBBOU0JpdG1hcEltYWdlUmVwoycpKlpOU0lt
-YWdlUmVwWE5TT2JqZWN00iUmLC1XTlNBcnJheaIsKtIlJi8wXk5TTXV0YWJsZUFycmF5oy8sKtMyMwo0
-NTZXTlNXaGl0ZVxOU0NvbG9yU3BhY2VEMCAwABADgAzSJSY4OVdOU0NvbG9yojgq0iUmOzxXTlNJbWFn
-ZaI7Kl8QD05TS2V5ZWRBcmNoaXZlctE/QFRyb290gAEACAARABoAIwAtADIANwBGAEwAVwBeAGUAcgB5
-AIEAgwCFAIoAjACOAJUAmgClAKcAqQCrALAAswC1ALcAuQC7AMAA1wDZANsJowmoCbMJvAnPCdMJ3gnn
-CewJ9An3CfwKCwoPChYKHgorCjAKMgo0CjkKQQpECkkKUQpUCmYKaQpuAAAAAAAAAgEAAAAAAAAAQQAA
-AAAAAAAAAAAAAAAACnA
+YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T
+S2V5ZWRBcmNoaXZlctEICVRyb290gAGuCwwZGh8UJCgpMDM2PD9VJG51bGzWDQ4PEBESExQVFhcYVk5T
+U2l6ZV5OU1Jlc2l6aW5nTW9kZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVwc1dOU0NvbG9ygAIQAIAN
+EiDDAACAA4ALVnsxLCAxfdIbDxweWk5TLm9iamVjdHOhHYAEgArSGw8gI6IhIoAFgAaACdIlDyYnXxAU
+TlNUSUZGUmVwcmVzZW50YXRpb26AB4AITxEIxE1NACoAAAAKAAAAEAEAAAMAAAABAAEAAAEBAAMAAAAB
+AAEAAAECAAMAAAACAAgACAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAEKAAMAAAABAAEAAAERAAQAAAAB
+AAAACAESAAMAAAABAAEAAAEVAAMAAAABAAIAAAEWAAMAAAABAAEAAAEXAAQAAAABAAAAAgEcAAMAAAAB
+AAEAAAEoAAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAACAAEAAYdzAAcAAAf0AAAA0AAAAAAAAAf0
+YXBwbAIgAABtbnRyR1JBWVhZWiAH0AACAA4ADAAAAABhY3NwQVBQTAAAAABub25lAAAAAAAAAAAAAAAA
+AAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAVkZXNjAAAAwAAAAG9kc2NtAAABMAAABmZjcHJ0AAAHmAAAADh3dHB0AAAH0AAAABRrVFJD
+AAAH5AAAAA5kZXNjAAAAAAAAABVHZW5lcmljIEdyYXkgUHJvZmlsZQAAAAAAAAAAAAAAFUdlbmVyaWMg
+R3JheSBQcm9maWxlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+bWx1YwAAAAAAAAAfAAAADHNrU0sAAAAqAAABhGVuVVMAAAAoAAABrmNhRVMAAAAsAAAB1nZpVk4AAAAs
+AAACAnB0QlIAAAAqAAACLnVrVUEAAAAsAAACWGZyRlUAAAAqAAAChGh1SFUAAAAuAAACrnpoVFcAAAAQ
+AAAC3G5iTk8AAAAsAAAC7GtvS1IAAAAYAAADGGNzQ1oAAAAkAAADMGhlSUwAAAAgAAADVHJvUk8AAAAk
+AAADdGRlREUAAAA6AAADmGl0SVQAAAAuAAAD0nN2U0UAAAAuAAAEAHpoQ04AAAAQAAAELmphSlAAAAAW
+AAAEPmVsR1IAAAAkAAAEVHB0UE8AAAA4AAAEeG5sTkwAAAAqAAAEsGVzRVMAAAAoAAAE2nRoVEgAAAAk
+AAAFAnRyVFIAAAAiAAAFJmZpRkkAAAAsAAAFSGhySFIAAAA6AAAFdHBsUEwAAAA2AAAFrnJ1UlUAAAAm
+AAAF5GFyRUcAAAAoAAAGCmRhREsAAAA0AAAGMgBWAWEAZQBvAGIAZQBjAG4A/QAgAHMAaQB2AP0AIABw
+AHIAbwBmAGkAbABHAGUAbgBlAHIAaQBjACAARwByAGEAeQAgAFAAcgBvAGYAaQBsAGUAUABlAHIAZgBp
+AGwAIABkAGUAIABnAHIAaQBzACAAZwBlAG4A6AByAGkAYwBDHqUAdQAgAGgA7ABuAGgAIABNAOAAdQAg
+AHgA4QBtACAAQwBoAHUAbgBnAFAAZQByAGYAaQBsACAAQwBpAG4AegBhACAARwBlAG4A6QByAGkAYwBv
+BBcEMAQzBDAEOwRMBD0EOAQ5ACAEPwRABD4ERAQwBDkEOwAgAEcAcgBhAHkAUAByAG8AZgBpAGwAIABn
+AOkAbgDpAHIAaQBxAHUAZQAgAGcAcgBpAHMAwQBsAHQAYQBsAOEAbgBvAHMAIABzAHoA/AByAGsAZQAg
+AHAAcgBvAGYAaQBskBp1KHBwlo6Ccl9pY8+P8ABHAGUAbgBlAHIAaQBzAGsAIABnAHIA5QB0AG8AbgBl
+AHAAcgBvAGYAaQBsx3y8GAAgAEcAcgBhAHkAINUEuFzTDMd8AE8AYgBlAGMAbgD9ACABYQBlAGQA/QAg
+AHAAcgBvAGYAaQBsBeQF6AXVBeQF2QXcACAARwByAGEAeQAgBdsF3AXcBdkAUAByAG8AZgBpAGwAIABn
+AHIAaQAgAGcAZQBuAGUAcgBpAGMAQQBsAGwAZwBlAG0AZQBpAG4AZQBzACAARwByAGEAdQBzAHQAdQBm
+AGUAbgAtAFAAcgBvAGYAaQBsAFAAcgBvAGYAaQBsAG8AIABnAHIAaQBnAGkAbwAgAGcAZQBuAGUAcgBp
+AGMAbwBHAGUAbgBlAHIAaQBzAGsAIABnAHIA5QBzAGsAYQBsAGUAcAByAG8AZgBpAGxmbpAacHBepmPP
+j/Blh072TgCCLDCwMOwwpDDXMO0w1TChMKQw6wOTA7UDvQO5A7oDzAAgA8ADwQO/A8YDrwO7ACADswO6
+A8EDuQBQAGUAcgBmAGkAbAAgAGcAZQBuAOkAcgBpAGMAbwAgAGQAZQAgAGMAaQBuAHoAZQBuAHQAbwBz
+AEEAbABnAGUAbQBlAGUAbgAgAGcAcgBpAGoAcwBwAHIAbwBmAGkAZQBsAFAAZQByAGYAaQBsACAAZwBy
+AGkAcwAgAGcAZQBuAOkAcgBpAGMAbw5CDhsOIw5EDh8OJQ5MDioONQ5ADhcOMg4XDjEOSA4nDkQOGwBH
+AGUAbgBlAGwAIABHAHIAaQAgAFAAcgBvAGYAaQBsAGkAWQBsAGUAaQBuAGUAbgAgAGgAYQByAG0AYQBh
+AHAAcgBvAGYAaQBpAGwAaQBHAGUAbgBlAHIAaQENAGsAaQAgAHAAcgBvAGYAaQBsACAAcwBpAHYAaQBo
+ACAAdABvAG4AbwB2AGEAVQBuAGkAdwBlAHIAcwBhAGwAbgB5ACAAcAByAG8AZgBpAGwAIABzAHoAYQBy
+AG8BWwBjAGkEHgQxBEkEOAQ5ACAEQQQ1BEAESwQ5ACAEPwRABD4ERAQ4BDsETAZFBkQGQQAgBioGOQYx
+BkoGQQAgAEcAcgBhAHkAIAYnBkQGOQYnBkUARwBlAG4AZQByAGUAbAAgAGcAcgDlAHQAbwBuAGUAYgBl
+AHMAawByAGkAdgBlAGwAcwBlAAB0ZXh0AAAAAENvcHlyaWdodCAyMDA3IEFwcGxlIEluYy4sIGFsbCBy
+aWdodHMgcmVzZXJ2ZWQuAFhZWiAAAAAAAADzUQABAAAAARbMY3VydgAAAAAAAAABAc0AANIqKywtWiRj
+bGFzc25hbWVYJGNsYXNzZXNfEBBOU0JpdG1hcEltYWdlUmVwoywuL1pOU0ltYWdlUmVwWE5TT2JqZWN0
+0iorMTJXTlNBcnJheaIxL9IqKzQ1Xk5TTXV0YWJsZUFycmF5ozQxL9M3OA85OjtXTlNXaGl0ZVxOU0Nv
+bG9yU3BhY2VEMCAwABADgAzSKis9PldOU0NvbG9yoj0v0iorQEFXTlNJbWFnZaJALwAIABEAGgAkACkA
+MgA3AEkATABRAFMAYgBoAHUAfACLAJIAnwCmAK4AsACyALQAuQC7AL0AxADJANQA1gDYANoA3wDiAOQA
+5gDoAO0BBAEGAQgJ0AnVCeAJ6Qn8CgAKCwoUChkKIQokCikKOAo8CkMKSwpYCl0KXwphCmYKbgpxCnYK
+fgAAAAAAAAIBAAAAAAAAAEIAAAAAAAAAAAAAAAAAAAqBA
 </mutableData>
         </image>
         <image name="generic" width="512" height="512"/>
