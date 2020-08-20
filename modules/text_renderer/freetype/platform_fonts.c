@@ -500,6 +500,12 @@ void DumpFamilies( vlc_font_select_t *fs )
     msg_Dbg( p_obj, "fallback_map" );
     msg_Dbg( p_obj, "-------------------" );
     DumpDictionary( p_obj, &fs->fallback_map, false, -1 );
+# ifdef _WIN32
+    msg_Dbg( p_obj, "-------------------" );
+    msg_Dbg( p_obj, "fontlinking_map" );
+    msg_Dbg( p_obj, "-------------------" );
+    DumpDictionary( p_obj, &fs->fontlinking_map, true, 1 );
+# endif
 }
 #endif
 
@@ -888,6 +894,7 @@ vlc_font_select_t * FontSelectNew( filter_t *p_filter )
     fs->pf_select_family = CoreText_GetFamily;
     fs->pf_get_fallbacks = CoreText_GetFallbacks;
 #elif defined( _WIN32 )
+    vlc_dictionary_init( &fs->fontlinking_map, 20 );
     if( InitDWrite( fs ) == VLC_SUCCESS )
     {
         fs->pf_select_family = DWrite_GetFamily;
@@ -940,6 +947,7 @@ void FontSelectDelete( vlc_font_select_t *fs )
 #elif defined( _WIN32 )
     if( fs->pf_select_family == DWrite_GetFamily )
         ReleaseDWrite( fs );
+    vlc_dictionary_clear( &fs->fontlinking_map, FreeFamilies, fs );
 #endif
 
     if( fs->families_lookup_lru )

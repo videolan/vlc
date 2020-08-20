@@ -64,6 +64,7 @@ struct vlc_font_select_t
 
 #if defined( _WIN32 )
     void *p_dw_sys;
+    vlc_dictionary_t  fontlinking_map;
 #endif
 };
 

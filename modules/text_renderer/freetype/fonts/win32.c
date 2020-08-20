@@ -59,6 +59,7 @@
 
 #if !VLC_WINSTORE_APP
 #define FONT_DIR_NT  TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts")
+#define FONT_LINKING_NT TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink")
 
 static inline void AppendFamily( vlc_family_t **pp_list, vlc_family_t *p_family )
 {
@@ -396,6 +397,82 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     return 1;
 }
 
+static void FillLinkedFontsForFamily( vlc_font_select_t *fs,
+                                      LPTSTR name, vlc_family_t *p_family )
+{
+    HDC hDC = GetDC( NULL );
+    if( !hDC )
+        return;
+
+    struct enumFontCallbackContext ctx;
+    ctx.fs = fs;
+    ctx.p_family = p_family;
+    ctx.prevFullName[0] = 0;
+
+    LOGFONT lf = { 0 };
+    lf.lfCharSet = DEFAULT_CHARSET;
+    wcsncpy( (LPTSTR)&lf.lfFaceName, name, LF_FACESIZE );
+
+    EnumFontFamiliesEx( hDC, &lf, (FONTENUMPROC)&EnumFontCallback, (LPARAM)&ctx, 0 );
+    ReleaseDC( NULL, hDC );
+}
+
+static int AddLinkedFonts( vlc_font_select_t *fs, const char *psz_family,
+                           vlc_family_t *p_family )
+{
+    HKEY fontLinkKey;
+    if (FAILED(RegOpenKeyEx( HKEY_LOCAL_MACHINE, FONT_LINKING_NT,
+                             0, KEY_READ, &fontLinkKey )))
+        return VLC_EGENERIC;
+
+    LPTSTR psz_buffer = ToWide( psz_family );
+    if( !psz_buffer )
+    {
+        RegCloseKey( fontLinkKey );
+        return VLC_EGENERIC;
+    }
+
+    DWORD linkedFontsBufferSize = 0;
+    DWORD lpType;
+    if( FAILED(RegQueryValueEx( fontLinkKey, psz_buffer, 0, &lpType,
+                               NULL, &linkedFontsBufferSize )) )
+    {
+        free( psz_buffer );
+        RegCloseKey( fontLinkKey );
+        return VLC_EGENERIC;
+    }
+
+    WCHAR* linkedFonts = (WCHAR*) malloc(linkedFontsBufferSize);
+
+    if ( linkedFonts &&
+         SUCCEEDED(RegQueryValueEx( fontLinkKey, psz_buffer, 0, &lpType,
+                                   (BYTE*)linkedFonts, &linkedFontsBufferSize ) )
+        && lpType == REG_MULTI_SZ)
+    {
+        DWORD start = 0;
+        for( DWORD i=0; i < linkedFontsBufferSize / sizeof(WCHAR); i++ )
+        {
+            if( linkedFonts[i] == 0 && i > start )
+            {
+                for( DWORD j=start + 1; j < i; j++ )
+                {
+                    if( linkedFonts[j] != ',' )
+                        continue;
+                    FillLinkedFontsForFamily( fs, &linkedFonts[j + 1], p_family );
+                    break;
+                }
+                start = i + 1;
+            }
+        }
+    }
+
+    free(psz_buffer);
+    free(linkedFonts);
+    RegCloseKey(fontLinkKey);
+
+    return VLC_SUCCESS;
+}
+
 int Win32_GetFamily( vlc_font_select_t *fs, const char *psz_lcname, const vlc_family_t **pp_result )
 {
     vlc_family_t *p_family =
@@ -531,6 +608,7 @@ int Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
     vlc_family_t  *p_family      = NULL;
     vlc_family_t  *p_fallbacks   = NULL;
     char          *psz_uniscribe = NULL;
+    char          *psz_linkname  = NULL;
     int            i_ret         = VLC_EGENERIC;
 
     p_fallbacks = vlc_dictionary_value_for_key( &fs->fallback_map, psz_lcname );
@@ -553,23 +631,39 @@ int Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
             goto done;
         }
 
-        const vlc_family_t *p_uniscribe = NULL;
-        if( Win32_GetFamily( fs, psz_uniscribe, &p_uniscribe ) != VLC_SUCCESS )
-            goto done;
-
-        if( !p_uniscribe || !p_uniscribe->p_fonts ||
-            !CheckFace( fs, p_uniscribe->p_fonts, codepoint ) )
+        /* Search for existing listing inserted from a different
+         * codepoint in fallbacks (and that means the fallback will not work) */
+        for( vlc_family_t *p = p_fallbacks; p; p = p->p_next )
         {
-            i_ret = VLC_SUCCESS;
-            goto done;
+            if( !strcasecmp( p->psz_name, psz_uniscribe ) )
+            {
+                i_ret = VLC_SUCCESS;
+                goto done;
+            }
         }
 
-        p_family = NewFamily( fs, psz_uniscribe, NULL, NULL, NULL );
-
-        if( unlikely( !p_family ) )
+        /* Load the replied font, but might still can't provide codepoint
+         * as it could rely on font linking */
+        const vlc_family_t *p_uniscribe = NULL;
+        if( Win32_GetFamily( fs, psz_uniscribe, &p_uniscribe ) != VLC_SUCCESS ||
+            p_uniscribe == NULL )
             goto done;
 
-        p_family->p_fonts = p_uniscribe->p_fonts;
+        /* Create entry for the replied font */
+        p_family = NewFamily( fs, psz_uniscribe, NULL, NULL, NULL );
+        if( !p_family )
+            goto done;
+
+        if( asprintf( &psz_linkname, "\xF0\x9F\x94\x97%s", psz_uniscribe ) < 0 )
+            goto done;
+
+        vlc_family_t *withlinked = NewFamily( fs, psz_linkname, NULL, NULL, NULL );
+        if( withlinked )
+        {
+            p_family->p_next = withlinked;
+            AddLinkedFonts( fs, psz_uniscribe, withlinked );
+            vlc_dictionary_insert( &fs->fontlinking_map, psz_linkname, withlinked );
+        }
 
         if( p_fallbacks )
             AppendFamily( &p_fallbacks, p_family );
@@ -581,6 +675,7 @@ int Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
     i_ret = VLC_SUCCESS;
 
 done:
+    free( psz_linkname );
     free( psz_uniscribe );
     *pp_result = p_family;
     return i_ret;
