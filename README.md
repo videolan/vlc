@@ -1,5 +1,4 @@
-README for the VLC media player
-===============================
+![VLC Logo](https://www.xda-developers.com/files/2017/10/Featured-Download-VLC-media-Player.jpg)
 
 VLC is a popular libre and open source media player and multimedia engine,
 used by a large number of individuals, professionals, companies and
@@ -12,27 +11,30 @@ The VideoLAN project was started at the university École Centrale Paris who
 relicensed VLC under the GPLv2 license in February 2001. Since then, VLC has
 been downloaded close to one billion times.
 
-Links:
-======
+## Links
 
-The VLC web site  . . . . . http://www.videolan.org/
-Support . . . . . . . . . . http://www.videolan.org/support/
-Forums  . . . . . . . . . . https://forum.videolan.org/
-Wiki  . . . . . . . . . . . https://wiki.videolan.org/
-The Developers site . . . . https://wiki.videolan.org/Developers_Corner
-VLC hacking guide . . . . . https://wiki.videolan.org/Hacker_Guide
-Bugtracker  . . . . . . . . https://trac.videolan.org/vlc/
-The VideoLAN web site . . . http://www.videolan.org/
+ For | Link 
+ -----|--------------
+ The VLC web site  | [http://www.videolan.org/](http://www.videolan.org/)
+ Support | [http://www.videolan.org/support/](http://www.videolan.org/support/)
+ Forums | [https://forum.videolan.org/](https://forum.videolan.org/)
+Wiki | [https://wiki.videolan.org/](https://wiki.videolan.org/)
+The Developers site | [https://wiki.videolan.org/Developers_Corner](https://wiki.videolan.org/Developers_Corner)
+VLC hacking guide |  [https://wiki.videolan.org/Hacker_Guide](https://wiki.videolan.org/Hacker_Guide)
+Bugtracker | [https://trac.videolan.org/vlc/](https://trac.videolan.org/vlc/)
+The VideoLAN web site | [http://www.videolan.org/](http://www.videolan.org/)
+----------------------------------------------------------------------------
 
-Source Code Content:
-===================
+## Source Code Content:
+<pre>
+
 ABOUT-NLS          - Notes on the Free Translation Project.
 AUTHORS            - VLC authors.
 COPYING            - The GPL license.
 COPYING.LIB        - The LGPL license.
 INSTALL            - Installation and building instructions.
 NEWS               - Important modifications between the releases.
-README             - This file.
+README.md          - This file.
 THANKS             - VLC contributors.
 
 bin/               - VLC binaries.
@@ -55,3 +57,5 @@ po/                - VLC translations.
 share/             - Common Resources files.
 src/               - libvlccore source code.
 test/              - testing system.
+
+</pre>
