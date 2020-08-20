@@ -548,46 +548,44 @@ static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
     /* Maximum number of faces to try for each run */
     #define MAX_FACES 5
     vlc_face_id_t *pp_facesidx[ MAX_FACES ] = {0};
-    vlc_face_id_t *p_faceidx = NULL;
 
     for( int i = i_start_offset; i < i_end_offset; ++i )
     {
-        int i_index = 0;
-        int i_glyph_index = 0;
-
 #ifdef HAVE_FRIBIDI
         /*
          * For white space, punctuation and neutral characters, try to use
          * the font of the previous character, if any. See #20466.
          */
-        if( p_faceidx &&
+        if( i > i_start_offset &&
+            p_paragraph->pp_facesidx[ i - 1 ] &&
             ( p_paragraph->p_types[ i ] == FRIBIDI_TYPE_WS
            || p_paragraph->p_types[ i ] == FRIBIDI_TYPE_CS
-           || p_paragraph->p_types[ i ] == FRIBIDI_TYPE_ON ) )
+           || p_paragraph->p_types[ i ] == FRIBIDI_TYPE_ON ) &&
+            vlc_ftcache_LookupCMapIndex( p_sys->ftcache,
+                                         p_paragraph->pp_facesidx[ i - 1 ],
+                                         p_paragraph->p_code_points[ i ] ) != 0 )
         {
-            i_glyph_index = vlc_ftcache_LookupCMapIndex( p_sys->ftcache, p_faceidx,
-                                                         p_paragraph->p_code_points[ i ] );
-            if( i_glyph_index )
-            {
-                p_paragraph->pp_facesidx[ i ] = p_faceidx;
-                continue;
-            }
+            p_paragraph->pp_facesidx[ i ] = p_paragraph->pp_facesidx[ i - 1 ];
+            continue;
         }
 #endif
 
-        do {
-            p_faceidx = pp_facesidx[ i_index ];
-            if( !p_faceidx )
-                p_faceidx = pp_facesidx[ i_index ] =
-                     SelectAndLoadFace( p_filter, p_style, p_paragraph->p_code_points[ i ] );
-            if( !p_faceidx )
-                continue;
-            i_glyph_index = vlc_ftcache_LookupCMapIndex( p_sys->ftcache, p_faceidx,
-                                             p_paragraph->p_code_points[ i ] );
-            if( i_glyph_index )
-                p_paragraph->pp_facesidx[ i ] = p_faceidx;
-
-        } while( i_glyph_index == 0 && ++i_index < MAX_FACES );
+        for( int j=0; j<MAX_FACES; j++ )
+        {
+            if( !pp_facesidx[ j ] )
+            {
+                p_paragraph->pp_facesidx[ i ] =
+                pp_facesidx[ j ] = SelectAndLoadFace( p_filter, p_style,
+                                                      p_paragraph->p_code_points[ i ] );
+                break;
+            }
+            else if( vlc_ftcache_LookupCMapIndex( p_sys->ftcache, pp_facesidx[ j ],
+                                                  p_paragraph->p_code_points[ i ] ) != 0 )
+            {
+                p_paragraph->pp_facesidx[ i ] = pp_facesidx[ j ];
+                break;
+            }
+        }
     }
 
     int i_run_start = i_start_offset;
