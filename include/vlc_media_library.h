@@ -74,6 +74,15 @@ typedef enum vlc_ml_thumbnail_size_t
     VLC_ML_THUMBNAIL_SIZE_COUNT
 } vlc_ml_thumbnail_size_t;
 
+typedef enum vlc_ml_thumbnail_status_t
+{
+    VLC_ML_THUMBNAIL_STATUS_MISSING,
+    VLC_ML_THUMBNAIL_STATUS_AVAILABLE,
+    VLC_ML_THUMBNAIL_STATUS_FAILURE,
+    VLC_ML_THUMBNAIL_STATUS_PERSISTENT_FAILURE,
+    VLC_ML_THUMBNAIL_STATUS_CRASH,
+} vlc_ml_thumbnail_status_t;
+
 typedef enum vlc_ml_history_type_t
 {
     VLC_ML_HISTORY_TYPE_MEDIA,
@@ -87,7 +96,7 @@ typedef struct vlc_ml_thumbnail_t
      * True if a thumbnail is available, or if thumbnail generation was
      * attempted but failed
      */
-    bool b_generated;
+    vlc_ml_thumbnail_status_t i_status;
 } vlc_ml_thumbnail_t;
 
 typedef struct vlc_ml_movie_t

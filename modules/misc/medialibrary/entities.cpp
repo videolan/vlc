@@ -66,14 +66,29 @@ static bool convertThumbnails( const T input, vlc_ml_thumbnail_t *output )
     for ( auto i = 0u; i < VLC_ML_THUMBNAIL_SIZE_COUNT; ++i )
     {
         auto sizeType = static_cast<medialibrary::ThumbnailSizeType>( i );
-        if ( input->thumbnailStatus( sizeType ) !=
-             medialibrary::ThumbnailStatus::Available )
+        switch ( input->thumbnailStatus( sizeType ) )
+        {
+            case medialibrary::ThumbnailStatus::Available:
+                output[i].i_status = VLC_ML_THUMBNAIL_STATUS_AVAILABLE;
+                break;
+            case medialibrary::ThumbnailStatus::Missing:
+                output[i].i_status = VLC_ML_THUMBNAIL_STATUS_MISSING;
+                break;
+            case medialibrary::ThumbnailStatus::Failure:
+                output[i].i_status = VLC_ML_THUMBNAIL_STATUS_FAILURE;
+                break;
+            case medialibrary::ThumbnailStatus::PersistentFailure:
+                output[i].i_status = VLC_ML_THUMBNAIL_STATUS_PERSISTENT_FAILURE;
+                break;
+            case medialibrary::ThumbnailStatus::Crash:
+                output[i].i_status = VLC_ML_THUMBNAIL_STATUS_CRASH;
+                break;
+        }
+        if ( output[i].i_status != VLC_ML_THUMBNAIL_STATUS_AVAILABLE )
         {
             output[i].psz_mrl = nullptr;
-            output[i].b_generated = false;
             continue;
         }
-        output[i].b_generated = true;
         const auto thumbnailMrl = input->thumbnailMrl( sizeType );
         if ( thumbnailMrl.empty() == false )
         {

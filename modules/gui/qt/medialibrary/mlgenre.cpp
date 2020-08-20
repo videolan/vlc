@@ -121,7 +121,8 @@ public:
         QStringList thumbnails;
         thumbnails.reserve(8);
         for( const vlc_ml_album_t& media: ml_range_iterate<vlc_ml_album_t>( album_list ) ) {
-            if (media.thumbnails[VLC_ML_THUMBNAIL_SMALL].b_generated) {
+            if (media.thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status ==
+                    VLC_ML_THUMBNAIL_STATUS_AVAILABLE) {
                 QUrl mediaURL( media.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl );
                 //QImage only accept local file
                 if (mediaURL.isValid() && mediaURL.isLocalFile()) {

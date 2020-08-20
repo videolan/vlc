@@ -139,7 +139,7 @@ private:
     float m_progress;
     QString m_progressTime;
     unsigned int m_playCount;
-    bool m_thumbnailGenerated;
+    vlc_ml_thumbnail_status_t m_thumbnailStatus;
     QObjectList m_audioDesc;
     QObjectList m_videoDesc;
 

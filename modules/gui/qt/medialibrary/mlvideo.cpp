@@ -82,7 +82,7 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
     , m_thumbnail( QString::fromUtf8( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
     , m_progress( data->f_progress )
     , m_playCount( data->i_playcount )
-    , m_thumbnailGenerated( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].b_generated )
+    , m_thumbnailStatus( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status )
     , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
         assert( m_ml != nullptr );
         vlc_ml_event_unregister_callback( m_ml, cb );
@@ -165,11 +165,14 @@ void MLVideo::onMlEvent( const vlc_ml_event_t* event )
     if ( event->i_type != VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED ||
          event->media_thumbnail_generated.i_size != VLC_ML_THUMBNAIL_SMALL )
         return;
-    m_thumbnailGenerated = true;
     if ( event->media_thumbnail_generated.p_media->i_id != m_id.id )
         return;
     if ( event->media_thumbnail_generated.b_success == false )
+    {
+        m_thumbnailStatus = VLC_ML_THUMBNAIL_STATUS_FAILURE;
         return;
+    }
+    m_thumbnailStatus = VLC_ML_THUMBNAIL_STATUS_AVAILABLE;
     auto thumbnailMrl = event->media_thumbnail_generated
             .p_media->thumbnails[event->media_thumbnail_generated.i_size].psz_mrl;
     m_thumbnail = QString::fromUtf8( thumbnailMrl );
@@ -189,7 +192,8 @@ QString MLVideo::getTitle() const
 
 QString MLVideo::getThumbnail()
 {
-    if ( m_thumbnailGenerated == false )
+    if ( m_thumbnailStatus == VLC_ML_THUMBNAIL_STATUS_MISSING ||
+         m_thumbnailStatus == VLC_ML_THUMBNAIL_STATUS_FAILURE )
     {
         m_ml_event_handle.reset( vlc_ml_event_register_callback( m_ml, onMlEvent, this ) );
         vlc_ml_media_generate_thumbnail( m_ml, m_id.id, VLC_ML_THUMBNAIL_SMALL,
