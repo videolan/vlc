@@ -179,13 +179,12 @@ NavigableFocusScope {
             }
         }
 
-        section.delegate: Text {
+        section.delegate: Widgets.ListLabel {
             x: view.headerItem.contentX - VLCStyle.table_section_width
             topPadding: VLCStyle.margin_xsmall
             bottomPadding: VLCStyle.margin_xxsmall
             leftPadding: VLCStyle.table_section_text_margin
             text: section
-            font.pixelSize: VLCStyle.fontHeight_normal
             color: VLCStyle.colors.accent
         }
 
