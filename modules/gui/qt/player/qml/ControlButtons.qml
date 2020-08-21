@@ -848,7 +848,15 @@ Item{
                     leftPadding: VLCStyle.margin_xsmall
 
                     ToolTip {
-                        text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
+                        contentItem: Text {
+                                  text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
+                                  color: VLCStyle.colors.tooltipTextColor
+                        }
+
+                        background: Rectangle {
+                            color: VLCStyle.colors.tooltipColor
+                        }
+
                         visible: artworkInfoItem.isClipped && (artworkInfoMouseArea.containsMouse || artworkInfoItem.active)
                         delay: 500
                     }
