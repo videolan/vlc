@@ -111,6 +111,9 @@ Item {
 
     property color sliderBarMiniplayerBgColor: isThemeDark ? "#FF929292" : "#FFEEEEEE"
 
+    property color tooltipTextColor: systemPalette.tooltipText
+    property color tooltipColor: systemPalette.tooltip
+
     //vlc orange
     property color accent: "#FFFF950D";
 
