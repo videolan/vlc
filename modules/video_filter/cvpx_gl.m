@@ -346,7 +346,7 @@ error:
     CVPixelBufferRef cvpx_buffer = _buffers[_currentFlip];
 
     glFlush();
-    glFinish();
+    //glFinish();
 
     picture_t *output = picture_NewFromFormat(&_fmt_out);
     if (output == NULL)
