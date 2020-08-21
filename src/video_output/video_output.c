@@ -1679,17 +1679,8 @@ static void ThreadProcessMouseState(vout_thread_sys_t *p_vout,
     if (vlc_mouse_HasMoved(&sys->mouse, m))
         var_SetCoords(vout, "mouse-moved", m->i_x, m->i_y);
 
-    if (vlc_mouse_HasButton(&sys->mouse, m)) {
+    if (vlc_mouse_HasButton(&sys->mouse, m))
         var_SetInteger(vout, "mouse-button-down", m->i_pressed);
-
-        if (vlc_mouse_HasPressed(&sys->mouse, m, MOUSE_BUTTON_LEFT)) {
-            /* FIXME? */
-            int x, y;
-
-            var_GetCoords(vout, "mouse-moved", &x, &y);
-            var_SetCoords(vout, "mouse-clicked", x, y);
-        }
-    }
 
     if (m->b_double_click)
         var_ToggleBool(vout, "fullscreen");
