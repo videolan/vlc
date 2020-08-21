@@ -137,6 +137,9 @@ struct vlc_gl_filters {
         bool top_field_first;
         vlc_rational_t framerate;
     } pic;
+
+    bool will_update;
+    struct vlc_gl_filter_priv *pending_filter;
 };
 
 struct vlc_gl_filters *
@@ -150,6 +153,8 @@ vlc_gl_filters_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     filters->gl = gl;
     filters->api = api;
     filters->interop = interop;
+    filters->will_update = false;
+    filters->pending_filter = NULL;
     vlc_list_init(&filters->list);
 
     memset(&filters->viewport, 0, sizeof(filters->viewport));
@@ -532,9 +537,17 @@ vlc_gl_filters_UpdatePicture(struct vlc_gl_filters *filters,
     return vlc_gl_sampler_UpdatePicture(first_filter->sampler, picture);
 }
 
-bool
-vlc_gl_filters_WillUpdate(struct vlc_gl_filters *filters, bool new_picture)
+static void
+ProcessWillUpdate(struct vlc_gl_filters *filters, bool new_picture)
 {
+    filters->will_update = false;
+    filters->pending_filter = NULL;
+    if (new_picture)
+    {
+        filters->will_update = true;
+        filters->pending_filter = vlc_list_first_entry_or_null(&filters->list, struct vlc_gl_filter_priv, node);
+        return;
+    }
     struct vlc_gl_filter_priv *priv;
     vlc_list_reverse_foreach(priv, &filters->list, node)
     {
@@ -542,14 +555,29 @@ vlc_gl_filters_WillUpdate(struct vlc_gl_filters *filters, bool new_picture)
         if (priv->filter.ops->will_update == NULL)
         {
             if (new_picture)
-                return true;
+            {
+                filters->will_update = true;
+                filters->pending_filter = priv;
+                break;
+            }
             else continue;
         }
 
         if (priv->filter.ops->will_update(&priv->filter, new_picture))
-            return true;
+        {
+            filters->will_update = true;
+            filters->pending_filter = priv;
+            break;
+        }
     }
-    return false;
+}
+
+bool
+vlc_gl_filters_WillUpdate(struct vlc_gl_filters *filters, bool new_picture)
+{
+    if (new_picture)
+        ProcessWillUpdate(filters, true);
+    return filters->will_update;
 }
 
 int
@@ -671,6 +699,8 @@ vlc_gl_filters_Draw(struct vlc_gl_filters *filters,
             }
         }
     }
+
+    ProcessWillUpdate(filters, false);
 
     if (output_meta)
         *output_meta = meta;
