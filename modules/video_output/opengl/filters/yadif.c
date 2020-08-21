@@ -62,6 +62,7 @@ struct program_yadif {
 struct plane {
     /* prev, current and next */
     GLuint textures[3];
+    GLuint fbos[3];
 };
 
 struct sys {
@@ -84,6 +85,14 @@ struct sys {
 
     vlc_tick_t last_pts;
 };
+
+static inline GLuint
+GetDrawFramebuffer(const opengl_vtable_t *vt)
+{
+    GLint value;
+    vt->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &value);
+    return value; /* as GLuint */
+}
 
 static void
 CopyInput(struct vlc_gl_filter *filter)
@@ -169,7 +178,7 @@ InitProgramCopy(struct vlc_gl_filter *filter, const char *shader_version,
     assert(prog->loc.vertex_pos != -1);
 
     vt->GenBuffers(1, &prog->vbo);
-    vt->GenFramebuffers(1, &prog->framebuffer);
+    //vt->GenFramebuffers(1, &prog->framebuffer);
 
     static const GLfloat vertex_pos[] = {
         -1,  1,
@@ -406,7 +415,10 @@ InitPlane(struct vlc_gl_filter *filter, unsigned plane_idx, GLsizei width,
     const opengl_vtable_t *vt = &filter->api->vt;
     struct plane *plane = &sys->planes[plane_idx];
 
+    GLuint draw_fb = GetDrawFramebuffer(vt);
+
     vt->GenTextures(3, plane->textures);
+    vt->GenFramebuffers(3, plane->fbos);
     for (int i = 0; i < 3; ++i)
     {
         vt->BindTexture(GL_TEXTURE_2D, plane->textures[i]);
@@ -416,7 +428,12 @@ InitPlane(struct vlc_gl_filter *filter, unsigned plane_idx, GLsizei width,
         vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        vt->BindFramebuffer(GL_FRAMEBUFFER, plane->fbos[i]);
+        vt->FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                 GL_TEXTURE_2D, plane->textures[i], 0);
     }
+
+    vt->BindFramebuffer(GL_FRAMEBUFFER, draw_fb);
 }
 
 static void
@@ -451,7 +468,7 @@ DestroyProgramCopy(struct vlc_gl_filter *filter)
     const opengl_vtable_t *vt = &filter->api->vt;
 
     vt->DeleteProgram(prog->id);
-    vt->DeleteFramebuffers(1, &prog->framebuffer);
+    //vt->DeleteFramebuffers(1, &prog->framebuffer);
     vt->DeleteBuffers(1, &prog->vbo);
 }
 
@@ -487,14 +504,6 @@ Flush(struct vlc_gl_filter *filter)
     sys->missing_frames = 2;
 }
 
-static inline GLuint
-GetDrawFramebuffer(const opengl_vtable_t *vt)
-{
-    GLint value;
-    vt->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &value);
-    return value; /* as GLuint */
-}
-
 static bool
 WillUpdate(struct vlc_gl_filter *filter, bool new_frame)
 {
@@ -524,9 +533,11 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
     unsigned cur = (next + 2) % 3;
 
     GLuint draw_fb = GetDrawFramebuffer(vt);
-    vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, sys->program_copy.framebuffer);
-    vt->FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                             GL_TEXTURE_2D, plane->textures[next], 0);
+
+    vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, plane->fbos[next]);
+    //vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, sys->program_copy.framebuffer);
+    //vt->FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+    //                         GL_TEXTURE_2D, plane->textures[next], 0);
 
     CopyInput(filter);
 
