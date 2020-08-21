@@ -98,12 +98,24 @@ NavigableFocusScope {
             property alias loadedHeader: headerLoader.item
 
             width: parent.width
-            height: childrenRect.height
+            height: col.height
             color: headerColor
             visible: view.modelCount > 0
             z: 3
 
+            Widgets.ListLabel {
+                x: contentX - VLCStyle.table_section_width
+                y: row.y
+                height: row.height
+                leftPadding: VLCStyle.table_section_text_margin
+                text: view.currentSection
+                color: VLCStyle.colors.accent
+                visible: text !== "" && view.contentY > (VLCStyle.fontHeight_normal + VLCStyle.margin_xxsmall - col.height)
+            }
+
             Column {
+                id: col
+
                 width: parent.width
                 height: childrenRect.height
 
