@@ -334,6 +334,7 @@ struct enumFontCallbackContext
 {
     vlc_font_select_t *fs;
     vlc_family_t *p_family;
+    WCHAR prevFullName[LF_FULLFACESIZE];
 };
 
 static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTMETRICEX *metric,
@@ -345,20 +346,20 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     struct enumFontCallbackContext *ctx = ( struct enumFontCallbackContext * ) lParam;
     vlc_family_t *p_family = ctx->p_family;
 
-    int i_flags = 0;
-    if( lpelfe->elfLogFont.lfWeight >= FW_BOLD )
-        i_flags |= VLC_FONT_FLAG_BOLD;
-    if( lpelfe->elfLogFont.lfItalic != 0 )
-        i_flags |= VLC_FONT_FLAG_ITALIC;
-
     /*
      * This function will be called by Windows as many times for each font
      * of the family as the number of scripts the font supports.
      * Check to avoid duplicates.
      */
-    for( vlc_font_t *p_font = p_family->p_fonts; p_font; p_font = p_font->p_next )
-        if( p_font->i_flags == i_flags )
-            return 1;
+    if( !wcscmp( ctx->prevFullName, lpelfe->elfFullName ) )
+        return 1;
+    wcscpy( ctx->prevFullName, lpelfe->elfFullName );
+
+    int i_flags = 0;
+    if( lpelfe->elfLogFont.lfWeight >= FW_BOLD )
+        i_flags |= VLC_FONT_FLAG_BOLD;
+    if( lpelfe->elfLogFont.lfItalic != 0 )
+        i_flags |= VLC_FONT_FLAG_ITALIC;
 
     char *psz_filename = NULL;
     char *psz_fontfile = NULL;
@@ -424,6 +425,7 @@ int Win32_GetFamily( vlc_font_select_t *fs, const char *psz_lcname, const vlc_fa
     struct enumFontCallbackContext ctx;
     ctx.fs = fs;
     ctx.p_family = p_family;
+    ctx.prevFullName[0] = 0;
     EnumFontFamiliesEx(hDC, &lf, (FONTENUMPROC)&EnumFontCallback, (LPARAM)&ctx, 0);
     ReleaseDC(NULL, hDC);
 
