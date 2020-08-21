@@ -1157,6 +1157,10 @@ static int StartVideoToolbox(decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    /* Initialized to NULL for error handling */
+    CFMutableDictionaryRef destinationPixelBufferAttributes = NULL;
+    CFMutableDictionaryRef decoderConfiguration = NULL;
+
     /* Late starts */
     if (p_sys->pf_late_start && p_sys->pf_late_start(p_dec))
     {
@@ -1169,19 +1173,16 @@ static int StartVideoToolbox(decoder_t *p_dec)
         return VLC_EGENERIC;
 
     /* destination pixel buffer attributes */
-    CFMutableDictionaryRef destinationPixelBufferAttributes = cfdict_create(0);
+    destinationPixelBufferAttributes = cfdict_create(0);
     if (destinationPixelBufferAttributes == NULL)
         return VLC_EGENERIC;
 
-    CFMutableDictionaryRef decoderConfiguration =
+    decoderConfiguration =
         CreateSessionDescriptionFormat(p_dec,
                                        p_dec->fmt_out.video.i_sar_num,
                                        p_dec->fmt_out.video.i_sar_den);
     if (decoderConfiguration == NULL)
-    {
-        CFRelease(destinationPixelBufferAttributes);
-        return VLC_EGENERIC;
-    }
+        goto error;
 
     /* create video format description */
     OSStatus status = CMVideoFormatDescriptionCreate(
@@ -1193,10 +1194,8 @@ static int StartVideoToolbox(decoder_t *p_dec)
                                             &p_sys->videoFormatDescription);
     if (status)
     {
-        CFRelease(destinationPixelBufferAttributes);
-        CFRelease(decoderConfiguration);
         msg_Err(p_dec, "video format description creation failed (%i)", (int)status);
-        return VLC_EGENERIC;
+        goto error;
     }
 
 #if !TARGET_OS_IPHONE
@@ -1245,6 +1244,15 @@ static int StartVideoToolbox(decoder_t *p_dec)
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
+
+error:
+    if (destinationPixelBufferAttributes != NULL)
+        CFRelease(destinationPixelBufferAttributes);
+
+    if (decoderConfiguration != NULL)
+        CFRelease(decoderConfiguration);
+
+    return VLC_EGENERIC;
 }
 
 static void StopVideoToolbox(decoder_t *p_dec, bool closing)
