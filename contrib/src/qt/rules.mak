@@ -42,6 +42,9 @@ ifdef HAVE_MACOSX
 QT_PLATFORM := -platform darwin-g++
 endif
 ifdef HAVE_WIN32
+# filter out the contrib includes as Qt doesn't ike pthread-GC2 headers
+QT_VARS := CFLAGS="$(shell echo $$CFLAGS | sed 's@ -I$$(PREFIX)/include@@g')" \
+         CXXFLAGS="$(shell echo $$CXXFLAGS | sed 's@ -I$$(PREFIX)/include@@g')"
 ifdef HAVE_CLANG
 QT_SPEC := win32-clang-g++
 else
@@ -58,7 +61,7 @@ QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 QT_CONFIG += -release
 
 .qt: qt
-	cd $< && ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX)
+	cd $< && $(QT_VARS) ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX)
 	# Make && Install libraries
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C src sub-corelib-install_subtargets sub-gui-install_subtargets sub-widgets-install_subtargets sub-platformsupport-install_subtargets sub-zlib-install_subtargets sub-bootstrap-install_subtargets
