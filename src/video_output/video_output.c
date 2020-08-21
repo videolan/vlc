@@ -389,7 +389,14 @@ void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *mouse)
     assert(mouse);
     vout_control_cmd_t cmd;
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_MOUSE_STATE);
-    cmd.mouse = *mouse;
+
+    /* Translate window coordinates to video coordinates */
+    vlc_mutex_lock(&sys->display_lock);
+    if (sys->display)
+        vout_display_TranslateMouseState(sys->display, &cmd.mouse, mouse);
+    else
+        cmd.mouse = *mouse;
+    vlc_mutex_unlock(&sys->display_lock);
 
     vout_control_Push(&sys->control, &cmd);
 }
@@ -1678,17 +1685,13 @@ void vout_ChangeSpuRate(vout_thread_t *vout, size_t channel_id, float rate)
 static void ThreadProcessMouseState(vout_thread_sys_t *p_vout,
                                     const vlc_mouse_t *win_mouse)
 {
-    vlc_mouse_t vid_mouse, tmp1, tmp2, *m;
+    vlc_mouse_t tmp1, tmp2;
+    const vlc_mouse_t *m;
     vout_thread_t *vout = &p_vout->obj;
     vout_thread_sys_t *sys = p_vout;
 
-    /* Translate window coordinates to video coordinates */
-    vlc_mutex_lock(&sys->display_lock);
-    vout_display_TranslateMouseState(sys->display, &vid_mouse, win_mouse);
-    vlc_mutex_unlock(&sys->display_lock);
-
-    /* Then pass up the filter chains. */
-    m = &vid_mouse;
+    /* pass mouse coordinates in the filter chains. */
+    m = win_mouse;
     vlc_mutex_lock(&sys->filter.lock);
     if (sys->filter.chain_static && sys->filter.chain_interactive) {
         if (!filter_chain_MouseFilter(sys->filter.chain_interactive,
