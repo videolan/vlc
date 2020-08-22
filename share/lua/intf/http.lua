@@ -169,7 +169,7 @@ function callback_art(data, request, args)
         local size = vlc.net.stat(filename).size
         local ext = string.match(filename,"%.([^%.]-)$")
         local raw = io.open(filename, 'rb'):read("*a")
-        local content = [[Content-Type: ]]..mimes[ext]..[[
+        local content = [[Content-Type: ]]..(mimes[ext] or "application/octet-stream")..[[
 
 Content-Length: ]]..size..[[
 
