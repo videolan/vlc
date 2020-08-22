@@ -170,14 +170,31 @@ FocusScope{
                     anchors.verticalCenter: parent.verticalCenter
                     hoverEnabled: true
 
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+
                     onPressed: function (event) {
                         volControl.forceActiveFocus()
-                        volControl.value = volControl.maxvolpos * event.x / (volControl.width)
+
+                        positionChanged(event)
                     }
+
                     onPositionChanged: function (event) {
+                        if (sliderMouseArea.pressedButtons === Qt.RightButton) {
+                            if (sliderMouseArea.mouseX < sliderMouseArea.width * volControl.fullvolpos / 4)
+                                volControl.value = 0
+                            else if (sliderMouseArea.mouseX < sliderMouseArea.width * volControl.fullvolpos * 3 / 4)
+                                volControl.value = 0.5
+                            else if (sliderMouseArea.mouseX >= sliderMouseArea.width)
+                                volControl.value = 1.25
+                            else
+                                volControl.value = 1
+                            return
+                        }
+
                         if(pressed)
                             volControl.value = volControl.maxvolpos * event.x / (volControl.width)
                     }
+
                     onWheel: {
                         if(wheel.angleDelta.y > 0)
                             volControl.increase()
@@ -185,6 +202,7 @@ FocusScope{
                             volControl.decrease()
                     }
                 }
+
                 Rectangle {
                     id: filled
                     width: volControl.visualPosition * sliderBg.width
