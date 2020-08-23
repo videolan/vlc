@@ -50,7 +50,7 @@ Item {
         }
 
         Widgets.ListLabel {
-            text: !rowModel ? "" : (rowModel[model.criteria] || "")
+            text: !rowModel ? "" : (rowModel[model.criteria] || i18n.qtr("Unknown Title"))
 
             Layout.fillHeight: true
             Layout.fillWidth: true
