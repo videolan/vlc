@@ -222,6 +222,7 @@
         <file alias="MediaCover.qml">widgets/qml/MediaCover.qml</file>
         <file alias="MenuLabel.qml">widgets/qml/MenuLabel.qml</file>
         <file alias="ListSubtitleLabel.qml">widgets/qml/ListSubtitleLabel.qml</file>
+        <file alias="HorizontalResizeHandle.qml">widgets/qml/HorizontalResizeHandle.qml</file>
     </qresource>
     <qresource prefix="/util">
         <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>
