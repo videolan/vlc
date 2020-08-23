@@ -63,6 +63,7 @@ NavigableFocusScope {
     property alias highlightMoveVelocity: view.highlightMoveVelocity
 
     property alias section: view.section
+    property alias currentSection: view.currentSection
     property alias orientation: view.orientation
 
     property alias add: view.add
