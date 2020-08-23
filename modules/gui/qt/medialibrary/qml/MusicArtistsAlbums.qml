@@ -86,8 +86,8 @@ Widgets.NavigableFocusScope {
         anchors.fill: parent
 
     Rectangle {
-        width: parent.width * 0.25
-        height: parent.height
+        width: artistList.width
+        height: artistList.height
         color: VLCStyle.colors.bgAlt
         opacity: .8
     }
@@ -98,9 +98,10 @@ Widgets.NavigableFocusScope {
         Widgets.KeyNavigableListView {
             id: artistList
 
-            width: parent.width * 0.25
+            width: resizeHandle.clamp(root.width / resizeHandle.widthFactor,
+                                      VLCStyle.colWidth(1) + VLCStyle.column_margin_width,
+                                      root.width * .5)
             height: parent.height
-
             spacing: 4
             model: artistModel
             currentIndex: -1
@@ -182,13 +183,32 @@ Widgets.NavigableFocusScope {
                 }
             }
 
+            Behavior on width {
+                SmoothedAnimation {
+                    easing.type: Easing.InSine
+                    duration: 10
+                }
+            }
+
+            Widgets.HorizontalResizeHandle {
+                id: resizeHandle
+
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    right: parent.right
+                }
+                sourceWidth: root.width
+                targetWidth: artistList.width
+            }
+
         }
 
         MusicArtist {
             id: albumSubView
 
             height: parent.height
-            width: parent.width * .75
+            width: root.width - artistList.width
             focus: true
             parentId: root.artistId
             initialIndex: root.initialAlbumIndex
