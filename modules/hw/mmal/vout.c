@@ -516,16 +516,6 @@ static void
 place_dest(vout_display_sys_t * const sys,
            const vout_display_cfg_t * const cfg, const video_format_t * fmt)
 {
-    video_format_t tfmt;
-
-    // Fix SAR if unknown
-    if (fmt->i_sar_den == 0 || fmt->i_sar_num == 0) {
-        tfmt = *fmt;
-        tfmt.i_sar_den = 1;
-        tfmt.i_sar_num = 1;
-        fmt = &tfmt;
-    }
-
     // Ignore what VLC thinks might be going on with display size
     vout_display_cfg_t tcfg = *cfg;
     vout_display_place_t place;
