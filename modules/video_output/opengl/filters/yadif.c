@@ -46,6 +46,7 @@ struct program_copy {
 
 struct program_yadif {
     GLuint id[2];
+    GLuint id_gather;
     GLuint vbo;
 
     struct {
@@ -57,12 +58,25 @@ struct program_yadif {
         GLint height;
         GLint field;
     } loc_order[2];
+
+    struct {
+        GLint vertex_pos;
+        GLint cur;
+        GLint computed;
+        GLint width;
+        GLint height;
+        GLint field;
+    } loc_gather;
 };
 
 struct plane {
     /* prev, current and next */
     GLuint textures[3];
     GLuint fbos[3];
+
+    /* output for intermediate computation */
+    GLuint texture_out;
+    GLuint fbo_out
 };
 
 struct sys {
@@ -315,20 +329,47 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
         "\n"
         "void main() {\n"
            /* bottom-left is (0.5, 0.5)
+              top-right is (width-0.5, height / 2.0 -0.5) */
+        "  float x = gl_FragCoord.x;\n"
+        "  float y = gl_FragCoord.y * 2.0 - 0.5;\n"
+        "  if (field == 1) y += 1.0;\n"
+        "\n"
+        "  float result;\n"
+        "  result = filter(x, y);\n"
+        "  gl_FragColor = vec4(result, 0.0, 0.0, 1.0);\n"
+        "}\n";
+
+
+    /* TODO: non-dynamic texture lookup, compute coords from vertex shader */
+    static const char *const GATHER_FRAGMENT_SHADER =
+        /* SHADER_VERSION */
+        /* FRAGMENT_SHADER_PRECISION */
+        "uniform sampler2D cur;\n"
+        "uniform sampler2D computed;\n"
+        "uniform float width;\n"
+        "uniform float height;\n"
+        "uniform int field;\n"
+        "\n"
+        "void main() {\n"
+           /* bottom-left is (0.5, 0.5)
               top-right is (width-0.5, height-0.5) */
         "  float x = gl_FragCoord.x;\n"
         "  float y = gl_FragCoord.y;\n"
         /* The line number, expressed in non-flipped coordinates */
         "  float line = floor(height - y);\n"
         "\n"
+        "  float cur_pix      = texture2D(cur, vec2(x / width, y / height)).x;\n"
+        "  float cur_computed = texture2D(computed, vec2(x / width, y / height)).x;\n"
+
         "  float result;\n"
         "  if (int(mod(line, 2.0)) == field) {\n"
-        "    result = pix(cur, x, y);\n"
+        "    result = cur_pix;\n"
         "  } else {\n"
-        "    result = filter(x, y);\n"
+        "    result = cur_computed;\n"
         "  }\n"
         "  gl_FragColor = vec4(result, 0.0, 0.0, 1.0);\n"
         "}\n";
+
 
     printf("====\n%s\n====\n", FRAGMENT_SHADER);
 
@@ -391,6 +432,36 @@ InitProgramYadif(struct vlc_gl_filter *filter, const char *shader_version,
         //assert(prog->loc_order[i].field != -1);
     }
 
+    const char * const fragment_code_gather[] =
+        { shader_version, shader_precision, GATHER_FRAGMENT_SHADER };
+
+    program_id =
+        vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
+                            ARRAY_SIZE(vertex_code), vertex_code,
+                            ARRAY_SIZE(fragment_code_gather), fragment_code_gather);
+
+    if (!program_id)
+        return VLC_EGENERIC;
+
+    prog->id_gather = program_id;
+    prog->loc_gather.vertex_pos = vt->GetAttribLocation(prog->id_gather, "vertex_pos");
+    //assert(prog->loc_gather.vertex_pos != -1);
+
+    prog->loc_gather.cur = vt->GetUniformLocation(prog->id_gather, "cur");
+    //assert(prog->loc_gather.cur != -1);
+
+    prog->loc_gather.computed = vt->GetUniformLocation(prog->id_gather, "computed");
+    //assert(prog->loc_gather.computed != -1);
+
+    prog->loc_gather.width = vt->GetUniformLocation(prog->id_gather, "width");
+    //assert(prog->loc_gather.width != -1);
+
+    prog->loc_gather.height = vt->GetUniformLocation(prog->id_gather, "height");
+    //assert(prog->loc_gather.height != -1);
+
+    prog->loc_gather.field = vt->GetUniformLocation(prog->id_gather, "field");
+    //assert(prog->loc_gather.field != -1);
+
     vt->GenBuffers(1, &prog->vbo);
 
     static const GLfloat vertex_pos[] = {
@@ -426,14 +497,27 @@ InitPlane(struct vlc_gl_filter *filter, unsigned plane_idx, GLsizei width,
         vt->BindTexture(GL_TEXTURE_2D, plane->textures[i]);
         vt->TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
                        GL_UNSIGNED_BYTE, NULL);
-        vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         vt->BindFramebuffer(GL_FRAMEBUFFER, plane->fbos[i]);
         vt->FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                  GL_TEXTURE_2D, plane->textures[i], 0);
     }
+
+    vt->GenTextures(1, &plane->texture_out);
+    vt->GenFramebuffers(1, &plane->fbo_out);
+    vt->BindTexture(GL_TEXTURE_2D, plane->texture_out);
+    vt->TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height / 2, 0, GL_RGBA,
+                   GL_UNSIGNED_BYTE, NULL);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    vt->BindFramebuffer(GL_FRAMEBUFFER, plane->fbo_out);
+    vt->FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                             GL_TEXTURE_2D, plane->texture_out, 0);
 
     vt->BindFramebuffer(GL_FRAMEBUFFER, draw_fb);
 }
@@ -459,6 +543,9 @@ DestroyPlanes(struct vlc_gl_filter *filter)
     {
         struct plane *plane = &sys->planes[i];
         vt->DeleteTextures(3, plane->textures);
+        vt->DeleteFramebuffers(3, plane->fbos);
+        vt->DeleteTextures(1, &plane->texture_out);
+        vt->DeleteFramebuffers(1, &plane->fbo_out);
     }
 }
 
@@ -537,13 +624,11 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
     GLuint draw_fb = GetDrawFramebuffer(vt);
 
     vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, plane->fbos[next]);
-    //vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, sys->program_copy.framebuffer);
-    //vt->FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-    //                         GL_TEXTURE_2D, plane->textures[next], 0);
-
     CopyInput(filter);
 
-    vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
+    /* Interpolate missing lines in the intermediate buffer (with
+     * size / 2). */
+    vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, plane->fbo_out);
 
     assert(sys->order == 0 || sys->order == 1);
     vt->UseProgram(prog->id[sys->order]);
@@ -577,6 +662,31 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
     vt->ActiveTexture(GL_TEXTURE2);
     vt->BindTexture(GL_TEXTURE_2D, plane->textures[next]);
     vt->Uniform1i(prog->loc_order[sys->order].next, 2);
+
+    vt->BindBuffer(GL_ARRAY_BUFFER, prog->vbo);
+    vt->EnableVertexAttribArray(prog->loc_order[sys->order].vertex_pos);
+    vt->VertexAttribPointer(prog->loc_order[sys->order].vertex_pos, 2, GL_FLOAT, GL_FALSE, 0,
+                            (const void *) 0);
+
+    vt->Clear(GL_COLOR_BUFFER_BIT);
+    vt->DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    /* Combine results with current picture */
+    vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_fb);
+    vt->UseProgram(prog->id_gather);
+
+    vt->Uniform1i(prog->loc_gather.field, field);
+
+    vt->Uniform1f(prog->loc_gather.width, width);
+    vt->Uniform1f(prog->loc_gather.height, height);
+
+    /* Binded in previous step */
+    vt->Uniform1i(prog->loc_gather.cur, 1);
+
+    /* We can drop the previous binding */
+    vt->ActiveTexture(GL_TEXTURE2);
+    vt->BindTexture(GL_TEXTURE_2D, plane->texture_out);
+    vt->Uniform1i(prog->loc_gather.computed, 2);
 
     vt->BindBuffer(GL_ARRAY_BUFFER, prog->vbo);
     vt->EnableVertexAttribArray(prog->loc_order[sys->order].vertex_pos);
