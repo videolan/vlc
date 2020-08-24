@@ -8,6 +8,10 @@ macOS:
  * Fixed displaying EQ bands in the UI depending on which frequency
    presets are set for the EQ in advanced preferences
 
+Misc:
+ * Several fixes in the web interface, including privacy and security
+   improvements
+
 Changes between 3.0.11 and 3.0.11.1:
 ----------------------------------
 
