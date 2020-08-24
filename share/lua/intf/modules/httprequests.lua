@@ -362,7 +362,7 @@ getbrowsetable = function ()
             end
             dir = vlc.strings.make_path(common.realpath(uri))
         end
-    else
+    elseif _GET["dir"] then
         dir = _GET["dir"]
 
         -- "" dir means listing all drive letters e.g. "A:\", "C:\"...
