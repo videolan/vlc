@@ -128,7 +128,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
 
-    vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (OpenGL output)");
+    vout_window_SetTitle(cfg->window, VOUT_TITLE " (OpenGL output)");
 
     vout_display_cfg_t embed_cfg = *cfg;
     embed_cfg.window = EmbedVideoWindow_Create(vd);

@@ -1667,9 +1667,6 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
         goto error;
     }
 
-    /* Change the window title bar text */
-    vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (Direct3D9 output)");
-
     msg_Dbg(vd, "Direct3D9 display adapter successfully initialized");
     return VLC_SUCCESS;
 
@@ -1889,6 +1886,9 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->display = Display;
     vd->control = Control;
     vd->close = Close;
+
+    /* Change the window title bar text */
+    vout_window_SetTitle(cfg->window, VOUT_TITLE " (Direct3D9 output)");
 
     return VLC_SUCCESS;
 error:

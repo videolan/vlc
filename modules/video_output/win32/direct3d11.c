@@ -356,7 +356,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
     }
 
-    vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (Direct3D11 output)");
+    vout_window_SetTitle(cfg->window, VOUT_TITLE " (Direct3D11 output)");
     msg_Dbg(vd, "Direct3D11 display adapter successfully initialized");
 
     vd->info.can_scale_spu        = true;

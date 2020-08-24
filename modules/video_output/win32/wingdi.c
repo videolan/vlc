@@ -124,6 +124,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (Init(vd, fmtp))
         goto error;
 
+    vout_window_SetTitle(cfg->window, VOUT_TITLE " (WinGDI output)");
+
     /* */
     vd->prepare = Prepare;
     vd->display = Display;
@@ -271,8 +273,6 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
 
     SelectObject(sys->off_dc, sys->off_bitmap);
     ReleaseDC(sys->sys.hvideownd, window_dc);
-
-    vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (WinGDI output)");
 
     return VLC_SUCCESS;
 }
