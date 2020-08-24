@@ -728,6 +728,10 @@ static const float f_min_window_height = 307.;
     PL_UNLOCK;
     [_sidebarView setNeedsDisplay:YES];
 
+    // Update badge in the sidebar for the first two items (Playlist and Media library)
+    [_sidebarView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(1,2)]
+                            columnIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [[_sidebarView tableColumns] count])]];
+
     [self _updatePlaylistTitle];
 }
 
@@ -969,40 +973,6 @@ static const float f_min_window_height = 307.;
     return [item hasChildren];
 }
 
-- (BOOL)sourceList:(PXSourceList*)aSourceList itemHasBadge:(id)item
-{
-    if ([[item identifier] isEqualToString: @"playlist"] || [[item identifier] isEqualToString: @"medialibrary"])
-        return YES;
-
-    return ([(VLCSourceListItem*)item badgeValue] != nil);
-}
-
-
-- (NSInteger)sourceList:(PXSourceList*)aSourceList badgeValueForItem:(id)item
-{
-    playlist_t * p_playlist = pl_Get(getIntf());
-    NSInteger i_playlist_size = 0;
-
-    if ([[item identifier] isEqualToString: @"playlist"]) {
-        PL_LOCK;
-        i_playlist_size = p_playlist->p_playing->i_children;
-        PL_UNLOCK;
-
-        return i_playlist_size;
-    }
-    if ([[item identifier] isEqualToString: @"medialibrary"]) {
-        PL_LOCK;
-        if (p_playlist->p_media_library)
-            i_playlist_size = p_playlist->p_media_library->i_children;
-        PL_UNLOCK;
-
-        return i_playlist_size;
-    }
-
-    return [[(VLCSourceListItem*)item badgeValue] integerValue];
-}
-
-
 - (BOOL)sourceList:(PXSourceList*)aSourceList itemHasIcon:(id)item
 {
     return ([item icon] != nil);
@@ -1145,17 +1115,27 @@ static const float f_min_window_height = 307.;
     cellView.imageView.image = [item icon];
 
     // Badge count
-    if ([[item identifier] isEqualToString: @"playlist"]) {
-        playlist_t * p_playlist = pl_Get(getIntf());
+    {
+        playlist_t *p_playlist = pl_Get(getIntf());
+        playlist_item_t *p_pl_item = NULL;
         NSInteger i_playlist_size = 0;
 
+        if ([[item identifier] isEqualToString: @"playlist"]) {
+            p_pl_item = p_playlist->p_playing;
+        } else if ([[item identifier] isEqualToString: @"medialibrary"]) {
+            p_pl_item = p_playlist->p_media_library;
+        }
+
         PL_LOCK;
-        i_playlist_size = p_playlist->p_playing->i_children;
+        if (p_pl_item)
+            i_playlist_size = p_pl_item->i_children;
         PL_UNLOCK;
 
-        cellView.badgeView.integerValue = i_playlist_size;
-    } else {
-        cellView.badgeView.integerValue = sourceListItem.badgeValue.integerValue;
+        if (p_pl_item) {
+            cellView.badgeView.integerValue = i_playlist_size;
+        } else {
+            cellView.badgeView.integerValue = sourceListItem.badgeValue.integerValue;
+        }
     }
 
     return cellView;
