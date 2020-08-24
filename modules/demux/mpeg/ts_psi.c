@@ -57,6 +57,7 @@
 #include "ts_descriptions.h"
 
 #include "../../access/dtv/en50221_capmt.h"
+#include "ts_streamwrapper.h"
 
 #include <assert.h>
 
@@ -2070,10 +2071,18 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
                                     (void *)p_en ) != VLC_SUCCESS )
             {
                 en50221_capmt_Delete( p_en );
-                if ( p_sys->standard == TS_STANDARD_ARIB && !p_sys->arib.b25stream )
+                if ( p_sys->standard == TS_STANDARD_ARIB && p_sys->stream == p_demux->s )
                 {
-                    p_sys->arib.b25stream = vlc_stream_FilterNew( p_demux->s, "aribcam" );
-                    p_sys->stream = ( p_sys->arib.b25stream ) ? p_sys->arib.b25stream : p_demux->s;
+                    stream_t *wrapper = ts_stream_wrapper_New( p_demux->s );
+                    if( wrapper )
+                    {
+                        p_sys->stream = vlc_stream_FilterNew( wrapper, "aribcam" );
+                        if( !p_sys->stream )
+                        {
+                            vlc_stream_Delete( wrapper );
+                            p_sys->stream = p_demux->s;
+                        }
+                    }
                 }
             }
         }
