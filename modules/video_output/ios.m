@@ -273,7 +273,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
         case VOUT_DISPLAY_CHANGE_VIEWPOINT:
             return vout_display_opengl_SetViewpoint(glsys->vgl,
-                &va_arg (ap, const vout_display_cfg_t* )->viewpoint);
+                                                    va_arg(ap, const vlc_viewpoint_t*));
 
         case VOUT_DISPLAY_RESET_PICTURES:
             vlc_assert_unreachable ();

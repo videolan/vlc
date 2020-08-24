@@ -79,7 +79,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
         return vout_display_opengl_SetViewpoint(sys->vgl,
-            &va_arg (args, const vout_display_cfg_t* )->viewpoint);
+                                                va_arg(args, const vlc_viewpoint_t*));
 
     return CommonControl(vd, &sys->area, &sys->sys, query, args);
 }

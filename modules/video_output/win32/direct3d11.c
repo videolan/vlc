@@ -494,10 +494,10 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
     {
-        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t*);
+        const vlc_viewpoint_t *viewpoint = va_arg(args, const vlc_viewpoint_t*);
         if ( sys->picQuad.pVertexShaderConstants )
         {
-            SetQuadVSProjection( vd, &sys->picQuad, &cfg->viewpoint );
+            SetQuadVSProjection( vd, &sys->picQuad, viewpoint );
             res = VLC_SUCCESS;
         }
     }
