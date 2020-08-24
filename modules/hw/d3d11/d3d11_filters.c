@@ -192,7 +192,6 @@ static void InitLevel(filter_t *filter, struct filter_level *range, const char *
 
 static picture_t *AllocPicture( filter_t *p_filter )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate( p_filter->vctx_out );
 
     const d3d_format_t *cfg = NULL;
