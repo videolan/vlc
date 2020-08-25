@@ -287,7 +287,7 @@ struct vout_display_t {
      * \note
      * Cropping is not requested while in the open function.
      */
-    video_format_t source;
+    const video_format_t *source;
 
     /**
      * Picture format.

@@ -122,10 +122,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     /* */
     CommonInit(&sys->area, cfg);
     if (CommonWindowInit(vd, &sys->area, &sys->sys,
-                   vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
+                   vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR))
         goto error;
 
-    if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
+    if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
 
     vout_window_SetTitle(cfg->window, VOUT_TITLE " (OpenGL output)");
@@ -217,7 +217,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         else if (place_cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
             place_cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
 
-        vout_display_PlacePicture(&place, &vd->source, &place_cfg);
+        vout_display_PlacePicture(&place, vd->source, &place_cfg);
 
         const int width  = place.width;
         const int height = place.height;

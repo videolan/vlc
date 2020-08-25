@@ -232,11 +232,10 @@ static int Control (vout_display_t *vd, int query, va_list ap)
       case VOUT_DISPLAY_CHANGE_ZOOM:
       {
         vout_display_cfg_t cfg = *va_arg(ap, const vout_display_cfg_t *);
-        const video_format_t *src = &vd->source;
 
         FlipVerticalAlign(&cfg);
 
-        vout_display_PlacePicture(&sys->place, src, &cfg);
+        vout_display_PlacePicture(&sys->place, vd->source, &cfg);
         sys->place_changed = true;
         vlc_gl_Resize (sys->gl, cfg.display.width, cfg.display.height);
         return VLC_SUCCESS;
@@ -249,7 +248,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
         FlipVerticalAlign(&cfg);
 
-        vout_display_PlacePicture(&sys->place, &vd->source, &cfg);
+        vout_display_PlacePicture(&sys->place, vd->source, &cfg);
         sys->place_changed = true;
         return VLC_SUCCESS;
       }

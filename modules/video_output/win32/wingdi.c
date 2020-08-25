@@ -109,7 +109,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 {
     vout_display_sys_t *sys;
 
-    if ( !vd->obj.force && vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
+    if ( !vd->obj.force && vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR)
         return VLC_EGENERIC; /* let a module who can handle it do it */
 
     vd->sys = sys = calloc(1, sizeof(*sys));
@@ -170,22 +170,22 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     SelectObject(sys->off_dc, sys->off_bitmap);
 
-    if (sys->area.place.width  != vd->source.i_visible_width ||
-        sys->area.place.height != vd->source.i_visible_height) {
+    if (sys->area.place.width  != vd->source->i_visible_width ||
+        sys->area.place.height != vd->source->i_visible_height) {
         SetStretchBltMode(hdc, COLORONCOLOR);
 
         StretchBlt(hdc, sys->area.place.x, sys->area.place.y,
                    sys->area.place.width, sys->area.place.height,
                    sys->off_dc,
-                   vd->source.i_x_offset, vd->source.i_y_offset,
-                   vd->source.i_x_offset + vd->source.i_visible_width,
-                   vd->source.i_y_offset + vd->source.i_visible_height,
+                   vd->source->i_x_offset, vd->source->i_y_offset,
+                   vd->source->i_x_offset + vd->source->i_visible_width,
+                   vd->source->i_y_offset + vd->source->i_visible_height,
                    SRCCOPY);
     } else {
         BitBlt(hdc, sys->area.place.x, sys->area.place.y,
                sys->area.place.width, sys->area.place.height,
                sys->off_dc,
-               vd->source.i_x_offset, vd->source.i_y_offset,
+               vd->source->i_x_offset, vd->source->i_y_offset,
                SRCCOPY);
     }
 

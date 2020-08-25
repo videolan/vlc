@@ -557,7 +557,7 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
             return -EINVAL;
         }
     } else {
-        fmt = &vd->source;
+        fmt = vd->source;
     }
 
     if (!cfg)
@@ -710,7 +710,7 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
 
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-            if (configure_display(vd, NULL, &vd->source) >= 0)
+            if (configure_display(vd, NULL, vd->source) >= 0)
                 ret = VLC_SUCCESS;
             break;
 
@@ -719,7 +719,7 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
             msg_Warn(vd, "Reset Pictures");
             kill_pool(sys);
             video_format_t *fmt = va_arg(args, video_format_t *);
-            *fmt = vd->source; // Take (nearly) whatever source wants to give us
+            *fmt = *vd->source; // Take (nearly) whatever source wants to give us
             fmt->i_chroma = req_chroma(fmt);  // Adjust chroma to something we can actually deal with
             ret = VLC_SUCCESS;
             break;
@@ -1209,7 +1209,7 @@ static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->display_height = vd->cfg->display.height;
     }
 
-    place_dest(sys, vd->cfg, &vd->source);  // Sets sys->dest_rect
+    place_dest(sys, vd->cfg, vd->source);  // Sets sys->dest_rect
 
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);

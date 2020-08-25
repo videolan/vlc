@@ -906,9 +906,9 @@ static int Control(vout_display_t *vd, int query, va_list args)
         msg_Dbg(vd, "change source crop/aspect");
 
         if (query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-            video_format_CopyCrop(&sys->p_window->fmt, &vd->source);
+            video_format_CopyCrop(&sys->p_window->fmt, vd->source);
         } else
-            CopySourceAspect(&sys->p_window->fmt, &vd->source);
+            CopySourceAspect(&sys->p_window->fmt, vd->source);
 
         UpdateVideoSize(sys, &sys->p_window->fmt);
         FixSubtitleFormat(sys);

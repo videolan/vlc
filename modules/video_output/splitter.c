@@ -242,7 +242,7 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
     video_splitter_t *splitter = &sys->splitter;
 
     vlc_mutex_init(&sys->lock);
-    video_format_Copy(&splitter->fmt, &vd->source);
+    video_format_Copy(&splitter->fmt, vd->source);
 
     splitter->p_module = module_need(splitter, "video splitter", name, true);
     free(name);

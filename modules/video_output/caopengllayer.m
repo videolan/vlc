@@ -326,7 +326,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 cfg_tmp.align.vertical = VLC_VIDEO_ALIGN_TOP;
 
             vout_display_place_t place;
-            vout_display_PlacePicture(&place, &vd->source, &cfg_tmp);
+            vout_display_PlacePicture(&place, vd->source, &cfg_tmp);
             if (unlikely(OpenglLock(sys->gl)))
                 // don't return an error or we need to handle VOUT_DISPLAY_RESET_PICTURES
                 return VLC_SUCCESS;

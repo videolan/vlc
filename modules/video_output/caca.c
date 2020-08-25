@@ -131,8 +131,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     if (!sys->dither) {
         /* Create the libcaca dither object */
         sys->dither = cucul_create_dither(32,
-                                            vd->source.i_visible_width,
-                                            vd->source.i_visible_height,
+                                            vd->source->i_visible_width,
+                                            vd->source->i_visible_height,
                                             picture->p[0].i_pitch,
                                             picture->format.i_rmask,
                                             picture->format.i_gmask,
@@ -148,8 +148,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     cucul_set_color_ansi(sys->cv, CUCUL_COLOR_DEFAULT, CUCUL_COLOR_BLACK);
     cucul_clear_canvas(sys->cv);
 
-    const int crop_offset = vd->source.i_y_offset * picture->p->i_pitch +
-                            vd->source.i_x_offset * picture->p->i_pixel_pitch;
+    const int crop_offset = vd->source->i_y_offset * picture->p->i_pitch +
+                            vd->source->i_x_offset * picture->p->i_pixel_pitch;
     cucul_dither_bitmap(sys->cv, sys->place.x, sys->place.y,
                         sys->place.width, sys->place.height,
                         sys->dither,

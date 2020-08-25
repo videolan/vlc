@@ -100,7 +100,7 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area, vout_dis
     vout_display_cfg_t place_cfg = area->vdcfg;
 
     vout_display_place_t before_place = area->place;
-    vout_display_PlacePicture(&area->place, &vd->source, &place_cfg);
+    vout_display_PlacePicture(&area->place, vd->source, &place_cfg);
 
     /* Signal the change in size/position */
     if (!vout_display_PlaceEquals(&before_place, &area->place))
@@ -109,9 +109,9 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area, vout_dis
 
 #ifndef NDEBUG
         msg_Dbg(vd, "UpdateRects source offset: %i,%i visible: %ix%i decoded: %ix%i",
-            vd->source.i_x_offset, vd->source.i_y_offset,
-            vd->source.i_visible_width, vd->source.i_visible_height,
-            vd->source.i_width, vd->source.i_height);
+            vd->source->i_x_offset, vd->source->i_y_offset,
+            vd->source->i_visible_width, vd->source->i_visible_height,
+            vd->source->i_width, vd->source->i_height);
         msg_Dbg(vd, "UpdateRects image_dst coords: %i,%i %ix%i",
             area->place.x, area->place.y, area->place.width, area->place.height);
 #endif

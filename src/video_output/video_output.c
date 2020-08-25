@@ -1270,20 +1270,20 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
                            vd->info.subpicture_chromas &&
                            *vd->info.subpicture_chromas != 0;
 
-    //FIXME: Denying do_early_spu if vd->source.orientation != ORIENT_NORMAL
+    //FIXME: Denying do_early_spu if vd->source->orientation != ORIENT_NORMAL
     //will have the effect that snapshots miss the subpictures. We do this
     //because there is currently no way to transform subpictures to match
     //the source format.
     const bool do_early_spu = !do_dr_spu &&
-                               vd->source.orientation == ORIENT_NORMAL;
+                               vd->source->orientation == ORIENT_NORMAL;
 
     const vlc_fourcc_t *subpicture_chromas;
     video_format_t fmt_spu;
     if (do_dr_spu) {
         vout_display_place_t place;
-        vout_display_PlacePicture(&place, &vd->source, vd->cfg);
+        vout_display_PlacePicture(&place, vd->source, vd->cfg);
 
-        fmt_spu = vd->source;
+        fmt_spu = *vd->source;
         if (fmt_spu.i_width * fmt_spu.i_height < place.width * place.height) {
             fmt_spu.i_sar_num = vd->cfg->display.sar.num;
             fmt_spu.i_sar_den = vd->cfg->display.sar.den;
@@ -1295,7 +1295,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
         subpicture_chromas = vd->info.subpicture_chromas;
     } else {
         if (do_early_spu) {
-            fmt_spu = vd->source;
+            fmt_spu = *vd->source;
         } else {
             fmt_spu = vd->fmt;
             fmt_spu.i_sar_num = vd->cfg->display.sar.num;
@@ -1322,7 +1322,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
     subpicture_t *subpic = !sys->spu ? NULL :
                            spu_Render(sys->spu,
                                       subpicture_chromas, &fmt_spu_rot,
-                                      &vd->source, system_now,
+                                      vd->source, system_now,
                                       render_subtitle_date,
                                       do_snapshot, vd->info.can_scale_spu);
     /*
@@ -1368,7 +1368,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
     if (do_snapshot)
     {
         assert(snap_pic);
-        vout_snapshot_Set(sys->snapshot, &vd->source, snap_pic);
+        vout_snapshot_Set(sys->snapshot, vd->source, snap_pic);
         if (snap_pic != todisplay)
             picture_Release(snap_pic);
     }

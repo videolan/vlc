@@ -645,7 +645,7 @@ static void GLESSwap(vlc_gl_t *gl)
     cfg.display.width  = _viewSize.width * _scaleFactor;
     cfg.display.height = _viewSize.height * _scaleFactor;
 
-    vout_display_PlacePicture(place, &_voutDisplay->source, &cfg);
+    vout_display_PlacePicture(place, _voutDisplay->source, &cfg);
 }
 
 - (void)reshape

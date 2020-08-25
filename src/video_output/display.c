@@ -208,7 +208,7 @@ void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
     vout_display_place_t place;
 
     /* Translate window coordinates to video coordinates */
-    vout_display_PlacePicture(&place, &vd->source, vd->cfg);
+    vout_display_PlacePicture(&place, vd->source, vd->cfg);
 
     if (place.width <= 0 || place.height <= 0) {
         memset(video, 0, sizeof (*video));
@@ -218,7 +218,7 @@ void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
     const int wx = window->i_x, wy = window->i_y;
     int x, y;
 
-    switch (vd->source.orientation) {
+    switch (vd->source->orientation) {
         case ORIENT_TOP_LEFT:
             x = wx;
             y = wy;
@@ -255,10 +255,10 @@ void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
             vlc_assert_unreachable();
     }
 
-    video->i_x = vd->source.i_x_offset
-        + (int64_t)(x - place.x) * vd->source.i_visible_width / place.width;
-    video->i_y = vd->source.i_y_offset
-        + (int64_t)(y - place.y) * vd->source.i_visible_height / place.height;
+    video->i_x = vd->source->i_x_offset
+        + (int64_t)(x - place.x) * vd->source->i_visible_width / place.width;
+    video->i_y = vd->source->i_y_offset
+        + (int64_t)(y - place.y) * vd->source->i_visible_height / place.height;
     video->i_pressed = window->i_pressed;
     video->b_double_click = window->b_double_click;
 }
@@ -296,7 +296,7 @@ static int vout_display_start(void *func, bool forced, va_list ap)
     vlc_video_context *context = osys->src_vctx;
 
     /* Picture buffer does not have the concept of aspect ratio */
-    video_format_Copy(&vd->fmt, &vd->source);
+    video_format_Copy(&vd->fmt, vd->source);
     vd->fmt.i_sar_num = 0;
     vd->fmt.i_sar_den = 0;
     vd->obj.force = forced; /* TODO: pass to activate() instead? */
@@ -333,7 +333,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     if (unlikely(osys->converters == NULL))
         return -1;
 
-    video_format_t v_src = vd->source;
+    video_format_t v_src = osys->source;
     v_src.i_sar_num = 0;
     v_src.i_sar_den = 0;
 
@@ -476,16 +476,14 @@ static void vout_display_Reset(vout_display_t *vd)
 static int vout_UpdateSourceCrop(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+    video_format_t fmt = osys->source;
     unsigned crop_num = osys->crop.num;
     unsigned crop_den = osys->crop.den;
 
     if (crop_num != 0 && crop_den != 0) {
-        video_format_t fmt = osys->source;
-        fmt.i_sar_num = vd->source.i_sar_num;
-        fmt.i_sar_den = vd->source.i_sar_den;
         VoutDisplayCropRatio(&osys->crop.left,  &osys->crop.top,
                              &osys->crop.right, &osys->crop.bottom,
-                             &fmt, crop_num, crop_den);
+                             &osys->source, crop_num, crop_den);
     }
 
     const int right_max  = osys->source.i_x_offset
@@ -510,12 +508,12 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
         bottom = (int)osys->source.i_y_offset + osys->crop.bottom;
     bottom = VLC_CLIP(bottom, top + 1, bottom_max);
 
-    vd->source.i_x_offset       = left;
-    vd->source.i_y_offset       = top;
-    vd->source.i_visible_width  = right - left;
-    vd->source.i_visible_height = bottom - top;
-    video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
-    video_format_Print(VLC_OBJECT(vd), "CROPPED", &vd->source);
+    osys->source.i_x_offset       = left;
+    osys->source.i_y_offset       = top;
+    osys->source.i_visible_width  = right - left;
+    osys->source.i_visible_height = bottom - top;
+    video_format_Print(VLC_OBJECT(vd), "SOURCE ", &fmt);
+    video_format_Print(VLC_OBJECT(vd), "CROPPED ", &osys->source);
 
     int ret = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP,
                                    &osys->cfg);
@@ -538,11 +536,11 @@ static int vout_SetSourceAspect(vout_display_t *vd,
     int ret = 0;
 
     if (sar_num > 0 && sar_den > 0) {
-        vd->source.i_sar_num = sar_num;
-        vd->source.i_sar_den = sar_den;
+        osys->source.i_sar_num = sar_num;
+        osys->source.i_sar_den = sar_den;
     } else {
-        vd->source.i_sar_num = osys->source.i_sar_num;
-        vd->source.i_sar_den = osys->source.i_sar_den;
+        osys->source.i_sar_num = osys->source.i_sar_num;
+        osys->source.i_sar_den = osys->source.i_sar_den;
     }
 
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
@@ -724,7 +722,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
 
     osys->pool = NULL;
 
-    osys->source = *source;
+    video_format_Copy(&osys->source, source);
     osys->crop.left   = 0;
     osys->crop.top    = 0;
     osys->crop.right  = 0;
@@ -736,7 +734,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
 
     /* */
     vout_display_t *vd = &osys->display;
-    video_format_Copy(&vd->source, source);
+    vd->source = &osys->source;
     vd->info = (vout_display_info_t){ };
     vd->cfg = &osys->cfg;
     vd->prepare = NULL;
@@ -772,7 +770,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     }
     return vd;
 error:
-    video_format_Clean(&vd->source);
+    video_format_Clean(&osys->source);
     vlc_object_delete(vd);
     return NULL;
 }
@@ -797,7 +795,7 @@ void vout_display_Delete(vout_display_t *vd)
         vd->close(vd);
     vlc_objres_clear(VLC_OBJECT(vd));
 
-    video_format_Clean(&vd->source);
+    video_format_Clean(&osys->source);
     video_format_Clean(&vd->fmt);
     vlc_object_delete(vd);
 }

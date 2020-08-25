@@ -183,7 +183,7 @@ static void RenderRegion(vout_display_t *vd, const subpicture_t *subpic,
 static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                     vlc_tick_t date)
 {
-    const video_format_t *fmt = &vd->source;
+    const video_format_t *fmt = vd->source;
     vout_display_sys_t *sys = vd->sys;
     xcb_connection_t *conn = sys->conn;
 
@@ -267,7 +267,7 @@ static void Display(vout_display_t *vd, picture_t *pic)
 
 static void CreateBuffers(vout_display_t *vd, const vout_display_cfg_t *cfg)
 {
-    const video_format_t *fmt = &vd->source;
+    const video_format_t *fmt = vd->source;
     vout_display_sys_t *sys = vd->sys;
     xcb_connection_t *conn = sys->conn;
 
@@ -671,7 +671,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     xcb_create_colormap(conn, XCB_COLORMAP_ALLOC_NONE, cmap, screen->root,
                         visual);
     xcb_create_pixmap(conn, 32, sys->drawable.source, screen->root,
-                      vd->source.i_width, vd->source.i_height);
+                      vd->source->i_width, vd->source->i_height);
     xcb_create_gc(conn, sys->gc, sys->drawable.source, 0, NULL);
     xcb_create_window(conn, 32, sys->drawable.dest, cfg->window->handle.xid,
                       0, 0, cfg->display.width, cfg->display.height, 0,

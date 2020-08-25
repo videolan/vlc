@@ -269,15 +269,15 @@ static void UpdateSize(vout_display_t *vd)
     D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
 
     RECT source_rect = {
-        .left   = vd->source.i_x_offset,
-        .right  = vd->source.i_x_offset + vd->source.i_visible_width,
-        .top    = vd->source.i_y_offset,
-        .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
+        .left   = vd->source->i_x_offset,
+        .right  = vd->source->i_x_offset + vd->source->i_visible_width,
+        .top    = vd->source->i_y_offset,
+        .bottom = vd->source->i_y_offset + vd->source->i_visible_height,
     };
     d3d11_device_lock( sys->d3d_dev );
 
     D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
-                             vd->source.orientation);
+                             vd->source->orientation);
 
     D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &sys->area.vdcfg.viewpoint,
                           (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height );
@@ -330,7 +330,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         if (cfg->window->type == VOUT_WINDOW_TYPE_HWND)
         {
             if (CommonWindowInit(vd, &sys->area, &sys->sys,
-                       vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
+                       vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR))
                 goto error;
         }
 
@@ -353,7 +353,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
 #if !VLC_WINSTORE_APP
-    if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
+    if (vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR && sys->sys.hvideownd)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
 #endif // !VLC_WINSTORE_APP
 
@@ -561,7 +561,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         renderSrc = p_sys->renderSrc;
     }
     D3D11_RenderQuad(sys->d3d_dev, &sys->picQuad,
-                     vd->source.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
+                     vd->source->projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
                      renderSrc, SelectRenderPlane, sys);
 
     if (subpicture) {
@@ -689,22 +689,22 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 {
     vout_display_sys_t *sys = vd->sys;
     video_format_t fmt;
-    video_format_Copy(&fmt, &vd->source);
+    video_format_Copy(&fmt, vd->source);
     int err = SetupOutputFormat(vd, &fmt, vctx);
     if (err != VLC_SUCCESS)
     {
-        if (!is_d3d11_opaque(vd->source.i_chroma)
+        if (!is_d3d11_opaque(vd->source->i_chroma)
 #if !VLC_WINSTORE_APP
             && vd->obj.force
 #endif
                 )
         {
-            const vlc_fourcc_t *list = vlc_fourcc_IsYUV(vd->source.i_chroma) ?
-                        vlc_fourcc_GetYUVFallback(vd->source.i_chroma) :
-                        vlc_fourcc_GetRGBFallback(vd->source.i_chroma);
+            const vlc_fourcc_t *list = vlc_fourcc_IsYUV(vd->source->i_chroma) ?
+                        vlc_fourcc_GetYUVFallback(vd->source->i_chroma) :
+                        vlc_fourcc_GetRGBFallback(vd->source->i_chroma);
             for (unsigned i = 0; list[i] != 0; i++) {
                 fmt.i_chroma = list[i];
-                if (fmt.i_chroma == vd->source.i_chroma)
+                if (fmt.i_chroma == vd->source->i_chroma)
                     continue;
                 err = SetupOutputFormat(vd, &fmt, NULL);
                 if (err == VLC_SUCCESS)
@@ -964,13 +964,13 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         return VLC_EGENERIC;
     }
 
-    if (D3D11_AllocateQuad(vd, sys->d3d_dev, vd->source.projection_mode, &sys->picQuad) != VLC_SUCCESS)
+    if (D3D11_AllocateQuad(vd, sys->d3d_dev, vd->source->projection_mode, &sys->picQuad) != VLC_SUCCESS)
     {
         msg_Err(vd, "Could not allocate quad buffers.");
        return VLC_EGENERIC;
     }
 
-    if (D3D11_SetupQuad( vd, sys->d3d_dev, &vd->source, &sys->picQuad, &sys->display) != VLC_SUCCESS)
+    if (D3D11_SetupQuad( vd, sys->d3d_dev, vd->source, &sys->picQuad, &sys->display) != VLC_SUCCESS)
     {
         msg_Err(vd, "Could not Create the main quad picture.");
         return VLC_EGENERIC;
@@ -982,14 +982,14 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         .top    = fmt->i_y_offset,
         .bottom = fmt->i_y_offset + fmt->i_visible_height,
     };
-    if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect, vd->source.orientation))
+    if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect, vd->source->orientation))
     {
         msg_Err(vd, "Could not set quad picture position.");
         return VLC_EGENERIC;
     }
 
-    if ( vd->source.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
-         vd->source.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
+    if ( vd->source->projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
+         vd->source->projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
         D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &sys->area.vdcfg.viewpoint,
                                (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height );
 
@@ -1007,7 +1007,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     {
         /* we need a staging texture */
         ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
-        video_format_t texture_fmt = vd->source;
+        video_format_t texture_fmt = *vd->source;
         texture_fmt.i_width  = sys->picQuad.i_width;
         texture_fmt.i_height = sys->picQuad.i_height;
         if (!is_d3d11_opaque(fmt->i_chroma))

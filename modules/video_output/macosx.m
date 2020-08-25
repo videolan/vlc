@@ -321,7 +321,7 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
     {
         if (@available(macOS 10.14, *)) {
             vout_display_place_t place;
-            vout_display_PlacePicture(&place, &vd->source, &sys->cfg);
+            vout_display_PlacePicture(&place, vd->source, &sys->cfg);
             vout_display_opengl_Viewport(vd->sys->vgl, place.x,
                                          sys->cfg.display.height - (place.y + place.height),
                                          place.width, place.height);
@@ -364,7 +364,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                     cfg_tmp.align.vertical = VLC_VIDEO_ALIGN_TOP;
 
                 vout_display_place_t place;
-                vout_display_PlacePicture(&place, &vd->source, &cfg_tmp);
+                vout_display_PlacePicture(&place, vd->source, &cfg_tmp);
                 @synchronized (sys->glView) {
                     sys->cfg = *cfg;
                 }
@@ -627,7 +627,7 @@ static void OpenglSwap (vlc_gl_t *gl)
             sys->cfg.display.width  = bounds.size.width;
             sys->cfg.display.height = bounds.size.height;
 
-            vout_display_PlacePicture(&place, &vd->source, &sys->cfg);
+            vout_display_PlacePicture(&place, vd->source, &sys->cfg);
             // FIXME: this call leads to a fatal mutex locking error in vout_ChangeDisplaySize()
             // vout_window_ReportSize(sys->embed, bounds.size.width, bounds.size.height);
         }

@@ -372,16 +372,16 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         /* Copy picture surface into texture surface
          * color space conversion happen here */
         RECT source_visible_rect = {
-            .left   = vd->source.i_x_offset,
-            .right  = vd->source.i_x_offset + vd->source.i_visible_width,
-            .top    = vd->source.i_y_offset,
-            .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
+            .left   = vd->source->i_x_offset,
+            .right  = vd->source->i_x_offset + vd->source->i_visible_width,
+            .top    = vd->source->i_y_offset,
+            .bottom = vd->source->i_y_offset + vd->source->i_visible_height,
         };
         RECT texture_visible_rect = {
             .left   = 0,
-            .right  = vd->source.i_visible_width,
+            .right  = vd->source->i_visible_width,
             .top    = 0,
-            .bottom = vd->source.i_visible_height,
+            .bottom = vd->source->i_visible_height,
         };
         // On nVidia & AMD, StretchRect will fail if the visible size isn't even.
         // When copying the entire buffer, the margin end up being blended in the actual picture
@@ -413,9 +413,9 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     region->texture = sys->sceneTexture;
     RECT texture_rect = {
         .left   = 0,
-        .right  = vd->source.i_width,
+        .right  = vd->source->i_width,
         .top    = 0,
-        .bottom = vd->source.i_height,
+        .bottom = vd->source->i_height,
     };
     RECT rect_in_display = {
         .left   = sys->area.place.x,
@@ -424,13 +424,13 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         .bottom = sys->area.place.y + sys->area.place.height,
     };
     RECT texture_visible_rect = {
-        .left   = vd->source.i_x_offset,
-        .right  = vd->source.i_x_offset + vd->source.i_visible_width,
-        .top    = vd->source.i_y_offset,
-        .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
+        .left   = vd->source->i_x_offset,
+        .right  = vd->source->i_x_offset + vd->source->i_visible_width,
+        .top    = vd->source->i_y_offset,
+        .bottom = vd->source->i_y_offset + vd->source->i_visible_height,
     };
     Direct3D9SetupVertices(region->vertex, &texture_rect, &texture_visible_rect,
-                           &rect_in_display, 255, vd->source.orientation);
+                           &rect_in_display, 255, vd->source->orientation);
     return VLC_SUCCESS;
 }
 
@@ -1442,10 +1442,10 @@ static void SetupProcessorInput(vout_display_t *vd, const video_format_t *fmt, c
     DXVAHD_STREAM_STATE_SOURCE_RECT_DATA srcRect;
     srcRect.Enable = TRUE;
     srcRect.SourceRect = (RECT) {
-        .left   = vd->source.i_x_offset,
-        .right  = vd->source.i_x_offset + vd->source.i_visible_width,
-        .top    = vd->source.i_y_offset,
-        .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
+        .left   = vd->source->i_x_offset,
+        .right  = vd->source->i_x_offset + vd->source->i_visible_width,
+        .top    = vd->source->i_y_offset,
+        .bottom = vd->source->i_y_offset + vd->source->i_visible_height,
     };;
     hr = IDXVAHD_VideoProcessor_SetVideoProcessStreamState( sys->processor.proc, 0, DXVAHD_STREAM_STATE_SOURCE_RECT, sizeof(srcRect), &srcRect );
 
@@ -1453,9 +1453,9 @@ static void SetupProcessorInput(vout_display_t *vd, const video_format_t *fmt, c
     dstRect.Enable = TRUE;
     dstRect.TargetRect = (RECT) {
         .left   = 0,
-        .right  = vd->source.i_visible_width,
+        .right  = vd->source->i_visible_width,
         .top    = 0,
-        .bottom = vd->source.i_visible_height,
+        .bottom = vd->source->i_visible_height,
     };
     hr = IDXVAHD_VideoProcessor_SetVideoProcessBltState( sys->processor.proc, DXVAHD_BLT_STATE_TARGET_RECT, sizeof(dstRect), &dstRect);
 }
@@ -1502,12 +1502,12 @@ static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt,
 
     DXVAHD_CONTENT_DESC desc;
     desc.InputFrameFormat = DXVAHD_FRAME_FORMAT_PROGRESSIVE;
-    GetFrameRate( &desc.InputFrameRate, &vd->source );
-    desc.InputWidth       = vd->source.i_visible_width;
-    desc.InputHeight      = vd->source.i_visible_height;
+    GetFrameRate( &desc.InputFrameRate, vd->source );
+    desc.InputWidth       = vd->source->i_visible_width;
+    desc.InputHeight      = vd->source->i_visible_height;
     desc.OutputFrameRate  = desc.InputFrameRate;
-    desc.OutputWidth      = vd->source.i_visible_width;
-    desc.OutputHeight     = vd->source.i_visible_height;
+    desc.OutputWidth      = vd->source->i_visible_width;
+    desc.OutputHeight     = vd->source->i_visible_height;
 
     hr = CreateDevice(sys->d3d9_device->d3ddev.devex, &desc, DXVAHD_DEVICE_USAGE_PLAYBACK_NORMAL, NULL, &hd_device);
     if (FAILED(hr))
@@ -1590,7 +1590,7 @@ static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt,
     }
     IDXVAHD_Device_Release( hd_device );
 
-    SetupProcessorInput(vd, &vd->source, d3dfmt);
+    SetupProcessorInput(vd, vd->source, d3dfmt);
 
     DXVAHD_BLT_STATE_OUTPUT_COLOR_SPACE_DATA colorspace;
     colorspace.Usage = 0; // playback
@@ -1618,7 +1618,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
     vout_display_sys_t *sys = vd->sys;
 
     libvlc_video_output_cfg_t render_out;
-    if (UpdateOutput(vd, &vd->source, &render_out) != VLC_SUCCESS)
+    if (UpdateOutput(vd, vd->source, &render_out) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
     sys->BufferFormat = render_out.d3d9_format;
@@ -1629,15 +1629,15 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
     /* Find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
      * the requested chroma which is usable by the hardware in an offscreen surface, as they
      * typically support more formats than textures */
-    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, &vd->source, vctx);
+    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, vd->source, vctx);
     if (!d3dfmt) {
-        msg_Err(vd, "unsupported source pixel format %4.4s", (const char*)&vd->source.i_chroma);
+        msg_Err(vd, "unsupported source pixel format %4.4s", (const char*)&vd->source->i_chroma);
         goto error;
     }
-    msg_Dbg(vd, "found input surface format %s for source %4.4s", d3dfmt->name, (const char *)&vd->source.i_chroma);
+    msg_Dbg(vd, "found input surface format %s for source %4.4s", d3dfmt->name, (const char *)&vd->source->i_chroma);
 
     bool force_dxva_hd = var_InheritBool(vd, "direct3d9-dxvahd");
-    if (force_dxva_hd || (dst_format && vd->source.color_range != COLOR_RANGE_FULL && dst_format->rmask && !d3dfmt->rmask &&
+    if (force_dxva_hd || (dst_format && vd->source->color_range != COLOR_RANGE_FULL && dst_format->rmask && !d3dfmt->rmask &&
                           sys->d3d9_device->d3ddev.identifier.VendorId == GPU_MANUFACTURER_NVIDIA))
     {
         // NVIDIA bug, YUV to RGB internal conversion in StretchRect always converts from limited to limited range
@@ -1662,7 +1662,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
     }
 
     /* */
-    *fmt = vd->source;
+    *fmt = *vd->source;
     fmt->i_chroma = d3dfmt->fourcc;
     fmt->i_rmask  = d3dfmt->rmask;
     fmt->i_gmask  = d3dfmt->gmask;
@@ -1768,10 +1768,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 {
     vout_display_sys_t *sys;
 
-    if ( !vd->obj.force && vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
+    if ( !vd->obj.force && vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR)
         return VLC_EGENERIC; /* let a module who can handle it do it */
 
-    if ( !vd->obj.force && vd->source.mastering.max_luminance != 0)
+    if ( !vd->obj.force && vd->source->mastering.max_luminance != 0)
         return VLC_EGENERIC; /* let a module who can handle it do it */
 
     /* do not use D3D9 on XP unless forced */
@@ -1827,11 +1827,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
 
-    if ( vd->source.i_visible_width  > sys->d3d9_device->d3ddev.caps.MaxTextureWidth ||
-         vd->source.i_visible_height > sys->d3d9_device->d3ddev.caps.MaxTextureHeight )
+    if ( vd->source->i_visible_width  > sys->d3d9_device->d3ddev.caps.MaxTextureWidth ||
+         vd->source->i_visible_height > sys->d3d9_device->d3ddev.caps.MaxTextureHeight )
     {
         msg_Err(vd, "Textures too large %ux%u max possible: %lx%lx",
-                vd->source.i_visible_width, vd->source.i_visible_height,
+                vd->source->i_visible_width, vd->source->i_visible_height,
                 sys->d3d9_device->d3ddev.caps.MaxTextureWidth,
                 sys->d3d9_device->d3ddev.caps.MaxTextureHeight);
         goto error;

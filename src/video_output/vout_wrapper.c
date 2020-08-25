@@ -102,7 +102,7 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys
         sys->private_pool = picture_pool_Reserve(display_pool, private_picture);
     } else {
         sys->private_pool =
-            picture_pool_NewFromFormat(&vd->source,
+            picture_pool_NewFromFormat(vd->source,
                                        __MAX(VOUT_MAX_PICTURES,
                                              reserved_picture - DISPLAY_PICTURE_COUNT));
     }
