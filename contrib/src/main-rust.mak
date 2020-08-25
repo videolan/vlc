@@ -37,3 +37,49 @@ endif
 ifneq ($(RUST_TARGET),)
 BUILD_RUST="1"
 endif
+
+RUSTUP_HOME= $(BUILDBINDIR)/.rustup
+CARGO_HOME = $(BUILDBINDIR)/.cargo
+
+CARGO = . $(CARGO_HOME)/env && RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) cargo
+
+CARGO_INSTALL_ARGS = --target=$(RUST_TARGET) --prefix=$(PREFIX) \
+	--library-type staticlib --release
+
+# Use the .cargo-vendor source if present, otherwise use crates.io
+CARGO_INSTALL_ARGS += \
+	$(shell test -d $<-vendor && echo --frozen --offline || echo --locked)
+
+CARGO_INSTALL = $(CARGO) install $(CARGO_INSTALL_ARGS)
+
+CARGOC_INSTALL = export TARGET_CC=$(CC) && export TARGET_AR=$(AR) && \
+	export TARGET_CFLAGS="$(CFLAGS)" && \
+	export RUSTFLAGS="-C lto -C panic=abort -C opt-level=z" && \
+	$(CARGO) capi install $(CARGO_INSTALL_ARGS)
+
+download_vendor = \
+	$(call download,$(CONTRIB_VIDEOLAN)/$(2)/$(1)) || (\
+               echo "" && \
+               echo "WARNING: cargo vendor archive for $(1) not found" && \
+               echo "" && \
+               touch $@);
+
+# Extract and move the vendor archive if the checksum is valid. Succeed even in
+# case of error (download or checksum failed). In that case, the cargo-vendor
+# archive won't be used (crates.io will be used directly).
+.%-vendor: $(SRC)/%-vendor/SHA512SUMS
+	$(RM) -R $(patsubst .%,%,$@)
+	-$(call checksum,$(SHA512SUM),SHA512,.) \
+		$(foreach f,$(filter %.tar.bz2,$^), && tar xvjfo $(f) && \
+		  mv $(patsubst %.tar.bz2,%,$(notdir $(f))) $(patsubst .%,%,$@))
+	touch $@
+
+CARGO_VENDOR_SETUP = \
+	if test -d $@-vendor; then \
+		mkdir -p $(UNPACK_DIR)/.cargo; \
+		echo "[source.crates-io]" > $(UNPACK_DIR)/.cargo/config.toml; \
+		echo "replace-with = \"vendored-sources\"" >> $(UNPACK_DIR)/.cargo/config.toml; \
+		echo "[source.vendored-sources]" >> $(UNPACK_DIR)/.cargo/config.toml; \
+		echo "directory = \"../$@-vendor\"" >> $(UNPACK_DIR)/.cargo/config.toml; \
+		echo "Using cargo vendor archive for $(UNPACK_DIR)"; \
+	fi;
