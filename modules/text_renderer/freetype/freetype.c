@@ -1185,6 +1185,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
             msg_Err( p_filter, "Render(): Error loading default face" );
             return VLC_EGENERIC;
         }
+        p_sys->i_font_default_size = i_font_default_size;
     }
 
     layout_text_block_t text_block = { 0 };
@@ -1434,14 +1435,6 @@ static int Create( vlc_object_t *p_this )
 
     if( LoadFontsFromAttachments( p_filter ) == VLC_ENOMEM )
         goto error;
-
-    p_sys->p_faceid = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
-    if( !p_sys->p_faceid )
-    {
-        msg_Err( p_filter, "Error loading default face %s",
-                 p_sys->p_default_style->psz_fontname );
-        goto error;
-    }
 
     p_filter->pf_render = Render;
 
