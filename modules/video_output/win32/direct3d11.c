@@ -296,7 +296,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (ret != VLC_SUCCESS)
         goto error;
 
-    CommonInit(vd, &sys->area, cfg);
+    CommonInit(&sys->area, cfg);
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );

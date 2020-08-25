@@ -75,7 +75,7 @@ int  CommonControl(vout_display_t *, display_win32_area_t *, vout_display_sys_wi
 
 void CommonPlacePicture (vout_display_t *, display_win32_area_t *, vout_display_sys_win32_t *);
 
-void CommonInit(vout_display_t *, display_win32_area_t *, const vout_display_cfg_t *);
+void CommonInit(display_win32_area_t *, const vout_display_cfg_t *);
 
 # ifdef __cplusplus
 extern "C" {

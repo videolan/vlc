@@ -41,12 +41,10 @@
 #include "common.h"
 #include "../../video_chroma/copy.h"
 
-void CommonInit(vout_display_t *vd, display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
+void CommonInit(display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
 {
     area->place_changed = false;
     area->vdcfg = *vdcfg;
-
-    var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 }
 
 #if !VLC_WINSTORE_APP
