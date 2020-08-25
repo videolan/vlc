@@ -451,6 +451,11 @@ REQUIRE_GNUV3 = \
 endif
 
 #
+# Rust specific rules
+#
+include $(SRC)/main-rust.mak
+
+#
 # Per-package build rules
 #
 PKGS_FOUND :=
