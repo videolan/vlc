@@ -143,7 +143,7 @@ static void Close(vout_display_t *vd)
 {
     Clean(vd);
 
-    CommonWindowClean(VLC_OBJECT(vd), &vd->sys->sys);
+    CommonWindowClean(&vd->sys->sys);
 
     free(vd->sys);
 }

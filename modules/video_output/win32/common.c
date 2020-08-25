@@ -128,7 +128,7 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area, vout_dis
 
 #if !VLC_WINSTORE_APP
 /* */
-void CommonWindowClean(vlc_object_t *obj, vout_display_sys_win32_t *sys)
+void CommonWindowClean(vout_display_sys_win32_t *sys)
 {
     if (sys->event) {
         EventThreadStop(sys->event);
