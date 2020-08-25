@@ -485,10 +485,12 @@ static int query_resolution(vout_display_t *vd, const int display_id, unsigned *
             msg_Dbg(vd, "HDMI: %dx%d", display_state.display.hdmi.width, display_state.display.hdmi.height);
             *width = display_state.display.hdmi.width;
             *height = display_state.display.hdmi.height;
+            vout_display_SetSize(vd, *width, *height);
         } else if (display_state.state & 0xFF00) {
             msg_Dbg(vd, "SDTV: %dx%d", display_state.display.sdtv.width, display_state.display.sdtv.height);
             *width = display_state.display.sdtv.width;
             *height = display_state.display.sdtv.height;
+            vout_display_SetSize(vd, *width, *height);
         } else {
             msg_Warn(vd, "Invalid display state %"PRIx32, display_state.state);
             ret = -1;
