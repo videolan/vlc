@@ -442,9 +442,13 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     else /* scrolling title */
     {
         if( i_item == -1 )
+        {
             snprintf( p_sys->psz_marquee, p_sys->i_length, "%s : %s",
                       feed_title + p_sys->i_cur_char,
                       p_feed->p_items[i_item+1].psz_title );
+            // Set i_item to 0 as the first item title was already printed.
+            i_item = 0;
+        }
         else
             snprintf( p_sys->psz_marquee, p_sys->i_length, "%s",
                       item_title + p_sys->i_cur_char );
