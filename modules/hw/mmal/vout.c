@@ -713,12 +713,15 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
             break;
 
         case VOUT_DISPLAY_RESET_PICTURES:
+        {
             msg_Warn(vd, "Reset Pictures");
             kill_pool(sys);
-            vd->fmt = vd->source; // Take (nearly) whatever source wants to give us
-            vd->fmt.i_chroma = req_chroma(&vd->fmt);  // Adjust chroma to something we can actually deal with
+            video_format_t *fmt = va_arg(args, video_format_t *);
+            *fmt = vd->source; // Take (nearly) whatever source wants to give us
+            fmt->i_chroma = req_chroma(fmt);  // Adjust chroma to something we can actually deal with
             ret = VLC_SUCCESS;
             break;
+        }
 
         case VOUT_DISPLAY_CHANGE_ZOOM:
             msg_Warn(vd, "Unsupported control query %d", query);
