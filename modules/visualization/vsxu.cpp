@@ -97,6 +97,14 @@ struct filter_sys_t
 static block_t *DoWork( filter_t *, block_t * );
 static void *Thread( void * );
 
+static const struct FilterOperationInitializer {
+    struct vlc_filter_operations ops {};
+    FilterOperationInitializer()
+    {
+        ops.filter_audio = DoWork;
+    };
+} filter_ops;
+
 /**
  * Open the module
  * @param p_this: the filter object
@@ -141,7 +149,7 @@ static int Open( vlc_object_t * p_this )
 
     p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
-    p_filter->pf_audio_filter = DoWork;
+    p_filter->ops = &filter_ops.ops;
 
     return VLC_SUCCESS;
 

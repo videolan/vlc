@@ -139,6 +139,10 @@ static int GetSwsCpuMask(void);
 /* XXX is it always 3 even for BIG_ENDIAN (blend.c seems to think so) ? */
 #define OFFSET_A (3)
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = Filter,
+};
+
 /*****************************************************************************
  * OpenScaler: probe the filter and return score
  *****************************************************************************/
@@ -192,7 +196,7 @@ static int OpenScaler( vlc_object_t *p_this )
     }
 
     /* */
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     msg_Dbg( p_filter, "%ix%i (%ix%i) chroma: %4.4s -> %ix%i (%ix%i) chroma: %4.4s with scaling using %s",
              p_filter->fmt_in.video.i_visible_width, p_filter->fmt_in.video.i_visible_height,

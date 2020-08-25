@@ -390,7 +390,7 @@ void RenderCursor( demux_t *p_demux, int i_x, int i_y,
     if( p_sys->p_blend )
     {
         p_sys->dst.p->p_pixels = p_dst;
-        p_sys->p_blend->pf_video_blend( p_sys->p_blend,
+        p_sys->p_blend->ops->blend_video( p_sys->p_blend,
                                         &p_sys->dst,
                                         p_sys->p_mouse,
 #ifdef SCREEN_SUBSCREEN

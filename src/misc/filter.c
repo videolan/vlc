@@ -164,7 +164,7 @@ int filter_Blend( vlc_blender_t *p_blend,
     if( !p_blend->p_module )
         return VLC_EGENERIC;
 
-    p_blend->pf_video_blend( p_blend, p_dst, p_src, i_dst_x, i_dst_y, i_alpha );
+    p_blend->ops->blend_video( p_blend, p_dst, p_src, i_dst_x, i_dst_y, i_alpha );
     return VLC_SUCCESS;
 }
 

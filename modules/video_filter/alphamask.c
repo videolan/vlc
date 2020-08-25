@@ -82,6 +82,11 @@ typedef struct
     vlc_mutex_t mask_lock;
 } filter_sys_t;
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
@@ -122,7 +127,7 @@ static int Create( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->mask_lock );
     var_AddCallback( p_filter, CFG_PREFIX "mask", MaskCallback,
                      p_filter );
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

@@ -79,6 +79,65 @@ typedef struct filter_owner_t
 
 struct vlc_mouse_t;
 
+struct vlc_filter_operations
+{
+    /* Operation depending on the type of filter. */
+    union
+    {
+        /** Filter a picture (video filter) */
+        picture_t * (*filter_video)(filter_t *, picture_t *);
+
+        /** Filter an audio block (audio filter) */
+        block_t * (*filter_audio)(filter_t *, block_t *);
+
+        /** Blend a subpicture onto a picture (blend) */
+        void (*blend_video)(filter_t *,  picture_t *, const picture_t *,
+                            int, int, int);
+
+        /** Generate a subpicture (sub source) */
+        subpicture_t *(*source_sub)(filter_t *, vlc_tick_t);
+
+        /** Filter a subpicture (sub filter) */
+        subpicture_t *(*filter_sub)(filter_t *, subpicture_t *);
+
+        /** Render text (text render) */
+        int (*render)(filter_t *, subpicture_region_t *,
+                      subpicture_region_t *, const vlc_fourcc_t *);
+    };
+
+    union
+    {
+        /* TODO: video filter drain */
+        /** Drain (audio filter) */
+        block_t *(*drain_audio)(filter_t *);
+    };
+
+    /** Flush
+     *
+     * Flush (i.e. discard) any internal buffer in a video or audio filter.
+     */
+    void (*flush)(filter_t *);
+
+    /** Change viewpoint
+     *
+     * Pass a new viewpoint to audio filters. Filters like the spatialaudio one
+     * used for Ambisonics rendering will change its output according to this
+     * viewpoint.
+     */
+    void (*change_viewpoint)(filter_t *, const vlc_viewpoint_t *);
+
+    /** Filter mouse state (video filter).
+     *
+     * If non-NULL, you must convert from output to input formats:
+     * - If VLC_SUCCESS is returned, the mouse state is propagated.
+     * - Otherwise, the mouse change is not propagated.
+     * If NULL, the mouse state is considered unchanged and will be
+     * propagated. */
+    int (*video_mouse)(filter_t *, struct vlc_mouse_t *,
+                       const struct vlc_mouse_t *p_old);
+
+};
+
 /** Structure describing a filter
  * @warning BIG FAT WARNING : the code relies on the first 4 members of
  * filter_t and decoder_t to be the same, so if you have anything to add,
@@ -106,62 +165,8 @@ struct filter_t
     /* Filter configuration */
     config_chain_t *    p_cfg;
 
-    union
-    {
-        /** Filter a picture (video filter) */
-        picture_t * (*pf_video_filter)( filter_t *, picture_t * );
-
-        /** Filter an audio block (audio filter) */
-        block_t * (*pf_audio_filter)( filter_t *, block_t * );
-
-        /** Blend a subpicture onto a picture (blend) */
-        void (*pf_video_blend)( filter_t *,  picture_t *, const picture_t *,
-                                 int, int, int );
-
-        /** Generate a subpicture (sub source) */
-        subpicture_t *(*pf_sub_source)( filter_t *, vlc_tick_t );
-
-        /** Filter a subpicture (sub filter) */
-        subpicture_t *(*pf_sub_filter)( filter_t *, subpicture_t * );
-
-        /** Render text (text render) */
-        int (*pf_render)( filter_t *, subpicture_region_t *,
-                          subpicture_region_t *, const vlc_fourcc_t * );
-    };
-
-    union
-    {
-        /* TODO: video filter drain */
-        /** Drain (audio filter) */
-        block_t *(*pf_audio_drain) ( filter_t * );
-    };
-
-    /** Flush
-     *
-     * Flush (i.e. discard) any internal buffer in a video or audio filter.
-     */
-    void (*pf_flush)( filter_t * );
-
-    /** Change viewpoint
-     *
-     * Pass a new viewpoint to audio filters. Filters like the spatialaudio one
-     * used for Ambisonics rendering will change its output according to this
-     * viewpoint.
-     */
-    void (*pf_change_viewpoint)( filter_t *, const vlc_viewpoint_t * );
-
-    union
-    {
-        /** Filter mouse state (video filter).
-         *
-         * If non-NULL, you must convert from output to input formats:
-         * - If VLC_SUCCESS is returned, the mouse state is propagated.
-         * - Otherwise, the mouse change is not propagated.
-         * If NULL, the mouse state is considered unchanged and will be
-         * propagated. */
-        int (*pf_video_mouse)( filter_t *, struct vlc_mouse_t *,
-                               const struct vlc_mouse_t *p_old);
-    };
+    /* Implementation of filter API */
+    const struct vlc_filter_operations *ops;
 
     /** Private structure for the owner of the filter */
     filter_owner_t      owner;
@@ -170,7 +175,7 @@ struct filter_t
 /**
  * This function will return a new picture usable by p_filter as an output
  * buffer. You have to release it using picture_Release or by returning
- * it to the caller as a pf_video_filter return value.
+ * it to the caller as a ops->filter_video return value.
  * Provided for convenience.
  *
  * \param p_filter filter_t object
@@ -198,15 +203,15 @@ static inline picture_t *filter_NewPicture( filter_t *p_filter )
  */
 static inline void filter_Flush( filter_t *p_filter )
 {
-    if( p_filter->pf_flush != NULL )
-        p_filter->pf_flush( p_filter );
+    if( p_filter->ops && p_filter->ops->flush != NULL )
+        p_filter->ops->flush( p_filter );
 }
 
 static inline void filter_ChangeViewpoint( filter_t *p_filter,
                                            const vlc_viewpoint_t *vp)
 {
-    if( p_filter->pf_change_viewpoint != NULL )
-        p_filter->pf_change_viewpoint( p_filter, vp );
+    if( p_filter->ops && p_filter->ops->change_viewpoint != NULL )
+        p_filter->ops->change_viewpoint( p_filter, vp );
 }
 
 static inline vlc_decoder_device * filter_HoldDecoderDevice( filter_t *p_filter )
@@ -239,8 +244,8 @@ static inline vlc_decoder_device * filter_HoldDecoderDeviceType( filter_t *p_fil
  */
 static inline block_t *filter_DrainAudio( filter_t *p_filter )
 {
-    if( p_filter->pf_audio_drain )
-        return p_filter->pf_audio_drain( p_filter );
+    if( p_filter->ops && p_filter->ops->drain_audio )
+        return p_filter->ops->drain_audio( p_filter );
     else
         return NULL;
 }
@@ -255,7 +260,7 @@ static inline void filter_SendAudioLoudness(filter_t *filter,
 /**
  * This function will return a new subpicture usable by p_filter as an output
  * buffer. You have to release it using subpicture_Delete or by returning it to
- * the caller as a pf_sub_source return value.
+ * the caller as a ops->sub_source return value.
  * Provided for convenience.
  *
  * \param p_filter filter_t object
@@ -353,7 +358,10 @@ VLC_API void filter_DeleteBlend( vlc_blender_t * );
         }                                                               \
         picture_Release( p_pic );                                       \
         return p_outpic;                                                \
-    }
+    }                                                                   \
+    static const struct vlc_filter_operations name ## _ops = {          \
+        .filter_video = name ## _Filter,                                \
+    };
 
 /**
  * Filter chain management API

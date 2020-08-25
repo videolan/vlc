@@ -781,6 +781,10 @@ static MMAL_FOURCC_T filter_enc_in(const video_format_t * const fmt)
 }
 
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = conv_filter, .flush = conv_flush,
+};
+
 int OpenConverter(vlc_object_t * obj)
 {
     filter_t * const p_filter = (filter_t *)obj;
@@ -969,8 +973,7 @@ retry:
         }
     }
 
-    p_filter->pf_video_filter = conv_filter;
-    p_filter->pf_flush = conv_flush;
+    p_filter->ops = &filter_ops;
     // video_drain NIF in filter structure
 
     return VLC_SUCCESS;

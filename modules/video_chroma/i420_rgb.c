@@ -131,7 +131,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* R5G5B6 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R5G5B5");
-                        p_filter->pf_video_filter = I420_R5G5B5_Filter;
+                        p_filter->ops = &I420_R5G5B5_ops;
                     }
                     else if( ( p_filter->fmt_out.video.i_rmask == 0xf800
                             && p_filter->fmt_out.video.i_gmask == 0x07e0
@@ -139,7 +139,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* R5G6B5 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R5G6B5");
-                        p_filter->pf_video_filter = I420_R5G6B5_Filter;
+                        p_filter->ops = &I420_R5G6B5_ops;
                     }
                     else
                         return VLC_EGENERIC;
@@ -152,7 +152,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* A8R8G8B8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is A8R8G8B8");
-                        p_filter->pf_video_filter = I420_A8R8G8B8_Filter;
+                        p_filter->ops = &I420_A8R8G8B8_ops;
                     }
                     else if( p_filter->fmt_out.video.i_rmask == 0xff000000
                           && p_filter->fmt_out.video.i_gmask == 0x00ff0000
@@ -160,7 +160,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* R8G8B8A8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is R8G8B8A8");
-                        p_filter->pf_video_filter = I420_R8G8B8A8_Filter;
+                        p_filter->ops = &I420_R8G8B8A8_ops;
                     }
                     else if( p_filter->fmt_out.video.i_rmask == 0x0000ff00
                           && p_filter->fmt_out.video.i_gmask == 0x00ff0000
@@ -168,7 +168,7 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* B8G8R8A8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is B8G8R8A8");
-                        p_filter->pf_video_filter = I420_B8G8R8A8_Filter;
+                        p_filter->ops = &I420_B8G8R8A8_ops;
                     }
                     else if( p_filter->fmt_out.video.i_rmask == 0x000000ff
                           && p_filter->fmt_out.video.i_gmask == 0x0000ff00
@@ -176,21 +176,21 @@ static int Activate( vlc_object_t *p_this )
                     {
                         /* A8B8G8R8 pixel format */
                         msg_Dbg(p_this, "RGB pixel format is A8B8G8R8");
-                        p_filter->pf_video_filter = I420_A8B8G8R8_Filter;
+                        p_filter->ops = &I420_A8B8G8R8_ops;
                     }
                     else
                         return VLC_EGENERIC;
                     break;
 #else
                 case VLC_CODEC_RGB8:
-                    p_filter->pf_video_filter = I420_RGB8_Filter;
+                    p_filter->ops = &I420_RGB8_ops;
                     break;
                 case VLC_CODEC_RGB15:
                 case VLC_CODEC_RGB16:
-                    p_filter->pf_video_filter = I420_RGB16_Filter;
+                    p_filter->ops = &I420_RGB16_ops;
                     break;
                 case VLC_CODEC_RGB32:
-                    p_filter->pf_video_filter = I420_RGB32_Filter;
+                    p_filter->ops = &I420_RGB32_ops;
                     break;
 #endif
                 default:

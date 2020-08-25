@@ -77,7 +77,11 @@ static int CreateResampler( vlc_object_t *p_this )
      || !AOUT_FMT_LINEAR( &p_filter->fmt_in.audio ) )
         return VLC_EGENERIC;
 
-    p_filter->pf_audio_filter = DoWork;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = DoWork,
+    };
+    p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }
 

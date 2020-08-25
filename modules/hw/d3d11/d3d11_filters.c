@@ -335,6 +335,10 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
     return VLC_SUCCESS;
 }
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = Filter,
+};
+
 static int D3D11OpenAdjust(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -507,7 +511,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
         }
     }
 
-    filter->pf_video_filter = Filter;
+    filter->ops = &filter_ops;
     filter->p_sys = sys;
     filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
     d3d11_device_unlock(sys->d3d_dev);

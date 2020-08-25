@@ -53,7 +53,7 @@
 /**
  * Top-level filtering method.
  *
- * Open() sets this up as the processing method (pf_video_filter)
+ * Open() sets this up as the processing method (filter_video)
  * in the filter structure.
  *
  * Note that there is no guarantee that the returned picture directly
@@ -480,6 +480,12 @@ int Mouse( filter_t *p_filter,
 }
 
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = Deinterlace,
+    .flush = Flush,
+    .video_mouse = Mouse,
+};
+
 /*****************************************************************************
  * Open
  *****************************************************************************/
@@ -643,9 +649,7 @@ notsupp:
     }
     p_filter->fmt_out.video = fmt;
     p_filter->fmt_out.i_codec = fmt.i_chroma;
-    p_filter->pf_video_filter = Deinterlace;
-    p_filter->pf_flush = Flush;
-    p_filter->pf_video_mouse  = Mouse;
+    p_filter->ops = &filter_ops;
 
     msg_Dbg( p_filter, "deinterlacing" );
 

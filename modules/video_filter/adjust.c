@@ -141,6 +141,16 @@ static int BoolCallback( vlc_object_t *obj, char const *varname,
     return VLC_SUCCESS;
 }
 
+static const struct vlc_filter_operations planar_filter_ops =
+{
+    .filter_video = FilterPlanar,
+};
+
+static const struct vlc_filter_operations packed_filter_ops =
+{
+    .filter_video = FilterPacked,
+};
+
 /*****************************************************************************
  * Create: allocates adjust video filter
  *****************************************************************************/
@@ -166,7 +176,7 @@ static int Create( vlc_object_t *p_this )
     {
         CASE_PLANAR_YUV
             /* Planar YUV */
-            p_filter->pf_video_filter = FilterPlanar;
+            p_filter->ops = &planar_filter_ops;
             p_sys->pf_process_sat_hue_clip = planar_sat_hue_clip_C;
             p_sys->pf_process_sat_hue = planar_sat_hue_C;
             break;
@@ -174,14 +184,14 @@ static int Create( vlc_object_t *p_this )
         CASE_PLANAR_YUV10
         CASE_PLANAR_YUV9
             /* Planar YUV 9-bit or 10-bit */
-            p_filter->pf_video_filter = FilterPlanar;
+            p_filter->ops = &planar_filter_ops;
             p_sys->pf_process_sat_hue_clip = planar_sat_hue_clip_C_16;
             p_sys->pf_process_sat_hue = planar_sat_hue_C_16;
             break;
 
         CASE_PACKED_YUV_422
             /* Packed YUV 4:2:2 */
-            p_filter->pf_video_filter = FilterPacked;
+            p_filter->ops = &packed_filter_ops;
             p_sys->pf_process_sat_hue_clip = packed_sat_hue_clip_C;
             p_sys->pf_process_sat_hue = packed_sat_hue_C;
             break;

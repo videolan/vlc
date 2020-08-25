@@ -143,7 +143,11 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* init data */
-    p_filter->pf_video_filter = Filter;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = Filter,
+    };
+    p_filter->ops = &filter_ops;
     p_sys->i_start_time = p_sys->i_cur_time = p_sys->i_last_time = vlc_tick_now();
 
     return VLC_SUCCESS;

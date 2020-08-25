@@ -174,6 +174,18 @@ static int Create( vlc_object_t *p_this )
     const audio_format_t *infmt = &p_filter->fmt_in.audio;
     const audio_format_t *outfmt = &p_filter->fmt_out.audio;
 
+    static const struct vlc_filter_operations equal_filter_ops =
+        { .filter_audio = Equals };
+
+    static const struct vlc_filter_operations extract_filter_ops =
+        { .filter_audio = Extract };
+
+    static const struct vlc_filter_operations upmix_filter_ops =
+        { .filter_audio = Upmix };
+
+    static const struct vlc_filter_operations downmix_filter_ops =
+        { .filter_audio = Downmix };
+
     if( infmt->i_physical_channels == 0 )
     {
         assert( infmt->i_channels > 0 );
@@ -181,7 +193,7 @@ static int Create( vlc_object_t *p_this )
             return VLC_EGENERIC;
         if( aout_FormatNbChannels( outfmt ) == infmt->i_channels )
         {
-            p_filter->pf_audio_filter = Equals;
+            p_filter->ops = &equal_filter_ops;
             return VLC_SUCCESS;
         }
         else
@@ -189,7 +201,7 @@ static int Create( vlc_object_t *p_this )
             if( infmt->i_channels > AOUT_CHAN_MAX )
                 msg_Info(p_filter, "%d channels will be dropped.",
                          infmt->i_channels - AOUT_CHAN_MAX);
-            p_filter->pf_audio_filter = Extract;
+            p_filter->ops = &extract_filter_ops;
             return VLC_SUCCESS;
         }
     }
@@ -211,7 +223,7 @@ static int Create( vlc_object_t *p_this )
     if ( aout_FormatNbChannels( outfmt ) == 1
       && aout_FormatNbChannels( infmt ) == 1 )
     {
-        p_filter->pf_audio_filter = Equals;
+        p_filter->ops = &equal_filter_ops;
         return VLC_SUCCESS;
     }
 
@@ -293,7 +305,7 @@ static int Create( vlc_object_t *p_this )
             }
         if( b_equals )
         {
-            p_filter->pf_audio_filter = Equals;
+            p_filter->ops = &equal_filter_ops;
             return VLC_SUCCESS;
         }
     }
@@ -305,9 +317,9 @@ static int Create( vlc_object_t *p_this )
     memcpy( p_sys->channel_map, channel_map, sizeof(channel_map) );
 
     if( aout_FormatNbChannels( outfmt ) > aout_FormatNbChannels( infmt ) )
-        p_filter->pf_audio_filter = Upmix;
+        p_filter->ops = &upmix_filter_ops;
     else
-        p_filter->pf_audio_filter = Downmix;
+        p_filter->ops = &downmix_filter_ops;
 
     return VLC_SUCCESS;
 }

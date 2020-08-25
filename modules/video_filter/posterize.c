@@ -134,7 +134,11 @@ static int Create( vlc_object_t *p_this )
 
     var_AddCallback( p_filter, CFG_PREFIX "level", FilterCallback, p_sys );
 
-    p_filter->pf_video_filter = Filter;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = Filter,
+    };
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

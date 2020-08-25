@@ -418,6 +418,14 @@ static bool is_fmt_valid_in(const vlc_fourcc_t fmt)
     return fmt == VLC_CODEC_MMAL_OPAQUE;
 }
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = deinterlace, .flush = di_flush,
+};
+
+static const struct vlc_filter_operations filter_pass_ops = {
+    .filter_video = pass_deinterlace, .flush = pass_flush,
+};
+
 static int OpenMmalDeinterlace(vlc_object_t *p_this)
 {
     filter_t *filter = (filter_t*)p_this;
@@ -500,8 +508,7 @@ static int OpenMmalDeinterlace(vlc_object_t *p_this)
 
     if (sys->use_passthrough)
     {
-        filter->pf_video_filter = pass_deinterlace;
-        filter->pf_flush = pass_flush;
+        filter->ops = &filter_pass_ops;
         return VLC_SUCCESS;
     }
 
@@ -601,8 +608,7 @@ static int OpenMmalDeinterlace(vlc_object_t *p_this)
         goto fail;
     }
 
-    filter->pf_video_filter = deinterlace;
-    filter->pf_flush = di_flush;
+    filter->ops = &filter_ops;
     return 0;
 
 fail:

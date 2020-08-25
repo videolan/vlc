@@ -270,7 +270,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
             video_format_Copy( &p_image->p_converter->fmt_out.video, p_fmt_out);
         }
 
-        p_pic = p_image->p_converter->pf_video_filter( p_image->p_converter, p_pic );
+        p_pic = p_image->p_converter->ops->filter_video( p_image->p_converter, p_pic );
     }
     else
     {
@@ -434,7 +434,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
         picture_Hold( p_pic );
 
         p_tmp_pic =
-            p_image->p_converter->pf_video_filter( p_image->p_converter, p_pic );
+            p_image->p_converter->ops->filter_video( p_image->p_converter, p_pic );
 
         if( likely(p_tmp_pic != NULL) )
         {
@@ -569,7 +569,7 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
 
     picture_Hold( p_pic );
 
-    return p_image->p_converter->pf_video_filter( p_image->p_converter, p_pic );
+    return p_image->p_converter->ops->filter_video( p_image->p_converter, p_pic );
 }
 
 /**

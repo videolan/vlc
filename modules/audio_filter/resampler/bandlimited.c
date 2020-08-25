@@ -279,6 +279,10 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
     return p_out_buf;
 }
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_audio = Resample,
+};
+
 /*****************************************************************************
  * OpenFilter:
  *****************************************************************************/
@@ -306,7 +310,7 @@ static int OpenFilter( vlc_object_t *p_this )
 
     p_sys->i_old_wing = 0;
     p_sys->b_first = true;
-    p_filter->pf_audio_filter = Resample;
+    p_filter->ops = &filter_ops;
 
     msg_Dbg( p_this, "%4.4s/%iKHz/%i->%4.4s/%iKHz/%i",
              (char *)&p_filter->fmt_in.i_codec,

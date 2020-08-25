@@ -122,6 +122,11 @@ typedef struct
     int i_paddright;
 } filter_sys_t;
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 /*****************************************************************************
  * OpenFilter: probe the filter and return score
  *****************************************************************************/
@@ -185,7 +190,7 @@ static int OpenFilter( vlc_object_t *p_this )
         - p_sys->i_cropleft - p_sys->i_cropright
         + p_sys->i_paddleft + p_sys->i_paddright;
 
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     msg_Dbg( p_filter, "Crop: Top: %d, Bottom: %d, Left: %d, Right: %d",
              p_sys->i_croptop, p_sys->i_cropbottom, p_sys->i_cropleft,

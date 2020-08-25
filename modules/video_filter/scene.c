@@ -148,7 +148,7 @@ typedef struct
 } filter_sys_t;
 
 /*****************************************************************************
- * Create: initialize and set pf_video_filter()
+ * Create: initialize and set ops
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
@@ -197,7 +197,11 @@ static int Create( vlc_object_t *p_this )
     if( p_sys->psz_path == NULL )
         p_sys->psz_path = config_GetUserDir( VLC_PICTURES_DIR );
 
-    p_filter->pf_video_filter = Filter;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = Filter,
+    };
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

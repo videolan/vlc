@@ -271,6 +271,10 @@ static void mosaic_ParseSetOffsets( vlc_object_t *p_this,
 #define mosaic_ParseSetOffsets( a, b, c ) \
             mosaic_ParseSetOffsets( VLC_OBJECT( a ), b, c )
 
+static const struct vlc_filter_operations filter_ops = {
+    .source_sub = Filter,
+};
+
 /*****************************************************************************
  * CreateFiler: allocate mosaic video filter
  *****************************************************************************/
@@ -288,7 +292,7 @@ static int CreateFilter( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_filter->pf_sub_source = Filter;
+    p_filter->ops = &filter_ops;
 
     vlc_mutex_init( &p_sys->lock );
     vlc_mutex_lock( &p_sys->lock );

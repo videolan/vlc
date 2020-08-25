@@ -649,7 +649,7 @@ struct filter_sys_t {
 /**
  * It blends 2 picture together.
  */
-static void Blend(filter_t *filter,
+static void DoBlend(filter_t *filter,
                   picture_t *dst, const picture_t *src,
                   int x_offset, int y_offset, int alpha)
 {
@@ -680,6 +680,14 @@ static void Blend(filter_t *filter,
                width, height, alpha);
 }
 
+static const struct FilterOperationInitializer {
+    struct vlc_filter_operations ops {};
+    FilterOperationInitializer()
+    {
+        ops.blend_video = DoBlend;
+    };
+} filter_ops;
+
 static int Open(vlc_object_t *object)
 {
     filter_t *filter = (filter_t *)object;
@@ -699,7 +707,7 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-    filter->pf_video_blend = Blend;
+    filter->ops = &filter_ops.ops;
     filter->p_sys          = sys;
     return VLC_SUCCESS;
 }
@@ -710,4 +718,3 @@ static void Close(vlc_object_t *object)
     filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( filter->p_sys );
     delete p_sys;
 }
-

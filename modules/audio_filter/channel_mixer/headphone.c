@@ -478,7 +478,12 @@ static int OpenFilter( vlc_object_t *p_this )
     {
         p_filter->fmt_in.audio.i_physical_channels = AOUT_CHANS_5_0;
     }
-    p_filter->pf_audio_filter = Convert;
+
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = Convert,
+    };
+    p_filter->ops = &filter_ops;
 
     aout_FormatPrepare(&p_filter->fmt_in.audio);
     aout_FormatPrepare(&p_filter->fmt_out.audio);

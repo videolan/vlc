@@ -56,6 +56,20 @@ vlc_module_end ()
 VIDEO_FILTER_WRAPPER( GREY_I420 )
 VIDEO_FILTER_WRAPPER( GREY_YUY2 )
 
+static const struct vlc_filter_operations *
+GetFilterOperations( filter_t *filter )
+{
+    switch( filter->fmt_out.video.i_chroma )
+    {
+        case VLC_CODEC_I420:
+            return &GREY_I420_ops;
+        case VLC_CODEC_YUYV:
+            return &GREY_YUY2_ops;
+        default:
+            return NULL;
+    }
+}
+
 /*****************************************************************************
  * Activate: allocate a chroma function
  *****************************************************************************
@@ -78,18 +92,9 @@ static int Activate( vlc_object_t *p_this )
 
     if ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_GREY )
         return VLC_EGENERIC;
-
-    switch( p_filter->fmt_out.video.i_chroma )
-    {
-        case VLC_CODEC_I420:
-            p_filter->pf_video_filter = GREY_I420_Filter;
-            break;
-        case VLC_CODEC_YUYV:
-            p_filter->pf_video_filter = GREY_YUY2_Filter;
-            break;
-        default:
-            return VLC_EGENERIC;
-    }
+    p_filter->ops = GetFilterOperations(p_filter);
+    if ( p_filter->ops == NULL )
+        return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }

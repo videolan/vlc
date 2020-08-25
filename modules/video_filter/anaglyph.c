@@ -86,6 +86,11 @@ typedef struct
     int left, right;
 } filter_sys_t;
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = &Filter,
+};
+
 
 static int Create(vlc_object_t *p_this)
 {
@@ -156,7 +161,7 @@ static int Create(vlc_object_t *p_this)
             break;
     }
 
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }
 
@@ -301,4 +306,3 @@ static void combine_side_by_side_yuv420(picture_t *p_inpic, picture_t *p_outpic,
         vout += p_outpic->p[V_PLANE].i_pitch - uv_visible_pitch;
     }
 }
-

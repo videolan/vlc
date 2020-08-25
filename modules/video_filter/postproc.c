@@ -252,7 +252,11 @@ static int OpenPostproc( vlc_object_t *p_this )
     var_AddCallback( p_filter, FILTER_PREFIX "q", PPQCallback, NULL );
     var_AddCallback( p_filter, FILTER_PREFIX "name", PPNameCallback, NULL );
 
-    p_filter->pf_video_filter = PostprocPict;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = PostprocPict,
+    };
+    p_filter->ops = &filter_ops;
 
     msg_Warn( p_filter, "Quantification table was not set by video decoder. "
                         "Postprocessing won't look good." );

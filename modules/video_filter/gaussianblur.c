@@ -123,6 +123,11 @@ static void gaussianblur_InitDistribution( filter_sys_t *p_sys )
     p_sys->pt_distribution = pt_distribution;
 }
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
@@ -155,7 +160,7 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     p_sys->f_sigma =
         var_CreateGetFloat( p_filter, FILTER_PREFIX "sigma" );

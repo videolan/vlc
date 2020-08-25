@@ -567,6 +567,10 @@ OpenAdjust_InitFilterParams(filter_t * filter, void * p_data,
     return VLC_SUCCESS;
 }
 
+static const struct vlc_filter_operations Adjust_ops = {
+    .filter_video = Adjust,
+};
+
 static int
 OpenAdjust(vlc_object_t * obj)
 {
@@ -587,7 +591,7 @@ OpenAdjust(vlc_object_t * obj)
     for (unsigned int i = 0; i < NUM_ADJUST_MODES; ++i)
         var_AddCallback(obj, adjust_params_names[i], FilterCallback, p_data);
 
-    filter->pf_video_filter = Adjust;
+    filter->ops = &Adjust_ops;
 
     return VLC_SUCCESS;
 
@@ -684,6 +688,10 @@ OpenBasicFilter_InitFilterParams(filter_t * filter, void * p_data,
     return VLC_SUCCESS;
 }
 
+static const struct vlc_filter_operations BasicFilter_ops = {
+    .filter_video = BasicFilter,
+};
+
 static int
 OpenBasicFilter(vlc_object_t * obj, VAProcFilterType filter_type,
                 const char *psz_sigma_name, struct range const *p_vlc_range)
@@ -708,7 +716,7 @@ OpenBasicFilter(vlc_object_t * obj, VAProcFilterType filter_type,
 
     var_AddCallback(obj, p_data->sigma.psz_name, FilterCallback, p_data);
 
-    filter->pf_video_filter = BasicFilter;
+    filter->ops = &BasicFilter_ops;
 
     return VLC_SUCCESS;
 
@@ -1065,6 +1073,13 @@ OpenDeinterlace_InitHistory(void * p_data, VAProcPipelineCaps const * pipeline_c
     return VLC_SUCCESS;
 }
 
+static const struct vlc_filter_operations DeinterlaceX2_ops = {
+    .filter_video = DeinterlaceX2, .flush = Deinterlace_Flush,
+};
+static const struct vlc_filter_operations Deinterlace_ops = {
+    .filter_video = Deinterlace,   .flush = Deinterlace_Flush,
+};
+
 static int
 OpenDeinterlace(vlc_object_t * obj)
 {
@@ -1079,10 +1094,9 @@ OpenDeinterlace(vlc_object_t * obj)
         goto error;
 
     if (p_data->b_double_rate)
-        filter->pf_video_filter = DeinterlaceX2;
+        filter->ops = &DeinterlaceX2_ops;
     else
-        filter->pf_video_filter = Deinterlace;
-    filter->pf_flush = Deinterlace_Flush;
+        filter->ops = &Deinterlace_ops;
 
     for (unsigned int i = 0; i < METADATA_SIZE; ++i)
     {

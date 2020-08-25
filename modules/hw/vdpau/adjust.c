@@ -139,6 +139,10 @@ static const char *const options[] = {
     "brightness", "contrast", "saturation", "hue", NULL
 };
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = Adjust,
+};
+
 static int Open(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -157,7 +161,7 @@ static int Open(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    filter->pf_video_filter = Adjust;
+    filter->ops = &filter_ops;
     filter->p_sys = sys;
 
     config_ChainParse(filter, "", options, filter->p_cfg);

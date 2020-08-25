@@ -616,8 +616,12 @@ static int Open( vlc_object_t *p_this )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    p_filter->pf_audio_filter = DoWork;
-    p_filter->pf_flush = Flush;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = DoWork,
+        .flush = Flush,
+    };
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

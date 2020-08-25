@@ -232,6 +232,10 @@ picture_t *AllocPicture( filter_t *p_filter )
     return pic;
 }
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = Deinterlace, .flush = Flush,
+};
+
 int D3D11OpenDeinterlace(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -350,8 +354,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
 
     filter->fmt_out.video   = out_fmt;
     filter->vctx_out        = vlc_video_context_Hold(filter->vctx_in);
-    filter->pf_video_filter = Deinterlace;
-    filter->pf_flush        = Flush;
+    filter->ops             = &filter_ops;
     filter->p_sys = sys;
 
     return VLC_SUCCESS;

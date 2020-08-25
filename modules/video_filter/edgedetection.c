@@ -82,6 +82,11 @@ static const struct filter_video_callbacks filter_video_edge_cbs =
     new_frame, NULL,
 };
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 /*****************************************************************************
  * Opens the filter.
  * Allocates and initializes data needed by the filter. The image needs to
@@ -123,7 +128,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     /* Set callback function */
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
     p_filter->p_sys = sys;
     return VLC_SUCCESS;
 }

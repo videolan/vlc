@@ -138,7 +138,11 @@ static int Create( vlc_object_t *p_this )
         ++i;
     }
 
-    p_filter->pf_audio_filter = DoWork;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = DoWork,
+    };
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

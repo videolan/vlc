@@ -188,10 +188,14 @@ Open( vlc_object_t *p_obj, bool b_change_ratio )
              (const char *)&p_filter->fmt_out.audio.i_format,
              p_filter->fmt_out.audio.i_rate );
 
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = Resample,
+        .drain_audio = Drain,
+        .flush = Flush,
+    };
+    p_filter->ops = &filter_ops;
     p_filter->p_sys = p_sys;
-    p_filter->pf_audio_filter = Resample;
-    p_filter->pf_flush = Flush;
-    p_filter->pf_audio_drain = Drain;
     return VLC_SUCCESS;
 }
 

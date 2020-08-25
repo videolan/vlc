@@ -378,6 +378,11 @@ static int Callback(vlc_object_t *object, char const *cmd,
     return VLC_SUCCESS;
 }
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 static int Open(vlc_object_t *object)
 {
     filter_t *filter = (filter_t *)object;
@@ -419,8 +424,8 @@ static int Open(vlc_object_t *object)
     sys->cfg.variance = var_CreateGetFloatCommand(filter, CFG_PREFIX "variance");
     var_AddCallback(filter, CFG_PREFIX "variance", Callback, NULL);
 
-    filter->p_sys           = sys;
-    filter->pf_video_filter = Filter;
+    filter->p_sys = sys;
+    filter->ops   = &filter_ops;
     return VLC_SUCCESS;
 }
 
@@ -432,4 +437,3 @@ static void Close(vlc_object_t *object)
     var_DelCallback(filter, CFG_PREFIX "variance", Callback, NULL);
     free(sys);
 }
-

@@ -132,6 +132,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
     return chain.front;
 }
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 static int Open( vlc_object_t *p_this)
 {
     filter_t *p_filter = (filter_t*)p_this;
@@ -181,7 +186,7 @@ static int Open( vlc_object_t *p_this)
 
     p_sys->p_previous_pic = NULL;
 
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     /* We don't change neither the format nor the picture */
     if ( p_filter->vctx_in )

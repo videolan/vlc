@@ -114,17 +114,22 @@ static int Open( vlc_object_t *p_this )
 
     p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
-    p_filter->pf_audio_filter = DoWork;
+
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = DoWork,
+    };
+    p_filter->ops = &filter_ops;
 
     p_sys->f_lowf = var_InheritFloat( p_this, "param-eq-lowf");
     p_sys->f_lowgain = var_InheritFloat( p_this, "param-eq-lowgain");
     p_sys->f_highf = var_InheritFloat( p_this, "param-eq-highf");
     p_sys->f_highgain = var_InheritFloat( p_this, "param-eq-highgain");
- 
+
     p_sys->f_f1 = var_InheritFloat( p_this, "param-eq-f1");
     p_sys->f_Q1 = var_InheritFloat( p_this, "param-eq-q1");
     p_sys->f_gain1 = var_InheritFloat( p_this, "param-eq-gain1");
- 
+
     p_sys->f_f2 = var_InheritFloat( p_this, "param-eq-f2");
     p_sys->f_Q2 = var_InheritFloat( p_this, "param-eq-q2");
     p_sys->f_gain2 = var_InheritFloat( p_this, "param-eq-gain2");
@@ -132,7 +137,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->f_f3 = var_InheritFloat( p_this, "param-eq-f3");
     p_sys->f_Q3 = var_InheritFloat( p_this, "param-eq-q3");
     p_sys->f_gain3 = var_InheritFloat( p_this, "param-eq-gain3");
- 
+
 
     i_samplerate = p_filter->fmt_in.audio.i_rate;
     CalcPeakEQCoeffs(p_sys->f_f1, p_sys->f_Q1, p_sys->f_gain1,
@@ -200,18 +205,18 @@ static void CalcPeakEQCoeffs( float f0, float Q, float gainDB, float Fs,
     if (f0 > Fs/2*0.95f) f0 = Fs/2*0.95f;
     if (gainDB < -40) gainDB = -40;
     if (gainDB > 40) gainDB = 40;
- 
+
     A = powf(10, gainDB/40);
     w0 = 2*((float)M_PI)*f0/Fs;
     alpha = sinf(w0)/(2*Q);
- 
+
     b0 = 1 + alpha*A;
     b1 = -2*cosf(w0);
     b2 = 1 - alpha*A;
     a0 = 1 + alpha/A;
     a1 = -2*cosf(w0);
     a2 = 1 - alpha/A;
- 
+
     // Store values to coeffs and normalize by 1/a0
     coeffs[0] = b0/a0;
     coeffs[1] = b1/a0;
@@ -320,4 +325,3 @@ void ProcessEQ( const float *src, float *dest, float *state,
         }
     }
 }
-

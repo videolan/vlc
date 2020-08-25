@@ -47,6 +47,10 @@ vlc_module_begin ()
     set_callback( OpenFilter )
 vlc_module_end ()
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = Filter,
+};
+
 /*****************************************************************************
  * OpenFilter: probe the filter and return score
  *****************************************************************************/
@@ -67,7 +71,7 @@ static int OpenFilter( vlc_object_t *p_this )
      || p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation)
         return -1;
 
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

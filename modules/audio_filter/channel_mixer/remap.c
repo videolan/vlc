@@ -366,7 +366,11 @@ static int OpenFilter( vlc_object_t *p_this )
              aout_FormatPrintChannels( audio_in ),
              aout_FormatPrintChannels( audio_out ) );
 
-    p_filter->pf_audio_filter = Remap;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = Remap,
+    };
+    p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }
 

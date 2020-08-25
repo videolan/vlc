@@ -249,8 +249,12 @@ static int Create( vlc_object_t *p_this )
     msg_Dbg( p_filter, "opencv_wrapper successfully started" );
 #endif
 
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = Filter,
+    };
+    p_filter->ops = &filter_ops;
     p_filter->p_sys = p_sys;
-    p_filter->pf_video_filter = Filter;
 
     return VLC_SUCCESS;
 }
@@ -414,7 +418,7 @@ static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
     VlcPictureToIplImage( p_filter, p_pic );
     // Pass the image (as a pointer to the first IplImage*) to the
     // internal OpenCV filter for processing.
-    p_sys->p_opencv->pf_video_filter( p_sys->p_opencv, (picture_t*)&(p_sys->p_cv_image[0]) );
+    p_sys->p_opencv->ops->filter_video( p_sys->p_opencv, (picture_t*)&(p_sys->p_cv_image[0]) );
 
     if(p_sys->i_wrapper_output == PROCESSED) {
         // Processed video
@@ -459,4 +463,3 @@ static picture_t* Filter( filter_t* p_filter, picture_t* p_pic )
         return NULL;
     }
 }
-

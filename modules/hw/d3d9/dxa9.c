@@ -258,7 +258,7 @@ static void YV12_D3D9(filter_t *p_filter, picture_t *src, picture_t *dst)
 
         picture_Hold( src );
 
-        sys->filter->pf_video_filter(sys->filter, src);
+        sys->filter->ops->filter_video(sys->filter, src);
 
         sys->staging->context = staging_pic_ctx;
 
@@ -396,23 +396,23 @@ int D3D9OpenConverter( vlc_object_t *obj )
     case VLC_CODEC_YV12:
         if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE )
             return VLC_EGENERIC;
-        p_filter->pf_video_filter = DXA9_YV12_Filter;
+        p_filter->ops = &DXA9_YV12_ops;
         break;
     case VLC_CODEC_I420_10L:
         if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B )
             return VLC_EGENERIC;
-        p_filter->pf_video_filter = DXA9_YV12_Filter;
+        p_filter->ops = &DXA9_YV12_ops;
         pixel_bytes = 2;
         break;
     case VLC_CODEC_NV12:
         if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE )
             return VLC_EGENERIC;
-        p_filter->pf_video_filter = DXA9_NV12_Filter;
+        p_filter->ops = &DXA9_NV12_ops;
         break;
     case VLC_CODEC_P010:
         if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B )
             return VLC_EGENERIC;
-        p_filter->pf_video_filter = DXA9_NV12_Filter;
+        p_filter->ops = &DXA9_NV12_ops;
         pixel_bytes = 2;
         break;
     default:
@@ -433,6 +433,10 @@ int D3D9OpenConverter( vlc_object_t *obj )
     return VLC_SUCCESS;
 }
 
+static const struct vlc_filter_operations YV12_D3D9_ops = {
+    .filter_video = YV12_D3D9_Filter,
+};
+
 int D3D9OpenCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
@@ -452,7 +456,7 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
     case VLC_CODEC_YV12:
     case VLC_CODEC_I420_10L:
     case VLC_CODEC_P010:
-        p_filter->pf_video_filter = YV12_D3D9_Filter;
+        p_filter->ops = &YV12_D3D9_ops;
         break;
     default:
         return VLC_EGENERIC;

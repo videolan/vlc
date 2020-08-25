@@ -231,16 +231,16 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_YUYV:
-                    filter->pf_video_filter = I420_YUYV_Filter;
+                    filter->ops = &I420_YUYV_ops;
                     break;
                 case VLC_CODEC_UYVY:
-                    filter->pf_video_filter = I420_UYVY_Filter;
+                    filter->ops = &I420_UYVY_ops;
                     break;
                 case VLC_CODEC_YVYU:
-                    filter->pf_video_filter = I420_YVYU_Filter;
+                    filter->ops = &I420_YVYU_ops;
                     break;
                 case VLC_CODEC_VYUY:
-                    filter->pf_video_filter = I420_VYUY_Filter;
+                    filter->ops = &I420_VYUY_ops;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -251,16 +251,16 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_YUYV:
-                    filter->pf_video_filter = I420_YVYU_Filter;
+                    filter->ops = &I420_YVYU_ops;
                     break;
                 case VLC_CODEC_UYVY:
-                    filter->pf_video_filter = I420_VYUY_Filter;
+                    filter->ops = &I420_VYUY_ops;
                     break;
                 case VLC_CODEC_YVYU:
-                    filter->pf_video_filter = I420_YUYV_Filter;
+                    filter->ops = &I420_YUYV_ops;
                     break;
                 case VLC_CODEC_VYUY:
-                    filter->pf_video_filter = I420_UYVY_Filter;
+                    filter->ops = &I420_UYVY_ops;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -271,16 +271,16 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_YUYV:
-                    filter->pf_video_filter = I422_YUYV_Filter;
+                    filter->ops = &I422_YUYV_ops;
                     break;
                 case VLC_CODEC_UYVY:
-                    filter->pf_video_filter = I422_UYVY_Filter;
+                    filter->ops = &I422_UYVY_ops;
                     break;
                 case VLC_CODEC_YVYU:
-                    filter->pf_video_filter = I422_YVYU_Filter;
+                    filter->ops = &I422_YVYU_ops;
                     break;
                 case VLC_CODEC_VYUY:
-                    filter->pf_video_filter = I422_VYUY_Filter;
+                    filter->ops = &I422_VYUY_ops;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -292,10 +292,10 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_I420:
-                    filter->pf_video_filter = Semiplanar_Planar_420_Filter;
+                    filter->ops = &Semiplanar_Planar_420_ops;
                     break;
                 case VLC_CODEC_YV12:
-                    filter->pf_video_filter = Semiplanar_Planar_420_Swap_Filter;
+                    filter->ops = &Semiplanar_Planar_420_Swap_ops;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -306,10 +306,10 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_I420:
-                    filter->pf_video_filter = Semiplanar_Planar_420_Swap_Filter;
+                    filter->ops = &Semiplanar_Planar_420_Swap_ops;
                     break;
                 case VLC_CODEC_YV12:
-                    filter->pf_video_filter = Semiplanar_Planar_420_Filter;
+                    filter->ops = &Semiplanar_Planar_420_ops;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -320,7 +320,7 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_I422:
-                    filter->pf_video_filter = Semiplanar_Planar_422_Filter;
+                    filter->ops = &Semiplanar_Planar_422_ops;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -331,7 +331,7 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_I444:
-                    filter->pf_video_filter = Semiplanar_Planar_444_Filter;
+                    filter->ops = &Semiplanar_Planar_444_ops;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -343,7 +343,7 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_I422:
-                    filter->pf_video_filter = YUYV_I422_Filter;
+                    filter->ops = &YUYV_I422_ops;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -353,7 +353,7 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_I422:
-                    filter->pf_video_filter = UYVY_I422_Filter;
+                    filter->ops = &UYVY_I422_ops;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -363,7 +363,7 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_I422:
-                    filter->pf_video_filter = YVYU_I422_Filter;
+                    filter->ops = &YVYU_I422_ops;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -374,7 +374,7 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.video.i_chroma)
             {
                 case VLC_CODEC_I422:
-                    filter->pf_video_filter = VYUY_I422_Filter;
+                    filter->ops = &VYUY_I422_ops;
                     break;
                 default:
                     return VLC_EGENERIC;

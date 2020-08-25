@@ -81,6 +81,10 @@ static const char *const ppsz_filter_options[] = {
     "input", "output", NULL
 };
 
+static const struct vlc_filter_operations filter_ops = {
+    .source_sub = Filter,
+};
+
 /*****************************************************************************
  * Create: allocates adjust video thread output method
  *****************************************************************************
@@ -110,7 +114,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->b_atomic = false;
     vlc_mutex_init( &p_sys->lock );
 
-    p_filter->pf_sub_source = Filter;
+    p_filter->ops = &filter_ops;
 
     config_ChainParse( p_filter, "overlay-", ppsz_filter_options,
                        p_filter->p_cfg );

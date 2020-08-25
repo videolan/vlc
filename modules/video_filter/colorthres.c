@@ -102,6 +102,16 @@ typedef struct
     atomic_int i_color;
 } filter_sys_t;
 
+static const struct vlc_filter_operations planar_filter_ops =
+{
+    .filter_video = Filter,
+};
+
+static const struct vlc_filter_operations packed_filter_ops =
+{
+    .filter_video = FilterPacked,
+};
+
 /*****************************************************************************
  * Create: allocates adjust video thread output method
  *****************************************************************************
@@ -115,11 +125,11 @@ static int Create( vlc_object_t *p_this )
     switch( p_filter->fmt_in.video.i_chroma )
     {
         CASE_PLANAR_YUV
-            p_filter->pf_video_filter = Filter;
+            p_filter->ops = &planar_filter_ops;
             break;
 
         CASE_PACKED_YUV_422
-            p_filter->pf_video_filter = FilterPacked;
+            p_filter->ops = &packed_filter_ops;
             break;
 
         default:

@@ -150,7 +150,7 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_in.video.i_chroma)
             {
                 case VLC_CODEC_I420:
-                    filter->pf_video_filter = I420_RV16_Filter;
+                    filter->ops = &I420_RV16_ops;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -166,16 +166,16 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_in.video.i_chroma)
             {
                 case VLC_CODEC_I420:
-                    filter->pf_video_filter = I420_RGBA_Filter;
+                    filter->ops = &I420_RGBA_ops;
                     break;
                 case VLC_CODEC_YV12:
-                    filter->pf_video_filter = YV12_RGBA_Filter;
+                    filter->ops = &YV12_RGBA_ops;
                     break;
                 case VLC_CODEC_NV21:
-                    filter->pf_video_filter = NV21_RGBA_Filter;
+                    filter->ops = &NV21_RGBA_ops;
                     break;
                 case VLC_CODEC_NV12:
-                    filter->pf_video_filter = NV12_RGBA_Filter;
+                    filter->ops = &NV12_RGBA_ops;
                     break;
                 default:
                     return VLC_EGENERIC;

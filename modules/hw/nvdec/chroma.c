@@ -117,6 +117,10 @@ done:
     return dst;
 }
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = FilterCUDAToCPU,
+};
+
 static int OpenCUDAToCPU( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
@@ -137,7 +141,7 @@ static int OpenCUDAToCPU( vlc_object_t *p_this )
            ) )
         return VLC_EGENERIC;
 
-    p_filter->pf_video_filter = FilterCUDAToCPU;
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

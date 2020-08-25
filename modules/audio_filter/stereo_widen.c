@@ -153,7 +153,11 @@ static int Open( vlc_object_t *obj )
         return VLC_ENOMEM;
     }
 
-    p_filter->pf_audio_filter = Filter;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = Filter,
+    };
+    p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }
 

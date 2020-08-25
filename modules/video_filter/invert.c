@@ -76,7 +76,11 @@ static int Create( vlc_object_t *p_this )
      || p_chroma->pixel_size * 8 != p_chroma->pixel_bits )
         return VLC_EGENERIC;
 
-    p_filter->pf_video_filter = Filter;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = Filter,
+    };
+    p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }
 

@@ -106,6 +106,11 @@ typedef struct
     uint8_t *p_at;
 } filter_sys_t;
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
@@ -143,7 +148,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_at = NULL;
 #undef GET_VAR
 
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

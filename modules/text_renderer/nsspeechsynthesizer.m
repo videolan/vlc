@@ -58,6 +58,10 @@ typedef struct filter_sys_t
     NSString *lastString;
 } filter_sys_t;
 
+static const struct vlc_filter_operations filter_ops = {
+    .render = RenderText,
+};
+
 static int  Create (vlc_object_t *p_this)
 {
     filter_t *p_filter = (filter_t *)p_this;
@@ -70,7 +74,7 @@ static int  Create (vlc_object_t *p_this)
     p_sys->currentLocale = p_sys->lastString = @"";
     p_sys->speechSynthesizer = [[NSSpeechSynthesizer alloc] init];
 
-    p_filter->pf_render = RenderText;
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

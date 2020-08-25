@@ -168,23 +168,23 @@ static int Create( vlc_object_t *p_this )
         case VLC_CODEC_J420:
             if( outfcc != VLC_CODEC_NV12 )
                 return -1;
-            p_filter->pf_video_filter = I420_NV12_Filter;
+            p_filter->ops = &I420_NV12_ops;
             break;
 
         case VLC_CODEC_YV12:
             if( outfcc != VLC_CODEC_NV12 )
                 return -1;
-            p_filter->pf_video_filter = YV12_NV12_Filter;
+            p_filter->ops = &YV12_NV12_ops;
             break;
         case VLC_CODEC_NV12:
             switch( outfcc )
             {
                 case VLC_CODEC_I420:
                 case VLC_CODEC_J420:
-                    p_filter->pf_video_filter = NV12_I420_Filter;
+                    p_filter->ops = &NV12_I420_ops;
                     break;
                 case VLC_CODEC_YV12:
-                    p_filter->pf_video_filter = NV12_YV12_Filter;
+                    p_filter->ops = &NV12_YV12_ops;
                     break;
                 default:
                     return -1;
@@ -195,14 +195,14 @@ static int Create( vlc_object_t *p_this )
             if( outfcc != VLC_CODEC_P010 )
                 return -1;
             pixel_bytes = 2;
-            p_filter->pf_video_filter = I42010B_P010_Filter;
+            p_filter->ops = &I42010B_P010_ops;
             break;
 
         case VLC_CODEC_P010:
             if( outfcc != VLC_CODEC_I420_10L )
                 return -1;
             pixel_bytes = 2;
-            p_filter->pf_video_filter = P010_I42010B_Filter;
+            p_filter->ops = &P010_I42010B_ops;
             break;
 
         default:

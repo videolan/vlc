@@ -90,7 +90,12 @@ static int Create( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
     p_filter->p_sys = p_sys;
-    p_filter->pf_video_filter = Filter;
+
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = Filter,
+    };
+    p_filter->ops = &filter_ops;
 
     p_sys->f_angle = 0.0;
     p_sys->last_date = 0;

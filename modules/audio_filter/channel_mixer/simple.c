@@ -345,8 +345,11 @@ static int OpenFilter( vlc_object_t *p_this )
     if( do_work == NULL )
         return VLC_EGENERIC;
 
-    p_filter->pf_audio_filter = Filter;
-    p_filter->p_sys = (void *)do_work;
+    static const struct vlc_filter_operations filter_ops =
+        { .filter_audio = Filter };
+
+    p_filter->ops = &filter_ops;
+    p_filter->p_sys = do_work;
     return VLC_SUCCESS;
 }
 
@@ -392,4 +395,3 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
 
     return p_out;
 }
-

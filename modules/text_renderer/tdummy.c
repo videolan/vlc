@@ -47,9 +47,13 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     return VLC_EGENERIC;
 }
 
+static const struct vlc_filter_operations filter_ops = {
+    .render = RenderText,
+};
+
 static int OpenRenderer( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    p_filter->pf_render = RenderText;
+    p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }

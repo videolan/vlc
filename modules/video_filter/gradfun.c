@@ -110,6 +110,11 @@ typedef struct
     struct vf_priv_s cfg;
 } filter_sys_t;
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 static int Open(vlc_object_t *object)
 {
     filter_t *filter = (filter_t *)object;
@@ -156,8 +161,8 @@ static int Open(vlc_object_t *object)
 #endif
         cfg->filter_line = filter_line_c;
 
-    filter->p_sys           = sys;
-    filter->pf_video_filter = Filter;
+    filter->p_sys = sys;
+    filter->ops   = &filter_ops;
     return VLC_SUCCESS;
 }
 
@@ -236,4 +241,3 @@ static int Callback(vlc_object_t *object, char const *cmd,
 
     return VLC_SUCCESS;
 }
-

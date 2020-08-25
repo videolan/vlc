@@ -89,6 +89,11 @@ typedef struct
     uint32_t i_color;
 } filter_sys_t;
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 /*****************************************************************************
  * Create
  *****************************************************************************/
@@ -142,7 +147,7 @@ static int Create( vlc_object_t *p_this )
     var_AddCallback( p_filter, FILTER_PREFIX "component",
                      ExtractCallback, p_sys );
 
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

@@ -248,6 +248,13 @@ static void Close(vlc_object_t *obj)
     free(p_sys);
 }
 
+static const struct vlc_filter_operations CVPX_TO_SW_ops = {
+    .filter_video = CVPX_TO_SW_Filter,
+};
+static const struct vlc_filter_operations SW_TO_CVPX_ops = {
+    .filter_video = SW_TO_CVPX_Filter,
+};
+
 static int Open(vlc_object_t *obj)
 {
     filter_t *p_filter = (filter_t *)obj;
@@ -261,9 +268,9 @@ static int Open(vlc_object_t *obj)
     case VLC_CODEC_CVPX_##x: \
         sw_fmt = p_filter->fmt_out.video; \
         if (p_filter->fmt_out.video.i_chroma == VLC_CODEC_##x) \
-            p_filter->pf_video_filter = CVPX_TO_SW_Filter; \
+            p_filter->ops = &CVPX_TO_SW_ops; \
         else if (i420_fcc != 0 && p_filter->fmt_out.video.i_chroma == i420_fcc) { \
-            p_filter->pf_video_filter = CVPX_TO_SW_Filter; \
+            p_filter->ops = &CVPX_TO_SW_ops; \
             sw_fmt.i_chroma = VLC_CODEC_##x; \
         } else return VLC_EGENERIC; \
 
@@ -271,10 +278,10 @@ static int Open(vlc_object_t *obj)
     case VLC_CODEC_CVPX_##x: \
         sw_fmt = p_filter->fmt_in.video; \
         if (p_filter->fmt_in.video.i_chroma == VLC_CODEC_##x) { \
-            p_filter->pf_video_filter = SW_TO_CVPX_Filter; \
+            p_filter->ops = &SW_TO_CVPX_ops; \
         } \
         else if (i420_fcc != 0 && p_filter->fmt_in.video.i_chroma == i420_fcc) { \
-            p_filter->pf_video_filter = SW_TO_CVPX_Filter; \
+            p_filter->ops = &SW_TO_CVPX_ops; \
             sw_fmt.i_chroma = VLC_CODEC_##x; \
         } else return VLC_EGENERIC; \
         b_need_pool = true;
@@ -432,6 +439,10 @@ static vlc_fourcc_t const supported_chromas[] = { VLC_CODEC_CVPX_BGRA,
                                                   VLC_CODEC_CVPX_P010,
                                                   VLC_CODEC_CVPX_UYVY };
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = Filter,
+};
+
 static int
 Open_CVPX_to_CVPX(vlc_object_t *obj)
 {
@@ -480,7 +491,7 @@ Open_CVPX_to_CVPX(vlc_object_t *obj)
     }
 
     filter->p_sys = p_sys;
-    filter->pf_video_filter = Filter;
+    filter->ops = &filter_ops;
     filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
     filter->fmt_out.i_codec = filter->fmt_out.video.i_chroma;
     return VLC_SUCCESS;
@@ -551,6 +562,10 @@ PrintConversionChain(filter_t *filter, void *opaque)
 static const vlc_fourcc_t supported_sw_chromas[] = {
     VLC_CODEC_I420, VLC_CODEC_BGRA, VLC_CODEC_NV12,
     VLC_CODEC_UYVY, VLC_CODEC_P010,
+};
+
+static const struct vlc_filter_operations chain_CVPX_ops = {
+    .filter_video = chain_CVPX_Filter, .flush = chain_CVPX_Flush,
 };
 
 static int
@@ -656,8 +671,7 @@ Open_chain_CVPX(vlc_object_t *obj)
 
     filter->vctx_out = vctx_out;
     filter->p_sys = chain;
-    filter->pf_flush = chain_CVPX_Flush;
-    filter->pf_video_filter = chain_CVPX_Filter;
+    filter->ops = &chain_CVPX_ops;
 
     /* Display the current conversion chain in the logs. */
     msg_Dbg(filter, "CVPX conversion chain:");

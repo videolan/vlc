@@ -316,6 +316,14 @@ static int CheckFmt(const video_format_t *in, const video_format_t *out,
     return VLC_EGENERIC;
 }
 
+static const struct vlc_filter_operations filter_upload_ops = {
+    .filter_video = UploadSurface,
+};
+
+static const struct vlc_filter_operations filter_download_ops = {
+    .filter_video = DownloadSurface,
+};
+
 int
 vlc_vaapi_OpenChroma(vlc_object_t *obj)
 {
@@ -333,7 +341,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
                  &pixel_bytes))
         return VLC_EGENERIC;
 
-    filter->pf_video_filter = is_upload ? UploadSurface : DownloadSurface;
+    filter->ops = is_upload ? &filter_upload_ops : &filter_download_ops;
 
     if (!(filter_sys = calloc(1, sizeof(filter_sys_t))))
     {

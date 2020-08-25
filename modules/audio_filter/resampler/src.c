@@ -103,8 +103,13 @@ static int OpenResampler (vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = Resample,
+    };
+    filter->ops = &filter_ops;
     filter->p_sys = s;
-    filter->pf_audio_filter = Resample;
+
     return VLC_SUCCESS;
 }
 

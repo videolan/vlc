@@ -144,6 +144,11 @@ static const struct filter_video_callbacks canvas_cbs =
     video_chain_new, NULL,
 };
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -373,7 +378,7 @@ static int Activate( vlc_object_t *p_this )
                   i_canvas_width, i_canvas_height );
     }
 
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

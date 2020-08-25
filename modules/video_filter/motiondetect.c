@@ -106,7 +106,11 @@ static int Create( vlc_object_t *p_this )
                      (char*)&(p_fmt->i_chroma) );
             return VLC_EGENERIC;
     }
-    p_filter->pf_video_filter = Filter;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = Filter,
+    };
+    p_filter->ops = &filter_ops;
 
     /* Allocate structure */
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );

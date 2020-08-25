@@ -111,6 +111,10 @@ static void *Thread(void *);
 const GLfloat lightZeroColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
 const GLfloat lightZeroPosition[] = {0.0f, 3.0f, 10.0f, 0.0f};
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_audio = DoWork,
+};
+
 /**
  * Open the module.
  * @param p_this: the filter object
@@ -160,7 +164,7 @@ static int Open(vlc_object_t * p_this)
 
     p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
-    p_filter->pf_audio_filter = DoWork;
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

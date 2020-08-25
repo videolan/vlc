@@ -487,6 +487,14 @@ out:
     return p_dst;
 }
 
+static const struct vlc_filter_operations filter_sub_ops = {
+    .source_sub = FilterSub,
+};
+
+static const struct vlc_filter_operations filter_video_ops = {
+    .filter_video = FilterVideo,
+};
+
 /**
  * Common open function
  */
@@ -558,9 +566,9 @@ static int OpenCommon(vlc_object_t *p_this, bool b_sub)
                          BarGraphCallback, p_sys);
 
     if (b_sub)
-        p_filter->pf_sub_source = FilterSub;
+        p_filter->ops = &filter_sub_ops;
     else
-        p_filter->pf_video_filter = FilterVideo;
+        p_filter->ops = &filter_video_ops;
 
     return VLC_SUCCESS;
 }

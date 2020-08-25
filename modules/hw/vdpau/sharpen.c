@@ -79,6 +79,10 @@ static picture_t *Sharpen(filter_t *filter, picture_t *pic)
 
 static const char *const options[] = { "sigma", NULL };
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = Sharpen,
+};
+
 static int Open(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -125,7 +129,7 @@ static int Open(vlc_object_t *obj)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    filter->pf_video_filter = Sharpen;
+    filter->ops = &filter_ops;
     filter->p_sys = sys;
 
     config_ChainParse(filter, "sharpen-", options, filter->p_cfg);

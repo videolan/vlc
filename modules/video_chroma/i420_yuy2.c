@@ -107,6 +107,34 @@ VIDEO_FILTER_WRAPPER( I420_IUYV )
 VIDEO_FILTER_WRAPPER( I420_Y211 )
 #endif
 
+static const struct vlc_filter_operations *
+GetFilterOperations( filter_t *p_filter )
+{
+    switch( p_filter->fmt_out.video.i_chroma )
+    {
+        case VLC_CODEC_YUYV:
+            return &I420_YUY2_ops;
+
+        case VLC_CODEC_YVYU:
+            return &I420_YVYU_ops;
+
+        case VLC_CODEC_UYVY:
+            return &I420_UYVY_ops;
+
+#if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
+        case VLC_FOURCC('I','U','Y','V'):
+            return &I420_IUYV_ops;
+#endif
+
+#if defined (MODULE_NAME_IS_i420_yuy2)
+        case VLC_CODEC_Y211:
+            return &I420_Y211_ops;
+#endif
+        default:
+            return NULL;
+    }
+}
+
 /*****************************************************************************
  * Activate: allocate a chroma function
  *****************************************************************************
@@ -134,33 +162,10 @@ static int Activate( vlc_object_t *p_this )
     if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_I420)
         return VLC_EGENERIC;
 
-    switch( p_filter->fmt_out.video.i_chroma )
-    {
-        case VLC_CODEC_YUYV:
-            p_filter->pf_video_filter = I420_YUY2_Filter;
-            break;
-
-        case VLC_CODEC_YVYU:
-            p_filter->pf_video_filter = I420_YVYU_Filter;
-            break;
-
-        case VLC_CODEC_UYVY:
-            p_filter->pf_video_filter = I420_UYVY_Filter;
-            break;
-#if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
-        case VLC_FOURCC('I','U','Y','V'):
-            p_filter->pf_video_filter = I420_IUYV_Filter;
-            break;
-#endif
-
-#if defined (MODULE_NAME_IS_i420_yuy2)
-        case VLC_CODEC_Y211:
-            p_filter->pf_video_filter = I420_Y211_Filter;
-            break;
-#endif
-        default:
-            return VLC_EGENERIC;
-    }
+    /* Find the adequate filter function depending on the output format. */
+    p_filter->ops = GetFilterOperations( p_filter );
+    if( p_filter->ops == NULL )
+        return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }

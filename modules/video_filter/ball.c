@@ -215,6 +215,10 @@ struct filter_sys_t
     } colorList[4];
 };
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
 
 /*****************************************************************************
 * Create: allocates Distort video thread output method
@@ -261,7 +265,7 @@ static int Create( vlc_object_t *p_this )
     if( p_sys->p_image == NULL )
         return VLC_EGENERIC;
 
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );

@@ -84,15 +84,15 @@ static int Activate( vlc_object_t *p_this )
             switch( p_filter->fmt_in.video.i_chroma )
             {
                 case VLC_CODEC_YUYV:
-                    p_filter->pf_video_filter = YUY2_I422_Filter;
+                    p_filter->ops = &YUY2_I422_ops;
                     break;
 
                 case VLC_CODEC_YVYU:
-                    p_filter->pf_video_filter = YVYU_I422_Filter;
+                    p_filter->ops = &YVYU_I422_ops;
                     break;
 
                 case VLC_CODEC_UYVY:
-                    p_filter->pf_video_filter = UYVY_I422_Filter;
+                    p_filter->ops = &UYVY_I422_ops;
                     break;
 
                 default:

@@ -94,6 +94,11 @@ typedef struct
     uint8_t *p_old_data;
 } filter_sys_t;
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 /*****************************************************************************
  * Create: allocates Distort video thread output method
  *****************************************************************************
@@ -121,7 +126,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_filter->p_sys = p_sys;
 
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     /* Initialize the arguments */
     atomic_init( &p_sys->i_window_size,

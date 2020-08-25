@@ -109,7 +109,7 @@ vlc_audio_meter_AddPlugin(struct vlc_audio_meter *meter, const char *chain,
         if (plugin->filter == NULL)
             goto error;
 
-        assert(plugin->filter->pf_audio_drain == NULL); /* Not supported */
+        assert(plugin->filter->ops->drain_audio == NULL); /* Not supported */
     }
 
     vlc_mutex_lock(&meter->lock);
@@ -198,7 +198,7 @@ vlc_audio_meter_Process(struct vlc_audio_meter *meter, block_t *block, vlc_tick_
         {
             plugin->last_date = date + block->i_length;
 
-            block_t *same_block = filter->pf_audio_filter(filter, block);
+            block_t *same_block = filter->ops->filter_audio(filter, block);
             assert(same_block == block); (void) same_block;
         }
     }
@@ -215,8 +215,8 @@ vlc_audio_meter_Flush(struct vlc_audio_meter *meter)
     vlc_list_foreach(plugin, &meter->plugins, node)
     {
         filter_t *filter = plugin->filter;
-        if (filter != NULL && filter->pf_flush != NULL)
-            filter->pf_flush(filter);
+        if (filter != NULL && filter->ops->flush != NULL)
+            filter->ops->flush(filter);
     }
 
     vlc_mutex_unlock(&meter->lock);

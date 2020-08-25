@@ -318,6 +318,16 @@ static int allocateBuffers(filter_spatialaudio *p_sys)
     return VLC_SUCCESS;
 }
 
+static const struct FilterOperationInitializer {
+    struct vlc_filter_operations ops {};
+    FilterOperationInitializer()
+    {
+        ops.filter_audio = Mix;
+        ops.flush = Flush;
+        ops.change_viewpoint = ChangeViewpoint;
+    };
+} filter_ops;
+
 static int OpenBinauralizer(vlc_object_t *p_this)
 {
     filter_t *p_filter = (filter_t *)p_this;
@@ -391,9 +401,7 @@ static int OpenBinauralizer(vlc_object_t *p_this)
     aout_FormatPrepare(outfmt);
 
     p_filter->p_sys = p_sys;
-    p_filter->pf_audio_filter = Mix;
-    p_filter->pf_flush = Flush;
-    p_filter->pf_change_viewpoint = ChangeViewpoint;
+    p_filter->ops = &filter_ops.ops;
 
     return VLC_SUCCESS;
 }
@@ -541,9 +549,7 @@ static int Open(vlc_object_t *p_this)
     }
 
     p_filter->p_sys = p_sys;
-    p_filter->pf_audio_filter = Mix;
-    p_filter->pf_flush = Flush;
-    p_filter->pf_change_viewpoint = ChangeViewpoint;
+    p_filter->ops = &filter_ops.ops;
 
     return VLC_SUCCESS;
 }

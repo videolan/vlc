@@ -75,7 +75,12 @@ static int Open (vlc_object_t *in)
     filter->fmt_out.audio.i_rate = filter->fmt_in.audio.i_rate;
     aout_FormatPrepare(&filter->fmt_in.audio);
     aout_FormatPrepare(&filter->fmt_out.audio);
-    filter->pf_audio_filter = Process;
+
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = Process,
+    };
+    filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }
 

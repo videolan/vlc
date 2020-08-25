@@ -93,6 +93,14 @@ static void LeaveMTA(void)
     CoUninitialize();
 }
 
+static const struct FilterOperationInitializer {
+    struct vlc_filter_operations ops {};
+    FilterOperationInitializer()
+    {
+        ops.render = RenderText;
+    };
+} filter_ops;
+
 static int Create (vlc_object_t *p_this)
 {
     filter_t *p_filter = (filter_t *)p_this;
@@ -157,7 +165,7 @@ static int Create (vlc_object_t *p_this)
 
     LeaveMTA();
 
-    p_filter->pf_render = RenderText;
+    p_filter->ops = &filter_ops.ops;
 
     return VLC_SUCCESS;
 

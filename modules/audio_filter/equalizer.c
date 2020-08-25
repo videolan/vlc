@@ -164,7 +164,11 @@ static int Open( vlc_object_t *p_this )
     p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
     aout_FormatPrepare(&p_filter->fmt_in.audio);
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
-    p_filter->pf_audio_filter = DoWork;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = DoWork,
+    };
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }
@@ -571,4 +575,3 @@ static int TwoPassCallback( vlc_object_t *p_this, char const *psz_cmd,
     vlc_mutex_unlock( &p_sys->lock );
     return VLC_SUCCESS;
 }
-

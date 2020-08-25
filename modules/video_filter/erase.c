@@ -122,6 +122,11 @@ static void LoadMask( filter_t *p_filter, const char *psz_filename )
     image_HandlerDelete( p_image );
 }
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+};
+
 /*****************************************************************************
  * Create
  *****************************************************************************/
@@ -153,7 +158,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys = p_filter->p_sys;
 
-    p_filter->pf_video_filter = Filter;
+    p_filter->ops = &filter_ops;
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );

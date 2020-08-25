@@ -114,6 +114,7 @@ typedef struct
 {
     filter_chain_t *p_chain;
     filter_t *p_video_filter;
+    struct vlc_filter_operations custom_ops;
 } filter_sys_t;
 
 /* Restart filter callback */
@@ -150,6 +151,10 @@ static vlc_decoder_device * HoldChainDecoderDevice(vlc_object_t *o, void *sys)
 static const struct filter_video_callbacks filter_video_chain_cbs =
 {
     BufferChainNew, HoldChainDecoderDevice,
+};
+
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = Chain,
 };
 
 /*****************************************************************************
@@ -213,7 +218,7 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
     }
     assert(p_filter->vctx_out == filter_chain_GetVideoCtxOut( p_sys->p_chain ));
     /* */
-    p_filter->pf_video_filter = Chain;
+    p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }
 
@@ -409,8 +414,12 @@ static int BuildFilterChain( filter_t *p_filter )
                 filter_AddProxyCallbacks( p_filter,
                                           p_sys->p_video_filter,
                                           RestartFilterCallback );
-                if (p_sys->p_video_filter->pf_video_mouse != NULL)
-                    p_filter->pf_video_mouse = ChainMouse;
+                if (p_sys->p_video_filter->ops->video_mouse != NULL)
+                {
+                    p_sys->custom_ops = *p_sys->p_video_filter->ops;
+                    p_sys->p_video_filter->ops = &p_sys->custom_ops;
+                    p_sys->custom_ops.video_mouse = ChainMouse;
+                }
                 es_format_Clean( &fmt_mid );
                 i_ret = VLC_SUCCESS;
                 p_filter->vctx_out = filter_chain_GetVideoCtxOut( p_sys->p_chain );

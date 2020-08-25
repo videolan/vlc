@@ -89,6 +89,35 @@ VIDEO_FILTER_WRAPPER( I422_IUYV )
 VIDEO_FILTER_WRAPPER( I422_Y211 )
 #endif
 
+
+static const struct vlc_filter_operations*
+GetFilterOperations(filter_t *filter)
+{
+    switch( filter->fmt_out.video.i_chroma )
+    {
+        case VLC_CODEC_YUYV:
+            return &I422_YUY2_ops;
+
+        case VLC_CODEC_YVYU:
+            return &I422_YVYU_ops;
+
+        case VLC_CODEC_UYVY:
+            return &I422_UYVY_ops;
+
+        case VLC_FOURCC('I','U','Y','V'):
+            return &I422_IUYV_ops;
+
+#if defined (MODULE_NAME_IS_i422_yuy2)
+        case VLC_CODEC_Y211:
+            return &I422_Y211_ops;
+#endif
+
+        default:
+            return NULL;
+    }
+
+}
+
 /*****************************************************************************
  * Activate: allocate a chroma function
  *****************************************************************************
@@ -111,42 +140,16 @@ static int Activate( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    switch( p_filter->fmt_in.video.i_chroma )
-    {
-        case VLC_CODEC_I422:
-            switch( p_filter->fmt_out.video.i_chroma )
-            {
-                case VLC_CODEC_YUYV:
-                    p_filter->pf_video_filter = I422_YUY2_Filter;
-                    break;
+    /* This is a i422 -> * converter. */
+    if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_I422 )
+        return VLC_EGENERIC;
 
-                case VLC_CODEC_YVYU:
-                    p_filter->pf_video_filter = I422_YVYU_Filter;
-                    break;
 
-                case VLC_CODEC_UYVY:
-                    p_filter->pf_video_filter = I422_UYVY_Filter;
-                    break;
+    p_filter->ops = GetFilterOperations( p_filter );
+    if( p_filter->ops == NULL)
+        return VLC_EGENERIC;
 
-                case VLC_FOURCC('I','U','Y','V'):
-                    p_filter->pf_video_filter = I422_IUYV_Filter;
-                    break;
-
-#if defined (MODULE_NAME_IS_i422_yuy2)
-                case VLC_CODEC_Y211:
-                    p_filter->pf_video_filter = I422_Y211_Filter;
-                    break;
-#endif
-
-                default:
-                    return -1;
-            }
-            break;
-
-        default:
-            return -1;
-    }
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /* Following functions are local */

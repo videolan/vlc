@@ -432,9 +432,13 @@ static int Open(vlc_object_t *object)
             goto error;
     }
 
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = Filter,
+        .video_mouse = Mouse,
+    };
+    filter->ops = &filter_ops;
     filter->p_sys           = sys;
-    filter->pf_video_filter = Filter;
-    filter->pf_video_mouse  = Mouse;
     return VLC_SUCCESS;
 error:
     free(sys);

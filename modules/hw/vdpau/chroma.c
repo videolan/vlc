@@ -743,6 +743,14 @@ const struct vlc_video_context_operations vdpau_vctx_ops = {
     NULL,
 };
 
+static const struct vlc_filter_operations filter_output_opaque_ops = {
+    .filter_video = VideoRender, .flush = Flush,
+};
+
+static const struct vlc_filter_operations filter_output_ycbcr_ops = {
+    .filter_video = YCbCrRender, .flush = Flush,
+};
+
 static int OutputOpen(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -766,7 +774,7 @@ static int OutputOpen(vlc_object_t *obj)
 
     filter->p_sys = sys;
 
-    picture_t *(*video_filter)(filter_t *, picture_t *) = VideoRender;
+    const struct vlc_filter_operations *ops = &filter_output_opaque_ops;
 
     if (filter->fmt_in.video.i_chroma == VLC_CODEC_VDPAU_VIDEO_444)
     {
@@ -789,7 +797,7 @@ static int OutputOpen(vlc_object_t *obj)
     else
     if (vlc_fourcc_to_vdp_ycc(filter->fmt_in.video.i_chroma,
                               &sys->chroma, &sys->format))
-        video_filter = YCbCrRender;
+        ops = &filter_output_ycbcr_ops;
     else
     {
         vlc_decoder_device_Release(dec_device);
@@ -817,7 +825,7 @@ static int OutputOpen(vlc_object_t *obj)
     }
 
     /* Create the video-to-output mixer */
-    sys->mixer = MixerCreate(filter, video_filter == YCbCrRender);
+    sys->mixer = MixerCreate(filter, ops == &filter_output_ycbcr_ops);
     if (sys->mixer == VDP_INVALID_HANDLE)
     {
         picture_pool_Release(sys->pool);
@@ -834,8 +842,7 @@ static int OutputOpen(vlc_object_t *obj)
     sys->procamp.saturation = 1.f;
     sys->procamp.hue = 0.f;
 
-    filter->pf_video_filter = video_filter;
-    filter->pf_flush = Flush;
+    filter->ops = ops;
     return VLC_SUCCESS;
 }
 
@@ -888,6 +895,10 @@ static bool ChromaMatches(VdpChromaType vdp_type, vlc_fourcc_t vlc_chroma)
     }
 }
 
+static const struct vlc_filter_operations filter_ycbcr_ops = {
+    .filter_video = VideoExport_Filter,
+};
+
 static int YCbCrOpen(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -913,7 +924,7 @@ static int YCbCrOpen(vlc_object_t *obj)
         return VLC_ENOMEM;
     sys->format = format;
 
-    filter->pf_video_filter = VideoExport_Filter;
+    filter->ops = &filter_ycbcr_ops;
     filter->p_sys = sys;
     return VLC_SUCCESS;
 }

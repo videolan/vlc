@@ -154,8 +154,13 @@ static int Open(vlc_object_t *this)
     sys->luma_temp = var_CreateGetFloatCommand(filter, FILTER_PREFIX "luma-temp");
     sys->chroma_temp = var_CreateGetFloatCommand(filter, FILTER_PREFIX "chroma-temp");
 
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = Filter,
+    };
+
     filter->p_sys = sys;
-    filter->pf_video_filter = Filter;
+    filter->ops = &filter_ops;
 
     var_AddCallback( filter, FILTER_PREFIX "luma-spat", DenoiseCallback, sys );
     var_AddCallback( filter, FILTER_PREFIX "chroma-spat", DenoiseCallback, sys );

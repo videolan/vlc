@@ -429,7 +429,7 @@ static picture_t *FilterChainVideoFilter( chained_filter_t *f, picture_t *p_pic 
     for( ; f != NULL; f = f->next )
     {
         filter_t *p_filter = &f->filter;
-        p_pic = p_filter->pf_video_filter( p_filter, p_pic );
+        p_pic = p_filter->ops->filter_video( p_filter, p_pic );
         if( !p_pic )
             break;
         if( !vlc_picture_chain_IsEmpty( &f->pending ) )
@@ -482,7 +482,7 @@ void filter_chain_SubSource( filter_chain_t *p_chain, spu_t *spu,
     for( chained_filter_t *f = p_chain->first; f != NULL; f = f->next )
     {
         filter_t *p_filter = &f->filter;
-        subpicture_t *p_subpic = p_filter->pf_sub_source( p_filter, display_date );
+        subpicture_t *p_subpic = p_filter->ops->source_sub( p_filter, display_date );
         if( p_subpic )
             spu_PutSubpicture( spu, p_subpic );
     }
@@ -494,7 +494,7 @@ subpicture_t *filter_chain_SubFilter( filter_chain_t *p_chain, subpicture_t *p_s
     {
         filter_t *p_filter = &f->filter;
 
-        p_subpic = p_filter->pf_sub_filter( p_filter, p_subpic );
+        p_subpic = p_filter->ops->filter_sub( p_filter, p_subpic );
 
         if( !p_subpic )
             break;
@@ -511,13 +511,13 @@ int filter_chain_MouseFilter( filter_chain_t *p_chain, vlc_mouse_t *p_dst, const
         filter_t *p_filter = &f->filter;
         vlc_mouse_t *p_mouse = f->mouse;
 
-        if( p_filter->pf_video_mouse && p_mouse )
+        if( p_filter->ops->video_mouse && p_mouse )
         {
             vlc_mouse_t old = *p_mouse;
             vlc_mouse_t filtered = current;
 
             *p_mouse = current;
-            if( p_filter->pf_video_mouse( p_filter, &filtered, &old ) )
+            if( p_filter->ops->video_mouse( p_filter, &filtered, &old) )
                 return VLC_EGENERIC;
             current = filtered;
         }

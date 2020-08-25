@@ -108,7 +108,14 @@ static int OpenFilter( vlc_object_t *p_this )
     p_sys->event_info.p_region = NULL;
     p_sys->i_id = 0;
 
-    p_filter->pf_video_filter = Filter;
+    static const struct FilterOperationInitializer {
+        struct vlc_filter_operations ops {};
+        FilterOperationInitializer()
+        {
+            ops.filter_video = Filter;
+        };
+    } filter_ops;
+    p_filter->ops = &filter_ops.ops;
 
     //create the VIDEO_FILTER_EVENT_VARIABLE
     vlc_value_t val;
@@ -157,7 +164,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     CvPoint pt1, pt2;
     int scale = 1;
     filter_sys_t *p_sys = static_cast<filter_sys_t *>(p_filter->p_sys);
- 
+
     if ((!p_pic) )
     {
         msg_Err( p_filter, "no image array" );
@@ -217,4 +224,3 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     return p_pic;
 }
-

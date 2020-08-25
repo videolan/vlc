@@ -74,7 +74,12 @@ static int OpenFilter( vlc_object_t *p_this )
 
 #warning Converter cannot (really) change output format.
     video_format_ScaleCropAr( &p_filter->fmt_out.video, &p_filter->fmt_in.video );
-    p_filter->pf_video_filter = Filter;
+
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = Filter,
+    };
+    p_filter->ops = &filter_ops;
 
     msg_Dbg( p_filter, "%ix%i -> %ix%i", p_filter->fmt_in.video.i_width,
              p_filter->fmt_in.video.i_height, p_filter->fmt_out.video.i_width,

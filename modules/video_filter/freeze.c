@@ -88,6 +88,12 @@ vlc_module_end()
  * Local prototypes
  *****************************************************************************/
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+    .video_mouse = freeze_mouse,
+};
+
 /**
  * Open the filter
  */
@@ -121,8 +127,7 @@ static int Open( vlc_object_t *p_this )
 
     /* init data */
 
-    p_filter->pf_video_filter = Filter;
-    p_filter->pf_video_mouse  = freeze_mouse;
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }

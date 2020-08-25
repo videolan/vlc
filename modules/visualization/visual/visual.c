@@ -188,6 +188,11 @@ typedef struct
     vlc_thread_t    thread;
 } filter_sys_t;
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_audio = DoWork,
+    .flush = Flush,
+};
+
 /*****************************************************************************
  * Open: open the visualizer
  *****************************************************************************/
@@ -323,8 +328,7 @@ static int Open( vlc_object_t *p_this )
 
     p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
-    p_filter->pf_audio_filter = DoWork;
-    p_filter->pf_flush = Flush;
+    p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
 
 error:

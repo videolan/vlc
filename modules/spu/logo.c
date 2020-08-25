@@ -215,6 +215,15 @@ static int OpenVideo( vlc_object_t *p_this )
     return OpenCommon( p_this, false );
 }
 
+static const struct vlc_filter_operations filter_sub_ops = {
+    .source_sub = FilterSub,
+};
+
+static const struct vlc_filter_operations filter_video_ops = {
+    .filter_video = FilterVideo,
+    .video_mouse = Mouse,
+};
+
 /**
  * Common open function
  */
@@ -293,14 +302,9 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
 
     /* Misc init */
     if( b_sub )
-    {
-        p_filter->pf_sub_source = FilterSub;
-    }
+        p_filter->ops = &filter_sub_ops;
     else
-    {
-        p_filter->pf_video_filter = FilterVideo;
-        p_filter->pf_video_mouse = Mouse;
-    }
+        p_filter->ops = &filter_video_ops;
 
     free( psz_filename );
     return VLC_SUCCESS;

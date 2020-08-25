@@ -384,7 +384,12 @@ static int OpenFilter( vlc_object_t *p_this )
         p_filter->fmt_out.audio.i_channels = 2;
     }
     p_filter->fmt_out.audio.i_rate = p_filter->fmt_in.audio.i_rate;
-    p_filter->pf_audio_filter = Convert;
+
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = Convert,
+    };
+    p_filter->ops = &filter_ops;
 
     msg_Dbg( p_this, "%4.4s->%4.4s, channels %d->%d, bits per sample: %i->%i",
              (char *)&p_filter->fmt_in.i_codec,

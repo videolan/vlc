@@ -96,6 +96,10 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
     return src;
 }
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_video = Deinterlace,
+};
+
 static int Open(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -119,7 +123,7 @@ static int Open(vlc_object_t *obj)
 
     sys->last_pts = VLC_TICK_INVALID;
 
-    filter->pf_video_filter = Deinterlace;
+    filter->ops = &filter_ops;
     filter->p_sys = sys;
     filter->fmt_out.video.i_frame_rate *= 2;
     filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);

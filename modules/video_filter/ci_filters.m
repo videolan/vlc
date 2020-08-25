@@ -376,7 +376,8 @@ Filter(filter_t *filter, picture_t *src)
 
     if (ctx->src_converter)
     {
-        src = ctx->dst_converter->pf_video_filter(ctx->src_converter, src);
+        // TODO
+        src = ctx->dst_converter->ops->filter_video(ctx->src_converter, src);
         if (!src)
             return NULL;
     }
@@ -416,7 +417,7 @@ Filter(filter_t *filter, picture_t *src)
 
     if (ctx->dst_converter)
     {
-        dst = ctx->dst_converter->pf_video_filter(ctx->dst_converter, dst);
+        dst = ctx->dst_converter->ops->filter_video(ctx->dst_converter, dst);
         if (!dst)
             return NULL;
     }
@@ -568,6 +569,12 @@ CVPX_to_CVPX_converter_Create(filter_t *filter, bool to_rgba)
     return converter;
 }
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .filter_video = Filter,
+    .video_mouse = Mouse,
+};
+
 static int
 Open(vlc_object_t *obj, char const *psz_filter)
 {
@@ -677,8 +684,7 @@ Open(vlc_object_t *obj, char const *psz_filter)
     p_sys->psz_filter = psz_filter;
     p_sys->ctx = ctx;
 
-    filter->pf_video_filter = Filter;
-    filter->pf_video_mouse = Mouse;
+    filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 

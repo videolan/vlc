@@ -1159,6 +1159,11 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     return rv;
 }
 
+static const struct vlc_filter_operations filter_ops =
+{
+    .render = Render,
+};
+
 /*****************************************************************************
  * Create: allocates osd-text video thread output method
  *****************************************************************************
@@ -1236,7 +1241,7 @@ static int Create( vlc_object_t *p_this )
     if( LoadFontsFromAttachments( p_filter ) == VLC_ENOMEM )
         goto error;
 
-    p_filter->pf_render = Render;
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 

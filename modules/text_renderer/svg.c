@@ -169,6 +169,10 @@ static char *svg_GetDocument( filter_t *p_filter, int i_width, int i_height, con
     return psz_result;
 }
 
+static const struct vlc_filter_operations filter_ops = {
+    .render = RenderText,
+};
+
 /*****************************************************************************
  * Create: allocates svg video thread output method
  *****************************************************************************
@@ -184,7 +188,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_filter->p_sys = p_sys;
 
-    p_filter->pf_render = RenderText;
+    p_filter->ops = &filter_ops;
     svg_LoadTemplate( p_filter );
 
 #if (GLIB_MAJOR_VERSION < 2 || GLIB_MINOR_VERSION < 36)

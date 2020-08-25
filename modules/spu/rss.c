@@ -240,6 +240,10 @@ static void InitCurrentContext(filter_sys_t *p_sys)
     p_sys->i_cur_char = -1;
 }
 
+static const struct vlc_filter_operations filter_ops = {
+    .source_sub = Filter,
+};
+
 /*****************************************************************************
  * CreateFilter: allocates RSS video filter
  *****************************************************************************/
@@ -311,7 +315,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     /* Misc init */
     vlc_mutex_init( &p_sys->lock );
-    p_filter->pf_sub_source = Filter;
+    p_filter->ops = &filter_ops;
     p_sys->last_date = (vlc_tick_t)0;
     p_sys->b_fetched = false;
 

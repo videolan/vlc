@@ -178,6 +178,10 @@ static const char *const ppsz_filter_options[] = {
     NULL
 };
 
+static const struct vlc_filter_operations filter_ops = {
+    .source_sub = Filter,
+};
+
 /*****************************************************************************
  * CreateFilter: allocates marquee video filter
  *****************************************************************************/
@@ -228,7 +232,7 @@ static int CreateFilter( vlc_object_t *p_this )
     CREATE_VAR( p_style->i_font_size, Integer, "marq-size" );
 
     /* Misc init */
-    p_filter->pf_sub_source = Filter;
+    p_filter->ops = &filter_ops;
     p_sys->last_time = 0;
 
     return VLC_SUCCESS;

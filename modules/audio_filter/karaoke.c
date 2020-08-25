@@ -54,7 +54,12 @@ static int Open (vlc_object_t *obj)
     filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
     aout_FormatPrepare(&filter->fmt_in.audio);
     filter->fmt_out.audio = filter->fmt_in.audio;
-    filter->pf_audio_filter = Process;
+
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = Process,
+    };
+    filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }
 

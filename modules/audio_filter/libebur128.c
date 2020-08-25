@@ -230,6 +230,10 @@ Flush(filter_t *filter)
     }
 }
 
+static const struct vlc_filter_operations filter_ops = {
+    .filter_audio = Process, .flush = Flush,
+};
+
 static int Open(vlc_object_t *this)
 {
     filter_t *filter = (filter_t *) this;
@@ -279,8 +283,7 @@ static int Open(vlc_object_t *this)
 
     filter->p_sys = sys;
     filter->fmt_out.audio = filter->fmt_in.audio;
-    filter->pf_audio_filter = Process;
-    filter->pf_flush = Flush;
+    filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }
 

@@ -444,7 +444,11 @@ static int Open( vlc_object_t *p_this )
     p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
     aout_FormatPrepare(&p_filter->fmt_in.audio);
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
-    p_filter->pf_audio_filter = DoWork;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = DoWork,
+    };
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }
@@ -510,7 +514,11 @@ static int OpenPitch( vlc_object_t *p_this )
     if( !p_sys->resampler )
         return VLC_EGENERIC;
 
-    p_filter->pf_audio_filter = DoPitchWork;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_audio = DoPitchWork,
+    };
+    p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
 }
@@ -609,7 +617,7 @@ static block_t *DoPitchWork( filter_t * p_filter, block_t * p_in_buf )
     p_filter->fmt_in.audio.i_rate = rate_shift;
 
     /* Change rate, thus changing pitch */
-    p_in_buf = p->resampler->pf_audio_filter( p->resampler, p_in_buf );
+    p_in_buf = p->resampler->ops->filter_audio( p->resampler, p_in_buf );
 
     /* Change tempo while preserving shifted pitch */
     return DoWork( p_filter, p_in_buf );

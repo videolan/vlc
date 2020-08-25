@@ -343,7 +343,7 @@ static int SpuRenderText(spu_t *spu,
     text->fmt_out.video.i_height =
     text->fmt_out.video.i_visible_height = i_original_height;
 
-    int i_ret = text->pf_render(text, region, region, chroma_list);
+    int i_ret = text->ops->render(text, region, region, chroma_list);
 
     vlc_mutex_unlock(&sys->textlock);
     return i_ret;
@@ -996,7 +996,7 @@ static void SpuRenderRegion(spu_t *spu,
                 scale_yuvp->fmt_out.video = region->fmt;
                 scale_yuvp->fmt_out.video.i_chroma = chroma_list[0];
 
-                picture = scale_yuvp->pf_video_filter(scale_yuvp, picture);
+                picture = scale_yuvp->ops->filter_video(scale_yuvp, picture);
                 if (!picture) {
                     /* Well we will try conversion+scaling */
                     msg_Warn(spu, "%4.4s to %4.4s conversion failed",
@@ -1027,7 +1027,7 @@ static void SpuRenderRegion(spu_t *spu,
                 scale->fmt_out.video.i_visible_height =
                     spu_scale_h(region->fmt.i_visible_height, scale_size);
 
-                picture = scale->pf_video_filter(scale, picture);
+                picture = scale->ops->filter_video(scale, picture);
                 if (!picture)
                     msg_Err(spu, "scaling failed");
             }

@@ -77,7 +77,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_filter->pf_video_filter = Convert_Filter;
+    p_filter->ops = &Convert_ops;
 
     msg_Dbg( p_filter, "YUVP to %4.4s converter",
              (const char*)&p_filter->fmt_out.video.i_chroma );

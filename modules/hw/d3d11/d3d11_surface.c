@@ -566,7 +566,7 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
         sys->staging_pic->context = NULL; // some CPU filters won't like the mix of CPU/GPU
 
         picture_Hold( src );
-        sys->filter->pf_video_filter(sys->filter, src);
+        sys->filter->ops->filter_video(sys->filter, src);
 
         sys->staging_pic->context = staging_pic_ctx;
         ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, p_staging_sys->resource[KNOWN_DXGI_INDEX], 0);
@@ -660,6 +660,10 @@ static picture_t *NV12_D3D11_Filter( filter_t *p_filter, picture_t *p_pic )
     return p_outpic;
 }
 
+static const struct vlc_filter_operations NV12_D3D11_ops = {
+    .filter_video = NV12_D3D11_Filter,
+};
+
 int D3D11OpenConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
@@ -679,34 +683,34 @@ int D3D11OpenConverter( vlc_object_t *obj )
     case VLC_CODEC_YV12:
         if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE )
             return VLC_EGENERIC;
-        p_filter->pf_video_filter = D3D11_YUY2_Filter;
+        p_filter->ops = &D3D11_YUY2_ops;
         break;
     case VLC_CODEC_I420_10L:
         if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_10B )
             return VLC_EGENERIC;
-        p_filter->pf_video_filter = D3D11_YUY2_Filter;
+        p_filter->ops = &D3D11_YUY2_ops;
         pixel_bytes = 2;
         break;
     case VLC_CODEC_NV12:
         if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE )
             return VLC_EGENERIC;
-        p_filter->pf_video_filter = D3D11_NV12_Filter;
+        p_filter->ops = &D3D11_NV12_ops;
         break;
     case VLC_CODEC_P010:
         if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_10B )
             return VLC_EGENERIC;
-        p_filter->pf_video_filter = D3D11_NV12_Filter;
+        p_filter->ops = &D3D11_NV12_ops;
         pixel_bytes = 2;
         break;
     case VLC_CODEC_RGBA:
         if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_RGBA )
             return VLC_EGENERIC;
-        p_filter->pf_video_filter = D3D11_RGBA_Filter;
+        p_filter->ops = &D3D11_RGBA_ops;
         break;
     case VLC_CODEC_BGRA:
         if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_BGRA )
             return VLC_EGENERIC;
-        p_filter->pf_video_filter = D3D11_RGBA_Filter;
+        p_filter->ops = &D3D11_RGBA_ops;
         break;
     default:
         return VLC_EGENERIC;
@@ -753,7 +757,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
     case VLC_CODEC_YV12:
     case VLC_CODEC_NV12:
     case VLC_CODEC_P010:
-        p_filter->pf_video_filter = NV12_D3D11_Filter;
+        p_filter->ops = &NV12_D3D11_ops;
         break;
     default:
         return VLC_EGENERIC;

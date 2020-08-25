@@ -98,7 +98,11 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_filter, "gain multiplier sets to %.2fx", p_sys->f_gain );
 
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
-    p_filter->pf_audio_filter = Process;
+
+    static const struct vlc_filter_operations filter_ops =
+        { .filter_audio = Process };
+    p_filter->ops = &filter_ops;
+
     return VLC_SUCCESS;
 }
 

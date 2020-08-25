@@ -129,8 +129,12 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_hide_timeout = VLC_TICK_FROM_MS( var_InheritInteger( p_filter, "mouse-hide-timeout" ) );
 
     /* */
-    p_filter->pf_video_filter = Filter;
-    p_filter->pf_video_mouse = Mouse;
+    static const struct vlc_filter_operations filter_ops =
+    {
+        .filter_video = Filter,
+        .video_mouse = Mouse,
+    };
+    p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
 }
 
@@ -419,4 +423,3 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_new, const vlc_mouse_t *p_o
     p_new->i_y = p_sys->i_y + p_new->i_y * ZOOM_FACTOR / p_sys->i_zoom;
     return VLC_SUCCESS;
 }
-

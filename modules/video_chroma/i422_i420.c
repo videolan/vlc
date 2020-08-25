@@ -87,15 +87,15 @@ static int Activate( vlc_object_t *p_this )
             {
                 case VLC_CODEC_I420:
                 case VLC_CODEC_J420:
-                    p_filter->pf_video_filter = I422_I420_Filter;
+                    p_filter->ops = &I422_I420_ops;
                     break;
 
                 case VLC_CODEC_YV12:
-                    p_filter->pf_video_filter = I422_YV12_Filter;
+                    p_filter->ops = &I422_YV12_ops;
                     break;
 
                 case VLC_CODEC_YUV420A:
-                    p_filter->pf_video_filter = I422_YUVA_Filter;
+                    p_filter->ops = &I422_YUVA_ops;
                     break;
 
                 default:
