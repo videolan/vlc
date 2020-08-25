@@ -359,7 +359,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     video_format_t fmt;
     subpicture_region_t *p_region;
 
-    int i_feed, i_item;
+    int i_item;
     rss_feed_t *p_feed;
 
     vlc_mutex_lock( &p_sys->lock );
@@ -421,45 +421,43 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     /* Generate the string that will be displayed. This string is supposed to
        be p_sys->i_length characters long. */
     i_item = p_sys->i_cur_item;
-    i_feed = p_sys->i_cur_feed;
-    p_feed = &p_sys->p_feeds[i_feed];
+    p_feed = &p_sys->p_feeds[p_sys->i_cur_feed];
+    char *feed_title = p_feed->psz_title;
+    char *item_title = p_feed->p_items[i_item].psz_title;
 
     if( ( p_feed->p_pic && p_sys->i_title == default_title )
         || p_sys->i_title == hide_title )
     {
         /* Don't display the feed's title if we have an image */
         snprintf( p_sys->psz_marquee, p_sys->i_length, "%s",
-                  p_sys->p_feeds[i_feed].p_items[i_item].psz_title
-                  +p_sys->i_cur_char );
+                  item_title + p_sys->i_cur_char );
     }
     else if( ( !p_feed->p_pic && p_sys->i_title == default_title )
              || p_sys->i_title == prepend_title )
     {
         snprintf( p_sys->psz_marquee, p_sys->i_length, "%s : %s",
-                  p_sys->p_feeds[i_feed].psz_title,
-                  p_sys->p_feeds[i_feed].p_items[i_item].psz_title
-                  +p_sys->i_cur_char );
+                  feed_title,
+                  item_title + p_sys->i_cur_char );
     }
     else /* scrolling title */
     {
         if( i_item == -1 )
             snprintf( p_sys->psz_marquee, p_sys->i_length, "%s : %s",
-                      p_sys->p_feeds[i_feed].psz_title + p_sys->i_cur_char,
-                      p_sys->p_feeds[i_feed].p_items[i_item+1].psz_title );
+                      feed_title + p_sys->i_cur_char,
+                      p_feed->p_items[i_item+1].psz_title );
         else
             snprintf( p_sys->psz_marquee, p_sys->i_length, "%s",
-                      p_sys->p_feeds[i_feed].p_items[i_item].psz_title
-                      +p_sys->i_cur_char );
+                      item_title + p_sys->i_cur_char );
     }
 
     while( strlen( p_sys->psz_marquee ) < (unsigned int)p_sys->i_length )
     {
         i_item++;
-        if( i_item == p_sys->p_feeds[i_feed].i_items ) break;
+        if( i_item == p_feed->i_items ) break;
         snprintf( strchr( p_sys->psz_marquee, 0 ),
                   p_sys->i_length - strlen( p_sys->psz_marquee ),
                   " - %s",
-                  p_sys->p_feeds[i_feed].p_items[i_item].psz_title );
+                  p_feed->p_items[i_item].psz_title );
     }
 
     /* Calls to snprintf might split multibyte UTF8 chars ...
