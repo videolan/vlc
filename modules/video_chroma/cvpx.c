@@ -361,8 +361,10 @@ static int Open(vlc_object_t *obj)
     {
         if (p_filter->vctx_in == NULL ||
             vlc_video_context_GetType(p_filter->vctx_in) != VLC_VIDEO_CONTEXT_CVPX)
-        ret = VLC_EGENERIC;
-        goto error;
+        {
+            ret = VLC_EGENERIC;
+            goto error;
+        }
     }
 
     p_filter->fmt_out.i_codec = p_filter->fmt_out.video.i_chroma;
