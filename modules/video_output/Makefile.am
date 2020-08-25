@@ -145,9 +145,6 @@ libglwin32_plugin_la_SOURCES = \
 	video_output/win32/win32touch.c video_output/win32/win32touch.h
 libwgl_plugin_la_SOURCES = video_output/win32/wgl.c
 
-libglwin32_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	-DMODULE_NAME_IS_glwin32
-
 libglwin32_plugin_la_LIBADD = libchroma_copy.la -lopengl32 -lgdi32 $(LIBCOM) -luuid libvlc_opengl.la
 libwgl_plugin_la_LIBADD = -lopengl32 -lgdi32 libvlc_opengl.la
 

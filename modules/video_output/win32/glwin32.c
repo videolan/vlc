@@ -211,11 +211,22 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         return;
     if (sys->area.place_changed)
     {
-        const int width  = sys->area.place.width;
-        const int height = sys->area.place.height;
+        vout_display_cfg_t place_cfg = sys->area.vdcfg;
+        vout_display_place_t place;
+
+        /* Reverse vertical alignment as the GL tex are Y inverted */
+        if (place_cfg.align.vertical == VLC_VIDEO_ALIGN_TOP)
+            place_cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+        else if (place_cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+            place_cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
+
+        vout_display_PlacePicture(&place, &vd->source, &place_cfg);
+
+        const int width  = place.width;
+        const int height = place.height;
         vlc_gl_Resize (sys->gl, width, height);
         vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
-        vout_display_opengl_Viewport(sys->vgl, sys->area.place.x, sys->area.place.y, width, height);
+        vout_display_opengl_Viewport(sys->vgl, place.x, place.y, width, height);
         sys->area.place_changed = false;
     }
     vout_display_opengl_Prepare (sys->vgl, picture, subpicture);
