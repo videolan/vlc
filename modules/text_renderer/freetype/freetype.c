@@ -1228,9 +1228,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         const vlc_fourcc_t p_chroma_list_yuvp[] = { VLC_CODEC_YUVP, 0 };
         const vlc_fourcc_t p_chroma_list_rgba[] = { VLC_CODEC_RGBA, 0 };
 
-        uint8_t i_background_opacity = var_InheritInteger( p_filter, "freetype-background-opacity" );
-        i_background_opacity = VLC_CLIP( i_background_opacity, 0, 255 );
-        int i_margin = (i_background_opacity > 0 && !p_region_in->b_gridmode) ? i_max_face_height / 4 : 0;
+        int i_margin = (p_sys->p_default_style->i_background_alpha > 0 && !p_region_in->b_gridmode)
+                     ? i_max_face_height / 4 : 0;
 
         if( (unsigned)i_margin * 2 >= i_max_width || (unsigned)i_margin * 2 >= i_max_height )
             i_margin = 0;
