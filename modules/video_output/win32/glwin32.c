@@ -207,13 +207,17 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    const int width  = sys->area.place.width;
-    const int height = sys->area.place.height;
-    vlc_gl_Resize (sys->gl, width, height);
     if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
         return;
-    vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
-    vout_display_opengl_Viewport(sys->vgl, sys->area.place.x, sys->area.place.y, width, height);
+    if (sys->area.place_changed)
+    {
+        const int width  = sys->area.place.width;
+        const int height = sys->area.place.height;
+        vlc_gl_Resize (sys->gl, width, height);
+        vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
+        vout_display_opengl_Viewport(sys->vgl, sys->area.place.x, sys->area.place.y, width, height);
+        sys->area.place_changed = false;
+    }
     vout_display_opengl_Prepare (sys->vgl, picture, subpicture);
     vlc_gl_ReleaseCurrent (sys->gl);
 }
