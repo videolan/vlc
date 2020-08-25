@@ -113,6 +113,8 @@ typedef struct
     int               i_font_default_size;
     int               i_outline_thickness;
 
+    vlc_fourcc_t      i_forced_chroma;
+
     vlc_font_select_t *fs;
     vlc_ftcache_t     *ftcache;
 

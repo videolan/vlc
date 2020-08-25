@@ -1234,7 +1234,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         if( (unsigned)i_margin * 2 >= i_max_width || (unsigned)i_margin * 2 >= i_max_height )
             i_margin = 0;
 
-        if( var_InheritBool( p_filter, "freetype-yuvp" ) )
+        if( p_sys->i_forced_chroma == VLC_CODEC_YUVP )
             p_chroma_list = p_chroma_list_yuvp;
         else if( !p_chroma_list || *p_chroma_list == 0 )
             p_chroma_list = p_chroma_list_rgba;
@@ -1414,6 +1414,9 @@ static int Create( vlc_object_t *p_this )
 
     /* fills default and forced style */
     FillDefaultStyles( p_filter );
+
+    if( var_InheritBool( p_filter, "freetype-yuvp" ) )
+        p_sys->i_forced_chroma = VLC_CODEC_YUVP;
 
     /*
      * The following variables should not be cached, as they might be changed on-the-fly:
