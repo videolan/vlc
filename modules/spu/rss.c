@@ -347,6 +347,11 @@ static void DestroyFilter( vlc_object_t *p_this )
     free( p_sys );
 }
 
+static void switchToNextFeed(filter_sys_t *p_sys)
+{
+    p_sys->i_cur_feed = (p_sys->i_cur_feed + 1)%p_sys->i_feeds;
+}
+
 /****************************************************************************
  * Filter: the whole thing
  ****************************************************************************
@@ -365,9 +370,17 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     vlc_mutex_lock( &p_sys->lock );
 
     /* Check if the feeds have been fetched and that we have some feeds */
-    /* TODO: check that we have items for each feeds */
     if( !p_sys->b_fetched && p_sys->i_feeds > 0 )
     {
+        vlc_mutex_unlock( &p_sys->lock );
+        return NULL;
+    }
+
+    /* If the current feed has no item then switch to the next feed
+       and skip further processing */
+    if (p_sys->p_feeds[p_sys->i_cur_feed].i_items == 0)
+    {
+        switchToNextFeed(p_sys);
         vlc_mutex_unlock( &p_sys->lock );
         return NULL;
     }
@@ -397,7 +410,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
                 p_sys->i_cur_item = -1;
             else
                 p_sys->i_cur_item = 0;
-            p_sys->i_cur_feed = (p_sys->i_cur_feed + 1)%p_sys->i_feeds;
+            switchToNextFeed(p_sys);
         }
     }
 
@@ -625,7 +638,7 @@ static char *removeWhiteChars( const char *psz_src )
 
 
 /****************************************************************************
- * Parse url list, psz_urls must be non empty (TODO: check it !)
+ * Parse url list, psz_urls must be non empty (ensured by check in CreateFilter() )
  ***************************************************************************/
 static int ParseUrls( filter_t *p_filter, char *psz_urls )
 {
