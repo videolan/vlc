@@ -105,19 +105,22 @@ static size_t str8len( const char *psz_string )
 
 static char * str8indup( const char *psz_string, size_t i_skip, size_t n )
 {
-    while( i_skip && *psz_string )
+    for( size_t i = 0; i< i_skip && *psz_string; i++ )
     {
-        if ( (*psz_string & 0xC0) != 0x80 ) i_skip--;
-        psz_string++;
+        while( *(++psz_string) && (*psz_string & 0xC0) == 0x80 )
+        {};
     }
-    if ( ! *psz_string || i_skip ) return NULL;
+
+    if ( ! *psz_string )
+        return NULL;
 
     const char *psz_tmp = psz_string;
-    while( n && *psz_tmp )
+    for( size_t i = 0; i < n && *psz_tmp; i++ )
     {
-        if ( (*psz_tmp & 0xC0) != 0x80 ) n--;
-        psz_tmp++;
+        while( *(++psz_tmp) && (*psz_tmp & 0xC0) == 0x80 )
+        {};
     }
+
     return strndup( psz_string, psz_tmp - psz_string );
 }
 
