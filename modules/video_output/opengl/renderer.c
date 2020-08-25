@@ -186,7 +186,7 @@ opengl_link_program(struct vlc_gl_filter *filter)
         "uniform mat4 ZoomMatrix;\n"
         "uniform mat4 ViewMatrix;\n"
         "void main() {\n"
-        " PicCoords = (StereoMatrix * vec3(PicCoordsIn, 1.0)).st;\n"
+        " PicCoords = vlc_texture_coords((StereoMatrix * vec3(PicCoordsIn, 1.0)).st);\n"
         " gl_Position = ProjectionMatrix * ZoomMatrix * ViewMatrix\n"
         "               * vec4(VertexPosition, 1.0);\n"
         "}\n";
@@ -215,6 +215,7 @@ opengl_link_program(struct vlc_gl_filter *filter)
 
     const char *vertex_shader[] = {
         shader_version,
+        sampler->shader.vertex_body,
         VERTEX_SHADER_BODY,
     };
     const char *fragment_shader[] = {
@@ -248,6 +249,7 @@ opengl_link_program(struct vlc_gl_filter *filter)
         vlc_gl_BuildProgram(VLC_OBJECT(filter), vt,
                             ARRAY_SIZE(vertex_shader), vertex_shader,
                             ARRAY_SIZE(fragment_shader), fragment_shader);
+
     if (!program_id)
         return VLC_EGENERIC;
 

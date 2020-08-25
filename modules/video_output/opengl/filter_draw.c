@@ -98,21 +98,27 @@ vlc_gl_filter_draw_Open(struct vlc_gl_filter *filter,
     struct vlc_gl_sampler *sampler = vlc_gl_filter_GetSampler(filter);
 
     static const char *const VERTEX_SHADER_BODY =
+        /* SHADER_VERSION is added in another string */
+        /* vlc_texture_coords definition */
         "attribute vec2 vertex_pos;\n"
         "varying vec2 tex_coords;\n"
         "void main() {\n"
         "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
-        "  tex_coords = vec2((vertex_pos.x + 1.0) / 2.0,\n"
+        "  vec2 tex_coords_orig = vec2((vertex_pos.x + 1.0) / 2.0,\n"
         "                    (vertex_pos.y + 1.0) / 2.0);\n"
+        "  tex_coords = vlc_texture_coords(tex_coords_orig);\n"
         "}\n";
 
     static const char *const VERTEX_SHADER_BODY_VFLIP =
+        /* SHADER_VERSION is added in another string */
+        /* vlc_texture_coords definition */
         "attribute vec2 vertex_pos;\n"
         "varying vec2 tex_coords;\n"
         "void main() {\n"
         "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
-        "  tex_coords = vec2((vertex_pos.x + 1.0) / 2.0,\n"
+        "  vec2 tex_coords_orig = vec2((vertex_pos.x + 1.0) / 2.0,\n"
         "                    (-vertex_pos.y + 1.0) / 2.0);\n"
+        "  tex_coords = vlc_texture_coords(tex_coords_orig);\n"
         "}\n";
 
     static const char *const FRAGMENT_SHADER_BODY =
@@ -144,6 +150,7 @@ vlc_gl_filter_draw_Open(struct vlc_gl_filter *filter,
 
     const char *vertex_shader[] = {
         shader_version,
+        sampler->shader.vertex_body,
         vflip ? VERTEX_SHADER_BODY_VFLIP : VERTEX_SHADER_BODY,
     };
     const char *fragment_shader[] = {

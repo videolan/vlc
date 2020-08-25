@@ -125,8 +125,9 @@ InitProgramCopy(struct vlc_gl_filter *filter, const char *shader_version,
         "varying vec2 tex_coords;\n"
         "void main() {\n"
         "  gl_Position = vec4(vertex_pos, 0.0, 1.0);\n"
-        "  tex_coords = vec2((vertex_pos.x + 1.0) / 2.0,\n"
+        "  vec2 tex_coords_orig = vec2((vertex_pos.x + 1.0) / 2.0,\n"
         "                    (vertex_pos.y + 1.0) / 2.0);\n"
+        "  tex_coords = vlc_texture_coords(tex_coords_orig);\n"
         "}\n";
 
     static const char *const FRAGMENT_SHADER_TEMPLATE =
@@ -151,6 +152,7 @@ InitProgramCopy(struct vlc_gl_filter *filter, const char *shader_version,
 
     const char * const vertex_code[] = {
         shader_version,
+        sampler->shader.vertex_body,
         VERTEX_SHADER,
     };
 

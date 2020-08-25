@@ -82,6 +82,17 @@ struct vlc_gl_sampler {
          * fragment shader, before any call to vlc_texture().
          */
         char *body;
+
+        /**
+         * Piece of vertex shader code providing the GLSL function
+         * vlc_texture_coords(vec2 coords).
+         *
+         * It is initialized by the sampler, and is never NULL.
+         *
+         * Users of this sampler should inject this provided code into their
+         * vertex shader, before any call to vlc_texture_coords().
+         */
+        char *vertex_body;
     } shader;
 
     const struct vlc_gl_sampler_ops *ops;

@@ -817,8 +817,8 @@ sampler_planes_load(const struct vlc_gl_sampler *sampler)
     }
 }
 
-static int
-sampler_planes_init(struct vlc_gl_sampler *sampler)
+static char *
+sampler_planes_GetFragmentPart(struct vlc_gl_sampler *sampler)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
     GLenum tex_target = priv->tex_target;
@@ -842,19 +842,68 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
     if (tex_target == GL_TEXTURE_RECTANGLE)
         ADD("uniform vec2 TexSize;\n");
 
-    ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
+    ADDF("#define vlc_texture(coords) %s(Texture, coords)\n", texture_fn);
+    //ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
+    //    /* Homogeneous (oriented) coordinates */
+    //    "  vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).st, 1.0);\n"
+    //    "  vec2 tex_coords = (TexCoordsMap * pic_hcoords).st;\n");
+
+    //if (tex_target == GL_TEXTURE_RECTANGLE)
+    //{
+    //    /* The coordinates are in texels values, not normalized */
+    //    ADD(" tex_coords = vec2(tex_coords.x * TexSize.x,\n"
+    //        "                   tex_coords.y * TexSize.y);\n");
+    //}
+
+    //ADDF("  return %s(Texture, tex_coords);\n", texture_fn);
+    //ADD("}\n");
+
+#undef ADD
+#undef ADDF
+
+    if (vlc_memstream_close(&ms) != 0)
+        return VLC_EGENERIC;
+
+    return ms.ptr;
+}
+
+char *sampler_planes_GetVertexPart(struct vlc_gl_sampler *sampler)
+{
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    GLenum tex_target = priv->tex_target;
+
+    struct vlc_memstream ms;
+    if (vlc_memstream_open(&ms))
+        return VLC_EGENERIC;
+
+#define ADD(x) vlc_memstream_puts(&ms, x)
+#define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
+
+    const char *sampler_type;
+    const char *texture_fn;
+    GetNames(tex_target, &sampler_type, &texture_fn);
+
+    ADDF("uniform %s Texture;\n", sampler_type);
+    ADD("uniform mat3 TexCoordsMap;\n"
+        "uniform mat4 TransformMatrix;\n"
+        "uniform mat4 OrientationMatrix;\n");
+
+    if (tex_target == GL_TEXTURE_RECTANGLE)
+        ADD("uniform vec2 TexSize;\n");
+
+    ADD("vec2 vlc_texture_coords(vec2 pic_coords) {\n"
         /* Homogeneous (oriented) coordinates */
         "  vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).st, 1.0);\n"
-        "  vec2 tex_coords = (TexCoordsMap * pic_hcoords).st;\n");
+        "  vec2 computed_coords = (TexCoordsMap * pic_hcoords).st;\n");
 
     if (tex_target == GL_TEXTURE_RECTANGLE)
     {
         /* The coordinates are in texels values, not normalized */
-        ADD(" tex_coords = vec2(tex_coords.x * TexSize.x,\n"
-            "                   tex_coords.y * TexSize.y);\n");
+        ADD("  computed_coords = vec2(computed_coords.x * TexSize.x,\n"
+            "                         computed_coords.y * TexSize.y);\n");
     }
 
-    ADDF("  return %s(Texture, tex_coords);\n", texture_fn);
+    ADDF("  return computed_coords;\n");
     ADD("}\n");
 
 #undef ADD
@@ -863,13 +912,24 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
     if (vlc_memstream_close(&ms) != 0)
         return VLC_EGENERIC;
 
+    return ms.ptr;
+}
+
+static int
+sampler_planes_init(struct vlc_gl_sampler *sampler)
+{
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    GLenum tex_target = priv->tex_target;
+
+    sampler->shader.body = sampler_planes_GetFragmentPart(sampler);
+    sampler->shader.vertex_body = sampler_planes_GetVertexPart(sampler);
+
+    if (!sampler->shader.body || !sampler->shader.vertex_body)
+        goto error;
+
     int ret = InitShaderExtensions(sampler, tex_target);
     if (ret != VLC_SUCCESS)
-    {
-        free(ms.ptr);
-        return VLC_EGENERIC;
-    }
-    sampler->shader.body = ms.ptr;
+        goto error;
 
     static const struct vlc_gl_sampler_ops ops = {
         .fetch_locations = sampler_planes_fetch_locations,
@@ -878,6 +938,50 @@ sampler_planes_init(struct vlc_gl_sampler *sampler)
     sampler->ops = &ops;
 
     return VLC_SUCCESS;
+
+error:
+    free(sampler->shader.body);
+    free(sampler->shader.vertex_body);
+    return VLC_EGENERIC;
+}
+
+static const char *
+opengl_shader_GetVertexPart(struct vlc_gl_sampler *sampler, bool is_yuv)
+{
+    struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    GLenum tex_target = priv->tex_target;
+
+    struct vlc_memstream ms;
+    if (vlc_memstream_open(&ms) != 0)
+        return NULL;
+
+#define ADD(x) vlc_memstream_puts(&ms, x)
+#define ADDF(x, ...) vlc_memstream_printf(&ms, x, ##__VA_ARGS__)
+
+    ADDF("uniform mat3 TexCoordsMaps[%u];\n", sampler->tex_count);
+    if (tex_target == GL_TEXTURE_RECTANGLE)
+        ADDF("uniform vec2 TexSizes[%u];\n", sampler->tex_count);
+
+    ADD("uniform mat4 TransformMatrix;\n"
+        "uniform mat4 OrientationMatrix;\n"
+
+        "vec2 vlc_texture_coords(vec2 pic_coords) {\n"
+        "  vec2 pic_hcoords = (TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).st;\n");
+
+    if (!is_yuv)
+    {
+        ADD("  pic_hcoords = (TexCoordsMaps[0] * vec3(pic_hcoords, 1.0)).st;\n");
+        if (tex_target == GL_TEXTURE_RECTANGLE)
+            ADD("   pic_hcoords *= TexSizes[0];\n");
+    }
+
+    ADD("  return pic_hcoords;\n"
+        "}\n");
+
+    if (vlc_memstream_close(&ms) != 0)
+        return NULL;
+
+    return ms.ptr;
 }
 
 static int
@@ -1027,7 +1131,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
 
     ADD("vec4 vlc_texture(vec2 pic_coords) {\n"
         /* Homogeneous (oriented) coordinates */
-        " vec3 pic_hcoords = vec3((TransformMatrix * OrientationMatrix * vec4(pic_coords, 0.0, 1.0)).st, 1.0);\n"
+        " vec3 pic_hcoords = vec3(pic_coords, 1.0);\n"
         " vec2 tex_coords;\n");
 
     unsigned color_count;
@@ -1060,11 +1164,7 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
     }
     else
     {
-        ADD(" tex_coords = (TexCoordsMaps[0] * pic_hcoords).st;\n");
-        if (tex_target == GL_TEXTURE_RECTANGLE)
-            ADD(" tex_coords *= TexSizes[0];\n");
-
-        ADDF(" vec4 result = %s(Textures[0], tex_coords);\n", lookup);
+        ADDF(" vec4 result = %s(Textures[0], pic_coords);\n", lookup);
         color_count = 1;
     }
     assert(yuv_space == COLOR_SPACE_UNDEF || color_count == 3);
@@ -1094,6 +1194,8 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, GLenum tex_target,
         return VLC_EGENERIC;
     }
     sampler->shader.body = ms.ptr;
+
+    sampler->shader.vertex_body = opengl_shader_GetVertexPart(sampler, is_yuv);
 
     static const struct vlc_gl_sampler_ops ops = {
         .fetch_locations = sampler_base_fetch_locations,
@@ -1133,6 +1235,7 @@ CreateSampler(struct vlc_gl_interop *interop, struct vlc_gl_t *gl,
 
     sampler->shader.extensions = NULL;
     sampler->shader.body = NULL;
+    sampler->shader.vertex_body = NULL;
 
     /* Expose the texture sizes publicly */
     sampler->tex_widths = priv->tex_widths;
@@ -1250,6 +1353,7 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
 
     free(sampler->shader.extensions);
     free(sampler->shader.body);
+    free(sampler->shader.vertex_body);
 
     free(priv);
 }
