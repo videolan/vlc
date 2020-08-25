@@ -49,7 +49,6 @@ using std::nothrow;
  * Module descriptor
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
 
 #define ROOMSIZE_TEXT N_("Room size")
 #define ROOMSIZE_LONGTEXT N_("Defines the virtual surface of the room" \
@@ -74,7 +73,7 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
-    set_callbacks( Open, Close )
+    set_callback( Open )
     add_shortcut( "spatializer" )
     add_float_with_range( "spatializer-roomsize", 0.85, 0., 1.1,
                             ROOMSIZE_TEXT, ROOMSIZE_LONGTEXT, false )
@@ -135,6 +134,26 @@ enum { num_callbacks=sizeof(callbacks)/sizeof(callback_s) };
 static block_t *DoWork( filter_t *, block_t * );
 
 /*****************************************************************************
+ * Close: close the filter
+ *****************************************************************************/
+static void Close( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
+    vlc_object_t *p_aout = vlc_object_parent(p_filter);
+
+    /* Delete the callbacks */
+    for(unsigned i=0;i<num_callbacks;++i)
+    {
+        var_DelCallback( p_aout, callbacks[i].psz_name,
+                         callbacks[i].fp_callback, p_sys );
+    }
+
+    delete p_sys->p_reverbm;
+    free( p_sys );
+    msg_Dbg( &p_filter->obj, "Closing filter spatializer" );
+}
+
+/*****************************************************************************
  * Open:
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
@@ -177,32 +196,12 @@ static int Open( vlc_object_t *p_this )
         FilterOperationInitializer()
         {
             ops.filter_audio = DoWork;
+            ops.close = Close;
         };
     } filter_ops;
 
     p_filter->ops = &filter_ops.ops;
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close: close the plugin
- *****************************************************************************/
-static void Close( vlc_object_t *p_this )
-{
-    filter_t     *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
-    vlc_object_t *p_aout = vlc_object_parent(p_filter);
-
-    /* Delete the callbacks */
-    for(unsigned i=0;i<num_callbacks;++i)
-    {
-        var_DelCallback( p_aout, callbacks[i].psz_name,
-                         callbacks[i].fp_callback, p_sys );
-    }
-
-    delete p_sys->p_reverbm;
-    free( p_sys );
-    msg_Dbg( p_this, "Closing filter spatializer" );
 }
 
 /*****************************************************************************
