@@ -76,27 +76,6 @@ static int vout_display_Control(vout_display_t *vd, int query, ...)
  *
  *****************************************************************************/
 
-static int vout_display_start(void *func, bool forced, va_list ap)
-{
-    vout_display_open_cb activate = func;
-    vout_display_t *vd = va_arg(ap, vout_display_t *);
-    const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
-    vlc_video_context *context = va_arg(ap, vlc_video_context *);
-
-    /* Picture buffer does not have the concept of aspect ratio */
-    video_format_Copy(&vd->fmt, &vd->source);
-    vd->fmt.i_sar_num = 0;
-    vd->fmt.i_sar_den = 0;
-    vd->obj.force = forced; /* TODO: pass to activate() instead? */
-
-    int ret = activate(vd, cfg, &vd->fmt, context);
-    if (ret != VLC_SUCCESS) {
-        video_format_Clean(&vd->fmt);
-        vlc_objres_clear(VLC_OBJECT(vd));
-    }
-    return ret;
-}
-
 /* */
 void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
                                         const video_format_t *source,
@@ -307,6 +286,27 @@ typedef struct {
     filter_chain_t *converters;
     picture_pool_t *pool;
 } vout_display_priv_t;
+
+static int vout_display_start(void *func, bool forced, va_list ap)
+{
+    vout_display_open_cb activate = func;
+    vout_display_t *vd = va_arg(ap, vout_display_t *);
+    const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
+    vlc_video_context *context = va_arg(ap, vlc_video_context *);
+
+    /* Picture buffer does not have the concept of aspect ratio */
+    video_format_Copy(&vd->fmt, &vd->source);
+    vd->fmt.i_sar_num = 0;
+    vd->fmt.i_sar_den = 0;
+    vd->obj.force = forced; /* TODO: pass to activate() instead? */
+
+    int ret = activate(vd, cfg, &vd->fmt, context);
+    if (ret != VLC_SUCCESS) {
+        video_format_Clean(&vd->fmt);
+        vlc_objres_clear(VLC_OBJECT(vd));
+    }
+    return ret;
+}
 
 static vlc_decoder_device * DisplayHoldDecoderDevice(vlc_object_t *o, void *sys)
 {
