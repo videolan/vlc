@@ -23,14 +23,14 @@ Item {
 
     readonly property real scale: mainInterface.intfScaleFactor
 
-    TextMetrics { id: fontMetrics_xxsmall; font.pixelSize: dp(6, scale);  text: "lq"}
-    TextMetrics { id: fontMetrics_xsmall;  font.pixelSize: dp(8, scale);  text: "lq"}
-    TextMetrics { id: fontMetrics_small;   font.pixelSize: dp(10, scale); text: "lq"}
-    TextMetrics { id: fontMetrics_normal;  font.pixelSize: dp(12, scale); text: "lq"}
-    TextMetrics { id: fontMetrics_large;   font.pixelSize: dp(14, scale); text: "lq"}
-    TextMetrics { id: fontMetrics_xlarge;  font.pixelSize: dp(16, scale); text: "lq"}
-    TextMetrics { id: fontMetrics_xxlarge;  font.pixelSize: dp(20, scale); text: "lq"}
-    TextMetrics { id: fontMetrics_xxxlarge;  font.pixelSize: dp(30, scale); text: "lq"}
+    FontMetrics { id: fontMetrics_xxsmall;  font.pixelSize: dp(6, scale);  }
+    FontMetrics { id: fontMetrics_xsmall;   font.pixelSize: dp(8, scale);  }
+    FontMetrics { id: fontMetrics_small;    font.pixelSize: dp(10, scale); }
+    FontMetrics { id: fontMetrics_normal;   font.pixelSize: dp(12, scale); }
+    FontMetrics { id: fontMetrics_large;    font.pixelSize: dp(14, scale); }
+    FontMetrics { id: fontMetrics_xlarge;   font.pixelSize: dp(16, scale); }
+    FontMetrics { id: fontMetrics_xxlarge;  font.pixelSize: dp(20, scale); }
+    FontMetrics { id: fontMetrics_xxxlarge; font.pixelSize: dp(30, scale); }
 
     property alias self: vlc_style
 
@@ -54,13 +54,13 @@ Item {
     property int fontSize_xxlarge: fontMetrics_xxlarge.font.pixelSize
     property int fontSize_xxxlarge: fontMetrics_xxxlarge.font.pixelSize
 
-    property int fontHeight_xsmall: Math.ceil(fontMetrics_xsmall.height)
-    property int fontHeight_small:  Math.ceil(fontMetrics_small.height)
-    property int fontHeight_normal: Math.ceil(fontMetrics_normal.height)
-    property int fontHeight_large:  Math.ceil(fontMetrics_large.height)
-    property int fontHeight_xlarge: Math.ceil(fontMetrics_xlarge.height)
-    property int fontHeight_xxlarge: Math.ceil(fontMetrics_xxlarge.height)
-    property int fontHeight_xxxlarge: Math.ceil(fontMetrics_xxxlarge.height)
+    property int fontHeight_xsmall: Math.ceil(fontMetrics_xsmall.lineSpacing)
+    property int fontHeight_small:  Math.ceil(fontMetrics_small.lineSpacing)
+    property int fontHeight_normal: Math.ceil(fontMetrics_normal.lineSpacing)
+    property int fontHeight_large:  Math.ceil(fontMetrics_large.lineSpacing)
+    property int fontHeight_xlarge: Math.ceil(fontMetrics_xlarge.lineSpacing)
+    property int fontHeight_xxlarge: Math.ceil(fontMetrics_xxlarge.lineSpacing)
+    property int fontHeight_xxxlarge: Math.ceil(fontMetrics_xxxlarge.lineSpacing)
 
 
     property int heightAlbumCover_xsmall: dp(32, scale);
