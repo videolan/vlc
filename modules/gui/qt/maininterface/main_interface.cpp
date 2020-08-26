@@ -166,7 +166,8 @@ MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::Windo
     /*********************************
      * Create the Systray Management *
      *********************************/
-    initSystray();
+    //postpone systray initialisation to speedup starting time
+    QMetaObject::invokeMethod(this, &MainInterface::initSystray, Qt::QueuedConnection);
 
     /*************************************************************
      * Connect the input manager to the GUI elements it manages  *
