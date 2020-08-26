@@ -257,7 +257,7 @@ static void UpdateSize(vout_display_t *vd)
     msg_Dbg(vd, "Detected size change %dx%d", sys->area.place.width,
             sys->area.place.height);
 
-    UpdateDisplayFormat(vd, &vd->fmt);
+    UpdateDisplayFormat(vd, vd->fmt);
 
     RECT rect_dst = {
         .left   = sys->area.place.x,

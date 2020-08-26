@@ -302,7 +302,7 @@ struct vout_display_t {
      * By default, it is equal to ::source except for the aspect ratio
      * which is undefined(0) and is ignored.
      */
-    video_format_t fmt;
+    const video_format_t *fmt;
 
     /* Information
      *

@@ -175,7 +175,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
     vout_display_sys_t *sys = vd->sys;
 
     /* */
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt = *vd->fmt;
 
     if (ORIENT_IS_SWAP(vd->source->orientation))
     {
@@ -232,8 +232,8 @@ static void Display(vout_display_t *vd, picture_t *picture)
         const plane_t *plane = &picture->p[i];
         const uint8_t *pixels = plane->p_pixels;
 
-        pixels += (vd->fmt.i_x_offset * plane->i_visible_pitch)
-                  / vd->fmt.i_visible_height;
+        pixels += (vd->fmt->i_x_offset * plane->i_visible_pitch)
+                  / vd->fmt->i_visible_height;
 
         for( int y = 0; y < plane->i_visible_lines; y++) {
             const size_t written = fwrite(pixels, 1, plane->i_visible_pitch,

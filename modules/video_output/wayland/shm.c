@@ -115,11 +115,11 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     }
 
     if (sys->viewport == NULL) /* Poor man's crop */
-        offset += 4 * vd->fmt.i_x_offset
-                  + pic->p->i_pitch * vd->fmt.i_y_offset;
+        offset += 4 * vd->fmt->i_x_offset
+                  + pic->p->i_pitch * vd->fmt->i_y_offset;
 
-    buf = wl_shm_pool_create_buffer(pool, offset, vd->fmt.i_visible_width,
-                                    vd->fmt.i_visible_height, stride,
+    buf = wl_shm_pool_create_buffer(pool, offset, vd->fmt->i_visible_width,
+                                    vd->fmt->i_visible_height, stride,
                                     WL_SHM_FORMAT_XRGB8888);
     wl_shm_pool_destroy(pool);
     if (buf == NULL)

@@ -260,8 +260,8 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         vout_display_place_t place;
 
         vout_display_PlacePicture(&place, vd->source, cfg);
-        if (place.width  != vd->fmt.i_visible_width
-         || place.height != vd->fmt.i_visible_height)
+        if (place.width  != vd->fmt->i_visible_width
+         || place.height != vd->fmt->i_visible_height)
             return VLC_EGENERIC;
 
         const uint32_t values[] = { place.x, place.y,

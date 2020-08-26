@@ -667,8 +667,8 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
 
     HRESULT result;
     int w, h, stride, length;
-    w = vd->fmt.i_width;
-    h = vd->fmt.i_height;
+    w = vd->fmt->i_width;
+    h = vd->fmt->i_height;
 
     IDeckLinkMutableVideoFrame *pDLVideoFrame;
     result = sys->p_output->CreateVideoFrame(w, h, w*3,

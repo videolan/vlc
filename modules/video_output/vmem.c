@@ -244,7 +244,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
 
     sys->pic_opaque = sys->lock(sys->opaque, planes);
 
-    picture_t *locked = picture_NewFromResource(&vd->fmt, &rsc);
+    picture_t *locked = picture_NewFromResource(vd->fmt, &rsc);
     if (likely(locked != NULL)) {
         for (unsigned i = 0; i < PICTURE_PLANE_MAX; i++) {
             locked->p[i].p_pixels = planes[i];

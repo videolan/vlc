@@ -578,7 +578,7 @@ static int OpenDisplay(vout_display_t *vd)
 
     picture_resource_t rsc = { 0 };
 
-    sys->picture = picture_NewFromResource(&vd->fmt, &rsc);
+    sys->picture = picture_NewFromResource(vd->fmt, &rsc);
 
     if (!sys->picture)
         goto err_out;

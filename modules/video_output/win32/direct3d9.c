@@ -1162,7 +1162,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
                 return VLC_EGENERIC;
         }
 #endif
-        UpdateOutput(vd, &vd->fmt, NULL);
+        UpdateOutput(vd, vd->fmt, NULL);
 
         sys->clear_scene = true;
         sys->area.place_changed = false;
@@ -1176,7 +1176,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         if (hr == D3DERR_DEVICENOTRESET && !sys->reset_device) {
             sys->reset_device = true;
             /* FIXME what to do here in case of failure */
-            if (Direct3D9Reset(vd, &vd->fmt)) {
+            if (Direct3D9Reset(vd, vd->fmt)) {
                 msg_Err(vd, "Failed to reset device");
                 return;
             }

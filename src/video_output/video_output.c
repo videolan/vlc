@@ -1297,7 +1297,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
         if (do_early_spu) {
             fmt_spu = *vd->source;
         } else {
-            fmt_spu = vd->fmt;
+            fmt_spu = *vd->fmt;
             fmt_spu.i_sar_num = vd->cfg->display.sar.num;
             fmt_spu.i_sar_den = vd->cfg->display.sar.den;
         }

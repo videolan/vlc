@@ -117,7 +117,7 @@ vout_display_t *vout_OpenWrapper(vout_thread_t *vout, vout_thread_private_t *sys
     var_AddCallback(vout, "video-wallpaper", Forward, vd);
 #endif
     var_SetBool(VLC_OBJECT(vout), "viewpoint-changeable",
-                vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
+                vd->fmt->projection_mode != PROJECTION_MODE_RECTANGULAR);
     return vd;
 
 error:

@@ -177,12 +177,12 @@ static MMAL_FOURCC_T vout_vlc_to_mmal_pic_fourcc(const unsigned int fcc)
 
 static void display_set_format(const vout_display_t * const vd, MMAL_ES_FORMAT_T *const es_fmt, const bool is_intermediate)
 {
-    const unsigned int w = is_intermediate ? vd->fmt.i_visible_width  : vd->fmt.i_width ;
-    const unsigned int h = is_intermediate ? vd->fmt.i_visible_height : vd->fmt.i_height;
+    const unsigned int w = is_intermediate ? vd->fmt->i_visible_width  : vd->fmt->i_width ;
+    const unsigned int h = is_intermediate ? vd->fmt->i_visible_height : vd->fmt->i_height;
     MMAL_VIDEO_FORMAT_T * const v_fmt = &es_fmt->es->video;
 
     es_fmt->type = MMAL_ES_TYPE_VIDEO;
-    es_fmt->encoding = is_intermediate ? MMAL_ENCODING_I420 : vout_vlc_to_mmal_pic_fourcc(vd->fmt.i_chroma);
+    es_fmt->encoding = is_intermediate ? MMAL_ENCODING_I420 : vout_vlc_to_mmal_pic_fourcc(vd->fmt->i_chroma);
     es_fmt->encoding_variant = 0;
 
     v_fmt->width  = (w + 31) & ~31;
@@ -191,25 +191,25 @@ static void display_set_format(const vout_display_t * const vd, MMAL_ES_FORMAT_T
     v_fmt->crop.y = 0;
     v_fmt->crop.width = w;
     v_fmt->crop.height = h;
-    if (vd->fmt.i_sar_num == 0 || vd->fmt.i_sar_den == 0) {
+    if (vd->fmt->i_sar_num == 0 || vd->fmt->i_sar_den == 0) {
         v_fmt->par.num        = 1;
         v_fmt->par.den        = 1;
     } else {
-        v_fmt->par.num        = vd->fmt.i_sar_num;
-        v_fmt->par.den        = vd->fmt.i_sar_den;
+        v_fmt->par.num        = vd->fmt->i_sar_num;
+        v_fmt->par.den        = vd->fmt->i_sar_den;
     }
-    v_fmt->frame_rate.num = vd->fmt.i_frame_rate;
-    v_fmt->frame_rate.den = vd->fmt.i_frame_rate_base;
-    v_fmt->color_space    = vlc_to_mmal_color_space(vd->fmt.space);
+    v_fmt->frame_rate.num = vd->fmt->i_frame_rate;
+    v_fmt->frame_rate.den = vd->fmt->i_frame_rate_base;
+    v_fmt->color_space    = vlc_to_mmal_color_space(vd->fmt->space);
 }
 
 static void display_src_rect(const vout_display_t * const vd, MMAL_RECT_T *const rect)
 {
     const bool wants_isp = false;
-    rect->x = wants_isp ? 0 : vd->fmt.i_x_offset;
-    rect->y = wants_isp ? 0 : vd->fmt.i_y_offset;
-    rect->width = vd->fmt.i_visible_width;
-    rect->height = vd->fmt.i_visible_height;
+    rect->x = wants_isp ? 0 : vd->fmt->i_x_offset;
+    rect->y = wants_isp ? 0 : vd->fmt->i_y_offset;
+    rect->width = vd->fmt->i_visible_width;
+    rect->height = vd->fmt->i_visible_height;
 }
 
 static void isp_input_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf)
@@ -830,7 +830,7 @@ static void vd_prepare(vout_display_t *vd, picture_t *p_pic,
     }
 
     // *****
-    if (want_copy(&vd->fmt)) {
+    if (want_copy(vd->fmt)) {
         if (sys->copy_buf != NULL) {
             msg_Err(vd, "Copy buf not NULL");
             mmal_buffer_header_release(sys->copy_buf);
@@ -931,8 +931,8 @@ static void adjust_refresh_rate(vout_display_t *vd, const video_format_t *fmt)
                                 mode->scan_mode == HDMI_INTERLACED)
                     continue;
             } else {
-                if (mode->width != vd->fmt.i_visible_width ||
-                        mode->height != vd->fmt.i_visible_height)
+                if (mode->width != vd->fmt->i_visible_width ||
+                        mode->height != vd->fmt->i_visible_height)
                     continue;
                 if (mode->scan_mode != sys->b_progressive ? HDMI_NONINTERLACED : HDMI_INTERLACED)
                     continue;
@@ -1105,9 +1105,9 @@ static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
     MMAL_STATUS_T status;
     int ret = VLC_EGENERIC;
     // At the moment all copy is via I420
-    const bool needs_copy = !hw_mmal_chroma_is_mmal(vd->fmt.i_chroma);
+    const bool needs_copy = !hw_mmal_chroma_is_mmal(vd->fmt->i_chroma);
     const MMAL_FOURCC_T enc_in = needs_copy ? MMAL_ENCODING_I420 :
-        vout_vlc_to_mmal_pic_fourcc(vd->fmt.i_chroma);
+        vout_vlc_to_mmal_pic_fourcc(vd->fmt->i_chroma);
 
     sys = calloc(1, sizeof(struct vout_display_sys_t));
     if (!sys)

@@ -51,9 +51,9 @@ static picture_t *VideoBufferNew(filter_t *filter)
     vout_display_t *vd = filter->owner.sys;
     const video_format_t *fmt = &filter->fmt_out.video;
 
-    assert(vd->fmt.i_chroma == fmt->i_chroma &&
-           vd->fmt.i_width  == fmt->i_width  &&
-           vd->fmt.i_height == fmt->i_height);
+    assert(vd->fmt->i_chroma == fmt->i_chroma &&
+           vd->fmt->i_width  == fmt->i_width  &&
+           vd->fmt->i_height == fmt->i_height);
 
     picture_pool_t *pool = vout_GetPool(vd, 3);
     if (!pool)
@@ -280,6 +280,7 @@ typedef struct {
 
     /* */
     video_format_t source;
+    video_format_t display_fmt;
     vlc_video_context *src_vctx;
      /* filters to convert the vout source to fmt, NULL means no conversion
       * can be done and nothing will be displayed */
@@ -296,14 +297,14 @@ static int vout_display_start(void *func, bool forced, va_list ap)
     vlc_video_context *context = osys->src_vctx;
 
     /* Picture buffer does not have the concept of aspect ratio */
-    video_format_Copy(&vd->fmt, vd->source);
-    vd->fmt.i_sar_num = 0;
-    vd->fmt.i_sar_den = 0;
+    video_format_Copy(&osys->display_fmt, vd->source);
+    osys->display_fmt.i_sar_num = 0;
+    osys->display_fmt.i_sar_den = 0;
     vd->obj.force = forced; /* TODO: pass to activate() instead? */
 
-    int ret = activate(vd, cfg, &vd->fmt, context);
+    int ret = activate(vd, cfg, &osys->display_fmt, context);
     if (ret != VLC_SUCCESS) {
-        video_format_Clean(&vd->fmt);
+        video_format_Clean(&osys->display_fmt);
         vlc_objres_clear(VLC_OBJECT(vd));
     }
     return ret;
@@ -337,7 +338,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     v_src.i_sar_num = 0;
     v_src.i_sar_den = 0;
 
-    video_format_t v_dst = vd->fmt;
+    video_format_t v_dst = *vd->fmt;
     v_dst.i_sar_num = 0;
     v_dst.i_sar_den = 0;
 
@@ -411,7 +412,7 @@ picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (osys->pool == NULL)
-        osys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
+        osys->pool = picture_pool_NewFromFormat(vd->fmt, count);
     return osys->pool;
 }
 
@@ -468,7 +469,7 @@ static void vout_display_Reset(vout_display_t *vd)
     }
 
     if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES, &osys->cfg,
-                             &vd->fmt)
+                             &osys->display_fmt)
      || VoutDisplayCreateRender(vd))
         msg_Err(vd, "Failed to adjust render format");
 }
@@ -735,6 +736,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     /* */
     vout_display_t *vd = &osys->display;
     vd->source = &osys->source;
+    vd->fmt = &osys->display_fmt;
     vd->info = (vout_display_info_t){ };
     vd->cfg = &osys->cfg;
     vd->prepare = NULL;
@@ -765,7 +767,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
         if (vd->close != NULL)
             vd->close(vd);
         vlc_objres_clear(VLC_OBJECT(vd));
-        video_format_Clean(&vd->fmt);
+        video_format_Clean(&osys->display_fmt);
         goto error;
     }
     return vd;
@@ -796,6 +798,6 @@ void vout_display_Delete(vout_display_t *vd)
     vlc_objres_clear(VLC_OBJECT(vd));
 
     video_format_Clean(&osys->source);
-    video_format_Clean(&vd->fmt);
+    video_format_Clean(&osys->display_fmt);
     vlc_object_delete(vd);
 }

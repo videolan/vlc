@@ -598,7 +598,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
 
     picture_resource_t rsc = { 0 };
 
-    sys->picture = picture_NewFromResource(&vd->fmt, &rsc);
+    sys->picture = picture_NewFromResource(vd->fmt, &rsc);
     if (unlikely(sys->picture == NULL)) {
         munmap(sys->video_ptr, sys->video_size);
         ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
