@@ -28,6 +28,10 @@ Widgets.NavigableFocusScope {
     id: root
     property alias columnLayout: columnLayout
 
+    onActionCancel: {
+        history.previous()
+    }
+
     AboutModel {
         id: about
     }

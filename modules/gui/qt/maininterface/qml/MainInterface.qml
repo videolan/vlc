@@ -24,8 +24,6 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-import "qrc:///player/" as Player
-import "qrc:///about/" as AB
 import "qrc:///dialogs/" as DG
 import "qrc:///playlist/" as PL
 import QtQuick.Window 2.11
@@ -77,29 +75,11 @@ Rectangle {
         }
     }
 
-    Component {
-        id: audioplayerComp
-        Player.Player {
-            focus: true
-        }
-    }
-
-    Component {
-        id: aboutComp
-        AB.About {
-            focus: true
-            onActionCancel: {
-                console.log("onActionCancel")
-                history.previous()
-            }
-        }
-    }
-
     readonly property var pageModel: [
-        { name: "about", component: aboutComp },
+        { name: "about", url: "qrc:///about/About.qml" },
         { name: "mc", url: "qrc:///medialibrary/MainDisplay.qml" },
         { name: "playlist", url: "qrc:///playlist/PlaylistMainView.qml" },
-        { name: "player", component: audioplayerComp },
+        { name: "player", url:"qrc:///player/Player.qml" },
     ]
 
     function loadCurrentHistoryView() {
