@@ -1280,6 +1280,7 @@ static void Swap(vout_display_t *vd)
 
 static void Display(vout_display_t *vd, picture_t *picture)
 {
+    VLC_UNUSED(picture);
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->lost_not_ready)
@@ -1356,7 +1357,7 @@ static const d3d9_format_t d3d_formats[] = {
     { NULL, 0, 0, 0,0,0}
 };
 
-static const d3d9_format_t *FindBufferFormat(vout_display_t *vd, D3DFORMAT fmt)
+static const d3d9_format_t *FindBufferFormat(D3DFORMAT fmt)
 {
     for (unsigned j = 0; d3d_formats[j].name; j++) {
         const d3d9_format_t *format = &d3d_formats[j];
@@ -1615,7 +1616,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
         return VLC_EGENERIC;
 
     sys->BufferFormat = render_out.d3d9_format;
-    const d3d9_format_t *dst_format = FindBufferFormat(vd, sys->BufferFormat);
+    const d3d9_format_t *dst_format = FindBufferFormat(sys->BufferFormat);
     if (unlikely(!dst_format))
         msg_Warn(vd, "Unknown back buffer format 0x%X", sys->BufferFormat);
 
@@ -1679,8 +1680,6 @@ error:
  */
 static void Direct3D9Close(vout_display_t *vd)
 {
-    vout_display_sys_t *sys = vd->sys;
-
     Direct3D9DestroyResources(vd);
 }
 
@@ -1749,6 +1748,7 @@ VLC_CONFIG_STRING_ENUM(FindShadersCallback)
 
 static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
+    VLC_UNUSED(cfg);
     vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
 
