@@ -34,6 +34,8 @@ enum vlc_module_properties
     VLC_MODULE_CREATE,
     VLC_CONFIG_CREATE,
 
+    VLC_MODULE_SCOPE_CREATE,
+
     /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
      * Append new items at the end ONLY. */
     VLC_MODULE_CPU_REQUIREMENT=0x100,
@@ -302,6 +304,8 @@ int CDECL_SYMBOL VLC_SYMBOL(vlc_entry)(vlc_set_cb vlc_set, void *opaque) \
 { \
     module_t *module; \
     struct vlc_param *config = NULL; \
+    if (vlc_plugin_set (VLC_MODULE_SCOPE_CREATE, &module)) \
+        goto error; \
     if (vlc_plugin_set (VLC_MODULE_CREATE, &module)) \
         goto error; \
     if (vlc_module_set (VLC_MODULE_NAME, (MODULE_STRING))) \
@@ -318,6 +322,10 @@ VLC_METADATA_EXPORTS
 
 #define add_submodule( ) \
     if (vlc_plugin_set (VLC_MODULE_CREATE, &module)) \
+        goto error;
+
+#define add_module_scope( ) \
+    if (vlc_plugin_set (VLC_MODULE_SCOPE_CREATE, &module)) \
         goto error;
 
 #define add_shortcut( ... ) \

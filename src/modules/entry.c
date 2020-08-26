@@ -26,6 +26,7 @@
 #include <stdatomic.h>
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_list.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <limits.h>
@@ -37,6 +38,32 @@
 #include "modules/modules.h"
 #include "config/configuration.h"
 #include "libvlc.h"
+
+struct vlc_module_scope
+{
+    size_t i_shortcuts;
+    const char **pp_shortcuts;
+
+    const char *psz_shortname;
+    const char *psz_longname;
+    const char *capability;
+
+    module_t *root_module;
+
+    struct vlc_list node;
+};
+
+static struct vlc_module_scope *vlc_module_scope_create()
+{
+    struct vlc_module_scope *scope = malloc(sizeof *scope);
+    scope->i_shortcuts = 0;
+    scope->pp_shortcuts = NULL;
+    scope->psz_shortname = NULL;
+    scope->psz_longname = NULL;
+    scope->capability = NULL;
+    scope->root_module = NULL;
+    return scope;
+}
 
 module_t *vlc_module_create(vlc_plugin_t *plugin)
 {
@@ -62,6 +89,7 @@ module_t *vlc_module_create(vlc_plugin_t *plugin)
 
     plugin->modules_count++;
     module->plugin = plugin;
+    module->scope = NULL;
 
     module->psz_shortname = NULL;
     module->psz_longname = NULL;
@@ -112,6 +140,9 @@ vlc_plugin_t *vlc_plugin_create(void)
 #endif
     plugin->module = NULL;
 
+    vlc_list_init(&plugin->scopes);
+    plugin->current_scope = NULL;
+
     return plugin;
 }
 
@@ -135,6 +166,11 @@ void vlc_plugin_destroy(vlc_plugin_t *plugin)
     free(plugin->abspath);
     free(plugin->path);
 #endif
+
+    struct vlc_module_scope *scope;
+    vlc_list_foreach(scope, &plugin->scopes, node)
+        free(scope);
+
     free(plugin);
 }
 
@@ -202,7 +238,6 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
     {
         case VLC_MODULE_CREATE:
         {
-            module_t *super = plugin->module;
             module_t *submodule = vlc_module_create(plugin);
             if (unlikely(submodule == NULL))
             {
@@ -211,17 +246,30 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             }
 
             *(va_arg (ap, module_t **)) = submodule;
-            if (super == NULL)
-                break;
 
-            /* Inheritance. Ugly!! */
+            if (plugin->current_scope == NULL)
+            {
+                plugin->current_scope = vlc_module_scope_create();
+                if (plugin->current_scope == NULL)
+                    return -1;
+                plugin->current_scope->root_module = submodule;
+                vlc_list_append(&plugin->current_scope->node, &plugin->scopes);
+
+                /* Root of the scope, there is no inheritency */
+                break;
+            }
+
+            struct vlc_module_scope * super_scope = plugin->current_scope;
+
+            submodule->scope = super_scope;
             submodule->pp_shortcuts = xmalloc (sizeof ( *submodule->pp_shortcuts ));
-            submodule->pp_shortcuts[0] = super->pp_shortcuts[0];
+            assert(super_scope->root_module->i_shortcuts > 0);
+            submodule->pp_shortcuts[0] = super_scope->root_module->pp_shortcuts[0];
             submodule->i_shortcuts = 1; /* object name */
 
-            submodule->psz_shortname = super->psz_shortname;
-            submodule->psz_longname = super->psz_longname;
-            submodule->psz_capability = super->psz_capability;
+            submodule->psz_shortname = super_scope->root_module->psz_shortname;
+            submodule->psz_longname = super_scope->root_module->psz_longname;
+            submodule->psz_capability = super_scope->root_module->psz_capability;
             break;
         }
 
@@ -233,6 +281,12 @@ static int vlc_plugin_desc_cb(void *ctx, void *tgt, int propid, ...)
             *va_arg(ap, struct vlc_param **)= param;
             if (unlikely(param == NULL))
                 ret = -1;
+            break;
+        }
+
+        case VLC_MODULE_SCOPE_CREATE:
+        {
+            plugin->current_scope = NULL;
             break;
         }
 
