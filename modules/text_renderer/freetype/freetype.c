@@ -47,6 +47,8 @@
 #include "platform_fonts.h"
 #include "freetype.h"
 #include "text_layout.h"
+#include "blend/rgb.h"
+#include "blend/yuv.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -208,27 +210,6 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /* */
-static void YUVFromRGB( uint32_t i_argb,
-                    uint8_t *pi_y, uint8_t *pi_u, uint8_t *pi_v )
-{
-    int i_red   = ( i_argb & 0x00ff0000 ) >> 16;
-    int i_green = ( i_argb & 0x0000ff00 ) >>  8;
-    int i_blue  = ( i_argb & 0x000000ff );
-
-    *pi_y = (uint8_t)__MIN(abs( 2104 * i_red  + 4130 * i_green +
-                      802 * i_blue + 4096 + 131072 ) >> 13, 235);
-    *pi_u = (uint8_t)__MIN(abs( -1214 * i_red  + -2384 * i_green +
-                     3598 * i_blue + 4096 + 1048576) >> 13, 240);
-    *pi_v = (uint8_t)__MIN(abs( 3598 * i_red + -3013 * i_green +
-                      -585 * i_blue + 4096 + 1048576) >> 13, 240);
-}
-static void RGBFromRGB( uint32_t i_argb,
-                        uint8_t *pi_r, uint8_t *pi_g, uint8_t *pi_b )
-{
-    *pi_r = ( i_argb & 0x00ff0000 ) >> 16;
-    *pi_g = ( i_argb & 0x0000ff00 ) >>  8;
-    *pi_b = ( i_argb & 0x000000ff );
-}
 
 static FT_Vector GetAlignedOffset( const line_desc_t *p_line,
                                    const FT_BBox *p_textbbox,
@@ -494,204 +475,14 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
  *****************************************************************************
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
-static void FillYUVAPicture( picture_t *p_picture,
-                             int i_a, int i_y, int i_u, int i_v )
-{
-    memset( p_picture->p[0].p_pixels, i_y,
-            p_picture->p[0].i_pitch * p_picture->p[0].i_lines );
-    memset( p_picture->p[1].p_pixels, i_u,
-            p_picture->p[1].i_pitch * p_picture->p[1].i_lines );
-    memset( p_picture->p[2].p_pixels, i_v,
-            p_picture->p[2].i_pitch * p_picture->p[2].i_lines );
-    memset( p_picture->p[3].p_pixels, i_a,
-            p_picture->p[3].i_pitch * p_picture->p[3].i_lines );
-}
 
-static inline void BlendYUVAPixel( picture_t *p_picture,
-                                   int i_picture_x, int i_picture_y,
-                                   int i_a, int i_y, int i_u, int i_v,
-                                   int i_alpha )
-{
-    if( i_alpha == 0 )
-        return;
-
-    int i_an = i_a * i_alpha / 255;
-
-    uint8_t *p_y = &p_picture->p[0].p_pixels[i_picture_y * p_picture->p[0].i_pitch + i_picture_x];
-    uint8_t *p_u = &p_picture->p[1].p_pixels[i_picture_y * p_picture->p[1].i_pitch + i_picture_x];
-    uint8_t *p_v = &p_picture->p[2].p_pixels[i_picture_y * p_picture->p[2].i_pitch + i_picture_x];
-    uint8_t *p_a = &p_picture->p[3].p_pixels[i_picture_y * p_picture->p[3].i_pitch + i_picture_x];
-
-    int i_ao = *p_a;
-    if( i_ao == 0 )
-    {
-        *p_y = i_y;
-        *p_u = i_u;
-        *p_v = i_v;
-        *p_a = i_an;
-    }
-    else
-    {
-        int i_ani = 255 - i_an;
-        int i_aoni = i_ao * i_ani / 255;
-        *p_a = 255 - (255 - *p_a) * i_ani / 255;
-        if( *p_a != 0 )
-        {
-            *p_y = ( *p_y * i_aoni + i_y * i_an ) / *p_a;
-            *p_u = ( *p_u * i_aoni + i_u * i_an ) / *p_a;
-            *p_v = ( *p_v * i_aoni + i_v * i_an ) / *p_a;
-        }
-    }
-}
-
-static void FillRGBAPicture( picture_t *p_picture,
-                             int i_a, int i_r, int i_g, int i_b )
-{
-    for( int dy = 0; dy < p_picture->p[0].i_visible_lines; dy++ )
-    {
-        for( int dx = 0; dx < p_picture->p[0].i_visible_pitch; dx += 4 )
-        {
-            uint8_t *p_rgba = &p_picture->p->p_pixels[dy * p_picture->p->i_pitch + dx];
-            p_rgba[0] = i_r;
-            p_rgba[1] = i_g;
-            p_rgba[2] = i_b;
-            p_rgba[3] = i_a;
-        }
-    }
-}
-
-static inline void BlendRGBAPixel( picture_t *p_picture,
-                                   int i_picture_x, int i_picture_y,
-                                   int i_a, int i_r, int i_g, int i_b,
-                                   int i_alpha )
-{
-    if( i_alpha == 0 )
-        return;
-
-    int i_an = i_a * i_alpha / 255;
-
-    uint8_t *p_rgba = &p_picture->p->p_pixels[i_picture_y * p_picture->p->i_pitch + 4 * i_picture_x];
-
-    int i_ao = p_rgba[3];
-    if( i_ao == 0 )
-    {
-        p_rgba[0] = i_r;
-        p_rgba[1] = i_g;
-        p_rgba[2] = i_b;
-        p_rgba[3] = i_an;
-    }
-    else
-    {
-        int i_ani = 255 - i_an;
-        p_rgba[3] = 255 - (255 - p_rgba[3]) * i_ani / 255;
-        if( p_rgba[3] != 0 )
-        {
-            int i_aoni = i_ao * i_ani / 255;
-            p_rgba[0] = ( p_rgba[0] * i_aoni + i_r * i_an ) / p_rgba[3];
-            p_rgba[1] = ( p_rgba[1] * i_aoni + i_g * i_an ) / p_rgba[3];
-            p_rgba[2] = ( p_rgba[2] * i_aoni + i_b * i_an ) / p_rgba[3];
-        }
-    }
-}
-
-static void FillARGBPicture(picture_t *pic, int a, int r, int g, int b)
-{
-    if (a == 0)
-        r = g = b = 0;
-    if (a == r && a == b && a == g)
-    {   /* fast path */
-        memset(pic->p->p_pixels, a, pic->p->i_visible_lines * pic->p->i_pitch);
-        return;
-    }
-
-    uint_fast32_t pixel = VLC_FOURCC(a, r, g, b);
-    uint8_t *line = pic->p->p_pixels;
-
-    for (unsigned lines = pic->p->i_visible_lines; lines > 0; lines--)
-    {
-        uint32_t *pixels = (uint32_t *)line;
-        for (unsigned cols = pic->p->i_visible_pitch; cols > 0; cols -= 4)
-            *(pixels++) = pixel;
-        line += pic->p->i_pitch;
-    }
-}
-
-static inline void BlendARGBPixel(picture_t *pic, int pic_x, int pic_y,
-                                  int a, int r, int g, int b, int alpha)
-{
-    if (alpha == 0)
-        return;
-
-    uint8_t *rgba = &pic->p->p_pixels[pic_y * pic->p->i_pitch + 4 * pic_x];
-    int an = a * alpha / 255;
-    int ao = rgba[3];
-
-    if (ao == 0)
-    {
-        rgba[0] = an;
-        rgba[1] = r;
-        rgba[2] = g;
-        rgba[3] = b;
-    }
-    else
-    {
-        int ani = 255 - an;
-        rgba[0] = 255 - (255 - rgba[0]) * ani / 255;
-        if (rgba[0] != 0)
-        {
-            int aoni = ao * ani / 255;
-            rgba[1] = (rgba[1] * aoni + r * an ) / rgba[0];
-            rgba[2] = (rgba[2] * aoni + g * an ) / rgba[0];
-            rgba[3] = (rgba[3] * aoni + b * an ) / rgba[0];
-        }
-    }
-}
-
-static inline void BlendAXYZGlyph( picture_t *p_picture,
-                                   int i_picture_x, int i_picture_y,
-                                   int i_a, int i_x, int i_y, int i_z,
-                                   FT_BitmapGlyph p_glyph,
-                                   void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
-
-{
-    for( unsigned int dy = 0; dy < p_glyph->bitmap.rows; dy++ )
-    {
-        for( unsigned int dx = 0; dx < p_glyph->bitmap.width; dx++ )
-            BlendPixel( p_picture, i_picture_x + dx, i_picture_y + dy,
-                        i_a, i_x, i_y, i_z,
-                        p_glyph->bitmap.buffer[dy * p_glyph->bitmap.pitch + dx] );
-    }
-}
-
-static inline void BlendAXYZLine( picture_t *p_picture,
-                                  int i_picture_x, int i_picture_y,
-                                  int i_a, int i_x, int i_y, int i_z,
-                                  const line_character_t *p_current,
-                                  const line_character_t *p_next,
-                                  void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
-{
-    int i_line_width = p_current->p_glyph->bitmap.width;
-    if( p_next )
-        i_line_width = p_next->p_glyph->left - p_current->p_glyph->left;
-
-    for( int dx = 0; dx < i_line_width; dx++ )
-    {
-        for( int dy = 0; dy < p_current->i_line_thickness; dy++ )
-            BlendPixel( p_picture,
-                        i_picture_x + dx,
-                        i_picture_y + p_current->i_line_offset + dy,
-                        i_a, i_x, i_y, i_z, 0xff );
-    }
-}
-
-static inline void RenderBackground( subpicture_region_t *p_region,
+static void RenderBackground( subpicture_region_t *p_region,
                                      line_desc_t *p_line_head,
                                      FT_BBox *p_regionbbox,
                                      FT_BBox *p_paddedbbox,
                                      FT_BBox *p_textbbox,
                                      picture_t *p_picture,
-                                     void (*ExtractComponents)( uint32_t, uint8_t *, uint8_t *, uint8_t * ),
-                                     void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
+                                     ft_drawing_functions draw )
 {
     for( const line_desc_t *p_line = p_line_head; p_line != NULL; p_line = p_line->p_next )
     {
@@ -749,8 +540,8 @@ static inline void RenderBackground( subpicture_region_t *p_region,
             if( p_char->p_style->i_style_flags & STYLE_BACKGROUND )
             {
                 uint8_t i_x, i_y, i_z;
-                ExtractComponents( p_char->p_style->i_background_color,
-                                   &i_x, &i_y, &i_z );
+                draw.extract( p_char->p_style->i_background_color,
+                                 &i_x, &i_y, &i_z );
                 const uint8_t i_alpha = p_char->p_style->i_background_alpha;
 
                 /* Render the actual background */
@@ -767,11 +558,9 @@ static inline void RenderBackground( subpicture_region_t *p_region,
                         .yMax = __MAX(0, p_regionbbox->yMax - segmentbgbox.yMax),
                     };
 
-                    for( int dy = absbox.yMax; dy < absbox.yMin; dy++ )
-                    {
-                        for( int dx = absbox.xMin; dx < absbox.xMax; dx++ )
-                            BlendPixel( p_picture, dx, dy, i_alpha, i_x, i_y, i_z, 0xff );
-                    }
+                    draw.fill( p_picture, i_alpha, i_x, i_y, i_z,
+                               absbox.xMin, absbox.yMax,
+                               absbox.xMax - absbox.xMin, absbox.yMin - absbox.yMax );
                 }
             }
 
@@ -789,8 +578,7 @@ static void RenderCharAXYZ( filter_t *p_filter,
                            int i_offset_x,
                            int i_offset_y,
                            int g,
-                           void (*ExtractComponents)( uint32_t, uint8_t *, uint8_t *, uint8_t * ),
-                           void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
+                           ft_drawing_functions draw )
 {
     VLC_UNUSED(p_filter);
     /* Render all glyphs and underline/strikethrough */
@@ -827,8 +615,7 @@ static void RenderCharAXYZ( filter_t *p_filter,
                             i_offset_x + p_rubydesc->origin.x,
                             i_offset_y - p_rubydesc->origin.y,
                             2,
-                            ExtractComponents,
-                            BlendPixel );
+                            draw );
         }
 
         /* Don't render if invisible or not wanted */
@@ -839,16 +626,13 @@ static void RenderCharAXYZ( filter_t *p_filter,
             continue;
 
         uint8_t i_x, i_y, i_z;
-        ExtractComponents( i_color, &i_x, &i_y, &i_z );
+        draw.extract( i_color, &i_x, &i_y, &i_z );
 
         int i_glyph_y = i_offset_y - p_glyph->top;
         int i_glyph_x = i_offset_x + p_glyph->left;
 
-        BlendAXYZGlyph( p_picture,
-                        i_glyph_x, i_glyph_y,
-                        i_a, i_x, i_y, i_z,
-                        p_glyph,
-                        BlendPixel );
+        draw.blend( p_picture, i_glyph_x, i_glyph_y,
+                    i_a, i_x, i_y, i_z, p_glyph );
 
         /* underline/strikethrough are only rendered for the normal glyph */
         if( g == 2 && ch->i_line_thickness > 0 )
@@ -857,7 +641,7 @@ static void RenderCharAXYZ( filter_t *p_filter,
                            i_a, i_x, i_y, i_z,
                            &ch[0],
                            i + 1 < p_line->i_character_count ? &ch[1] : NULL,
-                           BlendPixel );
+                           draw );
     }
 }
 
@@ -869,9 +653,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
                               FT_BBox *p_textbbox,
                               vlc_fourcc_t i_chroma,
                               const video_format_t *fmt_out,
-                              void (*ExtractComponents)( uint32_t, uint8_t *, uint8_t *, uint8_t * ),
-                              void (*FillPicture)( picture_t *p_picture, int, int, int, int ),
-                              void (*BlendPixel)(picture_t *, int, int, int, int, int, int, int) )
+                              ft_drawing_functions draw )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -904,17 +686,19 @@ static inline int RenderAXYZ( filter_t *p_filter,
 
     if (p_region->b_noregionbg) {
         /* Render the background just under the text */
-        FillPicture( p_picture, STYLE_ALPHA_TRANSPARENT, 0x00, 0x00, 0x00 );
+        draw.fill( p_picture, STYLE_ALPHA_TRANSPARENT, 0x00, 0x00, 0x00,
+                   0, 0, fmt.i_visible_width, fmt.i_visible_height );
     } else {
         /* Render background under entire subpicture block */
-        ExtractComponents( p_style->i_background_color, &i_x, &i_y, &i_z );
-        FillPicture( p_picture, p_style->i_background_alpha, i_x, i_y, i_z );
+        draw.extract( p_style->i_background_color, &i_x, &i_y, &i_z );
+        draw.fill( p_picture, p_style->i_background_alpha, i_x, i_y, i_z,
+                   0, 0, fmt.i_visible_width, fmt.i_visible_height );
     }
 
     /* Render text's background (from decoder) if any */
     RenderBackground(p_region, p_line_head,
                      p_regionbbox, p_paddedtextbbox, p_textbbox,
-                     p_picture, ExtractComponents, BlendPixel);
+                     p_picture, draw);
 
     /* Render shadow then outline and then normal glyphs */
     for( int g = 0; g < 3; g++ )
@@ -929,7 +713,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
 
             RenderCharAXYZ( p_filter, p_picture, p_line,
                             i_glyph_offset_x, i_glyph_offset_y, g,
-                            ExtractComponents, BlendPixel );
+                            draw );
         }
     }
 
@@ -1310,6 +1094,26 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 //            p_region_out->i_y = p_region_in->i_y;
 //        }
 
+        enum
+        {
+            DRAW_YUVA = 0,
+            DRAW_RGBA,
+            DRAW_ARGB,
+        };
+
+        const ft_drawing_functions drawfuncs[] =
+        {
+            [DRAW_YUVA] = { .extract = YUVFromRGB,
+                            .fill =    FillYUVAPicture,
+                            .blend =   BlendGlyphToYUVA },
+            [DRAW_RGBA] = { .extract = RGBFromRGB,
+                            .fill =    FillRGBAPicture,
+                            .blend =   BlendGlyphToRGBA },
+            [DRAW_ARGB] = { .extract = RGBFromRGB,
+                            .fill =    FillARGBPicture,
+                            .blend =   BlendGlyphToARGB },
+        };
+
         for( const vlc_fourcc_t *p_chroma = p_chroma_list; *p_chroma != 0; p_chroma++ )
         {
             rv = VLC_EGENERIC;
@@ -1321,26 +1125,20 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                                  &regionbbox, &paddedbbox, &bbox,
                                  VLC_CODEC_YUVA,
                                  &p_region_out->fmt,
-                                 YUVFromRGB,
-                                 FillYUVAPicture,
-                                 BlendYUVAPixel );
+                                 drawfuncs[DRAW_YUVA] );
             else if( *p_chroma == VLC_CODEC_RGBA
                   || *p_chroma == VLC_CODEC_BGRA )
                 rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
                                  *p_chroma,
                                  &p_region_out->fmt,
-                                 RGBFromRGB,
-                                 FillRGBAPicture,
-                                 BlendRGBAPixel );
+                                 drawfuncs[DRAW_RGBA] );
             else if( *p_chroma == VLC_CODEC_ARGB )
                 rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
                                  VLC_CODEC_ARGB,
                                  &p_region_out->fmt,
-                                 RGBFromRGB,
-                                 FillARGBPicture,
-                                 BlendARGBPixel );
+                                 drawfuncs[DRAW_ARGB] );
 
             if( !rv )
                 break;
