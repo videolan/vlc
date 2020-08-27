@@ -656,6 +656,7 @@ libqt_plugin_la_QML = \
 	gui/qt/playlist/qml/PlaylistMainView.qml \
 	gui/qt/playlist/qml/PlaylistMenu.qml \
 	gui/qt/playlist/qml/PlaylistToolbar.qml \
+	gui/qt/playlist/qml/PlaylistDetachedWindow.qml \
 	gui/qt/style/VLCColors.qml \
 	gui/qt/style/VLCIcons.qml \
 	gui/qt/style/VLCStyle.qml \

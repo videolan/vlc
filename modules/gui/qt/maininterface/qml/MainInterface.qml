@@ -26,7 +26,6 @@ import "qrc:///style/"
 
 import "qrc:///dialogs/" as DG
 import "qrc:///playlist/" as PL
-import QtQuick.Window 2.11
 
 Rectangle {
     id: root
@@ -50,19 +49,15 @@ Rectangle {
 
     Loader {
         id: playlistWindowLoader
+        asynchronous: true
         active: !mainInterface.playlistDocked && mainInterface.playlistVisible
-        sourceComponent: Window {
-            visible: true
-            title: i18n.qtr("Playlist")
-            color: VLCStyle.colors.bg
-            onClosing: mainInterface.playlistVisible = false
-            PL.PlaylistListView {
-                id: playlistView
-                focus: true
-                anchors.fill: parent
-            }
-        }
+        source: "qrc:///playlist/PlaylistDetachedWindow.qml"
     }
+    Connections {
+        target: playlistWindowLoader.item
+        onClosing: mainInterface.playlistVisible = false
+    }
+
 
     PlaylistControllerModel {
         id: mainPlaylistController
