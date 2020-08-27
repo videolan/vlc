@@ -34,6 +34,7 @@ Rectangle {
     property bool _playlistReady: false
 
     property alias mainInterfaceRect: root
+    property variant g_dialogs: dialogsLoader.item
 
     Binding {
         target: VLCStyle.self
@@ -163,10 +164,19 @@ Rectangle {
         }
     }
 
-    DG.Dialogs {
-        id: g_dialogs
+    Loader {
+        id: dialogsLoader
+
         anchors.fill: parent
-        bgContent: root
+        asynchronous: true
+        source: "qrc:///dialogs/Dialogs.qml"
+
+        onLoaded:  {
+            item.bgContent = root
+        }
+    }
+    Connections {
+        target: dialogsLoader.item
         onRestoreFocus: {
             stackView.focus = true
         }
