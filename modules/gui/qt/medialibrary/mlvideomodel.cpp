@@ -100,7 +100,7 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
         { VIDEO_TITLE, "title" },
         { VIDEO_THUMBNAIL, "thumbnail" },
         { VIDEO_DURATION, "duration" },
-        { VIDEO_DURATION_SHORT, "durationShort" },
+        { VIDEO_DURATION_SHORT, "duration_short" },
         { VIDEO_PROGRESS, "progress" },
         { VIDEO_PLAYCOUNT, "playcount" },
         { VIDEO_RESOLUTION, "resolution_name" },

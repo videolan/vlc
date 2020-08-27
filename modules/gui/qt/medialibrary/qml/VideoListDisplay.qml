@@ -71,7 +71,7 @@ Widgets.KeyNavigableTableView {
     sortModel: [
         { type: "image", criteria: "thumbnail", width: VLCStyle.colWidth(1), showSection: "", colDelegate: thumbnailColumn, headerDelegate: thumbnailHeader },
         { isPrimary: true, criteria: "title",   width: VLCStyle.colWidth(Math.max(listView_id._nbCols - 2, 1)), text: i18n.qtr("Title"),    showSection: "title" },
-        { criteria: "durationShort",            width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate, showContextButton: true },
+        { criteria: "duration_short",            width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate, showContextButton: true },
     ]
 
     section.property: "title_first_symbol"

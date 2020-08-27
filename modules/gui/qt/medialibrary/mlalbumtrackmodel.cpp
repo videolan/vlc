@@ -103,7 +103,7 @@ QHash<int, QByteArray> MLAlbumTrackModel::roleNames() const
         { TRACK_NUMBER, "track_number" },
         { TRACK_DISC_NUMBER, "disc_number" },
         { TRACK_DURATION, "duration" },
-        { TRACK_DURATION_SHORT, "durationShort" },
+        { TRACK_DURATION_SHORT, "duration_short" },
         { TRACK_ALBUM, "album_title"},
         { TRACK_ARTIST, "main_artist"},
         { TRACK_TITLE_FIRST_SYMBOL, "title_first_symbol"},

@@ -203,7 +203,7 @@ Widgets.NavigableFocusScope {
 
                 sortModel: [
                     { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(Math.max(expand_track_id._nbCols - 1, 1)), visible: true, text: i18n.qtr("Title"), showSection: "", colDelegate: titleDelegate, headerDelegate: titleHeaderDelegate },
-                    { criteria: "durationShort",          width: VLCStyle.colWidth(1), visible: true, showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
+                    { criteria: "duration_short",          width: VLCStyle.colWidth(1), visible: true, showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
                 ]
 
                 navigationParent: root
