@@ -24,7 +24,8 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumModel::M_names_to_criteria =
     {"release_year", VLC_ML_SORTING_RELEASEDATE},
     {"main_artist", VLC_ML_SORTING_ARTIST},
     //{"nb_tracks"},
-    {"duration", VLC_ML_SORTING_DURATION}
+    {"duration", VLC_ML_SORTING_DURATION},
+    {"duration_short", VLC_ML_SORTING_DURATION}
 };
 
 MLAlbumModel::MLAlbumModel(QObject *parent)
