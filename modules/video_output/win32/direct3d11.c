@@ -141,8 +141,7 @@ static void Direct3D11DestroyResources(vout_display_t *);
 static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
-static void SetQuadVSProjection(vout_display_t *, d3d_quad_t *, const vlc_viewpoint_t *);
-static void UpdatePicQuadPosition(vout_display_t *);
+static void SetQuadVSProjection(vout_display_sys_t *);
 
 static int Control(vout_display_t *, int, va_list);
 
@@ -269,9 +268,14 @@ static void UpdateSize(vout_display_t *vd)
 
     QueryDisplayFormat(vd, &vd->fmt);
 
-    d3d11_device_lock( sys->d3d_dev );
+    RECT rect_dst = {
+        .left   = sys->area.place.x,
+        .right  = sys->area.place.x + sys->area.place.width,
+        .top    = sys->area.place.y,
+        .bottom = sys->area.place.y + sys->area.place.height
+    };
 
-    UpdatePicQuadPosition(vd);
+    D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
 
     RECT source_rect = {
         .left   = vd->source.i_x_offset,
@@ -279,10 +283,20 @@ static void UpdateSize(vout_display_t *vd)
         .top    = vd->source.i_y_offset,
         .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
     };
+    d3d11_device_lock( sys->d3d_dev );
+
     D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
                              vd->source.orientation);
 
+    SetQuadVSProjection(sys);
+
     d3d11_device_unlock( sys->d3d_dev );
+
+#ifndef NDEBUG
+    msg_Dbg( vd, "picQuad position (%.02f,%.02f) %.02fx%.02f",
+             sys->picQuad.cropViewport[0].TopLeftX, sys->picQuad.cropViewport[0].TopLeftY,
+             sys->picQuad.cropViewport[0].Width, sys->picQuad.cropViewport[0].Height );
+#endif
 }
 
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
@@ -456,14 +470,13 @@ static float UpdateZ(float f_fovx, float f_fovy)
     return f_z;
 }
 
-static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_viewpoint_t *p_vp)
+static void SetQuadVSProjection(vout_display_sys_t *sys)
 {
-    vout_display_sys_t *sys = vd->sys;
-    if (!quad->pVertexShaderConstants)
+    if (!sys->picQuad.pVertexShaderConstants)
         return;
 
     // Convert degree into radian
-    float f_fovx = p_vp->fov * (float)M_PI / 180.f;
+    float f_fovx = sys->area.vdcfg.viewpoint.fov * (float)M_PI / 180.f;
     if ( f_fovx > FIELD_OF_VIEW_DEGREES_MAX * M_PI / 180 + 0.001f ||
          f_fovx < -0.001f )
         return;
@@ -474,17 +487,17 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 
     HRESULT hr;
     D3D11_MAPPED_SUBRESOURCE mapped;
-    hr = ID3D11DeviceContext_Map(sys->d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    hr = ID3D11DeviceContext_Map(sys->d3d_dev->d3dcontext, (ID3D11Resource *)sys->picQuad.pVertexShaderConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
     if (SUCCEEDED(hr)) {
         VS_PROJECTION_CONST *dst_data = mapped.pData;
         getZoomMatrix(SPHERE_RADIUS * f_z, dst_data->Zoom);
         getProjectionMatrix(f_sar, f_fovy, dst_data->Projection);
 
         vlc_viewpoint_t vp;
-        vlc_viewpoint_reverse(&vp, p_vp);
+        vlc_viewpoint_reverse(&vp, &sys->area.vdcfg.viewpoint);
         vlc_viewpoint_to_4x4(&vp, dst_data->View);
     }
-    ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0);
+    ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, (ID3D11Resource *)sys->picQuad.pVertexShaderConstants, 0);
 }
 
 static int Control(vout_display_t *vd, int query, va_list args)
@@ -494,10 +507,13 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
     {
-        const vlc_viewpoint_t *viewpoint = va_arg(args, const vlc_viewpoint_t*);
         if ( sys->picQuad.pVertexShaderConstants )
         {
-            SetQuadVSProjection( vd, &sys->picQuad, viewpoint );
+            const vlc_viewpoint_t *viewpoint = va_arg(args, const vlc_viewpoint_t*);
+            sys->area.vdcfg.viewpoint = *viewpoint;
+            d3d11_device_lock( sys->d3d_dev );
+            SetQuadVSProjection( sys );
+            d3d11_device_unlock( sys->d3d_dev );
             res = VLC_SUCCESS;
         }
     }
@@ -974,28 +990,6 @@ static void Direct3D11Close(vout_display_t *vd)
     msg_Dbg(vd, "Direct3D11 display adapter closed");
 }
 
-static void UpdatePicQuadPosition(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    RECT rect_dst = {
-        .left   = sys->area.place.x,
-        .right  = sys->area.place.x + sys->area.place.width,
-        .top    = sys->area.place.y,
-        .bottom = sys->area.place.y + sys->area.place.height
-    };
-
-    D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
-
-    SetQuadVSProjection(vd, &sys->picQuad, &sys->area.vdcfg.viewpoint);
-
-#ifndef NDEBUG
-    msg_Dbg( vd, "picQuad position (%.02f,%.02f) %.02fx%.02f",
-             sys->picQuad.cropViewport[0].TopLeftX, sys->picQuad.cropViewport[0].TopLeftY,
-             sys->picQuad.cropViewport[0].Width, sys->picQuad.cropViewport[0].Height );
-#endif
-}
-
 static bool CanUseTextureArray(vout_display_t *vd)
 {
 #ifndef HAVE_ID3D11VIDEODECODER
@@ -1075,22 +1069,27 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
        return VLC_EGENERIC;
     }
 
+    if (D3D11_SetupQuad( vd, sys->d3d_dev, &vd->source, &sys->picQuad, &sys->display) != VLC_SUCCESS)
+    {
+        msg_Err(vd, "Could not Create the main quad picture.");
+        return VLC_EGENERIC;
+    }
+
     RECT source_rect = {
         .left   = vd->source.i_x_offset,
         .right  = vd->source.i_x_offset + vd->source.i_visible_width,
         .top    = vd->source.i_y_offset,
         .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
     };
-    if (D3D11_SetupQuad( vd, sys->d3d_dev, &vd->source, &sys->picQuad, &sys->display,
-                         &source_rect,
-                         vd->source.orientation ) != VLC_SUCCESS) {
-        msg_Err(vd, "Could not Create the main quad picture.");
+    if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect, vd->source.orientation))
+    {
+        msg_Err(vd, "Could not set quad picture position.");
         return VLC_EGENERIC;
     }
 
     if ( vd->source.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
          vd->source.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
-        SetQuadVSProjection( vd, &sys->picQuad, &sys->area.vdcfg.viewpoint );
+        SetQuadVSProjection( sys );
 
     if (is_d3d11_opaque(fmt->i_chroma)) {
         ID3D10Multithread *pMultithread;
@@ -1202,7 +1201,22 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
       return VLC_EGENERIC;
     }
 
-    UpdatePicQuadPosition(vd);
+    RECT rect_dst = {
+        .left   = sys->area.place.x,
+        .right  = sys->area.place.x + sys->area.place.width,
+        .top    = sys->area.place.y,
+        .bottom = sys->area.place.y + sys->area.place.height
+    };
+
+    D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
+
+#ifndef NDEBUG
+    msg_Dbg( vd, "picQuad position (%.02f,%.02f) %.02fx%.02f",
+             sys->picQuad.cropViewport[0].TopLeftX, sys->picQuad.cropViewport[0].TopLeftY,
+             sys->picQuad.cropViewport[0].Width, sys->picQuad.cropViewport[0].Height );
+#endif
+
+    SetQuadVSProjection(sys);
 
     msg_Dbg(vd, "Direct3D11 resources created");
     return VLC_SUCCESS;
@@ -1286,18 +1300,17 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             }
         }
 
-        RECT output;
-        output.left   = r->fmt.i_x_offset;
-        output.right  = r->fmt.i_x_offset + r->fmt.i_visible_width;
-        output.top    = r->fmt.i_y_offset;
-        output.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
-
         picture_t *quad_picture = (*region)[i];
-        if (quad_picture == NULL) {
+        d3d_quad_t *quad;
+        if (quad_picture != NULL)
+            quad = quad_picture->p_sys;
+        else
+        {
             d3d_quad_t *d3dquad = calloc(1, sizeof(*d3dquad));
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
+            quad = d3dquad;
             if (AllocateTextures(vd, sys->d3d_dev, sys->regionQuad.textureFormat, &r->p_picture->format, d3dquad->picSys.texture, NULL)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
@@ -1329,8 +1342,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
 
-            err = D3D11_SetupQuad( vd, sys->d3d_dev, &r->fmt, d3dquad, &sys->display, &output,
-                                   ORIENT_NORMAL );
+            err = D3D11_SetupQuad( vd, sys->d3d_dev, &r->fmt, d3dquad, &sys->display );
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to setup %dx%d quad for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
@@ -1358,8 +1370,6 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                     ID3D11PixelShader_AddRef(d3dquad->d3dpixelShader[j]);
                 }
             }
-        } else {
-            D3D11_UpdateQuadPosition(vd, sys->d3d_dev, (d3d_quad_t *) quad_picture->p_sys, &output, ORIENT_NORMAL);
         }
 
         hr = ID3D11DeviceContext_Map(sys->d3d_dev->d3dcontext, ((d3d_quad_t *) quad_picture->p_sys)->picSys.resource[KNOWN_DXGI_INDEX], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -1385,7 +1395,13 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             continue;
         }
 
-        d3d_quad_t *quad = (d3d_quad_t *) quad_picture->p_sys;
+        RECT output;
+        output.left   = r->fmt.i_x_offset;
+        output.right  = r->fmt.i_x_offset + r->fmt.i_visible_width;
+        output.top    = r->fmt.i_y_offset;
+        output.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
+
+        D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad, &output, ORIENT_NORMAL);
 
         RECT spuViewport;
         spuViewport.left   = (FLOAT) r->i_x * sys->area.place.width  / subpicture->i_original_picture_width;

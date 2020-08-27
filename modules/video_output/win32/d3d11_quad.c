@@ -895,8 +895,7 @@ static void GetPrimariesTransform(FLOAT Primaries[4*4], video_color_primaries_t 
 
 #undef D3D11_SetupQuad
 int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format_t *fmt, d3d_quad_t *quad,
-                    const display_info_t *displayFormat, const RECT *output,
-                    video_orientation_t orientation)
+                    const display_info_t *displayFormat)
 {
     const bool RGB_src_shader = IsRGBShader(quad->textureFormat);
 
@@ -1037,10 +1036,6 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     }
 
     ShaderUpdateConstants(o, d3d_dev, quad, PS_CONST_COLORSPACE, &colorspace);
-
-
-    if (!D3D11_UpdateQuadPosition(o, d3d_dev, quad, output, orientation))
-        return VLC_EGENERIC;
 
     for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
     {
