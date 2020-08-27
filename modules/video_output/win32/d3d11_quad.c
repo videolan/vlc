@@ -265,89 +265,14 @@ static void orientationVertexOrder(video_orientation_t orientation, int vertex_o
     }
 }
 
-static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
-                          const d3d_quad_t *quad,
+static void SetupQuadFlat(d3d_vertex_t *dst_data, const POINT *output,
                           WORD *triangle_pos, video_orientation_t orientation)
 {
-    unsigned int src_width = quad->i_width;
-    unsigned int src_height = quad->i_height;
+    unsigned int src_width = output->x;
+    unsigned int src_height = output->y;
     float MidX,MidY;
 
-    float top, bottom, left, right;
-    /* find the middle of the visible part of the texture, it will be a 0,0
-     * the rest of the visible area must correspond to -1,1 */
-    switch (orientation)
-    {
-    case ORIENT_ROTATED_90: /* 90° anti clockwise */
-        /* right/top aligned */
-        MidY = (output->left + output->right) / 2.f;
-        MidX = (output->top + output->bottom) / 2.f;
-        top    =  MidY / (MidY - output->top);
-        bottom = -(src_height - MidX) / (MidX - output->top);
-        left   =  (MidX - src_height) / (MidX - output->left);
-        right  =                 MidX / (MidX - (src_width - output->right));
-        break;
-    case ORIENT_ROTATED_180: /* 180° */
-        /* right/top aligned */
-        MidY = (output->top + output->bottom) / 2.f;
-        MidX = (output->left + output->right) / 2.f;
-        top    =  (src_height - MidY) / (output->bottom - MidY);
-        bottom = -MidY / (MidY - output->top);
-        left   = -MidX / (MidX - output->left);
-        right  =  (src_width  - MidX) / (output->right - MidX);
-        break;
-    case ORIENT_ROTATED_270: /* 90° clockwise */
-        /* right/top aligned */
-        MidY = (output->left + output->right) / 2.f;
-        MidX = (output->top + output->bottom) / 2.f;
-        top    =  (src_width  - MidX) / (output->right - MidX);
-        bottom = -MidY / (MidY - output->top);
-        left   = -MidX / (MidX - output->left);
-        right  =  (src_height - MidY) / (output->bottom - MidY);
-        break;
-    case ORIENT_ANTI_TRANSPOSED:
-        MidY = (output->left + output->right) / 2.f;
-        MidX = (output->top + output->bottom) / 2.f;
-        top    =  (src_width  - MidX) / (output->right - MidX);
-        bottom = -MidY / (MidY - output->top);
-        left   = -(src_height - MidY) / (output->bottom - MidY);
-        right  =  MidX / (MidX - output->left);
-        break;
-    case ORIENT_TRANSPOSED:
-        MidY = (output->left + output->right) / 2.f;
-        MidX = (output->top + output->bottom) / 2.f;
-        top    =  (src_width  - MidX) / (output->right - MidX);
-        bottom = -MidY / (MidY - output->top);
-        left   = -MidX / (MidX - output->left);
-        right  =  (src_height - MidY) / (output->bottom - MidY);
-        break;
-    case ORIENT_VFLIPPED:
-        MidY = (output->top + output->bottom) / 2.f;
-        MidX = (output->left + output->right) / 2.f;
-        top    =  (src_height - MidY) / (output->bottom - MidY);
-        bottom = -MidY / (MidY - output->top);
-        left   = -MidX / (MidX - output->left);
-        right  =  (src_width  - MidX) / (output->right - MidX);
-        break;
-    case ORIENT_HFLIPPED:
-        MidY = (output->top + output->bottom) / 2.f;
-        MidX = (output->left + output->right) / 2.f;
-        top    =  MidY / (MidY - output->top);
-        bottom = -(src_height - MidY) / (output->bottom - MidY);
-        left   = -(src_width  - MidX) / (output->right - MidX);
-        right  =  MidX / (MidX - output->left);
-        break;
-    case ORIENT_NORMAL:
-    default:
-        /* left/top aligned */
-        MidY = (output->top + output->bottom) / 2.f;
-        MidX = (output->left + output->right) / 2.f;
-        top    =  MidY / (MidY - output->top);
-        bottom = -(src_height - MidY) / (output->bottom - MidY);
-        left   = -MidX / (MidX - output->left);
-        right  =  (src_width  - MidX) / (output->right - MidX);
-        break;
-    }
+    float top = 1, bottom = -1, left = -1, right = 1;
 
     const float vertices_coords[4][2] = {
         { left,  bottom },
@@ -409,11 +334,8 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
     }
 }
 
-static void SetupQuadSphere(d3d_vertex_t *dst_data, const RECT *output,
-                            const d3d_quad_t *quad, WORD *triangle_pos)
+static void SetupQuadSphere(d3d_vertex_t *dst_data, WORD *triangle_pos)
 {
-    const float scaleX = (float)(RECTWidth(*output))  / quad->i_width;
-    const float scaleY = (float)(RECTHeight(*output)) / quad->i_height;
     for (unsigned lat = 0; lat <= nbLatBands; lat++) {
         float theta = lat * (float) M_PI / nbLatBands;
         float sinTheta, cosTheta;
@@ -435,8 +357,8 @@ static void SetupQuadSphere(d3d_vertex_t *dst_data, const RECT *output,
             dst_data[off1].position.y = SPHERE_RADIUS * y;
             dst_data[off1].position.z = SPHERE_RADIUS * z;
 
-            dst_data[off1].texture.x = scaleX * lon / (float) nbLonBands; // 0(left) to 1(right)
-            dst_data[off1].texture.y = scaleY * lat / (float) nbLatBands; // 0(top) to 1 (bottom)
+            dst_data[off1].texture.x = lon / (float) nbLonBands;
+            dst_data[off1].texture.y = lat / (float) nbLatBands;
         }
     }
 
@@ -459,8 +381,7 @@ static void SetupQuadSphere(d3d_vertex_t *dst_data, const RECT *output,
 }
 
 
-static void SetupQuadCube(d3d_vertex_t *dst_data, const RECT *output,
-                          const d3d_quad_t *quad, WORD *triangle_pos)
+static void SetupQuadCube(d3d_vertex_t *dst_data, WORD *triangle_pos)
 {
 #define CUBEFACE(swap, value) \
     swap(value, -1.f,  1.f), \
@@ -486,11 +407,8 @@ static void SetupQuadCube(d3d_vertex_t *dst_data, const RECT *output,
 #undef Z_FACE
 #undef CUBEFACE
 
-    const float scaleX = (float)(output->right - output->left) / quad->i_width;
-    const float scaleY = (float)(output->bottom - output->top) / quad->i_height;
-
-    const float col[] = {0.f, scaleX / 3, scaleX * 2 / 3, scaleX};
-    const float row[] = {0.f, scaleY / 2, scaleY};
+    const float col[] = {0.f, 1.f / 3, 2.f / 3, 1.f};
+    const float row[] = {0.f, 1.f / 2, 1.f};
 
     const float tex[] = {
         col[1], row[1], // front
@@ -550,7 +468,7 @@ static void SetupQuadCube(d3d_vertex_t *dst_data, const RECT *output,
 
 #undef D3D11_UpdateQuadPosition
 bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad,
-                                const RECT *output, video_orientation_t orientation )
+                                const POINT *output, video_orientation_t orientation )
 {
     bool result = true;
     HRESULT hr;
@@ -579,13 +497,13 @@ bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_qua
     switch (quad->projection)
     {
     case PROJECTION_MODE_RECTANGULAR:
-        SetupQuadFlat(dst_data, output, quad, mappedResource.pData, orientation);
+        SetupQuadFlat(dst_data, output, mappedResource.pData, orientation);
         break;
     case PROJECTION_MODE_EQUIRECTANGULAR:
-        SetupQuadSphere(dst_data, output, quad, mappedResource.pData);
+        SetupQuadSphere(dst_data, mappedResource.pData);
         break;
     case PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD:
-        SetupQuadCube(dst_data, output, quad, mappedResource.pData);
+        SetupQuadCube(dst_data, mappedResource.pData);
         break;
     default:
         msg_Warn(o, "Projection mode %d not handled", quad->projection);
@@ -982,6 +900,17 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     };
 
     PS_COLOR_TRANSFORM colorspace;
+    memcpy(colorspace.SourceCrop, IDENTITY_4X4, sizeof(colorspace.SourceCrop));
+    float scale_w = (float)fmt->i_visible_width  / fmt->i_width;
+    float scale_h = (float)fmt->i_visible_height / fmt->i_height;
+    float left   = scale_w * fmt->i_x_offset;
+    float top    = scale_h * fmt->i_y_offset;
+
+    colorspace.SourceCrop[0*4 + 0] = scale_h;
+    colorspace.SourceCrop[1*4 + 1] = scale_w;
+
+    colorspace.SourceCrop[0*4 + 3] = left / fmt->i_visible_width;
+    colorspace.SourceCrop[1*4 + 3] = top  / fmt->i_visible_height;
 
     memcpy(colorspace.WhitePoint, IDENTITY_4X4, sizeof(colorspace.WhitePoint));
 

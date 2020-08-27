@@ -277,11 +277,9 @@ static void UpdateSize(vout_display_t *vd)
 
     D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
 
-    RECT source_rect = {
-        .left   = vd->fmt.i_x_offset,
-        .right  = vd->fmt.i_x_offset + vd->fmt.i_visible_width,
-        .top    = vd->fmt.i_y_offset,
-        .bottom = vd->fmt.i_y_offset + vd->fmt.i_visible_height,
+    POINT source_rect = {
+        .x = vd->source.i_visible_width,
+        .y = vd->source.i_visible_height,
     };
     d3d11_device_lock( sys->d3d_dev );
 
@@ -623,17 +621,9 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                  * display, do it preferrably when creating the texture */
                 assert(p_sys->renderSrc[0]!=NULL);
             }
-            if ( sys->picQuad.i_height != texDesc.Height ||
-                 sys->picQuad.i_width != texDesc.Width )
-            {
-                /* the decoder produced different sizes than the vout, we need to
-                 * adjust the vertex */
-                sys->picQuad.i_height = texDesc.Height;
-                sys->picQuad.i_width = texDesc.Width;
-
-                CommonPlacePicture(vd, &sys->area, &sys->sys);
-                UpdateSize(vd);
-            }
+            // we should receive a source update if they don't match
+            assert( vd->source.i_height == texDesc.Height );
+            assert( vd->source.i_width == texDesc.Width );
         }
     }
 
@@ -816,16 +806,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
                 LocalSwapchainCleanupDevice( sys->outside_opaque );
             return err;
         }
-    }
-
-    /* adjust the decoder sizes to have proper padding */
-    sys->picQuad.i_width  = fmt.i_width;
-    sys->picQuad.i_height = fmt.i_height;
-    if ( sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
-         sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
-    {
-        sys->picQuad.i_width  = (sys->picQuad.i_width  + 0x01) & ~0x01;
-        sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
     CommonPlacePicture(vd, &sys->area, &sys->sys);
@@ -1075,11 +1055,9 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         return VLC_EGENERIC;
     }
 
-    RECT source_rect = {
-        .left   = vd->fmt.i_x_offset,
-        .right  = vd->fmt.i_x_offset + vd->fmt.i_visible_width,
-        .top    = vd->fmt.i_y_offset,
-        .bottom = vd->fmt.i_y_offset + vd->fmt.i_visible_height,
+    POINT source_rect = {
+        .x = vd->source.i_visible_width,
+        .y = vd->source.i_visible_height,
     };
     if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect, vd->source.orientation))
     {
@@ -1106,8 +1084,15 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         /* we need a staging texture */
         ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
         video_format_t texture_fmt = vd->source;
-        texture_fmt.i_width  = sys->picQuad.i_width;
-        texture_fmt.i_height = sys->picQuad.i_height;
+
+        /* adjust the decoder sizes to have proper padding */
+        if ( sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
+             sys->picQuad.textureFormat->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
+        {
+            texture_fmt.i_width  = (texture_fmt.i_width  + 0x01) & ~0x01;
+            texture_fmt.i_height = (texture_fmt.i_height + 0x01) & ~0x01;
+        }
+
         if (!is_d3d11_opaque(fmt->i_chroma))
             texture_fmt.i_chroma = sys->picQuad.textureFormat->fourcc;
 
@@ -1329,8 +1314,6 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 free(d3dquad);
                 continue;
             }
-            d3dquad->i_width    = r->fmt.i_width;
-            d3dquad->i_height   = r->fmt.i_height;
 
             d3dquad->textureFormat = sys->regionQuad.textureFormat;
             err = D3D11_AllocateQuad(vd, sys->d3d_dev, PROJECTION_MODE_RECTANGULAR, d3dquad);
@@ -1395,11 +1378,10 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             continue;
         }
 
-        RECT output;
-        output.left   = r->fmt.i_x_offset;
-        output.right  = r->fmt.i_x_offset + r->fmt.i_visible_width;
-        output.top    = r->fmt.i_y_offset;
-        output.bottom = r->fmt.i_y_offset + r->fmt.i_visible_height;
+        POINT output = {
+            .x = r->fmt.i_visible_width,
+            .y = r->fmt.i_visible_height,
+        };
 
         D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad, &output, ORIENT_NORMAL);
 
