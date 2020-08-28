@@ -19,6 +19,7 @@ import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 import QtGraphicalEffects 1.0
+import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
@@ -89,14 +90,14 @@ Rectangle {
                     id: artwork
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectFit
-                    source: (model.artwork && model.artwork.toString()) ? model.artwork : VLCStyle.noArtCover
+                    source: (model && model.artwork && model.artwork.toString()) ? model.artwork : VLCStyle.noArtCover
                     visible: !statusIcon.visible
                 }
 
                 Widgets.IconLabel {
                     id: statusIcon
                     anchors.fill: parent
-                    visible: (model.isCurrent && text !== "")
+                    visible: (!!model && model.isCurrent && text !== "")
                     width: height
                     height: VLCStyle.icon_normal
                     horizontalAlignment: Text.AlignHCenter
@@ -113,8 +114,8 @@ Rectangle {
                     id: textInfo
                     Layout.leftMargin: VLCStyle.margin_small
 
-                    font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
-                    text: model.title
+                    font.weight: model && model.isCurrent ? Font.DemiBold : Font.Normal
+                    text: model ? model.title : ""
                     color: _colors.text
                 }
 
@@ -122,8 +123,8 @@ Rectangle {
                     id: textArtist
                     Layout.leftMargin: VLCStyle.margin_small
 
-                    font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
-                    text: (model.artist ? model.artist : i18n.qtr("Unknown Artist"))
+                    font.weight: (model && model.isCurrent) ? Font.DemiBold : Font.Normal
+                    text: ((model && model.artist) ? model.artist : i18n.qtr("Unknown Artist"))
                     color: _colors.text
                 }
             }
@@ -132,7 +133,7 @@ Rectangle {
                 id: textDuration
                 Layout.rightMargin: VLCStyle.margin_xsmall
 
-                text: model.duration
+                text: model ? model.duration : ""
                 color: _colors.text
             }
         }
