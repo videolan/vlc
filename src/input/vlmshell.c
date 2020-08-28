@@ -322,8 +322,7 @@ static int ExecuteHelp( vlm_message_t **pp_status )
     MessageAddChild( "output (output_name)" );
     MessageAddChild( "option (option_name)[=value]" );
     MessageAddChild( "enabled|disabled" );
-    MessageAddChild( "loop|unloop (broadcast only)" );
-    MessageAddChild( "mux (mux_name)" );
+    MessageAddChild( "loop|unloop" );
 
     message_child = MessageAdd( "Schedule Proprieties Syntax:" );
     MessageAddChild( "enabled|disabled" );
