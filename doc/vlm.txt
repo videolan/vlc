@@ -20,11 +20,7 @@ II - VLM Elements
  1) Medias
     A media is composed with a list of inputs (the videos and audios you
     want to stream), an output (where you want to stream them), and some
-    options.
-    There are two types of medias: vod and broadcast.
-    A vod media is commonly used for Video on Demand. It can be launched
-    only if a vod client asks for it.
-    A broadcast media is very close to a TV program, or channel: it is
+    options. It is very close to a TV program, or channel: it is
     launched, stopped, paused by the administrator (or a schedule), may
     be repeated several times etc.
 
@@ -40,9 +36,9 @@ Note: an element is a media or a schedule.
     help
         Displays an exhaustive commmand lines list.
 
-    new (name) vod|broadcast|schedule [properties]
-        Creates a new element. You must specify if it as a vod media, a
-        broadcast media, or a schedule (there is no default type).
+    new (name) broadcast|schedule [properties]
+        Creates a new element. You must specify if a broadcast media, or
+        a schedule (there is no default type).
         "media" and "schedule" are reserved names, and element names
         must be unique.
         Properties are optional: you can use the "setup" command to set
@@ -102,18 +98,12 @@ Note: an element is a media or a schedule.
         enabled|disabled
             Enable or Disable the media.
             If a media is disabled, it can not be streamed, paused,
-            launched by a schedule, or played as a VoD.
+            launched by a schedule.
         loop|unloop
             Used for broadcast only.
             If a media with "loop" option receives the "play" command
             and finally finishes to play the last input of the list, it
             will automatically restart to play the input list.
-        mux (mux_name)
-            Used for vod only.
-            Only needs to be specified if you want the elementary streams
-            to be sent encapsulated instead of raw. The (mux_name) should be
-            a fourcc describing the encapsulation type (eg. mp2t for MPEG TS,
-            or mp2t for MPEG PS).
 
     Schedule Properties Syntax:
         enabled|disabled
