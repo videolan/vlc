@@ -27,6 +27,7 @@
 #include "input_manager.hpp"                      /* THEMIM */
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QRect>
 #include <QStyleOptionViewItem>
 #include <QFontMetrics>

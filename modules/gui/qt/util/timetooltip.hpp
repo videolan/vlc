@@ -25,6 +25,7 @@
 #include "qt.hpp"
 
 #include <QWidget>
+#include <QPainterPath>
 
 class TimeTooltip : public QWidget
 {

@@ -23,7 +23,6 @@
 
 #include <QApplication>
 #include <QPainter>
-#include <QPainterPath>
 #include <QBitmap>
 #include <QFontMetrics>
 #include <QDesktopWidget>
