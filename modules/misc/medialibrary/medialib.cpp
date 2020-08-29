@@ -381,8 +381,8 @@ MediaLibrary::MediaLibrary( vlc_medialibrary_module_t* ml )
     m_ml.reset( NewMediaLibrary() );
 
     m_logger.reset( new Logger( VLC_OBJECT( m_vlc_ml ) ) );
-    m_ml->setVerbosity( var_InheritInteger( VLC_OBJECT( m_vlc_ml ), "verbose" ) >= 4 ?
-                          medialibrary::LogLevel::Debug : medialibrary::LogLevel::Info );
+    m_ml->setVerbosity( var_InheritBool( VLC_OBJECT( m_vlc_ml ), "ml-verbose" ) ?
+                          medialibrary::LogLevel::Debug : medialibrary::LogLevel::Warning );
     m_ml->setLogger( m_logger.get() );
 }
 
@@ -590,7 +590,7 @@ int MediaLibrary::Control( int query, va_list args )
             *va_arg( args, vlc_ml_media_t**) = CreateAndConvert<vlc_ml_media_t>( media.get() );
             return VLC_SUCCESS;
         }
-        case VLC_ML_MEDIA_INCREASE_PLAY_COUNT:
+        case VLC_ML_MEDIA_UPDATE_PROGRESS:
         case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE:
         case VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_STATE:
         case VLC_ML_MEDIA_GET_ALL_MEDIA_PLAYBACK_STATES:
@@ -961,8 +961,6 @@ medialibrary::IMedia::MetadataType MediaLibrary::metadataType( int meta )
     {
         case VLC_ML_PLAYBACK_STATE_RATING:
             return medialibrary::IMedia::MetadataType::Rating;
-        case VLC_ML_PLAYBACK_STATE_PROGRESS:
-            return medialibrary::IMedia::MetadataType::Progress;
         case VLC_ML_PLAYBACK_STATE_SPEED:
             return medialibrary::IMedia::MetadataType::Speed;
         case VLC_ML_PLAYBACK_STATE_TITLE:
@@ -1053,7 +1051,6 @@ int MediaLibrary::getMeta( const medialibrary::IMedia& media,
                            vlc_ml_playback_states_all* res )
 {
     auto metas = media.metadata();
-    res->progress = -1.f;
     res->rate = .0f;
     res->zoom = -1.f;
     res->current_title = -1;
@@ -1069,9 +1066,6 @@ int MediaLibrary::getMeta( const medialibrary::IMedia& media,
 
         switch ( meta.first )
         {
-            case medialibrary::IMedia::MetadataType::Progress:
-                res->progress = atof( meta.second.c_str() );
-                break;
             case medialibrary::IMedia::MetadataType::Speed:
                 res->rate = atof( meta.second.c_str() );
                 break;
@@ -1127,8 +1121,6 @@ int MediaLibrary::setMeta( medialibrary::IMedia& media,
 {
     using MT = medialibrary::IMedia::MetadataType;
     std::unordered_map<MT, std::string> metas;
-    if ( values->progress >= .0f )
-        metas[MT::Progress] = std::to_string( values->progress );
     if ( values->rate != .0f )
         metas[MT::Speed] = std::to_string( values->rate );
     if ( values->zoom != .0f )
@@ -1163,8 +1155,8 @@ int MediaLibrary::controlMedia( int query, va_list args )
         return VLC_EGENERIC;
     switch( query )
     {
-        case VLC_ML_MEDIA_INCREASE_PLAY_COUNT:
-            if ( m->increasePlayCount() == false )
+        case VLC_ML_MEDIA_UPDATE_PROGRESS:
+            if ( m->setProgress( va_arg( args, double ) ) == false )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_STATE:
@@ -1721,6 +1713,8 @@ static void Close( vlc_object_t* obj )
 #define ML_FOLDER_LONGTEXT _( "Semicolon separated list of folders to discover " \
                               "media from" )
 
+#define ML_VERBOSE _( "Extra verbose media library logs" )
+
 vlc_module_begin()
     set_shortname(N_("media library"))
     set_description(N_( "Organize your media" ))
@@ -1729,4 +1723,5 @@ vlc_module_begin()
     set_capability("medialibrary", 100)
     set_callbacks(Open, Close)
     add_string( "ml-folders", nullptr, ML_FOLDER_TEXT, ML_FOLDER_LONGTEXT, false )
+    add_bool( "ml-verbose", false, ML_VERBOSE, ML_VERBOSE, false )
 vlc_module_end()

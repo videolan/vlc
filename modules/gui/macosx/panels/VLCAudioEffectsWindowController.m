@@ -686,6 +686,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     audio_output_t *p_aout = [_playerController mainAudioOutput];
     if (!p_aout)
         return;
+    bool b_vlcfreqs = var_InheritBool(p_aout, "equalizer-vlcfreqs");
     bool b_2p = var_CreateGetBool(p_aout, "equalizer-2pass");
     bool bEnabled = GetEqualizerStatus(p_intf, _playerController, (char *)"equalizer");
 
@@ -702,6 +703,34 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
     [_equalizerView enableSubviews: bEnabled];
     [_equalizerEnableCheckbox setState: bEnabled];
     [_equalizerTwoPassCheckbox setState: b_2p];
+
+    /* Set the frequency labels */
+    if (b_vlcfreqs)
+    {
+        [_equalizerBand1TextField setStringValue:@"60"];
+        [_equalizerBand2TextField setStringValue:@"170"];
+        [_equalizerBand3TextField setStringValue:@"310"];
+        [_equalizerBand4TextField setStringValue:@"600"];
+        [_equalizerBand5TextField setStringValue:@"1K"];
+        [_equalizerBand6TextField setStringValue:@"3K"];
+        [_equalizerBand7TextField setStringValue:@"6K"];
+        [_equalizerBand8TextField setStringValue:@"12K"];
+        [_equalizerBand9TextField setStringValue:@"14K"];
+        [_equalizerBand10TextField setStringValue:@"16K"];
+    }
+    else
+    {
+        [_equalizerBand1TextField setStringValue:@"31"];
+        [_equalizerBand2TextField setStringValue:@"63"];
+        [_equalizerBand3TextField setStringValue:@"125"];
+        [_equalizerBand4TextField setStringValue:@"250"];
+        [_equalizerBand5TextField setStringValue:@"500"];
+        [_equalizerBand6TextField setStringValue:@"1K"];
+        [_equalizerBand7TextField setStringValue:@"2K"];
+        [_equalizerBand8TextField setStringValue:@"4K"];
+        [_equalizerBand9TextField setStringValue:@"8K"];
+        [_equalizerBand10TextField setStringValue:@"16K"];
+    }
 }
 
 - (id)sliderByIndex:(int)index

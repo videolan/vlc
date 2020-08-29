@@ -344,7 +344,7 @@ decoder_on_thumbnail_ready(vlc_input_decoder_t *decoder, picture_t *pic, void *u
 
 static void
 decoder_on_new_video_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsigned lost,
-                           unsigned displayed, void *userdata)
+                           unsigned displayed, unsigned late, void *userdata)
 {
     (void) decoder;
 
@@ -364,6 +364,8 @@ decoder_on_new_video_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsig
     atomic_fetch_add_explicit(&stats->lost_pictures, lost,
                               memory_order_relaxed);
     atomic_fetch_add_explicit(&stats->displayed_pictures, displayed,
+                              memory_order_relaxed);
+    atomic_fetch_add_explicit(&stats->late_pictures, late,
                               memory_order_relaxed);
 }
 
@@ -2780,9 +2782,10 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         bool pace = sout_instance_ControlsPace(input_priv(p_input)->p_sout);
 
         if( input_priv(p_input)->b_out_pace_control != pace )
+        {
             msg_Dbg( p_input, "switching to %ssync mode", pace ? "a" : "" );
-
-        input_priv(p_input)->b_out_pace_control = pace;
+            input_priv(p_input)->b_out_pace_control = pace;
+        }
     }
 #endif
 
@@ -2963,7 +2966,7 @@ static vlc_tick_t EsOutGetTracksDelay(es_out_t *out)
         tracks_delay = __MIN(tracks_delay, p_sys->i_audio_delay);
     if (has_spu)
         tracks_delay = __MIN(tracks_delay, p_sys->i_spu_delay);
-    return tracks_delay < 0 ? -tracks_delay : 0;
+    return -tracks_delay;
 }
 
 /**
@@ -3166,12 +3169,14 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
             return VLC_EGENERIC;
         }
 
+        input_thread_private_t *priv = input_priv(p_sys->p_input);
+
         /* TODO do not use vlc_tick_now() but proper stream acquisition date */
-        const bool b_low_delay = input_priv(p_sys->p_input)->b_low_delay;
+        const bool b_low_delay = priv->b_low_delay;
         bool b_extra_buffering_allowed = !b_low_delay && EsOutIsExtraBufferingAllowed( out );
         vlc_tick_t i_late = input_clock_Update(
                             p_pgrm->p_input_clock, VLC_OBJECT(p_sys->p_input),
-                            input_priv(p_sys->p_input)->b_can_pace_control || p_sys->b_buffering,
+                            priv->b_can_pace_control || p_sys->b_buffering,
                             b_extra_buffering_allowed,
                             i_pcr, vlc_tick_now() );
 
@@ -3187,8 +3192,8 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
         {
             /* Last pcr/clock update was late. We need to compensate by offsetting
                from the clock the rendering dates */
-            if( i_late > 0 && ( !input_priv(p_sys->p_input)->p_sout ||
-                            !input_priv(p_sys->p_input)->b_out_pace_control ) )
+            if( i_late > 0 && ( !priv->p_sout ||
+                            !priv->b_out_pace_control ) )
             {
                 /* input_clock_GetJitter returns compound delay:
                  * - initial pts delay (buffering/caching)
@@ -3209,15 +3214,13 @@ static int EsOutVaControlLocked( es_out_t *out, input_source_t *source,
                  *    and flush buffers (because all previous pts will now be late) */
 
                 /* Avoid dangerously high value */
-                const vlc_tick_t i_jitter_max =
-                        VLC_TICK_FROM_MS(var_InheritInteger( p_sys->p_input, "clock-jitter" ));
                 /* If the jitter increase is over our max or the total hits the maximum */
-                if( i_new_jitter > i_jitter_max ||
+                if( i_new_jitter > priv->i_jitter_max ||
                     i_clock_total_delay > INPUT_PTS_DELAY_MAX ||
                     /* jitter is always 0 due to median calculation first output
                        and low delay can't allow non reversible jitter increase
                        in branch below */
-                    (b_low_delay && i_late > i_jitter_max) )
+                    (b_low_delay && i_late > priv->i_jitter_max) )
                 {
                     msg_Err( p_sys->p_input,
                              "ES_OUT_SET_(GROUP_)PCR  is called %d ms late (jitter of %d ms ignored)",

@@ -91,7 +91,7 @@ private:
     std::shared_ptr<fs::IDevice>
     deviceByUuid(const std::string& uuid);
 
-    bool isStarted() const;
+    bool isStarted() const override;
 
     std::shared_ptr<fs::IDevice> deviceByMrl(const std::string& mrl);
 

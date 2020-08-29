@@ -192,7 +192,6 @@ static void InitLevel(filter_t *filter, struct filter_level *range, const char *
 
 static picture_t *AllocPicture( filter_t *p_filter )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     d3d11_video_context_t *vctx_sys = GetD3D11ContextPrivate( p_filter->vctx_out );
 
     const d3d_format_t *cfg = NULL;
@@ -358,6 +357,8 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     sys->d3d_dev = &dev_sys->d3d_dev;
     DXGI_FORMAT format = vtcx_sys->format;
 
+    d3d11_device_lock(sys->d3d_dev);
+
     if (D3D11_CreateProcessor(filter, sys->d3d_dev, D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE,
                               &filter->fmt_out.video, &filter->fmt_out.video, &sys->d3d_proc) != VLC_SUCCESS)
         goto error;
@@ -509,6 +510,7 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
     filter->pf_video_filter = Filter;
     filter->p_sys = sys;
     filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
+    d3d11_device_unlock(sys->d3d_dev);
 
     return VLC_SUCCESS;
 error:
@@ -525,6 +527,7 @@ error:
     if (sys->out[1].texture)
         ID3D11Texture2D_Release(sys->out[1].texture);
     D3D11_ReleaseProcessor(&sys->d3d_proc);
+    d3d11_device_unlock(sys->d3d_dev);
     free(sys);
 
     return VLC_EGENERIC;

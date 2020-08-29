@@ -53,7 +53,7 @@ Widgets.NavigableFocusScope {
     Widgets.IconToolButton {
         id: button
 
-        size: VLCStyle.icon_normal
+        size: VLCStyle.banner_icon_size
         iconText: VLCIcons.topbar_sort
         text: i18n.qtr("Sort")
 
@@ -130,7 +130,7 @@ Widgets.NavigableFocusScope {
                         visible: mouseArea.containsMouse
                     }
 
-                    Text {
+                    MenuCaption {
                         id: itemText
                         text: root.textRole ? (Array.isArray(root.model) ? modelData[root.textRole] : model[root.textRole]) : modelData
                         anchors.fill: parent
@@ -139,8 +139,6 @@ Widgets.NavigableFocusScope {
                         leftPadding: VLCStyle.margin_xsmall
                         rightPadding: VLCStyle.margin_xsmall
                         color: _colors.buttonText
-                        elide: Text.ElideRight
-                        verticalAlignment: Text.AlignVCenter
                     }
 
                     MouseArea {

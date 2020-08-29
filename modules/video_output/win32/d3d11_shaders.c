@@ -61,6 +61,7 @@ static const char* globPixelShaderDefault = "\
   };\n\
   cbuffer PS_COLOR_TRANSFORM : register(b1)\n\
   {\n\
+    float4x4 SourceCrop;\n\
     float4x4 WhitePoint;\n\
     float4x4 Colorspace;\n\
     float4x4 Primaries;\n\
@@ -117,7 +118,8 @@ static const char* globPixelShaderDefault = "\
       %s;\n\
   }\n\
   \n\
-  inline float4 sampleTexture(SamplerState samplerState, float3 coords) {\n\
+  inline float4 sampleTexture(SamplerState samplerState, float3 raw_coords) {\n\
+      float3 coords = mul(float4(raw_coords.xyz, 1), SourceCrop).xyz;\n\
       float4 sample;\n\
       %s /* sampling routine in sample */\n\
       return sample;\n\

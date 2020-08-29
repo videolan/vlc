@@ -1,0 +1,32 @@
+From 2612d34f216ec3e60b3f1b1165dc9935e4c2e2a5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Tue, 4 Aug 2020 13:45:54 +0300
+Subject: [PATCH 3/4] arm64: Add GSYM_PREFIX to function calls in assembly
+
+---
+ mpn/arm64/gcd_1.asm | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mpn/arm64/gcd_1.asm b/mpn/arm64/gcd_1.asm
+index bc03d80dd..9c267cb07 100644
+--- a/mpn/arm64/gcd_1.asm
++++ b/mpn/arm64/gcd_1.asm
+@@ -82,13 +82,13 @@ C Both U and V are single limbs, reduce with bmod if u0 >> v0.
+ 	b.hi	L(red1)
+ 
+ L(bmod):mov	x3, #0			C carry argument
+-	bl	mpn_modexact_1c_odd
++	bl	GSYM_PREFIX`'mpn_modexact_1c_odd
+ 	b	L(red0)
+ 
+ L(nby1):cmp	n, #BMOD_1_TO_MOD_1_THRESHOLD
+ 	b.lo	L(bmod)
+ 
+-	bl	mpn_mod_1
++	bl	GSYM_PREFIX`'mpn_mod_1
+ 
+ L(red0):mov	x3, x0
+ L(red1):cmp	x3, #0
+-- 
+2.24.3 (Apple Git-128)
+

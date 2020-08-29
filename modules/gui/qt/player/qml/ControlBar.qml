@@ -86,6 +86,8 @@ Widgets.NavigableFocusScope {
             Layout.fillWidth: true
             enabled: player.playingState == PlayerController.PLAYING_STATE_PLAYING || player.playingState == PlayerController.PLAYING_STATE_PAUSED
             Keys.onDownPressed: buttons.focus = true
+
+            parentWindow: mainInterfaceRect
         }
 
 
@@ -127,6 +129,8 @@ Widgets.NavigableFocusScope {
 
     ControlButtons{
         id:controlmodelbuttons
+
+        parentWindow: mainInterfaceRect
     }
 
 }

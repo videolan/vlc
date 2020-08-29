@@ -224,16 +224,15 @@ audio_output_t *aout_New (vlc_object_t *parent)
     vlc_viewpoint_init (&owner->vp.value);
     atomic_init (&owner->vp.update, false);
     vlc_atomic_rc_init(&owner->rc);
+    vlc_audio_meter_Init(&owner->meter, aout);
 
     /* Audio output module callbacks */
     var_Create (aout, "volume", VLC_VAR_FLOAT);
     var_AddCallback (aout, "volume", var_Copy, parent);
-    var_Create (aout, "mute", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+    var_Create (aout, "mute", VLC_VAR_BOOL);
     var_AddCallback (aout, "mute", var_Copy, parent);
     var_Create (aout, "device", VLC_VAR_STRING);
     var_AddCallback (aout, "device", var_CopyDevice, parent);
-    /* TODO: 3.0 HACK: only way to signal DTS_HD to aout modules. */
-    var_Create (aout, "dtshd", VLC_VAR_BOOL);
 
     aout->events = &aout_events;
 
@@ -365,6 +364,7 @@ void aout_Destroy (audio_output_t *aout)
     aout->volume_set = NULL;
     aout->mute_set = NULL;
     aout->device_select = NULL;
+    vlc_audio_meter_Destroy(&owner->meter);
     vlc_mutex_unlock(&owner->lock);
 
     var_DelCallback (aout, "viewpoint", ViewpointCallback, NULL);
@@ -803,4 +803,21 @@ static void aout_ChangeViewpoint(audio_output_t *aout,
     owner->vp.value = *p_viewpoint;
     atomic_store_explicit(&owner->vp.update, true, memory_order_relaxed);
     vlc_mutex_unlock(&owner->vp.lock);
+}
+
+vlc_audio_meter_plugin *
+aout_AddMeterPlugin(audio_output_t *aout, const char *chain,
+                    const struct vlc_audio_meter_plugin_owner *meter_plugin_owner)
+{
+    aout_owner_t *owner = aout_owner(aout);
+
+    return vlc_audio_meter_AddPlugin(&owner->meter, chain, meter_plugin_owner);
+}
+
+void
+aout_RemoveMeterPlugin(audio_output_t *aout, vlc_audio_meter_plugin *plugin)
+{
+    aout_owner_t *owner = aout_owner(aout);
+
+    vlc_audio_meter_RemovePlugin(&owner->meter, plugin);
 }

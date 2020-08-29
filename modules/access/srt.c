@@ -220,8 +220,8 @@ out:
 static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
 {
     stream_sys_t *p_sys = p_stream->p_sys;
-    int i_chunk_size = var_InheritInteger( p_stream, "chunk-size" );
-    int i_poll_timeout = var_InheritInteger( p_stream, "poll-timeout" );
+    int i_chunk_size = var_InheritInteger( p_stream, SRT_PARAM_CHUNK_SIZE );
+    int i_poll_timeout = var_InheritInteger( p_stream, SRT_PARAM_POLL_TIMEOUT );
     /* SRT doesn't have a concept of EOF for live streams. */
     VLC_UNUSED(eof);
 

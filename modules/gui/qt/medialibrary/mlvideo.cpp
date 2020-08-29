@@ -80,9 +80,9 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
     , m_id( data->i_id, VLC_ML_PARENT_UNKNOWN )
     , m_title( QString::fromUtf8( data->psz_title ) )
     , m_thumbnail( QString::fromUtf8( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
-    , m_progress( -1.f )
+    , m_progress( data->f_progress )
     , m_playCount( data->i_playcount )
-    , m_thumbnailGenerated( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].b_generated )
+    , m_thumbnailStatus( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status )
     , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
         assert( m_ml != nullptr );
         vlc_ml_event_unregister_callback( m_ml, cb );
@@ -99,13 +99,6 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
             m_mrl = QUrl::fromEncoded(file.psz_mrl);
             break;
         }
-    char *psz_progress;
-    if ( vlc_ml_media_get_playback_state( ml, data->i_id, VLC_ML_PLAYBACK_STATE_PROGRESS,
-                                    &psz_progress ) == VLC_SUCCESS && psz_progress != NULL )
-    {
-        m_progress = atof( psz_progress );
-        free( psz_progress );
-    }
 
     unsigned int numChannel = 0 , maxWidth = 0 , maxHeight = 0;
     for( const vlc_ml_media_track_t& track: ml_range_iterate<vlc_ml_media_track_t>( data->p_tracks ) ) {
@@ -172,11 +165,14 @@ void MLVideo::onMlEvent( const vlc_ml_event_t* event )
     if ( event->i_type != VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED ||
          event->media_thumbnail_generated.i_size != VLC_ML_THUMBNAIL_SMALL )
         return;
-    m_thumbnailGenerated = true;
     if ( event->media_thumbnail_generated.p_media->i_id != m_id.id )
         return;
     if ( event->media_thumbnail_generated.b_success == false )
+    {
+        m_thumbnailStatus = VLC_ML_THUMBNAIL_STATUS_FAILURE;
         return;
+    }
+    m_thumbnailStatus = VLC_ML_THUMBNAIL_STATUS_AVAILABLE;
     auto thumbnailMrl = event->media_thumbnail_generated
             .p_media->thumbnails[event->media_thumbnail_generated.i_size].psz_mrl;
     m_thumbnail = QString::fromUtf8( thumbnailMrl );
@@ -196,7 +192,8 @@ QString MLVideo::getTitle() const
 
 QString MLVideo::getThumbnail()
 {
-    if ( m_thumbnailGenerated == false )
+    if ( m_thumbnailStatus == VLC_ML_THUMBNAIL_STATUS_MISSING ||
+         m_thumbnailStatus == VLC_ML_THUMBNAIL_STATUS_FAILURE )
     {
         m_ml_event_handle.reset( vlc_ml_event_register_callback( m_ml, onMlEvent, this ) );
         vlc_ml_media_generate_thumbnail( m_ml, m_id.id, VLC_ML_THUMBNAIL_SMALL,

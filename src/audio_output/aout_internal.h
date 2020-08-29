@@ -26,6 +26,8 @@
 # include <stdatomic.h>
 
 # include <vlc_atomic.h>
+# include <vlc_filter.h>
+# include <vlc_list.h>
 # include <vlc_viewpoint.h>
 # include "../clock/clock.h"
 
@@ -94,6 +96,8 @@ typedef struct
 
     aout_filters_cfg_t filters_cfg;
 
+    struct vlc_audio_meter meter;
+
     atomic_uint buffers_lost;
     atomic_uint buffers_played;
     atomic_uchar restart;
@@ -133,6 +137,12 @@ void aout_Destroy (audio_output_t *);
 int aout_OutputNew(audio_output_t *);
 void aout_OutputDelete( audio_output_t * p_aout );
 
+vlc_audio_meter_plugin *
+aout_AddMeterPlugin(audio_output_t *aout, const char *chain,
+                    const struct vlc_audio_meter_plugin_owner *owner);
+
+void
+aout_RemoveMeterPlugin(audio_output_t *aout, vlc_audio_meter_plugin *plugin);
 
 /* From common.c : */
 void aout_FormatsPrint(vlc_object_t *, const char *,
@@ -192,5 +202,10 @@ aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *, const vlc_clock_t *,
 void aout_FiltersResetClock(aout_filters_t *filters);
 void aout_FiltersSetClockDelay(aout_filters_t *filters, vlc_tick_t delay);
 bool aout_FiltersCanResample (aout_filters_t *filters);
+filter_t *aout_filter_Create(vlc_object_t *obj, const filter_owner_t *restrict owner,
+                             const char *type, const char *name,
+                             const audio_sample_format_t *infmt,
+                             const audio_sample_format_t *outfmt,
+                             config_chain_t *cfg, bool const_fmt);
 
 #endif /* !LIBVLC_AOUT_INTERNAL_H */

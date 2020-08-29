@@ -292,17 +292,23 @@ static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
                                          unsigned frame_rate_base)
 {
     vlc_clock_main_t *main_clock = clock->owner;
+
+    if (system_now == INT64_MAX)
+    {
+        /* If system_now is INT64_MAX, the update is forced, don't modify anything
+        * but only notify the new clock point. */
+        vlc_clock_on_update(clock, INT64_MAX, ts, rate, frame_rate, frame_rate_base);
+        return INT64_MAX;
+    }
+
     vlc_mutex_lock(&main_clock->lock);
 
-    /* If system_now is INT64_MAX, the update is forced, don't modify anything
-     * but only notify the new clock point. */
-    vlc_tick_t computed = system_now == INT64_MAX ? INT64_MAX
-                        : clock->to_system_locked(clock, system_now, ts, rate);
+    vlc_tick_t computed = clock->to_system_locked(clock, system_now, ts, rate);
 
     vlc_mutex_unlock(&main_clock->lock);
 
     vlc_clock_on_update(clock, computed, ts, rate, frame_rate, frame_rate_base);
-    return computed != INT64_MAX ? computed - system_now : INT64_MAX;
+    return computed - system_now;
 }
 
 static void vlc_clock_slave_reset(vlc_clock_t *clock)
@@ -330,7 +336,7 @@ static vlc_tick_t vlc_clock_slave_set_delay(vlc_clock_t *clock, vlc_tick_t delay
     return 0;
 }
 
-int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
+void vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
                    double rate, vlc_tick_t max_duration)
 {
     vlc_clock_main_t *main_clock = clock->owner;
@@ -347,13 +353,9 @@ int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts,
         deadline = __MIN(deadline, max_deadline);
 
         if (vlc_cond_timedwait(&main_clock->cond, &main_clock->lock, deadline))
-        {
-            vlc_mutex_unlock(&main_clock->lock);
-            return 0;
-        }
+            break;
     }
     vlc_mutex_unlock(&main_clock->lock);
-    return -1;
 }
 
 vlc_clock_main_t *vlc_clock_main_New(void)

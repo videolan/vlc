@@ -43,7 +43,7 @@ public:
     bool isRemovable() const override;
     bool isPresent() const override;
     bool isNetwork() const override;
-    const std::string &mountpoint() const override;
+    std::vector<std::string> mountpoints() const override;
     void addMountpoint( std::string mrl ) override;
     void removeMountpoint( const std::string& mrl ) override;
     std::tuple<bool, std::string> matchesMountpoint( const std::string& mrl ) const override;

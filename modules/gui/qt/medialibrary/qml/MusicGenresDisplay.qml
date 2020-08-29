@@ -33,7 +33,7 @@ Widgets.NavigableFocusScope {
     property var viewProperties: ({})
 
     property var sortModel
-    property var contentModel
+    property var model
 
     readonly property var pageModel: [{
         name: "all",
@@ -61,7 +61,7 @@ Widgets.NavigableFocusScope {
             stackView.replace(root.pageModel[0].component)
         stackView.currentItem.navigationParent = root
         sortModel = stackView.currentItem.sortModel
-        contentModel = stackView.currentItem.model
+        model = stackView.currentItem.model
     }
 
     function _updateGenresAllHistory(currentIndex) {
@@ -88,10 +88,17 @@ Widgets.NavigableFocusScope {
         id: albumGenreComponent
         /* List View */
         MusicAlbums {
+            id: albumsView
+
             property string genreName: ""
 
-            header: Widgets.LabelSeparator {
+            gridViewMarginTop: 0
+
+            header: Widgets.SubtitleLabel {
                 text: i18n.qtr("Genres - %1").arg(genreName)
+                leftPadding: (albumsView.gridViewRowX || VLCStyle.margin_large)
+                topPadding: VLCStyle.margin_large
+                bottomPadding: VLCStyle.margin_normal
                 width: root.width
             }
 

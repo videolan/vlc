@@ -1,6 +1,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 
@@ -12,15 +13,13 @@ Widgets.NavigableFocusScope {
 
     id: root
 
-    Layout.fillWidth: true
-
     readonly property bool expanded: root.implicitHeight === root.childrenRect.height
 
-    Component.onCompleted : {
-        if (player.playingState === PlayerController.PLAYING_STATE_STOPPED)
-            root.implicitHeight = 0;
-        else
-            root.implicitHeight = root.childrenRect.height;
+    property var mainContent: undefined
+
+    Component.onCompleted: {
+        if (player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
+            root.implicitHeight = VLCStyle.miniPlayerHeight
     }
 
     Connections {
@@ -37,138 +36,212 @@ Widgets.NavigableFocusScope {
         id: animateExpand;
         target: root;
         properties: "implicitHeight"
-        duration: 250
-        to: root.childrenRect.height
+        duration: 200
+        easing.type: Easing.InSine
+        to: VLCStyle.miniPlayerHeight
     }
 
     PropertyAnimation {
         id: animateRetract;
         target: root;
         properties: "implicitHeight"
-        duration: 250
+        duration: 200
+        easing.type: Easing.OutSine
         to: 0
     }
 
-    Rectangle {
+    // this MouseArea prevents mouse events to be sent below miniplayer
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        acceptedButtons: Qt.AllButtons
+    }
 
+    Column {
         anchors.left: parent.left
         anchors.right: parent.right
 
-        height: VLCStyle.miniPlayerHeight
-        color: VLCStyle.colors.banner
+        spacing: VLCStyle.dp(-progressBar.height / 2)
 
-        RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: VLCStyle.applicationHorizontalMargin
-            anchors.rightMargin: VLCStyle.applicationHorizontalMargin
-            anchors.bottomMargin: VLCStyle.applicationVerticalMargin
+        SliderBar {
+            id: progressBar
+            value: player.position
+            visible: progressBar.value >= 0.0 && progressBar.value <= 1.0
+            z: 1
 
-            Widgets.FocusBackground {
-                id: playingItemInfo
-                Layout.fillHeight: true
-                Layout.preferredWidth: playingItemInfoRow.implicitWidth
-                width: childrenRect.width
-                focus: true
+            isMiniplayer: true
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: history.push(["player"])
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+        }
+
+
+        Item {
+            id: mainRect
+
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+            z: 0
+            height: VLCStyle.miniPlayerHeight
+
+            Widgets.FrostedGlassEffect {
+                anchors.fill: parent
+
+                source: mainContent
+                sourceRect: Qt.rect(root.x, root.y, root.width, root.height)
+
+                tint: VLCStyle.colors.blendColors(VLCStyle.colors.bg, VLCStyle.colors.banner, 0.85)
+            }
+
+            RowLayout {
+                anchors {
+                    fill: parent
+
+                    leftMargin: VLCStyle.applicationHorizontalMargin
+                    rightMargin: VLCStyle.applicationHorizontalMargin
+                    bottomMargin: VLCStyle.applicationVerticalMargin
                 }
 
-                Keys.onPressed: {
-                    if (KeyHelper.matchOk(event) ) {
-                        event.accepted = true
+                spacing: VLCStyle.margin_normal
+
+                Widgets.FocusBackground {
+                    id: playingItemInfo
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: playingItemInfoRow.implicitWidth
+                    width: childrenRect.width
+                    focus: true
+                    Layout.leftMargin: VLCStyle.margin_normal
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: history.push(["player"])
                     }
-                }
-                Keys.onReleased: {
-                    if (!event.accepted && KeyHelper.matchOk(event))
-                        history.push(["player"])
-                }
 
-                Row {
-                    id: playingItemInfoRow
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
+                    Keys.onPressed: {
+                        if (KeyHelper.matchOk(event) ) {
+                            event.accepted = true
+                        }
+                    }
+                    Keys.onReleased: {
+                        if (!event.accepted && KeyHelper.matchOk(event))
+                            history.push(["player"])
+                    }
 
-                    rightPadding: VLCStyle.margin_normal
 
-                    Image {
-                        id: cover
-                        source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
-                                ? mainPlaylistController.currentItem.artwork
-                                : VLCStyle.noArtAlbum
-                        fillMode: Image.PreserveAspectFit
-
+                    Row {
+                        id: playingItemInfoRow
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
-                    }
-
-                    Column {
                         anchors.verticalCenter: parent.verticalCenter
-                        leftPadding: VLCStyle.margin_normal
 
-                        Text {
-                            id: titleLabel
-                            text: mainPlaylistController.currentItem.title
-                            font.pixelSize: VLCStyle.fontSize_large
-                            color: VLCStyle.colors.text
+                        Item {
+                            anchors.verticalCenter: parent.verticalCenter
+                            implicitHeight: childrenRect.height
+                            implicitWidth:  childrenRect.width
+
+                            Rectangle {
+                                id: coverRect
+                                anchors.fill: cover
+                                color: VLCStyle.colors.bg
+                            }
+
+                            DropShadow {
+                                anchors.fill: coverRect
+                                source: coverRect
+                                radius: 8
+                                samples: 17
+                                color: VLCStyle.colors.glowColorBanner
+                                spread: 0.2
+                            }
+
+                            Image {
+                                id: cover
+
+                                source: (mainPlaylistController.currentItem.artwork && mainPlaylistController.currentItem.artwork.toString())
+                                        ? mainPlaylistController.currentItem.artwork
+                                        : VLCStyle.noArtAlbum
+                                fillMode: Image.PreserveAspectFit
+
+                                width: VLCStyle.dp(60)
+                                height: VLCStyle.dp(60)
+                            }
                         }
 
-                        Text {
-                            id: artistLabel
-                            text: mainPlaylistController.currentItem.artist
-                            font.pixelSize: VLCStyle.fontSize_normal
-                            color: VLCStyle.colors.textInactive
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            leftPadding: VLCStyle.margin_xsmall
+
+                            Widgets.MenuLabel {
+                                id: titleLabel
+                                text: mainPlaylistController.currentItem.title
+                            }
+
+                            Widgets.MenuCaption {
+                                id: artistLabel
+                                text: mainPlaylistController.currentItem.artist
+                            }
+
+                            Widgets.MenuCaption {
+                                id: progressIndicator
+                                text: player.time.toString() + " / " + player.length.toString()
+                            }
                         }
                     }
+
+                    KeyNavigation.right: buttonrow
                 }
 
-                KeyNavigation.right: buttonrow
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                PlayerButtonsLayout {
+                    id: buttonrow
+
+                    model: miniPlayerModel
+                    defaultSize: VLCStyle.icon_normal
+
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: buttonrow.implicitHeight
+                    Layout.leftMargin: VLCStyle.margin_normal
+                    Layout.rightMargin: VLCStyle.margin_normal
+
+                    navigationParent: root
+                    navigationLeftItem: playingItemInfo
+                }
             }
 
-            Item {
-                Layout.fillWidth: true
+            Connections{
+                target: mainInterface
+                onToolBarConfUpdated: {
+                    miniPlayerModel.reloadModel()
+                }
             }
 
-            PlayerButtonsLayout {
-                id: buttonrow
+            PlayerControlBarModel {
+                id: miniPlayerModel
+                mainCtx: mainctx
+                configName: "MiniPlayerToolbar"
+            }
 
-                model: miniPlayerModel
-                defaultSize: VLCStyle.icon_normal
+            ControlButtons {
+                id: controlmodelbuttons
 
-                Layout.alignment: Qt.AlignVCenter
-                Layout.rightMargin: VLCStyle.margin_normal
-                Layout.preferredWidth: buttonrow.implicitWidth
-                Layout.preferredHeight: buttonrow.implicitHeight
+                isMiniplayer: true
+                parentWindow: mainInterfaceRect
+            }
 
-                navigationParent: root
-                navigationLeftItem: playingItemInfo
+            Keys.onPressed: {
+                if (!event.accepted)
+                    defaultKeyAction(event, 0)
+                if (!event.accepted)
+                    mainInterface.sendHotkey(event.key, event.modifiers);
             }
         }
-
-        Connections{
-            target: mainInterface
-            onToolBarConfUpdated: {
-                miniPlayerModel.reloadModel()
-            }
-        }
-
-        PlayerControlBarModel {
-            id: miniPlayerModel
-            mainCtx: mainctx
-            configName: "MiniPlayerToolbar"
-        }
-
-        ControlButtons {
-            id: controlmodelbuttons
-        }
-
-        Keys.onPressed: {
-            if (!event.accepted)
-                defaultKeyAction(event, 0)
-            if (!event.accepted)
-                mainInterface.sendHotkey(event.key, event.modifiers);
-        }
-
     }
 }

@@ -36,6 +36,20 @@ Rectangle {
     property bool _interfaceReady: false
     property bool _playlistReady: false
 
+    property alias mainInterfaceRect: root
+
+    Binding {
+        target: VLCStyle.self
+        property: "appWidth"
+        value: root.width
+    }
+
+    Binding {
+        target: VLCStyle.self
+        property: "appHeight"
+        value: root.height
+    }
+
     Loader {
         id: playlistWindowLoader
         active: !mainInterface.playlistDocked && mainInterface.playlistVisible

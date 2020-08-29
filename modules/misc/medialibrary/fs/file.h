@@ -39,11 +39,14 @@ public:
     unsigned int lastModificationDate() const override;
     int64_t size() const override;
     inline bool isNetwork() const override { return true; }
+    LinkedFileType linkedType() const override;
+    const std::string &linkedWith() const override;
 
 private:
     std::string m_mrl;
     std::string m_name;
     std::string m_extension;
+    std::string m_linkedFile;
 };
 
   } /* namespace medialibrary */

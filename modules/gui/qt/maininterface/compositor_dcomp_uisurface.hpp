@@ -97,9 +97,9 @@ public:
     bool eventFilter(QObject* object, QEvent* event) override;
 
 private:
-    void initialiseD3DSwapchain(int width, int height);
+    bool initialiseD3DSwapchain(int width, int height);
     void releaseSharedTexture();
-    void updateSharedTexture(int width, int height);
+    bool updateSharedTexture(int width, int height);
     void resizeSwapchain(int width, int height);
 
     void requestUpdate();

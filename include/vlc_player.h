@@ -2142,6 +2142,118 @@ vlc_player_GetRenderer(vlc_player_t *player);
 /** @} vlc_player__renderer */
 
 /**
+ * @defgroup vlc_player__metadata Metadata callbacks
+ * @{
+ */
+
+/**
+ * Player metadata listener opaque structure.
+ *
+ * This opaque structure is returned by vlc_player_AddMetadataListener() and
+ * can be used to remove the listener via
+ * vlc_player_RemoveMetadataListener().
+ */
+typedef struct vlc_player_metadata_listener_id vlc_player_metadata_listener_id;
+
+/**
+ * Player metadata option
+ */
+enum vlc_player_metadata_option
+{
+    /**
+     * Ask for momentary loudness measurement
+     *
+     * Very low CPU usage.
+     * @see vlc_player_metadata_cbs.on_momentary_loudness_changed
+     */
+    VLC_PLAYER_METADATA_LOUDNESS_MOMENTARY,
+
+    /**
+     * Ask for all loudness measurements
+     *
+     * High CPU usage.
+     * @see vlc_player_metadata_cbs.on_loudness_changed
+     */
+    VLC_PLAYER_METADATA_LOUDNESS_FULL,
+};
+
+/**
+ * Player metadata callbacks
+ *
+ * Can be registered with vlc_player_AddMetadataListener().
+ *
+ * @warning To avoid deadlocks, users should never call vlc_player_t functions
+ * from these callbacks.
+ */
+union vlc_player_metadata_cbs
+{
+    /**
+     * Called when the momentary loudness measurement have changed
+     *
+     * @see VLC_PLAYER_METADATA_LOUDNESS_MOMEMTARY
+     *
+     * Only sent when audio is playing, approximately every 400ms (but can be
+     * higher, depending on the input sample size).
+     *
+     * @param date Absolute date of the measurement. It is most likely in the
+     * future (0 to 2seconds) depending on the audio output buffer size.
+     * @param momentary_loudness Momentary loudness
+     * @param data opaque pointer set by vlc_player_AddMetadataListener()
+     */
+    void (*on_momentary_loudness_changed)(vlc_tick_t date,
+                                          double momentary_loudness,
+                                          void *data);
+
+    /**
+     * Called when loudness measurements have changed
+     *
+     * @see VLC_PLAYER_METADATA_LOUDNESS_FULL
+     *
+     * Only sent when audio is playing, approximately every 400ms (but can be
+     * higher, depending on the input sample size).
+     *
+     * @param date Absolute date of the measurement. It is most likely in the
+     * future (0 to 2seconds) depending on the audio output buffer size.
+     * @param loudness loudness measurement
+     * @param data opaque pointer set by vlc_player_AddMetadataListener()
+     */
+    void (*on_loudness_changed)(vlc_tick_t date,
+                                const struct vlc_audio_loudness *loudness,
+                                void *data);
+};
+
+/**
+ * Add a metadata listener
+ *
+ * @note Every registered loudness meter need to be removed by the caller with
+ * vlc_player_RemoveMetadataListener().
+ *
+ * @param player locked player instance
+ * @param cbs pointer to a vlc_player_metadata_cbs union, the
+ * structure must be valid during the lifetime of the player
+ * @param cbs_data opaque pointer used by the callbacks
+ * @return a valid listener id, or NULL in case of error (plugin missing)
+ */
+VLC_API vlc_player_metadata_listener_id *
+vlc_player_AddMetadataListener(vlc_player_t *player,
+                               enum vlc_player_metadata_option option,
+                               const union vlc_player_metadata_cbs *cbs,
+                               void *cbs_data);
+
+/**
+ * Remove a metadata listener
+ *
+ * @param player player instance
+ * @param listener_id listener id returned by vlc_player_AddMetadataListener()
+ */
+VLC_API void
+vlc_player_RemoveMetadataListener(vlc_player_t *player,
+                                  vlc_player_metadata_listener_id *listener_id);
+
+
+/** @} vlc_player__metadata */
+
+/**
  * @defgroup vlc_player__aout Audio output control
  * @{
  */

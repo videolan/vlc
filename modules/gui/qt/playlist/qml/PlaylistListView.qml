@@ -54,6 +54,8 @@ Widgets.NavigableFocusScope {
         //label for DnD
         Widgets.DNDLabel {
             id: dragItem
+            _colors: root._colors
+            color: parent.color
         }
 
         PlaylistMenu {
@@ -130,7 +132,8 @@ Widgets.NavigableFocusScope {
 
         Widgets.MenuExt {
             id: contextMenu
-            property var model: ({})
+            property alias model: root.plmodel
+            property int itemIndex: -1
             property bool medialibAvailable: false
             closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
 
@@ -140,14 +143,42 @@ Widgets.NavigableFocusScope {
                 icon.width: VLCStyle.icon_small
                 icon.height: VLCStyle.icon_small
                 onTriggered: {
-                    mainPlaylistController.goTo(contextMenu.model.getSelection()[0], true)
+                    mainPlaylistController.goTo(contextMenu.itemIndex, true)
+                }
+            }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Stream")
+                icon.source: "qrc:/menu/stream.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
+                onTriggered: {
+                    var selection = contextMenu.model.getSelection()
+                    if (selection.length === 0)
+                        return
+
+                    dialogProvider.streamingDialog(selection.map(function(i) { return contextMenu.model.itemAt(i).url; }), false)
+                }
+            }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Save")
+                onTriggered: {
+                    var selection = contextMenu.model.getSelection()
+                    if (selection.length === 0)
+                        return
+
+                    dialogProvider.streamingDialog(selection.map(function(i) { return contextMenu.model.itemAt(i).url; }))
                 }
             }
 
             Widgets.MenuItemExt {
                 text: i18n.qtr("Information...")
+                icon.source: "qrc:/menu/info.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
                 onTriggered: {
-                    // not implemented
+                    dialogProvider.mediaInfoDialog(contextMenu.model.itemAt(contextMenu.itemIndex))
                 }
             }
 
@@ -155,8 +186,43 @@ Widgets.NavigableFocusScope {
 
             Widgets.MenuItemExt {
                 text: i18n.qtr("Show Containing Directory...")
+                icon.source: "qrc:/type/folder-grey.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
                 onTriggered: {
-                    // not implemented
+                    mainPlaylistController.explore(contextMenu.model.itemAt(contextMenu.itemIndex))
+                }
+            }
+
+            MenuSeparator { }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Add File...")
+                icon.source: "qrc:/buttons/playlist/playlist_add.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
+                onTriggered: {
+                    dialogProvider.simpleOpenDialog(false)
+                }
+            }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Add Directory...")
+                icon.source: "qrc:/buttons/playlist/playlist_add.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
+                onTriggered: {
+                    dialogProvider.PLAppendDir()
+                }
+            }
+
+            Widgets.MenuItemExt {
+                text: i18n.qtr("Advanced Open...")
+                icon.source: "qrc:/buttons/playlist/playlist_add.svg"
+                icon.width: VLCStyle.icon_small
+                icon.height: VLCStyle.icon_small
+                onTriggered: {
+                    dialogProvider.PLAppendDialog()
                 }
             }
 
@@ -271,6 +337,8 @@ Widgets.NavigableFocusScope {
                 model: root.plmodel
                 modelCount: root.plmodel.count
 
+                fadeColor: root.backgroundColor
+
                 property int shiftIndex: -1
                 property string mode: "normal"
 
@@ -284,39 +352,82 @@ Widgets.NavigableFocusScope {
                         if (view.currentIndex == -1 &&  root.plmodel.count > 0)
                             view.currentIndex = 0
                     }
+                    onSelectedCountChanged: {
+                        var selectedIndexes = root.plmodel.getSelection()
+                        var modelCount = root.plmodel.count
+
+                        if (modelCount === 0 || selectedIndexes.length === 0)
+                            return
+
+                        var bottomItemIndex = view.listView.indexAt(view.listView.contentX, (view.listView.contentY + view.height) - 2)
+                        var topItemIndex    = view.listView.indexAt(view.listView.contentX, view.listView.contentY + 2)
+
+                        if (topItemIndex !== -1 && (root.plmodel.isSelected(topItemIndex) || (modelCount >= 2 && root.plmodel.isSelected(topItemIndex + 1))))
+                            view.fadeRectTopHovered = true
+                        else
+                            view.fadeRectTopHovered = false
+
+                        if (bottomItemIndex !== -1 && (root.plmodel.isSelected(bottomItemIndex) || (root.plmodel.isSelected(bottomItemIndex - 1))))
+                            view.fadeRectBottomHovered = true
+                        else
+                            view.fadeRectBottomHovered = false
+                    }
                 }
 
-                footer: DropArea {
+                footer: Item {
                     width: parent.width
                     height: Math.max(VLCStyle.icon_normal, view.height - y)
 
-                    onEntered: {
-                        if(drag.source.model.index === root.plmodel.count - 1)
-                            return
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.RightButton | Qt.LeftButton
 
-                        root.setItemDropIndicatorVisible(view.modelCount - 1, true, false);
-                    }
-                    onExited: {
-                        if(drag.source.model.index === root.plmodel.count - 1)
-                            return
-
-                        root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
-                    }
-                    onDropped: {
-                        if(drag.source.model.index === root.plmodel.count - 1)
-                            return
-
-                        if (drop.hasUrls) {
-                            //force conversion to an actual list
-                            var urlList = []
-                            for ( var url in drop.urls)
-                                urlList.push(drop.urls[url])
-                            mainPlaylistController.insert(root.plmodel.count, urlList)
-                        } else {
-                            root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
+                        onClicked: {
+                            if( mouse.button === Qt.RightButton )
+                            {
+                                view.forceActiveFocus()
+                                root.plmodel.deselectAll()
+                                contextMenu.itemIndex = -1
+                                contextMenu.popup()
+                            }
+                            else if ( mouse.button === Qt.LeftButton )
+                            {
+                                view.forceActiveFocus()
+                                root.plmodel.deselectAll()
+                            }
                         }
-                        root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
-                        drop.accept()
+                    }
+
+                    DropArea {
+                        anchors.fill: parent
+                        onEntered: {
+                            if(drag.source.model.index === root.plmodel.count - 1)
+                                return
+
+                            root.setItemDropIndicatorVisible(view.modelCount - 1, true, false);
+                        }
+                        onExited: {
+                            if(drag.source.model.index === root.plmodel.count - 1)
+                                return
+
+                            root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
+                        }
+                        onDropped: {
+                            if(drag.source.model.index === root.plmodel.count - 1)
+                                return
+
+                            if (drop.hasUrls) {
+                                //force conversion to an actual list
+                                var urlList = []
+                                for ( var url in drop.urls)
+                                    urlList.push(drop.urls[url])
+                                mainPlaylistController.insert(root.plmodel.count, urlList)
+                            } else {
+                                root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
+                            }
+                            root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
+                            drop.accept()
+                        }
                     }
                 }
 
@@ -326,6 +437,7 @@ Widgets.NavigableFocusScope {
                         active: (index === 0) // load only for the first element to prevent overlapping
                         width: parent.width
                         height: 1
+                        z: 0
                         sourceComponent: Rectangle {
                             color: _colors.playlistSeparator
                             opacity: _colors.isThemeDark ? 0.05 : 1.0
@@ -341,7 +453,7 @@ Widgets.NavigableFocusScope {
                         id: plitem
                         plmodel: root.plmodel
                         width: root.width
-
+                        z: 1
                         leftPadding: root.leftPadding + VLCStyle.margin_normal
                         rightPadding: root.rightPadding + view.scrollBarWidth
 
@@ -368,7 +480,7 @@ Widgets.NavigableFocusScope {
 
                             if (button === Qt.RightButton)
                             {
-                                contextMenu.model = root.plmodel
+                                contextMenu.itemIndex = index
                                 contextMenu.popup()
                             }
                         }
@@ -394,11 +506,26 @@ Widgets.NavigableFocusScope {
                                 root.plmodel.moveItemsPre(root.plmodel.getSelection(), target)
                             }
                         }
+
+                        onHoveredChanged: {
+                            var bottomItemIndex = view.listView.indexAt(plitem.width / 2, (view.listView.contentY + view.height) - 2)
+                            var topItemIndex = view.listView.indexAt(plitem.width / 2, view.listView.contentY + 2)
+
+                            if(bottomItemIndex !== -1 && model.index >= bottomItemIndex - 1)
+                            {
+                                view.fadeRectBottomHovered = plitem.hovered
+                            }
+                            if(topItemIndex !== -1 && model.index <= topItemIndex + 1)
+                            {
+                                view.fadeRectTopHovered = plitem.hovered
+                            }
+                        }
                     }
 
                     Rectangle {
                         width: parent.width
                         height: 1
+                        z: 0
                         color: _colors.playlistSeparator
                         opacity: _colors.isThemeDark ? 0.05 : 1.0
                     }
@@ -619,5 +746,14 @@ Widgets.NavigableFocusScope {
 
     Keys.priority: Keys.AfterItem
     Keys.forwardTo: view
-    Keys.onPressed: defaultKeyAction(event, 0)
+    Keys.onPressed: {
+        if (event.matches(StandardKey.SelectAll))
+        {
+            root.plmodel.selectAll();
+        }
+        else
+        {
+            defaultKeyAction(event, 0)
+        }
+    }
 }

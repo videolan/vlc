@@ -383,6 +383,7 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
         _duration = p_mediaItem->i_duration;
         _playCount = p_mediaItem->i_playcount;
         _lastPlayedDate = p_mediaItem->i_last_played_date;
+        _progress = p_mediaItem->f_progress;
         _title = toNSStr(p_mediaItem->psz_title);
         _smallArtworkGenerated = p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
         if (_smallArtworkGenerated) {
@@ -598,16 +599,6 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
     [self setIntegerPreference:rating forKey:VLC_ML_PLAYBACK_STATE_RATING];
 }
 
-- (float)lastPlaybackPosition
-{
-    return [self floatPreferenceForKey:VLC_ML_PLAYBACK_STATE_PROGRESS];
-}
-
-- (void)setLastPlaybackPosition:(float)lastPlaybackPosition
-{
-    [self setFloatPreference:lastPlaybackPosition forKey:VLC_ML_PLAYBACK_STATE_PROGRESS];
-}
-
 - (float)lastPlaybackRate
 {
     return [self floatPreferenceForKey:VLC_ML_PLAYBACK_STATE_SPEED];
@@ -766,11 +757,6 @@ NSString *VLCMediaLibraryMediaItemLibraryID = @"VLCMediaLibraryMediaItemLibraryI
 - (void)setLastSubtitleDelay:(int)lastSubtitleDelay
 {
     [self setIntegerPreference:lastSubtitleDelay forKey:VLC_ML_PLAYBACK_STATE_SUBTITLE_DELAY];
-}
-
-- (int)increasePlayCount
-{
-    return vlc_ml_media_increase_playcount(_p_mediaLibrary, _libraryID);
 }
 
 @end

@@ -58,29 +58,30 @@ static char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
 
 static void addNewFontToFamily(vlc_font_select_t *fs, CTFontDescriptorRef iter, char *path, vlc_family_t *p_family)
 {
-    bool b_bold = false;
-    bool b_italic = false;
+    int i_flags = 0;
     CFDictionaryRef fontTraits = CTFontDescriptorCopyAttribute(iter, kCTFontTraitsAttribute);
     CFNumberRef trait = CFDictionaryGetValue(fontTraits, kCTFontWeightTrait);
     float traitValue = 0.;
     CFNumberGetValue(trait, kCFNumberFloatType, &traitValue);
-    b_bold = traitValue > 0.23;
+    if( traitValue > 0.23 )
+        i_flags |= VLC_FONT_FLAG_BOLD;
     trait = CFDictionaryGetValue(fontTraits, kCTFontSlantTrait);
     traitValue = 0.;
     CFNumberGetValue(trait, kCFNumberFloatType, &traitValue);
-    b_italic = traitValue > 0.03;
+    if( traitValue > 0.03 )
+        i_flags |= VLC_FONT_FLAG_ITALIC;
 
 #ifndef NDEBUG
     CFStringRef name = CTFontDescriptorCopyAttribute(iter, kCTFontNameAttribute);
     char *psz_name = name ? FromCFString(name, kCFStringEncodingUTF8) : 0;
-    msg_Dbg(fs->p_obj, "New font: (%s) bold %i italic %i path '%s'", psz_name, b_bold, b_italic, path);
+    msg_Dbg(fs->p_obj, "New font: (%s) %x path '%s'", psz_name, i_flags, path);
     free(psz_name);
     if(name)
         CFRelease(name);
 #else
     VLC_UNUSED(fs);
 #endif
-    NewFont(path, 0, b_bold, b_italic, p_family);
+    NewFont(path, 0, i_flags, p_family);
 
     CFRelease(fontTraits);
 }
@@ -92,15 +93,15 @@ static const struct
 }
 CoreTextGenericMapping[] =
 {
-    { "cursive",   "Apple Chancery" },
+    { "cursive",   "apple chancery" },
 //    { "emoji",     "" },
 //    { "fangsong",     "" },
-    { "fantasy",   "Papyrus" },
-    { "monospace", "Courier" },
-    { "sans",      "Helvetica" },
-    { "sans-serif","Helvetica" },
-    { "serif",     "Times" },
-    { "system-ui", ".AppleSystemUIFont" },
+    { "fantasy",   "papyrus" },
+    { "monospace", "courier" },
+    { "sans",      "helvetica" },
+    { "sans-serif","helvetica" },
+    { "serif",     "times" },
+    { "system-ui", ".applesystemuifont" },
 //    { "math",     "" },
 //    { "ui-monospace",     "" },
 //    { "ui-rounded",     "" },
@@ -159,24 +160,22 @@ static CFComparisonResult SortCTFontMatchResults(CTFontDescriptorRef desc1,
         return kCFCompareGreaterThan;
 }
 
-const vlc_family_t *CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_family)
+int CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_lcname,
+                       const vlc_family_t **pp_result)
 {
-    if (unlikely(psz_family == NULL)) {
-        return NULL;
+    int i_ret = VLC_EGENERIC;
+
+    if (unlikely(psz_lcname == NULL)) {
+        return VLC_EGENERIC;
     }
 
-    psz_family = CoreText_TranslateGenericFamily(psz_family);
-
-    char *psz_lc = ToLower(psz_family);
-    if (unlikely(!psz_lc)) {
-        return NULL;
-    }
+    psz_lcname = CoreText_TranslateGenericFamily(psz_lcname);
 
     /* let's double check if we have parsed this family already */
-    vlc_family_t *p_family = vlc_dictionary_value_for_key(&fs->family_map, psz_lc);
+    vlc_family_t *p_family = vlc_dictionary_value_for_key(&fs->family_map, psz_lcname);
     if (p_family) {
-        free(psz_lc);
-        return p_family;
+        *pp_result = p_family;
+        return VLC_SUCCESS;
     }
 
     CTFontCollectionRef coreTextFontCollection = NULL;
@@ -193,11 +192,11 @@ const vlc_family_t *CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_fa
     };
 
 #ifndef NDEBUG
-    msg_Dbg(fs->p_obj, "Creating new family for '%s'", psz_family);
+    msg_Dbg(fs->p_obj, "Creating new family for '%s'", psz_lcname);
 #endif
 
     CFStringRef familyName = CFStringCreateWithCString(kCFAllocatorDefault,
-                                                       psz_family,
+                                                       psz_lcname,
                                                        kCFStringEncodingUTF8);
     for (size_t x = 0; x < numberOfAttributes; x++) {
         coreTextAttributes[x] = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, NULL);
@@ -227,7 +226,7 @@ const vlc_family_t *CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_fa
     char *path = NULL;
 
     /* create a new family object */
-    p_family = NewFamily(fs, psz_lc, &fs->p_families, &fs->family_map, psz_lc);
+    p_family = NewFamily(fs, psz_lcname, &fs->p_families, &fs->family_map, psz_lcname);
     if (unlikely(!p_family)) {
         goto end;
     }
@@ -245,6 +244,8 @@ const vlc_family_t *CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_fa
         addNewFontToFamily(fs, iter, path, p_family);
     }
 
+    i_ret = VLC_SUCCESS;
+
 end:
     if (matchedFontDescriptions != NULL) {
         CFRelease(matchedFontDescriptions);
@@ -260,18 +261,20 @@ end:
 
     CFRelease(coreTextFontDescriptorsArray);
     CFRelease(familyName);
-    free(psz_lc);
 
-    return p_family;
+    *pp_result = p_family;
+    return i_ret;
 }
 
-vlc_family_t *CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_family, uni_char_t codepoint)
+int CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_lcname,
+                          uni_char_t codepoint, vlc_family_t **pp_result)
 {
-    if (unlikely(psz_family == NULL)) {
-        return NULL;
+    int i_ret = VLC_EGENERIC;
+    if (unlikely(psz_lcname == NULL)) {
+        return VLC_EGENERIC;
     }
 
-    psz_family = CoreText_TranslateGenericFamily(psz_family);
+    psz_lcname = CoreText_TranslateGenericFamily(psz_lcname);
 
     vlc_family_t *p_family = NULL;
     CFStringRef postScriptFallbackFontname = NULL;
@@ -280,7 +283,7 @@ vlc_family_t *CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_famil
     char *psz_fontPath = NULL;
 
     CFStringRef familyName = CFStringCreateWithCString(kCFAllocatorDefault,
-                                                       psz_family,
+                                                       psz_lcname,
                                                        kCFStringEncodingUTF8);
     CTFontRef font = CTFontCreateWithName(familyName, 0, NULL);
     uint32_t littleEndianCodePoint = OSSwapHostToLittleInt32(codepoint);
@@ -302,10 +305,11 @@ vlc_family_t *CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_famil
     msg_Dbg(fs->p_obj, "Will deploy fallback font '%s'", psz_fallbackFamilyName);
 #endif
 
-    psz_lc_fallback = ToLower(psz_fallbackFamilyName);
+    psz_lc_fallback = LowercaseDup(psz_fallbackFamilyName);
 
     p_family = vlc_dictionary_value_for_key(&fs->family_map, psz_lc_fallback);
     if (p_family) {
+        i_ret = VLC_SUCCESS;
         goto done;
     }
 
@@ -320,10 +324,13 @@ vlc_family_t *CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_famil
 
     /* check if the path is empty, which can happen in rare circumstances */
     if (psz_fontPath == NULL || *psz_fontPath == '\0') {
+        i_ret = VLC_SUCCESS;
         goto done;
     }
 
     addNewFontToFamily(fs, fallbackFontDescriptor, strdup(psz_fontPath), p_family);
+
+    i_ret = VLC_SUCCESS;
 
 done:
     CFRelease(familyName);
@@ -338,5 +345,7 @@ done:
         CFRelease(postScriptFallbackFontname);
     if (fallbackFontDescriptor != NULL)
         CFRelease(fallbackFontDescriptor);
-    return p_family;
+
+    *pp_result = p_family;
+    return i_ret;
 }

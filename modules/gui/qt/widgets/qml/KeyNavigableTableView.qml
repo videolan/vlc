@@ -63,24 +63,24 @@ NavigableFocusScope {
     property alias tableHeaderItem: view.headerItem
     property color headerColor
 
-    property alias selectionModel: selectionModel
+    property var selectionDelegateModel
     property real rowHeight: VLCStyle.fontHeight_normal + VLCStyle.margin_large
     readonly property real availableRowWidth: width - ( VLCStyle.table_section_width * 2 )
     property alias spacing: view.spacing
     property int horizontalSpacing: VLCStyle.column_margin_width
+
+    property alias fadeColor:             view.fadeColor
+    property alias fadeRectBottomHovered: view.fadeRectBottomHovered
+    property alias fadeRectTopHovered:    view.fadeRectTopHovered
+
+    property alias add:       view.add
+    property alias displaced: view.displaced
 
     Accessible.role: Accessible.Table
 
     function positionViewAtIndex(index, mode) {
         view.positionViewAtIndex(index, mode)
     }
-
-    Util.SelectableDelegateModel {
-        id: selectionModel
-
-        model: root.model
-    }
-
 
     KeyNavigableListView {
         id: view
@@ -98,12 +98,24 @@ NavigableFocusScope {
             property alias loadedHeader: headerLoader.item
 
             width: parent.width
-            height: childrenRect.height
+            height: col.height
             color: headerColor
             visible: view.modelCount > 0
             z: 3
 
+            Widgets.ListLabel {
+                x: contentX - VLCStyle.table_section_width
+                y: row.y
+                height: row.height
+                leftPadding: VLCStyle.table_section_text_margin
+                text: view.currentSection
+                color: VLCStyle.colors.accent
+                visible: text !== "" && view.contentY > (VLCStyle.fontHeight_normal + VLCStyle.margin_xxsmall - col.height)
+            }
+
             Column {
+                id: col
+
                 width: parent.width
                 height: childrenRect.height
 
@@ -167,13 +179,12 @@ NavigableFocusScope {
             }
         }
 
-        section.delegate: Text {
+        section.delegate: Widgets.ListLabel {
             x: view.headerItem.contentX - VLCStyle.table_section_width
             topPadding: VLCStyle.margin_xsmall
             bottomPadding: VLCStyle.margin_xxsmall
             leftPadding: VLCStyle.table_section_text_margin
             text: section
-            font.pixelSize: VLCStyle.fontHeight_normal
             color: VLCStyle.colors.accent
         }
 
@@ -181,9 +192,10 @@ NavigableFocusScope {
             id: lineView
 
             property var rowModel: model
-            property bool selected: selectionModel.isSelected(root.model.index(index, 0))
+            property bool selected: selectionDelegateModel.isSelected(root.model.index(index, 0))
             property alias showSeparator: separator.visible
             readonly property bool highlighted: selected || hoverArea.containsMouse || activeFocus
+            readonly property int _index: index
 
             width: view.width
             height: root.rowHeight
@@ -197,8 +209,8 @@ NavigableFocusScope {
             }
 
             Connections {
-                target: selectionModel
-                onSelectionChanged: lineView.selected = selectionModel.isSelected(root.model.index(index, 0))
+                target: selectionDelegateModel
+                onSelectionChanged: lineView.selected = selectionDelegateModel.isSelected(root.model.index(index, 0))
             }
 
             MouseArea {
@@ -209,7 +221,7 @@ NavigableFocusScope {
                 acceptedButtons: Qt.RightButton | Qt.LeftButton
 
                 onClicked: {
-                    selectionModel.updateSelection( mouse.modifiers , view.currentIndex, index)
+                    selectionDelegateModel.updateSelection( mouse.modifiers , view.currentIndex, index)
                     view.currentIndex = rowModel.index
                     lineView.forceActiveFocus()
 
@@ -219,7 +231,7 @@ NavigableFocusScope {
                 }
 
                 onDoubleClicked: {
-                    actionForSelection(selectionModel.selectedIndexes)
+                    actionForSelection(selectionDelegateModel.selectedIndexes)
                     root.itemDoubleClicked(model)
                 }
 
@@ -267,6 +279,7 @@ NavigableFocusScope {
                                 property var colModel: modelData
                                 readonly property bool currentlyFocused: lineView.activeFocus
                                 readonly property bool containsMouse: hoverArea.containsMouse
+                                readonly property int index: lineView._index
 
                                 anchors.fill: parent
                                 sourceComponent: colModel.colDelegate || root.colDelegate
@@ -290,9 +303,9 @@ NavigableFocusScope {
             }
         }
 
-        onSelectAll: selectionModel.selectAll()
-        onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
-        onActionAtIndex: root.actionForSelection( selectionModel.selectedIndexes )
+        onSelectAll: selectionDelegateModel.selectAll()
+        onSelectionUpdated: selectionDelegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+        onActionAtIndex: root.actionForSelection( selectionDelegateModel.selectedIndexes )
 
         navigationParent: root
     }
@@ -303,11 +316,11 @@ NavigableFocusScope {
      * selectedGroup update itself after this event
      */
     onActiveFocusChanged: {
-        if (activeFocus && view.count > 0 && !selectionModel.hasSelection) {
+        if (activeFocus && view.count > 0 && !selectionDelegateModel.hasSelection) {
             var initialIndex = 0
             if (view.currentIndex !== -1)
                 initialIndex = view.currentIndex
-            selectionModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
+            selectionDelegateModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
             view.currentIndex = initialIndex
         }
     }

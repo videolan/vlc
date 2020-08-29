@@ -347,11 +347,11 @@ static void vout_UpdateWindowSizeLocked(vout_thread_sys_t *vout)
 
 /* */
 void vout_GetResetStatistic(vout_thread_t *vout, unsigned *restrict displayed,
-                            unsigned *restrict lost)
+                            unsigned *restrict lost, unsigned *restrict late)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
-    vout_statistic_GetReset( &sys->statistic, displayed, lost );
+    vout_statistic_GetReset( &sys->statistic, displayed, lost, late );
 }
 
 bool vout_IsEmpty(vout_thread_t *vout)
@@ -1083,6 +1083,7 @@ static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse,
                         continue;
                     } else if (late > 0) {
                         msg_Dbg(&vout->obj, "picture might be displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
+                        vout_statistic_AddLate(&sys->statistic, 1);
                     }
                 }
                 vlc_video_context *pic_vctx = picture_GetVideoContext(decoded);
@@ -1678,17 +1679,8 @@ static void ThreadProcessMouseState(vout_thread_sys_t *p_vout,
     if (vlc_mouse_HasMoved(&sys->mouse, m))
         var_SetCoords(vout, "mouse-moved", m->i_x, m->i_y);
 
-    if (vlc_mouse_HasButton(&sys->mouse, m)) {
+    if (vlc_mouse_HasButton(&sys->mouse, m))
         var_SetInteger(vout, "mouse-button-down", m->i_pressed);
-
-        if (vlc_mouse_HasPressed(&sys->mouse, m, MOUSE_BUTTON_LEFT)) {
-            /* FIXME? */
-            int x, y;
-
-            var_GetCoords(vout, "mouse-moved", &x, &y);
-            var_SetCoords(vout, "mouse-clicked", x, y);
-        }
-    }
 
     if (m->b_double_click)
         var_ToggleBool(vout, "fullscreen");
@@ -1922,11 +1914,13 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     assert(sys->private.display_pool == NULL);
 
     if (sys->mouse_event)
+    {
         sys->mouse_event(NULL, sys->mouse_opaque);
+        sys->mouse_event = NULL;
+    }
 
     if (sys->spu)
         spu_Detach(sys->spu);
-    sys->mouse_event = NULL;
     sys->clock = NULL;
     video_format_Clean(&sys->original);
 }

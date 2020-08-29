@@ -39,7 +39,7 @@ struct vlc_input_decoder_callbacks {
                                void *userdata);
 
     void (*on_new_video_stats)(vlc_input_decoder_t *decoder, unsigned decoded,
-                               unsigned lost, unsigned displayed,
+                               unsigned lost, unsigned displayed, unsigned late,
                                void *userdata);
     void (*on_new_audio_stats)(vlc_input_decoder_t *decoder, unsigned decoded,
                                unsigned lost, unsigned played, void *userdata);

@@ -178,6 +178,7 @@
         <file alias="MainInterface.qml">maininterface/qml/MainInterface.qml</file>
     </qresource>
     <qresource prefix="/widgets">
+        <file alias="BannerTabButton.qml">widgets/qml/BannerTabButton.qml</file>
         <file alias="BusyIndicatorExt.qml">widgets/qml/BusyIndicatorExt.qml</file>
         <file alias="GridItem.qml">widgets/qml/GridItem.qml</file>
         <file alias="ListItem.qml">widgets/qml/ListItem.qml</file>
@@ -221,6 +222,9 @@
         <file alias="MediaCover.qml">widgets/qml/MediaCover.qml</file>
         <file alias="MenuLabel.qml">widgets/qml/MenuLabel.qml</file>
         <file alias="ListSubtitleLabel.qml">widgets/qml/ListSubtitleLabel.qml</file>
+        <file alias="HorizontalResizeHandle.qml">widgets/qml/HorizontalResizeHandle.qml</file>
+        <file alias="PointingTooltip.qml">widgets/qml/PointingTooltip.qml</file>
+        <file alias="FrostedGlassEffect.qml">widgets/qml/FrostedGlassEffect.qml</file>
     </qresource>
     <qresource prefix="/util">
         <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>

@@ -34,18 +34,18 @@ class CompositorDummy : public QObject, public Compositor
     Q_OBJECT
 public:
     CompositorDummy(intf_thread_t *p_intf, QObject* parent = nullptr);
-    ~CompositorDummy() = default;
+    virtual ~CompositorDummy() = default;
 
-    MainInterface *makeMainInterface() override;
+    virtual MainInterface *makeMainInterface() override;
     virtual void destroyMainInterface() override;
 
     bool setupVoutWindow(vout_window_t *p_wnd) override;
 
-private:
+protected:
 
     intf_thread_t *m_intf;
 
-    MainInterface* m_rootWindow;
+    MainInterface* m_rootWindow = nullptr;
 };
 
 }

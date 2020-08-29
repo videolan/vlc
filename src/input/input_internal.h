@@ -490,6 +490,7 @@ typedef struct input_thread_private_t
 
     /* Delays */
     bool        b_low_delay;
+    vlc_tick_t  i_jitter_max;
 
     /* Output */
     bool            b_out_pace_control; /* XXX Move it ot es_sout ? */
@@ -729,6 +730,7 @@ struct input_stats {
     atomic_uintmax_t played_abuffers;
     atomic_uintmax_t lost_abuffers;
     atomic_uintmax_t displayed_pictures;
+    atomic_uintmax_t late_pictures;
     atomic_uintmax_t lost_pictures;
 };
 

@@ -474,15 +474,13 @@ static int next_timeout(intf_thread_t *intf)
             next_timeout = *expiry;
     }
 
-    if (next_timeout >= INT64_MAX)
+    if (next_timeout == INT64_MAX)
         return -1;
 
-    next_timeout /= 1000;
-
-    if (next_timeout > INT_MAX)
+    if (MS_FROM_VLC_TICK(next_timeout) > INT_MAX)
         return INT_MAX;
 
-    return (int)next_timeout;
+    return MS_FROM_VLC_TICK(next_timeout);
 }
 
 /**

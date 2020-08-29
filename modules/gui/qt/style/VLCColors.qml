@@ -96,6 +96,8 @@ Item {
     property color glowColor: setColorAlpha(blendColors(bg, black, 0.8), 0.35)
     property color glowColorBanner: setColorAlpha(blendColors(banner, black, isThemeDark ? 0.25 : 0.35), 0.25)
 
+    property color sliderBarMiniplayerBgColor: isThemeDark ? "#FF929292" : "#FFEEEEEE"
+
     //vlc orange
     property color accent: "#FFFF950D";
 

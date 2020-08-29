@@ -79,7 +79,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
         return vout_display_opengl_SetViewpoint(sys->vgl,
-            &va_arg (args, const vout_display_cfg_t* )->viewpoint);
+                                                va_arg(args, const vlc_viewpoint_t*));
 
     return CommonControl(vd, &sys->area, &sys->sys, query, args);
 }
@@ -120,7 +120,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     /* */
-    CommonInit(vd, &sys->area, cfg);
+    CommonInit(&sys->area, cfg);
     if (CommonWindowInit(vd, &sys->area, &sys->sys,
                    vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR))
         goto error;
@@ -128,7 +128,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
         sys->p_sensors = HookWindowsSensors(vd, sys->sys.hvideownd);
 
-    vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (OpenGL output)");
+    vout_window_SetTitle(cfg->window, VOUT_TITLE " (OpenGL output)");
 
     vout_display_cfg_t embed_cfg = *cfg;
     embed_cfg.window = EmbedVideoWindow_Create(vd);
@@ -195,7 +195,7 @@ static void Close(vout_display_t *vd)
     }
 
     UnhookWindowsSensors(sys->p_sensors);
-    CommonWindowClean(VLC_OBJECT(vd), &sys->sys);
+    CommonWindowClean(&sys->sys);
 
     free(sys);
 }
@@ -207,13 +207,28 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    const int width  = sys->area.place.width;
-    const int height = sys->area.place.height;
-    vlc_gl_Resize (sys->gl, width, height);
     if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
         return;
-    vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
-    vout_display_opengl_Viewport(sys->vgl, sys->area.place.x, sys->area.place.y, width, height);
+    if (sys->area.place_changed)
+    {
+        vout_display_cfg_t place_cfg = sys->area.vdcfg;
+        vout_display_place_t place;
+
+        /* Reverse vertical alignment as the GL tex are Y inverted */
+        if (place_cfg.align.vertical == VLC_VIDEO_ALIGN_TOP)
+            place_cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+        else if (place_cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+            place_cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
+
+        vout_display_PlacePicture(&place, &vd->source, &place_cfg);
+
+        const int width  = place.width;
+        const int height = place.height;
+        vlc_gl_Resize (sys->gl, width, height);
+        vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)width / height);
+        vout_display_opengl_Viewport(sys->vgl, place.x, place.y, width, height);
+        sys->area.place_changed = false;
+    }
     vout_display_opengl_Prepare (sys->vgl, picture, subpicture);
     vlc_gl_ReleaseCurrent (sys->gl);
 }

@@ -606,6 +606,9 @@ typedef bool (*libvlc_video_update_output_cb)(void* opaque, const libvlc_video_r
 /**
  * Callback prototype called after performing drawing calls.
  *
+ * This callback is called outside of libvlc_video_makeCurrent_cb current/not-current
+ * calls.
+ *
  * \param opaque private pointer set on the opaque parameter of @a libvlc_video_output_setup_cb() [IN]
  * \version LibVLC 4.0.0 or later
  */
@@ -723,6 +726,9 @@ typedef void( *libvlc_video_output_set_resize_cb )( void *opaque,
  * The number of planes depend on the DXGI_FORMAT returned during the
  * \ref LIBVLC_VIDEO_UPDATE_OUTPUT call. It's usually one plane except for
  * semi-planar formats like DXGI_FORMAT_NV12 or DXGI_FORMAT_P010.
+ *
+ * This callback is called between libvlc_video_makeCurrent_cb current/not-current
+ * calls.
  */
 typedef bool( *libvlc_video_output_select_plane_cb )( void *opaque, size_t plane );
 

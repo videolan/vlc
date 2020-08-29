@@ -22,13 +22,13 @@
 
 #import "VLCClickerManager.h"
 
-#import "extensions/NSSound+VLCAdditions.h"
 #import "imported/SPMediaKeyTap/SPMediaKeyTap.h"
 #import "imported/AppleRemote/AppleRemote.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistModel.h"
 #import "playlist/VLCPlayerController.h"
+#import "os-integration/VLCSystemVolume.h"
 
 @interface VLCClickerManager()
 {
@@ -264,14 +264,14 @@
             break;
         case kRemoteButtonVolume_Plus:
             if (config_GetInt("macosx-appleremote-sysvol")) {
-                [NSSound increaseSystemVolume];
+                [VLCSystemVolume changeSystemVolume:kVLCSystemVolumeIncreaseDefault];
             } else {
                 [_playerController incrementVolume];
             }
             break;
         case kRemoteButtonVolume_Minus:
             if (config_GetInt("macosx-appleremote-sysvol")) {
-                [NSSound decreaseSystemVolume];
+                [VLCSystemVolume changeSystemVolume:kVLCSystemVolumeDecreaseDefault];
             } else {
                 [_playerController decrementVolume];
             }

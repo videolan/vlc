@@ -32,6 +32,8 @@ Item {
     TextMetrics { id: fontMetrics_xxlarge;  font.pixelSize: dp(20, scale); text: "lq"}
     TextMetrics { id: fontMetrics_xxxlarge;  font.pixelSize: dp(30, scale); text: "lq"}
 
+    property alias self: vlc_style
+
     property VLCColors colors: VLCColors {}
 
     // Sizes
@@ -118,7 +120,7 @@ Item {
 
     property real network_normal: dp(100, scale)
 
-    property int miniPlayerHeight: dp(60, scale)
+    property int miniPlayerHeight: dp(76, scale)
 
     property int expandAlbumTracksHeight: dp(200, scale)
 
@@ -172,11 +174,18 @@ Item {
     property int table_cover_border: dp(2, scale)
 
     property int artistBanner_height: dp(200, scale)
+    
+    //global application size, updated by the root widget
+    property int appWidth: 0
+    property int appHeight: 0
 
     //global application margin "safe area"
     property int applicationHorizontalMargin: 0
     property int applicationVerticalMargin: 0
 
+    property int globalToolbar_height: dp(32, scale)
+    property int localToolbar_height: dp(40, scale)
+    property int banner_icon_size: dp(38, scale)
 
     //timings
     property int delayToolTipAppear: 500;
@@ -195,7 +204,14 @@ Item {
     function dp(px, scale) {
         if (typeof scale === "undefined")
             scale = mainInterface.intfScaleFactor
-        return Math.max(1, Math.round(px * scale))
+
+        var scaledPx = Math.round(px * scale)
+        if (scaledPx < 0)
+            return Math.min(-1, scaledPx)
+        else if (scaledPx > 0)
+            return Math.max(1, scaledPx)
+        else // scaledPx == 0
+            return 0
     }
 
     function colWidth(nb) {

@@ -255,7 +255,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
       }
       case VOUT_DISPLAY_CHANGE_VIEWPOINT:
         return vout_display_opengl_SetViewpoint (sys->vgl,
-            &va_arg (ap, const vout_display_cfg_t* )->viewpoint);
+                                                 va_arg(ap, const vlc_viewpoint_t*));
       default:
         msg_Err (vd, "Unknown request %d", query);
     }

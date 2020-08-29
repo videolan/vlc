@@ -208,6 +208,7 @@ Widgets.NavigableFocusScope {
                     readonly property int _nbCols: VLCStyle.gridColumnsForWidth(artistTable.availableRowWidth)
 
                     anchors.fill: parent
+                    selectionDelegateModel: selectionModel
                     model: artistModel
                     focus: true
                     headerColor: VLCStyle.colors.bg

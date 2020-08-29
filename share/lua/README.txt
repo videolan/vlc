@@ -366,6 +366,24 @@ playlist.move( id_item, id_where ): take id_item and if id_where has children, i
 
 FIXME: add methods to get an item's meta, options, es ...
 
+Renderer discovery
+------------------
+
+Renderer discovery scripts can use the following RD functions:
+
+rd.create( module_type ): Create a renderer discovery object using the
+    module type provided as <module_type> (eg. "mdns_renderer")
+
+The renderer discovery object has the following members:
+  :list() List all known renderers
+    This returns an array of objects containings:
+        .type: The type of this renderer
+        .name: The renderer name
+        .id: The id, to be provided to select()
+        .selected: True if the renderer is currently selected
+
+  :select(<id>) Select a renderer, or disable the current one by providing -1
+
 Services discovery
 ------------------
 

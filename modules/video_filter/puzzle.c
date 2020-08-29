@@ -624,8 +624,8 @@ int puzzle_Callback( vlc_object_t *p_this, char const *psz_var,
 }
 
 /* mouse callback */
-int puzzle_mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
-                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+int puzzle_mouse( filter_t *p_filter, vlc_mouse_t *p_new,
+                  const vlc_mouse_t *p_old )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     const video_format_t  *p_fmt_in = &p_filter->fmt_in.video;
@@ -636,7 +636,6 @@ int puzzle_mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
         return VLC_EGENERIC;
 
     if (! p_sys->b_init || p_sys->b_change_param) {
-        *p_mouse = *p_new;
         return VLC_SUCCESS;
     }
 
@@ -656,7 +655,6 @@ int puzzle_mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
         else
         {
             /* otherwise we can forward the mouse */
-            *p_mouse = *p_new;
             return VLC_SUCCESS;
         }
     }
@@ -679,7 +677,6 @@ int puzzle_mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
             /* do not take into account if border clicked */
             if ((p_new->i_x <= i_border_width) || (p_new->i_y <=  i_border_height) || (p_new->i_x >= (int) p_fmt_in->i_width -  i_border_width) || (p_new->i_y >= (int) p_fmt_in->i_height -  i_border_height ) )
             {
-                *p_mouse = *p_new;
                 return VLC_SUCCESS;
             }
             else if( p_sys->i_selected == NO_PCE )
@@ -740,7 +737,6 @@ int puzzle_mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
     else /* jigsaw puzzle mode */
     {
         if ((p_sys->ps_desk_planes == NULL)  || (p_sys->ps_pict_planes == NULL)  || (p_sys->ps_puzzle_array == NULL) || (p_sys->ps_pieces == NULL)) {
-            *p_mouse = *p_new;
             return VLC_SUCCESS;
         }
 

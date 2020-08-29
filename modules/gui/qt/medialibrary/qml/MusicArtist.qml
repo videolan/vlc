@@ -314,6 +314,7 @@ Widgets.NavigableFocusScope {
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
 
             model: trackModel
+            selectionDelegateModel: trackSelectionModel
             headerColor: VLCStyle.colors.bg
             onActionForSelection: {
                 medialib.addAndPlay( model.getIdsForIndexes( selection ) )
@@ -325,7 +326,7 @@ Widgets.NavigableFocusScope {
             sortModel:  [
                 { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: i18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
                 { criteria: "album_title", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)), text: i18n.qtr("Album") },
-                { criteria: "durationShort", width:VLCStyle.colWidth(1), showSection: "", headerDelegate: tableColumns.timeHeaderDelegate, colDelegate: tableColumns.timeColDelegate },
+                { criteria: "duration_short", width:VLCStyle.colWidth(1), showSection: "", headerDelegate: tableColumns.timeHeaderDelegate, colDelegate: tableColumns.timeColDelegate },
             ]
 
             navigationCancel: function() {
@@ -347,6 +348,12 @@ Widgets.NavigableFocusScope {
             function setCurrentItemFocus() {
                 positionViewAtIndex(currentIndex, ItemView.Contain)
                 currentItem.forceActiveFocus()
+            }
+
+            Util.SelectableDelegateModel {
+                id: trackSelectionModel
+
+                model: trackModel
             }
         }
     }

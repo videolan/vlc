@@ -52,7 +52,7 @@ static struct wait_bucket
 static struct wait_bucket *wait_bucket_get(atomic_uint *addr)
 {
     uintptr_t u = (uintptr_t)addr;
-    size_t idx = (u / alignof (*addr)) % ARRAY_SIZE(wait_buckets);
+    size_t idx = (u / alignof (atomic_uint)) % ARRAY_SIZE(wait_buckets);
 
     return &wait_buckets[idx];
 }

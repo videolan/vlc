@@ -26,6 +26,7 @@
 #include <vlc_common.h>
 #include <vlc_player.h>
 #include <vlc_vector.h>
+#include <vlc_modules.h>
 
 #if defined(ZVBI_COMPILED)
 # define TELETEXT_DECODER "zvbi,"
@@ -2735,6 +2736,59 @@ test_teletext(struct ctx *ctx)
 }
 
 static void
+test_audio_loudness_meter_cb(vlc_tick_t date, double momentary_loudness,
+                             void *data)
+{
+    (void) date;
+    assert(momentary_loudness>= -23 -0.1 && momentary_loudness <= -23 +0.1);
+
+    bool *loudness_meter_received = data;
+    *loudness_meter_received = true;
+}
+
+static void
+test_audio_loudness_meter(struct ctx *ctx)
+{
+    vlc_player_t *player = ctx->player;
+
+    static const union vlc_player_metadata_cbs cbs = {
+        test_audio_loudness_meter_cb,
+    };
+
+    if (!module_exists("ebur128"))
+    {
+        test_log("audio loudness meter test skipped\n");
+        return;
+    }
+
+    struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_SEC(1));
+    params.track_count[AUDIO_ES] = 1;
+    params.track_count[VIDEO_ES] = 0;
+    params.track_count[SPU_ES] = 0;
+
+    /* cf. EBU TECH 3341, Table 1. A 1000Hz stereo sine wave, with an amplitude
+     * of -23dbFS (0.0707) should have a momentary loudness of -23LUFS */
+    params.config = "audio[0]{sinewave=true,sinewave_frequency=1000"
+                    ",sinewave_amplitude=0.0707}";
+    player_set_next_mock_media(ctx, "media1", &params);
+
+    bool loudness_meter_received = false;
+    vlc_player_metadata_listener_id *listener_id =
+        vlc_player_AddMetadataListener(player, VLC_PLAYER_METADATA_LOUDNESS_MOMENTARY,
+                                       &cbs, &loudness_meter_received);
+    assert(listener_id);
+
+    player_start(ctx);
+    wait_state(ctx, VLC_PLAYER_STATE_STARTED);
+    wait_state(ctx, VLC_PLAYER_STATE_STOPPED);
+
+    assert(loudness_meter_received);
+
+    vlc_player_RemoveMetadataListener(player, listener_id);
+    test_end(ctx);
+}
+
+static void
 test_es_selection_override(struct ctx *ctx)
 {
     test_log("test_es_selection_override\n");
@@ -2745,6 +2799,7 @@ test_es_selection_override(struct ctx *ctx)
     params.track_count[VIDEO_ES] = 1;
     params.track_count[AUDIO_ES] = 1;
     params.track_count[SPU_ES] = 0;
+
 
     player_set_next_mock_media(ctx, "media1", &params);
 
@@ -2799,6 +2854,10 @@ main(void)
     test_init();
 
     struct ctx ctx;
+    ctx_init(&ctx, 0);
+    test_audio_loudness_meter(&ctx);
+    ctx_destroy(&ctx);
+    return 0;
 
     /* Test with --aout=none --vout=none */
     ctx_init(&ctx, DISABLE_VIDEO_OUTPUT | DISABLE_AUDIO_OUTPUT);
@@ -2824,6 +2883,7 @@ main(void)
     test_programs(&ctx);
     test_timers(&ctx);
     test_teletext(&ctx);
+    test_audio_loudness_meter(&ctx);
 
     test_delete_while_playback(VLC_OBJECT(ctx.vlc->p_libvlc_int), true);
     test_delete_while_playback(VLC_OBJECT(ctx.vlc->p_libvlc_int), false);

@@ -149,8 +149,8 @@ void SDFileSystemFactory::onDeviceMounted(const std::string& uuid,
         }
         device->addMountpoint(mountpoint);
     }
-
-    m_callbacks->onDeviceMounted( *device );
+    fprintf(stderr, "device mounted: %s %s\n", uuid.c_str(), mountpoint.c_str());
+    m_callbacks->onDeviceMounted( *device, mountpoint );
 }
 
 void vlc::medialibrary::SDFileSystemFactory::onDeviceUnmounted(const std::string& uuid,
@@ -170,7 +170,7 @@ void vlc::medialibrary::SDFileSystemFactory::onDeviceUnmounted(const std::string
         return;
     }
     device->removeMountpoint(mountpoint);
-    m_callbacks->onDeviceUnmounted(*device);
+    m_callbacks->onDeviceUnmounted(*device, mountpoint);
 }
 
 std::shared_ptr<IDevice> SDFileSystemFactory::deviceByUuid(const std::string& uuid)

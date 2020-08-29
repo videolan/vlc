@@ -273,6 +273,7 @@ libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
         demux/mpeg/ts_hotfixes.c demux/mpeg/ts_hotfixes.h \
         demux/mpeg/ts_strings.h demux/mpeg/ts_streams_private.h \
         demux/mpeg/ts_pes.c demux/mpeg/ts_pes.h \
+        demux/mpeg/ts_streamwrapper.h \
         demux/mpeg/pes.h \
         demux/mpeg/timestamps.h \
 	demux/mpeg/ts_descriptions.h \
@@ -509,4 +510,5 @@ demux_LTLIBRARIES += libnoseek_plugin.la
 
 libdemux_mock_plugin_la_SOURCES = demux/mock.c
 libdemux_mock_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
+libdemux_mock_plugin_la_LIBADD = $(LIBM)
 noinst_LTLIBRARIES += libdemux_mock_plugin.la

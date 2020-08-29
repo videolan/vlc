@@ -1,9 +1,9 @@
-MEDIALIBRARY_HASH := cfc889fcd97ee9b1a71e100888715389025b12ea
+MEDIALIBRARY_HASH := b208f5b7f0e7981efbc779018d5ae7f117f331d2
 MEDIALIBRARY_VERSION := git-$(MEDIALIBRARY_HASH)
 MEDIALIBRARY_GITURL := https://code.videolan.org/videolan/medialibrary.git
 
 PKGS += medialibrary
-ifeq ($(call need_pkg,"medialibrary >= 0.8"),)
+ifeq ($(call need_pkg,"medialibrary >= 0.9"),)
 PKGS_FOUND += medialibrary
 endif
 

@@ -1215,6 +1215,8 @@ static void Statistics(intf_thread_t *intf)
                   item->p_stats->i_decoded_video);
         msg_print(intf, _("| frames displayed :    %5"PRIi64),
                   item->p_stats->i_displayed_pictures);
+        msg_print(intf, _("| frames late      :    %5"PRIi64),
+                  item->p_stats->i_late_pictures);
         msg_print(intf, _("| frames lost      :    %5"PRIi64),
                   item->p_stats->i_lost_pictures);
         msg_print(intf, "|");

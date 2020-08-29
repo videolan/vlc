@@ -20,13 +20,37 @@
 #include "qt.hpp"
 #include "playercontrolbarmodel.hpp"
 
-#define MAIN_TB1_DEFAULT "20;21;65;17;3;0-2;1-2;4;18;65;33;7"
-#define MINI_TB_DEFAULT "17;3;0;1;4;18"
+
+static const PlayerControlBarModel::IconToolButton MAIN_TB_DEFAULT[] = {
+                                                                           {PlayerControlBarModel::LANG_BUTTON},
+                                                                           {PlayerControlBarModel::MENU_BUTTON},
+                                                                           {PlayerControlBarModel::WIDGET_SPACER_EXTEND},
+                                                                           {PlayerControlBarModel::RANDOM_BUTTON},
+                                                                           {PlayerControlBarModel::PREVIOUS_BUTTON},
+                                                                           {PlayerControlBarModel::PLAY_BUTTON},
+                                                                           {PlayerControlBarModel::NEXT_BUTTON},
+                                                                           {PlayerControlBarModel::LOOP_BUTTON},
+                                                                           {PlayerControlBarModel::WIDGET_SPACER_EXTEND},
+                                                                           {PlayerControlBarModel::VOLUME},
+                                                                           {PlayerControlBarModel::FULLSCREEN_BUTTON}
+                                                                       };
+
+static const PlayerControlBarModel::IconToolButton MINI_TB_DEFAULT[] = {
+                                                                           {PlayerControlBarModel::WIDGET_SPACER_EXTEND},
+                                                                           {PlayerControlBarModel::RANDOM_BUTTON},
+                                                                           {PlayerControlBarModel::PREVIOUS_BUTTON},
+                                                                           {PlayerControlBarModel::PLAY_BUTTON},
+                                                                           {PlayerControlBarModel::NEXT_BUTTON},
+                                                                           {PlayerControlBarModel::LOOP_BUTTON},
+                                                                           {PlayerControlBarModel::WIDGET_SPACER_EXTEND},
+                                                                           {PlayerControlBarModel::VOLUME},
+                                                                           {PlayerControlBarModel::PLAYER_SWITCH_BUTTON}
+                                                                       };
+
 
 PlayerControlBarModel::PlayerControlBarModel(QObject *_parent) : QAbstractListModel(_parent)
 {
     configName = "MainPlayerToolbar";
-    defaultConfig = MAIN_TB1_DEFAULT;
 }
 
 void PlayerControlBarModel::saveConfig()
@@ -39,8 +63,6 @@ QString PlayerControlBarModel::getConfig()
     QString config="";
     for (IconToolButton it: mButtons) {
         config += QString::number(it.id);
-        if(it.size != WIDGET_NORMAL)
-            config += "-" + QString::number(it.size);
         config += ";";
     }
     return config;
@@ -58,13 +80,28 @@ void PlayerControlBarModel::reloadModel()
 {
     beginResetModel();
     mButtons.clear();
-    QString config = getSettings() ->value( configName, defaultConfig )
-                                            .toString();
-    parseAndAdd(config);
+
+    QVariant config = getSettings() ->value(configName);
+
+    if (!config.isNull() && config.canConvert<QString>())
+        parseAndAdd(config.toString());
+    else if (configName == "MainPlayerToolbar")
+        parseDefault(MAIN_TB_DEFAULT, ARRAY_SIZE(MAIN_TB_DEFAULT));
+    else
+        parseDefault(MINI_TB_DEFAULT, ARRAY_SIZE(MINI_TB_DEFAULT));
+    
     endResetModel();
 }
 
-void PlayerControlBarModel::parseAndAdd(QString &config)
+void PlayerControlBarModel::parseDefault(const PlayerControlBarModel::IconToolButton* config, const size_t config_size)
+{
+    beginInsertRows(QModelIndex(),rowCount(),rowCount() + config_size);
+    for (size_t i = 0; i < config_size; i++)
+        mButtons.append(config[i]);
+    endInsertRows();
+}
+
+void PlayerControlBarModel::parseAndAdd(const QString &config)
 {
     beginInsertRows(QModelIndex(),rowCount(),rowCount()+config.split(";", QString::SkipEmptyParts).length() - 1);
 
@@ -78,7 +115,6 @@ void PlayerControlBarModel::parseAndAdd(QString &config)
             continue;
         }
         bool ok;
-        int i_option = WIDGET_NORMAL;
         ButtonType_e i_type = static_cast<ButtonType_e>(list2.at( 0 ).toInt( &ok ));
         if( !ok )
         {
@@ -86,17 +122,8 @@ void PlayerControlBarModel::parseAndAdd(QString &config)
             continue;
         }
 
-        if( list2.count() > 1 )
-        {
-            i_option = list2.at( 1 ).toInt( &ok );
-            if( !ok )
-            {
-                msg_Warn( p_intf, "Parsing error 3. Please, report this." );
-                continue;
-            }
-        }
-
-        mButtons.append({ i_type , i_option});
+        IconToolButton itButton = {i_type};
+        mButtons.append(itButton);
     }
 
     endInsertRows();
@@ -120,9 +147,6 @@ QVariant PlayerControlBarModel::data(const QModelIndex &index, int role) const
     switch (role) {
     case ID_ROLE:
         return QVariant(button.id);
-
-    case SIZE_ROLE:
-        return QVariant(button.size);
     }
     return QVariant();
 }
@@ -134,8 +158,6 @@ bool PlayerControlBarModel::setData(const QModelIndex &index, const QVariant &va
     case ID_ROLE:
         button.id = value.toInt();
         break;
-    case SIZE_ROLE:
-        button.size = value.toInt();
     }
 
     if (setButtonAt(index.row(),button)) {
@@ -158,7 +180,6 @@ QHash<int, QByteArray> PlayerControlBarModel::roleNames() const
     QHash<int, QByteArray> names;
 
     names[ID_ROLE] = "id";
-    names[SIZE_ROLE] = "size";
 
     return names;
 }
@@ -168,7 +189,7 @@ bool PlayerControlBarModel::setButtonAt(int index, const IconToolButton &button)
         return false;
     const IconToolButton &oldButton = mButtons.at(index);
 
-    if (button.size == oldButton.size && button.id == oldButton.id)
+    if (button.id == oldButton.id)
         return false;
 
     mButtons[index] = button;
@@ -191,10 +212,6 @@ void PlayerControlBarModel::setConfigName(QString name)
     if(configName == name)
         return;
     configName = name;
-    if(configName == "MainPlayerToolbar")
-        defaultConfig = MAIN_TB1_DEFAULT;
-    else
-        defaultConfig = MINI_TB_DEFAULT;
     if  (m_mainCtx)
         reloadModel();
     emit configNameChanged(name);
@@ -203,7 +220,7 @@ void PlayerControlBarModel::setConfigName(QString name)
 void PlayerControlBarModel::insert(int index, QVariantMap bdata)
 {
     beginInsertRows(QModelIndex(),index,index);
-    mButtons.insert(index,{bdata.value("id").toInt(),bdata.value("size").toInt()});
+    mButtons.insert(index, { bdata.value("id").toInt() });
     endInsertRows();
 }
 void PlayerControlBarModel::move(int src, int dest)

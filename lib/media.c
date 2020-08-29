@@ -761,6 +761,7 @@ bool libvlc_media_get_stats(libvlc_media_t *p_md,
     p_stats->i_decoded_audio = p_itm_stats->i_decoded_audio;
 
     p_stats->i_displayed_pictures = p_itm_stats->i_displayed_pictures;
+    p_stats->i_late_pictures = p_itm_stats->i_late_pictures;
     p_stats->i_lost_pictures = p_itm_stats->i_lost_pictures;
 
     p_stats->i_played_abuffers = p_itm_stats->i_played_abuffers;

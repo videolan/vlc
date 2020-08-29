@@ -56,7 +56,7 @@ Widgets.NavigableFocusScope {
 
     //reset view
     function loadDefaultView() {
-        root.view = "albums"
+        root.view = "artists"
         root.viewProperties= ({})
     }
 
@@ -65,21 +65,21 @@ Widgets.NavigableFocusScope {
     }
 
     readonly property var pageModel: [{
-            displayText: i18n.qtr("Albums"),
-            name: "albums",
-            url: "qrc:///medialibrary/MusicAlbumsDisplay.qml"
-        }, {
             displayText: i18n.qtr("Artists"),
             name: "artists",
             url: "qrc:///medialibrary/MusicArtistsDisplay.qml"
         }, {
-            displayText: i18n.qtr("Genres"),
-            name: "genres" ,
-            url: "qrc:///medialibrary/MusicGenresDisplay.qml"
+            displayText: i18n.qtr("Albums"),
+            name: "albums",
+            url: "qrc:///medialibrary/MusicAlbumsDisplay.qml"
         }, {
             displayText: i18n.qtr("Tracks"),
             name: "tracks" ,
             url: "qrc:///medialibrary/MusicTracksDisplay.qml"
+        }, {
+            displayText: i18n.qtr("Genres"),
+            name: "genres" ,
+            url: "qrc:///medialibrary/MusicGenresDisplay.qml"
         }
     ]
 

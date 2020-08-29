@@ -6,7 +6,9 @@ text_LTLIBRARIES = libtdummy_plugin.la
 libfreetype_plugin_la_SOURCES = \
 	text_renderer/freetype/platform_fonts.c text_renderer/freetype/platform_fonts.h \
 	text_renderer/freetype/freetype.c text_renderer/freetype/freetype.h \
+	text_renderer/freetype/ftcache.c text_renderer/freetype/ftcache.h \
 	text_renderer/freetype/text_layout.c text_renderer/freetype/text_layout.h \
+	text_renderer/freetype/lru.c text_renderer/freetype/lru.h \
         text_renderer/freetype/fonts/backends.h
 
 libfreetype_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(FREETYPE_CFLAGS)

@@ -35,11 +35,9 @@ public:
     struct IconToolButton
     {
         int id;
-        int size;
     };
     enum{
-        ID_ROLE,
-        SIZE_ROLE
+        ID_ROLE
     };
     enum ButtonType_e
     {
@@ -69,6 +67,7 @@ public:
         CHAPTER_PREVIOUS_BUTTON,
         CHAPTER_NEXT_BUTTON,
         BUTTON_MAX,
+        PLAYER_SWITCH_BUTTON,
 
         SPLITTER = 0x20,
         VOLUME,
@@ -82,12 +81,6 @@ public:
     };
     Q_ENUM(ButtonType_e)
 
-    enum ButtonSize
-    {
-        WIDGET_NORMAL = 0x0,
-        WIDGET_BIG    = 0x2,
-    };
-    Q_ENUM(ButtonSize)
     // Basic functionality:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
@@ -117,9 +110,9 @@ protected:
 private:
     QVector<IconToolButton> mButtons;
     QString configName;
-    QString defaultConfig;
 
-    void parseAndAdd(QString& config);
+    void parseAndAdd(const QString& config);
+    void parseDefault(const IconToolButton* config, const size_t config_size);
 
     bool setButtonAt(int index, const IconToolButton &button);
     void addProfiles();

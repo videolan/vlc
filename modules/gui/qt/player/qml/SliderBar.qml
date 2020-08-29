@@ -18,16 +18,22 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtGraphicalEffects 1.0
 
+import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 Slider {
     id: control
-    property int barHeight: 5
+
+    property int barHeight: isMiniplayer ? VLCStyle.dp(3) : VLCStyle.dp(5)
     property bool _isHold: false
     property bool _isSeekPointsShown: true
-    
-    anchors.margins: VLCStyle.margin_xxsmall
+    property bool isMiniplayer: false
+
+    property alias parentWindow: timeTooltip.parentWindow
+
+    anchors.margins: isMiniplayer ? 0 : VLCStyle.margin_xxsmall
 
     Keys.onRightPressed: player.jumpFwd()
     Keys.onLeftPressed: player.jumpBwd()
@@ -39,39 +45,16 @@ Slider {
         onTriggered: control._isSeekPointsShown = false
     }
 
-    Item {
+    Widgets.PointingTooltip {
         id: timeTooltip
-        property real location: 0
-        property real position: location/control.width
 
-        y: VLCStyle.dp(-35)
-        x: location - (timeIndicatorRect.width / 2)
         visible: control.hovered
 
-        Rectangle {
-            width: VLCStyle.dp(10)
-            height: VLCStyle.dp(10)
+        text: player.length.scale(timeTooltip.position).toString() +
+              (player.hasChapters ?
+                   " - " + player.chapters.getNameAtPosition(timeTooltip.position) : "")
 
-            anchors.horizontalCenter: timeIndicatorRect.horizontalCenter
-            anchors.verticalCenter: timeIndicatorRect.bottom
-
-            rotation: 45
-            color: VLCStyle.colors.bgAlt
-        }
-
-        Rectangle {
-            id: timeIndicatorRect
-            width: childrenRect.width
-            height: VLCStyle.dp(20)
-            color: VLCStyle.colors.bgAlt
-
-            Text {
-                text: player.length.scale(timeTooltip.position).toString() +
-                      (player.hasChapters ?
-                           " - " + player.chapters.getNameAtPosition(timeTooltip.position) : "")
-                color: VLCStyle.colors.text
-            }
-        }
+        mouseArea: sliderRectMouseArea
     }
 
     Connections {    
@@ -98,7 +81,7 @@ Slider {
         width: control.availableWidth
         implicitHeight: control.implicitHeight
         height: implicitHeight
-        color:  VLCStyle.colors.setColorAlpha( VLCStyle.colors.playerFg, 0.7 )
+        color:  isMiniplayer ? (VLCStyle.colors.sliderBarMiniplayerBgColor) : VLCStyle.colors.setColorAlpha( VLCStyle.colors.playerFg, 0.7 )
         radius: implicitHeight
 
         MouseArea {
@@ -120,7 +103,6 @@ Slider {
                     control.value = event.x / control.width
                     player.position = control.value
                 }
-                timeTooltip.location = event.x
             }
             onEntered: {
                 if(player.hasChapters)
@@ -136,7 +118,7 @@ Slider {
             id: progressRect
             width: control.visualPosition * parent.width
             height: control.barHeight
-            color: control.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.bgHover
+            color: (control.activeFocus || control.isMiniplayer) ? VLCStyle.colors.accent : VLCStyle.colors.bgHover
             radius: control.barHeight
         }
 
@@ -245,6 +227,8 @@ Slider {
     }
 
     handle: Rectangle {
+        id: sliderHandle
+
         visible: control.activeFocus
         x: (control.visualPosition * control.availableWidth) - width / 2
         y: (control.barHeight - width) / 2
@@ -252,5 +236,24 @@ Slider {
         implicitHeight: VLCStyle.margin_small
         radius: VLCStyle.margin_small
         color: VLCStyle.colors.accent
+
+        transitions: [
+            Transition {
+                to: "hidden"
+                SequentialAnimation {
+                    NumberAnimation { target: sliderHandle; properties: "implicitWidth,implicitHeight"; to: 0; duration: 150; easing.type: Easing.OutSine}
+                    PropertyAction { target: sliderHandle; property: "visible"; value: false; }
+                }
+            },
+            Transition {
+                to: "visible"
+                SequentialAnimation {
+                    PropertyAction { target: sliderHandle; property: "visible"; value: true; }
+                    NumberAnimation { target: sliderHandle; properties: "implicitWidth,implicitHeight"; to: VLCStyle.margin_small; duration: 150; easing.type: Easing.InSine}
+                }
+            }
+        ]
+
+        state: isMiniplayer ? (control.hovered ? "visible" : "hidden") : undefined
     }
 }

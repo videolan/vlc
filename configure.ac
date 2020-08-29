@@ -119,6 +119,13 @@ AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option], [
   AX_APPEND_FLAG([-Werror=unknown-warning-option], [OBJCFLAGS])
 ])
 
+dnl Some Qt version are generating tons of warning that cannot be
+dnl avoided so mute them...
+AX_CHECK_COMPILE_FLAG([-Wno-deprecated-copy], [
+  VLC_ADD_CXXFLAGS([qt],[-Wno-deprecated-copy])
+])
+
+
 dnl
 dnl  Check the operating system
 dnl
@@ -3942,6 +3949,11 @@ dnl
 PKG_ENABLE_MODULES_VLC([SOXR], [], [soxr >= 0.1.2], [SoX Resampler library], [auto])
 
 dnl
+dnl  libebur128 module
+dnl
+PKG_ENABLE_MODULES_VLC([EBUR128], [], [libebur128 >= 1.2.4], [EBU R 128 standard for loudness normalisation], [auto])
+
+dnl
 dnl  OS/2 KAI plugin
 dnl
 AC_ARG_ENABLE([kai],
@@ -4470,7 +4482,7 @@ dnl Libnotify notification plugin
 dnl
 PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify], [libnotify notification], [auto])
 
-PKG_ENABLE_MODULES_VLC([MEDIALIBRARY], [medialibrary], [medialibrary >= 0.8.0], (medialibrary support), [auto])
+PKG_ENABLE_MODULES_VLC([MEDIALIBRARY], [medialibrary], [medialibrary >= 0.9.0], (medialibrary support), [auto])
 
 dnl
 dnl  Endianness check

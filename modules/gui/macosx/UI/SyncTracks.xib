@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16097" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
-        <capability name="box content view" minToolsVersion="7.0"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCTrackSynchronizationWindowController">
@@ -32,41 +32,41 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" utility="YES" HUD="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="286" width="450" height="222"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="800"/>
             <view key="contentView" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="450" height="222"/>
+                <rect key="frame" x="0.0" y="0.0" width="450" height="230"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="39">
-                        <rect key="frame" x="21" y="199" width="68" height="14"/>
+                        <rect key="frame" x="21" y="207" width="68" height="14"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Audio/Video" id="40">
-                            <font key="font" metaFont="smallSystem"/>
+                            <font key="font" metaFont="message" size="11"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <box borderType="line" title="Audio/Video" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="5">
-                        <rect key="frame" x="13" y="154" width="425" height="47"/>
+                        <rect key="frame" x="13" y="158" width="425" height="51"/>
                         <view key="contentView" id="cSz-hU-mVM">
-                            <rect key="frame" x="1" y="1" width="423" height="45"/>
+                            <rect key="frame" x="3" y="3" width="419" height="45"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6">
                                     <rect key="frame" x="15" y="16" width="147" height="14"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Audio track syncronization:" usesSingleLineMode="YES" id="7">
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8">
-                                    <rect key="frame" x="312" y="13" width="76" height="19"/>
+                                    <rect key="frame" x="308" y="13" width="76" height="19"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="76" id="inS-O9-M4h"/>
                                     </constraints>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" usesSingleLineMode="YES" id="9">
                                         <numberFormatter key="formatter" formatterBehavior="default10_4" numberStyle="decimal" lenient="YES" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="97"/>
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         <allowedInputSourceLocales>
@@ -78,9 +78,9 @@
                                     </connections>
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="10">
-                                    <rect key="frame" x="394" y="11" width="15" height="22"/>
+                                    <rect key="frame" x="390" y="11" width="15" height="22"/>
                                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.5" minValue="-60" maxValue="60" id="11">
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                     </stepperCell>
                                     <connections>
                                         <action selector="avValueChanged:" target="-2" id="124"/>
@@ -88,7 +88,6 @@
                                 </stepper>
                             </subviews>
                             <constraints>
-                                <constraint firstItem="8" firstAttribute="centerY" secondItem="6" secondAttribute="centerY" id="Dig-iw-3hj"/>
                                 <constraint firstAttribute="bottom" secondItem="6" secondAttribute="bottom" constant="16" id="NaA-4f-9By"/>
                                 <constraint firstItem="6" firstAttribute="leading" secondItem="cSz-hU-mVM" secondAttribute="leading" constant="17" id="aVd-9P-n8Q"/>
                                 <constraint firstItem="8" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6" secondAttribute="trailing" constant="17" id="k8E-KO-bnf"/>
@@ -101,32 +100,32 @@
                         </view>
                     </box>
                     <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="37">
-                        <rect key="frame" x="21" y="138" width="85" height="14"/>
+                        <rect key="frame" x="21" y="142" width="84" height="14"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Subtitles/Video" id="38">
-                            <font key="font" metaFont="smallSystem"/>
+                            <font key="font" metaFont="message" size="11"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <box borderType="line" title="Subtitles/Video" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="16">
-                        <rect key="frame" x="13" y="32" width="427" height="108"/>
+                        <rect key="frame" x="13" y="32" width="427" height="112"/>
                         <view key="contentView" id="KDu-mg-vUb">
-                            <rect key="frame" x="1" y="1" width="425" height="106"/>
+                            <rect key="frame" x="3" y="3" width="421" height="106"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="21">
                                     <rect key="frame" x="15" y="78" width="164" height="14"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Subtitle track synchronization:" usesSingleLineMode="YES" id="22">
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20">
-                                    <rect key="frame" x="312" y="75" width="76" height="19"/>
+                                    <rect key="frame" x="308" y="76" width="76" height="19"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" usesSingleLineMode="YES" id="23">
                                         <numberFormatter key="formatter" formatterBehavior="custom10_4" numberStyle="decimal" generatesDecimalNumbers="YES" lenient="YES" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" positiveSuffix=" s" negativeSuffix=" s" id="95"/>
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         <allowedInputSourceLocales>
@@ -138,9 +137,9 @@
                                     </connections>
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="19">
-                                    <rect key="frame" x="394" y="73" width="15" height="22"/>
+                                    <rect key="frame" x="390" y="74" width="15" height="22"/>
                                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.5" minValue="-60" maxValue="60" id="24">
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                     </stepperCell>
                                     <connections>
                                         <action selector="svAdvanceValueChanged:" target="-2" id="128"/>
@@ -149,16 +148,16 @@
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="27">
                                     <rect key="frame" x="15" y="46" width="84" height="14"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Subtitle speed:" usesSingleLineMode="YES" id="36">
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="28">
-                                    <rect key="frame" x="312" y="44" width="76" height="19"/>
+                                    <rect key="frame" x="308" y="44" width="76" height="19"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" usesSingleLineMode="YES" id="35">
                                         <numberFormatter key="formatter" formatterBehavior="custom10_4" numberStyle="decimal" lenient="YES" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" positiveSuffix=" s" negativeSuffix=" s" id="96"/>
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         <allowedInputSourceLocales>
@@ -170,9 +169,9 @@
                                     </connections>
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="29">
-                                    <rect key="frame" x="394" y="42" width="15" height="22"/>
+                                    <rect key="frame" x="390" y="42" width="15" height="22"/>
                                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="100" doubleValue="1" id="34">
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                     </stepperCell>
                                     <connections>
                                         <action selector="svSpeedValueChanged:" target="-2" id="132"/>
@@ -181,16 +180,16 @@
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="98">
                                     <rect key="frame" x="15" y="14" width="129" height="14"/>
                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Subtitle duration factor:" usesSingleLineMode="YES" id="102">
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="99">
-                                    <rect key="frame" x="312" y="12" width="76" height="19"/>
+                                    <rect key="frame" x="308" y="12" width="76" height="19"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" usesSingleLineMode="YES" id="100">
                                         <numberFormatter key="formatter" formatterBehavior="custom10_4" numberStyle="decimal" lenient="YES" minimumIntegerDigits="0" maximumIntegerDigits="2000000000" maximumFractionDigits="3" positiveSuffix=" s" negativeSuffix=" s" id="101"/>
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         <allowedInputSourceLocales>
@@ -202,9 +201,9 @@
                                     </connections>
                                 </textField>
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="105">
-                                    <rect key="frame" x="394" y="10" width="15" height="22"/>
+                                    <rect key="frame" x="390" y="10" width="15" height="22"/>
                                     <stepperCell key="cell" controlSize="small" continuous="YES" alignment="left" increment="0.20000000000000001" maxValue="20" id="106">
-                                        <font key="font" metaFont="smallSystem"/>
+                                        <font key="font" metaFont="message" size="11"/>
                                     </stepperCell>
                                     <connections>
                                         <action selector="svDurationValueChanged:" target="-2" id="130"/>
@@ -240,7 +239,7 @@
                         </view>
                     </box>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="41">
-                        <rect key="frame" x="16" y="12" width="39" height="17"/>
+                        <rect key="frame" x="16" y="13" width="39" height="15"/>
                         <buttonCell key="cell" type="roundRect" title="Reset" bezelStyle="roundedRect" image="buttonCell:42:image" imagePosition="overlaps" alignment="center" controlSize="mini" borderStyle="border" inset="2" id="42">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="miniSystem"/>
@@ -267,48 +266,50 @@
                     <constraint firstItem="41" firstAttribute="leading" secondItem="16" secondAttribute="leading" id="yiq-2N-OyP"/>
                 </constraints>
             </view>
+            <point key="canvasLocation" x="141" y="149"/>
         </window>
     </objects>
     <resources>
         <image name="buttonCell:42:image" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
-YnBsaXN0MDDUAQIDBAUGPT5YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
-GR4fIyQrLjE3OlUkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
-c1dOU0NvbG9ygAKADRIgywAAgAOAC1Z7MSwgMX3SFQoWGFpOUy5vYmplY3RzoReABIAK0hUKGh2iGxyA
-BYAGgAkQANIgCiEiXxAUTlNUSUZGUmVwcmVzZW50YXRpb26AB4AITxEGTE1NACoAAAAKAAAAEAEAAAMA
-AAABAAEAAAEBAAMAAAABAAEAAAECAAMAAAACAAgACAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAEKAAMA
-AAABAAEAAAERAAQAAAABAAAACAESAAMAAAABAAEAAAEVAAMAAAABAAIAAAEWAAMAAAABAAEAAAEXAAQA
-AAABAAAAAgEcAAMAAAABAAEAAAEoAAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAACAAEAAYdzAAcA
-AAV8AAAA0AAAAAAAAAV8YXBwbAIgAABtbnRyR1JBWVhZWiAH0AACAA4ADAAAAABhY3NwQVBQTAAAAABu
-b25lAAAAAAAAAAAAAAAAAAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVkZXNjAAAAwAAAAG9kc2NtAAABMAAAA+5jcHJ0AAAFIAAAADh3
-dHB0AAAFWAAAABRrVFJDAAAFbAAAAA5kZXNjAAAAAAAAABVHZW5lcmljIEdyYXkgUHJvZmlsZQAAAAAA
-AAAAAAAAFUdlbmVyaWMgR3JheSBQcm9maWxlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAbWx1YwAAAAAAAAATAAAADHB0QlIAAAAqAAAA9GZyRlUAAAAqAAABHnpoVFcA
-AAAQAAABSGl0SVQAAAAuAAABWG5iTk8AAAAsAAABhmtvS1IAAAAYAAABsmRlREUAAAA6AAABynN2U0UA
-AAAuAAACBHpoQ04AAAAQAAACMmphSlAAAAAWAAACQnB0UE8AAAA4AAACWG5sTkwAAAAqAAACkGVzRVMA
-AAAoAAACumZpRkkAAAAsAAAC4nBsUEwAAAA2AAADDnJ1UlUAAAAmAAADRGFyRUcAAAAoAAADamVuVVMA
-AAAoAAADkmRhREsAAAA0AAADugBQAGUAcgBmAGkAbAAgAEMAaQBuAHoAYQAgAEcAZQBuAOkAcgBpAGMA
-bwBQAHIAbwBmAGkAbAAgAGcA6QBuAOkAcgBpAHEAdQBlACAAZwByAGkAc5AadShwcJaOgnJfaWPPj/AA
-UAByAG8AZgBpAGwAbwAgAGcAcgBpAGcAaQBvACAAZwBlAG4AZQByAGkAYwBvAEcAZQBuAGUAcgBpAHMA
-awAgAGcAcgDlAHQAbwBuAGUAcAByAG8AZgBpAGzHfLwYACAARwByAGEAeQAg1QS4XNMMx3wAQQBsAGwA
-ZwBlAG0AZQBpAG4AZQBzACAARwByAGEAdQBzAHQAdQBmAGUAbgAtAFAAcgBvAGYAaQBsAEcAZQBuAGUA
-cgBpAHMAawAgAGcAcgDlAHMAawBhAGwAZQBwAHIAbwBmAGkAbGZukBpwcF6mY8+P8GWHTvZOAIIsMLAw
-7DCkMNcw7TDVMKEwpDDrAFAAZQByAGYAaQBsACAAZwBlAG4A6QByAGkAYwBvACAAZABlACAAYwBpAG4A
-egBlAG4AdABvAHMAQQBsAGcAZQBtAGUAZQBuACAAZwByAGkAagBzAHAAcgBvAGYAaQBlAGwAUABlAHIA
-ZgBpAGwAIABnAHIAaQBzACAAZwBlAG4A6QByAGkAYwBvAFkAbABlAGkAbgBlAG4AIABoAGEAcgBtAGEA
-YQBwAHIAbwBmAGkAaQBsAGkAVQBuAGkAdwBlAHIAcwBhAGwAbgB5ACAAcAByAG8AZgBpAGwAIABzAHoA
-YQByAG8BWwBjAGkEHgQxBEkEOAQ5ACAEQQQ1BEAESwQ5ACAEPwRABD4ERAQ4BDsETAZFBkQGQQAgBioG
-OQYxBkoGQQAgAEcAcgBhAHkAIAYnBkQGOQYnBkUARwBlAG4AZQByAGkAYwAgAEcAcgBhAHkAIABQAHIA
-bwBmAGkAbABlAEcAZQBuAGUAcgBlAGwAIABnAHIA5QB0AG8AbgBlAGIAZQBzAGsAcgBpAHYAZQBsAHMA
-ZQAAdGV4dAAAAABDb3B5cmlnaHQgMjAwNyBBcHBsZSBJbmMuLCBhbGwgcmlnaHRzIHJlc2VydmVkLgBY
-WVogAAAAAAAA81EAAQAAAAEWzGN1cnYAAAAAAAAAAQHNAADSJSYnKFokY2xhc3NuYW1lWCRjbGFzc2Vz
-XxAQTlNCaXRtYXBJbWFnZVJlcKMnKSpaTlNJbWFnZVJlcFhOU09iamVjdNIlJiwtV05TQXJyYXmiLCrS
-JSYvMF5OU011dGFibGVBcnJheaMvLCrTMjMKNDU2V05TV2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AM
-0iUmODlXTlNDb2xvcqI4KtIlJjs8V05TSW1hZ2WiOypfEA9OU0tleWVkQXJjaGl2ZXLRP0BUcm9vdIAB
-AAgAEQAaACMALQAyADcARgBMAFcAXgBlAHIAeQCBAIMAhQCKAIwAjgCVAJoApQCnAKkAqwCwALMAtQC3
-ALkAuwDAANcA2QDbBysHMAc7B0QHVwdbB2YHbwd0B3wHfweEB5MHlweeB6YHswe4B7oHvAfBB8kHzAfR
-B9kH3AfuB/EH9gAAAAAAAAIBAAAAAAAAAEEAAAAAAAAAAAAAAAAAAAf4A
+YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T
+S2V5ZWRBcmNoaXZlctEICVRyb290gAGuCwwZGh8UJCgpMDM2PD9VJG51bGzWDQ4PEBESExQVFhcYVk5T
+U2l6ZV5OU1Jlc2l6aW5nTW9kZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVwc1dOU0NvbG9ygAIQAIAN
+EiDLAACAA4ALVnsxLCAxfdIbDxweWk5TLm9iamVjdHOhHYAEgArSGw8gI6IhIoAFgAaACdIlDyYnXxAU
+TlNUSUZGUmVwcmVzZW50YXRpb26AB4AITxEGTE1NACoAAAAKAAAAEAEAAAMAAAABAAEAAAEBAAMAAAAB
+AAEAAAECAAMAAAACAAgACAEDAAMAAAABAAEAAAEGAAMAAAABAAEAAAEKAAMAAAABAAEAAAERAAQAAAAB
+AAAACAESAAMAAAABAAEAAAEVAAMAAAABAAIAAAEWAAMAAAABAAEAAAEXAAQAAAABAAAAAgEcAAMAAAAB
+AAEAAAEoAAMAAAABAAIAAAFSAAMAAAABAAEAAAFTAAMAAAACAAEAAYdzAAcAAAV8AAAA0AAAAAAAAAV8
+YXBwbAIgAABtbnRyR1JBWVhZWiAH0AACAA4ADAAAAABhY3NwQVBQTAAAAABub25lAAAAAAAAAAAAAAAA
+AAAAAAAA9tYAAQAAAADTLWFwcGwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAVkZXNjAAAAwAAAAG9kc2NtAAABMAAAA+5jcHJ0AAAFIAAAADh3dHB0AAAFWAAAABRrVFJD
+AAAFbAAAAA5kZXNjAAAAAAAAABVHZW5lcmljIEdyYXkgUHJvZmlsZQAAAAAAAAAAAAAAFUdlbmVyaWMg
+R3JheSBQcm9maWxlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+bWx1YwAAAAAAAAATAAAADHB0QlIAAAAqAAAA9GZyRlUAAAAqAAABHnpoVFcAAAAQAAABSGl0SVQAAAAu
+AAABWG5iTk8AAAAsAAABhmtvS1IAAAAYAAABsmRlREUAAAA6AAABynN2U0UAAAAuAAACBHpoQ04AAAAQ
+AAACMmphSlAAAAAWAAACQnB0UE8AAAA4AAACWG5sTkwAAAAqAAACkGVzRVMAAAAoAAACumZpRkkAAAAs
+AAAC4nBsUEwAAAA2AAADDnJ1UlUAAAAmAAADRGFyRUcAAAAoAAADamVuVVMAAAAoAAADkmRhREsAAAA0
+AAADugBQAGUAcgBmAGkAbAAgAEMAaQBuAHoAYQAgAEcAZQBuAOkAcgBpAGMAbwBQAHIAbwBmAGkAbAAg
+AGcA6QBuAOkAcgBpAHEAdQBlACAAZwByAGkAc5AadShwcJaOgnJfaWPPj/AAUAByAG8AZgBpAGwAbwAg
+AGcAcgBpAGcAaQBvACAAZwBlAG4AZQByAGkAYwBvAEcAZQBuAGUAcgBpAHMAawAgAGcAcgDlAHQAbwBu
+AGUAcAByAG8AZgBpAGzHfLwYACAARwByAGEAeQAg1QS4XNMMx3wAQQBsAGwAZwBlAG0AZQBpAG4AZQBz
+ACAARwByAGEAdQBzAHQAdQBmAGUAbgAtAFAAcgBvAGYAaQBsAEcAZQBuAGUAcgBpAHMAawAgAGcAcgDl
+AHMAawBhAGwAZQBwAHIAbwBmAGkAbGZukBpwcF6mY8+P8GWHTvZOAIIsMLAw7DCkMNcw7TDVMKEwpDDr
+AFAAZQByAGYAaQBsACAAZwBlAG4A6QByAGkAYwBvACAAZABlACAAYwBpAG4AegBlAG4AdABvAHMAQQBs
+AGcAZQBtAGUAZQBuACAAZwByAGkAagBzAHAAcgBvAGYAaQBlAGwAUABlAHIAZgBpAGwAIABnAHIAaQBz
+ACAAZwBlAG4A6QByAGkAYwBvAFkAbABlAGkAbgBlAG4AIABoAGEAcgBtAGEAYQBwAHIAbwBmAGkAaQBs
+AGkAVQBuAGkAdwBlAHIAcwBhAGwAbgB5ACAAcAByAG8AZgBpAGwAIABzAHoAYQByAG8BWwBjAGkEHgQx
+BEkEOAQ5ACAEQQQ1BEAESwQ5ACAEPwRABD4ERAQ4BDsETAZFBkQGQQAgBioGOQYxBkoGQQAgAEcAcgBh
+AHkAIAYnBkQGOQYnBkUARwBlAG4AZQByAGkAYwAgAEcAcgBhAHkAIABQAHIAbwBmAGkAbABlAEcAZQBu
+AGUAcgBlAGwAIABnAHIA5QB0AG8AbgBlAGIAZQBzAGsAcgBpAHYAZQBsAHMAZQAAdGV4dAAAAABDb3B5
+cmlnaHQgMjAwNyBBcHBsZSBJbmMuLCBhbGwgcmlnaHRzIHJlc2VydmVkLgBYWVogAAAAAAAA81EAAQAA
+AAEWzGN1cnYAAAAAAAAAAQHNAADSKissLVokY2xhc3NuYW1lWCRjbGFzc2VzXxAQTlNCaXRtYXBJbWFn
+ZVJlcKMsLi9aTlNJbWFnZVJlcFhOU09iamVjdNIqKzEyV05TQXJyYXmiMS/SKis0NV5OU011dGFibGVB
+cnJheaM0MS/TNzgPOTo7V05TV2hpdGVcTlNDb2xvclNwYWNlRDAgMAAQA4AM0iorPT5XTlNDb2xvcqI9
+L9IqK0BBV05TSW1hZ2WiQC8ACAARABoAJAApADIANwBJAEwAUQBTAGIAaAB1AHwAiwCSAJ8ApgCuALAA
+sgC0ALkAuwC9AMQAyQDUANYA2ADaAN8A4gDkAOYA6ADtAQQBBgEIB1gHXQdoB3EHhAeIB5MHnAehB6kH
+rAexB8AHxAfLB9MH4AflB+cH6QfuB/YH+Qf+CAYAAAAAAAACAQAAAAAAAABCAAAAAAAAAAAAAAAAAAAI
+CQ
 </mutableData>
         </image>
     </resources>

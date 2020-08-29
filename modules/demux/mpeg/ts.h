@@ -76,13 +76,12 @@ struct demux_sys_t
 
     ts_standards_e standard;
 
+#ifdef HAVE_ARIBB24
     struct
     {
-#ifdef HAVE_ARIBB24
         arib_instance_t *p_instance;
-#endif
-        stream_t     *b25stream;
     } arib;
+#endif
 
     /* All pid */
     ts_pid_list_t pids;

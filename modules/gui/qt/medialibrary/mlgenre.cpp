@@ -23,13 +23,34 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QDir>
+#include <QGradient>
+#include <QGraphicsScene>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsBlurEffect>
+#include <algorithm>
 #include "mlgenre.hpp"
 #include "qt.hpp"
 
 namespace  {
 
-#define THUMBNAIL_WIDTH 512
-#define THUMBNAIL_HEIGHT 512
+#define THUMBNAIL_WIDTH 260
+#define THUMBNAIL_HEIGHT 130
+
+QImage blurImage(const QImage& src)
+{
+    QGraphicsScene scene;
+    QGraphicsPixmapItem item;
+    item.setPixmap(QPixmap::fromImage(src));
+    QGraphicsBlurEffect blurEffect;
+    blurEffect.setBlurRadius(4);
+    blurEffect.setBlurHints(QGraphicsBlurEffect::QualityHint);
+    item.setGraphicsEffect(&blurEffect);
+    scene.addItem(&item);
+    QImage res(src.size(), QImage::Format_ARGB32);
+    QPainter ptr(&res);
+    scene.render(&ptr);
+    return res;
+}
 
 class GenerateCoverTask : public QRunnable
 {
@@ -97,20 +118,28 @@ public:
         memset(&queryParams, 0, sizeof(vlc_ml_query_params_t));
         album_list.reset( vlc_ml_list_genre_albums(m_ml, &queryParams, genreId) );
 
-        QStringList thumnails;
-        int count = 0;
+        QStringList thumbnails;
+        thumbnails.reserve(8);
         for( const vlc_ml_album_t& media: ml_range_iterate<vlc_ml_album_t>( album_list ) ) {
-            if (media.thumbnails[VLC_ML_THUMBNAIL_SMALL].b_generated) {
+            if (media.thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status ==
+                    VLC_ML_THUMBNAIL_STATUS_AVAILABLE) {
                 QUrl mediaURL( media.thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl );
                 //QImage only accept local file
                 if (mediaURL.isValid() && mediaURL.isLocalFile()) {
-                    thumnails.append(mediaURL.path());
-                    count++;
-                    if (count >= 4)
+                    thumbnails.append(mediaURL.path());
+                    if (thumbnails.size() == 8)
                         break;
                 }
             }
         }
+
+        if (thumbnails.empty()) {
+            thumbnails.append(":/noart_album.svg");
+        }
+
+        assert(thumbnails.size() <= 8);
+        std::copy(thumbnails.begin(), ( thumbnails.begin() + ( 8 - thumbnails.size() ) ), std::back_inserter(thumbnails));
+        assert(thumbnails.size() == 8);
 
         {
             QMutexLocker lock(&m_taskLock);
@@ -122,41 +151,29 @@ public:
         }
 
         QImage image(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, QImage::Format_RGB32);
+        image.fill(Qt::white);
 
         QPainter painter;
         painter.begin(&image);
-        switch (count) {
-            case 0:
-                break;
-
-            case 1:
-                drawRegion(painter, thumnails[0], QRect(0,                 0,                  THUMBNAIL_WIDTH,   THUMBNAIL_HEIGHT   ));
-                break;
-
-            case 2:
-                drawRegion(painter, thumnails[0], QRect(0,                 0,                  THUMBNAIL_WIDTH/2, THUMBNAIL_HEIGHT   ));
-                drawRegion(painter, thumnails[1], QRect(THUMBNAIL_WIDTH/2, 0,                  THUMBNAIL_WIDTH/2, THUMBNAIL_HEIGHT   ));
-                break;
-
-            case 3:
-                drawRegion(painter, thumnails[0], QRect(0,                 0,                  THUMBNAIL_WIDTH/2, THUMBNAIL_HEIGHT   ));
-                drawRegion(painter, thumnails[1], QRect(THUMBNAIL_WIDTH/2, 0,                  THUMBNAIL_WIDTH/2, THUMBNAIL_HEIGHT/2));
-                drawRegion(painter, thumnails[2], QRect(THUMBNAIL_WIDTH/2, THUMBNAIL_HEIGHT/2, THUMBNAIL_WIDTH/2, THUMBNAIL_HEIGHT/2));
-                break;
-
-            case 4:
-                drawRegion(painter, thumnails[0], QRect(0,                 0,                  THUMBNAIL_WIDTH/2, THUMBNAIL_HEIGHT/2));
-                drawRegion(painter, thumnails[1], QRect(THUMBNAIL_WIDTH/2, 0,                  THUMBNAIL_WIDTH/2, THUMBNAIL_HEIGHT/2));
-                drawRegion(painter, thumnails[2], QRect(THUMBNAIL_WIDTH/2, THUMBNAIL_HEIGHT/2, THUMBNAIL_WIDTH/2, THUMBNAIL_HEIGHT/2));
-                drawRegion(painter, thumnails[3], QRect(0,                 THUMBNAIL_HEIGHT/2, THUMBNAIL_WIDTH/2, THUMBNAIL_HEIGHT/2));
-                break;
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 4; j++) {
+                drawRegion(painter, thumbnails[2*j+1], QRect( ( THUMBNAIL_WIDTH / 4 ) * j, ( THUMBNAIL_HEIGHT / 2 ) * i, THUMBNAIL_WIDTH / 4, THUMBNAIL_HEIGHT / 2 ));
+            }
         }
         painter.end();
 
-        if (count > 0) {
-            if (image.save(m_filepath, "jpg"))
-                m_genre->setCover(QUrl::fromLocalFile(m_filepath).toString());
-        }
+        image = blurImage(image);
+
+        QLinearGradient gradient;
+        gradient.setColorAt(0, QColor(0, 0, 0, 255*.3));
+        gradient.setColorAt(1, QColor(0, 0, 0, 255*.7));
+        painter.begin(&image);
+        painter.setOpacity(.7);
+        painter.fillRect(image.rect(), gradient);
+        painter.end();
+
+        if (image.save(m_filepath, "jpg"))
+            m_genre->setCover(QUrl::fromLocalFile(m_filepath).toString());
 
         {
             QMutexLocker lock(&m_taskLock);

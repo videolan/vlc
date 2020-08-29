@@ -38,6 +38,8 @@ FocusScope{
 
     property color color: VLCStyle.colors.buttonText
 
+    property alias parentWindow: volumeTooltip.parentWindow
+
     RowLayout{
         id: volumeWidget
         Widgets.IconToolButton{
@@ -84,8 +86,31 @@ FocusScope{
                 }
             }
 
-            Keys.onUpPressed: volControl.increase()
-            Keys.onDownPressed: volControl.decrease()
+            Timer {
+                // useful for keyboard volume alteration
+                id: tooltipShower
+                running: false
+                repeat: false
+                interval: 1000
+
+                onRunningChanged: {
+                    if (running)
+                        volumeTooltip.visible = true
+                    else
+                        volumeTooltip.visible = Qt.binding(function() {return sliderMouseArea.containsMouse;})
+                }
+            }
+
+            Keys.onUpPressed: {
+                volControl.increase()
+                tooltipShower.restart()
+            }
+
+            Keys.onDownPressed: {
+                volControl.decrease()
+                tooltipShower.restart()
+            }
+
             Keys.onRightPressed: {
                 var right = widgetfscope.KeyNavigation.right
                 while (right && (!right.enabled || !right.visible)) {
@@ -111,6 +136,18 @@ FocusScope{
             onValueChanged: {
                 if (!paintOnly && player.muted) player.muted = false
                 player.volume = volControl.value
+            }
+
+            Widgets.PointingTooltip {
+                id: volumeTooltip
+
+                visible: sliderMouseArea.containsMouse
+
+                text: Math.round(volControl.value * 100) + "%"
+
+                mouseArea: sliderMouseArea
+
+                xPos: (handle.x + handle.width / 2)
             }
 
             background: Rectangle {
@@ -177,6 +214,7 @@ FocusScope{
             }
 
             handle: Rectangle {
+                id: handle
                 x: volControl.leftPadding + volControl.visualPosition * (volControl.availableWidth - width)
                 y: volControl.topPadding + volControl.availableHeight / 2 - height / 2
 

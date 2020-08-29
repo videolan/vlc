@@ -57,12 +57,11 @@ int D3D11_AllocateQuad(vlc_object_t *, d3d11_device_t *, video_projection_mode_t
 void D3D11_ReleaseQuad(d3d_quad_t *);
 
 int D3D11_SetupQuad(vlc_object_t *, d3d11_device_t *, const video_format_t *, d3d_quad_t *,
-                    const display_info_t *, const RECT *,
-                    video_orientation_t);
-#define D3D11_SetupQuad(a,b,c,d,e,f,g)  D3D11_SetupQuad(VLC_OBJECT(a),b,c,d,e,f,g)
+                    const display_info_t *);
+#define D3D11_SetupQuad(a,b,c,d,e)  D3D11_SetupQuad(VLC_OBJECT(a),b,c,d,e)
 
 bool D3D11_UpdateQuadPosition( vlc_object_t *, d3d11_device_t *, d3d_quad_t *,
-                               const RECT *output, video_orientation_t );
+                               const POINT *output, video_orientation_t );
 #define D3D11_UpdateQuadPosition(a,b,c,d,e)  D3D11_UpdateQuadPosition(VLC_OBJECT(a),b,c,d,e)
 
 void D3D11_UpdateViewport(d3d_quad_t *, const RECT *, const d3d_format_t *display);

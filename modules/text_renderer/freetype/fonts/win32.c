@@ -59,6 +59,7 @@
 
 #if !VLC_WINSTORE_APP
 #define FONT_DIR_NT  TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts")
+#define FONT_LINKING_NT TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\FontLink\\SystemLink")
 
 static inline void AppendFamily( vlc_family_t **pp_list, vlc_family_t *p_family )
 {
@@ -334,6 +335,7 @@ struct enumFontCallbackContext
 {
     vlc_font_select_t *fs;
     vlc_family_t *p_family;
+    WCHAR prevFullName[LF_FULLFACESIZE];
 };
 
 static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTMETRICEX *metric,
@@ -345,17 +347,20 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
     struct enumFontCallbackContext *ctx = ( struct enumFontCallbackContext * ) lParam;
     vlc_family_t *p_family = ctx->p_family;
 
-    bool b_bold = ( lpelfe->elfLogFont.lfWeight == FW_BOLD );
-    bool b_italic = ( lpelfe->elfLogFont.lfItalic != 0 );
-
     /*
      * This function will be called by Windows as many times for each font
      * of the family as the number of scripts the font supports.
      * Check to avoid duplicates.
      */
-    for( vlc_font_t *p_font = p_family->p_fonts; p_font; p_font = p_font->p_next )
-        if( !!p_font->b_bold == !!b_bold && !!p_font->b_italic == !!b_italic )
-            return 1;
+    if( !wcscmp( ctx->prevFullName, lpelfe->elfFullName ) )
+        return 1;
+    wcscpy( ctx->prevFullName, lpelfe->elfFullName );
+
+    int i_flags = 0;
+    if( lpelfe->elfLogFont.lfWeight >= FW_BOLD )
+        i_flags |= VLC_FONT_FLAG_BOLD;
+    if( lpelfe->elfLogFont.lfItalic != 0 )
+        i_flags |= VLC_FONT_FLAG_ITALIC;
 
     char *psz_filename = NULL;
     char *psz_fontfile = NULL;
@@ -387,36 +392,108 @@ static int CALLBACK EnumFontCallback(const ENUMLOGFONTEX *lpelfe, const NEWTEXTM
             return 1;
     }
 
-    NewFont( psz_fontfile, i_index, b_bold, b_italic, p_family );
+    NewFont( psz_fontfile, i_index, i_flags, p_family );
 
     return 1;
 }
 
-const vlc_family_t *Win32_GetFamily( vlc_font_select_t *fs, const char *psz_family )
+static void FillLinkedFontsForFamily( vlc_font_select_t *fs,
+                                      LPTSTR name, vlc_family_t *p_family )
 {
-    char *psz_lc = ToLower( psz_family );
+    HDC hDC = GetDC( NULL );
+    if( !hDC )
+        return;
 
-    if( unlikely( !psz_lc ) )
-        return NULL;
+    struct enumFontCallbackContext ctx;
+    ctx.fs = fs;
+    ctx.p_family = p_family;
+    ctx.prevFullName[0] = 0;
 
+    LOGFONT lf = { 0 };
+    lf.lfCharSet = DEFAULT_CHARSET;
+    wcsncpy( (LPTSTR)&lf.lfFaceName, name, LF_FACESIZE );
+
+    EnumFontFamiliesEx( hDC, &lf, (FONTENUMPROC)&EnumFontCallback, (LPARAM)&ctx, 0 );
+    ReleaseDC( NULL, hDC );
+}
+
+static int AddLinkedFonts( vlc_font_select_t *fs, const char *psz_family,
+                           vlc_family_t *p_family )
+{
+    HKEY fontLinkKey;
+    if (FAILED(RegOpenKeyEx( HKEY_LOCAL_MACHINE, FONT_LINKING_NT,
+                             0, KEY_READ, &fontLinkKey )))
+        return VLC_EGENERIC;
+
+    LPTSTR psz_buffer = ToWide( psz_family );
+    if( !psz_buffer )
+    {
+        RegCloseKey( fontLinkKey );
+        return VLC_EGENERIC;
+    }
+
+    DWORD linkedFontsBufferSize = 0;
+    DWORD lpType;
+    if( FAILED(RegQueryValueEx( fontLinkKey, psz_buffer, 0, &lpType,
+                               NULL, &linkedFontsBufferSize )) )
+    {
+        free( psz_buffer );
+        RegCloseKey( fontLinkKey );
+        return VLC_EGENERIC;
+    }
+
+    WCHAR* linkedFonts = (WCHAR*) malloc(linkedFontsBufferSize);
+
+    if ( linkedFonts &&
+         SUCCEEDED(RegQueryValueEx( fontLinkKey, psz_buffer, 0, &lpType,
+                                   (BYTE*)linkedFonts, &linkedFontsBufferSize ) )
+        && lpType == REG_MULTI_SZ)
+    {
+        DWORD start = 0;
+        for( DWORD i=0; i < linkedFontsBufferSize / sizeof(WCHAR); i++ )
+        {
+            if( linkedFonts[i] == 0 && i > start )
+            {
+                for( DWORD j=start + 1; j < i; j++ )
+                {
+                    if( linkedFonts[j] != ',' )
+                        continue;
+                    FillLinkedFontsForFamily( fs, &linkedFonts[j + 1], p_family );
+                    break;
+                }
+                start = i + 1;
+            }
+        }
+    }
+
+    free(psz_buffer);
+    free(linkedFonts);
+    RegCloseKey(fontLinkKey);
+
+    return VLC_SUCCESS;
+}
+
+int Win32_GetFamily( vlc_font_select_t *fs, const char *psz_lcname, const vlc_family_t **pp_result )
+{
     vlc_family_t *p_family =
-        vlc_dictionary_value_for_key( &fs->family_map, psz_lc );
-
-    free( psz_lc );
+        vlc_dictionary_value_for_key( &fs->family_map, psz_lcname );
 
     if( p_family )
-        return p_family;
+    {
+        *pp_result = p_family;
+        return VLC_SUCCESS;
+    }
 
-    p_family = NewFamily( fs, psz_family, &fs->p_families,
-                          &fs->family_map, psz_family );
+    p_family = NewFamily( fs, psz_lcname, &fs->p_families,
+                          &fs->family_map, psz_lcname );
 
     if( unlikely( !p_family ) )
-        return NULL;
+        return VLC_EGENERIC;
 
     LOGFONT lf;
     lf.lfCharSet = DEFAULT_CHARSET;
 
-    LPTSTR psz_fbuffer = ToWide( psz_family );
+    LPTSTR psz_fbuffer = ToWide( psz_lcname );
     wcsncpy( (LPTSTR)&lf.lfFaceName, psz_fbuffer, LF_FACESIZE );
     free( psz_fbuffer );
 
@@ -424,11 +501,13 @@ const vlc_family_t *Win32_GetFamily( vlc_font_select_t *fs, const char *psz_fami
     HDC hDC = GetDC( NULL );
     struct enumFontCallbackContext ctx;
     ctx.fs = fs;
-    ctx.p_family = NULL;
+    ctx.p_family = p_family;
+    ctx.prevFullName[0] = 0;
     EnumFontFamiliesEx(hDC, &lf, (FONTENUMPROC)&EnumFontCallback, (LPARAM)&ctx, 0);
     ReleaseDC(NULL, hDC);
 
-    return p_family;
+    *pp_result = p_family;
+    return VLC_SUCCESS;
 }
 
 static int CALLBACK MetaFileEnumProc( HDC hdc, HANDLETABLE* table,
@@ -453,7 +532,7 @@ static int CALLBACK MetaFileEnumProc( HDC hdc, HANDLETABLE* table,
  * This is a hack used by Chrome and WebKit to expose the fallback font used
  * by Uniscribe for some given text for use with custom shapers / font engines.
  */
-static char *UniscribeFallback( const char *psz_family, uni_char_t codepoint )
+static char *UniscribeFallback( const char *psz_lcname, uni_char_t codepoint )
 {
     HDC          hdc          = NULL;
     HDC          meta_file_dc = NULL;
@@ -471,7 +550,7 @@ static char *UniscribeFallback( const char *psz_family, uni_char_t codepoint )
     LOGFONT lf;
     memset( &lf, 0, sizeof( lf ) );
 
-    wchar_t *psz_fbuffer = ToWide( psz_family );
+    wchar_t *psz_fbuffer = ToWide( psz_lcname );
     if( !psz_fbuffer )
         goto error;
     wcsncpy( ( LPTSTR ) &lf.lfFaceName, psz_fbuffer, LF_FACESIZE );
@@ -507,7 +586,10 @@ static char *UniscribeFallback( const char *psz_family, uni_char_t codepoint )
         log_font.lfFaceName[ 0 ] = 0;
         EnumEnhMetaFile( 0, meta_file, MetaFileEnumProc, &log_font, NULL );
         if( log_font.lfFaceName[ 0 ] )
+        {
             psz_result = FromWide( log_font.lfFaceName );
+            LowercaseTransform( psz_result );
+        }
     }
 
     DeleteEnhMetaFile(meta_file);
@@ -520,20 +602,16 @@ error:
     return NULL;
 }
 
-vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_family,
-                                  uni_char_t codepoint )
+int Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_lcname,
+                        uni_char_t codepoint, vlc_family_t **pp_result )
 {
     vlc_family_t  *p_family      = NULL;
     vlc_family_t  *p_fallbacks   = NULL;
     char          *psz_uniscribe = NULL;
+    char          *psz_linkname  = NULL;
+    int            i_ret         = VLC_EGENERIC;
 
-
-    char *psz_lc = ToLower( psz_family );
-
-    if( unlikely( !psz_lc ) )
-        return NULL;
-
-    p_fallbacks = vlc_dictionary_value_for_key( &fs->fallback_map, psz_lc );
+    p_fallbacks = vlc_dictionary_value_for_key( &fs->fallback_map, psz_lcname );
 
     if( p_fallbacks )
         p_family = SearchFallbacks( fs, p_fallbacks, codepoint );
@@ -546,36 +624,61 @@ vlc_family_t *Win32_GetFallbacks( vlc_font_select_t *fs, const char *psz_family,
      */
     if( !p_family )
     {
-        psz_uniscribe = UniscribeFallback( psz_lc, codepoint );
-
+        psz_uniscribe = UniscribeFallback( psz_lcname, codepoint );
         if( !psz_uniscribe )
+        {
+            i_ret = VLC_SUCCESS;
+            goto done;
+        }
+
+        /* Search for existing listing inserted from a different
+         * codepoint in fallbacks (and that means the fallback will not work) */
+        for( vlc_family_t *p = p_fallbacks; p; p = p->p_next )
+        {
+            if( !strcasecmp( p->psz_name, psz_uniscribe ) )
+            {
+                i_ret = VLC_SUCCESS;
+                goto done;
+            }
+        }
+
+        /* Load the replied font, but might still can't provide codepoint
+         * as it could rely on font linking */
+        const vlc_family_t *p_uniscribe = NULL;
+        if( Win32_GetFamily( fs, psz_uniscribe, &p_uniscribe ) != VLC_SUCCESS ||
+            p_uniscribe == NULL )
             goto done;
 
-        const vlc_family_t *p_uniscribe = Win32_GetFamily( fs, psz_uniscribe );
-        if( !p_uniscribe || !p_uniscribe->p_fonts )
-            goto done;
-
-        if( !GetFace( fs, p_uniscribe->p_fonts, codepoint ) )
-            goto done;
-
+        /* Create entry for the replied font */
         p_family = NewFamily( fs, psz_uniscribe, NULL, NULL, NULL );
-
-        if( unlikely( !p_family ) )
+        if( !p_family )
             goto done;
 
-        p_family->p_fonts = p_uniscribe->p_fonts;
+        if( asprintf( &psz_linkname, "\xF0\x9F\x94\x97%s", psz_uniscribe ) < 0 )
+            goto done;
+
+        vlc_family_t *withlinked = NewFamily( fs, psz_linkname, NULL, NULL, NULL );
+        if( withlinked )
+        {
+            p_family->p_next = withlinked;
+            AddLinkedFonts( fs, psz_uniscribe, withlinked );
+            vlc_dictionary_insert( &fs->fontlinking_map, psz_linkname, withlinked );
+        }
 
         if( p_fallbacks )
             AppendFamily( &p_fallbacks, p_family );
         else
             vlc_dictionary_insert( &fs->fallback_map,
-                                   psz_lc, p_family );
+                                   psz_lcname, p_family );
     }
 
+    i_ret = VLC_SUCCESS;
+
 done:
-    free( psz_lc );
+    free( psz_linkname );
     free( psz_uniscribe );
-    return p_family;
+    *pp_result = p_family;
+    return i_ret;
 }
 
 char * MakeFilePath( vlc_font_select_t *fs, const char *psz_filename )

@@ -116,13 +116,15 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    CommonInit(vd, &sys->area, cfg);
+    CommonInit(&sys->area, cfg);
     if (CommonWindowInit(vd, &sys->area, &sys->sys, false))
         goto error;
 
     /* */
     if (Init(vd, fmtp))
         goto error;
+
+    vout_window_SetTitle(cfg->window, VOUT_TITLE " (WinGDI output)");
 
     /* */
     vd->prepare = Prepare;
@@ -141,7 +143,7 @@ static void Close(vout_display_t *vd)
 {
     Clean(vd);
 
-    CommonWindowClean(VLC_OBJECT(vd), &vd->sys->sys);
+    CommonWindowClean(&vd->sys->sys);
 
     free(vd->sys);
 }
@@ -271,8 +273,6 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
 
     SelectObject(sys->off_dc, sys->off_bitmap);
     ReleaseDC(sys->sys.hvideownd, window_dc);
-
-    vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (WinGDI output)");
 
     return VLC_SUCCESS;
 }

@@ -44,6 +44,7 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLVideoModel::M_names_to_criteria =
     {"id", VLC_ML_SORTING_DEFAULT},
     {"title", VLC_ML_SORTING_ALPHA},
     {"duration", VLC_ML_SORTING_DURATION},
+    {"duration_short", VLC_ML_SORTING_DURATION},
     {"playcount", VLC_ML_SORTING_PLAYCOUNT},
 };
 
@@ -100,7 +101,7 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
         { VIDEO_TITLE, "title" },
         { VIDEO_THUMBNAIL, "thumbnail" },
         { VIDEO_DURATION, "duration" },
-        { VIDEO_DURATION_SHORT, "durationShort" },
+        { VIDEO_DURATION_SHORT, "duration_short" },
         { VIDEO_PROGRESS, "progress" },
         { VIDEO_PLAYCOUNT, "playcount" },
         { VIDEO_RESOLUTION, "resolution_name" },

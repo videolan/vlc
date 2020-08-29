@@ -317,7 +317,7 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_GET_LENGTH:
             if( i_bitrate > 0 && i_end > i_start )
             {
-                *va_arg( args, vlc_tick_t * ) = INT64_C(8000000) * (i_end - i_start) / i_bitrate;
+                *va_arg( args, vlc_tick_t * ) = vlc_tick_from_samples((i_end - i_start) * 8, i_bitrate);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -325,7 +325,7 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_GET_TIME:
             if( i_bitrate > 0 && i_tell >= i_start )
             {
-                *va_arg( args, vlc_tick_t * ) = INT64_C(8000000) * (i_tell - i_start) / i_bitrate;
+                *va_arg( args, vlc_tick_t * ) = vlc_tick_from_samples((i_tell - i_start) * 8, i_bitrate);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -360,7 +360,7 @@ int demux_vaControlHelper( stream_t *s,
             i64 = va_arg( args, vlc_tick_t );
             if( i_bitrate > 0 && i64 >= 0 )
             {
-                int64_t i_block = i64 * i_bitrate / INT64_C(8000000) / i_align;
+                int64_t i_block = samples_from_vlc_tick( i64, i_bitrate ) / (8 * i_align);
                 if( vlc_stream_Seek( s, i_start + i_block * i_align ) )
                 {
                     return VLC_EGENERIC;

@@ -752,7 +752,7 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
     texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     texDesc.ArraySize = 1;
     if (is_d3d11_opaque(fmt->i_chroma)) {
-        texDesc.BindFlags |= D3D11_BIND_DECODER;
+        texDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
         texDesc.Usage = D3D11_USAGE_DEFAULT;
         texDesc.CPUAccessFlags = 0;
     } else {

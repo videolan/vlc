@@ -163,6 +163,24 @@
 					}
 					return false;
 				});
+				$('#qrCodeConfirm').dialog({
+					autoOpen: false,
+					width:600,
+					modal: true,
+					buttons:{
+						"<?vlc gettext("Yes") ?>":function(){
+							$(this).dialog('close');
+							var urlimg = $('#mobileintflink').prop('href');
+							var codeimg = $('<img width="350" height="350" alt="qrcode"/>');
+							codeimg.attr('src', 'https://chart.apis.google.com/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=' + encodeURIComponent(urlimg));
+							codeimg.dialog({width: 350, height: 350, title: "<?vlc gettext("QR Code") ?>"});
+						},
+						"<?vlc gettext("No") ?>":function(){
+							$(this).dialog('close');
+							window.location = $('#mobileintflink').attr('href');
+						}
+					}
+				});
 				$('#windowStreamConfirm').dialog({
 					autoOpen: false,
 					width:600,
@@ -255,11 +273,19 @@
 				</div>
 			</div>
 			<div class="footer">
-				VLC <?vlc print(vlc.misc.version() .. ' - Lua Web Interface - <a id="mobileintflink" href="/mobile.html">Mobile Interface</a> - ' .. vlc.misc.copyright()) ?>
+				VLC <?vlc print(vlc.misc.version() .. ' - Lua Web Interface - <a id="mobileintflink" href="mobile.html">Mobile Interface</a> - ' .. vlc.misc.copyright()) ?>
 			</div>
 		</div>
 		</div>
-		<div id="windowStreamConfirm" title="Confirm Stream Settings">
+		<div id="qrCodeConfirm" title="<?vlc gettext("Generate QR Code") ?>">
+			<p>
+				<?vlc gettext("VLC can display a QR code linking to the mobile version of the web interface; the web address of the web interface of your VLC media player instance will be transmitted over the internet to the Google Image Charts web service to generate this QR code.") ?>
+			</p>
+			<p>
+				<?vlc gettext("Do you want to go ahead with this?") ?>
+			</p>
+		</div>
+		<div id="windowStreamConfirm" title="<?vlc gettext("Confirm Stream Settings") ?>">
 			<p>
 				<?vlc gettext("By creating a stream, the <i>Main Controls</i> will operate the stream instead of the main interface.") ?>
 				<?vlc gettext("The stream will be created using default settings, for more advanced configuration, or to modify the default settings, select the button to the right: <i>Manage Streams</i>") ?>

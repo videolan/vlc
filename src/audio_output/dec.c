@@ -45,7 +45,7 @@ static void aout_Drain(audio_output_t *aout)
     else
     {
         vlc_tick_t delay;
-        if (aout->time_get(aout, &delay) == 0)
+        if (aout_TimeGet(aout, &delay) == 0)
             vlc_tick_sleep(delay);
     }
 }
@@ -104,6 +104,8 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
         goto error;
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
+    vlc_audio_meter_Reset(&owner->meter, &owner->mixer_format);
+
     if (!owner->bitexact)
     {
         /* Create the audio filtering "input" pipeline */
@@ -114,6 +116,8 @@ int aout_DecNew(audio_output_t *p_aout, const audio_sample_format_t *p_format,
         if (owner->filters == NULL)
         {
             aout_OutputDelete (p_aout);
+            vlc_audio_meter_Reset(&owner->meter, NULL);
+
 error:
             aout_volume_Delete (owner->volume);
             owner->volume = NULL;
@@ -203,6 +207,10 @@ static int aout_CheckReady (audio_output_t *aout)
             }
             aout_FiltersSetClockDelay(owner->filters, owner->sync.delay);
         }
+
+        vlc_audio_meter_Reset(&owner->meter,
+                         owner->mixer_format.i_format ? &owner->mixer_format : NULL);
+
         /* TODO: This would be a good time to call clean up any video output
          * left over by an audio visualization:
         input_resource_TerminatVout(MAGIC HERE); */
@@ -283,7 +291,7 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t system_now,
     aout_owner_t *owner = aout_owner (aout);
     vlc_tick_t delay;
 
-    if (aout->time_get(aout, &delay) != 0)
+    if (aout_TimeGet(aout, &delay) != 0)
         return; /* nothing can be done if timing is unknown */
 
     if (owner->sync.discontinuity)
@@ -304,7 +312,7 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t system_now,
         if (jitter > 0)
         {
             aout_DecSilence (aout, jitter, dec_pts - delay);
-            if (aout->time_get(aout, &delay) != 0)
+            if (aout_TimeGet(aout, &delay) != 0)
                 return;
         }
     }
@@ -318,10 +326,16 @@ void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
     aout_owner_t *owner = aout_owner (aout);
     float rate = owner->sync.rate;
     vlc_tick_t drift =
-        -vlc_clock_Update(owner->sync.clock, system_ts, audio_ts, rate);
+        vlc_clock_Update(owner->sync.clock, system_ts, audio_ts, rate);
 
     if (unlikely(drift == INT64_MAX) || owner->bitexact)
         return; /* cf. INT64_MAX comment in aout_DecPlay() */
+
+    /* Following calculations expect an opposite drift. Indeed,
+     * vlc_clock_Update() returns a positive relative time, corresponding to
+     * the time when audio_ts is expected to be played (in the future when not
+     * late). */
+    drift = -drift;
 
     /* Late audio output.
      * This can happen due to insufficient caching, scheduling jitter
@@ -486,6 +500,9 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
         play_date = system_now;
 
     }
+
+    vlc_audio_meter_Process(&owner->meter, block, play_date);
+
     /* Output */
     owner->sync.discontinuity = false;
     aout->play(aout, block, play_date);
@@ -544,6 +561,8 @@ void aout_DecFlush(audio_output_t *aout)
 
     if (owner->mixer_format.i_format)
     {
+        vlc_audio_meter_Flush(&owner->meter);
+
         if (owner->filters)
             aout_FiltersFlush (owner->filters);
 

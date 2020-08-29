@@ -128,7 +128,9 @@ static picture_t *filter_chain_VideoBufferNew( filter_t *filter )
 static vlc_decoder_device * filter_chain_HoldDecoderDevice(vlc_object_t *o, void *sys)
 {
     filter_chain_t *chain = sys;
-    if (!chain->parent_video_owner.video->hold_device)
+
+    if (chain->parent_video_owner.video == NULL ||
+        chain->parent_video_owner.video->hold_device == NULL)
         return NULL;
 
     return chain->parent_video_owner.video->hold_device(o, chain->parent_video_owner.sys);
@@ -515,10 +517,10 @@ int filter_chain_MouseFilter( filter_chain_t *p_chain, vlc_mouse_t *p_dst, const
         if( p_filter->pf_video_mouse && p_mouse )
         {
             vlc_mouse_t old = *p_mouse;
-            vlc_mouse_t filtered;
+            vlc_mouse_t filtered = current;
 
             *p_mouse = current;
-            if( p_filter->pf_video_mouse( p_filter, &filtered, &old, &current ) )
+            if( p_filter->pf_video_mouse( p_filter, &filtered, &old ) )
                 return VLC_EGENERIC;
             current = filtered;
         }

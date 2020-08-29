@@ -137,7 +137,11 @@ protected:
 class QVLCMW : public QMainWindow
 {
 public:
-    QVLCMW( intf_thread_t *_p_intf ) : QMainWindow( NULL ), p_intf( _p_intf ){}
+    QVLCMW( intf_thread_t *_p_intf,QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags() )
+        : QMainWindow( parent, flags )
+        , p_intf( _p_intf )
+    {}
+
     void toggleVisible()
     {
         if( isVisible() ) hide();

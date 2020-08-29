@@ -951,8 +951,10 @@ vlc_player_SelectPrevChapter(vlc_player_t *player)
 void
 vlc_player_Lock(vlc_player_t *player)
 {
-    /* Vout and aout locks should not be held, cf. vlc_player_vout_cbs and
-     * vlc_player_aout_cbs documentation */
+    /* Metadata, Vout and aout locks should not be held, cf.
+     * vlc_player_metadata_cbs, vlc_player_vout_cbs and vlc_player_aout_cbs
+     * documentation */
+    assert(!vlc_mutex_held(&player->metadata_listeners_lock));
     assert(!vlc_mutex_held(&player->vout_listeners_lock));
     assert(!vlc_mutex_held(&player->aout_listeners_lock));
     /* The timer lock should not be held (possible lock-order-inversion), cf.
@@ -1873,6 +1875,7 @@ vlc_player_InitLocks(vlc_player_t *player, enum vlc_player_lock_type lock_type)
     else
         vlc_mutex_init(&player->lock);
 
+    vlc_mutex_init(&player->metadata_listeners_lock);
     vlc_mutex_init(&player->vout_listeners_lock);
     vlc_mutex_init(&player->aout_listeners_lock);
     vlc_cond_init(&player->start_delay_cond);
@@ -1891,6 +1894,7 @@ vlc_player_Delete(vlc_player_t *player)
     vlc_cond_signal(&player->destructor.wait);
 
     assert(vlc_list_is_empty(&player->listeners));
+    assert(vlc_list_is_empty(&player->metadata_listeners));
     assert(vlc_list_is_empty(&player->vout_listeners));
     assert(vlc_list_is_empty(&player->aout_listeners));
 
@@ -1932,6 +1936,7 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     assert(!media_provider || media_provider->get_next);
 
     vlc_list_init(&player->listeners);
+    vlc_list_init(&player->metadata_listeners);
     vlc_list_init(&player->vout_listeners);
     vlc_list_init(&player->aout_listeners);
     vlc_list_init(&player->destructor.inputs);

@@ -35,6 +35,11 @@ gmp: gmp-$(GMP_VERSION).tar.bz2 .sum-gmp
 	$(APPLY) $(SRC)/gmp/ppc64.patch
 	$(APPLY) $(SRC)/gmp/win-arm64.patch
 	$(APPLY) $(SRC)/gmp/gmp-fix-asm-detection.patch
+	$(APPLY) $(SRC)/gmp/tests-mpn-t-sqrlo.c-Initialise-scratch-area.patch
+	$(APPLY) $(SRC)/gmp/arm64-Add-GSYM_PREFIX-to-function-calls-in-assembly.patch
+ifdef HAVE_DARWIN_OS
+	$(APPLY) $(SRC)/gmp/arm64-Change-adrp-add-relocations-to-darwin-style.patch
+endif
 	# do not try the cross compiler to detect the build compiler
 	cd $(UNPACK_DIR) && sed -i.orig 's/"$$CC" "$$CC $$CFLAGS $$CPPFLAGS" cc gcc c89 c99/cc gcc c89 c99/' acinclude.m4
 	$(MOVE)

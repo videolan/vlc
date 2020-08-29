@@ -186,11 +186,10 @@ Item {
                 color: Qt.rgba(0, 0, 0, .18)
             }
 
-            ColumnLayout {
+            Column {
                 id: layout
 
                 anchors.centerIn: parent
-                spacing: 0
 
                 Widgets.MediaCover {
                     id: picture
@@ -199,10 +198,6 @@ Item {
                     height: pictureHeight
                     playCoverVisible: root._highlighted
                     onPlayIconClicked: root.playClicked()
-
-                    Layout.preferredWidth: pictureWidth
-                    Layout.preferredHeight: pictureHeight
-                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
                     /* new indicator (triangle at top-left of cover)*/
                     Rectangle {
@@ -226,11 +221,9 @@ Item {
 
                     label: titleLabel
                     scroll: _highlighted
-
-                    Layout.preferredHeight: titleLabel.contentHeight
-                    Layout.topMargin: root.titleMargin
-                    Layout.fillWidth: true
-                    Layout.maximumWidth: pictureWidth
+                    height: titleLabel.height
+                    width: titleLabel.width
+                    visible: root.title !== ""
 
                     Widgets.MenuLabel {
                         id: titleLabel
@@ -238,6 +231,7 @@ Item {
                         elide: Text.ElideNone
                         width: pictureWidth
                         horizontalAlignment: root.textHorizontalAlignment
+                        topPadding: root.titleMargin
                     }
                 }
 
@@ -246,14 +240,7 @@ Item {
 
                     visible: text !== ""
                     text: root.subtitle
-
-                    Layout.preferredHeight: implicitHeight
-                    Layout.maximumWidth: pictureWidth
-                    Layout.fillWidth: true
-                }
-
-                Item {
-                    Layout.fillHeight: true
+                    width: pictureWidth
                 }
             }
         }

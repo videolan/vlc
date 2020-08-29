@@ -47,6 +47,8 @@ RowLayout{
 
     anchors.fill: parent
 
+    spacing: VLCStyle.margin_normal
+
     Repeater{
         id: buttonsRepeater
 
@@ -68,8 +70,7 @@ RowLayout{
                 buttonloader.item.focus = true
 
                 if(buttonloader.item instanceof Widgets.IconToolButton)
-                    buttonloader.item.size = model.size === PlayerControlBarModel.WIDGET_BIG ?
-                                VLCStyle.icon_large : playerButtonsLayout.defaultSize
+                    buttonloader.item.size = playerButtonsLayout.defaultSize
 
                 //force buttons color
                 if (playerButtonsLayout.forceColors) {

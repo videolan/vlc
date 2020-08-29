@@ -109,7 +109,6 @@ VLC_API picture_t *picture_pool_Wait(picture_pool_t *) VLC_USED;
  *
  * It won't return any pictures via picture_pool_Get or picture_pool_Wait if
  * canceled is true. This function will also unblock picture_pool_Wait.
- * picture_pool_Reset will also reset the cancel state to false.
  */
 void picture_pool_Cancel( picture_pool_t *, bool canceled );
 

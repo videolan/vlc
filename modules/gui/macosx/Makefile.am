@@ -40,8 +40,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/extensions/NSMenu+VLCAdditions.m \
 	gui/macosx/extensions/NSScreen+VLCAdditions.h \
 	gui/macosx/extensions/NSScreen+VLCAdditions.m \
-	gui/macosx/extensions/NSSound+VLCAdditions.h \
-	gui/macosx/extensions/NSSound+VLCAdditions.m \
 	gui/macosx/extensions/NSString+Helpers.h \
 	gui/macosx/extensions/NSString+Helpers.m \
 	gui/macosx/extensions/NSView+VLCAdditions.h \
@@ -118,6 +116,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/os-integration/Spotify.h \
 	gui/macosx/os-integration/VLCClickerManager.h \
 	gui/macosx/os-integration/VLCClickerManager.m \
+	gui/macosx/os-integration/VLCSystemVolume.h \
+	gui/macosx/os-integration/VLCSystemVolume.m \
 	gui/macosx/os-integration/VLCDocumentController.h \
 	gui/macosx/os-integration/VLCDocumentController.m \
 	gui/macosx/os-integration/VLCKeyboardBacklightControl.h \

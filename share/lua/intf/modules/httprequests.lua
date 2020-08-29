@@ -187,6 +187,14 @@ processcommands = function ()
         vlc.player.toggle_video_track(val)
     elseif command == "subtitle_track" then
         vlc.player.toggle_spu_track(val)
+    elseif command == "set_renderer" then
+        local rd = get_renderer_discovery()
+        if not rd then
+            return
+        end
+        rd:select(id)
+    elseif command == "unset_renderer" then
+        rd:select(-1)
     end
 
     local input = nil
@@ -339,70 +347,75 @@ end
 
 getbrowsetable = function ()
 
-    local dir = nil
-    local uri = _GET["uri"]
-    --uri takes precedence, but fall back to dir
-    if uri then
-        if uri == "file://~" then
-            dir = uri
-        else
-            dir = vlc.strings.make_path(uri)
-        end
-    else
-        dir = _GET["dir"]
-    end
-
-    --backwards compatibility with old format driveLetter:\\..
-    --this is forgiving with the slash type and number
-    if dir then
-        local position=string.find(dir, '%a:[\\/]*%.%.',0)
-        if position==1 then dir="" end
-    end
-
-    local result={}
     --paths are returned as an array of elements
-    result.element={}
-    result.element._array={}
+    local result = { element = { _array = {} } }
 
-    if dir then
-        if dir == "~" or dir == "file://~" then dir = vlc.config.homedir() end
-        -- FIXME: hack for Win32 drive list
-        if dir~="" then
-            dir = common.realpath(dir.."/")
+    local dir
+    --uri takes precedence, but fall back to dir
+    if _GET["uri"] then
+        if _GET["uri"] == "file://~" then
+            dir = "~"
+        else
+            local uri = string.gsub(_GET["uri"], "[?#].*$", "")
+            if not string.match(uri, "/$") then
+                uri = uri.."/"
+            end
+            dir = vlc.strings.make_path(common.realpath(uri))
+        end
+    elseif _GET["dir"] then
+        dir = _GET["dir"]
+
+        -- "" dir means listing all drive letters e.g. "A:\", "C:\"...
+        --however the opendir() API won't resolve "X:\.." to that behavior,
+        --so we offer this resolution as "backwards compatibility"
+        if string.match(dir, '^[a-zA-Z]:[\\/]*%.%.$') or
+           string.match(dir, '^[a-zA-Z]:[\\/]*%.%.[\\/]') then
+            dir = ""
         end
 
-        local d = vlc.net.opendir(dir)
-        table.sort(d)
+        if dir ~= "" and dir ~= "~" then
+            dir = dir.."/" --luckily Windows accepts '/' as '\'
+        end
+    end
+    if not dir then
+        return result
+    end
 
-        for _,f in pairs(d) do
-            if f == ".." or not string.match(f,"^%.") then
-                local df = common.realpath(dir..f)
-                local s = vlc.net.stat(df)
-                local path, name =  df, f
-                local element={}
+    if dir == "~" then
+        dir = vlc.config.homedir().."/"
+    end
 
-                if (s) then
-                    for k,v in pairs(s) do
-                        element[k]=v
-                    end
-                else
-                    element["type"]="unknown"
+    local d = vlc.net.opendir(dir)
+    table.sort(d)
+
+    --FIXME: this is the wrong place to do this, but this still offers
+    --some useful mitigation: see #25021
+    if #d == 0 and dir ~= "" then
+        table.insert(d, "..")
+    end
+
+    for _,f in pairs(d) do
+        if f == ".." or not string.match(f,"^%.") then
+            local path = dir..f
+            local element={}
+
+            local s = vlc.net.stat(path)
+            if (s) then
+                for k,v in pairs(s) do
+                    element[k]=v
                 end
-                element["path"]=path
-                element["name"]=name
+            else
+                element["type"]="unknown"
+            end
+            element["path"]=path
+            element["name"]=f
 
-                local uri=vlc.strings.make_uri(df)
-                --windows paths are returned with / separators, but make_uri expects \ for windows and returns nil
-                if not uri then
-                    --convert failed path to windows format and try again
-                    path=string.gsub(path,"/","\\")
-                    uri=vlc.strings.make_uri(df)
-                end
-                element["uri"]=uri
-
-                table.insert(result.element._array,element)
+            local uri=vlc.strings.make_uri(path)
+            if uri then
+                element["uri"]=common.realpath(uri)
             end
 
+            table.insert(result.element._array,element)
         end
     end
 
@@ -421,7 +434,7 @@ getstatus = function (includecategories)
     local s ={}
 
     --update api version when new data/commands added
-    s.apiversion=3
+    s.apiversion=4
     s.version=vlc.misc.version()
     s.volume=vlc.volume.get()
 
@@ -511,3 +524,10 @@ getstatus = function (includecategories)
     return s
 end
 
+get_renderers = function()
+    local rd = get_renderer_discovery()
+    if not rd then
+        return {}
+    end
+    return rd:list()
+end

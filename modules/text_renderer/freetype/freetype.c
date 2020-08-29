@@ -83,6 +83,8 @@ static void Destroy( vlc_object_t * );
 #define SHADOW_COLOR_TEXT N_("Shadow color")
 #define SHADOW_ANGLE_TEXT N_("Shadow angle")
 #define SHADOW_DISTANCE_TEXT N_("Shadow distance")
+#define CACHE_SIZE_TEXT N_("Cache size")
+#define CACHE_SIZE_LONGTEXT N_("Cache size in kBytes")
 
 #define TEXT_DIRECTION_TEXT N_("Text direction")
 #define TEXT_DIRECTION_LONGTEXT N_("Paragraph base direction for the Unicode bi-directional algorithm.")
@@ -180,6 +182,10 @@ vlc_module_begin ()
         change_safe()
     add_float_with_range( "freetype-shadow-distance", 0.06, 0.0, 1.0,
                           SHADOW_DISTANCE_TEXT, NULL, false )
+        change_safe()
+
+    add_integer_with_range( "freetype-cache-size", 200, 25, (UINT32_MAX >> 10),
+                            CACHE_SIZE_TEXT, CACHE_SIZE_LONGTEXT, true )
         change_safe()
 
     add_obsolete_integer( "freetype-fontsize" );
@@ -309,9 +315,11 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
                                             i_font_idx,
                                             &p_face ))
             {
-
-                bool b_bold = p_face->style_flags & FT_STYLE_FLAG_BOLD;
-                bool b_italic = p_face->style_flags & FT_STYLE_FLAG_ITALIC;
+                int i_flags = 0;
+                if( p_face->style_flags & FT_STYLE_FLAG_BOLD )
+                    i_flags |= VLC_FONT_FLAG_BOLD;
+                if( p_face->style_flags & FT_STYLE_FLAG_ITALIC )
+                    i_flags |= VLC_FONT_FLAG_ITALIC;
 
                 vlc_family_t *p_family = DeclareNewFamily( p_sys->fs, p_face->family_name );
                 if( unlikely( !p_family ) )
@@ -320,7 +328,7 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
                 char *psz_fontfile;
                 if( asprintf( &psz_fontfile, ":/%d",
                               p_sys->i_font_attachments - 1 ) < 0
-                 || !NewFont( psz_fontfile, i_font_idx, b_bold, b_italic, p_family ) )
+                 || !NewFont( psz_fontfile, i_font_idx, i_flags, p_family ) )
                     goto error;
 
                 FT_Done_Face( p_face );
@@ -439,7 +447,7 @@ static int RenderYUVP( filter_t *p_filter, subpicture_region_t *p_region,
             const line_character_t *ch = &p_line->p_character[i];
             FT_BitmapGlyph p_glyph = ch->p_glyph;
 
-            int i_glyph_y = offset.y + p_regionbbox->yMax - p_glyph->top + p_line->i_base_line;
+            int i_glyph_y = offset.y + p_regionbbox->yMax - p_glyph->top + p_line->origin.y;
             int i_glyph_x = offset.x + p_glyph->left - p_regionbbox->xMin;
 
             for( y = 0; y < p_glyph->bitmap.rows; y++ )
@@ -810,12 +818,14 @@ static void RenderCharAXYZ( filter_t *p_filter,
             break;
         }
 
-        if(ch->p_ruby && ch->p_ruby->p_laid)
+        const line_desc_t *p_rubydesc = ch->p_ruby ? ch->p_ruby->p_laid : NULL;
+        if(p_rubydesc)
         {
             RenderCharAXYZ( p_filter,
                             p_picture,
-                            ch->p_ruby->p_laid,
-                            i_offset_x, i_offset_y,
+                            p_rubydesc,
+                            i_offset_x + p_rubydesc->origin.x,
+                            i_offset_y - p_rubydesc->origin.y,
                             2,
                             ExtractComponents,
                             BlendPixel );
@@ -843,7 +853,7 @@ static void RenderCharAXYZ( filter_t *p_filter,
         /* underline/strikethrough are only rendered for the normal glyph */
         if( g == 2 && ch->i_line_thickness > 0 )
             BlendAXYZLine( p_picture,
-                           i_glyph_x, i_glyph_y + p_glyph->top,
+                           i_glyph_x, i_glyph_y + ch->bbox.yMax,
                            i_a, i_x, i_y, i_z,
                            &ch[0],
                            i + 1 < p_line->i_character_count ? &ch[1] : NULL,
@@ -914,7 +924,7 @@ static inline int RenderAXYZ( filter_t *p_filter,
         {
             FT_Vector offset = GetAlignedOffset( p_line, p_textbbox, p_region->i_text_align );
 
-            int i_glyph_offset_y = offset.y + p_regionbbox->yMax + p_line->i_base_line;
+            int i_glyph_offset_y = offset.y + p_regionbbox->yMax + p_line->origin.y;
             int i_glyph_offset_x = offset.x - p_regionbbox->xMin;
 
             RenderCharAXYZ( p_filter, p_picture, p_line,
@@ -935,6 +945,8 @@ static void UpdateDefaultLiveStyles( filter_t *p_filter )
 
     p_style->i_background_alpha = var_InheritInteger( p_filter, "freetype-background-opacity" );
     p_style->i_background_color = var_InheritInteger( p_filter, "freetype-background-color" );
+
+    p_sys->i_outline_thickness = var_InheritInteger( p_filter, "freetype-outline-thickness" );
 }
 
 static void FillDefaultStyles( filter_t *p_filter )
@@ -1163,14 +1175,17 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     UpdateDefaultLiveStyles( p_filter );
 
-    /*
-     * Update the default face to reflect changes in video size or text scaling
-     */
-    p_sys->p_face = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
-    if( !p_sys->p_face )
+    int i_font_default_size = ConvertToLiveSize( p_filter, p_sys->p_default_style );
+    if( !p_sys->p_faceid || i_font_default_size != p_sys->i_font_default_size )
     {
-        msg_Err( p_filter, "Render(): Error loading default face" );
-        return VLC_EGENERIC;
+        /* Update the default face to reflect changes in video size or text scaling */
+        p_sys->p_faceid = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
+        if( !p_sys->p_faceid )
+        {
+            msg_Err( p_filter, "Render(): Error loading default face" );
+            return VLC_EGENERIC;
+        }
+        p_sys->i_font_default_size = i_font_default_size;
     }
 
     layout_text_block_t text_block = { 0 };
@@ -1213,14 +1228,13 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
         const vlc_fourcc_t p_chroma_list_yuvp[] = { VLC_CODEC_YUVP, 0 };
         const vlc_fourcc_t p_chroma_list_rgba[] = { VLC_CODEC_RGBA, 0 };
 
-        uint8_t i_background_opacity = var_InheritInteger( p_filter, "freetype-background-opacity" );
-        i_background_opacity = VLC_CLIP( i_background_opacity, 0, 255 );
-        int i_margin = (i_background_opacity > 0 && !p_region_in->b_gridmode) ? i_max_face_height / 4 : 0;
+        int i_margin = (p_sys->p_default_style->i_background_alpha > 0 && !p_region_in->b_gridmode)
+                     ? i_max_face_height / 4 : 0;
 
         if( (unsigned)i_margin * 2 >= i_max_width || (unsigned)i_margin * 2 >= i_max_height )
             i_margin = 0;
 
-        if( var_InheritBool( p_filter, "freetype-yuvp" ) )
+        if( p_sys->i_forced_chroma == VLC_CODEC_YUVP )
             p_chroma_list = p_chroma_list_yuvp;
         else if( !p_chroma_list || *p_chroma_list == 0 )
             p_chroma_list = p_chroma_list_rgba;
@@ -1347,13 +1361,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
     return rv;
 }
 
-static void FreeFace( void *p_face, void *p_obj )
-{
-    VLC_UNUSED( p_obj );
-
-    FT_Done_Face( ( FT_Face ) p_face );
-}
-
 /*****************************************************************************
  * Create: allocates osd-text video thread output method
  *****************************************************************************
@@ -1383,8 +1390,10 @@ static int Create( vlc_object_t *p_this )
         p_sys->p_stroker = NULL;
     }
 
-    /* Dictionnaries for fonts */
-    vlc_dictionary_init( &p_sys->face_map, 50 );
+    p_sys->ftcache = vlc_ftcache_New( p_this, p_sys->p_library,
+                            var_InheritInteger( p_this, "freetype-cache-size" ) );
+    if( !p_sys->ftcache )
+        goto error;
 
     p_sys->i_scale = 100;
 
@@ -1406,6 +1415,9 @@ static int Create( vlc_object_t *p_this )
     /* fills default and forced style */
     FillDefaultStyles( p_filter );
 
+    if( var_InheritBool( p_filter, "freetype-yuvp" ) )
+        p_sys->i_forced_chroma = VLC_CODEC_YUVP;
+
     /*
      * The following variables should not be cached, as they might be changed on-the-fly:
      * freetype-rel-fontsize, freetype-background-opacity, freetype-background-color,
@@ -1425,14 +1437,6 @@ static int Create( vlc_object_t *p_this )
 
     if( LoadFontsFromAttachments( p_filter ) == VLC_ENOMEM )
         goto error;
-
-    p_sys->p_face = SelectAndLoadFace( p_filter, p_sys->p_default_style, ' ' );
-    if( !p_sys->p_face )
-    {
-        msg_Err( p_filter, "Error loading default face %s",
-                 p_sys->p_default_style->psz_fontname );
-        goto error;
-    }
 
     p_filter->pf_render = Render;
 
@@ -1458,15 +1462,18 @@ static void Destroy( vlc_object_t *p_this )
         DumpFamilies( p_sys->fs );
 #endif
 
+    if( p_sys->ftcache )
+        vlc_ftcache_Delete( p_sys->ftcache );
+
+    if( p_sys->fs )
+        FontSelectDelete( p_sys->fs );
+
     free( p_sys->psz_fontfile );
     free( p_sys->psz_monofontfile );
 
     /* Text styles */
     text_style_Delete( p_sys->p_default_style );
     text_style_Delete( p_sys->p_forced_style );
-
-    /* Fonts dicts */
-    vlc_dictionary_clear( &p_sys->face_map, FreeFace, p_filter );
 
     /* Attachments */
     if( p_sys->pp_font_attachments )
@@ -1476,9 +1483,6 @@ static void Destroy( vlc_object_t *p_this )
 
         free( p_sys->pp_font_attachments );
     }
-
-    if(p_sys->fs)
-        FontSelectDelete( p_sys->fs );
 
     /* Freetype */
     if( p_sys->p_stroker )

@@ -37,24 +37,17 @@
 #include <windows.h>
 #include <assert.h>
 
-#define COBJMACROS
-#include <shobjidl.h>
-
 #include "events.h"
 #include "common.h"
 #include "../../video_chroma/copy.h"
 
-void CommonInit(vout_display_t *vd, display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
+void CommonInit(display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
 {
     area->place_changed = false;
     area->vdcfg = *vdcfg;
-
-    var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 }
 
 #if !VLC_WINSTORE_APP
-static void CommonChangeThumbnailClip(vlc_object_t *, vout_display_sys_win32_t *, bool show);
-
 /* */
 int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
                      vout_display_sys_win32_t *sys, bool projection_gestures)
@@ -106,14 +99,6 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area, vout_dis
     /* Update the window position and size */
     vout_display_cfg_t place_cfg = area->vdcfg;
 
-#if (defined(MODULE_NAME_IS_glwin32))
-    /* Reverse vertical alignment as the GL tex are Y inverted */
-    if (place_cfg.align.vertical == VLC_VIDEO_ALIGN_TOP)
-        place_cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-    else if (place_cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-        place_cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
-#endif
-
     vout_display_place_t before_place = area->place;
     vout_display_PlacePicture(&area->place, &vd->source, &place_cfg);
 
@@ -130,71 +115,17 @@ void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area, vout_dis
         msg_Dbg(vd, "UpdateRects image_dst coords: %i,%i %ix%i",
             area->place.x, area->place.y, area->place.width, area->place.height);
 #endif
-
-#if !VLC_WINSTORE_APP
-        if (sys->event != NULL)
-        {
-            CommonChangeThumbnailClip(VLC_OBJECT(vd), sys, true);
-        }
-#endif
     }
 }
 
 #if !VLC_WINSTORE_APP
 /* */
-void CommonWindowClean(vlc_object_t *obj, vout_display_sys_win32_t *sys)
+void CommonWindowClean(vout_display_sys_win32_t *sys)
 {
     if (sys->event) {
-        CommonChangeThumbnailClip(obj, sys, false);
         EventThreadStop(sys->event);
         EventThreadDestroy(sys->event);
     }
-}
-
-/* */
-static void CommonChangeThumbnailClip(vlc_object_t *obj, vout_display_sys_win32_t *sys, bool show)
-{
-    /* Windows 7 taskbar thumbnail code */
-    OSVERSIONINFO winVer;
-    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if (!GetVersionEx(&winVer) || winVer.dwMajorVersion <= 5)
-        return;
-
-    if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)) )
-        vlc_assert_unreachable();
-
-    void *ptr;
-    if (S_OK == CoCreateInstance(&CLSID_TaskbarList,
-                                 NULL, CLSCTX_INPROC_SERVER,
-                                 &IID_ITaskbarList3,
-                                 &ptr)) {
-        ITaskbarList3 *taskbl = ptr;
-        taskbl->lpVtbl->HrInit(taskbl);
-
-        HWND hroot = GetAncestor(sys->hvideownd, GA_ROOT);
-        RECT video;
-        if (show) {
-            GetWindowRect(sys->hparent, &video);
-            POINT client = {video.left, video.top};
-            if (ScreenToClient(hroot, &client))
-            {
-                unsigned int width = RECTWidth(video);
-                unsigned int height = RECTHeight(video);
-                video.left = client.x;
-                video.top = client.y;
-                video.right = video.left + width;
-                video.bottom = video.top + height;
-            }
-        }
-        HRESULT hr;
-        hr = taskbl->lpVtbl->SetThumbnailClip(taskbl, hroot,
-                                                 show ? &video : NULL);
-        if ( hr != S_OK )
-            msg_Err(obj, "SetThumbNailClip failed: 0x%lX", hr);
-
-        taskbl->lpVtbl->Release(taskbl);
-    }
-    CoUninitialize();
 }
 #endif /* !VLC_WINSTORE_APP */
 
@@ -221,8 +152,8 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
             area->vdcfg.display.height = RECTHeight(clientRect);
 
             SetWindowPos(sys->hvideownd, 0, 0, 0,
-                         area->vdcfg.display.width,
-                         area->vdcfg.display.height, SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE);
+                         RECTWidth(clientRect),
+                         RECTHeight(clientRect), SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE);
         }
 #endif /* !VLC_WINSTORE_APP */
         CommonPlacePicture(vd, area, sys);

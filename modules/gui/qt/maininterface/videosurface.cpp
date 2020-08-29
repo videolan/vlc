@@ -122,6 +122,7 @@ VideoSurface::VideoSurface(QQuickItem* parent)
 
     connect(this, &QQuickItem::widthChanged, this, &VideoSurface::onSurfaceSizeChanged);
     connect(this, &QQuickItem::heightChanged, this, &VideoSurface::onSurfaceSizeChanged);
+    connect(this, &QQuickItem::enabledChanged, this, &VideoSurface::onSurfaceSizeChanged);
 }
 
 QmlMainContext*VideoSurface::getCtx()
@@ -269,12 +270,21 @@ QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintN
         connect(this, &VideoSurface::keyPressed, m_provider, &VideoSurfaceProvider::onKeyPressed);
         connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged);
 
+        connect(m_provider, &VideoSurfaceProvider::hasVideoChanged, this, &VideoSurface::onProviderVideoChanged);
+
         onSurfaceSizeChanged();
     }
     return node;
 }
 
+void VideoSurface::onProviderVideoChanged(bool hasVideo)
+{
+    if (hasVideo)
+        emit surfaceSizeChanged(size() * this->window()->effectiveDevicePixelRatio());
+}
+
 void VideoSurface::onSurfaceSizeChanged()
 {
-    emit surfaceSizeChanged(size() * this->window()->effectiveDevicePixelRatio());
+    if (isEnabled())
+        emit surfaceSizeChanged(size() * this->window()->effectiveDevicePixelRatio());
 }

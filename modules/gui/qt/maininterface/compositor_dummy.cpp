@@ -19,6 +19,7 @@
 
 #include "maininterface/main_interface.hpp"
 #include "maininterface/mainui.hpp"
+#include "maininterface/interface_window_handler.hpp"
 
 namespace vlc {
 
@@ -34,6 +35,8 @@ MainInterface* CompositorDummy::makeMainInterface()
     m_rootWindow->show();
     QQuickWidget* centralWidget = new QQuickWidget(m_rootWindow);
     centralWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+
+    new InterfaceWindowHandler(m_intf, m_rootWindow, m_rootWindow->windowHandle(), m_rootWindow);
 
     MainUI* m_ui = new MainUI(m_intf, m_rootWindow, this);
     m_ui->setup(centralWidget->engine());

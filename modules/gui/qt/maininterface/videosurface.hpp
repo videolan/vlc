@@ -106,9 +106,11 @@ signals:
     void keyPressed(int key, Qt::KeyboardModifiers modifier);
     void mouseWheeled(const QPointF& pos, int delta, Qt::MouseButtons buttons,  Qt::KeyboardModifiers modifiers, Qt::Orientation orient);
 
-private:
+protected slots:
+    void onProviderVideoChanged(bool);
     void onSurfaceSizeChanged();
 
+private:
     QmlMainContext* m_mainCtx = nullptr;
 
     bool m_sourceSizeChanged = false;

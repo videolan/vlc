@@ -33,6 +33,7 @@ Widgets.NavigableFocusScope {
     property alias ctx: deviceModel.ctx
     property alias sd_source: deviceModel.sd_source
     property alias model: deviceModel
+    property int leftPadding: VLCStyle.margin_xlarge
 
     property int _currentIndex: -1
     on_CurrentIndexChanged: {
@@ -70,19 +71,28 @@ Widgets.NavigableFocusScope {
 
         currentIndex: root._currentIndex
 
-        implicitHeight: VLCStyle.gridItem_network_height
+        implicitHeight: VLCStyle.gridItem_network_height + VLCStyle.margin_xlarge
         orientation: ListView.Horizontal
         anchors.fill: parent
+        spacing: VLCStyle.column_margin_width
+
+        header: Item {
+            width: root.leftPadding
+        }
 
         model: deviceModel
         delegate: NetworkGridItem {
             focus: true
+            x: selectedBorderWidth
+            y: selectedBorderWidth
 
             onItemClicked : {
                 deviceSelection.updateSelection( modifier ,  deviceSelection.currentIndex, index)
                 root._currentIndex = index
                 forceActiveFocus()
             }
+
+            onPlayClicked: deviceModel.addAndPlay( index )
 
             onItemDoubleClicked: {
                 if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)

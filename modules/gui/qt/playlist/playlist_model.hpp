@@ -65,7 +65,7 @@ public:
                   int role = Qt::DisplayRole) const override;
 
     /* provided for convenience */
-    const PlaylistItem &itemAt(int index) const;
+    Q_INVOKABLE PlaylistItem itemAt(int index) const;
 
     Q_INVOKABLE virtual void removeItems(const QList<int> &indexes);
     Q_INVOKABLE virtual void moveItemsPre(const QList<int> &indexes, int preTarget);

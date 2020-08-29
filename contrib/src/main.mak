@@ -131,16 +131,11 @@ endif
 
 ifdef HAVE_MACOSX
 EXTRA_CXXFLAGS += -stdlib=libc++
-ifeq ($(ARCH),x86_64)
-EXTRA_CFLAGS += -m64
-EXTRA_LDFLAGS += -m64
+ifeq ($(ARCH),aarch64)
+XCODE_FLAGS += -arch arm64
 else
-EXTRA_CFLAGS += -m32
-EXTRA_LDFLAGS += -m32
-endif
-
 XCODE_FLAGS += -arch $(ARCH)
-
+endif
 endif
 
 CCAS=$(CC) -c

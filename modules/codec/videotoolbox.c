@@ -1681,6 +1681,9 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
 #define VTERRCASE(x) \
     case x: msg_Warn(p_dec, "vt session error: '" #x "'"); break;
 
+#define VTERRCASE_LEGACY(code, name) \
+    case code: msg_Warn(p_dec, "vt session error: '" name "'"); break;
+
     switch (status)
     {
         case noErr:
@@ -1716,10 +1719,17 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
         VTERRCASE(kVTCouldNotFindTemporalFilterErr)
         VTERRCASE(kVTPixelTransferNotPermittedErr)
         VTERRCASE(kVTColorCorrectionImageRotationFailedErr)
+
+        /* Legacy error codes defined in the old Carbon MacErrors.h */
+        VTERRCASE_LEGACY(-8960, "codecErr")
+        VTERRCASE_LEGACY(-8961, "noCodecErr")
+        VTERRCASE_LEGACY(-8969, "codecBadDataErr")
+        VTERRCASE_LEGACY(-8973, "codecOpenErr")
         default:
             msg_Warn(p_dec, "unknown vt session error (%i)", (int)status);
     }
 #undef VTERRCASE
+#undef VTERRCASE_LEGACY
 
     if (p_vtsession_status)
     {

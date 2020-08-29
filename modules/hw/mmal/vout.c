@@ -485,10 +485,12 @@ static int query_resolution(vout_display_t *vd, const int display_id, unsigned *
             msg_Dbg(vd, "HDMI: %dx%d", display_state.display.hdmi.width, display_state.display.hdmi.height);
             *width = display_state.display.hdmi.width;
             *height = display_state.display.hdmi.height;
+            vout_display_SetSize(vd, *width, *height);
         } else if (display_state.state & 0xFF00) {
             msg_Dbg(vd, "SDTV: %dx%d", display_state.display.sdtv.width, display_state.display.sdtv.height);
             *width = display_state.display.sdtv.width;
             *height = display_state.display.sdtv.height;
+            vout_display_SetSize(vd, *width, *height);
         } else {
             msg_Warn(vd, "Invalid display state %"PRIx32, display_state.state);
             ret = -1;
@@ -516,16 +518,6 @@ static void
 place_dest(vout_display_sys_t * const sys,
            const vout_display_cfg_t * const cfg, const video_format_t * fmt)
 {
-    video_format_t tfmt;
-
-    // Fix SAR if unknown
-    if (fmt->i_sar_den == 0 || fmt->i_sar_num == 0) {
-        tfmt = *fmt;
-        tfmt.i_sar_den = 1;
-        tfmt.i_sar_num = 1;
-        fmt = &tfmt;
-    }
-
     // Ignore what VLC thinks might be going on with display size
     vout_display_cfg_t tcfg = *cfg;
     vout_display_place_t place;
@@ -723,12 +715,15 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
             break;
 
         case VOUT_DISPLAY_RESET_PICTURES:
+        {
             msg_Warn(vd, "Reset Pictures");
             kill_pool(sys);
-            vd->fmt = vd->source; // Take (nearly) whatever source wants to give us
-            vd->fmt.i_chroma = req_chroma(&vd->fmt);  // Adjust chroma to something we can actually deal with
+            video_format_t *fmt = va_arg(args, video_format_t *);
+            *fmt = vd->source; // Take (nearly) whatever source wants to give us
+            fmt->i_chroma = req_chroma(fmt);  // Adjust chroma to something we can actually deal with
             ret = VLC_SUCCESS;
             break;
+        }
 
         case VOUT_DISPLAY_CHANGE_ZOOM:
             msg_Warn(vd, "Unsupported control query %d", query);

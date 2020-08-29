@@ -94,11 +94,9 @@ static void VoutDisplayEventKey(vout_display_sys_t *sys, int key)
 /**
  * Compute the place in canvas unit.
  */
-static void Place(vout_display_t *vd, const vout_display_cfg_t *cfg)
+static void Place(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-
-    vout_display_PlacePicture(&sys->place, &vd->source, cfg);
 
     const int canvas_width   = cucul_get_canvas_width(sys->cv);
     const int canvas_height  = cucul_get_canvas_height(sys->cv);
@@ -501,7 +499,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     /* Fix initial state */
     caca_refresh_display(sys->dp);
 
-    Place(vd, cfg);
+    Place(vd);
 
     return VLC_SUCCESS;
 

@@ -120,6 +120,11 @@ extern "C" {
 /**
  * Representation of the fonts (linked-list)
  */
+enum
+{
+    VLC_FONT_FLAG_BOLD    = 1 << 0,
+    VLC_FONT_FLAG_ITALIC  = 1 << 1,
+};
 typedef struct vlc_font_t vlc_font_t;
 struct vlc_font_t
 {
@@ -130,9 +135,8 @@ struct vlc_font_t
      */
     char       *psz_fontfile;
     int         i_index;   /**< index of the font in the font file, starts at 0 */
-    bool        b_bold;    /**< if the font is a bold version */
-    bool        b_italic;  /**< if the font is an italic version */
-    FT_Face     p_face;    /**< the freetype structure for the font */
+    int         i_flags;
+    void       *faceid;    /* fontloader ref to font */
 };
 
 /**
@@ -155,6 +159,12 @@ struct vlc_family_t
     vlc_font_t   *p_fonts; /**< fonts matching this family */
 };
 
+typedef struct
+{
+    const char *psz_key;
+    struct VLC_VECTOR(char *) vec;
+} fontfamilies_t;
+
 #define FB_LIST_ATTACHMENTS "attachments"
 #define FB_LIST_DEFAULT     "default"
 #define FB_NAME             "fallback"
@@ -166,17 +176,17 @@ void FontSelectDelete( vlc_font_select_t * );
  * Get a pointer to the vlc_family_t in the master list that matches \p psz_family.
  * Add this family to the list if it hasn't been added yet.
  */
-const vlc_family_t * FontSelectGetFamily( vlc_font_select_t *, const char *psz_family );
+const vlc_family_t * FontSelectFamily( vlc_font_select_t *, const char *psz_family );
+const vlc_family_t * FontSelectAmongFamilies( vlc_font_select_t *, const fontfamilies_t * );
 
 /**
- * Get the fallback list for \p psz_family from the system and cache
+ * Get the fallback list for \p fontfamilies_t from the system and cache
  * it in \ref fallback_map.
  * On Windows fallback lists are populated progressively as required
  * using Uniscribe, so we need the codepoint here.
  */
-vlc_family_t * FontSelectGetFallbacks( vlc_font_select_t *, const char *psz_family,
+vlc_family_t * FontFallbacksAmongFamilies( vlc_font_select_t *, const fontfamilies_t *,
                                        uni_char_t codepoint );
-
 
 /* ******************
  * Family and fonts *
@@ -203,6 +213,9 @@ vlc_family_t * FontSelectGetFallbacks( vlc_font_select_t *, const char *psz_fami
 vlc_family_t *NewFamily( vlc_font_select_t *, const char *psz_family,
                          vlc_family_t **pp_list, vlc_dictionary_t *p_dict,
                          const char *psz_key );
+vlc_family_t *NewFamilyFromMixedCase( vlc_font_select_t *, const char *psz_family,
+                                      vlc_family_t **pp_list, vlc_dictionary_t *p_dict,
+                                      const char *psz_key );
 
 vlc_family_t * DeclareNewFamily( vlc_font_select_t *, const char *psz_family );
 int DeclareFamilyAsAttachMenFallback( vlc_font_select_t *, vlc_family_t * );
@@ -215,8 +228,7 @@ char *CreateUniqueFamilyKey( vlc_font_select_t * );
  * \param psz_fontfile font file, or ":/x" for font attachments, where x is the attachment index
  *        within \ref filter_sys_t::pp_font_attachments [IN]
  * \param i_index index of the font in the font file [IN]
- * \param b_bold is a bold font or not [IN]
- * \param b_bold is an italic or not [IN]
+ * \param i_flags is font style flags [IN]
  * \param p_parent parent family.
  *                 If not NULL, the font will be associated to this family, and
  *                 appended to the font list in that family [IN]
@@ -225,8 +237,7 @@ char *CreateUniqueFamilyKey( vlc_font_select_t * );
  * \return the new font
  */
 vlc_font_t *NewFont( char *psz_fontfile, int i_index,
-                     bool b_bold, bool b_italic,
-                     vlc_family_t *p_parent );
+                     int i_flags, vlc_family_t *p_parent );
 
 /**
  * Free families and fonts associated.
@@ -272,16 +283,19 @@ void DumpFamilies( vlc_font_select_t * );
 #endif
 
 /* String helpers */
-char* ToLower( const char *psz_src );
+char* LowercaseDup( const char *psz_src );
+
+bool IsLowercase( const char *psz_src );
+void LowercaseTransform( char *psz );
 
 /* Size helper, depending on the scaling factor */
 int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style );
 
-
 /* Only for fonts implementors */
 vlc_family_t *SearchFallbacks( vlc_font_select_t *, vlc_family_t *p_fallbacks,
                                       uni_char_t codepoint );
-FT_Face GetFace( vlc_font_select_t *, vlc_font_t *p_font, uni_char_t codepoint );
+bool CheckFace( vlc_font_select_t *fs, vlc_font_t *p_font, uni_char_t codepoint );
+FT_Face doLoadFace( void *, const char *psz_fontfile, int i_idx );
 
 char * MakeFilePath( vlc_font_select_t *, const char *psz_filename );
 

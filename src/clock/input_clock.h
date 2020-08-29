@@ -30,8 +30,7 @@
 /** @struct input_clock_t
  * This structure is used to manage clock drift and reception jitters
  *
- * XXX input_clock_ConvertTS can be called from any threads. All others functions
- * MUST be called from one and only one thread.
+ * All functions MUST be called from one and only one thread.
  */
 typedef struct input_clock_t input_clock_t;
 
@@ -92,23 +91,6 @@ void    input_clock_GetSystemOrigin( input_clock_t *, vlc_tick_t *pi_system, vlc
  * called imediatly after a input_clock_Update.
  */
 void    input_clock_ChangeSystemOrigin( input_clock_t *, bool b_absolute, vlc_tick_t i_system );
-
-/**
- * This function converts a pair of timestamp from stream clock to system clock.
- *
- * If p_rate is provided it will be filled with the rate value used for
- * the conversion.
- * p_ts0 is a pointer to a timestamp to be converted (in place) and must be non NULL.
- * p_ts1 is a pointer to a timestamp to be converted (in place) and can be NULL.
- *
- * It will return VLC_EGENERIC if i_ts_bound is not INT64_MAX and if the value *p_ts0
- * after conversion is not before the deadline vlc_tick_now() + i_pts_delay + i_ts_bound.
- * It will also return VLC_EGENERIC if the conversion cannot be done successfully. In
- * this case, *p_ts0 and *p_ts1 will hold an invalid timestamp.
- * Otherwise it will return VLC_SUCCESS.
- */
-int input_clock_ConvertTS( vlc_object_t *, input_clock_t *, float *p_rate,
-                           vlc_tick_t *pi_ts0, vlc_tick_t *pi_ts1, vlc_tick_t i_ts_bound );
 
 /**
  * This function returns the current rate.

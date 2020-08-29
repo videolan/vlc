@@ -50,9 +50,9 @@ typedef struct
 struct line_desc_t
 {
     line_desc_t      *p_next;
+    FT_Vector        origin; /* line position shift, baseline as y */
     int              i_width;
     int              i_height;
-    int              i_base_line;
     int              i_character_count;
     int              i_first_visible_char_index;
     int              i_last_visible_char_index;

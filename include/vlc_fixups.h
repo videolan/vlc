@@ -295,6 +295,10 @@ static inline char *getenv (const char *name)
 }
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef HAVE_SETENV
 int setenv (const char *, const char *, int);
 int unsetenv (const char *);
@@ -306,6 +310,10 @@ int posix_memalign(void **, size_t, size_t);
 
 #ifndef HAVE_ALIGNED_ALLOC
 void *aligned_alloc(size_t, size_t);
+#endif
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
 #if defined (_WIN32) && defined(__MINGW32__)

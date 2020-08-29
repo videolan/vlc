@@ -45,7 +45,8 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumTrackModel::M_names_to_crite
     {"track_number", VLC_ML_SORTING_TRACKNUMBER},
     {"release_year", VLC_ML_SORTING_RELEASEDATE},
     {"main_artist", VLC_ML_SORTING_ARTIST},
-    {"duration", VLC_ML_SORTING_DURATION}
+    {"duration", VLC_ML_SORTING_DURATION},
+    {"duration_short", VLC_ML_SORTING_DURATION}
 };
 
 MLAlbumTrackModel::MLAlbumTrackModel(QObject *parent)
@@ -103,7 +104,7 @@ QHash<int, QByteArray> MLAlbumTrackModel::roleNames() const
         { TRACK_NUMBER, "track_number" },
         { TRACK_DISC_NUMBER, "disc_number" },
         { TRACK_DURATION, "duration" },
-        { TRACK_DURATION_SHORT, "durationShort" },
+        { TRACK_DURATION_SHORT, "duration_short" },
         { TRACK_ALBUM, "album_title"},
         { TRACK_ARTIST, "main_artist"},
         { TRACK_TITLE_FIRST_SYMBOL, "title_first_symbol"},

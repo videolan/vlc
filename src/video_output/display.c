@@ -726,7 +726,7 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
         osys->cfg.viewpoint = *p_viewpoint;
 
         if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_VIEWPOINT,
-                                 &osys->cfg)) {
+                                 &osys->cfg.viewpoint)) {
             msg_Err(vd, "Failed to change Viewpoint");
             osys->cfg.viewpoint = old_vp;
         }

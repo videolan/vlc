@@ -65,15 +65,21 @@ vlc_tick_t PlaylistItem::getDuration() const
     return d->duration;
 }
 
+QUrl PlaylistItem::getUrl() const
+{
+    return d->url;
+}
+
 void PlaylistItem::sync() {
     input_item_t *media = vlc_playlist_item_GetMedia(d->item.get());
     vlc_mutex_lock(&media->lock);
-    d->title = media->psz_name;
+    d->title    = media->psz_name;
     d->duration = media->i_duration;
+    d->url      = media->psz_uri;
 
     if (media->p_meta) {
-        d->artist = vlc_meta_Get(media->p_meta, vlc_meta_Artist);
-        d->album = vlc_meta_Get(media->p_meta, vlc_meta_Album);
+        d->artist  = vlc_meta_Get(media->p_meta, vlc_meta_Artist);
+        d->album   = vlc_meta_Get(media->p_meta, vlc_meta_Album);
         d->artwork = vlc_meta_Get(media->p_meta, vlc_meta_ArtworkURL);
     }
     vlc_mutex_unlock(&media->lock);

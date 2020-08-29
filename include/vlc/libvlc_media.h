@@ -122,6 +122,7 @@ typedef struct libvlc_media_stats_t
 
     /* Video Output */
     int         i_displayed_pictures;
+    int         i_late_pictures;
     int         i_lost_pictures;
 
     /* Audio output */

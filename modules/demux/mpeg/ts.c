@@ -392,7 +392,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->vdr = vdr;
 
-    p_sys->arib.b25stream = NULL;
     p_sys->stream = p_demux->s;
 
     p_sys->b_broken_charset = false;
@@ -576,10 +575,10 @@ static void Close( vlc_object_t *p_this )
         arib_instance_destroy( p_sys->arib.p_instance );
 #endif
 
-    if ( p_sys->arib.b25stream )
+    if ( p_sys->stream != p_demux->s ) /* B25 wrapper in use */
     {
-        p_sys->arib.b25stream->s = NULL; /* don't chain kill demuxer's source */
-        vlc_stream_Delete( p_sys->arib.b25stream );
+        vlc_stream_Delete( p_sys->stream );
+        p_sys->stream = p_demux->s;
     }
 
     /* Release all non default pids */

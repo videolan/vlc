@@ -218,6 +218,8 @@ nobase_dist_pkgdata_DATA += \
 	lua/http/requests/vlm_cmd.xml \
 	lua/http/requests/status.xml \
 	lua/http/requests/status.json \
+	lua/http/requests/rd.json \
+	lua/http/requests/rd.xml \
 	lua/http/requests/vlm.xml \
 	lua/http/index.html \
 	lua/http/css/ui-lightness/jquery-ui-1.8.13.custom.css \
@@ -306,3 +308,6 @@ DIST_solid = \
 	solid/vlc-opencda.desktop \
 	solid/vlc-opendvd.desktop \
 	solid/vlc-openvcd.desktop
+
+EXTRA_DIST += \
+        hrtfs/dodeca_and_7channel_3DSL_HRTF.sofa

@@ -112,13 +112,22 @@ var_Read_unsigned(const char *psz)
     return value >= 0 && value < UINT_MAX ? value : UINT_MAX;
 }
 
+static float
+var_Read_float(const char *psz)
+{
+    return atof(psz);
+}
+
 #define OPTIONS_AUDIO(Y) \
     Y(audio, packetized, bool, add_bool, Bool, true) \
     Y(audio, add_track_at, vlc_tick_t, add_integer, Integer, VLC_TICK_INVALID) \
     Y(audio, channels, unsigned, add_integer, Unsigned, 2) \
-    Y(audio, format, vlc_fourcc_t, add_string, Fourcc, "u8") \
+    Y(audio, format, vlc_fourcc_t, add_string, Fourcc, "f32l") \
     Y(audio, rate, unsigned, add_integer, Unsigned, 44100) \
-    Y(audio, sample_length, vlc_tick_t, add_integer, Integer, VLC_TICK_FROM_MS(40) )
+    Y(audio, sample_length, vlc_tick_t, add_integer, Integer, VLC_TICK_FROM_MS(40)) \
+    Y(audio, sinewave, bool, add_bool, Bool, true) \
+    Y(audio, sinewave_frequency, unsigned, add_integer, Integer, 500) \
+    Y(audio, sinewave_amplitude, float, add_float, Float, 0.2)
 
 #define OPTIONS_VIDEO(Y) \
     Y(video, packetized, bool, add_bool, Bool, true)\
@@ -440,6 +449,27 @@ Control(demux_t *demux, int query, va_list args)
     }
 }
 
+static void
+GenerateAudioSineWave(demux_t *demux, struct mock_track *track, block_t *block)
+{
+    struct demux_sys *sys = demux->p_sys;
+    float *out = (float *) block->p_buffer;
+    double delta = 1 / (double) track->fmt.audio.i_rate;
+    double audio_pts_sec = sys->audio_pts / (double) CLOCK_FREQ;
+
+    assert(track->fmt.audio.i_format == VLC_CODEC_FL32);
+
+    for (unsigned si = 0; si < block->i_nb_samples; ++si)
+    {
+        double value = track->audio.sinewave_amplitude
+                     * sin(2 * M_PI * track->audio.sinewave_frequency * audio_pts_sec);
+        audio_pts_sec += delta;
+
+        for (unsigned ci = 0; ci < track->fmt.audio.i_channels; ++ci)
+            *out++ = value;
+    }
+}
+
 static block_t *
 CreateAudioBlock(demux_t *demux, struct mock_track *track, vlc_tick_t length)
 {
@@ -450,9 +480,14 @@ CreateAudioBlock(demux_t *demux, struct mock_track *track, vlc_tick_t length)
     block_t *b = block_Alloc(bytes);
     if (!b)
         return NULL;
-    memset(b->p_buffer, 0, b->i_buffer);
+    b->i_nb_samples = samples;
+
+    if (track->audio.sinewave)
+        GenerateAudioSineWave(demux, track, b);
+    else
+        memset(b->p_buffer, 0, b->i_buffer);
+
     return b;
-    (void) demux;
 }
 
 struct video_block
@@ -646,6 +681,15 @@ ConfigureAudioTrack(demux_t *demux,
             msg_Err(demux, "Invalid audio channels");
         return VLC_EGENERIC;
     }
+
+    if (options->sinewave && options->format != VLC_CODEC_FL32)
+    {
+        /* We could support every formats if we plug an audio converter, but
+         * this may be overkill for a mock module */
+        msg_Err(demux, "audio sinewave works only with fl32 format");
+        return VLC_EGENERIC;
+    }
+
 
     uint16_t physical_channels = 0;
     switch (options->channels)

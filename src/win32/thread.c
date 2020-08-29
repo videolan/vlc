@@ -275,7 +275,7 @@ static void WINAPI WakeByAddressFallback(void *addr)
 
 void vlc_atomic_wait(void *addr, unsigned val)
 {
-    WaitOnAddress(addr, &val, sizeof (val), -1);
+    WaitOnAddress(addr, &val, sizeof (val), INFINITE);
 }
 
 int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
@@ -289,8 +289,8 @@ int vlc_atomic_timedwait(void *addr, unsigned val, vlc_tick_t deadline)
         delay = deadline - vlc_tick_now();
 
         if (delay < 0)
-            ms = 0;
-        else if (delay >= VLC_TICK_FROM_MS(LONG_MAX))
+            break; // deadline passed
+        if (delay >= VLC_TICK_FROM_MS(LONG_MAX))
             ms = LONG_MAX;
         else
             ms = MS_FROM_VLC_TICK(delay);
@@ -314,8 +314,8 @@ int vlc_atomic_timedwait_daytime(void *addr, unsigned val, time_t deadline)
         delay = deadline - time(NULL);
 
         if (delay < 0)
-            ms = 0;
-        else if (delay >= (LONG_MAX / 1000))
+            break; // deadline passed
+        if (delay >= (LONG_MAX / 1000))
             ms = LONG_MAX;
         else
             ms = delay * 1000;

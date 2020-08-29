@@ -276,7 +276,6 @@ void vout_CreateVars( vout_thread_t *p_vout )
     /* Mouse coordinates */
     var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-moved", VLC_VAR_COORDS );
-    var_Create( p_vout, "mouse-clicked", VLC_VAR_COORDS );
 
     /* Device orientation */
     var_Create( p_vout, "viewpoint-moved", VLC_VAR_ADDRESS );

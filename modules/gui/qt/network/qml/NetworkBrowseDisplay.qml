@@ -20,6 +20,7 @@ import QtQuick.Controls 2.4
 import QtQml.Models 2.2
 import QtQuick.Layouts 1.3
 import QtQml 2.11
+import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
@@ -141,20 +142,38 @@ Widgets.NavigableFocusScope {
             delegateModel: selectionModel
             model: providerModel
 
-            headerDelegate: Widgets.LabelSeparator {
+            headerDelegate: Widgets.NavigableFocusScope {
                 width: view.width
-                text: providerModel.name
+                height: layout.implicitHeight + VLCStyle.margin_large + VLCStyle.margin_normal
+                navigable: btn.visible
 
-                navigable: inlineItem.visible
+                RowLayout {
+                    id: layout
 
-                inlineComponent: Widgets.TabButtonExt {
-                    focus: true
-                    iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
-                    text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
-                    visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
-                    onClicked: providerModel.indexed = !providerModel.indexed
+                    anchors.fill: parent
+                    anchors.topMargin: VLCStyle.margin_large
+                    anchors.bottomMargin: VLCStyle.margin_normal
+                    anchors.rightMargin: VLCStyle.margin_small
+
+                    Widgets.SubtitleLabel {
+                        text: providerModel.name
+                        leftPadding: gridView.rowX
+
+                        Layout.fillWidth: true
+                    }
+
+                    Widgets.TabButtonExt {
+                        id: btn
+
+                        focus: true
+                        iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
+                        text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
+                        visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
+                        onClicked: providerModel.indexed = !providerModel.indexed
+
+                        Layout.preferredWidth: implicitWidth
+                    }
                 }
-
 
                 Keys.onPressed: defaultKeyAction(event, 0)
                 navigationParent: root
@@ -165,15 +184,18 @@ Widgets.NavigableFocusScope {
             }
 
             cellWidth: VLCStyle.gridItem_network_width
-            cellHeight: VLCStyle.gridItem_network_height
+            cellHeight: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
 
             delegate: NetworkGridItem {
                 id: delegateGrid
 
                 property var model: ({})
+                property int index: -1
 
                 subtitle: ""
+                height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
 
+                onPlayClicked: selectionModel.model.addAndPlay( index )
                 onItemClicked : {
                     selectionModel.updateSelection( modifier ,  view.currentItem.currentIndex, index)
                     view.currentItem.currentIndex = index
@@ -207,71 +229,148 @@ Widgets.NavigableFocusScope {
     }
 
     Component{
-        id: listComponent
-        Widgets.KeyNavigableListView {
-            id: listView
+        id: tableComponent
+
+        Widgets.KeyNavigableTableView {
+            id: tableView
+
+            readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView.availableRowWidth)
+            readonly property int _nameColSpan: Math.max((_nbCols - 1) / 2, 1)
+            property Component thumbnailHeader: Item {
+                Widgets.IconLabel {
+                    height: VLCStyle.listAlbumCover_height
+                    width: VLCStyle.listAlbumCover_width
+                    horizontalAlignment: Text.AlignHCenter
+                    text: VLCIcons.album_cover
+                    color: VLCStyle.colors.caption
+                }
+            }
+
+            property Component thumbnailColumn: Item {
+                id: item
+
+                property var rowModel: parent.rowModel
+                property var model: parent.colModel
+                readonly property bool currentlyFocused: parent.currentlyFocused
+                readonly property bool containsMouse: parent.containsMouse
+                readonly property int index: parent.index
+
+                Rectangle {
+                    id: background
+
+                    color: VLCStyle.colors.bg
+                    width: VLCStyle.listAlbumCover_width
+                    height: VLCStyle.listAlbumCover_height
+                    visible: !artwork.visible
+
+                    Image {
+                        id: custom_cover
+
+                        anchors.centerIn: parent
+                        sourceSize.height: VLCStyle.icon_small
+                        sourceSize.width: VLCStyle.icon_small
+                        fillMode: Image.PreserveAspectFit
+                        mipmap: true
+                        source: {
+                            switch (rowModel.type){
+                            case NetworkMediaModel.TYPE_DISC:
+                                return  "qrc:///type/disc.svg"
+                            case NetworkMediaModel.TYPE_CARD:
+                                return  "qrc:///type/capture-card.svg"
+                            case NetworkMediaModel.TYPE_STREAM:
+                                return  "qrc:///type/stream.svg"
+                            case NetworkMediaModel.TYPE_PLAYLIST:
+                                return  "qrc:///type/playlist.svg"
+                            case NetworkMediaModel.TYPE_FILE:
+                                return  "qrc:///type/file_black.svg"
+                            default:
+                                return "qrc:///type/directory_black.svg"
+                            }
+                        }
+                    }
+
+                    ColorOverlay {
+                        anchors.fill: custom_cover
+                        source: custom_cover
+                        color: VLCStyle.colors.text
+                        visible: rowModel.type !== NetworkMediaModel.TYPE_DISC
+                                 && rowModel.type !== NetworkMediaModel.TYPE_CARD
+                                 && rowModel.type !== NetworkMediaModel.TYPE_STREAM
+                    }
+                }
+
+                Image {
+                    id: artwork
+
+                    x: (width - paintedWidth) / 2
+                    y: (height - paintedHeight) / 2
+                    width: VLCStyle.listAlbumCover_width
+                    height: VLCStyle.listAlbumCover_height
+                    fillMode: Image.PreserveAspectFit
+                    horizontalAlignment: Image.AlignLeft
+                    verticalAlignment: Image.AlignTop
+                    source: item.rowModel.artwork
+                    visible: item.rowModel.artwork && item.rowModel.artwork.toString() !== ""
+                    mipmap: true
+                }
+
+                Widgets.PlayCover {
+                    x: artwork.visible ? artwork.x : background.x
+                    y: artwork.visible ? artwork.y : background.y
+                    width: artwork.visible ? artwork.paintedWidth : background.width
+                    height: artwork.visible ? artwork.paintedHeight : background.height
+                    iconSize: VLCStyle.play_cover_small
+                    visible: currentlyFocused || containsMouse
+                    onIconClicked: providerModel.addAndPlay(item.index)
+                    onlyBorders: rowModel.type === NetworkMediaModel.TYPE_NODE || rowModel.type === NetworkMediaModel.TYPE_DIRECTORY
+                }
+            }
+
             height: view.height
             width: view.width
             model: providerModel
-
-            delegate: NetworkListItem {
-                id: delegateList
-                focus: true
-
-                selected: selectionModel.isSelected( providerModel.index(index, 0) )
-                Connections {
-                    target: selectionModel
-                    onSelectionChanged: delegateList.selected = selectionModel.isSelected(providerModel.index(index, 0))
-                }
-
-                onItemClicked : {
-                    selectionModel.updateSelection( modifier, view.currentItem.currentIndex, index )
-                    view.currentItem.currentIndex = index
-                    delegateList.forceActiveFocus()
-                }
-
-                onItemDoubleClicked: {
-                    if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
-                        history.push( ["mc", "network", { tree: model.tree } ])
-                    else
-                        providerModel.addAndPlay( index )
-                }
-
-                onContextMenuButtonClicked: {
-                    contextMenu.model = providerModel
-                    contextMenu.selectionModel = selectionModel
-                    contextMenu.popup(menuParent)
-                }
-
-                onActionLeft: root.navigationLeft(0)
-                onActionRight: root.navigationRight(0)
-            }
-
+            selectionDelegateModel: selectionModel
             focus: true
-            spacing: VLCStyle.margin_xxxsmall
-
-            onSelectAll: selectionModel.selectAll()
-            onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
-            onActionAtIndex: _actionAtIndex(index)
-
+            headerColor: VLCStyle.colors.bg
             navigationParent: root
-            navigationUpItem: listView.headerItem
+            navigationUpItem: tableView.headerItem
             navigationCancel: function() {
                 history.previous()
             }
 
-            header:  Widgets.LabelSeparator {
-                text: providerModel.name
+            rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
+
+            header: Widgets.NavigableFocusScope {
                 width: view.width
+                height: layout.implicitHeight + VLCStyle.margin_large + VLCStyle.margin_small
+                navigable: btn.visible
 
-                navigable: inlineItem.visible
+                RowLayout {
+                    id: layout
 
-                inlineComponent: Widgets.TabButtonExt {
-                    focus: true
-                    iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
-                    text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
-                    visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
-                    onClicked: providerModel.indexed = !providerModel.indexed
+                    anchors.fill: parent
+                    anchors.topMargin: VLCStyle.margin_large
+                    anchors.bottomMargin: VLCStyle.margin_small
+                    anchors.rightMargin: VLCStyle.margin_small
+
+                    Widgets.SubtitleLabel {
+                        text: providerModel.name
+                        leftPadding: VLCStyle.margin_large
+
+                        Layout.fillWidth: true
+                    }
+
+                    Widgets.TabButtonExt {
+                        id: btn
+
+                        focus: true
+                        iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
+                        text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
+                        visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
+                        onClicked: providerModel.indexed = !providerModel.indexed
+
+                        Layout.preferredWidth: implicitWidth
+                    }
                 }
 
                 Keys.onPressed: defaultKeyAction(event, 0)
@@ -279,8 +378,27 @@ Widgets.NavigableFocusScope {
                 navigationUpItem: root.navigationUpItem
                 navigationDown: function() {
                     focus = false
-                    listView.forceActiveFocus()
+                    tableView.forceActiveFocus()
                 }
+            }
+
+            sortModel: [
+                { criteria: "thumbnail", width: VLCStyle.colWidth(1), headerDelegate: tableView.thumbnailHeader, colDelegate: tableView.thumbnailColumn },
+                { isPrimary: true, criteria: "name", width: VLCStyle.colWidth(tableView._nameColSpan), text: i18n.qtr("Name") },
+                { criteria: "mrl", width: VLCStyle.colWidth(Math.max(tableView._nbCols - tableView._nameColSpan - 1), 1), text: i18n.qtr("Url"), showContextButton: true },
+            ]
+
+            onActionForSelection: _actionAtIndex(selection[0].row)
+            onItemDoubleClicked: {
+                if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
+                    history.push( ["mc", "network", { tree: model.tree } ])
+                else
+                    providerModel.addAndPlay( index )
+            }
+            onContextMenuButtonClicked: {
+                contextMenu.model = providerModel
+                contextMenu.selectionModel = selectionModel
+                contextMenu.popup(menuParent)
             }
         }
     }
@@ -290,7 +408,7 @@ Widgets.NavigableFocusScope {
         anchors.fill:parent
         clip: true
         focus: true
-        initialItem: medialib.gridView ? gridComponent : listComponent
+        initialItem: medialib.gridView ? gridComponent : tableComponent
 
         Connections {
             target: medialib
@@ -298,7 +416,7 @@ Widgets.NavigableFocusScope {
                 if (medialib.gridView)
                     view.replace(gridComponent)
                 else
-                    view.replace(listComponent)
+                    view.replace(tableComponent)
             }
         }
 

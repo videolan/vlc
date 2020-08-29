@@ -29,6 +29,8 @@
 #include "maininterface/mainui.hpp"
 #include "compositor_dcomp_uisurface.hpp"
 #include "videosurface.hpp"
+#include "interface_window_handler.hpp"
+#include "video_window_handler.hpp"
 
 #include <QOpenGLContext>
 
@@ -65,7 +67,9 @@ private:
     std::unique_ptr<CompositorDCompositionUISurface> m_uiSurface;
     vout_window_t *m_window = nullptr;
     std::unique_ptr<MainUI> m_ui;
+    std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;
     std::unique_ptr<VideoSurfaceProvider> m_qmlVideoSurfaceProvider;
+    InterfaceWindowHandler* m_interfaceWindowHandler = nullptr;
 
     //main window composition
     HINSTANCE m_dcomp_dll = nullptr;

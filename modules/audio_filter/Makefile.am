@@ -125,14 +125,21 @@ libsoxr_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SOXR_CFLAGS)
 libsoxr_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(audio_filterdir)'
 libsoxr_plugin_la_LIBADD = $(SOXR_LIBS) $(LIBM)
 
+libebur128_plugin_la_SOURCES = audio_filter/libebur128.c
+libebur128_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(EBUR128_CFLAGS)
+libebur128_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(audio_filterdir)'
+libebur128_plugin_la_LIBADD = $(EBUR128_LIBS)
+
 audio_filter_LTLIBRARIES += \
 	$(LTLIBsamplerate) \
 	$(LTLIBsoxr) \
+	$(LTLIBebur128) \
 	libugly_resampler_plugin.la
 EXTRA_LTLIBRARIES += \
 	libbandlimited_resampler_plugin.la \
 	libsamplerate_plugin.la \
-	libsoxr_plugin.la
+	libsoxr_plugin.la \
+	libebur128_plugin.la
 
 libspeex_resampler_plugin_la_SOURCES = audio_filter/resampler/speex.c
 libspeex_resampler_plugin_la_CFLAGS = $(AM_CFLAGS) $(SPEEXDSP_CFLAGS)

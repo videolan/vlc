@@ -75,13 +75,6 @@ Widgets.NavigableFocusScope {
         onGridViewChanged: loadView()
     }
 
-    Component {
-        id: headerComponent
-        Widgets.LabelSeparator {
-            text: i18n.qtr("Genres")
-            width: root.width
-        }
-    }
     MLGenreModel {
         id: genreModel
         ml: medialib
@@ -152,29 +145,60 @@ Widgets.NavigableFocusScope {
 
             delegateModel: selectionModel
             model: genreModel
+            topMargin: VLCStyle.margin_large
 
-            headerDelegate: headerComponent
+            delegate: Widgets.GridItem {
+                id: item
 
-            delegate: AudioGridItem {
-                id: gridItem
+                property var model: ({})
+                property int index: -1
 
+                width: VLCStyle.colWidth(2)
+                height: width / 2
+                pictureWidth: width
+                pictureHeight: height
                 image: model.cover || VLCStyle.noArtAlbum
-                title: model.name || "Unknown genre"
-                subtitle: ""
+                playCoverBorder.width: VLCStyle.dp(3, VLCStyle.scale)
 
+                onItemDoubleClicked: root.showAlbumView(model)
                 onItemClicked: {
                     selectionModel.updateSelection( modifier , view.currentItem.currentIndex, index)
                     view.currentItem.currentIndex = index
                     view.currentItem.forceActiveFocus()
                 }
+                onPlayClicked: {
+                    if (model.id)
+                        medialib.addAndPlay(model.id)
+                }
 
-                onItemDoubleClicked: root.showAlbumView(model)
+                Column {
+                    anchors.centerIn: parent
+                    opacity: item._highlighted ? .3 : 1
+
+                    Label {
+                         width: item.width
+                         elide: Text.ElideRight
+                         font.pixelSize: VLCStyle.fontSize_large
+                         font.weight: Font.DemiBold
+                         text: model.name
+                         color: "white"
+                         horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Widgets.CaptionLabel {
+                        width: item.width
+                        text: model.nb_tracks > 1 ? i18n.qtr("%1 Tracks").arg(model.nb_tracks) : i18n.qtr("%1 Track").arg(model.nb_tracks)
+                        opacity: .7
+                        color: "white"
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                }
             }
 
             focus: true
 
-            cellWidth: VLCStyle.gridItem_music_width
-            cellHeight: VLCStyle.gridItem_music_height
+            cellWidth: VLCStyle.colWidth(2)
+            cellHeight: cellWidth / 2
 
             onSelectAll: selectionModel.selectAll()
             onSelectionUpdated:  selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
@@ -190,17 +214,46 @@ Widgets.NavigableFocusScope {
         Widgets.KeyNavigableTableView {
             id: tableView_id
 
-            readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
+            readonly property int _nameColSpan: Math.max(
+                                                    VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth - VLCStyle.listAlbumCover_width - VLCStyle.column_margin_width) - 1
+                                                    , 1)
+
+            property Component thumbnailHeader: Item {
+                Widgets.IconLabel {
+                    height: VLCStyle.listAlbumCover_height
+                    width: VLCStyle.listAlbumCover_width
+                    horizontalAlignment: Text.AlignHCenter
+                    text: VLCIcons.album_cover
+                    color: VLCStyle.colors.caption
+                }
+            }
+
+            property Component thumbnailColumn: Item {
+
+                property var rowModel: parent.rowModel
+                property var model: parent.colModel
+                readonly property bool currentlyFocused: parent.currentlyFocused
+                readonly property bool containsMouse: parent.containsMouse
+
+                Widgets.MediaCover {
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: ( !rowModel ? undefined : rowModel[model.criteria] ) || VLCStyle.noArtCover
+                    playCoverVisible: currentlyFocused || containsMouse
+                    playIconSize: VLCStyle.play_cover_small
+                    onPlayIconClicked:  medialib.addAndPlay( rowModel.id )
+                }
+            }
 
             model: genreModel
-            header: headerComponent
+            selectionDelegateModel: selectionModel
             headerColor: VLCStyle.colors.bg
             focus: true
-            onActionForSelection: _actionAtIndex(index)
+            onActionForSelection: _actionAtIndex(selection)
             navigationParent: root
 
             sortModel:  [
-                { isPrimary: true, criteria: "name", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 1, 1)), text: i18n.qtr("Name"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
+                { isPrimary: true, criteria: "cover", width: VLCStyle.listAlbumCover_width, headerDelegate: thumbnailHeader, colDelegate: thumbnailColumn },
+                { criteria: "name", width: VLCStyle.colWidth(tableView_id._nameColSpan), text: i18n.qtr("Name") },
                 { criteria: "nb_tracks", width: VLCStyle.colWidth(1), text: i18n.qtr("Tracks") }
             ]
 
@@ -211,10 +264,6 @@ Widgets.NavigableFocusScope {
             onContextMenuButtonClicked: {
                 contextMenu.model = menuModel
                 contextMenu.popup(menuParent)
-            }
-
-            Widgets.TableColumns {
-                id: tableColumns
             }
         }
     }

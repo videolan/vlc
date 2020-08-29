@@ -42,6 +42,7 @@ Widgets.NavigableFocusScope {
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
     property int gridViewMarginTop: VLCStyle.margin_large
+    property var gridViewRowX: medialib.gridView ? view.currentItem.rowX : undefined
 
     navigationCancel: function() {
         if (view.currentItem.currentIndex <= 0) {
@@ -71,7 +72,7 @@ Widgets.NavigableFocusScope {
     }
 
     function _actionAtIndex(index) {
-        if (selectionModel.selectedGroup.count > 1) {
+        if (selectionModel.selectedIndexes.length > 1) {
             medialib.addAndPlay( model.getIdsForIndexes( selectionModel.selectedIndexes ) )
         } else {
             medialib.addAndPlay( model.getIdForIndex(index) )
@@ -188,8 +189,9 @@ Widgets.NavigableFocusScope {
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
 
             model: albumModelId
+            selectionDelegateModel: selectionModel
             headerColor: VLCStyle.colors.bg
-            onActionForSelection: _actionAtIndex(index)
+            onActionForSelection: _actionAtIndex(selection[0]);
             navigationParent: root
             section.property: "title_first_symbol"
             header: root.header
@@ -197,7 +199,7 @@ Widgets.NavigableFocusScope {
             sortModel:  [
                 { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: i18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
                 { criteria: "main_artist", width: VLCStyle.colWidth(Math.max(tableView_id._nbCols - 3, 1)), text: i18n.qtr("Artist") },
-                { criteria: "durationShort", width:VLCStyle.colWidth(1), showSection: "", headerDelegate: tableColumns.timeHeaderDelegate, colDelegate: tableColumns.timeColDelegate },
+                { criteria: "duration_short", width:VLCStyle.colWidth(1), showSection: "", headerDelegate: tableColumns.timeHeaderDelegate, colDelegate: tableColumns.timeColDelegate },
             ]
 
             navigationCancel: function() {

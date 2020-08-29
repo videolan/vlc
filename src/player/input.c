@@ -604,9 +604,9 @@ vlc_player_input_HandleTitleEvent(struct vlc_player_input *input,
             if (input->ml.restore == VLC_RESTOREPOINT_POSITION &&
                 input->ml.states.current_title >= 0 &&
                 (size_t)input->ml.states.current_title == ev->selected_idx &&
-                input->ml.states.progress > .0f)
+                input->ml.pos > .0f)
             {
-                input_SetPosition(input->thread, input->ml.states.progress, false);
+                input_SetPosition(input->thread, input->ml.pos, false);
             }
             /* Reset the wanted title to avoid forcing it or the position
              * again during the next title change
@@ -945,10 +945,10 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     input->ml.states.current_video_track =
         input->ml.states.current_audio_track =
         input->ml.states.current_subtitle_track = NULL;
-    input->ml.states.progress = -1.f;
     input->ml.restore = VLC_RESTOREPOINT_NONE;
     input->ml.restore_states = false;
     input->ml.delay_restore = false;
+    input->ml.pos = -1.f;
 
     input->thread = input_Create(player, input_thread_Events, input, item,
                                  player->resource, player->renderer);

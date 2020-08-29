@@ -25,37 +25,60 @@
 #define MAIN_INTERFACE_WIN32_HPP
 
 #include "maininterface/main_interface.hpp"
+#include "interface_window_handler.hpp"
+#include <QAbstractNativeEventFilter>
 
-class MainInterfaceWin32 : public MainInterface
+class WinTaskbarWidget : public QObject, public QAbstractNativeEventFilter
 {
     Q_OBJECT
-
 public:
-    MainInterfaceWin32( intf_thread_t *p_intf );
-    virtual ~MainInterfaceWin32();
+    WinTaskbarWidget( intf_thread_t *p_intf, QWindow* windowHandle, QObject* parent = nullptr);
+    virtual ~WinTaskbarWidget();
 
 private:
-    virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) Q_DECL_OVERRIDE;
-    virtual bool winEvent( MSG *, long * );
-    virtual void toggleUpdateSystrayMenuWhenVisible() Q_DECL_OVERRIDE;
-
-protected:
-    virtual void resizeEvent( QResizeEvent *event ) Q_DECL_OVERRIDE;
-
-private:
-    HWND WinId( QWidget *);
+    virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
     void createTaskBarButtons();
-
-private:
-    HIMAGELIST himl;
-    ITaskbarList3 *p_taskbl;
-    UINT taskbar_wmsg;
 
 private slots:
     void changeThumbbarButtons(PlayerController::PlayingState );
     void playlistItemCountChanged( size_t itemId );
-    virtual void reloadPrefs() Q_DECL_OVERRIDE;
-    virtual void setVideoFullScreen( bool fs ) Q_DECL_OVERRIDE;
+    virtual void onVideoFullscreenChanged( bool fs );
+
+private:
+    intf_thread_t* p_intf = nullptr;
+    HIMAGELIST himl = nullptr;
+    ITaskbarList3 *p_taskbl = nullptr;
+    UINT taskbar_wmsg = 0;
+    QWindow* m_window = nullptr;
+
+};
+
+
+
+class MainInterfaceWin32 : public MainInterface
+{
+    Q_OBJECT
+public:
+    MainInterfaceWin32( intf_thread_t *, QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
+    virtual ~MainInterfaceWin32() = default;
+
+private:
+    virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
+
+public slots:
+    virtual void reloadPrefs() override;
+
+};
+
+class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler
+{
+    Q_OBJECT
+public:
+    explicit InterfaceWindowHandlerWin32(intf_thread_t *_p_intf, MainInterface* mainInterface, QWindow* window, QObject *parent = nullptr);
+    virtual ~InterfaceWindowHandlerWin32() = default;
+    virtual void toggleWindowVisiblity() override;
+
+    virtual bool eventFilter(QObject*, QEvent* event) override;
 };
 
 #endif // MAIN_INTERFACE_WIN32_HPP

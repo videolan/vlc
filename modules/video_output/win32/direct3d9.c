@@ -1280,6 +1280,7 @@ static void Swap(vout_display_t *vd)
 
 static void Display(vout_display_t *vd, picture_t *picture)
 {
+    VLC_UNUSED(picture);
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->lost_not_ready)
@@ -1356,7 +1357,7 @@ static const d3d9_format_t d3d_formats[] = {
     { NULL, 0, 0, 0,0,0}
 };
 
-static const d3d9_format_t *FindBufferFormat(vout_display_t *vd, D3DFORMAT fmt)
+static const d3d9_format_t *FindBufferFormat(D3DFORMAT fmt)
 {
     for (unsigned j = 0; d3d_formats[j].name; j++) {
         const d3d9_format_t *format = &d3d_formats[j];
@@ -1615,7 +1616,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
         return VLC_EGENERIC;
 
     sys->BufferFormat = render_out.d3d9_format;
-    const d3d9_format_t *dst_format = FindBufferFormat(vd, sys->BufferFormat);
+    const d3d9_format_t *dst_format = FindBufferFormat(sys->BufferFormat);
     if (unlikely(!dst_format))
         msg_Warn(vd, "Unknown back buffer format 0x%X", sys->BufferFormat);
 
@@ -1624,7 +1625,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
      * typically support more formats than textures */
     const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, &vd->source, vctx);
     if (!d3dfmt) {
-        msg_Err(vd, "unsupported source pixel format %4.4s", &vd->source.i_chroma);
+        msg_Err(vd, "unsupported source pixel format %4.4s", (const char*)&vd->source.i_chroma);
         goto error;
     }
     msg_Dbg(vd, "found input surface format %s for source %4.4s", d3dfmt->name, (const char *)&vd->source.i_chroma);
@@ -1667,9 +1668,6 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt, vlc_video_cont
         goto error;
     }
 
-    /* Change the window title bar text */
-    vout_window_SetTitle(sys->area.vdcfg.window, VOUT_TITLE " (Direct3D9 output)");
-
     msg_Dbg(vd, "Direct3D9 display adapter successfully initialized");
     return VLC_SUCCESS;
 
@@ -1682,8 +1680,6 @@ error:
  */
 static void Direct3D9Close(vout_display_t *vd)
 {
-    vout_display_sys_t *sys = vd->sys;
-
     Direct3D9DestroyResources(vd);
 }
 
@@ -1752,6 +1748,7 @@ VLC_CONFIG_STRING_ENUM(FindShadersCallback)
 
 static bool LocalSwapchainUpdateOutput( void *opaque, const libvlc_video_render_cfg_t *cfg, libvlc_video_output_cfg_t *out )
 {
+    VLC_UNUSED(cfg);
     vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
 
@@ -1805,7 +1802,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    CommonInit(vd, &sys->area, cfg);
+    CommonInit(&sys->area, cfg);
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
@@ -1890,10 +1887,13 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->control = Control;
     vd->close = Close;
 
+    /* Change the window title bar text */
+    vout_window_SetTitle(cfg->window, VOUT_TITLE " (Direct3D9 output)");
+
     return VLC_SUCCESS;
 error:
     Direct3D9Close(vd);
-    CommonWindowClean(VLC_OBJECT(vd), &sys->sys);
+    CommonWindowClean(&sys->sys);
     Direct3D9Destroy(sys);
     free(vd->sys);
     return VLC_EGENERIC;
@@ -1906,7 +1906,7 @@ static void Close(vout_display_t *vd)
 {
     Direct3D9Close(vd);
 
-    CommonWindowClean(VLC_OBJECT(vd), &vd->sys->sys);
+    CommonWindowClean(&vd->sys->sys);
 
     Direct3D9Destroy(vd->sys);
 

@@ -22,6 +22,7 @@ import QtQuick.Layouts 1.3
 
 import org.videolan.medialib 0.1
 
+import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
@@ -32,21 +33,21 @@ Widgets.KeyNavigableTableView {
         { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(1), text: i18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(1), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
-        { criteria: "durationShort", width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
+        { criteria: "duration_short", width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
     ]
 
     property var sortModelMedium: [
         { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(2), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(1), text: i18n.qtr("Artist"),   showSection: "main_artist" },
-        { criteria: "durationShort", width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
+        { criteria: "duration_short", width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
     ]
 
     property var sortModelLarge: [
         { isPrimary: true, criteria: "title",       width: VLCStyle.colWidth(2), text: i18n.qtr("Title"),    showSection: "title", colDelegate: tableColumns.titleDelegate, headerDelegate: tableColumns.titleHeaderDelegate },
         { criteria: "album_title", width: VLCStyle.colWidth(2), text: i18n.qtr("Album"),    showSection: "album_title" },
         { criteria: "main_artist", width: VLCStyle.colWidth(2), text: i18n.qtr("Artist"),   showSection: "main_artist" },
-        { criteria: "durationShort", width: VLCStyle.colWidth(1), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
+        { criteria: "duration_short", width: VLCStyle.colWidth(1), text: i18n.qtr("Duration"), showSection: "", colDelegate: tableColumns.timeColDelegate, headerDelegate: tableColumns.timeHeaderDelegate },
         { criteria: "track_number",width: VLCStyle.colWidth(1), text: i18n.qtr("Track"), showSection: "" },
         { criteria: "disc_number", width: VLCStyle.colWidth(1), text: i18n.qtr("Disc"),  showSection: "" },
     ]
@@ -58,7 +59,18 @@ Widgets.KeyNavigableTableView {
 
     headerColor: VLCStyle.colors.bg
 
-    model: MLAlbumTrackModel {
+    model: rootmodel
+    selectionDelegateModel: selectionModel
+
+    property alias parentId: rootmodel.parentId
+
+    onActionForSelection:  medialib.addAndPlay(model.getIdsForIndexes( selection ))
+
+    Widgets.TableColumns {
+        id: tableColumns
+    }
+
+    MLAlbumTrackModel {
         id: rootmodel
         ml: medialib
         onSortCriteriaChanged: {
@@ -74,11 +86,9 @@ Widgets.KeyNavigableTableView {
         }
     }
 
-    property alias parentId: rootmodel.parentId
+    Util.SelectableDelegateModel {
+        id: selectionModel
 
-    onActionForSelection:  medialib.addAndPlay(model.getIdsForIndexes( selection ))
-
-    Widgets.TableColumns {
-        id: tableColumns
+        model: rootmodel
     }
 }

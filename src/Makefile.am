@@ -273,6 +273,7 @@ libvlccore_la_SOURCES = \
 	player/vout.c \
 	player/osd.c \
 	player/medialib.c \
+	player/metadata.c \
 	clock/input_clock.h \
 	clock/clock.h \
 	clock/clock_internal.h \
@@ -303,6 +304,7 @@ libvlccore_la_SOURCES = \
 	audio_output/common.c \
 	audio_output/dec.c \
 	audio_output/filters.c \
+	audio_output/meter.c \
 	audio_output/output.c \
 	audio_output/volume.c \
 	video_output/chrono.h \

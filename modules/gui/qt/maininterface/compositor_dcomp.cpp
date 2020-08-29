@@ -36,7 +36,7 @@
 
 #include <qpa/qplatformnativeinterface.h>
 #include "compositor_dcomp_error.hpp"
-
+#include "maininterface/interface_window_handler.hpp"
 
 namespace vlc {
 
@@ -75,8 +75,7 @@ void CompositorDirectComposition::window_disable(struct vout_window_t * p_wnd)
     try
     {
         that->m_qmlVideoSurfaceProvider->disable();
-        that->m_rootWindow->askVideoOnTop(false);
-        that->m_rootWindow->askVideoSetFullScreen(false);
+        that->m_videoWindowHandler->disable();
         msg_Dbg(that->m_intf, "window_disable");
         HR(that->m_rootVisual->RemoveVisual(that->m_videoVisual.Get()), "remove video visual from root");
         HR(that->m_dcompDevice->Commit(), "commit");
@@ -91,7 +90,7 @@ void CompositorDirectComposition::window_resize(struct vout_window_t * p_wnd, un
 {
     CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
     msg_Dbg(that->m_intf, "window_resize %ux%u", width, height);
-    that->m_rootWindow->requestResizeVideo(width, height);
+    that->m_videoWindowHandler->requestResizeVideo(width, height);
 }
 
 void CompositorDirectComposition::window_destroy(struct vout_window_t * p_wnd)
@@ -106,21 +105,21 @@ void CompositorDirectComposition::window_set_state(struct vout_window_t * p_wnd,
 {
     CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
     msg_Dbg(that->m_intf, "window_set_state");
-    that->m_rootWindow->requestVideoState(static_cast<vout_window_state>(state));
+    that->m_videoWindowHandler->requestVideoState(static_cast<vout_window_state>(state));
 }
 
 void CompositorDirectComposition::window_unset_fullscreen(struct vout_window_t * p_wnd)
 {
     CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
     msg_Dbg(that->m_intf, "window_unset_fullscreen");
-    that->m_rootWindow->requestVideoWindowed();
+    that->m_videoWindowHandler->requestVideoWindowed();
 }
 
 void CompositorDirectComposition::window_set_fullscreen(struct vout_window_t * p_wnd, const char *id)
 {
     CompositorDirectComposition* that = static_cast<CompositorDirectComposition*>(p_wnd->sys);
     msg_Dbg(that->m_intf, "window_set_fullscreen");
-    that->m_rootWindow->requestVideoFullScreen(id);
+    that->m_videoWindowHandler->requestVideoFullScreen(id);
 }
 
 CompositorDirectComposition::CompositorDirectComposition( intf_thread_t* p_intf,  QObject *parent)
@@ -157,13 +156,18 @@ bool CompositorDirectComposition::init()
         //| D3D11_CREATE_DEVICE_DEBUG
             ;
 
+    D3D_FEATURE_LEVEL requestedFeatureLevels[] = {
+        D3D_FEATURE_LEVEL_11_1,
+        D3D_FEATURE_LEVEL_11_0,
+    };
+
     hr = D3D11CreateDevice(
         nullptr,    // Adapter
         D3D_DRIVER_TYPE_HARDWARE,
         nullptr,    // Module
         creationFlags,
-        nullptr,
-        0, // Highest available feature level
+        requestedFeatureLevels,
+        ARRAY_SIZE(requestedFeatureLevels),
         D3D11_SDK_VERSION,
         m_d3d11Device.GetAddressOf(),
         nullptr,    // Actual feature level
@@ -197,8 +201,20 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         m_rootWindow->winId();
         m_rootWindow->show();
 
+        WinTaskbarWidget* taskbarWidget = new WinTaskbarWidget(m_intf, m_rootWindow->windowHandle(), this);
+        qApp->installNativeEventFilter(taskbarWidget);
+
+        m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf, m_rootWindow);
+        m_videoWindowHandler->setWindow( m_rootWindow->windowHandle() );
+
+        m_interfaceWindowHandler = new InterfaceWindowHandlerWin32(m_intf, m_rootWindow, m_rootWindow->windowHandle(), m_rootWindow);
+
         m_qmlVideoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
         m_rootWindow->setVideoSurfaceProvider(m_qmlVideoSurfaceProvider.get());
+
+        connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::hasVideoChanged,
+                m_interfaceWindowHandler, &InterfaceWindowHandlerWin32::onVideoEmbedChanged);
+
 
         HR(m_dcompDevice->CreateTargetForHwnd((HWND)m_rootWindow->windowHandle()->winId(), TRUE, &m_dcompTarget), "create target");
         HR(m_dcompDevice->CreateVisual(&m_rootVisual), "create root visual");

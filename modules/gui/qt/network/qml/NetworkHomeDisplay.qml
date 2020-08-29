@@ -65,13 +65,15 @@ Widgets.NavigableFocusScope {
             width: parent.width
             height: implicitHeight
 
-            spacing: VLCStyle.margin_normal
+            topPadding: VLCStyle.margin_large
+            spacing: VLCStyle.margin_small
 
-            Widgets.LabelSeparator {
+            Widgets.SubtitleLabel {
                 id: deviceLabel
-                text: i18n.qtr("Devices")
+                text: i18n.qtr("My Machine")
                 width: flickable.width
                 visible: deviceSection.model.count !== 0
+                leftPadding: VLCStyle.margin_xlarge
             }
 
             NetworkHomeDeviceListView {
@@ -92,11 +94,13 @@ Widgets.NavigableFocusScope {
                 }
             }
 
-            Widgets.LabelSeparator {
+            Widgets.SubtitleLabel {
                 id: lanLabel
-                text: i18n.qtr("LAN")
+                text: i18n.qtr("My LAN")
                 width: flickable.width
                 visible: lanSection.model.count !== 0
+                leftPadding: VLCStyle.margin_xlarge
+                topPadding: deviceLabel.visible ? VLCStyle.margin_small : 0
             }
 
             NetworkHomeDeviceListView {

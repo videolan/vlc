@@ -172,6 +172,7 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly) int64_t duration; /* Duration in milliseconds */
 @property (readonly) uint32_t playCount;
 @property (readonly) time_t lastPlayedDate;
+@property (readonly) float progress;
 @property (readonly) NSString *title;
 
 @property (readonly, nullable) NSString *smallArtworkMRL;
@@ -185,7 +186,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readonly, nullable) VLCMediaLibraryAlbumTrack *albumTrack;
 
 @property (readwrite) int rating;
-@property (readwrite) float lastPlaybackPosition;
 @property (readwrite) float lastPlaybackRate;
 @property (readwrite) int lastTitle;
 @property (readwrite) int lastChapter;
@@ -202,8 +202,6 @@ extern const long long int VLCMediaLibraryMediaItemDurationDenominator;
 @property (readwrite) int lastAudioDelay;
 @property (readwrite) int lastSubtitleTrack;
 @property (readwrite) int lastSubtitleDelay;
-
-- (int)increasePlayCount;
 
 @end
 

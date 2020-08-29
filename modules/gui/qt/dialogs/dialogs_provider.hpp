@@ -33,6 +33,9 @@
 #include "qt.hpp"
 
 #include "dialogs/open/open.hpp"
+
+#include "playlist/playlist_item.hpp"
+
 #include <QObject>
 #include <QStringList>
 
@@ -119,7 +122,8 @@ private:
 
 public slots:
     void bookmarksDialog();
-    void mediaInfoDialog();
+    void mediaInfoDialog( void );
+    void mediaInfoDialog( const PlaylistItem& pItem );
     void mediaCodecDialog();
     void prefsDialog();
     void extendedDialog();
@@ -144,7 +148,7 @@ public slots:
 
     void openFileGenericDialog( intf_dialog_args_t * );
 
-    void simpleOpenDialog();
+    void simpleOpenDialog( bool start = true );
 
     void openDialog();
     void openDiscDialog();
@@ -160,6 +164,7 @@ public slots:
 
     void streamingDialog( QWidget *parent, const QStringList& mrls, bool b_stream = true,
                           QStringList options = QStringList("") );
+    void streamingDialog( const QList<QUrl>& urls, bool b_stream = true );
     void openAndStreamingDialogs();
     void openAndTranscodingDialogs();
 

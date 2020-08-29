@@ -61,7 +61,7 @@ MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data,
         }
 
     for( const vlc_ml_thumbnail_t& thumbnail: _data->thumbnails )
-        if( thumbnail.b_generated )
+        if( thumbnail.i_status == VLC_ML_THUMBNAIL_STATUS_AVAILABLE )
         {
             m_cover = QString::fromUtf8(thumbnail.psz_mrl);
             break;

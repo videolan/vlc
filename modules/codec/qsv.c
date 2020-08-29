@@ -467,7 +467,8 @@ static int Open(vlc_object_t *this)
     sys->params.mfx.FrameInfo.BitDepthLuma   = 8; /* for VLC_CODEC_NV12 */
 
     /* Parsing options common to all RC methods and codecs */
-    sys->params.IOPattern       = MFX_IOPATTERN_IN_SYSTEM_MEMORY;
+    sys->params.IOPattern = MFX_IOPATTERN_OUT_SYSTEM_MEMORY;
+    sys->params.IOPattern |= MFX_IOPATTERN_IN_SYSTEM_MEMORY;
     sys->params.AsyncDepth      = var_InheritInteger(enc, SOUT_CFG_PREFIX "async-depth");
     sys->params.mfx.GopOptFlag  = 1; /* TODO */
     sys->params.mfx.GopPicSize  = var_InheritInteger(enc, SOUT_CFG_PREFIX "gop-size");
@@ -555,17 +556,6 @@ static int Open(vlc_object_t *this)
         goto error;
     }
 
-    enc->fmt_in.video.i_chroma = VLC_CODEC_NV12;
-    video_format_t pool_fmt = enc->fmt_in.video;
-    pool_fmt.i_width  = sys->params.mfx.FrameInfo.Width;
-    pool_fmt.i_height = sys->params.mfx.FrameInfo.Height;
-    sys->input_pool = picture_pool_NewFromFormat( &pool_fmt, 18 );
-    if (sys->input_pool == NULL)
-    {
-        msg_Err(enc, "Failed to create the internal pool");
-        goto error;
-    }
-
     sys->params.ExtParam    = (mfxExtBuffer**)&init_params;
     sys->params.NumExtParam =
 #if QSV_HAVE_CO2
@@ -619,9 +609,18 @@ static int Open(vlc_object_t *this)
 
     /* Vlc module configuration */
     enc->fmt_in.i_codec                = VLC_CODEC_NV12; // Intel Media SDK requirement
+    enc->fmt_in.video.i_chroma         = VLC_CODEC_NV12;
     enc->fmt_in.video.i_bits_per_pixel = 12;
+    // require aligned pictures on input, a filter may be added before the encoder
     enc->fmt_in.video.i_width          = sys->params.mfx.FrameInfo.Width;
     enc->fmt_in.video.i_height         = sys->params.mfx.FrameInfo.Height;
+
+    sys->input_pool = picture_pool_NewFromFormat( &enc->fmt_in.video, 18 );
+    if (sys->input_pool == NULL)
+    {
+        msg_Err(enc, "Failed to create the internal pool");
+        goto nomem;
+    }
 
     enc->pf_encode_video = Encode;
 

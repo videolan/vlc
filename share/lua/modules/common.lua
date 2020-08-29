@@ -111,8 +111,40 @@ function durationtostring(duration)
 end
 
 -- realpath
+-- this is for URL paths - do not use for file paths as this has
+-- no support for Windows '\' directory separators
 function realpath(path)
-    return string.gsub(string.gsub(string.gsub(string.gsub(path,"/%.%./[^/]+","/"),"/[^/]+/%.%./","/"),"/%./","/"),"//","/")
+    -- detect URLs to extract and process the path component
+    local s, p, qf = string.match(path, "^([a-zA-Z0-9+%-%.]-://[^/]-)(/[^?#]*)(.*)$")
+    if not s then
+        s = ""
+        p = path
+        qf = ""
+    end
+
+    local n
+    repeat
+        p, n = p:gsub("//","/", 1)
+    until n == 0
+
+    repeat
+        p, n = p:gsub("/%./","/", 1)
+    until n == 0
+    p = p:gsub("/%.$", "/", 1)
+
+    -- resolving ".." without an absolute path would be troublesome
+    if p:match("^/") then
+        repeat
+            p, n = p:gsub("^/%.%./","/", 1)
+            if n == 0 then
+                p, n = p:gsub("/[^/]+/%.%./","/", 1)
+            end
+        until n == 0
+        p = p:gsub("^/%.%.$","/", 1)
+        p = p:gsub("/[^/]+/%.%.$","/", 1)
+    end
+
+    return s..p..qf
 end
 
 -- parse the time from a string and return the seconds

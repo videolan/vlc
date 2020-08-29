@@ -19,6 +19,7 @@
 import QtQuick 2.11
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.4
+import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
 
@@ -27,6 +28,11 @@ import "qrc:///menus/" as Menus
 import "qrc:///style/"
 
 Item{
+    id: controlButtons
+
+    property bool isMiniplayer: false
+    property var  parentWindow: undefined
+
     property var buttonL: [
         { id:  PlayerControlBarModel.PLAY_BUTTON, label: VLCIcons.play, text: i18n.qtr("Play")},
         { id:  PlayerControlBarModel.STOP_BUTTON, label: VLCIcons.stop, text: i18n.qtr("Stop")},
@@ -57,7 +63,8 @@ Item{
         { id:  PlayerControlBarModel.TELETEXT_BUTTONS, label: VLCIcons.tvtelx, text: i18n.qtr("Teletext")},
         { id:  PlayerControlBarModel.ASPECT_RATIO_COMBOBOX, label: VLCIcons.aspect_ratio, text: i18n.qtr("Aspect Ratio")},
         { id:  PlayerControlBarModel.WIDGET_SPACER, label: VLCIcons.space, text: i18n.qtr("Spacer")},
-        { id:  PlayerControlBarModel.WIDGET_SPACER_EXTEND, label: VLCIcons.space, text: i18n.qtr("Expanding Spacer")}
+        { id:  PlayerControlBarModel.WIDGET_SPACER_EXTEND, label: VLCIcons.space, text: i18n.qtr("Expanding Spacer")},
+        { id:  PlayerControlBarModel.PLAYER_SWITCH_BUTTON, label: VLCIcons.fullscreen, text: i18n.qtr("Switch Player")}
     ]
 
     function returnbuttondelegate(inpID){
@@ -92,6 +99,7 @@ Item{
         case PlayerControlBarModel.VOLUME: return volumeBtnDelegate
         case PlayerControlBarModel.ASPECT_RATIO_COMBOBOX: return aspectRatioDelegate
         case PlayerControlBarModel.TELETEXT_BUTTONS: return teletextdelegate
+        case PlayerControlBarModel.PLAYER_SWITCH_BUTTON: return playerSwitchBtnDelegate
         }
         console.log("button delegate id " + inpID +  " doesn't exists")
         return spacerDelegate
@@ -136,19 +144,198 @@ Item{
 
     Component{
         id:playBtnDelegate
-        Widgets.IconToolButton {
+
+        Button {
             id: playBtn
-            size: VLCStyle.icon_medium
-            iconText: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
-                   && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
-                  ? VLCIcons.pause
-                  : VLCIcons.play
-            onClicked: mainPlaylistController.togglePlayPause()
+            width: VLCStyle.icon_medium
+            height: width
+
+            // TODO: Bind videoOverlays (set 'true' below) to player property which indicates if video is rendered over player controls
+            property bool videoOverlays: !isMiniplayer && true
+
+            property color color: VLCStyle.colors.buttonText
+            property color colorDisabled: VLCStyle.colors.textInactive
+
             property bool acceptFocus: true
-            text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
-                   && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
-                  ? i18n.qtr("Pause")
-                  : i18n.qtr("Play")
+
+            property bool paintOnly: false
+            enabled: !paintOnly
+
+            property bool realHovered: false
+
+            contentItem: Label {
+                id: contentLabel
+                color: videoOverlays ? (playBtn.enabled ? playBtn.color : playBtn.colorDisabled)
+                                     : (playBtn.enabled ? "#303030" : "#7f8c8d")
+
+                text: (player.playingState !== PlayerController.PLAYING_STATE_PAUSED
+                       && player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
+                      ? VLCIcons.pause
+                      : VLCIcons.play
+
+                Behavior on text {
+                    SequentialAnimation {
+                        NumberAnimation {
+                            target: contentLabel
+                            property: "font.pixelSize"
+                            to: 0
+                            easing.type: Easing.OutSine
+                            duration: 75
+                        }
+
+                        PropertyAction { }
+
+                        NumberAnimation {
+                            target: contentLabel
+                            property: "font.pixelSize"
+                            to: VLCIcons.pixelSize(VLCStyle.icon_normal)
+                            easing.type: Easing.InSine
+                            duration: 75
+                        }
+                    }
+                }
+
+                font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_normal)
+                font.family: VLCIcons.fontFamily
+
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            background: Item {
+
+                Gradient {
+                    id: playBtnGradient
+                    GradientStop { position: 0.0; color: "#f89a06" }
+                    GradientStop { position: 1.0; color: "#e25b01" }
+                }
+
+                MouseArea {
+                    id: playBtnMouseArea
+
+                    anchors.fill: parent
+                    anchors.margins: VLCStyle.dp(1)
+
+                    hoverEnabled: true
+
+                    readonly property int radius: playBtnMouseArea.width / 2
+
+                    function distance2D(x0, y0, x1, y1) {
+                        return Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0))
+                    }
+
+                    onPositionChanged: {
+                        if (distance2D(playBtnMouseArea.mouseX, playBtnMouseArea.mouseY, playBtnMouseArea.width / 2, playBtnMouseArea.height / 2) < radius) {
+                            // mouse is inside of the round button
+                            playBtn.realHovered = true
+                        }
+                        else {
+                            // mouse is outside
+                            playBtn.realHovered = false
+                        }
+                    }
+
+                    onHoveredChanged: {
+                        if (!playBtnMouseArea.containsMouse)
+                            playBtn.realHovered = false
+                    }
+
+                    onClicked: {
+                        if (playBtn.realHovered)
+                            mainPlaylistController.togglePlayPause()
+                    }
+
+                    onPressAndHold: {
+                        if (playBtn.realHovered)
+                            mainPlaylistController.stop()
+                    }
+
+                }
+
+                Rectangle {
+                    radius: (width * 0.5)
+                    anchors.fill: parent
+                    anchors.margins: VLCStyle.dp(1)
+
+                    color: VLCStyle.colors.white
+                    opacity: playBtn.videoOverlays ? 0.4 : 1.0
+                }
+
+                Rectangle {
+                    id: outerRect
+                    radius: (width * 0.5)
+                    anchors.fill: parent
+
+                    gradient: playBtnGradient
+
+                    visible: false
+
+                    antialiasing: true
+                }
+
+                Rectangle {
+                    id: innerColorRect
+
+                    anchors.fill: parent
+                    radius: (width * 0.5)
+
+                    opacity: 0
+                    gradient: playBtnGradient
+
+                    state: "transparent"
+
+                    readonly property bool stateIndicator: (playBtn.activeFocus || playBtn.realHovered || playBtn.highlighted)
+                    states: [
+                        State {
+                            name: "opaque"
+                            when: innerColorRect.stateIndicator
+                        },
+                        State {
+                            name: "transparent"
+                            when: !innerColorRect.stateIndicator
+                        }
+                    ]
+
+                    transitions: [
+                        Transition {
+                            from: "opaque"
+                            to: "transparent"
+
+                            NumberAnimation { target: innerColorRect; properties: "opacity"; to: 0; duration: 75; easing.type: Easing.OutSine }
+                        },
+                        Transition {
+                            from: "transparent"
+                            to: "opaque"
+
+                            NumberAnimation { target: innerColorRect; properties: "opacity"; to: 1; duration: 75; easing.type: Easing.InSine }
+                        }
+                    ]
+
+                    antialiasing: true
+                }
+
+                Rectangle {
+                    id: innerRect
+                    anchors.fill: parent
+
+                    radius: (width * 0.5)
+                    border.width: VLCStyle.dp(2)
+
+                    color: "transparent"
+                    visible: false
+                }
+
+                OpacityMask {
+                    id: opacityMask
+                    anchors.fill: parent
+
+                    source: outerRect
+                    maskSource: innerRect
+
+
+                    antialiasing: true
+                }
+            }
         }
     }
 
@@ -627,6 +814,28 @@ Item{
 
     Component{
         id: volumeBtnDelegate
-        VolumeWidget{}
+        VolumeWidget { parentWindow: controlButtons.parentWindow }
+    }
+
+    Component {
+        id: playerSwitchBtnDelegate
+
+        Widgets.IconToolButton{
+            size: VLCStyle.icon_medium
+            enabled: !paintOnly
+            iconText: VLCIcons.fullscreen
+
+            onClicked: {
+                if (isMiniplayer) {
+                    history.push(["player"])
+                }
+                else {
+                    history.previous()
+                }
+            }
+
+            property bool acceptFocus: true
+            text: i18n.qtr("Switch Player")
+        }
     }
 }
