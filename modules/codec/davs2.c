@@ -303,7 +303,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     picture_t *p_pic;
     int ret = 0 ;
 
-    decoder_AbortPictures( p_dec, true );
+    //decoder_AbortPictures( p_dec, true );
 
     /* do not flush buffers if codec hasn't been opened */
     if( p_sys && p_sys->decoder_open ){
@@ -326,7 +326,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     }
 
     /* Reset cancel state to false */
-    decoder_AbortPictures( p_dec, false );
+    //decoder_AbortPictures( p_dec, false );
 
     p_sys->decoder_open = false;
 
