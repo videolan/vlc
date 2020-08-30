@@ -155,7 +155,7 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                              " This option only works with Windows and " \
                              "X11 with composite extensions." )
 
-#define INTERFACE_SCALE_TEXT N_( "Initial user scale factor for the interface, betwwen 0.3 and 3.0" )
+#define INTERFACE_SCALE_TEXT N_( "Initial user scale factor for the interface, between 0.3 and 3.0" )
 
 #define ERROR_TEXT N_( "Show unimportant error and warnings dialogs" )
 
