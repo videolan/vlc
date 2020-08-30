@@ -81,9 +81,9 @@ w:set_text( text ): Change text displayed by the widget. Applies to: button, lab
 w:get_text(): Read text displayed by the widget. Returns a string. Applies to: button, label, html, text_input, password, check_box.
 w:set_checked( bool ): Set check state of a check box. Applies to: check_box.
 w:get_checked(): Read check state of a check box. Returns a boolean. Applies to: check_box.
-w:add_value( text, id ): Add a value with identifier 'id' (integer) and text 'text'. It's always best to have unique identifiers. Applies to: drop_down.
-w:get_value(): Return identifier of the selected item. Corresponds to the text value chosen by the user. Applies to: drop_down.
-w:clear(): Clear a list or drop_down widget. After that, all values previously added are lost.
+w:add_value( text, id ): Add a value with identifier 'id' (integer) and text 'text'. It's always best to have unique identifiers. Applies to: list and drop-down.
+w:get_value(): Return identifier of the selected item. Corresponds to the text value chosen by the user. Applies to: drop-down.
+w:clear(): Clear a list or drop-down widget. After that, all values previously added are lost.
 w:get_selection(): Retrieve a table representing the current selection. Keys are the ids, values are the texts associated. Applies to: list.
 
 errno
@@ -182,7 +182,7 @@ io.mkdir("path", "mode"): Similar to mkdir(2). The mode is passed as a string
   case of failure), and a more specific error code as its 2nd returned value
   in case of failure. The error code is to be used with vlc.errno
 io.readdir("path"): Lists all files & directories in the provided folder.
-io.open("path"[, "mode"]): Similar to lua's io.open. Mode is optional and 
+io.open("path"[, "mode"]): Similar to lua's io.open. Mode is optional and
   defaults to "r". It returns a file object with the following member functions:
     .read
     .write
@@ -361,7 +361,7 @@ playlist.sort( key ): sort the playlist according to the key.
                                             'title numeric' or 'album'.
 playlist.status(): return the playlist status: 'stopped', 'playing', 'paused' or 'unknown'.
 playlist.delete( id ): check if item of id is in playlist and delete it. returns -1 when invalid id.
-playlist.move( id_item, id_where ): take id_item and if id_where has children, it put it as first children, 
+playlist.move( id_item, id_where ): take id_item and if id_where has children, it put it as first children,
    if id_where don't have children, id_item is put after id_where in same playlist. returns -1 when invalid ids.
 
 FIXME: add methods to get an item's meta, options, es ...
