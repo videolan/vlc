@@ -72,4 +72,7 @@ void D3D11_UpdateQuadOpacity(vlc_object_t *, d3d11_device_t *, d3d_quad_t *, flo
 void D3D11_UpdateQuadLuminanceScale(vlc_object_t *, d3d11_device_t *, d3d_quad_t *, float luminanceScale);
 #define D3D11_UpdateQuadLuminanceScale(a,b,c,d)  D3D11_UpdateQuadLuminanceScale(VLC_OBJECT(a),b,c,d)
 
+void D3D11_UpdateViewpoint(vlc_object_t *, d3d11_device_t *, d3d_quad_t *, const vlc_viewpoint_t*, float sar);
+#define D3D11_UpdateViewpoint(a,b,c,d,e)  D3D11_UpdateViewpoint(VLC_OBJECT(a),b,c,d,e)
+
 #endif /* VLC_D3D11_QUAD_H */

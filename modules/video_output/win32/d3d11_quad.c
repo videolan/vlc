@@ -640,6 +640,97 @@ void D3D11_UpdateQuadLuminanceScale(vlc_object_t *o, d3d11_device_t *d3d_dev, d3
         quad->shaderConstants.LuminanceScale = old;
 }
 
+
+static void getZoomMatrix(float zoom, FLOAT matrix[static 16]) {
+
+    const FLOAT m[] = {
+        /* x   y     z     w */
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, zoom, 1.0f
+    };
+
+    memcpy(matrix, m, sizeof(m));
+}
+
+/* perspective matrix see https://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml */
+static void getProjectionMatrix(float sar, float fovy, FLOAT matrix[static 16]) {
+
+    float zFar  = 1000;
+    float zNear = 0.01;
+
+    float f = 1.f / tanf(fovy / 2.f);
+
+    const FLOAT m[] = {
+        f / sar, 0.f,                   0.f,                0.f,
+        0.f,     f,                     0.f,                0.f,
+        0.f,     0.f,     (zNear + zFar) / (zNear - zFar), -1.f,
+        0.f,     0.f, (2 * zNear * zFar) / (zNear - zFar),  0.f};
+
+     memcpy(matrix, m, sizeof(m));
+}
+
+static float UpdateFOVy(float f_fovx, float f_sar)
+{
+    return 2 * atanf(tanf(f_fovx / 2) / f_sar);
+}
+
+static float UpdateZ(float f_fovx, float f_fovy)
+{
+    /* Do trigonometry to calculate the minimal z value
+     * that will allow us to zoom out without seeing the outside of the
+     * sphere (black borders). */
+    float tan_fovx_2 = tanf(f_fovx / 2);
+    float tan_fovy_2 = tanf(f_fovy / 2);
+    float z_min = - SPHERE_RADIUS / sinf(atanf(sqrtf(
+                    tan_fovx_2 * tan_fovx_2 + tan_fovy_2 * tan_fovy_2)));
+
+    /* The FOV value above which z is dynamically calculated. */
+    const float z_thresh = 90.f;
+
+    float f_z;
+    if (f_fovx <= z_thresh * M_PI / 180)
+        f_z = 0;
+    else
+    {
+        float f = z_min / ((FIELD_OF_VIEW_DEGREES_MAX - z_thresh) * M_PI / 180);
+        f_z = f * f_fovx - f * z_thresh * M_PI / 180;
+        if (f_z < z_min)
+            f_z = z_min;
+    }
+    return f_z;
+}
+
+void (D3D11_UpdateViewpoint)(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad,
+                             const vlc_viewpoint_t *viewpoint, float f_sar)
+{
+    if (!quad->pVertexShaderConstants)
+        return;
+
+    // Convert degree into radian
+    float f_fovx = viewpoint->fov * (float)M_PI / 180.f;
+    if ( f_fovx > FIELD_OF_VIEW_DEGREES_MAX * M_PI / 180 + 0.001f ||
+         f_fovx < -0.001f )
+        return;
+
+    float f_fovy = UpdateFOVy(f_fovx, f_sar);
+    float f_z = UpdateZ(f_fovx, f_fovy);
+    vlc_viewpoint_t vp;
+    vlc_viewpoint_reverse(&vp, viewpoint);
+
+    HRESULT hr;
+    D3D11_MAPPED_SUBRESOURCE mapped;
+    hr = ID3D11DeviceContext_Map(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    if (SUCCEEDED(hr)) {
+        VS_PROJECTION_CONST *dst_data = mapped.pData;
+        getZoomMatrix(SPHERE_RADIUS * f_z, dst_data->Zoom);
+        getProjectionMatrix(f_sar, f_fovy, dst_data->Projection);
+        vlc_viewpoint_to_4x4(&vp, dst_data->View);
+    }
+    ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0);
+}
+
 #undef D3D11_AllocateQuad
 int D3D11_AllocateQuad(vlc_object_t *o, d3d11_device_t *d3d_dev,
                        video_projection_mode_t projection, d3d_quad_t *quad)

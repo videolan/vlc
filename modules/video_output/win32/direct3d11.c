@@ -141,8 +141,6 @@ static void Direct3D11DestroyResources(vout_display_t *);
 static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
-static void SetQuadVSProjection(vout_display_sys_t *);
-
 static int Control(vout_display_t *, int, va_list);
 
 
@@ -281,7 +279,8 @@ static void UpdateSize(vout_display_t *vd)
     D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
                              vd->source.orientation);
 
-    SetQuadVSProjection(sys);
+    D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &sys->area.vdcfg.viewpoint,
+                          (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height );
 
     d3d11_device_unlock( sys->d3d_dev );
 
@@ -401,98 +400,6 @@ static void Close(vout_display_t *vd)
     CommonWindowClean(&vd->sys->sys);
 #endif
 }
-
-static void getZoomMatrix(float zoom, FLOAT matrix[static 16]) {
-
-    const FLOAT m[] = {
-        /* x   y     z     w */
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, zoom, 1.0f
-    };
-
-    memcpy(matrix, m, sizeof(m));
-}
-
-/* perspective matrix see https://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml */
-static void getProjectionMatrix(float sar, float fovy, FLOAT matrix[static 16]) {
-
-    float zFar  = 1000;
-    float zNear = 0.01;
-
-    float f = 1.f / tanf(fovy / 2.f);
-
-    const FLOAT m[] = {
-        f / sar, 0.f,                   0.f,                0.f,
-        0.f,     f,                     0.f,                0.f,
-        0.f,     0.f,     (zNear + zFar) / (zNear - zFar), -1.f,
-        0.f,     0.f, (2 * zNear * zFar) / (zNear - zFar),  0.f};
-
-     memcpy(matrix, m, sizeof(m));
-}
-
-static float UpdateFOVy(float f_fovx, float f_sar)
-{
-    return 2 * atanf(tanf(f_fovx / 2) / f_sar);
-}
-
-static float UpdateZ(float f_fovx, float f_fovy)
-{
-    /* Do trigonometry to calculate the minimal z value
-     * that will allow us to zoom out without seeing the outside of the
-     * sphere (black borders). */
-    float tan_fovx_2 = tanf(f_fovx / 2);
-    float tan_fovy_2 = tanf(f_fovy / 2);
-    float z_min = - SPHERE_RADIUS / sinf(atanf(sqrtf(
-                    tan_fovx_2 * tan_fovx_2 + tan_fovy_2 * tan_fovy_2)));
-
-    /* The FOV value above which z is dynamically calculated. */
-    const float z_thresh = 90.f;
-
-    float f_z;
-    if (f_fovx <= z_thresh * M_PI / 180)
-        f_z = 0;
-    else
-    {
-        float f = z_min / ((FIELD_OF_VIEW_DEGREES_MAX - z_thresh) * M_PI / 180);
-        f_z = f * f_fovx - f * z_thresh * M_PI / 180;
-        if (f_z < z_min)
-            f_z = z_min;
-    }
-    return f_z;
-}
-
-static void SetQuadVSProjection(vout_display_sys_t *sys)
-{
-    if (!sys->picQuad.pVertexShaderConstants)
-        return;
-
-    // Convert degree into radian
-    float f_fovx = sys->area.vdcfg.viewpoint.fov * (float)M_PI / 180.f;
-    if ( f_fovx > FIELD_OF_VIEW_DEGREES_MAX * M_PI / 180 + 0.001f ||
-         f_fovx < -0.001f )
-        return;
-
-    float f_sar = (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height;
-    float f_fovy = UpdateFOVy(f_fovx, f_sar);
-    float f_z = UpdateZ(f_fovx, f_fovy);
-
-    HRESULT hr;
-    D3D11_MAPPED_SUBRESOURCE mapped;
-    hr = ID3D11DeviceContext_Map(sys->d3d_dev->d3dcontext, (ID3D11Resource *)sys->picQuad.pVertexShaderConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
-    if (SUCCEEDED(hr)) {
-        VS_PROJECTION_CONST *dst_data = mapped.pData;
-        getZoomMatrix(SPHERE_RADIUS * f_z, dst_data->Zoom);
-        getProjectionMatrix(f_sar, f_fovy, dst_data->Projection);
-
-        vlc_viewpoint_t vp;
-        vlc_viewpoint_reverse(&vp, &sys->area.vdcfg.viewpoint);
-        vlc_viewpoint_to_4x4(&vp, dst_data->View);
-    }
-    ID3D11DeviceContext_Unmap(sys->d3d_dev->d3dcontext, (ID3D11Resource *)sys->picQuad.pVertexShaderConstants, 0);
-}
-
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -505,7 +412,8 @@ static int Control(vout_display_t *vd, int query, va_list args)
             const vlc_viewpoint_t *viewpoint = va_arg(args, const vlc_viewpoint_t*);
             sys->area.vdcfg.viewpoint = *viewpoint;
             d3d11_device_lock( sys->d3d_dev );
-            SetQuadVSProjection( sys );
+            D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, viewpoint,
+                                   (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height );
             d3d11_device_unlock( sys->d3d_dev );
             res = VLC_SUCCESS;
         }
@@ -1082,7 +990,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     if ( vd->source.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
          vd->source.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
-        SetQuadVSProjection( sys );
+        D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &sys->area.vdcfg.viewpoint,
+                               (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height );
 
     if (is_d3d11_opaque(fmt->i_chroma)) {
         ID3D10Multithread *pMultithread;
@@ -1209,7 +1118,8 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
              sys->picQuad.cropViewport[0].Width, sys->picQuad.cropViewport[0].Height );
 #endif
 
-    SetQuadVSProjection(sys);
+    D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &sys->area.vdcfg.viewpoint,
+                          (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height );
 
     msg_Dbg(vd, "Direct3D11 resources created");
     return VLC_SUCCESS;
