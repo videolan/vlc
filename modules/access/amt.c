@@ -70,7 +70,7 @@
 #define TIMEOUT_TEXT N_("Native multicast timeout (sec)")
 #define AMT_RELAY_ADDRESS N_("AMT relay (IP address or FQDN)")
 #define AMT_RELAY_ADDR_LONG N_("AMT relay anycast address, or specify the relay you want by address or fully qualified domain name")
-#define AMT_DEFAULT_RELAY N_("amt-relay.m2icast.net")
+#define AMT_DEFAULT_RELAY "amt-relay.m2icast.net"
 
 /*****************************************************************************
  * Various Lengths of Msgs or Hdrs
