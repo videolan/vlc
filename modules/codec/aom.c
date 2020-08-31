@@ -97,7 +97,7 @@ vlc_module_begin ()
         add_integer( SOUT_CFG_PREFIX "usage", 0, "Usage (0: good, 1: realtime)", NULL )
             change_integer_range( 0, 1 )
         add_integer( SOUT_CFG_PREFIX "rc-end-usage", AOM_CBR, "Usage (0: VBR, 1: CBR, 2: CQ, 3: Q)", NULL )
-            change_integer_range( 0, 4 )
+            change_integer_range( 0, 3 )
 #ifdef AOM_CTRL_AV1E_SET_ROW_MT
         add_bool( SOUT_CFG_PREFIX "row-mt", false, "Row Multithreading", NULL )
 #endif
