@@ -246,10 +246,14 @@ local printXmlKeyValue = function (k,v,indent)
     print("\n")
     for i=1,indent do print(" ") end
     if (k) then
-        if not tonumber(k) then
-            print("<"..k..">")
+        --XML element naming rules: this is a bit more conservative
+        --than it strictly needs to be
+        if not string.match(k, "^[a-zA-Z_][a-zA-Z0-9_%-%.]*$")
+            or string.match(k, "^[xX][mM][lL]") then
+            print('<element name="'..xmlString(k)..'">')
+            k = "element"
         else
-            print("<entry_"..k..">")
+            print("<"..k..">")
         end
     end
 
@@ -260,16 +264,7 @@ local printXmlKeyValue = function (k,v,indent)
     end
 
     if (k) then
-        xs=xmlString(k)
-        space_loc=string.find(xs," ")
-        if space_loc == nil then
-            xs=string.sub(xs,1,space_loc)
-        end
-        if not tonumber(xs) then
-            print("</"..xs..">")
-        else
-            print("</entry_"..xs..">")
-        end
+        print("</"..k..">")
     end
 end
 
