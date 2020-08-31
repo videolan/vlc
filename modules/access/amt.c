@@ -68,7 +68,6 @@
 #define BUFFER_TEXT N_("Receive buffer")
 #define BUFFER_LONGTEXT N_("AMT receive buffer size (bytes)" )
 #define TIMEOUT_TEXT N_("Native multicast timeout (sec)")
-#define AMT_TIMEOUT_TEXT N_("AMT timeout (sec)")
 #define AMT_RELAY_ADDRESS N_("AMT relay (IP address or FQDN)")
 #define AMT_RELAY_ADDR_LONG N_("AMT relay anycast address, or specify the relay you want by address or fully qualified domain name")
 #define AMT_DEFAULT_RELAY N_("amt-relay.m2icast.net")
@@ -257,7 +256,6 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_integer( "amt-timeout", 5, AMT_TIMEOUT_TEXT, NULL, true )
     add_integer( "amt-native-timeout", 5, TIMEOUT_TEXT, NULL, true )
     add_string( "amt-relay", AMT_DEFAULT_RELAY, AMT_RELAY_ADDRESS, AMT_RELAY_ADDR_LONG, true )
 
