@@ -63,6 +63,11 @@ static const int pi_enc_bitdepth_values_list[] =
   { 8, 10, 12 };
 static const char *const ppsz_enc_bitdepth_text [] =
   { N_("8 bpp"), N_("10 bpp"), N_("12 bpp") };
+
+static const int pi_rc_end_usage_values_list[] =
+  { AOM_VBR, AOM_CBR, AOM_CQ, AOM_Q };
+static const char *const ppsz_rc_end_usage_text [] =
+  { N_("VBR"), N_("CBR"), N_("CQ"), N_("Q") };
 #endif
 
 /* Range of values for cpu-used was increased to 10 in libaom 3.2.0 */
@@ -107,8 +112,9 @@ vlc_module_begin ()
             change_integer_range(0, 70 /* MAX_LAG_BUFFERS + MAX_LAP_BUFFERS */ )
         add_integer( SOUT_CFG_PREFIX "usage", 0, "Usage (0: good, 1: realtime)", NULL )
             change_integer_range( 0, 1 )
-        add_integer( SOUT_CFG_PREFIX "rc-end-usage", AOM_CBR, "Usage (0: VBR, 1: CBR, 2: CQ, 3: Q)", NULL )
+        add_integer( SOUT_CFG_PREFIX "rc-end-usage", AOM_CBR, "Rate control mode", NULL )
             change_integer_range( 0, 3 )
+            change_integer_list( pi_rc_end_usage_values_list, ppsz_rc_end_usage_text )
 #ifdef AOM_CTRL_AV1E_SET_ROW_MT
         add_bool( SOUT_CFG_PREFIX "row-mt", false, "Row Multithreading", NULL )
 #endif
