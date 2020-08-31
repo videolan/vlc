@@ -1,0 +1,26 @@
+--- growl/Growl.xcodeproj/project.pbxproj	2012-12-12 07:18:11.000000000 +0100
++++ growl/Growl.xcodeproj/project.pbxproj	2020-08-31 16:50:03.000000000 +0200
+@@ -5667,6 +5667,7 @@
+ 			buildSettings = {
+ 				COMBINE_HIDPI_IMAGES = YES;
+ 				PRODUCT_NAME = Revision;
++				SDKROOT = macosx;
+ 			};
+ 			name = Localization;
+ 		};
+@@ -5794,6 +5795,7 @@
+ 			buildSettings = {
+ 				COMBINE_HIDPI_IMAGES = YES;
+ 				PRODUCT_NAME = Revision;
++				SDKROOT = macosx;
+ 			};
+ 			name = Debug;
+ 		};
+@@ -5803,6 +5805,7 @@
+ 			buildSettings = {
+ 				COMBINE_HIDPI_IMAGES = YES;
+ 				PRODUCT_NAME = Revision;
++				SDKROOT = macosx;
+ 			};
+ 			name = Release;
+ 		};
