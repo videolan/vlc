@@ -99,6 +99,7 @@ typedef struct
     video_projection_mode_t   projection;
 
     PS_CONSTANT_BUFFER        shaderConstants;
+    VS_PROJECTION_CONST       vertexConstants;
 } d3d_quad_t;
 
 #define D3D11_MAX_RENDER_TARGET    2

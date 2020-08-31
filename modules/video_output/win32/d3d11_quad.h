@@ -30,7 +30,7 @@
 
 #define PS_CONST_LUMI_BOUNDS 0
 #define PS_CONST_COLORSPACE  1
-#define PS_CONST_COUNT       2
+#define VS_CONST_VIEWPOINT   2
 
 /* matches the D3D11_INPUT_ELEMENT_DESC we setup */
 typedef struct d3d_vertex_t {

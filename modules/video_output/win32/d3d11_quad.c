@@ -598,21 +598,43 @@ bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_qua
     return result;
 }
 
-static bool ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad, size_t index, void *new_buf)
+static bool ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad, int type, void *new_buf)
 {
+    ID3D11Resource *res;
+    switch (type)
+    {
+        case PS_CONST_LUMI_BOUNDS:
+            res = (ID3D11Resource *)quad->pPixelShaderConstants[PS_CONST_LUMI_BOUNDS];
+            break;
+        case PS_CONST_COLORSPACE:
+            res = (ID3D11Resource *)quad->pPixelShaderConstants[PS_CONST_COLORSPACE];
+            break;
+        case VS_CONST_VIEWPOINT:
+            res = (ID3D11Resource *)quad->pVertexShaderConstants;
+            break;
+    }
+
     D3D11_MAPPED_SUBRESOURCE mappedResource;
-    HRESULT hr = ID3D11DeviceContext_Map(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[index], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-    if (FAILED(hr))
+    HRESULT hr = ID3D11DeviceContext_Map(d3d_dev->d3dcontext, res, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if (unlikely(FAILED(hr)))
     {
         msg_Err(o, "Failed to lock the picture shader constants (hr=0x%lX)", hr);
         return false;
     }
 
-    if (index == PS_CONST_LUMI_BOUNDS)
-        memcpy(mappedResource.pData, new_buf,sizeof(PS_CONSTANT_BUFFER));
-    else
-        memcpy(mappedResource.pData, new_buf,sizeof(PS_COLOR_TRANSFORM));
-    ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pPixelShaderConstants[index], 0);
+    switch (type)
+    {
+        case PS_CONST_LUMI_BOUNDS:
+            memcpy(mappedResource.pData, new_buf, sizeof(PS_CONSTANT_BUFFER));
+            break;
+        case PS_CONST_COLORSPACE:
+            memcpy(mappedResource.pData, new_buf, sizeof(PS_COLOR_TRANSFORM));
+            break;
+        case VS_CONST_VIEWPOINT:
+            memcpy(mappedResource.pData, new_buf, sizeof(VS_PROJECTION_CONST));
+            break;
+    }
+    ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, res, 0);
     return true;
 }
 
@@ -719,16 +741,11 @@ void (D3D11_UpdateViewpoint)(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_
     vlc_viewpoint_t vp;
     vlc_viewpoint_reverse(&vp, viewpoint);
 
-    HRESULT hr;
-    D3D11_MAPPED_SUBRESOURCE mapped;
-    hr = ID3D11DeviceContext_Map(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
-    if (SUCCEEDED(hr)) {
-        VS_PROJECTION_CONST *dst_data = mapped.pData;
-        getZoomMatrix(SPHERE_RADIUS * f_z, dst_data->Zoom);
-        getProjectionMatrix(f_sar, f_fovy, dst_data->Projection);
-        vlc_viewpoint_to_4x4(&vp, dst_data->View);
-    }
-    ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0);
+    getZoomMatrix(SPHERE_RADIUS * f_z, quad->vertexConstants.Zoom);
+    getProjectionMatrix(f_sar, f_fovy, quad->vertexConstants.Projection);
+    vlc_viewpoint_to_4x4(&vp, quad->vertexConstants.View);
+
+    ShaderUpdateConstants(o, d3d_dev, quad, VS_CONST_VIEWPOINT, &quad->vertexConstants);
 }
 
 #undef D3D11_AllocateQuad
