@@ -33,17 +33,25 @@ require "httprequests"
 
 httprequests.processcommands()
 
-local statusTable=httprequests.getstatus(false)
+local statusTable=httprequests.getstatus(true)
+
+--In the information section, an extra copy of some data is presented
+--in a non-standard way to keep compatibility.
+local information = statusTable.information
+statusTable.information = nil
 
 print('<root>\n')
 httprequests.printTableAsXml(statusTable,0)
 
 local item = vlc.player.item()
 
---data in the information section is presented in a non-standard way to keep compatibility.
-
 ?>
 <information>
+  <?vlc
+    if information then
+      httprequests.printTableAsXml(information,2)
+    end
+  ?>
     <category name="meta">
     <?vlc
       if item then
@@ -68,15 +76,4 @@ local item = vlc.player.item()
     end
   ?>
   </information>
-  <stats>
-  <?vlc
-    if item then
-      local stats = item:stats()
-      for k,v in pairs(stats) do
-        local tag = string.gsub(k,"_","")
-        print("<"..httprequests.xmlString(tag)..">"..httprequests.xmlString(v).."</"..httprequests.xmlString(tag)..">\n")
-      end
-    end
-  ?>
-  </stats>
 </root>
