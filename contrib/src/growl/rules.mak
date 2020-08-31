@@ -19,6 +19,7 @@ growl: GrowlSDK-$(GROWL_VERSION)-src.tar.gz .sum-growl
 	$(APPLY) $(SRC)/growl/growl-log-delegate.patch
 	$(APPLY) $(SRC)/growl/growl-partial-availability.diff
 	$(APPLY) $(SRC)/growl/growl-update-vcs-target.patch
+	$(APPLY) $(SRC)/growl/growl-support-arm64.patch
 	$(MOVE)
 
 .growl: growl

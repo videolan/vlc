@@ -1,0 +1,59 @@
+--- growl/Growl.xcodeproj/project.pbxproj	2020-08-31 16:59:37.000000000 +0200
++++ growl/Growl.xcodeproj/project.pbxproj	2020-08-31 18:32:49.000000000 +0200
+@@ -502,6 +502,8 @@
+ 			isa = PBXBuildRule;
+ 			compilerSpec = com.apple.compilers.gcc.4_0;
+ 			fileType = sourcecode.c;
++			inputFiles = (
++			);
+ 			isEditable = 1;
+ 			outputFiles = (
+ 			);
+@@ -5448,6 +5450,7 @@
+ 				FRAMEWORK_VERSION = A;
+ 				GCC_PREFIX_HEADER = Framework/Source/GrowlFramework_Prefix.pch;
+ 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
++				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+ 				INFOPLIST_FILE = "Framework/Resources/Growl.framework-Info.plist";
+ 				INFOPLIST_PREPROCESS = YES;
+ 				INSTALL_PATH = "@executable_path/../Frameworks";
+@@ -5462,6 +5465,7 @@
+ 				);
+ 				PRODUCT_NAME = Growl;
+ 				SDKROOT = macosx;
++				VALID_ARCHS = "i386 x86_64 arm64";
+ 				WARNING_LDFLAGS = "-Wassign-intercept";
+ 			};
+ 			name = Localization;
+@@ -6169,6 +6173,7 @@
+ 				FRAMEWORK_VERSION = A;
+ 				GCC_PREFIX_HEADER = Framework/Source/GrowlFramework_Prefix.pch;
+ 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
++				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+ 				INFOPLIST_FILE = "Framework/Resources/Growl.framework-Info.plist";
+ 				INFOPLIST_PREPROCESS = YES;
+ 				INSTALL_PATH = "@executable_path/../Frameworks";
+@@ -6183,6 +6188,7 @@
+ 				);
+ 				PRODUCT_NAME = Growl;
+ 				SDKROOT = macosx;
++				VALID_ARCHS = "i386 x86_64 arm64";
+ 				WARNING_LDFLAGS = "-Wassign-intercept";
+ 			};
+ 			name = Debug;
+@@ -6198,6 +6204,7 @@
+ 				FRAMEWORK_VERSION = A;
+ 				GCC_PREFIX_HEADER = Framework/Source/GrowlFramework_Prefix.pch;
+ 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
++				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+ 				INFOPLIST_FILE = "Framework/Resources/Growl.framework-Info.plist";
+ 				INFOPLIST_PREPROCESS = YES;
+ 				INSTALL_PATH = "@executable_path/../Frameworks";
+@@ -6212,6 +6219,7 @@
+ 				);
+ 				PRODUCT_NAME = Growl;
+ 				SDKROOT = macosx;
++				VALID_ARCHS = "i386 x86_64 arm64";
+ 				WARNING_LDFLAGS = "-Wassign-intercept";
+ 			};
+ 			name = Release;
