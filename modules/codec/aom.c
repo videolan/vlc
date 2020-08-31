@@ -64,6 +64,11 @@ static const int pi_enc_bitdepth_values_list[] =
 static const char *const ppsz_enc_bitdepth_text [] =
   { N_("8 bpp"), N_("10 bpp"), N_("12 bpp") };
 
+static const int pi_usage_values_list[] =
+  { AOM_USAGE_GOOD_QUALITY, AOM_USAGE_REALTIME, AOM_USAGE_ALL_INTRA };
+static const char *const ppsz_usage_text [] =
+  { N_("Good quality"), N_("Realtime"), N_("All intra") };
+
 static const int pi_rc_end_usage_values_list[] =
   { AOM_VBR, AOM_CBR, AOM_CQ, AOM_Q };
 static const char *const ppsz_rc_end_usage_text [] =
@@ -110,8 +115,9 @@ vlc_module_begin ()
             change_integer_range( 0, aom_has_max_speed_10() ? 10 : 8 ) /* good: 0-5, realtime: 6-8 (or 10 for libaom >= 3.2.0) */
         add_integer( SOUT_CFG_PREFIX "lag-in-frames", 16, "Maximum number of lookahead frames", NULL )
             change_integer_range(0, 70 /* MAX_LAG_BUFFERS + MAX_LAP_BUFFERS */ )
-        add_integer( SOUT_CFG_PREFIX "usage", 0, "Usage", "Usage (0: good quality, 1: realtime: 2: all intra)" )
+        add_integer( SOUT_CFG_PREFIX "usage", 0, "Usage", NULL )
             change_integer_range( 0, 2 )
+            change_integer_list( pi_usage_values_list, ppsz_usage_text )
         add_integer( SOUT_CFG_PREFIX "rc-end-usage", AOM_CBR, "Rate control mode", NULL )
             change_integer_range( 0, 3 )
             change_integer_list( pi_rc_end_usage_values_list, ppsz_rc_end_usage_text )
