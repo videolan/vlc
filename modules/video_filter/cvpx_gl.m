@@ -164,7 +164,7 @@ static void Close(vlc_gl_t *gl)
     };
 
 #if TARGET_OS_IPHONE
-    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+    _context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
     assert(_context != nil);
 
     cvret = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault,
