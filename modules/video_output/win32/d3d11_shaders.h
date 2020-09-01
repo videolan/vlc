@@ -57,7 +57,6 @@ typedef struct {
 } PS_CONSTANT_BUFFER;
 
 typedef struct {
-    FLOAT SourceCrop[4*4];
     FLOAT WhitePoint[4*4];
     FLOAT Colorspace[4*4];
     FLOAT Primaries[4*4];
@@ -95,6 +94,8 @@ typedef struct
     ID3D11PixelShader         *d3dpixelShader[D3D11_MAX_SHADER_VIEW];
     ID3D11SamplerState        *d3dsampState[2];
     D3D11_VIEWPORT            cropViewport[D3D11_MAX_SHADER_VIEW];
+    unsigned int              i_width;
+    unsigned int              i_height;
     video_projection_mode_t   projection;
 
     PS_CONSTANT_BUFFER        shaderConstants;
