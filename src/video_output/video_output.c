@@ -1725,6 +1725,7 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
 
     vout_display_cfg_t dcfg;
     int x = 0, y = 0, w = 0, h = 0;
+    unsigned crop_num = 0, crop_den = 0;
     unsigned num, den;
 
     vlc_mutex_lock(&sys->window_lock);
@@ -1744,8 +1745,8 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
         case VOUT_CROP_NONE:
             break;
         case VOUT_CROP_RATIO:
-            num = sys->source.crop.ratio.num;
-            den = sys->source.crop.ratio.den;
+            crop_num = sys->source.crop.ratio.num;
+            crop_den = sys->source.crop.ratio.den;
             break;
         case VOUT_CROP_WINDOW:
             x = sys->source.crop.window.x;
@@ -1777,7 +1778,7 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
         goto error;
     }
 
-    vout_SetDisplayCrop(sys->display, num, den, x, y, w, h);
+    vout_SetDisplayCrop(sys->display, crop_num, crop_den, x, y, w, h);
 
     if (num != 0 && den != 0)
         vout_SetDisplayAspect(sys->display, num, den);
