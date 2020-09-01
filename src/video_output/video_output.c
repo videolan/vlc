@@ -2198,6 +2198,14 @@ static int EnableWindowLocked(vout_thread_sys_t *vout, const video_format_t *ori
 
 static void vout_InitSource(vout_thread_sys_t *vout)
 {
+    char *psz_ar = var_InheritString(&vout->obj, "aspect-ratio");
+    if (psz_ar) {
+        unsigned num, den;
+        if (!GetAspectRatio(psz_ar, &num, &den))
+            vout_SetAspectRatio(vout, num, den);
+        free(psz_ar);
+    }
+
     char *psz_crop = var_InheritString(&vout->obj, "crop");
     if (psz_crop) {
         unsigned num, den;

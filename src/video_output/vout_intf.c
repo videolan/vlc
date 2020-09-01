@@ -523,7 +523,7 @@ static int CropBorderCallback(vlc_object_t *object, char const *cmd,
     return VLC_SUCCESS;
 }
 
-static bool GetAspectRatio(const char *ar_str, unsigned *num, unsigned *den)
+bool GetAspectRatio(const char *ar_str, unsigned *num, unsigned *den)
 {
     if (sscanf(ar_str, "%u:%u", num, den) == 2 &&
         (num != 0) == (den != 0))
