@@ -191,8 +191,7 @@ find_closest_path(vlc_keystore_entry *p_entries, unsigned i_count,
 static bool
 is_credential_valid(vlc_credential *p_credential)
 {
-    if (p_credential->psz_username && *p_credential->psz_username != '\0'
-     && p_credential->psz_password)
+    if (p_credential->psz_username && p_credential->psz_password)
         return true;
     p_credential->psz_password = NULL;
     return false;
