@@ -289,14 +289,15 @@ static void vout_SizeWindow(vout_thread_sys_t *vout,
     unsigned sar_num = original->i_sar_num;
     unsigned sar_den = original->i_sar_den;
 
+    if (sys->source.dar.num > 0 && sys->source.dar.den > 0) {
+        unsigned num = sys->source.dar.num * h;
+        unsigned den = sys->source.dar.den * w;
+
+        vlc_ureduce(&sar_num, &sar_den, num, den, 0);
+    }
+
     switch (sys->source.crop.mode) {
         case VOUT_CROP_NONE:
-            if (sys->source.dar.num > 0 && sys->source.dar.den > 0) {
-                unsigned num = sys->source.dar.num * h;
-                unsigned den = sys->source.dar.den * w;
-
-                vlc_ureduce(&sar_num, &sar_den, num, den, 0);
-            }
             break;
 
         case VOUT_CROP_RATIO: {
