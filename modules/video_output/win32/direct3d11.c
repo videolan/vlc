@@ -146,68 +146,7 @@ static void SetQuadVSProjection(vout_display_sys_t *);
 static int Control(vout_display_t *, int, va_list);
 
 
-static int UpdateDisplayFormat(vout_display_t *vd, libvlc_video_output_cfg_t *out,
-                               const video_format_t *input_fmt)
-{
-    vout_display_sys_t *sys = vd->sys;
-    display_info_t new_display = { 0 };
-
-    for (const d3d_format_t *output_format = GetRenderFormatList();
-         output_format->name != NULL; ++output_format)
-    {
-        if (output_format->formatTexture == (DXGI_FORMAT)out->dxgi_format &&
-            !is_d3d11_opaque(output_format->fourcc))
-        {
-            new_display.pixelFormat = output_format;
-            break;
-        }
-    }
-    if (unlikely(new_display.pixelFormat == NULL))
-    {
-        msg_Err(vd, "Could not find the output format.");
-        return VLC_EGENERIC;
-    }
-
-    new_display.color     = (video_color_space_t)     out->colorspace;
-    new_display.transfer  = (video_transfer_func_t)   out->transfer;
-    new_display.primaries = (video_color_primaries_t) out->primaries;
-    new_display.b_full_range = out->full_range;
-
-    /* guestimate the display peak luminance */
-    switch (out->transfer)
-    {
-    case TRANSFER_FUNC_LINEAR:
-    case TRANSFER_FUNC_SRGB:
-        new_display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
-        break;
-    case TRANSFER_FUNC_SMPTE_ST2084:
-        new_display.luminance_peak = MAX_PQ_BRIGHTNESS;
-        break;
-    default:
-        new_display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
-        break;
-    }
-
-    if ( sys->display.pixelFormat == NULL ||
-         ( sys->display.pixelFormat    != new_display.pixelFormat ||
-           sys->display.luminance_peak != new_display.luminance_peak ||
-           sys->display.color          != new_display.color ||
-           sys->display.transfer       != new_display.transfer ||
-           sys->display.primaries      != new_display.primaries ||
-           sys->display.b_full_range   != new_display.b_full_range ))
-    {
-        sys->display = new_display;
-        /* TODO release the pixel shaders if the format changed */
-        if (Direct3D11CreateFormatResources(vd, input_fmt)) {
-            msg_Err(vd, "Failed to allocate format resources");
-            return VLC_EGENERIC;
-        }
-    }
-
-    return VLC_SUCCESS;
-}
-
-static int QueryDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
+static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
     libvlc_video_render_cfg_t cfg;
@@ -257,7 +196,61 @@ static int QueryDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
         return VLC_EGENERIC;
     }
 
-    return UpdateDisplayFormat(vd, &out, fmt);
+    display_info_t new_display = { 0 };
+
+    for (const d3d_format_t *output_format = GetRenderFormatList();
+         output_format->name != NULL; ++output_format)
+    {
+        if (output_format->formatTexture == (DXGI_FORMAT)out.dxgi_format &&
+            !is_d3d11_opaque(output_format->fourcc))
+        {
+            new_display.pixelFormat = output_format;
+            break;
+        }
+    }
+    if (unlikely(new_display.pixelFormat == NULL))
+    {
+        msg_Err(vd, "Could not find the output format.");
+        return VLC_EGENERIC;
+    }
+
+    new_display.color     = (video_color_space_t)     out.colorspace;
+    new_display.transfer  = (video_transfer_func_t)   out.transfer;
+    new_display.primaries = (video_color_primaries_t) out.primaries;
+    new_display.b_full_range = out.full_range;
+
+    /* guestimate the display peak luminance */
+    switch (out.transfer)
+    {
+    case TRANSFER_FUNC_LINEAR:
+    case TRANSFER_FUNC_SRGB:
+        new_display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
+        break;
+    case TRANSFER_FUNC_SMPTE_ST2084:
+        new_display.luminance_peak = MAX_PQ_BRIGHTNESS;
+        break;
+    default:
+        new_display.luminance_peak = DEFAULT_SRGB_BRIGHTNESS;
+        break;
+    }
+
+    if ( sys->display.pixelFormat == NULL ||
+         ( sys->display.pixelFormat    != new_display.pixelFormat ||
+           sys->display.luminance_peak != new_display.luminance_peak ||
+           sys->display.color          != new_display.color ||
+           sys->display.transfer       != new_display.transfer ||
+           sys->display.primaries      != new_display.primaries ||
+           sys->display.b_full_range   != new_display.b_full_range ))
+    {
+        sys->display = new_display;
+        /* TODO release the pixel shaders if the format changed */
+        if (Direct3D11CreateFormatResources(vd, fmt)) {
+            msg_Err(vd, "Failed to allocate format resources");
+            return VLC_EGENERIC;
+        }
+    }
+
+    return VLC_SUCCESS;
 }
 
 static void UpdateSize(vout_display_t *vd)
@@ -266,7 +259,7 @@ static void UpdateSize(vout_display_t *vd)
     msg_Dbg(vd, "Detected size change %dx%d", sys->area.place.width,
             sys->area.place.height);
 
-    QueryDisplayFormat(vd, &vd->fmt);
+    UpdateDisplayFormat(vd, &vd->fmt);
 
     RECT rect_dst = {
         .left   = sys->area.place.x,
@@ -830,7 +823,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 
     CommonPlacePicture(vd, &sys->area, &sys->sys);
 
-    err = QueryDisplayFormat(vd, &fmt);
+    err = UpdateDisplayFormat(vd, &fmt);
     if (err != VLC_SUCCESS) {
         msg_Err(vd, "Could not update the backbuffer");
         return err;
