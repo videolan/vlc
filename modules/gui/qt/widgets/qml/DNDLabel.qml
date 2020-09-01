@@ -49,15 +49,15 @@ Rectangle {
 
     RectangularGlow {
         anchors.fill: parent
-        glowRadius: VLCStyle.dp(8)
+        glowRadius: VLCStyle.dp(8, VLCStyle.scale)
         color: _colors.glowColor
         spread: 0.2
     }
 
     Text {
         id: label
-        width: implicitWidth + VLCStyle.dp(10)
-        height: implicitHeight + VLCStyle.dp(10)
+        width: implicitWidth + VLCStyle.dp(10, VLCStyle.scale)
+        height: implicitHeight + VLCStyle.dp(10, VLCStyle.scale)
         font.pixelSize: VLCStyle.fontSize_normal
         color: _colors.text
         text: i18n.qtr("%1 tracks selected").arg(count)
@@ -76,8 +76,8 @@ Rectangle {
 
         RowLayout {
             id: content
-            width: implicitWidth + VLCStyle.dp(10)
-            height: implicitHeight + VLCStyle.dp(10)
+            width: implicitWidth + VLCStyle.dp(10, VLCStyle.scale)
+            height: implicitHeight + VLCStyle.dp(10, VLCStyle.scale)
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
             Item {

@@ -90,8 +90,8 @@ Item {
 
         Rectangle {
             id: arrow
-            width: VLCStyle.dp(10)
-            height: VLCStyle.dp(10)
+            width: VLCStyle.dp(10, VLCStyle.scale)
+            height: VLCStyle.dp(10, VLCStyle.scale)
 
             anchors.centerIn: parent
             anchors.verticalCenterOffset: -(parent.height / 2)
@@ -105,7 +105,7 @@ Item {
 
             RectangularGlow {
                 anchors.fill: parent
-                glowRadius: VLCStyle.dp(2)
+                glowRadius: VLCStyle.dp(2, VLCStyle.scale)
                 spread: 0.2
                 color: VLCStyle.colors.glowColor
             }
@@ -114,16 +114,16 @@ Item {
 
     Rectangle {
         id: timeIndicatorRect
-        width: timeMetrics.width + VLCStyle.dp(10)
-        height: timeMetrics.height + VLCStyle.dp(5)
+        width: timeMetrics.width + VLCStyle.dp(10, VLCStyle.scale)
+        height: timeMetrics.height + VLCStyle.dp(5, VLCStyle.scale)
 
         color: VLCStyle.colors.bgAlt
-        radius: VLCStyle.dp(6)
+        radius: VLCStyle.dp(6, VLCStyle.scale)
 
         RectangularGlow {
             anchors.fill: parent
 
-            glowRadius: VLCStyle.dp(2)
+            glowRadius: VLCStyle.dp(2, VLCStyle.scale)
             cornerRadius: parent.radius
             spread: 0.2
 

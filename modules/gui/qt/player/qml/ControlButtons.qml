@@ -214,7 +214,7 @@ Item{
                     id: playBtnMouseArea
 
                     anchors.fill: parent
-                    anchors.margins: VLCStyle.dp(1)
+                    anchors.margins: VLCStyle.dp(1, VLCStyle.scale)
 
                     hoverEnabled: true
 
@@ -255,7 +255,7 @@ Item{
                 Rectangle {
                     radius: (width * 0.5)
                     anchors.fill: parent
-                    anchors.margins: VLCStyle.dp(1)
+                    anchors.margins: VLCStyle.dp(1, VLCStyle.scale)
 
                     color: VLCStyle.colors.white
                     opacity: playBtn.videoOverlays ? 0.4 : 1.0
@@ -319,7 +319,7 @@ Item{
                     anchors.fill: parent
 
                     radius: (width * 0.5)
-                    border.width: VLCStyle.dp(2)
+                    border.width: VLCStyle.dp(2, VLCStyle.scale)
 
                     color: "transparent"
                     visible: false

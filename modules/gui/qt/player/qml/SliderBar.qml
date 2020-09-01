@@ -26,7 +26,7 @@ import "qrc:///style/"
 Slider {
     id: control
 
-    property int barHeight: isMiniplayer ? VLCStyle.dp(3) : VLCStyle.dp(5)
+    property int barHeight: isMiniplayer ? VLCStyle.dp(3, VLCStyle.scale) : VLCStyle.dp(5, VLCStyle.scale)
     property bool _isHold: false
     property bool _isSeekPointsShown: true
     property bool isMiniplayer: false
@@ -124,7 +124,7 @@ Slider {
 
         Rectangle {
             id: bufferRect
-            property int bufferAnimWidth: VLCStyle.dp(100)
+            property int bufferAnimWidth: VLCStyle.dp(100, VLCStyle.scale)
             property int bufferAnimPosition: 0
             property int bufferFrames: 1000
             property alias animateLoading: loadingAnim.running
@@ -207,7 +207,7 @@ Slider {
                     property real position: model.position === undefined ? 0.0 : model.position
 
                     color: VLCStyle.colors.seekpoint
-                    width: VLCStyle.dp(1)
+                    width: VLCStyle.dp(1, VLCStyle.scale)
                     height: control.barHeight
                     x: sliderRect.width * seekpointsRect.position
                 }

@@ -38,7 +38,7 @@ MouseArea {
     property int _previousX
 
     cursorShape: Qt.SplitHCursor
-    width: VLCStyle.dp(8)
+    width: VLCStyle.dp(8, VLCStyle.scale)
     acceptedButtons: Qt.LeftButton
 
     onPressed: _previousX = mouseX

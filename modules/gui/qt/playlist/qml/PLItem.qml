@@ -155,7 +155,7 @@ Rectangle {
             if (dragItem.visible)
             {
                 var pos = this.mapToGlobal( mouseX, mouseY)
-                dragItem.updatePos(pos.x + VLCStyle.dp(15), pos.y)
+                dragItem.updatePos(pos.x + VLCStyle.dp(15, VLCStyle.scale), pos.y)
             }
         }
 

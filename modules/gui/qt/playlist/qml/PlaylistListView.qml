@@ -659,7 +659,7 @@ Widgets.NavigableFocusScope {
                     visible: plmodel.count === 0
 
                     Widgets.IconLabel {
-                        font.pixelSize: VLCStyle.dp(48)
+                        font.pixelSize: VLCStyle.dp(48, VLCStyle.scale)
                         anchors.horizontalCenter: parent.horizontalCenter
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -704,8 +704,8 @@ Widgets.NavigableFocusScope {
 	                anchors.bottom: parent.bottom
 	                anchors.horizontalCenter: parent.horizontalCenter
 
-	                width: infoText.width + VLCStyle.dp(18)
-	                height: infoText.height + VLCStyle.dp(12)
+                    width: infoText.width + VLCStyle.dp(18, VLCStyle.scale)
+                    height: infoText.height + VLCStyle.dp(12, VLCStyle.scale)
 
 	                glowRadius: 2
 	                cornerRadius: 10

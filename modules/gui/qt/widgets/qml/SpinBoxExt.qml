@@ -30,8 +30,8 @@ SpinBox{
     property color borderColor:  VLCStyle.colors.buttonBorder
 
     background: Rectangle {
-        implicitWidth: VLCStyle.dp(4)
-        implicitHeight: VLCStyle.dp(32)
+        implicitWidth: VLCStyle.dp(4, VLCStyle.scale)
+        implicitHeight: VLCStyle.dp(32, VLCStyle.scale)
         border.color: control.borderColor
         color: control.bgColor
     }
@@ -52,8 +52,8 @@ SpinBox{
     up.indicator: Rectangle {
         x: parent.width - width
         height: parent.height / 2
-        implicitWidth: VLCStyle.dp(15)
-        implicitHeight: VLCStyle.dp(10)
+        implicitWidth: VLCStyle.dp(15, VLCStyle.scale)
+        implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
         anchors.top: parent.top
         color: control.up.pressed ? VLCStyle.colors.bgHover : control.bgColor
         border.color: control.borderColor
@@ -72,8 +72,8 @@ SpinBox{
     down.indicator: Rectangle {
         x: parent.width - width
         height: parent.height / 2
-        implicitWidth: VLCStyle.dp(15)
-        implicitHeight: VLCStyle.dp(10)
+        implicitWidth: VLCStyle.dp(15, VLCStyle.scale)
+        implicitHeight: VLCStyle.dp(10, VLCStyle.scale)
         anchors.bottom: parent.bottom
         color: control.down.pressed ? VLCStyle.colors.bgHover : control.bgColor
         border.color: control.borderColor

@@ -67,7 +67,7 @@ Widgets.NavigableFocusScope {
         anchors.left: parent.left
         anchors.right: parent.right
 
-        spacing: VLCStyle.dp(-progressBar.height / 2)
+        spacing: VLCStyle.dp(-progressBar.height / 2, VLCStyle.scale)
 
         SliderBar {
             id: progressBar
@@ -172,8 +172,8 @@ Widgets.NavigableFocusScope {
                                         : VLCStyle.noArtAlbum
                                 fillMode: Image.PreserveAspectFit
 
-                                width: VLCStyle.dp(60)
-                                height: VLCStyle.dp(60)
+                                width: VLCStyle.dp(60, VLCStyle.scale)
+                                height: VLCStyle.dp(60, VLCStyle.scale)
                             }
                         }
 

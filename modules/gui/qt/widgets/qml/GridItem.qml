@@ -167,7 +167,7 @@ Item {
                 source: baseRect
                 horizontalOffset: 0
                 verticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-                radius: VLCStyle.dp(14, scale)
+                radius: VLCStyle.dp(14, VLCStyle.scale)
                 spread: 0
                 samples: ( radius * 2 ) + 1
                 color: Qt.rgba(0, 0, 0, .22)

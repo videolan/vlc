@@ -23,7 +23,7 @@ import "qrc:///style/"
 ProgressBar {
     id: progressBar
     background: Rectangle {
-        implicitHeight: VLCStyle.dp(2)
+        implicitHeight: VLCStyle.dp(2, VLCStyle.scale)
         color: VLCStyle.colors.text
     }
     contentItem: Item {

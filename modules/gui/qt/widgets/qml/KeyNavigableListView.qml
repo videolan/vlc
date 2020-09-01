@@ -275,7 +275,7 @@ NavigableFocusScope {
             }
 
             gradient: Gradient {
-                GradientStop { position: 0.0; color: fadeColor }
+                GradientStop { position: 0.0; color: !!fadeColor ? fadeColor : "transparent" }
                 GradientStop { position: 1.0; color: "transparent" }
             }
         }
@@ -321,7 +321,7 @@ NavigableFocusScope {
 
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "transparent" }
-                GradientStop { position: 1.0; color: fadeColor }
+                GradientStop { position: 1.0; color: !!fadeColor ? fadeColor : "transparent" }
             }
         }
     }

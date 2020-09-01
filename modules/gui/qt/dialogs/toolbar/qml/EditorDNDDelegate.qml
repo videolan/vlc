@@ -39,7 +39,7 @@ MouseArea {
 
     Rectangle {
         z: 1
-        width: VLCStyle.dp(2)
+        width: VLCStyle.dp(2, VLCStyle.scale)
         height: parent.height
         anchors {
             left: parent.left
