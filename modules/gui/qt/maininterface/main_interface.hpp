@@ -261,6 +261,7 @@ public slots:
     void setPlaylistWidthFactor( double );
     void setInterfaceAlwaysOnTop( bool );
     void setShowRemainingTime( bool );
+    void incrementIntfUserScaleFactor( bool increment);
 
     void emitBoss();
     void emitRaise();

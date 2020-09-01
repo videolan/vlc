@@ -304,6 +304,15 @@ void MainInterface::updateIntfScaleFactor()
     emit intfScaleFactorChanged();
 }
 
+void MainInterface::incrementIntfUserScaleFactor(bool increment)
+{
+    if (increment)
+        m_intfUserScaleFactor = std::min(m_intfUserScaleFactor + 0.1, 3.0);
+    else
+        m_intfUserScaleFactor = std::max(m_intfUserScaleFactor - 0.1, 0.3);
+    updateIntfScaleFactor();
+}
+
 inline void MainInterface::initSystray()
 {
     bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();

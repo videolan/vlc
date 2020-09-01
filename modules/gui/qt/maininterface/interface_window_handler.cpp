@@ -72,6 +72,9 @@ InterfaceWindowHandler::InterfaceWindowHandler(intf_thread_t *_p_intf, MainInter
     connect( m_mainInterface, &MainInterface::setInterfaceVisibible,
              this, &InterfaceWindowHandler::setInterfaceVisible);
 
+    connect(this, &InterfaceWindowHandler::incrementIntfUserScaleFactor,
+            m_mainInterface, &MainInterface::incrementIntfUserScaleFactor);
+
     m_window->installEventFilter(this);
 }
 
@@ -84,7 +87,9 @@ InterfaceWindowHandler::~InterfaceWindowHandler()
 
 bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
 {
-    if( event->type() == QEvent::WindowStateChange )
+    switch ( event->type() )
+    {
+    case QEvent::WindowStateChange:
     {
         QWindowStateChangeEvent *windowStateChangeEvent = static_cast<QWindowStateChangeEvent*>(event);
         Qt::WindowStates newState = m_window->windowStates();
@@ -130,6 +135,21 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
                 THEMPL->play();
             }
         }
+        break;
+    }
+    case QEvent::Wheel:
+    {
+        QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
+        if (wheelEvent->modifiers() == Qt::ControlModifier)
+        {
+            emit incrementIntfUserScaleFactor(wheelEvent->delta() > 0);
+            wheelEvent->accept();
+            return true;
+        }
+        break;
+    }
+    default:
+        break;
     }
 
     return false;

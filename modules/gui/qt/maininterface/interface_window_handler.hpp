@@ -52,6 +52,7 @@ signals:
     void fullscreenInterfaceToggled( bool );
     void interfaceAlwaysOnTopChanged(bool);
     void interfaceFullScreenChanged(bool);
+    void incrementIntfUserScaleFactor(bool increment);
 
 protected:
     intf_thread_t* p_intf = nullptr;
