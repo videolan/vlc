@@ -1588,6 +1588,9 @@ static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt,
         msg_Dbg(vd, "Failed to create the processor (error 0x%lX)", hr);
         goto error;
     }
+
+    free(capsList);
+    free(formatsList);
     IDXVAHD_Device_Release( hd_device );
 
     SetupProcessorInput(vd, vd->source, d3dfmt);
