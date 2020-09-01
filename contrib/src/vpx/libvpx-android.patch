@@ -1,7 +1,7 @@
-diff -Naur libvpx-1.8.2.orig/vpx_ports/vpx_ports.mk libvpx-1.8.2/vpx_ports/vpx_ports.mk
---- libvpx-1.8.2.orig/vpx_ports/vpx_ports.mk	2019-12-10 00:09:20.000000000 +0100
-+++ libvpx-1.8.2/vpx_ports/vpx_ports.mk	2020-01-22 14:06:41.478331277 +0100
-@@ -35,6 +35,7 @@
+diff -ruw libvpx-1.9.0.orig/vpx_ports/vpx_ports.mk libvpx-1.9.0/vpx_ports/vpx_ports.mk
+--- libvpx-1.9.0.orig/vpx_ports/vpx_ports.mk	2020-07-30 15:59:15.000000000 -0400
++++ libvpx-1.9.0/vpx_ports/vpx_ports.mk	2020-08-31 22:29:18.638262049 -0400
+@@ -37,6 +37,7 @@
  endif
  
  PORTS_SRCS-$(VPX_ARCH_ARM) += arm_cpudetect.c
@@ -9,10 +9,10 @@ diff -Naur libvpx-1.8.2.orig/vpx_ports/vpx_ports.mk libvpx-1.8.2/vpx_ports/vpx_p
  PORTS_SRCS-$(VPX_ARCH_ARM) += arm.h
  
  PORTS_SRCS-$(VPX_ARCH_PPC) += ppc_cpudetect.c
-diff -Naur libvpx-1.8.2.orig/vpx_ports/x86_abi_support.asm libvpx-1.8.2/vpx_ports/x86_abi_support.asm
---- libvpx-1.8.2.orig/vpx_ports/x86_abi_support.asm	2019-12-10 00:09:20.000000000 +0100
-+++ libvpx-1.8.2/vpx_ports/x86_abi_support.asm	2020-01-22 14:07:11.774877937 +0100
-@@ -393,6 +393,7 @@
+diff -ruw libvpx-1.9.0.orig/vpx_ports/x86_abi_support.asm libvpx-1.9.0/vpx_ports/x86_abi_support.asm
+--- libvpx-1.9.0.orig/vpx_ports/x86_abi_support.asm	2020-07-30 15:59:15.000000000 -0400
++++ libvpx-1.9.0/vpx_ports/x86_abi_support.asm	2020-08-31 22:29:16.846269764 -0400
+@@ -414,6 +414,7 @@
  
  ; On Android platforms use lrand48 when building postproc routines. Prior to L
  ; rand() was not available.
