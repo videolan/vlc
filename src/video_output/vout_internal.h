@@ -101,6 +101,10 @@ void vout_StopDisplay(vout_thread_t *);
  */
 int vout_ChangeSource( vout_thread_t *p_vout, const video_format_t *fmt );
 
+enum vout_crop_mode {
+    VOUT_CROP_NONE, VOUT_CROP_RATIO, VOUT_CROP_WINDOW, VOUT_CROP_BORDER,
+};
+
 /* TODO to move them to vlc_vout.h */
 void vout_ChangeFullscreen(vout_thread_t *, const char *id);
 void vout_ChangeWindowed(vout_thread_t *);

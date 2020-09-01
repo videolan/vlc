@@ -30,10 +30,6 @@
 
 typedef struct vout_thread_private_t vout_thread_private_t;
 
-enum vout_crop_mode {
-    VOUT_CROP_NONE, VOUT_CROP_RATIO, VOUT_CROP_WINDOW, VOUT_CROP_BORDER,
-};
-
 /* */
 struct vout_thread_private_t
 {
