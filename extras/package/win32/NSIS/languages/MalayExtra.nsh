@@ -1,7 +1,7 @@
 !insertmacro LANGFILE_EXT Malay
 ${LangFileString} Name_Section01 "Pemain Media (diperlukan)"
 ${LangFileString} Name_Section02a "Pintasan Menu Start"
-${LangFileString} Name_Section02b "Pintasan Desktop"
+${LangFileString} Name_Section02b "Pintasan Atas Meja"
 ${LangFileString} Name_Section34 "Pemalam Sesawang"
 ${LangFileString} Name_Section03 "Pemalam Mozilla"
 ${LangFileString} Name_Section04 "Pemalam ActiveX"
@@ -18,7 +18,7 @@ ${LangFileString} Desc_Section01 \
 ${LangFileString} Desc_Section02a \
     "Tambah ikon pada menu mula untuk capaian mudah"
 ${LangFileString} Desc_Section02b \
-    "Tambah ikon pada desktop untuk capaian mudah"
+    "Tambah ikon pada atas meja untuk capaian mudah"
 ${LangFileString} Desc_Section03 \
     "Pemalam VLC Mozilla dan Mozilla Firefox"
 ${LangFileString} Desc_Section04 \
