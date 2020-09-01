@@ -287,7 +287,7 @@ static void vout_SizeWindow(vout_thread_sys_t *vout,
     unsigned w = original->i_visible_width;
     unsigned h = original->i_visible_height;
     unsigned sar_num = original->i_sar_num;
-    unsigned sar_den = original->i_sar_num;
+    unsigned sar_den = original->i_sar_den;
 
     switch (sys->source.crop.mode) {
         case VOUT_CROP_NONE:
