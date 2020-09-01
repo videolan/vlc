@@ -162,14 +162,14 @@ Widgets.NavigableFocusScope {
                     anchors.fill: parent
 
                     Widgets.ListLabel {
-                        text: rowModel.track_number
+                        text: rowModel ? rowModel.track_number : ""
 
                         Layout.fillHeight: true
                         Layout.preferredWidth: VLCStyle.margin_large
                     }
 
                     Widgets.ListLabel {
-                        text: rowModel.title
+                        text: rowModel ? rowModel.title : ""
 
                         Layout.fillHeight: true
                         Layout.fillWidth: true

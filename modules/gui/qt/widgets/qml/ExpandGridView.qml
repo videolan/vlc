@@ -309,6 +309,11 @@ NavigableFocusScope {
 
     onModelChanged: _onModelCountChanged()
 
+    Connections {
+        target: mainInterface
+        onIntfScaleFactorChanged: flickable.layout(true)
+    }
+
     //Gridview visible above the expanded item
     Flickable {
         id: flickable
