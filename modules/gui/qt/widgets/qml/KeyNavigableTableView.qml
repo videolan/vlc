@@ -58,7 +58,7 @@ NavigableFocusScope {
     property alias currentItem: view.currentItem
 
     property alias headerPositioning: view.headerPositioning
-    property Component header: undefined
+    property Component header: Item{}
     property var headerItem: view.headerItem.loadedHeader
     property alias tableHeaderItem: view.headerItem
     property color headerColor

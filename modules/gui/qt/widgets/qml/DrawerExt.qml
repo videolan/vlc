@@ -21,7 +21,7 @@ import QtQuick.Controls 2.4
 NavigableFocusScope {
     id: root
 
-    property Component component: undefined
+    property Component component: Item {}
 
     enum Edges {
         Top,
