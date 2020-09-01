@@ -19,7 +19,7 @@ Widgets.NavigableFocusScope {
 
     Component.onCompleted: {
         if (player.playingState !== PlayerController.PLAYING_STATE_STOPPED)
-            root.implicitHeight = VLCStyle.miniPlayerHeight
+            root.implicitHeight = Qt.binding(function() { return VLCStyle.miniPlayerHeight; })
     }
 
     Connections {
@@ -39,6 +39,9 @@ Widgets.NavigableFocusScope {
         duration: 200
         easing.type: Easing.InSine
         to: VLCStyle.miniPlayerHeight
+        onStopped: {
+            root.implicitHeight = Qt.binding(function() { return VLCStyle.miniPlayerHeight; })
+        }
     }
 
     PropertyAnimation {
@@ -48,6 +51,9 @@ Widgets.NavigableFocusScope {
         duration: 200
         easing.type: Easing.OutSine
         to: 0
+        onStopped: {
+            root.implicitHeight = 0
+        }
     }
 
     // this MouseArea prevents mouse events to be sent below miniplayer
