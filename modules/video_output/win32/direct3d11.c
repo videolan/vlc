@@ -278,10 +278,10 @@ static void UpdateSize(vout_display_t *vd)
     D3D11_UpdateViewport( &sys->picQuad, &rect_dst, sys->display.pixelFormat );
 
     RECT source_rect = {
-        .left   = vd->fmt.i_x_offset,
-        .right  = vd->fmt.i_x_offset + vd->fmt.i_visible_width,
-        .top    = vd->fmt.i_y_offset,
-        .bottom = vd->fmt.i_y_offset + vd->fmt.i_visible_height,
+        .left   = vd->source.i_x_offset,
+        .right  = vd->source.i_x_offset + vd->source.i_visible_width,
+        .top    = vd->source.i_y_offset,
+        .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
     };
     d3d11_device_lock( sys->d3d_dev );
 
@@ -1076,10 +1076,10 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     }
 
     RECT source_rect = {
-        .left   = vd->fmt.i_x_offset,
-        .right  = vd->fmt.i_x_offset + vd->fmt.i_visible_width,
-        .top    = vd->fmt.i_y_offset,
-        .bottom = vd->fmt.i_y_offset + vd->fmt.i_visible_height,
+        .left   = fmt->i_x_offset,
+        .right  = fmt->i_x_offset + fmt->i_visible_width,
+        .top    = fmt->i_y_offset,
+        .bottom = fmt->i_y_offset + fmt->i_visible_height,
     };
     if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect, vd->source.orientation))
     {
