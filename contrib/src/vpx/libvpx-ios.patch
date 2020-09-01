@@ -1,6 +1,6 @@
-diff -ru libvpx-1.9.0/build/make/configure.sh libvpx-1.9.0/build/make/configure.sh
---- libvpx-1.9.0/build/make/configure.sh	2020-07-30 21:59:15.000000000 +0200
-+++ libvpx-1.9.0/build/make/configure.sh	2020-11-29 18:05:12.000000000 +0100
+diff -ruw libvpx-1.9.0.orig/build/make/configure.sh libvpx-1.9.0/build/make/configure.sh
+--- libvpx-1.9.0.orig/build/make/configure.sh	2020-07-30 15:59:15.000000000 -0400
++++ libvpx-1.9.0/build/make/configure.sh	2020-09-01 09:32:08.722717206 -0400
 @@ -832,96 +832,6 @@
    # PIC is probably what we want when building shared libs
    enabled shared && soft_enable pic
