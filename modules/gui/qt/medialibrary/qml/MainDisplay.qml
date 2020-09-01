@@ -328,9 +328,12 @@ Widgets.NavigableFocusScope {
                                         atRight: false
                                         targetWidth: playlistColumn.width
                                         sourceWidth: root.width
-                                        widthFactor: mainInterface.playlistWidthFactor
 
                                         onWidthFactorChanged: mainInterface.setPlaylistWidthFactor(widthFactor)
+                                        Component.onCompleted:  {
+                                            //don't bind just provide the initial value, HorizontalResizeHandle.widthFactor updates itself
+                                            widthFactor = mainInterface.playlistWidthFactor
+                                        }
                                     }
                                 }
                             }
