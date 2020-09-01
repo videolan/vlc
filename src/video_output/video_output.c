@@ -629,6 +629,13 @@ void vout_ChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
     vlc_mutex_unlock(&sys->display_lock);
 }
 
+static void vout_SetAspectRatio(vout_thread_sys_t *sys,
+                                     unsigned dar_num, unsigned dar_den)
+{
+    sys->source.dar.num = dar_num;
+    sys->source.dar.den = dar_den;
+}
+
 void vout_ChangeDisplayAspectRatio(vout_thread_t *vout,
                                    unsigned dar_num, unsigned dar_den)
 {
@@ -636,8 +643,7 @@ void vout_ChangeDisplayAspectRatio(vout_thread_t *vout,
     assert(!sys->dummy);
 
     vlc_mutex_lock(&sys->window_lock);
-    sys->source.dar.num = dar_num;
-    sys->source.dar.den = dar_den;
+    vout_SetAspectRatio(sys, dar_num, dar_den);
 
     vout_UpdateWindowSizeLocked(sys);
 
@@ -649,18 +655,23 @@ void vout_ChangeDisplayAspectRatio(vout_thread_t *vout,
     vlc_mutex_unlock(&sys->display_lock);
 }
 
-void vout_ChangeCropRatio(vout_thread_t *vout, unsigned num, unsigned den)
+static void vout_SetCropRatio(vout_thread_sys_t *sys, unsigned num, unsigned den)
 {
-    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
-    assert(!sys->dummy);
-
-    vlc_mutex_lock(&sys->window_lock);
     if (num != 0 && den != 0) {
         sys->source.crop.mode = VOUT_CROP_RATIO;
         sys->source.crop.ratio.num = num;
         sys->source.crop.ratio.den = den;
     } else
         sys->source.crop.mode = VOUT_CROP_NONE;
+}
+
+void vout_ChangeCropRatio(vout_thread_t *vout, unsigned num, unsigned den)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+
+    vlc_mutex_lock(&sys->window_lock);
+    vout_SetCropRatio(sys, num, den);
 
     vout_UpdateWindowSizeLocked(sys);
 
@@ -672,12 +683,9 @@ void vout_ChangeCropRatio(vout_thread_t *vout, unsigned num, unsigned den)
     vlc_mutex_unlock(&sys->display_lock);
 }
 
-void vout_ChangeCropWindow(vout_thread_t *vout,
-                           int x, int y, int width, int height)
+static void vout_SetCropWindow(vout_thread_sys_t *sys,
+                             int x, int y, int width, int height)
 {
-    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
-    assert(!sys->dummy);
-
     if (x < 0)
         x = 0;
     if (y < 0)
@@ -687,12 +695,21 @@ void vout_ChangeCropWindow(vout_thread_t *vout,
     if (height < 0)
         height = 0;
 
-    vlc_mutex_lock(&sys->window_lock);
     sys->source.crop.mode = VOUT_CROP_WINDOW;
     sys->source.crop.window.x = x;
     sys->source.crop.window.y = y;
     sys->source.crop.window.width = width;
     sys->source.crop.window.height = height;
+}
+
+void vout_ChangeCropWindow(vout_thread_t *vout,
+                           int x, int y, int width, int height)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+
+    vlc_mutex_lock(&sys->window_lock);
+    vout_SetCropWindow(sys, x, y, width, height);
 
     vout_UpdateWindowSizeLocked(sys);
 
@@ -704,12 +721,9 @@ void vout_ChangeCropWindow(vout_thread_t *vout,
     vlc_mutex_unlock(&sys->display_lock);
 }
 
-void vout_ChangeCropBorder(vout_thread_t *vout,
-                           int left, int top, int right, int bottom)
+static void vout_SetCropBorder(vout_thread_sys_t *sys,
+                             int left, int top, int right, int bottom)
 {
-    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
-    assert(!sys->dummy);
-
     if (left < 0)
         left = 0;
     if (top < 0)
@@ -719,12 +733,21 @@ void vout_ChangeCropBorder(vout_thread_t *vout,
     if (bottom < 0)
         bottom = 0;
 
-    vlc_mutex_lock(&sys->window_lock);
     sys->source.crop.mode = VOUT_CROP_BORDER;
     sys->source.crop.border.left = left;
     sys->source.crop.border.right = right;
     sys->source.crop.border.top = top;
     sys->source.crop.border.bottom = bottom;
+}
+
+void vout_ChangeCropBorder(vout_thread_t *vout,
+                           int left, int top, int right, int bottom)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+
+    vlc_mutex_lock(&sys->window_lock);
+    vout_SetCropBorder(sys, left, top, right, bottom);
 
     vout_UpdateWindowSizeLocked(sys);
 
