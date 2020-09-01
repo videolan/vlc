@@ -179,9 +179,10 @@ typedef struct
 {
     FLOAT       x,y,z;      // vertex untransformed position
     FLOAT       rhw;        // eye distance
+    D3DCOLOR    diffuse;    // diffuse color
     FLOAT       tu, tv;     // texture relative coordinates
 } CUSTOMVERTEX;
-#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW|D3DFVF_TEX1)
+#define D3DFVF_CUSTOMVERTEX (D3DFVF_XYZRHW|D3DFVF_DIFFUSE|D3DFVF_TEX1)
 
 typedef struct d3d_region_t {
     D3DFORMAT          format; // for subpictures
@@ -323,6 +324,7 @@ static void  Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
 
         vertices[i].z       = 0.0f;
         vertices[i].rhw     = 1.0f;
+        vertices[i].diffuse = D3DCOLOR_ARGB(alpha, 255, 255, 255);
     }
 }
 
