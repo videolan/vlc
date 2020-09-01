@@ -43,6 +43,7 @@ extern "C" char **environ;
 #include <QDate>
 #include <QMutex>
 #include <QtQuickControls2/QQuickStyle>
+#include <QLoggingCategory>
 
 #include "qt.hpp"
 
@@ -592,6 +593,12 @@ static void *Thread( void *obj )
 
     /* Start the QApplication here */
     QVLCApp app( argc, argv );
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,1)
+    //suppress deprecation warnings about QML 'Connections' syntax
+    //legacy connection syntax is required to keep compatibility with Qt <= 5.14
+    QLoggingCategory::setFilterRules("qt.qml.connections.warning=false");
+#endif
 
     //app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
