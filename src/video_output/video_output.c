@@ -2196,6 +2196,37 @@ static int EnableWindowLocked(vout_thread_sys_t *vout, const video_format_t *ori
     return 0;
 }
 
+static void vout_InitSource(vout_thread_sys_t *vout)
+{
+    char *psz_crop = var_InheritString(&vout->obj, "crop");
+    if (psz_crop) {
+        unsigned num, den;
+        unsigned y, x;
+        unsigned width, height;
+        enum vout_crop_mode mode;
+
+        if (GetCropMode(psz_crop, &mode, &num, &den,
+                        &x, &y, &width, &height))
+        {
+            switch (mode)
+            {
+            case VOUT_CROP_RATIO:
+                vout_SetCropRatio(vout, num, den);
+                break;
+            case VOUT_CROP_WINDOW:
+                vout_SetCropWindow(vout, x, y, width, height);
+                break;
+            case VOUT_CROP_BORDER:
+                vout_SetCropBorder(vout, x, y, width, height);
+                break;
+            case VOUT_CROP_NONE:
+                break;
+            }
+        }
+        free(psz_crop);
+    }
+}
+
 int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input_thread_t *input)
 {
     vout_thread_sys_t *vout = VOUT_THREAD_TO_SYS(cfg->vout);
@@ -2218,6 +2249,8 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     }
 
     vlc_mutex_lock(&sys->window_lock);
+    vout_InitSource(vout);
+
     if (EnableWindowLocked(vout, &original) != 0)
     {
         /* the window was not enabled, nor the display started */

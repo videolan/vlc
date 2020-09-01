@@ -450,7 +450,7 @@ exit:
     free( psz_path );
 }
 
-static bool GetCropMode(const char *crop_str, enum vout_crop_mode *mode,
+bool GetCropMode(const char *crop_str, enum vout_crop_mode *mode,
                         unsigned *num, unsigned *den,
                         unsigned *x, unsigned *y,
                         unsigned *width, unsigned *height )
