@@ -424,10 +424,10 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
         .bottom = sys->area.place.y + sys->area.place.height,
     };
     RECT texture_visible_rect = {
-        .left   = 0,
-        .right  = vd->source.i_visible_width,
-        .top    = 0,
-        .bottom = vd->source.i_visible_height,
+        .left   = vd->source.i_x_offset,
+        .right  = vd->source.i_x_offset + vd->source.i_visible_width,
+        .top    = vd->source.i_y_offset,
+        .bottom = vd->source.i_y_offset + vd->source.i_visible_height,
     };
     Direct3D9SetupVertices(region->vertex, &texture_rect, &texture_visible_rect,
                            &rect_in_display, 255, vd->source.orientation);
@@ -527,9 +527,9 @@ static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt,
     }
 
     cfg.full_range = fmt->color_range == COLOR_RANGE_FULL;
-    cfg.primaries  = fmt->primaries;
-    cfg.colorspace = fmt->space;
-    cfg.transfer   = fmt->transfer;
+    cfg.primaries  = (libvlc_video_color_primaries_t) fmt->primaries;
+    cfg.colorspace = (libvlc_video_color_space_t) fmt->space;
+    cfg.transfer   = (libvlc_video_transfer_func_t) fmt->transfer;
 
     cfg.device = sys->d3d9_device->d3ddev.dev;
 
