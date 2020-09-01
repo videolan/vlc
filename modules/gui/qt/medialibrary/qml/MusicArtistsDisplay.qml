@@ -102,8 +102,10 @@ Widgets.NavigableFocusScope {
                 if (initialIndex >= artistModel.count)
                     initialIndex = 0
                 selectionModel.select(artistModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-                view.currentItem.currentIndex = initialIndex
-                view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+                if (view.currentItem) {
+                    view.currentItem.currentIndex = initialIndex
+                    view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+                }
             }
 
             MLArtistModel {

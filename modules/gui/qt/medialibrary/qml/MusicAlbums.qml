@@ -68,7 +68,8 @@ Widgets.NavigableFocusScope {
         if (initialIndex >= albumModelId.count)
             initialIndex = 0
         selectionModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+        if (view.currentItem)
+            view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
 
     function _actionAtIndex(index) {

@@ -58,7 +58,8 @@ Widgets.NavigableFocusScope {
         if (initialIndex >= videoModel.count)
             initialIndex = 0
         selectionModel.select(videoModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+        if (view.currentItem)
+            view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
     }
 
     function _actionAtIndex(index) {

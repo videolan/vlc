@@ -54,8 +54,10 @@ Widgets.NavigableFocusScope {
         if (initialIndex >= providerModel.count)
             initialIndex = 0
         selectionModel.select(providerModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        view.currentItem.currentIndex = initialIndex
-        view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+        if (view.currentItem) {
+            view.currentItem.currentIndex = initialIndex
+            view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
+        }
     }
 
 

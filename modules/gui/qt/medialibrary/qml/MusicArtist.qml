@@ -181,8 +181,10 @@ Widgets.NavigableFocusScope {
             initialIndex = 0
         albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
         var albumsListView = medialib.gridView ? view.currentItem : headerItem.albumsListView
-        albumsListView.currentIndex = initialIndex
-        albumsListView.positionViewAtIndex(initialIndex, ItemView.Contain)
+        if (albumsListView) {
+            albumsListView.currentIndex = initialIndex
+            albumsListView.positionViewAtIndex(initialIndex, ItemView.Contain)
+        }
     }
 
     function _actionAtIndex(index, model, selectionModel) {
