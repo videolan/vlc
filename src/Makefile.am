@@ -49,6 +49,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_es.h \
 	../include/vlc_es_out.h \
 	../include/vlc_events.h \
+	../include/vlc_executor.h \
 	../include/vlc_filter.h \
 	../include/vlc_fingerprinter.h \
 	../include/vlc_fourcc.h \
@@ -353,6 +354,7 @@ libvlccore_la_SOURCES = \
 	misc/actions.c \
 	misc/background_worker.c \
 	misc/background_worker.h \
+	misc/executor.c \
 	misc/md5.c \
 	misc/probe.c \
 	misc/rand.c \

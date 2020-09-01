@@ -976,3 +976,8 @@ vlc_video_context_GetType
 vlc_video_context_GetPrivate
 vlc_video_context_Hold
 vlc_video_context_HoldDevice
+vlc_executor_New
+vlc_executor_Delete
+vlc_executor_Submit
+vlc_executor_Cancel
+vlc_executor_WaitIdle
