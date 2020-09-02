@@ -102,7 +102,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 #ifndef USE_OPENGL_ES2
     if (surface->type == VOUT_WINDOW_TYPE_XID)
     {
-        switch (fmt->i_chroma)
+        switch (vd->source->i_chroma)
         {
             case VLC_CODEC_VDPAU_VIDEO_444:
             case VLC_CODEC_VDPAU_VIDEO_422:
