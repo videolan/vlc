@@ -143,7 +143,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* */
     video_format_t fmt;
-    video_format_ApplyRotation(&fmt, fmtp);
+    video_format_ApplyRotation(&fmt, vd->source);
     fmt.i_chroma = chroma;
     video_format_FixRgb(&fmt);
 

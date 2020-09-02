@@ -133,7 +133,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* Define the video format */
     video_format_t fmt;
-    video_format_ApplyRotation(&fmt, fmtp);
+    video_format_ApplyRotation(&fmt, vd->source);
 
     if (setup != NULL) {
         char chroma[5];

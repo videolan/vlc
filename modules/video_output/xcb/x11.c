@@ -219,6 +219,7 @@ static xcb_visualid_t DepthToFormat(const xcb_setup_t *setup,
 static xcb_visualid_t ScreenToFormat(const xcb_setup_t *setup,
                                      const xcb_screen_t *screen,
                                      uint8_t *restrict bits,
+                                     const video_format_t *source,
                                      video_format_t *restrict fmtp)
 {
     xcb_visualid_t visual = 0;
@@ -236,7 +237,7 @@ static xcb_visualid_t ScreenToFormat(const xcb_setup_t *setup,
         if (depth->depth <= *bits)
             continue; /* no better than earlier depth */
 
-        video_format_ApplyRotation(&fmt, fmtp);
+        video_format_ApplyRotation(&fmt, source);
         vid = DepthToFormat(setup, depth, &fmt);
         if (vid != 0)
         {
@@ -273,7 +274,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
     const xcb_setup_t *setup = xcb_get_setup (conn);
 
     /* Determine our pixel format */
-    xcb_visualid_t vid = ScreenToFormat(setup, scr, &sys->depth, fmtp);
+    xcb_visualid_t vid = ScreenToFormat(setup, scr, &sys->depth, vd->source, fmtp);
     if (vid == 0) {
         msg_Err(vd, "no supported visual & pixel format");
         goto error;

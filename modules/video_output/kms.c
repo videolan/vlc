@@ -725,7 +725,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_EGENERIC;
     }
 
-    video_format_ApplyRotation(&fmt, fmtp);
+    video_format_ApplyRotation(&fmt, vd->source);
 
     fmt.i_width = fmt.i_visible_width  = sys->width;
     fmt.i_height = fmt.i_visible_height = sys->height;

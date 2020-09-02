@@ -169,7 +169,7 @@ static void PMThread( void *arg )
 
     /* */
     video_format_t fmt;
-    video_format_ApplyRotation(&fmt, fmtp);
+    video_format_ApplyRotation(&fmt, vd->source);
 
     /* */
     MorphToPM();
