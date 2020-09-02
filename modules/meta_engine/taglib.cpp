@@ -852,6 +852,23 @@ static void ReadMetaFromMP4( MP4::Tag* tag, demux_meta_t *p_demux_meta, vlc_meta
     }
 }
 
+static bool isSchemeCompatible( const char *psz_uri )
+{
+    const char *p = strstr( psz_uri, "://" );
+    if( p == NULL )
+        return false;
+
+    size_t i_len = p - psz_uri;
+    const char * compatibleschemes[] =
+    {
+        "file", "smb",
+    };
+    for( size_t i=0; i<ARRAY_SIZE(compatibleschemes); i++ )
+        if( !strncasecmp( psz_uri, compatibleschemes[i], i_len ) )
+            return true;
+    return false;
+}
+
 /**
  * Get the tags from the file using TagLib
  * @param p_this: the demux object
@@ -869,6 +886,12 @@ static int ReadMeta( vlc_object_t* p_this)
     char *psz_uri = input_item_GetURI( p_demux_meta->p_item );
     if( unlikely(psz_uri == NULL) )
         return VLC_ENOMEM;
+
+    if( !isSchemeCompatible( psz_uri ) )
+    {
+        free( psz_uri );
+        return VLC_EGENERIC;
+    }
 
     if( !b_extensions_registered )
     {
