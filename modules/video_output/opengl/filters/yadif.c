@@ -849,13 +849,11 @@ static int OpenVideoFilter(vlc_object_t *obj, const char *name)
     if (!is_supported)
         return VLC_EGENERIC;
 
-    config_chain_t *prev_chain = filter->p_cfg;
     var_Create(filter, "opengl-filter", VLC_VAR_STRING);
     var_SetString(filter, "opengl-filter", name);
 
     filter->p_cfg = NULL;
     module_t *module = module_need(obj, "video filter", "opengl", true);
-    filter->p_cfg = prev_chain;
 
     var_Destroy(filter, "opengl-filter");
 
