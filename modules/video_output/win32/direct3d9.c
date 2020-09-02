@@ -1174,9 +1174,13 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     HRESULT hr = IDirect3DDevice9_TestCooperativeLevel(p_d3d9_dev->dev);
     if (FAILED(hr)) {
         if (hr == D3DERR_DEVICENOTRESET && !sys->reset_device) {
-            if (!is_d3d9_opaque(picture->format.i_chroma))
-                vout_display_SendEventPicturesInvalid(vd);
             sys->reset_device = true;
+            /* FIXME what to do here in case of failure */
+            if (Direct3D9Reset(vd, &vd->fmt)) {
+                msg_Err(vd, "Failed to reset device");
+                return;
+            }
+            sys->reset_device = false;
             sys->lost_not_ready = false;
         }
         if (hr == D3DERR_DEVICELOST && !sys->lost_not_ready) {
@@ -1688,25 +1692,7 @@ static void Direct3D9Close(vout_display_t *vd)
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
-
-    switch (query) {
-    case VOUT_DISPLAY_RESET_PICTURES:
-    {
-        /* FIXME what to do here in case of failure */
-        if (sys->reset_device) {
-            va_arg(args, const vout_display_cfg_t *);
-            const video_format_t *fmt = va_arg(args, video_format_t *);
-            if (Direct3D9Reset(vd, fmt)) {
-                msg_Err(vd, "Failed to reset device");
-                return VLC_EGENERIC;
-            }
-            sys->reset_device = false;
-        }
-        return VLC_SUCCESS;
-    }
-    default:
-        return CommonControl(vd, &sys->area, &sys->sys, query, args);
-    }
+    return CommonControl(vd, &sys->area, &sys->sys, query, args);
 }
 
 typedef struct
