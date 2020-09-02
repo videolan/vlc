@@ -175,20 +175,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
     vout_display_sys_t *sys = vd->sys;
 
     /* */
-    video_format_t fmt = *vd->fmt;
-
-    if (ORIENT_IS_SWAP(vd->source->orientation))
-    {
-        fmt.i_sar_num = vd->source->i_sar_den;
-        fmt.i_sar_den = vd->source->i_sar_num;
-    }
-    else
-    {
-        fmt.i_sar_num = vd->source->i_sar_num;
-        fmt.i_sar_den = vd->source->i_sar_den;
-    }
-
-    /* */
     char type;
     if (picture->b_progressive)
         type = 'p';
@@ -207,6 +193,19 @@ static void Display(vout_display_t *vd, picture_t *picture)
     if (!sys->is_first) {
         const char *header;
         char buffer[5];
+        video_format_t fmt = *vd->fmt;
+
+        if (ORIENT_IS_SWAP(vd->source->orientation))
+        {
+            fmt.i_sar_num = vd->source->i_sar_den;
+            fmt.i_sar_den = vd->source->i_sar_num;
+        }
+        else
+        {
+            fmt.i_sar_num = vd->source->i_sar_num;
+            fmt.i_sar_den = vd->source->i_sar_den;
+        }
+
         if (sys->is_yuv4mpeg2) {
             /* MPlayer compatible header, unfortunately it doesn't tell you
              * the exact fourcc used. */
