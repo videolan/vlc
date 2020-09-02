@@ -305,9 +305,6 @@ typedef struct {
      /* filters to convert the vout source to fmt, NULL means no conversion
       * can be done and nothing will be displayed */
     filter_chain_t *converters;
-#ifdef _WIN32
-    bool reset_pictures; // set/read under the same lock as the control
-#endif
     picture_pool_t *pool;
 } vout_display_priv_t;
 
@@ -385,19 +382,6 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     return ret;
 }
 
-void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
-{
-#ifdef _WIN32
-    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-
-    msg_Err(vd, "picture buffers invalidated asynchronously");
-    osys->reset_pictures = true;
-#else
-    (void) vd;
-    vlc_assert_unreachable();
-#endif
-}
-
 static void VoutDisplayCropRatio(int *left, int *top, int *right, int *bottom,
                                  const video_format_t *source,
                                  unsigned num, unsigned den)
@@ -472,10 +456,6 @@ static void vout_display_Reset(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-#ifdef _WIN32
-    osys->reset_pictures = false;
-#endif
-
     if (osys->converters != NULL) {
         filter_chain_Delete(osys->converters);
         osys->converters = NULL;
@@ -490,18 +470,6 @@ static void vout_display_Reset(vout_display_t *vd)
                              &vd->fmt)
      || VoutDisplayCreateRender(vd))
         msg_Err(vd, "Failed to adjust render format");
-}
-
-static bool vout_display_CheckReset(vout_display_t *vd)
-{
-#ifdef _WIN32
-    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-
-    return osys->reset_pictures;
-#else
-    VLC_UNUSED(vd);
-#endif
-    return false;
 }
 
 static int vout_UpdateSourceCrop(vout_display_t *vd)
@@ -627,7 +595,7 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
         err2 = vout_UpdateSourceCrop(vd);
     }
 
-    if (err1 || err2 || vout_display_CheckReset(vd))
+    if (err1 || err2)
         vout_display_Reset(vd);
 }
 
@@ -637,8 +605,7 @@ void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
 
     osys->cfg.display.width  = width;
     osys->cfg.display.height = height;
-    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &osys->cfg)
-        || vout_display_CheckReset(vd))
+    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &osys->cfg))
         vout_display_Reset(vd);
 }
 
@@ -651,7 +618,7 @@ void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
 
     osys->cfg.is_display_filled = is_filled;
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
-                             &osys->cfg) || vout_display_CheckReset(vd))
+                             &osys->cfg))
         vout_display_Reset(vd);
 }
 
@@ -665,8 +632,7 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 
     osys->cfg.zoom.num = num;
     osys->cfg.zoom.den = den;
-    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &osys->cfg) ||
-        vout_display_CheckReset(vd))
+    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &osys->cfg))
         vout_display_Reset(vd);
 }
 
@@ -684,8 +650,7 @@ void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_de
         sar_den = 0;
     }
 
-    if (vout_SetSourceAspect(vd, sar_num, sar_den) ||
-        vout_display_CheckReset(vd))
+    if (vout_SetSourceAspect(vd, sar_num, sar_den))
         vout_display_Reset(vd);
 }
 
@@ -707,7 +672,7 @@ void vout_SetDisplayCrop(vout_display_t *vd,
         osys->crop.num    = crop_num;
         osys->crop.den    = crop_den;
 
-        if (vout_UpdateSourceCrop(vd)|| vout_display_CheckReset(vd))
+        if (vout_UpdateSourceCrop(vd))
             vout_display_Reset(vd);
     }
 }
@@ -756,9 +721,6 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     osys->cfg.display.height = display_height;
     osys->cfg.window_props.width = osys->cfg.window_props.height = 0;
 
-#ifdef _WIN32
-    osys->reset_pictures = false;
-#endif
     osys->pool = NULL;
 
     osys->source = *source;
