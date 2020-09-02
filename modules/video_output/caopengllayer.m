@@ -107,6 +107,17 @@ struct gl_sys
     VLCCAOpenGLLayer *cgLayer;
 };
 
+static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
+{
+    vout_display_sys_t *sys = vd->sys;
+    if (OpenglLock(sys->gl))
+        return VLC_EGENERIC;
+
+    int ret = vout_display_opengl_SetViewpoint(sys->vgl, vp);
+    OpenglUnlock(sys->gl);
+    return ret;
+}
+
 /*****************************************************************************
  * Open: This function allocates and initializes the OpenGL vout method.
  *****************************************************************************/
@@ -201,6 +212,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         vd->prepare = PictureRender;
         vd->display = PictureDisplay;
         vd->control = Control;
+        vd->set_viewpoint = SetViewpoint;
         vd->close   = Close;
 
         if (OSX_SIERRA_AND_HIGHER) {
@@ -339,19 +351,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             sys->place = place;
 
             return VLC_SUCCESS;
-        }
-
-        case VOUT_DISPLAY_CHANGE_VIEWPOINT:
-        {
-            int ret;
-
-            if (OpenglLock(sys->gl))
-                return VLC_EGENERIC;
-
-            ret = vout_display_opengl_SetViewpoint(sys->vgl,
-                                                   va_arg(ap, const vlc_viewpoint_t*));
-            OpenglUnlock(sys->gl);
-            return ret;
         }
 
         case VOUT_DISPLAY_RESET_PICTURES:

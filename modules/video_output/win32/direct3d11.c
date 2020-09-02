@@ -291,6 +291,19 @@ static void UpdateSize(vout_display_t *vd)
 #endif
 }
 
+static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *viewpoint)
+{
+    vout_display_sys_t *sys = vd->sys;
+    if ( sys->picQuad.pVertexShaderConstants )
+    {
+        d3d11_device_lock( sys->d3d_dev );
+        D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, viewpoint,
+                                (float) vd->cfg->display.width / vd->cfg->display.height );
+        d3d11_device_unlock( sys->d3d_dev );
+    }
+    return VLC_SUCCESS;
+}
+
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
 {
@@ -380,6 +393,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
+    vd->set_viewpoint = SetViewpoint;
     vd->close = Close;
 
     msg_Dbg(vd, "Direct3D11 Open Succeeded");
@@ -402,21 +416,9 @@ static void Close(vout_display_t *vd)
 }
 static int Control(vout_display_t *vd, int query, va_list args)
 {
+    VLC_UNUSED(args);
     vout_display_sys_t *sys = vd->sys;
     int res = CommonControl( vd, &sys->area, &sys->sys, query );
-
-    if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
-    {
-        if ( sys->picQuad.pVertexShaderConstants )
-        {
-            const vlc_viewpoint_t *viewpoint = va_arg(args, const vlc_viewpoint_t*);
-            d3d11_device_lock( sys->d3d_dev );
-            D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, viewpoint,
-                                   (float) vd->cfg->display.width / vd->cfg->display.height );
-            d3d11_device_unlock( sys->d3d_dev );
-            res = VLC_SUCCESS;
-        }
-    }
 
     if ( sys->area.place_changed )
     {

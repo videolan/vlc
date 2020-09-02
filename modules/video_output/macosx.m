@@ -131,6 +131,12 @@ static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
     return dlsym(RTLD_DEFAULT, name);
 }
 
+static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
+{
+    vout_display_sys_t *sys = vd->sys;
+    return vout_display_opengl_SetViewpoint (sys->vgl, vp);
+}
+
 static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
                  video_format_t *fmt, vlc_video_context *context)
 {
@@ -244,6 +250,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         vd->prepare = PictureRender;
         vd->display = PictureDisplay;
         vd->control = Control;
+        vd->set_viewpoint = SetViewpoint;
         vd->close   = Close;
 
         /* */
@@ -386,10 +393,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
                 return VLC_SUCCESS;
             }
-
-            case VOUT_DISPLAY_CHANGE_VIEWPOINT:
-                return vout_display_opengl_SetViewpoint (sys->vgl,
-                                                         va_arg(ap, const vlc_viewpoint_t*));
 
             case VOUT_DISPLAY_RESET_PICTURES:
                 vlc_assert_unreachable ();

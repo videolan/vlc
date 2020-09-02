@@ -214,11 +214,6 @@ enum vout_display_query {
      *                      is necessary
      */
     VOUT_DISPLAY_CHANGE_SOURCE_CROP,
-
-    /**
-     * Notifies a change of VR/360° viewpoint.
-     */
-    VOUT_DISPLAY_CHANGE_VIEWPOINT,   /* const vlc_viewpoint_t * */
 };
 
 /**
@@ -358,6 +353,15 @@ struct vout_display_t {
      * See \ref vout_display_query for the list of request types.
      */
     int        (*control)(vout_display_t *, int query, va_list);
+
+    /**
+     * Notifies a change of VR/360° viewpoint.
+     *
+     * May be NULL.
+     *
+     * \param vp viewpoint to use on the next render
+     */
+    int (*set_viewpoint)(vout_display_t *, const vlc_viewpoint_t *vp);
 
     /**
      * Destroys the display.

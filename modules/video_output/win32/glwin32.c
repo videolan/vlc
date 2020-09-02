@@ -78,14 +78,16 @@ struct vout_display_sys_t
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
 static void           Display(vout_display_t *, picture_t *);
 
-static int Control(vout_display_t *vd, int query, va_list args)
+static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 {
     vout_display_sys_t *sys = vd->sys;
+    return vout_display_opengl_SetViewpoint(sys->vgl, vp);
+}
 
-    if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
-        return vout_display_opengl_SetViewpoint(sys->vgl,
-                                                va_arg(args, const vlc_viewpoint_t*));
-
+static int Control(vout_display_t *vd, int query, va_list args)
+{
+    VLC_UNUSED(args);
+    vout_display_sys_t *sys = vd->sys;
     return CommonControl(vd, &sys->area, &sys->sys, query);
 }
 
@@ -166,6 +168,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
+    vd->set_viewpoint = SetViewpoint;
     vd->close = Close;
 
     return VLC_SUCCESS;
