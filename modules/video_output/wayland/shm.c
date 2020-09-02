@@ -166,7 +166,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             video_format_t src;
             assert(sys->viewport == NULL);
 
-            vout_display_PlacePicture(&place, vd->source, cfg);
+            vout_display_PlacePicture(&place, vd->source, vd->cfg);
             video_format_ApplyRotation(&src, vd->source);
 
             fmt->i_width  = src.i_width * place.width

@@ -237,7 +237,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         vout_display_place_t place;
 
         msg_Dbg(vd, "resetting pictures");
-        vout_display_PlacePicture(&place, src, cfg);
+        vout_display_PlacePicture(&place, src, vd->cfg);
 
         fmt->i_width = src->i_width * place.width / src->i_visible_width;
         fmt->i_height = src->i_height * place.height / src->i_visible_height;
