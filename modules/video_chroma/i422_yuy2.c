@@ -103,7 +103,7 @@ static int Activate( vlc_object_t *p_this )
     if( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) & 1
      || (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height) & 1 )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     if( p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation )
