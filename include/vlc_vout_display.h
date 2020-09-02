@@ -157,7 +157,7 @@ enum vout_display_query {
      * \ref VOUT_DISPLAY_CHANGE_SOURCE_CROP
      * control query returns an error.
      */
-    VOUT_DISPLAY_RESET_PICTURES, /* const vout_display_cfg_t *, video_format_t * */
+    VOUT_DISPLAY_RESET_PICTURES, /* video_format_t * */
 
 #if defined(__OS2__)
     /* Ask the module to acknowledge/refuse the fullscreen state change after

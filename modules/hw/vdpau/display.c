@@ -231,7 +231,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     {
     case VOUT_DISPLAY_RESET_PICTURES:
     {
-        const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
         video_format_t *fmt = va_arg(ap, video_format_t *);
         const video_format_t *src= vd->source;
         vout_display_place_t place;

@@ -468,7 +468,7 @@ static void vout_display_Reset(vout_display_t *vd)
         osys->pool = NULL;
     }
 
-    if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES, &osys->cfg,
+    if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES,
                              &osys->display_fmt)
      || VoutDisplayCreateRender(vd))
         msg_Err(vd, "Failed to adjust render format");
