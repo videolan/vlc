@@ -174,7 +174,7 @@ enum vout_display_query {
      * \retval VLC_EGENERIC if a \ref VOUT_DISPLAY_RESET_PICTURES request
      *                      is necessary
      */
-    VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,   /* const vout_display_cfg_t *p_cfg */
+    VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
 
     /**
      * Notifies a change of the display fill display flag by the user.
@@ -183,7 +183,7 @@ enum vout_display_query {
      * \retval VLC_EGENERIC if a \ref VOUT_DISPLAY_RESET_PICTURES request
      *                      is necessary
      */
-    VOUT_DISPLAY_CHANGE_DISPLAY_FILLED, /* const vout_display_cfg_t *p_cfg */
+    VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
 
     /**
      * Notifies a change of the user zoom factor.
@@ -192,7 +192,7 @@ enum vout_display_query {
      * \retval VLC_EGENERIC if a \ref VOUT_DISPLAY_RESET_PICTURES request
      *                      is necessary
      */
-    VOUT_DISPLAY_CHANGE_ZOOM, /* const vout_display_cfg_t *p_cfg */
+    VOUT_DISPLAY_CHANGE_ZOOM,
 
     /**
      * Notifies a change of the sample aspect ratio.
@@ -201,7 +201,7 @@ enum vout_display_query {
      * \retval VLC_EGENERIC if a \ref VOUT_DISPLAY_RESET_PICTURES request
      *                      is necessary
      */
-    VOUT_DISPLAY_CHANGE_SOURCE_ASPECT, /* const vout_display_cfg_t *p_cfg */
+    VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
 
     /**
      * Notifies a change of the source cropping.
@@ -213,7 +213,7 @@ enum vout_display_query {
      * \retval VLC_EGENERIC if a \ref VOUT_DISPLAY_RESET_PICTURES request
      *                      is necessary
      */
-    VOUT_DISPLAY_CHANGE_SOURCE_CROP, /* const vout_display_cfg_t *p_cfg */
+    VOUT_DISPLAY_CHANGE_SOURCE_CROP,
 
     /**
      * Notifies a change of VR/360° viewpoint.

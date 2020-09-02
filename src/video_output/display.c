@@ -516,8 +516,7 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
     video_format_Print(VLC_OBJECT(vd), "SOURCE ", &fmt);
     video_format_Print(VLC_OBJECT(vd), "CROPPED ", &osys->source);
 
-    int ret = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP,
-                                   &osys->cfg);
+    int ret = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
     osys->crop.left   = left - osys->source.i_x_offset;
     osys->crop.top    = top  - osys->source.i_y_offset;
     /* FIXME for right/bottom we should keep the 'type' border vs window */
@@ -544,8 +543,7 @@ static int vout_SetSourceAspect(vout_display_t *vd,
         osys->source.i_sar_den = osys->source.i_sar_den;
     }
 
-    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
-                             &osys->cfg))
+    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT))
         ret = -1;
 
     /* If a crop ratio is requested, recompute the parameters */
@@ -605,7 +603,7 @@ void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
 
     osys->cfg.display.width  = width;
     osys->cfg.display.height = height;
-    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &osys->cfg))
+    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE))
         vout_display_Reset(vd);
 }
 
@@ -617,8 +615,7 @@ void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
         return; /* nothing to do */
 
     osys->cfg.is_display_filled = is_filled;
-    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
-                             &osys->cfg))
+    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED))
         vout_display_Reset(vd);
 }
 
@@ -632,7 +629,7 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 
     osys->cfg.zoom.num = num;
     osys->cfg.zoom.den = den;
-    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &osys->cfg))
+    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM))
         vout_display_Reset(vd);
 }
 
