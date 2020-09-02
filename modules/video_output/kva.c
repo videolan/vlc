@@ -393,15 +393,14 @@ static void Display( vout_display_t *vd, picture_t *picture )
  *****************************************************************************/
 static int Control( vout_display_t *vd, int query, va_list args )
 {
+    VLC_UNUSED(args);
     vout_display_sys_t *sys = vd->sys;
 
     switch (query)
     {
     case VOUT_DISPLAY_CHANGE_FULLSCREEN:
     {
-        bool fs = va_arg(args, int);
-
-        WinPostMsg( sys->client, WM_VLC_FULLSCREEN_CHANGE, MPFROMLONG(fs), 0 );
+        WinPostMsg( sys->client, WM_VLC_FULLSCREEN_CHANGE, MPFROMLONG(true), 0 );
         return VLC_SUCCESS;
     }
 

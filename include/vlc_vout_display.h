@@ -162,7 +162,7 @@ enum vout_display_query {
 #if defined(__OS2__)
     /* Ask the module to acknowledge/refuse the fullscreen state change after
      * being requested (externally or by VOUT_DISPLAY_EVENT_FULLSCREEN */
-    VOUT_DISPLAY_CHANGE_FULLSCREEN VLC_DEPRECATED_ENUM,     /* bool fs */
+    VOUT_DISPLAY_CHANGE_FULLSCREEN VLC_DEPRECATED_ENUM,
     /* Ask the module to acknowledge/refuse the window management state change
      * after being requested externally or by VOUT_DISPLAY_WINDOW_STATE */
     VOUT_DISPLAY_CHANGE_WINDOW_STATE VLC_DEPRECATED_ENUM,
