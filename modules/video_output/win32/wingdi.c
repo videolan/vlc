@@ -99,14 +99,16 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
 static int Control(vout_display_t *vd, int query, va_list args)
 {
+    VLC_UNUSED(args);
     vout_display_sys_t *sys = vd->sys;
-    return CommonControl(vd, &sys->area, &sys->sys, query, args);
+    return CommonControl(vd, &sys->area, &sys->sys, query);
 }
 
 /* */
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
 {
+    VLC_UNUSED(context);
     vout_display_sys_t *sys;
 
     if ( !vd->obj.force && vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR)
@@ -116,7 +118,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    CommonInit(&sys->area, cfg);
+    CommonInit(&sys->area);
     if (CommonWindowInit(vd, &sys->area, &sys->sys, false))
         goto error;
 
@@ -160,9 +162,9 @@ static void Display(vout_display_t *vd, picture_t *picture)
         /* clear the background */
         RECT display = {
             .left   = 0,
-            .right  = sys->area.vdcfg.display.width,
+            .right  = vd->cfg->display.width,
             .top    = 0,
-            .bottom = sys->area.vdcfg.display.height,
+            .bottom = vd->cfg->display.height,
         };
         FillRect(hdc, &display, GetStockObject(BLACK_BRUSH));
         sys->area.place_changed = false;

@@ -81,7 +81,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
         return vout_display_opengl_SetViewpoint(sys->vgl,
                                                 va_arg(args, const vlc_viewpoint_t*));
 
-    return CommonControl(vd, &sys->area, &sys->sys, query, args);
+    return CommonControl(vd, &sys->area, &sys->sys, query);
 }
 
 static const struct vout_window_operations embedVideoWindow_Ops =
@@ -120,7 +120,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     /* */
-    CommonInit(&sys->area, cfg);
+    CommonInit(&sys->area);
     if (CommonWindowInit(vd, &sys->area, &sys->sys,
                    vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR))
         goto error;
@@ -208,7 +208,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         return;
     if (sys->area.place_changed)
     {
-        vout_display_cfg_t place_cfg = sys->area.vdcfg;
+        vout_display_cfg_t place_cfg = *vd->cfg;
         vout_display_place_t place;
 
         /* Reverse vertical alignment as the GL tex are Y inverted */

@@ -499,8 +499,8 @@ static int UpdateOutput(vout_display_t *vd, const video_format_t *fmt,
 {
     vout_display_sys_t *sys = vd->sys;
     libvlc_video_render_cfg_t cfg;
-    cfg.width  = sys->area.vdcfg.display.width;
-    cfg.height = sys->area.vdcfg.display.height;
+    cfg.width  = vd->cfg->display.width;
+    cfg.height = vd->cfg->display.height;
 
     switch (fmt->i_chroma)
     {
@@ -1268,9 +1268,9 @@ static void Swap(vout_display_t *vd)
     // No stretching should happen here !
     RECT src = {
         .left   = 0,
-        .right  = sys->area.vdcfg.display.width,
+        .right  = vd->cfg->display.width,
         .top    = 0,
-        .bottom = sys->area.vdcfg.display.height
+        .bottom = vd->cfg->display.height
     };
 
     HRESULT hr;
@@ -1691,8 +1691,9 @@ static void Direct3D9Close(vout_display_t *vd)
 
 static int Control(vout_display_t *vd, int query, va_list args)
 {
+    VLC_UNUSED(args);
     vout_display_sys_t *sys = vd->sys;
-    return CommonControl(vd, &sys->area, &sys->sys, query, args);
+    return CommonControl(vd, &sys->area, &sys->sys, query);
 }
 
 typedef struct
@@ -1790,7 +1791,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    CommonInit(&sys->area, cfg);
+    CommonInit(&sys->area);
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
@@ -1838,7 +1839,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     if (sys->swapCb == LocalSwapchainSwap)
-        CommonPlacePicture(vd, &sys->area, &sys->sys);
+        CommonPlacePicture(vd, &sys->area);
 
     sys->hxdll = Direct3D9LoadShaderLibrary();
     if (!sys->hxdll)

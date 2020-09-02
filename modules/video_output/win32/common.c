@@ -41,10 +41,9 @@
 #include "common.h"
 #include "../../video_chroma/copy.h"
 
-void CommonInit(display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
+void CommonInit(display_win32_area_t *area)
 {
     area->place_changed = false;
-    area->vdcfg = *vdcfg;
 }
 
 #if !VLC_WINSTORE_APP
@@ -52,7 +51,7 @@ void CommonInit(display_win32_area_t *area, const vout_display_cfg_t *vdcfg)
 int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
                      vout_display_sys_win32_t *sys, bool projection_gestures)
 {
-    if (unlikely(area->vdcfg.window == NULL))
+    if (unlikely(vd->cfg->window == NULL))
         return VLC_EGENERIC;
 
     /* */
@@ -63,15 +62,15 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
     sys->hparent   = NULL;
 
     /* */
-    sys->event = EventThreadCreate(VLC_OBJECT(vd), area->vdcfg.window);
+    sys->event = EventThreadCreate(VLC_OBJECT(vd), vd->cfg->window);
     if (!sys->event)
         return VLC_EGENERIC;
 
     /* */
     event_cfg_t cfg;
     memset(&cfg, 0, sizeof(cfg));
-    cfg.width  = area->vdcfg.display.width;
-    cfg.height = area->vdcfg.display.height;
+    cfg.width  = vd->cfg->display.width;
+    cfg.height = vd->cfg->display.height;
     cfg.is_projected = projection_gestures;
 
     event_hwnd_t hwnd;
@@ -81,7 +80,7 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
     sys->hparent       = hwnd.hparent;
     sys->hvideownd     = hwnd.hvideownd;
 
-    CommonPlacePicture(vd, area, sys);
+    CommonPlacePicture(vd, area);
 
     return VLC_SUCCESS;
 }
@@ -94,13 +93,11 @@ int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
 * its job is to update the source and destination RECTs used to display the
 * picture.
 *****************************************************************************/
-void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys)
+void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area)
 {
     /* Update the window position and size */
-    vout_display_cfg_t place_cfg = area->vdcfg;
-
     vout_display_place_t before_place = area->place;
-    vout_display_PlacePicture(&area->place, vd->source, &place_cfg);
+    vout_display_PlacePicture(&area->place, vd->source, vd->cfg);
 
     /* Signal the change in size/position */
     if (!vout_display_PlaceEquals(&before_place, &area->place))
@@ -129,34 +126,30 @@ void CommonWindowClean(vout_display_sys_win32_t *sys)
 }
 #endif /* !VLC_WINSTORE_APP */
 
-int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys, int query, va_list args)
+int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys, int query)
 {
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {
-        area->vdcfg = *vd->cfg;
-        CommonPlacePicture(vd, area, sys);
+        CommonPlacePicture(vd, area);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {   /* Update dimensions */
-        area->vdcfg = *vd->cfg;
 #if !VLC_WINSTORE_APP
         if (sys->event != NULL)
         {
             RECT clientRect;
             GetClientRect(sys->hparent, &clientRect);
-            area->vdcfg.display.width  = RECTWidth(clientRect);
-            area->vdcfg.display.height = RECTHeight(clientRect);
 
             SetWindowPos(sys->hvideownd, 0, 0, 0,
                          RECTWidth(clientRect),
                          RECTHeight(clientRect), SWP_NOZORDER|SWP_NOMOVE|SWP_NOACTIVATE);
         }
 #endif /* !VLC_WINSTORE_APP */
-        CommonPlacePicture(vd, area, sys);
+        CommonPlacePicture(vd, area);
         return VLC_SUCCESS;
     }
 

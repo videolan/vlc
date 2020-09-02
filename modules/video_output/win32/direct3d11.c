@@ -149,8 +149,8 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
     vout_display_sys_t *sys = vd->sys;
     libvlc_video_render_cfg_t cfg;
 
-    cfg.width  = sys->area.vdcfg.display.width;
-    cfg.height = sys->area.vdcfg.display.height;
+    cfg.width  = vd->cfg->display.width;
+    cfg.height = vd->cfg->display.height;
 
     switch (fmt->i_chroma)
     {
@@ -279,8 +279,8 @@ static void UpdateSize(vout_display_t *vd)
     D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
                              vd->source->orientation);
 
-    D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &sys->area.vdcfg.viewpoint,
-                          (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height );
+    D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &vd->cfg->viewpoint,
+                          (float) vd->cfg->display.width / vd->cfg->display.height );
 
     d3d11_device_unlock( sys->d3d_dev );
 
@@ -302,7 +302,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (ret != VLC_SUCCESS)
         goto error;
 
-    CommonInit(&sys->area, cfg);
+    CommonInit(&sys->area);
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
@@ -403,17 +403,16 @@ static void Close(vout_display_t *vd)
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
-    int res = CommonControl( vd, &sys->area, &sys->sys, query, args );
+    int res = CommonControl( vd, &sys->area, &sys->sys, query );
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
     {
         if ( sys->picQuad.pVertexShaderConstants )
         {
             const vlc_viewpoint_t *viewpoint = va_arg(args, const vlc_viewpoint_t*);
-            sys->area.vdcfg.viewpoint = *viewpoint;
             d3d11_device_lock( sys->d3d_dev );
             D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, viewpoint,
-                                   (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height );
+                                   (float) vd->cfg->display.width / vd->cfg->display.height );
             d3d11_device_unlock( sys->d3d_dev );
             res = VLC_SUCCESS;
         }
@@ -532,7 +531,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 sys->picQuad.i_height = texDesc.Height;
                 sys->picQuad.i_width = texDesc.Width;
 
-                CommonPlacePicture(vd, &sys->area, &sys->sys);
+                CommonPlacePicture(vd, &sys->area);
                 UpdateSize(vd);
             }
         }
@@ -606,7 +605,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         uint32_t i_height;
         if (LocalSwapchainWinstoreSize( sys->outside_opaque, &i_width, &i_height ))
         {
-            if (i_width != sys->area.vdcfg.display.width || i_height != sys->area.vdcfg.display.height)
+            if (i_width != vd->cfg->display.width || i_height != vd->cfg->display.height)
                 vout_display_SetSize(vd, i_width, i_height);
         }
     }
@@ -729,7 +728,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
-    CommonPlacePicture(vd, &sys->area, &sys->sys);
+    CommonPlacePicture(vd, &sys->area);
 
     err = UpdateDisplayFormat(vd, &fmt);
     if (err != VLC_SUCCESS) {
@@ -990,8 +989,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     if ( vd->source->projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
          vd->source->projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
-        D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &sys->area.vdcfg.viewpoint,
-                               (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height );
+        D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &vd->cfg->viewpoint,
+                               (float) vd->cfg->display.width / vd->cfg->display.height );
 
     if (is_d3d11_opaque(fmt->i_chroma)) {
         ID3D10Multithread *pMultithread;
@@ -1118,8 +1117,8 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
              sys->picQuad.cropViewport[0].Width, sys->picQuad.cropViewport[0].Height );
 #endif
 
-    D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &sys->area.vdcfg.viewpoint,
-                          (float) sys->area.vdcfg.display.width / sys->area.vdcfg.display.height );
+    D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &vd->cfg->viewpoint,
+                          (float) vd->cfg->display.width / vd->cfg->display.height );
 
     msg_Dbg(vd, "Direct3D11 resources created");
     return VLC_SUCCESS;
