@@ -407,13 +407,9 @@ static int Control( vout_display_t *vd, int query, va_list args )
 
     case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
     {
-        const unsigned state = va_arg( args, unsigned );
-        const bool is_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
+        WinSetWindowPos( sys->frame, HWND_TOP, 0, 0, 0, 0, SWP_ZORDER );
 
-        if( is_on_top )
-            WinSetWindowPos( sys->frame, HWND_TOP, 0, 0, 0, 0, SWP_ZORDER );
-
-        sys->is_on_top = is_on_top;
+        sys->is_on_top = true;
 
         return VLC_SUCCESS;
     }

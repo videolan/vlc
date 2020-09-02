@@ -756,8 +756,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
         osys->cfg.is_fullscreen = true;
 
     if (var_InheritBool(parent, "video-on-top"))
-        vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
-                             (unsigned)VOUT_WINDOW_STATE_ABOVE);
+        vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE);
 #endif
 
     if (VoutDisplayCreateRender(vd)) {
