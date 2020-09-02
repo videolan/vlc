@@ -592,7 +592,7 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     char *title = var_InheritString( vd, "video-title" );
     if (title != NULL
      || asprintf( &title, VOUT_TITLE " (%4.4s to %4.4s - %s mode KVA output)",
-                  (char *)&vd->fmt->i_chroma, (char *)&sys->kvas.fccSrcColor,
+                  (char *)&fmt->i_chroma, (char *)&sys->kvas.fccSrcColor,
                   psz_video_mode[sys->kvac.ulMode - 1] ) >= 0)
     {
         WinSetWindowText( sys->frame, title );
