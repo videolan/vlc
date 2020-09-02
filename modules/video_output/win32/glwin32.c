@@ -146,11 +146,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     vlc_gl_Resize (sys->gl, cfg->display.width, cfg->display.height);
 
-    video_format_t fmt = *fmtp;
     const vlc_fourcc_t *subpicture_chromas;
     if (vlc_gl_MakeCurrent (sys->gl))
         goto error;
-    sys->vgl = vout_display_opengl_New(&fmt, &subpicture_chromas, sys->gl,
+    sys->vgl = vout_display_opengl_New(fmtp, &subpicture_chromas, sys->gl,
                                        &cfg->viewpoint, context);
     vlc_gl_ReleaseCurrent (sys->gl);
     if (!sys->vgl)
@@ -158,8 +157,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* Setup vout_display now that everything is fine */
     vd->info.subpicture_chromas = subpicture_chromas;
-
-    *fmtp    = fmt;
 
     vd->prepare = Prepare;
     vd->display = Display;
