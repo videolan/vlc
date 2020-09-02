@@ -298,8 +298,6 @@ static int vout_display_start(void *func, bool forced, va_list ap)
 
     /* Picture buffer does not have the concept of aspect ratio */
     video_format_Copy(&osys->display_fmt, vd->source);
-    osys->display_fmt.i_sar_num = 0;
-    osys->display_fmt.i_sar_den = 0;
     vd->obj.force = forced; /* TODO: pass to activate() instead? */
 
     int ret = activate(vd, cfg, &osys->display_fmt, context);
