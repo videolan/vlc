@@ -480,17 +480,14 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->cursor_deadline = INVALID_DEADLINE;
 
     /* Fix format */
-    video_format_t fmt = *fmtp;
-    if (fmt.i_chroma != VLC_CODEC_RGB32) {
-        fmt.i_chroma = VLC_CODEC_RGB32;
-        fmt.i_rmask = 0x00ff0000;
-        fmt.i_gmask = 0x0000ff00;
-        fmt.i_bmask = 0x000000ff;
+    if (fmtp->i_chroma != VLC_CODEC_RGB32) {
+        fmtp->i_chroma = VLC_CODEC_RGB32;
+        fmtp->i_rmask = 0x00ff0000;
+        fmtp->i_gmask = 0x0000ff00;
+        fmtp->i_bmask = 0x000000ff;
     }
 
     /* Setup vout_display now that everything is fine */
-    *fmtp = fmt;
-
     vd->prepare = Prepare;
     vd->display = PictureDisplay;
     vd->control = Control;
