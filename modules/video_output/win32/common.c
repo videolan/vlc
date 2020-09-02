@@ -132,17 +132,17 @@ void CommonWindowClean(vout_display_sys_win32_t *sys)
 int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_sys_win32_t *sys, int query, va_list args)
 {
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED: /* const vout_display_cfg_t *p_cfg */
-    case VOUT_DISPLAY_CHANGE_ZOOM:           /* const vout_display_cfg_t *p_cfg */
+    case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+    case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {
-        area->vdcfg = *va_arg(args, const vout_display_cfg_t *);
+        area->vdcfg = *vd->cfg;
         CommonPlacePicture(vd, area, sys);
         return VLC_SUCCESS;
     }
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:   /* const vout_display_cfg_t *p_cfg */
+    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {   /* Update dimensions */
-        area->vdcfg = *va_arg(args, const vout_display_cfg_t *);
+        area->vdcfg = *vd->cfg;
 #if !VLC_WINSTORE_APP
         if (sys->event != NULL)
         {

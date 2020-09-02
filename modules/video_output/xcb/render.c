@@ -360,18 +360,15 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP: {
-            const vout_display_cfg_t *cfg = va_arg(ap,
-                                                   const vout_display_cfg_t *);
-
             /* Update the window size */
             uint32_t mask = XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
             const uint32_t values[] = {
-                cfg->display.width, cfg->display.height
+                vd->cfg->display.width, vd->cfg->display.height
             };
 
             xcb_configure_window(sys->conn, sys->drawable.dest, mask, values);
             DeleteBuffers(vd);
-            CreateBuffers(vd, cfg);
+            CreateBuffers(vd, vd->cfg);
             xcb_flush(sys->conn);
             return VLC_SUCCESS;
         }

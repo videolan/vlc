@@ -420,11 +420,9 @@ static int Control( vout_display_t *vd, int query, va_list args )
 
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {
-        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-
         WinPostMsg( sys->client, WM_VLC_SIZE_CHANGE,
-                    MPFROMLONG( cfg->display.width ),
-                    MPFROMLONG( cfg->display.height ));
+                    MPFROMLONG( vd->cfg->display.width ),
+                    MPFROMLONG( vd->cfg->display.height ));
         return VLC_SUCCESS;
     }
 

@@ -261,12 +261,9 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         {
-            const vout_display_cfg_t *cfg =
-                va_arg(ap, const vout_display_cfg_t *);
+            assert(vd->cfg);
 
-            assert(cfg);
-
-            [sys->glESView updateVoutCfg:cfg withVGL:glsys->vgl];
+            [sys->glESView updateVoutCfg:vd->cfg withVGL:glsys->vgl];
 
             return VLC_SUCCESS;
         }

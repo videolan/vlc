@@ -350,12 +350,9 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
             {
-                const vout_display_cfg_t *cfg =
-                    va_arg (ap, const vout_display_cfg_t *);
-
                 /* we always use our current frame here, because we have some size constraints
                  in the ui vout provider */
-                vout_display_cfg_t cfg_tmp = *cfg;
+                vout_display_cfg_t cfg_tmp = *vd->cfg;
 
                 /* Reverse vertical alignment as the GL tex are Y inverted */
                 if (cfg_tmp.align.vertical == VLC_VIDEO_ALIGN_TOP)
@@ -366,7 +363,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 vout_display_place_t place;
                 vout_display_PlacePicture(&place, vd->source, &cfg_tmp);
                 @synchronized (sys->glView) {
-                    sys->cfg = *cfg;
+                    sys->cfg = *vd->cfg;
                 }
 
                 if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)

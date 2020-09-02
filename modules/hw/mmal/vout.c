@@ -702,8 +702,7 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
     switch (query) {
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         {
-            const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-            if (configure_display(vd, cfg, NULL) >= 0)
+            if (configure_display(vd, vd->cfg, NULL) >= 0)
                 ret = VLC_SUCCESS;
             break;
         }

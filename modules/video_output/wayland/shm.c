@@ -187,9 +187,8 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
-            const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
-            sys->display_width = cfg->display.width;
-            sys->display_height = cfg->display.height;
+            sys->display_width = vd->cfg->display.width;
+            sys->display_height = vd->cfg->display.height;
 
             if (sys->viewport != NULL)
             {
@@ -197,7 +196,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                 vout_display_place_t place;
 
                 video_format_ApplyRotation(&fmt, vd->source);
-                vout_display_PlacePicture(&place, vd->source, cfg);
+                vout_display_PlacePicture(&place, vd->source, vd->cfg);
 
                 wp_viewport_set_source(sys->viewport,
                                 wl_fixed_from_int(fmt.i_x_offset),

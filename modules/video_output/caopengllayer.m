@@ -308,11 +308,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
-            const vout_display_cfg_t *cfg =
-                va_arg (ap, const vout_display_cfg_t *);
-
             /* we always use our current frame here */
-            vout_display_cfg_t cfg_tmp = *cfg;
+            vout_display_cfg_t cfg_tmp = *vd->cfg;
             [CATransaction lock];
             CGRect bounds = [sys->cgLayer visibleRect];
             [CATransaction unlock];

@@ -916,10 +916,8 @@ static int Control(vout_display_t *vd, int query, va_list args)
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {
-        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
-
-        sys->i_display_width = cfg->display.width;
-        sys->i_display_height = cfg->display.height;
+        sys->i_display_width = vd->cfg->display.width;
+        sys->i_display_height = vd->cfg->display.height;
         msg_Dbg(vd, "change display size: %dx%d", sys->i_display_width,
                                                   sys->i_display_height);
         FixSubtitleFormat(sys);

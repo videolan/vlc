@@ -347,8 +347,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_ZOOM: {
-        vout_display_cfg_t cfg = *va_arg (ap, const vout_display_cfg_t *);
-        vout_display_PlacePicture(&sys->place, vd->source, &cfg);
+        vout_display_PlacePicture(&sys->place, vd->source, vd->cfg);
         return VLC_SUCCESS;
     }
 
