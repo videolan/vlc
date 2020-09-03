@@ -183,7 +183,7 @@ var_Read_float(const char *psz)
     READ(group_name##_##var_name, group_name.var_name, getter)
 
 #define DECLARE_MODULE_OPTIONS(var_name, type, module_header_type, getter, default_value) \
-    module_header_type("mock-"#var_name, default_value, NULL, NULL, true) \
+    module_header_type("mock-"#var_name, default_value, #var_name, NULL, true) \
     change_volatile() \
     change_safe()
 #define DECLARE_MODULE_SUBOPTIONS(a,b,c,d,e,f) \

@@ -610,7 +610,7 @@ vlc_module_begin()
     set_callback_dec_device( D3D11OpenDecoderDeviceAny, 8 )
 #if VLC_WINSTORE_APP
     /* LEGACY, the d3dcontext and swapchain were given by the host app */
-    add_integer("winrt-d3dcontext",    0x0, NULL, NULL, true) /* ID3D11DeviceContext* */
+    add_integer("winrt-d3dcontext", 0x0, N_("Context"), NULL, true) /* ID3D11DeviceContext* */
 #endif /* VLC_WINSTORE_APP */
     add_shortcut ("d3d11")
 
