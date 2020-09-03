@@ -91,8 +91,6 @@ vlc_module_begin ()
             "When mapping more than one channel to a single output channel, "
             "normalize the output accordingly.", false )
 
-    set_callbacks( OpenFilter, CloseFilter )
-
 vlc_module_end ()
 
 /*****************************************************************************
