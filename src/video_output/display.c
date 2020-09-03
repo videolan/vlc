@@ -290,9 +290,10 @@ typedef struct {
 static int vout_display_start(void *func, bool forced, va_list ap)
 {
     vout_display_open_cb activate = func;
-    vout_display_t *vd = va_arg(ap, vout_display_t *);
-    const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
-    vlc_video_context *context = va_arg(ap, vlc_video_context *);
+    vout_display_priv_t *osys = va_arg(ap, vout_display_priv_t *);
+    const vout_display_cfg_t *cfg = &osys->cfg;
+    vout_display_t *vd = &osys->display;
+    vlc_video_context *context = osys->src_vctx;
 
     /* Picture buffer does not have the concept of aspect ratio */
     video_format_Copy(&vd->fmt, &vd->source);
@@ -747,8 +748,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
         vd->owner = *owner;
 
     if (vlc_module_load(vd, "vout display", module, module && *module != '\0',
-                        vout_display_start, vd, &osys->cfg,
-                        osys->src_vctx) == NULL)
+                        vout_display_start, osys) == NULL)
         goto error;
 
 #if defined(__OS2__)
