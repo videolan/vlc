@@ -497,8 +497,8 @@ InitPlane(struct vlc_gl_filter *filter, unsigned plane_idx, GLsizei width,
         vt->BindTexture(GL_TEXTURE_2D, plane->textures[i]);
         vt->TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
                        GL_UNSIGNED_BYTE, NULL);
-        vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         vt->BindFramebuffer(GL_FRAMEBUFFER, plane->fbos[i]);
@@ -511,8 +511,8 @@ InitPlane(struct vlc_gl_filter *filter, unsigned plane_idx, GLsizei width,
     vt->BindTexture(GL_TEXTURE_2D, plane->texture_out);
     vt->TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height / 2, 0, GL_RGBA,
                    GL_UNSIGNED_BYTE, NULL);
-    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     vt->BindFramebuffer(GL_FRAMEBUFFER, plane->fbo_out);
