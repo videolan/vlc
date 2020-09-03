@@ -244,7 +244,7 @@ static const char *httpd_ReasonFromCode(unsigned i_code)
     assert((i_code >= 100) && (i_code <= 599));
 
     const http_status_info *p = http_reason;
-    while (i_code < p->i_code)
+    while (i_code > p->i_code)
         p++;
 
     if (p->i_code == i_code)
