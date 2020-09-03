@@ -170,6 +170,15 @@ struct httpd_client_t
 /*****************************************************************************
  * Various functions
  *****************************************************************************/
+
+static int cmp_code(const void *k, const void *e)
+{
+    const unsigned *code = k;
+    const unsigned *entry = e;
+
+    return (int)*code - (int)*entry;
+}
+
 static const char *httpd_ReasonFromCode(unsigned i_code)
 {
     typedef struct
@@ -234,22 +243,19 @@ static const char *httpd_ReasonFromCode(unsigned i_code)
         /*{ 504, "Gateway time-out" },*/
         { 505, "Protocol version not supported" },
         { 551, "Option not supported" },
-        { 999, "" }
     };
 
     static const char psz_fallback_reason[5][16] = {
         "Continue", "OK", "Found", "Client error", "Server error"
     };
 
-    assert((i_code >= 100) && (i_code <= 599));
-
-    const http_status_info *p = http_reason;
-    while (i_code > p->i_code)
-        p++;
-
-    if (p->i_code == i_code)
+    const http_status_info *p = bsearch(&i_code, http_reason,
+                                        ARRAY_SIZE(http_reason),
+                                        sizeof (http_reason[0]), cmp_code);
+    if (likely(p != NULL))
         return p->psz_reason;
 
+    assert(i_code >= 100 && i_code < 600);
     return psz_fallback_reason[(i_code / 100) - 1];
 }
 
