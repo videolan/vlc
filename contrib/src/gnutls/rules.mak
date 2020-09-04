@@ -36,9 +36,6 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 
 	# don't use connectx on macOS versions where it's not available
 	$(APPLY) $(SRC)/gnutls/0001-fix-connectx-not-available-on-older-macOS-SDK.patch
-ifdef HAVE_ANDROID
-	$(APPLY) $(SRC)/gnutls/no-create-time-h.patch
-endif
 	$(call pkg_static,"lib/gnutls.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
