@@ -37,6 +37,7 @@
 #include <ffnvcodec/dynlink_loader.h>
 #include "../../codec/hxxx_helper.h"
 #include "nvdec_fmt.h"
+#include "hw_pool.h"
 
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
@@ -79,27 +80,6 @@ vlc_module_end ()
 #define OUTPUT_WIDTH_ALIGN   16
 
 typedef struct nvdec_ctx  nvdec_ctx_t;
-typedef struct nvdec_pool_owner  nvdec_pool_owner_t;
-
-typedef struct nvdec_pool_t {
-    vlc_video_context           *vctx;
-
-    nvdec_pool_owner_t          *owner;
-
-    void                        *res[64];
-    size_t                      pool_size;
-
-    picture_pool_t              *picture_pool;
-
-    vlc_atomic_rc_t             rc;
-} nvdec_pool_t;
-
-struct nvdec_pool_owner
-{
-    void *sys;
-    void (*release_resources)(nvdec_pool_owner_t *, void *buffers[], size_t pics_count);
-    picture_context_t * (*attach_picture)(nvdec_pool_owner_t *, nvdec_pool_t *, void *surface);
-};
 
 typedef struct pic_pool_context_nvdec_t {
   pic_context_nvdec_t ctx;
@@ -148,68 +128,6 @@ static void PoolRelease(nvdec_pool_owner_t *owner, void *buffers[], size_t pics_
     free(p_sys);
 }
 
-static void nvdec_pool_AddRef(nvdec_pool_t *pool)
-{
-    vlc_atomic_rc_inc(&pool->rc);
-}
-
-static void nvdec_pool_Release(nvdec_pool_t *pool)
-{
-    if (!vlc_atomic_rc_dec(&pool->rc))
-        return;
-
-    pool->owner->release_resources(pool->owner, pool->res, pool->pool_size);
-
-    picture_pool_Release(pool->picture_pool);
-    vlc_video_context_Release(pool->vctx);
-}
-
-static nvdec_pool_t* nvdec_pool_Create(nvdec_pool_owner_t *owner,
-                                       const video_format_t *fmt,
-                                       vlc_video_context *vctx,
-                                       void *buffers[], size_t pics_count)
-{
-    nvdec_pool_t *pool = calloc(1, sizeof(*pool));
-    if (unlikely(!pool))
-        return NULL;
-
-    picture_t *pics[pics_count];
-    for (size_t i=0; i < pics_count; i++)
-    {
-        pics[i] = picture_NewFromResource(fmt, &(picture_resource_t) { 0 });
-        if (!pics[i])
-        {
-            while (i--)
-                picture_Release(pics[i]);
-            goto error;
-        }
-        pool->res[i] = buffers[i];
-        pics[i]->p_sys = buffers[i];
-    }
-
-    pool->picture_pool = picture_pool_New(pics_count, pics);
-    if (!pool->picture_pool)
-        goto free_pool;
-
-    pool->owner = owner;
-    pool->vctx = vctx;
-    pool->pool_size = pics_count;
-    vlc_video_context_Hold(pool->vctx);
-
-    vlc_atomic_rc_init(&pool->rc);
-    return pool;
-
-free_pool:
-    for (size_t i=0; i < pics_count; i++)
-    {
-        if (pics[i] != NULL)
-            picture_Release(pics[i]);
-    }
-error:
-    free(pool);
-    return NULL;
-}
-
 static void nvdec_picture_CtxDestroy(struct picture_context_t *picctx)
 {
     pic_pool_context_nvdec_t *srcpic = NVDEC_PICPOOLCTX_FROM_PICCTX(picctx);
@@ -228,22 +146,6 @@ static struct picture_context_t *nvdec_picture_CtxClone(struct picture_context_t
     vlc_video_context_Hold(clonectx->ctx.ctx.vctx);
     nvdec_pool_AddRef(clonectx->pool);
     return &clonectx->ctx.ctx;
-}
-
-static picture_t* nvdec_pool_Wait(nvdec_pool_t *pool)
-{
-    picture_t *pic = picture_pool_Wait(pool->picture_pool);
-    if (!pic)
-        return NULL;
-
-    void *surface = pic->p_sys;
-    pic->p_sys = NULL;
-    pic->context = pool->owner->attach_picture(pool->owner, pool, surface);
-    if (likely(pic->context != NULL))
-        return pic;
-
-    picture_Release(pic);
-    return NULL;
 }
 
 static picture_context_t * PoolAttachPicture(nvdec_pool_owner_t *owner, nvdec_pool_t *pool, void *surface)
