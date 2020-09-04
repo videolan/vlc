@@ -126,15 +126,6 @@ typedef struct nvdec_ctx {
 #define NVDEC_PICPOOLCTX_FROM_PICCTX(pic_ctx)  \
     container_of(NVDEC_PICCONTEXT_FROM_PICCTX(pic_ctx), pic_pool_context_nvdec_t, ctx)
 
-static void nvdec_pool_Destroy(nvdec_pool_t *pool)
-{
-    for (size_t i=0; i < ARRAY_SIZE(pool->outputDevicePtr); i++)
-        CALL_CUDA_POOL(cuMemFree, pool->outputDevicePtr[i]);
-
-    picture_pool_Release(pool->picture_pool);
-    vlc_video_context_Release(pool->vctx);
-}
-
 static void nvdec_pool_AddRef(nvdec_pool_t *pool)
 {
     vlc_atomic_rc_inc(&pool->rc);
@@ -145,7 +136,11 @@ static void nvdec_pool_Release(nvdec_pool_t *pool)
     if (!vlc_atomic_rc_dec(&pool->rc))
         return;
 
-    nvdec_pool_Destroy(pool);
+    for (size_t i=0; i < ARRAY_SIZE(pool->outputDevicePtr); i++)
+        CALL_CUDA_POOL(cuMemFree, pool->outputDevicePtr[i]);
+
+    picture_pool_Release(pool->picture_pool);
+    vlc_video_context_Release(pool->vctx);
 }
 
 static nvdec_pool_t* nvdec_pool_Create(vlc_video_context *vctx,
@@ -812,7 +807,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *) p_this;
     int result;
-    nvdec_ctx_t *p_sys = vlc_obj_calloc(VLC_OBJECT(p_dec), 1, sizeof(*p_sys));
+    nvdec_ctx_t *p_sys = calloc(1, sizeof(*p_sys));
     if (unlikely(!p_sys))
         return VLC_ENOMEM;
 
@@ -1072,6 +1067,7 @@ static int OpenDecoder(vlc_object_t *p_this)
 
 error:
     CloseDecoder(p_this);
+    free(p_sys);
     p_dec->p_sys = NULL;
     return VLC_EGENERIC;
 }
@@ -1083,17 +1079,18 @@ static void CloseDecoder(vlc_object_t *p_this)
     CALL_CUDA_DEC(cuCtxPushCurrent, p_sys->devsys->cuCtx);
     CALL_CUDA_DEC(cuCtxPopCurrent, NULL);
 
-    if (p_sys->out_pool)
-        nvdec_pool_Release(p_sys->out_pool);
     if (p_sys->cudecoder)
         CALL_CUVID(cuvidDestroyDecoder, p_sys->cudecoder);
     if (p_sys->cuparser)
         CALL_CUVID(cuvidDestroyVideoParser, p_sys->cuparser);
     if (p_sys->vctx_out)
         vlc_video_context_Release(p_sys->vctx_out);
-    cuvid_free_functions(&p_sys->cuvidFunctions);
     if (p_sys->b_is_hxxx)
         hxxx_helper_clean(&p_sys->hh);
+    if (p_sys->out_pool)
+        nvdec_pool_Release(p_sys->out_pool);
+    cuvid_free_functions(&p_sys->cuvidFunctions);
+    free(p_sys);
 }
 
 /** Decoder Device **/
