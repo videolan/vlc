@@ -178,7 +178,7 @@ static nvdec_pool_t* nvdec_pool_Create(vlc_video_context *vctx,
         if (ret != CUDA_SUCCESS || pool->outputDevicePtr[i] == 0)
             goto free_pool;
 
-        pics[i] = picture_NewFromFormat(fmt);
+        pics[i] = picture_NewFromResource(fmt, &(picture_resource_t) { 0 });
         if (!pics[i])
             goto free_pool;
         pics[i]->p_sys = (void*)(uintptr_t)pool->outputDevicePtr[i];
