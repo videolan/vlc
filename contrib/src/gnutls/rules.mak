@@ -34,9 +34,6 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	# disable the dllimport in static linking (pkg-config --static doesn't handle Cflags.private)
 	cd $(UNPACK_DIR) && sed -i.orig -e s/"_SYM_EXPORT __declspec(dllimport)"/"_SYM_EXPORT"/g lib/includes/gnutls/gnutls.h.in
 
-ifdef HAVE_ANDROID
-	$(APPLY) $(SRC)/gnutls/no-create-time-h.patch
-endif
 	$(call pkg_static,"lib/gnutls.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
