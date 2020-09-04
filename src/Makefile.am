@@ -352,8 +352,6 @@ libvlccore_la_SOURCES = \
 	text/iso_lang.c \
 	text/iso-639_def.h \
 	misc/actions.c \
-	misc/background_worker.c \
-	misc/background_worker.h \
 	misc/executor.c \
 	misc/md5.c \
 	misc/probe.c \
