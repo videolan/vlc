@@ -326,9 +326,11 @@ static void SetVideoEncoderConfig( sout_stream_t *p_stream, transcode_encoder_co
     p_cfg->video.threads.i_count = var_GetInteger( p_stream, SOUT_CFG_PREFIX "threads" );
     p_cfg->video.threads.pool_size = var_GetInteger( p_stream, SOUT_CFG_PREFIX "pool-size" );
 
+#if VLC_THREAD_PRIORITY_OUTPUT != VLC_THREAD_PRIORITY_VIDEO
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX "high-priority" ) )
         p_cfg->video.threads.i_priority = VLC_THREAD_PRIORITY_OUTPUT;
     else
+#endif
         p_cfg->video.threads.i_priority = VLC_THREAD_PRIORITY_VIDEO;
 }
 
