@@ -38,7 +38,7 @@ QVariant MLAlbumModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0)
         return QVariant();
 
-    const MLAlbum* ml_item = item(static_cast<unsigned int>(index.row()));
+    const MLAlbum* ml_item = item(index.row());
     if ( ml_item == NULL )
         return QVariant();
 

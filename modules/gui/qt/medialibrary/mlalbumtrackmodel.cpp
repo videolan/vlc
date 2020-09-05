@@ -59,7 +59,7 @@ QVariant MLAlbumTrackModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0)
         return QVariant();
 
-    const MLAlbumTrack* ml_track = item(static_cast<unsigned int>(index.row()));
+    const MLAlbumTrack* ml_track = item(index.row());
     if ( !ml_track )
         return QVariant();
 

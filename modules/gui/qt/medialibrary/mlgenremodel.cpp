@@ -47,7 +47,7 @@ QVariant MLGenreModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0)
         return QVariant();
 
-    const MLGenre* ml_genre = item(static_cast<unsigned int>(index.row()));
+    const MLGenre* ml_genre = item(index.row());
     if (!ml_genre)
         return QVariant();
 

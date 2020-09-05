@@ -44,7 +44,7 @@ QVariant MLArtistModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0)
         return QVariant();
 
-    const MLArtist* ml_artist = item(static_cast<unsigned int>(index.row()));
+    const MLArtist* ml_artist = item(index.row());
     if ( !ml_artist )
         return QVariant();
 
