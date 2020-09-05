@@ -96,6 +96,9 @@ size_t MediaSegmentTemplate::pruneBySequenceNumber(uint64_t number)
 
 uint64_t MediaSegmentTemplate::inheritStartNumber() const
 {
+    if( startNumber != std::numeric_limits<uint64_t>::max() )
+        return startNumber;
+
     const SegmentInformation *ulevel = parentSegmentInformation ? parentSegmentInformation
                                                                 : NULL;
     for( ; ulevel ; ulevel = ulevel->parent )
