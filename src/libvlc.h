@@ -44,7 +44,7 @@ void vlc_CPU_dump(vlc_object_t *);
  * Threads subsystem
  */
 
-/* This cannot be used as is from plugins yet: */
+VLC_DEPRECATED
 int vlc_clone_detach (vlc_thread_t *, void *(*)(void *), void *, int);
 
 int vlc_set_priority( vlc_thread_t, int );
