@@ -767,7 +767,7 @@ static int OpenDecoder(vlc_object_t *p_this)
                                            p_dec->fmt_in.i_extra);
             if (result != VLC_SUCCESS) {
                 hxxx_helper_clean(&p_sys->hh);
-                return VLC_EGENERIC;
+                goto early_exit;
             }
             p_sys->process_block = HXXXProcessBlock;
             break;
@@ -791,7 +791,7 @@ static int OpenDecoder(vlc_object_t *p_this)
                     break;
                 }
             }
-            return VLC_EGENERIC;
+            goto early_exit;
         case VLC_CODEC_MP1V:
         case VLC_CODEC_MP2V:
         case VLC_CODEC_MPGV:
@@ -803,37 +803,41 @@ static int OpenDecoder(vlc_object_t *p_this)
             if (p_dec->fmt_in.i_profile != 0 && p_dec->fmt_in.i_profile != 2)
             {
                 msg_Warn(p_dec, "Unsupported VP9 profile %d", p_dec->fmt_in.i_profile);
-                return VLC_EGENERIC;
+                goto early_exit;
             }
             p_sys->i_nb_surface = 10;
             break;
         default:
-            return VLC_EGENERIC;
+            goto early_exit;
     }
 
     vlc_decoder_device *dec_device = decoder_GetDecoderDevice( p_dec );
-    if (dec_device == NULL)
-        return VLC_ENOOBJ;
+    if (dec_device == NULL) {
+        if (p_sys->b_is_hxxx)
+            hxxx_helper_clean(&p_sys->hh);
+        goto early_exit;
+    }
     p_sys->devsys = GetNVDECOpaqueDevice(dec_device);
     if (p_sys->devsys == NULL)
     {
         vlc_decoder_device_Release(dec_device);
-        return VLC_ENOOBJ;
+        if (p_sys->b_is_hxxx)
+            hxxx_helper_clean(&p_sys->hh);
+        goto early_exit;
     }
     p_sys->vctx_out = vlc_video_context_Create( dec_device, VLC_VIDEO_CONTEXT_NVDEC, 0, NULL );
     vlc_decoder_device_Release(dec_device);
     if (unlikely(p_sys->vctx_out == NULL))
     {
         msg_Err(p_dec, "failed to create a video context");
-        return VLC_ENOOBJ;
+        if (p_sys->b_is_hxxx)
+            hxxx_helper_clean(&p_sys->hh);
+        goto early_exit;
     }
 
     result = cuvid_load_functions(&p_sys->cuvidFunctions, p_dec);
-    if (result != VLC_SUCCESS) {
-        if (p_sys->b_is_hxxx)
-            hxxx_helper_clean(&p_sys->hh);
+    if (result != VLC_SUCCESS)
         goto error;
-    }
 
     CUVIDPARSERPARAMS pparams = {
         .CodecType               = MapCodecID(p_dec->fmt_in.i_codec),
@@ -862,11 +866,8 @@ static int OpenDecoder(vlc_object_t *p_this)
         uint8_t i_chroma_idc, i_depth_chroma;
         result = hxxx_helper_get_chroma_chroma(&p_sys->hh, &i_chroma_idc,
                                             &i_depth_luma, &i_depth_chroma);
-        if (result != VLC_SUCCESS) {
-            if (p_sys->b_is_hxxx)
-                hxxx_helper_clean(&p_sys->hh);
-            return VLC_EGENERIC;
-        }
+        if (result != VLC_SUCCESS)
+            goto error;
         cudaChroma = MapChomaIDC(i_chroma_idc);
 
         unsigned i_w, i_h, i_vw, i_vh;
@@ -1010,7 +1011,8 @@ static int OpenDecoder(vlc_object_t *p_this)
 
 error:
     CloseDecoder(p_this);
-    free(p_sys);
+early_exit:
+    free(p_dec->p_sys);
     p_dec->p_sys = NULL;
     return VLC_EGENERIC;
 }
@@ -1035,7 +1037,8 @@ static void CloseDecoder(vlc_object_t *p_this)
     else
     {
         cuvid_free_functions(&p_sys->cuvidFunctions);
-        free(p_sys);
+        free(p_dec->p_sys);
+        p_dec->p_sys = NULL;
     }
 }
 
