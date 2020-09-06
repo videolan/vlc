@@ -2045,9 +2045,11 @@ decoder_New( vlc_object_t *p_parent, const es_format_t *fmt,
 
     assert( p_dec->fmt_in.i_cat != UNKNOWN_ES );
 
+#if VLC_THREAD_PRIORITY_AUDIO != VLC_THREAD_PRIORITY_VIDEO
     if( p_dec->fmt_in.i_cat == AUDIO_ES )
         i_priority = VLC_THREAD_PRIORITY_AUDIO;
     else
+#endif
         i_priority = VLC_THREAD_PRIORITY_VIDEO;
 
 #ifdef ENABLE_SOUT
