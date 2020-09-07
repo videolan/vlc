@@ -333,6 +333,9 @@ function parse()
                 -- unlikely to access it due to #24957
                 description = string.match( line, '\\"shortDescription\\":\\"(.-[^\\])\\"')
                 if description then
+                    if string.match( description, '^\\"' ) then
+                        description = ""
+                    end
                     -- FIXME: do this properly (see #24958)
                     -- This way of unescaping is technically wrong
                     -- so as little as possible of it should be done
