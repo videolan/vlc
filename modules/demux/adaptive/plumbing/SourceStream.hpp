@@ -92,12 +92,15 @@ namespace adaptive
             virtual std::string getContentType(); /* impl */
 
         private:
-            void fillByteStream();
+            ssize_t doRead(uint8_t *, size_t);
+            void fillByteStream(size_t);
+            void invalidatePeek();
             static const int MAX_BACKEND = 5 * 1024 * 1024;
             static const int MIN_BACKEND_CLEANUP = 50 * 1024;
             uint64_t i_global_offset;
             size_t i_bytestream_offset;
             block_bytestream_t bs;
+            block_t *p_peekdata;
     };
 }
 #endif // SOURCESTREAM_HPP

@@ -204,11 +204,13 @@ BufferedChunksSourceStream::BufferedChunksSourceStream(vlc_object_t *p_obj_, Abs
     i_global_offset = 0;
     i_bytestream_offset = 0;
     block_BytestreamInit( &bs );
+    p_peekdata = NULL;
 }
 
 BufferedChunksSourceStream::~BufferedChunksSourceStream()
 {
     block_BytestreamEmpty( &bs );
+    invalidatePeek();
 }
 
 void BufferedChunksSourceStream::Reset()
@@ -216,42 +218,40 @@ void BufferedChunksSourceStream::Reset()
     block_BytestreamEmpty( &bs );
     i_bytestream_offset = 0;
     i_global_offset = 0;
+    invalidatePeek();
     AbstractChunksSourceStream::Reset();
 }
 
-ssize_t BufferedChunksSourceStream::Read(uint8_t *buf, size_t size)
+ssize_t BufferedChunksSourceStream::doRead(uint8_t *buf, size_t i_toread)
 {
-    size_t i_copied = 0;
-    size_t i_toread = size;
-
-    while(i_toread && !b_eof)
+    size_t i_remain = block_BytestreamRemaining(&bs) - i_bytestream_offset;
+    if(i_remain < i_toread)
     {
-        size_t i_remain = block_BytestreamRemaining(&bs) - i_bytestream_offset;
-
-        if(i_remain < i_toread)
-        {
-            block_t *p_add = source->readNextBlock();
-            if(p_add)
-            {
-                i_remain += p_add->i_buffer;
-                block_BytestreamPush(&bs, p_add);
-
-            }
-            else b_eof = true;
-        }
-
-        size_t i_read;
-        if(i_remain >= i_toread)
-            i_read = i_toread;
-        else
-            i_read = i_remain;
-
-        if(buf)
-            block_PeekOffsetBytes(&bs, i_bytestream_offset, &buf[i_copied], i_read);
-        i_bytestream_offset += i_read;
-        i_copied += i_read;
-        i_toread -= i_read;
+        fillByteStream(i_bytestream_offset + i_toread);
+        i_remain = block_BytestreamRemaining(&bs) - i_bytestream_offset;
+        if(i_remain == 0)
+            return 0;
     }
+
+    if(i_remain < i_toread)
+        i_toread = i_remain;
+
+    if(buf)
+        block_PeekOffsetBytes(&bs, i_bytestream_offset, buf, i_toread);
+
+    return i_toread;
+}
+
+ssize_t BufferedChunksSourceStream::Read(uint8_t *buf, size_t i_toread)
+{
+    invalidatePeek();
+
+    ssize_t i_read = doRead(buf, i_toread);
+    if(i_read <= 0)
+        return i_read;
+
+    i_bytestream_offset += i_read;
+    i_toread -= i_read;
 
     if(i_bytestream_offset > MAX_BACKEND)
     {
@@ -264,41 +264,71 @@ ssize_t BufferedChunksSourceStream::Read(uint8_t *buf, size_t size)
             i_global_offset += i_drop;
         }
     }
-
-    return i_copied;
+    return i_read;
 }
 
 int BufferedChunksSourceStream::Seek(uint64_t i_seek)
 {
-    if(i_seek < i_global_offset ||
-       i_seek - i_global_offset > block_BytestreamRemaining(&bs))
+    if(i_seek < i_global_offset) /* can't seek into discarded data */
+    {
+        msg_Err(p_obj, "tried to seek back in cache %" PRIu64 " < %" PRIu64,
+                i_seek, i_global_offset);
         return VLC_EGENERIC;
+    }
+    size_t i_bsseekoffset = i_seek - i_global_offset;
+    fillByteStream(i_bsseekoffset);
+    if(block_BytestreamRemaining(&bs) < i_bsseekoffset)
+    {
+        msg_Err(p_obj, "tried to seek too far in cache %" PRIu64 " < %" PRIu64 " < %" PRIu64,
+                i_global_offset, i_seek, i_global_offset + block_BytestreamRemaining(&bs));
+        return VLC_EGENERIC;
+    }
+    invalidatePeek();
     i_bytestream_offset = i_seek - i_global_offset;
     return VLC_SUCCESS;
 }
 
 size_t BufferedChunksSourceStream::Peek(const uint8_t **pp, size_t sz)
 {
-    fillByteStream();
-    if(block_BytestreamRemaining(&bs) == 0)
+    sz = std::min(sz, (size_t)MAX_BACKEND);
+    invalidatePeek();
+    p_peekdata = block_Alloc(sz);
+    if(!p_peekdata)
         return 0;
-    *pp = bs.p_block->p_buffer;
-    return std::min(bs.p_block->i_buffer, sz);
+    ssize_t i_read = doRead(p_peekdata->p_buffer, sz);
+    if(i_read <= 0)
+    {
+        invalidatePeek();
+        return 0;
+    }
+    *pp = p_peekdata->p_buffer;
+    return i_read;
 }
 
 std::string BufferedChunksSourceStream::getContentType()
 {
-    fillByteStream();
+    if(block_BytestreamRemaining(&bs) == 0)
+        fillByteStream(1);
     return source->getContentType();
 }
 
-void BufferedChunksSourceStream::fillByteStream()
+void BufferedChunksSourceStream::fillByteStream(size_t sz)
 {
-    if(!b_eof && block_BytestreamRemaining(&bs) == 0)
+    sz = std::min(sz, (size_t)MAX_BACKEND);
+    while(!b_eof && sz > block_BytestreamRemaining(&bs))
     {
         block_t *p_block = source->readNextBlock();
         b_eof = !p_block;
         if(p_block)
             block_BytestreamPush(&bs, p_block);
+    }
+}
+
+void BufferedChunksSourceStream::invalidatePeek()
+{
+    if(p_peekdata)
+    {
+        block_Release(p_peekdata);
+        p_peekdata = NULL;
     }
 }
