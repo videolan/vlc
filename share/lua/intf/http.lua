@@ -105,6 +105,15 @@ function process(filename)
 end
 
 
+-- TODO: print localized error message
+-- For now this relies on lua bindings inappropriately doing so
+local function callback_nopassword()
+    return [[Status: 403
+Content-Length: 0
+
+]]
+end
+
 function callback_error(path,url,msg)
     local url = url or "&lt;page unknown&gt;"
     return  [[<html xmlns="http://www.w3.org/1999/xhtml">
@@ -327,5 +336,11 @@ end
 password = vlc.var.inherit(nil,"http-password")
 
 h = vlc.httpd()
-load_dir( http_dir )
-a = h:handler("/art",nil,password,callback_art,nil)
+if password == "" then
+    vlc.msg.err("Password unset, insecure web interface disabled")
+    vlc.msg.info("Set --http-password on the command line if you want to enable the web interface.")
+    p = h:handler("/",nil,nil,callback_nopassword,nil)
+else
+    load_dir( http_dir )
+    a = h:handler("/art",nil,password,callback_art,nil)
+end
