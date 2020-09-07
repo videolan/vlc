@@ -15,6 +15,16 @@ rustup: rustup-$(RUSTUP_VERSION).tar.gz .sum-cargo
 	$(UNPACK)
 	$(MOVE)
 
+# Test if we can use the host libssl library
+ifeq ($(shell unset PKG_CONFIG_LIBDIR PKG_CONFIG_PATH; \
+	pkg-config "openssl >= 1.0.1" 2>/dev/null || \
+	pkg-config "libssl >= 2.5" 2>/dev/null || echo FAIL),)
+CARGOC_FEATURES=
+else
+# Otherwise, let cargo build and statically link its own openssl
+CARGOC_FEATURES=--features=cargo/vendored-openssl
+endif
+
 # When needed (when we have a Rust dependency not using cargo-c), the cargo-c
 # installation should go in a different package
 .cargo: rustup
@@ -24,5 +34,5 @@ rustup: rustup-$(RUSTUP_VERSION).tar.gz .sum-cargo
 	$(RUSTUP) default stable
 	$(RUSTUP) target add $(RUST_TARGET)
 	unset PKG_CONFIG_LIBDIR PKG_CONFIG_PATH CFLAGS CPPFLAGS LDFLAGS; \
-		$(CARGO) install cargo-c
+		$(CARGO) install $(CARGOC_FEATURES) cargo-c
 	touch $@
