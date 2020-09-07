@@ -575,6 +575,7 @@ fourcc_tables.h: fourcc_gen$(BUILDEXEEXT)
 check_PROGRAMS = \
 	test_block \
 	test_dictionary \
+	test_executor \
 	test_i18n_atof \
 	test_interrupt \
 	test_list \
@@ -603,6 +604,7 @@ test_block_LDADD = $(LDADD) $(LIBS_libvlccore)
 test_block_DEPENDENCIES =
 
 test_dictionary_SOURCES = test/dictionary.c
+test_executor_SOURCES = test/executor.c
 test_i18n_atof_SOURCES = test/i18n_atof.c
 test_interrupt_SOURCES = test/interrupt.c
 test_interrupt_LDADD = $(LDADD) $(LIBS_libvlccore)
