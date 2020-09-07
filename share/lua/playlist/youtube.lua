@@ -334,9 +334,12 @@ function parse()
                 description = string.match( line, '\\"shortDescription\\":\\"(.-[^\\])\\"')
                 if description then
                     -- FIXME: do this properly (see #24958)
+                    -- This way of unescaping is technically wrong
+                    -- so as little as possible of it should be done
                     description = string.gsub( description, '\\(["\\/])', '%1' )
                     description = string.gsub( description, '\\(["\\/])', '%1' )
                     description = string.gsub( description, '\\n', '\n' )
+                    description = string.gsub( description, '\\r', '\r' )
                     description = string.gsub( description, "\\u0026", "&" )
                 end
             end
