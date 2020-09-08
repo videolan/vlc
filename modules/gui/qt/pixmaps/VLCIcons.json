@@ -139,6 +139,7 @@
 		{"key":"topbar_next", "path": "./topbar/next.svg"},
 		{"key":"topbar_filter", "path": "./topbar/filter.svg"},
 		{"key":"topbar_sort", "path": "./topbar/sort.svg"},
+		{"key":"topbar_discover", "path": "./topbar/discover.svg"},
 		{"key":"rename", "path": "./rename.svg"},
 		{"key":"del", "path": "./del.svg"},
 		{"key":"close", "path": "./close.svg"},
@@ -149,6 +150,7 @@
 		{"key":"time", "path": "./time.svg"},
 		{"key":"play_outline", "path": "./play_outline.svg"},
 		{"key":"enqueue", "path": "./enqueue.svg"},
-		{"key":"back", "path": "./back.svg"}
+		{"key":"back", "path": "./back.svg"},
+		{"key":"history", "path": "./history.svg"}
 	]
 }
