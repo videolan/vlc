@@ -76,6 +76,8 @@ public:
 
     Q_PROPERTY(QmlMainContext* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
     Q_PROPERTY(SDCatType sd_source READ getSdSource WRITE setSdSource NOTIFY sdSourceChanged)
+    Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
+    Q_PROPERTY(QString source_name READ getSourceName WRITE setSourceName NOTIFY sourceNameChanged)
     Q_PROPERTY(int count READ getCount NOTIFY countChanged)
 
 public:
@@ -87,9 +89,12 @@ public:
 
     void setCtx(QmlMainContext* ctx);
     void setSdSource(SDCatType s);
+    void setSourceName(const QString& sourceName);
 
     inline QmlMainContext* getCtx() { return m_ctx; }
     inline SDCatType getSdSource() { return m_sdSource; }
+    inline QString getName() { return m_name; }
+    inline QString getSourceName() { return m_sourceName; }
 
     int getCount() const;
 
@@ -105,6 +110,8 @@ public:
 signals:
     void ctxChanged();
     void sdSourceChanged();
+    void sourceNameChanged();
+    void nameChanged();
     void countChanged();
 
 private:
@@ -140,6 +147,8 @@ private:
     QmlMainContext* m_ctx = nullptr;
     vlc_medialibrary_t* m_ml = nullptr;
     SDCatType m_sdSource = CAT_UNDEFINED;
+    QString m_sourceName; // '*' -> all sources
+    QString m_name; // source long name
 
     std::vector<std::unique_ptr<NetworkSourceListener>> m_listeners;
 };

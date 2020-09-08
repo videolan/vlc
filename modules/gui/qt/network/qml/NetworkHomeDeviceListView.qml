@@ -57,6 +57,8 @@ Widgets.NavigableFocusScope {
 
     NetworkDeviceModel {
         id: deviceModel
+
+        source_name: "*"
     }
 
     Util.SelectableDelegateModel {
