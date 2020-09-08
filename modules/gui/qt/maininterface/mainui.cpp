@@ -31,6 +31,7 @@
 
 #include "network/networkmediamodel.hpp"
 #include "network/networkdevicemodel.hpp"
+#include "network/networksourcesmodel.hpp"
 
 #include "maininterface/main_interface.hpp"
 
@@ -165,6 +166,7 @@ void MainUI::registerQMLTypes()
         qRegisterMetaType<NetworkTreeItem>();
         qmlRegisterType<NetworkMediaModel>( "org.videolan.medialib", 0, 1, "NetworkMediaModel");
         qmlRegisterType<NetworkDeviceModel>( "org.videolan.medialib", 0, 1, "NetworkDeviceModel");
+        qmlRegisterType<NetworkSourcesModel>( "org.videolan.medialib", 0, 1, "NetworkSourcesModel");
         qmlRegisterType<MlFoldersModel>( "org.videolan.medialib", 0, 1, "MLFolderModel");
 
         //expose base object, they aren't instanciable from QML side
