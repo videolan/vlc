@@ -1,6 +1,6 @@
 # ncurses
 
-NCURSES_VERSION := 5.9
+NCURSES_VERSION := 6.2
 NCURSES_URL := $(GNU)/ncurses/ncurses-$(NCURSES_VERSION).tar.gz
 
 ifdef HAVE_MACOSX
