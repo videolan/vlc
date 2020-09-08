@@ -36,10 +36,11 @@
 
 #import "views/VLCScrollingClipView.h"
 
-
-/* this is a bit weird, but we should be confident that there will be more than
- * one arch to support again one day */
+#ifdef __x86_64__
 #define PLATFORM "Intel 64bit"
+#else
+#define PLATFORM "Apple Silicon"
+#endif
 
 @interface VLCAboutWindowController ()
 {
