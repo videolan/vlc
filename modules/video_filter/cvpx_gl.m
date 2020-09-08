@@ -68,7 +68,6 @@ struct vlc_video_context_operations vctx_ops = {0};
     CVOpenGLTextureRef _textures[2];
 #endif
 
-    CVPixelBufferPoolRef _pool;
     CVPixelBufferRef _buffers[2];
     GLuint _fbos[2];
     int _currentFlip;
@@ -373,6 +372,19 @@ error:
 - (void)dealloc
 {
     // cleanup
+#if TARGET_OS_IPHONE
+    EAGLContext *previous_context = [EAGLContext currentContext];
+    [EAGLContext setCurrentContext:_context];
+    glDeleteFramebuffers(2, _fbos);
+    [EAGLContext setCurrentContext:previous_context];
+
+    CFRelease(_textures[0]);
+    CFRelease(_textures[1]);
+    CFRelease(_textureCache);
+
+    CVPixelBufferRelease(_buffers[0]);
+    CVPixelBufferRelease(_buffers[1]);
+#endif
 }
 
 @end
