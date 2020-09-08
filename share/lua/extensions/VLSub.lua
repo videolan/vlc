@@ -1466,122 +1466,122 @@ function download_subtitles()
   display_subtitles() -- reset selection
 
   for _, index in ipairs(indexes) do
-  local item = openSub.itemStore[index]
-
-  if openSub.option.downloadBehaviour == 'manual'
-  or not openSub.file.hasInput then
-    local link = "<span style='color:#181'>"
-    link = link.."<b>"..lang["mess_dowload_link"]..":</b>"
-    link = link.."</span> &nbsp;"
-    link = link.."</span> &nbsp;<a href='"..
-      item.ZipDownloadLink.."'>"
-    link = link..item.MovieReleaseName.."</a>"
-
-    setMessage(link)
-    return false
-  end
-
-  local message = ""
-  local subfileName = openSub.file.name or ""
-
-  if openSub.option.langExt then
-    subfileName = subfileName.."."..item.SubLanguageID
-  end
-
-  subfileName = subfileName.."."..item.SubFormat
-  local tmp_dir = vlc.config.cachedir()
-  -- create the cache directory if it doesn't already exist
-  local separator = ""
-  local current_dir = ""
-  if package.config:sub(1, 1):match("/") then
-    -- unix based systems
-    separator = "/"
-    current_dir = "/"
-  else
-    -- windows systems
-    separator = "\\"
-  end
-  for dir in tmp_dir:gmatch("[^"..separator.."]+") do
-    current_dir = current_dir..dir..separator
-    local vars = vlc.io.mkdir(current_dir, "0700")
-  end
-
-  local file_target_access = true
-
-  local tmpFileName = dump_zip(
-    item.ZipDownloadLink,
-    tmp_dir,
-    item.SubFileName)
-
-  if not tmpFileName then
-    setError(lang["mess_save_fail"].." &nbsp;"..
-    "<a href='"..item.ZipDownloadLink.."'>"..
-    lang["mess_click_link"].."</a>")
-    return false
-  end
-  vlc.msg.dbg("[VLsub] tmpFileName: "..tmpFileName)
-
-  local subtitleMrl = find_subtitle_in_archive(tmpFileName, item.SubFormat)
-
-  if not subtitleMrl then
-    setMessage( lang['mess_not_load'] )
-    return false
-  end
-
-  -- Determine if the path to the video file is accessible for writing
-
-  local target
-  if openSub.file.dir then
-    target = openSub.file.dir..subfileName
-  end
-
-  if not target or not file_touch(target) then
-    if openSub.conf.dirPath then
-      target =  openSub.conf.dirPath..slash..subfileName
-      message = "<br>"..
-        warn_tag(lang["mess_save_warn"].." &nbsp;"..
-        "<a href='"..vlc.strings.make_uri(
-          openSub.conf.dirPath).."'>"..
-          lang["mess_click_link"].."</a>")
+    local item = openSub.itemStore[index]
+  
+    if openSub.option.downloadBehaviour == 'manual'
+    or not openSub.file.hasInput then
+      local link = "<span style='color:#181'>"
+      link = link.."<b>"..lang["mess_dowload_link"]..":</b>"
+      link = link.."</span> &nbsp;"
+      link = link.."</span> &nbsp;<a href='"..
+        item.ZipDownloadLink.."'>"
+      link = link..item.MovieReleaseName.."</a>"
+  
+      setMessage(link)
+      return false
+    end
+  
+    local message = ""
+    local subfileName = openSub.file.name or ""
+  
+    if openSub.option.langExt then
+      subfileName = subfileName.."."..item.SubLanguageID
+    end
+  
+    subfileName = subfileName.."."..item.SubFormat
+    local tmp_dir = vlc.config.cachedir()
+    -- create the cache directory if it doesn't already exist
+    local separator = ""
+    local current_dir = ""
+    if package.config:sub(1, 1):match("/") then
+      -- unix based systems
+      separator = "/"
+      current_dir = "/"
     else
+      -- windows systems
+      separator = "\\"
+    end
+    for dir in tmp_dir:gmatch("[^"..separator.."]+") do
+      current_dir = current_dir..dir..separator
+      local vars = vlc.io.mkdir(current_dir, "0700")
+    end
+  
+    local file_target_access = true
+  
+    local tmpFileName = dump_zip(
+      item.ZipDownloadLink,
+      tmp_dir,
+      item.SubFileName)
+  
+    if not tmpFileName then
       setError(lang["mess_save_fail"].." &nbsp;"..
       "<a href='"..item.ZipDownloadLink.."'>"..
       lang["mess_click_link"].."</a>")
       return false
     end
-  end
-
-  vlc.msg.dbg("[VLsub] Subtitles files: "..target)
-
-  -- Unzipped data into file target
-
-  local stream = vlc.stream(subtitleMrl)
-  local data = ""
-  local subfile = vlc.io.open(target, "wb")
-
-  while data do
-    subfile:write(data)
-    data = stream:read(65536)
-  end
-
-  subfile:flush()
-  subfile:close()
-
-  stream = nil
-  collectgarbage()
-
-  if not vlc.io.unlink(tmpFileName) then
-    vlc.msg.err("[VLsub] Unable to remove temp: "..tmpFileName)
-  end
-
-  -- load subtitles
-  if add_sub(target) then
-    message = success_tag(lang["mess_loaded"]) .. message
-  else
-    message = error_tag(lang["mess_not_load"]) .. message
-  end
-
-  setMessage(message)
+    vlc.msg.dbg("[VLsub] tmpFileName: "..tmpFileName)
+  
+    local subtitleMrl = find_subtitle_in_archive(tmpFileName, item.SubFormat)
+  
+    if not subtitleMrl then
+      setMessage( lang['mess_not_load'] )
+      return false
+    end
+  
+    -- Determine if the path to the video file is accessible for writing
+  
+    local target
+    if openSub.file.dir then
+      target = openSub.file.dir..subfileName
+    end
+  
+    if not target or not file_touch(target) then
+      if openSub.conf.dirPath then
+        target =  openSub.conf.dirPath..slash..subfileName
+        message = "<br>"..
+          warn_tag(lang["mess_save_warn"].." &nbsp;"..
+          "<a href='"..vlc.strings.make_uri(
+            openSub.conf.dirPath).."'>"..
+            lang["mess_click_link"].."</a>")
+      else
+        setError(lang["mess_save_fail"].." &nbsp;"..
+        "<a href='"..item.ZipDownloadLink.."'>"..
+        lang["mess_click_link"].."</a>")
+        return false
+      end
+    end
+  
+    vlc.msg.dbg("[VLsub] Subtitles files: "..target)
+  
+    -- Unzipped data into file target
+  
+    local stream = vlc.stream(subtitleMrl)
+    local data = ""
+    local subfile = vlc.io.open(target, "wb")
+  
+    while data do
+      subfile:write(data)
+      data = stream:read(65536)
+    end
+  
+    subfile:flush()
+    subfile:close()
+  
+    stream = nil
+    collectgarbage()
+  
+    if not vlc.io.unlink(tmpFileName) then
+      vlc.msg.err("[VLsub] Unable to remove temp: "..tmpFileName)
+    end
+  
+    -- load subtitles
+    if add_sub(target) then
+      message = success_tag(lang["mess_loaded"]) .. message
+    else
+      message = error_tag(lang["mess_not_load"]) .. message
+    end
+  
+    setMessage(message)
   end
 end
 
