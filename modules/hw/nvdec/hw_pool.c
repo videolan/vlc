@@ -29,10 +29,10 @@
 #include <vlc_atomic.h>
 #include "hw_pool.h"
 
-struct nvdec_pool_t {
+struct hw_pool_t {
     vlc_video_context           *vctx;
 
-    nvdec_pool_owner_t          *owner;
+    hw_pool_owner_t             *owner;
 
     void                        *res[64];
     size_t                      pool_size;
@@ -42,12 +42,12 @@ struct nvdec_pool_t {
     vlc_atomic_rc_t             rc;
 };
 
-void nvdec_pool_AddRef(nvdec_pool_t *pool)
+void hw_pool_AddRef(hw_pool_t *pool)
 {
     vlc_atomic_rc_inc(&pool->rc);
 }
 
-void nvdec_pool_Release(nvdec_pool_t *pool)
+void hw_pool_Release(hw_pool_t *pool)
 {
     if (!vlc_atomic_rc_dec(&pool->rc))
         return;
@@ -58,11 +58,11 @@ void nvdec_pool_Release(nvdec_pool_t *pool)
     vlc_video_context_Release(pool->vctx);
 }
 
-nvdec_pool_t* nvdec_pool_Create(nvdec_pool_owner_t *owner,
-                                const video_format_t *fmt, vlc_video_context *vctx,
-                                void *buffers[], size_t pics_count)
+hw_pool_t* hw_pool_Create(hw_pool_owner_t *owner,
+                          const video_format_t *fmt, vlc_video_context *vctx,
+                          void *buffers[], size_t pics_count)
 {
-    nvdec_pool_t *pool = calloc(1, sizeof(*pool));
+    hw_pool_t *pool = calloc(1, sizeof(*pool));
     if (unlikely(!pool))
         return NULL;
 
@@ -103,7 +103,7 @@ error:
     return NULL;
 }
 
-picture_t* nvdec_pool_Wait(nvdec_pool_t *pool)
+picture_t* hw_pool_Wait(hw_pool_t *pool)
 {
     picture_t *pic = picture_pool_Wait(pool->picture_pool);
     if (!pic)

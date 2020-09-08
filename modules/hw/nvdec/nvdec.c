@@ -80,7 +80,7 @@ typedef struct nvdec_ctx  nvdec_ctx_t;
 
 typedef struct pic_pool_context_nvdec_t {
   pic_context_nvdec_t ctx;
-  nvdec_pool_t        *pool;
+  hw_pool_t           *pool;
 } pic_pool_context_nvdec_t;
 
 struct nvdec_ctx {
@@ -103,8 +103,8 @@ struct nvdec_ctx {
     size_t                      decoderHeight;
 
     unsigned int                outputPitch;
-    nvdec_pool_t                *out_pool;
-    nvdec_pool_owner_t          pool_owner;
+    hw_pool_t                   *out_pool;
+    hw_pool_owner_t             pool_owner;
 
     vlc_video_context           *vctx_out;
 };
@@ -116,7 +116,7 @@ struct nvdec_ctx {
 #define NVDEC_PICPOOLCTX_FROM_PICCTX(pic_ctx)  \
     container_of(NVDEC_PICCONTEXT_FROM_PICCTX(pic_ctx), pic_pool_context_nvdec_t, ctx)
 
-static void PoolRelease(nvdec_pool_owner_t *owner, void *buffers[], size_t pics_count)
+static void PoolRelease(hw_pool_owner_t *owner, void *buffers[], size_t pics_count)
 {
     nvdec_ctx_t *p_sys = container_of(owner, nvdec_ctx_t, pool_owner);
     for (size_t i=0; i < pics_count; i++)
@@ -128,7 +128,7 @@ static void PoolRelease(nvdec_pool_owner_t *owner, void *buffers[], size_t pics_
 static void nvdec_picture_CtxDestroy(struct picture_context_t *picctx)
 {
     pic_pool_context_nvdec_t *srcpic = NVDEC_PICPOOLCTX_FROM_PICCTX(picctx);
-    nvdec_pool_Release(srcpic->pool);
+    hw_pool_Release(srcpic->pool);
     free(srcpic);
 }
 
@@ -141,11 +141,11 @@ static struct picture_context_t *nvdec_picture_CtxClone(struct picture_context_t
 
     *clonectx = *srcpic;
     vlc_video_context_Hold(clonectx->ctx.ctx.vctx);
-    nvdec_pool_AddRef(clonectx->pool);
+    hw_pool_AddRef(clonectx->pool);
     return &clonectx->ctx.ctx;
 }
 
-static picture_context_t * PoolAttachPicture(nvdec_pool_owner_t *owner, nvdec_pool_t *pool, void *surface)
+static picture_context_t * PoolAttachPicture(hw_pool_owner_t *owner, hw_pool_t *pool, void *surface)
 {
     nvdec_ctx_t *p_sys = container_of(owner, nvdec_ctx_t, pool_owner);
     pic_pool_context_nvdec_t *picctx = malloc(sizeof(*picctx));
@@ -161,7 +161,7 @@ static picture_context_t * PoolAttachPicture(nvdec_pool_owner_t *owner, nvdec_po
 
     picctx->ctx.devicePtr = (CUdeviceptr)surface;
     picctx->pool = pool;
-    nvdec_pool_AddRef(picctx->pool);
+    hw_pool_AddRef(picctx->pool);
 
     return &picctx->ctx.ctx;
 }
@@ -259,7 +259,7 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
     {
         if (p_sys->out_pool)
         {
-            nvdec_pool_Release(p_sys->out_pool);
+            hw_pool_Release(p_sys->out_pool);
             p_sys->out_pool = NULL;
         }
     }
@@ -352,16 +352,16 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
         p_sys->out_pool = NULL;
         if (outputDevicePtr[0])
         {
-            p_sys->pool_owner = (nvdec_pool_owner_t) {
+            p_sys->pool_owner = (hw_pool_owner_t) {
                 p_dec, PoolRelease, PoolAttachPicture,
             };
 
             void *bufferPtr[ARRAY_SIZE(outputDevicePtr)];
             for (size_t i=0; i<ARRAY_SIZE(outputDevicePtr); i++)
                 bufferPtr[i] = (void*)(uintptr_t)outputDevicePtr[i];
-            p_sys->out_pool = nvdec_pool_Create(&p_sys->pool_owner,
-                                                &p_dec->fmt_out.video, p_sys->vctx_out,
-                                                bufferPtr, ARRAY_SIZE(outputDevicePtr));
+            p_sys->out_pool = hw_pool_Create(&p_sys->pool_owner,
+                                             &p_dec->fmt_out.video, p_sys->vctx_out,
+                                             bufferPtr, ARRAY_SIZE(outputDevicePtr));
             if (p_sys->out_pool == NULL)
                 PoolRelease(&p_sys->pool_owner, bufferPtr, ARRAY_SIZE(outputDevicePtr));
         }
@@ -416,7 +416,7 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
 
     if ( is_nvdec_opaque(p_dec->fmt_out.video.i_chroma) )
     {
-        p_pic = nvdec_pool_Wait(p_sys->out_pool);
+        p_pic = hw_pool_Wait(p_sys->out_pool);
         if (unlikely(p_pic == NULL))
             return 0;
         pic_context_nvdec_t *picctx = NVDEC_PICCONTEXT_FROM_PICCTX(p_pic->context);
@@ -1026,7 +1026,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     if (p_sys->b_is_hxxx)
         hxxx_helper_clean(&p_sys->hh);
     if (p_sys->out_pool)
-        nvdec_pool_Release(p_sys->out_pool);
+        hw_pool_Release(p_sys->out_pool);
     else
     {
         cuvid_free_functions(&p_sys->cuvidFunctions);
