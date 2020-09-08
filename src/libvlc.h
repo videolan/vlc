@@ -44,9 +44,6 @@ void vlc_CPU_dump(vlc_object_t *);
  * Threads subsystem
  */
 
-VLC_DEPRECATED
-int vlc_clone_detach (vlc_thread_t *, void *(*)(void *), void *, int);
-
 int vlc_set_priority( vlc_thread_t, int );
 
 void vlc_threads_setup (libvlc_int_t *);

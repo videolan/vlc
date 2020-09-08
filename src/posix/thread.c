@@ -227,41 +227,6 @@ void vlc_join(vlc_thread_t th, void **result)
     VLC_THREAD_ASSERT ("joining thread");
 }
 
-/**
- * Creates and starts new detached thread.
- *
- * A detached thread cannot be joined. Its resources will be automatically
- * released whenever the thread exits (in particular, its call stack will be
- * reclaimed).
- *
- * \warning
- * Detached thread are intrinsically unsafe to use, as there are no ways to
- * know whence the thread has terminated cleanly and its resources can be
- * reclaimed (in particular, the executable code run by the thread).
- *
- * \bug
- * This function should be removed. Do not use this function in new code.
- *
- * @param th [OUT] pointer to hold the thread handle, or NULL
- * @param entry entry point for the thread
- * @param data data parameter given to the entry point
- * @param priority thread priority value
- * @return 0 on success, a standard error code on error.
- */
-int vlc_clone_detach (vlc_thread_t *th, void *(*entry) (void *), void *data,
-                      int priority)
-{
-    vlc_thread_t dummy;
-    pthread_attr_t attr;
-
-    if (th == NULL)
-        th = &dummy;
-
-    pthread_attr_init (&attr);
-    pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
-    return vlc_clone_attr (th, &attr, entry, data, priority);
-}
-
 VLC_WEAK unsigned long vlc_thread_id(void)
 {
      return -1;
