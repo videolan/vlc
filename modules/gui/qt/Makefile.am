@@ -640,12 +640,14 @@ libqt_plugin_la_QML = \
 	gui/qt/menus/qml/ToolsMenu.qml \
 	gui/qt/menus/qml/VideoMenu.qml \
 	gui/qt/menus/qml/ViewMenu.qml \
+	gui/qt/network/qml/DiscoverDisplay.qml \
 	gui/qt/network/qml/NetworkBrowseDisplay.qml \
 	gui/qt/network/qml/NetworkDisplay.qml \
 	gui/qt/network/qml/NetworkGridItem.qml \
 	gui/qt/network/qml/NetworkHomeDisplay.qml \
 	gui/qt/network/qml/NetworkHomeDeviceListView.qml \
 	gui/qt/network/qml/NetworkListItem.qml \
+	gui/qt/network/qml/ServicesHomeDisplay.qml \
 	gui/qt/player/qml/ControlBar.qml \
 	gui/qt/player/qml/ControlButtons.qml \
 	gui/qt/player/qml/MiniPlayer.qml \

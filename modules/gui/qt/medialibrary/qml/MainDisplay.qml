@@ -104,6 +104,12 @@ Widgets.NavigableFocusScope {
             name: "network",
             url: "qrc:///network/NetworkDisplay.qml"
         }, {
+            listed: true,
+            displayText: i18n.qtr("Discover"),
+            icon: VLCIcons.topbar_discover,
+            name: "discover",
+            url: "qrc:///network/DiscoverDisplay.qml"
+        }, {
             listed: false,
             name: "mlsettings",
             url: "qrc:///medialibrary/MLFoldersSettings.qml"

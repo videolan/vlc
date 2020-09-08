@@ -231,12 +231,14 @@
         <file alias="KeyHelper.js">util/qml/KeyHelper.js</file>
     </qresource>
     <qresource prefix="/network">
+        <file alias="DiscoverDisplay.qml">network/qml/DiscoverDisplay.qml</file>
         <file alias="NetworkDisplay.qml">network/qml/NetworkDisplay.qml</file>
         <file alias="NetworkHomeDeviceListView.qml">network/qml/NetworkHomeDeviceListView.qml</file>
         <file alias="NetworkHomeDisplay.qml">network/qml/NetworkHomeDisplay.qml</file>
         <file alias="NetworkBrowseDisplay.qml">network/qml/NetworkBrowseDisplay.qml</file>
         <file alias="NetworkGridItem.qml">network/qml/NetworkGridItem.qml</file>
         <file alias="NetworkListItem.qml">network/qml/NetworkListItem.qml</file>
+        <file alias="ServicesHomeDisplay.qml">network/qml/ServicesHomeDisplay.qml</file>
     </qresource>
     <qresource prefix="/medialibrary">
         <file alias="EmptyLabel.qml">medialibrary/qml/EmptyLabel.qml</file>
