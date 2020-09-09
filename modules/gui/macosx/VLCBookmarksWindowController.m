@@ -58,9 +58,6 @@
 
 - (void)dealloc
 {
-    if (p_old_input)
-        vlc_object_release(p_old_input);
-
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
