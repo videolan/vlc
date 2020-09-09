@@ -71,10 +71,10 @@ FocusScope {
 
     property int _newIndicatorMedian: VLCStyle.margin_xsmall
 
+    state: _highlighted ? "selected" : "unselected"
     states: [
         State {
             name: "unselected"
-            when: !root._highlighted
             PropertyChanges {
                 target: root
                 _primaryShadowVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
@@ -86,7 +86,6 @@ FocusScope {
         },
         State {
             name: "selected"
-            when: root._highlighted
             PropertyChanges {
                 target: root
                 _primaryShadowVerticalOffset: VLCStyle.dp(32, VLCStyle.scale)
