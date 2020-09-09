@@ -199,10 +199,11 @@
 
 - (IBAction)edit_ok:(id)sender
 {
-    /* save field contents and close sheet */
-     seekpoint_t **pp_bookmarks;
-    int i_bookmarks, i;
     input_thread_t * p_input = pl_CurrentInput(getIntf());
+
+    /* save field contents and close sheet */
+    [NSApp endSheet: _editBookmarksWindow];
+    [_editBookmarksWindow close];
 
     if (!p_input) {
         NSBeginCriticalAlertSheet(_NS("No input"), _NS("OK"), @"", @"", self.window, nil, nil, nil, nil, @"%@",_NS("No input found. A stream must be playing or paused for bookmarks to work."));
@@ -214,12 +215,15 @@
         return;
     }
 
+    seekpoint_t **pp_bookmarks = NULL;
+    int i_bookmarks = 0;
     if (input_Control(p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks, &i_bookmarks) != VLC_SUCCESS) {
+        msg_Warn(getIntf(), "Cannot get bookmarks");
         vlc_object_release(p_input);
         return;
     }
 
-    i = [_dataTable selectedRow];
+    int i = [_dataTable selectedRow];
 
     free(pp_bookmarks[i]->psz_name);
 
@@ -235,21 +239,16 @@
         pp_bookmarks[i]->i_time_offset = 1000000LL * ([[components firstObject] longLongValue] * 3600 + [[components objectAtIndex:1] longLongValue] * 60 + [[components objectAtIndex:2] floatValue]);
     else {
         msg_Err(getIntf(), "Invalid string format for time");
-        goto clear;
     }
 
     if (input_Control(p_input, INPUT_CHANGE_BOOKMARK, pp_bookmarks[i], i) != VLC_SUCCESS) {
-        msg_Warn(getIntf(), "Unable to change the bookmark");
-        goto clear;
+        msg_Err(getIntf(), "Unable to change the bookmark");
     }
 
     [_dataTable reloadData];
+
     vlc_object_release(p_input);
 
-    [NSApp endSheet: _editBookmarksWindow];
-    [_editBookmarksWindow close];
-
-clear:
     // Clear the bookmark list
     for (int i = 0; i < i_bookmarks; i++)
         vlc_seekpoint_Delete(pp_bookmarks[i]);
