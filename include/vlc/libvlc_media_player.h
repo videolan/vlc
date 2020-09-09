@@ -1345,20 +1345,32 @@ libvlc_media_player_get_track_from_id( libvlc_media_player_t *p_mi,
 
 
 /**
- * Select a track or unselect all tracks for one type
+ * Select a track
+ *
+ * This will unselected the current track.
  *
  * \version LibVLC 4.0.0 and later.
  *
  * \note Use libvlc_media_player_select_tracks() for multiple selection
  *
  * \param p_mi the media player
- * \param type type of the selected track
- * \param track track to select or NULL to unselect all tracks of for this type
+ * \param track track to select, can't be NULL
  */
 LIBVLC_API void
 libvlc_media_player_select_track( libvlc_media_player_t *p_mi,
-                                  libvlc_track_type_t type,
                                   const libvlc_media_track_t *track );
+
+/**
+ * Unselect all tracks for a given type
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \param p_mi the media player
+ * \param type type to unselect
+ */
+LIBVLC_API void
+libvlc_media_player_unselect_track_type( libvlc_media_player_t *p_mi,
+                                         libvlc_track_type_t type );
 
 /**
  * Select multiple tracks for one type
@@ -1374,7 +1386,7 @@ libvlc_media_player_select_track( libvlc_media_player_t *p_mi,
  *
  * \param p_mi the media player
  * \param type type of the selected track
- * \param tracks pointer to the track array
+ * \param tracks pointer to the track array, or NULL if track_count is 0
  * \param track_count number of tracks in the track array
  */
 LIBVLC_API void

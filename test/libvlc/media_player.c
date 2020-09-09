@@ -442,7 +442,7 @@ static void test_media_player_tracks(const char** argv, int argc)
     /* Select (replace) a new audio track */
     libtrack = libvlc_media_player_get_track_from_id(mp, "audio/0");
     assert(libtrack);
-    libvlc_media_player_select_track(mp, libvlc_track_audio, libtrack);
+    libvlc_media_player_select_track(mp, libtrack);
     libvlc_media_track_release(libtrack);
     atracks[0].toselect = true;
     atracks[2].toselect = false;
@@ -471,7 +471,7 @@ static void test_media_player_tracks(const char** argv, int argc)
     libvlc_media_track_release(vtrack2);
 
     /* Unselect all spu tracks */
-    libvlc_media_player_select_track(mp, libvlc_track_text, NULL);
+    libvlc_media_player_unselect_track_type(mp, libvlc_track_text);
     stracks[0].toselect = stracks[1].toselect = false;
 
     /* Check that all tracks are added and selected according to previous

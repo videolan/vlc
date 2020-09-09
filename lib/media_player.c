@@ -1898,27 +1898,30 @@ libvlc_media_player_get_track_from_id( libvlc_media_player_t *p_mi,
 
 void
 libvlc_media_player_select_track(libvlc_media_player_t *p_mi,
-                                 libvlc_track_type_t type,
                                  const libvlc_media_track_t *track)
 {
-    assert( track == NULL || type == track->i_type );
+    assert( track != NULL );
     vlc_player_t *player = p_mi->player;
 
     vlc_player_Lock(player);
 
-    if (track != NULL)
-    {
-        const libvlc_media_trackpriv_t *trackpriv =
-            libvlc_media_track_to_priv(track);
-        vlc_player_SelectEsId(player, trackpriv->es_id,
-                              VLC_PLAYER_SELECT_EXCLUSIVE);
-    }
-    else
-    {
-        const enum es_format_category_e cat = libvlc_track_type_to_escat(type);
-        vlc_player_UnselectTrackCategory(player, cat);
-    }
+    const libvlc_media_trackpriv_t *trackpriv =
+        libvlc_media_track_to_priv(track);
+    vlc_player_SelectEsId(player, trackpriv->es_id,
+                          VLC_PLAYER_SELECT_EXCLUSIVE);
 
+    vlc_player_Unlock(player);
+}
+
+void
+libvlc_media_player_unselect_track_type( libvlc_media_player_t *p_mi,
+                                         libvlc_track_type_t type )
+{
+    vlc_player_t *player = p_mi->player;
+    const enum es_format_category_e cat = libvlc_track_type_to_escat(type);
+
+    vlc_player_Lock(player);
+    vlc_player_UnselectTrackCategory(player, cat);
     vlc_player_Unlock(player);
 }
 
