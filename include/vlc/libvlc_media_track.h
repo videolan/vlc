@@ -122,7 +122,7 @@ typedef struct libvlc_media_track_t
     /* Codec fourcc */
     uint32_t    i_codec;
     uint32_t    i_original_fourcc;
-    int         i_id;
+    int         i_id; /* DEPRECATED: use psz_id */
     libvlc_track_type_t i_type;
 
     /* Codec specific */

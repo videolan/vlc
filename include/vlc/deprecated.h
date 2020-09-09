@@ -88,6 +88,186 @@ libvlc_media_parse_async( libvlc_media_t *p_md );
 LIBVLC_DEPRECATED LIBVLC_API bool
    libvlc_media_is_parsed( libvlc_media_t *p_md );
 
+/**
+ * Get media descriptor's elementary streams description
+ *
+ * Note, you need to call libvlc_media_parse_with_options() or play the media
+ * at least once before calling this function.
+ * Not doing this will result in an empty array.
+ *
+ * \version LibVLC 2.1.0 and later.
+ * \see libvlc_media_parse_with_options
+ *
+ * \param p_md media descriptor object
+ * \param tracks address to store an allocated array of Elementary Streams
+ *        descriptions (must be freed with libvlc_media_tracks_release
+          by the caller) [OUT]
+ *
+ * \return the number of Elementary Streams (zero on error)
+ */
+LIBVLC_DEPRECATED LIBVLC_API
+unsigned libvlc_media_tracks_get( libvlc_media_t *p_md,
+                                  libvlc_media_track_t ***tracks );
+
+/**
+ * Release media descriptor's elementary streams description array
+ *
+ * \version LibVLC 2.1.0 and later.
+ *
+ * \param p_tracks tracks info array to release
+ * \param i_count number of elements in the array
+ */
+LIBVLC_DEPRECATED LIBVLC_API
+void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks,
+                                  unsigned i_count );
+
+/** @}*/
+
+/**
+ * \ingroup libvlc libvlc_media_player
+ * @{
+ */
+
+/**
+ * Description for video, audio tracks and subtitles. It contains
+ * id, name (description string) and pointer to next record.
+ */
+typedef struct libvlc_track_description_t
+{
+    int   i_id;
+    char *psz_name;
+    struct libvlc_track_description_t *p_next;
+
+} libvlc_track_description_t;
+
+/**
+ * Release (free) libvlc_track_description_t
+ *
+ * \param p_track_description the structure to release
+ */
+LIBVLC_DEPRECATED LIBVLC_API void libvlc_track_description_list_release( libvlc_track_description_t *p_track_description );
+
+
+/** @}*/
+
+/**
+ * \ingroup libvlc libvlc_video
+ * @{
+ */
+
+/**
+ * Get number of available video tracks.
+ *
+ * \param p_mi media player
+ * \return the number of available video tracks (int)
+ */
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_video_get_track_count( libvlc_media_player_t *p_mi );
+
+/**
+ * Get the description of available video tracks.
+ *
+ * \param p_mi media player
+ * \return list with description of available video tracks, or NULL on error.
+ * It must be freed with libvlc_track_description_list_release()
+ */
+LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
+        libvlc_video_get_track_description( libvlc_media_player_t *p_mi );
+
+/**
+ * Get current video track.
+ *
+ * \param p_mi media player
+ * \return the video track ID (int) or -1 if no active input
+ */
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_video_get_track( libvlc_media_player_t *p_mi );
+
+/**
+ * Set video track.
+ *
+ * \param p_mi media player
+ * \param i_track the track ID (i_id field from track description)
+ * \return 0 on success, -1 if out of range
+ */
+LIBVLC_DEPRECATED LIBVLC_API
+int libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track );
+
+/**
+ * Get current video subtitle.
+ *
+ * \param p_mi the media player
+ * \return the video subtitle selected, or -1 if none
+ */
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_video_get_spu( libvlc_media_player_t *p_mi );
+
+/**
+ * Get the number of available video subtitles.
+ *
+ * \param p_mi the media player
+ * \return the number of available video subtitles
+ */
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_video_get_spu_count( libvlc_media_player_t *p_mi );
+
+/**
+ * Get the description of available video subtitles.
+ *
+ * \param p_mi the media player
+ * \return list containing description of available video subtitles.
+ * It must be freed with libvlc_track_description_list_release()
+ */
+LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
+        libvlc_video_get_spu_description( libvlc_media_player_t *p_mi );
+
+/**
+ * Set new video subtitle.
+ *
+ * \param p_mi the media player
+ * \param i_spu video subtitle track to select (i_id from track description)
+ * \return 0 on success, -1 if out of range
+ */
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu );
+
+/** @}*/
+
+/**
+ * \ingroup libvlc libvlc_audio
+ * @{
+ */
+
+/**
+ * Get number of available audio tracks.
+ *
+ * \param p_mi media player
+ * \return the number of available audio tracks (int), or -1 if unavailable
+ */
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_audio_get_track_count( libvlc_media_player_t *p_mi );
+
+/**
+ * Get the description of available audio tracks.
+ *
+ * \param p_mi media player
+ * \return list with description of available audio tracks, or NULL.
+ * It must be freed with libvlc_track_description_list_release()
+ */
+LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
+        libvlc_audio_get_track_description( libvlc_media_player_t *p_mi );
+
+/**
+ * Get current audio track.
+ *
+ * \param p_mi media player
+ * \return the audio track ID or -1 if no active input.
+ */
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_audio_get_track( libvlc_media_player_t *p_mi );
+
+/**
+ * Set current audio track.
+ *
+ * \param p_mi media player
+ * \param i_track the track ID (i_id field from track description)
+ * \return 0 on success, -1 on error
+ */
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track );
+
 /** @}*/
 
 /**

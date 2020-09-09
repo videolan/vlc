@@ -642,27 +642,6 @@ LIBVLC_API void
 LIBVLC_API void *libvlc_media_get_user_data( libvlc_media_t *p_md );
 
 /**
- * Get media descriptor's elementary streams description
- *
- * Note, you need to call libvlc_media_parse_with_options() or play the media
- * at least once before calling this function.
- * Not doing this will result in an empty array.
- *
- * \version LibVLC 2.1.0 and later.
- * \see libvlc_media_parse_with_options
- *
- * \param p_md media descriptor object
- * \param tracks address to store an allocated array of Elementary Streams
- *        descriptions (must be freed with libvlc_media_tracks_release
-          by the caller) [OUT]
- *
- * \return the number of Elementary Streams (zero on error)
- */
-LIBVLC_API
-unsigned libvlc_media_tracks_get( libvlc_media_t *p_md,
-                                  libvlc_media_track_t ***tracks );
-
-/**
  * Get the track list for one type
  *
  * \version LibVLC 4.0.0 and later.
@@ -704,18 +683,6 @@ libvlc_media_get_tracklist( libvlc_media_t *p_md, libvlc_track_type_t type );
 LIBVLC_API
 const char *libvlc_media_get_codec_description( libvlc_track_type_t i_type,
                                                 uint32_t i_codec );
-
-/**
- * Release media descriptor's elementary streams description array
- *
- * \version LibVLC 2.1.0 and later.
- *
- * \param p_tracks tracks info array to release
- * \param i_count number of elements in the array
- */
-LIBVLC_API
-void libvlc_media_tracks_release( libvlc_media_track_t **p_tracks,
-                                  unsigned i_count );
 
 /**
  * Get the media type of the media descriptor object
