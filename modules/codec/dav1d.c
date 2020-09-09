@@ -38,6 +38,7 @@
 #include <dav1d/dav1d.h>
 
 #include "../packetizer/iso_color_tables.h"
+#include "../packetizer/av1_obu.h"
 #include "cc.h"
 
 /****************************************************************************
@@ -391,6 +392,37 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->s.allocator.alloc_picture_callback = NewPicture;
     p_sys->s.allocator.release_picture_callback = FreePicture;
 
+    av1_OBU_sequence_header_t *sequence_hdr = NULL;
+    if (dec->fmt_in.i_extra > 4)
+    {
+        // in ISOBMFF/WebM/Matroska the first 4 bytes are from the AV1CodecConfigurationBox
+        // and then one or more OBU
+        const uint8_t *obu_start = ((const uint8_t*) dec->fmt_in.p_extra) + 4;
+        int obu_size = dec->fmt_in.i_extra - 4;
+        if (AV1_OBUIsValid(obu_start, obu_size) && AV1_OBUGetType(obu_start) == AV1_OBU_SEQUENCE_HEADER)
+            sequence_hdr = AV1_OBU_parse_sequence_header(obu_start, obu_size);
+    }
+
+    if (!sequence_hdr)
+    {
+        dec->fmt_out.i_codec = VLC_CODEC_I420;
+        dec->fmt_out.video.i_width = dec->fmt_in.video.i_width;
+        dec->fmt_out.video.i_height = dec->fmt_in.video.i_height;
+    }
+    else
+    {
+        // use the sequence header to get a better chroma to start with
+        dec->fmt_out.i_codec = AV1_get_chroma(sequence_hdr);
+
+        AV1_get_frame_max_dimensions(sequence_hdr, &dec->fmt_out.video.i_width, &dec->fmt_out.video.i_height);
+
+        if (dec->fmt_out.video.transfer == TRANSFER_FUNC_UNDEF)
+            AV1_get_colorimetry(sequence_hdr, &dec->fmt_out.video.primaries, &dec->fmt_out.video.transfer,
+                                &dec->fmt_out.video.space, &dec->fmt_out.video.color_range);
+    }
+    dec->fmt_out.video.i_visible_width  = dec->fmt_out.video.i_width;
+    dec->fmt_out.video.i_visible_height = dec->fmt_out.video.i_height;
+
     if (dav1d_open(&p_sys->c, &p_sys->s) < 0)
     {
         msg_Err(p_this, "Could not open the Dav1d decoder");
@@ -400,13 +432,10 @@ static int OpenDecoder(vlc_object_t *p_this)
     msg_Dbg(p_this, "Using dav1d version %s with %d/%d frame/tile threads",
             dav1d_version(), p_sys->s.n_frame_threads, p_sys->s.n_tile_threads);
 
-    dec->pf_decode = Decode;
-    dec->pf_flush = FlushDecoder;
     dec->i_extra_picture_buffers = (p_sys->s.n_frame_threads - 1);
+    dec->fmt_out.video.i_width  = (dec->fmt_out.video.i_width + 0x7F) & ~0x7F;
+    dec->fmt_out.video.i_height = (dec->fmt_out.video.i_height + 0x7F) & ~0x7F;
 
-    dec->fmt_out.video.i_width = dec->fmt_in.video.i_width;
-    dec->fmt_out.video.i_height = dec->fmt_in.video.i_height;
-    dec->fmt_out.i_codec = VLC_CODEC_I420;
     dec->p_sys = p_sys;
 
     if (dec->fmt_in.video.i_sar_num > 0 && dec->fmt_in.video.i_sar_den > 0) {
@@ -419,6 +448,20 @@ static int OpenDecoder(vlc_object_t *p_this)
     dec->fmt_out.video.color_range = dec->fmt_in.video.color_range;
     dec->fmt_out.video.mastering   = dec->fmt_in.video.mastering;
     dec->fmt_out.video.lighting    = dec->fmt_in.video.lighting;
+
+    if (sequence_hdr != NULL)
+    {
+        // we have the proper chroma, make sure we can use it
+        AV1_release_sequence_header(sequence_hdr);
+
+        if (decoder_UpdateVideoFormat(dec) != 0)
+        {
+            CloseDecoder(VLC_OBJECT(dec));
+            return VLC_EGENERIC;
+        }
+    }
+    dec->pf_decode = Decode;
+    dec->pf_flush = FlushDecoder;
 
     cc_Init(&p_sys->cc);
 

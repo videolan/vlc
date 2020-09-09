@@ -560,7 +560,8 @@ libtwolame_plugin_la_LIBADD = $(TWOLAME_LIBS) $(LIBM)
 EXTRA_LTLIBRARIES += libtwolame_plugin.la
 codec_LTLIBRARIES += $(LTLIBtwolame)
 
-libdav1d_plugin_la_SOURCES = codec/dav1d.c
+libdav1d_plugin_la_SOURCES = codec/dav1d.c \
+	packetizer/av1_obu.c packetizer/av1_obu.h
 libdav1d_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(DAV1D_CFLAGS)
 libdav1d_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdav1d_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
