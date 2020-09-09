@@ -158,6 +158,8 @@ struct av1_color_config_s
     obu_u1_t subsampling_y;
     obu_u2_t chroma_sample_position;
     obu_u1_t separate_uv_delta_q;
+
+    vlc_fourcc_t i_chroma;
 };
 
 static bool av1_parse_color_config(bs_t *p_bs,
@@ -191,12 +193,14 @@ static bool av1_parse_color_config(bs_t *p_bs,
     if(p_cc->mono_chrome)
     {
         p_cc->color_range = bs_read1(p_bs) ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
+        p_cc->i_chroma = VLC_CODEC_GREY;
     }
     else if( p_cc->color_primaries == 1 &&
              p_cc->transfer_characteristics == 13 &&
              p_cc->matrix_coefficients == 0 )
     {
         p_cc->color_range = COLOR_RANGE_FULL;
+        p_cc->i_chroma = VLC_CODEC_I444;
     }
     else
     {
@@ -213,7 +217,16 @@ static bool av1_parse_color_config(bs_t *p_bs,
             {
                 p_cc->subsampling_x = 1;
             }
+            p_cc->i_chroma = p_cc->subsampling_x ?
+                             p_cc->subsampling_y ? VLC_CODEC_I420 :
+                                                   VLC_CODEC_I422 :
+                                                   VLC_CODEC_I444;
         }
+        else if(seq_profile == 1)
+            p_cc->i_chroma = VLC_CODEC_I444;
+        else
+            p_cc->i_chroma = VLC_CODEC_I420;
+
         if(p_cc->subsampling_x && p_cc->subsampling_y)
             p_cc->chroma_sample_position = bs_read(p_bs, 2);
     }
@@ -542,6 +555,54 @@ bool AV1_get_colorimetry(const av1_OBU_sequence_header_t *p_seq,
     *p_colorspace = iso_23001_8_mc_to_vlc_coeffs(p_seq->color_config.matrix_coefficients);
     *p_full_range = p_seq->color_config.color_range ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
     return true;
+}
+
+vlc_fourcc_t AV1_get_chroma(const av1_OBU_sequence_header_t *p_seq)
+{
+    switch (p_seq->color_config.i_chroma)
+    {
+        case VLC_CODEC_GREY:
+            switch (p_seq->color_config.high_bitdepth + p_seq->color_config.twelve_bit)
+            {
+                case 0: return VLC_CODEC_GREY;
+                case 1: return VLC_CODEC_GREY_10L;
+                case 2: return VLC_CODEC_GREY_12L;
+                default:
+                    vlc_assert_unreachable();
+            }
+            break;
+        case VLC_CODEC_I420:
+            switch (p_seq->color_config.high_bitdepth + p_seq->color_config.twelve_bit)
+            {
+                case 0: return VLC_CODEC_I420;
+                case 1: return VLC_CODEC_I420_10L;
+                case 2: return VLC_CODEC_I420_12L;
+                default:
+                    vlc_assert_unreachable();
+            }
+            break;
+        case VLC_CODEC_I422:
+            switch (p_seq->color_config.high_bitdepth + p_seq->color_config.twelve_bit)
+            {
+                case 0: return VLC_CODEC_I422;
+                case 1: return VLC_CODEC_I422_10L;
+                case 2: return VLC_CODEC_I422_12L;
+                default:
+                    vlc_assert_unreachable();
+            }
+            break;
+        case VLC_CODEC_I444:
+            switch (p_seq->color_config.high_bitdepth + p_seq->color_config.twelve_bit)
+            {
+                case 0: return VLC_CODEC_I444;
+                case 1: return VLC_CODEC_I444_10L;
+                case 2: return VLC_CODEC_I444_12L;
+                default:
+                    vlc_assert_unreachable();
+            }
+        default:
+            vlc_assert_unreachable();
+    }
 }
 
 size_t AV1_create_DecoderConfigurationRecord(uint8_t **pp_buffer,
