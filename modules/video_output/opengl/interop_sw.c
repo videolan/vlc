@@ -330,8 +330,6 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         ret = opengl_interop_init(interop, GL_TEXTURE_2D, *list, space);
         if (ret == VLC_SUCCESS)
         {
-            interop->fmt_out.i_chroma = *list;
-
             if (interop->fmt_out.i_chroma == VLC_CODEC_RGB32)
             {
 #if defined(WORDS_BIGENDIAN)
