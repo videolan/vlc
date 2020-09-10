@@ -84,22 +84,22 @@ Rectangle {
                     uniform lowp float tintStrength;
 
 
-                    float rand(vec2 co){
+                    mediump float rand(highp vec2 co){
                         return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
                     }
 
 
-                    vec4 exclude(vec4 src, vec4 dst)
+                    mediump vec4 exclude(mediump vec4 src, mediump vec4 dst)
                     {
                         return src + dst - 2.0 * src * dst;
                     }
 
                     void main() {
-                       float r = rand(qt_TexCoord0) - 0.5;
-                       vec4 noise = vec4(r,r,r,1.0) * noiseStrength;
-                       vec4 blured  = texture2D(source, qt_TexCoord0);
+                       mediump float r = rand(qt_TexCoord0) - 0.5;
+                       mediump vec4 noise = vec4(r,r,r,1.0) * noiseStrength;
+                       mediump vec4 blured  = texture2D(source, qt_TexCoord0);
 
-                       vec4 exclColor = vec4(exclusionStrength, exclusionStrength, exclusionStrength, 0.0);
+                       mediump vec4 exclColor = vec4(exclusionStrength, exclusionStrength, exclusionStrength, 0.0);
 
                        blured = exclude(blured, exclColor);
 
