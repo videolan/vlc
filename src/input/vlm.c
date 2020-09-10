@@ -464,7 +464,6 @@ static int vlm_ControlMediaChange( vlm_t *p_vlm, vlm_media_t *p_cfg )
 static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id )
 {
     vlm_media_sys_t *p_media;
-    char *header;
 
     if( vlm_MediaDescriptionCheck( p_vlm, p_cfg ) || vlm_ControlMediaGetByName( p_vlm, p_cfg->psz_name ) )
     {
@@ -476,21 +475,6 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
                                  "media" );
     if( !p_media )
         return VLC_ENOMEM;
-
-    if( asprintf( &header, _("Media: %s"), p_cfg->psz_name ) == -1 )
-    {
-        vlc_object_delete(p_media);
-        return VLC_ENOMEM;
-    }
-
-    p_media->obj.logger = vlc_LogHeaderCreate( p_media->obj.logger, header );
-    free( header );
-
-    if( p_media->obj.logger == NULL )
-    {
-        vlc_object_delete(p_media);
-        return VLC_ENOMEM;
-    }
 
     vlm_media_Copy( &p_media->cfg, p_cfg );
     p_media->cfg.id = p_vlm->i_id++;
@@ -525,7 +509,6 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
     vlm_media_Clean( &p_media->cfg );
 
     TAB_REMOVE( p_vlm->i_media, p_vlm->media, p_media );
-    vlc_LogDestroy( p_media->obj.logger );
     vlc_object_delete(p_media);
 
     return VLC_SUCCESS;
