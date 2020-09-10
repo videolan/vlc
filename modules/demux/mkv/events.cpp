@@ -48,6 +48,9 @@ void event_thread_t::SetPci(const pci_t *data)
 {
     vlc_mutex_locker l(&lock);
 
+    if(es_list.empty())
+        return;
+
     memcpy(&pci_packet, data, sizeof(pci_packet));
 
 #ifndef WORDS_BIGENDIAN
@@ -356,7 +359,9 @@ bool event_thread_t::AddES( es_out_id_t* es, int category )
 void event_thread_t::DelES( es_out_id_t* es )
 {
     vlc_mutex_locker lock_guard( &lock );
-    es_list.erase( std::find( es_list.begin(), es_list.end(), es ) );
+    es_list_t::iterator info = std::find( es_list.begin(), es_list.end(), es );
+    if( info != es_list.end() )
+        es_list.erase( info );
 }
 
 } // namespace
