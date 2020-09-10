@@ -1089,4 +1089,3 @@ DecoderContextOpen(vlc_decoder_device *device, vout_window_t *window)
 
     return VLC_SUCCESS;
 }
-
