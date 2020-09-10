@@ -163,8 +163,12 @@ bool CompositorDCompositionUISurface::init()
     m_context = new QOpenGLContext(this);
     m_context->setScreen(m_rootWindow->screen());
     m_context->setFormat(format);
-    assert(m_context->create());
-    assert(m_context->isValid());
+    ret = m_context->create();
+    if (!ret || !m_context->isValid())
+    {
+        msg_Err(m_intf, "unable to create QML OpenGL context");
+        return false;
+    }
 
     QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
     m_eglDisplay = static_cast<EGLDisplay>(nativeInterface->nativeResourceForContext("eglDisplay", m_context));
