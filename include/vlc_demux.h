@@ -119,6 +119,12 @@ enum demux_query_e
      * arg1=double *quality, arg2=double *strength */
     DEMUX_GET_SIGNAL = 0x107,
 
+    /** Retrieves the demuxed content type
+     * Can fail if the control is not implemented
+     *
+     * arg1= int* */
+    DEMUX_GET_TYPE = 0x109,
+
     /** Sets the paused or playing/resumed state.
      *
      * Streams are initially in playing state. The control always specifies a

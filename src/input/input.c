@@ -2791,6 +2791,14 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
     if( demux_Control( in->p_demux, DEMUX_GET_FPS, &in->f_fps ) )
         in->f_fps = 0.f;
 
+    int input_type;
+    if( !demux_Control( in->p_demux, DEMUX_GET_TYPE, &input_type ) )
+    {
+        vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
+        input_priv(p_input)->p_item->i_type = input_type;
+        vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
+    }
+
     if( var_GetInteger( p_input, "clock-synchro" ) != -1 )
         in->b_can_pace_control = !var_GetInteger( p_input, "clock-synchro" );
 
