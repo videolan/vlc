@@ -460,6 +460,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 VLC_TICK_FROM_MS(var_InheritInteger( p_demux, "disc-caching" ));
             return VLC_SUCCESS;
 
+        case DEMUX_GET_TYPE:
+            *va_arg( args, int* ) = ITEM_TYPE_DISC;
+            return VLC_SUCCESS;
+
         /* TODO implement others */
         default:
             return VLC_EGENERIC;
