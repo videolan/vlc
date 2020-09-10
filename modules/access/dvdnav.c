@@ -832,6 +832,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             break;
         }
 
+        case DEMUX_GET_TYPE:
+        {
+            *va_arg( args, int* ) = ITEM_TYPE_DISC;
+            break;
+        }
+
         /* TODO implement others */
         default:
             return VLC_EGENERIC;
