@@ -539,7 +539,8 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 
     if( track.fmt.i_cat != DATA_ES && track.p_es == NULL )
     {
-        msg_Err( p_demux, "unknown track number" );
+        msg_Err( p_demux, "unknown track number %u (%4.4s)",
+                 track.i_number, (const char *) &track.fmt.i_codec );
         return;
     }
 
