@@ -61,7 +61,7 @@ static void player_on_state_changed(vlc_player_t *player,
                                     enum vlc_player_state new_state, void *data)
 {
     vlm_media_sys_t *p_media = data;
-    vlm_t *p_vlm = libvlc_priv( vlc_object_instance(p_media) )->p_vlm;
+    vlm_t *p_vlm = p_media->vlm;
     assert( p_vlm );
     const char *psz_instance_name = NULL;
 
@@ -471,10 +471,11 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
         return VLC_EGENERIC;
     }
 
-    p_media = vlc_custom_create( VLC_OBJECT(p_vlm), sizeof( *p_media ),
-                                 "media" );
+    p_media = malloc(sizeof(*p_media));
     if( !p_media )
         return VLC_ENOMEM;
+
+    p_media->vlm = p_vlm;
 
     vlm_media_Copy( &p_media->cfg, p_cfg );
     p_media->cfg.id = p_vlm->i_id++;
@@ -509,7 +510,7 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
     vlm_media_Clean( &p_media->cfg );
 
     TAB_REMOVE( p_vlm->i_media, p_vlm->media, p_media );
-    vlc_object_delete(p_media);
+    free(p_media);
 
     return VLC_SUCCESS;
 }
@@ -584,11 +585,8 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_media_sys_t *p_media,
         goto error;
 
     p_instance->i_index = 0;
-    p_instance->p_parent = vlc_object_create( p_media, sizeof (vlc_object_t) );
-    if (!p_instance->p_parent)
-        goto error;
 
-    p_instance->player = vlc_player_New(p_instance->p_parent,
+    p_instance->player = vlc_player_New(VLC_OBJECT(p_media->vlm),
                                         VLC_PLAYER_LOCK_NORMAL, NULL, NULL);
     if (!p_instance->player)
         goto error;
@@ -608,8 +606,6 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_media_sys_t *p_media,
 error:
     if (p_instance->player)
         vlc_player_Delete(p_instance->player);
-    if (p_instance->p_parent)
-        vlc_object_delete(p_instance->p_parent);
     if (p_instance->p_item)
         input_item_Release(p_instance->p_item);
     free(p_instance->psz_name);
@@ -629,7 +625,6 @@ static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instanc
 
     if (had_media)
         vlm_SendEventMediaInstanceStopped( p_vlm, id, p_media->cfg.psz_name );
-    vlc_object_delete(p_instance->p_parent);
 
     TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
     input_item_Release( p_instance->p_item );
