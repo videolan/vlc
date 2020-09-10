@@ -31,6 +31,7 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_url.h>
+#include <vlc_access.h>
 
 #if defined( _WIN32 ) || defined( __OS2__ )
 # include <ctype.h>                          /* isalpha */
@@ -199,4 +200,9 @@ char *ProcessMRL(const char *str, const char *base)
     }
 
     return abs;
+}
+
+int PlaylistControl( stream_t *p_access, int i_query, va_list args )
+{
+    return access_vaDirectoryControlHelper( p_access, i_query, args );
 }

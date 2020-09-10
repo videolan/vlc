@@ -159,7 +159,7 @@ int Import_SGIMB( vlc_object_t * p_this )
 
             msg_Dbg( p_demux, "using SGIMB playlist reader" );
             p_demux->pf_readdir = ReadDir;
-            p_demux->pf_control = access_vaDirectoryControlHelper;
+            p_demux->pf_control = PlaylistControl;
             p_demux->p_sys = p_sys;
             p_sys->psz_uri = NULL;
             p_sys->psz_server = NULL;

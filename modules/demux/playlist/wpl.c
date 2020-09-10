@@ -324,7 +324,7 @@ int Import_WPL( vlc_object_t* p_this )
 
     msg_Dbg( p_demux, "Found valid WPL playlist" );
     p_demux->pf_readdir = Demux;
-    p_demux->pf_control = access_vaDirectoryControlHelper;
+    p_demux->pf_control = PlaylistControl;
 
     return VLC_SUCCESS;
 }

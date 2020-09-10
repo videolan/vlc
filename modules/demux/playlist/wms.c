@@ -81,6 +81,6 @@ int Import_WMS(vlc_object_t *obj)
 
     msg_Dbg(demux, "found WMS metafile");
     demux->pf_readdir = ReadDir;
-    demux->pf_control = access_vaDirectoryControlHelper;
+    demux->pf_control = PlaylistControl;
     return VLC_SUCCESS;
 }

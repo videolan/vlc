@@ -60,7 +60,7 @@ int Import_PLS( vlc_object_t *p_this )
 
     msg_Dbg( p_demux, "found valid PLS playlist file");
     p_demux->pf_readdir = ReadDir;
-    p_demux->pf_control = access_vaDirectoryControlHelper;
+    p_demux->pf_control = PlaylistControl;
 
     return VLC_SUCCESS;
 }

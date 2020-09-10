@@ -82,7 +82,7 @@ int Import_BDMV( vlc_object_t *p_this )
     if( i_peek < 8 || memcmp( p_peek, psz_probe, 8 ) )
         return VLC_EGENERIC;
 
-    p_stream->pf_control = access_vaDirectoryControlHelper;
+    p_stream->pf_control = PlaylistControl;
 
     return VLC_SUCCESS;
 }

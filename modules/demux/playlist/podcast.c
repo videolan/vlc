@@ -89,7 +89,7 @@ int Import_podcast( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     p_demux->pf_readdir = ReadDir;
-    p_demux->pf_control = access_vaDirectoryControlHelper;
+    p_demux->pf_control = PlaylistControl;
     msg_Dbg( p_demux, "using podcast reader" );
 
     return VLC_SUCCESS;

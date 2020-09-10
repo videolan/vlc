@@ -24,6 +24,8 @@
 
 char *ProcessMRL( const char *, const char * );
 
+int PlaylistControl( stream_t *p_access, int i_query, va_list args );
+
 int Import_M3U ( vlc_object_t * );
 
 int Import_RAM ( vlc_object_t * );

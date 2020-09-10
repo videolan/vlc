@@ -176,7 +176,7 @@ int Import_ASX( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_demux->pf_control = access_vaDirectoryControlHelper;
+    p_demux->pf_control = PlaylistControl;
     p_demux->pf_readdir = ReadDir;
     return VLC_SUCCESS;
 }

@@ -102,7 +102,7 @@ int Import_xspf(vlc_object_t *p_this)
     msg_Dbg(p_stream, "using XSPF playlist reader");
     p_stream->p_sys = sys;
     p_stream->pf_readdir = ReadDir;
-    p_stream->pf_control = access_vaDirectoryControlHelper;
+    p_stream->pf_control = PlaylistControl;
 
     return VLC_SUCCESS;
 }
