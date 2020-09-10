@@ -282,4 +282,3 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl)
 
     return VLC_SUCCESS;
 }
-
