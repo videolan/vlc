@@ -2660,6 +2660,12 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         }
         return VLC_EGENERIC;
 
+    case DEMUX_GET_TYPE:
+    {
+        *va_arg( args, int* ) = ITEM_TYPE_DISC;
+        break;
+    }
+
     case DEMUX_CAN_RECORD:
     case DEMUX_GET_FPS:
     case DEMUX_SET_GROUP_DEFAULT:
