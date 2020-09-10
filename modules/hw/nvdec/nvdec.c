@@ -333,7 +333,7 @@ static int CUDAAPI HandleVideoSequence(void *p_opaque, CUVIDEOFORMAT *p_format)
                 vlc_assert_unreachable();
         }
 
-        int ret = CALL_CUDA_DEC(cuCtxPushCurrent, p_sys->devsys->cuCtx);
+        ret = CALL_CUDA_DEC(cuCtxPushCurrent, p_sys->devsys->cuCtx);
         if (ret != CUDA_SUCCESS)
             goto cuda_error;
 
