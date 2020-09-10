@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-29 09:23+0200\n"
+"PO-Revision-Date: 2020-09-11 01:36+0200\n"
 "Last-Translator: abuyop <abuyop@gmail.com>, 2020\n"
 "Language-Team: Malay (https://www.transifex.com/yaron/teams/16553/ms/)\n"
 "Language: ms\n"
@@ -1802,8 +1802,8 @@ msgstr "Unset"
 #: src/libvlc-module.c:203
 msgid "This adds audio post processing filters, to modify the sound rendering."
 msgstr ""
-"Ini akan menambah penapis pasca pemprosesan audio, untuk mengubahsuai "
-"penerapan bunyi."
+"Ini akan menambah penapis pasca pemprosesan audio, untuk mengubah suai "
+"pengemasgabungan bunyi."
 
 #: src/libvlc-module.c:208
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
@@ -2103,7 +2103,7 @@ msgstr "Benarkan mod kertas dinding"
 msgid ""
 "The wallpaper mode allows you to display the video as the desktop background."
 msgstr ""
-"Mod kertas dinding membenarkan anda paparkan video sebagai latar desktop."
+"Mod kertas dinding membenarkan anda paparkan video sebagai latar atas meja."
 
 #: src/libvlc-module.c:324
 msgid "Show media title on video"
@@ -2945,15 +2945,15 @@ msgstr ""
 
 #: src/libvlc-module.c:722
 msgid "Text rendering module"
-msgstr "Modul penerapan teks"
+msgstr "Modul pengemasgabungan teks"
 
 #: src/libvlc-module.c:724
 msgid ""
 "VLC normally uses Freetype for rendering, but this allows you to use svg for "
 "instance."
 msgstr ""
-"VLC biasanya menggunakan Freetype untuk penerapan, tetapi ini membolehkan "
-"anda untuk gunakan svg untuk kejadian."
+"VLC biasanya menggunakan Freetype untuk pengemasgabungan, tetapi ini "
+"membolehkan anda guna svg untuk kejadian."
 
 #: src/libvlc-module.c:726
 msgid "Subpictures source module"
@@ -3696,11 +3696,11 @@ msgid ""
 "machine."
 msgstr ""
 "Meningkatkan prioriti proses akan meningkatkan sedikit pengalaman "
-"memautarkannya kerana ianya membenarkan VLC tidak diganggu oleh aplikasi "
-"lain yang mungkin mengambil terlalu banyak masa pemproses. Bagaimanapun "
+"memainkannya kerana ianya membenarkan VLC tidak diganggu oleh aplikasi lain "
+"yang mungkin mengambil terlalu banyak masa pemproses. Bagaimanapun "
 "dinasihatkan dalam keadaan tertentu (pijat) VLC mungkin mengambil masa "
 "pemproses dan memberikan keseluruhan sistem tidak bertindak balas yang mana "
-"mungkin memerlukan but semual sistem anda."
+"mungkin memerlukan but semua sistem anda."
 
 #: src/libvlc-module.c:1099 modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Enqueue items into playlist in one instance mode"
@@ -6600,7 +6600,7 @@ msgstr ""
 
 #: modules/access/dshow/dshow.cpp:145 modules/access/v4l2/v4l2.c:196
 msgid "Picture aspect-ratio n:m"
-msgstr "Nisbah-aspek gambar n:m"
+msgstr "Nisbah-bidang gambar n:m"
 
 #: modules/access/dshow/dshow.cpp:146 modules/access/v4l2/v4l2.c:197
 msgid "Define input picture aspect-ratio to use. Default is 4:3"
@@ -8109,7 +8109,7 @@ msgstr "RDP"
 
 #: modules/access/rdp.c:89
 msgid "RDP Remote Desktop"
-msgstr "Desktop Jauh RDP"
+msgstr "Atas Meja Jauh RDP"
 
 #: modules/access/rtp/rtp.c:44
 msgid "RTCP (local) port"
@@ -9177,7 +9177,7 @@ msgstr "Mod gelung balik"
 
 #: modules/access/wasapi.c:486
 msgid "Record an audio rendering endpoint."
-msgstr "Rakam takat akhir penerapan audio."
+msgstr "Rakam takat akhir pengemasgabungan audio."
 
 #: modules/access/wasapi.c:489
 msgid "WASAPI"
@@ -9772,11 +9772,12 @@ msgstr "Mod fon kepala (binaural)"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
-msgstr "Jika output adalah stereo, terap ambisonic dengan penyahkod binaural."
+msgstr ""
+"Jika output adalah stereo, kemas gabung ambisonic dengan penyahkod binaural."
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:65
 msgid "Ambisonics renderer and binauralizer"
-msgstr "Penerap dan binauralizer Ambisonics"
+msgstr "Pengemas gabung dan binauralizer Ambisonics"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:77
 msgid "Binauralizer"
@@ -10719,7 +10720,7 @@ msgid ""
 "VLC restart to apply."
 msgstr ""
 "Pilih peranti Audio khas, atau biarkan windows tetapkan (lalai), ubah "
-"keperluan VLC mula semula untuk laksanakan."
+"keperluan VLC mula semula untuk diterapkan."
 
 #: modules/audio_output/waveout.c:149
 msgid "WaveOut audio output"
@@ -10813,11 +10814,11 @@ msgstr "Abai ruby (furigana) dalam sarikata."
 
 #: modules/codec/arib/aribsub.c:48
 msgid "Use Core Text renderer"
-msgstr "Guna penerap Teks Teras"
+msgstr "Guna pengemas gabung Core Text"
 
 #: modules/codec/arib/aribsub.c:49
 msgid "Use Core Text renderer in the subtitle."
-msgstr "Guna penerap Teks Teras dalam sarikata."
+msgstr "Guna pengemas gabung Core Text dalam sari kata."
 
 #: modules/codec/arib/aribsub.c:53
 msgid "ARIB subtitles decoder"
@@ -10883,7 +10884,7 @@ msgstr "Enkoder audio/video FFmpeg"
 
 #: modules/codec/avcodec/avcodec.h:56
 msgid "Direct rendering"
-msgstr "Persembahan langsung"
+msgstr "Pengemas gabung terus"
 
 #: modules/codec/avcodec/avcodec.h:59
 msgid "Show corrupted frames"
@@ -11467,7 +11468,7 @@ msgstr "Menyahkod kordinat X"
 
 #: modules/codec/dvbsub.c:84
 msgid "X coordinate of the rendered subtitle"
-msgstr "Koordinat X sarikata diterjemahkan yang dikemukakan"
+msgstr "Koordinat X bagi sari kata terkemas gabung"
 
 #: modules/codec/dvbsub.c:86
 msgid "Decoding Y coordinate"
@@ -11475,7 +11476,7 @@ msgstr "Menyahkod kordinat Y"
 
 #: modules/codec/dvbsub.c:87
 msgid "Y coordinate of the rendered subtitle"
-msgstr "Kordinat Y sarikata diterjemahkan"
+msgstr "Koordinat Y bagi sari kata terkemas gabung"
 
 #: modules/codec/dvbsub.c:89
 msgid "Subpicture position"
@@ -11730,9 +11731,9 @@ msgid ""
 "can choose to disable all formatting. Note that this has no effect is "
 "rendering via Tiger is enabled."
 msgstr ""
-"Strim Kate membolehkan pemformatan teks. VLC sebahagiannya melaksananya, "
+"Strim Kate membolehkan pemformatan teks. VLC sebahagiannya melaksanakannya, "
 "tetapi anda boleh pilih untuk lumpuhkan semua pemformatan. Perhatian, ia "
-"tidak memberi kesan jika penerapan melalui Tiger dibenarkan."
+"tidak memberi kesan jika pengemasgabungan melalui Tiger dibenarkan."
 
 #: modules/codec/kate.c:199
 msgid "Shadow"
@@ -11836,27 +11837,27 @@ msgstr "Aqua"
 
 #: modules/codec/kate.c:211
 msgid "Use Tiger for rendering"
-msgstr "Guna Tiger untuk mengemukakan"
+msgstr "Guna Tiger untuk pengemasgabungan"
 
 #: modules/codec/kate.c:212
 msgid ""
 "Kate streams can be rendered using the Tiger library. Disabling this will "
 "only render static text and bitmap based streams."
 msgstr ""
-"Strim Kate membolehkan pemformatan teks. Lumpuhkan ini hanya akan terap teks "
-"statik dan strim berasaskan peta bit."
+"Strim Kate boleh dikemas gabung menggunakan pustaka Tiger. Lumpuhkan ini "
+"hanya akan mengemas gabung teks statik dan strim berasaskan peta bit."
 
 #: modules/codec/kate.c:216
 msgid "Rendering quality"
-msgstr "Kualiti mengemukakan"
+msgstr "Kualiti pengemasgabungan"
 
 #: modules/codec/kate.c:217
 msgid ""
 "Select rendering quality, at the expense of speed. 0 is fastest, 1 is "
 "highest quality."
 msgstr ""
-"Pilih kualiti penerapan, tetapi dipengaruhi oleh kelajuan. 0 terpantas, 1 "
-"kualiti tertinggi."
+"Pilih kualiti pengemasgabungan, tetapi dipengaruhi oleh kelajuan. 0 "
+"terpantas, 1 kualiti tertinggi."
 
 #: modules/codec/kate.c:221
 msgid "Default font effect"
@@ -11949,10 +11950,10 @@ msgid ""
 "Note that changing settings below will not take effect until a new stream is "
 "played. This will hopefully be fixed soon."
 msgstr ""
-"Kate adalah kodeks unutk tindihan berasaskan teks dan imej.\n"
-"Pustaka penerapan Tiger diperlukan untuk menerap strim Kate yang kompleks, "
-"tetapi VLC masih dapat menerap sarikata berasaskan teks dan imej statik jika "
-"ia tidak tersedia.\n"
+"Kate adalah kodeks untuk tindihan berasaskan teks dan imej.\n"
+"Pustaka pengemasgabungan Tiger diperlukan untuk mengemas gabung strim Kate "
+"yang kompleks, tetapi VLC masih dapat mengemas gabung sari kata berasaskan "
+"teks dan imej statik jika ia tidak tersedia.\n"
 "Perhatian pengubahan tetapan dibawah tidak akan berkesan sehinggalah strim "
 "baharu dimainkan. Diharap ia akan dibaiki kelak."
 
@@ -11966,7 +11967,7 @@ msgstr "Dekoder lapisan Kate"
 
 #: modules/codec/kate.c:288
 msgid "Tiger rendering defaults"
-msgstr "Lalai penerapan tiger"
+msgstr "Lalai pengemas gabung Tiger"
 
 #: modules/codec/kate.c:323
 msgid "Kate text subtitles packetizer"
@@ -11978,7 +11979,7 @@ msgstr "Sarikata (lanjutan)"
 
 #: modules/codec/libass.c:61
 msgid "Subtitle renderers using libass"
-msgstr "Penerap sarikata menggunakan libass"
+msgstr "Pengemas gabung sari kata menggunakan libass"
 
 #: modules/codec/libass.c:249
 #: modules/text_renderer/freetype/fonts/fontconfig.c:78
@@ -12031,11 +12032,11 @@ msgstr "Pempaket video OggSpots"
 
 #: modules/codec/omxil/omxil.c:139
 msgid "OMX direct rendering"
-msgstr "Penerap langsung OMX"
+msgstr "Pengemas gabung terus OMX"
 
 #: modules/codec/omxil/omxil.c:141
 msgid "Enable OMX direct rendering."
-msgstr "Benarkan penerapan langsung OMX."
+msgstr "Benarkan pengemas gabung terus OMX."
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
@@ -13135,7 +13136,7 @@ msgstr "Faktor skala"
 
 #: modules/codec/svg.c:55
 msgid "Scale factor to apply to image"
-msgstr "Faktor skala untuk dilaksana pada imej"
+msgstr "Faktor skala untuk diterapkan pada imej"
 
 #: modules/codec/svg.c:63
 msgid "SVG video decoder"
@@ -16488,7 +16489,7 @@ msgstr "Kulit"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr "Laksana profil pada perlancaran berikutnya"
+msgstr "Terap profil pada perlancaran berikutnya"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:131
@@ -16829,7 +16830,7 @@ msgstr "Strim"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:152
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:181
 msgid "Apply"
-msgstr "Laksana"
+msgstr "Terap"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:154
 msgid "Save as new Profile..."
@@ -17562,11 +17563,11 @@ msgstr "Lompat ke Masa"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr "Penerap"
+msgstr "Pengemas Gabung"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
-msgstr "Tiada penerap"
+msgstr "Tiada pengemas gabung"
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -19074,7 +19075,7 @@ msgstr " h,H Tunjuk/Sembunyi kotak bantuan"
 
 #: modules/gui/ncurses.c:862
 msgid " i                      Show/Hide info box"
-msgstr " i                      Tunjuk/Sorok kotak info"
+msgstr " i                      Tunjuk/Sembunyi kotak info"
 
 #: modules/gui/ncurses.c:863
 msgid " M                      Show/Hide metadata box"
@@ -19082,11 +19083,11 @@ msgstr "M Tunjuk/Sembunyi kotak data meta"
 
 #: modules/gui/ncurses.c:864
 msgid " L                      Show/Hide messages box"
-msgstr " L                      Tunjuk/Sorok kotak mesej"
+msgstr " L                      Tunjuk/Sembunyi kotak mesej"
 
 #: modules/gui/ncurses.c:865
 msgid " P                      Show/Hide playlist box"
-msgstr " P                      Tunjuk/Sorok kotak senarai main"
+msgstr " P                      Tunjuk/Sembunyi kotak senarai main"
 
 #: modules/gui/ncurses.c:866
 msgid " B                      Show/Hide filebrowser"
@@ -20023,7 +20024,7 @@ msgstr "Senarai"
 
 #: modules/gui/qt/components/playlist/standardpanel.hpp:146
 msgid "PictureFlow"
-msgstr "AliranGambar"
+msgstr "Aliran Gambar"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:305
 msgid "Select File"
@@ -20064,7 +20065,7 @@ msgstr "Global"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1154
 msgid "Desktop level hotkey"
-msgstr "Kekunci panas aras dekstop"
+msgstr "Kekunci panas aras atas meja"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1237
 #: modules/gui/qt/components/preferences_widgets.cpp:1238
@@ -20540,7 +20541,7 @@ msgstr "T&idak"
 
 #: modules/gui/qt/dialogs/help.cpp:222 modules/gui/qt/ui/update.h:144
 msgid "VLC media player updates"
-msgstr "Kemakini pemain media VLC"
+msgstr "Kemas kini pemain media VLC"
 
 #: modules/gui/qt/dialogs/help.cpp:294
 msgid "A new version of VLC (%1.%2.%3%4) is available."
@@ -20724,7 +20725,8 @@ msgid ""
 "Skins customize player's appearance. You can activate them through "
 "preferences."
 msgstr ""
-"Skin suaikan penampilan pemain. Anda boleh aktifkan ia menerusi keutamaan."
+"Kulit menyuaikan penampilan pemain. Anda boleh mengaktifkan ia menerusi "
+"keutamaan."
 
 #: modules/gui/qt/dialogs/plugins.cpp:382
 msgid ""
@@ -21448,7 +21450,7 @@ msgstr "S&embunyi pemain media dalam palang tugas"
 
 #: modules/gui/qt/menus.cpp:1180
 msgid "Sho&w VLC media player"
-msgstr "T&unju pemain media VLC"
+msgstr "T&unjuk pemain media VLC"
 
 #: modules/gui/qt/menus.cpp:1191
 msgid "&Open Media"
@@ -21460,7 +21462,7 @@ msgstr "Kosongkan"
 
 #: modules/gui/qt/menus.cpp:1629
 msgid "&Renderer"
-msgstr "Pene&rap"
+msgstr "Penge&mas Gabung"
 
 #: modules/gui/qt/menus.cpp:1633
 msgid "<Local>"
@@ -21951,7 +21953,7 @@ msgstr "Skrin gelpa di bawah video."
 
 #: modules/hw/mmal/vout.c:55
 msgid "Render blank screen below video. Increases VideoCore load."
-msgstr "Terap skrin gelap di bawah video. Tingkatkan beban VideoCore."
+msgstr "Kemas gabung skrin gelap di bawah video. Tingkatkan beban VideoCore."
 
 #: modules/hw/mmal/vout.c:59 modules/hw/mmal/vout.c:60
 msgid "Adjust HDMI refresh rate to the video."
@@ -23834,7 +23836,7 @@ msgstr "Serivs zeroconf "
 
 #: modules/services_discovery/avahi.c:69
 msgid "Avahi Renderer Discovery"
-msgstr "Penemuan Penerap Avahi"
+msgstr "Penemuan Pengemas Gabung Avahi"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
@@ -23844,7 +23846,7 @@ msgstr "Penemuan Rangkaian Bonjour"
 
 #: modules/services_discovery/bonjour.m:70
 msgid "Bonjour Renderer Discovery"
-msgstr "Penemuan Penerap Bonjour"
+msgstr "Penemuan Pengemas Gabung Bonjour"
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -23856,17 +23858,17 @@ msgstr "Video Saya"
 #: modules/services_discovery/mediadirs.c:141
 #: modules/services_discovery/mediadirs.c:358
 msgid "My Music"
-msgstr "My Music"
+msgstr "Muzik Saya"
 
 #: modules/services_discovery/mediadirs.c:84
 msgid "Picture"
-msgstr "Picture"
+msgstr "Gambar"
 
 #: modules/services_discovery/mediadirs.c:85
 #: modules/services_discovery/mediadirs.c:149
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
-msgstr "My Pictures"
+msgstr "Gambar Saya"
 
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
@@ -23876,7 +23878,7 @@ msgstr "Penemuan Rangkaian mDNS"
 
 #: modules/services_discovery/microdns.c:65
 msgid "mDNS Renderer Discovery"
-msgstr "Penemuan Penerap mDNS"
+msgstr "Penemuan Pengemas gabung mDNS"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24073,7 +24075,7 @@ msgstr "Aplikasi"
 #: modules/services_discovery/xcb_apps.c:361
 #: modules/video_output/win32/direct3d9.c:340
 msgid "Desktop"
-msgstr "Desktop"
+msgstr "Atas meja"
 
 #: modules/spu/audiobargraph_v.c:44 modules/spu/logo.c:59
 #: modules/video_filter/erase.c:58
@@ -24325,7 +24327,7 @@ msgid ""
 "then blue. #000000 = black, #FF0000 = red, #00FF00 = green, #FFFF00 = yellow "
 "(red + green), #FFFFFF = white"
 msgstr ""
-"Warna teks yang akan dipersembahkan pada video. Mestilah heksadesimal "
+"Warna teks yang akan dikemas gabung pada video. Mestilah heksadesimal "
 "(seperti warna HTML). Dua aksara pertama untuk murah, berikutnya hijau, "
 "kemudian biru. #000000 = hitam, #FF0000 = merah, #00FF00 = hijau, #FFFF00 = "
 "kuning (merah + hijau), #FFFFFF = putih"
@@ -25161,11 +25163,11 @@ msgstr "Takrifan output strim"
 
 #: modules/stream_out/display.c:41
 msgid "Enable/disable audio rendering."
-msgstr "Hidup/lumpuh persembahan audio."
+msgstr "Benar/lumpuhkan pengemasgabungan audio."
 
 #: modules/stream_out/display.c:43
 msgid "Enable/disable video rendering."
-msgstr "Hidup/Lumpuh persembahan video."
+msgstr "Benar/lumpuhkan pengemasgabungan video."
 
 #: modules/stream_out/display.c:44
 msgid "Delay (ms)"
@@ -25566,7 +25568,7 @@ msgstr "Ubah bahasa strim asas"
 
 #: modules/stream_out/smem.c:61
 msgid "Video prerender callback"
-msgstr "Panggil balik pra-terap video"
+msgstr "Panggil balik pra-kemas-gabung video"
 
 #: modules/stream_out/smem.c:62
 msgid ""
@@ -25574,35 +25576,35 @@ msgid ""
 "buffer where render will be done."
 msgstr ""
 "Alamat bagi fungsi panggil balik pra-terap video. Fungsi ini akan tetapkan "
-"penimbal yang mana terap akan dibuat."
+"penimbal yang mana kemas gabung akan dibuat."
 
 #: modules/stream_out/smem.c:65
 msgid "Audio prerender callback"
-msgstr "Panggil balik pra-terap audio"
+msgstr "Panggil balik pra-kemas-gabung audio"
 
 #: modules/stream_out/smem.c:66
 msgid ""
 "Address of the audio prerender callback function. This function will set the "
 "buffer where render will be done."
 msgstr ""
-"Alamat fungsi panggil balik pra-terap audio. Fungsi ini akan tetapkan "
-"penimbal yang mana terap akan dibuat."
+"Alamat fungsi panggil balik pra-kemas-gabung audio. Fungsi ini akan tetapkan "
+"penimbal yang mana kemas gabung akan dibuat."
 
 #: modules/stream_out/smem.c:69
 msgid "Video postrender callback"
-msgstr "Panggil balik pasca-terap video"
+msgstr "Panggil balik pasca-kemas-gabung video"
 
 #: modules/stream_out/smem.c:70
 msgid ""
 "Address of the video postrender callback function. This function will be "
 "called when the render is into the buffer."
 msgstr ""
-"Alamat fungsi panggil balik pasca-terap video. Fungsi ini akan dikenali bila "
-"terap ke dalam penimbal."
+"Alamat fungsi panggil balik pasca-kemas-gabung video. Fungsi ini akan "
+"dikenali bila kemas gabung ke dalam penimbal."
 
 #: modules/stream_out/smem.c:73
 msgid "Audio postrender callback"
-msgstr "Panggil balik pasca-terap audio"
+msgstr "Panggil balik pasca-kemas-gabung audio"
 
 #: modules/stream_out/smem.c:74
 msgid ""
@@ -25610,7 +25612,7 @@ msgid ""
 "called when the render is into the buffer."
 msgstr ""
 "Alamat fungsi panggil balik pasca-terap audio. Fungsi ini akan dikenali bila "
-"terap ke dalam penimbal."
+"kemas gabung ke dalam penimbal."
 
 #: modules/stream_out/smem.c:77
 msgid "Video Callback data"
@@ -25637,8 +25639,9 @@ msgid ""
 "Time Synchronisation option for output. If true, stream will render as "
 "usual, else it will be rendered as fast as possible."
 msgstr ""
-"Pilihan Penyegerakan masa untuk output. Jika benar, strim akan diterap "
-"seperti biasa, jika tidak ia akan diterap sepantas yang mungkin."
+"Pilihan Penyegerakan masa untuk output. Jika benar, strim akan dikemas "
+"gabung seperti biasa, jika tidak ia akan dikemas gabung sepantas yang "
+"mungkin."
 
 #: modules/stream_out/smem.c:96
 msgid "Smem"
@@ -25952,8 +25955,9 @@ msgid ""
 "set to something different than 0 this option will override the relative "
 "font size."
 msgstr ""
-"Ini adalah saiz lalai font yang akan dikemukana pada video. Jika ditetapkan "
-"kepada sesuatu yang lain dari 0 pilihan ini akan menindih saiz font relatif."
+"Ini adalah saiz lalai font yang akan dikemas gabung pada video. Jika "
+"ditetapkan kepada sesuatu yang lain dari 0 pilihan ini akan menindih saiz "
+"font relatif."
 
 #: modules/text_renderer/freetype/freetype.c:91
 msgid "Text opacity"
@@ -25964,7 +25968,7 @@ msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque."
 msgstr ""
-"Kelegapan (songsang ketelusan) teks yang akan diterapkan pada video. 0 = "
+"Kelegapan (songsang ketelusan) teks yang akan dikemas gabung pada video. 0 = "
 "lutsinar, 255 = sepenuhnya legap."
 
 #: modules/text_renderer/freetype/freetype.c:95
@@ -25978,7 +25982,7 @@ msgid ""
 "then blue. #000000 = black, #FF0000 = red, #00FF00 = green, #FFFF00 = yellow "
 "(red + green), #FFFFFF = white"
 msgstr ""
-"Warna teks yang akan dipersembahkan pada video. Mestilah heksadesimal "
+"Warna teks yang akan dikemas gabung pada video. Mestilah heksadesimal "
 "(seperti warna HTML). Dua aksara pertama untuk murah, berikutnya hijau, "
 "kemudian biru. #000000 = hitam, #FF0000 = merah, #00FF00 = hijau, #FFFF00 = "
 "kuning (merah + hijau), #FFFFFF = putih"
@@ -25992,8 +25996,8 @@ msgid ""
 "This is the relative default size of the fonts that will be rendered on the "
 "video. If absolute font size is set, relative size will be overridden."
 msgstr ""
-"Ini adalah saiz lalai relatif fon yang akan diterap pada video. Jika saiz "
-"fon mutlak ditetapkan, saiz relatif akan dibatalkan."
+"Ini adalah saiz lalai relatif fon yang akan dikemas gabung pada video. Jika "
+"saiz fon mutlak ditetapkan, saiz relatif akan dibatalkan."
 
 #: modules/text_renderer/freetype/freetype.c:106
 msgid "Background opacity"
@@ -26033,15 +26037,15 @@ msgstr "Arah berasaskan perenggan untuk algoritma dwi-arah Unikod."
 
 #: modules/text_renderer/freetype/freetype.c:125
 msgid "Use YUVP renderer"
-msgstr "Guna pengemuka YUVP"
+msgstr "Guna pengemas gabung YUVP"
 
 #: modules/text_renderer/freetype/freetype.c:126
 msgid ""
 "This renders the font using \"paletized YUV\". This option is only needed if "
 "you want to encode into DVB subtitles"
 msgstr ""
-"Persembahan font menggunakan \"YUV terpalet\". Pilihan ini hanya diperlukan "
-"jika anda ingin mengkodnya kepada sarikata DVB"
+"Tindakan ini mengemas gabung fon menggunakan \"YUV terpalet\". Pilihan ini "
+"hanya diperlukan jika anda ingin mengkodnya kepada sari kata DVB"
 
 #: modules/text_renderer/freetype/freetype.c:143
 msgid "Thin"
@@ -26061,11 +26065,11 @@ msgstr "Kanan ke kiri"
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
-msgstr "Pengemuka teks"
+msgstr "Pengemas gabung teks"
 
 #: modules/text_renderer/freetype/freetype.c:157
 msgid "Freetype2 font renderer"
-msgstr "Pengemuka fon Freetype2"
+msgstr "Pengemas gabung fon Freetype2"
 
 #: modules/text_renderer/nsspeechsynthesizer.m:47
 msgid "Speech synthesis for Mac OS X"
@@ -26086,7 +26090,7 @@ msgstr "Lokasi fail yang memegang tempat SVG untuk penukaran automatik string"
 
 #: modules/text_renderer/tdummy.c:36
 msgid "Dummy font renderer"
-msgstr "Penerap fon semu"
+msgstr "Pengemas gabung fon semu"
 
 #: modules/video_chroma/chain.c:46
 msgid "Video filtering using a chain of video filter modules"
@@ -26870,7 +26874,7 @@ msgstr "Terap kesan kartun. Ia hanya digunakan oleh \"curam\" dan \"bucu\"."
 
 #: modules/video_filter/gradient.c:73
 msgid "Apply color gradient or edge detection effects"
-msgstr "Laksana gradien warna atau kesan pengesanan pinggir"
+msgstr "Terap gradien warna atau kesan pengesanan pinggir"
 
 #: modules/video_filter/gradient.c:81
 msgid "Gradient video filter"
@@ -27405,7 +27409,7 @@ msgstr "Penapisa video sepia"
 
 #: modules/video_filter/sepia.c:67
 msgid "Gives video a warmer tone by applying sepia effect"
-msgstr "Berikan video ton lebih panas dengan melaksanakan kesan sepia"
+msgstr "Berikan video ton lebih panas dengan menerapkan kesan sepia"
 
 #: modules/video_filter/sharpen.c:48
 msgid "Sharpen strength (0-2)"
@@ -27623,8 +27627,8 @@ msgstr "Peranti penimbal bingkai"
 #: modules/video_output/fb.c:58
 msgid "Framebuffer device to use for rendering (usually /dev/fb0)."
 msgstr ""
-"Peranti penimbal bingkai untuk diguna sebagai persembahan (kebiasaannya /dev/"
-"fb0)."
+"Peranti penimbal bingkai untuk digunakan untuk pengemasgabungan "
+"(kebiasaannya /dev/fb0)."
 
 #: modules/video_output/fb.c:60
 msgid "Run fb on current tty"
@@ -27764,7 +27768,7 @@ msgstr "Sambungan EGL untuk OpenGL"
 
 #: modules/video_output/win32/direct3d9.c:77
 msgid "The desktop mode allows you to display the video on the desktop."
-msgstr "Mod desktop membolehkan anda paparkan video diatas desktop."
+msgstr "Mod atas meja membolehkan anda paparkan video di atas meja."
 
 #: modules/video_output/win32/direct3d9.c:79
 #: modules/video_output/win32/direct3d11.c:65
@@ -27782,7 +27786,7 @@ msgstr "Pelorek Piksel"
 
 #: modules/video_output/win32/direct3d9.c:85
 msgid "Choose a pixel shader to apply."
-msgstr "Pilih satu pelorek piksel untuk dilaksanakan."
+msgstr "Pilih satu pelorek piksel untuk diterapkan."
 
 #: modules/video_output/win32/direct3d9.c:86
 msgid "Path to HLSL file"
@@ -27834,8 +27838,9 @@ msgid ""
 "Overlay is the hardware acceleration capability of your video card (ability "
 "to render video directly). VLC will try to use it by default."
 msgstr ""
-"Lapisan adalah keupayaan pemecutan perkakasan kad video anda (keupayaan "
-"untuk terap video secara terus). VLC akan cuba gunakannya sebagai lalai."
+"Tindihan adalah keupayaan pemecutan perkakasan kad video anda (keupayaan "
+"untuk kemas gabung video secara terus). VLC akan cuba gunakannya sebagai "
+"lalai."
 
 #: modules/video_output/win32/directdraw.c:75
 msgid "Use video buffers in system memory"
@@ -27977,8 +27982,8 @@ msgid ""
 "Video will be rendered with this Wayland display. If empty, the default "
 "display will be used."
 msgstr ""
-"Video akan diterap dengan paparan Wayland ini. Jika kosong, paparan lalai "
-"akan digunakan."
+"Video akan dikemas gabung dengan paparan Wayland ini. Jika kosong, paparan "
+"lalai akan digunakan."
 
 #: modules/video_output/wayland/shell.c:411
 msgid "WL shell"
@@ -28034,8 +28039,8 @@ msgid ""
 "Video will be rendered with this X11 display. If empty, the default display "
 "will be used."
 msgstr ""
-"Video akan diterap dengan paparan X11 ini. Jika kosong, paparan lalai akan "
-"digunakan."
+"Video akan dikemas gabung dengan paparan X11 ini. Jika kosong, paparan lalai "
+"akan digunakan."
 
 #: modules/video_output/xcb/window.c:705
 msgid "X11 window ID"
@@ -28779,7 +28784,7 @@ msgstr "Pemain media VLC - Antaramuka Web"
 
 #: share/lua/http/index.html:215
 msgid "Hide / Show Library"
-msgstr " Tunjuk/Sorok Pustaka"
+msgstr " Tunjuk/Sembunyi Pustaka"
 
 #: share/lua/http/index.html:216
 msgid "Hide / Show Viewer"
@@ -29387,7 +29392,7 @@ msgstr "Jeda mainbalik ketika minima"
 
 #: modules/gui/qt/ui/sprefs_interface.h:538
 msgid "Show media change popup:"
-msgstr "Tunjuk popup penukaran media:"
+msgstr "Tunjuk tetingkap timbul penukaran media:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
 msgid "Start in minimal view mode"
