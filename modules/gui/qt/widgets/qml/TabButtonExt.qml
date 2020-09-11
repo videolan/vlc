@@ -38,6 +38,7 @@ T.TabButton {
     property string iconTxt: ""
     property bool selected: false
     property color color: VLCStyle.colors.text
+    property bool busy: false
 
     font.pixelSize: VLCStyle.fontSize_normal
 
@@ -72,11 +73,17 @@ T.TabButton {
                     anchors.fill: parent
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
+                    visible: !control.busy
 
                     text: control.iconTxt
                     color: control.color
 
                     font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_topbar)
+                }
+
+                BusyIndicator {
+                    anchors.centerIn: parent
+                    running: control.busy
                 }
             }
 
