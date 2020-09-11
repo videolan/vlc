@@ -32,16 +32,15 @@ import "qrc:///style/"
 Widgets.NavigableFocusScope {
     id: root
 
-    property alias tree: providerModel.tree
+    property var providerModel
+    property var tree
+    onTreeChanged: providerModel.tree = tree
     readonly property var currentIndex: view.currentItem.currentIndex
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
 
-    NetworkMediaModel {
-        id: providerModel
-        ctx: mainctx
-        tree: undefined
-        onCountChanged: resetFocus()
+    function changeTree(new_tree) {
+        history.push(["mc", "network", { tree: new_tree }]);
     }
 
     Util.SelectableDelegateModel{
@@ -73,7 +72,7 @@ Widgets.NavigableFocusScope {
             var data = providerModel.getDataAt(index)
             if (data.type === NetworkMediaModel.TYPE_DIRECTORY
                     || data.type === NetworkMediaModel.TYPE_NODE)  {
-                history.push(["mc", "network", { tree: data.tree }]);
+                changeTree(data.tree)
             } else {
                 providerModel.addAndPlay( selectionModel.selectedIndexes )
             }
@@ -115,7 +114,7 @@ Widgets.NavigableFocusScope {
                         focus: true
                         iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
                         text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
-                        visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
+                        visible: !providerModel.is_on_provider_list && !!providerModel.canBeIndexed
                         onClicked: providerModel.indexed = !providerModel.indexed
 
                         Layout.preferredWidth: implicitWidth
@@ -147,7 +146,7 @@ Widgets.NavigableFocusScope {
 
                 onItemDoubleClicked: {
                     if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
-                        history.push( ["mc", "network", { tree: model.tree } ])
+                        changeTree(model.tree)
                     else
                         selectionModel.model.addAndPlay( index )
                 }
@@ -308,7 +307,7 @@ Widgets.NavigableFocusScope {
                         focus: true
                         iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
                         text:  providerModel.indexed ?  i18n.qtr("Remove from medialibrary") : i18n.qtr("Add to medialibrary")
-                        visible: !providerModel.is_on_provider_list && providerModel.canBeIndexed
+                        visible: !providerModel.is_on_provider_list && !!providerModel.canBeIndexed
                         onClicked: providerModel.indexed = !providerModel.indexed
 
                         Layout.preferredWidth: implicitWidth
@@ -333,7 +332,7 @@ Widgets.NavigableFocusScope {
             onActionForSelection: _actionAtIndex(selection[0].row)
             onItemDoubleClicked: {
                 if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
-                    history.push( ["mc", "network", { tree: model.tree } ])
+                    changeTree(model.tree)
                 else
                     providerModel.addAndPlay( index )
             }

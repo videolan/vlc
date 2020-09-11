@@ -42,14 +42,20 @@ Widgets.NavigableFocusScope {
 
     function loadView() {
         var page = "";
+        var props = undefined;
         if (root.tree === undefined)
             page ="qrc:///network/NetworkHomeDisplay.qml"
-        else
+        else {
             page = "qrc:///network/NetworkBrowseDisplay.qml"
-        view.replace(page)
-        if (root.tree) {
-            view.currentItem.tree = root.tree
+            props = { providerModel: mediaModel, tree: root.tree }
         }
+        view.replace(page, props)
+    }
+
+    NetworkMediaModel {
+        id: mediaModel
+
+        ctx: mainctx
     }
 
     Widgets.StackViewExt {
