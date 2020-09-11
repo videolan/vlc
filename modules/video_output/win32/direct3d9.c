@@ -1689,9 +1689,8 @@ static void Direct3D9Close(vout_display_t *vd)
     Direct3D9DestroyResources(vd);
 }
 
-static int Control(vout_display_t *vd, int query, va_list args)
+static int Control(vout_display_t *vd, int query)
 {
-    VLC_UNUSED(args);
     vout_display_sys_t *sys = vd->sys;
     return CommonControl(vd, &sys->area, &sys->sys, query);
 }

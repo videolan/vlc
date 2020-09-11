@@ -58,7 +58,7 @@ static void Close(vout_display_t *vd);
 
 static void PictureRender(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
 static void PictureDisplay(vout_display_t *, picture_t *);
-static int Control(vout_display_t*, int, va_list);
+static int Control(vout_display_t*, int);
 
 static void *OurGetProcAddress(vlc_gl_t *, const char *);
 
@@ -262,7 +262,7 @@ static void Close(vout_display_t *vd)
  * vout display callbacks
  *****************************************************************************/
 
-static int Control(vout_display_t *vd, int query, va_list ap)
+static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
     struct gl_sys *glsys = sys->gl->sys;

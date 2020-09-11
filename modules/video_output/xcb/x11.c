@@ -141,7 +141,7 @@ static int ResetPictures(vout_display_t *vd, video_format_t *fmt)
     return VLC_SUCCESS;
 }
 
-static int Control(vout_display_t *vd, int query, va_list ap)
+static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
 

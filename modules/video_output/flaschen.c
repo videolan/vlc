@@ -79,7 +79,7 @@ struct vout_display_sys_t {
     int             fd;
 };
 static void            Display(vout_display_t *, picture_t *);
-static int             Control(vout_display_t *, int, va_list);
+static int             Control(vout_display_t *, int);
 
 static const struct vlc_display_operations ops = {
     Close, NULL, Display, Control, NULL, NULL,
@@ -210,10 +210,8 @@ static void Display(vout_display_t *vd, picture_t *picture)
 /**
  * Control for vout display
  */
-static int Control(vout_display_t *vd, int query, va_list args)
+static int Control(vout_display_t *vd, int query)
 {
-    VLC_UNUSED(args);
-
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     case VOUT_DISPLAY_CHANGE_ZOOM:

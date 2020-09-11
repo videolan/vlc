@@ -97,9 +97,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     picture_CopyPixels(&fake_pic, picture);
 }
 
-static int Control(vout_display_t *vd, int query, va_list args)
+static int Control(vout_display_t *vd, int query)
 {
-    VLC_UNUSED(args);
     vout_display_sys_t *sys = vd->sys;
     return CommonControl(vd, &sys->area, &sys->sys, query);
 }

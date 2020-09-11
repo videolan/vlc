@@ -85,7 +85,7 @@ struct vout_display_sys_t
 /* Display callbacks */
 static void PictureRender (vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
 static void PictureDisplay (vout_display_t *, picture_t *);
-static int Control (vout_display_t *, int, va_list);
+static int Control (vout_display_t *, int);
 
 static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 {
@@ -229,7 +229,7 @@ FlipVerticalAlign(vout_display_cfg_t *cfg)
         cfg->align.vertical = VLC_VIDEO_ALIGN_TOP;
 }
 
-static int Control (vout_display_t *vd, int query, va_list ap)
+static int Control (vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
 

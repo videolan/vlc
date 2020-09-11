@@ -598,9 +598,9 @@ err_out:
 }
 
 
-static int Control(vout_display_t *vd, int query, va_list args)
+static int Control(vout_display_t *vd, int query)
 {
-    (void) vd; (void) args;
+    (void) vd;
 
     switch (query) {
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:

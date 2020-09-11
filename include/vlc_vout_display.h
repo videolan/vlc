@@ -296,7 +296,7 @@ struct vlc_display_operations
      *
      * See \ref vout_display_query for the list of request types.
      */
-    int        (*control)(vout_display_t *, int query, va_list);
+    int        (*control)(vout_display_t *, int query);
 
     /**
      * Reset the picture format handled by the module.

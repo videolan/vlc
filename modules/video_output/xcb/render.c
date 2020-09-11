@@ -350,7 +350,7 @@ static void DeleteBuffers(vout_display_t *vd)
     xcb_free_pixmap(conn, sys->drawable.crop);
 }
 
-static int Control(vout_display_t *vd, int query, va_list ap)
+static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
 

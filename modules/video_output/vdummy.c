@@ -64,7 +64,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static void            DisplayStat(vout_display_t *, picture_t *);
-static int             Control(vout_display_t *, int, va_list);
+static int             Control(vout_display_t *, int);
 
 /*****************************************************************************
  * OpenVideo: activates dummy vout display method
@@ -125,9 +125,9 @@ static void DisplayStat(vout_display_t *vd, picture_t *picture)
     }
 }
 
-static int Control(vout_display_t *vd, int query, va_list args)
+static int Control(vout_display_t *vd, int query)
 {
-    (void) vd; (void) args;
+    (void) vd;
 
     switch (query) {
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:

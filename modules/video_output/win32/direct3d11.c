@@ -141,7 +141,7 @@ static void Direct3D11DestroyResources(vout_display_t *);
 static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpicture_t *);
 
-static int Control(vout_display_t *, int, va_list);
+static int Control(vout_display_t *, int);
 
 
 static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
@@ -414,9 +414,8 @@ static void Close(vout_display_t *vd)
     CommonWindowClean(&vd->sys->sys);
 #endif
 }
-static int Control(vout_display_t *vd, int query, va_list args)
+static int Control(vout_display_t *vd, int query)
 {
-    VLC_UNUSED(args);
     vout_display_sys_t *sys = vd->sys;
     int res = CommonControl( vd, &sys->area, &sys->sys, query );
 

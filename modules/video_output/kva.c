@@ -110,7 +110,7 @@ struct vout_display_sys_t
  * Local prototypes
  *****************************************************************************/
 static void            Display(vout_display_t *, picture_t *);
-static int             Control(vout_display_t *, int, va_list);
+static int             Control(vout_display_t *, int);
 
 static int  OpenDisplay ( vout_display_t *, video_format_t * );
 static void CloseDisplay( vout_display_t * );
@@ -392,9 +392,8 @@ static void Display( vout_display_t *vd, picture_t *picture )
 /*****************************************************************************
  * Control: control facility for the vout
  *****************************************************************************/
-static int Control( vout_display_t *vd, int query, va_list args )
+static int Control( vout_display_t *vd, int query )
 {
-    VLC_UNUSED(args);
     vout_display_sys_t *sys = vd->sys;
 
     switch (query)

@@ -703,11 +703,10 @@ static int vd_reset_pictures(vout_display_t *vd, video_format_t *fmt)
     return VLC_SUCCESS;
 }
 
-static int vd_control(vout_display_t *vd, int query, va_list args)
+static int vd_control(vout_display_t *vd, int query)
 {
     vout_display_sys_t * const sys = vd->sys;
     int ret = VLC_EGENERIC;
-    VLC_UNUSED(args);
 
     switch (query) {
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:

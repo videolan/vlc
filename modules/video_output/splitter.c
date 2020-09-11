@@ -93,9 +93,9 @@ static void vlc_vidsplit_Display(vout_display_t *vd, picture_t *picture)
     (void) picture;
 }
 
-static int vlc_vidsplit_Control(vout_display_t *vd, int query, va_list args)
+static int vlc_vidsplit_Control(vout_display_t *vd, int query)
 {
-    (void) vd; (void) args;
+    (void) vd;
 
     switch (query) {
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:

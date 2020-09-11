@@ -346,7 +346,7 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
     sys->has_first_frame = true;
 }
 
-static int Control (vout_display_t *vd, int query, va_list ap)
+static int Control (vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
 
