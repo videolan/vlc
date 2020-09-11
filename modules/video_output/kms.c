@@ -662,6 +662,10 @@ static void Close(vout_display_t *vd)
         drmDropMaster(sys->drm_fd);
 }
 
+static const struct vlc_display_operations ops = {
+    Close, Prepare, Display, Control, NULL,
+};
+
 /**
  * This function allocates and initializes a KMS vout method.
  */
@@ -732,10 +736,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     fmt.i_chroma = sys->vlc_fourcc;
     *fmtp = fmt;
 
-    vd->prepare = Prepare;
-    vd->display = Display;
-    vd->control = Control;
-    vd->close = Close;
+    vd->ops = &ops;
 
     (void) context;
     return VLC_SUCCESS;

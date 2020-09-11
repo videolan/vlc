@@ -1761,6 +1761,10 @@ static void LocalSwapchainSwap( void *opaque )
     Swap( vd );
 }
 
+static const struct vlc_display_operations ops = {
+    Close, Prepare, Display, Control, NULL,
+};
+
 /**
  * It creates a Direct3D vout display.
  */
@@ -1871,10 +1875,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     video_format_Clean(fmtp);
     video_format_Copy(fmtp, &fmt);
 
-    vd->prepare = Prepare;
-    vd->display = Display;
-    vd->control = Control;
-    vd->close = Close;
+    vd->ops = &ops;
 
     /* Change the window title bar text */
     vout_window_SetTitle(cfg->window, VOUT_TITLE " (Direct3D9 output)");

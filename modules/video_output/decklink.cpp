@@ -768,6 +768,10 @@ static int ControlVideo(vout_display_t *vd, int query, va_list args)
     return VLC_EGENERIC;
 }
 
+static const struct vlc_display_operations ops = {
+    CloseVideo, PrepareVideo, NULL, ControlVideo, NULL,
+};
+
 static int OpenVideo(vout_display_t *vd, const vout_display_cfg_t *cfg,
                      video_format_t *fmtp, vlc_video_context *context)
 {
@@ -805,10 +809,7 @@ static int OpenVideo(vout_display_t *vd, const vout_display_cfg_t *cfg,
         }
     }
 
-    vd->prepare = PrepareVideo;
-    vd->display = NULL;
-    vd->control = ControlVideo;
-    vd->close = CloseVideo;
+    vd->ops = &ops;
 
     vd->sys = (vout_display_sys_t*) sys;
 

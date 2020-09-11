@@ -262,48 +262,12 @@ typedef int (*vout_display_open_cb)(vout_display_t *vd,
     } \
     set_capability( "vout display", priority )
 
-
-struct vout_display_t {
-    struct vlc_object_t obj;
-
+struct vlc_display_operations
+{
     /**
-     * User configuration.
-     *
-     * This cannot be modified directly. It reflects the current values.
+     * Destroys the display.
      */
-    const vout_display_cfg_t *cfg;
-
-    /**
-     * Source video format.
-     *
-     * This is the format of the video that is being displayed (after decoding
-     * and filtering). It cannot be modified.
-     *
-     * \note
-     * Cropping is not requested while in the open function.
-     */
-    const video_format_t *source;
-
-    /**
-     * Picture format.
-     *
-     * This is the format of the pictures that are supplied to the
-     * \ref prepare and \ref display callbacks. Ideally, it should be identical
-     * or as close as possible as \ref source.
-     *
-     * This can only be changed from the display module activation callback,
-     * or within a VOUT_DISPLAY_RESET_PICTURES control request.
-     *
-     * By default, it is equal to ::source except for the aspect ratio
-     * which is undefined(0) and is ignored.
-     */
-    const video_format_t *fmt;
-
-    /* Information
-     *
-     * You can only set them in the open function.
-     */
-    vout_display_info_t info;
+    void       (*close)(vout_display_t *);
 
     /**
      * Prepares a picture and an optional subpicture for display (optional).
@@ -361,12 +325,56 @@ struct vout_display_t {
      *
      * \param vp viewpoint to use on the next render
      */
-    int (*set_viewpoint)(vout_display_t *, const vlc_viewpoint_t *vp);
+    int        (*set_viewpoint)(vout_display_t *, const vlc_viewpoint_t *vp);
+};
+
+struct vout_display_t {
+    struct vlc_object_t obj;
 
     /**
-     * Destroys the display.
+     * User configuration.
+     *
+     * This cannot be modified directly. It reflects the current values.
      */
-    void (*close)(vout_display_t *);
+    const vout_display_cfg_t *cfg;
+
+    /**
+     * Source video format.
+     *
+     * This is the format of the video that is being displayed (after decoding
+     * and filtering). It cannot be modified.
+     *
+     * \note
+     * Cropping is not requested while in the open function.
+     */
+    const video_format_t *source;
+
+    /**
+     * Picture format.
+     *
+     * This is the format of the pictures that are supplied to the
+     * \ref prepare and \ref display callbacks. Ideally, it should be identical
+     * or as close as possible as \ref source.
+     *
+     * This can only be changed from the display module activation callback,
+     * or within a VOUT_DISPLAY_RESET_PICTURES control request.
+     *
+     * By default, it is equal to ::source except for the aspect ratio
+     * which is undefined(0) and is ignored.
+     */
+    const video_format_t *fmt;
+
+    /* Information
+     *
+     * You can only set them in the open function.
+     */
+    vout_display_info_t info;
+
+    /* Reserved for the vout_display_t owner.
+     *
+     * It must not be overwritten nor used directly by a module.
+     */
+    vout_display_owner_t owner;
 
     /**
      * Private data for the display module.
@@ -375,11 +383,10 @@ struct vout_display_t {
      */
     vout_display_sys_t *sys;
 
-    /* Reserved for the vout_display_t owner.
-     *
-     * It must not be overwritten nor used directly by a module.
+    /**
+     * Callbacks the display module must set on Open.
      */
-    vout_display_owner_t owner;
+    const struct vlc_display_operations *ops;
 };
 
 /**
@@ -426,8 +433,8 @@ VLC_API picture_t *vout_display_Prepare(vout_display_t *vd, picture_t *picture,
  */
 static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
 {
-    if (vd->display != NULL)
-        vd->display(vd, picture);
+    if (vd->ops->display != NULL)
+        vd->ops->display(vd, picture);
     picture_Release(picture);
 }
 

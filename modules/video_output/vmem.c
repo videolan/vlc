@@ -105,6 +105,10 @@ static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc
 static void           Display(vout_display_t *, picture_t *);
 static int            Control(vout_display_t *, int, va_list);
 
+static const struct vlc_display_operations ops = {
+    Close, Prepare, Display, Control, NULL,
+};
+
 /*****************************************************************************
  * Open: allocates video thread
  *****************************************************************************
@@ -216,10 +220,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     *fmtp = fmt;
 
     vd->sys     = sys;
-    vd->prepare = Prepare;
-    vd->display = Display;
-    vd->control = Control;
-    vd->close   = Close;
+    vd->ops     = &ops;
 
     (void) cfg; (void) context;
     return VLC_SUCCESS;

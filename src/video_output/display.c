@@ -67,7 +67,7 @@ static int vout_display_Control(vout_display_t *vd, int query, ...)
     int ret;
 
     va_start(ap, query);
-    ret = vd->control(vd, query, ap);
+    ret = vd->ops->control(vd, query, ap);
     va_end(ap);
     return ret;
 }
@@ -439,8 +439,8 @@ picture_t *vout_display_Prepare(vout_display_t *vd, picture_t *picture,
     assert(subpic == NULL); /* TODO */
     picture = vout_ConvertForDisplay(vd, picture);
 
-    if (picture != NULL && vd->prepare != NULL)
-        vd->prepare(vd, picture, subpic, date);
+    if (picture != NULL && vd->ops->prepare != NULL)
+        vd->ops->prepare(vd, picture, subpic, date);
     return picture;
 }
 
@@ -685,9 +685,9 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
 
         osys->cfg.viewpoint = *p_viewpoint;
 
-        if (vd->set_viewpoint)
+        if (vd->ops->set_viewpoint)
         {
-            if (vd->set_viewpoint(vd, &osys->cfg.viewpoint)) {
+            if (vd->ops->set_viewpoint(vd, &osys->cfg.viewpoint)) {
                 msg_Err(vd, "Failed to change Viewpoint");
                 osys->cfg.viewpoint = old_vp;
             }
@@ -736,10 +736,7 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     vd->fmt = &osys->display_fmt;
     vd->info = (vout_display_info_t){ };
     vd->cfg = &osys->cfg;
-    vd->prepare = NULL;
-    vd->display = NULL;
-    vd->control = NULL;
-    vd->close = NULL;
+    vd->ops = NULL;
     vd->sys = NULL;
     if (owner)
         vd->owner = *owner;
@@ -759,8 +756,8 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
 #endif
 
     if (VoutDisplayCreateRender(vd)) {
-        if (vd->close != NULL)
-            vd->close(vd);
+        if (vd->ops->close != NULL)
+            vd->ops->close(vd);
         vlc_objres_clear(VLC_OBJECT(vd));
         video_format_Clean(&osys->display_fmt);
         goto error;
@@ -788,8 +785,8 @@ void vout_display_Delete(vout_display_t *vd)
     if (osys->pool != NULL)
         picture_pool_Release(osys->pool);
 
-    if (vd->close != NULL)
-        vd->close(vd);
+    if (vd->ops->close != NULL)
+        vd->ops->close(vd);
     vlc_objres_clear(VLC_OBJECT(vd));
 
     video_format_Clean(&osys->source);

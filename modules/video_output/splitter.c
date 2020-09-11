@@ -219,6 +219,10 @@ static vout_window_t *video_splitter_CreateWindow(vlc_object_t *obj,
     return window;
 }
 
+static const struct vlc_display_operations ops = {
+    vlc_vidsplit_Close, vlc_vidsplit_Prepare, vlc_vidsplit_Display, vlc_vidsplit_Control, NULL,
+};
+
 static int vlc_vidsplit_Open(vout_display_t *vd,
                              const vout_display_cfg_t *cfg,
                              video_format_t *fmtp, vlc_video_context *ctx)
@@ -303,10 +307,7 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
         vlc_sem_post(&part->lock);
     }
 
-    vd->prepare = vlc_vidsplit_Prepare;
-    vd->display = vlc_vidsplit_Display;
-    vd->control = vlc_vidsplit_Control;
-    vd->close = vlc_vidsplit_Close;
+    vd->ops = &ops;
     (void) fmtp;
     return VLC_SUCCESS;
 }

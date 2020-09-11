@@ -109,6 +109,10 @@ static vout_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
     return wnd;
 }
 
+static const struct vlc_display_operations ops = {
+    Close, Prepare, Display, Control, SetViewpoint,
+};
+
 /**
  * It creates an OpenGL vout display.
  */
@@ -165,11 +169,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     /* Setup vout_display now that everything is fine */
     vd->info.subpicture_chromas = subpicture_chromas;
 
-    vd->prepare = Prepare;
-    vd->display = Display;
-    vd->control = Control;
-    vd->set_viewpoint = SetViewpoint;
-    vd->close = Close;
+    vd->ops = &ops;
 
     return VLC_SUCCESS;
 

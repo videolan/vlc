@@ -1096,6 +1096,10 @@ static int find_display_num(const char * name)
     return display_name_to_num[i].num;
 }
 
+static const struct vlc_display_operations ops = {
+    CloseMmalVout, vd_prepare, vd_display, vd_control, NULL,
+};
+
 static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
                         video_format_t *fmtp, vlc_video_context *vctx)
 {
@@ -1280,11 +1284,7 @@ static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
         .subpicture_chromas = hw_mmal_vzc_subpicture_chromas
     };
 
-    vd->prepare = vd_prepare;
-    vd->display = vd_display;
-    vd->control = vd_control;
-    vd->close = CloseMmalVout;
-
+    vd->ops = &ops;
 
     return VLC_SUCCESS;
 

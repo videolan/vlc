@@ -1404,8 +1404,8 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
     const unsigned frame_rate = todisplay->format.i_frame_rate;
     const unsigned frame_rate_base = todisplay->format.i_frame_rate_base;
 
-    if (vd->prepare != NULL)
-        vd->prepare(vd, todisplay, do_dr_spu ? subpic : NULL, system_pts);
+    if (vd->ops->prepare != NULL)
+        vd->ops->prepare(vd, todisplay, do_dr_spu ? subpic : NULL, system_pts);
 
     vout_chrono_Stop(&sys->render);
 #if 0

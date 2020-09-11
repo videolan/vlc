@@ -69,8 +69,7 @@ static int             Control(vout_display_t *, int, va_list);
 /*****************************************************************************
  * OpenVideo: activates dummy vout display method
  *****************************************************************************/
-static int Open(vout_display_t *vd, video_format_t *fmt,
-                void (*display)(vout_display_t *, picture_t *))
+static void Open(vout_display_t *vd, video_format_t *fmt)
 {
     /* p_vd->info is not modified */
 
@@ -83,25 +82,32 @@ static int Open(vout_display_t *vd, video_format_t *fmt,
         }
         free(chroma);
     }
-    vd->prepare = NULL;
-    vd->display = display;
-    vd->control = Control;
-
-    return VLC_SUCCESS;
 }
+
+static const struct vlc_display_operations ops_dummy = {
+    NULL, NULL, NULL, Control, NULL,
+};
 
 static int OpenDummy(vout_display_t *vd, const vout_display_cfg_t *cfg,
                      video_format_t *fmtp, vlc_video_context *context)
 {
     (void) cfg; (void) context;
-    return Open(vd, fmtp, NULL);
+    Open(vd, fmtp);
+    vd->ops = &ops_dummy;
+    return VLC_SUCCESS;
 }
+
+static const struct vlc_display_operations ops_stats = {
+    NULL, NULL, DisplayStat, Control, NULL,
+};
 
 static int OpenStats(vout_display_t *vd, const vout_display_cfg_t *cfg,
                      video_format_t *fmtp, vlc_video_context *context)
 {
     (void) cfg; (void) context;
-    return Open(vd, fmtp, DisplayStat);
+    Open(vd, fmtp);
+    vd->ops = &ops_stats;
+    return VLC_SUCCESS;
 }
 
 static void DisplayStat(vout_display_t *vd, picture_t *picture)

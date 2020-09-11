@@ -151,6 +151,10 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
     return vout_display_opengl_SetViewpoint (glsys->vgl, vp);
 }
 
+static const struct vlc_display_operations ops = {
+    Close, PictureRender, PictureDisplay, Control, SetViewpoint,
+};
+
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmt, vlc_video_context *context)
 {
@@ -216,11 +220,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         /* Setup vout_display_t once everything is fine */
         vd->info.subpicture_chromas = subpicture_chromas;
 
-        vd->prepare = PictureRender;
-        vd->display = PictureDisplay;
-        vd->control = Control;
-        vd->set_viewpoint = SetViewpoint;
-        vd->close   = Close;
+        vd->ops = &ops;
 
         return VLC_SUCCESS;
 

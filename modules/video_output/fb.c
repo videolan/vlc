@@ -161,6 +161,10 @@ static void ClearScreen(vout_display_sys_t *sys)
     }
 }
 
+static const struct vlc_display_operations ops = {
+    Close, NULL, Display, Control, NULL,
+};
+
 /**
  * This function allocates and initializes a FB vout method.
  */
@@ -292,10 +296,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* */
     *fmtp = fmt;
-    vd->prepare = NULL;
-    vd->display = Display;
-    vd->control = Control;
-    vd->close = Close;
+    vd->ops = &ops;
 
     (void) context;
     return VLC_SUCCESS;

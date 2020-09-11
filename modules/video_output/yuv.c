@@ -86,6 +86,10 @@ struct vout_display_sys_t {
     bool  is_yuv4mpeg2;
 };
 
+static const struct vlc_display_operations ops = {
+    Close, NULL, Display, Control, NULL,
+};
+
 /* */
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
@@ -149,10 +153,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* */
     *fmtp = fmt;
-    vd->prepare = NULL;
-    vd->display = Display;
-    vd->control = Control;
-    vd->close = Close;
+    vd->ops = &ops;
 
     (void) cfg; (void) context;
     return VLC_SUCCESS;

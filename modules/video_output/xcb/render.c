@@ -542,6 +542,10 @@ FindVisual(const xcb_setup_t *setup, const xcb_screen_t *scr,
     return 0;
 }
 
+static const struct vlc_display_operations ops = {
+    Close, Prepare, Display, Control, NULL,
+};
+
 /**
  * Probe the X server.
  */
@@ -684,10 +688,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->spu_chromas[1] = 0;
 
     vd->info.subpicture_chromas = sys->spu_chromas;
-    vd->prepare = Prepare;
-    vd->display = Display;
-    vd->control = Control;
-    vd->close = Close;
+    vd->ops = &ops;
 
     (void) ctx;
     return VLC_SUCCESS;

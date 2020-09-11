@@ -155,6 +155,10 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic, vl
     }
 }
 
+static const struct vlc_display_operations ops = {
+    Close, Prepare, Display, Control, NULL,
+};
+
 static void PMThread( void *arg )
 {
     struct open_init *init = ( struct open_init * )arg;
@@ -271,10 +275,7 @@ static void PMThread( void *arg )
     /* Setup vout_display now that everything is fine */
     *fmtp       = fmt;
 
-    vd->prepare = Prepare;
-    vd->display = Display;
-    vd->control = Control;
-    vd->close = Close;
+    vd->ops = &ops;
 
     /* Prevent SIG_FPE */
     _control87(MCW_EM, MCW_EM);

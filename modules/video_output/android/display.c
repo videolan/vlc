@@ -476,6 +476,10 @@ static void SetRGBMask(video_format_t *p_fmt)
     }
 }
 
+static const struct vlc_display_operations ops = {
+    Close, Prepare, Display, Control, NULL,
+};
+
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
 {
@@ -587,10 +591,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         UpdateVideoSize(sys, &sys->p_window->fmt);
     }
 
-    vd->prepare = Prepare;
-    vd->display = Display;
-    vd->control = Control;
-    vd->close = Close;
+    vd->ops = &ops;
 
     *fmtp = fmt;
 

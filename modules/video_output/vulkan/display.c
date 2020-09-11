@@ -77,6 +77,10 @@ static int Control(vout_display_t *, int, va_list);
 static void Close(vout_display_t *);
 static void UpdateParams(vout_display_t *);
 
+static const struct vlc_display_operations ops = {
+    Close, PictureRender, PictureDisplay, Control, NULL,
+};
+
 // Allocates a Vulkan surface and instance for video output.
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmt, vlc_video_context *context)
@@ -139,10 +143,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     vd->info.subpicture_chromas = subfmts;
 
-    vd->prepare = PictureRender;
-    vd->display = PictureDisplay;
-    vd->control = Control;
-    vd->close = Close;
+    vd->ops = &ops;
 
     UpdateParams(vd);
     (void) cfg; (void) context;

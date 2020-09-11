@@ -93,6 +93,10 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
     return vout_display_opengl_SetViewpoint (sys->vgl, vp);
 }
 
+static const struct vlc_display_operations ops = {
+    Close, PictureRender, PictureDisplay, Control, SetViewpoint,
+};
+
 /**
  * Allocates a surface and an OpenGL context for video output.
  */
@@ -155,11 +159,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     vd->sys = sys;
     vd->info.subpicture_chromas = spu_chromas;
-    vd->prepare = PictureRender;
-    vd->display = PictureDisplay;
-    vd->control = Control;
-    vd->set_viewpoint = SetViewpoint;
-    vd->close = Close;
+    vd->ops = &ops;
     return VLC_SUCCESS;
 
 error:

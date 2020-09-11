@@ -249,6 +249,10 @@ static xcb_visualid_t ScreenToFormat(const xcb_setup_t *setup,
     return visual;
 }
 
+static const struct vlc_display_operations ops = {
+    Close, Prepare, Display, Control, NULL,
+};
+
 /**
  * Probe the X server.
  */
@@ -333,10 +337,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     sys->fmt = *fmtp;
     /* Setup vout_display_t once everything is fine */
-    vd->prepare = Prepare;
-    vd->display = Display;
-    vd->control = Control;
-    vd->close = Close;
+    vd->ops = &ops;
 
     (void) context;
     return VLC_SUCCESS;

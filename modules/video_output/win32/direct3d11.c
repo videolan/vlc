@@ -304,6 +304,10 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *viewpoint)
     return VLC_SUCCESS;
 }
 
+static const struct vlc_display_operations ops = {
+    Close, Prepare, Display, Control, SetViewpoint,
+};
+
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
 {
@@ -390,11 +394,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     else
         vd->info.subpicture_chromas = NULL;
 
-    vd->prepare = Prepare;
-    vd->display = Display;
-    vd->control = Control;
-    vd->set_viewpoint = SetViewpoint;
-    vd->close = Close;
+    vd->ops = &ops;
 
     msg_Dbg(vd, "Direct3D11 Open Succeeded");
 

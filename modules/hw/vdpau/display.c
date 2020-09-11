@@ -283,6 +283,10 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     return VLC_SUCCESS;
 }
 
+static const struct vlc_display_operations ops = {
+    Close, Queue, Wait, Control, NULL,
+};
+
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
                 video_format_t *fmtp, vlc_video_context *context)
 {
@@ -488,12 +492,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->info.subpicture_chromas = spu_chromas;
     *fmtp = fmt;
 
-    vd->prepare = Queue;
-    vd->display = Wait;
-    vd->control = Control;
-    vd->close = Close;
+    vd->ops = &ops;
 
-    (void) context;
     return VLC_SUCCESS;
 
 error:
