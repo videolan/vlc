@@ -36,6 +36,7 @@ FocusScope {
     property alias playCoverOnlyBorders: picture.playCoverOnlyBorders
     property alias playIconSize: picture.playIconSize
     property alias pictureRadius: picture.radius
+    property alias pictureOverlay: picture.imageOverlay
     property bool selected: false
 
     property alias progress: picture.progress

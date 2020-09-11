@@ -32,10 +32,17 @@ Widgets.RoundImage {
     property alias playCoverOnlyBorders: playCover.onlyBorders
     property alias playIconSize: playCover.iconSize
     property alias playCoverBorder: playCover.border
+    property alias imageOverlay: overlay.sourceComponent
     signal playIconClicked
 
     height: VLCStyle.listAlbumCover_height
     width: VLCStyle.listAlbumCover_width
+
+    Loader {
+        id: overlay
+
+        anchors.fill: parent
+    }
 
     RowLayout {
         anchors {
