@@ -647,6 +647,7 @@ libqt_plugin_la_QML = \
 	gui/qt/network/qml/NetworkHomeDisplay.qml \
 	gui/qt/network/qml/NetworkHomeDeviceListView.qml \
 	gui/qt/network/qml/NetworkListItem.qml \
+	gui/qt/network/qml/NetworkThumbnailItem.qml \
 	gui/qt/network/qml/ServicesHomeDisplay.qml \
 	gui/qt/player/qml/ControlBar.qml \
 	gui/qt/player/qml/ControlButtons.qml \
