@@ -164,7 +164,7 @@ namespace adaptive
             void setEOF( bool );
             bool isDraining() const;
             bool isEOF() const;
-            mtime_t getDemuxedAmount() const;
+            mtime_t getDemuxedAmount(mtime_t) const;
             mtime_t getBufferingLevel() const;
             mtime_t getFirstDTS() const;
             mtime_t getPCR() const;
