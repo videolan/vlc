@@ -174,6 +174,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/network/networkmediamodel.hpp \
 	gui/qt/network/networksourcelistener.cpp \
 	gui/qt/network/networksourcelistener.hpp \
+	gui/qt/network/servicesdiscoverymodel.cpp \
+	gui/qt/network/servicesdiscoverymodel.hpp \
 	gui/qt/player/input_models.cpp gui/qt/player/input_models.hpp \
 	gui/qt/player/player_controller.cpp gui/qt/player/player_controller.hpp gui/qt/player/player_controller_p.hpp \
 	gui/qt/player/playercontrolbarmodel.cpp gui/qt/player/playercontrolbarmodel.hpp \
@@ -321,6 +323,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/network/networkdevicemodel.moc.cpp \
 	gui/qt/network/networksourcesmodel.moc.cpp \
 	gui/qt/network/networkmediamodel.moc.cpp \
+	gui/qt/network/servicesdiscoverymodel.moc.cpp \
 	gui/qt/player/input_models.moc.cpp \
 	gui/qt/player/player_controller.moc.cpp \
 	gui/qt/player/playercontrolbarmodel.moc.cpp \
