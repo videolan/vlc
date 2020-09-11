@@ -229,7 +229,7 @@ AbstractStream::buffering_status PlaylistManager::bufferize(vlc_tick_t i_nzdeadl
         PrioritizedAbstractStream &p = *it;
         p.st = *sit;
         p.status = p.st->getLastBufferStatus();
-        p.demuxed_amount = p.st->getDemuxedAmount();
+        p.demuxed_amount = p.st->getDemuxedAmount(i_nzdeadline);
         ++it;
     }
     std::sort(prioritized_streams.begin(), prioritized_streams.end(), streamCompare);

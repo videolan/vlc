@@ -164,7 +164,7 @@ namespace adaptive
             void setEOF( bool );
             bool isDraining() const;
             bool isEOF() const;
-            vlc_tick_t getDemuxedAmount() const;
+            vlc_tick_t getDemuxedAmount(vlc_tick_t) const;
             vlc_tick_t getBufferingLevel() const;
             vlc_tick_t getFirstDTS() const;
             vlc_tick_t getPCR() const;

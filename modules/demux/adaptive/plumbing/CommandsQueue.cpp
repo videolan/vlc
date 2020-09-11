@@ -452,9 +452,14 @@ bool CommandsQueue::isEOF() const
     return b;
 }
 
-vlc_tick_t CommandsQueue::getDemuxedAmount() const
+vlc_tick_t CommandsQueue::getDemuxedAmount(vlc_tick_t from) const
 {
-    return bufferinglevel - getFirstDTS();
+    if( from > bufferinglevel || from < getFirstDTS() )
+        return 0;
+    if( from > getFirstDTS() )
+        return bufferinglevel - from;
+    else
+        return bufferinglevel - getFirstDTS();
 }
 
 vlc_tick_t CommandsQueue::getBufferingLevel() const
