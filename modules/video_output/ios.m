@@ -152,7 +152,7 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, PictureRender, PictureDisplay, Control, SetViewpoint,
+    Close, PictureRender, PictureDisplay, Control, NULL, SetViewpoint,
 };
 
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
@@ -281,8 +281,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             return VLC_SUCCESS;
         }
 
-        case VOUT_DISPLAY_RESET_PICTURES:
-            vlc_assert_unreachable ();
         default:
             msg_Err(vd, "Unknown request %d", query);
             return VLC_EGENERIC;

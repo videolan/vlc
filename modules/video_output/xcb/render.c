@@ -373,8 +373,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
             return VLC_SUCCESS;
         }
 
-        case VOUT_DISPLAY_RESET_PICTURES:
-            vlc_assert_unreachable();
         default:
             msg_Err(vd, "Unknown request in XCB RENDER display");
             return VLC_EGENERIC;
@@ -543,7 +541,7 @@ FindVisual(const xcb_setup_t *setup, const xcb_screen_t *scr,
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, NULL,
+    Close, Prepare, Display, Control, NULL, NULL,
 };
 
 /**

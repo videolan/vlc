@@ -78,7 +78,7 @@ static void Close(vout_display_t *);
 static void UpdateParams(vout_display_t *);
 
 static const struct vlc_display_operations ops = {
-    Close, PictureRender, PictureDisplay, Control, NULL,
+    Close, PictureRender, PictureDisplay, Control, NULL, NULL,
 };
 
 // Allocates a Vulkan surface and instance for video output.
@@ -340,9 +340,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
     switch (query)
     {
-    case VOUT_DISPLAY_RESET_PICTURES:
-        assert(!"VOUT_DISPLAY_RESET_PICTURES");
-
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:

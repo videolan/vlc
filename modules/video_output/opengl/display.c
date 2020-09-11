@@ -94,7 +94,7 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, PictureRender, PictureDisplay, Control, SetViewpoint,
+    Close, PictureRender, PictureDisplay, Control, NULL, SetViewpoint,
 };
 
 /**
@@ -235,10 +235,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
     switch (query)
     {
-#ifndef NDEBUG
-      case VOUT_DISPLAY_RESET_PICTURES: // not needed
-        vlc_assert_unreachable();
-#endif
 
       case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
       case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:

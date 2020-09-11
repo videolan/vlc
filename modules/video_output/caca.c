@@ -373,7 +373,7 @@ static void Close(vout_display_t *vd)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, PictureDisplay, Control, NULL,
+    Close, Prepare, PictureDisplay, Control, NULL, NULL,
 };
 
 /**

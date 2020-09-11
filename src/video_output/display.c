@@ -466,8 +466,8 @@ static void vout_display_Reset(vout_display_t *vd)
         osys->pool = NULL;
     }
 
-    if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES,
-                             &osys->display_fmt)
+    assert(vd->ops->reset_pictures);
+    if (vd->ops->reset_pictures(vd, &osys->display_fmt) != VLC_SUCCESS
      || VoutDisplayCreateRender(vd))
         msg_Err(vd, "Failed to adjust render format");
 }

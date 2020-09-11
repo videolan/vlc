@@ -85,7 +85,7 @@ static void Open(vout_display_t *vd, video_format_t *fmt)
 }
 
 static const struct vlc_display_operations ops_dummy = {
-    NULL, NULL, NULL, Control, NULL,
+    NULL, NULL, NULL, Control, NULL, NULL,
 };
 
 static int OpenDummy(vout_display_t *vd, const vout_display_cfg_t *cfg,
@@ -98,7 +98,7 @@ static int OpenDummy(vout_display_t *vd, const vout_display_cfg_t *cfg,
 }
 
 static const struct vlc_display_operations ops_stats = {
-    NULL, NULL, DisplayStat, Control, NULL,
+    NULL, NULL, DisplayStat, Control, NULL, NULL,
 };
 
 static int OpenStats(vout_display_t *vd, const vout_display_cfg_t *cfg,

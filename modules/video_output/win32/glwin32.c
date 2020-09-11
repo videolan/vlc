@@ -110,7 +110,7 @@ static vout_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, SetViewpoint,
+    Close, Prepare, Display, Control, NULL, SetViewpoint,
 };
 
 /**

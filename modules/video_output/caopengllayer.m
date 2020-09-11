@@ -119,7 +119,7 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, PictureRender, PictureDisplay, Control, SetViewpoint,
+    Close, PictureRender, PictureDisplay, Control, NULL, SetViewpoint,
 };
 
 /*****************************************************************************
@@ -342,7 +342,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             vout_display_place_t place;
             vout_display_PlacePicture(&place, vd->source, &cfg_tmp);
             if (unlikely(OpenglLock(sys->gl)))
-                // don't return an error or we need to handle VOUT_DISPLAY_RESET_PICTURES
+                // don't return an error or we need to handle reset_pictures
                 return VLC_SUCCESS;
 
             vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
@@ -353,8 +353,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             return VLC_SUCCESS;
         }
 
-        case VOUT_DISPLAY_RESET_PICTURES:
-            vlc_assert_unreachable ();
         default:
             msg_Err (vd, "Unhandled request %d", query);
             return VLC_EGENERIC;

@@ -152,35 +152,35 @@ static void Display(vout_display_t *vd, picture_t *pic)
     (void) pic;
 }
 
+static int ResetPictures(vout_display_t *vd, video_format_t *fmt)
+{
+    vout_display_place_t place;
+    video_format_t src;
+    vout_display_sys_t *sys = vd->sys;
+    assert(sys->viewport == NULL);
+
+    vout_display_PlacePicture(&place, vd->source, vd->cfg);
+    video_format_ApplyRotation(&src, vd->source);
+
+    fmt->i_width  = src.i_width * place.width
+                                / src.i_visible_width;
+    fmt->i_height = src.i_height * place.height
+                                    / src.i_visible_height;
+    fmt->i_visible_width  = place.width;
+    fmt->i_visible_height = place.height;
+    fmt->i_x_offset = src.i_x_offset * place.width
+                                        / src.i_visible_width;
+    fmt->i_y_offset = src.i_y_offset * place.height
+                                        / src.i_visible_height;
+    return VLC_SUCCESS;
+}
+
 static int Control(vout_display_t *vd, int query, va_list ap)
 {
     vout_display_sys_t *sys = vd->sys;
 
     switch (query)
     {
-        case VOUT_DISPLAY_RESET_PICTURES:
-        {
-            video_format_t *fmt = va_arg(ap, video_format_t *);
-            vout_display_place_t place;
-            video_format_t src;
-            assert(sys->viewport == NULL);
-
-            vout_display_PlacePicture(&place, vd->source, vd->cfg);
-            video_format_ApplyRotation(&src, vd->source);
-
-            fmt->i_width  = src.i_width * place.width
-                                        / src.i_visible_width;
-            fmt->i_height = src.i_height * place.height
-                                         / src.i_visible_height;
-            fmt->i_visible_width  = place.width;
-            fmt->i_visible_height = place.height;
-            fmt->i_x_offset = src.i_x_offset * place.width
-                                             / src.i_visible_width;
-            fmt->i_y_offset = src.i_y_offset * place.height
-                                             / src.i_visible_height;
-            break;
-        }
-
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:
@@ -263,7 +263,7 @@ static void Close(vout_display_t *vd)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, NULL,
+    Close, Prepare, Display, Control, ResetPictures, NULL, NULL,
 };
 
 static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,

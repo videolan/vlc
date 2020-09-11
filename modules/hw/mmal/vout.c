@@ -693,6 +693,16 @@ fail:
     sys->next_phase_check = (sys->next_phase_check + 1) % PHASE_CHECK_INTERVAL;
 }
 
+static int vd_reset_pictures(vout_display_t *vd, video_format_t *fmt)
+{
+    vout_display_sys_t * const sys = vd->sys;
+    msg_Warn(vd, "Reset Pictures");
+    kill_pool(sys);
+    *fmt = *vd->source; // Take (nearly) whatever source wants to give us
+    fmt->i_chroma = req_chroma(fmt);  // Adjust chroma to something we can actually deal with
+    return VLC_SUCCESS;
+}
+
 static int vd_control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t * const sys = vd->sys;
@@ -712,17 +722,6 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
             if (configure_display(vd, NULL, vd->source) >= 0)
                 ret = VLC_SUCCESS;
             break;
-
-        case VOUT_DISPLAY_RESET_PICTURES:
-        {
-            msg_Warn(vd, "Reset Pictures");
-            kill_pool(sys);
-            video_format_t *fmt = va_arg(args, video_format_t *);
-            *fmt = *vd->source; // Take (nearly) whatever source wants to give us
-            fmt->i_chroma = req_chroma(fmt);  // Adjust chroma to something we can actually deal with
-            ret = VLC_SUCCESS;
-            break;
-        }
 
         case VOUT_DISPLAY_CHANGE_ZOOM:
             msg_Warn(vd, "Unsupported control query %d", query);
@@ -1097,7 +1096,7 @@ static int find_display_num(const char * name)
 }
 
 static const struct vlc_display_operations ops = {
-    CloseMmalVout, vd_prepare, vd_display, vd_control, NULL,
+    CloseMmalVout, vd_prepare, vd_display, vd_control, vd_reset_pictures, NULL,
 };
 
 static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,

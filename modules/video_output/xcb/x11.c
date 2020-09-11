@@ -127,11 +127,18 @@ static void Display (vout_display_t *vd, picture_t *pic)
    }
 
     /* FIXME might be WAY better to wait in some case (be carefull with
-     * VOUT_DISPLAY_RESET_PICTURES if done) + does not work with
+     * reset_pictures if done) + does not work with
      * vout_display wrapper. */
 
     if (sys->attached)
         xcb_shm_detach(conn, segment);
+}
+
+static int ResetPictures(vout_display_t *vd, video_format_t *fmt)
+{
+    vout_display_sys_t *sys = vd->sys;
+    *fmt = sys->fmt;
+    return VLC_SUCCESS;
 }
 
 static int Control(vout_display_t *vd, int query, va_list ap)
@@ -176,12 +183,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         fmt->i_y_offset = src.i_y_offset * place.height / src.i_visible_height;
 
         return ret;
-    }
-
-    case VOUT_DISPLAY_RESET_PICTURES:
-    {
-        *va_arg(ap, video_format_t *) = sys->fmt;
-        return VLC_SUCCESS;
     }
 
     default:
@@ -250,7 +251,7 @@ static xcb_visualid_t ScreenToFormat(const xcb_setup_t *setup,
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, NULL,
+    Close, Prepare, Display, Control, ResetPictures, NULL,
 };
 
 /**

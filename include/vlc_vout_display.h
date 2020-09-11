@@ -146,19 +146,6 @@ typedef struct {
  * Control query for vout_display_t
  */
 enum vout_display_query {
-    /**
-     * Asks to reset the internal buffers and picture format.
-     *
-     * This occurs after a
-     * \ref VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
-     * \ref VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
-     * \ref VOUT_DISPLAY_CHANGE_ZOOM,
-     * \ref VOUT_DISPLAY_CHANGE_SOURCE_ASPECT or
-     * \ref VOUT_DISPLAY_CHANGE_SOURCE_CROP
-     * control query returns an error.
-     */
-    VOUT_DISPLAY_RESET_PICTURES, /* video_format_t * */
-
 #if defined(__OS2__)
     /* Ask the module to acknowledge/refuse the fullscreen state change after
      * being requested (externally or by VOUT_DISPLAY_EVENT_FULLSCREEN */
@@ -171,8 +158,7 @@ enum vout_display_query {
      * Notifies a change in display size.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref VOUT_DISPLAY_RESET_PICTURES request
-     *                      is necessary
+     * \retval VLC_EGENERIC if a \ref reset_pictures request is necessary
      */
     VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
 
@@ -180,8 +166,7 @@ enum vout_display_query {
      * Notifies a change of the display fill display flag by the user.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref VOUT_DISPLAY_RESET_PICTURES request
-     *                      is necessary
+     * \retval VLC_EGENERIC if a \ref reset_pictures request is necessary
      */
     VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
 
@@ -189,8 +174,7 @@ enum vout_display_query {
      * Notifies a change of the user zoom factor.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref VOUT_DISPLAY_RESET_PICTURES request
-     *                      is necessary
+     * \retval VLC_EGENERIC if a \ref reset_pictures request is necessary
      */
     VOUT_DISPLAY_CHANGE_ZOOM,
 
@@ -198,8 +182,7 @@ enum vout_display_query {
      * Notifies a change of the sample aspect ratio.
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref VOUT_DISPLAY_RESET_PICTURES request
-     *                      is necessary
+     * \retval VLC_EGENERIC if a \ref reset_pictures request is necessary
      */
     VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
 
@@ -210,8 +193,7 @@ enum vout_display_query {
      * and video_format_t::i_visible_width/height
      *
      * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref VOUT_DISPLAY_RESET_PICTURES request
-     *                      is necessary
+     * \retval VLC_EGENERIC if a \ref reset_pictures request is necessary
      */
     VOUT_DISPLAY_CHANGE_SOURCE_CROP,
 };
@@ -243,9 +225,7 @@ struct vout_display_owner_t {
  *
  * @param vd vout display context
  * @param cfg Initial and current configuration.
- * @param fmtp By default, it is equal to vd->source except for the aspect
- * ratio which is undefined(0) and is ignored. It can be changed by the module
- * to request a different format.
+ * @param fmtp It can be changed by the module to request a different format.
  * @param context XXX: to be defined.
  * @return VLC_SUCCESS or a VLC error code
  */
@@ -319,6 +299,20 @@ struct vlc_display_operations
     int        (*control)(vout_display_t *, int query, va_list);
 
     /**
+     * Reset the picture format handled by the module.
+     * This occurs after a
+     * \ref VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
+     * \ref VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
+     * \ref VOUT_DISPLAY_CHANGE_ZOOM,
+     * \ref VOUT_DISPLAY_CHANGE_SOURCE_ASPECT or
+     * \ref VOUT_DISPLAY_CHANGE_SOURCE_CROP
+     * control query returns an error.
+     *
+     * \param ftmp video format that the module expects as input
+     */
+    int       (*reset_pictures)(vout_display_t *, video_format_t *fmtp);
+
+    /**
      * Notifies a change of VR/360° viewpoint.
      *
      * May be NULL.
@@ -357,7 +351,7 @@ struct vout_display_t {
      * or as close as possible as \ref source.
      *
      * This can only be changed from the display module activation callback,
-     * or within a VOUT_DISPLAY_RESET_PICTURES control request.
+     * or within a \ref reset_pictures request.
      *
      * By default, it is equal to ::source except for the aspect ratio
      * which is undefined(0) and is ignored.

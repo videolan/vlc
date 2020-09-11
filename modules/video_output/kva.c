@@ -156,7 +156,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic, vl
 }
 
 static const struct vlc_display_operations ops = {
-    Close, Prepare, Display, Control, NULL,
+    Close, Prepare, Display, Control, NULL, NULL,
 };
 
 static void PMThread( void *arg )
@@ -449,9 +449,6 @@ static int Control( vout_display_t *vd, int query, va_list args )
         kvaSetup( &sys->kvas );
         return VLC_SUCCESS;
     }
-
-    case VOUT_DISPLAY_RESET_PICTURES:
-        vlc_assert_unreachable();
     }
 
     msg_Err(vd, "Unsupported query(=%d) in vout display KVA", query);

@@ -153,9 +153,6 @@ int CommonControl(vout_display_t *vd, display_win32_area_t *area, vout_display_s
         return VLC_SUCCESS;
     }
 
-    case VOUT_DISPLAY_RESET_PICTURES:
-        vlc_assert_unreachable();
-
     default:
         return VLC_EGENERIC;
     }
