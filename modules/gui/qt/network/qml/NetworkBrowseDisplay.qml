@@ -254,12 +254,6 @@ Widgets.NavigableFocusScope {
             ]
 
             onActionForSelection: _actionAtIndex(selection[0].row)
-            onItemDoubleClicked: {
-                if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
-                    changeTree(model.tree)
-                else
-                    providerModel.addAndPlay( index )
-            }
             onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
             onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
         }
