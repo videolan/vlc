@@ -421,6 +421,8 @@ static const char *const enc_me_list_text[] =
 
 static const char *const bpyramid_list[] =
   { "none", "strict", "normal" };
+static const char *const bpyramid_list_text[] =
+  { N_("None"), N_("Strict"), N_("Normal") };
 
 static const char *const enc_analyse_list[] =
   { "none", "fast", "normal", "slow", "all" };
@@ -487,7 +489,7 @@ vlc_module_begin ()
 
     add_string( SOUT_CFG_PREFIX "bpyramid", "normal", BPYRAMID_TEXT,
               BPYRAMID_LONGTEXT, true )
-        change_string_list( bpyramid_list, bpyramid_list )
+        change_string_list( bpyramid_list, bpyramid_list_text )
 
     add_bool( SOUT_CFG_PREFIX "cabac", true, CABAC_TEXT, CABAC_LONGTEXT,
               true )
