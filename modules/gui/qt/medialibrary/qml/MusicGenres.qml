@@ -158,26 +158,27 @@ Widgets.NavigableFocusScope {
                     contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
 
-                Column {
-                    anchors.centerIn: parent
-                    opacity: item._highlighted ? .3 : 1
+                pictureOverlay: Item {
+                    Column {
+                        anchors.centerIn: parent
 
-                    Label {
-                         width: item.width
-                         elide: Text.ElideRight
-                         font.pixelSize: VLCStyle.fontSize_large
-                         font.weight: Font.DemiBold
-                         text: model.name
-                         color: "white"
-                         horizontalAlignment: Text.AlignHCenter
-                    }
+                        Label {
+                             width: item.width
+                             elide: Text.ElideRight
+                             font.pixelSize: VLCStyle.fontSize_large
+                             font.weight: Font.DemiBold
+                             text: model.name
+                             color: "white"
+                             horizontalAlignment: Text.AlignHCenter
+                        }
 
-                    Widgets.CaptionLabel {
-                        width: item.width
-                        text: model.nb_tracks > 1 ? i18n.qtr("%1 Tracks").arg(model.nb_tracks) : i18n.qtr("%1 Track").arg(model.nb_tracks)
-                        opacity: .7
-                        color: "white"
-                        horizontalAlignment: Text.AlignHCenter
+                        Widgets.CaptionLabel {
+                            width: item.width
+                            text: model.nb_tracks > 1 ? i18n.qtr("%1 Tracks").arg(model.nb_tracks) : i18n.qtr("%1 Track").arg(model.nb_tracks)
+                            opacity: .7
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                        }
                     }
                 }
             }
