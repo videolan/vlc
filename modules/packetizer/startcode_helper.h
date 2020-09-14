@@ -22,8 +22,16 @@
 
 #include <vlc_cpu.h>
 
-#if !defined(CAN_COMPILE_SSE2) && defined(HAVE_SSE2_INTRINSICS)
-   #include <emmintrin.h>
+#ifdef CAN_COMPILE_SSE2
+#  if defined __has_attribute
+#    if __has_attribute(__vector_size__)
+#      define HAS_ATTRIBUTE_VECTORSIZE
+#    endif
+#  endif
+
+#  ifdef HAS_ATTRIBUTE_VECTORSIZE
+    typedef unsigned char v16qu __attribute__((__vector_size__(16)));
+#  endif
 #endif
 
 /* Looks up efficiently for an AnnexB startcode 0x00 0x00 0x01
@@ -44,7 +52,7 @@
         }\
     }
 
-#if defined(CAN_COMPILE_SSE2) || defined(HAVE_SSE2_INTRINSICS)
+#ifdef CAN_COMPILE_SSE2
 
 __attribute__ ((__target__ ("sse2")))
 static inline const uint8_t * startcode_FindAnnexB_SSE2( const uint8_t *p, const uint8_t *end )
@@ -63,31 +71,33 @@ static inline const uint8_t * startcode_FindAnnexB_SSE2( const uint8_t *p, const
     alignedend = end - ((intptr_t) end & 15);
     if( alignedend > p )
     {
-#ifdef CAN_COMPILE_SSE2
-        asm volatile(
-            "pxor   %%xmm1, %%xmm1\n"
-            ::: "xmm1"
-        );
-#else
-        __m128i zeros = _mm_set1_epi8( 0x00 );
-#endif
+#  ifdef HAS_ATTRIBUTE_VECTORSIZE
+        const v16qu zeros = { 0 };
+#  endif
+
         for( ; p < alignedend; p += 16)
         {
             uint32_t match;
-#ifdef CAN_COMPILE_SSE2
+#  ifdef HAS_ATTRIBUTE_VECTORSIZE
             asm volatile(
                 "movdqa   0(%[v]),   %%xmm0\n"
-                "pcmpeqb   %%xmm1,   %%xmm0\n"
-                "pmovmskb  %%xmm0,   %[match]\n"
+                "pcmpeqb %[czero],   %%xmm0\n"
+                "pmovmskb  %%xmm0,   %[match]\n" /* mask will be in reversed match order */
                 : [match]"=r"(match)
-                : [v]"r"(p)
+                : [v]"r"(p), [czero]"x"(zeros)
                 : "xmm0"
             );
-#else
-            __m128i v = _mm_load_si128((__m128i*)p);
-            __m128i res = _mm_cmpeq_epi8( zeros, v );
-            match = _mm_movemask_epi8( res ); /* mask will be in reversed match order */
-#endif
+#  else
+            asm volatile(
+                "movdqa   0(%[v]),   %%xmm0\n"
+                "pxor      %%xmm1,   %%xmm1\n"
+                "pcmpeqb   %%xmm1,   %%xmm0\n"
+                "pmovmskb  %%xmm0,   %[match]\n" /* mask will be in reversed match order */
+                : [match]"=r"(match)
+                : [v]"r"(p)
+                : "xmm0", "xmm1"
+            );
+#  endif
             if( match & 0x000F )
                 TRY_MATCH(p, 0);
             if( match & 0x00F0 )
@@ -140,7 +150,7 @@ static inline const uint8_t * startcode_FindAnnexB_Bits( const uint8_t *p, const
 }
 #undef TRY_MATCH
 
-#if defined(CAN_COMPILE_SSE2) || defined(HAVE_SSE2_INTRINSICS)
+#ifdef CAN_COMPILE_SSE2
 static inline const uint8_t * startcode_FindAnnexB( const uint8_t *p, const uint8_t *end )
 {
     if (vlc_CPU_SSE2())
