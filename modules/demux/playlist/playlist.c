@@ -204,5 +204,14 @@ char *ProcessMRL(const char *str, const char *base)
 
 int PlaylistControl( stream_t *p_access, int i_query, va_list args )
 {
-    return access_vaDirectoryControlHelper( p_access, i_query, args );
+    switch ( i_query )
+    {
+        case STREAM_GET_TYPE:
+        {
+            *va_arg( args, int* ) = ITEM_TYPE_PLAYLIST;
+            return VLC_SUCCESS;
+        }
+        default:
+            return access_vaDirectoryControlHelper( p_access, i_query, args );
+    }
 }
