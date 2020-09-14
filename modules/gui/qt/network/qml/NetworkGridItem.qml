@@ -41,41 +41,42 @@ Widgets.GridItem {
     subtitle: model.mrl || ""
     title: model.name || i18n.qtr("Unknown share")
 
-    Image {
-        id: custom_cover
+    pictureOverlay: Item {
+        Image {
+            id: custom_cover
 
-        x: (pictureWidth - this.width) / 2
-        y: (pictureHeight - this.height) / 2
-        width: VLCStyle.icon_normal
-        height: VLCStyle.icon_normal
-        opacity: item._highlighted && !item.playCoverOnlyBorders ? .1 : 1
-        visible: !model.artwork || model.artwork.toString() === ""
-        source: {
-            switch (model.type){
-            case NetworkMediaModel.TYPE_DISC:
-                return  "qrc:///type/disc.svg"
-            case NetworkMediaModel.TYPE_CARD:
-                return  "qrc:///type/capture-card.svg"
-            case NetworkMediaModel.TYPE_STREAM:
-                return  "qrc:///type/stream.svg"
-            case NetworkMediaModel.TYPE_PLAYLIST:
-                return  "qrc:///type/playlist.svg"
-            case NetworkMediaModel.TYPE_FILE:
-                return  "qrc:///type/file_black.svg"
-            default:
-                return "qrc:///type/directory_black.svg"
+            x: (pictureWidth - this.width) / 2
+            y: (pictureHeight - this.height) / 2
+            width: VLCStyle.icon_normal
+            height: VLCStyle.icon_normal
+            visible: !model.artwork || model.artwork.toString() === ""
+            source: {
+                switch (model.type){
+                case NetworkMediaModel.TYPE_DISC:
+                    return  "qrc:///type/disc.svg"
+                case NetworkMediaModel.TYPE_CARD:
+                    return  "qrc:///type/capture-card.svg"
+                case NetworkMediaModel.TYPE_STREAM:
+                    return  "qrc:///type/stream.svg"
+                case NetworkMediaModel.TYPE_PLAYLIST:
+                    return  "qrc:///type/playlist.svg"
+                case NetworkMediaModel.TYPE_FILE:
+                    return  "qrc:///type/file_black.svg"
+                default:
+                    return "qrc:///type/directory_black.svg"
+                }
             }
         }
-    }
 
-    ColorOverlay {
-        anchors.fill: custom_cover
-        source: custom_cover
-        color: VLCStyle.colors.text
-        visible: custom_cover.visible
-                 && model.type !== NetworkMediaModel.TYPE_DISC
-                 && model.type !== NetworkMediaModel.TYPE_CARD
-                 && model.type !== NetworkMediaModel.TYPE_STREAM
+        ColorOverlay {
+            anchors.fill: custom_cover
+            source: custom_cover
+            color: VLCStyle.colors.text
+            visible: custom_cover.visible
+                     && model.type !== NetworkMediaModel.TYPE_DISC
+                     && model.type !== NetworkMediaModel.TYPE_CARD
+                     && model.type !== NetworkMediaModel.TYPE_STREAM
+        }
     }
 
 }
