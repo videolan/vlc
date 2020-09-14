@@ -48,6 +48,8 @@ typedef struct
     DIR *dir;
 } access_sys_t;
 
+static int DirRead (stream_t *access, input_item_node_t *node);
+
 /*****************************************************************************
  * DirInit: Init the directory access with a directory stream
  *****************************************************************************/
@@ -115,7 +117,7 @@ void DirClose(vlc_object_t *obj)
     closedir(sys->dir);
 }
 
-int DirRead (stream_t *access, input_item_node_t *node)
+static int DirRead (stream_t *access, input_item_node_t *node)
 {
     access_sys_t *sys = access->p_sys;
     const char *entry;
