@@ -58,8 +58,9 @@ static int Control(demux_t *demux, int query, va_list args)
             return VLC_SUCCESS;
         }
         case DEMUX_GET_META:
+        case DEMUX_GET_TYPE:
         {
-            return vlc_stream_vaControl(demux->s, STREAM_GET_META, args);
+            return vlc_stream_vaControl(demux->s, query, args);
         }
         case DEMUX_HAS_UNSUPPORTED_META:
         {
