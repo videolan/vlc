@@ -40,6 +40,8 @@ class VLCMenuBar : public QObject
     friend class MenuFunc;
 
 public:
+    VLCMenuBar(QObject* parent = nullptr);
+
     /* Main bar creation */
     static void createMenuBar( MainInterface *mi, intf_thread_t * );
 
@@ -57,7 +59,7 @@ public:
     static void freeRendererMenu(){ delete rendererMenu; rendererMenu = NULL; }
     static void freeRecentsMenu(){ delete recentsMenu; recentsMenu = NULL; }
 
-private:
+protected:
     /* All main Menus */
     static QMenu *FileMenu( intf_thread_t *, QWidget *, MainInterface * mi = NULL );
 

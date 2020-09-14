@@ -295,15 +295,13 @@ Widgets.NavigableFocusScope {
                             text: i18n.qtr("Menu")
                             height: playlistGroup.height
 
-                            onClicked: mainMenu.openBelow(this)
+                            onClicked: contextMenu.popup(this.mapToGlobal(0, height))
 
-                            Menus.MainDropdownMenu {
-                                id: mainMenu
-                                onClosed: {
-                                    if (mainMenu.activeFocus)
-                                        menu_selector.forceActiveFocus()
-                                }
+                            QmlGlobalMenu {
+                                id: contextMenu
+                                ctx: mainctx
                             }
+
                         }
 
                         Widgets.IconToolButton {

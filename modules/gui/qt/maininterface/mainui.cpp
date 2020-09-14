@@ -34,6 +34,8 @@
 
 #include "maininterface/main_interface.hpp"
 
+#include "menus/qml_menu_wrapper.hpp"
+
 #include "videosurface.hpp"
 
 #include <QQuickWindow>
@@ -195,6 +197,8 @@ void MainUI::registerQMLTypes()
     qmlRegisterType<QmlEventFilter>( "org.videolan.vlc", 0, 1, "EventFilter" );
 
     qmlRegisterType<PlayerControlBarModel>( "org.videolan.vlc", 0, 1, "PlayerControlBarModel");
+
+    qmlRegisterType<QmlGlobalMenu>( "org.videolan.vlc", 0, 1, "QmlGlobalMenu" );
 }
 
 void MainUI::onQmlWarning(const QList<QQmlError>& qmlErrors)

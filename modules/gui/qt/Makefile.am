@@ -163,6 +163,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlvideomodel.hpp \
 	gui/qt/menus/custom_menus.cpp \
 	gui/qt/menus/custom_menus.hpp \
+	gui/qt/menus/qml_menu_wrapper.cpp \
+	gui/qt/menus/qml_menu_wrapper.hpp \
 	gui/qt/menus/menus.cpp gui/qt/menus/menus.hpp \
 	gui/qt/network/networkdevicemodel.cpp \
 	gui/qt/network/networkdevicemodel.hpp \
@@ -312,6 +314,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlvideo.moc.cpp \
 	gui/qt/medialibrary/mlvideomodel.moc.cpp \
 	gui/qt/menus/custom_menus.moc.cpp \
+	gui/qt/menus/qml_menu_wrapper.moc.cpp \
 	gui/qt/menus/menus.moc.cpp \
 	gui/qt/network/networkdevicemodel.moc.cpp \
 	gui/qt/network/networkmediamodel.moc.cpp \

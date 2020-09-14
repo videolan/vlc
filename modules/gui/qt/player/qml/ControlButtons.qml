@@ -525,20 +525,14 @@ Item{
             id: menuBtn
             size: VLCStyle.icon_medium
             iconText: VLCIcons.menu
-            onClicked: {
-                root._lockAutoHide += 1
-                mainMenu.openAbove(this)
-            }
-            property alias mainMenuExt: mainMenu
-            Menus.MainDropdownMenu {
-                id: mainMenu
-                onClosed: {
-                    root._lockAutoHide -= 1
-                    menuBtn.forceActiveFocus()
-                }
-            }
+            onClicked: contextMenu.popup(this.mapToGlobal(0, 0))
             property bool acceptFocus: true
             text: i18n.qtr("Menu")
+
+            QmlGlobalMenu {
+                id: contextMenu
+                ctx: mainctx
+            }
         }
     }
 

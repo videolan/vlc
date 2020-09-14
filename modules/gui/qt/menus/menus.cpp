@@ -45,6 +45,8 @@
 #include "dialogs/extensions/extensions_manager.hpp"                 /* Extensions menu */
 #include "dialogs/extended/extended_panels.hpp"
 #include "util/varchoicemodel.hpp"
+#include "medialibrary/medialib.hpp"
+
 
 #include <QMenu>
 #include <QMenuBar>
@@ -166,6 +168,10 @@ static inline void addMenuToMainbar( QMenu *func, QString title, QMenuBar *bar )
 /**
  * Main Menu Bar Creation
  **/
+VLCMenuBar::VLCMenuBar(QObject* parent)
+    : QObject(parent)
+{}
+
 void VLCMenuBar::createMenuBar( MainInterface *mi,
                               intf_thread_t *p_intf )
 {
@@ -361,6 +367,15 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
     action->setChecked( mi->isInterfaceFullScreen() );
     connect( mi, &MainInterface::fullscreenInterfaceToggled,
              action, &QAction::setChecked );
+
+    action = menu->addAction( qtr( "&View Items as Grid" ), mi,
+            &MainInterface::setGridView );
+    action->setCheckable( true );
+    action->setChecked( mi->hasGridView() );
+    connect( mi, &MainInterface::gridViewChanged,
+             action, &QAction::setChecked );
+
+    menu->addMenu( new CheckableListMenu(qtr( "&Color Scheme" ), mi->getColorScheme(), CheckableListMenu::GROUPED, current) );
 
     menu->addSeparator();
 
