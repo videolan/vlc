@@ -328,7 +328,22 @@ bool NetworkMediaModel::initializeMediaSources()
         emit isIndexedChanged();
     }
 
-    vlc_media_tree_PreparseCancel( libvlc, this );
+    {
+        input_item_node_t* mediaNode = nullptr;
+        vlc_media_tree_Lock(tree);
+        vlc_media_tree_PreparseCancel( libvlc, this );
+        std::vector<InputItemPtr> itemList;
+        if (vlc_media_tree_Find( tree, m_treeItem.media.get(), &mediaNode, nullptr))
+        {
+            itemList.reserve(mediaNode->i_children);
+            for (int i = 0; i < mediaNode->i_children; i++)
+                itemList.emplace_back(mediaNode->pp_children[i]->p_item);
+        }
+        vlc_media_tree_Unlock(tree);
+        if (!itemList.empty())
+            refreshMediaList( m_treeItem.source, std::move( itemList ), true );
+    }
+
     m_preparseSem.acquire();
     vlc_media_tree_Preparse( tree, libvlc, m_treeItem.media.get(), this );
     m_parsingPending = true;
