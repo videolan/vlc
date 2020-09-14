@@ -49,6 +49,11 @@ Widgets.NavigableFocusScope {
         model: providerModel
     }
 
+    NetworkMediaContextMenu {
+        id: contextMenu
+        model: providerModel
+    }
+
     function resetFocus() {
         var initialIndex = root.initialIndex
         if (initialIndex >= providerModel.count)
@@ -74,66 +79,6 @@ Widgets.NavigableFocusScope {
             }
         }
     }
-
-    Widgets.MenuExt {
-        id: contextMenu
-        property var selectionModel: undefined
-        property var model: ({})
-        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
-        focus:true
-
-        Instantiator {
-            id: instanciator
-            property var modelActions: {
-                "play": function() {
-                    if (selectionModel) {
-                        providerModel.addAndPlay(selectionModel.selectedIndexes )
-                    }
-                    contextMenu.close()
-                },
-                "enqueue": function() {
-                    if (selectionModel) {
-                        providerModel.addToPlaylist(selectionModel.selectedIndexes )
-                    }
-                    contextMenu.close()
-                },
-                "index": function(index) {
-                    contextMenu.model.indexed = contextMenu.model.indexed
-                    contextMenu.close()
-                }
-            }
-
-            model: [{
-                    active: true,
-                    text: i18n.qtr("Play"),
-                    action: "play"
-                }, {
-                    active: true,
-                    text: i18n.qtr("Enqueue"),
-                    action: "enqueue"
-                }, {
-                    active:  contextMenu.model && !!contextMenu.model.can_index,
-                    text: contextMenu.model && contextMenu.model.indexed ? i18n.qtr("Remove from Media Library") : i18n.qtr("Add to Media Library") ,
-                    action: "index"
-                }
-            ]
-
-            onObjectAdded: model[index].active && contextMenu.insertItem( index, object )
-            onObjectRemoved: model[index].active && contextMenu.removeItem( object )
-            delegate: Widgets.MenuItemExt {
-                focus: true
-                text: modelData.text
-                onTriggered: {
-                    if (modelData.action && instanciator.modelActions[modelData.action]) {
-                        instanciator.modelActions[modelData.action]()
-                    }
-                }
-            }
-        }
-
-        onClosed: contextMenu.parent.forceActiveFocus()
-    }
-
 
     Component{
         id: gridComponent
@@ -212,9 +157,7 @@ Widgets.NavigableFocusScope {
                 }
 
                 onContextMenuButtonClicked: {
-                    contextMenu.model = providerModel
-                    contextMenu.selectionModel = selectionModel
-                    contextMenu.popup()
+                    contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
             }
 
@@ -397,11 +340,8 @@ Widgets.NavigableFocusScope {
                 else
                     providerModel.addAndPlay( index )
             }
-            onContextMenuButtonClicked: {
-                contextMenu.model = providerModel
-                contextMenu.selectionModel = selectionModel
-                contextMenu.popup(menuParent)
-            }
+            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
+            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
         }
     }
 

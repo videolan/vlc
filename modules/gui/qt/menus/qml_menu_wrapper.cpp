@@ -24,6 +24,7 @@
 #include "medialibrary/mlartistmodel.hpp"
 #include "medialibrary/mlgenremodel.hpp"
 #include "medialibrary/mlalbumtrackmodel.hpp"
+#include "network/networkmediamodel.hpp"
 
 
 #include <QSignalMapper>
@@ -201,6 +202,63 @@ void VideoContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVaria
 #else
         connect(sigmapper, QOverload<int>::of(&QSignalMapper::mapped), this, &VideoContextMenu::showMediaInformation);
 #endif
+    }
+
+    menu->popup(pos);
+}
+
+NetworkMediaContextMenu::NetworkMediaContextMenu(QObject* parent)
+    : QObject(parent)
+{}
+
+void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
+{
+    if (!m_model)
+        return;
+
+    QMenu* menu = new QMenu();
+    QAction* action;
+
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+
+    action = menu->addAction( qtr("Add and play") );
+    connect(action, &QAction::triggered, [this, selected]( ) {
+        m_model->addAndPlay(selected);
+    });
+
+    action = menu->addAction( qtr("Enqueue") );
+    connect(action, &QAction::triggered, [this, selected]( ) {
+        m_model->addToPlaylist(selected);
+    });
+
+    bool canBeIndexed = false;
+    unsigned countIndexed = 0;
+    for (const QModelIndex& idx : selected)
+    {
+        QVariant canIndex = m_model->data(m_model->index(idx.row()), NetworkMediaModel::NETWORK_CANINDEX );
+        if (canIndex.isValid() && canIndex.toBool())
+            canBeIndexed = true;
+        else
+            continue;
+        QVariant isIndexed = m_model->data(m_model->index(idx.row()), NetworkMediaModel::NETWORK_INDEXED );
+        if (!isIndexed.isValid())
+            continue;
+        if (isIndexed.toBool())
+            ++countIndexed;
+    }
+
+    if (canBeIndexed)
+    {
+        bool removeFromML = countIndexed > 0;
+        action = menu->addAction(removeFromML
+            ? qtr("Remove from Media Library")
+            : qtr("Add to Media Library"));
+
+        connect(action, &QAction::triggered, [this, selected, removeFromML]( ) {
+            for (const QModelIndex& idx : selected) {
+                m_model->setData(m_model->index(idx.row()), !removeFromML, NetworkMediaModel::NETWORK_INDEXED);
+            }
+        });
     }
 
     menu->popup(pos);

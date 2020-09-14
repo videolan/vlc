@@ -31,6 +31,7 @@ class MLGenreModel;
 class MLArtistModel;
 class MLAlbumTrackModel;
 class MLVideoModel;
+class NetworkMediaModel;
 class QmlMainContext;
 
 #define SIMPLE_MENU_PROPERTY(type, name, defaultValue) \
@@ -130,6 +131,16 @@ public slots:
 signals:
     void showMediaInformation(int index);
 };
+
+class NetworkMediaContextMenu : public QObject {
+    Q_OBJECT
+    SIMPLE_MENU_PROPERTY(NetworkMediaModel*, model, nullptr)
+public:
+    NetworkMediaContextMenu(QObject* parent = nullptr);
+public slots:
+    void popup(const QModelIndexList& selected, QPoint pos );
+};
+
 #undef SIMPLE_MENU_PROPERTY
 
 #endif // QMLMENUWRAPPER_HPP
