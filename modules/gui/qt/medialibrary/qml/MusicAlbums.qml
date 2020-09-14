@@ -96,6 +96,11 @@ Widgets.NavigableFocusScope {
         model: albumModelId
     }
 
+    AlbumContextMenu {
+        id: contextMenu
+        model: albumModelId
+    }
+
     Component {
         id: gridComponent
 
@@ -127,6 +132,12 @@ Widgets.NavigableFocusScope {
                     if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
                 }
 
+                onContextMenuButtonClicked: {
+                    contextMenu.popup(selectionModel.selectedIndexes, globalMousePos, {
+                        "information": index
+                    })
+                }
+
                 Behavior on opacity {
                     NumberAnimation {
                         duration: 100
@@ -155,30 +166,12 @@ Widgets.NavigableFocusScope {
             onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
 
             navigationParent: root
-        }
-    }
 
-    Widgets.MenuExt {
-        id: contextMenu
-        property var model: ({})
-        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
-
-        Widgets.MenuItemExt {
-            id: playMenuItem
-            text: "Play from start"
-            onTriggered: {
-                medialib.addAndPlay( contextMenu.model.id )
-                history.push(["player"])
+            Connections {
+                target: contextMenu
+                onShowMediaInformation: gridView_id.switchExpandItem( index )
             }
         }
-
-        Widgets.MenuItemExt {
-            text: "Enqueue"
-            onTriggered: medialib.addToPlaylist( contextMenu.model.id )
-        }
-
-        onClosed: contextMenu.parent.forceActiveFocus()
-
     }
 
     Component {
@@ -210,10 +203,8 @@ Widgets.NavigableFocusScope {
                     tableView_id.currentIndex = 0;
             }
 
-            onContextMenuButtonClicked: {
-                contextMenu.model = menuModel
-                contextMenu.popup(menuParent)
-            }
+            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes,  menuParent.mapToGlobal(0,0))
+            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
             Widgets.TableColumns {
                 id: tableColumns

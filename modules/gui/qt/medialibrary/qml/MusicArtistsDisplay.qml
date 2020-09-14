@@ -124,27 +124,9 @@ Widgets.NavigableFocusScope {
                 model: artistModel
             }
 
-            Widgets.MenuExt {
+            ArtistContextMenu {
                 id: contextMenu
-                property var model: ({})
-                closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
-
-                Widgets.MenuItemExt {
-                    id: playMenuItem
-                    text: i18n.qtr("Play")
-                    onTriggered: {
-                        medialib.addAndPlay( contextMenu.model.id )
-                        history.push(["player"])
-                    }
-                }
-
-                Widgets.MenuItemExt {
-                    text: "Enqueue"
-                    onTriggered: medialib.addToPlaylist( contextMenu.model.id )
-                }
-
-                onClosed: contextMenu.parent.forceActiveFocus()
-
+                model: artistModel
             }
 
             Component {
@@ -195,6 +177,8 @@ Widgets.NavigableFocusScope {
                         }
 
                         onItemDoubleClicked: artistAllView.showAlbumView(model)
+
+                        onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                     }
                 }
             }
@@ -233,11 +217,8 @@ Widgets.NavigableFocusScope {
                     onItemDoubleClicked: {
                         artistAllView.showAlbumView(model)
                     }
-
-                    onContextMenuButtonClicked: {
-                        contextMenu.model = menuModel
-                        contextMenu.popup(menuParent)
-                    }
+                    onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
+                    onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
 
                     Widgets.TableColumns {
                         id: tableColumns

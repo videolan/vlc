@@ -67,58 +67,6 @@ Widgets.NavigableFocusScope {
         history.push(["player"])
     }
 
-    Widgets.MenuExt {
-        id: contextMenu
-        property var model: ({})
-        property int itemIndex: -1
-        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
-
-        Widgets.MenuItemExt {
-            id: playMenuItem
-            text: "Play from start"
-            onTriggered: {
-                medialib.addAndPlay( contextMenu.model.id )
-                history.push(["player"])
-            }
-        }
-        Widgets.MenuItemExt {
-            text: "Play all"
-            onTriggered: console.log("not implemented")
-        }
-        Widgets.MenuItemExt {
-            text: "Play as audio"
-            onTriggered: console.log("not implemented")
-        }
-        Widgets.MenuItemExt {
-            text: "Enqueue"
-            onTriggered: medialib.addToPlaylist( contextMenu.model.id )
-        }
-        Widgets.MenuItemExt {
-            enabled: mainInterface.gridView
-            text: "Information"
-            onTriggered: {
-                view.currentItem.switchExpandItem(contextMenu.itemIndex)
-            }
-        }
-        Widgets.MenuItemExt {
-            text: "Download subtitles"
-            onTriggered: console.log("not implemented")
-        }
-        Widgets.MenuItemExt {
-            text: "Add to playlist"
-            onTriggered: console.log("not implemented")
-        }
-        Widgets.MenuItemExt {
-            text: "Delete"
-            onTriggered: g_dialogs.ask(i18n.qtr("Are you sure you want to delete?"), function() {
-                console.log("unimplemented")
-            })
-        }
-
-        onClosed: contextMenu.parent.forceActiveFocus()
-
-    }
-
     MLVideoModel {
         id: videoModel
         ml: medialib
@@ -134,6 +82,12 @@ Widgets.NavigableFocusScope {
         id: selectionModel
         model: videoModel
     }
+
+    VideoContextMenu {
+        id: contextMenu
+        model: videoModel
+    }
+
 
     Component {
         id: gridComponent
@@ -159,11 +113,9 @@ Widgets.NavigableFocusScope {
 
                 opacity: videosGV.expandIndex !== -1 && videosGV.expandIndex !== videoGridItem.index ? .7 : 1
 
-                onContextMenuButtonClicked: {
-                    contextMenu.model = videoGridItem.model
-                    contextMenu.itemIndex = index
-                    contextMenu.popup()
-                }
+                onContextMenuButtonClicked:  contextMenu.popup(selectionModel.selectedIndexes, globalMousePos, {
+                    "information" : index
+                } )
 
                 onItemClicked : {
                     selectionModel.updateSelection( modifier , videosGV.currentIndex, index)
@@ -206,6 +158,11 @@ Widgets.NavigableFocusScope {
             onSelectAll:selectionModel.selectAll()
             onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onActionAtIndex: _actionAtIndex( index )
+
+            Connections {
+                target: contextMenu
+                onShowMediaInformation: videosGV.switchExpandItem(index)
+            }
         }
 
     }
@@ -217,17 +174,14 @@ Widgets.NavigableFocusScope {
             height: view.height
             width: view.width
             model: videoModel
-            onContextMenuButtonClicked:{
-                contextMenu.model = menuModel
-                contextMenu.popup(menuParent)
-            }
-
-            onRightClick:{
-                contextMenu.model = menuModel
-                contextMenu.popup()
-            }
-
             navigationParent: root
+
+            selectionDelegateModel: selectionModel
+
+            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0) )
+
+            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos )
+
         }
     }
 

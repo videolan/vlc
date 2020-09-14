@@ -28,13 +28,6 @@ import "qrc:///style/"
 Widgets.KeyNavigableTableView {
     id: listView_id
 
-    model: MLVideoModel {
-        ml: medialib
-    }
-    selectionDelegateModel: Util.SelectableDelegateModel {
-        model: listView_id.model
-    }
-
     property Component thumbnailHeader: Item {
         Widgets.IconLabel {
             height: VLCStyle.listAlbumCover_height

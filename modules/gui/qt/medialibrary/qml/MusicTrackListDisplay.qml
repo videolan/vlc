@@ -66,6 +66,10 @@ Widgets.KeyNavigableTableView {
 
     onActionForSelection:  medialib.addAndPlay(model.getIdsForIndexes( selection ))
 
+    onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
+    onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+
+
     Widgets.TableColumns {
         id: tableColumns
     }
@@ -89,6 +93,11 @@ Widgets.KeyNavigableTableView {
     Util.SelectableDelegateModel {
         id: selectionModel
 
+        model: rootmodel
+    }
+
+    AlbumTrackContextMenu {
+        id: contextMenu
         model: rootmodel
     }
 }

@@ -173,6 +173,12 @@ void MainUI::registerQMLTypes()
         registerAnonymousType<MLAlbumTrack>("org.videolan.medialib", 1);
         registerAnonymousType<MLGenre>("org.videolan.medialib", 1);
         registerAnonymousType<MLVideo>("org.videolan.medialib", 1);
+
+        qmlRegisterType<AlbumContextMenu>( "org.videolan.medialib", 0, 1, "AlbumContextMenu" );
+        qmlRegisterType<ArtistContextMenu>( "org.videolan.medialib", 0, 1, "ArtistContextMenu" );
+        qmlRegisterType<GenreContextMenu>( "org.videolan.medialib", 0, 1, "GenreContextMenu" );
+        qmlRegisterType<AlbumTrackContextMenu>( "org.videolan.medialib", 0, 1, "AlbumTrackContextMenu" );
+        qmlRegisterType<VideoContextMenu>( "org.videolan.medialib", 0, 1, "VideoContextMenu" );
     }
 
     qmlRegisterUncreatableType<NavigationHistory>("org.videolan.vlc", 0, 1, "History", "Type of global variable history" );

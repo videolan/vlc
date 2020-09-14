@@ -224,6 +224,16 @@ Widgets.NavigableFocusScope {
         }
     }
 
+    AlbumContextMenu {
+        id: contextMenu
+        model: albumModel
+    }
+
+    AlbumTrackContextMenu {
+        id: trackContextMenu
+        model: trackModel
+    }
+
     Component {
         id: gridComponent
 
@@ -253,6 +263,8 @@ Widgets.NavigableFocusScope {
                     if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
                 }
 
+                onContextMenuButtonClicked: contextMenu.popup(albumSelectionModel.selectedIndexes, globalMousePos, { "information" : index})
+
                 Behavior on opacity {
                     NumberAnimation {
                         duration: 100
@@ -281,30 +293,13 @@ Widgets.NavigableFocusScope {
             onSelectAll: albumSelectionModel.selectAll()
             onSelectionUpdated: albumSelectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
             navigationParent: root
-        }
-    }
 
-    Widgets.MenuExt {
-        id: contextMenu
-
-        property var model: ({})
-        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
-
-        Widgets.MenuItemExt {
-            id: playMenuItem
-            text: i18n.qtr("Play from start")
-            onTriggered: {
-                medialib.addAndPlay( contextMenu.model.id )
-                history.push(["player"])
+            Connections {
+                target: contextMenu
+                onShowMediaInformation: gridView_id.switchExpandItem( index )
             }
         }
 
-        Widgets.MenuItemExt {
-            text: i18n.qtr("Enqueue")
-            onTriggered: medialib.addToPlaylist( contextMenu.model.id )
-        }
-
-        onClosed: contextMenu.parent.forceActiveFocus()
     }
 
     Component {
@@ -338,10 +333,8 @@ Widgets.NavigableFocusScope {
                     tableView_id.currentIndex = 0;
             }
 
-            onContextMenuButtonClicked: {
-                contextMenu.model = menuModel
-                contextMenu.popup(menuParent)
-            }
+            onContextMenuButtonClicked: trackContextMenu.popup(trackSelectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
+            onRightClick: trackContextMenu.popup(trackSelectionModel.selectedIndexes, globalMousePos)
 
             Widgets.TableColumns {
                 id: tableColumns

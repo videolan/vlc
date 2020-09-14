@@ -87,27 +87,6 @@ Widgets.NavigableFocusScope {
         }
     }
 
-    Widgets.MenuExt {
-        id: contextMenu
-        property var model: ({})
-        closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
-        onClosed: contextMenu.parent.forceActiveFocus()
-
-        Widgets.MenuItemExt {
-            id: playMenuItem
-            text: "Play from start"
-            onTriggered: {
-                medialib.addAndPlay( contextMenu.model.id )
-                history.push(["player"])
-            }
-        }
-
-        Widgets.MenuItemExt {
-            text: "Enqueue"
-            onTriggered: medialib.addToPlaylist( contextMenu.model.id )
-        }
-    }
-
     function _actionAtIndex(index) {
         if (selectionModel.selectedIndexes.length > 1) {
             medialib.addAndPlay(model.getIdsForIndexes(selectionModel.selectedIndexes))
@@ -136,6 +115,11 @@ Widgets.NavigableFocusScope {
             selectionModel.select(genreModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
             view.currentItem.currentIndex = initialIndex
         }
+    }
+
+    GenreContextMenu {
+        id: contextMenu
+        model: genreModel
     }
 
     /* Grid View */
@@ -170,6 +154,10 @@ Widgets.NavigableFocusScope {
                 onPlayClicked: {
                     if (model.id)
                         medialib.addAndPlay(model.id)
+                }
+
+                onContextMenuButtonClicked: {
+                    contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
 
                 Column {
@@ -262,10 +250,8 @@ Widgets.NavigableFocusScope {
                 root.showAlbumView(model)
             }
 
-            onContextMenuButtonClicked: {
-                contextMenu.model = menuModel
-                contextMenu.popup(menuParent)
-            }
+            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
+            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
         }
     }
 

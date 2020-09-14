@@ -18,6 +18,12 @@
 #include "qml_menu_wrapper.hpp"
 #include "menus.hpp"
 #include "util/qml_main_context.hpp"
+#include "medialibrary/medialib.hpp"
+#include "medialibrary/mlvideomodel.hpp"
+#include "medialibrary/mlalbummodel.hpp"
+#include "medialibrary/mlartistmodel.hpp"
+#include "medialibrary/mlgenremodel.hpp"
+#include "medialibrary/mlalbumtrackmodel.hpp"
 
 
 #include <QSignalMapper>
@@ -71,6 +77,131 @@ void QmlGlobalMenu::popup(QPoint pos)
 
     QAction* helpMenu = menu->addMenu( HelpMenu(menu) );
     helpMenu->setText(qtr( "&Help" ));
+
+    menu->popup(pos);
+}
+
+BaseMedialibMenu::BaseMedialibMenu(QObject* parent)
+    : QObject(parent)
+{}
+
+void BaseMedialibMenu::medialibAudioContextMenu(MediaLib* ml, const QVariantList& mlId, const QPoint& pos, const QVariantMap& options)
+{
+    QMenu* menu = new QMenu();
+    QAction* action;
+
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+
+    action = menu->addAction( qtr("Add and play") );
+    connect(action, &QAction::triggered, [ml, mlId]( ) {
+        ml->addAndPlay(mlId);
+    });
+
+    action = menu->addAction( qtr("Enqueue") );
+    connect(action, &QAction::triggered, [ml, mlId]( ) {
+        ml->addToPlaylist(mlId);
+    });
+
+    if (options.contains("information") && options["information"].type() == QVariant::Int) {
+
+        action = menu->addAction( qtr("Information") );
+        QSignalMapper* sigmapper = new QSignalMapper(menu);
+        connect(action, &QAction::triggered, sigmapper, QOverload<>::of(&QSignalMapper::map));
+        sigmapper->setMapping(action, options["information"].toInt());
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+        connect(sigmapper, &QSignalMapper::mappedInt, this, &BaseMedialibMenu   ::showMediaInformation);
+#else
+        connect(sigmapper, QOverload<int>::of(&QSignalMapper::mapped), this, &BaseMedialibMenu::showMediaInformation);
+#endif
+    }
+    menu->popup(pos);
+}
+
+AlbumContextMenu::AlbumContextMenu(QObject* parent)
+    : BaseMedialibMenu(parent)
+{}
+
+void AlbumContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVariantMap options)
+{
+    BaseMedialibMenu::popup(m_model, MLAlbumModel::ALBUM_ID, selected, pos, options);
+}
+
+
+ArtistContextMenu::ArtistContextMenu(QObject* parent)
+    : BaseMedialibMenu(parent)
+{}
+
+void ArtistContextMenu::popup(const QModelIndexList &selected, QPoint pos, QVariantMap options)
+{
+    BaseMedialibMenu::popup(m_model, MLArtistModel::ARTIST_ID, selected, pos, options);
+}
+
+GenreContextMenu::GenreContextMenu(QObject* parent)
+    : BaseMedialibMenu(parent)
+{}
+
+void GenreContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVariantMap options)
+{
+    BaseMedialibMenu::popup(m_model, MLGenreModel::GENRE_ID, selected, pos, options);
+}
+
+AlbumTrackContextMenu::AlbumTrackContextMenu(QObject* parent)
+    : BaseMedialibMenu(parent)
+{}
+
+void AlbumTrackContextMenu::popup(const QModelIndexList &selected, QPoint pos, QVariantMap options)
+{
+    BaseMedialibMenu::popup(m_model, MLAlbumTrackModel::TRACK_ID, selected, pos, options);
+}
+
+VideoContextMenu::VideoContextMenu(QObject* parent)
+    : QObject(parent)
+{}
+
+void VideoContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVariantMap options)
+{
+    if (!m_model)
+        return;
+
+    QMenu* menu = new QMenu();
+    QAction* action;
+
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+
+    MediaLib* ml= m_model->ml();
+
+    QVariantList itemIdList;
+    for (const QModelIndex& modelIndex : selected)
+        itemIdList.push_back(m_model->data(modelIndex, MLVideoModel::VIDEO_ID));
+
+    action = menu->addAction( qtr("Add and play") );
+
+    connect(action, &QAction::triggered, [ml, itemIdList]( ) {
+        ml->addAndPlay(itemIdList);
+    });
+
+    action = menu->addAction( qtr("Enqueue") );
+    connect(action, &QAction::triggered, [ml, itemIdList]( ) {
+        ml->addToPlaylist(itemIdList);
+    });
+
+    action = menu->addAction( qtr("Play as audio") );
+    connect(action, &QAction::triggered, [ml, itemIdList]( ) {
+        QStringList options({":no-video"});
+        ml->addAndPlay(itemIdList, &options);
+    });
+
+    if (options.contains("information") && options["information"].type() == QVariant::Int) {
+        action = menu->addAction( qtr("Information") );
+        QSignalMapper* sigmapper = new QSignalMapper(menu);
+        connect(action, &QAction::triggered, sigmapper, QOverload<>::of(&QSignalMapper::map));
+        sigmapper->setMapping(action, options["information"].toInt());
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+        connect(sigmapper, &QSignalMapper::mappedInt, this, &VideoContextMenu::showMediaInformation);
+#else
+        connect(sigmapper, QOverload<int>::of(&QSignalMapper::mapped), this, &VideoContextMenu::showMediaInformation);
+#endif
+    }
 
     menu->popup(pos);
 }
