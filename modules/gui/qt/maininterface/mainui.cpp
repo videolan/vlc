@@ -206,6 +206,7 @@ void MainUI::registerQMLTypes()
 
     qmlRegisterType<QmlGlobalMenu>( "org.videolan.vlc", 0, 1, "QmlGlobalMenu" );
     qmlRegisterType<NetworkMediaContextMenu>( "org.videolan.vlc", 0, 1, "NetworkMediaContextMenu" );
+    qmlRegisterType<PlaylistContextMenu>( "org.videolan.vlc", 0, 1, "PlaylistContextMenu" );
 }
 
 void MainUI::onQmlWarning(const QList<QQmlError>& qmlErrors)

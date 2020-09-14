@@ -32,8 +32,8 @@ Rectangle {
 
     property var plmodel
 
-    signal itemClicked(int button, int modifier)
-    signal itemDoubleClicked(int keys, int modifier)
+    signal itemClicked(int button, int modifier, var globalMousePos)
+    signal itemDoubleClicked(int keys, int modifier, var globalMousePos)
     signal dragStarting()
 
     property alias hovered: mouse.containsMouse
@@ -113,11 +113,11 @@ Rectangle {
         acceptedButtons: acceptedButtons | Qt.RightButton
 
         onClicked:{
-            plitem.itemClicked(mouse.button, mouse.modifiers);
+            plitem.itemClicked(mouse.button, mouse.modifiers, this.mapToGlobal(mouse.x, mouse.y));
         }
         onDoubleClicked: {
             if (mouse.button !== Qt.RightButton)
-                plitem.itemDoubleClicked(mouse.buttons, mouse.modifiers);
+                plitem.itemDoubleClicked(mouse.buttons, mouse.modifiers, this.mapToGlobal(mouse.x, mouse.y));
         }
 
         drag.target: dragItem

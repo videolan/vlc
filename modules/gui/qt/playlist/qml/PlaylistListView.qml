@@ -37,7 +37,6 @@ Widgets.NavigableFocusScope {
     property int leftPadding: 0
     property int rightPadding: 0
     property alias backgroundColor: parentRect.color
-    property alias mediaLibAvailable: contextMenu.medialibAvailable
 
     property bool forceDark: false
     property VLCColors _colors: forceDark ? vlcNightColors : VLCStyle.colors
@@ -56,6 +55,12 @@ Widgets.NavigableFocusScope {
             id: dragItem
             _colors: root._colors
             color: parent.color
+        }
+
+        PlaylistContextMenu {
+            id: contextMenu
+            model: root.plmodel
+            controler: mainPlaylistController
         }
 
         PlaylistMenu {
@@ -128,138 +133,6 @@ Widgets.NavigableFocusScope {
                     ]
                 }
             }
-        }
-
-        Widgets.MenuExt {
-            id: contextMenu
-            property alias model: root.plmodel
-            property int itemIndex: -1
-            property bool medialibAvailable: false
-            closePolicy: Popup.CloseOnReleaseOutside | Popup.CloseOnEscape
-
-            Widgets.MenuItemExt {
-                text: i18n.qtr("Play")
-                icon.source: "qrc:/toolbar/play_b.svg"
-                icon.width: VLCStyle.icon_small
-                icon.height: VLCStyle.icon_small
-                onTriggered: {
-                    mainPlaylistController.goTo(contextMenu.itemIndex, true)
-                }
-            }
-
-            Widgets.MenuItemExt {
-                text: i18n.qtr("Stream")
-                icon.source: "qrc:/menu/stream.svg"
-                icon.width: VLCStyle.icon_small
-                icon.height: VLCStyle.icon_small
-                onTriggered: {
-                    var selection = contextMenu.model.getSelection()
-                    if (selection.length === 0)
-                        return
-
-                    dialogProvider.streamingDialog(selection.map(function(i) { return contextMenu.model.itemAt(i).url; }), false)
-                }
-            }
-
-            Widgets.MenuItemExt {
-                text: i18n.qtr("Save")
-                onTriggered: {
-                    var selection = contextMenu.model.getSelection()
-                    if (selection.length === 0)
-                        return
-
-                    dialogProvider.streamingDialog(selection.map(function(i) { return contextMenu.model.itemAt(i).url; }))
-                }
-            }
-
-            Widgets.MenuItemExt {
-                text: i18n.qtr("Information...")
-                icon.source: "qrc:/menu/info.svg"
-                icon.width: VLCStyle.icon_small
-                icon.height: VLCStyle.icon_small
-                onTriggered: {
-                    dialogProvider.mediaInfoDialog(contextMenu.model.itemAt(contextMenu.itemIndex))
-                }
-            }
-
-            MenuSeparator { }
-
-            Widgets.MenuItemExt {
-                text: i18n.qtr("Show Containing Directory...")
-                icon.source: "qrc:/type/folder-grey.svg"
-                icon.width: VLCStyle.icon_small
-                icon.height: VLCStyle.icon_small
-                onTriggered: {
-                    mainPlaylistController.explore(contextMenu.model.itemAt(contextMenu.itemIndex))
-                }
-            }
-
-            MenuSeparator { }
-
-            Widgets.MenuItemExt {
-                text: i18n.qtr("Add File...")
-                icon.source: "qrc:/buttons/playlist/playlist_add.svg"
-                icon.width: VLCStyle.icon_small
-                icon.height: VLCStyle.icon_small
-                onTriggered: {
-                    dialogProvider.simpleOpenDialog(false)
-                }
-            }
-
-            Widgets.MenuItemExt {
-                text: i18n.qtr("Add Directory...")
-                icon.source: "qrc:/buttons/playlist/playlist_add.svg"
-                icon.width: VLCStyle.icon_small
-                icon.height: VLCStyle.icon_small
-                onTriggered: {
-                    dialogProvider.PLAppendDir()
-                }
-            }
-
-            Widgets.MenuItemExt {
-                text: i18n.qtr("Advanced Open...")
-                icon.source: "qrc:/buttons/playlist/playlist_add.svg"
-                icon.width: VLCStyle.icon_small
-                icon.height: VLCStyle.icon_small
-                onTriggered: {
-                    dialogProvider.PLAppendDialog()
-                }
-            }
-
-            MenuSeparator { }
-
-            Widgets.MenuItemExt {
-                text: i18n.qtr("Save Playlist to File...")
-                onTriggered: {
-                    dialogProvider.savePlayingToPlaylist();
-                }
-            }
-
-            MenuSeparator { }
-
-            Widgets.MenuItemExt {
-                text: i18n.qtr("Remove Selected")
-                icon.source: "qrc:/buttons/playlist/playlist_remove.svg"
-                icon.width: VLCStyle.icon_small
-                icon.height: VLCStyle.icon_small
-                onTriggered: {
-                    contextMenu.model.removeItems(contextMenu.model.getSelection())
-                }
-            }
-
-            Widgets.MenuItemExt {
-                text: i18n.qtr("Clear the playlist")
-                icon.source: "qrc:/toolbar/clear.svg"
-                icon.width: VLCStyle.icon_small
-                icon.height: VLCStyle.icon_small
-                onTriggered: {
-                    mainPlaylistController.clear()
-                }
-            }
-
-            MenuSeparator { }
-
-            onClosed: contextMenu.parent.forceActiveFocus()
         }
 
         ColumnLayout {
@@ -383,18 +256,11 @@ Widgets.NavigableFocusScope {
                         acceptedButtons: Qt.RightButton | Qt.LeftButton
 
                         onClicked: {
+                            view.forceActiveFocus()
                             if( mouse.button === Qt.RightButton )
-                            {
-                                view.forceActiveFocus()
-                                root.plmodel.deselectAll()
-                                contextMenu.itemIndex = -1
-                                contextMenu.popup()
-                            }
+                                contextMenu.popup(-1, this.mapToGlobal(mouse.x, mouse.y))
                             else if ( mouse.button === Qt.LeftButton )
-                            {
-                                view.forceActiveFocus()
                                 root.plmodel.deselectAll()
-                            }
                         }
                     }
 
@@ -479,10 +345,7 @@ Widgets.NavigableFocusScope {
                             }
 
                             if (button === Qt.RightButton)
-                            {
-                                contextMenu.itemIndex = index
-                                contextMenu.popup()
-                            }
+                                contextMenu.popup(index, globalMousePos)
                         }
                         onItemDoubleClicked: mainPlaylistController.goTo(index, true)
                         color: _colors.getBgColor(model.selected, plitem.hovered, plitem.activeFocus)

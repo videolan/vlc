@@ -33,6 +33,12 @@ class MLAlbumTrackModel;
 class MLVideoModel;
 class NetworkMediaModel;
 class QmlMainContext;
+namespace vlc {
+namespace playlist {
+class PlaylistControllerModel;
+class PlaylistListModel;
+}
+}
 
 #define SIMPLE_MENU_PROPERTY(type, name, defaultValue) \
     Q_PROPERTY(type name READ get##name WRITE set##name) \
@@ -139,6 +145,17 @@ public:
     NetworkMediaContextMenu(QObject* parent = nullptr);
 public slots:
     void popup(const QModelIndexList& selected, QPoint pos );
+};
+
+
+class PlaylistContextMenu : public QObject {
+    Q_OBJECT
+    SIMPLE_MENU_PROPERTY(vlc::playlist::PlaylistListModel*, model, nullptr)
+    SIMPLE_MENU_PROPERTY(vlc::playlist::PlaylistControllerModel*, controler, nullptr)
+public:
+    PlaylistContextMenu(QObject* parent = nullptr);
+public slots:
+    void popup(int currentIndex, QPoint pos );
 };
 
 #undef SIMPLE_MENU_PROPERTY

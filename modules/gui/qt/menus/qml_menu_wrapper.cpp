@@ -25,6 +25,9 @@
 #include "medialibrary/mlgenremodel.hpp"
 #include "medialibrary/mlalbumtrackmodel.hpp"
 #include "network/networkmediamodel.hpp"
+#include "playlist/playlist_controller.hpp"
+#include "playlist/playlist_model.hpp"
+#include "dialogs/dialogs_provider.hpp"
 
 
 #include <QSignalMapper>
@@ -264,3 +267,111 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
     menu->popup(pos);
 }
 
+PlaylistContextMenu::PlaylistContextMenu(QObject* parent)
+    : QObject(parent)
+{}
+
+void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
+{
+    if (!m_controler || !m_model)
+        return;
+
+    QMenu* menu = new QMenu();
+    QAction* action;
+
+    QList<QUrl> selectedUrlList;
+    for (const int modelIndex : m_model->getSelection())
+        selectedUrlList.push_back(m_model->itemAt(modelIndex).getUrl());
+
+    PlaylistItem currentItem;
+    if (currentIndex >= 0)
+        currentItem = m_model->itemAt(currentIndex);
+
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+
+    if (currentItem)
+    {
+        action = menu->addAction( qtr("Play") );
+        connect(action, &QAction::triggered, [this, currentIndex]( ) {
+            m_controler->goTo(currentIndex, true);
+        });
+
+        menu->addSeparator();
+    }
+
+    if (m_model->getSelectedCount() > 0) {
+        action = menu->addAction( qtr("Stream") );
+        connect(action, &QAction::triggered, [selectedUrlList]( ) {
+            DialogsProvider::getInstance()->streamingDialog(selectedUrlList, false);
+        });
+
+        action = menu->addAction( qtr("Save") );
+        connect(action, &QAction::triggered, [selectedUrlList]( ) {
+            DialogsProvider::getInstance()->streamingDialog(selectedUrlList, true);
+        });
+
+        menu->addSeparator();
+    }
+
+    if (currentItem) {
+        action = menu->addAction( qtr("Information") );
+        action->setIcon(QIcon(":/menu/info.svg"));
+        connect(action, &QAction::triggered, [currentItem]( ) {
+            DialogsProvider::getInstance()->mediaInfoDialog(currentItem);
+        });
+
+        menu->addSeparator();
+
+        action = menu->addAction( qtr("Show Containing Directory...") );
+        action->setIcon(QIcon(":/type/folder-grey.svg"));
+        connect(action, &QAction::triggered, [currentItem]( ) {
+            DialogsProvider::getInstance()->mediaInfoDialog(currentItem);
+        });
+
+        menu->addSeparator();
+    }
+
+    action = menu->addAction( qtr("Add File...") );
+    action->setIcon(QIcon(":/buttons/playlist/playlist_add.svg"));
+    connect(action, &QAction::triggered, []( ) {
+        DialogsProvider::getInstance()->simpleOpenDialog(false);
+    });
+
+    action = menu->addAction( qtr("Add Directory...") );
+    action->setIcon(QIcon(":/buttons/playlist/playlist_add.svg"));
+    connect(action, &QAction::triggered, []( ) {
+        DialogsProvider::getInstance()->PLAppendDir();
+    });
+
+    action = menu->addAction( qtr("Advanced Open...") );
+    action->setIcon(QIcon(":/buttons/playlist/playlist_add.svg"));
+    connect(action, &QAction::triggered, []( ) {
+        DialogsProvider::getInstance()->PLAppendDialog();
+    });
+
+    menu->addSeparator();
+
+    if (m_model->getSelectedCount() > 0)
+    {
+        action = menu->addAction( qtr("Save Playlist to File...") );
+        connect(action, &QAction::triggered, []( ) {
+            DialogsProvider::getInstance()->savePlayingToPlaylist();
+        });
+
+        menu->addSeparator();
+
+        action = menu->addAction( qtr("Remove Selected") );
+        action->setIcon(QIcon(":/buttons/playlist/playlist_remove.svg"));
+        connect(action, &QAction::triggered, [this]( ) {
+            m_model->removeItems(m_model->getSelection());
+        });
+    }
+
+    action = menu->addAction( qtr("Clear the playlist") );
+    action->setIcon(QIcon(":/toolbar/clear.svg"));
+    connect(action, &QAction::triggered, [this]( ) {
+        m_controler->clear();
+    });
+
+    menu->popup(pos);
+}
