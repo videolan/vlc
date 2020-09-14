@@ -50,6 +50,20 @@ typedef struct
 
 static int DirRead (stream_t *access, input_item_node_t *node);
 
+static int DirControl( stream_t *p_access, int i_query, va_list args )
+{
+    switch ( i_query )
+    {
+        case STREAM_GET_TYPE:
+        {
+            *va_arg( args, int* ) = ITEM_TYPE_DIRECTORY;
+            return VLC_SUCCESS;
+        }
+        default:
+            return access_vaDirectoryControlHelper( p_access, i_query, args );
+    }
+}
+
 /*****************************************************************************
  * DirInit: Init the directory access with a directory stream
  *****************************************************************************/
@@ -80,7 +94,7 @@ int DirInit (stream_t *access, DIR *dir)
 
     access->p_sys = sys;
     access->pf_readdir = DirRead;
-    access->pf_control = access_vaDirectoryControlHelper;
+    access->pf_control = DirControl;
     return VLC_SUCCESS;
 
 error:
