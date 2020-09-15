@@ -23,6 +23,7 @@
 #include "Chunk.h"
 
 #include <vlc_common.h>
+#include <vlc_cxx_helpers.hpp>
 #include <list>
 
 namespace adaptive
@@ -44,9 +45,10 @@ namespace adaptive
                 static void * downloaderThread(void *);
                 void Run();
                 void DownloadSource(HTTPChunkBufferedSource *);
+                void kill();
                 vlc_thread_t thread_handle;
-                vlc_mutex_t  lock;
-                vlc_cond_t   waitcond;
+                vlc::threads::mutex lock;
+                vlc::threads::condition_variable wait_cond;
                 bool         thread_handle_valid;
                 bool         killed;
                 std::list<HTTPChunkBufferedSource *> chunks;
