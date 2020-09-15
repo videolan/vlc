@@ -60,7 +60,7 @@ static void Close(vout_display_t *vd);
 static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
                            vlc_tick_t date);
 static void PictureDisplay (vout_display_t *vd, picture_t *pic);
-static int Control (vout_display_t *vd, int query, va_list ap);
+static int Control (vout_display_t *vd, int query);
 
 static void *OurGetProcAddress(vlc_gl_t *, const char *);
 
