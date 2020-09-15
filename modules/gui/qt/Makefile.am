@@ -186,6 +186,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/playlist/playlist_model_p.hpp \
 	gui/qt/util/audio_device_model.cpp  \
 	gui/qt/util/audio_device_model.hpp \
+	gui/qt/util/color_scheme_model.cpp gui/qt/util/color_scheme_model.hpp \
 	gui/qt/util/imagehelper.cpp gui/qt/util/imagehelper.hpp \
 	gui/qt/util/i18n.cpp gui/qt/util/i18n.hpp \
 	gui/qt/util/navigation_history.cpp gui/qt/util/navigation_history.hpp \
@@ -324,6 +325,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/playlist/playlist_item.moc.cpp \
 	gui/qt/playlist/playlist_model.moc.cpp \
 	gui/qt/util/audio_device_model.moc.cpp \
+	gui/qt/util/color_scheme_model.moc.cpp \
 	gui/qt/util/i18n.moc.cpp \
 	gui/qt/util/navigation_history.moc.cpp \
 	gui/qt/util/qml_main_context.moc.cpp \

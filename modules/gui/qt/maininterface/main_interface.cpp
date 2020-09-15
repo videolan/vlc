@@ -36,6 +36,7 @@
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
 #include "util/imagehelper.hpp"
 #include "util/recents.hpp"
+#include "util/color_scheme_model.hpp"
 
 #include "widgets/native/interface_widgets.hpp"     // bgWidget, videoWidget
 #include "dialogs/firstrun/firstrun.hpp"                 // First Run
@@ -148,8 +149,11 @@ MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::Windo
     playlistVisible  = getSettings()->value( "MainWindow/playlist-visible", false ).toBool();
     playlistWidthFactor = getSettings()->value( "MainWindow/playlist-width-factor", 4.0 ).toDouble();
     m_gridView = getSettings()->value( "MainWindow/grid-view", true).toBool();
-
+    QString currentColorScheme = getSettings()->value( "MainWindow/color-scheme", "system").toString();
     m_showRemainingTime = getSettings()->value( "MainWindow/ShowRemainingTime", false ).toBool();
+
+    m_colorScheme = new ColorSchemeModel(this);
+    m_colorScheme->setCurrent(currentColorScheme);
 
     /* Should the UI stays on top of other windows */
     b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );
@@ -236,6 +240,7 @@ MainInterface::~MainInterface()
     settings->setValue( "playlist-width-factor", playlistWidthFactor);
 
     settings->setValue( "grid-view", m_gridView );
+    settings->setValue( "color-scheme", m_colorScheme->getCurrent() );
     /* Save the stackCentralW sizes */
     settings->endGroup();
 

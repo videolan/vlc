@@ -107,9 +107,13 @@ Item {
 
     property color seekpoint: "red";
 
-    property var colorSchemes: ["system", "day", "night"]
+    property var colorSchemes: mainInterface.colorScheme
+    Component.onCompleted:  {
+        mainInterface.colorScheme.setAvailableColorSchemes(["system", "day", "night"])
+    }
 
-    state: settings.VLCStyle_colors_state
+
+    state: mainInterface.colorScheme.current
     states: [
         //other styles are provided for testing purpose
         State {

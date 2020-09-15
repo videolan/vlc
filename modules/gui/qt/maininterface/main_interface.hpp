@@ -28,6 +28,7 @@
 
 #include "widgets/native/qvlcframe.hpp"
 #include "player/player_controller.hpp"
+#include "util/color_scheme_model.hpp"
 
 #include <QSystemTrayIcon>
 #include <QStackedWidget>
@@ -150,6 +151,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(float intfScaleFactor READ getIntfScaleFactor NOTIFY intfScaleFactorChanged)
     Q_PROPERTY(bool mediaLibraryAvailable READ hasMediaLibrary CONSTANT)
     Q_PROPERTY(bool gridView READ hasGridView WRITE setGridView NOTIFY gridViewChanged)
+    Q_PROPERTY(ColorSchemeModel* colorScheme READ getColorScheme CONSTANT)
 
 public:
     /* tors */
@@ -185,6 +187,8 @@ public:
     inline float getIntfScaleFactor() const { return m_intfScaleFactor; }
     inline bool hasMediaLibrary() const { return b_hasMedialibrary; }
     inline bool hasGridView() const { return m_gridView; }
+    inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
+
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -247,6 +251,7 @@ protected:
 #endif
     bool                 b_hasMedialibrary;
     bool                 m_gridView;
+    ColorSchemeModel*    m_colorScheme;
 
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
@@ -312,6 +317,7 @@ signals:
     void toolBarConfUpdated();
     void showRemainingTimeChanged(bool);
     void gridViewChanged( bool );
+    void colorSchemeChanged( QString );
 
     void intfScaleFactorChanged();
 };
