@@ -311,7 +311,7 @@ HTTPChunkBufferedSource::~HTTPChunkBufferedSource()
 
     mutex_locker locker {lock};
     done = true;
-    if(held) /* wait release if not in queue but currently downloaded */
+    while(held) /* wait release if not in queue but currently downloaded */
         avail.wait(lock);
 
     if(p_head)
