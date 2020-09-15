@@ -313,7 +313,7 @@ HTTPChunkBufferedSource::~HTTPChunkBufferedSource()
 
     vlc_mutex_lock(&lock);
     done = true;
-    if(held) /* wait release if not in queue but currently downloaded */
+    while(held) /* wait release if not in queue but currently downloaded */
         vlc_cond_wait(&avail, &lock);
 
     if(p_head)
