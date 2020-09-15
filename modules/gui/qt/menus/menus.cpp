@@ -346,15 +346,6 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
 
     menu->addSeparator();
 
-    /* Minimal View */
-    action = menu->addAction( qtr( "Mi&nimal Interface" ) );
-    action->setShortcut( qtr( "Ctrl+H" ) );
-    action->setCheckable( true );
-
-
-    CONNECT( action, triggered( bool ), mi, toggleMinimalView( bool ) );
-    CONNECT( mi, minimalViewToggled( bool ), action, setChecked( bool ) );
-
     /* FullScreen View */
     action = menu->addAction( qtr( "&Fullscreen Interface" ), mi,
             SLOT( toggleInterfaceFullScreen() ), QString( "F11" ) );
@@ -362,22 +353,6 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
     action->setChecked( mi->isInterfaceFullScreen() );
     CONNECT( mi, fullscreenInterfaceToggled( bool ),
              action, setChecked( bool ) );
-
-    /* Advanced Controls */
-    action = menu->addAction( qtr( "&Advanced Controls" ), mi,
-            SLOT( toggleAdvancedButtons() ) );
-    action->setCheckable( true );
-
-    action = menu->addAction( qtr( "Status Bar" ) );
-    action->setCheckable( true );
-    action->setChecked( mi->statusBar()->isVisible() );
-    CONNECT( action, triggered( bool ), mi, setStatusBarVisibility( bool) );
-#if 0 /* For Visualisations. Not yet working */
-    adv = menu->addAction( qtr( "Visualizations selector" ), mi,
-                           SLOT( visual() ) );
-    adv->setCheckable( true );
-    if( visual_selector_enabled ) adv->setChecked( true );
-#endif
 
     menu->addSeparator();
 
