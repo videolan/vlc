@@ -387,10 +387,7 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
         vlc_mutex_unlock( &p_owner->lock );
 
         if( p_aout == NULL )
-        {
-            msg_Err( p_dec, "failed to create audio output" );
             return -1;
-        }
 
         p_dec->fmt_out.audio.i_bytes_per_frame =
             p_owner->fmt.audio.i_bytes_per_frame;
