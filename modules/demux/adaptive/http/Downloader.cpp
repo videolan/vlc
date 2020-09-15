@@ -80,9 +80,7 @@ void Downloader::cancel(HTTPChunkBufferedSource *source)
 void * Downloader::downloaderThread(void *opaque)
 {
     Downloader *instance = static_cast<Downloader *>(opaque);
-    int canc = vlc_savecancel();
     instance->Run();
-    vlc_restorecancel( canc );
     return NULL;
 }
 
