@@ -29,7 +29,6 @@
 MediaLib::MediaLib(intf_thread_t *_intf, QObject *_parent)
     : QObject( _parent )
     , m_intf( _intf )
-    , m_gridView ( m_intf->p_sys->mainSettings->value("medialib-gridView",true).toBool() )
     , m_ml( vlcMl() )
     , m_event_cb( nullptr, [this](vlc_ml_event_callback_t* cb ) {
         vlc_ml_event_unregister_callback( m_ml, cb );
@@ -37,19 +36,6 @@ MediaLib::MediaLib(intf_thread_t *_intf, QObject *_parent)
 {
     m_event_cb.reset( vlc_ml_event_register_callback( m_ml, MediaLib::onMediaLibraryEvent,
                                                       this ) );
-}
-
-// Should the items be displayed as a grid or as list ?
-bool MediaLib::isGridView() const
-{
-    return m_gridView;
-}
-
-void MediaLib::setGridView(bool state)
-{
-    m_gridView = state;
-    m_intf->p_sys->mainSettings->setValue("medialib-gridView",state);
-    emit gridViewChanged();
 }
 
 void MediaLib::openMRLFromMedia(const vlc_ml_media_t& media, bool start )

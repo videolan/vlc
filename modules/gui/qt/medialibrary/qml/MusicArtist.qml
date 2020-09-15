@@ -71,7 +71,7 @@ Widgets.NavigableFocusScope {
             Loader {
                 id: albumsLoader
 
-                active: !medialib.gridView
+                active: !mainInterface.gridView
                 focus: true
                 sourceComponent: Column {
                     property alias albumsListView: albumsList
@@ -164,7 +164,7 @@ Widgets.NavigableFocusScope {
     onActiveFocusChanged: {
         if (activeFocus && albumModel.count > 0 && !albumSelectionModel.hasSelection) {
             var initialIndex = 0
-            var albumsListView = medialib.gridView ? view.currentItem : headerItem.albumsListView
+            var albumsListView = mainInterface.gridView ? view.currentItem : headerItem.albumsListView
             if (albumsListView.currentIndex !== -1)
                 initialIndex = albumsListView.currentIndex
             albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
@@ -180,7 +180,7 @@ Widgets.NavigableFocusScope {
         if (initialIndex >= albumModel.count)
             initialIndex = 0
         albumSelectionModel.select(albumModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-        var albumsListView = medialib.gridView ? view.currentItem : headerItem.albumsListView
+        var albumsListView = mainInterface.gridView ? view.currentItem : headerItem.albumsListView
         if (albumsListView) {
             albumsListView.currentIndex = initialIndex
             albumsListView.positionViewAtIndex(initialIndex, ItemView.Contain)
@@ -365,12 +365,12 @@ Widgets.NavigableFocusScope {
 
         anchors.fill: parent
         focus: albumModel.count !== 0
-        initialItem: medialib.gridView ? gridComponent : tableComponent
+        initialItem: mainInterface.gridView ? gridComponent : tableComponent
 
         Connections {
-            target: medialib
+            target: mainInterface
             onGridViewChanged: {
-                if (medialib.gridView)
+                if (mainInterface.gridView)
                     view.replace(gridComponent)
                 else
                     view.replace(tableComponent)

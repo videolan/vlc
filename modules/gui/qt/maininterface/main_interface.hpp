@@ -149,6 +149,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(VLCVarChoiceModel* extraInterfaces READ getExtraInterfaces CONSTANT)
     Q_PROPERTY(float intfScaleFactor READ getIntfScaleFactor NOTIFY intfScaleFactorChanged)
     Q_PROPERTY(bool mediaLibraryAvailable READ hasMediaLibrary CONSTANT)
+    Q_PROPERTY(bool gridView READ hasGridView WRITE setGridView NOTIFY gridViewChanged)
 
 public:
     /* tors */
@@ -183,6 +184,7 @@ public:
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
     inline float getIntfScaleFactor() const { return m_intfScaleFactor; }
     inline bool hasMediaLibrary() const { return b_hasMedialibrary; }
+    inline bool hasGridView() const { return m_gridView; }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -243,10 +245,13 @@ protected:
 #ifdef QT5_HAS_WAYLAND
     bool                 b_hasWayland;
 #endif
-    bool                 b_hasMedialibrary = false;
+    bool                 b_hasMedialibrary;
+    bool                 m_gridView;
+
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
     double               playlistWidthFactor;   ///< playlist size: root.width / playlistScaleFactor
+
 
     static const Qt::Key kc[10]; /* easter eggs */
     int i_kc_offset;
@@ -263,6 +268,7 @@ public slots:
     void setPlaylistWidthFactor( double );
     void setInterfaceAlwaysOnTop( bool );
     void setShowRemainingTime( bool );
+    void setGridView( bool );
     void incrementIntfUserScaleFactor( bool increment);
 
     void emitBoss();
@@ -305,6 +311,7 @@ signals:
     void hasEmbededVideoChanged(bool);
     void toolBarConfUpdated();
     void showRemainingTimeChanged(bool);
+    void gridViewChanged( bool );
 
     void intfScaleFactorChanged();
 };

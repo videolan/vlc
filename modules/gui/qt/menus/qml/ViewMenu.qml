@@ -47,14 +47,12 @@ Widgets.MenuExt {
         onTriggered: mainInterface.interfaceFullScreen = !mainInterface.interfaceFullScreen
     }
 
-    Loader {
-        active: medialib !== null
-        sourceComponent:  Widgets.MenuItemExt {
-            text: i18n.qtr("&View Items as Grid")
-            checkable: true
-            checked: medialib.gridView
-            onTriggered: medialib.gridView = !medialib.gridView
-        }
+
+    Widgets.MenuItemExt {
+        text: i18n.qtr("&View Items as Grid")
+        checkable: true
+        checked: mainInterface.gridView
+        onTriggered: mainInterface.gridView = !mainInterface.gridView
     }
 
     Widgets.MenuExt {

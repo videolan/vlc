@@ -94,7 +94,7 @@ Widgets.NavigableFocusScope {
             onTriggered: medialib.addToPlaylist( contextMenu.model.id )
         }
         Widgets.MenuItemExt {
-            enabled: medialib.gridView
+            enabled: mainInterface.gridView
             text: "Information"
             onTriggered: {
                 view.currentItem.switchExpandItem(contextMenu.itemIndex)
@@ -236,11 +236,11 @@ Widgets.NavigableFocusScope {
         anchors.fill:parent
         clip: true
         focus: videoModel.count !== 0
-        initialItem: medialib.gridView ? gridComponent : listComponent
+        initialItem: mainInterface.gridView ? gridComponent : listComponent
         Connections {
-            target: medialib
+            target: mainInterface
             onGridViewChanged: {
-                if (medialib.gridView)
+                if (mainInterface.gridView)
                     view.replace(gridComponent)
                 else
                     view.replace(listComponent)

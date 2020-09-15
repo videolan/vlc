@@ -147,6 +147,7 @@ MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::Windo
     b_playlistDocked = getSettings()->value( "MainWindow/pl-dock-status", true ).toBool();
     playlistVisible  = getSettings()->value( "MainWindow/playlist-visible", false ).toBool();
     playlistWidthFactor = getSettings()->value( "MainWindow/playlist-width-factor", 4.0 ).toDouble();
+    m_gridView = getSettings()->value( "MainWindow/grid-view", true).toBool();
 
     m_showRemainingTime = getSettings()->value( "MainWindow/ShowRemainingTime", false ).toBool();
 
@@ -234,6 +235,7 @@ MainInterface::~MainInterface()
     settings->setValue( "playlist-visible", playlistVisible );
     settings->setValue( "playlist-width-factor", playlistWidthFactor);
 
+    settings->setValue( "grid-view", m_gridView );
     /* Save the stackCentralW sizes */
     settings->endGroup();
 
@@ -369,6 +371,12 @@ void MainInterface::setShowRemainingTime( bool show )
 {
     m_showRemainingTime = show;
     emit showRemainingTimeChanged(show);
+}
+
+void MainInterface::setGridView(bool asGrid)
+{
+    m_gridView = asGrid;
+    emit gridViewChanged( asGrid );
 }
 
 void MainInterface::setInterfaceAlwaysOnTop( bool on_top )

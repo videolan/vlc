@@ -42,7 +42,7 @@ Widgets.NavigableFocusScope {
     //the index to "go to" when the view is loaded
     property var initialIndex: 0
     property int gridViewMarginTop: VLCStyle.margin_large
-    property var gridViewRowX: medialib.gridView ? view.currentItem.rowX : undefined
+    property var gridViewRowX: mainInterface.gridView ? view.currentItem.rowX : undefined
 
     navigationCancel: function() {
         if (view.currentItem.currentIndex <= 0) {
@@ -241,12 +241,12 @@ Widgets.NavigableFocusScope {
         anchors.fill: parent
         focus: albumModelId.count !== 0
 
-        initialItem: medialib.gridView ? gridComponent : tableComponent
+        initialItem: mainInterface.gridView ? gridComponent : tableComponent
 
         Connections {
-            target: medialib
+            target: mainInterface
             onGridViewChanged: {
-                if (medialib.gridView)
+                if (mainInterface.gridView)
                     view.replace(gridComponent)
                 else
                     view.replace(tableComponent)

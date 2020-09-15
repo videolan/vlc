@@ -48,7 +48,7 @@ Widgets.NavigableFocusScope {
     Component.onCompleted: loadView()
 
     function loadView() {
-        if (medialib.gridView) {
+        if (mainInterface.gridView) {
             view.replace(gridComponent)
         } else {
             view.replace(tableComponent)
@@ -272,7 +272,7 @@ Widgets.NavigableFocusScope {
     Widgets.StackViewExt {
         id: view
 
-        initialItem: medialib.gridView ? gridComponent : tableComponent
+        initialItem: mainInterface.gridView ? gridComponent : tableComponent
 
         anchors.fill: parent
         focus: genreModel.count !== 0

@@ -250,13 +250,13 @@ Widgets.NavigableFocusScope {
 
                 anchors.fill: parent
                 focus: true
-                initialItem: medialib.gridView ? gridComponent : tableComponent
+                initialItem: mainInterface.gridView ? gridComponent : tableComponent
             }
 
             Connections {
-                target: medialib
+                target: mainInterface
                 onGridViewChanged: {
-                    if (medialib.gridView) {
+                    if (mainInterface.gridView) {
                         view.replace(gridComponent)
                     } else {
                         view.replace(tableComponent)

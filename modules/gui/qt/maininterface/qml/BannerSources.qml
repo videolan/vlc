@@ -50,7 +50,7 @@ Widgets.NavigableFocusScope {
 
     // Triggered when the toogleView button is selected
     function toggleView () {
-        medialib.gridView = !medialib.gridView
+        mainInterface.gridView = !mainInterface.gridView
     }
 
     function search() {
@@ -185,10 +185,10 @@ Widgets.NavigableFocusScope {
                         Widgets.IconToolButton {
                             id: list_grid_btn
                             size: VLCStyle.banner_icon_size
-                            iconText: medialib.gridView ? VLCIcons.list : VLCIcons.grid
+                            iconText: mainInterface.gridView ? VLCIcons.list : VLCIcons.grid
                             text: i18n.qtr("List/Grid")
                             height: localToolbar.height
-                            onClicked: medialib.gridView = !medialib.gridView
+                            onClicked: mainInterface.gridView = !mainInterface.gridView
                             enabled: true
                         }
 
