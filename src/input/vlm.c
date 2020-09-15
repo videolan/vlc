@@ -72,7 +72,6 @@ static void player_on_state_changed(vlc_player_t *player,
             break;
         }
     }
-    assert(psz_instance_name);
     enum vlm_state_e vlm_state;
     switch (new_state)
     {
