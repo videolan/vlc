@@ -31,6 +31,7 @@
 #include <vector>
 #include <string>
 #include <stdint.h>
+#include <vlc_cxx_helpers.hpp>
 
 typedef struct block_t block_t;
 
@@ -104,7 +105,7 @@ namespace adaptive
                 virtual bool        prepare();
                 AbstractConnection    *connection;
                 AbstractConnectionManager *connManager;
-                mutable vlc_mutex_t lock;
+                mutable vlc::threads::mutex lock;
                 size_t              consumed; /* read pointer */
                 bool                prepared;
                 bool                eof;
@@ -141,7 +142,7 @@ namespace adaptive
                 bool                done;
                 bool                eof;
                 vlc_tick_t          downloadstart;
-                vlc_cond_t          avail;
+                vlc::threads::condition_variable avail;
                 bool                held;
         };
 
