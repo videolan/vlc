@@ -36,17 +36,6 @@ void vout_control_cmd_Init(vout_control_cmd_t *cmd, int type)
     cmd->type = type;
 }
 
-void vout_control_cmd_Clean(vout_control_cmd_t *cmd)
-{
-    switch (cmd->type) {
-    case VOUT_CONTROL_CHANGE_FILTERS:
-        free(cmd->string);
-        break;
-    default:
-        break;
-    }
-}
-
 /* */
 void vout_control_Init(vout_control_t *ctrl)
 {
@@ -64,10 +53,6 @@ void vout_control_Init(vout_control_t *ctrl)
 void vout_control_Clean(vout_control_t *ctrl)
 {
     /* */
-    for (int i = 0; i < ctrl->cmd.i_size; i++) {
-        vout_control_cmd_t cmd = ARRAY_VAL(ctrl->cmd, i);
-        vout_control_cmd_Clean(&cmd);
-    }
     ARRAY_RESET(ctrl->cmd);
 }
 
@@ -84,8 +69,6 @@ void vout_control_Push(vout_control_t *ctrl, vout_control_cmd_t *cmd)
     if (!ctrl->is_dead) {
         ARRAY_APPEND(ctrl->cmd, *cmd);
         vlc_cond_signal(&ctrl->wait_request);
-    } else {
-        vout_control_cmd_Clean(cmd);
     }
     vlc_mutex_unlock(&ctrl->lock);
 }
@@ -111,15 +94,6 @@ void vout_control_PushBool(vout_control_t *ctrl, int type, bool boolean)
 
     vout_control_cmd_Init(&cmd, type);
     cmd.boolean = boolean;
-    vout_control_Push(ctrl, &cmd);
-}
-
-void vout_control_PushString(vout_control_t *ctrl, int type, const char *string)
-{
-    vout_control_cmd_t cmd;
-
-    vout_control_cmd_Init(&cmd, type);
-    cmd.string = string ? strdup(string) : NULL;
     vout_control_Push(ctrl, &cmd);
 }
 

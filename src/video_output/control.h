@@ -28,7 +28,6 @@
 /* */
 enum {
     VOUT_CONTROL_TERMINATE,
-    VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
 
     VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
@@ -39,13 +38,11 @@ typedef struct {
 
     union {
         bool    boolean;
-        char    *string;
         vlc_mouse_t mouse;
     };
 } vout_control_cmd_t;
 
 void vout_control_cmd_Init(vout_control_cmd_t *, int type);
-void vout_control_cmd_Clean(vout_control_cmd_t *);
 
 typedef struct {
     vlc_mutex_t lock;
@@ -70,7 +67,6 @@ void vout_control_WaitEmpty(vout_control_t *);
 void vout_control_Push(vout_control_t *, vout_control_cmd_t *);
 void vout_control_PushVoid(vout_control_t *, int type);
 void vout_control_PushBool(vout_control_t *, int type, bool boolean);
-void vout_control_PushString(vout_control_t *, int type, const char *string);
 void vout_control_Wake(vout_control_t *);
 void vout_control_Hold(vout_control_t *);
 void vout_control_Release(vout_control_t *);

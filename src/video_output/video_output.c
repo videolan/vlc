@@ -1907,9 +1907,6 @@ static void *Thread(void *object)
             switch(cmd.type) {
                 case VOUT_CONTROL_TERMINATE:
                     return NULL; /* no need to clean &cmd */
-                case VOUT_CONTROL_CHANGE_FILTERS:
-                    ThreadChangeFilters(vout, cmd.string, NULL, false);
-                    break;
                 case VOUT_CONTROL_CHANGE_INTERLACE:
                     ThreadChangeFilters(vout, NULL, &cmd.boolean, false);
                     break;
@@ -1917,7 +1914,6 @@ static void *Thread(void *object)
                     ThreadProcessMouseState(vout, &cmd.mouse);
                     break;
             }
-            vout_control_cmd_Clean(&cmd);
         }
 
         deadline = VLC_TICK_INVALID;
