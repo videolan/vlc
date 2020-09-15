@@ -605,7 +605,7 @@ int aout_OutputNew (audio_output_t *aout)
     vlc_mutex_unlock(&owner->lock);
     if (ret)
     {
-        msg_Err (aout, "module not functional");
+        msg_Err (aout, "failed to start audio output");
         return -1;
     }
     assert(aout->flush && aout->play && aout->time_get && aout->pause);
