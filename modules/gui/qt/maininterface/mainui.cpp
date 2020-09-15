@@ -23,7 +23,6 @@
 #include "util/i18n.hpp"
 #include "util/systempalette.hpp"
 #include "util/recent_media_model.hpp"
-#include "util/settings.hpp"
 #include "util/navigation_history.hpp"
 
 #include "dialogs/help/aboutmodel.hpp"
@@ -91,7 +90,6 @@ bool MainUI::setup(QQmlEngine* engine)
     rootCtx->setContextProperty( "topWindow", m_mainInterface->windowHandle());
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
     rootCtx->setContextProperty( "recentsMedias",  new VLCRecentMediaModel( m_intf, this ));
-    rootCtx->setContextProperty( "settings",  new Settings( m_intf, this ));
     rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));
 
     if (m_mainInterface->hasMediaLibrary())

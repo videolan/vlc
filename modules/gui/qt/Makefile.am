@@ -203,8 +203,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/renderer_manager.cpp gui/qt/util/renderer_manager.hpp \
 	gui/qt/util/selectable_list_model.cpp \
 	gui/qt/util/selectable_list_model.hpp \
-	gui/qt/util/settings.cpp \
-	gui/qt/util/settings.hpp \
 	gui/qt/util/singleton.hpp \
 	gui/qt/util/soutchain.cpp gui/qt/util/soutchain.hpp \
 	gui/qt/util/systempalette.cpp gui/qt/util/systempalette.hpp \
@@ -335,7 +333,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/recents.moc.cpp \
 	gui/qt/util/renderer_manager.moc.cpp \
 	gui/qt/util/selectable_list_model.moc.cpp \
-	gui/qt/util/settings.moc.cpp \
 	gui/qt/util/systempalette.moc.cpp \
 	gui/qt/util/validators.moc.cpp \
 	gui/qt/util/varchoicemodel.moc.cpp \
