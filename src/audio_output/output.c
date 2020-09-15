@@ -605,7 +605,11 @@ int aout_OutputNew (audio_output_t *aout)
     vlc_mutex_unlock(&owner->lock);
     if (ret)
     {
-        msg_Err (aout, "failed to start audio output");
+        if (AOUT_FMT_LINEAR(fmt))
+            msg_Err (aout, "failed to start audio output");
+        else
+            msg_Warn (aout, "failed to start passthrough audio output, "
+                      "failing back to linear format");
         return -1;
     }
     assert(aout->flush && aout->play && aout->time_get && aout->pause);
