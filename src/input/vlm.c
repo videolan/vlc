@@ -47,9 +47,7 @@
 #include "vlm_event.h"
 #include <vlc_sout.h>
 #include <vlc_url.h>
-#include "../stream_output/stream_output.h"
 #include "../libvlc.h"
-#include "input_internal.h"
 
 /*****************************************************************************
  * Local prototypes.

@@ -25,7 +25,6 @@
 
 #include <vlc_vlm.h>
 #include <vlc_player.h>
-#include "input_interface.h"
 
 /* Private */
 typedef struct
