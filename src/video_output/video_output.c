@@ -1060,7 +1060,8 @@ static void ThreadChangeFilters(vout_thread_sys_t *vout)
 
 
 /* */
-static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
+VLC_USED
+static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                                        bool frame_by_frame, bool *paused)
 {
     vout_thread_sys_t *sys = vout;
@@ -1146,15 +1147,7 @@ static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse_decod
 
     vlc_mutex_unlock(&sys->filter.lock);
 
-    if (!picture)
-        return VLC_EGENERIC;
-
-    assert(!sys->displayed.next);
-    if (!sys->displayed.current)
-        sys->displayed.current = picture;
-    else
-        sys->displayed.next    = picture;
-    return VLC_SUCCESS;
+    return picture;
 }
 
 static vlc_decoder_device * VoutHoldDecoderDevice(vlc_object_t *o, void *opaque)
@@ -1483,15 +1476,22 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
     if (deadline)
         *deadline = VLC_TICK_INVALID;
 
-    if (first)
-        if (ThreadDisplayPreparePicture(vout, true, frame_by_frame, &paused) != VLC_SUCCESS) /* FIXME not sure it is ok */
-            return VLC_EGENERIC;
+    if (!sys->displayed.current)
+    {
+        assert(!sys->displayed.next);
+        sys->displayed.current =
+            ThreadDisplayPreparePicture(vout, true, frame_by_frame, &paused);
+        if (!sys->displayed.current)
+            return VLC_EGENERIC; // wait with no known deadline
+    }
 
     if (!paused || frame_by_frame)
     {
         while (!sys->displayed.next)
         {
-            if (ThreadDisplayPreparePicture(vout, false, frame_by_frame, &paused) != VLC_SUCCESS)
+            sys->displayed.next =
+                ThreadDisplayPreparePicture(vout, false, frame_by_frame, &paused);
+            if (!sys->displayed.next)
                 break;
         }
     }
