@@ -572,7 +572,7 @@ codec_LTLIBRARIES += $(LTLIBdav1d)
 
 ### Hardware encoders ###
 
-libqsv_plugin_la_SOURCES = codec/qsv.c codec/vlc_fifo_helper.h demux/mpeg/timestamps.h
+libqsv_plugin_la_SOURCES = codec/qsv.c demux/mpeg/timestamps.h
 libqsv_plugin_la_CFLAGS = $(AM_CFLAGS) $(MFX_CFLAGS)
 libqsv_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libqsv_plugin_la_LIBADD = $(MFX_LIBS)

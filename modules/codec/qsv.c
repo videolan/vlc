@@ -32,8 +32,8 @@
 #include <vlc_picture.h>
 #include <vlc_codec.h>
 #include <vlc_picture_pool.h>
+#include <vlc_list.h>
 
-#include "vlc_fifo_helper.h"
 
 #include <mfx/mfxvideo.h>
 #include "../demux/mpeg/timestamps.h"
@@ -272,13 +272,11 @@ typedef struct _QSVFrame
 
 typedef struct async_task_t
 {
-    fifo_item_t      fifo;
+    struct vlc_list  fifo;
     mfxBitstream     bs;                  // Intel's bitstream structure.
     mfxSyncPoint     *syncp;              // Async Task Sync Point.
     block_t          *block;              // VLC's block structure to be returned by Encode.
 } async_task_t;
-
-TYPED_FIFO(async_task_t, async_task_t)
 
 typedef struct
 {
@@ -288,7 +286,7 @@ typedef struct
     uint64_t         dts_warn_counter;    // DTS warning counter for rate-limiting of msg;
     uint64_t         busy_warn_counter;   // Device Busy warning counter for rate-limiting of msg;
     uint64_t         async_depth;         // Number of parallel encoding operations.
-    fifo_t           packets;             // FIFO of queued packets
+    struct vlc_list  packets;             // FIFO of queued packets
     vlc_tick_t       offset_pts;          // The pts of the first frame, to avoid conversion overflow.
     vlc_tick_t       last_dts;            // The dts of the last frame, to interpolate over buggy dts
 
@@ -605,7 +603,7 @@ static int Open(vlc_object_t *this)
     enc->fmt_out.i_extra = i_extra;
 
     sys->async_depth = sys->params.AsyncDepth;
-    async_task_t_fifo_Init(&sys->packets);
+    vlc_list_init(&sys->packets);
 
     /* Vlc module configuration */
     enc->fmt_in.i_codec                = VLC_CODEC_NV12; // Intel Media SDK requirement
@@ -645,7 +643,7 @@ static void Close(vlc_object_t *this)
     MFXClose(sys->session);
     /* if (enc->fmt_out.p_extra) */
     /*     free(enc->fmt_out.p_extra); */
-    async_task_t_fifo_Release(&sys->packets);
+    assert(vlc_list_is_empty(&sys->packets));
     if (sys->input_pool)
         picture_pool_Release(sys->input_pool);
     free(sys);
@@ -863,14 +861,19 @@ static block_t *Encode(encoder_t *this, picture_t *pic)
     {
         task = encode_frame( enc, pic );
         if (likely(task != NULL))
-            async_task_t_fifo_Put(&sys->packets, task);
+            vlc_list_append(&sys->packets, &task->fifo);
     }
 
-    if ( async_task_t_fifo_GetCount(&sys->packets) == (sys->async_depth + 1) ||
-         (!pic && async_task_t_fifo_GetCount(&sys->packets)))
+    size_t fifo_count = 0;
+    vlc_list_foreach( task, &sys->packets, fifo )
+        fifo_count++;
+
+    if ( fifo_count == (sys->async_depth + 1) ||
+         (!pic && fifo_count))
     {
-        assert(async_task_t_fifo_Show(&sys->packets)->syncp != 0);
-        task = async_task_t_fifo_Get(&sys->packets);
+        task = vlc_list_first_entry_or_null(&sys->packets, async_task_t, fifo);
+        assert(task->syncp != 0);
+        vlc_list_remove(&task->fifo);
         block = qsv_synchronize_block( enc, task );
         free(task->syncp);
         free(task);
