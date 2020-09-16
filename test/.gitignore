@@ -1,11 +1,1 @@
-test_libvlc_core
-test_libvlc_equalizer
-test_libvlc_events
-test_libvlc_media
-test_libvlc_media_list
-test_libvlc_media_list_player
-test_libvlc_media_player
-test_libvlc_meta
-test_src_crypto_update
-test_src_config_chain
-test_src_misc_variables
+test_*
