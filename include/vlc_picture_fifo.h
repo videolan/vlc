@@ -79,11 +79,5 @@ VLC_API void picture_fifo_Push( picture_fifo_t *, picture_t * );
  */
 VLC_API void picture_fifo_Flush( picture_fifo_t *, vlc_tick_t date, bool flush_before );
 
-/**
- * It applies a delta on all the picture timestamp.
- */
-VLC_API void picture_fifo_OffsetDate( picture_fifo_t *, vlc_tick_t delta );
-
-
 #endif /* VLC_PICTURE_FIFO_H */
 
