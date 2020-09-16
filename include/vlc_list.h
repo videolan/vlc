@@ -257,11 +257,11 @@ static inline void vlc_list_it_next(struct vlc_list_it *restrict it)
  * It is however <b>not</b> safe to delete another item.
  */
 #define vlc_list_foreach(pos, head, member) \
-    for (struct vlc_list_it vlc_list_it_##pos = vlc_list_it_start(head); \
-         vlc_list_it_continue(&(vlc_list_it_##pos)) \
-          && ((pos) = vlc_list_entry_p((vlc_list_it_##pos).current, \
+    for (struct vlc_list_it vlc_list_it__##pos = vlc_list_it_start(head); \
+         vlc_list_it_continue(&(vlc_list_it__##pos)) \
+          && ((pos) = vlc_list_entry_p((vlc_list_it__##pos).current, \
                                        pos, member), true); \
-         vlc_list_it_next(&(vlc_list_it_##pos)))
+         vlc_list_it_next(&(vlc_list_it__##pos)))
 
 /**
  * Converts a list node pointer to an element pointer.
