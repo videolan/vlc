@@ -380,7 +380,7 @@ QMenu *VLCMenuBar::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
 {
     assert(current);
     VLCVarChoiceModel* model = new VLCVarChoiceModel(VLC_OBJECT(p_intf), "intf-add", current);
-    CheckableListMenu* submenu = new CheckableListMenu(qtr("Interfaces"), model, current);
+    CheckableListMenu* submenu = new CheckableListMenu(qtr("Interfaces"), model, CheckableListMenu::UNGROUPED, current);
     current->addMenu(submenu);
     return current;
 }
@@ -425,7 +425,7 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 {
     if( current->isEmpty() )
     {
-        current->addMenu(new CheckableListMenu(qtr( "Audio &Track" ), THEMIM->getAudioTracks(), current));
+        current->addMenu(new CheckableListMenu(qtr( "Audio &Track" ), THEMIM->getAudioTracks(), CheckableListMenu::GROUPED, current));
 
         QAction *audioDeviceAction = new QAction( qtr( "Audio &Device" ), current );
         QMenu *audioDeviceSubmenu = new QMenu( current );
@@ -435,10 +435,10 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
             updateAudioDevice( p_intf, audioDeviceSubmenu );
         });
 
-        current->addMenu( new CheckableListMenu(qtr( "&Stereo Mode" ), THEMIM->getAudioStereoMode(), current) );
+        current->addMenu( new CheckableListMenu(qtr( "&Stereo Mode" ), THEMIM->getAudioStereoMode(), CheckableListMenu::GROUPED, current) );
         current->addSeparator();
 
-        current->addMenu( new CheckableListMenu(qtr( "&Visualizations" ), THEMIM->getAudioVisualizations(), current) );
+        current->addMenu( new CheckableListMenu(qtr( "&Visualizations" ), THEMIM->getAudioVisualizations(), CheckableListMenu::GROUPED, current) );
         VolumeEntries( p_intf, current );
     }
 
@@ -452,7 +452,7 @@ QMenu *VLCMenuBar::SubtitleMenu( intf_thread_t *p_intf, QMenu *current, bool b_p
     {
         addDPStaticEntry( current, qtr( "Add &Subtitle File..." ), "",
                 &DialogsProvider::loadSubtitlesFile);
-        current->addMenu(new CheckableListMenu(qtr( "Sub &Track" ), THEMIM->getSubtitleTracks(), current));
+        current->addMenu(new CheckableListMenu(qtr( "Sub &Track" ), THEMIM->getSubtitleTracks(), CheckableListMenu::GROUPED, current));
         current->addSeparator();
     }
     return current;
@@ -466,7 +466,7 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 {
     if( current->isEmpty() )
     {
-        current->addMenu(new CheckableListMenu(qtr( "Video &Track" ), THEMIM->getVideoTracks(), current));
+        current->addMenu(new CheckableListMenu(qtr( "Video &Track" ), THEMIM->getVideoTracks(), CheckableListMenu::GROUPED, current));
 
         current->addSeparator();
         /* Surface modifiers */
@@ -479,14 +479,14 @@ QMenu *VLCMenuBar::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 
         current->addSeparator();
         /* Size modifiers */
-        current->addMenu( new CheckableListMenu(qtr( "&Zoom" ), THEMIM->getZoom(), current) );
-        current->addMenu( new CheckableListMenu(qtr( "&Aspect Ratio" ), THEMIM->getAspectRatio(), current) );
-        current->addMenu( new CheckableListMenu(qtr( "&Crop" ), THEMIM->getCrop(), current) );
+        current->addMenu( new CheckableListMenu(qtr( "&Zoom" ), THEMIM->getZoom(), CheckableListMenu::GROUPED, current) );
+        current->addMenu( new CheckableListMenu(qtr( "&Aspect Ratio" ), THEMIM->getAspectRatio(), CheckableListMenu::GROUPED, current) );
+        current->addMenu( new CheckableListMenu(qtr( "&Crop" ), THEMIM->getCrop(), CheckableListMenu::GROUPED, current) );
 
         current->addSeparator();
         /* Rendering modifiers */
-        current->addMenu( new CheckableListMenu(qtr( "&Deinterlace" ), THEMIM->getDeinterlace(), current) );
-        current->addMenu( new CheckableListMenu(qtr( "&Deinterlace mode" ), THEMIM->getDeinterlaceMode(), current) );
+        current->addMenu( new CheckableListMenu(qtr( "&Deinterlace" ), THEMIM->getDeinterlace(), CheckableListMenu::GROUPED, current) );
+        current->addMenu( new CheckableListMenu(qtr( "&Deinterlace mode" ), THEMIM->getDeinterlaceMode(), CheckableListMenu::GROUPED, current) );
 
         current->addSeparator();
         /* Other actions */
@@ -507,11 +507,11 @@ QMenu *VLCMenuBar::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     QAction *action;
     QMenu *submenu;
 
-    menu->addMenu( new CheckableListMenu( qtr( "T&itle" ), THEMIM->getTitles(), menu) );
-    submenu = new CheckableListMenu( qtr( "&Chapter" ), THEMIM->getChapters(), menu );
+    menu->addMenu( new CheckableListMenu( qtr( "T&itle" ), THEMIM->getTitles(), CheckableListMenu::GROUPED, menu) );
+    submenu = new CheckableListMenu( qtr( "&Chapter" ), THEMIM->getChapters(), CheckableListMenu::GROUPED, menu );
     submenu->setTearOffEnabled( true );
     menu->addMenu( submenu );
-    menu->addMenu( new CheckableListMenu( qtr("&Program") , THEMIM->getPrograms(), menu) );
+    menu->addMenu( new CheckableListMenu( qtr("&Program") , THEMIM->getPrograms(), CheckableListMenu::GROUPED , menu) );
 
     submenu = new QMenu( qtr( I_MENU_BOOKMARK ), menu );
     submenu->setTearOffEnabled( true );
@@ -851,7 +851,7 @@ QMenu* VLCMenuBar::PopupMenu( intf_thread_t *p_intf, bool show )
             }
 
             VLCVarChoiceModel* skinmodel = new VLCVarChoiceModel(p_object, "intf-skins", submenu);
-            CheckableListMenu* skinsubmenu = new CheckableListMenu(qtr("Interface"), skinmodel, submenu);
+            CheckableListMenu* skinsubmenu = new CheckableListMenu(qtr("Interface"), skinmodel, CheckableListMenu::GROUPED, submenu);
             submenu->addMenu(skinsubmenu);
 
             submenu->addSeparator();

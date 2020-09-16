@@ -202,11 +202,16 @@ void RendererMenu::RendererSelected(QAction *action)
 
 /*   CheckableListMenu   */
 
-CheckableListMenu::CheckableListMenu(QString title, QAbstractListModel* model , QWidget *parent)
+CheckableListMenu::CheckableListMenu(QString title, QAbstractListModel* model , GroupingMode grouping,  QWidget *parent)
     : QMenu(parent)
     , m_model(model)
+    , m_grouping(grouping)
 {
     this->setTitle(title);
+    if (m_grouping == GROUPED)
+    {
+        m_actionGroup = new QActionGroup(this);
+    }
 
     connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this, &CheckableListMenu::onRowsAboutToBeRemoved);
     connect(m_model, &QAbstractListModel::rowsInserted, this, &CheckableListMenu::onRowInserted);
@@ -221,6 +226,8 @@ void CheckableListMenu::onRowsAboutToBeRemoved(const QModelIndex &, int first, i
     for (int i = last; i >= first; i--)
     {
         QAction* action = actions()[i];
+        if (m_actionGroup)
+            m_actionGroup->removeAction(action);
         delete action;
     }
     if (actions().count() == 0)
@@ -237,6 +244,8 @@ void CheckableListMenu::onRowInserted(const QModelIndex &, int first, int last)
 
         QAction *choiceAction = new QAction(title, this);
         addAction(choiceAction);
+        if (m_actionGroup)
+            m_actionGroup->addAction(choiceAction);
         connect(choiceAction, &QAction::triggered, [this, i](bool checked){
             QModelIndex dataIndex = m_model->index(i);
             m_model->setData(dataIndex, QVariant::fromValue<bool>(checked), Qt::CheckStateRole);
@@ -267,7 +276,11 @@ void CheckableListMenu::onDataChanged(const QModelIndex &topLeft, const QModelIn
 void CheckableListMenu::onModelAboutToBeReset()
 {
     for (QAction* action  :actions())
+    {
+        if (m_actionGroup)
+            m_actionGroup->addAction(action);
         delete action;
+    }
     setEnabled(false);
 }
 
