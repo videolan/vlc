@@ -1502,13 +1502,7 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         const vlc_tick_t next_system_pts =
             vlc_clock_ConvertToSystem(sys->clock, system_now,
                                       sys->displayed.next->date, sys->rate);
-        if (unlikely(next_system_pts == INT64_MAX))
-        {
-            /* The clock was just paused, don't display the next frame (keep
-             * the current one). */
-            paused = true;
-        }
-        else
+        if (likely(next_system_pts != INT64_MAX))
         {
             date_next = next_system_pts - render_delay;
             if (date_next <= system_now)
