@@ -883,7 +883,7 @@ DeinterlaceX2(filter_t * filter, picture_t * src)
         dest[i]->i_nb_fields = 1;
     }
 
-    dest[0]->p_next = dest[1];
+    vlc_picture_chain_AppendChain( dest[0], dest[1] );
     dest[0]->date = cur->date;
     if (dest[0]->date != VLC_TICK_INVALID)
         dest[1]->date = dest[0]->date + i_field_dur;
