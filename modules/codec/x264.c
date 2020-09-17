@@ -680,7 +680,7 @@ vlc_module_begin ()
         change_integer_range( 0, 1000 )
 
     add_integer( SOUT_CFG_PREFIX "deadzone-inter", 21, DEADZONE_INTER_TEXT,
-                 DEADZONE_INTRA_LONGTEXT, true )
+                 DEADZONE_INTER_LONGTEXT, true )
         change_integer_range( 0, 32 )
 
     add_integer( SOUT_CFG_PREFIX "deadzone-intra", 11, DEADZONE_INTRA_TEXT,
