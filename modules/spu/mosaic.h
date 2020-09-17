@@ -25,7 +25,7 @@ typedef struct bridged_es_t
 {
     es_format_t fmt;
     picture_t *p_picture;
-    picture_t **pp_last;
+    picture_t *tail;
     bool b_empty;
     char *psz_id;
 

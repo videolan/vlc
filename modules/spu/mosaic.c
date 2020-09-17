@@ -544,7 +544,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
                 /* Display blank */
                 picture_Release( p_es->p_picture );
                 p_es->p_picture = NULL;
-                p_es->pp_last = &p_es->p_picture;
+                p_es->tail = NULL;
                 break;
             }
             else
