@@ -453,9 +453,9 @@ picture_t *filter_chain_VideoFilter( filter_chain_t *p_chain, picture_t *p_pic )
     }
     for( chained_filter_t *b = p_chain->last; b != NULL; b = b->prev )
     {
-        p_pic = b->pending;
-        if( !p_pic )
+        if( !b->pending )
             continue;
+        p_pic = b->pending;
         b->pending = p_pic->p_next;
         p_pic->p_next = NULL;
 
