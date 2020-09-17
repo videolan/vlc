@@ -262,7 +262,7 @@ static picture_t *deinterlace(filter_t * p_filter, picture_t * p_pic)
     }
 
     // Return anything that is in the out Q
-    picture_t ** pp_pic = &ret_pics;
+    picture_t * chain_tail = ret_pics;
 
     // Advanced di has a 3 frame latency, so if the seq delta is greater
     // than that then we are expecting at least two frames of output. Wait
@@ -284,8 +284,13 @@ static picture_t *deinterlace(filter_t * p_filter, picture_t * p_pic)
         }
         out_buf = NULL;  // Now attached to pic or recycled
 
-        *pp_pic = out_pic;
-        pp_pic = &out_pic->p_next;
+        if (ret_pics == NULL)
+        {
+            ret_pics = out_pic;
+            chain_tail = out_pic;
+        }
+        else
+            chain_tail = vlc_picture_chain_Append( chain_tail, out_pic );
 
         // Ignore 0 seqs
         // Don't think these should actually happen
