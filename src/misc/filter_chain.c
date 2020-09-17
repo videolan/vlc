@@ -437,8 +437,7 @@ static picture_t *FilterChainVideoFilter( chained_filter_t *f, picture_t *p_pic 
             msg_Warn( p_filter, "dropping pictures" );
             FilterDeletePictures( f->pending );
         }
-        f->pending = p_pic->p_next;
-        p_pic->p_next = NULL;
+        f->pending = picture_GetAndResetChain( p_pic );
     }
     return p_pic;
 }
@@ -456,8 +455,7 @@ picture_t *filter_chain_VideoFilter( filter_chain_t *p_chain, picture_t *p_pic )
         if( !b->pending )
             continue;
         p_pic = b->pending;
-        b->pending = p_pic->p_next;
-        p_pic->p_next = NULL;
+        b->pending = picture_GetAndResetChain( p_pic );
 
         p_pic = FilterChainVideoFilter( b->next, p_pic );
         if( p_pic )
@@ -535,8 +533,7 @@ static void FilterDeletePictures( picture_t *picture )
 {
     while( picture )
     {
-        picture_t *next = picture->p_next;
-        picture_Release( picture );
-        picture = next;
+        picture_t *next = vlc_picture_chain_PopFront( &picture );
+        picture_Release( next );
     }
 }
