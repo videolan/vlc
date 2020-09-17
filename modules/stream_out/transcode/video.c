@@ -150,8 +150,12 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     sout_stream_id_sys_t *id = p_owner->id;
 
     vlc_mutex_lock(&id->fifo.lock);
-    *id->fifo.pic.last = p_pic;
-    id->fifo.pic.last = &p_pic->p_next;
+    if (id->fifo.pic.first == NULL)
+        id->fifo.pic.first = p_pic;
+    else
+        id->fifo.pic.tail->p_next = p_pic;
+    id->fifo.pic.tail = p_pic;
+    assert(p_pic->p_next == NULL);
     vlc_mutex_unlock(&id->fifo.lock);
 }
 
@@ -160,7 +164,7 @@ static picture_t *transcode_dequeue_all_pics( sout_stream_id_sys_t *id )
     vlc_mutex_lock(&id->fifo.lock);
     picture_t *p_pics = id->fifo.pic.first;
     id->fifo.pic.first = NULL;
-    id->fifo.pic.last = &id->fifo.pic.first;
+    id->fifo.pic.tail  = NULL;
     vlc_mutex_unlock(&id->fifo.lock);
 
     return p_pics;
@@ -174,7 +178,7 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
              (char*)&p_fmt->i_codec, (char*)&id->p_enccfg->i_codec );
 
     id->fifo.pic.first = NULL;
-    id->fifo.pic.last = &id->fifo.pic.first;
+    id->fifo.pic.tail  = NULL;
     id->b_transcode = true;
     es_format_Init( &id->decoder_out, VIDEO_ES, 0 );
 

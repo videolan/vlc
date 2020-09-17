@@ -89,7 +89,7 @@ struct sout_stream_id_sys_t
         {
             struct {
                 picture_t *first;
-                picture_t **last;
+                picture_t *tail;
             } pic;
             struct {
                 subpicture_t *first;
