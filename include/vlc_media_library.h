@@ -400,6 +400,7 @@ enum vlc_ml_list_queries
     VLC_ML_COUNT_PLAYLISTS,       /**< arg1 (out): size_t*                                          */
     VLC_ML_LIST_HISTORY,          /**< arg1 (out): vlc_ml_media_list_t**                            */
     VLC_ML_LIST_STREAM_HISTORY,   /**< arg1 (out): vlc_ml_media_list_t**                            */
+    VLC_ML_COUNT_STREAM_HISTORY,  /**< arg1 (out): size_t*                                          */
 
     /* Album specific listings */
     VLC_ML_LIST_ALBUM_TRACKS,     /**< arg1: The album id. arg2 (out): vlc_ml_media_list_t**  */
@@ -1434,6 +1435,15 @@ static inline vlc_ml_media_list_t* vlc_ml_list_stream_history( vlc_medialibrary_
     if ( vlc_ml_list( p_ml, VLC_ML_LIST_STREAM_HISTORY, params, &res ) != VLC_SUCCESS )
         return NULL;
     return res;
+}
+
+static inline size_t vlc_ml_count_stream_history( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_STREAM_HISTORY, params, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
 }
 
 static inline vlc_ml_playlist_list_t* vlc_ml_list_playlists( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params )
