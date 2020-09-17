@@ -149,13 +149,15 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     sout_stream_id_sys_t *id = p_owner->id;
 
+    assert(!picture_HasChainedPics(p_pic));
     vlc_mutex_lock(&id->fifo.lock);
     if (id->fifo.pic.first == NULL)
+    {
         id->fifo.pic.first = p_pic;
+        id->fifo.pic.tail = p_pic;
+    }
     else
-        id->fifo.pic.tail->p_next = p_pic;
-    id->fifo.pic.tail = p_pic;
-    assert(p_pic->p_next == NULL);
+        id->fifo.pic.tail = vlc_picture_chain_Append( id->fifo.pic.tail, p_pic );
     vlc_mutex_unlock(&id->fifo.lock);
 }
 
@@ -525,12 +527,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
     do
     {
-        picture_t *p_pic = p_pics;
-        if( p_pic )
-        {
-            p_pics = p_pic->p_next;
-            p_pic->p_next = NULL;
-        }
+        picture_t *p_pic = vlc_picture_chain_PopFront( &p_pics );
 
         if( id->b_error && p_pic )
         {
