@@ -123,12 +123,7 @@ typedef struct pic_fifo_s {
 
 static picture_t * pic_fifo_get(pic_fifo_t * const pf)
 {
-    picture_t * const pic = pf->head;;
-    if (pic != NULL) {
-        pf->head = pic->p_next;
-        pic->p_next = NULL;
-    }
-    return pic;
+    return vlc_picture_chain_PopFront( &pf->head );
 }
 
 static void pic_fifo_release_all(pic_fifo_t * const pf)
@@ -147,12 +142,16 @@ static void pic_fifo_init(pic_fifo_t * const pf)
 
 static void pic_fifo_put(pic_fifo_t * const pf, picture_t * pic)
 {
-    pic->p_next = NULL;
     if (pf->head == NULL)
+    {
+        pic->p_next = NULL;
         pf->head = pic;
+        pf->tail = pic;
+    }
     else
-        pf->tail->p_next = pic;
-    pf->tail = pic;
+    {
+        pf->tail = vlc_picture_chain_Append( pf->tail, pic  );
+    }
 }
 
 #define SUBS_MAX 3
@@ -289,8 +288,6 @@ static void conv_input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf)
 
 static void conv_out_q_pic(converter_sys_t * const sys, picture_t * const pic)
 {
-    pic->p_next = NULL;
-
     vlc_mutex_lock(&sys->lock);
     pic_fifo_put(&sys->ret_pics, pic);
     vlc_mutex_unlock(&sys->lock);
