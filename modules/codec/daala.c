@@ -170,7 +170,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
         return VLC_ENOMEM;
 
     p_dec->p_sys = p_sys;
-    p_dec->p_sys->b_packetizer = b_packetizer;
+    p_sys->b_packetizer = b_packetizer;
     p_sys->b_has_headers = false;
     p_sys->i_pts = VLC_TICK_INVALID;
     p_sys->b_decoded_first_keyframe = false;
@@ -510,14 +510,15 @@ static void ParseDaalaComments( decoder_t *p_dec )
        the bitstream format itself treats them as 8-bit clean vectors,
        possibly containing null characters, and so the length array
        should be treated as their authoritative length. */
-    for ( int i = 0; i < p_dec->p_sys->dc.comments; i++ )
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    for ( int i = 0; i < p_sys->dc.comments; i++ )
     {
-        int clen = p_dec->p_sys->dc.comment_lengths[i];
+        int clen = p_sys->dc.comment_lengths[i];
         if ( clen <= 0 || clen >= INT_MAX ) { continue; }
         psz_comment = malloc( clen + 1 );
         if( !psz_comment )
             break;
-        memcpy( (void*)psz_comment, (void*)p_dec->p_sys->dc.user_comments[i], clen + 1 );
+        memcpy( (void*)psz_comment, (void*)p_sys->dc.user_comments[i], clen + 1 );
         psz_comment[clen] = '\0';
 
         psz_name = psz_comment;
