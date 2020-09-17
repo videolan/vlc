@@ -105,14 +105,15 @@ void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before
 
     vlc_mutex_lock(&fifo->lock);
 
-    picture = fifo->first;
+    picture_t *old_fifo = fifo->first;
     PictureFifoReset(fifo);
 
     picture_fifo_t tmp;
     PictureFifoReset(&tmp);
 
-    while (picture) {
-        picture_t *next = picture->p_next;
+    while (old_fifo) {
+        picture = old_fifo;
+        old_fifo = old_fifo->p_next;
 
         picture->p_next = NULL;
         if ((date == VLC_TICK_INVALID) ||
@@ -121,7 +122,6 @@ void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before
             PictureFifoPush(&tmp, picture);
         else
             PictureFifoPush(fifo, picture);
-        picture = next;
     }
     vlc_mutex_unlock(&fifo->lock);
 
