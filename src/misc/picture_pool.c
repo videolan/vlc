@@ -93,7 +93,7 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
     picture_t *clone = picture_InternalClone(picture, picture_pool_ReleaseClone,
                                  (void*)sys);
     if (clone != NULL) {
-        assert(clone->p_next == NULL);
+        assert(!picture_HasChainedPics(clone));
         atomic_fetch_add_explicit(&pool->refs, 1, memory_order_relaxed);
     }
     return clone;
