@@ -47,6 +47,7 @@ struct vout_snapshot {
     bool        is_available;
     int         request_count;
     picture_t   *picture;
+    picture_t   *tail;
 
 };
 
@@ -62,6 +63,7 @@ vout_snapshot_t *vout_snapshot_New(void)
     snap->is_available = true;
     snap->request_count = 0;
     snap->picture = NULL;
+    snap->tail = NULL;
     return snap;
 }
 
@@ -70,11 +72,10 @@ void vout_snapshot_Destroy(vout_snapshot_t *snap)
     if (snap == NULL)
         return;
 
-    picture_t *picture = snap->picture;
-    while (picture) {
-        picture_t *next = picture->p_next;
+    while (snap->picture) {
+        picture_t *picture = snap->picture;
+        snap->picture = picture->p_next;
         picture_Release(picture);
-        picture = next;
     }
 
     free(snap);
@@ -153,8 +154,16 @@ void vout_snapshot_Set(vout_snapshot_t *snap,
 
         video_format_CopyCrop( &dup->format, fmt );
 
-        dup->p_next = snap->picture;
-        snap->picture = dup;
+        if (snap->picture == NULL)
+        {
+            snap->picture = dup;
+            snap->tail = dup;
+        }
+        else
+        {
+            snap->tail->p_next = dup;
+            snap->tail =  dup;
+        }
         snap->request_count--;
     }
     vlc_cond_broadcast(&snap->wait);
