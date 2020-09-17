@@ -49,7 +49,7 @@ static void PictureFifoReset(picture_fifo_t *fifo)
 }
 static void PictureFifoPush(picture_fifo_t *fifo, picture_t *picture)
 {
-    assert(!picture->p_next);
+    assert(!picture_HasChainedPics(picture));
     if (fifo->first == NULL)
     {
         fifo->first = picture;
@@ -57,20 +57,12 @@ static void PictureFifoPush(picture_fifo_t *fifo, picture_t *picture)
     }
     else
     {
-        fifo->tail->p_next = picture;
-        fifo->tail =  picture;
-        picture->p_next = NULL; // we're appending a picture, not a chain
+        fifo->tail = vlc_picture_chain_Append( fifo->tail, picture );
     }
 }
 static picture_t *PictureFifoPop(picture_fifo_t *fifo)
 {
-    if (fifo->first == NULL)
-        return NULL;
-
-    picture_t *picture = fifo->first;
-    fifo->first = picture->p_next;
-    picture->p_next = NULL;
-    return picture;
+    return vlc_picture_chain_PopFront( &fifo->first );
 }
 
 picture_fifo_t *picture_fifo_New(void)
@@ -112,17 +104,15 @@ void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before
 
     vlc_mutex_lock(&fifo->lock);
 
-    picture_t *old_fifo = fifo->first;
+    picture_t *old_chain = fifo->first;
     PictureFifoReset(fifo);
 
     picture_fifo_t tmp;
     PictureFifoReset(&tmp);
 
-    while (old_fifo) {
-        picture = old_fifo;
-        old_fifo = old_fifo->p_next;
+    while (old_chain) {
+        picture_t *picture = vlc_picture_chain_PopFront( &old_chain );
 
-        picture->p_next = NULL;
         if ((date == VLC_TICK_INVALID) ||
             ( flush_before && picture->date <= date) ||
             (!flush_before && picture->date >= date))
