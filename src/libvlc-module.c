@@ -169,10 +169,6 @@ static const char *ppsz_roles_text[] = {
 #define AUDIO_RESAMPLER_LONGTEXT N_( \
     "This selects which plugin to use for audio resampling." )
 
-#define MULTICHA_LONGTEXT N_( \
-    "Sets the audio output channels mode that will be used by default " \
-    "if your hardware and the audio stream are compatible.")
-
 #if defined(__ANDROID__) || defined(__APPLE__) || defined(_WIN32)
 #define SPDIF_TEXT N_("Force S/PDIF support")
 #define SPDIF_LONGTEXT N_( \
@@ -451,11 +447,6 @@ static const char *const screensaver_texts[] = {
 #define AUTOSCALE_TEXT N_("Video Auto Scaling")
 #define AUTOSCALE_LONGTEXT N_( \
     "Let the video scale to fit a given window or fullscreen.")
-
-#define SCALEFACTOR_TEXT N_("Video scaling factor")
-#define SCALEFACTOR_LONGTEXT N_( \
-    "Scaling factor used when Auto Scaling is disabled.\n" \
-    "Default value is 1.0 (original video size).")
 
 #define CUSTOM_CROP_RATIOS_TEXT N_("Custom crop ratios list")
 #define CUSTOM_CROP_RATIOS_LONGTEXT N_( \
@@ -832,9 +823,6 @@ static const char *const ppsz_prefres[] = {
 # define VCD_DEV_LONGTEXT N_( \
     "This is the default VCD drive (or file) to use. Don't forget the colon " \
     "after the drive letter (e.g. D:)")
-# define CDAUDIO_DEV_LONGTEXT N_( \
-    "This is the default Audio CD drive (or file) to use. Don't forget the " \
-    "colon after the drive letter (e.g. D:)")
 # define DVD_DEVICE     NULL
 # define VCD_DEVICE     "D:"
 
@@ -843,8 +831,6 @@ static const char *const ppsz_prefres[] = {
     "This is the default DVD device to use.")
 # define VCD_DEV_LONGTEXT N_( \
     "This is the default VCD device to use." )
-# define CDAUDIO_DEV_LONGTEXT N_( \
-    "This is the default Audio CD device to use." )
 
 # if defined(__OpenBSD__)
 #  define DVD_DEVICE     "/dev/cd0c"
@@ -1049,11 +1035,6 @@ static const char *const ppsz_prefres[] = {
 #define ACCESS_OUTPUT_LONGTEXT N_( \
     "This is a legacy entry to let you configure access output modules")
 
-#define ANN_SAPCTRL_LONGTEXT N_( \
-    "If this option is enabled, the flow on " \
-    "the SAP multicast address will be controlled. This is needed if you " \
-    "want to make announcements on the MBone." )
-
 #define ANN_SAPINTV_TEXT N_("SAP announcement interval")
 #define ANN_SAPINTV_LONGTEXT N_( \
     "When the SAP flow control is disabled, " \
@@ -1093,10 +1074,6 @@ static const char *const ppsz_prefres[] = {
 #define VOD_SERVER_LONGTEXT N_( \
     "You can select which VoD server module you want to use. Set this " \
     "to 'vod_rtsp' to switch back to the old, legacy module." )
-
-#define USE_STREAM_IMMEDIATE_LONGTEXT N_( \
-     "This option is useful if you want to lower the latency when " \
-     "reading a stream")
 
 #define VLM_CONF_TEXT N_("VLM configuration file")
 #define VLM_CONF_LONGTEXT N_( \
