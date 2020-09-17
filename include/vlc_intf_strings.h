@@ -60,30 +60,7 @@
 
 #define I_MENU_ABOUT N_("&About")
 
-/* Playlist popup */
-#define I_POP_PLAY N_("Play")
-#define I_POP_DEL N_("Remove Selected")
-#define I_POP_INFO N_("Information...")
-#define I_POP_NEWFOLDER I_DIR_OR_FOLDER( N_("Create Directory..."), \
-                                         N_("Create Folder...") )
-#define I_POP_RENAMEFOLDER I_DIR_OR_FOLDER( N_("Rename Directory..."), \
-                                         N_("Rename Folder...") )
-#define I_POP_EXPLORE I_DIR_OR_FOLDER( N_("Show Containing Directory..."), \
-                                       N_("Show Containing Folder...") )
-#define I_POP_STREAM N_("Stream...")
-#define I_POP_SAVE N_("Save...")
-
 /*************** Playlist *************/
-
-#define I_PL_LOOP       N_("Repeat All")
-#define I_PL_REPEAT     N_("Repeat One")
-#define I_PL_RANDOM     N_("Random")
-#define I_PL_NORANDOM   N_("Random Off")
-#define I_PL_ADDPL      N_("Add to Playlist")
-
-#define I_PL_ADDF       N_("Add File...")
-#define I_PL_ADDDIR     I_DIR_OR_FOLDER( N_("Add Directory..."), \
-                                         N_("Add Folder...") )
 
 #define I_PL_SAVE       N_("Save Playlist to &File...")
 
@@ -95,7 +72,6 @@
 
 /*************** Video filters **************/
 
-#define I_WAVE      N_("Waves")
 #define I_LONGHELP N_("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head><body>" \
     "<h2>Welcome to VLC media player Help</h2>" \
         "<h3>Documentation</h3>" \
