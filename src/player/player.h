@@ -117,6 +117,11 @@ struct vlc_player_input
         float pos;
         bool restore_states;
         bool delay_restore;
+        /* Keep a trace of tracks as they appear since they won't be available
+         * for probing when the input gets stopped
+         */
+        bool has_video_tracks;
+        bool has_audio_tracks;
     } ml;
 };
 

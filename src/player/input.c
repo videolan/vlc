@@ -498,6 +498,10 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
             if (!trackpriv)
                 break;
 
+            if (ev->fmt->i_cat == VIDEO_ES)
+                input->ml.has_video_tracks = true;
+            else if (ev->fmt->i_cat == AUDIO_ES)
+                input->ml.has_audio_tracks = true;
             if (!vlc_vector_push(vec, trackpriv))
             {
                 vlc_player_track_priv_Delete(trackpriv);
@@ -949,6 +953,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     input->ml.restore_states = false;
     input->ml.delay_restore = false;
     input->ml.pos = -1.f;
+    input->ml.has_audio_tracks = input->ml.has_video_tracks = false;
 
     input->thread = input_Create(player, input_thread_Events, input, item,
                                  player->resource, player->renderer);
