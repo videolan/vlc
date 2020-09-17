@@ -8,6 +8,7 @@
 #include "medialibrary/mlartistmodel.hpp"
 #include "medialibrary/mlalbumtrackmodel.hpp"
 #include "medialibrary/mlgenremodel.hpp"
+#include "medialibrary/mlurlmodel.hpp"
 #include "medialibrary/mlvideomodel.hpp"
 #include "medialibrary/mlrecentsvideomodel.hpp"
 #include "medialibrary/mlfoldersmodel.hpp"
@@ -162,6 +163,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<MLArtistModel>( "org.videolan.medialib", 0, 1, "MLArtistModel" );
         qmlRegisterType<MLAlbumTrackModel>( "org.videolan.medialib", 0, 1, "MLAlbumTrackModel" );
         qmlRegisterType<MLGenreModel>( "org.videolan.medialib", 0, 1, "MLGenreModel" );
+        qmlRegisterType<MLUrlModel>( "org.videolan.medialib", 0, 1, "MLUrlModel" );
         qmlRegisterType<MLVideoModel>( "org.videolan.medialib", 0, 1, "MLVideoModel" );
         qmlRegisterType<MLRecentsVideoModel>( "org.videolan.medialib", 0, 1, "MLRecentsVideoModel" );
         qRegisterMetaType<NetworkTreeItem>();
