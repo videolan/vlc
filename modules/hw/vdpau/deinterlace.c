@@ -77,8 +77,8 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
     dst->i_nb_fields = 1;
     src->i_nb_fields = 1;
 
-    assert(src->p_next == NULL);
-    src->p_next = dst;
+    assert(!picture_HasChainedPics(src));
+    vlc_picture_chain_AppendChain( src, dst );
 
     if (src->b_progressive || src->b_top_field_first)
     {
