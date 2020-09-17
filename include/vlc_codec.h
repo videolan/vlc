@@ -390,7 +390,7 @@ VLC_API void decoder_Clean( decoder_t *p_dec );
 static inline void decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
 {
     vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
-    vlc_assert( p_pic->p_next == NULL );
+    vlc_assert( !picture_HasChainedPics( p_pic ) );
     vlc_assert( dec->cbs->video.queue != NULL );
     dec->cbs->video.queue( dec, p_pic );
 }
