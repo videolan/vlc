@@ -358,23 +358,22 @@ module_config_t *module_config_get( const module_t *module, unsigned *restrict p
 {
     const vlc_plugin_t *plugin = module->plugin;
 
+    assert( psize != NULL );
+    *psize = 0;
+
     if (plugin->module != module)
     {   /* For backward compatibility, pretend non-first modules have no
          * configuration items. */
-        *psize = 0;
         return NULL;
     }
 
-    unsigned i,j;
     size_t size = plugin->conf.size;
     module_config_t *config = vlc_alloc( size, sizeof( *config ) );
-
-    assert( psize != NULL );
-    *psize = 0;
 
     if( !config )
         return NULL;
 
+    unsigned i, j;
     for( i = 0, j = 0; i < size; i++ )
     {
         const module_config_t *item = plugin->conf.items + i;
