@@ -532,11 +532,10 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         while ( p_es->p_picture != NULL
                  && p_es->p_picture->date + p_sys->i_delay < date )
         {
-            if ( p_es->p_picture->p_next != NULL )
+            if ( picture_HasChainedPics( p_es->p_picture ) )
             {
-                picture_t *p_next = p_es->p_picture->p_next;
-                picture_Release( p_es->p_picture );
-                p_es->p_picture = p_next;
+                picture_t *es_picture = vlc_picture_chain_PopFront( &p_es->p_picture );
+                picture_Release( es_picture );
             }
             else if ( p_es->p_picture->date + p_sys->i_delay + BLANK_DELAY <
                         date )

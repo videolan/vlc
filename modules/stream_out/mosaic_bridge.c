@@ -462,9 +462,8 @@ static void Del( sout_stream_t *p_stream, void *id )
     p_es->b_empty = true;
     while ( p_es->p_picture )
     {
-        picture_t *p_next = p_es->p_picture->p_next;
-        picture_Release( p_es->p_picture );
-        p_es->p_picture = p_next;
+        picture_t *es_picture = vlc_picture_chain_PopFront( &p_es->p_picture );
+        picture_Release( es_picture );
     }
 
     for ( i = 0; i < p_bridge->i_es_num; i++ )
@@ -572,11 +571,13 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     bridged_es_t *p_es = p_sys->p_es;
     vlc_global_lock( VLC_MOSAIC_MUTEX );
     if (p_es->p_picture == NULL)
+    {
         p_es->p_picture = p_new_pic;
+        p_es->tail      = p_new_pic;
+        p_new_pic->p_next = NULL;
+    }
     else
-        p_es->tail->p_next = p_new_pic;
-    p_new_pic->p_next = NULL;
-    p_es->tail = p_new_pic;
+        p_es->tail = vlc_picture_chain_Append( p_es->tail, p_new_pic );
     vlc_global_unlock( VLC_MOSAIC_MUTEX );
 }
 
