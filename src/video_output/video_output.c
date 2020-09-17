@@ -494,7 +494,7 @@ void vout_PutPicture(vout_thread_t *vout, picture_t *picture)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
-    picture->p_next = NULL;
+    assert( !picture_HasChainedPics( picture ) );
     picture_fifo_Push(sys->decoder_fifo, picture);
     vout_control_Wake(&sys->control);
 }
