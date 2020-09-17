@@ -1,5 +1,5 @@
 DAALA_VERSION := e248823a04292a8c2f56aa260f5c0b369d41d64e
-DAALA_GITURL := http://git.xiph.org/daala.git
+DAALA_GITURL := http://gitlab.xiph.org/xiph/daala.git
 
 # Default disabled for now
 # PKGS += daala
