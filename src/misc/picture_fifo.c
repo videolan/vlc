@@ -39,30 +39,37 @@
 struct picture_fifo_t {
     vlc_mutex_t lock;
     picture_t   *first;
-    picture_t   **last_ptr;
+    picture_t   *tail;
 };
 
 static void PictureFifoReset(picture_fifo_t *fifo)
 {
     fifo->first    = NULL;
-    fifo->last_ptr = &fifo->first;
+    fifo->tail     = NULL;
 }
 static void PictureFifoPush(picture_fifo_t *fifo, picture_t *picture)
 {
     assert(!picture->p_next);
-    *fifo->last_ptr = picture;
-    fifo->last_ptr  = &picture->p_next;
+    if (fifo->first == NULL)
+    {
+        fifo->first = picture;
+        fifo->tail  = picture;
+    }
+    else
+    {
+        fifo->tail->p_next = picture;
+        fifo->tail =  picture;
+        picture->p_next = NULL; // we're appending a picture, not a chain
+    }
 }
 static picture_t *PictureFifoPop(picture_fifo_t *fifo)
 {
-    picture_t *picture = fifo->first;
+    if (fifo->first == NULL)
+        return NULL;
 
-    if (picture) {
-        fifo->first = picture->p_next;
-        if (!fifo->first)
-            fifo->last_ptr = &fifo->first;
-        picture->p_next = NULL;
-    }
+    picture_t *picture = fifo->first;
+    fifo->first = picture->p_next;
+    picture->p_next = NULL;
     return picture;
 }
 
