@@ -219,7 +219,6 @@ vlc_player_destructor_Thread(void *data)
                                          VLC_TICK_INVALID);
             vlc_player_destructor_AddStoppingInput(player, input);
 
-            vlc_player_UpdateMLStates(player, input);
             input_Stop(input->thread);
         }
 
@@ -228,6 +227,8 @@ vlc_player_destructor_Thread(void *data)
             !vlc_list_is_empty(&player->destructor.joinable_inputs);
         vlc_list_foreach(input, &player->destructor.joinable_inputs, node)
         {
+            vlc_player_UpdateMLStates(player, input);
+
             keep_sout = var_GetBool(input->thread, "sout-keep");
 
             if (input->state == VLC_PLAYER_STATE_STOPPING)
