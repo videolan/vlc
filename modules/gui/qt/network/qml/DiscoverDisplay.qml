@@ -68,6 +68,10 @@ Widgets.NavigableFocusScope {
             displayText: i18n.qtr("Services"),
             name: "services",
             url: "qrc:///network/ServicesHomeDisplay.qml"
+        }, {
+            displayText: i18n.qtr("URL"),
+            name: "url",
+            url: "qrc:/medialibrary/UrlListDisplay.qml"
         }
     ]
 
