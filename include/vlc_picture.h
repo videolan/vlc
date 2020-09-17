@@ -168,6 +168,74 @@ static inline vlc_video_context* picture_GetVideoContext(picture_t *pic)
 }
 
 /**
+ * picture chaining helpers
+ */
+
+/**
+ * Pop the front of a picture chain.
+ *
+ * The next picture in the chain becomes the front of the picture chain.
+ *
+ * \return the front of the picture chain (the picture itself)
+ */
+static inline picture_t * vlc_picture_chain_PopFront(picture_t **chain)
+{
+    picture_t *front = *chain;
+    if (front)
+    {
+        *chain = front->p_next;
+        // unlink the front picture from the rest of the chain
+        front->p_next = NULL;
+    }
+    return front;
+}
+
+/**
+ * Append a picture to a picture chain.
+ *
+ * \param chain the picture chain pointer
+ * \param pic the picture to append to the chain
+ *
+ * \return the new tail of the picture chain
+ */
+VLC_USED
+static inline picture_t * vlc_picture_chain_Append(picture_t *chain, picture_t *pic)
+{
+    chain->p_next = pic;
+    pic->p_next = NULL; // we're appending a picture, not a chain
+    return pic;
+}
+
+/**
+ * Append a picture chain to a picture chain.
+ */
+static inline void vlc_picture_chain_AppendChain(picture_t *chain, picture_t *tail)
+{
+    chain->p_next = tail;
+}
+
+/**
+ * Check whether a picture has other pictures linked
+ */
+static inline bool picture_HasChainedPics(const picture_t *pic)
+{
+    return pic->p_next != NULL;
+}
+
+/**
+ * Reset a picture chain.
+ *
+ * \return the picture chain that was contained in the picture
+ */
+static inline picture_t * picture_GetAndResetChain(picture_t *pic)
+{
+    picture_t *chain = pic->p_next;
+    pic->p_next = NULL;
+    return chain;
+}
+
+
+/**
  * This function will create a new picture.
  * The picture created will implement a default release management compatible
  * with picture_Hold and picture_Release. This default management will release
