@@ -233,10 +233,10 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
         /* Allocate output frames. */
         for( int i = 1; i < i_double_rate_alloc_end ; ++i )
         {
-            p_dst[i-1]->p_next =
             p_dst[i]           = AllocPicture( p_filter );
             if( p_dst[i] )
             {
+                p_dst[i-1]->p_next = p_dst[i];
                 picture_CopyProperties( p_dst[i], p_pic );
             }
             else
