@@ -236,7 +236,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
             p_dst[i]           = AllocPicture( p_filter );
             if( p_dst[i] )
             {
-                p_dst[i-1]->p_next = p_dst[i];
+                vlc_picture_chain_AppendChain( p_dst[i-1], p_dst[i] );
                 picture_CopyProperties( p_dst[i], p_pic );
             }
             else
