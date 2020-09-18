@@ -96,6 +96,8 @@ void vlc_clock_main_ChangePause(vlc_clock_main_t *clock, vlc_tick_t system_now,
 /**
  * This function creates a new master vlc_clock_t interface
  *
+ * @warning There can be only one master at a given time.
+ *
  * You must use vlc_clock_Delete to free it.
  */
 vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,

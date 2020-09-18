@@ -565,11 +565,8 @@ vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
         return NULL;
 
     vlc_mutex_lock(&main_clock->lock);
-    if (main_clock->master != NULL)
-    {
-        vlc_clock_master_reset(main_clock->master);
-        vlc_clock_set_slave_callbacks(main_clock->master);
-    }
+    assert(main_clock->master == NULL);
+
     vlc_clock_set_master_callbacks(clock);
     main_clock->master = clock;
     main_clock->rc++;
