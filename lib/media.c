@@ -479,6 +479,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     /* A media descriptor can be a playlist. When you open a playlist
      * It can give a bunch of item to read. */
     p_md->p_subitems        = NULL;
+    p_md->p_input_item->libvlc_owner = p_md;
 
     libvlc_event_manager_init( &p_md->event_manager, p_md );
 

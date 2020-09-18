@@ -197,15 +197,24 @@ LIBVLC_API void libvlc_media_player_retain( libvlc_media_player_t *p_mi );
  * Set the media that will be used by the media_player. If any,
  * previous md will be released.
  *
+ * \note The user should listen to the libvlc_MediaPlayerMediaChanged event, to
+ * know when the new media is actually used by the player (or to known that the
+ * older media is no longuer used).
+ *
  * \param p_mi the Media Player
  * \param p_md the Media. Afterwards the p_md can be safely
  *        destroyed.
  */
 LIBVLC_API void libvlc_media_player_set_media( libvlc_media_player_t *p_mi,
-                                                   libvlc_media_t *p_md );
+                                               libvlc_media_t *p_md );
 
 /**
  * Get the media used by the media_player.
+ *
+ * \warning Calling this function just after libvlc_media_player_set_media()
+ * will return the media that was just set, but this media might not be
+ * currently used internally by the player. To detect such case, the user
+ * should listen to the libvlc_MediaPlayerMediaChanged event.
  *
  * \param p_mi the Media Player
  * \return the media associated with p_mi, or NULL if no

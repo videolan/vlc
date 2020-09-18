@@ -64,34 +64,18 @@ on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
 
     libvlc_media_player_t *mp = data;
 
-    libvlc_media_t *md = mp->p_md;
-
-    input_item_t *media = md ? md->p_input_item : NULL;
-    if (new_media == media)
-        /* no changes */
-        return;
-
-    if (md)
-        media_detach_preparsed_event(md);
-
-    if (new_media)
+    libvlc_media_t *libmedia;
+    if (new_media != NULL)
     {
-        mp->p_md = libvlc_media_new_from_input_item(mp->p_libvlc_instance,
-                                                    new_media);
-        if (!mp->p_md)
-            /* error already printed by the function call */
-            return;
-
-        media_attach_preparsed_event(mp->p_md);
+        libmedia = new_media->libvlc_owner;
+        assert(libmedia != NULL);
     }
     else
-        mp->p_md = NULL;
-
-    libvlc_media_release(md);
+        libmedia = NULL;
 
     libvlc_event_t event;
     event.type = libvlc_MediaPlayerMediaChanged;
-    event.u.media_player_media_changed.new_media = mp->p_md;
+    event.u.media_player_media_changed.new_media = libmedia;
     libvlc_event_send(&mp->event_manager, &event);
 }
 
