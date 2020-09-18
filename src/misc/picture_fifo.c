@@ -91,15 +91,13 @@ picture_t *picture_fifo_Pop(picture_fifo_t *fifo)
 
     return picture;
 }
-picture_t *picture_fifo_Peek(picture_fifo_t *fifo)
+bool picture_fifo_IsEmpty(picture_fifo_t *fifo)
 {
     vlc_mutex_lock(&fifo->lock);
-    picture_t *picture = fifo->first;
-    if (picture)
-        picture_Hold(picture);
+    bool empty = fifo->first == NULL;
     vlc_mutex_unlock(&fifo->lock);
 
-    return picture;
+    return empty;
 }
 void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before)
 {

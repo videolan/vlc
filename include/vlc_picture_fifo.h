@@ -57,13 +57,9 @@ VLC_API void picture_fifo_Delete( picture_fifo_t * );
 VLC_API picture_t * picture_fifo_Pop( picture_fifo_t * ) VLC_USED;
 
 /**
- * It returns the first picture_t pointer from the fifo but does not
- * remove it. The picture returned has been hold for you so you
- * must call picture_Release on it.
- *
- * If the fifo is empty, it return NULL without waiting.
+ * It returns whether the fifo is empty or not.
  */
-VLC_API picture_t * picture_fifo_Peek( picture_fifo_t * ) VLC_USED;
+VLC_API bool picture_fifo_IsEmpty( picture_fifo_t * );
 
 /**
  * It saves a picture_t into the fifo.

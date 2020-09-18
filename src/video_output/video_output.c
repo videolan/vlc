@@ -364,11 +364,7 @@ bool vout_IsEmpty(vout_thread_t *vout)
     if (!sys->decoder_fifo)
         return true;
 
-    picture_t *picture = picture_fifo_Peek(sys->decoder_fifo);
-    if (picture)
-        picture_Release(picture);
-
-    return !picture;
+    return picture_fifo_IsEmpty(sys->decoder_fifo);
 }
 
 void vout_DisplayTitle(vout_thread_t *vout, const char *title)
