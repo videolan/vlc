@@ -262,41 +262,39 @@ static picture_t *deinterlace(filter_t * p_filter, picture_t * p_pic)
     }
 
     // Return anything that is in the out Q
+    picture_t ** pp_pic = &ret_pics;
+
+    // Advanced di has a 3 frame latency, so if the seq delta is greater
+    // than that then we are expecting at least two frames of output. Wait
+    // for one of those.
+    // seq_in is seq of the next frame we are going to submit (1-15, no 0)
+    // seq_out is last frame we removed from Q
+    // So after 4 frames sent (1st time we want to wait), 0 rx seq_in=5, seq_out=15, delta=5
+
+    while ((out_buf = (seq_delta(sys->seq_in, sys->seq_out) >= 5 ? mmal_queue_timedwait(sys->out_q, 1000) : mmal_queue_get(sys->out_q))) != NULL)
     {
-        picture_t ** pp_pic = &ret_pics;
+        const unsigned int seq_out = (out_buf->flags / MMAL_BUFFER_HEADER_FLAG_USER0) & 0xf;
+        picture_t * out_pic = di_alloc_opaque(p_filter, out_buf);
 
-        // Advanced di has a 3 frame latency, so if the seq delta is greater
-        // than that then we are expecting at least two frames of output. Wait
-        // for one of those.
-        // seq_in is seq of the next frame we are going to submit (1-15, no 0)
-        // seq_out is last frame we removed from Q
-        // So after 4 frames sent (1st time we want to wait), 0 rx seq_in=5, seq_out=15, delta=5
-
-        while ((out_buf = (seq_delta(sys->seq_in, sys->seq_out) >= 5 ? mmal_queue_timedwait(sys->out_q, 1000) : mmal_queue_get(sys->out_q))) != NULL)
-        {
-            const unsigned int seq_out = (out_buf->flags / MMAL_BUFFER_HEADER_FLAG_USER0) & 0xf;
-            picture_t * out_pic = di_alloc_opaque(p_filter, out_buf);
-
-            if (out_pic == NULL) {
-                msg_Warn(p_filter, "Failed to alloc new filter output pic");
-                mmal_queue_put_back(sys->out_q, out_buf);  // Wedge buf back into Q in the hope we can alloc a pic later
-                out_buf = NULL;
-                break;
-            }
-            out_buf = NULL;  // Now attached to pic or recycled
-
-            *pp_pic = out_pic;
-            pp_pic = &out_pic->p_next;
-
-            // Ignore 0 seqs
-            // Don't think these should actually happen
-            if (seq_out != 0)
-                sys->seq_out = seq_out;
+        if (out_pic == NULL) {
+            msg_Warn(p_filter, "Failed to alloc new filter output pic");
+            mmal_queue_put_back(sys->out_q, out_buf);  // Wedge buf back into Q in the hope we can alloc a pic later
+            out_buf = NULL;
+            break;
         }
+        out_buf = NULL;  // Now attached to pic or recycled
 
-        // Crash on lockup
-        assert(ret_pics != NULL || seq_delta(sys->seq_in, sys->seq_out) < 5);
+        *pp_pic = out_pic;
+        pp_pic = &out_pic->p_next;
+
+        // Ignore 0 seqs
+        // Don't think these should actually happen
+        if (seq_out != 0)
+            sys->seq_out = seq_out;
     }
+
+    // Crash on lockup
+    assert(ret_pics != NULL || seq_delta(sys->seq_in, sys->seq_out) < 5);
 
     return ret_pics;
 
