@@ -194,7 +194,10 @@ vlc_player_UpdateMLStates(vlc_player_t *player, struct vlc_player_input* input)
     if (media->i_type == VLC_ML_MEDIA_TYPE_UNKNOWN)
     {
         if (!vlc_player_UpdateMediaType(input, ml, media))
+        {
+            vlc_ml_release( media );
             return;
+        }
     }
     assert(media->i_type != VLC_ML_MEDIA_TYPE_UNKNOWN);
 
