@@ -142,16 +142,7 @@ static void pic_fifo_init(pic_fifo_t * const pf)
 
 static void pic_fifo_put(pic_fifo_t * const pf, picture_t * pic)
 {
-    if (pf->head == NULL)
-    {
-        pic->p_next = NULL;
-        pf->head = pic;
-        pf->tail = pic;
-    }
-    else
-    {
-        pf->tail = vlc_picture_chain_Append( pf->tail, pic  );
-    }
+    pf->tail = vlc_picture_chain_Append( &pf->head, pf->tail, pic  );
 }
 
 #define SUBS_MAX 3

@@ -122,7 +122,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
         picture_Copy( p_tmp, p_sys->p_previous_pic);
         p_tmp->date = date_Get( &p_sys->next_output_pts );
 
-        last_pic = vlc_picture_chain_Append( last_pic, p_tmp );
+        last_pic = vlc_picture_chain_Append( &p_sys->p_previous_pic, last_pic, p_tmp );
         date_Increment( &p_sys->next_output_pts, 1 );
     }
 

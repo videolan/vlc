@@ -284,13 +284,7 @@ static picture_t *deinterlace(filter_t * p_filter, picture_t * p_pic)
         }
         out_buf = NULL;  // Now attached to pic or recycled
 
-        if (ret_pics == NULL)
-        {
-            ret_pics = out_pic;
-            chain_tail = out_pic;
-        }
-        else
-            chain_tail = vlc_picture_chain_Append( chain_tail, out_pic );
+        chain_tail = vlc_picture_chain_Append( &ret_pics, chain_tail, out_pic );
 
         // Ignore 0 seqs
         // Don't think these should actually happen

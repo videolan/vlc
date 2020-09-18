@@ -50,15 +50,7 @@ static void PictureFifoReset(picture_fifo_t *fifo)
 static void PictureFifoPush(picture_fifo_t *fifo, picture_t *picture)
 {
     assert(!picture_HasChainedPics(picture));
-    if (fifo->first == NULL)
-    {
-        fifo->first = picture;
-        fifo->tail  = picture;
-    }
-    else
-    {
-        fifo->tail = vlc_picture_chain_Append( fifo->tail, picture );
-    }
+    fifo->tail = vlc_picture_chain_Append( &fifo->first, fifo->tail, picture );
 }
 static picture_t *PictureFifoPop(picture_fifo_t *fifo)
 {

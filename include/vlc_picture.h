@@ -194,14 +194,19 @@ static inline picture_t * vlc_picture_chain_PopFront(picture_t **chain)
  * Append a picture to a picture chain.
  *
  * \param chain the picture chain pointer
+ * \param tail the known tail of the picture chain
  * \param pic the picture to append to the chain
  *
  * \return the new tail of the picture chain
  */
 VLC_USED
-static inline picture_t * vlc_picture_chain_Append(picture_t *chain, picture_t *pic)
+static inline picture_t * vlc_picture_chain_Append(picture_t **chain, picture_t *tail,
+                                                   picture_t *pic)
 {
-    chain->p_next = pic;
+    if (*chain == NULL)
+        *chain = pic;
+    else
+        tail->p_next = pic;
     pic->p_next = NULL; // we're appending a picture, not a chain
     return pic;
 }

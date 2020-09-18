@@ -570,14 +570,7 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     /* push the picture in the mosaic-struct structure */
     bridged_es_t *p_es = p_sys->p_es;
     vlc_global_lock( VLC_MOSAIC_MUTEX );
-    if (p_es->p_picture == NULL)
-    {
-        p_es->p_picture = p_new_pic;
-        p_es->tail      = p_new_pic;
-        p_new_pic->p_next = NULL;
-    }
-    else
-        p_es->tail = vlc_picture_chain_Append( p_es->tail, p_new_pic );
+    p_es->tail = vlc_picture_chain_Append( &p_es->p_picture, p_es->tail, p_new_pic );
     vlc_global_unlock( VLC_MOSAIC_MUTEX );
 }
 
