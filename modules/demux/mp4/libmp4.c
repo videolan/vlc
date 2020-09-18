@@ -4400,9 +4400,12 @@ static int MP4_ReadBox_iref( stream_t *p_stream, MP4_Box_t *p_box )
 static void MP4_FreeBox_iloc( MP4_Box_t *p_box )
 {
     MP4_Box_data_iloc_t *p_data = p_box->data.p_iloc;
-    for( uint32_t i=0; i<p_data->i_item_count; i++ )
-        free( p_data->p_items[i].p_extents );
-    free( p_data->p_items );
+    if( p_data->p_items )
+    {
+        for( uint32_t i=0; i<p_data->i_item_count; i++ )
+            free( p_data->p_items[i].p_extents );
+        free( p_data->p_items );
+    }
 }
 
 static int MP4_ReadBox_iloc( stream_t *p_stream, MP4_Box_t *p_box )
