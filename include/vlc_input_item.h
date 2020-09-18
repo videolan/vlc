@@ -120,6 +120,9 @@ struct input_item_t
 
     bool        b_preparse_interact; /**< Force interaction with the user when
                                           preparsing.*/
+
+    void        *libvlc_owner;       /**< LibVLC private data, can only be set
+                                          before events are registered. */
 };
 
 #define INPUT_ITEM_URI_NOP "vlc://nop" /* dummy URI for node/directory items */
