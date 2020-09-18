@@ -31,7 +31,7 @@ NavigableFocusScope {
     //forwarded from subview
     signal actionForSelection( var selection )
     signal contextMenuButtonClicked(Item menuParent, var menuModel)
-    signal rightClick(Item menuParent, var menuModel)
+    signal rightClick(Item menuParent, var menuModel, var globalMousePos)
     signal itemDoubleClicked(var model)
 
     property var sortModel: []
@@ -226,7 +226,7 @@ NavigableFocusScope {
                     lineView.forceActiveFocus()
 
                     if (mouse.button === Qt.RightButton){
-                        root.rightClick(lineView,rowModel)
+                        root.rightClick(lineView,rowModel, hoverArea.mapToGlobal(mouse.x,mouse.y) )
                     }
                 }
 

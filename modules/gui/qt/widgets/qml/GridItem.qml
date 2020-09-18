@@ -49,9 +49,9 @@ FocusScope {
     signal addToPlaylistClicked
     signal itemClicked(Item menuParent, int key, int modifier)
     signal itemDoubleClicked(Item menuParent, int keys, int modifier)
-    signal contextMenuButtonClicked(Item menuParent)
+    signal contextMenuButtonClicked(Item menuParent, var globalMousePos)
 
-    Keys.onMenuPressed: root.contextMenuButtonClicked(picture)
+    Keys.onMenuPressed: root.contextMenuButtonClicked(picture, root.mapToGlobal(0,0))
 
     Accessible.role: Accessible.Cell
     Accessible.name: title
@@ -114,11 +114,11 @@ FocusScope {
         implicitHeight: content.implicitHeight
 
         acceptedButtons: Qt.RightButton | Qt.LeftButton
-        Keys.onMenuPressed: root.contextMenuButtonClicked(picture)
+        Keys.onMenuPressed: root.contextMenuButtonClicked(picture, root.mapToGlobal(0,0))
 
         onClicked: {
             if (mouse.button === Qt.RightButton)
-                contextMenuButtonClicked(picture);
+                contextMenuButtonClicked(picture, mouseArea.mapToGlobal(mouse.x,mouse.y));
             else {
                 root.itemClicked(picture, mouse.button, mouse.modifiers);
             }
