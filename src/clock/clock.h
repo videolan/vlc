@@ -94,12 +94,6 @@ void vlc_clock_main_ChangePause(vlc_clock_main_t *clock, vlc_tick_t system_now,
                                 bool paused);
 
 /**
- * This function set the allocated interface as the master making the current
- * master if any a slave.
- */
-void vlc_clock_main_SetMaster(vlc_clock_main_t *main_clock, vlc_clock_t *clock);
-
-/**
  * This function creates a new master vlc_clock_t interface
  *
  * You must use vlc_clock_Delete to free it.

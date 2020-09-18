@@ -619,20 +619,6 @@ vlc_clock_t *vlc_clock_CreateSlave(const vlc_clock_t *clock,
     return vlc_clock_main_CreateSlave(clock->owner, cat, NULL, NULL);
 }
 
-void vlc_clock_main_SetMaster(vlc_clock_main_t *main_clock, vlc_clock_t *clock)
-{
-    vlc_mutex_lock(&main_clock->lock);
-    if (main_clock->master != NULL)
-    {
-        vlc_clock_master_reset(main_clock->master);
-        vlc_clock_set_slave_callbacks(main_clock->master);
-    }
-    vlc_clock_set_master_callbacks(clock);
-    main_clock->master = clock;
-    vlc_mutex_unlock(&main_clock->lock);
-}
-
-
 void vlc_clock_Delete(vlc_clock_t *clock)
 {
     vlc_clock_main_t *main_clock = clock->owner;
