@@ -689,11 +689,6 @@ void MainInterface::emitShow()
     emit askShow();
 }
 
-void MainInterface::popupMenu(bool show)
-{
-    emit askPopupMenu( show );
-}
-
 void MainInterface::emitRaise()
 {
     emit askRaise();

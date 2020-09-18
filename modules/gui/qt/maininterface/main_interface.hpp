@@ -279,7 +279,6 @@ public slots:
     void emitBoss();
     void emitRaise();
     void emitShow();
-    void popupMenu( bool show );
 
     virtual void reloadPrefs();
     VLCVarChoiceModel* getExtraInterfaces();
@@ -305,7 +304,6 @@ signals:
     void askShow();
     void askBoss();
     void askRaise();
-    void askPopupMenu( bool show );
     void kc_pressed(); /* easter eggs */
 
     void playlistDockedChanged(bool);

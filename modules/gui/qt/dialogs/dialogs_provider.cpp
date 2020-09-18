@@ -165,15 +165,10 @@ void DialogsProvider::customEvent( QEvent *event )
            bool show = (de->i_arg != 0);
            if( show )
            {
-               if( p_intf->p_sys->p_mi )
-                   p_intf->p_sys->p_mi->popupMenu( show );
-               else
-               {
-                   //popping a QMenu prevents mouse release events to be received,
-                   //this ensures the coherency of the vout mouse state.
-                   emit releaseMouseEvents();
-                   popupMenu = VLCMenuBar::PopupMenu( p_intf, show );
-               }
+              //popping a QMenu prevents mouse release events to be received,
+              //this ensures the coherency of the vout mouse state.
+              emit releaseMouseEvents();
+              popupMenu = VLCMenuBar::PopupMenu( p_intf, true );
            }
            break;
         }

@@ -373,10 +373,6 @@ Widgets.NavigableFocusScope {
             toolbarAutoHide.setVisible(1000)
             mousePosition = Qt.point(x, y)
         }
-
-        Menus.PopupMenu {
-            id: dialogMenu
-        }
     }
 
     Timer {
@@ -436,9 +432,6 @@ Widgets.NavigableFocusScope {
         target: mainInterface
         onAskShow: {
             toolbarAutoHide.toggleForceVisible()
-        }
-        onAskPopupMenu: {
-            dialogMenu.popup(videoSurface.mousePosition)
         }
     }
 }
