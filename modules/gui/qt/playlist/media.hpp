@@ -36,7 +36,7 @@ using InputItemPtr = vlc_shared_data_ptr_type(input_item_t,
 class Media
 {
 public:
-    Media(input_item_t *media = nullptr)
+    Media(input_item_t *media = nullptr, const QStringList* options = nullptr)
     {
         if (media)
         {
@@ -44,10 +44,11 @@ public:
             ptr.reset(input_item_Copy(media), false);
             if (!ptr)
                 throw std::bad_alloc();
+            setMediaOptions(options);
         }
     }
 
-    Media(QString uri, QString name, QStringList* options = nullptr)
+    Media(QString uri, QString name, const QStringList* options = nullptr)
     {
         auto uUri = uri.toUtf8();
         auto uName = name.toUtf8();
@@ -56,7 +57,11 @@ public:
         ptr.reset(input_item_New(rawUri, rawName), false);
         if (!ptr)
             throw std::bad_alloc();
+        setMediaOptions(options);
+    }
 
+    void setMediaOptions(const QStringList* options = nullptr)
+    {
         if (options && options->count() > 0)
         {
             char **ppsz_options = NULL;

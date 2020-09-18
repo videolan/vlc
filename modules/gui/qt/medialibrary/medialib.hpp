@@ -46,15 +46,15 @@ class MediaLib : public QObject
 public:
     MediaLib(intf_thread_t* _intf, QObject* _parent = nullptr );
 
-    Q_INVOKABLE void addToPlaylist(const MLParentId &itemId);
-    Q_INVOKABLE void addToPlaylist(const QString& mrl);
-    Q_INVOKABLE void addToPlaylist(const QUrl& mrl);
-    Q_INVOKABLE void addToPlaylist(const QVariantList& itemIdList);
+    Q_INVOKABLE void addToPlaylist(const MLParentId &itemId, const QStringList* options = nullptr);
+    Q_INVOKABLE void addToPlaylist(const QString& mrl, const QStringList* options = nullptr);
+    Q_INVOKABLE void addToPlaylist(const QUrl& mrl, const QStringList* options = nullptr);
+    Q_INVOKABLE void addToPlaylist(const QVariantList& itemIdList, const QStringList* options = nullptr);
 
-    Q_INVOKABLE void addAndPlay(const MLParentId &itemId);
-    Q_INVOKABLE void addAndPlay(const QString& mrl);
-    Q_INVOKABLE void addAndPlay(const QUrl& mrl);
-    Q_INVOKABLE void addAndPlay(const QVariantList&itemIdList);
+    Q_INVOKABLE void addAndPlay(const MLParentId &itemId, const QStringList* options = nullptr);
+    Q_INVOKABLE void addAndPlay(const QString& mrl, const QStringList* options = nullptr);
+    Q_INVOKABLE void addAndPlay(const QUrl& mrl, const QStringList* options = nullptr);
+    Q_INVOKABLE void addAndPlay(const QVariantList&itemIdList, const QStringList* options = nullptr);
 
     Q_INVOKABLE void reload();
 
