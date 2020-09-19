@@ -115,11 +115,74 @@ out:
 
 #else /* _POSIX_SPAWN */
 
+#include <vlc_fs.h>
+
 static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
                            const int *fdv, const char *const *argv,
                            bool search)
 {
-    (void) pid; (void) path; (void) fdv; (void) argv; (void) search;
+    size_t argc = 0;
+
+    assert(pid != NULL);
+    assert(path != NULL);
+    assert(fdv != NULL);
+    assert(argv != NULL);
+
+    int nulfd = vlc_open("/dev/null", O_RDWR);
+    if (unlikely(nulfd == -1))
+        return errno;
+
+    while (argv[argc++] != NULL);
+
+    char **vargv = malloc(sizeof (*argv) * argc);
+    if (unlikely(vargv == NULL)) {
+        vlc_close(nulfd);
+        return errno;
+    }
+
+    for (size_t i = 0; i < argc; i++)
+        vargv[i] = (char *)argv[i];
+
+    *pid = fork();
+
+    switch (*pid) {
+         case -1:
+             return errno;
+
+         case 0:
+             break;
+
+         default:
+             free(vargv);
+             vlc_close(nulfd);
+             return 0;
+    }
+
+    for (int newfd = 0; newfd < 3 || fdv[newfd] != -1; newfd++) {
+        int oldfd = fdv[newfd];
+
+        if (oldfd == -1)
+            oldfd = nulfd;
+
+        if (oldfd == newfd)
+            fcntl(oldfd, F_SETFD, fcntl(oldfd, F_GETFD) & ~FD_CLOEXEC);
+        else
+        if (dup2(oldfd, newfd) < 0)
+            _exit(1);
+    }
+
+    sigset_t set;
+
+    sigemptyset(&set);
+    pthread_sigmask(SIG_SETMASK, &set, NULL);
+    signal(SIGPIPE, SIG_DFL);
+
+    if (search)
+        execvp(path, vargv);
+    else
+        execv(path, vargv);
+
+    _exit(1);
 }
 
 #endif /* _POSIX_SPAWN */
