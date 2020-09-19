@@ -310,6 +310,7 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_GET_PTS_DELAY:
         case DEMUX_GET_META:
         case DEMUX_GET_SIGNAL:
+        case DEMUX_GET_TYPE:
         case DEMUX_SET_PAUSE_STATE:
             return vlc_stream_vaControl( s, i_query, args );
 
