@@ -378,6 +378,7 @@ static int Control(stream_t *stream, int query, va_list args)
             return VLC_SUCCESS;
         case STREAM_GET_SIGNAL:
         case STREAM_GET_TAGS:
+        case STREAM_GET_TYPE:
             return VLC_EGENERIC;
         case STREAM_SET_PAUSE_STATE:
         {
