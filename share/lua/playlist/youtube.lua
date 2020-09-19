@@ -535,7 +535,7 @@ function parse()
             arturl = vlc.strings.decode_uri( arturl )
         end
 
-        return { { path = path, title = title, description = description, artist = artist, arturl = arturl } }
+        return { { path = path, name = title, description = description, artist = artist, arturl = arturl } }
 
     else -- Other supported URL formats
         local video_id = string.match( vlc.path, "/[^/]+/([^?]*)" )
