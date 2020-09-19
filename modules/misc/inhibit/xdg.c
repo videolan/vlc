@@ -25,10 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_inhibit.h>
-#include <assert.h>
-#include <signal.h>
-#include <spawn.h>
-#include <sys/wait.h>
+#include <vlc_spawn.h>
 
 static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
@@ -45,28 +42,19 @@ vlc_module_end ()
 struct vlc_inhibit_sys
 {
     vlc_timer_t timer;
-    posix_spawnattr_t attr;
 };
-
-extern char **environ;
 
 static void Timer (void *data)
 {
+    static const char *const argv[] = { "xdg-screensaver", "reset", NULL };
+    static const int fdv[] = { -1, 2, 2, -1 };
     vlc_inhibit_t *ih = data;
-    vlc_inhibit_sys_t *sys = ih->p_sys;
-    char *argv[3] = {
-        (char *)"xdg-screensaver", (char *)"reset", NULL
-    };
     pid_t pid;
 
-    int err = posix_spawnp (&pid, "xdg-screensaver", NULL, &sys->attr,
-                            argv, environ);
-    if (err == 0)
-    {
-        int status;
+    int err = vlc_spawnp(&pid, argv[0], fdv, argv);
 
-        while (waitpid (pid, &status, 0) == -1);
-    }
+    if (err == 0)
+        vlc_waitpid(pid);
     else
         msg_Warn (ih, "error starting xdg-screensaver: %s",
                   vlc_strerror_c(err));
@@ -88,23 +76,9 @@ static int Open (vlc_object_t *obj)
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
-    posix_spawnattr_init (&p_sys->attr);
-    /* Reset signal handlers to default and clear mask in the child process */
-    {
-        sigset_t set;
-
-        sigemptyset (&set);
-        posix_spawnattr_setsigmask (&p_sys->attr, &set);
-        sigaddset (&set, SIGPIPE);
-        posix_spawnattr_setsigdefault (&p_sys->attr, &set);
-        posix_spawnattr_setflags (&p_sys->attr, POSIX_SPAWN_SETSIGDEF
-                                              | POSIX_SPAWN_SETSIGMASK);
-    }
-
     ih->p_sys = p_sys;
     if (vlc_timer_create (&p_sys->timer, Timer, ih))
     {
-        posix_spawnattr_destroy (&p_sys->attr);
         free (p_sys);
         return VLC_ENOMEM;
     }
@@ -119,6 +93,5 @@ static void Close (vlc_object_t *obj)
     vlc_inhibit_sys_t *p_sys = ih->p_sys;
 
     vlc_timer_destroy (p_sys->timer);
-    posix_spawnattr_destroy (&p_sys->attr);
     free (p_sys);
 }
