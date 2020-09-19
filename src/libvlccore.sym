@@ -450,6 +450,9 @@ vlc_accept
 vlc_send
 vlc_sendto
 vlc_sendmsg
+vlc_spawn
+vlc_spawnp
+vlc_waitpid
 utf8_vfprintf
 var_AddCallback
 var_AddListCallback

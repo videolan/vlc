@@ -91,6 +91,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_services_discovery.h \
 	../include/vlc_sort.h \
 	../include/vlc_sout.h \
+	../include/vlc_spawn.h \
 	../include/vlc_spu.h \
 	../include/vlc_stream.h \
 	../include/vlc_stream_extractor.h \
@@ -478,6 +479,7 @@ libvlccore_la_SOURCES += \
 	posix/filesystem.c \
 	posix/plugin.c \
 	posix/rand.c \
+	posix/spawn.c \
 	posix/timer.c
 if !HAVE_LINUX
 libvlccore_la_SOURCES += posix/wait.c
