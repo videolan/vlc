@@ -39,11 +39,6 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_ADVANCED_MISC)
 vlc_module_end ()
 
-struct vlc_inhibit_sys
-{
-    vlc_timer_t timer;
-};
-
 static void Timer (void *data)
 {
     static const char *const argv[] = { "xdg-screensaver", "reset", NULL };
@@ -62,27 +57,22 @@ static void Timer (void *data)
 
 static void Inhibit (vlc_inhibit_t *ih, unsigned mask)
 {
-    vlc_inhibit_sys_t *sys = ih->p_sys;
+    vlc_timer_t timer = (void *)ih->p_sys;
     bool suspend = (mask & VLC_INHIBIT_DISPLAY) != 0;
     vlc_tick_t delay = suspend ? VLC_TICK_FROM_SEC(30): VLC_TIMER_DISARM;
 
-    vlc_timer_schedule (sys->timer, false, delay, delay);
+    vlc_timer_schedule(timer, false, delay, delay);
 }
 
 static int Open (vlc_object_t *obj)
 {
     vlc_inhibit_t *ih = (vlc_inhibit_t *)obj;
-    vlc_inhibit_sys_t *p_sys = malloc (sizeof (*p_sys));
-    if (p_sys == NULL)
+    vlc_timer_t timer;
+
+    if (vlc_timer_create(&timer, Timer, ih))
         return VLC_ENOMEM;
 
-    ih->p_sys = p_sys;
-    if (vlc_timer_create (&p_sys->timer, Timer, ih))
-    {
-        free (p_sys);
-        return VLC_ENOMEM;
-    }
-
+    ih->p_sys = (void *)timer;
     ih->inhibit = Inhibit;
     return VLC_SUCCESS;
 }
@@ -90,8 +80,7 @@ static int Open (vlc_object_t *obj)
 static void Close (vlc_object_t *obj)
 {
     vlc_inhibit_t *ih = (vlc_inhibit_t *)obj;
-    vlc_inhibit_sys_t *p_sys = ih->p_sys;
+    vlc_timer_t timer = (void *)ih->p_sys;
 
-    vlc_timer_destroy (p_sys->timer);
-    free (p_sys);
+    vlc_timer_destroy(timer);
 }
