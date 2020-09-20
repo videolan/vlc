@@ -30,6 +30,7 @@
 
 #include "json/json.h"
 #include <vlc_common.h>
+#include <vlc_demux.h>
 #include <vlc_stream.h>
 #include <vlc_fs.h>
 #include <vlc_input_item.h>
@@ -75,6 +76,7 @@ FILE *vlc_popen(pid_t *restrict pid, const char *argv[])
 
 struct ytdl_playlist {
     struct json_object json;
+    stream_t *source;
 };
 
 static const struct json_object *PickFormat(stream_t *s,
@@ -236,10 +238,54 @@ static int Control(stream_t *s, int query, va_list args)
     return VLC_SUCCESS;
 }
 
+static int DemuxNested(stream_t *s)
+{
+    struct ytdl_playlist *sys = s->p_sys;
+
+    return demux_Demux(sys->source);
+}
+
+static int ControlNested(stream_t *s, int query, va_list args)
+{
+    struct ytdl_playlist *sys = s->p_sys;
+
+    switch (query) {
+        case DEMUX_GET_META: {
+            vlc_meta_t *meta = va_arg(args, vlc_meta_t *);
+
+            GetMeta(meta, &sys->json);
+            return demux_Control(sys->source, query, meta);
+        }
+
+        default:
+            return demux_vaControl(sys->source, query, args);
+    }
+}
+
+static stream_t *vlc_demux_NewURL(vlc_object_t *obj, const char *url,
+                                  es_out_t *out)
+{
+    stream_t *stream = vlc_stream_NewURL(obj, url);
+
+    if (stream != NULL) {
+        demux_t *demux = demux_New(obj, "any", stream, out);
+
+        if (demux != NULL)
+            return demux;
+
+        vlc_stream_Delete(stream);
+    }
+
+    return NULL;
+}
+
 static void Close(vlc_object_t *obj)
 {
     stream_t *s = (stream_t *)obj;
     struct ytdl_playlist *sys = s->p_sys;
+
+    if (sys->source != NULL)
+        vlc_stream_Delete(sys->source);
 
     json_free(&sys->json);
 }
@@ -281,8 +327,41 @@ static int OpenCommon(vlc_object_t *obj)
     }
 
     s->p_sys = sys;
-    s->pf_readdir = ReadDir;
-    s->pf_control = Control;
+    sys->source = NULL;
+
+    if (json_get(&sys->json, "entries") != NULL) {
+        /* Playlist */
+        s->pf_readdir = ReadDir;
+        s->pf_control = Control;
+        return VLC_SUCCESS;
+    }
+
+    /* Redirect if there is a single URL, so that we can refresh it every
+     * time it is opened.
+     */
+    const struct json_object *fmt = PickFormat(s, &sys->json);
+    stream_t *demux = NULL;
+
+    if (fmt != NULL) {
+        const char *url = json_get_str(fmt, "url");
+
+        if (url != NULL) {
+            var_Create(obj, "ytdl", VLC_VAR_BOOL);
+            demux = vlc_demux_NewURL(obj, url, s->out);
+
+            if (demux == NULL)
+                msg_Err(s, "cannot open URL: %s", url);
+            else
+                msg_Dbg(s, "redirecting to: %s", url);
+         }
+    }
+
+    if (demux == NULL)
+        return VLC_EGENERIC;
+
+    s->pf_demux = DemuxNested;
+    s->pf_control = ControlNested;
+    sys->source = demux;
     return VLC_SUCCESS;
 }
 
