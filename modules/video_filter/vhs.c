@@ -452,10 +452,12 @@ static int vhs_sliding_effect( filter_t *p_filter, picture_t *p_pic_out ) {
         if ( abs( p_sys->i_sliding_speed ) < 5 )
             p_sys->i_sliding_speed += 1;
 
-        /* check if offset is close to 0 and then ready to stop */
-        if ( abs( p_sys->i_sliding_ofs ) < abs( p_sys->i_sliding_speed
+        int threshold = p_sys->i_sliding_speed
              * p_sys->i_height[Y_PLANE]
-             * SEC_FROM_VLC_TICK( p_sys->i_cur_time - p_sys->i_last_time ) )
+             * SEC_FROM_VLC_TICK( p_sys->i_cur_time - p_sys->i_last_time );
+
+        /* check if offset is close to 0 and then ready to stop */
+        if ( abs( p_sys->i_sliding_ofs ) < abs( threshold )
              || abs( p_sys->i_sliding_ofs ) < p_sys->i_height[Y_PLANE] * 100 / 20 ) {
 
             /* reset sliding parameters */
