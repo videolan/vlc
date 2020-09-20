@@ -463,6 +463,7 @@ static int AStreamControl(stream_t *s, int i_query, va_list args)
         case STREAM_GET_CONTENT_TYPE:
         case STREAM_GET_SIGNAL:
         case STREAM_GET_TAGS:
+        case STREAM_GET_TYPE:
         case STREAM_SET_PAUSE_STATE:
         case STREAM_SET_PRIVATE_ID_STATE:
         case STREAM_SET_PRIVATE_ID_CA:
