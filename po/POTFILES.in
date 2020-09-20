@@ -435,6 +435,7 @@ modules/demux/xa.c
 modules/demux/xiph.h
 modules/demux/xiph_metadata.c
 modules/demux/xiph_metadata.h
+modules/demux/ytdl.c
 modules/gui/macosx/coreinteraction/VLCHotkeysController.h
 modules/gui/macosx/coreinteraction/VLCHotkeysController.m
 modules/gui/macosx/coreinteraction/VLCVideoFilterHelper.h

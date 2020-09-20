@@ -505,6 +505,14 @@ libadaptive_plugin_la_LIBADD += $(GCRYPT_LIBS)
 endif
 demux_LTLIBRARIES += libadaptive_plugin.la
 
+libytdl_plugin_la_SOURCES = demux/ytdl.c
+libytdl_plugin_la_LIBADD = libvlc_json.la
+if !HAVE_WIN32
+if !HAVE_ANDROID
+demux_LTLIBRARIES += libytdl_plugin.la
+endif
+endif
+
 libnoseek_plugin_la_SOURCES = demux/filter/noseek.c
 demux_LTLIBRARIES += libnoseek_plugin.la
 
@@ -519,6 +527,6 @@ libvlc_json_la_SOURCES = \
 	demux/json/grammar.y \
 	demux/json/json.c demux/json/json.h
 libvlc_json_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/demux/json
-libvlc_json_la_LIBADD = $(LTLIBVLCCORE) ../compat/libcompat.la
+libvlc_json_la_LIBADD = $(LTLIBVLCCORE) ../compat/libcompat.la $(LIBM)
 libvlc_json_la_LDFLAGS = -static
 noinst_LTLIBRARIES += libvlc_json.la
