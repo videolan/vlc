@@ -916,7 +916,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
                 p_sys->i_pic_reorder_max++;
                 pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
                                               p_sys->i_pic_reorder_max, p_info->i_num_ts);
-                msg_Info(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
+                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
                 break;
             }
             else if (!p_sys->b_poc_based_reorder &&
@@ -927,7 +927,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
                 p_sys->i_pic_reorder_max++;
                 pic_pacer_UpdateReorderMax(p_sys->pic_pacer,
                                               p_sys->i_pic_reorder_max, p_info->i_num_ts);
-                msg_Info(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
+                msg_Dbg(p_dec, "Raising max DPB to %"PRIu8, p_sys->i_pic_reorder_max);
                 break;
             }
         }
