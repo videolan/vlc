@@ -857,33 +857,30 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
     const size_t i_newchars = i_bytes / 4;
     const size_t i_new_count = p_text_block->i_count + i_newchars;
     if( SIZE_MAX / 4 < i_new_count )
-    {
-        free( p_ucs4 );
-        return 0;
-    }
+        goto error;
 
     size_t i_realloc = i_new_count * 4;
     void *p_realloc = realloc( p_text_block->p_uchars, i_realloc );
     if( unlikely(!p_realloc) )
-        return 0;
+        goto error;
     p_text_block->p_uchars = p_realloc;
 
     /* We want one per segment shared text_style_t* per unicode character */
     if( SIZE_MAX / sizeof(text_style_t *) < i_new_count )
-        return 0;
+        goto error;
     i_realloc = i_new_count * sizeof(text_style_t *);
     p_realloc = realloc( p_text_block->pp_styles, i_realloc );
     if ( unlikely(!p_realloc) )
-        return 0;
+        goto error;
     p_text_block->pp_styles = p_realloc;
 
     /* Same for ruby text */
     if( SIZE_MAX / sizeof(text_segment_ruby_t *) < i_new_count )
-        return 0;
+        goto error;
     i_realloc = i_new_count * sizeof(text_segment_ruby_t *);
     p_realloc = realloc( p_text_block->pp_ruby, i_realloc );
     if ( unlikely(!p_realloc) )
-        return 0;
+        goto error;
     p_text_block->pp_ruby = p_realloc;
 
     /* Copy data */
@@ -917,9 +914,8 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
             p_rubyblock->p_style = text_style_Duplicate( p_mgstyle );
             if( !p_rubyblock->p_style )
             {
-                free( p_ucs4 );
                 free( p_rubyblock );
-                return 0;
+                goto error;
             }
             p_rubyblock->p_style->i_font_size *= 0.4;
             p_rubyblock->p_style->f_font_relsize *= 0.4;
@@ -936,6 +932,9 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
     p_text_block->i_count += i_newchars;
 
     return i_newchars;
+error:
+    free( p_ucs4 );
+    return 0;
 }
 
 static size_t SegmentsToTextAndStyles( filter_t *p_filter, const text_segment_t *p_segment,
