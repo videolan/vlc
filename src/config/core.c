@@ -116,6 +116,11 @@ char *config_GetPsz(const char *psz_name)
 
     p_config = config_FindConfig( psz_name );
 
+#ifndef NDEBUG
+    if (p_config == NULL)
+        fprintf(stderr, "Unknown vlc configuration variable named %s\n", psz_name);
+#endif
+
     /* sanity checks */
     assert(p_config != NULL);
     assert(IsConfigStringType (p_config->i_type));
