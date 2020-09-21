@@ -43,6 +43,11 @@ variables:
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-w64-mingw32
 
+.variables-uwp-arm64: &variables-uwp-arm64
+        SHORTARCH: arm64
+        HOST_ARCH: aarch64
+        TRIPLET: $HOST_ARCH-w64-mingw32
+
 .variables-macos: &variables-macos
         VLC_PATH: /Users/videolanci/sandbox/bin
         VLC_FORCE_KERNELVERSION: 18
@@ -151,6 +156,15 @@ uwp64-libvlc-llvm:
         name: $VLC_UWP_LLVM_IMAGE
     variables:
         <<: *variables-win64
+        LIBVLC_EXTRA_BUILD_FLAGS: -z
+        UWP_EXTRA_BUILD_FLAGS: -u -w -x
+
+uwp-arm64-libvlc-llvm:
+    extends: .win-common
+    image:
+        name: $VLC_UWP_LLVM_IMAGE
+    variables:
+        <<: *variables-uwp-arm64
         LIBVLC_EXTRA_BUILD_FLAGS: -z
         UWP_EXTRA_BUILD_FLAGS: -u -w -x
 
