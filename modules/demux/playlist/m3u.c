@@ -332,6 +332,12 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                     meta.psz_album_art = pf_dup( psz_parse );
                 }
             }
+            else if ( !strncasecmp( psz_parse, "PLAYLIST:",
+                      sizeof( "PLAYLIST:" ) - 1 ) )
+            {
+                psz_parse += sizeof( "PLAYLIST:" ) - 1;
+                input_item_SetTitle( p_demux->p_input_item, psz_parse );
+            }
         }
         else if( !strncasecmp( psz_parse, "RTSPtext", sizeof("RTSPtext") -1 ) )
         {
