@@ -73,8 +73,7 @@ void vout_snapshot_Destroy(vout_snapshot_t *snap)
         return;
 
     while (snap->picture) {
-        picture_t *picture = snap->picture;
-        snap->picture = picture->p_next;
+        picture_t *picture = vlc_picture_chain_PopFront( &snap->picture );
         picture_Release(picture);
     }
 
@@ -112,10 +111,8 @@ picture_t *vout_snapshot_Get(vout_snapshot_t *snap, vlc_tick_t timeout)
         vlc_cond_timedwait(&snap->wait, &snap->lock, deadline) == 0);
 
     /* */
-    picture_t *picture = snap->picture;
-    if (picture)
-        snap->picture = picture->p_next;
-    else if (snap->request_count > 0)
+    picture_t *picture = vlc_picture_chain_PopFront( &snap->picture );
+    if (!picture && snap->request_count > 0)
         snap->request_count--;
 
     vlc_mutex_unlock(&snap->lock);
@@ -161,8 +158,7 @@ void vout_snapshot_Set(vout_snapshot_t *snap,
         }
         else
         {
-            snap->tail->p_next = dup;
-            snap->tail =  dup;
+            snap->tail = vlc_picture_chain_Append( snap->tail, dup );
         }
         snap->request_count--;
     }
