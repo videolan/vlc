@@ -855,30 +855,32 @@ static size_t AddTextAndStyles( filter_sys_t *p_sys,
         return 0;
 
     const size_t i_newchars = i_bytes / 4;
-    if( SIZE_MAX / 4 < p_text_block->i_count + i_newchars )
+    const size_t i_new_count = p_text_block->i_count + i_newchars;
+    if( SIZE_MAX / 4 < i_new_count )
     {
         free( p_ucs4 );
         return 0;
     }
-    size_t i_realloc = (p_text_block->i_count + i_newchars) * 4;
+
+    size_t i_realloc = i_new_count * 4;
     void *p_realloc = realloc( p_text_block->p_uchars, i_realloc );
     if( unlikely(!p_realloc) )
         return 0;
     p_text_block->p_uchars = p_realloc;
 
     /* We want one per segment shared text_style_t* per unicode character */
-    if( SIZE_MAX / sizeof(text_style_t *) < p_text_block->i_count + i_newchars )
+    if( SIZE_MAX / sizeof(text_style_t *) < i_new_count )
         return 0;
-    i_realloc = (p_text_block->i_count + i_newchars) * sizeof(text_style_t *);
+    i_realloc = i_new_count * sizeof(text_style_t *);
     p_realloc = realloc( p_text_block->pp_styles, i_realloc );
     if ( unlikely(!p_realloc) )
         return 0;
     p_text_block->pp_styles = p_realloc;
 
     /* Same for ruby text */
-    if( SIZE_MAX / sizeof(text_segment_ruby_t *) < p_text_block->i_count + i_newchars )
+    if( SIZE_MAX / sizeof(text_segment_ruby_t *) < i_new_count )
         return 0;
-    i_realloc = (p_text_block->i_count + i_newchars) * sizeof(text_segment_ruby_t *);
+    i_realloc = i_new_count * sizeof(text_segment_ruby_t *);
     p_realloc = realloc( p_text_block->pp_ruby, i_realloc );
     if ( unlikely(!p_realloc) )
         return 0;
