@@ -136,7 +136,8 @@ var_Read_float(const char *psz)
     Y(video, width, unsigned, add_integer, Unsigned, 640) \
     Y(video, height, unsigned, add_integer, Unsigned, 480) \
     Y(video, frame_rate, unsigned, add_integer, Unsigned, 25) \
-    Y(video, frame_rate_base, unsigned, add_integer, Unsigned, 1)
+    Y(video, frame_rate_base, unsigned, add_integer, Unsigned, 1) \
+    Y(video, orientation, unsigned, add_integer, Unsigned, ORIENT_NORMAL)
 
 #define OPTIONS_SUB(Y) \
     Y(sub, packetized, bool, add_bool, Bool, true)\
@@ -647,12 +648,19 @@ ConfigureVideoTrack(demux_t *demux,
         return VLC_EGENERIC;
     }
 
+    if (options->orientation > ORIENT_RIGHT_BOTTOM)
+    {
+        msg_Err(demux, "Invalid orientation value %u", options->orientation);
+        return VLC_EGENERIC;
+    }
+
     fmt->i_codec = chroma;
     fmt->video.i_chroma = chroma;
     fmt->video.i_width = fmt->video.i_visible_width = options->width;
     fmt->video.i_height = fmt->video.i_visible_height = options->height;
     fmt->video.i_frame_rate = options->frame_rate;
     fmt->video.i_frame_rate_base = options->frame_rate_base;
+    fmt->video.orientation = options->orientation;
 
     fmt->b_packetized = options->packetized;
 
