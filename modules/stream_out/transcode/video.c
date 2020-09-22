@@ -266,58 +266,6 @@ static const struct filter_video_callbacks transcode_filter_video_cbs =
     transcode_video_filter_buffer_new, transcode_video_filter_hold_device,
 };
 
-/* Take care of the scaling and chroma conversions. */
-static int transcode_video_set_conversions( sout_stream_t *p_stream,
-                                            sout_stream_id_sys_t *id,
-                                            const es_format_t **pp_src,
-                                            vlc_video_context **pp_src_vctx,
-                                            const es_format_t *p_dst,
-                                            bool b_reorient )
-{
-    filter_owner_t owner = {
-        .video = &transcode_filter_video_cbs,
-        .sys = id,
-    };
-
-    const bool b_do_scale = (*pp_src)->video.i_visible_width != p_dst->video.i_visible_width ||
-                            (*pp_src)->video.i_visible_height != p_dst->video.i_visible_height;
-    const bool b_do_chroma = (*pp_src)->video.i_chroma != p_dst->video.i_chroma;
-    const bool b_do_orient = ((*pp_src)->video.orientation != ORIENT_NORMAL) && b_reorient;
-
-    const es_format_t *p_tmpdst = p_dst;
-
-    if( ! (b_do_scale || b_do_chroma || b_do_orient) )
-        return VLC_SUCCESS;
-
-    es_format_t tmpdst;
-    if( b_do_orient )
-    {
-        es_format_Init( &tmpdst, VIDEO_ES, p_dst->video.i_chroma );
-        video_format_ApplyRotation( &tmpdst.video, &p_dst->video );
-        p_tmpdst = &tmpdst;
-    }
-
-    msg_Dbg( p_stream, "adding (scale %d,chroma %d, orient %d) converters",
-                b_do_scale, b_do_chroma, b_do_orient );
-
-    id->p_conv_nonstatic = filter_chain_NewVideo( p_stream, true, &owner );
-    if( !id->p_conv_nonstatic )
-        return VLC_EGENERIC;
-    filter_chain_Reset( id->p_conv_nonstatic, *pp_src, *pp_src_vctx, p_tmpdst );
-
-    if( filter_chain_AppendConverter( id->p_conv_nonstatic, p_tmpdst ) != VLC_SUCCESS )
-        return VLC_EGENERIC;
-
-    *pp_src = filter_chain_GetFmtOut( id->p_conv_nonstatic );
-    *pp_src_vctx = filter_chain_GetVideoCtxOut( id->p_conv_nonstatic );
-    debug_format( p_stream, *pp_src );
-
-    if( ((*pp_src)->video.orientation != ORIENT_NORMAL) && b_reorient )
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
-}
-
 static inline bool transcode_video_filters_configured( const sout_stream_id_sys_t *id )
 {
     return !!id->p_f_chain;
@@ -359,11 +307,6 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
         src_ctx = filter_chain_GetVideoCtxOut( id->p_f_chain );
     }
 
-    /* Chroma and other conversions */
-    if( transcode_video_set_conversions( p_stream, id, &p_src, &src_ctx, p_dst
-                                         false ) != VLC_SUCCESS )
-        return VLC_EGENERIC;
-
     /* User filters */
     if( p_cfg->psz_filters )
     {
@@ -400,7 +343,6 @@ void transcode_video_clean( sout_stream_id_sys_t *id )
 
     /* Close filters */
     transcode_remove_filters( &id->p_f_chain );
-    transcode_remove_filters( &id->p_conv_nonstatic );
     transcode_remove_filters( &id->p_uf_chain );
     transcode_remove_filters( &id->p_final_conv_static );
     if( id->p_spu_blender )
@@ -538,7 +480,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                         );
                 /* Close filters, encoder format input can't change */
                 transcode_remove_filters( &id->p_f_chain );
-                transcode_remove_filters( &id->p_conv_nonstatic );
                 transcode_remove_filters( &id->p_uf_chain );
                 transcode_remove_filters( &id->p_final_conv_static );
                 if( id->p_spu_blender )
@@ -637,14 +578,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         for ( picture_t *p_in = p_pic; ; p_in = NULL /* drain second time */ )
         {
             /* Run filter chain */
-            filter_chain_t * primary_chains[] = { id->p_f_chain,
-                                                  id->p_conv_nonstatic };
-            for( size_t i=0; p_in && i<ARRAY_SIZE(primary_chains); i++ )
-            {
-                if( !primary_chains[i] )
-                    continue;
-                p_in = filter_chain_VideoFilter( primary_chains[i], p_in );
-            }
+            if( id->p_f_chain )
+                p_in = filter_chain_VideoFilter( id->p_f_chain, p_in );
 
             if( !p_in )
                 break;
@@ -685,7 +620,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             transcode_encoder_close( id->encoder );
             /* Close filters */
             transcode_remove_filters( &id->p_f_chain );
-            transcode_remove_filters( &id->p_conv_nonstatic );
             transcode_remove_filters( &id->p_uf_chain );
             transcode_remove_filters( &id->p_final_conv_static );
             tag_last_block_with_flag( out, BLOCK_FLAG_END_OF_SEQUENCE );
