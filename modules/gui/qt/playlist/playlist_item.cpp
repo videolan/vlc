@@ -87,7 +87,7 @@ void PlaylistItem::sync() {
 
 PlaylistItem::operator bool() const
 {
-    return d;
+    return d && d->item.get();
 }
 
 
