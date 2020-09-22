@@ -33,6 +33,18 @@ class MLGenreModel : public MLSlidingWindowModel<MLGenre>
     Q_OBJECT
 
 public:
+    enum Roles
+    {
+        GENRE_ID = Qt::UserRole + 1,
+        GENRE_NAME,
+        GENRE_NB_TRACKS,
+        GENRE_ARTISTS,
+        GENRE_TRACKS,
+        GENRE_ALBUMS,
+        GENRE_COVER
+    };
+
+public:
     explicit MLGenreModel(QObject *parent = nullptr);
     virtual ~MLGenreModel() = default;
 

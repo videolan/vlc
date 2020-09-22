@@ -74,6 +74,18 @@ class NetworkMediaModel : public QAbstractListModel, public NetworkSourceListene
     Q_OBJECT
 
 public:
+    enum Role {
+        NETWORK_NAME = Qt::UserRole + 1,
+        NETWORK_MRL,
+        NETWORK_INDEXED,
+        NETWORK_CANINDEX,
+        NETWORK_TYPE,
+        NETWORK_PROTOCOL,
+        NETWORK_TREE,
+        NETWORK_SOURCE,
+        NETWORK_ARTWORK,
+    };
+
     enum ItemType{
         // qt version of input_item_type_e
         TYPE_UNKNOWN = ITEM_TYPE_UNKNOWN,

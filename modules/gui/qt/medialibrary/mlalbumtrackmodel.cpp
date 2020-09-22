@@ -18,26 +18,6 @@
 
 #include "mlalbumtrackmodel.hpp"
 
-namespace {
-
-enum Role {
-    TRACK_ID = Qt::UserRole + 1,
-    TRACK_TITLE,
-    TRACK_COVER,
-    TRACK_NUMBER,
-    TRACK_DISC_NUMBER,
-    TRACK_DURATION,
-    TRACK_DURATION_SHORT,
-    TRACK_ALBUM,
-    TRACK_ARTIST,
-
-    TRACK_TITLE_FIRST_SYMBOL,
-    TRACK_ALBUM_FIRST_SYMBOL,
-    TRACK_ARTIST_FIRST_SYMBOL,
-};
-
-}
-
 QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumTrackModel::M_names_to_criteria = {
     {"id", VLC_ML_SORTING_DEFAULT},
     {"title", VLC_ML_SORTING_ALPHA},

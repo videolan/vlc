@@ -39,6 +39,17 @@ class NetworkDeviceModel : public QAbstractListModel, public NetworkSourceListen
 {
     Q_OBJECT
 public:
+
+    enum Role {
+        NETWORK_NAME = Qt::UserRole + 1,
+        NETWORK_MRL,
+        NETWORK_TYPE,
+        NETWORK_PROTOCOL,
+        NETWORK_SOURCE,
+        NETWORK_TREE,
+        NETWORK_ARTWORK,
+    };
+
     enum ItemType{
         // qt version of input_item_type_e
         TYPE_UNKNOWN = ITEM_TYPE_UNKNOWN,

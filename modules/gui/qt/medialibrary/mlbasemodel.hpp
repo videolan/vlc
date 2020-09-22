@@ -84,6 +84,7 @@ protected:
         return "";
     }
 
+public:
     MLParentId parentId() const;
     void setParentId(MLParentId parentId);
     void unsetParentId();
@@ -102,6 +103,7 @@ protected:
 
     virtual unsigned int getCount() const = 0;
 
+protected:
     virtual void onVlcMlEvent( const vlc_ml_event_t* event );
 
     MLParentId m_parent;

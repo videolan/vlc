@@ -33,6 +33,23 @@ class MLAlbumTrackModel : public MLSlidingWindowModel<MLAlbumTrack>
     Q_OBJECT
 
 public:
+    enum Roles {
+        TRACK_ID = Qt::UserRole + 1,
+        TRACK_TITLE,
+        TRACK_COVER,
+        TRACK_NUMBER,
+        TRACK_DISC_NUMBER,
+        TRACK_DURATION,
+        TRACK_DURATION_SHORT,
+        TRACK_ALBUM,
+        TRACK_ARTIST,
+
+        TRACK_TITLE_FIRST_SYMBOL,
+        TRACK_ALBUM_FIRST_SYMBOL,
+        TRACK_ARTIST_FIRST_SYMBOL,
+    };
+
+public:
     explicit MLAlbumTrackModel(QObject *parent = nullptr);
 
     virtual ~MLAlbumTrackModel() = default;

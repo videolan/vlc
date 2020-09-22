@@ -18,28 +18,6 @@
 
 #include "mlvideomodel.hpp"
 
-namespace {
-
-enum Role {
-    VIDEO_ID = Qt::UserRole + 1,
-    VIDEO_TITLE,
-    VIDEO_THUMBNAIL,
-    VIDEO_DURATION,
-    VIDEO_DURATION_SHORT,
-    VIDEO_PROGRESS,
-    VIDEO_PLAYCOUNT,
-    VIDEO_RESOLUTION,
-    VIDEO_CHANNEL,
-    VIDEO_MRL,
-    VIDEO_DISPLAY_MRL,
-    VIDEO_VIDEO_TRACK,
-    VIDEO_AUDIO_TRACK,
-
-    VIDEO_TITLE_FIRST_SYMBOL,
-};
-
-}
-
 QHash<QByteArray, vlc_ml_sorting_criteria_t> MLVideoModel::M_names_to_criteria = {
     {"id", VLC_ML_SORTING_DEFAULT},
     {"title", VLC_ML_SORTING_ALPHA},

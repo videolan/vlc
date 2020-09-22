@@ -23,22 +23,6 @@
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
 
-namespace {
-
-enum Role {
-    NETWORK_NAME = Qt::UserRole + 1,
-    NETWORK_MRL,
-    NETWORK_INDEXED,
-    NETWORK_CANINDEX,
-    NETWORK_TYPE,
-    NETWORK_PROTOCOL,
-    NETWORK_TREE,
-    NETWORK_SOURCE,
-    NETWORK_ARTWORK,
-};
-
-}
-
 NetworkMediaModel::NetworkMediaModel( QObject* parent )
     : QAbstractListModel( parent )
     , m_preparseSem(1)

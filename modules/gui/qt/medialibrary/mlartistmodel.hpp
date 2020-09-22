@@ -30,6 +30,16 @@
 class MLArtistModel : public MLSlidingWindowModel<MLArtist>
 {
     Q_OBJECT
+public:
+    enum Roles
+    {
+        ARTIST_ID = Qt::UserRole + 1,
+        ARTIST_NAME,
+        ARTIST_SHORT_BIO,
+        ARTIST_COVER,
+        ARTIST_NB_ALBUMS,
+        ARTIST_NB_TRACKS
+    };
 
 public:
     explicit MLArtistModel(QObject *parent = nullptr);
