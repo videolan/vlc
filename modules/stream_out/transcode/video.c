@@ -279,8 +279,8 @@ static int transcode_video_set_conversions( sout_stream_t *p_stream,
         .sys = id,
     };
 
-    const bool b_do_scale = (*pp_src)->video.i_width != p_dst->video.i_width ||
-                            (*pp_src)->video.i_height != p_dst->video.i_height;
+    const bool b_do_scale = (*pp_src)->video.i_visible_width != p_dst->video.i_visible_width ||
+                            (*pp_src)->video.i_visible_height != p_dst->video.i_visible_height;
     const bool b_do_chroma = (*pp_src)->video.i_chroma != p_dst->video.i_chroma;
     const bool b_do_orient = ((*pp_src)->video.orientation != ORIENT_NORMAL) && b_reorient;
 
