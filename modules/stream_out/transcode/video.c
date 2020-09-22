@@ -360,8 +360,8 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
     }
 
     /* Chroma and other conversions */
-    if( transcode_video_set_conversions( p_stream, id, &p_src, &src_ctx, p_dst,
-                                         p_cfg->video.b_reorient ) != VLC_SUCCESS )
+    if( transcode_video_set_conversions( p_stream, id, &p_src, &src_ctx, p_dst
+                                         false ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
     /* User filters */
@@ -593,8 +593,19 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 if ( !id->p_final_conv_static )
                     id->p_final_conv_static =
                         filter_chain_NewVideo( p_stream, false, NULL );
+
+                const es_format_t *p_fmt_filtered = &filter_fmt_out;
+                es_format_t tmpdst;
+                if ( id->p_filterscfg->video.b_reorient &&
+                    filter_fmt_out.video.orientation != ORIENT_NORMAL )
+                {
+                    es_format_Init( &tmpdst, VIDEO_ES, p_fmt_filtered->video.i_chroma );
+                    video_format_ApplyRotation( &tmpdst.video, &p_fmt_filtered->video );
+                    p_fmt_filtered = &tmpdst;
+                }
+
                 filter_chain_Reset( id->p_final_conv_static,
-                                    &filter_fmt_out,
+                                    p_fmt_filtered,
                                     //encoder_vctx_in,
                                     NULL,
                                     encoder_fmt_in );
