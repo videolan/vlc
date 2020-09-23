@@ -212,6 +212,7 @@ static void entry_meta_Clean( struct entry_meta_s *e )
     free( e->psz_tvgid );
     free( e->psz_grouptitle );
     while( e->i_options-- ) free( (char*)e->ppsz_options[e->i_options] );
+    TAB_CLEAN( e->i_options, e->ppsz_options );
 }
 
 static void parseEXTINF( char *, char *(*)(const char *), struct entry_meta_s * );
