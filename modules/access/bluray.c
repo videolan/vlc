@@ -1222,6 +1222,8 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
             p_es = p_pair->p_es;
             if(!es_format_IsSimilar(p_fmt, &p_pair->fmt) ||
                p_fmt->b_packetized != p_pair->fmt.b_packetized ||
+               strcmp(fmt.psz_language ? fmt.psz_language : "",
+                      p_pair->fmt.psz_language ? p_pair->fmt.psz_language : "") ||
                esout_sys->b_restart_decoders_on_reuse)
             {
                 es_out_Control(esout_sys->p_dst_out, ES_OUT_SET_ES_FMT, p_pair->p_es, &fmt);
