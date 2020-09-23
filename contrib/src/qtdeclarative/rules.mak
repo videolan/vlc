@@ -46,12 +46,14 @@ QT_DECLARATIVE_CONFIG := \
 		sub-quickwidgets-install_subtargets \
 		sub-imports-install_subtargets \
 		sub-qmlmodels-install_subtargets \
-		sub-qmlworkerscript-install_subtargets
+		sub-qmlworkerscript-install_subtargets \
+		sub-quickshapes-install_subtargets
 	cd $</tools && $(PREFIX)/lib/qt5/bin/qmake -o Makefile tools.pro
 	cd $< && $(MAKE) -C tools sub-qmlcachegen-install_subtargets
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick.2 qtquick2plugin
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick/Layouts qquicklayoutsplugin
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick/Window.2 windowplugin
+	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Quick qml/QtQuick/Shapes qmlshapesplugin
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Qml qml/QtQml qmlplugin
 	$(SRC)/qt/AddStaticLink.sh "$(PREFIX)" Qt5Qml qml/QtQml/Models.2 modelsplugin
 
