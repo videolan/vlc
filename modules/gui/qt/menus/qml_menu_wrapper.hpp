@@ -30,6 +30,7 @@ class MLAlbumModel;
 class MLGenreModel;
 class MLArtistModel;
 class MLAlbumTrackModel;
+class MLUrlModel;
 class MLVideoModel;
 class NetworkMediaModel;
 class QmlMainContext;
@@ -126,6 +127,14 @@ public slots:
     void popup(const QModelIndexList& selected, QPoint pos, QVariantMap options = {});
 };
 
+class URLContextMenu : public BaseMedialibMenu {
+    Q_OBJECT
+    SIMPLE_MENU_PROPERTY(MLUrlModel*, model, nullptr)
+public:
+    URLContextMenu(QObject* parent = nullptr);
+public slots:
+    void popup(const QModelIndexList& selected, QPoint pos, QVariantMap options = {});
+};
 
 class VideoContextMenu : public QObject {
     Q_OBJECT

@@ -24,6 +24,7 @@
 #include "medialibrary/mlartistmodel.hpp"
 #include "medialibrary/mlgenremodel.hpp"
 #include "medialibrary/mlalbumtrackmodel.hpp"
+#include "medialibrary/mlurlmodel.hpp"
 #include "network/networkmediamodel.hpp"
 #include "playlist/playlist_controller.hpp"
 #include "playlist/playlist_model.hpp"
@@ -157,6 +158,16 @@ void AlbumTrackContextMenu::popup(const QModelIndexList &selected, QPoint pos, Q
 {
     BaseMedialibMenu::popup(m_model, MLAlbumTrackModel::TRACK_ID, selected, pos, options);
 }
+
+URLContextMenu::URLContextMenu(QObject* parent)
+    : BaseMedialibMenu(parent)
+{}
+
+void URLContextMenu::popup(const QModelIndexList &selected, QPoint pos, QVariantMap options)
+{
+    BaseMedialibMenu::popup(m_model, MLUrlModel::URL_ID, selected, pos, options);
+}
+
 
 VideoContextMenu::VideoContextMenu(QObject* parent)
     : QObject(parent)
