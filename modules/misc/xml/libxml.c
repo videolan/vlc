@@ -183,16 +183,6 @@ skip:
     return likely(p_sys->node != NULL) ? ret : XML_READER_ERROR;
 }
 
-#if 0
-static char *ReaderValue( xml_reader_t *p_reader )
-{
-    const xmlChar *psz_value =
-        xmlTextReaderConstValue( p_reader->p_sys->xml );
-
-    return psz_value ? strdup( (const char *)psz_value ) : NULL;
-}
-#endif
-
 static const char *ReaderNextAttr( xml_reader_t *p_reader, const char **pval )
 {
     xml_reader_sys_t *p_sys = p_reader->p_sys;
