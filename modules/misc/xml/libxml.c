@@ -79,13 +79,25 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-#ifdef LIBXML_GETS_A_CLUE_ABOUT_REENTRANCY_AND_MEMORY_LEAKS
-    vlc_mutex_lock( &lock );
-    xmlCleanupParser();
-    vlc_mutex_unlock( &lock );
-#endif
+    /* /!\
+     * In theory, xmlCleanupParser() should be called here.
+     * Unfortunately that function is not thread-safe,
+     * operating on global state. So even if we would be
+     * able to know when this module is unloaded, we could
+     * still not call it then, as other libraries or the apps
+     * using libVLC could still use libxml themselves.
+     *
+     * Citing the libxml docs for xmlCleanupParser:
+     *
+     * > If your application is multithreaded or has plugin support
+     * > calling this may crash the application if another thread or
+     * > a plugin is still using libxml2. It's sometimes very hard to
+     * > guess if libxml2 is in use in the application, some libraries
+     * > or plugins may use it without notice. In case of doubt abstain
+     * > from calling this function or do it just before calling exit()
+     * > to avoid leak reports from valgrind!
+     */
     VLC_UNUSED(p_this);
-    return;
 }
 
 /*****************************************************************************
@@ -229,6 +241,10 @@ static int ReaderOpen( vlc_object_t *p_this )
     if( !p_libxml_reader )
     {
         free( p_sys );
+        /* /!\
+         * xmlCleanupParser should but can't be called here,
+         * for the same reason as in Close().
+         */
         return VLC_ENOMEM;
     }
 
@@ -253,13 +269,13 @@ static void ReaderClose( vlc_object_t *p_this )
     xml_reader_sys_t *p_sys = p_reader->p_sys;
 
     xmlFreeTextReader( p_sys->xml );
-#ifdef LIBXML_GETS_A_CLUE_ABOUT_REENTRANCY_AND_MEMORY_LEAKS
-    vlc_mutex_lock( &lock );
-    xmlCleanupParser();
-    vlc_mutex_unlock( &lock );
-#endif
     free( p_sys->node );
     free( p_sys );
+
+    /* /!\
+     * xmlCleanupParser should but can't be called here,
+     * same reason as in Close() of the main xml module.
+     */
 }
 
 vlc_module_begin ()
