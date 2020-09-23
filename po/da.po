@@ -10,7 +10,7 @@
 # Nicolai Nystrup-Eriksen <nicolain-e@hotmail.dk>, 2014
 # Peter Jespersen <flywheel@illogical.dk>, 2013
 # Mikkel Scheike <scheike@outlook.com>, 2018
-# scootergrisen <scootergrisen@gmail.com>, 2015-2018
+# scootergrisen <scootergrisen@gmail.com>, 2015-2020
 # Sejani, 2013
 # Ulrik Johansen, 2013-2018
 # Jonas Larsen <jonas@vrt.dk>
@@ -33,8 +33,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2020-09-23 18:29+0200\n"
+"Last-Translator: scootergrisen <scootergrisen@gmail.com>, 2020\n"
 "Language-Team: Danish (https://www.transifex.com/yaron/teams/16553/da/)\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -245,7 +245,7 @@ msgid ""
 "input side of VLC. Use with care..."
 msgstr ""
 "Streamfiltre er særlige moduler, der giver mulighed for avancerede "
-"handlinger på input-siden af VLC. Brug med forsigtighed..."
+"handlinger på input-siden af VLC. Brug med forsigtighed ..."
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
@@ -281,7 +281,7 @@ msgstr "Indstillinger til undertekster, tekst-TV samt CC-dekodere og -kodere."
 
 #: include/vlc_config_cat.h:124
 msgid "General input settings. Use with care..."
-msgstr "Generelle indstillinger for input. Brug med forsigtighed..."
+msgstr "Generelle indstillinger for input. Brug med forsigtighed ..."
 
 #: include/vlc_config_cat.h:127 src/libvlc-module.c:1962
 #: modules/access/avio.h:50
@@ -304,7 +304,7 @@ msgstr ""
 "\"outputtilgangsmodul\", der kan gemme streamen som en fil eller streame den "
 "(UDP, HTTP, RTP/RTSP).\n"
 "Sout-streammoduler giver mulighed for avanceret efterbehandling af stream'en "
-"(konvertering, duplikering osv.)."
+"(konvertering, duplikering ...)."
 
 #: include/vlc_config_cat.h:137
 msgid "General stream output settings"
@@ -425,7 +425,7 @@ msgstr "Avanceret"
 
 #: include/vlc_config_cat.h:185
 msgid "Advanced settings. Use with care..."
-msgstr "Avancerede indstillinger. Brug med forsigtighed..."
+msgstr "Avancerede indstillinger. Brug med forsigtighed ..."
 
 #: include/vlc_config_cat.h:187
 msgid "Advanced settings"
@@ -433,19 +433,19 @@ msgstr "Avancerede indstillinger"
 
 #: include/vlc_intf_strings.h:46
 msgid "&Open File..."
-msgstr "&Åbn fil..."
+msgstr "&Åbn fil ..."
 
 #: include/vlc_intf_strings.h:47
 msgid "&Advanced Open..."
-msgstr "&Avanceret åbn..."
+msgstr "&Avanceret åbn ..."
 
 #: include/vlc_intf_strings.h:48
 msgid "Open D&irectory..."
-msgstr "Åbn &mappe..."
+msgstr "Åbn &mappe ..."
 
 #: include/vlc_intf_strings.h:49
 msgid "Open &Folder..."
-msgstr "Åbn &mappe..."
+msgstr "Åbn &mappe ..."
 
 #: include/vlc_intf_strings.h:50
 msgid "Select one or more files to open"
@@ -506,39 +506,39 @@ msgstr "Fjern markerede"
 
 #: include/vlc_intf_strings.h:67
 msgid "Information..."
-msgstr "Oplysninger..."
+msgstr "Oplysninger ..."
 
 #: include/vlc_intf_strings.h:68
 msgid "Create Directory..."
-msgstr "Opret mappe..."
+msgstr "Opret mappe ..."
 
 #: include/vlc_intf_strings.h:69
 msgid "Create Folder..."
-msgstr "Opret mappe..."
+msgstr "Opret mappe ..."
 
 #: include/vlc_intf_strings.h:70
 msgid "Rename Directory..."
-msgstr "Omdøb mappe..."
+msgstr "Omdøb mappe ..."
 
 #: include/vlc_intf_strings.h:71
 msgid "Rename Folder..."
-msgstr "Omdøb mappe..."
+msgstr "Omdøb mappe ..."
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
-msgstr "Vis overordnet mappe..."
+msgstr "Vis overordnet mappe ..."
 
 #: include/vlc_intf_strings.h:73
 msgid "Show Containing Folder..."
-msgstr "Vis indeholdende mappe..."
+msgstr "Vis indeholdende mappe ..."
 
 #: include/vlc_intf_strings.h:74
 msgid "Stream..."
-msgstr "Stream..."
+msgstr "Stream ..."
 
 #: include/vlc_intf_strings.h:75
 msgid "Save..."
-msgstr "Gem..."
+msgstr "Gem ..."
 
 #: include/vlc_intf_strings.h:79 modules/gui/macosx/VLCCoreInteraction.m:447
 #: modules/gui/macosx/VLCMainMenu.m:399
@@ -567,19 +567,19 @@ msgstr "Tilføj til afspilningsliste"
 
 #: include/vlc_intf_strings.h:85 modules/gui/macosx/VLCPlaylist.m:235
 msgid "Add File..."
-msgstr "Tilføj fil..."
+msgstr "Tilføj fil ..."
 
 #: include/vlc_intf_strings.h:86
 msgid "Add Directory..."
-msgstr "Tilføj mappe..."
+msgstr "Tilføj mappe ..."
 
 #: include/vlc_intf_strings.h:87
 msgid "Add Folder..."
-msgstr "Tilføj mappe..."
+msgstr "Tilføj mappe ..."
 
 #: include/vlc_intf_strings.h:89
 msgid "Save Playlist to &File..."
-msgstr "&Gem afspilningsliste som fil..."
+msgstr "&Gem afspilningsliste som fil ..."
 
 #: include/vlc_intf_strings.h:91 modules/gui/macosx/VLCMainWindow.m:189
 #: modules/gui/qt/components/preferences_widgets.cpp:1138
@@ -916,7 +916,7 @@ msgid ""
 "Press the RETURN key to continue...\n"
 msgstr ""
 "\n"
-"Tryk på RETUR for at fortsætte...\n"
+"Tryk på RETUR for at fortsætte ...\n"
 
 #: src/darwin/error.c:37
 msgid "Unknown error"
@@ -5330,7 +5330,7 @@ msgid ""
 "Downloading... %s/%s %.1f%% done"
 msgstr ""
 "%s\n"
-"Downloader... %s/%s %.1f%% færdig"
+"Downloader ... %s/%s %.1f%% færdig"
 
 #: src/misc/update.c:649
 msgid "File could not be verified"
@@ -15247,7 +15247,7 @@ msgstr "Ødelagt eller manglende AVI-indeks"
 
 #: modules/demux/avi/avi.c:2774
 msgid "Fixing AVI Index..."
-msgstr "Retter AVI-indeks..."
+msgstr "Retter AVI-indeks ..."
 
 #: modules/demux/caf.c:53
 msgid "CAF demuxer"
@@ -16499,12 +16499,12 @@ msgstr "Lydeffekter"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:327
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:393
 msgid "Duplicate current profile..."
-msgstr "Opret en kopi af den nuværende profil..."
+msgstr "Opret en kopi af den nuværende profil ..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:332
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1062
 msgid "Organize Profiles..."
-msgstr "Organiser profiler..."
+msgstr "Organiser profiler ..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:511
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:789
@@ -16564,11 +16564,11 @@ msgstr "Fjern"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:647
 msgid "Add new Preset..."
-msgstr "Tilføj en ny forudindstilling..."
+msgstr "Tilføj en ny forudindstilling ..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:652
 msgid "Organize Presets..."
-msgstr "Organiser forudindstillinger..."
+msgstr "Organiser forudindstillinger ..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:823
 msgid "Save current selection as new preset"
@@ -16712,7 +16712,7 @@ msgstr "Træk og slip mediefiler her"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:139
 #: modules/gui/macosx/VLCMainWindow.m:210
 msgid "Open media..."
-msgstr "Åbn medie..."
+msgstr "Åbn medie ..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:140
 msgid "Choose Profile"
@@ -16720,7 +16720,7 @@ msgstr "Vælg profil"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:141
 msgid "Customize..."
-msgstr "Tilpas..."
+msgstr "Tilpas ..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:142
 msgid "Choose Destination"
@@ -16745,11 +16745,11 @@ msgstr "Vælg en output placering"
 #: modules/gui/qt/ui/open_file.h:146 modules/gui/qt/ui/sprefs_audio.h:414
 #: modules/gui/qt/ui/sprefs_input.h:365 modules/gui/qt/ui/sprefs_video.h:329
 msgid "Browse..."
-msgstr "Gennemse..."
+msgstr "Gennemse ..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:146
 msgid "Setup Streaming..."
-msgstr "Indstil streaming..."
+msgstr "Indstil streaming ..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:404
@@ -16774,7 +16774,7 @@ msgstr "Anvend"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:154
 msgid "Save as new Profile..."
-msgstr "Gem som ny profil..."
+msgstr "Gem som ny profil ..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:155
 #: modules/gui/qt/ui/profiles.h:723
@@ -17355,11 +17355,11 @@ msgstr "Størst"
 
 #: modules/gui/macosx/VLCMainMenu.m:341
 msgid "Check for Update..."
-msgstr "Søg efter opdatering..."
+msgstr "Søg efter opdatering ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:342
 msgid "Preferences..."
-msgstr "Indstillinger..."
+msgstr "Indstillinger ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:348
 msgid "Services"
@@ -17388,23 +17388,23 @@ msgstr "1:Arkiv"
 
 #: modules/gui/macosx/VLCMainMenu.m:355
 msgid "Advanced Open File..."
-msgstr "Avanceret Åbn fil..."
+msgstr "Avanceret Åbn fil ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:356
 msgid "Open File..."
-msgstr "Åbn fil..."
+msgstr "Åbn fil ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:357
 msgid "Open Disc..."
-msgstr "Åbn disk..."
+msgstr "Åbn disk ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:358
 msgid "Open Network..."
-msgstr "Åbn netværk..."
+msgstr "Åbn netværk ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:359
 msgid "Open Capture Device..."
-msgstr "Åbn optageenhed..."
+msgstr "Åbn optageenhed ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:360
 msgid "Open Recent"
@@ -17416,11 +17416,11 @@ msgstr "Luk vindue"
 
 #: modules/gui/macosx/VLCMainMenu.m:362
 msgid "Convert / Stream..."
-msgstr "Konverter/stream..."
+msgstr "Konverter/stream ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:363
 msgid "Save Playlist..."
-msgstr "Gem afspilningsliste..."
+msgstr "Gem afspilningsliste ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:364 modules/gui/macosx/VLCPlaylist.m:234
 msgid "Reveal in Finder"
@@ -17547,7 +17547,7 @@ msgstr "Efterbehandling"
 
 #: modules/gui/macosx/VLCMainMenu.m:451
 msgid "Add Subtitle File..."
-msgstr "Tilføj undertekstfil..."
+msgstr "Tilføj undertekstfil ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:452 modules/gui/macosx/VLCMainMenu.m:453
 msgid "Subtitles Track"
@@ -17591,39 +17591,39 @@ msgstr "Minimer"
 
 #: modules/gui/macosx/VLCMainMenu.m:476
 msgid "Player..."
-msgstr "Afspiller..."
+msgstr "Afspiller ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:477
 msgid "Main Window..."
-msgstr "Hovedvindue..."
+msgstr "Hovedvindue ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:478
 msgid "Audio Effects..."
-msgstr "Lydeffekter..."
+msgstr "Lydeffekter ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:479
 msgid "Video Effects..."
-msgstr "Videoeffekter..."
+msgstr "Videoeffekter ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:480
 msgid "Bookmarks..."
-msgstr "Bogmærker..."
+msgstr "Bogmærker ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:481
 msgid "Playlist..."
-msgstr "Afspilningsliste..."
+msgstr "Afspilningsliste ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:482 modules/gui/macosx/VLCPlaylist.m:233
 msgid "Media Information..."
-msgstr "Medieoplysninger..."
+msgstr "Medieoplysninger ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:483
 msgid "Messages..."
-msgstr "Meddelelser..."
+msgstr "Meddelelser ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:484
 msgid "Errors and Warnings..."
-msgstr "Fejl og advarsler..."
+msgstr "Fejl og advarsler ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:486
 msgid "Bring All to Front"
@@ -17636,23 +17636,23 @@ msgstr "Hjælp"
 
 #: modules/gui/macosx/VLCMainMenu.m:489
 msgid "VLC media player Help..."
-msgstr "VLC media player-hjælp..."
+msgstr "VLC media player-hjælp ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:491
 msgid "Online Documentation..."
-msgstr "Dokumentation på nettet..."
+msgstr "Dokumentation på nettet ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:492
 msgid "VideoLAN Website..."
-msgstr "VideoLANs websted..."
+msgstr "VideoLANs websted ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:493
 msgid "Make a donation..."
-msgstr "Giv et bidrag..."
+msgstr "Giv et bidrag ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:494
 msgid "Online Forum..."
-msgstr "Onlineforum..."
+msgstr "Onlineforum ..."
 
 #: modules/gui/macosx/VLCMainMenu.m:1158
 msgid "File Format:"
@@ -17811,7 +17811,7 @@ msgstr "Stream-output:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
-msgstr "Indstillinger..."
+msgstr "Indstillinger ..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
 msgid "Choose media input type"
@@ -17854,7 +17854,7 @@ msgstr "Afspil andet medie samtidig"
 #: modules/gui/macosx/VLCSimplePrefsController.m:345
 #: modules/gui/qt/ui/sprefs_interface.h:545
 msgid "Choose..."
-msgstr "Vælg..."
+msgstr "Vælg ..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:153
 msgid "Select another file to play in sync with the previously selected file"
@@ -18922,7 +18922,7 @@ msgstr "Gennemsigtighed"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:398
 msgid "Organize profiles..."
-msgstr "Organiser profiler..."
+msgstr "Organiser profiler ..."
 
 #: modules/gui/macosx/misc.m:301
 msgid "B"
@@ -20184,7 +20184,7 @@ msgstr "Filnavn"
 #: modules/gui/qt/components/sout/sout_widgets.cpp:173
 #: modules/gui/qt/dialogs/convert.cpp:161
 msgid "Save file..."
-msgstr "Gem fil..."
+msgstr "Gem fil ..."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:174
 msgid ""
@@ -20382,7 +20382,7 @@ msgstr "Gem kodeordet"
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
 msgid "Privacy and Network Access Policy"
-msgstr "Privatlivs- og netværksadgangspolitik"
+msgstr "Regler for privatliv og netværksadgang"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:69
 msgid ""
@@ -20401,7 +20401,7 @@ msgstr ""
 "b> personlige data og videregiver dem heller ikke, selv i anonym form, til "
 "andre.</p>\n"
 "<p>Ikke desto mindre, er <i>VLC</i> i stand til automatisk at hente "
-"oplysninger om medierne i din afspilningsliste fra internet-baseret "
+"oplysninger om medierne i din afspilningsliste fra internetbaseret "
 "tredjepartstjenester. Det inkludere coverbillede, spornavne, kunstnernavne "
 "og andet metadata.</p>\n"
 "<p>Som følge heraf, kan nogle af dine mediefiler identificeres af "
@@ -20411,7 +20411,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:88
 msgid "Network Access Policy"
-msgstr "Netværksadgangspolitik"
+msgstr "Regler for netværksadgang"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:100
 msgid "Regularly check for VLC updates"
@@ -20480,7 +20480,7 @@ msgstr "Du har den seneste version af VLC media player."
 
 #: modules/gui/qt/dialogs/help.cpp:326
 msgid "An error occurred while checking for updates..."
-msgstr "Der opstod en fejl ved søgning efter opdateringer..."
+msgstr "Der opstod en fejl ved søgning efter opdateringer ..."
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:52
 msgid "Current Media Information"
@@ -20522,7 +20522,7 @@ msgstr "Gemmer alle de viste logge til en fil"
 
 #: modules/gui/qt/dialogs/messages.cpp:259
 msgid "Save log file as..."
-msgstr "Gem logfil som..."
+msgstr "Gem logfil som ..."
 
 #: modules/gui/qt/dialogs/messages.cpp:261
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
@@ -20601,7 +20601,7 @@ msgstr "Åbn URL"
 
 #: modules/gui/qt/dialogs/openurl.cpp:64
 msgid "Enter URL here..."
-msgstr "Angiv URL her..."
+msgstr "Angiv URL her ..."
 
 #: modules/gui/qt/dialogs/openurl.cpp:67
 msgid "Please enter the URL or path to the media you want to play."
@@ -20640,7 +20640,7 @@ msgstr "&Søg:"
 #: modules/gui/qt/dialogs/plugins.cpp:251
 #: modules/gui/qt/dialogs/plugins.cpp:1284
 msgid "More information..."
-msgstr "Flere oplysninger..."
+msgstr "Flere oplysninger ..."
 
 #: modules/gui/qt/dialogs/plugins.cpp:259
 msgid "Reload extensions"
@@ -20685,7 +20685,7 @@ msgstr "Kun de installerede"
 
 #: modules/gui/qt/dialogs/plugins.cpp:523
 msgid "Retrieving addons..."
-msgstr "Henter tilføjelser..."
+msgstr "Henter tilføjelser ..."
 
 #: modules/gui/qt/dialogs/plugins.cpp:534
 msgid "No addons found"
@@ -20984,7 +20984,7 @@ msgstr "&Eksporter"
 
 #: modules/gui/qt/dialogs/vlm.cpp:264
 msgid "Save VLM configuration as..."
-msgstr "Gem VLM-opsætning som..."
+msgstr "Gem VLM-opsætning som ..."
 
 #: modules/gui/qt/dialogs/vlm.cpp:266 modules/gui/qt/dialogs/vlm.cpp:335
 msgid "VLM conf (*.vlm);;All (*)"
@@ -20992,7 +20992,7 @@ msgstr "VLM-konf. (*.vlm);;Alle (*)"
 
 #: modules/gui/qt/dialogs/vlm.cpp:333
 msgid "Open VLM configuration..."
-msgstr "Åbn VLM-opsætning..."
+msgstr "Åbn VLM-opsætning ..."
 
 #: modules/gui/qt/dialogs/vlm.cpp:532
 msgid "Broadcast: "
@@ -21016,7 +21016,7 @@ msgstr "Åbn mappe"
 
 #: modules/gui/qt/dialogs_provider.cpp:629
 msgid "Open playlist..."
-msgstr "Åbn afspilningsliste..."
+msgstr "Åbn afspilningsliste ..."
 
 #: modules/gui/qt/dialogs_provider.cpp:652
 msgid "XSPF playlist"
@@ -21032,11 +21032,11 @@ msgstr "M3U8-afspilningsliste"
 
 #: modules/gui/qt/dialogs_provider.cpp:672
 msgid "Save playlist as..."
-msgstr "Gem afspilningsliste som..."
+msgstr "Gem afspilningsliste som ..."
 
 #: modules/gui/qt/dialogs_provider.cpp:820
 msgid "Open subtitles..."
-msgstr "Åbn undertekster..."
+msgstr "Åbn undertekster ..."
 
 #: modules/gui/qt/dialogs_provider.hpp:40
 msgid "Media Files"
@@ -21110,23 +21110,23 @@ msgstr "&Hjælp"
 
 #: modules/gui/qt/menus.cpp:357
 msgid "Open &File..."
-msgstr "Åbn &fil..."
+msgstr "Åbn &fil ..."
 
 #: modules/gui/qt/menus.cpp:359
 msgid "&Open Multiple Files..."
-msgstr "Åbn f&lere filer..."
+msgstr "Åbn f&lere filer ..."
 
 #: modules/gui/qt/menus.cpp:363 modules/gui/qt/menus.cpp:939
 msgid "Open &Disc..."
-msgstr "Åbn &disk..."
+msgstr "Åbn &disk ..."
 
 #: modules/gui/qt/menus.cpp:365
 msgid "Open &Network Stream..."
-msgstr "Åbn &netværksstream..."
+msgstr "Åbn &netværksstream ..."
 
 #: modules/gui/qt/menus.cpp:367 modules/gui/qt/menus.cpp:943
 msgid "Open &Capture Device..."
-msgstr "Åbn &optageenhed..."
+msgstr "Åbn &optageenhed ..."
 
 #: modules/gui/qt/menus.cpp:370
 msgid "Open &Location from clipboard"
@@ -21138,11 +21138,11 @@ msgstr "Åbn s&eneste medier"
 
 #: modules/gui/qt/menus.cpp:387
 msgid "Conve&rt / Save..."
-msgstr "&Konverter / gem..."
+msgstr "&Konverter / gem ..."
 
 #: modules/gui/qt/menus.cpp:389
 msgid "&Stream..."
-msgstr "&Stream..."
+msgstr "&Stream ..."
 
 #: modules/gui/qt/menus.cpp:394
 msgid "Quit at the end of playlist"
@@ -21170,7 +21170,7 @@ msgstr "Plu&gins og udvidelser"
 
 #: modules/gui/qt/menus.cpp:442
 msgid "Customi&ze Interface..."
-msgstr "&Tilpas brugerflade..."
+msgstr "&Tilpas brugerflade ..."
 
 #: modules/gui/qt/menus.cpp:445
 msgid "&Preferences"
@@ -21250,7 +21250,7 @@ msgstr "&Visualiseringer"
 
 #: modules/gui/qt/menus.cpp:653
 msgid "Add &Subtitle File..."
-msgstr "Tilføj &undertekstfil..."
+msgstr "Tilføj &undertekstfil ..."
 
 #: modules/gui/qt/menus.cpp:655
 msgid "Sub &Track"
@@ -21314,7 +21314,7 @@ msgstr "&Håndter"
 
 #: modules/gui/qt/menus.cpp:790
 msgid "Check for &Updates..."
-msgstr "Søg efter &opdateringer..."
+msgstr "Søg efter &opdateringer ..."
 
 #: modules/gui/qt/menus.cpp:837
 msgid "&Stop"
@@ -21358,7 +21358,7 @@ msgstr "Ctrl+T"
 
 #: modules/gui/qt/menus.cpp:941
 msgid "Open &Network..."
-msgstr "Åbn &netværk..."
+msgstr "Åbn &netværk ..."
 
 #: modules/gui/qt/menus.cpp:1035
 msgid "Leave Fullscreen"
@@ -21394,7 +21394,7 @@ msgstr "<Local>"
 
 #: modules/gui/qt/menus.cpp:1646
 msgid "Scanning..."
-msgstr "Skanner..."
+msgstr "Skanner ..."
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -21498,7 +21498,7 @@ msgstr "Antal dage mellem søgninger"
 
 #: modules/gui/qt/qt.cpp:130
 msgid "Ask for network policy at start"
-msgstr "Spørg efter netværkspolitik ved start"
+msgstr "Spørg efter regler for netværk ved start"
 
 #: modules/gui/qt/qt.cpp:132
 msgid "Save the recently played items in the menu"
@@ -21741,7 +21741,7 @@ msgstr "Vælg skin"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
 msgid "Open skin..."
-msgstr "Åben skin..."
+msgstr "Åben skin ..."
 
 #: modules/hw/d3d11/d3d11_filters.c:86 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -28422,7 +28422,7 @@ msgstr "FFT vindue"
 #: modules/visualization/visual/visual.c:63
 msgid "The type of FFT window to use for spectrum-based visualizations."
 msgstr ""
-"Typen af FFT-vindue der skal bruges til spektrum-baseret visualiseringer."
+"Typen af FFT-vindue der skal bruges til spektrumbaseret visualiseringer."
 
 #: modules/visualization/visual/visual.c:65
 msgid "Kaiser window parameter"
@@ -28697,7 +28697,7 @@ msgstr "Opdater liste"
 
 #: share/lua/http/index.html:252
 msgid "Loading flowplayer..."
-msgstr "Indlæser flowplayer..."
+msgstr "Indlæser flowplayer ..."
 
 #: share/lua/http/index.html:252
 msgid "If nothing appears, check your internet connection."
@@ -28790,7 +28790,7 @@ msgstr "&Filter:"
 
 #: modules/gui/qt/ui/messages_panel.h:139
 msgid "&Save as..."
-msgstr "Gem &som..."
+msgstr "Gem &som ..."
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "Modules Tree"
@@ -28878,7 +28878,7 @@ msgstr "Få adgang til avancerede indstillinger for at finjustere enheden"
 
 #: modules/gui/qt/ui/open_capture.h:103
 msgid "Advanced options..."
-msgstr "Avancerede indstillinger..."
+msgstr "Avancerede indstillinger ..."
 
 #: modules/gui/qt/ui/open_disk.h:294
 msgid "Disc Selection"
@@ -28930,7 +28930,7 @@ msgstr "Her kan du vælge lokale filer."
 
 #: modules/gui/qt/ui/open_file.h:152
 msgid "Add..."
-msgstr "Tilføj..."
+msgstr "Tilføj ..."
 
 #: modules/gui/qt/ui/open_net.h:94
 msgid "Network Protocol"
@@ -29234,7 +29234,7 @@ msgstr "Live555 stream transport"
 
 #: modules/gui/qt/ui/sprefs_input.h:373
 msgid "Default caching policy"
-msgstr "Standard cachingpolitik"
+msgstr "Standardregler for mellemlager"
 
 #: modules/gui/qt/ui/sprefs_interface.h:528
 msgid "Menus language:"
@@ -29242,7 +29242,7 @@ msgstr "Menusprog:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:529
 msgid "Look and feel"
-msgstr "Udseende og funktionsmåde"
+msgstr "Udseende og fremtoning"
 
 #: modules/gui/qt/ui/sprefs_interface.h:530
 msgid "Use custom skin"
@@ -29334,7 +29334,7 @@ msgstr "Tilknytning af filtyper"
 
 #: modules/gui/qt/ui/sprefs_interface.h:565
 msgid "Set up associations..."
-msgstr "Indstil tilknytninger..."
+msgstr "Indstil tilknytninger ..."
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:288
 msgid "Enable On Screen Display (OSD)"
@@ -29462,7 +29462,7 @@ msgstr "Søg efter opdateringer til VLC"
 
 #: modules/gui/qt/ui/update.h:146
 msgid "Launching an update request..."
-msgstr "Starter en opdateringsanmodning..."
+msgstr "Starter en opdateringsanmodning ..."
 
 #: modules/gui/qt/ui/update.h:147
 msgid "Do you want to download it?"
@@ -29496,7 +29496,7 @@ msgstr "Vinkel"
 #: modules/gui/qt/ui/video_effects.h:1267
 #: modules/gui/qt/ui/video_effects.h:1284
 msgid "..."
-msgstr "..."
+msgstr " ..."
 
 #: modules/gui/qt/ui/video_effects.h:1272
 msgid "full"
