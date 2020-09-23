@@ -113,15 +113,14 @@ Widgets.NavigableFocusScope {
 
                 opacity: videosGV.expandIndex !== -1 && videosGV.expandIndex !== videoGridItem.index ? .7 : 1
 
-                onContextMenuButtonClicked:  contextMenu.popup(selectionModel.selectedIndexes, globalMousePos, {
-                    "information" : index
-                } )
-
-                onItemClicked : {
-                    selectionModel.updateSelection( modifier , videosGV.currentIndex, index)
-                    videosGV.currentIndex = index
-                    videosGV.forceActiveFocus()
+                onContextMenuButtonClicked: {
+                    videosGV.rightClickOnItem(index)
+                    contextMenu.popup(selectionModel.selectedIndexes, globalMousePos, {
+                        "information" : index
+                    } )
                 }
+
+                onItemClicked : videosGV.leftClickOnItem(modifier, index)
 
                 Behavior on opacity {
                     NumberAnimation {

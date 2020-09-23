@@ -143,11 +143,7 @@ Widgets.NavigableFocusScope {
                 height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
 
                 onPlayClicked: selectionModel.model.addAndPlay( index )
-                onItemClicked : {
-                    selectionModel.updateSelection( modifier ,  view.currentItem.currentIndex, index)
-                    view.currentItem.currentIndex = index
-                    delegateGrid.forceActiveFocus()
-                }
+                onItemClicked : gridView.leftClickOnItem(modifier, index)
 
                 onItemDoubleClicked: {
                     if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
@@ -157,6 +153,7 @@ Widgets.NavigableFocusScope {
                 }
 
                 onContextMenuButtonClicked: {
+                    gridView.rightClickOnItem(index)
                     contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
             }

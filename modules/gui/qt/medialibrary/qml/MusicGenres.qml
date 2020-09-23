@@ -146,17 +146,15 @@ Widgets.NavigableFocusScope {
                 playCoverBorder.width: VLCStyle.dp(3, VLCStyle.scale)
 
                 onItemDoubleClicked: root.showAlbumView(model)
-                onItemClicked: {
-                    selectionModel.updateSelection( modifier , view.currentItem.currentIndex, index)
-                    view.currentItem.currentIndex = index
-                    view.currentItem.forceActiveFocus()
-                }
+                onItemClicked: gridView_id.leftClickOnItem(index)
+
                 onPlayClicked: {
                     if (model.id)
                         medialib.addAndPlay(model.id)
                 }
 
                 onContextMenuButtonClicked: {
+                    gridView_id.rightClickOnItem(index)
                     contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
                 }
 

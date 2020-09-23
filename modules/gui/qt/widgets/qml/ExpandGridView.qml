@@ -166,6 +166,18 @@ NavigableFocusScope {
             animateFlickableContentY(newContentY)
     }
 
+    function leftClickOnItem(modifier, index) {
+        delegateModel.updateSelection( modifier , currentIndex, index)
+        currentIndex = index
+        root.forceActiveFocus()
+    }
+
+    function rightClickOnItem(index) {
+        if (!delegateModel.isSelected(model.index(index, 0))) {
+            root.leftClickOnItem(Qt.NoModifier, index)
+        }
+    }
+
     function _updateSelected() {
         for (var id in _idChildrenMap) {
             var item = _idChildrenMap[id]

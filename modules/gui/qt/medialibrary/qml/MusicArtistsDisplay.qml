@@ -170,15 +170,14 @@ Widgets.NavigableFocusScope {
                         textHorizontalAlignment: Text.AlignHCenter
                         width: VLCStyle.colWidth(1)
 
-                        onItemClicked: {
-                            selectionModel.updateSelection( modifier , view.currentItem.currentIndex, index )
-                            view.currentItem.currentIndex = index
-                            view.currentItem.forceActiveFocus()
-                        }
+                        onItemClicked: artistGrid.leftClickOnItem(modifier, index)
 
                         onItemDoubleClicked: artistAllView.showAlbumView(model)
 
-                        onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+                        onContextMenuButtonClicked: {
+                            artistGrid.rightClickOnItem(index)
+                            contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+                        }
                     }
                 }
             }

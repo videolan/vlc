@@ -253,17 +253,16 @@ Widgets.NavigableFocusScope {
 
                 opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
 
-                onItemClicked : {
-                    albumSelectionModel.updateSelection( modifier , gridView_id.currentIndex, index )
-                    gridView_id.currentIndex = index
-                    gridView_id.forceActiveFocus()
-                }
+                onItemClicked : gridView_id.leftClickOnItem(modifier, index)
 
                 onItemDoubleClicked: {
                     if ( model.id !== undefined ) { medialib.addAndPlay( model.id ) }
                 }
 
-                onContextMenuButtonClicked: contextMenu.popup(albumSelectionModel.selectedIndexes, globalMousePos, { "information" : index})
+                onContextMenuButtonClicked: {
+                    gridView_id.rightClickOnItem(index)
+                    contextMenu.popup(albumSelectionModel.selectedIndexes, globalMousePos, { "information" : index})
+                }
 
                 Behavior on opacity {
                     NumberAnimation {
