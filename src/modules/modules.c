@@ -199,20 +199,16 @@ ssize_t vlc_module_match(const char *capability, const char *names,
 static int module_load(vlc_logger_t *log, module_t *m,
                        vlc_activate_t init, bool forced, va_list args)
 {
-    int ret = VLC_SUCCESS;
+    va_list ap;
+    int ret;
 
     if (vlc_plugin_Map(log, m->plugin))
         return VLC_EGENERIC;
 
-    if (m->pf_activate != NULL)
-    {
-        va_list ap;
-
-        va_copy (ap, args);
-        ret = init(m->pf_activate, forced, ap);
-        va_end (ap);
-    }
-
+    assert(m->pf_activate != NULL);
+    va_copy(ap, args);
+    ret = init(m->pf_activate, forced, ap);
+    va_end(ap);
     return ret;
 }
 
