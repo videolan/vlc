@@ -196,20 +196,10 @@ ssize_t vlc_module_match(const char *capability, const char *names,
     return matches;
 }
 
-static int module_load(vlc_logger_t *log, module_t *m,
-                       vlc_activate_t init, bool forced, va_list args)
+static
+void *vlc_module_map(vlc_logger_t *log, module_t *module)
 {
-    va_list ap;
-    int ret;
-
-    if (vlc_plugin_Map(log, m->plugin))
-        return VLC_EGENERIC;
-
-    assert(m->pf_activate != NULL);
-    va_copy(ap, args);
-    ret = init(m->pf_activate, forced, ap);
-    va_end(ap);
-    return ret;
+    return vlc_plugin_Map(log, module->plugin) ? NULL : module->pf_activate;
 }
 
 /**
@@ -258,7 +248,16 @@ module_t *(vlc_module_load)(struct vlc_logger *log, const char *capability,
 
     for (size_t i = 0; i < (size_t)total; i++) {
         module_t *cand = mods[i];
-        int ret = module_load(log, cand, probe, i < strict_total, args);
+        int ret = VLC_EGENERIC;
+        void *cb = vlc_module_map(log, cand);
+
+        if (cb != NULL) {
+            va_list ap;
+
+            va_copy(ap, args);
+            ret = probe(cb, i < strict_total, ap);
+            va_end(ap);
+        }
 
         switch (ret) {
             case VLC_SUCCESS:
