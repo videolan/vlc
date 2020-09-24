@@ -118,7 +118,7 @@ static MMAL_FOURCC_T pic_to_slice_mmal_fourcc(MMAL_FOURCC_T fcc)
 
 static picture_t * pic_fifo_get(vlc_picture_chain_t * const pf)
 {
-    return vlc_picture_chain_PopFront( &pf->front );
+    return vlc_picture_chain_PopFront( &pf );
 }
 
 static void pic_fifo_release_all(vlc_picture_chain_t * const pf)

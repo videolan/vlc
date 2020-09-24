@@ -464,7 +464,7 @@ static void Del( sout_stream_t *p_stream, void *id )
     p_es->b_empty = true;
     while ( !vlc_picture_chain_IsEmpty( &p_es->pictures ) )
     {
-        picture_t *es_picture = vlc_picture_chain_PopFront( &p_es->pictures.front );
+        picture_t *es_picture = vlc_picture_chain_PopFront( &p_es->pictures );
         picture_Release( es_picture );
     }
 

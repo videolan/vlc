@@ -70,7 +70,7 @@ void vout_snapshot_Destroy(vout_snapshot_t *snap)
         return;
 
     while ( !vlc_picture_chain_IsEmpty( &snap->pics ) ) {
-        picture_t *picture = vlc_picture_chain_PopFront( &snap->pics.front );
+        picture_t *picture = vlc_picture_chain_PopFront( &snap->pics );
         picture_Release(picture);
     }
 
@@ -108,7 +108,7 @@ picture_t *vout_snapshot_Get(vout_snapshot_t *snap, vlc_tick_t timeout)
         vlc_cond_timedwait(&snap->wait, &snap->lock, deadline) == 0);
 
     /* */
-    picture_t *picture = vlc_picture_chain_PopFront( &snap->pics.front );
+    picture_t *picture = vlc_picture_chain_PopFront( &snap->pics );
     if (!picture && snap->request_count > 0)
         snap->request_count--;
 

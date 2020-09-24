@@ -532,7 +532,7 @@ static void FilterDeletePictures( vlc_picture_chain_t *pictures )
 {
     while( !vlc_picture_chain_IsEmpty( pictures ) )
     {
-        picture_t *next = vlc_picture_chain_PopFront( &pictures->front );
+        picture_t *next = vlc_picture_chain_PopFront( pictures );
         picture_Release( next );
     }
 }

@@ -52,7 +52,7 @@ static void PictureFifoPush(picture_fifo_t *fifo, picture_t *picture)
 }
 static picture_t *PictureFifoPop(picture_fifo_t *fifo)
 {
-    return vlc_picture_chain_PopFront( &fifo->pics.front );
+    return vlc_picture_chain_PopFront( &fifo->pics );
 }
 
 picture_fifo_t *picture_fifo_New(void)
@@ -101,7 +101,7 @@ void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before
     PictureFifoReset(&tmp);
 
     while ( !vlc_picture_chain_IsEmpty( &old_chain ) ) {
-        picture_t *picture = vlc_picture_chain_PopFront( &old_chain.front );
+        picture_t *picture = vlc_picture_chain_PopFront( &old_chain );
 
         if ((date == VLC_TICK_INVALID) ||
             ( flush_before && picture->date <= date) ||

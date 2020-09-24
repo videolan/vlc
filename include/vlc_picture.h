@@ -204,12 +204,12 @@ static inline bool vlc_picture_chain_IsEmpty(const vlc_picture_chain_t *chain)
  *
  * \return the front of the picture chain (the picture itself)
  */
-static inline picture_t * vlc_picture_chain_PopFront(picture_t **chain)
+static inline picture_t * vlc_picture_chain_PopFront(vlc_picture_chain_t *chain)
 {
-    picture_t *front = *chain;
+    picture_t *front = chain->front;
     if (front)
     {
-        *chain = front->p_next;
+        chain->front = front->p_next;
         // unlink the front picture from the rest of the chain
         front->p_next = NULL;
     }
@@ -223,9 +223,9 @@ static inline picture_t * vlc_picture_chain_PopFront(picture_t **chain)
  *
  * \return the front of the picture chain (the picture itself)
  */
-static inline picture_t * vlc_picture_chain_PeekFront(picture_t **chain)
+static inline picture_t * vlc_picture_chain_PeekFront(vlc_picture_chain_t *chain)
 {
-    return *chain;
+    return chain->front;
 }
 
 /**
