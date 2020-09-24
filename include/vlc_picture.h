@@ -270,9 +270,11 @@ static inline bool picture_HasChainedPics(const picture_t *pic)
  *
  * \return the picture chain that was contained in the picture
  */
-static inline picture_t * picture_GetAndResetChain(picture_t *pic)
+static inline vlc_picture_chain_t picture_GetAndResetChain(picture_t *pic)
 {
-    picture_t *chain = pic->p_next;
+    vlc_picture_chain_t chain = (vlc_picture_chain_t) { pic->p_next, pic->p_next };
+    while ( chain.tail && chain.tail->p_next ) // find the proper tail
+        chain.tail = chain.tail->p_next;
     pic->p_next = NULL;
     return chain;
 }
