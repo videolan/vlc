@@ -131,8 +131,7 @@ vlc_module_end ()
 static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 {
     char * psz_name, * psz_format;
-    int i_channels, i = 0;
-    int i_format_list_size;
+    int i_channels;
 
     if( aout_FormatNbChannels( fmt ) == 0 )
         return VLC_EGENERIC;
@@ -178,16 +177,18 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         return VLC_EGENERIC;
     }
 
-    i_format_list_size = (int)ARRAY_SIZE(format_list);
-    for (i = 0; i < i_format_list_size; i++)
+    fmt->i_format = 0;
+
+    for (size_t i = 0; i < ARRAY_SIZE(format_list); i++)
     {
         if ( !strcmp( format_list[i], psz_format ) )
         {
+            fmt->i_format = format_int[i];
             break;
         }
     }
 
-    if ( i == i_format_list_size )
+    if (fmt->i_format == 0)
     {
         msg_Err( p_aout, "cannot understand the format string (%s)",
                  psz_format );
@@ -199,7 +200,6 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
     }
     free( psz_format );
 
-    fmt->i_format = format_int[i];
     if ( AOUT_FMT_SPDIF( fmt ) )
     {
         fmt->i_bytes_per_frame = AOUT_SPDIF_SIZE;
