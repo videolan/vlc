@@ -151,16 +151,15 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 
     assert(!picture_HasChainedPics(p_pic));
     vlc_mutex_lock(&id->fifo.lock);
-    id->fifo.pic.tail = vlc_picture_chain_Append( &id->fifo.pic.first, id->fifo.pic.tail, p_pic );
+    id->fifo.pic.tail = vlc_picture_chain_Append( &id->fifo.pic.front, id->fifo.pic.tail, p_pic );
     vlc_mutex_unlock(&id->fifo.lock);
 }
 
-static picture_t *transcode_dequeue_all_pics( sout_stream_id_sys_t *id )
+static vlc_picture_chain_t transcode_dequeue_all_pics( sout_stream_id_sys_t *id )
 {
     vlc_mutex_lock(&id->fifo.lock);
-    picture_t *p_pics = id->fifo.pic.first;
-    id->fifo.pic.first = NULL;
-    id->fifo.pic.tail  = NULL;
+    vlc_picture_chain_t p_pics = id->fifo.pic;
+    vlc_picture_chain_Init( &id->fifo.pic );
     vlc_mutex_unlock(&id->fifo.lock);
 
     return p_pics;
@@ -173,8 +172,7 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
              "creating video transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
              (char*)&p_fmt->i_codec, (char*)&id->p_enccfg->i_codec );
 
-    id->fifo.pic.first = NULL;
-    id->fifo.pic.tail  = NULL;
+    vlc_picture_chain_Init( &id->fifo.pic );
     id->b_transcode = true;
     es_format_Init( &id->decoder_out, VIDEO_ES, 0 );
 
@@ -446,9 +444,9 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     if( ret != VLCDEC_SUCCESS )
         return VLC_EGENERIC;
 
-    picture_t *p_pics = transcode_dequeue_all_pics( id );
+    vlc_picture_chain_t p_pics = transcode_dequeue_all_pics( id );
 
-    do
+    while( !vlc_picture_chain_IsEmpty( &p_pics ) )
     {
         picture_t *p_pic = vlc_picture_chain_PopFront( &p_pics );
 
@@ -631,7 +629,7 @@ error:
         if( p_pic )
             picture_Release( p_pic );
         id->b_error = true;
-    } while( p_pics );
+    }
 
     if( id->p_enccfg->video.threads.i_count >= 1 )
     {

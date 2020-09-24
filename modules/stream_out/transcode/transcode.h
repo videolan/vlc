@@ -87,10 +87,7 @@ struct sout_stream_id_sys_t
         vlc_mutex_t lock;
         union
         {
-            struct {
-                picture_t *first;
-                picture_t *tail;
-            } pic;
+            vlc_picture_chain_t pic;
             struct {
                 subpicture_t *first;
                 subpicture_t **last;
