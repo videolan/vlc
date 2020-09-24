@@ -279,20 +279,11 @@ static int transcode_video_set_conversions( sout_stream_t *p_stream,
         .sys = id,
     };
 
-    enum
-    {
-        STEP_NONSTATIC = 0,
-        STEP_STATIC,
-    };
-    int step = STEP_NONSTATIC;
     {
         const bool b_do_scale = (*pp_src)->video.i_width != p_dst->video.i_width ||
                                 (*pp_src)->video.i_height != p_dst->video.i_height;
         const bool b_do_chroma = (*pp_src)->video.i_chroma != p_dst->video.i_chroma;
         const bool b_do_orient = ((*pp_src)->video.orientation != ORIENT_NORMAL) && b_reorient;
-
-        if( step == STEP_STATIC && b_do_orient )
-            return VLC_EGENERIC;
 
         const es_format_t *p_tmpdst = p_dst;
 
@@ -310,30 +301,25 @@ static int transcode_video_set_conversions( sout_stream_t *p_stream,
         msg_Dbg( p_stream, "adding (scale %d,chroma %d, orient %d) converters",
                  b_do_scale, b_do_chroma, b_do_orient );
 
-        filter_chain_t **pp_chain = (step == STEP_NONSTATIC)
-                ? &id->p_conv_nonstatic
-                : &id->p_conv_static;
-
-        *pp_chain = filter_chain_NewVideo( p_stream, step == STEP_NONSTATIC, &owner );
-        if( !*pp_chain )
+        id->p_conv_nonstatic = filter_chain_NewVideo( p_stream, true, &owner );
+        if( !id->p_conv_nonstatic )
             return VLC_EGENERIC;
-        filter_chain_Reset( *pp_chain, *pp_src, *pp_src_vctx, p_tmpdst );
+        filter_chain_Reset( id->p_conv_nonstatic, *pp_src, *pp_src_vctx, p_tmpdst );
 
-        if( filter_chain_AppendConverter( *pp_chain, p_tmpdst ) != VLC_SUCCESS )
+        if( filter_chain_AppendConverter( id->p_conv_nonstatic, p_tmpdst ) != VLC_SUCCESS )
             return VLC_EGENERIC;
 
-        *pp_src = filter_chain_GetFmtOut( *pp_chain );
-        *pp_src_vctx = filter_chain_GetVideoCtxOut( *pp_chain );
+        *pp_src = filter_chain_GetFmtOut( id->p_conv_nonstatic );
+        *pp_src_vctx = filter_chain_GetVideoCtxOut( id->p_conv_nonstatic );
         debug_format( p_stream, *pp_src );
     }
-    step = STEP_STATIC;
     {
         const bool b_do_scale = (*pp_src)->video.i_width != p_dst->video.i_width ||
                                 (*pp_src)->video.i_height != p_dst->video.i_height;
         const bool b_do_chroma = (*pp_src)->video.i_chroma != p_dst->video.i_chroma;
         const bool b_do_orient = ((*pp_src)->video.orientation != ORIENT_NORMAL) && b_reorient;
 
-        if( step == STEP_STATIC && b_do_orient )
+        if( b_do_orient )
             return VLC_EGENERIC;
 
         const es_format_t *p_tmpdst = p_dst;
@@ -341,31 +327,19 @@ static int transcode_video_set_conversions( sout_stream_t *p_stream,
         if( ! (b_do_scale || b_do_chroma || b_do_orient) )
             return VLC_SUCCESS;
 
-        es_format_t tmpdst;
-        if( b_do_orient )
-        {
-            es_format_Init( &tmpdst, VIDEO_ES, p_dst->video.i_chroma );
-            video_format_ApplyRotation( &tmpdst.video, &p_dst->video );
-            p_tmpdst = &tmpdst;
-        }
-
         msg_Dbg( p_stream, "adding (scale %d,chroma %d, orient %d) converters",
                  b_do_scale, b_do_chroma, b_do_orient );
 
-        filter_chain_t **pp_chain = (step == STEP_NONSTATIC)
-                ? &id->p_conv_nonstatic
-                : &id->p_conv_static;
-
-        *pp_chain = filter_chain_NewVideo( p_stream, step == STEP_NONSTATIC, &owner );
-        if( !*pp_chain )
+        id->p_conv_static = filter_chain_NewVideo( p_stream, false, &owner );
+        if( !id->p_conv_static )
             return VLC_EGENERIC;
-        filter_chain_Reset( *pp_chain, *pp_src, *pp_src_vctx, p_tmpdst );
+        filter_chain_Reset( id->p_conv_static, *pp_src, *pp_src_vctx, p_tmpdst );
 
-        if( filter_chain_AppendConverter( *pp_chain, p_tmpdst ) != VLC_SUCCESS )
+        if( filter_chain_AppendConverter( id->p_conv_static, p_tmpdst ) != VLC_SUCCESS )
             return VLC_EGENERIC;
 
-        *pp_src = filter_chain_GetFmtOut( *pp_chain );
-        *pp_src_vctx = filter_chain_GetVideoCtxOut( *pp_chain );
+        *pp_src = filter_chain_GetFmtOut( id->p_conv_static );
+        *pp_src_vctx = filter_chain_GetVideoCtxOut( id->p_conv_static );
         debug_format( p_stream, *pp_src );
     }
 
