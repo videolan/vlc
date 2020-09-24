@@ -52,6 +52,10 @@ stream_t *vlc_stream_FilterNew( stream_t *p_source,
 {
     assert(p_source != NULL);
 
+    /* Stream filters can only filter byte streams. */
+    if (p_source->pf_read == NULL && p_source->pf_block == NULL)
+        return NULL;
+
     struct vlc_stream_filter_private *priv;
     stream_t *s = vlc_stream_CustomNew(vlc_object_parent(p_source),
                                        StreamDelete, sizeof (*priv),
