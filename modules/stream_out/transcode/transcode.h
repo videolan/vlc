@@ -123,7 +123,6 @@ struct sout_stream_id_sys_t
          {
              filter_chain_t  *p_f_chain; /**< deinterlace & fps video filters */
              filter_chain_t  *p_conv_nonstatic;
-             filter_chain_t  *p_conv_static;
              filter_chain_t  *p_uf_chain; /**< User-specified video filters */
              filter_chain_t  *p_final_conv_static; /**< converter to adapt filtered pics to the encoder */
              vlc_blender_t   *p_spu_blender;
