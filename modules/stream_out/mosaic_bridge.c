@@ -419,8 +419,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
     //p_es->fmt = *p_fmt;
     p_es->psz_id = p_sys->psz_id;
-    p_es->p_picture = NULL;
-    p_es->tail = NULL;
+    vlc_picture_chain_Init( &p_es->pictures );
     p_es->b_empty = false;
 
     vlc_global_unlock( VLC_MOSAIC_MUTEX );
@@ -463,9 +462,9 @@ static void Del( sout_stream_t *p_stream, void *id )
     p_es = p_sys->p_es;
 
     p_es->b_empty = true;
-    while ( p_es->p_picture )
+    while ( !vlc_picture_chain_IsEmpty( &p_es->pictures ) )
     {
-        picture_t *es_picture = vlc_picture_chain_PopFront( &p_es->p_picture );
+        picture_t *es_picture = vlc_picture_chain_PopFront( &p_es->pictures.front );
         picture_Release( es_picture );
     }
 
@@ -573,7 +572,7 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     /* push the picture in the mosaic-struct structure */
     bridged_es_t *p_es = p_sys->p_es;
     vlc_global_lock( VLC_MOSAIC_MUTEX );
-    p_es->tail = vlc_picture_chain_Append( &p_es->p_picture, p_es->tail, p_new_pic );
+    p_es->pictures.tail = vlc_picture_chain_Append( &p_es->pictures.front, p_es->pictures.tail, p_new_pic );
     vlc_global_unlock( VLC_MOSAIC_MUTEX );
 }
 

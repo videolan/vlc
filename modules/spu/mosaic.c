@@ -529,16 +529,16 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         if ( p_es->b_empty )
             continue;
 
-        while ( p_es->p_picture != NULL )
+        while ( !vlc_picture_chain_IsEmpty( &p_es->pictures ) )
         {
-            picture_t *front = vlc_picture_chain_PeekFront( &p_es->p_picture );
+            picture_t *front = vlc_picture_chain_PeekFront( &p_es->pictures.front );
             if ( front->date + p_sys->i_delay >= date )
                 break; // front picture not late
 
             if ( picture_HasChainedPics( front ) )
             {
                 // front picture is late and has more pictures chained, skip it
-                front = vlc_picture_chain_PopFront( &p_es->p_picture );
+                front = vlc_picture_chain_PopFront( &p_es->pictures.front );
                 picture_Release( front );
                 continue;
             }
@@ -546,7 +546,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
             if ( front->date + p_sys->i_delay + BLANK_DELAY < date )
             {
                 // front picture is late and too old, don't display it
-                front = vlc_picture_chain_PopFront( &p_es->p_picture );
+                front = vlc_picture_chain_PopFront( &p_es->pictures.front );
                 // the picture chain is empty as the front didn't have chained pics
                 picture_Release( front );
                 break;
@@ -561,7 +561,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
             }
         }
 
-        if ( p_es->p_picture == NULL )
+        if ( vlc_picture_chain_IsEmpty( &p_es->pictures ) )
             continue;
 
         if ( p_sys->i_order_length == 0 )
@@ -589,7 +589,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         video_format_Init( &fmt_in, 0 );
         video_format_Init( &fmt_out, 0 );
 
-        p_converted = vlc_picture_chain_PeekFront( &p_es->p_picture );
+        p_converted = vlc_picture_chain_PeekFront( &p_es->pictures.front );
         if ( !p_sys->b_keep )
         {
             /* Convert the images */
