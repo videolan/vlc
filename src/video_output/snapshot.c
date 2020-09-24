@@ -46,9 +46,7 @@ struct vout_snapshot {
 
     bool        is_available;
     int         request_count;
-    picture_t   *picture;
-    picture_t   *tail;
-
+    vlc_picture_chain_t pics;
 };
 
 vout_snapshot_t *vout_snapshot_New(void)
@@ -62,8 +60,7 @@ vout_snapshot_t *vout_snapshot_New(void)
 
     snap->is_available = true;
     snap->request_count = 0;
-    snap->picture = NULL;
-    snap->tail = NULL;
+    vlc_picture_chain_Init( &snap->pics );
     return snap;
 }
 
@@ -72,8 +69,8 @@ void vout_snapshot_Destroy(vout_snapshot_t *snap)
     if (snap == NULL)
         return;
 
-    while (snap->picture) {
-        picture_t *picture = vlc_picture_chain_PopFront( &snap->picture );
+    while ( !vlc_picture_chain_IsEmpty( &snap->pics ) ) {
+        picture_t *picture = vlc_picture_chain_PopFront( &snap->pics.front );
         picture_Release(picture);
     }
 
@@ -107,11 +104,11 @@ picture_t *vout_snapshot_Get(vout_snapshot_t *snap, vlc_tick_t timeout)
     snap->request_count++;
 
     /* */
-    while (snap->is_available && !snap->picture &&
+    while (snap->is_available && vlc_picture_chain_IsEmpty( &snap->pics ) &&
         vlc_cond_timedwait(&snap->wait, &snap->lock, deadline) == 0);
 
     /* */
-    picture_t *picture = vlc_picture_chain_PopFront( &snap->picture );
+    picture_t *picture = vlc_picture_chain_PopFront( &snap->pics.front );
     if (!picture && snap->request_count > 0)
         snap->request_count--;
 
@@ -151,7 +148,7 @@ void vout_snapshot_Set(vout_snapshot_t *snap,
 
         video_format_CopyCrop( &dup->format, fmt );
 
-        snap->tail = vlc_picture_chain_Append( &snap->picture, snap->tail, dup );
+        snap->pics.tail = vlc_picture_chain_Append( &snap->pics.front, snap->pics.tail, dup );
         snap->request_count--;
     }
     vlc_cond_broadcast(&snap->wait);
