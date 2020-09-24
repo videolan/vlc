@@ -73,63 +73,6 @@ static const char *demux_NameFromMimeType(const char *mime)
     return (type != NULL) ? type->name : "any";
 }
 
-static const char* DemuxNameFromExtension( char const* ext,
-                                           bool b_preparsing )
-{
-    /* NOTE: Add only file without any problems here and with strong detection:
-     * - no .mp3, .a52, ...
-     *  - wav can't be added 'cause of a52 and dts in them as raw audio
-     */
-    static demux_mapping strong[] =
-    { /* NOTE: must be sorted in asc order */
-        { "aiff", "aiff" },
-        { "asf",  "asf" },
-        { "au",   "au" },
-        { "avi",  "avi" },
-        { "dv",   "dv" },
-        { "flac", "flac" },
-        { "h264", "h264" },
-        { "kar", "smf" },
-        { "m3u",  "m3u" },
-        { "m4a",  "mp4" },
-        { "m4v",  "m4v" },
-        { "mid",  "smf" },
-        { "mka",  "mkv" },
-        { "mks",  "mkv" },
-        { "mkv",  "mkv" },
-        { "moov", "mp4" },
-        { "mov",  "mp4" },
-        { "mp4",  "mp4" },
-        { "nsv",  "nsv" },
-        { "oga",  "ogg" },
-        { "ogg",  "ogg" },
-        { "ogm",  "ogg" },
-        { "ogv",  "ogg" },
-        { "ogx",  "ogg" }, /*RFC5334*/
-        { "opus", "ogg" }, /*draft-terriberry-oggopus-01*/
-        { "pva",  "pva" },
-        { "rm",   "avformat" },
-        { "rmi",  "smf" },
-        { "spx",  "ogg" },
-        { "voc",  "voc" },
-        { "wma",  "asf" },
-        { "wmv",  "asf" },
-    };
-
-    /* Here, we don't mind if it does not work, it must be quick */
-    static demux_mapping quick[] =
-    { /* NOTE: shall be sorted in asc order */
-        { "mp3", "mpga" },
-    };
-
-    demux_mapping *res = demux_lookup(ext, strong, ARRAY_SIZE(strong));
-
-    if (res == NULL && b_preparsing)
-        res = demux_lookup(ext, quick, ARRAY_SIZE(quick));
-
-    return (res != NULL) ? res->name : NULL;
-}
-
 demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
                     stream_t *s, es_out_t *out )
 {
@@ -224,18 +167,27 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
     p_demux->pf_control = NULL;
     p_demux->p_sys      = NULL;
 
+    char *modbuf = NULL;
+
     if (strcasecmp(module, "any") == 0 && p_demux->psz_filepath != NULL)
     {
-        char const* psz_ext = strrchr( p_demux->psz_filepath, '.' );
+        const char *ext = strrchr(p_demux->psz_filepath, '.');
 
-        if( psz_ext )
-            module = DemuxNameFromExtension( psz_ext + 1, b_preparsing );
+        if (ext != NULL) {
+            if (b_preparsing && !vlc_ascii_strcasecmp(ext, ".mp3"))
+                module = "mpga";
+            else
+            if (likely(asprintf(&modbuf, "ext-%s", ext + 1) >= 0))
+                module = modbuf;
+        }
     }
 
     bool strict = strcmp(module, p_demux->psz_name) == 0;
 
     priv->module = vlc_module_load(p_demux, "demux", module, strict,
                                    demux_Probe, p_demux);
+    free(modbuf);
+
     if (priv->module == NULL)
     {
         free( p_demux->psz_filepath );
