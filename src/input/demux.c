@@ -183,7 +183,7 @@ static int demux_Probe(void *func, bool forced, va_list ap)
 }
 
 demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
-                            const char *psz_demux, const char *url,
+                            const char *module, const char *url,
                             stream_t *s, es_out_t *out, bool b_preparsing )
 {
     struct vlc_demux_private *priv;
@@ -196,18 +196,18 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
     assert(s != NULL);
     priv = vlc_stream_Private(p_demux);
 
-    if (!strcasecmp( psz_demux, "any" ) || !psz_demux[0])
+    if (!strcasecmp(module, "any" ) || module[0] == '\0')
     {   /* Look up demux by mime-type for hard to detect formats */
         char *type = stream_MimeType( s );
         if( type != NULL )
         {
-            psz_demux = demux_NameFromMimeType( type );
+            module = demux_NameFromMimeType( type );
             free( type );
         }
     }
 
     p_demux->p_input_item = p_input ? input_GetItem(p_input) : NULL;
-    p_demux->psz_name = strdup( psz_demux );
+    p_demux->psz_name = strdup(module);
     if (unlikely(p_demux->psz_name == NULL))
         goto error;
 
@@ -221,7 +221,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
 
     if( !b_preparsing )
         msg_Dbg( p_obj, "creating demux \"%s\", URL: %s, path: %s",
-                 psz_demux, url, p_demux->psz_filepath );
+                 module, url, p_demux->psz_filepath );
 
     p_demux->s              = s;
     p_demux->out            = out;
@@ -231,22 +231,18 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
     p_demux->pf_control = NULL;
     p_demux->p_sys      = NULL;
 
-    const char *psz_module = NULL;
-
-    if( !strcmp( p_demux->psz_name, "any" ) && p_demux->psz_filepath )
+    if (strcasecmp(module, "any") == 0 && p_demux->psz_filepath != NULL)
     {
         char const* psz_ext = strrchr( p_demux->psz_filepath, '.' );
 
         if( psz_ext )
-            psz_module = DemuxNameFromExtension( psz_ext + 1, b_preparsing );
+            module = DemuxNameFromExtension( psz_ext + 1, b_preparsing );
     }
 
-    if( psz_module == NULL )
-        psz_module = p_demux->psz_name;
+    bool strict = strcmp(module, p_demux->psz_name) == 0;
 
-    priv->module = vlc_module_load(p_demux, "demux", psz_module,
-        !strcmp(psz_module, p_demux->psz_name), demux_Probe, p_demux);
-
+    priv->module = vlc_module_load(p_demux, "demux", module, strict,
+                                   demux_Probe, p_demux);
     if (priv->module == NULL)
     {
         free( p_demux->psz_filepath );
