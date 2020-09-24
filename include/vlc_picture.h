@@ -191,6 +191,18 @@ static inline picture_t * vlc_picture_chain_PopFront(picture_t **chain)
 }
 
 /**
+ * Peek the front of a picture chain.
+ *
+ * The picture chain is unchanged.
+ *
+ * \return the front of the picture chain (the picture itself)
+ */
+static inline picture_t * vlc_picture_chain_PeekFront(picture_t **chain)
+{
+    return *chain;
+}
+
+/**
  * Append a picture to a picture chain.
  *
  * \param chain the picture chain pointer
