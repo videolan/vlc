@@ -15,8 +15,10 @@ else ifdef HAVE_ANDROID
 RUST_TARGET = $(HOST)
 else ifdef HAVE_IOS
 ifneq ($(ARCH),arm) # iOS 32bit is Tier 3
+ifneq ($(ARCH),i386) # iOS 32bit is Tier 3
 ifndef HAVE_TVOS # tvOS is Tier 3
 RUST_TARGET = $(ARCH)-apple-ios
+endif
 endif
 endif
 else ifdef HAVE_MACOSX
