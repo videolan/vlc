@@ -27,44 +27,14 @@ import "qrc:///style/"
 
 import org.videolan.medialib 0.1
 
-Widgets.NavigableFocusScope {
+Widgets.PageLoader {
     id: root
-
-    //name and properties of the tab to be initially loaded
-    property string view: "artists"
-    property var viewProperties: ({})
 
     property var sortModel
     property var contentModel
 
-    onViewChanged: {
-        viewProperties = ({})
-        loadView()
-    }
-    onViewPropertiesChanged: loadView()
-    Component.onCompleted: loadView()
-
-    function loadView() {
-        var found = stackView.loadView(root.pageModel, view, viewProperties)
-        if (!found)
-            stackView.replace(root.pageModel[0].component)
-
-        stackView.currentItem.navigationParent = root
-        sortModel = stackView.currentItem.sortModel
-        contentModel = stackView.currentItem.model
-    }
-
-    //reset view
-    function loadDefaultView() {
-        root.view = "artists"
-        root.viewProperties= ({})
-    }
-
-    function loadIndex(index) {
-        history.push(["mc", "music", root.pageModel[index].name])
-    }
-
-    readonly property var pageModel: [{
+    defaultPage: "artists"
+    pageModel: [{
             displayText: i18n.qtr("Artists"),
             name: "artists",
             url: "qrc:///medialibrary/MusicArtistsDisplay.qml"
@@ -83,6 +53,15 @@ Widgets.NavigableFocusScope {
         }
     ]
 
+    onCurrentItemChanged: {
+        sortModel = currentItem.sortModel
+        contentModel = currentItem.model
+    }
+
+    function loadIndex(index) {
+        history.push(["mc", "music", root.pageModel[index].name])
+    }
+
     property var tabModel: ListModel {
         Component.onCompleted: {
             pageModel.forEach(function(e) {
@@ -91,18 +70,6 @@ Widgets.NavigableFocusScope {
                            name: e.name,
                        })
             })
-        }
-    }
-
-    /* The data elements */
-    Widgets.StackViewExt  {
-        id: stackView
-        anchors.fill: parent
-        focus: true
-
-        onCurrentItemChanged: {
-            sortModel = stackView.currentItem.sortModel
-            contentModel = stackView.currentItem.model
         }
     }
 }

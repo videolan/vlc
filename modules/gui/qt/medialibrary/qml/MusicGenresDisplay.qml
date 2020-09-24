@@ -25,17 +25,11 @@ import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+Widgets.PageLoader {
     id: root
 
-    //name and properties of the tab to be initially loaded
-    property string view: "all"
-    property var viewProperties: ({})
-
-    property var sortModel
-    property var model
-
-    readonly property var pageModel: [{
+    defaultPage: "all"
+    pageModel: [{
         name: "all",
         component: genresComponent
     }, {
@@ -43,26 +37,14 @@ Widgets.NavigableFocusScope {
         component: albumGenreComponent
     }]
 
-    Component.onCompleted: loadView()
-    onViewChanged: {
-        viewProperties = {}
-        loadView()
-    }
-    onViewPropertiesChanged: loadView()
+    property var sortModel
+    property var model
 
-    function loadDefaultView() {
-        root.view = "all"
-        root.viewProperties= ({})
+    onCurrentItemChanged: {
+        sortModel = currentItem.sortModel
+        model = currentItem.model
     }
 
-    function loadView() {
-        var found = stackView.loadView(root.pageModel, view, viewProperties)
-        if (!found)
-            stackView.replace(root.pageModel[0].component)
-        stackView.currentItem.navigationParent = root
-        sortModel = stackView.currentItem.sortModel
-        model = stackView.currentItem.model
-    }
 
     function _updateGenresAllHistory(currentIndex) {
         history.update(["mc", "music", "genres", "all", { "initialIndex": currentIndex }])
@@ -106,12 +88,5 @@ Widgets.NavigableFocusScope {
             onGenreNameChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
             onCurrentIndexChanged: _updateGenresAlbumsHistory(currentIndex, parentId, genreName)
         }
-    }
-
-    Widgets.StackViewExt {
-        id: stackView
-
-        anchors.fill: parent
-        focus: true
     }
 }

@@ -27,15 +27,13 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
 
-Widgets.NavigableFocusScope {
+Widgets.PageLoader {
     id: root
 
-    //name and properties of the tab to be initially loaded
-    property string view: "all"
-    property var viewProperties: ({})
     property var model
 
-    readonly property var pageModel: [{
+    defaultPage: "all"
+    pageModel: [{
         name: "all",
         component: artistGridComponent
     }, {
@@ -43,24 +41,8 @@ Widgets.NavigableFocusScope {
         component: artistAlbumsComponent
     }]
 
-    Component.onCompleted: loadView()
-    onViewChanged: {
-        viewProperties = {}
-        loadView()
-    }
-    onViewPropertiesChanged: loadView()
-
-    function loadDefaultView() {
-        root.view = "all"
-        root.viewProperties= ({})
-    }
-
-    function loadView() {
-        var found = stackView.loadView(root.pageModel, view, viewProperties)
-        if (!found)
-            stackView.replace(root.pageModel[0].component)
-        stackView.currentItem.navigationParent = root
-        model = stackView.currentItem.model
+    onCurrentItemChanged: {
+        model = currentItem.model
     }
 
     function _updateArtistsAllHistory(currentIndex) {
@@ -260,12 +242,5 @@ Widgets.NavigableFocusScope {
             onCurrentIndexChanged: _updateArtistsAlbumsHistory(currentIndex, currentAlbumIndex)
             onCurrentAlbumIndexChanged: _updateArtistsAlbumsHistory(currentIndex, currentAlbumIndex)
         }
-    }
-
-    Widgets.StackViewExt {
-        id: stackView
-
-        anchors.fill: parent
-        focus: true
     }
 }

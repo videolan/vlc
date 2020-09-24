@@ -225,6 +225,7 @@
         <file alias="HorizontalResizeHandle.qml">widgets/qml/HorizontalResizeHandle.qml</file>
         <file alias="PointingTooltip.qml">widgets/qml/PointingTooltip.qml</file>
         <file alias="FrostedGlassEffect.qml">widgets/qml/FrostedGlassEffect.qml</file>
+	<file alias="PageLoader.qml">widgets/qml/PageLoader.qml</file>
     </qresource>
     <qresource prefix="/util">
         <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>

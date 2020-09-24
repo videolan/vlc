@@ -28,16 +28,14 @@ import "qrc:///widgets/" as Widgets
 import "qrc:///util/" as Util
 import "qrc:///style/"
 
-Widgets.NavigableFocusScope {
+Widgets.PageLoader {
     id: root
-
-    property string view: "all"
-    property var viewProperties: ({})
 
     property var sortModel
     property var model
 
-    readonly property var pageModel: [{
+    defaultPage: "all"
+    pageModel: [{
         name: "all",
         component: allSourcesComponent
     }, {
@@ -51,24 +49,9 @@ Widgets.NavigableFocusScope {
         component: sourceBrowseComponent
     }]
 
-    Component.onCompleted: loadView()
-    onViewChanged: {
-        viewProperties = {}
-        loadView()
-    }
-    onViewPropertiesChanged: loadView()
-
-    function loadDefaultView() {
-        root.view = "all"
-        root.viewProperties = ({})
-    }
-
-    function loadView() {
-        var found = stackView.loadView(root.pageModel, view, viewProperties)
-        if (!found)
-            stackView.replace(root.pageModel[0].component)
-        stackView.currentItem.navigationParent = root
-        model = stackView.currentItem.model
+    onCurrentItemChanged: {
+        sortModel = currentItem.sortModel
+        model = currentItem.model
     }
 
     Component {
@@ -389,14 +372,5 @@ Widgets.NavigableFocusScope {
                 searchRole: "name"
             }
         }
-    }
-
-
-
-    Widgets.StackViewExt {
-        id: stackView
-
-        anchors.fill: parent
-        focus: true
     }
 }
