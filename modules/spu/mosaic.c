@@ -529,28 +529,34 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         if ( p_es->b_empty )
             continue;
 
-        while ( p_es->p_picture != NULL
-                 && p_es->p_picture->date + p_sys->i_delay < date )
+        while ( p_es->p_picture != NULL )
         {
-            if ( picture_HasChainedPics( p_es->p_picture ) )
+            picture_t *front = vlc_picture_chain_PeekFront( &p_es->p_picture );
+            if ( front->date + p_sys->i_delay >= date )
+                break; // front picture not late
+
+            if ( picture_HasChainedPics( front ) )
             {
-                picture_t *es_picture = vlc_picture_chain_PopFront( &p_es->p_picture );
-                picture_Release( es_picture );
+                // front picture is late and has more pictures chained, skip it
+                front = vlc_picture_chain_PopFront( &p_es->p_picture );
+                picture_Release( front );
+                continue;
             }
-            else if ( p_es->p_picture->date + p_sys->i_delay + BLANK_DELAY <
-                        date )
+
+            if ( front->date + p_sys->i_delay + BLANK_DELAY < date )
             {
-                /* Display blank */
-                picture_Release( p_es->p_picture );
-                p_es->p_picture = NULL;
-                p_es->tail = NULL;
+                // front picture is late and too old, don't display it
+                front = vlc_picture_chain_PopFront( &p_es->p_picture );
+                // the picture chain is empty as the front didn't have chained pics
+                picture_Release( front );
                 break;
             }
             else
             {
+                // front picture is a little late, display it
                 msg_Dbg( p_filter, "too late picture for %s (%"PRId64 ")",
                          p_es->psz_id,
-                         date - p_es->p_picture->date - p_sys->i_delay );
+                         date - front->date - p_sys->i_delay );
                 break;
             }
         }
@@ -583,12 +589,13 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         video_format_Init( &fmt_in, 0 );
         video_format_Init( &fmt_out, 0 );
 
+        p_converted = vlc_picture_chain_PeekFront( &p_es->p_picture );
         if ( !p_sys->b_keep )
         {
             /* Convert the images */
-            fmt_in.i_chroma = p_es->p_picture->format.i_chroma;
-            fmt_in.i_height = p_es->p_picture->format.i_height;
-            fmt_in.i_width = p_es->p_picture->format.i_width;
+            fmt_in.i_chroma = p_converted->format.i_chroma;
+            fmt_in.i_height = p_converted->format.i_height;
+            fmt_in.i_width = p_converted->format.i_width;
 
             if( fmt_in.i_chroma == VLC_CODEC_YUVA ||
                 fmt_in.i_chroma == VLC_CODEC_RGBA )
@@ -616,7 +623,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
             fmt_out.i_visible_width = fmt_out.i_width;
             fmt_out.i_visible_height = fmt_out.i_height;
 
-            p_converted = image_Convert( p_sys->p_image, p_es->p_picture,
+            p_converted = image_Convert( p_sys->p_image, p_converted,
                                          &fmt_in, &fmt_out );
             if( !p_converted )
             {
@@ -629,7 +636,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         }
         else
         {
-            p_converted = p_es->p_picture;
             fmt_in.i_width = fmt_out.i_width = p_converted->format.i_width;
             fmt_in.i_height = fmt_out.i_height = p_converted->format.i_height;
             fmt_in.i_chroma = fmt_out.i_chroma = p_converted->format.i_chroma;
