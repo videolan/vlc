@@ -171,6 +171,32 @@ static inline vlc_video_context* picture_GetVideoContext(picture_t *pic)
  * picture chaining helpers
  */
 
+typedef struct vlc_pic_chain {
+    picture_t *front;
+    picture_t *tail;
+} vlc_picture_chain_t;
+
+/**
+ * Initializes or reset a picture chain
+ *
+ * \warning do not call this if the chain still holds pictures, it will leak them.
+ */
+static inline void vlc_picture_chain_Init(vlc_picture_chain_t *chain)
+{
+    chain->front = NULL;
+    // chain->tail = NULL not needed
+}
+
+/**
+ * Check whether a picture chain holds pictures or not.
+ *
+ * \return true if it is empty.
+ */
+static inline bool vlc_picture_chain_IsEmpty(const vlc_picture_chain_t *chain)
+{
+    return chain->front == NULL;
+}
+
 /**
  * Pop the front of a picture chain.
  *
