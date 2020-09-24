@@ -46,18 +46,6 @@
 
 /*** TLS credentials ***/
 
-static int tls_client_load(void *func, bool forced, va_list ap)
-{
-    int (*activate)(vlc_tls_client_t *) = func;
-    vlc_tls_client_t *crd = va_arg(ap, vlc_tls_client_t *);
-
-    int ret = activate (crd);
-    if (ret)
-        vlc_objres_clear(VLC_OBJECT(crd));
-    (void) forced;
-    return ret;
-}
-
 vlc_tls_server_t *
 vlc_tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
                       const char *key_path)
@@ -112,15 +100,29 @@ vlc_tls_client_t *vlc_tls_ClientCreate(vlc_object_t *obj)
     if (unlikely(crd == NULL))
         return NULL;
 
-    if (vlc_module_load(crd, "tls client", NULL, false,
-                        tls_client_load, crd) == NULL)
-    {
-        msg_Err (crd, "TLS client plugin not available");
-        vlc_object_delete(crd);
+    module_t **mods;
+    ssize_t total = vlc_module_match("tls client", "any", false, &mods, NULL);
+
+    if (unlikely(total < 0))
         return NULL;
+
+    for (ssize_t i = 0; i < total; i++) {
+        int (*probe)(vlc_tls_client_t *);
+
+        probe = vlc_module_map(obj->logger, mods[i]);
+
+        if (probe != NULL && probe(crd) == VLC_SUCCESS) {
+            free(mods);
+            return crd;
+        }
+
+        vlc_objres_clear(VLC_OBJECT(crd));
     }
 
-    return crd;
+    free(mods);
+    msg_Err(crd, "TLS client plugin not available");
+    vlc_object_delete(crd);
+    return NULL;
 }
 
 void vlc_tls_ClientDelete(vlc_tls_client_t *crd)
