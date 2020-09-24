@@ -38,23 +38,21 @@
  *****************************************************************************/
 struct picture_fifo_t {
     vlc_mutex_t lock;
-    picture_t   *first;
-    picture_t   *tail;
+    vlc_picture_chain_t pics;
 };
 
 static void PictureFifoReset(picture_fifo_t *fifo)
 {
-    fifo->first    = NULL;
-    fifo->tail     = NULL;
+    vlc_picture_chain_Init( &fifo->pics );
 }
 static void PictureFifoPush(picture_fifo_t *fifo, picture_t *picture)
 {
     assert(!picture_HasChainedPics(picture));
-    fifo->tail = vlc_picture_chain_Append( &fifo->first, fifo->tail, picture );
+    fifo->pics.tail = vlc_picture_chain_Append( &fifo->pics.front, fifo->pics.tail, picture );
 }
 static picture_t *PictureFifoPop(picture_fifo_t *fifo)
 {
-    return vlc_picture_chain_PopFront( &fifo->first );
+    return vlc_picture_chain_PopFront( &fifo->pics.front );
 }
 
 picture_fifo_t *picture_fifo_New(void)
@@ -85,7 +83,7 @@ picture_t *picture_fifo_Pop(picture_fifo_t *fifo)
 bool picture_fifo_IsEmpty(picture_fifo_t *fifo)
 {
     vlc_mutex_lock(&fifo->lock);
-    bool empty = fifo->first == NULL;
+    bool empty = vlc_picture_chain_IsEmpty( &fifo->pics );
     vlc_mutex_unlock(&fifo->lock);
 
     return empty;
@@ -96,14 +94,14 @@ void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before
 
     vlc_mutex_lock(&fifo->lock);
 
-    picture_t *old_chain = fifo->first;
+    vlc_picture_chain_t old_chain = fifo->pics;
     PictureFifoReset(fifo);
 
     picture_fifo_t tmp;
     PictureFifoReset(&tmp);
 
-    while (old_chain) {
-        picture_t *picture = vlc_picture_chain_PopFront( &old_chain );
+    while ( !vlc_picture_chain_IsEmpty( &old_chain ) ) {
+        picture_t *picture = vlc_picture_chain_PopFront( &old_chain.front );
 
         if ((date == VLC_TICK_INVALID) ||
             ( flush_before && picture->date <= date) ||
