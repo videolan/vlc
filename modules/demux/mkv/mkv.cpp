@@ -81,6 +81,9 @@ vlc_module_begin ()
             N_("Find all cluster positions by jumping cluster-to-cluster before playback"), true );
 
     add_shortcut( "mka", "mkv" )
+    add_file_extension("mka")
+    add_file_extension("mks")
+    add_file_extension("mkv")
 vlc_module_end ()
 
 namespace mkv {

@@ -50,6 +50,7 @@ vlc_module_begin ()
     set_capability( "demux", 10 )
     set_callback( Open )
     add_shortcut( "au" )
+    add_file_extension("au")
 vlc_module_end ()
 
 /*****************************************************************************

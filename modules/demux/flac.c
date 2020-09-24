@@ -54,6 +54,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_callbacks( Open, Close )
     add_shortcut( "flac" )
+    add_file_extension("flac")
 vlc_module_end ()
 
 /*****************************************************************************

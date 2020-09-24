@@ -54,6 +54,7 @@ vlc_module_begin ()
     add_bool( "rawdv-hurry-up", false, HURRYUP_TEXT, HURRYUP_LONGTEXT, false )
     set_callbacks( Open, Close )
     add_shortcut( "rawdv" )
+    add_file_extension("dv")
 vlc_module_end ()
 
 

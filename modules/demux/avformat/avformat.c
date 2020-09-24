@@ -28,6 +28,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_demux.h>
 
 #include "avformat.h"
 #include "../../codec/avcodec/avcommon.h"
@@ -35,6 +36,7 @@
 vlc_module_begin ()
 #endif /* MERGE_FFMPEG */
     add_shortcut( "ffmpeg", "avformat" )
+    add_file_extension("rm")
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("Avformat demuxer" ) )

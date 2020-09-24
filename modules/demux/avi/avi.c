@@ -73,6 +73,7 @@ vlc_module_begin ()
     set_capability( "demux", 212 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
+    add_file_extension("avi")
 
     add_bool( "avi-interleaved", false,
               INTERLEAVE_TEXT, INTERLEAVE_TEXT, true )

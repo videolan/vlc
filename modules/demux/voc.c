@@ -45,6 +45,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_capability( "demux", 10 )
     set_callback( Open )
+    add_file_extension("voc")
 vlc_module_end ()
 
 /*****************************************************************************

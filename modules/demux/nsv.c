@@ -53,6 +53,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_callbacks( Open, Close )
     add_shortcut( "nsv" )
+    add_file_extension("nsv")
 vlc_module_end ()
 
 /*****************************************************************************

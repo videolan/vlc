@@ -64,6 +64,13 @@ vlc_module_begin ()
     set_capability( "demux", 50 )
     set_callbacks( Open, Close )
     add_shortcut( "ogg" )
+    add_file_extension("oga")
+    add_file_extension("ogg")
+    add_file_extension("ogm")
+    add_file_extension("ogv")
+    add_file_extension("ogx")
+    add_file_extension("opus")
+    add_file_extension("spx")
 vlc_module_end ()
 
 

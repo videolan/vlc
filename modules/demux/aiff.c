@@ -49,6 +49,7 @@ vlc_module_begin ()
     set_capability( "demux", 10 )
     set_callback( Open )
     add_shortcut( "aiff" )
+    add_file_extension("aiff")
 vlc_module_end ()
 
 /*****************************************************************************

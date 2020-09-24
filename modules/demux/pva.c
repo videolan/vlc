@@ -47,6 +47,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_callbacks( Open, Close )
     add_shortcut( "pva" )
+    add_file_extension("pva")
 vlc_module_end ()
 
 /*****************************************************************************

@@ -62,6 +62,9 @@ vlc_module_begin ()
     set_capability( "demux", 200 )
     set_callbacks( Open, Close )
     add_shortcut( "asf", "wmv" )
+    add_file_extension("asf")
+    add_file_extension("wma")
+    add_file_extension("wmv")
 vlc_module_end ()
 
 

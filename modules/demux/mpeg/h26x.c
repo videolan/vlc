@@ -56,6 +56,7 @@ vlc_module_begin ()
     add_float( "h264-fps", 0.0, FPS_TEXT, FPS_LONGTEXT, true )
     set_callbacks( OpenH264, Close )
     add_shortcut( "h264" )
+    add_file_extension("h264")
 
     add_submodule()
         set_shortname( "HEVC")
