@@ -57,6 +57,20 @@ ssize_t vlc_module_match(const char *capability, const char *names,
                          size_t *restrict strict_matches);
 
 /**
+ * Maps a module in memory.
+ *
+ * This function attempts to map a given module in memory, if it is not
+ * already mapped. If it is already mapped, this function does nothing.
+ *
+ * \param log message logger
+ * \param mod module to map
+ *
+ * \return the module activation function on success, NULL on failure
+ */
+VLC_API
+void *vlc_module_map(struct vlc_logger *log, module_t *mod);
+
+/**
  * Finds and instantiates the best module of a certain type.
  * All candidates modules having the specified capability and name will be
  * sorted in decreasing order of priority. Then the probe callback will be

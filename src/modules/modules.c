@@ -179,7 +179,6 @@ ssize_t vlc_module_match(const char *capability, const char *names,
     return matches;
 }
 
-static
 void *vlc_module_map(vlc_logger_t *log, module_t *module)
 {
     return vlc_plugin_Map(log, module->plugin) ? NULL : module->pf_activate;

@@ -267,6 +267,7 @@ module_need
 module_provides
 module_unneed
 vlc_module_load
+vlc_module_map
 vlc_module_match
 vlc_memstream_open
 vlc_memstream_flush
