@@ -120,21 +120,14 @@ static const char* DemuxNameFromExtension( char const* ext,
     static demux_mapping quick[] =
     { /* NOTE: shall be sorted in asc order */
         { "mp3", "mpga" },
-        { "ogg", "ogg" },
-        { "wma", "asf" },
     };
 
-    struct {
-        demux_mapping* data;
-        size_t size;
+    demux_mapping *res = demux_lookup(ext, strong, ARRAY_SIZE(strong));
 
-    } lookup = {
-        .data = b_preparsing ? quick : strong,
-        .size = b_preparsing ? ARRAY_SIZE( quick ) : ARRAY_SIZE( strong )
-    };
+    if (res == NULL && b_preparsing)
+        res = demux_lookup(ext, quick, ARRAY_SIZE(quick));
 
-    demux_mapping* result = demux_lookup( ext, lookup.data, lookup.size );
-    return result ? result->name : NULL;
+    return (res != NULL) ? res->name : NULL;
 }
 
 demux_t *demux_New( vlc_object_t *p_obj, const char *psz_name,
