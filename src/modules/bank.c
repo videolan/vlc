@@ -542,7 +542,7 @@ static void AllocateAllPlugins (vlc_object_t *p_this)
  *
  * \return 0 on success, -1 on failure
  */
-int module_Map(struct vlc_logger *log, vlc_plugin_t *plugin)
+int vlc_plugin_Map(struct vlc_logger *log, vlc_plugin_t *plugin)
 {
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
@@ -594,7 +594,7 @@ error:
  * \note This function is not thread-safe. The caller must ensure that the
  * plug-in is no longer used before calling this function.
  */
-static void module_Unmap(vlc_plugin_t *plugin)
+static void vlc_plugin_Unmap(vlc_plugin_t *plugin)
 {
     if (!plugin->unloadable)
         return;
@@ -605,10 +605,10 @@ static void module_Unmap(vlc_plugin_t *plugin)
         vlc_dlclose(handle);
 }
 
-void *module_Symbol(struct vlc_logger *log,
-                    vlc_plugin_t *plugin, const char *name)
+void *vlc_plugin_Symbol(struct vlc_logger *log,
+                        vlc_plugin_t *plugin, const char *name)
 {
-    if (plugin->abspath == NULL || module_Map(log, plugin))
+    if (plugin->abspath == NULL || vlc_plugin_Map(log, plugin))
         return NULL;
 
     void *handle = (void *)atomic_load_explicit(&plugin->handle,
@@ -617,19 +617,19 @@ void *module_Symbol(struct vlc_logger *log,
     return vlc_dlsym(handle, name);
 }
 #else
-int module_Map(struct vlc_logger *log, vlc_plugin_t *plugin)
+int vlc_plugin_Map(struct vlc_logger *log, vlc_plugin_t *plugin)
 {
     (void) log; (void) plugin;
     return 0;
 }
 
-static void module_Unmap(vlc_plugin_t *plugin)
+static void vlc_plugin_Unmap(vlc_plugin_t *plugin)
 {
     (void) plugin;
 }
 
-void *module_Symbol(struct vlc_logger *log,
-                    vlc_plugin_t *plugin, const char *name)
+void *vlc_plugin_Symbol(struct vlc_logger *log,
+                        vlc_plugin_t *plugin, const char *name)
 {
     (void) log; (void) plugin; (void) name;
     return NULL;
@@ -707,7 +707,7 @@ void module_EndBank (bool b_plugins)
         vlc_plugin_t *lib = libs;
 
         libs = lib->next;
-        module_Unmap(lib);
+        vlc_plugin_Unmap(lib);
         vlc_plugin_destroy(lib);
     }
 

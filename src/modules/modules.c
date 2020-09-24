@@ -201,7 +201,7 @@ static int module_load(vlc_logger_t *log, module_t *m,
 {
     int ret = VLC_SUCCESS;
 
-    if (module_Map(log, m->plugin))
+    if (vlc_plugin_Map(log, m->plugin))
         return VLC_EGENERIC;
 
     if (m->pf_activate != NULL)

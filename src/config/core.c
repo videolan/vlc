@@ -207,7 +207,7 @@ ssize_t config_GetIntChoices(const char *name,
     {
         int (*cb)(const char *, int64_t **, char ***);
 
-        cb = module_Symbol(NULL, cfg->owner, "vlc_entry_cfg_int_enum");
+        cb = vlc_plugin_Symbol(NULL, cfg->owner, "vlc_entry_cfg_int_enum");
         if (cb == NULL)
             return 0;
 
@@ -330,7 +330,7 @@ ssize_t config_GetPszChoices(const char *name,
     {
         int (*cb)(const char *, char ***, char ***);
 
-        cb = module_Symbol(NULL, cfg->owner, "vlc_entry_cfg_str_enum");
+        cb = vlc_plugin_Symbol(NULL, cfg->owner, "vlc_entry_cfg_str_enum");
         if (cb == NULL)
             return 0;
 
