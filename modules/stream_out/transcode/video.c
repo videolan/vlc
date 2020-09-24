@@ -324,7 +324,7 @@ static int transcode_video_set_conversions( sout_stream_t *p_stream,
 
         const es_format_t *p_tmpdst = p_dst;
 
-        if( ! (b_do_scale || b_do_chroma || b_do_orient) )
+        if( !b_do_orient )
             return VLC_SUCCESS;
 
         msg_Dbg( p_stream, "adding (scale %d,chroma %d, orient %d) converters",
