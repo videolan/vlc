@@ -262,4 +262,15 @@ Widgets.NavigableFocusScope {
         anchors.fill: parent
         focus: genreModel.count !== 0
     }
+
+    Connections {
+        target: mainInterface
+        onGridViewChanged: {
+            if (mainInterface.gridView) {
+                view.replace(gridComponent)
+            } else {
+                view.replace(tableComponent)
+            }
+        }
+    }
 }
