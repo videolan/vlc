@@ -237,16 +237,15 @@ static inline picture_t * vlc_picture_chain_PeekFront(vlc_picture_chain_t *chain
  *
  * \return the new tail of the picture chain
  */
-VLC_USED
-static inline picture_t * vlc_picture_chain_Append(picture_t **chain, picture_t *tail,
-                                                   picture_t *pic)
+static inline void vlc_picture_chain_Append(vlc_picture_chain_t *chain,
+                                            picture_t *pic)
 {
-    if (*chain == NULL)
-        *chain = pic;
+    if (chain->front == NULL)
+        chain->front = pic;
     else
-        tail->p_next = pic;
+        chain->tail->p_next = pic;
     pic->p_next = NULL; // we're appending a picture, not a chain
-    return pic;
+    chain->tail = pic;
 }
 
 /**

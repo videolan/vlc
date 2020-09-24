@@ -148,7 +148,7 @@ void vout_snapshot_Set(vout_snapshot_t *snap,
 
         video_format_CopyCrop( &dup->format, fmt );
 
-        snap->pics.tail = vlc_picture_chain_Append( &snap->pics.front, snap->pics.tail, dup );
+        vlc_picture_chain_Append( &snap->pics, dup );
         snap->request_count--;
     }
     vlc_cond_broadcast(&snap->wait);

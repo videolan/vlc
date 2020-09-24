@@ -151,7 +151,7 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 
     assert(!picture_HasChainedPics(p_pic));
     vlc_mutex_lock(&id->fifo.lock);
-    id->fifo.pic.tail = vlc_picture_chain_Append( &id->fifo.pic.front, id->fifo.pic.tail, p_pic );
+    vlc_picture_chain_Append( &id->fifo.pic, p_pic );
     vlc_mutex_unlock(&id->fifo.lock);
 }
 
