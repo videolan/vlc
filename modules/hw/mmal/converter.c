@@ -116,17 +116,12 @@ static MMAL_FOURCC_T pic_to_slice_mmal_fourcc(MMAL_FOURCC_T fcc)
     return 0;
 }
 
-typedef struct pic_fifo_s {
-    picture_t * head;
-    picture_t * tail;
-} pic_fifo_t;
-
-static picture_t * pic_fifo_get(pic_fifo_t * const pf)
+static picture_t * pic_fifo_get(vlc_picture_chain_t * const pf)
 {
-    return vlc_picture_chain_PopFront( &pf->head );
+    return vlc_picture_chain_PopFront( &pf->front );
 }
 
-static void pic_fifo_release_all(pic_fifo_t * const pf)
+static void pic_fifo_release_all(vlc_picture_chain_t * const pf)
 {
     picture_t * pic;
     while ((pic = pic_fifo_get(pf)) != NULL) {
@@ -134,15 +129,14 @@ static void pic_fifo_release_all(pic_fifo_t * const pf)
     }
 }
 
-static void pic_fifo_init(pic_fifo_t * const pf)
+static void pic_fifo_init(vlc_picture_chain_t * const pf)
 {
-    pf->head = NULL;
-    pf->tail = NULL;  // Not strictly needed
+    vlc_picture_chain_Init( pf );
 }
 
-static void pic_fifo_put(pic_fifo_t * const pf, picture_t * pic)
+static void pic_fifo_put(vlc_picture_chain_t * const pf, picture_t * pic)
 {
-    pf->tail = vlc_picture_chain_Append( &pf->head, pf->tail, pic  );
+    pf->tail = vlc_picture_chain_Append( &pf->front, pf->tail, pic  );
 }
 
 #define SUBS_MAX 3
@@ -167,7 +161,7 @@ typedef struct
 
     subpic_reg_stash_t subs[SUBS_MAX];
 
-    pic_fifo_t ret_pics;
+    vlc_picture_chain_t ret_pics;
 
     unsigned int pic_n;
     vlc_sem_t sem;
@@ -186,7 +180,7 @@ typedef struct
 
     // Slice specific tracking stuff
     struct {
-        pic_fifo_t pics;
+        vlc_picture_chain_t pics;
         unsigned int line;  // Lines filled
     } slice;
 
