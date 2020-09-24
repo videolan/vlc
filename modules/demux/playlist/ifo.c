@@ -52,8 +52,6 @@ int Import_IFO( vlc_object_t *p_this )
 {
     stream_t *p_stream = (stream_t *)p_this;
 
-    CHECK_FILE(p_stream);
-
     if( !stream_HasExtension( p_stream, ".IFO" ) )
         return VLC_EGENERIC;
 

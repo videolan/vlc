@@ -47,7 +47,6 @@ int Import_podcast( vlc_object_t *p_this )
 {
     stream_t *p_demux = (stream_t *)p_this;
 
-    CHECK_FILE(p_demux);
     if( stream_IsMimeType( p_demux->s, "text/xml" )
      || stream_IsMimeType( p_demux->s, "application/xml" ) )
     {

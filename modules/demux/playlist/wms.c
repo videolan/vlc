@@ -73,8 +73,6 @@ int Import_WMS(vlc_object_t *obj)
     stream_t *demux = (stream_t *)obj;
     const uint8_t *peek;
 
-    CHECK_FILE(demux);
-
     if (vlc_stream_Peek(demux->s, &peek, 10) < 10
      || strncmp((const char *)peek, "[Reference]", 11))
         return VLC_EGENERIC;

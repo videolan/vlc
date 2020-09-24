@@ -45,7 +45,7 @@ static int ReadDir( stream_t *, input_item_node_t * );
 int Import_iTML( vlc_object_t *p_this )
 {
     stream_t *p_demux = (stream_t *)p_this;
-    CHECK_FILE(p_demux);
+
     if( !stream_HasExtension( p_demux, ".xml" )
      && !p_demux->obj.force )
         return VLC_EGENERIC;

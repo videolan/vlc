@@ -274,11 +274,9 @@ static int ReadDir(stream_t *s, input_item_node_t *node)
  *****************************************************************************/
 int Import_LuaPlaylist(vlc_object_t *obj)
 {
-    if( lua_Disabled( obj ) )
-        return VLC_EGENERIC;
-
     stream_t *s = (stream_t *)obj;
-    if( s->s->pf_readdir != NULL )
+
+    if( lua_Disabled( obj ) )
         return VLC_EGENERIC;
 
     struct vlclua_playlist *sys = malloc(sizeof (*sys));

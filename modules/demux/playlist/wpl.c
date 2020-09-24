@@ -279,7 +279,6 @@ int Import_WPL( vlc_object_t* p_this )
 {
     stream_t* p_demux = (stream_t*)p_this;
 
-    CHECK_FILE(p_demux);
     if( !stream_HasExtension( p_demux, ".wpl" ) &&
         !stream_HasExtension( p_demux, ".zpl" ) )
         return VLC_EGENERIC;

@@ -47,8 +47,6 @@ int Import_PLS( vlc_object_t *p_this )
     stream_t *p_demux = (stream_t *)p_this;
     const uint8_t *p_peek;
 
-    CHECK_FILE(p_demux);
-
     if( vlc_stream_Peek( p_demux->s, &p_peek, 10 ) < 10 ) {
         msg_Dbg( p_demux, "not enough data" );
         return VLC_EGENERIC;

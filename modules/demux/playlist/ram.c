@@ -73,7 +73,6 @@ int Import_RAM( vlc_object_t *p_this )
     stream_t *p_demux = (stream_t *)p_this;
     const uint8_t *p_peek;
 
-    CHECK_FILE(p_demux);
     if( !stream_HasExtension( p_demux, ".ram" )
      && !stream_HasExtension( p_demux, ".rm" ) )
         return VLC_EGENERIC;

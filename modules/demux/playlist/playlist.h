@@ -65,9 +65,3 @@ void Close_WPL ( vlc_object_t * );
 
 #define GetCurrentItem(obj) ((obj)->p_input_item)
 #define GetSource(obj) ((obj)->s)
-
-#define CHECK_FILE(obj) \
-do { \
-    if( GetSource(obj)->pf_readdir != NULL ) \
-        return VLC_EGENERIC; \
-} while(0)

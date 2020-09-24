@@ -48,7 +48,6 @@ int Import_B4S( vlc_object_t *p_this )
 {
     stream_t *demux = (stream_t *)p_this;
 
-    CHECK_FILE(demux);
     if( !stream_HasExtension( demux, ".b4s" ) )
         return VLC_EGENERIC;
 

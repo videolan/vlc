@@ -80,7 +80,6 @@ int Import_M3U( vlc_object_t *p_this )
     ssize_t i_peek;
     int offset = 0;
 
-    CHECK_FILE(p_stream);
     i_peek = vlc_stream_Peek( p_stream->s, &p_peek, 1024 );
     if( i_peek < 8 )
         return VLC_EGENERIC;

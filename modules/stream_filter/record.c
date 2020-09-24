@@ -79,9 +79,6 @@ static int Open ( vlc_object_t *p_this )
     stream_t *s = (stream_t*)p_this;
     stream_sys_t *p_sys;
 
-    if( s->s->pf_readdir != NULL )
-        return VLC_EGENERIC;
-
     /* */
     s->p_sys = p_sys = malloc( sizeof( *p_sys ) );
     if( !p_sys )

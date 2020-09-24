@@ -155,9 +155,6 @@ static bool PeekASX( stream_t *s )
 int Import_ASX( vlc_object_t *p_this )
 {
     stream_t *p_demux = (stream_t *)p_this;
-
-    CHECK_FILE(p_demux);
-
     char *type = stream_MimeType( p_demux->s );
 
     if( stream_HasExtension( p_demux, ".asx" )
