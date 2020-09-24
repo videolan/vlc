@@ -156,6 +156,7 @@ static int OpenEncoder(vlc_object_t *this)
     }
 
     int ret;
+    int err = VLC_EGENERIC;
 
     ret = rav1e_config_parse_int(ra_config, "height", enc->fmt_in.video.i_visible_height);
     if (ret < 0)
@@ -173,7 +174,8 @@ static int OpenEncoder(vlc_object_t *this)
     RaRational *timebase = malloc(sizeof(RaRational));
     if (timebase == NULL)
     {
-        msg_Err(enc, "%s", "Unable to set width\n");
+        msg_Err(enc, "%s", "Unable to allocate timebase\n");
+        err = VLC_ENOMEM;
         goto error;
     }
 
@@ -259,6 +261,7 @@ static int OpenEncoder(vlc_object_t *this)
     if (!sys->ra_context)
     {
         msg_Err(enc, "Unable to allocate a new context\n");
+        err = VLC_ENOMEM;
         goto error;
     }
     rav1e_config_unref(ra_config);
@@ -273,7 +276,7 @@ static int OpenEncoder(vlc_object_t *this)
 error:
     rav1e_config_unref(ra_config);
     free(sys);
-    return VLC_EGENERIC;
+    return err;
 }
 
 static void CloseEncoder(vlc_object_t* this)
