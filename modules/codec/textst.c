@@ -40,7 +40,6 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
 
 typedef struct
 {
@@ -52,7 +51,7 @@ vlc_module_begin()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_SCODEC)
     set_capability("spu decoder", 10)
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
 
 #define BD_TEXTST_DATA_STRING      1
@@ -259,12 +258,6 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
     return VLCDEC_SUCCESS;
 }
 
-static void Close(vlc_object_t *object)
-{
-    decoder_t *p_dec = (decoder_t*)object;
-    free(p_dec->p_sys);
-}
-
 static int Open(vlc_object_t *object)
 {
     decoder_t *p_dec = (decoder_t*)object;
@@ -272,7 +265,7 @@ static int Open(vlc_object_t *object)
     if (p_dec->fmt_in.i_codec != VLC_CODEC_BD_TEXT)
         return VLC_EGENERIC;
 
-    decoder_sys_t *p_sys = malloc(sizeof(decoder_sys_t));
+    decoder_sys_t *p_sys = vlc_obj_malloc(object, sizeof(decoder_sys_t));
     if(!p_sys)
         return VLC_ENOMEM;
     memset(p_sys->palette, 0xFF, 256 * sizeof(uint32_t));
