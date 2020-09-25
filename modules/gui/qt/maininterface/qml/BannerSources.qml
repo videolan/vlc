@@ -111,16 +111,22 @@ Widgets.NavigableFocusScope {
                     anchors.leftMargin: VLCStyle.applicationHorizontalMargin
                     spacing: VLCStyle.margin_xxxsmall
 
+                    Widgets.IconToolButton {
+                         id: history_back
+                         size: VLCStyle.banner_icon_size
+                         iconText: VLCIcons.topbar_previous
+                         text: i18n.qtr("Previous")
+                         height: localToolbar.height
+                         colorDisabled: VLCStyle.colors.textDisabled
+                         onClicked: history.previous()
+                         enabled: !history.previousEmpty
+                     }
+
                     Image {
                         sourceSize.width: VLCStyle.icon_small
                         sourceSize.height: VLCStyle.icon_small
                         source: "qrc:///logo/cone.svg"
                         enabled: false
-                    }
-
-                    Widgets.SubtitleLabel {
-                        text: "VLC"
-                        font.pixelSize: VLCStyle.fontSize_xxlarge
                     }
 
                 }
@@ -169,17 +175,6 @@ Widgets.NavigableFocusScope {
                         id: localContextModel
 
                         property int countExtra: 0
-
-                        Widgets.IconToolButton {
-                             id: history_back
-                             size: VLCStyle.banner_icon_size
-                             iconText: VLCIcons.topbar_previous
-                             text: i18n.qtr("Previous")
-                             height: localToolbar.height
-                             colorDisabled: VLCStyle.colors.textDisabled
-                             onClicked: history.previous()
-                             enabled: !history.previousEmpty
-                         }
 
                         Widgets.IconToolButton {
                             id: list_grid_btn
@@ -288,6 +283,18 @@ Widgets.NavigableFocusScope {
                         }
 
                         Widgets.IconToolButton {
+                            id: playlist_btn
+
+                            size: VLCStyle.banner_icon_size
+                            iconText: VLCIcons.playlist
+                            text: i18n.qtr("Playlist")
+                            height: playlistGroup.height
+
+                            onClicked:  mainInterface.playlistVisible = !mainInterface.playlistVisible
+                            color: mainInterface.playlistVisible && !playlist_btn.backgroundVisible ? VLCStyle.colors.accent : VLCStyle.colors.buttonText
+                        }
+
+                        Widgets.IconToolButton {
                             id: menu_selector
 
                             size: VLCStyle.banner_icon_size
@@ -301,19 +308,6 @@ Widgets.NavigableFocusScope {
                                 id: contextMenu
                                 ctx: mainctx
                             }
-
-                        }
-
-                        Widgets.IconToolButton {
-                            id: playlist_btn
-
-                            size: VLCStyle.banner_icon_size
-                            iconText: VLCIcons.playlist
-                            text: i18n.qtr("Playlist")
-                            height: playlistGroup.height
-
-                            onClicked:  mainInterface.playlistVisible = !mainInterface.playlistVisible
-                            color: mainInterface.playlistVisible && !playlist_btn.backgroundVisible ? VLCStyle.colors.accent : VLCStyle.colors.buttonText
                         }
                     }
 
