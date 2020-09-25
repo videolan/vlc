@@ -97,8 +97,6 @@ Widgets.NavigableFocusScope {
             id: col
             anchors {
                 fill: parent
-                leftMargin: VLCStyle.applicationHorizontalMargin
-                rightMargin: VLCStyle.applicationHorizontalMargin
                 topMargin: VLCStyle.applicationVerticalMargin
             }
 
@@ -110,7 +108,7 @@ Widgets.NavigableFocusScope {
                 RowLayout {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
-                    anchors.leftMargin: VLCStyle.margin_normal
+                    anchors.leftMargin: VLCStyle.applicationHorizontalMargin
                     spacing: VLCStyle.margin_xxxsmall
 
                     Image {
@@ -164,6 +162,7 @@ Widgets.NavigableFocusScope {
                         top: parent.top
                         left: parent.left
                         bottom: parent.bottom
+                        leftMargin: VLCStyle.applicationHorizontalMargin
                     }
 
                     model: ObjectModel {
@@ -274,6 +273,7 @@ Widgets.NavigableFocusScope {
                         top: parent.top
                         right: parent.right
                         bottom: parent.bottom
+                        rightMargin: VLCStyle.applicationHorizontalMargin
                     }
                     spacing: VLCStyle.margin_xxxsmall
 
