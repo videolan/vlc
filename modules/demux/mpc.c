@@ -110,13 +110,7 @@ static int Open( vlc_object_t * p_this )
             return VLC_EGENERIC;
 
         if( !p_demux->obj.force )
-        {
-            /* Check file name extension */
-            if( !demux_IsPathExtension( p_demux, ".mpc" ) &&
-                !demux_IsPathExtension( p_demux, ".mp+" ) &&
-                !demux_IsPathExtension( p_demux, ".mpp" ) )
-                return VLC_EGENERIC;
-        }
+            return VLC_EGENERIC;
     }
 
     /* */
