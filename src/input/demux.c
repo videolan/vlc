@@ -154,6 +154,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
     p_demux->p_sys      = NULL;
 
     char *modbuf = NULL;
+    bool strict = true;
 
     if (!strcasecmp(module, "any" ) || module[0] == '\0') {
         /* Look up demux by content type for hard to detect formats */
@@ -163,6 +164,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
             module = demux_NameFromMimeType(type);
             free(type);
         }
+        strict = false;
     }
 
     if (strcasecmp(module, "any") == 0 && p_demux->psz_filepath != NULL)
@@ -176,9 +178,8 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
             if (likely(asprintf(&modbuf, "ext-%s", ext + 1) >= 0))
                 module = modbuf;
         }
+        strict = false;
     }
-
-    bool strict = strcmp(module, p_demux->psz_name) == 0;
 
     priv->module = vlc_module_load(p_demux, "demux", module, strict,
                                    demux_Probe, p_demux);
