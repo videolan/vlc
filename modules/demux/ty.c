@@ -70,6 +70,8 @@ vlc_module_begin ()
      */
     set_callbacks( Open, Close )
     add_shortcut("ty", "tivo")
+    add_file_extension("ty")
+    add_file_extension("ty+")
 vlc_module_end ()
 
 /*****************************************************************************
