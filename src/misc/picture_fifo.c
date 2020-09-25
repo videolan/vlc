@@ -92,27 +92,27 @@ void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before
 {
     picture_t *picture;
 
+    vlc_picture_chain_t flush_chain;
+
+    vlc_picture_chain_Init(&flush_chain);
+
     vlc_mutex_lock(&fifo->lock);
+    vlc_picture_chain_t filter_chain;
+    vlc_picture_chain_GetAndClear(&fifo->pics, &filter_chain);
 
-    vlc_picture_chain_t old_chain = fifo->pics;
-    PictureFifoReset(fifo);
-
-    picture_fifo_t tmp;
-    PictureFifoReset(&tmp);
-
-    while ( !vlc_picture_chain_IsEmpty( &old_chain ) ) {
-        picture_t *picture = vlc_picture_chain_PopFront( &old_chain );
+    while ( !vlc_picture_chain_IsEmpty( &filter_chain ) ) {
+        picture_t *picture = vlc_picture_chain_PopFront( &filter_chain );
 
         if ((date == VLC_TICK_INVALID) ||
             ( flush_before && picture->date <= date) ||
             (!flush_before && picture->date >= date))
-            PictureFifoPush(&tmp, picture);
+            vlc_picture_chain_Append( &flush_chain, picture );
         else
             PictureFifoPush(fifo, picture);
     }
     vlc_mutex_unlock(&fifo->lock);
 
-    while ((picture = PictureFifoPop(&tmp)) != NULL)
+    while ((picture = vlc_picture_chain_PopFront(&flush_chain)) != NULL)
         picture_Release(picture);
 }
 void picture_fifo_Delete(picture_fifo_t *fifo)
