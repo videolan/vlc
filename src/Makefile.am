@@ -479,7 +479,6 @@ libvlccore_la_SOURCES += \
 	posix/filesystem.c \
 	posix/plugin.c \
 	posix/rand.c \
-	posix/spawn.c \
 	posix/timer.c
 if !HAVE_LINUX
 libvlccore_la_SOURCES += posix/wait.c
@@ -494,6 +493,7 @@ libvlccore_la_SOURCES += \
 	posix/error.c \
 	posix/netconf.c \
 	posix/picture.c \
+	posix/spawn.c \
 	posix/specific.c
 if HAVE_LIBANL
 libvlccore_la_SOURCES += \
