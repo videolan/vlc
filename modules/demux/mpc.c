@@ -57,6 +57,9 @@ vlc_module_begin ()
 
     set_callback( Open )
     add_shortcut( "mpc" )
+    add_file_extension("mpc")
+    add_file_extension("mp+")
+    add_file_extension("mpp")
 vlc_module_end ()
 
 /*****************************************************************************
