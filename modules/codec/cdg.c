@@ -70,7 +70,6 @@ typedef struct
  * Local prototypes
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
 
 static int Decode( decoder_t *, block_t * );
 
@@ -86,7 +85,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_description( N_("CDG video decoder") )
     set_capability( "video decoder", 1000 )
-    set_callbacks( Open, Close )
+    set_callback( Open )
     add_shortcut( "cdg" )
 vlc_module_end ()
 
@@ -102,7 +101,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
-    p_dec->p_sys = p_sys = calloc( 1, sizeof(decoder_sys_t) );
+    p_dec->p_sys = p_sys = vlc_obj_calloc( p_this, 1, sizeof(decoder_sys_t) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -184,17 +183,6 @@ exit:
     if( p_pic != NULL )
         decoder_QueueVideo( p_dec, p_pic );
     return VLCDEC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close: decoder destruction
- *****************************************************************************/
-static void Close( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t *)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    free( p_sys );
 }
 
 /*****************************************************************************
