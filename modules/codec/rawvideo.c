@@ -54,7 +54,6 @@ typedef struct
  ****************************************************************************/
 static int  OpenDecoder   ( vlc_object_t * );
 static int  OpenPacketizer( vlc_object_t * );
-static void CloseCommon   ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -64,12 +63,12 @@ vlc_module_begin ()
     set_capability( "video decoder", 50 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
-    set_callbacks( OpenDecoder, CloseCommon )
+    set_callback( OpenDecoder )
 
     add_submodule ()
     set_description( N_("Pseudo raw video packetizer") )
     set_capability( "packetizer", 100 )
-    set_callbacks( OpenPacketizer, CloseCommon )
+    set_callback( OpenPacketizer )
 vlc_module_end ()
 
 /**
@@ -90,7 +89,7 @@ static int OpenCommon( decoder_t *p_dec )
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    decoder_sys_t *p_sys = calloc(1, sizeof(*p_sys));
+    decoder_sys_t *p_sys = vlc_obj_calloc(VLC_OBJECT(p_dec), 1, sizeof(*p_sys));
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
@@ -324,13 +323,4 @@ static int OpenPacketizer( vlc_object_t *p_this )
         p_dec->pf_flush = Flush;
     }
     return ret;
-}
-
-/**
- * Common deinitialization
- */
-static void CloseCommon( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t*)p_this;
-    free( p_dec->p_sys );
 }
