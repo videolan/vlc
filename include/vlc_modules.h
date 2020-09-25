@@ -43,7 +43,8 @@ struct vlc_logger;
  * table.
  *
  * \param capability capability, i.e. class of module
- * \param names string of comma-separated requested module shortcut names
+ * \param names string of comma-separated requested module shortcut names,
+ *              or NULL for defaults
  * \param strict whether to exclude modules with no unmatching shortcut names
  * \param modules storage location for the base address of a sorted table
  *                of candidate modules (NULL on error) [OUT]

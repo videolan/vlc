@@ -125,32 +125,34 @@ ssize_t vlc_module_match(const char *capability, const char *names,
     *modules = sorted;
 
     /* Go through the list of module shortcut names. */
-    while (names[0] != '\0') {
-        const char *shortcut = names;
-        size_t slen = strcspn(names, ",");
+    if (names != NULL) {
+        while (names[0] != '\0') {
+            const char *shortcut = names;
+            size_t slen = strcspn(names, ",");
 
-        names += slen;
-        names += strspn(names, ",");
+            names += slen;
+            names += strspn(names, ",");
 
-        /* "none" matches nothing and ends the search */
-        if (slen == 4 && strncasecmp("none", shortcut, 4) == 0) {
-            total = 0;
-            break;
-        }
+            /* "none" matches nothing and ends the search */
+            if (slen == 4 && strncasecmp("none", shortcut, 4) == 0) {
+                total = 0;
+                break;
+            }
 
-        /* "any" matches everything with strictly positive score */
-        if (slen == 3 && strncasecmp("any", shortcut, 3) == 0) {
-            strict = false;
-            break;
-        }
+            /* "any" matches everything with strictly positive score */
+            if (slen == 3 && strncasecmp("any", shortcut, 3) == 0) {
+                strict = false;
+                break;
+            }
 
-        for (size_t i = 0; i < total; i++) {
-            module_t *cand = unsorted[i];
+            for (size_t i = 0; i < total; i++) {
+                module_t *cand = unsorted[i];
 
-            if (cand != NULL && module_match_name(cand, shortcut, slen)) {
-                assert(matches < total);
-                sorted[matches++] = cand;
-                unsorted[i] = NULL;
+                if (cand != NULL && module_match_name(cand, shortcut, slen)) {
+                    assert(matches < total);
+                    sorted[matches++] = cand;
+                    unsorted[i] = NULL;
+                }
             }
         }
     }

@@ -59,7 +59,7 @@ vlc_tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
         key_path = cert_path;
 
     module_t **mods;
-    ssize_t total = vlc_module_match("tls server", "any", false, &mods, NULL);
+    ssize_t total = vlc_module_match("tls server", NULL, false, &mods, NULL);
 
     for (ssize_t i = 0; i < total; i++) {
         int (*probe)(vlc_tls_server_t *, const char *, const char *);
@@ -98,7 +98,7 @@ vlc_tls_client_t *vlc_tls_ClientCreate(vlc_object_t *obj)
         return NULL;
 
     module_t **mods;
-    ssize_t total = vlc_module_match("tls client", "any", false, &mods, NULL);
+    ssize_t total = vlc_module_match("tls client", NULL, false, &mods, NULL);
 
     for (ssize_t i = 0; i < total; i++) {
         int (*probe)(vlc_tls_client_t *);

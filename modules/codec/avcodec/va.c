@@ -109,7 +109,7 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
         return NULL;
 
     module_t **mods;
-    ssize_t total = vlc_module_match("hw decoder", "any", false, &mods, NULL);
+    ssize_t total = vlc_module_match("hw decoder", NULL, false, &mods, NULL);
 
     for (ssize_t i = 0; i < total; i++) {
         vlc_va_open open = vlc_module_map(obj->logger, mods[i]);
