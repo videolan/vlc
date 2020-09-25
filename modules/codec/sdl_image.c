@@ -46,7 +46,6 @@ typedef struct
  * Local prototypes
  *****************************************************************************/
 static int  OpenDecoder   ( vlc_object_t * );
-static void CloseDecoder  ( vlc_object_t * );
 
 static int DecodeBlock  ( decoder_t *, block_t * );
 
@@ -59,7 +58,7 @@ vlc_module_begin ()
     set_shortname( N_("SDL Image decoder"))
     set_description( N_("SDL_image video decoder") )
     set_capability( "video decoder", 60 )
-    set_callbacks( OpenDecoder, CloseDecoder )
+    set_callback( OpenDecoder )
     add_shortcut( "sdl_image" )
 vlc_module_end ()
 
@@ -106,7 +105,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+          vlc_obj_malloc(p_this, sizeof(decoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
     p_sys->psz_sdl_type = p_supported_fmt[i].psz_sdl_type;
 
@@ -266,15 +265,4 @@ error:
     if ( p_surface != NULL ) SDL_FreeSurface( p_surface );
     block_Release( p_block );
     return VLCDEC_SUCCESS;
-}
-
-/*****************************************************************************
- * CloseDecoder: sdl decoder destruction
- *****************************************************************************/
-static void CloseDecoder( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t *)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    free( p_sys );
 }
