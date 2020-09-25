@@ -1376,7 +1376,7 @@ int tt_OpenDecoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
-    p_dec->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
+    p_dec->p_sys = p_sys = vlc_obj_calloc( p_this, 1, sizeof( *p_sys ) );
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
@@ -1389,15 +1389,4 @@ int tt_OpenDecoder( vlc_object_t *p_this )
     ttml_in_pes_Init( &p_sys->pes );
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * tt_CloseDecoder: clean up the decoder
- *****************************************************************************/
-void tt_CloseDecoder( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t *)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    free( p_sys );
 }
