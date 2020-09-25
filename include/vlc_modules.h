@@ -46,7 +46,7 @@ struct vlc_logger;
  * \param names string of comma-separated requested module shortcut names
  * \param strict whether to exclude modules with no unmatching shortcut names
  * \param modules storage location for the base address of a sorted table
- *                of candidate modules [OUT]
+ *                of candidate modules (NULL on error) [OUT]
  * \param strict_matches storage location for the count of strictly matched
  *                       modules [OUT]
  * \return number of modules found or a strictly negative value on error

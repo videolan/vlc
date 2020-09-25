@@ -112,16 +112,17 @@ ssize_t vlc_module_match(const char *capability, const char *names,
     module_t **sorted = malloc(total * sizeof (*sorted));
     size_t matches = 0;
 
-    *modules = sorted;
-
     if (total > 0) {
         if (unlikely(unsorted == NULL || sorted == NULL)) {
             free(unsorted);
             free(sorted);
+            *modules = NULL;
             return -1;
         }
         memcpy(unsorted, tab, total * sizeof (*unsorted));
     }
+
+    *modules = sorted;
 
     /* Go through the list of module shortcut names. */
     while (names[0] != '\0') {
