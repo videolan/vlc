@@ -187,6 +187,9 @@ Item {
     property int localToolbar_height: dp(40, scale)
     property int banner_icon_size: dp(38, scale)
 
+    property int bannerTabButton_width_small: banner_icon_size
+    property int bannerTabButton_width_large: column_width
+
     //timings
     property int delayToolTipAppear: 500;
     property int timingPlaylistClose: 1000;

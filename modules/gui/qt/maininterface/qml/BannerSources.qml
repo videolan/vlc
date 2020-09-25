@@ -105,6 +105,9 @@ Widgets.NavigableFocusScope {
                 width: parent.width
                 height: VLCStyle.globalToolbar_height
 
+                property bool colapseTabButtons: globalToolbar.width  > (Math.max(globalToolbarLeft.width, globalToolbarRight.width) + VLCStyle.applicationHorizontalMargin)* 2
+                                                 + globalMenuGroup.model.count * VLCStyle.bannerTabButton_width_large
+
                 //drag and dbl click the titlebar in CSD mode
                 Loader {
                     anchors.fill: parent
@@ -113,6 +116,7 @@ Widgets.NavigableFocusScope {
                 }
 
                 RowLayout {
+                    id: globalToolbarLeft
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: VLCStyle.applicationHorizontalMargin
@@ -155,6 +159,7 @@ Widgets.NavigableFocusScope {
 
                     delegate: Widgets.BannerTabButton {
                         iconTxt: model.icon
+                        showText: globalToolbar.colapseTabButtons
                         selected: model.index === selectedIndex
                         onClicked: root.itemClicked(model.index)
                         height: globalMenuGroup.height

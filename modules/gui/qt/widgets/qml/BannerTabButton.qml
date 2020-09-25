@@ -29,10 +29,11 @@ T.TabButton {
 
     property color color: VLCStyle.colors.banner
     property color colorSelected: VLCStyle.colors.bg
+    property bool showText: true
 
     text: model.displayText
     padding: 0
-    width: VLCStyle.colWidth(1)
+    width: control.showText ? VLCStyle.bannerTabButton_width_large : VLCStyle.banner_icon_size
     height: implicitHeight
     implicitWidth: contentItem.implicitWidth
     implicitHeight: contentItem.implicitHeight
@@ -73,7 +74,7 @@ T.TabButton {
 
             Widgets.MenuLabel {
                 id: txt
-
+                visible: showText
                 font.weight: (control.activeFocus || control.hovered || control.selected) ? Font.DemiBold : Font.Normal
                 color: (control.activeFocus || control.hovered || control.selected) ? VLCStyle.colors.text : VLCStyle.colors.menuCaption
                 text: control.text
