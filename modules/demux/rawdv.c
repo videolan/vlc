@@ -48,7 +48,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( "DV" )
     set_description( N_("DV (Digital Video) demuxer") )
-    set_capability( "demux", 3 )
+    set_capability( "demux", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     add_bool( "rawdv-hurry-up", false, HURRYUP_TEXT, HURRYUP_LONGTEXT, false )
@@ -135,9 +135,6 @@ static int Open( vlc_object_t * p_this )
     uint32_t    i_dword;
     dv_header_t dv_header;
     dv_id_t     dv_id;
-
-    if( !p_demux->obj.force )
-        return VLC_EGENERIC;
 
     if( vlc_stream_Peek( p_demux->s, &p_peek, DV_PAL_FRAME_SIZE ) <
         DV_NTSC_FRAME_SIZE )
