@@ -39,7 +39,6 @@
  * Module descriptor
  *****************************************************************************/
 static int  DecoderOpen ( vlc_object_t * );
-static void DecoderClose( vlc_object_t * );
 
 #ifdef ENABLE_SOUT
 static int  EncoderOpen ( vlc_object_t * );
@@ -51,7 +50,7 @@ vlc_module_begin ()
     set_capability( "audio decoder", 100 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )
-    set_callbacks( DecoderOpen, DecoderClose )
+    set_callback( DecoderOpen )
 
 #ifdef ENABLE_SOUT
     /* audio encoder submodule */
@@ -257,7 +256,7 @@ static int DecoderOpen( vlc_object_t *p_this )
              p_dec->fmt_in.audio.i_bitspersample );
 
     /* Allocate the memory needed to store the decoder's structure */
-    decoder_sys_t *p_sys = malloc(sizeof(*p_sys));
+    decoder_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof(*p_sys));
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
@@ -627,16 +626,6 @@ static void DAT12Decode( void *outp, const uint8_t *in, unsigned samples )
 
     if( samples )
         *(out++) = dat12tos16(U16_AT(in) >> 4);
-}
-
-/*****************************************************************************
- * DecoderClose: decoder destruction
- *****************************************************************************/
-static void DecoderClose( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t *)p_this;
-
-    free( p_dec->p_sys );
 }
 
 #ifdef ENABLE_SOUT
