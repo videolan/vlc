@@ -165,5 +165,9 @@ Item {
     property string enqueue : "\ue091"
     property string back : "\ue092"
     property string history : "\ue093"
+    property string window_close : "\ue094"
+    property string window_maximize : "\ue095"
+    property string window_minimize : "\ue096"
+    property string window_restore : "\ue097"
 
 }
