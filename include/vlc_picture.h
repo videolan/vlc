@@ -257,6 +257,20 @@ static inline void vlc_picture_chain_AppendChain(picture_t *chain, picture_t *ta
 }
 
 /**
+ * Copy the picture chain in another picture chain and clear the original
+ * picture chain.
+ *
+ * \param in picture chain to copy and clear
+ * \param out picture chain to copy into
+ */
+static inline void vlc_picture_chain_GetAndClear(vlc_picture_chain_t *in,
+                                                 vlc_picture_chain_t *out)
+{
+    *out = *in;
+    vlc_picture_chain_Init(in);
+}
+
+/**
  * Check whether a picture has other pictures linked
  */
 static inline bool picture_HasChainedPics(const picture_t *pic)
