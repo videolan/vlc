@@ -34,14 +34,13 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open(vlc_object_t *);
-static void Close(vlc_object_t *);
 
 vlc_module_begin()
     set_description(N_("Ulead DV audio decoder"))
     set_capability("audio decoder", 50)
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_ACODEC)
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
 
 typedef struct
@@ -146,7 +145,7 @@ static int Open(vlc_object_t *object)
     if (dec->fmt_in.audio.i_rate <= 0)
         return VLC_EGENERIC;
 
-    decoder_sys_t *sys = dec->p_sys = malloc(sizeof(*sys));
+    decoder_sys_t *sys = dec->p_sys = vlc_obj_malloc(object, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
 
@@ -172,11 +171,3 @@ static int Open(vlc_object_t *object)
 
     return VLC_SUCCESS;
 }
-
-static void Close(vlc_object_t *object)
-{
-    decoder_t *dec = (decoder_t *)object;
-
-    free(dec->p_sys);
-}
-
