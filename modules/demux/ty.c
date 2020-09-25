@@ -311,9 +311,7 @@ static int Open(vlc_object_t *p_this)
          U32_AT(&p_peek[4]) != 0x02 ||
          U32_AT(&p_peek[8]) != CHUNK_SIZE )
     {
-        if( !p_demux->obj.force &&
-            !demux_IsPathExtension( p_demux, ".ty" ) &&
-            !demux_IsPathExtension( p_demux, ".ty+" ) )
+        if( !p_demux->obj.force )
             return VLC_EGENERIC;
         msg_Warn( p_demux, "this does not look like a TY file, "
                            "continuing anyway..." );
