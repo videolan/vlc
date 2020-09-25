@@ -48,7 +48,6 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open  ( vlc_object_t * );
-static void Close ( vlc_object_t * );
 
 vlc_module_begin ()
     set_category( CAT_INPUT )
@@ -56,7 +55,7 @@ vlc_module_begin ()
     set_description( N_("MusePack demuxer") )
     set_capability( "demux", 145 )
 
-    set_callbacks( Open, Close )
+    set_callback( Open )
     add_shortcut( "mpc" )
 vlc_module_end ()
 
@@ -118,7 +117,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* */
-    p_sys = calloc( 1, sizeof( *p_sys ) );
+    p_sys = vlc_obj_calloc( p_this, 1, sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -134,12 +133,12 @@ static int Open( vlc_object_t * p_this )
     /* Load info */
     mpc_streaminfo_init( &p_sys->info );
     if( mpc_streaminfo_read( &p_sys->info, &p_sys->reader ) != ERROR_CODE_OK )
-        goto error;
+        return VLC_EGENERIC;
 
     /* */
     mpc_decoder_setup( &p_sys->decoder, &p_sys->reader );
     if( !mpc_decoder_initialize( &p_sys->decoder, &p_sys->info ) )
-        goto error;
+        return VLC_EGENERIC;
 
     /* Fill p_demux fields */
     p_demux->pf_demux = Demux;
@@ -192,24 +191,9 @@ static int Open( vlc_object_t * p_this )
     fmt.i_id = 0;
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
     if( !p_sys->p_es )
-        goto error;
+        return VLC_EGENERIC;
 
     return VLC_SUCCESS;
-
-error:
-    free( p_sys );
-    return VLC_EGENERIC;
-}
-
-/*****************************************************************************
- * Close: frees unused data
- *****************************************************************************/
-static void Close( vlc_object_t * p_this )
-{
-    demux_t        *p_demux = (demux_t*)p_this;
-    demux_sys_t    *p_sys = p_demux->p_sys;
-
-    free( p_sys );
 }
 
 /*****************************************************************************
