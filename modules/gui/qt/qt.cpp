@@ -234,6 +234,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define AUTORAISE_ON_PLAYBACK_LONGTEXT N_( "This option allows the interface to be raised automatically " \
     "when a video/audio playback starts, or never." )
 
+#define QT_CLIENT_SIDE_DECORATION_TEXT N_( "Enable window titlebar" )
+#define QT_CLIENT_SIDE_DECORATION_LONGTEXT N_( "This option enables the title bar. Disabling it will remove " \
+    "the titlebar and move window buttons within the interface (Client Side Decoration)" )
+
 #define FULLSCREEN_CONTROL_PIXELS N_( "Fullscreen controller mouse sensitivity" )
 
 #define CONTINUE_PLAYBACK_TEXT N_("Continue playback?")
@@ -326,6 +330,16 @@ vlc_module_begin ()
               QT_DISABLE_VOLUME_KEYS_TEXT          /* text */,
               QT_DISABLE_VOLUME_KEYS_LONGTEXT      /* longtext */,
               false                                /* advanced mode only */)
+#endif
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+    add_bool( "qt-titlebar",
+#ifdef _WIN32
+              false                              /* use CSD by default on windows */,
+#else
+              true                               /* but not on linux */,
+#endif
+              QT_CLIENT_SIDE_DECORATION_TEXT, QT_CLIENT_SIDE_DECORATION_LONGTEXT, false )
 #endif
 
     add_bool( "qt-embedded-open", false, QT_NATIVEOPEN_TEXT,

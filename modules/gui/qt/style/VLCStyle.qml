@@ -180,8 +180,8 @@ Item {
     property int appHeight: 0
 
     //global application margin "safe area"
-    property int applicationHorizontalMargin: 0
-    property int applicationVerticalMargin: 0
+    property int applicationHorizontalMargin: mainInterface.clientSideDecoration ? dp(5, scale) : 0
+    property int applicationVerticalMargin: mainInterface.clientSideDecoration ? dp(5, scale) : 0
 
     property int globalToolbar_height: dp(32, scale)
     property int localToolbar_height: dp(40, scale)

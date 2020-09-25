@@ -158,6 +158,10 @@ MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::Windo
     /* Should the UI stays on top of other windows */
     b_interfaceOnTop = var_InheritBool( p_intf, "video-on-top" );
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+    m_clientSideDecoration = ! var_InheritBool( p_intf, "qt-titlebar" );
+#endif
+
     QString platformName = QGuiApplication::platformName();
 
 #ifdef QT5_HAS_WAYLAND
@@ -194,6 +198,8 @@ MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::Windo
 
     /* VideoWidget connects for asynchronous calls */
     connect( this, &MainInterface::askToQuit, THEDP, &DialogsProvider::quit, Qt::QueuedConnection  );
+
+    connect(this, &MainInterface::interfaceFullScreenChanged, this, &MainInterface::useClientSideDecorationChanged);
 
     connect( THEDP, &DialogsProvider::toolBarConfUpdated, this, &MainInterface::toolBarConfUpdated );
 
@@ -255,6 +261,12 @@ MainInterface::~MainInterface()
     var_DelCallback( libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
     p_intf->p_sys->p_mi = NULL;
+}
+
+bool MainInterface::useClientSideDecoration() const
+{
+    //don't show CSD when interface is fullscreen
+    return m_clientSideDecoration && !b_interfaceFullScreen;
 }
 
 void MainInterface::computeMinimumSize()

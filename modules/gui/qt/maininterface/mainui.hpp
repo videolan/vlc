@@ -19,7 +19,7 @@ class MainUI : public QObject
     Q_OBJECT
 
 public:
-    explicit MainUI(intf_thread_t *_p_intf, MainInterface* mainInterface, QObject *parent = nullptr);
+    explicit MainUI(intf_thread_t *_p_intf, MainInterface* mainInterface, QWindow* interfaceWindow, QObject *parent = nullptr);
     ~MainUI();
 
     bool setup(QQmlEngine* engine);
@@ -36,6 +36,7 @@ private:
 
     intf_thread_t* m_intf = nullptr;
     MainInterface* m_mainInterface = nullptr;
+    QWindow*       m_interfaceWindow = nullptr;
 
     QQmlComponent* m_component = nullptr;
     QQuickItem* m_rootItem = nullptr;

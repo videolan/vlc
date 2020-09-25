@@ -54,6 +54,12 @@ signals:
     void interfaceFullScreenChanged(bool);
     void incrementIntfUserScaleFactor(bool increment);
 
+private:
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+    bool CSDSetCursor(QMouseEvent* mouseEvent);
+    bool CSDHandleClick(QMouseEvent* mouseEvent);
+#endif
+
 protected:
     intf_thread_t* p_intf = nullptr;
     QWindow* m_window = nullptr;
@@ -66,6 +72,8 @@ protected:
     bool m_pauseOnMinimize ;
     bool m_maximizedView = false;
     bool m_hideAfterCreation  = false; // --qt-start-minimized
+
+    bool m_hasResizeCursor = false;
 
     QRect m_interfaceGeometry;
 };

@@ -65,13 +65,15 @@ void registerAnonymousType( const char *uri, int versionMajor )
 } // anonymous namespace
 
 
-MainUI::MainUI(intf_thread_t *p_intf, MainInterface *mainInterface,  QObject *parent)
+MainUI::MainUI(intf_thread_t *p_intf, MainInterface *mainInterface, QWindow* interfaceWindow,  QObject *parent)
     : QObject(parent)
     , m_intf(p_intf)
     , m_mainInterface(mainInterface)
+    , m_interfaceWindow(interfaceWindow)
 {
     assert(m_intf);
     assert(m_mainInterface);
+    assert(m_interfaceWindow);
 
     registerQMLTypes();
 }
@@ -93,7 +95,7 @@ bool MainUI::setup(QQmlEngine* engine)
     rootCtx->setContextProperty( "i18n", new I18n(this) );
     rootCtx->setContextProperty( "mainctx", new QmlMainContext(m_intf, m_mainInterface, this));
     rootCtx->setContextProperty( "mainInterface", m_mainInterface);
-    rootCtx->setContextProperty( "topWindow", m_mainInterface->windowHandle());
+    rootCtx->setContextProperty( "topWindow", m_interfaceWindow);
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
     rootCtx->setContextProperty( "recentsMedias",  new VLCRecentMediaModel( m_intf, this ));
     rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));

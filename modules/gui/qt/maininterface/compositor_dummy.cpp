@@ -32,17 +32,25 @@ CompositorDummy::CompositorDummy(intf_thread_t *p_intf, QObject* parent)
 MainInterface* CompositorDummy::makeMainInterface()
 {
     m_rootWindow = new MainInterface(m_intf);
+    if (m_rootWindow->useClientSideDecoration())
+        m_rootWindow->setWindowFlag(Qt::FramelessWindowHint);
     m_rootWindow->show();
     QQuickWidget* centralWidget = new QQuickWidget(m_rootWindow);
     centralWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
     new InterfaceWindowHandler(m_intf, m_rootWindow, m_rootWindow->windowHandle(), m_rootWindow);
 
-    MainUI* m_ui = new MainUI(m_intf, m_rootWindow, this);
+    MainUI* m_ui = new MainUI(m_intf, m_rootWindow, m_rootWindow->windowHandle(), this);
     m_ui->setup(centralWidget->engine());
     centralWidget->setContent(QUrl(), m_ui->getComponent(), m_ui->createRootItem());
 
     m_rootWindow->setCentralWidget(centralWidget);
+
+    connect(m_rootWindow, &MainInterface::requestInterfaceMaximized,
+            m_rootWindow, &MainInterface::showMaximized);
+    connect(m_rootWindow, &MainInterface::requestInterfaceNormal,
+            m_rootWindow, &MainInterface::showNormal);
+
     return m_rootWindow;
 }
 

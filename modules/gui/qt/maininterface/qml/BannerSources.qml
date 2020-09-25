@@ -105,6 +105,13 @@ Widgets.NavigableFocusScope {
                 width: parent.width
                 height: VLCStyle.globalToolbar_height
 
+                //drag and dbl click the titlebar in CSD mode
+                Loader {
+                    anchors.fill: parent
+                    active: mainInterface.clientSideDecoration
+                    source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
+                }
+
                 RowLayout {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
@@ -152,6 +159,18 @@ Widgets.NavigableFocusScope {
                         onClicked: root.itemClicked(model.index)
                         height: globalMenuGroup.height
                     }
+                }
+
+                Loader {
+                    id: globalToolbarRight
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        right: parent.right
+                        rightMargin: VLCStyle.applicationHorizontalMargin
+                    }
+                    active: mainInterface.clientSideDecoration
+                    source: "qrc:///widgets/CSDWindowButtonSet.qml"
                 }
             }
 

@@ -65,6 +65,13 @@ Widgets.NavigableFocusScope{
             anchors.rightMargin: VLCStyle.applicationHorizontalMargin
             implicitHeight: rowLayout.implicitHeight
 
+            //drag and dbl click the titlebar in CSD mode
+            Loader {
+                anchors.fill: parent
+                active: mainInterface.clientSideDecoration
+                source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
+            }
+
             RowLayout {
                 id: rowLayout
                 anchors.fill: parent
@@ -131,6 +138,19 @@ Widgets.NavigableFocusScope{
                     Layout.alignment: Qt.AlignTop | Qt.AlignRight
 
                     spacing: VLCStyle.margin_xsmall
+
+                    Loader {
+                        //Layout.alignment: Qt.AlignRight | Qt.AlignTop
+                        anchors.right: parent.right
+                        height: VLCStyle.icon_normal
+                        active: mainInterface.clientSideDecoration
+                        enabled: mainInterface.clientSideDecoration
+                        source: "qrc:///widgets/CSDWindowButtonSet.qml"
+                        onLoaded: {
+                            item.color = VLCStyle.colors.playerFg
+                            item.hoverColor = VLCStyle.colors.windowCSDButtonDarkBg
+                        }
+                    }
 
                     Row {
                         //Layout.alignment: Qt.AlignRight | Qt.AlignTop

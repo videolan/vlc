@@ -152,6 +152,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(bool mediaLibraryAvailable READ hasMediaLibrary CONSTANT)
     Q_PROPERTY(bool gridView READ hasGridView WRITE setGridView NOTIFY gridViewChanged)
     Q_PROPERTY(ColorSchemeModel* colorScheme READ getColorScheme CONSTANT)
+    Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged)
 
 public:
     /* tors */
@@ -188,7 +189,7 @@ public:
     inline bool hasMediaLibrary() const { return b_hasMedialibrary; }
     inline bool hasGridView() const { return m_gridView; }
     inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
-
+    bool useClientSideDecoration() const;
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -252,6 +253,7 @@ protected:
     bool                 b_hasMedialibrary;
     bool                 m_gridView;
     ColorSchemeModel*    m_colorScheme;
+    bool                 m_clientSideDecoration = false;
 
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
@@ -316,6 +318,12 @@ signals:
     void showRemainingTimeChanged(bool);
     void gridViewChanged( bool );
     void colorSchemeChanged( QString );
+    void useClientSideDecorationChanged();
+
+    /// forward window maximise query to the actual window or widget
+    void requestInterfaceMaximized();
+    /// forward window normal query to the actual window or widget
+    void requestInterfaceNormal();
 
     void intfScaleFactorChanged();
 };

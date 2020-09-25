@@ -112,6 +112,9 @@ Item {
         mainInterface.colorScheme.setAvailableColorSchemes(["system", "day", "night"])
     }
 
+    property color windowCSDButtonDarkBg:  "#80484848"
+    property color windowCSDButtonLightBg: "#80DADADA"
+    property color windowCSDButtonBg: isThemeDark ? windowCSDButtonDarkBg : windowCSDButtonLightBg
 
     state: mainInterface.colorScheme.current
     states: [

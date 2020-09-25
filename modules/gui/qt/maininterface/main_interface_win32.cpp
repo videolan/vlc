@@ -340,6 +340,19 @@ bool MainInterfaceWin32::nativeEvent(const QByteArray &eventType, void *message,
     short cmd;
     switch( msg->message )
     {
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+        case WM_NCCALCSIZE:
+        {
+            /* This is used to remove the decoration instead of using FramelessWindowHint because
+             * frameless window don't support areo snapping
+             */
+            if (useClientSideDecoration()) {
+                *result = 0;
+                return true;
+            }
+            break;
+        }
+#endif
         case WM_APPCOMMAND:
             cmd = GET_APPCOMMAND_LPARAM(msg->lParam);
 
