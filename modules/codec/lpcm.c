@@ -44,7 +44,6 @@
  *****************************************************************************/
 static int  OpenDecoder   ( vlc_object_t * );
 static int  OpenPacketizer( vlc_object_t * );
-static void CloseCommon   ( vlc_object_t * );
 
 #ifdef ENABLE_SOUT
 static int  OpenEncoder   ( vlc_object_t * );
@@ -58,12 +57,12 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACODEC )
     set_description( N_("Linear PCM audio decoder") )
     set_capability( "audio decoder", 100 )
-    set_callbacks( OpenDecoder, CloseCommon )
+    set_callback( OpenDecoder )
 
     add_submodule ()
     set_description( N_("Linear PCM audio packetizer") )
     set_capability( "packetizer", 100 )
-    set_callbacks( OpenPacketizer, CloseCommon )
+    set_callback( OpenPacketizer )
 
 #ifdef ENABLE_SOUT
     add_submodule ()
@@ -246,7 +245,8 @@ static int OpenCommon( decoder_t *p_dec, bool b_packetizer )
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys = malloc(sizeof(decoder_sys_t)) ) == NULL )
+    p_sys = vlc_obj_malloc(VLC_OBJECT(p_dec), sizeof (*p_sys));
+    if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
     /* Misc init */
@@ -299,7 +299,7 @@ static int OpenCommon( decoder_t *p_dec, bool b_packetizer )
     else
         p_dec->pf_packetize = Packetize;
     p_dec->pf_flush     = Flush;
-
+    p_dec->p_sys = p_sys;
     return VLC_SUCCESS;
 }
 static int OpenDecoder( vlc_object_t *p_this )
@@ -507,15 +507,6 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
     if( p_out != NULL )
         decoder_QueueAudio( p_dec, p_out );
     return VLCDEC_SUCCESS;
-}
-
-/*****************************************************************************
- * CloseCommon : lpcm decoder destruction
- *****************************************************************************/
-static void CloseCommon( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t*)p_this;
-    free( p_dec->p_sys );
 }
 
 #ifdef ENABLE_SOUT
