@@ -63,7 +63,6 @@ typedef struct
  * Local prototypes
  *****************************************************************************/
 static int  OpenDecoder   ( vlc_object_t * );
-static void CloseDecoder  ( vlc_object_t * );
 
 static int DecodeBlock  ( decoder_t *, block_t * );
 
@@ -77,7 +76,6 @@ typedef struct
 } encoder_sys_t;
 
 static int  OpenEncoder(vlc_object_t *);
-static void CloseEncoder(vlc_object_t *);
 
 static block_t *EncodeBlock(encoder_t *, picture_t *);
 
@@ -89,7 +87,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_description( N_("PNG video decoder") )
     set_capability( "video decoder", 1000 )
-    set_callbacks( OpenDecoder, CloseDecoder )
+    set_callback( OpenDecoder )
     add_shortcut( "png" )
 
     /* encoder submodule */
@@ -98,7 +96,7 @@ vlc_module_begin ()
     set_section(N_("Encoding"), NULL)
     set_description(N_("PNG video encoder"))
     set_capability("encoder", 1000)
-    set_callbacks(OpenEncoder, CloseEncoder)
+    set_callback(OpenEncoder)
 vlc_module_end ()
 
 /*****************************************************************************
@@ -115,7 +113,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    decoder_sys_t *p_sys = malloc( sizeof(decoder_sys_t) );
+    decoder_sys_t *p_sys = vlc_obj_malloc( p_this, sizeof(decoder_sys_t) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
     p_dec->p_sys = p_sys;
@@ -321,17 +319,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     return VLCDEC_SUCCESS;
 }
 
-/*****************************************************************************
- * CloseDecoder: png decoder destruction
- *****************************************************************************/
-static void CloseDecoder( vlc_object_t *p_this )
-{
-    decoder_t *p_dec = (decoder_t *)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    free( p_sys );
-}
-
 static int OpenEncoder(vlc_object_t *p_this)
 {
     encoder_t *p_enc = (encoder_t *) p_this;
@@ -340,7 +327,7 @@ static int OpenEncoder(vlc_object_t *p_this)
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the encoder's structure */
-    encoder_sys_t *p_sys = malloc( sizeof(encoder_sys_t) );
+    encoder_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof(encoder_sys_t));
     if( p_sys == NULL )
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
@@ -444,15 +431,4 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
 
     block_Release(p_block);
     return NULL;
-}
-
-/*****************************************************************************
- * CloseEncoder: png encoder destruction
- *****************************************************************************/
-static void CloseEncoder( vlc_object_t *p_this )
-{
-    encoder_t *p_enc = (encoder_t *)p_this;
-    encoder_sys_t *p_sys = p_enc->p_sys;
-
-    free( p_sys );
 }
