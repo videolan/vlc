@@ -47,7 +47,6 @@
  * Module descriptor.
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
 static int  Decode( decoder_t *, block_t * );
 
 #define OVERRIDE_PAGE_TEXT N_("Override page")
@@ -72,7 +71,7 @@ vlc_module_begin ()
     set_capability( "spu decoder", 50 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 
     add_integer( "telx-override-page", -1,
                  OVERRIDE_PAGE_TEXT, OVERRIDE_PAGE_LONGTEXT, true )
@@ -185,14 +184,13 @@ static int Open( vlc_object_t *p_this )
     decoder_sys_t *p_sys = NULL;
     int            i_val;
 
-
     if( p_dec->fmt_in.i_codec != VLC_CODEC_TELETEXT)
     {
         return VLC_EGENERIC;
     }
 
     p_dec->pf_decode = Decode;
-    p_sys = p_dec->p_sys = calloc( 1, sizeof(*p_sys) );
+    p_sys = p_dec->p_sys = vlc_obj_calloc( p_this, 1, sizeof(*p_sys) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
     p_dec->fmt_out.i_codec = 0;
@@ -247,17 +245,6 @@ static int Open( vlc_object_t *p_this )
 /*       p_sys = NULL; */
 /*     } */
 /*     return VLC_EGENERIC; */
-}
-
-/*****************************************************************************
- * Close:
- *****************************************************************************/
-static void Close( vlc_object_t *p_this )
-{
-    decoder_t     *p_dec = (decoder_t*) p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    free( p_sys );
 }
 
 /**************************
