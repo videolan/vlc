@@ -157,9 +157,9 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 
 static vlc_picture_chain_t transcode_dequeue_all_pics( sout_stream_id_sys_t *id )
 {
+    vlc_picture_chain_t p_pics;
     vlc_mutex_lock(&id->fifo.lock);
-    vlc_picture_chain_t p_pics = id->fifo.pic;
-    vlc_picture_chain_Init( &id->fifo.pic );
+    vlc_picture_chain_GetAndClear(&id->fifo.pic, &p_pics);
     vlc_mutex_unlock(&id->fifo.lock);
 
     return p_pics;
