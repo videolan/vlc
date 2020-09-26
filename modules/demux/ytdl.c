@@ -207,17 +207,9 @@ static void Close(vlc_object_t *obj)
     json_free(&sys->json);
 }
 
-static int OpenFilter(vlc_object_t *obj)
+static int OpenCommon(vlc_object_t *obj)
 {
     stream_t *s = (stream_t *)obj;
-
-    if (s->psz_url == NULL)
-        return VLC_EGENERIC;
-    if (strncasecmp(s->psz_url, "http:", 5)
-     && strncasecmp(s->psz_url, "https:", 6))
-        return VLC_EGENERIC;
-    if (!var_InheritBool(s, "ytdl"))
-        return VLC_EGENERIC;
 
     struct ytdl_playlist *sys = vlc_obj_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
@@ -257,6 +249,21 @@ static int OpenFilter(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
+static int OpenFilter(vlc_object_t *obj)
+{
+    stream_t *s = (stream_t *)obj;
+
+    if (s->psz_url == NULL)
+        return VLC_EGENERIC;
+    if (strncasecmp(s->psz_url, "http:", 5)
+     && strncasecmp(s->psz_url, "https:", 6))
+        return VLC_EGENERIC;
+    if (!var_InheritBool(obj, "ytdl"))
+        return VLC_EGENERIC;
+
+    return OpenCommon(obj);
+}
+
 vlc_module_begin()
     set_shortname("YT-DL")
     set_description("YoutubeDL")
@@ -267,4 +274,9 @@ vlc_module_begin()
     /* TODO: convert to demux and enable by default */
     add_bool("ytdl", false, N_("Enable YT-DL"), N_("Enable YT-DL"), true)
         change_safe()
+
+    add_submodule()
+    set_capability("access", 0)
+    add_shortcut("ytdl")
+    set_callbacks(OpenCommon, Close)
 vlc_module_end()

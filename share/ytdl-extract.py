@@ -18,6 +18,7 @@
 
 import sys
 import json
+import urllib.parse
 import youtube_dl
 
 class logger(object):
@@ -32,6 +33,7 @@ class logger(object):
 
 def url_extract(url):
     opts = {
+        'extract_flat': True,
         'logger': logger(),
         'youtube_include_dash_manifest': False,
     }
@@ -40,7 +42,36 @@ def url_extract(url):
 
     # Process a given URL
     infos = dl.extract_info(url, download=False)
+
+    if 'entries' in infos:
+        for entry in infos['entries']:
+             if 'ie_key' in entry and entry['ie_key']:
+                 # Flat-extracted playlist entry
+                 url = 'ytdl:///?' + urllib.parse.urlencode(entry)
+                 entry['url'] = url;
+
+    print(json.dumps(infos))
+
+def url_process(ie_url):
+    opts = {
+        'logger': logger(),
+        'youtube_include_dash_manifest': False,
+    }
+
+    dl = youtube_dl.YoutubeDL(opts)
+
+    # Rebuild the original IE entry
+    entry = { }
+
+    for p in urllib.parse.parse_qsl(url[9:]):
+        entry[p[0]] = p[1]
+
+    infos = dl.process_ie_result(entry, download=False)
     print(json.dumps(infos))
 
 url = sys.argv[1]
-url_extract(url)
+
+if url.startswith('ytdl:///?'):
+    url_process(url)
+else:
+    url_extract(url)
