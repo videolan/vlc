@@ -121,9 +121,7 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
         }
     }
 
-    if (likely(total >= 0))
-        free(mods);
-
+    free(mods);
     vlc_object_delete(va);
     return NULL;
 }
