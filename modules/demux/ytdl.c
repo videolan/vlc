@@ -294,13 +294,12 @@ static int OpenFilter(vlc_object_t *obj)
 
 vlc_module_begin()
     set_shortname("YT-DL")
-    set_description("YoutubeDL")
+    set_description("YT-DL extractor")
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_STREAM_FILTER)
-    set_capability("stream_filter", 305)
+    set_capability("demux", 5)
     set_callbacks(OpenFilter, Close)
-    /* TODO: convert to demux and enable by default */
-    add_bool("ytdl", false, N_("Enable YT-DL"), N_("Enable YT-DL"), true)
+    add_bool("ytdl", true, N_("Enable YT-DL"), N_("Enable YT-DL"), true)
         change_safe()
 
     add_submodule()
