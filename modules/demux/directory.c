@@ -48,7 +48,6 @@ static int Demux( demux_t *p_demux )
 
 static int Control(demux_t *demux, int query, va_list args)
 {
-    (void) demux;
     switch( query )
     {
         case DEMUX_IS_PLAYLIST:
