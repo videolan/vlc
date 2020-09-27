@@ -132,6 +132,25 @@ static const char *PickArt(const struct json_object *entry)
     return json_get_str(&v->object, "url");
 }
 
+static void GetMeta(vlc_meta_t *meta, const struct json_object *json)
+{
+    const char *title = json_get_str(json, "title");
+    if (title != NULL)
+        vlc_meta_Set(meta, vlc_meta_Title, title);
+
+    const char *desc = json_get_str(json, "description");
+    if (desc != NULL)
+        vlc_meta_Set(meta, vlc_meta_Description, desc);
+
+    const char *author = json_get_str(json, "uploader");
+    if (author != NULL)
+        vlc_meta_Set(meta, vlc_meta_Artist, author);
+
+    const char *arturl = PickArt(json);
+    if (arturl != NULL)
+        vlc_meta_Set(meta, vlc_meta_ArtworkURL, arturl);
+}
+
 static int ReadItem(stream_t *s, input_item_node_t *node,
                     const struct json_object *json)
 {
@@ -158,18 +177,8 @@ static int ReadItem(stream_t *s, input_item_node_t *node,
     if (unlikely(item == NULL))
         return VLC_ENOMEM;
 
-    const char *desc = json_get_str(json, "description");
-    if (desc != NULL)
-        input_item_SetDescription(item, desc);
-
-    const char *author = json_get_str(json, "uploader");
-    if (author != NULL)
-        input_item_SetArtist(item, author);
-
-    const char *arturl = PickArt(json);
-    if (arturl != NULL)
-        input_item_SetArtURL(item, arturl);
-
+    /* Don't care to lock, the item is still private. */
+    GetMeta(item->p_meta, json);
     input_item_AddOption(item, "no-ytdl", 0);
     input_item_node_AppendItem(node, item);
     input_item_Release(item);
