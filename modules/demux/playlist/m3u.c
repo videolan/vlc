@@ -52,24 +52,6 @@ static char *CheckUnicode (const char *str)
     return IsUTF8 (str) ? strdup (str): NULL;
 }
 
-static bool IsHLS(const unsigned char *buf, size_t length)
-{
-    static const char *const hlsexts[] =
-    {
-        "#EXT-X-MEDIA:",
-        "#EXT-X-VERSION:",
-        "#EXT-X-TARGETDURATION:",
-        "#EXT-X-MEDIA-SEQUENCE:",
-        "#EXT-X-STREAM-INF:",
-    };
-
-    for (size_t i = 0; i < ARRAY_SIZE(hlsexts); i++)
-        if (strnstr((const char *)buf, hlsexts[i], length) != NULL)
-            return true;
-
-    return false;
-}
-
 /*****************************************************************************
  * Import_M3U: main import function
  *****************************************************************************/
@@ -101,41 +83,11 @@ int Import_M3U( vlc_object_t *p_this )
         i_peek -= offset;
     }
 
-    /* File type: playlist, or not (HLS manifest or whatever else) */
-    char *type = stream_MimeType(p_stream->s);
-    bool match;
-
-    if (p_stream->obj.force)
-        match = true;
-    else
-    if (type != NULL
-     && !vlc_ascii_strcasecmp(type, "application/vnd.apple.mpegurl")) /* HLS */
-        match = false;
-    else
-    if (memcmp(p_peek, "#EXTM3U", 7 ) == 0
-     || (type != NULL
-      && (vlc_ascii_strcasecmp(type, "application/mpegurl") == 0
-       || vlc_ascii_strcasecmp(type, "application/x-mpegurl") == 0
-       || vlc_ascii_strcasecmp(type, "audio/mpegurl") == 0
-       || vlc_ascii_strcasecmp(type, "vnd.apple.mpegURL") == 0
-       || vlc_ascii_strcasecmp(type, "audio/x-mpegurl") == 0))
-     || stream_HasExtension(p_stream, ".m3u8")
-     || stream_HasExtension(p_stream, ".m3u"))
-        match = !IsHLS(p_peek, i_peek);
-    else
-    if (stream_HasExtension(p_stream, ".vlc")
-     || strncasecmp((const char *)p_peek, "RTSPtext", 8) == 0
-     || ContainsURL(p_peek, i_peek))
-        match = true;
-    else
-        match = false;
-
-    free(type);
-
-    if (!match)
-        return VLC_EGENERIC;
-
-    if (offset != 0 && vlc_stream_Seek(p_stream->s, offset))
+    if (!p_stream->obj.force
+     && memcmp(p_peek, "#EXTM3U", 7 ) != 0
+     && !stream_HasExtension(p_stream, ".vlc")
+     && strncasecmp((const char *)p_peek, "RTSPtext", 8) != 0
+     && !ContainsURL(p_peek, i_peek))
         return VLC_EGENERIC;
 
     msg_Dbg( p_stream, "found valid M3U playlist" );
