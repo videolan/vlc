@@ -92,6 +92,7 @@ vlc_decoder_device_Release
 demux_PacketizerDestroy
 demux_PacketizerNew
 demux_New
+demux_Demux
 demux_vaControl
 demux_vaControlHelper
 vlc_demux_chained_New

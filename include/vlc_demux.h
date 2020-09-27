@@ -298,14 +298,7 @@ static inline void demux_Delete(demux_t *demux)
 VLC_API int demux_vaControlHelper( stream_t *, int64_t i_start, int64_t i_end,
                                    int64_t i_bitrate, int i_align, int i_query, va_list args );
 
-VLC_USED static inline int demux_Demux( demux_t *p_demux )
-{
-    if( !p_demux->pf_demux )
-        return VLC_DEMUXER_SUCCESS;
-
-    return p_demux->pf_demux( p_demux );
-}
-
+VLC_API int demux_Demux( demux_t *p_demux ) VLC_USED;
 VLC_API int demux_vaControl( demux_t *p_demux, int i_query, va_list args );
 
 static inline int demux_Control( demux_t *p_demux, int i_query, ... )

@@ -198,6 +198,13 @@ error:
     return NULL;
 }
 
+int demux_Demux(demux_t *demux)
+{
+    if (demux->pf_demux != NULL)
+        return demux->pf_demux(demux);
+    return VLC_DEMUXER_SUCCESS;
+}
+
 #define static_control_match(foo) \
     static_assert((unsigned) DEMUX_##foo == STREAM_##foo, "Mismatch")
 
