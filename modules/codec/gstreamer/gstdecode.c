@@ -363,6 +363,11 @@ static GstStructure* vlc_to_gst_fmt( const es_format_t *p_fmt )
             gst_structure_set( p_str, "stream-format", G_TYPE_STRING,
                     "byte-stream", NULL );
         break;
+    case VLC_CODEC_HEVC:
+        p_str = gst_structure_new_empty( "video/x-h265" );
+        gst_structure_set( p_str, "alignment", G_TYPE_STRING, "au",
+                "stream-format", G_TYPE_STRING, "hvc1", NULL );
+        break;
     case VLC_CODEC_MP4V:
         p_str = gst_structure_new_empty( "video/mpeg" );
         gst_structure_set( p_str, "mpegversion", G_TYPE_INT, 4,
@@ -370,6 +375,9 @@ static GstStructure* vlc_to_gst_fmt( const es_format_t *p_fmt )
         break;
     case VLC_CODEC_VP8:
         p_str = gst_structure_new_empty( "video/x-vp8" );
+        break;
+    case VLC_CODEC_VP9:
+        p_str = gst_structure_new_empty( "video/x-vp9" );
         break;
     case VLC_CODEC_MPGV:
         p_str = gst_structure_new_empty( "video/mpeg" );
