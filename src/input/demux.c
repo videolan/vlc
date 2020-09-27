@@ -149,6 +149,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
     p_demux->out            = out;
     p_demux->b_preparsing   = b_preparsing;
 
+    p_demux->pf_readdir = NULL;
     p_demux->pf_demux   = NULL;
     p_demux->pf_control = NULL;
     p_demux->p_sys      = NULL;
@@ -202,6 +203,23 @@ int demux_Demux(demux_t *demux)
 {
     if (demux->pf_demux != NULL)
         return demux->pf_demux(demux);
+
+    if (demux->pf_readdir != NULL && demux->p_input_item != NULL) {
+        input_item_node_t *node = input_item_node_Create(demux->p_input_item);
+
+        if (unlikely(node == NULL))
+            return VLC_DEMUXER_EGENERIC;
+
+        if (vlc_stream_ReadDir(demux, node)) {
+             input_item_node_Delete(node);
+             return VLC_DEMUXER_EGENERIC;
+        }
+
+        if (es_out_Control(demux->out, ES_OUT_POST_SUBNODE, node))
+            input_item_node_Delete(node);
+        return VLC_DEMUXER_EOF;
+    }
+
     return VLC_DEMUXER_SUCCESS;
 }
 

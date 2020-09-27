@@ -500,7 +500,7 @@ static void *Preparse( void *data )
         if ( input_item_ShouldPreparseSubItems( priv->p_item )
           && demux_Control( priv->master->p_demux, DEMUX_IS_PLAYLIST,
                             &b_is_playlist ) )
-            b_is_playlist = false;
+            b_is_playlist = priv->master->p_demux->pf_readdir != NULL;
         if( b_is_playlist )
             MainLoop( p_input, false );
         End( p_input );
@@ -675,7 +675,8 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     bool b_paused_at_eof = false;
 
     demux_t *p_demux = input_priv(p_input)->master->p_demux;
-    const bool b_can_demux = p_demux->pf_demux != NULL;
+    const bool b_can_demux = p_demux->pf_demux != NULL
+                          || p_demux->pf_readdir != NULL;
 
     while( !input_Stopped( p_input ) && input_priv(p_input)->i_state != ERROR_S )
     {
@@ -2713,6 +2714,7 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
                        &in->b_can_pace_control ) )
         in->b_can_pace_control = false;
 
+    /* Threaded and directory demuxers do not have pace control */
     assert( in->p_demux->pf_demux != NULL || !in->b_can_pace_control );
 
     if( !in->b_can_pace_control )
