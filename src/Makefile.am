@@ -153,7 +153,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = vlc-plugin.pc
 CLEANFILES += $(pkgconfig_DATA)
 
-.pc.in.pc: $(top_builddir)/config.status
+vlc-plugin.pc: vlc-plugin.pc.in $(top_builddir)/config.status
 	$(AM_V_GEN)cd "$(top_builddir)" && \
 	$(SHELL) ./config.status --file="src/$@"
 
@@ -166,7 +166,7 @@ noinst_DATA = libvlc_win32_rc.rc
 endif
 EXTRA_DIST += libvlc_win32_rc.rc.in
 
-.rc.in.rc: $(top_builddir)/config.status
+libvlc_win32_rc.rc: libvlc_win32_rc.rc.in $(top_builddir)/config.status
 	cd "$(top_builddir)" && \
 	$(SHELL) ./config.status --file="src/$@"
 

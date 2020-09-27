@@ -77,7 +77,7 @@ endif
 
 pkgconfig_DATA = libvlc.pc
 
-.pc.in.pc: $(top_builddir)/config.status
+libvlc.pc: libvlc.pc.in $(top_builddir)/config.status
 	$(AM_V_GEN)cd "$(top_builddir)" && \
 	$(SHELL) ./config.status --file="lib/$@"
 
