@@ -30,6 +30,9 @@
 
 #include <vlc_common.h>
 
+/* from gstreamer/fourcc.c */
+vlc_fourcc_t GetGstVLCFourcc( const char* );
+
 #define gst_vlc_picture_plane_allocator_parent_class parent_class
 G_DEFINE_TYPE (GstVlcPicturePlaneAllocator, gst_vlc_picture_plane_allocator, \
         GST_TYPE_ALLOCATOR);
@@ -130,6 +133,22 @@ static GstMemory* gst_vlc_picture_plane_copy(
     return NULL;
 }
 
+static vlc_fourcc_t gst_vlc_to_map_format( const char* psz_fourcc )
+{
+    if( !psz_fourcc )
+        return VLC_CODEC_UNKNOWN;
+
+    if( strlen( psz_fourcc ) != 4 )
+    {
+        return GetGstVLCFourcc( psz_fourcc );
+    }
+    else
+    {
+        return vlc_fourcc_GetCodecFromString(
+                VIDEO_ES, psz_fourcc );
+    }
+}
+
 void gst_vlc_picture_plane_allocator_release(
     GstVlcPicturePlaneAllocator *p_allocator, GstBuffer *p_buffer )
 {
@@ -221,10 +240,10 @@ bool gst_vlc_set_vout_fmt( GstVideoInfo *p_info, GstVideoAlignment *p_align,
     vlc_fourcc_t i_chroma;
     int i_padded_width, i_padded_height;
 
-    i_chroma = p_outfmt->i_codec = vlc_fourcc_GetCodecFromString(
-            VIDEO_ES,
-            gst_structure_get_string( p_str, "format" ) );
-    if( !i_chroma )
+    const char* psz_fourcc = gst_structure_get_string( p_str, "format" );
+
+    i_chroma = p_outfmt->i_codec = gst_vlc_to_map_format( psz_fourcc );
+    if( !i_chroma || i_chroma == VLC_CODEC_UNKNOWN )
     {
         msg_Err( p_dec, "video chroma type not supported" );
         return false;
