@@ -514,6 +514,7 @@ libdemux_mock_plugin_la_LIBADD = $(LIBM)
 noinst_LTLIBRARIES += libdemux_mock_plugin.la
 
 libvlc_json_la_SOURCES = \
+	demux/json/lexicon.l \
 	demux/json/json.c demux/json/json.h
 libvlc_json_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/demux/json
 libvlc_json_la_LIBADD = $(LTLIBVLCCORE) ../compat/libcompat.la
