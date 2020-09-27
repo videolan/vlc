@@ -1112,7 +1112,13 @@ input_item_t *input_item_Copy( input_item_t *p_input )
     item = input_item_NewExt( p_input->psz_uri, p_input->psz_name,
                               p_input->i_duration, p_input->i_type,
                               ITEM_NET_UNKNOWN );
-    if( likely(item != NULL) && p_input->p_meta != NULL )
+    if( unlikely(item == NULL) )
+    {
+        vlc_mutex_unlock( &p_input->lock );
+        return NULL;
+    }
+
+    if( p_input->p_meta != NULL )
     {
         meta = vlc_meta_New();
         if( likely(meta != NULL) )
@@ -1120,7 +1126,7 @@ input_item_t *input_item_Copy( input_item_t *p_input )
     }
     b_net = p_input->b_net;
 
-    if( likely(item != NULL) && p_input->i_slaves > 0 )
+    if( p_input->i_slaves > 0 )
     {
         for( int i = 0; i < p_input->i_slaves; i++ )
         {
@@ -1137,13 +1143,10 @@ input_item_t *input_item_Copy( input_item_t *p_input )
 
     vlc_mutex_unlock( &p_input->lock );
 
-    if( likely(item != NULL) )
-    {   /* No need to lock; no other thread has seen this new item yet. */
-        input_item_CopyOptions( item, p_input );
-        item->p_meta = meta;
-        item->b_net = b_net;
-    }
-
+    /* No need to lock; no other thread has seen this new item yet. */
+    input_item_CopyOptions( item, p_input );
+    item->p_meta = meta;
+    item->b_net = b_net;
     return item;
 }
 
