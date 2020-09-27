@@ -131,6 +131,7 @@ static void json_append(struct json_object *o, struct json_member m)
 	struct json_object object;
 }
 
+%token YYEOF 0
 %token VALUE_NULL
 %token <boolean> BOOLEAN
 %token <number> NUMBER
