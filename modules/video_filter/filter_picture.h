@@ -49,7 +49,7 @@
 
 #define CASE_PLANAR_YUV                     \
         CASE_PLANAR_YUV_SQUARE              \
-        CASE_PLANAR_YUV_NONSQUARE           \
+        CASE_PLANAR_YUV_NONSQUARE
 
 #define CASE_PACKED_YUV_422                 \
         case VLC_CODEC_UYVY:   \
