@@ -42,7 +42,7 @@ char *json_unescape(const char *in, size_t inlen)
     /* 1) Convert UTF-8 to UTF-16.
      * This will catch any invalid UTF-8 byte sequence.
      */
-    size_t buflen = 2 * (inlen + 1);
+    size_t buflen = 2 * inlen;
     void *buf = malloc(buflen);
 
     if (unlikely(buf == NULL))
