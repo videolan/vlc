@@ -71,9 +71,6 @@ void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed )
 
     vlc_mutex_lock( &p_i->lock );
 
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
-
     int status = vlc_meta_GetStatus(p_i->p_meta);
     int new_status;
     if( b_preparsed )
@@ -100,9 +97,6 @@ void input_item_SetArtNotFound( input_item_t *p_i, bool b_not_found )
 {
     vlc_mutex_lock( &p_i->lock );
 
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
-
     int status = vlc_meta_GetStatus(p_i->p_meta);
 
     if( b_not_found )
@@ -119,9 +113,6 @@ void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched )
 {
     vlc_mutex_lock( &p_i->lock );
 
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
-
     int status = vlc_meta_GetStatus(p_i->p_meta);
 
     if( b_art_fetched )
@@ -137,8 +128,6 @@ void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched )
 void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz_val )
 {
     vlc_mutex_lock( &p_i->lock );
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
     vlc_meta_Set( p_i->p_meta, meta_type, psz_val );
     vlc_mutex_unlock( &p_i->lock );
 
@@ -237,11 +226,6 @@ bool input_item_MetaMatch( input_item_t *p_i,
 {
     vlc_mutex_lock( &p_i->lock );
 
-    if( !p_i->p_meta )
-    {
-        vlc_mutex_unlock( &p_i->lock );
-        return false;
-    }
     const char *psz_meta = vlc_meta_Get( p_i->p_meta, meta_type );
     bool b_ret = psz_meta && strcasestr( psz_meta, psz );
 
@@ -254,9 +238,6 @@ const char *input_item_GetMetaLocked(input_item_t *item,
                                      vlc_meta_type_t meta_type)
 {
     vlc_mutex_assert(&item->lock);
-
-    if (!item->p_meta)
-        return NULL;
 
     return vlc_meta_Get(item->p_meta, meta_type);
 }
@@ -275,13 +256,6 @@ char *input_item_GetTitleFbName( input_item_t *p_item )
 {
     char *psz_ret;
     vlc_mutex_lock( &p_item->lock );
-
-    if( !p_item->p_meta )
-    {
-        psz_ret = p_item->psz_name ? strdup( p_item->psz_name ) : NULL;
-        vlc_mutex_unlock( &p_item->lock );
-        return psz_ret;
-    }
 
     const char *psz_title = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
     if( !EMPTY_STR( psz_title ) )
@@ -439,7 +413,7 @@ char *input_item_GetNowPlayingFb( input_item_t *p_item )
 bool input_item_IsPreparsed( input_item_t *p_item )
 {
     vlc_mutex_lock( &p_item->lock );
-    bool b_preparsed = p_item->p_meta ? ( vlc_meta_GetStatus(p_item->p_meta) & ITEM_PREPARSED ) != 0 : false;
+    bool b_preparsed = vlc_meta_GetStatus(p_item->p_meta) & ITEM_PREPARSED;
     vlc_mutex_unlock( &p_item->lock );
 
     return b_preparsed;
@@ -448,7 +422,7 @@ bool input_item_IsPreparsed( input_item_t *p_item )
 bool input_item_IsArtFetched( input_item_t *p_item )
 {
     vlc_mutex_lock( &p_item->lock );
-    bool b_fetched = p_item->p_meta ? ( vlc_meta_GetStatus(p_item->p_meta) & ITEM_ART_FETCHED ) != 0 : false;
+    bool b_fetched = vlc_meta_GetStatus(p_item->p_meta) & ITEM_ART_FETCHED;
     vlc_mutex_unlock( &p_item->lock );
 
     return b_fetched;
@@ -485,9 +459,7 @@ void input_item_Release( input_item_t *p_item )
     free( p_item->psz_name );
     free( p_item->psz_uri );
     free( p_item->p_stats );
-
-    if( p_item->p_meta != NULL )
-        vlc_meta_Delete( p_item->p_meta );
+    vlc_meta_Delete( p_item->p_meta );
 
     for( input_item_opaque_t *o = p_item->opaques, *next; o != NULL; o = next )
     {
@@ -1062,6 +1034,13 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
     input_item_t *p_input = &owner->item;
     vlc_event_manager_t * p_em = &p_input->event_manager;
 
+    p_input->p_meta = vlc_meta_New();
+    if( unlikely(p_input->p_meta == NULL) )
+    {
+        free(owner);
+        return NULL;
+    }
+
     vlc_mutex_init( &p_input->lock );
 
     p_input->psz_name = NULL;
@@ -1086,7 +1065,6 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
     TAB_INIT( p_input->i_categories, p_input->pp_categories );
     TAB_INIT( p_input->i_es, p_input->es );
     p_input->p_stats = NULL;
-    p_input->p_meta = NULL;
     TAB_INIT( p_input->i_epg, p_input->pp_epg );
     TAB_INIT( p_input->i_slaves, p_input->pp_slaves );
 
@@ -1103,9 +1081,7 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
 
 input_item_t *input_item_Copy( input_item_t *p_input )
 {
-    vlc_meta_t *meta = NULL;
     input_item_t *item;
-    bool b_net;
 
     vlc_mutex_lock( &p_input->lock );
 
@@ -1118,13 +1094,8 @@ input_item_t *input_item_Copy( input_item_t *p_input )
         return NULL;
     }
 
-    if( p_input->p_meta != NULL )
-    {
-        meta = vlc_meta_New();
-        if( likely(meta != NULL) )
-            vlc_meta_Merge( meta, p_input->p_meta );
-    }
-    b_net = p_input->b_net;
+    vlc_meta_Merge( item->p_meta, p_input->p_meta );
+    item->b_net = p_input->b_net;
 
     if( p_input->i_slaves > 0 )
     {
@@ -1145,8 +1116,6 @@ input_item_t *input_item_Copy( input_item_t *p_input )
 
     /* No need to lock; no other thread has seen this new item yet. */
     input_item_CopyOptions( item, p_input );
-    item->p_meta = meta;
-    item->b_net = b_net;
     return item;
 }
 
