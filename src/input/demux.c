@@ -331,10 +331,6 @@ int demux_vaControlHelper( stream_t *s,
             }
             return VLC_EGENERIC;
 
-        case DEMUX_IS_PLAYLIST:
-            *va_arg( args, bool * ) = false;
-            return VLC_SUCCESS;
-
         case DEMUX_GET_FPS:
         case DEMUX_HAS_UNSUPPORTED_META:
         case DEMUX_SET_NEXT_DEMUX_TIME:

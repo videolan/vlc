@@ -495,13 +495,8 @@ static void *Preparse( void *data )
     if( !Init( p_input ) )
     {   /* if the demux is a playlist, call Mainloop that will call
          * demux_Demux in order to fetch sub items */
-        bool b_is_playlist = false;
-
         if ( input_item_ShouldPreparseSubItems( priv->p_item )
-          && demux_Control( priv->master->p_demux, DEMUX_IS_PLAYLIST,
-                            &b_is_playlist ) )
-            b_is_playlist = priv->master->p_demux->pf_readdir != NULL;
-        if( b_is_playlist )
+         && priv->master->p_demux->pf_readdir != NULL )
             MainLoop( p_input, false );
         End( p_input );
     }

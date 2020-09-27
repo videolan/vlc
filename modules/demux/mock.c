@@ -428,8 +428,6 @@ Control(demux_t *demux, int query, va_list args)
             return VLC_SUCCESS;
         case DEMUX_SET_RATE:
             return sys->can_control_rate ? VLC_SUCCESS : VLC_EGENERIC;
-        case DEMUX_IS_PLAYLIST:
-            return VLC_EGENERIC;
         case DEMUX_NAV_ACTIVATE:
             return VLC_EGENERIC;
         case DEMUX_NAV_UP:

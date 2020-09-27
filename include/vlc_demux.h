@@ -251,14 +251,6 @@ enum demux_query_e
      * It should return the value really used in *p_rate */
     DEMUX_SET_RATE,             /* arg1= float*p_rate res=can fail */
 
-    /** Checks whether the stream is actually a playlist, rather than a real
-     * stream.
-     *
-     * Can fail if the stream is not a playlist (same as returning false).
-     *
-     * arg1= bool * */
-    DEMUX_IS_PLAYLIST,
-
     /* Menu (VCD/DVD/BD) Navigation */
     /** Activate the navigation item selected. Can fail */
     DEMUX_NAV_ACTIVATE,
