@@ -167,7 +167,7 @@ endif
 EXTRA_DIST += libvlc_win32_rc.rc.in
 
 libvlc_win32_rc.rc: libvlc_win32_rc.rc.in $(top_builddir)/config.status
-	cd "$(top_builddir)" && \
+	$(AM_V_GEN)cd "$(top_builddir)" && \
 	$(SHELL) ./config.status --file="src/$@"
 
 ###############################################################################
