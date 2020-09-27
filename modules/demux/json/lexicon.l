@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 %option 8bit
+%option bison-bridge
 %option nodefault
 %option noinput
 %option reentrant
@@ -35,8 +36,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "json.h"
-
-enum { VALUE_NULL, BOOLEAN, NUMBER, STRING };
+#include "grammar.h"
 
 %}
 
@@ -46,18 +46,18 @@ enum { VALUE_NULL, BOOLEAN, NUMBER, STRING };
 
 "null" {		return VALUE_NULL; }
 
-"false"	{		//yylval->boolean = false;
+"false"	{		yylval->boolean = false;
 			return BOOLEAN; }
 
-"true" {		//yylval->boolean = true;
+"true" {		yylval->boolean = true;
 			return BOOLEAN; }
 
 -?(0|([1-9][0-9]*))(\.[0-9]+)?(e[+-]?[0-9]+)? {
-			//yylval->number = atof(yytext);
+			yylval->number = atof(yytext);
 			return NUMBER; }
 
 \"([^"\\]|\\[\"\\/bfnrt]|\\u[0-9A-Fa-f]{4})*\" {
-			//yylval->string = json_unescape(yytext + 1, yyleng - 2);
+			yylval->string = json_unescape(yytext + 1, yyleng - 2);
 			return STRING; }
 
 [{}:,[\]] {		return *yytext; }
