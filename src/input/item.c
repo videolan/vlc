@@ -1115,7 +1115,8 @@ input_item_t *input_item_Copy( input_item_t *p_input )
     if( likely(item != NULL) && p_input->p_meta != NULL )
     {
         meta = vlc_meta_New();
-        vlc_meta_Merge( meta, p_input->p_meta );
+        if( likely(meta != NULL) )
+            vlc_meta_Merge( meta, p_input->p_meta );
     }
     b_net = p_input->b_net;
 
