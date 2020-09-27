@@ -124,7 +124,7 @@ vlc_module_begin ()
         add_shortcut( "luaplaylist" )
         set_shortname( N_("Lua Playlist") )
         set_description( N_("Lua Playlist Parser Interface") )
-        set_capability( "stream_filter", 302 )
+        set_capability( "demux", 2 )
         set_callbacks( Import_LuaPlaylist, Close_LuaPlaylist )
 
     add_submodule ()
