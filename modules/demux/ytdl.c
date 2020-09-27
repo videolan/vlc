@@ -117,6 +117,21 @@ static const struct json_object *PickFormat(stream_t *s,
      return best_fmt;
 }
 
+static const char *PickArt(const struct json_object *entry)
+{
+    const struct json_value *v = json_get(entry, "thumbnails");
+
+    if (v == NULL || v->type != JSON_ARRAY || v->array.size == 0)
+        return NULL;
+
+    v = &v->array.entries[0];
+
+    if (v->type != JSON_OBJECT)
+        return NULL;
+
+    return json_get_str(&v->object, "url");
+}
+
 static int ReadItem(stream_t *s, input_item_node_t *node,
                     const struct json_object *json)
 {
@@ -140,11 +155,24 @@ static int ReadItem(stream_t *s, input_item_node_t *node,
 
     input_item_t *item = input_item_NewStream(url, title, ticks);
 
-    if (likely(item != NULL)) {
-        input_item_AddOption(item, "no-ytdl", 0);
-        input_item_node_AppendItem(node, item);
-        input_item_Release(item);
-    }
+    if (unlikely(item == NULL))
+        return VLC_ENOMEM;
+
+    const char *desc = json_get_str(json, "description");
+    if (desc != NULL)
+        input_item_SetDescription(item, desc);
+
+    const char *author = json_get_str(json, "uploader");
+    if (author != NULL)
+        input_item_SetArtist(item, author);
+
+    const char *arturl = PickArt(json);
+    if (arturl != NULL)
+        input_item_SetArtURL(item, arturl);
+
+    input_item_AddOption(item, "no-ytdl", 0);
+    input_item_node_AppendItem(node, item);
+    input_item_Release(item);
 
     return VLC_SUCCESS;
 }
