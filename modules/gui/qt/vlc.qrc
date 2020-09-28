@@ -232,6 +232,7 @@
         <file alias="HorizontalResizeHandle.qml">widgets/qml/HorizontalResizeHandle.qml</file>
         <file alias="PointingTooltip.qml">widgets/qml/PointingTooltip.qml</file>
         <file alias="FrostedGlassEffect.qml">widgets/qml/FrostedGlassEffect.qml</file>
+        <file alias="CheckedDelegate.qml">widgets/qml/CheckedDelegate.qml</file>
         <file alias="PageLoader.qml">widgets/qml/PageLoader.qml</file>
     </qresource>
     <qresource prefix="/network">
