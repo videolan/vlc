@@ -224,12 +224,18 @@ static void HXXXGetBestChroma(decoder_t *p_dec)
     {
         if (i_depth_luma == 8 && i_depth_chroma == 8)
             p_sys->i_cvpx_format = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;
+        else if (i_depth_luma == 10 && i_depth_chroma == 10)
+        {
 #if !TARGET_OS_IPHONE
-        /* Not for iOS since there is no 10bits textures with the old iOS
-         * openGLES version, and therefore no P010 shaders */
-        else if (i_depth_luma == 10 && i_depth_chroma == 10 && deviceSupportsHEVC())
-            p_sys->i_cvpx_format = 'x420'; /* kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange */
+            if (deviceSupportsHEVC()) /* 42010bit went with HEVC on macOS */
+                p_sys->i_cvpx_format = kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange;
+#else
+            /* Force BGRA output (and let VT handle the tone mapping) on iOS
+             * since the apple openGLES implementation can't handle 16 bit
+             * textures. */
+            p_sys->i_cvpx_format = kCVPixelFormatType_32BGRA;
 #endif
+        }
     }
 }
 
