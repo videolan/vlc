@@ -45,9 +45,6 @@ static int  Activate ( vlc_object_t * );
 static void I422_I420( filter_t *, picture_t *, picture_t * );
 static void I422_YV12( filter_t *, picture_t *, picture_t * );
 static void I422_YUVA( filter_t *, picture_t *, picture_t * );
-static picture_t *I422_I420_Filter( filter_t *, picture_t * );
-static picture_t *I422_YV12_Filter( filter_t *, picture_t * );
-static picture_t *I422_YUVA_Filter( filter_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -57,6 +54,10 @@ vlc_module_begin ()
     set_capability( "video converter", 60 )
     set_callback( Activate )
 vlc_module_end ()
+
+VIDEO_FILTER_WRAPPER( I422_I420 )
+VIDEO_FILTER_WRAPPER( I422_YV12 )
+VIDEO_FILTER_WRAPPER( I422_YUVA )
 
 /*****************************************************************************
  * Activate: allocate a chroma function
@@ -109,9 +110,6 @@ static int Activate( vlc_object_t *p_this )
 }
 
 /* Following functions are local */
-VIDEO_FILTER_WRAPPER( I422_I420 )
-VIDEO_FILTER_WRAPPER( I422_YV12 )
-VIDEO_FILTER_WRAPPER( I422_YUVA )
 
 /*****************************************************************************
  * I422_I420: planar YUV 4:2:2 to planar I420 4:2:0 Y:U:V

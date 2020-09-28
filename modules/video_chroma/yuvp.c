@@ -52,9 +52,10 @@ vlc_module_end ()
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static picture_t *Convert_Filter( filter_t *, picture_t * );
 static void Convert( filter_t *, picture_t *, picture_t * );
 static void Yuv2Rgb( uint8_t *r, uint8_t *g, uint8_t *b, int y1, int u1, int v1 );
+
+VIDEO_FILTER_WRAPPER( Convert )
 
 /*****************************************************************************
  * Open: probe the filter and return score
@@ -96,7 +97,6 @@ static void Close( vlc_object_t *p_this )
 /****************************************************************************
  * Filter: the whole thing
  ****************************************************************************/
-VIDEO_FILTER_WRAPPER( Convert )
 
 static void Convert( filter_t *p_filter, picture_t *p_source,
                                            picture_t *p_dest )

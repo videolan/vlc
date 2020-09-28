@@ -53,13 +53,8 @@ static void I422_YUY2               ( filter_t *, picture_t *, picture_t * );
 static void I422_YVYU               ( filter_t *, picture_t *, picture_t * );
 static void I422_UYVY               ( filter_t *, picture_t *, picture_t * );
 static void I422_IUYV               ( filter_t *, picture_t *, picture_t * );
-static picture_t *I422_YUY2_Filter  ( filter_t *, picture_t * );
-static picture_t *I422_YVYU_Filter  ( filter_t *, picture_t * );
-static picture_t *I422_UYVY_Filter  ( filter_t *, picture_t * );
-static picture_t *I422_IUYV_Filter  ( filter_t *, picture_t * );
 #if defined (MODULE_NAME_IS_i422_yuy2)
 static void I422_Y211               ( filter_t *, picture_t *, picture_t * );
-static picture_t *I422_Y211_Filter  ( filter_t *, picture_t * );
 #endif
 
 /*****************************************************************************
@@ -84,6 +79,15 @@ vlc_module_begin ()
 #endif
     set_callback( Activate )
 vlc_module_end ()
+
+
+VIDEO_FILTER_WRAPPER( I422_YUY2 )
+VIDEO_FILTER_WRAPPER( I422_YVYU )
+VIDEO_FILTER_WRAPPER( I422_UYVY )
+VIDEO_FILTER_WRAPPER( I422_IUYV )
+#if defined (MODULE_NAME_IS_i422_yuy2)
+VIDEO_FILTER_WRAPPER( I422_Y211 )
+#endif
 
 /*****************************************************************************
  * Activate: allocate a chroma function
@@ -146,14 +150,6 @@ static int Activate( vlc_object_t *p_this )
 }
 
 /* Following functions are local */
-
-VIDEO_FILTER_WRAPPER( I422_YUY2 )
-VIDEO_FILTER_WRAPPER( I422_YVYU )
-VIDEO_FILTER_WRAPPER( I422_UYVY )
-VIDEO_FILTER_WRAPPER( I422_IUYV )
-#if defined (MODULE_NAME_IS_i422_yuy2)
-VIDEO_FILTER_WRAPPER( I422_Y211 )
-#endif
 
 /*****************************************************************************
  * I422_YUY2: planar YUV 4:2:2 to packed YUY2 4:2:2

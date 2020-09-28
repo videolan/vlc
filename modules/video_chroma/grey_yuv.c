@@ -44,9 +44,6 @@ static int  Activate ( vlc_object_t * );
 static void GREY_I420( filter_t *, picture_t *, picture_t * );
 static void GREY_YUY2( filter_t *, picture_t *, picture_t * );
 
-static picture_t *GREY_I420_Filter( filter_t *, picture_t * );
-static picture_t *GREY_YUY2_Filter( filter_t *, picture_t * );
-
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
@@ -55,6 +52,9 @@ vlc_module_begin ()
     set_capability( "video converter", 80 )
     set_callback( Activate )
 vlc_module_end ()
+
+VIDEO_FILTER_WRAPPER( GREY_I420 )
+VIDEO_FILTER_WRAPPER( GREY_YUY2 )
 
 /*****************************************************************************
  * Activate: allocate a chroma function
@@ -98,9 +98,6 @@ static int Activate( vlc_object_t *p_this )
 
     return 0;
 }
-
-VIDEO_FILTER_WRAPPER( GREY_I420 )
-VIDEO_FILTER_WRAPPER( GREY_YUY2 )
 
 /* Following functions are local */
 

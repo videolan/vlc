@@ -65,16 +65,11 @@ static int  Activate ( vlc_object_t * );
 static void I420_YUY2           ( filter_t *, picture_t *, picture_t * );
 static void I420_YVYU           ( filter_t *, picture_t *, picture_t * );
 static void I420_UYVY           ( filter_t *, picture_t *, picture_t * );
-static picture_t *I420_YUY2_Filter    ( filter_t *, picture_t * );
-static picture_t *I420_YVYU_Filter    ( filter_t *, picture_t * );
-static picture_t *I420_UYVY_Filter    ( filter_t *, picture_t * );
 #if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
 static void I420_IUYV           ( filter_t *, picture_t *, picture_t * );
-static picture_t *I420_IUYV_Filter    ( filter_t *, picture_t * );
 #endif
 #if defined (MODULE_NAME_IS_i420_yuy2)
 static void I420_Y211           ( filter_t *, picture_t *, picture_t * );
-static picture_t *I420_Y211_Filter    ( filter_t *, picture_t * );
 #endif
 
 /*****************************************************************************
@@ -101,6 +96,16 @@ vlc_module_begin ()
 #endif
     set_callback( Activate )
 vlc_module_end ()
+
+VIDEO_FILTER_WRAPPER( I420_YUY2 )
+VIDEO_FILTER_WRAPPER( I420_YVYU )
+VIDEO_FILTER_WRAPPER( I420_UYVY )
+#if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
+VIDEO_FILTER_WRAPPER( I420_IUYV )
+#endif
+#if defined (MODULE_NAME_IS_i420_yuy2)
+VIDEO_FILTER_WRAPPER( I420_Y211 )
+#endif
 
 /*****************************************************************************
  * Activate: allocate a chroma function
@@ -176,16 +181,6 @@ static inline unsigned long long read_cycles(void)
 #endif
 
 /* Following functions are local */
-
-VIDEO_FILTER_WRAPPER( I420_YUY2 )
-VIDEO_FILTER_WRAPPER( I420_YVYU )
-VIDEO_FILTER_WRAPPER( I420_UYVY )
-#if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
-VIDEO_FILTER_WRAPPER( I420_IUYV )
-#endif
-#if defined (MODULE_NAME_IS_i420_yuy2)
-VIDEO_FILTER_WRAPPER( I420_Y211 )
-#endif
 
 /*****************************************************************************
  * I420_YUY2: planar YUV 4:2:0 to packed YUYV 4:2:2

@@ -38,19 +38,9 @@
 #include "i420_rgb.h"
 #ifdef PLAIN
 # include "i420_rgb_c.h"
-static picture_t *I420_RGB8_Filter( filter_t *, picture_t * );
-static picture_t *I420_RGB16_Filter( filter_t *, picture_t * );
-static picture_t *I420_RGB32_Filter( filter_t *, picture_t * );
 
 static void SetYUV( filter_t *, const video_format_t * );
 static void Set8bppPalette( filter_t *, uint8_t * );
-#else
-static picture_t *I420_R5G5B5_Filter( filter_t *, picture_t * );
-static picture_t *I420_R5G6B5_Filter( filter_t *, picture_t * );
-static picture_t *I420_A8R8G8B8_Filter( filter_t *, picture_t * );
-static picture_t *I420_R8G8B8A8_Filter( filter_t *, picture_t * );
-static picture_t *I420_B8G8R8A8_Filter( filter_t *, picture_t * );
-static picture_t *I420_A8B8G8R8_Filter( filter_t *, picture_t * );
 #endif
 
 /*****************************************************************************
@@ -86,6 +76,19 @@ vlc_module_begin ()
 #endif
     set_callbacks( Activate, Deactivate )
 vlc_module_end ()
+
+#ifndef PLAIN
+VIDEO_FILTER_WRAPPER( I420_R5G5B5 )
+VIDEO_FILTER_WRAPPER( I420_R5G6B5 )
+VIDEO_FILTER_WRAPPER( I420_A8R8G8B8 )
+VIDEO_FILTER_WRAPPER( I420_R8G8B8A8 )
+VIDEO_FILTER_WRAPPER( I420_B8G8R8A8 )
+VIDEO_FILTER_WRAPPER( I420_A8B8G8R8 )
+#else
+VIDEO_FILTER_WRAPPER( I420_RGB8 )
+VIDEO_FILTER_WRAPPER( I420_RGB16 )
+VIDEO_FILTER_WRAPPER( I420_RGB32 )
+#endif
 
 /*****************************************************************************
  * Activate: allocate a chroma function
@@ -290,18 +293,7 @@ static void Deactivate( vlc_object_t *p_this )
     free( p_sys );
 }
 
-#ifndef PLAIN
-VIDEO_FILTER_WRAPPER( I420_R5G5B5 )
-VIDEO_FILTER_WRAPPER( I420_R5G6B5 )
-VIDEO_FILTER_WRAPPER( I420_A8R8G8B8 )
-VIDEO_FILTER_WRAPPER( I420_R8G8B8A8 )
-VIDEO_FILTER_WRAPPER( I420_B8G8R8A8 )
-VIDEO_FILTER_WRAPPER( I420_A8B8G8R8 )
-#else
-VIDEO_FILTER_WRAPPER( I420_RGB8 )
-VIDEO_FILTER_WRAPPER( I420_RGB16 )
-VIDEO_FILTER_WRAPPER( I420_RGB32 )
-
+#ifdef PLAIN
 /*****************************************************************************
  * SetYUV: compute tables and set function pointers
  *****************************************************************************/
