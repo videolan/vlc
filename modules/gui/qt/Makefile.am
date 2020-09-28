@@ -649,6 +649,7 @@ libqt_plugin_la_QML = \
 	gui/qt/network/qml/ServicesHomeDisplay.qml \
 	gui/qt/player/qml/ControlBar.qml \
 	gui/qt/player/qml/ControlButtons.qml \
+	gui/qt/player/qml/LanguageMenu.qml \
 	gui/qt/player/qml/MiniPlayer.qml \
 	gui/qt/player/qml/Player.qml \
 	gui/qt/player/qml/PlayerButtonsLayout.qml \

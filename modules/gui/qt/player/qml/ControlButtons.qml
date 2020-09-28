@@ -411,92 +411,22 @@ Item{
 
             text: i18n.qtr("Languages and tracks")
 
-            PlayerMenu {
+            LanguageMenu {
                 id: langMenu
+
                 parent: rootPlayer
+                focus: true
+                x: 0
+                y: rootPlayer.positionSliderY - height
+                z: 1
+
                 onOpened: rootPlayer._menu = langMenu
                 onMenuClosed: {
                     root._lockAutoHide -= 1
                     langBtn.forceActiveFocus()
                     rootPlayer._menu = undefined
                 }
-                focus: true
-
-                title: i18n.qtr("Languages and Tracks")
-
-
-                Connections {
-                    target: player
-                    onInputChanged: {
-                        subtrackMenu.dismiss()
-                        audiotrackMenu.dismiss()
-                        videotrackMenu.dismiss()
-                        langMenu.dismiss()
-                    }
-                }
-
-                PlayerMenu {
-                    id: subtrackMenu
-                    onOpened: rootPlayer._menu = subtrackMenu
-                    parentMenu: langMenu
-                    title: i18n.qtr("Subtitle Track")
-                    enabled: player.isPlaying && player.subtitleTracks.count > 0
-                    Repeater {
-                        model: player.subtitleTracks
-                        PlayerMenuItem {
-                            parentMenu:  subtrackMenu
-                            text: model.display
-                            checkable: true
-                            checked: model.checked
-                            onTriggered: model.checked = !model.checked
-                        }
-                    }
-                    onMenuClosed: langMenu.menuClosed()
-                }
-
-                PlayerMenu {
-                    id: audiotrackMenu
-                    title: i18n.qtr("Audio Track")
-
-                    parentMenu: langMenu
-                    onOpened: rootPlayer._menu = audiotrackMenu
-
-                    enabled: player.isPlaying && player.audioTracks.count > 0
-                    Repeater {
-                        model: player.audioTracks
-                        PlayerMenuItem {
-                            parentMenu: audiotrackMenu
-
-                            text: model.display
-                            checkable: true
-                            checked: model.checked
-                            onTriggered: model.checked = !model.checked
-                        }
-                    }
-                    onMenuClosed: langMenu.menuClosed()
-                }
-
-                PlayerMenu {
-                    id: videotrackMenu
-                    title: i18n.qtr("Video Track")
-                    parentMenu: langMenu
-                    onOpened: rootPlayer._menu = videotrackMenu
-                    enabled: player.isPlaying && player.videoTracks.count > 0
-                    Repeater {
-                        model: player.videoTracks
-                        PlayerMenuItem {
-                            parentMenu: videotrackMenu
-                            text: model.display
-                            checkable: true
-                            checked: model.checked
-                            onTriggered: model.checked = !model.checked
-                        }
-                    }
-                    onMenuClosed: langMenu.menuClosed()
-                }
             }
-
-            property bool acceptFocus: true
         }
     }
 
