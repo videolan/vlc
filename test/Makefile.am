@@ -199,7 +199,6 @@ libvlc_demux_run_la_LIBADD += \
 	../modules/libh26x_plugin.la \
 	../modules/libmjpeg_plugin.la \
 	../modules/libmp4_plugin.la \
-	../modules/libnsc_plugin.la \
 	../modules/libnsv_plugin.la \
 	../modules/libnuv_plugin.la \
 	../modules/libps_plugin.la \

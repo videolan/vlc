@@ -87,9 +87,6 @@ libnuv_plugin_la_SOURCES = demux/nuv.c
 libnuv_plugin_la_LIBADD = $(LIBM)
 demux_LTLIBRARIES += libnuv_plugin.la
 
-libnsc_plugin_la_SOURCES = demux/nsc.c
-demux_LTLIBRARIES += libnsc_plugin.la
-
 libmpc_plugin_la_SOURCES = demux/mpc.c
 libmpc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(demuxdir)'
 libmpc_plugin_la_LIBADD = $(LIBS_mpc) $(LIBM)

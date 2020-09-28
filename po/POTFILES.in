@@ -395,7 +395,6 @@ modules/demux/mpeg/mpgv.c
 modules/demux/mpeg/ps.c
 modules/demux/mpeg/ts.c
 modules/demux/mpeg/ts_descriptions.h
-modules/demux/nsc.c
 modules/demux/nsv.c
 modules/demux/nuv.c
 modules/demux/ogg.c

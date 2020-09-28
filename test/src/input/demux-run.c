@@ -435,7 +435,6 @@ extern vlc_plugin_cb vlc_static_modules[];
     f(demux_mjpeg) \
     PLUGIN_MKV(f) \
     f(demux_mp4_mp4) \
-    f(demux_nsc) \
     f(demux_nsv) \
     f(demux_mpeg_ps) \
     f(demux_pva) \
