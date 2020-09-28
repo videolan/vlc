@@ -734,14 +734,14 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static const char *const ppsz_sout_options[] = {
-    "8x8dct", "asm", "aud", "bframes", "bime", "bpyramid",
-    "b-adapt", "b-bias", "b-rdo", "cabac", "chroma-me", "chroma-qp-offset",
+    "8x8dct", "asm", "aud", "bframes", "bpyramid",
+    "b-adapt", "b-bias", "cabac", "chroma-me", "chroma-qp-offset",
     "cplxblur", "crf", "dct-decimate", "deadzone-inter", "deadzone-intra",
     "deblock", "direct", "direct-8x8", "fast-pskip",
     "interlaced", "ipratio", "keyint", "level",
     "me", "merange", "min-keyint", "mixed-refs", "mvrange", "mvrange-thread",
     "nf", "non-deterministic", "nr", "partitions", "pass", "pbratio",
-    "pre-scenecut", "psnr", "qblur", "qp", "qcomp", "qpstep", "qpmax",
+    "psnr", "qblur", "qp", "qcomp", "qpstep", "qpmax",
     "qpmin", "quiet", "ratetol", "ref", "scenecut",
     "sps-id", "ssim", "stats", "subme", "trellis",
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp",
