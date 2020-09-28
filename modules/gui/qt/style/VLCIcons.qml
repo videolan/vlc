@@ -170,5 +170,10 @@ Item {
     property string window_minimize : "\ue096"
     property string window_restore : "\ue097"
     property string home : "\ue098"
+    property string download : "\ue099"
+    property string multiselect : "\ue09a"
+    property string sync : "\ue09b"
+    property string check : "\ue09c"
+    property string visualization : "\ue09d"
 
 }

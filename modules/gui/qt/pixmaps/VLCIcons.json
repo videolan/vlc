@@ -9,7 +9,7 @@
 		{"key":"faster", "path": "./faster.svg"},
 		{"key":"go_next", "path": "./go-next.svg"},
 		{"key":"update", "path": "./update.svg"},
-		{"key":"extended", "path": "./toolbar/extended_16px.svg"},
+		{"key":"extended", "path": "./toolbar/extended.svg"},
 		{"key":"renderer", "path": "./toolbar/renderer.svg"},
 		{"key":"tvtelx", "path": "./toolbar/tvtelx.svg"},
 		{"key":"visu", "path": "./toolbar/visu.svg"},
@@ -156,6 +156,11 @@
 		{"key": "window_maximize", "path": "./topbar/window_maximize.svg" },
 		{"key": "window_minimize", "path": "./topbar/window_minimize.svg" },
 		{"key": "window_restore", "path": "./topbar/window_restore.svg" },
-		{"key": "home", "path": "./home.svg" }
+		{"key": "home", "path": "./home.svg" },
+		{"key":"download", "path": "./download.svg"},
+		{"key":"multiselect", "path": "./multiselect.svg"},
+		{"key":"sync", "path": "./sync.svg"},
+		{"key":"check", "path": "./check.svg"},
+		{"key":"visualization", "path": "./visualization.svg"}
 	]
 }

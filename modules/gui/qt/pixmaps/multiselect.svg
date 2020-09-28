@@ -2,6 +2,10 @@
 <!-- Generator: Adobe Illustrator 24.0.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 48 48" style="enable-background:new 0 0 48 48;" xml:space="preserve">
-<title>Icon-Pause</title>
-<path d="M14.5,8h3.2v32h-3.2V8z M30.3,8v32h3.2V8H30.3z"/>
+<style type="text/css">
+	.st0{fill-rule:evenodd;clip-rule:evenodd;}
+</style>
+<title>Icon-Multiselect</title>
+<path class="st0" d="M29.7,20.6L18.3,32l-3.5-3.4l-1.1-1.1l-1.2,1.2l2.3,2.3l2.1,2l1.4,1.4l1.4-1.4l11.2-11.1L29.7,20.6z M40,8v27.3
+	h-3.4V33h1.1V10.3H14.8v1.3h-2.3V8H40z M14.8,12.7h20.6V33l0,0v2.3l0,0V40H8V12.7L14.8,12.7L14.8,12.7z"/>
 </svg>
