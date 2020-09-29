@@ -79,6 +79,47 @@ struct ytdl_playlist {
     stream_t *source;
 };
 
+
+static int CompareFormats(const struct json_object *f_a,
+                          const struct json_object *f_b, double pref_height)
+{
+    double h_a = json_get_num(f_a, "height");
+    double abr_a = json_get_num(f_a, "abr");
+    double h_b = json_get_num(f_b, "height");
+    double abr_b = json_get_num(f_b, "abr");
+
+    /* Prefer non-mute formats */
+    if (!isnan(abr_a) != !isnan(abr_b))
+        return isnan(abr_a) ? -1 : +1;
+
+    /* Prefer non-blind formats */
+    if (!isnan(h_a) != !isnan(h_b))
+        return isnan(h_a) ? -1 : +1;
+
+    if (islessequal(h_a, pref_height)) {
+        if (!islessequal(h_b, pref_height))
+            return +1;
+        if (h_a > h_b)
+            return -1;
+        if (h_a < h_b)
+            return +1;
+    } else {
+        if (islessequal(h_b, pref_height))
+            return -1;
+        if (isless(h_a, h_b))
+            return -1;
+        if (isgreater(h_a, h_b))
+            return +1;
+    }
+
+    if (isgreater(abr_a, abr_b))
+        return +1;
+    if (isgreater(abr_b, abr_a))
+        return -1;
+
+    return 0;
+}
+
 static const struct json_object *PickFormat(stream_t *s,
                                             const struct json_object *entry)
 {
@@ -91,8 +132,9 @@ static const struct json_object *PickFormat(stream_t *s,
 
      const struct json_object *best_fmt = NULL;
      double pref_height = var_InheritInteger(s, "preferred-resolution");
-     double best_height = -1.;
-     double best_abr = -1.;
+
+     if (isless(pref_height, 0.))
+         pref_height = NAN;
 
      for (size_t i = 0; i < fmts->array.size; i++) {
          const struct json_value *v = &fmts->array.entries[i];
@@ -101,19 +143,14 @@ static const struct json_object *PickFormat(stream_t *s,
              continue;
 
          const struct json_object *fmt = &v->object;
-         double height = json_get_num(fmt, "height");
-         double abr = json_get_num(fmt, "abr");
 
-         if (!isgreaterequal(height, best_height)
-          || (best_height < pref_height && pref_height < height))
+         if (best_fmt == NULL) {
+             best_fmt = fmt;
              continue;
+         }
 
-         if (!isgreaterequal(abr, best_abr))
-             continue;
-
-         best_fmt = fmt;
-         best_height = height;
-         best_abr = abr;
+         if (CompareFormats(fmt, best_fmt, pref_height) > 0)
+              best_fmt = fmt;
      }
 
      return best_fmt;
