@@ -118,6 +118,7 @@ Widgets.NavigableFocusScope {
                 Layout.preferredWidth: implicitWidth
                 text: i18n.qtr("Continue")
                 font.bold: true
+                color: VLCStyle.colors.playerFg
                 focus: true
                 onClicked: {
                     player.restorePlaybackPos()
@@ -133,6 +134,7 @@ Widgets.NavigableFocusScope {
                 Layout.preferredWidth: implicitWidth
                 text: i18n.qtr("Dismiss")
                 font.bold: true
+                color: VLCStyle.colors.playerFg
                 onClicked: hideResumePanel()
 
                 KeyNavigation.left: continueBtn
