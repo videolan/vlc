@@ -497,7 +497,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             p_sys->i_offset = 0;
             p_sys->crc = 0;
 
-            if( block_BytestreamRemaining(&p_sys->bytestream) > 0 )
+            if( block_BytestreamRemaining(&p_sys->bytestream) > 0 || pp_block == NULL /* drain */)
                 p_sys->i_state = STATE_SEND_DATA;
             else
                 p_sys->i_state = STATE_NOSYNC;
@@ -509,7 +509,8 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         p_dec->fmt_out.audio.i_channels = p_sys->headerinfo.i_channels;
         p_dec->fmt_out.audio.i_physical_channels = pi_channels_maps[p_sys->stream_info.channels];
 
-        if( p_sys->bytestream.p_block->i_pts > date_Get( &p_sys->pts ) &&
+        if( p_sys->bytestream.p_block &&
+            p_sys->bytestream.p_block->i_pts > date_Get( &p_sys->pts ) &&
             p_sys->bytestream.p_block->i_pts != VLC_TICK_INVALID )
         {
             date_Init( &p_sys->pts, p_sys->headerinfo.i_rate, 1 );
