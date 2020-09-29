@@ -185,12 +185,19 @@ static void HXXXGetBestChroma(decoder_t *p_dec)
 #if !TARGET_OS_IPHONE
             if (deviceSupportsHEVC()) /* 42010bit went with HEVC on macOS */
                 p_sys->i_cvpx_format = kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange;
-#else
-            /* Force BGRA output (and let VT handle the tone mapping) on iOS
-             * since the apple openGLES implementation can't handle 16 bit
-             * textures. */
-            p_sys->i_cvpx_format = kCVPixelFormatType_32BGRA;
+            else
 #endif
+           /* Force BGRA output (and let VT handle the tone mapping) since the
+            * Apple openGL* implementation can't handle 16 bit textures. This
+            * is the case for iOS and some macOS devices (ones that are not
+            * handling HEVC). */
+            p_sys->i_cvpx_format = kCVPixelFormatType_32BGRA;
+        }
+        else if (i_depth_luma > 10 && i_depth_chroma > 10)
+        {
+            /* XXX: The apple openGL implementation doesn't support 12 or 16
+             * bit rendering */
+            p_sys->i_cvpx_format = kCVPixelFormatType_32BGRA;
         }
     }
 }
