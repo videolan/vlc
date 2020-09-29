@@ -35,6 +35,8 @@ Widgets.NavigableFocusScope {
     onTreeChanged:  loadView()
     Component.onCompleted: loadView()
 
+    property var contentModel
+
     //reset view
     function loadDefaultView() {
         root.tree = undefined
@@ -50,6 +52,8 @@ Widgets.NavigableFocusScope {
             props = { providerModel: mediaModel, contextMenu: mediaContextMenu, tree: root.tree }
         }
         view.replace(page, props)
+        if (view.currentItem.model)
+            root.contentModel = view.currentItem.model
     }
 
     NetworkMediaModel {

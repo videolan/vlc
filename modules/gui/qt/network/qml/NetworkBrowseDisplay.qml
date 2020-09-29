@@ -32,6 +32,7 @@ import "qrc:///style/"
 Widgets.NavigableFocusScope {
     id: root
 
+    property alias model: filterModel
     property var providerModel
     property var contextMenu
     property var tree
@@ -44,16 +45,32 @@ Widgets.NavigableFocusScope {
         history.push(["mc", "network", { tree: new_tree }]);
     }
 
+    function playSelected() {
+        providerModel.addAndPlay(filterModel.mapIndexesToSource(selectionModel.selectedIndexes))
+    }
+
+    function playAt(index) {
+        providerModel.addAndPlay(filterModel.mapIndexToSource(index))
+    }
+
     Util.SelectableDelegateModel{
         id: selectionModel
-        model: providerModel
+
+        model: filterModel
+    }
+
+    SortFilterProxyModel {
+        id: filterModel
+
+        sourceModel: providerModel
+        searchRole: "name"
     }
 
     function resetFocus() {
         var initialIndex = root.initialIndex
-        if (initialIndex >= providerModel.count)
+        if (initialIndex >= filterModel.count)
             initialIndex = 0
-        selectionModel.select(providerModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
+        selectionModel.select(filterModel.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
         if (view.currentItem) {
             view.currentItem.currentIndex = initialIndex
             view.currentItem.positionViewAtIndex(initialIndex, ItemView.Contain)
@@ -63,14 +80,14 @@ Widgets.NavigableFocusScope {
 
     function _actionAtIndex(index) {
         if ( selectionModel.selectedIndexes.length > 1 ) {
-            providerModel.addAndPlay( selectionModel.selectedIndexes )
+            playSelected()
         } else {
-            var data = providerModel.getDataAt(index)
+            var data = filterModel.getDataAt(index)
             if (data.type === NetworkMediaModel.TYPE_DIRECTORY
                     || data.type === NetworkMediaModel.TYPE_NODE)  {
                 changeTree(data.tree)
             } else {
-                providerModel.addAndPlay( selectionModel.selectedIndexes )
+                playAt(index)
             }
         }
     }
@@ -82,7 +99,7 @@ Widgets.NavigableFocusScope {
             id: gridView
 
             delegateModel: selectionModel
-            model: providerModel
+            model: filterModel
 
             headerDelegate: Widgets.NavigableFocusScope {
                 width: view.width
@@ -137,19 +154,19 @@ Widgets.NavigableFocusScope {
                 subtitle: ""
                 height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
 
-                onPlayClicked: selectionModel.model.addAndPlay( index )
+                onPlayClicked: playAt(index)
                 onItemClicked : gridView.leftClickOnItem(modifier, index)
 
                 onItemDoubleClicked: {
                     if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
                         changeTree(model.tree)
                     else
-                        selectionModel.model.addAndPlay( index )
+                        playAt(index)
                 }
 
                 onContextMenuButtonClicked: {
                     gridView.rightClickOnItem(index)
-                    contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+                    contextMenu.popup(filterModel.mapIndexesToSource(selectionModel.selectedIndexes), globalMousePos)
                 }
             }
 
@@ -184,12 +201,12 @@ Widgets.NavigableFocusScope {
             }
 
             property Component thumbnailColumn: NetworkThumbnailItem {
-                onPlayClicked: providerModel.addAndPlay(index)
+                onPlayClicked: playAt(index)
             }
 
             height: view.height
             width: view.width
-            model: providerModel
+            model: filterModel
             selectionDelegateModel: selectionModel
             focus: true
             headerColor: VLCStyle.colors.bg
@@ -250,8 +267,8 @@ Widgets.NavigableFocusScope {
             ]
 
             onActionForSelection: _actionAtIndex(selection[0].row)
-            onContextMenuButtonClicked: contextMenu.popup(selectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
-            onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            onContextMenuButtonClicked: contextMenu.popup(filterModel.mapIndexesToSource(selectionModel.selectedIndexes), menuParent.mapToGlobal(0,0))
+            onRightClick: contextMenu.popup(filterModel.mapIndexesToSource(selectionModel.selectedIndexes), globalMousePos)
         }
     }
 
