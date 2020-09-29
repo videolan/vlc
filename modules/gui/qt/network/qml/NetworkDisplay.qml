@@ -47,7 +47,7 @@ Widgets.NavigableFocusScope {
             page ="qrc:///network/NetworkHomeDisplay.qml"
         else {
             page = "qrc:///network/NetworkBrowseDisplay.qml"
-            props = { providerModel: mediaModel, tree: root.tree }
+            props = { providerModel: mediaModel, contextMenu: mediaContextMenu, tree: root.tree }
         }
         view.replace(page, props)
     }
@@ -56,6 +56,12 @@ Widgets.NavigableFocusScope {
         id: mediaModel
 
         ctx: mainctx
+    }
+
+    NetworkMediaContextMenu {
+        id: mediaContextMenu
+
+        model: mediaModel
     }
 
     Widgets.StackViewExt {

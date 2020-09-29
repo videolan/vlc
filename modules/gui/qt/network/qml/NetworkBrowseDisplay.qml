@@ -33,6 +33,7 @@ Widgets.NavigableFocusScope {
     id: root
 
     property var providerModel
+    property var contextMenu
     property var tree
     onTreeChanged: providerModel.tree = tree
     readonly property var currentIndex: view.currentItem.currentIndex
@@ -45,11 +46,6 @@ Widgets.NavigableFocusScope {
 
     Util.SelectableDelegateModel{
         id: selectionModel
-        model: providerModel
-    }
-
-    NetworkMediaContextMenu {
-        id: contextMenu
         model: providerModel
     }
 

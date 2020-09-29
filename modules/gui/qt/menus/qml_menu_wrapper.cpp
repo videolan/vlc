@@ -25,6 +25,7 @@
 #include "medialibrary/mlgenremodel.hpp"
 #include "medialibrary/mlalbumtrackmodel.hpp"
 #include "medialibrary/mlurlmodel.hpp"
+#include "network/networkdevicemodel.hpp"
 #include "network/networkmediamodel.hpp"
 #include "playlist/playlist_controller.hpp"
 #include "playlist/playlist_model.hpp"
@@ -274,6 +275,33 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
             }
         });
     }
+
+    menu->popup(pos);
+}
+
+NetworkDeviceContextMenu::NetworkDeviceContextMenu(QObject* parent)
+    : QObject(parent)
+{}
+
+void NetworkDeviceContextMenu::popup(const QModelIndexList& selected, QPoint pos)
+{
+    if (!m_model)
+        return;
+
+    QMenu* menu = new QMenu();
+    QAction* action;
+
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+
+    action = menu->addAction( qtr("Add and play") );
+    connect(action, &QAction::triggered, [this, selected]( ) {
+        m_model->addAndPlay(selected);
+    });
+
+    action = menu->addAction( qtr("Enqueue") );
+    connect(action, &QAction::triggered, [this, selected]( ) {
+        m_model->addToPlaylist(selected);
+    });
 
     menu->popup(pos);
 }

@@ -21,6 +21,7 @@ import QtQml.Models 2.2
 import QtQuick.Layouts 1.11
 import QtQuick.Shapes 1.0
 
+import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
@@ -76,6 +77,7 @@ Widgets.NavigableFocusScope {
             property alias source_name: deviceModel.source_name
 
             providerModel: deviceModel
+            contextMenu: contextMenu
 
             function changeTree(new_tree) {
                 history.push(["mc", "discover", "services", "source_browse", { tree: new_tree }]);
@@ -87,6 +89,12 @@ Widgets.NavigableFocusScope {
                 ctx: mainctx
                 sd_source: NetworkDeviceModel.CAT_INTERNET
             }
+
+            NetworkDeviceContextMenu {
+                id: contextMenu
+
+                model: deviceModel
+            }
         }
     }
 
@@ -95,6 +103,7 @@ Widgets.NavigableFocusScope {
         NetworkBrowseDisplay {
 
             providerModel: mediaModel
+            contextMenu: contextMenu
 
             function changeTree(new_tree) {
                 history.push(["mc", "discover", "services", "source_browse", { tree: new_tree }]);
@@ -104,6 +113,12 @@ Widgets.NavigableFocusScope {
                 id: mediaModel
 
                 ctx: mainctx
+            }
+
+            NetworkMediaContextMenu {
+                id: contextMenu
+
+                model: mediaModel
             }
         }
     }

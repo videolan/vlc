@@ -32,6 +32,7 @@ class MLArtistModel;
 class MLAlbumTrackModel;
 class MLUrlModel;
 class MLVideoModel;
+class NetworkDeviceModel;
 class NetworkMediaModel;
 class QmlMainContext;
 namespace vlc {
@@ -152,6 +153,15 @@ class NetworkMediaContextMenu : public QObject {
     SIMPLE_MENU_PROPERTY(NetworkMediaModel*, model, nullptr)
 public:
     NetworkMediaContextMenu(QObject* parent = nullptr);
+public slots:
+    void popup(const QModelIndexList& selected, QPoint pos );
+};
+
+class NetworkDeviceContextMenu : public QObject {
+    Q_OBJECT
+    SIMPLE_MENU_PROPERTY(NetworkDeviceModel*, model, nullptr)
+public:
+    NetworkDeviceContextMenu(QObject* parent = nullptr);
 public slots:
     void popup(const QModelIndexList& selected, QPoint pos );
 };

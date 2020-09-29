@@ -213,6 +213,7 @@ void MainUI::registerQMLTypes()
 
     qmlRegisterType<QmlGlobalMenu>( "org.videolan.vlc", 0, 1, "QmlGlobalMenu" );
     qmlRegisterType<NetworkMediaContextMenu>( "org.videolan.vlc", 0, 1, "NetworkMediaContextMenu" );
+    qmlRegisterType<NetworkDeviceContextMenu>( "org.videolan.vlc", 0, 1, "NetworkDeviceContextMenu" );
     qmlRegisterType<PlaylistContextMenu>( "org.videolan.vlc", 0, 1, "PlaylistContextMenu" );
 }
 
