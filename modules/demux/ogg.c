@@ -1074,6 +1074,8 @@ static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_st
             if( p_block->i_flags & BLOCK_FLAG_HEADER )
                 continue;
             p_block->i_dts = date_Get( &d );
+            if( p_block->i_dts < VLC_TICK_0 )
+                p_block->i_dts = VLC_TICK_0;
             date_Increment( &d, p_block->i_nb_samples );
         }
     } /* else can't do anything, no timestamped blocks in stream */
