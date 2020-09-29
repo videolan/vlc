@@ -68,6 +68,7 @@ Widgets.NavigableFocusScope {
         if (!found)
             stackView.replace(root.pageModel[0].component)
         stackView.currentItem.navigationParent = root
+        model = stackView.currentItem.model
     }
 
     Component {
@@ -130,7 +131,7 @@ Widgets.NavigableFocusScope {
         Widgets.KeyNavigableListView {
             id: servicesView
 
-            model: discoveryModel
+            model: discoveryFilterModel
             topMargin: VLCStyle.margin_large
             leftMargin: VLCStyle.margin_large
             rightMargin: VLCStyle.margin_large
@@ -211,9 +212,9 @@ Widgets.NavigableFocusScope {
 
                                 onClicked: {
                                     if (model.state === ServicesDiscoveryModel.NOTINSTALLED)
-                                        discoveryModel.installService(index)
+                                        discoveryModel.installService(discoveryFilterModel.mapIndexToSource(index))
                                     else if (model.state === ServicesDiscoveryModel.INSTALLED)
-                                        discoveryModel.removeService(index)
+                                        discoveryModel.installService(discoveryFilterModel.mapIndexToSource(index))
                                 }
                             }
                         }
@@ -248,6 +249,13 @@ Widgets.NavigableFocusScope {
                 ctx: mainctx
             }
 
+            SortFilterProxyModel {
+                id: discoveryFilterModel
+
+                sourceModel: discoveryModel
+                searchRole: "name"
+            }
+
         }
     }
 
@@ -258,7 +266,7 @@ Widgets.NavigableFocusScope {
             id: gridView
 
             delegateModel: selectionModel
-            model: sourcesModel
+            model: sourcesFilterModel
             topMargin: VLCStyle.margin_large
             cellWidth: VLCStyle.gridItem_network_width
             cellHeight: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
@@ -350,7 +358,7 @@ Widgets.NavigableFocusScope {
             onSelectAll: selectionModel.selectAll()
             onSelectionUpdated: selectionModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onActionAtIndex: {
-                var itemData = sourcesModel.getDataAt(index)
+                var itemData = sourcesFilterModel.getDataAt(index)
                 if (itemData.type === NetworkSourcesModel.TYPE_DUMMY)
                     history.push(["mc", "discover", "services", "services_manage"])
                 else
@@ -371,7 +379,14 @@ Widgets.NavigableFocusScope {
             Util.SelectableDelegateModel {
                 id: selectionModel
 
-                model: sourcesModel
+                model: sourcesFilterModel
+            }
+
+            SortFilterProxyModel {
+                id: sourcesFilterModel
+
+                sourceModel: sourcesModel
+                searchRole: "name"
             }
         }
     }
