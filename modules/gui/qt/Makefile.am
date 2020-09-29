@@ -212,6 +212,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/selectable_list_model.cpp \
 	gui/qt/util/selectable_list_model.hpp \
 	gui/qt/util/singleton.hpp \
+	gui/qt/util/sortfilterproxymodel.cpp \
+	gui/qt/util/sortfilterproxymodel.hpp \
 	gui/qt/util/soutchain.cpp gui/qt/util/soutchain.hpp \
 	gui/qt/util/systempalette.cpp gui/qt/util/systempalette.hpp \
 	gui/qt/util/validators.cpp gui/qt/util/validators.hpp \
@@ -345,6 +347,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/recents.moc.cpp \
 	gui/qt/util/renderer_manager.moc.cpp \
 	gui/qt/util/selectable_list_model.moc.cpp \
+	gui/qt/util/sortfilterproxymodel.moc.cpp \
 	gui/qt/util/systempalette.moc.cpp \
 	gui/qt/util/validators.moc.cpp \
 	gui/qt/util/varchoicemodel.moc.cpp \

@@ -24,6 +24,7 @@
 #include "util/i18n.hpp"
 #include "util/systempalette.hpp"
 #include "util/recent_media_model.hpp"
+#include "util/sortfilterproxymodel.hpp"
 #include "util/navigation_history.hpp"
 
 #include "dialogs/help/aboutmodel.hpp"
@@ -215,6 +216,7 @@ void MainUI::registerQMLTypes()
     qmlRegisterType<NetworkMediaContextMenu>( "org.videolan.vlc", 0, 1, "NetworkMediaContextMenu" );
     qmlRegisterType<NetworkDeviceContextMenu>( "org.videolan.vlc", 0, 1, "NetworkDeviceContextMenu" );
     qmlRegisterType<PlaylistContextMenu>( "org.videolan.vlc", 0, 1, "PlaylistContextMenu" );
+    qmlRegisterType<SortFilterProxyModel>( "org.videolan.vlc", 0, 1, "SortFilterProxyModel" );
 }
 
 void MainUI::onQmlWarning(const QList<QQmlError>& qmlErrors)
