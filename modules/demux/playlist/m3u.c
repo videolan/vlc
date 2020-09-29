@@ -83,11 +83,30 @@ int Import_M3U( vlc_object_t *p_this )
         i_peek -= offset;
     }
 
+    /* File type: playlist, or not (HLS manifest or whatever else) */
+    char *type = stream_MimeType(p_stream->s);
+    bool match;
+
     if (!p_stream->obj.force
      && memcmp(p_peek, "#EXTM3U", 7 ) != 0
+     && (type == NULL
+      || (vlc_ascii_strcasecmp(type, "application/mpegurl") != 0
+       && vlc_ascii_strcasecmp(type, "application/x-mpegurl") != 0
+       && vlc_ascii_strcasecmp(type, "audio/mpegurl") != 0
+       && vlc_ascii_strcasecmp(type, "vnd.apple.mpegURL") != 0
+       && vlc_ascii_strcasecmp(type, "audio/x-mpegurl") != 0))
+     && !stream_HasExtension(p_stream, ".m3u8")
+     && !stream_HasExtension(p_stream, ".m3u")
      && !stream_HasExtension(p_stream, ".vlc")
      && strncasecmp((const char *)p_peek, "RTSPtext", 8) != 0
      && !ContainsURL(p_peek, i_peek))
+        match = false;
+    else
+        match = true;
+
+    free(type);
+
+    if (!match)
         return VLC_EGENERIC;
 
     msg_Dbg( p_stream, "found valid M3U playlist" );
