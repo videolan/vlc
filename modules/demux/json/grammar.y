@@ -160,11 +160,11 @@ extern int yylex_destroy(void *);
 
 %}
 
-%destructor { fprintf(stderr, "freeing string %s\n", $$); free($$); } <string>
-%destructor { fprintf(stderr, "freeing value %p\n", &$$); json_value_free(&$$); } <value>
-%destructor { fprintf(stderr, "freeing array %p\n", &$$); json_array_free(&$$); } <array>
-%destructor { fprintf(stderr, "freeing member %p\n", &$$); json_member_free(&$$); } <member>
-%destructor { fprintf(stderr, "freeing object %p\n", &$$); json_free(&$$); } <object>
+%destructor { free($$); } <string>
+%destructor { json_value_free(&$$); } <value>
+%destructor { json_array_free(&$$); } <array>
+%destructor { json_member_free(&$$); } <member>
+%destructor { json_free(&$$); } <object>
 
 %%
 
