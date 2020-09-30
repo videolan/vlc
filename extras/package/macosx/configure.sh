@@ -23,7 +23,6 @@ OPTIONS="
         --disable-xcb
         --disable-caca
         --disable-pulse
-        --disable-sdl-image
         --disable-vnc
         --with-macosx-version-min=10.11
 "
