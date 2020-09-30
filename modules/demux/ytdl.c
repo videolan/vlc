@@ -39,7 +39,7 @@
 
 struct ytdl_json {
     struct vlc_logger *logger;
-    FILE *input;
+    int fd;
 };
 
 void json_parse_error(void *data, const char *msg)
@@ -53,24 +53,15 @@ size_t json_read(void *data, void *buf, size_t size)
 {
     struct ytdl_json *sys = data;
 
-    return fread(buf, 1, size, sys->input);
+    return read(sys->fd, buf, size);
 }
 
-static
-FILE *vlc_popen(pid_t *restrict pid, const char *argv[])
+static int ytdl_popen(pid_t *restrict pid, const char *argv[])
 {
     int fds[2];
 
     if (vlc_pipe(fds))
-        return NULL;
-
-    FILE *input = fdopen(fds[0], "rt");
-
-    if (input == NULL) {
-        vlc_close(fds[1]);
-        vlc_close(fds[0]);
-        return NULL;
-    }
+        return -1;
 
     int fdv[] = { -1, fds[1], 2, -1 };
     int val = vlc_spawn(pid, argv[0], fdv, argv);
@@ -78,19 +69,18 @@ FILE *vlc_popen(pid_t *restrict pid, const char *argv[])
     vlc_close(fds[1]);
 
     if (val) {
-        fclose(input);
-        input = NULL;
+        vlc_close(fds[0]);
         errno = val;
+        return -1;
     }
 
-    return input;
+    return fds[0];
 }
 
 struct ytdl_playlist {
     struct json_object json;
     stream_t *source;
 };
-
 
 static int CompareFormats(const struct json_object *f_a,
                           const struct json_object *f_b, double pref_height)
@@ -351,11 +341,14 @@ static int OpenCommon(vlc_object_t *obj)
     if (unlikely(path == NULL))
         return VLC_EGENERIC;
 
+    struct ytdl_json jsdata;
     pid_t pid;
     const char *argv[] = { path, s->psz_url, NULL };
-    FILE *input = vlc_popen(&pid, argv);
 
-    if (input == NULL) {
+    jsdata.logger = s->obj.logger;
+    jsdata.fd = ytdl_popen(&pid, argv);
+
+    if (jsdata.fd == -1) {
         msg_Dbg(obj, "cannot start %s: %s", path, vlc_strerror_c(errno));
         free(path);
         return VLC_EGENERIC;
@@ -363,11 +356,10 @@ static int OpenCommon(vlc_object_t *obj)
 
     free(path);
 
-    struct ytdl_json jsdata = { s->obj.logger, input };
     int val = json_parse(&jsdata, &sys->json);
 
     kill(pid, SIGTERM);
-    fclose(input);
+    vlc_close(jsdata.fd);
     vlc_waitpid(pid);
 
     if (val) {
