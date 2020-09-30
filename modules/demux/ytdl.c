@@ -36,6 +36,7 @@
 #include <vlc_input_item.h>
 #include <vlc_plugin.h>
 #include <vlc_spawn.h>
+#include <vlc_interrupt.h>
 
 struct ytdl_json {
     struct vlc_logger *logger;
@@ -53,7 +54,14 @@ size_t json_read(void *data, void *buf, size_t size)
 {
     struct ytdl_json *sys = data;
 
-    return read(sys->fd, buf, size);
+    while (!vlc_killed()) {
+        ssize_t val = vlc_read_i11e(sys->fd, buf, size);
+
+        if (val >= 0)
+            return val;
+    }
+
+    return 0;
 }
 
 static int ytdl_popen(pid_t *restrict pid, const char *argv[])
@@ -398,8 +406,10 @@ static int OpenCommon(vlc_object_t *obj)
          }
     }
 
-    if (demux == NULL)
+    if (demux == NULL) {
+        json_free(&sys->json);
         return VLC_EGENERIC;
+    }
 
     s->pf_demux = DemuxNested;
     s->pf_control = ControlNested;
