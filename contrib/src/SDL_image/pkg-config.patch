@@ -1,9 +1,0 @@
---- SDL_image/SDL_image.pc.in.orig	2011-11-15 10:34:23.504770604 -0500
-+++ SDL_image/SDL_image.pc.in	2011-11-15 10:34:39.924852030 -0500
-@@ -8,5 +8,6 @@
- Version: @VERSION@
- Requires: sdl >= @SDL_VERSION@
- Libs: -L${libdir} -lSDL_image
-+Libs.private:  -ljpeg -ltiff
- Cflags: -I${includedir}/SDL
- 
