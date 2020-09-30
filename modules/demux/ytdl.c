@@ -37,11 +37,15 @@
 #include <vlc_plugin.h>
 #include <vlc_spawn.h>
 
+struct ytdl_json {
+    struct vlc_logger *logger;
+};
+
 void json_parse_error(void *data, const char *msg)
 {
-    struct vlc_logger *log = data;
+    struct ytdl_json *sys = data;
 
-    vlc_error(log, "%s", msg);
+    vlc_error(sys->logger, "%s", msg);
 }
 
 static
@@ -351,7 +355,8 @@ static int OpenCommon(vlc_object_t *obj)
 
     free(path);
 
-    int val = json_parse(obj->logger, input, &sys->json);
+    struct ytdl_json jsdata = { s->obj.logger };
+    int val = json_parse(&jsdata, input, &sys->json);
 
     kill(pid, SIGTERM);
     fclose(input);
