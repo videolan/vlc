@@ -38,6 +38,12 @@
 #include "json.h"
 #include "grammar.h"
 
+#define YY_INPUT(buf,result,size) \
+{ \
+    size_t len = json_read(yyextra, buf, size); \
+    result = (len > 0) ? len : YY_NULL; \
+}
+
 %}
 
 %%

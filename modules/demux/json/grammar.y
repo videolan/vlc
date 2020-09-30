@@ -154,7 +154,6 @@ static void yyerror(void *log, void *scanner, struct json_object *result,
 }
 
 extern int yylex_init_extra(void *, void **);
-extern void yyset_in(FILE *, void *);
 extern int yylex(YYSTYPE *value, void *scanner);
 extern int yylex_destroy(void *);
 
@@ -214,7 +213,7 @@ value:
 
 %%
 
-int json_parse(void *opaque, FILE *in, struct json_object *result)
+int json_parse(void *opaque, struct json_object *result)
 {
 	void *scanner;
 	int ret = yylex_init_extra(opaque, &scanner);
@@ -222,7 +221,6 @@ int json_parse(void *opaque, FILE *in, struct json_object *result)
 	if (ret)
 		return ret;
 
-	yyset_in(in, scanner);
 	ret = yyparse(opaque, scanner, result);
 	yylex_destroy(scanner);
 	return ret;
