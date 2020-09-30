@@ -143,13 +143,6 @@ libsvgdec_plugin_la_LIBADD = $(LIBS_svgdec)
 EXTRA_LTLIBRARIES += libsvgdec_plugin.la
 codec_LTLIBRARIES += $(LTLIBsvgdec)
 
-libsdl_image_plugin_la_SOURCES = codec/sdl_image.c
-libsdl_image_plugin_la_CFLAGS = $(AM_CFLAGS) $(SDL_IMAGE_CFLAGS)
-libsdl_image_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-libsdl_image_plugin_la_LIBADD = $(SDL_IMAGE_LIBS)
-EXTRA_LTLIBRARIES += libsdl_image_plugin.la
-codec_LTLIBRARIES += $(LTLIBsdl_image)
-
 libxwd_plugin_la_SOURCES = codec/xwd.c
 libxwd_plugin_la_CFLAGS = $(AM_CFLAGS) $(XPROTO_CFLAGS)
 libxwd_plugin_la_LIBADD = $(XPROTO_LIBS)

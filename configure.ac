@@ -3523,19 +3523,6 @@ AM_CONDITIONAL([HAVE_XKBCOMMON], [test "${have_xkbcommon}" = "yes"])
 
 
 dnl
-dnl  SDL image decoder module
-dnl
-AC_ARG_ENABLE([sdl-image],
-  AS_HELP_STRING([--enable-sdl-image], [SDL image support (default enabled)]))
-AS_IF([test "${enable_sdl_image}" != "no"],[
-  PKG_CHECK_MODULES(SDL_IMAGE, [SDL_image >= 1.2.10], [
-    VLC_ADD_PLUGIN([sdl_image])
-  ], [
-    AC_MSG_WARN([${SDL_IMAGE_PKG_ERRORS}. You should install it alongside your SDL package.])
-  ])
-])
-
-dnl
 dnl  freetype module
 dnl
 AC_ARG_ENABLE([freetype],

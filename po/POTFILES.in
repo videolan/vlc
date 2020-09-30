@@ -325,7 +325,6 @@ modules/codec/schroedinger.c
 modules/codec/scte18.c
 modules/codec/scte18.h
 modules/codec/scte27.c
-modules/codec/sdl_image.c
 modules/codec/shine.c
 modules/codec/spdif.c
 modules/codec/speex.c
