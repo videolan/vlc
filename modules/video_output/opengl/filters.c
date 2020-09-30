@@ -183,6 +183,9 @@ InitPlane(struct vlc_gl_filter_priv *priv, unsigned plane, GLsizei width,
 {
     const opengl_vtable_t *vt = &priv->filter.api->vt;
 
+    GLint draw_framebuffer;
+    vt->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &draw_framebuffer);
+
     GLuint framebuffer = priv->framebuffers_out[plane];
     GLuint texture = priv->textures_out[plane];
 
@@ -197,13 +200,16 @@ InitPlane(struct vlc_gl_filter_priv *priv, unsigned plane, GLsizei width,
     vt->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     /* Create a framebuffer and attach the texture */
-    vt->BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
     vt->FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                              GL_TEXTURE_2D, texture, 0);
 
     GLenum status = vt->CheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE)
         return VLC_EGENERIC;
+
+    /* Restore bindings */
+    vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer);
 
     return VLC_SUCCESS;
 }
@@ -267,6 +273,11 @@ InitFramebufferMSAA(struct vlc_gl_filter_priv *priv, unsigned msaa_level)
 
     const opengl_vtable_t *vt = &priv->filter.api->vt;
 
+    GLint renderbuffer;
+    GLint draw_framebuffer;
+    vt->GetIntegerv(GL_RENDERBUFFER_BINDING, &renderbuffer);
+    vt->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &draw_framebuffer);
+
     vt->GenRenderbuffers(1, &priv->renderbuffer_msaa);
     vt->BindRenderbuffer(GL_RENDERBUFFER, priv->renderbuffer_msaa);
     vt->RenderbufferStorageMultisample(GL_RENDERBUFFER, msaa_level,
@@ -275,13 +286,17 @@ InitFramebufferMSAA(struct vlc_gl_filter_priv *priv, unsigned msaa_level)
                                        priv->size_out.height);
 
     vt->GenFramebuffers(1, &priv->framebuffer_msaa);
-    vt->BindFramebuffer(GL_FRAMEBUFFER, priv->framebuffer_msaa);
+    vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, priv->framebuffer_msaa);
     vt->FramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                 GL_RENDERBUFFER, priv->renderbuffer_msaa);
 
     GLenum status = vt->CheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE)
         return VLC_EGENERIC;
+
+    /* Restore bindings */
+    vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer);
+    vt->BindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 
     return VLC_SUCCESS;
 }
