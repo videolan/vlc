@@ -517,18 +517,7 @@ static int ParseImageAttachments( decoder_t *p_dec )
                     es_in.video.i_chroma = type;
                     video_format_Init( &fmt_out, VLC_CODEC_YUVA );
 
-                    /* Find a suitable decoder module */
-                    if( module_exists( "sdl_image" ) )
-                    {
-                        /* ffmpeg thinks it can handle bmp properly but it can't (at least
-                         * not all of them), so use sdl_image if it is available */
-
-                        var_Create( p_dec, "codec", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-                        var_SetString( p_dec, "codec", "sdl_image" );
-                    }
-
                     p_pic = image_Read( p_image, p_block, &es_in, &fmt_out );
-                    var_Destroy( p_dec, "codec" );
                     es_format_Clean( &es_in );
                     video_format_Clean( &fmt_out );
                 }
