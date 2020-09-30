@@ -1245,6 +1245,36 @@ void PlayerController::setSecondarySubtitleDelay(VLCTick delay)
                                 delay, VLC_PLAYER_WHENCE_ABSOLUTE);
 }
 
+int PlayerController::getAudioDelayMS() const
+{
+    return MS_FROM_VLC_TICK( getAudioDelay() );
+}
+
+void PlayerController::setAudioDelayMS(int ms)
+{
+    setAudioDelay( VLC_TICK_FROM_MS(ms) );
+}
+
+int PlayerController::getSubtitleDelayMS() const
+{
+    return MS_FROM_VLC_TICK( getSubtitleDelay() );
+}
+
+void PlayerController::setSubtitleDelayMS(int ms)
+{
+    setSubtitleDelay( VLC_TICK_FROM_MS(ms) );
+}
+
+int PlayerController::getSecondarySubtitleDelayMS() const
+{
+    return MS_FROM_VLC_TICK( getSecondarySubtitleDelay() );
+}
+
+void PlayerController::setSecondarySubtitleDelayMS(int ms)
+{
+    setSecondarySubtitleDelay( VLC_TICK_FROM_MS(ms) );
+}
+
 void PlayerController::setSubtitleFPS(float fps)
 {
     Q_D(PlayerController);
