@@ -33,6 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_http.h>
+#include <vlc_block.h>
 #include <vlc_strings.h>
 #include <vlc_memstream.h>
 #include "message.h"
@@ -291,6 +292,36 @@ block_t *vlc_http_msg_read(struct vlc_http_msg *m)
         return NULL;
 
     return vlc_http_stream_read(m->payload);
+}
+
+int vlc_http_msg_write(struct vlc_http_msg *m, block_t *block, bool eos)
+{
+    if (m->payload == NULL)
+        return -1;
+
+    /* Ideally, we'd send the end-of-stream with the last block of data.
+     * But if there are zero blocks, then we have to send it separately.
+     */
+    if (block == NULL && eos)
+        return vlc_http_stream_write(m->payload, NULL, 0, true);
+
+    while (block != NULL)
+    {
+        block_t *next = block->p_next;
+        bool end = eos && next == NULL;
+
+        if (vlc_http_stream_write(m->payload, block->p_buffer, block->i_buffer,
+                                  end) < (ssize_t)block->i_buffer)
+            goto error;
+
+        block_Release(block);
+        block = next;
+    }
+
+    return 0;
+error:
+    block_ChainRelease(block);
+    return -1;
 }
 
 /* Serialization and deserialization */

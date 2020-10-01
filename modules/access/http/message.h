@@ -288,6 +288,20 @@ struct vlc_http_msg *vlc_http_msg_get_final(struct vlc_http_msg *) VLC_USED;
  */
 struct block_t *vlc_http_msg_read(struct vlc_http_msg *) VLC_USED;
 
+/**
+ * Sends HTTP data.
+ *
+ * Queues the next block of data for an HTTP message payload.
+ *
+ * @note This function takes ownership of the passed data block(s).
+ *
+ * @param b chain of block of data to be sent
+ * @param eos true to indicate the end of the payload
+ * @retval 0 success
+ * @retval -1 fatal error
+ */
+int vlc_http_msg_write(struct vlc_http_msg *, block_t *b, bool eos);
+
 /** @} */
 
 /**
@@ -333,6 +347,7 @@ VLC_USED;
 struct vlc_http_stream_cbs
 {
     struct vlc_http_msg *(*read_headers)(struct vlc_http_stream *);
+    ssize_t (*write)(struct vlc_http_stream *, const void *, size_t, bool eos);
     struct block_t *(*read)(struct vlc_http_stream *);
     void (*close)(struct vlc_http_stream *, bool abort);
 };
@@ -358,6 +373,26 @@ static inline
 struct vlc_http_msg *vlc_http_stream_read_headers(struct vlc_http_stream *s)
 {
     return s->cbs->read_headers(s);
+}
+
+/**
+ * Write message payload data.
+ *
+ * Writes data as message payload of an HTTP stream.
+ *
+ * @todo Take a block structure rather than a byte array.
+ *
+ * @param base start address of data to write
+ * @param length length in bytes of data to write
+ * @param eos whether this is the last write on the stream
+ * @retval len success
+ * @retval -1 error
+ */
+static inline ssize_t vlc_http_stream_write(struct vlc_http_stream *s,
+                                            const void *base, size_t length,
+                                            bool eos)
+{
+    return s->cbs->write(s, base, length, eos);
 }
 
 /**

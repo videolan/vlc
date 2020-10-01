@@ -327,6 +327,7 @@ static void stream_close(struct vlc_http_stream *s, bool abort)
 static const struct vlc_http_stream_cbs stream_callbacks =
 {
     stream_read_headers,
+    NULL,
     stream_read,
     stream_close,
 };

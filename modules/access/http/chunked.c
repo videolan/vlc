@@ -146,6 +146,7 @@ static void vlc_chunked_close(struct vlc_http_stream *stream, bool abort)
 static struct vlc_http_stream_cbs vlc_chunked_callbacks =
 {
     vlc_chunked_wait,
+    NULL,
     vlc_chunked_read,
     vlc_chunked_close,
 };

@@ -404,6 +404,7 @@ static void vlc_h2_stream_close(struct vlc_http_stream *stream, bool aborted)
 static const struct vlc_http_stream_cbs vlc_h2_stream_callbacks =
 {
     vlc_h2_stream_wait,
+    NULL,
     vlc_h2_stream_read,
     vlc_h2_stream_close,
 };
