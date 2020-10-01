@@ -1737,6 +1737,7 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
         VTERRCASE_LEGACY(-8960, "codecErr")
         VTERRCASE_LEGACY(-8961, "noCodecErr")
         VTERRCASE_LEGACY(-8969, "codecBadDataErr")
+        VTERRCASE_LEGACY(-8971, "codecExtensionNotFoundErr")
         VTERRCASE_LEGACY(-8973, "codecOpenErr")
         default:
             msg_Warn(p_dec, "unknown vt session error (%i)", (int)status);
