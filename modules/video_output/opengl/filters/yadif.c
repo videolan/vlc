@@ -621,6 +621,15 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
     unsigned prev = (next + 1) % 3;
     unsigned cur = (next + 2) % 3;
 
+    if (sys->missing_frames)
+    {
+        if (sys->missing_frames == 2)
+            /* cur is missing */
+            cur = next;
+        /* prev is missing */
+        prev = cur;
+    }
+
     GLuint draw_fb = GetDrawFramebuffer(vt);
 
     vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, plane->fbos[next]);
@@ -701,17 +710,10 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
 
     if (meta->plane == 2 && sys->order == 0) {
         /* This was the last pass of the last plane */
-        sys->next = prev; /* rotate */
+        sys->next = (sys->next + 1) % 3; /* rotate */
 
         if (sys->missing_frames)
-        {
-            if (sys->missing_frames == 2)
-                /* cur is missing */
-                cur = next;
-            /* prev is missing */
-            prev = cur;
             --sys->missing_frames;
-        }
 
         if ( true)
         {
