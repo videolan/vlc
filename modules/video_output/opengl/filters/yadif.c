@@ -696,7 +696,7 @@ Draw(struct vlc_gl_filter *filter, struct vlc_gl_input_meta *meta)
     vt->Clear(GL_COLOR_BUFFER_BIT);
     vt->DrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    if (sys->is_yadif2x)
+    if (sys->is_yadif2x && meta->plane == 2)
         sys->order ^= 1; /* alternate between 0 and 1 */
 
     if (meta->plane == 2 && sys->order == 0) {
