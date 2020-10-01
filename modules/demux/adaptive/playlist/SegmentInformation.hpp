@@ -74,14 +74,10 @@ namespace adaptive
 
                 ISegment * getSegment(SegmentInfoType, uint64_t = 0) const;
                 ISegment * getNextSegment(SegmentInfoType, uint64_t, uint64_t *, bool *) const;
-                bool getSegmentNumberByTime(vlc_tick_t, uint64_t *) const;
-                bool getPlaybackTimeDurationBySegmentNumber(uint64_t, vlc_tick_t *, vlc_tick_t *) const;
-                bool     getMediaPlaybackRange(vlc_tick_t *, vlc_tick_t *, vlc_tick_t *) const;
                 virtual void updateWith(SegmentInformation *);
                 virtual void mergeWithTimeline(SegmentTimeline *); /* ! don't use with global merge */
                 virtual void pruneBySegmentNumber(uint64_t);
                 virtual void pruneByPlaybackTime(vlc_tick_t);
-                virtual uint64_t translateSegmentNumber(uint64_t, const SegmentInformation *) const;
                 void setEncryption(const CommonEncryption &);
                 const CommonEncryption & intheritEncryption() const;
 

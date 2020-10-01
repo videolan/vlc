@@ -162,72 +162,6 @@ std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegme
     return retSegments.size();
 }
 
-bool SegmentInformation::getMediaPlaybackRange(vlc_tick_t *rangeBegin,
-                                               vlc_tick_t *rangeEnd,
-                                               vlc_tick_t *rangeLength) const
-{
-    if( mediaSegmentTemplate )
-    {
-        const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
-        const SegmentTimeline *timeline = mediaSegmentTemplate->inheritSegmentTimeline();
-        if( timeline )
-        {
-            stime_t startTime, endTime, duration;
-            if(!timeline->getScaledPlaybackTimeDurationBySegmentNumber(timeline->minElementNumber(),
-                                                                       &startTime, &duration) ||
-               !timeline->getScaledPlaybackTimeDurationBySegmentNumber(timeline->maxElementNumber(),
-                                                                       &endTime, &duration))
-                return false;
-
-            *rangeBegin = timescale.ToTime(startTime);
-            *rangeEnd = timescale.ToTime(endTime+duration);
-            *rangeLength = timescale.ToTime(timeline->getTotalLength());
-            return true;
-        }
-        /* Else compute, current time and timeshiftdepth based */
-        else if( mediaSegmentTemplate->duration.Get() )
-        {
-            *rangeEnd = 0;
-            *rangeBegin = -1 * getPlaylist()->timeShiftBufferDepth.Get();
-            *rangeLength = getPlaylist()->timeShiftBufferDepth.Get();
-            return true;
-        }
-    }
-    else if ( segmentList && !segmentList->getSegments().empty() )
-    {
-        const Timescale timescale = segmentList->inheritTimescale();
-        const std::vector<ISegment *> list = segmentList->getSegments();
-
-        const ISegment *back = list.back();
-        const stime_t startTime = list.front()->startTime.Get();
-        const stime_t endTime = back->startTime.Get() + back->duration.Get();
-        *rangeBegin = timescale.ToTime(startTime);
-        *rangeEnd = timescale.ToTime(endTime);
-        *rangeLength = timescale.ToTime(segmentList->getTotalLength());
-        return true;
-    }
-    else if( segmentBase )
-    {
-        const std::vector<ISegment *> list = segmentBase->subSegments();
-        if(list.empty())
-            return false;
-
-        const Timescale timescale = inheritTimescale();
-        const ISegment *back = list.back();
-        const stime_t startTime = list.front()->startTime.Get();
-        const stime_t endTime = back->startTime.Get() + back->duration.Get();
-        *rangeBegin = timescale.ToTime(startTime);
-        *rangeEnd = timescale.ToTime(endTime);
-        *rangeLength = 0;
-        return true;
-    }
-
-    if(parent)
-        return parent->getMediaPlaybackRange(rangeBegin, rangeEnd, rangeLength);
-    else
-        return false;
-}
-
 /* Returns wanted segment, or next in sequence if not found */
 ISegment * SegmentInformation::getNextSegment(SegmentInfoType type, uint64_t i_pos,
                                               uint64_t *pi_newpos, bool *pb_gap) const
@@ -328,120 +262,6 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
     return NULL;
 }
 
-bool SegmentInformation::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) const
-{
-    if( mediaSegmentTemplate )
-    {
-        const SegmentTimeline *timeline = mediaSegmentTemplate->inheritSegmentTimeline();
-        if(timeline)
-        {
-            const Timescale timescale = timeline->getTimescale().isValid()
-                                      ? timeline->getTimescale()
-                                      : mediaSegmentTemplate->inheritTimescale();
-            stime_t st = timescale.ToScaled(time);
-            *ret = timeline->getElementNumberByScaledPlaybackTime(st);
-            return true;
-        }
-
-        const stime_t duration = mediaSegmentTemplate->duration.Get();
-        if( duration )
-        {
-            if( getPlaylist()->isLive() )
-            {
-                vlc_tick_t now = vlc_tick_from_sec(::time(NULL));
-                if(getPlaylist()->availabilityStartTime.Get())
-                {
-                    if(time >= getPlaylist()->availabilityStartTime.Get() && time < now)
-                        *ret = mediaSegmentTemplate->getLiveTemplateNumber(time, true);
-                    else if(now - getPlaylist()->availabilityStartTime.Get() > time)
-                        *ret = mediaSegmentTemplate->getLiveTemplateNumber(time, false);
-                }
-                else return false;
-            }
-            else
-            {
-                const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
-                *ret = mediaSegmentTemplate->inheritStartNumber();
-                *ret += timescale.ToScaled(time) / duration;
-            }
-            return true;
-        }
-    }
-    else if ( segmentList && !segmentList->getSegments().empty() )
-    {
-        const Timescale timescale = segmentList->inheritTimescale();
-        stime_t st = timescale.ToScaled(time);
-        return segmentList->getSegmentNumberByScaledTime(st, ret);
-    }
-    else if( segmentBase )
-    {
-        const Timescale timescale = inheritTimescale();
-        stime_t st = timescale.ToScaled(time);
-        *ret = 0;
-        const std::vector<ISegment *> list = segmentBase->subSegments();
-        return SegmentInfoCommon::getSegmentNumberByScaledTime(list, st, ret);
-    }
-
-    if(parent)
-        return parent->getSegmentNumberByTime(time, ret);
-    else
-        return false;
-}
-
-bool SegmentInformation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
-                                                                vlc_tick_t *time, vlc_tick_t *duration) const
-{
-    SegmentList *segList;
-    MediaSegmentTemplate *mediaTemplate;
-
-    if(number == std::numeric_limits<uint64_t>::max())
-        return false;
-
-    if( (mediaTemplate = inheritSegmentTemplate()) )
-    {
-        const Timescale timescale = mediaTemplate->inheritTimescale();
-        const SegmentTimeline * timeline = mediaTemplate->inheritSegmentTimeline();
-
-        stime_t stime, sduration;
-        if(timeline)
-        {
-            if(!timeline->getScaledPlaybackTimeDurationBySegmentNumber(number, &stime, &sduration))
-                return false;
-        }
-        else
-        {
-            uint64_t startNumber = mediaTemplate->inheritStartNumber();
-            if(number < startNumber)
-                return false;
-            sduration = mediaTemplate->inheritDuration();
-            stime = (number - startNumber) * sduration;
-        }
-        *time = timescale.ToTime(stime);
-        *duration = timescale.ToTime(sduration);
-        return true;
-    }
-    else if ( (segList = inheritSegmentList()) )
-    {
-        return segList->getPlaybackTimeDurationBySegmentNumber(number, time, duration);
-    }
-    else
-    {
-        const Timescale timescale = inheritTimescale();
-        const ISegment *segment = getSegment(INFOTYPE_MEDIA, number);
-        if( segment )
-        {
-            *time = timescale.ToTime(segment->startTime.Get());
-            *duration = timescale.ToTime(segment->duration.Get());
-            return true;
-        }
-    }
-
-    if(parent)
-        return parent->getPlaybackTimeDurationBySegmentNumber(number, time, duration);
-
-    return false;
-}
-
 SegmentInformation * SegmentInformation::getChildByID(const adaptive::ID &id)
 {
     std::vector<SegmentInformation *>::const_iterator it;
@@ -506,14 +326,6 @@ void SegmentInformation::pruneBySegmentNumber(uint64_t num)
 
     if(mediaSegmentTemplate)
          mediaSegmentTemplate->pruneBySequenceNumber(num);
-}
-
-uint64_t SegmentInformation::translateSegmentNumber(uint64_t num, const SegmentInformation *from) const
-{
-    vlc_tick_t time, duration;
-    if( from->getPlaybackTimeDurationBySegmentNumber(num, &time, &duration) )
-        getSegmentNumberByTime(time, &num);
-    return num;
 }
 
 const CommonEncryption & SegmentInformation::intheritEncryption() const
