@@ -66,14 +66,11 @@ static inline void vlc_av_get_options(const char *psz_opts, AVDictionary** pp_di
 {
     config_chain_t *cfg = NULL;
     config_ChainParseOptions(&cfg, psz_opts);
-    while (cfg) {
-        config_chain_t *next = cfg->p_next;
-        av_dict_set(pp_dict, cfg->psz_name, cfg->psz_value, 0);
-        free(cfg->psz_name);
-        free(cfg->psz_value);
-        free(cfg);
-        cfg = next;
+    for (config_chain_t *item = cfg; item != NULL; item = item->p_next) {
+        av_dict_set(pp_dict, item->psz_name, item->psz_value, 0);
     }
+    if (cfg)
+        config_ChainDestroy(cfg);
 }
 
 static inline void vlc_init_avutil(vlc_object_t *obj)
