@@ -129,6 +129,10 @@ enum libvlc_event_e {
     /** A track was updated, cf. media_player_es_changed in \ref
      * libvlc_event_t.u to get the id of the updated track. */
     libvlc_MediaPlayerESUpdated,
+    libvlc_MediaPlayerProgramAdded,
+    libvlc_MediaPlayerProgramDeleted,
+    libvlc_MediaPlayerProgramSelected,
+    libvlc_MediaPlayerProgramUpdated,
     /**
      * The title list changed, call
      * libvlc_media_player_get_full_title_descriptions() to get the new list.
@@ -369,6 +373,19 @@ typedef struct libvlc_event_t
             const char *psz_unselected_id;
             const char *psz_selected_id;
         } media_player_es_selection_changed;
+
+        /* ProgramAdded, ProgramDeleted, ProgramUpdated */
+        struct
+        {
+            int i_id;
+        } media_player_program_changed;
+
+        /* ProgramSelected */
+        struct
+        {
+            int i_unselected_id;
+            int i_selected_id;
+        } media_player_program_selection_changed;
 
         struct
         {

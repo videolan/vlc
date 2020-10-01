@@ -290,20 +290,24 @@ on_program_list_changed(vlc_player_t *player,
                         enum vlc_player_list_action action,
                         const struct vlc_player_program *prgm, void* data)
 {
-    (void) action;
-    (void) prgm;
-
+    (void) player;
     libvlc_media_player_t *mp = data;
 
-    const struct vlc_player_program *selected =
-        vlc_player_GetSelectedProgram(player);
-    if (!selected)
-        return;
-
     libvlc_event_t event;
-    event.type = libvlc_MediaPlayerScrambledChanged;
-    event.u.media_player_scrambled_changed.new_scrambled = selected->scrambled;
+    switch (action)
+    {
+        case VLC_PLAYER_LIST_ADDED:
+            event.type = libvlc_MediaPlayerProgramAdded;
+            break;
+        case VLC_PLAYER_LIST_REMOVED:
+            event.type = libvlc_MediaPlayerProgramDeleted;
+            break;
+        case VLC_PLAYER_LIST_UPDATED:
+            event.type = libvlc_MediaPlayerProgramUpdated;
+            break;
+    }
 
+    event.u.media_player_program_changed.i_id = prgm->group_id;
     libvlc_event_send(&mp->event_manager, &event);
 }
 
@@ -311,22 +315,13 @@ static void
 on_program_selection_changed(vlc_player_t *player, int unselected_id,
                              int selected_id, void *data)
 {
-    (void) unselected_id;
-
+    (void) player;
     libvlc_media_player_t *mp = data;
 
-    if (selected_id == -1)
-        return;
-
-    const struct vlc_player_program *program =
-        vlc_player_GetSelectedProgram(player);
-
-    if (unlikely(program == NULL)) /* can happen when the player is stopping */
-        return;
-
     libvlc_event_t event;
-    event.type = libvlc_MediaPlayerScrambledChanged;
-    event.u.media_player_scrambled_changed.new_scrambled = program->scrambled;
+    event.type = libvlc_MediaPlayerProgramSelected;
+    event.u.media_player_program_selection_changed.i_unselected_id = unselected_id;
+    event.u.media_player_program_selection_changed.i_selected_id = selected_id;
 
     libvlc_event_send(&mp->event_manager, &event);
 }
@@ -2021,6 +2016,161 @@ int libvlc_media_player_set_equalizer( libvlc_media_player_t *p_mi, libvlc_equal
     }
 
     return 0;
+}
+
+
+static libvlc_player_program_t *
+libvlc_player_program_new(const struct vlc_player_program *program)
+{
+    libvlc_player_program_t *libprogram = malloc(sizeof(*libprogram));
+    if (libprogram == NULL)
+        return NULL;
+
+    libprogram->i_group_id = program->group_id;
+    libprogram->psz_name = strdup(program->name);
+    libprogram->b_selected = program->selected;
+    libprogram->b_scrambled = program->scrambled;
+
+    return libprogram;
+}
+
+void
+libvlc_player_program_delete( libvlc_player_program_t *program )
+{
+    free( program->psz_name );
+    free( program );
+}
+
+void libvlc_media_player_select_program_id( libvlc_media_player_t *p_mi,
+                                            int program_id)
+{
+    vlc_player_t *player = p_mi->player;
+
+    vlc_player_Lock(player);
+
+    vlc_player_SelectProgram(player, program_id);
+
+    vlc_player_Unlock(player);
+}
+
+libvlc_player_program_t *
+libvlc_media_player_get_selected_program( libvlc_media_player_t *p_mi)
+{
+    vlc_player_t *player = p_mi->player;
+
+    vlc_player_Lock(player);
+
+    const struct vlc_player_program *program = vlc_player_GetSelectedProgram( player );
+    if( program == NULL )
+    {
+        vlc_player_Unlock(player);
+        return NULL;
+    }
+    libvlc_player_program_t *libprogram = libvlc_player_program_new(program);
+
+    vlc_player_Unlock(player);
+
+    return libprogram;
+}
+
+libvlc_player_program_t *
+libvlc_media_player_get_program_from_id( libvlc_media_player_t *p_mi, int i_group_id )
+{
+    vlc_player_t *player = p_mi->player;
+
+    vlc_player_Lock(player);
+
+    libvlc_player_program_t *libprogram = NULL;
+
+    size_t count = vlc_player_GetProgramCount(player);
+    for (size_t i = 0; i < count; ++i)
+    {
+        const struct vlc_player_program *program =
+            vlc_player_GetProgramAt(player, i);
+        assert(program);
+        if (program->group_id == i_group_id)
+        {
+            libprogram = libvlc_player_program_new(program);
+            break;
+        }
+    }
+
+    vlc_player_Unlock(player);
+
+    return libprogram;
+}
+
+struct libvlc_player_programlist_t
+{
+    size_t count;
+    libvlc_player_program_t *programs[];
+};
+
+size_t
+libvlc_player_programlist_count( const libvlc_player_programlist_t *list )
+{
+    return list->count;
+}
+
+libvlc_player_program_t *
+libvlc_player_programlist_at( libvlc_player_programlist_t *list, size_t index )
+{
+    assert(index < list->count);
+    return list->programs[index];
+}
+
+void
+libvlc_player_programlist_delete( libvlc_player_programlist_t *list )
+{
+    for (size_t i = 0; i < list->count; ++i)
+        libvlc_player_program_delete(list->programs[i]);
+    free(list);
+}
+
+libvlc_player_programlist_t *
+libvlc_media_player_get_programlist( libvlc_media_player_t *p_mi )
+{
+    vlc_player_t *player = p_mi->player;
+
+    vlc_player_Lock(player);
+
+    size_t count = vlc_player_GetProgramCount(player);
+    if (count == 0)
+        goto error;
+
+    size_t size;
+    if( mul_overflow( count, sizeof(libvlc_player_program_t *), &size) )
+        goto error;
+    if( add_overflow( size, sizeof(libvlc_player_programlist_t), &size) )
+        goto error;
+
+    libvlc_player_programlist_t *list = malloc( size );
+    if( list == NULL )
+        goto error;
+
+    list->count = 0;
+    for (size_t i = 0; i < count; ++i)
+    {
+        const struct vlc_player_program *program =
+            vlc_player_GetProgramAt(player, i);
+        assert(program);
+        list->programs[i] = libvlc_player_program_new(program);
+        if (list->programs[i] == NULL)
+        {
+            libvlc_player_programlist_delete(list);
+            goto error;
+        }
+
+        list->count++;
+    }
+
+    vlc_player_Unlock(player);
+
+    return list;
+
+error:
+    vlc_player_Unlock(player);
+    return NULL;
 }
 
 static const char roles[][16] =

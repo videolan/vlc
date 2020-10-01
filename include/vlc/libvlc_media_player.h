@@ -1461,6 +1461,137 @@ int libvlc_media_player_add_slave( libvlc_media_player_t *p_mi,
                                    libvlc_media_slave_type_t i_type,
                                    const char *psz_uri, bool b_select );
 
+typedef struct libvlc_player_program_t
+{
+    /** Id used for libvlc_media_player_select_program() */
+    int i_group_id;
+    /** Program name, always valid */
+    char *psz_name;
+    /** True if the program is selected */
+    bool b_selected;
+    /** True if the program is scrambled */
+    bool b_scrambled;
+} libvlc_player_program_t;
+
+/**
+ * Opaque struct containing a list of program
+ */
+typedef struct libvlc_player_programlist_t libvlc_player_programlist_t;
+
+/**
+ * Delete a program struct
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \param program returned by libvlc_media_player_get_selected_program() or
+ * libvlc_media_player_get_program_from_id()
+ *
+ */
+LIBVLC_API void
+libvlc_player_program_delete( libvlc_player_program_t *program );
+
+/**
+ * Get the number of programs in a programlist
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \param list valid programlist
+ *
+ * \return number of programs, or 0 if the list is empty
+ */
+LIBVLC_API size_t
+libvlc_player_programlist_count( const libvlc_player_programlist_t *list );
+
+/**
+ * Get a program at a specific index
+ *
+ * \warning The behaviour is undefined if the index is not valid.
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \param list valid programlist
+ * \param index valid index in the range [0; count[
+ *
+ * \return a valid program (can't be NULL if libvlc_player_programlist_count()
+ * returned a valid count)
+ */
+LIBVLC_API libvlc_player_program_t *
+libvlc_player_programlist_at( libvlc_player_programlist_t *list, size_t index );
+
+/**
+ * Release a programlist
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \see libvlc_media_get_programlist
+ * \see libvlc_media_player_get_programlist
+ *
+ * \param list valid programlist
+ */
+LIBVLC_API void
+libvlc_player_programlist_delete( libvlc_player_programlist_t *list );
+
+/**
+ * Select program with a given program id.
+ *
+ * \note program ids are sent via the libvlc_MediaPlayerProgramAdded event or
+ * can be fetch via libvlc_media_player_get_programlist()
+ *
+ * \version LibVLC 4.0.0 or later
+ *
+ * \param p_mi opaque media player handle
+ * \param program_id
+ */
+LIBVLC_API void libvlc_media_player_select_program_id( libvlc_media_player_t *p_mi, int program_id);
+
+/**
+ * Get the selected program
+ *
+ * \version LibVLC 4.0.0 or later
+ *
+ * \param p_mi opaque media player handle
+ *
+ * \return a valid program struct or NULL if no programs are selected. The
+ * program need to be freed with libvlc_player_program_delete().
+ */
+LIBVLC_API libvlc_player_program_t *
+libvlc_media_player_get_selected_program( libvlc_media_player_t *p_mi);
+
+/**
+ * Get a program struct from a program id
+ *
+ * \version LibVLC 4.0.0 or later
+ *
+ * \param p_mi opaque media player handle
+ * \param i_group_id program id
+ *
+ * \return a valid program struct or NULL if the group_id is not found. The
+ * program need to be freed with libvlc_player_program_delete().
+ */
+LIBVLC_API libvlc_player_program_t *
+libvlc_media_player_get_program_from_id( libvlc_media_player_t *p_mi, int i_group_id );
+
+/**
+ * Get the program list
+ *
+ * \version LibVLC 4.0.0 and later.
+ * \note This program list is a snapshot of the current programs when this
+ * function is called. If a program is updated after this call, the user will
+ * need to call this function again to get the updated program.
+ *
+ * The program list can be used to get program informations and to select
+ * specific programs.
+ *
+ * \param p_mi the media player
+ * \param type type of the program list to request
+ *
+ * \return a valid libvlc_media_programlist_t or NULL in case of error or empty
+ * list, delete with libvlc_media_programlist_delete()
+ */
+LIBVLC_API libvlc_player_programlist_t *
+libvlc_media_player_get_programlist( libvlc_media_player_t *p_mi );
+
+
 /** \defgroup libvlc_video LibVLC video controls
  * @{
  */
