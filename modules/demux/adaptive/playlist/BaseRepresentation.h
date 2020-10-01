@@ -77,6 +77,13 @@ namespace adaptive
 
                 static bool         bwCompare(const BaseRepresentation *a,
                                               const BaseRepresentation *b);
+
+                virtual uint64_t translateSegmentNumber(uint64_t, const BaseRepresentation *) const;
+                bool getSegmentNumberByTime(mtime_t, uint64_t *) const;
+                bool getPlaybackTimeDurationBySegmentNumber(uint64_t, mtime_t *, mtime_t *) const;
+                bool getMediaPlaybackRange(mtime_t *rangeBegin,
+                                                               mtime_t *rangeEnd,
+                                                               mtime_t *rangeLength) const;
             protected:
                 virtual bool        validateCodec(const std::string &) const;
                 BaseAdaptationSet                  *adaptationSet;

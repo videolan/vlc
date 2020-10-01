@@ -161,7 +161,7 @@ bool Representation::runLocalUpdates(SharedResources *res)
     return true;
 }
 
-uint64_t Representation::translateSegmentNumber(uint64_t num, const SegmentInformation *from) const
+uint64_t Representation::translateSegmentNumber(uint64_t num, const BaseRepresentation *from) const
 {
     if(consistentSegmentNumber())
         return num;

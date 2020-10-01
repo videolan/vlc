@@ -51,7 +51,8 @@ namespace hls
                 virtual bool needsUpdate(uint64_t) const;  /* reimpl */
                 virtual void debug(vlc_object_t *, int) const;  /* reimpl */
                 virtual bool runLocalUpdates(SharedResources *); /* reimpl */
-                virtual uint64_t translateSegmentNumber(uint64_t, const SegmentInformation *) const; /* reimpl */
+
+                virtual uint64_t translateSegmentNumber(uint64_t, const BaseRepresentation *) const; /* reimpl */
 
             private:
                 StreamFormat streamFormat;
