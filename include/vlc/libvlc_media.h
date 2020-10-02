@@ -450,6 +450,9 @@ LIBVLC_API char *libvlc_media_get_mrl( libvlc_media_t *p_md );
 /**
  * Duplicate a media descriptor object.
  *
+ * \warning the duplicated media won't share forthcoming updates from the
+ * original one.
+ *
  * \param p_md a media descriptor object.
  */
 LIBVLC_API libvlc_media_t *libvlc_media_duplicate( libvlc_media_t *p_md );
