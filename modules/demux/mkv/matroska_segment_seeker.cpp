@@ -118,7 +118,14 @@ SegmentSeeker::add_seekpoint( track_id_t track_id, Seekpoint sp )
     seekpoints_t&  seekpoints = _tracks_seekpoints[ track_id ];
     seekpoints_t::iterator it = std::lower_bound( seekpoints.begin(), seekpoints.end(), sp );
 
-    if( it != seekpoints.end() && it->pts == sp.pts )
+    if( it != seekpoints.end() && it->fpos == sp.fpos )
+    {
+        if (sp.trust_level <= it->trust_level)
+            return;
+
+        *it = sp;
+    }
+    else if( it != seekpoints.end() && it->pts == sp.pts )
     {
         if (sp.trust_level <= it->trust_level)
             return;
