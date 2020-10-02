@@ -318,8 +318,10 @@ SegmentSeeker::get_seekpoints( matroska_segment_c& ms, vlc_tick_t target_pts,
         if ( start.fpos == std::numeric_limits<fptr_t>::max() )
             return tracks_seekpoint_t();
 
-        if ( end.fpos != std::numeric_limits<fptr_t>::max() || !ms.b_cues )
+        if ( (end.fpos != std::numeric_limits<fptr_t>::max() || !ms.b_cues) &&
+             (needle_pts != start.pts || start.trust_level < Seekpoint::TRUSTED))
             // do not read the whole (infinite?) file to get seek indexes
+            // do not generate an index if we already have the correct seekpoint
             index_range( ms, Range( start.fpos, end.fpos ), needle_pts );
 
         tracks_seekpoint_t tpoints = find_greatest_seekpoints_in_range( start.fpos, target_pts, filter_tracks );
