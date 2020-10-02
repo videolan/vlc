@@ -216,6 +216,31 @@ void ExtensionsManager::menu( QMenu *current )
     vlc_mutex_unlock( &p_extensions_manager->lock );
 }
 
+void ExtensionsManager::openVLsub()
+{
+    if( !isLoaded() )
+    {
+        // This case can happen: do nothing
+        return;
+    }
+
+    vlc_mutex_lock( &p_extensions_manager->lock );
+
+    extension_t *p_ext;
+    ARRAY_FOREACH( p_ext, p_extensions_manager->extensions )
+    {
+        const char *extensionName = p_ext->psz_shortdescription ? p_ext->psz_shortdescription: p_ext->psz_title;
+        if ( !extensionName || strcmp( extensionName, "VLsub" ) )
+            continue;
+
+        vlc_mutex_unlock( &p_extensions_manager->lock );
+        triggerMenu( MENU_MAP( 0, array_index_p_ext ) );
+        return;
+    }
+
+    vlc_mutex_unlock( &p_extensions_manager->lock );
+}
+
 void ExtensionsManager::triggerMenu( int id )
 {
     uint16_t i_ext = MENU_GET_EXTENSION( id );

@@ -280,6 +280,7 @@ public slots:
     void updateTimeFromTimer();
     bool canRestorePlayback() const;
     void restorePlaybackPos();
+    void openVLsub();
 
     //tracks
     TrackListModel* getVideoTracks();

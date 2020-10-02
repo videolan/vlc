@@ -20,6 +20,7 @@
 # include "config.h"
 #endif
 
+#include "dialogs/extensions/extensions_manager.hpp"
 #include "player_controller.hpp"
 #include "player_controller_p.hpp"
 
@@ -1593,6 +1594,17 @@ void PlayerController::updateTime(vlc_tick_t system_now, bool forceUpdate)
                                   + imprecision_delay_ms);
         }
     }
+}
+
+void PlayerController::openVLsub()
+{
+    Q_D(PlayerController);
+
+    const auto extensionManager = ExtensionsManager::getInstance( d->p_intf );
+    if ( !extensionManager->isLoaded() )
+        extensionManager->loadExtensions();
+
+    extensionManager->openVLsub();
 }
 
 void PlayerController::updateTimeFromTimer()
