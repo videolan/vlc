@@ -66,8 +66,8 @@ bool TrackListModel::setData(const QModelIndex &index, const QVariant &value, in
         vlc_es_id_t *es_id = m_data[row].m_id.get();
         const enum es_format_category_e cat = vlc_es_id_GetCat(es_id);
         enum vlc_player_select_policy policy =
-            cat == VIDEO_ES ? VLC_PLAYER_SELECT_SIMULTANEOUS
-                            : VLC_PLAYER_SELECT_EXCLUSIVE;
+            ( cat ==  VIDEO_ES ) || m_multiSelect ? VLC_PLAYER_SELECT_SIMULTANEOUS
+                                                  : VLC_PLAYER_SELECT_EXCLUSIVE;
         vlc_player_SelectEsId(m_player, es_id, policy);
     }
     else
@@ -151,6 +151,32 @@ QHash<int, QByteArray> TrackListModel::roleNames() const
     QHash<int, QByteArray> roleNames = this->QAbstractListModel::roleNames();
     roleNames[Qt::CheckStateRole] = "checked";
     return roleNames;
+}
+
+void TrackListModel::setMultiSelect(bool multiSelect)
+{
+    if (m_multiSelect == multiSelect)
+        return;
+
+    m_multiSelect = multiSelect;
+    if ( !m_multiSelect && getCount() > 1 )
+    {
+        int firstSelectedIndex = -1;
+        for ( int i = 0; i < getCount(); i++ )
+        {
+            if ( data( index( i ), Qt::CheckStateRole ).toBool() )
+            {
+                if (firstSelectedIndex != -1)
+                    setData( index(i), false, Qt::CheckStateRole );
+                else
+                    firstSelectedIndex = i;
+            }
+        }
+
+        if ( firstSelectedIndex != -1 )
+            setData( index(firstSelectedIndex), true, Qt::CheckStateRole );
+    }
+    emit multiSelectChanged(m_multiSelect);
 }
 
 TrackListModel::Data::Data(const vlc_player_track *track_info)

@@ -45,7 +45,7 @@ class TrackListModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(int count READ getCount NOTIFY countChanged)
-
+    Q_PROPERTY(bool multiSelect READ getMultiSelect WRITE setMultiSelect NOTIFY multiSelectChanged)
 
 public:
     TrackListModel(vlc_player_t* player, QObject* parent = nullptr);
@@ -68,8 +68,14 @@ public:
 
     inline int getCount() const { return m_data.size(); }
 
+    inline bool getMultiSelect() const { return m_multiSelect; }
+
+public slots:
+    void setMultiSelect(bool multiSelect);
+
 signals:
     void countChanged();
+    void multiSelectChanged(bool multiSelect);
 
 private:
     vlc_player_t* m_player;
@@ -88,6 +94,7 @@ private:
         bool m_selected = false;
     };
     QList<Data> m_data;
+    bool m_multiSelect = false; // this only work for subtitles
 };
 
 /**
