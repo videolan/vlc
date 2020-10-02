@@ -66,8 +66,10 @@ FocusScope {
 
     property alias _primaryShadowVerticalOffset: primaryShadow.verticalOffset
     property alias _primaryShadowRadius: primaryShadow.radius
+    property alias _primaryShadowSamples: primaryShadow.samples
     property alias _secondaryShadowVerticalOffset: secondaryShadow.verticalOffset
     property alias _secondaryShadowRadius: secondaryShadow.radius
+    property alias _secondaryShadowSamples: secondaryShadow.samples
 
     property int _newIndicatorMedian: VLCStyle.margin_xsmall
 
@@ -79,8 +81,10 @@ FocusScope {
                 target: root
                 _primaryShadowVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
                 _primaryShadowRadius: VLCStyle.dp(14, VLCStyle.scale)
+                _primaryShadowSamples: 1 + VLCStyle.dp(14, VLCStyle.scale) * 2
                 _secondaryShadowVerticalOffset: VLCStyle.dp(1, VLCStyle.scale)
                 _secondaryShadowRadius: VLCStyle.dp(3, VLCStyle.scale)
+                _secondaryShadowSamples: 1 + VLCStyle.dp(3, VLCStyle.scale) * 2
                 _newIndicatorMedian: VLCStyle.margin_xsmall
             }
         },
@@ -90,8 +94,10 @@ FocusScope {
                 target: root
                 _primaryShadowVerticalOffset: VLCStyle.dp(32, VLCStyle.scale)
                 _primaryShadowRadius: VLCStyle.dp(72, VLCStyle.scale)
+                _primaryShadowSamples: 1 + VLCStyle.dp(72, VLCStyle.scale) * 2
                 _secondaryShadowVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
                 _secondaryShadowRadius: VLCStyle.dp(8, VLCStyle.scale)
+                _secondaryShadowSamples: 1 + VLCStyle.dp(8, VLCStyle.scale) * 2
                 _newIndicatorMedian: VLCStyle.margin_small
             }
         }
@@ -99,10 +105,16 @@ FocusScope {
 
     transitions: Transition {
         to: "*"
-        SmoothedAnimation {
-          duration: 64
-          properties: "_primaryShadowVerticalOffset,_primaryShadowRadius,_secondaryShadowVerticalOffset,_secondaryShadowRadius,_newIndicatorMedian"
-       }
+        SequentialAnimation {
+            PropertyAction {
+                properties: "_primaryShadowSamples,_secondaryShadowSamples"
+            }
+
+            SmoothedAnimation {
+                duration: 64
+                properties: "_primaryShadowVerticalOffset,_primaryShadowRadius,_secondaryShadowVerticalOffset,_secondaryShadowRadius,_newIndicatorMedian"
+            }
+        }
     }
 
     MouseArea {
@@ -166,10 +178,7 @@ FocusScope {
                 anchors.fill: baseRect
                 source: baseRect
                 horizontalOffset: 0
-                verticalOffset: VLCStyle.dp(6, VLCStyle.scale)
-                radius: VLCStyle.dp(14, VLCStyle.scale)
                 spread: 0
-                samples: ( radius * 2 ) + 1
                 color: Qt.rgba(0, 0, 0, .22)
             }
 
@@ -179,10 +188,7 @@ FocusScope {
                 anchors.fill: baseRect
                 source: baseRect
                 horizontalOffset: 0
-                verticalOffset: VLCStyle.dp(1, VLCStyle.scale)
-                radius: VLCStyle.dp(3, VLCStyle.scale)
                 spread: 0
-                samples: ( radius * 2 ) + 1
                 color: Qt.rgba(0, 0, 0, .18)
             }
 
