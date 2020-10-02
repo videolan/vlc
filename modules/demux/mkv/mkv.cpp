@@ -44,6 +44,7 @@ extern "C" {
  *****************************************************************************/
 namespace mkv {
 static int  Open ( vlc_object_t * );
+static int  OpenTrusted ( vlc_object_t * );
 static void Close( vlc_object_t * );
 } // namespace
 
@@ -84,6 +85,11 @@ vlc_module_begin ()
     add_file_extension("mka")
     add_file_extension("mks")
     add_file_extension("mkv")
+
+    add_submodule()
+        set_callbacks( OpenTrusted, Close )
+        set_capability( "demux", 0 )
+        add_shortcut( "mka_trusted", "mkv_trusted" )
 vlc_module_end ()
 
 namespace mkv {
@@ -97,9 +103,8 @@ static int  Seek   ( demux_t *, vlc_tick_t i_mk_date, double f_percent, virtual_
 /*****************************************************************************
  * Open: initializes matroska demux structures
  *****************************************************************************/
-static int Open( vlc_object_t * p_this )
+static int OpenInternal( demux_t *p_demux, bool trust_cues )
 {
-    demux_t            *p_demux = (demux_t*)p_this;
     demux_sys_t        *p_sys;
     matroska_stream_c  *p_stream;
     matroska_segment_c *p_segment;
@@ -117,7 +122,7 @@ static int Open( vlc_object_t * p_this )
     /* Set the demux function */
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys = new demux_sys_t( *p_demux );
+    p_demux->p_sys      = p_sys = new demux_sys_t( *p_demux, trust_cues );
 
     vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
     if ( !p_sys->b_seekable || vlc_stream_Control(
@@ -268,6 +273,18 @@ static int Open( vlc_object_t * p_this )
 error:
     delete p_sys;
     return VLC_EGENERIC;
+}
+
+static int Open( vlc_object_t *p_this )
+{
+    demux_t *p_demux = (demux_t*)p_this;
+    return OpenInternal( p_demux, false );
+}
+
+static int OpenTrusted( vlc_object_t *p_this )
+{
+    demux_t *p_demux = (demux_t*)p_this;
+    return OpenInternal( p_demux, true );
 }
 
 /*****************************************************************************

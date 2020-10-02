@@ -39,7 +39,7 @@ class chapter_item_c;
 struct demux_sys_t
 {
 public:
-    demux_sys_t( demux_t & demux )
+    demux_sys_t( demux_t & demux, bool trust_cues )
         :demuxer(demux)
         ,b_seekable(false)
         ,b_fastseekable(false)
@@ -54,6 +54,7 @@ public:
         ,p_current_vsegment(NULL)
         ,dvd_interpretor( *this )
         ,i_duration(-1)
+        ,trust_cues(trust_cues)
         ,ev(&demux)
     {
         vlc_mutex_init( &lock_demuxer );
@@ -88,6 +89,8 @@ public:
 
     /* duration of the stream */
     vlc_tick_t              i_duration;
+
+    const bool              trust_cues;
 
     matroska_segment_c *FindSegment( const EbmlBinary & uid ) const;
     virtual_chapter_c *BrowseCodecPrivate( unsigned int codec_id,

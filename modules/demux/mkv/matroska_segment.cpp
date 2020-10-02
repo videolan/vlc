@@ -216,7 +216,9 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
 
                 if( ! b_invalid_cue && tracks.find( track_id ) != tracks.end() )
                 {
-                    level = SegmentSeeker::Seekpoint::QUESTIONABLE; // TODO: var_InheritBool( ..., "mkv-trust-cues" );
+                    level = sys.trust_cues ?
+                            SegmentSeeker::Seekpoint::TRUSTED :
+                            SegmentSeeker::Seekpoint::QUESTIONABLE;
                 }
 
                 _seeker.add_seekpoint( track_id,
