@@ -109,10 +109,12 @@ enum libvlc_event_e {
     libvlc_MediaPlayerSnapshotTaken = libvlc_MediaPlayerPausableChanged + 2,
     libvlc_MediaPlayerLengthChanged,
     libvlc_MediaPlayerVout,
-    libvlc_MediaPlayerScrambledChanged,
+
+    /* libvlc_MediaPlayerScrambledChanged, use libvlc_MediaPlayerProgramUpdated */
+
     /** A track was added, cf. media_player_es_changed in \ref libvlc_event_t.u
      * to get the id of the new track. */
-    libvlc_MediaPlayerESAdded,
+    libvlc_MediaPlayerESAdded = libvlc_MediaPlayerVout + 2,
     /** A track was removed, cf. media_player_es_changed in \ref
      * libvlc_event_t.u to get the id of the removed track. */
     libvlc_MediaPlayerESDeleted,
