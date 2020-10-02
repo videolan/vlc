@@ -47,7 +47,7 @@ AbstractDemuxer *DASHStream::newDemux(vlc_object_t *p_obj, const StreamFormat &f
             break;
 
         case StreamFormat::WEBM:
-            ret = new Demuxer(p_obj, "mkv", out, source);
+            ret = new Demuxer(p_obj, "mkv_trusted", out, source);
             break;
 
         case StreamFormat::WEBVTT:
