@@ -195,6 +195,7 @@ char *vlc_stream_ReadLine( stream_t *s )
         if( i_pos == 0 && i_data >= 2 )
         {
             const char *psz_encoding = NULL;
+            bool little_endian = false;
 
             if( unlikely(priv->text.conv != (vlc_iconv_t)-1) )
             {   /* seek back to beginning? reset */
@@ -205,7 +206,7 @@ char *vlc_stream_ReadLine( stream_t *s )
             if( !memcmp( p_data, "\xFF\xFE", 2 ) )
             {
                 psz_encoding = "UTF-16LE";
-                priv->text.little_endian = true;
+                little_endian = true;
             }
             else if( !memcmp( p_data, "\xFE\xFF", 2 ) )
             {
@@ -223,6 +224,7 @@ char *vlc_stream_ReadLine( stream_t *s )
                     goto error;
                 }
                 priv->text.char_width = 2;
+                priv->text.little_endian = little_endian;
             }
         }
 
