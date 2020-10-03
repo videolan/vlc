@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Aled Powell <aled@aledpowell.cymru>, 2013-2017
+# Aled Powell <aled@aledpowell.cymru>, 2013-2017,2020
 # Huw Waters <huwwaters@gmail.com>, 2012-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2018-12-19 22:50+0100\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2020-10-03 16:00+0200\n"
+"Last-Translator: Aled Powell <aled@aledpowell.cymru>, 2020\n"
 "Language-Team: Welsh (https://www.transifex.com/yaron/teams/16553/cy/)\n"
 "Language: cy\n"
 "MIME-Version: 1.0\n"
@@ -1030,11 +1030,11 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr "Cydraniad fideo"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "Maint byffer"
 
 #: src/input/es_out.c:3183 src/input/es_out.c:3186 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1052,39 +1052,39 @@ msgstr "Fformat datgodwyd"
 
 #: src/input/es_out.c:3199
 msgid "Top left"
-msgstr ""
+msgstr "Top chwith"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr ""
+msgstr "Chwith top"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "Gwaelod dde"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
-msgstr ""
+msgstr "Top dde"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr ""
+msgstr "Gwaleod chwith"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr ""
+msgstr "Gwaleod dde"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr ""
+msgstr "Chwith gwaelod"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
-msgstr ""
+msgstr "De top"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "Cyfeiriad"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
@@ -1094,11 +1094,11 @@ msgstr "Anniffiniedig"
 
 #: src/input/es_out.c:3212
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 llinell, 60 Hz)"
 
 #: src/input/es_out.c:3214
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 llinell, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
@@ -1124,11 +1124,11 @@ msgstr ""
 #: src/input/es_out.c:3253
 #, c-format
 msgid "%s Range"
-msgstr ""
+msgstr "Ystod %s "
 
 #: src/input/es_out.c:3255
 msgid "Full"
-msgstr ""
+msgstr "Llawn"
 
 #: src/input/es_out.c:3262 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1143,19 +1143,19 @@ msgstr "Canol"
 
 #: src/input/es_out.c:3263
 msgid "Top Left"
-msgstr ""
+msgstr "Top Chwith"
 
 #: src/input/es_out.c:3264
 msgid "Top Center"
-msgstr ""
+msgstr "Top Canol"
 
 #: src/input/es_out.c:3265
 msgid "Bottom Left"
-msgstr ""
+msgstr "Gwaelod Chwith"
 
 #: src/input/es_out.c:3266
 msgid "Bottom Center"
-msgstr ""
+msgstr "Gwaelod Canol"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
@@ -1163,7 +1163,7 @@ msgstr ""
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
-msgstr ""
+msgstr "Petryal"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
@@ -1175,7 +1175,7 @@ msgstr ""
 
 #: src/input/es_out.c:3291
 msgid "Projection"
-msgstr ""
+msgstr "Tafluniad"
 
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
@@ -1185,7 +1185,7 @@ msgstr ""
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Traw"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
@@ -1207,19 +1207,19 @@ msgstr ""
 
 #: src/input/es_out.c:3318
 msgid "Primary R"
-msgstr ""
+msgstr "Coch Sylfaenol (R)"
 
 #: src/input/es_out.c:3325
 msgid "Primary G"
-msgstr ""
+msgstr "Gwyrdd Sylfaenol (G)"
 
 #: src/input/es_out.c:3332
 msgid "Primary B"
-msgstr ""
+msgstr "Glas Sylfaenol (B)"
 
 #: src/input/es_out.c:3339
 msgid "White point"
-msgstr ""
+msgstr "Pwynt gwyn"
 
 #: src/input/es_out.c:3354 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1338,11 +1338,11 @@ msgstr "Actorion"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 msgid "Album Artist"
-msgstr ""
+msgstr "Artist yr Albwm"
 
 #: src/input/meta.c:80
 msgid "Disc number"
-msgstr ""
+msgstr "Rhif disg"
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1384,7 +1384,7 @@ msgstr "Teitl Diwethaf"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "Teitl dewislen"
 
 #: src/input/var.c:285
 msgid "Menu popup"
@@ -1606,11 +1606,11 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "Cerddoriaeth"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
-msgstr ""
+msgstr "Cyfathrebiad"
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
@@ -1618,19 +1618,19 @@ msgstr "Gêm"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "Hysbysiad"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
-msgstr ""
+msgstr "Animeiddiad"
 
 #: src/libvlc-module.c:143
 msgid "Production"
-msgstr ""
+msgstr "Cynhyrchiad"
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
-msgstr ""
+msgstr "Hygyrchedd"
 
 #: src/libvlc-module.c:144
 msgid "Test"
@@ -15846,7 +15846,7 @@ msgstr "Nôl"
 #: modules/gui/macosx/VLCControlsBarCommon.m:183
 #: modules/gui/macosx/VLCFSPanelController.m:123
 msgid "Seek backward"
-msgstr ""
+msgstr "Canfod nôl"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:88
 #: modules/gui/macosx/VLCControlsBarCommon.m:185
@@ -15858,7 +15858,7 @@ msgstr "Ymlaen"
 #: modules/gui/macosx/VLCControlsBarCommon.m:186
 #: modules/gui/macosx/VLCFSPanelController.m:120
 msgid "Seek forward"
-msgstr ""
+msgstr "Canfod ymlaen"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:93
 msgid "Playback position"
@@ -16276,13 +16276,15 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:82
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 msgid "Display VLC status menu icon"
-msgstr ""
+msgstr "Dangos eicon dewislen statws VLC"
 
 #: modules/gui/macosx/macosx.m:83
 msgid ""
 "By default, VLC will show the statusbar icon menu. However, you can choose "
 "to disable it (restart required)."
 msgstr ""
+"Fel arfer, bydd VLC yn dangos dewislen eicon y bar statws. Ond gellir "
+"analluogi hyn (angen ail-gychwyn)."
 
 #: modules/gui/macosx/macosx.m:85
 msgid "Control playlist items with the Apple Remote"
@@ -17102,19 +17104,19 @@ msgstr "Dyfeisiau Mewnbwn"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:210
 msgid "Subscreen left"
-msgstr ""
+msgstr "Chwith is-sgrin"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:211
 msgid "Subscreen top"
-msgstr ""
+msgstr "Brig is-sgrin"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:212
 msgid "Subscreen Width"
-msgstr ""
+msgstr "Lled is-sgrin"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:213
 msgid "Subscreen Height"
-msgstr ""
+msgstr "Uchder is-sgrin"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
@@ -20750,7 +20752,7 @@ msgstr "datfygio"
 #: modules/gui/qt/util/searchlineedit.cpp:49
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr ""
+msgstr "Clirio"
 
 #: modules/gui/skins2/src/dialogs.cpp:212
 msgid "Open a skin file"
@@ -25687,12 +25689,14 @@ msgstr "Chwyddo"
 
 #: modules/video_filter/mirror.c:64
 msgid "Mirror orientation"
-msgstr ""
+msgstr "Cyfeiriadedd drychweddu"
 
 #: modules/video_filter/mirror.c:65
 msgid ""
 "Defines orientation of the mirror splitting. Can be vertical or horizontal."
 msgstr ""
+"Mae'n diffinio cyfeiriadedd yr hollti drychweddu. Gall fod yn fertigol neu'n "
+"llorweddol."
 
 #: modules/video_filter/mirror.c:69
 msgid "Vertical"
@@ -25708,7 +25712,7 @@ msgstr "Cyfeiriad"
 
 #: modules/video_filter/mirror.c:72
 msgid "Direction of the mirroring."
-msgstr ""
+msgstr "Cyfeiriad y drychweddu."
 
 #: modules/video_filter/mirror.c:75
 msgid "Left to right/Top to bottom"
@@ -25728,7 +25732,7 @@ msgstr "Drychweddu'r fideo"
 
 #: modules/video_filter/mirror.c:82
 msgid "Splits video in two same parts, like in a mirror"
-msgstr "Hollti'r fideo yn dwy ran, fel mewn drych"
+msgstr "Hollti'r fideo yn ddwy ran yr un fath, fel mewn drych"
 
 #: modules/video_filter/motionblur.c:54
 msgid "Blur factor (1-127)"
@@ -25969,7 +25973,7 @@ msgstr ""
 
 #: modules/video_filter/puzzle.c:72
 msgid "Rotation parameter: none;180;90-270;mirror"
-msgstr ""
+msgstr "Paramedr cylchdroi: dim;180;90-270;drychweddu"
 
 #: modules/video_filter/puzzle.c:75
 msgid "jigsaw puzzle"
