@@ -59,6 +59,7 @@ struct vlc_h2_conn
     uint32_t max_send_frame; /**< Maximum sent frame size */
     uint32_t init_send_cwnd; /**< Initial send congestion window */
     uint64_t send_cwnd; /**< Send congestion window */
+    vlc_cond_t send_wait;
 
     vlc_mutex_t lock; /**< State machine lock */
     vlc_thread_t thread; /**< Receive thread */
@@ -86,6 +87,7 @@ struct vlc_h2_stream
     vlc_cond_t recv_wait;
 
     uint64_t send_cwnd; /**< Send congestion window */
+    vlc_cond_t send_wait;
 };
 
 static int vlc_h2_conn_queue(struct vlc_h2_conn *conn, struct vlc_h2_frame *f)
@@ -225,6 +227,7 @@ static void vlc_h2_stream_window_update(void *ctx, uint_fast32_t credit)
      * insanely broken anyway.
      */
     s->send_cwnd += credit;
+    vlc_cond_broadcast(&s->send_wait);
 
     vlc_http_dbg(SO(s), "stream %"PRIu32" window update: +%"PRIuFAST32" to "
                  "%"PRIu64, s->id, credit, s->send_cwnd);
@@ -435,6 +438,7 @@ static struct vlc_http_stream *vlc_h2_stream_open(struct vlc_http_conn *c,
     s->recv_head = NULL;
     s->recv_tailp = &s->recv_head;
     vlc_cond_init(&s->recv_wait);
+    vlc_cond_init(&s->send_wait);
     s->send_cwnd = conn->init_send_cwnd;
 
     vlc_mutex_lock(&conn->lock);
@@ -477,9 +481,13 @@ static void vlc_h2_initial_window_update(struct vlc_h2_conn *conn,
 
     conn->init_send_cwnd = value;
     conn->send_cwnd += delta;
+    vlc_cond_broadcast(&conn->send_wait);
 
     for (struct vlc_h2_stream *s = conn->streams; s != NULL; s = s->older)
+    {
         s->send_cwnd += delta;
+        vlc_cond_broadcast(&s->send_wait);
+    }
 }
 
 /** Reports an HTTP/2 peer connection setting */
@@ -574,6 +582,7 @@ static void vlc_h2_window_update(void *ctx, uint_fast32_t credit)
     struct vlc_h2_conn *conn = ctx;
 
     conn->send_cwnd += credit;
+    vlc_cond_broadcast(&conn->send_wait);
 
     vlc_http_dbg(CO(conn), "window update: +%"PRIuFAST32" to %"PRIu64,
                  credit, conn->send_cwnd);
@@ -795,6 +804,7 @@ struct vlc_http_conn *vlc_h2_conn_create(void *ctx, struct vlc_tls *tls)
         goto error;
 
     vlc_mutex_init(&conn->lock);
+    vlc_cond_init(&conn->send_wait);
 
     if (vlc_h2_conn_queue(conn, vlc_h2_frame_settings())
      || vlc_clone(&conn->thread, vlc_h2_recv_thread, conn,
