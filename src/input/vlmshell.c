@@ -67,8 +67,8 @@ static char *Save( vlm_t * );
 static int Load( vlm_t *, char * );
 
 static vlm_schedule_sys_t *vlm_ScheduleNew( vlm_t *vlm, const char *psz_name );
-static int vlm_ScheduleSetup( vlm_schedule_sys_t *schedule, const char *psz_cmd,
-                              const char *psz_value );
+static int vlm_ScheduleSetup( vlm_t *vlm, vlm_schedule_sys_t *schedule,
+                              const char *psz_cmd, const char *psz_value );
 
 /* */
 static vlm_media_sys_t *vlm_MediaSearch( vlm_t *, const char *);
@@ -573,7 +573,7 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
         if( !strcmp( ppsz_property[i], "enabled" ) ||
             !strcmp( ppsz_property[i], "disabled" ) )
         {
-            if ( vlm_ScheduleSetup( p_schedule, ppsz_property[i], NULL ) )
+            if ( vlm_ScheduleSetup( p_vlm, p_schedule, ppsz_property[i], NULL ) )
                 goto error;
         }
         else if( !strcmp( ppsz_property[i], "append" ) )
@@ -608,7 +608,7 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
             }
 
             if( i_ret == VLC_SUCCESS )
-                i_ret = vlm_ScheduleSetup( p_schedule, "append", psz_line );
+                i_ret = vlm_ScheduleSetup( p_vlm, p_schedule, "append", psz_line );
             free( psz_line );
 
             if( i_ret )
@@ -624,7 +624,7 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
                 return ExecuteSyntaxError( psz_cmd, pp_status );
             }
 
-            if( vlm_ScheduleSetup( p_schedule, ppsz_property[i], ppsz_property[i+1] ) )
+            if( vlm_ScheduleSetup( p_vlm, p_schedule, ppsz_property[i], ppsz_property[i+1] ) )
                 goto error;
             i++;
         }
@@ -1010,8 +1010,8 @@ static vlm_schedule_sys_t *vlm_ScheduleSearch( vlm_t *vlm, const char *psz_name 
 }
 
 /* Ok, setup schedule command will be able to support only one (argument value) at a time  */
-static int vlm_ScheduleSetup( vlm_schedule_sys_t *schedule, const char *psz_cmd,
-                       const char *psz_value )
+static int vlm_ScheduleSetup( vlm_t *vlm, vlm_schedule_sys_t *schedule,
+                              const char *psz_cmd, const char *psz_value )
 {
     if( !strcmp( psz_cmd, "enabled" ) )
     {
@@ -1164,6 +1164,12 @@ static int vlm_ScheduleSetup( vlm_schedule_sys_t *schedule, const char *psz_cmd,
         schedule->period = ((((time.tm_year * 12 + time.tm_mon) * 30
             + time.tm_mday) * 24 + time.tm_hour) * 60 + time.tm_min) * 60
             + time.tm_sec;
+
+        if( schedule->period >= 86400 || ( schedule->period > 0 &&
+            86400 % schedule->period == 0 && 3600 % schedule->period != 0 ) )
+        {
+            msg_Warn( vlm, "Repeating VLM schedules neither adjust for DST nor properly count calendar months or years" );
+        }
     }
     else if( !strcmp( psz_cmd, "repeat" ) )
     {
