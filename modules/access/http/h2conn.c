@@ -282,6 +282,96 @@ static struct vlc_http_msg *vlc_h2_stream_wait(struct vlc_http_stream *stream)
     return m;
 }
 
+static ssize_t vlc_h2_stream_write(struct vlc_http_stream *stream,
+                                   const void *base, size_t length, bool eos)
+{
+    struct vlc_h2_stream *s =
+        container_of(stream, struct vlc_h2_stream, stream);
+    struct vlc_h2_conn *conn = s->conn;
+    ssize_t total = 0;
+    int err = 0;
+
+    if (unlikely(length == 0 && !eos))
+        return 0;
+
+    vlc_h2_stream_lock(s);
+    do
+    {
+        size_t size = length;
+
+        /* This and the following flow control comparison and subtraction all
+         * assumes that we do *not* use any padding on the data frames.
+         */
+        if (size > conn->max_send_frame)
+            size = conn->max_send_frame;
+
+        /* Stream flow control */
+        if (size > s->send_cwnd)
+            size = s->send_cwnd;
+        if (size == 0 && length > 0)
+        {
+            if (s->interrupted)
+            {
+                err = EINTR;
+                break;
+            }
+
+            mutex_cleanup_push(&conn->lock);
+            vlc_cond_wait(&s->send_wait, &conn->lock);
+            vlc_cleanup_pop();
+            continue;
+        }
+
+        /* Connection flow control */
+        if (size > conn->send_cwnd)
+            size = conn->send_cwnd;
+        if (size == 0 && length > 0)
+        {
+            if (s->interrupted)
+            {
+                err = EINTR;
+                break;
+            }
+
+            mutex_cleanup_push(&conn->lock);
+            vlc_cond_wait(&conn->send_wait, &conn->lock);
+            vlc_cleanup_pop();
+            continue;
+        }
+
+        /* Frame send */
+        bool end = eos && length == size;
+        struct vlc_h2_frame *f = vlc_h2_frame_data(s->id, base, size, end);
+
+        if (f == NULL)
+        {
+            err = ENOMEM;
+            break;
+        }
+
+        if (vlc_h2_conn_queue(conn, f))
+        {
+            err = ECONNRESET;
+            break;
+        }
+
+        base = (const char *)base + size;
+        length -= size;
+        total += size;
+        s->send_cwnd -= size;
+        conn->send_cwnd -= size;
+    }
+    while (length > 0);
+    vlc_h2_stream_unlock(s);
+
+    if (total == 0 && err != 0)
+    {
+        errno = err;
+        total = -1;
+    }
+    return total;
+}
+
 /**
  * Receives stream data.
  *
@@ -404,7 +494,7 @@ static void vlc_h2_stream_close(struct vlc_http_stream *stream, bool aborted)
 static const struct vlc_http_stream_cbs vlc_h2_stream_callbacks =
 {
     vlc_h2_stream_wait,
-    NULL,
+    vlc_h2_stream_write,
     vlc_h2_stream_read,
     vlc_h2_stream_close,
 };
