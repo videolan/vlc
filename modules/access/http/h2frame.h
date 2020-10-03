@@ -94,7 +94,9 @@ const char *vlc_h2_setting_name(uint_fast16_t);
 /* Protocol default settings */
 #define VLC_H2_DEFAULT_MAX_HEADER_TABLE  4096
 #define VLC_H2_DEFAULT_INIT_WINDOW      65535
+#define VLC_H2_MIN_MAX_FRAME            16384
 #define VLC_H2_DEFAULT_MAX_FRAME        16384
+#define VLC_H2_MAX_MAX_FRAME         16777215
 
 struct vlc_h2_parser;
 struct vlc_h2_parser_cbs

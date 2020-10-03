@@ -56,6 +56,7 @@ struct vlc_h2_conn
     uint32_t next_id; /**< Next free stream identifier */
     bool released; /**< Connection released by owner */
 
+    uint32_t max_send_frame; /**< Maximum sent frame size */
     uint32_t init_send_cwnd; /**< Initial send congestion window */
     uint64_t send_cwnd; /**< Send congestion window */
 
@@ -494,6 +495,11 @@ static void vlc_h2_setting(void *ctx, uint_fast16_t id, uint_fast32_t value)
         case VLC_H2_SETTING_INITIAL_WINDOW_SIZE:
             vlc_h2_initial_window_update(conn, value);
             break;
+        case VLC_H2_SETTING_MAX_FRAME_SIZE:
+            if (value >= VLC_H2_MIN_MAX_FRAME
+             && value <= VLC_H2_MAX_MAX_FRAME)
+                conn->max_send_frame = value;
+            break;
     }
 }
 
@@ -781,6 +787,7 @@ struct vlc_http_conn *vlc_h2_conn_create(void *ctx, struct vlc_tls *tls)
     conn->streams = NULL;
     conn->next_id = 1; /* TODO: server side */
     conn->released = false;
+    conn->max_send_frame = VLC_H2_DEFAULT_MAX_FRAME;
     conn->init_send_cwnd = VLC_H2_DEFAULT_INIT_WINDOW;
     conn->send_cwnd = VLC_H2_DEFAULT_INIT_WINDOW;
 

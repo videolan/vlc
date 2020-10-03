@@ -41,7 +41,7 @@ vlc_h2_frame_alloc(uint_fast8_t type, uint_fast8_t flags,
 {
     assert((stream_id >> 31) == 0);
 
-    if (unlikely(length >= (1u << 24)))
+    if (unlikely(length > VLC_H2_MAX_MAX_FRAME))
     {
         errno = EINVAL;
         return NULL;
