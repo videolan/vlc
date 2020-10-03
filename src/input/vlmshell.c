@@ -799,6 +799,11 @@ static int ExecuteNew( vlm_t *p_vlm, const char *psz_name, const char *psz_type,
         vlm_media_Clean( &cfg );
         return ExecuteMediaProperty( p_vlm, id, true, i_property, ppsz_property, pp_status );
     }
+    else if( !strcmp( psz_type, "vod" ) )
+    {
+        *pp_status = vlm_MessageNew( "new", "VoD support was removed" );
+        return VLC_EGENERIC;
+    }
     else
     {
         *pp_status = vlm_MessageNew( "new", "%s: Choose between broadcast or schedule", psz_type );
