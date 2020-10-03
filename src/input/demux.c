@@ -448,7 +448,7 @@ static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
         return NULL;
 
     priv = vlc_stream_Private(p_demux);
-    p_demux->p_next       = p_next;
+    p_demux->s            = p_next;
     p_demux->p_input_item = NULL;
     p_demux->p_sys        = NULL;
     p_demux->psz_name     = NULL;

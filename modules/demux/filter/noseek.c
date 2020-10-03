@@ -28,7 +28,7 @@
 
 static int Demux(demux_t *demux)
 {
-    return demux_Demux(demux->p_next);
+    return demux_Demux(demux->s);
 }
 
 static int Control(demux_t *demux, int query, va_list args)
@@ -48,7 +48,7 @@ static int Control(demux_t *demux, int query, va_list args)
         {
             unsigned *restrict pf = va_arg(args, unsigned *);
 
-            if (demux_Control(demux->p_next, DEMUX_TEST_AND_CLEAR_FLAGS, pf))
+            if (demux_Control(demux->s, DEMUX_TEST_AND_CLEAR_FLAGS, pf))
                 *pf = 0;
             *pf &= ~(INPUT_UPDATE_TITLE|INPUT_UPDATE_SEEKPOINT|
                      INPUT_UPDATE_TITLE_LIST);
@@ -56,7 +56,7 @@ static int Control(demux_t *demux, int query, va_list args)
         }
 
         default:
-            return demux_vaControl(demux->p_next, query, args);
+            return demux_vaControl(demux->s, query, args);
     }
 
     return VLC_SUCCESS;

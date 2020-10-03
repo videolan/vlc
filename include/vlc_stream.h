@@ -53,24 +53,15 @@ struct stream_t
     bool         b_preparsing; /**< True if this access is used to preparse */
     input_item_t *p_input_item;/**< Input item (can be NULL) */
 
-    union {
-        /**
-         * Input stream
-         *
-         * Depending on the module capability:
-         * - "stream filter" or "demux": input byte stream (not NULL)
-         * - "access": a NULL pointer
-         * - "demux_filter": undefined
-         */
-        stream_t    *s;
-        /**
-         * Input demuxer
-         *
-         * If the module capability is "demux_filter", this is the upstream
-         * demuxer or demux filter. Otherwise, this is undefined.
-         */
-        demux_t *p_next;
-    };
+    /**
+     * Input stream
+     *
+     * Depending on the module capability:
+     * - "stream filter" or "demux": input byte stream (not NULL)
+     * - "access": a NULL pointer
+     * - "demux_filter": upstream demuxer or demux filter
+     */
+    stream_t *s;
 
     /* es output */
     es_out_t    *out;   /* our p_es_out */
