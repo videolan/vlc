@@ -217,6 +217,8 @@ char *vlc_stream_ReadLine( stream_t *s )
                 vlc_iconv_close( priv->text.conv );
                 priv->text.conv = (vlc_iconv_t)-1;
             }
+            priv->text.char_width = 1;
+            priv->text.little_endian = false;
 
             if( !memcmp( p_data, "\xFF\xFE", 2 ) )
             {
