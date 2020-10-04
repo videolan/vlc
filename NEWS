@@ -69,6 +69,7 @@ Access:
 
 Access output:
  * Added support for the RIST (Reliable Internet Stream Transport) Protocol
+ * Added support for HTTP PUT (HTTP upload)
 
 Video output:
  * Added X11 RENDER video output plugin

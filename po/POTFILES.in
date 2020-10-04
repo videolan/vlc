@@ -215,6 +215,7 @@ modules/access/wasapi.c
 modules/access_output/dummy.c
 modules/access_output/file.c
 modules/access_output/http.c
+modules/access_output/http-put.c
 modules/access_output/livehttp.c
 modules/access_output/rist.c
 modules/access_output/shout.c
