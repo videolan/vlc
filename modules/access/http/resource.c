@@ -165,18 +165,6 @@ void vlc_http_res_destroy(struct vlc_http_resource *res)
     free(res);
 }
 
-static char *vlc_http_authority(const char *host, unsigned port)
-{
-    static const char *const formats[4] = { "%s", "[%s]", "%s:%u", "[%s]:%u" };
-    const bool brackets = strchr(host, ':') != NULL;
-    const char *fmt = formats[brackets + 2 * (port != 0)];
-    char *authority;
-
-    if (unlikely(asprintf(&authority, fmt, host, port) == -1))
-        return NULL;
-    return authority;
-}
-
 int vlc_http_res_init(struct vlc_http_resource *restrict res,
                       const struct vlc_http_resource_cbs *cbs,
                       struct vlc_http_mgr *mgr,

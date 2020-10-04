@@ -76,6 +76,16 @@ int vlc_http_msg_add_header(struct vlc_http_msg *, const char *name,
                             const char *fmt, ...) VLC_FORMAT(3,4);
 
 /**
+ * Formats an authority.
+ *
+ * @param host host name (cannot be NULL)
+ * @param port port number (0 for unspecified)
+ * @return the formatted authority as a heap-allocated nul-terminated string,
+ *         or NULL on allocation failure
+ */
+char *vlc_http_authority(const char *host, unsigned port);
+
+/**
  * Sets the agent field.
  *
  * Sets the User-Agent or Server header field.
