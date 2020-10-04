@@ -256,6 +256,28 @@ int main(void)
     conn_expect(RST_STREAM);
     conn_expect(RST_STREAM);
 
+    /* Test stream with request payload */
+    sid += 2;
+    s = stream_open(true);
+    assert(s != NULL);
+    stream_continuation(sid);
+    m = vlc_http_msg_get_initial(s);
+    assert(m != NULL);
+    b = block_Alloc(12);
+    assert(b != NULL);
+    memcpy(b->p_buffer, "Hello world!", 12);
+    assert(vlc_http_msg_write(m, b, false) == 0);
+    assert(vlc_http_msg_write(m, NULL, true) == 0);
+    stream_reply(sid, false);
+    m = vlc_http_msg_iterate(m);
+    assert(m != NULL);
+    vlc_http_msg_destroy(m);
+
+    conn_expect(HEADERS);
+    conn_expect(DATA);
+    conn_expect(DATA);
+    conn_expect(RST_STREAM);
+
     /* Test nonexistent stream reset */
     conn_send(vlc_h2_frame_rst_stream(sid + 100, VLC_H2_REFUSED_STREAM));
 
