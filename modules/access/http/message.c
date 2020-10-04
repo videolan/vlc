@@ -265,7 +265,9 @@ struct vlc_http_msg *vlc_http_msg_iterate(struct vlc_http_msg *m)
 {
     struct vlc_http_msg *next = vlc_http_stream_read_headers(m->payload);
 
-    m->payload = NULL;
+    if (next != NULL)
+        m->payload = NULL;
+
     vlc_http_msg_destroy(m);
     return next;
 }
