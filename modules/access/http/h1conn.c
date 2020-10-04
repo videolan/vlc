@@ -228,6 +228,22 @@ static struct vlc_http_msg *vlc_h1_stream_wait(struct vlc_http_stream *stream)
     return resp;
 }
 
+static ssize_t vlc_h1_stream_write(struct vlc_http_stream *stream,
+                                   const void *base, size_t length, bool eos)
+{
+    struct vlc_h1_conn *conn = vlc_h1_stream_conn(stream);
+
+    assert(conn->active);
+
+    if (conn->conn.tls == NULL)
+    {
+        errno = EPIPE;
+        return -1;
+    }
+
+    return vlc_https_chunked_write(conn->conn.tls, base, length, eos);
+}
+
 static block_t *vlc_h1_stream_read(struct vlc_http_stream *stream)
 {
     struct vlc_h1_conn *conn = vlc_h1_stream_conn(stream);
@@ -286,7 +302,7 @@ static void vlc_h1_stream_close(struct vlc_http_stream *stream, bool abort)
 static const struct vlc_http_stream_cbs vlc_h1_stream_callbacks =
 {
     vlc_h1_stream_wait,
-    NULL,
+    vlc_h1_stream_write,
     vlc_h1_stream_read,
     vlc_h1_stream_close,
 };
