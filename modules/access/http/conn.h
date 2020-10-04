@@ -67,6 +67,8 @@ struct vlc_http_conn *vlc_h1_conn_create(void *ctx, struct vlc_tls *,
                                          bool proxy);
 struct vlc_http_stream *vlc_chunked_open(struct vlc_http_stream *,
                                          struct vlc_tls *);
+ssize_t vlc_https_chunked_write(struct vlc_tls *, const void *base, size_t len,
+                                bool eos);
 
 /**
  * Sends an HTTP/1.x request through a new connection.
