@@ -69,10 +69,6 @@ int Import_M3U( vlc_object_t *p_this )
     /* Encoding: UTF-8 or unspecified */
     char *(*pf_dup) (const char *) = GuessEncoding;
 
-    if (stream_HasExtension(p_stream, ".m3u8")
-     || strncasecmp((const char *)p_peek, "RTSPtext", 8) == 0) /* QuickTime */
-        pf_dup = CheckUnicode;
-    else
     if (memcmp( p_peek, "\xef\xbb\xbf", 3) == 0) /* UTF-8 Byte Order Mark */
     {
         if( i_peek < 12 )
@@ -82,6 +78,10 @@ int Import_M3U( vlc_object_t *p_this )
         p_peek += offset;
         i_peek -= offset;
     }
+
+    if (stream_HasExtension(p_stream, ".m3u8")
+     || strncasecmp((const char *)p_peek, "RTSPtext", 8) == 0) /* QuickTime */
+        pf_dup = CheckUnicode;
 
     /* File type: playlist, or not (HLS manifest or whatever else) */
     char *type = stream_MimeType(p_stream->s);
