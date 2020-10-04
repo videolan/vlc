@@ -249,5 +249,30 @@ int main(void)
     vlc_http_msg_destroy(m);
     conn_destroy();
 
+    /* Test HTTP/1.1 with chunked request payload */
+    conn_create();
+    s = stream_open(true);
+    assert(s != NULL);
+    conn_send("HTTP/1.1 100 Continue\r\n\r\n");
+    m = vlc_http_msg_get_initial(s);
+    assert(m != NULL);
+    b = block_Alloc(11);
+    assert(b != NULL);
+    memcpy(b->p_buffer, "Message 1\r\n", 11);
+    assert(vlc_http_msg_write(m, b, false) == 0);
+    assert(vlc_http_msg_write(m, NULL, true) == 0);
+    conn_send("HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK");
+    m = vlc_http_msg_iterate(m);
+    assert(m != NULL);
+    b = vlc_http_msg_read(m);
+    assert(b != NULL);
+    assert(b->i_buffer == 2);
+    assert(!memcmp(b->p_buffer, "OK", 2));
+    block_Release(b);
+    b = vlc_http_msg_read(m);
+    assert(b == NULL);
+    vlc_http_msg_destroy(m);
+    conn_destroy();
+
     return 0;
 }
