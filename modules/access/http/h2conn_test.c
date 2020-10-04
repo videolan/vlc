@@ -121,13 +121,14 @@ static void conn_destroy(void)
     vlc_tls_SessionDelete(external_tls);
 }
 
-static struct vlc_http_stream *stream_open(void)
+static struct vlc_http_stream *stream_open(bool has_data)
 {
-    struct vlc_http_msg *m = vlc_http_req_create("GET", "https",
+    const char *verb = has_data ? "POST" : "GET";
+    struct vlc_http_msg *m = vlc_http_req_create(verb, "https",
                                                  "www.example.com", "/");
     assert(m != NULL);
 
-    struct vlc_http_stream *s = vlc_http_stream_open(conn, m);
+    struct vlc_http_stream *s = vlc_http_stream_open(conn, m, has_data);
     vlc_http_msg_destroy(m);
     return s;
 }
@@ -174,7 +175,7 @@ int main(void)
 
     /* Test rejected stream */
     sid += 2;
-    s = stream_open();
+    s = stream_open(false);
     assert(s != NULL);
     conn_expect(HEADERS);
     conn_send(vlc_h2_frame_rst_stream(sid, VLC_H2_REFUSED_STREAM));
@@ -187,7 +188,7 @@ int main(void)
 
     /* Test accepted stream */
     sid += 2;
-    s = stream_open();
+    s = stream_open(false);
     assert(s != NULL);
     stream_reply(sid, false);
     m = vlc_http_msg_get_initial(s);
@@ -204,7 +205,7 @@ int main(void)
 
     /* Test continuation then accepted stream */
     sid += 2;
-    s = stream_open();
+    s = stream_open(false);
     assert(s != NULL);
     stream_continuation(sid);
     m = vlc_http_msg_get_initial(s);
@@ -232,12 +233,12 @@ int main(void)
 
     /* Test accepted stream after continuation */
     sid += 2;
-    s = stream_open();
+    s = stream_open(false);
     assert(s != NULL);
     stream_continuation(sid);
     stream_reply(sid, true);
     sid += 2;
-    s2 = stream_open(); /* second stream to enforce test timing/ordering */
+    s2 = stream_open(false); /* 2nd stream to enforce test timing/ordering */
     assert(s2 != NULL);
     stream_reply(sid, true);
     m = vlc_http_msg_get_initial(s2);
@@ -260,10 +261,10 @@ int main(void)
 
     /* Test multiple streams in non-LIFO order */
     sid += 2;
-    s = stream_open();
+    s = stream_open(false);
     assert(s != NULL);
     sid += 2;
-    s2 = stream_open();
+    s2 = stream_open(false);
     assert(s2 != NULL);
     stream_reply(sid, false);
     stream_reply(sid - 2, true);
@@ -283,14 +284,14 @@ int main(void)
 
     /* Test graceful connection termination */
     sid += 2;
-    s = stream_open();
+    s = stream_open(false);
     assert(s != NULL);
     conn_send(vlc_h2_frame_goaway(sid - 2, VLC_H2_NO_ERROR));
     m = vlc_http_stream_read_headers(s);
     assert(m == NULL);
 
     /* Test stream after connection shut down */
-    assert(stream_open() == NULL);
+    assert(stream_open(false) == NULL);
 
     /* Test releasing connection before stream */
     conn_destroy();

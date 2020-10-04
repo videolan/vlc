@@ -421,7 +421,7 @@ static const struct vlc_http_stream_cbs vlc_h2_stream_callbacks =
  * \return an HTTP stream, or NULL on error
  */
 static struct vlc_http_stream *vlc_h2_stream_open(struct vlc_http_conn *c,
-                                                const struct vlc_http_msg *msg)
+                                 const struct vlc_http_msg *msg, bool has_data)
 {
     struct vlc_h2_conn *conn = container_of(c, struct vlc_h2_conn, conn);
     struct vlc_h2_stream *s = malloc(sizeof (*s));
@@ -453,7 +453,7 @@ static struct vlc_http_stream *vlc_h2_stream_open(struct vlc_http_conn *c,
     s->id = conn->next_id;
     conn->next_id += 2;
 
-    struct vlc_h2_frame *f = vlc_http_msg_h2_frame(msg, s->id, true);
+    struct vlc_h2_frame *f = vlc_http_msg_h2_frame(msg, s->id, !has_data);
     if (f == NULL)
         goto error;
 

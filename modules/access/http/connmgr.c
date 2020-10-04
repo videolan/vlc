@@ -130,7 +130,7 @@ struct vlc_http_msg *vlc_http_mgr_reuse(struct vlc_http_mgr *mgr,
     if (conn == NULL)
         return NULL;
 
-    struct vlc_http_stream *stream = vlc_http_stream_open(conn, req);
+    struct vlc_http_stream *stream = vlc_http_stream_open(conn, req, false);
     if (stream != NULL)
     {
         struct vlc_http_msg *m = vlc_http_msg_get_initial(stream);
@@ -232,7 +232,7 @@ static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
         if (url.psz_host != NULL)
             stream = vlc_h1_request(mgr->logger, url.psz_host,
                                     url.i_port ? url.i_port : 80, true, req,
-                                    true, &conn);
+                                    true, false, &conn);
         else
             stream = NULL;
 
@@ -240,7 +240,7 @@ static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
     }
     else
         stream = vlc_h1_request(mgr->logger, host, port ? port : 80, false,
-                                req, true, &conn);
+                                req, true, false, &conn);
 
     if (stream == NULL)
         return NULL;
