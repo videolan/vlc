@@ -8,6 +8,7 @@ libvlc_http_la_SOURCES = \
 	access/http/resource.c access/http/resource.h \
 	access/http/file.c access/http/file.h \
 	access/http/live.c access/http/live.h \
+	access/http/outfile.c access/http/outfile.h \
 	access/http/hpack.c access/http/hpack.h access/http/hpackenc.c \
 	access/http/h2frame.c access/http/h2frame.h \
 	access/http/h2output.c access/http/h2output.h \
