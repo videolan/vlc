@@ -91,7 +91,7 @@ retry:
         return NULL;
 
     struct vlc_http_msg *resp = vlc_http_mgr_request(res->manager, res->secure,
-                                                    res->host, res->port, req);
+                                              res->host, res->port, req, true);
     vlc_http_msg_destroy(req);
 
     resp = vlc_http_msg_get_final(resp);
