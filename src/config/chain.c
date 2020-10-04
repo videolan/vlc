@@ -258,8 +258,8 @@ void config_ChainDestroy( config_chain_t *p_cfg )
 
         p_next = p_cfg->p_next;
 
-        FREENULL( p_cfg->psz_name );
-        FREENULL( p_cfg->psz_value );
+        free( p_cfg->psz_name );
+        free( p_cfg->psz_value );
         free( p_cfg );
 
         p_cfg = p_next;
