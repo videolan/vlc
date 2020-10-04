@@ -150,7 +150,7 @@ static struct vlc_http_stream *vlc_h1_stream_open(struct vlc_http_conn *c,
     if (conn->active || conn->conn.tls == NULL)
         return NULL;
 
-    char *payload = vlc_http_msg_format(req, &len, conn->proxy);
+    char *payload = vlc_http_msg_format(req, &len, conn->proxy, false);
     if (unlikely(payload == NULL))
         return NULL;
 

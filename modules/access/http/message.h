@@ -397,11 +397,12 @@ static inline void vlc_http_stream_close(struct vlc_http_stream *s, bool abort)
  *             [OUT]
  * @param proxied whether the message is meant for sending to a proxy rather
  *                than an origin (only relevant for requests)
+ * @param chunked whether to append a chunked transfer encoding header line
  * @return A heap-allocated nul-terminated string or *lenp bytes,
  *         or NULL on error
  */
 char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp,
-                          bool proxied) VLC_USED;
+                          bool proxied, bool chunked) VLC_USED;
 
 /**
  * Parses an HTTP 1.1 message header.

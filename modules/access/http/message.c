@@ -296,7 +296,7 @@ block_t *vlc_http_msg_read(struct vlc_http_msg *m)
 /* Serialization and deserialization */
 
 char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp,
-                          bool proxied)
+                          bool proxied, bool chunked)
 {
     struct vlc_memstream stream;
 
@@ -316,6 +316,9 @@ char *vlc_http_msg_format(const struct vlc_http_msg *m, size_t *restrict lenp,
     for (unsigned i = 0; i < m->count; i++)
         vlc_memstream_printf(&stream, "%s: %s\r\n",
                              m->headers[i][0], m->headers[i][1]);
+
+    if (chunked)
+        vlc_memstream_puts(&stream, "Transfer-Encoding: chunked\r\n");
 
     vlc_memstream_puts(&stream, "\r\n");
 
