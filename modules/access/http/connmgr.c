@@ -124,13 +124,14 @@ static void vlc_http_mgr_release(struct vlc_http_mgr *mgr,
 static
 struct vlc_http_msg *vlc_http_mgr_reuse(struct vlc_http_mgr *mgr,
                                         const char *host, unsigned port,
-                                        const struct vlc_http_msg *req)
+                                        const struct vlc_http_msg *req,
+                                        bool payload)
 {
     struct vlc_http_conn *conn = vlc_http_mgr_find(mgr, host, port);
     if (conn == NULL)
         return NULL;
 
-    struct vlc_http_stream *stream = vlc_http_stream_open(conn, req, false);
+    struct vlc_http_stream *stream = vlc_http_stream_open(conn, req, payload);
     if (stream != NULL)
     {
         struct vlc_http_msg *m = vlc_http_msg_get_initial(stream);
@@ -145,7 +146,7 @@ struct vlc_http_msg *vlc_http_mgr_reuse(struct vlc_http_mgr *mgr,
 static struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
                                               const char *host, unsigned port,
                                               const struct vlc_http_msg *req,
-                                              bool idempotent)
+                                              bool idempotent, bool payload)
 {
     vlc_tls_t *tls;
     bool http2 = true;
@@ -166,7 +167,8 @@ static struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
          * the nonidempotent request was processed if the connection fails
          * before the response is received.
          */
-        struct vlc_http_msg *resp = vlc_http_mgr_reuse(mgr, host, port, req);
+        struct vlc_http_msg *resp = vlc_http_mgr_reuse(mgr, host, port, req,
+                                                       payload);
         if (resp != NULL)
             return resp; /* existing connection reused */
     }
@@ -208,20 +210,21 @@ static struct vlc_http_msg *vlc_https_request(struct vlc_http_mgr *mgr,
         vlc_http_mgr_release(mgr, mgr->conn);
 
     mgr->conn = conn;
-    return vlc_http_mgr_reuse(mgr, host, port, req);
+    return vlc_http_mgr_reuse(mgr, host, port, req, payload);
 }
 
 static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
                                              const char *host, unsigned port,
                                              const struct vlc_http_msg *req,
-                                             bool idempotent)
+                                             bool idempotent, bool payload)
 {
     if (mgr->creds != NULL && mgr->conn != NULL)
         return NULL; /* switch from HTTPS to HTTP not implemented */
 
     if (idempotent)
     {
-        struct vlc_http_msg *resp = vlc_http_mgr_reuse(mgr, host, port, req);
+        struct vlc_http_msg *resp = vlc_http_mgr_reuse(mgr, host, port, req,
+                                                       payload);
         if (resp != NULL)
             return resp;
     }
@@ -240,7 +243,7 @@ static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
         if (url.psz_host != NULL)
             stream = vlc_h1_request(mgr->logger, url.psz_host,
                                     url.i_port ? url.i_port : 80, true, req,
-                                    idempotent, false, &conn);
+                                    idempotent, payload, &conn);
         else
             stream = NULL;
 
@@ -248,7 +251,7 @@ static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
     }
     else
         stream = vlc_h1_request(mgr->logger, host, port ? port : 80, false,
-                                req, idempotent, false, &conn);
+                                req, idempotent, payload, &conn);
 
     if (stream == NULL)
         return NULL;
@@ -270,13 +273,13 @@ static struct vlc_http_msg *vlc_http_request(struct vlc_http_mgr *mgr,
 struct vlc_http_msg *vlc_http_mgr_request(struct vlc_http_mgr *mgr, bool https,
                                           const char *host, unsigned port,
                                           const struct vlc_http_msg *m,
-                                          bool idempotent)
+                                          bool idempotent, bool payload)
 {
     if (port && vlc_http_port_blocked(port))
         return NULL;
 
     return (https ? vlc_https_request : vlc_http_request)(mgr, host, port, m,
-                                                          idempotent);
+                                                          idempotent, payload);
 }
 
 struct vlc_http_cookie_jar_t *vlc_http_mgr_get_jar(struct vlc_http_mgr *mgr)
