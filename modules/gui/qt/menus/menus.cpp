@@ -201,9 +201,8 @@ void VLCMenuBar::createMenuBar( MainInterface *mi,
  * Media ( File ) Menu
  * Opening, streaming and quit
  **/
-QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QWidget *parent, MainInterface *mi )
+QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QMenu *menu, MainInterface *mi )
 {
-    QMenu *menu = new QMenu( parent );
     QAction *action;
 
     addDPStaticEntry( menu, qtr( "Open &File..." ),
@@ -575,9 +574,8 @@ QMenu *VLCMenuBar::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
 /**
  * Help/About Menu
 **/
-QMenu *VLCMenuBar::HelpMenu( QWidget *parent )
+QMenu *VLCMenuBar::HelpMenu( QMenu *menu )
 {
-    QMenu *menu = new QMenu( parent );
     addDPStaticEntry( menu, qtr( "&Help" ) ,
         ":/menu/help.svg", &DialogsProvider::helpDialog, "F1" );
 #ifdef UPDATE_CHECK

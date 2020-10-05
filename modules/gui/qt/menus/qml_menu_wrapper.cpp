@@ -66,8 +66,8 @@ void QmlGlobalMenu::popup(QPoint pos)
     m_menu = new QMenu();
     QMenu* submenu;
 
-    QAction* fileMenu = m_menu->addMenu(FileMenu( p_intf, m_menu, p_intf->p_sys->p_mi ));
-    fileMenu->setText(qtr( "&Media" ));
+    submenu = m_menu->addMenu(qtr( "&Media" ));
+    FileMenu( p_intf, submenu, p_intf->p_sys->p_mi );
 
     /* Dynamic menus, rebuilt before being showed */
     submenu = m_menu->addMenu(qtr( "P&layback" ));
@@ -89,8 +89,8 @@ void QmlGlobalMenu::popup(QPoint pos)
     submenu = m_menu->addMenu(qtr( "V&iew" ));
     ViewMenu( p_intf, submenu, p_intf->p_sys->p_mi );
 
-    QAction* helpMenu = m_menu->addMenu( HelpMenu(m_menu) );
-    helpMenu->setText(qtr( "&Help" ));
+    submenu = m_menu->addMenu(qtr( "&Help" ));
+    HelpMenu(submenu);
 
     m_menu->popup(pos);
 }
