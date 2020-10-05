@@ -24,6 +24,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
+import "qrc:///menus/" as Menus
 
 Widgets.NavigableFocusScope{
     id: topFocusScope
@@ -81,7 +82,18 @@ Widgets.NavigableFocusScope{
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignTop | Qt.AlignLeft
 
-                    spacing: VLCStyle.margin_xsmall
+                    spacing: 0
+
+                    Menus.Menubar {
+                        id: menubar
+
+                        width: parent.width
+                        height: VLCStyle.icon_normal
+
+                        Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+
+                        visible: mainInterface.hasToolbarMenu
+                    }
 
                     RowLayout {
                         anchors.left: parent.left
@@ -137,7 +149,7 @@ Widgets.NavigableFocusScope{
                     id: windowAndGlobalButtonsLayout
                     Layout.alignment: Qt.AlignTop | Qt.AlignRight
 
-                    spacing: VLCStyle.margin_xsmall
+                    spacing: 0
 
                     Loader {
                         //Layout.alignment: Qt.AlignRight | Qt.AlignTop

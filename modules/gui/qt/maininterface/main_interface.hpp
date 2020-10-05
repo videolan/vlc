@@ -154,6 +154,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(ColorSchemeModel* colorScheme READ getColorScheme CONSTANT)
     Q_PROPERTY(bool hasVLM READ hasVLM CONSTANT)
     Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged)
+    Q_PROPERTY(bool hasToolbarMenu READ hasToolbarMenu NOTIFY hasToolbarMenuChanged)
 
 public:
     /* tors */
@@ -192,6 +193,7 @@ public:
     inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
     bool hasVLM() const;
     bool useClientSideDecoration() const;
+    inline bool hasToolbarMenu() const { return m_hasToolbarMenu; }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -256,6 +258,7 @@ protected:
     bool                 m_gridView;
     ColorSchemeModel*    m_colorScheme;
     bool                 m_clientSideDecoration = false;
+    bool                 m_hasToolbarMenu = false;
 
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?
@@ -321,6 +324,7 @@ signals:
     void gridViewChanged( bool );
     void colorSchemeChanged( QString );
     void useClientSideDecorationChanged();
+    void hasToolbarMenuChanged();
 
     /// forward window maximise query to the actual window or widget
     void requestInterfaceMaximized();

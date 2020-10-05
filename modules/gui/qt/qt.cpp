@@ -238,6 +238,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_CLIENT_SIDE_DECORATION_LONGTEXT N_( "This option enables the title bar. Disabling it will remove " \
     "the titlebar and move window buttons within the interface (Client Side Decoration)" )
 
+
+#define QT_MENUBAR_TEXT N_( "Show the menu bar" )
+#define QT_MENUBAR_LONGTEXT N_( "This option displays the classic menu bar" )
+
 #define FULLSCREEN_CONTROL_PIXELS N_( "Fullscreen controller mouse sensitivity" )
 
 #define CONTINUE_PLAYBACK_TEXT N_("Continue playback?")
@@ -341,6 +345,8 @@ vlc_module_begin ()
 #endif
               QT_CLIENT_SIDE_DECORATION_TEXT, QT_CLIENT_SIDE_DECORATION_LONGTEXT, false )
 #endif
+
+    add_bool( "qt-menubar", false, QT_MENUBAR_TEXT, QT_MENUBAR_LONGTEXT, false )
 
     add_bool( "qt-embedded-open", false, QT_NATIVEOPEN_TEXT,
                QT_NATIVEOPEN_TEXT, false )

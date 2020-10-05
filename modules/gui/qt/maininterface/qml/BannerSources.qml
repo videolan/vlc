@@ -31,7 +31,11 @@ import "qrc:///menus/" as Menus
 Widgets.NavigableFocusScope {
     id: root
 
-    height: VLCStyle.globalToolbar_height + VLCStyle.localToolbar_height + VLCStyle.applicationVerticalMargin
+    height: VLCStyle.applicationVerticalMargin
+            + (menubar.visible ? menubar.height : 0)
+            + VLCStyle.globalToolbar_height
+            + VLCStyle.localToolbar_height
+
 
     property int selectedIndex: 0
     property int subSelectedIndex: 0
@@ -93,7 +97,6 @@ Widgets.NavigableFocusScope {
         property alias model: globalMenuGroup.model
 
         Column {
-
             id: col
             anchors {
                 fill: parent
@@ -104,6 +107,8 @@ Widgets.NavigableFocusScope {
                 id: globalToolbar
                 width: parent.width
                 height: VLCStyle.globalToolbar_height
+                    + (menubar.visible ? menubar.height : 0)
+                anchors.rightMargin: VLCStyle.applicationHorizontalMargin
 
                 property bool colapseTabButtons: globalToolbar.width  > (Math.max(globalToolbarLeft.width, globalToolbarRight.width) + VLCStyle.applicationHorizontalMargin)* 2
                                                  + globalMenuGroup.model.count * VLCStyle.bannerTabButton_width_large
@@ -115,54 +120,71 @@ Widgets.NavigableFocusScope {
                     source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
                 }
 
-                RowLayout {
-                    id: globalToolbarLeft
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
+                Column {
+                    anchors.fill: parent
                     anchors.leftMargin: VLCStyle.applicationHorizontalMargin
-                    spacing: VLCStyle.margin_xxxsmall
+                    anchors.rightMargin: VLCStyle.applicationHorizontalMargin
 
-                    Widgets.IconToolButton {
-                         id: history_back
-                         size: VLCStyle.banner_icon_size
-                         iconText: VLCIcons.topbar_previous
-                         text: i18n.qtr("Previous")
-                         height: localToolbar.height
-                         colorDisabled: VLCStyle.colors.textDisabled
-                         onClicked: history.previous()
-                         enabled: !history.previousEmpty
-                     }
-
-                    Image {
-                        sourceSize.width: VLCStyle.icon_small
-                        sourceSize.height: VLCStyle.icon_small
-                        source: "qrc:///logo/cone.svg"
-                        enabled: false
+                    Menus.Menubar {
+                        id: menubar
+                        width: parent.width
+                        height: implicitHeight
+                        visible: mainInterface.hasToolbarMenu
                     }
 
-                }
+                    Item {
+                        width: parent.width
+                        height: VLCStyle.globalToolbar_height
 
-                /* Button for the sources */
-                Widgets.NavigableRow {
-                    id: globalMenuGroup
+                        RowLayout {
+                            id: globalToolbarLeft
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            spacing: VLCStyle.margin_xxxsmall
 
-                    anchors {
-                        top: parent.top
-                        bottom: parent.bottom
-                        horizontalCenter: parent.horizontalCenter
-                    }
+                            Widgets.IconToolButton {
+                                 id: history_back
+                                 size: VLCStyle.banner_icon_size
+                                 iconText: VLCIcons.topbar_previous
+                                 text: i18n.qtr("Previous")
+                                 height: localToolbar.height
+                                 colorDisabled: VLCStyle.colors.textDisabled
+                                 onClicked: history.previous()
+                                 enabled: !history.previousEmpty
+                             }
 
-                    focus: true
+                            Image {
+                                sourceSize.width: VLCStyle.icon_small
+                                sourceSize.height: VLCStyle.icon_small
+                                source: "qrc:///logo/cone.svg"
+                                enabled: false
+                            }
 
-                    navigationParent: root
-                    navigationDownItem: localMenuGroup.visible ?  localMenuGroup : playlistGroup
+                        }
 
-                    delegate: Widgets.BannerTabButton {
-                        iconTxt: model.icon
-                        showText: globalToolbar.colapseTabButtons
-                        selected: model.index === selectedIndex
-                        onClicked: root.itemClicked(model.index)
-                        height: globalMenuGroup.height
+                        /* Button for the sources */
+                        Widgets.NavigableRow {
+                            id: globalMenuGroup
+
+                            anchors {
+                                top: parent.top
+                                bottom: parent.bottom
+                                horizontalCenter: parent.horizontalCenter
+                            }
+
+                            focus: true
+
+                            navigationParent: root
+                            navigationDownItem: localMenuGroup.visible ?  localMenuGroup : playlistGroup
+
+                            delegate: Widgets.BannerTabButton {
+                                iconTxt: model.icon
+                                showText: globalToolbar.colapseTabButtons
+                                selected: model.index === selectedIndex
+                                onClicked: root.itemClicked(model.index)
+                                height: globalMenuGroup.height
+                            }
+                        }
                     }
                 }
 
@@ -170,10 +192,10 @@ Widgets.NavigableFocusScope {
                     id: globalToolbarRight
                     anchors {
                         top: parent.top
-                        bottom: parent.bottom
                         right: parent.right
                         rightMargin: VLCStyle.applicationHorizontalMargin
                     }
+                    height: VLCStyle.globalToolbar_height
                     active: mainInterface.clientSideDecoration
                     source: "qrc:///widgets/CSDWindowButtonSet.qml"
                 }

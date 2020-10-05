@@ -161,6 +161,7 @@ MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::Windo
 #if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
     m_clientSideDecoration = ! var_InheritBool( p_intf, "qt-titlebar" );
 #endif
+    m_hasToolbarMenu = var_InheritBool( p_intf, "qt-menubar" );
 
     QString platformName = QGuiApplication::platformName();
 

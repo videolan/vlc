@@ -36,8 +36,9 @@ Widgets.NavigableFocusScope {
 
         ColumnLayout {
             anchors.fill: parent
+            spacing: 0
 
-            Menus.MainMenubar {
+            Menus.Menubar {
                 Layout.fillWidth: true
             }
 
