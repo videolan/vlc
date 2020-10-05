@@ -136,6 +136,8 @@ struct vlc_filter_operations
     int (*video_mouse)(filter_t *, struct vlc_mouse_t *,
                        const struct vlc_mouse_t *p_old);
 
+    /** Close the filter and release its resources. */
+    void (*close)(filter_t *);
 };
 
 /** Structure describing a filter
@@ -171,6 +173,12 @@ struct filter_t
     /** Private structure for the owner of the filter */
     filter_owner_t      owner;
 };
+
+static inline void filter_Close( filter_t *p_filter )
+{
+    if ( p_filter->ops->close )
+        p_filter->ops->close( p_filter );
+}
 
 /**
  * This function will return a new picture usable by p_filter as an output

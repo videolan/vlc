@@ -263,6 +263,7 @@ static void Close( vlc_object_t *p_this )
         picture_Release( p_sys->p_mouse );
     if( p_sys->p_blend )
     {
+        filter_Close( p_sys->p_blend );
         module_unneed( p_sys->p_blend, p_sys->p_blend->p_module );
         vlc_object_delete(p_sys->p_blend);
     }

@@ -271,6 +271,7 @@ static void Destroy( vlc_object_t *p_this )
     ReleaseImages( p_filter );
 
     // Release the internal OpenCV filter.
+    filter_Close( p_sys->p_opencv );
     module_unneed( p_sys->p_opencv, p_sys->p_opencv->p_module );
     vlc_object_delete(p_sys->p_opencv);
 

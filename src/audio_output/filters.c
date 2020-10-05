@@ -118,6 +118,7 @@ static void aout_FiltersPipelineDestroy(filter_t *const *filters, unsigned n)
     {
         filter_t *p_filter = filters[i];
 
+        filter_Close( p_filter );
         module_unneed( p_filter, p_filter->p_module );
         vlc_object_delete(p_filter);
     }
@@ -432,6 +433,7 @@ static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
                                     max - 1, infmt, &filter->fmt_in.audio, false))
     {
         msg_Err (filter, "cannot add user %s \"%s\" (skipped)", type, name);
+        filter_Close( filter );
         module_unneed (filter, filter->p_module);
         vlc_object_delete(filter);
         return -1;

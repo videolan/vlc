@@ -225,7 +225,10 @@ static ssize_t spu_GetFreeChannelId(spu_t *spu, enum vlc_vout_order *order)
 static void FilterRelease(filter_t *filter)
 {
     if (filter->p_module)
+    {
+        filter_Close(filter);
         module_unneed(filter, filter->p_module);
+    }
     vlc_object_delete(filter);
 }
 

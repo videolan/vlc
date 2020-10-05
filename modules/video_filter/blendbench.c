@@ -271,6 +271,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                   p_sys->p_blend_image->p[Y_PLANE].i_visible_pitch *
                   p_sys->p_blend_image->p[Y_PLANE].i_visible_lines );
 
+    filter_Close( p_blend );
     module_unneed( p_blend, p_blend->p_module );
 
     vlc_object_delete(p_blend);

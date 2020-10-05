@@ -331,6 +331,7 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
         chain->last = chained->prev;
     }
 
+    filter_Close( filter );
     module_unneed( filter, filter->p_module );
 
     msg_Dbg( chain->obj, "Filter %p removed from chain", (void *)filter );

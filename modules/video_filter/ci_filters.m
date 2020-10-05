@@ -525,11 +525,13 @@ cvpx_video_context_Destroy(void *priv)
 
     if (ctx->src_converter)
     {
+        filter_Close( ctx->src_converter );
         module_unneed(ctx->src_converter, ctx->src_converter->p_module);
         vlc_object_delete(ctx->src_converter);
     }
     if (ctx->dst_converter)
     {
+        filter_Close( ctx->dst_converter );
         module_unneed(ctx->dst_converter, ctx->dst_converter->p_module);
         vlc_object_delete(ctx->dst_converter);
     }

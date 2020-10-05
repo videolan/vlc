@@ -133,6 +133,7 @@ vlc_audio_meter_RemovePlugin(struct vlc_audio_meter *meter, vlc_audio_meter_plug
 
     if (plugin->filter != NULL)
     {
+        filter_Close(plugin->filter);
         module_unneed(plugin->filter, plugin->filter->p_module);
         vlc_object_delete(plugin->filter);
     }
@@ -162,6 +163,7 @@ vlc_audio_meter_Reset(struct vlc_audio_meter *meter, const audio_sample_format_t
     {
         if (plugin->filter != NULL)
         {
+            filter_Close(plugin->filter);
             module_unneed(plugin->filter, plugin->filter->p_module);
             vlc_object_delete(plugin->filter);
             plugin->filter = NULL;
