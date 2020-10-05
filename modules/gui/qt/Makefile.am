@@ -641,6 +641,7 @@ libqt_plugin_la_QML = \
 	gui/qt/menus/qml/HelpMenu.qml \
 	gui/qt/menus/qml/MainDropdownMenu.qml \
 	gui/qt/menus/qml/MainMenubar.qml \
+	gui/qt/menus/qml/Menubar.qml \
 	gui/qt/menus/qml/MediaMenu.qml \
 	gui/qt/menus/qml/PlaybackMenu.qml \
 	gui/qt/menus/qml/PopupMenu.qml \

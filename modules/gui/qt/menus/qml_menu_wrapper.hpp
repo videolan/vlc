@@ -22,7 +22,7 @@
 
 #include <QObject>
 #include <QPoint>
-
+#include <QQuickItem>
 #include "menus.hpp"
 
 class MediaLib;
@@ -63,6 +63,61 @@ public slots:
     void popup( QPoint pos );
 private:
     QMenu* m_menu = nullptr;
+};
+
+//inherit VLCMenuBar so we can access menu creation functions
+class QmlMenuBarMenu;
+class QmlMenuBar : public VLCMenuBar
+{
+    Q_OBJECT
+    SIMPLE_MENU_PROPERTY(QmlMainContext*, ctx, nullptr)
+    SIMPLE_MENU_PROPERTY(QQuickItem*, menubar, nullptr)
+    SIMPLE_MENU_PROPERTY(bool, openMenuOnHover, false)
+
+public:
+    explicit QmlMenuBar(QObject *parent = nullptr);
+    ~QmlMenuBar();
+
+signals:
+    //navigate to the left(-1)/right(1) menu
+    void navigateMenu(int direction);
+
+    void menuClosed();
+
+public slots:
+    void popupMediaMenu( QQuickItem* button);
+    void popupPlaybackMenu( QQuickItem* button);
+    void popupAudioMenu( QQuickItem* button );
+    void popupVideoMenu( QQuickItem* button );
+    void popupSubtitleMenu( QQuickItem* button );
+    void popupToolsMenu( QQuickItem* button );
+    void popupViewMenu( QQuickItem* button );
+    void popupHelpMenu( QQuickItem* button );
+
+private slots:
+    void onMenuClosed();
+
+private:
+    typedef QMenu* (*CreateMenuFunc)();
+    void popupMenuCommon( QQuickItem* button, std::function<void(QMenu*)> createMenuFunc);
+    QMenu* m_menu = nullptr;
+    QQuickItem* m_button = nullptr;
+    friend class QmlMenuBarMenu;
+};
+
+//specialized QMenu for QmlMenuBar
+class QmlMenuBarMenu : public QMenu
+{
+    Q_OBJECT
+public:
+    QmlMenuBarMenu(QmlMenuBar* menubar, QWidget* parent = nullptr);
+    ~QmlMenuBarMenu();
+protected:
+    void mouseMoveEvent(QMouseEvent* mouseEvent) override;
+    void keyPressEvent(QKeyEvent *) override;
+    void keyReleaseEvent(QKeyEvent *) override;
+private:
+    QmlMenuBar* m_menubar = nullptr;
 };
 
 class BaseMedialibMenu : public QObject

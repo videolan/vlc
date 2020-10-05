@@ -30,6 +30,7 @@
 #include "playlist/playlist_controller.hpp"
 #include "playlist/playlist_model.hpp"
 #include "dialogs/dialogs_provider.hpp"
+#include "maininterface/main_interface.hpp"
 
 
 #include <QSignalMapper>
@@ -93,6 +94,141 @@ void QmlGlobalMenu::popup(QPoint pos)
     HelpMenu(submenu);
 
     m_menu->popup(pos);
+}
+
+QmlMenuBarMenu::QmlMenuBarMenu(QmlMenuBar* menubar, QWidget* parent)
+    : QMenu(parent)
+    , m_menubar(menubar)
+{}
+
+QmlMenuBarMenu::~QmlMenuBarMenu()
+{
+}
+
+void QmlMenuBarMenu::mouseMoveEvent(QMouseEvent* mouseEvent)
+{
+    QPoint globalPos =m_menubar-> m_menu->mapToGlobal(mouseEvent->pos());
+    if (m_menubar->getmenubar()->contains(m_menubar->getmenubar()->mapFromGlobal(globalPos))
+        && !m_menubar->m_button->contains(m_menubar->m_button->mapFromGlobal(globalPos)))
+    {
+        m_menubar->setopenMenuOnHover(true);
+        close();
+        return;
+    }
+    QMenu::mouseMoveEvent(mouseEvent);
+}
+
+void QmlMenuBarMenu::keyPressEvent(QKeyEvent * event)
+{
+    QMenu::keyPressEvent(event);
+    if (!event->isAccepted()
+        && (event->key() == Qt::Key_Left  || event->key() == Qt::Key_Right))
+    {
+        event->accept();
+        emit m_menubar->navigateMenu(event->key() == Qt::Key_Left ? -1 : 1);
+    }
+}
+
+void QmlMenuBarMenu::keyReleaseEvent(QKeyEvent * event)
+{
+    QMenu::keyReleaseEvent(event);
+}
+
+QmlMenuBar::QmlMenuBar(QObject *parent)
+    : VLCMenuBar(parent)
+{
+}
+
+QmlMenuBar::~QmlMenuBar()
+{
+    if (m_menu)
+        delete m_menu;
+}
+
+void QmlMenuBar::popupMenuCommon( QQuickItem* button, std::function<void(QMenu*)> createMenuFunc)
+{
+    if (!m_ctx || !m_menubar || !button)
+        return;
+
+    intf_thread_t* p_intf = m_ctx->getIntf();
+    if (!p_intf)
+        return;
+
+    if (m_menu)
+        delete m_menu;
+
+    m_menu = new QmlMenuBarMenu(this, nullptr);
+    createMenuFunc(m_menu);
+    m_button = button;
+    m_openMenuOnHover = false;
+    connect(m_menu, &QMenu::aboutToHide, this, &QmlMenuBar::onMenuClosed);
+    QPointF position = button->mapToGlobal(QPoint(0, button->height()));
+    m_menu->popup(position.toPoint());
+}
+
+void QmlMenuBar::popupMediaMenu( QQuickItem* button )
+{
+    popupMenuCommon(button, [this](QMenu* menu) {
+        intf_thread_t* p_intf = m_ctx->getIntf();
+        FileMenu( p_intf, menu , p_intf->p_sys->p_mi );
+    });
+}
+
+void QmlMenuBar::popupPlaybackMenu( QQuickItem* button )
+{
+    popupMenuCommon(button, [this](QMenu* menu) {
+        NavigMenu( m_ctx->getIntf(), menu );
+    });
+}
+
+void QmlMenuBar::popupAudioMenu(QQuickItem* button )
+{
+    popupMenuCommon(button, [this](QMenu* menu) {
+        AudioMenu( m_ctx->getIntf(), menu );
+    });
+}
+
+void QmlMenuBar::popupVideoMenu( QQuickItem* button )
+{
+    popupMenuCommon(button, [this](QMenu* menu) {
+        VideoMenu( m_ctx->getIntf(), menu );
+    });
+}
+
+void QmlMenuBar::popupSubtitleMenu( QQuickItem* button )
+{
+    popupMenuCommon(button, [this](QMenu* menu) {
+        SubtitleMenu( m_ctx->getIntf(), menu );
+    });
+}
+
+
+void QmlMenuBar::popupToolsMenu( QQuickItem* button )
+{
+    popupMenuCommon(button, [this](QMenu* menu) {
+        ToolsMenu( m_ctx->getIntf(), menu );
+    });
+}
+
+void QmlMenuBar::popupViewMenu( QQuickItem* button )
+{
+    popupMenuCommon(button, [this](QMenu* menu) {
+        intf_thread_t* p_intf = m_ctx->getIntf();
+        ViewMenu( p_intf, menu, p_intf->p_sys->p_mi );
+    });
+}
+
+void QmlMenuBar::popupHelpMenu( QQuickItem* button )
+{
+    popupMenuCommon(button, [](QMenu* menu) {
+        HelpMenu(menu);
+    });
+}
+
+void QmlMenuBar::onMenuClosed()
+{
+    if (!m_openMenuOnHover)
+        emit menuClosed();
 }
 
 BaseMedialibMenu::BaseMedialibMenu(QObject* parent)
