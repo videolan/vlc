@@ -263,6 +263,14 @@ MainInterface::~MainInterface()
     p_intf->p_sys->p_mi = NULL;
 }
 
+bool MainInterface::hasVLM() const {
+#ifdef ENABLE_VLM
+    return true;
+#else
+    return false;
+#endif
+}
+
 bool MainInterface::useClientSideDecoration() const
 {
     //don't show CSD when interface is fullscreen

@@ -152,6 +152,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(bool mediaLibraryAvailable READ hasMediaLibrary CONSTANT)
     Q_PROPERTY(bool gridView READ hasGridView WRITE setGridView NOTIFY gridViewChanged)
     Q_PROPERTY(ColorSchemeModel* colorScheme READ getColorScheme CONSTANT)
+    Q_PROPERTY(bool hasVLM READ hasVLM CONSTANT)
     Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged)
 
 public:
@@ -189,6 +190,7 @@ public:
     inline bool hasMediaLibrary() const { return b_hasMedialibrary; }
     inline bool hasGridView() const { return m_gridView; }
     inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
+    bool hasVLM() const;
     bool useClientSideDecoration() const;
 
     bool hasEmbededVideo() const;
