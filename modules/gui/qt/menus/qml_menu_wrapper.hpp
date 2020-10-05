@@ -57,9 +57,12 @@ class QmlGlobalMenu : public VLCMenuBar
     SIMPLE_MENU_PROPERTY(QmlMainContext*, ctx, nullptr)
 public:
     explicit QmlGlobalMenu(QObject *parent = nullptr);
+    ~QmlGlobalMenu();
 
 public slots:
     void popup( QPoint pos );
+private:
+    QMenu* m_menu = nullptr;
 };
 
 class BaseMedialibMenu : public QObject
@@ -67,6 +70,7 @@ class BaseMedialibMenu : public QObject
     Q_OBJECT
 public:
     BaseMedialibMenu(QObject* parent = nullptr);
+    virtual ~BaseMedialibMenu();
 signals:
     void showMediaInformation(int index);
 
@@ -87,6 +91,9 @@ protected:
             itemIdList.push_back(model->data(modelIndex, role));
         medialibAudioContextMenu(ml, itemIdList, pos, options);
     }
+
+private:
+    QMenu* m_menu = nullptr;
 };
 
 class AlbumContextMenu : public BaseMedialibMenu {
@@ -142,10 +149,14 @@ class VideoContextMenu : public QObject {
     SIMPLE_MENU_PROPERTY(MLVideoModel*, model, nullptr)
 public:
     VideoContextMenu(QObject* parent = nullptr);
+    ~VideoContextMenu();
+
 public slots:
     void popup(const QModelIndexList& selected, QPoint pos, QVariantMap options = {} );
 signals:
     void showMediaInformation(int index);
+private:
+    QMenu* m_menu = nullptr;
 };
 
 class NetworkMediaContextMenu : public QObject {
@@ -153,8 +164,12 @@ class NetworkMediaContextMenu : public QObject {
     SIMPLE_MENU_PROPERTY(NetworkMediaModel*, model, nullptr)
 public:
     NetworkMediaContextMenu(QObject* parent = nullptr);
+    ~NetworkMediaContextMenu();
+
 public slots:
     void popup(const QModelIndexList& selected, QPoint pos );
+private:
+    QMenu* m_menu = nullptr;
 };
 
 class NetworkDeviceContextMenu : public QObject {
@@ -162,8 +177,11 @@ class NetworkDeviceContextMenu : public QObject {
     SIMPLE_MENU_PROPERTY(NetworkDeviceModel*, model, nullptr)
 public:
     NetworkDeviceContextMenu(QObject* parent = nullptr);
+    ~NetworkDeviceContextMenu();
 public slots:
     void popup(const QModelIndexList& selected, QPoint pos );
+private:
+    QMenu* m_menu = nullptr;
 };
 
 
@@ -173,8 +191,12 @@ class PlaylistContextMenu : public QObject {
     SIMPLE_MENU_PROPERTY(vlc::playlist::PlaylistControllerModel*, controler, nullptr)
 public:
     PlaylistContextMenu(QObject* parent = nullptr);
+    ~PlaylistContextMenu();
+
 public slots:
     void popup(int currentIndex, QPoint pos );
+private:
+    QMenu* m_menu = nullptr;
 };
 
 #undef SIMPLE_MENU_PROPERTY

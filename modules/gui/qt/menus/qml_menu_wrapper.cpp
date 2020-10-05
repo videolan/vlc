@@ -45,6 +45,12 @@ QmlGlobalMenu::QmlGlobalMenu(QObject *parent)
 {
 }
 
+QmlGlobalMenu::~QmlGlobalMenu()
+{
+    if (m_menu)
+        delete m_menu;
+}
+
 void QmlGlobalMenu::popup(QPoint pos)
 {
     if (!m_ctx)
@@ -54,64 +60,73 @@ void QmlGlobalMenu::popup(QPoint pos)
     if (!p_intf)
         return;
 
-    QMenu* menu = new QMenu();
-    menu->setAttribute(Qt::WA_DeleteOnClose);
+    if (m_menu)
+        delete m_menu;
+
+    m_menu = new QMenu();
     QMenu* submenu;
 
-    QAction* fileMenu = menu->addMenu(FileMenu( p_intf, menu, p_intf->p_sys->p_mi ));
+    QAction* fileMenu = m_menu->addMenu(FileMenu( p_intf, m_menu, p_intf->p_sys->p_mi ));
     fileMenu->setText(qtr( "&Media" ));
 
     /* Dynamic menus, rebuilt before being showed */
-    submenu = menu->addMenu(qtr( "P&layback" ));
+    submenu = m_menu->addMenu(qtr( "P&layback" ));
     NavigMenu( p_intf, submenu );
 
-    submenu = menu->addMenu(qtr( "&Audio" ));
+    submenu = m_menu->addMenu(qtr( "&Audio" ));
     AudioMenu( p_intf, submenu );
 
-    submenu = menu->addMenu(qtr( "&Video" ));
+    submenu = m_menu->addMenu(qtr( "&Video" ));
     VideoMenu( p_intf, submenu );
 
-    submenu = menu->addMenu(qtr( "Subti&tle" ));
+    submenu = m_menu->addMenu(qtr( "Subti&tle" ));
     SubtitleMenu( p_intf, submenu );
 
-    submenu = menu->addMenu(qtr( "Tool&s" ));
+    submenu = m_menu->addMenu(qtr( "Tool&s" ));
     ToolsMenu( p_intf, submenu );
 
     /* View menu, a bit different */
-    submenu = menu->addMenu(qtr( "V&iew" ));
+    submenu = m_menu->addMenu(qtr( "V&iew" ));
     ViewMenu( p_intf, submenu, p_intf->p_sys->p_mi );
 
-    QAction* helpMenu = menu->addMenu( HelpMenu(menu) );
+    QAction* helpMenu = m_menu->addMenu( HelpMenu(m_menu) );
     helpMenu->setText(qtr( "&Help" ));
 
-    menu->popup(pos);
+    m_menu->popup(pos);
 }
 
 BaseMedialibMenu::BaseMedialibMenu(QObject* parent)
     : QObject(parent)
 {}
 
+BaseMedialibMenu::~BaseMedialibMenu()
+{
+    if (m_menu)
+        delete m_menu;
+}
+
 void BaseMedialibMenu::medialibAudioContextMenu(MediaLib* ml, const QVariantList& mlId, const QPoint& pos, const QVariantMap& options)
 {
-    QMenu* menu = new QMenu();
+    if (m_menu)
+        delete m_menu;
+
+    m_menu = new QMenu();
     QAction* action;
 
-    menu->setAttribute(Qt::WA_DeleteOnClose);
-
-    action = menu->addAction( qtr("Add and play") );
+    action = m_menu->addAction( qtr("Add and play") );
     connect(action, &QAction::triggered, [ml, mlId]( ) {
         ml->addAndPlay(mlId);
     });
 
-    action = menu->addAction( qtr("Enqueue") );
+    action = m_menu->addAction( qtr("Enqueue") );
     connect(action, &QAction::triggered, [ml, mlId]( ) {
         ml->addToPlaylist(mlId);
     });
 
     if (options.contains("information") && options["information"].type() == QVariant::Int) {
 
-        action = menu->addAction( qtr("Information") );
-        QSignalMapper* sigmapper = new QSignalMapper(menu);
+        action = m_menu->addAction( qtr("Information") );
+        QSignalMapper* sigmapper = new QSignalMapper(m_menu);
         connect(action, &QAction::triggered, sigmapper, QOverload<>::of(&QSignalMapper::map));
         sigmapper->setMapping(action, options["information"].toInt());
 #if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
@@ -120,7 +135,7 @@ void BaseMedialibMenu::medialibAudioContextMenu(MediaLib* ml, const QVariantList
         connect(sigmapper, QOverload<int>::of(&QSignalMapper::mapped), this, &BaseMedialibMenu::showMediaInformation);
 #endif
     }
-    menu->popup(pos);
+    m_menu->popup(pos);
 }
 
 AlbumContextMenu::AlbumContextMenu(QObject* parent)
@@ -174,15 +189,22 @@ VideoContextMenu::VideoContextMenu(QObject* parent)
     : QObject(parent)
 {}
 
+VideoContextMenu::~VideoContextMenu()
+{
+    if (m_menu)
+        delete m_menu;
+}
+
 void VideoContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVariantMap options)
 {
     if (!m_model)
         return;
 
-    QMenu* menu = new QMenu();
-    QAction* action;
+    if (m_menu)
+        delete m_menu;
 
-    menu->setAttribute(Qt::WA_DeleteOnClose);
+    m_menu = new QMenu();
+    QAction* action;
 
     MediaLib* ml= m_model->ml();
 
@@ -190,26 +212,26 @@ void VideoContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVaria
     for (const QModelIndex& modelIndex : selected)
         itemIdList.push_back(m_model->data(modelIndex, MLVideoModel::VIDEO_ID));
 
-    action = menu->addAction( qtr("Add and play") );
+    action = m_menu->addAction( qtr("Add and play") );
 
     connect(action, &QAction::triggered, [ml, itemIdList]( ) {
         ml->addAndPlay(itemIdList);
     });
 
-    action = menu->addAction( qtr("Enqueue") );
+    action = m_menu->addAction( qtr("Enqueue") );
     connect(action, &QAction::triggered, [ml, itemIdList]( ) {
         ml->addToPlaylist(itemIdList);
     });
 
-    action = menu->addAction( qtr("Play as audio") );
+    action = m_menu->addAction( qtr("Play as audio") );
     connect(action, &QAction::triggered, [ml, itemIdList]( ) {
         QStringList options({":no-video"});
         ml->addAndPlay(itemIdList, &options);
     });
 
     if (options.contains("information") && options["information"].type() == QVariant::Int) {
-        action = menu->addAction( qtr("Information") );
-        QSignalMapper* sigmapper = new QSignalMapper(menu);
+        action = m_menu->addAction( qtr("Information") );
+        QSignalMapper* sigmapper = new QSignalMapper(m_menu);
         connect(action, &QAction::triggered, sigmapper, QOverload<>::of(&QSignalMapper::map));
         sigmapper->setMapping(action, options["information"].toInt());
 #if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
@@ -219,29 +241,36 @@ void VideoContextMenu::popup(const QModelIndexList& selected, QPoint pos, QVaria
 #endif
     }
 
-    menu->popup(pos);
+    m_menu->popup(pos);
 }
 
 NetworkMediaContextMenu::NetworkMediaContextMenu(QObject* parent)
     : QObject(parent)
 {}
 
+NetworkMediaContextMenu::~NetworkMediaContextMenu()
+{
+    if (m_menu)
+        delete m_menu;
+}
+
 void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
 {
     if (!m_model)
         return;
 
-    QMenu* menu = new QMenu();
+    if (m_menu)
+        delete m_menu;
+
+    m_menu = new QMenu();
     QAction* action;
 
-    menu->setAttribute(Qt::WA_DeleteOnClose);
-
-    action = menu->addAction( qtr("Add and play") );
+    action = m_menu->addAction( qtr("Add and play") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addAndPlay(selected);
     });
 
-    action = menu->addAction( qtr("Enqueue") );
+    action = m_menu->addAction( qtr("Enqueue") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addToPlaylist(selected);
     });
@@ -265,7 +294,7 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
     if (canBeIndexed)
     {
         bool removeFromML = countIndexed > 0;
-        action = menu->addAction(removeFromML
+        action = m_menu->addAction(removeFromML
             ? qtr("Remove from Media Library")
             : qtr("Add to Media Library"));
 
@@ -276,17 +305,26 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
         });
     }
 
-    menu->popup(pos);
+    m_menu->popup(pos);
 }
 
 NetworkDeviceContextMenu::NetworkDeviceContextMenu(QObject* parent)
     : QObject(parent)
 {}
 
+NetworkDeviceContextMenu::~NetworkDeviceContextMenu()
+{
+    if (m_menu)
+        delete m_menu;
+}
+
 void NetworkDeviceContextMenu::popup(const QModelIndexList& selected, QPoint pos)
 {
     if (!m_model)
         return;
+
+    if (m_menu)
+        delete m_menu;
 
     QMenu* menu = new QMenu();
     QAction* action;
@@ -310,12 +348,20 @@ PlaylistContextMenu::PlaylistContextMenu(QObject* parent)
     : QObject(parent)
 {}
 
+PlaylistContextMenu::~PlaylistContextMenu()
+{
+    if (m_menu)
+        delete m_menu;
+}
 void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
 {
     if (!m_controler || !m_model)
         return;
 
-    QMenu* menu = new QMenu();
+    if (m_menu)
+        delete m_menu;
+
+    m_menu = new QMenu();
     QAction* action;
 
     QList<QUrl> selectedUrlList;
@@ -326,91 +372,89 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
     if (currentIndex >= 0)
         currentItem = m_model->itemAt(currentIndex);
 
-    menu->setAttribute(Qt::WA_DeleteOnClose);
-
     if (currentItem)
     {
-        action = menu->addAction( qtr("Play") );
+        action = m_menu->addAction( qtr("Play") );
         connect(action, &QAction::triggered, [this, currentIndex]( ) {
             m_controler->goTo(currentIndex, true);
         });
 
-        menu->addSeparator();
+        m_menu->addSeparator();
     }
 
     if (m_model->getSelectedCount() > 0) {
-        action = menu->addAction( qtr("Stream") );
+        action = m_menu->addAction( qtr("Stream") );
         connect(action, &QAction::triggered, [selectedUrlList]( ) {
             DialogsProvider::getInstance()->streamingDialog(selectedUrlList, false);
         });
 
-        action = menu->addAction( qtr("Save") );
+        action = m_menu->addAction( qtr("Save") );
         connect(action, &QAction::triggered, [selectedUrlList]( ) {
             DialogsProvider::getInstance()->streamingDialog(selectedUrlList, true);
         });
 
-        menu->addSeparator();
+        m_menu->addSeparator();
     }
 
     if (currentItem) {
-        action = menu->addAction( qtr("Information") );
+        action = m_menu->addAction( qtr("Information") );
         action->setIcon(QIcon(":/menu/info.svg"));
         connect(action, &QAction::triggered, [currentItem]( ) {
             DialogsProvider::getInstance()->mediaInfoDialog(currentItem);
         });
 
-        menu->addSeparator();
+        m_menu->addSeparator();
 
-        action = menu->addAction( qtr("Show Containing Directory...") );
+        action = m_menu->addAction( qtr("Show Containing Directory...") );
         action->setIcon(QIcon(":/type/folder-grey.svg"));
         connect(action, &QAction::triggered, [currentItem]( ) {
             DialogsProvider::getInstance()->mediaInfoDialog(currentItem);
         });
 
-        menu->addSeparator();
+        m_menu->addSeparator();
     }
 
-    action = menu->addAction( qtr("Add File...") );
+    action = m_menu->addAction( qtr("Add File...") );
     action->setIcon(QIcon(":/buttons/playlist/playlist_add.svg"));
     connect(action, &QAction::triggered, []( ) {
         DialogsProvider::getInstance()->simpleOpenDialog(false);
     });
 
-    action = menu->addAction( qtr("Add Directory...") );
+    action = m_menu->addAction( qtr("Add Directory...") );
     action->setIcon(QIcon(":/buttons/playlist/playlist_add.svg"));
     connect(action, &QAction::triggered, []( ) {
         DialogsProvider::getInstance()->PLAppendDir();
     });
 
-    action = menu->addAction( qtr("Advanced Open...") );
+    action = m_menu->addAction( qtr("Advanced Open...") );
     action->setIcon(QIcon(":/buttons/playlist/playlist_add.svg"));
     connect(action, &QAction::triggered, []( ) {
         DialogsProvider::getInstance()->PLAppendDialog();
     });
 
-    menu->addSeparator();
+    m_menu->addSeparator();
 
     if (m_model->getSelectedCount() > 0)
     {
-        action = menu->addAction( qtr("Save Playlist to File...") );
+        action = m_menu->addAction( qtr("Save Playlist to File...") );
         connect(action, &QAction::triggered, []( ) {
             DialogsProvider::getInstance()->savePlayingToPlaylist();
         });
 
-        menu->addSeparator();
+        m_menu->addSeparator();
 
-        action = menu->addAction( qtr("Remove Selected") );
+        action = m_menu->addAction( qtr("Remove Selected") );
         action->setIcon(QIcon(":/buttons/playlist/playlist_remove.svg"));
         connect(action, &QAction::triggered, [this]( ) {
             m_model->removeItems(m_model->getSelection());
         });
     }
 
-    action = menu->addAction( qtr("Clear the playlist") );
+    action = m_menu->addAction( qtr("Clear the playlist") );
     action->setIcon(QIcon(":/toolbar/clear.svg"));
     connect(action, &QAction::triggered, [this]( ) {
         m_controler->clear();
     });
 
-    menu->popup(pos);
+    m_menu->popup(pos);
 }
