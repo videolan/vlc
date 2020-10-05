@@ -165,6 +165,11 @@ Rectangle {
     }
 
     Loader {
+        asynchronous: true
+        source: "qrc:///menus/GlobalShortcuts.qml"
+    }
+
+    Loader {
         id: dialogsLoader
 
         anchors.fill: parent

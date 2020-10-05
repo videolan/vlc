@@ -637,6 +637,7 @@ libqt_plugin_la_QML = \
 	gui/qt/medialibrary/qml/VideoListDisplay.qml \
 	gui/qt/menus/qml/AudioMenu.qml \
 	gui/qt/menus/qml/CheckableModelSubMenu.qml \
+	gui/qt/menus/qml/GlobalShortcuts.qml \
 	gui/qt/menus/qml/HelpMenu.qml \
 	gui/qt/menus/qml/MainDropdownMenu.qml \
 	gui/qt/menus/qml/MainMenubar.qml \

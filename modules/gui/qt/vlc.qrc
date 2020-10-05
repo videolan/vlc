@@ -294,6 +294,7 @@
         <file alias="CheckableModelSubMenu.qml">menus/qml/CheckableModelSubMenu.qml</file>
         <file alias="ViewMenu.qml">menus/qml/ViewMenu.qml</file>
         <file alias="PopupMenu.qml">menus/qml/PopupMenu.qml</file>
+        <file alias="GlobalShortcuts.qml">menus/qml/GlobalShortcuts.qml</file>
     </qresource>
     <qresource prefix="/player">
         <file alias="Player.qml">player/qml/Player.qml</file>
