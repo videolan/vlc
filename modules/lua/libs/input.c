@@ -645,7 +645,9 @@ static int vlclua_input_add_subtitle(lua_State *L, bool b_path)
         mrl = vlc_path2uri(sub, NULL);
 
     const char *uri = b_path ? mrl : sub;
+    vlc_player_Lock(player);
     vlc_player_AddAssociatedMedia(player, SPU_ES, uri, autoselect, true, false);
+    vlc_player_Unlock(player);
     if (b_path)
         free(mrl);
 
