@@ -96,8 +96,14 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
     return src;
 }
 
+static void Close(filter_t *filter)
+{
+    vlc_video_context_Release(filter->vctx_out);
+    free(filter->p_sys);
+}
+
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = Deinterlace,
+    .filter_video = Deinterlace, .close = Close,
 };
 
 static int Open(vlc_object_t *obj)
@@ -130,20 +136,11 @@ static int Open(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *obj)
-{
-    filter_t *filter = (filter_t *)obj;
-    filter_sys_t *sys = filter->p_sys;
-
-    vlc_video_context_Release(filter->vctx_out);
-    free(sys);
-}
-
 vlc_module_begin()
     set_description(N_("VDPAU deinterlacing filter"))
     set_capability("video filter", 0)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callbacks(Open, Close)
+    set_callback(Open)
     add_shortcut ("deinterlace")
 vlc_module_end()
