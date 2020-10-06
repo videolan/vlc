@@ -62,7 +62,6 @@ static const char * const  ppsz_converter_text[] = {
 };
 
 int OpenConverter(vlc_object_t *);
-void CloseConverter(vlc_object_t *);
 
 vlc_module_begin()
     add_submodule()
@@ -76,7 +75,7 @@ vlc_module_begin()
     add_integer( MMAL_CONVERTER_TYPE_NAME, FILTER_RESIZER_HVS, MMAL_CONVERTER_TYPE_TEXT, MMAL_CONVERTER_TYPE_LONGTEXT, true )
         change_integer_list( pi_converter_modes, ppsz_converter_text )
 #endif
-    set_callbacks(OpenConverter, CloseConverter)
+    set_callback(OpenConverter)
 vlc_module_end()
 
 #define MMAL_SLICE_HEIGHT 16
@@ -717,9 +716,8 @@ fail:
     return NULL;
 }
 
-void CloseConverter(vlc_object_t * obj)
+static void CloseConverter(filter_t *p_filter)
 {
-    filter_t * const p_filter = (filter_t *)obj;
     converter_sys_t * const sys = p_filter->p_sys;
 
     if (sys == NULL)
@@ -782,7 +780,7 @@ static MMAL_FOURCC_T filter_enc_in(const video_format_t * const fmt)
 
 
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = conv_filter, .flush = conv_flush,
+    .filter_video = conv_filter, .flush = conv_flush, .close = CloseConverter,
 };
 
 int OpenConverter(vlc_object_t * obj)
@@ -896,7 +894,7 @@ retry:
     if (status != MMAL_SUCCESS) {
         if (resizer_type == FILTER_RESIZER_HVS) {
             msg_Warn(p_filter, "Failed to create HVS resizer - retrying with ISP");
-            CloseConverter(obj);
+            CloseConverter(p_filter);
             resizer_type = FILTER_RESIZER_ISP;
             goto retry;
         }
@@ -979,7 +977,7 @@ retry:
     return VLC_SUCCESS;
 
 fail:
-    CloseConverter(obj);
+    CloseConverter(p_filter);
 
     if (resizer_type != FILTER_RESIZER_RESIZER && status == MMAL_ENOMEM) {
         resizer_type = FILTER_RESIZER_RESIZER;
