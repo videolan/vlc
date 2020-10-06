@@ -61,7 +61,6 @@
 #define MMAL_DEINTERLACE_FULL_RATE_LONGTEXT N_("Full output framerate. 1 output frame for each interlaced field input")
 
 static int OpenMmalDeinterlace(vlc_object_t *);
-static void CloseMmalDeinterlace(vlc_object_t *);
 
 vlc_module_begin()
     set_shortname(N_("MMAL deinterlace"))
@@ -69,7 +68,7 @@ vlc_module_begin()
     set_capability("video filter", 900)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callbacks(OpenMmalDeinterlace, CloseMmalDeinterlace)
+    set_callback(OpenMmalDeinterlace)
     add_shortcut("deinterlace")
     add_bool(MMAL_DEINTERLACE_NO_QPU, false, MMAL_DEINTERLACE_NO_QPU_TEXT,
                     MMAL_DEINTERLACE_NO_QPU_LONGTEXT, true);
@@ -364,9 +363,8 @@ static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     mmal_buffer_header_release(buffer);
 }
 
-static void CloseMmalDeinterlace(vlc_object_t *p_this)
+static void CloseMmalDeinterlace(filter_t *filter)
 {
-    filter_t *filter = (filter_t*)p_this;
     filter_sys_t * const sys = filter->p_sys;
 
     if (sys == NULL)
@@ -413,11 +411,11 @@ static bool is_fmt_valid_in(const vlc_fourcc_t fmt)
 }
 
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = deinterlace, .flush = di_flush,
+    .filter_video = deinterlace, .flush = di_flush, .close = CloseMmalDeinterlace,
 };
 
 static const struct vlc_filter_operations filter_pass_ops = {
-    .filter_video = pass_deinterlace,
+    .filter_video = pass_deinterlace, .close = CloseMmalDeinterlace,
 };
 
 static int OpenMmalDeinterlace(vlc_object_t *p_this)
@@ -505,6 +503,7 @@ static int OpenMmalDeinterlace(vlc_object_t *p_this)
         filter->ops = &filter_pass_ops;
         return VLC_SUCCESS;
     }
+    filter->ops = &filter_ops;
 
     filter->vctx_out = vlc_video_context_Hold(filter->vctx_in);
 
@@ -602,11 +601,10 @@ static int OpenMmalDeinterlace(vlc_object_t *p_this)
         goto fail;
     }
 
-    filter->ops = &filter_ops;
     return 0;
 
 fail:
-    CloseMmalDeinterlace(p_this);
+    CloseMmalDeinterlace(filter);
     return ret;
 }
 
