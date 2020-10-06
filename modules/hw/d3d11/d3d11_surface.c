@@ -664,8 +664,18 @@ static picture_t *NV12_D3D11_Filter( filter_t *p_filter, picture_t *p_pic )
     return p_outpic;
 }
 
+static void D3D11CloseCPUConverter( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    if (p_sys->filter)
+        DeleteFilter(p_sys->filter);
+    if (p_sys->staging_pic)
+        picture_Release(p_sys->staging_pic);
+    vlc_video_context_Release(p_filter->vctx_out);
+}
+
 static const struct vlc_filter_operations NV12_D3D11_ops = {
-    .filter_video = NV12_D3D11_Filter,
+    .filter_video = NV12_D3D11_Filter, .close = D3D11CloseCPUConverter,
 };
 
 int D3D11OpenConverter( vlc_object_t *obj )
@@ -848,15 +858,4 @@ void D3D11CloseConverter( vlc_object_t *obj )
     CopyCleanCache(&p_sys->cache);
     if (p_sys->staging)
         ID3D11Texture2D_Release(p_sys->staging);
-}
-
-void D3D11CloseCPUConverter( vlc_object_t *obj )
-{
-    filter_t *p_filter = (filter_t *)obj;
-    filter_sys_t *p_sys = p_filter->p_sys;
-    if (p_sys->filter)
-        DeleteFilter(p_sys->filter);
-    if (p_sys->staging_pic)
-        picture_Release(p_sys->staging_pic);
-    vlc_video_context_Release(p_filter->vctx_out);
 }

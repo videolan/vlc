@@ -232,8 +232,17 @@ picture_t *AllocPicture( filter_t *p_filter )
     return pic;
 }
 
+static void D3D11CloseDeinterlace(filter_t *filter)
+{
+    filter_sys_t *sys = filter->p_sys;
+    D3D11_ReleaseProcessor( &sys->d3d_proc );
+    vlc_video_context_Release(filter->vctx_out);
+
+    free(sys);
+}
+
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = Deinterlace, .flush = Flush,
+    .filter_video = Deinterlace, .flush = Flush, .close = D3D11CloseDeinterlace,
 };
 
 int D3D11OpenDeinterlace(vlc_object_t *obj)
@@ -364,15 +373,5 @@ error:
     free(sys);
 
     return VLC_EGENERIC;
-}
-
-void D3D11CloseDeinterlace(vlc_object_t *obj)
-{
-    filter_t *filter = (filter_t *)obj;
-    filter_sys_t *sys = filter->p_sys;
-    D3D11_ReleaseProcessor( &sys->d3d_proc );
-    vlc_video_context_Release(filter->vctx_out);
-
-    free(sys);
 }
 
