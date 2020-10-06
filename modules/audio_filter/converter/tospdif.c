@@ -40,14 +40,13 @@
 #include "../../packetizer/dts_header.h"
 
 static int  Open( vlc_object_t * );
-static void Close( vlc_object_t * );
 
 vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
     set_description( N_("Audio filter for A/52/DTS->S/PDIF encapsulation") )
     set_capability( "audio converter", 10 )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 typedef struct
@@ -597,6 +596,12 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     return p_out_buf;
 }
 
+static void Close( filter_t *p_filter )
+{
+    Flush( p_filter );
+    free( p_filter->p_sys );
+}
+
 static int Open( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
@@ -620,16 +625,9 @@ static int Open( vlc_object_t *p_this )
     {
         .filter_audio = DoWork,
         .flush = Flush,
+        .close = Close,
     };
     p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
-}
-
-static void Close( vlc_object_t *p_this )
-{
-    filter_t *p_filter = (filter_t *)p_this;
-
-    Flush( p_filter );
-    free( p_filter->p_sys );
 }
