@@ -41,12 +41,11 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("YUVP converter") )
     set_capability( "video converter", 10 )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 /****************************************************************************
@@ -84,14 +83,6 @@ static int Open( vlc_object_t *p_this )
              (const char*)&p_filter->fmt_out.video.i_chroma );
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close: clean up the filter
- *****************************************************************************/
-static void Close( vlc_object_t *p_this )
-{
-    VLC_UNUSED(p_this );
 }
 
 /****************************************************************************
