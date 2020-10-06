@@ -445,8 +445,19 @@ int D3D9OpenConverter( vlc_object_t *obj )
     return VLC_SUCCESS;
 }
 
+static void D3D9CloseCPUConverter( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    DeleteFilter(p_sys->filter);
+    if (p_sys->staging)
+        picture_Release(p_sys->staging);
+    vlc_video_context_Release(p_filter->vctx_out);
+    free( p_sys );
+    p_filter->p_sys = NULL;
+}
+
 static const struct vlc_filter_operations YV12_D3D9_ops = {
-    .filter_video = YV12_D3D9_Filter,
+    .filter_video = YV12_D3D9_Filter, .close = D3D9CloseCPUConverter,
 };
 
 int D3D9OpenCPUConverter( vlc_object_t *obj )
@@ -533,16 +544,4 @@ done:
         free(p_sys);
     }
     return err;
-}
-
-void D3D9CloseCPUConverter( vlc_object_t *obj )
-{
-    filter_t *p_filter = (filter_t *)obj;
-    filter_sys_t *p_sys = p_filter->p_sys;
-    DeleteFilter(p_sys->filter);
-    if (p_sys->staging)
-        picture_Release(p_sys->staging);
-    vlc_video_context_Release(p_filter->vctx_out);
-    free( p_sys );
-    p_filter->p_sys = NULL;
 }

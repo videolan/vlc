@@ -321,8 +321,21 @@ picture_t *AllocPicture( filter_t *p_filter )
     return pic;
 }
 
+
+static void D3D9CloseDeinterlace(filter_t *filter)
+{
+    filter_sys_t *sys = filter->p_sys;
+
+    IDirect3DSurface9_Release( sys->hw_surface );
+    IDirectXVideoProcessor_Release( sys->processor );
+    FreeLibrary( sys->hdecoder_dll );
+    vlc_video_context_Release(filter->vctx_out);
+
+    free(sys);
+}
+
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = Deinterlace, .flush = Flush,
+    .filter_video = Deinterlace, .flush = Flush, .close = D3D9CloseDeinterlace,
 };
 
 int D3D9OpenDeinterlace(vlc_object_t *obj)
@@ -521,17 +534,4 @@ error:
     free(sys);
 
     return VLC_EGENERIC;
-}
-
-void D3D9CloseDeinterlace(vlc_object_t *obj)
-{
-    filter_t *filter = (filter_t *)obj;
-    filter_sys_t *sys = filter->p_sys;
-
-    IDirect3DSurface9_Release( sys->hw_surface );
-    IDirectXVideoProcessor_Release( sys->processor );
-    FreeLibrary( sys->hdecoder_dll );
-    vlc_video_context_Release(filter->vctx_out);
-
-    free(sys);
 }
