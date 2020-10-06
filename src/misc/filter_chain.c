@@ -260,6 +260,7 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
 
     if( filter->p_module == NULL )
         goto error;
+    assert( filter->ops != NULL );
 
     if( chain->last == NULL )
     {

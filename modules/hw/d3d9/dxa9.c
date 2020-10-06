@@ -217,6 +217,7 @@ static filter_t *CreateFilter( filter_t *p_this, const es_format_t *p_fmt_in,
         DeleteFilter( p_filter );
         return NULL;
     }
+    assert( p_filter->ops != NULL );
 
     return p_filter;
 }

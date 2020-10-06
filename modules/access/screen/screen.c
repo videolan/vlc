@@ -385,6 +385,7 @@ void RenderCursor( demux_t *p_demux, int i_x, int i_y,
                 vlc_object_delete(p_sys->p_blend);
                 p_sys->p_blend = NULL;
             }
+            assert( p_sys->p_blend->ops != NULL );
         }
     }
     if( p_sys->p_blend )

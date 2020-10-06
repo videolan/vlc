@@ -493,6 +493,7 @@ static filter_t *ResamplerCreate(filter_t *p_filter)
         vlc_object_delete(p_resampler);
         return NULL;
     }
+    assert( p_resampler->ops != NULL );
     return p_resampler;
 }
 

@@ -272,6 +272,7 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
         vlc_object_delete(text);
         return NULL;
     }
+    assert( text->ops != NULL );
 
     return text;
 }
@@ -305,6 +306,7 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
         vlc_object_delete(scale);
         return NULL;
     }
+    assert( scale->ops != NULL );
 
     return scale;
 }

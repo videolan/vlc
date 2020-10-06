@@ -203,14 +203,14 @@ static inline picture_t *filter_NewPicture( filter_t *p_filter )
  */
 static inline void filter_Flush( filter_t *p_filter )
 {
-    if( p_filter->ops && p_filter->ops->flush != NULL )
+    if( p_filter->ops->flush != NULL )
         p_filter->ops->flush( p_filter );
 }
 
 static inline void filter_ChangeViewpoint( filter_t *p_filter,
                                            const vlc_viewpoint_t *vp)
 {
-    if( p_filter->ops && p_filter->ops->change_viewpoint != NULL )
+    if( p_filter->ops->change_viewpoint != NULL )
         p_filter->ops->change_viewpoint( p_filter, vp );
 }
 
@@ -244,7 +244,7 @@ static inline vlc_decoder_device * filter_HoldDecoderDeviceType( filter_t *p_fil
  */
 static inline block_t *filter_DrainAudio( filter_t *p_filter )
 {
-    if( p_filter->ops && p_filter->ops->drain_audio )
+    if( p_filter->ops->drain_audio )
         return p_filter->ops->drain_audio( p_filter );
     else
         return NULL;

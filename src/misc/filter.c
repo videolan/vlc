@@ -154,6 +154,7 @@ int filter_ConfigureBlend( vlc_blender_t *p_blend,
         p_blend->p_module = module_need( p_blend, "video blending", NULL, false );
     if( !p_blend->p_module )
         return VLC_EGENERIC;
+    assert( p_blend->ops != NULL );
     return VLC_SUCCESS;
 }
 

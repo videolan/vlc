@@ -509,6 +509,7 @@ static filter_t *CreateCPUtoGPUFilter( filter_t *p_this, const es_format_t *p_fm
         DeleteFilter( p_filter );
         return NULL;
     }
+    assert( p_filter->ops != NULL );
 
     return p_filter;
 }

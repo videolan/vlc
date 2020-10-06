@@ -565,6 +565,7 @@ CVPX_to_CVPX_converter_Create(filter_t *filter, bool to_rgba)
         vlc_object_delete(converter);
         return NULL;
     }
+    assert( converter->ops != NULL );
 
     return converter;
 }

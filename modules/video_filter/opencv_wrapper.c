@@ -187,7 +187,7 @@ static int Create( vlc_object_t *p_this )
 
         return VLC_ENOMOD;
     }
-
+    assert( p_sys->p_opencv->ops != NULL );
 
     /* Init structure */
     p_sys->p_image = image_HandlerCreate( p_filter );

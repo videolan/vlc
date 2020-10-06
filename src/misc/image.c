@@ -808,6 +808,7 @@ static filter_t *CreateConverter( vlc_object_t *p_this,
         DeleteConverter( p_filter );
         return NULL;
     }
+    assert( p_filter->ops != NULL );
 
     return p_filter;
 }

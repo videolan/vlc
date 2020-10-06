@@ -253,6 +253,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         vlc_object_delete(p_blend);
         return NULL;
     }
+    assert( p_blend->ops != NULL );
 
     vlc_tick_t time = vlc_tick_now();
     for( int i_iter = 0; i_iter < p_sys->i_loops; ++i_iter )
