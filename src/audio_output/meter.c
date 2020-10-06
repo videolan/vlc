@@ -217,8 +217,8 @@ vlc_audio_meter_Flush(struct vlc_audio_meter *meter)
     vlc_list_foreach(plugin, &meter->plugins, node)
     {
         filter_t *filter = plugin->filter;
-        if (filter != NULL && filter->ops->flush != NULL)
-            filter->ops->flush(filter);
+        if (filter != NULL)
+            filter_Flush(filter);
     }
 
     vlc_mutex_unlock(&meter->lock);
