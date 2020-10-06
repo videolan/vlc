@@ -128,12 +128,18 @@ static void P010_I42010B( filter_t *p_filter, picture_t *p_src,
 }
 
 /* Following functions are local */
-VIDEO_FILTER_WRAPPER( I420_NV12 )
-VIDEO_FILTER_WRAPPER( YV12_NV12 )
-VIDEO_FILTER_WRAPPER( NV12_I420 )
-VIDEO_FILTER_WRAPPER( NV12_YV12 )
-VIDEO_FILTER_WRAPPER( I42010B_P010 )
-VIDEO_FILTER_WRAPPER( P010_I42010B )
+static void Delete(filter_t *p_filter)
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    CopyCleanCache( &p_sys->cache );
+}
+
+VIDEO_FILTER_WRAPPER_CLOSE( I420_NV12, Delete )
+VIDEO_FILTER_WRAPPER_CLOSE( YV12_NV12, Delete )
+VIDEO_FILTER_WRAPPER_CLOSE( NV12_I420, Delete )
+VIDEO_FILTER_WRAPPER_CLOSE( NV12_YV12, Delete )
+VIDEO_FILTER_WRAPPER_CLOSE( I42010B_P010, Delete )
+VIDEO_FILTER_WRAPPER_CLOSE( P010_I42010B, Delete )
 
 /*****************************************************************************
  * Create: allocate a chroma function
@@ -223,18 +229,11 @@ static int Create( vlc_object_t *p_this )
     return 0;
 }
 
-static void Delete(vlc_object_t *p_this)
-{
-    filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
-    CopyCleanCache( &p_sys->cache );
-}
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("YUV planar to semiplanar conversions") )
     set_capability( "video converter", 160 )
-    set_callbacks( Create, Delete )
+    set_callback( Create )
 vlc_module_end ()
