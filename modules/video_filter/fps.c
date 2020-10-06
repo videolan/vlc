@@ -34,7 +34,6 @@
 #include <vlc_picture.h>
 
 static int Open( vlc_object_t *p_this);
-static void Close( vlc_object_t *p_this);
 static picture_t *Filter( filter_t *p_filter, picture_t *p_picture);
 
 #define CFG_PREFIX "fps-"
@@ -50,7 +49,7 @@ vlc_module_begin ()
 
     add_shortcut( "fps" )
     add_string( CFG_PREFIX "fps", NULL, FPS_TEXT, FPS_TEXT, false )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -132,9 +131,19 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
     return last_pic;
 }
 
+static void Close( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    if( p_sys->p_previous_pic )
+        picture_Release( p_sys->p_previous_pic );
+    if( p_filter->vctx_out )
+        vlc_video_context_Release( p_filter->vctx_out );
+    free( p_sys );
+}
+
 static const struct vlc_filter_operations filter_ops =
 {
-    .filter_video = Filter,
+    .filter_video = Filter, .close = Close,
 };
 
 static int Open( vlc_object_t *p_this)
@@ -193,15 +202,4 @@ static int Open( vlc_object_t *p_this)
         p_filter->vctx_out = vlc_video_context_Hold( p_filter->vctx_in );
 
     return VLC_SUCCESS;
-}
-
-static void Close( vlc_object_t *p_this )
-{
-    filter_t *p_filter = (filter_t*)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
-    if( p_sys->p_previous_pic )
-        picture_Release( p_sys->p_previous_pic );
-    if( p_filter->vctx_out )
-        vlc_video_context_Release( p_filter->vctx_out );
-    free( p_sys );
 }
