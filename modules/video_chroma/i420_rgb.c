@@ -55,7 +55,7 @@ static void Set8bppPalette( filter_t *, uint8_t * );
  * Module descriptor.
  *****************************************************************************/
 static int  Activate   ( vlc_object_t * );
-static void Deactivate ( vlc_object_t * );
+static void Deactivate ( filter_t * );
 
 vlc_module_begin ()
 #if defined (SSE2)
@@ -74,20 +74,20 @@ vlc_module_begin ()
     set_capability( "video converter", 80 )
 # define vlc_CPU_capable() (true)
 #endif
-    set_callbacks( Activate, Deactivate )
+    set_callback( Activate )
 vlc_module_end ()
 
 #ifndef PLAIN
-VIDEO_FILTER_WRAPPER( I420_R5G5B5 )
-VIDEO_FILTER_WRAPPER( I420_R5G6B5 )
-VIDEO_FILTER_WRAPPER( I420_A8R8G8B8 )
-VIDEO_FILTER_WRAPPER( I420_R8G8B8A8 )
-VIDEO_FILTER_WRAPPER( I420_B8G8R8A8 )
-VIDEO_FILTER_WRAPPER( I420_A8B8G8R8 )
+VIDEO_FILTER_WRAPPER_CLOSE( I420_R5G5B5, Deactivate )
+VIDEO_FILTER_WRAPPER_CLOSE( I420_R5G6B5, Deactivate )
+VIDEO_FILTER_WRAPPER_CLOSE( I420_A8R8G8B8, Deactivate )
+VIDEO_FILTER_WRAPPER_CLOSE( I420_R8G8B8A8, Deactivate )
+VIDEO_FILTER_WRAPPER_CLOSE( I420_B8G8R8A8, Deactivate )
+VIDEO_FILTER_WRAPPER_CLOSE( I420_A8B8G8R8, Deactivate )
 #else
-VIDEO_FILTER_WRAPPER( I420_RGB8 )
-VIDEO_FILTER_WRAPPER( I420_RGB16 )
-VIDEO_FILTER_WRAPPER( I420_RGB32 )
+VIDEO_FILTER_WRAPPER_CLOSE( I420_RGB8, Deactivate )
+VIDEO_FILTER_WRAPPER_CLOSE( I420_RGB16, Deactivate )
+VIDEO_FILTER_WRAPPER_CLOSE( I420_RGB32, Deactivate )
 #endif
 
 /*****************************************************************************
@@ -280,9 +280,8 @@ static int Activate( vlc_object_t *p_this )
  *****************************************************************************
  * This function frees the previously allocated chroma function
  *****************************************************************************/
-static void Deactivate( vlc_object_t *p_this )
+static void Deactivate( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
 #ifdef PLAIN
