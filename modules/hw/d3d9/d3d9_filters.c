@@ -519,7 +519,7 @@ vlc_module_begin()
 
     add_submodule()
     set_capability( "video converter", 10 )
-    set_callbacks( D3D9OpenConverter, D3D9CloseConverter )
+    set_callback( D3D9OpenConverter )
 
     add_submodule()
     set_callbacks( D3D9OpenCPUConverter, D3D9CloseCPUConverter )

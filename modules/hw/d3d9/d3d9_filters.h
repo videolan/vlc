@@ -31,7 +31,6 @@
 int  D3D9OpenDeinterlace(vlc_object_t *);
 void D3D9CloseDeinterlace(vlc_object_t *);
 int  D3D9OpenConverter(vlc_object_t *);
-void D3D9CloseConverter(vlc_object_t *);
 int  D3D9OpenCPUConverter(vlc_object_t *);
 void D3D9CloseCPUConverter(vlc_object_t *);
 

@@ -365,8 +365,16 @@ done:
     return NULL;
 }
 
-VIDEO_FILTER_WRAPPER (DXA9_YV12)
-VIDEO_FILTER_WRAPPER (DXA9_NV12)
+static void D3D9CloseConverter( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    CopyCleanCache( &p_sys->cache );
+    free( p_sys );
+    p_filter->p_sys = NULL;
+}
+
+VIDEO_FILTER_WRAPPER_CLOSE(DXA9_YV12, D3D9CloseConverter)
+VIDEO_FILTER_WRAPPER_CLOSE(DXA9_NV12, D3D9CloseConverter)
 
 static picture_t *YV12_D3D9_Filter( filter_t *p_filter, picture_t *p_pic )
 {
@@ -525,15 +533,6 @@ done:
         free(p_sys);
     }
     return err;
-}
-
-void D3D9CloseConverter( vlc_object_t *obj )
-{
-    filter_t *p_filter = (filter_t *)obj;
-    filter_sys_t *p_sys = p_filter->p_sys;
-    CopyCleanCache( &p_sys->cache );
-    free( p_sys );
-    p_filter->p_sys = NULL;
 }
 
 void D3D9CloseCPUConverter( vlc_object_t *obj )
