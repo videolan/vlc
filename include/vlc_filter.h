@@ -354,7 +354,7 @@ VLC_API void filter_DeleteBlend( vlc_blender_t * );
  *
  * Currently used by the chroma video filters
  */
-#define VIDEO_FILTER_WRAPPER( name )                                    \
+#define VIDEO_FILTER_WRAPPER_CLOSE( name, close_cb )                    \
     static picture_t *name ## _Filter ( filter_t *p_filter,             \
                                         picture_t *p_pic )              \
     {                                                                   \
@@ -368,8 +368,10 @@ VLC_API void filter_DeleteBlend( vlc_blender_t * );
         return p_outpic;                                                \
     }                                                                   \
     static const struct vlc_filter_operations name ## _ops = {          \
-        .filter_video = name ## _Filter,                                \
+        .filter_video = name ## _Filter, .close = close_cb,             \
     };
+
+#define VIDEO_FILTER_WRAPPER( name )   VIDEO_FILTER_WRAPPER_CLOSE( name, NULL )
 
 /**
  * Filter chain management API
