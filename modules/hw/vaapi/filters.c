@@ -1073,11 +1073,28 @@ OpenDeinterlace_InitHistory(void * p_data, VAProcPipelineCaps const * pipeline_c
     return VLC_SUCCESS;
 }
 
+static void CloseDeinterlace(filter_t *filter)
+{
+    filter_sys_t *const         filter_sys = filter->p_sys;
+    struct deint_data *const    p_data = filter_sys->p_data;
+
+    if (p_data->forward_refs.surfaces)
+        free(p_data->forward_refs.surfaces);
+    if (p_data->history.pp_pics)
+    {
+        while (p_data->history.num_pics)
+            picture_Release(p_data->history.pp_pics[--p_data->history.num_pics]);
+        free(p_data->history.pp_pics);
+    }
+    free(p_data);
+    Close(filter, filter_sys);
+}
+
 static const struct vlc_filter_operations DeinterlaceX2_ops = {
-    .filter_video = DeinterlaceX2, .flush = Deinterlace_Flush,
+    .filter_video = DeinterlaceX2, .flush = Deinterlace_Flush, .close = CloseDeinterlace,
 };
 static const struct vlc_filter_operations Deinterlace_ops = {
-    .filter_video = Deinterlace,   .flush = Deinterlace_Flush,
+    .filter_video = Deinterlace,   .flush = Deinterlace_Flush, .close = CloseDeinterlace,
 };
 
 static int
@@ -1115,25 +1132,6 @@ error:
     return VLC_EGENERIC;
 }
 
-static void
-CloseDeinterlace(vlc_object_t * obj)
-{
-    filter_t *const             filter = (filter_t *)obj;
-    filter_sys_t *const         filter_sys = filter->p_sys;
-    struct deint_data *const    p_data = filter_sys->p_data;
-
-    if (p_data->forward_refs.surfaces)
-        free(p_data->forward_refs.surfaces);
-    if (p_data->history.pp_pics)
-    {
-        while (p_data->history.num_pics)
-            picture_Release(p_data->history.pp_pics[--p_data->history.num_pics]);
-        free(p_data->history.pp_pics);
-    }
-    free(p_data);
-    Close(filter, filter_sys);
-}
-
 /*********************
  * Module descriptor *
  *********************/
@@ -1150,7 +1148,7 @@ vlc_module_begin()
     add_shortcut("adjust")
 
     add_submodule()
-    set_callbacks(OpenDeinterlace, CloseDeinterlace)
+    set_callback(OpenDeinterlace)
     add_shortcut("deinterlace")
 
     add_submodule()
