@@ -10794,10 +10794,6 @@ msgstr "ตัวอ่านรหัสส่วนรับที่ปิด
 msgid "CDG video decoder"
 msgstr "ตัวอ่านรหัสวีดิทัศน์ CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "ตัวอ่านรหัสวีดิทัศน์ HD ด้วยฮาร์ดแวร์ Crystal"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "ตัวอ่านรหัสบทบรรยาย CVD"

@@ -11469,10 +11469,6 @@ msgstr "Penyahkod Kapsyen Tertutup"
 msgid "CDG video decoder"
 msgstr "Dekoder video CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Penyahkod video perkakasan HD Crystal"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Dekoder sarikata CVD"

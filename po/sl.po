@@ -11490,10 +11490,6 @@ msgstr "Odkodirnik zaprtih naslovov"
 msgid "CDG video decoder"
 msgstr "CDG odkodirnik slike"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Crystal HD strojni video dekoder"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Odkodirnik podnapisov CVD"

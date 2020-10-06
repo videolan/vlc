@@ -11018,10 +11018,6 @@ msgstr ""
 msgid "CDG video decoder"
 msgstr ""
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr ""
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD उपशीर्षक असङ्केतक"

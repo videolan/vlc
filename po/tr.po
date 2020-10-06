@@ -11574,10 +11574,6 @@ msgstr "Closed Captions Kod Çözücüsü"
 msgid "CDG video decoder"
 msgstr "CDG Görüntü Kod Çözücüsü"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Crystal HD Donanımsal Görüntü Kod Çözücüsü"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD Altyazı Çözücüsü"

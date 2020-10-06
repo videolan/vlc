@@ -11339,10 +11339,6 @@ msgstr "बन्न कैप्शन विकोडक"
 msgid "CDG video decoder"
 msgstr "CDG वीडियो विकोडक"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "क्रिस्टल HD हार्डवेयर वीडियो डिकोडर"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD उपशीर्षक विकोटक"

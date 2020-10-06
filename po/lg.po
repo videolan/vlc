@@ -11306,11 +11306,6 @@ msgstr ""
 msgid "CDG video decoder"
 msgstr "Ebikka ya vidiyo"
 
-#: modules/codec/crystalhd.c:90
-#, fuzzy
-msgid "Crystal HD hardware video decoder"
-msgstr "Ebikka ya vidiyo"
-
 #: modules/codec/cvdsub.c:50
 #, fuzzy
 msgid "CVD subtitle decoder"

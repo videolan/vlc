@@ -10954,10 +10954,6 @@ msgstr ""
 msgid "CDG video decoder"
 msgstr "Discôdeu videyo CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Discôdeu videyo di l' éndjolreye Crystal HD"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Discôdeu do sortite CVD"

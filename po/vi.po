@@ -11731,10 +11731,6 @@ msgstr "Đóng tiêu đề giải mã"
 msgid "CDG video decoder"
 msgstr "Giải mã video CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Trình giải mã video thuộc phần cứng Crystal HD"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Giải mã phụ đề CVD"

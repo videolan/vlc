@@ -11677,10 +11677,6 @@ msgstr "Decodificatore sottotitoli chiusi"
 msgid "CDG video decoder"
 msgstr "Decodificatore video CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Decodificatore video hardware Crystal HD"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Decodifica sottotitoli CVD"

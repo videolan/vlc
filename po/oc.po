@@ -11608,10 +11608,6 @@ msgstr "Desencodadors de sostítols per malentendents"
 msgid "CDG video decoder"
 msgstr "Desencodador vidèo CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Desencodador vidèo material Crystal HD"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Desencodador de sostítols CVD"

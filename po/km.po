@@ -11210,10 +11210,6 @@ msgstr "បាន​បិទ​ឌិកូឌ័រ​ចំណងជើង"
 msgid "CDG video decoder"
 msgstr "ឌិកូឌ័រ​វីដេអូ CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "ឌិកូឌ័រ"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "ឌិកូឌ័រ​ចំណងជើង​រង CVD"

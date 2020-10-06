@@ -11229,10 +11229,6 @@ msgstr "Suletud pealdiste dekooder"
 msgid "CDG video decoder"
 msgstr "CDG video dekooder"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Crystal HD riistvaraline video dekooder"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD subtiitrite dekooder"

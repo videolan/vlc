@@ -11290,10 +11290,6 @@ msgstr "બંધ કૅપ્શન ડિકોડર"
 msgid "CDG video decoder"
 msgstr "CDG વિડિઓ ડિકોડર"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "ક્રિસ્ટલ HD હાર્ડવેર વિડિઓ ડિકોડર"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD ઉપશીર્ષક ડિકોડર"

@@ -10937,10 +10937,6 @@ msgstr "Datgodiwr Capsiynnau Caeedig"
 msgid "CDG video decoder"
 msgstr "Datgodiwr fideo CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Datgodiwr caledwedd fideo MU (HD) Crystal"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Datgodiwr isdeitlau CVD"

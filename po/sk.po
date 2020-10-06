@@ -11603,10 +11603,6 @@ msgstr "Dekodér pre uzatvorené kapitoly"
 msgid "CDG video decoder"
 msgstr "Video dekodér CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Hardvérový video dekodér Crystal HD"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Dekodér titulkov CVD"

@@ -11551,10 +11551,6 @@ msgstr "Closed Captions -purkaja"
 msgid "CDG video decoder"
 msgstr "CDG-videopurkaja"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Crystal HD -rautapurku videolle"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD-tekstityksen purkaja"

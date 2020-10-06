@@ -10816,10 +10816,6 @@ msgstr "Жасырын титр кодсыздандырғышы"
 msgid "CDG video decoder"
 msgstr "CDG бейнелік кодсыздандырғыш"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr ""
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD субтитр кодсыздандырғышы"

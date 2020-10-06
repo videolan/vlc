@@ -11613,10 +11613,6 @@ msgstr "Closed Captions-Decoder"
 msgid "CDG video decoder"
 msgstr "CDG-Videodecoder"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Crystal HD Hardware-Video-Dekodierer"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD-Untertiteldecoder"

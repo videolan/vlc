@@ -11761,10 +11761,6 @@ msgstr "Αποκωδικοποιητής κλεισμένων λεζαντών"
 msgid "CDG video decoder"
 msgstr "Αποκωδικοποιητής βίντεο CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Αποκωδικοποιητής βίντεο υλικού Crystal HD"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Αποκωδικοποιητής υπότιτλων CVD"

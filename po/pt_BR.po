@@ -11557,10 +11557,6 @@ msgstr "Decodificador de legenda oculta"
 msgid "CDG video decoder"
 msgstr "Decodificador de vídeo CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Decodificador de vídeo Crystal HD por hardware"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Decodificador de legenda de CVD"

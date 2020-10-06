@@ -11454,10 +11454,6 @@ msgstr "بند کیپشن ڈیکوڈر "
 msgid "CDG video decoder"
 msgstr "سی ڈی جی ویڈیو ڈیکوڈر "
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "کرسٹل ایچ ڈی ہارڈوِیر ویڈیو ڈیکوڈر "
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "سی وی ڈی سب ٹایٹل ڈیکوڈر "

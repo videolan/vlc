@@ -11794,10 +11794,6 @@ msgstr "Descodificador de títols tancats"
 msgid "CDG video decoder"
 msgstr "Descodificador de vídeo CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Descodificador de vídeo del maquinari Crystal HD "
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Descodificador de subtítols CVD"

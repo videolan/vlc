@@ -11601,10 +11601,6 @@ msgstr "Decodor de subtitluri pentru persoane cu dizabilități"
 msgid "CDG video decoder"
 msgstr "Decodor video CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Decodor video Crystal HD hardware"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Decodor de subtitlu CVD"

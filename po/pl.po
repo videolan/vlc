@@ -11492,10 +11492,6 @@ msgstr "Dekoder zamkniętych napisów"
 msgid "CDG video decoder"
 msgstr "Dekoder obrazu CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Sprzętowy dekoder wideo Crystal HD"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Dekoder napisów CVD"

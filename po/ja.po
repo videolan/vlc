@@ -11429,10 +11429,6 @@ msgstr "クローズドキャプションデコーダー"
 msgid "CDG video decoder"
 msgstr "CDGビデオデコーダー"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Crystal HDハードウェアビデオデコーダー"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD字幕デコーダー"

@@ -11365,10 +11365,6 @@ msgstr "बंद मथळे विसंकेतक"
 msgid "CDG video decoder"
 msgstr "सीडीजी ध्वनीचित्रफित विसंकेतक"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "सुस्पष्ट एचडी हार्डवेअर ध्वनीचित्रफित विसंकेतक"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "सीव्हीडी अनुवादपट्टी विसंकेतक"

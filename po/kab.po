@@ -11398,11 +11398,7 @@ msgstr "CC 608/708"
 #: modules/codec/cdg.c:88
 msgid "CDG video decoder"
 msgstr "Décodeur vidéo CDG"
-
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Décodeur vidéo matériel Crystal HD"
-
+Crystal HD
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Décodeur de sous-titres CVD"

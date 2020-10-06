@@ -11346,11 +11346,6 @@ msgstr "Vorbis აუდიო დეკოდერი"
 msgid "CDG video decoder"
 msgstr "PNG ვიდეო დეკოდერი"
 
-#: modules/codec/crystalhd.c:90
-#, fuzzy
-msgid "Crystal HD hardware video decoder"
-msgstr "Theora ვიდეო დეკოდერი"
-
 #: modules/codec/cvdsub.c:50
 #, fuzzy
 msgid "CVD subtitle decoder"

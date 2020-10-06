@@ -11031,10 +11031,6 @@ msgstr "Dekodér skrytých titulků"
 msgid "CDG video decoder"
 msgstr "Video dekodér CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Hardwarový dekodér videa Cristal HD"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Dekodér CVD titulků"

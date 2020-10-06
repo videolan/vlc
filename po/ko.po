@@ -11334,10 +11334,6 @@ msgstr "특수 자막 디코더"
 msgid "CDG video decoder"
 msgstr "CDG 비디오 디코더"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "크리스탈 HD 하드웨어 비디오 디코더"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD 자막 디코더"

@@ -10773,10 +10773,6 @@ msgstr "Closed Captions skjátextaafkóðari"
 msgid "CDG video decoder"
 msgstr "CDG myndmerkisafkóðari"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Crystal HD vélbúnaðarafkóðari myndmerkis"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Afkóðari fyrir CVD-skjátexta"

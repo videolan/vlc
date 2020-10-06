@@ -11531,10 +11531,6 @@ msgstr "Undertekster-decoder"
 msgid "CDG video decoder"
 msgstr "Dekoder til CDG-video"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Videodekoder til Crystal HD-udstyr"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Dekoder til CVD-undertekster"

@@ -11667,10 +11667,6 @@ msgstr "Itxi epigrafeen deskodetzailea"
 msgid "CDG video decoder"
 msgstr "CDG bideo-deskodetzailea"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Crystal HD hardware bidezko bideo-deskodetzailea"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD azpitituluen deskodetzailea"

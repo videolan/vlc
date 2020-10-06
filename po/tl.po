@@ -11011,11 +11011,6 @@ msgstr ""
 msgid "CDG video decoder"
 msgstr "_Makit-an"
 
-#: modules/codec/crystalhd.c:90
-#, fuzzy
-msgid "Crystal HD hardware video decoder"
-msgstr "_Makit-an"
-
 #: modules/codec/cvdsub.c:50
 #, fuzzy
 msgid "CVD subtitle decoder"

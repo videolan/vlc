@@ -11501,10 +11501,6 @@ msgstr "Dekoder zatvorenih natpisa"
 msgid "CDG video decoder"
 msgstr "Video koder CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Sklopovski video dekoder Crystal HD"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Dekoder podnaslova CVD"

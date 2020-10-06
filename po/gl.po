@@ -11611,10 +11611,6 @@ msgstr ""
 msgid "CDG video decoder"
 msgstr "Descodificador de vídeo CDG"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Descodificador de vídeo por hardware Crystal HD"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "Descodificador de subtítulos de CVD"

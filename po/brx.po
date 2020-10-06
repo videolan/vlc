@@ -11353,10 +11353,6 @@ msgstr "बन्द खालामखानाय केपसन डिक'�
 msgid "CDG video decoder"
 msgstr "CVD भिडिअ' डिक'डार"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "क्रिस्टाल HD हार्डवेयार भिडिअ' डिक'डार"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD दालाय-बिमुं डिक'डार"

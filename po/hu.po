@@ -11574,10 +11574,6 @@ msgstr "Filmfelirat-dekódoló"
 msgid "CDG video decoder"
 msgstr "CDG videodekódoló"
 
-#: modules/codec/crystalhd.c:90
-msgid "Crystal HD hardware video decoder"
-msgstr "Crystal HD hardveres videodekódoló"
-
 #: modules/codec/cvdsub.c:50
 msgid "CVD subtitle decoder"
 msgstr "CVD feliratdekódoló"
