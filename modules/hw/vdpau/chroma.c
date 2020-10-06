@@ -743,12 +743,22 @@ const struct vlc_video_context_operations vdpau_vctx_ops = {
     NULL,
 };
 
+static void OutputClose(filter_t *filter)
+{
+    vlc_vdp_mixer_t *sys = filter->p_sys;
+
+    Flush(filter);
+    vdp_video_mixer_destroy(sys->vdp, sys->mixer);
+    picture_pool_Release(sys->pool);
+    vlc_video_context_Release(filter->vctx_out);
+}
+
 static const struct vlc_filter_operations filter_output_opaque_ops = {
-    .filter_video = VideoRender, .flush = Flush,
+    .filter_video = VideoRender, .flush = Flush, .close = OutputClose,
 };
 
 static const struct vlc_filter_operations filter_output_ycbcr_ops = {
-    .filter_video = YCbCrRender, .flush = Flush,
+    .filter_video = YCbCrRender, .flush = Flush, .close = OutputClose,
 };
 
 static int OutputOpen(vlc_object_t *obj)
@@ -846,17 +856,6 @@ static int OutputOpen(vlc_object_t *obj)
     return VLC_SUCCESS;
 }
 
-static void OutputClose(vlc_object_t *obj)
-{
-    filter_t *filter = (filter_t *)obj;
-    vlc_vdp_mixer_t *sys = filter->p_sys;
-
-    Flush(filter);
-    vdp_video_mixer_destroy(sys->vdp, sys->mixer);
-    picture_pool_Release(sys->pool);
-    vlc_video_context_Release(filter->vctx_out);
-}
-
 typedef struct
 {
     VdpYCbCrFormat format;
@@ -945,7 +944,7 @@ vlc_module_begin()
     set_capability("video converter", 10)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callbacks(OutputOpen, OutputClose)
+    set_callback(OutputOpen)
 
     add_integer("vdpau-deinterlace",
                 VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
