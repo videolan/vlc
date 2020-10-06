@@ -711,7 +711,7 @@ fail:
         mmal_buffer_header_release(out_buf);
     if (p_pic != NULL)
         picture_Release(p_pic);
-    conv_flush(p_filter);
+    filter_Flush(p_filter);
     return NULL;
 }
 

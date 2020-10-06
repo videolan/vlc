@@ -588,7 +588,7 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
         case SPDIF_MORE_DATA:
             break;
         case SPDIF_ERROR:
-            Flush( p_filter );
+            filter_Flush( p_filter );
             break;
     }
 
