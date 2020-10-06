@@ -340,12 +340,6 @@ static void di_flush(filter_t *p_filter)
 }
 
 
-static void pass_flush(filter_t *p_filter)
-{
-    // Nothing to do
-    VLC_UNUSED(p_filter);
-}
-
 static picture_t * pass_deinterlace(filter_t * p_filter, picture_t * p_pic)
 {
     VLC_UNUSED(p_filter);
@@ -423,7 +417,7 @@ static const struct vlc_filter_operations filter_ops = {
 };
 
 static const struct vlc_filter_operations filter_pass_ops = {
-    .filter_video = pass_deinterlace, .flush = pass_flush,
+    .filter_video = pass_deinterlace,
 };
 
 static int OpenMmalDeinterlace(vlc_object_t *p_this)
