@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-25 23:05+0100\n"
+"PO-Revision-Date: 2020-10-06 23:10+0200\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2020\n"
 "Language-Team: German (https://www.transifex.com/yaron/teams/16553/de/)\n"
 "Language: de\n"
@@ -4111,7 +4111,7 @@ msgstr "Wählen Sie den Hotkey zur Verlangsamung der Wiedergabe."
 
 #: src/libvlc-module.c:1240
 msgid "Normal rate"
-msgstr "Normale Rate"
+msgstr "Normale Geschwindigkeit"
 
 #: src/libvlc-module.c:1241
 msgid "Select the hotkey to set the playback rate back to normal."
