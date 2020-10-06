@@ -156,12 +156,6 @@ static int Mouse( filter_t *p_filter,
                   vlc_mouse_t *p_mouse,
                   const vlc_mouse_t *p_old );
 
-/**
- * Stops and uninitializes the filter, and deallocates memory.
- * @param p_this The filter instance as vlc_object_t.
- */
-static void Close( vlc_object_t *p_this );
-
 /*****************************************************************************
  * Extra documentation
  *****************************************************************************/
@@ -313,7 +307,7 @@ vlc_module_begin ()
         change_integer_list( phosphor_dimmer_list, phosphor_dimmer_list_text )
         change_safe ()
     add_shortcut( "deinterlace" )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -479,11 +473,24 @@ int Mouse( filter_t *p_filter,
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * Close: clean up the filter
+ *****************************************************************************/
+/**
+ * Stops and uninitializes the filter, and deallocates memory.
+ * @param p_this The filter instance as vlc_object_t.
+ */
+static void Close( filter_t *p_filter )
+{
+    Flush( p_filter );
+    free( p_filter->p_sys );
+}
 
 static const struct vlc_filter_operations filter_ops = {
     .filter_video = Deinterlace,
     .flush = Flush,
     .video_mouse = Mouse,
+    .close = Close,
 };
 
 /*****************************************************************************
@@ -644,7 +651,7 @@ notsupp:
         ( fmt.i_chroma != p_filter->fmt_in.video.i_chroma ||
           fmt.i_height != p_filter->fmt_in.video.i_height ) )
     {
-        Close( VLC_OBJECT(p_filter) );
+        Close( p_filter );
         return VLC_EGENERIC;
     }
     p_filter->fmt_out.video = fmt;
@@ -654,16 +661,4 @@ notsupp:
     msg_Dbg( p_filter, "deinterlacing" );
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close: clean up the filter
- *****************************************************************************/
-
-void Close( vlc_object_t *p_this )
-{
-    filter_t *p_filter = (filter_t*)p_this;
-
-    Flush( p_filter );
-    free( p_filter->p_sys );
 }
