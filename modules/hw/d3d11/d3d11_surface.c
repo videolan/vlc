@@ -591,9 +591,22 @@ static void NV12_D3D11(filter_t *p_filter, picture_t *src, picture_t *dst)
     dst->i_planes = 0;
 }
 
-VIDEO_FILTER_WRAPPER (D3D11_NV12)
-VIDEO_FILTER_WRAPPER (D3D11_YUY2)
-VIDEO_FILTER_WRAPPER (D3D11_RGBA)
+static void D3D11CloseConverter( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+#if CAN_PROCESSOR
+    if (p_sys->procOutTexture)
+        ID3D11Texture2D_Release(p_sys->procOutTexture);
+    D3D11_ReleaseProcessor( &p_sys->d3d_proc );
+#endif
+    CopyCleanCache(&p_sys->cache);
+    if (p_sys->staging)
+        ID3D11Texture2D_Release(p_sys->staging);
+}
+
+VIDEO_FILTER_WRAPPER_CLOSE(D3D11_NV12, D3D11CloseConverter)
+VIDEO_FILTER_WRAPPER_CLOSE(D3D11_YUY2, D3D11CloseConverter)
+VIDEO_FILTER_WRAPPER_CLOSE(D3D11_RGBA, D3D11CloseConverter)
 
 static picture_t *AllocateCPUtoGPUTexture(filter_t *p_filter, filter_sys_t *p_sys)
 {
@@ -844,18 +857,4 @@ done:
         vlc_video_context_Release(p_filter->vctx_out);
     }
     return err;
-}
-
-void D3D11CloseConverter( vlc_object_t *obj )
-{
-    filter_t *p_filter = (filter_t *)obj;
-    filter_sys_t *p_sys = p_filter->p_sys;
-#if CAN_PROCESSOR
-    if (p_sys->procOutTexture)
-        ID3D11Texture2D_Release(p_sys->procOutTexture);
-    D3D11_ReleaseProcessor( &p_sys->d3d_proc );
-#endif
-    CopyCleanCache(&p_sys->cache);
-    if (p_sys->staging)
-        ID3D11Texture2D_Release(p_sys->staging);
 }
