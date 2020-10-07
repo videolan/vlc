@@ -28,11 +28,9 @@
 #ifdef __APPLE__
 # include <TargetConditionals.h>
 # if !TARGET_OS_IPHONE
-#  undef USE_OPENGL_ES2
 #  define MACOS_OPENGL
 #  include <OpenGL/gl.h>
 # else /* Force ESv2 on iOS */
-#  define USE_OPENGL_ES2
 #  include <OpenGLES/ES1/gl.h>
 #  include <OpenGLES/ES2/gl.h>
 #  include <OpenGLES/ES2/glext.h>
