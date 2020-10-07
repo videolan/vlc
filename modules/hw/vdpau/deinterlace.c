@@ -96,6 +96,12 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
     return src;
 }
 
+static void Flush(filter_t *filter)
+{
+    filter_sys_t *sys = filter->p_sys;
+    sys->last_pts = VLC_TICK_INVALID;
+}
+
 static void Close(filter_t *filter)
 {
     vlc_video_context_Release(filter->vctx_out);
@@ -103,6 +109,7 @@ static void Close(filter_t *filter)
 
 static const struct vlc_filter_operations filter_ops = {
     .filter_video = Deinterlace, .close = Close,
+    .flush = Flush,
 };
 
 static int Open(filter_t *filter)
