@@ -318,7 +318,7 @@ static void slice_output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf)
     if (buf->data != NULL && buf->length != 0)
     {
         // Got slice
-        picture_t *pic = sys->slice.pics.head;
+        picture_t *pic = vlc_picture_chain_PeekFront( &sys->slice.pics );
         const unsigned int scale_lines = sys->output->format->es->video.height;  // Expected lines of callback
 
         if (pic == NULL) {
@@ -366,7 +366,7 @@ static void slice_output_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf)
                 sys->slice.line = 0;
 
                 vlc_mutex_lock(&sys->lock);
-                pic_fifo_get(&sys->slice.pics);  // Remove head from Q
+                pic = pic_fifo_get(&sys->slice.pics);  // Remove head from Q
                 vlc_mutex_unlock(&sys->lock);
 
                 buf_to_pic_copy_props(pic, buf);
