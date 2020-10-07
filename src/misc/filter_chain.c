@@ -455,8 +455,7 @@ picture_t *filter_chain_VideoFilter( filter_chain_t *p_chain, picture_t *p_pic )
     {
         if( vlc_picture_chain_IsEmpty( &b->pending ) )
             continue;
-        p_pic = b->pending.front;
-        b->pending = picture_GetAndResetChain( p_pic );
+        p_pic = vlc_picture_chain_PopFront( &b->pending );
 
         p_pic = FilterChainVideoFilter( b->next, p_pic );
         if( p_pic )
