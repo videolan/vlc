@@ -117,6 +117,7 @@ typedef struct decoder_sys_t
     CFDictionaryRef             (*pf_copy_extradata)(decoder_t *);
     bool                        (*pf_fill_reorder_info)(decoder_t *, const block_t *,
                                                         frame_info_t *);
+
     /* !Codec specific callbacks */
 
     bool                        b_vt_feed;
@@ -135,7 +136,6 @@ typedef struct decoder_sys_t
     bool                        b_format_propagated;
 
     enum vtsession_status       vtsession_status;
-    unsigned                    i_restart_count;
 
     OSType                      i_cvpx_format;
     bool                        b_cvpx_format_forced;
@@ -1752,10 +1752,10 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
             case kVTVideoDecoderMalfunctionErr:
             case kVTInvalidSessionErr:
             case kVTVideoDecoderReferenceMissingErr:
+            case kVTVideoDecoderBadDataErr:
+            case -8969 /* codecBadDataErr */:
                 *p_vtsession_status = VTSESSION_STATUS_RESTART;
                 break;
-            case -8969 /* codecBadDataErr */:
-            case kVTVideoDecoderBadDataErr:
             default:
                 *p_vtsession_status = VTSESSION_STATUS_ABORT;
                 break;
@@ -1848,7 +1848,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     if (p_sys->vtsession_status == VTSESSION_STATUS_RESTART ||
         p_sys->vtsession_status == VTSESSION_STATUS_RESTART_CHROMA)
     {
-        bool do_restart;
+        bool do_restart = true;
         if (p_sys->vtsession_status == VTSESSION_STATUS_RESTART_CHROMA)
         {
             if (p_sys->i_cvpx_format == 0 && p_sys->b_cvpx_format_forced)
@@ -1862,10 +1862,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
                 p_sys->b_cvpx_format_forced = true;
                 do_restart = true;
             }
-        }
-        else
-        {
-            do_restart = p_sys->i_restart_count <= VT_RESTART_MAX;
         }
 
         if (do_restart)
@@ -1989,8 +1985,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     else
     {
         vlc_mutex_lock(&p_sys->lock);
-        if (vtsession_status == VTSESSION_STATUS_RESTART)
-            p_sys->i_restart_count++;
         p_sys->vtsession_status = vtsession_status;
         /* In case of abort, the decoder module will be reloaded next time
          * since we already modified the input block */
@@ -2149,11 +2143,7 @@ static void DecoderCallback(void *decompressionOutputRefCon,
     if (HandleVTStatus(p_dec, status, &vtsession_status) != VLC_SUCCESS)
     {
         if (p_sys->vtsession_status != VTSESSION_STATUS_ABORT)
-        {
             p_sys->vtsession_status = vtsession_status;
-            if (vtsession_status == VTSESSION_STATUS_RESTART)
-                p_sys->i_restart_count++;
-        }
         goto end;
     }
     if (unlikely(!imageBuffer))
@@ -2232,8 +2222,6 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             picture_Release(p_pic);
             goto end;
         }
-
-        p_sys->i_restart_count = 0;
 
         OnDecodedFrame( p_dec, p_info );
         p_info = NULL;
