@@ -705,7 +705,6 @@ static int vd_reset_pictures(vout_display_t *vd, video_format_t *fmt)
 
 static int vd_control(vout_display_t *vd, int query)
 {
-    vout_display_sys_t * const sys = vd->sys;
     int ret = VLC_EGENERIC;
 
     switch (query) {
