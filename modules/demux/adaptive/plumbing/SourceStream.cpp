@@ -312,10 +312,9 @@ std::string BufferedChunksSourceStream::getContentType()
     return source->getContentType();
 }
 
-void BufferedChunksSourceStream::fillByteStream(size_t sz)
+void BufferedChunksSourceStream::fillByteStream(size_t level)
 {
-    sz = std::min(sz, (size_t)MAX_BACKEND);
-    while(!b_eof && sz > block_BytestreamRemaining(&bs))
+    while(!b_eof && level > block_BytestreamRemaining(&bs))
     {
         block_t *p_block = source->readNextBlock();
         b_eof = !p_block;
