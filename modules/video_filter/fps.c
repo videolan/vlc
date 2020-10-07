@@ -61,17 +61,24 @@ static const char *const ppsz_filter_options[] = {
 typedef struct
 {
     date_t          next_output_pts; /**< output calculated PTS */
-    picture_t       *p_previous_pic;
+    picture_t       *p_previous_pic; /**< kept source picture used to produce filter output */
     vlc_tick_t      i_output_frame_interval;
 } filter_sys_t;
+
+static void SetOutputDate(filter_sys_t *p_sys, picture_t *pic)
+{
+    pic->date = date_Get( &p_sys->next_output_pts );
+    date_Increment( &p_sys->next_output_pts, 1 );
+}
 
 static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
+    const vlc_tick_t src_date = p_picture->date;
     /* If input picture doesn't have actual valid timestamp,
         we don't really have currently a way to know what else
         to do with it other than drop it for now*/
-    if( unlikely( p_picture->date == VLC_TICK_INVALID) )
+    if( unlikely( src_date == VLC_TICK_INVALID) )
     {
         msg_Dbg( p_filter, "skipping non-dated picture");
         picture_Release( p_picture );
@@ -84,20 +91,20 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
     /* First time we get some valid timestamp, we'll take it as base for output
         later on we retake new timestamp if it has jumped too much */
     if( unlikely( ( date_Get( &p_sys->next_output_pts ) == VLC_TICK_INVALID ) ||
-                   ( p_picture->date > ( date_Get( &p_sys->next_output_pts ) + p_sys->i_output_frame_interval ) )
+                   ( src_date > ( date_Get( &p_sys->next_output_pts ) + p_sys->i_output_frame_interval ) )
                 ) )
     {
         msg_Dbg( p_filter, "Resetting timestamps" );
-        date_Set( &p_sys->next_output_pts, p_picture->date );
+        date_Set( &p_sys->next_output_pts, src_date );
         if( p_sys->p_previous_pic )
             picture_Release( p_sys->p_previous_pic );
         p_sys->p_previous_pic = picture_Hold( p_picture );
-        date_Increment( &p_sys->next_output_pts, 1 );
+        SetOutputDate( p_sys, p_picture );
         return p_picture;
     }
 
     /* Check if we can skip input as better should follow */
-    if( p_picture->date <
+    if( src_date <
         ( date_Get( &p_sys->next_output_pts ) - p_sys->i_output_frame_interval ) )
     {
         if( p_sys->p_previous_pic )
@@ -106,23 +113,21 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
         return NULL;
     }
 
-    p_sys->p_previous_pic->date = date_Get( &p_sys->next_output_pts );
-    date_Increment( &p_sys->next_output_pts, 1 );
+    SetOutputDate( p_sys, p_sys->p_previous_pic );
 
     picture_t *last_pic = p_sys->p_previous_pic;
     /* Duplicating pictures are not that effective and framerate increase
         should be avoided, it's only here as filter should work in that direction too*/
-    while( unlikely( (date_Get( &p_sys->next_output_pts ) + p_sys->i_output_frame_interval ) < p_picture->date ) )
+    while( unlikely( (date_Get( &p_sys->next_output_pts ) + p_sys->i_output_frame_interval ) < src_date ) )
     {
         picture_t *p_tmp = NULL;
         p_tmp = picture_NewFromFormat( &p_filter->fmt_out.video );
 
         picture_Copy( p_tmp, p_sys->p_previous_pic);
-        p_tmp->date = date_Get( &p_sys->next_output_pts );
+        SetOutputDate( p_sys, p_tmp );
 
         vlc_picture_chain_AppendChain( last_pic, p_tmp );
         last_pic = p_tmp;
-        date_Increment( &p_sys->next_output_pts, 1 );
     }
 
     last_pic = p_sys->p_previous_pic;
