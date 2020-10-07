@@ -255,7 +255,7 @@ static void aout_DecSilence (audio_output_t *aout, vlc_tick_t length, vlc_tick_t
     if (unlikely(block == NULL))
         return; /* uho! */
 
-    msg_Dbg (aout, "inserting %zu zeroes / %ld ms", frames, MS_FROM_VLC_TICK(length));
+    msg_Dbg (aout, "inserting %zu zeroes / %"PRId64"ms", frames, MS_FROM_VLC_TICK(length));
     memset (block->p_buffer, 0, block->i_buffer);
     block->i_nb_samples = frames;
     block->i_pts = pts;
