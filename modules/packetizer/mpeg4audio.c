@@ -560,7 +560,7 @@ static int Mpeg4GASpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
 
 static int Mpeg4ELDSpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
 {
-    p_cfg->i_frame_length = bs_read1(s) ? 960 : 480;
+    p_cfg->i_frame_length = bs_read1(s) ? 480 : 512;
 
     /* ELDSpecificConfig Table 4.180 */
 
