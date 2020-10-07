@@ -143,18 +143,6 @@ Widgets.NavigableFocusScope {
             Item {
                 Layout.fillWidth: true
             }
-
-            Loader {
-                Layout.alignment: Qt.AlignRight | Qt.AlignTop
-                height: VLCStyle.icon_normal
-                active: mainInterface.clientSideDecoration
-                enabled: mainInterface.clientSideDecoration
-                source: "qrc:///widgets/CSDWindowButtonSet.qml"
-                onLoaded: {
-                    item.color = VLCStyle.colors.playerFg
-                    item.hoverColor = VLCStyle.colors.windowCSDButtonDarkBg
-                }
-            }
         }
     }
 }

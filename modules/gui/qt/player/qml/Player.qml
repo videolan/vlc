@@ -73,6 +73,132 @@ Widgets.NavigableFocusScope {
         }
     }
 
+    Widgets.DrawerExt {
+        id: csdGroup
+
+        z: 4
+        anchors.right: parent.right
+        anchors.top: parent.top
+        state: topcontrolView.state
+        edge: Widgets.DrawerExt.Edges.Top
+        width: contentItem.width
+        focus: true
+
+        component: Column {
+            spacing: VLCStyle.margin_xxsmall
+            focus: true
+
+            onActiveFocusChanged: if (activeFocus) menu_selector.forceActiveFocus()
+
+            Loader {
+                focus: false
+                anchors.right: parent.right
+                height: VLCStyle.icon_normal
+                active: mainInterface.clientSideDecoration
+                enabled: mainInterface.clientSideDecoration
+                visible: mainInterface.clientSideDecoration
+                source: "qrc:///widgets/CSDWindowButtonSet.qml"
+                onLoaded: {
+                    item.color = VLCStyle.colors.playerFg
+                    item.hoverColor = VLCStyle.colors.windowCSDButtonDarkBg
+                }
+            }
+
+            Row {
+                anchors.right: parent.right
+                focus: true
+                KeyNavigation.down: playlistpopup.state === "visible" ? playlistpopup : controlBarView
+
+                Widgets.IconToolButton {
+                    id: menu_selector
+
+                    focus: true
+                    size: VLCStyle.banner_icon_size
+                    iconText: VLCIcons.ellipsis
+                    text: i18n.qtr("Menu")
+                    color: VLCStyle.colors.playerFg
+                    property bool acceptFocus: true
+
+                    onClicked: contextMenu.popup(this.mapToGlobal(0, height))
+
+                    KeyNavigation.left: topcontrolView
+                    KeyNavigation.right: playlistBtn
+
+                    QmlGlobalMenu {
+                        id: contextMenu
+                        ctx: mainctx
+                    }
+                }
+
+                Widgets.IconToolButton {
+                    id: playlistBtn
+
+                    objectName: PlayerControlBarModel.PLAYLIST_BUTTON
+                    size: VLCStyle.banner_icon_size
+                    iconText: VLCIcons.playlist
+                    text: i18n.qtr("Playlist")
+                    color: VLCStyle.colors.playerFg
+                    focus: false
+                    onClicked:  {
+                        if (mainInterface.playlistDocked)
+                            playlistpopup.showPlaylist = !playlistpopup.showPlaylist
+                        else
+                            mainInterface.playlistVisible = !mainInterface.playlistVisible
+                    }
+                    property bool acceptFocus: true
+
+                    KeyNavigation.left: menu_selector
+                }
+            }
+        }
+    }
+
+    Widgets.DrawerExt {
+        id: playlistpopup
+
+        property bool showPlaylist: false
+        property var previousFocus: undefined
+
+        z: 2
+        anchors {
+            top: parent.top
+            right: parent.right
+            bottom: parent.bottom
+            bottomMargin: parent.height - rootPlayer.positionSliderY
+        }
+        focus: false
+        edge: Widgets.DrawerExt.Edges.Right
+        state: showPlaylist && mainInterface.playlistDocked ? "visible" : "hidden"
+        component: Rectangle {
+            color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
+            width: rootPlayer.width/4
+            height: playlistpopup.height
+
+            PL.PlaylistListView {
+                id: playlistView
+                focus: true
+                anchors.fill: parent
+
+                forceDark: true
+                navigationParent: rootPlayer
+                navigationUpItem: csdGroup
+                navigationDownItem: controlBarView
+                navigationLeft: function() {
+                    playlistpopup.showPlaylist = false
+                    controlBarView.forceActiveFocus()
+                }
+                navigationCancel: function() {
+                    playlistpopup.showPlaylist = false
+                    controlBarView.forceActiveFocus()
+                }
+            }
+        }
+        onStateChanged: {
+            if (state === "hidden")
+                toolbarAutoHide.restart()
+        }
+    }
+
     //property alias centralLayout: mainLayout.centralLayout
     ColumnLayout {
         id: mainLayout
@@ -111,18 +237,11 @@ Widgets.NavigableFocusScope {
                     }
 
                     lockAutoHide: playlistpopup.state === "visible"
-
-                    onTogglePlaylistVisiblity:  {
-                        if (mainInterface.playlistDocked)
-                            playlistpopup.showPlaylist = !playlistpopup.showPlaylist
-                        else
-                            mainInterface.playlistVisible = !mainInterface.playlistVisible
-                    }
-
                     title: mainPlaylistController.currentItem.title
 
                     navigationParent: rootPlayer
                     navigationDownItem: playlistpopup.showPlaylist ? playlistpopup : controlBarView
+                    navigationRightItem: csdGroup
                 }
 
                 ResumeDialog {
@@ -227,50 +346,7 @@ Widgets.NavigableFocusScope {
                 }
             }
 
-            Widgets.DrawerExt {
-                id: playlistpopup
 
-                z: 2
-
-                anchors {
-                    top: centralLayout.top
-                    right: parent.right
-                    bottom: centralLayout.bottom
-                }
-                property bool showPlaylist: false
-                property var previousFocus: undefined
-                focus: false
-                edge: Widgets.DrawerExt.Edges.Right
-                state: showPlaylist && mainInterface.playlistDocked ? "visible" : "hidden"
-                component: Rectangle {
-                    color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
-                    width: rootPlayer.width/4
-                    height: playlistpopup.height
-
-                    PL.PlaylistListView {
-                        id: playlistView
-                        focus: true
-                        anchors.fill: parent
-
-                        forceDark: true
-                        navigationParent: rootPlayer
-                        navigationUpItem: topcontrolView
-                        navigationDownItem: controlBarView
-                        navigationLeft: function() {
-                            playlistpopup.showPlaylist = false
-                            controlBarView.forceActiveFocus()
-                        }
-                        navigationCancel: function() {
-                            playlistpopup.showPlaylist = false
-                            controlBarView.forceActiveFocus()
-                        }
-                    }
-                }
-                onStateChanged: {
-                    if (state === "hidden")
-                        toolbarAutoHide.restart()
-                }
-            }
         }
 
         Widgets.DrawerExt {
