@@ -60,7 +60,9 @@ Widgets.NavigableFocusScope {
         sourcesBanner.contentModel = stackView.currentItem.contentModel
         sourcesBanner.extraLocalActions = stackView.currentItem.extraLocalActions
         // Restore sourcesBanner state
-        sourcesBanner.selectedIndex = pageModel.findIndex(function (e) {
+        sourcesBanner.selectedIndex = pageModel.filter(function (e) {
+            return e.listed;
+        }).findIndex(function (e) {
             return e.name === root.view
         })
         if (stackView.currentItem.pageModel !== undefined)
