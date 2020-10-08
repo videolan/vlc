@@ -1401,6 +1401,9 @@ static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
     decoder_t *dec = ctx->opaque;
     decoder_sys_t *sys = dec->p_sys;
 
+    if (sys->b_dr_failure)
+        return -1;
+
     if (ctx->pix_fmt == AV_PIX_FMT_PAL8)
         return -1;
 
@@ -1422,16 +1425,14 @@ static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
     {
         if (pic->p[i].i_pitch % aligns[i])
         {
-            if (sys->b_dr_failure == false)
-                msg_Warn(dec, "plane %d: pitch not aligned (%d%%%d): disabling direct rendering",
-                         i, pic->p[i].i_pitch, aligns[i]);
+            msg_Warn(dec, "plane %d: pitch not aligned (%d%%%d): disabling direct rendering",
+                     i, pic->p[i].i_pitch, aligns[i]);
             sys->b_dr_failure = true;
             goto error;
         }
         if (((uintptr_t)pic->p[i].p_pixels) % aligns[i])
         {
-            if (sys->b_dr_failure == false)
-                msg_Warn(dec, "plane %d not aligned: disabling direct rendering", i);
+            msg_Warn(dec, "plane %d not aligned: disabling direct rendering", i);
             sys->b_dr_failure = true;
             goto error;
         }
