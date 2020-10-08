@@ -354,7 +354,7 @@ VLC_API void filter_DeleteBlend( vlc_blender_t * );
  *
  * Currently used by the chroma video filters
  */
-#define VIDEO_FILTER_WRAPPER_CLOSE( name, close_cb )                    \
+#define VIDEO_FILTER_WRAPPER_CLOSE_FILT( name, close_cb )               \
     static picture_t *name ## _Filter ( filter_t *p_filter,             \
                                         picture_t *p_pic )              \
     {                                                                   \
@@ -371,7 +371,26 @@ VLC_API void filter_DeleteBlend( vlc_blender_t * );
         .filter_video = name ## _Filter, .close = close_cb,             \
     };
 
-#define VIDEO_FILTER_WRAPPER( name )   VIDEO_FILTER_WRAPPER_CLOSE( name, NULL )
+#define VIDEO_FILTER_WRAPPER_CLOSE( name, close_cb )                    \
+    static void name (filter_t *, picture_t *, picture_t *);            \
+    static void close_cb (filter_t *);                                  \
+    VIDEO_FILTER_WRAPPER_CLOSE_FILT( name, close_cb )
+
+#define VIDEO_FILTER_WRAPPER( name )                                    \
+    static void name (filter_t *, picture_t *, picture_t *);            \
+    VIDEO_FILTER_WRAPPER_CLOSE_FILT( name, NULL )
+
+/**
+ * Wrappers to use when the filter function is not a static function
+ */
+#define VIDEO_FILTER_WRAPPER_EXT( name )                                \
+    void name (filter_t *, picture_t *, picture_t *);                   \
+    VIDEO_FILTER_WRAPPER_CLOSE_FILT( name, NULL )
+
+#define VIDEO_FILTER_WRAPPER_CLOSE_EXT( name, close_cb )                \
+    void name (filter_t *, picture_t *, picture_t *);                   \
+    static void close_cb (filter_t *);                                  \
+    VIDEO_FILTER_WRAPPER_CLOSE_FILT( name, close_cb )
 
 /**
  * Filter chain management API
