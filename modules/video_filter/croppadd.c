@@ -33,14 +33,14 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
-#include "filter_picture.h"
 
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
 static int  OpenFilter ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
+VIDEO_FILTER_WRAPPER(Filter)
 
 #define CROPTOP_TEXT N_( "Pixels to crop from top" )
 #define CROPTOP_LONGTEXT N_( \
@@ -121,11 +121,6 @@ typedef struct
     int i_paddright;
 } filter_sys_t;
 
-static const struct vlc_filter_operations filter_ops =
-{
-    .filter_video = Filter,
-};
-
 /*****************************************************************************
  * OpenFilter: probe the filter and return score
  *****************************************************************************/
@@ -189,7 +184,7 @@ static int OpenFilter( vlc_object_t *p_this )
         - p_sys->i_cropleft - p_sys->i_cropright
         + p_sys->i_paddleft + p_sys->i_paddright;
 
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     msg_Dbg( p_filter, "Crop: Top: %d, Bottom: %d, Left: %d, Right: %d",
              p_sys->i_croptop, p_sys->i_cropbottom, p_sys->i_cropleft,
@@ -209,24 +204,13 @@ static int OpenFilter( vlc_object_t *p_this )
 /****************************************************************************
  * Filter: the whole thing
  ****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    picture_t *p_outpic;
     int i_width, i_height, i_xcrop, i_ycrop,
         i_outwidth, i_outheight, i_xpadd, i_ypadd;
 
     const int p_padd_color[] = { 0x00, 0x80, 0x80, 0xff };
-
-    if( !p_pic ) return NULL;
-
-    /* Request output picture */
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     for( int i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     /* p_pic and p_outpic have the same chroma/number of planes but that's
@@ -302,6 +286,4 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         memset( p_out, i_padd_color,
                  ( i_outheight - i_ypadd - i_height ) * p_outplane->i_pitch );
     }
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }

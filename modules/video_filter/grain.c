@@ -42,6 +42,8 @@
  *****************************************************************************/
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
+static void Filter(filter_t *filter, picture_t *src, picture_t *dst);
+VIDEO_FILTER_WRAPPER( Filter )
 
 #define BANK_SIZE (64)
 
@@ -249,15 +251,9 @@ static void PlaneFilter(filter_t *filter,
         sys->emms();
 }
 
-static picture_t *Filter(filter_t *filter, picture_t *src)
+static void Filter(filter_t *filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = filter->p_sys;
-
-    picture_t *dst = filter_NewPicture(filter);
-    if (!dst) {
-        picture_Release(src);
-        return NULL;
-    }
 
     vlc_mutex_lock(&sys->cfg.lock);
     const double variance = VLC_CLIP(sys->cfg.variance, VARIANCE_MIN, VARIANCE_MAX);
@@ -283,10 +279,6 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
             plane_CopyPixels(dstp, srcp);
         }
     }
-
-    picture_CopyProperties(dst, src);
-    picture_Release(src);
-    return dst;
 }
 
 /**
@@ -378,11 +370,6 @@ static int Callback(vlc_object_t *object, char const *cmd,
     return VLC_SUCCESS;
 }
 
-static const struct vlc_filter_operations filter_ops =
-{
-    .filter_video = Filter,
-};
-
 static int Open(vlc_object_t *object)
 {
     filter_t *filter = (filter_t *)object;
@@ -425,7 +412,7 @@ static int Open(vlc_object_t *object)
     var_AddCallback(filter, CFG_PREFIX "variance", Callback, NULL);
 
     filter->p_sys = sys;
-    filter->ops   = &filter_ops;
+    filter->ops   = &Filter_ops;
     return VLC_SUCCESS;
 }
 

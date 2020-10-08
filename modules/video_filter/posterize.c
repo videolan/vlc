@@ -43,12 +43,13 @@
 static int  Create      ( vlc_object_t * );
 static void Destroy     ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
 static void PlanarYUVPosterize( picture_t *, picture_t *, int);
 static void PackedYUVPosterize( picture_t *, picture_t *, int);
 static void RVPosterize( picture_t *, picture_t *, bool, int );
 static void YuvPosterization( uint8_t *, uint8_t *, uint8_t *, uint8_t *,
                     uint8_t, uint8_t, uint8_t, uint8_t, int );
+VIDEO_FILTER_WRAPPER( Filter )
 
 static const char *const ppsz_filter_options[] = {
     "level", NULL
@@ -134,11 +135,7 @@ static int Create( vlc_object_t *p_this )
 
     var_AddCallback( p_filter, CFG_PREFIX "level", FilterCallback, p_sys );
 
-    static const struct vlc_filter_operations filter_ops =
-    {
-        .filter_video = Filter,
-    };
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     return VLC_SUCCESS;
 }
@@ -164,22 +161,10 @@ static void Destroy( vlc_object_t *p_this )
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
-
-    if( !p_pic ) return NULL;
-
     filter_sys_t *p_sys = p_filter->p_sys;
     int level = atomic_load( &p_sys->i_level );
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        msg_Warn( p_filter, "can't get output picture" );
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     switch( p_pic->format.i_chroma )
     {
@@ -198,8 +183,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         default:
             vlc_assert_unreachable();
     }
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************

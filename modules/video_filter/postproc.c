@@ -40,8 +40,6 @@
 #include <vlc_picture.h>
 #include <vlc_cpu.h>
 
-#include "filter_picture.h"
-
 #ifdef HAVE_POSTPROC_POSTPROCESS_H
 #   include <postproc/postprocess.h>
 #else
@@ -58,7 +56,8 @@
 static int OpenPostproc( vlc_object_t * );
 static void ClosePostproc( vlc_object_t * );
 
-static picture_t *PostprocPict( filter_t *, picture_t * );
+static void PostprocPict( filter_t *, picture_t *, picture_t * );
+VIDEO_FILTER_WRAPPER( PostprocPict )
 
 static int PPQCallback( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
@@ -252,11 +251,7 @@ static int OpenPostproc( vlc_object_t *p_this )
     var_AddCallback( p_filter, FILTER_PREFIX "q", PPQCallback, NULL );
     var_AddCallback( p_filter, FILTER_PREFIX "name", PPNameCallback, NULL );
 
-    static const struct vlc_filter_operations filter_ops =
-    {
-        .filter_video = PostprocPict,
-    };
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &PostprocPict_ops;
 
     msg_Warn( p_filter, "Quantification table was not set by video decoder. "
                         "Postprocessing won't look good." );
@@ -284,16 +279,9 @@ static void ClosePostproc( vlc_object_t *p_this )
 /*****************************************************************************
  * PostprocPict
  *****************************************************************************/
-static picture_t *PostprocPict( filter_t *p_filter, picture_t *p_pic )
+static void PostprocPict( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    picture_t *p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     /* Lock to prevent issues if pp_mode is changed */
     vlc_mutex_lock( &p_sys->lock );
@@ -322,8 +310,6 @@ static picture_t *PostprocPict( filter_t *p_filter, picture_t *p_pic )
     else
         picture_CopyPixels( p_outpic, p_pic );
     vlc_mutex_unlock( &p_sys->lock );
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************

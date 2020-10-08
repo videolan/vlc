@@ -40,13 +40,14 @@
  * Local prototypes
  *****************************************************************************/
 static int GetLuminanceAvg( picture_t * p_pic );
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
 static int AntiFlickerCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *p_data );
 
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
+VIDEO_FILTER_WRAPPER( Filter )
 
 #define WINDOW_TEXT N_("Window size")
 #define WINDOW_LONGTEXT N_("Number of frames (0 to 100)")
@@ -94,11 +95,6 @@ typedef struct
     uint8_t *p_old_data;
 } filter_sys_t;
 
-static const struct vlc_filter_operations filter_ops =
-{
-    .filter_video = Filter,
-};
-
 /*****************************************************************************
  * Create: allocates Distort video thread output method
  *****************************************************************************
@@ -126,7 +122,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_filter->p_sys = p_sys;
 
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     /* Initialize the arguments */
     atomic_init( &p_sys->i_window_size,
@@ -207,16 +203,8 @@ static int GetLuminanceAvg( picture_t *p_pic )
  * The function uses moving average of past frames to adjust the luminance
  * of current frame also applies temporaral smoothening if enabled.
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    if( !p_pic ) return NULL;
-
-    picture_t *p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     /****************** Get variables *************************/
 
@@ -295,7 +283,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     if (scene_changed || i_softening == 0)
     {
-       return CopyInfoAndRelease( p_outpic, p_pic );
+       return;
     }
 
     /******* Temporal softening phase. Adapted from code by Steven Don ******/
@@ -325,8 +313,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 p_yplane_out_old[i_line*i_video_width+i_col];
         }
     }
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************

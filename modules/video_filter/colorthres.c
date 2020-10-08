@@ -45,8 +45,9 @@
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
 static picture_t *FilterPacked( filter_t *, picture_t * );
+VIDEO_FILTER_WRAPPER( Filter )
 
 /*****************************************************************************
  * Module descriptor
@@ -102,11 +103,6 @@ typedef struct
     atomic_int i_color;
 } filter_sys_t;
 
-static const struct vlc_filter_operations planar_filter_ops =
-{
-    .filter_video = Filter,
-};
-
 static const struct vlc_filter_operations packed_filter_ops =
 {
     .filter_video = FilterPacked,
@@ -125,7 +121,7 @@ static int Create( vlc_object_t *p_this )
     switch( p_filter->fmt_in.video.i_chroma )
     {
         CASE_PLANAR_YUV
-            p_filter->ops = &planar_filter_ops;
+            p_filter->ops = &Filter_ops;
             break;
 
         CASE_PACKED_YUV_422
@@ -214,22 +210,12 @@ static bool IsSimilar( int u, int v,
  * waits until it is displayed and switch the two rendering buffers, preparing
  * next frame.
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
     int i_simthres = atomic_load( &p_sys->i_simthres );
     int i_satthres = atomic_load( &p_sys->i_satthres );
     int i_color = atomic_load( &p_sys->i_color );
-
-    if( !p_pic ) return NULL;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     /* Copy the Y plane */
     plane_CopyPixels( &p_outpic->p[Y_PLANE], &p_pic->p[Y_PLANE] );
@@ -266,8 +252,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             p_src_v++;
         }
     }
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )

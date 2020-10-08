@@ -98,8 +98,9 @@ vlc_module_end()
 #include <stdalign.h>
 #include "gradfun.h"
 
-static picture_t *Filter(filter_t *, picture_t *);
+static void Filter(filter_t *, picture_t *, picture_t *);
 static int Callback(vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void *);
+VIDEO_FILTER_WRAPPER( Filter )
 
 typedef struct
 {
@@ -109,11 +110,6 @@ typedef struct
     const vlc_chroma_description_t *chroma;
     struct vf_priv_s cfg;
 } filter_sys_t;
-
-static const struct vlc_filter_operations filter_ops =
-{
-    .filter_video = Filter,
-};
 
 static int Open(vlc_object_t *object)
 {
@@ -162,7 +158,7 @@ static int Open(vlc_object_t *object)
         cfg->filter_line = filter_line_c;
 
     filter->p_sys = sys;
-    filter->ops   = &filter_ops;
+    filter->ops   = &Filter_ops;
     return VLC_SUCCESS;
 }
 
@@ -177,15 +173,9 @@ static void Close(vlc_object_t *object)
     free(sys);
 }
 
-static picture_t *Filter(filter_t *filter, picture_t *src)
+static void Filter(filter_t *filter, picture_t *src, picture_t *dst)
 {
     filter_sys_t *sys = filter->p_sys;
-
-    picture_t *dst = filter_NewPicture(filter);
-    if (!dst) {
-        picture_Release(src);
-        return NULL;
-    }
 
     vlc_mutex_lock(&sys->lock);
     float strength = VLC_CLIP(sys->strength, STRENGTH_MIN, STRENGTH_MAX);
@@ -219,10 +209,6 @@ static picture_t *Filter(filter_t *filter, picture_t *src)
             plane_CopyPixels(dstp, srcp);
         }
     }
-
-    picture_CopyProperties(dst, src);
-    picture_Release(src);
-    return dst;
 }
 
 static int Callback(vlc_object_t *object, char const *cmd,

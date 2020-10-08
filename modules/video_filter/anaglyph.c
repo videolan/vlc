@@ -31,7 +31,7 @@
 #include "filter_picture.h"
 
 static int Create(vlc_object_t *);
-static picture_t *Filter(filter_t *, picture_t *);
+static void Filter(filter_t *, picture_t *, picture_t *);
 static void combine_side_by_side_yuv420(picture_t *, picture_t *, int, int);
 
 #define SCHEME_TEXT N_("Color scheme")
@@ -85,11 +85,7 @@ typedef struct
     int left, right;
 } filter_sys_t;
 
-static const struct vlc_filter_operations filter_ops =
-{
-    .filter_video = &Filter,
-};
-
+VIDEO_FILTER_WRAPPER(Filter)
 
 static int Create(vlc_object_t *p_this)
 {
@@ -160,23 +156,13 @@ static int Create(vlc_object_t *p_this)
             break;
     }
 
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
     return VLC_SUCCESS;
 }
 
-static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
+static void Filter(filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    if (!p_pic)
-        return NULL;
-
-    picture_t *p_outpic = filter_NewPicture(p_filter);
-    if (!p_outpic)
-    {
-        picture_Release(p_pic);
-        return NULL;
-    }
 
     switch (p_pic->format.i_chroma)
     {
@@ -188,13 +174,8 @@ static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)
             break;
 
         default:
-            msg_Warn(p_filter, "Unsupported input chroma (%4.4s)",
-                     (char*)&(p_pic->format.i_chroma));
-            picture_Release(p_pic);
-            return NULL;
+            vlc_assert_unreachable();
     }
-
-    return CopyInfoAndRelease(p_outpic, p_pic);
 }
 
 

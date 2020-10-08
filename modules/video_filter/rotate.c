@@ -45,8 +45,9 @@
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
 static picture_t *FilterPacked( filter_t *, picture_t * );
+VIDEO_FILTER_WRAPPER( Filter )
 
 static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
@@ -118,11 +119,6 @@ static void fetch_trigo( filter_sys_t *sys, int *i_sin, int *i_cos )
     *i_cos = sincos.cos;
 }
 
-static const struct vlc_filter_operations planar_filter_ops =
-{
-    .filter_video = Filter,
-};
-
 static const struct vlc_filter_operations packed_filter_ops =
 {
     .filter_video = FilterPacked,
@@ -145,7 +141,7 @@ static int Create( vlc_object_t *p_this )
     switch( p_filter->fmt_in.video.i_chroma )
     {
         CASE_PLANAR_YUV
-            p_filter->ops = &planar_filter_ops;
+            p_filter->ops = &Filter_ops;
             break;
 
         CASE_PACKED_YUV_422
@@ -210,19 +206,9 @@ static void Destroy( vlc_object_t *p_this )
 /*****************************************************************************
  *
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    if( !p_pic ) return NULL;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     if( p_sys->p_motion != NULL )
     {
@@ -331,8 +317,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             i_col_orig0 += i_col_next;
         }
     }
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************

@@ -42,9 +42,10 @@
 static int  Create      ( vlc_object_t * );
 static void Destroy     ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
 static int ExtractCallback( vlc_object_t *, char const *,
                             vlc_value_t, vlc_value_t, void * );
+VIDEO_FILTER_WRAPPER( Filter )
 
 static void make_projection_matrix( filter_t *, int color, int *matrix );
 static void get_custom_from_yuv( picture_t *, picture_t *, int const, int const, int const, int const * );
@@ -88,11 +89,6 @@ typedef struct
     int *projection_matrix;
     uint32_t i_color;
 } filter_sys_t;
-
-static const struct vlc_filter_operations filter_ops =
-{
-    .filter_video = Filter,
-};
 
 /*****************************************************************************
  * Create
@@ -147,7 +143,7 @@ static int Create( vlc_object_t *p_this )
     var_AddCallback( p_filter, FILTER_PREFIX "component",
                      ExtractCallback, p_sys );
 
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     return VLC_SUCCESS;
 }
@@ -169,19 +165,9 @@ static void Destroy( vlc_object_t *p_this )
 /*****************************************************************************
  * Render
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    if( !p_pic ) return NULL;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     vlc_mutex_lock( &p_sys->lock );
     switch( p_pic->format.i_chroma )
@@ -201,15 +187,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             break;
 
     default:
-        vlc_mutex_unlock( &p_sys->lock );
-        msg_Warn( p_filter, "Unsupported input chroma (%4.4s)",
-                  (char*)&(p_pic->format.i_chroma) );
-        picture_Release( p_pic );
-        return NULL;
+        vlc_assert_unreachable();
     }
     vlc_mutex_unlock( &p_sys->lock );
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 #define U8 128

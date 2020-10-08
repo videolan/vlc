@@ -32,14 +32,14 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
-#include "filter_picture.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Create      ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
+VIDEO_FILTER_WRAPPER(Filter)
 
 /*****************************************************************************
  * Module descriptor
@@ -75,11 +75,7 @@ static int Create( vlc_object_t *p_this )
      || p_chroma->pixel_size * 8 != p_chroma->pixel_bits )
         return VLC_EGENERIC;
 
-    static const struct vlc_filter_operations filter_ops =
-    {
-        .filter_video = Filter,
-    };
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
     return VLC_SUCCESS;
 }
 
@@ -90,20 +86,10 @@ static int Create( vlc_object_t *p_this )
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
+    VLC_UNUSED(p_filter);
     int i_planes;
-
-    if( !p_pic ) return NULL;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        msg_Warn( p_filter, "can't get output picture" );
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     if( p_pic->format.i_chroma == VLC_CODEC_YUVA )
     {
@@ -161,6 +147,4 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                      - p_outpic->p[i_index].i_visible_pitch;
         }
     }
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }

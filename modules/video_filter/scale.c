@@ -38,7 +38,8 @@
  * Local prototypes
  ****************************************************************************/
 static int  OpenFilter ( vlc_object_t * );
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
+VIDEO_FILTER_WRAPPER(Filter)
 
 /*****************************************************************************
  * Module descriptor
@@ -75,11 +76,7 @@ static int OpenFilter( vlc_object_t *p_this )
 #warning Converter cannot (really) change output format.
     video_format_ScaleCropAr( &p_filter->fmt_out.video, &p_filter->fmt_in.video );
 
-    static const struct vlc_filter_operations filter_ops =
-    {
-        .filter_video = Filter,
-    };
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     msg_Dbg( p_filter, "%ix%i -> %ix%i", p_filter->fmt_in.video.i_width,
              p_filter->fmt_in.video.i_height, p_filter->fmt_out.video.i_width,
@@ -91,22 +88,10 @@ static int OpenFilter( vlc_object_t *p_this )
 /****************************************************************************
  * Filter: the whole thing
  ****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_pic_dst )
 {
-    picture_t *p_pic_dst;
-
-    if( !p_pic ) return NULL;
-
 #warning Converter cannot (really) change output format.
     video_format_ScaleCropAr( &p_filter->fmt_out.video, &p_filter->fmt_in.video );
-
-    /* Request output picture */
-    p_pic_dst = filter_NewPicture( p_filter );
-    if( !p_pic_dst )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGBA &&
         p_filter->fmt_in.video.i_chroma != VLC_CODEC_ARGB &&
@@ -201,8 +186,4 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             }
         }
     }
-
-    picture_CopyProperties( p_pic_dst, p_pic );
-    picture_Release( p_pic );
-    return p_pic_dst;
 }

@@ -35,7 +35,6 @@
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_url.h>
-#include "filter_picture.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -43,10 +42,11 @@
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
 static void FilterErase( filter_t *, picture_t *, picture_t * );
 static int EraseCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
+VIDEO_FILTER_WRAPPER( Filter )
 
 /*****************************************************************************
  * Module descriptor
@@ -122,11 +122,6 @@ static void LoadMask( filter_t *p_filter, const char *psz_filename )
     image_HandlerDelete( p_image );
 }
 
-static const struct vlc_filter_operations filter_ops =
-{
-    .filter_video = Filter,
-};
-
 /*****************************************************************************
  * Create
  *****************************************************************************/
@@ -158,7 +153,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys = p_filter->p_sys;
 
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
@@ -208,19 +203,9 @@ static void Destroy( vlc_object_t *p_this )
 /*****************************************************************************
  * Filter
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    if( !p_pic ) return NULL;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     /* If the mask is empty: just copy the image */
     vlc_mutex_lock( &p_sys->lock );
@@ -229,8 +214,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     else
         picture_CopyPixels( p_outpic, p_pic );
     vlc_mutex_unlock( &p_sys->lock );
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************

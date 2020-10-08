@@ -47,7 +47,7 @@
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
-static picture_t *FilterPlanar( filter_t *, picture_t * );
+static void FilterPlanar( filter_t *, picture_t *, picture_t * );
 static picture_t *FilterPacked( filter_t *, picture_t * );
 
 /*****************************************************************************
@@ -141,10 +141,7 @@ static int BoolCallback( vlc_object_t *obj, char const *varname,
     return VLC_SUCCESS;
 }
 
-static const struct vlc_filter_operations planar_filter_ops =
-{
-    .filter_video = FilterPlanar,
-};
+VIDEO_FILTER_WRAPPER( FilterPlanar )
 
 static const struct vlc_filter_operations packed_filter_ops =
 {
@@ -176,7 +173,7 @@ static int Create( vlc_object_t *p_this )
     {
         CASE_PLANAR_YUV
             /* Planar YUV */
-            p_filter->ops = &planar_filter_ops;
+            p_filter->ops = &FilterPlanar_ops;
             p_sys->pf_process_sat_hue_clip = planar_sat_hue_clip_C;
             p_sys->pf_process_sat_hue = planar_sat_hue_C;
             break;
@@ -184,7 +181,7 @@ static int Create( vlc_object_t *p_this )
         CASE_PLANAR_YUV10
         CASE_PLANAR_YUV9
             /* Planar YUV 9-bit or 10-bit */
-            p_filter->ops = &planar_filter_ops;
+            p_filter->ops = &FilterPlanar_ops;
             p_sys->pf_process_sat_hue_clip = planar_sat_hue_clip_C_16;
             p_sys->pf_process_sat_hue = planar_sat_hue_C_16;
             break;
@@ -253,24 +250,13 @@ static void Destroy( vlc_object_t *p_this )
 /*****************************************************************************
  * Run the filter on a Planar YUV picture
  *****************************************************************************/
-static picture_t *FilterPlanar( filter_t *p_filter, picture_t *p_pic )
+static void FilterPlanar( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
     /* The full range will only be used for 10-bit */
     int pi_luma[1024];
     int pi_gamma[1024];
 
-    picture_t *p_outpic;
-
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    if( !p_pic ) return NULL;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     bool b_16bit;
     float f_range;
@@ -443,8 +429,6 @@ static picture_t *FilterPlanar( filter_t *p_filter, picture_t *p_pic )
         p_sys->pf_process_sat_hue( p_pic, p_outpic, i_sin, i_cos, i_sat,
                                         i_x, i_y );
     }
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************

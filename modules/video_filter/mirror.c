@@ -43,7 +43,7 @@
 static int  Create      ( vlc_object_t * );
 static void Destroy     ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
 static void VerticalMirror( picture_t *, picture_t *, int plane, bool );
 static void HorizontalMirror( picture_t *, picture_t *, int, bool );
 static void PlanarVerticalMirror( picture_t *, picture_t *, int plane, bool );
@@ -52,6 +52,7 @@ static void RV24VerticalMirror( picture_t *, picture_t *, int plane, bool );
 static void RV32VerticalMirror( picture_t *, picture_t *, int plane, bool );
 
 static void YUV422Mirror2Pixels( uint8_t *, uint8_t *, bool );
+VIDEO_FILTER_WRAPPER( Filter )
 
 static const char *const ppsz_filter_options[] = {
     "split", "direction", NULL
@@ -155,11 +156,7 @@ static int Create( vlc_object_t *p_this )
     var_AddCallback( p_filter, CFG_PREFIX "split", FilterCallback, p_sys );
     var_AddCallback( p_filter, CFG_PREFIX "direction", FilterCallback, p_sys );
 
-    static const struct vlc_filter_operations filter_ops =
-    {
-        .filter_video = Filter,
-    };
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     return VLC_SUCCESS;
 }
@@ -186,24 +183,13 @@ static void Destroy( vlc_object_t *p_this )
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
     bool b_vertical_split, b_left_to_right;
-
-    if( !p_pic ) return NULL;
 
     filter_sys_t *p_sys = p_filter->p_sys;
     b_vertical_split = !atomic_load( &p_sys->i_split );
     b_left_to_right = !atomic_load( &p_sys->i_direction );
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        msg_Warn( p_filter, "can't get output picture" );
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     for( int i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
@@ -212,8 +198,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         else
             HorizontalMirror( p_pic, p_outpic, i_index, b_left_to_right );
     }
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************

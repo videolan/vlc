@@ -36,7 +36,6 @@
 #include <vlc_sout.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
-#include "filter_picture.h"
 
 /*****************************************************************************
  * Local protypes
@@ -45,10 +44,11 @@ typedef struct filter_sys_t filter_sys_t;
 
 static int  Create       ( vlc_object_t * );
 static void Destroy      ( vlc_object_t * );
-static picture_t *Filter ( filter_t *, picture_t * );
+static void Filter ( filter_t *, picture_t *, picture_t * );
 static void RenderBlur   ( filter_sys_t *, picture_t *, picture_t * );
 static int MotionBlurCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
+VIDEO_FILTER_WRAPPER( Filter )
 
 /*****************************************************************************
  * Module descriptor
@@ -113,11 +113,7 @@ static int Create( vlc_object_t *p_this )
     }
     p_sys->b_first = true;
 
-    static const struct vlc_filter_operations filter_ops =
-    {
-        .filter_video = Filter,
-    };
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
@@ -149,19 +145,9 @@ static void Destroy( vlc_object_t *p_this )
 /*****************************************************************************
  * Filter
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t * p_outpic )
 {
-    picture_t * p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    if( !p_pic ) return NULL;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     if( p_sys->b_first )
     {
@@ -173,8 +159,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     RenderBlur( p_sys, p_pic, p_outpic );
 
     picture_CopyPixels( p_sys->p_tmp, p_outpic );
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************

@@ -42,7 +42,6 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
-#include "filter_picture.h"
 
 #define SIG_TEXT N_("Sharpen strength (0-2)")
 #define SIG_LONGTEXT N_("Set the Sharpen strength, between 0 and 2. Defaults to 0.05.")
@@ -53,9 +52,10 @@
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
 static int SharpenCallback( vlc_object_t *, char const *,
                             vlc_value_t, vlc_value_t, void * );
+VIDEO_FILTER_WRAPPER( Filter )
 
 #define SHARPEN_HELP N_("Augment contrast between contours.")
 #define FILTER_PREFIX "sharpen-"
@@ -118,11 +118,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_filter->p_sys = p_sys;
 
-    static const struct vlc_filter_operations filter_ops =
-    {
-        .filter_video = Filter,
-    };
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                    p_filter->p_cfg );
@@ -208,20 +204,12 @@ static void Destroy( vlc_object_t *p_this )
                i_visible_pitch);                                        \
     } while (0)
 
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
     const int v1 = -1;
     const int v2 = 3; /* 2^3 = 8 */
     const unsigned i_visible_lines = p_pic->p[Y_PLANE].i_visible_lines;
     const unsigned i_visible_pitch = p_pic->p[Y_PLANE].i_visible_pitch;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -232,8 +220,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     plane_CopyPixels( &p_outpic->p[U_PLANE], &p_pic->p[U_PLANE] );
     plane_CopyPixels( &p_outpic->p[V_PLANE], &p_pic->p[V_PLANE] );
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 static int SharpenCallback( vlc_object_t *p_this, char const *psz_var,

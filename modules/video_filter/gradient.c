@@ -46,10 +46,11 @@ enum { GRADIENT, EDGE, HOUGH };
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
 static int GradientCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t,
                              void * );
+VIDEO_FILTER_WRAPPER( Filter )
 
 static void FilterGradient( filter_t *, picture_t *, picture_t * );
 static void FilterEdge    ( filter_t *, picture_t *, picture_t * );
@@ -124,11 +125,6 @@ typedef struct
     int *p_pre_hough;
 } filter_sys_t;
 
-static const struct vlc_filter_operations filter_ops =
-{
-    .filter_video = Filter,
-};
-
 /*****************************************************************************
  * Create: allocates Distort video thread output method
  *****************************************************************************
@@ -156,7 +152,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_filter->p_sys = p_sys;
 
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     p_sys->p_pre_hough = NULL;
 
@@ -244,19 +240,8 @@ static void Destroy( vlc_object_t *p_this )
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
-
-    if( !p_pic ) return NULL;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
-
     filter_sys_t *p_sys = p_filter->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );
@@ -278,8 +263,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             break;
     }
     vlc_mutex_unlock( &p_sys->lock );
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 /*****************************************************************************

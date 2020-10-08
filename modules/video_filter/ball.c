@@ -75,7 +75,8 @@ typedef struct filter_sys_t filter_sys_t;
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
+VIDEO_FILTER_WRAPPER( Filter )
 
 static void drawBall( filter_sys_t *p_sys, picture_t *p_outpic );
 static void drawPixelRGB24( filter_sys_t *p_sys, picture_t *p_outpic,
@@ -215,11 +216,6 @@ struct filter_sys_t
     } colorList[4];
 };
 
-static const struct vlc_filter_operations filter_ops =
-{
-    .filter_video = Filter,
-};
-
 /*****************************************************************************
 * Create: allocates Distort video thread output method
 *****************************************************************************
@@ -265,7 +261,7 @@ static int Create( vlc_object_t *p_this )
     if( p_sys->p_image == NULL )
         return VLC_EGENERIC;
 
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
@@ -353,27 +349,13 @@ static void Destroy( vlc_object_t *p_this )
 * until it is displayed and switch the two rendering buffers, preparing next
 * frame.
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
-
-    if( !p_pic ) return NULL;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
-
     filter_sys_t *p_sys = p_filter->p_sys;
     vlc_mutex_lock( &p_sys->lock );
     FilterBall( p_filter, p_pic, p_outpic );
     vlc_mutex_unlock( &p_sys->lock );
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
-
 
 /*****************************************************************************
 * Drawing functions

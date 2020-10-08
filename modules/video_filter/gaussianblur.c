@@ -32,7 +32,6 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
-#include "filter_picture.h"
 
 #include <math.h>                                          /* exp(), sqrt() */
 
@@ -72,7 +71,8 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
+VIDEO_FILTER_WRAPPER( Filter )
 
 static const char *const ppsz_filter_options[] = {
     "sigma", NULL
@@ -123,11 +123,6 @@ static void gaussianblur_InitDistribution( filter_sys_t *p_sys )
     p_sys->pt_distribution = pt_distribution;
 }
 
-static const struct vlc_filter_operations filter_ops =
-{
-    .filter_video = Filter,
-};
-
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
@@ -160,7 +155,7 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     p_sys->f_sigma =
         var_CreateGetFloat( p_filter, FILTER_PREFIX "sigma" );
@@ -191,23 +186,14 @@ static void Destroy( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
     const int i_dim = p_sys->i_dim;
     type_t *pt_buffer;
     type_t *pt_scale;
     const type_t *pt_distribution = p_sys->pt_distribution;
 
-    if( !p_pic ) return NULL;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
     if( !p_sys->pt_buffer )
     {
         p_sys->pt_buffer = realloc_or_free( p_sys->pt_buffer,
@@ -297,6 +283,4 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             }
         }
     }
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }

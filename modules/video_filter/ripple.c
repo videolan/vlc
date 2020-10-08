@@ -42,7 +42,8 @@
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 
-static picture_t *Filter( filter_t *, picture_t * );
+static void Filter( filter_t *, picture_t *, picture_t * );
+VIDEO_FILTER_WRAPPER(Filter)
 
 /*****************************************************************************
  * Module descriptor
@@ -90,11 +91,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_filter->p_sys = p_sys;
 
-    static const struct vlc_filter_operations filter_ops =
-    {
-        .filter_video = Filter,
-    };
-    p_filter->ops = &filter_ops;
+    p_filter->ops = &Filter_ops;
 
     p_sys->f_angle = 0.0;
     p_sys->last_date = 0;
@@ -109,20 +106,10 @@ static int Create( vlc_object_t *p_this )
  * until it is displayed and switch the two rendering buffers, preparing next
  * frame.
  *****************************************************************************/
-static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
+static void Filter( filter_t *p_filter, picture_t *p_pic, picture_t *p_outpic )
 {
-    picture_t *p_outpic;
     double f_angle;
     vlc_tick_t new_date = vlc_tick_now();
-
-    if( !p_pic ) return NULL;
-
-    p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        return NULL;
-    }
 
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -221,6 +208,4 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             p_out += p_outpic->p[i_index].i_pitch;
         }
     }
-
-    return CopyInfoAndRelease( p_outpic, p_pic );
 }
