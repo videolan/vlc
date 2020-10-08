@@ -92,7 +92,7 @@ typedef struct
 
     /* for direct rendering */
     bool        b_direct_rendering;
-    atomic_bool b_dr_failure;
+    bool        b_dr_failure; /* Protected by lock */
 
     /* Hack to force display of still pictures */
     bool b_first_frame;
@@ -498,7 +498,7 @@ int InitVideoDec( vlc_object_t *obj )
 
     /* ***** libavcodec direct rendering ***** */
     p_sys->b_direct_rendering = false;
-    atomic_init(&p_sys->b_dr_failure, false);
+    p_sys->b_dr_failure = false;
     if( var_CreateGetBool( p_dec, "avcodec-dr" ) &&
        (p_codec->capabilities & AV_CODEC_CAP_DR1) &&
         /* No idea why ... but this fixes flickering on some TSCC streams */
@@ -1422,15 +1422,17 @@ static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
     {
         if (pic->p[i].i_pitch % aligns[i])
         {
-            if (!atomic_exchange(&sys->b_dr_failure, true))
+            if (sys->b_dr_failure == false)
                 msg_Warn(dec, "plane %d: pitch not aligned (%d%%%d): disabling direct rendering",
                          i, pic->p[i].i_pitch, aligns[i]);
+            sys->b_dr_failure = true;
             goto error;
         }
         if (((uintptr_t)pic->p[i].p_pixels) % aligns[i])
         {
-            if (!atomic_exchange(&sys->b_dr_failure, true))
+            if (sys->b_dr_failure == false)
                 msg_Warn(dec, "plane %d not aligned: disabling direct rendering", i);
+            sys->b_dr_failure = true;
             goto error;
         }
     }
