@@ -106,7 +106,7 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic );
  * Open() is atomic: if an error occurs, the state of p_this
  * is left as it was before the call to this function.
  *
- * @param p_this The filter instance as vlc_object_t.
+ * @param p_filter The filter instance.
  * @return VLC error code
  * @retval VLC_SUCCESS All ok, filter set up and started.
  * @retval VLC_ENOMEM Memory allocation error, initialization aborted.
@@ -114,7 +114,7 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic );
  * @see IsChromaSupported()
  * @see SetFilterMethod()
  */
-static int Open( vlc_object_t *p_this );
+static int Open( filter_t *p_filter );
 
 /**
  * Resets the filter state, including resetting all algorithm-specific state
@@ -290,7 +290,6 @@ static int Mouse( filter_t *p_filter,
 vlc_module_begin ()
     set_description( N_("Deinterlacing video filter") )
     set_shortname( N_("Deinterlace" ))
-    set_capability( "video filter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
@@ -306,8 +305,7 @@ vlc_module_begin ()
                 PHOSPHOR_DIMMER_LONGTEXT, true )
         change_integer_list( phosphor_dimmer_list, phosphor_dimmer_list_text )
         change_safe ()
-    add_shortcut( "deinterlace" )
-    set_callback( Open )
+    set_deinterlace_callback( Open )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -497,9 +495,8 @@ static const struct vlc_filter_operations filter_ops = {
  * Open
  *****************************************************************************/
 
-int Open( vlc_object_t *p_this )
+int Open( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
 
     const vlc_fourcc_t fourcc = p_filter->fmt_in.video.i_chroma;

@@ -60,16 +60,14 @@
 #define MMAL_DEINTERLACE_FULL_RATE_TEXT N_("Full output framerate")
 #define MMAL_DEINTERLACE_FULL_RATE_LONGTEXT N_("Full output framerate. 1 output frame for each interlaced field input")
 
-static int OpenMmalDeinterlace(vlc_object_t *);
+static int OpenMmalDeinterlace(filter_t *);
 
 vlc_module_begin()
     set_shortname(N_("MMAL deinterlace"))
     set_description(N_("MMAL-based deinterlace filter plugin"))
-    set_capability("video filter", 900)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callback(OpenMmalDeinterlace)
-    add_shortcut("deinterlace")
+    set_deinterlace_callback(OpenMmalDeinterlace)
     add_bool(MMAL_DEINTERLACE_NO_QPU, false, MMAL_DEINTERLACE_NO_QPU_TEXT,
                     MMAL_DEINTERLACE_NO_QPU_LONGTEXT, true);
     add_bool(MMAL_DEINTERLACE_ADV, false, MMAL_DEINTERLACE_ADV_TEXT,
@@ -418,9 +416,8 @@ static const struct vlc_filter_operations filter_pass_ops = {
     .filter_video = pass_deinterlace, .close = CloseMmalDeinterlace,
 };
 
-static int OpenMmalDeinterlace(vlc_object_t *p_this)
+static int OpenMmalDeinterlace(filter_t *filter)
 {
-    filter_t *filter = (filter_t*)p_this;
     int32_t frame_duration = filter->fmt_in.video.i_frame_rate != 0 ?
             CLOCK_FREQ * filter->fmt_in.video.i_frame_rate_base /
             filter->fmt_in.video.i_frame_rate : 0;

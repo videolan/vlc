@@ -338,9 +338,8 @@ static const struct vlc_filter_operations filter_ops = {
     .filter_video = Deinterlace, .flush = Flush, .close = D3D9CloseDeinterlace,
 };
 
-int D3D9OpenDeinterlace(vlc_object_t *obj)
+int D3D9OpenDeinterlace(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
     filter_sys_t *sys;
     HINSTANCE hdecoder_dll = NULL;
     HRESULT hr;

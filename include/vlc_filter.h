@@ -140,6 +140,18 @@ struct vlc_filter_operations
     void (*close)(filter_t *);
 };
 
+typedef int (*vlc_open_deinterlace)(filter_t *);
+
+
+#define set_deinterlace_callback( activate )     \
+    {                                            \
+        vlc_open_deinterlace open__ = activate;  \
+        (void) open__;                           \
+        set_callback(activate)                   \
+    }                                            \
+    set_capability( "video filter", 0 )          \
+    add_shortcut( "deinterlace" )
+
 /** Structure describing a filter
  * @warning BIG FAT WARNING : the code relies on the first 4 members of
  * filter_t and decoder_t to be the same, so if you have anything to add,

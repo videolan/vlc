@@ -513,8 +513,7 @@ vlc_module_begin()
 
     add_submodule()
     set_description(N_("Direct3D9 deinterlace filter"))
-    set_callback( D3D9OpenDeinterlace )
-    add_shortcut ("deinterlace")
+    set_deinterlace_callback( D3D9OpenDeinterlace )
 
     add_submodule()
     set_capability( "video converter", 10 )

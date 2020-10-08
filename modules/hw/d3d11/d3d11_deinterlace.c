@@ -245,9 +245,8 @@ static const struct vlc_filter_operations filter_ops = {
     .filter_video = Deinterlace, .flush = Flush, .close = D3D11CloseDeinterlace,
 };
 
-int D3D11OpenDeinterlace(vlc_object_t *obj)
+int D3D11OpenDeinterlace(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
     HRESULT hr;
 
     if (!is_d3d11_opaque(filter->fmt_in.video.i_chroma))

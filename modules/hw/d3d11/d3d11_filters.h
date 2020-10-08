@@ -28,7 +28,7 @@
 
 #include "../../video_chroma/d3d11_fmt.h"
 
-int  D3D11OpenDeinterlace(vlc_object_t *);
+int  D3D11OpenDeinterlace(filter_t *);
 int  D3D11OpenConverter(vlc_object_t *);
 int  D3D11OpenCPUConverter(vlc_object_t *);
 

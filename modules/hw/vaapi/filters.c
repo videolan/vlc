@@ -1096,10 +1096,9 @@ static const struct vlc_filter_operations Deinterlace_ops = {
 };
 
 static int
-OpenDeinterlace(vlc_object_t * obj)
+OpenDeinterlace(filter_t *filter)
 {
     VAProcPipelineCaps          pipeline_caps;
-    filter_t *const             filter = (filter_t *)obj;
     struct deint_data *const    p_data = calloc(1, sizeof(*p_data));
     if (!p_data)
         return VLC_ENOMEM;
@@ -1146,8 +1145,7 @@ vlc_module_begin()
     add_shortcut("adjust")
 
     add_submodule()
-    set_callback(OpenDeinterlace)
-    add_shortcut("deinterlace")
+    set_deinterlace_callback(OpenDeinterlace)
 
     add_submodule()
     set_callback(OpenDenoiseFilter)
