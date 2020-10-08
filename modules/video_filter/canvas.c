@@ -38,7 +38,7 @@
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
-static int  Activate( vlc_object_t * );
+static int  Activate( filter_t * );
 static void Destroy( filter_t * );
 static picture_t *Filter( filter_t *, picture_t * );
 static void Flush( filter_t * );
@@ -104,9 +104,8 @@ static void Flush( filter_t * );
 vlc_module_begin ()
     set_shortname( N_("Canvas") )
     set_description( N_("Canvas video filter") )
-    set_capability( "video filter", 0 )
     set_help( CANVAS_HELP )
-    set_callback( Activate )
+    set_callback_video_filter( Activate )
 
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
@@ -153,9 +152,8 @@ static const struct vlc_filter_operations filter_ops =
 /*****************************************************************************
  *
  *****************************************************************************/
-static int Activate( vlc_object_t *p_this )
+static int Activate( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     unsigned i_canvas_width; /* visible width of output canvas */
     unsigned i_canvas_height; /* visible height of output canvas */
     unsigned i_canvas_aspect; /* canvas PictureAspectRatio */

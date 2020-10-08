@@ -39,7 +39,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open (vlc_object_t *);
+static int  Open (filter_t *);
 
 #define CFG_PREFIX "gradfun-"
 
@@ -57,7 +57,6 @@ vlc_module_begin()
     set_description(N_("Gradfun video filter"))
     set_shortname(N_("Gradfun"))
     set_help(N_("Debanding algorithm"))
-    set_capability("video filter", 0)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     add_integer_with_range(CFG_PREFIX "radius", 16, RADIUS_MIN, RADIUS_MAX,
@@ -65,7 +64,7 @@ vlc_module_begin()
     add_float_with_range(CFG_PREFIX "strength", 1.2, STRENGTH_MIN, STRENGTH_MAX,
                          STRENGTH_TEXT, STRENGTH_LONGTEXT, false)
 
-    set_callback(Open)
+    set_callback_video_filter(Open)
 vlc_module_end()
 
 /*****************************************************************************
@@ -109,9 +108,8 @@ typedef struct
     struct vf_priv_s cfg;
 } filter_sys_t;
 
-static int Open(vlc_object_t *object)
+static int Open(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)object;
     const vlc_fourcc_t fourcc = filter->fmt_in.video.i_chroma;
 
     const vlc_chroma_description_t *chroma = vlc_fourcc_GetChromaDescription(fourcc);

@@ -71,17 +71,16 @@ static void freeze_free_allocated_data( filter_t * );
 
 #define CFG_PREFIX "freeze-"
 
-static int  Open ( vlc_object_t * );
+static int  Open ( filter_t * );
 static void Close( filter_t * );
 
 vlc_module_begin()
     set_description( N_("Freezing interactive video filter") )
     set_shortname(   N_("Freeze" ) )
-    set_capability(  "video filter", 0 )
     set_category(    CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    set_callback( Open )
+    set_callback_video_filter( Open )
 vlc_module_end()
 
 /*****************************************************************************
@@ -98,9 +97,8 @@ static const struct vlc_filter_operations filter_ops =
 /**
  * Open the filter
  */
-static int Open( vlc_object_t *p_this )
+static int Open( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
     /* Assert video in match with video out */

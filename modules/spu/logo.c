@@ -80,7 +80,7 @@ static const char *const ppsz_pos_descriptions[] =
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
 static int  OpenSub  ( vlc_object_t * );
-static int  OpenVideo( vlc_object_t * );
+static int  OpenVideo( filter_t * );
 static void Close    ( filter_t * );
 
 vlc_module_begin ()
@@ -106,8 +106,7 @@ vlc_module_begin ()
 
     /* video output filter submodule */
     add_submodule ()
-    set_capability( "video filter", 0 )
-    set_callback( OpenVideo )
+    set_callback_video_filter( OpenVideo )
     set_description( N_("Logo video filter") )
     add_shortcut( "logo" )
 vlc_module_end ()
@@ -210,9 +209,9 @@ static int OpenSub( vlc_object_t *p_this )
 /**
  * Open the video filter
  */
-static int OpenVideo( vlc_object_t *p_this )
+static int OpenVideo( filter_t *p_filter )
 {
-    return OpenCommon( p_this, false );
+    return OpenCommon( VLC_OBJECT(p_filter), false );
 }
 
 static const struct vlc_filter_operations filter_sub_ops = {

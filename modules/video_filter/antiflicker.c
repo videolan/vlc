@@ -44,7 +44,7 @@ static int AntiFlickerCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *p_data );
 
-static int  Create    ( vlc_object_t * );
+static int  Create    ( filter_t * );
 VIDEO_FILTER_WRAPPER_CLOSE( Filter, Destroy )
 
 #define WINDOW_TEXT N_("Window size")
@@ -65,7 +65,6 @@ VIDEO_FILTER_WRAPPER_CLOSE( Filter, Destroy )
 vlc_module_begin ()
     set_description( N_("Antiflicker video filter") )
     set_shortname( N_( "antiflicker" ))
-    set_capability( "video filter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
@@ -76,7 +75,7 @@ vlc_module_begin ()
         SFTN_TEXT, SFTN_LONGTEXT, false )
 
     add_shortcut( "antiflicker" )
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -98,10 +97,8 @@ typedef struct
  *****************************************************************************
  * This function allocates and initializes a Distort vout method.
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     switch( p_filter->fmt_in.video.i_chroma )
     {
         CASE_PLANAR_YUV

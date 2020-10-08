@@ -597,10 +597,8 @@ static const struct vlc_filter_operations filter_ops =
 };
 
 static int
-Open(vlc_object_t *obj, char const *psz_filter)
+Open(filter_t *filter, char const *psz_filter)
 {
-    filter_t *filter = (filter_t *)obj;
-
     switch (filter->fmt_in.video.i_chroma)
     {
         case VLC_CODEC_CVPX_NV12:
@@ -717,45 +715,45 @@ error:
 }
 
 static int
-OpenAdjust(vlc_object_t *obj)
+OpenAdjust(filter_t *filter)
 {
-    return Open(obj, "adjust");
+    return Open(filter, "adjust");
 }
 
 static int
-OpenInvert(vlc_object_t *obj)
+OpenInvert(filter_t *filter)
 {
-    return Open(obj, "invert");
+    return Open(filter, "invert");
 }
 
 static int
-OpenPosterize(vlc_object_t *obj)
+OpenPosterize(filter_t *filter)
 {
-    return Open(obj, "posterize");
+    return Open(filter, "posterize");
 }
 
 static int
-OpenSepia(vlc_object_t *obj)
+OpenSepia(filter_t *filter)
 {
-    return Open(obj, "sepia");
+    return Open(filter, "sepia");
 }
 
 static int
-OpenSharpen(vlc_object_t *obj)
+OpenSharpen(filter_t *filter)
 {
-    return Open(obj, "sharpen");
+    return Open(filter, "sharpen");
 }
 
 static int
-OpenPsychedelic(vlc_object_t *obj)
+OpenPsychedelic(filter_t *filter)
 {
-    return Open(obj, "psychedelic");
+    return Open(filter, "psychedelic");
 }
 
 static int
-OpenCustom(vlc_object_t *obj)
+OpenCustom(filter_t *filter)
 {
-    return Open(obj, "custom");
+    return Open(filter, "custom");
 }
 
 #define CI_CUSTOM_FILTER_TEXT N_("Use a specific Core Image Filter")
@@ -763,37 +761,36 @@ OpenCustom(vlc_object_t *obj)
     "Example: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'")
 
 vlc_module_begin()
-    set_capability("video filter", 0)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_description(N_("Mac OS X hardware video filters"))
 
     add_submodule()
-    set_callback(OpenAdjust)
+    set_callback_video_filter(OpenAdjust)
     add_shortcut("adjust")
 
     add_submodule()
-    set_callback(OpenInvert)
+    set_callback_video_filter(OpenInvert)
     add_shortcut("invert")
 
     add_submodule()
-    set_callback(OpenPosterize)
+    set_callback_video_filter(OpenPosterize)
     add_shortcut("posterize")
 
     add_submodule()
-    set_callback(OpenSepia)
+    set_callback_video_filter(OpenSepia)
     add_shortcut("sepia")
 
     add_submodule()
-    set_callback(OpenSharpen)
+    set_callback_video_filter(OpenSharpen)
     add_shortcut("sharpen")
 
     add_submodule()
-    set_callback(OpenPsychedelic)
+    set_callback_video_filter(OpenPsychedelic)
     add_shortcut("psychedelic")
 
     add_submodule()
-    set_callback(OpenCustom)
+    set_callback_video_filter(OpenCustom)
     add_shortcut("ci")
     add_string("ci-filter", "CIComicEffect", CI_CUSTOM_FILTER_TEXT, CI_CUSTOM_FILTER_LONGTEXT, true);
 vlc_module_end()

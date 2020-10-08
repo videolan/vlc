@@ -38,15 +38,14 @@
  * Module descriptor
  *****************************************************************************/
 static int       ActivateConverter  ( filter_t * );
-static int       ActivateFilter     ( vlc_object_t * );
+static int       ActivateFilter     ( filter_t * );
 static void      Destroy            ( filter_t * );
 
 vlc_module_begin ()
     set_description( N_("Video filtering using a chain of video filter modules") )
     set_callback_video_converter( ActivateConverter, 1 )
     add_submodule ()
-        set_capability( "video filter", 0 )
-        set_callback( ActivateFilter )
+        set_callback_video_filter( ActivateFilter )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -239,10 +238,8 @@ static int ActivateConverter( filter_t *p_filter )
                                BuildChromaChain );
 }
 
-static int ActivateFilter( vlc_object_t *p_this )
+static int ActivateFilter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     if( !p_filter->b_allow_fmt_out_change || p_filter->psz_name == NULL )
         return VLC_EGENERIC;
 

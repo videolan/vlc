@@ -53,7 +53,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int OpenPostproc( vlc_object_t * );
+static int OpenPostproc( filter_t * );
 
 VIDEO_FILTER_WRAPPER_CLOSE(PostprocPict, ClosePostproc)
 
@@ -84,9 +84,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    set_capability( "video filter", 0 )
-
-    set_callback( OpenPostproc )
+    set_callback_video_filter( OpenPostproc )
 
     add_integer_with_range( FILTER_PREFIX "q", PP_QUALITY_MAX, 0,
                             PP_QUALITY_MAX, Q_TEXT, Q_LONGTEXT, false )
@@ -118,9 +116,8 @@ typedef struct
 /*****************************************************************************
  * OpenPostproc: probe and open the postproc
  *****************************************************************************/
-static int OpenPostproc( vlc_object_t *p_this )
+static int OpenPostproc( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     vlc_value_t val, val_orig;
     const char *desc;

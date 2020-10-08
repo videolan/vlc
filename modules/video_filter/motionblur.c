@@ -42,7 +42,7 @@
  *****************************************************************************/
 typedef struct filter_sys_t filter_sys_t;
 
-static int  Create       ( vlc_object_t * );
+static int  Create       ( filter_t * );
 static void RenderBlur   ( filter_sys_t *, picture_t *, picture_t * );
 static int MotionBlurCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
@@ -59,7 +59,6 @@ VIDEO_FILTER_WRAPPER_CLOSE(Filter, Destroy)
 vlc_module_begin ()
     set_shortname( N_("Motion blur") )
     set_description( N_("Motion blur filter") )
-    set_capability( "video filter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
@@ -68,7 +67,7 @@ vlc_module_begin ()
 
     add_shortcut( "blur" )
 
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -88,10 +87,8 @@ struct filter_sys_t
 /*****************************************************************************
  * Create
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     const vlc_chroma_description_t *p_chroma =
         vlc_fourcc_GetChromaDescription( p_filter->fmt_in.video.i_chroma );
     if( p_chroma == NULL || p_chroma->plane_count == 0 )

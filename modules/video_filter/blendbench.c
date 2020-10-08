@@ -40,7 +40,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int Create( vlc_object_t * );
+static int Create( filter_t * );
 static void Destroy( filter_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
@@ -75,7 +75,6 @@ vlc_module_begin ()
     set_shortname( N_("Blendbench" ))
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter", 0 )
 
     set_section( N_("Benchmarking"), NULL )
     add_integer( CFG_PREFIX "loops", 1000, LOOPS_TEXT,
@@ -95,7 +94,7 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "blend-chroma", "YUVA", BLEND_CHROMA_TEXT,
               BLEND_CHROMA_LONGTEXT, false )
 
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -152,9 +151,8 @@ static const struct vlc_filter_operations filter_ops =
 /*****************************************************************************
  * Create: allocates video thread output method
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     char *psz_temp, *psz_cmd;
     int i_ret;
@@ -183,7 +181,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_base_chroma = !psz_temp || strlen( psz_temp ) != 4 ? 0 :
         VLC_FOURCC( psz_temp[0], psz_temp[1], psz_temp[2], psz_temp[3] );
     psz_cmd = var_CreateGetStringCommand( p_filter, CFG_PREFIX "base-image" );
-    i_ret = blendbench_LoadImage( p_this, &p_sys->p_base_image,
+    i_ret = blendbench_LoadImage( VLC_OBJECT(p_filter), &p_sys->p_base_image,
                                   p_sys->i_base_chroma, psz_cmd, "Base" );
     free( psz_temp );
     free( psz_cmd );
@@ -198,7 +196,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_blend_chroma = !psz_temp || strlen( psz_temp ) != 4
         ? 0 : VLC_FOURCC( psz_temp[0], psz_temp[1], psz_temp[2], psz_temp[3] );
     psz_cmd = var_CreateGetStringCommand( p_filter, CFG_PREFIX "blend-image" );
-    i_ret = blendbench_LoadImage( p_this, &p_sys->p_blend_image, p_sys->i_blend_chroma,
+    i_ret = blendbench_LoadImage( VLC_OBJECT(p_filter), &p_sys->p_blend_image, p_sys->i_blend_chroma,
                                   psz_cmd, "Blend" );
 
     free( psz_temp );

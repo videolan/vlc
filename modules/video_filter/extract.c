@@ -39,7 +39,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Create      ( vlc_object_t * );
+static int  Create      ( filter_t * );
 
 static int ExtractCallback( vlc_object_t *, char const *,
                             vlc_value_t, vlc_value_t, void * );
@@ -66,14 +66,13 @@ vlc_module_begin ()
     set_shortname( N_("Extract" ))
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter", 0 )
     add_shortcut( "extract" )
 
     add_integer_with_range( FILTER_PREFIX "component", 0xFF0000, 1, 0xFFFFFF,
                             COMPONENT_TEXT, COMPONENT_LONGTEXT, false )
         change_integer_list( pi_component_values, ppsz_component_descriptions )
 
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -91,10 +90,8 @@ typedef struct
 /*****************************************************************************
  * Create
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_I420:

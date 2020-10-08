@@ -91,10 +91,8 @@ static const struct vlc_filter_operations filter_ops = {
     .filter_video = Sharpen, .close = Close,
 };
 
-static int Open(vlc_object_t *obj)
+static int Open(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
-
     if ( filter->vctx_in == NULL ||
          vlc_video_context_GetType(filter->vctx_in) != VLC_VIDEO_CONTEXT_VDPAU )
         return VLC_EGENERIC;
@@ -154,7 +152,6 @@ vlc_module_begin()
     set_description(N_("VDPAU sharpen video filter"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_capability("video filter", 0)
     add_shortcut("sharpen")
-    set_callbacks(Open, Close)
+    set_callback_video_filter(Open)
 vlc_module_end()

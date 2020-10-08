@@ -41,17 +41,16 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Create    ( vlc_object_t * );
+static int  Create    ( filter_t * );
 static void Destroy   ( filter_t * );
 
 vlc_module_begin ()
     set_description( N_("Magnify/Zoom interactive video filter") )
     set_shortname( N_( "Magnify" ))
-    set_capability( "video filter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 
@@ -88,9 +87,8 @@ typedef struct
 /*****************************************************************************
  * Create:
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
     /* */

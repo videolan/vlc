@@ -43,7 +43,7 @@ enum { GRADIENT, EDGE, HOUGH };
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Create    ( vlc_object_t * );
+static int  Create    ( filter_t * );
 
 static int GradientCallback( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t,
@@ -79,7 +79,6 @@ vlc_module_begin ()
     set_description( N_("Gradient video filter") )
     set_shortname( N_( "Gradient" ))
     set_help(GRADIENT_HELP)
-    set_capability( "video filter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
@@ -93,7 +92,7 @@ vlc_module_begin ()
                 CARTOON_TEXT, CARTOON_LONGTEXT, false )
 
     add_shortcut( "gradient" )
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -128,9 +127,8 @@ typedef struct
  *****************************************************************************
  * This function allocates and initializes a Distort vout method.
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     char *psz_method;
 
     switch( p_filter->fmt_in.video.i_chroma )

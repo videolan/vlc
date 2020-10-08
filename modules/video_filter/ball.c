@@ -72,7 +72,7 @@ enum { RED, GREEN, BLUE, WHITE };
 
 typedef struct filter_sys_t filter_sys_t;
 
-static int  Create    ( vlc_object_t * );
+static int  Create    ( filter_t * );
 
 VIDEO_FILTER_WRAPPER_CLOSE( Filter, Destroy )
 
@@ -125,7 +125,6 @@ vlc_module_begin ()
     set_description( N_("Ball video filter") )
     set_shortname( N_( "Ball" ))
     set_help(BALL_HELP)
-    set_capability( "video filter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
@@ -146,7 +145,7 @@ vlc_module_begin ()
               EDGE_VISIBLE_TEXT, EDGE_VISIBLE_LONGTEXT, true )
 
     add_shortcut( "ball" )
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -219,9 +218,8 @@ struct filter_sys_t
 *****************************************************************************
 * This function allocates and initializes a Distort vout method.
 *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     char *psz_method;
 
     /* Allocate structure */
@@ -273,7 +271,7 @@ static int Create( vlc_object_t *p_this )
         p_sys->ballColor = RED;
     }
     else
-        p_sys->ballColor = getBallColor( p_this, psz_method );
+        p_sys->ballColor = getBallColor( VLC_OBJECT(p_filter), psz_method );
 
     free( psz_method );
 

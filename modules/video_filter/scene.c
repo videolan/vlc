@@ -44,7 +44,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Create      ( vlc_object_t * );
+static int  Create      ( filter_t * );
 static void Destroy     ( filter_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
@@ -96,7 +96,6 @@ vlc_module_begin ()
     set_help(SCENE_HELP)
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter", 0 )
 
     /* General options */
     add_string(  CFG_PREFIX "format", "png",
@@ -116,7 +115,7 @@ vlc_module_begin ()
     add_integer_with_range( CFG_PREFIX "ratio", 50, 1, INT_MAX,
                             RATIO_TEXT, RATIO_LONGTEXT, false )
 
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 static const char *const ppsz_vfilter_options[] = {
@@ -150,9 +149,8 @@ typedef struct
 /*****************************************************************************
  * Create: initialize and set ops
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
     const vlc_chroma_description_t *p_chroma =
@@ -167,15 +165,15 @@ static int Create( vlc_object_t *p_this )
     if( p_filter->p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_sys->p_image = image_HandlerCreate( p_this );
+    p_sys->p_image = image_HandlerCreate( p_filter );
     if( !p_sys->p_image )
     {
-        msg_Err( p_this, "Couldn't get handle to image conversion routines." );
+        msg_Err( p_filter, "Couldn't get handle to image conversion routines." );
         free( p_sys );
         return VLC_EGENERIC;
     }
 
-    p_sys->psz_format = var_CreateGetString( p_this, CFG_PREFIX "format" );
+    p_sys->psz_format = var_CreateGetString( p_filter, CFG_PREFIX "format" );
     p_sys->i_format = image_Type2Fourcc( p_sys->psz_format );
     if( !p_sys->i_format )
     {
@@ -186,14 +184,14 @@ static int Create( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    p_sys->i_width = var_CreateGetInteger( p_this, CFG_PREFIX "width" );
-    p_sys->i_height = var_CreateGetInteger( p_this, CFG_PREFIX "height" );
-    p_sys->i_ratio = var_CreateGetInteger( p_this, CFG_PREFIX "ratio" );
+    p_sys->i_width = var_CreateGetInteger( p_filter, CFG_PREFIX "width" );
+    p_sys->i_height = var_CreateGetInteger( p_filter, CFG_PREFIX "height" );
+    p_sys->i_ratio = var_CreateGetInteger( p_filter, CFG_PREFIX "ratio" );
     if( p_sys->i_ratio <= 0)
         p_sys->i_ratio = 1;
-    p_sys->b_replace = var_CreateGetBool( p_this, CFG_PREFIX "replace" );
-    p_sys->psz_prefix = var_CreateGetString( p_this, CFG_PREFIX "prefix" );
-    p_sys->psz_path = var_GetNonEmptyString( p_this, CFG_PREFIX "path" );
+    p_sys->b_replace = var_CreateGetBool( p_filter, CFG_PREFIX "replace" );
+    p_sys->psz_prefix = var_CreateGetString( p_filter, CFG_PREFIX "prefix" );
+    p_sys->psz_path = var_GetNonEmptyString( p_filter, CFG_PREFIX "path" );
     if( p_sys->psz_path == NULL )
         p_sys->psz_path = config_GetUserDir( VLC_PICTURES_DIR );
 

@@ -40,7 +40,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Create      ( vlc_object_t * );
+static int  Create      ( filter_t * );
 
 static void PlanarYUVPosterize( picture_t *, picture_t *, int);
 static void PackedYUVPosterize( picture_t *, picture_t *, int);
@@ -68,11 +68,10 @@ vlc_module_begin ()
     set_help( N_("Posterize video by lowering the number of colors") )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter", 0 )
     add_integer_with_range( CFG_PREFIX "level", 6, 2, 256,
                            POSTERIZE_LEVEL_TEXT, POSTERIZE_LEVEL_LONGTEXT,
                            false )
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -94,9 +93,8 @@ typedef struct
  *****************************************************************************
  * This function allocates and initializes a Posterize vout method.
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
     switch( p_filter->fmt_in.video.i_chroma )

@@ -40,7 +40,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open (vlc_object_t *);
+static int  Open (filter_t *);
 VIDEO_FILTER_WRAPPER_CLOSE(Filter, Close)
 
 #define BANK_SIZE (64)
@@ -63,7 +63,6 @@ vlc_module_begin()
     set_description(N_("Grain video filter"))
     set_shortname( N_("Grain"))
     set_help(N_("Adds filtered gaussian noise"))
-    set_capability( "video filter", 0 )
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     add_float_with_range(CFG_PREFIX "variance", 2.0, VARIANCE_MIN, VARIANCE_MAX,
@@ -72,7 +71,7 @@ vlc_module_begin()
                            PERIOD_MIN_TEXT, PERIOD_MIN_LONGTEXT, false)
     add_integer_with_range(CFG_PREFIX "period-max", 3*PERIOD_MAX/4, PERIOD_MIN, PERIOD_MAX,
                            PERIOD_MAX_TEXT, PERIOD_MAX_LONGTEXT, false)
-    set_callback(Open)
+    set_callback_video_filter(Open)
 vlc_module_end()
 
 /*****************************************************************************
@@ -368,10 +367,8 @@ static int Callback(vlc_object_t *object, char const *cmd,
     return VLC_SUCCESS;
 }
 
-static int Open(vlc_object_t *object)
+static int Open(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)object;
-
     const vlc_chroma_description_t *chroma =
         vlc_fourcc_GetChromaDescription(filter->fmt_in.video.i_chroma);
     if (!chroma || chroma->plane_count < 3 || chroma->pixel_size != 1) {

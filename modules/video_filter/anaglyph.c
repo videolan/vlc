@@ -30,7 +30,7 @@
 #include <vlc_picture.h>
 #include "filter_picture.h"
 
-static int Create(vlc_object_t *);
+static int Create(filter_t *);
 static void combine_side_by_side_yuv420(picture_t *, picture_t *, int, int);
 
 #define SCHEME_TEXT N_("Color scheme")
@@ -69,10 +69,9 @@ vlc_module_begin()
     set_shortname(N_("Anaglyph"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_capability("video filter", 0)
     add_string(FILTER_PREFIX "scheme", "red-cyan", SCHEME_TEXT, SCHEME_LONGTEXT, false)
         change_string_list(ppsz_scheme_values, ppsz_scheme_descriptions)
-    set_callback(Create)
+    set_callback_video_filter(Create)
 vlc_module_end()
 
 static const char *const ppsz_filter_options[] = {
@@ -86,10 +85,8 @@ typedef struct
 
 VIDEO_FILTER_WRAPPER(Filter)
 
-static int Create(vlc_object_t *p_this)
+static int Create(filter_t *p_filter)
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     switch (p_filter->fmt_in.video.i_chroma)
     {
         case VLC_CODEC_I420:

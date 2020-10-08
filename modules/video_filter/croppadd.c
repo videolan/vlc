@@ -37,7 +37,7 @@
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int  OpenFilter ( vlc_object_t * );
+static int  OpenFilter ( filter_t * );
 
 VIDEO_FILTER_WRAPPER(Filter)
 
@@ -75,8 +75,7 @@ VIDEO_FILTER_WRAPPER(Filter)
 vlc_module_begin ()
     set_shortname( N_("Croppadd") )
     set_description( N_("Video cropping filter") )
-    set_capability( "video filter", 0 )
-    set_callback( OpenFilter )
+    set_callback_video_filter( OpenFilter )
 
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER );
@@ -123,9 +122,8 @@ typedef struct
 /*****************************************************************************
  * OpenFilter: probe the filter and return score
  *****************************************************************************/
-static int OpenFilter( vlc_object_t *p_this )
+static int OpenFilter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
 
     if( !p_filter->b_allow_fmt_out_change )

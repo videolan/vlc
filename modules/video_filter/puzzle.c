@@ -77,13 +77,12 @@ static const char *const ppsz_rotation_descriptions[] = { N_("0"), N_("0/180"), 
 
 #define CFG_PREFIX "puzzle-"
 
-static int  Open ( vlc_object_t * );
+static int  Open ( filter_t * );
 static void Close( filter_t * );
 
 vlc_module_begin()
     set_description( N_("Puzzle interactive game video filter") )
     set_shortname( N_( "Puzzle" ))
-    set_capability( "video filter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
@@ -110,7 +109,7 @@ vlc_module_begin()
               MODE_TEXT, MODE_LONGTEXT, false )
         change_integer_list(pi_mode_values, ppsz_mode_descriptions )
 
-    set_callback( Open )
+    set_callback_video_filter( Open )
 vlc_module_end()
 
 /*****************************************************************************
@@ -124,9 +123,8 @@ const char *const ppsz_filter_options[] = {
 /**
  * Open the filter
  */
-static int Open( vlc_object_t *p_this )
+static int Open( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
     /* Assert video in match with video out */

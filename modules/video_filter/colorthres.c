@@ -42,7 +42,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Create    ( vlc_object_t * );
+static int  Create    ( filter_t * );
 
 static picture_t *FilterPacked( filter_t *, picture_t * );
 VIDEO_FILTER_WRAPPER_CLOSE( Filter, Destroy )
@@ -70,14 +70,13 @@ vlc_module_begin ()
     set_help(COLOR_HELP)
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter", 0 )
     add_rgb(CFG_PREFIX "color", 0x00FF0000, COLOR_TEXT, COLOR_LONGTEXT)
         change_integer_list( pi_color_values, ppsz_color_descriptions )
     add_integer( CFG_PREFIX "saturationthres", 20,
                  N_("Saturation threshold"), "", false )
     add_integer( CFG_PREFIX "similaritythres", 15,
                  N_("Similarity threshold"), "", false )
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -111,9 +110,8 @@ static const struct vlc_filter_operations packed_filter_ops =
  *****************************************************************************
  * This function allocates and initializes a adjust vout method.
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
     switch( p_filter->fmt_in.video.i_chroma )

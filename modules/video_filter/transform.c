@@ -41,7 +41,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open (vlc_object_t *);
+static int  Open (filter_t *);
 
 #define CFG_PREFIX "transform-"
 
@@ -57,7 +57,6 @@ vlc_module_begin()
     set_description(N_("Video transformation filter"))
     set_shortname(N_("Transformation"))
     set_help(N_("Rotate or flip the video"))
-    set_capability("video filter", 0)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
 
@@ -66,7 +65,7 @@ vlc_module_begin()
         change_safe()
 
     add_shortcut("transform")
-    set_callback(Open)
+    set_callback_video_filter(Open)
 vlc_module_end()
 
 /*****************************************************************************
@@ -301,9 +300,8 @@ static int Mouse(filter_t *filter, vlc_mouse_t *mouse,
     return VLC_SUCCESS;
 }
 
-static int Open(vlc_object_t *object)
+static int Open(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)object;
     const video_format_t *src = &filter->fmt_in.video;
     video_format_t       *dst = &filter->fmt_out.video;
 

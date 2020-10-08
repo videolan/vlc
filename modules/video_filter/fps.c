@@ -33,7 +33,7 @@
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 
-static int Open( vlc_object_t *p_this);
+static int Open( filter_t * );
 static picture_t *Filter( filter_t *p_filter, picture_t *p_picture);
 
 #define CFG_PREFIX "fps-"
@@ -43,13 +43,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture);
 vlc_module_begin ()
     set_description( N_("FPS conversion video filter") )
     set_shortname( N_("FPS Converter" ))
-    set_capability( "video filter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_shortcut( "fps" )
     add_string( CFG_PREFIX "fps", NULL, FPS_TEXT, FPS_TEXT, false )
-    set_callback( Open )
+    set_callback_video_filter( Open )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -146,9 +145,8 @@ static const struct vlc_filter_operations filter_ops =
     .filter_video = Filter, .close = Close,
 };
 
-static int Open( vlc_object_t *p_this)
+static int Open( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
 
     /* This filter cannot change the format. */

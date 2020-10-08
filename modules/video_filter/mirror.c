@@ -40,7 +40,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Create      ( vlc_object_t * );
+static int  Create      ( filter_t * );
 
 static void VerticalMirror( picture_t *, picture_t *, int plane, bool );
 static void HorizontalMirror( picture_t *, picture_t *, int, bool );
@@ -80,7 +80,6 @@ vlc_module_begin ()
     set_help( N_("Splits video in two same parts, like in a mirror") )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter", 0 )
     add_integer( CFG_PREFIX "split", 0, ORIENTATION_TEXT,
                 ORIENTATION_LONGTEXT, false )
         change_integer_list( pi_orientation_values,
@@ -88,7 +87,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "direction", 0, DIRECTION_TEXT,
                 DIRECTION_LONGTEXT, false )
         change_integer_list( pi_direction_values, ppsz_direction_descriptions )
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -111,9 +110,8 @@ typedef struct
  *****************************************************************************
  * This function allocates and initializes a Mirror vout method.
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
     switch( p_filter->fmt_in.video.i_chroma )

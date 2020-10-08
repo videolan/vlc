@@ -44,7 +44,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Create    ( vlc_object_t * );
+static int  Create    ( filter_t * );
 
 static picture_t *FilterPacked( filter_t *, picture_t * );
 
@@ -72,7 +72,6 @@ vlc_module_begin ()
     set_shortname( N_("Image adjust" ))
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter", 0 )
 
     add_float_with_range( "contrast", 1.0, 0.0, 2.0,
                           CONT_TEXT, CONT_LONGTEXT, false )
@@ -94,7 +93,7 @@ vlc_module_begin ()
         change_safe()
 
     add_shortcut( "adjust" )
-    set_callback( Create )
+    set_callback_video_filter( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -149,10 +148,8 @@ static const struct vlc_filter_operations packed_filter_ops =
 /*****************************************************************************
  * Create: allocates adjust video filter
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
     {
         msg_Err( p_filter, "Input and output chromas don't match" );
@@ -160,7 +157,7 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Allocate structure */
-    filter_sys_t *p_sys = vlc_obj_malloc( p_this, sizeof( *p_sys ) );
+    filter_sys_t *p_sys = vlc_obj_malloc( VLC_OBJECT(p_filter), sizeof( *p_sys ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
     p_filter->p_sys = p_sys;
