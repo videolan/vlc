@@ -176,6 +176,7 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
         memset(p_output, 0, i_silence_bytes);
 
         i_requested -= i_silence_bytes;
+        p_output += i_silence_bytes;
 
         /* Start the first rendering */
     }
@@ -188,9 +189,11 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
     while (p_block != NULL && i_requested != 0)
     {
         size_t i_tocopy = __MIN(i_requested, p_block->i_buffer);
-        memcpy(&p_output[i_copied], p_block->p_buffer, i_tocopy);
+        memcpy(p_output, p_block->p_buffer, i_tocopy);
         i_requested -= i_tocopy;
         i_copied += i_tocopy;
+        p_output += i_tocopy;
+
         if (i_tocopy == p_block->i_buffer)
         {
             block_t *p_release = p_block;
@@ -215,7 +218,7 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
     {
         assert(p_sys->i_out_size == 0);
         p_sys->i_underrun_size += i_requested;
-        memset(&p_output[i_copied], 0, i_requested);
+        memset(p_output, 0, i_requested);
     }
 
     lock_unlock(p_sys);
