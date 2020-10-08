@@ -691,10 +691,8 @@ static const struct vlc_filter_operations NV12_D3D11_ops = {
     .filter_video = NV12_D3D11_Filter, .close = D3D11CloseCPUConverter,
 };
 
-int D3D11OpenConverter( vlc_object_t *obj )
+int D3D11OpenConverter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)obj;
-
     if ( !is_d3d11_opaque(p_filter->fmt_in.video.i_chroma) )
         return VLC_EGENERIC;
     if ( GetD3D11ContextPrivate(p_filter->vctx_in) == NULL )
@@ -743,7 +741,7 @@ int D3D11OpenConverter( vlc_object_t *obj )
         return VLC_EGENERIC;
     }
 
-    filter_sys_t *p_sys = vlc_obj_calloc(obj, 1, sizeof(filter_sys_t));
+    filter_sys_t *p_sys = vlc_obj_calloc(VLC_OBJECT(p_filter), 1, sizeof(filter_sys_t));
     if (!p_sys)
         return VLC_ENOMEM;
 
@@ -764,9 +762,8 @@ int D3D11OpenConverter( vlc_object_t *obj )
     return VLC_SUCCESS;
 }
 
-int D3D11OpenCPUConverter( vlc_object_t *obj )
+int D3D11OpenCPUConverter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
     filter_sys_t *p_sys = NULL;
 
@@ -804,7 +801,7 @@ int D3D11OpenCPUConverter( vlc_object_t *obj )
         return VLC_EGENERIC;
     }
 
-    p_sys = vlc_obj_calloc(obj, 1, sizeof(filter_sys_t));
+    p_sys = vlc_obj_calloc(VLC_OBJECT(p_filter), 1, sizeof(filter_sys_t));
     if (!p_sys) {
         vlc_decoder_device_Release(dec_device);
         return VLC_ENOMEM;

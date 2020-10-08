@@ -28,7 +28,7 @@
 #include "vlc_vaapi.h"
 
 /* chroma filters callbacks */
-int  vlc_vaapi_OpenChroma(vlc_object_t *obj);
+int  vlc_vaapi_OpenChroma(filter_t *);
 void vlc_vaapi_CloseChroma(filter_t *);
 
 #endif /* VLC_VAAPI_FILTERS_H */

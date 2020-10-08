@@ -37,14 +37,14 @@
 #include "../codec/vt_utils.h"
 #include "../video_chroma/copy.h"
 
-static int Open(vlc_object_t *);
+static int Open(filter_t *);
 static void Close(filter_t *);
 
 #if !TARGET_OS_IPHONE
-static int Open_CVPX_to_CVPX(vlc_object_t *);
+static int Open_CVPX_to_CVPX(filter_t *);
 static void Close_CVPX_to_CVPX(filter_t *);
 
-static int Open_chain_CVPX(vlc_object_t *);
+static int Open_chain_CVPX(filter_t *);
 static void Close_chain_CVPX(filter_t *);
 #endif
 
@@ -66,18 +66,15 @@ typedef struct
 
 vlc_module_begin ()
     set_description("Conversions from/to CoreVideo buffers")
-    set_capability("video converter", 10)
-    set_callback(Open)
+    set_callback_video_converter(Open, 10)
 #if !TARGET_OS_IPHONE
     add_submodule()
     set_description("Conversions between CoreVideo buffers")
-    set_callback(Open_CVPX_to_CVPX)
-    set_capability("video converter", 10)
+    set_callback_video_converter(Open_CVPX_to_CVPX, 10)
 
     add_submodule()
     set_description("Fast CoreVideo resize+conversion")
-    set_callback(Open_chain_CVPX)
-    set_capability("video converter", 11)
+    set_callback_video_converter(Open_chain_CVPX, 11)
 #endif
 vlc_module_end ()
 
@@ -254,10 +251,8 @@ static const struct vlc_filter_operations SW_TO_CVPX_ops = {
     .filter_video = SW_TO_CVPX_Filter, .close = Close,
 };
 
-static int Open(vlc_object_t *obj)
+static int Open(filter_t *p_filter)
 {
-    filter_t *p_filter = (filter_t *)obj;
-
     if (p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height
         || p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width)
         return VLC_EGENERIC;
@@ -443,10 +438,8 @@ static const struct vlc_filter_operations filter_ops = {
 };
 
 static int
-Open_CVPX_to_CVPX(vlc_object_t *obj)
+Open_CVPX_to_CVPX(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
-
     /* Avoid conversion to self if we're not resizing */
     if (filter->fmt_in.video.i_chroma == filter->fmt_out.video.i_chroma &&
         filter->fmt_in.video.i_visible_width == filter->fmt_out.video.i_visible_width &&
@@ -568,10 +561,8 @@ static const struct vlc_filter_operations chain_CVPX_ops = {
 };
 
 static int
-Open_chain_CVPX(vlc_object_t *obj)
+Open_chain_CVPX(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
-
     bool is_input_valid = false;
     bool is_output_valid = false;
 
@@ -629,7 +620,7 @@ Open_chain_CVPX(vlc_object_t *obj)
     if (!is_input_valid || !is_output_valid)
         return VLC_EGENERIC;
 
-    msg_Dbg(obj, "Starting CVPX conversion chain %4.4s -> %4.4s",
+    msg_Dbg(filter, "Starting CVPX conversion chain %4.4s -> %4.4s",
              (const char *)&input_chroma,
              (const char *)&output_chroma);
 

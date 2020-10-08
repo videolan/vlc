@@ -40,15 +40,14 @@
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
-static int  Activate ( vlc_object_t * );
+static int  Activate ( filter_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) )
-    set_capability( "video converter", 60 )
-    set_callback( Activate )
+    set_callback_video_converter( Activate, 60 )
 vlc_module_end ()
 
 VIDEO_FILTER_WRAPPER( I422_I420 )
@@ -60,10 +59,8 @@ VIDEO_FILTER_WRAPPER( I422_YUVA )
  *****************************************************************************
  * This function allocates and initializes a chroma function
  *****************************************************************************/
-static int Activate( vlc_object_t *p_this )
+static int Activate( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     if( p_filter->fmt_in.video.i_width & 1
      || p_filter->fmt_in.video.i_height & 1 )
     {

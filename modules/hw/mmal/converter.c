@@ -61,7 +61,7 @@ static const char * const  ppsz_converter_text[] = {
     "Hardware Video Scaler", "ISP", "Resizer"
 };
 
-int OpenConverter(vlc_object_t *);
+static int OpenConverter(filter_t *);
 
 vlc_module_begin()
     add_submodule()
@@ -70,12 +70,11 @@ vlc_module_begin()
     set_shortname(N_("MMAL resizer"))
     set_description(N_("MMAL resizing conversion filter"))
     add_shortcut("mmal_converter")
-    set_capability( "video converter", 900 )
 #ifndef NDEBUG
     add_integer( MMAL_CONVERTER_TYPE_NAME, FILTER_RESIZER_HVS, MMAL_CONVERTER_TYPE_TEXT, MMAL_CONVERTER_TYPE_LONGTEXT, true )
         change_integer_list( pi_converter_modes, ppsz_converter_text )
 #endif
-    set_callback(OpenConverter)
+    set_callback_video_converter(OpenConverter, 900)
 vlc_module_end()
 
 #define MMAL_SLICE_HEIGHT 16
@@ -783,9 +782,8 @@ static const struct vlc_filter_operations filter_ops = {
     .filter_video = conv_filter, .flush = conv_flush, .close = CloseConverter,
 };
 
-int OpenConverter(vlc_object_t * obj)
+static int OpenConverter(filter_t *p_filter)
 {
-    filter_t * const p_filter = (filter_t *)obj;
     int ret = VLC_EGENERIC;
     converter_sys_t *sys;
     MMAL_STATUS_T status;

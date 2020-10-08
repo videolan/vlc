@@ -37,7 +37,7 @@
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int  OpenFilter ( vlc_object_t * );
+static int  OpenFilter ( filter_t * );
 VIDEO_FILTER_WRAPPER(Filter)
 
 /*****************************************************************************
@@ -45,17 +45,14 @@ VIDEO_FILTER_WRAPPER(Filter)
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("Video scaling filter") )
-    set_capability( "video converter", 10 )
-    set_callback( OpenFilter )
+    set_callback_video_converter( OpenFilter, 10 )
 vlc_module_end ()
 
 /*****************************************************************************
  * OpenFilter: probe the filter and return score
  *****************************************************************************/
-static int OpenFilter( vlc_object_t *p_this )
+static int OpenFilter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t*)p_this;
-
     if( ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVP &&
           p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVA &&
           p_filter->fmt_in.video.i_chroma != VLC_CODEC_I420 &&

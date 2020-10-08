@@ -60,7 +60,7 @@
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
-static int  Activate ( vlc_object_t * );
+static int  Activate ( filter_t * );
 
 /*****************************************************************************
  * Module descriptor.
@@ -68,23 +68,22 @@ static int  Activate ( vlc_object_t * );
 vlc_module_begin ()
 #if defined (MODULE_NAME_IS_i420_yuy2)
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) )
-    set_capability( "video converter", 80 )
+    set_callback_video_converter( Activate, 80 )
 # define vlc_CPU_capable() (true)
 #elif defined (MODULE_NAME_IS_i420_yuy2_mmx)
     set_description( N_("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) )
-    set_capability( "video converter", 160 )
+    set_callback_video_converter( Activate, 160 )
 # define vlc_CPU_capable() vlc_CPU_MMX()
 #elif defined (MODULE_NAME_IS_i420_yuy2_sse2)
     set_description( N_("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) )
-    set_capability( "video converter", 250 )
+    set_callback_video_converter( Activate, 250 )
 # define vlc_CPU_capable() vlc_CPU_SSE2()
 #elif defined (MODULE_NAME_IS_i420_yuy2_altivec)
     set_description(
             _("AltiVec conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "video converter", 250 )
+    set_callback_video_converter( Activate, 250 )
 # define vlc_CPU_capable() vlc_CPU_ALTIVEC()
 #endif
-    set_callback( Activate )
 vlc_module_end ()
 
 VIDEO_FILTER_WRAPPER( I420_YUY2 )
@@ -130,10 +129,8 @@ GetFilterOperations( filter_t *p_filter )
  *****************************************************************************
  * This function allocates and initializes a chroma function
  *****************************************************************************/
-static int Activate( vlc_object_t *p_this )
+static int Activate( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     if( !vlc_CPU_capable() )
         return VLC_EGENERIC;
 

@@ -31,15 +31,14 @@
 
 #include "nvdec_fmt.h"
 
-static int OpenCUDAToCPU( vlc_object_t * );
+static int OpenCUDAToCPU( filter_t * );
 
 vlc_module_begin()
     set_shortname(N_("CUDA converter"))
     set_description(N_("CUDA/NVDEC Chroma Converter filter"))
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_capability("video converter", 10)
-    set_callbacks(OpenCUDAToCPU, NULL)
+    set_callback_video_converter(OpenCUDAToCPU, 10)
 vlc_module_end()
 
 #define CALL_CUDA(func, ...) CudaCheckErr(VLC_OBJECT(p_filter), devsys->cudaFunctions, devsys->cudaFunctions->func(__VA_ARGS__), #func)
@@ -121,10 +120,8 @@ static const struct vlc_filter_operations filter_ops = {
     .filter_video = FilterCUDAToCPU,
 };
 
-static int OpenCUDAToCPU( vlc_object_t *p_this )
+static int OpenCUDAToCPU( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     if ( p_filter->vctx_in == NULL ||
          vlc_video_context_GetType(p_filter->vctx_in) != VLC_VIDEO_CONTEXT_NVDEC )
         return VLC_EGENERIC;

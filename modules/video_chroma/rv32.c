@@ -35,7 +35,7 @@
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static int  OpenFilter ( vlc_object_t * );
+static int  OpenFilter ( filter_t * );
 static picture_t *Filter( filter_t *, picture_t * );
 
 /*****************************************************************************
@@ -43,8 +43,7 @@ static picture_t *Filter( filter_t *, picture_t * );
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("RV32 conversion filter") )
-    set_capability( "video converter", 1 )
-    set_callback( OpenFilter )
+    set_callback_video_converter( OpenFilter, 1 )
 vlc_module_end ()
 
 static const struct vlc_filter_operations filter_ops = {
@@ -54,10 +53,8 @@ static const struct vlc_filter_operations filter_ops = {
 /*****************************************************************************
  * OpenFilter: probe the filter and return score
  *****************************************************************************/
-static int OpenFilter( vlc_object_t *p_this )
+static int OpenFilter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t*)p_this;
-
     /* XXX Only support RV24 -> RV32 conversion */
     if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGB24 ||
         (p_filter->fmt_out.video.i_chroma != VLC_CODEC_RGB32 &&

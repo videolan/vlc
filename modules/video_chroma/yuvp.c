@@ -40,12 +40,11 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open ( vlc_object_t * );
+static int  Open ( filter_t * );
 
 vlc_module_begin ()
     set_description( N_("YUVP converter") )
-    set_capability( "video converter", 10 )
-    set_callback( Open )
+    set_callback_video_converter( Open, 10 )
 vlc_module_end ()
 
 /****************************************************************************
@@ -58,10 +57,8 @@ VIDEO_FILTER_WRAPPER( Convert )
 /*****************************************************************************
  * Open: probe the filter and return score
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int Open( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t*)p_this;
-
     /* It only supports YUVP to YUVA/RGBA without scaling
      * (if scaling is required another filter can do it) */
     if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVP ||

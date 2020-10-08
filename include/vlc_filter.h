@@ -141,6 +141,7 @@ struct vlc_filter_operations
 };
 
 typedef int (*vlc_open_deinterlace)(filter_t *);
+typedef int (*vlc_video_converter_open)(filter_t *);
 
 
 #define set_deinterlace_callback( activate )     \
@@ -151,6 +152,14 @@ typedef int (*vlc_open_deinterlace)(filter_t *);
     }                                            \
     set_capability( "video filter", 0 )          \
     add_shortcut( "deinterlace" )
+
+#define set_callback_video_converter( activate, priority ) \
+    {                                                      \
+        vlc_video_converter_open open__ = activate;        \
+        (void) open__;                                     \
+        set_callback(activate)                             \
+    }                                                      \
+    set_capability( "video converter", priority )
 
 /** Structure describing a filter
  * @warning BIG FAT WARNING : the code relies on the first 4 members of

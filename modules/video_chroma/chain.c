@@ -37,14 +37,13 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int       ActivateConverter  ( vlc_object_t * );
+static int       ActivateConverter  ( filter_t * );
 static int       ActivateFilter     ( vlc_object_t * );
 static void      Destroy            ( filter_t * );
 
 vlc_module_begin ()
     set_description( N_("Video filtering using a chain of video filter modules") )
-    set_capability( "video converter", 1 )
-    set_callback( ActivateConverter )
+    set_callback_video_converter( ActivateConverter, 1 )
     add_submodule ()
         set_capability( "video filter", 0 )
         set_callback( ActivateFilter )
@@ -223,10 +222,8 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
     return VLC_SUCCESS;
 }
 
-static int ActivateConverter( vlc_object_t *p_this )
+static int ActivateConverter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     const bool b_chroma = p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma;
     const bool b_resize = p_filter->fmt_in.video.i_width  != p_filter->fmt_out.video.i_width ||
                           p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height;

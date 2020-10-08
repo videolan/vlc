@@ -29,12 +29,11 @@
 #include <vlc_cpu.h>
 #include "arm_neon/chroma_neon.h"
 
-static int Open (vlc_object_t *);
+static int Open (filter_t *);
 
 vlc_module_begin ()
     set_description (N_("ARM NEON video chroma conversions"))
-    set_capability ("video converter", 250)
-    set_callback(Open)
+    set_callback_video_converter(Open, 250)
 vlc_module_end ()
 
 #define DEFINE_PACK(pack, pict) \
@@ -214,10 +213,8 @@ static void VYUY_I422 (filter_t *filter, picture_t *src, picture_t *dst)
 }
 VIDEO_FILTER_WRAPPER (VYUY_I422)
 
-static int Open (vlc_object_t *obj)
+static int Open (filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
-
     if (!vlc_CPU_ARM_NEON())
         return VLC_EGENERIC;
     if ((filter->fmt_in.video.i_width != filter->fmt_out.video.i_width)

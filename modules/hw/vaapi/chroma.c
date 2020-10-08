@@ -325,9 +325,8 @@ static const struct vlc_filter_operations filter_download_ops = {
 };
 
 int
-vlc_vaapi_OpenChroma(vlc_object_t *obj)
+vlc_vaapi_OpenChroma(filter_t *filter)
 {
-    filter_t *const     filter = (filter_t *)obj;
     filter_sys_t *      filter_sys;
 
     if (filter->fmt_in.video.i_height != filter->fmt_out.video.i_height
@@ -345,7 +344,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
 
     if (!(filter_sys = calloc(1, sizeof(filter_sys_t))))
     {
-        msg_Err(obj, "unable to allocate memory");
+        msg_Err(filter, "unable to allocate memory");
         return VLC_ENOMEM;
     }
     filter_sys->derive_failed = false;
@@ -370,7 +369,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
         filter_sys->dpy = dec_device->opaque;
 
         filter_sys->dest_pics =
-            vlc_vaapi_PoolNew(obj, filter->vctx_out, filter_sys->dpy,
+            vlc_vaapi_PoolNew(VLC_OBJECT(filter), filter->vctx_out, filter_sys->dpy,
                               DEST_PICS_POOL_SZ, &filter_sys->va_surface_ids,
                               &filter->fmt_out.video);
         if (!filter_sys->dest_pics)
@@ -403,7 +402,7 @@ vlc_vaapi_OpenChroma(vlc_object_t *obj)
     }
 
     filter->p_sys = filter_sys;
-    msg_Warn(obj, "Using SW chroma filter for %dx%d %4.4s -> %4.4s",
+    msg_Warn(filter, "Using SW chroma filter for %dx%d %4.4s -> %4.4s",
              filter->fmt_in.video.i_width,
              filter->fmt_in.video.i_height,
              (const char *) &filter->fmt_in.video.i_chroma,

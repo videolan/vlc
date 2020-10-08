@@ -29,8 +29,8 @@
 #include "../../video_chroma/d3d9_fmt.h"
 
 int  D3D9OpenDeinterlace(filter_t *);
-int  D3D9OpenConverter(vlc_object_t *);
-int  D3D9OpenCPUConverter(vlc_object_t *);
+int  D3D9OpenConverter(filter_t *);
+int  D3D9OpenCPUConverter(filter_t *);
 
 int D3D9OpenDecoderDevice(vlc_decoder_device *, vout_window_t *);
 

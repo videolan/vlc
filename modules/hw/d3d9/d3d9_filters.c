@@ -516,12 +516,10 @@ vlc_module_begin()
     set_deinterlace_callback( D3D9OpenDeinterlace )
 
     add_submodule()
-    set_capability( "video converter", 10 )
-    set_callback( D3D9OpenConverter )
+    set_callback_video_converter( D3D9OpenConverter, 10 )
 
     add_submodule()
-    set_callback( D3D9OpenCPUConverter )
-    set_capability( "video converter", 10 )
+    set_callback_video_converter( D3D9OpenCPUConverter, 10 )
 
     add_submodule()
     set_description(N_("Direct3D9"))

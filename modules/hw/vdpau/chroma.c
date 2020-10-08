@@ -761,10 +761,8 @@ static const struct vlc_filter_operations filter_output_ycbcr_ops = {
     .filter_video = YCbCrRender, .flush = Flush, .close = OutputClose,
 };
 
-static int OutputOpen(vlc_object_t *obj)
+static int OutputOpen(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
-
     if (filter->fmt_out.video.i_chroma != VLC_CODEC_VDPAU_OUTPUT)
         return VLC_EGENERIC;
 
@@ -775,7 +773,7 @@ static int OutputOpen(vlc_object_t *obj)
     if (dec_device == NULL)
         return VLC_EGENERIC;
 
-    vlc_vdp_mixer_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
+    vlc_vdp_mixer_t *sys = vlc_obj_malloc(VLC_OBJECT(filter), sizeof (*sys));
     if (unlikely(sys == NULL))
     {
         vlc_decoder_device_Release(dec_device);
@@ -825,7 +823,7 @@ static int OutputOpen(vlc_object_t *obj)
         return VLC_EGENERIC;
 
     /* Allocate the output surface picture pool */
-    sys->pool = OutputPoolAlloc(obj, vdpau_decoder,
+    sys->pool = OutputPoolAlloc(VLC_OBJECT(filter), vdpau_decoder,
                                 &filter->fmt_out.video);
     if (sys->pool == NULL)
     {
@@ -898,9 +896,8 @@ static const struct vlc_filter_operations filter_ycbcr_ops = {
     .filter_video = VideoExport_Filter,
 };
 
-static int YCbCrOpen(vlc_object_t *obj)
+static int YCbCrOpen(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
     VdpChromaType type;
     VdpYCbCrFormat format;
 
@@ -918,7 +915,7 @@ static int YCbCrOpen(vlc_object_t *obj)
           != filter->fmt_in.video.i_sar_den * filter->fmt_out.video.i_sar_num))
         return VLC_EGENERIC;
 
-    vlc_vdp_yuv_getter_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
+    vlc_vdp_yuv_getter_t *sys = vlc_obj_malloc(VLC_OBJECT(filter), sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
     sys->format = format;
@@ -941,10 +938,9 @@ static const char *const algo_names[] = {
 vlc_module_begin()
     set_shortname(N_("VDPAU"))
     set_description(N_("VDPAU surface conversions"))
-    set_capability("video converter", 10)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VFILTER)
-    set_callback(OutputOpen)
+    set_callback_video_converter(OutputOpen, 10)
 
     add_integer("vdpau-deinterlace",
                 VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
@@ -961,5 +957,5 @@ vlc_module_begin()
        N_("Scaling quality"), N_("High quality scaling level"), true)
 
     add_submodule()
-    set_callback(YCbCrOpen)
+    set_callback_video_converter(YCbCrOpen, 10)
 vlc_module_end()

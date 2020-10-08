@@ -388,10 +388,8 @@ static picture_t *YV12_D3D9_Filter( filter_t *p_filter, picture_t *p_pic )
     return p_outpic;
 }
 
-int D3D9OpenConverter( vlc_object_t *obj )
+int D3D9OpenConverter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)obj;
-
     if ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE &&
          p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D9_OPAQUE_10B )
         return VLC_EGENERIC;
@@ -460,9 +458,8 @@ static const struct vlc_filter_operations YV12_D3D9_ops = {
     .filter_video = YV12_D3D9_Filter, .close = D3D9CloseCPUConverter,
 };
 
-int D3D9OpenCPUConverter( vlc_object_t *obj )
+int D3D9OpenCPUConverter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
     picture_t *p_dst = NULL;
 

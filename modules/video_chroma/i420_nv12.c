@@ -146,11 +146,8 @@ VIDEO_FILTER_WRAPPER_CLOSE( P010_I42010B, Delete )
  *****************************************************************************
  * This function allocates and initializes a chroma function
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
-
     /* video must be even, because 4:2:0 is subsampled by 2 in both ways */
     if( p_filter->fmt_in.video.i_width  & 1
      || p_filter->fmt_in.video.i_height & 1 )
@@ -234,6 +231,5 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("YUV planar to semiplanar conversions") )
-    set_capability( "video converter", 160 )
-    set_callback( Create )
+    set_callback_video_converter( Create, 160 )
 vlc_module_end ()

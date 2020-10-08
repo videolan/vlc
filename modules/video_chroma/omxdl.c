@@ -29,13 +29,12 @@
 #include <omxtypes.h>
 #include <omxIP.h>
 
-static int Open (vlc_object_t *);
-static int OpenScaler (vlc_object_t *);
+static int Open (filter_t *);
+static int OpenScaler (filter_t *);
 
 vlc_module_begin ()
     set_description (N_("OpenMAX DL image processing"))
-    set_capability ("video converter", 90)
-    set_callback(Open)
+    set_callback_video_converter(Open,  90)
 vlc_module_end ()
 
 #define SRC_WIDTH  (filter->fmt_in.video.i_width)
@@ -246,16 +245,14 @@ static int FixRV12 (video_format_t *fmt)
 }
 
 /*** Initialization ***/
-static int Open (vlc_object_t *obj)
+static int Open (filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
-
     if (filter->fmt_in.video.orientation != filter->fmt_out.video.orientation)
         return VLC_EGENERIC;
 
     if ((filter->fmt_in.video.i_width != filter->fmt_out.video.i_width)
      || (filter->fmt_in.video.i_height != filter->fmt_out.video.i_height))
-        return OpenScaler (obj);
+        return OpenScaler (filter);
 
     switch (filter->fmt_in.video.i_chroma)
     {
@@ -333,7 +330,7 @@ static int Open (vlc_object_t *obj)
             return VLC_EGENERIC;
     }
     /* fallback to scaler (conversion with 1:1 scale) */
-    return OpenScaler (obj);
+    return OpenScaler (filter);
 }
 
 /* TODO: configurable interpolation */
@@ -468,10 +465,9 @@ static void I422_RGB_Scale (filter_t *filter, picture_t *src, picture_t *dst)
 VIDEO_FILTER_WRAPPER (I422_RGB_Scale)
 
 /*** Scaling initialization ***/
-static int OpenScaler (vlc_object_t *obj)
+static int OpenScaler (filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
-    int *conv = vlc_obj_malloc(obj, sizeof (*conv));
+    int *conv = vlc_obj_malloc(VLC_OBJECT(filter), sizeof (*conv));
 
     if (unlikely(conv == NULL))
         return VLC_ENOMEM;

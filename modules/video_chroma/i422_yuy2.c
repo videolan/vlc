@@ -47,7 +47,7 @@
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
-static int  Activate ( vlc_object_t * );
+static int  Activate ( filter_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -55,21 +55,20 @@ static int  Activate ( vlc_object_t * );
 vlc_module_begin ()
 #if defined (MODULE_NAME_IS_i422_yuy2)
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) )
-    set_capability( "video converter", 80 )
+    set_callback_video_converter( Activate, 80 )
 # define vlc_CPU_capable() (true)
 # define VLC_TARGET
 #elif defined (MODULE_NAME_IS_i422_yuy2_mmx)
     set_description( N_("MMX conversions from " SRC_FOURCC " to " DEST_FOURCC) )
-    set_capability( "video converter", 100 )
+    set_callback_video_converter( Activate, 100 )
 # define vlc_CPU_capable() vlc_CPU_MMX()
 # define VLC_TARGET VLC_MMX
 #elif defined (MODULE_NAME_IS_i422_yuy2_sse2)
     set_description( N_("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) )
-    set_capability( "video converter", 120 )
+    set_callback_video_converter( Activate, 120 )
 # define vlc_CPU_capable() vlc_CPU_SSE2()
 # define VLC_TARGET VLC_SSE
 #endif
-    set_callback( Activate )
 vlc_module_end ()
 
 
@@ -115,10 +114,8 @@ GetFilterOperations(filter_t *filter)
  *****************************************************************************
  * This function allocates and initializes a chroma function
  *****************************************************************************/
-static int Activate( vlc_object_t *p_this )
+static int Activate( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
     if( !vlc_CPU_capable() )
         return VLC_EGENERIC;
     if( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) & 1

@@ -51,7 +51,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  OpenScaler( vlc_object_t * );
+static int  OpenScaler( filter_t * );
 static void CloseScaler( filter_t * );
 
 #define SCALEMODE_TEXT N_("Scaling mode")
@@ -67,10 +67,9 @@ static const char *const ppsz_mode_descriptions[] =
 vlc_module_begin ()
     set_description( N_("Video scaling filter") )
     set_shortname( N_("Swscale" ) )
-    set_capability( "video converter", 150 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_callback( OpenScaler )
+    set_callback_video_converter( OpenScaler, 150 )
     add_integer( "swscale-mode", 2, SCALEMODE_TEXT, SCALEMODE_LONGTEXT, true )
         change_integer_list( pi_mode_values, ppsz_mode_descriptions )
 vlc_module_end ()
@@ -145,9 +144,8 @@ static const struct vlc_filter_operations filter_ops = {
 /*****************************************************************************
  * OpenScaler: probe the filter and return score
  *****************************************************************************/
-static int OpenScaler( vlc_object_t *p_this )
+static int OpenScaler( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
 
     int i_sws_mode;
