@@ -183,7 +183,7 @@ private:
 
     void refreshMediaList(MediaSourcePtr s, std::vector<InputItemPtr> childrens , bool clear);
 
-    static bool canBeIndexed(const QUrl& url , ItemType itemType );
+    bool canBeIndexed(const QUrl& url , ItemType itemType );
 
 private:
     //properties of the current node

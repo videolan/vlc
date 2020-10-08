@@ -306,7 +306,7 @@ bool NetworkMediaModel::initializeMediaSources()
         emit typeChanged();
         m_canBeIndexed = canBeIndexed( m_url, m_type );
         emit canBeIndexedChanged();
-        if ( vlc_ml_is_indexed( m_ml, QByteArray(m_treeItem.media->psz_uri).append('/').constData(), &m_indexed ) != VLC_SUCCESS ) {
+        if ( !m_ml || vlc_ml_is_indexed( m_ml, QByteArray(m_treeItem.media->psz_uri).append('/').constData(), &m_indexed ) != VLC_SUCCESS ) {
             m_indexed = false;
         }
         emit isIndexedChanged();
@@ -459,7 +459,7 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
             free(artwork);
         }
 
-        if ( item.canBeIndexed == true )
+        if ( m_ml && item.canBeIndexed == true )
         {
             if ( vlc_ml_is_indexed( m_ml, qtu( item.mainMrl.toString( QUrl::FullyEncoded ) ),
                                     &item.indexed ) != VLC_SUCCESS )
@@ -485,5 +485,5 @@ void NetworkMediaModel::refreshMediaList( MediaSourcePtr mediaSource,
 
 bool NetworkMediaModel::canBeIndexed(const QUrl& url , ItemType itemType )
 {
-    return static_cast<input_item_type_e>(itemType) != ITEM_TYPE_FILE && (url.scheme() == "smb" || url.scheme() == "ftp" || url.scheme() == "file");
+    return  m_ml && static_cast<input_item_type_e>(itemType) != ITEM_TYPE_FILE && (url.scheme() == "smb" || url.scheme() == "ftp" || url.scheme() == "file");
 }
