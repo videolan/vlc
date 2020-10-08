@@ -169,5 +169,6 @@ Item {
     property string window_maximize : "\ue095"
     property string window_minimize : "\ue096"
     property string window_restore : "\ue097"
+    property string home : "\ue098"
 
 }

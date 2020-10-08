@@ -155,6 +155,7 @@
 		{"key": "window_close", "path": "./topbar/window_close.svg" },
 		{"key": "window_maximize", "path": "./topbar/window_maximize.svg" },
 		{"key": "window_minimize", "path": "./topbar/window_minimize.svg" },
-		{"key": "window_restore", "path": "./topbar/window_restore.svg" }
+		{"key": "window_restore", "path": "./topbar/window_restore.svg" },
+		{"key": "home", "path": "./home.svg" }
 	]
 }
