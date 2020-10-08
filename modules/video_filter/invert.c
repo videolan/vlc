@@ -38,7 +38,6 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create      ( vlc_object_t * );
-static void Destroy     ( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
 
@@ -52,7 +51,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_capability( "video filter", 0 )
     add_shortcut( "invert" )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -82,16 +81,6 @@ static int Create( vlc_object_t *p_this )
     };
     p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Destroy: destroy Invert video thread output method
- *****************************************************************************
- * Terminate an output method created by InvertCreateOutputMethod
- *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
-{
-    (void)p_this;
 }
 
 /*****************************************************************************
