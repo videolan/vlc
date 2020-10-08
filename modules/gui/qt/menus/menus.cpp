@@ -527,13 +527,16 @@ QMenu *VLCMenuBar::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     menu->addMenu( submenu );
     menu->addMenu( new CheckableListMenu( qtr("&Program") , THEMIM->getPrograms(), CheckableListMenu::GROUPED , menu) );
 
-    submenu = new QMenu( qtr( I_MENU_BOOKMARK ), menu );
-    submenu->setTearOffEnabled( true );
-    addDPStaticEntry( submenu, qtr( "&Manage" ), "",
-                      &DialogsProvider::bookmarksDialog, "Ctrl+B" );
-    submenu->addSeparator();
-    action = menu->addMenu( submenu );
-    action->setData( "bookmark" );
+    if (p_intf->p_sys->p_mi->hasMediaLibrary() )
+    {
+        submenu = new QMenu( qtr( I_MENU_BOOKMARK ), menu );
+        submenu->setTearOffEnabled( true );
+        addDPStaticEntry( submenu, qtr( "&Manage" ), "",
+                          &DialogsProvider::bookmarksDialog, "Ctrl+B" );
+        submenu->addSeparator();
+        action = menu->addMenu( submenu );
+        action->setData( "bookmark" );
+    }
 
     menu->addSeparator();
 

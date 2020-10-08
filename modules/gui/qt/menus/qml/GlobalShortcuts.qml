@@ -35,7 +35,7 @@ Item {
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+J"; onActivated: dialogProvider.mediaCodecDialog(); }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+M"; onActivated: dialogProvider.messagesDialog(); }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+P"; onActivated: dialogProvider.prefsDialog(); }
-    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+B"; onActivated: dialogProvider.bookmarksDialog(); }
+    Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+B"; onActivated: dialogProvider.bookmarksDialog(); enabled: !!medialib}
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+T"; onActivated: dialogProvider.gotoTimeDialog(); }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"F1";     onActivated: dialogProvider.helpDialog(); }
 
