@@ -42,7 +42,6 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
 
 #define CFG_PREFIX "transform-"
 
@@ -67,7 +66,7 @@ vlc_module_begin()
         change_safe()
 
     add_shortcut("transform")
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
 
 /*****************************************************************************
@@ -313,8 +312,8 @@ static int Open(vlc_object_t *object)
     if (chroma == NULL)
         return VLC_EGENERIC;
 
-    filter_sys_t *sys = malloc(sizeof(*sys));
-    if (!sys)
+    filter_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(filter), sizeof(*sys));
+    if (unlikely(!sys))
         return VLC_ENOMEM;
 
     sys->chroma = chroma;
@@ -441,14 +440,6 @@ static int Open(vlc_object_t *object)
     filter->p_sys           = sys;
     return VLC_SUCCESS;
 error:
-    free(sys);
+    vlc_obj_free(VLC_OBJECT(filter), sys);
     return VLC_EGENERIC;
-}
-
-static void Close(vlc_object_t *object)
-{
-    filter_t     *filter = (filter_t *)object;
-    filter_sys_t *sys    = filter->p_sys;
-
-    free(sys);
 }

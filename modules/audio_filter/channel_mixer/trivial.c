@@ -36,14 +36,13 @@
 #include <vlc_filter.h>
 
 static int Create( vlc_object_t * );
-static void Destroy( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("Audio filter for trivial channel mixing") )
     set_capability( "audio converter", 1 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 typedef struct
@@ -310,8 +309,8 @@ static int Create( vlc_object_t *p_this )
         }
     }
 
-    filter_sys_t *p_sys = malloc( sizeof(*p_sys) );
-    if( !p_sys )
+    filter_sys_t *p_sys = vlc_obj_malloc( VLC_OBJECT(p_filter), sizeof(*p_sys) );
+    if( unlikely(!p_sys) )
         return VLC_ENOMEM;
     p_filter->p_sys = p_sys;
     memcpy( p_sys->channel_map, channel_map, sizeof(channel_map) );
@@ -322,10 +321,4 @@ static int Create( vlc_object_t *p_this )
         p_filter->ops = &downmix_filter_ops;
 
     return VLC_SUCCESS;
-}
-
-static void Destroy( vlc_object_t *p_this )
-{
-    filter_t *p_filter = (filter_t *)p_this;
-    free( p_filter->p_sys );
 }

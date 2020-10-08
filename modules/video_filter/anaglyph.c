@@ -31,7 +31,6 @@
 #include "filter_picture.h"
 
 static int Create(vlc_object_t *);
-static void Destroy(vlc_object_t *);
 static picture_t *Filter(filter_t *, picture_t *);
 static void combine_side_by_side_yuv420(picture_t *, picture_t *, int, int);
 
@@ -74,7 +73,7 @@ vlc_module_begin()
     set_capability("video filter", 0)
     add_string(FILTER_PREFIX "scheme", "red-cyan", SCHEME_TEXT, SCHEME_LONGTEXT, false)
         change_string_list(ppsz_scheme_values, ppsz_scheme_descriptions)
-    set_callbacks(Create, Destroy)
+    set_callback(Create)
 vlc_module_end()
 
 static const char *const ppsz_filter_options[] = {
@@ -109,8 +108,8 @@ static int Create(vlc_object_t *p_this)
             return VLC_EGENERIC;
     }
 
-    p_filter->p_sys = malloc(sizeof(filter_sys_t));
-    if (!p_filter->p_sys)
+    p_filter->p_sys = vlc_obj_malloc(VLC_OBJECT(p_filter), sizeof(filter_sys_t));
+    if (unlikely(!p_filter->p_sys))
         return VLC_ENOMEM;
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -163,13 +162,6 @@ static int Create(vlc_object_t *p_this)
 
     p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
-}
-
-static void Destroy(vlc_object_t *p_this)
-{
-    filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
-    free(p_sys);
 }
 
 static picture_t *Filter(filter_t *p_filter, picture_t *p_pic)

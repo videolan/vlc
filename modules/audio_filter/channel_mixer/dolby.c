@@ -37,7 +37,6 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
 
 static block_t *DoWork( filter_t *, block_t * );
 
@@ -50,7 +49,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )
     set_capability( "audio converter", 5 )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -98,8 +97,8 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the module's structure */
-    p_sys = p_filter->p_sys = malloc( sizeof(*p_sys) );
-    if( p_sys == NULL )
+    p_sys = p_filter->p_sys = vlc_obj_malloc( VLC_OBJECT(p_filter), sizeof(*p_sys) );
+    if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
     p_sys->i_left = -1;
     p_sys->i_center = -1;
@@ -145,15 +144,6 @@ static int Create( vlc_object_t *p_this )
     p_filter->ops = &filter_ops;
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Destroy: deallocate resources associated with headphone downmixer
- *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
-{
-    filter_t * p_filter = (filter_t *)p_this;
-    free( p_filter->p_sys );
 }
 
 /*****************************************************************************

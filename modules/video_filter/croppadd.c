@@ -39,7 +39,6 @@
  * Local prototypes
  ****************************************************************************/
 static int  OpenFilter ( vlc_object_t * );
-static void CloseFilter( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
 
@@ -78,7 +77,7 @@ vlc_module_begin ()
     set_shortname( N_("Croppadd") )
     set_description( N_("Video cropping filter") )
     set_capability( "video filter", 0 )
-    set_callbacks( OpenFilter, CloseFilter )
+    set_callback( OpenFilter )
 
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER );
@@ -158,8 +157,8 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_filter->p_sys = (filter_sys_t *)malloc( sizeof( filter_sys_t ) );
-    if( !p_filter->p_sys ) return VLC_ENOMEM;
+    p_filter->p_sys = (filter_sys_t *)vlc_obj_malloc( VLC_OBJECT(p_filter), sizeof( filter_sys_t ) );
+    if( unlikely(!p_filter->p_sys) ) return VLC_ENOMEM;
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
@@ -205,15 +204,6 @@ static int OpenFilter( vlc_object_t *p_this )
              p_filter->fmt_out.video.i_height );
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * CloseFilter: clean up the filter
- *****************************************************************************/
-static void CloseFilter( vlc_object_t *p_this )
-{
-    filter_t *p_filter = (filter_t *)p_this;
-    free( p_filter->p_sys );
 }
 
 /****************************************************************************
