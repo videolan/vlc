@@ -40,9 +40,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( filter_t * );
 
-static void Filter( filter_t *, picture_t *, picture_t * );
 static void FilterErase( filter_t *, picture_t *, picture_t * );
 static int EraseCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );

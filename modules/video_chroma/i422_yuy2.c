@@ -49,14 +49,6 @@
  *****************************************************************************/
 static int  Activate ( vlc_object_t * );
 
-static void I422_YUY2               ( filter_t *, picture_t *, picture_t * );
-static void I422_YVYU               ( filter_t *, picture_t *, picture_t * );
-static void I422_UYVY               ( filter_t *, picture_t *, picture_t * );
-static void I422_IUYV               ( filter_t *, picture_t *, picture_t * );
-#if defined (MODULE_NAME_IS_i422_yuy2)
-static void I422_Y211               ( filter_t *, picture_t *, picture_t * );
-#endif
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/

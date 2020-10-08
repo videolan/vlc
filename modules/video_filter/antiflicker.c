@@ -40,13 +40,11 @@
  * Local prototypes
  *****************************************************************************/
 static int GetLuminanceAvg( picture_t * p_pic );
-static void Filter( filter_t *, picture_t *, picture_t * );
 static int AntiFlickerCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *p_data );
 
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( filter_t * );
 VIDEO_FILTER_WRAPPER_CLOSE( Filter, Destroy )
 
 #define WINDOW_TEXT N_("Window size")

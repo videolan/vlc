@@ -73,9 +73,7 @@ enum { RED, GREEN, BLUE, WHITE };
 typedef struct filter_sys_t filter_sys_t;
 
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( filter_t * );
 
-static void Filter( filter_t *, picture_t *, picture_t * );
 VIDEO_FILTER_WRAPPER_CLOSE( Filter, Destroy )
 
 static void drawBall( filter_sys_t *p_sys, picture_t *p_outpic );

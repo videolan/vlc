@@ -42,12 +42,10 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create      ( vlc_object_t * );
-static void Destroy     ( filter_t * );
 
 static void RVSepia( picture_t *, picture_t *, int );
 static void PlanarI420Sepia( picture_t *, picture_t *, int);
 static void PackedYUVSepia( picture_t *, picture_t *, int);
-static void Filter( filter_t *, picture_t *, picture_t * );
 static const char *const ppsz_filter_options[] = {
     "intensity", NULL
 };

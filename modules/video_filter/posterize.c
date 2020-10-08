@@ -41,9 +41,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create      ( vlc_object_t * );
-static void Destroy     ( filter_t * );
 
-static void Filter( filter_t *, picture_t *, picture_t * );
 static void PlanarYUVPosterize( picture_t *, picture_t *, int);
 static void PackedYUVPosterize( picture_t *, picture_t *, int);
 static void RVPosterize( picture_t *, picture_t *, bool, int );

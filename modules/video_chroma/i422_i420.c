@@ -42,10 +42,6 @@
  *****************************************************************************/
 static int  Activate ( vlc_object_t * );
 
-static void I422_I420( filter_t *, picture_t *, picture_t * );
-static void I422_YV12( filter_t *, picture_t *, picture_t * );
-static void I422_YUVA( filter_t *, picture_t *, picture_t * );
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/

@@ -31,7 +31,6 @@
 #include "filter_picture.h"
 
 static int Create(vlc_object_t *);
-static void Filter(filter_t *, picture_t *, picture_t *);
 static void combine_side_by_side_yuv420(picture_t *, picture_t *, int, int);
 
 #define SCHEME_TEXT N_("Color scheme")

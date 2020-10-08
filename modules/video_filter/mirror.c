@@ -41,9 +41,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create      ( vlc_object_t * );
-static void Destroy     ( filter_t * );
 
-static void Filter( filter_t *, picture_t *, picture_t * );
 static void VerticalMirror( picture_t *, picture_t *, int plane, bool );
 static void HorizontalMirror( picture_t *, picture_t *, int, bool );
 static void PlanarVerticalMirror( picture_t *, picture_t *, int plane, bool );

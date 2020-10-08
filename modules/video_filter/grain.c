@@ -41,8 +41,6 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open (vlc_object_t *);
-static void Close(filter_t *);
-static void Filter(filter_t *filter, picture_t *src, picture_t *dst);
 VIDEO_FILTER_WRAPPER_CLOSE(Filter, Close)
 
 #define BANK_SIZE (64)

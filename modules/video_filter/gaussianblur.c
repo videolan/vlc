@@ -39,7 +39,6 @@
  * Module descriptor
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( filter_t * );
 
 #define SIGMA_MIN (0.01)
 #define SIGMA_MAX (4096.0)
@@ -71,7 +70,6 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void Filter( filter_t *, picture_t *, picture_t * );
 VIDEO_FILTER_WRAPPER_CLOSE(Filter, Destroy)
 
 static const char *const ppsz_filter_options[] = {

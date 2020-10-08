@@ -62,16 +62,6 @@
  *****************************************************************************/
 static int  Activate ( vlc_object_t * );
 
-static void I420_YUY2           ( filter_t *, picture_t *, picture_t * );
-static void I420_YVYU           ( filter_t *, picture_t *, picture_t * );
-static void I420_UYVY           ( filter_t *, picture_t *, picture_t * );
-#if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
-static void I420_IUYV           ( filter_t *, picture_t *, picture_t * );
-#endif
-#if defined (MODULE_NAME_IS_i420_yuy2)
-static void I420_Y211           ( filter_t *, picture_t *, picture_t * );
-#endif
-
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/

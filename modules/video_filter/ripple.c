@@ -42,7 +42,6 @@
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 
-static void Filter( filter_t *, picture_t *, picture_t * );
 VIDEO_FILTER_WRAPPER(Filter)
 
 /*****************************************************************************

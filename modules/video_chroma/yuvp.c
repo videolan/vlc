@@ -51,7 +51,6 @@ vlc_module_end ()
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static void Convert( filter_t *, picture_t *, picture_t * );
 static void Yuv2Rgb( uint8_t *r, uint8_t *g, uint8_t *b, int y1, int u1, int v1 );
 
 VIDEO_FILTER_WRAPPER( Convert )

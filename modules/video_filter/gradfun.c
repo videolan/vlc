@@ -40,7 +40,6 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open (vlc_object_t *);
-static void Close(filter_t *);
 
 #define CFG_PREFIX "gradfun-"
 
@@ -98,7 +97,6 @@ vlc_module_end()
 #include <stdalign.h>
 #include "gradfun.h"
 
-static void Filter(filter_t *, picture_t *, picture_t *);
 static int Callback(vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void *);
 VIDEO_FILTER_WRAPPER_CLOSE(Filter, Close)
 

@@ -39,7 +39,6 @@
  ****************************************************************************/
 static int  OpenFilter ( vlc_object_t * );
 
-static void Filter( filter_t *, picture_t *, picture_t * );
 VIDEO_FILTER_WRAPPER(Filter)
 
 #define CROPTOP_TEXT N_( "Pixels to crop from top" )

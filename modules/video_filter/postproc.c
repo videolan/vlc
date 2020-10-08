@@ -54,9 +54,7 @@
  * Local prototypes
  *****************************************************************************/
 static int OpenPostproc( vlc_object_t * );
-static void ClosePostproc( filter_t * );
 
-static void PostprocPict( filter_t *, picture_t *, picture_t * );
 VIDEO_FILTER_WRAPPER_CLOSE(PostprocPict, ClosePostproc)
 
 static int PPQCallback( vlc_object_t *, char const *,
