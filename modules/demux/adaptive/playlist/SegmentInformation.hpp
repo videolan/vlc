@@ -59,8 +59,8 @@ namespace adaptive
                 {
                     public:
                         size_t offset;
-                        mtime_t time;
-                        mtime_t duration;
+                        stime_t time;
+                        stime_t duration;
                 };
                 void SplitUsingIndex(std::vector<SplitPoint>&);
 

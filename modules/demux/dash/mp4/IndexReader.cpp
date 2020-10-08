@@ -48,14 +48,16 @@ bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep, uint64_t
         /* sidx refers to offsets from end of sidx pos in the file + first offset */
         point.offset = sidx->i_first_offset + i_fileoffset + sidxbox->i_pos + sidxbox->i_size;
         point.time = 0;
-        for(uint16_t i=0; i<sidx->i_reference_count && sidx->i_timescale; i++)
+        if(!sidx->i_timescale)
+            return false;
+        for(uint16_t i=0; i<sidx->i_reference_count; i++)
         {
             splitlist.push_back(point);
             point.offset += sidx->p_items[i].i_referenced_size;
-            point.duration = CLOCK_FREQ * sidx->p_items[i].i_subsegment_duration /
-                    sidx->i_timescale;
+            point.duration = sidx->p_items[i].i_subsegment_duration;
             point.time += point.duration;
         }
+        rep->setTimescale(Timescale(sidx->i_timescale));
         rep->SplitUsingIndex(splitlist);
         rep->getPlaylist()->debug();
     }
