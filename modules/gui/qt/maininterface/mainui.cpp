@@ -169,12 +169,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<MLUrlModel>( "org.videolan.medialib", 0, 1, "MLUrlModel" );
         qmlRegisterType<MLVideoModel>( "org.videolan.medialib", 0, 1, "MLVideoModel" );
         qmlRegisterType<MLRecentsVideoModel>( "org.videolan.medialib", 0, 1, "MLRecentsVideoModel" );
-        qRegisterMetaType<NetworkTreeItem>();
-        qmlRegisterType<NetworkMediaModel>( "org.videolan.medialib", 0, 1, "NetworkMediaModel");
-        qmlRegisterType<NetworkDeviceModel>( "org.videolan.medialib", 0, 1, "NetworkDeviceModel");
-        qmlRegisterType<NetworkSourcesModel>( "org.videolan.medialib", 0, 1, "NetworkSourcesModel");
-        qmlRegisterType<ServicesDiscoveryModel>( "org.videolan.medialib", 0, 1, "ServicesDiscoveryModel");
-        qmlRegisterType<MlFoldersModel>( "org.videolan.medialib", 0, 1, "MLFolderModel");
 
         //expose base object, they aren't instanciable from QML side
         registerAnonymousType<MLAlbum>("org.videolan.medialib", 1);
@@ -190,6 +184,13 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<URLContextMenu>( "org.videolan.medialib", 0, 1, "URLContextMenu" );
         qmlRegisterType<VideoContextMenu>( "org.videolan.medialib", 0, 1, "VideoContextMenu" );
     }
+
+    qRegisterMetaType<NetworkTreeItem>();
+    qmlRegisterType<NetworkMediaModel>( "org.videolan.vlc", 0, 1, "NetworkMediaModel");
+    qmlRegisterType<NetworkDeviceModel>( "org.videolan.vlc", 0, 1, "NetworkDeviceModel");
+    qmlRegisterType<NetworkSourcesModel>( "org.videolan.vlc", 0, 1, "NetworkSourcesModel");
+    qmlRegisterType<ServicesDiscoveryModel>( "org.videolan.vlc", 0, 1, "ServicesDiscoveryModel");
+    qmlRegisterType<MlFoldersModel>( "org.videolan.vlc", 0, 1, "MLFolderModel");
 
     qmlRegisterUncreatableType<NavigationHistory>("org.videolan.vlc", 0, 1, "History", "Type of global variable history" );
 
