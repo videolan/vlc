@@ -1670,7 +1670,6 @@ no_reuse:
 
         p_sys->p_va = va;
         p_sys->pix_fmt = hwfmt;
-        p_context->draw_horiz_band = NULL;
         vlc_mutex_unlock(&p_sys->lock);
         return hwfmt;
     }
