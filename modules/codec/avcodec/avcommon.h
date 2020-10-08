@@ -255,4 +255,107 @@ static inline void set_video_color_settings( const video_format_t *p_fmt, AVCode
     }
 }
 
+static inline void get_video_color_settings( const AVCodecContext *ctx,
+                                             video_format_t *fmt )
+{
+    switch ( ctx->color_range )
+    {
+    case AVCOL_RANGE_JPEG:
+        fmt->color_range = COLOR_RANGE_FULL;
+        break;
+    case AVCOL_RANGE_MPEG:
+        fmt->color_range = COLOR_RANGE_LIMITED;
+        break;
+    default: /* do nothing */
+        break;
+    }
+
+    switch( ctx->colorspace )
+    {
+        case AVCOL_SPC_BT709:
+            fmt->space = COLOR_SPACE_BT709;
+            break;
+        case AVCOL_SPC_SMPTE170M:
+        case AVCOL_SPC_BT470BG:
+            fmt->space = COLOR_SPACE_BT601;
+            break;
+        case AVCOL_SPC_BT2020_NCL:
+        case AVCOL_SPC_BT2020_CL:
+            fmt->space = COLOR_SPACE_BT2020;
+            break;
+        default:
+            break;
+    }
+
+    switch( ctx->color_trc )
+    {
+        case AVCOL_TRC_LINEAR:
+            fmt->transfer = TRANSFER_FUNC_LINEAR;
+            break;
+        case AVCOL_TRC_GAMMA22:
+            fmt->transfer = TRANSFER_FUNC_SRGB;
+            break;
+        case AVCOL_TRC_BT709:
+            fmt->transfer = TRANSFER_FUNC_BT709;
+            break;
+        case AVCOL_TRC_SMPTE170M:
+        case AVCOL_TRC_BT2020_10:
+        case AVCOL_TRC_BT2020_12:
+            fmt->transfer = TRANSFER_FUNC_BT2020;
+            break;
+#if LIBAVUTIL_VERSION_CHECK( 55, 14, 0, 31, 100)
+        case AVCOL_TRC_ARIB_STD_B67:
+            fmt->transfer = TRANSFER_FUNC_ARIB_B67;
+            break;
+#endif
+#if LIBAVUTIL_VERSION_CHECK( 55, 17, 0, 37, 100)
+        case AVCOL_TRC_SMPTE2084:
+            fmt->transfer = TRANSFER_FUNC_SMPTE_ST2084;
+            break;
+        case AVCOL_TRC_SMPTE240M:
+            fmt->transfer = TRANSFER_FUNC_SMPTE_240;
+            break;
+        case AVCOL_TRC_GAMMA28:
+            fmt->transfer = TRANSFER_FUNC_BT470_BG;
+            break;
+#endif
+        default:
+            break;
+    }
+
+    switch( ctx->color_primaries )
+    {
+        case AVCOL_PRI_BT709:
+            fmt->primaries = COLOR_PRIMARIES_BT709;
+            break;
+        case AVCOL_PRI_BT470BG:
+            fmt->primaries = COLOR_PRIMARIES_BT601_625;
+            break;
+        case AVCOL_PRI_SMPTE170M:
+        case AVCOL_PRI_SMPTE240M:
+            fmt->primaries = COLOR_PRIMARIES_BT601_525;
+            break;
+        case AVCOL_PRI_BT2020:
+            fmt->primaries = COLOR_PRIMARIES_BT2020;
+            break;
+        default:
+            break;
+    }
+
+    switch( ctx->chroma_sample_location )
+    {
+        case AVCHROMA_LOC_LEFT:
+            fmt->chroma_location = CHROMA_LOCATION_LEFT;
+            break;
+        case AVCHROMA_LOC_CENTER:
+            fmt->chroma_location = CHROMA_LOCATION_CENTER;
+            break;
+        case AVCHROMA_LOC_TOPLEFT:
+            fmt->chroma_location = CHROMA_LOCATION_TOP_LEFT;
+            break;
+        default:
+            break;
+    }
+}
+
 #endif
