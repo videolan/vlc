@@ -74,7 +74,6 @@ Rectangle {
     readonly property var pageModel: [
         { name: "about", url: "qrc:///about/About.qml" },
         { name: "mc", url: "qrc:///medialibrary/MainDisplay.qml" },
-        { name: "playlist", url: "qrc:///playlist/PlaylistMainView.qml" },
         { name: "player", url:"qrc:///player/Player.qml" },
     ]
 
@@ -101,7 +100,7 @@ Rectangle {
             if (medialib)
                 history.push(["mc", "video"])
             else
-                history.push(["playlist"])
+                history.push(["mc", "home"])
         }
     }
 
@@ -143,7 +142,7 @@ Rectangle {
                             if (medialib)
                                 history.push(["mc", "video"])
                             else
-                                history.push(["playlist"])
+                                history.push(["mc", "home"])
                         }
                         else
                             history.previous()

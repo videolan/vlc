@@ -42,7 +42,8 @@ Widgets.NavigableFocusScope {
     onViewPropertiesChanged: loadView()
     Component.onCompleted: {
         loadView()
-        medialib.reload()
+        if (medialib)
+            medialib.reload()
     }
 
     function loadView() {
@@ -87,17 +88,23 @@ Widgets.NavigableFocusScope {
 
     readonly property var pageModel: [
         {
-            listed: true,
+            listed: !!medialib,
             displayText: i18n.qtr("Video"),
             icon: VLCIcons.topbar_video,
             name: "video",
             url: "qrc:///medialibrary/VideoDisplay.qml"
         }, {
-            listed: true,
+            listed: !!medialib,
             displayText: i18n.qtr("Music"),
             icon: VLCIcons.topbar_music,
             name: "music",
             url: "qrc:///medialibrary/MusicDisplay.qml"
+        }, {
+            listed: !medialib,
+            displayText: i18n.qtr("Home"),
+            icon: VLCIcons.home,
+            name: "home",
+            url: "qrc:///main/NoMedialibHome.qml"
         }, {
             listed: true,
             displayText: i18n.qtr("Network"),

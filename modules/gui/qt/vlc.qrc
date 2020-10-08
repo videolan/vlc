@@ -178,6 +178,7 @@
     <qresource prefix="/main">
         <file alias="BannerSources.qml">maininterface/qml/BannerSources.qml</file>
         <file alias="MainInterface.qml">maininterface/qml/MainInterface.qml</file>
+        <file alias="NoMedialibHome.qml">maininterface/qml/NoMedialibHome.qml</file>
     </qresource>
     <qresource prefix="/widgets">
         <file alias="BannerTabButton.qml">widgets/qml/BannerTabButton.qml</file>
