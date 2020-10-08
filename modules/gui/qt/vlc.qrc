@@ -24,6 +24,8 @@
         <file alias="wait2.svg">pixmaps/util/wait2.svg</file>
         <file alias="wait3.svg">pixmaps/util/wait3.svg</file>
         <file alias="wait4.svg">pixmaps/util/wait4.svg</file>
+        <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>
+        <file alias="KeyHelper.js">util/qml/KeyHelper.js</file>
     </qresource>
     <qresource prefix="/toolbar">
         <file alias="faster.svg">pixmaps/faster.svg</file>
@@ -228,14 +230,11 @@
         <file alias="HorizontalResizeHandle.qml">widgets/qml/HorizontalResizeHandle.qml</file>
         <file alias="PointingTooltip.qml">widgets/qml/PointingTooltip.qml</file>
         <file alias="FrostedGlassEffect.qml">widgets/qml/FrostedGlassEffect.qml</file>
-	<file alias="PageLoader.qml">widgets/qml/PageLoader.qml</file>
-    </qresource>
-    <qresource prefix="/util">
-        <file alias="SelectableDelegateModel.qml">util/qml/SelectableDelegateModel.qml</file>
-        <file alias="KeyHelper.js">util/qml/KeyHelper.js</file>
+        <file alias="PageLoader.qml">widgets/qml/PageLoader.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="DiscoverDisplay.qml">network/qml/DiscoverDisplay.qml</file>
+        <file alias="DiscoverUrlDisplay.qml">network/qml/DiscoverUrlDisplay.qml</file>
         <file alias="NetworkDisplay.qml">network/qml/NetworkDisplay.qml</file>
         <file alias="NetworkHomeDeviceListView.qml">network/qml/NetworkHomeDeviceListView.qml</file>
         <file alias="NetworkHomeDisplay.qml">network/qml/NetworkHomeDisplay.qml</file>

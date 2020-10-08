@@ -42,7 +42,7 @@ Widgets.PageLoader {
         }, {
             displayText: i18n.qtr("URL"),
             name: "url",
-            url: "qrc:/medialibrary/UrlListDisplay.qml"
+            url: "qrc:///network/DiscoverUrlDisplay.qml"
         }
     ]
 

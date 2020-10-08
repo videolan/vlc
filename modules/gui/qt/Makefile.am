@@ -638,6 +638,7 @@ libqt_plugin_la_QML = \
 	gui/qt/menus/qml/GlobalShortcuts.qml \
 	gui/qt/menus/qml/Menubar.qml \
 	gui/qt/network/qml/DiscoverDisplay.qml \
+	gui/qt/network/qml/DiscoverUrlDisplay.qml \
 	gui/qt/network/qml/NetworkBrowseDisplay.qml \
 	gui/qt/network/qml/NetworkDisplay.qml \
 	gui/qt/network/qml/NetworkGridItem.qml \
