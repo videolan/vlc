@@ -601,7 +601,6 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
     getSegments(INFOTYPE_MEDIA, seglist);
     size_t prevstart = 0;
     stime_t prevtime = 0;
-    const Timescale timescale = inheritTimescale();
 
     SplitPoint split = {0,0,0};
     std::vector<SplitPoint>::const_iterator splitIt;
@@ -611,22 +610,19 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
         if(splitIt != splitlist.begin())
         {
             /* do previous splitpoint */
-            const stime_t duration = timescale.ToScaled(split.duration);
-            insertIntoSegment(seglist, prevstart, split.offset - 1, prevtime, duration);
+            insertIntoSegment(seglist, prevstart, split.offset - 1, prevtime, split.duration);
         }
         prevstart = split.offset;
-        prevtime = timescale.ToScaled(split.time);
+        prevtime = split.time;
     }
 
     if(splitlist.size() == 1)
     {
-        const stime_t duration = timescale.ToScaled(split.duration);
-        insertIntoSegment(seglist, prevstart, 0, prevtime, duration);
+        insertIntoSegment(seglist, prevstart, 0, prevtime, split.duration);
     }
     else if(splitlist.size() > 1)
     {
-        const stime_t duration = timescale.ToScaled(split.duration);
-        insertIntoSegment(seglist, prevstart, split.offset - 1, prevtime, duration);
+        insertIntoSegment(seglist, prevstart, split.offset - 1, prevtime, split.duration);
     }
 }
 

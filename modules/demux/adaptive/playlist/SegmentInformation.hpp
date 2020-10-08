@@ -59,8 +59,8 @@ namespace adaptive
                 {
                     public:
                         size_t offset;
-                        vlc_tick_t time;
-                        vlc_tick_t duration;
+                        stime_t time;
+                        stime_t duration;
                 };
                 void SplitUsingIndex(std::vector<SplitPoint>&);
 
