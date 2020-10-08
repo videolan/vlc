@@ -434,7 +434,7 @@ bool CommandsQueue::isEOF() const
 
 mtime_t CommandsQueue::getDemuxedAmount(mtime_t from) const
 {
-    if( from > bufferinglevel || from < getFirstDTS() )
+    if( from > bufferinglevel )
         return 0;
     if( from > getFirstDTS() )
         return bufferinglevel - from;
