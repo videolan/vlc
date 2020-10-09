@@ -755,7 +755,7 @@ void DialogsProvider::openAndTranscodingDialogs()
                                 ->showTab( OPEN_FILE_TAB );
 }
 
-void DialogsProvider::loadSubtitlesFile()
+void  DialogsProvider::loadMediaFile( const es_format_category_e category, const int filter , const QString &dialogTitle)
 {
     input_item_t *p_item = THEMIM->getInput();
     if( !p_item ) return;
@@ -771,16 +771,31 @@ void DialogsProvider::loadSubtitlesFile()
         free(path);
     }
 
-    QStringList qsl = showSimpleOpen( qtr( "Open subtitles..." ),
-                                      EXT_FILTER_SUBTITLE,
+    QStringList qsl = showSimpleOpen( dialogTitle,
+                                      filter,
                                       url );
 
     foreach( const QString &qsUrl, qsl )
     {
 
-        if ( THEMIM->AddAssociatedMedia( SPU_ES, qsUrl, true, true, false ) )
-            msg_Warn( p_intf, "unable to load subtitles from '%s'", qtu( qsUrl ) );
+        if ( THEMIM->AddAssociatedMedia( category, qsUrl, true, true, false ) )
+            msg_Warn( p_intf, "unable to load media from '%s', category(%d)", qtu( qsUrl ), category );
     }
+}
+
+void DialogsProvider::loadSubtitlesFile()
+{
+    loadMediaFile( SPU_ES, EXT_FILTER_SUBTITLE, qtr( "Open subtitles..." ) );
+}
+
+void DialogsProvider::loadAudioFile()
+{
+    loadMediaFile( AUDIO_ES, EXT_FILTER_AUDIO, qtr( "Open audio..." ) );
+}
+
+void DialogsProvider::loadVideoFile()
+{
+    loadMediaFile( VIDEO_ES, EXT_FILTER_VIDEO, qtr( "Open video..." ) );
 }
 
 

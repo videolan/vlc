@@ -108,6 +108,8 @@ private:
     virtual ~DialogsProvider();
     static DialogsProvider *instance;
 
+    void loadMediaFile( es_format_category_e category, int filter, const QString& dialogTitle );
+
     intf_thread_t *p_intf;
 
     QMenu* popupMenu;
@@ -171,6 +173,8 @@ public slots:
     void savePlayingToPlaylist();
 
     void loadSubtitlesFile();
+    void loadAudioFile();
+    void loadVideoFile();
 
     void quit();
 
