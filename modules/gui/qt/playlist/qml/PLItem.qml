@@ -310,21 +310,25 @@ Rectangle {
                 Layout.preferredHeight: parent.height / 2
 
                 onEntered: {
-                    var delta = drag.source.model.index - model.index
+                    var delta = 1
+
+                    if(!drag.hasUrls)
+                        delta = drag.source.model.index - model.index
+
                     if(delta === 0 || delta === -1)
                         return
 
                     dropVisible = true
                 }
                 onExited: {
-                    var delta = drag.source.model.index - model.index
-                    if(delta === 0 || delta === -1)
-                        return
-
                     dropVisible = false
                 }
                 onDropped: {
-                    var delta = drag.source.model.index - model.index
+                    var delta = 1
+
+                    if(!drop.hasUrls)
+                        delta = drag.source.model.index - model.index
+
                     if(delta === 0 || delta === -1)
                         return
 
@@ -341,7 +345,11 @@ Rectangle {
                 property bool _isLastItem : model.index === plitem.plmodel.count - 1
 
                 onEntered: {
-                    var delta = drag.source.model.index - model.index
+                    var delta = -1
+
+                    if(!drag.hasUrls)
+                        delta = drag.source.model.index - model.index
+
                     if(delta === 0 || delta === 1)
                         return
 
@@ -355,10 +363,6 @@ Rectangle {
                     }
                 }
                 onExited: {
-                    var delta = drag.source.model.index - model.index
-                    if(delta === 0 || delta === 1)
-                        return
-
                     if (_isLastItem)
                     {
                         root.setItemDropIndicatorVisible(model.index, false, false);
@@ -369,7 +373,11 @@ Rectangle {
                     }
                 }
                 onDropped: {
-                    var delta = drag.source.model.index - model.index
+                    var delta = -1
+
+                    if(!drop.hasUrls)
+                        delta = drag.source.model.index - model.index
+
                     if(delta === 0 || delta === 1)
                         return
 
@@ -394,7 +402,6 @@ Rectangle {
                     }
                 }
             }
-
         }
     }
 }

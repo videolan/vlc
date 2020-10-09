@@ -301,19 +301,18 @@ Widgets.NavigableFocusScope {
                     DropArea {
                         anchors.fill: parent
                         onEntered: {
-                            if(drag.source.model.index === root.plmodel.count - 1)
+                            if(!drag.hasUrls && drag.source.model.index === root.plmodel.count - 1)
                                 return
 
                             root.setItemDropIndicatorVisible(view.modelCount - 1, true, false);
                         }
                         onExited: {
-                            if(drag.source.model.index === root.plmodel.count - 1)
-                                return
+
 
                             root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
                         }
                         onDropped: {
-                            if(drag.source.model.index === root.plmodel.count - 1)
+                            if(!drop.hasUrls && drop.source.model.index === root.plmodel.count - 1)
                                 return
 
                             if (drop.hasUrls) {
