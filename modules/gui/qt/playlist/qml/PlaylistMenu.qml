@@ -81,24 +81,34 @@ Widgets.NavigableFocusScope {
         opacity: 0.4
     }
 
+    Item {
+        id: parentItem
 
-    Rectangle {
-        color: "black"
         anchors {
             right: parent.right
             top: parent.top
             bottom: parent.bottom
         }
         width: parent.width * drawerRatio
-        opacity: 0.9
 
+        Widgets.FrostedGlassEffect {
+            id: glassEffect
+            source: view
+
+            anchors.fill: parent
+
+            readonly property point overlayLocalPos: view.mapFromItem(overlayMenu, parentItem.x, parentItem.y)
+            sourceRect: Qt.rect(overlayLocalPos.x, overlayLocalPos.y, glassEffect.width, glassEffect.height)
+
+            tint: VLCStyle.colors.blendColors(VLCStyle.colors.black, VLCStyle.colors.banner, 0.85)
+            tintStrength: 0.6
+        }
 
         //avoid mouse event to be propagated to the widget below
         MouseArea {
             anchors.fill: parent
             hoverEnabled: true
         }
-
 
         Widgets.KeyNavigableListView {
             id: playlistMenu
@@ -168,7 +178,8 @@ Widgets.NavigableFocusScope {
                 background: Rectangle {
                     implicitWidth: 100
                     implicitHeight: VLCStyle.fontHeight_normal
-                    color: control.activeFocus ? "orange" : "transparent"
+                    color: control.activeFocus ? VLCStyle.colors.accent : "transparent"
+                    opacity: 0.8
 
                     Item {
                         id: leftSide
