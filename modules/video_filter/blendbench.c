@@ -258,8 +258,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     vlc_tick_t time = vlc_tick_now();
     for( int i_iter = 0; i_iter < p_sys->i_loops; ++i_iter )
     {
-        filter_Blend( p_blend, p_sys->p_base_image, p_sys->p_blend_image,
-                      0, 0, p_sys->i_alpha );
+        filter_Blend( p_blend, p_sys->p_base_image,
+                      0, 0, p_sys->p_blend_image, p_sys->i_alpha );
     }
     time = vlc_tick_now() - time;
 
