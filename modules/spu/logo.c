@@ -79,7 +79,7 @@ static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
-static int  OpenSub  ( vlc_object_t * );
+static int  OpenSub  ( filter_t * );
 static int  OpenVideo( filter_t * );
 static void Close    ( filter_t * );
 
@@ -87,8 +87,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
     set_help(LOGO_HELP)
-    set_capability( "sub source", 0 )
-    set_callback( OpenSub )
+    set_callback_sub_source( OpenSub, 0 )
     set_description( N_("Logo sub source") )
     set_shortname( N_("Logo overlay") )
     add_shortcut( "logo" )
@@ -183,7 +182,7 @@ static const char *const ppsz_filter_callbacks[] = {
     NULL
 };
 
-static int OpenCommon( vlc_object_t *, bool b_sub );
+static int OpenCommon( filter_t *, bool b_sub );
 
 static subpicture_t *FilterSub( filter_t *, vlc_tick_t );
 static picture_t    *FilterVideo( filter_t *, picture_t * );
@@ -201,9 +200,9 @@ static logo_t *LogoListCurrent( logo_list_t *p_list );
 /**
  * Open the sub source
  */
-static int OpenSub( vlc_object_t *p_this )
+static int OpenSub( filter_t *p_filter )
 {
-    return OpenCommon( p_this, true );
+    return OpenCommon( p_filter, true );
 }
 
 /**
@@ -211,7 +210,7 @@ static int OpenSub( vlc_object_t *p_this )
  */
 static int OpenVideo( filter_t *p_filter )
 {
-    return OpenCommon( VLC_OBJECT(p_filter), false );
+    return OpenCommon( p_filter, false );
 }
 
 static const struct vlc_filter_operations filter_sub_ops = {
@@ -227,9 +226,8 @@ static const struct vlc_filter_operations filter_video_ops = {
 /**
  * Common open function
  */
-static int OpenCommon( vlc_object_t *p_this, bool b_sub )
+static int OpenCommon( filter_t *p_filter, bool b_sub )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     char *psz_filename;
 
@@ -275,7 +273,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
         return VLC_ENOMEM;
     }
     if( *psz_filename == '\0' )
-        msg_Warn( p_this, "no logo file specified" );
+        msg_Warn( p_filter, "no logo file specified" );
 
     p_list->i_alpha = var_CreateGetIntegerCommand( p_filter, "logo-opacity");
     p_list->i_alpha = VLC_CLIP( p_list->i_alpha, 0, 255 );
@@ -292,7 +290,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
         p_sys->i_pos = 0;
 
     vlc_mutex_init( &p_sys->lock );
-    LogoListLoad( p_this, p_list, psz_filename );
+    LogoListLoad( VLC_OBJECT(p_filter), p_list, psz_filename );
     p_sys->b_spu_update = true;
     p_sys->b_mouse_grab = false;
 

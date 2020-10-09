@@ -44,7 +44,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int Create( vlc_object_t * );
+static int Create( filter_t * );
 static void Destroy( filter_t * );
 static subpicture_t *Filter( filter_t *, vlc_tick_t );
 
@@ -67,14 +67,13 @@ vlc_module_begin ()
     set_shortname( N_("Overlay" ))
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "sub source", 0 )
 
     add_loadfile("overlay-input", NULL, INPUT_TEXT, INPUT_LONGTEXT)
     /* Note: add_loadfile as O_WRONLY w/o O_CREAT, i.e. FIFO must exist */
     add_loadfile("overlay-output", NULL, OUTPUT_TEXT, OUTPUT_LONGTEXT)
 
     add_shortcut( "overlay" )
-    set_callback( Create )
+    set_callback_sub_source( Create, 0 )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -90,9 +89,8 @@ static const struct vlc_filter_operations filter_ops = {
  *****************************************************************************
  * This function allocates and initializes a adjust vout method.
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
     /* Allocate structure */

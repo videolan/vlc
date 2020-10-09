@@ -49,7 +49,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  CreateFilter ( vlc_object_t * );
+static int  CreateFilter ( filter_t * );
 static void DestroyFilter( filter_t * );
 static subpicture_t *Filter( filter_t *, vlc_tick_t );
 
@@ -188,10 +188,9 @@ static const char *const ppsz_title_modes[] =
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
-    set_capability( "sub source", 1 )
     set_shortname( N_("RSS / Atom") )
     set_help(RSS_HELP)
-    set_callback( CreateFilter )
+    set_callback_sub_source( CreateFilter, 1 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
     add_string( CFG_PREFIX "urls", NULL, MSG_TEXT, MSG_LONGTEXT, false )
@@ -247,9 +246,8 @@ static const struct vlc_filter_operations filter_ops = {
 /*****************************************************************************
  * CreateFilter: allocates RSS video filter
  *****************************************************************************/
-static int CreateFilter( vlc_object_t *p_this )
+static int CreateFilter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     char *psz_urls;
     int i_ttl;

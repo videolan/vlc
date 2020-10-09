@@ -145,6 +145,7 @@ typedef int (*vlc_video_converter_open)(filter_t *);
 typedef int (*vlc_video_filter_open)(filter_t *);
 typedef int (*vlc_video_text_renderer_open)(filter_t *);
 typedef int (*vlc_video_sub_filter_open)(filter_t *);
+typedef int (*vlc_video_sub_source_open)(filter_t *);
 
 
 #define set_deinterlace_callback( activate )     \
@@ -187,6 +188,14 @@ typedef int (*vlc_video_sub_filter_open)(filter_t *);
         set_callback(activate)                             \
     }                                                      \
     set_capability( "sub filter", 0 )
+
+#define set_callback_sub_source( activate, priority )      \
+    {                                                      \
+        vlc_video_sub_source_open open__ = activate;       \
+        (void) open__;                                     \
+        set_callback(activate)                             \
+    }                                                      \
+    set_capability( "sub source", priority )
 
 /** Structure describing a filter
  * @warning BIG FAT WARNING : the code relies on the first 4 members of

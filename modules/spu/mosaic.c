@@ -44,7 +44,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  CreateFilter    ( vlc_object_t * );
+static int  CreateFilter    ( filter_t * );
 static void DestroyFilter   ( filter_t * );
 static subpicture_t *Filter ( filter_t *, vlc_tick_t );
 
@@ -176,8 +176,7 @@ vlc_module_begin ()
     set_shortname( N_("Mosaic") )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC)
-    set_capability( "sub source", 0 )
-    set_callback( CreateFilter )
+    set_callback_sub_source( CreateFilter, 0 )
 
     add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255,
                             ALPHA_TEXT, ALPHA_LONGTEXT, false )
@@ -278,9 +277,8 @@ static const struct vlc_filter_operations filter_ops = {
 /*****************************************************************************
  * CreateFiler: allocate mosaic video filter
  *****************************************************************************/
-static int CreateFilter( vlc_object_t *p_this )
+static int CreateFilter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     char *psz_order, *_psz_order;
     char *psz_offsets;
