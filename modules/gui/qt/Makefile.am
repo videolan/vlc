@@ -663,7 +663,6 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/VolumeWidget.qml \
 	gui/qt/playlist/qml/PLItem.qml \
 	gui/qt/playlist/qml/PlaylistListView.qml \
-	gui/qt/playlist/qml/PlaylistMainView.qml \
 	gui/qt/playlist/qml/PlaylistMenu.qml \
 	gui/qt/playlist/qml/PlaylistToolbar.qml \
 	gui/qt/playlist/qml/PlaylistDetachedWindow.qml \
