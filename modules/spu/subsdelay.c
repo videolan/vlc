@@ -186,7 +186,7 @@ typedef struct
 
 static int SubsdelayCreate( vlc_object_t * );
 
-static void SubsdelayDestroy( vlc_object_t * );
+static void SubsdelayDestroy( filter_t * );
 
 static subpicture_t * SubsdelayFilter( filter_t *p_filter, subpicture_t* p_subpic );
 
@@ -266,7 +266,7 @@ vlc_module_begin()
         set_description( N_("Subtitle delay") )
         set_help( SUBSDELAY_HELP )
         set_capability( "sub filter", 0 )
-        set_callbacks( SubsdelayCreate, SubsdelayDestroy )
+        set_callback( SubsdelayCreate )
         set_category( CAT_VIDEO )
         set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
@@ -294,7 +294,7 @@ vlc_module_begin()
 static const char * const ppsz_filter_options[] = { "mode", "factor", "overlap", NULL };
 
 static const struct vlc_filter_operations filter_ops = {
-    .filter_sub = SubsdelayFilter,
+    .filter_sub = SubsdelayFilter, .close = SubsdelayDestroy,
 };
 
 /*****************************************************************************
@@ -352,9 +352,8 @@ static int SubsdelayCreate( vlc_object_t *p_this )
 /*****************************************************************************
  * SubsdelayDestroy: Destroy subsdelay filter
  *****************************************************************************/
-static void SubsdelayDestroy( vlc_object_t *p_this )
+static void SubsdelayDestroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *) p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     SubsdelayHeapDestroy( &p_sys->heap );
