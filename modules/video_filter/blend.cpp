@@ -37,12 +37,12 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static void Close(filter_t *);
 
 vlc_module_begin()
     set_description(N_("Video pictures blending"))
     set_capability("video blending", 100)
-    set_callbacks(Open, Close)
+    set_callback(Open)
 vlc_module_end()
 
 static inline unsigned div255(unsigned v)
@@ -685,6 +685,7 @@ static const struct FilterOperationInitializer {
     FilterOperationInitializer()
     {
         ops.blend_video = DoBlend;
+        ops.close       = Close;
     };
 } filter_ops;
 
@@ -712,9 +713,8 @@ static int Open(vlc_object_t *object)
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *object)
+static void Close(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)object;
     filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( filter->p_sys );
     delete p_sys;
 }
