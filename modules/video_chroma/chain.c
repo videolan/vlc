@@ -54,6 +54,7 @@ vlc_module_end ()
  * Local prototypes.
  *****************************************************************************/
 static picture_t *Chain         ( filter_t *, picture_t * );
+static void Flush               ( filter_t * );
 
 static int BuildTransformChain( filter_t *p_filter );
 static int BuildChromaResize( filter_t * );
@@ -154,7 +155,7 @@ static const struct filter_video_callbacks filter_video_chain_cbs =
 };
 
 static const struct vlc_filter_operations filter_ops = {
-    .filter_video = Chain,
+    .filter_video = Chain, .flush = Flush,
 };
 
 /*****************************************************************************
@@ -277,6 +278,12 @@ static picture_t *Chain( filter_t *p_filter, picture_t *p_pic )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     return filter_chain_VideoFilter( p_sys->p_chain, p_pic );
+}
+
+static void Flush( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_chain_VideoFlush( p_sys->p_chain );
 }
 
 /*****************************************************************************
