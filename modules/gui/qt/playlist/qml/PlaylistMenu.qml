@@ -34,6 +34,9 @@ Widgets.NavigableFocusScope {
     property int leftPadding: 0
     property int rightPadding: 0
 
+    property bool isPLEmpty: false
+    property bool isItemNotSelected: false
+
     onActiveFocusChanged: {
         if (!activeFocus) {
             overlayMenu.close()
@@ -46,7 +49,7 @@ Widgets.NavigableFocusScope {
     }
 
     function open() {
-        playlistMenu.currentModel = "rootmenu"
+        playlistMenu.currentModel = isPLEmpty ? "rootmenu_plempty" : (isItemNotSelected ? "rootmenu_noselection" : "rootmenu")
         playlistMenu.menuHierachy = []
         overlayMenu.visible = true
         overlayMenu.forceActiveFocus()

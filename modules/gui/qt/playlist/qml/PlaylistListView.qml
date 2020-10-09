@@ -74,6 +74,9 @@ Widgets.NavigableFocusScope {
             leftPadding: root.leftPadding
             rightPadding: root.rightPadding
 
+            isPLEmpty: (root.plmodel.count === 0)
+            isItemNotSelected: (root.plmodel.selectedCount === 0)
+
             //rootmenu
             Action { id:playAction;         text: i18n.qtr("Play");                      onTriggered: mainPlaylistController.goTo(root.plmodel.getSelection()[0], true); icon.source: "qrc:///toolbar/play_b.svg"                   }
             Action { id:streamAction;       text: i18n.qtr("Stream");                    onTriggered: dialogProvider.streamingDialog(root.plmodel.getSelection().map(function(i) { return root.plmodel.itemAt(i).url; }), false); icon.source: "qrc:/menu/stream.svg" }
@@ -132,6 +135,26 @@ Widgets.NavigableFocusScope {
                         selectTracksAction,
                         moveTracksAction,
                         deleteAction
+                    ]
+                },
+                "rootmenu_plempty" : {
+                    title: i18n.qtr("Playlist"),
+                    entries: [
+                        addFileAction,
+                        addDirAction,
+                        addAdvancedAction
+                    ]
+                },
+                "rootmenu_noselection" : {
+                    title: i18n.qtr("Playlist"),
+                    entries: [
+                        addFileAction,
+                        addDirAction,
+                        addAdvancedAction,
+                        savePlAction,
+                        clearAllAction,
+                        sortAction,
+                        selectTracksAction
                     ]
                 },
                 "sortmenu" :{
