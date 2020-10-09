@@ -99,9 +99,7 @@ Widgets.NavigableFocusScope {
                 
                 listWidth: VLCStyle.widthSortBox
                 onSortSelected: {
-                    if (modelData.criteria !== sortKey)
-                        mainPlaylistController.setSortOrder(PlaylistControllerModel.SORT_ORDER_ASC)
-                    mainPlaylistController.setSortKey(modelData.criteria)
+                    root.sortPL(modelData.criteria)
                 }
 
                 Keys.priority: Keys.AfterItem

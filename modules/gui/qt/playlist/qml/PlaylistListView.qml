@@ -45,6 +45,18 @@ Widgets.NavigableFocusScope {
 
     VLCColors {id: vlcNightColors; state: "night"}
 
+    function sortPL(key) {
+        if (mainPlaylistController.sortKey !== key) {
+            mainPlaylistController.setSortOrder(PlaylistControllerModel.SORT_ORDER_ASC)
+            mainPlaylistController.setSortKey(key)
+        }
+        else {
+            mainPlaylistController.switchSortOrder()
+        }
+
+        mainPlaylistController.sort()
+    }
+
     Rectangle {
         id: parentRect
         anchors.fill: parent
@@ -95,25 +107,72 @@ Widgets.NavigableFocusScope {
             Action { id:moveTracksAction;   text: i18n.qtr("Move Selection");            onTriggered: view.mode = "move";                                                                                                           }
             Action { id:deleteAction;       text: i18n.qtr("Remove Selected");           onTriggered: view.onDelete();                                                                                                              }
 
-            //sortmenu
-            Action { id: sortTitleAction;   text: i18n.qtr("Title");
-                onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_TITLE, PlaylistControllerModel.SORT_ORDER_ASC)}
-            Action { id: sortDurationAction;text: i18n.qtr("Duration");
-                onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_DURATION, PlaylistControllerModel.SORT_ORDER_ASC)}
-            Action { id: sortArtistAction;  text: i18n.qtr("Artist");
-                onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_ARTIST, PlaylistControllerModel.SORT_ORDER_ASC)}
-            Action { id: sortAlbumAction;   text: i18n.qtr("Album");
-                onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_ALBUM, PlaylistControllerModel.SORT_ORDER_ASC)}
-            Action { id: sortGenreAction;   text: i18n.qtr("Genre");
-                onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_GENRE, PlaylistControllerModel.SORT_ORDER_ASC)}
-            Action { id: sortDateAction;    text: i18n.qtr("Date");
-                onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_DATE, PlaylistControllerModel.SORT_ORDER_ASC)}
-            Action { id: sortTrackAction;   text: i18n.qtr("Track Number");
-                onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_TRACK_NUMBER, PlaylistControllerModel.SORT_ORDER_ASC)}
-            Action { id: sortURLAction;     text: i18n.qtr("URL");
-                onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_URL, PlaylistControllerModel.SORT_ORDER_ASC)}
-            Action { id: sortRatingAction;  text: i18n.qtr("Rating");
-                onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_RATING, PlaylistControllerModel.SORT_ORDER_ASC)}
+            readonly property var sortList: [sortTitleAction,
+                                            sortDurationAction,
+                                            sortArtistAction,
+                                            sortAlbumAction,
+                                            sortGenreAction,
+                                            sortDateAction,
+                                            sortTrackAction,
+                                            sortURLAction,
+                                            sortRatingAction]
+
+            Connections {
+                id: plControllerConnections
+                target: mainPlaylistController
+
+                property alias sortList: overlayMenu.sortList
+
+                function setMark() {
+                    for (var i = 0; i < sortList.length; i++) {
+                        if(sortList[i].key === mainPlaylistController.sortKey) {
+                            sortList[i].sortActiveMark = "✓"
+                            sortList[i].sortOrderMark  = (mainPlaylistController.sortOrder === PlaylistControllerModel.SORT_ORDER_ASC ? "↓" : "↑")
+                            continue
+                        }
+
+                        sortList[i].sortActiveMark = ""
+                        sortList[i].sortOrderMark  = ""
+                    }
+                }
+
+                onSortOrderChanged: {
+                    plControllerConnections.setMark()
+                }
+
+                onSortKeyChanged: {
+                    plControllerConnections.setMark()
+                }
+            }
+
+            // sortmenu
+            Action { id: sortTitleAction;   text: i18n.qtr("Title"); onTriggered: root.sortPL(key);
+                readonly property int key: PlaylistControllerModel.SORT_KEY_TITLE;
+                property string sortActiveMark; property string sortOrderMark }
+            Action { id: sortDurationAction; text: i18n.qtr("Duration"); onTriggered: root.sortPL(key);
+                readonly property int key: PlaylistControllerModel.SORT_KEY_DURATION
+                property string sortActiveMark; property string sortOrderMark }
+            Action { id: sortArtistAction;  text: i18n.qtr("Artist"); onTriggered: root.sortPL(key);
+                readonly property int key: PlaylistControllerModel.SORT_KEY_ARTIST
+                property string sortActiveMark; property string sortOrderMark }
+            Action { id: sortAlbumAction;   text: i18n.qtr("Album"); onTriggered: root.sortPL(key);
+                readonly property int key: PlaylistControllerModel.SORT_KEY_ALBUM
+                property string sortActiveMark; property string sortOrderMark }
+            Action { id: sortGenreAction;   text: i18n.qtr("Genre"); onTriggered: root.sortPL(key);
+                readonly property int key: PlaylistControllerModel.SORT_KEY_GENRE
+                property string sortActiveMark; property string sortOrderMark }
+            Action { id: sortDateAction;    text: i18n.qtr("Date"); onTriggered: root.sortPL(key);
+                readonly property int key: PlaylistControllerModel.SORT_KEY_DATE
+                property string sortActiveMark; property string sortOrderMark }
+            Action { id: sortTrackAction;   text: i18n.qtr("Track Number"); onTriggered: root.sortPL(key);
+                readonly property int key: PlaylistControllerModel.SORT_KEY_TRACK_NUMBER
+                property string sortActiveMark; property string sortOrderMark }
+            Action { id: sortURLAction;     text: i18n.qtr("URL"); onTriggered: root.sortPL(key);
+                readonly property int key: PlaylistControllerModel.SORT_KEY_URL
+                property string sortActiveMark; property string sortOrderMark }
+            Action { id: sortRatingAction;  text: i18n.qtr("Rating"); onTriggered: root.sortPL(key);
+                readonly property int key: PlaylistControllerModel.SORT_KEY_RATING
+                property string sortActiveMark; property string sortOrderMark }
 
             models: {
                 "rootmenu" : {
@@ -159,17 +218,7 @@ Widgets.NavigableFocusScope {
                 },
                 "sortmenu" :{
                     title: i18n.qtr("Sort Playlist"),
-                    entries:  [
-                        sortTitleAction,
-                        sortDurationAction,
-                        sortArtistAction,
-                        sortAlbumAction,
-                        sortGenreAction,
-                        sortDateAction,
-                        sortTrackAction,
-                        sortURLAction,
-                        sortRatingAction,
-                    ]
+                    entries: sortList
                 }
             }
         }
@@ -619,19 +668,19 @@ Widgets.NavigableFocusScope {
                 height: VLCStyle.heightBar_normal
                 visible: !(infoText.text === "")
 
-	            RectangularGlow {
-	                anchors.top: parent.top
-	                anchors.bottom: parent.bottom
-	                anchors.horizontalCenter: parent.horizontalCenter
+                RectangularGlow {
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
 
                     width: infoText.width + VLCStyle.dp(18, VLCStyle.scale)
                     height: infoText.height + VLCStyle.dp(12, VLCStyle.scale)
 
-	                glowRadius: 2
-	                cornerRadius: 10
-	                spread: 0.1
-	                color: _colors.glowColorBanner
-	            }
+                    glowRadius: 2
+                    cornerRadius: 10
+                    spread: 0.1
+                    color: _colors.glowColorBanner
+                }
 
                 Label {
                     id: infoText

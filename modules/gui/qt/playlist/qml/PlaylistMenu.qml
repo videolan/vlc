@@ -142,12 +142,27 @@ Widgets.NavigableFocusScope {
                 icon.width: VLCStyle.fontHeight_normal
                 icon.height: VLCStyle.fontHeight_normal
 
-                contentItem: Label {
-                    text: control.text
-                    color: "white"
-                    font.pixelSize: VLCStyle.fontSize_normal
-                    leftPadding: VLCStyle.icon_small
+                contentItem: RowLayout {
+                    width: control.width
 
+                    Label {
+                        Layout.fillWidth: true
+
+                        text: control.text
+                        color: "white"
+                        font.pixelSize: VLCStyle.fontSize_normal
+                        leftPadding: VLCStyle.icon_small
+                    }
+
+                    Loader {
+                        active: currentModel === "sortmenu"
+
+                        sourceComponent: Label {
+                            text: modelData.sortOrderMark
+                            color: "white"
+                            font.pixelSize: VLCStyle.fontSize_normal
+                        }
+                    }
                 }
 
                 background: Rectangle {
@@ -155,18 +170,42 @@ Widgets.NavigableFocusScope {
                     implicitHeight: VLCStyle.fontHeight_normal
                     color: control.activeFocus ? "orange" : "transparent"
 
-                    ColorImage {
+                    Item {
+                        id: leftSide
                         width: control.icon.width
                         height: control.icon.height
 
                         x: control.mirrored ? control.width - width - control.rightPadding : control.leftPadding
                         y: control.topPadding + (control.availableHeight - height) / 2
 
-                        source: control.checked ? "qrc:/qt-project.org/imports/QtQuick/Controls.2/images/check.png"
-                            : modelData.icon.source ? modelData.icon.source
-                            : ""
-                        visible: true
-                        color: control.enabled ? VLCStyle.colors.playerFg : VLCStyle.colors.playerFgInactive
+                        Loader {
+                            id: leftTextLoader
+                            active: currentModel === "sortmenu"
+
+                            anchors.fill: parent
+
+                            sourceComponent: Label {
+                                text: modelData.sortActiveMark
+                                color: "white"
+                                font.pixelSize: VLCStyle.fontSize_normal
+                            }
+                        }
+
+                        Loader {
+                            active: !leftTextLoader.active
+                            anchors.fill: parent
+
+                            sourceComponent: ColorImage {
+                                width: leftSide.width
+                                height: leftSide.height
+
+                                source: control.checked ? "qrc:/qt-project.org/imports/QtQuick/Controls.2/images/check.png"
+                                    : modelData.icon.source ? modelData.icon.source
+                                    : ""
+                                visible: true
+                                color: control.enabled ? VLCStyle.colors.playerFg : VLCStyle.colors.playerFgInactive
+                            }
+                        }
                     }
 
                     ColorImage {
