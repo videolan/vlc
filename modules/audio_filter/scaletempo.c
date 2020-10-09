@@ -41,12 +41,12 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open( vlc_object_t * );
-static void Close( vlc_object_t * );
+static void Close( filter_t * );
 static block_t *DoWork( filter_t *, block_t * );
 
 #ifdef PITCH_SHIFTER
 static int  OpenPitch( vlc_object_t * );
-static void ClosePitch( vlc_object_t * );
+static void ClosePitch( filter_t * );
 static block_t *DoPitchWork( filter_t *, block_t * );
 # define MODULE_DESC N_("Pitch Shifter")
 # define MODULES_SHORTNAME N_("Audio pitch changer")
@@ -71,9 +71,9 @@ vlc_module_begin ()
 #ifdef PITCH_SHIFTER
     add_float_with_range( "pitch-shift", 0, -12, 12,
         N_("Pitch Shift"), N_("Pitch shift in semitones."), false )
-    set_callbacks( OpenPitch, ClosePitch )
+    set_callback( OpenPitch )
 #else
-    set_callbacks( Open, Close )
+    set_callback( Open )
 #endif
 
 vlc_module_end ()
@@ -437,7 +437,7 @@ static int Open( vlc_object_t *p_this )
 
     if( reinit_buffers( p_filter ) != VLC_SUCCESS )
     {
-        Close( p_this );
+        Close( p_filter );
         return VLC_EGENERIC;
     }
 
@@ -446,7 +446,7 @@ static int Open( vlc_object_t *p_this )
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_audio = DoWork,
+        .filter_audio = DoWork, .close = Close,
     };
     p_filter->ops = &filter_ops;
 
@@ -517,7 +517,7 @@ static int OpenPitch( vlc_object_t *p_this )
 
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_audio = DoPitchWork,
+        .filter_audio = DoPitchWork, .close = ClosePitch,
     };
     p_filter->ops = &filter_ops;
 
@@ -525,9 +525,8 @@ static int OpenPitch( vlc_object_t *p_this )
 }
 #endif
 
-static void Close( vlc_object_t *p_this )
+static void Close( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
     free( p_sys->buf_queue );
     free( p_sys->buf_overlap );
@@ -538,9 +537,8 @@ static void Close( vlc_object_t *p_this )
 }
 
 #ifdef PITCH_SHIFTER
-static void ClosePitch( vlc_object_t *p_this )
+static void ClosePitch( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
     vlc_object_t *p_aout = vlc_object_parent(p_filter);
     var_DelCallback( p_aout, "pitch-shift", PitchCallback, p_sys );
@@ -548,7 +546,7 @@ static void ClosePitch( vlc_object_t *p_this )
     filter_Close( p_sys->resampler );
     module_unneed( p_sys->resampler, p_sys->resampler->p_module );
     vlc_object_delete(p_sys->resampler);
-    Close( p_this );
+    Close( p_filter );
 }
 #endif
 

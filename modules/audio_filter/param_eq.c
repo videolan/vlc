@@ -40,7 +40,7 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static void Close( filter_t * );
 static void CalcPeakEQCoeffs( float, float, float, float, float * );
 static void CalcShelfEQCoeffs( float, float, float, int, float, float * );
 static void ProcessEQ( const float *, float *, float *, unsigned, unsigned,
@@ -76,7 +76,7 @@ vlc_module_begin ()
     add_float_with_range( "param-eq-q3", 3, 0.1, 100.0,
                           N_("Freq 3 Q"),NULL,false )
 
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -117,7 +117,7 @@ static int Open( vlc_object_t *p_this )
 
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_audio = DoWork,
+        .filter_audio = DoWork, .close = Close,
     };
     p_filter->ops = &filter_ops;
 
@@ -156,9 +156,8 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static void Close( vlc_object_t *p_this )
+static void Close( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
     free( p_sys->p_state );
     free( p_sys );

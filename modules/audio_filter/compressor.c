@@ -115,7 +115,7 @@ typedef union
 } ls_pcast32;
 
 static int      Open            ( vlc_object_t * );
-static void     Close           ( vlc_object_t * );
+static void     Close           ( filter_t * );
 static block_t *DoWork          ( filter_t *, block_t * );
 
 static void     DbInit          ( filter_sys_t * );
@@ -193,7 +193,7 @@ vlc_module_begin()
                KNEE_TEXT, KNEE_LONGTEXT, false )
     add_float_with_range( "compressor-makeup-gain", 7.0, 0.0, 24.0,
                MAKEUP_GAIN_TEXT, MAKEUP_GAIN_LONGTEXT, false )
-    set_callbacks( Open, Close )
+    set_callback( Open )
     add_shortcut( "compressor" )
 vlc_module_end ()
 
@@ -259,7 +259,7 @@ static int Open( vlc_object_t *p_this )
 
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_audio = DoWork,
+        .filter_audio = DoWork, .close = Close,
     };
     p_filter->ops = &filter_ops;
 
@@ -272,9 +272,8 @@ static int Open( vlc_object_t *p_this )
  * Close: destroy interface
  *****************************************************************************/
 
-static void Close( vlc_object_t *p_this )
+static void Close( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t*)p_this;
     vlc_object_t *p_aout = vlc_object_parent(p_filter);
     filter_sys_t *p_sys = p_filter->p_sys;
 

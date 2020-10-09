@@ -41,7 +41,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  OpenFilter ( vlc_object_t * );
-static void CloseFilter( vlc_object_t * );
+static void CloseFilter( filter_t * );
 static block_t *Convert( filter_t *, block_t * );
 
 /*****************************************************************************
@@ -85,7 +85,7 @@ vlc_module_begin ()
               HEADPHONE_DOLBY_LONGTEXT, true )
 
     set_capability( "audio filter", 0 )
-    set_callbacks( OpenFilter, CloseFilter )
+    set_callback( OpenFilter )
     add_shortcut( "headphone" )
 vlc_module_end ()
 
@@ -481,7 +481,7 @@ static int OpenFilter( vlc_object_t *p_this )
 
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_audio = Convert,
+        .filter_audio = Convert, .close = CloseFilter,
     };
     p_filter->ops = &filter_ops;
 
@@ -494,9 +494,8 @@ static int OpenFilter( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseFilter : deallocate data structures
  *****************************************************************************/
-static void CloseFilter( vlc_object_t *p_this )
+static void CloseFilter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     free( p_sys->p_overflow_buffer );

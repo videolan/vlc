@@ -33,7 +33,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static void Close( filter_t * );
 
 static block_t *Filter ( filter_t *, block_t * );
 static int paramCallback( vlc_object_t *, char const *, vlc_value_t ,
@@ -80,7 +80,7 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
     set_capability( "audio filter", 0 )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 
     add_float_with_range( CONFIG_PREFIX "delay", 20, 1, 100,
         DELAY_TEXT, DELAY_LONGTEXT, true )
@@ -149,13 +149,13 @@ static int Open( vlc_object_t *obj )
     if( MakeRingBuffer( &p_sys->pf_ringbuf, &p_sys->i_len, &p_sys->pf_write,
                         p_sys->f_delay, p_filter->fmt_in.audio.i_rate ) != VLC_SUCCESS )
     {
-        Close( obj );
+        Close( p_filter );
         return VLC_ENOMEM;
     }
 
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_audio = Filter,
+        .filter_audio = Filter, .close = Close,
     };
     p_filter->ops = &filter_ops;
     return VLC_SUCCESS;
@@ -198,9 +198,8 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
 /*****************************************************************************
  * Close: close the plugin
  *****************************************************************************/
-static void Close( vlc_object_t *obj )
+static void Close( filter_t *p_filter )
 {
-    filter_t *p_filter  = (filter_t *)obj;
     vlc_object_t *p_aout = vlc_object_parent(p_filter);
     filter_sys_t *p_sys = p_filter->p_sys;
 

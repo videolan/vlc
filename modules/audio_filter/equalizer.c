@@ -52,7 +52,7 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static void Close( filter_t * );
 
 #define PRESET_TEXT N_( "Equalizer preset" )
 #define PRESET_LONGTEXT N_("Preset to use for the equalizer." )
@@ -93,7 +93,7 @@ vlc_module_begin ()
               VLC_BANDS_LONGTEXT, true )
     add_float( "equalizer-preamp", 12.0f, PREAMP_TEXT,
                PREAMP_LONGTEXT, true )
-    set_callbacks( Open, Close )
+    set_callback( Open )
     add_shortcut( "equalizer" )
 vlc_module_end ()
 
@@ -166,7 +166,7 @@ static int Open( vlc_object_t *p_this )
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_audio = DoWork,
+        .filter_audio = DoWork, .close = Close,
     };
     p_filter->ops = &filter_ops;
 
@@ -176,9 +176,8 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close: close the plugin
  *****************************************************************************/
-static void Close( vlc_object_t *p_this )
+static void Close( filter_t *p_filter )
 {
-    filter_t     *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     EqzClean( p_filter );

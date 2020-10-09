@@ -48,7 +48,7 @@
  *****************************************************************************/
 
 static int  Open     ( vlc_object_t * );
-static void Close    ( vlc_object_t * );
+static void Close    ( filter_t * );
 static block_t *DoWork( filter_t *, block_t * );
 
 typedef struct
@@ -84,7 +84,7 @@ vlc_module_begin ()
     add_float( "norm-max-level", 2.0, LEVEL_TEXT,
                LEVEL_LONGTEXT, true )
     set_capability( "audio filter", 0 )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -121,7 +121,7 @@ static int Open( vlc_object_t *p_this )
     p_filter->fmt_out.audio = p_filter->fmt_in.audio;
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_audio = DoWork,
+        .filter_audio = DoWork, .close = Close,
     };
     p_filter->ops = &filter_ops;
 
@@ -226,9 +226,8 @@ out:
 /**********************************************************************
  * Close
  **********************************************************************/
-static void Close( vlc_object_t *p_this )
+static void Close( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     free( p_sys->p_last );

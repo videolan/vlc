@@ -40,7 +40,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  OpenFilter    ( vlc_object_t * );
-static void CloseFilter   ( vlc_object_t * );
+static void CloseFilter   ( filter_t * );
 
 static block_t *Convert( filter_t *p_filter, block_t *p_block );
 
@@ -98,7 +98,7 @@ vlc_module_begin ()
     set_capability( "audio filter", 0 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
-    set_callbacks( OpenFilter, CloseFilter )
+    set_callback( OpenFilter )
     set_shortname( "Mono" )
 
     add_bool( MONO_CFG "downmix", true, MONO_DOWNMIX_TEXT,
@@ -387,7 +387,7 @@ static int OpenFilter( vlc_object_t *p_this )
 
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_audio = Convert,
+        .filter_audio = Convert, .close = CloseFilter,
     };
     p_filter->ops = &filter_ops;
 
@@ -410,9 +410,8 @@ static int OpenFilter( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseFilter
  *****************************************************************************/
-static void CloseFilter( vlc_object_t *p_this)
+static void CloseFilter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *) p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     free( p_sys->p_atomic_operations );

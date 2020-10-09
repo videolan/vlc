@@ -75,7 +75,7 @@ vlc_module_begin()
     add_submodule()
     set_shortname(N_("Binauralizer"))
     set_capability("audio filter", 0)
-    set_callbacks(OpenBinauralizer, Close)
+    set_callback(OpenBinauralizer)
     add_shortcut("binauralizer")
 vlc_module_end()
 
@@ -318,6 +318,11 @@ static int allocateBuffers(filter_spatialaudio *p_sys)
     return VLC_SUCCESS;
 }
 
+static void CloseFilter(filter_t *p_filter)
+{
+    Close( VLC_OBJECT(p_filter) );
+}
+
 static const struct FilterOperationInitializer {
     struct vlc_filter_operations ops {};
     FilterOperationInitializer()
@@ -325,6 +330,7 @@ static const struct FilterOperationInitializer {
         ops.filter_audio = Mix;
         ops.flush = Flush;
         ops.change_viewpoint = ChangeViewpoint;
+        ops.close = CloseFilter;
     };
 } filter_ops;
 
