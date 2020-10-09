@@ -184,7 +184,7 @@ typedef struct
  * Filter functions
  *****************************************************************************/
 
-static int SubsdelayCreate( vlc_object_t * );
+static int SubsdelayCreate( filter_t * );
 
 static void SubsdelayDestroy( filter_t * );
 
@@ -265,8 +265,7 @@ vlc_module_begin()
         set_shortname( N_("Subsdelay") )
         set_description( N_("Subtitle delay") )
         set_help( SUBSDELAY_HELP )
-        set_capability( "sub filter", 0 )
-        set_callback( SubsdelayCreate )
+        set_callback_sub_filter( SubsdelayCreate )
         set_category( CAT_VIDEO )
         set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
@@ -300,9 +299,8 @@ static const struct vlc_filter_operations filter_ops = {
 /*****************************************************************************
  * SubsdelayCreate: Create subsdelay filter
  *****************************************************************************/
-static int SubsdelayCreate( vlc_object_t *p_this )
+static int SubsdelayCreate( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *) p_this;
     filter_sys_t *p_sys;
 
     /* allocate structure */
