@@ -92,6 +92,8 @@ Widgets.NavigableFocusScope {
         padding: 1
 
         onOpened: {
+            updateBgRect()
+
             button.KeyNavigation.down = list
             button.highlighted = true
             list.forceActiveFocus()
@@ -110,18 +112,6 @@ Widgets.NavigableFocusScope {
             implicitHeight: contentHeight
             spacing: 0
 
-            highlight: Rectangle {
-                color: _colors.accent
-            }
-
-            Rectangle {
-                z: 10
-                width: parent.width
-                height: parent.height
-                color: "transparent"
-                border.color: _colors.accent
-            }
-
             ScrollIndicator.vertical: ScrollIndicator { }
 
             delegate: ItemDelegate {
@@ -139,6 +129,7 @@ Widgets.NavigableFocusScope {
                         anchors.fill: parent
                         color: _colors.accent
                         visible: mouseArea.containsMouse
+                        opacity: 0.8
                     }
 
                     RowLayout {
@@ -216,13 +207,59 @@ Widgets.NavigableFocusScope {
             }
         }
 
+        function updateBgRect() {
+            glassEffect.popupGlobalPos = mainInterfaceRect.mapFromItem(root, popup.x, popup.y)
+        }
+
         background: Rectangle {
-            color: _colors.button
-            border.color: _colors.buttonBorder
+            border.width: VLCStyle.dp(1)
+            border.color: _colors.accent
+
+            Widgets.FrostedGlassEffect {
+                id: glassEffect
+                source: mainInterfaceRect
+
+                anchors.fill: parent
+                anchors.margins: VLCStyle.dp(1)
+
+                property point popupGlobalPos
+                sourceRect: Qt.rect(popupGlobalPos.x, popupGlobalPos.y, glassEffect.width, glassEffect.height)
+
+                tint: _colors.bg
+                tintStrength: 0.3
+            }
+        }
+
+        Connections {
+            target: mainInterfaceRect
+
+            enabled: popup.visible
+
+            onWidthChanged: {
+                popup.updateBgRect()
+            }
+
+            onHeightChanged: {
+                popup.updateBgRect()
+            }
+        }
+
+        Connections {
+            target: mainInterface
+
+            enabled: popup.visible
+
+            onIntfScaleFactorChanged: {
+                popup.updateBgRect()
+            }
+        }
+
+        Connections {
+            target: playlistColumn
+
+            onWidthChanged: {
+                popup.updateBgRect()
+            }
         }
     }
 }
-
-
-
-
