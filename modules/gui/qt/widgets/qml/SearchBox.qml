@@ -55,7 +55,7 @@ Widgets.NavigableFocusScope {
 
     SmoothedAnimation {
         id: animateExpand;
-        target: searchBox;
+        target: searchBoxRect;
         properties: "width"
         duration: 200
         to: VLCStyle.widthSearchInput
@@ -67,7 +67,7 @@ Widgets.NavigableFocusScope {
 
     SmoothedAnimation {
         id: animateRetract;
-        target: searchBox;
+        target: searchBoxRect;
         properties: "width"
         duration: 200
         to: 0
@@ -94,56 +94,82 @@ Widgets.NavigableFocusScope {
             }
         }
 
-        TextField {
-            id: searchBox
+        Rectangle {
+            id: searchBoxRect
+            color: VLCStyle.colors.button
 
             anchors.verticalCenter: parent.verticalCenter
 
-            font.pixelSize: VLCStyle.fontSize_normal
-
-            color: VLCStyle.colors.buttonText
             width: 0
+            implicitHeight: searchBox.height
 
-            selectByMouse: true
+            border.color: {
+                if ( searchBox.text.length < 3 && searchBox.text.length !== 0 )
+                    return VLCStyle.colors.alert
+                else if ( searchBox.activeFocus )
+                    return VLCStyle.colors.accent
+                else
+                    return VLCStyle.colors.buttonBorder
+            }
 
-            background: Rectangle {
-                color: VLCStyle.colors.button
-                border.color: {
-                    if ( searchBox.text.length < 3 && searchBox.text.length !== 0 )
-                        return VLCStyle.colors.alert
-                    else if ( searchBox.activeFocus )
-                        return VLCStyle.colors.accent
-                    else
-                        return VLCStyle.colors.buttonBorder
+            TextField {
+                id: searchBox
+
+                anchors.fill: searchBoxRect
+                anchors.rightMargin: clearButton.visible ? (VLCStyle.margin_xxsmall + clearButton.width) : 0
+
+                font.pixelSize: VLCStyle.fontSize_normal
+
+                color: VLCStyle.colors.buttonText
+
+                selectByMouse: true
+
+                background: Rectangle { color: "transparent" }
+
+                onTextChanged: {
+                    if (contentModel !== undefined)
+                        contentModel.searchPattern = text;
+                }
+
+                Keys.onPressed: {
+                    //don't use KeyHelper.matchCancel here as we don't want to match Backspace
+                    if (event.key === Qt.Key_Back
+                        || event.key === Qt.Key_Cancel
+                        || event.matches(StandardKey.Back)
+                        || event.matches(StandardKey.Cancel))
+                    {
+                        event.accepted = true
+                    }
+                }
+
+                Keys.onReleased: {
+                    //don't use KeyHelper.matchCancel here as we don't want to match Backspace
+                    if (event.key === Qt.Key_Back
+                        || event.key === Qt.Key_Cancel
+                        || event.matches(StandardKey.Back)
+                        || event.matches(StandardKey.Cancel))
+                    {
+                        text = ""
+                        expanded = false
+                        event.accepted = true
+                    }
                 }
             }
 
-            onTextChanged: {
-                if (contentModel !== undefined)
-                    contentModel.searchPattern = text;
-            }
+            Widgets.IconToolButton {
+                id: clearButton
 
-            Keys.onPressed: {
-                //don't use KeyHelper.matchCancel here as we don't want to match Backspace
-                if (event.key === Qt.Key_Back
-                    || event.key === Qt.Key_Cancel
-                    || event.matches(StandardKey.Back)
-                    || event.matches(StandardKey.Cancel))
-                {
-                    event.accepted = true
-                }
-            }
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: VLCStyle.margin_xxsmall
 
-            Keys.onReleased: {
-                //don't use KeyHelper.matchCancel here as we don't want to match Backspace
-                if (event.key === Qt.Key_Back
-                    || event.key === Qt.Key_Cancel
-                    || event.matches(StandardKey.Back)
-                    || event.matches(StandardKey.Cancel))
-                {
-                    text = ""
-                    expanded = false
-                    event.accepted = true
+                size: VLCStyle.icon_small
+                iconText: VLCIcons.close
+
+                visible: ( expanded && searchBox.text.length > 0 )
+
+                onClicked: {
+                    searchBox.clear()
                 }
             }
         }
