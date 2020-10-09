@@ -250,6 +250,8 @@ NavigableFocusScope {
             }
         }
 
+        readonly property bool _fadeRectsOverlap: fadeRectTop.y + fadeRectTop.height > fadeRectBottom.y
+
         Rectangle {
             id: fadeRectTop
             anchors {
@@ -259,7 +261,7 @@ NavigableFocusScope {
                 topMargin: headerItem && (headerPositioning === ListView.OverlayHeader) ? headerItem.height : 0
             }
             height: highlightMargin * 2
-            visible: !!fadeColor && fadeRectTop.opacity !== 0.0
+            visible: !!fadeColor && fadeRectTop.opacity !== 0.0 && !view._fadeRectsOverlap
 
             property bool isHovered: false
             property bool _stateVisible: ((orientation === ListView.Vertical && !view.atYBeginning)
@@ -304,7 +306,7 @@ NavigableFocusScope {
                 right: parent.right
             }
             height: highlightMargin * 2
-            visible: !!fadeColor && fadeRectBottom.opacity !== 0.0
+            visible: !!fadeColor && fadeRectBottom.opacity !== 0.0 && !view._fadeRectsOverlap
 
             property bool isHovered: false
             property bool _stateVisible: ((orientation === ListView.Vertical && !view.atYEnd)
