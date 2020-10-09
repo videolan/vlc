@@ -218,65 +218,29 @@ Rectangle {
 
                 ToolTip {
                     id: textInfoExtendTooltip
-                    text: textArtistHider.visible ? (textInfoHider.visible ? textInfo.text + '\n' + textArtist.text : textArtist.text) : textInfo.text
-                    visible: (root.hovered || model.selected) && (textArtistHider.visible || textInfoHider.visible)
-                    opacity: 0.75
-                    delay: 1000
-                    timeout: 2000
+                    text: (textInfo.text + '\n' + textArtist.text)
+                    visible: (plitem.hovered || model.selected) && (textInfo.implicitWidth > textInfo.width || textArtist.implicitWidth > textArtist.width)
+                    delay: 750
                 }
 
                 Widgets.ListLabel {
                     id: textInfo
 
+                    width: parent.width
+
                     font.weight: model.isCurrent ? Font.Bold : Font.Normal
                     text: model.title
                     color: _colors.text
-
-                    Item {
-                        id: textInfoHider
-                        anchors.fill: parent
-
-                        visible: textInfo.width + textInfoColumn.x > textDuration.x
-
-                        LinearGradient {
-                            anchors.fill: parent
-                            start: Qt.point(0, 0)
-                            end: Qt.point(parent.width - (textInfo.width + textInfoColumn.x - textDuration.x), 0)
-                            gradient: Gradient {
-                                GradientStop { position: 0.75; color: "transparent" }
-                                GradientStop { position: 1.0; color: selectedBackground.visible === true ? selectedBackground.color
-                                                                                                         : Qt.colorEqual(plitem.color, "transparent") ? _colors.banner
-                                                                                                         : plitem.color }
-                            }
-                        }
-                    }
                 }
 
                 Widgets.ListSubtitleLabel {
                     id: textArtist
 
+                    width: parent.width
+
                     font.weight: model.isCurrent ? Font.DemiBold : Font.Normal
                     text: (model.artist ? model.artist : i18n.qtr("Unknown Artist"))
                     color: _colors.text
-
-                    Item {
-                        id: textArtistHider
-                        anchors.fill: parent
-
-                        visible: textArtist.width + textInfoColumn.x > textDuration.x
-
-                        LinearGradient {
-                            anchors.fill: parent
-                            start: Qt.point(0, 0)
-                            end: Qt.point(parent.width - (textArtist.width + textInfoColumn.x - textDuration.x), 0)
-                            gradient: Gradient {
-                                GradientStop { position: 0.75; color: "transparent" }
-                                GradientStop { position: 1.0; color: selectedBackground.visible === true ? selectedBackground.color
-                                                                                                         : Qt.colorEqual(plitem.color, "transparent") ? _colors.banner
-                                                                                                         : plitem.color }
-                            }
-                        }
-                    }
                 }
             }
 
