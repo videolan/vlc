@@ -76,7 +76,6 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /* Version checking */
-#if LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0)
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
@@ -235,10 +234,8 @@ static int GetSwsCpuMask(void)
 #if defined(__i386__) || defined(__x86_64__)
     if( vlc_CPU_MMX() )
         i_sws_cpu |= SWS_CPU_CAPS_MMX;
-#if (LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0))
     if( vlc_CPU_MMXEXT() )
         i_sws_cpu |= SWS_CPU_CAPS_MMX2;
-#endif
     if( vlc_CPU_3dNOW() )
         i_sws_cpu |= SWS_CPU_CAPS_3DNOW;
 #elif defined(__ppc__) || defined(__ppc64__) || defined(__powerpc__)
@@ -713,16 +710,3 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     picture_Release( p_pic );
     return p_pic_dst;
 }
-
-#else /* LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0) */
-
-int OpenScaler( vlc_object_t *p_this )
-{
-    return VLC_EGENERIC;
-}
-
-void CloseScaler( vlc_object_t *p_this )
-{
-}
-
-#endif /* LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0) */

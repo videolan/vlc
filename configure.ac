@@ -2814,7 +2814,7 @@ AC_ARG_ENABLE([swscale],
           (default enabled)]))
 if test "${enable_swscale}" != "no"
 then
-  PKG_CHECK_MODULES(SWSCALE,[libswscale],
+  PKG_CHECK_MODULES(SWSCALE,[libswscale >= 0.5.0],
     [
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${SWSCALE_CFLAGS}"
