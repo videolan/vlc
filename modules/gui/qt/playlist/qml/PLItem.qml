@@ -159,13 +159,6 @@ Rectangle {
             }
         }
 
-        Rectangle {
-            id: selectedBackground
-            color: _colors.bg
-            anchors.fill: parent
-            visible: model.isCurrent && !plitem.hovered && !model.selected
-        }
-
         RowLayout {
             id: content
             anchors {
