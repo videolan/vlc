@@ -112,7 +112,7 @@
 #define VOUT_HEIGHT 500
 
 static int  Open         ( vlc_object_t * );
-static void Close        ( vlc_object_t * );
+static void Close        ( filter_t * );
 
 vlc_module_begin ()
     set_shortname( N_("Visualizer"))
@@ -166,7 +166,7 @@ vlc_module_begin ()
     add_integer("spect-peak-height", 1,
              PEAK_HEIGHT_TEXT, PEAK_HEIGHT_LONGTEXT, true )
     set_capability( "visualization", 0 )
-    set_callbacks( Open, Close )
+    set_callback( Open )
     add_shortcut( "visualizer")
 vlc_module_end ()
 
@@ -191,6 +191,7 @@ typedef struct
 static const struct vlc_filter_operations filter_ops = {
     .filter_audio = DoWork,
     .flush = Flush,
+    .close = Close,
 };
 
 /*****************************************************************************
@@ -403,9 +404,8 @@ static void Flush( filter_t *p_filter )
 /*****************************************************************************
  * Close: close the plugin
  *****************************************************************************/
-static void Close( vlc_object_t *p_this )
+static void Close( filter_t * p_filter )
 {
-    filter_t * p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     vlc_queue_Kill(&p_sys->queue, &p_sys->dead);

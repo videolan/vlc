@@ -46,7 +46,7 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
-static void Close        ( vlc_object_t * );
+static void Close        ( filter_t * );
 
 #define CONFIG_TEXT N_("projectM configuration file")
 #define CONFIG_LONGTEXT N_("File that will be used to configure the projectM " \
@@ -124,7 +124,7 @@ vlc_module_begin ()
     add_integer( "projectm-texture-size", 1024, TEXTURE_TEXT, TEXTURE_LONGTEXT,
                  false )
     add_shortcut( "projectm" )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 
@@ -221,9 +221,8 @@ error:
  * Close the module
  * @param p_this: the filter object
  */
-static void Close( vlc_object_t *p_this )
+static void Close( filter_t *p_filter )
 {
-    filter_t  *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
 
     /* Stop the thread

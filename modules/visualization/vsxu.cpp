@@ -46,7 +46,7 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
-static void Close        ( vlc_object_t * );
+static void Close        ( filter_t * );
 
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_("The width of the video window, in pixels.")
@@ -65,7 +65,7 @@ vlc_module_begin ()
     add_integer( "vsxu-height", 800, HEIGHT_TEXT, HEIGHT_LONGTEXT,
                  false )
     add_shortcut( "vsxu" )
-    set_callbacks( Open, Close )
+    set_callback( Open )
 vlc_module_end ()
 
 
@@ -102,6 +102,7 @@ static const struct FilterOperationInitializer {
     FilterOperationInitializer()
     {
         ops.filter_audio = DoWork;
+        ops.close = Close;
     };
 } filter_ops;
 
@@ -162,9 +163,8 @@ error:
  * Close the module
  * @param p_this: the filter object
  */
-static void Close( vlc_object_t *p_this )
+static void Close( filter_t *p_filter )
 {
-    filter_t  *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );
