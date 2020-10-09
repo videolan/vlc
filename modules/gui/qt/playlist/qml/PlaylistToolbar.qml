@@ -95,10 +95,13 @@ Widgets.NavigableFocusScope {
                     { text: i18n.qtr("Rating"),           criteria: PlaylistControllerModel.SORT_KEY_RATIN },
                 ]
                 textRole: "text"
-
+                criteriaRole: "criteria"
+                
                 listWidth: VLCStyle.widthSortBox
                 onSortSelected: {
-                    mainPlaylistController.sort(modelData.criteria, PlaylistControllerModel.SORT_ORDER_ASC)
+                    if (modelData.criteria !== sortKey)
+                        mainPlaylistController.setSortOrder(PlaylistControllerModel.SORT_ORDER_ASC)
+                    mainPlaylistController.setSortKey(modelData.criteria)
                 }
 
                 Keys.priority: Keys.AfterItem
@@ -106,6 +109,9 @@ Widgets.NavigableFocusScope {
                 navigationParent: playlistToolbar
 
                 _colors: playlistToolbar._colors
+
+                sortOrder: mainPlaylistController.sortOrder
+                sortKey: mainPlaylistController.sortKey
             }
 
             Widgets.IconToolButton {
