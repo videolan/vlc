@@ -75,19 +75,6 @@ Widgets.KeyNavigableTableView {
 
     onActionForSelection: medialib.addAndPlay(model.getIdsForIndexes( selection ))
 
-    navigationLeft:  function(index) {
-        if (isFocusOnContextButton )
-            isFocusOnContextButton = false
-        else
-            defaultNavigationLeft(index)
-    }
-    navigationRight: function(index) {
-        if (!isFocusOnContextButton)
-            isFocusOnContextButton = true
-        else
-            defaultNavigationRight(index)
-    }
-
     Widgets.TableColumns {
         id: tableColumns
     }
