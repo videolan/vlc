@@ -236,6 +236,7 @@ Widgets.NavigableFocusScope {
                             id: sortControl
 
                             textRole: "text"
+                            criteriaRole: "criteria"
                             listWidth: VLCStyle.widthSortBox
                             height: localToolbar.height
 
@@ -246,9 +247,18 @@ Widgets.NavigableFocusScope {
 
                             onSortSelected: {
                                 if (contentModel !== undefined) {
-                                    contentModel.sortCriteria = modelData.criteria
+                                    contentModel.sortCriteria = modelData[criteriaRole]
                                 }
                             }
+
+                            onSortOrderSelected: {
+                                if (contentModel !== undefined) {
+                                    contentModel.sortOrder = order
+                                }
+                            }
+
+                            sortKey: contentModel.sortCriteria
+                            sortOrder: contentModel.sortOrder
                         }
                     }
 
