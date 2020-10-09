@@ -380,7 +380,7 @@ Rectangle {
                             var urlList = []
                             for ( var url in drop.urls)
                                 urlList.push(drop.urls[url])
-                            mainPlaylistController.insert(root.plmodel.count, urlList)
+                            mainPlaylistController.insert(root.plmodel.count, urlList, false)
                         } else {
                             root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
                         }
