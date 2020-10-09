@@ -200,7 +200,7 @@ Widgets.NavigableFocusScope {
                             leftMargin: VLCStyle.applicationHorizontalMargin
                         }
 
-                        Widgets.ScanProgressBar {
+                        Loader {
                             z: 1
                             anchors {
                                 left: parent.left
@@ -208,7 +208,11 @@ Widgets.NavigableFocusScope {
                                 bottom: parent.bottom
                                 rightMargin: VLCStyle.margin_small
                                 leftMargin: VLCStyle.margin_small
+                                topMargin: VLCStyle.dp(10, VLCStyle.scale)
+                                bottomMargin: VLCStyle.dp(10, VLCStyle.scale)
                             }
+                            active: !!medialib
+                            source: "qrc:///widgets/ScanProgressBar.qml"
                         }
                     }
 

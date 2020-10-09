@@ -28,8 +28,6 @@ T.ProgressBar {
     from: 0
     to: 100
     height: progressText_id.height
-    anchors.topMargin: 10
-    anchors.bottomMargin: 10
     value: medialib.parsingProgress
     indeterminate: medialib.discoveryPending
 
