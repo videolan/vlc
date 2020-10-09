@@ -65,8 +65,56 @@ Widgets.NavigableFocusScope {
         //label for DnD
         Widgets.DNDLabel {
             id: dragItem
+
             _colors: root._colors
             color: parent.color
+
+            property int _scrollingDirection: 0
+
+            on_PosChanged: {
+                var dragItemY = root.mapToGlobal(dragItem._pos.x, dragItem._pos.y).y
+                var viewY     = root.mapToGlobal(view.x, view.y).y
+
+                var topDiff    = (viewY + VLCStyle.dp(20, VLCStyle.scale)) - dragItemY
+                var bottomDiff = dragItemY - (viewY + view.height - VLCStyle.dp(20, VLCStyle.scale))
+
+                if(!view.listView.atYBeginning && topDiff > 0) {
+                    _scrollingDirection = -1
+
+                    view.fadeRectTopHovered = true
+                }
+                else if( !view.listView.atYEnd && bottomDiff > 0) {
+                    _scrollingDirection = 1
+
+                    view.fadeRectBottomHovered = true
+                }
+                else {
+                    _scrollingDirection = 0
+
+                    view.fadeRectTopHovered = false
+                    view.fadeRectBottomHovered = false
+                }
+            }
+
+            SmoothedAnimation {
+                id: upAnimation
+                target: view.listView
+                property: "contentY"
+                to: 0
+                running: dragItem._scrollingDirection === -1 && dragItem.visible
+
+                velocity: VLCStyle.dp(150, VLCStyle.scale)
+            }
+
+            SmoothedAnimation {
+                id: downAnimation
+                target: view.listView
+                property: "contentY"
+                to: view.listView.contentHeight - view.height
+                running: dragItem._scrollingDirection === 1 && dragItem.visible
+
+                velocity: VLCStyle.dp(150, VLCStyle.scale)
+            }
         }
 
         PlaylistContextMenu {

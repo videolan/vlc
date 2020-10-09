@@ -42,10 +42,16 @@ Rectangle {
 
     property var count: 0
 
+    property point _pos: null
+
     function updatePos(x, y) {
         var pos = root.mapFromGlobal(x, y)
         dragItem.x = pos.x
         dragItem.y = pos.y
+
+        // since we override position update during dragging with updatePos(),
+        // it is better to track the final position through a property:
+        _pos = pos
     }
 
     RectangularGlow {
