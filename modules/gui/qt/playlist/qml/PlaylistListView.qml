@@ -75,14 +75,22 @@ Widgets.NavigableFocusScope {
             rightPadding: root.rightPadding
 
             //rootmenu
-            Action { id:playAction;         text: i18n.qtr("Play");             onTriggered: view.onPlay(); icon.source: "qrc:///toolbar/play_b.svg" }
-            Action { id:deleteAction;       text: i18n.qtr("Delete");           onTriggered: view.onDelete() }
-            Action { id:clearAllAction;     text: i18n.qtr("Clear Playlist");   onTriggered: mainPlaylistController.clear() }
-            Action { id:selectAllAction;    text: i18n.qtr("Select All");       onTriggered: root.plmodel.selectAll() }
-            Action { id:shuffleAction;      text: i18n.qtr("Shuffle Playlist");  onTriggered: mainPlaylistController.shuffle(); icon.source: "qrc:///buttons/playlist/shuffle_on.svg" }
-            Action { id:sortAction;         text: i18n.qtr("Sort");             property string subMenu: "sortmenu"}
-            Action { id:selectTracksAction; text: i18n.qtr("Select Tracks");    onTriggered: view.mode = "select" }
-            Action { id:moveTracksAction;   text: i18n.qtr("Move Selection");   onTriggered: view.mode = "move" }
+            Action { id:playAction;         text: i18n.qtr("Play");                      onTriggered: mainPlaylistController.goTo(root.plmodel.getSelection()[0], true); icon.source: "qrc:///toolbar/play_b.svg"                   }
+            Action { id:streamAction;       text: i18n.qtr("Stream");                    onTriggered: dialogProvider.streamingDialog(root.plmodel.getSelection().map(function(i) { return root.plmodel.itemAt(i).url; }), false); icon.source: "qrc:/menu/stream.svg" }
+            Action { id:saveAction;         text: i18n.qtr("Save");                      onTriggered: dialogProvider.streamingDialog(root.plmodel.getSelection().map(function(i) { return root.plmodel.itemAt(i).url; }));          }
+            Action { id:infoAction;         text: i18n.qtr("Information");               onTriggered: dialogProvider.mediaInfoDialog(root.plmodel.itemAt(root.plmodel.getSelection()[0])); icon.source: "qrc:/menu/info.svg"        }
+            Action { id:exploreAction;      text: i18n.qtr("Show Containing Directory"); onTriggered: mainPlaylistController.explore(root.plmodel.itemAt(root.plmodel.getSelection()[0])); icon.source: "qrc:/type/folder-grey.svg" }
+            Action { id:addFileAction;      text: i18n.qtr("Add File...");               onTriggered: dialogProvider.simpleOpenDialog(false);                             icon.source: "qrc:/buttons/playlist/playlist_add.svg"     }
+            Action { id:addDirAction;       text: i18n.qtr("Add Directory...");          onTriggered: dialogProvider.PLAppendDir();                                       icon.source: "qrc:/buttons/playlist/playlist_add.svg"     }
+            Action { id:addAdvancedAction;  text: i18n.qtr("Advanced Open...");          onTriggered: dialogProvider.PLAppendDialog();                                    icon.source: "qrc:/buttons/playlist/playlist_add.svg"     }
+            Action { id:savePlAction;       text: i18n.qtr("Save Playlist to File...");  onTriggered: dialogProvider.savePlayingToPlaylist();                                                                                       }
+            Action { id:clearAllAction;     text: i18n.qtr("Clear Playlist");            onTriggered: mainPlaylistController.clear();                                     icon.source: "qrc:/toolbar/clear.svg"                     }
+            Action { id:selectAllAction;    text: i18n.qtr("Select All");                onTriggered: root.plmodel.selectAll();                                                                                                     }
+            Action { id:shuffleAction;      text: i18n.qtr("Shuffle Playlist");          onTriggered: mainPlaylistController.shuffle();                                   icon.source: "qrc:///buttons/playlist/shuffle_on.svg"     }
+            Action { id:sortAction;         text: i18n.qtr("Sort");                      property string subMenu: "sortmenu";                                                                                                       }
+            Action { id:selectTracksAction; text: i18n.qtr("Select Tracks");             onTriggered: view.mode = "select";                                                                                                         }
+            Action { id:moveTracksAction;   text: i18n.qtr("Move Selection");            onTriggered: view.mode = "move";                                                                                                           }
+            Action { id:deleteAction;       text: i18n.qtr("Remove Selected");           onTriggered: view.onDelete();                                                                                                              }
 
             //sortmenu
             Action { id: sortTitleAction;   text: i18n.qtr("Tile");
@@ -109,13 +117,21 @@ Widgets.NavigableFocusScope {
                     title: i18n.qtr("Playlist"),
                     entries: [
                         playAction,
-                        deleteAction,
+                        streamAction,
+                        saveAction,
+                        infoAction,
+                        exploreAction,
+                        addFileAction,
+                        addDirAction,
+                        addAdvancedAction,
+                        savePlAction,
                         clearAllAction,
                         selectAllAction,
                         shuffleAction,
                         sortAction,
                         selectTracksAction,
-                        moveTracksAction
+                        moveTracksAction,
+                        deleteAction
                     ]
                 },
                 "sortmenu" :{
