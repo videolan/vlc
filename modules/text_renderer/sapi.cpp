@@ -44,7 +44,7 @@
 #include <sapi.h>
 #include <sphelper.h>
 
-static int Create (vlc_object_t *);
+static int Create (filter_t *);
 static void Destroy(filter_t *);
 static int RenderText(filter_t *,
                       subpicture_region_t *,
@@ -57,8 +57,7 @@ vlc_module_begin ()
  set_category(CAT_VIDEO)
  set_subcategory(SUBCAT_VIDEO_SUBPIC)
 
- set_capability("text renderer", 0)
- set_callback(Create)
+ set_callback_text_renderer(Create, 0)
  add_integer("sapi-voice", -1, "Voice Index", "Voice index", false)
 vlc_module_end ()
 
@@ -102,13 +101,12 @@ static const struct FilterOperationInitializer {
     };
 } filter_ops;
 
-static int Create (vlc_object_t *p_this)
+static int Create (filter_t *p_filter)
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     HRESULT hr;
 
-    if (TryEnterMTA(p_this))
+    if (TryEnterMTA(p_filter))
         return VLC_EGENERIC;
 
     p_filter->p_sys = p_sys = (filter_sys_t*) malloc(sizeof(filter_sys_t));
@@ -131,7 +129,7 @@ static int Create (vlc_object_t *p_this)
             hr = cpEnum->GetCount(&ulCount);
             if (SUCCEEDED (hr))
             {
-                int voiceIndex = var_InheritInteger(p_this, "sapi-voice");
+                int voiceIndex = var_InheritInteger(p_filter, "sapi-voice");
                 if (voiceIndex > -1)
                 {
                     if ((unsigned)voiceIndex < ulCount) {
@@ -139,17 +137,17 @@ static int Create (vlc_object_t *p_this)
                         if (SUCCEEDED(hr)) {
                             hr = p_sys->cpVoice->SetVoice(cpVoiceToken);
                             if (SUCCEEDED(hr)) {
-                                msg_Dbg(p_this, "Selected voice %d", voiceIndex);
+                                msg_Dbg(p_filter, "Selected voice %d", voiceIndex);
                             }
                             else {
-                                msg_Err(p_this, "Failed to set voice %d", voiceIndex);
+                                msg_Err(p_filter, "Failed to set voice %d", voiceIndex);
                             }
                             cpVoiceToken->Release();
                             cpVoiceToken = NULL;
                         }
                     }
                     else
-                        msg_Err(p_this, "Voice index exceeds available count");
+                        msg_Err(p_filter, "Voice index exceeds available count");
                 }
             }
             cpEnum->Release();

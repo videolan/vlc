@@ -100,7 +100,7 @@ struct vlc_filter_operations
         /** Filter a subpicture (sub filter) */
         subpicture_t *(*filter_sub)(filter_t *, subpicture_t *);
 
-        /** Render text (text render) */
+        /** Render text (text renderer) */
         int (*render)(filter_t *, subpicture_region_t *,
                       subpicture_region_t *, const vlc_fourcc_t *);
     };
@@ -143,6 +143,7 @@ struct vlc_filter_operations
 typedef int (*vlc_open_deinterlace)(filter_t *);
 typedef int (*vlc_video_converter_open)(filter_t *);
 typedef int (*vlc_video_filter_open)(filter_t *);
+typedef int (*vlc_video_text_renderer_open)(filter_t *);
 
 
 #define set_deinterlace_callback( activate )     \
@@ -169,6 +170,14 @@ typedef int (*vlc_video_filter_open)(filter_t *);
         set_callback(activate)                             \
     }                                                      \
     set_capability( "video converter", priority )
+
+#define set_callback_text_renderer( activate, priority )   \
+    {                                                      \
+        vlc_video_text_renderer_open open__ = activate;    \
+        (void) open__;                                     \
+        set_callback(activate)                             \
+    }                                                      \
+    set_capability( "text renderer", priority )
 
 /** Structure describing a filter
  * @warning BIG FAT WARNING : the code relies on the first 4 members of

@@ -47,7 +47,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Create    ( vlc_object_t * );
+static int  Create    ( filter_t * );
 static void Destroy   ( filter_t * );
 static int  RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
                         subpicture_region_t *p_region_in,
@@ -73,10 +73,9 @@ typedef struct
 vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
-    set_capability( "text renderer", 99 )
     add_shortcut( "svg" )
     add_string( "svg-template-file", "", TEMPLATE_TEXT, TEMPLATE_LONGTEXT, true )
-    set_callback( Create )
+    set_callback_text_renderer( Create, 99 )
 vlc_module_end ()
 
 static void svg_RescaletoFit  ( filter_t *, int *width, int *height, float * );
@@ -179,10 +178,8 @@ static const struct vlc_filter_operations filter_ops = {
  * This function allocates and initializes a  vout method.
  *****************************************************************************/
 
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t *p_filter = ( filter_t * )p_this;
-
     filter_sys_t *p_sys = calloc( 1, sizeof(*p_sys) );
     if( !p_sys )
         return VLC_ENOMEM;

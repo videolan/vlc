@@ -53,7 +53,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Create ( vlc_object_t * );
+static int  Create ( filter_t * );
 static void Destroy( filter_t * );
 
 #define FONT_TEXT N_("Font")
@@ -204,9 +204,8 @@ vlc_module_begin ()
         change_safe()
 #endif
 
-    set_capability( "text renderer", 100 )
     add_shortcut( "text" )
-    set_callback( Create )
+    set_callback_text_renderer( Create, 100 )
 vlc_module_end ()
 
 /* */
@@ -1169,9 +1168,8 @@ static const struct vlc_filter_operations filter_ops =
  *****************************************************************************
  * This function allocates and initializes a Clone vout method.
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Create( filter_t *p_filter )
 {
-    filter_t      *p_filter         = ( filter_t * ) p_this;
     filter_sys_t  *p_sys            = NULL;
 
     /* Allocate structure */
@@ -1193,8 +1191,8 @@ static int Create( vlc_object_t *p_this )
         p_sys->p_stroker = NULL;
     }
 
-    p_sys->ftcache = vlc_ftcache_New( p_this, p_sys->p_library,
-                            var_InheritInteger( p_this, "freetype-cache-size" ) );
+    p_sys->ftcache = vlc_ftcache_New( VLC_OBJECT(p_filter), p_sys->p_library,
+                            var_InheritInteger( p_filter, "freetype-cache-size" ) );
     if( !p_sys->ftcache )
         goto error;
 
