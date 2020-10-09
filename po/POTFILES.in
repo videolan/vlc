@@ -796,9 +796,9 @@ modules/gui/qt/dialogs/help/qml/About.qml
 modules/gui/qt/dialogs/toolbar/qml/ToolbarEditor.qml
 modules/gui/qt/maininterface/qml/BannerSources.qml
 modules/gui/qt/maininterface/qml/MainInterface.qml
+modules/gui/qt/maininterface/qml/MainDisplay.qml
 modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml
 modules/gui/qt/medialibrary/qml/AudioGridItem.qml
-modules/gui/qt/medialibrary/qml/MainDisplay.qml
 modules/gui/qt/medialibrary/qml/MusicAlbumsDisplay.qml
 modules/gui/qt/medialibrary/qml/MusicAlbumsGridExpandDelegate.qml
 modules/gui/qt/medialibrary/qml/MusicAlbums.qml

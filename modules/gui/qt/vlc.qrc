@@ -178,6 +178,7 @@
     <qresource prefix="/main">
         <file alias="BannerSources.qml">maininterface/qml/BannerSources.qml</file>
         <file alias="MainInterface.qml">maininterface/qml/MainInterface.qml</file>
+        <file alias="MainDisplay.qml">maininterface/qml/MainDisplay.qml</file>
         <file alias="NoMedialibHome.qml">maininterface/qml/NoMedialibHome.qml</file>
     </qresource>
     <qresource prefix="/widgets">
@@ -260,7 +261,6 @@
         <file alias="MusicTracksDisplay.qml">medialibrary/qml/MusicTracksDisplay.qml</file>
         <file alias="MusicTrackListDisplay.qml">medialibrary/qml/MusicTrackListDisplay.qml</file>
         <file alias="ArtistTopBanner.qml">medialibrary/qml/ArtistTopBanner.qml</file>
-        <file alias="MainDisplay.qml">medialibrary/qml/MainDisplay.qml</file>
         <file alias="UrlListDisplay.qml">medialibrary/qml/UrlListDisplay.qml</file>
         <file alias="VideoInfoExpandPanel.qml">medialibrary/qml/VideoInfoExpandPanel.qml</file>
         <file alias="VideoListDisplay.qml">medialibrary/qml/VideoListDisplay.qml</file>

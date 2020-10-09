@@ -73,7 +73,7 @@ Rectangle {
 
     readonly property var pageModel: [
         { name: "about", url: "qrc:///about/About.qml" },
-        { name: "mc", url: "qrc:///medialibrary/MainDisplay.qml" },
+        { name: "mc", url: "qrc:///main/MainDisplay.qml" },
         { name: "player", url:"qrc:///player/Player.qml" },
     ]
 
