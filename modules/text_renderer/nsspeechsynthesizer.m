@@ -36,7 +36,7 @@
 #import <Cocoa/Cocoa.h>
 
 static int Create (vlc_object_t *);
-static void Destroy(vlc_object_t *);
+static void Destroy(filter_t *);
 static int RenderText(filter_t *,
                       subpicture_region_t *,
                       subpicture_region_t *,
@@ -48,7 +48,7 @@ set_category(CAT_VIDEO)
 set_subcategory(SUBCAT_VIDEO_SUBPIC)
 
 set_capability("text renderer", 0)
-set_callbacks(Create, Destroy)
+set_callback(Create)
 vlc_module_end ()
 
 typedef struct filter_sys_t
@@ -59,7 +59,7 @@ typedef struct filter_sys_t
 } filter_sys_t;
 
 static const struct vlc_filter_operations filter_ops = {
-    .render = RenderText,
+    .render = RenderText, .close = Destroy,
 };
 
 static int  Create (vlc_object_t *p_this)
@@ -79,9 +79,8 @@ static int  Create (vlc_object_t *p_this)
     return VLC_SUCCESS;
 }
 
-static void Destroy(vlc_object_t *p_this)
+static void Destroy(filter_t *p_filter)
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     [p_sys->speechSynthesizer stopSpeaking];

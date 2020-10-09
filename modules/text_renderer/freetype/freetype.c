@@ -54,7 +54,7 @@
  * Module descriptor
  *****************************************************************************/
 static int  Create ( vlc_object_t * );
-static void Destroy( vlc_object_t * );
+static void Destroy( filter_t * );
 
 #define FONT_TEXT N_("Font")
 #define MONOSPACE_FONT_TEXT N_("Monospace Font")
@@ -206,7 +206,7 @@ vlc_module_begin ()
 
     set_capability( "text renderer", 100 )
     add_shortcut( "text" )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 /* */
@@ -1161,7 +1161,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
 
 static const struct vlc_filter_operations filter_ops =
 {
-    .render = Render,
+    .render = Render, .close = Destroy,
 };
 
 /*****************************************************************************
@@ -1246,7 +1246,7 @@ static int Create( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
-    Destroy( VLC_OBJECT(p_filter) );
+    Destroy( p_filter );
     return VLC_EGENERIC;
 }
 
@@ -1255,9 +1255,8 @@ error:
  *****************************************************************************
  * Clean up all data and library connections
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
 #ifdef DEBUG_PLATFORM_FONTS

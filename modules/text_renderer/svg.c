@@ -48,7 +48,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
+static void Destroy   ( filter_t * );
 static int  RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
                         subpicture_region_t *p_region_in,
                         const vlc_fourcc_t * );
@@ -76,7 +76,7 @@ vlc_module_begin ()
     set_capability( "text renderer", 99 )
     add_shortcut( "svg" )
     add_string( "svg-template-file", "", TEMPLATE_TEXT, TEMPLATE_LONGTEXT, true )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 static void svg_RescaletoFit  ( filter_t *, int *width, int *height, float * );
@@ -170,7 +170,7 @@ static char *svg_GetDocument( filter_t *p_filter, int i_width, int i_height, con
 }
 
 static const struct vlc_filter_operations filter_ops = {
-    .render = RenderText,
+    .render = RenderText, .close = Destroy,
 };
 
 /*****************************************************************************
@@ -203,9 +203,8 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************
  * Clean up all data and library connections
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = ( filter_t * )p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 #if (GLIB_MAJOR_VERSION < 2 || GLIB_MINOR_VERSION < 36)
     rsvg_term();

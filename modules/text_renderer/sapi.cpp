@@ -45,7 +45,7 @@
 #include <sphelper.h>
 
 static int Create (vlc_object_t *);
-static void Destroy(vlc_object_t *);
+static void Destroy(filter_t *);
 static int RenderText(filter_t *,
                       subpicture_region_t *,
                       subpicture_region_t *,
@@ -58,7 +58,7 @@ vlc_module_begin ()
  set_subcategory(SUBCAT_VIDEO_SUBPIC)
 
  set_capability("text renderer", 0)
- set_callbacks(Create, Destroy)
+ set_callback(Create)
  add_integer("sapi-voice", -1, "Voice Index", "Voice index", false)
 vlc_module_end ()
 
@@ -98,6 +98,7 @@ static const struct FilterOperationInitializer {
     FilterOperationInitializer()
     {
         ops.render = RenderText;
+        ops.close  = Destroy;
     };
 } filter_ops;
 
@@ -175,9 +176,8 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Destroy(vlc_object_t *p_this)
+static void Destroy(filter_t *p_filter)
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = reinterpret_cast<filter_sys_t *>( p_filter->p_sys );
 
     if (p_sys->cpVoice)
