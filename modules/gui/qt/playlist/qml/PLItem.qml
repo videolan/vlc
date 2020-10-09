@@ -393,7 +393,7 @@ Rectangle {
                             root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
                         }
                         root.setItemDropIndicatorVisible(model.index, false, false);
-                        drop.accept()
+                        drop.accept(Qt.IgnoreAction)
                     }
                     else
                     {

@@ -398,6 +398,7 @@ Widgets.NavigableFocusScope {
                                 for ( var url in drop.urls)
                                     urlList.push(drop.urls[url])
                                 mainPlaylistController.insert(target, urlList, false)
+                                drop.accept(Qt.IgnoreAction)
                             } else {
                                 root.plmodel.moveItemsPre(root.plmodel.getSelection(), target)
                             }
