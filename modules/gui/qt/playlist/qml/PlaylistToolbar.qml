@@ -81,6 +81,7 @@ Widgets.NavigableFocusScope {
                 id: sort
                 Layout.alignment: Qt.AlignHCenter
                 //Layout.minimumWidth: VLCStyle.icon_normal * 2
+                enabled: !mainPlaylistController.empty
                 popupAlignment: Qt.AlignRight | Qt.AlignTop
 
                 model: [
@@ -96,7 +97,7 @@ Widgets.NavigableFocusScope {
                 ]
                 textRole: "text"
                 criteriaRole: "criteria"
-                
+
                 listWidth: VLCStyle.widthSortBox
                 onSortSelected: {
                     root.sortPL(modelData.criteria)
