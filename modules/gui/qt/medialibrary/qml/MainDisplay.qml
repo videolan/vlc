@@ -264,7 +264,7 @@ Widgets.NavigableFocusScope {
 
                                 SequentialAnimation {
                                     PropertyAction { target: playlistColumn; property: "visible" }
-                                    SmoothedAnimation { target: playlistColumn; property: "width"; easing.type: Easing.OutSine; duration: 150; }
+                                    SmoothedAnimation { target: playlistColumn; property: "width"; easing.type: Easing.InSine; duration: 150; }
                                 }
                             }
                         ]
