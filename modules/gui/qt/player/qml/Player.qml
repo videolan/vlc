@@ -26,7 +26,6 @@ import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/KeyHelper.js" as KeyHelper
 import "qrc:///playlist/" as PL
-import "qrc:///menus/" as Menus
 
 Widgets.NavigableFocusScope {
     id: rootPlayer

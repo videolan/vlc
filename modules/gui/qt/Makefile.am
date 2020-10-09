@@ -635,20 +635,8 @@ libqt_plugin_la_QML = \
 	gui/qt/medialibrary/qml/VideoGridItem.qml \
 	gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml \
 	gui/qt/medialibrary/qml/VideoListDisplay.qml \
-	gui/qt/menus/qml/AudioMenu.qml \
-	gui/qt/menus/qml/CheckableModelSubMenu.qml \
 	gui/qt/menus/qml/GlobalShortcuts.qml \
-	gui/qt/menus/qml/HelpMenu.qml \
-	gui/qt/menus/qml/MainDropdownMenu.qml \
-	gui/qt/menus/qml/MainMenubar.qml \
 	gui/qt/menus/qml/Menubar.qml \
-	gui/qt/menus/qml/MediaMenu.qml \
-	gui/qt/menus/qml/PlaybackMenu.qml \
-	gui/qt/menus/qml/PopupMenu.qml \
-	gui/qt/menus/qml/SubtitleMenu.qml \
-	gui/qt/menus/qml/ToolsMenu.qml \
-	gui/qt/menus/qml/VideoMenu.qml \
-	gui/qt/menus/qml/ViewMenu.qml \
 	gui/qt/network/qml/DiscoverDisplay.qml \
 	gui/qt/network/qml/NetworkBrowseDisplay.qml \
 	gui/qt/network/qml/NetworkDisplay.qml \

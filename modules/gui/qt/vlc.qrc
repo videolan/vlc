@@ -282,19 +282,7 @@
         <file alias="PlaylistDetachedWindow.qml">playlist/qml/PlaylistDetachedWindow.qml</file>
     </qresource>
     <qresource prefix="/menus">
-        <file alias="AudioMenu.qml">menus/qml/AudioMenu.qml</file>
-        <file alias="HelpMenu.qml">menus/qml/HelpMenu.qml</file>
-        <file alias="MainDropdownMenu.qml">menus/qml/MainDropdownMenu.qml</file>
-        <file alias="MainMenubar.qml">menus/qml/MainMenubar.qml</file>
-        <file alias="MediaMenu.qml">menus/qml/MediaMenu.qml</file>
         <file alias="Menubar.qml">menus/qml/Menubar.qml</file>
-        <file alias="PlaybackMenu.qml">menus/qml/PlaybackMenu.qml</file>
-        <file alias="SubtitleMenu.qml">menus/qml/SubtitleMenu.qml</file>
-        <file alias="ToolsMenu.qml">menus/qml/ToolsMenu.qml</file>
-        <file alias="VideoMenu.qml">menus/qml/VideoMenu.qml</file>
-        <file alias="CheckableModelSubMenu.qml">menus/qml/CheckableModelSubMenu.qml</file>
-        <file alias="ViewMenu.qml">menus/qml/ViewMenu.qml</file>
-        <file alias="PopupMenu.qml">menus/qml/PopupMenu.qml</file>
         <file alias="GlobalShortcuts.qml">menus/qml/GlobalShortcuts.qml</file>
     </qresource>
     <qresource prefix="/player">

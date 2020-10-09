@@ -24,7 +24,6 @@ import QtGraphicalEffects 1.0
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
-import "qrc:///menus/" as Menus
 import "qrc:///style/"
 
 Item{
