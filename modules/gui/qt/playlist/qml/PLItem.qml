@@ -80,7 +80,7 @@ Rectangle {
     Rectangle {
         z: 2
         width: parent.width
-        height: 2
+        height: 1
         anchors.top: parent.top
         antialiasing: true
         visible: dropVisible
