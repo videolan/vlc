@@ -81,14 +81,14 @@ static const char *const ppsz_pos_descriptions[] =
 
 static int  OpenSub  ( vlc_object_t * );
 static int  OpenVideo( vlc_object_t * );
-static void Close    ( vlc_object_t * );
+static void Close    ( filter_t * );
 
 vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
     set_help(LOGO_HELP)
     set_capability( "sub source", 0 )
-    set_callbacks( OpenSub, Close )
+    set_callback( OpenSub )
     set_description( N_("Logo sub source") )
     set_shortname( N_("Logo overlay") )
     add_shortcut( "logo" )
@@ -216,18 +216,13 @@ static int OpenVideo( vlc_object_t *p_this )
 }
 
 static const struct vlc_filter_operations filter_sub_ops = {
-    .source_sub = FilterSub,
+    .source_sub = FilterSub, .close = Close,
 };
-
-static void CloseVideo( filter_t *p_filter )
-{
-    Close( VLC_OBJECT(p_filter) );
-}
 
 static const struct vlc_filter_operations filter_video_ops = {
     .filter_video = FilterVideo,
     .video_mouse = Mouse,
-    .close = CloseVideo,
+    .close = Close,
 };
 
 /**
@@ -319,9 +314,8 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
 /**
  * Common close function
  */
-static void Close( vlc_object_t *p_this )
+static void Close( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     for( int i = 0; ppsz_filter_callbacks[i]; i++ )

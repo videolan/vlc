@@ -45,7 +45,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  CreateFilter    ( vlc_object_t * );
-static void DestroyFilter   ( vlc_object_t * );
+static void DestroyFilter   ( filter_t * );
 static subpicture_t *Filter ( filter_t *, vlc_tick_t );
 
 static int MosaicCallback   ( vlc_object_t *, char const *, vlc_value_t,
@@ -177,7 +177,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC)
     set_capability( "sub source", 0 )
-    set_callbacks( CreateFilter, DestroyFilter )
+    set_callback( CreateFilter )
 
     add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255,
                             ALPHA_TEXT, ALPHA_LONGTEXT, false )
@@ -272,7 +272,7 @@ static void mosaic_ParseSetOffsets( vlc_object_t *p_this,
             mosaic_ParseSetOffsets( VLC_OBJECT( a ), b, c )
 
 static const struct vlc_filter_operations filter_ops = {
-    .source_sub = Filter,
+    .source_sub = Filter, .close = DestroyFilter,
 };
 
 /*****************************************************************************
@@ -379,9 +379,8 @@ static int CreateFilter( vlc_object_t *p_this )
 /*****************************************************************************
  * DestroyFilter: destroy mosaic video filter
  *****************************************************************************/
-static void DestroyFilter( vlc_object_t *p_this )
+static void DestroyFilter( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
 #define DEL_CB( name ) \

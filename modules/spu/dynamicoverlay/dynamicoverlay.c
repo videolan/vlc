@@ -45,7 +45,7 @@
  * Local prototypes
  *****************************************************************************/
 static int Create( vlc_object_t * );
-static void Destroy( vlc_object_t * );
+static void Destroy( filter_t * );
 static subpicture_t *Filter( filter_t *, vlc_tick_t );
 
 static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
@@ -74,7 +74,7 @@ vlc_module_begin ()
     add_loadfile("overlay-output", NULL, OUTPUT_TEXT, OUTPUT_LONGTEXT)
 
     add_shortcut( "overlay" )
-    set_callbacks( Create, Destroy )
+    set_callback( Create )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
@@ -82,7 +82,7 @@ static const char *const ppsz_filter_options[] = {
 };
 
 static const struct vlc_filter_operations filter_ops = {
-    .source_sub = Filter,
+    .source_sub = Filter, .close = Destroy,
 };
 
 /*****************************************************************************
@@ -136,9 +136,8 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************
  * Terminate an output method created by adjustCreateOutputMethod
  *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+static void Destroy( filter_t *p_filter )
 {
-    filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
     BufferDestroy( &p_sys->input );
