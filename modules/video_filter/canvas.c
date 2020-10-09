@@ -41,6 +41,7 @@
 static int  Activate( vlc_object_t * );
 static void Destroy( vlc_object_t * );
 static picture_t *Filter( filter_t *, picture_t * );
+static void Flush( filter_t * );
 
 /* This module effectively implements a form of picture-in-picture.
  *  - The outer picture is called the canvas.
@@ -146,7 +147,7 @@ static const struct filter_video_callbacks canvas_cbs =
 
 static const struct vlc_filter_operations filter_ops =
 {
-    .filter_video = Filter,
+    .filter_video = Filter, .flush = Flush,
 };
 
 /*****************************************************************************
@@ -402,3 +403,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     filter_sys_t *p_sys = p_filter->p_sys;
     return filter_chain_VideoFilter( p_sys->p_chain, p_pic );
 }
+
+static void Flush( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_chain_VideoFlush( p_sys->p_chain );
+}
+
