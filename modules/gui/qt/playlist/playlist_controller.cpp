@@ -303,6 +303,9 @@ PlaylistControllerModel::PlaylistControllerModel(QObject *parent)
     : QObject(parent)
     , d_ptr( new PlaylistControllerModelPrivate(this) )
 {
+    connect(this, &PlaylistControllerModel::itemsMoved, this, &PlaylistControllerModel::resetSortKey);
+    connect(this, &PlaylistControllerModel::itemsAdded, this, &PlaylistControllerModel::resetSortKey);
+    connect(this, &PlaylistControllerModel::isEmptyChanged, [this](bool isEmpty) {if (isEmpty) emit resetSortKey();});
 }
 
 PlaylistControllerModel::PlaylistControllerModel(vlc_playlist_t *playlist, QObject *parent)
@@ -455,9 +458,23 @@ PlaylistControllerModel::sort(const QVector<vlc_playlist_sort_criterion> &criter
 
 void PlaylistControllerModel::sort(PlaylistControllerModel::SortKey key, PlaylistControllerModel::SortOrder order)
 {
+    if(key != SortKey::SORT_KEY_NONE)
+        setSortKey(key);
+    setSortOrder(order);
+
+    sort();
+}
+
+void PlaylistControllerModel::sort(void)
+{
+    Q_D(PlaylistControllerModel);
+
+    if (d->m_sortKey == SortKey::SORT_KEY_NONE)
+        return;
+
     vlc_playlist_sort_criterion crit = {
-        static_cast<vlc_playlist_sort_key>(key) ,
-        static_cast<vlc_playlist_sort_order>(order)
+        static_cast<vlc_playlist_sort_key>(d->m_sortKey),
+        static_cast<vlc_playlist_sort_order>(d->m_sortOrder)
     };
     QVector<vlc_playlist_sort_criterion> criteria { crit };
     sort( criteria );
@@ -657,6 +674,13 @@ void PlaylistControllerModel::setPlaylistPtr(vlc_playlist_t* newPlaylist)
     emit playlistPtrChanged( PlaylistPtr(newPlaylist) );
 }
 
+void PlaylistControllerModel::resetSortKey()
+{
+    Q_D(PlaylistControllerModel);
+    d->m_sortKey = SortKey::SORT_KEY_NONE;
+    emit sortKeyChanged();
+}
+
 void PlaylistControllerModel::setPlaylistPtr(PlaylistPtr ptr)
 {
     setPlaylistPtr(ptr.m_playlist);
@@ -700,6 +724,57 @@ size_t PlaylistControllerModel::count() const
 {
     Q_D(const PlaylistControllerModel);
     return d->m_count;
+}
+
+void PlaylistControllerModel::setSortKey(SortKey sortKey)
+{
+    Q_D(PlaylistControllerModel);
+
+    if (sortKey == d->m_sortKey)
+        return;
+
+    d->m_sortKey = sortKey;
+    emit sortKeyChanged();
+}
+
+void PlaylistControllerModel::setSortOrder(SortOrder sortOrder)
+{
+    Q_D(PlaylistControllerModel);
+
+    SortOrder order = d->m_sortOrder;
+    if(sortOrder == order)
+        return;
+
+    d->m_sortOrder = sortOrder;
+    emit sortOrderChanged();
+}
+
+void PlaylistControllerModel::switchSortOrder()
+{
+    Q_D(PlaylistControllerModel);
+
+    SortOrder order = d->m_sortOrder;
+    if (order == SortOrder::SORT_ORDER_ASC)
+        order = SortOrder::SORT_ORDER_DESC;
+    else if (order == SortOrder::SORT_ORDER_DESC)
+        order = SortOrder::SORT_ORDER_ASC;
+    else
+        return;
+
+    d->m_sortOrder = order;
+    emit sortOrderChanged();
+}
+
+PlaylistControllerModel::SortKey PlaylistControllerModel::getSortKey() const
+{
+    Q_D(const PlaylistControllerModel);
+    return d->m_sortKey;
+}
+
+PlaylistControllerModel::SortOrder PlaylistControllerModel::getSortOrder() const
+{
+    Q_D(const PlaylistControllerModel);
+    return d->m_sortOrder;
 }
 
 bool PlaylistControllerModel::hasNext() const

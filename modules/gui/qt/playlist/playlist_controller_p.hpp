@@ -61,6 +61,8 @@ public:
     bool m_isPlayAndExit;
     bool m_empty = true;
     size_t m_count = 0;
+    PlaylistControllerModel::SortKey m_sortKey = PlaylistControllerModel::SORT_KEY_NONE;
+    PlaylistControllerModel::SortOrder m_sortOrder = PlaylistControllerModel::SORT_ORDER_ASC;
 };
 
 } //namespace playlist

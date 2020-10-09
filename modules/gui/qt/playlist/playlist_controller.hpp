@@ -59,7 +59,8 @@ public:
         SORT_KEY_TRACK_NUMBER = VLC_PLAYLIST_SORT_KEY_TRACK_NUMBER,
         SORT_KEY_DISC_NUMBER = VLC_PLAYLIST_SORT_KEY_DISC_NUMBER,
         SORT_KEY_URL = VLC_PLAYLIST_SORT_KEY_URL,
-        SORT_KEY_RATIN = VLC_PLAYLIST_SORT_KEY_RATING
+        SORT_KEY_RATIN = VLC_PLAYLIST_SORT_KEY_RATING,
+        SORT_KEY_NONE
     };
     Q_ENUM(SortKey)
 
@@ -81,6 +82,8 @@ public:
     Q_PROPERTY(bool playAndExit READ isPlayAndExit WRITE setPlayAndExit NOTIFY playAndExitChanged)
     Q_PROPERTY(bool empty READ isEmpty NOTIFY isEmptyChanged)
     Q_PROPERTY(size_t count READ count NOTIFY countChanged)
+    Q_PROPERTY(SortKey sortKey READ getSortKey WRITE setSortKey NOTIFY sortKeyChanged)
+    Q_PROPERTY(SortOrder sortOrder READ getSortOrder WRITE setSortOrder NOTIFY sortOrderChanged)
 
 public:
     Q_INVOKABLE void play();
@@ -107,7 +110,10 @@ public:
 
     Q_INVOKABLE void shuffle();
     void sort(const QVector<vlc_playlist_sort_criterion> &);
+
     Q_INVOKABLE void sort(SortKey key, SortOrder order);
+    Q_INVOKABLE void sort(void);
+
     Q_INVOKABLE void explore(const PlaylistItem& pItem);
 
 public:
@@ -133,9 +139,17 @@ public slots:
     bool isEmpty() const;
     size_t count() const;
 
+    SortKey getSortKey() const;
+    void setSortKey(SortKey sortKey);
+    SortOrder getSortOrder() const;
+    void setSortOrder(SortOrder sortOrder);
+    void switchSortOrder();
+
     PlaylistPtr getPlaylistPtr() const;
     void setPlaylistPtr(PlaylistPtr id);
     void setPlaylistPtr(vlc_playlist_t* newPlaylist);
+
+    void resetSortKey();
 
 signals:
     void playlistPtrChanged( PlaylistPtr );
@@ -149,6 +163,9 @@ signals:
     void repeatModeChanged( PlaybackRepeat );
     void isEmptyChanged( bool empty );
     void countChanged(size_t );
+
+    void sortKeyChanged();
+    void sortOrderChanged();
 
     void currentIndexChanged(ssize_t index);
     void itemsReset(QVector<PlaylistItem>);
