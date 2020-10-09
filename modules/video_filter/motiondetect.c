@@ -81,6 +81,16 @@ typedef struct
     int color_y_max[NUM_COLORS];
 } filter_sys_t;
 
+static void Flush(filter_t *p_filter)
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    if (p_sys->p_old != NULL)
+    {
+        picture_Release(p_sys->p_old);
+        p_sys->p_old = NULL;
+    }
+}
+
 /*****************************************************************************
  * Create
  *****************************************************************************/
@@ -108,7 +118,7 @@ static int Create( vlc_object_t *p_this )
     }
     static const struct vlc_filter_operations filter_ops =
     {
-        .filter_video = Filter,
+        .filter_video = Filter, .flush = Flush,
     };
     p_filter->ops = &filter_ops;
 
@@ -311,6 +321,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
     p_sys->p_old = picture_Hold( p_inpic );
 
 exit:
+    picture_CopyProperties(p_outpic, p_inpic);
     picture_Release( p_inpic );
     return p_outpic;
 }
