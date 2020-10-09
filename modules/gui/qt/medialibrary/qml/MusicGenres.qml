@@ -146,7 +146,7 @@ Widgets.NavigableFocusScope {
                 playCoverBorder.width: VLCStyle.dp(3, VLCStyle.scale)
 
                 onItemDoubleClicked: root.showAlbumView(model)
-                onItemClicked: gridView_id.leftClickOnItem(index)
+                onItemClicked: gridView_id.leftClickOnItem(modifier, item.index)
 
                 onPlayClicked: {
                     if (model.id)
