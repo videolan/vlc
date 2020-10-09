@@ -36,7 +36,7 @@
 
 static int Open (vlc_object_t *);
 static int OpenResampler (vlc_object_t *);
-static void Close (vlc_object_t *);
+static void Close (filter_t *);
 
 vlc_module_begin ()
     set_shortname (N_("Speex resampler"))
@@ -47,11 +47,11 @@ vlc_module_begin ()
                  QUALITY_TEXT, QUALITY_LONGTEXT, true)
         change_integer_range (0, 10)
     set_capability ("audio converter", 0)
-    set_callbacks (Open, Close)
+    set_callback (Open)
 
     add_submodule ()
     set_capability ("audio resampler", 0)
-    set_callbacks (OpenResampler, Close)
+    set_callback (OpenResampler)
     add_shortcut ("speex")
 vlc_module_end ()
 
@@ -93,7 +93,7 @@ static int OpenResampler (vlc_object_t *obj)
     }
 
     static const struct vlc_filter_operations filter_ops =
-        { .filter_audio = Resample };
+        { .filter_audio = Resample, .close = Close };
 
     filter->p_sys = st;
     filter->ops = &filter_ops;
@@ -111,9 +111,8 @@ static int Open (vlc_object_t *obj)
     return OpenResampler (obj);
 }
 
-static void Close (vlc_object_t *obj)
+static void Close (filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
     SpeexResamplerState *st = (SpeexResamplerState *)filter->p_sys;
 
     speex_resampler_destroy (st);
