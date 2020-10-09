@@ -101,6 +101,7 @@ Widgets.NavigableFocusScope {
             id: playlistMenu
             anchors.fill: parent
             focus: true
+            keyNavigationWraps: true
 
             property var models: {
                 "rootmenu" : {
