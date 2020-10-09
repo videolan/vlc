@@ -57,9 +57,9 @@ Widgets.NavigableFocusScope {
         id: animateExpand;
         target: searchBoxRect;
         properties: "width"
-        duration: 200
+        duration: 125
         to: VLCStyle.widthSearchInput
-        easing.type: Easing.OutSine
+        easing.type: Easing.InSine
         onStopped: {
             searchBox.placeholderText = i18n.qtr("filter")
         }
@@ -69,7 +69,7 @@ Widgets.NavigableFocusScope {
         id: animateRetract;
         target: searchBoxRect;
         properties: "width"
-        duration: 200
+        duration: 125
         to: 0
         easing.type: Easing.OutSine
     }
