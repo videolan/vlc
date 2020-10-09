@@ -46,7 +46,10 @@ Widgets.NavigableFocusScope {
     property var sortKey : PlaylistControllerModel.SORT_KEY_NONE
     property var sortOrder : undefined
 
+    property bool _intSortOrder : false
+
     signal sortSelected(var modelData)
+    signal sortOrderSelected(var order)
 
     onFocusChanged: {
         if (!focus)
@@ -190,7 +193,24 @@ Widgets.NavigableFocusScope {
 
                 onClicked: {
                     root.currentIndex = index
+
+                    if (root.sortOrder !== undefined) {
+                        var _sortOrder = root.sortOrder
+                        var _sortKey = root.sortKey
+                    }
+
                     root.sortSelected(Array.isArray(root.model) ? modelData : model)
+
+                    if (root.sortOrder !== undefined) {
+                        if (root.sortKey !== _sortKey)
+                            root._intSortOrder = false
+
+                        if (root.sortOrder === _sortOrder) {
+                            root.sortOrderSelected(root._intSortOrder ? PlaylistControllerModel.SORT_ORDER_DESC : PlaylistControllerModel.SORT_ORDER_ASC)
+                            root._intSortOrder = !root._intSortOrder
+                        }
+                    }
+
                     popup.close()
                 }
             }
