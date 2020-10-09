@@ -56,6 +56,31 @@ Rectangle {
 
     property bool dropVisible: false
 
+    function showTooltip(binding) {
+        plInfoTooltip.close()
+        plInfoTooltip.text = Qt.binding(function() { return (textInfo.text + '\n' + textArtist.text); })
+        plInfoTooltip.parent = textInfoColumn
+        if (plmodel.getSelection().length > 1 && binding)
+            plInfoTooltip.timeout = 2000
+        else
+            plInfoTooltip.timeout = 0
+        plInfoTooltip.visible = Qt.binding(function() { return ( (binding ? model.selected : plitem.hovered) && !overlayMenu.visible &&
+                                                                (textInfo.implicitWidth > textInfo.width || textArtist.implicitWidth > textArtist.width)); })
+
+    }
+
+    onHoveredChanged: {
+        if(hovered)
+            showTooltip(false)
+    }
+
+    readonly property bool selected : model.selected
+
+    onSelectedChanged: {
+        if(selected)
+            showTooltip(true)
+    }
+
     Connections {
         target: root
 
@@ -208,13 +233,6 @@ Rectangle {
                 id: textInfoColumn
                 Layout.fillWidth: true
                 Layout.leftMargin: VLCStyle.margin_large
-
-                ToolTip {
-                    id: textInfoExtendTooltip
-                    text: (textInfo.text + '\n' + textArtist.text)
-                    visible: (plitem.hovered || model.selected) && (textInfo.implicitWidth > textInfo.width || textArtist.implicitWidth > textArtist.width)
-                    delay: 750
-                }
 
                 Widgets.ListLabel {
                     id: textInfo

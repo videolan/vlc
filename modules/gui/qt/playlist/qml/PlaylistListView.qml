@@ -450,6 +450,11 @@ Widgets.NavigableFocusScope {
                     }
                 }
 
+                ToolTip {
+                    id: plInfoTooltip
+                    delay: 750
+                }
+
                 delegate: Column {
 
                     Loader {
