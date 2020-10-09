@@ -91,6 +91,10 @@ Widgets.NavigableFocusScope {
             onClicked: {
                 if (searchBox.text == "")
                     expanded = !expanded
+                else {
+                    searchBox.clear()
+                    expanded = !expanded
+                }
             }
         }
 
