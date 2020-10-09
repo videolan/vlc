@@ -87,8 +87,8 @@ Item {
     property color roundPlayCoverBorder: "#979797"
 
     // playlist
-    property color playlistSeparator: colors_id.white
-    property color plItemHover_Focus: isThemeDark ? "#272727" : "#DDDDDD"
+    property color playlistSeparator: white
+    property color plItemHover_Focus: bannerHover
     property color plItemSelect:      isThemeDark ? "#1E1E1E" : "#EDEDED"
 
     function getPLItemColor(selected, hovered, focus)
@@ -155,8 +155,8 @@ Item {
 
                 textActiveSource: "#ff950d";
 
-                banner: "#eff0f1";
-                bannerHover: "#3daee9";
+                banner: "#d8d8d8";
+                bannerHover: "#DDDDDD";
 
                 accent: "#ff950d";
                 alert: "#ff0000";
@@ -183,7 +183,7 @@ Item {
                 buttonBorder: "#575b5f"
                 textActiveSource: "#ff950d"
                 banner: "#31363b"
-                bannerHover: "#3daee9"
+                bannerHover: "#272727"
                 accent: "#ff950d"
                 alert: "#ff0000"
                 separator: "#2d2d2d"
