@@ -167,9 +167,27 @@ Widgets.NavigableFocusScope {
                 }
 
                 Widgets.CaptionLabel {
+                    function getHoursMinutesText(duration) {
+                        var hours = duration.toHours()
+                        var minutes = duration.toMinutes()
+                        var text
+                        if (hours >= 1) {
+                            minutes = minutes % 60
+                            text = i18n.qtr("%1h %2min").arg(hours).arg(minutes)
+                        }
+                        else if (minutes > 0) {
+                            text = i18n.qtr("%1 min").arg(minutes)
+                        }
+                        else {
+                            text = i18n.qtr("%1 sec").arg(duration.toSeconds())
+                        }
+
+                        return text
+                    }
+
                     anchors.topMargin: VLCStyle.margin_small
                     visible: plmodel.count !== 0
-                    text: i18n.qtr("%1 elements, %2 min").arg(root.plmodel.count).arg(plmodel.duration.toMinutes())
+                    text: i18n.qtr("%1 elements, %2").arg(root.plmodel.count).arg(getHoursMinutesText(plmodel.duration))
                     color: _colors.caption
                 }
             }
