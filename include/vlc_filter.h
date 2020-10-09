@@ -90,7 +90,7 @@ struct vlc_filter_operations
         /** Filter an audio block (audio filter) */
         block_t * (*filter_audio)(filter_t *, block_t *);
 
-        /** Blend a subpicture onto a picture (blend) */
+        /** Blend a subpicture onto a picture (video blending) */
         void (*blend_video)(filter_t *,  picture_t *, const picture_t *,
                             int, int, int);
 
@@ -146,6 +146,7 @@ typedef int (*vlc_video_filter_open)(filter_t *);
 typedef int (*vlc_video_text_renderer_open)(filter_t *);
 typedef int (*vlc_video_sub_filter_open)(filter_t *);
 typedef int (*vlc_video_sub_source_open)(filter_t *);
+typedef int (*vlc_video_blending_open)(filter_t *);
 
 
 #define set_deinterlace_callback( activate )     \
@@ -196,6 +197,14 @@ typedef int (*vlc_video_sub_source_open)(filter_t *);
         set_callback(activate)                             \
     }                                                      \
     set_capability( "sub source", priority )
+
+#define set_callback_video_blending( activate, priority )  \
+    {                                                      \
+        vlc_video_blending_open open__ = activate;         \
+        (void) open__;                                     \
+        set_callback(activate)                             \
+    }                                                      \
+    set_capability( "video blending", priority )
 
 /** Structure describing a filter
  * @warning BIG FAT WARNING : the code relies on the first 4 members of

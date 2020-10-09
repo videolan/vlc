@@ -36,13 +36,12 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open (vlc_object_t *);
+static int  Open (filter_t *);
 static void Close(filter_t *);
 
 vlc_module_begin()
     set_description(N_("Video pictures blending"))
-    set_capability("video blending", 100)
-    set_callback(Open)
+    set_callback_video_blending(Open, 100)
 vlc_module_end()
 
 static inline unsigned div255(unsigned v)
@@ -689,9 +688,8 @@ static const struct FilterOperationInitializer {
     };
 } filter_ops;
 
-static int Open(vlc_object_t *object)
+static int Open(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)object;
     const vlc_fourcc_t src = filter->fmt_in.video.i_chroma;
     const vlc_fourcc_t dst = filter->fmt_out.video.i_chroma;
 
