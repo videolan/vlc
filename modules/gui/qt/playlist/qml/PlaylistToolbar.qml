@@ -84,7 +84,7 @@ Widgets.NavigableFocusScope {
                 popupAlignment: Qt.AlignRight | Qt.AlignTop
 
                 model: [
-                    { text: i18n.qtr("Tile"),             criteria: PlaylistControllerModel.SORT_KEY_TITLE },
+                    { text: i18n.qtr("Title"),            criteria: PlaylistControllerModel.SORT_KEY_TITLE },
                     { text: i18n.qtr("Duration"),         criteria: PlaylistControllerModel.SORT_KEY_DURATION },
                     { text: i18n.qtr("Artist"),           criteria: PlaylistControllerModel.SORT_KEY_ARTIST },
                     { text: i18n.qtr("Album"),            criteria: PlaylistControllerModel.SORT_KEY_ALBUM },
@@ -92,7 +92,7 @@ Widgets.NavigableFocusScope {
                     { text: i18n.qtr("Date"),             criteria: PlaylistControllerModel.SORT_KEY_DATE },
                     { text: i18n.qtr("Track number"),     criteria: PlaylistControllerModel.SORT_KEY_TRACK_NUMBER },
                     { text: i18n.qtr("URL"),              criteria: PlaylistControllerModel.SORT_KEY_URL },
-                    { text: i18n.qtr("Rating"),           criteria: PlaylistControllerModel.SORT_KEY_RATIN },
+                    { text: i18n.qtr("Rating"),           criteria: PlaylistControllerModel.SORT_KEY_RATING },
                 ]
                 textRole: "text"
                 criteriaRole: "criteria"

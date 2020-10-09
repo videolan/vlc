@@ -93,7 +93,7 @@ Widgets.NavigableFocusScope {
             Action { id:deleteAction;       text: i18n.qtr("Remove Selected");           onTriggered: view.onDelete();                                                                                                              }
 
             //sortmenu
-            Action { id: sortTitleAction;   text: i18n.qtr("Tile");
+            Action { id: sortTitleAction;   text: i18n.qtr("Title");
                 onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_TITLE, PlaylistControllerModel.SORT_ORDER_ASC)}
             Action { id: sortDurationAction;text: i18n.qtr("Duration");
                 onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_DURATION, PlaylistControllerModel.SORT_ORDER_ASC)}
@@ -110,7 +110,7 @@ Widgets.NavigableFocusScope {
             Action { id: sortURLAction;     text: i18n.qtr("URL");
                 onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_URL, PlaylistControllerModel.SORT_ORDER_ASC)}
             Action { id: sortRatingAction;  text: i18n.qtr("Rating");
-                onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_RATIN, PlaylistControllerModel.SORT_ORDER_ASC)}
+                onTriggered: mainPlaylistController.sort(PlaylistControllerModel.SORT_KEY_RATING, PlaylistControllerModel.SORT_ORDER_ASC)}
 
             models: {
                 "rootmenu" : {
