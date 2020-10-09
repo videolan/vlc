@@ -235,7 +235,7 @@ void PlaylistListModelPrivate::onItemsRemoved(size_t index, size_t count)
 {
     Q_Q(PlaylistListModel);
 
-    for(size_t i = index; i < count; ++i)
+    for(size_t i = index; i <= index + count - 1; ++i)
     {
         m_duration -= m_items.at(i).getDuration();
     }
