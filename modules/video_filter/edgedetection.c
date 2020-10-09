@@ -82,9 +82,15 @@ static const struct filter_video_callbacks filter_video_edge_cbs =
     new_frame, NULL,
 };
 
+static void Flush( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_chain_VideoFlush( p_sys );
+}
+
 static const struct vlc_filter_operations filter_ops =
 {
-    .filter_video = Filter,
+    .filter_video = Filter, .flush = Flush,
 };
 
 /*****************************************************************************
