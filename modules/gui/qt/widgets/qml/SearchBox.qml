@@ -18,7 +18,6 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
-import QtQuick 2.11 as QtQuick
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
@@ -128,8 +127,8 @@ Widgets.NavigableFocusScope {
                 //don't use KeyHelper.matchCancel here as we don't want to match Backspace
                 if (event.key === Qt.Key_Back
                     || event.key === Qt.Key_Cancel
-                    || event.matches(QtQuick.StandardKey.Back)
-                    || event.matches(QtQuick.StandardKey.Cancel))
+                    || event.matches(StandardKey.Back)
+                    || event.matches(StandardKey.Cancel))
                 {
                     event.accepted = true
                 }
@@ -139,8 +138,8 @@ Widgets.NavigableFocusScope {
                 //don't use KeyHelper.matchCancel here as we don't want to match Backspace
                 if (event.key === Qt.Key_Back
                     || event.key === Qt.Key_Cancel
-                    || event.matches(QtQuick.StandardKey.Back)
-                    || event.matches(QtQuick.StandardKey.Cancel))
+                    || event.matches(StandardKey.Back)
+                    || event.matches(StandardKey.Cancel))
                 {
                     text = ""
                     expanded = false
