@@ -194,9 +194,9 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
 /*****************************************************************************
  *
  *****************************************************************************/
-int sout_InputDelete( sout_packetizer_input_t *p_input )
+int sout_InputDelete( sout_instance_t *p_sout,
+                      sout_packetizer_input_t *p_input )
 {
-    sout_instance_t     *p_sout = p_input->p_sout;
 
     msg_Dbg(p_sout->p_stream, "removing an output ES (%p)", (void *)p_input);
 
@@ -209,9 +209,10 @@ int sout_InputDelete( sout_packetizer_input_t *p_input )
     return( VLC_SUCCESS);
 }
 
-static int sout_InputControlVa( sout_packetizer_input_t *p_input, int i_query, va_list args )
+static int sout_InputControlVa( sout_instance_t *p_sout,
+                                sout_packetizer_input_t *p_input,
+                                int i_query, va_list args )
 {
-    sout_instance_t *p_sout = p_input->p_sout;
     if( i_query == SOUT_INPUT_SET_SPU_HIGHLIGHT )
     {
         vlc_mutex_lock( &p_sout->lock );
@@ -224,21 +225,21 @@ static int sout_InputControlVa( sout_packetizer_input_t *p_input, int i_query, v
     return VLC_EGENERIC;
 }
 
-int sout_InputControl( sout_packetizer_input_t *p_input, int i_query, ... )
+int sout_InputControl( sout_instance_t *p_sout,
+                       sout_packetizer_input_t *p_input, int i_query, ... )
 {
     va_list args;
     int     i_result;
 
     va_start( args, i_query );
-    i_result = sout_InputControlVa( p_input, i_query, args );
+    i_result = sout_InputControlVa( p_sout, p_input, i_query, args );
     va_end( args );
     return i_result;
 }
 
-void sout_InputFlush( sout_packetizer_input_t *p_input )
+void sout_InputFlush( sout_instance_t *p_sout,
+                      sout_packetizer_input_t *p_input )
 {
-    sout_instance_t     *p_sout = p_input->p_sout;
-
     vlc_mutex_lock( &p_sout->lock );
     sout_StreamFlush( p_sout->p_stream, p_input->id );
     vlc_mutex_unlock( &p_sout->lock );
@@ -248,10 +249,10 @@ void sout_InputFlush( sout_packetizer_input_t *p_input )
 /*****************************************************************************
  *
  *****************************************************************************/
-int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
+int sout_InputSendBuffer( sout_instance_t *p_sout,
+                          sout_packetizer_input_t *p_input,
                           block_t *p_buffer )
 {
-    sout_instance_t     *p_sout = p_input->p_sout;
     int                 i_ret;
 
     if( p_input->b_flushed )

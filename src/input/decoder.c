@@ -828,7 +828,8 @@ static int DecoderThread_PlaySout( vlc_input_decoder_t *p_owner, block_t *p_sout
     vlc_mutex_unlock( &p_owner->lock );
 
     /* FIXME --VLC_TICK_INVALID inspect stream_output*/
-    return sout_InputSendBuffer( p_owner->p_sout_input, p_sout_block );
+    return sout_InputSendBuffer( p_owner->p_sout, p_owner->p_sout_input,
+                                 p_sout_block );
 }
 
 /* This function process a block for sout
@@ -901,7 +902,7 @@ static void DecoderThread_ProcessSout( vlc_input_decoder_t *p_owner, block_t *p_
                         }
 
                         if( !p_owner->cc.p_sout_input ||
-                            sout_InputSendBuffer( p_owner->cc.p_sout_input, p_cc ) )
+                            sout_InputSendBuffer( p_owner->p_sout, p_owner->cc.p_sout_input, p_cc ) )
                         {
                             block_Release( p_cc );
                         }
@@ -1453,7 +1454,7 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
 #ifdef ENABLE_SOUT
     if ( p_owner->p_sout_input != NULL )
     {
-        sout_InputFlush( p_owner->p_sout_input );
+        sout_InputFlush( p_owner->p_sout, p_owner->p_sout_input );
     }
 #endif
     if( p_dec->fmt_out.i_cat == AUDIO_ES )
@@ -1928,9 +1929,9 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner )
 #ifdef ENABLE_SOUT
     if( p_owner->p_sout_input )
     {
-        sout_InputDelete( p_owner->p_sout_input );
+        sout_InputDelete( p_owner->p_sout, p_owner->p_sout_input );
         if( p_owner->cc.p_sout_input )
-            sout_InputDelete( p_owner->cc.p_sout_input );
+            sout_InputDelete( p_owner->p_sout, p_owner->cc.p_sout_input );
     }
 #endif
 
@@ -2625,7 +2626,8 @@ int vlc_input_decoder_SetSpuHighlight( vlc_input_decoder_t *p_owner,
 
 #ifdef ENABLE_SOUT
     if( p_owner->p_sout_input )
-        sout_InputControl( p_owner->p_sout_input, SOUT_INPUT_SET_SPU_HIGHLIGHT, spu_hl );
+        sout_InputControl( p_owner->p_sout, p_owner->p_sout_input,
+                           SOUT_INPUT_SET_SPU_HIGHLIGHT, spu_hl );
 #endif
 
     vlc_mutex_lock( &p_owner->lock );
