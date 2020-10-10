@@ -42,20 +42,6 @@ extern "C" {
  * Stream output modules interface
  */
 
-/** Stream output instance (FIXME: should be private to src/ to avoid
- * invalid unsynchronized access) */
-struct sout_instance_t
-{
-    struct vlc_object_t obj;
-
-    char *psz_sout;
-
-    bool                b_wants_substreams;
-
-    vlc_mutex_t         lock;
-    sout_stream_t       *p_stream;
-};
-
 /**
  * \defgroup sout_access Access output
  * Raw output byte streams

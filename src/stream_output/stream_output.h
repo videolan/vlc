@@ -29,6 +29,19 @@
 # include <vlc_sout.h>
 # include <vlc_network.h>
 
+/** Stream output instance */
+struct sout_instance_t
+{
+    struct vlc_object_t obj;
+
+    char *psz_sout;
+
+    bool                b_wants_substreams;
+
+    vlc_mutex_t         lock;
+    sout_stream_t       *p_stream;
+};
+
 /****************************************************************************
  * sout_packetizer_input_t: p_sout <-> p_packetizer
  ****************************************************************************/
