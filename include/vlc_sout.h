@@ -167,7 +167,6 @@ static inline int sout_MuxControl( sout_mux_t *p_mux, int i_query, ... )
 /** @} */
 
 enum sout_stream_query_e {
-    SOUT_STREAM_EMPTY,    /* arg1=bool *,       res=can fail (assume true) */
     SOUT_STREAM_WANTS_SUBSTREAMS,  /* arg1=bool *, res=can fail (assume false) */
     SOUT_STREAM_ID_SPU_HIGHLIGHT,  /* arg1=void *, arg2=const vlc_spu_highlight_t *, res=can fail */
     SOUT_STREAM_IS_SYNCHRONOUS, /* arg1=bool *, can fail (assume false) */

@@ -60,7 +60,6 @@ bool sout_instance_ControlsPace( sout_instance_t *sout );
 sout_packetizer_input_t *sout_InputNew( sout_instance_t *, const es_format_t * );
 int sout_InputDelete( sout_packetizer_input_t * );
 int sout_InputSendBuffer( sout_packetizer_input_t *, block_t* );
-bool sout_InputIsEmpty(sout_packetizer_input_t *);
 
 enum sout_input_query_e
 {

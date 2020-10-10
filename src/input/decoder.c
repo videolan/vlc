@@ -2228,7 +2228,7 @@ bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * p_owner )
     vlc_mutex_lock( &p_owner->lock );
 #ifdef ENABLE_SOUT
     if( p_owner->p_sout_input != NULL )
-        b_empty = sout_InputIsEmpty( p_owner->p_sout_input );
+        b_empty = true;
     else
 #endif
     if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
