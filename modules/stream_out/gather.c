@@ -68,6 +68,10 @@ typedef struct
     sout_stream_id_sys_t **id;
 } sout_stream_sys_t;
 
+static const struct sout_stream_operations ops = {
+    Add, Del, Send, NULL, NULL,
+};
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -80,9 +84,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_EGENERIC;
 
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
+    p_stream->ops = &ops;
 
     TAB_INIT( p_sys->i_id, p_sys->id );
 
