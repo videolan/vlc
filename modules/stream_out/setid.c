@@ -119,13 +119,14 @@ static int OpenCommon( vlc_object_t *p_this )
     if( unlikely( !p_sys ) )
         return VLC_ENOMEM;
 
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
-
     p_stream->p_sys     = p_sys;
 
     return VLC_SUCCESS;
 }
+
+static const struct sout_stream_operations id_ops = {
+    AddId, Del, Send, NULL, NULL,
+};
 
 static int OpenId( vlc_object_t *p_this )
 {
@@ -143,10 +144,14 @@ static int OpenId( vlc_object_t *p_this )
     p_sys->i_new_id = var_GetInteger( p_stream, SOUT_CFG_PREFIX_ID "new-id" );
     p_sys->psz_language = NULL;
 
-    p_stream->pf_add = AddId;
+    p_stream->ops = &id_ops;
 
     return VLC_SUCCESS;
 }
+
+static const struct sout_stream_operations lang_ops = {
+    AddLang, Del, Send, NULL, NULL,
+};
 
 static int OpenLang( vlc_object_t *p_this )
 {
@@ -164,7 +169,7 @@ static int OpenLang( vlc_object_t *p_this )
     p_sys->i_new_id = -1;
     p_sys->psz_language = var_GetString( p_stream, SOUT_CFG_PREFIX_LANG "lang" );
 
-    p_stream->pf_add = AddLang;
+    p_stream->ops = &lang_ops;
 
     return VLC_SUCCESS;
 }
