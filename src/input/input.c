@@ -42,9 +42,9 @@
 #include "item.h"
 #include "resource.h"
 #include "stream.h"
+#include "stream_output/stream_output.h"
 
 #include <vlc_aout.h>
-#include <vlc_sout.h>
 #include <vlc_dialog.h>
 #include <vlc_url.h>
 #include <vlc_charset.h>
@@ -1313,8 +1313,7 @@ static int Init( input_thread_t * p_input )
 
     if( !priv->b_preparsing && priv->p_sout )
     {
-        priv->b_out_pace_control = priv->p_sout->i_out_pace_nocontrol > 0;
-
+        priv->b_out_pace_control = !sout_instance_ControlsPace(priv->p_sout);
         msg_Dbg( p_input, "starting in %ssync mode",
                  priv->b_out_pace_control ? "a" : "" );
     }
