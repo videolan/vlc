@@ -197,7 +197,6 @@ struct sout_stream_t
     void              (*pf_del)( sout_stream_t *, void * );
     /* manage a packet */
     int               (*pf_send)( sout_stream_t *, void *, block_t* );
-    int               (*pf_control)( sout_stream_t *, int, va_list );
 
     void              *p_sys;
 };
@@ -243,11 +242,8 @@ static inline void sout_StreamFlush( sout_stream_t *s,
 
 static inline int sout_StreamControlVa( sout_stream_t *s, int i_query, va_list args )
 {
-    if (s->ops == NULL) {
-        if (s->pf_control == NULL)
-            return VLC_EGENERIC;
-        return s->pf_control(s, i_query, args);
-    }
+    if (s->ops == NULL)
+        return VLC_EGENERIC;
     if (s->ops->control == NULL)
         return VLC_EGENERIC;
     return s->ops->control(s, i_query, args);
