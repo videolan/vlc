@@ -113,8 +113,6 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
     vlc_mutex_init( &p_sout->lock );
     p_sout->p_stream = NULL;
 
-    var_Create( p_sout, "sout-mux-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
     p_sout->p_stream = sout_StreamChainNew( VLC_OBJECT(p_sout), psz_chain,
                                             NULL, NULL );
     if( p_sout->p_stream )
