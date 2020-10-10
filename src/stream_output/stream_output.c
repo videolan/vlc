@@ -810,7 +810,7 @@ static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
     p_stream->pf_control = NULL;
     p_stream->p_sys = NULL;
 
-    msg_Dbg( p_sout, "stream=`%s'", p_stream->psz_name );
+    msg_Dbg( p_stream, "stream=`%s'", p_stream->psz_name );
 
     p_stream->p_module = module_need( p_stream, cap, p_stream->psz_name, true );
 
