@@ -287,8 +287,25 @@ static int SendOut( sout_stream_t *p_stream, void *id, block_t *p_buffer )
     return VLC_SUCCESS;
 }
 
+static int ControlCommon(sout_stream_t *stream, int query, va_list args)
+{
+    (void) stream;
+
+    switch (query)
+    {
+        case SOUT_STREAM_IS_SYNCHRONOUS:
+            *va_arg(args, bool *) = true;
+            break;
+
+        default:
+            return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
 static const struct sout_stream_operations ops_out = {
-    AddOut, DelOut, SendOut, NULL, NULL,
+    AddOut, DelOut, SendOut, ControlCommon, NULL,
 };
 
 /*****************************************************************************
@@ -322,8 +339,6 @@ static int OpenOut( vlc_object_t *p_this )
 
     p_stream->ops = &ops_out;
     p_stream->p_sys     = p_sys;
-    p_stream->pace_nocontrol = true;
-
     return VLC_SUCCESS;
 }
 
@@ -616,7 +631,7 @@ static int SendIn( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 }
 
 static const struct sout_stream_operations ops_in = {
-    AddIn, DelIn, SendIn, NULL, NULL,
+    AddIn, DelIn, SendIn, ControlCommon, NULL,
 };
 
 /*****************************************************************************
@@ -668,8 +683,6 @@ static int OpenIn( vlc_object_t *p_this )
 
     p_stream->ops = &ops_in;
     p_stream->p_sys     = p_sys;
-    p_stream->pace_nocontrol = true;
-
     return VLC_SUCCESS;
 }
 
