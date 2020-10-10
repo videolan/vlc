@@ -219,7 +219,6 @@ struct sout_stream_t
     void              (*pf_flush)( sout_stream_t *, void * );
 
     void              *p_sys;
-    bool pace_nocontrol;
 };
 
 VLC_API void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_last );
