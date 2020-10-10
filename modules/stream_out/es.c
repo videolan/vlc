@@ -266,6 +266,10 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     return sout_MuxSendBuffer( id->p_mux, id->p_input, p_buffer );
 }
 
+static const struct sout_stream_operations ops = {
+    Add, Del, Send, NULL, NULL,
+};
+
 #define SOUT_CFG_PREFIX "sout-es-"
 
 static const char *const ppsz_sout_options[] = {
@@ -304,11 +308,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_dst_audio = var_GetString( p_stream, SOUT_CFG_PREFIX "dst-audio" );
     p_sys->psz_dst_video = var_GetString( p_stream, SOUT_CFG_PREFIX "dst-video" );
 
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
-
-    p_stream->p_sys     = p_sys;
+    p_stream->ops = &ops;
+    p_stream->p_sys = p_sys;
 
     return VLC_SUCCESS;
 }
