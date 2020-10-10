@@ -33,41 +33,6 @@
 #include <vlc_block.h>
 #include <vlc_sout.h>
 
-/*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-static int      Open    ( vlc_object_t * );
-
-static void *Add( sout_stream_t *, const es_format_t * );
-static void  Del ( sout_stream_t *, void * );
-static int   Send( sout_stream_t *, void *, block_t* );
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-vlc_module_begin ()
-    set_description( N_("Dummy stream output") )
-    set_capability( "sout output", 50 )
-    add_shortcut( "dummy", "drop" )
-    set_callback( Open )
-vlc_module_end ()
-
-/*****************************************************************************
- * Open:
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
-{
-    sout_stream_t *p_stream = (sout_stream_t*)p_this;
-
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
-
-    p_stream->p_sys     = NULL;
-
-    return VLC_SUCCESS;
-}
-
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     VLC_UNUSED(p_stream); VLC_UNUSED(p_fmt);
@@ -87,3 +52,28 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * Open:
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
+{
+    sout_stream_t *p_stream = (sout_stream_t*)p_this;
+
+    p_stream->pf_add    = Add;
+    p_stream->pf_del    = Del;
+    p_stream->pf_send   = Send;
+
+    p_stream->p_sys     = NULL;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+vlc_module_begin()
+    set_description(N_("Dummy stream output"))
+    set_capability("sout output", 50)
+    add_shortcut("dummy", "drop")
+    set_callback(Open )
+vlc_module_end()
