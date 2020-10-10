@@ -900,6 +900,10 @@ static void Del(sout_stream_t *p_stream, void *_id)
     }
 }
 
+static const struct sout_stream_operations ops = {
+    Add, Del, Send, NULL, Flush,
+};
+
 int OpenSout( vlc_object_t *p_this )
 {
     sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>(p_this);
@@ -940,12 +944,8 @@ int OpenSout( vlc_object_t *p_this )
 
     p_sys->device_protocols = p_sys->renderer->GetProtocolInfo();
 
-    p_stream->pf_add     = Add;
-    p_stream->pf_del     = Del;
-    p_stream->pf_send    = Send;
-    p_stream->pf_flush   = Flush;
-
     p_stream->p_sys = p_sys;
+    p_stream->ops = &ops;
 
     free(base_url);
     free(device_url);
