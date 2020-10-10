@@ -28,6 +28,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -142,9 +143,11 @@ int FileOpen( vlc_object_t *p_this )
     if (!strcasecmp (p_access->psz_name, "fd"))
     {
         char *end;
-        int oldfd = strtol (p_access->psz_location, &end, 10);
+        unsigned long oldfd = strtoul(p_access->psz_location, &end, 10);
 
-        if (*end == '\0')
+        if (oldfd > INT_MAX)
+            errno = EBADF;
+        else if (*end == '\0')
             fd = vlc_dup (oldfd);
         else if (*end == '/' && end > p_access->psz_location)
         {
