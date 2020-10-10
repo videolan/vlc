@@ -1479,7 +1479,7 @@ static int Demux( demux_t *p_demux )
     {
         /* FIXME Make this configurable
         msg_Err( p_demux, "no multicast data received in 36s, aborting" );
-        return 0;
+        return VLC_DEMUXER_EOF;
         */
     }
     else if( !p_sys->b_multicast && !p_sys->b_paused &&
@@ -1494,21 +1494,21 @@ static int Demux( demux_t *p_demux )
             if( RollOverTcp( p_demux ) )
             {
                 msg_Err( p_demux, "TCP rollover failed, aborting" );
-                return 0;
+                return VLC_DEMUXER_EOF;
             }
-            return 1;
+            return VLC_DEMUXER_SUCCESS;
         }
         msg_Err( p_demux, "no data received in 10s, aborting" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
     else if( !p_sys->b_multicast && !p_sys->b_paused &&
              ( p_sys->i_no_data_ti > 34 ) )
     {
         /* EOF ? */
         msg_Warn( p_demux, "no data received in 10s, eof ?" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
-    return p_sys->b_error ? 0 : 1;
+    return p_sys->b_error ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
