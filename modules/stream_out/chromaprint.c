@@ -88,6 +88,10 @@ struct sout_stream_id_sys_t
 
 #define BYTESPERSAMPLE 2
 
+static const struct sout_stream_operations ops = {
+    Add, Del, Send, NULL, NULL,
+};
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -118,9 +122,7 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    p_stream->pf_add  = Add;
-    p_stream->pf_del  = Del;
-    p_stream->pf_send = Send;
+    p_stream->ops = &ops;
     return VLC_SUCCESS;
 }
 
