@@ -315,6 +315,10 @@ static void checkAccessMux( sout_stream_t *p_stream, char *psz_access,
     }
 }
 
+static const struct sout_stream_operations ops = {
+    Add, Del, Send, NULL, Flush,
+};
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -399,10 +403,7 @@ static int Open( vlc_object_t *p_this )
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX"sap" ) )
         create_SDP( p_stream, p_access );
 
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
-    p_stream->pf_flush  = Flush;
+    p_stream->ops = &ops;
     if( !sout_AccessOutCanControlPace( p_access ) )
         p_stream->pace_nocontrol = true;
 
