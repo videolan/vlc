@@ -50,8 +50,6 @@ struct sout_instance_t
 
     char *psz_sout;
 
-    /** count of output that can't control the space */
-    int                 i_out_pace_nocontrol;
     bool                b_wants_substreams;
 
     vlc_mutex_t         lock;

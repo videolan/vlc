@@ -108,7 +108,6 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
 
     /* *** init descriptor *** */
     p_sout->psz_sout    = strdup( psz_dest );
-    p_sout->i_out_pace_nocontrol = 0;
     p_sout->b_wants_substreams = false;
 
     vlc_mutex_init( &p_sout->lock );
@@ -152,11 +151,10 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
 
 bool sout_instance_ControlsPace( sout_instance_t *sout )
 {
-    bool ret = false;
+    bool ret;
 
     vlc_mutex_lock( &sout->lock );
-    if (!sout_StreamIsSynchronous(sout->p_stream))
-        ret = sout->i_out_pace_nocontrol <= 0;
+    ret = !sout_StreamIsSynchronous(sout->p_stream);
     vlc_mutex_unlock( &sout->lock );
     return ret;
 }
