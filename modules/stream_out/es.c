@@ -57,6 +57,7 @@ typedef struct
 {
     sout_input_t *p_input;
     sout_mux_t   *p_mux;
+    bool synchronous;
 } sout_stream_id_sys_t;
 
 static char * es_print_url( const char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count,
@@ -110,14 +111,12 @@ out:
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    sout_stream_id_sys_t  *id;
 
     const char        *psz_access;
     const char        *psz_mux;
     char              *psz_dst;
 
     sout_access_out_t *p_access;
-    sout_mux_t        *p_mux;
 
     /* *** get access name *** */
     if( p_fmt->i_cat == AUDIO_ES && p_sys->psz_access_audio && *p_sys->psz_access_audio )
@@ -203,11 +202,19 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         return( NULL );
     }
 
-    bool pace_control = sout_AccessOutCanControlPace( p_access );
+    sout_stream_id_sys_t *id = malloc(sizeof (*id));
+    if (unlikely(id == NULL))
+    {
+        sout_AccessOutDelete(p_access);
+        free(psz_dst);
+        return NULL;
+    }
+
+    id->synchronous = !sout_AccessOutCanControlPace(p_access);
 
     /* *** find and open appropriate mux module *** */
-    p_mux = sout_MuxNew( p_access, psz_mux );
-    if( p_mux == NULL )
+    id->p_mux = sout_MuxNew( p_access, psz_mux );
+    if (id->p_mux == NULL)
     {
         msg_Err( p_stream, "no suitable sout mux module for `%s/%s://%s'",
                  psz_access, psz_mux, psz_dst );
@@ -220,27 +227,17 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     }
     free( psz_dst );
 
-    id = malloc( sizeof( sout_stream_id_sys_t ) );
-    if( !id )
-    {
-        sout_MuxDelete( p_mux );
-        sout_AccessOutDelete( p_access );
-        return NULL;
-    }
-    id->p_mux = p_mux;
-    id->p_input = sout_MuxAddStream( p_mux, p_fmt );
+    id->p_input = sout_MuxAddStream(id->p_mux, p_fmt);
 
     if( id->p_input == NULL )
     {
-        sout_MuxDelete( p_mux );
+        sout_MuxDelete(id->p_mux);
         sout_AccessOutDelete( p_access );
         free( id );
         return NULL;
     }
 
-    if( !pace_control )
-        p_stream->p_sout->i_out_pace_nocontrol++;
-
+    p_stream->p_sout->i_out_pace_nocontrol += id->synchronous;
     return id;
 }
 
@@ -252,10 +249,9 @@ static void Del( sout_stream_t *p_stream, void *_id )
 
     sout_MuxDeleteStream( id->p_mux, id->p_input );
     sout_MuxDelete( id->p_mux );
-    if( !sout_AccessOutCanControlPace( p_access ) )
-        p_stream->p_sout->i_out_pace_nocontrol--;
     sout_AccessOutDelete( p_access );
 
+    p_stream->p_sout->i_out_pace_nocontrol -= id->synchronous;
     free( id );
 }
 
