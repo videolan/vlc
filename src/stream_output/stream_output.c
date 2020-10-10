@@ -798,7 +798,6 @@ static sout_stream_t *sout_StreamNew( vlc_object_t *parent, char *psz_name,
     if( !p_stream )
         return NULL;
 
-    p_stream->p_sout   = parent;
     p_stream->psz_name = psz_name;
     p_stream->p_cfg    = p_cfg;
     p_stream->p_next   = p_next;
