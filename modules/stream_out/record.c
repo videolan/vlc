@@ -126,8 +126,6 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
 
-    p_stream->ops = &ops;
-
     p_stream->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -158,6 +156,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_drop = false;
     p_sys->i_dts_start = 0;
     TAB_INIT( p_sys->i_id, p_sys->id );
+    p_stream->ops = &ops;
 
     return VLC_SUCCESS;
 }
