@@ -169,7 +169,6 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
     if( !p_fmt->i_codec || !(p_input = malloc(sizeof(sout_packetizer_input_t))) )
         return NULL;
 
-    p_input->p_sout = p_sout;
     p_input->b_flushed = false;
 
     msg_Dbg(p_sout->p_stream, "adding an output ES for `%4.4s` (%p)",

@@ -45,8 +45,6 @@ struct sout_instance_t
  ****************************************************************************/
 struct sout_packetizer_input_t
 {
-    sout_instance_t     *p_sout;
-
     void                *id;
     bool                 b_flushed;
 };
