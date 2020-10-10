@@ -32,48 +32,7 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-#define ID_TEXT N_("Elementary Stream ID")
-#define ID_LONGTEXT N_( \
-    "Specify an identifier integer for this elementary stream" )
-
-#define DELAY_TEXT N_("Delay of the ES (ms)")
-#define DELAY_LONGTEXT N_( \
-    "Specify a delay (in ms) for this elementary stream. " \
-    "Positive means delay and negative means advance." )
-
-static int  Open    ( vlc_object_t * );
-static void Close   ( vlc_object_t * );
-
 #define SOUT_CFG_PREFIX "sout-delay-"
-
-vlc_module_begin()
-    set_shortname( N_("Delay"))
-    set_description( N_("Delay a stream"))
-    set_capability( "sout filter", 50 )
-    add_shortcut( "delay" )
-    set_category( CAT_SOUT )
-    set_subcategory( SUBCAT_SOUT_STREAM )
-    set_callbacks( Open, Close )
-    add_integer( SOUT_CFG_PREFIX "id", 0, ID_TEXT, ID_LONGTEXT,
-                 false )
-    add_integer( SOUT_CFG_PREFIX "delay", 0, DELAY_TEXT, DELAY_LONGTEXT,
-                 false )
-vlc_module_end()
-
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static const char *ppsz_sout_options[] = {
-    "id", "delay", NULL
-};
-
-static void *Add( sout_stream_t *, const es_format_t * );
-static void  Del( sout_stream_t *, void * );
-static int   Send( sout_stream_t *, void *, block_t * );
 
 typedef struct
 {
@@ -81,45 +40,6 @@ typedef struct
     int i_id;
     vlc_tick_t i_delay;
 } sout_stream_sys_t;
-
-/*****************************************************************************
- * Open:
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys;
-
-    p_sys = calloc( 1, sizeof( sout_stream_sys_t ) );
-    if( !p_sys )
-        return VLC_ENOMEM;
-
-
-    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
-                   p_stream->p_cfg );
-
-    p_sys->i_id = var_GetInteger( p_stream, SOUT_CFG_PREFIX "id" );
-    p_sys->i_delay = VLC_TICK_FROM_MS(var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" ));
-
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
-
-    p_stream->p_sys     = p_sys;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close:
- *****************************************************************************/
-static void Close( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
-
-    free( p_sys );
-}
 
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
@@ -165,3 +85,72 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 
     return sout_StreamIdSend( p_stream->p_next, id, p_buffer );
 }
+
+static const char *ppsz_sout_options[] = {
+    "id", "delay", NULL
+};
+
+/*****************************************************************************
+ * Open:
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
+{
+    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    sout_stream_sys_t *p_sys;
+
+    p_sys = calloc( 1, sizeof( sout_stream_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+
+
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+                   p_stream->p_cfg );
+
+    p_sys->i_id = var_GetInteger( p_stream, SOUT_CFG_PREFIX "id" );
+    p_sys->i_delay = VLC_TICK_FROM_MS(var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" ));
+
+    p_stream->pf_add    = Add;
+    p_stream->pf_del    = Del;
+    p_stream->pf_send   = Send;
+
+    p_stream->p_sys     = p_sys;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close:
+ *****************************************************************************/
+static void Close( vlc_object_t * p_this )
+{
+    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
+
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define ID_TEXT N_("Elementary Stream ID")
+#define ID_LONGTEXT N_( \
+    "Specify an identifier integer for this elementary stream" )
+
+#define DELAY_TEXT N_("Delay of the ES (ms)")
+#define DELAY_LONGTEXT N_( \
+    "Specify a delay (in ms) for this elementary stream. " \
+    "Positive means delay and negative means advance." )
+
+vlc_module_begin()
+    set_shortname(N_("Delay"))
+    set_description(N_("Delay a stream"))
+    set_capability("sout filter", 50)
+    add_shortcut("delay")
+    set_category(CAT_SOUT)
+    set_subcategory(SUBCAT_SOUT_STREAM)
+    set_callbacks(Open, Close)
+    add_integer(SOUT_CFG_PREFIX "id", 0, ID_TEXT, ID_LONGTEXT,
+                false)
+    add_integer(SOUT_CFG_PREFIX "delay", 0, DELAY_TEXT, DELAY_LONGTEXT,
+                false)
+vlc_module_end()
