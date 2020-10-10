@@ -232,6 +232,10 @@ static vlc_tick_t ParseTime(const char *str)
     return -1;
 }
 
+static const struct sout_stream_operations ops = {
+    Add, Del, Send, NULL, NULL,
+};
+
 static int Open(vlc_object_t *obj)
 {
     sout_stream_t *stream = (sout_stream_t *)obj;
@@ -297,9 +301,7 @@ static int Open(vlc_object_t *obj)
     sys->next = sys->start;
     sys->period = offset;
 
-    stream->pf_add = Add;
-    stream->pf_del = Del;
-    stream->pf_send = Send;
+    stream->ops = &ops;
     stream->p_sys = sys;
     return VLC_SUCCESS;
 }
