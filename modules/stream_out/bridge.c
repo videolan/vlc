@@ -287,6 +287,10 @@ static int SendOut( sout_stream_t *p_stream, void *id, block_t *p_buffer )
     return VLC_SUCCESS;
 }
 
+static const struct sout_stream_operations ops_out = {
+    AddOut, DelOut, SendOut, NULL, NULL,
+};
+
 /*****************************************************************************
  * OpenOut:
  *****************************************************************************/
@@ -316,10 +320,7 @@ static int OpenOut( vlc_object_t *p_this )
     }
     free( val.psz_string );
 
-    p_stream->pf_add    = AddOut;
-    p_stream->pf_del    = DelOut;
-    p_stream->pf_send   = SendOut;
-
+    p_stream->ops = &ops_out;
     p_stream->p_sys     = p_sys;
     p_stream->pace_nocontrol = true;
 
@@ -614,6 +615,10 @@ static int SendIn( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     return VLC_SUCCESS;
 }
 
+static const struct sout_stream_operations ops_in = {
+    AddIn, DelIn, SendIn, NULL, NULL,
+};
+
 /*****************************************************************************
  * OpenIn:
  *****************************************************************************/
@@ -661,10 +666,7 @@ static int OpenIn( vlc_object_t *p_this )
     p_sys->id_video = NULL;
     p_sys->id_audio = NULL;
 
-    p_stream->pf_add    = AddIn;
-    p_stream->pf_del    = DelIn;
-    p_stream->pf_send   = SendIn;
-
+    p_stream->ops = &ops_in;
     p_stream->p_sys     = p_sys;
     p_stream->pace_nocontrol = true;
 
