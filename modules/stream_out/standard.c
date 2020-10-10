@@ -118,6 +118,7 @@ typedef struct
 {
     sout_mux_t           *p_mux;
     session_descriptor_t *p_session;
+    bool                  synchronous;
 } sout_stream_sys_t;
 
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
@@ -315,8 +316,25 @@ static void checkAccessMux( sout_stream_t *p_stream, char *psz_access,
     }
 }
 
+static int Control(sout_stream_t *stream, int query, va_list args)
+{
+    sout_stream_sys_t *sys = stream->p_sys;
+
+    switch (query)
+    {
+        case SOUT_STREAM_IS_SYNCHRONOUS:
+            *va_arg(args, bool *) = sys->synchronous;
+            break;
+
+        default:
+            return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, Flush,
+    Add, Del, Send, Control, Flush,
 };
 
 /*****************************************************************************
@@ -379,6 +397,7 @@ static int Open( vlc_object_t *p_this )
         goto end;
     }
 
+    p_sys->synchronous = !sout_AccessOutCanControlPace(p_access);
     p_sys->p_mux = sout_MuxNew( p_access, psz_mux );
     if( !p_sys->p_mux )
     {
@@ -404,11 +423,7 @@ static int Open( vlc_object_t *p_this )
         create_SDP( p_stream, p_access );
 
     p_stream->ops = &ops;
-    if( !sout_AccessOutCanControlPace( p_access ) )
-        p_stream->pace_nocontrol = true;
-
     ret = VLC_SUCCESS;
-
     msg_Dbg( p_this, "using `%s/%s://%s'", psz_access, psz_mux, psz_url );
 
 end:
