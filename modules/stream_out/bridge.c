@@ -139,14 +139,6 @@ static const char *const ppsz_sout_options_in[] = {
     NULL
 };
 
-static void *AddOut( sout_stream_t *, const es_format_t * );
-static void  DelOut( sout_stream_t *, void * );
-static int   SendOut( sout_stream_t *, void *, block_t * );
-
-static void *AddIn( sout_stream_t *, const es_format_t * );
-static void  DelIn( sout_stream_t *, void * );
-static int   SendIn( sout_stream_t *, void *, block_t * );
-
 typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
 
 typedef struct bridged_es_t
@@ -182,57 +174,6 @@ typedef struct out_sout_stream_sys_t
 
     char *psz_name;
 } out_sout_stream_sys_t;
-
-/*****************************************************************************
- * OpenOut:
- *****************************************************************************/
-static int OpenOut( vlc_object_t *p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t *)p_this;
-    out_sout_stream_sys_t *p_sys;
-    vlc_value_t val;
-
-    config_ChainParse( p_stream, SOUT_CFG_PREFIX_OUT, ppsz_sout_options_out,
-                   p_stream->p_cfg );
-
-    p_sys          = malloc( sizeof( out_sout_stream_sys_t ) );
-    if( unlikely( !p_sys ) )
-        return VLC_ENOMEM;
-    p_sys->b_inited = false;
-
-    var_Get( p_stream, SOUT_CFG_PREFIX_OUT "id", &val );
-    p_sys->i_id = val.i_int;
-
-    var_Get( p_stream, SOUT_CFG_PREFIX_OUT "in-name", &val );
-    if( asprintf( &p_sys->psz_name, "bridge-struct-%s", val.psz_string )<0 )
-    {
-        free( val.psz_string );
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
-    free( val.psz_string );
-
-    p_stream->pf_add    = AddOut;
-    p_stream->pf_del    = DelOut;
-    p_stream->pf_send   = SendOut;
-
-    p_stream->p_sys     = p_sys;
-    p_stream->pace_nocontrol = true;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * CloseOut:
- *****************************************************************************/
-static void CloseOut( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
-
-    free( p_sys->psz_name );
-    free( p_sys );
-}
 
 static void *AddOut( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
@@ -346,6 +287,56 @@ static int SendOut( sout_stream_t *p_stream, void *id, block_t *p_buffer )
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * OpenOut:
+ *****************************************************************************/
+static int OpenOut( vlc_object_t *p_this )
+{
+    sout_stream_t     *p_stream = (sout_stream_t *)p_this;
+    out_sout_stream_sys_t *p_sys;
+    vlc_value_t val;
+
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX_OUT, ppsz_sout_options_out,
+                   p_stream->p_cfg );
+
+    p_sys          = malloc( sizeof( out_sout_stream_sys_t ) );
+    if( unlikely( !p_sys ) )
+        return VLC_ENOMEM;
+    p_sys->b_inited = false;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX_OUT "id", &val );
+    p_sys->i_id = val.i_int;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX_OUT "in-name", &val );
+    if( asprintf( &p_sys->psz_name, "bridge-struct-%s", val.psz_string )<0 )
+    {
+        free( val.psz_string );
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+    free( val.psz_string );
+
+    p_stream->pf_add    = AddOut;
+    p_stream->pf_del    = DelOut;
+    p_stream->pf_send   = SendOut;
+
+    p_stream->p_sys     = p_sys;
+    p_stream->pace_nocontrol = true;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * CloseOut:
+ *****************************************************************************/
+static void CloseOut( vlc_object_t * p_this )
+{
+    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    out_sout_stream_sys_t *p_sys = (out_sout_stream_sys_t *)p_stream->p_sys;
+
+    free( p_sys->psz_name );
+    free( p_sys );
+}
 
 /*
  * Bridge in
@@ -369,75 +360,6 @@ typedef struct in_sout_stream_sys_t
 } in_sout_stream_sys_t;
 
 enum { placeholder_on, placeholder_off };
-
-/*****************************************************************************
- * OpenIn:
- *****************************************************************************/
-static int OpenIn( vlc_object_t *p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    in_sout_stream_sys_t *p_sys;
-    vlc_value_t val;
-
-    p_sys          = malloc( sizeof( in_sout_stream_sys_t ) );
-    if( unlikely( !p_sys ) )
-        return VLC_ENOMEM;
-
-    config_ChainParse( p_stream, SOUT_CFG_PREFIX_IN, ppsz_sout_options_in,
-                   p_stream->p_cfg );
-
-    var_Get( p_stream, SOUT_CFG_PREFIX_IN "id-offset", &val );
-    p_sys->i_id_offset = val.i_int;
-
-    var_Get( p_stream, SOUT_CFG_PREFIX_IN "delay", &val );
-    p_sys->i_delay = VLC_TICK_FROM_MS(val.i_int);
-
-    var_Get( p_stream, SOUT_CFG_PREFIX_IN "name", &val );
-    if( asprintf( &p_sys->psz_name, "bridge-struct-%s", val.psz_string )<0 )
-    {
-        free( val.psz_string );
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
-    free( val.psz_string );
-
-    var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder", &val );
-    p_sys->b_placeholder = val.b_bool;
-
-    var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder-switch-on-iframe", &val);
-    p_sys->b_switch_on_iframe = val.b_bool;
-
-    p_sys->i_state = placeholder_on;
-
-    var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder-delay", &val );
-    p_sys->i_placeholder_delay = VLC_TICK_FROM_MS(val.i_int);
-
-    p_sys->i_last_video = VLC_TICK_INVALID;
-    p_sys->i_last_audio = VLC_TICK_INVALID;
-    p_sys->id_video = NULL;
-    p_sys->id_audio = NULL;
-
-    p_stream->pf_add    = AddIn;
-    p_stream->pf_del    = DelIn;
-    p_stream->pf_send   = SendIn;
-
-    p_stream->p_sys     = p_sys;
-    p_stream->pace_nocontrol = true;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * CloseIn:
- *****************************************************************************/
-static void CloseIn( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
-
-    free( p_sys->psz_name );
-    free( p_sys );
-}
 
 struct sout_stream_id_sys_t
 {
@@ -690,4 +612,73 @@ static int SendIn( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     vlc_mutex_unlock( &lock );
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * OpenIn:
+ *****************************************************************************/
+static int OpenIn( vlc_object_t *p_this )
+{
+    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    in_sout_stream_sys_t *p_sys;
+    vlc_value_t val;
+
+    p_sys          = malloc( sizeof( in_sout_stream_sys_t ) );
+    if( unlikely( !p_sys ) )
+        return VLC_ENOMEM;
+
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX_IN, ppsz_sout_options_in,
+                   p_stream->p_cfg );
+
+    var_Get( p_stream, SOUT_CFG_PREFIX_IN "id-offset", &val );
+    p_sys->i_id_offset = val.i_int;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX_IN "delay", &val );
+    p_sys->i_delay = VLC_TICK_FROM_MS(val.i_int);
+
+    var_Get( p_stream, SOUT_CFG_PREFIX_IN "name", &val );
+    if( asprintf( &p_sys->psz_name, "bridge-struct-%s", val.psz_string )<0 )
+    {
+        free( val.psz_string );
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+    free( val.psz_string );
+
+    var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder", &val );
+    p_sys->b_placeholder = val.b_bool;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder-switch-on-iframe", &val);
+    p_sys->b_switch_on_iframe = val.b_bool;
+
+    p_sys->i_state = placeholder_on;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder-delay", &val );
+    p_sys->i_placeholder_delay = VLC_TICK_FROM_MS(val.i_int);
+
+    p_sys->i_last_video = VLC_TICK_INVALID;
+    p_sys->i_last_audio = VLC_TICK_INVALID;
+    p_sys->id_video = NULL;
+    p_sys->id_audio = NULL;
+
+    p_stream->pf_add    = AddIn;
+    p_stream->pf_del    = DelIn;
+    p_stream->pf_send   = SendIn;
+
+    p_stream->p_sys     = p_sys;
+    p_stream->pace_nocontrol = true;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * CloseIn:
+ *****************************************************************************/
+static void CloseIn( vlc_object_t * p_this )
+{
+    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
+
+    free( p_sys->psz_name );
+    free( p_sys );
 }
