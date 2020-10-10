@@ -168,8 +168,25 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
+static int Control(sout_stream_t *stream, int query, va_list args)
+{
+    (void) stream;
+
+    switch (query)
+    {
+        case SOUT_STREAM_IS_SYNCHRONOUS:
+            *va_arg(args, bool *) = true;
+            break;
+
+        default:
+            return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
 static const struct sout_stream_operations ops = {
-    Add, Del, Send, NULL, NULL,
+    Add, Del, Send, Control, NULL,
 };
 
 static const char *const ppsz_sout_options[] = {
@@ -252,8 +269,6 @@ static int Open( vlc_object_t *p_this )
 #undef INT_COMMAND
 
     p_stream->ops = &ops;
-    p_stream->pace_nocontrol = true;
-
     return VLC_SUCCESS;
 }
 

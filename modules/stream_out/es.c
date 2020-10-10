@@ -39,6 +39,7 @@ typedef struct
     int  i_count_audio;
     int  i_count_video;
     int  i_count;
+    unsigned int count_sync;
 
     char *psz_mux;
     char *psz_mux_audio;
@@ -237,13 +238,13 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         return NULL;
     }
 
-    p_stream->p_sout->i_out_pace_nocontrol += id->synchronous;
+    p_sys->count_sync += id->synchronous;
     return id;
 }
 
 static void Del( sout_stream_t *p_stream, void *_id )
 {
-    VLC_UNUSED(p_stream);
+    sout_stream_sys_t *sys = p_stream->p_sys;
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
     sout_access_out_t *p_access = id->p_mux->p_access;
 
@@ -251,7 +252,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
     sout_MuxDelete( id->p_mux );
     sout_AccessOutDelete( p_access );
 
-    p_stream->p_sout->i_out_pace_nocontrol -= id->synchronous;
+    sys->count_sync -= id->synchronous;
     free( id );
 }
 
