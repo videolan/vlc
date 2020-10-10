@@ -168,6 +168,10 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
+static const struct sout_stream_operations ops = {
+    Add, Del, Send, NULL, NULL,
+};
+
 static const char *const ppsz_sout_options[] = {
     "id", "width", "height", "sar", "vfilter", "chroma", "alpha", "x", "y", NULL
 };
@@ -247,9 +251,7 @@ static int Open( vlc_object_t *p_this )
 
 #undef INT_COMMAND
 
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
+    p_stream->ops = &ops;
     p_stream->pace_nocontrol = true;
 
     return VLC_SUCCESS;
