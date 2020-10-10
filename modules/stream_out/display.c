@@ -154,6 +154,10 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
     return VLC_EGENERIC;
 }
 
+static const struct sout_stream_operations ops = {
+    Add, Del, Send, Control, NULL,
+};
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -180,10 +184,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_video = var_GetBool( p_stream, SOUT_CFG_PREFIX "video" );
     p_sys->i_delay = VLC_TICK_FROM_MS( var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" ) );
 
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
-    p_stream->pf_control = Control;
+    p_stream->ops = &ops;
     p_stream->p_sys     = p_sys;
     p_stream->pace_nocontrol = true;
 
