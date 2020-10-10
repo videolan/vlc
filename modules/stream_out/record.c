@@ -114,6 +114,10 @@ typedef struct
 static void OutputStart( sout_stream_t *p_stream );
 static void OutputSend( sout_stream_t *p_stream, sout_stream_id_sys_t *id, block_t * );
 
+static const struct sout_stream_operations ops = {
+    Add, Del, Send, NULL, NULL,
+};
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -122,9 +126,7 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
 
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
+    p_stream->ops = &ops;
 
     p_stream->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )
