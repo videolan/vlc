@@ -144,14 +144,24 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 
 static int Control( sout_stream_t *p_stream, int i_query, va_list args )
 {
-    if( i_query == SOUT_STREAM_ID_SPU_HIGHLIGHT )
+    switch (i_query)
     {
-        vlc_input_decoder_t *p_dec = va_arg(args, void *);
-        void *spu_hl = va_arg(args, void *);
-        return vlc_input_decoder_SetSpuHighlight( p_dec, spu_hl );
+        case SOUT_STREAM_ID_SPU_HIGHLIGHT:
+        {
+            vlc_input_decoder_t *p_dec = va_arg(args, void *);
+            void *spu_hl = va_arg(args, void *);
+            return vlc_input_decoder_SetSpuHighlight( p_dec, spu_hl );
+        }
+
+        case SOUT_STREAM_IS_SYNCHRONOUS:
+            *va_arg(args, bool *) = true;
+            break;
+
+        default:
+           return VLC_EGENERIC;
     }
     (void) p_stream;
-    return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 static const struct sout_stream_operations ops = {
@@ -186,8 +196,6 @@ static int Open( vlc_object_t *p_this )
 
     p_stream->ops = &ops;
     p_stream->p_sys     = p_sys;
-    p_stream->pace_nocontrol = true;
-
     return VLC_SUCCESS;
 }
 
