@@ -191,13 +191,6 @@ struct sout_stream_t
     sout_stream_t     *p_next;
 
     const struct sout_stream_operations *ops;
-
-    /* add, remove a stream */
-    void             *(*pf_add)( sout_stream_t *, const es_format_t * );
-    void              (*pf_del)( sout_stream_t *, void * );
-    /* manage a packet */
-    int               (*pf_send)( sout_stream_t *, void *, block_t* );
-
     void              *p_sys;
 };
 
@@ -208,42 +201,30 @@ VLC_API sout_stream_t *sout_StreamChainNew(vlc_object_t *parent,
 static inline void *sout_StreamIdAdd( sout_stream_t *s,
                                       const es_format_t *fmt )
 {
-    if (s->ops == NULL)
-        return s->pf_add(s, fmt);
     return s->ops->add(s, fmt);
 }
 
 static inline void sout_StreamIdDel( sout_stream_t *s,
                                      void *id )
 {
-    if (s->ops == NULL) {
-        s->pf_del(s, id);
-        return;
-    }
     s->ops->del(s, id);
 }
 
 static inline int sout_StreamIdSend( sout_stream_t *s,
                                      void *id, block_t *b )
 {
-    if (s->ops == NULL)
-        return s->pf_send(s, id, b);
     return s->ops->send(s, id, b);
 }
 
 static inline void sout_StreamFlush( sout_stream_t *s,
                                      void *id )
 {
-    if (s->ops == NULL)
-        return;
     if (s->ops->flush != NULL)
         s->ops->flush(s, id);
 }
 
 static inline int sout_StreamControlVa( sout_stream_t *s, int i_query, va_list args )
 {
-    if (s->ops == NULL)
-        return VLC_EGENERIC;
     if (s->ops->control == NULL)
         return VLC_EGENERIC;
     return s->ops->control(s, i_query, args);
