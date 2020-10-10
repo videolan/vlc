@@ -186,6 +186,7 @@ enum sout_stream_query_e {
     SOUT_STREAM_EMPTY,    /* arg1=bool *,       res=can fail (assume true) */
     SOUT_STREAM_WANTS_SUBSTREAMS,  /* arg1=bool *, res=can fail (assume false) */
     SOUT_STREAM_ID_SPU_HIGHLIGHT,  /* arg1=void *, arg2=const vlc_spu_highlight_t *, res=can fail */
+    SOUT_STREAM_IS_SYNCHRONOUS, /* arg1=bool *, can fail (assume false) */
 };
 
 struct sout_stream_operations {
@@ -284,6 +285,16 @@ static inline int sout_StreamControl( sout_stream_t *s, int i_query, ... )
     i_result = sout_StreamControlVa( s, i_query, args );
     va_end( args );
     return i_result;
+}
+
+static inline bool sout_StreamIsSynchronous(sout_stream_t *s)
+{
+    bool b;
+
+    if (sout_StreamControl(s, SOUT_STREAM_IS_SYNCHRONOUS, &b))
+        b = false;
+
+    return b;
 }
 
 /****************************************************************************

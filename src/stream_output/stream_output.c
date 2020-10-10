@@ -152,10 +152,11 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
 
 bool sout_instance_ControlsPace( sout_instance_t *sout )
 {
-    bool ret;
+    bool ret = false;
 
     vlc_mutex_lock( &sout->lock );
-    ret = sout->i_out_pace_nocontrol <= 0;
+    if (!sout_StreamIsSynchronous(sout->p_stream))
+        ret = sout->i_out_pace_nocontrol <= 0;
     vlc_mutex_unlock( &sout->lock );
     return ret;
 }
