@@ -802,7 +802,6 @@ static sout_stream_t *sout_StreamNew( vlc_object_t *parent, char *psz_name,
     p_stream->p_cfg    = p_cfg;
     p_stream->p_next   = p_next;
     p_stream->ops = NULL;
-    p_stream->pf_flush = NULL;
     p_stream->pf_control = NULL;
     p_stream->p_sys = NULL;
 

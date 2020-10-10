@@ -198,7 +198,6 @@ struct sout_stream_t
     /* manage a packet */
     int               (*pf_send)( sout_stream_t *, void *, block_t* );
     int               (*pf_control)( sout_stream_t *, int, va_list );
-    void              (*pf_flush)( sout_stream_t *, void * );
 
     void              *p_sys;
 };
@@ -236,12 +235,9 @@ static inline int sout_StreamIdSend( sout_stream_t *s,
 static inline void sout_StreamFlush( sout_stream_t *s,
                                      void *id )
 {
-    if (s->ops == NULL) {
-        if (s->pf_flush != NULL)
-            s->pf_flush(s, id);
+    if (s->ops == NULL)
         return;
-   }
-   if (s->ops->flush != NULL)
+    if (s->ops->flush != NULL)
         s->ops->flush(s, id);
 }
 
