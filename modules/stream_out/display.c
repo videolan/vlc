@@ -74,11 +74,6 @@ static const char *const ppsz_sout_options[] = {
     "audio", "video", "delay", NULL
 };
 
-static void *Add( sout_stream_t *, const es_format_t * );
-static void  Del( sout_stream_t *, void * );
-static int   Send( sout_stream_t *, void *, block_t * );
-static int   Control( sout_stream_t *, int, va_list );
-
 typedef struct
 {
     bool     b_audio;
@@ -87,54 +82,6 @@ typedef struct
     vlc_tick_t     i_delay;
     input_resource_t *p_resource;
 } sout_stream_sys_t;
-
-/*****************************************************************************
- * Open:
- *****************************************************************************/
-static int Open( vlc_object_t *p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys;
-
-    p_sys = malloc( sizeof( sout_stream_sys_t ) );
-    if( p_sys == NULL )
-        return VLC_ENOMEM;
-
-    p_sys->p_resource = input_resource_New( p_this );
-    if( unlikely(p_sys->p_resource == NULL) )
-    {
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
-
-    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
-                   p_stream->p_cfg );
-
-    p_sys->b_audio = var_GetBool( p_stream, SOUT_CFG_PREFIX"audio" );
-    p_sys->b_video = var_GetBool( p_stream, SOUT_CFG_PREFIX "video" );
-    p_sys->i_delay = VLC_TICK_FROM_MS( var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" ) );
-
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
-    p_stream->pf_control = Control;
-    p_stream->p_sys     = p_sys;
-    p_stream->pace_nocontrol = true;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Close:
- *****************************************************************************/
-static void Close( vlc_object_t * p_this )
-{
-    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    input_resource_Release( p_sys->p_resource );
-    free( p_sys );
-}
 
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
@@ -205,4 +152,52 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
     }
     (void) p_stream;
     return VLC_EGENERIC;
+}
+
+/*****************************************************************************
+ * Open:
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
+{
+    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    sout_stream_sys_t *p_sys;
+
+    p_sys = malloc( sizeof( sout_stream_sys_t ) );
+    if( p_sys == NULL )
+        return VLC_ENOMEM;
+
+    p_sys->p_resource = input_resource_New( p_this );
+    if( unlikely(p_sys->p_resource == NULL) )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+                   p_stream->p_cfg );
+
+    p_sys->b_audio = var_GetBool( p_stream, SOUT_CFG_PREFIX"audio" );
+    p_sys->b_video = var_GetBool( p_stream, SOUT_CFG_PREFIX "video" );
+    p_sys->i_delay = VLC_TICK_FROM_MS( var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" ) );
+
+    p_stream->pf_add    = Add;
+    p_stream->pf_del    = Del;
+    p_stream->pf_send   = Send;
+    p_stream->pf_control = Control;
+    p_stream->p_sys     = p_sys;
+    p_stream->pace_nocontrol = true;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close:
+ *****************************************************************************/
+static void Close( vlc_object_t * p_this )
+{
+    sout_stream_t     *p_stream = (sout_stream_t*)p_this;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    input_resource_Release( p_sys->p_resource );
+    free( p_sys );
 }
