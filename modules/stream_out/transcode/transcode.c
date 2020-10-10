@@ -364,9 +364,6 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
 {
     switch( i_query )
     {
-        case SOUT_STREAM_EMPTY:
-            return sout_StreamControlVa( p_stream->p_next, i_query, args );
-
         case SOUT_STREAM_ID_SPU_HIGHLIGHT:
         {
             sout_stream_id_sys_t *id = (sout_stream_id_sys_t *) va_arg(args, void *);
