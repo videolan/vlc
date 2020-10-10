@@ -434,7 +434,7 @@ void sout_access_out_sys_t::stop()
 
 void sout_access_out_sys_t::prepare(sout_stream_t *p_stream, const std::string &mime)
 {
-    var_SetAddress(p_stream->p_sout, SOUT_CFG_PREFIX "access-out-sys", this);
+    var_SetAddress(p_stream, SOUT_CFG_PREFIX "access-out-sys", this);
 
     vlc_fifo_Lock(m_fifo);
     clearUnlocked();
@@ -822,7 +822,7 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
 
     access_out_live.prepare( p_stream, mime );
 
-    p_out = sout_StreamChainNew( p_stream->p_sout, sout.c_str(), NULL, NULL);
+    p_out = sout_StreamChainNew(VLC_OBJECT(p_stream), sout.c_str(), NULL, NULL);
     if (p_out == NULL) {
         msg_Dbg(p_stream, "could not create sout chain:%s", sout.c_str());
         out_streams.clear();
@@ -1301,7 +1301,7 @@ static int Open(vlc_object_t *p_this)
     var_Create( p_stream->p_sout, SOUT_CFG_PREFIX "sys", VLC_VAR_ADDRESS );
     var_SetAddress( p_stream->p_sout, SOUT_CFG_PREFIX "sys", p_sys );
 
-    var_Create( p_stream->p_sout, SOUT_CFG_PREFIX "access-out-sys", VLC_VAR_ADDRESS );
+    var_Create(p_stream, SOUT_CFG_PREFIX "access-out-sys", VLC_VAR_ADDRESS);
 
     // Set the sout callbacks.
     p_stream->ops = &ops;
