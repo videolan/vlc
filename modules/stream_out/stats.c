@@ -202,6 +202,10 @@ static int OutputSend(sout_stream_t *stream, void *id, block_t *block)
     return VLC_SUCCESS;
 }
 
+static const struct sout_stream_operations output_ops = {
+    Add, Del, OutputSend, NULL, NULL,
+};
+
 static int OutputOpen(vlc_object_t *obj)
 {
     sout_stream_t *stream = (sout_stream_t *)obj;
@@ -212,11 +216,7 @@ static int OutputOpen(vlc_object_t *obj)
     int val = Open(stream);
 
     if (val == VLC_SUCCESS)
-    {
-        stream->pf_add = Add;
-        stream->pf_del = Del;
-        stream->pf_send = OutputSend;
-    }
+        stream->ops = &output_ops;
 
     return val;
 }
@@ -248,6 +248,10 @@ static int FilterSend(sout_stream_t *stream, void *opaque, block_t *block)
     return sout_StreamIdSend(stream->p_next, id->next_id, block);
 }
 
+static const struct sout_stream_operations filter_ops = {
+    FilterAdd, FilterDel, FilterSend, NULL, NULL,
+};
+
 static int FilterOpen(vlc_object_t *obj)
 {
     sout_stream_t *stream = (sout_stream_t *)obj;
@@ -258,11 +262,7 @@ static int FilterOpen(vlc_object_t *obj)
     int val = Open(stream);
 
     if (val == VLC_SUCCESS)
-    {
-        stream->pf_add = FilterAdd;
-        stream->pf_del = FilterDel;
-        stream->pf_send = FilterSend;
-    }
+        stream->ops = &filter_ops;
 
     return val;
 }
