@@ -162,6 +162,7 @@ int SDIOutput::Control(int i_query, va_list args)
     switch(i_query)
     {
         case SOUT_STREAM_WANTS_SUBSTREAMS:
+        case SOUT_STREAM_IS_SYNCHRONOUS:
             *va_arg(args, bool *) = true;
             return VLC_SUCCESS;
         default:
