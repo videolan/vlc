@@ -32,8 +32,6 @@
 /** Stream output instance */
 struct sout_instance_t
 {
-    struct vlc_object_t obj;
-
     char *psz_sout;
 
     bool                b_wants_substreams;

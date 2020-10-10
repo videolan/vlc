@@ -146,7 +146,7 @@ static sout_instance_t *RequestSout( input_resource_t *p_resource,
     {
         if( p_resource->p_sout )
         {
-            msg_Dbg( p_resource->p_sout, "destroying useless sout" );
+            msg_Dbg( p_resource->p_parent, "destroying useless sout" );
             DestroySout( p_resource );
         }
         return NULL;

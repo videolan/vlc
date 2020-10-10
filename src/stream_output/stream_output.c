@@ -97,14 +97,14 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
         return NULL;
 
     /* *** Allocate descriptor *** */
-    p_sout = vlc_custom_create( p_parent, sizeof( *p_sout ), "stream output" );
+    p_sout = malloc(sizeof (*p_sout));
     if( p_sout == NULL )
     {
         free( psz_chain );
         return NULL;
     }
 
-    msg_Dbg( p_sout, "using sout chain=`%s'", psz_chain );
+    msg_Dbg(p_parent, "creating stream output chain `%s'", psz_chain);
 
     /* *** init descriptor *** */
     p_sout->psz_sout    = strdup( psz_dest );
@@ -113,8 +113,7 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
     vlc_mutex_init( &p_sout->lock );
     p_sout->p_stream = NULL;
 
-    p_sout->p_stream = sout_StreamChainNew( VLC_OBJECT(p_sout), psz_chain,
-                                            NULL, NULL );
+    p_sout->p_stream = sout_StreamChainNew(p_parent, psz_chain, NULL, NULL);
     if( p_sout->p_stream )
     {
         free( psz_chain );
@@ -124,12 +123,12 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
         return p_sout;
     }
 
-    msg_Err( p_sout, "stream chain failed for `%s'", psz_chain );
+    msg_Err(p_parent, "failed to create stream output chain `%s'", psz_chain);
     free( psz_chain );
 
     FREENULL( p_sout->psz_sout );
 
-    vlc_object_delete(p_sout);
+    free(p_sout);
     return NULL;
 }
 
@@ -145,7 +144,7 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     FREENULL( p_sout->psz_sout );
 
     /* *** free structure *** */
-    vlc_object_delete(p_sout);
+    free(p_sout);
 }
 
 bool sout_instance_ControlsPace( sout_instance_t *sout )
@@ -173,8 +172,8 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
     p_input->p_sout = p_sout;
     p_input->b_flushed = false;
 
-    msg_Dbg( p_sout, "adding a new sout input for `%4.4s` (sout_input: %p)",
-             (char*) &p_fmt->i_codec, (void *)p_input );
+    msg_Dbg(p_sout->p_stream, "adding an output ES for `%4.4s` (%p)",
+            (char *)&p_fmt->i_codec, (void *)p_input);
 
     /* *** add it to the stream chain */
     vlc_mutex_lock( &p_sout->lock );
@@ -183,8 +182,8 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
 
     if( p_input->id == NULL )
     {
-        msg_Warn( p_sout, "new sout input failed (sout_input: %p)",
-                 (void *)p_input );
+        msg_Warn(p_sout->p_stream, "failed to add output ES (%p)",
+                 (void *)p_input);
         free( p_input );
         p_input = NULL;
     }
@@ -199,8 +198,7 @@ int sout_InputDelete( sout_packetizer_input_t *p_input )
 {
     sout_instance_t     *p_sout = p_input->p_sout;
 
-    msg_Dbg( p_sout, "removing a sout input (sout_input: %p)",
-             (void *)p_input );
+    msg_Dbg(p_sout->p_stream, "removing an output ES (%p)", (void *)p_input);
 
     vlc_mutex_lock( &p_sout->lock );
     sout_StreamIdDel( p_sout->p_stream, p_input->id );
