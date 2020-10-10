@@ -115,7 +115,8 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
 
     var_Create( p_sout, "sout-mux-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    p_sout->p_stream = sout_StreamChainNew( p_sout, psz_chain, NULL, NULL );
+    p_sout->p_stream = sout_StreamChainNew( VLC_OBJECT(p_sout), psz_chain,
+                                            NULL, NULL );
     if( p_sout->p_stream )
     {
         free( psz_chain );
@@ -789,7 +790,7 @@ void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_last)
 /*
  * XXX name and p_cfg are used (-> do NOT free them)
  */
-static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
+static sout_stream_t *sout_StreamNew( vlc_object_t *parent, char *psz_name,
                                config_chain_t *p_cfg, sout_stream_t *p_next)
 {
     const char *cap = (p_next != NULL) ? "sout filter" : "sout output";
@@ -797,11 +798,11 @@ static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
 
     assert(psz_name);
 
-    p_stream = vlc_custom_create( p_sout, sizeof( *p_stream ), "stream out" );
+    p_stream = vlc_custom_create( parent, sizeof( *p_stream ), "stream out" );
     if( !p_stream )
         return NULL;
 
-    p_stream->p_sout   = p_sout;
+    p_stream->p_sout   = parent;
     p_stream->psz_name = psz_name;
     p_stream->p_cfg    = p_cfg;
     p_stream->p_next   = p_next;
@@ -838,7 +839,7 @@ static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
  *
  *  Returns a pointer to the first module.
  */
-sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout, const char *psz_chain,
+sout_stream_t *sout_StreamChainNew(vlc_object_t *parent, const char *psz_chain,
                                 sout_stream_t *p_next, sout_stream_t **pp_last)
 {
     if(!psz_chain || !*psz_chain)
@@ -873,7 +874,7 @@ sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout, const char *psz_chai
     vlc_array_init(&module);
     while(i--)
     {
-        p_next = sout_StreamNew( p_sout, vlc_array_item_at_index(&name, i),
+        p_next = sout_StreamNew( parent, vlc_array_item_at_index(&name, i),
             vlc_array_item_at_index(&cfg, i), p_next);
 
         if(!p_next)

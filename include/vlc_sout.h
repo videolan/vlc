@@ -200,7 +200,7 @@ struct sout_stream_t
     struct vlc_object_t obj;
 
     module_t          *p_module;
-    sout_instance_t   *p_sout;
+    vlc_object_t      *p_sout;
 
     char              *psz_name;
     config_chain_t    *p_cfg;
@@ -220,7 +220,7 @@ struct sout_stream_t
 };
 
 VLC_API void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_last );
-VLC_API sout_stream_t *sout_StreamChainNew(sout_instance_t *p_sout,
+VLC_API sout_stream_t *sout_StreamChainNew(vlc_object_t *parent,
         const char *psz_chain, sout_stream_t *p_next, sout_stream_t **p_last) VLC_USED;
 
 static inline void *sout_StreamIdAdd( sout_stream_t *s,
