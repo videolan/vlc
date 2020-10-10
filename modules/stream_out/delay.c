@@ -86,6 +86,10 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
     return sout_StreamIdSend( p_stream->p_next, id, p_buffer );
 }
 
+static const struct sout_stream_operations ops = {
+    Add, Del, Send, NULL, NULL,
+};
+
 static const char *ppsz_sout_options[] = {
     "id", "delay", NULL
 };
@@ -109,12 +113,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_id = var_GetInteger( p_stream, SOUT_CFG_PREFIX "id" );
     p_sys->i_delay = VLC_TICK_FROM_MS(var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" ));
 
-    p_stream->pf_add    = Add;
-    p_stream->pf_del    = Del;
-    p_stream->pf_send   = Send;
-
-    p_stream->p_sys     = p_sys;
-
+    p_stream->ops = &ops;
+    p_stream->p_sys = p_sys;
     return VLC_SUCCESS;
 }
 
