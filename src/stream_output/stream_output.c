@@ -110,7 +110,6 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
     p_sout->psz_sout    = strdup( psz_dest );
     p_sout->b_wants_substreams = false;
 
-    vlc_mutex_init( &p_sout->lock );
     p_sout->p_stream = NULL;
 
     p_sout->p_stream = sout_StreamChainNew(p_parent, psz_chain, NULL);
@@ -149,12 +148,7 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
 
 bool sout_instance_ControlsPace( sout_instance_t *sout )
 {
-    bool ret;
-
-    vlc_mutex_lock( &sout->lock );
-    ret = !sout_StreamIsSynchronous(sout->p_stream);
-    vlc_mutex_unlock( &sout->lock );
-    return ret;
+    return !sout_StreamIsSynchronous(sout->p_stream);
 }
 
 /*****************************************************************************
@@ -182,9 +176,7 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
             (char *)&p_fmt->i_codec, (void *)p_input);
 
     /* *** add it to the stream chain */
-    vlc_mutex_lock( &p_sout->lock );
     p_input->id = sout_StreamIdAdd( p_sout->p_stream, p_fmt );
-    vlc_mutex_unlock( &p_sout->lock );
 
     if( p_input->id == NULL )
     {
@@ -206,10 +198,7 @@ int sout_InputDelete( sout_instance_t *p_sout,
 
     msg_Dbg(p_sout->p_stream, "removing an output ES (%p)", (void *)p_input);
 
-    vlc_mutex_lock( &p_sout->lock );
     sout_StreamIdDel( p_sout->p_stream, p_input->id );
-    vlc_mutex_unlock( &p_sout->lock );
-
     free( p_input );
 
     return( VLC_SUCCESS);
@@ -221,12 +210,9 @@ static int sout_InputControlVa( sout_instance_t *p_sout,
 {
     if( i_query == SOUT_INPUT_SET_SPU_HIGHLIGHT )
     {
-        vlc_mutex_lock( &p_sout->lock );
-        int i_ret = sout_StreamControl( p_sout->p_stream,
+        return sout_StreamControl( p_sout->p_stream,
                                         SOUT_STREAM_ID_SPU_HIGHLIGHT,
                                         p_input->id, va_arg(args, void *) );
-        vlc_mutex_unlock( &p_sout->lock );
-        return i_ret;
     }
     return VLC_EGENERIC;
 }
@@ -246,9 +232,7 @@ int sout_InputControl( sout_instance_t *p_sout,
 void sout_InputFlush( sout_instance_t *p_sout,
                       sout_packetizer_input_t *p_input )
 {
-    vlc_mutex_lock( &p_sout->lock );
     sout_StreamFlush( p_sout->p_stream, p_input->id );
-    vlc_mutex_unlock( &p_sout->lock );
     p_input->b_flushed = true;
 }
 
@@ -266,11 +250,7 @@ int sout_InputSendBuffer( sout_instance_t *p_sout,
         p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         p_input->b_flushed = false;
     }
-    vlc_mutex_lock( &p_sout->lock );
-    i_ret = sout_StreamIdSend( p_sout->p_stream, p_input->id, p_buffer );
-    vlc_mutex_unlock( &p_sout->lock );
-
-    return i_ret;
+    return sout_StreamIdSend( p_sout->p_stream, p_input->id, p_buffer );
 }
 
 #undef sout_AccessOutNew

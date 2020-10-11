@@ -35,8 +35,6 @@ struct sout_instance_t
     char *psz_sout;
 
     bool                b_wants_substreams;
-
-    vlc_mutex_t         lock;
     sout_stream_t       *p_stream;
 };
 
