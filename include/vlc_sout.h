@@ -196,37 +196,11 @@ VLC_API void sout_StreamChainDelete(sout_stream_t *first, sout_stream_t *end);
 VLC_API sout_stream_t *sout_StreamChainNew(vlc_object_t *parent,
         const char *psz_chain, sout_stream_t *p_next) VLC_USED;
 
-static inline void *sout_StreamIdAdd( sout_stream_t *s,
-                                      const es_format_t *fmt )
-{
-    return s->ops->add(s, fmt);
-}
-
-static inline void sout_StreamIdDel( sout_stream_t *s,
-                                     void *id )
-{
-    s->ops->del(s, id);
-}
-
-static inline int sout_StreamIdSend( sout_stream_t *s,
-                                     void *id, block_t *b )
-{
-    return s->ops->send(s, id, b);
-}
-
-static inline void sout_StreamFlush( sout_stream_t *s,
-                                     void *id )
-{
-    if (s->ops->flush != NULL)
-        s->ops->flush(s, id);
-}
-
-static inline int sout_StreamControlVa( sout_stream_t *s, int i_query, va_list args )
-{
-    if (s->ops->control == NULL)
-        return VLC_EGENERIC;
-    return s->ops->control(s, i_query, args);
-}
+VLC_API void *sout_StreamIdAdd(sout_stream_t *s, const es_format_t *fmt);
+VLC_API void sout_StreamIdDel(sout_stream_t *s, void *id);
+VLC_API int sout_StreamIdSend( sout_stream_t *s, void *id, block_t *b);
+VLC_API void sout_StreamFlush(sout_stream_t *s, void *id);
+VLC_API int sout_StreamControlVa(sout_stream_t *s, int i_query, va_list args);
 
 static inline int sout_StreamControl( sout_stream_t *s, int i_query, ... )
 {

@@ -742,6 +742,34 @@ struct sout_stream_private {
 #define sout_stream_priv(s) \
         container_of(s, struct sout_stream_private, stream)
 
+void *sout_StreamIdAdd(sout_stream_t *s, const es_format_t *fmt)
+{
+    return s->ops->add(s, fmt);
+}
+
+void sout_StreamIdDel(sout_stream_t *s, void *id)
+{
+    s->ops->del(s, id);
+}
+
+int sout_StreamIdSend(sout_stream_t *s, void *id, block_t *b)
+{
+    return s->ops->send(s, id, b);
+}
+
+void sout_StreamFlush(sout_stream_t *s, void *id)
+{
+    if (s->ops->flush != NULL)
+        s->ops->flush(s, id);
+}
+
+int sout_StreamControlVa(sout_stream_t *s, int i_query, va_list args)
+{
+    if (s->ops->control == NULL)
+        return VLC_EGENERIC;
+    return s->ops->control(s, i_query, args);
+}
+
 /* Destroy a "stream_out" module */
 static void sout_StreamDelete( sout_stream_t *p_stream )
 {

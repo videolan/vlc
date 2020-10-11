@@ -346,6 +346,11 @@ sout_MuxSendBuffer
 sout_MuxFlush
 sout_StreamChainDelete
 sout_StreamChainNew
+sout_StreamIdAdd
+sout_StreamIdDel
+sout_StreamIdSend
+sout_StreamFlush
+sout_StreamControlVa
 spu_Create
 spu_Destroy
 spu_PutSubpicture
