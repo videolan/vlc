@@ -734,13 +734,23 @@ static void mrl_Clean( mrl_t *p_mrl )
  ****************************************************************************
  ****************************************************************************/
 
+struct sout_stream_private {
+    sout_stream_t stream;
+    module_t *module;
+};
+
+#define sout_stream_priv(s) \
+        container_of(s, struct sout_stream_private, stream)
+
 /* Destroy a "stream_out" module */
 static void sout_StreamDelete( sout_stream_t *p_stream )
 {
+    struct sout_stream_private *priv = sout_stream_priv(p_stream);
+
     msg_Dbg( p_stream, "destroying chain... (name=%s)", p_stream->psz_name );
 
-    if( p_stream->p_module != NULL )
-        module_unneed( p_stream, p_stream->p_module );
+    if (priv->module != NULL)
+        module_unneed(p_stream, priv->module);
 
     FREENULL( p_stream->psz_name );
 
@@ -776,14 +786,16 @@ static sout_stream_t *sout_StreamNew( vlc_object_t *parent, char *psz_name,
                                config_chain_t *p_cfg, sout_stream_t *p_next)
 {
     const char *cap = (p_next != NULL) ? "sout filter" : "sout output";
+    struct sout_stream_private *priv;
     sout_stream_t *p_stream;
 
     assert(psz_name);
 
-    p_stream = vlc_custom_create( parent, sizeof( *p_stream ), "stream out" );
-    if( !p_stream )
+    priv = vlc_custom_create(parent, sizeof (*priv), "stream out");
+    if (unlikely(priv == NULL))
         return NULL;
 
+    p_stream = &priv->stream;
     p_stream->psz_name = psz_name;
     p_stream->p_cfg    = p_cfg;
     p_stream->p_next   = p_next;
@@ -792,9 +804,9 @@ static sout_stream_t *sout_StreamNew( vlc_object_t *parent, char *psz_name,
 
     msg_Dbg( p_stream, "stream=`%s'", p_stream->psz_name );
 
-    p_stream->p_module = module_need( p_stream, cap, p_stream->psz_name, true );
+    priv->module = module_need(p_stream, cap, p_stream->psz_name, true);
 
-    if( !p_stream->p_module )
+    if (priv->module == NULL)
     {
         /* those must be freed by the caller if creation failed */
         p_stream->psz_name = NULL;

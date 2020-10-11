@@ -184,7 +184,6 @@ struct sout_stream_t
 {
     struct vlc_object_t obj;
 
-    module_t          *p_module;
     char              *psz_name;
     config_chain_t    *p_cfg;
     sout_stream_t     *p_next;
