@@ -35,6 +35,7 @@
 #include <vlc_plugin.h>
 #include <vlc_block.h>
 #include <vlc_sout.h>
+#include <vlc_list.h>
 
 typedef struct sout_cycle sout_cycle_t;
 
@@ -48,8 +49,7 @@ struct sout_cycle
 typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
 struct sout_stream_id_sys_t
 {
-    sout_stream_id_sys_t *prev;
-    sout_stream_id_sys_t *next;
+    struct vlc_list node;
     es_format_t fmt;
     void *id;
 };
@@ -57,8 +57,7 @@ struct sout_stream_id_sys_t
 typedef struct
 {
     sout_stream_t *stream; /*< Current output stream */
-    sout_stream_id_sys_t *first; /*< First elementary stream */
-    sout_stream_id_sys_t *last; /*< Last elementary stream */
+    struct vlc_list ids; /*< List of elementary streams */
 
     sout_cycle_t *start;
     sout_cycle_t *next;
@@ -78,8 +77,6 @@ static void *Add(sout_stream_t *stream, const es_format_t *fmt)
     if (unlikely(id == NULL))
         return NULL;
 
-    id->next = NULL;
-
     if (es_format_Copy(&id->fmt, fmt))
     {
         es_format_Clean(&id->fmt);
@@ -90,12 +87,7 @@ static void *Add(sout_stream_t *stream, const es_format_t *fmt)
     if (sys->stream != NULL)
         id->id = sout_StreamIdAdd(sys->stream, &id->fmt);
 
-    id->prev = sys->last;
-    sys->last = id;
-    if (id->prev != NULL)
-        id->prev->next = id;
-    else
-        sys->first = id;
+    vlc_list_append(&id->node, &sys->ids);
     return id;
 }
 
@@ -104,15 +96,7 @@ static void Del(sout_stream_t *stream, void *_id)
     sout_stream_sys_t *sys = stream->p_sys;
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
 
-    if (id->prev != NULL)
-        id->prev->next = id->next;
-    else
-        sys->first = id->next;
-
-    if (id->next != NULL)
-        id->next->prev = id->prev;
-    else
-        sys->last = id->prev;
+    vlc_list_remove(&id->node);
 
     if (sys->stream != NULL)
         sout_StreamIdDel(sys->stream, id->id);
@@ -124,6 +108,7 @@ static void Del(sout_stream_t *stream, void *_id)
 static int AddStream(sout_stream_t *stream, char *chain)
 {
     sout_stream_sys_t *sys = stream->p_sys;
+    sout_stream_id_sys_t *id;
 
     msg_Dbg(stream, "starting new phase \"%s\"", chain);
     /* TODO format */
@@ -132,7 +117,7 @@ static int AddStream(sout_stream_t *stream, char *chain)
     if (sys->stream == NULL)
         return -1;
 
-    for (sout_stream_id_sys_t *id = sys->first; id != NULL; id = id->next)
+    vlc_list_foreach (id, &sys->ids, node)
         id->id = sout_StreamIdAdd(sys->stream, &id->fmt);
 
     return 0;
@@ -141,11 +126,12 @@ static int AddStream(sout_stream_t *stream, char *chain)
 static void DelStream(sout_stream_t *stream)
 {
     sout_stream_sys_t *sys = stream->p_sys;
+    sout_stream_id_sys_t *id;
 
     if (sys->stream == NULL)
         return;
 
-    for (sout_stream_id_sys_t *id = sys->first; id != NULL; id = id->next)
+    vlc_list_foreach (id, &sys->ids, node)
         if (id->id != NULL)
             sout_StreamIdDel(sys->stream, id->id);
 
@@ -244,8 +230,7 @@ static int Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     sys->stream = NULL;
-    sys->first = NULL;
-    sys->last = NULL;
+    vlc_list_init(&sys->ids);
     sys->start = NULL;
     sys->clock = get_dts;
 
@@ -311,7 +296,7 @@ static void Close(vlc_object_t *obj)
     sout_stream_t *stream = (sout_stream_t *)obj;
     sout_stream_sys_t *sys = stream->p_sys;
 
-    assert(sys->first == NULL && sys->last == NULL);
+    assert(vlc_list_is_empty(&sys->ids));
 
     if (sys->stream != NULL)
         sout_StreamChainDelete(sys->stream, NULL);
