@@ -131,6 +131,8 @@ static int Open( vlc_object_t *p_this )
     TAB_INIT( p_sys->i_nb_last_streams, p_sys->pp_last_streams );
     TAB_INIT( p_sys->i_nb_select, p_sys->ppsz_select );
 
+    char **ppsz_select = NULL;
+
     for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
     {
         if( !strncmp( p_cfg->psz_name, "dst", strlen( "dst" ) ) )
@@ -147,24 +149,24 @@ static int Open( vlc_object_t *p_this )
                 TAB_APPEND( p_sys->i_nb_last_streams, p_sys->pp_last_streams,
                     p_last );
                 TAB_APPEND( p_sys->i_nb_select,  p_sys->ppsz_select, NULL );
+                ppsz_select = &p_sys->ppsz_select[p_sys->i_nb_select - 1];
             }
         }
         else if( !strncmp( p_cfg->psz_name, "select", strlen( "select" ) ) )
         {
             char *psz = p_cfg->psz_value;
-            if( p_sys->i_nb_select > 0 && psz && *psz )
-            {
-                char **ppsz_select = &p_sys->ppsz_select[p_sys->i_nb_select - 1];
 
-                if( *ppsz_select )
+            if( psz && *psz )
+            {
+                if( ppsz_select == NULL )
                 {
-                    msg_Err( p_stream, " * ignore selection `%s' (it already has `%s')",
-                             psz, *ppsz_select );
+                    msg_Err( p_stream, " * ignore selection `%s'", psz );
                 }
                 else
                 {
                     msg_Dbg( p_stream, " * apply selection `%s'", psz );
                     *ppsz_select = strdup( psz );
+                    ppsz_select = NULL;
                 }
             }
         }
