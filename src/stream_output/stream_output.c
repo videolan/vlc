@@ -743,38 +743,71 @@ static void mrl_Clean( mrl_t *p_mrl )
 
 struct sout_stream_private {
     sout_stream_t stream;
+    vlc_mutex_t lock;
     module_t *module;
 };
 
 #define sout_stream_priv(s) \
         container_of(s, struct sout_stream_private, stream)
 
+static void sout_StreamLock(sout_stream_t *s)
+{
+    vlc_mutex_lock(&sout_stream_priv(s)->lock);
+}
+
+static void sout_StreamUnlock(sout_stream_t *s)
+{
+    vlc_mutex_unlock(&sout_stream_priv(s)->lock);
+}
+
 void *sout_StreamIdAdd(sout_stream_t *s, const es_format_t *fmt)
 {
-    return s->ops->add(s, fmt);
+    void *id;
+
+    sout_StreamLock(s);
+    id = s->ops->add(s, fmt);
+    sout_StreamUnlock(s);
+    return id;
 }
 
 void sout_StreamIdDel(sout_stream_t *s, void *id)
 {
+    sout_StreamLock(s);
     s->ops->del(s, id);
+    sout_StreamUnlock(s);
 }
 
 int sout_StreamIdSend(sout_stream_t *s, void *id, block_t *b)
 {
-    return s->ops->send(s, id, b);
+    int val;
+
+    sout_StreamLock(s);
+    val = s->ops->send(s, id, b);
+    sout_StreamUnlock(s);
+    return val;
 }
 
 void sout_StreamFlush(sout_stream_t *s, void *id)
 {
     if (s->ops->flush != NULL)
+    {
+        sout_StreamLock(s);
         s->ops->flush(s, id);
+        sout_StreamUnlock(s);
+    }
 }
 
 int sout_StreamControlVa(sout_stream_t *s, int i_query, va_list args)
 {
-    if (s->ops->control == NULL)
-        return VLC_EGENERIC;
-    return s->ops->control(s, i_query, args);
+    int val = VLC_EGENERIC;
+
+    if (s->ops->control != NULL)
+    {
+        sout_StreamLock(s);
+        val = s->ops->control(s, i_query, args);
+        sout_StreamUnlock(s);
+    }
+    return val;
 }
 
 /* Destroy a "stream_out" module */
@@ -830,6 +863,7 @@ static sout_stream_t *sout_StreamNew( vlc_object_t *parent, char *psz_name,
     if (unlikely(priv == NULL))
         return NULL;
 
+    vlc_mutex_init(&priv->lock);
     p_stream = &priv->stream;
     p_stream->psz_name = psz_name;
     p_stream->p_cfg    = p_cfg;
