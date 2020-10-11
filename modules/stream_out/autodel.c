@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
+#include <vlc_list.h>
 
 typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
 struct sout_stream_id_sys_t
@@ -40,12 +41,12 @@ struct sout_stream_id_sys_t
     es_format_t fmt;
     vlc_tick_t i_last;
     bool b_error;
+    struct vlc_list node;
 };
 
 typedef struct
 {
-    sout_stream_id_sys_t **pp_es;
-    int i_es_num;
+    struct vlc_list ids;
 } sout_stream_sys_t;
 
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
@@ -60,20 +61,18 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     p_es->id = NULL;
     p_es->i_last = VLC_TICK_INVALID;
     p_es->b_error = false;
-    TAB_APPEND( p_sys->i_es_num, p_sys->pp_es, p_es );
-
+    vlc_list_append(&p_es->node, &p_sys->ids);
     return p_es;
 }
 
 static void Del( sout_stream_t *p_stream, void *_p_es )
 {
-    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
     sout_stream_id_sys_t *p_es = (sout_stream_id_sys_t *)_p_es;
 
     if( p_es->id != NULL )
         sout_StreamIdDel( p_stream->p_next, p_es->id );
 
-    TAB_REMOVE( p_sys->i_es_num, p_sys->pp_es, p_es );
+    vlc_list_remove(&p_es->node);
     es_format_Clean( &p_es->fmt );
     free( p_es );
 }
@@ -83,7 +82,6 @@ static int Send( sout_stream_t *p_stream, void *_p_es, block_t *p_buffer )
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
     sout_stream_id_sys_t *p_es = (sout_stream_id_sys_t *)_p_es;
     vlc_tick_t i_current = vlc_tick_now();
-    int i;
 
     p_es->i_last = p_buffer->i_dts;
     if ( !p_es->id && !p_es->b_error )
@@ -102,17 +100,14 @@ static int Send( sout_stream_t *p_stream, void *_p_es, block_t *p_buffer )
     else
         block_ChainRelease( p_buffer );
 
-    for ( i = 0; i < p_sys->i_es_num; i++ )
-    {
-        if ( p_sys->pp_es[i]->id != NULL
-              && (p_sys->pp_es[i]->fmt.i_cat == VIDEO_ES
-                   || p_sys->pp_es[i]->fmt.i_cat == AUDIO_ES)
-              && p_sys->pp_es[i]->i_last < i_current )
+    vlc_list_foreach (p_es, &p_sys->ids, node)
+        if (p_es->id != NULL
+         && (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES)
+         && p_es->i_last < i_current)
         {
-            sout_StreamIdDel( p_stream->p_next, p_sys->pp_es[i]->id );
-            p_sys->pp_es[i]->id = NULL;
+            sout_StreamIdDel(p_stream->p_next, p_es->id);
+            p_es->id = NULL;
         }
-    }
 
     return VLC_SUCCESS;
 }
@@ -129,9 +124,7 @@ static int Open( vlc_object_t *p_this )
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
 
-    p_sys->pp_es = NULL;
-    p_sys->i_es_num = 0;
-
+    vlc_list_init(&p_sys->ids);
     p_stream->ops = &ops;
     p_stream->p_sys = p_sys;
 
