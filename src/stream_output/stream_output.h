@@ -40,15 +40,6 @@ struct sout_instance_t
     sout_stream_t       *p_stream;
 };
 
-/****************************************************************************
- * sout_packetizer_input_t: p_sout <-> p_packetizer
- ****************************************************************************/
-struct sout_packetizer_input_t
-{
-    void                *id;
-    bool                 b_flushed;
-};
-
 sout_instance_t *sout_NewInstance( vlc_object_t *, const char * );
 #define sout_NewInstance(a,b) sout_NewInstance(VLC_OBJECT(a),b)
 void sout_DeleteInstance( sout_instance_t * );

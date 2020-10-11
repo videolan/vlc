@@ -160,6 +160,13 @@ bool sout_instance_ControlsPace( sout_instance_t *sout )
 /*****************************************************************************
  * Packetizer/Input
  *****************************************************************************/
+
+struct sout_packetizer_input_t
+{
+    void                *id;
+    bool                 b_flushed;
+};
+
 sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
                                         const es_format_t *p_fmt )
 {
