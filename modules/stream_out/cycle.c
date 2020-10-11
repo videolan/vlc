@@ -135,7 +135,7 @@ static void DelStream(sout_stream_t *stream)
         if (id->id != NULL)
             sout_StreamIdDel(sys->stream, id->id);
 
-    sout_StreamChainDelete(sys->stream, NULL);
+    sout_StreamChainDelete(sys->stream, stream->p_next);
     sys->stream = NULL;
 }
 
@@ -299,7 +299,7 @@ static void Close(vlc_object_t *obj)
     assert(vlc_list_is_empty(&sys->ids));
 
     if (sys->stream != NULL)
-        sout_StreamChainDelete(sys->stream, NULL);
+        sout_StreamChainDelete(sys->stream, stream->p_next);
 
     for (sout_cycle_t *cycle = sys->start, *next; cycle != NULL; cycle = next)
     {
