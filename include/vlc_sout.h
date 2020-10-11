@@ -193,7 +193,7 @@ struct sout_stream_t
     void              *p_sys;
 };
 
-VLC_API void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_last );
+VLC_API void sout_StreamChainDelete(sout_stream_t *first, sout_stream_t *end);
 VLC_API sout_stream_t *sout_StreamChainNew(vlc_object_t *parent,
         const char *psz_chain, sout_stream_t *p_next, sout_stream_t **p_last) VLC_USED;
 

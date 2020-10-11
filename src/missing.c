@@ -151,9 +151,9 @@ noreturn void sout_MuxFlush(sout_mux_t *mux, sout_input_t *input)
 }
 
 noreturn void sout_StreamChainDelete(sout_stream_t *first,
-                                     sout_stream_t *last)
+                                     sout_stream_t *end)
 {
-    (void) first; (void) last;
+    (void) first; (void) end;
     vlc_assert_unreachable ();
 }
 

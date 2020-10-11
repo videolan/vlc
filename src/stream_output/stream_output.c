@@ -757,15 +757,13 @@ static void sout_StreamDelete( sout_stream_t *p_stream )
  *  if NULL, all modules are destroyed
  *  if not NULL, modules following it must be destroyed separately
  */
-void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_last)
+void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *end)
 {
-    while(p_first != NULL)
+    while (p_first != end)
     {
         sout_stream_t *p_next = p_first->p_next;
 
         sout_StreamDelete(p_first);
-        if(p_first == p_last)
-           break;
         p_first = p_next;
     }
 }
