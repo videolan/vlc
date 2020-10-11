@@ -56,6 +56,7 @@ struct sout_stream_id_sys_t
 struct sout_stream_sys_t
 {
     sout_stream_t *stream; /*< Current output stream */
+    sout_stream_t *last_stream;
     sout_stream_id_sys_t *first; /*< First elementary stream */
     sout_stream_id_sys_t *last; /*< Last elementary stream */
 
@@ -126,7 +127,7 @@ static int AddStream(sout_stream_t *stream, char *chain)
     msg_Dbg(stream, "starting new phase \"%s\"", chain);
     /* TODO format */
     sys->stream = sout_StreamChainNew(stream->p_sout, chain,
-                                      stream->p_next, NULL);
+                                      stream->p_next, &sys->last_stream);
     if (sys->stream == NULL)
         return -1;
 
@@ -147,7 +148,7 @@ static void DelStream(sout_stream_t *stream)
         if (id->id != NULL)
             sout_StreamIdDel(sys->stream, id->id);
 
-    sout_StreamChainDelete(sys->stream, NULL);
+    sout_StreamChainDelete(sys->stream, sys->last_stream);
     sys->stream = NULL;
 }
 
@@ -310,7 +311,7 @@ static void Close(vlc_object_t *obj)
     assert(sys->first == NULL && sys->last == NULL);
 
     if (sys->stream != NULL)
-        sout_StreamChainDelete(sys->stream, NULL);
+        sout_StreamChainDelete(sys->stream, sys->last_stream);
 
     for (sout_cycle_t *cycle = sys->start, *next; cycle != NULL; cycle = next)
     {
