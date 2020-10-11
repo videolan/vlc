@@ -133,11 +133,11 @@ static int Open( vlc_object_t *p_this )
     {
         if( !strncmp( p_cfg->psz_name, "dst", strlen( "dst" ) ) )
         {
-            sout_stream_t *s, *p_last;
+            sout_stream_t *s;
 
             msg_Dbg( p_stream, " * adding `%s'", p_cfg->psz_value );
             s = sout_StreamChainNew( VLC_OBJECT(p_stream), p_cfg->psz_value,
-                p_stream->p_next, &p_last );
+                p_stream->p_next, NULL );
 
             if( s )
             {
