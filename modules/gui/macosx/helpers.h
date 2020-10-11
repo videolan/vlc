@@ -55,10 +55,16 @@ static inline NSArray<NSValue *> *getVouts(void)
     vout_thread_t **pp_vouts;
     size_t i_num_vouts;
 
-    if (!p_input
-        || input_Control(p_input, INPUT_GET_VOUTS, &pp_vouts, &i_num_vouts)
-        || !i_num_vouts)
+    if (!p_input)
         return nil;
+
+    if (input_Control(p_input, INPUT_GET_VOUTS, &pp_vouts, &i_num_vouts)
+        || !i_num_vouts) {
+        vlc_object_release(p_input);
+        return nil;
+    }
+
+    vlc_object_release(p_input);
 
     NSMutableArray<NSValue *> *vouts =
         [NSMutableArray arrayWithCapacity:i_num_vouts];
