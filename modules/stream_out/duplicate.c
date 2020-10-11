@@ -65,9 +65,6 @@ typedef struct
     int             i_nb_streams;
     sout_stream_t   **pp_streams;
 
-    int             i_nb_last_streams;
-    sout_stream_t   **pp_last_streams;
-
     int             i_nb_select;
     char            **ppsz_select;
 } sout_stream_sys_t;
@@ -128,7 +125,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     TAB_INIT( p_sys->i_nb_streams, p_sys->pp_streams );
-    TAB_INIT( p_sys->i_nb_last_streams, p_sys->pp_last_streams );
     TAB_INIT( p_sys->i_nb_select, p_sys->ppsz_select );
 
     char **ppsz_select = NULL;
@@ -146,8 +142,6 @@ static int Open( vlc_object_t *p_this )
             if( s )
             {
                 TAB_APPEND( p_sys->i_nb_streams, p_sys->pp_streams, s );
-                TAB_APPEND( p_sys->i_nb_last_streams, p_sys->pp_last_streams,
-                    p_last );
                 TAB_APPEND( p_sys->i_nb_select,  p_sys->ppsz_select, NULL );
                 ppsz_select = &p_sys->ppsz_select[p_sys->i_nb_select - 1];
             }
@@ -204,7 +198,6 @@ static void Close( vlc_object_t * p_this )
         free( p_sys->ppsz_select[i] );
     }
     free( p_sys->pp_streams );
-    free( p_sys->pp_last_streams );
     free( p_sys->ppsz_select );
 
     free( p_sys );
