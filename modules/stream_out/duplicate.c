@@ -78,7 +78,8 @@ typedef struct
     void                **pp_ids;
 } sout_stream_id_sys_t;
 
-static bool ESSelected( const es_format_t *fmt, char *psz_select );
+static bool ESSelected( struct vlc_logger *, const es_format_t *fmt,
+                        char *psz_select );
 
 /*****************************************************************************
  * Control
@@ -229,7 +230,8 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     {
         void *id_new = NULL;
 
-        if( ESSelected( p_fmt, p_sys->ppsz_select[i_stream] ) )
+        if( ESSelected( p_stream->obj.logger, p_fmt,
+                        p_sys->ppsz_select[i_stream] ) )
         {
             sout_stream_t *out = p_sys->pp_streams[i_stream];
 
@@ -345,7 +347,8 @@ static bool NumInRange( const char *psz_range, int i_num )
         || (beginRange > endRange && (i_num <= beginRange && i_num >= endRange));
 }
 
-static bool ESSelected( const es_format_t *fmt, char *psz_select )
+static bool ESSelected( struct vlc_logger *logger, const es_format_t *fmt,
+                        char *psz_select )
 {
     char  *psz_dup;
     char  *psz;
@@ -476,7 +479,7 @@ static bool ESSelected( const es_format_t *fmt, char *psz_select )
         }
         else
         {
-            fprintf( stderr, "unknown args (%s)\n", psz );
+            vlc_error( logger, "unknown args (%s)", psz );
         }
         /* Next */
         psz = p;
