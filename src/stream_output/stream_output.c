@@ -821,12 +821,13 @@ static sout_stream_t *sout_StreamNew( vlc_object_t *parent, char *psz_name,
  *  Returns a pointer to the first module.
  */
 sout_stream_t *sout_StreamChainNew(vlc_object_t *parent, const char *psz_chain,
-                                sout_stream_t *p_next, sout_stream_t **pp_last)
+                                   sout_stream_t *sink,
+                                   sout_stream_t **restrict pp_last)
 {
     if(!psz_chain || !*psz_chain)
     {
         if(pp_last) *pp_last = NULL;
-        return p_next;
+        return sink;
     }
 
     char *psz_parser = strdup(psz_chain);
@@ -850,38 +851,42 @@ sout_stream_t *sout_StreamChainNew(vlc_object_t *parent, const char *psz_chain,
         vlc_array_append_or_abort(&name, psz_name);
     }
 
+    /* Instantiate modules from back to front of chain */
+    sout_stream_t *front = sink;
     size_t i = vlc_array_count(&name);
-    vlc_array_t module;
-    vlc_array_init(&module);
+
     while(i--)
     {
-        p_next = sout_StreamNew( parent, vlc_array_item_at_index(&name, i),
-            vlc_array_item_at_index(&cfg, i), p_next);
+        sout_stream_t *prev;
 
-        if(!p_next)
+        prev = sout_StreamNew(parent, vlc_array_item_at_index(&name, i),
+                              vlc_array_item_at_index(&cfg, i), front);
+        if (prev == NULL)
             goto error;
 
-        if(i == vlc_array_count(&name) - 1 && pp_last)
-            *pp_last = p_next;   /* last module created in the chain */
+        if (front == sink && pp_last != NULL)
+            *pp_last = prev; /* last module created in the chain */
 
-        vlc_array_append_or_abort(&module, p_next);
+        front = prev;
     }
 
     vlc_array_clear(&name);
     vlc_array_clear(&cfg);
-    vlc_array_clear(&module);
 
-    return p_next;
+    return front;
 
 error:
 
     i++;    /* last module couldn't be created */
 
-    /* destroy all modules created, starting with the last one */
-    int modules = vlc_array_count(&module);
-    while(modules--)
-        sout_StreamDelete(vlc_array_item_at_index(&module, modules));
-    vlc_array_clear(&module);
+    /* Destroy module instances in LIFO order */
+    while (front != sink)
+    {
+        sout_stream_t *next = front->p_next;
+
+        sout_StreamDelete(front);
+        front = next;
+    }
 
     /* then destroy all names and config which weren't destroyed by
      * sout_StreamDelete */
