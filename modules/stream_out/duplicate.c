@@ -46,6 +46,10 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
     set_callbacks( Open, Close )
+    add_submodule()
+    set_capability("sout filter", 0)
+    add_shortcut("duplicate", "dup")
+    set_callbacks(Open, Close)
 vlc_module_end ()
 
 
