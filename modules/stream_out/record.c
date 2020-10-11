@@ -347,7 +347,7 @@ static int OutputNew( sout_stream_t *p_stream,
     /* Create the output */
     msg_Dbg( p_stream, "Using record output `%s'", psz_output );
 
-    p_sys->p_out = sout_StreamChainNew( VLC_OBJECT(p_stream), psz_output, NULL,
+    p_sys->p_out = sout_StreamChainNew( VLC_OBJECT(p_stream), psz_output,
                                         NULL );
 
     if( !p_sys->p_out )

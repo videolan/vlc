@@ -113,7 +113,7 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
     vlc_mutex_init( &p_sout->lock );
     p_sout->p_stream = NULL;
 
-    p_sout->p_stream = sout_StreamChainNew(p_parent, psz_chain, NULL, NULL);
+    p_sout->p_stream = sout_StreamChainNew(p_parent, psz_chain, NULL);
     if( p_sout->p_stream )
     {
         free( psz_chain );
@@ -812,19 +812,14 @@ static sout_stream_t *sout_StreamNew( vlc_object_t *parent, char *psz_name,
  *  chain format: module1{option=*:option=*}[:module2{option=*:...}]
  *
  *  The modules are created starting from the last one and linked together
- *  A pointer to the last module created is stored if pp_last isn't NULL, to
- *  make sure sout_StreamChainDelete doesn't delete modules created in another
- *  place.
  *
  *  Returns a pointer to the first module.
  */
 sout_stream_t *sout_StreamChainNew(vlc_object_t *parent, const char *psz_chain,
-                                   sout_stream_t *sink,
-                                   sout_stream_t **restrict pp_last)
+                                   sout_stream_t *sink)
 {
     if(!psz_chain || !*psz_chain)
     {
-        if(pp_last) *pp_last = NULL;
         return sink;
     }
 
@@ -861,9 +856,6 @@ sout_stream_t *sout_StreamChainNew(vlc_object_t *parent, const char *psz_chain,
                               vlc_array_item_at_index(&cfg, i), front);
         if (prev == NULL)
             goto error;
-
-        if (front == sink && pp_last != NULL)
-            *pp_last = prev; /* last module created in the chain */
 
         front = prev;
     }

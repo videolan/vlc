@@ -103,7 +103,7 @@ GetVencOption( sout_stream_t *p_stream, std::vector<vlc_fourcc_t> codecs,
             ssout << "transcode{" << ssvenc.str() << "}:dummy";
 
             sout_stream_t *p_sout_test =
-                sout_StreamChainNew( VLC_OBJECT(p_stream), ssout.str().c_str(), NULL, NULL );
+                sout_StreamChainNew( VLC_OBJECT(p_stream), ssout.str().c_str(), NULL );
 
             if( p_sout_test != NULL )
             {

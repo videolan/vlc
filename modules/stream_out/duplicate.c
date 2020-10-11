@@ -137,7 +137,7 @@ static int Open( vlc_object_t *p_this )
 
             msg_Dbg( p_stream, " * adding `%s'", p_cfg->psz_value );
             s = sout_StreamChainNew( VLC_OBJECT(p_stream), p_cfg->psz_value,
-                p_stream->p_next, NULL );
+                p_stream->p_next );
 
             if( s )
             {

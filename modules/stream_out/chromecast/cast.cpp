@@ -822,7 +822,7 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
 
     access_out_live.prepare( p_stream, mime );
 
-    p_out = sout_StreamChainNew(VLC_OBJECT(p_stream), sout.c_str(), NULL, NULL);
+    p_out = sout_StreamChainNew(VLC_OBJECT(p_stream), sout.c_str(), NULL);
     if (p_out == NULL) {
         msg_Dbg(p_stream, "could not create sout chain:%s", sout.c_str());
         out_streams.clear();

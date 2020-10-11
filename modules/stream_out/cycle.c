@@ -113,7 +113,7 @@ static int AddStream(sout_stream_t *stream, char *chain)
     msg_Dbg(stream, "starting new phase \"%s\"", chain);
     /* TODO format */
     sys->stream = sout_StreamChainNew(VLC_OBJECT(stream), chain,
-                                      stream->p_next, NULL);
+                                      stream->p_next);
     if (sys->stream == NULL)
         return -1;
 

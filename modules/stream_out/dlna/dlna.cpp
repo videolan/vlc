@@ -226,8 +226,7 @@ bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
     msg_Dbg( p_stream, "Creating chain %s", sout.c_str() );
     out_streams = new_streams;
 
-    p_out = sout_StreamChainNew(VLC_OBJECT(p_stream), sout.c_str(), nullptr,
-                                nullptr);
+    p_out = sout_StreamChainNew(VLC_OBJECT(p_stream), sout.c_str(), nullptr);
     if (p_out == nullptr) {
         msg_Err(p_stream, "could not create sout chain:%s", sout.c_str());
         out_streams.clear();

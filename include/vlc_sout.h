@@ -195,7 +195,7 @@ struct sout_stream_t
 
 VLC_API void sout_StreamChainDelete(sout_stream_t *first, sout_stream_t *end);
 VLC_API sout_stream_t *sout_StreamChainNew(vlc_object_t *parent,
-        const char *psz_chain, sout_stream_t *p_next, sout_stream_t **p_last) VLC_USED;
+        const char *psz_chain, sout_stream_t *p_next) VLC_USED;
 
 static inline void *sout_StreamIdAdd( sout_stream_t *s,
                                       const es_format_t *fmt )

@@ -159,10 +159,9 @@ noreturn void sout_StreamChainDelete(sout_stream_t *first,
 
 noreturn sout_stream_t *sout_StreamChainNew(sout_instance_t *sout,
                                             const char *chain,
-                                            sout_stream_t *next,
-                                            sout_stream_t **last)
+                                            sout_stream_t *next)
 {
-    (void) sout; (void) chain; (void) next; (void) last;
+    (void) sout; (void) chain; (void) next;
     vlc_assert_unreachable ();
 }
 
