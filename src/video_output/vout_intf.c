@@ -528,8 +528,10 @@ bool GetAspectRatio(const char *ar_str, unsigned *num, unsigned *den)
     if (sscanf(ar_str, "%u:%u", num, den) == 2 &&
         (num != 0) == (den != 0))
         return true;
-    else if (*ar_str == '\0')
+    else if (*ar_str == '\0') {
         *num = *den = 0;
+        return true;
+    }
     return false;
 }
 
