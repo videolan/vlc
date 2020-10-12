@@ -15,6 +15,8 @@ struct vlc_context
 };
 
 
+static const char *AspectRatio = NULL;
+
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if( message == WM_CREATE )
@@ -53,6 +55,39 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
                 DragFinish(hDrop);
             }
             return 0;
+        case WM_KEYDOWN:
+        case WM_SYSKEYDOWN:
+            {
+                int key = tolower( (unsigned char)MapVirtualKey( wParam, 2 ) );
+                if (key == 'a')
+                {
+                    if (AspectRatio == NULL)
+                        AspectRatio = "16:10";
+                    else if (strcmp(AspectRatio,"16:10")==0)
+                        AspectRatio = "16:9";
+                    else if (strcmp(AspectRatio,"16:9")==0)
+                        AspectRatio = "4:3";
+                    else if (strcmp(AspectRatio,"4:3")==0)
+                        AspectRatio = "185:100";
+                    else if (strcmp(AspectRatio,"185:100")==0)
+                        AspectRatio = "221:100";
+                    else if (strcmp(AspectRatio,"221:100")==0)
+                        AspectRatio = "235:100";
+                    else if (strcmp(AspectRatio,"235:100")==0)
+                        AspectRatio = "239:100";
+                    else if (strcmp(AspectRatio,"239:100")==0)
+                        AspectRatio = "5:3";
+                    else if (strcmp(AspectRatio,"5:3")==0)
+                        AspectRatio = "5:4";
+                    else if (strcmp(AspectRatio,"5:4")==0)
+                        AspectRatio = "1:1";
+                    else if (strcmp(AspectRatio,"1:1")==0)
+                        AspectRatio = NULL;
+                    libvlc_video_set_aspect_ratio( ctx->p_mediaplayer, AspectRatio );
+                }
+                break;
+            }
+        default: break;
     }
 
     return DefWindowProc (hWnd, message, wParam, lParam);

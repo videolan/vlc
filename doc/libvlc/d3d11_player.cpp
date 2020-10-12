@@ -38,6 +38,8 @@ struct render_context
 {
     HWND hWnd;
 
+    libvlc_media_player_t *p_mp;
+
     /* resources shared by VLC */
     ID3D11Device            *d3deviceVLC;
     ID3D11DeviceContext     *d3dctxVLC;
@@ -503,6 +505,8 @@ static void Resize_cb( void *opaque,
     LeaveCriticalSection(&ctx->sizeLock);
 }
 
+static const char *AspectRatio = NULL;
+
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if( message == WM_CREATE )
@@ -535,6 +539,40 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         case WM_DESTROY:
             PostQuitMessage(0);
             return 0;
+
+        case WM_KEYDOWN:
+        case WM_SYSKEYDOWN:
+            {
+                int key = tolower( (unsigned char)MapVirtualKey( wParam, 2 ) );
+                if (key == 'a')
+                {
+                    if (AspectRatio == NULL)
+                        AspectRatio = "16:10";
+                    else if (strcmp(AspectRatio,"16:10")==0)
+                        AspectRatio = "16:9";
+                    else if (strcmp(AspectRatio,"16:9")==0)
+                        AspectRatio = "4:3";
+                    else if (strcmp(AspectRatio,"4:3")==0)
+                        AspectRatio = "185:100";
+                    else if (strcmp(AspectRatio,"185:100")==0)
+                        AspectRatio = "221:100";
+                    else if (strcmp(AspectRatio,"221:100")==0)
+                        AspectRatio = "235:100";
+                    else if (strcmp(AspectRatio,"235:100")==0)
+                        AspectRatio = "239:100";
+                    else if (strcmp(AspectRatio,"239:100")==0)
+                        AspectRatio = "5:3";
+                    else if (strcmp(AspectRatio,"5:3")==0)
+                        AspectRatio = "5:4";
+                    else if (strcmp(AspectRatio,"5:4")==0)
+                        AspectRatio = "1:1";
+                    else if (strcmp(AspectRatio,"1:1")==0)
+                        AspectRatio = NULL;
+                    libvlc_video_set_aspect_ratio( ctx->p_mp, AspectRatio );
+                }
+                break;
+            }
+        default: break;
     }
 
     return DefWindowProc (hWnd, message, wParam, lParam);
@@ -550,7 +588,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
     char *file_path;
     libvlc_instance_t *p_libvlc;
     libvlc_media_t *p_media;
-    libvlc_media_player_t *p_mp;
     (void)hPrevInstance;
 
     /* remove "" around the given path */
@@ -566,7 +603,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     p_libvlc = libvlc_new( 0, NULL );
     p_media = libvlc_media_new_path( p_libvlc, file_path );
     free( file_path );
-    p_mp = libvlc_media_player_new_from_media( p_media );
+    Context.p_mp = libvlc_media_player_new_from_media( p_media );
 
     InitializeCriticalSection(&Context.sizeLock);
 
@@ -601,12 +638,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
     // DON'T use with callbacks libvlc_media_player_set_hwnd(p_mp, hWnd);
 
     /* Tell VLC to render into our D3D11 environment */
-    libvlc_video_set_output_callbacks( p_mp, libvlc_video_engine_d3d11,
+    libvlc_video_set_output_callbacks( Context.p_mp, libvlc_video_engine_d3d11,
                                        Setup_cb, Cleanup_cb, Resize_cb, UpdateOutput_cb, Swap_cb, StartRendering_cb,
                                        nullptr, nullptr, SelectPlane_cb,
                                        &Context );
 
-    libvlc_media_player_play( p_mp );
+    libvlc_media_player_play( Context.p_mp );
 
     MSG msg;
 
@@ -622,9 +659,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
         }
     }
 
-    libvlc_media_player_stop_async( p_mp );
+    libvlc_media_player_stop_async( Context.p_mp );
 
-    libvlc_media_player_release( p_mp );
+    libvlc_media_player_release( Context.p_mp );
     libvlc_media_release( p_media );
     libvlc_release( p_libvlc );
 
