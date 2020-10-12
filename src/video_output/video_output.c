@@ -81,10 +81,7 @@ typedef struct vout_thread_sys_t
 
     /* */
     struct {
-        struct {
-            unsigned num;
-            unsigned den;
-        } dar;
+        vlc_rational_t dar;
         struct {
             enum vout_crop_mode mode;
             union {
@@ -1379,7 +1376,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
     }
 
     /* Render the direct buffer */
-    vout_UpdateDisplaySourceProperties(vd, &todisplay->format);
+    vout_UpdateDisplaySourceProperties(vd, &todisplay->format, &sys->source.dar);
 
     todisplay = vout_ConvertForDisplay(vd, todisplay);
     if (todisplay == NULL) {
