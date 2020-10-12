@@ -2157,10 +2157,12 @@ int ProbeStart( demux_t *p_demux, int i_program )
         if( vlc_stream_Seek( p_sys->stream, i_pos ) )
             return VLC_EGENERIC;
 
-        ProbeChunk( p_demux, i_program, false, &b_found );
+        int i_count =  ProbeChunk( p_demux, i_program, false, &b_found );
+        if( i_count < PROBE_CHUNK_COUNT )
+            break;
 
         /* Go ahead one more chunk if end of file contained only stuffing packets */
-        i_probe_count += PROBE_CHUNK_COUNT;
+        i_probe_count += i_count;
     } while( i_pos < i_stream_size && !b_found &&
              i_probe_count < PROBE_MAX );
 
@@ -2188,10 +2190,12 @@ int ProbeEnd( demux_t *p_demux, int i_program )
         if( vlc_stream_Seek( p_sys->stream, i_pos ) )
             return VLC_EGENERIC;
 
-        ProbeChunk( p_demux, i_program, true, &b_found );
+        int i_count = ProbeChunk( p_demux, i_program, true, &b_found );
+        if( i_count < PROBE_CHUNK_COUNT )
+            break;
 
         /* Go ahead one more chunk if end of file contained only stuffing packets */
-        i_probe_count += PROBE_CHUNK_COUNT;
+        i_probe_count += i_count;
     } while( i_pos > 0 && !b_found &&
              i_probe_count < PROBE_MAX );
 
