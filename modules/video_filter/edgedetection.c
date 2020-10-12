@@ -84,7 +84,7 @@ static const struct filter_video_callbacks filter_video_edge_cbs =
 
 static void Flush( filter_t *p_filter )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_chain_t *p_sys = p_filter->p_sys;
     filter_chain_VideoFlush( p_sys );
 }
 
