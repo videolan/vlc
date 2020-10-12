@@ -376,7 +376,7 @@ static int Open(vlc_object_t *obj)
     p_filter->fmt_out.i_codec = p_filter->fmt_out.video.i_chroma;
     return VLC_SUCCESS;
 error:
-    Close(filter);
+    Close(p_filter);
     p_filter->p_sys = NULL;
 
     assert(ret != VLC_SUCCESS);
