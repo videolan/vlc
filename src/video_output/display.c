@@ -530,9 +530,6 @@ static int vout_SetSourceAspect(vout_display_t *vd,
     if (sar_num > 0 && sar_den > 0) {
         osys->source.i_sar_num = sar_num;
         osys->source.i_sar_den = sar_den;
-    } else {
-        osys->source.i_sar_num = osys->source.i_sar_num;
-        osys->source.i_sar_den = osys->source.i_sar_den;
     }
 
     if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT))
