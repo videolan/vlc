@@ -2901,7 +2901,7 @@ static void EsOutDelLocked( es_out_t *out, es_out_id_t *es )
     EsOutDeleteInfoEs( out, es );
 
     /* Update program */
-    if( EsOutIsGroupSticky( out, es->id.source, es->fmt.i_group ) )
+    if( !EsOutIsGroupSticky( out, es->id.source, es->fmt.i_group ) )
     {
         assert( es->p_pgrm );
 
