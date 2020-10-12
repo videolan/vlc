@@ -136,22 +136,32 @@ static void DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     msg_Dbg( p_mux, "removing input" );
 }
 
+static block_t *block_FifoTryGet(block_fifo_t *fifo)
+{
+    block_t *block;
+
+    vlc_fifo_Lock(fifo);
+    block = vlc_fifo_DequeueUnlocked(fifo);
+    vlc_fifo_Unlock(fifo);
+    return block;
+}
+
 static int Mux( sout_mux_t *p_mux )
 {
     block_fifo_t *p_fifo;
+    block_t *p_data;
 
     if( !p_mux->i_nb_inputs ) return VLC_SUCCESS;
 
     p_fifo = p_mux->pp_inputs[0]->p_fifo;
 
-    while( block_FifoCount( p_fifo ) > 0 )
+    while ((p_data = block_FifoTryGet(p_fifo)) != NULL)
     {
         static const char psz_hfmt[] = "\r\n"
             "--"BOUNDARY"\r\n"
             "Content-Type: image/jpeg\r\n"
             "Content-Length: %zu\r\n"
             "\r\n";
-        block_t *p_data = block_FifoGet( p_fifo );
         block_t *p_header = block_Alloc( sizeof( psz_hfmt ) + 20 );
 
         if( p_header == NULL ) /* uho! */
