@@ -46,7 +46,7 @@ typedef struct
 {
     shine_t s;
     unsigned int samples_per_frame;
-    block_fifo_t *p_fifo;
+    block_t *first, **lastp;
 
     unsigned int i_buffer;
     uint8_t *p_buffer;
@@ -108,11 +108,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( !p_sys )
         goto enomem;
 
-    if( !( p_sys->p_fifo = block_FifoNew() ) )
-    {
-        free( p_sys );
-        goto enomem;
-    }
+    p_sys->first = NULL;
+    p_sys->lastp = &p_sys->first;
 
     shine_config_t cfg = {
         .wave = {
@@ -177,7 +174,8 @@ static block_t *GetPCM( encoder_t *p_enc, block_t *p_block )
 
         p_block->i_buffer -= p_sys->samples_per_frame * 4 - i_buffer;
 
-        block_FifoPut( p_sys->p_fifo, p_pcm_block );
+        *(p_sys->lastp) = p_pcm_block;
+        p_sys->lastp = &p_pcm_block->p_next;
     }
 
     /* We hadn't enough data to make a block, put it in standby */
@@ -207,7 +205,15 @@ static block_t *GetPCM( encoder_t *p_enc, block_t *p_block )
 
 buffered:
     /* and finally get a block back */
-    return block_FifoCount( p_sys->p_fifo ) > 0 ? block_FifoGet( p_sys->p_fifo ) : NULL;
+    p_pcm_block = p_sys->first;
+
+    if( p_pcm_block != NULL ) {
+        p_sys->first = p_pcm_block->p_next;
+        if( p_pcm_block->p_next == NULL )
+            p_sys->lastp = &p_sys->first;
+    }
+
+    return p_pcm_block;
 }
 
 static block_t *EncodeFrame( encoder_t *p_enc, block_t *p_block )
@@ -279,6 +285,6 @@ static void CloseEncoder( vlc_object_t *p_this )
     shine_close(p_sys->s);
     atomic_store(&busy, false);
 
-    block_FifoRelease( p_sys->p_fifo );
+    block_ChainRelease(p_sys->first);
     free( p_sys );
 }
