@@ -2074,6 +2074,10 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, bool *pb_fou
             if( b_adaptfield && p_pkt->i_buffer >= 4 + 2 + 5 )
                 i_pcr = GetPCR( p_pkt );
 
+            /* Designated PCR pid will be valid, don't repick (on the fly probing) */
+            if( i_pcr != -1 && !p_pid->probed.i_pcr_count )
+                p_pid->probed.i_pcr_count++;
+
             if( i_pcr == -1 &&
                 (p_pkt->p_buffer[1] & 0xC0) == 0x40 && /* payload start */
                 (p_pkt->p_buffer[3] & 0xD0) == 0x10 && /* Has payload but is not encrypted */
