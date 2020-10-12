@@ -27,6 +27,8 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
@@ -66,11 +68,7 @@ vlc_module_begin();
     set_callbacks( OpenEncoder, CloseEncoder );
 vlc_module_end();
 
-static struct
-{
-    bool busy;
-    vlc_mutex_t lock;
-} entrant = { false, VLC_STATIC_MUTEX, };
+static atomic_bool busy = ATOMIC_VAR_INIT(false);
 
 static int OpenEncoder( vlc_object_t *p_this )
 {
@@ -100,15 +98,11 @@ static int OpenEncoder( vlc_object_t *p_this )
              p_enc->fmt_out.i_bitrate, p_enc->fmt_out.audio.i_rate,
              p_enc->fmt_out.audio.i_channels );
 
-    vlc_mutex_lock( &entrant.lock );
-    if( entrant.busy )
+    if( atomic_exchange(&busy, true) )
     {
         msg_Err( p_enc, "encoder already in progress" );
-        vlc_mutex_unlock( &entrant.lock );
         return VLC_EGENERIC;
     }
-    entrant.busy = true;
-    vlc_mutex_unlock( &entrant.lock );
 
     p_enc->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )
@@ -147,9 +141,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 enomem:
-    vlc_mutex_lock( &entrant.lock );
-    entrant.busy = false;
-    vlc_mutex_unlock( &entrant.lock );
+    atomic_store(&busy, false);
     return VLC_ENOMEM;
 }
 
@@ -279,9 +271,7 @@ static void CloseEncoder( vlc_object_t *p_this )
 {
     encoder_sys_t *p_sys = ((encoder_t*)p_this)->p_sys;
 
-    vlc_mutex_lock( &entrant.lock );
-    entrant.busy = false;
-    vlc_mutex_unlock( &entrant.lock );
+    atomic_store(&busy, false);
 
     /* TODO: we should send the last PCM block padded with 0
      * But we don't know if other blocks will come before it's too late */
