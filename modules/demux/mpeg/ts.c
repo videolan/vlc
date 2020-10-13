@@ -623,9 +623,9 @@ static int Demux( demux_t *p_demux )
     /* If we had no PAT within MIN_PAT_INTERVAL, create PAT/PMT from probed streams */
     if( p_sys->i_pmt_es == 0 && !SEEN(GetPID(p_sys, 0)) && p_sys->patfix.status == PAT_MISSING )
     {
+        GetPID(p_sys, 0)->u.p_pat->b_generated = true;
         MissingPATPMTFixup( p_demux );
         p_sys->patfix.status = PAT_FIXTRIED;
-        GetPID(p_sys, 0)->u.p_pat->b_generated = true;
     }
 
     /* We read at most 100 TS packet or until a frame is completed */

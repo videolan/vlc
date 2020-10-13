@@ -112,7 +112,10 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
             return;
         }
     }
-    else msg_Warn( p_demux, "Replacing generated PAT with one received from stream" );
+    else if( p_pat->i_version != -1 )
+    {
+        msg_Warn( p_demux, "Replacing generated PAT with one received from stream" );
+    }
 
     /* check content */
     if( !p_dvbpsipat->b_current_next || p_sys->b_user_pmt ||
