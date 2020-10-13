@@ -193,6 +193,25 @@ static unsigned int seq_delta(unsigned int sseq, unsigned int fseq)
     return fseq == 0 ? 0 : fseq <= sseq ? sseq - fseq : 15 - (fseq - sseq);
 }
 
+static picture_t *but_to_pic(filter_t * p_filter, MMAL_BUFFER_HEADER_T *out_buf)
+{
+    filter_sys_t * const sys = p_filter->p_sys;
+    const unsigned int seq_out = (out_buf->flags / MMAL_BUFFER_HEADER_FLAG_USER0) & 0xf;
+    picture_t * out_pic = di_alloc_opaque(p_filter, out_buf);
+
+    if (out_pic == NULL) {
+        msg_Warn(p_filter, "Failed to alloc new filter output pic");
+        mmal_queue_put_back(sys->out_q, out_buf);  // Wedge buf back into Q in the hope we can alloc a pic later
+        return NULL;
+    }
+
+    // Ignore 0 seqs
+    // Don't think these should actually happen
+    if (seq_out != 0)
+        sys->seq_out = seq_out;
+    return out_pic;
+}
+
 static picture_t *deinterlace(filter_t * p_filter, picture_t * p_pic)
 {
     filter_sys_t * const sys = p_filter->p_sys;
@@ -270,24 +289,12 @@ static picture_t *deinterlace(filter_t * p_filter, picture_t * p_pic)
 
     while ((out_buf = (seq_delta(sys->seq_in, sys->seq_out) >= 5 ? mmal_queue_timedwait(sys->out_q, 1000) : mmal_queue_get(sys->out_q))) != NULL)
     {
-        const unsigned int seq_out = (out_buf->flags / MMAL_BUFFER_HEADER_FLAG_USER0) & 0xf;
-        picture_t * out_pic = di_alloc_opaque(p_filter, out_buf);
-
-        if (out_pic == NULL) {
-            msg_Warn(p_filter, "Failed to alloc new filter output pic");
-            mmal_queue_put_back(sys->out_q, out_buf);  // Wedge buf back into Q in the hope we can alloc a pic later
-            out_buf = NULL;
+        picture_t * out_pic = but_to_pic(p_filter, out_buf);
+        if (unlikely(out_pic == NULL))
             break;
-        }
-        out_buf = NULL;  // Now attached to pic or recycled
 
         vlc_picture_chain_AppendChain( chain_tail, out_pic );
         chain_tail = out_pic;
-
-        // Ignore 0 seqs
-        // Don't think these should actually happen
-        if (seq_out != 0)
-            sys->seq_out = seq_out;
     }
 
     // Crash on lockup
