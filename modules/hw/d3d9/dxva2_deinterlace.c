@@ -326,6 +326,7 @@ static void D3D9CloseDeinterlace(filter_t *filter)
 {
     filter_sys_t *sys = filter->p_sys;
 
+    Flush(filter);
     IDirect3DSurface9_Release( sys->hw_surface );
     IDirectXVideoProcessor_Release( sys->processor );
     FreeLibrary( sys->hdecoder_dll );
