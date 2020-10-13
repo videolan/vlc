@@ -1,6 +1,7 @@
 # cargo/cargo-c installation via rustup
 
 RUST_VERSION=1.47.0
+CARGOC_VERSION=0.6.15
 RUSTUP_VERSION=1.22.1
 RUSTUP_URL=https://github.com/rust-lang/rustup/archive/$(RUSTUP_VERSION).tar.gz
 
@@ -35,5 +36,5 @@ endif
 	$(RUSTUP) default $(RUST_VERSION)
 	$(RUSTUP) target add $(RUST_TARGET)
 	unset PKG_CONFIG_LIBDIR PKG_CONFIG_PATH CFLAGS CPPFLAGS LDFLAGS; \
-		$(CARGO) install $(CARGOC_FEATURES) cargo-c
+		$(CARGO) install --locked $(CARGOC_FEATURES) cargo-c --version $(CARGOC_VERSION)
 	touch $@
