@@ -1,0 +1,34 @@
+name: Sync With Master And Build
+
+on:
+  schedule:
+    - cron: '59 23 * * *'
+
+
+jobs:
+  sync-with-master-and-build:
+    runs-on: 'ubuntu:20.04'
+    steps:
+      - name: Update system
+        run: sudo apt-get update && sudo apt-get dist-upgrade -y
+        
+      - name: Install latest gcc
+        run: sudo apt-get install gcc-10
+      
+      - name: Get dependencies
+        run: sudo apt-get build-dep vlc
+      
+      - name: Get latest vlc sources
+        run: wget -r --no-parent -A 'vlc-*.tar.xz' -R "index.html*" http://download.videolan.org/pub/videolan/vlc/last/
+      
+      - name: Remove unwanted files
+        run: ls -R | grep -v vlc-*.tar.xz | xargs rm
+        
+      - name: Upload Built Packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: vlc-build
+          path: /vlc
+            
+      - run: ./.github/scripts/build.sh
+        shell: bash
