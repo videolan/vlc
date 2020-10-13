@@ -4,12 +4,14 @@
 # This file is under the same license as the vlc package.
 
 ifdef HAVE_WIN32
+ifndef HAVE_WINSTORE
 ifeq ($(HOST),i686-w64-mingw32)
 RUST_TARGET = i686-pc-windows-gnu # ARCH is i386
 else ifeq ($(HOST),x86_64-w64-mingw32)
 RUST_TARGET = $(ARCH)-pc-windows-gnu
 else
 # Not supported on armv7/aarch64 yet
+endif
 endif
 else ifdef HAVE_ANDROID
 RUST_TARGET = $(HOST)
