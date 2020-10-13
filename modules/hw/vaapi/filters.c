@@ -1163,5 +1163,6 @@ vlc_module_begin()
     add_shortcut("sharpen")
 
     add_submodule()
-    set_video_converter_callback(vlc_vaapi_OpenChroma, 10)
+    set_capability("video converter", 10)
+    set_callback(vlc_vaapi_OpenChroma)
 vlc_module_end()
