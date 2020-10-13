@@ -130,11 +130,21 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
     return last_pic;
 }
 
-static void Close( filter_t *p_filter )
+static void Flush( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
+    date_Init( &p_sys->next_output_pts,
+               p_filter->fmt_out.video.i_frame_rate, p_filter->fmt_out.video.i_frame_rate_base );
     if( p_sys->p_previous_pic )
+    {
         picture_Release( p_sys->p_previous_pic );
+        p_sys->p_previous_pic = NULL;
+    }
+}
+
+static void Close( filter_t *p_filter )
+{
+    Flush( p_filter );
     if( p_filter->vctx_out )
         vlc_video_context_Release( p_filter->vctx_out );
 }
@@ -142,6 +152,7 @@ static void Close( filter_t *p_filter )
 static const struct vlc_filter_operations filter_ops =
 {
     .filter_video = Filter, .close = Close,
+    .flush = Flush,
 };
 
 static int Open( filter_t *p_filter )
