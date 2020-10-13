@@ -137,7 +137,6 @@ static void Close( filter_t *p_filter )
         picture_Release( p_sys->p_previous_pic );
     if( p_filter->vctx_out )
         vlc_video_context_Release( p_filter->vctx_out );
-    free( p_sys );
 }
 
 static const struct vlc_filter_operations filter_ops =
@@ -153,7 +152,7 @@ static int Open( filter_t *p_filter )
     if( p_filter->fmt_out.video.i_chroma != p_filter->fmt_in.video.i_chroma )
         return VLC_EGENERIC;
 
-    p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
+    p_sys = p_filter->p_sys = vlc_obj_malloc( VLC_OBJECT(p_filter), sizeof( *p_sys ) );
 
     if( unlikely( !p_sys ) )
         return VLC_ENOMEM;
@@ -177,7 +176,7 @@ static int Open( filter_t *p_filter )
 
     if( p_filter->fmt_out.video.i_frame_rate == 0 ) {
         msg_Err( p_filter, "Invalid output frame rate" );
-        free( p_sys );
+        vlc_obj_free( VLC_OBJECT(p_filter), p_sys );
         return VLC_EGENERIC;
     }
 
