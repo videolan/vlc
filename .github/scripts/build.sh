@@ -1,4 +1,4 @@
-tar -xvzf vlc*.tar.xz
+tar -xvf vlc*.tar.xz
 rm *.tar.xz
 mv vlc* vlc
 ./configure --prefix=$HOME/opt/
