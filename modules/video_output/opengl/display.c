@@ -108,7 +108,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     sys->gl = NULL;
-    sys->place_changed = false;
 
     vout_window_t *surface = cfg->window;
     char *gl_name = var_InheritString(surface, MODULE_VARNAME);
@@ -143,6 +142,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     free(gl_name);
     if (sys->gl == NULL)
         goto error;
+
+    vout_display_PlacePicture(&sys->place, vd->source, cfg);
+    sys->place_changed = true;
+    vlc_gl_Resize (sys->gl, cfg->display.width, cfg->display.height);
 
     /* Initialize video display */
     const vlc_fourcc_t *spu_chromas;
