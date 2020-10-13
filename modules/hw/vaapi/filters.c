@@ -1074,14 +1074,9 @@ static void CloseDeinterlace(filter_t *filter)
     filter_sys_t *const         filter_sys = filter->p_sys;
     struct deint_data *const    p_data = filter_sys->p_data;
 
-    if (p_data->forward_refs.surfaces)
-        free(p_data->forward_refs.surfaces);
-    if (p_data->history.pp_pics)
-    {
-        while (p_data->history.num_pics)
-            picture_Release(p_data->history.pp_pics[--p_data->history.num_pics]);
-        free(p_data->history.pp_pics);
-    }
+    Deinterlace_Flush(filter);
+    free(p_data->forward_refs.surfaces);
+    free(p_data->history.pp_pics);
     free(p_data);
     Close(filter, filter_sys);
 }
