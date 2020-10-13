@@ -10,3 +10,4 @@ export CXX=g++-10
 export LD=g++-10
 make -j4
 make dist-gzip
+find -name "*.tar.gz" -print0 | xargs -0 -I {} mv {} ..
