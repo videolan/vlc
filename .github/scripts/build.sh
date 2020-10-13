@@ -1,3 +1,5 @@
+tar -xvzf vlc**.tar.xz
+ls -d | grep vlc | xargs cd 
 ./configure --prefix=$HOME/opt/
 export CC=gcc-10
 export CPP=g++-10
