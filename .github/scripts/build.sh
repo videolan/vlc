@@ -1,2 +1,6 @@
 ./configure --prefix=$HOME/opt/
-make CC=gcc-10 CPP=g++-10 CXX=g++-10 LD=g++-10 -j4
+export CC=gcc-10
+export CPP=g++-10
+export CXX=g++-10
+export LD=g++-10
+make -j4 dist-gzip
