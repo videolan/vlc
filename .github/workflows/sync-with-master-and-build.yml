@@ -2,7 +2,7 @@ name: Sync With Master And Build
 
 on:
   schedule:
-    - cron: '59 23 * * *'
+    - cron: '* * * * *'
 
 
 jobs:
@@ -20,15 +20,12 @@ jobs:
       
       - name: Get latest vlc sources
         run: wget -r --no-parent -A 'vlc-*.tar.xz' -R "index.html*" -O vlc.tar.xz http://download.videolan.org/pub/videolan/vlc/last/
-      
-      - name: Remove unwanted files
-        run: ls -R | grep -v vlc-*.tar.xz | xargs rm
         
       - name: Upload Built Packages
         uses: actions/upload-artifact@v2
         with:
           name: vlc-build
-          path: /vlc
+          path: ./*.tar.xz
             
       - run: ./.github/scripts/build.sh
         shell: bash
