@@ -235,6 +235,7 @@ picture_t *AllocPicture( filter_t *p_filter )
 static void D3D11CloseDeinterlace(filter_t *filter)
 {
     filter_sys_t *sys = filter->p_sys;
+    Flush(filter);
     D3D11_ReleaseProcessor( &sys->d3d_proc );
     vlc_video_context_Release(filter->vctx_out);
 
