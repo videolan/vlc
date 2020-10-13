@@ -131,6 +131,7 @@ struct demux_sys_t
     {
         stime_t i_first_dts;     /* first dts encountered for the stream */
         int     i_timesourcepid; /* which pid we saved the dts from */
+        bool    b_pcrhasnopcrfield;
         enum { PAT_WAITING = 0, PAT_MISSING, PAT_FIXTRIED } status; /* set if we haven't seen PAT within MIN_PAT_INTERVAL */
     } patfix;
 

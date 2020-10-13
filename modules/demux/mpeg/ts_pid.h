@@ -78,7 +78,8 @@ struct ts_pid_t
         vlc_fourcc_t i_fourcc;
         vlc_fourcc_t i_original_fourcc;
         int i_cat;
-        int i_pcr_count;
+        int i_dts_count;
+        int i_pcr_count; /* carries PCR field */
         uint8_t i_stream_id;
     } probed;
 

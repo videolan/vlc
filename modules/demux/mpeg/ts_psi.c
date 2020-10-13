@@ -184,6 +184,8 @@ static void PATCallBack( void *data, dvbpsi_pat_t *p_dvbpsipat )
         }
 
         pmtpid->u.p_pmt->i_number = p_program->i_number;
+        if( p_pat->b_generated )
+            pmtpid->u.p_pmt->pcr.b_disable = p_sys->patfix.b_pcrhasnopcrfield;
 
         ARRAY_APPEND( p_pat->programs, pmtpid );
 
