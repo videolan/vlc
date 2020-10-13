@@ -19,7 +19,7 @@ jobs:
         run: sudo apt-get build-dep vlc
       
       - name: Get latest vlc sources
-        run: wget -r --no-parent -A 'vlc-*.tar.xz' -R "index.html*" http://download.videolan.org/pub/videolan/vlc/last/
+        run: wget -r --no-parent -A 'vlc-*.tar.xz' -R "index.html*" -O vlc.tar.xz http://download.videolan.org/pub/videolan/vlc/last/
       
       - name: Remove unwanted files
         run: ls -R | grep -v vlc-*.tar.xz | xargs rm
