@@ -164,7 +164,7 @@ static bool srt_schedule_reconnect(stream_t *p_stream)
 
     /* Set latency */
     srt_set_socket_option( strm_obj, SRT_PARAM_LATENCY, p_sys->sock,
-            SRTO_TSBPDDELAY, &i_latency, sizeof(i_latency) );
+            SRTO_LATENCY, &i_latency, sizeof(i_latency) );
 
     /* set passphrase */
     if (psz_passphrase != NULL && psz_passphrase[0] != '\0') {
