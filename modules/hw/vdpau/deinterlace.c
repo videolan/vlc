@@ -99,7 +99,6 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
 static void Close(filter_t *filter)
 {
     vlc_video_context_Release(filter->vctx_out);
-    free(filter->p_sys);
 }
 
 static const struct vlc_filter_operations filter_ops = {
@@ -118,7 +117,7 @@ static int Open(filter_t *filter)
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;
 
-    filter_sys_t *sys = malloc(sizeof (*sys));
+    filter_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(filter), sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
