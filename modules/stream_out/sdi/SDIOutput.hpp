@@ -22,6 +22,7 @@
 
 #include "SDIStream.hpp"
 #include <vlc_common.h>
+#include <vlc_sout.h>
 #include <list>
 
 namespace sdi_sout
@@ -85,6 +86,7 @@ namespace sdi_sout
             static int   SoutCallback_Send(sout_stream_t *, void *, block_t*);
             static int   SoutCallback_Control(sout_stream_t *, int, va_list);
             static void  SoutCallback_Flush(sout_stream_t *, void *);
+            struct sout_stream_operations ops;
     };
 }
 
