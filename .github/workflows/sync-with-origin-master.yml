@@ -1,0 +1,10 @@
+name: sync-with-origin-master.yml
+on:
+  schedule:
+    - cron: '1 12 * * *'
+jobs:
+  sync-with-origin-master:
+    steps:
+      - run:  |
+          git remote add upstream https://github.com/videolan/vlc.git
+      
