@@ -64,7 +64,7 @@ Url SegmentInfoCommon::getUrlSegment() const
     return ret;
 }
 
-bool SegmentInfoCommon::getSegmentNumberByScaledTime(const std::vector<ISegment *> &segments,
+bool SegmentInfoCommon::getSegmentNumberByScaledTime(const std::vector<Segment *> &segments,
                                                       stime_t time, uint64_t *ret)
 {
     if(segments.empty() || (segments.size() > 1 && segments[1]->startTime.Get() == 0) )
@@ -72,10 +72,10 @@ bool SegmentInfoCommon::getSegmentNumberByScaledTime(const std::vector<ISegment 
 
     *ret = 0;
 
-    std::vector<ISegment *>::const_iterator it = segments.begin();
+    std::vector<Segment *>::const_iterator it = segments.begin();
     while(it != segments.end())
     {
-        const ISegment *seg = *it;
+        const Segment *seg = *it;
         if(seg->startTime.Get() > time)
         {
             if(it == segments.begin())

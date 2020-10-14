@@ -71,10 +71,15 @@ namespace adaptive
                 SegmentInformation *parentSegmentInformation;
         };
 
-        class InitSegmentTemplate : public BaseSegmentTemplate
+        class InitSegmentTemplate : public InitSegment
         {
             public:
-                InitSegmentTemplate( ICanonicalUrl * = NULL );
+                InitSegmentTemplate( ICanonicalUrl * = NULL, MediaSegmentTemplate * = NULL );
+                virtual ~InitSegmentTemplate();
+                virtual void setSourceUrl( const std::string &url ); /* reimpl */
+
+            protected:
+                const MediaSegmentTemplate *maintempl;
         };
     }
 }

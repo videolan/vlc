@@ -165,16 +165,16 @@ uint64_t Representation::translateSegmentNumber(uint64_t num, const BaseRepresen
 {
     if(consistentSegmentNumber())
         return num;
-    ISegment *fromSeg = from->getSegment(INFOTYPE_MEDIA, num);
+    ISegment *fromSeg = from->getMediaSegment(num);
     HLSSegment *fromHlsSeg = dynamic_cast<HLSSegment *>(fromSeg);
     if(!fromHlsSeg)
         return 1;
     const vlc_tick_t utcTime = fromHlsSeg->getUTCTime() +
                                getTimescale().ToTime(fromHlsSeg->duration.Get()) / 2;
 
-    std::vector<ISegment *> list;
-    std::vector<ISegment *>::const_iterator it;
-    getSegments(INFOTYPE_MEDIA, list);
+    std::vector<Segment *> list;
+    std::vector<Segment *>::const_iterator it;
+    getMediaSegments(list);
     for(it=list.begin(); it != list.end(); ++it)
     {
         const HLSSegment *hlsSeg = dynamic_cast<HLSSegment *>(*it);

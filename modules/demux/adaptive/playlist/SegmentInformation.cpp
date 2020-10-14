@@ -77,103 +77,44 @@ AbstractPlaylist * SegmentInformation::getPlaylist() const
         return NULL;
 }
 
-std::size_t SegmentInformation::getSegments(SegmentInfoType type, std::vector<ISegment *> &retSegments) const
+std::size_t SegmentInformation::getMediaSegments(std::vector<Segment *> &retSegments) const
 {
-    switch (type)
+    if( mediaSegmentTemplate )
     {
-        case INFOTYPE_INIT:
-        {
-            /* init segments are always single segment */
-            if( segmentBase && segmentBase->initialisationSegment.Get() )
-            {
-                retSegments.push_back( segmentBase->initialisationSegment.Get() );
-            }
-            else if( segmentList && segmentList->initialisationSegment.Get() )
-            {
-                retSegments.push_back( segmentList->initialisationSegment.Get() );
-            }
-            else if( mediaSegmentTemplate && mediaSegmentTemplate->initialisationSegment.Get() )
-            {
-                retSegments.push_back( mediaSegmentTemplate->initialisationSegment.Get() );
-            }
-        }
-        break;
-
-        case INFOTYPE_MEDIA:
-        {
-            if( mediaSegmentTemplate )
-            {
-                retSegments.push_back( mediaSegmentTemplate );
-            }
-            else if ( segmentList && !segmentList->getSegments().empty() )
-            {
-                std::vector<ISegment *> list = segmentList->getSegments();
-                retSegments.insert( retSegments.end(), list.begin(), list.end() );
-            }
-            else if( segmentBase )
-            {
-                std::vector<ISegment *> list = segmentBase->subSegments();
-                retSegments.insert( retSegments.end(), list.begin(), list.end() );
-            }
-        }
-        break;
-
-        case INFOTYPE_INDEX:
-        {
-            /* index segments are always single segment */
-            if( segmentBase && segmentBase->indexSegment.Get() )
-            {
-                retSegments.push_back( segmentBase->indexSegment.Get() );
-            }
-            else if( segmentList && segmentList->indexSegment.Get() )
-            {
-                retSegments.push_back( segmentList->indexSegment.Get() );
-            }
-            // templated index ?
-        }
-
-        default:
-        break;
+        retSegments.push_back( mediaSegmentTemplate );
     }
-
-    if( retSegments.empty() && parent )
+    else if ( segmentList && !segmentList->getSegments().empty() )
     {
-        return parent->getSegments( type, retSegments );
+        std::vector<Segment *> list = segmentList->getSegments();
+        retSegments.insert( retSegments.end(), list.begin(), list.end() );
     }
-    else
+    else if( segmentBase )
     {
-        return retSegments.size();
+        const std::vector<Segment *> &list = segmentBase->subSegments();
+        retSegments.insert( retSegments.end(), list.begin(), list.end() );
     }
-}
-
-std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegments) const
-{
-    for(int i=0; i<InfoTypeCount; i++)
+    else if( parent )
     {
-        std::vector<ISegment *> segs;
-        if( getSegments(static_cast<SegmentInfoType>(i), segs) )
-            retSegments.insert( retSegments.end(), segs.begin(), segs.end() );
+        return parent->getMediaSegments(retSegments);
     }
     return retSegments.size();
 }
 
 /* Returns wanted segment, or next in sequence if not found */
-ISegment * SegmentInformation::getNextSegment(SegmentInfoType type, uint64_t i_pos,
-                                              uint64_t *pi_newpos, bool *pb_gap) const
+Segment *  SegmentInformation::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newpos,
+                                                   bool *pb_gap) const
 {
     *pb_gap = false;
     *pi_newpos = i_pos;
-    if( type != INFOTYPE_MEDIA )
-        return NULL;
 
-    std::vector<ISegment *> retSegments;
-    const size_t size = getSegments( type, retSegments );
+    std::vector<Segment *> retSegments;
+    const size_t size = getMediaSegments( retSegments );
     if( size )
     {
-        std::vector<ISegment *>::const_iterator it;
+        std::vector<Segment *>::const_iterator it;
         for(it = retSegments.begin(); it != retSegments.end(); ++it)
         {
-            ISegment *seg = *it;
+            Segment *seg = *it;
             if(seg->isTemplate()) /* we don't care about seq number */
             {
                 /* Check if we don't exceed timeline */
@@ -224,36 +165,78 @@ ISegment * SegmentInformation::getNextSegment(SegmentInfoType type, uint64_t i_p
     return NULL;
 }
 
-ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) const
+InitSegment * SegmentInformation::getInitSegment() const
 {
-    std::vector<ISegment *> retSegments;
-    const size_t size = getSegments( type, retSegments );
-    if( size )
+    if( segmentBase && segmentBase->initialisationSegment.Get() )
     {
-        if(size == 1 && retSegments[0]->isTemplate())
+        return segmentBase->initialisationSegment.Get();
+    }
+    else if( segmentList && segmentList->initialisationSegment.Get() )
+    {
+        return segmentList->initialisationSegment.Get();
+    }
+    else if( mediaSegmentTemplate && mediaSegmentTemplate->initialisationSegment.Get() )
+    {
+        return mediaSegmentTemplate->initialisationSegment.Get();
+    }
+    else if( parent )
+    {
+        return parent->getInitSegment();
+    }
+    else return NULL;
+}
+
+IndexSegment *SegmentInformation::getIndexSegment() const
+{
+    if( segmentBase && segmentBase->indexSegment.Get() )
+    {
+        return segmentBase->indexSegment.Get();
+    }
+    else if( segmentList && segmentList->indexSegment.Get() )
+    {
+        return segmentList->indexSegment.Get();
+    }
+    else if( parent )
+    {
+        return parent->getIndexSegment();
+    }
+    else return NULL;
+}
+
+Segment * SegmentInformation::getMediaSegment(uint64_t pos) const
+{
+    if( mediaSegmentTemplate )
+    {
+        const SegmentTimeline *tl = mediaSegmentTemplate->inheritSegmentTimeline();
+        if(tl == NULL || tl->maxElementNumber() > pos)
+            return mediaSegmentTemplate;
+    }
+    else if( segmentList )
+    {
+        return segmentList->getSegmentByNumber( pos );
+    }
+    else if( segmentBase )
+    {
+        /* FIXME add getSegmentByNumber */
+        const std::vector<Segment *> &retSegments = segmentBase->subSegments();
+        std::vector<Segment *>::const_iterator it;
+        for(it = retSegments.begin(); it != retSegments.end(); ++it)
         {
-            MediaSegmentTemplate *templ = dynamic_cast<MediaSegmentTemplate*>(retSegments[0]);
-            const SegmentTimeline *tl = templ->inheritSegmentTimeline();
-            if(!templ || tl == NULL || tl->maxElementNumber() > pos)
-                return templ;
-        }
-        else
-        {
-            std::vector<ISegment *>::const_iterator it;
-            for(it = retSegments.begin(); it != retSegments.end(); ++it)
+            Segment *seg = *it;
+            if(seg->getSequenceNumber() >= pos)
             {
-                ISegment *seg = *it;
-                if(seg->getSequenceNumber() >= pos)
-                {
-                    if(seg->getSequenceNumber() == pos)
-                        return seg;
-                    else
-                        return NULL;
-                }
+                if(seg->getSequenceNumber() == pos)
+                    return seg;
+                else
+                    return NULL;
             }
         }
+        return NULL;
     }
-
+    else if( parent )
+    {
+        return parent->getMediaSegment(pos);
+    }
     return NULL;
 }
 
@@ -383,20 +366,20 @@ void SegmentInformation::setSegmentTemplate(MediaSegmentTemplate *templ)
         mediaSegmentTemplate = templ;
 }
 
-static void insertIntoSegment(std::vector<ISegment *> &seglist, size_t start,
+static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
                               size_t end, stime_t time, stime_t duration)
 {
-    std::vector<ISegment *>::iterator segIt;
+    std::vector<Segment *>::iterator segIt;
     for(segIt = seglist.begin(); segIt < seglist.end(); ++segIt)
     {
-        ISegment *segment = *segIt;
+        Segment *segment = *segIt;
         if(segment->getClassId() == Segment::CLASSID_SEGMENT &&
            (end == 0 || segment->contains(end)))
         {
             SubSegment *subsegment = new SubSegment(segment, start, (end != 0) ? end : 0);
             subsegment->startTime.Set(time);
             subsegment->duration.Set(duration);
-            static_cast<Segment *>(segment)->addSubSegment(subsegment);
+            segment->addSubSegment(subsegment);
             break;
         }
     }
@@ -408,7 +391,7 @@ void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
     if(!segmentBase)
         return;
 
-    std::vector<ISegment *> seglist;
+    std::vector<Segment *> seglist;
     seglist.push_back( segmentBase );
 
     size_t prevstart = 0;

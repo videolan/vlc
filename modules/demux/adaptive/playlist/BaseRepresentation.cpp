@@ -122,8 +122,8 @@ void BaseRepresentation::pruneByPlaybackTime(vlc_tick_t time)
 
 vlc_tick_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
 {
-    std::vector<ISegment *> seglist;
-    getSegments(INFOTYPE_MEDIA, seglist);
+    std::vector<Segment *> seglist;
+    getMediaSegments(seglist);
 
     if(seglist.size() == 1 && seglist.front()->isTemplate())
     {
@@ -141,10 +141,10 @@ vlc_tick_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
 
     vlc_tick_t minTime = 0;
     const Timescale timescale = inheritTimescale();
-    std::vector<ISegment *>::const_iterator it;
+    std::vector<Segment *>::const_iterator it;
     for(it = seglist.begin(); it != seglist.end(); ++it)
     {
-        const ISegment *seg = *it;
+        const Segment *seg = *it;
         if(seg->getSequenceNumber() > curnum)
             minTime += timescale.ToTime(seg->duration.Get());
     }
@@ -166,9 +166,14 @@ void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
         text.append("]");
     }
     msg_Dbg(obj, "%s", text.c_str());
-    std::vector<ISegment *> list;
-    getAllSegments(list);
-    std::vector<ISegment *>::const_iterator l;
+    const ISegment *seg;
+    if((seg = getInitSegment()))
+        seg->debug(obj, indent + 1);
+    if((seg = getIndexSegment()))
+        seg->debug(obj, indent + 1);
+    std::vector<Segment *> list;
+    getMediaSegments(list);
+    std::vector<Segment *>::const_iterator l;
     for(l = list.begin(); l != list.end(); ++l)
         (*l)->debug(obj, indent + 1);
 }
@@ -253,7 +258,7 @@ bool BaseRepresentation::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) 
         const Timescale timescale = inheritTimescale();
         stime_t st = timescale.ToScaled(time);
         *ret = 0;
-        const std::vector<ISegment *> list = segmentBase->subSegments();
+        const std::vector<Segment *> &list = segmentBase->subSegments();
         return SegmentInfoCommon::getSegmentNumberByScaledTime(list, st, ret);
     }
 
@@ -299,7 +304,7 @@ bool BaseRepresentation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     else
     {
         const Timescale timescale = inheritTimescale();
-        const ISegment *segment = getSegment(INFOTYPE_MEDIA, number);
+        const ISegment *segment = getMediaSegment(number);
         if( segment )
         {
             *time = timescale.ToTime(segment->startTime.Get());
@@ -348,7 +353,7 @@ bool BaseRepresentation::getMediaPlaybackRange(vlc_tick_t *rangeBegin,
     if ( segmentList && !segmentList->getSegments().empty() )
     {
         const Timescale timescale = segmentList->inheritTimescale();
-        const std::vector<ISegment *> list = segmentList->getSegments();
+        const std::vector<Segment *> &list = segmentList->getSegments();
 
         const ISegment *back = list.back();
         const stime_t startTime = list.front()->startTime.Get();
@@ -362,12 +367,12 @@ bool BaseRepresentation::getMediaPlaybackRange(vlc_tick_t *rangeBegin,
     SegmentBase *segmentBase = inheritSegmentBase();
     if( segmentBase )
     {
-        const std::vector<ISegment *> list = segmentBase->subSegments();
+        const std::vector<Segment *> &list = segmentBase->subSegments();
         if(list.empty())
             return false;
 
         const Timescale timescale = inheritTimescale();
-        const ISegment *back = list.back();
+        const Segment *back = list.back();
         const stime_t startTime = list.front()->startTime.Get();
         const stime_t endTime = back->startTime.Get() + back->duration.Get();
         *rangeBegin = timescale.ToTime(startTime);

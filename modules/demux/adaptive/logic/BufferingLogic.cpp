@@ -269,7 +269,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
     else if (segmentList && !segmentList->getSegments().empty())
     {
         const Timescale timescale = segmentList->inheritTimescale();
-        const std::vector<ISegment *> list = segmentList->getSegments();
+        const std::vector<Segment *> &list = segmentList->getSegments();
         const ISegment *back = list.back();
 
         /* working around HLS discontinuities by using durations */
@@ -338,12 +338,12 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
     }
     else if(segmentBase)
     {
-        const std::vector<ISegment *> list = segmentBase->subSegments();
+        const std::vector<Segment *> &list = segmentBase->subSegments();
         if(!list.empty())
             return segmentBase->getSequenceNumber();
 
         const Timescale timescale = rep->inheritTimescale();
-        const ISegment *back = list.back();
+        const Segment *back = list.back();
         const stime_t bufferingstart = back->startTime.Get() + back->duration.Get() -
                                        timescale.ToScaled(i_buffering);
 

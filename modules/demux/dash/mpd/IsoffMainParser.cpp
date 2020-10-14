@@ -213,7 +213,7 @@ size_t IsoffMainParser::parseSegmentTemplate(MPD *mpd, Node *templateNode, Segme
     if(templateNode->hasAttribute("initialization"))
     {
         std::string initurl = templateNode->getAttributeValue("initialization");
-        if(!initurl.empty() && (initTemplate = new (std::nothrow) InitSegmentTemplate(info)))
+        if(!initurl.empty() && (initTemplate = new (std::nothrow) InitSegmentTemplate(info, mediaTemplate)))
             initTemplate->setSourceUrl(initurl);
     }
     mediaTemplate->initialisationSegment.Set(initTemplate);
@@ -354,7 +354,7 @@ void    IsoffMainParser::parseRepresentations (MPD *mpd, Node *adaptationSetNode
         /* Empty Representation with just baseurl (ex: subtitles) */
         if(i_total == 0 &&
            (currentRepresentation->baseUrl.Get() && !currentRepresentation->baseUrl.Get()->empty()) &&
-            adaptationSet->getSegment(SegmentInformation::INFOTYPE_MEDIA, 0) == NULL)
+            adaptationSet->getMediaSegment(0) == NULL)
         {
             SegmentBase *base = new (std::nothrow) SegmentBase(currentRepresentation);
             if(base)
@@ -392,7 +392,7 @@ size_t IsoffMainParser::parseSegmentBase(MPD *mpd, Node * segmentBaseNode, Segme
 
     if(!base->initialisationSegment.Get() && base->indexSegment.Get() && base->indexSegment.Get()->getOffset())
     {
-        Segment *initSeg = new InitSegment( info );
+        InitSegment *initSeg = new InitSegment( info );
         initSeg->setSourceUrl(base->getUrlSegment().toString());
         initSeg->setByteRange(0, base->indexSegment.Get()->getOffset() - 1);
         base->initialisationSegment.Set(initSeg);
@@ -462,12 +462,12 @@ size_t IsoffMainParser::parseSegmentList(MPD *mpd, Node * segListNode, SegmentIn
     return total;
 }
 
-void IsoffMainParser::parseInitSegment(Node *initNode, Initializable<Segment> *init, SegmentInformation *parent)
+void IsoffMainParser::parseInitSegment(Node *initNode, Initializable<InitSegment> *init, SegmentInformation *parent)
 {
     if(!initNode)
         return;
 
-    Segment *seg = new InitSegment( parent );
+    InitSegment *seg = new InitSegment( parent );
     seg->setSourceUrl(initNode->getAttributeValue("sourceURL"));
 
     if(initNode->hasAttribute("range"))

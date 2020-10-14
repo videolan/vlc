@@ -39,8 +39,8 @@ namespace adaptive
         class Segment;
 
         class SegmentInfoCommon : public ICanonicalUrl,
-                                  public Initializable<Segment>,
-                                  public Indexable<Segment>
+                                  public Initializable<InitSegment>,
+                                  public Indexable<IndexSegment>
         {
             public:
                 SegmentInfoCommon( ICanonicalUrl *parent = NULL );
@@ -50,7 +50,7 @@ namespace adaptive
                 void                    appendBaseURL( const std::string& url );
                 virtual Url             getUrlSegment() const; /* impl */
                 Property<stime_t>      duration;
-                static bool             getSegmentNumberByScaledTime(const std::vector<ISegment *> &,
+                static bool             getSegmentNumberByScaledTime(const std::vector<Segment *> &,
                                                                      stime_t, uint64_t *);
 
             private:

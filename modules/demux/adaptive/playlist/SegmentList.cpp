@@ -38,22 +38,22 @@ SegmentList::SegmentList( SegmentInformation *parent ):
 }
 SegmentList::~SegmentList()
 {
-    std::vector<ISegment *>::iterator it;
+    std::vector<Segment *>::iterator it;
     for(it = segments.begin(); it != segments.end(); ++it)
         delete(*it);
 }
 
-const std::vector<ISegment*>& SegmentList::getSegments() const
+const std::vector<Segment*>& SegmentList::getSegments() const
 {
     return segments;
 }
 
-ISegment * SegmentList::getSegmentByNumber(uint64_t number)
+Segment * SegmentList::getSegmentByNumber(uint64_t number)
 {
-    std::vector<ISegment *>::const_iterator it = segments.begin();
+    std::vector<Segment *>::const_iterator it = segments.begin();
     for(it = segments.begin(); it != segments.end(); ++it)
     {
-        ISegment *seg = *it;
+        Segment *seg = *it;
         if(seg->getSequenceNumber() == number)
         {
             return seg;
@@ -66,7 +66,7 @@ ISegment * SegmentList::getSegmentByNumber(uint64_t number)
     return NULL;
 }
 
-void SegmentList::addSegment(ISegment *seg)
+void SegmentList::addSegment(Segment *seg)
 {
     seg->setParent(this);
     segments.push_back(seg);
@@ -75,18 +75,18 @@ void SegmentList::addSegment(ISegment *seg)
 
 void SegmentList::updateWith(SegmentList *updated, bool b_restamp)
 {
-    const ISegment * lastSegment = (segments.empty()) ? NULL : segments.back();
-    const ISegment * prevSegment = lastSegment;
+    const Segment * lastSegment = (segments.empty()) ? NULL : segments.back();
+    const Segment * prevSegment = lastSegment;
 
     if(updated->segments.empty())
         return;
 
     uint64_t firstnumber = updated->segments.front()->getSequenceNumber();
 
-    std::vector<ISegment *>::iterator it;
+    std::vector<Segment *>::iterator it;
     for(it = updated->segments.begin(); it != updated->segments.end(); ++it)
     {
-        ISegment *cur = *it;
+        Segment *cur = *it;
         if(!lastSegment || lastSegment->compare(cur) < 0)
         {
             if(b_restamp && prevSegment)
@@ -119,10 +119,10 @@ void SegmentList::pruneByPlaybackTime(vlc_tick_t time)
 
 void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
 {
-    std::vector<ISegment *>::iterator it = segments.begin();
+    std::vector<Segment *>::iterator it = segments.begin();
     while(it != segments.end())
     {
-        ISegment *seg = *it;
+        Segment *seg = *it;
 
         if(seg->getSequenceNumber() >= tobelownum)
             break;
@@ -154,10 +154,10 @@ bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     bool found = false;
     stime_t seg_start = first->startTime.Get();
     stime_t seg_dura = 0;
-    std::vector<ISegment *>::const_iterator it = segments.begin();
+    std::vector<Segment *>::const_iterator it = segments.begin();
     for(it = segments.begin(); it != segments.end(); ++it)
     {
-        const ISegment *seg = *it;
+        const Segment *seg = *it;
 
         if(seg->duration.Get())
             seg_dura = seg->duration.Get();

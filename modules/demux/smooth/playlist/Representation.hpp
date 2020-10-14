@@ -39,13 +39,13 @@ namespace smooth
         using namespace adaptive::playlist;
 
         class Representation : public BaseRepresentation,
-                               public Initializable<Segment>
+                               public Initializable<InitSegment>
         {
             public:
                 Representation(BaseAdaptationSet *);
                 virtual ~Representation ();
 
-                virtual std::size_t getSegments(SegmentInfoType, std::vector<ISegment *>&) const; /* reimpl */
+                virtual InitSegment * getInitSegment() const; /* reimpl */
                 virtual StreamFormat getStreamFormat() const; /* reimpl */
 
                 /* for segment templates */

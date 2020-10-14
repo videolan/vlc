@@ -208,9 +208,21 @@ void MediaSegmentTemplate::debug(vlc_object_t *obj, int indent) const
         segmentTimeline->debug(obj, indent + 1);
 }
 
-InitSegmentTemplate::InitSegmentTemplate( ICanonicalUrl *parent ) :
-    BaseSegmentTemplate(parent)
+InitSegmentTemplate::InitSegmentTemplate( ICanonicalUrl *parent,
+                                          MediaSegmentTemplate *templ ) :
+    InitSegment(parent)
 {
     debugName = "InitSegmentTemplate";
     classId = InitSegment::CLASSID_INITSEGMENT;
+    maintempl = templ;
+}
+
+InitSegmentTemplate::~InitSegmentTemplate()
+{
+
+}
+
+void InitSegmentTemplate::setSourceUrl(const std::string &url)
+{
+    sourceUrl = Url(Url::Component(url, maintempl));
 }

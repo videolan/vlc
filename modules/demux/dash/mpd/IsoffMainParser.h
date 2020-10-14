@@ -74,7 +74,7 @@ namespace dash
                 void    parseMPDAttributes  (MPD *, xml::Node *);
                 void    parseAdaptationSets (MPD *, xml::Node *periodNode, Period *period);
                 void    parseRepresentations(MPD *, xml::Node *adaptationSetNode, AdaptationSet *adaptationSet);
-                void    parseInitSegment    (xml::Node *, Initializable<Segment> *, SegmentInformation *);
+                void    parseInitSegment    (xml::Node *, Initializable<InitSegment> *, SegmentInformation *);
                 void    parseTimeline       (xml::Node *, MediaSegmentTemplate *);
                 void    parsePeriods        (MPD *, xml::Node *);
                 size_t  parseSegmentInformation(MPD *, xml::Node *, SegmentInformation *, uint64_t *);

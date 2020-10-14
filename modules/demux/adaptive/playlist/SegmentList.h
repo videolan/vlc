@@ -41,9 +41,9 @@ namespace adaptive
                 SegmentList             ( SegmentInformation * = NULL );
                 virtual ~SegmentList    ();
 
-                const std::vector<ISegment *>&   getSegments() const;
-                ISegment *              getSegmentByNumber(uint64_t);
-                void                    addSegment(ISegment *seg);
+                const std::vector<Segment *>&   getSegments() const;
+                Segment *               getSegmentByNumber(uint64_t);
+                void                    addSegment(Segment *seg);
                 void                    updateWith(SegmentList *, bool = false);
                 void                    pruneBySegmentNumber(uint64_t);
                 void                    pruneByPlaybackTime(vlc_tick_t);
@@ -52,7 +52,7 @@ namespace adaptive
                 stime_t                 getTotalLength() const;
 
             private:
-                std::vector<ISegment *>  segments;
+                std::vector<Segment *>  segments;
                 stime_t totalLength;
         };
     }
