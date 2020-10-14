@@ -213,7 +213,7 @@ void Segment::addSubSegment(SubSegment *subsegment)
 
 Segment::~Segment()
 {
-    std::vector<SubSegment*>::iterator it;
+    std::vector<ISegment*>::iterator it;
     for(it=subsegments.begin();it!=subsegments.end();++it)
         delete *it;
 }
@@ -235,7 +235,7 @@ void Segment::debug(vlc_object_t *obj, int indent) const
         std::string text(indent, ' ');
         text.append("Segment");
         msg_Dbg(obj, "%s", text.c_str());
-        std::vector<SubSegment *>::const_iterator l;
+        std::vector<ISegment *>::const_iterator l;
         for(l = subsegments.begin(); l != subsegments.end(); ++l)
             (*l)->debug(obj, indent + 1);
     }
@@ -256,20 +256,9 @@ Url Segment::getUrlSegment() const
     }
 }
 
-std::vector<ISegment*> Segment::subSegments()
+std::vector<ISegment*> & Segment::subSegments()
 {
-    std::vector<ISegment*> list;
-    if(!subsegments.empty())
-    {
-        std::vector<SubSegment*>::iterator it;
-        for(it=subsegments.begin();it!=subsegments.end();++it)
-            list.push_back(*it);
-    }
-    else
-    {
-        list.push_back(this);
-    }
-    return list;
+    return subsegments;
 }
 
 InitSegment::InitSegment(ICanonicalUrl *parent) :
@@ -305,14 +294,3 @@ Url SubSegment::getUrlSegment() const
     return getParentUrlSegment();
 }
 
-std::vector<ISegment*> SubSegment::subSegments()
-{
-    std::vector<ISegment*> list;
-    list.push_back(this);
-    return list;
-}
-
-void SubSegment::addSubSegment(SubSegment *)
-{
-
-}

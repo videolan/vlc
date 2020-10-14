@@ -135,15 +135,7 @@ void SegmentList::pruneBySegmentNumber(uint64_t tobelownum)
 
 bool SegmentList::getSegmentNumberByScaledTime(stime_t time, uint64_t *ret) const
 {
-    std::vector<ISegment *> allsubsegments;
-    std::vector<ISegment *>::const_iterator it;
-    for(it=segments.begin(); it!=segments.end(); ++it)
-    {
-        std::vector<ISegment *> list = (*it)->subSegments();
-        allsubsegments.insert( allsubsegments.end(), list.begin(), list.end() );
-    }
-
-    return SegmentInfoCommon::getSegmentNumberByScaledTime(allsubsegments, time, ret);
+    return SegmentInfoCommon::getSegmentNumberByScaledTime(segments, time, ret);
 }
 
 bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
