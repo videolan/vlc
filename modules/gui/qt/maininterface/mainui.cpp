@@ -99,7 +99,7 @@ bool MainUI::setup(QQmlEngine* engine)
     rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));
 
     if (m_mainInterface->hasMediaLibrary())
-        rootCtx->setContextProperty( "medialib", new MediaLib(m_intf, this) );
+        rootCtx->setContextProperty( "medialib", m_mainInterface->getMediaLibrary() );
     else
         rootCtx->setContextProperty( "medialib", nullptr );
 

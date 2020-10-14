@@ -138,7 +138,11 @@ MainInterface::MainInterface(intf_thread_t *_p_intf , QWidget* parent, Qt::Windo
     /* Get the available interfaces */
     m_extraInterfaces = new VLCVarChoiceModel(p_intf, "intf-add", this);
 
-    b_hasMedialibrary = (vlc_ml_instance_get( p_intf ) != NULL);
+    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_intf );
+    b_hasMedialibrary = (ml != NULL);
+    if (b_hasMedialibrary) {
+        m_medialib = new MediaLib(p_intf, this);
+    }
 
     /* Set the other interface settings */
     settings = getSettings();

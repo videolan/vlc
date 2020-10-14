@@ -29,6 +29,7 @@
 #include "widgets/native/qvlcframe.hpp"
 #include "player/player_controller.hpp"
 #include "util/color_scheme_model.hpp"
+#include "medialibrary/medialib.hpp"
 
 #include <QSystemTrayIcon>
 #include <QStackedWidget>
@@ -150,6 +151,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(VLCVarChoiceModel* extraInterfaces READ getExtraInterfaces CONSTANT)
     Q_PROPERTY(float intfScaleFactor READ getIntfScaleFactor NOTIFY intfScaleFactorChanged)
     Q_PROPERTY(bool mediaLibraryAvailable READ hasMediaLibrary CONSTANT)
+    Q_PROPERTY(MediaLib* mediaLibrary READ getMediaLibrary CONSTANT)
     Q_PROPERTY(bool gridView READ hasGridView WRITE setGridView NOTIFY gridViewChanged)
     Q_PROPERTY(ColorSchemeModel* colorScheme READ getColorScheme CONSTANT)
     Q_PROPERTY(bool hasVLM READ hasVLM CONSTANT)
@@ -189,6 +191,7 @@ public:
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
     inline float getIntfScaleFactor() const { return m_intfScaleFactor; }
     inline bool hasMediaLibrary() const { return b_hasMedialibrary; }
+    inline MediaLib* getMediaLibrary() const { return m_medialib; }
     inline bool hasGridView() const { return m_gridView; }
     inline ColorSchemeModel* getColorScheme() const { return m_colorScheme; }
     bool hasVLM() const;
@@ -255,6 +258,7 @@ protected:
     bool                 b_hasWayland;
 #endif
     bool                 b_hasMedialibrary;
+    MediaLib*            m_medialib = nullptr;
     bool                 m_gridView;
     ColorSchemeModel*    m_colorScheme;
     bool                 m_clientSideDecoration = false;
