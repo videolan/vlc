@@ -283,6 +283,7 @@
     <qresource prefix="/menus">
         <file alias="Menubar.qml">menus/qml/Menubar.qml</file>
         <file alias="GlobalShortcuts.qml">menus/qml/GlobalShortcuts.qml</file>
+        <file alias="GlobalShortcutsMedialib.qml">menus/qml/GlobalShortcutsMedialib.qml</file>
     </qresource>
     <qresource prefix="/player">
         <file alias="Player.qml">player/qml/Player.qml</file>

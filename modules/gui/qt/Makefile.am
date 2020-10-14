@@ -635,6 +635,7 @@ libqt_plugin_la_QML = \
 	gui/qt/medialibrary/qml/VideoInfoExpandPanel.qml \
 	gui/qt/medialibrary/qml/VideoListDisplay.qml \
 	gui/qt/menus/qml/GlobalShortcuts.qml \
+	gui/qt/menus/qml/GlobalShortcutsMedialib.qml \
 	gui/qt/menus/qml/Menubar.qml \
 	gui/qt/network/qml/DiscoverDisplay.qml \
 	gui/qt/network/qml/DiscoverUrlDisplay.qml \
