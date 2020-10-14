@@ -155,6 +155,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlhelper.cpp \
 	gui/qt/medialibrary/mlhelper.hpp \
 	gui/qt/medialibrary/mlqmltypes.hpp \
+	gui/qt/medialibrary/mlrecentsmodel.cpp \
+	gui/qt/medialibrary/mlrecentsmodel.hpp \
 	gui/qt/medialibrary/mlrecentsvideomodel.cpp \
 	gui/qt/medialibrary/mlrecentsvideomodel.hpp \
 	gui/qt/medialibrary/mlurlmodel.cpp \
@@ -315,6 +317,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlgenre.moc.cpp \
 	gui/qt/medialibrary/mlgenremodel.moc.cpp \
 	gui/qt/medialibrary/mlqmltypes.moc.cpp \
+	gui/qt/medialibrary/mlrecentsmodel.moc.cpp \
 	gui/qt/medialibrary/mlrecentsvideomodel.moc.cpp \
 	gui/qt/medialibrary/mlurlmodel.moc.cpp \
 	gui/qt/medialibrary/mlvideo.moc.cpp \

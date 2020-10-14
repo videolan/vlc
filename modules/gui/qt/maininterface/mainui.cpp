@@ -10,6 +10,7 @@
 #include "medialibrary/mlgenremodel.hpp"
 #include "medialibrary/mlurlmodel.hpp"
 #include "medialibrary/mlvideomodel.hpp"
+#include "medialibrary/mlrecentsmodel.hpp"
 #include "medialibrary/mlrecentsvideomodel.hpp"
 #include "medialibrary/mlfoldersmodel.hpp"
 
@@ -167,6 +168,14 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<MLUrlModel>( "org.videolan.medialib", 0, 1, "MLUrlModel" );
         qmlRegisterType<MLVideoModel>( "org.videolan.medialib", 0, 1, "MLVideoModel" );
         qmlRegisterType<MLRecentsVideoModel>( "org.videolan.medialib", 0, 1, "MLRecentsVideoModel" );
+
+        qRegisterMetaType<NetworkTreeItem>();
+        qmlRegisterType<NetworkMediaModel>( "org.videolan.medialib", 0, 1, "NetworkMediaModel");
+        qmlRegisterType<NetworkDeviceModel>( "org.videolan.medialib", 0, 1, "NetworkDeviceModel");
+        qmlRegisterType<NetworkSourcesModel>( "org.videolan.medialib", 0, 1, "NetworkSourcesModel");
+        qmlRegisterType<ServicesDiscoveryModel>( "org.videolan.medialib", 0, 1, "ServicesDiscoveryModel");
+        qmlRegisterType<MlFoldersModel>( "org.videolan.medialib", 0, 1, "MLFolderModel");
+        qmlRegisterType<MLRecentsModel>( "org.videolan.medialib", 0, 1, "MLRecentModel" );
 
         //expose base object, they aren't instanciable from QML side
         registerAnonymousType<MLAlbum>("org.videolan.medialib", 1);
