@@ -92,10 +92,11 @@ QHash<int, QByteArray> MLRecentsVideoModel::roleNames() const
     };
 }
 
-std::vector<std::unique_ptr<MLVideo> > MLRecentsVideoModel::fetch() const
+std::vector<std::unique_ptr<MLVideo> > MLRecentsVideoModel::fetch(const MLQueryParams &params) const
 {
+    auto queryParams = params.toCQueryParams();
     ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_history(
-                m_ml, &m_query_param ) };
+                m_ml, &queryParams ) };
     if ( media_list == nullptr )
         return {};
     std::vector<std::unique_ptr<MLVideo>> res;
@@ -109,10 +110,13 @@ std::vector<std::unique_ptr<MLVideo> > MLRecentsVideoModel::fetch() const
     return res;
 }
 
-size_t MLRecentsVideoModel::countTotalElements() const
+size_t MLRecentsVideoModel::countTotalElements(const MLQueryParams &params) const
 {
     // FIXME: countTotalElements() may not depend on fetch(), since the call to
     // fetch() depends on countTotalElements()
+
+    (void) params;
+
     if(numberOfItemsToShow == -1){
         return m_video_count;
     }

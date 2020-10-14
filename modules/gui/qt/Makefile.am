@@ -156,6 +156,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlhelper.cpp \
 	gui/qt/medialibrary/mlhelper.hpp \
 	gui/qt/medialibrary/mlqmltypes.hpp \
+	gui/qt/medialibrary/mlqueryparams.cpp \
+	gui/qt/medialibrary/mlqueryparams.hpp \
 	gui/qt/medialibrary/mlrecentsmodel.cpp \
 	gui/qt/medialibrary/mlrecentsmodel.hpp \
 	gui/qt/medialibrary/mlrecentsvideomodel.cpp \

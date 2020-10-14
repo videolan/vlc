@@ -79,10 +79,10 @@ void MLRecentsModel::clearHistory()
     vlc_ml_clear_history(m_ml);
 }
 
-std::vector<std::unique_ptr<MLRecentMedia> > MLRecentsModel::fetch() const
+std::vector<std::unique_ptr<MLRecentMedia> > MLRecentsModel::fetch(const MLQueryParams &params) const
 {
     std::vector<std::unique_ptr<MLRecentMedia>> res;
-    auto queryParams = m_query_param;
+    auto queryParams = params.toCQueryParams();
     if (m_numberOfItemsToShow >= 0)
     {
         if (queryParams.i_offset <= static_cast<uint32_t>(m_numberOfItemsToShow))
@@ -100,9 +100,9 @@ std::vector<std::unique_ptr<MLRecentMedia> > MLRecentsModel::fetch() const
     return res;
 }
 
-size_t MLRecentsModel::countTotalElements() const
+size_t MLRecentsModel::countTotalElements(const MLQueryParams &params) const
 {
-    auto queryParams = m_query_param;
+    auto queryParams = params.toCQueryParams();
     queryParams.i_offset = 0;
     queryParams.i_nbResults = m_numberOfItemsToShow;
     size_t realCount = vlc_ml_count_history( m_ml, &queryParams );

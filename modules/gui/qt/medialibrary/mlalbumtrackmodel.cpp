@@ -93,9 +93,9 @@ QHash<int, QByteArray> MLAlbumTrackModel::roleNames() const
     };
 }
 
-size_t MLAlbumTrackModel::countTotalElements() const
+size_t MLAlbumTrackModel::countTotalElements(const MLQueryParams &params) const
 {
-    auto queryParams = m_query_param;
+    auto queryParams = params.toCQueryParams();
     queryParams.i_offset = 0;
     queryParams.i_nbResults = 0;
     if ( m_parent.id <= 0 )
@@ -103,14 +103,16 @@ size_t MLAlbumTrackModel::countTotalElements() const
     return vlc_ml_count_media_of(m_ml, &queryParams, m_parent.type, m_parent.id );
 }
 
-std::vector<std::unique_ptr<MLAlbumTrack>> MLAlbumTrackModel::fetch() const
+std::vector<std::unique_ptr<MLAlbumTrack>> MLAlbumTrackModel::fetch(const MLQueryParams &params) const
 {
+    auto queryParams = params.toCQueryParams();
+
     ml_unique_ptr<vlc_ml_media_list_t> media_list;
 
     if ( m_parent.id <= 0 )
-        media_list.reset( vlc_ml_list_audio_media(m_ml, &m_query_param) );
+        media_list.reset( vlc_ml_list_audio_media(m_ml, &queryParams) );
     else
-        media_list.reset( vlc_ml_list_media_of(m_ml, &m_query_param, m_parent.type, m_parent.id ) );
+        media_list.reset( vlc_ml_list_media_of(m_ml, &queryParams, m_parent.type, m_parent.id ) );
     if ( media_list == nullptr )
         return {};
     std::vector<std::unique_ptr<MLAlbumTrack>> res;

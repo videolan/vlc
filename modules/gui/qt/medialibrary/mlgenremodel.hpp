@@ -52,8 +52,8 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
 
 private:
-    std::vector<std::unique_ptr<MLGenre>> fetch() const override;
-    size_t countTotalElements() const override;
+    std::vector<std::unique_ptr<MLGenre>> fetch(const MLQueryParams &params) const override;
+    size_t countTotalElements(const MLQueryParams &params) const override;
     void onVlcMlEvent(const MLEvent &event) override;
     void thumbnailUpdated(int idx) override;
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;

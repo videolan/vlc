@@ -32,6 +32,7 @@
 #include "medialib.hpp"
 #include <memory>
 #include "mlevent.hpp"
+#include "mlqueryparams.hpp"
 
 class MediaLib;
 
@@ -110,9 +111,9 @@ protected:
 
     vlc_medialibrary_t* m_ml;
     MediaLib* m_mediaLib;
-    mutable vlc_ml_query_params_t m_query_param;
-    std::unique_ptr<char, void(*)(void*)> m_search_pattern_cstr;
     QString m_search_pattern;
+    vlc_ml_sorting_criteria_t m_sort;
+    bool m_sort_desc;
 
     std::unique_ptr<vlc_ml_event_callback_t,
                     std::function<void(vlc_ml_event_callback_t*)>> m_ml_event_handle;
@@ -136,8 +137,8 @@ public:
         : MLBaseModel(parent)
         , m_initialized(false)
         , m_total_count(0)
+        , m_offset(0)
     {
-        m_query_param.i_nbResults = BatchSize;
     }
 
     int rowCount(const QModelIndex &parent = {}) const override
@@ -147,7 +148,8 @@ public:
 
         if ( m_initialized == false )
         {
-            m_total_count = countTotalElements();
+            MLQueryParams params{ m_search_pattern.toUtf8(), m_sort, m_sort_desc };
+            m_total_count = countTotalElements(params);
             m_initialized = true;
             emit countChanged( static_cast<unsigned int>(m_total_count) );
         }
@@ -157,7 +159,7 @@ public:
 
     void clear() override
     {
-        m_query_param.i_offset = 0;
+        m_offset = 0;
         m_initialized = false;
         m_total_count = 0;
         m_item_list.clear();
@@ -226,19 +228,17 @@ protected:
         if ( idx >= m_total_count )
             return nullptr;
 
-        if ( idx < m_query_param.i_offset ||  idx >= m_query_param.i_offset + m_item_list.size() )
+        if ( idx < m_offset ||  idx >= m_offset + m_item_list.size() )
         {
-            if (m_query_param.i_nbResults == 0)
-                m_query_param.i_offset = 0;
-            else
-                m_query_param.i_offset = idx - idx % m_query_param.i_nbResults;
-            m_item_list = fetch();
+            m_offset = idx - idx % BatchSize;
+            MLQueryParams params{ m_search_pattern.toUtf8(), m_sort, m_sort_desc, m_offset, BatchSize };
+            m_item_list = fetch(params);
         }
 
         //db has changed
-        if ( idx - m_query_param.i_offset >= m_item_list.size() || idx < m_query_param.i_offset )
+        if ( idx >= m_offset + m_item_list.size() || idx < m_offset )
             return nullptr;
-        return m_item_list[idx - m_query_param.i_offset].get();
+        return m_item_list[idx - m_offset].get();
     }
 
     virtual void onVlcMlEvent(const MLEvent &event) override
@@ -248,7 +248,7 @@ protected:
             case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
             {
                 if (event.media_thumbnail_generated.b_success) {
-                    int idx = static_cast<int>(m_query_param.i_offset);
+                    int idx = static_cast<int>(m_offset);
                     for ( const auto& it : m_item_list ) {
                         if (it->getId().id == event.media_thumbnail_generated.i_media_id) {
                             thumbnailUpdated(idx);
@@ -266,13 +266,14 @@ protected:
     }
 
 private:
-    virtual size_t countTotalElements() const = 0;
-    virtual std::vector<std::unique_ptr<T>> fetch() const = 0;
+    virtual size_t countTotalElements(const MLQueryParams &params) const = 0;
+    virtual std::vector<std::unique_ptr<T>> fetch(const MLQueryParams &params) const = 0;
     virtual void thumbnailUpdated( int ) {}
 
     mutable std::vector<std::unique_ptr<T>> m_item_list;
     mutable bool m_initialized;
     mutable size_t m_total_count;
+    mutable size_t m_offset; /* offset of m_item_list in the global list */
 };
 
 #endif // MLBASEMODEL_HPP

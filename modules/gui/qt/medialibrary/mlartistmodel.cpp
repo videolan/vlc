@@ -67,13 +67,15 @@ QHash<int, QByteArray> MLArtistModel::roleNames() const
     };
 }
 
-std::vector<std::unique_ptr<MLArtist>> MLArtistModel::fetch() const
+std::vector<std::unique_ptr<MLArtist>> MLArtistModel::fetch(const MLQueryParams &params) const
 {
+    auto queryParams = params.toCQueryParams();
+
     ml_unique_ptr<vlc_ml_artist_list_t> artist_list;
     if ( m_parent.id <= 0 )
-        artist_list.reset( vlc_ml_list_artists(m_ml, &m_query_param, false) );
+        artist_list.reset( vlc_ml_list_artists(m_ml, &queryParams, false) );
     else
-        artist_list.reset( vlc_ml_list_artist_of(m_ml, &m_query_param, m_parent.type, m_parent.id) );
+        artist_list.reset( vlc_ml_list_artist_of(m_ml, &queryParams, m_parent.type, m_parent.id) );
     if ( artist_list == nullptr )
         return {};
     std::vector<std::unique_ptr<MLArtist>> res;
@@ -82,9 +84,9 @@ std::vector<std::unique_ptr<MLArtist>> MLArtistModel::fetch() const
     return res;
 }
 
-size_t MLArtistModel::countTotalElements() const
+size_t MLArtistModel::countTotalElements(const MLQueryParams &params) const
 {
-    auto queryParams = m_query_param;
+    auto queryParams = params.toCQueryParams();
     queryParams.i_offset = 0;
     queryParams.i_nbResults = 0;
 

@@ -45,8 +45,8 @@ public:
     int numberOfItemsToShow = 10;
 
 private:
-    std::vector<std::unique_ptr<MLVideo>> fetch() const override;
-    size_t countTotalElements() const override;
+    std::vector<std::unique_ptr<MLVideo>> fetch(const MLQueryParams &params) const override;
+    size_t countTotalElements(const MLQueryParams &params) const override;
     vlc_ml_sorting_criteria_t roleToCriteria( int /* role */ ) const override{
         return VLC_ML_SORTING_DEFAULT;
     }

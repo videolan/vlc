@@ -72,19 +72,21 @@ void MLUrlModel::addAndPlay( const QString &url )
     });
 }
 
-size_t MLUrlModel::countTotalElements() const
+size_t MLUrlModel::countTotalElements(const MLQueryParams &params) const
 {
-    auto queryParams = m_query_param;
+    auto queryParams = params.toCQueryParams();
     queryParams.i_offset = 0;
     queryParams.i_nbResults = 0;
     auto s = vlc_ml_count_stream_history( m_ml, &queryParams );
     return s;
 }
 
-std::vector<std::unique_ptr<MLUrl>> MLUrlModel::fetch() const
+std::vector<std::unique_ptr<MLUrl>> MLUrlModel::fetch(const MLQueryParams &params) const
 {
+    auto queryParams = params.toCQueryParams();
+
     ml_unique_ptr<vlc_ml_media_list_t> media_list;
-    media_list.reset( vlc_ml_list_stream_history(m_ml, &m_query_param) );
+    media_list.reset( vlc_ml_list_stream_history(m_ml, &queryParams) );
     if ( media_list == nullptr )
         return {};
 

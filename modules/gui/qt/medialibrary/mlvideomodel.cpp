@@ -92,10 +92,11 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
     };
 }
 
-std::vector<std::unique_ptr<MLVideo> > MLVideoModel::fetch() const
+std::vector<std::unique_ptr<MLVideo> > MLVideoModel::fetch(const MLQueryParams &params) const
 {
+    auto queryParams = params.toCQueryParams();
     ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_video_media(
-                m_ml, &m_query_param ) };
+                m_ml, &queryParams ) };
     if ( media_list == nullptr )
         return {};
     std::vector<std::unique_ptr<MLVideo>> res;
@@ -104,12 +105,12 @@ std::vector<std::unique_ptr<MLVideo> > MLVideoModel::fetch() const
     return res;
 }
 
-size_t MLVideoModel::countTotalElements() const
+size_t MLVideoModel::countTotalElements(const MLQueryParams &params) const
 {
-    vlc_ml_query_params_t params = m_query_param;
-    params.i_offset = 0;
-    params.i_nbResults = 0;
-    return vlc_ml_count_video_media(m_ml, &params);
+    auto queryParams = params.toCQueryParams();
+    queryParams.i_offset = 0;
+    queryParams.i_nbResults = 0;
+    return vlc_ml_count_video_media(m_ml, &queryParams);
 }
 
 vlc_ml_sorting_criteria_t MLVideoModel::roleToCriteria(int role) const

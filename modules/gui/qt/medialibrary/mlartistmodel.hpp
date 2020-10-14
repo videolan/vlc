@@ -49,8 +49,8 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 private:
-    std::vector<std::unique_ptr<MLArtist>> fetch() const override;
-    size_t countTotalElements() const override;
+    std::vector<std::unique_ptr<MLArtist>> fetch(const MLQueryParams &params) const override;
+    size_t countTotalElements(const MLQueryParams &params) const override;
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
     QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;

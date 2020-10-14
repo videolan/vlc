@@ -24,17 +24,14 @@
 MLBaseModel::MLBaseModel(QObject *parent)
     : QAbstractListModel(parent)
     , m_ml(nullptr)
-    , m_search_pattern_cstr( nullptr, &free )
     , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
             assert( m_ml != nullptr );
             vlc_ml_event_unregister_callback( m_ml, cb );
         })
     , m_need_reset( false )
 {
-    memset(&m_query_param, 0, sizeof(vlc_ml_query_params_t));
-    m_query_param.b_desc = false;
-    m_query_param.i_nbResults = 20; //FIXME: value for test
-    m_query_param.i_sort = VLC_ML_SORTING_DEFAULT;
+    m_sort = VLC_ML_SORTING_DEFAULT;
+    m_sort_desc = false;
 
     connect( this, &MLBaseModel::resetRequested, this, &MLBaseModel::onResetRequested );
 }
@@ -46,8 +43,8 @@ MLBaseModel::~MLBaseModel()
 void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)
 {
     beginResetModel();
-    m_query_param.b_desc = (order == Qt::SortOrder::DescendingOrder);
-    m_query_param.i_sort = nameToCriteria(name);
+    m_sort_desc = (order == Qt::SortOrder::DescendingOrder);
+    m_sort = nameToCriteria(name);
     clear();
     endResetModel();
 }
@@ -143,26 +140,26 @@ const QString& MLBaseModel::searchPattern() const
 
 void MLBaseModel::setSearchPattern( const QString& pattern )
 {
+    QString patternToApply = pattern.length() < 3 ? nullptr : pattern;
+    if (patternToApply == m_search_pattern)
+        /* No changes */
+        return;
+
     beginResetModel();
-    if ( pattern.length() >= 3 )
-        m_search_pattern_cstr = vlc::wrap_cptr( strdup( qtu( pattern ) ) );
-    else
-        m_search_pattern_cstr.reset();
-    m_search_pattern = pattern;
-    m_query_param.psz_pattern = m_search_pattern_cstr.get();
+    m_search_pattern = patternToApply;
     clear();
     endResetModel();
 }
 
 Qt::SortOrder MLBaseModel::getSortOrder() const
 {
-    return m_query_param.b_desc ? Qt::SortOrder::DescendingOrder : Qt::SortOrder::AscendingOrder;
+    return m_sort_desc ? Qt::SortOrder::DescendingOrder : Qt::SortOrder::AscendingOrder;
 }
 
 void MLBaseModel::setSortOder(Qt::SortOrder order)
 {
     beginResetModel();
-    m_query_param.b_desc = (order == Qt::SortOrder::DescendingOrder);
+    m_sort_desc = (order == Qt::SortOrder::DescendingOrder);
     clear();
     endResetModel();
     emit sortOrderChanged();
@@ -170,13 +167,13 @@ void MLBaseModel::setSortOder(Qt::SortOrder order)
 
 const QString MLBaseModel::getSortCriteria() const
 {
-    return criteriaToName(m_query_param.i_sort);
+    return criteriaToName(m_sort);
 }
 
 void MLBaseModel::setSortCriteria(const QString& criteria)
 {
     beginResetModel();
-    m_query_param.i_sort = nameToCriteria(criteria.toUtf8());
+    m_sort = nameToCriteria(criteria.toUtf8());
     clear();
     endResetModel();
     emit sortCriteriaChanged();
@@ -185,7 +182,7 @@ void MLBaseModel::setSortCriteria(const QString& criteria)
 void MLBaseModel::unsetSortCriteria()
 {
     beginResetModel();
-    m_query_param.i_sort = VLC_ML_SORTING_DEFAULT;
+    m_sort = VLC_ML_SORTING_DEFAULT;
     clear();
     endResetModel();
     emit sortCriteriaChanged();

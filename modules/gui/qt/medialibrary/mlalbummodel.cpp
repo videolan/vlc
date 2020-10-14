@@ -88,13 +88,15 @@ QHash<int, QByteArray> MLAlbumModel::roleNames() const
     };
 }
 
-std::vector<std::unique_ptr<MLAlbum>> MLAlbumModel::fetch() const
+std::vector<std::unique_ptr<MLAlbum>> MLAlbumModel::fetch(const MLQueryParams &params) const
 {
+    auto queryParams = params.toCQueryParams();
+
     ml_unique_ptr<vlc_ml_album_list_t> album_list;
     if ( m_parent.id <= 0 )
-        album_list.reset( vlc_ml_list_albums(m_ml, &m_query_param ) );
+        album_list.reset( vlc_ml_list_albums(m_ml, &queryParams) );
     else
-        album_list.reset( vlc_ml_list_albums_of(m_ml, &m_query_param, m_parent.type, m_parent.id ) );
+        album_list.reset( vlc_ml_list_albums_of(m_ml, &queryParams, m_parent.type, m_parent.id ) );
     if ( album_list == nullptr )
         return {};
     std::vector<std::unique_ptr<MLAlbum>> res;
@@ -161,9 +163,9 @@ vlc_ml_sorting_criteria_t MLAlbumModel::roleToCriteria(int role) const
     }
 }
 
-size_t MLAlbumModel::countTotalElements() const
+size_t MLAlbumModel::countTotalElements(const MLQueryParams &params) const
 {
-    auto queryParams = m_query_param;
+    vlc_ml_query_params_t queryParams = params.toCQueryParams();
     queryParams.i_offset = 0;
     queryParams.i_nbResults = 0;
     if ( m_parent.id <= 0 )
