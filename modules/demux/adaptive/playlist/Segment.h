@@ -102,13 +102,13 @@ namespace adaptive
                 virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *); /* impl */
                 virtual void setSourceUrl( const std::string &url );
                 virtual Url getUrlSegment() const; /* impl */
-                virtual std::vector<ISegment*> & subSegments();
+                virtual const std::vector<Segment*> & subSegments() const;
                 virtual void debug(vlc_object_t *,int = 0) const;
                 virtual void addSubSegment(SubSegment *);
                 static const int CLASSID_SEGMENT = 1;
 
             protected:
-                std::vector<ISegment *> subsegments;
+                std::vector<Segment *> subsegments;
                 Url sourceUrl;
                 int size;
         };
@@ -127,10 +127,10 @@ namespace adaptive
                 static const int CLASSID_INDEXSEGMENT = 3;
         };
 
-        class SubSegment : public ISegment
+        class SubSegment : public Segment
         {
             public:
-                SubSegment(ISegment *, size_t start, size_t end);
+                SubSegment(Segment *, size_t start, size_t end);
                 virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *); /* impl */
                 virtual Url getUrlSegment() const; /* impl */
                 static const int CLASSID_SUBSEGMENT = 4;

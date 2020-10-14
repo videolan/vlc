@@ -35,8 +35,8 @@ namespace adaptive
     {
         /* SegmentBase can contain only one segment */
         class SegmentBase : public Segment,
-                            public Initializable<Segment>,
-                            public Indexable<Segment>
+                            public Initializable<InitSegment>,
+                            public Indexable<IndexSegment>
         {
             public:
                 SegmentBase             (ICanonicalUrl *);

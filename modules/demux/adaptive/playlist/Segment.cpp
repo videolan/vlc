@@ -213,7 +213,7 @@ void Segment::addSubSegment(SubSegment *subsegment)
 
 Segment::~Segment()
 {
-    std::vector<ISegment*>::iterator it;
+    std::vector<Segment*>::iterator it;
     for(it=subsegments.begin();it!=subsegments.end();++it)
         delete *it;
 }
@@ -235,7 +235,7 @@ void Segment::debug(vlc_object_t *obj, int indent) const
         std::string text(indent, ' ');
         text.append("Segment");
         msg_Dbg(obj, "%s", text.c_str());
-        std::vector<ISegment *>::const_iterator l;
+        std::vector<Segment *>::const_iterator l;
         for(l = subsegments.begin(); l != subsegments.end(); ++l)
             (*l)->debug(obj, indent + 1);
     }
@@ -256,7 +256,7 @@ Url Segment::getUrlSegment() const
     }
 }
 
-std::vector<ISegment*> & Segment::subSegments()
+const std::vector<Segment*> & Segment::subSegments() const
 {
     return subsegments;
 }
@@ -275,8 +275,8 @@ IndexSegment::IndexSegment(ICanonicalUrl *parent) :
     classId = CLASSID_INDEXSEGMENT;
 }
 
-SubSegment::SubSegment(ISegment *main, size_t start, size_t end) :
-    ISegment(main)
+SubSegment::SubSegment(Segment *main, size_t start, size_t end) :
+    Segment(main)
 {
     setByteRange(start, end);
     debugName = "SubSegment";

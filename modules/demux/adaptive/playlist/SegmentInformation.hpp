@@ -64,16 +64,11 @@ namespace adaptive
                 };
                 void SplitUsingIndex(std::vector<SplitPoint>&);
 
-                enum SegmentInfoType
-                {
-                    INFOTYPE_INIT = 0,
-                    INFOTYPE_MEDIA,
-                    INFOTYPE_INDEX
-                };
-                static const int InfoTypeCount = INFOTYPE_INDEX + 1;
+                virtual InitSegment * getInitSegment() const;
+                virtual IndexSegment *getIndexSegment() const;
+                virtual Segment *     getMediaSegment(uint64_t = 0) const;
+                virtual Segment *     getNextMediaSegment(uint64_t, uint64_t *, bool *) const;
 
-                ISegment * getSegment(SegmentInfoType, uint64_t = 0) const;
-                ISegment * getNextSegment(SegmentInfoType, uint64_t, uint64_t *, bool *) const;
                 virtual void updateWith(SegmentInformation *);
                 virtual void mergeWithTimeline(SegmentTimeline *); /* ! don't use with global merge */
                 virtual void pruneBySegmentNumber(uint64_t);
@@ -82,8 +77,7 @@ namespace adaptive
                 const CommonEncryption & intheritEncryption() const;
 
             protected:
-                std::size_t getAllSegments(std::vector<ISegment *> &) const;
-                virtual std::size_t getSegments(SegmentInfoType, std::vector<ISegment *>&) const;
+                std::size_t getMediaSegments(std::vector<Segment *>&) const;
                 std::vector<SegmentInformation *> childs;
                 SegmentInformation * getChildByID( const ID & );
                 SegmentInformation *parent;
