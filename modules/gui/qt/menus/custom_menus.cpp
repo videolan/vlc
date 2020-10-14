@@ -278,7 +278,7 @@ void CheckableListMenu::onModelAboutToBeReset()
     for (QAction* action  :actions())
     {
         if (m_actionGroup)
-            m_actionGroup->addAction(action);
+            m_actionGroup->removeAction(action);
         delete action;
     }
     setEnabled(false);
