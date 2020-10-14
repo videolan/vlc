@@ -25,6 +25,7 @@
 
 #include <QMenu>
 #include <QAbstractListModel>
+#include "medialibrary/mlrecentsmodel.hpp"
 
 class RendererAction : public QAction
 {
@@ -122,5 +123,25 @@ private:
     QObject* m_model;
     QString m_propertyName;
 };
+
+class RecentMenu : public QMenu
+{
+    Q_OBJECT
+public:
+    RecentMenu(MLRecentsModel* model, MediaLib* ml, QWidget *parent = nullptr);
+
+private slots:
+    void onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
+    void onRowInserted(const QModelIndex &parent, int first, int last);
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
+    void onModelAboutToBeReset();
+    void onModelReset();
+
+private:
+    MLRecentsModel* m_model = nullptr;
+    QAction* m_separator = nullptr;
+    MediaLib* m_ml = nullptr;
+};
+
 
 #endif // CUSTOM_MENUS_HPP

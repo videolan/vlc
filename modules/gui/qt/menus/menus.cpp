@@ -45,6 +45,7 @@
 #include "dialogs/extended/extended_panels.hpp"
 #include "util/varchoicemodel.hpp"
 #include "medialibrary/medialib.hpp"
+#include "medialibrary/mlrecentsmodel.hpp"
 
 
 #include <QMenu>
@@ -219,6 +220,17 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QMenu *menu, MainInterface *
 
     addDPStaticEntry( menu, qtr( "Open &Location from clipboard" ),
                       NULL, &DialogsProvider::openUrlDialog, "Ctrl+V" );
+
+    if( var_InheritBool( p_intf, "qt-recentplay" ) && mi->hasMediaLibrary() )
+    {
+        MLRecentsModel* recentModel = new MLRecentsModel(nullptr);
+        recentModel->setMl(mi->getMediaLibrary());
+        recentModel->setNumberOfItemsToShow(10);
+        QMenu* recentsMenu = new RecentMenu(recentModel, mi->getMediaLibrary(), menu);
+        recentsMenu->setTitle(qtr( "Open &Recent Media" ) );
+        recentModel->setParent(recentsMenu);
+        menu->addMenu( recentsMenu );
+    }
 
     menu->addSeparator();
 
