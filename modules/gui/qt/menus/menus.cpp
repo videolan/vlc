@@ -41,7 +41,6 @@
 #include "dialogs/dialogs_provider.hpp"                   /* Dialogs display */
 #include "player/player_controller.hpp"                      /* Input Management */
 #include "playlist/playlist_controller.hpp"
-#include "util/recents.hpp"                            /* Recent Items */
 #include "dialogs/extensions/extensions_manager.hpp"                 /* Extensions menu */
 #include "dialogs/extended/extended_panels.hpp"
 #include "util/varchoicemodel.hpp"
@@ -67,7 +66,6 @@ using namespace vlc::playlist;
 
   */
 
-QMenu *VLCMenuBar::recentsMenu = NULL;
 RendererMenu *VLCMenuBar::rendererMenu = NULL;
 
 /**
@@ -222,14 +220,6 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QMenu *menu, MainInterface *
     addDPStaticEntry( menu, qtr( "Open &Location from clipboard" ),
                       NULL, &DialogsProvider::openUrlDialog, "Ctrl+V" );
 
-    if( !recentsMenu && var_InheritBool( p_intf, "qt-recentplay" ) )
-        recentsMenu = new QMenu( qtr( "Open &Recent Media" ) );
-
-    if( recentsMenu )
-    {
-        updateRecents( p_intf );
-        menu->addMenu( recentsMenu );
-    }
     menu->addSeparator();
 
     addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", &DialogsProvider::savePlayingToPlaylist,
@@ -997,53 +987,4 @@ void VLCMenuBar::updateAudioDevice( intf_thread_t * p_intf, QMenu *current )
     free( ids );
     free( names );
     free( selected );
-}
-
-void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
-{
-    if( recentsMenu )
-    {
-        QAction* action;
-        RecentsMRL* rmrl = RecentsMRL::getInstance( p_intf );
-        QStringList l = rmrl->recentList();
-
-        recentsMenu->clear();
-
-        if( !l.count() )
-        {
-            recentsMenu->setEnabled( false );
-        }
-        else
-        {
-            for( int i = 0; i < __MIN( l.count(), 10) ; ++i )
-            {
-                QString mrl = l.at( i );
-                char *psz = vlc_uri_decode_duplicate( qtu( mrl ) );
-                QString text = qfu( psz );
-
-                text.replace("&", "&&");
-#ifdef _WIN32
-# define FILE_SCHEME "file:///"
-#else
-# define FILE_SCHEME "file://"
-#endif
-                if ( text.startsWith( FILE_SCHEME ) )
-                    text.remove( 0, strlen( FILE_SCHEME ) );
-#undef FILE_SCHEME
-
-                free( psz );
-                action = recentsMenu->addAction(
-                        QString( i < 9 ? "&%1: ": "%1: " ).arg( i + 1 ) +
-                            QApplication::fontMetrics().elidedText( text,
-                                                          Qt::ElideLeft, 400 ),
-                        rmrl->signalMapper, SLOT( map() ),
-                        i < 9 ? QString( "Ctrl+%1" ).arg( i + 1 ) : "" );
-                rmrl->signalMapper->setMapping( action, l.at( i ) );
-            }
-
-            recentsMenu->addSeparator();
-            recentsMenu->addAction( qtr("&Clear"), rmrl, &RecentsMRL::clear );
-            recentsMenu->setEnabled( true );
-        }
-    }
 }

@@ -58,7 +58,6 @@ extern "C" char **environ;
 #include "dialogs/extensions/extensions_manager.hpp" /* Extensions manager */
 #include "dialogs/plugins/addons_manager.hpp" /* Addons manager */
 #include "dialogs/help/help.hpp"     /* Launch Update */
-#include "util/recents.hpp"          /* Recents Item destruction */
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 #include "maininterface/compositor.hpp"
 
@@ -801,9 +800,6 @@ static void *ThreadCleanup( intf_thread_t *p_intf, bool error )
        Settings must be destroyed after that.
      */
     DialogsProvider::killInstance();
-
-    /* Delete the recentsMRL object before the configuration */
-    RecentsMRL::killInstance();
 
     /* Save the path or delete if recent play are disabled */
     if( var_InheritBool( p_intf, "qt-recentplay" ) )

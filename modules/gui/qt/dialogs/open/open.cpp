@@ -26,8 +26,8 @@
 
 #include "dialogs/open/open.hpp"
 #include "dialogs/dialogs_provider.hpp"
-#include "util/recents.hpp"
 #include "util/qt_dirs.hpp"
+#include "playlist/playlist_controller.hpp"
 
 #include <QTabWidget>
 #include <QRegExp>
@@ -371,16 +371,13 @@ void OpenDialog::enqueue( bool b_enqueue )
     itemsMRL.sort();
 
     /* Go through the item list */
-    for( int i = 0; i < itemsMRL.count(); i++ )
-    {
-        bool b_start = !i && !b_enqueue;
-
-        /* Take options from the UI, not from what we stored */
-        QStringList optionsList = getOptions().split( " :" );
-
-        /* Switch between enqueuing and starting the item */
-        Open::openMRLwithOptions( p_intf, itemsMRL[i], &optionsList, b_start );
-    }
+    QVector<vlc::playlist::Media> medias;
+    /* Take options from the UI, not from what we stored */
+    QStringList optionsList = getOptions().split( " :" );
+    for( const QString& mrl : itemsMRL)
+        medias.push_back( vlc::playlist::Media{mrl, nullptr, &optionsList} );
+    if (!medias.empty())
+        THEMPL->append(medias, !b_enqueue);
 }
 
 void OpenDialog::transcode()

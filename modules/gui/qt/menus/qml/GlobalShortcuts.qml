@@ -44,16 +44,5 @@ Item {
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"Ctrl+L"; onActivated: mainInterface.playlistVisible = !mainInterface.playlistVisible; }
     Shortcut{ context: Qt.ApplicationShortcut; sequence:"F11"; onActivated: mainInterface.toggleInterfaceFullScreen(); }
 
-    Repeater {
-        model: recentsMedias
-
-        Item {
-            Shortcut {
-                sequence: "Ctrl+" + (index + 1)
-                onActivated:  mainPlaylistController.append([mrl], true)
-                context: Qt.ApplicationShortcut
-            }
-        }
-    }
 
 }

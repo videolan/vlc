@@ -35,7 +35,6 @@
 #include "widgets/native/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
 #include "util/imagehelper.hpp"
-#include "util/recents.hpp"
 #include "util/color_scheme_model.hpp"
 
 #include "widgets/native/interface_widgets.hpp"     // bgWidget, videoWidget
@@ -599,8 +598,8 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
         }
     }
 
-    bool first = b_play;
-    foreach( const QUrl &url, mimeData->urls() )
+    QVector<vlc::playlist::Media> medias;
+    for( const QUrl &url: mimeData->urls() )
     {
         if( url.isValid() )
         {
@@ -623,10 +622,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
             }
 #endif
             if( mrl.length() > 0 )
-            {
-                Open::openMRL( p_intf, mrl, first );
-                first = false;
-            }
+                medias.push_back( vlc::playlist::Media{ mrl, nullptr, nullptr });
         }
     }
 
@@ -637,8 +633,10 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
         QUrl(mimeData->text()).isValid() )
     {
         QString mrl = toURI( mimeData->text() );
-        Open::openMRL( p_intf, mrl, first );
+        medias.push_back( vlc::playlist::Media{ mrl, nullptr, nullptr });
     }
+    if (!medias.empty())
+        THEMPL->append(medias, b_play);
     event->accept();
 }
 void MainInterface::dragEnterEvent(QDragEnterEvent *event)

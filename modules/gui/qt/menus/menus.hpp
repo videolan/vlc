@@ -57,7 +57,6 @@ public:
 
     /* destructor for parentless Menus (kept in static variables) */
     static void freeRendererMenu(){ delete rendererMenu; rendererMenu = NULL; }
-    static void freeRecentsMenu(){ delete recentsMenu; recentsMenu = NULL; }
 
 protected:
     /* All main Menus */
@@ -107,14 +106,9 @@ protected:
     static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf, bool b = true );
 
     /* recentMRL menu */
-    static QMenu *recentsMenu;
-
     static RendererMenu *rendererMenu;
 
     static void updateAudioDevice(intf_thread_t *, QMenu* );
-
-public slots:
-    static void updateRecents( intf_thread_t * );
 };
 
 #endif

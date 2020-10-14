@@ -32,7 +32,6 @@
 #include "player/player_controller.hpp" /* Load Subtitles */
 #include "playlist/playlist_controller.hpp"
 #include "menus/menus.hpp"
-#include "util/recents.hpp"
 #include "util/qt_dirs.hpp"
 #include "widgets/native/customwidgets.hpp" /* VLCKeyToString() */
 #include "maininterface/main_interface.hpp"
@@ -98,7 +97,6 @@ DialogsProvider::~DialogsProvider()
     delete miscPopupMenu;
 
     /* free parentless menus  */
-    VLCMenuBar::freeRecentsMenu();
     VLCMenuBar::freeRendererMenu();
 }
 
@@ -504,13 +502,12 @@ void DialogsProvider::simpleOpenDialog(bool start)
 {
     QStringList urls = DialogsProvider::showSimpleOpen();
 
-    bool first = start;
     urls.sort();
-    foreach( const QString &url, urls )
-    {
-        Open::openMRL( p_intf, url, first );
-        first = false;
-    }
+    QVector<vlc::playlist::Media> medias;
+    for( const QString& mrl : urls)
+        medias.push_back( vlc::playlist::Media{mrl, nullptr, nullptr} );
+    if (!medias.empty())
+        THEMPL->append(medias, start);
 }
 
 /* Url & Clipboard */
@@ -536,8 +533,8 @@ void DialogsProvider::openUrlDialog()
         url = qfu(uri);
         free( uri );
     }
-
-    Open::openMRL( p_intf, qtu(url), !oud.shouldEnqueue() );
+    QVector<vlc::playlist::Media> medias = { {url, nullptr, nullptr} };
+    THEMPL->append(medias, !oud.shouldEnqueue());
 }
 
 /* Directory */
@@ -550,7 +547,10 @@ static void openDirectory( intf_thread_t *p_intf, bool go )
 {
     QString uri = DialogsProvider::getDirectoryDialog( p_intf );
     if( !uri.isEmpty() )
-        Open::openMRL( p_intf, uri, go );
+    {
+        QVector<vlc::playlist::Media> medias = { {uri, nullptr, nullptr} };
+        THEMPL->append(medias, go);
+    }
 }
 
 QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )

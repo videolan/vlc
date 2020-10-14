@@ -18,7 +18,6 @@
 
 #include "medialib.hpp"
 #include "mlhelper.hpp"
-#include "util/recents.hpp"
 
 #include <vlc_playlist.h>
 #include <vlc_input_item.h>
@@ -36,18 +35,6 @@ MediaLib::MediaLib(intf_thread_t *_intf, QObject *_parent)
 {
     m_event_cb.reset( vlc_ml_event_register_callback( m_ml, MediaLib::onMediaLibraryEvent,
                                                       this ) );
-}
-
-void MediaLib::openMRLFromMedia(const vlc_ml_media_t& media, bool start )
-{
-    if (!media.p_files)
-        return;
-    for ( const vlc_ml_file_t& mediafile: ml_range_iterate<vlc_ml_file_t>(media.p_files) )
-    {
-        if (mediafile.psz_mrl)
-            Open::openMRL(m_intf, mediafile.psz_mrl, start);
-        start = false;
-    }
 }
 
 void MediaLib::addToPlaylist(const QString& mrl, const QStringList* options)

@@ -204,9 +204,6 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/qmleventfilter.hpp \
 	gui/qt/util/qt_dirs.cpp gui/qt/util/qt_dirs.hpp \
 	gui/qt/util/qvlcapp.hpp \
-	gui/qt/util/recent_media_model.cpp  \
-	gui/qt/util/recent_media_model.hpp \
-	gui/qt/util/recents.cpp gui/qt/util/recents.hpp \
 	gui/qt/util/registry.cpp gui/qt/util/registry.hpp \
 	gui/qt/util/renderer_manager.cpp gui/qt/util/renderer_manager.hpp \
 	gui/qt/util/selectable_list_model.cpp \
@@ -343,8 +340,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/util/qml_main_context.moc.cpp \
 	gui/qt/util/qmleventfilter.moc.cpp \
 	gui/qt/util/qvlcapp.moc.cpp \
-	gui/qt/util/recent_media_model.moc.cpp \
-	gui/qt/util/recents.moc.cpp \
 	gui/qt/util/renderer_manager.moc.cpp \
 	gui/qt/util/selectable_list_model.moc.cpp \
 	gui/qt/util/sortfilterproxymodel.moc.cpp \

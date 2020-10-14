@@ -22,7 +22,6 @@
 
 #include "player_controller.hpp"
 #include "player_controller_p.hpp"
-#include "util/recents.hpp"
 
 #include <vlc_actions.h>           /* ACTION_ID */
 #include <vlc_url.h>            /* vlc_uri_decode */
@@ -266,8 +265,6 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
         that->UpdateName( newMediaPtr.get() );
         that->UpdateArt( newMediaPtr.get() );
         that->UpdateMeta( newMediaPtr.get() );
-
-        RecentsMRL::getInstance( that->p_intf )->addRecent( newMediaPtr.get()->psz_uri );
 
         {
             vlc_player_locker lock{ that->m_player };

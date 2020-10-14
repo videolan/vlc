@@ -23,7 +23,6 @@
 #include "util/qmleventfilter.hpp"
 #include "util/i18n.hpp"
 #include "util/systempalette.hpp"
-#include "util/recent_media_model.hpp"
 #include "util/sortfilterproxymodel.hpp"
 #include "util/navigation_history.hpp"
 
@@ -97,7 +96,6 @@ bool MainUI::setup(QQmlEngine* engine)
     rootCtx->setContextProperty( "mainInterface", m_mainInterface);
     rootCtx->setContextProperty( "topWindow", m_interfaceWindow);
     rootCtx->setContextProperty( "dialogProvider", DialogsProvider::getInstance());
-    rootCtx->setContextProperty( "recentsMedias",  new VLCRecentMediaModel( m_intf, this ));
     rootCtx->setContextProperty( "systemPalette", new SystemPalette(this));
 
     if (m_mainInterface->hasMediaLibrary())

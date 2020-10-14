@@ -774,8 +774,6 @@ modules/gui/qt/menus/menus.cpp
 modules/gui/qt/menus/menus.hpp
 modules/gui/qt/qt.cpp
 modules/gui/qt/qt.hpp
-modules/gui/qt/util/recents.cpp
-modules/gui/qt/util/recents.hpp
 modules/gui/qt/widgets/native/animators.cpp
 modules/gui/qt/widgets/native/animators.hpp
 modules/gui/qt/widgets/native/customwidgets.cpp
