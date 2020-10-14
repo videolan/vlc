@@ -107,13 +107,8 @@ std::size_t SegmentInformation::getSegments(SegmentInfoType type, std::vector<IS
             }
             else if ( segmentList && !segmentList->getSegments().empty() )
             {
-                std::vector<ISegment *>::const_iterator it;
-                for(it=segmentList->getSegments().begin();
-                    it!=segmentList->getSegments().end(); ++it)
-                {
-                    std::vector<ISegment *> list = (*it)->subSegments();
-                    retSegments.insert( retSegments.end(), list.begin(), list.end() );
-                }
+                std::vector<ISegment *> list = segmentList->getSegments();
+                retSegments.insert( retSegments.end(), list.begin(), list.end() );
             }
             else if( segmentBase )
             {
@@ -401,7 +396,7 @@ static void insertIntoSegment(std::vector<ISegment *> &seglist, size_t start,
             SubSegment *subsegment = new SubSegment(segment, start, (end != 0) ? end : 0);
             subsegment->startTime.Set(time);
             subsegment->duration.Set(duration);
-            segment->addSubSegment(subsegment);
+            static_cast<Segment *>(segment)->addSubSegment(subsegment);
             break;
         }
     }
@@ -409,8 +404,13 @@ static void insertIntoSegment(std::vector<ISegment *> &seglist, size_t start,
 
 void SegmentInformation::SplitUsingIndex(std::vector<SplitPoint> &splitlist)
 {
+    SegmentBase *segmentBase = inheritSegmentBase();
+    if(!segmentBase)
+        return;
+
     std::vector<ISegment *> seglist;
-    getSegments(INFOTYPE_MEDIA, seglist);
+    seglist.push_back( segmentBase );
+
     size_t prevstart = 0;
     stime_t prevtime = 0;
 
