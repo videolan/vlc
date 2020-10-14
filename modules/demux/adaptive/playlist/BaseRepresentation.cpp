@@ -92,6 +92,12 @@ bool BaseRepresentation::needsUpdate(uint64_t) const
     return false;
 }
 
+bool BaseRepresentation::needsIndex() const
+{
+    SegmentBase *base = inheritSegmentBase();
+    return base && base->subSegments().empty();
+}
+
 bool BaseRepresentation::runLocalUpdates(SharedResources *)
 {
     return false;
