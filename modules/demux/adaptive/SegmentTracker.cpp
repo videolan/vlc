@@ -305,9 +305,12 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     if(!current.index_sent)
     {
         ++next;
-        segment = current.rep->getSegment(BaseRepresentation::INFOTYPE_INDEX);
-        if(segment)
-            return segment->toChunk(resources, connManager, current.number, current.rep);
+        if(current.rep->needsIndex())
+        {
+            segment = current.rep->getSegment(BaseRepresentation::INFOTYPE_INDEX);
+            if(segment)
+                return segment->toChunk(resources, connManager, current.number, current.rep);
+        }
         current = next;
     }
 

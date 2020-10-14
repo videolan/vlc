@@ -66,6 +66,7 @@ namespace adaptive
 
                 virtual mtime_t     getMinAheadTime         (uint64_t) const;
                 virtual bool        needsUpdate             (uint64_t) const;
+                virtual bool        needsIndex              () const;
                 virtual bool        runLocalUpdates         (SharedResources *);
                 virtual void        scheduleNextUpdate      (uint64_t, bool);
 
