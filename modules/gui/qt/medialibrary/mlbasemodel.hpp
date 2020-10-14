@@ -144,7 +144,7 @@ public:
         m_query_param.i_nbResults = BatchSize;
     }
 
-    int rowCount(const QModelIndex &parent) const override
+    int rowCount(const QModelIndex &parent = {}) const override
     {
         bool countHasChanged = false;
         if (parent.isValid())

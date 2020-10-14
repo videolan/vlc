@@ -116,7 +116,7 @@ public:
 
     QVariant data(const QModelIndex& index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
-    int rowCount(const QModelIndex& parent) const override;
+    int rowCount(const QModelIndex& parent = {}) const override;
 
     Qt::ItemFlags flags( const QModelIndex& idx ) const override;
     bool setData( const QModelIndex& idx,const QVariant& value, int role ) override;
