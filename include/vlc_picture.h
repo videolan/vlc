@@ -206,6 +206,14 @@ static inline bool vlc_picture_chain_IsEmpty(const vlc_picture_chain_t *chain)
 }
 
 /**
+ * Check whether a picture chain has more than one picture.
+ */
+static inline bool vlc_picture_chain_HasNext(const vlc_picture_chain_t *chain)
+{
+    return !vlc_picture_chain_IsEmpty(chain) && chain->front != chain->tail;
+}
+
+/**
  * Pop the front of a picture chain.
  *
  * The next picture in the chain becomes the front of the picture chain.
