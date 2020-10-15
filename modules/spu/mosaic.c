@@ -536,7 +536,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
             if ( front->date + p_sys->i_delay >= date )
                 break; // front picture not late
 
-            if ( picture_HasChainedPics( front ) )
+            if ( vlc_picture_chain_HasNext( &p_es->pictures ) )
             {
                 // front picture is late and has more pictures chained, skip it
                 front = vlc_picture_chain_PopFront( &p_es->pictures );
