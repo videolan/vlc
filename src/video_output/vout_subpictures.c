@@ -1002,6 +1002,7 @@ static void SpuRenderRegion(spu_t *spu,
                 scale_yuvp->fmt_out.video.i_chroma = chroma_list[0];
 
                 picture = scale_yuvp->ops->filter_video(scale_yuvp, picture);
+                assert(picture == NULL || !picture_HasChainedPics(picture)); // no chaining
                 if (!picture) {
                     /* Well we will try conversion+scaling */
                     msg_Warn(spu, "%4.4s to %4.4s conversion failed",
@@ -1033,6 +1034,7 @@ static void SpuRenderRegion(spu_t *spu,
                     spu_scale_h(region->fmt.i_visible_height, scale_size);
 
                 picture = scale->ops->filter_video(scale, picture);
+                assert(picture == NULL || !picture_HasChainedPics(picture)); // no chaining
                 if (!picture)
                     msg_Err(spu, "scaling failed");
             }

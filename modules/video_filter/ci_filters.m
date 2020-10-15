@@ -380,6 +380,7 @@ Filter(filter_t *filter, picture_t *src)
         src = ctx->src_converter->ops->filter_video(ctx->src_converter, src);
         if (!src)
             return NULL;
+        assert(!picture_HasChainedPics(src)); // no chaining
     }
 
     @autoreleasepool {
@@ -420,6 +421,7 @@ Filter(filter_t *filter, picture_t *src)
         dst = ctx->dst_converter->ops->filter_video(ctx->dst_converter, dst);
         if (!dst)
             return NULL;
+        assert(!picture_HasChainedPics(dst)); // no chaining
     }
 
     p_sys->mouse_moved = false;

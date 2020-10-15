@@ -271,6 +271,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         }
 
         p_pic = p_image->p_converter->ops->filter_video( p_image->p_converter, p_pic );
+        assert(p_pic == NULL || !picture_HasChainedPics(p_pic)); // no chaining
     }
     else
     {
@@ -438,6 +439,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 
         if( likely(p_tmp_pic != NULL) )
         {
+            assert(!picture_HasChainedPics(p_tmp_pic)); // no chaining
             p_block = p_image->p_enc->pf_encode_video( p_image->p_enc,
                                                        p_tmp_pic );
             picture_Release( p_tmp_pic );
@@ -569,7 +571,9 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
 
     picture_Hold( p_pic );
 
-    return p_image->p_converter->ops->filter_video( p_image->p_converter, p_pic );
+    p_pic = p_image->p_converter->ops->filter_video( p_image->p_converter, p_pic );
+    assert(p_pic == NULL || !picture_HasChainedPics(p_pic)); // no chaining
+    return p_pic;
 }
 
 /**
