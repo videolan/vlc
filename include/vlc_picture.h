@@ -168,6 +168,14 @@ static inline vlc_video_context* picture_GetVideoContext(picture_t *pic)
 }
 
 /**
+ * Check whether a picture has other pictures linked
+ */
+static inline bool picture_HasChainedPics(const picture_t *pic)
+{
+    return pic->p_next != NULL;
+}
+
+/**
  * picture chaining helpers
  */
 
@@ -244,6 +252,8 @@ static inline void vlc_picture_chain_Append(vlc_picture_chain_t *chain,
         chain->front = pic;
     else
         chain->tail->p_next = pic;
+    // make sure the picture doesn't have chained pics
+    vlc_assert( !picture_HasChainedPics( pic ) );
     pic->p_next = NULL; // we're appending a picture, not a chain
     chain->tail = pic;
 }
@@ -268,14 +278,6 @@ static inline void vlc_picture_chain_GetAndClear(vlc_picture_chain_t *in,
 {
     *out = *in;
     vlc_picture_chain_Init(in);
-}
-
-/**
- * Check whether a picture has other pictures linked
- */
-static inline bool picture_HasChainedPics(const picture_t *pic)
-{
-    return pic->p_next != NULL;
 }
 
 /**
