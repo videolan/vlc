@@ -377,7 +377,7 @@ Filter(filter_t *filter, picture_t *src)
     if (ctx->src_converter)
     {
         // TODO
-        src = ctx->dst_converter->ops->filter_video(ctx->src_converter, src);
+        src = ctx->src_converter->ops->filter_video(ctx->src_converter, src);
         if (!src)
             return NULL;
     }
