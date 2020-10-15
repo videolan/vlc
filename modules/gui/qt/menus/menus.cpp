@@ -205,8 +205,9 @@ QMenu *VLCMenuBar::FileMenu( intf_thread_t *p_intf, QMenu *menu, MainInterface *
 {
     QAction *action;
 
+    //use a lambda here as the Triggrered signal is emiting and it will pass false (checked) as a first argument
     addDPStaticEntry( menu, qtr( "Open &File..." ),
-        ":/type/file-asym.svg", &DialogsProvider::simpleOpenDialog, "Ctrl+O" );
+        ":/type/file-asym.svg", []() { THEDP->simpleOpenDialog(); } , "Ctrl+O" );
     addDPStaticEntry( menu, qtr( "&Open Multiple Files..." ),
         ":/type/file-asym.svg", &DialogsProvider::openFileDialog, "Ctrl+Shift+O" );
     addDPStaticEntry( menu, qtr( I_OP_OPDIR ),
