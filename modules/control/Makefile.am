@@ -8,7 +8,10 @@ libhotkeys_plugin_la_LIBADD = $(LIBM)
 # way to control the output clock from the player
 #libnetsync_plugin_la_SOURCES = control/netsync.c
 #libnetsync_plugin_la_LIBADD = $(SOCKET_LIBS)
-librc_plugin_la_SOURCES = control/rc.c control/intromsg.h
+librc_plugin_la_SOURCES = \
+	control/intromsg.h \
+	control/cli/player.c control/cli/playlist.c \
+	control/cli/cli.c control/cli/cli.h
 librc_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBM)
 
 control_LTLIBRARIES = \

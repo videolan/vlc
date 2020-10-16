@@ -362,7 +362,9 @@ modules/control/hotkeys.c
 modules/control/intromsg.h
 modules/control/lirc.c
 modules/control/ntservice.c
-modules/control/rc.c
+modules/control/cli/cli.c
+modules/control/cli/player.c
+modules/control/cli/playlist.c
 modules/control/win_msg.c
 modules/demux/adaptive/adaptive.cpp
 modules/demux/aiff.c
