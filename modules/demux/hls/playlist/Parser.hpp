@@ -20,10 +20,11 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
-#include "../../adaptive/playlist/SegmentInfoCommon.h"
+#include "../../adaptive/playlist/SegmentBaseType.hpp"
 
 #include <cstdlib>
 #include <sstream>
+#include <list>
 
 #include <vlc_common.h>
 
@@ -34,7 +35,7 @@ namespace adaptive
     namespace playlist
     {
         class SegmentInformation;
-        class MediaSegmentTemplate;
+        class SegmentTemplate;
         class BasePeriod;
         class BaseAdaptationSet;
     }

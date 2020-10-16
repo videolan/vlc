@@ -283,14 +283,4 @@ SubSegment::SubSegment(Segment *main, size_t start, size_t end) :
     classId = CLASSID_SUBSEGMENT;
 }
 
-SegmentChunk* SubSegment::createChunk(AbstractChunkSource *source, BaseRepresentation *rep)
-{
-     /* act as factory */
-    return new (std::nothrow) SegmentChunk(source, rep);
-}
-
-Url SubSegment::getUrlSegment() const
-{
-    return getParentUrlSegment();
-}
 

@@ -40,7 +40,7 @@ namespace adaptive
     {
         class BaseAdaptationSet;
         class AbstractPlaylist;
-        class BaseSegmentTemplate;
+        class SegmentTemplateSegment;
 
         class BaseRepresentation : public CommonAttributesElements,
                                    public SegmentInformation
@@ -74,7 +74,7 @@ namespace adaptive
 
                 /* for segment templates */
                 virtual std::string contextualize(size_t, const std::string &,
-                                                  const BaseSegmentTemplate *) const;
+                                                  const SegmentTemplate *) const;
 
                 static bool         bwCompare(const BaseRepresentation *a,
                                               const BaseRepresentation *b);

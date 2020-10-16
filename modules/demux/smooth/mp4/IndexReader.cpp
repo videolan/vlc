@@ -71,7 +71,9 @@ bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep)
             timelineadd->addElement(i+1, dur, 0, stime);
         }
 
-        rep->mergeWithTimeline(timelineadd);
+        rep->inheritSegmentTemplate()->
+             inheritSegmentTimeline()->
+             updateWith(*timelineadd);
         delete timelineadd;
 
 #ifndef NDEBUG

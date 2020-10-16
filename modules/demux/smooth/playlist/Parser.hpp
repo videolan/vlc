@@ -20,7 +20,7 @@
 #ifndef MANIFESTPARSER_HPP
 #define MANIFESTPARSER_HPP
 
-#include "../../adaptive/playlist/SegmentInfoCommon.h"
+#include "../../adaptive/playlist/SegmentBaseType.hpp"
 
 #include <cstdlib>
 #include <sstream>
@@ -32,7 +32,7 @@ namespace adaptive
     namespace playlist
     {
         class SegmentInformation;
-        class MediaSegmentTemplate;
+        class SegmentTemplate;
         class BasePeriod;
         class BaseAdaptationSet;
     }

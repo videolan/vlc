@@ -89,17 +89,15 @@ void Representation::addDependency(const Representation *dep)
 }
 
 std::string Representation::contextualize(size_t number, const std::string &component,
-                                          const BaseSegmentTemplate *basetempl) const
+                                          const SegmentTemplate *templ) const
 {
     std::string ret(component);
-    size_t pos;
-    if(!basetempl)
+    if(!templ)
         return ret;
 
-    const MediaSegmentTemplate *templ = dynamic_cast<const MediaSegmentTemplate *>(basetempl);
-
     bool replaced;
-    do
+    std::string::size_type pos = 0;
+    while(pos < ret.length())
     {
         replaced = false;
         if(templ)
@@ -176,7 +174,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
     return ret;
 }
 
-mtime_t Representation::getScaledTimeBySegmentNumber(uint64_t index, const MediaSegmentTemplate *templ) const
+stime_t Representation::getScaledTimeBySegmentNumber(uint64_t index, const SegmentTemplate *templ) const
 {
     mtime_t time = 0;
     const SegmentTimeline *tl = templ->inheritSegmentTimeline();

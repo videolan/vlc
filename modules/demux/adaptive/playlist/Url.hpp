@@ -28,7 +28,7 @@ namespace adaptive
 {
     namespace playlist
     {
-        class BaseSegmentTemplate;
+        class SegmentTemplate;
         class BaseRepresentation;
 
         class Url
@@ -38,11 +38,11 @@ namespace adaptive
                 {
                     friend class Url;
                     public:
-                        Component(const std::string &, const BaseSegmentTemplate * = NULL);
+                        Component(const std::string &, const SegmentTemplate * = NULL);
 
                     protected:
                         std::string component;
-                        const BaseSegmentTemplate *templ;
+                        const SegmentTemplate *templ;
 
                     private:
                         bool b_scheme;

@@ -20,7 +20,7 @@
 #ifndef SMOOTHREPRESENTATION_HPP
 #define SMOOTHREPRESENTATION_HPP
 
-#include "../../adaptive/playlist/SegmentInfoCommon.h"
+#include "../../adaptive/playlist/SegmentBaseType.hpp"
 #include "../../adaptive/playlist/BaseRepresentation.h"
 
 namespace adaptive
@@ -50,7 +50,7 @@ namespace smooth
 
                 /* for segment templates */
                 virtual std::string contextualize(size_t, const std::string &,
-                                                  const BaseSegmentTemplate *) const; // reimpl
+                                                  const SegmentTemplate *) const; // reimpl
         };
     }
 }
