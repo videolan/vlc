@@ -76,7 +76,7 @@ public:
     int getNumberOfItemsToShow() const;
 
 private:
-    std::vector<std::unique_ptr<MLRecentMedia>> fetch() override;
+    std::vector<std::unique_ptr<MLRecentMedia>> fetch() const override;
     size_t countTotalElements() const override;
     vlc_ml_sorting_criteria_t roleToCriteria( int /* role */ ) const override{
         return VLC_ML_SORTING_DEFAULT;

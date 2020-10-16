@@ -81,7 +81,7 @@ size_t MLUrlModel::countTotalElements() const
     return s;
 }
 
-std::vector<std::unique_ptr<MLUrl>> MLUrlModel::fetch()
+std::vector<std::unique_ptr<MLUrl>> MLUrlModel::fetch() const
 {
     ml_unique_ptr<vlc_ml_media_list_t> media_list;
     media_list.reset( vlc_ml_list_stream_history(m_ml, &m_query_param) );

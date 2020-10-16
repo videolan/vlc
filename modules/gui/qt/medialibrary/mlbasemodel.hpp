@@ -235,7 +235,7 @@ protected:
         {
             m_total_count = countTotalElements();
             if ( m_total_count > 0 )
-                m_item_list = const_cast<MLSlidingWindowModel<T>*>(this)->fetch();
+                m_item_list = fetch();
             m_initialized = true;
             emit countChanged( static_cast<unsigned int>(m_total_count) );
         }
@@ -249,7 +249,7 @@ protected:
                 m_query_param.i_offset = 0;
             else
                 m_query_param.i_offset = idx - idx % m_query_param.i_nbResults;
-            m_item_list = const_cast<MLSlidingWindowModel<T>*>(this)->fetch();
+            m_item_list = fetch();
         }
 
         //db has changed
@@ -284,7 +284,7 @@ protected:
 
 private:
     virtual size_t countTotalElements() const = 0;
-    virtual std::vector<std::unique_ptr<T>> fetch() = 0;
+    virtual std::vector<std::unique_ptr<T>> fetch() const = 0;
     virtual void thumbnailUpdated( int ) {}
 
     mutable std::vector<std::unique_ptr<T>> m_item_list;

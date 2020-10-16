@@ -92,7 +92,7 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
     };
 }
 
-std::vector<std::unique_ptr<MLVideo> > MLVideoModel::fetch()
+std::vector<std::unique_ptr<MLVideo> > MLVideoModel::fetch() const
 {
     ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_video_media(
                 m_ml, &m_query_param ) };

@@ -79,7 +79,7 @@ void MLRecentsModel::clearHistory()
     vlc_ml_clear_history(m_ml);
 }
 
-std::vector<std::unique_ptr<MLRecentMedia> > MLRecentsModel::fetch()
+std::vector<std::unique_ptr<MLRecentMedia> > MLRecentsModel::fetch() const
 {
     std::vector<std::unique_ptr<MLRecentMedia>> res;
     auto queryParams = m_query_param;

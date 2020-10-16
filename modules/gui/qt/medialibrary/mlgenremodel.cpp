@@ -68,7 +68,7 @@ QHash<int, QByteArray> MLGenreModel::roleNames() const
     };
 }
 
-std::vector<std::unique_ptr<MLGenre>> MLGenreModel::fetch()
+std::vector<std::unique_ptr<MLGenre>> MLGenreModel::fetch() const
 {
     ml_unique_ptr<vlc_ml_genre_list_t> genre_list(
         vlc_ml_list_genres(m_ml, &m_query_param)

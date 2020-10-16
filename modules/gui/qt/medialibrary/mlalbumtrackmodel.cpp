@@ -103,7 +103,7 @@ size_t MLAlbumTrackModel::countTotalElements() const
     return vlc_ml_count_media_of(m_ml, &queryParams, m_parent.type, m_parent.id );
 }
 
-std::vector<std::unique_ptr<MLAlbumTrack>> MLAlbumTrackModel::fetch()
+std::vector<std::unique_ptr<MLAlbumTrack>> MLAlbumTrackModel::fetch() const
 {
     ml_unique_ptr<vlc_ml_media_list_t> media_list;
 

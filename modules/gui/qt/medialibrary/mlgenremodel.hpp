@@ -52,7 +52,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
 
 private:
-    std::vector<std::unique_ptr<MLGenre>> fetch() override;
+    std::vector<std::unique_ptr<MLGenre>> fetch() const override;
     size_t countTotalElements() const override;
     void onVlcMlEvent(const MLEvent &event) override;
     void thumbnailUpdated(int idx) override;

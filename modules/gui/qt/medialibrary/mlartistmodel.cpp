@@ -67,7 +67,7 @@ QHash<int, QByteArray> MLArtistModel::roleNames() const
     };
 }
 
-std::vector<std::unique_ptr<MLArtist>> MLArtistModel::fetch()
+std::vector<std::unique_ptr<MLArtist>> MLArtistModel::fetch() const
 {
     ml_unique_ptr<vlc_ml_artist_list_t> artist_list;
     if ( m_parent.id <= 0 )
