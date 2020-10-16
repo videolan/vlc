@@ -157,6 +157,7 @@ class MainInterface : public QVLCMW
     Q_PROPERTY(bool hasVLM READ hasVLM CONSTANT)
     Q_PROPERTY(bool clientSideDecoration READ useClientSideDecoration NOTIFY useClientSideDecorationChanged)
     Q_PROPERTY(bool hasToolbarMenu READ hasToolbarMenu NOTIFY hasToolbarMenuChanged)
+    Q_PROPERTY(bool canShowVideoPIP READ canShowVideoPIP CONSTANT)
 
 public:
     /* tors */
@@ -197,6 +198,8 @@ public:
     bool hasVLM() const;
     bool useClientSideDecoration() const;
     inline bool hasToolbarMenu() const { return m_hasToolbarMenu; }
+    inline bool canShowVideoPIP() const { return m_canShowVideoPIP; }
+    inline void setCanShowVideoPIP(bool canShowVideoPIP) { m_canShowVideoPIP = canShowVideoPIP; }
 
     bool hasEmbededVideo() const;
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
@@ -266,6 +269,7 @@ protected:
     ColorSchemeModel*    m_colorScheme;
     bool                 m_clientSideDecoration = false;
     bool                 m_hasToolbarMenu = false;
+    bool                 m_canShowVideoPIP = false;
 
     /* States */
     bool                 playlistVisible;       ///< Is the playlist visible ?

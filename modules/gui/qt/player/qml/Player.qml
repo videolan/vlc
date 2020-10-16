@@ -67,7 +67,7 @@ Widgets.NavigableFocusScope {
         if (rootPlayer.hasEmbededVideo && controlBarView.state === "visible") {
             toolbarAutoHide._setVisibleControlBar(false)
         } else {
-            if (player.hasVideoOutput) {
+            if (mainInterface.hasEmbededVideo && !mainInterface.canShowVideoPIP) {
                mainPlaylistController.stop()
             }
             history.previous()

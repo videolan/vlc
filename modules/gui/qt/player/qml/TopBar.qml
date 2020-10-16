@@ -102,8 +102,8 @@ Widgets.NavigableFocusScope{
                             text: i18n.qtr("Back")
                             color: VLCStyle.colors.playerFg
                             onClicked: {
-                                if (player.hasVideoOutput) {
-                                    mainPlaylistController.stop()
+                                if (mainInterface.hasEmbededVideo && !mainInterface.canShowVideoPIP) {
+                                   mainPlaylistController.stop()
                                 }
                                 history.previous()
                             }

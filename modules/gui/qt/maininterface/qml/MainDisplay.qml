@@ -127,6 +127,7 @@ Widgets.NavigableFocusScope {
         }
     ]
 
+
     property var tabModel: ListModel {
         id: tabModelid
         Component.onCompleted: {
