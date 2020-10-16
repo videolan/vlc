@@ -1484,7 +1484,7 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
             return VLC_EGENERIC; // wait with no known deadline
     }
 
-    bool force_refresh;
+    bool render_now;
     if (frame_by_frame)
     {
         if (!sys->displayed.next)
@@ -1497,7 +1497,7 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         sys->displayed.current = sys->displayed.next;
         sys->displayed.next    = NULL;
 
-        force_refresh = true;
+        render_now = true;
     }
     else
     {
@@ -1514,32 +1514,12 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->render) + VOUT_MWAIT_TOLERANCE;
 
         bool dropped_current_frame = false;
-        vlc_tick_t date_next = VLC_TICK_INVALID;
-
-        if (!paused && sys->displayed.next) {
-            const vlc_tick_t next_system_pts =
-                vlc_clock_ConvertToSystem(sys->clock, system_now,
-                                        sys->displayed.next->date, sys->rate);
-            if (likely(next_system_pts != INT64_MAX))
-            {
-                date_next = next_system_pts - render_delay;
-                if (date_next <= system_now)
-                {
-                    // next frame will still need some waiting before display
-                    dropped_current_frame = true;
-
-                    picture_Release(sys->displayed.current);
-                    sys->displayed.current = sys->displayed.next;
-                    sys->displayed.next    = NULL;
-                }
-            }
-        }
 
         /* FIXME/XXX we must redisplay the last decoded picture (because
         * of potential vout updated, or filters update or SPU update)
         * For now a high update period is needed but it could be removed
         * if and only if:
-        * - vout module emits events from theselves.
+        * - vout module emits events from themselves.
         * - *and* SPU is modified to emit an event or a deadline when needed.
         *
         * So it will be done later.
@@ -1551,12 +1531,32 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
             date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
             refresh = date_refresh <= system_now;
         }
-        force_refresh = !dropped_current_frame && refresh;
+        render_now = refresh;
 
+        if (!paused && sys->displayed.next) {
+            const vlc_tick_t next_system_pts =
+                vlc_clock_ConvertToSystem(sys->clock, system_now,
+                                        sys->displayed.next->date, sys->rate);
+            if (likely(next_system_pts != INT64_MAX))
+            {
+                vlc_tick_t date_next = next_system_pts - render_delay;
+                if (date_refresh == VLC_TICK_INVALID || date_next < date_refresh)
+                    date_refresh = date_next;
+
+                if (date_next <= system_now)
+                {
+                    // next frame will still need some waiting before display
+                    dropped_current_frame = true;
+                    render_now = false;
+
+                    picture_Release(sys->displayed.current);
+                    sys->displayed.current = sys->displayed.next;
+                    sys->displayed.next    = NULL;
+                }
+            }
+        }
         if (date_refresh != VLC_TICK_INVALID)
             *deadline = date_refresh;
-        if (date_next != VLC_TICK_INVALID && date_next < *deadline)
-            *deadline = date_next;
 
         if (!first && !refresh && !dropped_current_frame) {
             // nothing changed, wait until the next deadline or a control
@@ -1568,9 +1568,9 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         return VLC_EGENERIC;
 
     /* display the picture immediately */
-    bool render_now = force_refresh || sys->displayed.current->b_force;
+    render_now |= sys->displayed.current->b_force;
     int ret = ThreadDisplayRenderPicture(vout, render_now);
-    return force_refresh ? VLC_EGENERIC : ret;
+    return render_now ? VLC_EGENERIC : ret;
 }
 
 void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
