@@ -758,7 +758,7 @@ Item{
 
             onClicked: {
                 if (isMiniplayer) {
-                    history.push(["player"])
+                    g_mainDisplay.showPlayer()
                 }
                 else {
                     history.previous()
@@ -793,14 +793,14 @@ Item{
             }
             Keys.onReleased: {
                 if (!event.accepted && KeyHelper.matchOk(event))
-                    history.push(["player"])
+		    g_mainDisplay.showPlayer()
             }
 
             MouseArea {
                 id: artworkInfoMouseArea
                 anchors.fill: parent
                 visible: !paintOnly
-                onClicked: history.push(["player"])
+                onClicked: g_mainDisplay.showPlayer()
                 hoverEnabled: true
             }
 

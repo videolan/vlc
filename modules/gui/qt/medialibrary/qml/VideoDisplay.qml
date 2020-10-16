@@ -64,8 +64,8 @@ Widgets.NavigableFocusScope {
     }
 
     function _actionAtIndex(index) {
+        g_mainDisplay.showPlayer()
         medialib.addAndPlay( videoModel.getIdsForIndexes( selectionModel.selectedIndexes ) )
-        history.push(["player"])
     }
 
     MLVideoModel {

@@ -41,14 +41,14 @@ Widgets.GridItem {
     showNewIndicator: true
     onItemDoubleClicked: {
         if ( model.id !== undefined ) {
+            g_mainDisplay.showPlayer()
             medialib.addAndPlay( model.id )
-            history.push(["player"])
         }
     }
     onPlayClicked: {
         if ( model.id !== undefined ) {
+            g_mainDisplay.showPlayer()
             medialib.addAndPlay( model.id )
-            history.push(["player"])
         }
     }
 }

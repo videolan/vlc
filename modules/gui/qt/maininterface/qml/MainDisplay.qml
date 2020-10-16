@@ -35,6 +35,9 @@ Widgets.NavigableFocusScope {
     property string view: ""
     property var viewProperties: ({})
 
+    property alias g_mainDisplay: root
+    property bool _inhibitMiniPlayer: false
+
     onViewChanged: {
         viewProperties = ({})
         loadView()
@@ -137,6 +140,12 @@ Widgets.NavigableFocusScope {
                        })
             })
         }
+    }
+
+
+    function showPlayer() {
+        root._inhibitMiniPlayer = true
+        history.push(["player"])
     }
 
     Rectangle {
@@ -319,6 +328,8 @@ Widgets.NavigableFocusScope {
 
             Player.MiniPlayer {
                 id: miniPlayer
+
+                visible: !root._inhibitMiniPlayer
 
                 anchors.left: parent.left
                 anchors.right: parent.right
