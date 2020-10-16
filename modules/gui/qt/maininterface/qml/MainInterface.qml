@@ -149,17 +149,6 @@ Rectangle {
                     }
                 }
             }
-
-            Connections {
-                target: player.videoTracks
-                onDataChanged: {
-                    if (player.videoTracks.rowCount() > 0
-                            && player.playingState === PlayerController.PLAYING_STATE_PLAYING
-                            && history.current.view !== "player") {
-                        history.push(["player"])
-                    }
-                }
-            }
         }
     }
 

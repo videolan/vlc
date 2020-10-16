@@ -381,6 +381,16 @@ Widgets.NavigableFocusScope {
 
                 mainContent: mainColumn
             }
+
+            Connections {
+                target: player.videoTracks
+                onDataChanged: {
+                    if (player.videoTracks.rowCount() > 0
+                            && player.playingState === PlayerController.PLAYING_STATE_PLAYING) {
+                        g_mainDisplay.showPlayer()
+                    }
+                }
+            }
         }
     }
 }
