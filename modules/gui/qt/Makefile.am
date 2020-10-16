@@ -663,6 +663,7 @@ libqt_plugin_la_QML = \
 	gui/qt/player/qml/ControlButtons.qml \
 	gui/qt/player/qml/LanguageMenu.qml \
 	gui/qt/player/qml/MiniPlayer.qml \
+	gui/qt/player/qml/PIPPlayer.qml \
 	gui/qt/player/qml/Player.qml \
 	gui/qt/player/qml/PlayerButtonsLayout.qml \
 	gui/qt/player/qml/PlayerMenu.qml \
@@ -701,6 +702,7 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/GridItem.qml \
 	gui/qt/widgets/qml/HorizontalResizeHandle.qml \
 	gui/qt/widgets/qml/IconLabel.qml \
+	gui/qt/widgets/qml/IconButton.qml \
 	gui/qt/widgets/qml/IconToolButton.qml \
 	gui/qt/widgets/qml/ImageToolButton.qml \
 	gui/qt/widgets/qml/KeyNavigableGridView.qml \

@@ -239,6 +239,7 @@
         <file alias="CheckedDelegate.qml">widgets/qml/CheckedDelegate.qml</file>
         <file alias="PageLoader.qml">widgets/qml/PageLoader.qml</file>
         <file alias="LocalTabBar.qml">widgets/qml/LocalTabBar.qml</file>
+        <file alias="IconButton.qml">widgets/qml/IconButton.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>
@@ -304,6 +305,7 @@
         <file alias="TeletextWidget.qml">player/qml/TeletextWidget.qml</file>
         <file alias="MiniPlayer.qml">player/qml/MiniPlayer.qml</file>
         <file alias="TopBar.qml">player/qml/TopBar.qml</file>
+        <file alias="PIPPlayer.qml">player/qml/PIPPlayer.qml</file>
         <file alias="PlayerButtonsLayout.qml">player/qml/PlayerButtonsLayout.qml</file>
         <file alias="PlayerMenu.qml">player/qml/PlayerMenu.qml</file>
         <file alias="PlayerMenuItem.qml">player/qml/PlayerMenuItem.qml</file>
