@@ -26,6 +26,7 @@
 #include "compositor.hpp"
 
 class MainInterface;
+class QQuickWidget;
 
 namespace vlc {
 
@@ -42,10 +43,10 @@ public:
     bool setupVoutWindow(vout_window_t *p_wnd) override;
 
 protected:
-
     intf_thread_t *m_intf;
 
     MainInterface* m_rootWindow = nullptr;
+    QQuickWidget* m_qmlWidget = nullptr;
 };
 
 }

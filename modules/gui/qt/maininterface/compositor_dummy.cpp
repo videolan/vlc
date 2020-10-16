@@ -35,16 +35,16 @@ MainInterface* CompositorDummy::makeMainInterface()
     if (m_rootWindow->useClientSideDecoration())
         m_rootWindow->setWindowFlag(Qt::FramelessWindowHint);
     m_rootWindow->show();
-    QQuickWidget* centralWidget = new QQuickWidget(m_rootWindow);
-    centralWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    m_qmlWidget = new QQuickWidget(m_rootWindow);
+    m_qmlWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
     new InterfaceWindowHandler(m_intf, m_rootWindow, m_rootWindow->windowHandle(), m_rootWindow);
 
     MainUI* m_ui = new MainUI(m_intf, m_rootWindow, m_rootWindow->windowHandle(), this);
-    m_ui->setup(centralWidget->engine());
-    centralWidget->setContent(QUrl(), m_ui->getComponent(), m_ui->createRootItem());
+    m_ui->setup(m_qmlWidget->engine());
+    m_qmlWidget->setContent(QUrl(), m_ui->getComponent(), m_ui->createRootItem());
 
-    m_rootWindow->setCentralWidget(centralWidget);
+    m_rootWindow->setCentralWidget(m_qmlWidget);
 
     connect(m_rootWindow, &MainInterface::requestInterfaceMaximized,
             m_rootWindow, &MainInterface::showMaximized);
@@ -56,6 +56,11 @@ MainInterface* CompositorDummy::makeMainInterface()
 
 void CompositorDummy::destroyMainInterface()
 {
+    if (m_qmlWidget)
+    {
+        delete m_qmlWidget;
+        m_qmlWidget = nullptr;
+    }
     if (m_rootWindow)
     {
         delete m_rootWindow;
