@@ -1508,6 +1508,7 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
              * the current one). */
             paused = true;
         }
+        else
         {
             date_next = next_system_pts - render_delay;
             if (date_next <= system_now)
