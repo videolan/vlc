@@ -1251,7 +1251,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
         render_subtitle_date = sys->pause.date;
     else
     {
-        render_subtitle_date = filtered->date <= 1 ? system_now :
+        render_subtitle_date = filtered->date <= VLC_TICK_0 ? system_now :
             vlc_clock_ConvertToSystem(sys->clock, system_now, filtered->date,
                                       sys->rate);
 
