@@ -1060,7 +1060,7 @@ static void ThreadChangeFilters(vout_thread_sys_t *vout)
 
 
 /* */
-static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse,
+static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                                        bool frame_by_frame, bool *paused)
 {
     vout_thread_sys_t *sys = vout;
@@ -1069,11 +1069,11 @@ static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse,
     vlc_mutex_lock(&sys->filter.lock);
 
     picture_t *picture = filter_chain_VideoFilter(sys->filter.chain_static, NULL);
-    assert(!reuse || !picture);
+    assert(!reuse_decoded || !picture);
 
     while (!picture) {
         picture_t *decoded;
-        if (reuse && sys->displayed.decoded) {
+        if (reuse_decoded && sys->displayed.decoded) {
             decoded = picture_Hold(sys->displayed.decoded);
         } else {
             decoded = picture_fifo_Pop(sys->decoder_fifo);
@@ -1130,7 +1130,7 @@ static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse,
 
         if (!decoded)
             break;
-        reuse = false;
+        reuse_decoded = false;
 
         if (sys->displayed.decoded)
             picture_Release(sys->displayed.decoded);
