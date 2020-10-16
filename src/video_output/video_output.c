@@ -1140,7 +1140,7 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
         sys->displayed.timestamp     = decoded->date;
         sys->displayed.is_interlaced = !decoded->b_progressive;
 
-        picture = filter_chain_VideoFilter(sys->filter.chain_static, decoded);
+        picture = filter_chain_VideoFilter(sys->filter.chain_static, sys->displayed.decoded);
     }
 
     vlc_mutex_unlock(&sys->filter.lock);
@@ -1216,12 +1216,13 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
 {
     vout_thread_sys_t *sys = vout;
 
-    picture_t *torender = picture_Hold(sys->displayed.current);
+    // hold it as the filter chain will release it or return it and we release it
+    picture_Hold(sys->displayed.current);
 
     vout_chrono_Start(&sys->render);
 
     vlc_mutex_lock(&sys->filter.lock);
-    picture_t *filtered = filter_chain_VideoFilter(sys->filter.chain_interactive, torender);
+    picture_t *filtered = filter_chain_VideoFilter(sys->filter.chain_interactive, sys->displayed.current);
     vlc_mutex_unlock(&sys->filter.lock);
 
     if (!filtered)
