@@ -1484,13 +1484,17 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         *deadline = VLC_TICK_INVALID;
 
     if (first)
-        if (ThreadDisplayPreparePicture(vout, true, frame_by_frame, &paused)) /* FIXME not sure it is ok */
+        if (ThreadDisplayPreparePicture(vout, true, frame_by_frame, &paused) != VLC_SUCCESS) /* FIXME not sure it is ok */
             return VLC_EGENERIC;
 
     if (!paused || frame_by_frame)
-        while (!sys->displayed.next
-            && !ThreadDisplayPreparePicture(vout, false, frame_by_frame, &paused))
-            ;
+    {
+        while (!sys->displayed.next)
+        {
+            if (ThreadDisplayPreparePicture(vout, false, frame_by_frame, &paused) != VLC_SUCCESS)
+                break;
+        }
+    }
 
     const vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->render) + VOUT_MWAIT_TOLERANCE;
