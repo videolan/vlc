@@ -1513,7 +1513,7 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         const vlc_tick_t system_now = vlc_tick_now();
         const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->render) + VOUT_MWAIT_TOLERANCE;
 
-        bool drop_next_frame = false;
+        bool dropped_current_frame = false;
         vlc_tick_t date_next = VLC_TICK_INVALID;
 
         if (!paused && sys->displayed.next) {
@@ -1524,7 +1524,14 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
             {
                 date_next = next_system_pts - render_delay;
                 if (date_next <= system_now)
-                    drop_next_frame = true;
+                {
+                    // next frame will still need some waiting before display
+                    dropped_current_frame = true;
+
+                    picture_Release(sys->displayed.current);
+                    sys->displayed.current = sys->displayed.next;
+                    sys->displayed.next    = NULL;
+                }
             }
         }
 
@@ -1544,22 +1551,16 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
             date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
             refresh = date_refresh <= system_now;
         }
-        force_refresh = !drop_next_frame && refresh;
+        force_refresh = !dropped_current_frame && refresh;
 
         if (date_refresh != VLC_TICK_INVALID)
             *deadline = date_refresh;
         if (date_next != VLC_TICK_INVALID && date_next < *deadline)
             *deadline = date_next;
 
-        if (!first && !refresh && !drop_next_frame) {
+        if (!first && !refresh && !dropped_current_frame) {
             // nothing changed, wait until the next deadline or a control
             return VLC_EGENERIC;
-        }
-
-        if (drop_next_frame) {
-            picture_Release(sys->displayed.current);
-            sys->displayed.current = sys->displayed.next;
-            sys->displayed.next    = NULL;
         }
     }
 
