@@ -1080,9 +1080,9 @@ static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse,
 
             if (decoded) {
                 if (is_late_dropped && !decoded->b_force) {
-                    const vlc_tick_t date = vlc_tick_now();
+                    const vlc_tick_t system_now = vlc_tick_now();
                     const vlc_tick_t system_pts =
-                        vlc_clock_ConvertToSystem(sys->clock, date,
+                        vlc_clock_ConvertToSystem(sys->clock, system_now,
                                                   decoded->date, sys->rate);
 
                     vlc_tick_t late;
@@ -1095,7 +1095,7 @@ static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse,
                         late = 0;
                     }
                     else
-                        late = date - system_pts;
+                        late = system_now - system_pts;
 
                     vlc_tick_t late_threshold;
                     if (decoded->format.i_frame_rate && decoded->format.i_frame_rate_base)
