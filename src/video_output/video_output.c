@@ -1098,8 +1098,10 @@ static int ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reuse_decod
                         late = system_now - system_pts;
 
                     vlc_tick_t late_threshold;
-                    if (decoded->format.i_frame_rate && decoded->format.i_frame_rate_base)
-                        late_threshold = VLC_TICK_FROM_MS(500) * decoded->format.i_frame_rate_base / decoded->format.i_frame_rate;
+                    if (decoded->format.i_frame_rate && decoded->format.i_frame_rate_base) {
+                        late_threshold = vlc_tick_from_samples(decoded->format.i_frame_rate_base, decoded->format.i_frame_rate);
+                        late_threshold /=  2;
+                    }
                     else
                         late_threshold = VOUT_DISPLAY_LATE_THRESHOLD;
                     if (late > late_threshold) {
