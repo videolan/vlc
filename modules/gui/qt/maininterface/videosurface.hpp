@@ -43,6 +43,8 @@ signals:
     void ctxChanged(QmlMainContext*);
     bool videoEnabledChanged(bool);
     bool hasVideoEmbedChanged(bool);
+    void surfacePositionChanged(QPointF position);
+    void surfaceSizeChanged(QSizeF size);
 
 public slots:
     void onWindowClosed();
@@ -101,6 +103,7 @@ signals:
     void ctxChanged(QmlMainContext*);
     void sourceSizeChanged(QSize);
     void surfaceSizeChanged(QSizeF);
+    void surfacePositionChanged(QPointF);
 
     void mousePressed( int vlcButton );
     void mouseReleased( int vlcButton );
@@ -112,6 +115,8 @@ signals:
 protected slots:
     void onProviderVideoChanged(bool);
     void onSurfaceSizeChanged();
+    void onSurfacePositionChanged();
+    void updatePositionAndSize();
 
 private:
     QmlMainContext* m_mainCtx = nullptr;
