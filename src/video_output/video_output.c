@@ -1065,7 +1065,7 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
                                        bool frame_by_frame, bool *paused)
 {
     vout_thread_sys_t *sys = vout;
-    bool is_late_dropped = sys->is_late_dropped && !sys->pause.is_on && !frame_by_frame;
+    bool is_late_dropped = sys->is_late_dropped && !frame_by_frame;
 
     vlc_mutex_lock(&sys->filter.lock);
 
@@ -1080,23 +1080,21 @@ static picture_t *ThreadDisplayPreparePicture(vout_thread_sys_t *vout, bool reus
             decoded = picture_fifo_Pop(sys->decoder_fifo);
 
             if (decoded) {
-                if (is_late_dropped && !decoded->b_force) {
-                    const vlc_tick_t system_now = vlc_tick_now();
-                    const vlc_tick_t system_pts =
-                        vlc_clock_ConvertToSystem(sys->clock, system_now,
-                                                  decoded->date, sys->rate);
+                const vlc_tick_t system_now = vlc_tick_now();
+                const vlc_tick_t system_pts =
+                    vlc_clock_ConvertToSystem(sys->clock, system_now,
+                                              decoded->date, sys->rate);
 
-                    vlc_tick_t late;
-                    if (system_pts == INT64_MAX)
-                    {
-                        /* The clock is paused, notify it (so that the current
-                         * picture is displayed but not the next one), this
-                         * current picture can't be be late. */
-                        *paused = true;
-                        late = 0;
-                    }
-                    else
-                        late = system_now - system_pts;
+                if (system_pts == INT64_MAX)
+                {
+                    /* The clock is paused, notify it (so that the current
+                        * picture is displayed but not the next one), this
+                        * current picture can't be be late. */
+                    *paused = true;
+                }
+                else if (is_late_dropped && !decoded->b_force)
+                {
+                    vlc_tick_t late = system_now - system_pts;
 
                     vlc_tick_t late_threshold;
                     if (decoded->format.i_frame_rate && decoded->format.i_frame_rate_base) {
