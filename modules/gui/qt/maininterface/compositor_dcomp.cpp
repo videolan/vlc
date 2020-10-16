@@ -232,9 +232,12 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
 
         m_qmlVideoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
         m_rootWindow->setVideoSurfaceProvider(m_qmlVideoSurfaceProvider.get());
+        m_rootWindow->setCanShowVideoPIP(true);
 
         connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::hasVideoEmbedChanged,
                 m_interfaceWindowHandler, &InterfaceWindowHandlerWin32::onVideoEmbedChanged);
+        connect(m_qmlVideoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
+                this, &CompositorDirectComposition::onSurfacePositionChanged);
 
         connect(m_rootWindow, &MainInterface::requestInterfaceMaximized,
                 m_rootWindow, &MainInterface::showMaximized);
@@ -259,6 +262,13 @@ MainInterface* CompositorDirectComposition::makeMainInterface()
         destroyMainInterface();
         return nullptr;
     }
+}
+
+void CompositorDirectComposition::onSurfacePositionChanged(QPointF position)
+{
+    HR(m_videoVisual->SetOffsetX(position.x()));
+    HR(m_videoVisual->SetOffsetY(position.y()));
+    HR(m_dcompDevice->Commit(), "commit UI visual");
 }
 
 void CompositorDirectComposition::destroyMainInterface()

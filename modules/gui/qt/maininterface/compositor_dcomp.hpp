@@ -52,6 +52,9 @@ public:
 
     bool setupVoutWindow(vout_window_t *p_wnd) override;
 
+private slots:
+    void onSurfacePositionChanged(QPointF position);
+
 private:
     static int window_enable(struct vout_window_t *, const vout_window_cfg_t *);
     static void window_disable(struct vout_window_t *);
