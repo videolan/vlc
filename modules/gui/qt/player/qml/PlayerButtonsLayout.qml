@@ -65,7 +65,7 @@ Widgets.NavigableFocusScope {
         id: controlmodelbuttons
 
         isMiniplayer: false
-        parentWindow: mainInterfaceRect
+        parentWindow: g_root
     }
 
     ButtonsLayout {

@@ -33,7 +33,7 @@ Rectangle {
     property bool _interfaceReady: false
     property bool _playlistReady: false
 
-    property alias mainInterfaceRect: root
+    property alias g_root: root
     property variant g_dialogs: dialogsLoader.item
 
     Binding {

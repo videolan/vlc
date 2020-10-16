@@ -229,7 +229,7 @@ Widgets.NavigableFocusScope {
         }
 
         function updateBgRect() {
-            glassEffect.popupGlobalPos = mainInterfaceRect.mapFromItem(root, popup.x, popup.y)
+            glassEffect.popupGlobalPos = g_root.mapFromItem(root, popup.x, popup.y)
         }
 
         background: Rectangle {
@@ -238,7 +238,7 @@ Widgets.NavigableFocusScope {
 
             Widgets.FrostedGlassEffect {
                 id: glassEffect
-                source: mainInterfaceRect
+                source: g_root
 
                 anchors.fill: parent
                 anchors.margins: VLCStyle.dp(1)
@@ -252,7 +252,7 @@ Widgets.NavigableFocusScope {
         }
 
         Connections {
-            target: mainInterfaceRect
+            target: g_root
 
             enabled: popup.visible
 

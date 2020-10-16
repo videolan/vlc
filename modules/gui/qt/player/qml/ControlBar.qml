@@ -86,7 +86,7 @@ Widgets.NavigableFocusScope {
             enabled: player.playingState == PlayerController.PLAYING_STATE_PLAYING || player.playingState == PlayerController.PLAYING_STATE_PAUSED
             Keys.onDownPressed: playerButtonsLayout.focus = true
 
-            parentWindow: mainInterfaceRect
+            parentWindow: g_root
         }
 
         Item {

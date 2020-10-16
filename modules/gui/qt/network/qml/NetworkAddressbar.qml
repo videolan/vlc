@@ -247,9 +247,7 @@ Control {
         }
 
         function updateBgRect() {
-            glassEffect.popupGlobalPos = mainInterfaceRect.mapFromItem(control,
-                                                                       popup.x,
-                                                                       popup.y)
+            glassEffect.popupGlobalPos = g_root.mapFromItem(control, popup.x, popup.y)
         }
 
         background: Rectangle {
@@ -258,7 +256,7 @@ Control {
 
             Widgets.FrostedGlassEffect {
                 id: glassEffect
-                source: mainInterfaceRect
+                source: g_root
 
                 anchors.fill: parent
                 anchors.margins: VLCStyle.dp(1)
