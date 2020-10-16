@@ -326,6 +326,41 @@ Widgets.NavigableFocusScope {
                 }
             }
 
+            Player.PIPPlayer {
+                id: playerPip
+                anchors {
+                    bottom: miniPlayer.top
+                    left: parent.left
+                    bottomMargin: VLCStyle.margin_normal
+                    leftMargin: VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin
+                }
+
+                width: VLCStyle.dp(320, VLCStyle.scale)
+                height: VLCStyle.dp(180, VLCStyle.scale)
+                z: 2
+                visible: !root._inhibitMiniPlayer && mainInterface.hasEmbededVideo
+                enabled: !root._inhibitMiniPlayer && mainInterface.hasEmbededVideo
+
+                dragXMin: 0
+                dragXMax: root.width - playerPip.width
+                dragYMin: sourcesBanner.y + sourcesBanner.height
+                dragYMax: miniPlayer.y - playerPip.height
+
+                //keep the player visible on resize
+                Connections {
+                    target: root
+                    onWidthChanged: {
+                        if (playerPip.x > playerPip.dragXMax)
+                            playerPip.x = playerPip.dragXMax
+                    }
+                    onHeightChanged: {
+                        if (playerPip.y > playerPip.dragYMax)
+                            playerPip.y = playerPip.dragYMax
+                    }
+                }
+            }
+
+
             Player.MiniPlayer {
                 id: miniPlayer
 
@@ -335,7 +370,7 @@ Widgets.NavigableFocusScope {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
 
-                z: 2
+                z: 3
                 navigationParent: medialibId
                 navigationUpItem: stackView
                 navigationCancelItem:sourcesBanner
