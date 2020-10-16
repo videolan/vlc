@@ -80,24 +80,8 @@ uint64_t DefaultBufferingLogic::getStartSegmentNumber(BaseRepresentation *rep) c
     if(rep->getPlaylist()->isLive())
         return getLiveStartSegmentNumber(rep);
 
-    const MediaSegmentTemplate *segmentTemplate = rep->inheritSegmentTemplate();
-    if(segmentTemplate)
-    {
-        const SegmentTimeline *timeline = segmentTemplate->inheritSegmentTimeline();
-        if(timeline)
-            return timeline->minElementNumber();
-        return segmentTemplate->inheritStartNumber();
-    }
-
-    const SegmentList *list = rep->inheritSegmentList();
-    if(list)
-        return list->getStartIndex();
-
-    const SegmentBase *base = rep->inheritSegmentBase();
-    if(base)
-        return base->getSequenceNumber();
-
-    return 0;
+    const AbstractSegmentBaseType *profile = rep->inheritSegmentProfile();
+    return profile ? profile->getStartSegmentNumber() : 0;
 }
 
 vlc_tick_t DefaultBufferingLogic::getMinBuffering(const AbstractPlaylist *p) const
@@ -154,7 +138,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
 
     SegmentList *segmentList = rep->inheritSegmentList();
     SegmentBase *segmentBase = rep->inheritSegmentBase();
-    MediaSegmentTemplate *mediaSegmentTemplate = rep->inheritSegmentTemplate();
+    SegmentTemplate *mediaSegmentTemplate = rep->inheritSegmentTemplate();
     if(mediaSegmentTemplate)
     {
         uint64_t start = 0;
@@ -347,8 +331,8 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
         const stime_t bufferingstart = back->startTime.Get() + back->duration.Get() -
                                        timescale.ToScaled(i_buffering);
 
-        uint64_t start;
-        if(!SegmentInfoCommon::getSegmentNumberByScaledTime(list, bufferingstart, &start))
+        uint64_t start = AbstractSegmentBaseType::findSegmentNumberByScaledTime(list, bufferingstart);
+        if(start == std::numeric_limits<uint64_t>::max())
             return list.front()->getSequenceNumber();
 
         if(segmentBase->getSequenceNumber() + SAFETY_BUFFERING_EDGE_OFFSET <= start)

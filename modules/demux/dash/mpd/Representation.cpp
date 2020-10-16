@@ -54,13 +54,11 @@ StreamFormat Representation::getStreamFormat() const
 }
 
 std::string Representation::contextualize(size_t number, const std::string &component,
-                                          const BaseSegmentTemplate *basetempl) const
+                                          const SegmentTemplate *templ) const
 {
     std::string str(component);
-    if(!basetempl)
+    if(!templ)
         return str;
-
-    const MediaSegmentTemplate *templ = dynamic_cast<const MediaSegmentTemplate *>(basetempl);
 
     std::string::size_type pos = 0;
     while(pos < str.length())
@@ -103,7 +101,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
     return str;
 }
 
-stime_t Representation::getScaledTimeBySegmentNumber(uint64_t index, const MediaSegmentTemplate *templ) const
+stime_t Representation::getScaledTimeBySegmentNumber(uint64_t index, const SegmentTemplate *templ) const
 {
     stime_t time = 0;
     const SegmentTimeline *tl = templ->inheritSegmentTimeline();

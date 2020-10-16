@@ -25,7 +25,7 @@
 #ifndef SEGMENTLIST_H_
 #define SEGMENTLIST_H_
 
-#include "SegmentInfoCommon.h"
+#include "SegmentBaseType.hpp"
 
 namespace adaptive
 {
@@ -34,22 +34,29 @@ namespace adaptive
         class SegmentInformation;
         class Segment;
 
-        class SegmentList : public SegmentInfoCommon,
-                            public TimescaleAble
+        class SegmentList : public AbstractMultipleSegmentBaseType
         {
             public:
                 SegmentList             ( SegmentInformation * = NULL );
                 virtual ~SegmentList    ();
 
                 const std::vector<Segment *>&   getSegments() const;
-                Segment *               getSegmentByNumber(uint64_t);
                 void                    addSegment(Segment *seg);
-                void                    updateWith(SegmentList *, bool = false);
+                virtual void            updateWith(AbstractMultipleSegmentBaseType *,
+                                                   bool = false); /* reimpl */
                 void                    pruneBySegmentNumber(uint64_t);
                 void                    pruneByPlaybackTime(vlc_tick_t);
-                bool                    getSegmentNumberByScaledTime(stime_t, uint64_t *) const;
-                bool                    getPlaybackTimeDurationBySegmentNumber(uint64_t, vlc_tick_t *, vlc_tick_t *) const;
                 stime_t                 getTotalLength() const;
+
+                virtual vlc_tick_t  getMinAheadTime(uint64_t) const; /* impl */
+                virtual Segment * getMediaSegment(uint64_t pos) const; /* impl */
+                virtual Segment * getNextMediaSegment(uint64_t, uint64_t *, bool *) const; /* impl */
+                virtual uint64_t  getStartSegmentNumber() const; /* impl */
+                virtual bool getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) const; /* impl */
+                virtual bool getPlaybackTimeDurationBySegmentNumber(uint64_t number,
+                                            vlc_tick_t *time, vlc_tick_t *duration) const; /* impl */
+
+                virtual void debug(vlc_object_t *, int = 0) const; /* reimpl */
 
             private:
                 std::vector<Segment *>  segments;

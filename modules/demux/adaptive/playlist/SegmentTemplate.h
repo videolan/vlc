@@ -25,61 +25,64 @@
 
 #include "Segment.h"
 #include "../tools/Properties.hpp"
-#include "SegmentInfoCommon.h"
+#include "SegmentBaseType.hpp"
 
 namespace adaptive
 {
     namespace playlist
     {
         class ICanonicalUrl;
-        class InitSegmentTemplate;
+        class SegmentTemplateInit;
         class SegmentInformation;
-        class SegmentTimeline;
+        class SegmentTemplate;
 
-        class BaseSegmentTemplate : public Segment
+        class SegmentTemplateSegment : public Segment
         {
             public:
-                BaseSegmentTemplate( ICanonicalUrl * = NULL );
-                virtual ~BaseSegmentTemplate();
+                SegmentTemplateSegment( SegmentTemplate *, ICanonicalUrl * = NULL );
+                virtual ~SegmentTemplateSegment();
                 virtual void setSourceUrl( const std::string &url ); /* reimpl */
+
+            protected:
+                const SegmentTemplate *templ;
         };
 
-        class MediaSegmentTemplate : public BaseSegmentTemplate,
-                                     public Initializable<InitSegmentTemplate>,
-                                     public TimescaleAble
+        class SegmentTemplate : public AbstractMultipleSegmentBaseType
         {
             public:
-                MediaSegmentTemplate( SegmentInformation * = NULL );
-                virtual ~MediaSegmentTemplate();
-                void setStartNumber( uint64_t );
-                void setSegmentTimeline( SegmentTimeline * );
-                void updateWith( MediaSegmentTemplate * );
-                virtual uint64_t getSequenceNumber() const; /* reimpl */
+                SegmentTemplate( SegmentInformation * = NULL );
+                virtual ~SegmentTemplate();
+                void setSourceUrl( const std::string &url );
                 uint64_t getLiveTemplateNumber(vlc_tick_t, bool = true) const;
-                stime_t getMinAheadScaledTime(uint64_t) const;
                 void pruneByPlaybackTime(vlc_tick_t);
                 size_t pruneBySequenceNumber(uint64_t);
-                virtual Timescale inheritTimescale() const; /* reimpl */
-                virtual uint64_t inheritStartNumber() const;
-                stime_t inheritDuration() const;
-                SegmentTimeline * inheritSegmentTimeline() const;
+
+                virtual vlc_tick_t getMinAheadTime(uint64_t curnum) const; /* impl */
+                virtual Segment * getMediaSegment(uint64_t number) const; /* impl */
+                virtual Segment * getNextMediaSegment(uint64_t, uint64_t *, bool *) const; /* impl */
+                virtual InitSegment *getInitSegment() const;/* reimpl */
+                virtual uint64_t getStartSegmentNumber() const; /* impl */
+
+                virtual bool getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) const; /* impl */
+                virtual bool getPlaybackTimeDurationBySegmentNumber(uint64_t number,
+                                            vlc_tick_t *time, vlc_tick_t *duration) const; /* impl */
+
                 virtual void debug(vlc_object_t *, int = 0) const; /* reimpl */
 
             protected:
-                uint64_t startNumber;
-                SegmentTimeline *segmentTimeline;
                 SegmentInformation *parentSegmentInformation;
+                std::vector<SegmentTemplateSegment *> segments; /* should have only 1 */
         };
 
-        class InitSegmentTemplate : public InitSegment
+        class SegmentTemplateInit : public InitSegment
         {
             public:
-                InitSegmentTemplate( ICanonicalUrl * = NULL, MediaSegmentTemplate * = NULL );
-                virtual ~InitSegmentTemplate();
+                SegmentTemplateInit( SegmentTemplate *, ICanonicalUrl * = NULL );
+                virtual ~SegmentTemplateInit();
                 virtual void setSourceUrl( const std::string &url ); /* reimpl */
 
             protected:
-                const MediaSegmentTemplate *maintempl;
+                const SegmentTemplate *templ;
         };
     }
 }

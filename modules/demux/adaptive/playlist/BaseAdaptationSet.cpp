@@ -137,6 +137,9 @@ void BaseAdaptationSet::debug(vlc_object_t *obj, int indent) const
     text.append("BaseAdaptationSet ");
     text.append(id.str());
     msg_Dbg(obj, "%s", text.c_str());
+    const AbstractSegmentBaseType *profile = getProfile();
+    if(profile)
+        profile->debug(obj, indent + 1);
     std::vector<BaseRepresentation *>::const_iterator k;
     for(k = representations.begin(); k != representations.end(); ++k)
         (*k)->debug(obj, indent + 1);

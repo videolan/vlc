@@ -21,9 +21,10 @@
 #define SEGMENTINFORMATION_HPP
 
 #include "ICanonicalUrl.hpp"
+#include "Inheritables.hpp"
+#include "Segment.h"
 #include "../tools/Properties.hpp"
 #include "../encryption/CommonEncryption.hpp"
-#include "SegmentInfoCommon.h"
 #include <vlc_common.h>
 #include <vector>
 
@@ -31,11 +32,12 @@ namespace adaptive
 {
     namespace playlist
     {
+        class AbstractSegmentBaseType;
         class SegmentBase;
         class SegmentList;
         class SegmentTimeline;
         class SegmentTemplate;
-        class MediaSegmentTemplate;
+        class SegmentTemplate;
         class AbstractPlaylist;
         class ISegment;
 
@@ -45,7 +47,8 @@ namespace adaptive
                                    public TimescaleAble,
                                    public Unique
         {
-            friend class MediaSegmentTemplate;
+            friend class AbstractMultipleSegmentBaseType;
+
             public:
                 SegmentInformation( SegmentInformation * = 0 );
                 explicit SegmentInformation( AbstractPlaylist * );
@@ -70,7 +73,6 @@ namespace adaptive
                 virtual Segment *     getNextMediaSegment(uint64_t, uint64_t *, bool *) const;
 
                 virtual void updateWith(SegmentInformation *);
-                virtual void mergeWithTimeline(SegmentTimeline *); /* ! don't use with global merge */
                 virtual void pruneBySegmentNumber(uint64_t);
                 virtual void pruneByPlaybackTime(vlc_tick_t);
                 void setEncryption(const CommonEncryption &);
@@ -83,16 +85,19 @@ namespace adaptive
                 SegmentInformation *parent;
 
             public:
+                SegmentInformation *getParent() const;
+                AbstractSegmentBaseType *getProfile() const;
                 void updateSegmentList(SegmentList *, bool = false);
                 void setSegmentBase(SegmentBase *);
-                void setSegmentTemplate(MediaSegmentTemplate *);
+                void setSegmentTemplate(SegmentTemplate *);
                 virtual Url getUrlSegment() const; /* impl */
                 Property<Url *> baseUrl;
                 void setAvailabilityTimeOffset(vlc_tick_t);
                 void setAvailabilityTimeComplete(bool);
+                const AbstractSegmentBaseType * inheritSegmentProfile() const;
                 SegmentBase *     inheritSegmentBase() const;
                 SegmentList *     inheritSegmentList() const;
-                MediaSegmentTemplate * inheritSegmentTemplate() const;
+                SegmentTemplate * inheritSegmentTemplate() const;
                 vlc_tick_t        inheritAvailabilityTimeOffset() const;
                 bool              inheritAvailabilityTimeComplete() const;
 
@@ -100,7 +105,7 @@ namespace adaptive
                 void init();
                 SegmentBase     *segmentBase;
                 SegmentList     *segmentList;
-                MediaSegmentTemplate *mediaSegmentTemplate;
+                SegmentTemplate *mediaSegmentTemplate;
                 CommonEncryption commonEncryption;
                 Undef<bool>      availabilityTimeComplete;
                 Undef<vlc_tick_t>availabilityTimeOffset;

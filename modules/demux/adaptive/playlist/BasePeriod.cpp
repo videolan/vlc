@@ -28,6 +28,7 @@
 
 #include "BasePeriod.h"
 #include "AbstractPlaylist.hpp"
+#include "SegmentBaseType.hpp"
 #include "../Streams.hpp"
 
 #include <vlc_common.h>
@@ -90,6 +91,9 @@ void BasePeriod::debug(vlc_object_t *obj, int indent) const
     std::string text(indent, ' ');
     text.append("Period");
     msg_Dbg(obj, "%s", text.c_str());
+    const AbstractSegmentBaseType *profile = getProfile();
+    if(profile)
+        profile->debug(obj, indent + 1);
     std::vector<BaseAdaptationSet *>::const_iterator k;
     for(k = adaptationSets.begin(); k != adaptationSets.end(); ++k)
         (*k)->debug(obj, indent + 1);

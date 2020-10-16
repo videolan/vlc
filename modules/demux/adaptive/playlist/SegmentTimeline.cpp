@@ -24,15 +24,19 @@
 #endif
 
 #include "SegmentTimeline.h"
+#include "SegmentBaseType.hpp"
+#include "SegmentInformation.hpp"
 
 #include <algorithm>
+#include <sstream>
 
 using namespace adaptive::playlist;
 
-SegmentTimeline::SegmentTimeline(TimescaleAble *parent)
-    :TimescaleAble(parent)
+SegmentTimeline::SegmentTimeline(AbstractMultipleSegmentBaseType *parent_)
+    :TimescaleAble(NULL)
 {
     totalLength = 0;
+    parent = parent_;
 }
 
 SegmentTimeline::SegmentTimeline(uint64_t scale)
@@ -40,6 +44,7 @@ SegmentTimeline::SegmentTimeline(uint64_t scale)
 {
     setTimescale(scale);
     totalLength = 0;
+    parent = NULL;
 }
 
 SegmentTimeline::~SegmentTimeline()
@@ -86,6 +91,33 @@ stime_t SegmentTimeline::getMinAheadScaledTime(uint64_t number) const
     }
 
     return totalscaledtime;
+}
+
+Timescale SegmentTimeline::inheritTimescale() const
+{
+    if(getTimescale().isValid())
+        return getTimescale();
+
+    if(parent && parent->getTimescale().isValid())
+        return parent->getTimescale();
+
+    SegmentInformation *info = NULL;
+    if(parent && parent->getParent() && parent->getParent()->getParent())
+        info = parent->getParent()->getParent();
+    else
+        info = NULL;
+
+    AbstractMultipleSegmentBaseType *bt;
+    for(; info; info = info->getParent())
+    {
+        bt = dynamic_cast<AbstractMultipleSegmentBaseType *>(info->getProfile());
+        if(bt && bt->getSegmentTimeline() && bt->getSegmentTimeline()->getTimescale().isValid())
+            return bt->getSegmentTimeline()->getTimescale();
+        if(info->getTimescale().isValid())
+            return info->getTimescale();
+    }
+
+    return Timescale(1);
 }
 
 uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) const
@@ -165,6 +197,21 @@ uint64_t SegmentTimeline::minElementNumber() const
     if(elements.empty())
         return 0;
     return elements.front()->number;
+}
+
+uint64_t SegmentTimeline::getElementIndexBySequence(uint64_t number) const
+{
+    std::list<Element *>::const_iterator it;
+    for(it = elements.begin(); it != elements.end(); ++it)
+    {
+        const Element *el = *it;
+        if(number >= el->number)
+        {
+            if(number <= el->number + el->r)
+                return std::distance(elements.begin(), it);
+        }
+    }
+    return std::numeric_limits<uint64_t>::max();
 }
 
 void SegmentTimeline::pruneByPlaybackTime(vlc_tick_t time)

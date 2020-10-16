@@ -47,6 +47,7 @@ namespace adaptive
     {
         class BaseRepresentation;
         class SubSegment;
+        class Segment;
         class SegmentChunk;
 
         using namespace http;
@@ -131,8 +132,6 @@ namespace adaptive
         {
             public:
                 SubSegment(Segment *, size_t start, size_t end);
-                virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *); /* impl */
-                virtual Url getUrlSegment() const; /* impl */
                 static const int CLASSID_SUBSEGMENT = 4;
         };
     }

@@ -81,7 +81,7 @@ std::size_t SegmentInformation::getMediaSegments(std::vector<Segment *> &retSegm
 {
     if( mediaSegmentTemplate )
     {
-        retSegments.push_back( mediaSegmentTemplate );
+        retSegments.push_back( mediaSegmentTemplate->getMediaSegment(0) );
     }
     else if ( segmentList && !segmentList->getSegments().empty() )
     {
@@ -100,144 +100,49 @@ std::size_t SegmentInformation::getMediaSegments(std::vector<Segment *> &retSegm
     return retSegments.size();
 }
 
+const AbstractSegmentBaseType * SegmentInformation::inheritSegmentProfile() const
+{
+    const AbstractSegmentBaseType *profile = inheritSegmentTemplate();
+    if(!profile)
+        profile = inheritSegmentList();
+    if(!profile)
+        profile = inheritSegmentBase();
+    return profile;
+}
+
+
 /* Returns wanted segment, or next in sequence if not found */
 Segment *  SegmentInformation::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newpos,
                                                    bool *pb_gap) const
 {
-    *pb_gap = false;
-    *pi_newpos = i_pos;
-
-    std::vector<Segment *> retSegments;
-    const size_t size = getMediaSegments( retSegments );
-    if( size )
-    {
-        std::vector<Segment *>::const_iterator it;
-        for(it = retSegments.begin(); it != retSegments.end(); ++it)
-        {
-            Segment *seg = *it;
-            if(seg->isTemplate()) /* we don't care about seq number */
-            {
-                /* Check if we don't exceed timeline */
-                MediaSegmentTemplate *templ = dynamic_cast<MediaSegmentTemplate*>(retSegments[0]);
-                const SegmentTimeline *timeline = (templ) ? templ->inheritSegmentTimeline() : NULL;
-                if(timeline)
-                {
-                    *pi_newpos = std::max(timeline->minElementNumber(), i_pos);
-                    if(timeline->maxElementNumber() < i_pos)
-                        return NULL;
-                }
-                else
-                {
-                    /* check template upper bound */
-                    if(!getPlaylist()->isLive())
-                    {
-                        const Timescale timescale = templ->inheritTimescale();
-                        const stime_t segmentduration = templ->inheritDuration();
-                        vlc_tick_t totalduration = getPeriodDuration();
-                        if(totalduration == 0)
-                            totalduration = getPlaylist()->duration.Get();
-                        if(totalduration && segmentduration)
-                        {
-                            uint64_t endnum = templ->inheritStartNumber() +
-                                    (timescale.ToScaled(totalduration) + segmentduration - 1) / segmentduration;
-                            if(i_pos >= endnum)
-                            {
-                                *pi_newpos = i_pos;
-                                return NULL;
-                            }
-                        }
-                    }
-                    *pi_newpos = i_pos;
-                    /* start number */
-                    *pi_newpos = std::max(templ->inheritStartNumber(), i_pos);
-                }
-                return seg;
-            }
-            else if(seg->getSequenceNumber() >= i_pos)
-            {
-                *pi_newpos = seg->getSequenceNumber();
-                *pb_gap = (*pi_newpos != i_pos);
-                return seg;
-            }
-        }
-    }
-
-    return NULL;
+    const AbstractSegmentBaseType *profile = inheritSegmentProfile();
+    if(!profile)
+        return NULL;
+    return profile->getNextMediaSegment(i_pos, pi_newpos, pb_gap);
 }
 
 InitSegment * SegmentInformation::getInitSegment() const
 {
-    if( segmentBase && segmentBase->initialisationSegment.Get() )
-    {
-        return segmentBase->initialisationSegment.Get();
-    }
-    else if( segmentList && segmentList->initialisationSegment.Get() )
-    {
-        return segmentList->initialisationSegment.Get();
-    }
-    else if( mediaSegmentTemplate && mediaSegmentTemplate->initialisationSegment.Get() )
-    {
-        return mediaSegmentTemplate->initialisationSegment.Get();
-    }
-    else if( parent )
-    {
-        return parent->getInitSegment();
-    }
-    else return NULL;
+    const AbstractSegmentBaseType *profile = inheritSegmentProfile();
+    if(!profile)
+        return NULL;
+    return profile->getInitSegment();
 }
 
 IndexSegment *SegmentInformation::getIndexSegment() const
 {
-    if( segmentBase && segmentBase->indexSegment.Get() )
-    {
-        return segmentBase->indexSegment.Get();
-    }
-    else if( segmentList && segmentList->indexSegment.Get() )
-    {
-        return segmentList->indexSegment.Get();
-    }
-    else if( parent )
-    {
-        return parent->getIndexSegment();
-    }
-    else return NULL;
+    const AbstractSegmentBaseType *profile = inheritSegmentProfile();
+    if(!profile)
+        return NULL;
+    return profile->getIndexSegment();
 }
 
 Segment * SegmentInformation::getMediaSegment(uint64_t pos) const
 {
-    if( mediaSegmentTemplate )
-    {
-        const SegmentTimeline *tl = mediaSegmentTemplate->inheritSegmentTimeline();
-        if(tl == NULL || tl->maxElementNumber() > pos)
-            return mediaSegmentTemplate;
-    }
-    else if( segmentList )
-    {
-        return segmentList->getSegmentByNumber( pos );
-    }
-    else if( segmentBase )
-    {
-        /* FIXME add getSegmentByNumber */
-        const std::vector<Segment *> &retSegments = segmentBase->subSegments();
-        std::vector<Segment *>::const_iterator it;
-        for(it = retSegments.begin(); it != retSegments.end(); ++it)
-        {
-            Segment *seg = *it;
-            if(seg->getSequenceNumber() >= pos)
-            {
-                if(seg->getSequenceNumber() == pos)
-                    return seg;
-                else
-                    return NULL;
-            }
-        }
+    const AbstractSegmentBaseType *profile = inheritSegmentProfile();
+    if(!profile)
         return NULL;
-    }
-    else if( parent )
-    {
-        return parent->getMediaSegment(pos);
-    }
-    return NULL;
+    return profile->getMediaSegment(pos);
 }
 
 SegmentInformation * SegmentInformation::getChildByID(const adaptive::ID &id)
@@ -269,17 +174,6 @@ void SegmentInformation::updateWith(SegmentInformation *updated)
             child->updateWith(updatedChild);
     }
     /* FIXME: handle difference */
-}
-
-void SegmentInformation::mergeWithTimeline(SegmentTimeline *updated)
-{
-    MediaSegmentTemplate *templ = inheritSegmentTemplate();
-    if(templ)
-    {
-        SegmentTimeline *timeline = templ->inheritSegmentTimeline();
-        if(timeline)
-            timeline->updateWith(*updated);
-    }
 }
 
 void SegmentInformation::pruneByPlaybackTime(vlc_tick_t time)
@@ -334,6 +228,23 @@ vlc_tick_t SegmentInformation::getPeriodDuration() const
         return 0;
 }
 
+SegmentInformation * SegmentInformation::getParent() const
+{
+    return parent;
+}
+
+AbstractSegmentBaseType * SegmentInformation::getProfile() const
+{
+    if(mediaSegmentTemplate)
+        return mediaSegmentTemplate;
+    else if(segmentList)
+        return segmentList;
+    else if(segmentBase)
+        return segmentBase;
+    else
+        return NULL;
+}
+
 void SegmentInformation::updateSegmentList(SegmentList *list, bool restamp)
 {
     if(segmentList && restamp)
@@ -355,7 +266,7 @@ void SegmentInformation::setSegmentBase(SegmentBase *base)
     segmentBase = base;
 }
 
-void SegmentInformation::setSegmentTemplate(MediaSegmentTemplate *templ)
+void SegmentInformation::setSegmentTemplate(SegmentTemplate *templ)
 {
     if(mediaSegmentTemplate)
     {
@@ -456,7 +367,7 @@ SegmentList * SegmentInformation::inheritSegmentList() const
         return NULL;
 }
 
-MediaSegmentTemplate * SegmentInformation::inheritSegmentTemplate() const
+SegmentTemplate * SegmentInformation::inheritSegmentTemplate() const
 {
     if(mediaSegmentTemplate)
         return mediaSegmentTemplate;

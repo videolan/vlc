@@ -140,7 +140,7 @@ std::string Url::toString(size_t index, const BaseRepresentation *rep) const
     return ret;
 }
 
-Url::Component::Component(const std::string & str, const BaseSegmentTemplate *templ_)
+Url::Component::Component(const std::string & str, const SegmentTemplate *templ_)
  : component(str), templ(templ_), b_scheme(false), b_dir(false), b_absolute(false)
 {
     if(!component.empty())

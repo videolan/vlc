@@ -122,34 +122,13 @@ void BaseRepresentation::pruneByPlaybackTime(vlc_tick_t time)
 
 vlc_tick_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
 {
-    std::vector<Segment *> seglist;
-    getMediaSegments(seglist);
+    AbstractSegmentBaseType *profile = inheritSegmentTemplate();
+    if(!profile)
+        profile = inheritSegmentList();
+    if(!profile)
+        profile = inheritSegmentBase();
 
-    if(seglist.size() == 1 && seglist.front()->isTemplate())
-    {
-        const MediaSegmentTemplate *templ = dynamic_cast<MediaSegmentTemplate *>(seglist.front());
-        if(templ)
-        {
-            const Timescale timescale = templ->inheritTimescale();
-            stime_t i_length = templ->getMinAheadScaledTime(curnum);
-            return timescale.ToTime(i_length);
-        }
-
-        /* should not happen */
-        return VLC_TICK_FROM_SEC(1);
-    }
-
-    vlc_tick_t minTime = 0;
-    const Timescale timescale = inheritTimescale();
-    std::vector<Segment *>::const_iterator it;
-    for(it = seglist.begin(); it != seglist.end(); ++it)
-    {
-        const Segment *seg = *it;
-        if(seg->getSequenceNumber() > curnum)
-            minTime += timescale.ToTime(seg->duration.Get());
-    }
-
-    return minTime;
+    return profile ? profile->getMinAheadTime(curnum) : 0;
 }
 
 void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
@@ -166,20 +145,13 @@ void BaseRepresentation::debug(vlc_object_t *obj, int indent) const
         text.append("]");
     }
     msg_Dbg(obj, "%s", text.c_str());
-    const ISegment *seg;
-    if((seg = getInitSegment()))
-        seg->debug(obj, indent + 1);
-    if((seg = getIndexSegment()))
-        seg->debug(obj, indent + 1);
-    std::vector<Segment *> list;
-    getMediaSegments(list);
-    std::vector<Segment *>::const_iterator l;
-    for(l = list.begin(); l != list.end(); ++l)
-        (*l)->debug(obj, indent + 1);
+    const AbstractSegmentBaseType *profile = getProfile();
+    if(profile)
+        profile->debug(obj, indent + 1);
 }
 
 std::string BaseRepresentation::contextualize(size_t, const std::string &component,
-                                              const BaseSegmentTemplate *) const
+                                              const SegmentTemplate *) const
 {
     return component;
 }
@@ -205,64 +177,8 @@ uint64_t BaseRepresentation::translateSegmentNumber(uint64_t num, const BaseRepr
 
 bool BaseRepresentation::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) const
 {
-    MediaSegmentTemplate *mediaSegmentTemplate = inheritSegmentTemplate();
-    if( mediaSegmentTemplate )
-    {
-        const SegmentTimeline *timeline = mediaSegmentTemplate->inheritSegmentTimeline();
-        if(timeline)
-        {
-            const Timescale timescale = timeline->getTimescale().isValid()
-                                      ? timeline->getTimescale()
-                                      : mediaSegmentTemplate->inheritTimescale();
-            stime_t st = timescale.ToScaled(time);
-            *ret = timeline->getElementNumberByScaledPlaybackTime(st);
-            return true;
-        }
-
-        const stime_t duration = mediaSegmentTemplate->duration.Get();
-        if( duration )
-        {
-            if( getPlaylist()->isLive() )
-            {
-                vlc_tick_t now = vlc_tick_from_sec(::time(NULL));
-                if(getPlaylist()->availabilityStartTime.Get())
-                {
-                    if(time >= getPlaylist()->availabilityStartTime.Get() && time < now)
-                        *ret = mediaSegmentTemplate->getLiveTemplateNumber(time, true);
-                    else if(now - getPlaylist()->availabilityStartTime.Get() > time)
-                        *ret = mediaSegmentTemplate->getLiveTemplateNumber(time, false);
-                }
-                else return false;
-            }
-            else
-            {
-                const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
-                *ret = mediaSegmentTemplate->inheritStartNumber();
-                *ret += timescale.ToScaled(time) / duration;
-            }
-            return true;
-        }
-    }
-
-    SegmentList *segmentList = inheritSegmentList();
-    if ( segmentList && !segmentList->getSegments().empty() )
-    {
-        const Timescale timescale = segmentList->inheritTimescale();
-        stime_t st = timescale.ToScaled(time);
-        return segmentList->getSegmentNumberByScaledTime(st, ret);
-    }
-
-    SegmentBase *segmentBase = inheritSegmentBase();
-    if( segmentBase )
-    {
-        const Timescale timescale = inheritTimescale();
-        stime_t st = timescale.ToScaled(time);
-        *ret = 0;
-        const std::vector<Segment *> &list = segmentBase->subSegments();
-        return SegmentInfoCommon::getSegmentNumberByScaledTime(list, st, ret);
-    }
-
-    return false;
+    const AbstractSegmentBaseType *profile = inheritSegmentProfile();
+    return profile && profile->getSegmentNumberByTime(time, ret);
 }
 
 bool BaseRepresentation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
@@ -271,56 +187,15 @@ bool BaseRepresentation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     if(number == std::numeric_limits<uint64_t>::max())
         return false;
 
-    MediaSegmentTemplate *mediaTemplate = inheritSegmentTemplate();
-    if( mediaTemplate )
-    {
-        const Timescale timescale = mediaTemplate->inheritTimescale();
-        const SegmentTimeline * timeline = mediaTemplate->inheritSegmentTimeline();
-
-        stime_t stime, sduration;
-        if(timeline)
-        {
-            if(!timeline->getScaledPlaybackTimeDurationBySegmentNumber(number, &stime, &sduration))
-                return false;
-        }
-        else
-        {
-            uint64_t startNumber = mediaTemplate->inheritStartNumber();
-            if(number < startNumber)
-                return false;
-            sduration = mediaTemplate->inheritDuration();
-            stime = (number - startNumber) * sduration;
-        }
-        *time = timescale.ToTime(stime);
-        *duration = timescale.ToTime(sduration);
-        return true;
-    }
-
-    SegmentList *segList = inheritSegmentList();
-    if ( segList )
-    {
-        return segList->getPlaybackTimeDurationBySegmentNumber(number, time, duration);
-    }
-    else
-    {
-        const Timescale timescale = inheritTimescale();
-        const ISegment *segment = getMediaSegment(number);
-        if( segment )
-        {
-            *time = timescale.ToTime(segment->startTime.Get());
-            *duration = timescale.ToTime(segment->duration.Get());
-            return true;
-        }
-    }
-
-    return false;
+    const AbstractSegmentBaseType *profile = inheritSegmentProfile();
+    return profile && profile->getPlaybackTimeDurationBySegmentNumber(number, time, duration);
 }
 
 bool BaseRepresentation::getMediaPlaybackRange(vlc_tick_t *rangeBegin,
                                                vlc_tick_t *rangeEnd,
                                                vlc_tick_t *rangeLength) const
 {
-    MediaSegmentTemplate *mediaSegmentTemplate = inheritSegmentTemplate();
+    SegmentTemplate *mediaSegmentTemplate = inheritSegmentTemplate();
     if( mediaSegmentTemplate )
     {
         const Timescale timescale = mediaSegmentTemplate->inheritTimescale();

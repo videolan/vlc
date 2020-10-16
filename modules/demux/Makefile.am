@@ -315,10 +315,10 @@ libadaptive_plugin_la_SOURCES = \
     demux/adaptive/playlist/Segment.h \
     demux/adaptive/playlist/SegmentBase.cpp \
     demux/adaptive/playlist/SegmentBase.h \
+    demux/adaptive/playlist/SegmentBaseType.cpp \
+    demux/adaptive/playlist/SegmentBaseType.hpp \
     demux/adaptive/playlist/SegmentChunk.cpp \
     demux/adaptive/playlist/SegmentChunk.hpp \
-    demux/adaptive/playlist/SegmentInfoCommon.cpp \
-    demux/adaptive/playlist/SegmentInfoCommon.h \
     demux/adaptive/playlist/SegmentList.cpp \
     demux/adaptive/playlist/SegmentList.h \
     demux/adaptive/playlist/SegmentTimeline.cpp \

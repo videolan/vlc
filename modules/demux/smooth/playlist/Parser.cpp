@@ -232,7 +232,7 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
         if(!url.empty())
         {
             /* SmoothSegment is a template holder */
-            SmoothSegment *templ = new SmoothSegment(adaptSet);
+            SmoothSegmentTemplate *templ = new SmoothSegmentTemplate(adaptSet);
             if(templ)
             {
                 templ->setSourceUrl(url);

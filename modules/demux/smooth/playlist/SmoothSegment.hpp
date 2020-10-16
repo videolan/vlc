@@ -37,11 +37,11 @@ namespace smooth
                 virtual void onDownload(block_t **); /* reimpl */
         };
 
-        class SmoothSegment : public MediaSegmentTemplate
+        class SmoothSegmentTemplate : public SegmentTemplate
         {
             public:
-                SmoothSegment(SegmentInformation * = NULL);
-                ~SmoothSegment();
+                SmoothSegmentTemplate(SegmentInformation * = NULL);
+                ~SmoothSegmentTemplate();
                 virtual SegmentChunk* createChunk(AbstractChunkSource *, BaseRepresentation *); /* reimpl */
         };
     }

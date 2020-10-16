@@ -26,7 +26,7 @@
 #define DASHREPRESENTATION_H_
 
 #include "DASHCommonAttributesElements.h"
-#include "../../adaptive/playlist/SegmentInfoCommon.h"
+#include "../../adaptive/playlist/SegmentBaseType.hpp"
 #include "../../adaptive/playlist/BaseRepresentation.h"
 
 namespace dash
@@ -50,12 +50,12 @@ namespace dash
 
                 /* for segment templates */
                 virtual std::string contextualize(size_t, const std::string &,
-                                                  const BaseSegmentTemplate *) const; // reimpl
+                                                  const SegmentTemplate *) const; // reimpl
 
             private:
 
                 /* for contextualize() */
-                stime_t getScaledTimeBySegmentNumber(uint64_t, const MediaSegmentTemplate *) const;
+                stime_t getScaledTimeBySegmentNumber(uint64_t, const SegmentTemplate *) const;
         };
     }
 }
