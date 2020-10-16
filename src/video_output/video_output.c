@@ -1487,12 +1487,10 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
 
     if (!paused || frame_by_frame)
     {
-        while (!sys->displayed.next)
+        if (!sys->displayed.next)
         {
             sys->displayed.next =
                 ThreadDisplayPreparePicture(vout, false, frame_by_frame, &paused);
-            if (!sys->displayed.next)
-                break;
         }
     }
 
