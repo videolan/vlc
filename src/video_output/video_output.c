@@ -1212,7 +1212,7 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_sys_t *vout, picture_t *pic,
     return NULL;
 }
 
-static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
+static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
 {
     vout_thread_sys_t *sys = vout;
 
@@ -1255,7 +1255,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
         if (unlikely(render_subtitle_date == INT64_MAX))
         {
             render_subtitle_date = system_now;
-            is_forced = true;
+            render_now = true;
         }
     }
 
@@ -1386,7 +1386,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
 
     system_now = vlc_tick_now();
     const vlc_tick_t pts = todisplay->date;
-    vlc_tick_t system_pts = is_forced ? system_now :
+    vlc_tick_t system_pts = render_now ? system_now :
         vlc_clock_ConvertToSystem(sys->clock, system_now, pts, sys->rate);
     if (unlikely(system_pts == INT64_MAX))
     {
@@ -1394,7 +1394,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
          * picture, display the current picture anyway and force the rendering
          * to now. */
         system_pts = system_now;
-        is_forced = true;
+        render_now = true;
     }
 
     const unsigned frame_rate = todisplay->format.i_frame_rate;
@@ -1414,7 +1414,7 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool is_forced)
 #endif
 
     system_now = vlc_tick_now();
-    if (!is_forced)
+    if (!render_now)
     {
         if (unlikely(system_now > system_pts))
         {
@@ -1568,8 +1568,8 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
         return VLC_EGENERIC;
 
     /* display the picture immediately */
-    bool is_forced = force_refresh || sys->displayed.current->b_force;
-    int ret = ThreadDisplayRenderPicture(vout, is_forced);
+    bool render_now = force_refresh || sys->displayed.current->b_force;
+    int ret = ThreadDisplayRenderPicture(vout, render_now);
     return force_refresh ? VLC_EGENERIC : ret;
 }
 
