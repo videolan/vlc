@@ -715,10 +715,14 @@ void Statistics(intf_thread_t *intf)
 void IsPlaying(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
+    vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
+    enum vlc_player_state state;
 
-    msg_print(intf, "%d",
-              sys->last_state == VLC_PLAYER_STATE_PLAYING ||
-              sys->last_state == VLC_PLAYER_STATE_PAUSED);
+    vlc_player_Lock(player);
+    state = vlc_player_GetState(player);
+    msg_print(intf, "%d", state == VLC_PLAYER_STATE_PLAYING
+                       || state == VLC_PLAYER_STATE_PAUSED);
+    vlc_player_Unlock(player);
 }
 
 void *RegisterPlayer(intf_thread_t *intf)

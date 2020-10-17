@@ -34,7 +34,6 @@ struct intf_sys_t
 
     /* status changes */
     vlc_mutex_t             status_lock;
-    enum vlc_player_state   last_state;
     bool                    b_input_buffering;
 
 #ifndef _WIN32
