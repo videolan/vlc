@@ -252,16 +252,16 @@ static void PlayerSeek(intf_thread_t *intf, const char *const *args,
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
 
     vlc_player_Lock(player);
-        if (count > 1 && args[1][strlen(args[1]) - 1] == '%' )
-        {
-            float f = atof(args[1]) / 100.0;
-            vlc_player_SetPosition(player, f);
-        }
-        else
-        {
-            int t = atoi(args[1]);
-            vlc_player_SetTime(player, vlc_tick_from_sec(t));
-        }
+    if (count > 1 && args[1][strlen(args[1]) - 1] == '%' )
+    {
+        float f = atof(args[1]) / 100.0;
+        vlc_player_SetPosition(player, f);
+    }
+    else
+    {
+        int t = atoi(args[1]);
+        vlc_player_SetTime(player, vlc_tick_from_sec(t));
+    }
     vlc_player_Unlock(player);
 }
 
@@ -272,24 +272,20 @@ static void PlayerSetChapter(intf_thread_t *intf, const char *const *args,
 
     vlc_player_Lock(player);
 
-            if (count > 1)
-            {
-                /* Set. */
-                vlc_player_SelectChapterIdx(player, atoi(args[1]));
-            }
-            else
-            {
-                /* Get. */
-                struct vlc_player_title const *title = vlc_player_GetSelectedTitle(player);
-                ssize_t chapter = -1;
-                if (title != NULL)
-                    chapter = vlc_player_GetSelectedChapterIdx(player);
-                if (chapter != -1)
-                    msg_print(intf, "Currently playing chapter %zd/%zu.",
-                              chapter, title->chapter_count);
-                else
-                    msg_print(intf, "No chapter selected.");
-            }
+    if (count > 1)
+        vlc_player_SelectChapterIdx(player, atoi(args[1]));
+    else
+    {
+        struct vlc_player_title const *title = vlc_player_GetSelectedTitle(player);
+        ssize_t chapter = -1;
+        if (title != NULL)
+            chapter = vlc_player_GetSelectedChapterIdx(player);
+        if (chapter != -1)
+            msg_print(intf, "Currently playing chapter %zd/%zu.",
+                      chapter, title->chapter_count);
+        else
+            msg_print(intf, "No chapter selected.");
+    }
     vlc_player_Unlock(player);
 }
 
@@ -300,29 +296,26 @@ static void PlayerSetTitle(intf_thread_t *intf, const char *const *args,
 
     vlc_player_Lock(player);
 
-
-            if (count > 1)
-            {
-                /* Set. */
-                int idx = atoi(args[1]);
-                if (idx >= 0)
-                    vlc_player_SelectTitleIdx(player, (size_t)idx);
-            }
-            else
-            {
-                /* Get. */
-                ssize_t title = vlc_player_GetSelectedTitleIdx(player);
-                vlc_player_title_list *titles =
-                    vlc_player_GetTitleList(player);
-                size_t title_count = 0;
-                if (titles != NULL)
-                    title_count = vlc_player_title_list_GetCount(titles);
-                if (title != -1 && title_count != 0)
-                    msg_print(intf, "Currently playing title %zd/%zu.", title,
-                              title_count);
-                else
-                    msg_print(intf, "No title selected.");
-            }
+    if (count > 1)
+    {
+        int idx = atoi(args[1]);
+        if (idx >= 0)
+            vlc_player_SelectTitleIdx(player, (size_t)idx);
+    }
+    else
+    {
+        ssize_t title = vlc_player_GetSelectedTitleIdx(player);
+            vlc_player_title_list *titles =
+        vlc_player_GetTitleList(player);
+        size_t title_count = 0;
+        if (titles != NULL)
+            title_count = vlc_player_title_list_GetCount(titles);
+        if (title != -1 && title_count != 0)
+            msg_print(intf, "Currently playing title %zd/%zu.", title,
+                      title_count);
+        else
+            msg_print(intf, "No title selected.");
+    }
     vlc_player_Unlock(player);
 }
 
@@ -332,45 +325,54 @@ static void PlayerSetTrack(intf_thread_t *intf, const char *const *args,
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
     const char *psz_cmd = args[0];
 
-        enum es_format_category_e cat;
-        if( !strcmp( psz_cmd, "atrack" ) )
+    enum es_format_category_e cat;
+
+    switch (psz_cmd[0])
+    {
+        case 'a':
             cat = AUDIO_ES;
-        else if( !strcmp( psz_cmd, "vtrack" ) )
+            break;
+        case 'v':
             cat = VIDEO_ES;
-        else
+            break;
+        default:
             cat = SPU_ES;
+    }
 
     vlc_player_Lock(player);
 
-        if (count > 1)
+    if (count > 1)
+    {
+        int idx = atoi(args[1]);
+        if (idx < 0)
+            goto out;
+
+        size_t track_count = vlc_player_GetTrackCount(player, cat);
+        if ((unsigned)idx >= track_count)
+            goto out;
+
+        struct vlc_player_track const *track =
+            vlc_player_GetTrackAt(player, cat, (size_t)idx);
+        if (track != NULL)
+            vlc_player_SelectTrack(player, track, VLC_PLAYER_SELECT_EXCLUSIVE);
+    }
+    else
+    {
+        struct vlc_player_track const *cur_track =
+            vlc_player_GetSelectedTrack(player, cat);
+        char const *name = cur_track ? cur_track->name : psz_cmd;
+        size_t track_count = vlc_player_GetTrackCount(player, cat);
+
+        msg_print(intf, "+----[ %s ]", name);
+        for (size_t i = 0; i < track_count; ++i)
         {
-            int idx = atoi(args[1]);
-            if (idx < 0)
-                goto out;
-            size_t track_count = vlc_player_GetTrackCount(player, cat);
-            if ((unsigned)idx >= track_count)
-                goto out;
             struct vlc_player_track const *track =
-                vlc_player_GetTrackAt(player, cat, (size_t)idx);
-            if (track != NULL)
-                vlc_player_SelectTrack(player, track, VLC_PLAYER_SELECT_EXCLUSIVE);
-        }
-        else
-        {
-            struct vlc_player_track const *cur_track =
-                vlc_player_GetSelectedTrack(player, cat);
-            char const *name = cur_track ? cur_track->name : psz_cmd;
-            msg_print(intf, "+----[ %s ]", name);
-            size_t track_count = vlc_player_GetTrackCount(player, cat);
-            for (size_t i = 0; i < track_count; ++i)
-            {
-                struct vlc_player_track const *track =
                     vlc_player_GetTrackAt(player, cat, i);
-                msg_print(intf, "| %zu - %s%s",
-                          i, track->name, track == cur_track ? " *" : "");
-            }
-            msg_print(intf, "+----[ end of %s ]", name);
+            msg_print(intf, "| %zu - %s%s",
+                      i, track->name, track == cur_track ? " *" : "");
         }
+        msg_print(intf, "+----[ end of %s ]", name);
+    }
 out:
     vlc_player_Unlock(player);
 }
@@ -382,22 +384,20 @@ static void PlayerRecord(intf_thread_t *intf, const char *const *args,
 
     vlc_player_Lock(player);
 
-        bool b_update = true;
-        bool b_value = vlc_player_IsRecording(player);
+    bool b_update = true;
+    bool b_value = vlc_player_IsRecording(player);
 
-        if (count > 1)
-        {
-            if ( ( !strncmp( args[1], "on", 2 )  &&  b_value ) ||
-                 ( !strncmp( args[1], "off", 3 ) && !b_value ) )
-            {
-                b_update = false;
-            }
-        }
-        if( b_update )
-        {
-            b_value = !b_value;
-            vlc_player_SetRecordingEnabled( player, b_value );
-        }
+    if (count > 1)
+    {
+        if ((strncmp(args[1], "on", 2) == 0 &&  b_value)
+         || (strncmp( args[1], "off", 3) == 0 && !b_value))
+            b_update = false;
+    }
+    if (b_update)
+    {
+        b_value = !b_value;
+        vlc_player_SetRecordingEnabled(player, b_value);
+    }
     vlc_player_Unlock(player);
 }
 
