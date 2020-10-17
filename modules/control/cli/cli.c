@@ -270,6 +270,9 @@ static void Process(intf_thread_t *intf, const char *line)
     /* Skip heading spaces */
     const char *cmd = line + strspn(line, " ");
 
+    if (*cmd == '\0')
+        return; /* Ignore empty line */
+
     /* Split psz_cmd at the first space and make sure that
      * psz_arg is valid */
     char *arg = strchr(cmd, ' ');
@@ -298,18 +301,7 @@ static void Process(intf_thread_t *intf, const char *line)
             return;
         }
 
-    /* misc menu commands */
-        switch (cmd[0])
-        {
-            case '\0': /* Ignore empty lines */
-                break;
-
-            default:
-                msg_print(intf,
-                          _("Unknown command `%s'. Type `help' for help."),
-                          cmd);
-                break;
-        }
+    msg_print(intf, _("Unknown command `%s'. Type `help' for help."), cmd);
 }
 
 
