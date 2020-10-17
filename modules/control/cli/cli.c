@@ -520,40 +520,6 @@ static void *Run( void *data )
             }
         }
 
-        if( !vlc_player_IsStarted( player ) )
-        {
-            if (item)
-                item = NULL;
-
-            p_sys->last_state = VLC_PLAYER_STATE_STOPPED;
-            msg_rc( STATUS_CHANGE "( stop state: 0 )" );
-        }
-
-        if( item != NULL )
-        {
-            enum vlc_player_state state = vlc_player_GetState(player);
-
-            if (p_sys->last_state != state)
-            {
-                switch (state)
-                {
-                    case VLC_PLAYER_STATE_STOPPING:
-                    case VLC_PLAYER_STATE_STOPPED:
-                        msg_rc(STATUS_CHANGE "( stop state: 5 )");
-                        break;
-                    case VLC_PLAYER_STATE_PLAYING:
-                        msg_rc(STATUS_CHANGE "( play state: 3 )");
-                        break;
-                    case VLC_PLAYER_STATE_PAUSED:
-                        msg_rc(STATUS_CHANGE "( pause state: 4 )");
-                        break;
-                    default:
-                        break;
-                }
-                p_sys->last_state = state;
-            }
-        }
-
         if( item && b_showpos )
         {
             i_newpos = 100 * vlc_player_GetPosition( player );
@@ -746,7 +712,6 @@ static int Activate( vlc_object_t *p_this )
     p_sys->psz_unix_path = psz_unix_path;
 #endif
     vlc_mutex_init( &p_sys->status_lock );
-    p_sys->last_state = VLC_PLAYER_STATE_STOPPED;
     p_sys->b_input_buffering = false;
     p_sys->playlist = vlc_intf_GetMainPlaylist(p_intf);;
 
