@@ -4373,7 +4373,6 @@ AM_COND_IF([HAVE_WIN32], [
 
 AM_COND_IF([HAVE_DARWIN], [
   AC_CONFIG_FILES([
-    modules/gui/macosx/UI/InfoPlist.strings:modules/gui/macosx/Resources/InfoPlist.strings.in
     share/macosx/Info.plist:share/Info.plist.in
   ])
 ])

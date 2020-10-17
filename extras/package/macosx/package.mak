@@ -17,7 +17,8 @@ VLC.app: install
 	## Copy Contents
 	cp -R $(prefix)/share/macosx/ $@
 	## Copy .strings file and .nib files
-	cp -R $(top_builddir)/modules/gui/macosx/UI $@/Contents/Resources/Base.lproj
+	cp -R "$(top_builddir)/modules/gui/macosx/UI" $@/Contents/Resources/Base.lproj
+	cp "$(srcdir)/modules/gui/macosx/Resources/InfoPlist.strings" $@/Contents/Resources/Base.lproj/
 	## Copy Info.plist and convert to binary
 	cp -R $(top_builddir)/share/macosx/Info.plist $@/Contents/
 	xcrun plutil -convert binary1 $@/Contents/Info.plist
