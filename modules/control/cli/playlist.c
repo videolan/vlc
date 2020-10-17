@@ -489,6 +489,32 @@ static void PlaylistEnqueue(intf_thread_t *intf, const char *const *args,
     PlaylistAddCommon(intf, args, count, false);
 }
 
+static void PlaylistMove(intf_thread_t *intf, const char *const *args,
+                         size_t count)
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+
+    if (count != 3)
+    {
+        msg_print(intf, "%s expects two parameters", args[0]);
+        return;
+    }
+
+    size_t from = strtoul(args[1], NULL, 0);
+    size_t to = strtoul(args[2], NULL, 0);
+
+    vlc_playlist_Lock(playlist);
+    size_t size = vlc_playlist_Count(playlist);
+
+    if (from >= size || to >= size)
+        msg_print(intf,
+                  vlc_ngettext("Playlist has only %zu element",
+                               "Playlist has only %zu elements", size), size);
+    else
+        vlc_playlist_Move(playlist, from, 1, to);
+    vlc_playlist_Unlock(playlist);
+}
+
 static const struct cli_handler cmds[] =
 {
     { "playlist", PlaylistList },
@@ -505,6 +531,7 @@ static const struct cli_handler cmds[] =
     { "random", PlaylistRandom },
     { "enqueue", PlaylistEnqueue },
     { "goto", PlaylistGoto },
+    { "move", PlaylistMove },
 };
 
 void RegisterPlaylist(intf_thread_t *intf)
