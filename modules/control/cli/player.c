@@ -39,6 +39,7 @@
 struct player_cli {
     vlc_player_listener_id *player_listener;
     vlc_player_aout_listener_id *player_aout_listener;
+    bool input_buffering;
 };
 
 /********************************************************************
@@ -75,8 +76,9 @@ player_on_buffering_changed(vlc_player_t *player,
 { VLC_UNUSED(player); VLC_UNUSED(new_buffering);
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
+    struct player_cli *pc = sys->player_cli;
 
-    sys->b_input_buffering = true;
+    pc->input_buffering = true;
 }
 
 static void
@@ -93,11 +95,13 @@ player_on_position_changed(vlc_player_t *player,
 { VLC_UNUSED(player); VLC_UNUSED(new_pos);
     intf_thread_t *p_intf = data;
     intf_sys_t *sys = p_intf->p_sys;
+    struct player_cli *pc = sys->player_cli;
 
-    if (sys->b_input_buffering)
+    if (pc->input_buffering)
         msg_rc(STATUS_CHANGE "( time: %"PRId64"s )",
                SEC_FROM_VLC_TICK(new_time));
-    sys->b_input_buffering = false;
+
+    pc->input_buffering = false;
 }
 
 static const struct vlc_player_cbs player_cbs =
@@ -728,6 +732,8 @@ void *RegisterPlayer(intf_thread_t *intf)
 
     if (unlikely(pc == NULL))
         return NULL;
+
+    pc->input_buffering = false;
 
     vlc_player_Lock(player);
     pc->player_listener = vlc_player_AddListener(player, &player_cbs, intf);

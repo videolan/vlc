@@ -32,9 +32,6 @@ struct intf_sys_t
     /* playlist */
     vlc_playlist_t              *playlist;
 
-    /* status changes */
-    bool                    b_input_buffering;
-
 #ifndef _WIN32
     char *psz_unix_path;
 #else

@@ -711,7 +711,6 @@ static int Activate( vlc_object_t *p_this )
 #ifdef AF_LOCAL
     p_sys->psz_unix_path = psz_unix_path;
 #endif
-    p_sys->b_input_buffering = false;
     p_sys->playlist = vlc_intf_GetMainPlaylist(p_intf);;
 
     /* Non-buffered stdout */
