@@ -34,6 +34,9 @@
 #include <math.h>
 #include <sys/types.h>
 #include <unistd.h>
+#ifdef HAVE_WORDEXP_H
+#include <wordexp.h>
+#endif
 
 #define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
 #include <vlc_common.h>
@@ -276,6 +279,26 @@ static void Process(intf_thread_t *intf, const char *line)
     if (*cmd == '\0')
         return; /* Ignore empty line */
 
+#ifdef HAVE_WORDEXP_H
+    wordexp_t we;
+    int val = wordexp(cmd, &we, 0);
+
+    if (val != 0)
+    {
+        if (val == WRDE_NOSPACE)
+error:      wordfree(&we);
+        msg_print(intf, N_("parse error"));
+        return;
+    }
+
+    size_t count = we.we_wordc;
+    const char **args = vlc_alloc(count, sizeof (*args));
+    if (unlikely(args == NULL))
+        goto error;
+
+    for (size_t i = 0; i < we.we_wordc; i++)
+        args[i] = we.we_wordv[i];
+#else
     /* Split psz_cmd at the first space and make sure that
      * psz_arg is valid */
     const char *args[] = { cmd, NULL };
@@ -290,17 +313,26 @@ static void Process(intf_thread_t *intf, const char *line)
         if (*arg)
             count++;
     }
+#endif
 
-    void (*cb)(intf_thread_t *, const char *const *, size_t) = UnknownCmd;
+    if (count > 0)
+    {
+        void (*cb)(intf_thread_t *, const char *const *, size_t) = UnknownCmd;
 
-    for (size_t i = 0; i < ARRAY_SIZE(cmds); i++)
-        if (strcmp(args[0], cmds[i].name) == 0)
-        {
-            cb = cmds[i].handler;
-            break;
-        }
+        for (size_t i = 0; i < ARRAY_SIZE(cmds); i++)
+            if (strcmp(args[0], cmds[i].name) == 0)
+            {
+                cb = cmds[i].handler;
+                break;
+            }
 
-    cb(intf, args, count);
+        cb(intf, args, count);
+    }
+
+#ifdef HAVE_WORDEXP_H
+    free(args);
+    wordfree(&we);
+#endif
 }
 
 

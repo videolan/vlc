@@ -34,6 +34,7 @@
 
 #include "cli.h"
 
+#ifndef HAVE_WORDEXP_H
 /*****************************************************************************
  * parse_MRL: build a input item from a full mrl
  *****************************************************************************
@@ -137,6 +138,7 @@ static input_item_t *parse_MRL(const char *mrl)
 
     return p_item;
 }
+#endif
 
 static void print_playlist(intf_thread_t *p_intf, vlc_playlist_t *playlist)
 {
@@ -388,9 +390,59 @@ static void PlaylistAddCommon(intf_thread_t *intf, const char *const *args,
                               size_t n_args, bool play)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
-    const char *arg = n_args > 1 ? args[1] : "";
+    size_t count;
 
     vlc_playlist_Lock(playlist);
+    count = vlc_playlist_Count(playlist);
+#ifdef HAVE_WORDEXP_H
+
+    for (size_t i = 1; i < n_args;)
+    {
+        input_item_t *item;
+
+        if (strstr(args[i], "://" ) != NULL)
+            item = input_item_New(args[i], NULL);
+        else
+        {
+            char *url = vlc_path2uri(args[i], NULL);
+
+            if (url != NULL)
+            {
+                item = input_item_New(url, NULL);
+                free(url);
+            }
+            else
+                item = NULL;
+        }
+
+        i++;
+
+        /* Check if following argument(s) are input item options prefixed with
+         * a colon.
+         */
+        while (i < n_args && args[i][0] == ':')
+        {
+            if (likely(item != NULL))
+                input_item_AddOption(item, args[i] + 1,
+                                     VLC_INPUT_OPTION_TRUSTED);
+            i++;
+        }
+
+        if (unlikely(item == NULL))
+            continue;
+
+        if (vlc_playlist_InsertOne(playlist, count, item) == VLC_SUCCESS)
+        {
+            if (play)
+                vlc_playlist_PlayAt(playlist, count);
+
+            count++;
+        }
+
+        input_item_Release(item);
+    }
+#else
+    const char *arg = n_args > 1 ? args[1] : "";
 
     input_item_t *item = parse_MRL( arg );
 
@@ -399,14 +451,13 @@ static void PlaylistAddCommon(intf_thread_t *intf, const char *const *args,
         msg_print(intf, "Trying to %s %s to playlist.",
                   play ? "add" : "enqueue", arg);
 
-        size_t count = vlc_playlist_Count(playlist);
         if (vlc_playlist_InsertOne(playlist, count, item) == VLC_SUCCESS
          && play)
             vlc_playlist_PlayAt(playlist, count);
 
         input_item_Release(item);
     }
-
+#endif
     vlc_playlist_Unlock(playlist);
 }
 
