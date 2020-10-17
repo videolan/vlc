@@ -58,32 +58,6 @@ struct cli_handler
 void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,
                       size_t count);
 
-void PlayerPause(intf_thread_t *intf, const char *const *, size_t);
-void PlayerFastForward(intf_thread_t *intf, const char *const *, size_t);
-void PlayerRewind(intf_thread_t *intf, const char *const *, size_t);
-void PlayerFaster(intf_thread_t *intf, const char *const *, size_t);
-void PlayerSlower(intf_thread_t *intf, const char *const *, size_t);
-void PlayerNormal(intf_thread_t *intf, const char *const *, size_t);
-void PlayerFrame(intf_thread_t *intf, const char *const *, size_t);
-void PlayerChapterPrev(intf_thread_t *intf, const char *const *, size_t);
-void PlayerChapterNext(intf_thread_t *intf, const char *const *, size_t);
-void PlayerTitlePrev(intf_thread_t *intf, const char *const *, size_t);
-void PlayerTitleNext(intf_thread_t *intf, const char *const *, size_t);
-void Input(intf_thread_t *intf, const char *const *, size_t);
-void PlayerItemInfo(intf_thread_t *intf, const char *const *, size_t);
-void PlayerGetTime(intf_thread_t *intf, const char *const *, size_t);
-void PlayerGetLength(intf_thread_t *intf, const char *const *, size_t);
-void PlayerGetTitle(intf_thread_t *intf, const char *const *, size_t);
-void PlayerVoutSnapshot(intf_thread_t *intf, const char *const *, size_t);
-void PlayerFullscreen(intf_thread_t *intf, const char *const *, size_t);
-void Volume(intf_thread_t *intf, const char *const *, size_t);
-void VolumeMove(intf_thread_t *intf, const char *const *, size_t);
-void VideoConfig(intf_thread_t *intf, const char *const *, size_t);
-void AudioDevice(intf_thread_t *intf, const char *const *, size_t);
-void AudioChannel(intf_thread_t *intf, const char *const *, size_t);
-void Statistics(intf_thread_t *intf, const char *const *, size_t);
-void IsPlaying(intf_thread_t *intf, const char *const *, size_t);
-
 void *RegisterPlayer(intf_thread_t *intf);
 void DeregisterPlayer(intf_thread_t *intf, void *);
 

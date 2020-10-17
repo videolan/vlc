@@ -226,25 +226,7 @@ static const struct cli_handler cmds[] =
     { "prev", PlaylistPrev },
     { "next", PlaylistNext },
     { "status", PlaylistStatus },
-    { "pause", PlayerPause },
-    { "title_n", PlayerTitleNext },
-    { "title_p", PlayerTitlePrev },
-    { "chapter_n", PlayerChapterNext },
-    { "chapter_p", PlayerChapterPrev },
-    { "fastforward", PlayerFastForward },
-    { "rewind", PlayerRewind },
-    { "faster", PlayerFaster },
-    { "slower", PlayerSlower },
-    { "normal", PlayerNormal },
-    { "frame", PlayerFrame },
-    { "info", PlayerItemInfo },
-    { "get_time", PlayerGetTime },
-    { "get_length", PlayerGetLength },
-    { "get_title", PlayerGetTitle },
-    { "snapshot", PlayerVoutSnapshot },
 
-    { "is_playing", IsPlaying },
-    { "stats", Statistics },
     { "longhelp", Help },
     { "h", Help },
     { "help", Help },
@@ -260,31 +242,6 @@ static const struct cli_handler cmds[] =
     { "random", PlaylistRandom },
     { "enqueue", PlaylistEnqueue },
     { "goto", PlaylistGoto },
-
-    /* DVD commands */
-    { "seek", Input },
-    { "title", Input },
-    { "chapter", Input },
-
-    { "atrack", Input },
-    { "vtrack", Input },
-    { "strack", Input },
-    { "record", Input },
-    { "f", PlayerFullscreen },
-    { "fs", PlayerFullscreen },
-    { "fullscreen", PlayerFullscreen },
-
-    /* video commands */
-    { "vratio", VideoConfig },
-    { "vcrop", VideoConfig },
-    { "vzoom", VideoConfig },
-
-    /* audio commands */
-    { "volume", Volume },
-    { "volup", VolumeMove },
-    { "voldown", VolumeMove },
-    { "adev", AudioDevice },
-    { "achan", AudioChannel },
 
     { "key", KeyAction },
     { "hotkey", KeyAction },

@@ -139,14 +139,15 @@ static void PlayerDoVoid(intf_thread_t *intf, void (*cb)(vlc_player_t *))
     vlc_player_Unlock(player);
 }
 
-void PlayerPause(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerPause(intf_thread_t *intf, const char *const *args,
+                        size_t count)
 {
     PlayerDoVoid(intf, vlc_player_TogglePause);
     (void) args; (void) count;
 }
 
-void PlayerFastForward(intf_thread_t *intf, const char *const *args,
-                       size_t count)
+static void PlayerFastForward(intf_thread_t *intf, const char *const *args,
+                              size_t count)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
@@ -165,7 +166,8 @@ void PlayerFastForward(intf_thread_t *intf, const char *const *args,
     (void) args; (void) count;
 }
 
-void PlayerRewind(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerRewind(intf_thread_t *intf, const char *const *args,
+                         size_t count)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
@@ -183,13 +185,15 @@ void PlayerRewind(intf_thread_t *intf, const char *const *args, size_t count)
     (void) args; (void) count;
 }
 
-void PlayerFaster(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerFaster(intf_thread_t *intf, const char *const *args,
+                         size_t count)
 {
     PlayerDoVoid(intf, vlc_player_IncrementRate);
     (void) args; (void) count;
 }
 
-void PlayerSlower(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerSlower(intf_thread_t *intf, const char *const *args,
+                         size_t count)
 {
     PlayerDoVoid(intf, vlc_player_DecrementRate);
     (void) args; (void) count;
@@ -200,43 +204,49 @@ static void PlayerDoNormal(vlc_player_t *player)
     vlc_player_ChangeRate(player, 1.f);
 }
 
-void PlayerNormal(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerNormal(intf_thread_t *intf, const char *const *args,
+                         size_t count)
 {
     PlayerDoVoid(intf, PlayerDoNormal);
     (void) args; (void) count;
 }
 
-void PlayerFrame(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerFrame(intf_thread_t *intf, const char *const *args,
+                        size_t count)
 {
     PlayerDoVoid(intf, vlc_player_NextVideoFrame);
     (void) args; (void) count;
 }
 
-void PlayerChapterPrev(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerChapterPrev(intf_thread_t *intf, const char *const *args,
+                              size_t count)
 {
     PlayerDoVoid(intf, vlc_player_SelectPrevChapter);
     (void) args; (void) count;
 }
 
-void PlayerChapterNext(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerChapterNext(intf_thread_t *intf, const char *const *args,
+                              size_t count)
 {
     PlayerDoVoid(intf, vlc_player_SelectNextChapter);
     (void) args; (void) count;
 }
 
-void PlayerTitlePrev(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerTitlePrev(intf_thread_t *intf, const char *const *args,
+                            size_t count)
 {
     PlayerDoVoid(intf, vlc_player_SelectPrevTitle);
     (void) args; (void) count;
 }
 
-void PlayerTitleNext(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerTitleNext(intf_thread_t *intf, const char *const *args,
+                            size_t count)
 {
     PlayerDoVoid(intf, vlc_player_SelectNextTitle);
     (void) args; (void) count;
 }
 
-void Input(intf_thread_t *intf, const char *const *args, size_t n_args)
+static void Input(intf_thread_t *intf, const char *const *args, size_t n_args)
 {
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
     const char *psz_cmd = args[0];
@@ -368,7 +378,8 @@ out:
     vlc_player_Unlock(player);
 }
 
-void PlayerItemInfo(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerItemInfo(intf_thread_t *intf, const char *const *args,
+                           size_t count)
 {
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
     input_item_t *item;
@@ -402,7 +413,8 @@ void PlayerItemInfo(intf_thread_t *intf, const char *const *args, size_t count)
     (void) args; (void) count;
 }
 
-void PlayerGetTime(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerGetTime(intf_thread_t *intf, const char *const *args,
+                          size_t count)
 {
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
     vlc_tick_t t;
@@ -416,7 +428,8 @@ void PlayerGetTime(intf_thread_t *intf, const char *const *args, size_t count)
     (void) args; (void) count;
 }
 
-void PlayerGetLength(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerGetLength(intf_thread_t *intf, const char *const *args,
+                            size_t count)
 {
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
     vlc_tick_t l;
@@ -431,7 +444,8 @@ void PlayerGetLength(intf_thread_t *intf, const char *const *args, size_t count)
     (void) args; (void) count;
 }
 
-void PlayerGetTitle(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlayerGetTitle(intf_thread_t *intf, const char *const *args,
+                           size_t count)
 {
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
     const struct vlc_player_title *title;
@@ -443,15 +457,15 @@ void PlayerGetTitle(intf_thread_t *intf, const char *const *args, size_t count)
     (void) args; (void) count;
 }
 
-void PlayerVoutSnapshot(intf_thread_t *intf, const char *const *args,
-                        size_t count)
+static void PlayerVoutSnapshot(intf_thread_t *intf, const char *const *args,
+                               size_t count)
 {
     PlayerDoVoid(intf, vlc_player_vout_Snapshot);
     (void) args; (void) count;
 }
 
-void PlayerFullscreen(intf_thread_t *intf, const char *const *args,
-                      size_t count)
+static void PlayerFullscreen(intf_thread_t *intf, const char *const *args,
+                             size_t count)
 {
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
     bool fs = !vlc_player_vout_IsFullscreen(player);
@@ -467,7 +481,7 @@ void PlayerFullscreen(intf_thread_t *intf, const char *const *args,
     vlc_player_vout_SetFullscreen(player, fs);
 }
 
-void Volume(intf_thread_t *intf, const char *const *args, size_t count)
+static void Volume(intf_thread_t *intf, const char *const *args, size_t count)
 {
     const char *arg = count > 1 ? args[1] : "";
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
@@ -488,7 +502,8 @@ void Volume(intf_thread_t *intf, const char *const *args, size_t count)
     vlc_player_Unlock(player);
 }
 
-void VolumeMove(intf_thread_t *intf, const char *const *args, size_t count)
+static void VolumeMove(intf_thread_t *intf, const char *const *args,
+                       size_t count)
 {
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
     const char *psz_cmd = args[0];
@@ -505,7 +520,8 @@ void VolumeMove(intf_thread_t *intf, const char *const *args, size_t count)
     vlc_player_Unlock(player);
 }
 
-void VideoConfig(intf_thread_t *intf, const char *const *args, size_t n_args)
+static void VideoConfig(intf_thread_t *intf, const char *const *args,
+                        size_t n_args)
 {
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
     vout_thread_t *p_vout = vlc_player_vout_Hold(player);
@@ -606,7 +622,8 @@ void VideoConfig(intf_thread_t *intf, const char *const *args, size_t n_args)
     vout_Release(p_vout);
 }
 
-void AudioDevice(intf_thread_t *intf, const char *const *args, size_t count)
+static void AudioDevice(intf_thread_t *intf, const char *const *args,
+                        size_t count)
 {
     const char *cmd = args[0];
     const char *arg = count > 1 ? args[1] : "";
@@ -663,7 +680,8 @@ out:
     aout_Release(aout);
 }
 
-void AudioChannel(intf_thread_t *intf, const char *const *args, size_t n_args)
+static void AudioChannel(intf_thread_t *intf, const char *const *args,
+                         size_t n_args)
 {
     const char *cmd = args[0];
     const char *arg = n_args > 1 ? args[1] : "";
@@ -706,7 +724,8 @@ out:
     aout_Release(p_aout);
 }
 
-void Statistics(intf_thread_t *intf, const char *const *args, size_t count)
+static void Statistics(intf_thread_t *intf, const char *const *args,
+                       size_t count)
 {
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
     input_item_t *item;
@@ -764,7 +783,8 @@ void Statistics(intf_thread_t *intf, const char *const *args, size_t count)
     (void) args; (void) count;
 }
 
-void IsPlaying(intf_thread_t *intf, const char *const *args, size_t count)
+static void IsPlaying(intf_thread_t *intf, const char *const *args,
+                      size_t count)
 {
     intf_sys_t *sys = intf->p_sys;
     vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
@@ -778,6 +798,54 @@ void IsPlaying(intf_thread_t *intf, const char *const *args, size_t count)
     (void) args; (void) count;
 }
 
+static const struct cli_handler cmds[] =
+{
+    { "pause", PlayerPause },
+    { "title_n", PlayerTitleNext },
+    { "title_p", PlayerTitlePrev },
+    { "chapter_n", PlayerChapterNext },
+    { "chapter_p", PlayerChapterPrev },
+    { "fastforward", PlayerFastForward },
+    { "rewind", PlayerRewind },
+    { "faster", PlayerFaster },
+    { "slower", PlayerSlower },
+    { "normal", PlayerNormal },
+    { "frame", PlayerFrame },
+    { "info", PlayerItemInfo },
+    { "get_time", PlayerGetTime },
+    { "get_length", PlayerGetLength },
+    { "get_title", PlayerGetTitle },
+    { "snapshot", PlayerVoutSnapshot },
+
+    { "is_playing", IsPlaying },
+    { "stats", Statistics },
+
+    /* DVD commands */
+    { "seek", Input },
+    { "title", Input },
+    { "chapter", Input },
+
+    { "atrack", Input },
+    { "vtrack", Input },
+    { "strack", Input },
+    { "record", Input },
+    { "f", PlayerFullscreen },
+    { "fs", PlayerFullscreen },
+    { "fullscreen", PlayerFullscreen },
+
+    /* video commands */
+    { "vratio", VideoConfig },
+    { "vcrop", VideoConfig },
+    { "vzoom", VideoConfig },
+
+    /* audio commands */
+    { "volume", Volume },
+    { "volup", VolumeMove },
+    { "voldown", VolumeMove },
+    { "adev", AudioDevice },
+    { "achan", AudioChannel },
+};
+
 void *RegisterPlayer(intf_thread_t *intf)
 {
     vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);;
@@ -789,6 +857,8 @@ void *RegisterPlayer(intf_thread_t *intf)
 
     pc->intf = intf;
     pc->input_buffering = false;
+
+    RegisterHandlers(intf, cmds, ARRAY_SIZE(cmds));
 
     vlc_player_Lock(player);
     pc->player_listener = vlc_player_AddListener(player, &player_cbs, pc);
