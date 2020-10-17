@@ -37,6 +37,7 @@
 #include "cli.h"
 
 struct player_cli {
+    intf_thread_t *intf;
     vlc_player_listener_id *player_listener;
     vlc_player_aout_listener_id *player_aout_listener;
     bool input_buffering;
@@ -49,6 +50,9 @@ static void
 player_on_state_changed(vlc_player_t *player,
                         enum vlc_player_state state, void *data)
 { VLC_UNUSED(player);
+    struct player_cli *pc = data;
+    intf_thread_t *p_intf = pc->intf;
+
     char const *psz_cmd;
     switch (state)
     {
@@ -66,7 +70,7 @@ player_on_state_changed(vlc_player_t *player,
         psz_cmd = "";
         break;
     }
-    intf_thread_t *p_intf = data;
+
     msg_rc(STATUS_CHANGE "( %s state: %d )", psz_cmd, state);
 }
 
@@ -74,9 +78,7 @@ static void
 player_on_buffering_changed(vlc_player_t *player,
                             float new_buffering, void *data)
 { VLC_UNUSED(player); VLC_UNUSED(new_buffering);
-    intf_thread_t *intf = data;
-    intf_sys_t *sys = intf->p_sys;
-    struct player_cli *pc = sys->player_cli;
+    struct player_cli *pc = data;
 
     pc->input_buffering = true;
 }
@@ -84,7 +86,8 @@ player_on_buffering_changed(vlc_player_t *player,
 static void
 player_on_rate_changed(vlc_player_t *player, float new_rate, void *data)
 { VLC_UNUSED(player);
-    intf_thread_t *p_intf = data;
+    struct player_cli *pc = data;
+    intf_thread_t *p_intf = pc->intf;
 
     msg_rc(STATUS_CHANGE "( new rate: %.3f )", new_rate);
 }
@@ -93,9 +96,8 @@ static void
 player_on_position_changed(vlc_player_t *player,
                            vlc_tick_t new_time, float new_pos, void *data)
 { VLC_UNUSED(player); VLC_UNUSED(new_pos);
-    intf_thread_t *p_intf = data;
-    intf_sys_t *sys = p_intf->p_sys;
-    struct player_cli *pc = sys->player_cli;
+    struct player_cli *pc = data;
+    intf_thread_t *p_intf = pc->intf;
 
     if (pc->input_buffering)
         msg_rc(STATUS_CHANGE "( time: %"PRId64"s )",
@@ -115,7 +117,8 @@ static const struct vlc_player_cbs player_cbs =
 static void
 player_aout_on_volume_changed(audio_output_t *aout, float volume, void *data)
 { VLC_UNUSED(aout);
-    intf_thread_t *p_intf = data;
+    struct player_cli *pc = data;
+    intf_thread_t *p_intf = pc->intf;
 
     msg_rc(STATUS_CHANGE "( audio volume: %ld )",
             lroundf(volume * 100));
@@ -745,16 +748,17 @@ void *RegisterPlayer(intf_thread_t *intf)
     if (unlikely(pc == NULL))
         return NULL;
 
+    pc->intf = intf;
     pc->input_buffering = false;
 
     vlc_player_Lock(player);
-    pc->player_listener = vlc_player_AddListener(player, &player_cbs, intf);
+    pc->player_listener = vlc_player_AddListener(player, &player_cbs, pc);
 
     if (unlikely(pc->player_listener == NULL))
         goto error;
 
     pc->player_aout_listener =
-        vlc_player_aout_AddListener(player, &player_aout_cbs, intf);
+        vlc_player_aout_AddListener(player, &player_aout_cbs, pc);
 
     if (pc->player_aout_listener == NULL)
     {
@@ -762,7 +766,7 @@ void *RegisterPlayer(intf_thread_t *intf)
         goto error;
     }
 
-    player_on_state_changed(player, vlc_player_GetState(player), intf);
+    player_on_state_changed(player, vlc_player_GetState(player), pc);
     vlc_player_Unlock(player);
     return pc;
 
