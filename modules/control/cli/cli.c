@@ -172,6 +172,14 @@ static void LogOut(intf_thread_t *intf)
     }
 }
 
+static void KeyAction(intf_thread_t *intf, const char *const *args, size_t n)
+{
+    vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(intf));
+
+    if (n > 1)
+        var_SetInteger(vlc, "key-action", vlc_actions_get_id(args[1]));
+}
+
 static const struct
 {
     const char *name;
@@ -245,6 +253,10 @@ static const struct
     { "voldown", VolumeMove },
     { "adev", AudioDevice },
     { "achan", AudioChannel },
+
+    { "key", KeyAction },
+    { "hotkey", KeyAction },
+
 };
 
 static void Process(intf_thread_t *intf, const char *line)
@@ -283,12 +295,6 @@ static void Process(intf_thread_t *intf, const char *line)
         }
 
     /* misc menu commands */
-    if (strcmp(cmd, "key") == 0 || strcmp(cmd, "hotkey") == 0)
-    {
-       vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(intf));
-       var_SetInteger(vlc, "key-action", vlc_actions_get_id(arg));
-    }
-    else
         switch (cmd[0])
         {
             case 'f':
