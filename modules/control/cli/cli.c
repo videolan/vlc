@@ -214,6 +214,10 @@ static const struct
     { "is_playing", IsPlaying },
     { "stats", Statistics },
     { "longhelp", Help },
+    { "h", Help },
+    { "help", Help },
+    { "H", Help },
+    { "?", Help },
     { "logout", LogOut },
     { "quit", Quit },
 };
@@ -297,12 +301,6 @@ static void Process(intf_thread_t *intf, const char *line)
     /* misc menu commands */
         switch (cmd[0])
         {
-            case 'h':
-            case 'H':
-            case '?':
-                Help(intf);
-                break;
-
             case 's':
             case 'S':
             case '\0': /* Ignore empty lines */
