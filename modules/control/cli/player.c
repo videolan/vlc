@@ -578,13 +578,15 @@ void AudioDevice(intf_thread_t *intf, char const *cmd, vlc_value_t cur)
 
     if (setdev)
     {
-        int i;
-        for (i = 0; i < n; ++i)
+        for (int i = 0; i < n; ++i)
+        {
             if (!strcmp(cur.psz_string, ids[i]))
-                break;
-        if (i < n)
-            vlc_player_osd_Message(player,
-                                   _("Audio device: %s"), names[i]);
+                vlc_player_osd_Message(player,
+                                       _("Audio device: %s"), names[i]);
+
+            free(names[i]);
+            free(ids[i]);
+        }
     }
     else
     {
