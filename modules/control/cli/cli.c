@@ -241,6 +241,9 @@ static const struct
     { "vtrack", Input },
     { "strack", Input },
     { "record", Input },
+    { "f", PlayerFullscreen },
+    { "fs", PlayerFullscreen },
+    { "fullscreen", PlayerFullscreen },
 
     /* video commands */
     { "vratio", VideoConfig },
@@ -256,13 +259,10 @@ static const struct
 
     { "key", KeyAction },
     { "hotkey", KeyAction },
-
 };
 
 static void Process(intf_thread_t *intf, const char *line)
 {
-    intf_sys_t *sys = intf->p_sys;
-
     /* Skip heading spaces */
     const char *cmd = line + strspn(line, " ");
 
@@ -297,22 +297,6 @@ static void Process(intf_thread_t *intf, const char *line)
     /* misc menu commands */
         switch (cmd[0])
         {
-            case 'f':
-            case 'F':
-            {
-                vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
-                bool fs;
-
-                if (strncasecmp(arg, "on", 2) == 0)
-                    fs = true;
-                else if (strncasecmp(arg, "off", 3) == 0)
-                    fs = false;
-                else
-                    fs = !vlc_player_vout_IsFullscreen(player);
-                vlc_player_vout_SetFullscreen(player, fs);
-                break;
-            }
-
             case 'h':
             case 'H':
             case '?':

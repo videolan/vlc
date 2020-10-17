@@ -65,6 +65,7 @@ void PlayerGetTime(intf_thread_t *intf);
 void PlayerGetLength(intf_thread_t *intf);
 void PlayerGetTitle(intf_thread_t *intf);
 void PlayerVoutSnapshot(intf_thread_t *intf);
+void PlayerFullscreen(intf_thread_t *intf, const char *const *, size_t);
 void Volume(intf_thread_t *intf, const char *const *, size_t);
 void VolumeMove(intf_thread_t *intf, const char *const *, size_t);
 void VideoConfig(intf_thread_t *intf, const char *const *, size_t);

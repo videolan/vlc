@@ -430,6 +430,23 @@ void PlayerVoutSnapshot(intf_thread_t *intf)
     PlayerDoVoid(intf, vlc_player_vout_Snapshot);
 }
 
+void PlayerFullscreen(intf_thread_t *intf, const char *const *args,
+                      size_t count)
+{
+    vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
+    bool fs = !vlc_player_vout_IsFullscreen(player);
+
+    if (count > 1)
+    {
+        if (strncasecmp(args[1], "on", 2) == 0)
+            fs = true;
+        if (strncasecmp(args[1], "off", 3) == 0)
+            fs = false;
+    }
+
+    vlc_player_vout_SetFullscreen(player, fs);
+}
+
 void Volume(intf_thread_t *intf, const char *const *args, size_t count)
 {
     const char *arg = count > 1 ? args[1] : "";
