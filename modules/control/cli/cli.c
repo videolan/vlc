@@ -249,9 +249,24 @@ static const struct
     { "achan", AudioChannel },
 };
 
-static void Process(intf_thread_t *intf, const char *cmd, const char *arg)
+static void Process(intf_thread_t *intf, const char *line)
 {
     intf_sys_t *sys = intf->p_sys;
+
+    /* Skip heading spaces */
+    const char *cmd = line + strspn(line, " ");
+
+    /* Split psz_cmd at the first space and make sure that
+     * psz_arg is valid */
+    char *arg = strchr(cmd, ' ');
+
+    if (arg != NULL)
+    {
+        *(arg++) = '\0';
+        arg += strspn(arg, " ");
+    }
+    else
+        arg = (char *)"";
 
     for (size_t i = 0; i < ARRAY_SIZE(void_cmds); i++)
         if (strcmp(cmd, void_cmds[i].name) == 0)
@@ -490,7 +505,6 @@ static void *Run( void *data )
 
     for( ;; )
     {
-        char *psz_cmd, *psz_arg;
         bool b_complete;
 
         vlc_restorecancel( canc );
@@ -533,30 +547,7 @@ static void *Run( void *data )
         /* Is there something to do? */
         if( !b_complete ) continue;
 
-        /* Skip heading spaces */
-        psz_cmd = p_buffer;
-        while( *psz_cmd == ' ' )
-        {
-            psz_cmd++;
-        }
-
-        /* Split psz_cmd at the first space and make sure that
-         * psz_arg is valid */
-        psz_arg = strchr( psz_cmd, ' ' );
-        if( psz_arg )
-        {
-            *psz_arg++ = 0;
-            while( *psz_arg == ' ' )
-            {
-                psz_arg++;
-            }
-        }
-        else
-        {
-            psz_arg = (char*)"";
-        }
-
-        Process(p_intf, psz_cmd, psz_arg);
+        Process(p_intf, p_buffer);
 
         /* Command processed */
         i_size = 0; p_buffer[0] = 0;
