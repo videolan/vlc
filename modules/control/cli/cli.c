@@ -57,7 +57,6 @@
 #include "cli.h"
 
 #define MAX_LINE_LENGTH 1024
-#define STATUS_CHANGE "status change: "
 
 void msg_print(intf_thread_t *p_intf, const char *psz_fmt, ...)
 {
