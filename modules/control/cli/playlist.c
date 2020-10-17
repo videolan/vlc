@@ -291,23 +291,20 @@ void PlaylistStatus(intf_thread_t *intf, const char *const *args, size_t count)
     (void) args; (void) count;
 }
 
-void Playlist(intf_thread_t *intf, const char *const *args, size_t n_args)
+void PlaylistRepeat(intf_thread_t *intf, const char *const *args, size_t count)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
-    const char *psz_cmd = args[0];
-    const char *arg = n_args > 1 ? args[1] : "";
+    const char *arg = count > 1 ? args[1] : "";
 
     vlc_playlist_Lock(playlist);
 
     /* Parse commands that require a playlist */
-    if( !strcmp( psz_cmd, "repeat" ) )
-    {
         bool b_update = true;
         enum vlc_playlist_playback_repeat repeat_mode =
             vlc_playlist_GetPlaybackRepeat(playlist);
         bool b_value = repeat_mode == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
 
-        if( strlen( arg ) > 0 )
+        if( count > 1 )
         {
             if ( ( !strncmp( arg, "on", 2 )  &&  b_value ) ||
                  ( !strncmp( arg, "off", 3 ) && !b_value ) )
@@ -325,9 +322,17 @@ void Playlist(intf_thread_t *intf, const char *const *args, size_t n_args)
             vlc_playlist_SetPlaybackRepeat(playlist, repeat_mode);
         }
         msg_print(intf, "Setting repeat to %s", b_value ? "true" : "false");
-    }
-    else if( !strcmp( psz_cmd, "loop" ) )
-    {
+
+    vlc_playlist_Unlock(playlist);
+}
+
+void PlaylistLoop(intf_thread_t *intf, const char *const *args, size_t count)
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+    const char *arg = count > 1 ? args[1] : "";
+
+    vlc_playlist_Lock(playlist);
+
         bool b_update = true;
         enum vlc_playlist_playback_repeat repeat_mode =
             vlc_playlist_GetPlaybackRepeat(playlist);
@@ -351,9 +356,17 @@ void Playlist(intf_thread_t *intf, const char *const *args, size_t n_args)
             vlc_playlist_SetPlaybackRepeat(playlist, repeat_mode);
         }
         msg_print(intf, "Setting loop to %s", b_value ? "true" : "false");
-    }
-    else if( !strcmp( psz_cmd, "random" ) )
-    {
+
+    vlc_playlist_Unlock(playlist);
+}
+
+void PlaylistRandom(intf_thread_t *intf, const char *const *args, size_t count)
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+    const char *arg = count > 1 ? args[1] : "";
+
+    vlc_playlist_Lock(playlist);
+
         bool b_update = true;
         enum vlc_playlist_playback_order order_mode =
             vlc_playlist_GetPlaybackOrder(playlist);
@@ -377,9 +390,17 @@ void Playlist(intf_thread_t *intf, const char *const *args, size_t n_args)
             vlc_playlist_SetPlaybackOrder(playlist, order_mode);
         }
         msg_print(intf, "Setting random to %s", b_value ? "true" : "false");
-    }
-    else if (!strcmp( psz_cmd, "goto" ) )
-    {
+
+    vlc_playlist_Unlock(playlist);
+}
+
+void PlaylistGoto(intf_thread_t *intf, const char *const *args, size_t n_args)
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+    const char *arg = n_args > 1 ? args[1] : "";
+
+    vlc_playlist_Lock(playlist);
+
         long long llindex = atoll(arg);
         size_t index = (size_t)llindex;
         size_t count = vlc_playlist_Count(playlist);
@@ -392,32 +413,41 @@ void Playlist(intf_thread_t *intf, const char *const *args, size_t n_args)
                       vlc_ngettext("Playlist has only %zu element",
                                    "Playlist has only %zu elements", count),
                       count);
-    }
-    else if ((!strcmp(psz_cmd, "add") || !strcmp(psz_cmd, "enqueue")) &&
-             n_args > 1)
-    {
+    vlc_playlist_Unlock(playlist);
+}
+
+static void PlaylistAddCommon(intf_thread_t *intf, const char *const *args,
+                              size_t n_args, bool play)
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+    const char *arg = n_args > 1 ? args[1] : "";
+
+    vlc_playlist_Lock(playlist);
+
         input_item_t *p_item = parse_MRL( arg );
 
         if( p_item )
         {
-            msg_print(intf, "Trying to %s %s to playlist.", psz_cmd, arg);
+            msg_print(intf, "Trying to %s %s to playlist.",
+                      play ? "add" : "enqueue", arg);
 
             size_t count = vlc_playlist_Count(playlist);
             int ret = vlc_playlist_InsertOne(playlist, count, p_item);
             input_item_Release(p_item);
-            if (ret != VLC_SUCCESS)
-                goto end;
-
-            if (!strcmp(psz_cmd, "add"))
+            if (ret == VLC_SUCCESS && play)
                 vlc_playlist_PlayAt(playlist, count);
         }
-    }
-    /*
-     * sanity check
-     */
-    else
-        msg_print(intf, "unknown command!");
 
-end:
     vlc_playlist_Unlock(playlist);
+}
+
+void PlaylistAdd(intf_thread_t *intf, const char *const *args, size_t count)
+{
+    PlaylistAddCommon(intf, args, count, true);
+}
+
+void PlaylistEnqueue(intf_thread_t *intf, const char *const *args,
+                     size_t count)
+{
+    PlaylistAddCommon(intf, args, count, false);
 }

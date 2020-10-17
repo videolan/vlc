@@ -225,12 +225,12 @@ static const struct
     { "quit", Quit },
 
     { "intf", Intf },
-    { "add", Playlist },
-    { "repeat", Playlist },
-    { "loop", Playlist },
-    { "random", Playlist },
-    { "enqueue", Playlist },
-    { "goto", Playlist },
+    { "add", PlaylistAdd },
+    { "repeat", PlaylistRepeat },
+    { "loop", PlaylistLoop },
+    { "random", PlaylistRandom },
+    { "enqueue", PlaylistEnqueue },
+    { "goto", PlaylistGoto },
 
     /* DVD commands */
     { "seek", Input },
