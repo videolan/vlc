@@ -27,11 +27,10 @@
 struct intf_sys_t
 {
     vlc_thread_t thread;
+    void *player_cli;
 
     /* playlist */
     vlc_playlist_t              *playlist;
-    vlc_player_listener_id      *player_listener;
-    vlc_player_aout_listener_id *player_aout_listener;
 
     /* status changes */
     vlc_mutex_t             status_lock;
@@ -53,9 +52,6 @@ void msg_print(intf_thread_t *p_intf, const char *psz_fmt, ...);
 
 #define msg_rc(...) msg_print(p_intf, __VA_ARGS__)
 #define STATUS_CHANGE "status change: "
-
-extern const struct vlc_player_cbs player_cbs;
-extern const struct vlc_player_aout_cbs player_aout_cbs;
 
 void PlayerPause(intf_thread_t *intf);
 void PlayerFastForward(intf_thread_t *intf);
@@ -81,6 +77,9 @@ void AudioDevice(intf_thread_t *intf, char const *cmd, vlc_value_t cur);
 void AudioChannel(intf_thread_t *intf, char const *cmd, vlc_value_t cur);
 void Statistics(intf_thread_t *intf);
 void IsPlaying(intf_thread_t *intf);
+
+void *RegisterPlayer(intf_thread_t *intf);
+void DeregisterPlayer(intf_thread_t *intf, void *);
 
 void PlaylistPrev(intf_thread_t *intf);
 void PlaylistNext(intf_thread_t *intf);

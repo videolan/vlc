@@ -36,6 +36,11 @@
 
 #include "cli.h"
 
+struct player_cli {
+    vlc_player_listener_id *player_listener;
+    vlc_player_aout_listener_id *player_aout_listener;
+};
+
 /********************************************************************
  * Status callback routines
  ********************************************************************/
@@ -99,7 +104,7 @@ player_on_position_changed(vlc_player_t *player,
     vlc_mutex_unlock(&sys->status_lock);
 }
 
-const struct vlc_player_cbs player_cbs =
+static const struct vlc_player_cbs player_cbs =
 {
     .on_state_changed = player_on_state_changed,
     .on_buffering_changed = player_on_buffering_changed,
@@ -117,7 +122,7 @@ player_aout_on_volume_changed(audio_output_t *aout, float volume, void *data)
     vlc_mutex_unlock(&p_intf->p_sys->status_lock);
 }
 
-const struct vlc_player_aout_cbs player_aout_cbs =
+static const struct vlc_player_aout_cbs player_aout_cbs =
 {
     .on_volume_changed = player_aout_on_volume_changed,
 };
@@ -714,4 +719,51 @@ void IsPlaying(intf_thread_t *intf)
     msg_print(intf, "%d",
               sys->last_state == VLC_PLAYER_STATE_PLAYING ||
               sys->last_state == VLC_PLAYER_STATE_PAUSED);
+}
+
+void *RegisterPlayer(intf_thread_t *intf)
+{
+    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);;
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+    struct player_cli *pc = malloc(sizeof (*pc));
+
+    if (unlikely(pc == NULL))
+        return NULL;
+
+    vlc_player_Lock(player);
+    pc->player_listener = vlc_player_AddListener(player, &player_cbs, intf);
+
+    if (unlikely(pc->player_listener == NULL))
+        goto error;
+
+    pc->player_aout_listener =
+        vlc_player_aout_AddListener(player, &player_aout_cbs, intf);
+
+    if (pc->player_aout_listener == NULL)
+    {
+        vlc_player_RemoveListener(player, pc->player_listener);
+        goto error;
+    }
+
+    vlc_player_Unlock(player);
+    return pc;
+
+error:
+    vlc_player_Unlock(player);
+    free(pc);
+    return NULL;
+}
+
+void DeregisterPlayer(intf_thread_t *intf, void *data)
+{
+    vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(intf);;
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+    struct player_cli *pc = data;
+
+    vlc_player_Lock(player);
+    vlc_player_aout_RemoveListener(player, pc->player_aout_listener);
+    vlc_player_RemoveListener(player, pc->player_listener);
+    vlc_player_Unlock(player);
+    free(pc);
+    (void) intf;
 }

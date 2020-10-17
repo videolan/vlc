@@ -749,7 +749,6 @@ static int Activate( vlc_object_t *p_this )
     p_sys->last_state = VLC_PLAYER_STATE_STOPPED;
     p_sys->b_input_buffering = false;
     p_sys->playlist = vlc_intf_GetMainPlaylist(p_intf);;
-    vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
 
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
@@ -762,35 +761,18 @@ static int Activate( vlc_object_t *p_this )
         intf_consoleIntroMsg( p_intf );
 #endif
 
+    p_sys->player_cli = RegisterPlayer(p_intf);
+    if (unlikely(p_sys->player_cli == NULL))
+        goto error;
+
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
         goto error;
 
     msg_rc( "%s", _("Remote control interface initialized. Type `help' for help.") );
 
-    vlc_player_Lock(player);
-    p_sys->player_listener =
-        vlc_player_AddListener(player, &player_cbs, p_intf);
-    if (!p_sys->player_listener)
-    {
-        vlc_player_Unlock(player);
-        goto error;
-    }
-
-    p_sys->player_aout_listener =
-        vlc_player_aout_AddListener(player, &player_aout_cbs, p_intf);
-    vlc_player_Unlock(player);
-    if (!p_sys->player_aout_listener)
-        goto error;
-
     return VLC_SUCCESS;
 
 error:
-    if (p_sys->player_listener)
-    {
-        vlc_player_Lock(player);
-        vlc_player_RemoveListener(player, p_sys->player_listener);
-        vlc_player_Unlock(player);
-    }
     net_ListenClose( pi_socket );
     free( psz_unix_path );
     free( p_sys );
@@ -805,14 +787,10 @@ static void Deactivate( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
-    vlc_player_Lock(player);
-    vlc_player_aout_RemoveListener(player, p_sys->player_aout_listener);
-    vlc_player_RemoveListener(player, p_sys->player_listener);
-    vlc_player_Unlock(player);
-
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
+
+    DeregisterPlayer(p_intf, p_sys->player_cli);
 
     net_ListenClose( p_sys->pi_socket_listen );
     if( p_sys->i_socket != -1 )
