@@ -143,19 +143,23 @@ static input_item_t *parse_MRL(const char *mrl)
 static void print_playlist(intf_thread_t *p_intf, vlc_playlist_t *playlist)
 {
     size_t count = vlc_playlist_Count(playlist);
+    size_t current = vlc_playlist_GetCurrentIndex(playlist);
+
     for (size_t i = 0; i < count; ++i)
     {
         vlc_playlist_item_t *plitem = vlc_playlist_Get(playlist, i);
         input_item_t *item = vlc_playlist_item_GetMedia(plitem);
         vlc_tick_t len = item->i_duration;
+        char selected = (i == current) ? '*' : ' ';
+
         if (len != INPUT_DURATION_INDEFINITE && len != VLC_TICK_INVALID)
         {
             char buf[MSTRTIME_MAX_SIZE];
             secstotimestr(buf, SEC_FROM_VLC_TICK(len));
-            msg_rc("|-- %s (%s)", item->psz_name, buf);
+            msg_rc("| %c%zu %s (%s)", selected, i, item->psz_name, buf);
         }
         else
-            msg_rc("|-- %s", item->psz_name);
+            msg_rc("| %c%zu %s", selected, i, item->psz_name);
     }
 }
 
