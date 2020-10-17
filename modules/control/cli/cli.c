@@ -37,6 +37,9 @@
 #ifdef HAVE_WORDEXP_H
 #include <wordexp.h>
 #endif
+#ifdef HAVE_SEARCH_H
+#include <search.h>
+#endif
 
 #define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
 #include <vlc_common.h>
@@ -85,6 +88,33 @@ void msg_print(intf_thread_t *p_intf, const char *psz_fmt, ...)
         net_Write( p_intf, p_intf->p_sys->i_socket, msg, len );
 
     free( msg );
+}
+
+static int cmdcmp(const void *a, const void *b)
+{
+    const char *const *na = a;
+    const char *const *nb = b;
+
+    return strcmp(*na, *nb);
+}
+
+void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,
+                      size_t count)
+{
+    intf_sys_t *sys = intf->p_sys;
+
+    for (size_t i = 0; i < count; i++)
+    {
+        const char *const *name = &handlers[i].name;
+        const char *const **pp;
+
+        pp = tsearch(name, &sys->commands, cmdcmp);
+
+        if (unlikely(pp == NULL))
+            continue;
+
+        assert(*pp == name); /* Fails if duplicate command */
+    }
 }
 
 #if defined (_WIN32) && !VLC_WINSTORE_APP
@@ -186,11 +216,7 @@ static void KeyAction(intf_thread_t *intf, const char *const *args, size_t n)
         var_SetInteger(vlc, "key-action", vlc_actions_get_id(args[1]));
 }
 
-static const struct
-{
-    const char *name;
-    void (*handler)(intf_thread_t *, const char *const *, size_t);
-} cmds[] =
+static const struct cli_handler cmds[] =
 {
     { "playlist", PlaylistList },
     { "sort", PlaylistSort },
@@ -273,6 +299,7 @@ static void UnknownCmd(intf_thread_t *intf, const char *const *args,
 
 static void Process(intf_thread_t *intf, const char *line)
 {
+    intf_sys_t *sys = intf->p_sys;
     /* Skip heading spaces */
     const char *cmd = line + strspn(line, " ");
 
@@ -318,13 +345,10 @@ error:      wordfree(&we);
     if (count > 0)
     {
         void (*cb)(intf_thread_t *, const char *const *, size_t) = UnknownCmd;
+        const struct cli_handler **h = tfind(&args[0], &sys->commands, cmdcmp);
 
-        for (size_t i = 0; i < ARRAY_SIZE(cmds); i++)
-            if (strcmp(args[0], cmds[i].name) == 0)
-            {
-                cb = cmds[i].handler;
-                break;
-            }
+        if (h != NULL)
+            cb = (*h)->callback;
 
         cb(intf, args, count);
     }
@@ -703,12 +727,15 @@ static int Activate( vlc_object_t *p_this )
     }
 
     p_intf->p_sys = p_sys;
+    p_sys->commands = NULL;
     p_sys->pi_socket_listen = pi_socket;
     p_sys->i_socket = -1;
 #ifdef AF_LOCAL
     p_sys->psz_unix_path = psz_unix_path;
 #endif
     p_sys->playlist = vlc_intf_GetMainPlaylist(p_intf);;
+
+    RegisterHandlers(p_intf, cmds, ARRAY_SIZE(cmds));
 
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
@@ -739,6 +766,11 @@ error:
     return VLC_EGENERIC;
 }
 
+static void dummy_free(void *p)
+{
+    (void) p;
+}
+
 /*****************************************************************************
  * Deactivate: uninitialize and cleanup
  *****************************************************************************/
@@ -751,6 +783,7 @@ static void Deactivate( vlc_object_t *p_this )
     vlc_join( p_sys->thread, NULL );
 
     DeregisterPlayer(p_intf, p_sys->player_cli);
+    tdestroy(p_sys->commands, dummy_free);
 
     net_ListenClose( p_sys->pi_socket_listen );
     if( p_sys->i_socket != -1 )

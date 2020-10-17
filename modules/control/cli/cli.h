@@ -27,6 +27,7 @@
 struct intf_sys_t
 {
     vlc_thread_t thread;
+    void *commands;
     void *player_cli;
 
     /* playlist */
@@ -47,6 +48,15 @@ void msg_print(intf_thread_t *p_intf, const char *psz_fmt, ...);
 
 #define msg_rc(...) msg_print(p_intf, __VA_ARGS__)
 #define STATUS_CHANGE "status change: "
+
+struct cli_handler
+{
+    const char *name;
+    void (*callback)(intf_thread_t *intf, const char *const *, size_t);
+};
+
+void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,
+                      size_t count);
 
 void PlayerPause(intf_thread_t *intf, const char *const *, size_t);
 void PlayerFastForward(intf_thread_t *intf, const char *const *, size_t);
