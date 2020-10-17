@@ -384,20 +384,19 @@ static void PlayerRecord(intf_thread_t *intf, const char *const *args,
 
     vlc_player_Lock(player);
 
-    bool b_update = true;
-    bool b_value = vlc_player_IsRecording(player);
+    bool cur_value = vlc_player_IsRecording(player);
+    bool new_value = !cur_value;
 
     if (count > 1)
     {
-        if ((strncmp(args[1], "on", 2) == 0 &&  b_value)
-         || (strncmp( args[1], "off", 3) == 0 && !b_value))
-            b_update = false;
+        if (strcmp(args[1], "on") == 0)
+            new_value = true;
+        if (strcmp(args[1], "off") == 0)
+            new_value = false;
     }
-    if (b_update)
-    {
-        b_value = !b_value;
-        vlc_player_SetRecordingEnabled(player, b_value);
-    }
+
+    if (cur_value != new_value)
+        vlc_player_SetRecordingEnabled(player, new_value);
     vlc_player_Unlock(player);
 }
 
