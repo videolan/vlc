@@ -33,7 +33,6 @@ struct intf_sys_t
     vlc_playlist_t              *playlist;
 
     /* status changes */
-    vlc_mutex_t             status_lock;
     bool                    b_input_buffering;
 
 #ifndef _WIN32

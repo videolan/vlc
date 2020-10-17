@@ -75,19 +75,16 @@ player_on_buffering_changed(vlc_player_t *player,
 { VLC_UNUSED(player); VLC_UNUSED(new_buffering);
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
-    vlc_mutex_lock(&sys->status_lock);
+
     sys->b_input_buffering = true;
-    vlc_mutex_unlock(&sys->status_lock);
 }
 
 static void
 player_on_rate_changed(vlc_player_t *player, float new_rate, void *data)
 { VLC_UNUSED(player);
     intf_thread_t *p_intf = data;
-    intf_sys_t *sys = p_intf->p_sys;
-    vlc_mutex_lock(&sys->status_lock);
+
     msg_rc(STATUS_CHANGE "( new rate: %.3f )", new_rate);
-    vlc_mutex_unlock(&sys->status_lock);
 }
 
 static void
@@ -96,12 +93,11 @@ player_on_position_changed(vlc_player_t *player,
 { VLC_UNUSED(player); VLC_UNUSED(new_pos);
     intf_thread_t *p_intf = data;
     intf_sys_t *sys = p_intf->p_sys;
-    vlc_mutex_lock(&sys->status_lock);
+
     if (sys->b_input_buffering)
         msg_rc(STATUS_CHANGE "( time: %"PRId64"s )",
                SEC_FROM_VLC_TICK(new_time));
     sys->b_input_buffering = false;
-    vlc_mutex_unlock(&sys->status_lock);
 }
 
 static const struct vlc_player_cbs player_cbs =
@@ -116,10 +112,9 @@ static void
 player_aout_on_volume_changed(audio_output_t *aout, float volume, void *data)
 { VLC_UNUSED(aout);
     intf_thread_t *p_intf = data;
-    vlc_mutex_lock(&p_intf->p_sys->status_lock);
+
     msg_rc(STATUS_CHANGE "( audio volume: %ld )",
             lroundf(volume * 100));
-    vlc_mutex_unlock(&p_intf->p_sys->status_lock);
 }
 
 static const struct vlc_player_aout_cbs player_aout_cbs =
