@@ -166,19 +166,22 @@ static void PlaylistDoVoid(intf_thread_t *intf, int (*cb)(vlc_playlist_t *))
     vlc_playlist_Unlock(playlist);
 }
 
-void PlaylistPrev(intf_thread_t *intf)
+void PlaylistPrev(intf_thread_t *intf, const char *const *args, size_t count)
 {
     PlaylistDoVoid(intf, vlc_playlist_Prev);
+    (void) args; (void) count;
 }
 
-void PlaylistNext(intf_thread_t *intf)
+void PlaylistNext(intf_thread_t *intf, const char *const *args, size_t count)
 {
     PlaylistDoVoid(intf, vlc_playlist_Next);
+    (void) args; (void) count;
 }
 
-void PlaylistPlay(intf_thread_t *intf)
+void PlaylistPlay(intf_thread_t *intf, const char *const *args, size_t count)
 {
     PlaylistDoVoid(intf, vlc_playlist_Start);
+    (void) args; (void) count;
 }
 
 static int PlaylistDoStop(vlc_playlist_t *playlist)
@@ -187,9 +190,10 @@ static int PlaylistDoStop(vlc_playlist_t *playlist)
     return 0;
 }
 
-void PlaylistStop(intf_thread_t *intf)
+void PlaylistStop(intf_thread_t *intf, const char *const *args, size_t count)
 {
     PlaylistDoVoid(intf, PlaylistDoStop);
+    (void) args; (void) count;
 }
 
 static int PlaylistDoClear(vlc_playlist_t *playlist)
@@ -199,9 +203,10 @@ static int PlaylistDoClear(vlc_playlist_t *playlist)
     return 0;
 }
 
-void PlaylistClear(intf_thread_t *intf)
+void PlaylistClear(intf_thread_t *intf, const char *const *args, size_t count)
 {
     PlaylistDoVoid(intf, PlaylistDoClear);
+    (void) args; (void) count;
 }
 
 static int PlaylistDoSort(vlc_playlist_t *playlist)
@@ -215,12 +220,13 @@ static int PlaylistDoSort(vlc_playlist_t *playlist)
     return vlc_playlist_Sort(playlist, &criteria, 1);
 }
 
-void PlaylistSort(intf_thread_t *intf)
+void PlaylistSort(intf_thread_t *intf, const char *const *args, size_t count)
 {
     PlaylistDoVoid(intf, PlaylistDoSort);
+    (void) args; (void) count;
 }
 
-void PlaylistList(intf_thread_t *intf)
+void PlaylistList(intf_thread_t *intf, const char *const *args, size_t count)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
 
@@ -229,9 +235,10 @@ void PlaylistList(intf_thread_t *intf)
     print_playlist(intf, playlist);
     vlc_playlist_Unlock(playlist);
     msg_print(intf, "+----[ End of playlist ]");
+    (void) args; (void) count;
 }
 
-void PlaylistStatus(intf_thread_t *intf)
+void PlaylistStatus(intf_thread_t *intf, const char *const *args, size_t count)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
@@ -281,6 +288,7 @@ void PlaylistStatus(intf_thread_t *intf)
     }
 
     msg_print(intf, STATUS_CHANGE "( %s state: %u )", stname, stnum);
+    (void) args; (void) count;
 }
 
 void Playlist(intf_thread_t *intf, const char *const *args, size_t n_args)

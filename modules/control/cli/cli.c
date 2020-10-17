@@ -88,7 +88,7 @@ void msg_print(intf_thread_t *p_intf, const char *psz_fmt, ...)
 # include "../intromsg.h"
 #endif
 
-static void Help( intf_thread_t *p_intf)
+static void Help( intf_thread_t *p_intf, const char *const *args, size_t count)
 {
     msg_rc("%s", _("+----[ Remote control commands ]"));
     msg_rc(  "| ");
@@ -148,6 +148,7 @@ static void Help( intf_thread_t *p_intf)
     msg_rc("%s", _("| quit . . . . . . . . . . . . . . . . . . .  quit vlc"));
     msg_rc(  "| ");
     msg_rc("%s", _("+----[ end of help ]"));
+    (void) args; (void) count;
 }
 
 static void Intf(intf_thread_t *intf, const char *const *args, size_t count)
@@ -155,12 +156,13 @@ static void Intf(intf_thread_t *intf, const char *const *args, size_t count)
     intf_Create(vlc_object_instance(intf), count == 1 ? "" : args[1]);
 }
 
-static void Quit(intf_thread_t *intf)
+static void Quit(intf_thread_t *intf, const char *const *args, size_t count)
 {
     libvlc_Quit(vlc_object_instance(intf));
+    (void) args; (void) count;
 }
 
-static void LogOut(intf_thread_t *intf)
+static void LogOut(intf_thread_t *intf, const char *const *args, size_t count)
 {
     intf_sys_t *sys = intf->p_sys;
 
@@ -170,6 +172,7 @@ static void LogOut(intf_thread_t *intf)
         net_Close(sys->i_socket);
         sys->i_socket = -1;
     }
+    (void) args; (void) count;
 }
 
 static void KeyAction(intf_thread_t *intf, const char *const *args, size_t n)
@@ -183,8 +186,8 @@ static void KeyAction(intf_thread_t *intf, const char *const *args, size_t n)
 static const struct
 {
     const char *name;
-    void (*handler)(intf_thread_t *);
-} void_cmds[] =
+    void (*handler)(intf_thread_t *, const char *const *, size_t);
+} cmds[] =
 {
     { "playlist", PlaylistList },
     { "sort", PlaylistSort },
@@ -220,14 +223,7 @@ static const struct
     { "?", Help },
     { "logout", LogOut },
     { "quit", Quit },
-};
 
-static const struct
-{
-    const char *name;
-    void (*handler)(intf_thread_t *, const char *const *, size_t);
-} string_cmds[] =
-{
     { "intf", Intf },
     { "add", Playlist },
     { "repeat", Playlist },
@@ -265,6 +261,13 @@ static const struct
     { "hotkey", KeyAction },
 };
 
+static void UnknownCmd(intf_thread_t *intf, const char *const *args,
+                       size_t count)
+{
+    msg_print(intf, _("Unknown command `%s'. Type `help' for help."), args[0]);
+    (void) count;
+}
+
 static void Process(intf_thread_t *intf, const char *line)
 {
     /* Skip heading spaces */
@@ -275,33 +278,29 @@ static void Process(intf_thread_t *intf, const char *line)
 
     /* Split psz_cmd at the first space and make sure that
      * psz_arg is valid */
+    const char *args[] = { cmd, NULL };
+    size_t count = 1;
     char *arg = strchr(cmd, ' ');
 
     if (arg != NULL)
     {
         *(arg++) = '\0';
         arg += strspn(arg, " ");
+
+        if (*arg)
+            count++;
     }
-    else
-        arg = (char *)"";
 
-    for (size_t i = 0; i < ARRAY_SIZE(void_cmds); i++)
-        if (strcmp(cmd, void_cmds[i].name) == 0)
+    void (*cb)(intf_thread_t *, const char *const *, size_t) = UnknownCmd;
+
+    for (size_t i = 0; i < ARRAY_SIZE(cmds); i++)
+        if (strcmp(args[0], cmds[i].name) == 0)
         {
-            void_cmds[i].handler(intf);
-            return;
+            cb = cmds[i].handler;
+            break;
         }
 
-    for (size_t i = 0; i < ARRAY_SIZE(string_cmds); i++)
-        if (strcmp(cmd, string_cmds[i].name) == 0)
-        {
-            const char *argv[3] = { cmd, arg, NULL };
-
-            string_cmds[i].handler(intf, argv, 1 + (argv[1][0] != '\0'));
-            return;
-        }
-
-    msg_print(intf, _("Unknown command `%s'. Type `help' for help."), cmd);
+    cb(intf, args, count);
 }
 
 
