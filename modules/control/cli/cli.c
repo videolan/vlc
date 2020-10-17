@@ -301,8 +301,6 @@ static void Process(intf_thread_t *intf, const char *line)
     /* misc menu commands */
         switch (cmd[0])
         {
-            case 's':
-            case 'S':
             case '\0': /* Ignore empty lines */
                 break;
 
