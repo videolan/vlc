@@ -525,12 +525,7 @@ static void *Run( void *data )
         i_size = 0; p_buffer[0] = 0;
     }
 
-    msg_rc( STATUS_CHANGE "( stop state: 0 )" );
-    msg_rc( STATUS_CHANGE "( quit )" );
-
-    vlc_restorecancel( canc );
-
-    return NULL;
+    vlc_assert_unreachable();
 }
 
 /*****************************************************************************
