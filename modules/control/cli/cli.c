@@ -150,11 +150,9 @@ static void Help( intf_thread_t *p_intf)
     msg_rc("%s", _("+----[ end of help ]"));
 }
 
-static void Intf(intf_thread_t *intf, char const *psz_cmd,
-                 vlc_value_t newval)
+static void Intf(intf_thread_t *intf, const char *const *args, size_t count)
 {
-    VLC_UNUSED(psz_cmd);
-    intf_Create(vlc_object_instance(intf), newval.psz_string);
+    intf_Create(vlc_object_instance(intf), count == 1 ? "" : args[1]);
 }
 
 static void Quit(intf_thread_t *intf)
@@ -215,7 +213,7 @@ static const struct
 static const struct
 {
     const char *name;
-    void (*handler)(intf_thread_t *, const char *, vlc_value_t);
+    void (*handler)(intf_thread_t *, const char *const *, size_t);
 } string_cmds[] =
 {
     { "intf", Intf },
@@ -278,9 +276,9 @@ static void Process(intf_thread_t *intf, const char *line)
     for (size_t i = 0; i < ARRAY_SIZE(string_cmds); i++)
         if (strcmp(cmd, string_cmds[i].name) == 0)
         {
-            vlc_value_t n = { .psz_string = (char *)arg };
+            const char *argv[3] = { cmd, arg, NULL };
 
-            string_cmds[i].handler(intf, cmd, n);
+            string_cmds[i].handler(intf, argv, 1 + (argv[1][0] != '\0'));
             return;
         }
 

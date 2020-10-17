@@ -283,9 +283,11 @@ void PlaylistStatus(intf_thread_t *intf)
     msg_print(intf, STATUS_CHANGE "( %s state: %u )", stname, stnum);
 }
 
-void Playlist(intf_thread_t *intf, char const *psz_cmd, vlc_value_t newval)
+void Playlist(intf_thread_t *intf, const char *const *args, size_t n_args)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
+    const char *psz_cmd = args[0];
+    const char *arg = n_args > 1 ? args[1] : "";
 
     vlc_playlist_Lock(playlist);
 
@@ -297,10 +299,10 @@ void Playlist(intf_thread_t *intf, char const *psz_cmd, vlc_value_t newval)
             vlc_playlist_GetPlaybackRepeat(playlist);
         bool b_value = repeat_mode == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
 
-        if( strlen( newval.psz_string ) > 0 )
+        if( strlen( arg ) > 0 )
         {
-            if ( ( !strncmp( newval.psz_string, "on", 2 )  &&  b_value ) ||
-                 ( !strncmp( newval.psz_string, "off", 3 ) && !b_value ) )
+            if ( ( !strncmp( arg, "on", 2 )  &&  b_value ) ||
+                 ( !strncmp( arg, "off", 3 ) && !b_value ) )
             {
                 b_update = false;
             }
@@ -323,10 +325,10 @@ void Playlist(intf_thread_t *intf, char const *psz_cmd, vlc_value_t newval)
             vlc_playlist_GetPlaybackRepeat(playlist);
         bool b_value = repeat_mode == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
 
-        if( strlen( newval.psz_string ) > 0 )
+        if( strlen( arg ) > 0 )
         {
-            if ( ( !strncmp( newval.psz_string, "on", 2 )  &&  b_value ) ||
-                 ( !strncmp( newval.psz_string, "off", 3 ) && !b_value ) )
+            if ( ( !strncmp( arg, "on", 2 )  &&  b_value ) ||
+                 ( !strncmp( arg, "off", 3 ) && !b_value ) )
             {
                 b_update = false;
             }
@@ -349,10 +351,10 @@ void Playlist(intf_thread_t *intf, char const *psz_cmd, vlc_value_t newval)
             vlc_playlist_GetPlaybackOrder(playlist);
         bool b_value = order_mode == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
 
-        if( strlen( newval.psz_string ) > 0 )
+        if( strlen( arg ) > 0 )
         {
-            if ( ( !strncmp( newval.psz_string, "on", 2 )  &&  b_value ) ||
-                 ( !strncmp( newval.psz_string, "off", 3 ) && !b_value ) )
+            if ( ( !strncmp( arg, "on", 2 )  &&  b_value ) ||
+                 ( !strncmp( arg, "off", 3 ) && !b_value ) )
             {
                 b_update = false;
             }
@@ -370,7 +372,7 @@ void Playlist(intf_thread_t *intf, char const *psz_cmd, vlc_value_t newval)
     }
     else if (!strcmp( psz_cmd, "goto" ) )
     {
-        long long llindex = atoll(newval.psz_string);
+        long long llindex = atoll(arg);
         size_t index = (size_t)llindex;
         size_t count = vlc_playlist_Count(playlist);
         if (llindex < 0)
@@ -384,14 +386,13 @@ void Playlist(intf_thread_t *intf, char const *psz_cmd, vlc_value_t newval)
                       count);
     }
     else if ((!strcmp(psz_cmd, "add") || !strcmp(psz_cmd, "enqueue")) &&
-             newval.psz_string && *newval.psz_string)
+             n_args > 1)
     {
-        input_item_t *p_item = parse_MRL( newval.psz_string );
+        input_item_t *p_item = parse_MRL( arg );
 
         if( p_item )
         {
-            msg_print(intf, "Trying to %s %s to playlist.", psz_cmd,
-                      newval.psz_string);
+            msg_print(intf, "Trying to %s %s to playlist.", psz_cmd, arg);
 
             size_t count = vlc_playlist_Count(playlist);
             int ret = vlc_playlist_InsertOne(playlist, count, p_item);
