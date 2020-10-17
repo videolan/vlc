@@ -61,17 +61,4 @@ void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,
 void *RegisterPlayer(intf_thread_t *intf);
 void DeregisterPlayer(intf_thread_t *intf, void *);
 
-void PlaylistPrev(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistNext(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistPlay(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistStop(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistClear(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistSort(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistList(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistStatus(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistRepeat(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistLoop(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistRandom(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistGoto(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistAdd(intf_thread_t *intf, const char *const *, size_t);
-void PlaylistEnqueue(intf_thread_t *intf, const char *const *, size_t);
+void RegisterPlaylist(intf_thread_t *intf);

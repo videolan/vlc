@@ -218,15 +218,6 @@ static void KeyAction(intf_thread_t *intf, const char *const *args, size_t n)
 
 static const struct cli_handler cmds[] =
 {
-    { "playlist", PlaylistList },
-    { "sort", PlaylistSort },
-    { "play", PlaylistPlay },
-    { "stop", PlaylistStop },
-    { "clear", PlaylistClear },
-    { "prev", PlaylistPrev },
-    { "next", PlaylistNext },
-    { "status", PlaylistStatus },
-
     { "longhelp", Help },
     { "h", Help },
     { "help", Help },
@@ -236,13 +227,6 @@ static const struct cli_handler cmds[] =
     { "quit", Quit },
 
     { "intf", Intf },
-    { "add", PlaylistAdd },
-    { "repeat", PlaylistRepeat },
-    { "loop", PlaylistLoop },
-    { "random", PlaylistRandom },
-    { "enqueue", PlaylistEnqueue },
-    { "goto", PlaylistGoto },
-
     { "key", KeyAction },
     { "hotkey", KeyAction },
 };
@@ -708,6 +692,8 @@ static int Activate( vlc_object_t *p_this )
     p_sys->player_cli = RegisterPlayer(p_intf);
     if (unlikely(p_sys->player_cli == NULL))
         goto error;
+
+    RegisterPlaylist(p_intf);
 
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
         goto error;
