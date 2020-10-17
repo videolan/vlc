@@ -291,105 +291,74 @@ void PlaylistStatus(intf_thread_t *intf, const char *const *args, size_t count)
     (void) args; (void) count;
 }
 
-void PlaylistRepeat(intf_thread_t *intf, const char *const *args, size_t count)
+static void PlaylistRepeatCommon(intf_thread_t *intf, const char *const *args,
+                                 size_t count,
+                                 enum vlc_playlist_playback_repeat on_mode)
+
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
-    const char *arg = count > 1 ? args[1] : "";
 
     vlc_playlist_Lock(playlist);
 
-    /* Parse commands that require a playlist */
-        bool b_update = true;
-        enum vlc_playlist_playback_repeat repeat_mode =
-            vlc_playlist_GetPlaybackRepeat(playlist);
-        bool b_value = repeat_mode == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+    enum vlc_playlist_playback_repeat cur_mode =
+                                      vlc_playlist_GetPlaybackRepeat(playlist);
+    enum vlc_playlist_playback_repeat new_mode;
 
-        if( count > 1 )
-        {
-            if ( ( !strncmp( arg, "on", 2 )  &&  b_value ) ||
-                 ( !strncmp( arg, "off", 3 ) && !b_value ) )
-            {
-                b_update = false;
-            }
-        }
+    if (cur_mode == on_mode)
+        new_mode = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+    else
+        new_mode = on_mode;
 
-        if ( b_update )
-        {
-            b_value = !b_value;
-            repeat_mode = b_value
-                ? VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT
-                : VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
-            vlc_playlist_SetPlaybackRepeat(playlist, repeat_mode);
-        }
-        msg_print(intf, "Setting repeat to %s", b_value ? "true" : "false");
+    if (count > 1)
+    {
+        if (strcmp(args[1], "on") == 0)
+            new_mode = on_mode;
+        if (strcmp(args[1], "off") == 0)
+            new_mode = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+    }
+
+    if (new_mode != cur_mode)
+        vlc_playlist_SetPlaybackRepeat(playlist, new_mode);
 
     vlc_playlist_Unlock(playlist);
 }
 
+void PlaylistRepeat(intf_thread_t *intf, const char *const *args, size_t count)
+{
+    PlaylistRepeatCommon(intf, args, count,
+                         VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT);
+}
+
 void PlaylistLoop(intf_thread_t *intf, const char *const *args, size_t count)
 {
-    vlc_playlist_t *playlist = intf->p_sys->playlist;
-    const char *arg = count > 1 ? args[1] : "";
-
-    vlc_playlist_Lock(playlist);
-
-        bool b_update = true;
-        enum vlc_playlist_playback_repeat repeat_mode =
-            vlc_playlist_GetPlaybackRepeat(playlist);
-        bool b_value = repeat_mode == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
-
-        if( strlen( arg ) > 0 )
-        {
-            if ( ( !strncmp( arg, "on", 2 )  &&  b_value ) ||
-                 ( !strncmp( arg, "off", 3 ) && !b_value ) )
-            {
-                b_update = false;
-            }
-        }
-
-        if ( b_update )
-        {
-            b_value = !b_value;
-            repeat_mode = b_value
-                ? VLC_PLAYLIST_PLAYBACK_REPEAT_ALL
-                : VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
-            vlc_playlist_SetPlaybackRepeat(playlist, repeat_mode);
-        }
-        msg_print(intf, "Setting loop to %s", b_value ? "true" : "false");
-
-    vlc_playlist_Unlock(playlist);
+    PlaylistRepeatCommon(intf, args, count, VLC_PLAYLIST_PLAYBACK_REPEAT_ALL);
 }
 
 void PlaylistRandom(intf_thread_t *intf, const char *const *args, size_t count)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
-    const char *arg = count > 1 ? args[1] : "";
 
     vlc_playlist_Lock(playlist);
 
-        bool b_update = true;
-        enum vlc_playlist_playback_order order_mode =
-            vlc_playlist_GetPlaybackOrder(playlist);
-        bool b_value = order_mode == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+    enum vlc_playlist_playback_order cur_mode =
+                                       vlc_playlist_GetPlaybackOrder(playlist);
+    enum vlc_playlist_playback_order new_mode;
 
-        if( strlen( arg ) > 0 )
-        {
-            if ( ( !strncmp( arg, "on", 2 )  &&  b_value ) ||
-                 ( !strncmp( arg, "off", 3 ) && !b_value ) )
-            {
-                b_update = false;
-            }
-        }
+    if (cur_mode == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+        new_mode = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+    else
+        new_mode = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
 
-        if ( b_update )
-        {
-            b_value = !b_value;
-            order_mode = b_value
-                ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM
-                : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
-            vlc_playlist_SetPlaybackOrder(playlist, order_mode);
-        }
-        msg_print(intf, "Setting random to %s", b_value ? "true" : "false");
+    if (count > 1)
+    {
+        if (strcmp(args[1], "on") == 0)
+            new_mode = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+        if (strcmp(args[1], "off") == 0)
+            new_mode = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+    }
+
+    if (new_mode != cur_mode)
+        vlc_playlist_SetPlaybackOrder(playlist, new_mode);
 
     vlc_playlist_Unlock(playlist);
 }
@@ -398,21 +367,20 @@ void PlaylistGoto(intf_thread_t *intf, const char *const *args, size_t n_args)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
     const char *arg = n_args > 1 ? args[1] : "";
+    unsigned long long index = atoll(arg);
 
     vlc_playlist_Lock(playlist);
 
-        long long llindex = atoll(arg);
-        size_t index = (size_t)llindex;
-        size_t count = vlc_playlist_Count(playlist);
-        if (llindex < 0)
-            msg_print(intf, _("Error: `goto' needs an argument greater or equal to zero."));
-        else if (index < count)
-            vlc_playlist_PlayAt(playlist, index);
-        else
-            msg_print(intf,
-                      vlc_ngettext("Playlist has only %zu element",
-                                   "Playlist has only %zu elements", count),
-                      count);
+    size_t count = vlc_playlist_Count(playlist);
+
+    if (index < count)
+        vlc_playlist_PlayAt(playlist, index);
+    else
+        msg_print(intf,
+                  vlc_ngettext("Playlist has only %zu element",
+                               "Playlist has only %zu elements", count),
+                  count);
+
     vlc_playlist_Unlock(playlist);
 }
 
@@ -424,19 +392,20 @@ static void PlaylistAddCommon(intf_thread_t *intf, const char *const *args,
 
     vlc_playlist_Lock(playlist);
 
-        input_item_t *p_item = parse_MRL( arg );
+    input_item_t *item = parse_MRL( arg );
 
-        if( p_item )
-        {
-            msg_print(intf, "Trying to %s %s to playlist.",
-                      play ? "add" : "enqueue", arg);
+    if (item != NULL)
+    {
+        msg_print(intf, "Trying to %s %s to playlist.",
+                  play ? "add" : "enqueue", arg);
 
-            size_t count = vlc_playlist_Count(playlist);
-            int ret = vlc_playlist_InsertOne(playlist, count, p_item);
-            input_item_Release(p_item);
-            if (ret == VLC_SUCCESS && play)
-                vlc_playlist_PlayAt(playlist, count);
-        }
+        size_t count = vlc_playlist_Count(playlist);
+        if (vlc_playlist_InsertOne(playlist, count, item) == VLC_SUCCESS
+         && play)
+            vlc_playlist_PlayAt(playlist, count);
+
+        input_item_Release(item);
+    }
 
     vlc_playlist_Unlock(playlist);
 }
