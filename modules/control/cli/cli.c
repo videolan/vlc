@@ -206,7 +206,7 @@ static const struct
     { "get_title", PlayerGetTitle },
     { "snapshot", PlayerVoutSnapshot },
 
-    { "is_player", IsPlaying },
+    { "is_playing", IsPlaying },
     { "stats", Statistics },
     { "longhelp", Help },
     { "logout", LogOut },
