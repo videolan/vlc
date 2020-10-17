@@ -251,17 +251,30 @@ static void PlayerSeek(intf_thread_t *intf, const char *const *args,
 {
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
 
+    if (count != 2)
+    {
+        msg_print(intf, "%s expects one parameter", args[0]);
+        return;
+    }
+
+    char *end;
+    double value = strtod(args[1], &end);
+    bool relative = args[1][0] == '-' || args[1][0] == '+';
+    bool pct = *end == '%';
+
     vlc_player_Lock(player);
-    if (count > 1 && args[1][strlen(args[1]) - 1] == '%' )
+    if (relative)
     {
-        float f = atof(args[1]) / 100.0;
-        vlc_player_SetPosition(player, f);
+        if (pct)
+            value += vlc_player_GetPosition(player) * 100.;
+        else
+            value += secf_from_vlc_tick(vlc_player_GetTime(player));
     }
+
+    if (pct)
+        vlc_player_SetPosition(player, value / 100.);
     else
-    {
-        int t = atoi(args[1]);
-        vlc_player_SetTime(player, vlc_tick_from_sec(t));
-    }
+        vlc_player_SetTime(player, vlc_tick_from_sec(value));
     vlc_player_Unlock(player);
 }
 
