@@ -471,7 +471,6 @@ static void *Run( void *data )
 
     /* Register commands that will be cleaned up upon object destruction */
     vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
-    input_item_t *item = NULL;
 
     /* status callbacks */
 
@@ -493,19 +492,7 @@ static void *Run( void *data )
 
         vlc_player_Lock(player);
         /* Manage the input part */
-        if( item == NULL )
-        {
-            item = vlc_player_GetCurrentMedia(player);
-            /* New input has been registered */
-            if( item )
-            {
-                char *psz_uri = input_item_GetURI( item );
-                msg_rc( STATUS_CHANGE "( new input: %s )", psz_uri );
-                free( psz_uri );
-            }
-        }
-
-        if( item && b_showpos )
+        if( b_showpos )
         {
             i_newpos = 100 * vlc_player_GetPosition( player );
             if( i_oldpos != i_newpos )

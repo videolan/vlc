@@ -46,6 +46,23 @@ struct player_cli {
 /********************************************************************
  * Status callback routines
  ********************************************************************/
+
+static void
+player_on_media_changed(vlc_player_t *player, input_item_t *item, void *data)
+{
+    struct player_cli *pc = data;
+    intf_thread_t *p_intf = pc->intf;
+
+    (void) player;
+
+    if (item != NULL)
+    {
+        vlc_mutex_lock(&item->lock);
+        msg_rc(STATUS_CHANGE "( new input: %s )", item->psz_uri);
+        vlc_mutex_unlock(&item->lock);
+    }
+}
+
 static void
 player_on_state_changed(vlc_player_t *player,
                         enum vlc_player_state state, void *data)
@@ -108,6 +125,7 @@ player_on_position_changed(vlc_player_t *player,
 
 static const struct vlc_player_cbs player_cbs =
 {
+    .on_current_media_changed = player_on_media_changed,
     .on_state_changed = player_on_state_changed,
     .on_buffering_changed = player_on_buffering_changed,
     .on_rate_changed = player_on_rate_changed,
