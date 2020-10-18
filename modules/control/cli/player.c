@@ -26,6 +26,7 @@
 #endif
 
 #include <assert.h>
+#include <math.h>
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
@@ -40,7 +41,9 @@ struct player_cli {
     intf_thread_t *intf;
     vlc_player_listener_id *player_listener;
     vlc_player_aout_listener_id *player_aout_listener;
+    long position;
     bool input_buffering;
+    bool show_position;
 };
 
 /********************************************************************
@@ -117,10 +120,19 @@ player_on_position_changed(vlc_player_t *player,
     intf_thread_t *p_intf = pc->intf;
 
     if (pc->input_buffering)
+    {
         msg_rc(STATUS_CHANGE "( time: %"PRId64"s )",
                SEC_FROM_VLC_TICK(new_time));
+        pc->input_buffering = false;
+    }
 
-    pc->input_buffering = false;
+    long position = lroundf(new_pos * 100.f);
+
+    if (pc->show_position && position != pc->position)
+    {
+        pc->position = position;
+        msg_rc("pos: %ld%%", pc->position);
+    }
 }
 
 static const struct vlc_player_cbs player_cbs =
@@ -931,7 +943,9 @@ void *RegisterPlayer(intf_thread_t *intf)
         return NULL;
 
     pc->intf = intf;
+    pc->position = -1.;
     pc->input_buffering = false;
+    pc->show_position = var_InheritBool(intf, "rc-show-pos");
 
     RegisterHandlers(intf, cmds, ARRAY_SIZE(cmds));
 

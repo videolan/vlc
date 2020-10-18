@@ -450,11 +450,8 @@ static void *Run( void *data )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     char p_buffer[ MAX_LINE_LENGTH + 1 ];
-    bool b_showpos = var_InheritBool( p_intf, "rc-show-pos" );
 
     int  i_size = 0;
-    int  i_oldpos = 0;
-    int  i_newpos;
     int  canc = vlc_savecancel( );
 
     p_buffer[0] = 0;
@@ -468,11 +465,6 @@ static void *Run( void *data )
         return NULL;
     }
 #endif
-
-    /* Register commands that will be cleaned up upon object destruction */
-    vlc_player_t *player = vlc_playlist_GetPlayer(p_sys->playlist);
-
-    /* status callbacks */
 
     for( ;; )
     {
@@ -489,19 +481,6 @@ static void *Run( void *data )
 
         b_complete = ReadCommand( p_intf, p_buffer, &i_size );
         canc = vlc_savecancel( );
-
-        vlc_player_Lock(player);
-        /* Manage the input part */
-        if( b_showpos )
-        {
-            i_newpos = 100 * vlc_player_GetPosition( player );
-            if( i_oldpos != i_newpos )
-            {
-                i_oldpos = i_newpos;
-                msg_rc( "pos: %d%%", i_newpos );
-            }
-        }
-        vlc_player_Unlock(player);
 
         /* Is there something to do? */
         if( !b_complete ) continue;
