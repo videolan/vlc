@@ -139,6 +139,22 @@ static void PlayerDoVoid(intf_thread_t *intf, void (*cb)(vlc_player_t *))
     vlc_player_Unlock(player);
 }
 
+static void PlayerDoFloat(intf_thread_t *intf, const char *const *args,
+                          size_t count,
+                          void (*setter)(vlc_player_t *, float),
+                          float (*getter)(vlc_player_t *))
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+
+    vlc_player_Lock(player);
+    if (count < 2)
+        msg_print(intf, "%f", getter(player));
+    else
+        setter(player, atof(args[1]));
+    vlc_player_Unlock(player);
+}
+
 static void PlayerPause(intf_thread_t *intf, const char *const *args,
                         size_t count)
 {
@@ -209,6 +225,11 @@ static void PlayerNormal(intf_thread_t *intf, const char *const *args,
 {
     PlayerDoVoid(intf, PlayerDoNormal);
     (void) args; (void) count;
+}
+
+static void PlayerRate(intf_thread_t *intf, const char *const *args, size_t n)
+{
+    PlayerDoFloat(intf, args, n, vlc_player_ChangeRate, vlc_player_GetRate);
 }
 
 static void PlayerFrame(intf_thread_t *intf, const char *const *args,
@@ -845,6 +866,7 @@ static const struct cli_handler cmds[] =
     { "faster", PlayerFaster },
     { "slower", PlayerSlower },
     { "normal", PlayerNormal },
+    { "rate", PlayerRate },
     { "frame", PlayerFrame },
     { "info", PlayerItemInfo },
     { "get_time", PlayerGetTime },
