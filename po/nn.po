@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-01-18 12:22+0100\n"
+"PO-Revision-Date: 2020-10-18 10:10+0200\n"
 "Last-Translator: Bjørn I. <bjorn.svindseth@online.no>, 2020\n"
 "Language-Team: Norwegian Nynorsk (https://www.transifex.com/yaron/"
 "teams/16553/nn/)\n"
@@ -599,7 +599,7 @@ msgid ""
 "can <b>promote</b> VLC media player.</p></body></html>"
 msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
-"charset=utf-8\" /></head><body><h2>Velkomen til hjelp for VLC mediaspelar</"
+"charset=utf-8\" /></head><body><h2>Velkomen til hjelp for VLC mediespelar</"
 "h2><h3>Dokumentasjon</h3><p>Du finn VLC-dokumentasjonen på <a href=\"http://"
 "wiki.videolan.org\">wikinettstaden</a> til VideoLAN.</p><p>Viss du nett har "
 "byrja å bruka VLC mediespelar, les <br><a href=\"http://wiki.videolan.org/"
@@ -1116,7 +1116,7 @@ msgstr "Lineær"
 
 #: src/input/es_out.c:3236
 msgid "Hybrid Log-Gamma"
-msgstr ""
+msgstr "Hybrid Log-Gamma"
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
@@ -1190,7 +1190,7 @@ msgstr "Yaw"
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Tone"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
@@ -1647,7 +1647,7 @@ msgstr "Lydforsterking"
 
 #: src/libvlc-module.c:149
 msgid "This linear gain will be applied to outputted audio."
-msgstr ""
+msgstr "Dette lineære sporvolumet vil vere gjengs for all avspelt lyd."
 
 #: src/libvlc-module.c:151
 msgid "Audio output volume step"
@@ -1655,7 +1655,7 @@ msgstr "Lydnivåsteg for utdata"
 
 #: src/libvlc-module.c:153
 msgid "The step size of the volume is adjustable using this option."
-msgstr ""
+msgstr "Storleiken på volumhoppa kan stillast på med dette valet."
 
 #: src/libvlc-module.c:156
 msgid "Remember the audio volume"
@@ -1665,6 +1665,7 @@ msgstr "Hugs lydstyrken"
 msgid ""
 "The volume can be recorded and automatically restored next time VLC is used."
 msgstr ""
+"Lydnivået kan bli spelt inn og automatisk lagra neste gang VLC vert starta."
 
 #: src/libvlc-module.c:161
 msgid "Audio desynchronization compensation"
@@ -2042,7 +2043,7 @@ msgstr "Plasser alltid videovindauget over andre vindauge."
 
 #: src/libvlc-module.c:319
 msgid "Enable wallpaper mode"
-msgstr ""
+msgstr "Slå på bakgrunnsmodus"
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -3262,7 +3263,7 @@ msgstr ""
 
 #: src/libvlc-module.c:953
 msgid "Enable SPU stream output"
-msgstr ""
+msgstr "Slå på SPU-strøymeutdata"
 
 #: src/libvlc-module.c:955
 msgid ""
@@ -3368,7 +3369,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1011
 msgid "Demux filter module"
-msgstr ""
+msgstr "Demux filtermodul"
 
 #: src/libvlc-module.c:1013
 msgid "Demux filters are used to modify/control the stream that is being read."
@@ -3376,7 +3377,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1015
 msgid "Demux module"
-msgstr ""
+msgstr "Demux-modul"
 
 #: src/libvlc-module.c:1017
 msgid ""
@@ -4486,7 +4487,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1416
 msgid "Boss key"
-msgstr ""
+msgstr "Universalnykel"
 
 #: src/libvlc-module.c:1417
 msgid "Hide the interface and pause playback."
@@ -5169,7 +5170,7 @@ msgstr "Installer"
 
 #: src/misc/update.c:727
 msgid "Update VLC media player"
-msgstr "Oppdater VLC mediaspelar"
+msgstr "Oppdater VLC mediespelar"
 
 #: src/playlist/engine.c:247 src/playlist/loadsave.c:159 lib/media_list.c:237
 #: modules/gui/macosx/VLCMainWindow.m:321
@@ -13548,7 +13549,7 @@ msgstr "D-Bus-styringsgrensesnitt"
 #: modules/video_output/wayland/xdg-shell.c:291
 #: modules/video_output/xcb/window.c:464
 msgid "VLC media player"
-msgstr "VLC mediaspelar"
+msgstr "VLC mediespelar"
 
 #: modules/control/dummy.c:38 modules/control/oldrc.c:176
 msgid "Do not open a DOS command box interface"
@@ -15458,7 +15459,7 @@ msgstr "Lysbilde (bilde)"
 #: modules/gui/macosx/VLCAboutWindowController.m:96
 #: modules/gui/macosx/VLCMainMenu.m:339
 msgid "About VLC media player"
-msgstr "Om VLC mediaspelar"
+msgstr "Om VLC mediespelar"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/qt/dialogs/help.cpp:125
@@ -15491,10 +15492,10 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC mediaspelar er ein fri og open kjeldekode-mediespelar, straumkodar og "
+"<p>VLC mediespelar er ein fri og open kjeldekode-mediespelar, straumkodar og "
 "kringkastar (streamer) som er laga av dei frivillige i <a href=\"https://www."
 "videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
-"\">VideoLAN</span></a>-fellesskapet.</p><p>VLC brukar eigne interne kodeker, "
+"\">VideoLAN</span></a>-fellesskapet.</p><p>VLC brukar eigne interne kodekar, "
 "fungerer på praktisk talt alle filer, CD-ar, DVD-ar, nettverksstraumar, "
 "opptakskort og andre medieformat!</p><p><a href=\"https://www.videolan.org/"
 "contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
@@ -16627,7 +16628,7 @@ msgstr "Lågare lyd"
 
 #: modules/gui/macosx/VLCMainMenu.m:422 modules/gui/macosx/VLCMainMenu.m:423
 msgid "Audio Device"
-msgstr "Audio-eining"
+msgstr "Lydeining"
 
 #: modules/gui/macosx/VLCMainMenu.m:428
 msgid "Half Size"
@@ -16752,7 +16753,7 @@ msgstr "Hjelp"
 
 #: modules/gui/macosx/VLCMainMenu.m:489
 msgid "VLC media player Help..."
-msgstr "Hjelp for VLC mediaspelar…"
+msgstr "Hjelp for VLC mediespelar…"
 
 #: modules/gui/macosx/VLCMainMenu.m:491
 msgid "Online Documentation..."
@@ -17187,7 +17188,7 @@ msgstr "URI"
 
 #: modules/gui/macosx/VLCPlaylist.m:116
 msgid "File Size"
-msgstr "Filstørrelse"
+msgstr "Filstorleik"
 
 #: modules/gui/macosx/VLCPlaylist.m:230
 msgid "Expand All"
@@ -19465,7 +19466,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:100
 msgid "Regularly check for VLC updates"
-msgstr ""
+msgstr "Sjå regelmessig etter VLC-oppdateringar"
 
 #: modules/gui/qt/dialogs/gototime.cpp:42
 msgid "Go to Time"
@@ -19518,7 +19519,7 @@ msgstr "&Nei"
 
 #: modules/gui/qt/dialogs/help.cpp:222 modules/gui/qt/ui/update.h:144
 msgid "VLC media player updates"
-msgstr "Oppdateringar for VLC mediaspelar"
+msgstr "Oppdateringar for VLC mediespelar"
 
 #: modules/gui/qt/dialogs/help.cpp:294
 msgid "A new version of VLC (%1.%2.%3%4) is available."
@@ -19526,7 +19527,7 @@ msgstr "Ein ny versjon avVLC (%1.%2.%3%4) er tilgjengeleg."
 
 #: modules/gui/qt/dialogs/help.cpp:319
 msgid "You have the latest version of VLC media player."
-msgstr "Du har den nyaste versjonen av VLC mediaspelar."
+msgstr "Du har den nyaste versjonen av VLC mediespelar."
 
 #: modules/gui/qt/dialogs/help.cpp:326
 msgid "An error occurred while checking for updates..."
@@ -19820,7 +19821,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/preferences.cpp:337
 msgid "Are you sure you want to reset your VLC media player preferences?"
-msgstr "Er du sikker på at du vil nullstilla innstillingane i VLC mediaspelar?"
+msgstr "Er du sikker på at du vil nullstilla innstillingane i VLC mediespelar?"
 
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:198
 msgid "Stream Output"
@@ -20401,11 +20402,11 @@ msgstr "&Avspeling"
 
 #: modules/gui/qt/menus.cpp:1174
 msgid "&Hide VLC media player in taskbar"
-msgstr "&Gøym VLC-mediaspelar i oppgåvelinja"
+msgstr "&Gøym VLC-mediespelar i oppgåvelinja"
 
 #: modules/gui/qt/menus.cpp:1180
 msgid "Sho&w VLC media player"
-msgstr "&Vis VLC-mediaspelar"
+msgstr "&Vis VLC-mediespelar"
 
 #: modules/gui/qt/menus.cpp:1191
 msgid "&Open Media"
@@ -20448,7 +20449,7 @@ msgid ""
 "basic actions."
 msgstr ""
 "Vis eit ikon i systemkorga som lèt deg kontrollera dei grunnleggjande "
-"funksjonane i VLC mediaspelar."
+"funksjonane i VLC mediespelar."
 
 #: modules/gui/qt/qt.cpp:91
 msgid "Start VLC with only a systray icon"
@@ -26033,11 +26034,11 @@ msgstr ""
 
 #: modules/video_output/android/window.c:50
 msgid "Android Window"
-msgstr ""
+msgstr "Android-vindauge"
 
 #: modules/video_output/android/window.c:51
 msgid "Android native window"
-msgstr ""
+msgstr "Androids innebygde vindaugestil"
 
 #: modules/video_output/caca.c:57
 msgid "Color ASCII art video output"
@@ -26148,7 +26149,7 @@ msgstr ""
 
 #: modules/video_output/drawable.c:34
 msgid "Window handle (HWND)"
-msgstr ""
+msgstr "Vindaugehandtering (HWND)"
 
 #: modules/video_output/drawable.c:36 modules/video_output/xcb/window.c:707
 msgid ""
@@ -26162,7 +26163,7 @@ msgstr ""
 
 #: modules/video_output/drawable.c:47 modules/video_output/xcb/window.c:729
 msgid "Embedded window video"
-msgstr ""
+msgstr "Innebygd videovindauge"
 
 #: modules/video_output/fb.c:56
 msgid "Framebuffer device"
@@ -26426,7 +26427,7 @@ msgstr ""
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
-msgstr ""
+msgstr "Windows GDI-videoutdata"
 
 #: modules/video_output/win32/wgl.c:42
 msgid "GPU affinity"
@@ -26531,7 +26532,7 @@ msgstr ""
 #: modules/video_output/xcb/window.c:433
 msgctxt "ASCII"
 msgid "VLC media player"
-msgstr "VLC mediaspelar"
+msgstr "VLC mediespelar"
 
 #. xgettext: This is a plain ASCII spelling of "VLC"
 #. for the ICCCM window name. This must be pure ASCII.
@@ -27270,7 +27271,7 @@ msgstr "Tid:"
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
 msgid "VLC media player - Web Interface"
-msgstr "VLC mediaspelar - nettgrensesnitt"
+msgstr "VLC mediespelar - nettgrensesnitt"
 
 #: share/lua/http/index.html:215
 msgid "Hide / Show Library"
