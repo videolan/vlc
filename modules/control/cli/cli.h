@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <stdio.h>
 #include <vlc_common.h>
 #include <vlc_playlist.h>
 
@@ -34,13 +35,15 @@ struct intf_sys_t
     vlc_playlist_t              *playlist;
 
 #ifndef _WIN32
+    FILE *stream;
+    int fd;
     char *psz_unix_path;
 #else
     HANDLE hConsoleIn;
     bool b_quiet;
+    int i_socket;
 #endif
     int *pi_socket_listen;
-    int i_socket;
 };
 
 VLC_FORMAT(2, 3)

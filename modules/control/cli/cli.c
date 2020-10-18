@@ -33,6 +33,7 @@
 #include <assert.h>
 #include <math.h>
 #include <sys/types.h>
+#include <fcntl.h>
 #include <unistd.h>
 #ifdef HAVE_WORDEXP_H
 #include <wordexp.h>
@@ -67,6 +68,7 @@
 static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
 {
 #ifndef _WIN32
+    intf_sys_t *sys = p_intf->p_sys;
     char fmt_eol[strlen (psz_fmt) + 3], *msg;
     int len;
 
@@ -76,11 +78,7 @@ static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
     if( len < 0 )
         return;
 
-    if( p_intf->p_sys->i_socket == -1 )
-        vlc_write( 1, msg, len );
-    else
-        net_Write( p_intf, p_intf->p_sys->i_socket, msg, len );
-
+    vlc_write(sys->fd, msg, len);
     free( msg );
 #else
     char fmt_eol[strlen (psz_fmt) + 3], *msg;
@@ -220,11 +218,20 @@ static void LogOut(intf_thread_t *intf, const char *const *args, size_t count)
     intf_sys_t *sys = intf->p_sys;
 
     /* Close connection */
+#ifndef _WIN32
+    if (sys->pi_socket_listen != NULL)
+    {
+        fclose(sys->stream);
+        sys->stream = NULL;
+        sys->fd = -1;
+    }
+#else
     if (sys->i_socket != -1)
     {
         net_Close(sys->i_socket);
         sys->i_socket = -1;
     }
+#endif
     (void) args; (void) count;
 }
 
@@ -321,82 +328,53 @@ error:      wordfree(&we);
 }
 
 #ifndef _WIN32
-static bool ReadCommand(intf_thread_t *p_intf, char *p_buffer, int *pi_size)
-{
-    while( *pi_size < MAX_LINE_LENGTH )
-    {
-        if( p_intf->p_sys->i_socket == -1 )
-        {
-            if( read( 0/*STDIN_FILENO*/, p_buffer + *pi_size, 1 ) <= 0 )
-            {   /* Standard input closed: exit */
-                libvlc_Quit( vlc_object_instance(p_intf) );
-                p_buffer[*pi_size] = 0;
-                return true;
-            }
-        }
-        else
-        {   /* Connection closed */
-            if( net_Read( p_intf, p_intf->p_sys->i_socket, p_buffer + *pi_size,
-                          1 ) <= 0 )
-            {
-                net_Close( p_intf->p_sys->i_socket );
-                p_intf->p_sys->i_socket = -1;
-                p_buffer[*pi_size] = 0;
-                return true;
-            }
-        }
-
-        if( p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
-            break;
-
-        (*pi_size)++;
-    }
-
-    if( *pi_size == MAX_LINE_LENGTH ||
-        p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
-    {
-        p_buffer[ *pi_size ] = 0;
-        return true;
-    }
-
-    return false;
-}
-
 static void *Run(void *data)
 {
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
 
-    char buf[MAX_LINE_LENGTH + 1];
-    int size = 0;
-    int canc = vlc_savecancel();
-
-    buf[0] = '\0';
-
     for (;;)
     {
-        bool complete;
+        char buf[MAX_LINE_LENGTH + 1];
 
-        vlc_restorecancel(canc);
-
-        if (sys->pi_socket_listen != NULL && sys->i_socket == -1)
+        while (sys->stream == NULL)
         {
-            sys->i_socket = net_Accept(intf, sys->pi_socket_listen);
-            if (sys->i_socket == -1)
+            assert(sys->pi_socket_listen != NULL);
+
+            int fd = net_Accept(intf, sys->pi_socket_listen);
+            if (fd == -1)
                 continue;
+
+            int canc = vlc_savecancel();
+
+            fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
+            sys->stream = fdopen(fd, "r");
+            if (sys->stream != NULL)
+                sys->fd = fd;
+            else
+                vlc_close(fd);
+            vlc_restorecancel(canc);
         }
 
-        complete = ReadCommand(intf, buf, &size);
-        canc = vlc_savecancel();
-
-        if (!complete)
-            continue;
-
-        Process(intf, buf);
-        buf[0] = '\0';
-        size = 0;
+        char *cmd = fgets(buf, sizeof (buf), sys->stream);
+        if (cmd != NULL)
+        {
+            int canc = vlc_savecancel();
+            if (cmd[0] != '\0')
+                cmd[strlen(cmd) - 1] = '\0'; /* remove trailing LF */
+            Process(intf, cmd);
+            vlc_restorecancel(canc);
+        }
+        else if (sys->pi_socket_listen == NULL)
+            break;
+        else
+            LogOut(intf, NULL, 0);
     }
-    vlc_assert_unreachable();
+
+    int canc = vlc_savecancel();
+    libvlc_Quit(vlc_object_instance(intf));
+    vlc_restorecancel(canc);
+    return NULL;
 }
 
 #else
@@ -731,10 +709,6 @@ static int Activate( vlc_object_t *p_this )
     p_intf->p_sys = p_sys;
     p_sys->commands = NULL;
     p_sys->pi_socket_listen = pi_socket;
-    p_sys->i_socket = -1;
-#ifdef AF_LOCAL
-    p_sys->psz_unix_path = psz_unix_path;
-#endif
     p_sys->playlist = vlc_intf_GetMainPlaylist(p_intf);;
 
     RegisterHandlers(p_intf, cmds, ARRAY_SIZE(cmds));
@@ -742,12 +716,27 @@ static int Activate( vlc_object_t *p_this )
     /* Line-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
+#ifndef _WIN32
+    if (pi_socket == NULL)
+    {
+        p_sys->stream = stdin;
+        p_sys->fd = 1;
+    }
+    else
+    {
+        p_sys->stream = NULL;
+        p_sys->fd = -1;
+    }
+    p_sys->psz_unix_path = psz_unix_path;
+#else
+    p_sys->i_socket = -1;
 #if VLC_WINSTORE_APP
     p_sys->b_quiet = true;
-#elif defined(_WIN32)
+#else
     p_sys->b_quiet = var_InheritBool( p_intf, "rc-quiet" );
     if( !p_sys->b_quiet )
         intf_consoleIntroMsg( p_intf );
+#endif
 #endif
 
     p_sys->player_cli = RegisterPlayer(p_intf);
@@ -789,16 +778,22 @@ static void Deactivate( vlc_object_t *p_this )
     DeregisterPlayer(p_intf, p_sys->player_cli);
     tdestroy(p_sys->commands, dummy_free);
 
-    net_ListenClose( p_sys->pi_socket_listen );
-    if( p_sys->i_socket != -1 )
-        net_Close( p_sys->i_socket );
-#if defined(AF_LOCAL) && !defined(_WIN32)
-    if( p_sys->psz_unix_path != NULL )
+    if (p_sys->pi_socket_listen != NULL)
     {
-        unlink( p_sys->psz_unix_path );
-        free( p_sys->psz_unix_path );
-    }
+        net_ListenClose(p_sys->pi_socket_listen);
+#ifndef _WIN32
+        if (p_sys->stream != NULL)
+            fclose(p_sys->stream);
+        if (p_sys->psz_unix_path != NULL)
+        {
+            unlink(p_sys->psz_unix_path);
+            free(p_sys->psz_unix_path);
+        }
+#else
+        if (p_sys->i_socket != -1)
+            net_Close(p_sys->i_socket);
 #endif
+    }
     free( p_sys );
 }
 
