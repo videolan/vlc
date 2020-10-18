@@ -1,6 +1,7 @@
 # Lua 5.1
 
-LUA_VERSION := 5.1.4
+LUA_SHORTVERSION := 5.1
+LUA_VERSION := $(LUA_SHORTVERSION).4
 LUA_URL := http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz
 
 # Reverse priority order
@@ -64,25 +65,42 @@ endif
 ifdef HAVE_WIN32
 	cd $(UNPACK_DIR) && sed -i.orig -e 's/lua luac/lua.exe luac.exe/' Makefile
 endif
-	cd $(UNPACK_DIR)/src && sed -i.orig \
+	# Setup the variable used by the contrib system into the lua Makefile
+	# and change lua library artifact to include the version, so that it
+	# does not conflict with a system one
+	cd $(UNPACK_DIR) && sed -i.orig \
 		-e 's%CC=%#CC=%' \
 		-e 's%= *strip%=$(STRIP)%' \
 		-e 's%= *ranlib%= $(RANLIB)%' \
 		-e 's%AR= *ar%AR= $(AR)%' \
-		Makefile
+		-e "s:^LUA_A=.*:LUA_A= liblua$(LUA_VERSION).a:" \
+		src/Makefile
 	$(MOVE)
 
 .lua: lua
 	cd $< && $(HOSTVARS_PIC) $(MAKE) $(LUA_TARGET)
 ifdef HAVE_WIN32
-	cd $< && $(HOSTVARS) $(MAKE) -C src liblua.a
+	cd $< && $(HOSTVARS) $(MAKE) -C src liblua$(LUA_VERSION).a
 endif
-	cd $< && $(HOSTVARS) $(MAKE) install INSTALL_TOP="$(PREFIX)"
+
+	cd $< && $(HOSTVARS) $(MAKE) install \
+		TO_LIB="liblua$(LUA_VERSION).a" \
+		INSTALL_INC="$(PREFIX)/include/lua$(LUA_VERSION)" \
+		INSTALL_LIB="$(PREFIX)/lib" \
+		INSTALL_TOP="$(PREFIX)"
 ifdef HAVE_WIN32
-	cd $< && $(RANLIB) "$(PREFIX)/lib/liblua.a"
+	cd $< && $(RANLIB) "$(PREFIX)/lib/liblua$(LUA_VERSION).a"
 endif
 	mkdir -p -- "$(PREFIX)/lib/pkgconfig"
-	sed "s#^prefix=.*#prefix=$(PREFIX)#" $</etc/lua.pc > "$(PREFIX)/lib/pkgconfig/lua.pc"
+
+	# Redefine pkgconfig variable to account for the version and subdirectory
+	sed  -e "s#^prefix=.*#prefix=$(PREFIX)#" \
+		 -e "s#^includedir=.*#includedir=$(PREFIX)/include/lua$(LUA_VERSION)#" \
+		 -e "s#-llua#$(PREFIX)/lib/liblua$(LUA_VERSION).a#" \
+		 $</etc/lua.pc > "$(PREFIX)/lib/pkgconfig/lua.pc"
+
+	# Configure scripts might search for lua >= 5.1 or lua5.1 so expose both
+	cp "$(PREFIX)/lib/pkgconfig/lua.pc" "$(PREFIX)/lib/pkgconfig/lua$(LUA_SHORTVERSION).pc"
 	touch $@
 
 .sum-luac: .sum-lua
