@@ -34,6 +34,7 @@ struct intf_sys_t
     /* playlist */
     vlc_playlist_t              *playlist;
 
+    vlc_mutex_t output_lock;
 #ifndef _WIN32
     FILE *stream;
     int fd;

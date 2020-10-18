@@ -69,17 +69,25 @@ static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
 {
 #ifndef _WIN32
     intf_sys_t *sys = p_intf->p_sys;
-    char fmt_eol[strlen (psz_fmt) + 3], *msg;
-    int len;
+    int fd;
 
-    snprintf (fmt_eol, sizeof (fmt_eol), "%s\r\n", psz_fmt);
-    len = vasprintf( &msg, fmt_eol, args );
+    vlc_mutex_lock(&sys->output_lock);
+    fd = sys->fd;
+    if (fd != -1)
+    {
+        char fmt_eol[strlen (psz_fmt) + 3], *msg;
+        int len;
 
-    if( len < 0 )
-        return;
+        snprintf(fmt_eol, sizeof (fmt_eol), "%s\r\n", psz_fmt);
+        len = vasprintf(&msg, fmt_eol, args);
 
-    vlc_write(sys->fd, msg, len);
-    free( msg );
+        if (len < 0)
+            return;
+
+        vlc_write(sys->fd, msg, len);
+        free(msg);
+    }
+    vlc_mutex_unlock(&sys->output_lock);
 #else
     char fmt_eol[strlen (psz_fmt) + 3], *msg;
     int len;
@@ -221,9 +229,11 @@ static void LogOut(intf_thread_t *intf, const char *const *args, size_t count)
 #ifndef _WIN32
     if (sys->pi_socket_listen != NULL)
     {
+        vlc_mutex_lock(&sys->output_lock);
+        sys->fd = -1;
+        vlc_mutex_unlock(&sys->output_lock);
         fclose(sys->stream);
         sys->stream = NULL;
-        sys->fd = -1;
     }
     else
     {   /* Force end-of-file on the standard input. */
@@ -363,7 +373,11 @@ static void *Run(void *data)
             fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
             sys->stream = fdopen(fd, "r");
             if (sys->stream != NULL)
+            {
+                vlc_mutex_lock(&sys->output_lock);
                 sys->fd = fd;
+                vlc_mutex_unlock(&sys->output_lock);
+            }
             else
                 vlc_close(fd);
             vlc_restorecancel(canc);
@@ -721,6 +735,7 @@ static int Activate( vlc_object_t *p_this )
 
     p_intf->p_sys = p_sys;
     p_sys->commands = NULL;
+    vlc_mutex_init(&p_sys->output_lock);
     p_sys->pi_socket_listen = pi_socket;
     p_sys->playlist = vlc_intf_GetMainPlaylist(p_intf);;
 
