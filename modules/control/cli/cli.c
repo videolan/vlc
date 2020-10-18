@@ -75,16 +75,15 @@ static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
     fd = sys->fd;
     if (fd != -1)
     {
-        char fmt_eol[strlen (psz_fmt) + 3], *msg;
-        int len;
+        char *msg;
+        int len = vasprintf(&msg, psz_fmt, args);
 
-        snprintf(fmt_eol, sizeof (fmt_eol), "%s\r\n", psz_fmt);
-        len = vasprintf(&msg, fmt_eol, args);
-
-        if (len < 0)
+        if (unlikely(len < 0))
             return;
 
-        vlc_write(sys->fd, msg, len);
+        struct iovec iov[2] = { { msg, len }, { (char *)"\n", 1 } };
+
+        vlc_writev(sys->fd, iov, ARRAY_SIZE(iov));
         free(msg);
     }
     vlc_mutex_unlock(&sys->output_lock);
