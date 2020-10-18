@@ -673,7 +673,7 @@ static int Activate( vlc_object_t *p_this )
 
     RegisterHandlers(p_intf, cmds, ARRAY_SIZE(cmds));
 
-    /* Non-buffered stdout */
+    /* Line-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
 #if VLC_WINSTORE_APP
