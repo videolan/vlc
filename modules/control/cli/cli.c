@@ -225,6 +225,19 @@ static void LogOut(intf_thread_t *intf, const char *const *args, size_t count)
         sys->stream = NULL;
         sys->fd = -1;
     }
+    else
+    {   /* Force end-of-file on the standard input. */
+        int fd = vlc_open("/dev/null", O_RDONLY);
+        if (fd != -1)
+        {   /* POSIX requires flushing before, and seeking after, replacing a
+             * file descriptor underneath an I/O stream.
+             */
+            fflush(sys->stream);
+            dup2(fd, 0 /* fileno(sys->stream) */);
+            fseek(sys->stream, 0, SEEK_SET);
+            vlc_close(fd);
+        }
+    }
 #else
     if (sys->i_socket != -1)
     {
