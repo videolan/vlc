@@ -66,6 +66,7 @@
 
 static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
 {
+#ifndef _WIN32
     char fmt_eol[strlen (psz_fmt) + 3], *msg;
     int len;
 
@@ -76,15 +77,28 @@ static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
         return;
 
     if( p_intf->p_sys->i_socket == -1 )
-#ifdef _WIN32
-        utf8_fprintf( stdout, "%s", msg );
-#else
         vlc_write( 1, msg, len );
-#endif
     else
         net_Write( p_intf, p_intf->p_sys->i_socket, msg, len );
 
     free( msg );
+#else
+    char fmt_eol[strlen (psz_fmt) + 3], *msg;
+    int len;
+
+    snprintf (fmt_eol, sizeof (fmt_eol), "%s\r\n", psz_fmt);
+    len = vasprintf( &msg, fmt_eol, args );
+
+    if( len < 0 )
+        return;
+
+    if( p_intf->p_sys->i_socket == -1 )
+        utf8_fprintf( stdout, "%s", msg );
+    else
+        net_Write( p_intf, p_intf->p_sys->i_socket, msg, len );
+
+    free( msg );
+#endif
 }
 
 void msg_print(intf_thread_t *intf, const char *fmt, ...)
@@ -306,8 +320,87 @@ error:      wordfree(&we);
 #endif
 }
 
+#ifndef _WIN32
+static bool ReadCommand(intf_thread_t *p_intf, char *p_buffer, int *pi_size)
+{
+    while( *pi_size < MAX_LINE_LENGTH )
+    {
+        if( p_intf->p_sys->i_socket == -1 )
+        {
+            if( read( 0/*STDIN_FILENO*/, p_buffer + *pi_size, 1 ) <= 0 )
+            {   /* Standard input closed: exit */
+                libvlc_Quit( vlc_object_instance(p_intf) );
+                p_buffer[*pi_size] = 0;
+                return true;
+            }
+        }
+        else
+        {   /* Connection closed */
+            if( net_Read( p_intf, p_intf->p_sys->i_socket, p_buffer + *pi_size,
+                          1 ) <= 0 )
+            {
+                net_Close( p_intf->p_sys->i_socket );
+                p_intf->p_sys->i_socket = -1;
+                p_buffer[*pi_size] = 0;
+                return true;
+            }
+        }
 
-#if defined(_WIN32) && !VLC_WINSTORE_APP
+        if( p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
+            break;
+
+        (*pi_size)++;
+    }
+
+    if( *pi_size == MAX_LINE_LENGTH ||
+        p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
+    {
+        p_buffer[ *pi_size ] = 0;
+        return true;
+    }
+
+    return false;
+}
+
+static void *Run(void *data)
+{
+    intf_thread_t *intf = data;
+    intf_sys_t *sys = intf->p_sys;
+
+    char buf[MAX_LINE_LENGTH + 1];
+    int size = 0;
+    int canc = vlc_savecancel();
+
+    buf[0] = '\0';
+
+    for (;;)
+    {
+        bool complete;
+
+        vlc_restorecancel(canc);
+
+        if (sys->pi_socket_listen != NULL && sys->i_socket == -1)
+        {
+            sys->i_socket = net_Accept(intf, sys->pi_socket_listen);
+            if (sys->i_socket == -1)
+                continue;
+        }
+
+        complete = ReadCommand(intf, buf, &size);
+        canc = vlc_savecancel();
+
+        if (!complete)
+            continue;
+
+        Process(intf, buf);
+        buf[0] = '\0';
+        size = 0;
+    }
+    vlc_assert_unreachable();
+}
+
+#else
+#if !VLC_WINSTORE_APP
 static bool ReadWin32( intf_thread_t *p_intf, unsigned char *p_buffer, int *pi_size )
 {
     INPUT_RECORD input_record;
@@ -395,7 +488,7 @@ static bool ReadWin32( intf_thread_t *p_intf, unsigned char *p_buffer, int *pi_s
 
 static bool ReadCommand(intf_thread_t *p_intf, char *p_buffer, int *pi_size)
 {
-#if defined(_WIN32) && !VLC_WINSTORE_APP
+#if !VLC_WINSTORE_APP
     if( p_intf->p_sys->i_socket == -1 && !p_intf->p_sys->b_quiet )
         return ReadWin32( p_intf, (unsigned char*)p_buffer, pi_size );
     else if( p_intf->p_sys->i_socket == -1 )
@@ -462,7 +555,7 @@ static void *Run( void *data )
 
     p_buffer[0] = 0;
 
-#if defined(_WIN32) && !VLC_WINSTORE_APP
+#if !VLC_WINSTORE_APP
     /* Get the file descriptor of the console input */
     p_intf->p_sys->hConsoleIn = GetStdHandle(STD_INPUT_HANDLE);
     if( p_intf->p_sys->hConsoleIn == INVALID_HANDLE_VALUE )
@@ -499,6 +592,7 @@ static void *Run( void *data )
 
     vlc_assert_unreachable();
 }
+#endif
 
 /*****************************************************************************
  * Activate: initialize and create stuff
