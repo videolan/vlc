@@ -64,16 +64,13 @@
 
 #define MAX_LINE_LENGTH 1024
 
-void msg_print(intf_thread_t *p_intf, const char *psz_fmt, ...)
+static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
 {
-    va_list args;
     char fmt_eol[strlen (psz_fmt) + 3], *msg;
     int len;
 
     snprintf (fmt_eol, sizeof (fmt_eol), "%s\r\n", psz_fmt);
-    va_start( args, psz_fmt );
     len = vasprintf( &msg, fmt_eol, args );
-    va_end( args );
 
     if( len < 0 )
         return;
@@ -88,6 +85,15 @@ void msg_print(intf_thread_t *p_intf, const char *psz_fmt, ...)
         net_Write( p_intf, p_intf->p_sys->i_socket, msg, len );
 
     free( msg );
+}
+
+void msg_print(intf_thread_t *intf, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    msg_vprint(intf, fmt, ap);
+    va_end(ap);
 }
 
 static int cmdcmp(const void *a, const void *b)
