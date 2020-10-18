@@ -33,7 +33,6 @@
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_player.h>
-#include <vlc_actions.h>
 
 #include "cli.h"
 
@@ -206,8 +205,12 @@ static void PlayerFastForward(intf_thread_t *intf, const char *const *args,
                               isgreater(rate, 0.f) ? rate * 2.f : -rate);
     }
     else
-        var_SetInteger(vlc_object_instance(intf), "key-action",
-                       ACTIONID_JUMP_FORWARD_EXTRASHORT);
+    {
+        int secs = var_InheritInteger(intf, "extrashort-jump-size");
+        vlc_tick_t t = vlc_player_GetTime(player) + vlc_tick_from_sec(secs);
+
+        vlc_player_SetTime(player, t);
+    }
     vlc_player_Unlock(player);
     (void) args; (void) count;
 }
@@ -225,8 +228,12 @@ static void PlayerRewind(intf_thread_t *intf, const char *const *args,
         vlc_player_ChangeRate(player, isless(rate, 0.f) ? rate * 2.f : -rate);
     }
     else
-        var_SetInteger(vlc_object_instance(intf), "key-action",
-                       ACTIONID_JUMP_BACKWARD_EXTRASHORT);
+    {
+        int secs = var_InheritInteger(intf, "extrashort-jump-size");
+        vlc_tick_t t = vlc_player_GetTime(player) - vlc_tick_from_sec(secs);
+
+        vlc_player_SetTime(player, t);
+    }
     vlc_player_Unlock(player);
     (void) args; (void) count;
 }
