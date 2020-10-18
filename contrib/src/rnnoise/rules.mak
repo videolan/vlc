@@ -3,7 +3,10 @@
 RNNOISE_GITURL := http://github.com/xiph/rnnoise.git
 RNNOISE_GITHASH := 90ec41ef659fd82cfec2103e9bb7fc235e9ea66c
 
+ifndef HAVE_ANDROID
 PKGS += rnnoise
+endif
+
 ifeq ($(call need_pkg,"rnnoise"),)
 PKGS_FOUND += rnnoise
 endif
