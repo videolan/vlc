@@ -1625,6 +1625,15 @@ void PlayerController::restorePlaybackPos()
     vlc_player_RestorePlaybackPos( d->m_player );
 }
 
+void PlayerController::acknowledgeRestoreCallback()
+{
+    Q_D(PlayerController);
+    if (d->m_canRestorePlayback) {
+        d->m_canRestorePlayback = false;
+        emit playbackRestoreQueried();
+    }
+}
+
 //MISC
 
 void PlayerController::setABloopState(ABLoopState state)

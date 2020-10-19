@@ -44,6 +44,7 @@ Widgets.NavigableFocusScope {
     function hideResumePanel() {
         resumeTimeout.stop()
         resumePanel.visible = false
+        player.acknowledgeRestoreCallback()
         hidden()
     }
 

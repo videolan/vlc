@@ -282,6 +282,7 @@ public slots:
     bool canRestorePlayback() const;
     void restorePlaybackPos();
     void openVLsub();
+    void acknowledgeRestoreCallback();
 
     //tracks
     TrackListModel* getVideoTracks();
