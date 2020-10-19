@@ -80,9 +80,9 @@ static vlc_decoder_device * video_get_decoder_device( decoder_t *p_dec )
     return TranscodeHoldDecoderDevice(&p_dec->obj, p_owner->id);
 }
 
-static void debug_format( sout_stream_t *p_stream, const es_format_t *fmt )
+static void debug_format( vlc_object_t *p_obj, const es_format_t *fmt )
 {
-    msg_Dbg( p_stream, "format now %4.4s/%4.4s %dx%d(%dx%d) ø%d",
+    msg_Dbg( p_obj, "format now %4.4s/%4.4s %dx%d(%dx%d) ø%d",
              (const char *) &fmt->i_codec,
              (const char *) &fmt->video.i_chroma,
              fmt->video.i_visible_width, fmt->video.i_visible_height,
