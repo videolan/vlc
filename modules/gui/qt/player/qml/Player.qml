@@ -300,15 +300,24 @@ Widgets.NavigableFocusScope {
                         anchors.centerIn: parent
                     }
 
+                    DropShadow {
+                        anchors.fill: cover
+                        source: cover
+                        horizontalOffset: 0
+                        verticalOffset: VLCStyle.dp(1, VLCStyle.scale)
+                        radius: VLCStyle.dp(3, VLCStyle.scale)
+                        samples: 1 + VLCStyle.dp(3, VLCStyle.scale) * 2
+                        color: Qt.rgba(0, 0, 0, .18)
+                    }
 
                     DropShadow {
                         anchors.fill: cover
                         source: cover
-                        horizontalOffset: 3
-                        verticalOffset: 10
-                        radius: 12
-                        samples: 17
-                        color: "black"
+                        horizontalOffset: 0
+                        verticalOffset: VLCStyle.dp(6, VLCStyle.scale)
+                        radius: VLCStyle.dp(14, VLCStyle.scale)
+                        samples: 1 + VLCStyle.dp(14, VLCStyle.scale) * 2
+                        color: Qt.rgba(0, 0, 0, .22)
                     }
                 }
 
