@@ -269,7 +269,7 @@ Widgets.NavigableFocusScope {
 
             ColumnLayout {
                 anchors.fill: parent
-                spacing: VLCStyle.margin_small
+                spacing: 0
 
 
                 visible: !rootPlayer.hasEmbededVideo
@@ -321,31 +321,30 @@ Widgets.NavigableFocusScope {
                     }
                 }
 
-                Label {
+                Widgets.SubtitleLabel {
                     id: albumLabel
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: implicitHeight
-                    Layout.alignment: Qt.AlignHCenter
+                    Layout.topMargin: VLCStyle.margin_normal
 
                     text: mainPlaylistController.currentItem.album
-                    font.pixelSize: VLCStyle.fontSize_xxlarge
-                    font.bold: true
+                    font.weight: Font.Light
                     horizontalAlignment: Text.AlignHCenter
                     color: VLCStyle.colors.playerFg
                     Accessible.description: i18n.qtr("album")
                 }
 
-                Label {
+                Widgets.MenuLabel {
                     id: artistLabel
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: implicitHeight
-                    Layout.alignment: Qt.AlignHCenter
+                    Layout.topMargin: VLCStyle.margin_xxsmall
 
                     text: mainPlaylistController.currentItem.artist
+                    font.weight: Font.Light
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: VLCStyle.fontSize_xlarge
                     color: VLCStyle.colors.playerFg
                     Accessible.description: i18n.qtr("artist")
                 }
