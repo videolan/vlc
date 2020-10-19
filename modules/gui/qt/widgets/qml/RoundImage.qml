@@ -23,6 +23,7 @@ import "qrc:///style/"
 
 Image {
     id: cover
+    asynchronous: true
     property real radius: 3
     fillMode: Image.PreserveAspectCrop
     sourceSize: Qt.size(width, height)

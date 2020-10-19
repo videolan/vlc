@@ -78,6 +78,7 @@ Widgets.NavigableFocusScope {
                 /* A bigger cover for the album */
                 Image {
                     id: expand_cover_id
+                    asynchronous: true
                     height: VLCStyle.expandCover_music_height
                     width: VLCStyle.expandCover_music_width
                     source: model.cover || VLCStyle.noArtAlbum

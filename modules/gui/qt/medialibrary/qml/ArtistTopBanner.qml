@@ -35,6 +35,7 @@ Widgets.NavigableFocusScope {
 
     Image {
         id: background
+        asynchronous: true
 
         width: parent.width
         height: VLCStyle.artistBanner_height

@@ -72,6 +72,7 @@ Widgets.NavigableFocusScope {
                     /* A bigger cover for the album */
                     Image {
                         id: expand_cover_id
+                        asynchronous: true
 
                         height: VLCStyle.gridCover_video_height
                         width: VLCStyle.gridCover_video_width
