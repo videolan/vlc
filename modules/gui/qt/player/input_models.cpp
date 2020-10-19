@@ -144,6 +144,7 @@ void TrackListModel::clear()
     beginRemoveRows({}, 0, m_data.size() - 1);
     m_data.clear();
     endRemoveRows();
+    emit countChanged();
 }
 
 QHash<int, QByteArray> TrackListModel::roleNames() const

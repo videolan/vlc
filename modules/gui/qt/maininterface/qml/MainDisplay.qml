@@ -383,9 +383,9 @@ Widgets.NavigableFocusScope {
             }
 
             Connections {
-                target: player.videoTracks
-                onDataChanged: {
-                    if (player.videoTracks.rowCount() > 0
+                target: player.videoTracks.count
+                onCountChanged: {
+                    if (player.videoTracks.count > 0
                             && player.playingState === PlayerController.PLAYING_STATE_PLAYING) {
                         g_mainDisplay.showPlayer()
                     }
