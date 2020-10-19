@@ -894,12 +894,12 @@ void InputManager::reverse()
 
 void InputManager::slower()
 {
-    var_TriggerCallback( THEPL, "rate-slower" );
+    var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_SLOWER );
 }
 
 void InputManager::faster()
 {
-    var_TriggerCallback( THEPL, "rate-faster" );
+    var_SetInteger( p_intf->obj.libvlc, "key-action", ACTIONID_FASTER );
 }
 
 void InputManager::littlefaster()
