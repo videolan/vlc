@@ -581,7 +581,24 @@ VoutUpdateFormat(vout_display_t *vd, video_format_t *fmt,
 {
     if (!vd->ops->update_format)
         return VLC_EGENERIC;
-    return vd->ops->update_format(vd, fmt, ctx);
+
+    int ret = vd->ops->update_format(vd, fmt, ctx);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+
+    /* Copy to a local variable not to destroy osys->source on failure */
+    video_format_t copy;
+    ret = video_format_Copy(&copy, fmt);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    /* Move the local variable to osys->source */
+    video_format_Clean(&osys->source);
+    memcpy(&osys->source, &copy, sizeof(copy));
+
+    return ret;
 }
 
 void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
