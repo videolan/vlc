@@ -43,17 +43,11 @@ Widgets.NavigableFocusScope{
     Keys.priority: Keys.AfterItem
     Keys.onPressed: defaultKeyAction(event, 0)
 
-    Rectangle{
+    Item {
         id : topcontrolContent
-        color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.banner, 0.8)
+
         anchors.fill: parent
         implicitHeight: topcontrollerMouseArea.implicitHeight + topcontrollerMouseArea.anchors.topMargin
-
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: VLCStyle.colors.playerBg }
-            GradientStop { position: 1.0; color: "transparent" }
-        }
-
 
         MouseArea {
             id: topcontrollerMouseArea

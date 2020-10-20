@@ -199,6 +199,42 @@ Widgets.NavigableFocusScope {
         }
     }
 
+    /// Backgrounds of topControlbar and controlBar are drawn separately since they outgrow their content
+    /* top control bar background */
+    Widgets.DrawerExt {
+        z: 1
+        edge: Widgets.DrawerExt.Edges.Top
+        state: topcontrolView.state
+        width: parent.width
+        height: VLCStyle.dp(206, VLCStyle.scale)
+        component: Rectangle {
+            width: rootPlayer.width
+            height: VLCStyle.dp(206, VLCStyle.scale)
+            gradient: Gradient {
+                GradientStop { position: 0; color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.playerBg, .8) }
+                GradientStop { position: 1; color: "transparent" }
+            }
+        }
+    }
+
+    /* bottom control bar background */
+    Widgets.DrawerExt {
+        z: 1
+        anchors.bottom: parent.bottom
+        width: parent.width
+        edge: Widgets.DrawerExt.Edges.Bottom
+        state: topcontrolView.state
+        height: VLCStyle.dp(206, VLCStyle.scale)
+        component: Rectangle {
+            width: rootPlayer.width
+            height: VLCStyle.dp(206, VLCStyle.scale)
+            gradient: Gradient {
+                GradientStop { position: 0; color: "transparent" }
+                GradientStop { position: 1; color: VLCStyle.colors.setColorAlpha(VLCStyle.colors.playerBg, .8) }
+            }
+        }
+    }
+
     //property alias centralLayout: mainLayout.centralLayout
     ColumnLayout {
         id: mainLayout
@@ -371,12 +407,8 @@ Widgets.NavigableFocusScope {
             state: "visible"
             edge: Widgets.DrawerExt.Edges.Bottom
 
-            component: Rectangle {
+            component: Item {
                 id: controllerBarId
-                gradient: Gradient {
-                    GradientStop { position: 1.0; color: VLCStyle.colors.playerBg }
-                    GradientStop { position: 0.0; color: "transparent" }
-                }
 
                 width: controlBarView.width
                 height: controllerId.implicitHeight + controllerId.anchors.bottomMargin
