@@ -182,6 +182,8 @@ MainInterface* CompositorWin7::makeMainInterface()
     m_qmlView->setColor(QColor(Qt::transparent));
     m_qmlView->setGeometry(m_rootWindow->geometry());
     m_qmlView->setMinimumSize( m_rootWindow->minimumSize() );
+    if (m_rootWindow->useClientSideDecoration())
+        m_qmlView->setFlag(Qt::FramelessWindowHint);
 
     m_qmlView->installEventFilter(this);
     Win7NativeEventFilter* m_nativeEventFilter = new Win7NativeEventFilter(this);
