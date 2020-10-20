@@ -34,7 +34,7 @@
 
 #include "cli.h"
 
-#ifndef HAVE_WORDEXP_H
+#ifndef HAVE_WORDEXP
 /*****************************************************************************
  * parse_MRL: build a input item from a full mrl
  *****************************************************************************
@@ -410,7 +410,7 @@ static void PlaylistAddCommon(intf_thread_t *intf, const char *const *args,
 
     vlc_playlist_Lock(playlist);
     count = vlc_playlist_Count(playlist);
-#ifdef HAVE_WORDEXP_H
+#ifdef HAVE_WORDEXP
 
     for (size_t i = 1; i < n_args;)
     {

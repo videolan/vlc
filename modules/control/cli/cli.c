@@ -296,7 +296,7 @@ static void Process(intf_thread_t *intf, const char *line)
     if (*cmd == '\0')
         return; /* Ignore empty line */
 
-#ifdef HAVE_WORDEXP_H
+#ifdef HAVE_WORDEXP
     wordexp_t we;
     int val = wordexp(cmd, &we, 0);
 
@@ -343,7 +343,7 @@ error:      wordfree(&we);
         cb(intf, args, count);
     }
 
-#ifdef HAVE_WORDEXP_H
+#ifdef HAVE_WORDEXP
     free(args);
     wordfree(&we);
 #endif
