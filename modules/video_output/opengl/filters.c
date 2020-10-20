@@ -200,7 +200,6 @@ InitFramebufferOut(struct vlc_gl_filter_priv *priv)
     if (status != GL_FRAMEBUFFER_COMPLETE)
         return VLC_EGENERIC;
 
-    vt->BindFramebuffer(GL_FRAMEBUFFER, 0);
     return VLC_SUCCESS;
 }
 
@@ -228,7 +227,6 @@ InitFramebufferMSAA(struct vlc_gl_filter_priv *priv, unsigned msaa_level)
     if (status != GL_FRAMEBUFFER_COMPLETE)
         return VLC_EGENERIC;
 
-    vt->BindFramebuffer(GL_FRAMEBUFFER, 0);
     return VLC_SUCCESS;
 }
 
@@ -368,6 +366,14 @@ vlc_gl_filters_InitFramebuffers(struct vlc_gl_filters *filters)
     struct vlc_gl_filter_priv *priv = NULL;
     struct vlc_gl_filter_priv *subfilter_priv;
 
+    const opengl_vtable_t *vt = &filters->api->vt;
+
+    /* Save the current bindings to restore them at the end */
+    GLint renderbuffer;
+    GLint draw_framebuffer;
+    vt->GetIntegerv(GL_RENDERBUFFER_BINDING, &renderbuffer);
+    vt->GetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &draw_framebuffer);
+
     vlc_list_foreach(priv, &filters->list, node)
     {
         /* Compute the highest msaa_level among the filter and its subfilters */
@@ -425,6 +431,10 @@ vlc_gl_filters_InitFramebuffers(struct vlc_gl_filters *filters)
                 return ret;
         }
     }
+
+    /* Restore bindings */
+    vt->BindFramebuffer(GL_DRAW_FRAMEBUFFER, draw_framebuffer);
+    vt->BindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
 
     return VLC_SUCCESS;
 }
