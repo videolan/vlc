@@ -18,6 +18,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
+import QtQml.Models 2.11
 import QtGraphicalEffects 1.0
 
 import org.videolan.vlc 0.1
@@ -107,7 +108,7 @@ Widgets.NavigableFocusScope {
             Row {
                 anchors.right: parent.right
                 focus: true
-                KeyNavigation.down: playlistpopup.state === "visible" ? playlistpopup : controlBarView
+                KeyNavigation.down: playlistpopup.state === "visible" ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
 
                 Widgets.IconToolButton {
                     id: menu_selector
@@ -183,13 +184,16 @@ Widgets.NavigableFocusScope {
                 navigationParent: rootPlayer
                 navigationUpItem: csdGroup
                 navigationDownItem: controlBarView
-                navigationLeft: function() {
+                navigationLeft: closePlaylist
+                navigationCancel: closePlaylist
+
+                function closePlaylist() {
                     playlistpopup.showPlaylist = false
                     controlBarView.forceActiveFocus()
-                }
-                navigationCancel: function() {
-                    playlistpopup.showPlaylist = false
-                    controlBarView.forceActiveFocus()
+                    if (audioControls.visible)
+                        audioControls.forceActiveFocus()
+                    else
+                        controlBarView.forceActiveFocus()
                 }
             }
         }
@@ -276,7 +280,7 @@ Widgets.NavigableFocusScope {
                     title: mainPlaylistController.currentItem.title
 
                     navigationParent: rootPlayer
-                    navigationDownItem: playlistpopup.showPlaylist ? playlistpopup : controlBarView
+                    navigationDownItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : controlBarView)
                     navigationRightItem: csdGroup
                 }
 
@@ -319,7 +323,7 @@ Widgets.NavigableFocusScope {
                     Layout.fillHeight: true
                     Layout.maximumHeight: rootPlayer.height / 2
                     Layout.minimumHeight: 1
-                    Layout.topMargin: albumLabel.Layout.preferredHeight + artistLabel.Layout.preferredHeight
+                    Layout.topMargin: albumLabel.Layout.preferredHeight + artistLabel.Layout.preferredHeight + audioControls.width
 
                     Image {
                         id: cover
@@ -385,6 +389,46 @@ Widgets.NavigableFocusScope {
                     Accessible.description: i18n.qtr("artist")
                 }
 
+                Widgets.NavigableRow {
+                    id: audioControls
+
+                    Layout.preferredHeight: implicitHeight
+                    Layout.preferredWidth: implicitWidth
+                    Layout.topMargin: VLCStyle.margin_xsmall
+                    Layout.alignment: Qt.AlignHCenter
+                    visible: player.videoTracks.count === 0
+                    focus: visible
+                    navigationParent: rootPlayer
+                    KeyNavigation.up: topcontrolView
+                    KeyNavigation.down: controlBarView
+
+                    model: ObjectModel {
+                        Widgets.IconToolButton {
+                            size: VLCStyle.icon_medium
+                            iconText: VLCIcons.skip_back
+                            onClicked: player.jumpBwd()
+                            text: i18n.qtr("Step back")
+                            color: VLCStyle.colors.playerFg
+                        }
+
+                        Widgets.IconToolButton {
+                            size: VLCStyle.icon_medium
+                            iconText: VLCIcons.visualization
+                            onClicked: player.toggleVisualization()
+                            text: i18n.qtr("Visualization")
+                            color: VLCStyle.colors.playerFg
+                        }
+
+                        Widgets.IconToolButton{
+                            size: VLCStyle.icon_medium
+                            iconText: VLCIcons.skip_for
+                            onClicked: player.jumpFwd()
+                            text: i18n.qtr("Step forward")
+                            color: VLCStyle.colors.playerFg
+                        }
+                    }
+                }
+
                 Item {
                     Layout.fillHeight: true
                 }
@@ -437,7 +481,7 @@ Widgets.NavigableFocusScope {
                         }
 
                         navigationParent: rootPlayer
-                        navigationUpItem: playlistpopup.showPlaylist ? playlistpopup : topcontrolView
+                        navigationUpItem: playlistpopup.showPlaylist ? playlistpopup : (audioControls.visible ? audioControls : topcontrolView)
                     }
                 }
             }
