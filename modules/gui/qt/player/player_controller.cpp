@@ -1656,6 +1656,29 @@ void PlayerController::toggleRecord()
     setRecording(!d->m_recording);
 }
 
+void PlayerController::toggleVisualization()
+{
+    Q_D(PlayerController);
+
+    if ( d->m_audioVisualization.rowCount() < 1 )
+        return;
+
+    if ( !d->m_audioVisualization.hasCurrent()
+         || d->m_audioVisualization.currentRow() == 0 /*0th row is "Disable"*/)
+    {
+        const int r = rand() % d->m_audioVisualization.rowCount();
+        d->m_audioVisualization.setData( d->m_audioVisualization.index( r )
+                                         , QVariant::fromValue<bool>( true )
+                                         , Qt::CheckStateRole );
+    }
+    else
+    {
+        d->m_audioVisualization.setData( d->m_audioVisualization.index(0)
+                                         , QVariant::fromValue<bool>( true )
+                                         , Qt::CheckStateRole);
+    }
+}
+
 void PlayerController::setRecording( bool recording )
 {
     Q_D(PlayerController);

@@ -225,6 +225,7 @@ public slots:
     Q_INVOKABLE void toggleABloopState();
     Q_INVOKABLE void snapshot();
     Q_INVOKABLE void toggleRecord();
+    Q_INVOKABLE void toggleVisualization();
 
 public:
     PlayerController( intf_thread_t * );

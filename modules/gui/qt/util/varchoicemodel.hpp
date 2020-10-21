@@ -67,6 +67,7 @@ public:
     bool resetObject(T *object);
 
     bool hasCurrent() const;
+    int currentRow() const;
 
     static int on_variable_callback( vlc_object_t * object, char const * , vlc_value_t oldvalue, vlc_value_t newvalue, void * data);
     static int on_variable_list_callback( vlc_object_t * object, char const * , int action, vlc_value_t* value, void * data);

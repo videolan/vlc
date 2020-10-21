@@ -229,6 +229,11 @@ bool VLCVarChoiceModel::hasCurrent() const
     return m_current != -1;
 }
 
+int VLCVarChoiceModel::currentRow() const
+{
+    return m_current;
+}
+
 void VLCVarChoiceModel::toggleIndex(int index)
 {
     setData(QAbstractItemModel::createIndex(index,0),true,Qt::CheckStateRole);
