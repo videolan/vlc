@@ -57,7 +57,7 @@ void FormatNamespace::ParseMPEG4Elements(const std::vector<std::string> &element
     if(elements.size() < 1)
         return;
 
-    uint8_t objectType = std::stoi(elements.at(0).substr(0,1), nullptr, 16);
+    uint8_t objectType = std::stoi(elements.at(0).substr(0,2), nullptr, 16);
     if(!MPEG4_Codec_By_ObjectType(objectType, NULL, 0,
                                   &fmt.i_codec,
                                   &fmt.i_profile))
@@ -67,7 +67,7 @@ void FormatNamespace::ParseMPEG4Elements(const std::vector<std::string> &element
     {
         case 0x40:
             if(elements.size() > 1)
-                fmt.i_profile = std::stoi(elements.at(1).substr(0,1), nullptr, 16);
+                fmt.i_profile = std::stoi(elements.at(1).substr(0,2), nullptr, 16);
             break;
         default:
             break;
@@ -98,7 +98,7 @@ void FormatNamespace::Parse(vlc_fourcc_t fcc, const std::vector<std::string> &el
         /* VIDEO */
         case MP4RA("mp4v"):
             /* set default if no elements */
-            es_format_Change(&fmt, AUDIO_ES, VLC_CODEC_MP4V);
+            es_format_Change(&fmt, VIDEO_ES, VLC_CODEC_MP4V);
             ParseMPEG4Elements(elements);
             break;
         case MP4RA("avc1"):
