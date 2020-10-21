@@ -669,6 +669,12 @@ void AbstractStream::trackerEvent(const SegmentTrackerEvent &event)
                    !event.u.switching.next->getAdaptationSet()->isBitSwitchable()))
                     needrestart = true;
             }
+            AdvDebug(msg_Dbg(p_realdemux, "Stream %s switching %s %s to %s %s",
+                    description.c_str(),
+                    event.u.switching.prev ? event.u.switching.prev->getID().str().c_str() : "",
+                    event.u.switching.prev ? event.u.switching.prev->getStreamFormat().str().c_str() : "",
+                    event.u.switching.next ? event.u.switching.next->getID().str().c_str() : "",
+                    event.u.switching.next ? event.u.switching.next->getStreamFormat().str().c_str() : ""));
             break;
 
         case SegmentTrackerEvent::SEGMENT_CHANGE:
