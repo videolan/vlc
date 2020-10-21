@@ -30,16 +30,16 @@ int CompositorWin7::window_enable(struct vout_window_t * p_wnd, const vout_windo
 {
     CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
     msg_Dbg(that->m_intf, "window_enable");
-    that->m_qmlVideoSurfaceProvider->enable(p_wnd);
-    that->m_qmlVideoSurfaceProvider->setVideoEmbed(true);
+    that->m_videoSurfaceProvider->enable(p_wnd);
+    that->m_videoSurfaceProvider->setVideoEmbed(true);
     return VLC_SUCCESS;
 }
 
 void CompositorWin7::window_disable(struct vout_window_t * p_wnd)
 {
     CompositorWin7* that = static_cast<CompositorWin7*>(p_wnd->sys);
-    that->m_qmlVideoSurfaceProvider->setVideoEmbed(false);
-    that->m_qmlVideoSurfaceProvider->disable();
+    that->m_videoSurfaceProvider->setVideoEmbed(false);
+    that->m_videoSurfaceProvider->disable();
     that->m_videoWindowHandler->disable();
     msg_Dbg(that->m_intf, "window_disable");
 }
@@ -152,29 +152,39 @@ MainInterface* CompositorWin7::makeMainInterface()
      * m_stable is not attached to the main interface because dialogs are attached to the mainInterface
      * and showing them would raise the video widget above the interface
      */
-    m_stable = new QWidget(nullptr, Qt::Tool | Qt::FramelessWindowHint);
+    m_videoWidget = new QWidget(nullptr, Qt::Tool | Qt::FramelessWindowHint);
+    m_stable = new QWidget(m_videoWidget);
     m_stable->setContextMenuPolicy( Qt::PreventContextMenu );
 
     QPalette plt = m_rootWindow->palette();
     plt.setColor( QPalette::Window, Qt::black );
+    m_rootWindow->setPalette(plt);
+
     m_stable->setPalette( plt );
     m_stable->setAutoFillBackground(true);
     /* Force the widget to be native so that it gets a winId() */
     m_stable->setAttribute( Qt::WA_NativeWindow, true );
     m_stable->setAttribute( Qt::WA_PaintOnScreen, true );
     m_stable->setMouseTracking( true );
-    m_stable->setWindowFlags( Qt::Tool | Qt::FramelessWindowHint | Qt::WindowDoesNotAcceptFocus );
+    //m_stable->setWindowFlags( Qt::Tool | Qt::FramelessWindowHint | Qt::WindowDoesNotAcceptFocus );
     m_stable->setAttribute( Qt::WA_ShowWithoutActivating );
-    m_stable->show();
+    m_stable->setVisible(true);
 
-    m_videoWindowHWND = (HWND)m_stable->winId();
+    m_videoWidget->show();
+    m_videoWindowHWND = (HWND)m_videoWidget->winId();
 
     BOOL excluseFromPeek = TRUE;
     DwmSetWindowAttribute(m_videoWindowHWND, DWMWA_EXCLUDED_FROM_PEEK, &excluseFromPeek, sizeof(excluseFromPeek));
     DwmSetWindowAttribute(m_videoWindowHWND, DWMWA_DISALLOW_PEEK, &excluseFromPeek, sizeof(excluseFromPeek));
 
-    m_qmlVideoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
-    m_rootWindow->setVideoSurfaceProvider(m_qmlVideoSurfaceProvider.get());
+    m_videoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
+    m_rootWindow->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
+    m_rootWindow->setCanShowVideoPIP(true);
+
+    connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
+            this, &CompositorWin7::onSurfacePositionChanged);
+    connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
+            this, &CompositorWin7::onSurfaceSizeChanged);
 
     m_qmlView = std::make_unique<QQuickView>();
     m_qmlView->setResizeMode(QQuickView::SizeRootObjectToView);
@@ -223,7 +233,7 @@ MainInterface* CompositorWin7::makeMainInterface()
 
 void CompositorWin7::destroyMainInterface()
 {
-    m_qmlVideoSurfaceProvider.reset();
+    m_videoSurfaceProvider.reset();
     m_videoWindowHandler.reset();
     m_qmlView.reset();
     if (m_rootWindow)
@@ -273,16 +283,16 @@ bool CompositorWin7::eventFilter(QObject*, QEvent* ev)
     case QEvent::Move:
     case QEvent::Resize:
     case QEvent::ApplicationStateChange:
-        m_stable->setGeometry(m_qmlView->geometry());
+        m_videoWidget->setGeometry(m_qmlView->geometry());
         resetVideoZOrder();
         break;
     case QEvent::WindowStateChange:
         if (m_qmlView->windowStates() & Qt::WindowMinimized)
-            m_stable->hide();
+            m_videoWidget->hide();
         else
         {
-            m_stable->show();
-            m_stable->setGeometry(m_qmlView->geometry());
+            m_videoWidget->show();
+            m_videoWidget->setGeometry(m_qmlView->geometry());
             resetVideoZOrder();
         }
         break;
@@ -291,11 +301,11 @@ bool CompositorWin7::eventFilter(QObject*, QEvent* ev)
         resetVideoZOrder();
         break;
     case QEvent::Show:
-        m_stable->show();
+        m_videoWidget->show();
         resetVideoZOrder();
         break;
     case QEvent::Hide:
-        m_stable->hide();
+        m_videoWidget->hide();
         break;
     default:
         break;
@@ -322,6 +332,17 @@ void CompositorWin7::resetVideoZOrder()
         SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE
     );
 }
+
+void CompositorWin7::onSurfacePositionChanged(QPointF position)
+{
+    m_stable->move((position / m_stable->window()->devicePixelRatioF()).toPoint());
+}
+
+void CompositorWin7::onSurfaceSizeChanged(QSizeF size)
+{
+    m_stable->resize((size / m_stable->window()->devicePixelRatioF()).toSize());
+}
+
 
 Win7NativeEventFilter::Win7NativeEventFilter(QObject* parent)
     : QObject(parent)

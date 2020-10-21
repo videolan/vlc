@@ -66,15 +66,18 @@ private:
 
 private slots:
     void resetVideoZOrder();
+    void onSurfacePositionChanged(QPointF position);
+    void onSurfaceSizeChanged(QSizeF size);
 
 private:
     intf_thread_t *m_intf = nullptr;
 
     MainInterface* m_rootWindow = nullptr;
+    QWidget* m_videoWidget = nullptr;
     QWidget* m_stable = nullptr;
     std::unique_ptr<QQuickView> m_qmlView;
     std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;
-    std::unique_ptr<VideoSurfaceProvider> m_qmlVideoSurfaceProvider;
+    std::unique_ptr<VideoSurfaceProvider> m_videoSurfaceProvider;
     WinTaskbarWidget* m_taskbarWidget = nullptr;
     Win7NativeEventFilter* m_nativeEventFilter = nullptr;
 
