@@ -670,7 +670,7 @@ Item{
         Widgets.IconToolButton{
             id: extdSettingsBtn
             size: VLCStyle.icon_medium
-            text: VLCIcons.extended
+            iconText: VLCIcons.extended
             onClicked: dialogProvider.extendedDialog()
             property bool acceptFocus: true
             Accessible.name: i18n.qtr("Extended settings")
