@@ -453,7 +453,7 @@ Item{
         Widgets.IconToolButton {
             id: menuBtn
             size: VLCStyle.icon_medium
-            iconText: VLCIcons.menu
+            iconText: VLCIcons.ellipsis
             onClicked: contextMenu.popup(this.mapToGlobal(0, 0))
             property bool acceptFocus: true
             text: i18n.qtr("Menu")
