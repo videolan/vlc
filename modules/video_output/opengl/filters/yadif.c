@@ -591,6 +591,7 @@ Flush(struct vlc_gl_filter *filter)
     /* The next call to Draw will provide the "next" frame. The "prev" and
      * "cur" frames are missing. */
     sys->missing_frames = 2;
+    sys->order = 0;
 }
 
 static bool

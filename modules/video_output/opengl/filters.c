@@ -741,6 +741,9 @@ vlc_gl_filters_Flush(struct vlc_gl_filters *filters)
                 subfilter->ops->flush(subfilter);
         }
     }
+
+    filters->will_update = false;
+    filters->pending_filter = NULL;
 }
 
 void
