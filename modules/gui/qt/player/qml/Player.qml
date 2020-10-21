@@ -306,6 +306,7 @@ Widgets.NavigableFocusScope {
 
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.topMargin: VLCStyle.margin_xsmall
 
             ColumnLayout {
                 anchors.fill: parent
@@ -319,11 +320,12 @@ Widgets.NavigableFocusScope {
                 }
 
                 Item {
-                    Layout.fillWidth: true
                     Layout.fillHeight: true
+                    Layout.preferredHeight: Math.max(Math.min(parent.height, parent.width - VLCStyle.margin_small * 2), 0)
                     Layout.maximumHeight: rootPlayer.height / 2
                     Layout.minimumHeight: 1
-                    Layout.topMargin: albumLabel.Layout.preferredHeight + artistLabel.Layout.preferredHeight + audioControls.width
+                    Layout.preferredWidth: height * cover.sar
+                    Layout.alignment: Qt.AlignHCenter
 
                     Image {
                         id: cover
@@ -334,10 +336,7 @@ Widgets.NavigableFocusScope {
 
                         //source aspect ratio
                         readonly property real sar: cover.sourceSize.width / cover.sourceSize.height
-
-                        height: Math.min(parent.height, parent.width - VLCStyle.margin_small * 2)
-                        width: height  * sar
-                        anchors.centerIn: parent
+                        anchors.fill: parent
                     }
 
                     DropShadow {
