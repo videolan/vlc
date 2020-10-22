@@ -564,7 +564,7 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shaders_t *shade
         if (src_full_range)
             range_adjust = -1; /* lower the source to studio range */
     }
-    if (!IsRGBShader(quad->textureFormat) && !src_full_range)
+    if (!IsRGBShader(quad->textureFormat) && !src_full_range && IsRGBShader(display->pixelFormat))
         range_adjust--; /* the YUV->RGB conversion already output full range */
 
     if (range_adjust != 0)
