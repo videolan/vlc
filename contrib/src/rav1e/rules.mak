@@ -5,7 +5,10 @@ RAV1E_URL := https://github.com/xiph/rav1e/archive/v$(RAV1E_VERSION).tar.gz
 
 ifdef BUILD_RUST
 ifdef BUILD_ENCODERS
+# Rav1e is not linking correctly on iOS arm64
+ifndef HAVE_IOS
 PKGS += rav1e
+endif
 endif
 endif
 
