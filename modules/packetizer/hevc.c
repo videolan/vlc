@@ -506,7 +506,7 @@ static void AppendAsAnnexB(const block_t *p_block,
         if(((set != rg[i].p_decoded) == !b) && rg[i].p_nal)\
         {\
             AppendAsAnnexB(rg[i].p_nal, &p_data, &i_data);\
-            break;\
+            if(b) break;\
         }\
     }
 
