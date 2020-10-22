@@ -294,7 +294,7 @@ static void UpdateSize(vout_display_t *vd)
 static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *viewpoint)
 {
     vout_display_sys_t *sys = vd->sys;
-    if ( sys->picQuad.pVertexShaderConstants )
+    if ( sys->picQuad.viewpointShaderConstant )
     {
         d3d11_device_lock( sys->d3d_dev );
         D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, viewpoint,

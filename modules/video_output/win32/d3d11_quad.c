@@ -55,8 +55,8 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad, d3d_vshader_t *
     ID3D11DeviceContext_IASetInputLayout(d3d_dev->d3dcontext, vsshader->layout);
     ID3D11DeviceContext_IASetVertexBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pVertexBuffer, &quad->vertexStride, &offset);
     ID3D11DeviceContext_IASetIndexBuffer(d3d_dev->d3dcontext, quad->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-    if ( quad->pVertexShaderConstants )
-        ID3D11DeviceContext_VSSetConstantBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pVertexShaderConstants);
+    if ( quad->viewpointShaderConstant )
+        ID3D11DeviceContext_VSSetConstantBuffers(d3d_dev->d3dcontext, 0, 1, &quad->viewpointShaderConstant);
 
     ID3D11DeviceContext_VSSetShader(d3d_dev->d3dcontext, vsshader->shader, NULL, 0);
 
@@ -179,10 +179,10 @@ void D3D11_ReleaseQuad(d3d_quad_t *quad)
         ID3D11Buffer_Release(quad->pIndexBuffer);
         quad->pIndexBuffer = NULL;
     }
-    if (quad->pVertexShaderConstants)
+    if (quad->viewpointShaderConstant)
     {
-        ID3D11Buffer_Release(quad->pVertexShaderConstants);
-        quad->pVertexShaderConstants = NULL;
+        ID3D11Buffer_Release(quad->viewpointShaderConstant);
+        quad->viewpointShaderConstant = NULL;
     }
     D3D11_ReleasePixelShader(quad);
     for (size_t i=0; i<2; i++)
@@ -611,7 +611,7 @@ static bool ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_
             res = (ID3D11Resource *)quad->pPixelShaderConstants[PS_CONST_COLORSPACE];
             break;
         case VS_CONST_VIEWPOINT:
-            res = (ID3D11Resource *)quad->pVertexShaderConstants;
+            res = (ID3D11Resource *)quad->viewpointShaderConstant;
             break;
     }
 
@@ -728,7 +728,7 @@ static float UpdateZ(float f_fovx, float f_fovy)
 void (D3D11_UpdateViewpoint)(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad,
                              const vlc_viewpoint_t *viewpoint, float f_sar)
 {
-    if (!quad->pVertexShaderConstants)
+    if (!quad->viewpointShaderConstant)
         return;
 
     // Convert degree into radian
@@ -779,7 +779,7 @@ int D3D11_AllocateQuad(vlc_object_t *o, d3d11_device_t *d3d_dev,
     {
         static_assert((sizeof(VS_PROJECTION_CONST)%16)==0,"Constant buffers require 16-byte alignment");
         constantDesc.ByteWidth = sizeof(VS_PROJECTION_CONST);
-        hr = ID3D11Device_CreateBuffer(d3d_dev->d3ddevice, &constantDesc, NULL, &quad->pVertexShaderConstants);
+        hr = ID3D11Device_CreateBuffer(d3d_dev->d3ddevice, &constantDesc, NULL, &quad->viewpointShaderConstant);
         if(FAILED(hr)) {
             msg_Err(o, "Could not create the vertex shader constant buffer. (hr=0x%lX)", hr);
             goto error;

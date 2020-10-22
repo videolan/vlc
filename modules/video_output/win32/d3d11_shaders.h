@@ -88,7 +88,7 @@ typedef struct
     UINT                      vertexStride;
     ID3D11Buffer              *pIndexBuffer;
     UINT                      indexCount;
-    ID3D11Buffer              *pVertexShaderConstants;
+    ID3D11Buffer              *viewpointShaderConstant;
     ID3D11Buffer              *pPixelShaderConstants[2];
     UINT                       PSConstantsCount;
     ID3D11PixelShader         *d3dpixelShader[D3D11_MAX_SHADER_VIEW];
