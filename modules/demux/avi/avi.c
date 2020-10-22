@@ -916,7 +916,7 @@ aviindex:
             tk->i_samplesize != 0 )
             continue;
 
-        avi_chunk_list_t *p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, i, true );
+        avi_chunk_list_t *p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, tk->fmt.i_id, true );
         avi_chunk_strf_t *p_strf = AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0, false );
         if( !p_strf || p_strf->i_cat != AUDIO_ES )
             continue;
