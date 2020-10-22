@@ -2660,7 +2660,8 @@ static void AVI_IndexLoad_indx( demux_t *p_demux,
                 {
                     break;
                 }
-                if( ck_sub.indx.i_indextype == AVI_INDEX_OF_CHUNKS )
+                if( ck_sub.common.i_chunk_fourcc == AVIFOURCC_indx &&
+                     ck_sub.indx.i_indextype == AVI_INDEX_OF_CHUNKS )
                     __Parse_indx( p_demux, &p_index[i_stream], pi_last_offset, &ck_sub.indx );
                 AVI_ChunkClean( p_demux->s, &ck_sub );
             }
