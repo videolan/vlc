@@ -280,17 +280,17 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
     HRESULT hr;
-    hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &quad->d3dsampState[0]);
+    hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &quad->SamplerStates[0]);
     if (FAILED(hr)) {
         msg_Err(o, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
         return hr;
     }
 
     sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-    hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &quad->d3dsampState[1]);
+    hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &quad->SamplerStates[1]);
     if (FAILED(hr)) {
         msg_Err(o, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
-        ID3D11SamplerState_Release(quad->d3dsampState[0]);
+        ID3D11SamplerState_Release(quad->SamplerStates[0]);
         return hr;
     }
 

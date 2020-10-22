@@ -92,7 +92,7 @@ typedef struct
     ID3D11Buffer              *pPixelShaderConstants[2];
     UINT                       PSConstantsCount;
     ID3D11PixelShader         *d3dpixelShader[D3D11_MAX_SHADER_VIEW];
-    ID3D11SamplerState        *d3dsampState[2];
+    ID3D11SamplerState        *SamplerStates[2];
     D3D11_VIEWPORT            cropViewport[D3D11_MAX_SHADER_VIEW];
     unsigned int              i_width;
     unsigned int              i_height;
