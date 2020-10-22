@@ -232,6 +232,8 @@ bool CompositorDCompositionUISurface::init()
 
 CompositorDCompositionUISurface::~CompositorDCompositionUISurface()
 {
+    if (m_rootItem)
+        delete m_rootItem;
     if (m_uiWindow)
         delete m_uiWindow;
     if (m_uiRenderControl)
@@ -240,8 +242,6 @@ CompositorDCompositionUISurface::~CompositorDCompositionUISurface()
         delete m_uiOffscreenSurface;
     if (m_context)
         delete m_context;
-    if (m_rootItem)
-        delete m_rootItem;
     if (m_qmlEngine)
         delete m_qmlEngine;
     releaseSharedTexture();

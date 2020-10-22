@@ -271,7 +271,6 @@ void CompositorDirectComposition::destroyMainInterface()
         m_uiVisual.Reset();
     }
     m_uiSurface.reset();
-    m_ui.reset();
     m_rootVisual.Reset();
     m_dcompTarget.Reset();
     m_qmlVideoSurfaceProvider.reset();
@@ -280,6 +279,7 @@ void CompositorDirectComposition::destroyMainInterface()
         delete m_rootWindow;
         m_rootWindow = nullptr;
     }
+    m_ui.reset();
 }
 
 bool CompositorDirectComposition::setupVoutWindow(vout_window_t *p_wnd)
