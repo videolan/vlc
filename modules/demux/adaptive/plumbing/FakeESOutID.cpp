@@ -102,6 +102,10 @@ bool FakeESOutID::isCompatible( const FakeESOutID *p_other ) const
                 /* Reject audio streams with different or unknown rates */
                 if(fmt.audio.i_rate != p_other->fmt.audio.i_rate || !fmt.audio.i_rate)
                     return false;
+                if(fmt.i_extra &&
+                   (fmt.i_extra != p_other->fmt.i_extra ||
+                    memcmp(fmt.p_extra, p_other->fmt.p_extra, fmt.i_extra)))
+                    return false;
             }
 
             return es_format_IsSimilar( &p_other->fmt, &fmt );
