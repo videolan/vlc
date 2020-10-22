@@ -47,7 +47,7 @@ typedef struct d3d_vertex_t {
 
 typedef bool (*d3d11_select_plane_t)(void *opaque, size_t plane_index);
 
-void D3D11_RenderQuad(d3d11_device_t *, d3d_quad_t *, d3d_vshader_t *,
+void D3D11_RenderQuad(d3d11_device_t *, d3d_quad_t *, d3d_vertex_shader_t *,
                       ID3D11ShaderResourceView *resourceViews[D3D11_MAX_SHADER_VIEW],
                       d3d11_select_plane_t selectPlane, void *selectOpaque);
 

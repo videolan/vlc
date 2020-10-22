@@ -75,7 +75,7 @@ extern const char* globVertexShaderProjection;
 typedef struct {
     ID3D11VertexShader        *shader;
     ID3D11InputLayout         *layout;
-} d3d_vshader_t;
+} d3d_vertex_shader_t;
 
 /* A Quad is texture that can be displayed in a rectangle */
 typedef struct
@@ -118,10 +118,10 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d11_shader_compiler_t *
     D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 void D3D11_ReleasePixelShader(d3d_quad_t *);
 
-HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, const d3d11_shader_compiler_t *, d3d11_device_t *, d3d_vshader_t *);
+HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, const d3d11_shader_compiler_t *, d3d11_device_t *, d3d_vertex_shader_t *);
 #define D3D11_CompileFlatVertexShader(a,b,c,d) D3D11_CompileFlatVertexShader(VLC_OBJECT(a),b,c,d)
 
-HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *, const d3d11_shader_compiler_t *, d3d11_device_t *, d3d_vshader_t *);
+HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *, const d3d11_shader_compiler_t *, d3d11_device_t *, d3d_vertex_shader_t *);
 #define D3D11_CompileProjectionVertexShader(a,b,c,d) D3D11_CompileProjectionVertexShader(VLC_OBJECT(a),b,c,d)
 
 float GetFormatLuminance(vlc_object_t *, const video_format_t *);
@@ -133,7 +133,6 @@ HRESULT D3D11_CreateRenderTargets(d3d11_device_t *, ID3D11Resource *, const d3d_
 void D3D11_ClearRenderTargets(d3d11_device_t *, const d3d_format_t *,
                               ID3D11RenderTargetView *targets[D3D11_MAX_RENDER_TARGET]);
 
-void D3D11_SetVertexShader(d3d_vshader_t *dst, d3d_vshader_t *src);
-void D3D11_ReleaseVertexShader(d3d_vshader_t *);
+void D3D11_ReleaseVertexShader(d3d_vertex_shader_t *);
 
 #endif /* VLC_D3D11_SHADERS_H */
