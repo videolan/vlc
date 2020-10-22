@@ -254,7 +254,7 @@ static HRESULT CompileTargetShader(vlc_object_t *o, const d3d11_shader_compiler_
 
 HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_t *compiler, bool legacy_shader,
                                  d3d11_device_t *d3d_dev,
-                                 const display_info_t *display,
+                                 const display_info_t *display, bool sharp,
                                  video_transfer_func_t transfer,
                                  video_color_primaries_t primaries, bool src_full_range,
                                  d3d_quad_t *quad)
@@ -271,7 +271,7 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_
 
     D3D11_SAMPLER_DESC sampDesc;
     memset(&sampDesc, 0, sizeof(sampDesc));
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+    sampDesc.Filter = sharp ? D3D11_FILTER_MIN_MAG_MIP_POINT : D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
     sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
     sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
     sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;

@@ -110,12 +110,12 @@ int D3D11_InitShaders(vlc_object_t *, d3d11_shader_compiler_t *);
 void D3D11_ReleaseShaders(d3d11_shader_compiler_t *);
 
 HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d11_shader_compiler_t *, bool legacy_shader,
-                                 d3d11_device_t *, const display_info_t *,
+                                 d3d11_device_t *, const display_info_t *, bool sharp,
                                  video_transfer_func_t, video_color_primaries_t,
                                  bool src_full_range,
                                  d3d_quad_t *);
-#define D3D11_CompilePixelShader(a,b,c,d,e,f,g,h,i) \
-    D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
+#define D3D11_CompilePixelShader(a,b,c,d,e,f,g,h,i,j) \
+    D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h,i,j)
 void D3D11_ReleasePixelShader(d3d_quad_t *);
 
 HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, const d3d11_shader_compiler_t *, d3d11_device_t *, d3d_vertex_shader_t *);
