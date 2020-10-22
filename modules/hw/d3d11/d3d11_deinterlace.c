@@ -466,7 +466,7 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
     if ( sys->videoProcessor==NULL &&
          p_mode->i_mode != D3D11_VIDEO_PROCESSOR_PROCESSOR_CAPS_DEINTERLACE_BOB )
     {
-        msg_Dbg(filter, "mode %s not available, trying bob", psz_mode);
+        msg_Dbg(filter, "mode %s not available, trying bob", p_mode->psz_mode);
         p_mode = GetFilterMode("bob");
         for (UINT type = 0; type < processorCaps.RateConversionCapsCount; ++type)
         {
