@@ -148,6 +148,7 @@ struct picture_t
      */
     bool            b_progressive;          /**< is it a progressive frame? */
     bool            b_top_field_first;             /**< which field is first */
+    bool            b_multiview_left_eye; /**< left eye or right eye in multiview */
     unsigned int    i_nb_fields;                  /**< number of displayed fields */
     picture_context_t *context;      /**< video format-specific data pointer */
     /**@}*/

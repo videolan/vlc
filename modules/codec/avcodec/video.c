@@ -943,7 +943,7 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
         }
 #if LIBAVUTIL_VERSION_CHECK( 56, 7, 0, 4, 100 )
         p_pic->format.b_multiview_right_eye_first = stereo_data->flags & AV_STEREO3D_FLAG_INVERT;
-        p_pic->format.b_multiview_left_eye = (stereo_data->view == AV_STEREO3D_VIEW_LEFT);
+        p_pic->b_multiview_left_eye = (stereo_data->view == AV_STEREO3D_VIEW_LEFT);
 
         p_dec->fmt_out.video.b_multiview_right_eye_first = p_pic->format.b_multiview_right_eye_first;
 #endif
