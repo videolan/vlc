@@ -38,7 +38,7 @@ signals:
     void windowStyleChanged();
 };
 
-class CompositorWin7 : public CompositorDummy
+class CompositorWin7 : public QObject, public Compositor
 {
     Q_OBJECT
 public:
@@ -49,6 +49,7 @@ public:
     bool init();
 
     virtual MainInterface *makeMainInterface() override;
+    virtual void destroyMainInterface() override;
     virtual bool setupVoutWindow(vout_window_t*) override;
 
 protected:
@@ -67,6 +68,9 @@ private slots:
     void resetVideoZOrder();
 
 private:
+    intf_thread_t *m_intf = nullptr;
+
+    MainInterface* m_rootWindow = nullptr;
     QWidget* m_stable = nullptr;
     std::unique_ptr<QQuickView> m_qmlView;
     std::unique_ptr<VideoWindowHandler> m_videoWindowHandler;

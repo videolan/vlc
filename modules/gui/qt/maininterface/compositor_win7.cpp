@@ -78,7 +78,8 @@ void CompositorWin7::window_set_fullscreen(struct vout_window_t * p_wnd, const c
 
 
 CompositorWin7::CompositorWin7(intf_thread_t *p_intf, QObject* parent)
-    : CompositorDummy(p_intf, parent)
+    : QObject(parent)
+    , m_intf(p_intf)
 {
 }
 
@@ -214,6 +215,18 @@ MainInterface* CompositorWin7::makeMainInterface()
             m_qmlView.get(), &QWindow::showNormal);
 
     return m_rootWindow;
+}
+
+void CompositorWin7::destroyMainInterface()
+{
+    m_qmlVideoSurfaceProvider.reset();
+    m_videoWindowHandler.reset();
+    m_qmlView.reset();
+    if (m_rootWindow)
+    {
+        delete m_rootWindow;
+        m_rootWindow = nullptr;
+    }
 }
 
 bool CompositorWin7::setupVoutWindow(vout_window_t *p_wnd)
