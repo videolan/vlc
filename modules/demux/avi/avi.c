@@ -784,7 +784,7 @@ aviindex:
         {
             continue;
         }
-        p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, i, true );
+        p_strl = AVI_ChunkFind( p_hdrl, AVIFOURCC_strl, tk->fmt.i_id, true );
         p_auds = AVI_ChunkFind( p_strl, AVIFOURCC_strf, 0, false );
 
         if( p_auds &&
