@@ -39,7 +39,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-04-15 06:48+0200\n"
+"PO-Revision-Date: 2020-10-22 06:43+0200\n"
 "Last-Translator: Vincenzo Reale <vinx.reale@gmail.com>, 2020\n"
 "Language-Team: Italian (https://www.transifex.com/yaron/teams/16553/it/)\n"
 "Language: it\n"
@@ -4321,8 +4321,8 @@ msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
 msgstr ""
-"Selezionare il tasto per spostare il selettore verso l'alto nei menu del "
-"DVD / Sposta il punto di vista verso l'alto (altezza)."
+"Seleziona il tasto per spostare il selettore verso l'alto nei menu del DVD / "
+"Sposta il punto di vista verso l'alto (altezza)."
 
 #: src/libvlc-module.c:1297
 msgid "Navigate down"
@@ -4333,7 +4333,7 @@ msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
 msgstr ""
-"Selezionare il tasto per spostare il selettore verso il basso nei menu del "
+"Seleziona il tasto per spostare il selettore verso il basso nei menu del "
 "DVD / Sposta il punto di vista verso il basso (altezza)."
 
 #: src/libvlc-module.c:1299
@@ -4345,7 +4345,7 @@ msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
 msgstr ""
-"Selezionare il tasto per spostare il selettore a sinistra nei menu del DVD / "
+"Seleziona il tasto per spostare il selettore a sinistra nei menu del DVD / "
 "Sposta il punto di vista a sinistra (imbardata)."
 
 #: src/libvlc-module.c:1301
@@ -4357,8 +4357,8 @@ msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
 msgstr ""
-"Selezionare il tasto per spostare il selettore verso destra nei menu del "
-"DVD / Sposta il punto di vista verso destra (imbardata)."
+"Seleziona il tasto per spostare il selettore verso destra nei menu del DVD / "
+"Sposta il punto di vista verso destra (imbardata)."
 
 #: src/libvlc-module.c:1303
 msgid "Activate"
@@ -9946,7 +9946,7 @@ msgstr "Modalità cuffie (binaurale)"
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
 msgstr ""
-"Se l'uscita è stereo, eseguire il rendering ambisonico con il decodificatore "
+"Se l'uscita è stereo, esegui il rendering ambisonico con il decodificatore "
 "binaurale."
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:65
@@ -26268,7 +26268,7 @@ msgid ""
 "threads when threads > 0"
 msgstr ""
 "Definisce quante immagini consentiamo di essere in pool tra i thread del "
-"decodificatore / encoder quando i thread > 0"
+"decodificatore/codificatore quando i thread > 0"
 
 #: modules/stream_out/transcode/transcode.c:146
 msgid "Transcode"
