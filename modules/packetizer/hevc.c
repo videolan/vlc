@@ -495,13 +495,16 @@ static block_t *GetXPSCopy(decoder_sys_t *p_sys)
     struct hevc_tuple_s *xpstype[3] = {p_sys->rg_vps, p_sys->rg_sps, p_sys->rg_pps};
     size_t xpsmax[3] = {HEVC_VPS_ID_MAX, HEVC_SPS_ID_MAX, HEVC_PPS_ID_MAX};
     for(size_t i=0; i<3; i++)
+    {
+        struct hevc_tuple_s *xps = xpstype[i];
         for(size_t j=0; j<xpsmax[i]; j++)
         {
             block_t *p_dup;
-            if(xpstype[i]->p_nal &&
-               (p_dup = block_Duplicate(xpstype[i]->p_nal)))
+            if(xps[j].p_nal &&
+               (p_dup = block_Duplicate(xps[j].p_nal)))
                 block_ChainLastAppend(&pp_append, p_dup);
         };
+    }
     return p_chain;
 }
 
