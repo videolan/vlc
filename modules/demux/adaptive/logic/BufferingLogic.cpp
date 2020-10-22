@@ -139,73 +139,82 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
     SegmentList *segmentList = rep->inheritSegmentList();
     SegmentBase *segmentBase = rep->inheritSegmentBase();
     SegmentTemplate *mediaSegmentTemplate = rep->inheritSegmentTemplate();
+
+    SegmentTimeline *timeline;
     if(mediaSegmentTemplate)
+        timeline = mediaSegmentTemplate->inheritSegmentTimeline();
+    else if(segmentList)
+        timeline = segmentList->inheritSegmentTimeline();
+    else
+        timeline = NULL;
+
+    if(timeline)
     {
         uint64_t start = 0;
-        const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
+        const Timescale timescale = timeline->inheritTimescale();
 
-        const SegmentTimeline *timeline = mediaSegmentTemplate->inheritSegmentTimeline();
-        if(timeline)
+        uint64_t safeMinElementNumber = timeline->minElementNumber();
+        uint64_t safeMaxElementNumber = timeline->maxElementNumber();
+        stime_t safeedgetime, safestarttime, duration;
+        for(unsigned i=0; i<SAFETY_BUFFERING_EDGE_OFFSET; i++)
         {
-            uint64_t safeMinElementNumber = timeline->minElementNumber();
-            uint64_t safeMaxElementNumber = timeline->maxElementNumber();
-            stime_t safeedgetime, safestarttime, duration;
-            for(unsigned i=0; i<SAFETY_BUFFERING_EDGE_OFFSET; i++)
-            {
-                if(safeMinElementNumber == safeMaxElementNumber)
-                    break;
-                safeMaxElementNumber--;
-            }
-            bool b_ret = timeline->getScaledPlaybackTimeDurationBySegmentNumber(safeMaxElementNumber,
-                                                                                &safeedgetime, &duration);
-            if(unlikely(!b_ret))
-                return 0;
-            safeedgetime += duration - 1;
-
-            for(unsigned i=0; i<SAFETY_EXPURGING_OFFSET; i++)
-            {
-                if(safeMinElementNumber + 1 >= safeMaxElementNumber)
-                    break;
-                safeMinElementNumber++;
-            }
-            b_ret = timeline->getScaledPlaybackTimeDurationBySegmentNumber(safeMinElementNumber,
-                                                                           &safestarttime, &duration);
-            if(unlikely(!b_ret))
-                return 0;
-
-            if(playlist->timeShiftBufferDepth.Get())
-            {
-                stime_t edgetime;
-                bool b_ret = timeline->getScaledPlaybackTimeDurationBySegmentNumber(timeline->maxElementNumber(),
-                                                                                    &edgetime, &duration);
-                if(unlikely(!b_ret))
-                    return 0;
-                edgetime += duration - 1;
-                stime_t timeshiftdepth = timescale.ToScaled(playlist->timeShiftBufferDepth.Get());
-                if(safestarttime + timeshiftdepth < edgetime)
-                {
-                    safestarttime = edgetime - timeshiftdepth;
-                    safeMinElementNumber = timeline->getElementNumberByScaledPlaybackTime(safestarttime);
-                }
-            }
-            assert(safestarttime<=safeedgetime);
-
-            stime_t starttime;
-            if(safeedgetime - safestarttime > timescale.ToScaled(i_buffering))
-                starttime = safeedgetime - timescale.ToScaled(i_buffering);
-            else
-                starttime = safestarttime;
-
-            start = timeline->getElementNumberByScaledPlaybackTime(starttime);
-            assert(start >= timeline->minElementNumber());
-            assert(start >= safeMinElementNumber);
-            assert(start <= timeline->maxElementNumber());
-            assert(start <= safeMaxElementNumber);
-
-            return start;
+            if(safeMinElementNumber == safeMaxElementNumber)
+                break;
+            safeMaxElementNumber--;
         }
+        bool b_ret = timeline->getScaledPlaybackTimeDurationBySegmentNumber(safeMaxElementNumber,
+                                                                            &safeedgetime, &duration);
+        if(unlikely(!b_ret))
+            return 0;
+        safeedgetime += duration - 1;
+
+        for(unsigned i=0; i<SAFETY_EXPURGING_OFFSET; i++)
+        {
+            if(safeMinElementNumber + 1 >= safeMaxElementNumber)
+                break;
+            safeMinElementNumber++;
+        }
+        b_ret = timeline->getScaledPlaybackTimeDurationBySegmentNumber(safeMinElementNumber,
+                                                                       &safestarttime, &duration);
+        if(unlikely(!b_ret))
+            return 0;
+
+        if(playlist->timeShiftBufferDepth.Get())
+        {
+            stime_t edgetime;
+            bool b_ret = timeline->getScaledPlaybackTimeDurationBySegmentNumber(timeline->maxElementNumber(),
+                                                                                &edgetime, &duration);
+            if(unlikely(!b_ret))
+                return 0;
+            edgetime += duration - 1;
+            stime_t timeshiftdepth = timescale.ToScaled(playlist->timeShiftBufferDepth.Get());
+            if(safestarttime + timeshiftdepth < edgetime)
+            {
+                safestarttime = edgetime - timeshiftdepth;
+                safeMinElementNumber = timeline->getElementNumberByScaledPlaybackTime(safestarttime);
+            }
+        }
+        assert(safestarttime<=safeedgetime);
+
+        stime_t starttime;
+        if(safeedgetime - safestarttime > timescale.ToScaled(i_buffering))
+            starttime = safeedgetime - timescale.ToScaled(i_buffering);
+        else
+            starttime = safestarttime;
+
+        start = timeline->getElementNumberByScaledPlaybackTime(starttime);
+        assert(start >= timeline->minElementNumber());
+        assert(start >= safeMinElementNumber);
+        assert(start <= timeline->maxElementNumber());
+        assert(start <= safeMaxElementNumber);
+
+        return start;
+    }
+    else if(mediaSegmentTemplate)
+    {
         /* Else compute, current time and timeshiftdepth based */
-        else if(mediaSegmentTemplate->duration.Get())
+        uint64_t start = 0;
+        if(mediaSegmentTemplate->duration.Get())
         {
             /* Compute playback offset and effective finished segment from wall time */
             vlc_tick_t now = vlc_tick_from_sec(time(NULL));
