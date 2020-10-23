@@ -38,10 +38,6 @@
 
 #include "d3d11_shaders.h"
 
-#if !VLC_WINSTORE_APP
-# define D3DCompile(args...)                    shaders->OurD3DCompile(args)
-#endif
-
 #define ST2084_PQ_CONSTANTS  "const float ST2084_m1 = 2610.0 / (4096.0 * 4);\n\
 const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;\n\
 const float ST2084_c1 = 3424.0 / 4096.0;\n\
@@ -684,6 +680,11 @@ static ID3DBlob* D3D11_CompileShader(vlc_object_t *obj, const d3d11_shaders_t *s
             target = "vs_4_0_level_9_1";
     }
 
+#if VLC_WINSTORE_APP
+    VLC_UNUSED(shaders);
+#else
+# define D3DCompile(args...)    shaders->OurD3DCompile(args)
+#endif
     HRESULT hr = D3DCompile(psz_shader, strlen(psz_shader),
                             NULL, NULL, NULL, "main", target,
                             0, 0, &pShaderBlob, &pErrBlob);
