@@ -162,6 +162,7 @@ static const struct FilterOperationInitializer {
     FilterOperationInitializer()
     {
         ops.filter_audio = DoWork;
+        ops.close = Close;
     };
 } filter_ops;
 
