@@ -155,14 +155,6 @@ public:
         return m_total_count;
     }
 
-    virtual T* get(int idx) const
-    {
-        T* obj = item( idx );
-        if (!obj)
-            return nullptr;
-        return obj->clone();
-    }
-
     void clear() override
     {
         m_query_param.i_offset = 0;
