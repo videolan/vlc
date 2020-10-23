@@ -109,8 +109,8 @@ bool IsRGBShader(const d3d_format_t *);
 int D3D11_InitShaders(vlc_object_t *, d3d11_shader_compiler_t *);
 void D3D11_ReleaseShaders(d3d11_shader_compiler_t *);
 
-HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d11_shader_compiler_t *, bool legacy_shader,
-                                 d3d11_device_t *, const display_info_t *, bool sharp,
+HRESULT D3D11_CompilePixelShader(vlc_object_t *, const d3d11_shader_compiler_t *,
+                                 d3d11_device_t *, bool texture_array, const display_info_t *, bool sharp,
                                  video_transfer_func_t, video_color_primaries_t,
                                  bool src_full_range,
                                  d3d_quad_t *);

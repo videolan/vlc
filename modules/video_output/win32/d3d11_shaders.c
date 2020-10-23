@@ -205,8 +205,9 @@ bool IsRGBShader(const d3d_format_t *cfg)
            cfg->formatTexture != DXGI_FORMAT_420_OPAQUE;
 }
 
-static HRESULT CompileTargetShader(vlc_object_t *o, const d3d11_shader_compiler_t *compiler, bool legacy_shader,
+static HRESULT CompileTargetShader(vlc_object_t *o, const d3d11_shader_compiler_t *compiler,
                                    d3d11_device_t *d3d_dev,
+                                   bool texture_array,
                                    const char *psz_sampler,
                                    const char *psz_src_to_linear,
                                    const char *psz_primaries_transform,
@@ -216,7 +217,7 @@ static HRESULT CompileTargetShader(vlc_object_t *o, const d3d11_shader_compiler_
                                    ID3D11PixelShader **output)
 {
     char *shader;
-    int allocated = asprintf(&shader, globPixelShaderDefault, legacy_shader ? "" : "Array",
+    int allocated = asprintf(&shader, globPixelShaderDefault, texture_array ? "Array" : "",
                              psz_src_to_linear, psz_linear_to_display,
                              psz_primaries_transform, psz_tone_mapping,
                              psz_adjust_range, psz_move_planes, psz_sampler);
@@ -252,8 +253,9 @@ static HRESULT CompileTargetShader(vlc_object_t *o, const d3d11_shader_compiler_
     return hr;
 }
 
-HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_t *compiler, bool legacy_shader,
+HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_t *compiler,
                                  d3d11_device_t *d3d_dev,
+                                 bool texture_array,
                                  const display_info_t *display, bool sharp,
                                  video_transfer_func_t transfer,
                                  video_color_primaries_t primaries, bool src_full_range,
@@ -627,13 +629,13 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_
         }
     }
 
-    hr = CompileTargetShader(o, compiler, legacy_shader, d3d_dev,
+    hr = CompileTargetShader(o, compiler, d3d_dev, texture_array,
                                      psz_sampler[0], psz_src_to_linear,
                                      psz_primaries_transform,
                                      psz_linear_to_display, psz_tone_mapping,
                                      psz_adjust_range, psz_move_planes[0], &quad->d3dpixelShader[0]);
     if (!FAILED(hr) && psz_sampler[1])
-        hr = CompileTargetShader(o, compiler, legacy_shader, d3d_dev,
+        hr = CompileTargetShader(o, compiler, d3d_dev, texture_array,
                                  psz_sampler[1], psz_src_to_linear,
                                  psz_primaries_transform,
                                  psz_linear_to_display, psz_tone_mapping,
