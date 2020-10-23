@@ -61,7 +61,7 @@ static const char* globPixelShaderDefault = "\
     float4x4 Colorspace;\n\
     float4x4 Primaries;\n\
   };\n\
-  Texture2D%s shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\n\
+  Texture2D%s shaderTexture[%d];\n\
   SamplerState SamplerStates[2];\n\
   \n\
   struct PS_INPUT\n\
@@ -207,7 +207,7 @@ bool IsRGBShader(const d3d_format_t *cfg)
 
 static HRESULT CompileTargetShader(vlc_object_t *o, const d3d11_shader_compiler_t *compiler,
                                    d3d11_device_t *d3d_dev,
-                                   bool texture_array,
+                                   bool texture_array, size_t texture_count,
                                    const char *psz_sampler,
                                    const char *psz_src_to_linear,
                                    const char *psz_primaries_transform,
@@ -218,6 +218,7 @@ static HRESULT CompileTargetShader(vlc_object_t *o, const d3d11_shader_compiler_
 {
     char *shader;
     int allocated = asprintf(&shader, globPixelShaderDefault, texture_array ? "Array" : "",
+                             texture_count * D3D11_MAX_SHADER_VIEW,
                              psz_src_to_linear, psz_linear_to_display,
                              psz_primaries_transform, psz_tone_mapping,
                              psz_adjust_range, psz_move_planes, psz_sampler);
@@ -255,7 +256,7 @@ static HRESULT CompileTargetShader(vlc_object_t *o, const d3d11_shader_compiler_
 
 HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_t *compiler,
                                  d3d11_device_t *d3d_dev,
-                                 bool texture_array,
+                                 bool texture_array, size_t texture_count,
                                  const display_info_t *display, bool sharp,
                                  video_transfer_func_t transfer,
                                  video_color_primaries_t primaries, bool src_full_range,
@@ -629,13 +630,13 @@ HRESULT (D3D11_CompilePixelShader)(vlc_object_t *o, const d3d11_shader_compiler_
         }
     }
 
-    hr = CompileTargetShader(o, compiler, d3d_dev, texture_array,
+    hr = CompileTargetShader(o, compiler, d3d_dev, texture_array, texture_count,
                                      psz_sampler[0], psz_src_to_linear,
                                      psz_primaries_transform,
                                      psz_linear_to_display, psz_tone_mapping,
                                      psz_adjust_range, psz_move_planes[0], &quad->d3dpixelShader[0]);
     if (!FAILED(hr) && psz_sampler[1])
-        hr = CompileTargetShader(o, compiler, d3d_dev, texture_array,
+        hr = CompileTargetShader(o, compiler, d3d_dev, texture_array, texture_count,
                                  psz_sampler[1], psz_src_to_linear,
                                  psz_primaries_transform,
                                  psz_linear_to_display, psz_tone_mapping,
