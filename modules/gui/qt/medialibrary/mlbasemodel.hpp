@@ -219,20 +219,11 @@ public:
 protected:
     T* item(int signedidx) const
     {
-        if (signedidx < 0)
+        if (!m_initialized || signedidx < 0)
             return nullptr;
 
         unsigned int idx = static_cast<unsigned int>(signedidx);
-        if ( m_initialized == false )
-        {
-            m_total_count = countTotalElements();
-            if ( m_total_count > 0 )
-                m_item_list = fetch();
-            m_initialized = true;
-            emit countChanged( static_cast<unsigned int>(m_total_count) );
-        }
-
-        if ( idx >= m_total_count  )
+        if ( idx >= m_total_count )
             return nullptr;
 
         if ( idx < m_query_param.i_offset ||  idx >= m_query_param.i_offset + m_item_list.size() )
