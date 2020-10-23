@@ -66,7 +66,6 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad, d3d_vshader_t *
     /* pixel shader */
     ID3D11DeviceContext_PSSetConstantBuffers(d3d_dev->d3dcontext, 0, ARRAY_SIZE(quad->pPixelShaderConstants), quad->pPixelShaderConstants);
     assert(quad->resourceCount <= D3D11_MAX_SHADER_VIEW);
-    ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, resourceView);
 
     for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
     {
@@ -76,17 +75,19 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad, d3d_vshader_t *
         if (unlikely(!selectPlane(selectOpaque, i)))
             continue;
 
+        ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, resourceView);
+
         ID3D11DeviceContext_PSSetShader(d3d_dev->d3dcontext, quad->d3dpixelShader[i], NULL, 0);
 
         ID3D11DeviceContext_RSSetViewports(d3d_dev->d3dcontext, 1, &quad->cropViewport[i]);
 
         ID3D11DeviceContext_DrawIndexed(d3d_dev->d3dcontext, quad->indexCount, 0, 0);
-    }
 
-    /* force unbinding the input texture, otherwise we get:
-     * OMSetRenderTargets: Resource being set to OM RenderTarget slot 0 is still bound on input! */
-    ID3D11ShaderResourceView *reset[D3D11_MAX_SHADER_VIEW] = { 0 };
-    ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, reset);
+        // /* force unbinding the input texture, otherwise we get:
+        // * OMSetRenderTargets: Resource being set to OM RenderTarget slot 0 is still bound on input! */
+        // ID3D11ShaderResourceView *reset[D3D11_MAX_SHADER_VIEW] = { 0 };
+        // ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, reset);
+    }
 }
 
 static bool AllocQuadVertices(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad, video_projection_mode_t projection)
