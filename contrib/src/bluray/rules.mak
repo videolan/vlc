@@ -1,12 +1,12 @@
 # LIBBLURAY
 
-BLURAY_VERSION := 1.2.0
+BLURAY_VERSION := 1.2.1
 BLURAY_URL := $(VIDEOLAN)/libbluray/$(BLURAY_VERSION)/libbluray-$(BLURAY_VERSION).tar.bz2
 
 ifdef BUILD_DISCS
 PKGS += bluray
 endif
-ifeq ($(call need_pkg,"libbluray >= 0.7.0"),)
+ifeq ($(call need_pkg,"libbluray >= 1.0.0"),)
 PKGS_FOUND += bluray
 endif
 
@@ -57,7 +57,6 @@ $(TARBALLS)/libbluray-$(BLURAY_VERSION).tar.bz2:
 bluray: libbluray-$(BLURAY_VERSION).tar.bz2 .sum-bluray
 	$(UNPACK)
 	$(APPLY) $(SRC)/bluray/0001-install-bdjo_data-header.patch
-	$(APPLY) $(SRC)/bluray/0001-configure.ac-Add-lpthread-to-.pc-file-if-needed.patch
 	$(call pkg_static,"src/libbluray.pc.in")
 	$(MOVE)
 
