@@ -1,6 +1,6 @@
 # LIBBLURAY
 
-BLURAY_VERSION := 1.2.0
+BLURAY_VERSION := 1.2.1
 BLURAY_URL := $(VIDEOLAN)/libbluray/$(BLURAY_VERSION)/libbluray-$(BLURAY_VERSION).tar.bz2
 
 ifdef BUILD_DISCS
@@ -8,7 +8,7 @@ ifndef HAVE_WINSTORE
 PKGS += bluray
 endif
 endif
-ifeq ($(call need_pkg,"libbluray >= 0.7.0"),)
+ifeq ($(call need_pkg,"libbluray >= 1.1.0"),)
 PKGS_FOUND += bluray
 endif
 
