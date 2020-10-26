@@ -2672,7 +2672,7 @@ static void EsOutSelectList( es_out_t *out, enum es_format_category_e cat,
                 vlc_es_id_t *es_id = es_id_list[i];
                 if( es_id == NULL )
                     break;
-                else if( es_id->i_id == other->id.i_id )
+                else if( es_id == &other->id )
                 {
                     select = true;
                     break;
