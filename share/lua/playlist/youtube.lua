@@ -380,7 +380,8 @@ function parse()
             -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG", "playerConfig" ...
             if string.match( line, "ytplayer%.config" ) then
 
-                local js_url = string.match( line, "\"js\": *\"(.-)\"" )
+                local js_url = string.match( line, '"jsUrl":"(.-)"' )
+                    or string.match( line, "\"js\": *\"(.-)\"" )
                 if js_url then
                     js_url = string.gsub( js_url, "\\/", "/" )
                     -- Resolve URL
