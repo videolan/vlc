@@ -981,3 +981,6 @@ vlc_executor_Delete
 vlc_executor_Submit
 vlc_executor_Cancel
 vlc_executor_WaitIdle
+vlc_input_attachment_Delete
+vlc_input_attachment_New
+vlc_input_attachment_Duplicate

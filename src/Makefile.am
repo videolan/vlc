@@ -265,6 +265,7 @@ libvlccore_la_SOURCES = \
 	input/input.c \
 	input/info.h \
 	input/meta.c \
+	input/attachment.c \
 	player/player.c \
 	player/player.h \
 	player/input.c \

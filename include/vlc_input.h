@@ -165,50 +165,15 @@ struct input_attachment_t
     void *p_data;
 };
 
-static inline void vlc_input_attachment_Delete( input_attachment_t *a )
-{
-    if( !a )
-        return;
+VLC_API void vlc_input_attachment_Delete( input_attachment_t *a );
 
-    free( a->p_data );
-    free( a->psz_description );
-    free( a->psz_mime );
-    free( a->psz_name );
-    free( a );
-}
+VLC_API input_attachment_t *vlc_input_attachment_New( const char *psz_name,
+                                                      const char *psz_mime,
+                                                      const char *psz_description,
+                                                      const void *p_data,
+                                                      size_t i_data );
 
-static inline input_attachment_t *vlc_input_attachment_New( const char *psz_name,
-                                                            const char *psz_mime,
-                                                            const char *psz_description,
-                                                            const void *p_data,
-                                                            size_t i_data )
-{
-    input_attachment_t *a = (input_attachment_t *)malloc( sizeof (*a) );
-    if( unlikely(a == NULL) )
-        return NULL;
-
-    a->psz_name = strdup( psz_name ? psz_name : "" );
-    a->psz_mime = strdup( psz_mime ? psz_mime : "" );
-    a->psz_description = strdup( psz_description ? psz_description : "" );
-    a->i_data = i_data;
-    a->p_data = malloc( i_data );
-    if( i_data > 0 && likely(a->p_data != NULL) )
-        memcpy( a->p_data, p_data, i_data );
-
-    if( unlikely(a->psz_name == NULL || a->psz_mime == NULL
-              || a->psz_description == NULL || (i_data > 0 && a->p_data == NULL)) )
-    {
-        vlc_input_attachment_Delete( a );
-        a = NULL;
-    }
-    return a;
-}
-
-static inline input_attachment_t *vlc_input_attachment_Duplicate( const input_attachment_t *a )
-{
-    return vlc_input_attachment_New( a->psz_name, a->psz_mime, a->psz_description,
-                                     a->p_data, a->i_data );
-}
+VLC_API input_attachment_t *vlc_input_attachment_Duplicate( const input_attachment_t *a );
 
 /**
  * Input rate.
