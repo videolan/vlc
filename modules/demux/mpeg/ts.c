@@ -550,7 +550,7 @@ static int Open( vlc_object_t *p_this )
 static void FreeDictAttachment( void *p_value, void *p_obj )
 {
     VLC_UNUSED(p_obj);
-    vlc_input_attachment_Delete( (input_attachment_t *) p_value );
+    vlc_input_attachment_Release( (input_attachment_t *) p_value );
 }
 
 static void Close( vlc_object_t *p_this )
@@ -1196,7 +1196,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                          p_entry; p_entry = p_entry->p_next )
             {
                 msg_Err(p_demux, "GET ATTACHMENT %s", p_entry->psz_key);
-                (*ppp_attach)[*pi_int] = vlc_input_attachment_Duplicate(
+                (*ppp_attach)[*pi_int] = vlc_input_attachment_Hold(
                                                 (input_attachment_t *) p_entry->p_value );
                 if( (*ppp_attach)[*pi_int] )
                     (*pi_int)++;

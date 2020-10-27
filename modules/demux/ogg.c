@@ -751,7 +751,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_ENOMEM;
             *pi_int = p_sys->i_attachments;
             for( int i = 0; i < p_sys->i_attachments; i++ )
-                (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachments[i] );
+                (*ppp_attach)[i] = vlc_input_attachment_Hold( p_sys->attachments[i] );
             return VLC_SUCCESS;
         }
 
@@ -2258,7 +2258,7 @@ static void Ogg_EndOfStream( demux_t *p_demux )
     p_ogg->p_meta = NULL;
 
     for(int i=0; i<p_ogg->i_attachments; i++)
-        vlc_input_attachment_Delete( p_ogg->attachments[i] );
+        vlc_input_attachment_Release( p_ogg->attachments[i] );
     TAB_CLEAN(p_ogg->i_attachments, p_ogg->attachments);
 
     for ( int i=0; i < p_ogg->i_seekpoints; i++ )

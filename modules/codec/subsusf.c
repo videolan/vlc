@@ -537,7 +537,7 @@ static int ParseImageAttachments( decoder_t *p_dec )
                 }
             }
         }
-        vlc_input_attachment_Delete( pp_attachments[ k ] );
+        vlc_input_attachment_Release( pp_attachments[ k ] );
     }
     free( pp_attachments );
 

@@ -288,7 +288,7 @@ static void Close ( vlc_object_t * p_this )
         vlc_meta_Delete( p_sys->meta );
 
     for( unsigned i = 0; i < p_sys->i_attachment; i++)
-        vlc_input_attachment_Delete(p_sys->attachment[i]);
+        vlc_input_attachment_Release(p_sys->attachment[i]);
     free(p_sys->attachment);
 
     free( p_sys );
@@ -1703,7 +1703,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 *pi_int = p_sys->i_attachment;
                 for( unsigned i = 0; i < p_sys->i_attachment; i++ )
-                    (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachment[i] );
+                    (*ppp_attach)[i] = vlc_input_attachment_Hold( p_sys->attachment[i] );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;

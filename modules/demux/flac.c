@@ -203,7 +203,7 @@ static void Close( vlc_object_t * p_this )
     TAB_CLEAN( p_sys->i_seekpoint, p_sys->seekpoint );
 
     for( int i = 0; i < p_sys->i_attachments; i++ )
-        vlc_input_attachment_Delete( p_sys->attachments[i] );
+        vlc_input_attachment_Release( p_sys->attachments[i] );
     TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
 
     for( int i = 0; i < p_sys->i_title_seekpoints; i++ )
@@ -585,7 +585,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
         *pi_int = p_sys->i_attachments;
         for( int i = 0; i < p_sys->i_attachments; i++ )
-            (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachments[i] );
+            (*ppp_attach)[i] = vlc_input_attachment_Hold( p_sys->attachments[i] );
         return VLC_SUCCESS;
     }
     else if( i_query == DEMUX_GET_TITLE_INFO )

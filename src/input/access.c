@@ -86,7 +86,7 @@ static stream_t *accessNewAttachment(vlc_object_t *parent,
     stream_t *stream = vlc_stream_AttachmentNew(parent, attachment);
     if (!stream)
     {
-        vlc_input_attachment_Delete(attachment);
+        vlc_input_attachment_Release(attachment);
         return NULL;
     }
     stream->psz_url = strdup(mrl);

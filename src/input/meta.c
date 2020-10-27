@@ -234,7 +234,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input,
 
     input_SaveArt( VLC_OBJECT(p_input), p_item,
                    p_attachment->p_data, p_attachment->i_data, psz_type );
-    vlc_input_attachment_Delete( p_attachment );
+    vlc_input_attachment_Release( p_attachment );
 }
 
 int input_item_WriteMeta( vlc_object_t *obj, input_item_t *p_item )

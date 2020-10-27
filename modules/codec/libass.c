@@ -192,7 +192,7 @@ static int Create( vlc_object_t *p_this )
 
             ass_add_font( p_sys->p_library, p_attach->psz_name, p_attach->p_data, p_attach->i_data );
         }
-        vlc_input_attachment_Delete( p_attach );
+        vlc_input_attachment_Release( p_attach );
     }
     free( pp_attachments );
 

@@ -1128,7 +1128,7 @@ static void blurayClose(vlc_object_t *object)
     TAB_CLEAN(p_sys->i_title, p_sys->pp_title);
 
     for (int i = 0; i < p_sys->i_attachments; i++)
-      vlc_input_attachment_Delete(p_sys->attachments[i]);
+      vlc_input_attachment_Release(p_sys->attachments[i]);
     TAB_CLEAN(p_sys->i_attachments, p_sys->attachments);
 
     ARRAY_RESET(p_sys->events_delayed);
@@ -2629,9 +2629,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
             return VLC_EGENERIC;
         for (int i = 0; i < p_sys->i_attachments; i++)
         {
-            input_attachment_t *p_dup = vlc_input_attachment_Duplicate(p_sys->attachments[i]);
-            if(p_dup)
-                (*ppp_attach)[(*pi_int)++] = p_dup;
+            (*ppp_attach)[(*pi_int)++] = vlc_input_attachment_Hold(p_sys->attachments[i]);
         }
         return VLC_SUCCESS;
     }

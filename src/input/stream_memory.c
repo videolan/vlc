@@ -60,7 +60,7 @@ static void stream_AttachmentDelete(stream_t *s)
 {
     struct vlc_stream_attachment_private *sys = vlc_stream_Private(s);
 
-    vlc_input_attachment_Delete(sys->attachment);
+    vlc_input_attachment_Release(sys->attachment);
     free(s->psz_name);
 }
 

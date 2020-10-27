@@ -223,8 +223,12 @@ enum demux_query_e
     /* Meta data */
     DEMUX_HAS_UNSUPPORTED_META, /* arg1= bool *   res can fail    */
 
-    /* Attachments */
-    DEMUX_GET_ATTACHMENTS,      /* arg1=input_attachment_t***, int* res=can fail */
+    /*
+     * Fetches attachment from the demux.
+     * The returned attachments are owned by the demuxer and must not be modified
+     * arg1=input_attachment_t***, int* res=can fail
+     */
+    DEMUX_GET_ATTACHMENTS,
 
     /* RECORD you are ensured that it is never called twice with the same state
      * you should accept it only if the stream can be recorded without

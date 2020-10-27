@@ -165,7 +165,7 @@ struct input_attachment_t
     void *p_data;
 };
 
-VLC_API void vlc_input_attachment_Delete( input_attachment_t *a );
+VLC_API void vlc_input_attachment_Release( input_attachment_t *a );
 
 VLC_API input_attachment_t *vlc_input_attachment_New( const char *psz_name,
                                                       const char *psz_mime,
@@ -173,7 +173,7 @@ VLC_API input_attachment_t *vlc_input_attachment_New( const char *psz_name,
                                                       const void *p_data,
                                                       size_t i_data );
 
-VLC_API input_attachment_t *vlc_input_attachment_Duplicate( const input_attachment_t *a );
+VLC_API input_attachment_t *vlc_input_attachment_Hold( input_attachment_t *a );
 
 /**
  * Input rate.

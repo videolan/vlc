@@ -780,7 +780,7 @@ void avformat_CloseDemux( vlc_object_t *p_this )
     }
 
     for( int i = 0; i < p_sys->i_attachments; i++ )
-        vlc_input_attachment_Delete( p_sys->attachments[i] );
+        vlc_input_attachment_Release( p_sys->attachments[i] );
     TAB_CLEAN( p_sys->i_attachments, p_sys->attachments);
 
     if( p_sys->p_title )
@@ -1185,9 +1185,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             for( i = 0; i < p_sys->i_attachments; i++ )
             {
-                (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachments[i] );
-                if((*ppp_attach)[i] == NULL)
-                    break;
+                (*ppp_attach)[i] = vlc_input_attachment_Hold( p_sys->attachments[i] );
             }
             *pi_int = i;
             return VLC_SUCCESS;
