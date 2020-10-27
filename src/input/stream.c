@@ -350,6 +350,9 @@ char *vlc_stream_ReadLine( stream_t *s )
             {
                 msg_Err( s, "conversion error: %s", vlc_strerror_c( errno ) );
                 msg_Dbg( s, "original: %d, in %zu, out %zu", i_line, i_in, i_out );
+                /* Reset state */
+                size_t r = vlc_iconv( priv->text.conv, NULL, NULL, NULL, NULL );
+                VLC_UNUSED( r );
             }
             free( p_line );
             p_line = psz_new_line;
