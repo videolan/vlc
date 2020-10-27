@@ -355,13 +355,6 @@ char *vlc_stream_ReadLine( stream_t *s )
 error:
     /* We failed to read any data, probably EOF */
     free( p_line );
-
-    /* */
-    if( priv->text.conv != (vlc_iconv_t)(-1) )
-    {
-        vlc_iconv_close( priv->text.conv );
-        priv->text.conv = (vlc_iconv_t)(-1);
-    }
     return NULL;
 }
 
