@@ -245,6 +245,7 @@ libvlc_video_get_spu
 libvlc_video_get_spu_count
 libvlc_video_get_spu_delay
 libvlc_video_get_spu_description
+libvlc_video_get_spu_text_scale
 libvlc_video_get_teletext
 libvlc_video_get_track
 libvlc_video_get_track_count

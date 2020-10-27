@@ -368,6 +368,18 @@ int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi,
     return 0;
 }
 
+float libvlc_video_get_spu_text_scale( libvlc_media_player_t *p_mi )
+{
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    unsigned scale = vlc_player_GetSubtitleTextScale(player);
+
+    vlc_player_Unlock(player);
+
+    return scale / 100.f;
+}
+
 void libvlc_video_set_spu_text_scale( libvlc_media_player_t *p_mi,
                                       float f_scale )
 {
