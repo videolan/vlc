@@ -336,7 +336,11 @@ char *vlc_stream_ReadLine( stream_t *s )
         i_read += i_data;
 
         if( i_read >= STREAM_LINE_MAX )
-            goto error; /* line too long */
+        {
+            msg_Err( s, "line too long, exceeding %zu bytes",
+                     (size_t) STREAM_LINE_MAX );
+            goto error;
+        }
     }
 
     if( i_read > 0 )
