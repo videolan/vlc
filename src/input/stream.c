@@ -245,9 +245,11 @@ char *vlc_stream_ReadLine( stream_t *s )
 
     for( ;; )
     {
+        size_t i_peek = i_line == 0 ? STREAM_PROBE_LINE
+                                    : __MIN( i_line * 2, STREAM_LINE_MAX );
+
         /* Probe more data */
-        ssize_t i_data = vlc_stream_Peek( s, &p_data,
-                                          i_line + STREAM_PROBE_LINE );
+        ssize_t i_data = vlc_stream_Peek( s, &p_data, i_peek );
         if( i_data <= 0 )
             return NULL;
 
