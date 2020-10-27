@@ -194,31 +194,27 @@ char *vlc_stream_ReadLine( stream_t *s )
     if( s->pf_read == NULL && s->pf_block == NULL )
         return NULL;
 
-    for( ;; )
+    /* BOM detection */
+    if( vlc_stream_Tell( s ) == 0 )
     {
-        char *psz_eol;
         const uint8_t *p_data;
-        int i_data;
-        int64_t i_pos;
+        ssize_t i_data = vlc_stream_Peek( s, &p_data, 2 );
 
-        /* Probe new data */
-        i_data = vlc_stream_Peek( s, &p_data, STREAM_PROBE_LINE );
-        if( i_data <= 0 ) break; /* No more data */
+        if( i_data <= 0 )
+            return NULL;
 
-        /* BOM detection */
-        i_pos = vlc_stream_Tell( s );
-        if( i_pos == 0 && i_data >= 2 )
+        if( unlikely(priv->text.conv != (vlc_iconv_t)-1) )
+        {   /* seek back to beginning? reset */
+            vlc_iconv_close( priv->text.conv );
+            priv->text.conv = (vlc_iconv_t)-1;
+        }
+        priv->text.char_width = 1;
+        priv->text.little_endian = false;
+
+        if( i_data >= 2 )
         {
             const char *psz_encoding = NULL;
             bool little_endian = false;
-
-            if( unlikely(priv->text.conv != (vlc_iconv_t)-1) )
-            {   /* seek back to beginning? reset */
-                vlc_iconv_close( priv->text.conv );
-                priv->text.conv = (vlc_iconv_t)-1;
-            }
-            priv->text.char_width = 1;
-            priv->text.little_endian = false;
 
             if( !memcmp( p_data, "\xFF\xFE", 2 ) )
             {
@@ -238,12 +234,23 @@ char *vlc_stream_ReadLine( stream_t *s )
                 if( unlikely(priv->text.conv == (vlc_iconv_t)-1) )
                 {
                     msg_Err( s, "iconv_open failed" );
-                    goto error;
+                    return NULL;
                 }
                 priv->text.char_width = 2;
                 priv->text.little_endian = little_endian;
             }
         }
+    }
+
+    for( ;; )
+    {
+        char *psz_eol;
+        const uint8_t *p_data;
+        int i_data;
+
+        /* Probe new data */
+        i_data = vlc_stream_Peek( s, &p_data, STREAM_PROBE_LINE );
+        if( i_data <= 0 ) break; /* No more data */
 
         /* Deal here with lone-byte incomplete UTF-16 sequences at EOF
            that we won't be able to process anyway */
