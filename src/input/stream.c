@@ -245,15 +245,22 @@ char *vlc_stream_ReadLine( stream_t *s )
             }
         }
 
-        if( i_data % priv->text.char_width )
+        /* Deal here with lone-byte incomplete UTF-16 sequences at EOF
+           that we won't be able to process anyway */
+        if( i_data < priv->text.char_width )
         {
-            /* keep i_char_width boundary */
-            i_data = i_data - ( i_data % priv->text.char_width );
-            msg_Warn( s, "the read is not i_char_width compatible");
+            assert( priv->text.char_width == 2 );
+            uint8_t inc;
+            ssize_t i_inc = vlc_stream_Read( s, &inc, priv->text.char_width );
+            assert( i_inc == i_data );
+            if( i_inc > 0 )
+                msg_Err( s, "discarding incomplete UTF-16 sequence at EOF: 0x%02x", inc );
+            break;
         }
 
-        if( i_data == 0 )
-            break;
+        /* Keep to text encoding character width boundary */
+        if( i_data % priv->text.char_width )
+            i_data = i_data - ( i_data % priv->text.char_width );
 
         /* Check if there is an EOL */
         if( priv->text.char_width == 1 )
@@ -313,10 +320,10 @@ char *vlc_stream_ReadLine( stream_t *s )
 
         /* Read data (+1 for easy \0 append) */
         p_line = realloc_or_free( p_line,
-                          i_line + STREAM_PROBE_LINE + priv->text.char_width );
+                        i_line + i_data + priv->text.char_width );
         if( !p_line )
             goto error;
-        i_data = vlc_stream_Read( s, &p_line[i_line], STREAM_PROBE_LINE );
+        i_data = vlc_stream_Read( s, &p_line[i_line], i_data );
         if( i_data <= 0 ) break; /* Hmmm */
         i_line += i_data;
         i_read += i_data;
