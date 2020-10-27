@@ -1014,8 +1014,7 @@ static const char *const ppsz_prefres[] = {
 #define SOUT_KEEP_TEXT N_("Keep stream output open" )
 #define SOUT_KEEP_LONGTEXT N_( \
     "This allows you to keep an unique stream output instance across " \
-    "multiple playlist item (automatically insert the gather stream output " \
-    "if not specified)" )
+    "multiple playlist item." )
 
 #define SOUT_MUX_CACHING_TEXT N_("Stream output muxer caching (ms)")
 #define SOUT_MUX_CACHING_LONGTEXT N_( \
