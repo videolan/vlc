@@ -187,9 +187,6 @@ stream_t *(vlc_stream_NewMRL)(vlc_object_t* parent, const char* mrl )
 char *vlc_stream_ReadLine( stream_t *s )
 {
     stream_priv_t *priv = (stream_priv_t *)s;
-    char *p_line = NULL;
-    size_t i_line = 0;
-    bool b_data = false;
 
     /* Let's fail quickly if this is a readdir access */
     if( s->pf_read == NULL && s->pf_block == NULL )
@@ -243,14 +240,16 @@ char *vlc_stream_ReadLine( stream_t *s )
         }
     }
 
+    size_t i_line = 0;
+    const uint8_t *p_data;
+
     for( ;; )
     {
-        const uint8_t *p_data, *psz_eol;
-        ssize_t i_data;
-
-        /* Probe new data */
-        i_data = vlc_stream_Peek( s, &p_data, STREAM_PROBE_LINE );
-        if( i_data <= 0 ) break; /* No more data */
+        /* Probe more data */
+        ssize_t i_data = vlc_stream_Peek( s, &p_data,
+                                          i_line + STREAM_PROBE_LINE );
+        if( i_data <= 0 )
+            return NULL;
 
         /* Deal here with lone-byte incomplete UTF-16 sequences at EOF
            that we won't be able to process anyway */
@@ -262,24 +261,31 @@ char *vlc_stream_ReadLine( stream_t *s )
             assert( i_inc == i_data );
             if( i_inc > 0 )
                 msg_Err( s, "discarding incomplete UTF-16 sequence at EOF: 0x%02x", inc );
-            break;
+            return NULL;
         }
 
         /* Keep to text encoding character width boundary */
         if( i_data % priv->text.char_width )
             i_data = i_data - ( i_data % priv->text.char_width );
 
-        /* Check if there is an EOL */
+        if( (size_t) i_data == i_line )
+            break; /* No more data */
+
+        assert( (size_t) i_data > i_line );
+
+        /* Resume search for an EOL where we left off */
+        const uint8_t *p_cur = p_data + i_line, *psz_eol;
+
         /* FIXME: <CR> behavior varies depending on where buffer
            boundaries happen to fall; a <CR><LF> across the boundary
            creates a bogus empty line. */
         if( priv->text.char_width == 1 )
         {
             /* UTF-8: 0A <LF> */
-            psz_eol = memchr( p_data, '\n', i_data );
+            psz_eol = memchr( p_cur, '\n', i_data - i_line );
             if( psz_eol == NULL )
                 /* UTF-8: 0D <CR> */
-                psz_eol = memchr( p_data, '\r', i_data );
+                psz_eol = memchr( p_cur, '\r', i_data - i_line );
         }
         else
         {
@@ -289,7 +295,7 @@ char *vlc_stream_ReadLine( stream_t *s )
             assert( priv->text.char_width == 2 );
             psz_eol = NULL;
             /* UTF-16: 000A <LF> */
-            for( const uint8_t *p = p_data; p <= p_last; p += 2 )
+            for( const uint8_t *p = p_cur; p <= p_last; p += 2 )
             {
                 if( U16_AT( p ) == eol )
                 {
@@ -301,7 +307,7 @@ char *vlc_stream_ReadLine( stream_t *s )
             if( psz_eol == NULL )
             {   /* UTF-16: 000D <CR> */
                 eol = priv->text.little_endian ? 0x0D00 : 0x000D;
-                for( const uint8_t *p = p_data; p <= p_last; p += 2 )
+                for( const uint8_t *p = p_cur; p <= p_last; p += 2 )
                 {
                     if( U16_AT( p ) == eol )
                     {
@@ -313,58 +319,38 @@ char *vlc_stream_ReadLine( stream_t *s )
         }
 
         if( psz_eol )
-            i_data = (psz_eol - p_data) + priv->text.char_width;
-
-        /* Read data (+1 for easy \0 append) */
-        p_line = realloc_or_free( p_line,
-                        i_line + i_data + priv->text.char_width );
-        if( !p_line )
-            return NULL;
-        i_data = vlc_stream_Read( s, &p_line[i_line], i_data );
-        if( i_data < priv->text.char_width ) break; /* Hmmm */
-        i_line += i_data;
-        b_data = true;
-
-        if( psz_eol )
         {
-            i_line -= priv->text.char_width; /* skip \n */;
+            i_line = (psz_eol - p_data) + priv->text.char_width;
             /* We have our line */
             break;
         }
+
+        i_line = i_data;
 
         if( i_line >= STREAM_LINE_MAX )
         {
             msg_Err( s, "line too long, exceeding %zu bytes",
                      (size_t) STREAM_LINE_MAX );
-            free( p_line );
             return NULL;
         }
     }
 
-    if( !b_data ) /* We failed to read any data, probably EOF */
+    if( i_line == 0 ) /* We failed to read any data, probably EOF */
         return NULL;
+
+    /* If encoding conversion is required, UTF-8 needs at most 150%
+       as long a buffer as UTF-16 */
+    size_t i_line_conv = priv->text.char_width == 1 ? i_line : i_line * 3 / 2;
+    char *p_line = malloc( i_line_conv + 1 ); /* +1 for easy \0 append */
+    if( !p_line )
+        return NULL;
+    void *p_read = p_line;
 
     if( priv->text.char_width > 1 )
     {
-        size_t i_new_line = 0;
-        size_t i_in = 0, i_out = 0;
-        const char * p_in = NULL;
-        char * p_out = NULL;
-        char * psz_new_line = NULL;
-
-        /* iconv */
-        /* UTF-8 needs at most 150% of the buffer as many as UTF-16 */
-        i_new_line = i_line * 3 / 2 + 1;
-        psz_new_line = malloc( i_new_line );
-        if( psz_new_line == NULL )
-        {
-            free( p_line );
-            return NULL;
-        }
-        i_in = i_line;
-        i_out = i_new_line;
-        p_in = p_line;
-        p_out = psz_new_line;
+        size_t i_in = i_line, i_out = i_line_conv;
+        const char * p_in = (char *) p_data;
+        char * p_out = p_line;
 
         if( vlc_iconv( priv->text.conv, &p_in, &i_in, &p_out, &i_out ) == VLC_ICONV_ERR )
         {
@@ -373,11 +359,23 @@ char *vlc_stream_ReadLine( stream_t *s )
             /* Reset state */
             size_t r = vlc_iconv( priv->text.conv, NULL, NULL, NULL, NULL );
             VLC_UNUSED( r );
+            /* FIXME: the rest of the line is discarded and lost */
         }
-        free( p_line );
-        p_line = psz_new_line;
-        i_line = i_new_line - i_out; /* does not include \0 */
+
+        i_line_conv -= i_out;
+        p_read = NULL; /* Line already read, only need to advance the stream */
     }
+
+    ssize_t i_data = vlc_stream_Read( s, p_read, i_line );
+    assert( i_data > 0 && (size_t) i_data == i_line );
+    if( i_data <= 0 )
+    {
+        /* Hmmm */
+        free( p_line );
+        return NULL;
+    }
+
+    i_line = i_line_conv;
 
     /* Remove trailing LF/CR */
     while( i_line >= 1 &&
