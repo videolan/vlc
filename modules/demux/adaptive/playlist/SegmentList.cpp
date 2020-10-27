@@ -34,8 +34,8 @@
 
 using namespace adaptive::playlist;
 
-SegmentList::SegmentList( SegmentInformation *parent ):
-    AbstractMultipleSegmentBaseType( parent )
+SegmentList::SegmentList( SegmentInformation *parent_ ):
+    AbstractMultipleSegmentBaseType( parent_, AttrsNode::Type::SEGMENTLIST )
 {
     totalLength = 0;
 }
@@ -80,7 +80,7 @@ Segment * SegmentList::getMediaSegment(uint64_t number) const
 
 void SegmentList::addSegment(Segment *seg)
 {
-    seg->setParent(parent);
+    seg->setParent(AbstractSegmentBaseType::parent);
     segments.push_back(seg);
     totalLength += seg->duration.Get();
 }
@@ -178,8 +178,8 @@ bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
             return false;
 
         bool found = false;
-        stime_t stime = first->startTime.Get();
-        stime_t sduration = 0;
+        stime = first->startTime.Get();
+        sduration = 0;
         std::vector<Segment *>::const_iterator it = segments.begin();
         for(it = segments.begin(); it != segments.end(); ++it)
         {
@@ -188,7 +188,7 @@ bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
             if(seg->duration.Get())
                 sduration = seg->duration.Get();
             else
-                sduration = duration.Get();
+                sduration = inheritDuration();
 
             /* Assuming there won't be any discontinuity in sequence */
             if(seg->getSequenceNumber() == number)
@@ -280,9 +280,7 @@ bool SegmentList::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
     const SegmentTimeline *timeline = inheritSegmentTimeline();
     if(timeline)
     {
-        const Timescale timescale = timeline->getTimescale().isValid()
-                                  ? timeline->getTimescale()
-                                  : inheritTimescale();
+        const Timescale timescale = timeline->inheritTimescale();
         stime_t st = timescale.ToScaled(time);
         *ret = timeline->getElementNumberByScaledPlaybackTime(st);
         return true;
@@ -303,6 +301,7 @@ void SegmentList::debug(vlc_object_t *obj, int indent) const
     std::vector<Segment *>::const_iterator it;
     for(it = segments.begin(); it != segments.end(); ++it)
         (*it)->debug(obj, indent);
-    if(segmentTimeline)
-        segmentTimeline->debug(obj, indent + 1);
+    const AbstractAttr *p = getAttribute(Type::TIMELINE);
+    if(p)
+        ((SegmentTimeline *) p)->debug(obj, indent + 1);
 }

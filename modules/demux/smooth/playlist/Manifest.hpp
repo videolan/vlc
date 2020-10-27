@@ -21,8 +21,6 @@
 #define MANIFEST_HPP
 
 #include "../../adaptive/playlist/AbstractPlaylist.hpp"
-#include "../../adaptive/playlist/Inheritables.hpp"
-#include "../../adaptive/Time.hpp"
 
 namespace smooth
 {
@@ -30,8 +28,7 @@ namespace smooth
     {
         using namespace adaptive::playlist;
 
-        class Manifest : public AbstractPlaylist,
-                         public TimescaleAble
+        class Manifest : public AbstractPlaylist
         {
             friend class ManifestParser;
 

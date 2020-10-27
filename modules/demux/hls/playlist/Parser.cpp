@@ -210,7 +210,8 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
 {
     SegmentList *segmentList = new (std::nothrow) SegmentList(rep);
 
-    rep->setTimescale(1000000);
+    Timescale timescale(1000000);
+    rep->addAttribute(new TimescaleAttr(timescale));
     rep->b_loaded = true;
 
     mtime_t totalduration = 0;
@@ -267,8 +268,8 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                         nzDuration = CLOCK_FREQ * durAttribute->floatingPoint();
                     ctx_extinf = NULL;
                 }
-                segment->duration.Set(rep->getTimescale().ToScaled(nzDuration));
-                segment->startTime.Set(rep->getTimescale().ToScaled(nzStartTime));
+                segment->duration.Set(timescale.ToScaled(nzDuration));
+                segment->startTime.Set(timescale.ToScaled(nzStartTime));
                 nzStartTime += nzDuration;
                 totalduration += nzDuration;
                 if(absReferenceTime > VLC_TS_INVALID)

@@ -25,6 +25,7 @@
 #include <string>
 
 #include "ICanonicalUrl.hpp"
+#include "Inheritables.hpp"
 #include "../tools/Properties.hpp"
 
 namespace adaptive
@@ -34,7 +35,8 @@ namespace adaptive
     {
         class BasePeriod;
 
-        class AbstractPlaylist : public ICanonicalUrl
+        class AbstractPlaylist : public ICanonicalUrl,
+                                 public AttrsNode
         {
             public:
                 AbstractPlaylist(vlc_object_t *);
@@ -52,10 +54,6 @@ namespace adaptive
                 void    addPeriod               (BasePeriod *period);
                 void    addBaseUrl              (const std::string &);
                 void    setPlaylistUrl          (const std::string &);
-                void    setAvailabilityTimeOffset(mtime_t);
-                void    setAvailabilityTimeComplete(bool);
-                mtime_t getAvailabilityTimeOffset() const;
-                bool    getAvailabilityTimeComplete() const;
 
                 virtual Url         getUrlSegment() const; /* impl */
                 vlc_object_t *      getVLCObject()  const;
@@ -85,10 +83,6 @@ namespace adaptive
                 mtime_t                             minBufferTime;
                 mtime_t                             maxBufferTime;
                 bool                                b_needsUpdates;
-
-             private:
-                Undef<bool>                         availabilityTimeComplete;
-                Undef<mtime_t>                      availabilityTimeOffset;
         };
     }
 }

@@ -70,12 +70,12 @@ static void parseAvailability(MPD *mpd, Node *node, T *s)
     if(node->hasAttribute("availabilityTimeOffset"))
     {
         double val = Integer<double>(node->getAttributeValue("availabilityTimeOffset"));
-        s->setAvailabilityTimeOffset(val * CLOCK_FREQ);
+        s->addAttribute(new AvailabilityTimeOffsetAttr(val * CLOCK_FREQ));
     }
     if(node->hasAttribute("availabilityTimeComplete"))
     {
         bool b = (node->getAttributeValue("availabilityTimeComplete") == "false");
-        s->setAvailabilityTimeComplete(!b);
+        s->addAttribute(new AvailabilityTimeCompleteAttr(!b));
         if(b)
             mpd->setLowLatency(b);
     }
@@ -204,8 +204,10 @@ void IsoffMainParser::parseSegmentBaseType(MPD *, Node *node,
     }
 
     if(node->hasAttribute("timescale"))
-        base->setTimescale(Integer<uint64_t>(node->getAttributeValue("timescale")));
-
+    {
+        TimescaleAttr *prop = new TimescaleAttr(Timescale(Integer<uint64_t>(node->getAttributeValue("timescale"))));
+        base->addAttribute(prop);
+    }
 }
 
 void IsoffMainParser::parseMultipleSegmentBaseType(MPD *mpd, Node *node,
@@ -215,10 +217,10 @@ void IsoffMainParser::parseMultipleSegmentBaseType(MPD *mpd, Node *node,
     parseSegmentBaseType(mpd, node, base, parent);
 
     if(node->hasAttribute("duration"))
-        base->duration.Set(Integer<stime_t>(node->getAttributeValue("duration")));
+        base->addAttribute(new DurationAttr(Integer<stime_t>(node->getAttributeValue("duration"))));
 
     if(node->hasAttribute("startNumber"))
-        base->setStartNumber(Integer<uint64_t>(node->getAttributeValue("startNumber")));
+        base->addAttribute(new StartnumberAttr(Integer<uint64_t>(node->getAttributeValue("startNumber"))));
 
     parseTimeline(DOMHelper::getFirstChildElementByName(node, "SegmentTimeline"), base);
 }
@@ -267,7 +269,7 @@ size_t IsoffMainParser::parseSegmentInformation(MPD *mpd, Node *node,
     total += parseSegmentList(mpd, DOMHelper::getFirstChildElementByName(node, "SegmentList"), info);
     total += parseSegmentTemplate(mpd, DOMHelper::getFirstChildElementByName(node, "SegmentTemplate" ), info);
     if(node->hasAttribute("timescale"))
-        info->setTimescale(Integer<uint64_t>(node->getAttributeValue("timescale")));
+        info->addAttribute(new TimescaleAttr(Timescale(Integer<uint64_t>(node->getAttributeValue("timescale")))));
 
     parseAvailability<SegmentInformation>(mpd, node, info);
 
@@ -391,7 +393,7 @@ void    IsoffMainParser::parseRepresentations (MPD *mpd, Node *adaptationSetNode
         {
             SegmentBase *base = new (std::nothrow) SegmentBase(currentRepresentation);
             if(base)
-                currentRepresentation->setSegmentBase(base);
+                currentRepresentation->addAttribute(base);
         }
 
         adaptationSet->addRepresentation(currentRepresentation);
@@ -416,7 +418,7 @@ size_t IsoffMainParser::parseSegmentBase(MPD *mpd, Node * segmentBaseNode, Segme
         base->initialisationSegment.Set(initSeg);
     }
 
-    info->setSegmentBase(base);
+    info->addAttribute(base);
 
     return 1;
 }
@@ -455,11 +457,12 @@ size_t IsoffMainParser::parseSegmentList(MPD *mpd, Node * segListNode, SegmentIn
                     seg->setByteRange(atoi(range.substr(0, pos).c_str()), atoi(range.substr(pos + 1, range.size()).c_str()));
                 }
 
-                if(list->duration.Get())
+                stime_t duration = list->inheritDuration();
+                if(duration)
                 {
                     seg->startTime.Set(nzStartTime);
-                    seg->duration.Set(list->duration.Get());
-                    nzStartTime += list->duration.Get();
+                    seg->duration.Set(duration);
+                    nzStartTime += duration;
                 }
 
                 seg->setSequenceNumber(total);
@@ -531,7 +534,8 @@ void IsoffMainParser::parseTimeline(Node *node, AbstractMultipleSegmentBaseType 
 
             number += (1 + r);
         }
-        base->setSegmentTimeline(timeline);
+        //base->setSegmentTimeline(timeline);
+        base->addAttribute(timeline);
     }
 }
 

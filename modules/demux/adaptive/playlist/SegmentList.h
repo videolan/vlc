@@ -26,6 +26,7 @@
 #define SEGMENTLIST_H_
 
 #include "SegmentBaseType.hpp"
+#include "Inheritables.hpp"
 
 namespace adaptive
 {
