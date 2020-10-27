@@ -33,18 +33,10 @@
 using namespace adaptive::playlist;
 
 SegmentTimeline::SegmentTimeline(AbstractMultipleSegmentBaseType *parent_)
-    :TimescaleAble(NULL)
+    : AttrsNode(Type::TIMELINE, parent_)
 {
     totalLength = 0;
     parent = parent_;
-}
-
-SegmentTimeline::SegmentTimeline(uint64_t scale)
-    :TimescaleAble(NULL)
-{
-    setTimescale(scale);
-    totalLength = 0;
-    parent = NULL;
 }
 
 SegmentTimeline::~SegmentTimeline()
@@ -91,33 +83,6 @@ stime_t SegmentTimeline::getMinAheadScaledTime(uint64_t number) const
     }
 
     return totalscaledtime;
-}
-
-Timescale SegmentTimeline::inheritTimescale() const
-{
-    if(getTimescale().isValid())
-        return getTimescale();
-
-    if(parent && parent->getTimescale().isValid())
-        return parent->getTimescale();
-
-    SegmentInformation *info = NULL;
-    if(parent && parent->getParent() && parent->getParent()->getParent())
-        info = parent->getParent()->getParent();
-    else
-        info = NULL;
-
-    AbstractMultipleSegmentBaseType *bt;
-    for(; info; info = info->getParent())
-    {
-        bt = dynamic_cast<AbstractMultipleSegmentBaseType *>(info->getProfile());
-        if(bt && bt->getSegmentTimeline() && bt->getSegmentTimeline()->getTimescale().isValid())
-            return bt->getSegmentTimeline()->getTimescale();
-        if(info->getTimescale().isValid())
-            return info->getTimescale();
-    }
-
-    return Timescale(1);
 }
 
 uint64_t SegmentTimeline::getElementNumberByScaledPlaybackTime(stime_t scaled) const

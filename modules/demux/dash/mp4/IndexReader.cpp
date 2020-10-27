@@ -57,7 +57,7 @@ bool IndexReader::parseIndex(block_t *p_block, BaseRepresentation *rep, uint64_t
             point.duration = sidx->p_items[i].i_subsegment_duration;
             point.time += point.duration;
         }
-        rep->setTimescale(Timescale(sidx->i_timescale));
+        rep->replaceAttribute(new TimescaleAttr(Timescale(sidx->i_timescale)));
         rep->SplitUsingIndex(splitlist);
         rep->getPlaylist()->debug();
     }

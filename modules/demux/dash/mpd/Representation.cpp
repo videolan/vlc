@@ -109,9 +109,9 @@ stime_t Representation::getScaledTimeBySegmentNumber(uint64_t index, const Segme
     {
         time = tl->getScaledPlaybackTimeByElementNumber(index);
     }
-    else if(templ->duration.Get())
+    else if(templ->inheritDuration())
     {
-        time = templ->duration.Get() * index;
+        time = templ->inheritDuration() * index;
     }
     return time;
 }

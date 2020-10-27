@@ -215,7 +215,7 @@ bool BaseRepresentation::getMediaPlaybackRange(vlc_tick_t *rangeBegin,
             return true;
         }
         /* Else compute, current time and timeshiftdepth based */
-        else if( mediaSegmentTemplate->duration.Get() )
+        else if( mediaSegmentTemplate->inheritDuration() )
         {
             *rangeEnd = 0;
             *rangeBegin = -1 * getPlaylist()->timeShiftBufferDepth.Get();
@@ -229,7 +229,6 @@ bool BaseRepresentation::getMediaPlaybackRange(vlc_tick_t *rangeBegin,
     {
         const Timescale timescale = segmentList->inheritTimescale();
         const std::vector<Segment *> &list = segmentList->getSegments();
-
         const ISegment *back = list.back();
         const stime_t startTime = list.front()->startTime.Get();
         const stime_t endTime = back->startTime.Get() + back->duration.Get();

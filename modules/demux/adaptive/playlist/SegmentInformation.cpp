@@ -39,7 +39,7 @@ using namespace adaptive::playlist;
 
 SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
     ICanonicalUrl( parent_ ),
-    TimescaleAble( parent_ )
+    AttrsNode( AbstractAttr::SEGMENTINFORMATION, parent_ )
 {
     parent = parent_;
     init();
@@ -47,7 +47,7 @@ SegmentInformation::SegmentInformation(SegmentInformation *parent_) :
 
 SegmentInformation::SegmentInformation(AbstractPlaylist * parent_) :
     ICanonicalUrl(parent_),
-    TimescaleAble()
+    AttrsNode( AbstractAttr::SEGMENTINFORMATION, NULL )
 {
     parent = NULL;
     init();
@@ -56,16 +56,10 @@ SegmentInformation::SegmentInformation(AbstractPlaylist * parent_) :
 void SegmentInformation::init()
 {
     baseUrl.Set(NULL);
-    segmentBase = NULL;
-    segmentList = NULL;
-    mediaSegmentTemplate = NULL;
 }
 
 SegmentInformation::~SegmentInformation()
 {
-    delete segmentBase;
-    delete segmentList;
-    delete mediaSegmentTemplate;
     delete baseUrl.Get();
 }
 
@@ -136,11 +130,17 @@ SegmentInformation * SegmentInformation::getChildByID(const adaptive::ID &id)
 void SegmentInformation::updateWith(SegmentInformation *updated)
 {
     /* Support Segment List for now */
-    if(segmentList && updated->segmentList)
-        segmentList->updateWith(updated->segmentList);
+    AbstractAttr *p = getAttribute(Type::SEGMENTLIST);
+    if(p && p->isValid() && updated->getAttribute(Type::SEGMENTLIST))
+    {
+        inheritSegmentList()->updateWith(updated->inheritSegmentList());
+    }
 
-    if(mediaSegmentTemplate && updated->mediaSegmentTemplate)
-        mediaSegmentTemplate->updateWith(updated->mediaSegmentTemplate);
+    p = getAttribute(Type::SEGMENTTEMPLATE);
+    if(p && p->isValid() && updated->getAttribute(Type::SEGMENTTEMPLATE))
+    {
+        inheritSegmentTemplate()->updateWith(updated->inheritSegmentTemplate());
+    }
 
     std::vector<SegmentInformation *>::const_iterator it;
     for(it=childs.begin(); it!=childs.end(); ++it)
@@ -155,11 +155,13 @@ void SegmentInformation::updateWith(SegmentInformation *updated)
 
 void SegmentInformation::pruneByPlaybackTime(vlc_tick_t time)
 {
+    SegmentList *segmentList = static_cast<SegmentList *>(getAttribute(Type::SEGMENTLIST));
     if(segmentList)
         segmentList->pruneByPlaybackTime(time);
 
-    if(mediaSegmentTemplate)
-        mediaSegmentTemplate->pruneByPlaybackTime(time);
+    SegmentTemplate *templ = static_cast<SegmentTemplate *>(getAttribute(Type::SEGMENTTEMPLATE));
+    if(templ)
+        templ->pruneByPlaybackTime(time);
 
     std::vector<SegmentInformation *>::const_iterator it;
     for(it=childs.begin(); it!=childs.end(); ++it)
@@ -170,11 +172,13 @@ void SegmentInformation::pruneBySegmentNumber(uint64_t num)
 {
     assert(dynamic_cast<BaseRepresentation *>(this));
 
+    SegmentList *segmentList = static_cast<SegmentList *>(getAttribute(Type::SEGMENTLIST));
     if(segmentList)
         segmentList->pruneBySegmentNumber(num);
 
-    if(mediaSegmentTemplate)
-         mediaSegmentTemplate->pruneBySequenceNumber(num);
+    SegmentTemplate *templ = static_cast<SegmentTemplate *>(getAttribute(Type::SEGMENTTEMPLATE));
+    if(templ)
+        templ->pruneBySequenceNumber(num);
 }
 
 const CommonEncryption & SegmentInformation::intheritEncryption() const
@@ -205,25 +209,22 @@ vlc_tick_t SegmentInformation::getPeriodDuration() const
         return 0;
 }
 
-SegmentInformation * SegmentInformation::getParent() const
-{
-    return parent;
-}
-
 AbstractSegmentBaseType * SegmentInformation::getProfile() const
 {
-    if(mediaSegmentTemplate)
-        return mediaSegmentTemplate;
-    else if(segmentList)
-        return segmentList;
-    else if(segmentBase)
-        return segmentBase;
-    else
-        return NULL;
+    AbstractAttr *p;
+    if((p = getAttribute(Type::SEGMENTTEMPLATE)))
+        return (SegmentTemplate *) p;
+    else if((p = getAttribute(Type::SEGMENTLIST)))
+        return (SegmentList *) p;
+    else if((p = getAttribute(Type::SEGMENTBASE)))
+        return (SegmentBase *) p;
+
+    return NULL;
 }
 
 void SegmentInformation::updateSegmentList(SegmentList *list, bool restamp)
 {
+    SegmentList *segmentList = static_cast<SegmentList *>(getAttribute(Type::SEGMENTLIST));
     if(segmentList && restamp)
     {
         segmentList->updateWith(list, restamp);
@@ -231,27 +232,22 @@ void SegmentInformation::updateSegmentList(SegmentList *list, bool restamp)
     }
     else
     {
-        delete segmentList;
-        segmentList = list;
+        replaceAttribute(list);
     }
-}
-
-void SegmentInformation::setSegmentBase(SegmentBase *base)
-{
-    if(segmentBase)
-        delete segmentBase;
-    segmentBase = base;
 }
 
 void SegmentInformation::setSegmentTemplate(SegmentTemplate *templ)
 {
-    if(mediaSegmentTemplate)
+    SegmentTemplate *local = static_cast<SegmentTemplate *>(getAttribute(Type::SEGMENTTEMPLATE));
+    if(local)
     {
-        mediaSegmentTemplate->updateWith(templ);
+        local->updateWith(templ);
         delete templ;
     }
     else
-        mediaSegmentTemplate = templ;
+    {
+        addAttribute(templ);
+    }
 }
 
 static void insertIntoSegment(std::vector<Segment *> &seglist, size_t start,
@@ -322,64 +318,4 @@ Url SegmentInformation::getUrlSegment() const
             ret.append(*(baseUrl.Get()));
         return ret;
     }
-}
-
-SegmentBase * SegmentInformation::inheritSegmentBase() const
-{
-    if(segmentBase)
-        return segmentBase;
-    else if (parent)
-        return parent->inheritSegmentBase();
-    else
-        return NULL;
-}
-
-SegmentList * SegmentInformation::inheritSegmentList() const
-{
-    if(segmentList)
-        return segmentList;
-    else if (parent)
-        return parent->inheritSegmentList();
-    else
-        return NULL;
-}
-
-SegmentTemplate * SegmentInformation::inheritSegmentTemplate() const
-{
-    if(mediaSegmentTemplate)
-        return mediaSegmentTemplate;
-    else if (parent)
-        return parent->inheritSegmentTemplate();
-    else
-        return NULL;
-}
-
-void SegmentInformation::setAvailabilityTimeOffset(vlc_tick_t t)
-{
-    availabilityTimeOffset = t;
-}
-
-void SegmentInformation::setAvailabilityTimeComplete(bool b)
-{
-    availabilityTimeComplete = b;
-}
-
-vlc_tick_t SegmentInformation::inheritAvailabilityTimeOffset() const
-{
-    for(const SegmentInformation *p = this; p; p = p->parent)
-    {
-        if(availabilityTimeOffset.isSet())
-            return availabilityTimeOffset.value();
-    }
-    return getPlaylist()->getAvailabilityTimeOffset();
-}
-
-bool SegmentInformation::inheritAvailabilityTimeComplete() const
-{
-    for(const SegmentInformation *p = this; p; p = p->parent)
-    {
-        if(availabilityTimeComplete.isSet())
-            return availabilityTimeComplete.value();
-    }
-    return getPlaylist()->getAvailabilityTimeComplete();
 }

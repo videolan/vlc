@@ -34,10 +34,10 @@ namespace adaptive
 
         class AbstractSegmentBaseType : public Initializable<InitSegment>,
                                         public Indexable<IndexSegment>,
-                                        public TimescaleAble
+                                        public AttrsNode
         {
             public:
-                AbstractSegmentBaseType( SegmentInformation * );
+                AbstractSegmentBaseType( SegmentInformation *, AttrsNode::Type );
                 virtual ~AbstractSegmentBaseType();
 
                 virtual vlc_tick_t getMinAheadTime(uint64_t) const = 0;
@@ -51,15 +51,12 @@ namespace adaptive
                 virtual bool getPlaybackTimeDurationBySegmentNumber(uint64_t number,
                                                 vlc_tick_t *time, vlc_tick_t *duration) const = 0;
 
-                Timescale inheritTimescale() const; /* reimpl */
-
                 virtual void debug(vlc_object_t *, int = 0) const;
 
                 static Segment * findSegmentByScaledTime(const std::vector<Segment *> &,
                                                          stime_t);
                 static uint64_t findSegmentNumberByScaledTime(const std::vector<Segment *> &,
                                                              stime_t);
-                SegmentInformation * getParent() const;
 
             protected:
                 SegmentInformation *parent;
@@ -68,22 +65,10 @@ namespace adaptive
         class AbstractMultipleSegmentBaseType : public AbstractSegmentBaseType
         {
             public:
-                AbstractMultipleSegmentBaseType( SegmentInformation * );
+                AbstractMultipleSegmentBaseType( SegmentInformation *, AttrsNode::Type );
                 virtual ~AbstractMultipleSegmentBaseType();
 
-                void setSegmentTimeline( SegmentTimeline * );
-                SegmentTimeline * inheritSegmentTimeline() const;
-                SegmentTimeline * getSegmentTimeline() const;
-                void setStartNumber( uint64_t );
-                uint64_t inheritStartNumber() const;
-                stime_t inheritDuration() const;
                 virtual void updateWith(AbstractMultipleSegmentBaseType *, bool = false);
-                Property<stime_t>       duration;
-
-            protected:
-                uint64_t startNumber;
-                SegmentTimeline *segmentTimeline;
-
         };
     }
 }

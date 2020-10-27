@@ -33,7 +33,8 @@
 using namespace adaptive::playlist;
 
 SegmentBase::SegmentBase(SegmentInformation *parent) :
-             Segment(parent), AbstractSegmentBaseType(parent)
+             Segment(parent),
+             AbstractSegmentBaseType(parent, AttrsNode::Type::SEGMENTBASE)
 {
     this->parent = parent;
 }

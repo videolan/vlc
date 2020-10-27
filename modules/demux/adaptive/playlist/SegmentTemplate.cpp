@@ -52,7 +52,7 @@ void SegmentTemplateSegment::setSourceUrl(const std::string &url)
 }
 
 SegmentTemplate::SegmentTemplate( SegmentInformation *parent ) :
-    AbstractMultipleSegmentBaseType( NULL ) /* we don't want auto inherit */
+    AbstractMultipleSegmentBaseType( parent, AbstractAttr::Type::SEGMENTTEMPLATE )
 {
     initialisationSegment.Set( NULL );
     parentSegmentInformation = parent;
@@ -71,14 +71,16 @@ void SegmentTemplate::setSourceUrl( const std::string &url )
 
 void SegmentTemplate::pruneByPlaybackTime(vlc_tick_t time)
 {
-    if(segmentTimeline)
-        return segmentTimeline->pruneByPlaybackTime(time);
+    const AbstractAttr *p = getAttribute(Type::TIMELINE);
+    if(p)
+        return ((SegmentTimeline *) p)->pruneByPlaybackTime(time);
 }
 
 size_t SegmentTemplate::pruneBySequenceNumber(uint64_t number)
 {
-    if(segmentTimeline)
-        return segmentTimeline->pruneBySequenceNumber(number);
+    const AbstractAttr *p = getAttribute(Type::TIMELINE);
+    if(p)
+        return ((SegmentTimeline *) p)->pruneBySequenceNumber(number);
     return 0;
 }
 
@@ -111,16 +113,18 @@ void SegmentTemplate::debug(vlc_object_t *obj, int indent) const
 {
     AbstractSegmentBaseType::debug(obj, indent);
     (*segments.begin())->debug(obj, indent);
-    if(segmentTimeline)
-        segmentTimeline->debug(obj, indent + 1);
+    const AbstractAttr *p = getAttribute(Type::TIMELINE);
+    if(p)
+        ((SegmentTimeline *) p)->debug(obj, indent + 1);
 }
 
 vlc_tick_t SegmentTemplate::getMinAheadTime(uint64_t number) const
 {
-    if( segmentTimeline )
+    SegmentTimeline *timeline = inheritSegmentTimeline();
+    if( timeline )
     {
-        const Timescale timescale = segmentTimeline->inheritTimescale();
-        return timescale.ToTime(segmentTimeline->getMinAheadScaledTime(number));
+        const Timescale timescale = timeline->inheritTimescale();
+        return timescale.ToTime(timeline->getMinAheadScaledTime(number));
     }
     else
     {
@@ -197,9 +201,7 @@ bool SegmentTemplate::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) con
     const SegmentTimeline *timeline = inheritSegmentTimeline();
     if(timeline)
     {
-        const Timescale timescale = timeline->getTimescale().isValid()
-                                  ? timeline->getTimescale()
-                                  : inheritTimescale();
+        const Timescale timescale = timeline->inheritTimescale();
         stime_t st = timescale.ToScaled(time);
         *ret = timeline->getElementNumberByScaledPlaybackTime(st);
         return true;

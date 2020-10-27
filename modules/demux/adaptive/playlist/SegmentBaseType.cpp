@@ -65,8 +65,8 @@ uint64_t AbstractSegmentBaseType::findSegmentNumberByScaledTime(const std::vecto
     return s->getSequenceNumber();
 }
 
-AbstractSegmentBaseType::AbstractSegmentBaseType(SegmentInformation *parent)
-                : TimescaleAble(parent)
+AbstractSegmentBaseType::AbstractSegmentBaseType(SegmentInformation *parent, AttrsNode::Type t)
+                : AttrsNode(t, parent)
 {
     this->parent = parent;
 }
@@ -85,30 +85,6 @@ IndexSegment *AbstractSegmentBaseType::getIndexSegment() const
     return indexSegment.Get();
 }
 
-Timescale AbstractSegmentBaseType::inheritTimescale() const
-{
-    if(getTimescale().isValid())
-        return getTimescale();
-    if(parent)
-    {
-        if(parent->getTimescale().isValid())
-            return parent->getTimescale();
-        if(parent->getParent())
-        {
-            AbstractSegmentBaseType *bt =
-                dynamic_cast<AbstractSegmentBaseType *>(parent->getParent()->getProfile());
-            if(bt)
-                return bt->inheritTimescale();
-        }
-    }
-    return Timescale(1);
-}
-
-SegmentInformation *AbstractSegmentBaseType::getParent() const
-{
-    return parent;
-}
-
 void AbstractSegmentBaseType::debug(vlc_object_t *obj, int indent) const
 {
     if(initialisationSegment.Get())
@@ -117,84 +93,21 @@ void AbstractSegmentBaseType::debug(vlc_object_t *obj, int indent) const
         indexSegment.Get()->debug(obj, indent);
 }
 
-AbstractMultipleSegmentBaseType::AbstractMultipleSegmentBaseType(SegmentInformation *parent)
-                : AbstractSegmentBaseType(parent)
+AbstractMultipleSegmentBaseType::AbstractMultipleSegmentBaseType(SegmentInformation *parent,
+                                                                 AttrsNode::Type type)
+                : AbstractSegmentBaseType(parent, type)
 {
-    startNumber = std::numeric_limits<uint64_t>::max();
-    segmentTimeline = NULL;
-    duration.Set(0);
 }
 
 AbstractMultipleSegmentBaseType::~AbstractMultipleSegmentBaseType()
 {
-    delete segmentTimeline;
-}
-
-void AbstractMultipleSegmentBaseType::setSegmentTimeline( SegmentTimeline *v )
-{
-    delete segmentTimeline;
-    segmentTimeline = v;
-}
-
-SegmentTimeline * AbstractMultipleSegmentBaseType::inheritSegmentTimeline() const
-{
-    if( segmentTimeline )
-        return segmentTimeline;
-    const SegmentInformation *ulevel = parent ? parent->getParent() : NULL;
-    for( ; ulevel ; ulevel = ulevel->getParent() )
-    {
-        AbstractMultipleSegmentBaseType *bt =
-            dynamic_cast<AbstractMultipleSegmentBaseType *>(ulevel->getProfile());
-        if( bt && bt->segmentTimeline )
-            return bt->segmentTimeline;
-    }
-    return NULL;
-}
-
-SegmentTimeline * AbstractMultipleSegmentBaseType::getSegmentTimeline() const
-{
-    return segmentTimeline;
-}
-
-void AbstractMultipleSegmentBaseType::setStartNumber( uint64_t v )
-{
-    startNumber = v;
-}
-
-uint64_t AbstractMultipleSegmentBaseType::inheritStartNumber() const
-{
-    if( startNumber != std::numeric_limits<uint64_t>::max() )
-        return startNumber;
-
-    const SegmentInformation *ulevel = parent ? parent->getParent() : NULL;
-    for( ; ulevel ; ulevel = ulevel->parent )
-    {
-        AbstractMultipleSegmentBaseType *bt =
-            dynamic_cast<AbstractMultipleSegmentBaseType *>(ulevel->getProfile());
-        if( bt && bt->startNumber != std::numeric_limits<uint64_t>::max() )
-            return bt->startNumber;
-    }
-    return std::numeric_limits<uint64_t>::max();
-}
-
-stime_t AbstractMultipleSegmentBaseType::inheritDuration() const
-{
-    if(duration.Get() > 0)
-        return duration.Get();
-    const SegmentInformation *ulevel = parent ? parent->getParent() : NULL;
-    for( ; ulevel ; ulevel = ulevel->parent )
-    {
-        AbstractMultipleSegmentBaseType *bt =
-            dynamic_cast<AbstractMultipleSegmentBaseType *>(ulevel->getProfile());
-        if( bt && bt->duration.Get() > 0 )
-            return bt->duration.Get();
-    }
-    return 0;
 }
 
 void AbstractMultipleSegmentBaseType::updateWith(AbstractMultipleSegmentBaseType *updated,
                                                  bool)
 {
-    if(segmentTimeline && updated->segmentTimeline)
-        segmentTimeline->updateWith(*updated->segmentTimeline);
+    SegmentTimeline *local = static_cast<SegmentTimeline *>(getAttribute(Type::TIMELINE));
+    SegmentTimeline *other = static_cast<SegmentTimeline *>(updated->getAttribute(Type::TIMELINE));
+    if(local && other)
+        local->updateWith(*other);
 }

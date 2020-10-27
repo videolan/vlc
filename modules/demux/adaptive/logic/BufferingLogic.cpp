@@ -214,7 +214,8 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
     {
         /* Else compute, current time and timeshiftdepth based */
         uint64_t start = 0;
-        if(mediaSegmentTemplate->duration.Get())
+        stime_t scaledduration = mediaSegmentTemplate->inheritDuration();
+        if(scaledduration)
         {
             /* Compute playback offset and effective finished segment from wall time */
             vlc_tick_t now = vlc_tick_from_sec(time(NULL));
@@ -224,7 +225,7 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
             const Timescale timescale = mediaSegmentTemplate->inheritTimescale();
             if(!timescale)
                 return startnumber;
-            const vlc_tick_t duration = timescale.ToTime(mediaSegmentTemplate->inheritDuration());
+            const vlc_tick_t duration = timescale.ToTime(scaledduration);
             if(!duration)
                 return startnumber;
 
@@ -336,6 +337,8 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
             return segmentBase->getSequenceNumber();
 
         const Timescale timescale = rep->inheritTimescale();
+        if(!timeline->isValid())
+            return std::numeric_limits<uint64_t>::max();
         const Segment *back = list.back();
         const stime_t bufferingstart = back->startTime.Get() + back->duration.Get() -
                                        timescale.ToScaled(i_buffering);

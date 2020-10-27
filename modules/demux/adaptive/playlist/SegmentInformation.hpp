@@ -44,8 +44,8 @@ namespace adaptive
         /* common segment elements for period/adaptset/rep 5.3.9.1,
          * with properties inheritance */
         class SegmentInformation : public ICanonicalUrl,
-                                   public TimescaleAble,
-                                   public Unique
+                                   public Unique,
+                                   public AttrsNode
         {
             friend class AbstractMultipleSegmentBaseType;
 
@@ -84,30 +84,16 @@ namespace adaptive
                 SegmentInformation *parent;
 
             public:
-                SegmentInformation *getParent() const;
                 AbstractSegmentBaseType *getProfile() const;
                 void updateSegmentList(SegmentList *, bool = false);
-                void setSegmentBase(SegmentBase *);
                 void setSegmentTemplate(SegmentTemplate *);
                 virtual Url getUrlSegment() const; /* impl */
                 Property<Url *> baseUrl;
-                void setAvailabilityTimeOffset(vlc_tick_t);
-                void setAvailabilityTimeComplete(bool);
                 const AbstractSegmentBaseType * inheritSegmentProfile() const;
-                SegmentBase *     inheritSegmentBase() const;
-                SegmentList *     inheritSegmentList() const;
-                SegmentTemplate * inheritSegmentTemplate() const;
-                vlc_tick_t        inheritAvailabilityTimeOffset() const;
-                bool              inheritAvailabilityTimeComplete() const;
 
             private:
                 void init();
-                SegmentBase     *segmentBase;
-                SegmentList     *segmentList;
-                SegmentTemplate *mediaSegmentTemplate;
                 CommonEncryption commonEncryption;
-                Undef<bool>      availabilityTimeComplete;
-                Undef<vlc_tick_t>availabilityTimeOffset;
         };
     }
 }

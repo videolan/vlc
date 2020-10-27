@@ -34,20 +34,18 @@ namespace adaptive
     {
         class AbstractMultipleSegmentBaseType;
 
-        class SegmentTimeline : public TimescaleAble
+        class SegmentTimeline : public AttrsNode
         {
             class Element;
 
             public:
                 SegmentTimeline(AbstractMultipleSegmentBaseType *);
-                SegmentTimeline(uint64_t);
                 virtual ~SegmentTimeline();
                 void addElement(uint64_t, stime_t d, uint64_t r = 0, stime_t t = 0);
                 uint64_t getElementNumberByScaledPlaybackTime(stime_t) const;
                 bool    getScaledPlaybackTimeDurationBySegmentNumber(uint64_t, stime_t *, stime_t *) const;
                 stime_t getScaledPlaybackTimeByElementNumber(uint64_t) const;
                 stime_t getMinAheadScaledTime(uint64_t) const;
-                Timescale inheritTimescale() const; /* reimpl */
                 stime_t getTotalLength() const;
                 uint64_t maxElementNumber() const;
                 uint64_t minElementNumber() const;

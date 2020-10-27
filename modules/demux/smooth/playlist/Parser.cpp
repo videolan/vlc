@@ -52,9 +52,9 @@ ManifestParser::~ManifestParser()
 {
 }
 
-static SegmentTimeline *createTimeline(Node *streamIndexNode, uint64_t timescale)
+static SegmentTimeline *createTimeline(Node *streamIndexNode)
 {
-    SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline(timescale);
+    SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline(NULL);
     if(timeline)
     {
         std::vector<Node *> chunks = DOMHelper::getElementByTagName(streamIndexNode, "c", true);
@@ -143,7 +143,8 @@ static SegmentTimeline *createTimeline(Node *streamIndexNode, uint64_t timescale
     return timeline;
 }
 
-static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const std::string &type, unsigned id, unsigned trackid)
+static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const std::string &type,
+                              unsigned id, unsigned trackid, const Timescale &timescale)
 {
     Representation *rep = new (std::nothrow) Representation(adaptSet);
     if(rep)
@@ -168,7 +169,7 @@ static void ParseQualityLevel(BaseAdaptationSet *adaptSet, Node *qualNode, const
 
         ForgedInitSegment *initSegment = new (std::nothrow)
                 ForgedInitSegment(rep, type,
-                                  adaptSet->inheritTimescale(),
+                                  timescale,
                                   adaptSet->getPlaylist()->duration.Get());
         if(initSegment)
         {
@@ -225,8 +226,12 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
         if(streamIndexNode->hasAttribute("Name"))
             adaptSet->description.Set(streamIndexNode->getAttributeValue("Name"));
 
+        Timescale timescale(10000000);
         if(streamIndexNode->hasAttribute("TimeScale"))
-            adaptSet->setTimescale(Integer<uint64_t>(streamIndexNode->getAttributeValue("TimeScale")));
+        {
+            timescale = Timescale(Integer<uint64_t>(streamIndexNode->getAttributeValue("TimeScale")));
+            adaptSet->addAttribute(new TimescaleAttr(timescale));
+        }
 
         const std::string url = streamIndexNode->getAttributeValue("Url");
         if(!url.empty())
@@ -236,8 +241,8 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
             if(templ)
             {
                 templ->setSourceUrl(url);
-                SegmentTimeline *timeline = createTimeline(streamIndexNode, adaptSet->inheritTimescale());
-                templ->setSegmentTimeline(timeline);
+                SegmentTimeline *timeline = createTimeline(streamIndexNode);
+                templ->addAttribute(timeline);
                 adaptSet->setSegmentTemplate(templ);
             }
 
@@ -246,7 +251,7 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
             std::vector<Node *> qualLevels = DOMHelper::getElementByTagName(streamIndexNode, "QualityLevel", true);
             std::vector<Node *>::const_iterator it;
             for(it = qualLevels.begin(); it != qualLevels.end(); ++it)
-                ParseQualityLevel(adaptSet, *it, type, nextid++, id);
+                ParseQualityLevel(adaptSet, *it, type, nextid++, id, timescale);
         }
         if(!adaptSet->getRepresentations().empty())
             period->addAdaptationSet(adaptSet);
@@ -263,19 +268,24 @@ Manifest * ManifestParser::parse()
 
     manifest->setPlaylistUrl(Helper::getDirectoryPath(playlisturl).append("/"));
 
+    Timescale timescale(10000000);
+
     if(root->hasAttribute("TimeScale"))
-        manifest->setTimescale(Integer<uint64_t>(root->getAttributeValue("TimeScale")));
+    {
+        timescale = Timescale(Integer<uint64_t>(root->getAttributeValue("TimeScale")));
+        manifest->addAttribute(new TimescaleAttr(timescale));
+    }
 
     if(root->hasAttribute("Duration"))
     {
         stime_t time = Integer<stime_t>(root->getAttributeValue("Duration"));
-        manifest->duration.Set(manifest->getTimescale().ToTime(time));
+        manifest->duration.Set(timescale.ToTime(time));
     }
 
     if(root->hasAttribute("DVRWindowLength"))
     {
         stime_t time = Integer<stime_t>(root->getAttributeValue("DVRWindowLength"));
-        manifest->timeShiftBufferDepth.Set(manifest->getTimescale().ToTime(time));
+        manifest->timeShiftBufferDepth.Set(timescale.ToTime(time));
     }
 
     if(root->hasAttribute("IsLive") && root->getAttributeValue("IsLive") == "TRUE")
@@ -285,7 +295,6 @@ Manifest * ManifestParser::parse()
     BasePeriod *period = new (std::nothrow) BasePeriod(manifest);
     if(period)
     {
-        period->setTimescale(manifest->getTimescale());
         period->duration.Set(manifest->duration.Get());
         unsigned nextid = 1;
         std::vector<Node *> streamIndexes = DOMHelper::getElementByTagName(root, "StreamIndex", true);
