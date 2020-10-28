@@ -107,6 +107,7 @@ bool srt_parse_url(char* url, srt_params_t* params)
     params->key_length = -1;
     params->payload_size = -1;
     params->bandwidth_overhead_limit = -1;
+    params->streamid = NULL;
 
     /* Parse URL parameters */
     query = find( url, '?' );
@@ -127,6 +128,9 @@ bool srt_parse_url(char* url, srt_params_t* params)
                 } else if (strcmp( local_params[i].key, SRT_PARAM_PASSPHRASE )
                         == 0) {
                     params->passphrase = val;
+                } else if (strcmp( local_params[i].key, SRT_PARAM_STREAMID )
+                        == 0) {
+                    params->streamid = val;
                 } else if (strcmp( local_params[i].key, SRT_PARAM_PAYLOAD_SIZE )
                         == 0) {
                     int temp = atoi( val );
