@@ -30,6 +30,7 @@
 #include <vlc_plugin.h>
 #include "interop.h"
 #include "../android/utils.h"
+#include "gl_api.h"
 
 struct priv
 {
@@ -112,6 +113,14 @@ Open(vlc_object_t *obj)
      || !interop->gl->surface->handle.anativewindow
      || !interop->vctx)
         return VLC_EGENERIC;
+
+    const char *extensions = interop->api->vt.GetString(GL_EXTENSIONS);
+    if (!vlc_gl_StrHasToken(extensions, "GL_OES_EGL_image_external"))
+    {
+        msg_Warn(&interop->obj, "GL_OES_EGL_image_external is not available,"
+                " disabling android interop.");
+        return VLC_EGENERIC;
+    }
 
     android_video_context_t *avctx =
         vlc_video_context_GetPrivate(interop->vctx, VLC_VIDEO_CONTEXT_AWINDOW);
