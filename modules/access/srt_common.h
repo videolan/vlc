@@ -39,6 +39,7 @@
 #define SRT_PARAM_CHUNK_SIZE                  "chunk-size"
 #define SRT_PARAM_POLL_TIMEOUT                "poll-timeout"
 #define SRT_PARAM_KEY_LENGTH                  "key-length"
+#define SRT_PARAM_STREAMID                    "streamid"
 
 
 #define SRT_DEFAULT_BANDWIDTH_OVERHEAD_LIMIT 25
@@ -68,6 +69,7 @@ typedef struct srt_params {
     int key_length;
     int payload_size;
     int bandwidth_overhead_limit;
+    const char* streamid;
 } srt_params_t;
 
 bool srt_parse_url(char* url, srt_params_t* params);

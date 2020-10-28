@@ -68,6 +68,8 @@ static bool srt_schedule_reconnect(sout_access_out_t *p_access)
     int i_payload_size = var_InheritInteger( p_access, SRT_PARAM_PAYLOAD_SIZE );
     char *psz_passphrase = var_InheritString( p_access, SRT_PARAM_PASSPHRASE );
     bool passphrase_needs_free = true;
+    char *psz_streamid = var_InheritString( p_access, SRT_PARAM_STREAMID );
+    bool streamid_needs_free = true;
     int i_max_bandwidth_limit =
     var_InheritInteger( p_access, SRT_PARAM_BANDWIDTH_OVERHEAD_LIMIT );
     char *url = NULL;
@@ -136,6 +138,11 @@ static bool srt_schedule_reconnect(sout_access_out_t *p_access)
                 passphrase_needs_free = false;
                 psz_passphrase = (char *) params.passphrase;
             }
+	    if (params.streamid != NULL) {
+                free( psz_streamid );
+                streamid_needs_free = false;
+                psz_streamid = (char *) params.streamid;
+            }
         }
     }
 
@@ -166,6 +173,12 @@ static bool srt_schedule_reconnect(sout_access_out_t *p_access)
 
         srt_set_socket_option( access_obj, SRT_PARAM_PASSPHRASE, p_sys->sock,
                 SRTO_PASSPHRASE, psz_passphrase, strlen(psz_passphrase) );
+    }
+
+    /* set streamid */
+    if (psz_streamid != NULL && psz_streamid[0] != '\0') {
+        srt_set_socket_option( access_obj, SRT_PARAM_STREAMID, p_sys->sock,
+                SRTO_STREAMID, psz_streamid, strlen(psz_streamid) );
     }
 
     /* set maximumu payload size */
@@ -204,6 +217,8 @@ out:
 
     if (passphrase_needs_free)
         free( psz_passphrase );
+    if (streamid_needs_free)
+        free( psz_streamid );
     free( psz_dst_addr );
     free( url );
     freeaddrinfo( res );
@@ -444,6 +459,9 @@ vlc_module_begin()
     add_integer( SRT_PARAM_KEY_LENGTH, SRT_DEFAULT_KEY_LENGTH, SRT_KEY_LENGTH_TEXT,
             SRT_KEY_LENGTH_TEXT, false )
     change_integer_list( srt_key_lengths, srt_key_length_names )
+    add_string(SRT_PARAM_STREAMID, "",
+            N_(" SRT Stream ID"), NULL, false)
+    change_safe()
 
     set_capability( "sout access", 0 )
     add_shortcut( "srt" )
