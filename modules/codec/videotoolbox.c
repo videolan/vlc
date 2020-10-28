@@ -119,6 +119,9 @@ typedef struct decoder_sys_t
     CFDictionaryRef             (*pf_copy_extradata)(decoder_t *);
     bool                        (*pf_fill_reorder_info)(decoder_t *, const block_t *,
                                                         frame_info_t *);
+    /* Configuration variables */
+    bool                        b_fallback_on_error;
+
     /* !Codec specific callbacks */
 
     bool                        b_vt_feed;
@@ -1398,6 +1401,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->i_pic_reorder_max = 4;
     p_sys->vtsession_status = VTSESSION_STATUS_OK;
     p_sys->b_cvpx_format_forced = false;
+    p_sys->b_fallback_on_error = var_InheritBool(p_dec, "videotoolbox-error-fallback");
 
     char *cvpx_chroma = var_InheritString(p_dec, "videotoolbox-cvpx-chroma");
     if (cvpx_chroma != NULL)
@@ -1775,8 +1779,7 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
                 *p_vtsession_status = VTSESSION_STATUS_RESTART;
                 break;
             case kVTVideoDecoderBadDataErr:
-                p_sys->error_counter++;
-                if (p_sys->error_counter == 3)
+                if (p_sys->b_fallback_on_error)
                     *p_vtsession_status = VTSESSION_STATUS_ABORT;
                 else
                     *p_vtsession_status = VTSESSION_STATUS_RESTART;
@@ -1891,7 +1894,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
         }
         else
         {
-            do_restart = p_sys->i_restart_count <= VT_RESTART_MAX;
+            do_restart = p_sys->i_restart_count <= VT_RESTART_MAX || !p_sys->b_fallback_on_error;
         }
 
         if (do_restart)
@@ -2638,6 +2641,11 @@ static void CloseEncoder(vlc_object_t *obj)
 
 #pragma mark - Module descriptor
 
+#define VT_FALLBACK_ERROR "Fallback on different decoders in case of decoder error"
+#define VT_FALLBACK_ERROR_LONG "Fallback on a different decoder in case of decoder error" \
+    " which could stall the decoder or crash the device. Disabling this option is not" \
+    " recommended unless you have specific data that you know to be playable with VT" \
+    " and want to play with HW decoding even if stream corruption happens."
 #define VT_REQUIRE_HW_DEC N_("Use Hardware decoders only")
 #define VT_FORCE_CVPX_CHROMA "Force the VideoToolbox output chroma"
 #define VT_FORCE_CVPX_CHROMA_LONG "Force the VideoToolbox decoder to output \
@@ -2671,6 +2679,7 @@ vlc_module_begin()
     set_capability("video decoder", 800)
     set_callbacks(OpenDecoder, CloseDecoder)
 
+    add_bool("videotoolbox-error-fallback", true, VT_FALLBACK_ERROR, VT_FALLBACK_ERROR_LONG, false)
     add_bool("videotoolbox-hw-decoder-only", true, VT_REQUIRE_HW_DEC, VT_REQUIRE_HW_DEC, false)
     add_string("videotoolbox-cvpx-chroma", "", VT_FORCE_CVPX_CHROMA, VT_FORCE_CVPX_CHROMA_LONG, true);
         change_string_list(chroma_list_values, chroma_list_names)
