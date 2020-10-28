@@ -32,8 +32,10 @@ Downloader::Downloader()
 {
     vlc_mutex_init(&lock);
     vlc_cond_init(&waitcond);
+    vlc_cond_init(&updatedcond);
     killed = false;
     thread_handle_valid = false;
+    current = NULL;
 }
 
 bool Downloader::start()
@@ -72,8 +74,14 @@ void Downloader::schedule(HTTPChunkBufferedSource *source)
 void Downloader::cancel(HTTPChunkBufferedSource *source)
 {
     vlc_mutex_lock(&lock);
-    source->release();
-    chunks.remove(source);
+    while (current == source)
+        vlc_cond_wait(&updatedcond, &lock);
+
+    if(!source->isDone())
+    {
+        chunks.remove(source);
+        source->release();
+    }
     vlc_mutex_unlock(&lock);
 }
 
@@ -82,12 +90,6 @@ void * Downloader::downloaderThread(void *opaque)
     Downloader *instance = static_cast<Downloader *>(opaque);
     instance->Run();
     return NULL;
-}
-
-void Downloader::DownloadSource(HTTPChunkBufferedSource *source)
-{
-    if(!source->isDone())
-        source->bufferize(HTTPChunkSource::CHUNK_SIZE);
 }
 
 void Downloader::Run()
@@ -101,16 +103,17 @@ void Downloader::Run()
         if(killed)
             break;
 
-        if(!chunks.empty())
+        current = chunks.front();
+        vlc_mutex_unlock(&lock);
+        current->bufferize(HTTPChunkSource::CHUNK_SIZE);
+        vlc_mutex_lock(&lock);
+        if(current->isDone())
         {
-            HTTPChunkBufferedSource *source = chunks.front();
-            DownloadSource(source);
-            if(source->isDone())
-            {
-                chunks.pop_front();
-                source->release();
-            }
+            chunks.pop_front();
+            current->release();
         }
+        current = NULL;
+        vlc_cond_signal(&updatedcond);
     }
     vlc_mutex_unlock(&lock);
 }
