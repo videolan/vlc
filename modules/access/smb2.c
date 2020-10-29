@@ -484,17 +484,32 @@ smb2_share_enum_cb(struct smb2_context *smb2, int status, void *data,
 }
 
 static int
-vlc_smb2_open_share(stream_t *access, const struct smb2_url *smb2_url,
+vlc_smb2_open_share(stream_t *access, const char *url,
                     const vlc_credential *credential)
 {
     struct access_sys *sys = access->p_sys;
+
+    struct smb2_url *smb2_url = NULL;
+
+    sys->smb2 = smb2_init_context();
+    if (sys->smb2 == NULL)
+    {
+        msg_Err(access, "smb2_init_context failed");
+        goto error;
+    }
+    smb2_url = smb2_parse_url(sys->smb2, url);
+
+    if (!smb2_url || !smb2_url->share || !smb2_url->server)
+    {
+        msg_Err(access, "smb2_parse_url failed");
+        goto error;
+    }
 
     const bool do_enum = smb2_url->share[0] == '\0';
     const char *username = credential->psz_username;
     const char *password = credential->psz_password;
     const char *domain = credential->psz_realm;
     const char *share = do_enum ? "IPC$" : smb2_url->share;
-
     if (!username)
     {
         username = "Guest";
@@ -502,6 +517,7 @@ vlc_smb2_open_share(stream_t *access, const struct smb2_url *smb2_url,
         password = NULL;
     }
 
+    smb2_set_security_mode(sys->smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
     smb2_set_password(sys->smb2, password);
     smb2_set_domain(sys->smb2, domain ? domain : "");
 
@@ -554,10 +570,18 @@ vlc_smb2_open_share(stream_t *access, const struct smb2_url *smb2_url,
 
     if (vlc_smb2_mainloop(access, false) != 0)
         goto error;
+    smb2_destroy_url(smb2_url);
     return 0;
 
 error:
-    vlc_smb2_disconnect_share(access);
+    if (smb2_url != NULL)
+        smb2_destroy_url(smb2_url);
+    if (sys->smb2 != NULL)
+    {
+        vlc_smb2_disconnect_share(access);
+        smb2_destroy_context(sys->smb2);
+        sys->smb2 = NULL;
+    }
     return -1;
 }
 
@@ -606,7 +630,6 @@ Open(vlc_object_t *p_obj)
 {
     stream_t *access = (stream_t *)p_obj;
     struct access_sys *sys = vlc_obj_calloc(p_obj, 1, sizeof (*sys));
-    struct smb2_url *smb2_url = NULL;
     char *var_domain = NULL;
 
     if (unlikely(sys == NULL))
@@ -617,20 +640,12 @@ Open(vlc_object_t *p_obj)
     if (vlc_UrlParseFixup(&sys->encoded_url, access->psz_url) != 0)
         return VLC_ENOMEM;
 
-    sys->smb2 = smb2_init_context();
-    if (sys->smb2 == NULL)
-    {
-        msg_Err(access, "smb2_init_context failed");
-        goto error;
-    }
-
-    smb2_set_security_mode(sys->smb2, SMB2_NEGOTIATE_SIGNING_ENABLED);
-
     if (sys->encoded_url.psz_path == NULL)
         sys->encoded_url.psz_path = (char *) "/";
 
     char *resolved_host = vlc_smb2_resolve(access, sys->encoded_url.psz_host,
                                            sys->encoded_url.i_port);
+    const char *host;
 
     /* smb2_* functions need a decoded url. Re compose the url from the
      * modified sys->encoded_url (with the resolved host). */
@@ -640,21 +655,17 @@ Open(vlc_object_t *p_obj)
         vlc_url_t resolved_url = sys->encoded_url;
         resolved_url.psz_host = resolved_host;
         url = vlc_uri_compose(&resolved_url);
-        free(resolved_host);
+        host = resolved_host;
     }
     else
+    {
         url = vlc_uri_compose(&sys->encoded_url);
+        host = sys->encoded_url.psz_host;
+    }
     if (!vlc_uri_decode(url))
     {
         free(url);
-        goto error;
-    }
-    smb2_url = smb2_parse_url(sys->smb2, url);
-    free(url);
-
-    if (!smb2_url || !smb2_url->share || !smb2_url->server)
-    {
-        msg_Err(access, "smb2_parse_url failed");
+        free(resolved_host);
         goto error;
     }
 
@@ -668,17 +679,19 @@ Open(vlc_object_t *p_obj)
      * keystore/user interaction) */
     vlc_credential_get(&credential, access, "smb-user", "smb-pwd", NULL,
                        NULL);
-    ret = vlc_smb2_open_share(access, smb2_url, &credential);
+    ret = vlc_smb2_open_share(access, url, &credential);
 
     while (ret == -1
         && (!sys->error_status || VLC_SMB2_STATUS_DENIED(sys->error_status))
         && vlc_credential_get(&credential, access, "smb-user", "smb-pwd",
                               SMB_LOGIN_DIALOG_TITLE, SMB_LOGIN_DIALOG_TEXT,
-                              smb2_url->server))
+                              host))
     {
         sys->error_status = 0;
-        ret = vlc_smb2_open_share(access, smb2_url, &credential);
+        ret = vlc_smb2_open_share(access, url, &credential);
     }
+    free(resolved_host);
+    free(url);
     if (ret == 0)
         vlc_credential_store(&credential, access);
     vlc_credential_clean(&credential);
@@ -720,18 +733,10 @@ Open(vlc_object_t *p_obj)
     else
         vlc_assert_unreachable();
 
-    smb2_destroy_url(smb2_url);
     free(var_domain);
     return VLC_SUCCESS;
 
 error:
-    if (smb2_url != NULL)
-        smb2_destroy_url(smb2_url);
-    if (sys->smb2 != NULL)
-    {
-        vlc_smb2_disconnect_share(access);
-        smb2_destroy_context(sys->smb2);
-    }
     vlc_UrlClean(&sys->encoded_url);
     free(var_domain);
 
