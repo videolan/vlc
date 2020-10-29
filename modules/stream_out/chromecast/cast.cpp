@@ -1415,7 +1415,16 @@ static int Open(vlc_object_t *p_this)
     var_SetInteger(p_stream, "http-port", i_local_server_port);
     var_Create(p_stream, "http-host", VLC_VAR_STRING);
     var_SetString(p_stream, "http-host", "");
+
+    /* Chromecast clients buffer lot of data (burst mode) and can wait more
+     * than 10 seconds between 2 consecutive I/O. Tell httpd that the
+     * timeout of this client should not be handled (infinite timeout) to
+     * avoid closing the client connection after 10 seconds without any
+     * socket activity */
+    var_Create(p_stream, "http-no-timeout", VLC_VAR_VOID);
+
     httpd_host = vlc_http_HostNew(VLC_OBJECT(p_stream));
+    var_Destroy(p_stream, "http-no-timeout");
     if (httpd_host == NULL)
         goto error;
 

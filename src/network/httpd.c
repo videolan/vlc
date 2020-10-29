@@ -93,6 +93,7 @@ struct httpd_host_t
     int         i_url;
     httpd_url_t **url;
 
+    bool           b_no_timeout;
     int            i_client;
     httpd_client_t **client;
 
@@ -946,6 +947,10 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
     vlc_mutex_init(&host->lock);
     vlc_cond_init(&host->wait);
     host->i_ref = 1;
+
+    host->b_no_timeout = var_Type(p_this, "http-no-timeout") != 0;
+    if (host->b_no_timeout)
+        msg_Warn(p_this, "httpd timeout disabled");
 
     char *hostname = var_InheritString(p_this, hostvar);
 
@@ -2031,6 +2036,8 @@ static void httpdLoop(httpd_host_t *host)
         }
 
         cl = httpd_ClientNew(sk, now);
+        if (host->b_no_timeout)
+            cl->i_activity_timeout = 0;
 
         if (host->p_tls != NULL)
             cl->i_state = HTTPD_CLIENT_TLS_HS_OUT;
