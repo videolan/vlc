@@ -34,7 +34,7 @@ libvout_macosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa
 
 libcaopengllayer_plugin_la_SOURCES = video_output/caopengllayer.m
-libcaopengllayer_plugin_la_CFLAGS = $(AM_CFLAGS)  -DHAVE_GL_CORE_SYMBOLS
+libcaopengllayer_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)  -DHAVE_GL_CORE_SYMBOLS
 libcaopengllayer_plugin_la_LIBADD = libvlc_opengl.la
 libcaopengllayer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,OpenGL,-framework,Cocoa,-framework,QuartzCore
