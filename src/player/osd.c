@@ -25,6 +25,7 @@
 #include <limits.h>
 
 #include <vlc_common.h>
+#include <vlc_memstream.h>
 #include "player.h"
 #include "input/resource.h"
 
@@ -197,6 +198,47 @@ vlc_player_osd_Track(vlc_player_t *player, vlc_es_id_t *id, bool select)
     assert(cat_name);
     const char *track_name = select ? track->name : _("N/A");
     vlc_player_osd_Message(player, _("%s track: %s"), cat_name, track_name);
+}
+
+void
+vlc_player_osd_Tracks(vlc_player_t *player, vlc_es_id_t * const *selected, vlc_es_id_t *unselect)
+{
+    if (!selected || !selected[0])
+        return;
+
+    const enum es_format_category_e cat = vlc_es_id_GetCat(selected[0]);
+    const char *cat_name = es_format_category_to_string(cat);
+    int tracks_count = 0;
+    struct vlc_memstream stream;
+    vlc_memstream_open(&stream);
+
+    for (size_t i = 0; selected[i] != NULL; i++)
+    {
+        if (unselect != NULL
+         && !strcmp(vlc_es_id_GetStrId(selected[i]), vlc_es_id_GetStrId(unselect)))
+            continue;
+
+        const struct vlc_player_track *track =
+            vlc_player_GetTrack(player, selected[i]);
+        if (track)
+        {
+            if (tracks_count != 0)
+                vlc_memstream_puts(&stream, ", ");
+            vlc_memstream_puts(&stream, track->name);
+            tracks_count++;
+        }
+    }
+    if (vlc_memstream_close(&stream) == 0 && tracks_count != 0)
+    {
+        if (tracks_count == 1)
+            vlc_player_osd_Message(player, _("%s track: %s"), cat_name,
+                                   stream.ptr);
+        else
+            vlc_player_osd_Message(player, _("%s tracks: %s"), cat_name,
+                                   stream.ptr);
+        free(stream.ptr);
+    } else if (tracks_count == 0)
+        vlc_player_osd_Message(player, _("%s track: %s"), cat_name, _("N/A"));
 }
 
 void

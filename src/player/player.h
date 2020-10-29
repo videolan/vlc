@@ -519,6 +519,9 @@ void
 vlc_player_osd_Track(vlc_player_t *player, vlc_es_id_t *id, bool select);
 
 void
+vlc_player_osd_Tracks(vlc_player_t *player, vlc_es_id_t * const*selected, vlc_es_id_t *unselect);
+
+void
 vlc_player_osd_Program(vlc_player_t *player, const char *name);
 
 /*
