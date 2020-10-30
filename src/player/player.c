@@ -31,6 +31,7 @@
 #include <vlc_tick.h>
 #include <vlc_decoder.h>
 #include <vlc_memstream.h>
+#include <vlc_http.h>
 
 #include "libvlc.h"
 #include "input/resource.h"
@@ -1911,6 +1912,13 @@ vlc_player_Delete(vlc_player_t *player)
     if (player->renderer)
         vlc_renderer_item_release(player->renderer);
 
+    vlc_http_cookie_jar_t *cookies = var_GetAddress(player, "http-cookies");
+    if (cookies != NULL)
+    {
+        var_Destroy(player, "http-cookies");
+        vlc_http_cookies_destroy(cookies);
+    }
+
     vlc_object_delete(player);
 }
 
@@ -1986,6 +1994,14 @@ vlc_player_New(vlc_object_t *parent, enum vlc_player_lock_type lock_type,
     VAR_CREATE("start-paused", VLC_VAR_BOOL);
     VAR_CREATE("play-and-pause", VLC_VAR_BOOL);
 
+    /* Initialize the shared HTTP cookie jar */
+    vlc_value_t cookies;
+    cookies.p_address = vlc_http_cookies_new();
+    if (likely(cookies.p_address != NULL))
+    {
+        VAR_CREATE("http-cookies", VLC_VAR_ADDRESS);
+        var_SetChecked(player, "http-cookies", VLC_VAR_ADDRESS, cookies);
+    }
 #undef VAR_CREATE
 
     player->resource = input_resource_New(VLC_OBJECT(player));
