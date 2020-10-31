@@ -107,44 +107,140 @@ static const struct filter_video_callbacks transcode_filter_video_cbs =
     transcode_video_filter_buffer_new, transcode_video_filter_hold_device,
 };
 
+static int transcode_video_filters_init( sout_stream_t *p_stream,
+                                         const sout_filters_config_t *p_cfg,
+                                         const es_format_t *p_src,
+                                         vlc_video_context *src_ctx,
+                                         const es_format_t *p_dst,
+                                         sout_stream_id_sys_t *id );
+
 static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vctx )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     sout_stream_id_sys_t *id = p_owner->id;
-    vlc_object_t        *p_obj = p_owner->p_obj;
-    filter_chain_t       *test_chain;
 
-    vlc_mutex_lock( &id->fifo.lock );
-
-    const es_format_t *p_enc_in = transcode_encoder_format_in( id->encoder );
-
-    if( p_enc_in->i_codec == p_dec->fmt_out.i_codec ||
-        video_format_IsSimilar( &id->decoder_out.video, &p_dec->fmt_out.video ) )
+    vlc_mutex_lock(&id->fifo.lock);
+    if( id->encoder != NULL && transcode_encoder_opened( id->encoder ) )
     {
-        vlc_mutex_unlock( &id->fifo.lock );
-        return 0;
+        if( video_format_IsSimilar( &p_dec->fmt_out.video, &id->decoder_out.video ) )
+        {
+            vlc_mutex_unlock(&id->fifo.lock);
+            goto end;
+        }
+
+        transcode_remove_filters( &id->p_final_conv_static );
+        transcode_remove_filters( &id->p_uf_chain );
+        transcode_remove_filters( &id->p_f_chain );
     }
+    else if( id->encoder == NULL )
+    {
+        struct encoder_owner *p_enc_owner =
+           (struct encoder_owner *)sout_EncoderCreate( VLC_OBJECT(p_owner->p_stream), sizeof(struct encoder_owner) );
+        if ( unlikely(p_enc_owner == NULL))
+            return VLC_EGENERIC;
+
+        id->encoder = transcode_encoder_new( &p_enc_owner->enc, &p_dec->fmt_out );
+        if( !id->encoder )
+        {
+            vlc_object_delete( &p_enc_owner->enc );
+            return VLC_EGENERIC;
+        }
+
+        p_enc_owner->id = id;
+        p_enc_owner->enc.cbs = &encoder_video_transcode_cbs;
+    }
+
 
     es_format_Clean( &id->decoder_out );
     es_format_Copy( &id->decoder_out, &p_dec->fmt_out );
-
     /* crap, decoders resetting the whole fmtout... */
     es_format_SetMeta( &id->decoder_out, &p_dec->fmt_in );
 
+    if( transcode_video_filters_init( p_owner->p_stream,
+                  id->p_filterscfg,
+                  &id->decoder_out,
+                  vctx,
+                  &id->decoder_out, id) != VLC_SUCCESS )
+    {
+        msg_Err(p_dec, "Could not update transcode chain to new format");
+        goto error;
+    }
+
+    struct vlc_video_context *enc_vctx = NULL;
+    const es_format_t *out_fmt;
+
+    if( id->p_uf_chain )
+    {
+        enc_vctx = filter_chain_GetVideoCtxOut( id->p_uf_chain );
+        out_fmt = filter_chain_GetFmtOut( id->p_uf_chain );
+    }
+    else if( id->p_f_chain )
+    {
+        enc_vctx = filter_chain_GetVideoCtxOut( id->p_f_chain );
+        out_fmt = filter_chain_GetFmtOut( id->p_f_chain );
+    }
+    else
+    {
+        enc_vctx = vctx; /* Decoder video context */
+        out_fmt = &id->decoder_out;
+    }
+
+    if( !transcode_encoder_opened( id->encoder ) )
+    {
+        transcode_encoder_video_configure( VLC_OBJECT(p_owner->p_stream),
+                   &id->p_decoder->fmt_out.video,
+                   id->p_enccfg,
+                   &out_fmt->video,
+                   enc_vctx,
+                   id->encoder);
+
+        if( transcode_encoder_open( id->encoder, id->p_enccfg ) != VLC_SUCCESS )
+            goto error;
+    }
+
+    const es_format_t *encoder_fmt = transcode_encoder_format_in( id->encoder );
+
+    if( !video_format_IsSimilar(&encoder_fmt->video, &out_fmt->video) )
+    {
+        filter_owner_t chain_owner = {
+           .video = &transcode_filter_video_cbs,
+           .sys = id,
+        };
+
+        if ( !id->p_final_conv_static )
+            id->p_final_conv_static =
+               filter_chain_NewVideo( p_owner->p_stream, false, &chain_owner );
+         filter_chain_Reset( id->p_final_conv_static,
+               out_fmt,
+               enc_vctx,
+               encoder_fmt);
+         if( filter_chain_AppendConverter( id->p_final_conv_static, NULL ) != VLC_SUCCESS )
+             goto error;
+    }
+    vlc_mutex_unlock(&id->fifo.lock);
+
+    if( !id->downstream_id )
+        id->downstream_id =
+            id->pf_transcode_downstream_add( p_owner->p_stream,
+                                             &id->p_decoder->fmt_in,
+                                             transcode_encoder_format_out( id->encoder ) );
+    msg_Info( p_dec, "video format update succeed" );
+
+end:
+    return VLC_SUCCESS;
+
+error:
+    transcode_remove_filters( &id->p_final_conv_static );
+
+    if( transcode_encoder_opened( id->encoder ) )
+        transcode_encoder_close( id->encoder );
+
+    transcode_remove_filters( &id->p_uf_chain );
+    transcode_remove_filters( &id->p_f_chain );
+
     vlc_mutex_unlock( &id->fifo.lock );
 
-    msg_Dbg( p_obj, "Checking if filter chain %4.4s -> %4.4s is possible",
-                 (char *)&p_dec->fmt_out.i_codec, (char*)&p_enc_in->i_codec );
-    test_chain = filter_chain_NewVideo( p_obj, false, NULL );
-    filter_chain_Reset( test_chain, &p_dec->fmt_out, vctx, p_enc_in );
-
-    int chain_works = filter_chain_AppendConverter( test_chain, p_enc_in );
-    filter_chain_Delete( test_chain );
-
-    msg_Dbg( p_obj, "Filter chain testing done, input chroma %4.4s seems to be %s for transcode",
-                     (char *)&p_dec->fmt_out.video.i_chroma,
-                     chain_works == 0 ? "possible" : "not possible");
-    return chain_works;
+    return VLC_EGENERIC;
 }
 
 static picture_t *video_new_buffer_encoder( transcode_encoder_t *p_enc )
@@ -216,52 +312,7 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
         es_format_Copy( &id->decoder_out, &id->p_decoder->fmt_out );
     }
 
-    /*
-     * Open encoder.
-     * Because some info about the decoded input will only be available
-     * once the first frame is decoded, we actually only test the availability
-     * of the encoder here.
-     */
-
-    /* Should be the same format until encoder loads */
-    es_format_t encoder_tested_fmt_in;
-    es_format_Init( &encoder_tested_fmt_in, id->decoder_out.i_cat, 0 );
-
-    struct encoder_owner *p_enc_owner = (struct encoder_owner*)sout_EncoderCreate(p_stream, sizeof(struct encoder_owner));
-    if ( unlikely(p_enc_owner == NULL))
-       goto error;
-
-    p_enc_owner->id = id;
-    p_enc_owner->enc.cbs = &encoder_video_transcode_cbs;
-
-    if( transcode_encoder_test( &p_enc_owner->enc,
-                                id->p_enccfg,
-                                &id->p_decoder->fmt_in,
-                                id->p_decoder->fmt_out.i_codec,
-                                &encoder_tested_fmt_in ) )
-       goto error;
-
-    p_enc_owner = (struct encoder_owner *)sout_EncoderCreate(p_stream, sizeof(struct encoder_owner));
-    if ( unlikely(p_enc_owner == NULL))
-       goto error;
-
-    id->encoder = transcode_encoder_new( &p_enc_owner->enc, &encoder_tested_fmt_in );
-    if( !id->encoder )
-       goto error;
-
-    p_enc_owner->id = id;
-    p_enc_owner->enc.cbs = &encoder_video_transcode_cbs;
-
-    es_format_Clean( &encoder_tested_fmt_in );
-
     return VLC_SUCCESS;
-
-error:
-    module_unneed( id->p_decoder, id->p_decoder->p_module );
-    id->p_decoder->p_module = NULL;
-    es_format_Clean( &encoder_tested_fmt_in );
-    es_format_Clean( &id->decoder_out );
-    return VLC_EGENERIC;
 }
 
 static inline bool transcode_video_filters_configured( const sout_stream_id_sys_t *id )
@@ -322,8 +373,8 @@ static int transcode_video_filters_init( sout_stream_t *p_stream,
         filter_chain_Reset( id->p_uf_chain, p_src, src_ctx, p_dst );
         filter_chain_AppendFromString( id->p_uf_chain, p_cfg->psz_filters );
         p_src = filter_chain_GetFmtOut( id->p_uf_chain );
-        debug_format( p_stream, p_src );
-    }
+        debug_format( VLC_OBJECT(p_stream), p_src );
+   }
 
     /* Update encoder so it matches filters output */
     transcode_encoder_update_format_in( id->encoder, p_src, id->p_enccfg );
@@ -460,123 +511,24 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     {
         picture_t *p_pic = vlc_picture_chain_PopFront( &p_pics );
 
+        assert( p_pic == NULL || (id->encoder != NULL && transcode_encoder_opened(id->encoder)));
+
         if( id->b_error && p_pic )
         {
             picture_Release( p_pic );
             continue;
         }
 
-        if( p_pic && ( unlikely(!transcode_encoder_opened(id->encoder)) ||
-              !video_format_IsSimilar( &id->decoder_out.video, &p_pic->format ) ) )
+        if( !id->downstream_id )
+            id->downstream_id =
+                id->pf_transcode_downstream_add( p_stream,
+                                                 &id->p_decoder->fmt_in,
+                                                 transcode_encoder_format_out( id->encoder ) );
+        if( !id->downstream_id )
         {
-            if( !transcode_encoder_opened(id->encoder) ) /* Configure Encoder input/output */
-            {
-                assert( !id->p_f_chain && !id->p_uf_chain );
-                transcode_encoder_video_configure( VLC_OBJECT(p_stream),
-                                                   &id->p_decoder->fmt_out.video,
-                                                   id->p_enccfg,
-                                                   &p_pic->format,
-                                                   picture_GetVideoContext(p_pic),
-                                                   id->encoder );
-                /* will be opened below */
-            }
-            else /* picture format has changed */
-            {
-                msg_Info( p_stream, "aspect-ratio changed, reiniting. %i -> %i : %i -> %i.",
-                            id->decoder_out.video.i_sar_num, p_pic->format.i_sar_num,
-                            id->decoder_out.video.i_sar_den, p_pic->format.i_sar_den
-                        );
-                /* Close filters, encoder format input can't change */
-                transcode_remove_filters( &id->p_f_chain );
-                transcode_remove_filters( &id->p_uf_chain );
-                transcode_remove_filters( &id->p_final_conv_static );
-                if( id->p_spu_blender )
-                    filter_DeleteBlend( id->p_spu_blender );
-                id->p_spu_blender = NULL;
-
-                video_format_Clean( &id->decoder_out.video );
-            }
-
-            video_format_Copy( &id->decoder_out.video, &p_pic->format );
-            transcode_video_framerate_apply( &p_pic->format, &id->decoder_out.video );
-            transcode_video_sar_apply( &p_pic->format, &id->decoder_out.video );
-
-            if( !transcode_video_filters_configured( id ) )
-            {
-                if( transcode_video_filters_init( p_stream,
-                                                  id->p_filterscfg,
-                                                 &id->decoder_out,
-                                                 picture_GetVideoContext(p_pic),
-                                                 transcode_encoder_format_in( id->encoder ),
-                                                 id ) != VLC_SUCCESS )
-                    goto error;
-            }
-
-            /* Store the current encoder input chroma to detect whether we need
-             * a converter in p_final_conv_static. The encoder will override it
-             * if it needs any different format or chroma. */
-            es_format_t filter_fmt_out;
-            es_format_Copy( &filter_fmt_out, transcode_encoder_format_in( id->encoder ) );
-            bool is_encoder_open = transcode_encoder_opened( id->encoder );
-
-            /* Start missing encoder */
-            if( !is_encoder_open &&
-                transcode_encoder_open( id->encoder, id->p_enccfg ) != VLC_SUCCESS )
-            {
-                msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s). "
-                                   "Take a look few lines earlier to see possible reason.",
-                                   id->p_enccfg->psz_name ? id->p_enccfg->psz_name : "any",
-                                   (char *)&id->p_enccfg->i_codec );
-                goto error;
-            }
-
-            /* The fmt_in may have been overridden by the encoder. */
-            const es_format_t *encoder_fmt_in = transcode_encoder_format_in( id->encoder );
-
-            /* check if we need to add a converter between last user filter and encoder. */
-            if( filter_fmt_out.i_codec != encoder_fmt_in->i_codec ||
-                id->decoder_out.video.i_width  != encoder_fmt_in->video.i_width ||
-                id->decoder_out.video.i_height != encoder_fmt_in->video.i_height ||
-                id->decoder_out.video.i_visible_width  != encoder_fmt_in->video.i_visible_width ||
-                id->decoder_out.video.i_visible_height != encoder_fmt_in->video.i_visible_height )
-            {
-                if ( !id->p_final_conv_static )
-                    id->p_final_conv_static =
-                        filter_chain_NewVideo( p_stream, false, NULL );
-
-                const es_format_t *p_fmt_filtered = &filter_fmt_out;
-                es_format_t tmpdst;
-                if ( id->p_filterscfg->video.b_reorient &&
-                    filter_fmt_out.video.orientation != ORIENT_NORMAL )
-                {
-                    es_format_Init( &tmpdst, VIDEO_ES, p_fmt_filtered->video.i_chroma );
-                    video_format_ApplyRotation( &tmpdst.video, &p_fmt_filtered->video );
-                    p_fmt_filtered = &tmpdst;
-                }
-
-                filter_chain_Reset( id->p_final_conv_static,
-                                    &id->decoder_out,
-                                    picture_GetVideoContext(p_pic),
-                                    encoder_fmt_in );
-                filter_chain_AppendConverter( id->p_final_conv_static, NULL );
-            }
-            es_format_Clean(&filter_fmt_out);
-
-            msg_Dbg( p_stream, "destination (after video filters) %ux%u",
-                               transcode_encoder_format_in( id->encoder )->video.i_width,
-                               transcode_encoder_format_in( id->encoder )->video.i_height );
-
-            if( !id->downstream_id )
-                id->downstream_id =
-                    id->pf_transcode_downstream_add( p_stream,
-                                                     &id->p_decoder->fmt_in,
-                                                     transcode_encoder_format_out( id->encoder ) );
-            if( !id->downstream_id )
-            {
-                msg_Err( p_stream, "cannot output transcoded stream %4.4s",
-                                   (char *) &id->p_enccfg->i_codec );
-                goto error;
-            }
+            msg_Err( p_stream, "cannot output transcoded stream %4.4s",
+                               (char *) &id->p_enccfg->i_codec );
+            goto error;
         }
 
         /* Run the filter and output chains; first with the picture,
