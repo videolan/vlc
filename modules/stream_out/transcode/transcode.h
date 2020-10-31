@@ -150,7 +150,7 @@ struct sout_stream_id_sys_t
 struct decoder_owner
 {
     decoder_t dec;
-    vlc_object_t *p_obj;
+    sout_stream_t *p_stream;
     sout_stream_id_sys_t *id;
 };
 
