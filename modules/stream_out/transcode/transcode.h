@@ -79,6 +79,8 @@ struct sout_stream_id_sys_t
                                           const es_format_t *orig,
                                           const es_format_t *current );
 
+    vlc_fifo_t *output_fifo;
+
     /* Decoder */
     decoder_t       *p_decoder;
 

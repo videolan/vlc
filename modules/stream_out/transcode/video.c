@@ -248,15 +248,31 @@ static picture_t *video_new_buffer_encoder( transcode_encoder_t *p_enc )
     return picture_NewFromFormat( &transcode_encoder_format_in( p_enc )->video );
 }
 
+static int transcode_process_picture( sout_stream_id_sys_t *id,
+                                      picture_t *p_pic, block_t **out);
+
 static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     sout_stream_id_sys_t *id = p_owner->id;
 
-    assert(!picture_HasChainedPics(p_pic));
-    vlc_mutex_lock(&id->fifo.lock);
-    vlc_picture_chain_Append( &id->fifo.pic, p_pic );
-    vlc_mutex_unlock(&id->fifo.lock);
+    block_t *p_block = NULL;
+    int ret = transcode_process_picture( id, p_pic, &p_block );
+
+    if( p_block == NULL )
+        return;
+
+    vlc_fifo_Lock( id->output_fifo );
+    id->b_error |= ret != VLC_SUCCESS;
+    if( id->b_error )
+    {
+        vlc_fifo_Unlock( id->output_fifo );
+        block_ChainRelease( p_block );
+        return;
+    }
+
+    vlc_fifo_QueueUnlocked( id->output_fifo, p_block );
+    vlc_fifo_Unlock( id->output_fifo );
 }
 
 static vlc_picture_chain_t transcode_dequeue_all_pics( sout_stream_id_sys_t *id )
@@ -277,6 +293,10 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
              (char*)&p_fmt->i_codec, (char*)&id->p_enccfg->i_codec );
 
     vlc_picture_chain_Init( &id->fifo.pic );
+    id->output_fifo = block_FifoNew();
+    if( id->output_fifo == NULL )
+        return VLC_ENOMEM;
+
     id->b_transcode = true;
     es_format_Init( &id->decoder_out, VIDEO_ES, 0 );
 
@@ -405,6 +425,8 @@ void transcode_video_clean( sout_stream_id_sys_t *id )
         spu_Destroy( id->p_spu );
     if ( id->dec_dev )
         vlc_decoder_device_Release( id->dec_dev );
+
+    block_FifoRelease(id->output_fifo);
 }
 
 void transcode_video_push_spu( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
@@ -489,6 +511,53 @@ static void tag_last_block_with_flag( block_t **out, int i_flag )
     }
 }
 
+static int transcode_process_picture( sout_stream_id_sys_t *id,
+                                      picture_t *p_pic, block_t **out)
+{
+    /* Run the filter and output chains; first with the picture,
+     * and then with NULL as many times as we need until they
+     * stop outputting frames.
+     */
+    for ( picture_t *p_in = p_pic ;; p_in = NULL /* drain second time */ )
+    {
+        /* Run filter chain */
+        if( id->p_f_chain )
+            p_in = filter_chain_VideoFilter( id->p_f_chain, p_in );
+
+        if( !p_in )
+            break;
+
+        for( ;; p_in = NULL /* drain second time */ )
+        {
+            /* Run user specified filter chain */
+            filter_chain_t * secondary_chains[] = { id->p_uf_chain,
+                                                    id->p_final_conv_static };
+            for( size_t i=0; i<ARRAY_SIZE(secondary_chains); i++ )
+            {
+                if( !secondary_chains[i] )
+                    continue;
+                p_in = filter_chain_VideoFilter( secondary_chains[i], p_in );
+            }
+
+            if( !p_in )
+                break;
+
+            /* Blend subpictures */
+            p_in = RenderSubpictures( id, p_in );
+
+            if( p_in )
+            {
+                /* If a packetizer is used, multiple blocks might be returned, in w */
+                block_t *p_encoded = transcode_encoder_encode( id->encoder, p_in );
+                picture_Release( p_in );
+                block_ChainAppend( out, p_encoded );
+            }
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+
 int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                                     block_t *in, block_t **out )
 {
@@ -500,101 +569,13 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     if( ret != VLCDEC_SUCCESS )
         return VLC_EGENERIC;
 
-    vlc_picture_chain_t p_pics = transcode_dequeue_all_pics( id );
-
-    while( !vlc_picture_chain_IsEmpty( &p_pics ) )
-    {
-        picture_t *p_pic = vlc_picture_chain_PopFront( &p_pics );
-
-        assert( p_pic == NULL || (id->encoder != NULL && transcode_encoder_opened(id->encoder)));
-
-        if( id->b_error && p_pic )
-        {
-            picture_Release( p_pic );
-            continue;
-        }
-
-        if( !id->downstream_id )
-            id->downstream_id =
-                id->pf_transcode_downstream_add( p_stream,
-                                                 &id->p_decoder->fmt_in,
-                                                 transcode_encoder_format_out( id->encoder ) );
-        if( !id->downstream_id )
-        {
-            msg_Err( p_stream, "cannot output transcoded stream %4.4s",
-                               (char *) &id->p_enccfg->i_codec );
-            goto error;
-        }
-
-        /* Run the filter and output chains; first with the picture,
-         * and then with NULL as many times as we need until they
-         * stop outputting frames.
-         */
-        for ( picture_t *p_in = p_pic; ; p_in = NULL /* drain second time */ )
-        {
-            /* Run filter chain */
-            if( id->p_f_chain )
-                p_in = filter_chain_VideoFilter( id->p_f_chain, p_in );
-
-            if( !p_in )
-                break;
-
-            for ( ;; p_in = NULL /* drain second time */ )
-            {
-                /* Run user specified filter chain */
-                filter_chain_t * secondary_chains[] = { id->p_uf_chain,
-                                                        id->p_final_conv_static };
-                for( size_t i=0; p_in && i<ARRAY_SIZE(secondary_chains); i++ )
-                {
-                    if( !secondary_chains[i] )
-                        continue;
-                    p_in = filter_chain_VideoFilter( secondary_chains[i], p_in );
-                }
-
-                if( !p_in )
-                    break;
-
-                /* Blend subpictures */
-                p_in = RenderSubpictures( id, p_in );
-
-                if( p_in )
-                {
-                    block_t *p_encoded = transcode_encoder_encode( id->encoder, p_in );
-                    if( p_encoded )
-                        block_ChainAppend( out, p_encoded );
-                    picture_Release( p_in );
-                }
-            }
-        }
-
-        if( b_eos )
-        {
-            msg_Info( p_stream, "Drain/restart on EOS" );
-            if( transcode_encoder_drain( id->encoder, out ) != VLC_SUCCESS )
-                goto error;
-            transcode_encoder_close( id->encoder );
-            /* Close filters */
-            transcode_remove_filters( &id->p_f_chain );
-            transcode_remove_filters( &id->p_uf_chain );
-            transcode_remove_filters( &id->p_final_conv_static );
-            tag_last_block_with_flag( out, BLOCK_FLAG_END_OF_SEQUENCE );
-            b_eos = false;
-        }
-
-        continue;
-error:
-        if( p_pic )
-            picture_Release( p_pic );
-        id->b_error = true;
-    }
-
-    if( id->p_enccfg->video.threads.i_count >= 1 )
-    {
-        /* Pick up any return data the encoder thread wants to output. */
-        block_ChainAppend( out, transcode_encoder_get_output_async( id->encoder ) );
-    }
+    /* Only drain if we drained the decoder too. */
+    if (in != NULL)
+        return VLC_SUCCESS;
 
     /* Drain encoder */
+    vlc_fifo_Lock( id->output_fifo );
+    assert(id->encoder);
     if( unlikely( !id->b_error && in == NULL ) && transcode_encoder_opened( id->encoder ) )
     {
         msg_Dbg( p_stream, "Flushing thread and waiting that");
@@ -603,9 +584,16 @@ error:
         else
             msg_Warn( p_stream, "Flushing failed");
     }
+    bool has_error = id->b_error;
+    if( !has_error )
+    {
+        vlc_frame_t *pendings = vlc_fifo_DequeueAllUnlocked( id->output_fifo );
+        block_ChainAppend(out, pendings);
+    }
+    vlc_fifo_Unlock( id->output_fifo );
 
     if( b_eos )
         tag_last_block_with_flag( out, BLOCK_FLAG_END_OF_SEQUENCE );
 
-    return id->b_error ? VLC_EGENERIC : VLC_SUCCESS;
+    return has_error ? VLC_EGENERIC : VLC_SUCCESS;
 }
