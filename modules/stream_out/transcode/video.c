@@ -90,11 +90,22 @@ static void debug_format( vlc_object_t *p_obj, const es_format_t *fmt )
              fmt->video.orientation );
 }
 
+static picture_t *transcode_video_filter_buffer_new( filter_t *p_filter )
+{
+    assert(p_filter->fmt_out.video.i_chroma == p_filter->fmt_out.i_codec);
+    return picture_NewFromFormat( &p_filter->fmt_out.video );
+}
+
 static vlc_decoder_device * transcode_video_filter_hold_device(vlc_object_t *o, void *sys)
 {
     sout_stream_id_sys_t *id = sys;
     return TranscodeHoldDecoderDevice(o, id);
 }
+
+static const struct filter_video_callbacks transcode_filter_video_cbs =
+{
+    transcode_video_filter_buffer_new, transcode_video_filter_hold_device,
+};
 
 static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vctx )
 {
@@ -139,12 +150,6 @@ static int video_update_format_decoder( decoder_t *p_dec, vlc_video_context *vct
 static picture_t *video_new_buffer_encoder( transcode_encoder_t *p_enc )
 {
     return picture_NewFromFormat( &transcode_encoder_format_in( p_enc )->video );
-}
-
-static picture_t *transcode_video_filter_buffer_new( filter_t *p_filter )
-{
-    assert(p_filter->fmt_out.video.i_chroma == p_filter->fmt_out.i_codec);
-    return picture_NewFromFormat( &p_filter->fmt_out.video );
 }
 
 static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
@@ -258,11 +263,6 @@ error:
     es_format_Clean( &id->decoder_out );
     return VLC_EGENERIC;
 }
-
-static const struct filter_video_callbacks transcode_filter_video_cbs =
-{
-    transcode_video_filter_buffer_new, transcode_video_filter_hold_device,
-};
 
 static inline bool transcode_video_filters_configured( const sout_stream_id_sys_t *id )
 {
