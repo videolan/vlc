@@ -315,11 +315,6 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     return VLC_SUCCESS;
 }
 
-static inline bool transcode_video_filters_configured( const sout_stream_id_sys_t *id )
-{
-    return !!id->p_f_chain;
-}
-
 static int transcode_video_filters_init( sout_stream_t *p_stream,
                                          const sout_filters_config_t *p_cfg,
                                          const es_format_t *p_src,
