@@ -242,9 +242,6 @@ int transcode_encoder_test( encoder_t *p_encoder,
 
     switch ( p_dec_fmtin->i_cat )
     {
-        case VIDEO_ES:
-            return transcode_encoder_video_test( p_encoder, p_cfg, p_dec_fmtin,
-                                                 i_codec_in, p_enc_wanted_in );
         case AUDIO_ES:
             return transcode_encoder_audio_test( p_encoder, p_cfg, p_dec_fmtin,
                                                  i_codec_in, p_enc_wanted_in );

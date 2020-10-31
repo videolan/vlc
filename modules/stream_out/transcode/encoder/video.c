@@ -295,58 +295,6 @@ void transcode_encoder_video_configure( vlc_object_t *p_obj,
              (const char *)&p_enc_in->i_chroma);
 }
 
-int transcode_encoder_video_test( encoder_t *p_encoder,
-                                  const transcode_encoder_config_t *p_cfg,
-                                  const es_format_t *p_dec_fmtin,
-                                  vlc_fourcc_t i_codec_in,
-                                  es_format_t *p_enc_wanted_in )
-{
-    p_encoder->i_threads = p_cfg->video.threads.i_count;
-    p_encoder->p_cfg = p_cfg->p_config_chain;
-    p_encoder->ops = NULL;
-
-    es_format_Init( &p_encoder->fmt_in, VIDEO_ES, i_codec_in );
-    es_format_Init( &p_encoder->fmt_out, VIDEO_ES, p_cfg->i_codec );
-
-    const video_format_t *p_dec_in = &p_dec_fmtin->video;
-    video_format_t *p_vfmt_in = &p_encoder->fmt_in.video;
-    video_format_t *p_vfmt_out = &p_encoder->fmt_out.video;
-
-    /* Requested output */
-    p_encoder->fmt_out.i_bitrate = p_cfg->video.i_bitrate;
-
-    /* The dimensions will be set properly later on.
-     * Just put sensible values so we can test an encoder is available. */
-    /* Input */
-    p_vfmt_in->i_chroma = i_codec_in;
-    transcode_video_size_config_apply(VLC_OBJECT(p_encoder), p_dec_in, p_cfg, p_vfmt_in);
-    p_vfmt_in->i_frame_rate = ENC_FRAMERATE;
-    p_vfmt_in->i_frame_rate_base = ENC_FRAMERATE_BASE;
-
-    p_vfmt_out->i_width  = p_vfmt_in->i_width & ~1;
-    p_vfmt_out->i_height = p_vfmt_in->i_height & ~1;
-
-    module_t *p_module = module_need( p_encoder, "video encoder", p_cfg->psz_name, true );
-    if( !p_module )
-    {
-        msg_Err( p_encoder, "cannot find video encoder (module:%s fourcc:%4.4s). "
-                           "Take a look few lines earlier to see possible reason.",
-                 p_cfg->psz_name ? p_cfg->psz_name : "any",
-                 (char *)&p_cfg->i_codec );
-    }
-
-    if( likely(!p_encoder->fmt_in.video.i_chroma) ) /* always missing, and required by filter chain */
-        p_encoder->fmt_in.video.i_chroma = p_encoder->fmt_in.i_codec;
-
-    /* output our requested format */
-    es_format_Copy( p_enc_wanted_in, &p_encoder->fmt_in );
-    video_format_FixRgb( &p_enc_wanted_in->video ); /* set masks when RGB */
-
-    vlc_encoder_Destroy(p_encoder);
-
-    return p_module != NULL ? VLC_SUCCESS : VLC_EGENERIC;
-}
-
 static void* EncoderThread( void *obj )
 {
     transcode_encoder_t *p_enc = obj;
