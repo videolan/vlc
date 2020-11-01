@@ -679,22 +679,18 @@ void PlaylistManager::Run()
 
         if(needsUpdate())
         {
-            int canc = vlc_savecancel();
             if(updatePlaylist())
                 scheduleNextUpdate();
             else
                 failedupdates++;
-            vlc_restorecancel(canc);
         }
 
         vlc_mutex_lock(&demux.lock);
         mtime_t i_nzpcr = demux.i_nzpcr;
         vlc_mutex_unlock(&demux.lock);
 
-        int canc = vlc_savecancel();
         AbstractStream::BufferingStatus i_return = bufferize(i_nzpcr, i_min_buffering,
                                                              i_max_buffering, i_target_buffering);
-        vlc_restorecancel( canc );
 
         if(i_return != AbstractStream::BufferingStatus::Lessthanmin)
         {
