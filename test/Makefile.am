@@ -46,6 +46,7 @@ check_PROGRAMS = \
 	test_modules_demux_timestamps_filter \
 	test_modules_demux_ts_pes \
 	test_modules_playlist_m3u \
+	test_modules_stream_out_transcode \
 	$(NULL)
 
 if ENABLE_SOUT
@@ -176,6 +177,12 @@ test_src_video_output_SOURCES = \
 test_src_video_output_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_video_output_opengl_SOURCES = src/video_output/opengl.c
 test_src_video_output_opengl_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
+test_modules_stream_out_transcode_SOURCES = \
+	modules/stream_out/transcode.c \
+	modules/stream_out/transcode.h \
+	modules/stream_out/transcode_scenarios.c
+test_modules_stream_out_transcode_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
