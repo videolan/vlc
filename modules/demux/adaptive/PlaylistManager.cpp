@@ -116,10 +116,8 @@ bool PlaylistManager::setupPeriod()
         return false;
 
     std::vector<BaseAdaptationSet*> sets = currentPeriod->getAdaptationSets();
-    std::vector<BaseAdaptationSet*>::iterator it;
-    for(it=sets.begin();it!=sets.end();++it)
+    for(BaseAdaptationSet *set : sets)
     {
-        BaseAdaptationSet *set = *it;
         if(set && streamFactory)
         {
             SegmentTracker *tracker = new SegmentTracker(resources, logic,
@@ -223,20 +221,19 @@ AbstractStream::buffering_status PlaylistManager::bufferize(vlc_tick_t i_nzdeadl
     /* First reorder by status >> buffering level */
     std::vector<PrioritizedAbstractStream> prioritized_streams(streams.size());
     std::vector<PrioritizedAbstractStream>::iterator it = prioritized_streams.begin();
-    std::vector<AbstractStream *>::iterator sit = streams.begin();
-    for( ; sit!=streams.end(); ++sit)
+    for(AbstractStream *stream : streams)
     {
         PrioritizedAbstractStream &p = *it;
-        p.st = *sit;
+        p.st = stream;
         p.status = p.st->getLastBufferStatus();
         p.demuxed_amount = p.st->getDemuxedAmount(i_nzdeadline);
         ++it;
     }
     std::sort(prioritized_streams.begin(), prioritized_streams.end(), streamCompare);
 
-    for(it=prioritized_streams.begin(); it!=prioritized_streams.end(); ++it)
+    for(PrioritizedAbstractStream &pst : prioritized_streams)
     {
-        AbstractStream *st = (*it).st;
+        AbstractStream *st = pst.st;
 
         if(!st->isValid())
             continue;
@@ -284,11 +281,8 @@ AbstractStream::status PlaylistManager::dequeue(vlc_tick_t i_floor, vlc_tick_t *
 
     const vlc_tick_t i_nzdeadline = *pi_nzbarrier;
 
-    std::vector<AbstractStream *>::iterator it;
-    for(it=streams.begin(); it!=streams.end(); ++it)
+    for(AbstractStream *st : streams)
     {
-        AbstractStream *st = *it;
-
         vlc_tick_t i_pcr;
         AbstractStream::status i_ret = st->dequeue(i_nzdeadline, &i_pcr);
         if( i_ret > i_return )
@@ -306,11 +300,8 @@ void PlaylistManager::drain()
     for(;;)
     {
         bool b_drained = true;
-        std::vector<AbstractStream *>::iterator it;
-        for(it=streams.begin(); it!=streams.end(); ++it)
+        for(AbstractStream *st : streams)
         {
-            AbstractStream *st = *it;
-
             if (!st->isValid() || st->isDisabled())
                 continue;
 
@@ -334,10 +325,9 @@ vlc_tick_t PlaylistManager::getResumeTime() const
 vlc_tick_t PlaylistManager::getFirstDTS() const
 {
     vlc_tick_t mindts = VLC_TICK_INVALID;
-    std::vector<AbstractStream *>::const_iterator it;
-    for(it=streams.begin(); it!=streams.end(); ++it)
+    for(const AbstractStream *stream : streams)
     {
-        const vlc_tick_t dts = (*it)->getFirstDTS();
+        const vlc_tick_t dts = stream->getFirstDTS();
         if(mindts == VLC_TICK_INVALID)
             mindts = dts;
         else if(dts != VLC_TICK_INVALID)
@@ -348,11 +338,11 @@ vlc_tick_t PlaylistManager::getFirstDTS() const
 
 unsigned PlaylistManager::getActiveStreamsCount() const
 {
+    // TODO improve
     unsigned count = 0;
-    std::vector<AbstractStream *>::const_iterator it;
-    for(it=streams.begin(); it!=streams.end(); ++it)
+    for(const AbstractStream* st : streams)
     {
-        if((*it)->isValid() && !(*it)->isDisabled())
+        if(st->isValid() && !st->isDisabled())
             count++;
     }
     return count;
@@ -365,10 +355,8 @@ bool PlaylistManager::setPosition(vlc_tick_t time)
     for(int real = 0; real < 2; real++)
     {
         /* Always probe if we can seek first */
-        std::vector<AbstractStream *>::iterator it;
-        for(it=streams.begin(); it!=streams.end(); ++it)
+        for(AbstractStream* st : streams)
         {
-            AbstractStream *st = *it;
             if(st->isValid() && !st->isDisabled())
             {
                 hasValidStream = true;
@@ -399,9 +387,8 @@ void PlaylistManager::scheduleNextUpdate()
 
 bool PlaylistManager::updatePlaylist()
 {
-    std::vector<AbstractStream *>::const_iterator it;
-    for(it=streams.begin(); it!=streams.end(); ++it)
-        (*it)->runUpdates();
+    for(AbstractStream* st : streams)
+        st->runUpdates();
 
     updateControlsPosition();
     return true;
@@ -700,10 +687,8 @@ void PlaylistManager::updateControlsPosition()
 
     vlc_tick_t rapPlaylistStart = 0;
     vlc_tick_t rapDemuxStart = 0;
-    std::vector<AbstractStream *>::iterator it;
-    for(it=streams.begin(); it!=streams.end(); ++it)
+    for(AbstractStream* st : streams)
     {
-        AbstractStream *st = *it;
         if(st->isValid() && !st->isDisabled() && st->isSelected())
         {
             if(st->getMediaPlaybackTimes(&cached.playlistStart, &cached.playlistEnd,
