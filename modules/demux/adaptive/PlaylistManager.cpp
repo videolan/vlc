@@ -704,9 +704,9 @@ void PlaylistManager::Run()
             else /*if(i_return == AbstractStream::BufferingStatus::suspended)*/
                 i_deadline += (CLOCK_FREQ / 4);
 
-            vlc_mutex_lock(&demux.lock);
+            // TODO: The current function doesn't seem to modify shared
+            //       state under demux lock.
             vlc_cond_signal(&demux.cond);
-            vlc_mutex_unlock(&demux.lock);
 
             while(b_buffering &&
                     vlc_cond_timedwait(&waitcond, &lock, i_deadline) == 0 &&
