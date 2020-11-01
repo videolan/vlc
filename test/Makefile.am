@@ -35,6 +35,7 @@ check_PROGRAMS = \
 	test_src_misc_bits \
 	test_src_misc_epg \
 	test_src_misc_keystore \
+	test_src_video_output \
 	test_modules_packetizer_helpers \
 	test_modules_packetizer_hxxx \
 	test_modules_packetizer_h264 \
@@ -77,7 +78,7 @@ check_HEADERS = libvlc/test.h libvlc/libvlc_additions.h
 TESTS = $(check_PROGRAMS) check_POTFILES.sh
 
 AM_CFLAGS = -DSRCDIR=\"$(srcdir)\"
-AM_LDFLAGS = -no-install
+AM_LDFLAGS = -no-install $(LDFLAGS_vlc)
 LIBVLCCORE = -L../src/ -lvlccore
 LIBVLC = -L../lib -lvlc
 
@@ -155,6 +156,12 @@ test_modules_demux_ts_pes_SOURCES = modules/demux/ts_pes.c \
 				../modules/demux/mpeg/ts_pes.h
 test_modules_stream_output_transcode_SOURCES = modules/stream_output/transcode.c
 test_modules_stream_output_transcode_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
+test_src_video_output_SOURCES = \
+	src/video_output/video_output.c \
+	src/video_output/video_output.h \
+	src/video_output/video_output_scenarios.c
+test_src_video_output_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
