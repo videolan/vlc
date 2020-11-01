@@ -51,6 +51,7 @@
 using namespace adaptive::http;
 using namespace adaptive::logic;
 using namespace adaptive;
+using vlc::threads::mutex_locker;
 
 PlaylistManager::PlaylistManager( demux_t *p_demux_,
                                   SharedResources *res,
@@ -75,8 +76,6 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
     demux.i_firstpcr = VLC_TICK_INVALID;
     vlc_mutex_init(&demux.lock);
     vlc_cond_init(&demux.cond);
-    vlc_mutex_init(&lock);
-    vlc_cond_init(&waitcond);
     vlc_mutex_init(&cached.lock);
     cached.b_live = false;
     cached.f_position = 0.0;
@@ -184,16 +183,17 @@ bool PlaylistManager::started() const
 
 void PlaylistManager::stop()
 {
-    if(b_thread)
-    {
-        vlc_mutex_lock(&lock);
-        b_canceled = true;
-        vlc_cond_signal(&waitcond);
-        vlc_mutex_unlock(&lock);
+    if(!b_thread)
+        return;
 
-        vlc_join(thread, NULL);
-        b_thread = false;
+    {
+        mutex_locker locker {lock};
+        b_canceled = true;
+        waitcond.signal();
     }
+
+    vlc_join(thread, NULL);
+    b_thread = false;
 }
 
 struct PrioritizedAbstractStream
@@ -626,21 +626,20 @@ int PlaylistManager::doControl(int i_query, va_list args)
 
 void PlaylistManager::setBufferingRunState(bool b)
 {
-    vlc_mutex_lock(&lock);
+    mutex_locker locker {lock};
     b_buffering = b;
-    vlc_cond_signal(&waitcond);
-    vlc_mutex_unlock(&lock);
+    waitcond.signal();
 }
 
 void PlaylistManager::Run()
 {
-    vlc_mutex_lock(&lock);
+    mutex_locker locker {lock};
     const vlc_tick_t i_min_buffering = bufferingLogic->getMinBuffering(playlist);
     const vlc_tick_t i_extra_buffering = bufferingLogic->getMaxBuffering(playlist) - i_min_buffering;
     while(1)
     {
         while(!b_buffering && !b_canceled)
-            vlc_cond_wait(&waitcond, &lock);
+            waitcond.wait(lock);
         if (b_canceled)
             break;
 
@@ -675,14 +674,13 @@ void PlaylistManager::Run()
             vlc_cond_signal(&demux.cond);
 
             while(b_buffering &&
-                    vlc_cond_timedwait(&waitcond, &lock, i_deadline) == 0 &&
+                    waitcond.timedwait(lock, i_deadline) == 0 &&
                     i_deadline > vlc_tick_now() &&
                     !b_canceled);
             if (b_canceled)
                 break;
         }
     }
-    vlc_mutex_unlock(&lock);
 }
 
 void * PlaylistManager::managerThread(void *opaque)

@@ -26,6 +26,8 @@
 #include "Streams.hpp"
 #include <vector>
 
+#include <vlc_cxx_helpers.hpp>
+
 namespace adaptive
 {
     namespace playlist
@@ -133,10 +135,10 @@ namespace adaptive
             void setBufferingRunState(bool);
             void Run();
             static void * managerThread(void *);
-            vlc_mutex_t  lock;
+            vlc::threads::mutex  lock;
+            vlc::threads::condition_variable waitcond;
             vlc_thread_t thread;
             bool         b_thread;
-            vlc_cond_t   waitcond;
             bool         b_buffering;
             bool         b_canceled;
     };
