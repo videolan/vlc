@@ -4,15 +4,15 @@
 #
 # Translators:
 # David Ó Laıġeanáın, 2015,2016
-# Seanán Ó Coistín <seananoc@gmail.com>, 2010,2016-2018
+# Seanán Ó Coistín <seananoc@gmail.com>, 2010,2016-2018,2020
 # Seán Ó Séaghdha <sean.anseo@gmail.com>, 2017-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-02-24 13:36+0100\n"
-"Last-Translator: Seán Ó Séaghdha <sean.anseo@gmail.com>, 2019\n"
+"PO-Revision-Date: 2020-11-01 22:09+0100\n"
+"Last-Translator: Seanán Ó Coistín <seananoc@gmail.com>, 2020\n"
 "Language-Team: Irish (https://www.transifex.com/yaron/teams/16553/ga/)\n"
 "Language: ga\n"
 "MIME-Version: 1.0\n"
@@ -10802,7 +10802,7 @@ msgstr ""
 
 #: modules/codec/fdkaac.c:73
 msgid "VBR Quality"
-msgstr ""
+msgstr "Cáilíocht VBR"
 
 #: modules/codec/fdkaac.c:74
 msgid ""
