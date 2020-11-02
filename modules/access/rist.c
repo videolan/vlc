@@ -35,10 +35,6 @@
 #include <vlc_block.h>
 #include <vlc_url.h>
 #include <poll.h>
-#include <bitstream/ietf/rtcp_rr.h>
-#include <bitstream/ietf/rtcp_sdes.h>
-#include <bitstream/ietf/rtcp_fb.h>
-#include <bitstream/ietf/rtp.h>
 
 #include "rist.h"
 
