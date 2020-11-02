@@ -1456,33 +1456,30 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
     {
         KaxFileData  &img_data     = GetChild<KaxFileData>( *attachedFile );
         std::string attached_filename( UTFstring( GetChild<KaxFileName>( *attachedFile ) ).GetUTF8() );
-        attachment_c *new_attachment = new attachment_c( attached_filename,
-                                                         GetChild<KaxMimeType>( *attachedFile ),
-                                                         img_data.GetSize() );
+        auto new_attachment = vlc_input_attachment_New( attached_filename.c_str(),
+                                                        GetChild<KaxMimeType>( *attachedFile ).GetValue().c_str(),
+                                                        nullptr,
+                                                        img_data.GetBuffer(),
+                                                        img_data.GetSize() );
+        if (!new_attachment)
+            continue;
+        msg_Dbg( &sys.demuxer, "|   |   - %s (%s)", new_attachment->psz_name,
+                 new_attachment->psz_mime );
 
-        msg_Dbg( &sys.demuxer, "|   |   - %s (%s)", new_attachment->fileName(), new_attachment->mimeType() );
-
-        if( new_attachment->init() )
+        if( !strncmp( new_attachment->psz_mime, "image/", 6 ) )
         {
-            memcpy( new_attachment->p_data, img_data.GetBuffer(), img_data.GetSize() );
-            sys.stored_attachments.push_back( new_attachment );
-            if( !strncmp( new_attachment->mimeType(), "image/", 6 ) )
+            char *psz_url;
+            if( asprintf( &psz_url, "attachment://%s",
+                          new_attachment->psz_name ) >= 0 )
             {
-                char *psz_url;
-                if( asprintf( &psz_url, "attachment://%s",
-                              new_attachment->fileName() ) == -1 )
-                    continue;
                 if( !sys.meta )
                     sys.meta = vlc_meta_New();
                 vlc_meta_SetArtURL( sys.meta, psz_url );
                 free( psz_url );
             }
         }
-        else
-        {
-            delete new_attachment;
-        }
-
+        sys.stored_attachments.push_back( vlc::wrap_cptr( new_attachment,
+                                                          &vlc_input_attachment_Release ) );
         attachedFile = &GetNextChild<KaxAttached>( *attachments, *attachedFile );
     }
 }

@@ -340,14 +340,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_ENOMEM;
             for( size_t i = 0; i < p_sys->stored_attachments.size(); i++ )
             {
-                attachment_c *a = p_sys->stored_attachments[i];
-                (*ppp_attach)[i] = vlc_input_attachment_New( a->fileName(), a->mimeType(), NULL,
-                                                             a->p_data, a->size() );
-                if( !(*ppp_attach)[i] )
-                {
-                    free(*ppp_attach);
-                    return VLC_ENOMEM;
-                }
+                (*ppp_attach)[i] = vlc_input_attachment_Hold( p_sys->stored_attachments[i].get() );
             }
             return VLC_SUCCESS;
 

@@ -31,6 +31,8 @@
 #include "dvd_types.hpp"
 #include "events.hpp"
 
+#include <memory>
+
 namespace mkv {
 
 class virtual_segment_c;
@@ -80,7 +82,8 @@ public:
     unsigned                         i_updates;
 
     std::vector<matroska_stream_c*>  streams;
-    std::vector<attachment_c*>       stored_attachments;
+    std::vector<std::unique_ptr<input_attachment_t,
+                    void(*)(input_attachment_t*)>> stored_attachments;
     std::vector<matroska_segment_c*> opened_segments;
     std::vector<virtual_segment_c*>  used_vsegments;
     virtual_segment_c                *p_current_vsegment;

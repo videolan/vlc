@@ -39,8 +39,6 @@ demux_sys_t::~demux_sys_t()
         delete opened_segments[i];
     for ( i=0; i<used_vsegments.size(); i++ )
         delete used_vsegments[i];
-    for ( i=0; i<stored_attachments.size(); i++ )
-        delete stored_attachments[i];
     if( meta ) vlc_meta_Delete( meta );
 
     while( titles.size() )
