@@ -339,7 +339,6 @@ function parse()
             if string.match( line, "<meta property=\"og:title\"" ) then
                 _,_,name = string.find( line, "content=\"(.-)\"" )
                 name = vlc.strings.resolve_xml_special_chars( name )
-                name = vlc.strings.resolve_xml_special_chars( name )
             end
 
             if not description then
