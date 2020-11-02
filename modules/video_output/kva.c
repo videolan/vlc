@@ -871,7 +871,7 @@ static void MousePressed( vout_display_t *vd, HWND hwnd, unsigned button )
 
     vd->sys->button_pressed |= 1 << button;
 
-    vout_display_SendEventMousePressed( vd, button );
+    vout_window_ReportMousePressed( vd->cfg->window, button );
 }
 
 static void MouseReleased( vout_display_t *vd, unsigned button )
@@ -880,7 +880,7 @@ static void MouseReleased( vout_display_t *vd, unsigned button )
     if( !vd->sys->button_pressed )
         WinSetCapture( HWND_DESKTOP, NULLHANDLE );
 
-    vout_display_SendEventMouseReleased( vd, button );
+    vout_window_ReportMouseReleased( vd->cfg->window, button );
 }
 
 #define WM_MOUSELEAVE   0x41F
@@ -940,7 +940,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             /* Invert Y coordinate and add y offset */
             y = ( place.height - y ) + place.y;
 
-            vout_display_SendMouseMovedDisplayCoordinates( vd, x, y );
+            vout_window_ReportMouseMoved( vd->cfg->window, x, y );
 
             result = WinDefWindowProc( hwnd, msg, mp1,mp2 );
             break;
@@ -971,7 +971,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             break;
 
         case WM_BUTTON1DBLCLK :
-            vout_display_SendEventMouseDoubleClick(vd);
+            vout_window_ReportMouseDoubleClick( vd->cfg->window, MOUSE_BUTTON_LEFT );
             break;
 
         case WM_TRANSLATEACCEL :
