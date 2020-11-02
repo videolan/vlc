@@ -96,7 +96,6 @@ struct vout_display_sys_t
     bool               b_fixt23;
     PFNWP              p_old_frame;
     RECTL              client_rect;
-    vout_window_t     *parent_window;
     HWND               parent;
     unsigned           button_pressed;
     bool               is_mouse_hidden;
@@ -187,15 +186,10 @@ static void PMThread( void *arg )
                       CS_SIZEREDRAW | CS_MOVENOTIFY,
                       sizeof( PVOID ));
 
-    sys->b_fixt23 = var_CreateGetBool( vd, "kva-fixt23");
-
-    if( !sys->b_fixt23 && vd->cfg->window->type == VOUT_WINDOW_TYPE_HWND )
-        /* If an external window was specified, we'll draw in it. */
-        sys->parent_window = vd->cfg->window;
-
     if( !sys->b_fixt23 )
     {
-        sys->parent = ( HWND )sys->parent_window->handle.hwnd;
+        /* If an external window was specified, we'll draw in it. */
+        sys->parent = ( HWND )vd->cfg->window->handle.hwnd;
 
         ULONG i_style = WinQueryWindowULong( sys->parent, QWL_STYLE );
         WinSetWindowULong( sys->parent, QWL_STYLE,
@@ -335,6 +329,14 @@ static int Open ( vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->sys = sys = calloc( 1, sizeof( *sys ));
     if( !sys )
         return VLC_ENOMEM;
+
+    sys->b_fixt23 = var_CreateGetBool( vd, "kva-fixt23");
+
+    if( !sys->b_fixt23 && cfg->window->type != VOUT_WINDOW_TYPE_HWND )
+    {
+        free( sys );
+        return VLC_EBADVAR;
+    }
 
     DosCreateEventSem( NULL, &sys->ack_event, 0, FALSE );
 
