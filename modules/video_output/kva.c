@@ -193,7 +193,7 @@ static void PMThread( void *arg )
         /* If an external window was specified, we'll draw in it. */
         sys->parent_window = vd->cfg->window;
 
-    if( sys->parent_window )
+    if( !sys->b_fixt23 )
     {
         sys->parent = ( HWND )sys->parent_window->handle.hwnd;
 
@@ -231,7 +231,7 @@ static void PMThread( void *arg )
 
     WinSetWindowPtr( sys->client, 0, vd );
 
-    if( !sys->parent_window )
+    if( sys->b_fixt23 )
     {
         WinSetWindowPtr( sys->frame, 0, vd );
         sys->p_old_frame = WinSubclassWindow( sys->frame, MyFrameWndProc );
@@ -283,13 +283,13 @@ static void PMThread( void *arg )
     sys->i_result = VLC_SUCCESS;
     DosPostEventSem( sys->ack_event );
 
-    if( !sys->parent_window )
+    if( sys->b_fixt23 )
         WinSetVisibleRegionNotify( sys->frame, TRUE );
 
     while( WinGetMsg( sys->hab, &qm, NULLHANDLE, 0, 0 ))
         WinDispatchMsg( sys->hab, &qm );
 
-    if( !sys->parent_window )
+    if( sys->b_fixt23 )
         WinSetVisibleRegionNotify( sys->frame, FALSE );
 
     kvaEnableScreenSaver();
@@ -302,7 +302,7 @@ exit_open_display :
     kvaDone();
 
 exit_kva_init :
-    if( !sys->parent_window )
+    if( sys->b_fixt23 )
         WinSubclassWindow( sys->frame, sys->p_old_frame );
 
     WinDestroyWindow( sys->frame );
@@ -597,7 +597,7 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     sys->i_screen_width  = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
     sys->i_screen_height = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
 
-    if( sys->parent_window )
+    if( !sys->b_fixt23 )
         WinQueryWindowRect( sys->parent, &sys->client_rect );
     else
     {
@@ -985,7 +985,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             int    i_key   = 0;
 
             /* If embedded window, let the parent process keys */
-            if( sys->parent_window )
+            if( !sys->b_fixt23 )
             {
                 WinPostMsg( sys->parent, msg, mp1, mp2 );
                 break;
@@ -1093,7 +1093,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
 
     /* If embedded window, we need to change our window size according to a
      * parent window size */
-    if( sys->parent_window )
+    if( !sys->b_fixt23 )
     {
         RECTL rect;
 
