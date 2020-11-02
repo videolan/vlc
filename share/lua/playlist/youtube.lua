@@ -321,7 +321,7 @@ function parse()
             -- The next line is the major configuration line that we need.
             -- It is very long and readline() is likely to fail on it due
             -- to #24957, so we need this instead.
-            if string.match( line, '<div id="player%-api">' ) then
+            if string.match( line, '^ *<div id="player%-api">' ) then
                 if not vlc.peek( 1 ) then break end
                 local eol
                 local pos = 0
