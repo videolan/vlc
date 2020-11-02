@@ -222,7 +222,7 @@ static void process_nack(sout_access_out_t *p_access, uint8_t  ptype, uint16_t n
     if (ptype == RTCP_PT_RTPFR)
     {
         uint8_t pi_ssrc[4];
-        rtcp_fb_get_ssrc_media_src(pkt, pi_ssrc);
+        rist_rtcp_fb_get_ssrc_media_src(pkt, pi_ssrc);
         if (memcmp(pi_ssrc, "RIST", 4) != 0)
         {
             msg_Info(p_access, "   Ignoring Nack with name %s", pi_ssrc);
@@ -244,14 +244,14 @@ static void process_nack(sout_access_out_t *p_access, uint8_t  ptype, uint16_t n
             vlc_mutex_unlock( &p_sys->lock );
         }
     }
-    else if (ptype == RTCP_PT_RTPFB)
+    else if (ptype == RIST_RTCP_PT_RTPFB)
     {
         for (i = 0; i < (nrecords-2); i++) {
             uint16_t missing;
             uint16_t bitmask;
             uint8_t *rtp_nack_record = (pkt + 12 + i * 4);
-            missing = rtcp_fb_nack_get_packet_id(rtp_nack_record);
-            bitmask = rtcp_fb_nack_get_bitmask_lost(rtp_nack_record);
+            missing = rist_rtcp_fb_nack_get_packet_id(rtp_nack_record);
+            bitmask = rist_rtcp_fb_nack_get_bitmask_lost(rtp_nack_record);
             /*msg_Info(p_access, "  Nack (Bitmask), %d, current seq is: [%d]", missing, flow->wi);*/
             vlc_mutex_lock( &p_sys->lock );
             rist_retransmit(p_access, flow, missing);
@@ -266,7 +266,7 @@ static void process_nack(sout_access_out_t *p_access, uint8_t  ptype, uint16_t n
     else
     {
         msg_Err(p_access, "   !!! Wrong feedback. Ptype is %02x!=%02x, FMT: %02x", ptype, 
-            RTCP_PT_RTPFR, rtcp_fb_get_fmt(pkt));
+            RTCP_PT_RTPFR, rist_rtcp_fb_get_fmt(pkt));
     }
 }
 
@@ -290,43 +290,43 @@ static void rist_rtcp_recv(sout_access_out_t *p_access, struct rist_flow *flow, 
                 bytes_left);
             return; 
         }
-        else if (!rtp_check_hdr(pkt))
+        else if (!rist_rtp_check_hdr(pkt))
         {
             /* check for a valid rtp header */
             msg_Err(p_access, "Malformed feedback packet starting with %02x, ignoring.", pkt[0]);
             return;
         }
 
-        ptype =  rtcp_get_pt(pkt);
-        records = rtcp_get_length(pkt);
+        ptype =  rist_rtcp_get_pt(pkt);
+        records = rist_rtcp_get_length(pkt);
         uint16_t bytes = (uint16_t)(4 * (1 + records));
         if (bytes > bytes_left)
         {
             /* check for a sane number of bytes */
             msg_Err(p_access, "Malformed feedback packet, wrong len %d, expecting %u bytes in the" \
-                " packet, got a buffer of %u bytes. ptype = %d", rtcp_get_length(pkt), bytes, 
+                " packet, got a buffer of %u bytes. ptype = %d", rist_rtcp_get_length(pkt), bytes, 
                 bytes_left, ptype);
             return;
         }
 
         switch(ptype) {
             case RTCP_PT_RTPFR:
-            case RTCP_PT_RTPFB:
+            case RIST_RTCP_PT_RTPFB:
                 process_nack(p_access, ptype, records, flow, pkt);
                 break;
 
-            case RTCP_PT_RR:
+            case RIST_RTCP_PT_RR:
                 /*
                 if (p_sys->b_ismulticast == false)
                     process_rr(f, pkt, len);
                 */
                 break;
 
-            case RTCP_PT_SDES:
+            case RIST_RTCP_PT_SDES:
                 {
                     if (p_sys->b_ismulticast == false)
                     {
-                        int8_t name_length = rtcp_sdes_get_name_length(pkt);
+                        int8_t name_length = rist_rtcp_sdes_get_name_length(pkt);
                         if (name_length > bytes_left)
                         {
                             /* check for a sane number of bytes */
@@ -334,16 +334,16 @@ static void rist_rtcp_recv(sout_access_out_t *p_access, struct rist_flow *flow, 
                                 "buffer of %u bytes.", name_length, bytes_left);
                             return;
                         }
-                        if (memcmp(pkt + RTCP_SDES_SIZE, p_sys->receiver_name, name_length) != 0)
+                        if (memcmp(pkt + RIST_RTCP_SDES_SIZE, p_sys->receiver_name, name_length) != 0)
                         {
-                            memcpy(p_sys->receiver_name, pkt + RTCP_SDES_SIZE, name_length);
+                            memcpy(p_sys->receiver_name, pkt + RIST_RTCP_SDES_SIZE, name_length);
                             msg_Info(p_access, "Receiver name: %s", p_sys->receiver_name);
                         }
                     }
                 }
                 break;
 
-            case RTCP_PT_SR:
+            case RIST_RTCP_PT_SR:
                 break;
 
             default:
@@ -357,7 +357,7 @@ static void rist_rtcp_send(sout_access_out_t *p_access)
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     struct rist_flow *flow = p_sys->flow;
-    uint8_t rtcp_buf[RTCP_SR_SIZE + RTCP_SDES_SIZE + MAX_CNAME] = { };
+    uint8_t rtcp_buf[RIST_RTCP_SR_SIZE + RIST_RTCP_SDES_SIZE + MAX_CNAME] = { };
     struct timeval tv;
     int r;
     uint64_t fractions;
@@ -366,37 +366,37 @@ static void rist_rtcp_send(sout_access_out_t *p_access)
 
     /* Populate SR for sender report */
     uint8_t *p_sr = rtcp_buf;
-    rtp_set_hdr(p_sr);
-    rtcp_sr_set_pt(p_sr);
-    rtcp_sr_set_length(p_sr, 6);
-    rtcp_fb_set_int_ssrc_pkt_sender(p_sr, p_sys->ssrc);
-    rtcp_sr_set_ntp_time_msw(p_sr, tv.tv_sec + SEVENTY_YEARS_OFFSET);
+    rist_rtp_set_hdr(p_sr);
+    rist_rtcp_sr_set_pt(p_sr);
+    rist_rtcp_sr_set_length(p_sr, 6);
+    rist_rtcp_fb_set_int_ssrc_pkt_sender(p_sr, p_sys->ssrc);
+    rist_rtcp_sr_set_ntp_time_msw(p_sr, tv.tv_sec + SEVENTY_YEARS_OFFSET);
     fractions = (uint64_t)tv.tv_usec;
     fractions <<= 32ULL;
     fractions /= 1000000ULL;
-    rtcp_sr_set_ntp_time_lsw(p_sr, (uint32_t)fractions);
-    rtcp_sr_set_rtp_time(p_sr, rtp_get_ts(mdate()));
+    rist_rtcp_sr_set_ntp_time_lsw(p_sr, (uint32_t)fractions);
+    rist_rtcp_sr_set_rtp_time(p_sr, rtp_get_ts(mdate()));
     vlc_mutex_lock( &p_sys->lock );
-    rtcp_sr_set_packet_count(p_sr, flow->packets_count);
-    rtcp_sr_set_octet_count(p_sr, flow->bytes_count);
+    rist_rtcp_sr_set_packet_count(p_sr, flow->packets_count);
+    rist_rtcp_sr_set_octet_count(p_sr, flow->bytes_count);
     vlc_mutex_unlock( &p_sys->lock );
 
     /* Populate SDES for sender description */
-    uint8_t *p_sdes = (rtcp_buf + RTCP_SR_SIZE);
+    uint8_t *p_sdes = (rtcp_buf + RIST_RTCP_SR_SIZE);
     /* we need to make sure it is a multiple of 4, pad if necessary */
     if ((namelen - 2) & 0x3)
         namelen = ((((namelen - 2) >> 2) + 1) << 2) + 2;
-    rtp_set_hdr(p_sdes);
-    rtp_set_cc(p_sdes, 1); /* Actually it is source count in this case */
-    rtcp_sdes_set_pt(p_sdes);
-    rtcp_set_length(p_sdes, (namelen >> 2) + 2);
-    rtcp_sdes_set_cname(p_sdes, 1);
-    rtcp_sdes_set_name_length(p_sdes, strlen(flow->cname));
-    p_sdes += RTCP_SDES_SIZE;
+    rist_rtp_set_hdr(p_sdes);
+    rist_rtp_set_cc(p_sdes, 1); /* Actually it is source count in this case */
+    rist_rtcp_sdes_set_pt(p_sdes);
+    rist_rtcp_set_length(p_sdes, (namelen >> 2) + 2);
+    rist_rtcp_sdes_set_cname(p_sdes, 1);
+    rist_rtcp_sdes_set_name_length(p_sdes, strlen(flow->cname));
+    p_sdes += RIST_RTCP_SDES_SIZE;
     strlcpy((char *)p_sdes, flow->cname, namelen);
 
     /* Send the rtcp message */
-    r = send(flow->fd_rtcp, rtcp_buf, RTCP_SR_SIZE + RTCP_SDES_SIZE + namelen, 0);
+    r = send(flow->fd_rtcp, rtcp_buf, RIST_RTCP_SR_SIZE + RIST_RTCP_SDES_SIZE + namelen, 0);
     (void)r;
 }
 
@@ -494,8 +494,8 @@ static void* ThreadSend( void *data )
         len = out->i_buffer;
         int canc = vlc_savecancel();
 
-        seq = rtp_get_seqnum(out->p_buffer);
-        pkt_ts = rtp_get_timestamp(out->p_buffer);
+        seq = rist_rtp_get_seqnum(out->p_buffer);
+        pkt_ts = rist_rtp_get_timestamp(out->p_buffer);
 
         vlc_mutex_lock( &p_sys->fd_lock );
 #ifdef TEST_PACKET_LOSS
@@ -575,12 +575,12 @@ static void SendtoFIFO( sout_access_out_t *p_access, block_t *buffer )
 
     /* Set fresh rtp header data */
     uint8_t *bufhdr = buffer->p_buffer;
-    rtp_set_hdr(bufhdr);
-    rtp_set_type(bufhdr, MPEG_II_TRANSPORT_STREAM);
-    rtp_set_seqnum(bufhdr, seq);
-    rtp_set_int_ssrc(bufhdr, p_sys->ssrc);
+    rist_rtp_set_hdr(bufhdr);
+    rist_rtp_set_type(bufhdr, MPEG_II_TRANSPORT_STREAM);
+    rist_rtp_set_seqnum(bufhdr, seq);
+    rist_rtp_set_int_ssrc(bufhdr, p_sys->ssrc);
     uint32_t pkt_ts = rtp_get_ts(buffer->i_dts);
-    rtp_set_timestamp(bufhdr, pkt_ts);
+    rist_rtp_set_timestamp(bufhdr, pkt_ts);
 
     block_t *pkt = block_Duplicate(buffer);
     block_FifoPut( p_sys->p_fifo, pkt );
@@ -608,7 +608,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
         if( p_sys->p_pktbuffer->i_buffer + p_buffer->i_buffer > p_sys->i_packet_size )
         {
             SendtoFIFO(p_access, p_sys->p_pktbuffer);
-            p_sys->p_pktbuffer->i_buffer = RTP_HEADER_SIZE;
+            p_sys->p_pktbuffer->i_buffer = RIST_RTP_HEADER_SIZE;
         }
 
         i_len += p_buffer->i_buffer;
@@ -620,7 +620,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
             i_block_split++;
 
-            if( p_sys->p_pktbuffer->i_buffer == RTP_HEADER_SIZE )
+            if( p_sys->p_pktbuffer->i_buffer == RIST_RTP_HEADER_SIZE )
             {
                 p_sys->p_pktbuffer->i_dts = p_buffer->i_dts;
             }
@@ -638,7 +638,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             if( p_sys->p_pktbuffer->i_buffer == p_sys->i_packet_size || i_block_split > 1 )
             {
                 SendtoFIFO(p_access, p_sys->p_pktbuffer);
-                p_sys->p_pktbuffer->i_buffer = RTP_HEADER_SIZE;
+                p_sys->p_pktbuffer->i_buffer = RIST_RTP_HEADER_SIZE;
             }
 
         }
@@ -792,7 +792,7 @@ static int Open( vlc_object_t *p_this )
     if( unlikely(p_sys->p_pktbuffer == NULL) )
         goto failed;
 
-    p_sys->p_pktbuffer->i_buffer = RTP_HEADER_SIZE;
+    p_sys->p_pktbuffer->i_buffer = RIST_RTP_HEADER_SIZE;
 
     p_access->p_sys = p_sys;
 

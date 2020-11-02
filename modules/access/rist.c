@@ -230,27 +230,27 @@ static void send_rtcp_feedback(stream_t *p_access, struct rist_flow *flow)
     if ((namelen - 2) & 0x3)
         namelen = ((((namelen - 2) >> 2) + 1) << 2) + 2;
 
-    int rtcp_feedback_size = RTCP_EMPTY_RR_SIZE + RTCP_SDES_SIZE + namelen;
+    int rtcp_feedback_size = RTCP_EMPTY_RR_SIZE + RIST_RTCP_SDES_SIZE + namelen;
     uint8_t *buf = malloc(rtcp_feedback_size);
     if ( unlikely( buf == NULL ) )
         return;
 
     /* Populate RR */
     uint8_t *rr = buf;
-    rtp_set_hdr(rr);
-    rtcp_rr_set_pt(rr);
-    rtcp_set_length(rr, 1);
-    rtcp_fb_set_int_ssrc_pkt_sender(rr, 0);
+    rist_rtp_set_hdr(rr);
+    rist_rtcp_rr_set_pt(rr);
+    rist_rtcp_set_length(rr, 1);
+    rist_rtcp_fb_set_int_ssrc_pkt_sender(rr, 0);
 
     /* Populate SDES */
     uint8_t *p_sdes = (buf + RTCP_EMPTY_RR_SIZE);
-    rtp_set_hdr(p_sdes);
-    rtp_set_cc(p_sdes, 1); /* Actually it is source count in this case */
-    rtcp_sdes_set_pt(p_sdes);
-    rtcp_set_length(p_sdes, (namelen >> 2) + 2);
-    rtcp_sdes_set_cname(p_sdes, 1);
-    rtcp_sdes_set_name_length(p_sdes, strlen(flow->cname));
-    uint8_t *p_sdes_name = (buf + RTCP_EMPTY_RR_SIZE + RTCP_SDES_SIZE);
+    rist_rtp_set_hdr(p_sdes);
+    rist_rtp_set_cc(p_sdes, 1); /* Actually it is source count in this case */
+    rist_rtcp_sdes_set_pt(p_sdes);
+    rist_rtcp_set_length(p_sdes, (namelen >> 2) + 2);
+    rist_rtcp_sdes_set_cname(p_sdes, 1);
+    rist_rtcp_sdes_set_name_length(p_sdes, strlen(flow->cname));
+    uint8_t *p_sdes_name = (buf + RTCP_EMPTY_RR_SIZE + RIST_RTCP_SDES_SIZE);
     strlcpy((char *)p_sdes_name, flow->cname, namelen);
 
     /* Write to Socket */
@@ -266,30 +266,30 @@ static void send_bbnack(stream_t *p_access, int fd_nack, block_t *pkt_nacks, uin
     struct rist_flow *flow = p_sys->flow;
     int len = 0;
 
-    int bbnack_bufsize = RTCP_FB_HEADER_SIZE +
-        RTCP_FB_FCI_GENERIC_NACK_SIZE * nack_count;
+    int bbnack_bufsize = RIST_RTCP_FB_HEADER_SIZE +
+        RIST_RTCP_FB_FCI_GENERIC_NACK_SIZE * nack_count;
     uint8_t *buf = malloc(bbnack_bufsize);
     if ( unlikely( buf == NULL ) )
         return;
 
     /* Populate NACKS */
     uint8_t *nack = buf;
-    rtp_set_hdr(nack);
-    rtcp_fb_set_fmt(nack, NACK_FMT_BITMASK);
-    rtcp_set_pt(nack, RTCP_PT_RTPFB);
-    rtcp_set_length(nack, 2 + nack_count);
+    rist_rtp_set_hdr(nack);
+    rist_rtcp_fb_set_fmt(nack, NACK_FMT_BITMASK);
+    rist_rtcp_set_pt(nack, RIST_RTCP_PT_RTPFB);
+    rist_rtcp_set_length(nack, 2 + nack_count);
     /*uint8_t name[4] = "RIST";*/
-    /*rtcp_fb_set_ssrc_media_src(nack, name);*/
-    len += RTCP_FB_HEADER_SIZE;
+    /*rist_rtcp_fb_set_ssrc_media_src(nack, name);*/
+    len += RIST_RTCP_FB_HEADER_SIZE;
     /* TODO : group together */
     uint16_t nacks[MAX_NACKS];
     memcpy(nacks, pkt_nacks->p_buffer, pkt_nacks->i_buffer);
     for (int i = 0; i < nack_count; i++) {
-        uint8_t *nack_record = buf + len + RTCP_FB_FCI_GENERIC_NACK_SIZE*i;
-        rtcp_fb_nack_set_packet_id(nack_record, nacks[i]);
-        rtcp_fb_nack_set_bitmask_lost(nack_record, 0);
+        uint8_t *nack_record = buf + len + RIST_RTCP_FB_FCI_GENERIC_NACK_SIZE*i;
+        rist_rtcp_fb_nack_set_packet_id(nack_record, nacks[i]);
+        rist_rtcp_fb_nack_set_bitmask_lost(nack_record, 0);
     }
-    len += RTCP_FB_FCI_GENERIC_NACK_SIZE * nack_count;
+    len += RIST_RTCP_FB_FCI_GENERIC_NACK_SIZE * nack_count;
 
     /* Write to Socket */
     if (p_sys->b_sendnacks && p_sys->b_disablenacks == false)
@@ -305,31 +305,31 @@ static void send_rbnack(stream_t *p_access, int fd_nack, block_t *pkt_nacks, uin
     struct rist_flow *flow = p_sys->flow;
     int len = 0;
 
-    int rbnack_bufsize = RTCP_FB_HEADER_SIZE +
-        RTCP_FB_FCI_GENERIC_NACK_SIZE * nack_count;
+    int rbnack_bufsize = RIST_RTCP_FB_HEADER_SIZE +
+        RIST_RTCP_FB_FCI_GENERIC_NACK_SIZE * nack_count;
     uint8_t *buf = malloc(rbnack_bufsize);
     if ( unlikely( buf == NULL ) )
         return;
 
     /* Populate NACKS */
     uint8_t *nack = buf;
-    rtp_set_hdr(nack);
-    rtcp_fb_set_fmt(nack, NACK_FMT_RANGE);
-    rtcp_set_pt(nack, RTCP_PT_RTPFR);
-    rtcp_set_length(nack, 2 + nack_count);
+    rist_rtp_set_hdr(nack);
+    rist_rtcp_fb_set_fmt(nack, NACK_FMT_RANGE);
+    rist_rtcp_set_pt(nack, RTCP_PT_RTPFR);
+    rist_rtcp_set_length(nack, 2 + nack_count);
     uint8_t name[4] = "RIST";
-    rtcp_fb_set_ssrc_media_src(nack, name);
-    len += RTCP_FB_HEADER_SIZE;
+    rist_rtcp_fb_set_ssrc_media_src(nack, name);
+    len += RIST_RTCP_FB_HEADER_SIZE;
     /* TODO : group together */
     uint16_t nacks[MAX_NACKS];
     memcpy(nacks, pkt_nacks->p_buffer, pkt_nacks->i_buffer);
     for (int i = 0; i < nack_count; i++)
     {
-        uint8_t *nack_record = buf + len + RTCP_FB_FCI_GENERIC_NACK_SIZE*i;
+        uint8_t *nack_record = buf + len + RIST_RTCP_FB_FCI_GENERIC_NACK_SIZE*i;
         rtcp_fb_nack_set_range_start(nack_record, nacks[i]);
         rtcp_fb_nack_set_range_extra(nack_record, 0);
     }
-    len += RTCP_FB_FCI_GENERIC_NACK_SIZE * nack_count;
+    len += RIST_RTCP_FB_FCI_GENERIC_NACK_SIZE * nack_count;
 
     /* Write to Socket */
     if (p_sys->b_sendnacks && p_sys->b_disablenacks == false)
@@ -489,40 +489,40 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
                 bytes_left);
             return;
         }
-        else if (!rtp_check_hdr(buf))
+        else if (!rist_rtp_check_hdr(buf))
         {
             /* check for a valid rtp header */
             msg_Err(p_access, "Malformed rtcp packet starting with %02x, ignoring.", buf[0]);
             return;
         }
 
-        ptype =  rtcp_get_pt(buf);
-        records = rtcp_get_length(buf);
+        ptype =  rist_rtcp_get_pt(buf);
+        records = rist_rtcp_get_length(buf);
         uint16_t bytes = (uint16_t)(4 * (1 + records));
         if (bytes > bytes_left)
         {
             /* check for a sane number of bytes */
             msg_Err(p_access, "Malformed rtcp packet, wrong len %d, expecting %u bytes in the " \
-                "packet, got a buffer of %u bytes.", rtcp_get_length(buf), bytes, bytes_left);
+                "packet, got a buffer of %u bytes.", rist_rtcp_get_length(buf), bytes, bytes_left);
             return;
         }
 
         switch(ptype) {
             case RTCP_PT_RTPFR:
-            case RTCP_PT_RTPFB:
+            case RIST_RTCP_PT_RTPFB:
                 break;
 
-            case RTCP_PT_RR:
+            case RIST_RTCP_PT_RR:
                 break;
 
-            case RTCP_PT_SDES:
+            case RIST_RTCP_PT_SDES:
                 {
                     if (p_sys->b_sendnacks == false)
                         p_sys->b_sendnacks = true;
                     if (p_sys->b_ismulticast)
                         return;
                     /* Check for changes in source IP address or port */
-                    int8_t name_length = rtcp_sdes_get_name_length(buf);
+                    int8_t name_length = rist_rtcp_sdes_get_name_length(buf);
                     if (name_length > bytes_left || name_length <= 0 ||
                         (size_t)name_length > sizeof(new_sender_name))
                     {
@@ -549,7 +549,7 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
                     /* Check for changes in cname */
                     bool peer_name_changed = false;
                     memset(new_sender_name, 0, MAX_CNAME);
-                    memcpy(new_sender_name, buf + RTCP_SDES_SIZE, name_length);
+                    memcpy(new_sender_name, buf + RIST_RTCP_SDES_SIZE, name_length);
                     if (memcmp(new_sender_name, p_sys->sender_name, name_length) != 0)
                     {
                         peer_name_changed = true;
@@ -559,7 +559,7 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
                             msg_Info(p_access, "Peer Name change detected: old Name: %s, new " \
                                 "Name: %s", p_sys->sender_name, new_sender_name);
                         memset(p_sys->sender_name, 0, MAX_CNAME);
-                        memcpy(p_sys->sender_name, buf + RTCP_SDES_SIZE, name_length);
+                        memcpy(p_sys->sender_name, buf + RIST_RTCP_SDES_SIZE, name_length);
                     }
 
                     /* Reset the buffer as the source must have been restarted */
@@ -571,7 +571,7 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
                 }
                 break;
 
-            case RTCP_PT_SR:
+            case RIST_RTCP_PT_SR:
                 if (p_sys->b_sendnacks == false)
                     p_sys->b_sendnacks = true;
                 if (p_sys->b_ismulticast)
@@ -590,21 +590,21 @@ static bool rist_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf,
     stream_sys_t *p_sys = p_access->p_sys;
 
     /* safety checks */
-    if ( len < RTP_HEADER_SIZE )
+    if ( len < RIST_RTP_HEADER_SIZE )
     {
         /* check if packet size >= rtp header size */
         msg_Err(p_access, "Rist rtp packet must have at least 12 bytes, we have %zu", len);
         return false;
     }
-    else if (!rtp_check_hdr(buf))
+    else if (!rist_rtp_check_hdr(buf))
     {
         /* check for a valid rtp header */
         msg_Err(p_access, "Malformed rtp packet header starting with %02x, ignoring.", buf[0]);
         return false;
     }
 
-    uint16_t idx = rtp_get_seqnum(buf);
-    uint32_t pkt_ts = rtp_get_timestamp(buf);
+    uint16_t idx = rist_rtp_get_seqnum(buf);
+    uint32_t pkt_ts = rist_rtp_get_timestamp(buf);
     bool retrasnmitted = false;
     bool success = true;
 
@@ -734,12 +734,12 @@ static block_t *rist_dequeue(stream_t *p_access, struct rist_flow *flow)
         if (flow->hi_timestamp > (uint32_t)(pkt->rtp_ts + flow->rtp_latency))
         {
             /* Populate output packet now but remove rtp header from source */
-            int newSize = pkt->buffer->i_buffer - RTP_HEADER_SIZE;
+            int newSize = pkt->buffer->i_buffer - RIST_RTP_HEADER_SIZE;
             pktout = block_Alloc(newSize);
             if (pktout)
             {
                 pktout->i_buffer = newSize;
-                memcpy(pktout->p_buffer, pkt->buffer->p_buffer + RTP_HEADER_SIZE, newSize);
+                memcpy(pktout->p_buffer, pkt->buffer->p_buffer + RIST_RTP_HEADER_SIZE, newSize);
                 /* free the buffer and increase the read index */
                 flow->ri = idx;
                 /* TODO: calculate average duration using buffer average (bring from sender) */
