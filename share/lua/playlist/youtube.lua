@@ -371,7 +371,7 @@ function parse()
                 artist = string.match(line, '\\"author\\":\\"(.-)\\"')
                 if artist then
                     -- FIXME: do this properly (see #24958)
-                    artist = string.gsub( artist, "\\/", "/" )
+                    artist = string.gsub( artist, '\\(["\\/])', '%1' )
                     artist = string.gsub( artist, "\\u0026", "&" )
                 end
             end
