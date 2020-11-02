@@ -335,10 +335,14 @@ function parse()
                 line = vlc.read( eol or len )
             end
 
-            -- Try to find the video's title
-            if string.match( line, "<meta property=\"og:title\"" ) then
-                _,_,name = string.find( line, "content=\"(.-)\"" )
-                name = vlc.strings.resolve_xml_special_chars( name )
+            if not title then
+                local meta = string.match( line, '<meta property="og:title"( .-)>' )
+                if meta then
+                    title = string.match( meta, ' content="(.-)"' )
+                    if title then
+                        title = vlc.strings.resolve_xml_special_chars( title )
+                    end
+                end
             end
 
             if not description then
@@ -361,9 +365,14 @@ function parse()
                 end
             end
 
-            if string.match( line, "<meta property=\"og:image\"" ) then
-                _,_,arturl = string.find( line, "content=\"(.-)\"" )
-                arturl = vlc.strings.resolve_xml_special_chars( arturl )
+            if not arturl then
+                local meta = string.match( line, '<meta property="og:image"( .-)>' )
+                if meta then
+                    arturl = string.match( meta, ' content="(.-)"' )
+                    if arturl then
+                        arturl = vlc.strings.resolve_xml_special_chars( arturl )
+                    end
+                end
             end
 
             if not artist then
@@ -453,7 +462,7 @@ function parse()
             arturl = get_arturl()
         end
 
-        return { { path = path; name = name; description = description; artist = artist; arturl = arturl } }
+        return { { path = path; name = title; description = description; artist = artist; arturl = arturl } }
 
     elseif string.match( vlc.path, "/get_video_info%?" ) then -- video info API
         local line = vlc.read( 1024*1024 ) -- data is on one line only
