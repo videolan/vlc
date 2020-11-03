@@ -288,7 +288,6 @@ end:
 static void
 Interrupt(struct task *task)
 {
-    assert(!atomic_load(&task->interrupted));
     atomic_store(&task->interrupted, true);
 
     /* Wake up the preparser cond_wait */
