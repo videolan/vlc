@@ -351,13 +351,18 @@ function parse()
                 -- unlikely to access it due to #24957
                 description = string.match( line, '\\"shortDescription\\":\\"(.-[^\\])\\"')
                 if description then
-                    if string.match( description, '^\\"' ) then
+                    -- FIXME: do this properly (see #24958)
+                    description = string.gsub( description, '\\(["\\/])', '%1' )
+                else
+                    description = string.match( line, '"shortDescription":"(.-[^\\])"')
+                end
+                if description then
+                    if string.match( description, '^"' ) then
                         description = ""
                     end
                     -- FIXME: do this properly (see #24958)
                     -- This way of unescaping is technically wrong
                     -- so as little as possible of it should be done
-                    description = string.gsub( description, '\\(["\\/])', '%1' )
                     description = string.gsub( description, '\\(["\\/])', '%1' )
                     description = string.gsub( description, '\\n', '\n' )
                     description = string.gsub( description, '\\r', '\r' )
@@ -380,7 +385,19 @@ function parse()
                 if artist then
                     -- FIXME: do this properly (see #24958)
                     artist = string.gsub( artist, '\\(["\\/])', '%1' )
+                else
+                    artist = string.match( line, '"author":"(.-)"' )
+                end
+                if artist then
+                    -- FIXME: do this properly (see #24958)
                     artist = string.gsub( artist, "\\u0026", "&" )
+                end
+            end
+
+            if not nonce then
+                if string.match( line, '<script nonce="' ) then
+                    vlc.msg.dbg( "Detected new YouTube HTML code layout" )
+                    nonce = true
                 end
             end
 
@@ -421,9 +438,14 @@ function parse()
                 if not path then
                     local stream_map = string.match( line, '\\"formats\\":%[(.-)%]' )
                     if stream_map then
-                        vlc.msg.dbg( "Found new-style parameters for youtube video stream, parsing..." )
                         -- FIXME: do this properly (see #24958)
                         stream_map = string.gsub( stream_map, '\\(["\\/])', '%1' )
+                    else
+                        stream_map = string.match( line, '"formats":%[(.-)%]' )
+                    end
+                    if stream_map then
+                        vlc.msg.dbg( "Found new-style parameters for youtube video stream, parsing..." )
+                        -- FIXME: do this properly (see #24958)
                         stream_map = string.gsub( stream_map, "\\u0026", "&" )
                         path = pick_stream( stream_map, js_url )
                     end
@@ -433,6 +455,7 @@ function parse()
                     -- If this is a live stream, the URL map will be empty
                     -- and we get the URL from this field instead
                     local hlsvp = string.match( line, '\\"hlsManifestUrl\\": *\\"(.-)\\"' )
+                        or string.match( line, '"hlsManifestUrl":"(.-)"' )
                     if hlsvp then
                         hlsvp = string.gsub( hlsvp, "\\/", "/" )
                         path = hlsvp
