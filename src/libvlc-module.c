@@ -198,6 +198,16 @@ static const char *const ppsz_stereo_mode_texts[] = { N_("Unset"),
     N_("Headphones"), N_("Mono"),
 };
 
+#define MIX_MODE_TEXT N_("Audio mix mode")
+static const int pi_mix_mode_values[] = { 
+    AOUT_MIX_MODE_UNSET, AOUT_MIX_MODE_STEREO,
+    AOUT_MIX_MODE_4_0, AOUT_MIX_MODE_5_1, AOUT_MIX_MODE_7_1,
+};
+static const char *const ppsz_mix_mode_texts[] = {
+    N_("Unset"), N_("Stereo"),
+    "4.0", "5.1", "7.1",
+};
+
 #define AUDIO_FILTER_TEXT N_("Audio filters")
 #define AUDIO_FILTER_LONGTEXT N_( \
     "This adds audio post processing filters, to modify " \
@@ -1552,6 +1562,8 @@ vlc_module_begin ()
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions )
     add_integer( "stereo-mode", 0, STEREO_MODE_TEXT, NULL, true )
         change_integer_list( pi_stereo_mode_values, ppsz_stereo_mode_texts )
+    add_integer( "mix-mode", NULL, MIX_MODE_TEXT, MIX_MODE_TEXT, true )
+        change_integer_list( pi_mix_mode_values, ppsz_mix_mode_texts )
     add_integer( "audio-desync", 0, DESYNC_TEXT,
                  DESYNC_LONGTEXT, true )
         change_safe ()

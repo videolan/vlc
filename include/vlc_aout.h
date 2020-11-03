@@ -100,6 +100,12 @@
 #define AOUT_VAR_CHAN_HEADPHONES    6
 #define AOUT_VAR_CHAN_MONO          7
 
+#define AOUT_MIX_MODE_UNSET         0
+#define AOUT_MIX_MODE_STEREO        1
+#define AOUT_MIX_MODE_4_0           2
+#define AOUT_MIX_MODE_5_1           3
+#define AOUT_MIX_MODE_7_1           4
+
 /*****************************************************************************
  * Main audio output structures
  *****************************************************************************/

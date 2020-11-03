@@ -78,6 +78,7 @@ typedef struct
     vlc_tick_t original_pts;
 
     int requested_stereo_mode; /**< Requested stereo mode set by the user */
+    int requested_mix_mode; /**< Requested mix mode set by the user */
 
     /* Original input format and profile, won't change for the lifetime of a
      * stream (between aout_DecNew() and aout_DecDelete()). */
