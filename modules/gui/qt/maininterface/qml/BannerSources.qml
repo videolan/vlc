@@ -61,32 +61,6 @@ Widgets.NavigableFocusScope {
             searchBox.expanded = true
     }
 
-    DropShadow {
-        id: primaryShadow
-
-        anchors.fill: pLBannerSources
-        source: pLBannerSources
-        horizontalOffset: 0
-        verticalOffset: VLCStyle.dp(1, VLCStyle.scale)
-        radius: VLCStyle.dp(9, VLCStyle.scale)
-        spread: 0
-        samples: ( radius * 2 ) + 1
-        color: Qt.rgba(0, 0, 0, .22)
-    }
-
-    DropShadow {
-        id: secondaryShadow
-
-        anchors.fill: pLBannerSources
-        source: pLBannerSources
-        horizontalOffset: 0
-        verticalOffset: VLCStyle.dp(0, VLCStyle.scale)
-        radius: VLCStyle.dp(2, VLCStyle.scale)
-        spread: 0
-        samples: ( radius * 2 ) + 1
-        color: Qt.rgba(0, 0, 0, .18)
-    }
-
     Rectangle {
         id: pLBannerSources
 
@@ -200,12 +174,26 @@ Widgets.NavigableFocusScope {
                 }
             }
 
-            Rectangle {
+            Item {
                 id: localToolbar
 
-                color: VLCStyle.colors.bg
                 width: parent.width
                 height: VLCStyle.localToolbar_height
+
+                Rectangle {
+                    id: localToolbarBg
+                    color: VLCStyle.colors.bg
+                    anchors.fill: parent
+                }
+
+                Widgets.CoverShadow {
+                    anchors.fill: localToolbarBg
+                    source: localToolbarBg
+                    primaryVerticalOffset: VLCStyle.dp(1)
+                    primaryRadius: VLCStyle.dp(9)
+                    secondaryVerticalOffset: VLCStyle.dp(0)
+                    secondaryRadius: VLCStyle.dp(2)
+                }
 
                 Widgets.NavigableRow {
                     id: localContextGroup
