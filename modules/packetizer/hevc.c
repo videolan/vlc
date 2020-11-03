@@ -630,6 +630,16 @@ static void ActivateSets(decoder_t *p_dec,
             }
         }
 
+        if ( p_dec->fmt_in.video.i_sar_num == 0 || p_dec->fmt_in.video.i_sar_den == 0)
+        {
+            unsigned num, den;
+            if ( hevc_get_aspect_ratio( p_sps, &num, &den ) )
+            {
+                p_dec->fmt_out.video.i_sar_num = num;
+                p_dec->fmt_out.video.i_sar_den = den;
+            }
+        }
+
         if(p_dec->fmt_in.i_profile == -1)
         {
             uint8_t i_profile, i_level;
