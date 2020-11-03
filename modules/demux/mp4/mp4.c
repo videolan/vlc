@@ -145,6 +145,9 @@ typedef struct
     } hacks;
 
     mp4_fragments_index_t *p_fragsindex;
+
+    ssize_t i_attachments;
+    input_attachment_t **pp_attachments;
 } demux_sys_t;
 
 #define DEMUX_INCREMENT VLC_TICK_FROM_MS(250) /* How far the pcr will go, each round */
@@ -809,6 +812,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
 
     p_sys->context.i_lastseqnumber = UINT32_MAX;
+    p_sys->i_attachments = -1;
 
     p_demux->p_sys = p_sys;
 
@@ -2053,9 +2057,17 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             input_attachment_t ***ppp_attach = va_arg( args, input_attachment_t*** );
             int *pi_int = va_arg( args, int * );
 
-            *pi_int = MP4_GetAttachments( p_sys->p_root, ppp_attach );
-            for( int i=0; i<*pi_int; i++ )
+            if( p_sys->i_attachments == -1 )
+                p_sys->i_attachments = MP4_GetAttachments( p_sys->p_root, &p_sys->pp_attachments );
+            *ppp_attach = calloc( p_sys->i_attachments, sizeof(**ppp_attach ) );
+            if( !*ppp_attach )
+                return VLC_ENOMEM;
+            for ( size_t i = 0; i < p_sys->i_attachments; ++i )
+            {
+                (*ppp_attach)[i] = vlc_input_attachment_Hold( p_sys->pp_attachments[i] );
                 msg_Dbg( p_demux, "adding attachment %s", (*ppp_attach)[i]->psz_name );
+            }
+            *pi_int = p_sys->i_attachments;
 
             return VLC_SUCCESS;
         }
@@ -2177,6 +2189,10 @@ static void Close ( vlc_object_t * p_this )
     for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
         MP4_TrackClean( p_demux->out, &p_sys->track[i_track] );
     free( p_sys->track );
+
+    for ( size_t i = 0; i < p_sys->i_attachments; ++i )
+        vlc_input_attachment_Release( p_sys->pp_attachments[i] );
+    free( p_sys->pp_attachments );
 
     free( p_sys );
 }

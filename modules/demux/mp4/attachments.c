@@ -233,11 +233,11 @@ int MP4_GetCoverMetaURI( const MP4_Box_t *p_root,
     return VLC_SUCCESS;
 }
 
-int MP4_GetAttachments( const MP4_Box_t *p_root, input_attachment_t ***ppp_attach )
+size_t MP4_GetAttachments( const MP4_Box_t *p_root, input_attachment_t ***ppp_attach )
 {
     const MP4_Box_t *p_metaroot = NULL;
     const char *psz_metarootpath;
-    unsigned i_count = 0;
+    size_t i_count = 0;
     input_attachment_t **pp_attach = NULL;
     *ppp_attach = NULL;
 
@@ -371,6 +371,7 @@ int MP4_GetAttachments( const MP4_Box_t *p_root, input_attachment_t ***ppp_attac
     if ( i_count == 0 )
     {
         free( pp_attach );
+        **ppp_attach = NULL;
         return 0;
     }
 
