@@ -1387,12 +1387,21 @@ static int RenderPicture(void *opaque, picture_t *pic, bool render_now)
         /* Tell the clock that the pts was forced */
         system_pts = VLC_TICK_MAX;
     }
+
+    vlc_tick_t clock_offset = vlc_clock_ConvertToSystem(sys->clock, system_now, 0, sys->rate);
     vlc_tick_t drift = vlc_clock_UpdateVideo(sys->clock, system_pts, pts, sys->rate,
                                              frame_rate, frame_rate_base);
 
     /* Display the direct buffer returned by vout_RenderPicture */
     if (sys->rendering_enabled)
         vout_display_Display(vd, todisplay);
+
+    vlc_tick_t now_ts = vlc_tick_now();
+    msg_Info( vd, "avstats: ts=%" PRId64 ", [RENDER][VIDEO], pts_per_vsync=%" PRId64 " pts=%" PRId64 " pcr=%" PRId64,
+              NS_FROM_VLC_TICK(now_ts),
+              NS_FROM_VLC_TICK(pts),
+              NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts),
+              NS_FROM_VLC_TICK(system_now - clock_offset));
 
     vlc_queuedmutex_unlock(&sys->display_lock);
     vlc_mutex_unlock(&sys->render_lock);
