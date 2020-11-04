@@ -131,14 +131,6 @@ NavigableFocusScope {
         //key navigation is reimplemented for item selection
         keyNavigationEnabled: false
 
-        preferredHighlightBegin : (view.orientation === ListView.Vertical)
-                                    ? highlightMargin + (headerItem ? headerItem.height : 0)
-                                    : highlightMargin
-        preferredHighlightEnd : (view.orientation === ListView.Vertical)
-                                    ? height - highlightMargin
-                                    : width - highlightMargin
-        highlightRangeMode: ListView.ApplyRange
-
         focus: true
 
         clip: true
