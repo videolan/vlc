@@ -129,6 +129,7 @@ typedef struct
 
     bool                b_index;
     bool                b_canfastseek;
+    bool                b_pcr_sent;
     uint8_t             i_seek_track;
     uint8_t             i_access_selected_track[ES_CATEGORY_COUNT]; /* mms, depends on access algorithm */
     unsigned int        i_wait_keyframe;
@@ -250,13 +251,21 @@ static int Demux( demux_t *p_demux )
     {
         bool b_data = Block_Dequeue( p_demux, p_sys->i_time + CHUNK );
 
-        p_sys->i_time += CHUNK;
-        es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_time );
+        if( p_sys->i_time != VLC_TICK_INVALID )
+        {
+            p_sys->i_time += CHUNK;
+            p_sys->b_pcr_sent = true;
+            es_out_SetPCR( p_demux->out, p_sys->i_time );
 #ifdef ASF_DEBUG
-        msg_Dbg( p_demux, "Demux Loop Setting PCR to %"PRId64, VLC_TICK_0 + p_sys->i_time );
+            msg_Dbg( p_demux, "Demux Loop Setting PCR to %"PRId64, p_sys->i_time );
 #endif
+        }
+
         if ( !b_data && p_sys->b_eos )
         {
+            if( p_sys->i_time != VLC_TICK_INVALID )
+                es_out_SetPCR( p_demux->out, p_sys->i_time );
+
             /* We end this stream */
             if( !p_sys->b_eof )
             {
@@ -392,8 +401,9 @@ static void SeekPrepare( demux_t *p_demux )
 
     p_sys->b_eof = false;
     p_sys->b_eos = false;
+    p_sys->b_pcr_sent = false;
     p_sys->i_time = VLC_TICK_INVALID;
-    p_sys->i_sendtime = -1;
+    p_sys->i_sendtime = VLC_TICK_INVALID;
     p_sys->i_preroll_start = ASFPACKET_PREROLL_FROM_CURRENT;
 
     for( int i = 0; i < MAX_ASF_TRACKS ; i++ )
@@ -579,7 +589,7 @@ static void Packet_SetSendTime( asf_packet_sys_t *p_packetsys, vlc_tick_t i_time
     demux_t *p_demux = p_packetsys->p_demux;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    p_sys->i_sendtime = i_time;
+    p_sys->i_sendtime = VLC_TICK_0 + i_time;
 }
 
 static void Packet_UpdateTime( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
@@ -590,7 +600,7 @@ static void Packet_UpdateTime( asf_packet_sys_t *p_packetsys, uint8_t i_stream_n
     asf_track_t *tk = p_sys->track[i_stream_number];
 
     if ( tk )
-        tk->i_time = i_time;
+        tk->i_time = VLC_TICK_0 + i_time;
 }
 
 static asf_track_info_t * Packet_GetTrackInfo( asf_packet_sys_t *p_packetsys,
@@ -679,11 +689,12 @@ static bool Block_Dequeue( demux_t *p_demux, vlc_tick_t i_nexttime )
             else
                 p_block->p_next = NULL;
 
-            if( p_sys->i_time == VLC_TICK_INVALID )
+            if( !p_sys->b_pcr_sent && p_sys->i_time != VLC_TICK_INVALID )
             {
-                es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_time );
+                p_sys->b_pcr_sent = true;
+                es_out_SetPCR( p_demux->out, p_sys->i_time );
 #ifdef ASF_DEBUG
-                msg_Dbg( p_demux, "    dequeue setting PCR to %"PRId64, VLC_TICK_0 + p_sys->i_time );
+                msg_Dbg( p_demux, "    dequeue setting PCR to %"PRId64, p_sys->i_time );
 #endif
             }
 
@@ -778,7 +789,7 @@ static int DemuxInit( demux_t *p_demux )
 
     /* init context */
     p_sys->i_time   = VLC_TICK_INVALID;
-    p_sys->i_sendtime    = -1;
+    p_sys->i_sendtime    = VLC_TICK_INVALID;
     p_sys->i_length = 0;
     p_sys->b_eos = false;
     p_sys->b_eof = false;
@@ -788,6 +799,7 @@ static int DemuxInit( demux_t *p_demux )
     p_sys->b_index  = 0;
     p_sys->i_track  = 0;
     p_sys->i_seek_track = 0;
+    p_sys->b_pcr_sent = false;
     p_sys->i_wait_keyframe = 0;
     for( int i = 0; i < MAX_ASF_TRACKS; i++ )
     {
