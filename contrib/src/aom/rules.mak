@@ -89,7 +89,7 @@ endif
 	rm -rf $(PREFIX)/include/aom
 	cd $< && rm -rf aom_build && mkdir -p aom_build
 	cd $</aom_build && LDFLAGS="$(AOM_LDFLAGS)" $(HOSTVARS) $(CMAKE) ../ $(AOM_CONF)
-	cd $< && $(MAKE) -C aom_build
+	cd $< && $(CMAKEBUILD) aom_build
 	$(call pkg_static,"aom_build/aom.pc")
-	cd $</aom_build && $(MAKE) install
+	cd $</aom_build && $(CMAKEBUILD) . --target install
 	touch $@

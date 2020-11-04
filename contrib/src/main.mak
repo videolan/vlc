@@ -392,8 +392,9 @@ AUTORECONF = autoreconf
 endif
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 	cd $< && $(AUTORECONF) -fiv $(ACLOCAL_AMFLAGS)
+CMAKEBUILD := cmake --build
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
-		-DCMAKE_INSTALL_PREFIX=$(PREFIX) $(CMAKE_GENERATOR) \
+		-DCMAKE_INSTALL_PREFIX=$(PREFIX) \
 		-DBUILD_SHARED_LIBS:BOOL=OFF
 ifdef HAVE_WIN32
 CMAKE += -DCMAKE_DEBUG_POSTFIX:STRING=

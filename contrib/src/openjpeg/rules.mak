@@ -30,5 +30,5 @@ endif
 		-DBUILD_PKGCONFIG_FILES=ON \
 			-DBUILD_CODEC:bool=OFF \
 		.
-	cd $< && $(MAKE) install
+	cd $< && $(CMAKEBUILD) . --target install
 	touch $@

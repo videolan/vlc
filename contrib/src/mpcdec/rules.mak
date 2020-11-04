@@ -43,7 +43,7 @@ endif
 
 .mpcdec: musepack toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DSHARED=OFF .
-	cd $< && $(MAKE) install
+	cd $< && $(CMAKEBUILD) . --target install
 	mkdir -p -- "$(PREFIX)/lib"
 	# Use globbing to work around cmake's change of destination file
 	cd $< && cp libmpcdec/*mpcdec_static.* "$(PREFIX)/lib/libmpcdec.a"
