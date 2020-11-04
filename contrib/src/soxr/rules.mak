@@ -37,6 +37,6 @@ endif
 		-DWITH_LSR_BINDINGS=OFF \
 		-DWITH_OPENMP=OFF \
 		-DWITH_AVFFT=ON \
-		-Wno-dev $(CMAKE_GENERATOR)
-	cd $< && $(MAKE) install
+		-Wno-dev
+	cd $< && $(CMAKEBUILD) . --target install
 	touch $@

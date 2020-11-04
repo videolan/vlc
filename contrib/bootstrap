@@ -266,7 +266,11 @@ test -z "$GNUV3" || add_make_enabled "GNUV3"
 test -z "$AD_CLAUSES" || add_make_enabled "AD_CLAUSES"
 test -z "$WITH_OPTIMIZATION" || add_make_enabled "WITH_OPTIMIZATION"
 test -z "$ENABLE_PDB" || add_make_enabled "ENABLE_PDB"
-test "`uname -o 2>/dev/null`" != "Msys" || add_make "CMAKE_GENERATOR := -G \"MSYS Makefiles\""
+
+if [ "`uname -o 2>/dev/null`" = "Msys" ]; then
+    add_make "CMAKE_GENERATOR := MSYS Makefiles"
+    add_make "export CMAKE_GENERATOR"
+fi
 
 #
 # Checks
