@@ -331,7 +331,9 @@ function parse()
         -- (cf. http://en.wikipedia.org/wiki/YouTube#Quality_and_formats)
         fmt = get_url_param( vlc.path, "fmt" )
         while true do
-            local line = vlc.readline()
+            -- The new HTML code layout has fewer and longer lines; always
+            -- use the long line workaround until we get more visibility.
+            local line = new_layout and read_long_line() or vlc.readline()
             if not line then break end
 
             -- The next line is the major configuration line that we need.
@@ -400,10 +402,10 @@ function parse()
                 end
             end
 
-            if not nonce then
+            if not new_layout then
                 if string.match( line, '<script nonce="' ) then
                     vlc.msg.dbg( "Detected new YouTube HTML code layout" )
-                    nonce = true
+                    new_layout = true
                 end
             end
 
