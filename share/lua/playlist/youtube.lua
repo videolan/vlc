@@ -62,6 +62,22 @@ function get_fmt( fmt_list )
     return fmt
 end
 
+-- Helper emulating vlc.readline() to work around its failure on
+-- very long lines (see #24957)
+function read_long_line()
+    local eol
+    local pos = 0
+    local len = 32768
+    repeat
+        len = len * 2
+        local line = vlc.peek( len )
+        if not line then return nil end
+        eol = string.find( line, "\n", pos + 1 )
+        pos = len
+    until eol or len >= 1024 * 1024 -- No EOF detection, loop until limit
+    return vlc.read( eol or len )
+end
+
 -- Buffering iterator to parse through the HTTP stream several times
 -- without making several HTTP requests
 function buf_iter( s )
@@ -319,20 +335,10 @@ function parse()
             if not line then break end
 
             -- The next line is the major configuration line that we need.
-            -- It is very long and readline() is likely to fail on it due
-            -- to #24957, so we need this instead.
+            -- It is very long so we need this workaround (see #24957).
             if string.match( line, '^ *<div id="player%-api">' ) then
-                if not vlc.peek( 1 ) then break end
-                local eol
-                local pos = 0
-                local len = 32768
-                repeat
-                    len = len * 2
-                    line = vlc.peek( len )
-                    eol = string.find( line, "\n", pos + 1 )
-                    pos = len
-                until eol or len >= 1024 * 1024
-                line = vlc.read( eol or len )
+                line = read_long_line()
+                if not line then break end
             end
 
             if not title then
