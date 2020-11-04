@@ -57,5 +57,5 @@ struct asf_packet_sys_s
     void (*pf_setaspectratio)(asf_packet_sys_t *, uint8_t, uint8_t, uint8_t);
 };
 
-int DemuxASFPacket( asf_packet_sys_t *, uint32_t, uint32_t );
+int DemuxASFPacket( asf_packet_sys_t *, uint32_t, uint32_t, uint64_t, uint64_t );
 #endif

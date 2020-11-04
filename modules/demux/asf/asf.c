@@ -219,7 +219,8 @@ static int Demux( demux_t *p_demux )
         /* Read and demux a packet */
         if( DemuxASFPacket( &p_sys->packet_sys,
                              p_sys->p_fp->i_min_data_packet_size,
-                             p_sys->p_fp->i_max_data_packet_size ) <= 0 )
+                             p_sys->p_fp->i_max_data_packet_size,
+                             p_sys->i_data_begin, p_sys->i_data_end ) <= 0 )
         {
             p_sys->b_eos = true;
             /* Check if we have concatenated files */
