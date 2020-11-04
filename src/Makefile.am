@@ -433,17 +433,6 @@ libvlccore_la_SOURCES += \
 	os2/thread.c
 endif
 
-if HAVE_NACL
-libvlccore_la_SOURCES += \
-	android/error.c \
-	posix/dirs.c \
-	posix/filesystem.c \
-	posix/netconf.c \
-	posix/rand.c \
-	posix/specific.c \
-	posix/timer.c
-endif
-
 if HAVE_EMSCRIPTEN
 libvlccore_la_SOURCES += \
 	posix/thread.c \
@@ -490,7 +479,6 @@ endif
 
 if !HAVE_WIN32
 if !HAVE_OS2
-if !HAVE_NACL
 libvlccore_la_SOURCES += \
 	posix/filesystem.c \
 	posix/plugin.c \
@@ -520,7 +508,6 @@ libvlccore_la_LIBADD += -lanl
 else
 libvlccore_la_SOURCES += \
 	posix/getaddrinfo.c
-endif
 endif
 endif
 endif

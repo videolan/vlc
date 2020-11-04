@@ -443,7 +443,6 @@ AM_CONDITIONAL([HAVE_IOS],     [test "${HAVE_IOS}" = "1"])
 AM_CONDITIONAL([HAVE_OSX],     [test "${HAVE_OSX}" = "1"])
 AM_CONDITIONAL([HAVE_TVOS],    [test "${HAVE_TVOS}" = "1"])
 
-AM_CONDITIONAL([HAVE_NACL],    [test "${SYS}" = "nacl"])
 AM_CONDITIONAL([HAVE_LIBANL],  [test "${HAVE_LIBANL}" = "1"])
 
 AM_CONDITIONAL([HAVE_WIN32],   [test "${SYS}" = "mingw32"])

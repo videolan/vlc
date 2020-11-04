@@ -21,7 +21,7 @@ AS_IF([test x$GCC != xyes], [dolt_supported=no])
 AS_CASE([$host],
     [*-*-linux*|*-*-freebsd*], [pic_options='-fPIC'],
     [*-apple-darwin*],         [pic_options='-fno-common'],
-    [*mingw*|*nacl*],          [pic_options='']
+    [*mingw*],                 [pic_options='']
     [*],                       [dolt_supported=no]
 )
 AS_IF([test x$dolt_supported = xno], [
