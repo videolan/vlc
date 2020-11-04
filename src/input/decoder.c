@@ -1121,6 +1121,18 @@ static void ModuleThread_QueueVideo( decoder_t *p_dec, picture_t *p_pic )
     assert( p_pic );
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
 
+    const char *type =
+        p_dec->fmt_in.i_cat == VIDEO_ES ? "VIDEO" :
+        p_dec->fmt_in.i_cat == AUDIO_ES ? "AUDIO" :
+        NULL;
+
+    if( type != NULL )
+    {
+        msg_Info( p_dec, "avstats: ts=%" PRId64 ", [DEC][OUT][%s], pts=%" PRId64,
+                  NS_FROM_VLC_TICK(vlc_tick_now()), type,
+                  NS_FROM_VLC_TICK(p_pic->date) );
+    }
+
     int success = ModuleThread_PlayVideo( p_owner, p_pic );
 
     ModuleThread_UpdateStatVideo( p_owner, success != VLC_SUCCESS );
@@ -1322,6 +1334,20 @@ static void DecoderThread_ProcessInput( vlc_input_decoder_t *p_owner, block_t *p
 static void DecoderThread_DecodeBlock( vlc_input_decoder_t *p_owner, block_t *p_block )
 {
     decoder_t *p_dec = &p_owner->dec;
+
+    const char *type =
+        p_dec->fmt_in.i_cat == VIDEO_ES ? "VIDEO" :
+        p_dec->fmt_in.i_cat == AUDIO_ES ? "AUDIO" :
+        NULL;
+
+    if( type != NULL && p_block )
+    {
+        msg_Info( p_dec, "avstats: ts=%" PRId64 ", [DEC][IN][%s], dts=%" PRId64
+                          ", pts=%" PRId64,
+                  NS_FROM_VLC_TICK(vlc_tick_now()), type,
+                  NS_FROM_VLC_TICK(p_block->i_dts),
+                  NS_FROM_VLC_TICK(p_block->i_pts) );
+    }
 
     int ret = p_dec->pf_decode( p_dec, p_block );
     switch( ret )

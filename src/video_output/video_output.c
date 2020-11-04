@@ -1337,11 +1337,24 @@ static int ThreadDisplayRenderPicture(vout_thread_sys_t *vout, bool render_now)
         /* Tell the clock that the pts was forced */
         system_pts = INT64_MAX;
     }
+
+
+    vlc_tick_t clock_offset = vlc_clock_ConvertToSystem(sys->clock, system_now, 0, sys->rate);
+
     vlc_clock_UpdateVideo(sys->clock, system_pts, pts, sys->rate,
                           frame_rate, frame_rate_base);
 
     /* Display the direct buffer returned by vout_RenderPicture */
+
     vout_display_Display(vd, todisplay);
+
+    vlc_tick_t now_ts = vlc_tick_now();
+    msg_Info( vd, "avstats: ts=%" PRId64 ", [RENDER][VIDEO], pts_per_vsync=%" PRId64 " pts=%" PRId64 " pcr=%" PRId64,
+              NS_FROM_VLC_TICK(now_ts),
+              NS_FROM_VLC_TICK(pts),
+              NS_FROM_VLC_TICK(system_pts == INT64_MAX ? system_now : system_pts),
+              NS_FROM_VLC_TICK(system_now - clock_offset));
+
     vlc_mutex_unlock(&sys->display_lock);
 
     if (subpic)
