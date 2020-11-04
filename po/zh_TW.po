@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
+# Aefgh Threenine <aefgh3962@gmail.com>, 2020
 # Cheng-Chia Tseng <pswo10680@gmail.com>, 2017
 # Chen Wang <iwangce@gmail.com>, 2013
 # Ethan Chan <yunsangc207@gmail.com>, 2015
@@ -18,8 +19,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-02-19 16:19+0100\n"
-"Last-Translator: byStarTW <pan93412@gmail.com>, 2020\n"
+"PO-Revision-Date: 2020-11-04 13:59+0100\n"
+"Last-Translator: Aefgh Threenine <aefgh3962@gmail.com>, 2020\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/yaron/teams/16553/"
 "zh_TW/)\n"
 "Language: zh_TW\n"
@@ -35,10 +36,10 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
-"在法律許可的範圍內，本軟體沒有任何保證。\n"
-"您可以根據 GNU GPL 的條款再次散布此軟體；\n"
-"欲知詳情請閱讀 COPYING 文件。\n"
-"軟體由 VideoLAN 團隊撰寫；查看 AUTHORS 文件。\n"
+"於法許之內，此程式不提供任何保證。\n"
+"您可以根據 GNU GPL 之條款複散之；\n"
+"欲知詳情請閱讀 COPYING 檔案。\n"
+"由 VideoLAN 團隊撰寫；查看 AUTHORS 檔案。\n"
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
@@ -1127,11 +1128,11 @@ msgstr "線性"
 
 #: src/input/es_out.c:3236
 msgid "Hybrid Log-Gamma"
-msgstr ""
+msgstr "Hybrid Log-Gamma"
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
-msgstr ""
+msgstr "色彩傳輸功能"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
@@ -1175,7 +1176,7 @@ msgstr "中下"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
-msgstr ""
+msgstr "色度位置"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
@@ -1183,11 +1184,11 @@ msgstr "矩形"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
-msgstr ""
+msgstr "等距柱狀"
 
 #: src/input/es_out.c:3285
 msgid "Cubemap"
-msgstr ""
+msgstr "立方體地圖"
 
 #: src/input/es_out.c:3291
 msgid "Projection"
@@ -1196,22 +1197,22 @@ msgstr "投影"
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "繞 Z 軸旋轉"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "繞 X 軸旋轉"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "繞 Y 軸旋轉"
 
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "視野"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
@@ -1547,6 +1548,8 @@ msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
+"這可對已傳送至主控台的訊息啟用顏色標示。您的終端機需要 Linux 色彩支援，此功能"
+"才能運作。"
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1684,7 +1687,7 @@ msgstr "這邊選擇使用哪個音效重取樣外掛。"
 msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
-msgstr ""
+msgstr "設定當您的音訊資料流與您的硬體相容時預設將使用的音訊輸出通道模式。"
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -1694,7 +1697,7 @@ msgstr "強制 S/PDIF 支援"
 msgid ""
 "This option should be used when the audio output can't negotiate S/PDIF "
 "support."
-msgstr ""
+msgstr "當音訊輸出無法交涉 S/PDIF 支援時，才使用這個選項。"
 
 #: src/libvlc-module.c:178
 msgid "Force detection of Dolby Surround"
@@ -1771,7 +1774,7 @@ msgstr "播放的前置放大"
 msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
-msgstr ""
+msgstr "這可讓您變更具有重播增益資訊的資料流的預設目標等級 (89 dB)"
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
@@ -1779,7 +1782,7 @@ msgstr "預設的播放增益"
 
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
-msgstr ""
+msgstr "這適用於不具有重播增益資訊的資料流的增益"
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
@@ -1787,7 +1790,7 @@ msgstr "峰值保護"
 
 #: src/libvlc-module.c:227
 msgid "Protect against sound clipping"
-msgstr ""
+msgstr "防止爆音"
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
@@ -2134,7 +2137,7 @@ msgstr "視訊分割模組"
 
 #: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
-msgstr ""
+msgstr "這會新增視訊分割器，例如複製或視訊牆"
 
 #: src/libvlc-module.c:383
 msgid "Video filter module"
@@ -2164,7 +2167,7 @@ msgstr "視訊抓圖格式"
 
 #: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
-msgstr ""
+msgstr "將用來儲存視訊快照的圖像格式"
 
 #: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
@@ -2180,7 +2183,7 @@ msgstr "使用循序編號而不是時間戳記"
 
 #: src/libvlc-module.c:407
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
-msgstr ""
+msgstr "抓圖編號使用循序編號而不是時間戳記"
 
 #: src/libvlc-module.c:409
 msgid "Video snapshot width"
@@ -2311,6 +2314,7 @@ msgid ""
 "Enables framedropping on MPEG2 stream. Framedropping occurs when your "
 "computer is not powerful enough"
 msgstr ""
+"在 MPEG2 資料流上啟用畫面丟棄。當您的電腦不夠強大時，就會發生畫面丟棄。"
 
 #: src/libvlc-module.c:473
 msgid "Drop late frames"
@@ -2491,19 +2495,23 @@ msgstr "預設的多點傳輸介面。此設定會覆載路由表格。"
 
 #: src/libvlc-module.c:559
 msgid "DiffServ Code Point"
-msgstr ""
+msgstr "DiffServ 代碼點值"
 
 #: src/libvlc-module.c:560
 msgid ""
 "Differentiated Services Code Point for outgoing UDP streams (or IPv4 Type Of "
 "Service, or IPv6 Traffic Class). This is used for network Quality of Service."
 msgstr ""
+"寄出 UDP 資料流的區別服務代碼點值 (或 IPv4 服務類型、或 IPv6 流量類別)。這適"
+"用於網路服務品質。"
 
 #: src/libvlc-module.c:566
 msgid ""
 "Choose the program to select by giving its Service ID. Only use this option "
 "if you want to read a multi-program stream (like DVB streams for example)."
 msgstr ""
+"用服務識別碼 (SID) 來指定要選擇的程式。只有當您要讀取多程式資料流 (例如 DVB "
+"資料流) 時，才使用這個選項。"
 
 #: src/libvlc-module.c:572
 msgid ""
@@ -2511,6 +2519,8 @@ msgid ""
 "IDs (SIDs). Only use this option if you want to read a multi-program stream "
 "(like DVB streams for example)."
 msgstr ""
+"用逗號分隔的服務識別碼 (SID) 清單來指定要選擇的程式。只有當您要讀取多程式資料"
+"流 (例如 DVB 資料流) 時，才使用這個選項。"
 
 #: src/libvlc-module.c:578 modules/gui/qt/ui/open_disk.h:309
 msgid "Audio track"
@@ -2629,7 +2639,7 @@ msgstr "重複輸入"
 
 #: src/libvlc-module.c:632
 msgid "Number of time the same input will be repeated"
-msgstr ""
+msgstr "重複相同的輸入的次數"
 
 #: src/libvlc-module.c:634 modules/gui/macosx/VLCOpenWindowController.m:159
 msgid "Start time"
@@ -2679,11 +2689,11 @@ msgstr "輸入清單"
 msgid ""
 "You can give a comma-separated list of inputs that will be concatenated "
 "together after the normal one."
-msgstr ""
+msgstr "您可以指定將在現有的輸入之後串連一起的逗號分隔的輸入清單。"
 
 #: src/libvlc-module.c:659
 msgid "Input slave (experimental)"
-msgstr ""
+msgstr "輸入從屬 (實驗性)"
 
 #: src/libvlc-module.c:661
 msgid ""
@@ -2695,7 +2705,7 @@ msgstr ""
 
 #: src/libvlc-module.c:665
 msgid "Bookmarks list for a stream"
-msgstr ""
+msgstr "資料流的書籤清單"
 
 #: src/libvlc-module.c:667
 msgid ""
@@ -2703,6 +2713,8 @@ msgid ""
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
 "{...}\""
 msgstr ""
+"您可以在「{name=資料名稱,time=選擇性的時間位移,bytes=選擇性的位元組位移},"
+"{...}」格式指定資料流的書籤清單"
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
@@ -2720,7 +2732,7 @@ msgstr "偏好原生的串流錄影"
 msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
-msgstr ""
+msgstr "如果可行，將錄製輸入資料流，而非使用資料流輸出模組"
 
 #: src/libvlc-module.c:680
 msgid "Timeshift directory"
@@ -2751,6 +2763,9 @@ msgid ""
 "Track num<br>$p: Now playing<br>$A: Date<br>$D: Duration<br>$Z: \"Now playing"
 "\" (Fall back on Title - Artist)"
 msgstr ""
+"此選項讓您可以根據正在播放的內容設定標題<br>$a: 演出者<br>$b: 專輯<br>$c: 版"
+"權<br>$t: 標題<br>$g: 內容類型<br>$n: 曲目編號<br>$p: 正在播放<br>$A: 日期"
+"<br>$D: 時長<br>$Z: 「正在播放」(在 [標題 - 演出者] 上遞補)"
 
 #: src/libvlc-module.c:695
 msgid "Disable all lua plugins"
@@ -2763,6 +2778,9 @@ msgid ""
 "filters here and configure them in the \"subsources filters\" modules "
 "section. You can also set many miscellaneous subpictures options."
 msgstr ""
+"這些選項讓您可以修改子圖片子系統的行為。例如，您可以啟用子圖片原始檔 (logo "
+"等)。在這裡啟用這些篩選器並在「子原始檔篩選器」模組區段中設定它們。您也可以設"
+"定許多其他子圖片選項。"
 
 #: src/libvlc-module.c:705 modules/gui/qt/ui/sprefs_subtitles.h:302
 msgid "Force subtitle position"
@@ -2821,6 +2839,8 @@ msgid ""
 "This adds so-called \"subpicture sources\". These filters overlay some "
 "images or text over the video (like a logo, arbitrary text, ...)."
 msgstr ""
+"這會新增所謂的「子圖片原始檔」。這些篩選器會在視訊上重疊部分影像或文字 (例如"
+"標誌、任何文字、...)。"
 
 #: src/libvlc-module.c:731
 msgid "Subpictures filter module"
@@ -2831,6 +2851,8 @@ msgid ""
 "This adds so-called \"subpicture filters\". These filter subpictures created "
 "by subtitle decoders or other subpictures sources."
 msgstr ""
+"這會增加所謂的「子圖片篩選器」。這些會篩選由字幕解碼器或其他子圖片原始檔建立"
+"的子圖片。"
 
 #: src/libvlc-module.c:736
 msgid "Autodetect subtitle files"
@@ -2856,6 +2878,12 @@ msgid ""
 "3 = subtitle file matching the movie name with additional chars\n"
 "4 = subtitle file matching the movie name exactly"
 msgstr ""
+"這會決定字幕和電影檔案名稱符合的模糊程度。選項是:\n"
+"0 = 不自動偵測字幕\n"
+"1 = 任何字幕檔案\n"
+"2 = 任何包含電影名稱的字幕檔案\n"
+"3 = 符合有其他字元的電影名稱的字幕檔案\n"
+"4 = 完全符合電影名稱的字幕檔案"
 
 #: src/libvlc-module.c:751
 msgid "Subtitle autodetection paths"
@@ -2952,6 +2980,9 @@ msgid ""
 "127.0.0.1) or a host name (e.g. localhost) to restrict them to a specific "
 "network interface."
 msgstr ""
+"這會定義 RTSP 伺服器會監聽的位址，及 RTSP VOD 媒體的基礎路徑。語法是 [位址/路"
+"徑]。伺服器預設會監聽任何的本機 IP 位址。指定 IP 位址 (例如 ::1 或 "
+"127.0.0.1) 或主機名稱 (例如 localhost) 以限制使用特定的網路介面。"
 
 #: src/libvlc-module.c:817
 msgid "HTTP server port"
@@ -2963,6 +2994,8 @@ msgid ""
 "is 80. However allocation of port numbers below 1025 is usually restricted "
 "by the operating system."
 msgstr ""
+"HTTP 伺服器會藍廳此 TCP 連接埠。標準 HTTP 連接埠號碼是 80。不過 1025 以下的連"
+"接埠號碼的配置通常由作業系統限制。"
 
 #: src/libvlc-module.c:824
 msgid "HTTPS server port"
@@ -2974,6 +3007,8 @@ msgid ""
 "number is 443. However allocation of port numbers below 1025 is usually "
 "restricted by the operating system."
 msgstr ""
+"HTTPS 伺服器會藍廳此 TCP 連接埠。標準 HTTPS 連接埠號碼是 443。不過 1025 以下"
+"的連接埠號碼的配置通常由作業系統限制。"
 
 #: src/libvlc-module.c:831
 msgid "RTSP server port"
@@ -2985,6 +3020,8 @@ msgid ""
 "is 554. However allocation of port numbers below 1025 is usually restricted "
 "by the operating system."
 msgstr ""
+"RTSP 伺服器會藍廳此 TCP 連接埠。標準 RTSP 連接埠號碼是 554。不過 1025 以下的"
+"連接埠號碼的配置通常由作業系統限制。"
 
 #: src/libvlc-module.c:838
 msgid "HTTP/TLS server certificate"
@@ -2995,6 +3032,8 @@ msgid ""
 "This X.509 certicate file (PEM format) is used for server-side TLS. On OS X, "
 "the string is used as a label to search the certificate in the keychain."
 msgstr ""
+"此 X.509 憑證檔案 (PEM 格式) 是用於伺服器端 TLS。在 OS X 平台，此字串是用為"
+"在 keychain 中搜尋憑證的標籤。"
 
 #: src/libvlc-module.c:843
 msgid "HTTP/TLS server private key"
@@ -3002,7 +3041,7 @@ msgstr "HTTP/TLS 伺服器密鑰"
 
 #: src/libvlc-module.c:845
 msgid "This private key file (PEM format) is used for server-side TLS."
-msgstr ""
+msgstr "此私密金鑰檔案 (PEM 格式) 是用於伺服器端 TLS。"
 
 #: src/libvlc-module.c:847
 msgid "HTTP proxy"
@@ -3033,6 +3072,8 @@ msgid ""
 "SOCKS proxy server to use. This must be of the form address:port. It will be "
 "used for all TCP connections"
 msgstr ""
+"要使用的 SOCKS Proxy 伺服器。格式必須是 [位址:連接埠]。它會在所有 TCP 連線中"
+"使用。"
 
 #: src/libvlc-module.c:862
 msgid "SOCKS user name"
@@ -3120,6 +3161,8 @@ msgid ""
 "(decompression methods). Only advanced users should alter this option as it "
 "can break playback of all your streams."
 msgstr ""
+"可使用這個選項來更改VLC 的編解碼器選擇方式(解壓縮方式)。只有進階使用者應該更"
+"改，因為此選項可能會中斷您的所有串流的播放。"
 
 #: src/libvlc-module.c:908
 msgid "Preferred decoders list"
@@ -3131,6 +3174,9 @@ msgid ""
 "try the dummy and a52 codecs before trying the other ones. Only advanced "
 "users should alter this option as it can break playback of all your streams."
 msgstr ""
+"VLC 將依優先順序排序使用的編解碼器的清單。例如，「dummy,a52」將在嘗試其他編解"
+"碼器之前嘗試 dummy 和 a52 編解碼器。只有進階使用者應該更改，因為此選項可能會"
+"中斷您的所有串流的播放。"
 
 #: src/libvlc-module.c:915
 msgid "Preferred encoders list"
@@ -3166,7 +3212,7 @@ msgstr "啟用所有 ES 的串流"
 
 #: src/libvlc-module.c:937
 msgid "Stream all elementary streams (video, audio and subtitles)"
-msgstr ""
+msgstr "輸出所有的基本串流 (視訊、音訊與字幕)"
 
 #: src/libvlc-module.c:939
 msgid "Display while streaming"
@@ -3216,6 +3262,7 @@ msgid ""
 "playlist item (automatically insert the gather stream output if not "
 "specified)"
 msgstr ""
+"在多個播放清單項目之間維持單一的串流輸出 (若未指定則自動插入收集串流輸出)"
 
 #: src/libvlc-module.c:964
 msgid "Stream output muxer caching (ms)"
@@ -3225,7 +3272,7 @@ msgstr "串流輸出多工器快取(毫秒)"
 msgid ""
 "This allow you to configure the initial caching amount for stream output "
 "muxer. This value should be set in milliseconds."
-msgstr ""
+msgstr "這讓您可以設定串流輸出多工器的初始快取大小 (毫秒)。"
 
 #: src/libvlc-module.c:969
 msgid "Preferred packetizer list"
@@ -3242,7 +3289,7 @@ msgstr "多工模組"
 
 #: src/libvlc-module.c:976
 msgid "This is a legacy entry to let you configure mux modules"
-msgstr ""
+msgstr "這是讓您可以設定多工器模組的傳統項目"
 
 #: src/libvlc-module.c:978
 msgid "Access output module"
@@ -3250,13 +3297,15 @@ msgstr "存取輸出模組"
 
 #: src/libvlc-module.c:980
 msgid "This is a legacy entry to let you configure access output modules"
-msgstr ""
+msgstr "這是讓您可以設定存取輸出模組的傳統項目"
 
 #: src/libvlc-module.c:983
 msgid ""
 "If this option is enabled, the flow on the SAP multicast address will be "
 "controlled. This is needed if you want to make announcements on the MBone."
 msgstr ""
+"如果啟用此選項，SAP 多點傳送位址上的流程會被控制。如果您想要在 MBone 上發佈公"
+"告，這是必要的選項。"
 
 #: src/libvlc-module.c:987
 msgid "SAP announcement interval"
@@ -3266,13 +3315,14 @@ msgstr "SAP 發佈時間間隔"
 msgid ""
 "When the SAP flow control is disabled, this lets you set the fixed interval "
 "between SAP announcements."
-msgstr ""
+msgstr "當停用 SAP 流量控制時，此選項讓您設定 SAP 宣告之間的固定間隔。"
 
 #: src/libvlc-module.c:998
 msgid ""
 "These options allow you to select default modules. Leave these alone unless "
 "you really know what you are doing."
 msgstr ""
+"這些選項讓您選擇預設模組。除非您真的知道您在做什麼，否則請勿修改這些選項。"
 
 #: src/libvlc-module.c:1001
 msgid "Access module"
@@ -3284,6 +3334,8 @@ msgid ""
 "access is not automatically detected. You should not set this as a global "
 "option unless you really know what you are doing."
 msgstr ""
+"此選項可讓您指定存取模組。如果偵測不到正確的存取模組，您可以使用此選項。除非"
+"您真的知道您在做什麼，否則請勿將此選項設定為全域選項。"
 
 #: src/libvlc-module.c:1007
 msgid "Stream filter module"
@@ -3291,15 +3343,15 @@ msgstr "串流過濾器模組"
 
 #: src/libvlc-module.c:1009
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr ""
+msgstr "串流過濾器可用來修改讀取的串流。"
 
 #: src/libvlc-module.c:1011
 msgid "Demux filter module"
-msgstr ""
+msgstr "解多工過濾器模組"
 
 #: src/libvlc-module.c:1013
 msgid "Demux filters are used to modify/control the stream that is being read."
-msgstr ""
+msgstr "解多工過濾器可用來修改/控制讀取的串流。"
 
 #: src/libvlc-module.c:1015
 msgid "Demux module"
@@ -3312,6 +3364,9 @@ msgid ""
 "automatically detected. You should not set this as a global option unless "
 "you really know what you are doing."
 msgstr ""
+"解多工器是用來分隔「基本」串流 (如音訊和視訊串流)。如果偵測不到正確的解多工"
+"器，您可以使用此選項。除非您真的知道您在做什麼，否則請勿將此選項設定為全域選"
+"項。"
 
 #: src/libvlc-module.c:1022
 msgid "VoD server module"
@@ -3322,6 +3377,8 @@ msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr ""
+"您可以選擇要使用的 VoD 伺服器模組。如果要切換回舊版模組，將此選項設定為"
+"「vod_rtsp」。"
 
 #: src/libvlc-module.c:1027
 msgid "Allow real-time priority"
@@ -3379,15 +3436,15 @@ msgstr "掃描新的外掛"
 msgid ""
 "Scan plugin directories for new plugins at startup. This increases the "
 "startup time of VLC."
-msgstr ""
+msgstr "在啟動時掃描外掛目錄是否有新的外掛。這可能會增加 VLC 的啟動時間。"
 
 #: src/libvlc-module.c:1058
 msgid "Preferred keystore list"
-msgstr ""
+msgstr "偏好的金鑰儲存區清單"
 
 #: src/libvlc-module.c:1060
 msgid "List of keystores that VLC will use in priority."
-msgstr ""
+msgstr "VLC 將依優先順序排序使用的金鑰儲存區清單。"
 
 #: src/libvlc-module.c:1062
 msgid "Locally collect statistics"
@@ -3425,6 +3482,9 @@ msgid ""
 "This option will allow you to play the file with the already running "
 "instance or enqueue it."
 msgstr ""
+"只允許一個 VLC 的執行實體有時候可能會有用。例如，如果您已經與 VLC 關聯部分媒"
+"體類型，然後又不想每次從檔案管理員開啟檔案時開啟新的 VLC 的執行實體。這個選項"
+"可讓您將要播放的檔案排入正在執行的 VLC 的執行實體的佇列。"
 
 #: src/libvlc-module.c:1082
 msgid "VLC is started from file association"
@@ -3465,11 +3525,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1104
 msgid "Expose media player via D-Bus"
-msgstr ""
+msgstr "通過 D-Bus 公開媒體播放器"
 
 #: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
-msgstr ""
+msgstr "允許其他應用程式使用 D-Bus MPRIS 通訊協定控制 VLC。"
 
 #: src/libvlc-module.c:1114
 msgid ""
@@ -3479,17 +3539,17 @@ msgstr "這些選項用來定義播放清單的行為。部份選項可能會被
 
 #: src/libvlc-module.c:1117
 msgid "Automatically preparse items"
-msgstr ""
+msgstr "自動剖析項目"
 
 #: src/libvlc-module.c:1119
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
-msgstr ""
+msgstr "自動剖析加入至播放清單的項目 (以擷取部分中繼資料)。"
 
 #: src/libvlc-module.c:1122
 msgid "Preparsing timeout"
-msgstr ""
+msgstr "剖析逾時"
 
 #: src/libvlc-module.c:1124
 msgid "Maximum time allowed to preparse an item, in milliseconds"
@@ -3981,7 +4041,7 @@ msgstr "啟動"
 
 #: src/libvlc-module.c:1304
 msgid "Select the key to activate selected item in DVD menus."
-msgstr ""
+msgstr "選擇用於啟用 DVD 選單中的選擇項目的按鍵。"
 
 #: src/libvlc-module.c:1305 modules/gui/qt/dialogs/toolbar.cpp:509
 msgid "Go to the DVD menu"
@@ -3989,7 +4049,7 @@ msgstr "前往 DVD 選單"
 
 #: src/libvlc-module.c:1306
 msgid "Select the key to take you to the DVD menu"
-msgstr ""
+msgstr "選擇用於移至 DVD 選單的按鍵。"
 
 #: src/libvlc-module.c:1307
 msgid "Select previous DVD title"
@@ -3997,7 +4057,7 @@ msgstr "選擇上一個 DVD 標題"
 
 #: src/libvlc-module.c:1308
 msgid "Select the key to choose the previous title from the DVD"
-msgstr ""
+msgstr "選擇用於選擇 DVD 的上一個標題的按鍵"
 
 #: src/libvlc-module.c:1309
 msgid "Select next DVD title"
@@ -4005,7 +4065,7 @@ msgstr "選擇下一個 DVD 標題"
 
 #: src/libvlc-module.c:1310
 msgid "Select the key to choose the next title from the DVD"
-msgstr ""
+msgstr "選擇用於選擇 DVD 的下一個標題的按鍵"
 
 #: src/libvlc-module.c:1311
 msgid "Select prev DVD chapter"
@@ -4013,7 +4073,7 @@ msgstr "選擇上一個 DVD 章節"
 
 #: src/libvlc-module.c:1312
 msgid "Select the key to choose the previous chapter from the DVD"
-msgstr ""
+msgstr "選擇用於選擇 DVD 的上一章的按鍵"
 
 #: src/libvlc-module.c:1313
 msgid "Select next DVD chapter"
@@ -4021,7 +4081,7 @@ msgstr "選擇下一個 DVD 章節"
 
 #: src/libvlc-module.c:1314
 msgid "Select the key to choose the next chapter from the DVD"
-msgstr ""
+msgstr "選擇用於選擇 DVD 的下一章的按鍵"
 
 #: src/libvlc-module.c:1315
 msgid "Volume up"
@@ -4056,7 +4116,7 @@ msgstr "增加字幕延遲"
 
 #: src/libvlc-module.c:1322
 msgid "Select the key to increase the subtitle delay."
-msgstr ""
+msgstr "選擇增加字幕延遲的按鍵。"
 
 #: src/libvlc-module.c:1323
 msgid "Subtitle delay down"
@@ -4064,7 +4124,7 @@ msgstr "減少字幕延遲"
 
 #: src/libvlc-module.c:1324
 msgid "Select the key to decrease the subtitle delay."
-msgstr ""
+msgstr "選擇減少字幕延遲的按鍵。"
 
 #: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
@@ -4241,7 +4301,7 @@ msgstr "清除播放清單"
 
 #: src/libvlc-module.c:1374
 msgid "Select the key to clear the current playlist."
-msgstr ""
+msgstr "選擇用於清除目前的播放清單的按鍵。"
 
 #: src/libvlc-module.c:1376
 msgid "Playlist bookmark 1"
@@ -5831,29 +5891,26 @@ msgstr "找不到音訊輸入裝置"
 msgid ""
 "Your Mac does not seem to be equipped with a suitable audio input device."
 "Please check your connectors and drivers."
-msgstr ""
+msgstr "您的 Mac 似乎沒有裝配音訊輸入裝置。請檢查您的連接器和驅動程式。"
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "問題的詳細訊息與系統設定值"
+msgstr "存取系統資源時發生問題"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
-msgstr ""
+msgstr "請開啟「系統偏好設定」->「安全性與隱私權」並允許 VLC 存取您的麥克風。"
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "AVFoundation 視訊擷取"
+msgstr "AVFoundation 音訊擷取"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "AVFoundation 視訊擷取模組。"
+msgstr "AVFoundation 音訊擷取模組。"
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -5871,7 +5928,7 @@ msgstr "找不到視訊裝置"
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
-msgstr ""
+msgstr "您的 Mac 似乎沒有裝配視訊輸入裝置。請檢查您的連接器和驅動程式。"
 
 #: modules/access/avcapture.m:325
 msgid ""
@@ -5883,7 +5940,7 @@ msgstr "您的 Mac 似乎沒有裝配適當的輸入裝置。請檢查您的連�
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
-msgstr ""
+msgstr "請開啟「系統偏好設定」->「安全性與隱私權」並允許 VLC 存取您的相機。"
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -5913,7 +5970,7 @@ msgstr "區域碼"
 msgid ""
 "Blu-Ray player region code. Some discs can be played only with a correct "
 "region code."
-msgstr ""
+msgstr "Blu-Ray 播放器的區域碼。部分光碟只能與正確的區域碼播放。"
 
 #: modules/access/bluray.c:103 modules/services_discovery/udev.c:603
 #: modules/gui/qt/ui/open_disk.h:296
@@ -5926,7 +5983,7 @@ msgstr "藍光光碟支援 (libbluray)"
 
 #: modules/access/bluray.c:845
 msgid "Path doesn't appear to be a Blu-ray"
-msgstr ""
+msgstr "路徑似乎不是 Blu-ray。"
 
 #: modules/access/bluray.c:860
 msgid ""
@@ -5940,7 +5997,7 @@ msgstr "藍光光碟損毀。"
 
 #: modules/access/bluray.c:868
 msgid "Missing AACS configuration file!"
-msgstr ""
+msgstr "沒有 AACS 設定檔案!"
 
 #: modules/access/bluray.c:870
 msgid "No valid processing key found in AACS config file."
@@ -5994,7 +6051,7 @@ msgstr "藍光錯誤"
 
 #: modules/access/bluray.c:2109
 msgid "Top Menu"
-msgstr ""
+msgstr "上層功能表"
 
 #: modules/access/bluray.c:2112
 msgid "First Play"
@@ -6286,7 +6343,7 @@ msgstr "裝置屬性"
 #: modules/access/dshow/dshow.cpp:157
 msgid ""
 "Show the properties dialog of the selected device before starting the stream."
-msgstr ""
+msgstr "在開始串流之前顯示選擇的裝置的屬性對話視窗。"
 
 #: modules/access/dshow/dshow.cpp:159
 msgid "Tuner properties"
@@ -6438,7 +6495,7 @@ msgstr ""
 
 #: modules/access/dsm/access.c:72 modules/access/dsm/sd.c:138
 msgid "Windows networks"
-msgstr ""
+msgstr "Windows 網路"
 
 #: modules/access/dsm/access.c:74
 msgid "libdsm's SMB (Windows network shares) input and browser"
@@ -6454,7 +6511,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:38
 msgid "DVB adapter"
-msgstr ""
+msgstr "DVB 介面卡"
 
 #: modules/access/dtv/access.c:40
 msgid ""
@@ -6492,7 +6549,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:55
 msgid "Network name to create"
-msgstr ""
+msgstr "要建立的網路名稱"
 
 #: modules/access/dtv/access.c:56
 msgid "Create unique name in the System Tuning Spaces"
@@ -6617,7 +6674,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:138
 msgid "Hierarchy mode"
-msgstr ""
+msgstr "階層模式"
 
 #: modules/access/dtv/access.c:146
 msgid "DVB-T2 Physical Layer Pipe"
@@ -6649,11 +6706,11 @@ msgstr ""
 
 #: modules/access/dtv/access.c:156
 msgid "Stream identifier"
-msgstr ""
+msgstr "串流識別元"
 
 #: modules/access/dtv/access.c:158
 msgid "Pilot"
-msgstr ""
+msgstr "試驗"
 
 #: modules/access/dtv/access.c:160
 msgid "Roll-off factor"
@@ -6783,7 +6840,7 @@ msgstr ""
 
 #: modules/access/dtv/access.c:222
 msgid "Network identifier"
-msgstr ""
+msgstr "網路識別元"
 
 #: modules/access/dtv/access.c:223
 msgid "Satellite azimuth"
@@ -6919,7 +6976,7 @@ msgstr ""
 
 #: modules/access/dvb/access.c:79
 msgid "DVB"
-msgstr ""
+msgstr "DVB"
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
@@ -6934,7 +6991,7 @@ msgstr ""
 
 #: modules/access/dvb/scan.c:827
 msgid "Scanning DVB"
-msgstr ""
+msgstr "正在掃描 DVB"
 
 #: modules/access/dvdnav.c:71 modules/access/dvdread.c:69
 msgid "DVD angle"
@@ -7475,7 +7532,7 @@ msgstr "若網址中無使用者或密碼時使用的連線密碼。"
 
 #: modules/access/live555.cpp:90
 msgid "RTSP frame buffer size"
-msgstr ""
+msgstr "RTSP 框架緩衝大小"
 
 #: modules/access/live555.cpp:91
 msgid ""
