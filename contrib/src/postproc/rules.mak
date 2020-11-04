@@ -103,10 +103,6 @@ ifdef HAVE_SOLARIS
 POSTPROCCONF += --enable-pic
 endif
 
-ifdef HAVE_NACL
-POSTPROCCONF += --target-os=linux
-endif
-
 # Build
 
 ifdef GPL

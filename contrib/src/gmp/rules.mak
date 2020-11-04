@@ -13,11 +13,6 @@ ifeq ($(ARCH),mips64el)
 GMP_CONF += --disable-assembly
 endif
 endif
-ifdef HAVE_NACL
-ifeq ($(ARCH),x86_64)
-GMP_CONF += --disable-assembly
-endif
-endif
 
 ifdef HAVE_WIN32
 ifeq ($(ARCH),arm)

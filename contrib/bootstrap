@@ -355,9 +355,6 @@ case "${OS}" in
 	*solaris*)
 		add_make_enabled "HAVE_SOLARIS"
 		;;
-	*nacl*)
-		add_make_enabled "HAVE_NACL"
-		;;
 	*emscripten*)
 	       add_make_enabled "HAVE_EMSCRIPTEN"
 	       ;;

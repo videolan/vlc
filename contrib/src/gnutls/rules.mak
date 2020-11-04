@@ -75,10 +75,6 @@ ifeq ($(ARCH),aarch64)
 endif
 endif
 
-ifdef HAVE_NACL
-	GNUTLS_CONF += --disable-hardware-acceleration
-endif
-
 .gnutls: gnutls
 	cd $< && $(GNUTLS_ENV) ./configure $(GNUTLS_CONF)
 	cd $< && $(MAKE) -C gl install

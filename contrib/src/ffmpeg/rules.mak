@@ -211,10 +211,6 @@ endif
 FFMPEGCONF += --target-os=sunos --enable-pic
 endif
 
-ifdef HAVE_NACL
-FFMPEGCONF+=--disable-inline-asm --disable-asm --target-os=linux
-endif
-
 ifdef HAVE_EMSCRIPTEN
 FFMPEGCONF+= --arch=wasm32 --target-os=emscripten
 endif
