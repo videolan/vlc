@@ -54,17 +54,6 @@ int putc_unlocked (int c, FILE *stream)
 {
     return _putc_nolock (c, stream);
 }
-
-#elif defined __native_client__
-void flockfile (FILE *stream)
-{
-    _flockfile(stream);
-}
-
-void funlockfile (FILE *stream)
-{
-    _funlockfile(stream);
-}
 #else
 # error flockfile not implemented on your platform!
 #endif

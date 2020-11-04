@@ -33,7 +33,7 @@
 
 /* C++11 says there's no need to define __STDC_*_MACROS when including
  * inttypes.h and stdint.h. */
-#if defined (__cplusplus) && (defined(__MINGW32__) || defined(__UCLIBC__) || defined(__native_client__))
+#if defined (__cplusplus) && (defined(__MINGW32__) || defined(__UCLIBC__))
 # ifndef __STDC_FORMAT_MACROS
 #  define __STDC_FORMAT_MACROS 1
 # endif
@@ -119,15 +119,6 @@ typedef struct
 extern "C" {
 #else
 # define VLC_NOTHROW
-#endif
-
-/* signal.h */
-#if !defined(HAVE_SIGWAIT) && defined(__native_client__)
-/* NaCl does not define sigwait in signal.h. We need to include it here to
- * define sigwait, because sigset_t is allowed to be either an integral or a
- * struct. */
-#include <signal.h>
-int sigwait(const sigset_t *set, int *sig);
 #endif
 
 /* stddef.h */
@@ -269,10 +260,6 @@ pid_t getpid (void) VLC_NOTHROW;
 int fsync (int fd);
 #endif
 
-#ifndef HAVE_PATHCONF
-long pathconf (const char *path, int name);
-#endif
-
 /* dirent.h */
 #ifndef HAVE_DIRFD
 int (dirfd) (DIR *);
@@ -322,10 +309,6 @@ void *aligned_alloc(size_t, size_t);
 #define aligned_free(ptr)  _aligned_free(ptr)
 #else
 #define aligned_free(ptr)  free(ptr)
-#endif
-
-#if defined(__native_client__) && defined(__cplusplus)
-# define HAVE_USELOCALE
 #endif
 
 #if !defined(HAVE_NEWLOCALE) && defined(HAVE_CXX_LOCALE_T) && defined(__cplusplus)
@@ -391,11 +374,6 @@ typedef int socklen_t;
 # endif
 int inet_pton(int, const char *, void *);
 const char *inet_ntop(int, const void *, char *, socklen_t);
-#endif
-
-/* NaCl has a broken netinet/tcp.h, so TCP_NODELAY is not set */
-#if defined(__native_client__) && !defined( HAVE_NETINET_TCP_H )
-#  define TCP_NODELAY 1
 #endif
 
 #ifndef HAVE_STRUCT_POLLFD
