@@ -179,6 +179,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->packet_sys.s = p_demux->s;
     p_sys->packet_sys.logger = p_demux->obj.logger;
     p_sys->packet_sys.b_deduplicate = false;
+    p_sys->packet_sys.b_can_hold_multiple_packets = false;
     p_sys->packet_sys.pf_doskip = Packet_DoSkip;
     p_sys->packet_sys.pf_send = Packet_Enqueue;
     p_sys->packet_sys.pf_gettrackinfo = Packet_GetTrackInfo;
@@ -1361,6 +1362,7 @@ static int DemuxInit( demux_t *p_demux )
 
     p_sys->packet_sys.pi_preroll = &p_sys->p_fp->i_preroll;
     p_sys->packet_sys.pi_preroll_start = &p_sys->i_preroll_start;
+    p_sys->packet_sys.b_can_hold_multiple_packets = false;
 
     return VLC_SUCCESS;
 

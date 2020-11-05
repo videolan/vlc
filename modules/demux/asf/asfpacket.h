@@ -57,6 +57,7 @@ struct asf_packet_sys_s
     vlc_tick_t *pi_preroll;
     vlc_tick_t *pi_preroll_start;
     bool b_deduplicate; /* Flip4mac repeats data object payloads */
+    bool b_can_hold_multiple_packets; /* Flip4mac passes multiple buffers */
 
     /* callbacks */
     void (*pf_send)(asf_packet_sys_t *, uint8_t, block_t **);

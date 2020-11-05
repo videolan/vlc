@@ -526,19 +526,37 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
 
     if( pkt.left > 0 )
     {
-#ifdef ASF_DEBUG
-        if( pkt.left > pkt.padding_length )
-            vlc_warning( p_packetsys->logger, "Didn't read %"PRIu32" bytes in the packet",
-                            pkt.left - pkt.padding_length );
-        else if( pkt.left < pkt.padding_length )
-            vlc_warning( p_packetsys->logger, "Read %"PRIu32" too much bytes in the packet",
-                            pkt.padding_length - pkt.left );
-#endif
-        i_return = vlc_stream_Read( p_packetsys->s, NULL, pkt.left );
-        if( i_return < 0 || (size_t) i_return < pkt.left )
+        size_t toskip;
+        if( pkt.left > pkt.padding_length &&
+            !p_packetsys->b_can_hold_multiple_packets )
         {
-            vlc_error( p_packetsys->logger, "cannot skip data, EOF ?" );
-            return 0;
+            toskip = pkt.left;
+#ifdef ASF_DEBUG
+            vlc_warning( p_packetsys->logger, "Didn't read %"PRIu32" bytes in the packet at %"PRIu64,
+                            pkt.left - pkt.padding_length, vlc_stream_Tell(p_packetsys->s) );
+#endif
+        }
+        else if( pkt.left < pkt.padding_length )
+        {
+            toskip = 0;
+#ifdef ASF_DEBUG
+            vlc_warning( p_packetsys->logger, "Read %"PRIu32" too much bytes from the packet",
+                               pkt.padding_length - pkt.left );
+#endif
+        }
+        else
+        {
+            toskip = pkt.padding_length;
+        }
+
+        if( toskip )
+        {
+            i_return = vlc_stream_Read( p_packetsys->s, NULL, toskip );
+            if( i_return < 0 || (size_t) i_return < toskip )
+            {
+                vlc_error( p_packetsys->logger, "cannot skip data, EOF ?" );
+                return 0;
+            }
         }
     }
 
