@@ -717,9 +717,17 @@ static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_b
             p_track->i_dts_backup = p_block->i_dts;
             p_track->i_pts_backup = p_block->i_pts;
             /* And demux it as ASF packet */
-            DemuxASFPacket( &p_sys->asfpacketsys, p_block->i_buffer, p_block->i_buffer,
-                            0, p_block->i_buffer );
-            vlc_stream_Delete( p_sys->asfpacketsys.s );
+            uint64_t startpos;
+            do
+            {
+                startpos = vlc_stream_Tell(p_sys->asfpacketsys.s);
+                DemuxASFPacket( &p_sys->asfpacketsys,
+                                p_block->i_buffer - startpos,
+                                p_block->i_buffer - startpos,
+                                0, p_block->i_buffer );
+            } while( vlc_stream_Tell(p_sys->asfpacketsys.s) != p_block->i_buffer &&
+                     vlc_stream_Tell(p_sys->asfpacketsys.s) != startpos );
+            vlc_stream_Delete(p_sys->asfpacketsys.s);
         }
         block_Release(p_block);
     }
@@ -1170,7 +1178,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->asfpacketsys.pi_preroll = &p_sys->i_preroll;
     p_sys->asfpacketsys.pi_preroll_start = &p_sys->i_preroll_start;
     p_sys->asfpacketsys.b_deduplicate = true;
-    p_sys->asfpacketsys.b_can_hold_multiple_packets = false;
+    p_sys->asfpacketsys.b_can_hold_multiple_packets = true;
     p_sys->asfpacketsys.pf_doskip = NULL;
     p_sys->asfpacketsys.pf_send = MP4ASF_Send;
     p_sys->asfpacketsys.pf_gettrackinfo = MP4ASF_GetTrackInfo;
