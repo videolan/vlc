@@ -77,10 +77,37 @@ static uint32_t SkipBytes( stream_t *s, uint32_t i_bytes )
 }
 
 static int DemuxSubPayload( asf_packet_sys_t *p_packetsys,
-                            uint8_t i_stream_number, block_t **pp_frame,
+                            uint8_t i_stream_number, asf_track_info_t *p_tkinfo,
                             uint32_t i_sub_payload_data_length, vlc_tick_t i_pts, vlc_tick_t i_dts,
-                            uint32_t i_media_object_offset, bool b_keyframe, bool b_ignore_pts )
+                            uint32_t i_media_object_number, uint32_t i_media_object_offset,
+                            bool b_keyframe, bool b_ignore_pts )
 {
+    block_t **pp_frame = &p_tkinfo->p_frame;
+
+    if( p_packetsys->b_deduplicate )
+    {
+        for(size_t i=0; i<p_tkinfo->i_pktcount; i++)
+        {
+            if(p_tkinfo->prev[i].media_number == i_media_object_number &&
+               p_tkinfo->prev[i].media_offset == i_media_object_offset)
+            {
+                vlc_debug(p_packetsys->logger, "dropping duplicate num %"PRIu32" off %"PRIu32,
+                          i_media_object_number , i_media_object_offset);
+                ssize_t skipped = vlc_stream_Read( p_packetsys->s, NULL, i_sub_payload_data_length );
+                return ( skipped >= 0 && (uint32_t) skipped == i_sub_payload_data_length ) ? 0 : -1;
+            }
+        }
+
+        unsigned dedupindex;
+        if( p_tkinfo->i_pktcount < ASFPACKET_DEDUPLICATE )
+            dedupindex = p_tkinfo->i_pkt = p_tkinfo->i_pktcount++;
+        else
+            dedupindex = (++p_tkinfo->i_pkt) % ASFPACKET_DEDUPLICATE;
+
+        p_tkinfo->prev[dedupindex].media_number = i_media_object_number;
+        p_tkinfo->prev[dedupindex].media_offset = i_media_object_offset;
+    }
+
     /* FIXME I don't use i_media_object_number, sould I ? */
     if( *pp_frame && i_media_object_offset == 0 )
     {
@@ -342,9 +369,10 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
             i_payload_dts -= VLC_TICK_FROM_MSFTIME(p_tkinfo->p_sp->i_time_offset);
 
         if ( i_sub_payload_data_length &&
-             DemuxSubPayload( p_packetsys, i_stream_number, &p_tkinfo->p_frame,
+             DemuxSubPayload( p_packetsys, i_stream_number, p_tkinfo,
                               i_sub_payload_data_length, i_payload_pts, i_payload_dts,
-                              i_media_object_offset, b_packet_keyframe, b_ignore_pts ) < 0)
+                              i_media_object_number, i_media_object_offset,
+                              b_packet_keyframe, b_ignore_pts ) < 0)
             return -1;
 
         if ( pkt->left > pkt->i_skip + i_sub_payload_data_length )
@@ -539,6 +567,8 @@ void ASFPacketTrackInit( asf_track_info_t *p_ti )
     p_ti->p_esp = NULL;
     p_ti->p_sp = NULL;
     p_ti->p_frame = NULL;
+    p_ti->i_pktcount = 0;
+    p_ti->i_pkt = 0;
 }
 
 void ASFPacketTrackReset( asf_track_info_t *p_ti )
@@ -546,4 +576,6 @@ void ASFPacketTrackReset( asf_track_info_t *p_ti )
     if( p_ti->p_frame )
         block_ChainRelease( p_ti->p_frame );
     p_ti->p_frame = NULL;
+    p_ti->i_pktcount = 0;
+    p_ti->i_pkt = 0;
 }

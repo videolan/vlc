@@ -1169,6 +1169,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->asfpacketsys.logger = p_demux->obj.logger;
     p_sys->asfpacketsys.pi_preroll = &p_sys->i_preroll;
     p_sys->asfpacketsys.pi_preroll_start = &p_sys->i_preroll_start;
+    p_sys->asfpacketsys.b_deduplicate = true;
     p_sys->asfpacketsys.pf_doskip = NULL;
     p_sys->asfpacketsys.pf_send = MP4ASF_Send;
     p_sys->asfpacketsys.pf_gettrackinfo = MP4ASF_GetTrackInfo;

@@ -28,6 +28,7 @@
 #include "libasf.h"
 
 #define ASFPACKET_PREROLL_FROM_CURRENT -1
+#define ASFPACKET_DEDUPLICATE 8
 
 typedef struct
 {
@@ -35,6 +36,13 @@ typedef struct
     asf_object_stream_properties_t *p_sp;
     asf_object_extended_stream_properties_t *p_esp;
     int i_cat;
+    struct
+    {
+        unsigned media_number;
+        unsigned media_offset;
+    } prev[ASFPACKET_DEDUPLICATE];
+    unsigned i_pkt;
+    unsigned i_pktcount;
 } asf_track_info_t;
 
 typedef struct asf_packet_sys_s asf_packet_sys_t;
@@ -48,6 +56,7 @@ struct asf_packet_sys_s
     /* global stream info */
     vlc_tick_t *pi_preroll;
     vlc_tick_t *pi_preroll_start;
+    bool b_deduplicate; /* Flip4mac repeats data object payloads */
 
     /* callbacks */
     void (*pf_send)(asf_packet_sys_t *, uint8_t, block_t **);
