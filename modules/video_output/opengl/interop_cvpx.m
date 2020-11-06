@@ -205,10 +205,10 @@ Open(vlc_object_t *obj)
 #else
     const GLenum tex_target = GL_TEXTURE_RECTANGLE;
     {
-        priv->gl_ctx = var_InheritAddress(interop->gl, "macosx-glcontext");
+        priv->gl_ctx = CGLGetCurrentContext();
         if (!priv->gl_ctx)
         {
-            msg_Err(interop->gl, "can't find macosx-glcontext");
+            msg_Warn(&interop->obj, "OpenGL provider is not using CGL, cannot use interop_cvpx");
             free(priv);
             return VLC_EGENERIC;
         }
