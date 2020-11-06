@@ -20,7 +20,7 @@ libdecklinkoutput_plugin_la_LIBADD = $(LIBS_decklink) $(LIBDL) -lpthread
 vout_LTLIBRARIES += libdecklinkoutput_plugin.la
 endif
 
-libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.c \
+libglinterop_cvpx_plugin_la_SOURCES = video_output/opengl/interop_cvpx.m \
 	video_output/opengl/interop.h
 libglinterop_cvpx_plugin_la_SOURCES += codec/vt_utils.c codec/vt_utils.h
 libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
