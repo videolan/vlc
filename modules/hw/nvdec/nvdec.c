@@ -552,13 +552,13 @@ static int CUDAAPI HandlePictureDisplay(void *p_opaque, CUVIDPARSERDISPINFO *p_d
     {
         // the picture has not been deinterlaced, forward the field parameters
         p_pic->b_progressive = p_dispinfo->progressive_frame;
-        p_pic->b_top_field_first = p_dispinfo->top_field_first;
         p_pic->i_nb_fields = 2 + p_dispinfo->repeat_first_field;
     }
     else
     {
         p_pic->b_progressive = true;
     }
+    p_pic->b_top_field_first = p_dispinfo->top_field_first;
     p_pic->date = p_dispinfo->timestamp;
 
     // Push decoded frame to display queue
