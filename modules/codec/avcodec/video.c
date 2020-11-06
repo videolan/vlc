@@ -860,7 +860,7 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
     else
         p_pic->format.multiview_mode = p_dec->fmt_out.video.multiview_mode;
 
-    if (format_changed && decoder_UpdateVideoFormat( p_dec ))
+    if (format_changed && decoder_UpdateVideoOutput( p_dec, p_sys->vctx_out ))
         return -1;
 
     const AVFrameSideData *p_avcc = av_frame_get_side_data( frame, AV_FRAME_DATA_A53_CC );
