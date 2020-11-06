@@ -85,6 +85,11 @@ struct  ci_filters_ctx
     struct filter_chain *       fchain;
     filter_t *                  src_converter;
     filter_t *                  dst_converter;
+#if !TARGET_OS_IPHONE
+    CGLContextObj               cgl_context;
+#else
+    CVEAGLContext               eagl_context;
+#endif
 };
 
 typedef struct filter_sys_t
@@ -670,13 +675,21 @@ Open(filter_t *filter, char const *psz_filter)
         }
 
 #if !TARGET_OS_IPHONE
-        CGLContextObj glctx = var_InheritAddress(filter, "macosx-glcontext");
-        if (!glctx)
-        {
-            msg_Err(filter, "can't find 'macosx-glcontext' var");
-            goto error;
-        }
-        ctx->ci_ctx = [CIContext contextWithCGLContext: glctx
+        CGLPixelFormatAttribute pixel_attr[] = {
+            kCGLPFAAccelerated,
+            kCGLPFAAllowOfflineRenderers,
+            0,
+        };
+
+        CGLPixelFormatObj pixelFormat;
+        GLint numPixelFormats = 0;
+
+        CGLChoosePixelFormat (pixel_attr, &pixelFormat, &numPixelFormats);
+
+        CGLCreateContext( pixelFormat, NULL, &ctx->cgl_context) ;
+        CGLDestroyPixelFormat( pixelFormat ) ;
+
+        ctx->ci_ctx = [CIContext contextWithCGLContext: ctx->cgl_context
                                            pixelFormat: nil
                                             colorSpace: nil
                                                options: @{
@@ -684,13 +697,8 @@ Open(filter_t *filter, char const *psz_filter)
                                                 kCIContextOutputColorSpace : [NSNull null],
                                                }];
 #else
-        CVEAGLContext eaglctx = var_InheritAddress(filter, "ios-eaglcontext");
-        if (!eaglctx)
-        {
-            msg_Err(filter, "can't find 'ios-eaglcontext' var");
-            goto error;
-        }
-        ctx->ci_ctx = [CIContext contextWithEAGLContext: eaglctx];
+        ctx->eagl_context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+        ctx->ci_ctx = [CIContext contextWithEAGLContext: ctx->eagl_context];
 #endif
         if (!ctx->ci_ctx)
             goto error;
@@ -710,6 +718,14 @@ Open(filter_t *filter, char const *psz_filter)
     return VLC_SUCCESS;
 
 error:
+#if !TARGET_OS_IPHONE
+    if (ctx->cgl_context)
+        CGLDestroyContext(ctx->cgl_context);
+#else
+    if (ctx->eagl_context)
+        [ctx->eagl_context release];
+#endif
+
     if (filter->vctx_out)
         vlc_video_context_Release(filter->vctx_out);
     free(p_sys);

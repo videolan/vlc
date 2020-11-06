@@ -113,7 +113,8 @@ video_filter_LTLIBRARIES = \
 libci_filters_plugin_la_SOURCES = video_filter/ci_filters.m codec/vt_utils.c codec/vt_utils.h
 if HAVE_OSX
 libci_filters_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)' \
-	-Wl,-framework,Foundation -Wl,-framework,CoreGraphics -Wl,-framework,CoreImage -Wl,-framework,CoreVideo
+	-Wl,-framework,Foundation -Wl,-framework,CoreGraphics -Wl,-framework,CoreImage \
+	-Wl,-framework,CoreVideo -Wl,-framework,OpenGL
 video_filter_LTLIBRARIES += libci_filters_plugin.la
 endif
 
