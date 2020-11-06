@@ -1100,19 +1100,24 @@ static const float f_min_window_height = 307.;
 
 - (NSView *)sourceList:(PXSourceList *)aSourceList viewForItem:(id)item
 {
-    VLCSourceListTableCellView *cellView = nil;
-    if ([aSourceList levelForItem:item] == 0)
-        cellView = [aSourceList makeViewWithIdentifier:@"HeaderCell" owner:nil];
-    else
-        cellView = [aSourceList makeViewWithIdentifier:@"DataCell" owner:nil];
-
     PXSourceListItem *sourceListItem = item;
+
+    if ([aSourceList levelForItem:item] == 0) {
+        PXSourceListTableCellView *cellView = [aSourceList makeViewWithIdentifier:@"HeaderCell" owner:nil];
+
+        cellView.textField.editable = NO;
+        cellView.textField.selectable = NO;
+        cellView.textField.stringValue = sourceListItem.title ? sourceListItem.title : @"";
+
+        return cellView;
+    }
+
+    VLCSourceListTableCellView * cellView = [aSourceList makeViewWithIdentifier:@"DataCell" owner:nil];
 
     cellView.textField.editable = NO;
     cellView.textField.selectable = NO;
-
     cellView.textField.stringValue = sourceListItem.title ? sourceListItem.title : @"";
-    cellView.imageView.image = [item icon];
+    cellView.imageView.image = [sourceListItem icon];
 
     // Badge count
     {
@@ -1120,9 +1125,9 @@ static const float f_min_window_height = 307.;
         playlist_item_t *p_pl_item = NULL;
         NSInteger i_playlist_size = 0;
 
-        if ([[item identifier] isEqualToString: @"playlist"]) {
+        if ([[sourceListItem identifier] isEqualToString: @"playlist"]) {
             p_pl_item = p_playlist->p_playing;
-        } else if ([[item identifier] isEqualToString: @"medialibrary"]) {
+        } else if ([[sourceListItem identifier] isEqualToString: @"medialibrary"]) {
             p_pl_item = p_playlist->p_media_library;
         }
 
