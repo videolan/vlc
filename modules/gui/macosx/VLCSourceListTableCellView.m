@@ -25,4 +25,16 @@
 
 @implementation VLCSourceListTableCellView
 
+- (void)awakeFromNib
+{
+    [super awakeFromNib];
+
+    // Set larger margin for Big Sur sidebar to reduce icon size
+    // 10.16 == 11.0, but the latter is not known in older SDKs
+    if(@available(macOS 10.16, *)) {
+        self.imageBottomConstraint.constant = 6.0;
+        self.imageTopConstraint.constant = 6.0;
+    }
+}
+
 @end
