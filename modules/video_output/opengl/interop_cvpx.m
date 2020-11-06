@@ -31,6 +31,7 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #include <CoreVideo/CVOpenGLESTextureCache.h>
+#include <OpenGLES/EAGL.h>
 #else
 #include <IOSurface/IOSurface.h>
 #endif
@@ -184,10 +185,10 @@ Open(vlc_object_t *obj)
     const GLenum tex_target = GL_TEXTURE_2D;
 
     {
-        CVEAGLContext eagl_ctx = var_InheritAddress(interop->gl, "ios-eaglcontext");
+        CVEAGLContext eagl_ctx = [EAGLContext currentContext];
         if (!eagl_ctx)
         {
-            msg_Err(interop->gl, "can't find ios-eaglcontext");
+            msg_Warn(&interop->obj, "OpenGL provider is not using CAEAGL, cannot use interop_cvpx");
             free(priv);
             return VLC_EGENERIC;
         }
