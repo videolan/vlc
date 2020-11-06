@@ -1328,7 +1328,8 @@ static bool TsStorageIsEmpty( ts_storage_t *p_storage )
 static void TsStoragePushCmd( ts_storage_t *p_storage, const ts_cmd_t *p_cmd, bool b_flush )
 {
     assert( !TsStorageIsFull( p_storage, p_cmd ) );
-    ts_cmd_t cmd = *p_cmd;
+    ts_cmd_t cmd;
+    memcpy(&cmd, p_cmd, TsStorageSizeofCommand[p_cmd->header.i_type]);
 
     if( cmd.header.i_type == C_SEND )
     {
