@@ -68,7 +68,6 @@ typedef struct
     MMAL_ES_FORMAT_T *output_format;
 
     MMAL_STATUS_T err_stream;
-    bool b_top_field_first;
     bool b_progressive;
 
     bool b_flushed;
@@ -365,8 +364,6 @@ apply_fmt:
                 status, mmal_status_to_string(status));
     } else {
         sys->b_progressive = (interlace_type.eMode == MMAL_InterlaceProgressive);
-        sys->b_top_field_first = sys->b_progressive ? true :
-            (interlace_type.eMode == MMAL_InterlaceFieldsInterleavedUpperFirst);
     }
 
     // Tell the rest of the world we have changed format
