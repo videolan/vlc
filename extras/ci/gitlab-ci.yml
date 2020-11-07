@@ -378,7 +378,7 @@ tvos-arm64:
     image:
         name: $VLC_ANDROID_IMAGE
     script: |
-        wget https://code.videolan.org/videolan/vlc-android/raw/7d2b0fd2ba332d5e3c83415b67dbe2fe5748f346/buildsystem/compile-libvlc.sh
+        wget https://code.videolan.org/videolan/vlc-android/raw/fd4d934ad31d37f3eeaa834214ca16eb0d4ecb6a/buildsystem/compile-libvlc.sh
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
             /bin/sh ./compile-libvlc.sh -a $ANDROID_ARCH --with-prebuilt-contribs
         else
