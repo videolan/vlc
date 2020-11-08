@@ -838,8 +838,19 @@ AbstractAdaptationLogic *PlaylistManager::createLogic(AbstractAdaptationLogic::L
 
     if(logic)
     {
-        logic->setMaxDeviceResolution( var_InheritInteger(p_demux, "adaptive-maxwidth"),
-                                       var_InheritInteger(p_demux, "adaptive-maxheight") );
+        int w = var_InheritInteger(p_demux, "adaptive-maxwidth");
+        int h = var_InheritInteger(p_demux, "adaptive-maxheight");
+        if(h == 0)
+        {
+            h = var_InheritInteger(p_demux, "preferred-resolution");
+            /* Adapt for slightly different minimum/maximum semantics */
+            if(h == -1)
+                h = 0;
+            else if(h == 0)
+                h = 1;
+        }
+
+        logic->setMaxDeviceResolution(w, h);
     }
 
     return logic;
