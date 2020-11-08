@@ -43,11 +43,7 @@ RepresentationSelector::~RepresentationSelector()
 BaseRepresentation * RepresentationSelector::lowest(BaseAdaptationSet *adaptSet) const
 {
     std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
-    /* No maxsize check here */
-    BaseRepresentation *rep = (reps.empty()) ? NULL : *(reps.begin());
-    if(rep && rep->getWidth() <= maxwidth && rep->getHeight() <= maxheight)
-        return rep;
-    return NULL;
+    return (reps.empty()) ? NULL : *(reps.begin());
 }
 
 BaseRepresentation * RepresentationSelector::highest(BaseAdaptationSet *adaptSet) const
@@ -60,7 +56,7 @@ BaseRepresentation * RepresentationSelector::highest(BaseAdaptationSet *adaptSet
         if( (*it)->getWidth() <= maxwidth && (*it)->getHeight() <= maxheight )
             return *it;
     }
-    return NULL;
+    return lowest(adaptSet);
 }
 
 BaseRepresentation * RepresentationSelector::higher(BaseAdaptationSet *adaptSet, BaseRepresentation *rep) const
@@ -102,11 +98,11 @@ BaseRepresentation * RepresentationSelector::select(std::vector<BaseRepresentati
     std::vector<BaseRepresentation *>::const_iterator repIt;
     for(repIt=reps.begin(); repIt!=reps.end(); ++repIt)
     {
-        if( (*repIt)->getWidth() > maxwidth || (*repIt)->getHeight() > maxheight )
-            continue;
-
         if ( !lowest || (*repIt)->getBandwidth() < lowest->getBandwidth())
             lowest = *repIt;
+
+        if( (*repIt)->getWidth() > maxwidth || (*repIt)->getHeight() > maxheight )
+            continue;
 
         if ( (*repIt)->getBandwidth() < maxbitrate &&
              (*repIt)->getBandwidth() > minbitrate )
