@@ -1,0 +1,18 @@
+diff -Naur Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/loader/CMakeLists.txt Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/loader/CMakeLists.txt
+--- Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0-orig/loader/CMakeLists.txt	2017-06-29 08:19:36.448133100 +0300
++++ Vulkan-LoaderAndValidationLayers-sdk-1.0.46.0/loader/CMakeLists.txt	2017-06-29 08:42:41.322355600 +0300
+@@ -286,6 +286,7 @@
+     if(INSTALL_LVL_FILES)
+         install(TARGETS ${API_LOWERCASE} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+     endif()
++endif()
+ 
+     if(NOT APPLE)
+         # Generate pkg-config file.
+@@ -302,6 +302,5 @@
+             endif()
+         endif()
+     endif()
+-endif()
+ 
+ 
