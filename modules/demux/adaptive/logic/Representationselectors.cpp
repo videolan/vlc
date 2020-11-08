@@ -91,17 +91,8 @@ BaseRepresentation * RepresentationSelector::select(BaseAdaptationSet *adaptSet,
     if (adaptSet == NULL)
         return NULL;
 
-    BaseRepresentation *best = NULL;
     std::vector<BaseRepresentation *> reps = adaptSet->getRepresentations();
-    BaseRepresentation *candidate = select(reps, (best)?best->getBandwidth():0, bitrate);
-    if (candidate)
-    {
-        if (candidate->getBandwidth() > bitrate) /* none matched, returned lowest */
-            return candidate;
-        best = candidate;
-    }
-
-    return best;
+    return select(reps, 0, bitrate);
 }
 
 BaseRepresentation * RepresentationSelector::select(std::vector<BaseRepresentation *>& reps,
