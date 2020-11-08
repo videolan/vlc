@@ -368,7 +368,7 @@ if [ ! -z "$WINSTORE" ]; then
     # uses CreateFile to access files/drives outside of the app
     CONFIGFLAGS="$CONFIGFLAGS --disable-vcd"
     # other modules that were disabled in the old UWP builds
-    CONFIGFLAGS="$CONFIGFLAGS --disable-crystalhd --disable-dxva2"
+    CONFIGFLAGS="$CONFIGFLAGS --disable-dxva2"
 
 else
     CONFIGFLAGS="$CONFIGFLAGS --enable-dvdread --enable-caca"
