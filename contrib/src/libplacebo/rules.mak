@@ -17,6 +17,15 @@ ifdef HAVE_WIN32
 DEPS_libplacebo += pthreads $(DEPS_pthreads)
 endif
 
+# We don't want vulkan on darwin for now
+ifndef HAVE_DARWIN_OS
+# This should be enabled on Linux too, but it currently fails picking xcb on
+# cross-compilation setup. Test the raspbian build for instance of this issue.
+ifndef HAVE_LINUX
+DEPS_libplacebo += vulkan-loader $(DEPS_vulkan-loader) vulkan-headers $(DEPS_vulkan-headers)
+endif
+endif
+
 PLACEBOCONF := -Dglslang=enabled \
 	-Dshaderc=disabled
 
