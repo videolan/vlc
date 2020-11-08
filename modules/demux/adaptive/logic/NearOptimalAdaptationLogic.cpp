@@ -87,8 +87,13 @@ BaseRepresentation *NearOptimalAdaptationLogic::getNextRepresentation(BaseAdapta
 {
     RepresentationSelector selector(maxwidth, maxheight);
 
-    const float umin = getUtility(selector.lowest(adaptSet));
-    const float umax = getUtility(selector.highest(adaptSet));
+    BaseRepresentation *lowest = selector.lowest(adaptSet);
+    BaseRepresentation *highest = selector.highest(adaptSet);
+    if(lowest == NULL || highest == NULL)
+        return NULL;
+
+    const float umin = getUtility(lowest);
+    const float umax = getUtility(highest);
 
     vlc_mutex_lock(&lock);
 
