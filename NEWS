@@ -16,6 +16,7 @@ macOS:
 Misc:
  * Several fixes in the web interface, including privacy and security
    improvements
+ * Update YouTube and Vocaroo scripts
 
 Changes between 3.0.11 and 3.0.11.1:
 ----------------------------------
