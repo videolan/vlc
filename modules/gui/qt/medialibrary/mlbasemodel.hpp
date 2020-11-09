@@ -136,6 +136,7 @@ public:
     MLSlidingWindowModel(QObject* parent = nullptr)
         : MLBaseModel(parent)
         , m_initialized(false)
+        , m_total_count(0)
     {
         m_query_param.i_nbResults = BatchSize;
     }
