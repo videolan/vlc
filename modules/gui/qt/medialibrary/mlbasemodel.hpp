@@ -253,7 +253,7 @@ protected:
             emit countChanged( static_cast<unsigned int>(m_total_count) );
         }
 
-        if ( m_total_count == 0 || idx >= m_total_count  )
+        if ( idx >= m_total_count  )
             return nullptr;
 
         if ( idx < m_query_param.i_offset ||  idx >= m_query_param.i_offset + m_item_list.size() )
