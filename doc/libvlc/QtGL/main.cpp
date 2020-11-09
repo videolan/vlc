@@ -3,8 +3,12 @@
 #include <QSurfaceFormat>
 #include <QMainWindow>
 
-#include <QtPlugin>
+#ifdef QT_STATIC
+# include <QtPlugin>
+#ifdef QT_STATICPLUGIN
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+#endif
+#endif
 
 
 #include "qtvlcwidget.h"
