@@ -150,7 +150,6 @@ public:
             vlc_mutex_locker lock( &m_item_lock );
             if ( m_initialized == false )
             {
-                m_item_list = const_cast<MLSlidingWindowModel<T>*>(this)->fetch();
                 m_total_count = countTotalElements();
                 m_initialized = true;
                 countHasChanged = true;
