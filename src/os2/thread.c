@@ -60,7 +60,6 @@ struct vlc_thread
     HEV            done_event;
     int            cancel_sock;
 
-    bool           detached;
     bool           killable;
     bool           killed;
     vlc_cleanup_t *cleaners;
@@ -262,16 +261,6 @@ retry:
         }
     }
     vlc_mutex_unlock (&super_mutex);
-
-    if (th->detached)
-    {
-        DosCloseEventSem (th->cancel_event);
-        DosCloseEventSem (th->done_event );
-
-        soclose (th->cancel_sock);
-
-        free (th);
-    }
 }
 
 static void vlc_entry( void *p )
@@ -285,15 +274,14 @@ static void vlc_entry( void *p )
     vlc_thread_cleanup (th);
 }
 
-static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
-                           void *(*entry) (void *), void *data, int priority)
+int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
+               void *data, int priority)
 {
     struct vlc_thread *th = malloc (sizeof (*th));
     if (unlikely(th == NULL))
         return ENOMEM;
     th->entry = entry;
     th->data = data;
-    th->detached = detached;
     th->killable = false; /* not until vlc_entry() ! */
     th->killed = false;
     th->cleaners = NULL;
@@ -329,12 +317,6 @@ error:
     free (th);
 
     return ENOMEM;
-}
-
-int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
-                void *data, int priority)
-{
-    return vlc_clone_attr (p_handle, false, entry, data, priority);
 }
 
 void vlc_join (vlc_thread_t th, void **result)
