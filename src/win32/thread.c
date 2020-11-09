@@ -339,12 +339,6 @@ void vlc_atomic_notify_all(void *addr)
 }
 
 /*** Threads ***/
-static void vlc_thread_destroy(vlc_thread_t th)
-{
-    DeleteCriticalSection(&th->wait.lock);
-    free(th);
-}
-
 static
 #if VLC_WINSTORE_APP
 DWORD
@@ -360,13 +354,11 @@ __stdcall vlc_entry (void *p)
     th->data = th->entry (th->data);
     TlsSetValue(thread_key, NULL);
 
-    if (th->id == NULL) /* Detached thread */
-        vlc_thread_destroy(th);
     return 0;
 }
 
-static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
-                           void *(*entry) (void *), void *data, int priority)
+int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
+               void *data, int priority)
 {
     struct vlc_thread *th = malloc (sizeof (*th));
     if (unlikely(th == NULL))
@@ -396,13 +388,7 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
         return err;
     }
 
-    if (detached)
-    {
-        CloseHandle(h);
-        th->id = NULL;
-    }
-    else
-        th->id = h;
+    th->id = h;
 
     if (p_handle != NULL)
         *p_handle = th;
@@ -411,12 +397,6 @@ static int vlc_clone_attr (vlc_thread_t *p_handle, bool detached,
         SetThreadPriority (th->id, priority);
 
     return 0;
-}
-
-int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
-                void *data, int priority)
-{
-    return vlc_clone_attr (p_handle, false, entry, data, priority);
 }
 
 void vlc_join (vlc_thread_t th, void **result)
@@ -433,7 +413,8 @@ void vlc_join (vlc_thread_t th, void **result)
     if (result != NULL)
         *result = th->data;
     CloseHandle (th->id);
-    vlc_thread_destroy(th);
+    DeleteCriticalSection(&th->wait.lock);
+    free(th);
 }
 
 unsigned long vlc_thread_id (void)
@@ -514,8 +495,6 @@ void vlc_testcancel (void)
         p->proc (p->data);
 
     th->data = NULL; /* TODO: special value? */
-    if (th->id == NULL) /* Detached thread */
-        vlc_thread_destroy(th);
 #if VLC_WINSTORE_APP
     ExitThread(0);
 #else // !VLC_WINSTORE_APP
