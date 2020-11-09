@@ -2933,7 +2933,7 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
     if( i_size < 6 || GetWLE( &p[0] ) != 0x04 )
         goto exit;
     const unsigned i_payload = GetDWLE( &p[2] );
-    if( i_size < 6 + i_payload || i_payload <= 0 )
+    if( i_size - 6 < i_payload || i_payload == 0 )
         goto exit;
     p += 6;
     i_size -= 6;
