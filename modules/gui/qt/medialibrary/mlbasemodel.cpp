@@ -31,7 +31,6 @@ MLBaseModel::MLBaseModel(QObject *parent)
         })
     , m_need_reset( false )
 {
-    vlc_mutex_init( &m_item_lock );
     memset(&m_query_param, 0, sizeof(vlc_ml_query_params_t));
     m_query_param.b_desc = false;
     m_query_param.i_nbResults = 20; //FIXME: value for test
