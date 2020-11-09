@@ -30,7 +30,6 @@ MLBaseModel::MLBaseModel(QObject *parent)
             vlc_ml_event_unregister_callback( m_ml, cb );
         })
     , m_need_reset( false )
-    , m_is_reloading( false )
 {
     vlc_mutex_init( &m_item_lock );
     memset(&m_query_param, 0, sizeof(vlc_ml_query_params_t));
@@ -76,16 +75,10 @@ void MLBaseModel::onVlcMlEvent(const vlc_ml_event_t* event)
     switch(event->i_type)
     {
         case VLC_ML_EVENT_BACKGROUND_IDLE_CHANGED:
-            if ( event->background_idle_changed.b_idle == false )
-                m_is_reloading = true;
-            else
+            if ( event->background_idle_changed.b_idle && m_need_reset )
             {
-                m_is_reloading = false;
-                if ( m_need_reset )
-                {
-                    emit resetRequested();
-                    m_need_reset = false;
-                }
+                emit resetRequested();
+                m_need_reset = false;
             }
             break;
     }

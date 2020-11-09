@@ -118,7 +118,6 @@ protected:
     std::unique_ptr<vlc_ml_event_callback_t,
                     std::function<void(vlc_ml_event_callback_t*)>> m_ml_event_handle;
     std::atomic_bool m_need_reset;
-    std::atomic_bool m_is_reloading;
 };
 
 /**
