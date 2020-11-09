@@ -20,6 +20,9 @@ public:
 
     bool playMedia(const char* url);
 
+signals:
+    void contextReady(QOpenGLContext *ctx);
+
 public slots:
     void cleanup();
 

@@ -4,7 +4,9 @@
 #include <QCoreApplication>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLFunctions>
+#include <QOffscreenSurface>
 #include <QThread>
+#include <QSemaphore>
 #include <cmath>
 
 #include <mutex>
@@ -20,6 +22,25 @@ public:
         mBuffers[0] = NULL;
         mBuffers[1] = NULL;
         mBuffers[2] = NULL;
+
+        /* Use default format for context. */
+        mContext = new QOpenGLContext(widget);
+
+        /* Use offscreen surface to render the buffers */
+        mSurface = new QOffscreenSurface(nullptr, widget);
+
+        /* Widget doesn't have an OpenGL context right now, we'll get it later. */
+        QObject::connect(widget, &QtVLCWidget::contextReady, [this](QOpenGLContext *render_context) {
+            /* Video view is now ready, we can start */
+            mSurface->setFormat(mWidget->format());
+            mSurface->create();
+
+            mContext->setFormat(mWidget->format());
+            mContext->setShareContext(render_context);
+            mContext->create();
+
+            videoReady.release();
+        });
     }
 
     ~VLCVideo()
@@ -72,6 +93,10 @@ public:
             return false;
 
         VLCVideo* that = static_cast<VLCVideo*>(*data);
+
+        /* Wait for rendering view to be ready. */
+        that->videoReady.acquire();
+
         that->m_width = 0;
         that->m_height = 0;
         return true;
@@ -108,9 +133,9 @@ public:
     {
         VLCVideo* that = static_cast<VLCVideo*>(data);
         if (current)
-            that->mWidget->makeCurrent();
+            that->mContext->makeCurrent(that->mSurface);
         else
-            that->mWidget->doneCurrent();
+            that->mContext->doneCurrent();
         return true;
     }
 
@@ -118,12 +143,14 @@ public:
     static void* get_proc_address(void* data, const char* current)
     {
         VLCVideo* that = static_cast<VLCVideo*>(data);
-        QOpenGLContext *ctx = that->mWidget->context();
-        return reinterpret_cast<void*>(ctx->getProcAddress(current));
+        return reinterpret_cast<void*>(that->mContext->getProcAddress(current));
     }
 
 private:
     QtVLCWidget *mWidget;
+    QOpenGLContext *mContext;
+    QOffscreenSurface *mSurface;
+    QSemaphore videoReady;
 
     //FBO data
     unsigned m_width = 0;
@@ -281,6 +308,8 @@ void QtVLCWidget::initializeGL()
     m_program->setUniformValue("texture", 0);
 
     m_program->bindAttributeLocation("position", 0);
+
+    emit contextReady(context());
 }
 
 void QtVLCWidget::paintGL()
