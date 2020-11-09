@@ -25,3 +25,9 @@ endif
 
 libjson_tracer_plugin_la_SOURCES = logger/json.c
 logger_LTLIBRARIES += libjson_tracer_plugin.la
+
+libemscripten_logger_plugin_la_SOURCES = logger/emscripten.c
+
+if HAVE_EMSCRIPTEN
+logger_LTLIBRARIES += libemscripten_logger_plugin.la
+endif
