@@ -300,10 +300,7 @@ private:
     virtual std::vector<std::unique_ptr<T>> fetch() = 0;
     virtual void thumbnailUpdated( int ) {}
 
-protected:
     mutable std::vector<std::unique_ptr<T>> m_item_list;
-
-private:
     mutable bool m_initialized;
     mutable size_t m_total_count;
 };
