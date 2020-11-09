@@ -272,8 +272,6 @@ static void send_parsed_changed( libvlc_media_t *p_md,
 
     vlc_mutex_unlock( &p_md->parsed_lock );
 
-    if( new_status == libvlc_media_parsed_status_done )
-    {
         libvlc_media_list_t *p_subitems = media_get_subitems( p_md, false );
         if( p_subitems != NULL )
         {
@@ -282,7 +280,6 @@ static void send_parsed_changed( libvlc_media_t *p_md,
             libvlc_media_list_internal_end_reached( p_subitems );
             libvlc_media_list_unlock( p_subitems );
         }
-    }
 
     /* Construct the event */
     event.type = libvlc_MediaParsedChanged;
