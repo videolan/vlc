@@ -96,6 +96,9 @@ public:
     static bool setup(void** data, const libvlc_video_setup_device_cfg_t *cfg,
                       libvlc_video_setup_device_info_t *out)
     {
+        Q_UNUSED(cfg);
+        Q_UNUSED(out);
+
         if (!QOpenGLContext::supportsThreadedOpenGL())
             return false;
 
@@ -355,5 +358,7 @@ void QtVLCWidget::paintGL()
 
 void QtVLCWidget::resizeGL(int w, int h)
 {
+    Q_UNUSED(w);
+    Q_UNUSED(h);
     /* TODO */
 }
