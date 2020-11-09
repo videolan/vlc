@@ -1,6 +1,6 @@
 # srt
 
-SRT_VERSION := 1.3.1
+SRT_VERSION := 1.4.2
 SRT_URL := $(GITHUB)/Haivision/srt/archive/v$(SRT_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
@@ -26,12 +26,7 @@ $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 
 srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
-	$(APPLY) $(SRC)/srt/0001-api-Don-t-use-inet_ntop.patch
-	$(APPLY) $(SRC)/srt/0002-win32-Only-include-inttypes.h-with-MSVC.patch
-	$(APPLY) $(SRC)/srt/0003-cmake-Only-install-Windows-headers-in-win-subdir.patch
-	$(APPLY) $(SRC)/srt/0004-cmake-pthread-win32.patch
-	$(APPLY) $(SRC)/srt/0005-cmake-Prefer-lpthread-for-now-because-clang-and-VLC.patch
-	$(APPLY) $(SRC)/srt/0006-cmake-Don-t-confuse-libs-and-requires.patch
+	$(APPLY) $(SRC)/srt/0001-core-ifdef-MSG_TRUNC-nixes-fix.patch
 	$(call pkg_static,"scripts/srt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
