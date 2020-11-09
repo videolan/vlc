@@ -48,6 +48,13 @@ public:
         cleanup(this);
     }
 
+    /// return whether we are using OpenGLES or OpenGL, which is needed to know
+    /// whether we use the libvlc OpenGLES2 engine or the OpenGL one
+    bool isOpenGLES()
+    {
+        return mContext->isOpenGLES();
+    }
+
     /// return the texture to be displayed
     QOpenGLFramebufferObject *getVideoFrame()
     {
@@ -198,7 +205,8 @@ bool QtVLCWidget::playMedia(const char* url)
     }
 
     // Define the opengl rendering callbacks
-    libvlc_video_set_output_callbacks(m_mp, libvlc_video_engine_opengl,
+    libvlc_video_set_output_callbacks(m_mp,
+        mVLC->isOpenGLES() ? libvlc_video_engine_gles2 : libvlc_video_engine_opengl,
         VLCVideo::setup, VLCVideo::cleanup, nullptr, VLCVideo::resizeRenderTextures, VLCVideo::swap,
         VLCVideo::make_current, VLCVideo::get_proc_address, nullptr, nullptr,
         mVLC);
