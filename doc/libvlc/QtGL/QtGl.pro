@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = qtglvlc
 
-CONFIG += link_pkgconfig
+CONFIG += link_pkgconfig force_debug_info
 PKGCONFIG = libvlc
 QT += widgets
 
