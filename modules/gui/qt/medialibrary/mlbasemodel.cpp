@@ -25,7 +25,6 @@ MLBaseModel::MLBaseModel(QObject *parent)
     : QAbstractListModel(parent)
     , m_ml(nullptr)
     , m_search_pattern_cstr( nullptr, &free )
-    , m_nb_max_items( 0 )
     , m_ml_event_handle( nullptr, [this](vlc_ml_event_callback_t* cb ) {
             assert( m_ml != nullptr );
             vlc_ml_event_unregister_callback( m_ml, cb );

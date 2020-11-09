@@ -46,7 +46,6 @@ public:
 
     Q_PROPERTY( MLParentId parentId READ parentId WRITE setParentId NOTIFY parentIdChanged RESET unsetParentId )
     Q_PROPERTY( MediaLib* ml READ ml WRITE setMl )
-    Q_PROPERTY( unsigned int maxItems MEMBER m_nb_max_items )
     Q_PROPERTY( QString searchPattern READ searchPattern WRITE setSearchPattern )
 
     Q_PROPERTY( Qt::SortOrder sortOrder READ getSortOrder WRITE setSortOder NOTIFY sortOrderChanged )
@@ -113,8 +112,6 @@ protected:
     mutable vlc_ml_query_params_t m_query_param;
     std::unique_ptr<char, void(*)(void*)> m_search_pattern_cstr;
     QString m_search_pattern;
-
-    unsigned int m_nb_max_items;
 
     mutable vlc_mutex_t m_item_lock;
 
