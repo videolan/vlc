@@ -153,6 +153,14 @@ public:
     static void* get_proc_address(void* data, const char* current)
     {
         VLCVideo* that = static_cast<VLCVideo*>(data);
+        /* Qt usual expects core symbols to be queryable, even though it's not
+         * mentioned in the API. Cf QPlatformOpenGLContext::getProcAddress.
+         * Thus, we don't need to wrap the function symbols here, but it might
+         * fail to work (not crash though) on exotic platforms since Qt doesn't
+         * commit to this behaviour. A way to handle this in a more stable way
+         * would be to store the mContext->functions() table in a thread local
+         * variable, and wrap every call to OpenGL in a function using this
+         * thread local state to call the correct variant. */
         return reinterpret_cast<void*>(that->mContext->getProcAddress(current));
     }
 
