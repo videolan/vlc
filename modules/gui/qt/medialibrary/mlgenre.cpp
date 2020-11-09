@@ -185,9 +185,9 @@ public:
     void cancel()
     {
         QMutexLocker lock(&m_taskLock);
+        m_canceled = true;
         if (!m_running)
             return;
-        m_canceled = true;
         m_taskCond.wait(&m_taskLock);
     }
 
