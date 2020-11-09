@@ -137,9 +137,9 @@ QByteArray MLVideoModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) cons
     return M_names_to_criteria.key(criteria, "");
 }
 
-void MLVideoModel::onVlcMlEvent(const vlc_ml_event_t* event)
+void MLVideoModel::onVlcMlEvent(const MLEvent &event)
 {
-    switch (event->i_type)
+    switch (event.i_type)
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
         case VLC_ML_EVENT_MEDIA_UPDATED:

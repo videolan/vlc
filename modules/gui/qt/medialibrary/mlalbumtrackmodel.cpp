@@ -144,12 +144,12 @@ QByteArray MLAlbumTrackModel::criteriaToName(vlc_ml_sorting_criteria_t criteria)
     return M_names_to_criteria.key(criteria, "");
 }
 
-void MLAlbumTrackModel::onVlcMlEvent(const vlc_ml_event_t* event)
+void MLAlbumTrackModel::onVlcMlEvent(const MLEvent &event)
 {
-    switch (event->i_type)
+    switch (event.i_type)
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
-            if ( event->creation.p_media->i_subtype == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK )
+            if ( event.creation.media.i_subtype == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK )
                 m_need_reset = true;
             break;
         case VLC_ML_EVENT_MEDIA_UPDATED:
@@ -160,17 +160,17 @@ void MLAlbumTrackModel::onVlcMlEvent(const vlc_ml_event_t* event)
             break;
         case VLC_ML_EVENT_ALBUM_UPDATED:
             if ( m_parent.id != 0 && m_parent.type == VLC_ML_PARENT_ALBUM &&
-                 m_parent.id == event->modification.i_entity_id )
+                 m_parent.id == event.modification.i_entity_id )
                 m_need_reset = true;
             break;
         case VLC_ML_EVENT_ALBUM_DELETED:
             if ( m_parent.id != 0 && m_parent.type == VLC_ML_PARENT_ALBUM &&
-                 m_parent.id == event->deletion.i_entity_id )
+                 m_parent.id == event.deletion.i_entity_id )
                 m_need_reset = true;
             break;
         case VLC_ML_EVENT_GENRE_DELETED:
             if ( m_parent.id != 0 && m_parent.type == VLC_ML_PARENT_GENRE &&
-                 m_parent.id == event->deletion.i_entity_id )
+                 m_parent.id == event.deletion.i_entity_id )
                 m_need_reset = true;
             break;
     }

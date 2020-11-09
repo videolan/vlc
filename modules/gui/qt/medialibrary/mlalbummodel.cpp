@@ -113,9 +113,9 @@ QByteArray MLAlbumModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) cons
     return M_names_to_criteria.key(criteria, "");
 }
 
-void MLAlbumModel::onVlcMlEvent(const vlc_ml_event_t* event)
+void MLAlbumModel::onVlcMlEvent(const MLEvent &event)
 {
-    switch( event->i_type )
+    switch( event.i_type )
     {
         case VLC_ML_EVENT_ALBUM_ADDED:
         case VLC_ML_EVENT_ALBUM_DELETED:
@@ -124,12 +124,12 @@ void MLAlbumModel::onVlcMlEvent(const vlc_ml_event_t* event)
             break;
         case VLC_ML_EVENT_ARTIST_DELETED:
             if ( m_parent.id != 0 && m_parent.type == VLC_ML_PARENT_ARTIST &&
-                 event->deletion.i_entity_id == m_parent.id )
+                 event.deletion.i_entity_id == m_parent.id )
                     m_need_reset = true;
             break;
         case VLC_ML_EVENT_GENRE_DELETED:
             if ( m_parent.id != 0 && m_parent.type == VLC_ML_PARENT_GENRE &&
-                 event->deletion.i_entity_id == m_parent.id )
+                 event.deletion.i_entity_id == m_parent.id )
                     m_need_reset = true;
             break;
         default:

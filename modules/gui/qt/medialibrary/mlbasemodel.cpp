@@ -70,12 +70,12 @@ void MLBaseModel::onResetRequested()
     endResetModel();
 }
 
-void MLBaseModel::onVlcMlEvent(const vlc_ml_event_t* event)
+void MLBaseModel::onVlcMlEvent(const MLEvent &event)
 {
-    switch(event->i_type)
+    switch(event.i_type)
     {
         case VLC_ML_EVENT_BACKGROUND_IDLE_CHANGED:
-            if ( event->background_idle_changed.b_idle && m_need_reset )
+            if ( event.background_idle_changed.b_idle && m_need_reset )
             {
                 emit resetRequested();
                 m_need_reset = false;
@@ -95,7 +95,9 @@ QString MLBaseModel::getFirstSymbol(QString str)
 void MLBaseModel::onVlcMlEvent(void* data, const vlc_ml_event_t* event)
 {
     auto self = static_cast<MLBaseModel*>(data);
-    self->onVlcMlEvent(event);
+    QMetaObject::invokeMethod(self, [self, event = MLEvent(event)] {
+        self->onVlcMlEvent(event);
+    });
 }
 
 MLParentId MLBaseModel::parentId() const

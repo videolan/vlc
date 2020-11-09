@@ -31,6 +31,7 @@
 #include "mlqmltypes.hpp"
 #include "medialib.hpp"
 #include <memory>
+#include "mlevent.hpp"
 
 class MediaLib;
 
@@ -103,7 +104,7 @@ public:
     virtual unsigned int getCount() const = 0;
 
 protected:
-    virtual void onVlcMlEvent( const vlc_ml_event_t* event );
+    virtual void onVlcMlEvent( const MLEvent &event );
 
     MLParentId m_parent;
 
@@ -271,16 +272,16 @@ protected:
         return m_item_list[idx - m_query_param.i_offset].get();
     }
 
-    virtual void onVlcMlEvent(const vlc_ml_event_t* event) override
+    virtual void onVlcMlEvent(const MLEvent &event) override
     {
-        switch (event->i_type)
+        switch (event.i_type)
         {
             case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
             {
-                if (event->media_thumbnail_generated.b_success) {
+                if (event.media_thumbnail_generated.b_success) {
                     int idx = static_cast<int>(m_query_param.i_offset);
                     for ( const auto& it : m_item_list ) {
-                        if (it->getId().id == event->media_thumbnail_generated.p_media->i_id) {
+                        if (it->getId().id == event.media_thumbnail_generated.i_media_id) {
                             thumbnailUpdated(idx);
                             break;
                         }

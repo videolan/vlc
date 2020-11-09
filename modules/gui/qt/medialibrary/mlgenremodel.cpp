@@ -89,9 +89,9 @@ size_t MLGenreModel::countTotalElements() const
     return vlc_ml_count_genres( m_ml, &queryParams );
 }
 
-void MLGenreModel::onVlcMlEvent(const vlc_ml_event_t* event)
+void MLGenreModel::onVlcMlEvent(const MLEvent &event)
 {
-    switch (event->i_type)
+    switch (event.i_type)
     {
         case VLC_ML_EVENT_GENRE_ADDED:
         case VLC_ML_EVENT_GENRE_UPDATED:

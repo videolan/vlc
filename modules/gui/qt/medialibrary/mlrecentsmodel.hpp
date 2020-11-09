@@ -84,7 +84,7 @@ private:
     vlc_ml_sorting_criteria_t nameToCriteria( QByteArray /* name */ ) const override{
         return VLC_ML_SORTING_DEFAULT;
     }
-    virtual void onVlcMlEvent( const vlc_ml_event_t* event ) override;
+    virtual void onVlcMlEvent( const MLEvent &event ) override;
 };
 
 #endif // ML_RECENTS_MODEL_H

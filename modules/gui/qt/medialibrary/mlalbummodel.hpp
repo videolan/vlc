@@ -63,7 +63,7 @@ private:
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
     QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;
-    virtual void onVlcMlEvent( const vlc_ml_event_t* event ) override;
+    virtual void onVlcMlEvent( const MLEvent &event ) override;
     void thumbnailUpdated(int idx) override;
 
     static  QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;

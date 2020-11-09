@@ -106,9 +106,9 @@ vlc_ml_sorting_criteria_t MLUrlModel::roleToCriteria(int role) const
     }
 }
 
-void MLUrlModel::onVlcMlEvent(const vlc_ml_event_t* event)
+void MLUrlModel::onVlcMlEvent(const MLEvent &event)
 {
-    switch (event->i_type)
+    switch (event.i_type)
     {
         case VLC_ML_EVENT_MEDIA_UPDATED:
         case VLC_ML_EVENT_HISTORY_CHANGED:

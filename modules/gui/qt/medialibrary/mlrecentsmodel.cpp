@@ -111,9 +111,9 @@ size_t MLRecentsModel::countTotalElements() const
     return realCount;
 }
 
-void MLRecentsModel::onVlcMlEvent( const vlc_ml_event_t* event )
+void MLRecentsModel::onVlcMlEvent( const MLEvent &event )
 {
-    switch ( event->i_type )
+    switch ( event.i_type )
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
         case VLC_ML_EVENT_MEDIA_UPDATED:

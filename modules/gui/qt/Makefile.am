@@ -146,6 +146,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/medialibrary/mlbasemodel.hpp \
 	gui/qt/medialibrary/mlbookmarkmodel.cpp \
 	gui/qt/medialibrary/mlbookmarkmodel.hpp \
+	gui/qt/medialibrary/mlevent.hpp \
 	gui/qt/medialibrary/mlfoldersmodel.cpp \
 	gui/qt/medialibrary/mlfoldersmodel.hpp \
 	gui/qt/medialibrary/mlgenre.cpp \
