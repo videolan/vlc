@@ -3474,7 +3474,10 @@ int input_GetAttachments(input_thread_t *input,
 
     *attachments = vlc_alloc(attachments_count, sizeof(input_attachment_t*));
     if (!*attachments)
+    {
+        vlc_mutex_unlock(&priv->p_item->lock);
         return -1;
+    }
 
     for (int i = 0; i < attachments_count; i++)
         (*attachments)[i] = vlc_input_attachment_Hold(priv->attachment[i]);
