@@ -123,6 +123,8 @@ static void AddressDestroy (sap_address_t *addr)
  */
 static void *RunThread (void *self)
 {
+    vlc_thread_set_name("vlc-sap");
+
     sap_address_t *addr = self;
 
     vlc_mutex_lock(&sap_mutex);

@@ -2054,6 +2054,8 @@ static void httpdLoop(httpd_host_t *host)
 
 static void* httpd_HostThread(void *data)
 {
+    vlc_thread_set_name("vlc-httpd");
+
     httpd_host_t *host = data;
 
     while (atomic_load_explicit(&host->ref, memory_order_relaxed) > 0)

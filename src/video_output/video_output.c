@@ -1717,6 +1717,8 @@ static void *Thread(void *object)
     vout_thread_sys_t *vout = object;
     vout_thread_sys_t *sys = vout;
 
+    vlc_thread_set_name("vlc-vout");
+
     vlc_tick_t deadline = VLC_TICK_INVALID;
 
     for (;;) {

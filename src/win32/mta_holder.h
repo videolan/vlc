@@ -39,6 +39,8 @@ typedef struct vlc_mta_holder
 
 static inline void* MtaMainLoop( void* opaque )
 {
+    vlc_thread_set_name("vlc-mta");
+
     vlc_mta_holder* p_mta = (vlc_mta_holder*)opaque;
     CoInitializeEx( NULL, COINIT_MULTITHREADED );
 

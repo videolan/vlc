@@ -419,6 +419,8 @@ static void *Run( void *data )
     input_thread_private_t *priv = data;
     input_thread_t *p_input = &priv->input;
 
+    vlc_thread_set_name("vlc-input");
+
     vlc_interrupt_set(&priv->interrupt);
 
     if( !Init( p_input ) )
@@ -437,6 +439,8 @@ static void *Preparse( void *data )
 {
     input_thread_private_t *priv = data;
     input_thread_t *p_input = &priv->input;
+
+    vlc_thread_set_name("vlc-preparse");
 
     vlc_interrupt_set(&priv->interrupt);
 
