@@ -56,6 +56,7 @@ public:
     Q_INVOKABLE void addAndPlay(const QString& mrl, const QStringList* options = nullptr);
     Q_INVOKABLE void addAndPlay(const QUrl& mrl, const QStringList* options = nullptr);
     Q_INVOKABLE void addAndPlay(const QVariantList&itemIdList, const QStringList* options = nullptr);
+    Q_INVOKABLE void insertIntoPlaylist(size_t index, const QVariantList &itemIds /*QList<MLParentId>*/, const QStringList *options = nullptr);
 
     Q_INVOKABLE void reload();
 

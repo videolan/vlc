@@ -187,6 +187,42 @@ void MediaLib::addAndPlay(const QVariantList& itemIdList, const QStringList* opt
     }
 }
 
+void MediaLib::insertIntoPlaylist(const size_t index, const QVariantList &itemIds, const QStringList *options)
+{
+    QVector<vlc::playlist::Media> medias;
+    for ( const auto &id : itemIds )
+    {
+        if (!id.canConvert<MLItemId>())
+            continue;
+
+        const MLItemId itemId = id.value<MLItemId>();
+        if (itemId.id == 0)
+            continue;
+        if (itemId.type == VLC_ML_PARENT_UNKNOWN)
+        {
+            vlc::playlist::InputItemPtr item(vlc_ml_get_input_item( m_ml, itemId.id ), false);
+            if (item)
+                medias.push_back(vlc::playlist::Media(item.get(), options));
+        }
+        else
+        {
+            vlc_ml_query_params_t query;
+            memset(&query, 0, sizeof(vlc_ml_query_params_t));
+            ml_unique_ptr<vlc_ml_media_list_t> media_list(vlc_ml_list_media_of( m_ml, &query, itemId.type, itemId.id));
+            if (media_list == nullptr)
+                return;
+
+            auto mediaRange = ml_range_iterate<vlc_ml_media_t>( media_list );
+            std::transform(mediaRange.begin(), mediaRange.end(), std::back_inserter(medias), [&](vlc_ml_media_t& m) {
+                vlc::playlist::InputItemPtr item(vlc_ml_get_input_item( m_ml, m.i_id ), false);
+                return vlc::playlist::Media(item.get(), options);
+            });
+        }
+    }
+    if (!medias.isEmpty())
+        m_intf->p_sys->p_mainPlaylistController->insert( index, medias );
+}
+
 void MediaLib::reload()
 {
     vlc_ml_reload_folder( vlcMl(), nullptr );
