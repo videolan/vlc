@@ -28,6 +28,7 @@
 #include <limits.h>
 #include <sys/types.h>
 #include <pthread.h>
+#include <pthread_np.h>
 #include <sys/thr.h>
 #include <sys/umtx.h>
 
@@ -42,6 +43,11 @@ unsigned long vlc_thread_id(void)
          tid = thr_self();
 
      return tid;
+}
+
+void vlc_thread_set_name(const char *name)
+{
+    pthread_set_name_np(pthread_self(), name);
 }
 
 static int vlc_umtx_wake(void *addr, int nr)

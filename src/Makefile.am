@@ -466,7 +466,8 @@ endif
 if HAVE_DARWIN
 libvlccore_la_SOURCES += \
 	darwin/error.c \
-	darwin/specific.c
+	darwin/specific.c \
+	darwin/thread.c
 libvlccore_objc_la_SOURCES = \
 	darwin/dirs.m \
 	darwin/netconf.m

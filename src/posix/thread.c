@@ -204,6 +204,11 @@ VLC_WEAK unsigned long vlc_thread_id(void)
      return (uintptr_t)(void *)&dummy;
 }
 
+VLC_WEAK void vlc_thread_set_name(const char *name)
+{
+    VLC_UNUSED(name);
+}
+
 void vlc_cancel(vlc_thread_t th)
 {
     pthread_cancel(th.handle);

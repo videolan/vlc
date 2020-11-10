@@ -636,6 +636,7 @@ vlc_interrupt_register
 vlc_interrupt_unregister
 vlc_killed
 vlc_join
+vlc_thread_set_name
 vlc_list_children
 vlc_meta_AddExtra
 vlc_meta_CopyExtraNames

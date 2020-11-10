@@ -31,6 +31,7 @@
 
 #define _DECL_DLLMAIN
 #include <vlc_common.h>
+#include <vlc_charset.h>
 
 #include "libvlc.h"
 #include <stdarg.h>
@@ -160,6 +161,7 @@ retry:
 }
 
 /*** Futeces^WAddress waits ***/
+static HRESULT (WINAPI *SetThreadDescription_)(HANDLE, PCWSTR);
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
 static BOOL (WINAPI *WaitOnAddress_)(VOID volatile *, PVOID, SIZE_T, DWORD);
 #define WaitOnAddress (*WaitOnAddress_)
@@ -403,6 +405,16 @@ void vlc_join (vlc_thread_t th, void **result)
 unsigned long vlc_thread_id (void)
 {
     return GetCurrentThreadId ();
+}
+
+void vlc_thread_set_name(const char *name)
+{
+    if (SetThreadDescription_)
+    {
+        wchar_t *wname = ToWide(name);
+        SetThreadDescription_(GetCurrentThread(), wname);
+        free(wname);
+    }
 }
 
 /*** Thread cancellation ***/
@@ -723,8 +735,17 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     {
         case DLL_PROCESS_ATTACH:
         {
+            HMODULE h;
+            h = GetModuleHandle(TEXT("kernel32.dll"));
+            if (h == NULL)
+                h = GetModuleHandle(TEXT("api-ms-win-core-processthreads-l1-1-3.dll"));
+            if (h != NULL)
+                LOOKUP(SetThreadDescription);
+            else
+                SetThreadDescription_ = NULL;
+
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-            HMODULE h = GetModuleHandle(TEXT("api-ms-win-core-synch-l1-2-0.dll"));
+            h = GetModuleHandle(TEXT("api-ms-win-core-synch-l1-2-0.dll"));
             if (h == NULL || !LOOKUP(WaitOnAddress)
              || !LOOKUP(WakeByAddressAll) || !LOOKUP(WakeByAddressSingle))
             {

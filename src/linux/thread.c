@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/prctl.h>
 #include <sys/syscall.h>
 #include <linux/futex.h>
 
@@ -48,6 +49,11 @@ unsigned long vlc_thread_id(void)
          tid = syscall(__NR_gettid);
 
      return tid;
+}
+
+void vlc_thread_set_name(const char *name)
+{
+    prctl(PR_SET_NAME, name);
 }
 
 static int sys_futex(void *addr, int op, unsigned val,
