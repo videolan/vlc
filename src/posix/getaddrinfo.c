@@ -42,6 +42,8 @@ struct vlc_gai_req
 
 static void *vlc_gai_thread(void *data)
 {
+    vlc_thread_set_name("vlc-getaddrinfo");
+
     struct vlc_gai_req *req = data;
 
     req->error = EAI_SYSTEM;

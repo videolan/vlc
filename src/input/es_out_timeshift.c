@@ -1091,6 +1091,8 @@ static int TsChangeRate( ts_thread_t *p_ts, float src_rate, float rate )
 
 static void *TsRun( void *p_data )
 {
+    vlc_thread_set_name("vlc-timeshift");
+
     ts_thread_t *p_ts = p_data;
     vlc_tick_t i_buffering_date = -1;
 

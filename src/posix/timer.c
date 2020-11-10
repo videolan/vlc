@@ -52,6 +52,8 @@ struct vlc_timer
 
 static void *vlc_timer_thread (void *data)
 {
+    vlc_thread_set_name("vlc-timer");
+
     struct vlc_timer *timer = data;
 
     vlc_mutex_lock (&timer->lock);

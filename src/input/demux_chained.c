@@ -53,6 +53,8 @@ struct vlc_demux_chained_t
 
 static void *vlc_demux_chained_Thread(void *data)
 {
+    vlc_thread_set_name("vlc-demux-chain");
+
     vlc_demux_chained_t *dc = data;
     demux_t *demux = demux_New(VLC_OBJECT(dc->reader), dc->name, dc->reader,
                                dc->out);

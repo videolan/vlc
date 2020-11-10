@@ -1527,6 +1527,8 @@ static void * spu_PrerenderThread(void *priv)
     spu_private_t *sys = spu->p;
     vlc_fourcc_t chroma_list[SPU_CHROMALIST_COUNT+1];
 
+    vlc_thread_set_name("vlc-spu-prerend");
+
     chroma_list[SPU_CHROMALIST_COUNT] = 0;
 
     vlc_mutex_lock(&sys->prerender.lock);

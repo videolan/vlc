@@ -412,6 +412,8 @@ void update_Check( update_t *p_update, void (*pf_callback)( void*, bool ), void 
 
 void* update_CheckReal( void *obj )
 {
+    vlc_thread_set_name("vlc-updater-chk");
+
     update_check_thread_t *p_uct = (update_check_thread_t *)obj;
     bool b_ret;
     int canc;
@@ -524,6 +526,8 @@ void update_Download( update_t *p_update, const char *psz_destdir )
 
 static void* update_DownloadReal( void *obj )
 {
+    vlc_thread_set_name("vlc-updater-dl");
+
     update_download_thread_t *p_udt = (update_download_thread_t *)obj;
     uint64_t l_size;
     uint64_t l_downloaded = 0;

@@ -119,6 +119,8 @@ ThreadRun(void *userdata)
     struct vlc_executor_thread *thread = userdata;
     vlc_executor_t *executor = thread->owner;
 
+    vlc_thread_set_name("vlc-exec-runner");
+
     vlc_mutex_lock(&executor->lock);
 
     struct vlc_runnable *runnable;

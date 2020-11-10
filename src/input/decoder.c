@@ -1671,6 +1671,8 @@ static void *DecoderThread( void *p_data )
     vlc_tick_t delay = 0;
     bool paused = false;
 
+    vlc_thread_set_name("vlc-decoder");
+
     /* The decoder's main loop */
     vlc_fifo_Lock( p_owner->p_fifo );
 

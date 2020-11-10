@@ -205,6 +205,8 @@ vlc_player_destructor_Thread(void *data)
 {
     vlc_player_t *player = data;
 
+    vlc_thread_set_name("vlc-player-end");
+
     vlc_mutex_lock(&player->lock);
 
     /* Terminate this thread when the player is deleting (vlc_player_Delete()

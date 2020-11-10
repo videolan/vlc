@@ -330,6 +330,8 @@ static void finder_thread_interrupted( void* p_data )
 
 static void *FinderThread( void *p_data )
 {
+    vlc_thread_set_name("vlc-addon-find");
+
     addons_manager_t *p_manager = p_data;
     int i_cancel = vlc_savecancel();
     vlc_interrupt_set( p_manager->p_priv->finder.p_interrupt );
@@ -456,6 +458,8 @@ static void installer_thread_interrupted( void* p_data )
 
 static void *InstallerThread( void *p_data )
 {
+    vlc_thread_set_name("vlc-addon-instl");
+
     addons_manager_t *p_manager = p_data;
     int i_cancel = vlc_savecancel();
     vlc_interrupt_set( p_manager->p_priv->installer.p_interrupt );
