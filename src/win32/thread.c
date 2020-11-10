@@ -31,6 +31,7 @@
 
 #define _DECL_DLLMAIN
 #include <vlc_common.h>
+#include <vlc_charset.h>
 
 #include "libvlc.h"
 #include <stdarg.h>
@@ -165,6 +166,7 @@ retry:
 }
 
 /*** Futeces^WAddress waits ***/
+static HRESULT (WINAPI *SetThreadDescription_)(HANDLE, PCWSTR);
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
 static BOOL (WINAPI *WaitOnAddress_)(VOID volatile *, PVOID, SIZE_T, DWORD);
 #define WaitOnAddress (*WaitOnAddress_)
@@ -427,6 +429,16 @@ int vlc_set_priority (vlc_thread_t th, int priority)
     if (!SetThreadPriority (th->id, priority))
         return VLC_EGENERIC;
     return VLC_SUCCESS;
+}
+
+void vlc_thread_set_name(const char *name)
+{
+    if (SetThreadDescription_)
+    {
+        wchar_t *wname = ToWide(name);
+        SetThreadDescription_(GetCurrentThread(), wname);
+        free(wname);
+    }
 }
 
 /*** Thread cancellation ***/
@@ -807,6 +819,15 @@ BOOL WINAPI DllMain (HANDLE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
                 WakeByAddressAll_ = WakeByAddressFallback;
                 WakeByAddressSingle_ = WakeByAddressFallback;
             }
+            LOOKUP(SetThreadDescription);
+#else
+            HMODULE h = GetModuleHandle(TEXT("kernel32.dll"));
+            if (h == NULL)
+                h = GetModuleHandle(TEXT("api-ms-win-core-processthreads-l1-1-3.dll"));
+            if (h != NULL)
+                LOOKUP(SetThreadDescription);
+            else
+                SetThreadDescription_ = NULL;
 #endif
             thread_key = TlsAlloc();
             if (unlikely(thread_key == TLS_OUT_OF_INDEXES))

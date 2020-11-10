@@ -729,6 +729,16 @@ VLC_API int vlc_clone(vlc_thread_t *th, void *(*entry)(void *), void *data,
                       int priority) VLC_USED;
 
 /**
+ * Set the thread name of the current thread.
+ *
+ * \param name the string to use as the thread name
+ *
+ * \note On Linux the name can be up to 16 bytes long, including the terminating
+ * null byte on Linux. If larger the name will be truncated.
+ */
+VLC_API void vlc_thread_set_name(const char *name);
+
+/**
  * Marks a thread as cancelled.
  *
  * Next time the target thread reaches a cancellation point (while not having

@@ -208,6 +208,29 @@ int vlc_set_priority (vlc_thread_t th, int priority)
     return VLC_SUCCESS;
 }
 
+#ifdef __linux__
+#include <sys/prctl.h>
+void vlc_thread_set_name(const char *name)
+{
+    prctl(PR_SET_NAME, name);
+}
+#elif defined(__APPLE__)
+void vlc_thread_set_name(const char *name)
+{
+    pthread_setname_np(name);
+}
+#elif defined(__NetBSD__)
+void vlc_thread_set_name(const char *name)
+{
+    pthread_setname_np(pthread_self(), "%s", (void*)name);
+}
+#else
+void vlc_thread_set_name(const char *name)
+{
+    VLC_UNUSED(name);
+}
+#endif
+
 void vlc_cancel(vlc_thread_t th)
 {
     pthread_cancel(th.handle);

@@ -164,6 +164,14 @@ int vlc_set_priority (vlc_thread_t th, int priority)
     return VLC_SUCCESS;
 }
 
+void vlc_thread_set_name(const char *name)
+{
+    char buf[16];       // MAX_TASK_COMM_LEN=16 is hard-coded into bionic
+    strncpy(buf, name, 15);
+    buf[15] = '\0';
+    pthread_setname_np(pthread_self(), buf);
+}
+
 void vlc_cancel (vlc_thread_t thread_id)
 {
     atomic_uint *addr;
