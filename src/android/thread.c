@@ -92,27 +92,6 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
 }
 
 /* pthread */
-static void clean_detached_thread(void *data)
-{
-    struct vlc_thread *th = data;
-
-    /* release thread handle */
-    free(th);
-}
-
-static void *detached_thread(void *data)
-{
-    vlc_thread_t th = data;
-
-    thread = th;
-
-    vlc_cleanup_push(clean_detached_thread, th);
-    th->entry(th->data);
-    vlc_cleanup_pop();
-    clean_detached_thread(th);
-    return NULL;
-}
-
 static void *joinable_thread(void *data)
 {
     vlc_thread_t th = data;
@@ -122,7 +101,7 @@ static void *joinable_thread(void *data)
 }
 
 static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
-                           void *data, bool detach)
+                           void *data)
 {
     vlc_thread_t thread = malloc (sizeof (*thread));
     if (unlikely(thread == NULL))
@@ -152,11 +131,9 @@ static int vlc_clone_attr (vlc_thread_t *th, void *(*entry) (void *),
 
     pthread_attr_t attr;
     pthread_attr_init (&attr);
-    pthread_attr_setdetachstate (&attr, detach ? PTHREAD_CREATE_DETACHED
-                                               : PTHREAD_CREATE_JOINABLE);
+    pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_JOINABLE);
 
-    ret = pthread_create (&thread->thread, &attr,
-                          detach ? detached_thread : joinable_thread, thread);
+    ret = pthread_create (&thread->thread, &attr, joinable_thread, thread);
     pthread_attr_destroy (&attr);
 
     pthread_sigmask (SIG_SETMASK, &oldset, NULL);
@@ -168,25 +145,17 @@ int vlc_clone (vlc_thread_t *th, void *(*entry) (void *), void *data,
                int priority)
 {
     (void) priority;
-    return vlc_clone_attr (th, entry, data, false);
+    return vlc_clone_attr (th, entry, data);
 }
 
 void vlc_join (vlc_thread_t handle, void **result)
 {
     int val = pthread_join (handle->thread, result);
     VLC_THREAD_ASSERT ("joining thread");
-    clean_detached_thread(handle);
-}
+    struct vlc_thread *th = handle;
 
-int vlc_clone_detach (vlc_thread_t *th, void *(*entry) (void *), void *data,
-                      int priority)
-{
-    vlc_thread_t dummy;
-    if (th == NULL)
-        th = &dummy;
-
-    (void) priority;
-    return vlc_clone_attr (th, entry, data, true);
+    /* release thread handle */
+    free(th);
 }
 
 int vlc_set_priority (vlc_thread_t th, int priority)
