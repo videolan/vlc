@@ -2237,9 +2237,13 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, stime_t i_pcr )
 
         if( i_mindts != VLC_TICK_INVALID )
         {
-            msg_Dbg( p_demux, "Program %d PCR prequeue fixup %"PRId64"->%"PRId64,
-                     p_pmt->i_number, TO_SCALE(i_mindts), i_pcr );
-            i_pcr = TO_SCALE(i_mindts);
+            if( i_pcr > p_pmt->pcr.i_first ) /* don't bork the natural pcr offset */
+            {
+                msg_Dbg( p_demux, "Program %d PCR prequeue fixup %"PRId64"->%"PRId64,
+                         p_pmt->i_number, TO_SCALE(i_mindts), i_pcr );
+                i_pcr = TO_SCALE(i_mindts);
+            }
+            else i_pcr = p_pmt->pcr.i_first;
         }
     }
 
