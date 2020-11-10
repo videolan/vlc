@@ -89,7 +89,6 @@ static inline struct vlc_object_t *VLC_OBJECT(struct t *d) \
 vlc_object_cast(libvlc_int_t)
 vlc_object_cast(intf_thread_t)
 vlc_object_cast(vlc_player_t)
-vlc_object_cast(playlist_t)
 vlc_object_cast(stream_t)
 vlc_object_cast(stream_directory_t)
 vlc_object_cast(stream_extractor_t)

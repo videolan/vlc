@@ -341,8 +341,6 @@ typedef struct date_t date_t;
 
 /* Playlist */
 
-typedef struct playlist_t playlist_t;
-typedef struct playlist_item_t playlist_item_t;
 typedef struct services_discovery_t services_discovery_t;
 typedef struct vlc_renderer_discovery_t vlc_renderer_discovery_t;
 typedef struct vlc_renderer_item_t vlc_renderer_item_t;
