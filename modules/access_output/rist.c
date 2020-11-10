@@ -121,7 +121,7 @@ static struct rist_flow *rist_init_tx()
     return flow;
 }
 
-static struct rist_flow *rist_udp_transmitter(sout_access_out_t *p_access, char *psz_dst_server, 
+static struct rist_flow *rist_udp_transmitter(sout_access_out_t *p_access, char *psz_dst_server,
     int i_dst_port, bool b_ismulticast)
 {
     struct rist_flow *flow;
@@ -208,11 +208,11 @@ static void rist_retransmit(sout_access_out_t *p_access, struct rist_flow *flow,
     }
     else
     {
-        msg_Dbg(p_access, "   Sending Nack #%d (age %"PRId64" ms), current seq is: [%d]", 
+        msg_Dbg(p_access, "   Sending Nack #%d (age %"PRId64" ms), current seq is: [%d]",
             seq, age, flow->wi);
         p_sys->i_retransmit_packets++;
         vlc_mutex_lock( &p_sys->fd_lock );
-        if (rist_Write(flow->fd_out, pkt->buffer->p_buffer, pkt->buffer->i_buffer) 
+        if (rist_Write(flow->fd_out, pkt->buffer->p_buffer, pkt->buffer->i_buffer)
                 != (ssize_t)pkt->buffer->i_buffer) {
             msg_Err(p_access, "Error sending retransmitted packet after 2 tries ...");
         }
@@ -221,13 +221,13 @@ static void rist_retransmit(sout_access_out_t *p_access, struct rist_flow *flow,
     }
 }
 
-static void process_nack(sout_access_out_t *p_access, uint8_t  ptype, uint16_t nrecords, 
+static void process_nack(sout_access_out_t *p_access, uint8_t  ptype, uint16_t nrecords,
     struct rist_flow *flow, uint8_t *pkt)
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     int i,j;
 
-    /*msg_Info(p_access, "   Nack (BbRR), %d record(s), Window: [%d:%d-->%d]", nrecords, 
+    /*msg_Info(p_access, "   Nack (BbRR), %d record(s), Window: [%d:%d-->%d]", nrecords,
         flow->ri, flow->wi, flow->wi-flow->ri);*/
 
     if (ptype == RTCP_PT_RTPFR)
@@ -276,12 +276,12 @@ static void process_nack(sout_access_out_t *p_access, uint8_t  ptype, uint16_t n
     }
     else
     {
-        msg_Err(p_access, "   !!! Wrong feedback. Ptype is %02x!=%02x, FMT: %02x", ptype, 
+        msg_Err(p_access, "   !!! Wrong feedback. Ptype is %02x!=%02x, FMT: %02x", ptype,
             RTCP_PT_RTPFR, rtcp_fb_get_fmt(pkt));
     }
 }
 
-static void rist_rtcp_recv(sout_access_out_t *p_access, struct rist_flow *flow, uint8_t *pkt_raw, 
+static void rist_rtcp_recv(sout_access_out_t *p_access, struct rist_flow *flow, uint8_t *pkt_raw,
     size_t len)
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
@@ -297,9 +297,9 @@ static void rist_rtcp_recv(sout_access_out_t *p_access, struct rist_flow *flow, 
         if ( bytes_left < 4 )
         {
             /* we must have at least 4 bytes */
-            msg_Err(p_access, "Rist rtcp packet must have at least 4 bytes, we have %d", 
+            msg_Err(p_access, "Rist rtcp packet must have at least 4 bytes, we have %d",
                 bytes_left);
-            return; 
+            return;
         }
         else if (!rtp_check_hdr(pkt))
         {
@@ -315,7 +315,7 @@ static void rist_rtcp_recv(sout_access_out_t *p_access, struct rist_flow *flow, 
         {
             /* check for a sane number of bytes */
             msg_Err(p_access, "Malformed feedback packet, wrong len %d, expecting %u bytes in the" \
-                " packet, got a buffer of %u bytes. ptype = %d", rtcp_get_length(pkt), bytes, 
+                " packet, got a buffer of %u bytes. ptype = %d", rtcp_get_length(pkt), bytes,
                 bytes_left, ptype);
             return;
         }
@@ -444,7 +444,7 @@ static void *rist_thread(void *data)
                         "cut, please keep it under %d bytes", r, RTP_PKT_SIZE);
                 }
                 if (unlikely(r == -1)) {
-                    msg_Err(p_access, "socket %d error: %s\n", p_sys->flow->fd_rtcp, 
+                    msg_Err(p_access, "socket %d error: %s\n", p_sys->flow->fd_rtcp,
                         gai_strerror(errno));
                 }
                 else {
@@ -563,7 +563,7 @@ static void* ThreadSend( void *data )
                 if (p_sys->i_total_packets > 0)
                     quality = (float)100 - (float)100*(float)(p_sys->i_retransmit_packets)
                         /(float)p_sys->i_total_packets;
-                msg_Info(p_access, "STATS: Total %u, Retransmitted %u, Link Quality %.2f%%", 
+                msg_Info(p_access, "STATS: Total %u, Retransmitted %u, Link Quality %.2f%%",
                     p_sys->i_total_packets, p_sys->i_retransmit_packets, quality);
             }
             p_sys->i_last_stat = now;
@@ -605,7 +605,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
         if( !p_sys->b_mtu_warning && p_buffer->i_buffer > p_sys->i_packet_size )
         {
             msg_Warn( p_access, "Buffer data size (%zu) > configured packet size (%zu), you " \
-                "should probably increase the configured packet size", p_buffer->i_buffer, 
+                "should probably increase the configured packet size", p_buffer->i_buffer,
                 p_sys->i_packet_size );
             p_sys->b_mtu_warning = true;
         }
@@ -765,7 +765,7 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->lock );
     vlc_mutex_init( &p_sys->fd_lock );
 
-    msg_Info(p_access, "Connecting RIST output to %s:%d and %s:%d", psz_dst_addr, i_dst_port, 
+    msg_Info(p_access, "Connecting RIST output to %s:%d and %s:%d", psz_dst_addr, i_dst_port,
         psz_dst_addr, i_dst_port+1);
     p_sys->b_ismulticast = is_multicast_address(psz_dst_addr);
     struct rist_flow *flow = rist_udp_transmitter(p_access, psz_dst_addr, i_dst_port,
@@ -785,7 +785,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->ssrc &= ~(1 << 0);
 
     msg_Info(p_access, "SSRC: 0x%08X", p_sys->ssrc);
-    p_sys->i_ticks_caching = VLC_TICK_FROM_MS(var_InheritInteger( p_access, 
+    p_sys->i_ticks_caching = VLC_TICK_FROM_MS(var_InheritInteger( p_access,
         SOUT_CFG_PREFIX "caching"));
     p_sys->i_packet_size = var_InheritInteger(p_access, SOUT_CFG_PREFIX "packet-size" );
     p_sys->dead = false;
