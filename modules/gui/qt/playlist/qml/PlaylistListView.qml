@@ -43,6 +43,25 @@ Widgets.NavigableFocusScope {
 
     signal setItemDropIndicatorVisible(int index, bool isVisible, bool top)
 
+    function isDropAcceptable(drop, index) {
+        return drop.hasUrls
+                || ((!!drop.source && (drop.source instanceof PlaylistDroppable))
+                     && drop.source.canInsertIntoPlaylist(index))
+    }
+
+    function acceptDrop(index, drop) {
+        if (!!drop.source && (drop.source instanceof PlaylistDroppable)) {
+            drop.source.insertIntoPlaylist(index)
+        } else if (drop.hasUrls) {
+            //force conversion to an actual list
+            var urlList = []
+            for ( var url in drop.urls)
+                urlList.push(drop.urls[url])
+            mainPlaylistController.insert(index, urlList, false)
+        }
+        drop.accept(Qt.IgnoreAction)
+    }
+
     VLCColors {id: vlcNightColors; state: "night"}
 
     function sortPL(key) {
@@ -70,6 +89,15 @@ Widgets.NavigableFocusScope {
             color: parent.color
 
             property int _scrollingDirection: 0
+
+            function insertIntoPlaylist(index) {
+                root.plmodel.moveItemsPre(root.plmodel.getSelection(), index)
+            }
+
+            function canInsertIntoPlaylist(index) {
+                var delta = model.index - index
+                return delta !== 0 && delta !== -1 && index !== model.index
+            }
 
             on_PosChanged: {
                 var dragItemY = root.mapToGlobal(dragItem._pos.x, dragItem._pos.y).y
@@ -421,7 +449,7 @@ Widgets.NavigableFocusScope {
                     DropArea {
                         anchors.fill: parent
                         onEntered: {
-                            if(!drag.hasUrls && drag.source.model.index === root.plmodel.count - 1)
+                            if(!root.isDropAcceptable(drag, root.plmodel.count))
                                 return
 
                             root.setItemDropIndicatorVisible(view.modelCount - 1, true, false);
@@ -432,20 +460,10 @@ Widgets.NavigableFocusScope {
                             root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
                         }
                         onDropped: {
-                            if(!drop.hasUrls && drop.source.model.index === root.plmodel.count - 1)
+                            if(!root.isDropAcceptable(drop, root.plmodel.count))
                                 return
-
-                            if (drop.hasUrls) {
-                                //force conversion to an actual list
-                                var urlList = []
-                                for ( var url in drop.urls)
-                                    urlList.push(drop.urls[url])
-                                mainPlaylistController.insert(root.plmodel.count, urlList, false)
-                            } else {
-                                root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
-                            }
+                            root.acceptDrop(root.plmodel.count, drop)
                             root.setItemDropIndicatorVisible(view.modelCount - 1, false, false);
-                            drop.accept()
                         }
                     }
                 }
@@ -520,17 +538,12 @@ Widgets.NavigableFocusScope {
                             }
                         }
 
+                        function isDropAcceptable(drop, index) {
+                            return root.isDropAcceptable(drop, index)
+                        }
+
                         onDropedMovedAt: {
-                            if (drop.hasUrls) {
-                                //force conversion to an actual list
-                                var urlList = []
-                                for ( var url in drop.urls)
-                                    urlList.push(drop.urls[url])
-                                mainPlaylistController.insert(target, urlList, false)
-                                drop.accept(Qt.IgnoreAction)
-                            } else {
-                                root.plmodel.moveItemsPre(root.plmodel.getSelection(), target)
-                            }
+                            root.acceptDrop(target, drop)
                         }
 
                         onHoveredChanged: {

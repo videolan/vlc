@@ -22,21 +22,29 @@ import QtGraphicalEffects 1.0
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///playlist/" as Playlist
 import "qrc:///style/"
 
-Rectangle {
+Playlist.PlaylistDroppable {
     property alias text: label.text
     property alias model: plitem.model
+    property alias color: bg.color
     property VLCColors _colors: VLCStyle.colors
 
     z: 1
     width:  plitem.visible ? plitem.width : label.width
     height: plitem.visible ? plitem.height : label.height
-    color: _colors.button
-    border.color : _colors.buttonBorder
-    radius: 6
     opacity: 0.75
     visible: false
+
+    Rectangle {
+        id: bg
+
+        anchors.fill: parent
+        color: _colors.button
+        border.color : _colors.buttonBorder
+        radius: 6
+    }
 
     Drag.active: visible
 

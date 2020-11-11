@@ -67,6 +67,10 @@ Rectangle {
 
     }
 
+    function isDropAcceptable(drop, index) {
+        console.assert(false, "parent should reimplement this function")
+    }
+
     onHoveredChanged: {
         if(hovered)
             showTooltip(false)
@@ -284,26 +288,14 @@ Rectangle {
                 Layout.preferredHeight: parent.height / 2
 
                 onEntered: {
-                    var delta = 1
-
-                    if(!drag.hasUrls)
-                        delta = drag.source.model.index - model.index
-
-                    if(delta === 0 || delta === -1)
-                        return
-
-                    root.setItemDropIndicatorVisible(model.index, true, true)
+                    if (isDropAcceptable(drag, model.index))
+                        root.setItemDropIndicatorVisible(model.index, true, true)
                 }
                 onExited: {
                     root.setItemDropIndicatorVisible(model.index, false, true)
                 }
                 onDropped: {
-                    var delta = 1
-
-                    if(!drop.hasUrls)
-                        delta = drag.source.model.index - model.index
-
-                    if(delta === 0 || delta === -1)
+                    if (!isDropAcceptable(drop, model.index))
                         return
 
                     plitem.dropedMovedAt(model.index, drop)
@@ -316,64 +308,24 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                property bool _isLastItem : model.index === plitem.plmodel.count - 1
+                readonly property bool _isLastItem: model.index === plitem.plmodel.count - 1
+                readonly property int _targetIndex: _isLastItem ? model.index + 1 : model.index
 
                 onEntered: {
-                    var delta = -1
-
-                    if(!drag.hasUrls)
-                        delta = drag.source.model.index - model.index
-
-                    if(delta === 0 || delta === 1)
+                    if (!isDropAcceptable(drag, _targetIndex))
                         return
 
-                    if (_isLastItem)
-                    {
-                        root.setItemDropIndicatorVisible(model.index, true, false);
-                    }
-                    else
-                    {
-                        root.setItemDropIndicatorVisible(model.index + 1, true, true);
-                    }
+                    root.setItemDropIndicatorVisible(_targetIndex, true, !_isLastItem)
                 }
                 onExited: {
-                    if (_isLastItem)
-                    {
-                        root.setItemDropIndicatorVisible(model.index, false, false);
-                    }
-                    else
-                    {
-                        root.setItemDropIndicatorVisible(model.index + 1, false, true);
-                    }
+                    root.setItemDropIndicatorVisible(_targetIndex, false, !_isLastItem)
                 }
                 onDropped: {
-                    var delta = -1
-
-                    if(!drop.hasUrls)
-                        delta = drag.source.model.index - model.index
-
-                    if(delta === 0 || delta === 1)
+                    if(!isDropAcceptable(drop, _targetIndex))
                         return
 
-                    if (_isLastItem)
-                    {
-                        if (drop.hasUrls) {
-                            //force conversion to an actual list
-                            var urlList = []
-                            for ( var url in drop.urls)
-                                urlList.push(drop.urls[url])
-                            mainPlaylistController.insert(root.plmodel.count, urlList, false)
-                        } else {
-                            root.plmodel.moveItemsPost(root.plmodel.getSelection(), root.plmodel.count - 1)
-                        }
-                        root.setItemDropIndicatorVisible(model.index, false, false);
-                        drop.accept(Qt.IgnoreAction)
-                    }
-                    else
-                    {
-                        plitem.dropedMovedAt(model.index + 1, drop)
-                        root.setItemDropIndicatorVisible(model.index + 1, false, true);
-                    }
+                    plitem.dropedMovedAt(_targetIndex, drop)
+                    root.setItemDropIndicatorVisible(_targetIndex, false, !_isLastItem)
                 }
             }
         }

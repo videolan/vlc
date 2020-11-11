@@ -285,6 +285,7 @@
     </qresource>
     <qresource prefix="/playlist">
         <file alias="PLItem.qml">playlist/qml/PLItem.qml</file>
+        <file alias="PlaylistDroppable.qml">playlist/qml/PlaylistDroppable.qml</file>
         <file alias="PlaylistListView.qml">playlist/qml/PlaylistListView.qml</file>
         <file alias="PlaylistMenu.qml">playlist/qml/PlaylistMenu.qml</file>
         <file alias="PlaylistToolbar.qml">playlist/qml/PlaylistToolbar.qml</file>
