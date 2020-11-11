@@ -240,6 +240,7 @@
         <file alias="PageLoader.qml">widgets/qml/PageLoader.qml</file>
         <file alias="LocalTabBar.qml">widgets/qml/LocalTabBar.qml</file>
         <file alias="IconButton.qml">widgets/qml/IconButton.qml</file>
+        <file alias="DragItem.qml">widgets/qml/DragItem.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>
