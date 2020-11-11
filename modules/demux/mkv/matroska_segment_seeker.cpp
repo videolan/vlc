@@ -31,7 +31,7 @@
 #include <sstream>
 #include <limits>
 
-namespace { 
+namespace {
     template<class It, class T>
     It greatest_lower_bound( It beg, It end, T const& value )
     {
@@ -95,7 +95,7 @@ SegmentSeeker::add_cluster( KaxCluster * const p_cluster )
         static void fix( Cluster& prev, Cluster& next )
         {
             if( ( prev.fpos + prev.size) == next.fpos )
-                prev.duration = next.pts - prev.pts; 
+                prev.duration = next.pts - prev.pts;
         }
     };
 
@@ -340,7 +340,7 @@ SegmentSeeker::index_range( matroska_segment_c& ms, Range search_area, vlc_tick_
 {
     ranges_t areas_to_search = get_search_areas( search_area.start, search_area.end );
 
-    for( ranges_t::const_iterator range_it = areas_to_search.begin(); range_it != areas_to_search.end(); ++range_it ) 
+    for( ranges_t::const_iterator range_it = areas_to_search.begin(); range_it != areas_to_search.end(); ++range_it )
         index_unsearched_range( ms, *range_it, max_pts );
 }
 
