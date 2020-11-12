@@ -38,7 +38,7 @@ typedef struct chained_filter_t
     filter_t filter;
     /* Private filter chain data (shhhh!) */
     struct chained_filter_t *prev, *next;
-    vlc_mouse_t *mouse;
+    vlc_mouse_t mouse;
     vlc_picture_chain_t pending;
 } chained_filter_t;
 
@@ -273,10 +273,7 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     chain->last = chained;
     chained->next = NULL;
 
-    vlc_mouse_t *mouse = malloc( sizeof(*mouse) );
-    if( likely(mouse != NULL) )
-        vlc_mouse_Init( mouse );
-    chained->mouse = mouse;
+    vlc_mouse_Init( &chained->mouse );
     vlc_picture_chain_Init( &chained->pending );
 
     msg_Dbg( chain->obj, "Filter '%s' (%p) appended to chain",
@@ -337,7 +334,6 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
     msg_Dbg( chain->obj, "Filter %p removed from chain", (void *)filter );
     FilterDeletePictures( &chained->pending );
 
-    free( chained->mouse );
     es_format_Clean( &filter->fmt_out );
     es_format_Clean( &filter->fmt_in );
 
@@ -510,14 +506,13 @@ int filter_chain_MouseFilter( filter_chain_t *p_chain, vlc_mouse_t *p_dst, const
     for( chained_filter_t *f = p_chain->last; f != NULL; f = f->prev )
     {
         filter_t *p_filter = &f->filter;
-        vlc_mouse_t *p_mouse = f->mouse;
 
-        if( p_filter->ops->video_mouse && p_mouse )
+        if( p_filter->ops->video_mouse )
         {
-            vlc_mouse_t old = *p_mouse;
+            vlc_mouse_t old = f->mouse;
             vlc_mouse_t filtered = current;
 
-            *p_mouse = current;
+            f->mouse = current;
             if( p_filter->ops->video_mouse( p_filter, &filtered, &old) )
                 return VLC_EGENERIC;
             current = filtered;
