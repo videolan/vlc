@@ -327,6 +327,7 @@ function parse()
         or string.match( vlc.path, "/live$" )
         or string.match( vlc.path, "/live%?" )
     then -- This is the HTML page's URL
+        local js_url
         -- fmt is the format of the video
         -- (cf. http://en.wikipedia.org/wiki/YouTube#Quality_and_formats)
         fmt = get_url_param( vlc.path, "fmt" )
@@ -409,11 +410,10 @@ function parse()
                 end
             end
 
-            -- JSON parameters, also formerly known as "swfConfig",
-            -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG", "playerConfig" ...
-            if string.match( line, "ytplayer%.config" ) then
-
-                local js_url = string.match( line, '"jsUrl":"(.-)"' )
+            -- We need this when parsing the main stream configuration;
+            -- it can indeed be found on that same line (among others).
+            if not js_url then
+                js_url = string.match( line, '"jsUrl":"(.-)"' )
                     or string.match( line, "\"js\": *\"(.-)\"" )
                 if js_url then
                     js_url = string.gsub( js_url, "\\/", "/" )
@@ -424,6 +424,11 @@ function parse()
                     end
                     js_url = string.gsub( js_url, "^//", vlc.access.."://" )
                 end
+            end
+
+            -- JSON parameters, also formerly known as "swfConfig",
+            -- "SWF_ARGS", "swfArgs", "PLAYER_CONFIG", "playerConfig" ...
+            if string.match( line, "ytplayer%.config" ) then
 
                 -- Classic parameters - out of use since early 2020
                 if not fmt then
