@@ -346,17 +346,12 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     es_format_InitFromVideo(&src, &v_src);
 
     /* */
-    int ret = -1;
+    es_format_t dst;
+    es_format_InitFromVideo(&dst, &v_dst);
 
-    {
-        es_format_t dst;
-
-        es_format_InitFromVideo(&dst, &v_dst);
-
-        filter_chain_Reset(osys->converters, &src, osys->src_vctx, &dst);
-        ret = filter_chain_AppendConverter(osys->converters, &dst);
-        es_format_Clean(&dst);
-    }
+    filter_chain_Reset(osys->converters, &src, osys->src_vctx, &dst);
+    int ret = filter_chain_AppendConverter(osys->converters, &dst);
+    es_format_Clean(&dst);
     es_format_Clean(&src);
 
     if (ret != 0) {
