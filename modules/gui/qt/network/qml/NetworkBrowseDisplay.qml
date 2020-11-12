@@ -66,6 +66,38 @@ Widgets.NavigableFocusScope {
         searchRole: "name"
     }
 
+    Widgets.DragItem {
+        id: networkDragItem
+
+        function updateComponents(maxCovers) {
+          var items = selectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
+            return filterModel.getDataAt(x.row)
+          })
+          var title = items.map(function (item){ return item.name || i18n.qtr("Unknown share")}).join(", ")
+          var covers = items.map(function (item) { return {artwork: item.artwork, cover: custom_cover, type: item.type}})
+          return {
+            covers: covers,
+            title: title,
+            count: selectionModel.selectedIndexes.length
+          }
+        }
+
+        function insertIntoPlaylist(index) {
+            providerModel.insertIntoPlaylist(filterModel.mapIndexesToSource(selectionModel.selectedIndexes), index)
+        }
+
+        Component {
+            id: custom_cover
+
+            NetworkCustomCover {
+                networkModel: model
+                iconSize: networkDragItem.coverSize / 2
+                width: networkDragItem.coverSize / 2
+                height: networkDragItem.coverSize / 2
+            }
+        }
+    }
+
     function resetFocus() {
         var initialIndex = root.initialIndex
         if (initialIndex >= filterModel.count)
@@ -153,6 +185,7 @@ Widgets.NavigableFocusScope {
 
                 subtitle: ""
                 height: VLCStyle.gridCover_network_height + VLCStyle.margin_xsmall + VLCStyle.fontHeight_normal
+                dragItem: networkDragItem
 
                 onPlayClicked: playAt(index)
                 onItemClicked : gridView.leftClickOnItem(modifier, index)
@@ -204,6 +237,7 @@ Widgets.NavigableFocusScope {
                 onPlayClicked: playAt(index)
             }
 
+            dragItem: networkDragItem
             height: view.height
             width: view.width
             model: filterModel
