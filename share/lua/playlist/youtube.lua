@@ -561,6 +561,7 @@ function parse()
             -- FIXME: do this properly (see #24958)
             description = string.gsub( description, '\\(["\\/])', '%1' )
             description = string.gsub( description, '\\n', '\n' )
+            description = string.gsub( description, '\\r', '\r' )
             description = string.gsub( description, "\\u0026", "&" )
         end
         local artist = string.match( line, "%%22author%%22%%3A%%22(.-)%%22" )
