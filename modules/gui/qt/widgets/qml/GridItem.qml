@@ -45,6 +45,7 @@ FocusScope {
     property real pictureWidth: VLCStyle.colWidth(1)
     property real pictureHeight: pictureWidth
     property int titleMargin: VLCStyle.margin_xsmall
+    property Item dragItem
 
     signal playClicked
     signal addToPlaylistClicked
@@ -72,6 +73,7 @@ FocusScope {
     property alias _secondaryShadowSamples: secondaryShadow.samples
 
     property int _newIndicatorMedian: VLCStyle.margin_xsmall
+    property int _modifiersOnLastPress: Qt.NoModifier
 
     state: _highlighted ? "selected" : "unselected"
     states: [
@@ -124,6 +126,18 @@ FocusScope {
         anchors.fill: parent
         implicitWidth: content.implicitWidth
         implicitHeight: content.implicitHeight
+        drag.target: root.dragItem
+        drag.axis: Drag.XAndYAxis
+        drag.onActiveChanged: {
+            // perform the "click" action because the click action is only executed on mouse release (we are in the pressed state)
+            // but we will need the updated list on drop
+            if (drag.active && !selected) {
+                root.itemClicked(picture, Qt.LeftButton, root._modifiersOnLastPress)
+            } else if (root.dragItem) {
+                root.dragItem.Drag.drop()
+            }
+            root.dragItem.Drag.active = drag.active
+        }
 
         acceptedButtons: Qt.RightButton | Qt.LeftButton
         Keys.onMenuPressed: root.contextMenuButtonClicked(picture, root.mapToGlobal(0,0))
@@ -139,6 +153,16 @@ FocusScope {
         onDoubleClicked: {
             if (mouse.button === Qt.LeftButton)
                 root.itemDoubleClicked(picture,mouse.buttons, mouse.modifiers)
+        }
+
+        onPressed: _modifiersOnLastPress = mouse.modifiers
+
+        onPositionChanged: {
+            if (drag.active) {
+                var pos = drag.target.parent.mapFromItem(mouseArea, mouseX, mouseY)
+                drag.target.x = pos.x + 12
+                drag.target.y = pos.y + 12
+            }
         }
 
         FocusScope {
