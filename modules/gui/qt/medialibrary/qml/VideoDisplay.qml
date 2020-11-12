@@ -113,6 +113,7 @@ Widgets.NavigableFocusScope {
                 id: videoGridItem
 
                 opacity: videosGV.expandIndex !== -1 && videosGV.expandIndex !== videoGridItem.index ? .7 : 1
+                dragItem: videoDragItem
 
                 onContextMenuButtonClicked: {
                     videosGV.rightClickOnItem(index)
@@ -174,6 +175,7 @@ Widgets.NavigableFocusScope {
             height: view.height
             width: view.width
             model: videoModel
+            dragItem: videoDragItem
             navigationParent: root
 
             selectionDelegateModel: selectionModel
@@ -182,6 +184,28 @@ Widgets.NavigableFocusScope {
 
             onRightClick: contextMenu.popup(selectionModel.selectedIndexes, globalMousePos )
 
+        }
+    }
+
+
+    Widgets.DragItem {
+        id: videoDragItem
+
+        function updateComponents(maxCovers) {
+          var items = selectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
+            return videoModel.getDataAt(x.row)
+          })
+          var title = items.map(function (item){ return item.title}).join(", ")
+          var covers = items.map(function (item) { return {artwork: item.thumbnail || VLCStyle.noArtCover}})
+          return {
+            covers: covers,
+            title: title,
+            count: selectionModel.selectedIndexes.length
+          }
+        }
+
+        function insertIntoPlaylist(index) {
+            medialib.insertIntoPlaylist(index, videoModel.getIdsForIndexes(selectionModel.selectedIndexes))
         }
     }
 
