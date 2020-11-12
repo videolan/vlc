@@ -1,6 +1,9 @@
 Changes between 3.0.11.1 and 3.0.12:
 ----------------------------------
 
+Demux:
+ * Fixed adaptive's handling of resolution settings
+
 Audio output:
  * Fix audio distortion on macOS during start of playback
 
