@@ -334,14 +334,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     v_dst.i_sar_num = 0;
     v_dst.i_sar_den = 0;
 
-    video_format_t v_dst_cmp = v_dst;
-    if ((v_src.i_chroma == VLC_CODEC_J420 && v_dst.i_chroma == VLC_CODEC_I420) ||
-        (v_src.i_chroma == VLC_CODEC_J422 && v_dst.i_chroma == VLC_CODEC_I422) ||
-        (v_src.i_chroma == VLC_CODEC_J440 && v_dst.i_chroma == VLC_CODEC_I440) ||
-        (v_src.i_chroma == VLC_CODEC_J444 && v_dst.i_chroma == VLC_CODEC_I444))
-        v_dst_cmp.i_chroma = v_src.i_chroma;
-
-    const bool convert = memcmp(&v_src, &v_dst_cmp, sizeof(v_src)) != 0;
+    const bool convert = memcmp(&v_src, &v_dst, sizeof(v_src)) != 0;
     if (!convert)
         return 0;
 
@@ -355,16 +348,14 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     /* */
     int ret = -1;
 
-    for (int i = 0; i < 1 + (v_dst_cmp.i_chroma != v_dst.i_chroma); i++) {
+    {
         es_format_t dst;
 
-        es_format_InitFromVideo(&dst, i == 0 ? &v_dst : &v_dst_cmp);
+        es_format_InitFromVideo(&dst, &v_dst);
 
         filter_chain_Reset(osys->converters, &src, osys->src_vctx, &dst);
         ret = filter_chain_AppendConverter(osys->converters, &dst);
         es_format_Clean(&dst);
-        if (ret == 0)
-            break;
     }
     es_format_Clean(&src);
 
