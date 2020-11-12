@@ -653,6 +653,7 @@ libqt_plugin_la_QML = \
 	gui/qt/network/qml/DiscoverUrlDisplay.qml \
 	gui/qt/network/qml/NetworkAddressbar.qml \
 	gui/qt/network/qml/NetworkBrowseDisplay.qml \
+	gui/qt/network/qml/NetworkCustomCover.qml \
 	gui/qt/network/qml/NetworkDisplay.qml \
 	gui/qt/network/qml/NetworkGridItem.qml \
 	gui/qt/network/qml/NetworkHomeDisplay.qml \

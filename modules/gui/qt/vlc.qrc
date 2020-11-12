@@ -245,6 +245,7 @@
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>
         <file alias="DiscoverDisplay.qml">network/qml/DiscoverDisplay.qml</file>
         <file alias="DiscoverUrlDisplay.qml">network/qml/DiscoverUrlDisplay.qml</file>
+        <file alias="NetworkCustomCover.qml">network/qml/NetworkCustomCover.qml</file>
         <file alias="NetworkDisplay.qml">network/qml/NetworkDisplay.qml</file>
         <file alias="NetworkHomeDeviceListView.qml">network/qml/NetworkHomeDeviceListView.qml</file>
         <file alias="NetworkHomeDisplay.qml">network/qml/NetworkHomeDisplay.qml</file>
