@@ -101,7 +101,6 @@ QMap<QString, QVariant> NetworkMediaModel::getDataAt(int idx)
     return dataDict;
 }
 
-
 int NetworkMediaModel::rowCount(const QModelIndex& parent) const
 {
     if ( parent.isValid() )
@@ -182,7 +181,29 @@ void NetworkMediaModel::setTree(QVariant parentTree)
     emit treeChanged();
 }
 
-bool NetworkMediaModel::addToPlaylist(int index)
+bool NetworkMediaModel::insertIntoPlaylist(const QModelIndexList &itemIdList, const ssize_t playlistIndex)
+{
+    if (!(m_ctx && m_hasTree))
+        return false;
+    QVector<vlc::playlist::Media> medias;
+    medias.reserve( itemIdList.size() );
+    for ( const QModelIndex &id : itemIdList )
+    {
+        if ( !id.isValid() )
+            continue;
+        const int index = id.row();
+        if ( index < 0 || (size_t)index >= m_items.size() )
+            continue;
+
+        medias.append( vlc::playlist::Media {m_items[index].tree.media.get()} );
+    }
+    if (medias.isEmpty())
+        return false;
+    m_ctx->getIntf()->p_sys->p_mainPlaylistController->insert(playlistIndex, medias, false);
+    return true;
+}
+
+bool NetworkMediaModel::addToPlaylist(const int index)
 {
     if (!(m_ctx && m_hasTree))
         return false;

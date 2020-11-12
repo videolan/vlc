@@ -115,6 +115,27 @@ int NetworkDeviceModel::getCount() const
     return static_cast<int>( m_items.size() );
 }
 
+bool NetworkDeviceModel::insertIntoPlaylist(const QModelIndexList &itemIdList, ssize_t playlistIndex)
+{
+    if (!(m_ctx && m_sdSource != CAT_MYCOMPUTER))
+        return false;
+    QVector<vlc::playlist::Media> medias;
+    medias.reserve( itemIdList.size() );
+    for ( const QModelIndex &id : itemIdList )
+    {
+        if ( !id.isValid() )
+            continue;
+        const int index = id.row();
+        if ( index < 0 || (size_t)index >= m_items.size() )
+            continue;
+
+        medias.append( vlc::playlist::Media {m_items[index].inputItem.get()} );
+    }
+    if (medias.isEmpty())
+        return false;
+    m_ctx->getIntf()->p_sys->p_mainPlaylistController->insert(playlistIndex, medias, false);
+    return true;
+}
 
 bool NetworkDeviceModel::addToPlaylist(int index)
 {
