@@ -561,6 +561,17 @@ function parse()
             end
         end
 
+        if not path and get_url_param( vlc.path, "el" ) ~= "detailpage" then
+            -- Retry with the other known value for the "el" parameter;
+            -- either value has historically been wrong and failed for
+            -- some videos but not others.
+            local video_id = get_url_param( vlc.path, "video_id" )
+            if video_id then
+                path = vlc.access.."://www.youtube.com/get_video_info?video_id="..video_id.."&el=detailpage"..copy_url_param( vlc.path, "fmt" )..copy_url_param( vlc.path, "jsurl" )
+                vlc.msg.warn( "Couldn't extract video URL, retrying with alternate YouTube API parameters" )
+            end
+        end
+
         if not path then
             vlc.msg.err( "Couldn't extract youtube video URL, please check for updates to this script" )
             return { }
