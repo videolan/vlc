@@ -78,6 +78,7 @@ NavigableFocusScope {
 
     property alias add:       view.add
     property alias displaced: view.displaced
+    property Item dragItem
 
     Accessible.role: Accessible.Table
 
@@ -199,6 +200,7 @@ NavigableFocusScope {
             property alias showSeparator: separator.visible
             readonly property bool highlighted: selected || hoverArea.containsMouse || activeFocus
             readonly property int _index: index
+            property int _modifiersOnLastPress: Qt.NoModifier
 
             width: view.width
             height: root.rowHeight
@@ -222,6 +224,20 @@ NavigableFocusScope {
                 hoverEnabled: true
                 Keys.onMenuPressed: root.contextMenuButtonClicked(contextButton,rowModel)
                 acceptedButtons: Qt.RightButton | Qt.LeftButton
+                drag.target: root.dragItem
+                drag.axis: Drag.XAndYAxis
+                drag.onActiveChanged: {
+                    // perform the "click" action because the click action is only executed on mouse release (we are in the pressed state)
+                    // but we will need the updated list on drop
+                    if (drag.active && !selectionDelegateModel.isSelected(root.model.index(index, 0))) {
+                        selectionDelegateModel.updateSelection(_modifiersOnLastPress , view.currentIndex, index)
+                    } else if (root.dragItem) {
+                        root.dragItem.Drag.drop()
+                    }
+                    root.dragItem.Drag.active = drag.active
+                }
+
+                onPressed: _modifiersOnLastPress = mouse.modifiers
 
                 onClicked: {
                     if (mouse.button === Qt.LeftButton || !selectionDelegateModel.isSelected(root.model.index(index, 0))) {
@@ -232,6 +248,14 @@ NavigableFocusScope {
 
                     if (mouse.button === Qt.RightButton){
                         root.rightClick(lineView,rowModel, hoverArea.mapToGlobal(mouse.x,mouse.y) )
+                    }
+                }
+
+                onPositionChanged: {
+                    if (drag.active) {
+                        var pos = drag.target.parent.mapFromItem(hoverArea, mouseX, mouseY)
+                        drag.target.x = pos.x + 12
+                        drag.target.y = pos.y + 12
                     }
                 }
 
