@@ -306,6 +306,7 @@ function probe()
     return ( ( vlc.access == "http" or vlc.access == "https" )
              and (
                string.match( vlc.path, "^www%.youtube%.com/" )
+            or string.match( vlc.path, "^music%.youtube%.com/" )
             or string.match( vlc.path, "^gaming%.youtube%.com/" ) -- out of use
              ) and (
                string.match( vlc.path, "/watch%?" ) -- the html page
