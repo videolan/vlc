@@ -480,6 +480,16 @@ function parse()
                 -- of "embedded" and "detailpage" have historically been
                 -- wrong and failed for various restricted videos.
                 path = vlc.access.."://www.youtube.com/get_video_info?video_id="..video_id..copy_url_param( vlc.path, "fmt" )
+
+                -- The YouTube API output doesn't provide the URL to the
+                -- javascript code necessary to descramble URL signatures,
+                -- without which functionality can be seriously limited.
+                -- #18801 prevents us from using a subrequest to the API,
+                -- so we forward the URL this way.
+                if js_url then
+                    path = path.."&jsurl="..vlc.strings.encode_uri_component( js_url )
+                end
+
                 vlc.msg.warn( "Couldn't extract video URL, falling back to alternate youtube API" )
             end
         end
@@ -502,6 +512,11 @@ function parse()
             return { }
         end
 
+        local js_url = get_url_param( vlc.path, "jsurl" )
+        if js_url then
+            js_url= vlc.strings.decode_uri( js_url )
+        end
+
         -- Classic parameters - out of use since early 2020
         local fmt = get_url_param( vlc.path, "fmt" )
         if not fmt then
@@ -516,7 +531,7 @@ function parse()
         if url_map then
             vlc.msg.dbg( "Found classic parameters for youtube video stream, parsing..." )
             url_map = vlc.strings.decode_uri( url_map )
-            path = pick_url( url_map, fmt )
+            path = pick_url( url_map, fmt, js_url )
         end
 
         -- New-style parameters
@@ -527,7 +542,7 @@ function parse()
                 stream_map = vlc.strings.decode_uri( stream_map )
                 -- FIXME: do this properly (see #24958)
                 stream_map = string.gsub( stream_map, "\\u0026", "&" )
-                path = pick_stream( stream_map )
+                path = pick_stream( stream_map, js_url )
             end
         end
 
