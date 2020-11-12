@@ -10,7 +10,6 @@ info()
 
 ARCH="x86_64"
 MINIMAL_OSX_VERSION="10.7"
-OSX_VERSION=$(xcrun --show-sdk-version)
 OSX_KERNELVERSION=`uname -r | cut -d. -f1`
 SDKROOT=$(xcrun --show-sdk-path)
 VLCBUILDDIR=""
@@ -135,7 +134,6 @@ fi
 export CC="`xcrun --find clang`"
 export CXX="`xcrun --find clang++`"
 export OBJC="`xcrun --find clang`"
-export OSX_VERSION
 export SDKROOT
 export PATH="${vlcroot}/extras/tools/build/bin:${vlcroot}/contrib/${TRIPLET}/bin:$python3Path:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
 
@@ -220,7 +218,7 @@ export OBJCFLAGS="-Werror=partial-availability"
 
 export EXTRA_CFLAGS="-isysroot $SDKROOT -mmacosx-version-min=$MINIMAL_OSX_VERSION -DMACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION"
 export EXTRA_LDFLAGS="-Wl,-syslibroot,$SDKROOT -mmacosx-version-min=$MINIMAL_OSX_VERSION -isysroot $SDKROOT -DMACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION"
-export XCODE_FLAGS="MACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION -sdk macosx$OSX_VERSION WARNING_CFLAGS=-Werror=partial-availability"
+export XCODE_FLAGS="MACOSX_DEPLOYMENT_TARGET=$MINIMAL_OSX_VERSION -sdk $SDKROOT WARNING_CFLAGS=-Werror=partial-availability"
 
 info "Building contribs"
 spushd "${vlcroot}/contrib"
