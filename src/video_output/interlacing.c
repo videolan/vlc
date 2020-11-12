@@ -137,16 +137,6 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, vout_thread_private_t *sys
     var_Create(vout, "deinterlace-needed", VLC_VAR_BOOL);
     var_AddCallback(vout, "deinterlace-needed", DeinterlaceCallback, NULL);
 
-    /* Override the initial value from filters if present */
-    char *filter_mode = NULL;
-    if (sys->interlacing.has_deint)
-        filter_mode = var_CreateGetNonEmptyString(vout, "sout-deinterlace-mode");
-    if (filter_mode) {
-        deinterlace_state = 1;
-        free(deinterlace_mode);
-        deinterlace_mode = filter_mode;
-    }
-
     /* */
     val.psz_string = deinterlace_mode ? deinterlace_mode : optm->orig.psz;
     var_Change(vout, "deinterlace-mode", VLC_VAR_SETVALUE, val);
