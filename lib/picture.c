@@ -30,6 +30,8 @@
 #include <vlc_atomic.h>
 #include <vlc_picture.h>
 #include <vlc_block.h>
+#include <vlc_image.h>
+#include <vlc_input.h>
 #include <vlc_fs.h>
 
 #include "picture_internal.h"
@@ -41,6 +43,13 @@ struct libvlc_picture_t
     block_t* converted;
     video_format_t fmt;
     libvlc_time_t time;
+    input_attachment_t* attachment;
+};
+
+struct libvlc_picture_list_t
+{
+    size_t count;
+    libvlc_picture_t* pictures[];
 };
 
 libvlc_picture_t* libvlc_picture_new( vlc_object_t* p_obj, picture_t* input,
@@ -54,6 +63,7 @@ libvlc_picture_t* libvlc_picture_new( vlc_object_t* p_obj, picture_t* input,
     vlc_atomic_rc_init( &pic->rc );
     pic->type = type;
     pic->time = MS_FROM_VLC_TICK( input->date );
+    pic->attachment = NULL;
     vlc_fourcc_t format;
     switch ( type )
     {
@@ -79,6 +89,51 @@ libvlc_picture_t* libvlc_picture_new( vlc_object_t* p_obj, picture_t* input,
     return pic;
 }
 
+static void libvlc_picture_block_release( block_t* block )
+{
+    free( block );
+}
+
+static const struct vlc_block_callbacks block_cbs =
+{
+    libvlc_picture_block_release,
+};
+
+static libvlc_picture_t* libvlc_picture_from_attachment( input_attachment_t* attachment )
+{
+    vlc_fourcc_t fcc = image_Mime2Fourcc( attachment->psz_mime );
+    if ( fcc != VLC_CODEC_PNG && fcc != VLC_CODEC_JPEG )
+        return NULL;
+    libvlc_picture_t *pic = malloc( sizeof( *pic ) );
+    if ( unlikely( pic == NULL ) )
+        return NULL;
+    pic->converted = malloc( sizeof( *pic->converted ) );
+    if ( unlikely( pic->converted == NULL ) )
+    {
+        free(pic);
+        return NULL;
+    }
+    vlc_atomic_rc_init( &pic->rc );
+    pic->attachment = vlc_input_attachment_Hold( attachment );
+    pic->time = VLC_TICK_INVALID;
+    block_Init( pic->converted, &block_cbs, attachment->p_data,
+                attachment->i_data);
+    video_format_Init( &pic->fmt, fcc );
+    switch ( fcc )
+    {
+    case VLC_CODEC_PNG:
+        pic->type = libvlc_picture_Png;
+        break;
+    case VLC_CODEC_JPEG:
+        pic->type = libvlc_picture_Jpg;
+        break;
+    default:
+        vlc_assert_unreachable();
+    }
+
+    return pic;
+}
+
 void libvlc_picture_retain( libvlc_picture_t* pic )
 {
     vlc_atomic_rc_inc( &pic->rc );
@@ -91,6 +146,8 @@ void libvlc_picture_release( libvlc_picture_t* pic )
     video_format_Clean( &pic->fmt );
     if ( pic->converted )
         block_Release( pic->converted );
+    if ( pic->attachment )
+        vlc_input_attachment_Release( pic->attachment );
     free( pic );
 }
 
