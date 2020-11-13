@@ -26,12 +26,35 @@ Widgets.NavigableFocusScope {
     id: root
     property alias sortModel: tracklistdisplay_id.sortModel
     property alias model: tracklistdisplay_id.model
+    property alias selectionModel: tracklistdisplay_id.selectionDelegateModel
+
+    Widgets.DragItem {
+        id: trackDragItem
+
+        function updateComponents(maxCovers) {
+          var items = selectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
+            return model.getDataAt(x.row)
+          })
+          var title = items.map(function (item){ return item.title}).join(", ")
+          var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtCover}})
+          return {
+            covers: covers,
+            title: title,
+            count: selectionModel.selectedIndexes.length
+          }
+        }
+
+        function insertIntoPlaylist(index) {
+            medialib.insertIntoPlaylist(index, model.getIdsForIndexes(selectionModel.selectedIndexes))
+        }
+    }
 
     MusicTrackListDisplay {
         id: tracklistdisplay_id
         anchors.fill: parent
         visible: model.count > 0
         focus: visible
+        dragItem: trackDragItem
         navigationParent: root
         navigationCancel: function() {
             if (tracklistdisplay_id.currentIndex <= 0)
