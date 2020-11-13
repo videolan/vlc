@@ -50,8 +50,11 @@ input_preparser_t *input_preparser_New( vlc_object_t * );
  * indefinitely. If > 0, the timeout will be used (in milliseconds).
  * @param id unique id provided by the caller. This is can be used to cancel
  * the request with input_preparser_Cancel()
+ * @returns VLC_SUCCESS if the item was scheduled for preparsing, an error code
+ * otherwise
+ * If this returns an error, the on_preparse_ended will *not* be invoked
  */
-void input_preparser_Push( input_preparser_t *, input_item_t *,
+int input_preparser_Push( input_preparser_t *, input_item_t *,
                            input_item_meta_request_option_t,
                            const input_preparser_callbacks_t *cbs,
                            void *cbs_userdata,

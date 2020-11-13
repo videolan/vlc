@@ -333,13 +333,13 @@ input_preparser_t* input_preparser_New( vlc_object_t *parent )
     return preparser;
 }
 
-void input_preparser_Push( input_preparser_t *preparser,
+int input_preparser_Push( input_preparser_t *preparser,
     input_item_t *item, input_item_meta_request_option_t i_options,
     const input_preparser_callbacks_t *cbs, void *cbs_userdata,
     int timeout_ms, void *id )
 {
     if( atomic_load( &preparser->deactivated ) )
-        return;
+        return VLC_EGENERIC;
 
     vlc_mutex_lock( &item->lock );
     enum input_item_type_e i_type = item->i_type;
@@ -360,7 +360,7 @@ void input_preparser_Push( input_preparser_t *preparser,
         default:
             if (cbs && cbs->on_preparse_ended)
                 cbs->on_preparse_ended(item, ITEM_PREPARSE_SKIPPED, cbs_userdata);
-            return;
+            return VLC_SUCCESS;
     }
 
     vlc_tick_t timeout = timeout_ms == -1 ? preparser->default_timeout
@@ -368,11 +368,12 @@ void input_preparser_Push( input_preparser_t *preparser,
     struct task *task =
         TaskNew(preparser, item, i_options, cbs, cbs_userdata, id, timeout);
     if( !task )
-        return;
+        return VLC_ENOMEM;
 
     PreparserAddTask(preparser, task);
 
     vlc_executor_Submit(preparser->executor, &task->runnable);
+    return VLC_SUCCESS;
 }
 
 void input_preparser_fetcher_Push( input_preparser_t *preparser,
