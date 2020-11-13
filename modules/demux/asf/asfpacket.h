@@ -24,6 +24,7 @@
 
 #include <vlc_demux.h>
 #include <vlc_es.h>
+#include <vlc_messages.h>
 #include "libasf.h"
 
 #define ASFPACKET_PREROLL_FROM_CURRENT -1
@@ -40,7 +41,9 @@ typedef struct asf_packet_sys_s asf_packet_sys_t;
 
 struct asf_packet_sys_s
 {
-    demux_t *p_demux;
+    void *priv;
+    stream_t *s;
+    struct vlc_logger *logger;
 
     /* global stream info */
     vlc_tick_t *pi_preroll;

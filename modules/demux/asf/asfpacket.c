@@ -87,9 +87,9 @@ static int DemuxSubPayload( asf_packet_sys_t *p_packetsys,
         p_packetsys->pf_send( p_packetsys, i_stream_number, pp_frame );
     }
 
-    block_t *p_frag = vlc_stream_Block( p_packetsys->p_demux->s, i_sub_payload_data_length );
+    block_t *p_frag = vlc_stream_Block( p_packetsys->s, i_sub_payload_data_length );
     if( p_frag == NULL ) {
-        msg_Warn( p_packetsys->p_demux, "cannot read data" );
+        vlc_warning( p_packetsys->logger, "cannot read data" );
         return -1;
     }
 
@@ -108,8 +108,6 @@ static void ParsePayloadExtensions( asf_packet_sys_t *p_packetsys,
                                     const uint8_t *p_data, size_t i_data,
                                     bool *b_keyframe )
 {
-    demux_t *p_demux = p_packetsys->p_demux;
-
     if ( !p_tkinfo || !p_tkinfo->p_esp || !p_tkinfo->p_esp->p_ext )
         return;
 
@@ -180,7 +178,7 @@ static void ParsePayloadExtensions( asf_packet_sys_t *p_packetsys,
     return;
 
 sizeerror:
-    msg_Warn( p_demux, "Unknown extension " GUID_FMT " data size of %u",
+    vlc_warning( p_packetsys->logger, "Unknown extension " GUID_FMT " data size of %u",
               GUID_PRINT( p_ext->i_extension_id ), i_payload_extensions_size );
 }
 
@@ -189,8 +187,6 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
 #ifndef ASF_DEBUG
     VLC_UNUSED( i_payload );
 #endif
-    demux_t *p_demux = p_packetsys->p_demux;
-
     if( ! pkt->left || pkt->i_skip >= pkt->left )
         return -1;
 
@@ -260,7 +256,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     else
     {
         /* >1 && <8 Invalid replicated length ! */
-        msg_Warn( p_demux, "Invalid replicated data length detected." );
+        vlc_warning( p_packetsys->logger, "Invalid replicated data length detected." );
         if( pkt->length - pkt->i_skip < pkt->padding_length )
             return -1;
 
@@ -289,18 +285,20 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     i_payload_data_length = i_temp_payload_length;
 
 #ifdef ASF_DEBUG
-     msg_Dbg( p_demux,
-              "payload(%d) stream_number:%"PRIu8" media_object_number:%d media_object_offset:%"PRIu32" replicated_data_length:%"PRIu32" payload_data_length %"PRIu32,
+     vlc_debug( p_packetsys->logger,
+              "payload(%d) stream_number:%"PRIu8" media_object_number:%d media_object_offset:%"PRIu32
+                " replicated_data_length:%"PRIu32" payload_data_length %"PRIu32,
               i_payload + 1, i_stream_number, i_media_object_number,
               i_media_object_offset, i_replicated_data_length, i_payload_data_length );
-     msg_Dbg( p_demux,
+     vlc_debug( p_packetsys->logger,
               "  pkttime=%"PRId64" st=%"PRId64,
               i_pkt_time, MS_FROM_VLC_TICK(pkt->send_time) );
 #endif
 
      if( ! i_payload_data_length || i_payload_data_length > pkt->left )
      {
-         msg_Dbg( p_demux, "  payload length problem %d %"PRIu32" %"PRIu32, pkt->multiple, i_payload_data_length, pkt->left );
+         vlc_debug( p_packetsys->logger, "  payload length problem %d %"PRIu32
+                    " %"PRIu32, pkt->multiple, i_payload_data_length, pkt->left );
          return -1;
      }
 
@@ -331,7 +329,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
                 goto skip;
         }
 
-        SkipBytes( p_demux->s, pkt->i_skip );
+        SkipBytes( p_packetsys->s, pkt->i_skip );
 
         vlc_tick_t i_payload_pts;
         i_payload_pts = i_pkt_time + i_pkt_time_delta * i_subpayload_count;
@@ -356,10 +354,10 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         pkt->i_skip = 0;
         if( pkt->left > 0 )
         {
-            ssize_t i_return = vlc_stream_Peek( p_demux->s, &pkt->p_peek, pkt->left );
+            ssize_t i_return = vlc_stream_Peek( p_packetsys->s, &pkt->p_peek, pkt->left );
             if ( i_return <= 0 || (size_t) i_return < pkt->left )
             {
-                msg_Warn( p_demux, "unexpected end of file" );
+                vlc_warning( p_packetsys->logger, "unexpected end of file" );
                 return -1;
             }
         }
@@ -383,19 +381,17 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
                     uint32_t i_data_packet_min, uint32_t i_data_packet_max,
                     uint64_t i_data_begin, uint64_t i_data_end )
 {
-    demux_t *p_demux = p_packetsys->p_demux;
-
-    const uint64_t i_read_pos = vlc_stream_Tell( p_demux->s );
+    const uint64_t i_read_pos = vlc_stream_Tell( p_packetsys->s );
     if( i_read_pos < i_data_begin ||
         i_data_packet_min > i_data_end ||
         i_read_pos > i_data_end - i_data_packet_min )
         return 0;
 
     const uint8_t *p_peek;
-    ssize_t i_return = vlc_stream_Peek( p_demux->s, &p_peek,i_data_packet_min );
+    ssize_t i_return = vlc_stream_Peek( p_packetsys->s, &p_peek,i_data_packet_min );
     if( i_return <= 0 || (size_t) i_return < i_data_packet_min )
     {
-        msg_Warn( p_demux, "unexpected end of file" );
+        vlc_warning( p_packetsys->logger, "unexpected end of file" );
         return 0;
     }
     unsigned int i_skip = 0;
@@ -418,7 +414,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
         i_skip += i_error_correction_data_length;
     }
     else
-        msg_Warn( p_demux, "no error correction" );
+        vlc_warning( p_packetsys->logger, "no error correction" );
 
     /* sanity check */
     if( i_skip + 2 >= i_data_packet_min )
@@ -442,7 +438,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
 
     if( pkt.padding_length > pkt.length )
     {
-        msg_Warn( p_demux, "Too large padding: %"PRIu32, pkt.padding_length );
+        vlc_warning( p_packetsys->logger, "Too large padding: %"PRIu32, pkt.padding_length );
         goto loop_error_recovery;
     }
 
@@ -462,15 +458,15 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     if( pkt.length > i_data_end ||
         i_read_pos > i_data_end - pkt.length )
     {
-        msg_Warn( p_demux, "pkt size %"PRIu32" at %"PRIu64" does not fit data chunk",
+        vlc_warning( p_packetsys->logger, "pkt size %"PRIu32" at %"PRIu64" does not fit data chunk",
                   pkt.length, i_read_pos );
         return 0;
     }
 
-    i_return = vlc_stream_Peek( p_demux->s, &p_peek, pkt.length );
+    i_return = vlc_stream_Peek( p_packetsys->s, &p_peek, pkt.length );
     if( i_return <= 0 || pkt.length == 0 || (size_t)i_return < pkt.length )
     {
-        msg_Warn( p_demux, "unexpected end of file" );
+        vlc_warning( p_packetsys->logger, "unexpected end of file" );
         return 0;
     }
 
@@ -486,7 +482,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     }
 
 #ifdef ASF_DEBUG
-    msg_Dbg(p_demux, "%d payloads", i_payload_count);
+    vlc_debug( p_packetsys->logger, "%d payloads", i_payload_count);
 #endif
 
     pkt.i_skip = i_skip;
@@ -496,7 +492,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     for( int i_payload = 0; i_payload < i_payload_count ; i_payload++ )
         if (DemuxPayload(p_packetsys, &pkt, i_payload) < 0)
         {
-            msg_Warn( p_demux, "payload err %d / %d", i_payload + 1, i_payload_count );
+            vlc_warning( p_packetsys->logger, "payload err %d / %d", i_payload + 1, i_payload_count );
             return 0;
         }
 
@@ -504,16 +500,16 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     {
 #ifdef ASF_DEBUG
         if( pkt.left > pkt.padding_length )
-            msg_Warn( p_demux, "Didn't read %"PRIu32" bytes in the packet",
+            vlc_warning( p_packetsys->logger, "Didn't read %"PRIu32" bytes in the packet",
                             pkt.left - pkt.padding_length );
         else if( pkt.left < pkt.padding_length )
-            msg_Warn( p_demux, "Read %"PRIu32" too much bytes in the packet",
+            vlc_warning( p_packetsys->logger, "Read %"PRIu32" too much bytes in the packet",
                             pkt.padding_length - pkt.left );
 #endif
-        i_return = vlc_stream_Read( p_demux->s, NULL, pkt.left );
+        i_return = vlc_stream_Read( p_packetsys->s, NULL, pkt.left );
         if( i_return < 0 || (size_t) i_return < pkt.left )
         {
-            msg_Err( p_demux, "cannot skip data, EOF ?" );
+            vlc_error( p_packetsys->logger, "cannot skip data, EOF ?" );
             return 0;
         }
     }
@@ -521,16 +517,16 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     return 1;
 
 loop_error_recovery:
-    msg_Warn( p_demux, "unsupported packet header" );
+    vlc_warning( p_packetsys->logger, "unsupported packet header" );
     if( i_data_packet_min != i_data_packet_max )
     {
-        msg_Err( p_demux, "unsupported packet header, fatal error" );
+        vlc_error( p_packetsys->logger, "unsupported packet header, fatal error" );
         return -1;
     }
-    i_return = vlc_stream_Read( p_demux->s, NULL, i_data_packet_min );
+    i_return = vlc_stream_Read( p_packetsys->s, NULL, i_data_packet_min );
     if( i_return <= 0 || (size_t) i_return != i_data_packet_min )
     {
-        msg_Warn( p_demux, "cannot skip data, EOF ?" );
+        vlc_warning( p_packetsys->logger, "cannot skip data, EOF ?" );
         return 0;
     }
 

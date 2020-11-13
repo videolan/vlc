@@ -711,20 +711,17 @@ static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_b
     /* ASF packets in mov */
     if( p_track->p_asf )
     {
-        /* Fake a new stream from MP4 block */
-        stream_t *p_stream = p_demux->s;
-        p_demux->s = vlc_stream_MemoryNew( p_demux, p_block->p_buffer, p_block->i_buffer, true );
-        if ( p_demux->s )
+        p_sys->asfpacketsys.s = vlc_stream_MemoryNew( p_demux, p_block->p_buffer, p_block->i_buffer, true );
+        if ( p_sys->asfpacketsys.s )
         {
             p_track->i_dts_backup = p_block->i_dts;
             p_track->i_pts_backup = p_block->i_pts;
             /* And demux it as ASF packet */
             DemuxASFPacket( &p_sys->asfpacketsys, p_block->i_buffer, p_block->i_buffer,
                             0, p_block->i_buffer );
-            vlc_stream_Delete(p_demux->s);
+            vlc_stream_Delete( p_sys->asfpacketsys.s );
         }
         block_Release(p_block);
-        p_demux->s = p_stream;
     }
     else
         es_out_Send( p_demux->out, p_track->p_es, p_block );
@@ -1167,7 +1164,9 @@ static int Open( vlc_object_t * p_this )
     /* */
     LoadChapter( p_demux );
 
-    p_sys->asfpacketsys.p_demux = p_demux;
+    p_sys->asfpacketsys.priv = p_demux;
+    p_sys->asfpacketsys.s = p_demux->s;
+    p_sys->asfpacketsys.logger = p_demux->obj.logger;
     p_sys->asfpacketsys.pi_preroll = &p_sys->i_preroll;
     p_sys->asfpacketsys.pi_preroll_start = &p_sys->i_preroll_start;
     p_sys->asfpacketsys.pf_doskip = NULL;
@@ -5151,7 +5150,8 @@ end:
 inline static mp4_track_t *MP4ASF_GetTrack( asf_packet_sys_t *p_packetsys,
                                             uint8_t i_stream_number )
 {
-    demux_sys_t *p_sys = p_packetsys->p_demux->p_sys;
+    demux_t *p_demux = p_packetsys->priv;
+    demux_sys_t *p_sys = p_demux->p_sys;
     for ( unsigned int i=0; i<p_sys->i_tracks; i++ )
     {
         if ( p_sys->track[i].p_asf &&
@@ -5176,6 +5176,7 @@ static asf_track_info_t * MP4ASF_GetTrackInfo( asf_packet_sys_t *p_packetsys,
 static void MP4ASF_Send( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
                          block_t **pp_frame )
 {
+    demux_t *p_demux = p_packetsys->priv;
     mp4_track_t *p_track = MP4ASF_GetTrack( p_packetsys, i_stream_number );
     if ( !p_track )
     {
@@ -5186,7 +5187,7 @@ static void MP4ASF_Send( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
         block_t *p_gather = block_ChainGather( *pp_frame );
         p_gather->i_dts = p_track->i_dts_backup;
         p_gather->i_pts = p_track->i_pts_backup;
-        es_out_Send( p_packetsys->p_demux->out, p_track->p_es, p_gather );
+        es_out_Send( p_demux->out, p_track->p_es, p_gather );
     }
 
     *pp_frame = NULL;
