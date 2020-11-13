@@ -197,6 +197,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/playlist/playlist_model.cpp \
 	gui/qt/playlist/playlist_model.hpp \
 	gui/qt/playlist/playlist_model_p.hpp \
+	gui/qt/util/asynctask.hpp \
 	gui/qt/util/audio_device_model.cpp  \
 	gui/qt/util/audio_device_model.hpp \
 	gui/qt/util/color_scheme_model.cpp gui/qt/util/color_scheme_model.hpp \
@@ -340,6 +341,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/playlist/playlist_controller.moc.cpp \
 	gui/qt/playlist/playlist_item.moc.cpp \
 	gui/qt/playlist/playlist_model.moc.cpp \
+	gui/qt/util/asynctask.moc.cpp \
 	gui/qt/util/audio_device_model.moc.cpp \
 	gui/qt/util/color_scheme_model.moc.cpp \
 	gui/qt/util/i18n.moc.cpp \
