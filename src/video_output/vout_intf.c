@@ -170,7 +170,6 @@ void vout_CreateVars( vout_thread_t *p_vout )
     /* Add variables to manage scaling video */
     var_Create( p_vout, "autoscale", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
                 | VLC_VAR_ISCOMMAND );
-    var_Change( p_vout, "autoscale", VLC_VAR_SETTEXT, _("Autoscale video") );
 
     var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_ISCOMMAND |
                 VLC_VAR_DOINHERIT );
