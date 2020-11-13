@@ -179,7 +179,7 @@ ATTR_PACKED
 
 #if defined(__SUNPRO_C) || defined(_MSC_VER)
 #   pragma pack()
-#elif defined(__APPLE__) && !HAVE_ATTRIBUTE_PACKED
+#elif defined(__APPLE__) && !defined(HAVE_ATTRIBUTE_PACKED)
 #   pragma pack(pop)
 #endif
 
