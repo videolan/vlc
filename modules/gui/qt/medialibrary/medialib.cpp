@@ -35,6 +35,9 @@ MediaLib::MediaLib(intf_thread_t *_intf, QObject *_parent)
 {
     m_event_cb.reset( vlc_ml_event_register_callback( m_ml, MediaLib::onMediaLibraryEvent,
                                                       this ) );
+
+    /* https://xkcd.com/221/ */
+    m_threadPool.setMaxThreadCount(4);
 }
 
 void MediaLib::addToPlaylist(const QString& mrl, const QStringList* options)

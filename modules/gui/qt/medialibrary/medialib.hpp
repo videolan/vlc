@@ -28,6 +28,7 @@
 #include <QMetaObject>
 #include <QMetaMethod>
 #include <QQmlEngine>
+#include <QThreadPool>
 
 #include <memory>
 
@@ -65,6 +66,8 @@ public:
 
     vlc_medialibrary_t* vlcMl();
 
+    QThreadPool &threadPool() { return m_threadPool; }
+
 signals:
     void reloadStarted();
     void reloadCompleted();
@@ -90,4 +93,5 @@ private:
     vlc_medialibrary_t* m_ml;
     std::unique_ptr<vlc_ml_event_callback_t, std::function<void(vlc_ml_event_callback_t*)>> m_event_cb;
 
+    QThreadPool m_threadPool;
 };
