@@ -123,4 +123,3 @@ void picture_fifo_Delete(picture_fifo_t *fifo)
     picture_fifo_Flush(fifo, VLC_TICK_INVALID, true);
     free(fifo);
 }
-
