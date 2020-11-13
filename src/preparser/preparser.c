@@ -367,6 +367,8 @@ void input_preparser_Push( input_preparser_t *preparser,
                                           : VLC_TICK_FROM_MS(timeout_ms);
     struct task *task =
         TaskNew(preparser, item, i_options, cbs, cbs_userdata, id, timeout);
+    if( !task )
+        return;
 
     PreparserAddTask(preparser, task);
 
