@@ -404,6 +404,7 @@ static void input_item_preparse_ended(input_item_t *item,
             return;
     }
     send_parsed_changed( p_md, new_status );
+    libvlc_media_release( p_md );
 }
 
 /**
@@ -835,11 +836,15 @@ static int media_parse(libvlc_media_t *media, bool b_async,
         if (parse_flag & libvlc_media_do_interact)
             parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
 
+        libvlc_media_retain(media);
         ret = libvlc_MetadataRequest(libvlc, item, parse_scope,
                                      &input_preparser_callbacks, media,
                                      timeout, media);
         if (ret != VLC_SUCCESS)
+        {
+            libvlc_media_release(media);
             return ret;
+        }
     }
     else
         return VLC_EGENERIC;
