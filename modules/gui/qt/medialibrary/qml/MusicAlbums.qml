@@ -97,6 +97,27 @@ Widgets.NavigableFocusScope {
         model: albumModelId
     }
 
+    Widgets.DragItem {
+        id: albumDragItem
+
+        function updateComponents(maxCovers) {
+          var items = selectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
+            return albumModelId.getDataAt(x.row)
+          })
+          var title = items.map(function (item){ return item.title}).join(", ")
+          var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtAlbum}})
+          return {
+            covers: covers,
+            title: title,
+            count: selectionModel.selectedIndexes.length
+          }
+        }
+
+        function insertIntoPlaylist(index) {
+            medialib.insertIntoPlaylist(index, albumModelId.getIdsForIndexes(selectionModel.selectedIndexes))
+        }
+    }
+
     AlbumContextMenu {
         id: contextMenu
         model: albumModelId
@@ -122,6 +143,7 @@ Widgets.NavigableFocusScope {
                 id: audioGridItem
 
                 opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
+                dragItem: albumDragItem
 
                 onItemClicked : gridView_id.leftClickOnItem(modifier, index)
 
@@ -187,6 +209,7 @@ Widgets.NavigableFocusScope {
             navigationParent: root
             section.property: "title_first_symbol"
             header: root.header
+            dragItem: albumDragItem
 
             sortModel:  [
                 { isPrimary: true, criteria: "title", width: VLCStyle.colWidth(2), text: i18n.qtr("Title"), headerDelegate: tableColumns.titleHeaderDelegate, colDelegate: tableColumns.titleDelegate },
