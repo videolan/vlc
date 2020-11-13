@@ -118,6 +118,7 @@ Widgets.NavigableFocusScope {
                             pictureWidth: VLCStyle.gridCover_music_width
                             pictureHeight: VLCStyle.gridCover_music_height
                             playCoverBorder.width: VLCStyle.gridCover_music_border
+                            dragItem: albumDragItem
 
                             onPlayClicked: play()
                             onItemDoubleClicked: play()
@@ -212,6 +213,27 @@ Widgets.NavigableFocusScope {
         model: albumModel
     }
 
+    Widgets.DragItem {
+        id: albumDragItem
+
+        function updateComponents(maxCovers) {
+          var items = albumSelectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
+            return albumModel.getDataAt(x.row)
+          })
+          var title = items.map(function (item){ return item.title}).join(", ")
+          var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtAlbum}})
+          return {
+            covers: covers,
+            title: title,
+            count: albumSelectionModel.selectedIndexes.length
+          }
+        }
+
+        function insertIntoPlaylist(index) {
+            medialib.insertIntoPlaylist(index, albumModel.getIdsForIndexes(albumSelectionModel.selectedIndexes))
+        }
+    }
+
     MLAlbumTrackModel {
         id: trackModel
 
@@ -259,6 +281,7 @@ Widgets.NavigableFocusScope {
                 id: audioGridItem
 
                 opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
+                dragItem: albumDragItem
 
                 onItemClicked : gridView_id.leftClickOnItem(modifier, index)
 
@@ -341,6 +364,24 @@ Widgets.NavigableFocusScope {
 
             onContextMenuButtonClicked: trackContextMenu.popup(trackSelectionModel.selectedIndexes, menuParent.mapToGlobal(0,0))
             onRightClick: trackContextMenu.popup(trackSelectionModel.selectedIndexes, globalMousePos)
+            dragItem: Widgets.DragItem {
+                function updateComponents(maxCovers) {
+                  var items = trackSelectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
+                    return trackModel.getDataAt(x.row)
+                  })
+                  var title = items.map(function (item){ return item.title}).join(", ")
+                  var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtCover}})
+                  return {
+                    covers: covers,
+                    title: title,
+                    count: trackSelectionModel.selectedIndexes.length
+                  }
+                }
+
+                function insertIntoPlaylist(index) {
+                    medialib.insertIntoPlaylist(index, trackModel.getIdsForIndexes(trackSelectionModel.selectedIndexes))
+                }
+            }
 
             Widgets.TableColumns {
                 id: tableColumns
