@@ -249,6 +249,12 @@ Widgets.NavigableFocusScope {
             delegateModel: albumSelectionModel
             model: albumModel
 
+            Connections {
+                target: root
+                // selectionModel updates but doesn't trigger any signal, this forces selection update in view
+                onParentIdChanged: currentIndex = -1
+            }
+
             delegate: AudioGridItem {
                 id: audioGridItem
 
