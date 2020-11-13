@@ -195,3 +195,51 @@ libvlc_time_t libvlc_picture_get_time( const libvlc_picture_t* pic )
 {
     return pic->time;
 }
+
+libvlc_picture_list_t* libvlc_picture_list_from_attachments( input_attachment_t** attachments,
+                                                             size_t nb_attachments )
+{
+    size_t size = 0;
+    libvlc_picture_list_t* list;
+    if ( mul_overflow( nb_attachments, sizeof( libvlc_picture_t* ), &size ) )
+        return NULL;
+    if ( add_overflow( size, sizeof( *list ), &size ) )
+        return NULL;
+
+    list = malloc( size );
+    if ( !list )
+        return NULL;
+    list->count = 0;
+    for ( size_t i = 0; i < nb_attachments; ++i )
+    {
+        input_attachment_t* a = attachments[i];
+        libvlc_picture_t *pic = libvlc_picture_from_attachment( a );
+        if( !pic )
+            continue;
+        list->pictures[list->count] = pic;
+        list->count++;
+    }
+    return list;
+}
+
+size_t libvlc_picture_list_count( const libvlc_picture_list_t* list )
+{
+    assert( list );
+    return list->count;
+}
+
+libvlc_picture_t* libvlc_picture_list_at( const libvlc_picture_list_t* list,
+                                          size_t index )
+{
+    assert( list );
+    return list->pictures[index];
+}
+
+void libvlc_picture_list_destroy( libvlc_picture_list_t* list )
+{
+    if ( !list )
+        return;
+    for ( size_t i = 0; i < list->count; ++i )
+        libvlc_picture_release( list->pictures[i] );
+    free( list );
+}

@@ -28,6 +28,7 @@ extern "C" {
 # endif
 
 typedef struct libvlc_picture_t libvlc_picture_t;
+typedef struct libvlc_picture_list_t libvlc_picture_list_t;
 
 typedef enum libvlc_picture_type_t
 {
@@ -119,6 +120,27 @@ libvlc_picture_get_height( const libvlc_picture_t* pic );
  */
 LIBVLC_API libvlc_time_t
 libvlc_picture_get_time( const libvlc_picture_t* pic );
+
+/**
+ * Returns the number of pictures in the list
+ */
+LIBVLC_API size_t libvlc_picture_list_count( const libvlc_picture_list_t* list );
+
+/**
+ * Returns the picture at the provided index.
+ *
+ * If the index is out of bound, the result is undefined.
+ */
+LIBVLC_API libvlc_picture_t* libvlc_picture_list_at( const libvlc_picture_list_t* list,
+                                                     size_t index );
+
+/**
+ * Destroys a picture list and releases the pictures it contains
+ * \param list The list to destroy
+ *
+ * Calling this function with a NULL list is safe and will return immediatly
+ */
+LIBVLC_API void libvlc_picture_list_destroy( libvlc_picture_list_t* list );
 
 # ifdef __cplusplus
 }
