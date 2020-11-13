@@ -107,6 +107,27 @@ Widgets.PageLoader {
                 model: artistModel
             }
 
+            Widgets.DragItem {
+                id: artistsDragItem
+
+                function updateComponents(maxCovers) {
+                  var items = selectionModel.selectedIndexes.slice(0, maxCovers).map(function (x){
+                    return artistModel.getDataAt(x.row)
+                  })
+                  var title = items.map(function (item){ return item.name}).join(", ")
+                  var covers = items.map(function (item) { return {artwork: item.cover || VLCStyle.noArtArtistSmall}})
+                  return {
+                    covers: covers,
+                    title: title,
+                    count: selectionModel.selectedIndexes.length
+                  }
+                }
+
+                function insertIntoPlaylist(index) {
+                    medialib.insertIntoPlaylist(index, artistModel.getIdsForIndexes(selectionModel.selectedIndexes))
+                }
+            }
+
             ArtistContextMenu {
                 id: contextMenu
                 model: artistModel
@@ -152,6 +173,7 @@ Widgets.PageLoader {
                         playIconSize: VLCStyle.play_cover_small
                         textHorizontalAlignment: Text.AlignHCenter
                         width: VLCStyle.colWidth(1)
+                        dragItem: artistsDragItem
 
                         onItemClicked: artistGrid.leftClickOnItem(modifier, index)
 
@@ -181,6 +203,7 @@ Widgets.PageLoader {
                     focus: true
                     headerColor: VLCStyle.colors.bg
                     navigationParent: root
+                    dragItem: artistsDragItem
 
                     onActionForSelection: {
                         if (selection.length > 1) {
