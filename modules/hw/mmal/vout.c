@@ -515,11 +515,11 @@ place_to_mmal_rect(const vout_display_place_t place)
 }
 
 static void
-place_dest(vout_display_sys_t * const sys,
-           const vout_display_cfg_t * const cfg, const video_format_t * fmt)
+place_dest(vout_display_t *vd, const video_format_t * fmt)
 {
+    vout_display_sys_t * const sys = vd->sys;
     // Ignore what VLC thinks might be going on with display size
-    vout_display_cfg_t tcfg = *cfg;
+    vout_display_cfg_t tcfg = *vd->cfg;
     vout_display_place_t place;
     tcfg.display.width = sys->display_width;
     tcfg.display.height = sys->display_height;
@@ -531,14 +531,13 @@ place_dest(vout_display_sys_t * const sys,
 
 
 
-static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
-                const video_format_t *fmt)
+static int configure_display(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t * const sys = vd->sys;
     MMAL_DISPLAYREGION_T display_region;
     MMAL_STATUS_T status;
 
-    if (!cfg && !fmt)
+    if (!fmt)
     {
         msg_Err(vd, "Missing cfg & fmt");
         return -EINVAL;
@@ -556,14 +555,11 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
                             sys->input->name, status, mmal_status_to_string(status));
             return -EINVAL;
         }
+        place_dest(vd, fmt);
     } else {
         fmt = vd->source;
+        place_dest(vd, vd->source);
     }
-
-    if (!cfg)
-        cfg = vd->cfg;
-
-    place_dest(sys, cfg, fmt);
 
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);
@@ -709,17 +705,13 @@ static int vd_control(vout_display_t *vd, int query)
 
     switch (query) {
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
-            if (configure_display(vd, vd->cfg, NULL) >= 0)
+            if (configure_display(vd, vd->source) >= 0)
                 ret = VLC_SUCCESS;
             break;
         }
-
-        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-            if (configure_display(vd, NULL, vd->source) >= 0)
-                ret = VLC_SUCCESS;
-            break;
 
         case VOUT_DISPLAY_CHANGE_ZOOM:
             msg_Warn(vd, "Unsupported control query %d", query);
@@ -815,7 +807,7 @@ static void vd_prepare(vout_display_t *vd, picture_t *p_pic,
         sys->b_progressive = p_pic->b_progressive;
         sys->i_frame_rate = p_pic->format.i_frame_rate;
         sys->i_frame_rate_base = p_pic->format.i_frame_rate_base;
-        configure_display(vd, NULL, &p_pic->format);
+        configure_display(vd, &p_pic->format);
     }
 
     // Subpics can either turn up attached to the main pic or in the
@@ -1209,7 +1201,7 @@ static int OpenMmalVout(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->display_height = vd->cfg->display.height;
     }
 
-    place_dest(sys, vd->cfg, vd->source);  // Sets sys->dest_rect
+    place_dest(vd, vd->source);  // Sets sys->dest_rect
 
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);
