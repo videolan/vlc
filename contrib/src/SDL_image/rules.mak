@@ -3,7 +3,10 @@
 SDL_IMAGE_VERSION := 1.2.12
 SDL_IMAGE_URL := http://www.libsdl.org/projects/SDL_image/release/SDL_image-$(SDL_IMAGE_VERSION).tar.gz
 
+# sdl_image module is disabled on macOS, and it's dependency sdl failed to build
+ifndef HAVE_DARWIN_OS
 PKGS += SDL_image
+endif
 ifeq ($(call need_pkg,"SDL_image"),)
 PKGS_FOUND += SDL_image
 endif
