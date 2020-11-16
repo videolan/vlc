@@ -267,6 +267,9 @@ static const char *const compositor_vlc[] = {
 #endif
     "win7",
 #endif
+#ifdef QT5_HAS_X11_COMPOSITOR
+    "x11",
+#endif
     "dummy"
 };
 static const char *const compositor_user[] = {
@@ -276,6 +279,9 @@ static const char *const compositor_user[] = {
     "Direct Composition",
 #endif
     "Windows 7",
+#endif
+#ifdef QT5_HAS_X11_COMPOSITOR
+    N_("X11"),
 #endif
     N_("Dummy"),
 };

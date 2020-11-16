@@ -32,6 +32,10 @@
 #  include "compositor_win7.hpp"
 #endif
 
+#ifdef QT5_HAS_XCB
+#  include "compositor_x11.hpp"
+#endif
+
 using namespace vlc;
 
 template<typename T>
@@ -54,6 +58,9 @@ struct {
     {"dcomp", &instanciateCompositor<CompositorDirectComposition>, &preInit<CompositorDirectComposition> },
 #endif
     {"win7", &instanciateCompositor<CompositorWin7>, &preInit<CompositorWin7> },
+#endif
+#ifdef QT5_HAS_X11_COMPOSITOR
+    {"x11", &instanciateCompositor<CompositorX11>, &preInit<CompositorX11> },
 #endif
     {"dummy", &instanciateCompositor<CompositorDummy>, &preInit<CompositorDummy> }
 };

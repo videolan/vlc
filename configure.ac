@@ -3266,6 +3266,7 @@ AC_ARG_ENABLE([xcb],
 have_xcb="no"
 have_xkbcommon_x11="no"
 have_xcb_keysyms="no"
+have_xcb_damage="no"
 AS_IF([test "${enable_xcb}" != "no"], [
   xcb_err=""
 
@@ -3305,12 +3306,19 @@ AS_IF([test "${enable_xcb}" != "no"], [
     AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}. Global hotkeys are disabled.])
   ])
 
+  dnl xcb-damage
+  PKG_CHECK_MODULES([XCB_DAMAGE], [xcb-damage], [
+      have_xcb_damage="yes"
+  ], [
+    AC_MSG_WARN([${XCB_DAMAGE_PKG_ERRORS}. Qt X11 composition disabled.])
+  ])
+
   have_xcb="yes"
 ])
 AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
 AM_CONDITIONAL([HAVE_XKBCOMMON_X11], [test "${have_xkbcommon_x11}" = "yes"])
 AM_CONDITIONAL([HAVE_XCB_KEYSYMS], [test "${have_xcb_keysyms}" = "yes"])
-
+AM_CONDITIONAL([HAVE_XCB_DAMAGE], [test "${have_xcb_damage}" = "yes"])
 
 dnl
 dnl VDPAU needs X11

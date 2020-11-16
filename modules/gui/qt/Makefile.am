@@ -36,9 +36,17 @@ if HAVE_QT5_X11
 libqt_plugin_la_CXXFLAGS += $(QT5_X11_CFLAGS) -DQT5_HAS_X11
 libqt_plugin_la_LIBADD += $(QT5_X11_LIBS) $(X_LIBS) $(X_PRE_LIB) -lX11
 endif
+
 if HAVE_XCB
-libqt_plugin_la_CXXFLAGS += -DQT5_HAS_XCB
+libqt_plugin_la_CXXFLAGS += -DQT5_HAS_XCB $(XCB_CFLAGS)
+libqt_plugin_la_LIBADD += $(XCB_LIBS)
+if HAVE_XCB_DAMAGE
+libqt_plugin_la_CXXFLAGS += -DQT5_HAS_X11_COMPOSITOR \
+        $(XCB_RENDER_CFLAGS) $(XCB_COMPOSITE_CFLAGS) $(XLCB_DAMAGE_CFLAGS)
+libqt_plugin_la_LIBADD += $(XCB_RENDER_LIBS) $(XCB_COMPOSITE_LIBS) $(XCB_DAMAGE_LIBS)
 endif
+endif
+
 if HAVE_WAYLAND
 libqt_plugin_la_CPPFLAGS += -DQT5_HAS_WAYLAND \
 	-DQPNI_HEADER=\<$(QT_VERSION)/QtGui/qpa/qplatformnativeinterface.h\>
@@ -283,6 +291,23 @@ libqt_plugin_la_SOURCES += \
 	gui/qt/maininterface/compositor_dcomp_uisurface.cpp \
 	gui/qt/maininterface/compositor_dcomp_uisurface.hpp
 endif
+
+endif
+
+if HAVE_XCB
+if HAVE_XCB_DAMAGE
+libqt_plugin_la_SOURCES += \
+	gui/qt/maininterface/compositor_x11.cpp \
+	gui/qt/maininterface/compositor_x11.hpp \
+	gui/qt/maininterface/compositor_x11_renderclient.cpp \
+	gui/qt/maininterface/compositor_x11_renderclient.hpp \
+	gui/qt/maininterface/compositor_x11_renderwindow.cpp \
+	gui/qt/maininterface/compositor_x11_renderwindow.hpp \
+	gui/qt/maininterface/compositor_x11_uisurface.cpp \
+	gui/qt/maininterface/compositor_x11_uisurface.hpp \
+	gui/qt/maininterface/compositor_x11_utils.cpp \
+	gui/qt/maininterface/compositor_x11_utils.hpp
+endif
 endif
 
 # Meta-object compilation
@@ -421,6 +446,17 @@ nodist_libqt_plugin_la_SOURCES += \
 	gui/qt/maininterface/compositor_dcomp_uisurface.moc.cpp
 endif
 
+endif
+
+if HAVE_XCB
+if HAVE_XCB_DAMAGE
+nodist_libqt_plugin_la_SOURCES += \
+	gui/qt/maininterface/compositor_x11.moc.cpp \
+	gui/qt/maininterface/compositor_x11_renderclient.moc.cpp \
+	gui/qt/maininterface/compositor_x11_renderwindow.moc.cpp \
+	gui/qt/maininterface/compositor_x11_uisurface.moc.cpp \
+	gui/qt/maininterface/compositor_x11_utils.moc.cpp
+endif
 endif
 
 nodist_libqt_plugin_la_SOURCES += \

@@ -54,7 +54,8 @@ public:
     {
         DummyCompositor,
         Win7Compositor,
-        DirectCompositionCompositor
+        DirectCompositionCompositor,
+        X11Compositor
     };
 
     typedef void (*VoutDestroyCb)(vout_window_t *p_wnd);
