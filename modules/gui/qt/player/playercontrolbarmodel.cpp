@@ -21,13 +21,13 @@
 #include "playercontrolbarmodel.hpp"
 
 enum default_align {
-    LEFT = 0,
-    CENTER,
-    RIGHT,
-    SIZE
+    ALIGN_LEFT = 0,
+    ALIGN_CENTER,
+    ALIGN_RIGHT,
+    ALIGN_SIZE
 };
 
-static const QVector<PlayerControlBarModel::IconToolButton> MAIN_TB_DEFAULT[default_align::SIZE] =
+static const QVector<PlayerControlBarModel::IconToolButton> MAIN_TB_DEFAULT[default_align::ALIGN_SIZE] =
 {
     {
         // left
@@ -49,7 +49,7 @@ static const QVector<PlayerControlBarModel::IconToolButton> MAIN_TB_DEFAULT[defa
     }
 };
 
-static const QVector<PlayerControlBarModel::IconToolButton> MINI_TB_DEFAULT[default_align::SIZE] =
+static const QVector<PlayerControlBarModel::IconToolButton> MINI_TB_DEFAULT[default_align::ALIGN_SIZE] =
 {
     {
         // left
@@ -119,20 +119,20 @@ void PlayerControlBarModel::reloadModel()
         if (configName.startsWith("MainPlayerToolbar"))
         {
             if (alignment == "left")
-                parseDefault(MAIN_TB_DEFAULT[default_align::LEFT]);
+                parseDefault(MAIN_TB_DEFAULT[default_align::ALIGN_LEFT]);
             else if (alignment == "center")
-                parseDefault(MAIN_TB_DEFAULT[default_align::CENTER]);
+                parseDefault(MAIN_TB_DEFAULT[default_align::ALIGN_CENTER]);
             else if (alignment == "right")
-                parseDefault(MAIN_TB_DEFAULT[default_align::RIGHT]);
+                parseDefault(MAIN_TB_DEFAULT[default_align::ALIGN_RIGHT]);
         }
         else
         {
             if (alignment == "left")
-                parseDefault(MINI_TB_DEFAULT[default_align::LEFT]);
+                parseDefault(MINI_TB_DEFAULT[default_align::ALIGN_LEFT]);
             else if (alignment == "center")
-                parseDefault(MINI_TB_DEFAULT[default_align::CENTER]);
+                parseDefault(MINI_TB_DEFAULT[default_align::ALIGN_CENTER]);
             else if (alignment == "right")
-                parseDefault(MINI_TB_DEFAULT[default_align::RIGHT]);
+                parseDefault(MINI_TB_DEFAULT[default_align::ALIGN_RIGHT]);
         }
     }
     endResetModel();
@@ -282,4 +282,3 @@ void PlayerControlBarModel::remove(int index)
     mButtons.remove(index);
     endRemoveRows();
 }
-
