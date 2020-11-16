@@ -29,6 +29,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QQuickWidget>
+#include <QLibrary>
 
 #include <QOpenGLFunctions>
 #include <QOpenGLFramebufferObject>
@@ -142,6 +143,90 @@ CompositorDirectComposition::~CompositorDirectComposition()
 
 bool CompositorDirectComposition::preInit(qt_intf_t * p_intf)
 {
+    //import DirectComposition API (WIN8+)
+    QLibrary dcompDll("DCOMP.dll");
+    if (!dcompDll.load())
+        return false;
+    DCompositionCreateDeviceFun myDCompositionCreateDevice = (DCompositionCreateDeviceFun)dcompDll.resolve("DCompositionCreateDevice");
+    if (!myDCompositionCreateDevice)
+    {
+        msg_Dbg(p_intf, "Direct Composition is not present, can't initialize direct composition");
+        return false;
+    }
+
+    //check whether D3DCompiler is available. whitout it Angle won't work
+    QLibrary d3dCompilerDll;
+    for (int i = 47; i > 41; --i)
+    {
+        d3dCompilerDll.setFileName(QString("D3DCOMPILER_%1.dll").arg(i));
+        if (d3dCompilerDll.load())
+            break;
+    }
+    if (!d3dCompilerDll.isLoaded())
+    {
+        msg_Dbg(p_intf, "can't find d3dcompiler_xx.dll, can't initialize direct composition");
+        return false;
+    }
+
+    HRESULT hr;
+    UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT
+        //| D3D11_CREATE_DEVICE_DEBUG
+            ;
+
+    D3D_FEATURE_LEVEL requestedFeatureLevels[] = {
+        D3D_FEATURE_LEVEL_11_1,
+        D3D_FEATURE_LEVEL_11_0,
+    };
+
+    ComPtr<ID3D11Device> d3dDevice;
+    hr = D3D11CreateDevice(
+        nullptr,    // Adapter
+        D3D_DRIVER_TYPE_HARDWARE,
+        nullptr,    // Module
+        creationFlags,
+        requestedFeatureLevels,
+        ARRAY_SIZE(requestedFeatureLevels),
+        D3D11_SDK_VERSION,
+        d3dDevice.GetAddressOf(),
+        nullptr,    // Actual feature level
+        nullptr);
+
+    if (FAILED(hr))
+    {
+        msg_Dbg(p_intf, "can't create D3D11 device, can't initialize direct composition");
+        return false;
+    }
+
+    //check that we can create a shared texture
+    D3D11_FEATURE_DATA_D3D11_OPTIONS d3d11Options;
+    HRESULT checkFeatureHR = d3dDevice->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &d3d11Options, sizeof(d3d11Options));
+
+    D3D11_TEXTURE2D_DESC texDesc = { };
+    texDesc.MipLevels = 1;
+    texDesc.SampleDesc.Count = 1;
+    texDesc.MiscFlags = 0;
+    texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    texDesc.CPUAccessFlags = 0;
+    texDesc.ArraySize = 1;
+    texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    texDesc.Height = 16;
+    texDesc.Width  = 16;
+    if (SUCCEEDED(checkFeatureHR) && d3d11Options.ExtendedResourceSharing) //D3D11.1 feature
+        texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+    else
+        texDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED;
+
+    ComPtr<ID3D11Texture2D> d3dTmpTexture;
+    hr = d3dDevice->CreateTexture2D( &texDesc, NULL, &d3dTmpTexture );
+    if (FAILED(hr))
+    {
+        msg_Dbg(p_intf, "can't create shared texture, can't initialize direct composition");
+        return false;
+    }
+
+    //sanity check succeeded, we can now setup global Qt settings
+
     //force usage of ANGLE backend
     QApplication::setAttribute( Qt::AA_UseOpenGLES );
 
