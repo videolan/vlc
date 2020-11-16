@@ -28,26 +28,62 @@
 
 namespace vlc {
 
-Compositor* Compositor::createCompositor(qt_intf_t *p_intf)
-{
-    bool ret;
-    VLC_UNUSED(ret);
+template<typename T>
+static Compositor* instanciateCompositor(qt_intf_t *p_intf) {
+    return new T(p_intf);
+}
+
+template<typename T>
+static bool preInit(qt_intf_t *p_intf) {
+    return T::preInit(p_intf);
+}
+
+struct {
+    const char* name;
+    Compositor* (*instanciate)(qt_intf_t *p_intf);
+    bool (*preInit)(qt_intf_t *p_intf);
+} static compositorList[] = {
 #ifdef _WIN32
 #ifdef HAVE_DCOMP_H
-    CompositorDirectComposition* dcomp_compositor = new CompositorDirectComposition(p_intf);
-    ret = dcomp_compositor->init();
-    if (ret)
-        return dcomp_compositor;
-    delete dcomp_compositor;
-    msg_Dbg(p_intf, "failed to create DirectComposition backend, use fallback");
+    {"dcomp", &instanciateCompositor<CompositorDirectComposition>, &preInit<CompositorDirectComposition> },
 #endif
-    CompositorWin7* win7_compositor = new CompositorWin7(p_intf);
-    if (win7_compositor->init())
-        return win7_compositor;
-    delete win7_compositor;
-    msg_Dbg(p_intf, "failed to create Win7 compositor backend, use fallback");
+    {"win7", &instanciateCompositor<CompositorWin7>, &preInit<CompositorWin7> },
 #endif
-    return new CompositorDummy(p_intf);
+    {"dummy", &instanciateCompositor<CompositorDummy>, &preInit<CompositorDummy> }
+};
+
+CompositorFactory::CompositorFactory(qt_intf_t *p_intf, const char* compositor)
+    : m_intf(p_intf)
+    , m_compositorName(compositor)
+{
+}
+
+bool CompositorFactory::preInit()
+{
+    for (; m_compositorIndex < ARRAY_SIZE(compositorList); m_compositorIndex++)
+    {
+        if (m_compositorName == "auto" || m_compositorName == compositorList[m_compositorIndex].name)
+        {
+            if (compositorList[m_compositorIndex].preInit(m_intf))
+                return true;
+        }
+    }
+    return false;
+}
+
+Compositor* CompositorFactory::createCompositor()
+{
+    for (; m_compositorIndex < ARRAY_SIZE(compositorList); m_compositorIndex++)
+    {
+        if (m_compositorName == "auto" || m_compositorName == compositorList[m_compositorIndex].name)
+        {
+            Compositor* compositor = compositorList[m_compositorIndex].instanciate(m_intf);
+            if (compositor->init())
+                return compositor;
+        }
+    }
+    msg_Err(m_intf, "no suitable compositor found");
+    return nullptr;
 }
 
 void Compositor::onWindowDestruction(vout_window_t *p_wnd)

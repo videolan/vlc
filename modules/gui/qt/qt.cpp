@@ -647,7 +647,9 @@ static void *Thread( void *obj )
 
     Q_INIT_RESOURCE( vlc );
 
-    p_intf->p_compositor = vlc::Compositor::createCompositor(p_intf);
+    vlc::CompositorFactory compositorFactory(p_intf);
+
+    compositorFactory.preInit();
 
     QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
     QApplication::setAttribute( Qt::AA_UseHighDpiPixmaps );
@@ -730,7 +732,12 @@ static void *Thread( void *obj )
 
     if( !p_intf->b_isDialogProvider )
     {
-        p_mi = p_intf->p_compositor->makeMainInterface();
+        do {
+            p_intf->p_compositor = compositorFactory.createCompositor();
+            if (! p_intf->p_compositor)
+                break;
+            p_mi = p_intf->p_compositor->makeMainInterface();
+        } while(p_mi == nullptr);
         p_intf->p_mi = p_mi;
 
         if (!p_mi)

@@ -96,7 +96,7 @@ CompositorWin7::~CompositorWin7()
         delete m_stable;
 }
 
-bool CompositorWin7::init()
+bool CompositorWin7::preInit(qt_intf_t *p_intf)
 {
     //check whether D3DCompiler is available. whitout it Angle won't work
     QLibrary d3dCompilerDll;
@@ -134,10 +134,15 @@ bool CompositorWin7::init()
     //otherwise Qt will load angle and fail.
     if (!d3dCompilerDll.isLoaded() || FAILED(hr))
     {
-        msg_Info(m_intf, "no D3D support, use software backend");
+        msg_Info(p_intf, "no D3D support, use software backend");
         QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
     }
 
+    return true;
+}
+
+bool CompositorWin7::init()
+{
     return true;
 }
 

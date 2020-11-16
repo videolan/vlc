@@ -29,6 +29,16 @@ CompositorDummy::CompositorDummy(qt_intf_t *p_intf, QObject* parent)
 {
 }
 
+bool CompositorDummy::preInit(qt_intf_t *)
+{
+    return true;
+}
+
+bool CompositorDummy::init()
+{
+    return true;
+}
+
 MainInterface* CompositorDummy::makeMainInterface()
 {
     m_rootWindow = new MainInterface(m_intf);

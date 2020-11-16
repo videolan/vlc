@@ -45,7 +45,8 @@ public:
     CompositorDirectComposition(qt_intf_t *p_intf, QObject* parent = nullptr);
     ~CompositorDirectComposition();
 
-    bool init();
+    static bool preInit(qt_intf_t *);
+    bool init() override;
 
     MainInterface *makeMainInterface() override;
     void destroyMainInterface() override;
@@ -70,6 +71,7 @@ private:
     qt_intf_t *m_intf = nullptr;
 
     MainInterface* m_rootWindow = nullptr;
+
     std::unique_ptr<CompositorDCompositionUISurface> m_uiSurface;
     vout_window_t *m_window = nullptr;
     std::unique_ptr<MainUI> m_ui;

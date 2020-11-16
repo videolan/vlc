@@ -140,6 +140,14 @@ CompositorDirectComposition::~CompositorDirectComposition()
         FreeLibrary(m_dcomp_dll);
 }
 
+bool CompositorDirectComposition::preInit(qt_intf_t * p_intf)
+{
+    //force usage of ANGLE backend
+    QApplication::setAttribute( Qt::AA_UseOpenGLES );
+
+    return true;
+}
+
 bool CompositorDirectComposition::init()
 {
     //import DirectComposition API (WIN8+)
@@ -186,8 +194,6 @@ bool CompositorDirectComposition::init()
     hr = myDCompositionCreateDevice(dxgiDevice.Get(), __uuidof(IDCompositionDevice), &m_dcompDevice);
     if (FAILED(hr))
         return false;
-
-    QApplication::setAttribute( Qt::AA_UseOpenGLES ); //force usage of ANGLE backend
 
     return true;
 }
