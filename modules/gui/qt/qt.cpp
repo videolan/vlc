@@ -243,6 +243,9 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define FULLSCREEN_CONTROL_PIXELS N_( "Fullscreen controller mouse sensitivity" )
 
+#define QT_COMPOSITOR_TEXT N_("Select Qt video intergration backend")
+#define QT_COMPOSITOR_LONGTEXT N_("Select Qt video intergration backend. Use with care, the interface may not start if an incompatible compositor is selected")
+
 static const int i_notification_list[] =
     { NOTIFICATION_NEVER, NOTIFICATION_MINIMIZED, NOTIFICATION_ALWAYS };
 
@@ -255,6 +258,27 @@ static const int i_raise_list[] =
 
 static const char *const psz_raise_list_text[] =
     { N_( "Never" ), N_( "Video" ), N_( "Audio" ), _( "Audio/Video" ) };
+
+static const char *const compositor_vlc[] = {
+    "auto",
+#ifdef _WIN32
+#ifdef HAVE_DCOMP_H
+    "dcomp"
+#endif
+    "win7",
+#endif
+    "dummy"
+};
+static const char *const compositor_user[] = {
+    N_("Automatic"),
+#ifdef _WIN32
+#ifdef HAVE_DCOMP_H
+    "Direct Composition",
+#endif
+    "Windows 7",
+#endif
+    N_("Dummy"),
+};
 
 /**********************************************************************/
 vlc_module_begin ()
@@ -299,6 +323,9 @@ vlc_module_begin ()
               TITLE_LONGTEXT )
     add_bool( "qt-fs-controller", true, QT_FULLSCREEN_TEXT,
               nullptr )
+
+    add_string("qt-compositor", "auto", QT_COMPOSITOR_TEXT, QT_COMPOSITOR_LONGTEXT)
+            change_string_list(compositor_vlc, compositor_user)
 
     add_bool( "qt-recentplay", true, RECENTPLAY_TEXT,
               nullptr )
@@ -647,7 +674,7 @@ static void *Thread( void *obj )
 
     Q_INIT_RESOURCE( vlc );
 
-    vlc::CompositorFactory compositorFactory(p_intf);
+    vlc::CompositorFactory compositorFactory(p_intf, var_InheritString(p_intf, "qt-compositor"));
 
     compositorFactory.preInit();
 
