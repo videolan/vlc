@@ -458,8 +458,8 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     if( pkt.length > i_data_end ||
         i_read_pos > i_data_end - pkt.length )
     {
-        vlc_warning( p_packetsys->logger, "pkt size %"PRIu32" at %"PRIu64" does not fit data chunk",
-                  pkt.length, i_read_pos );
+        vlc_warning( p_packetsys->logger, "pkt size %"PRIu32" at %"PRIu64" does not fit data chunk size %"PRIu32,
+                  pkt.length, i_read_pos, i_data_packet_max );
         return 0;
     }
 

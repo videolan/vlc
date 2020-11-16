@@ -1526,7 +1526,7 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
 
     if( ASF_ReadObjectCommon( s, p_obj ) )
     {
-        msg_Warn( s, "cannot read one asf object" );
+        msg_Warn( s, "cannot read one asf object at %"PRIu64, vlc_stream_Tell(s) );
         return VLC_EGENERIC;
     }
     p_obj->common.p_father = p_father;
@@ -1537,7 +1537,7 @@ static int ASF_ReadObject( stream_t *s, asf_object_t *p_obj,
 
     if( p_obj->common.i_object_size < ASF_OBJECT_COMMON_SIZE )
     {
-        msg_Warn( s, "found a corrupted asf object (size<24)" );
+        msg_Warn( s, "found a corrupted asf object (size<24) at %"PRIu64, vlc_stream_Tell(s) );
         return VLC_EGENERIC;
     }
 
