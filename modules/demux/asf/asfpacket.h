@@ -61,4 +61,6 @@ struct asf_packet_sys_s
 };
 
 int DemuxASFPacket( asf_packet_sys_t *, uint32_t, uint32_t, uint64_t, uint64_t );
+void ASFPacketTrackInit( asf_track_info_t * );
+void ASFPacketTrackReset( asf_track_info_t * );
 #endif

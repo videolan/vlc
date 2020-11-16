@@ -532,3 +532,18 @@ loop_error_recovery:
 
     return 1;
 }
+
+void ASFPacketTrackInit( asf_track_info_t *p_ti )
+{
+    p_ti->i_cat = UNKNOWN_ES;
+    p_ti->p_esp = NULL;
+    p_ti->p_sp = NULL;
+    p_ti->p_frame = NULL;
+}
+
+void ASFPacketTrackReset( asf_track_info_t *p_ti )
+{
+    if( p_ti->p_frame )
+        block_ChainRelease( p_ti->p_frame );
+    p_ti->p_frame = NULL;
+}

@@ -900,12 +900,10 @@ static int DemuxInit( demux_t *p_demux )
             goto error;
         memset( tk, 0, sizeof( asf_track_t ) );
 
+        ASFPacketTrackInit( &tk->info );
         tk->i_time = VLC_TICK_INVALID;
         tk->info.p_sp = p_sp;
         tk->p_es = NULL;
-        tk->info.p_esp = NULL;
-        tk->info.p_frame = NULL;
-        tk->info.i_cat = UNKNOWN_ES;
         tk->queue.p_first = NULL;
         tk->queue.pp_last = &tk->queue.p_first;
 
@@ -1373,11 +1371,7 @@ error:
  *****************************************************************************/
 static void FlushQueue( asf_track_t *tk )
 {
-    if( tk->info.p_frame )
-    {
-        block_ChainRelease( tk->info.p_frame );
-        tk->info.p_frame = NULL;
-    }
+    ASFPacketTrackReset( &tk->info );
     if( tk->queue.p_first )
     {
         block_ChainRelease( tk->queue.p_first );

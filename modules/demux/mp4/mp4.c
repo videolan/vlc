@@ -3566,8 +3566,7 @@ static void MP4_TrackClean( es_out_t *out, mp4_track_t *p_track )
     if( !p_track->i_sample_size )
         free( p_track->p_sample_size );
 
-    if ( p_track->asfinfo.p_frame )
-        block_ChainRelease( p_track->asfinfo.p_frame );
+    ASFPacketTrackReset( &p_track->asfinfo );
 
     free( p_track->context.runs.p_array );
 }
@@ -3581,6 +3580,7 @@ static void MP4_TrackInit( mp4_track_t *p_track, const MP4_Box_t *p_trackbox )
     const MP4_Box_t *p_tkhd = MP4_BoxGet( p_trackbox, "tkhd" );
     if(likely(p_tkhd) && BOXDATA(p_tkhd))
         p_track->i_track_ID = BOXDATA(p_tkhd)->i_track_ID;
+    ASFPacketTrackInit( &p_track->asfinfo );
 }
 
 static void MP4_TrackSelect( demux_t *p_demux, mp4_track_t *p_track, bool b_select )
@@ -5198,10 +5198,6 @@ static void MP4ASF_ResetFrames( demux_sys_t *p_sys )
     for ( unsigned int i=0; i<p_sys->i_tracks; i++ )
     {
         mp4_track_t *p_track = &p_sys->track[i];
-        if( p_track->asfinfo.p_frame )
-        {
-            block_ChainRelease( p_track->asfinfo.p_frame );
-            p_track->asfinfo.p_frame = NULL;
-        }
+        ASFPacketTrackReset( &p_track->asfinfo );
     }
 }
