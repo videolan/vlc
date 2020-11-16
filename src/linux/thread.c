@@ -31,6 +31,11 @@
 #include <sys/syscall.h>
 #include <linux/futex.h>
 
+/* 32bit architectures with 64bit time_t do not define __NR_futex syscall */
+#if !defined(SYS_futex) && defined(SYS_futex_time64)
+#define SYS_futex SYS_futex_time64
+#endif
+
 #ifndef FUTEX_PRIVATE_FLAG
 #define FUTEX_WAKE_PRIVATE FUTEX_WAKE
 #define FUTEX_WAIT_PRIVATE FUTEX_WAIT
@@ -52,7 +57,7 @@ unsigned long vlc_thread_id(void)
 static int sys_futex(void *addr, int op, unsigned val,
                      const struct timespec *to, void *addr2, int val3)
 {
-    return syscall(__NR_futex, addr, op, val, to, addr2, val3);
+    return syscall(SYS_futex, addr, op, val, to, addr2, val3);
 }
 
 static int vlc_futex_wake(void *addr, int nr)
