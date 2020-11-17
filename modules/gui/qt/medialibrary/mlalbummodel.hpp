@@ -57,9 +57,10 @@ public:
     Q_INVOKABLE QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     Q_INVOKABLE QHash<int, QByteArray> roleNames() const override;
 
+protected:
+    ListCacheLoader<std::unique_ptr<MLAlbum>> *createLoader() const override;
+
 private:
-    std::vector<std::unique_ptr<MLAlbum>> fetch(const MLQueryParams &params) const override;
-    size_t countTotalElements(const MLQueryParams &params) const override;
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
     QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;
@@ -67,6 +68,13 @@ private:
     void thumbnailUpdated(int idx) override;
 
     static  QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
+
+    struct Loader : public BaseLoader
+    {
+        Loader(const MLAlbumModel &model) : BaseLoader(model) {}
+        size_t count() const override;
+        std::vector<std::unique_ptr<MLAlbum>> load(size_t index, size_t count) const override;
+    };
 };
 
 

@@ -92,37 +92,6 @@ QHash<int, QByteArray> MLRecentsVideoModel::roleNames() const
     };
 }
 
-std::vector<std::unique_ptr<MLVideo> > MLRecentsVideoModel::fetch(const MLQueryParams &params) const
-{
-    auto queryParams = params.toCQueryParams();
-    ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_history(
-                m_ml, &queryParams ) };
-    if ( media_list == nullptr )
-        return {};
-    std::vector<std::unique_ptr<MLVideo>> res;
-    m_video_count = 0;
-    for( vlc_ml_media_t &media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
-        if( media.i_type == VLC_ML_MEDIA_TYPE_VIDEO )
-        {
-            m_video_count++;
-            res.emplace_back( std::make_unique<MLVideo>( m_ml, &media ) );
-        }
-    return res;
-}
-
-size_t MLRecentsVideoModel::countTotalElements(const MLQueryParams &params) const
-{
-    // FIXME: countTotalElements() may not depend on fetch(), since the call to
-    // fetch() depends on countTotalElements()
-
-    (void) params;
-
-    if(numberOfItemsToShow == -1){
-        return m_video_count;
-    }
-    return std::min(m_video_count,numberOfItemsToShow);
-}
-
 void MLRecentsVideoModel::onVlcMlEvent( const MLEvent &event )
 {
     switch ( event.i_type )
@@ -139,7 +108,51 @@ void MLRecentsVideoModel::onVlcMlEvent( const MLEvent &event )
 }
 void MLRecentsVideoModel::setNumberOfItemsToShow( int n ){
     numberOfItemsToShow = n;
+    invalidateCache();
 }
 int MLRecentsVideoModel::getNumberOfItemsToShow(){
     return numberOfItemsToShow;
+}
+
+ListCacheLoader<std::unique_ptr<MLVideo>> *
+MLRecentsVideoModel::createLoader() const
+{
+    return new Loader(*this, numberOfItemsToShow);
+}
+
+size_t MLRecentsVideoModel::Loader::count() const
+{
+    MLQueryParams params = getParams();
+    auto queryParams = params.toCQueryParams();
+
+    // FIXME: count() may not depend on load(), since the call to load()
+    // depends on count()
+
+    (void) queryParams;
+
+    if (m_numberOfItemsToShow == -1) {
+        return m_video_count;
+    }
+    return std::min(m_video_count, m_numberOfItemsToShow);
+}
+
+std::vector<std::unique_ptr<MLVideo>>
+MLRecentsVideoModel::Loader::load(size_t index, size_t count) const
+{
+    MLQueryParams params = getParams(index, count);
+    auto queryParams = params.toCQueryParams();
+
+    ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_history(
+                m_ml, &queryParams ) };
+    if ( media_list == nullptr )
+        return {};
+    std::vector<std::unique_ptr<MLVideo>> res;
+    m_video_count = 0;
+    for( vlc_ml_media_t &media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
+        if( media.i_type == VLC_ML_MEDIA_TYPE_VIDEO )
+        {
+            m_video_count++;
+            res.emplace_back( std::make_unique<MLVideo>( m_ml, &media ) );
+        }
+    return res;
 }

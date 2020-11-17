@@ -69,11 +69,19 @@ public:
 
     Q_INVOKABLE void addAndPlay( const QString& url );
 
+protected:
+    ListCacheLoader<std::unique_ptr<MLUrl>> *createLoader() const override;
+
 private:
-    std::vector<std::unique_ptr<MLUrl>> fetch(const MLQueryParams &params) const override;
-    size_t countTotalElements(const MLQueryParams &params) const override;
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     virtual void onVlcMlEvent( const MLEvent &event ) override;
+
+    struct Loader : public BaseLoader
+    {
+        Loader(const MLUrlModel &model) : BaseLoader(model) {}
+        size_t count() const override;
+        std::vector<std::unique_ptr<MLUrl>> load(size_t index, size_t count) const override;
+    };
 };
 
 #endif // MLURLMODEL_H

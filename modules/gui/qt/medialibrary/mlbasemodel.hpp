@@ -212,12 +212,14 @@ public:
     }
 
 protected:
+    virtual ListCacheLoader<std::unique_ptr<T>> *createLoader() const = 0;
+
     void validateCache() const
     {
         if (m_cache)
             return;
 
-        auto loader = new Loader(*this);
+        auto loader = createLoader();
         m_cache.reset(new ListCache<std::unique_ptr<T>>(loader));
         connect(&*m_cache, &BaseListCache::localDataChanged,
                 this, &MLSlidingWindowModel<T>::onLocalDataChanged);
@@ -290,48 +292,41 @@ protected:
         MLBaseModel::onVlcMlEvent( event );
     }
 
-private:
-    virtual size_t countTotalElements(const MLQueryParams &params) const = 0;
-    virtual std::vector<std::unique_ptr<T>> fetch(const MLQueryParams &params) const = 0;
-    virtual void thumbnailUpdated( int ) {}
-
     /* Data loader for the cache */
-    struct Loader : public ListCacheLoader<std::unique_ptr<T>>
+    struct BaseLoader : public ListCacheLoader<std::unique_ptr<T>>
     {
-        Loader(const MLSlidingWindowModel &model)
-            : m_model(model)
-            , m_searchPattern(model.m_search_pattern)
-            , m_sort(model.m_sort)
-            , m_sort_desc(model.m_sort_desc)
+        BaseLoader(vlc_medialibrary_t *ml, MLParentId parent, QString searchPattern,
+                   vlc_ml_sorting_criteria_t sort, bool sort_desc)
+            : m_ml(ml)
+            , m_parent(parent)
+            , m_searchPattern(searchPattern)
+            , m_sort(sort)
+            , m_sort_desc(sort_desc)
         {
         }
 
-        size_t count() const override;
-        std::vector<std::unique_ptr<T>> load(size_t index, size_t count) const override;
+        BaseLoader(const MLSlidingWindowModel<T> &model)
+            : BaseLoader(model.m_ml, model.m_parent, model.m_search_pattern, model.m_sort, model.m_sort_desc)
+        {
+        }
 
-    private:
-        const MLSlidingWindowModel &m_model;
+        MLQueryParams getParams(size_t index = 0, size_t count = 0) const
+        {
+            return { m_searchPattern.toUtf8(), m_sort, m_sort_desc, index, count };
+        }
+
+    protected:
+        vlc_medialibrary_t *m_ml;
+        MLParentId m_parent;
         QString m_searchPattern;
         vlc_ml_sorting_criteria_t m_sort;
         bool m_sort_desc;
     };
 
+private:
+    virtual void thumbnailUpdated( int ) {}
+
     mutable std::unique_ptr<ListCache<std::unique_ptr<T>>> m_cache;
 };
-
-template <typename T>
-size_t MLSlidingWindowModel<T>::Loader::count() const
-{
-    MLQueryParams params{ m_searchPattern.toUtf8(), m_sort, m_sort_desc };
-    return m_model.countTotalElements(params);
-}
-
-template <typename T>
-std::vector<std::unique_ptr<T>>
-MLSlidingWindowModel<T>::Loader::load(size_t index, size_t count) const
-{
-    MLQueryParams params{ m_searchPattern.toUtf8(), m_sort, m_sort_desc, index, count };
-    return m_model.fetch(params);
-}
 
 #endif // MLBASEMODEL_HPP

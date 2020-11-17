@@ -51,9 +51,10 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     QVariant data(const QModelIndex &index, int role) const override;
 
+protected:
+    ListCacheLoader<std::unique_ptr<MLGenre>> *createLoader() const override;
+
 private:
-    std::vector<std::unique_ptr<MLGenre>> fetch(const MLQueryParams &params) const override;
-    size_t countTotalElements(const MLQueryParams &params) const override;
     void onVlcMlEvent(const MLEvent &event) override;
     void thumbnailUpdated(int idx) override;
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
@@ -61,6 +62,13 @@ private:
 
 
     static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
+
+    struct Loader : public BaseLoader
+    {
+        Loader(const MLGenreModel &model) : BaseLoader(model) {}
+        size_t count() const override;
+        std::vector<std::unique_ptr<MLGenre>> load(size_t index, size_t count) const override;
+    };
 };
 
 

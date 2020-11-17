@@ -44,9 +44,10 @@ public:
     QHash<int, QByteArray> roleNames() const override;
     int numberOfItemsToShow = 10;
 
+protected:
+    ListCacheLoader<std::unique_ptr<MLVideo>> *createLoader() const override;
+
 private:
-    std::vector<std::unique_ptr<MLVideo>> fetch(const MLQueryParams &params) const override;
-    size_t countTotalElements(const MLQueryParams &params) const override;
     vlc_ml_sorting_criteria_t roleToCriteria( int /* role */ ) const override{
         return VLC_ML_SORTING_DEFAULT;
     }
@@ -56,7 +57,24 @@ private:
     virtual void onVlcMlEvent( const MLEvent &event ) override;
     void setNumberOfItemsToShow(int);
     int getNumberOfItemsToShow();
-    mutable int m_video_count;
+
+    struct Loader : public BaseLoader
+    {
+        Loader(const MLRecentsVideoModel &model, int numberOfItemsToShow)
+            : BaseLoader(model)
+            , m_numberOfItemsToShow(numberOfItemsToShow)
+        {
+        }
+
+        size_t count() const override;
+        std::vector<std::unique_ptr<MLVideo>> load(size_t index, size_t count) const override;
+
+    private:
+        int m_numberOfItemsToShow;
+        // FIXME: count() may not depend on load(), since the call to load()
+        // depends on count()
+        mutable int m_video_count;
+    };
 };
 
 #endif // ML_RECENTS_VIDEO_MODEL_H

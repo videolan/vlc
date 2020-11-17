@@ -72,30 +72,6 @@ void MLUrlModel::addAndPlay( const QString &url )
     });
 }
 
-size_t MLUrlModel::countTotalElements(const MLQueryParams &params) const
-{
-    auto queryParams = params.toCQueryParams();
-    queryParams.i_offset = 0;
-    queryParams.i_nbResults = 0;
-    auto s = vlc_ml_count_stream_history( m_ml, &queryParams );
-    return s;
-}
-
-std::vector<std::unique_ptr<MLUrl>> MLUrlModel::fetch(const MLQueryParams &params) const
-{
-    auto queryParams = params.toCQueryParams();
-
-    ml_unique_ptr<vlc_ml_media_list_t> media_list;
-    media_list.reset( vlc_ml_list_stream_history(m_ml, &queryParams) );
-    if ( media_list == nullptr )
-        return {};
-
-    std::vector<std::unique_ptr<MLUrl>> res;
-    for( const vlc_ml_media_t& media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
-        res.emplace_back( std::make_unique<MLUrl>( &media ) );
-    return res;
-}
-
 vlc_ml_sorting_criteria_t MLUrlModel::roleToCriteria(int role) const
 {
     switch (role) {
@@ -148,4 +124,35 @@ QString MLUrl::getLastPlayedDate() const
 
 MLUrl *MLUrl::clone() const {
     return new MLUrl( *this );
+}
+
+ListCacheLoader<std::unique_ptr<MLUrl>> *
+MLUrlModel::createLoader() const
+{
+    return new Loader(*this);
+}
+
+size_t MLUrlModel::Loader::count() const
+{
+    MLQueryParams params = getParams();
+    auto queryParams = params.toCQueryParams();
+
+    return vlc_ml_count_stream_history( m_ml, &queryParams );
+}
+
+std::vector<std::unique_ptr<MLUrl>>
+MLUrlModel::Loader::load(size_t index, size_t count) const
+{
+    MLQueryParams params = getParams(index, count);
+    auto queryParams = params.toCQueryParams();
+
+    ml_unique_ptr<vlc_ml_media_list_t> media_list;
+    media_list.reset( vlc_ml_list_stream_history(m_ml, &queryParams) );
+    if ( media_list == nullptr )
+        return {};
+
+    std::vector<std::unique_ptr<MLUrl>> res;
+    for( const vlc_ml_media_t& media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
+        res.emplace_back( std::make_unique<MLUrl>( &media ) );
+    return res;
 }

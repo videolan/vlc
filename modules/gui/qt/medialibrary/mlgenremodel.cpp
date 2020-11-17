@@ -68,28 +68,6 @@ QHash<int, QByteArray> MLGenreModel::roleNames() const
     };
 }
 
-std::vector<std::unique_ptr<MLGenre>> MLGenreModel::fetch(const MLQueryParams &params) const
-{
-    auto queryParams = params.toCQueryParams();
-    ml_unique_ptr<vlc_ml_genre_list_t> genre_list(
-        vlc_ml_list_genres(m_ml, &queryParams)
-    );
-    if ( genre_list == nullptr )
-        return {};
-    std::vector<std::unique_ptr<MLGenre>> res;
-    for( const vlc_ml_genre_t& genre: ml_range_iterate<vlc_ml_genre_t>( genre_list ) )
-        res.emplace_back( std::make_unique<MLGenre>( m_ml, &genre ) );
-    return res;
-}
-
-size_t MLGenreModel::countTotalElements(const MLQueryParams &params) const
-{
-    auto queryParams = params.toCQueryParams();
-    queryParams.i_offset = 0;
-    queryParams.i_nbResults = 0;
-    return vlc_ml_count_genres( m_ml, &queryParams );
-}
-
 void MLGenreModel::onVlcMlEvent(const MLEvent &event)
 {
     switch (event.i_type)
@@ -122,4 +100,36 @@ vlc_ml_sorting_criteria_t MLGenreModel::roleToCriteria(int role) const
 vlc_ml_sorting_criteria_t MLGenreModel::nameToCriteria(QByteArray name) const
 {
     return M_names_to_criteria.value(name, VLC_ML_SORTING_DEFAULT);
+}
+
+ListCacheLoader<std::unique_ptr<MLGenre>> *
+MLGenreModel::createLoader() const
+{
+    return new Loader(*this);
+}
+
+size_t MLGenreModel::Loader::count() const
+{
+    MLQueryParams params = getParams();
+    auto queryParams = params.toCQueryParams();
+
+    return vlc_ml_count_genres( m_ml, &queryParams );
+}
+
+std::vector<std::unique_ptr<MLGenre>>
+MLGenreModel::Loader::load(size_t index, size_t count) const
+{
+    MLQueryParams params = getParams(index, count);
+    auto queryParams = params.toCQueryParams();
+
+    ml_unique_ptr<vlc_ml_genre_list_t> genre_list(
+        vlc_ml_list_genres(m_ml, &queryParams)
+    );
+    if ( genre_list == nullptr )
+        return {};
+    std::vector<std::unique_ptr<MLGenre>> res;
+    for( const vlc_ml_genre_t& genre: ml_range_iterate<vlc_ml_genre_t>( genre_list ) )
+        res.emplace_back( std::make_unique<MLGenre>( m_ml, &genre ) );
+    return res;
+
 }

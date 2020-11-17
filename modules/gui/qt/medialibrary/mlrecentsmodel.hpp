@@ -75,9 +75,10 @@ public:
     void setNumberOfItemsToShow(int);
     int getNumberOfItemsToShow() const;
 
+protected:
+    ListCacheLoader<std::unique_ptr<MLRecentMedia>> *createLoader() const override;
+
 private:
-    std::vector<std::unique_ptr<MLRecentMedia>> fetch(const MLQueryParams &params) const override;
-    size_t countTotalElements(const MLQueryParams &params) const override;
     vlc_ml_sorting_criteria_t roleToCriteria( int /* role */ ) const override{
         return VLC_ML_SORTING_DEFAULT;
     }
@@ -85,6 +86,21 @@ private:
         return VLC_ML_SORTING_DEFAULT;
     }
     virtual void onVlcMlEvent( const MLEvent &event ) override;
+
+    struct Loader : public BaseLoader
+    {
+        Loader(const MLRecentsModel &model, int numberOfItemsToShow)
+            : BaseLoader(model)
+            , m_numberOfItemsToShow(numberOfItemsToShow)
+        {
+        }
+
+        size_t count() const override;
+        std::vector<std::unique_ptr<MLRecentMedia>> load(size_t index, size_t count) const override;
+
+    private:
+        int m_numberOfItemsToShow;
+    };
 };
 
 #endif // ML_RECENTS_MODEL_H

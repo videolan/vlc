@@ -79,38 +79,6 @@ void MLRecentsModel::clearHistory()
     vlc_ml_clear_history(m_ml);
 }
 
-std::vector<std::unique_ptr<MLRecentMedia> > MLRecentsModel::fetch(const MLQueryParams &params) const
-{
-    std::vector<std::unique_ptr<MLRecentMedia>> res;
-    auto queryParams = params.toCQueryParams();
-    if (m_numberOfItemsToShow >= 0)
-    {
-        if (queryParams.i_offset <= static_cast<uint32_t>(m_numberOfItemsToShow))
-           queryParams.i_nbResults = static_cast<uint32_t>(m_numberOfItemsToShow) - queryParams.i_offset;
-        else
-            return res;
-    }
-
-    ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_history(
-                m_ml, &queryParams ) };
-    if ( media_list == nullptr )
-        return {};
-    for( vlc_ml_media_t &media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
-        res.emplace_back( std::make_unique<MLRecentMedia>( &media ) );
-    return res;
-}
-
-size_t MLRecentsModel::countTotalElements(const MLQueryParams &params) const
-{
-    auto queryParams = params.toCQueryParams();
-    queryParams.i_offset = 0;
-    queryParams.i_nbResults = m_numberOfItemsToShow;
-    size_t realCount = vlc_ml_count_history( m_ml, &queryParams );
-    if (m_numberOfItemsToShow >= 0)
-        return std::min( realCount, static_cast<size_t>(m_numberOfItemsToShow) );
-    return realCount;
-}
-
 void MLRecentsModel::onVlcMlEvent( const MLEvent &event )
 {
     switch ( event.i_type )
@@ -127,7 +95,49 @@ void MLRecentsModel::onVlcMlEvent( const MLEvent &event )
 }
 void MLRecentsModel::setNumberOfItemsToShow( int n ){
     m_numberOfItemsToShow = n;
+    invalidateCache();
 }
 int MLRecentsModel::getNumberOfItemsToShow() const {
     return m_numberOfItemsToShow;
+}
+
+ListCacheLoader<std::unique_ptr<MLRecentMedia>> *
+MLRecentsModel::createLoader() const
+{
+    return new Loader(*this, m_numberOfItemsToShow);
+}
+
+size_t MLRecentsModel::Loader::count() const
+{
+    MLQueryParams params = getParams();
+    auto queryParams = params.toCQueryParams();
+
+    size_t realCount = vlc_ml_count_history( m_ml, &queryParams );
+    if (m_numberOfItemsToShow >= 0)
+        return std::min( realCount, static_cast<size_t>(m_numberOfItemsToShow) );
+    return realCount;
+}
+
+std::vector<std::unique_ptr<MLRecentMedia>>
+MLRecentsModel::Loader::load(size_t index, size_t count) const
+{
+    MLQueryParams params = getParams(index, count);
+    auto queryParams = params.toCQueryParams();
+
+    std::vector<std::unique_ptr<MLRecentMedia>> res;
+    if (m_numberOfItemsToShow >= 0)
+    {
+        if (queryParams.i_offset <= static_cast<uint32_t>(m_numberOfItemsToShow))
+           queryParams.i_nbResults = static_cast<uint32_t>(m_numberOfItemsToShow) - queryParams.i_offset;
+        else
+            return res;
+    }
+
+    ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_history(
+                m_ml, &queryParams ) };
+    if ( media_list == nullptr )
+        return {};
+    for( vlc_ml_media_t &media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
+        res.emplace_back( std::make_unique<MLRecentMedia>( &media ) );
+    return res;
 }

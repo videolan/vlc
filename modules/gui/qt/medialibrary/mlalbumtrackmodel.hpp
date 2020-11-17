@@ -57,14 +57,22 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
 
+protected:
+    ListCacheLoader<std::unique_ptr<MLAlbumTrack>> *createLoader() const override;
+
 private:
-    std::vector<std::unique_ptr<MLAlbumTrack>> fetch(const MLQueryParams &params) const override;
-    size_t countTotalElements(const MLQueryParams &params) const override;
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
     QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;
     virtual void onVlcMlEvent( const MLEvent &event ) override;
 
     static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
+
+    struct Loader : public BaseLoader
+    {
+        Loader(const MLAlbumTrackModel &model) : BaseLoader(model) {}
+        size_t count() const override;
+        std::vector<std::unique_ptr<MLAlbumTrack>> load(size_t index, size_t count) const override;
+    };
 };
 #endif // MLTRACKMODEL_HPP
