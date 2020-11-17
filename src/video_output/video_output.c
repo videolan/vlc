@@ -1493,7 +1493,8 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                 ThreadDisplayPreparePicture(vout, false, true, &paused);
         }
 
-        picture_Release(sys->displayed.current);
+        if (likely(sys->displayed.current != NULL))
+            picture_Release(sys->displayed.current);
         sys->displayed.current = sys->displayed.next;
         sys->displayed.next    = NULL;
 
@@ -1549,7 +1550,8 @@ static int ThreadDisplayPicture(vout_thread_sys_t *vout, vlc_tick_t *deadline)
                     dropped_current_frame = true;
                     render_now = false;
 
-                    picture_Release(sys->displayed.current);
+                    if (likely(sys->displayed.current != NULL))
+                        picture_Release(sys->displayed.current);
                     sys->displayed.current = sys->displayed.next;
                     sys->displayed.next    = NULL;
                 }
