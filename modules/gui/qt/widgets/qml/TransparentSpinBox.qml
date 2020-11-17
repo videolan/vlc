@@ -35,9 +35,11 @@ T.SpinBox {
     editable: true
     from: 0
     to: 99999
+    padding: VLCStyle.dp(6, VLCStyle.scale)
     font.pixelSize: VLCStyle.fontSize_normal
+    implicitHeight: VLCStyle.fontHeight_normal + control.topPadding + control.bottomPadding
 
-    contentItem: TextField {
+    contentItem: TextInput {
         z: 2
         text: control.textFromValue(control.value, control.locale)
         color: control.color
@@ -47,13 +49,10 @@ T.SpinBox {
         readOnly: !control.editable
         validator: control.validator
         inputMethodHints: Qt.ImhFormattedNumbersOnly
-
-        background: Item {}
+        padding: 0
     }
 
     background: Rectangle {
-        implicitHeight: VLCStyle.dp(28, VLCStyle.scale)
-        implicitWidth: VLCStyle.dp(128, VLCStyle.scale)
         color: "transparent"
         border.width: control.borderWidth
         border.color: control.borderColor
@@ -69,7 +68,8 @@ T.SpinBox {
         color: !control.up.pressed ? control.color : VLCStyle.colors.accent
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        padding: VLCStyle.margin_xsmall
+        leftPadding: control.leftPadding
+        rightPadding: control.rightPadding
 
         MouseArea {
             anchors.fill: parent
@@ -96,7 +96,8 @@ T.SpinBox {
         color: !control.down.pressed ? control.color : VLCStyle.colors.accent
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        padding: VLCStyle.margin_xsmall
+        leftPadding: control.leftPadding
+        rightPadding: control.rightPadding
 
         MouseArea {
             anchors.fill: parent

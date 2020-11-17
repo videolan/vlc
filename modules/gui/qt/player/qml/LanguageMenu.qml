@@ -401,7 +401,6 @@ T.Menu {
 
                         property bool inhibitUpdate: true
 
-                        padding: VLCStyle.margin_xxxsmall
                         textFromValue: function (value, locale) {
                             return i18n.qtr("%1 ms").arg(
                                         Number(value).toLocaleString(locale,
@@ -416,7 +415,6 @@ T.Menu {
                         from: -10000
 
                         Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
-                        Layout.preferredHeight: VLCStyle.dp(27, VLCStyle.scale)
 
                         onValueChanged: {
                             if (inhibitUpdate)
@@ -476,14 +474,12 @@ T.Menu {
 
                         property bool inhibitUpdate: true
 
-                        padding: VLCStyle.margin_xxxsmall
                         textFromValue: audioDelaySpin.textFromValue
                         valueFromText: audioDelaySpin.valueFromText
                         stepSize: 50
                         from: -10000
 
                         Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
-                        Layout.preferredHeight: VLCStyle.dp(27, VLCStyle.scale)
 
                         onValueChanged: {
                             if (inhibitUpdate)
@@ -538,14 +534,12 @@ T.Menu {
 
                         property bool inhibitUpdate: true
 
-                        padding: VLCStyle.margin_xxxsmall
                         textFromValue: primarySubSpin.textFromValue
                         valueFromText: primarySubSpin.valueFromText
                         stepSize: 50
                         from: -10000
 
                         Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
-                        Layout.preferredHeight: VLCStyle.dp(27, VLCStyle.scale)
 
                         onValueChanged: {
                             if (inhibitUpdate)
@@ -655,7 +649,6 @@ T.Menu {
 
                         property bool inhibitUpdate: true
 
-                        padding: VLCStyle.margin_xxxsmall
                         stepSize: 1
                         textFromValue: function (value, locale) {
                             return i18n.qtr("%1 fps").arg(
@@ -669,7 +662,6 @@ T.Menu {
                         }
 
                         Layout.preferredWidth: VLCStyle.dp(128, VLCStyle.scale)
-                        Layout.preferredHeight: VLCStyle.dp(27, VLCStyle.scale)
 
                         onValueChanged: {
                             if (inhibitUpdate)
