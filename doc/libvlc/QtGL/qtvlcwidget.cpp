@@ -197,7 +197,7 @@ QtVLCWidget::QtVLCWidget(QWidget *parent)
     // support it, the widget will become transparent apart from the logo.
 
     const char *args[] = {
-        "--verbose=4"
+        "--verbose=2"
     };
     m_vlc = libvlc_new(sizeof(args) / sizeof(*args), args);
 
