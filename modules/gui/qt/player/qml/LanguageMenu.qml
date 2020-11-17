@@ -383,6 +383,7 @@ T.Menu {
                 Widgets.SubtitleLabel {
                     Layout.fillWidth: true
                     text: i18n.qtr("Audio track synchronization")
+                    color: "white"
                 }
                 RowLayout {
                     Layout.fillWidth: true
@@ -456,6 +457,7 @@ T.Menu {
                     Layout.fillWidth: true
                     Layout.topMargin: VLCStyle.margin_large
                     text: i18n.qtr("Subtitle synchronization")
+                    color: "white"
                 }
 
                 RowLayout {
@@ -632,6 +634,7 @@ T.Menu {
                 Widgets.SubtitleLabel {
                     Layout.fillWidth: true
                     text: i18n.qtr("Subtitles")
+                    color: "white"
                 }
                 RowLayout {
                     width: parent.width
