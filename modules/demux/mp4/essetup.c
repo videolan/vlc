@@ -623,6 +623,19 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
             break;
         }
 
+        case VLC_FOURCC( 'v', 'v', 'c', '1' ):
+        {
+            MP4_Box_t *p_vvcC = MP4_BoxGet( p_sample, "vvcC" );
+            if( p_vvcC && p_vvcC->data.p_binary &&
+                p_vvcC->data.p_binary->i_blob > 4 )
+            {
+                CopyExtradata( ((uint8_t *)p_vvcC->data.p_binary->p_blob) + 4,
+                               p_vvcC->data.p_binary->i_blob - 4,
+                               p_fmt );
+            }
+            break;
+        }
+
         /* avc1: send avcC (h264 without annexe B, ie without start code)*/
         case VLC_FOURCC( 'a', 'v', 'c', '3' ):
         case VLC_FOURCC( 'a', 'v', 'c', '1' ):
