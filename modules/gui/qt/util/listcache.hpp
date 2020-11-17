@@ -75,8 +75,8 @@ class ListCache : public BaseListCache
 public:
     static constexpr ssize_t COUNT_UNINITIALIZED = -1;
 
-    ListCache(std::unique_ptr<ListCacheLoader<T>> loader, size_t chunkSize = 100)
-        : m_loader(std::move(loader))
+    ListCache(ListCacheLoader<T> *loader, size_t chunkSize = 100)
+        : m_loader(loader)
         , m_chunkSize(chunkSize) {}
 
     /**

@@ -217,8 +217,8 @@ protected:
         if (m_cache)
             return;
 
-        auto loader = std::make_unique<Loader>(*this);
-        m_cache.reset(new ListCache<std::unique_ptr<T>>(std::move(loader)));
+        auto loader = new Loader(*this);
+        m_cache.reset(new ListCache<std::unique_ptr<T>>(loader));
         connect(&*m_cache, &BaseListCache::localDataChanged,
                 this, &MLSlidingWindowModel<T>::onLocalDataChanged);
 
