@@ -66,6 +66,14 @@ void MLBaseModel::onResetRequested()
     endResetModel();
 }
 
+void MLBaseModel::onLocalDataChanged(size_t offset, size_t count)
+{
+    assert(count);
+    auto first = index(offset);
+    auto last = index(offset + count - 1);
+    emit dataChanged(first, last);
+}
+
 void MLBaseModel::onVlcMlEvent(const MLEvent &event)
 {
     switch(event.i_type)

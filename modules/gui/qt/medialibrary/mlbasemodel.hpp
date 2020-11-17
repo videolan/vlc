@@ -33,6 +33,7 @@
 #include <memory>
 #include "mlevent.hpp"
 #include "mlqueryparams.hpp"
+#include "util/listcache.hpp"
 
 class MediaLib;
 
@@ -69,6 +70,7 @@ signals:
 
 protected slots:
     void onResetRequested();
+    void onLocalDataChanged(size_t index, size_t count);
 
 private:
     static void onVlcMlEvent( void* data, const vlc_ml_event_t* event );
@@ -131,13 +133,11 @@ template <typename T>
 class MLSlidingWindowModel : public MLBaseModel
 {
 public:
-    static constexpr size_t BatchSize = 100;
+    static constexpr ssize_t COUNT_UNINITIALIZED =
+        ListCache<std::unique_ptr<T>>::COUNT_UNINITIALIZED;
 
     MLSlidingWindowModel(QObject* parent = nullptr)
         : MLBaseModel(parent)
-        , m_initialized(false)
-        , m_total_count(0)
-        , m_offset(0)
     {
     }
 
@@ -146,24 +146,15 @@ public:
         if (parent.isValid())
             return 0;
 
-        if ( m_initialized == false )
-        {
-            MLQueryParams params{ m_search_pattern.toUtf8(), m_sort, m_sort_desc };
-            m_total_count = countTotalElements(params);
-            m_initialized = true;
-            emit countChanged( static_cast<unsigned int>(m_total_count) );
-        }
+        validateCache();
 
-        return m_total_count;
+        return m_cache->count();
     }
 
     void clear() override
     {
-        m_offset = 0;
-        m_initialized = false;
-        m_total_count = 0;
-        m_item_list.clear();
-        emit countChanged( static_cast<unsigned int>(m_total_count) );
+        invalidateCache();
+        emit countChanged( static_cast<unsigned int>(0) );
     }
 
 
@@ -215,30 +206,50 @@ public:
     }
 
     unsigned int getCount() const override {
-        return static_cast<unsigned int>(m_total_count);
+        if (!m_cache || m_cache->count() == COUNT_UNINITIALIZED)
+            return 0;
+        return static_cast<unsigned int>(m_cache->count());
     }
 
 protected:
+    void validateCache() const
+    {
+        if (m_cache)
+            return;
+
+        auto loader = std::make_unique<Loader>(*this);
+        m_cache.reset(new ListCache<std::unique_ptr<T>>(std::move(loader)));
+        connect(&*m_cache, &BaseListCache::localDataChanged,
+                this, &MLSlidingWindowModel<T>::onLocalDataChanged);
+
+        m_cache->initCount();
+        emit countChanged( static_cast<unsigned int>(m_cache->count()) );
+    }
+
+    void invalidateCache()
+    {
+        m_cache.reset();
+    }
+
     T* item(int signedidx) const
     {
-        if (!m_initialized || signedidx < 0)
+        validateCache();
+
+        ssize_t count = m_cache->count();
+        if (count == COUNT_UNINITIALIZED || signedidx < 0
+                || signedidx >= count)
             return nullptr;
 
         unsigned int idx = static_cast<unsigned int>(signedidx);
-        if ( idx >= m_total_count )
+        m_cache->refer(idx);
+
+        const std::unique_ptr<T> *item = m_cache->get(idx);
+        if (!item)
+            /* Not in cache */
             return nullptr;
 
-        if ( idx < m_offset ||  idx >= m_offset + m_item_list.size() )
-        {
-            m_offset = idx - idx % BatchSize;
-            MLQueryParams params{ m_search_pattern.toUtf8(), m_sort, m_sort_desc, m_offset, BatchSize };
-            m_item_list = fetch(params);
-        }
-
-        //db has changed
-        if ( idx >= m_offset + m_item_list.size() || idx < m_offset )
-            return nullptr;
-        return m_item_list[idx - m_offset].get();
+        /* Return raw pointer */
+        return item->get();
     }
 
     virtual void onVlcMlEvent(const MLEvent &event) override
@@ -248,13 +259,27 @@ protected:
             case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
             {
                 if (event.media_thumbnail_generated.b_success) {
-                    int idx = static_cast<int>(m_offset);
-                    for ( const auto& it : m_item_list ) {
-                        if (it->getId().id == event.media_thumbnail_generated.i_media_id) {
-                            thumbnailUpdated(idx);
+                    if (!m_cache)
+                        break;
+
+                    ssize_t stotal = m_cache->count();
+                    if (stotal == COUNT_UNINITIALIZED)
+                        break;
+
+                    size_t total = static_cast<size_t>(stotal);
+                    for (size_t i = 0; i < total; ++i)
+                    {
+                        const std::unique_ptr<T> *item = m_cache->get(i);
+                        if (!item)
+                            /* Only consider items available locally in cache */
+                            break;
+
+                        T *localItem = item->get();
+                        if (localItem->getId().id == event.media_thumbnail_generated.i_media_id)
+                        {
+                            thumbnailUpdated(i);
                             break;
                         }
-                        idx += 1;
                     }
                 }
                 break;
@@ -270,10 +295,43 @@ private:
     virtual std::vector<std::unique_ptr<T>> fetch(const MLQueryParams &params) const = 0;
     virtual void thumbnailUpdated( int ) {}
 
-    mutable std::vector<std::unique_ptr<T>> m_item_list;
-    mutable bool m_initialized;
-    mutable size_t m_total_count;
-    mutable size_t m_offset; /* offset of m_item_list in the global list */
+    /* Data loader for the cache */
+    struct Loader : public ListCacheLoader<std::unique_ptr<T>>
+    {
+        Loader(const MLSlidingWindowModel &model)
+            : m_model(model)
+            , m_searchPattern(model.m_search_pattern)
+            , m_sort(model.m_sort)
+            , m_sort_desc(model.m_sort_desc)
+        {
+        }
+
+        size_t count() const override;
+        std::vector<std::unique_ptr<T>> load(size_t index, size_t count) const override;
+
+    private:
+        const MLSlidingWindowModel &m_model;
+        QString m_searchPattern;
+        vlc_ml_sorting_criteria_t m_sort;
+        bool m_sort_desc;
+    };
+
+    mutable std::unique_ptr<ListCache<std::unique_ptr<T>>> m_cache;
 };
+
+template <typename T>
+size_t MLSlidingWindowModel<T>::Loader::count() const
+{
+    MLQueryParams params{ m_searchPattern.toUtf8(), m_sort, m_sort_desc };
+    return m_model.countTotalElements(params);
+}
+
+template <typename T>
+std::vector<std::unique_ptr<T>>
+MLSlidingWindowModel<T>::Loader::load(size_t index, size_t count) const
+{
+    MLQueryParams params{ m_searchPattern.toUtf8(), m_sort, m_sort_desc, index, count };
+    return m_model.fetch(params);
+}
 
 #endif // MLBASEMODEL_HPP
