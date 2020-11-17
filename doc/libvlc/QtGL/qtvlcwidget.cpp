@@ -117,6 +117,9 @@ public:
     static void cleanup(void* data)
     {
         VLCVideo* that = static_cast<VLCVideo*>(data);
+
+        that->videoReady.release();
+
         if (that->m_width == 0 && that->m_height == 0)
             return;
         delete that->mBuffers[0];
