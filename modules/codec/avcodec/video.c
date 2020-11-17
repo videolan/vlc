@@ -481,6 +481,11 @@ static int InitVideoDecCommon( decoder_t *p_dec )
     /* ***** Output always the frames ***** */
     p_context->flags |= AV_CODEC_FLAG_OUTPUT_CORRUPT;
 
+#if LIBAVCODEC_VERSION_CHECK( 61, 03, 100 )
+    if( p_dec->fmt_in->i_codec == VLC_CODEC_VVC )
+        p_context->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+#endif
+
     i_val = var_CreateGetInteger( p_dec, "avcodec-skiploopfilter" );
     if( i_val >= 4 ) p_context->skip_loop_filter = AVDISCARD_ALL;
     else if( i_val == 3 ) p_context->skip_loop_filter = AVDISCARD_NONKEY;

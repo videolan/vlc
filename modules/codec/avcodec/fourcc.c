@@ -286,6 +286,9 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
 
     { VLC_CODEC_DXV, AV_CODEC_ID_DXV },
 
+#if LIBAVCODEC_VERSION_CHECK( 61, 03, 100 )
+    { VLC_CODEC_VVC, AV_CODEC_ID_VVC },
+#endif
     /* ffmpeg only: AV_CODEC_ID_BRENDER_PIX */
     /* ffmpeg only: AV_CODEC_ID_Y41P */
     /* ffmpeg only: AV_CODEC_ID_EXR */
