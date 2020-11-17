@@ -55,30 +55,28 @@ vlc_gl_interop_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
         vlc_object_delete(interop);
         return NULL;
     }
+
     if (desc->plane_count == 0)
     {
         /* Opaque chroma: load a module to handle it */
         interop->vctx = context;
         interop->module = module_need_var(interop, "glinterop", "glinterop");
+        if (interop->module == NULL)
+            goto error;
     }
-
-    int ret;
-    if (interop->module != NULL)
-        ret = VLC_SUCCESS;
     else
     {
-        /* Software chroma or gl hw converter failed: use a generic
-         * converter */
-        ret = opengl_interop_generic_init(interop, true);
-    }
-
-    if (ret != VLC_SUCCESS)
-    {
-        vlc_object_delete(interop);
-        return NULL;
+        /* No opengl interop module found: use a generic interop. */
+        int ret = opengl_interop_generic_init(interop, true);
+        if (ret != VLC_SUCCESS)
+            goto error;
     }
 
     return interop;
+
+error:
+    vlc_object_delete(interop);
+    return NULL;
 }
 
 struct vlc_gl_interop *
