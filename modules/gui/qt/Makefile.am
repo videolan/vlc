@@ -610,6 +610,10 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/back.svg \
 	gui/qt/pixmaps/time.svg
 
+if HAVE_WIN32
+libqt_plugin_la_RES += gui/qt/pixmaps/windows-theme.conf
+endif
+
 #QML and JS resources
 libqt_plugin_la_QML = \
 	gui/qt/dialogs/dialogs/qml/CustomDialog.qml \
@@ -753,7 +757,13 @@ libqt_plugin_la_QML = \
 	gui/qt/widgets/qml/FrostedGlassEffect.qml \
 	gui/qt/widgets/qml/OverlayMenu.qml
 
-EXTRA_DIST += gui/qt/vlc.qrc $(libqt_plugin_la_RES)
+lib_qt_plugin_la_QRC = gui/qt/vlc.qrc
+
+if HAVE_WIN32
+lib_qt_plugin_la_QRC += gui/qt/windows.qrc
+endif
+
+EXTRA_DIST += $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES)
 
 nodist_libqt_plugin_la_SOURCES += gui/qt/resources.cpp
 
@@ -778,8 +788,11 @@ libqt_plugin_la_SOURCES += $(libqt_plugin_la_QML)
 qml_cache.qrc: gui/qt/vlc.qrc
 	$(AM_V_GEN)$(QMLCACHE) --filter-resource-file -o $@ $<
 
-gui/qt/resources.cpp: qml_cache.qrc $(libqt_plugin_la_RES)
-	$(AM_V_GEN)$(RCC) --name qml_cache -o $@ $<
+QRCS_EXCEPT_VLC_QRC = $(filter-out gui/qt/vlc.qrc, $(lib_qt_plugin_la_QRC))
+QRCS_EXCEPT_VLC_QRC += qml_cache.qrc
+
+gui/qt/resources.cpp: $(QRCS_EXCEPT_VLC_QRC) $(libqt_plugin_la_RES)
+	$(AM_V_GEN)$(RCC) --name qml_cache -o $@ $(filter %.qrc, $^)
 
 #output name matters here
 gui/qt/qmlcache_loader.cpp: gui/qt/vlc.qrc qml_cache.qrc $(libqt_plugin_la_QML)
@@ -789,8 +802,8 @@ else
 
 EXTRA_DIST += $(libqt_plugin_la_QML)
 
-gui/qt/resources.cpp: gui/qt/vlc.qrc $(libqt_plugin_la_RES) $(libqt_plugin_la_QML)
-	$(AM_V_GEN)$(RCC) --name vlc -o $@ $<
+gui/qt/resources.cpp: $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plugin_la_QML)
+	$(AM_V_GEN)$(RCC) --name vlc -o $@ $(filter %.qrc, $^)
 
 endif
 
