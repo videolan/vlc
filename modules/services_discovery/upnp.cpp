@@ -407,7 +407,7 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
     } else {
         char* psz_mrl;
         // We might already have some options specified in the location.
-        char opt_delim = desc->location.find( '?' ) == 0 ? '?' : '&';
+        char opt_delim = desc->location.find( '?' ) == std::string::npos ? '?' : '&';
         if( asprintf( &psz_mrl, "upnp://%s%cObjectID=0", desc->location.c_str(), opt_delim ) < 0 )
             return false;
 
