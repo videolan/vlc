@@ -44,13 +44,13 @@ ForgedInitSegment::ForgedInitSegment(ICanonicalUrl *parent,
                                      const std::string &type_,
                                      uint64_t timescale_,
                                      uint64_t duration_) :
-    InitSegment(parent), TimescaleAble()
+    InitSegment(parent)
 {
     type = type_;
     duration.Set(duration_);
     extradata = NULL;
     i_extradata = 0;
-    setTimescale(timescale_);
+    timescale = timescale_;
     formatex.cbSize = 0;
     formatex.nAvgBytesPerSec = 0;
     formatex.nBlockAlign = 0;
@@ -207,11 +207,10 @@ void ForgedInitSegment::setLanguage(const std::string &lang)
 
 block_t * ForgedInitSegment::buildMoovBox()
 {
-    const Timescale &trackTimescale = inheritTimescale();
     mp4mux_trackinfo_t trackinfo;
     mp4mux_trackinfo_Init(&trackinfo,
                           0x01, /* Will always be 1st and unique track; tfhd patched on block read */
-                          (uint32_t) trackTimescale);
+                          (uint32_t) timescale);
     trackinfo.i_read_duration = duration.Get();
     trackinfo.i_trex_default_length = 1;
     trackinfo.i_trex_default_size = 1;
@@ -277,7 +276,7 @@ block_t * ForgedInitSegment::buildMoovBox()
 
     if(mp4mux_CanMux( NULL, &trackinfo.fmt ))
        box = mp4mux_GetMoovBox(NULL, &p_tracks, 1,
-                               trackTimescale.ToTime(duration.Get()),
+                               timescale.ToTime(duration.Get()),
                                true, false, false, false);
 
     mp4mux_trackinfo_Clear(&trackinfo);
