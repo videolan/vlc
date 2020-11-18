@@ -82,6 +82,7 @@ Item {
     property int icon_xlarge: dp(128, scale);
 
     property int icon_topbar: dp(38, scale)
+    property int icon_checkedDelegate: dp(40, scale)
 
     property int play_cover_small: dp(24, scale)
 

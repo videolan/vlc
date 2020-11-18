@@ -27,6 +27,7 @@ T.ItemDelegate {
     id: control
 
     checkable: true
+    font.pixelSize: VLCStyle.fontSize_large
     leftPadding: VLCStyle.margin_xlarge
     rightPadding: VLCStyle.margin_xsmall
 
@@ -41,7 +42,7 @@ T.ItemDelegate {
             text: VLCIcons.check
             visible: control.checked
             height: parent.height
-            font.pixelSize: 24
+            font.pixelSize: VLCIcons.pixelSize(VLCStyle.icon_checkedDelegate)
             color: "white"
             verticalAlignment: Text.AlignVCenter
         }
