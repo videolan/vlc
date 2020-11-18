@@ -44,13 +44,13 @@ ForgedInitSegment::ForgedInitSegment(ICanonicalUrl *parent,
                                      const std::string &type_,
                                      uint64_t timescale_,
                                      vlc_tick_t duration_) :
-    InitSegment(parent), TimescaleAble()
+    InitSegment(parent)
 {
     type = type_;
     duration.Set(duration_);
     extradata = NULL;
     i_extradata = 0;
-    setTimescale(timescale_);
+    timescale = timescale_;
     formatex.cbSize = 0;
     formatex.nAvgBytesPerSec = 0;
     formatex.nBlockAlign = 0;
@@ -210,8 +210,6 @@ void ForgedInitSegment::setLanguage(const std::string &lang)
 
 block_t * ForgedInitSegment::buildMoovBox()
 {
-    const Timescale &trackTimescale = inheritTimescale();
-
     es_format_t fmt;
     es_format_Init(&fmt, es_type, vlc_fourcc_GetCodec(es_type, fourcc));
     fmt.i_original_fourcc = fourcc;
@@ -282,12 +280,12 @@ block_t * ForgedInitSegment::buildMoovBox()
         {
             mp4mux_trackinfo_t *p_track = mp4mux_track_Add(muxh,
                                      0x01, /* Will always be 1st and unique track; tfhd patched on block read */
-                                     &fmt, (uint32_t) trackTimescale);
+                                     &fmt, (uint32_t) timescale);
             if(p_track)
                 mp4mux_track_ForceDuration(p_track, duration.Get());
         }
 
-        box = mp4mux_GetMoov(muxh, NULL, trackTimescale.ToTime(duration.Get()));
+        box = mp4mux_GetMoov(muxh, NULL, timescale.ToTime(duration.Get()));
     }
     es_format_Clean(&fmt);
 
