@@ -102,6 +102,7 @@ typedef enum vlc_event_type_t {
     vlc_InputItemNameChanged,
     vlc_InputItemInfoChanged,
     vlc_InputItemErrorWhenReadingChanged,
+    vlc_InputItemAttachmentsFound,
 } vlc_event_type_t;
 
 typedef struct vlc_event_listeners_group_t
@@ -114,7 +115,7 @@ typedef struct vlc_event_manager_t
 {
     void * p_obj;
     vlc_mutex_t lock;
-    vlc_event_listeners_group_t events[vlc_InputItemErrorWhenReadingChanged + 1];
+    vlc_event_listeners_group_t events[vlc_InputItemAttachmentsFound + 1];
 } vlc_event_manager_t;
 
 /* Event definition */
@@ -161,6 +162,11 @@ typedef struct vlc_event_t
         {
             int new_status;
         } input_item_preparse_ended;
+        struct input_item_attachments_found
+        {
+            input_attachment_t** attachments;
+            size_t count;
+        } input_item_attachments_found;
     } u;
 } vlc_event_t;
 
