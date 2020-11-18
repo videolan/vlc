@@ -296,7 +296,7 @@ static int Open(vlc_object_t *obj)
         is_dir = true;
         size = 0;
 
-        if (errno != EACCES)
+        if (errno != EACCES && errno != EPERM)
             break;
 
         errno = 0;
