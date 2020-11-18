@@ -89,6 +89,12 @@ enum libvlc_event_e {
      * \see libvlc_media_get_thumbnail()
      */
     libvlc_MediaThumbnailGenerated,
+    /**
+     * One or more embedded thumbnails were found during the media preparsing
+     * The user can hold these picture(s) using libvlc_picture_retain if they
+     * wish to use them
+     */
+    libvlc_MediaAttachedThumbnailsFound,
 
     libvlc_MediaPlayerMediaChanged=0x100,
     libvlc_MediaPlayerNothingSpecial,
@@ -272,6 +278,10 @@ typedef struct libvlc_event_t
         {
             libvlc_media_t * item;
         } media_subitemtree_added;
+        struct
+        {
+            libvlc_picture_list_t* thumbnails;
+        } media_attached_thumbnails_found;
 
         /* media instance */
         struct
