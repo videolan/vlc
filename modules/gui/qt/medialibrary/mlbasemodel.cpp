@@ -66,6 +66,19 @@ void MLBaseModel::onResetRequested()
     endResetModel();
 }
 
+void MLBaseModel::onLocalSizeAboutToBeChanged(size_t size)
+{
+    (void) size;
+    beginResetModel();
+}
+
+void MLBaseModel::onLocalSizeChanged(size_t size)
+{
+    (void) size;
+    endResetModel();
+    emit countChanged(size);
+}
+
 void MLBaseModel::onLocalDataChanged(size_t offset, size_t count)
 {
     assert(count);

@@ -72,11 +72,19 @@ class BaseListCache : public QObject
     Q_OBJECT
 
 signals:
+    /* useful for signaling QAbstractItemModel::modelAboutToBeReset() */
+    void localSizeAboutToBeChanged(size_t size);
+
+    void localSizeChanged(size_t size);
     void localDataChanged(size_t index, size_t count);
 
 protected slots:
     virtual void onLoadResult() = 0;
+    virtual void onCountResult() = 0;
 };
+
+template <typename T>
+class CountTask;
 
 template <typename T>
 class LoadTask;
@@ -147,9 +155,11 @@ public:
     void refer(size_t index);
 
 private:
+    void asyncLoad(size_t offset, size_t count);
     void onLoadResult() override;
 
-    void asyncLoad(size_t offset, size_t count);
+    void asyncCount();
+    void onCountResult() override;
 
     QThreadPool &m_threadPool;
     /* Ownershipshared between this cache and the runnable spawned to execute
@@ -161,14 +171,18 @@ private:
     ssize_t m_total_count = COUNT_UNINITIALIZED;
     size_t m_offset = 0;
 
+    bool m_countRequested = false;
     MLRange m_lastRangeRequested;
 
     LoadTask<T> *m_loadTask = nullptr;
+    CountTask<T> *m_countTask = nullptr;
 };
 
 template <typename T>
 ListCache<T>::~ListCache()
 {
+    if (m_countTask)
+        m_countTask->abandon();
     if (m_loadTask)
         m_loadTask->abandon();
 }
@@ -192,8 +206,8 @@ ssize_t ListCache<T>::count() const
 template <typename T>
 void ListCache<T>::initCount()
 {
-    assert(m_total_count == COUNT_UNINITIALIZED);
-    m_total_count = static_cast<ssize_t>(m_loader->count());
+    assert(!m_countRequested);
+    asyncCount();
 }
 
 template <typename T>
@@ -219,6 +233,48 @@ void ListCache<T>::refer(size_t index)
         size_t count = qMin(m_total_count - offset, m_chunkSize);
         asyncLoad(offset, count);
     }
+}
+
+template <typename T>
+class CountTask : public AsyncTask<size_t>
+{
+public:
+    CountTask(QSharedPointer<ListCacheLoader<T>> loader) : m_loader(loader) {}
+
+    size_t execute() override
+    {
+        return m_loader->count();
+    }
+
+private:
+    QSharedPointer<ListCacheLoader<T>> m_loader;
+};
+
+template <typename T>
+void ListCache<T>::asyncCount()
+{
+    assert(!m_countTask);
+
+    m_countTask = new CountTask<T>(m_loader);
+    connect(m_countTask, &BaseAsyncTask::result,
+            this, &ListCache<T>::onCountResult);
+    m_countRequested = true;
+    m_countTask->start(m_threadPool);
+}
+
+template <typename T>
+void ListCache<T>::onCountResult()
+{
+    CountTask<T> *task = static_cast<CountTask<T> *>(sender());
+    assert(task == m_countTask);
+
+    m_offset = 0;
+    m_list.clear();
+    m_total_count = static_cast<ssize_t>(task->takeResult());
+    emit localSizeChanged(m_total_count);
+
+    task->abandon();
+    m_countTask = nullptr;
 }
 
 template <typename T>

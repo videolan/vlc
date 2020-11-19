@@ -70,6 +70,8 @@ signals:
 
 protected slots:
     void onResetRequested();
+    void onLocalSizeAboutToBeChanged(size_t size);
+    void onLocalSizeChanged(size_t size);
     void onLocalDataChanged(size_t index, size_t count);
 
 private:
@@ -222,11 +224,14 @@ protected:
         auto &threadPool = m_mediaLib->threadPool();
         auto loader = createLoader();
         m_cache.reset(new ListCache<std::unique_ptr<T>>(threadPool, loader));
+        connect(&*m_cache, &BaseListCache::localSizeAboutToBeChanged,
+                this, &MLSlidingWindowModel<T>::onLocalSizeAboutToBeChanged);
+        connect(&*m_cache, &BaseListCache::localSizeChanged,
+                this, &MLSlidingWindowModel<T>::onLocalSizeChanged);
         connect(&*m_cache, &BaseListCache::localDataChanged,
                 this, &MLSlidingWindowModel<T>::onLocalDataChanged);
 
         m_cache->initCount();
-        emit countChanged( static_cast<unsigned int>(m_cache->count()) );
     }
 
     void invalidateCache()
