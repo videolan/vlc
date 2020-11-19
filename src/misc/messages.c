@@ -51,10 +51,6 @@ static void vlc_LogSpam(vlc_object_t *obj)
     msg_Dbg(obj, "configured with %s", CONFIGURE_LINE);
 }
 
-struct vlc_logger {
-    const struct vlc_logger_operations *ops;
-};
-
 static void vlc_vaLogCallback(vlc_logger_t *logger, int type,
                               const vlc_log_t *item, const char *format,
                               va_list ap)
