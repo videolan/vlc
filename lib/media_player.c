@@ -583,6 +583,23 @@ static void media_detach_preparsed_event( libvlc_media_t *p_md )
                       p_md );
 }
 
+static void media_player_logger_log(
+        void *data, int type, const vlc_log_t *item, const char *fmt,
+        va_list args )
+{
+    libvlc_media_player_t *mp =
+        container_of(data, libvlc_media_player_t, logger);
+
+    struct vlc_logger *parent = vlc_object_parent(mp)->logger;
+    if (parent == NULL)
+        return;
+
+    parent->ops->log(parent, type, item, fmt, args);
+}
+
+struct vlc_logger_operations media_player_logger_ops =
+    { .log = media_player_logger_log, };
+
 /**************************************************************************
  * Create a Media Instance object.
  *
@@ -610,6 +627,9 @@ libvlc_media_player_new( libvlc_instance_t *instance )
         libvlc_printerr("Not enough memory");
         return NULL;
     }
+
+    mp->logger = (struct vlc_logger) { .ops = &media_player_logger_ops };
+    mp->obj.logger = &mp->logger;
 
     /* Input */
     var_Create (mp, "rate", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT);
