@@ -1,9 +1,9 @@
 TEMPLATE = app
 TARGET = qtvlc
-DEPENDPATH += .
-INCLUDEPATH += .
-LIBS += -lvlc -lX11
 
-# Input
+CONFIG += link_pkgconfig force_debug_info
+PKGCONFIG = libvlc
+QT += widgets
+
 HEADERS += player.h
 SOURCES += main.cpp player.cpp
