@@ -129,24 +129,6 @@ namespace adaptive
                     AttrWrapper<AbstractAttr::Type::DURATION, stime_t>( v ) {}
                 virtual bool isValid() const { return value > 0; }
         };
-
-        class TimescaleAble
-        {
-            public:
-                TimescaleAble( TimescaleAble * = NULL );
-                virtual ~TimescaleAble();
-                void setParentTimescaleAble( TimescaleAble * );
-                virtual Timescale inheritTimescale() const;
-                void setTimescale( const Timescale & );
-                void setTimescale( uint64_t );
-                const Timescale & getTimescale() const;
-
-            protected:
-                TimescaleAble *parentTimescaleAble;
-
-            private:
-                Timescale timescale;
-        };
     }
 }
 
