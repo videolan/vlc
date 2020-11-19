@@ -219,8 +219,9 @@ protected:
         if (m_cache)
             return;
 
+        auto &threadPool = m_mediaLib->threadPool();
         auto loader = createLoader();
-        m_cache.reset(new ListCache<std::unique_ptr<T>>(loader));
+        m_cache.reset(new ListCache<std::unique_ptr<T>>(threadPool, loader));
         connect(&*m_cache, &BaseListCache::localDataChanged,
                 this, &MLSlidingWindowModel<T>::onLocalDataChanged);
 
