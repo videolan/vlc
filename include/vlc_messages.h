@@ -64,6 +64,11 @@ typedef struct vlc_log_t
     unsigned long tid; /**< Emitter thread ID */
 } vlc_log_t;
 
+/* Logger object interface. */
+struct vlc_logger {
+    const struct vlc_logger_operations *ops;
+};
+
 /**
  * Emit a log message.
  *
