@@ -301,27 +301,24 @@ Item{
                         State {
                             name: "opaque"
                             when: innerColorRect.stateIndicator
+                            PropertyChanges {
+                                target: innerColorRect
+                                opacity: 1.0
+                            }
                         },
                         State {
                             name: "transparent"
                             when: !innerColorRect.stateIndicator
+                            PropertyChanges {
+                                target: innerColorRect
+                                opacity: 0
+                            }
                         }
                     ]
 
-                    transitions: [
-                        Transition {
-                            from: "opaque"
-                            to: "transparent"
-
-                            NumberAnimation { target: innerColorRect; properties: "opacity"; to: 0; duration: 75; easing.type: Easing.OutSine }
-                        },
-                        Transition {
-                            from: "transparent"
-                            to: "opaque"
-
-                            NumberAnimation { target: innerColorRect; properties: "opacity"; to: 1; duration: 75; easing.type: Easing.InSine }
-                        }
-                    ]
+                    transitions: Transition {
+                        NumberAnimation { properties: "opacity"; duration: 75; easing.type: Easing.InOutSine }
+                    }
 
                     antialiasing: true
                 }
