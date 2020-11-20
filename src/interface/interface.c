@@ -240,6 +240,22 @@ void libvlc_InternalPlay(libvlc_int_t *libvlc)
     vlc_playlist_Unlock(playlist);
 }
 
+static void libvlc_AutoRun(libvlc_int_t *libvlc)
+{
+    struct vlc_logger *log = libvlc->obj.logger;
+    module_t **mods;
+    ssize_t total = vlc_module_match("autorun", NULL, false, &mods, NULL);
+
+    for (ssize_t i = 0; i < total; i++) {
+        void (*func)(libvlc_int_t *) = vlc_module_map(log, mods[i]);
+
+        assert(func != NULL);
+        func(libvlc);
+    }
+
+    free(mods);
+}
+
 /**
  * Starts an interface plugin.
  */
@@ -251,6 +267,8 @@ int libvlc_InternalAddIntf(libvlc_int_t *libvlc, const char *name)
         ret = intf_Create(libvlc, name);
     else
     {   /* Default interface */
+        libvlc_AutoRun(libvlc);
+
         char *intf = var_InheritString(libvlc, "intf");
         if (intf == NULL) /* "intf" has not been set */
             msg_Info(libvlc, _("Running vlc with the default interface. "
