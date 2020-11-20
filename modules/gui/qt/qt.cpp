@@ -84,6 +84,7 @@ extern "C" char **environ;
   Q_IMPORT_PLUGIN(QtQmlModelsPlugin)
   Q_IMPORT_PLUGIN(QtGraphicalEffectsPlugin)
   Q_IMPORT_PLUGIN(QtGraphicalEffectsPrivatePlugin)
+  Q_IMPORT_PLUGIN(QmlShapesPlugin)
 
   #if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
    Q_IMPORT_PLUGIN(QtQmlPlugin)
