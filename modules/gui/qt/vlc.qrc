@@ -180,6 +180,7 @@
         <file alias="MainInterface.qml">maininterface/qml/MainInterface.qml</file>
         <file alias="MainDisplay.qml">maininterface/qml/MainDisplay.qml</file>
         <file alias="NoMedialibHome.qml">maininterface/qml/NoMedialibHome.qml</file>
+        <file alias="MiniPlayerBottomMargin.qml">maininterface/qml/MiniPlayerBottomMargin.qml</file>
     </qresource>
     <qresource prefix="/widgets">
         <file alias="BannerTabButton.qml">widgets/qml/BannerTabButton.qml</file>
