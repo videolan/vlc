@@ -51,6 +51,8 @@ RowLayout{
 
     spacing: VLCStyle.margin_normal
 
+    VLCColors {id: vlcNightColors; state: "night"}
+
     Repeater{
         id: buttonsRepeater
 
@@ -76,12 +78,17 @@ RowLayout{
 
                 //force buttons color
                 if (playerButtonsLayout.forceColors) {
-                    if ( buttonloader.item.color )
-                        buttonloader.item.color = VLCStyle.colors.playerFg
-                    if ( buttonloader.item.bgColor )
-                        buttonloader.item.bgColor = VLCStyle.colors.setColorAlpha(VLCStyle.colors.playerBg, 0.8)
-                    if ( buttonloader.item.borderColor )
-                        buttonloader.item.borderColor = VLCStyle.colors.playerBorder
+                    if ( buttonloader.item._colors ) {
+                        buttonloader.item._colors = vlcNightColors
+                    }
+                    else {
+                        if ( buttonloader.item.color )
+                            buttonloader.item.color = VLCStyle.colors.playerFg
+                        if ( buttonloader.item.bgColor )
+                            buttonloader.item.bgColor = VLCStyle.colors.setColorAlpha(VLCStyle.colors.playerBg, 0.8)
+                        if ( buttonloader.item.borderColor )
+                            buttonloader.item.borderColor = VLCStyle.colors.playerBorder
+                    }
                 }
 
                 if (index > 0)

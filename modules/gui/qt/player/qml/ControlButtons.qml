@@ -780,7 +780,9 @@ Item{
 
         Widgets.FocusBackground {
             id: artworkInfoItem
+
             property bool paintOnly: false
+            property VLCColors _colors: VLCStyle.colors
 
             implicitWidth: playingItemInfoRow.implicitWidth
             implicitHeight: playingItemInfoRow.implicitHeight
@@ -814,7 +816,7 @@ Item{
                     Rectangle {
                         id: coverRect
                         anchors.fill: cover
-                        color: VLCStyle.colors.bg
+                        color: _colors.bg
                     }
 
                     DropShadow {
@@ -851,11 +853,11 @@ Item{
                          
                         contentItem: Text {
                                   text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
-                                  color: VLCStyle.colors.tooltipTextColor
+                                  color: _colors.tooltipTextColor
                         }
 
                         background: Rectangle {
-                            color: VLCStyle.colors.tooltipColor
+                            color: _colors.tooltipColor
                         }
                     }
 
@@ -864,6 +866,7 @@ Item{
                         width: implicitWidth < VLCStyle.artworkInfoTextWidth ? implicitWidth : VLCStyle.artworkInfoTextWidth
                         text: mainPlaylistController.currentItem.title
                         visible: text !== ""
+                        color: _colors.text
                     }
 
                     Widgets.MenuCaption {
@@ -871,12 +874,14 @@ Item{
                         width: implicitWidth < VLCStyle.artworkInfoTextWidth ? implicitWidth : VLCStyle.artworkInfoTextWidth
                         text: mainPlaylistController.currentItem.artist
                         visible: text !== ""
+                        color: _colors.menuCaption
                     }
 
                     Widgets.MenuCaption {
                         id: progressIndicator
                         text: player.time.toString() + " / " + player.length.toString()
                         visible: text !== ""
+                        color: _colors.menuCaption
                     }
                 }
             }
