@@ -79,7 +79,6 @@ namespace adaptive
                 const CommonEncryption & intheritEncryption() const;
 
             protected:
-                std::size_t getMediaSegments(std::vector<Segment *>&) const;
                 std::vector<SegmentInformation *> childs;
                 SegmentInformation * getChildByID( const ID & );
                 SegmentInformation *parent;
