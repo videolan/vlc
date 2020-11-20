@@ -77,29 +77,6 @@ AbstractPlaylist * SegmentInformation::getPlaylist() const
         return NULL;
 }
 
-std::size_t SegmentInformation::getMediaSegments(std::vector<Segment *> &retSegments) const
-{
-    if( mediaSegmentTemplate )
-    {
-        retSegments.push_back( mediaSegmentTemplate->getMediaSegment(0) );
-    }
-    else if ( segmentList && !segmentList->getSegments().empty() )
-    {
-        std::vector<Segment *> list = segmentList->getSegments();
-        retSegments.insert( retSegments.end(), list.begin(), list.end() );
-    }
-    else if( segmentBase )
-    {
-        const std::vector<Segment *> &list = segmentBase->subSegments();
-        retSegments.insert( retSegments.end(), list.begin(), list.end() );
-    }
-    else if( parent )
-    {
-        return parent->getMediaSegments(retSegments);
-    }
-    return retSegments.size();
-}
-
 const AbstractSegmentBaseType * SegmentInformation::inheritSegmentProfile() const
 {
     const AbstractSegmentBaseType *profile = inheritSegmentTemplate();
