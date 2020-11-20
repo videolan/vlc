@@ -314,18 +314,31 @@ bool NetworkMediaModel::initializeMediaSources()
 
     {
         input_item_node_t* mediaNode = nullptr;
+        input_item_node_t* parent = nullptr;
         vlc_media_tree_Lock(tree);
         vlc_media_tree_PreparseCancel( libvlc, this );
         std::vector<InputItemPtr> itemList;
-        if (vlc_media_tree_Find( tree, m_treeItem.media.get(), &mediaNode, nullptr))
+        m_path = {QVariant::fromValue(PathNode(m_treeItem, m_name))};
+        if (vlc_media_tree_Find( tree, m_treeItem.media.get(), &mediaNode, &parent))
         {
             itemList.reserve(mediaNode->i_children);
             for (int i = 0; i < mediaNode->i_children; i++)
                 itemList.emplace_back(mediaNode->pp_children[i]->p_item);
+
+            while (parent && parent->p_item) {
+                m_path.push_front(QVariant::fromValue(PathNode(NetworkTreeItem(m_treeItem.source, parent->p_item), parent->p_item->psz_name)));
+                input_item_node_t *node = nullptr;
+                input_item_node_t *grandParent = nullptr;
+                if (!vlc_media_tree_Find( tree, parent->p_item, &node, &grandParent)) {
+                    break;
+                }
+                parent = grandParent;
+            }
         }
         vlc_media_tree_Unlock(tree);
         if (!itemList.empty())
             refreshMediaList( m_treeItem.source, std::move( itemList ), true );
+        emit pathChanged();
     }
 
     m_preparseSem.acquire();
