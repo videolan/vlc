@@ -249,10 +249,14 @@ QSize QtVLCWidget::sizeHint() const
 void QtVLCWidget::cleanup()
 {
     stop();
+
     if (m_vlc)
         libvlc_release(m_vlc);
+    m_vlc = nullptr;
+
     if (m_program == nullptr)
         return;
+
     makeCurrent();
     vertexBuffer.destroy();
     vertexIndexBuffer.destroy();
