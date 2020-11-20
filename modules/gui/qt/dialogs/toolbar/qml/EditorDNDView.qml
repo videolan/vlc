@@ -45,6 +45,19 @@ ListView {
             scrollBar.increase()
     }
 
+    remove: Transition {
+        NumberAnimation { property: "opacity"; from: 1.0; to: 0; duration: 200 }
+    }
+
+    add: Transition {
+        NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 200 }
+    }
+
+    displaced: Transition {
+        NumberAnimation { properties: "x"; duration: 200; easing.type: Easing.OutSine }
+        NumberAnimation { property: "opacity"; to: 1.0 }
+    }
+    
     MouseArea {
         anchors.fill: parent
         z: 1
