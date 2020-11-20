@@ -201,7 +201,7 @@ QtVLCWidget::QtVLCWidget(QWidget *parent)
     };
     m_vlc = libvlc_new(sizeof(args) / sizeof(*args), args);
 
-    mVLC = new VLCVideo(this);
+    mVLC = std::make_unique<VLCVideo>(this);
 }
 
 bool QtVLCWidget::playMedia(const char* url)
@@ -223,7 +223,7 @@ bool QtVLCWidget::playMedia(const char* url)
         mVLC->isOpenGLES() ? libvlc_video_engine_gles2 : libvlc_video_engine_opengl,
         VLCVideo::setup, VLCVideo::cleanup, nullptr, VLCVideo::resizeRenderTextures, VLCVideo::swap,
         VLCVideo::make_current, VLCVideo::get_proc_address, nullptr, nullptr,
-        mVLC);
+        mVLC.get());
 
     // Play the video
     libvlc_media_player_play (m_mp);

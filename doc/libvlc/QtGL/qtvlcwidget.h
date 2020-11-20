@@ -35,7 +35,7 @@ private:
     QOpenGLVertexArrayObject m_vao;
     QOpenGLShaderProgram *m_program;
 
-    class VLCVideo  *mVLC;
+    std::unique_ptr<class VLCVideo> mVLC;
 
     void stop();
     struct libvlc_instance_t*  m_vlc = nullptr;
