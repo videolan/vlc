@@ -238,6 +238,7 @@
         <file alias="LocalTabBar.qml">widgets/qml/LocalTabBar.qml</file>
     </qresource>
     <qresource prefix="/network">
+        <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>
         <file alias="DiscoverDisplay.qml">network/qml/DiscoverDisplay.qml</file>
         <file alias="DiscoverUrlDisplay.qml">network/qml/DiscoverUrlDisplay.qml</file>
         <file alias="NetworkDisplay.qml">network/qml/NetworkDisplay.qml</file>
@@ -247,6 +248,7 @@
         <file alias="NetworkGridItem.qml">network/qml/NetworkGridItem.qml</file>
         <file alias="NetworkListItem.qml">network/qml/NetworkListItem.qml</file>
         <file alias="NetworkThumbnailItem.qml">network/qml/NetworkThumbnailItem.qml</file>
+        <file alias="NetworkAddressbar.qml">network/qml/NetworkAddressbar.qml</file>
         <file alias="ServicesHomeDisplay.qml">network/qml/ServicesHomeDisplay.qml</file>
     </qresource>
     <qresource prefix="/medialibrary">
