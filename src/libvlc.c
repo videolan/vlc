@@ -279,9 +279,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     libvlc_AddInterfaces(p_libvlc, "extraintf");
     libvlc_AddInterfaces(p_libvlc, "control");
 
-    if( var_InheritBool( p_libvlc, "network-synchronisation") )
-        libvlc_InternalAddIntf( p_libvlc, "netsync,none" );
-
 #ifdef __APPLE__
     var_Create( p_libvlc, "drawable-view-top", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-view-left", VLC_VAR_INTEGER );

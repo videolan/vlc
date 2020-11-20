@@ -64,6 +64,12 @@ static void Close(vlc_object_t *);
 #define NETSYNC_TIMEOUT_LONGTEXT N_("Length of time (in ms) " \
   "until aborting data reception.")
 
+static void AutoRun(libvlc_int_t *libvlc)
+{
+    if (var_InheritBool(libvlc, "network-synchronisation"))
+        intf_Create(libvlc, MODULE_STRING);
+}
+
 vlc_module_begin()
     set_shortname(N_("Network Sync"))
     set_description(N_("Network synchronization"))
@@ -79,6 +85,10 @@ vlc_module_begin()
 
     set_capability("interface", 0)
     set_callbacks(Open, Close)
+
+    add_submodule()
+    set_capability("autorun", 40)
+    set_callback(AutoRun)
 vlc_module_end()
 
 /*****************************************************************************
