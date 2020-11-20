@@ -41,18 +41,32 @@ Widgets.NavigableFocusScope {
         root.tree = undefined
     }
 
+    property Component localMenuDelegate
+
     function loadView() {
         var page = "";
         var props = undefined;
-        if (root.tree === undefined)
+        if (root.tree === undefined) {
             page ="qrc:///network/NetworkHomeDisplay.qml"
-        else {
+            root.localMenuDelegate = null
+        } else {
             page = "qrc:///network/NetworkBrowseDisplay.qml"
             props = { providerModel: mediaModel, contextMenu: mediaContextMenu, tree: root.tree }
+            root.localMenuDelegate = addressBar
         }
         view.replace(page, props)
         if (view.currentItem.model)
             root.contentModel = view.currentItem.model
+    }
+
+    Component {
+        id: addressBar
+
+        NetworkAddressbar {
+            path: mediaModel.path
+
+            onHomeButtonClicked: history.push(["mc", "network"])
+        }
     }
 
     NetworkMediaModel {
