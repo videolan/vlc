@@ -33,10 +33,13 @@ Control {
     property var _contentModel
     property var _menuModel
 
+    readonly property int maximumWidth: VLCStyle.bannerTabButton_width_large * 4
+    readonly property int minimumWidth: VLCStyle.bannerTabButton_width_large
+
     onPathChanged: createContentModel()
     onAvailableWidthChanged: createContentModel()
-    width: VLCStyle.bannerTabButton_width_large * 4
-    height: VLCStyle.dp(24, VLCStyle.scale)
+    implicitWidth: VLCStyle.bannerTabButton_width_large * 4
+    implicitHeight: VLCStyle.dp(24, VLCStyle.scale)
     focus: true
     onActiveFocusChanged: if (activeFocus)
                               contentItem.forceActiveFocus()
