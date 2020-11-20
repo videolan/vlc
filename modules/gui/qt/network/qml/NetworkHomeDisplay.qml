@@ -59,7 +59,6 @@ Widgets.NavigableFocusScope {
     ScrollView {
         id: flickable
         anchors.fill: parent
-        ScrollBar.vertical: ScrollBar{}
         focus: true
 
         Column {
