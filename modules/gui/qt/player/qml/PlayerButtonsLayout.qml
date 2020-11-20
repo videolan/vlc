@@ -85,7 +85,7 @@ RowLayout{
                 }
 
                 if (index > 0)
-                    buttonloader.item.KeyNavigation.left = buttonrow.children[index-1].item
+                    buttonloader.item.KeyNavigation.left = buttonrow.children[index].item
             }
         }
     }
