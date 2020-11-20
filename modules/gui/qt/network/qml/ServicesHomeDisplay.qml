@@ -32,6 +32,7 @@ Widgets.PageLoader {
 
     property var sortModel
     property var model
+    property Component localMenuDelegate: null
 
     defaultPage: "all"
     pageModel: [{
@@ -51,6 +52,7 @@ Widgets.PageLoader {
     onCurrentItemChanged: {
         sortModel = currentItem.sortModel
         model = currentItem.model
+        localMenuDelegate = !!currentItem.addressBar ? currentItem.addressBar : null
     }
 
     Component {
@@ -58,12 +60,20 @@ Widgets.PageLoader {
 
         NetworkBrowseDisplay {
             property alias source_name: deviceModel.source_name
+            property Component addressBar: NetworkAddressbar {
+                path: [{display: deviceModel.name, tree: {}}]
+
+                onHomeButtonClicked: history.push(["mc", "discover", "services"])
+
+                function changeTree(new_tree) {
+                }
+            }
 
             providerModel: deviceModel
             contextMenu: contextMenu
 
             function changeTree(new_tree) {
-                history.push(["mc", "discover", "services", "source_browse", { tree: new_tree }]);
+                history.push(["mc", "discover", "services", "source_browse", { tree: new_tree, "root_name": deviceModel.name, "source_name": source_name }]);
             }
 
             NetworkDeviceModel {
@@ -87,9 +97,26 @@ Widgets.PageLoader {
 
             providerModel: mediaModel
             contextMenu: contextMenu
+            property string root_name
+            property string source_name
+            property Component addressBar: NetworkAddressbar {
+                path: {
+                    var _path = mediaModel.path
+                    _path.unshift({display: root_name, tree: {"source_name": source_name, "isRoot": true}})
+                    return _path
+                }
+
+                onHomeButtonClicked: history.push(["mc", "discover", "services"])
+                function changeTree(new_tree) {
+                    if (!!new_tree.isRoot)
+                        history.push(["mc", "discover", "services", "source_root", { source_name: new_tree.source_name }])
+                    else
+                        history.push(["mc", "discover", "services", "source_browse", { tree: new_tree, "root": root_name }]);
+                }
+            }
 
             function changeTree(new_tree) {
-                history.push(["mc", "discover", "services", "source_browse", { tree: new_tree }]);
+                history.push(["mc", "discover", "services", "source_browse", { tree: new_tree, "root": root_name }]);
             }
 
             NetworkMediaModel {

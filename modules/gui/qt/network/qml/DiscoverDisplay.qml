@@ -49,6 +49,7 @@ Widgets.PageLoader {
     onCurrentItemChanged: {
         sortModel = currentItem.sortModel
         contentModel = currentItem.model
+        localMenuDelegate = !!currentItem.localMenuDelegate ? currentItem.localMenuDelegate : menuDelegate
     }
 
 
