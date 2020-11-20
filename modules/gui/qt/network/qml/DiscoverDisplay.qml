@@ -67,4 +67,17 @@ Widgets.PageLoader {
             })
         }
     }
+
+    property Component localMenuDelegate: menuDelegate
+
+    Component {
+        id: menuDelegate
+
+        Widgets.LocalTabBar {
+            currentView: root.view
+            model: tabModel
+
+            onClicked: root.loadIndex(index)
+        }
+    }
 }

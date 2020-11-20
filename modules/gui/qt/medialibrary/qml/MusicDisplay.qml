@@ -72,4 +72,11 @@ Widgets.PageLoader {
             })
         }
     }
+
+    property Component localMenuDelegate: Widgets.LocalTabBar {
+        currentView: root.view
+        model: tabModel
+
+        onClicked: root.loadIndex(index)
+    }
 }

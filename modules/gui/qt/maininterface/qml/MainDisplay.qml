@@ -56,10 +56,10 @@ Widgets.NavigableFocusScope {
             return miniPlayer.expanded ? miniPlayer : medialibId
         })
 
-        sourcesBanner.subTabModel = stackView.currentItem.tabModel
-        sourcesBanner.sortModel = stackView.currentItem.sortModel
-        sourcesBanner.contentModel = stackView.currentItem.contentModel
-        sourcesBanner.extraLocalActions = stackView.currentItem.extraLocalActions
+        sourcesBanner.localMenuDelegate = Qt.binding(function () { return !!stackView.currentItem.localMenuDelegate ? stackView.currentItem.localMenuDelegate : null })
+        sourcesBanner.sortModel = Qt.binding(function () { return stackView.currentItem.sortModel  })
+        sourcesBanner.contentModel = Qt.binding(function () { return stackView.currentItem.contentModel })
+        sourcesBanner.extraLocalActions = Qt.binding(function () { return stackView.currentItem.extraLocalActions })
         // Restore sourcesBanner state
         sourcesBanner.selectedIndex = pageModel.filter(function (e) {
             return e.listed;
@@ -169,18 +169,10 @@ Widgets.NavigableFocusScope {
                     model: root.tabModel
 
                     onItemClicked: {
-                        sourcesBanner.subTabModel = undefined
+                        sourcesBanner.localMenuDelegate = null
                         var name = root.tabModel.get(index).name
                         selectedIndex = index
                         history.push(["mc", name])
-                    }
-
-                    onSubItemClicked: {
-                        subSelectedIndex = index
-                        stackView.currentItem.loadIndex(index)
-                        sortModel = stackView.currentItem.sortModel
-                        contentModel = stackView.currentItem.contentModel
-                        extraLocalActions = stackView.currentItem.extraLocalActions
                     }
 
                     navigationParent: medialibId
