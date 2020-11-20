@@ -145,10 +145,6 @@ Widgets.NavigableFocusScope {
                 Keys.onPressed: defaultKeyAction(event, 0)
             }
 
-            Item {
-                Layout.fillWidth: true
-            }
-
             PlayerButtonsLayout {
                 id: buttons_right
 

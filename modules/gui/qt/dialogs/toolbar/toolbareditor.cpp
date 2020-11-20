@@ -80,11 +80,16 @@ ToolbarEditorDialog::ToolbarEditorDialog( QWidget *_w, intf_thread_t *_p_intf)
     /* Load defaults ones if we have no combos */
     if( i_size == 0 )
     {
+        profileCombo->addItem( qtr("Default Style"), PlayerControlBarModel::getSerializedDefaultStyle() );
         profileCombo->addItem( PROFILE_NAME_1, QString( VALUE_1 ) );
         profileCombo->addItem( PROFILE_NAME_2, QString( VALUE_2 ) );
         profileCombo->addItem( PROFILE_NAME_3, QString( VALUE_3 ) );
+        profileCombo->setCurrentIndex(0);
     }
-    profileCombo->setCurrentIndex( -1 );
+    else
+    {
+        profileCombo->setCurrentIndex( -1 );
+    }
 
     /* Drag and Drop */
     editorView = new QQuickWidget(this);
@@ -175,7 +180,8 @@ void ToolbarEditorDialog::changeProfile( int i )
 {
     QStringList qs_list = profileCombo->itemData( i ).toString().split( "|" );
     if( qs_list.count() < 2 )
-            return;
+        return;
+
     QStringList align_list_main = qs_list[0].split("#");
     QStringList align_list_mini = qs_list[1].split("#");
 
@@ -198,14 +204,4 @@ void ToolbarEditorDialog::changeProfile( int i )
         emit updatePlayerModel("MiniPlayerToolbar-right", align_list_mini[2]);
     else
         emit updatePlayerModel("MiniPlayerToolbar-right", "");
-}
-
-void ToolbarEditorDialog::deleteCursor()
-{
-    QApplication::setOverrideCursor(Qt::ForbiddenCursor);
-}
-
-void ToolbarEditorDialog::restoreCursor()
-{
-    QApplication::restoreOverrideCursor();
 }

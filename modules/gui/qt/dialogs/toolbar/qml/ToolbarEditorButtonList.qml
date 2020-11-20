@@ -36,7 +36,72 @@ GridView{
 
     highlightMoveDuration: 0 //ms
 
-    delegate:MouseArea{
+    property alias removeInfoRectVisible: removeInfoRect.visible
+
+    DropArea {
+        id: dropArea
+        anchors.fill: parent
+
+        z: 3
+
+        function isFromList() {
+            if (drag.source.objectName === "buttonsList")
+                return true
+            else
+                return false
+        }
+
+        onDropped: {
+            if (isFromList())
+                return
+
+            drag.source.dndView.model.remove(drag.source.DelegateModel.itemsIndex)
+        }
+    }
+
+    Rectangle {
+        id: removeInfoRect
+        anchors.fill: parent
+        z: 2
+
+        visible: false
+
+        opacity: 0.8
+        color: VLCStyle.colors.bg
+
+        border.color: VLCStyle.colors.menuCaption
+        border.width: VLCStyle.dp(2, VLCStyle.scale)
+
+        Text {
+            anchors.centerIn: parent
+
+            text: VLCIcons.del
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+
+            font.pointSize: VLCStyle.fontHeight_xxxlarge
+
+            font.family: VLCIcons.fontFamily
+            color: VLCStyle.colors.menuCaption
+        }
+
+        MouseArea {
+            anchors.fill: parent
+
+            cursorShape: visible ? Qt.DragMoveCursor : Qt.ArrowCursor
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        z: 1
+
+        visible: root._held
+
+        cursorShape: visible ? Qt.DragMoveCursor : Qt.ArrowCursor
+    }
+
+    delegate: MouseArea {
         id:dragArea
         objectName: "buttonsList"
         hoverEnabled: true
@@ -53,27 +118,21 @@ GridView{
             buttonDragItem.text = controlButtons.buttonL[model.index].label
             buttonDragItem.Drag.source = dragArea
             held = true
-            var pos = this.mapToGlobal( mouseX, mouseY)
-            buttonDragItem.updatePos(pos.x, pos.y)
-            playerBtnDND_left.addBtn = true
-            playerBtnDND_center.addBtn = true
-            playerBtnDND_right.addBtn = true
-            miniPlayerBtnDND_left.addBtn = true
-            miniPlayerBtnDND_center.addBtn = true
-            miniPlayerBtnDND_right.addBtn = true
+            root._held = true
         }
 
         onReleased: {
             drag.target.Drag.drop()
             buttonDragItem.visible = false
             held = false
-            playerBtnDND_left.addBtn = false
-            playerBtnDND_center.addBtn = false
-            playerBtnDND_right.addBtn = false
-            miniPlayerBtnDND_left.addBtn = false
-            miniPlayerBtnDND_center.addBtn = false
-            miniPlayerBtnDND_right.addBtn = false
+            root._held = false
         }
+
+        onPositionChanged: {
+            var pos = this.mapToGlobal(mouseX, mouseY)
+            buttonDragItem.updatePos(pos.x, pos.y)
+        }
+
         onEntered: allButtonsView.currentIndex = index
 
         ColumnLayout{

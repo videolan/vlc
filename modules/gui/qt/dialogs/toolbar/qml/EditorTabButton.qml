@@ -26,6 +26,8 @@ TabButton {
     property int index: 0
     property bool active: index == bar.currentIndex
 
+    implicitWidth: VLCStyle.button_width_large
+
     contentItem: Text {
         text: mainPlayerControl.text
         color: VLCStyle.colors.buttonText
@@ -34,9 +36,23 @@ TabButton {
     }
 
     background: Rectangle {
-        width: VLCStyle.button_width_large
-        height: VLCStyle.heightBar_normal
         color: active ? VLCStyle.colors.bgAlt : hovered ? VLCStyle.colors.bgHover : VLCStyle.colors.bg
-        radius: 2
+
+        border.color: VLCStyle.colors.accent
+        border.width: active ? VLCStyle.dp(1, VLCStyle.scale) : 0
+
+        Rectangle {
+            width: parent.width - parent.border.width * 2
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.bottom
+
+            anchors.topMargin: -(height / 2)
+
+            color: parent.color
+
+            visible: active
+
+            height: parent.border.width * 2
+        }
     }
 }

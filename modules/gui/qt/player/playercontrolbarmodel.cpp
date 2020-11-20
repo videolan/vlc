@@ -27,8 +27,7 @@ enum default_align {
     ALIGN_SIZE
 };
 
-static const QVector<PlayerControlBarModel::IconToolButton> MAIN_TB_DEFAULT[default_align::ALIGN_SIZE] =
-{
+static const QVector<PlayerControlBarModel::IconToolButton> MAIN_TB_DEFAULT[default_align::ALIGN_SIZE] = {
     {
         // left
         {PlayerControlBarModel::LANG_BUTTON},
@@ -49,8 +48,7 @@ static const QVector<PlayerControlBarModel::IconToolButton> MAIN_TB_DEFAULT[defa
     }
 };
 
-static const QVector<PlayerControlBarModel::IconToolButton> MINI_TB_DEFAULT[default_align::ALIGN_SIZE] =
-{
+static const QVector<PlayerControlBarModel::IconToolButton> MINI_TB_DEFAULT[default_align::ALIGN_SIZE] = {
     {
         // left
         {PlayerControlBarModel::ARTWORK_INFO}
@@ -260,6 +258,33 @@ void PlayerControlBarModel::setConfigName(QString name)
     if  (m_mainCtx)
         reloadModel();
     emit configNameChanged(name);
+}
+
+QString PlayerControlBarModel::getSerializedDefaultStyle()
+{
+    QString out;
+
+    auto serialize = [](auto style)
+    {
+          QString _out;
+          for (size_t i = 0; i < default_align::ALIGN_SIZE; i++)
+          {
+              for (const auto& it : style[i])
+              {
+                  _out += QString::number(it.id) + ";";
+              }
+              _out.chop(1);
+              _out += "#";
+          }
+          _out.chop(1);
+          return _out;
+    };
+
+    out += serialize(MAIN_TB_DEFAULT);
+    out += " | ";
+    out += serialize(MINI_TB_DEFAULT);
+
+    return out;
 }
 
 void PlayerControlBarModel::insert(int index, QVariantMap bdata)

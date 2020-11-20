@@ -32,11 +32,30 @@ MouseArea {
     property bool dropVisible: false
     property var dndView: null
     anchors.verticalCenter: parent.verticalCenter
-    cursorShape: dropVisible ? Qt.DragMoveCursor : Qt.OpenHandCursor
+    cursorShape: Qt.OpenHandCursor
     drag.target: held ? content : undefined
     width: buttonloader.width
     height: VLCStyle.icon_medium
     hoverEnabled: true
+
+    property alias containsDrag: dropArea.containsDrag
+
+    onHeldChanged: {
+        if (held) {
+            removeInfoRectVisible = true
+        }
+        else {
+            removeInfoRectVisible = false
+        }
+    }
+
+    Rectangle {
+        z: -1
+        anchors.fill: parent
+
+        visible: dragArea.containsMouse && !held
+        color: VLCStyle.colors.bgHover
+    }
 
     Rectangle {
         z: 1
@@ -45,27 +64,39 @@ MouseArea {
         anchors {
             left: parent.left
             verticalCenter: parent.verticalCenter
+            leftMargin: index === 0 ? 0 : -width
         }
         antialiasing: true
         visible: dropVisible
         color: VLCStyle.colors.accent
     }
-    onPressed: held = true
+
+    onPressed: {
+        held = true
+        root._held = true
+    }
+
     onEntered: playerBtnDND.currentIndex = index
 
-    onExited: {
-        if(containsPress)
-            dndView.deleteBtn = true
+    onWheel: {
+        playerBtnDND.wheelScroll(wheel.angleDelta.y)
     }
 
     onReleased: {
         drag.target.Drag.drop()
         held = false
-        if(dndView.deleteBtn){
-            dndView.deleteBtn = false
-            dndView.model.remove(
-                        dragArea.DelegateModel.itemsIndex)
-        }
+        root._held = false
+    }
+
+    onPositionChanged: {
+        var pos = this.mapToGlobal(mouseX, mouseY)
+        updatePos(pos.x, pos.y)
+    }
+
+    function updatePos(x, y) {
+        var pos = root.mapFromGlobal(x, y)
+        content.x = pos.x
+        content.y = pos.y
     }
 
     Rectangle {
@@ -76,6 +107,9 @@ MouseArea {
             horizontalCenter: parent.horizontalCenter
             verticalCenter: parent.verticalCenter
         }
+
+        opacity: held ? 0.75 : 1.0
+
         Loader{
             id: buttonloader
             anchors {
@@ -96,22 +130,42 @@ MouseArea {
                 anchors { horizontalCenter: undefined; verticalCenter: undefined }
             }
         }
+
+        onXChanged: {
+            root.handleScroll(this)
+        }
     }
+
     DropArea {
+        id: dropArea
         anchors.fill: parent
 
         onEntered: {
+            if ((drag.source === null ||
+                 (drag.source.dndView === playerBtnDND &&
+                  (parent.DelegateModel.itemsIndex === drag.source.DelegateModel.itemsIndex + 1))))
+                return
+
+            if (held)
+                return
+
             dropVisible = true
-            dndView.deleteBtn = false
         }
 
         onExited: {
+            if (held)
+                return
+
             dropVisible = false
-            if(!dndView.addBtn)
-                dndView.deleteBtn = true
         }
 
         onDropped: {
+            if (!dropVisible)
+                return
+
+            if (held)
+                return
+
             if (drag.source.dndView === playerBtnDND) {
                 // moving from same section
                 var srcIndex = drag.source.DelegateModel.itemsIndex
@@ -128,6 +182,7 @@ MouseArea {
             else {
                 // moving between sections
                 dndView.model.insert(parent.DelegateModel.itemsIndex, {"id" : drag.source.controlId})
+                drag.source.dndView.model.remove(drag.source.DelegateModel.itemsIndex)
             }
 
             dropVisible = false

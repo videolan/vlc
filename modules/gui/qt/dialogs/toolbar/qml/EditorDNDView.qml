@@ -25,25 +25,45 @@ import "qrc:///style/"
 
 ListView {
     id: playerBtnDND
-    spacing: VLCStyle.margin_xxsmall
+    spacing: VLCStyle.margin_xsmall
     orientation: Qt.Horizontal
     clip: true
-    property bool deleteBtn: false
-    property bool addBtn: false
-    onDeleteBtnChanged: {
-        if(deleteBtn)
-            toolbareditor.deleteCursor()
-        else
-            toolbareditor.restoreCursor()
+
+    property bool containsDrag: footerItem.dropVisible
+
+    property alias scrollBar: scrollBar
+
+    ScrollBar.horizontal: ScrollBar {
+        id: scrollBar
+        policy: playerBtnDND.contentWidth > playerBtnDND.width ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded
     }
 
-    ScrollBar.horizontal: ScrollBar {}
+    function wheelScroll(delta) {
+        if (delta > 0)
+            scrollBar.decrease()
+        else
+            scrollBar.increase()
+    }
 
-    footer: Item {
+    MouseArea {
+        anchors.fill: parent
+        z: 1
+
+        visible: root._held
+
+        cursorShape: visible ? Qt.DragMoveCursor : Qt.ArrowCursor
+    }
+
+    footer: MouseArea {
         height: VLCStyle.icon_medium
-        width: height
+        width: Math.max(height, playerBtnDND.width - x)
         anchors.verticalCenter: parent.verticalCenter
         property bool dropVisible: false
+
+        onWheel: {
+            wheelScroll(wheel.angleDelta.y)
+        }
+
         Rectangle {
             z: 2
             width: VLCStyle.dp(2, VLCStyle.scale)
@@ -59,16 +79,20 @@ ListView {
             anchors.fill: parent
 
             onEntered: {
+                if (drag.source.dndView === playerBtnDND && drag.source.DelegateModel.itemsIndex === playerBtnDND.count - 1)
+                    return
+
                 dropVisible = true
-                playerBtnDND.deleteBtn = false
             }
 
             onExited: {
                 dropVisible = false
-                playerBtnDND.deleteBtn = true
             }
 
             onDropped: {
+                if (!dropVisible)
+                    return
+
                 if (drag.source.dndView === playerBtnDND) {
                     // moving from same section
                     playerBtnDND.model.move(drag.source.DelegateModel.itemsIndex, playerBtnDND.count - 1)
@@ -80,22 +104,25 @@ ListView {
                 else {
                     // moving between sections
                     playerBtnDND.model.insert(playerBtnDND.count, {"id" : drag.source.controlId})
+                    drag.source.dndView.model.remove(drag.source.DelegateModel.itemsIndex)
                 }
 
                 dropVisible = false
             }
         }
-
     }
 
     delegate: EditorDNDDelegate {
         dndView: playerBtnDND
-    }
-    highlight: Rectangle{
-        anchors.verticalCenter: currentIndex > 0 ? parent.verticalCenter : undefined
-        color: VLCStyle.colors.bgHover
-    }
 
-    highlightMoveDuration: 0 //ms
-    highlightResizeDuration: 0 //ms
+        onContainsDragChanged: {
+            for(var child in playerBtnDND.contentItem.children) {
+                if (playerBtnDND.contentItem.children[child].containsDrag === true) {
+                    playerBtnDND.containsDrag = true
+                    return
+                }
+            }
+            playerBtnDND.containsDrag = Qt.binding(function() { return footerItem.dropVisible; } )
+        }
+    }
 }

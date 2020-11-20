@@ -103,6 +103,8 @@ public:
     inline QString getConfigName() { return configName; }
     void setConfigName(QString name);
 
+    static QString getSerializedDefaultStyle();
+
 signals:
     void ctxChanged(QmlMainContext*);
     void configNameChanged(QString);

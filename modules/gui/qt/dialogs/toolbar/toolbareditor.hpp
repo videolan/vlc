@@ -37,8 +37,6 @@ public:
 public slots:
     Q_INVOKABLE void close();
     Q_INVOKABLE void cancel();
-    Q_INVOKABLE void deleteCursor();
-    Q_INVOKABLE void restoreCursor();
 
 private slots:
     void newProfile();
