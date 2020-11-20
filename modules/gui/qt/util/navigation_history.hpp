@@ -11,7 +11,6 @@ class NavigationHistory : public QObject
 public:
     Q_PROPERTY(QVariant current READ getCurrent NOTIFY currentChanged)
     Q_PROPERTY(bool previousEmpty READ isPreviousEmpty NOTIFY previousEmptyChanged)
-    Q_PROPERTY(bool nextEmpty READ isNextEmpty NOTIFY nextEmptyChanged)
 
     enum class PostAction{
         Stay,
@@ -24,12 +23,10 @@ public:
 
     QVariant getCurrent();
     bool isPreviousEmpty();
-    bool isNextEmpty();
 
 signals:
     void currentChanged(QVariant current);
     void previousEmptyChanged(bool empty);
-    void nextEmptyChanged(bool empty);
 
 public slots:
     /**
@@ -84,12 +81,8 @@ public slots:
     // Go to previous page
     void previous( PostAction = PostAction::Go );
 
-    // Go to next page
-    void next( PostAction = PostAction::Go );
-
 private:
     QVariantList m_history;
-    int m_position;
 };
 
 #endif // NAVIGATION_HISTORY_HPP
