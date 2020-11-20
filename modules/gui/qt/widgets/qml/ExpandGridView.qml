@@ -75,6 +75,9 @@ NavigableFocusScope {
     property int headerHeight: headerItemLoader.implicitHeight
     property alias headerItem: headerItemLoader.item
 
+    property alias footerItem: footerItemLoader.item
+    property alias footerDelegate: footerItemLoader.sourceComponent
+
     //signals emitted when selected items is updated from keyboard
     signal selectionUpdated( int keyModifiers, int oldIndex,int newIndex )
     signal selectAll()
@@ -356,6 +359,21 @@ NavigableFocusScope {
             }
         }
 
+        Loader {
+            id: footerItemLoader
+            focus: item.focus
+            y: root.topMargin + root.headerHeight + (root._effectiveCellHeight * (Math.ceil(model.count / getNbItemsPerRow()))) +
+               _expandItemVerticalSpace
+        }
+
+        Connections {
+            target: footerItem
+            onHeightChanged: {
+                if (flickable.contentY + flickable.height > footerItemLoader.y + footerItemLoader.height)
+                    flickable.contentY = footerItemLoader.y + footerItemLoader.height - flickable.height
+                flickable.layout(false)
+            }
+        }
 
         Loader {
             id: expandItemLoader
@@ -444,6 +462,7 @@ NavigableFocusScope {
             // Calculate and set the contentHeight
             var newContentHeight = root.getItemPos(_count - 1)[1] + root._effectiveCellHeight + _expandItemVerticalSpace
             contentHeight = newContentHeight + root.bottomMargin // topMargin is included from root.getItemPos
+            contentHeight += footerItemLoader.item ? footerItemLoader.item.height : 0
             contentWidth = root._effectiveCellWidth * root.getNbItemsPerRow() - root.horizontalSpacing
 
             _updateSelected()
