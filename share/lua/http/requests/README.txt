@@ -116,12 +116,6 @@ status.xml or status.json
 > toggle fullscreen:
   ?command=fullscreen
 
-> enable services discovery module <val>:
-  ?command=pl_sd_add&val=<val>
-
-> disable services discovery module <val>:
-  ?command=pl_sd_remove&val=<val>
-
 > set volume level to <val> (can be absolute integer, percent or +/- relative value):
   ?command=volume&val=<val>
   Allowed values are of the form:
