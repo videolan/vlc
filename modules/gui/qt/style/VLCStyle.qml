@@ -124,7 +124,7 @@ Item {
 
     property int expandAlbumTracksHeight: dp(200, scale)
 
-    property int artworkInfoMaxWidth: dp(350, scale)
+    readonly property real artworkInfoTextWidth: (appWidth / 6)
 
     //combobox
     property int combobox_width_small: dp(64, scale)

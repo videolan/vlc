@@ -782,10 +782,8 @@ Item{
             id: artworkInfoItem
             property bool paintOnly: false
 
-            readonly property bool isClipped: implicitWidth < playingItemInfoRow.implicitWidth
-            implicitWidth: Math.min(playingItemInfoRow.implicitWidth, VLCStyle.artworkInfoMaxWidth)
+            implicitWidth: playingItemInfoRow.implicitWidth
             implicitHeight: playingItemInfoRow.implicitHeight
-            clip: isClipped
 
             Keys.onPressed: {
                 if (KeyHelper.matchOk(event) ) {
@@ -842,12 +840,15 @@ Item{
                 }
 
                 Column {
-                    id: rightPart
-
                     anchors.verticalCenter: parent.verticalCenter
                     leftPadding: VLCStyle.margin_xsmall
 
                     ToolTip {
+                        text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
+                        visible: (titleLabel.implicitWidth > titleLabel.width || artistLabel.implicitWidth > titleLabel.width)
+                                 && (artworkInfoMouseArea.containsMouse || artworkInfoItem.active)
+                        delay: 500 
+                         
                         contentItem: Text {
                                   text: i18n.qtr("%1\n%2").arg(titleLabel.text).arg(artistLabel.text)
                                   color: VLCStyle.colors.tooltipTextColor
@@ -856,74 +857,26 @@ Item{
                         background: Rectangle {
                             color: VLCStyle.colors.tooltipColor
                         }
-
-                        visible: artworkInfoItem.isClipped && (artworkInfoMouseArea.containsMouse || artworkInfoItem.active)
-                        delay: 500
                     }
 
-                    Item {
-                        id: titleLabelItem
-                        implicitWidth: titleLabel.width
-                        implicitHeight: titleLabel.height
-
-                        readonly property point realWidth: Qt.point(artworkInfoItem.width - playingItemInfoRow.mapFromItem(rightPart, titleLabelItem.x, titleLabelItem.y).x, 0)
-                        readonly property bool  isTextClipped: titleLabelItem.implicitWidth > realWidth.x
-
-                        Widgets.MenuLabel {
-                            id: titleLabel
-                            text: mainPlaylistController.currentItem.title
-
-                            visible: !titleLabelItem.isTextClipped
-                        }
-
-                        LinearGradient  {
-                            anchors.fill: titleLabel
-                            source: titleLabel
-                            start: Qt.point(0, 0)
-                            end: titleLabelItem.realWidth
-
-                            visible: titleLabelItem.isTextClipped
-
-                            gradient: Gradient {
-                                GradientStop { position: 0.75; color: titleLabel.color }
-                                GradientStop { position: 1.00; color: "transparent" }
-                            }
-                        }
+                    Widgets.MenuLabel {
+                        id: titleLabel
+                        width: implicitWidth < VLCStyle.artworkInfoTextWidth ? implicitWidth : VLCStyle.artworkInfoTextWidth
+                        text: mainPlaylistController.currentItem.title
+                        visible: text !== ""
                     }
 
-                    Item {
-                        id: artistLabelItem
-                        implicitWidth: artistLabel.width
-                        implicitHeight:  artistLabel.height
-
-                        readonly property point realWidth: Qt.point(artworkInfoItem.width - playingItemInfoRow.mapFromItem(rightPart, artistLabelItem.x, artistLabelItem.y).x, 0)
-                        readonly property bool  isTextClipped: artistLabelItem.implicitWidth > realWidth.x
-
-                        Widgets.MenuCaption {
-                            id: artistLabel
-                            text: mainPlaylistController.currentItem.artist
-
-                            visible: !artistLabelItem.isTextClipped
-                        }
-
-                        LinearGradient  {
-                            anchors.fill: artistLabel
-                            source: artistLabel
-                            start: Qt.point(0, 0)
-                            end: artistLabelItem.realWidth
-
-                            visible: artistLabelItem.isTextClipped
-
-                            gradient: Gradient {
-                                GradientStop { position: 0.75; color: titleLabel.color }
-                                GradientStop { position: 1.00; color: "transparent" }
-                            }
-                        }
+                    Widgets.MenuCaption {
+                        id: artistLabel
+                        width: implicitWidth < VLCStyle.artworkInfoTextWidth ? implicitWidth : VLCStyle.artworkInfoTextWidth
+                        text: mainPlaylistController.currentItem.artist
+                        visible: text !== ""
                     }
 
                     Widgets.MenuCaption {
                         id: progressIndicator
                         text: player.time.toString() + " / " + player.length.toString()
+                        visible: text !== ""
                     }
                 }
             }
