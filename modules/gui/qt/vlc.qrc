@@ -235,6 +235,7 @@
         <file alias="FrostedGlassEffect.qml">widgets/qml/FrostedGlassEffect.qml</file>
         <file alias="CheckedDelegate.qml">widgets/qml/CheckedDelegate.qml</file>
         <file alias="PageLoader.qml">widgets/qml/PageLoader.qml</file>
+        <file alias="LocalTabBar.qml">widgets/qml/LocalTabBar.qml</file>
     </qresource>
     <qresource prefix="/network">
         <file alias="DiscoverDisplay.qml">network/qml/DiscoverDisplay.qml</file>
