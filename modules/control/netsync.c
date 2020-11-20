@@ -51,6 +51,11 @@
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 
+#define NETSYNC_TEXT N_("Network synchronisation" )
+#define NETSYNC_LONGTEXT N_( "This allows you to remotely " \
+        "synchronise clocks for server and client. The detailed settings " \
+        "are available in Advanced / Network Sync." )
+
 #define NETSYNC_TEXT N_("Network master clock")
 #define NETSYNC_LONGTEXT N_("When set, " \
   "this VLC instance will act as the master clock for synchronization " \
@@ -76,6 +81,8 @@ vlc_module_begin()
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
 
+    add_bool("network-synchronisation", false, NETSYNC_TEXT, NETSYNC_LONGTEXT,
+             true)
     add_bool("netsync-master", false,
               NETSYNC_TEXT, NETSYNC_LONGTEXT, true)
     add_string("netsync-master-ip", NULL, MIP_TEXT, MIP_LONGTEXT,
