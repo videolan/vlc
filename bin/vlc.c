@@ -235,7 +235,6 @@ int main(int argc, const char *argv[])
     libvlc_set_app_id (vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
     libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
-    libvlc_add_intf (vlc, "hotkeys,none");
 #if !defined (__OS2__)
     libvlc_add_intf (vlc, "globalhotkeys,none");
 #endif

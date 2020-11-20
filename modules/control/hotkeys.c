@@ -1268,6 +1268,11 @@ Close(vlc_object_t *this)
     free(sys);
 }
 
+static void AutoRun(libvlc_int_t *libvlc)
+{
+    intf_Create(libvlc, MODULE_STRING);
+}
+
 vlc_module_begin ()
     set_shortname(N_("Hotkeys"))
     set_description(N_("Hotkeys management interface"))
@@ -1275,4 +1280,8 @@ vlc_module_begin ()
     set_callbacks(Open, Close)
     set_category(CAT_INTERFACE)
     set_subcategory(SUBCAT_INTERFACE_HOTKEYS)
+
+    add_submodule()
+    set_capability("autorun", 20)
+    set_callback(AutoRun)
 vlc_module_end ()
