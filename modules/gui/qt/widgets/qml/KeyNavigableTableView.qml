@@ -63,6 +63,9 @@ NavigableFocusScope {
     property alias tableHeaderItem: view.headerItem
     property color headerColor
 
+    property alias footerItem: view.footerItem
+    property alias footer: view.footer
+
     property var selectionDelegateModel
     property real rowHeight: VLCStyle.fontHeight_normal + VLCStyle.margin_large
     readonly property real availableRowWidth: width - ( VLCStyle.table_section_width * 2 )
