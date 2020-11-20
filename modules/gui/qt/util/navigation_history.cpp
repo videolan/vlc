@@ -1,5 +1,6 @@
 #include "navigation_history.hpp"
 #include <cassert>
+#include "network/networkmediamodel.hpp"
 
 NavigationHistory::NavigationHistory(QObject *parent)
     : QObject(parent)
@@ -44,6 +45,53 @@ static void pushListRec(QVariantMap& itemMap, QVariantList::const_iterator it, Q
     }
 }
 
+
+static bool isNodeValid(QVariant& value)
+{
+    if (value.canConvert(QVariant::StringList)
+        || value.canConvert(QVariant::StringList)
+        || value.canConvert(QVariant::String)
+        || value.canConvert(QVariant::UInt)
+        || value.canConvert(QVariant::Int)
+        || value.canConvert(QVariant::Bool)
+        )
+    {
+        return true;
+    }
+    else if ( value.canConvert(QVariant::List) )
+    {
+        QVariantList valueList = value.toList();
+        for (QVariant& v : valueList) {
+            if (!isNodeValid(v))
+                return false;
+        }
+        return true;
+    }
+    else if (value.canConvert<NetworkTreeItem>() )
+    {
+        NetworkTreeItem item = value.value<NetworkTreeItem>();
+        if ( ! item.isValid() )
+        {
+            return false;
+        }
+        return true;
+    }
+    else if ( value.canConvert(QVariant::Map) )
+    {
+        QVariantMap valueList = value.toMap();
+        for (QVariant& v : valueList.values()) {
+            if (!isNodeValid(v)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    assert(false);
+    return false;
+}
+
+
 void NavigationHistory::push(QVariantList itemList, NavigationHistory::PostAction postAction)
 {
     QVariantMap itemMap;
@@ -72,6 +120,11 @@ void NavigationHistory::previous(PostAction postAction)
         return;
 
     m_history.pop_back();
+    while (!isNodeValid(m_history.back())) {
+        m_history.pop_back();
+        if (m_history.count() == 1)
+            break;
+    }
 
     if (m_history.count() == 1)
         emit previousEmptyChanged(true);

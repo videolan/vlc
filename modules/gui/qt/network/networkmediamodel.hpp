@@ -65,6 +65,14 @@ public:
         return source.get() != nullptr;
     }
 
+    bool isValid() {
+        vlc_media_tree_Lock(source->tree);
+        input_item_node_t* node;
+        bool ret = vlc_media_tree_Find( source->tree, media.get(), &node, nullptr);
+        vlc_media_tree_Unlock(source->tree);
+        return ret;
+    }
+
     MediaSourcePtr source;
     InputItemPtr media;
 };
@@ -230,5 +238,7 @@ private:
     std::unique_ptr<NetworkSourceListener> m_listener;
     QVariantList m_path;
 };
+
+Q_DECLARE_METATYPE(NetworkTreeItem)
 
 #endif // MLNETWORKMEDIAMODEL_HPP
