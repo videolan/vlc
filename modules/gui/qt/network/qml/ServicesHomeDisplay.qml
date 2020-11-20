@@ -25,6 +25,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/" as Util
+import "qrc:///main/" as MainInterface
 import "qrc:///style/"
 
 Widgets.PageLoader {
@@ -145,6 +146,10 @@ Widgets.PageLoader {
             leftMargin: VLCStyle.margin_large
             rightMargin: VLCStyle.margin_large
             spacing: VLCStyle.margin_xsmall
+
+            footer: MainInterface.MiniPlayerBottomMargin {
+                width: servicesView.width
+            }
 
             delegate: Rectangle {
                 width: servicesView.width - VLCStyle.margin_large * 2
@@ -271,7 +276,7 @@ Widgets.PageLoader {
     Component {
         id: allSourcesComponent
 
-        Widgets.ExpandGridView {
+        MainInterface.MainGridView {
             id: gridView
 
             delegateModel: selectionModel

@@ -24,6 +24,7 @@ import org.videolan.medialib 0.1
 
 import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
+import "qrc:///main/" as MainInterface
 import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
@@ -92,7 +93,7 @@ Widgets.NavigableFocusScope {
     Component {
         id: gridComponent
 
-        Widgets.ExpandGridView {
+        MainInterface.MainGridView {
             id: videosGV
             property Item currentItem: Item{}
 

@@ -26,6 +26,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
+import "qrc:///main/" as MainInterface
 import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
@@ -94,7 +95,7 @@ Widgets.NavigableFocusScope {
     Component{
         id: gridComponent
 
-        Widgets.ExpandGridView {
+        MainInterface.MainGridView {
             id: gridView
 
             delegateModel: selectionModel
@@ -184,7 +185,7 @@ Widgets.NavigableFocusScope {
     Component{
         id: tableComponent
 
-        Widgets.KeyNavigableTableView {
+        MainInterface.MainTableView {
             id: tableView
 
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView.availableRowWidth)

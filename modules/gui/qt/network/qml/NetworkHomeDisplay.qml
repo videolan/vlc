@@ -23,6 +23,7 @@ import QtQml 2.11
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///main/" as MainInterface
 import "qrc:///util/" as Util
 import "qrc:///style/"
 
@@ -119,6 +120,10 @@ Widgets.NavigableFocusScope {
                     if (activeFocus)
                         _centerFlickableOnItem(lanLabel.y, lanSection.y + lanSection.height)
                 }
+            }
+
+            MainInterface.MiniPlayerBottomMargin {
+                width: flickable.width
             }
         }
 

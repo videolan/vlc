@@ -23,6 +23,7 @@ import org.videolan.medialib 0.1
 
 import "qrc:///util/" as Util
 import "qrc:///widgets/" as Widgets
+import "qrc:///main/" as MainInterface
 import "qrc:///style/"
 
 Widgets.NavigableFocusScope {
@@ -125,7 +126,7 @@ Widgets.NavigableFocusScope {
     /* Grid View */
     Component {
         id: gridComponent
-        Widgets.ExpandGridView {
+        MainInterface.MainGridView {
             id: gridView_id
 
             delegateModel: selectionModel
@@ -199,7 +200,7 @@ Widgets.NavigableFocusScope {
     Component {
         id: tableComponent
         /* Table View */
-        Widgets.KeyNavigableTableView {
+        MainInterface.MainTableView {
             id: tableView_id
 
             readonly property int _nameColSpan: Math.max(
