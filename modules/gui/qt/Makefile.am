@@ -615,6 +615,8 @@ libqt_plugin_la_QML = \
 	gui/qt/maininterface/qml/BannerSources.qml \
 	gui/qt/maininterface/qml/MainInterface.qml \
 	gui/qt/maininterface/qml/MainDisplay.qml \
+	gui/qt/maininterface/qml/MainGridView.qml \
+	gui/qt/maininterface/qml/MainTableView.qml \
 	gui/qt/maininterface/qml/MiniPlayerBottomMargin.qml \
 	gui/qt/maininterface/qml/NoMedialibHome.qml \
 	gui/qt/medialibrary/qml/ArtistTopBanner.qml \
