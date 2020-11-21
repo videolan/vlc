@@ -33,6 +33,7 @@
 #include <vlc/libvlc_events.h>
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 
 #include "libvlc_internal.h"
 #include "media_internal.h" // libvlc_media_new_from_input_item()
@@ -161,11 +162,10 @@ libvlc_media_list_t *libvlc_media_list_new(void)
     p_mlist->b_read_only = false;
 
     vlc_mutex_init( &p_mlist->object_lock );
-    vlc_mutex_init( &p_mlist->refcount_lock ); // FIXME: spinlock?
+    vlc_atomic_rc_init( &p_mlist->rc );
 
     vlc_array_init( &p_mlist->items );
     assert( p_mlist->items.i_count == 0 );
-    p_mlist->i_refcount = 1;
     p_mlist->p_md = NULL;
     p_mlist->p_internal_md = NULL;
 
@@ -179,14 +179,8 @@ libvlc_media_list_t *libvlc_media_list_new(void)
  **************************************************************************/
 void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
 {
-    vlc_mutex_lock( &p_mlist->refcount_lock );
-    p_mlist->i_refcount--;
-    if( p_mlist->i_refcount > 0 )
-    {
-        vlc_mutex_unlock( &p_mlist->refcount_lock );
-        return;
-    }
-    vlc_mutex_unlock( &p_mlist->refcount_lock );
+    if( !vlc_atomic_rc_dec( &p_mlist->rc ) )
+        return
 
     /* Refcount null, time to free */
 
@@ -211,9 +205,7 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
  **************************************************************************/
 void libvlc_media_list_retain( libvlc_media_list_t * p_mlist )
 {
-    vlc_mutex_lock( &p_mlist->refcount_lock );
-    p_mlist->i_refcount++;
-    vlc_mutex_unlock( &p_mlist->refcount_lock );
+    vlc_atomic_rc_inc( &p_mlist->rc );
 }
 
 /**************************************************************************

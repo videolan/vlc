@@ -36,9 +36,8 @@
 struct libvlc_media_list_t
 {
     libvlc_event_manager_t      event_manager;
-    int                         i_refcount;
     vlc_mutex_t                 object_lock;
-    vlc_mutex_t                 refcount_lock;
+    vlc_atomic_rc_t             rc;
     libvlc_media_t * p_md; /* The media from which the
                                        * mlist comes, if any. */
     libvlc_media_t * p_internal_md; /* media set from media.c */
