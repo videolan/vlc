@@ -729,7 +729,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
 
     vlc_player_Unlock(mp->player);
 
-    mp->i_refcount = 1;
+    vlc_atomic_rc_init(&mp->rc);
     libvlc_event_manager_init(&mp->event_manager, mp);
 
     /* Snapshot initialization */
@@ -824,15 +824,11 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
  **************************************************************************/
 void libvlc_media_player_release( libvlc_media_player_t *p_mi )
 {
-    bool destroy;
-
     assert( p_mi );
-    vlc_player_Lock(p_mi->player);
-    destroy = !--p_mi->i_refcount;
-    vlc_player_Unlock(p_mi->player);
+    if( !vlc_atomic_rc_dec( &p_mi->rc ) )
+        return;
 
-    if( destroy )
-        libvlc_media_player_destroy( p_mi );
+    libvlc_media_player_destroy( p_mi );
 }
 
 /**************************************************************************
@@ -843,10 +839,7 @@ void libvlc_media_player_release( libvlc_media_player_t *p_mi )
 void libvlc_media_player_retain( libvlc_media_player_t *p_mi )
 {
     assert( p_mi );
-
-    vlc_player_Lock(p_mi->player);
-    p_mi->i_refcount++;
-    vlc_player_Unlock(p_mi->player);
+    vlc_atomic_rc_inc( &p_mi->rc );
 }
 
 /**************************************************************************

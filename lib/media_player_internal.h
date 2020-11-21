@@ -40,8 +40,7 @@
 struct libvlc_media_player_t
 {
     struct vlc_object_t obj;
-
-    int                i_refcount;
+    vlc_atomic_rc_t    rc;
 
     vlc_player_t *player;
     vlc_player_listener_id *listener;
