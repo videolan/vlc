@@ -383,9 +383,13 @@ static void PlaylistAddCommon(intf_thread_t *intf, const char *const *args,
          */
         while (i < n_args && args[i][0] == ':')
         {
-            if (likely(item != NULL))
-                input_item_AddOption(item, args[i] + 1,
-                                     VLC_INPUT_OPTION_TRUSTED);
+            if (likely(item != NULL)
+             && input_item_AddOption(item, args[i] + 1,
+                                     VLC_INPUT_OPTION_TRUSTED))
+            {
+                input_item_Release(item);
+                item = NULL;
+            }
             i++;
         }
 
