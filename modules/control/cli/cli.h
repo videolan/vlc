@@ -56,7 +56,7 @@ void msg_print(intf_thread_t *p_intf, const char *psz_fmt, ...);
 struct cli_handler
 {
     const char *name;
-    void (*callback)(intf_thread_t *intf, const char *const *, size_t);
+    int (*callback)(intf_thread_t *intf, const char *const *, size_t);
 };
 
 void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,

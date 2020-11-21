@@ -146,7 +146,7 @@ void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,
 # include "../intromsg.h"
 #endif
 
-static void Help( intf_thread_t *p_intf, const char *const *args, size_t count)
+static int Help( intf_thread_t *p_intf, const char *const *args, size_t count)
 {
     msg_rc("%s", _("+----[ Remote control commands ]"));
     msg_rc(  "| ");
@@ -207,20 +207,22 @@ static void Help( intf_thread_t *p_intf, const char *const *args, size_t count)
     msg_rc(  "| ");
     msg_rc("%s", _("+----[ end of help ]"));
     (void) args; (void) count;
+    return 0;
 }
 
-static void Intf(intf_thread_t *intf, const char *const *args, size_t count)
+static int Intf(intf_thread_t *intf, const char *const *args, size_t count)
 {
-    intf_Create(vlc_object_instance(intf), count == 1 ? "" : args[1]);
+    return intf_Create(vlc_object_instance(intf), count == 1 ? "" : args[1]);
 }
 
-static void Quit(intf_thread_t *intf, const char *const *args, size_t count)
+static int Quit(intf_thread_t *intf, const char *const *args, size_t count)
 {
     libvlc_Quit(vlc_object_instance(intf));
     (void) args; (void) count;
+    return 0;
 }
 
-static void LogOut(intf_thread_t *intf, const char *const *args, size_t count)
+static int LogOut(intf_thread_t *intf, const char *const *args, size_t count)
 {
     intf_sys_t *sys = intf->p_sys;
 
@@ -255,14 +257,18 @@ static void LogOut(intf_thread_t *intf, const char *const *args, size_t count)
     }
 #endif
     (void) args; (void) count;
+    return 0;
 }
 
-static void KeyAction(intf_thread_t *intf, const char *const *args, size_t n)
+static int KeyAction(intf_thread_t *intf, const char *const *args, size_t n)
 {
     vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(intf));
 
-    if (n > 1)
-        var_SetInteger(vlc, "key-action", vlc_actions_get_id(args[1]));
+    if (n != 1)
+        return VLC_EGENERIC; /* EINVAL */
+
+    var_SetInteger(vlc, "key-action", vlc_actions_get_id(args[1]));
+    return 0;
 }
 
 static const struct cli_handler cmds[] =
@@ -280,21 +286,23 @@ static const struct cli_handler cmds[] =
     { "hotkey", KeyAction },
 };
 
-static void UnknownCmd(intf_thread_t *intf, const char *const *args,
+static int UnknownCmd(intf_thread_t *intf, const char *const *args,
                        size_t count)
 {
     msg_print(intf, _("Unknown command `%s'. Type `help' for help."), args[0]);
     (void) count;
+    return VLC_EGENERIC;
 }
 
-static void Process(intf_thread_t *intf, const char *line)
+static int Process(intf_thread_t *intf, const char *line)
 {
     intf_sys_t *sys = intf->p_sys;
     /* Skip heading spaces */
     const char *cmd = line + strspn(line, " ");
+    int ret;
 
     if (*cmd == '\0')
-        return; /* Ignore empty line */
+        return 0; /* Ignore empty line */
 
 #ifdef HAVE_WORDEXP
     wordexp_t we;
@@ -303,15 +311,24 @@ static void Process(intf_thread_t *intf, const char *line)
     if (val != 0)
     {
         if (val == WRDE_NOSPACE)
+        {
+            ret = VLC_ENOMEM;
 error:      wordfree(&we);
+        }
+        else
+            ret = VLC_EGENERIC;
+
         msg_print(intf, N_("parse error"));
-        return;
+        return ret;
     }
 
     size_t count = we.we_wordc;
     const char **args = vlc_alloc(count, sizeof (*args));
     if (unlikely(args == NULL))
+    {
+        ret = VLC_ENOMEM;
         goto error;
+    }
 
     for (size_t i = 0; i < we.we_wordc; i++)
         args[i] = we.we_wordv[i];
@@ -334,19 +351,20 @@ error:      wordfree(&we);
 
     if (count > 0)
     {
-        void (*cb)(intf_thread_t *, const char *const *, size_t) = UnknownCmd;
+        int (*cb)(intf_thread_t *, const char *const *, size_t) = UnknownCmd;
         const struct cli_handler **h = tfind(&args[0], &sys->commands, cmdcmp);
 
         if (h != NULL)
             cb = (*h)->callback;
 
-        cb(intf, args, count);
+        ret = cb(intf, args, count);
     }
 
 #ifdef HAVE_WORDEXP
     free(args);
     wordfree(&we);
 #endif
+    return ret;
 }
 
 #ifndef _WIN32
