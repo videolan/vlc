@@ -1,6 +1,12 @@
 Changes between 3.0.11.1 and 3.0.12:
 ----------------------------------
 
+Access:
+ * Add new RIST access module compliant with simple profile (VSF_TR-06-1)
+
+Access Output:
+ * Add new RIST access output module compliant with simple profile (VSF_TR-06-1)
+
 Demux:
  * Fixed adaptive's handling of resolution settings
 
