@@ -28,7 +28,6 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_input_item.h>
-#include <vlc_player.h>
 #include <vlc_playlist.h>
 #include <vlc_url.h>
 
@@ -251,60 +250,6 @@ static void PlaylistList(intf_thread_t *intf, const char *const *args,
     (void) args; (void) count;
 }
 
-static void PlaylistStatus(intf_thread_t *intf, const char *const *args,
-                           size_t count)
-{
-    vlc_playlist_t *playlist = intf->p_sys->playlist;
-    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
-
-    vlc_playlist_Lock(playlist);
-
-    input_item_t *item = vlc_player_GetCurrentMedia(player);
-    if (item != NULL)
-    {
-        char *uri = input_item_GetURI(item);
-        if (likely(uri != NULL))
-        {
-            msg_print(intf, STATUS_CHANGE "( new input: %s )", uri);
-            free(uri);
-        }
-    }
-
-    float volume = vlc_player_aout_GetVolume(player);
-    if (isgreaterequal(volume, 0.f))
-        msg_print(intf, STATUS_CHANGE "( audio volume: %ld )",
-                  lroundf(volume * 100.f));
-
-    enum vlc_player_state state = vlc_player_GetState(player);
-
-    vlc_playlist_Unlock(playlist);
-
-    int stnum = -1;
-    const char *stname = "unknown";
-
-    switch (state)
-    {
-        case VLC_PLAYER_STATE_STOPPING:
-        case VLC_PLAYER_STATE_STOPPED:
-            stnum = 5;
-            stname = "stop";
-            break;
-        case VLC_PLAYER_STATE_PLAYING:
-            stnum = 3;
-            stname = "play";
-            break;
-        case VLC_PLAYER_STATE_PAUSED:
-            stnum = 4;
-            stname = "pause";
-            break;
-        default:
-            break;
-    }
-
-    msg_print(intf, STATUS_CHANGE "( %s state: %u )", stname, stnum);
-    (void) args; (void) count;
-}
-
 static void PlaylistRepeatCommon(intf_thread_t *intf, const char *const *args,
                                  size_t count,
                                  enum vlc_playlist_playback_repeat on_mode)
@@ -524,7 +469,6 @@ static const struct cli_handler cmds[] =
     { "clear", PlaylistClear },
     { "prev", PlaylistPrev },
     { "next", PlaylistNext },
-    { "status", PlaylistStatus },
     { "add", PlaylistAdd },
     { "repeat", PlaylistRepeat },
     { "loop", PlaylistLoop },

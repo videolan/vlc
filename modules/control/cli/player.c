@@ -891,6 +891,60 @@ static void IsPlaying(intf_thread_t *intf, const char *const *args,
     (void) args; (void) count;
 }
 
+static void PlayerStatus(intf_thread_t *intf, const char *const *args,
+                         size_t count)
+{
+    vlc_playlist_t *playlist = intf->p_sys->playlist;
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+
+    vlc_playlist_Lock(playlist);
+
+    input_item_t *item = vlc_player_GetCurrentMedia(player);
+    if (item != NULL)
+    {
+        char *uri = input_item_GetURI(item);
+        if (likely(uri != NULL))
+        {
+            msg_print(intf, STATUS_CHANGE "( new input: %s )", uri);
+            free(uri);
+        }
+    }
+
+    float volume = vlc_player_aout_GetVolume(player);
+    if (isgreaterequal(volume, 0.f))
+        msg_print(intf, STATUS_CHANGE "( audio volume: %ld )",
+                  lroundf(volume * 100.f));
+
+    enum vlc_player_state state = vlc_player_GetState(player);
+
+    vlc_playlist_Unlock(playlist);
+
+    int stnum = -1;
+    const char *stname = "unknown";
+
+    switch (state)
+    {
+        case VLC_PLAYER_STATE_STOPPING:
+        case VLC_PLAYER_STATE_STOPPED:
+            stnum = 5;
+            stname = "stop";
+            break;
+        case VLC_PLAYER_STATE_PLAYING:
+            stnum = 3;
+            stname = "play";
+            break;
+        case VLC_PLAYER_STATE_PAUSED:
+            stnum = 4;
+            stname = "pause";
+            break;
+        default:
+            break;
+    }
+
+    msg_print(intf, STATUS_CHANGE "( %s state: %u )", stname, stnum);
+    (void) args; (void) count;
+}
+
 static const struct cli_handler cmds[] =
 {
     { "pause", PlayerPause },
@@ -912,6 +966,7 @@ static const struct cli_handler cmds[] =
     { "snapshot", PlayerVoutSnapshot },
 
     { "is_playing", IsPlaying },
+    { "status", PlayerStatus },
     { "stats", Statistics },
 
     /* DVD commands */
