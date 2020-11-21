@@ -217,6 +217,11 @@ vlc_module_begin ()
               RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "caching", MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY),
                  CACHING_TEXT, CACHING_LONGTEXT, true )
+    add_integer( "rtsp-timeout", 60, RTSP_TIMEOUT_TEXT,
+                 RTSP_TIMEOUT_LONGTEXT, true )
+    add_string( "sout-rtsp-user", "",
+                RTSP_USER_TEXT, RTSP_USER_LONGTEXT, true )
+    add_password("sout-rtsp-pwd", "", RTSP_PASS_TEXT, RTSP_PASS_LONGTEXT)
 
 #ifdef HAVE_SRTP
     add_string( SOUT_CFG_PREFIX "key", "",
