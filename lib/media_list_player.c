@@ -36,6 +36,9 @@
 #include <vlc/libvlc_events.h>
 #include <assert.h>
 
+#include <vlc_common.h>
+#include <vlc_atomic.h>
+
 #include "libvlc_internal.h"
 
 #include "media_internal.h" // Abuse, could and should be removed
@@ -58,7 +61,6 @@
 struct libvlc_media_list_player_t
 {
     libvlc_event_manager_t      event_manager;
-    int                         i_refcount;
     int                         seek_offset;
     bool                        dead;
     /* Protect access to this structure. */
@@ -73,6 +75,7 @@ struct libvlc_media_list_player_t
     libvlc_playback_mode_t      e_playback_mode;
 
     vlc_thread_t                thread;
+    vlc_atomic_rc_t             rc;
 };
 
 /*
@@ -473,7 +476,7 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance)
         return NULL;
     }
 
-    p_mlp->i_refcount = 1;
+    vlc_atomic_rc_init(&p_mlp->rc);
     p_mlp->seek_offset = 0;
     p_mlp->dead = false;
     vlc_mutex_init(&p_mlp->object_lock);
@@ -509,15 +512,8 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
     if (!p_mlp)
         return;
 
-    lock(p_mlp);
-    p_mlp->i_refcount--;
-    if (p_mlp->i_refcount > 0)
-    {
-        unlock(p_mlp);
+    if (!vlc_atomic_rc_dec(&p_mlp->rc))
         return;
-    }
-    assert(p_mlp->i_refcount == 0);
-    unlock(p_mlp);
 
     vlc_mutex_lock(&p_mlp->mp_callback_lock);
     p_mlp->dead = true;
@@ -552,9 +548,7 @@ void libvlc_media_list_player_retain(libvlc_media_list_player_t * p_mlp)
     if (!p_mlp)
         return;
 
-    lock(p_mlp);
-    p_mlp->i_refcount++;
-    unlock(p_mlp);
+    vlc_atomic_rc_inc(&p_mlp->rc);
 }
 
 /**************************************************************************
