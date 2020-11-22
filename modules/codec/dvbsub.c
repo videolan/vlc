@@ -1068,7 +1068,7 @@ static void decode_object( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length 
     dvbsub_region_t *p_region;
     int i_coding_method, i_id, i;
 
-    /* ETSI 300-743 paragraph 7.2.4
+    /* ETSI 300-743 v1.5.1 section 7.2.5 'Object data segment'
      * sync_byte, segment_type, page_id and i_segment_length have already been processed.
      */
     i_id             = bs_read( s, 16 );
