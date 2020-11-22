@@ -149,8 +149,7 @@ player_aout_on_volume_changed(audio_output_t *aout, float volume, void *data)
     struct player_cli *pc = data;
     intf_thread_t *p_intf = pc->intf;
 
-    msg_rc(STATUS_CHANGE "( audio volume: %ld )",
-            lroundf(volume * 100));
+    msg_rc(STATUS_CHANGE "( audio volume: %f )", volume);
 }
 
 static const struct vlc_player_aout_cbs player_aout_cbs =
@@ -622,11 +621,8 @@ static int Volume(intf_thread_t *intf, const char *const *args, size_t count)
         vlc_player_aout_SetVolume(player, volume);
     }
     else
-    {
-        /* Get. */
-        long int volume = lroundf(vlc_player_aout_GetVolume(player) * 100.f);
-        msg_print(intf, STATUS_CHANGE "( audio volume: %ld )", volume);
-    }
+        msg_print(intf, STATUS_CHANGE "( audio volume: %f )",
+                  vlc_player_aout_GetVolume(player));
     vlc_player_Unlock(player);
     return 0;
 }
