@@ -610,14 +610,28 @@ static int PlayerFullscreen(intf_thread_t *intf, const char *const *args,
 
 static int Volume(intf_thread_t *intf, const char *const *args, size_t count)
 {
-    const char *arg = count > 1 ? args[1] : "";
     vlc_player_t *player = vlc_playlist_GetPlayer(intf->p_sys->playlist);
 
     vlc_player_Lock(player);
-    if ( *arg )
+    if (count == 2)
     {
-        /* Set. */
-        float volume = atol(arg) / 100.f;
+        /* NOTE: For unfortunate hysterical raisins, integer value above 1 are
+         * interpreted in a scale of 256 parts. Floating point values are taken
+         * as ratio as usual in the VLC code.
+         * Yes, this sucks (hopefully nobody uses volume 1/256).
+         */
+        char *end;
+        unsigned long ul = strtoul(args[1], &end, 10);
+        float volume;
+
+        static_assert ((AOUT_VOLUME_DEFAULT & (AOUT_VOLUME_DEFAULT - 1)) == 0,
+                       "AOUT_VOLUME_DEFAULT must be a power of two.");
+
+        if (*end == '\0' && ul > 1 && ul <= AOUT_VOLUME_MAX)
+            volume = ldexpf(ul, -ctz(AOUT_VOLUME_DEFAULT));
+        else
+            volume = atof(args[1]);
+
         vlc_player_aout_SetVolume(player, volume);
     }
     else
