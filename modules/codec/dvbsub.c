@@ -1673,7 +1673,7 @@ typedef struct
     unsigned int i_region_ver;
     unsigned int i_clut_ver;
 
-    int i_regions;
+    unsigned int i_regions;
     encoder_region_t *p_regions;
 
     vlc_tick_t i_pts;
@@ -2060,7 +2060,8 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
     encoder_sys_t *p_sys = p_enc->p_sys;
     subpicture_region_t *p_region;
     bool b_mode_change = false;
-    int i_regions, i_timeout;
+    unsigned int i_regions;
+    int i_timeout;
 
     bs_write( s, 8, 0x0f ); /* Sync byte */
     bs_write( s, 8, DVBSUB_ST_PAGE_COMPOSITION ); /* Segment type */
@@ -2084,7 +2085,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
               (int)p_region->fmt.i_visible_width ) )
         {
             b_mode_change = true;
-            msg_Dbg( p_enc, "region %i width change: %i -> %i",
+            msg_Dbg( p_enc, "region %u width change: %i -> %i",
                      i_regions, p_sys->p_regions[i_regions].i_width,
                      p_region->fmt.i_visible_width );
             p_sys->p_regions[i_regions].i_width =
@@ -2094,7 +2095,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
              (int)p_region->fmt.i_visible_height )
         {
             b_mode_change = true;
-            msg_Dbg( p_enc, "region %i height change: %i -> %i",
+            msg_Dbg( p_enc, "region %u height change: %i -> %i",
                      i_regions, p_sys->p_regions[i_regions].i_height,
                      p_region->fmt.i_visible_height );
             p_sys->p_regions[i_regions].i_height =
