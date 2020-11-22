@@ -2037,6 +2037,12 @@ static void httpdLoop(httpd_host_t *host)
 
         cl = httpd_ClientNew(sk, now);
 
+        if (unlikely(cl == NULL))
+        {
+            vlc_tls_Close(sk);
+            continue;
+        }
+
         if (host->p_tls != NULL)
             cl->i_state = HTTPD_CLIENT_TLS_HS_OUT;
 
