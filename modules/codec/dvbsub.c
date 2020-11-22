@@ -1069,7 +1069,7 @@ static void decode_object( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length 
     int i_coding_method, i_id, i;
 
     /* ETSI 300-743 paragraph 7.2.4
-     * sync_byte, segment_type and page_id have already been processed.
+     * sync_byte, segment_type, page_id and i_segment_length have already been processed.
      */
     i_id             = bs_read( s, 16 );
     bs_skip( s, 4 ); /* version */
