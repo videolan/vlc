@@ -76,9 +76,19 @@ bool config_IsSafe( const char *name )
     return p_config != NULL && p_config->b_safe;
 }
 
-int64_t config_GetInt(const char *psz_name)
+static module_config_t * config_FindConfigChecked( const char *psz_name )
 {
     module_config_t *p_config = config_FindConfig( psz_name );
+#ifndef NDEBUG
+    if (p_config == NULL)
+        fprintf(stderr, "Unknown vlc configuration variable named %s\n", psz_name);
+#endif
+    return p_config;
+}
+
+int64_t config_GetInt(const char *psz_name)
+{
+    module_config_t *p_config = config_FindConfigChecked( psz_name );
 
     /* sanity checks */
     assert(p_config != NULL);
@@ -96,7 +106,7 @@ float config_GetFloat(const char *psz_name)
 {
     module_config_t *p_config;
 
-    p_config = config_FindConfig( psz_name );
+    p_config = config_FindConfigChecked( psz_name );
 
     /* sanity checks */
     assert(p_config != NULL);
@@ -112,14 +122,7 @@ float config_GetFloat(const char *psz_name)
 
 char *config_GetPsz(const char *psz_name)
 {
-    module_config_t *p_config;
-
-    p_config = config_FindConfig( psz_name );
-
-#ifndef NDEBUG
-    if (p_config == NULL)
-        fprintf(stderr, "Unknown vlc configuration variable named %s\n", psz_name);
-#endif
+    module_config_t *p_config = config_FindConfigChecked( psz_name );
 
     /* sanity checks */
     assert(p_config != NULL);
@@ -135,8 +138,7 @@ char *config_GetPsz(const char *psz_name)
 
 void config_PutPsz(const char *psz_name, const char *psz_value)
 {
-    module_config_t *p_config = config_FindConfig( psz_name );
-
+    module_config_t *p_config = config_FindConfigChecked( psz_name );
 
     /* sanity checks */
     assert(p_config != NULL);
@@ -159,7 +161,7 @@ void config_PutPsz(const char *psz_name, const char *psz_value)
 
 void config_PutInt(const char *psz_name, int64_t i_value )
 {
-    module_config_t *p_config = config_FindConfig( psz_name );
+    module_config_t *p_config = config_FindConfigChecked( psz_name );
 
     /* sanity checks */
     assert(p_config != NULL);
@@ -178,7 +180,7 @@ void config_PutInt(const char *psz_name, int64_t i_value )
 
 void config_PutFloat(const char *psz_name, float f_value)
 {
-    module_config_t *p_config = config_FindConfig( psz_name );
+    module_config_t *p_config = config_FindConfigChecked( psz_name );
 
     /* sanity checks */
     assert(p_config != NULL);
@@ -204,7 +206,7 @@ ssize_t config_GetIntChoices(const char *name,
     *values = NULL;
     *texts = NULL;
 
-    module_config_t *cfg = config_FindConfig(name);
+    module_config_t *cfg = config_FindConfigChecked(name);
     assert(cfg != NULL);
 
     size_t count = cfg->list_count;
