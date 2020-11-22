@@ -1201,21 +1201,6 @@ void httpd_MsgAdd(httpd_message_t *msg, const char *name, const char *psz_value,
     msg->i_headers++;
 }
 
-static void httpd_ClientInit(httpd_client_t *cl, vlc_tick_t now)
-{
-    cl->i_state = HTTPD_CLIENT_RECEIVING;
-    cl->i_activity_timeout = VLC_TICK_FROM_SEC(10);
-    cl->i_timeout_date = now + cl->i_activity_timeout;
-    cl->i_buffer_size = HTTPD_CL_BUFSIZE;
-    cl->i_buffer = 0;
-    cl->p_buffer = xmalloc(cl->i_buffer_size);
-    cl->i_keyframe_wait_to_pass = -1;
-    cl->b_stream_mode = false;
-
-    httpd_MsgInit(&cl->query);
-    httpd_MsgInit(&cl->answer);
-}
-
 char* httpd_ClientIP(const httpd_client_t *cl, char *ip, int *port)
 {
     return net_GetPeerAddress(vlc_tls_GetFD(cl->sock), ip, port) ? NULL : ip;
@@ -1245,8 +1230,17 @@ static httpd_client_t *httpd_ClientNew(vlc_tls_t *sock, vlc_tick_t now)
 
     cl->sock    = sock;
     cl->url     = NULL;
+    cl->i_state = HTTPD_CLIENT_RECEIVING;
+    cl->i_activity_timeout = VLC_TICK_FROM_SEC(10);
+    cl->i_timeout_date = now + cl->i_activity_timeout;
+    cl->i_buffer_size = HTTPD_CL_BUFSIZE;
+    cl->i_buffer = 0;
+    cl->p_buffer = xmalloc(cl->i_buffer_size);
+    cl->i_keyframe_wait_to_pass = -1;
+    cl->b_stream_mode = false;
 
-    httpd_ClientInit(cl, now);
+    httpd_MsgInit(&cl->query);
+    httpd_MsgInit(&cl->answer);
     return cl;
 }
 
