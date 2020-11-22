@@ -161,12 +161,10 @@ static void rootprocess (int fd)
         sock = socket (family, SOCK_STREAM, IPPROTO_TCP);
         if (sock != -1)
         {
-            const int val = 1;
-
-            setsockopt (sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof (val));
+            setsockopt (sock, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
 #ifdef AF_INET6
             if (addr.sa.sa_family == AF_INET6)
-                setsockopt (sock, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof (val));
+                setsockopt (sock, IPPROTO_IPV6, IPV6_V6ONLY, &(int){ 1 }, sizeof (int));
 #endif
             if (bind (sock, &addr.sa, len) == 0)
             {
