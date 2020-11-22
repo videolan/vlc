@@ -917,8 +917,8 @@ httpd_host_t *vlc_https_HostNew(vlc_object_t *obj)
 
 httpd_host_t *vlc_rtsp_HostNew(vlc_object_t *p_this)
 {
-    /* XXX: for QT I have to disable timeout. Try to find why */
-    return httpd_HostCreate(p_this, "rtsp-host", "rtsp-port", NULL, 0);
+    unsigned timeout = var_InheritInteger(p_this, "rtsp-timeout");
+    return httpd_HostCreate(p_this, "rtsp-host", "rtsp-port", NULL, timeout);
 }
 
 static struct httpd
