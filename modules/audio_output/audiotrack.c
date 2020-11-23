@@ -98,7 +98,7 @@ typedef struct
 
     /* Used by AudioTrack_getPlaybackHeadPosition */
     struct {
-        uint32_t i_wrap_count;
+        uint64_t i_wrap_count;
         uint32_t i_last;
     } headpos;
 
@@ -596,7 +596,7 @@ AudioTrack_getPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
     if( p_sys->headpos.i_last > i_pos )
         p_sys->headpos.i_wrap_count++;
     p_sys->headpos.i_last = i_pos;
-    return p_sys->headpos.i_last + ((uint64_t)p_sys->headpos.i_wrap_count << 32);
+    return p_sys->headpos.i_last + (p_sys->headpos.i_wrap_count << 32);
 }
 
 /**
