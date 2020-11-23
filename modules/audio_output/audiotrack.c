@@ -118,7 +118,6 @@ typedef struct
         vlc_tick_t p_us[SMOOTHPOS_SAMPLE_COUNT];
         vlc_tick_t i_us;
         vlc_tick_t i_last_time;
-        vlc_tick_t i_latency_us;
     } smoothpos;
 
     uint32_t i_max_audiotrack_samples;
@@ -211,6 +210,7 @@ static struct
         jmethodID writeShortV23;
         jmethodID writeBufferV21;
         jmethodID writeFloat;
+        jmethodID getLatency;
         jmethodID getPlaybackHeadPosition;
         jmethodID getTimestamp;
         jmethodID getMinBufferSize;
@@ -274,10 +274,6 @@ static struct
         bool has_ERROR_DEAD_OBJECT;
         jint STREAM_MUSIC;
     } AudioManager;
-    struct {
-        jclass clazz;
-        jmethodID getOutputLatency;
-    } AudioSystem;
     struct {
         jclass clazz;
         jmethodID ctor;
@@ -364,6 +360,10 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     } else
         GET_ID( GetMethodID, AudioTrack.write, "write", "([BII)I", true );
 
+#ifdef AUDIOTRACK_HW_LATENCY
+    GET_ID( GetMethodID, AudioTrack.getLatency, "getLatency", "()I", false );
+#endif
+
     GET_ID( GetMethodID, AudioTrack.getTimestamp,
             "getTimestamp", "(Landroid/media/AudioTimestamp;)Z", false );
     GET_ID( GetMethodID, AudioTrack.getPlaybackHeadPosition,
@@ -430,17 +430,6 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
         GET_ID( GetFieldID, AudioTimestamp.nanoTime,
                 "nanoTime", "J", true );
     }
-
-#ifdef AUDIOTRACK_HW_LATENCY
-    /* AudioSystem class init */
-    GET_CLASS( "android/media/AudioSystem", false );
-    if( clazz )
-    {
-        jfields.AudioSystem.clazz = (jclass) (*env)->NewGlobalRef( env, clazz );
-        GET_ID( GetStaticMethodID, AudioSystem.getOutputLatency,
-                "getOutputLatency", "(I)I", false );
-    }
-#endif
 
     /* AudioFormat class init */
     GET_CLASS( "android/media/AudioFormat", true );
@@ -639,7 +628,6 @@ AudioTrack_ResetPositions( JNIEnv *env, audio_output_t *p_aout )
     p_sys->smoothpos.i_idx = 0;
     p_sys->smoothpos.i_last_time = 0;
     p_sys->smoothpos.i_us = 0;
-    p_sys->smoothpos.i_latency_us = 0;
 }
 
 /**
@@ -653,6 +641,29 @@ AudioTrack_Reset( JNIEnv *env, audio_output_t *p_aout )
     AudioTrack_ResetPositions( env, p_aout );
     AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
     p_sys->i_samples_written = 0;
+}
+
+static vlc_tick_t
+AudioTrack_GetLatencyUs( JNIEnv *env, audio_output_t *p_aout )
+{
+    aout_sys_t *p_sys = p_aout->sys;
+
+    if( jfields.AudioTrack.getLatency )
+    {
+        int i_latency_ms = JNI_AT_CALL_INT( getLatency );
+
+        /* getLatency() includes the latency due to AudioTrack buffer size,
+         * AudioMixer (if any) and audio hardware driver. We only need the
+         * audio hardware latency */
+        if( i_latency_ms > 0 )
+        {
+            vlc_tick_t i_latency_us = VLC_TICK_FROM_MS( i_latency_ms )
+                - FRAMES_TO_US( p_sys->i_max_audiotrack_samples );
+            return i_latency_us >= 0 ? i_latency_us : 0;
+        }
+    }
+
+    return 0;
 }
 
 /**
@@ -688,19 +699,9 @@ AudioTrack_GetSmoothPositionUs( JNIEnv *env, audio_output_t *p_aout )
             p_sys->smoothpos.i_us += p_sys->smoothpos.p_us[i];
         p_sys->smoothpos.i_us /= p_sys->smoothpos.i_count;
 
-        if( jfields.AudioSystem.getOutputLatency )
-        {
-            int i_latency_ms = JNI_CALL( CallStaticIntMethod,
-                                         jfields.AudioSystem.clazz,
-                                         jfields.AudioSystem.getOutputLatency,
-                                         jfields.AudioManager.STREAM_MUSIC );
-
-            p_sys->smoothpos.i_latency_us = i_latency_ms > 0 ?
-                                            i_latency_ms * 1000L : 0;
-        }
     }
     if( p_sys->smoothpos.i_us != 0 )
-        return p_sys->smoothpos.i_us + i_now - p_sys->smoothpos.i_latency_us;
+        return p_sys->smoothpos.i_us + i_now - AudioTrack_GetLatencyUs( env, p_aout );
     else
         return 0;
 }
@@ -789,9 +790,10 @@ TimeGet( audio_output_t *p_aout, vlc_tick_t *restrict p_delay )
 {
     vlc_tick_t i_ts_us = AudioTrack_GetTimestampPositionUs( env, p_aout );
     vlc_tick_t i_smooth_us = AudioTrack_GetSmoothPositionUs(env, p_aout );
+    vlc_tick_t i_latency_us = AudioTrack_GetLatencyUs( env, p_aout );
 
     msg_Err( p_aout, "TimeGet: TimeStamp: %"PRId64", Smooth: %"PRId64" (latency: %"PRId64")",
-             i_ts_us, i_smooth_us, p_sys->smoothpos.i_latency_us );
+             i_ts_us, i_smooth_us, i_latency_us );
 }
 #endif
 
