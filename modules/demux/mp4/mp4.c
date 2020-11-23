@@ -2059,6 +2059,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             if( p_sys->i_attachments == -1 )
                 p_sys->i_attachments = MP4_GetAttachments( p_sys->p_root, &p_sys->pp_attachments );
+            if( !p_sys->i_attachments )
+                return VLC_EGENERIC;
             *ppp_attach = calloc( p_sys->i_attachments, sizeof(**ppp_attach ) );
             if( !*ppp_attach )
                 return VLC_ENOMEM;
