@@ -41,7 +41,6 @@ enum {
 };
 
 typedef struct aout_volume aout_volume_t;
-typedef struct aout_dev aout_dev_t;
 
 typedef struct
 {
@@ -54,7 +53,7 @@ typedef struct
     struct
     {
         vlc_mutex_t lock;
-        aout_dev_t *list;
+        struct vlc_list list;
         unsigned count;
     } dev;
 

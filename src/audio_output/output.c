@@ -35,12 +35,12 @@
 #include "libvlc.h"
 #include "aout_internal.h"
 
-struct aout_dev
+typedef struct aout_dev
 {
-    aout_dev_t *next;
+    struct vlc_list node;
     char *name;
     char id[1];
-};
+} aout_dev_t;
 
 
 /* Local functions */
@@ -102,14 +102,16 @@ static void aout_HotplugNotify (audio_output_t *aout,
                                 const char *id, const char *name)
 {
     aout_owner_t *owner = aout_owner (aout);
-    aout_dev_t *dev, **pp = &owner->dev.list;
+    aout_dev_t *dev = NULL, *p;
 
     vlc_mutex_lock (&owner->dev.lock);
-    while ((dev = *pp) != NULL)
+    vlc_list_foreach(p, &owner->dev.list, node)
     {
-        if (!strcmp (id, dev->id))
+        if (!strcmp (id, p->id))
+        {
+            dev = p;
             break;
-        pp = &dev->next;
+        }
     }
 
     if (name != NULL)
@@ -119,9 +121,8 @@ static void aout_HotplugNotify (audio_output_t *aout,
             dev = malloc (sizeof (*dev) + strlen (id));
             if (unlikely(dev == NULL))
                 goto out;
-            dev->next = NULL;
             strcpy (dev->id, id);
-            *pp = dev;
+            vlc_list_append(&dev->node, &owner->dev.list);
             owner->dev.count++;
         }
         else /* Modified device */
@@ -133,7 +134,7 @@ static void aout_HotplugNotify (audio_output_t *aout,
         if (dev != NULL) /* Removed device */
         {
             owner->dev.count--;
-            *pp = dev->next;
+            vlc_list_remove(&dev->node);
             free (dev->name);
             free (dev);
         }
@@ -222,6 +223,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     vlc_mutex_init (&owner->dev.lock);
     vlc_mutex_init (&owner->vp.lock);
     vlc_viewpoint_init (&owner->vp.value);
+    vlc_list_init(&owner->dev.list);
     atomic_init (&owner->vp.update, false);
     vlc_atomic_rc_init(&owner->rc);
     vlc_audio_meter_Init(&owner->meter, aout);
@@ -386,9 +388,10 @@ void aout_Release(audio_output_t *aout)
 
     atomic_thread_fence(memory_order_acquire);
 
-    for (aout_dev_t *dev = owner->dev.list, *next; dev != NULL; dev = next)
+    aout_dev_t *dev;
+    vlc_list_foreach(dev, &owner->dev.list, node)
     {
-        next = dev->next;
+        vlc_list_remove(&dev->node);
         free (dev->name);
         free (dev);
     }
@@ -766,7 +769,8 @@ int aout_DevicesList (audio_output_t *aout, char ***ids, char ***names)
     *ids = tabid;
     *names = tabname;
 
-    for (aout_dev_t *dev = owner->dev.list; dev != NULL; dev = dev->next)
+    aout_dev_t *dev;
+    vlc_list_foreach(dev, &owner->dev.list, node)
     {
         tabid[i] = strdup(dev->id);
         if (unlikely(tabid[i] == NULL))
