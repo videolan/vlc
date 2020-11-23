@@ -210,6 +210,7 @@ static struct
         jmethodID writeShortV23;
         jmethodID writeBufferV21;
         jmethodID writeFloat;
+        jmethodID getBufferSizeInFrames;
         jmethodID getLatency;
         jmethodID getPlaybackHeadPosition;
         jmethodID getTimestamp;
@@ -359,6 +360,9 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
 #endif
     } else
         GET_ID( GetMethodID, AudioTrack.write, "write", "([BII)I", true );
+
+    GET_ID( GetMethodID, AudioTrack.getBufferSizeInFrames,
+            "getBufferSizeInFrames", "()I", false );
 
 #ifdef AUDIOTRACK_HW_LATENCY
     GET_ID( GetMethodID, AudioTrack.getLatency, "getLatency", "()I", false );
@@ -1335,7 +1339,10 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     if( i_ret != 0 )
         return VLC_EGENERIC;
 
-    p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( p_sys->audiotrack_args.i_size );
+    if( jfields.AudioTrack.getBufferSizeInFrames )
+        p_sys->i_max_audiotrack_samples = JNI_AT_CALL_INT( getBufferSizeInFrames );
+    else
+        p_sys->i_max_audiotrack_samples = BYTES_TO_FRAMES( p_sys->audiotrack_args.i_size );
 
 #ifdef AUDIOTRACK_HW_LATENCY
     if( jfields.AudioTimestamp.clazz )
