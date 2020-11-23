@@ -106,7 +106,11 @@ typedef struct
     struct {
         jobject p_obj; /* AudioTimestamp ref */
         vlc_tick_t i_frame_us;
-        jlong i_frame_pos;
+
+        jlong i_frame_post_last;
+        uint64_t i_frame_wrap_count;
+        uint64_t i_frame_pos;
+
         vlc_tick_t i_play_time; /* time when play was called */
         vlc_tick_t i_last_time;
     } timestamp;
@@ -612,6 +616,9 @@ AudioTrack_ResetWrapCount( JNIEnv *env, audio_output_t *p_aout )
 
     p_sys->headpos.i_last = 0;
     p_sys->headpos.i_wrap_count = 0;
+
+    p_sys->timestamp.i_frame_post_last = 0;
+    p_sys->timestamp.i_frame_wrap_count = 0;
 }
 
 /**
@@ -748,7 +755,15 @@ AudioTrack_GetTimestampPositionUs( JNIEnv *env, audio_output_t *p_aout )
         if( JNI_AT_CALL_BOOL( getTimestamp, p_sys->timestamp.p_obj ) )
         {
             p_sys->timestamp.i_frame_us = VLC_TICK_FROM_NS(JNI_AUDIOTIMESTAMP_GET_LONG( nanoTime ));
-            p_sys->timestamp.i_frame_pos = JNI_AUDIOTIMESTAMP_GET_LONG( framePosition );
+
+            /* the low-order 32 bits of position is in wrapping frame units
+             * similar to AudioTrack#getPlaybackHeadPosition. */
+            jlong i_frame_post_last = JNI_AUDIOTIMESTAMP_GET_LONG( framePosition );
+            if( p_sys->timestamp.i_frame_post_last > i_frame_post_last )
+                p_sys->timestamp.i_frame_wrap_count++;
+            p_sys->timestamp.i_frame_post_last = i_frame_post_last;
+            p_sys->timestamp.i_frame_pos = i_frame_post_last
+                                         + (p_sys->timestamp.i_frame_wrap_count << 32);
         }
         else
         {
