@@ -79,7 +79,7 @@ private:
     unsigned int m_sampleRate;
 };
 
-class MLVideo : public QObject
+class MLVideo : public QObject, public MLItem
 {
     Q_OBJECT
 
@@ -101,7 +101,6 @@ class MLVideo : public QObject
 public:
     MLVideo(vlc_medialibrary_t *ml, const vlc_ml_media_t *data, QObject *parent = nullptr);
 
-    MLItemId getId() const;
     QString getTitle() const;
     QString getThumbnail();
     QString getDuration() const;
@@ -127,9 +126,7 @@ private:
     static void onMlEvent( void* data, const vlc_ml_event_t* event );
     void onMlEvent( const vlc_ml_event_t* event );
 
-
     vlc_medialibrary_t* m_ml;
-    MLItemId m_id;
     QString m_title;
     QString m_thumbnail;
     int64_t m_duration;

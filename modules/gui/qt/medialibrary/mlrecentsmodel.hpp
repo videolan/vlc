@@ -32,7 +32,7 @@
 #include <QObject>
 #include <QDateTime>
 
-class MLRecentMedia {
+class MLRecentMedia : public MLItem {
 public:
     MLRecentMedia( const vlc_ml_media_t *_data );
 
@@ -40,12 +40,10 @@ public:
 
     inline QUrl getUrl() const { return m_url; }
     inline QDateTime getLastPlayedDate() const { return m_lastPlayedDate; }
-    inline MLItemId getId() const { return m_id; }
 
     MLRecentMedia *clone() const;
 
 private:
-    MLItemId m_id;
     QUrl m_url;
     QDateTime m_lastPlayedDate;
 };

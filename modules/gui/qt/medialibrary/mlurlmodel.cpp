@@ -97,7 +97,7 @@ void MLUrlModel::onVlcMlEvent(const MLEvent &event)
 }
 
 MLUrl::MLUrl(const vlc_ml_media_t *_data)
-    : m_id( _data->i_id, VLC_ML_PARENT_UNKNOWN )
+    : MLItem( MLItemId( _data->i_id, VLC_ML_PARENT_UNKNOWN ) )
     , m_url( _data->p_files->i_nb_items > 0 ? _data->p_files->p_items[0].psz_mrl : "" )
     , m_lastPlayedDate(
           QDateTime::fromTime_t( _data->i_last_played_date ).toString( QLocale::system().dateFormat( QLocale::ShortFormat ) )
@@ -106,7 +106,7 @@ MLUrl::MLUrl(const vlc_ml_media_t *_data)
 }
 
 MLUrl::MLUrl(const MLUrl &url)
-    : m_id( url.m_id )
+    : MLItem( url.getId() )
     , m_url( url.m_url )
     , m_lastPlayedDate( url.m_lastPlayedDate )
 {

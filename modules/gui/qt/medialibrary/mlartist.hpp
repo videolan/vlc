@@ -34,7 +34,7 @@
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
 
-class MLArtist : public QObject
+class MLArtist : public QObject, public MLItem
 {
     Q_OBJECT
 
@@ -48,7 +48,6 @@ class MLArtist : public QObject
 public:
     MLArtist(const vlc_ml_artist_t *_data, QObject *_parent = nullptr);
 
-    MLItemId getId() const;
     QString getName() const;
     QString getShortBio() const;
     QString getCover() const;
@@ -64,7 +63,6 @@ public:
 private:
     MLArtist(const MLArtist &artist, QObject *_parent = nullptr);
 
-    MLItemId m_id;
     QString m_name;
     QString m_shortBio;
     QString m_cover;

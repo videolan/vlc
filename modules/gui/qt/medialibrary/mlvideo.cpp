@@ -76,8 +76,8 @@ unsigned int AudioDescription::getSampleRate() const
 
 MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* parent)
     : QObject( parent )
+    , MLItem( MLItemId( data->i_id, VLC_ML_PARENT_UNKNOWN ) )
     , m_ml( ml )
-    , m_id( data->i_id, VLC_ML_PARENT_UNKNOWN )
     , m_title( QString::fromUtf8( data->psz_title ) )
     , m_thumbnail( QString::fromUtf8( data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
     , m_progress( data->f_progress )
@@ -143,8 +143,8 @@ MLVideo::MLVideo(vlc_medialibrary_t* ml, const vlc_ml_media_t* data, QObject* pa
 
 MLVideo::MLVideo(const MLVideo& video, QObject* parent)
     : QObject( parent )
+    , MLItem( video.getId() )
     , m_ml( video.m_ml )
-    , m_id( video.m_id )
     , m_title( video.m_title )
     , m_thumbnail( video.m_thumbnail )
     , m_duration( video.m_duration )
@@ -165,7 +165,7 @@ void MLVideo::onMlEvent( const vlc_ml_event_t* event )
     if ( event->i_type != VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED ||
          event->media_thumbnail_generated.i_size != VLC_ML_THUMBNAIL_SMALL )
         return;
-    if ( event->media_thumbnail_generated.p_media->i_id != m_id.id )
+    if ( event->media_thumbnail_generated.p_media->i_id != getId().id )
         return;
     if ( event->media_thumbnail_generated.b_success == false )
     {
@@ -180,11 +180,6 @@ void MLVideo::onMlEvent( const vlc_ml_event_t* event )
     emit onThumbnailChanged( m_thumbnail );
 }
 
-MLItemId MLVideo::getId() const
-{
-    return m_id;
-}
-
 QString MLVideo::getTitle() const
 {
     return m_title;
@@ -196,7 +191,7 @@ QString MLVideo::getThumbnail()
          m_thumbnailStatus == VLC_ML_THUMBNAIL_STATUS_FAILURE )
     {
         m_ml_event_handle.reset( vlc_ml_event_register_callback( m_ml, onMlEvent, this ) );
-        vlc_ml_media_generate_thumbnail( m_ml, m_id.id, VLC_ML_THUMBNAIL_SMALL,
+        vlc_ml_media_generate_thumbnail( m_ml, getId().id, VLC_ML_THUMBNAIL_SMALL,
                                          512, 320, .15 );
     }
 

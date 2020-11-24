@@ -33,7 +33,7 @@
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
 
-class MLGenre : public QObject
+class MLGenre : public QObject, public MLItem
 {
     Q_OBJECT
 
@@ -46,7 +46,6 @@ public:
     MLGenre( vlc_medialibrary_t* _ml, const vlc_ml_genre_t *_data, QObject *_parent = nullptr);
     ~MLGenre();
 
-    MLItemId getId() const;
     QString getName() const;
     unsigned int getNbTracks() const;
     QString getCover() const;
@@ -68,7 +67,6 @@ private:
 
     vlc_medialibrary_t* m_ml;
 
-    MLItemId m_id;
     QString m_name;
     QString m_cover;
     QRunnable* m_coverTask = nullptr;

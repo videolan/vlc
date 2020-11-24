@@ -22,7 +22,7 @@
 
 MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data, QObject *_parent )
     : QObject( _parent )
-    , m_id         ( _data->i_id, VLC_ML_PARENT_UNKNOWN )
+    , MLItem       ( MLItemId( _data->i_id, VLC_ML_PARENT_UNKNOWN ) )
     , m_title      ( QString::fromUtf8( _data->psz_title ) )
     , m_trackNumber( _data->album_track.i_track_nb )
     , m_discNumber( _data->album_track.i_disc_nb )
@@ -84,7 +84,7 @@ MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data,
 
 MLAlbumTrack::MLAlbumTrack(const MLAlbumTrack &albumtrack, QObject *_parent)
     : QObject( _parent )
-    , m_id           ( albumtrack.m_id )
+    , MLItem         ( albumtrack.getId() )
     , m_title        ( albumtrack.m_title )
     , m_albumTitle   ( albumtrack.m_albumTitle )
     , m_artist       ( albumtrack.m_artist )
@@ -95,11 +95,6 @@ MLAlbumTrack::MLAlbumTrack(const MLAlbumTrack &albumtrack, QObject *_parent)
     , m_durationShort( albumtrack.m_durationShort )
     , m_mrl          ( albumtrack.m_mrl )
 {
-}
-
-MLItemId MLAlbumTrack::getId() const
-{
-    return m_id;
 }
 
 QString MLAlbumTrack::getTitle() const

@@ -62,4 +62,16 @@ public:
 
 Q_DECLARE_METATYPE(MLItemId)
 
+class MLItem
+{
+public:
+    MLItem(MLItemId id) : m_id(id) {}
+    virtual ~MLItem() = default;
+
+    MLItemId getId() const { return m_id; };
+
+private:
+    MLItemId m_id;
+};
+
 #endif // MLQMLTYPES_HPP

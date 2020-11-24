@@ -20,14 +20,14 @@
 #include <QDateTime>
 
 MLRecentMedia::MLRecentMedia( const vlc_ml_media_t *media )
-    : m_id (media->i_id, VLC_ML_PARENT_UNKNOWN)
+    : MLItem( MLItemId( media->i_id, VLC_ML_PARENT_UNKNOWN ) )
     , m_url ( media->p_files->i_nb_items > 0 ? media->p_files->p_items[0].psz_mrl : "" )
     , m_lastPlayedDate(QDateTime::fromTime_t( media->i_last_played_date ))
 {
 }
 
 MLRecentMedia::MLRecentMedia( const MLRecentMedia& media )
-    : m_id(media.m_id)
+    : MLItem(media.getId())
     , m_url(media.m_url)
     , m_lastPlayedDate(media.m_lastPlayedDate)
 {

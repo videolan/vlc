@@ -30,7 +30,7 @@
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
 
-class MLUrl {
+class MLUrl : public MLItem {
 public:
     MLUrl( const vlc_ml_media_t *_data );
 
@@ -38,12 +38,10 @@ public:
 
     QString getUrl() const;
     QString getLastPlayedDate() const;
-    MLItemId getId() const { return m_id; }
 
     MLUrl *clone() const;
 
 private:
-    MLItemId m_id;
     QString m_url;
     QString m_lastPlayedDate;
 };
