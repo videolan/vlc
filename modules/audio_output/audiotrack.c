@@ -113,7 +113,6 @@ typedef struct
         uint64_t i_frame_wrap_count;
         uint64_t i_frame_pos;
 
-        vlc_tick_t i_play_time; /* time when play was called */
         vlc_tick_t i_last_time;
     } timestamp;
 
@@ -640,7 +639,6 @@ AudioTrack_ResetPositions( JNIEnv *env, audio_output_t *p_aout )
     aout_sys_t *p_sys = p_aout->sys;
     VLC_UNUSED( env );
 
-    p_sys->timestamp.i_play_time = vlc_tick_now();
     p_sys->timestamp.i_last_time = 0;
     p_sys->timestamp.i_frame_us = 0;
     p_sys->timestamp.i_frame_pos = 0;
@@ -777,7 +775,6 @@ AudioTrack_GetTimestampPositionUs( JNIEnv *env, audio_output_t *p_aout )
              * frame time shouldn't be in the future
              * frame time should be less than 10 seconds old */
             if( p_sys->timestamp.i_frame_us != 0 && p_sys->timestamp.i_frame_pos != 0
-             && p_sys->timestamp.i_frame_us > p_sys->timestamp.i_play_time
              && i_now > p_sys->timestamp.i_frame_us
              && ( i_now - p_sys->timestamp.i_frame_us ) <= VLC_TICK_FROM_SEC(10) )
                 p_sys->timestamp.i_last_time = i_now;
