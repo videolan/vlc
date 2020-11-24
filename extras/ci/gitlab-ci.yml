@@ -50,7 +50,7 @@ variables:
 
 .variables-macos: &variables-macos
         VLC_PATH: /Users/videolanci/sandbox/bin
-        VLC_FORCE_KERNELVERSION: 18
+        VLC_FORCE_KERNELVERSION: 19
         HOST_ARCH: x86_64
         TRIPLET: $HOST_ARCH-apple-darwin$VLC_FORCE_KERNELVERSION
 
@@ -307,7 +307,8 @@ raspbian-arm:
 macos:
     extends: .base-template
     tags:
-        - macos
+        - amd64
+        - catalina
     script: |
         if [ "${CI_JOB_NAME:0:8}" = "nightly-" ]; then
             NIGHTLY_EXTRA_BUILD_FLAGS="-i n"
@@ -344,7 +345,8 @@ nightly-macos:
 .apple-os-common:
     extends: .base-template
     tags:
-        - macos
+        - amd64
+        - catalina
     script: |
         mkdir build && cd build
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
