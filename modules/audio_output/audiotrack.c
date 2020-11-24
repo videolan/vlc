@@ -1613,9 +1613,9 @@ Stop( audio_output_t *p_aout )
  * that we won't wait in AudioTrack.write() method.
  */
 static int
-AudioTrack_PlayByteArray( JNIEnv *env, audio_output_t *p_aout,
-                          size_t i_data_size, size_t i_data_offset,
-                          bool b_force )
+AudioTrack_WriteByteArray( JNIEnv *env, audio_output_t *p_aout,
+                           size_t i_data_size, size_t i_data_offset,
+                           bool b_force )
 {
     aout_sys_t *p_sys = p_aout->sys;
     uint64_t i_samples;
@@ -1657,8 +1657,8 @@ AudioTrack_PlayByteArray( JNIEnv *env, audio_output_t *p_aout,
  * flags.
  */
 static int
-AudioTrack_PlayByteArrayV23( JNIEnv *env, audio_output_t *p_aout,
-                             size_t i_data_size, size_t i_data_offset )
+AudioTrack_WriteByteArrayV23( JNIEnv *env, audio_output_t *p_aout,
+                              size_t i_data_size, size_t i_data_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -1673,8 +1673,8 @@ AudioTrack_PlayByteArrayV23( JNIEnv *env, audio_output_t *p_aout,
  * flags.
  */
 static int
-AudioTrack_PlayByteBuffer( JNIEnv *env, audio_output_t *p_aout,
-                           size_t i_data_size, size_t i_data_offset )
+AudioTrack_WriteByteBuffer( JNIEnv *env, audio_output_t *p_aout,
+                            size_t i_data_size, size_t i_data_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -1710,7 +1710,7 @@ AudioTrack_PlayByteBuffer( JNIEnv *env, audio_output_t *p_aout,
  * flags.
  */
 static int
-AudioTrack_PlayShortArrayV23( JNIEnv *env, audio_output_t *p_aout,
+AudioTrack_WriteShortArrayV23( JNIEnv *env, audio_output_t *p_aout,
                                size_t i_data_size, size_t i_data_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
@@ -1731,8 +1731,8 @@ AudioTrack_PlayShortArrayV23( JNIEnv *env, audio_output_t *p_aout,
  * flags.
  */
 static int
-AudioTrack_PlayFloatArray( JNIEnv *env, audio_output_t *p_aout,
-                           size_t i_data_size, size_t i_data_offset )
+AudioTrack_WriteFloatArray( JNIEnv *env, audio_output_t *p_aout,
+                            size_t i_data_size, size_t i_data_offset )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int i_ret;
@@ -1747,8 +1747,8 @@ AudioTrack_PlayFloatArray( JNIEnv *env, audio_output_t *p_aout,
 }
 
 static int
-AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout, size_t i_data_size,
-                 size_t i_data_offset, bool b_force )
+AudioTrack_Write( JNIEnv *env, audio_output_t *p_aout, size_t i_data_size,
+                  size_t i_data_offset, bool b_force )
 {
     aout_sys_t *p_sys = p_aout->sys;
     int i_ret;
@@ -1756,24 +1756,24 @@ AudioTrack_Play( JNIEnv *env, audio_output_t *p_aout, size_t i_data_size,
     switch( p_sys->i_write_type )
     {
     case WRITE_BYTEARRAYV23:
-        i_ret = AudioTrack_PlayByteArrayV23( env, p_aout, i_data_size,
-                                             i_data_offset );
-        break;
-    case WRITE_BYTEBUFFER:
-        i_ret = AudioTrack_PlayByteBuffer( env, p_aout, i_data_size,
-                                           i_data_offset );
-        break;
-    case WRITE_SHORTARRAYV23:
-        i_ret = AudioTrack_PlayShortArrayV23( env, p_aout, i_data_size,
+        i_ret = AudioTrack_WriteByteArrayV23( env, p_aout, i_data_size,
                                               i_data_offset );
         break;
+    case WRITE_BYTEBUFFER:
+        i_ret = AudioTrack_WriteByteBuffer( env, p_aout, i_data_size,
+                                            i_data_offset );
+        break;
+    case WRITE_SHORTARRAYV23:
+        i_ret = AudioTrack_WriteShortArrayV23( env, p_aout, i_data_size,
+                                               i_data_offset );
+        break;
     case WRITE_BYTEARRAY:
-        i_ret = AudioTrack_PlayByteArray( env, p_aout, i_data_size,
-                                          i_data_offset, b_force );
+        i_ret = AudioTrack_WriteByteArray( env, p_aout, i_data_size,
+                                           i_data_offset, b_force );
         break;
     case WRITE_FLOATARRAY:
-        i_ret = AudioTrack_PlayFloatArray( env, p_aout, i_data_size,
-                                           i_data_offset );
+        i_ret = AudioTrack_WriteFloatArray( env, p_aout, i_data_size,
+                                            i_data_offset );
         break;
     default:
         vlc_assert_unreachable();
@@ -1880,8 +1880,8 @@ AudioTrack_Thread( void *p_data )
         i_data_size = __MIN( p_sys->circular.i_size - i_data_offset,
                              p_sys->circular.i_write - p_sys->circular.i_read );
 
-        i_ret = AudioTrack_Play( env, p_aout, i_data_size, i_data_offset,
-                                 b_forced );
+        i_ret = AudioTrack_Write( env, p_aout, i_data_size, i_data_offset,
+                                  b_forced );
         if( i_ret >= 0 )
         {
             if( p_sys->i_write_type == WRITE_BYTEARRAY )
