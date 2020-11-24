@@ -988,9 +988,7 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
             BOOL mute;
 
             hr = ISimpleAudioVolume_GetMute(volume, &mute);
-            if (SUCCEEDED(hr))
-                aout_MuteReport(aout, mute != FALSE);
-            else
+            if (FAILED(hr))
                 msg_Err(aout, "cannot get mute (error 0x%lX)", hr);
 
             if (sys->requested_mute >= 0)
@@ -1002,6 +1000,9 @@ static HRESULT MMSession(audio_output_t *aout, IMMDeviceEnumerator *it)
                     msg_Err(aout, "cannot set mute (error 0x%lX)", hr);
             }
             sys->requested_mute = -1;
+
+            if (SUCCEEDED(hr))
+                aout_MuteReport(aout, mute != FALSE);
         }
 
         SleepConditionVariableCS(&sys->work, &sys->lock, INFINITE);
