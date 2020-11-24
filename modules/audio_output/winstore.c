@@ -566,7 +566,8 @@ static void Close(vlc_object_t *obj)
     assert(sys->refs == 0);
 
     free(sys->acquired_device);
-    free(sys->requested_device);
+    if (sys->requested_device != sys->default_device)
+        free(sys->requested_device);
     CoTaskMemFree(sys->default_device);
     DeleteCriticalSection(&sys->lock);
 
