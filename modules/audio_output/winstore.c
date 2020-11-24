@@ -62,6 +62,8 @@ typedef struct
     wchar_t* requested_device;
     wchar_t* default_device; // read once on open
 
+    float gain;
+
     // IActivateAudioInterfaceCompletionHandler interface
     IActivateAudioInterfaceCompletionHandler client_locator;
     vlc_sem_t async_completed;
@@ -279,17 +281,18 @@ static int VolumeSet(audio_output_t *aout, float vol)
         return VLC_EGENERIC;
     HRESULT hr;
     ISimpleAudioVolume *pc_AudioVolume = NULL;
-    float gain = 1.f;
 
-    vol = vol * vol * vol; /* ISimpleAudioVolume is tapered linearly. */
+    float linear_vol = vol * vol * vol; /* ISimpleAudioVolume is tapered linearly. */
 
-    if (vol > 1.f)
+    if (linear_vol > 1.f)
     {
-        gain = vol;
-        vol = 1.f;
+        sys->gain = linear_vol;
+        linear_vol = 1.f;
     }
+    else
+        sys->gain = 1.f;
 
-    aout_GainRequest(aout, gain);
+    aout_GainRequest(aout, sys->gain);
 
     hr = IAudioClient_GetService(sys->client, &IID_ISimpleAudioVolume, (void**)&pc_AudioVolume);
     if (FAILED(hr))
@@ -298,15 +301,18 @@ static int VolumeSet(audio_output_t *aout, float vol)
         goto done;
     }
 
-    hr = ISimpleAudioVolume_SetMasterVolume(pc_AudioVolume, vol, NULL);
+    hr = ISimpleAudioVolume_SetMasterVolume(pc_AudioVolume, linear_vol, NULL);
     if (FAILED(hr))
     {
         msg_Err(aout, "cannot set volume (error 0x%lX)", hr);
         goto done;
     }
 
+    aout_VolumeReport(aout, vol);
+
 done:
-    ISimpleAudioVolume_Release(pc_AudioVolume);
+    if (pc_AudioVolume)
+        ISimpleAudioVolume_Release(pc_AudioVolume);
 
     return SUCCEEDED(hr) ? 0 : -1;
 }
@@ -333,10 +339,20 @@ static int MuteSet(audio_output_t *aout, bool mute)
         goto done;
     }
 
+    float vol;
+    hr = ISimpleAudioVolume_GetMasterVolume(pc_AudioVolume, &vol);
+    if (FAILED(hr))
+    {
+        msg_Err(aout, "cannot get volume (error 0x%lX)", hr);
+        goto done;
+    }
+
+    aout_VolumeReport(aout, cbrtf(vol * sys->gain));
     aout_MuteReport(aout, mute);
 
 done:
-    ISimpleAudioVolume_Release(pc_AudioVolume);
+    if (pc_AudioVolume)
+        ISimpleAudioVolume_Release(pc_AudioVolume);
 
     return SUCCEEDED(hr) ? 0 : -1;
 }
@@ -543,6 +559,7 @@ static int Open(vlc_object_t *obj)
     sys->requested_device = sys->default_device;
     sys->acquired_device = NULL;
     sys->client_locator = (IActivateAudioInterfaceCompletionHandler) { &MMDeviceLocator_vtable };
+    sys->gain = 1.f;
 
     aout->sys = sys;
     sys->stream = NULL;
