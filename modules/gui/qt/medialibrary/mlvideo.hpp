@@ -83,7 +83,7 @@ class MLVideo : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(MLParentId id READ getId CONSTANT);
+    Q_PROPERTY(MLItemId id READ getId CONSTANT);
     Q_PROPERTY(QString title READ getTitle CONSTANT);
     Q_PROPERTY(QString thumbnail READ getThumbnail NOTIFY onThumbnailChanged);
     Q_PROPERTY(QString duration READ getDuration CONSTANT);
@@ -101,7 +101,7 @@ class MLVideo : public QObject
 public:
     MLVideo(vlc_medialibrary_t *ml, const vlc_ml_media_t *data, QObject *parent = nullptr);
 
-    MLParentId getId() const;
+    MLItemId getId() const;
     QString getTitle() const;
     QString getThumbnail();
     QString getDuration() const;
@@ -129,7 +129,7 @@ private:
 
 
     vlc_medialibrary_t* m_ml;
-    MLParentId m_id;
+    MLItemId m_id;
     QString m_title;
     QString m_thumbnail;
     int64_t m_duration;

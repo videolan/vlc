@@ -53,7 +53,7 @@ void MediaLib::addToPlaylist(const QUrl& mrl, const QStringList* options)
 }
 
 // A specific item has been asked to be added to the playlist
-void MediaLib::addToPlaylist(const MLParentId & itemId, const QStringList* options)
+void MediaLib::addToPlaylist(const MLItemId & itemId, const QStringList* options)
 {
     //invalid item
     if (itemId.id == 0)
@@ -99,9 +99,9 @@ void MediaLib::addToPlaylist(const QVariantList& itemIdList, const QStringList* 
             auto mrl = varValue.value<QString>();
             addToPlaylist(mrl, options);
         }
-        else if (varValue.canConvert<MLParentId>())
+        else if (varValue.canConvert<MLItemId>())
         {
-            MLParentId itemId = varValue.value<MLParentId>();
+            MLItemId itemId = varValue.value<MLItemId>();
             addToPlaylist(itemId, options);
         }
     }
@@ -109,7 +109,7 @@ void MediaLib::addToPlaylist(const QVariantList& itemIdList, const QStringList* 
 
 // A specific item has been asked to be played,
 // so it's added to the playlist and played
-void MediaLib::addAndPlay(const MLParentId & itemId, const QStringList* options )
+void MediaLib::addAndPlay(const MLItemId & itemId, const QStringList* options )
 {
     if (itemId.id == 0)
         return;
@@ -173,9 +173,9 @@ void MediaLib::addAndPlay(const QVariantList& itemIdList, const QStringList* opt
             else
                 addToPlaylist(mrl, options);
         }
-        else if (varValue.canConvert<MLParentId>())
+        else if (varValue.canConvert<MLItemId>())
         {
-            MLParentId itemId = varValue.value<MLParentId>();
+            MLItemId itemId = varValue.value<MLItemId>();
             if (b_start)
                 addAndPlay(itemId, options);
             else

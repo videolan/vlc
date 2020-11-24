@@ -35,7 +35,7 @@ class MLAlbum : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(MLParentId id READ getId CONSTANT)
+    Q_PROPERTY(MLItemId id READ getId CONSTANT)
     Q_PROPERTY(QString title READ getTitle CONSTANT)
     Q_PROPERTY(unsigned int releaseyear READ getReleaseYear CONSTANT)
     Q_PROPERTY(QString shortsummary READ getShortSummary CONSTANT)
@@ -48,7 +48,7 @@ class MLAlbum : public QObject
 public:
     MLAlbum(vlc_medialibrary_t* _ml, const vlc_ml_album_t *_data, QObject *_parent = nullptr);
 
-    MLParentId getId() const;
+    MLItemId getId() const;
     QString getTitle() const;
     unsigned int getReleaseYear() const;
     QString getShortSummary() const;
@@ -70,7 +70,7 @@ private:
 
     vlc_medialibrary_t* m_ml;
 
-    MLParentId m_id;
+    MLItemId m_id;
     QString m_title;
     unsigned int m_releaseYear;
     QString m_shortSummary;

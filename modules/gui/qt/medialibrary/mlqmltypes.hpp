@@ -27,13 +27,13 @@
 #include <vlc_common.h>
 #include <vlc_media_library.h>
 
-class MLParentId
+class MLItemId
 {
     Q_GADGET
 public:
-    MLParentId() : id(0), type( VLC_ML_PARENT_UNKNOWN ) {}
-    MLParentId( int64_t i, vlc_ml_parent_type t ) : id( i ), type( t ) {}
-    bool operator!=( const MLParentId& lhs )
+    MLItemId() : id(0), type( VLC_ML_PARENT_UNKNOWN ) {}
+    MLItemId( int64_t i, vlc_ml_parent_type t ) : id( i ), type( t ) {}
+    bool operator!=( const MLItemId& lhs )
     {
         return id != lhs.id || type != lhs.type;
     }
@@ -56,6 +56,6 @@ public:
     }
 };
 
-Q_DECLARE_METATYPE(MLParentId)
+Q_DECLARE_METATYPE(MLItemId)
 
 #endif // MLQMLTYPES_HPP

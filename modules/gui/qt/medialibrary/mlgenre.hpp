@@ -37,7 +37,7 @@ class MLGenre : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(MLParentId id READ getId CONSTANT)
+    Q_PROPERTY(MLItemId id READ getId CONSTANT)
     Q_PROPERTY(QString name READ getName CONSTANT)
     Q_PROPERTY(unsigned int nbtracks READ getNbTracks CONSTANT)
     Q_PROPERTY(QString cover READ getCover WRITE setCover NOTIFY coverChanged)
@@ -46,7 +46,7 @@ public:
     MLGenre( vlc_medialibrary_t* _ml, const vlc_ml_genre_t *_data, QObject *_parent = nullptr);
     ~MLGenre();
 
-    MLParentId getId() const;
+    MLItemId getId() const;
     QString getName() const;
     unsigned int getNbTracks() const;
     QString getCover() const;
@@ -68,7 +68,7 @@ private:
 
     vlc_medialibrary_t* m_ml;
 
-    MLParentId m_id;
+    MLItemId m_id;
     QString m_name;
     QString m_cover;
     QRunnable* m_coverTask = nullptr;

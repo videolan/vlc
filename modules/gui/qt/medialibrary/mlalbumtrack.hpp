@@ -35,7 +35,7 @@ class MLAlbumTrack : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(MLParentId id READ getId CONSTANT)
+    Q_PROPERTY(MLItemId id READ getId CONSTANT)
     Q_PROPERTY(QString title READ getTitle CONSTANT)
     Q_PROPERTY(QString album_title READ getAlbumTitle CONSTANT)
     Q_PROPERTY(QString main_artist READ getArtist CONSTANT)
@@ -49,7 +49,7 @@ class MLAlbumTrack : public QObject
 public:
     MLAlbumTrack(vlc_medialibrary_t *_ml, const vlc_ml_media_t *_data, QObject *_parent = nullptr);
 
-    MLParentId getId() const;
+    MLItemId getId() const;
     QString getTitle() const;
     QString getAlbumTitle() const;
     QString getArtist() const;
@@ -65,7 +65,7 @@ public:
 private:
     MLAlbumTrack(const MLAlbumTrack& albumtrack, QObject *_parent = nullptr);
 
-    MLParentId m_id;
+    MLItemId m_id;
     QString m_title;
     QString m_albumTitle;
     QString m_artist;

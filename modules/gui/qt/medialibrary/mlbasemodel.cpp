@@ -117,12 +117,12 @@ void MLBaseModel::onVlcMlEvent(void* data, const vlc_ml_event_t* event)
     });
 }
 
-MLParentId MLBaseModel::parentId() const
+MLItemId MLBaseModel::parentId() const
 {
     return m_parent;
 }
 
-void MLBaseModel::setParentId(MLParentId parentId)
+void MLBaseModel::setParentId(MLItemId parentId)
 {
     beginResetModel();
     m_parent = parentId;
@@ -134,7 +134,7 @@ void MLBaseModel::setParentId(MLParentId parentId)
 void MLBaseModel::unsetParentId()
 {
     beginResetModel();
-    m_parent = MLParentId();
+    m_parent = MLItemId();
     clear();
     endResetModel();
     emit parentIdChanged();

@@ -160,7 +160,7 @@ void MainUI::registerQMLTypes()
 
     if (m_mainInterface->hasMediaLibrary())
     {
-        qRegisterMetaType<MLParentId>();
+        qRegisterMetaType<MLItemId>();
         qmlRegisterType<MLAlbumModel>( "org.videolan.medialib", 0, 1, "MLAlbumModel" );
         qmlRegisterType<MLArtistModel>( "org.videolan.medialib", 0, 1, "MLArtistModel" );
         qmlRegisterType<MLAlbumTrackModel>( "org.videolan.medialib", 0, 1, "MLAlbumTrackModel" );

@@ -43,7 +43,7 @@ MLArtist::MLArtist(const MLArtist &artist, QObject *_parent)
 
 }
 
-MLParentId MLArtist::getId() const
+MLItemId MLArtist::getId() const
 {
     return m_id;
 }

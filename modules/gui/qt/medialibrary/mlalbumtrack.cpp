@@ -97,7 +97,7 @@ MLAlbumTrack::MLAlbumTrack(const MLAlbumTrack &albumtrack, QObject *_parent)
 {
 }
 
-MLParentId MLAlbumTrack::getId() const
+MLItemId MLAlbumTrack::getId() const
 {
     return m_id;
 }

@@ -38,12 +38,12 @@ public:
 
     QString getUrl() const;
     QString getLastPlayedDate() const;
-    MLParentId getId() const { return m_id; }
+    MLItemId getId() const { return m_id; }
 
     MLUrl *clone() const;
 
 private:
-    MLParentId m_id;
+    MLItemId m_id;
     QString m_url;
     QString m_lastPlayedDate;
 };

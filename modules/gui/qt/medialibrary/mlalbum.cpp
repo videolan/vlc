@@ -70,7 +70,7 @@ MLAlbum::MLAlbum(const MLAlbum& _album, QObject *_parent)
 {
 }
 
-MLParentId MLAlbum::getId() const
+MLItemId MLAlbum::getId() const
 {
     return m_id;
 }

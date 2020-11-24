@@ -38,7 +38,7 @@ class MLArtist : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(MLParentId id READ getId CONSTANT)
+    Q_PROPERTY(MLItemId id READ getId CONSTANT)
     Q_PROPERTY(QString name READ getName CONSTANT)
     Q_PROPERTY(QString shortbio READ getShortBio CONSTANT)
     Q_PROPERTY(QString cover READ getCover CONSTANT)
@@ -48,7 +48,7 @@ class MLArtist : public QObject
 public:
     MLArtist(const vlc_ml_artist_t *_data, QObject *_parent = nullptr);
 
-    MLParentId getId() const;
+    MLItemId getId() const;
     QString getName() const;
     QString getShortBio() const;
     QString getCover() const;
@@ -64,7 +64,7 @@ public:
 private:
     MLArtist(const MLArtist &artist, QObject *_parent = nullptr);
 
-    MLParentId m_id;
+    MLItemId m_id;
     QString m_name;
     QString m_shortBio;
     QString m_cover;

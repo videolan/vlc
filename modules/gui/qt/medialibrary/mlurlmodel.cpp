@@ -66,7 +66,7 @@ void MLUrlModel::addAndPlay( const QString &url )
         }
         if (!s)
             return;
-        MLParentId itemId( s->i_id, VLC_ML_PARENT_UNKNOWN );
+        MLItemId itemId( s->i_id, VLC_ML_PARENT_UNKNOWN );
         m_mediaLib->addAndPlay(itemId);
         emit resetRequested();
     });

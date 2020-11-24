@@ -180,7 +180,7 @@ void MLVideo::onMlEvent( const vlc_ml_event_t* event )
     emit onThumbnailChanged( m_thumbnail );
 }
 
-MLParentId MLVideo::getId() const
+MLItemId MLVideo::getId() const
 {
     return m_id;
 }

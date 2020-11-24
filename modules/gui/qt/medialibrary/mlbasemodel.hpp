@@ -47,7 +47,7 @@ public:
 
     Q_INVOKABLE void sortByColumn(QByteArray name, Qt::SortOrder order);
 
-    Q_PROPERTY( MLParentId parentId READ parentId WRITE setParentId NOTIFY parentIdChanged RESET unsetParentId )
+    Q_PROPERTY( MLItemId parentId READ parentId WRITE setParentId NOTIFY parentIdChanged RESET unsetParentId )
     Q_PROPERTY( MediaLib* ml READ ml WRITE setMl )
     Q_PROPERTY( QString searchPattern READ searchPattern WRITE setSearchPattern )
 
@@ -90,8 +90,8 @@ protected:
     }
 
 public:
-    MLParentId parentId() const;
-    void setParentId(MLParentId parentId);
+    MLItemId parentId() const;
+    void setParentId(MLItemId parentId);
     void unsetParentId();
 
     MediaLib* ml() const;
@@ -111,7 +111,7 @@ public:
 protected:
     virtual void onVlcMlEvent( const MLEvent &event );
 
-    MLParentId m_parent;
+    MLItemId m_parent;
 
     vlc_medialibrary_t* m_ml;
     MediaLib* m_mediaLib;
@@ -301,7 +301,7 @@ protected:
     /* Data loader for the cache */
     struct BaseLoader : public ListCacheLoader<std::unique_ptr<T>>
     {
-        BaseLoader(vlc_medialibrary_t *ml, MLParentId parent, QString searchPattern,
+        BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QString searchPattern,
                    vlc_ml_sorting_criteria_t sort, bool sort_desc)
             : m_ml(ml)
             , m_parent(parent)
@@ -323,7 +323,7 @@ protected:
 
     protected:
         vlc_medialibrary_t *m_ml;
-        MLParentId m_parent;
+        MLItemId m_parent;
         QString m_searchPattern;
         vlc_ml_sorting_criteria_t m_sort;
         bool m_sort_desc;

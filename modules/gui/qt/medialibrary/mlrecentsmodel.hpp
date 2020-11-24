@@ -40,12 +40,12 @@ public:
 
     inline QUrl getUrl() const { return m_url; }
     inline QDateTime getLastPlayedDate() const { return m_lastPlayedDate; }
-    inline MLParentId getId() const { return m_id; }
+    inline MLItemId getId() const { return m_id; }
 
     MLRecentMedia *clone() const;
 
 private:
-    MLParentId m_id;
+    MLItemId m_id;
     QUrl m_url;
     QDateTime m_lastPlayedDate;
 };

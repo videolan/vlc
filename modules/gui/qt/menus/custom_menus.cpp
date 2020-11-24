@@ -361,7 +361,7 @@ void RecentMenu::onRowInserted(const QModelIndex&, int first, int last)
         insertAction(m_separator , choiceAction);
         connect(choiceAction, &QAction::triggered, [this, i](){
             QModelIndex dataIndex = m_model->index(i);
-            MLParentId id = m_model->data(dataIndex, MLRecentsModel::RECENT_MEDIA_ID).value<MLParentId>();
+            MLItemId id = m_model->data(dataIndex, MLRecentsModel::RECENT_MEDIA_ID).value<MLItemId>();
             m_ml->addAndPlay(id);
         });
         setEnabled(true);

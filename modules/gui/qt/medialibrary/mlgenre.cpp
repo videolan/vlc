@@ -242,7 +242,7 @@ MLGenre::~MLGenre()
     }
 }
 
-MLParentId MLGenre::getId() const
+MLItemId MLGenre::getId() const
 {
     return m_id;
 }
