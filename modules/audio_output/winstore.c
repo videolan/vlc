@@ -558,6 +558,13 @@ static int Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
+    char *psz_default = FromWide(sys->default_device);
+    if (likely(psz_default != NULL))
+    {
+        aout_HotplugReport(aout, psz_default, _("Default"));
+        free(psz_default);
+    }
+
     InitializeCriticalSection(&sys->lock);
 
     vlc_sem_init(&sys->async_completed, 0);
