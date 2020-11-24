@@ -40,6 +40,8 @@
 
 #define AUDIOTIMESTAMP_INTERVAL_US VLC_TICK_FROM_MS(500) // 500ms
 
+#define AUDIOTRACK_MAX_BUFFER_US VLC_TICK_FROM_MS(750) // 750ms
+
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 static void Stop( audio_output_t * );
@@ -571,6 +573,14 @@ frames_to_bytes( aout_sys_t *p_sys, uint64_t i_frames )
 }
 #define FRAMES_TO_BYTES(x) frames_to_bytes( p_sys, (x) )
 
+static inline uint64_t
+us_to_frames( aout_sys_t *p_sys, vlc_tick_t i_us )
+{
+    return samples_from_vlc_tick( i_us, p_sys->fmt.i_rate );
+}
+#define US_TO_FRAMES(x) us_to_frames( p_sys, x)
+#define US_TO_BYTES(x) frames_to_bytes( p_sys, us_to_frames( p_sys, x ) )
+
 /**
  * Get the AudioTrack position
  *
@@ -1078,6 +1088,12 @@ AudioTrack_Create( JNIEnv *env, audio_output_t *p_aout,
         return -1;
     }
     i_size = i_min_buffer_size * 2;
+
+    /* Clip the buffer size to a maximum safe size since audiotrack init will
+     * fail of the requested size is too big. */
+    const int i_max_size = US_TO_BYTES( AUDIOTRACK_MAX_BUFFER_US );
+    if( i_size > i_max_size )
+        i_size = i_max_size;
 
     /* create AudioTrack object */
     if( AudioTrack_New( env, p_aout, i_rate, i_channel_config,
