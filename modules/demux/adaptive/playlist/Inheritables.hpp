@@ -21,9 +21,9 @@
 #define INHERITABLES_H
 
 #include "../tools/Properties.hpp"
-#include <string>
+#include <list>
+#include <limits>
 #include <stdint.h>
-#include "../ID.hpp"
 #include "../Time.hpp"
 
 namespace adaptive
@@ -46,16 +46,6 @@ namespace adaptive
 
             private:
                 Timescale timescale;
-        };
-
-        class Unique
-        {
-            public:
-                const ID & getID() const;
-                void       setID(const ID &);
-
-            protected:
-                ID id;
         };
     }
 }

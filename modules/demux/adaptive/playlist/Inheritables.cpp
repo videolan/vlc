@@ -65,13 +65,3 @@ const Timescale & TimescaleAble::getTimescale() const
 {
     return timescale;
 }
-
-const ID & Unique::getID() const
-{
-    return id;
-}
-
-void Unique::setID(const ID &id_)
-{
-    id = id_;
-}

@@ -37,6 +37,16 @@ namespace adaptive
         private:
             std::string id;
     };
+
+    class Unique
+    {
+        public:
+            const ID & getID() const;
+            void       setID(const ID &);
+
+        protected:
+            ID id;
+    };
 }
 
 #endif // ID_HPP
