@@ -333,6 +333,8 @@ static int MuteSet(audio_output_t *aout, bool mute)
         goto done;
     }
 
+    aout_MuteReport(aout, mute);
+
 done:
     ISimpleAudioVolume_Release(pc_AudioVolume);
 
