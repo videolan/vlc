@@ -1309,12 +1309,14 @@ static int Init( input_thread_t * p_input )
         }
     }
 
+#ifdef ENABLE_SOUT
     if( !priv->b_preparsing && priv->p_sout )
     {
         priv->b_out_pace_control = !sout_instance_ControlsPace(priv->p_sout);
         msg_Dbg( p_input, "starting in %ssync mode",
                  priv->b_out_pace_control ? "a" : "" );
     }
+#endif
 
     if (!input_item_IsPreparsed(input_priv(p_input)->p_item))
     {
