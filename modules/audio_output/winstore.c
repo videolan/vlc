@@ -431,6 +431,10 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     if (unlikely(s == NULL))
         return -1;
 
+    // Load the "out stream" for the requested device
+    EnterMTA();
+    EnterCriticalSection(&sys->lock);
+
     if (sys->requested_device != NULL)
     {
         if (sys->acquired_device == NULL || wcscmp(sys->acquired_device, sys->requested_device))
@@ -439,15 +443,13 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
             DeviceRestartLocked(aout);
             if (sys->client == NULL)
             {
+                LeaveCriticalSection(&sys->lock);
+                LeaveMTA();
                 vlc_object_delete(&s->obj);
                 return -1;
             }
         }
     }
-
-    // Load the "out stream" for the requested device
-    EnterMTA();
-    EnterCriticalSection(&sys->lock);
 
     s->owner.activate = ActivateDevice;
     for (;;)
