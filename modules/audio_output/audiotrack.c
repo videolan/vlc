@@ -148,8 +148,6 @@ typedef struct
     bool b_thread_running;  /* Set to false by aout to stop the thread */
     bool b_thread_paused;   /* If true, the thread won't process any data, see
                              * Pause() */
-    bool b_thread_waiting;  /* If true, the thread is waiting for enough spaces
-                             * in AudioTrack internal buffers */
 
     uint64_t i_samples_written; /* Number of samples written since last flush */
     bool b_audiotrack_exception; /* True if audiotrack threw an exception */
@@ -1835,15 +1833,11 @@ AudioTrack_Thread( void *p_data )
         /* Wait for free space in Audiotrack internal buffer */
         if( i_play_deadline != 0 && vlc_tick_now() < i_play_deadline )
         {
-            /* Don't wake up the thread when there is new data since we are
-             * waiting for more space */
-            p_sys->b_thread_waiting = true;
             while( p_sys->b_thread_running && i_ret == 0 )
                 i_ret = vlc_cond_timedwait( &p_sys->thread_cond,
                                             &p_sys->lock,
                                             i_play_deadline );
             i_play_deadline = 0;
-            p_sys->b_thread_waiting = false;
         }
 
         /* Wait for not paused state */
@@ -2039,8 +2033,7 @@ Play( audio_output_t *p_aout, block_t *p_buffer, vlc_tick_t i_date )
         i_buffer_offset += i_data_size;
         p_sys->circular.i_write += i_data_size;
 
-        if( !p_sys->b_thread_waiting )
-            vlc_cond_signal( &p_sys->thread_cond );
+        vlc_cond_signal( &p_sys->thread_cond );
     }
 
 bailout:
