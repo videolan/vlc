@@ -46,7 +46,7 @@ private:
     QString m_lastPlayedDate;
 };
 
-class MLUrlModel : public MLSlidingWindowModel<MLUrl>
+class MLUrlModel : public MLSlidingWindowModel
 {
     Q_OBJECT
 
@@ -68,7 +68,7 @@ public:
     Q_INVOKABLE void addAndPlay( const QString& url );
 
 protected:
-    ListCacheLoader<std::unique_ptr<MLUrl>> *createLoader() const override;
+    ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
 
 private:
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
@@ -78,7 +78,7 @@ private:
     {
         Loader(const MLUrlModel &model) : BaseLoader(model) {}
         size_t count() const override;
-        std::vector<std::unique_ptr<MLUrl>> load(size_t index, size_t count) const override;
+        std::vector<std::unique_ptr<MLItem>> load(size_t index, size_t count) const override;
     };
 };
 

@@ -28,7 +28,7 @@
 #include "mlalbum.hpp"
 #include "medialib.hpp"
 
-class MLAlbumModel : public MLSlidingWindowModel<MLAlbum>
+class MLAlbumModel : public MLSlidingWindowModel
 {
     Q_OBJECT
 
@@ -58,7 +58,7 @@ public:
     Q_INVOKABLE QHash<int, QByteArray> roleNames() const override;
 
 protected:
-    ListCacheLoader<std::unique_ptr<MLAlbum>> *createLoader() const override;
+    ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
 
 private:
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
@@ -73,7 +73,7 @@ private:
     {
         Loader(const MLAlbumModel &model) : BaseLoader(model) {}
         size_t count() const override;
-        std::vector<std::unique_ptr<MLAlbum>> load(size_t index, size_t count) const override;
+        std::vector<std::unique_ptr<MLItem>> load(size_t index, size_t count) const override;
     };
 };
 

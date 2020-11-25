@@ -27,7 +27,7 @@
 #include "mlbasemodel.hpp"
 #include "mlartist.hpp"
 
-class MLArtistModel : public MLSlidingWindowModel<MLArtist>
+class MLArtistModel : public MLSlidingWindowModel
 {
     Q_OBJECT
 public:
@@ -49,7 +49,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 protected:
-    ListCacheLoader<std::unique_ptr<MLArtist>> *createLoader() const override;
+    ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
 
 private:
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
@@ -64,7 +64,7 @@ private:
     {
         Loader(const MLArtistModel &model) : BaseLoader(model) {}
         size_t count() const override;
-        std::vector<std::unique_ptr<MLArtist>> load(size_t index, size_t count) const override;
+        std::vector<std::unique_ptr<MLItem>> load(size_t index, size_t count) const override;
     };
 };
 

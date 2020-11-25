@@ -37,13 +37,13 @@ enum Role {
 }
 
 MLRecentsVideoModel::MLRecentsVideoModel( QObject* parent )
-    : MLSlidingWindowModel<MLVideo>( parent )
+    : MLSlidingWindowModel( parent )
 {
 }
 
 QVariant MLRecentsVideoModel::data( const QModelIndex& index , int role ) const
 {
-    const auto video = item( index.row() );
+    const auto video = static_cast<MLVideo *>( item( index.row() ) );
     if ( video == nullptr )
         return {};
     switch ( role )
@@ -114,7 +114,7 @@ int MLRecentsVideoModel::getNumberOfItemsToShow(){
     return numberOfItemsToShow;
 }
 
-ListCacheLoader<std::unique_ptr<MLVideo>> *
+ListCacheLoader<std::unique_ptr<MLItem>> *
 MLRecentsVideoModel::createLoader() const
 {
     return new Loader(*this, numberOfItemsToShow);
@@ -136,7 +136,7 @@ size_t MLRecentsVideoModel::Loader::count() const
     return std::min(m_video_count, m_numberOfItemsToShow);
 }
 
-std::vector<std::unique_ptr<MLVideo>>
+std::vector<std::unique_ptr<MLItem>>
 MLRecentsVideoModel::Loader::load(size_t index, size_t count) const
 {
     MLQueryParams params = getParams(index, count);
@@ -146,7 +146,7 @@ MLRecentsVideoModel::Loader::load(size_t index, size_t count) const
                 m_ml, &queryParams ) };
     if ( media_list == nullptr )
         return {};
-    std::vector<std::unique_ptr<MLVideo>> res;
+    std::vector<std::unique_ptr<MLItem>> res;
     m_video_count = 0;
     for( vlc_ml_media_t &media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
         if( media.i_type == VLC_ML_MEDIA_TYPE_VIDEO )

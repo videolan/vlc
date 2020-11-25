@@ -29,7 +29,7 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumModel::M_names_to_criteria =
 };
 
 MLAlbumModel::MLAlbumModel(QObject *parent)
-    : MLSlidingWindowModel<MLAlbum>(parent)
+    : MLSlidingWindowModel(parent)
 {
 }
 
@@ -38,7 +38,7 @@ QVariant MLAlbumModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0)
         return QVariant();
 
-    const MLAlbum* ml_item = item(index.row());
+    const MLAlbum* ml_item = static_cast<MLAlbum *>(item(index.row()));
     if ( ml_item == NULL )
         return QVariant();
 
@@ -146,7 +146,7 @@ vlc_ml_sorting_criteria_t MLAlbumModel::roleToCriteria(int role) const
     }
 }
 
-ListCacheLoader<std::unique_ptr<MLAlbum>> *
+ListCacheLoader<std::unique_ptr<MLItem>> *
 MLAlbumModel::createLoader() const
 {
     return new Loader(*this);
@@ -162,7 +162,7 @@ size_t MLAlbumModel::Loader::count() const
     return vlc_ml_count_albums_of(m_ml, &queryParams, m_parent.type, m_parent.id);
 }
 
-std::vector<std::unique_ptr<MLAlbum>>
+std::vector<std::unique_ptr<MLItem>>
 MLAlbumModel::Loader::load(size_t index, size_t count) const
 {
     MLQueryParams params = getParams(index, count);
@@ -175,7 +175,7 @@ MLAlbumModel::Loader::load(size_t index, size_t count) const
         album_list.reset( vlc_ml_list_albums_of(m_ml, &queryParams, m_parent.type, m_parent.id ) );
     if ( album_list == nullptr )
         return {};
-    std::vector<std::unique_ptr<MLAlbum>> res;
+    std::vector<std::unique_ptr<MLItem>> res;
     for( const vlc_ml_album_t& album: ml_range_iterate<vlc_ml_album_t>( album_list ) )
         res.emplace_back( std::make_unique<MLAlbum>( m_ml, &album ) );
     return res;

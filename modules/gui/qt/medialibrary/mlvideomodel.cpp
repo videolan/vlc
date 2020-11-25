@@ -27,13 +27,13 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLVideoModel::M_names_to_criteria =
 };
 
 MLVideoModel::MLVideoModel(QObject* parent)
-    : MLSlidingWindowModel<MLVideo>(parent)
+    : MLSlidingWindowModel(parent)
 {
 }
 
 QVariant MLVideoModel::data(const QModelIndex& index, int role) const
 {
-    const auto video = item(index.row());
+    const auto video = static_cast<MLVideo *>(item(index.row()));
     if ( video == nullptr )
         return {};
     switch (role)
@@ -137,7 +137,7 @@ void MLVideoModel::thumbnailUpdated(int idx)
     emit dataChanged(index(idx), index(idx), {VIDEO_THUMBNAIL});
 }
 
-ListCacheLoader<std::unique_ptr<MLVideo>> *
+ListCacheLoader<std::unique_ptr<MLItem>> *
 MLVideoModel::createLoader() const
 {
     return new Loader(*this);
@@ -151,7 +151,7 @@ size_t MLVideoModel::Loader::count() const
     return vlc_ml_count_video_media(m_ml, &queryParams);
 }
 
-std::vector<std::unique_ptr<MLVideo>>
+std::vector<std::unique_ptr<MLItem>>
 MLVideoModel::Loader::load(size_t index, size_t count) const
 {
     MLQueryParams params = getParams(index, count);
@@ -161,7 +161,7 @@ MLVideoModel::Loader::load(size_t index, size_t count) const
                 m_ml, &queryParams ) };
     if ( media_list == nullptr )
         return {};
-    std::vector<std::unique_ptr<MLVideo>> res;
+    std::vector<std::unique_ptr<MLItem>> res;
     for( vlc_ml_media_t &media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
         res.emplace_back( std::make_unique<MLVideo>(m_ml, &media) );
     return res;

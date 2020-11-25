@@ -131,12 +131,11 @@ protected:
  * to be known (so the scrollbar would grow as we scroll, until we displayed all
  * elements), and implies having all elements loaded in RAM at all time.
  */
-template <typename T>
 class MLSlidingWindowModel : public MLBaseModel
 {
 public:
     static constexpr ssize_t COUNT_UNINITIALIZED =
-        ListCache<std::unique_ptr<T>>::COUNT_UNINITIALIZED;
+        ListCache<std::unique_ptr<MLItem>>::COUNT_UNINITIALIZED;
 
     MLSlidingWindowModel(QObject* parent = nullptr)
         : MLBaseModel(parent)
@@ -162,7 +161,7 @@ public:
 
     virtual QVariant getIdForIndex( QVariant index ) const override
     {
-        T* obj = nullptr;
+        MLItem* obj = nullptr;
         if (index.canConvert<int>())
             obj = item( index.toInt() );
         else if ( index.canConvert<QModelIndex>() )
@@ -179,7 +178,7 @@ public:
         QVariantList idList;
         idList.reserve(indexes.length());
         std::transform( indexes.begin(), indexes.end(),std::back_inserter(idList), [this](const QModelIndex& index) -> QVariant {
-            T* obj = item( index.row() );
+            MLItem* obj = item( index.row() );
             if (!obj)
                 return {};
             return QVariant::fromValue(obj->getId());
@@ -193,7 +192,7 @@ public:
 
         idList.reserve(indexes.length());
         std::transform( indexes.begin(), indexes.end(),std::back_inserter(idList), [this](const QVariant& index) -> QVariant {
-            T* obj = nullptr;
+            MLItem* obj = nullptr;
             if (index.canConvert<int>())
                 obj = item( index.toInt() );
             else if ( index.canConvert<QModelIndex>() )
@@ -214,7 +213,7 @@ public:
     }
 
 protected:
-    virtual ListCacheLoader<std::unique_ptr<T>> *createLoader() const = 0;
+    virtual ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const = 0;
 
     void validateCache() const
     {
@@ -223,13 +222,13 @@ protected:
 
         auto &threadPool = m_mediaLib->threadPool();
         auto loader = createLoader();
-        m_cache.reset(new ListCache<std::unique_ptr<T>>(threadPool, loader));
+        m_cache.reset(new ListCache<std::unique_ptr<MLItem>>(threadPool, loader));
         connect(&*m_cache, &BaseListCache::localSizeAboutToBeChanged,
-                this, &MLSlidingWindowModel<T>::onLocalSizeAboutToBeChanged);
+                this, &MLSlidingWindowModel::onLocalSizeAboutToBeChanged);
         connect(&*m_cache, &BaseListCache::localSizeChanged,
-                this, &MLSlidingWindowModel<T>::onLocalSizeChanged);
+                this, &MLSlidingWindowModel::onLocalSizeChanged);
         connect(&*m_cache, &BaseListCache::localDataChanged,
-                this, &MLSlidingWindowModel<T>::onLocalDataChanged);
+                this, &MLSlidingWindowModel::onLocalDataChanged);
 
         m_cache->initCount();
     }
@@ -239,7 +238,7 @@ protected:
         m_cache.reset();
     }
 
-    T* item(int signedidx) const
+    MLItem* item(int signedidx) const
     {
         validateCache();
 
@@ -251,7 +250,7 @@ protected:
         unsigned int idx = static_cast<unsigned int>(signedidx);
         m_cache->refer(idx);
 
-        const std::unique_ptr<T> *item = m_cache->get(idx);
+        const std::unique_ptr<MLItem> *item = m_cache->get(idx);
         if (!item)
             /* Not in cache */
             return nullptr;
@@ -277,12 +276,12 @@ protected:
                     size_t total = static_cast<size_t>(stotal);
                     for (size_t i = 0; i < total; ++i)
                     {
-                        const std::unique_ptr<T> *item = m_cache->get(i);
+                        const std::unique_ptr<MLItem> *item = m_cache->get(i);
                         if (!item)
                             /* Only consider items available locally in cache */
                             break;
 
-                        T *localItem = item->get();
+                        MLItem *localItem = item->get();
                         if (localItem->getId().id == event.media_thumbnail_generated.i_media_id)
                         {
                             thumbnailUpdated(i);
@@ -299,7 +298,7 @@ protected:
     }
 
     /* Data loader for the cache */
-    struct BaseLoader : public ListCacheLoader<std::unique_ptr<T>>
+    struct BaseLoader : public ListCacheLoader<std::unique_ptr<MLItem>>
     {
         BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QString searchPattern,
                    vlc_ml_sorting_criteria_t sort, bool sort_desc)
@@ -311,7 +310,7 @@ protected:
         {
         }
 
-        BaseLoader(const MLSlidingWindowModel<T> &model)
+        BaseLoader(const MLSlidingWindowModel &model)
             : BaseLoader(model.m_ml, model.m_parent, model.m_search_pattern, model.m_sort, model.m_sort_desc)
         {
         }
@@ -332,7 +331,7 @@ protected:
 private:
     virtual void thumbnailUpdated( int ) {}
 
-    mutable std::unique_ptr<ListCache<std::unique_ptr<T>>> m_cache;
+    mutable std::unique_ptr<ListCache<std::unique_ptr<MLItem>>> m_cache;
 };
 
 #endif // MLBASEMODEL_HPP

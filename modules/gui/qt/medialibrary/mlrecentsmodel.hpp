@@ -48,7 +48,7 @@ private:
     QDateTime m_lastPlayedDate;
 };
 
-class MLRecentsModel : public MLSlidingWindowModel<MLRecentMedia>
+class MLRecentsModel : public MLSlidingWindowModel
 {
     Q_OBJECT
     Q_PROPERTY(int numberOfItemsToShow READ getNumberOfItemsToShow WRITE setNumberOfItemsToShow)
@@ -74,7 +74,7 @@ public:
     int getNumberOfItemsToShow() const;
 
 protected:
-    ListCacheLoader<std::unique_ptr<MLRecentMedia>> *createLoader() const override;
+    ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
 
 private:
     vlc_ml_sorting_criteria_t roleToCriteria( int /* role */ ) const override{
@@ -94,7 +94,7 @@ private:
         }
 
         size_t count() const override;
-        std::vector<std::unique_ptr<MLRecentMedia>> load(size_t index, size_t count) const override;
+        std::vector<std::unique_ptr<MLItem>> load(size_t index, size_t count) const override;
 
     private:
         int m_numberOfItemsToShow;

@@ -39,7 +39,7 @@ MLRecentMedia* MLRecentMedia::clone() const {
 
 
 MLRecentsModel::MLRecentsModel( QObject* parent )
-    : MLSlidingWindowModel<MLRecentMedia>( parent )
+    : MLSlidingWindowModel( parent )
 {
 }
 
@@ -48,7 +48,7 @@ QVariant MLRecentsModel::data( const QModelIndex& index , int role ) const
     if (!index.isValid() || index.row() < 0)
         return QVariant();
 
-    const MLRecentMedia* media = item(index.row());
+    const MLRecentMedia* media = static_cast<MLRecentMedia *>(item(index.row()));
     if ( !media )
         return QVariant();
 
@@ -101,7 +101,7 @@ int MLRecentsModel::getNumberOfItemsToShow() const {
     return m_numberOfItemsToShow;
 }
 
-ListCacheLoader<std::unique_ptr<MLRecentMedia>> *
+ListCacheLoader<std::unique_ptr<MLItem>> *
 MLRecentsModel::createLoader() const
 {
     return new Loader(*this, m_numberOfItemsToShow);
@@ -118,13 +118,13 @@ size_t MLRecentsModel::Loader::count() const
     return realCount;
 }
 
-std::vector<std::unique_ptr<MLRecentMedia>>
+std::vector<std::unique_ptr<MLItem>>
 MLRecentsModel::Loader::load(size_t index, size_t count) const
 {
     MLQueryParams params = getParams(index, count);
     auto queryParams = params.toCQueryParams();
 
-    std::vector<std::unique_ptr<MLRecentMedia>> res;
+    std::vector<std::unique_ptr<MLItem>> res;
     if (m_numberOfItemsToShow >= 0)
     {
         if (queryParams.i_offset <= static_cast<uint32_t>(m_numberOfItemsToShow))

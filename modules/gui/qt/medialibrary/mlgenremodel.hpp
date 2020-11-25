@@ -28,7 +28,7 @@
 #include "mlbasemodel.hpp"
 #include "mlgenre.hpp"
 
-class MLGenreModel : public MLSlidingWindowModel<MLGenre>
+class MLGenreModel : public MLSlidingWindowModel
 {
     Q_OBJECT
 
@@ -52,7 +52,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
 
 protected:
-    ListCacheLoader<std::unique_ptr<MLGenre>> *createLoader() const override;
+    ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
 
 private:
     void onVlcMlEvent(const MLEvent &event) override;
@@ -67,7 +67,7 @@ private:
     {
         Loader(const MLGenreModel &model) : BaseLoader(model) {}
         size_t count() const override;
-        std::vector<std::unique_ptr<MLGenre>> load(size_t index, size_t count) const override;
+        std::vector<std::unique_ptr<MLItem>> load(size_t index, size_t count) const override;
     };
 };
 

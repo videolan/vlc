@@ -26,7 +26,7 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLGenreModel::M_names_to_criteria =
 };
 
 MLGenreModel::MLGenreModel(QObject *parent)
-    : MLSlidingWindowModel<MLGenre>(parent)
+    : MLSlidingWindowModel(parent)
 {
 }
 
@@ -35,7 +35,7 @@ QVariant MLGenreModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0)
         return QVariant();
 
-    const MLGenre* ml_genre = item(index.row());
+    const MLGenre* ml_genre = static_cast<MLGenre *>(item(index.row()));
     if (!ml_genre)
         return QVariant();
 
@@ -102,7 +102,7 @@ vlc_ml_sorting_criteria_t MLGenreModel::nameToCriteria(QByteArray name) const
     return M_names_to_criteria.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
-ListCacheLoader<std::unique_ptr<MLGenre>> *
+ListCacheLoader<std::unique_ptr<MLItem>> *
 MLGenreModel::createLoader() const
 {
     return new Loader(*this);
@@ -116,7 +116,7 @@ size_t MLGenreModel::Loader::count() const
     return vlc_ml_count_genres( m_ml, &queryParams );
 }
 
-std::vector<std::unique_ptr<MLGenre>>
+std::vector<std::unique_ptr<MLItem>>
 MLGenreModel::Loader::load(size_t index, size_t count) const
 {
     MLQueryParams params = getParams(index, count);
@@ -127,7 +127,7 @@ MLGenreModel::Loader::load(size_t index, size_t count) const
     );
     if ( genre_list == nullptr )
         return {};
-    std::vector<std::unique_ptr<MLGenre>> res;
+    std::vector<std::unique_ptr<MLItem>> res;
     for( const vlc_ml_genre_t& genre: ml_range_iterate<vlc_ml_genre_t>( genre_list ) )
         res.emplace_back( std::make_unique<MLGenre>( m_ml, &genre ) );
     return res;

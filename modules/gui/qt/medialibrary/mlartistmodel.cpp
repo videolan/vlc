@@ -32,7 +32,7 @@ QVariant MLArtistModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0)
         return QVariant();
 
-    const MLArtist* ml_artist = item(index.row());
+    const MLArtist* ml_artist = static_cast<MLArtist *>(item(index.row()));
     if ( !ml_artist )
         return QVariant();
 
@@ -111,7 +111,7 @@ void MLArtistModel::thumbnailUpdated(int idx)
     emit dataChanged(index(idx), index(idx), {ARTIST_COVER});
 }
 
-ListCacheLoader<std::unique_ptr<MLArtist>> *
+ListCacheLoader<std::unique_ptr<MLItem>> *
 MLArtistModel::createLoader() const
 {
     return new Loader(*this);
@@ -127,7 +127,7 @@ size_t MLArtistModel::Loader::count() const
     return vlc_ml_count_artists_of(m_ml, &queryParams, m_parent.type, m_parent.id );
 }
 
-std::vector<std::unique_ptr<MLArtist>>
+std::vector<std::unique_ptr<MLItem>>
 MLArtistModel::Loader::load(size_t index, size_t count) const
 {
     MLQueryParams params = getParams(index, count);
@@ -140,7 +140,7 @@ MLArtistModel::Loader::load(size_t index, size_t count) const
         artist_list.reset( vlc_ml_list_artist_of(m_ml, &queryParams, m_parent.type, m_parent.id) );
     if ( artist_list == nullptr )
         return {};
-    std::vector<std::unique_ptr<MLArtist>> res;
+    std::vector<std::unique_ptr<MLItem>> res;
     for( const vlc_ml_artist_t& artist: ml_range_iterate<vlc_ml_artist_t>( artist_list ) )
         res.emplace_back( std::make_unique<MLArtist>( &artist ) );
     return res;

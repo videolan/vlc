@@ -21,7 +21,7 @@
 #include <QDateTime>
 
 MLUrlModel::MLUrlModel(QObject *parent)
-    : MLSlidingWindowModel<MLUrl>(parent)
+    : MLSlidingWindowModel(parent)
 {
 }
 
@@ -30,7 +30,7 @@ QVariant MLUrlModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0)
         return QVariant();
 
-    const MLUrl* ml_url = item(static_cast<unsigned int>(index.row()));
+    const MLUrl* ml_url = static_cast<MLUrl *>(item(index.row()));
     if ( !ml_url )
         return QVariant();
 
@@ -126,7 +126,7 @@ MLUrl *MLUrl::clone() const {
     return new MLUrl( *this );
 }
 
-ListCacheLoader<std::unique_ptr<MLUrl>> *
+ListCacheLoader<std::unique_ptr<MLItem>> *
 MLUrlModel::createLoader() const
 {
     return new Loader(*this);
@@ -140,7 +140,7 @@ size_t MLUrlModel::Loader::count() const
     return vlc_ml_count_stream_history( m_ml, &queryParams );
 }
 
-std::vector<std::unique_ptr<MLUrl>>
+std::vector<std::unique_ptr<MLItem>>
 MLUrlModel::Loader::load(size_t index, size_t count) const
 {
     MLQueryParams params = getParams(index, count);
@@ -151,7 +151,7 @@ MLUrlModel::Loader::load(size_t index, size_t count) const
     if ( media_list == nullptr )
         return {};
 
-    std::vector<std::unique_ptr<MLUrl>> res;
+    std::vector<std::unique_ptr<MLItem>> res;
     for( const vlc_ml_media_t& media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
         res.emplace_back( std::make_unique<MLUrl>( &media ) );
     return res;

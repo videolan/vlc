@@ -30,7 +30,7 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumTrackModel::M_names_to_crite
 };
 
 MLAlbumTrackModel::MLAlbumTrackModel(QObject *parent)
-    : MLSlidingWindowModel<MLAlbumTrack>(parent)
+    : MLSlidingWindowModel(parent)
 {
 }
 
@@ -39,7 +39,7 @@ QVariant MLAlbumTrackModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0)
         return QVariant();
 
-    const MLAlbumTrack* ml_track = item(index.row());
+    const MLAlbumTrack* ml_track = static_cast<MLAlbumTrack *>(item(index.row()));
     if ( !ml_track )
         return QVariant();
 
@@ -151,7 +151,7 @@ void MLAlbumTrackModel::onVlcMlEvent(const MLEvent &event)
     MLBaseModel::onVlcMlEvent( event );
 }
 
-ListCacheLoader<std::unique_ptr<MLAlbumTrack>> *
+ListCacheLoader<std::unique_ptr<MLItem>> *
 MLAlbumTrackModel::createLoader() const
 {
     return new Loader(*this);
@@ -167,7 +167,7 @@ size_t MLAlbumTrackModel::Loader::count() const
     return vlc_ml_count_media_of(m_ml, &queryParams, m_parent.type, m_parent.id );
 }
 
-std::vector<std::unique_ptr<MLAlbumTrack>>
+std::vector<std::unique_ptr<MLItem>>
 MLAlbumTrackModel::Loader::load(size_t index, size_t count) const
 {
     MLQueryParams params = getParams(index, count);
@@ -181,7 +181,7 @@ MLAlbumTrackModel::Loader::load(size_t index, size_t count) const
         media_list.reset( vlc_ml_list_media_of(m_ml, &queryParams, m_parent.type, m_parent.id ) );
     if ( media_list == nullptr )
         return {};
-    std::vector<std::unique_ptr<MLAlbumTrack>> res;
+    std::vector<std::unique_ptr<MLItem>> res;
     for( const vlc_ml_media_t& media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
         res.emplace_back( std::make_unique<MLAlbumTrack>( m_ml, &media ) );
     return res;

@@ -28,7 +28,7 @@
 #include "mlalbumtrack.hpp"
 
 
-class MLAlbumTrackModel : public MLSlidingWindowModel<MLAlbumTrack>
+class MLAlbumTrackModel : public MLSlidingWindowModel
 {
     Q_OBJECT
 
@@ -58,7 +58,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 protected:
-    ListCacheLoader<std::unique_ptr<MLAlbumTrack>> *createLoader() const override;
+    ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const override;
 
 private:
     vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
@@ -72,7 +72,7 @@ private:
     {
         Loader(const MLAlbumTrackModel &model) : BaseLoader(model) {}
         size_t count() const override;
-        std::vector<std::unique_ptr<MLAlbumTrack>> load(size_t index, size_t count) const override;
+        std::vector<std::unique_ptr<MLItem>> load(size_t index, size_t count) const override;
     };
 };
 #endif // MLTRACKMODEL_HPP
