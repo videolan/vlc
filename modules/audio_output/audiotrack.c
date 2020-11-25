@@ -605,7 +605,7 @@ AudioTrack_getPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
  * Called after flush, or start
  */
 static void
-AudioTrack_ResetPlaybackHeadPosition( JNIEnv *env, audio_output_t *p_aout )
+AudioTrack_ResetWrapCount( JNIEnv *env, audio_output_t *p_aout )
 {
     (void) env;
     aout_sys_t *p_sys = p_aout->sys;
@@ -643,7 +643,7 @@ AudioTrack_Reset( JNIEnv *env, audio_output_t *p_aout )
     aout_sys_t *p_sys = p_aout->sys;
 
     AudioTrack_ResetPositions( env, p_aout );
-    AudioTrack_ResetPlaybackHeadPosition( env, p_aout );
+    AudioTrack_ResetWrapCount( env, p_aout );
     p_sys->i_samples_written = 0;
 }
 
