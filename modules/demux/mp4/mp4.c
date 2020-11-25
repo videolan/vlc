@@ -2062,7 +2062,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *ppp_attach = calloc( p_sys->i_attachments, sizeof(**ppp_attach ) );
             if( !*ppp_attach )
                 return VLC_ENOMEM;
-            for ( size_t i = 0; i < p_sys->i_attachments; ++i )
+            for ( ssize_t i = 0; i < p_sys->i_attachments; ++i )
             {
                 (*ppp_attach)[i] = vlc_input_attachment_Hold( p_sys->pp_attachments[i] );
                 msg_Dbg( p_demux, "adding attachment %s", (*ppp_attach)[i]->psz_name );
@@ -2190,7 +2190,7 @@ static void Close ( vlc_object_t * p_this )
         MP4_TrackClean( p_demux->out, &p_sys->track[i_track] );
     free( p_sys->track );
 
-    for ( size_t i = 0; i < p_sys->i_attachments; ++i )
+    for ( ssize_t i = 0; i < p_sys->i_attachments; ++i )
         vlc_input_attachment_Release( p_sys->pp_attachments[i] );
     free( p_sys->pp_attachments );
 
