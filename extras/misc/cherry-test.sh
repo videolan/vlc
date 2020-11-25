@@ -9,7 +9,7 @@ Check that cherry pick commits are properly formatted/documented.
 Differing patches are put in patches-new/ and patches-orig/
 
 original_branch:  the branch where the cherry-picked commits come from
-commit_range   :  the commits to check (master..HEAD if not specified)
+commit_range   :  the commits to check (origin/master..HEAD if not specified)
 
 - edits are marked as
 (cherry picked from commit <hash>) (edited)
@@ -31,7 +31,7 @@ ORIGINAL_BRANCH=$1
 if test -n "$2"; then
     COMMIT_RANGE=$2
 else
-    COMMIT_RANGE="master..HEAD"
+    COMMIT_RANGE="origin/master..HEAD"
 fi
 
 CHERY_PICK_DETECT="cherry picked from commit "
