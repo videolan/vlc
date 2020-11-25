@@ -20,6 +20,7 @@
 #include "mlbasemodel.hpp"
 #include "medialib.hpp"
 #include <vlc_cxx_helpers.hpp>
+#include "util/listcache.hpp"
 
 static constexpr ssize_t COUNT_UNINITIALIZED =
     ListCache<std::unique_ptr<MLItem>>::COUNT_UNINITIALIZED;
@@ -216,6 +217,9 @@ MLSlidingWindowModel::MLSlidingWindowModel(QObject *parent)
     : MLBaseModel(parent)
 {
 }
+
+/* For std::unique_ptr, see Effective Modern C++, Item 22 */
+MLSlidingWindowModel::~MLSlidingWindowModel() = default;
 
 int MLSlidingWindowModel::rowCount(const QModelIndex &parent) const
 {

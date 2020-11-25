@@ -33,7 +33,10 @@
 #include <memory>
 #include "mlevent.hpp"
 #include "mlqueryparams.hpp"
-#include "util/listcache.hpp"
+#include "util/listcacheloader.hpp"
+
+template <typename T>
+class ListCache;
 
 class MediaLib;
 
@@ -135,6 +138,7 @@ class MLSlidingWindowModel : public MLBaseModel
 {
 public:
     MLSlidingWindowModel(QObject* parent = nullptr);
+    ~MLSlidingWindowModel();
 
     int rowCount(const QModelIndex &parent = {}) const override;
 

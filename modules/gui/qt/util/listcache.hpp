@@ -31,6 +31,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include "asynctask.hpp"
+#include "listcacheloader.hpp"
 
 /**
  * `ListCache<T>` represents a cache for a (constant) list of items.
@@ -57,14 +58,6 @@
  *
  * All its public methods must be called from the UI thread.
  */
-
-template <typename T>
-struct ListCacheLoader
-{
-    virtual ~ListCacheLoader() = default;
-    virtual size_t count() const = 0;
-    virtual std::vector<T> load(size_t index, size_t count) const = 0;
-};
 
 /* Non-template class for signals */
 class BaseListCache : public QObject

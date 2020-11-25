@@ -204,6 +204,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/util/imagehelper.cpp gui/qt/util/imagehelper.hpp \
 	gui/qt/util/i18n.cpp gui/qt/util/i18n.hpp \
 	gui/qt/util/listcache.hpp \
+	gui/qt/util/listcacheloader.hpp \
 	gui/qt/util/navigation_history.cpp gui/qt/util/navigation_history.hpp \
 	gui/qt/util/qml_main_context.cpp \
 	gui/qt/util/qml_main_context.hpp \
