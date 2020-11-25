@@ -1815,7 +1815,6 @@ AudioTrack_Thread( void *p_data )
     audio_output_t *p_aout = p_data;
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env = GET_ENV();
-    vlc_tick_t i_play_deadline = 0;
     vlc_tick_t i_last_time_blocked = 0;
 
     if( !env )
@@ -1829,16 +1828,6 @@ AudioTrack_Thread( void *p_data )
         size_t i_data_size;
 
         vlc_mutex_lock( &p_sys->lock );
-
-        /* Wait for free space in Audiotrack internal buffer */
-        if( i_play_deadline != 0 && vlc_tick_now() < i_play_deadline )
-        {
-            while( p_sys->b_thread_running && i_ret == 0 )
-                i_ret = vlc_cond_timedwait( &p_sys->thread_cond,
-                                            &p_sys->lock,
-                                            i_play_deadline );
-            i_play_deadline = 0;
-        }
 
         /* Wait for not paused state */
         while( p_sys->b_thread_running && p_sys->b_thread_paused )
@@ -1878,22 +1867,31 @@ AudioTrack_Thread( void *p_data )
                                   b_forced );
         if( i_ret >= 0 )
         {
-            if( p_sys->i_write_type == WRITE_BYTEARRAY )
-            {
-                if( i_ret != 0 )
-                    i_last_time_blocked = 0;
-                else if( i_last_time_blocked == 0 )
-                    i_last_time_blocked = vlc_tick_now();
-            }
-
             if( i_ret == 0 )
-                i_play_deadline = vlc_tick_now() + __MAX( 10000, FRAMES_TO_US(
-                                  p_sys->i_max_audiotrack_samples / 5 ) );
+            {
+                vlc_tick_t i_now = vlc_tick_now();
+
+                /* cf. b_forced HACK comment */
+                if( p_sys->i_write_type == WRITE_BYTEARRAY && i_last_time_blocked == 0 )
+                    i_last_time_blocked = i_now;
+
+                /* Wait for free space in Audiotrack internal buffer */
+                vlc_tick_t i_play_deadline = i_now + __MAX( 10000,
+                        FRAMES_TO_US( p_sys->i_max_audiotrack_samples / 5 ) );
+
+                while( p_sys->b_thread_running && i_ret == 0 )
+                    i_ret = vlc_cond_timedwait( &p_sys->thread_cond, &p_sys->lock,
+                                                i_play_deadline );
+
+            }
             else
+            {
+                i_last_time_blocked = 0;
                 p_sys->circular.i_read += i_ret;
+                vlc_cond_signal( &p_sys->aout_cond );
+            }
         }
 
-        vlc_cond_signal( &p_sys->aout_cond );
         vlc_mutex_unlock( &p_sys->lock );
     }
 
