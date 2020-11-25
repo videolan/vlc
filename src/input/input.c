@@ -3038,8 +3038,10 @@ static void AppendAttachment( input_thread_t *p_input, int i_new,
     int i;
 
     if ( i_attachment + i_new == 0 )
-        /* nothing to do */
+    {
+        free( pp_new );
         return;
+    }
 
     input_attachment_t **pp_att = realloc( priv->attachment,
                     sizeof(*pp_att) * ( i_attachment + i_new ) );
