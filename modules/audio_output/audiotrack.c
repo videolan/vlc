@@ -683,6 +683,8 @@ AudioTrack_GetSmoothPositionUs( JNIEnv *env, audio_output_t *p_aout )
     if( i_now - p_sys->smoothpos.i_last_time >= SMOOTHPOS_INTERVAL_US )
     {
         i_audiotrack_us = FRAMES_TO_US( AudioTrack_getPlaybackHeadPosition( env, p_aout ) );
+        if( i_audiotrack_us == 0 )
+            goto bailout;
 
         p_sys->smoothpos.i_last_time = i_now;
 
@@ -702,8 +704,9 @@ AudioTrack_GetSmoothPositionUs( JNIEnv *env, audio_output_t *p_aout )
     }
     if( p_sys->smoothpos.i_us != 0 )
         return p_sys->smoothpos.i_us + i_now - AudioTrack_GetLatencyUs( env, p_aout );
-    else
-        return 0;
+
+bailout:
+    return 0;
 }
 
 static vlc_tick_t
