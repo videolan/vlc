@@ -29,7 +29,7 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumModel::M_names_to_criteria =
 };
 
 MLAlbumModel::MLAlbumModel(QObject *parent)
-    : MLSlidingWindowModel(parent)
+    : MLBaseModel(parent)
 {
 }
 
@@ -120,7 +120,7 @@ void MLAlbumModel::onVlcMlEvent(const MLEvent &event)
         default:
             break;
     }
-    MLSlidingWindowModel::onVlcMlEvent( event );
+    MLBaseModel::onVlcMlEvent( event );
 }
 
 void MLAlbumModel::thumbnailUpdated(int idx)

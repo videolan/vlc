@@ -46,7 +46,7 @@ private:
     QString m_lastPlayedDate;
 };
 
-class MLUrlModel : public MLSlidingWindowModel
+class MLUrlModel : public MLBaseModel
 {
     Q_OBJECT
 

@@ -40,9 +40,8 @@ MLBaseModel::MLBaseModel(QObject *parent)
     connect( this, &MLBaseModel::resetRequested, this, &MLBaseModel::onResetRequested );
 }
 
-MLBaseModel::~MLBaseModel()
-{
-}
+/* For std::unique_ptr, see Effective Modern C++, Item 22 */
+MLBaseModel::~MLBaseModel() = default;
 
 void MLBaseModel::sortByColumn(QByteArray name, Qt::SortOrder order)
 {
@@ -102,6 +101,34 @@ void MLBaseModel::onVlcMlEvent(const MLEvent &event)
                 m_need_reset = false;
             }
             break;
+        case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
+        {
+            if (event.media_thumbnail_generated.b_success) {
+                if (!m_cache)
+                    break;
+
+                ssize_t stotal = m_cache->count();
+                if (stotal == COUNT_UNINITIALIZED)
+                    break;
+
+                size_t total = static_cast<size_t>(stotal);
+                for (size_t i = 0; i < total; ++i)
+                {
+                    const std::unique_ptr<MLItem> *item = m_cache->get(i);
+                    if (!item)
+                        /* Only consider items available locally in cache */
+                        break;
+
+                    MLItem *localItem = item->get();
+                    if (localItem->getId().id == event.media_thumbnail_generated.i_media_id)
+                    {
+                        thumbnailUpdated(i);
+                        break;
+                    }
+                }
+            }
+            break;
+        }
     }
 }
 
@@ -213,15 +240,7 @@ void MLBaseModel::unsetSortCriteria()
     emit sortCriteriaChanged();
 }
 
-MLSlidingWindowModel::MLSlidingWindowModel(QObject *parent)
-    : MLBaseModel(parent)
-{
-}
-
-/* For std::unique_ptr, see Effective Modern C++, Item 22 */
-MLSlidingWindowModel::~MLSlidingWindowModel() = default;
-
-int MLSlidingWindowModel::rowCount(const QModelIndex &parent) const
+int MLBaseModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
@@ -231,13 +250,13 @@ int MLSlidingWindowModel::rowCount(const QModelIndex &parent) const
     return m_cache->count();
 }
 
-void MLSlidingWindowModel::clear()
+void MLBaseModel::clear()
 {
     invalidateCache();
     emit countChanged( static_cast<unsigned int>(0) );
 }
 
-QVariant MLSlidingWindowModel::getIdForIndex(QVariant index) const
+QVariant MLBaseModel::getIdForIndex(QVariant index) const
 {
     MLItem* obj = nullptr;
     if (index.canConvert<int>())
@@ -252,7 +271,7 @@ QVariant MLSlidingWindowModel::getIdForIndex(QVariant index) const
 }
 
 
-QVariantList MLSlidingWindowModel::getIdsForIndexes(QModelIndexList indexes) const
+QVariantList MLBaseModel::getIdsForIndexes(QModelIndexList indexes) const
 {
     QVariantList idList;
     idList.reserve(indexes.length());
@@ -265,7 +284,7 @@ QVariantList MLSlidingWindowModel::getIdsForIndexes(QModelIndexList indexes) con
     return idList;
 }
 
-QVariantList MLSlidingWindowModel::getIdsForIndexes(QVariantList indexes) const
+QVariantList MLBaseModel::getIdsForIndexes(QVariantList indexes) const
 {
     QVariantList idList;
 
@@ -286,14 +305,14 @@ QVariantList MLSlidingWindowModel::getIdsForIndexes(QVariantList indexes) const
     return idList;
 }
 
-unsigned MLSlidingWindowModel::getCount() const
+unsigned MLBaseModel::getCount() const
 {
     if (!m_cache || m_cache->count() == COUNT_UNINITIALIZED)
         return 0;
     return static_cast<unsigned>(m_cache->count());
 }
 
-void MLSlidingWindowModel::validateCache() const
+void MLBaseModel::validateCache() const
 {
     if (m_cache)
         return;
@@ -302,21 +321,21 @@ void MLSlidingWindowModel::validateCache() const
     auto loader = createLoader();
     m_cache.reset(new ListCache<std::unique_ptr<MLItem>>(threadPool, loader));
     connect(&*m_cache, &BaseListCache::localSizeAboutToBeChanged,
-            this, &MLSlidingWindowModel::onLocalSizeAboutToBeChanged);
+            this, &MLBaseModel::onLocalSizeAboutToBeChanged);
     connect(&*m_cache, &BaseListCache::localSizeChanged,
-            this, &MLSlidingWindowModel::onLocalSizeChanged);
+            this, &MLBaseModel::onLocalSizeChanged);
     connect(&*m_cache, &BaseListCache::localDataChanged,
-            this, &MLSlidingWindowModel::onLocalDataChanged);
+            this, &MLBaseModel::onLocalDataChanged);
 
     m_cache->initCount();
 }
 
-void MLSlidingWindowModel::invalidateCache()
+void MLBaseModel::invalidateCache()
 {
     m_cache.reset();
 }
 
-MLItem *MLSlidingWindowModel::item(int signedidx) const
+MLItem *MLBaseModel::item(int signedidx) const
 {
     validateCache();
 
@@ -337,46 +356,8 @@ MLItem *MLSlidingWindowModel::item(int signedidx) const
     return item->get();
 }
 
-void MLSlidingWindowModel::onVlcMlEvent(const MLEvent &event)
-{
-    switch (event.i_type)
-    {
-        case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
-        {
-            if (event.media_thumbnail_generated.b_success) {
-                if (!m_cache)
-                    break;
-
-                ssize_t stotal = m_cache->count();
-                if (stotal == COUNT_UNINITIALIZED)
-                    break;
-
-                size_t total = static_cast<size_t>(stotal);
-                for (size_t i = 0; i < total; ++i)
-                {
-                    const std::unique_ptr<MLItem> *item = m_cache->get(i);
-                    if (!item)
-                        /* Only consider items available locally in cache */
-                        break;
-
-                    MLItem *localItem = item->get();
-                    if (localItem->getId().id == event.media_thumbnail_generated.i_media_id)
-                    {
-                        thumbnailUpdated(i);
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        default:
-            break;
-    }
-    MLBaseModel::onVlcMlEvent( event );
-}
-
-MLSlidingWindowModel::BaseLoader::BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QString searchPattern,
-                                             vlc_ml_sorting_criteria_t sort, bool sort_desc)
+MLBaseModel::BaseLoader::BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QString searchPattern,
+                                    vlc_ml_sorting_criteria_t sort, bool sort_desc)
     : m_ml(ml)
     , m_parent(parent)
     , m_searchPattern(searchPattern)
@@ -385,12 +366,12 @@ MLSlidingWindowModel::BaseLoader::BaseLoader(vlc_medialibrary_t *ml, MLItemId pa
 {
 }
 
-MLSlidingWindowModel::BaseLoader::BaseLoader(const MLSlidingWindowModel &model)
+MLBaseModel::BaseLoader::BaseLoader(const MLBaseModel &model)
     : BaseLoader(model.m_ml, model.m_parent, model.m_search_pattern, model.m_sort, model.m_sort_desc)
 {
 }
 
-MLQueryParams MLSlidingWindowModel::BaseLoader::getParams(size_t index, size_t count) const
+MLQueryParams MLBaseModel::BaseLoader::getParams(size_t index, size_t count) const
 {
     return { m_searchPattern.toUtf8(), m_sort, m_sort_desc, index, count };
 }

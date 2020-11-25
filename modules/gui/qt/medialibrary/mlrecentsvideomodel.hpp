@@ -31,7 +31,7 @@
 
 #include <QObject>
 
-class MLRecentsVideoModel : public MLSlidingWindowModel
+class MLRecentsVideoModel : public MLBaseModel
 {
     Q_OBJECT
     Q_PROPERTY(int numberOfItemsToShow READ getNumberOfItemsToShow WRITE setNumberOfItemsToShow)

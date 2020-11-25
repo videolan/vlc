@@ -48,7 +48,7 @@ private:
     QDateTime m_lastPlayedDate;
 };
 
-class MLRecentsModel : public MLSlidingWindowModel
+class MLRecentsModel : public MLBaseModel
 {
     Q_OBJECT
     Q_PROPERTY(int numberOfItemsToShow READ getNumberOfItemsToShow WRITE setNumberOfItemsToShow)

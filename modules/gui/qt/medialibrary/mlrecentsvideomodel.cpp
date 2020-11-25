@@ -37,7 +37,7 @@ enum Role {
 }
 
 MLRecentsVideoModel::MLRecentsVideoModel( QObject* parent )
-    : MLSlidingWindowModel( parent )
+    : MLBaseModel( parent )
 {
 }
 

@@ -39,7 +39,7 @@ MLRecentMedia* MLRecentMedia::clone() const {
 
 
 MLRecentsModel::MLRecentsModel( QObject* parent )
-    : MLSlidingWindowModel( parent )
+    : MLBaseModel( parent )
 {
 }
 

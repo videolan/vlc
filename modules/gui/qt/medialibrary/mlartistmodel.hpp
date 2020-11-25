@@ -27,7 +27,7 @@
 #include "mlbasemodel.hpp"
 #include "mlartist.hpp"
 
-class MLArtistModel : public MLSlidingWindowModel
+class MLArtistModel : public MLBaseModel
 {
     Q_OBJECT
 public:

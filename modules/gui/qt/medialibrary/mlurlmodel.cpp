@@ -21,7 +21,7 @@
 #include <QDateTime>
 
 MLUrlModel::MLUrlModel(QObject *parent)
-    : MLSlidingWindowModel(parent)
+    : MLBaseModel(parent)
 {
 }
 

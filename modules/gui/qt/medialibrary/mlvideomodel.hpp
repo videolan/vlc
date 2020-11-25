@@ -31,7 +31,7 @@
 
 #include <QObject>
 
-class MLVideoModel : public MLSlidingWindowModel
+class MLVideoModel : public MLBaseModel
 {
     Q_OBJECT
 

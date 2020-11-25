@@ -24,6 +24,7 @@
 #endif
 #include "vlc_common.h"
 
+
 #include <memory>
 #include <QObject>
 #include <QAbstractListModel>
@@ -58,9 +59,9 @@ public:
     Q_PROPERTY( QString sortCriteria READ getSortCriteria WRITE setSortCriteria NOTIFY sortCriteriaChanged RESET unsetSortCriteria )
     Q_PROPERTY( unsigned int count READ getCount NOTIFY countChanged )
 
-    Q_INVOKABLE virtual QVariant getIdForIndex( QVariant index) const = 0;
-    Q_INVOKABLE virtual QVariantList getIdsForIndexes( QVariantList indexes ) const = 0;
-    Q_INVOKABLE virtual QVariantList getIdsForIndexes( QModelIndexList indexes ) const = 0;
+    Q_INVOKABLE virtual QVariant getIdForIndex( QVariant index) const;
+    Q_INVOKABLE virtual QVariantList getIdsForIndexes( QVariantList indexes ) const;
+    Q_INVOKABLE virtual QVariantList getIdsForIndexes( QModelIndexList indexes ) const;
 
     Q_INVOKABLE QMap<QString, QVariant> getDataAt(int index);
 
@@ -81,7 +82,7 @@ private:
     static void onVlcMlEvent( void* data, const vlc_ml_event_t* event );
 
 protected:
-    virtual void clear() = 0;
+    virtual void clear();
     virtual vlc_ml_sorting_criteria_t roleToCriteria(int role) const = 0;
     static QString getFirstSymbol(QString str);
     virtual vlc_ml_sorting_criteria_t nameToCriteria(QByteArray) const {
@@ -91,6 +92,32 @@ protected:
     {
         return "";
     }
+
+    void validateCache() const;
+    void invalidateCache();
+    MLItem* item(int signedidx) const;
+    virtual void onVlcMlEvent( const MLEvent &event );
+
+    virtual ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const = 0;
+
+    virtual void thumbnailUpdated( int ) {}
+
+    /* Data loader for the cache */
+    struct BaseLoader : public ListCacheLoader<std::unique_ptr<MLItem>>
+    {
+        BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QString searchPattern,
+                   vlc_ml_sorting_criteria_t sort, bool sort_desc);
+        BaseLoader(const MLBaseModel &model);
+
+        MLQueryParams getParams(size_t index = 0, size_t count = 0) const;
+
+    protected:
+        vlc_medialibrary_t *m_ml;
+        MLItemId m_parent;
+        QString m_searchPattern;
+        vlc_ml_sorting_criteria_t m_sort;
+        bool m_sort_desc;
+    };
 
 public:
     MLItemId parentId() const;
@@ -109,11 +136,10 @@ public:
     void setSortCriteria(const QString& criteria);
     void unsetSortCriteria();
 
-    virtual unsigned int getCount() const = 0;
+    int rowCount(const QModelIndex &parent = {}) const;
+    virtual unsigned int getCount() const;
 
 protected:
-    virtual void onVlcMlEvent( const MLEvent &event );
-
     MLItemId m_parent;
 
     vlc_medialibrary_t* m_ml;
@@ -125,58 +151,6 @@ protected:
     std::unique_ptr<vlc_ml_event_callback_t,
                     std::function<void(vlc_ml_event_callback_t*)>> m_ml_event_handle;
     bool m_need_reset;
-};
-
-/**
- * Implements a basic sliding window.
- * const_cast & immutable are unavoidable, since all access member functions
- * are marked as const. fetchMore & canFetchMore don't allow for the full size
- * to be known (so the scrollbar would grow as we scroll, until we displayed all
- * elements), and implies having all elements loaded in RAM at all time.
- */
-class MLSlidingWindowModel : public MLBaseModel
-{
-public:
-    MLSlidingWindowModel(QObject* parent = nullptr);
-    ~MLSlidingWindowModel();
-
-    int rowCount(const QModelIndex &parent = {}) const override;
-
-    void clear() override;
-
-    QVariant getIdForIndex( QVariant index ) const override;
-    QVariantList getIdsForIndexes( QModelIndexList indexes ) const override;
-    QVariantList getIdsForIndexes( QVariantList indexes ) const override;
-
-    unsigned getCount() const override;
-
-protected:
-    virtual ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const = 0;
-
-    void validateCache() const;
-    void invalidateCache();
-    MLItem* item(int signedidx) const;
-    void onVlcMlEvent(const MLEvent &event) override;
-
-    /* Data loader for the cache */
-    struct BaseLoader : public ListCacheLoader<std::unique_ptr<MLItem>>
-    {
-        BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QString searchPattern,
-                   vlc_ml_sorting_criteria_t sort, bool sort_desc);
-        BaseLoader(const MLSlidingWindowModel &model);
-
-        MLQueryParams getParams(size_t index = 0, size_t count = 0) const;
-
-    protected:
-        vlc_medialibrary_t *m_ml;
-        MLItemId m_parent;
-        QString m_searchPattern;
-        vlc_ml_sorting_criteria_t m_sort;
-        bool m_sort_desc;
-    };
-
-private:
-    virtual void thumbnailUpdated( int ) {}
 
     mutable std::unique_ptr<ListCache<std::unique_ptr<MLItem>>> m_cache;
 };

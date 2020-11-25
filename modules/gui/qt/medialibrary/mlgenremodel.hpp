@@ -28,7 +28,7 @@
 #include "mlbasemodel.hpp"
 #include "mlgenre.hpp"
 
-class MLGenreModel : public MLSlidingWindowModel
+class MLGenreModel : public MLBaseModel
 {
     Q_OBJECT
 

@@ -30,7 +30,7 @@ QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumTrackModel::M_names_to_crite
 };
 
 MLAlbumTrackModel::MLAlbumTrackModel(QObject *parent)
-    : MLSlidingWindowModel(parent)
+    : MLBaseModel(parent)
 {
 }
 

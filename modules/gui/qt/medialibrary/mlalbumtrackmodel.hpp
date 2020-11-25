@@ -28,7 +28,7 @@
 #include "mlalbumtrack.hpp"
 
 
-class MLAlbumTrackModel : public MLSlidingWindowModel
+class MLAlbumTrackModel : public MLBaseModel
 {
     Q_OBJECT
 
