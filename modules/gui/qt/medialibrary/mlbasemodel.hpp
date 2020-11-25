@@ -134,191 +134,34 @@ protected:
 class MLSlidingWindowModel : public MLBaseModel
 {
 public:
-    static constexpr ssize_t COUNT_UNINITIALIZED =
-        ListCache<std::unique_ptr<MLItem>>::COUNT_UNINITIALIZED;
+    MLSlidingWindowModel(QObject* parent = nullptr);
 
-    MLSlidingWindowModel(QObject* parent = nullptr)
-        : MLBaseModel(parent)
-    {
-    }
+    int rowCount(const QModelIndex &parent = {}) const override;
 
-    int rowCount(const QModelIndex &parent = {}) const override
-    {
-        if (parent.isValid())
-            return 0;
+    void clear() override;
 
-        validateCache();
+    QVariant getIdForIndex( QVariant index ) const override;
+    QVariantList getIdsForIndexes( QModelIndexList indexes ) const override;
+    QVariantList getIdsForIndexes( QVariantList indexes ) const override;
 
-        return m_cache->count();
-    }
-
-    void clear() override
-    {
-        invalidateCache();
-        emit countChanged( static_cast<unsigned int>(0) );
-    }
-
-
-    virtual QVariant getIdForIndex( QVariant index ) const override
-    {
-        MLItem* obj = nullptr;
-        if (index.canConvert<int>())
-            obj = item( index.toInt() );
-        else if ( index.canConvert<QModelIndex>() )
-            obj = item( index.value<QModelIndex>().row() );
-
-        if (!obj)
-            return {};
-
-        return QVariant::fromValue(obj->getId());
-    }
-
-    virtual QVariantList getIdsForIndexes( QModelIndexList indexes ) const override
-    {
-        QVariantList idList;
-        idList.reserve(indexes.length());
-        std::transform( indexes.begin(), indexes.end(),std::back_inserter(idList), [this](const QModelIndex& index) -> QVariant {
-            MLItem* obj = item( index.row() );
-            if (!obj)
-                return {};
-            return QVariant::fromValue(obj->getId());
-        });
-        return idList;
-    }
-
-    virtual QVariantList getIdsForIndexes( QVariantList indexes ) const override
-    {
-        QVariantList idList;
-
-        idList.reserve(indexes.length());
-        std::transform( indexes.begin(), indexes.end(),std::back_inserter(idList), [this](const QVariant& index) -> QVariant {
-            MLItem* obj = nullptr;
-            if (index.canConvert<int>())
-                obj = item( index.toInt() );
-            else if ( index.canConvert<QModelIndex>() )
-                obj = item( index.value<QModelIndex>().row() );
-
-            if (!obj)
-                return {};
-
-            return QVariant::fromValue(obj->getId());
-        });
-        return idList;
-    }
-
-    unsigned int getCount() const override {
-        if (!m_cache || m_cache->count() == COUNT_UNINITIALIZED)
-            return 0;
-        return static_cast<unsigned int>(m_cache->count());
-    }
+    unsigned getCount() const override;
 
 protected:
     virtual ListCacheLoader<std::unique_ptr<MLItem>> *createLoader() const = 0;
 
-    void validateCache() const
-    {
-        if (m_cache)
-            return;
-
-        auto &threadPool = m_mediaLib->threadPool();
-        auto loader = createLoader();
-        m_cache.reset(new ListCache<std::unique_ptr<MLItem>>(threadPool, loader));
-        connect(&*m_cache, &BaseListCache::localSizeAboutToBeChanged,
-                this, &MLSlidingWindowModel::onLocalSizeAboutToBeChanged);
-        connect(&*m_cache, &BaseListCache::localSizeChanged,
-                this, &MLSlidingWindowModel::onLocalSizeChanged);
-        connect(&*m_cache, &BaseListCache::localDataChanged,
-                this, &MLSlidingWindowModel::onLocalDataChanged);
-
-        m_cache->initCount();
-    }
-
-    void invalidateCache()
-    {
-        m_cache.reset();
-    }
-
-    MLItem* item(int signedidx) const
-    {
-        validateCache();
-
-        ssize_t count = m_cache->count();
-        if (count == COUNT_UNINITIALIZED || signedidx < 0
-                || signedidx >= count)
-            return nullptr;
-
-        unsigned int idx = static_cast<unsigned int>(signedidx);
-        m_cache->refer(idx);
-
-        const std::unique_ptr<MLItem> *item = m_cache->get(idx);
-        if (!item)
-            /* Not in cache */
-            return nullptr;
-
-        /* Return raw pointer */
-        return item->get();
-    }
-
-    virtual void onVlcMlEvent(const MLEvent &event) override
-    {
-        switch (event.i_type)
-        {
-            case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
-            {
-                if (event.media_thumbnail_generated.b_success) {
-                    if (!m_cache)
-                        break;
-
-                    ssize_t stotal = m_cache->count();
-                    if (stotal == COUNT_UNINITIALIZED)
-                        break;
-
-                    size_t total = static_cast<size_t>(stotal);
-                    for (size_t i = 0; i < total; ++i)
-                    {
-                        const std::unique_ptr<MLItem> *item = m_cache->get(i);
-                        if (!item)
-                            /* Only consider items available locally in cache */
-                            break;
-
-                        MLItem *localItem = item->get();
-                        if (localItem->getId().id == event.media_thumbnail_generated.i_media_id)
-                        {
-                            thumbnailUpdated(i);
-                            break;
-                        }
-                    }
-                }
-                break;
-            }
-            default:
-                break;
-        }
-        MLBaseModel::onVlcMlEvent( event );
-    }
+    void validateCache() const;
+    void invalidateCache();
+    MLItem* item(int signedidx) const;
+    void onVlcMlEvent(const MLEvent &event) override;
 
     /* Data loader for the cache */
     struct BaseLoader : public ListCacheLoader<std::unique_ptr<MLItem>>
     {
         BaseLoader(vlc_medialibrary_t *ml, MLItemId parent, QString searchPattern,
-                   vlc_ml_sorting_criteria_t sort, bool sort_desc)
-            : m_ml(ml)
-            , m_parent(parent)
-            , m_searchPattern(searchPattern)
-            , m_sort(sort)
-            , m_sort_desc(sort_desc)
-        {
-        }
+                   vlc_ml_sorting_criteria_t sort, bool sort_desc);
+        BaseLoader(const MLSlidingWindowModel &model);
 
-        BaseLoader(const MLSlidingWindowModel &model)
-            : BaseLoader(model.m_ml, model.m_parent, model.m_search_pattern, model.m_sort, model.m_sort_desc)
-        {
-        }
-
-        MLQueryParams getParams(size_t index = 0, size_t count = 0) const
-        {
-            return { m_searchPattern.toUtf8(), m_sort, m_sort_desc, index, count };
-        }
+        MLQueryParams getParams(size_t index = 0, size_t count = 0) const;
 
     protected:
         vlc_medialibrary_t *m_ml;
