@@ -44,7 +44,7 @@ bool HLSSegment::prepareChunk(SharedResources *res, SegmentChunk *chunk, BaseRep
     {
         if (encryption.iv.size() != 16)
         {
-            uint64_t sequence = getSequenceNumber() - Segment::SEQUENCE_FIRST;
+            uint64_t sequence = getSequenceNumber();
             encryption.iv.clear();
             encryption.iv.resize(16);
             encryption.iv[15] = (sequence >> 0) & 0xff;

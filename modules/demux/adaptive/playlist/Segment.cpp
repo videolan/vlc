@@ -39,9 +39,6 @@
 using namespace adaptive::http;
 using namespace adaptive::playlist;
 
-const int ISegment::SEQUENCE_INVALID = 0;
-const int ISegment::SEQUENCE_FIRST   = 1;
-
 ISegment::ISegment(const ICanonicalUrl *parent):
     ICanonicalUrl( parent ),
     startByte  (0),
@@ -51,7 +48,7 @@ ISegment::ISegment(const ICanonicalUrl *parent):
     classId = CLASSID_ISEGMENT;
     startTime.Set(0);
     duration.Set(0);
-    sequence = SEQUENCE_INVALID;
+    sequence = 0;
     templated = false;
     discontinuity = false;
 }
@@ -122,7 +119,7 @@ void ISegment::setByteRange(size_t start, size_t end)
 
 void ISegment::setSequenceNumber(uint64_t seq)
 {
-    sequence = SEQUENCE_FIRST + seq;
+    sequence = seq;
 }
 
 uint64_t ISegment::getSequenceNumber() const
@@ -209,8 +206,7 @@ void Segment::addSubSegment(SubSegment *subsegment)
     {
         /* Use our own sequence number, and since it it now
            uneffective, also for next subsegments numbering */
-        subsegment->setSequenceNumber(getSequenceNumber());
-        setSequenceNumber(getSequenceNumber());
+        subsegment->setSequenceNumber(subsegments.size());
     }
     subsegments.push_back(subsegment);
 }
