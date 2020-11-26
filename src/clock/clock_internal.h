@@ -21,6 +21,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef CLOCK_INTERNAL_H
+# define CLOCK_INTERNAL_H
+
 #include <vlc_common.h>
 
 /*****************************************************************************
@@ -60,3 +63,4 @@ static inline clock_point_t clock_point_Create(vlc_tick_t system, vlc_tick_t str
     return (clock_point_t) { .system = system, .stream = stream };
 }
 
+#endif
