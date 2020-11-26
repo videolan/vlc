@@ -210,7 +210,7 @@ static bool picture_InitPrivate(const video_format_t *restrict p_fmt,
     if( picture_Setup( p_picture, p_fmt ) )
         return false;
 
-    atomic_init(&p_picture->refs, 1);
+    vlc_atomic_rc_init(&p_picture->refs);
     priv->gc.opaque = NULL;
 
     p_picture->p_sys = p_resource->p_sys;
@@ -337,9 +337,7 @@ picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_
 
 void picture_Destroy(picture_t *picture)
 {
-    /* See changes from other threads */
-    atomic_thread_fence(memory_order_acquire);
-    assert(atomic_load_explicit(&picture->refs, memory_order_relaxed) == 0);
+    assert(vlc_atomic_rc_get(&picture->refs) == 0);
 
     PictureDestroyContext(picture);
 
