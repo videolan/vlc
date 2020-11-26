@@ -94,8 +94,6 @@ namespace adaptive
                 int                     classId;
                 bool                    templated;
                 uint64_t                sequence;
-                static const int        SEQUENCE_INVALID;
-                static const int        SEQUENCE_FIRST;
         };
 
         class Segment : public ISegment
