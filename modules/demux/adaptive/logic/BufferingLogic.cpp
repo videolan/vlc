@@ -302,11 +302,14 @@ uint64_t DefaultBufferingLogic::getLiveStartSegmentNumber(BaseRepresentation *re
         uint64_t safeedgenumber = back->getSequenceNumber() -
                         std::min((uint64_t)list.size() - 1,
                                  (uint64_t)SAFETY_BUFFERING_EDGE_OFFSET);
-
         uint64_t safestartnumber = availableliststartnumber;
-        if(safeedgenumber > safestartnumber)
-            safestartnumber -= std::min(safeedgenumber-safestartnumber - 1,
-                                        (uint64_t)SAFETY_EXPURGING_OFFSET);
+
+        for(unsigned i=0; i<SAFETY_EXPURGING_OFFSET; i++)
+        {
+            if(safestartnumber + 1 >= safeedgenumber)
+                break;
+            safestartnumber++;
+        }
 
         stime_t maxbufferizable = 0;
         stime_t safeedgeduration = 0;
