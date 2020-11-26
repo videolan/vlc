@@ -206,8 +206,7 @@ void Segment::addSubSegment(SubSegment *subsegment)
     {
         /* Use our own sequence number, and since it it now
            uneffective, also for next subsegments numbering */
-        subsegment->setSequenceNumber(getSequenceNumber());
-        setSequenceNumber(getSequenceNumber());
+        subsegment->setSequenceNumber(subsegments.size());
     }
     subsegments.push_back(subsegment);
 }
