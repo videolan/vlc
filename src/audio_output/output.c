@@ -386,8 +386,6 @@ void aout_Release(audio_output_t *aout)
     if (!vlc_atomic_rc_dec(&owner->rc))
         return;
 
-    atomic_thread_fence(memory_order_acquire);
-
     aout_dev_t *dev;
     vlc_list_foreach(dev, &owner->dev.list, node)
     {
