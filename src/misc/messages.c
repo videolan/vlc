@@ -304,7 +304,7 @@ struct vlc_logger_switch {
     vlc_rwlock_t lock;
 };
 
-static void vlc_vaLogSwitch(void *d, int type, const vlc_log_t *item,
+static void vlc_logswitch_vaLog(void *d, int type, const vlc_log_t *item,
                             const char *format, va_list ap)
 {
     struct vlc_logger *logger = d;
@@ -318,7 +318,7 @@ static void vlc_vaLogSwitch(void *d, int type, const vlc_log_t *item,
     vlc_rwlock_unlock(&logswitch->lock);
 }
 
-static void vlc_LogSwitchClose(void *d)
+static void vlc_logswitch_Close(void *d)
 {
     struct vlc_logger *logger = d;
     struct vlc_logger_switch *logswitch =
@@ -332,8 +332,8 @@ static void vlc_LogSwitchClose(void *d)
 }
 
 static const struct vlc_logger_operations switch_ops = {
-    vlc_vaLogSwitch,
-    vlc_LogSwitchClose,
+    vlc_logswitch_vaLog,
+    vlc_logswitch_Close,
 };
 
 static void vlc_LogSwitch(vlc_logger_t *logger, vlc_logger_t *new_logger)
