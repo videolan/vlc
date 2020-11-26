@@ -185,8 +185,6 @@ static int VolumeSetLocked(audio_output_t *aout, float vol)
         vol = 1.f;
     }
 
-    aout_GainRequest(aout, gain);
-
     sys->gain = gain;
     sys->requested_volume = vol;
     return 0;
@@ -198,6 +196,7 @@ static int VolumeSet(audio_output_t *aout, float vol)
 
     EnterCriticalSection(&sys->lock);
     int ret = VolumeSetLocked(aout, vol);
+    aout_GainRequest(aout, sys->gain);
     WakeConditionVariable(&sys->work);
     LeaveCriticalSection(&sys->lock);
     return ret;
