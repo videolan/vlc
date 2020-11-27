@@ -449,16 +449,21 @@ static int ModuleThread_UpdateVideoFormat( decoder_t *p_dec, vlc_video_context *
             dpb_size = 2;
             break;
         }
-
-        p_owner->out_pool = picture_pool_NewFromFormat( &p_dec->fmt_out.video,
+        picture_pool_t *pool = picture_pool_NewFromFormat( &p_dec->fmt_out.video,
                             dpb_size + p_dec->i_extra_picture_buffers + 1 );
-        if (p_owner->out_pool == NULL)
+
+        if( pool == NULL)
         {
             msg_Err(p_dec, "Failed to create a pool of %d %4.4s pictures",
                            dpb_size + p_dec->i_extra_picture_buffers + 1,
                            (char*)&p_dec->fmt_out.video.i_chroma);
             return -1;
         }
+
+        vlc_mutex_lock( &p_owner->lock );
+        p_owner->out_pool = pool;
+        vlc_mutex_unlock( &p_owner->lock );
+
     }
 
     vout_configuration_t cfg = {
@@ -544,13 +549,12 @@ static int CreateVoutIfNeeded(vlc_input_decoder_t *p_owner)
 
     DecoderUpdateFormatLocked( p_owner );
     p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
+    picture_pool_t *pool = p_owner->out_pool;
+    p_owner->out_pool = NULL;
     vlc_mutex_unlock( &p_owner->lock );
 
-     if ( p_owner->out_pool != NULL )
-     {
-         picture_pool_Release( p_owner->out_pool );
-         p_owner->out_pool = NULL;
-     }
+     if ( pool != NULL )
+         picture_pool_Release( pool );
 
     if( p_vout == NULL )
     {
