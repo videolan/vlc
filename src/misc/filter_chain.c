@@ -105,7 +105,7 @@ static picture_t *filter_chain_VideoBufferNew( filter_t *filter )
         // HACK as intermediate filters may not have the same video format as
         // the last one handled by the owner
         filter_owner_t saved_owner = filter->owner;
-        filter->owner = (filter_owner_t) {};
+        filter->owner = (filter_owner_t) {0};
         pic = filter_NewPicture( filter );
         filter->owner = saved_owner;
         if( pic == NULL )
