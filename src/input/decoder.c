@@ -1948,9 +1948,6 @@ static void DeleteDecoder( vlc_input_decoder_t *p_owner )
         case VIDEO_ES: {
             vout_thread_t *vout = p_owner->p_vout;
 
-            if (p_owner->out_pool)
-                picture_pool_Cancel( p_owner->out_pool, false );
-
             if (vout != NULL)
             {
                 /* Hold the vout since PutVout will likely release it and a
