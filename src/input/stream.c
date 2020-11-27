@@ -434,8 +434,8 @@ static ssize_t vlc_stream_ReadRaw(stream_t *s, void *buf, size_t len)
             if (unlikely(len == 0))
                 return 0;
 
-            char dummy[(len <= 256 ? len : 256)];
-            ret = s->pf_read(s, dummy, sizeof (dummy));
+            char dummy[256];
+            ret = s->pf_read(s, dummy, len <= 256 ? len : 256);
         }
         else
             ret = s->pf_read(s, buf, len);
