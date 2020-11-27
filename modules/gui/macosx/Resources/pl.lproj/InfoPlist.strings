@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC chce uzyskać dostęp do kamery zgodnie z żądaniem użytkownika.";
+"NSMicrophoneUsageDescription" = "VLC chce uzyskać dostęp do mikrofonu zgodnie z żądaniem użytkownika.";
+"NSAppleEventsUsageDescription" = "VLC chce wstrzymać i wznowić zewnętrzne odtwarzacze multimedialne.";
+"NSDesktopFolderUsageDescription" = "VLC chce uzyskać dostęp do folderu na pulpicie zgodnie z żądaniem użytkownika.";
+"NSDocumentsFolderUsageDescription" = "VLC chce uzyskać dostęp do folderu dokumentów zgodnie z żądaniem użytkownika.";
+"NSDownloadsFolderUsageDescription" = "VLC chce uzyskać dostęp do folderu pobierania zgodnie z żądaniem użytkownika.";
+"NSNetworkVolumesUsageDescription" = "VLC chce uzyskać dostęp do woluminu sieciowego zgodnie z żądaniem użytkownika.";
+"NSRemovableVolumesUsageDescription" = "VLC chce uzyskać dostęp do wymiennego woluminu zgodnie z żądaniem użytkownika.";
