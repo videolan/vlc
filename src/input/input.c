@@ -1180,6 +1180,8 @@ static void InitPrograms( input_thread_t * p_input )
     int *tab;
     size_t count;
 
+    TAB_INIT(count, tab);
+
     /* Compute correct pts_delay */
     UpdatePtsDelay( p_input );
 
@@ -1193,7 +1195,6 @@ static void InitPrograms( input_thread_t * p_input )
         {
             char *buf;
 
-            TAB_INIT(count, tab);
             for( const char *prgm = strtok_r( prgms, ",", &buf );
                  prgm != NULL;
                  prgm = strtok_r( NULL, ",", &buf ) )
