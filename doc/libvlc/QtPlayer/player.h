@@ -46,8 +46,11 @@ class Mwindow : public QMainWindow {
 
                libvlc_instance_t *vlcInstance;
                libvlc_media_player_t *vlcPlayer;
+               libvlc_logger_t *vlcLogger;
 
                void initUI();
+               static void logger_cb(void *, int, const libvlc_log_t *,
+                                     const char *, va_list);
 };
 
 
