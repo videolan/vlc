@@ -42,9 +42,19 @@
 # include <libavutil/cpu.h>
 # include <libavutil/log.h>
 
+#define VLC_TIME_BASE_Q     (AVRational){1, CLOCK_FREQ}
+
+#define FROM_AVSCALE(x, scale) \
+    av_rescale_q((x), (scale), VLC_TIME_BASE_Q)
+#define TO_AVSCALE(x, scale)\
+    av_rescale_q((x), VLC_TIME_BASE_Q, (scale))
+
 #if (CLOCK_FREQ == AV_TIME_BASE)
 #define FROM_AV_TS(x)  (x)
 #define TO_AV_TS(x)    (x)
+#elif defined(USE_AV_RESCALEQ) /* until we migrate all conversions */
+#define FROM_AV_TS(x)  FROM_AVSCALE(x, AV_TIME_BASE_Q)
+#define TO_AV_TS(x)    TO_AVSCALE(x, AV_TIME_BASE_Q)
 #elif (CLOCK_FREQ % AV_TIME_BASE) == 0
 #define FROM_AV_TS(x)  ((x) * (CLOCK_FREQ / AV_TIME_BASE))
 #define TO_AV_TS(x)    ((x) / (CLOCK_FREQ / AV_TIME_BASE))

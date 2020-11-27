@@ -35,6 +35,8 @@
 
 #include <libavformat/avformat.h>
 
+#define USE_AV_RESCALEQ
+
 #include "avformat.h"
 #include "../../codec/avcodec/avcodec.h"
 #include "../../codec/avcodec/avcommon.h"
@@ -398,12 +400,12 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         pkt.flags |= AV_PKT_FLAG_KEY;
     }
 
-    if( p_data->i_pts > 0 )
-        pkt.pts = TO_AV_TS(p_data->i_pts * p_stream->time_base.den /
-            CLOCK_FREQ / p_stream->time_base.num);
-    if( p_data->i_dts > 0 )
-        pkt.dts = TO_AV_TS(p_data->i_dts * p_stream->time_base.den /
-            CLOCK_FREQ / p_stream->time_base.num);
+    if( p_data->i_pts >= VLC_TICK_0 )
+        pkt.pts = av_rescale_q( p_data->i_pts - VLC_TICK_0,
+                                VLC_TIME_BASE_Q, p_stream->time_base );
+    if( p_data->i_dts >= VLC_TICK_0 )
+        pkt.dts = av_rescale_q( p_data->i_dts - VLC_TICK_0,
+                                VLC_TIME_BASE_Q, p_stream->time_base );
 
     /* this is another hack to prevent libavformat from triggering the "non monotone timestamps" check in avformat/utils.c */
     p_stream->cur_dts = ( p_data->i_dts * p_stream->time_base.den /

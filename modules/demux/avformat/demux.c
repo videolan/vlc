@@ -37,6 +37,8 @@
 #include <vlc_charset.h>
 #include <vlc_avcodec.h>
 
+#define USE_AV_RESCALEQ
+
 #include "../../codec/avcodec/avcodec.h"
 #include "../../codec/avcodec/chroma.h"
 #include "../../codec/avcodec/avcommon_compat.h"
@@ -748,10 +750,9 @@ int avformat_OpenDemux( vlc_object_t *p_this )
             EnsureUTF8( s->psz_name );
             msg_Dbg( p_demux, "    - chapter %d: %s", i, s->psz_name );
         }
-        s->i_time_offset = vlc_tick_from_samples( p_sys->ic->chapters[i]->start *
-            p_sys->ic->chapters[i]->time_base.num,
-            p_sys->ic->chapters[i]->time_base.den ) -
-            (i_start_time != VLC_TICK_INVALID ? i_start_time : 0 );
+        s->i_time_offset = FROM_AVSCALE( p_sys->ic->chapters[i]->start,
+                                         p_sys->ic->chapters[i]->time_base )
+                 - (i_start_time != VLC_TICK_INVALID ? i_start_time : 0 );
         TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
     }
 
@@ -859,7 +860,7 @@ static int Demux( demux_t *p_demux )
     /* Used to avoid timestamps overlow */
     if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
     {
-        i_start_time = vlc_tick_from_frac(p_sys->ic->start_time, AV_TIME_BASE);
+        i_start_time = FROM_AV_TS(p_sys->ic->start_time);
     }
     else
         i_start_time = 0;
@@ -868,7 +869,7 @@ static int Demux( demux_t *p_demux )
         p_frame->i_dts = VLC_TICK_INVALID;
     else
     {
-        p_frame->i_dts = vlc_tick_from_frac( pkt.dts * p_stream->time_base.num, p_stream->time_base.den )
+        p_frame->i_dts = FROM_AVSCALE( pkt.dts, p_stream->time_base )
                 - i_start_time + VLC_TICK_0;
     }
 
@@ -876,13 +877,11 @@ static int Demux( demux_t *p_demux )
         p_frame->i_pts = VLC_TICK_INVALID;
     else
     {
-        p_frame->i_pts = vlc_tick_from_frac( pkt.pts * p_stream->time_base.num, p_stream->time_base.den )
+        p_frame->i_pts = FROM_AVSCALE( pkt.pts, p_stream->time_base )
                 - i_start_time + VLC_TICK_0;
     }
     if( pkt.duration > 0 && p_frame->i_length <= 0 )
-        p_frame->i_length = vlc_tick_from_samples(pkt.duration *
-            p_stream->time_base.num,
-            p_stream->time_base.den );
+        p_frame->i_length = FROM_AVSCALE( pkt.duration, p_stream->time_base );
 
     /* Add here notoriously bugged file formats/samples */
     if( !strcmp( p_sys->fmt->name, "flv" ) )
@@ -970,21 +969,9 @@ static void ResetTime( demux_t *p_demux, int64_t i_time )
     vlc_tick_t t;
 
     if( p_sys->ic->start_time == (int64_t)AV_NOPTS_VALUE || i_time < 0 )
-    {
         t = VLC_TICK_INVALID;
-    }
     else
-    {
-#if CLOCK_FREQ == AV_TIME_BASE
-        t = FROM_AV_TS(i_time);
-#else
-        lldiv_t q = lldiv( i_time, AV_TIME_BASE );
-        t = vlc_tick_from_sec(q.quot) + FROM_AV_TS(q.rem);
-#endif
-
-        if( t == VLC_TICK_INVALID )
-            t = VLC_TICK_0;
-    }
+        t = VLC_TICK_0 + FROM_AV_TS( i_time );
 
     p_sys->i_pcr = t;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
