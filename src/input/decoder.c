@@ -1470,6 +1470,11 @@ static void DecoderThread_Flush( vlc_input_decoder_t *p_owner )
     {
         if( p_owner->p_vout )
             vout_FlushAll( p_owner->p_vout );
+
+        /* Reset the pool cancel state, previously set by
+         * vlc_input_decoder_Flush() */
+        if( p_owner->out_pool != NULL )
+            picture_pool_Cancel( p_owner->out_pool, false );
     }
     else if( p_dec->fmt_out.i_cat == SPU_ES )
     {
@@ -2287,6 +2292,17 @@ void vlc_input_decoder_Flush( vlc_input_decoder_t *p_owner )
     vlc_fifo_Signal( p_owner->p_fifo );
 
     vlc_fifo_Unlock( p_owner->p_fifo );
+
+    if ( p_owner->fmt.i_cat == VIDEO_ES )
+    {
+        /* Set the pool cancel state. This will unblock the module if it is
+         * waiting for new pictures (likely). This state will be reset back
+         * from the DecoderThread once the flush request is processed. */
+        vlc_mutex_lock( &p_owner->lock );
+        if( p_owner->out_pool != NULL )
+            picture_pool_Cancel( p_owner->out_pool, true );
+        vlc_mutex_unlock( &p_owner->lock );
+    }
 
     if( p_owner->paused )
     {
