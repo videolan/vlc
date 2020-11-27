@@ -18,6 +18,17 @@
 #include <QVBoxLayout>
 #include <QFileDialog>
 
+
+void Mwindow::logger_cb(void *data, int, const libvlc_log_t *,
+                        const char *fmt, va_list args)
+{
+    Mwindow *window = static_cast<Mwindow*>(data);
+    libvlc_media_player_t *player = window->vlcPlayer;
+    fprintf(stderr, "Instance=%p: ", player);
+    vfprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
+}
+
 Mwindow::Mwindow() {
     vlcPlayer = NULL;
 
@@ -30,11 +41,18 @@ Mwindow::Mwindow() {
         exit(1);
     }
 
+    /* Initialize logger */
+    vlcLogger = libvlc_logger_new_callback(Mwindow::logger_cb,
+                                           static_cast<void*>(this));
+
     /* Interface initialization */
     initUI();
 }
 
 Mwindow::~Mwindow() {
+    if (vlcLogger)
+        libvlc_logger_release(vlcLogger);
+
     /* Release libVLC instance on quit */
     if (vlcInstance)
         libvlc_release(vlcInstance);
@@ -137,7 +155,8 @@ void Mwindow::openFile() {
         return;
 
     /* Create a new libvlc player */
-    vlcPlayer = libvlc_media_player_new_from_media (vlcInstance, vlcMedia);
+    vlcPlayer = libvlc_media_player_new_with_logger(vlcInstance, vlcLogger);
+    libvlc_media_player_set_media(vlcPlayer, vlcMedia);
 
     /* Release the media */
     libvlc_media_release(vlcMedia);
