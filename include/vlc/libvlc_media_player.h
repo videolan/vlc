@@ -40,6 +40,7 @@ extern "C" {
  */
 
 typedef struct libvlc_media_player_t libvlc_media_player_t;
+typedef struct libvlc_logger_t libvlc_logger_t;
 
 /**
  * Description for titles
@@ -164,6 +165,18 @@ typedef struct libvlc_equalizer_t libvlc_equalizer_t;
  */
 LIBVLC_API libvlc_media_player_t * libvlc_media_player_new( libvlc_instance_t *p_libvlc_instance );
 
+/**
+ * Creat ean empty Media Player with a custom dedicated logger
+ *
+ * \param p_libvlc_instance the libvlc instance in which the Media Player
+ *        should be created.
+ * \param p_logger the logger to forward the message to.
+ * \return a new media player object, or NULL on error.
+ * It mustbe released by libvlc_media_player_release().
+ */
+LIBVLC_API libvlc_media_player_t *
+libvlc_media_player_new_with_logger( libvlc_instance_t *p_libvlc_instance,
+                                     libvlc_logger_t *p_logger );
 /**
  * Create a Media Player object from a Media
  *

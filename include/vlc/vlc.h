@@ -46,6 +46,7 @@ extern "C" {
 #include <vlc/libvlc_media_discoverer.h>
 #include <vlc/libvlc_events.h>
 #include <vlc/libvlc_dialog.h>
+#include <vlc/libvlc_logger.h>
 #include <vlc/deprecated.h>
 
 # ifdef __cplusplus

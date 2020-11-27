@@ -41,6 +41,7 @@
 #include "media_internal.h" // libvlc_media_set_state()
 #include "media_player_internal.h"
 #include "renderer_discoverer_internal.h"
+#include "logger_internal.h"
 
 #define ES_INIT (-2) /* -1 is reserved for ES deselect */
 
@@ -583,23 +584,6 @@ static void media_detach_preparsed_event( libvlc_media_t *p_md )
                       p_md );
 }
 
-static void media_player_logger_log(
-        void *data, int type, const vlc_log_t *item, const char *fmt,
-        va_list args )
-{
-    libvlc_media_player_t *mp =
-        container_of(data, libvlc_media_player_t, logger);
-
-    struct vlc_logger *parent = vlc_object_parent(mp)->logger;
-    if (parent == NULL)
-        return;
-
-    parent->ops->log(parent, type, item, fmt, args);
-}
-
-struct vlc_logger_operations media_player_logger_ops =
-    { .log = media_player_logger_log, };
-
 /**************************************************************************
  * Create a Media Instance object.
  *
@@ -617,6 +601,13 @@ struct vlc_logger_operations media_player_logger_ops =
 libvlc_media_player_t *
 libvlc_media_player_new( libvlc_instance_t *instance )
 {
+    return libvlc_media_player_new_with_logger( instance, NULL );
+}
+
+libvlc_media_player_t *
+libvlc_media_player_new_with_logger( libvlc_instance_t *instance,
+                                     libvlc_logger_t *logger)
+{
     libvlc_media_player_t * mp;
 
     assert(instance);
@@ -628,8 +619,12 @@ libvlc_media_player_new( libvlc_instance_t *instance )
         return NULL;
     }
 
-    mp->logger = (struct vlc_logger) { .ops = &media_player_logger_ops };
-    mp->obj.logger = &mp->logger;
+    /* Setup log redirection if logger is not NULL */
+    if (logger)
+    {
+        mp->logger = logger;
+        mp->obj.logger = &logger->internal;
+    }
 
     /* Input */
     var_Create (mp, "rate", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT);

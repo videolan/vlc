@@ -42,6 +42,7 @@ struct libvlc_media_player_t
     struct vlc_object_t obj;
     vlc_atomic_rc_t    rc;
 
+    libvlc_logger_t *logger;
     vlc_player_t *player;
     vlc_player_listener_id *listener;
     vlc_player_aout_listener_id *aout_listener;
@@ -49,8 +50,6 @@ struct libvlc_media_player_t
     struct libvlc_instance_t * p_libvlc_instance; /* Parent instance */
     libvlc_media_t * p_md; /* current media descriptor */
     libvlc_event_manager_t event_manager;
-
-    struct vlc_logger logger;
 };
 
 libvlc_track_description_t * libvlc_get_track_description(

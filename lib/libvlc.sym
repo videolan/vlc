@@ -59,6 +59,8 @@ libvlc_log_get_object
 libvlc_log_set
 libvlc_log_set_file
 libvlc_log_unset
+libvlc_logger_new_callback
+libvlc_logger_release
 libvlc_media_add_option
 libvlc_media_add_option_flag
 libvlc_media_discoverer_is_running
@@ -159,6 +161,7 @@ libvlc_media_player_has_vout
 libvlc_media_player_is_seekable
 libvlc_media_player_is_playing
 libvlc_media_player_new
+libvlc_media_player_new_with_logger
 libvlc_media_player_new_from_media
 libvlc_media_player_next_chapter
 libvlc_media_player_set_pause
