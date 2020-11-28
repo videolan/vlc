@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-25 16:56+0100\n"
+"PO-Revision-Date: 2020-11-28 11:40+0100\n"
 "Last-Translator: Thomas De Rocker <thomasderocker at outlook dot com>, 2020\n"
 "Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "Language: nl\n"
@@ -5132,7 +5132,7 @@ msgstr "Media audiospoor"
 
 #: src/misc/actions.c:84
 msgid "Media Forward"
-msgstr "Media voortspoelen"
+msgstr "Media vooruitspoelen"
 
 #: src/misc/actions.c:85
 msgid "Media Menu"
@@ -12516,7 +12516,7 @@ msgstr "Inter-afbeeldingen verwijzen alleen naar vroegere afbeeldingen"
 #: modules/codec/schroedinger.c:104 modules/codec/schroedinger.c:105
 msgid "Inter pictures can refer to previous or future pictures"
 msgstr ""
-"Inter-afbeeldingen kunne verwijzen naar vroegere of toekomstige afbeeldingen"
+"Inter-afbeeldingen kunnen verwijzen naar vroegere of toekomstige afbeeldingen"
 
 #: modules/codec/schroedinger.c:109
 msgid "Constant quality factor"
@@ -13509,7 +13509,7 @@ msgid ""
 "frames, but do not start a new GOP."
 msgstr ""
 "Zet minimuminterval tussen IDR-beelden. In H.264 betekenen I-beelden niet "
-"per sé een gesloten GOP, omdat een P-beeld voorspeld mag worden meer beelden "
+"per se een gesloten GOP, omdat een P-beeld voorspeld mag worden meer beelden "
 "dan het beeld ervoor (zie ook optie referentiebeeld). Daarom zijn I-beelden "
 "niet per sé zoekbaar. P-beelden na IDR-beelden kunnen niet verwijzen naar "
 "ieder beeld voor het IDR-beeld. \n"
