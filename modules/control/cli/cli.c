@@ -115,6 +115,13 @@ void msg_print(intf_thread_t *intf, const char *fmt, ...)
     va_end(ap);
 }
 
+struct command {
+    union {
+        const char *name;
+        struct cli_handler handler;
+    };
+};
+
 static int cmdcmp(const void *a, const void *b)
 {
     const char *const *na = a;
@@ -130,15 +137,20 @@ void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,
 
     for (size_t i = 0; i < count; i++)
     {
-        const char *const *name = &handlers[i].name;
-        const char *const **pp;
+        struct command *cmd = malloc(sizeof (*cmd));
+        if (unlikely(cmd == NULL))
+            break;
 
-        pp = tsearch(name, &sys->commands, cmdcmp);
+        cmd->handler = handlers[i];
 
+        struct command **pp = tsearch(&cmd->name, &sys->commands, cmdcmp);
         if (unlikely(pp == NULL))
+        {
+            free(cmd);
             continue;
+        }
 
-        assert(*pp == name); /* Fails if duplicate command */
+        assert(*pp == cmd); /* Fails if duplicate command */
     }
 }
 
@@ -352,10 +364,10 @@ error:      wordfree(&we);
     if (count > 0)
     {
         int (*cb)(intf_thread_t *, const char *const *, size_t) = UnknownCmd;
-        const struct cli_handler **h = tfind(&args[0], &sys->commands, cmdcmp);
+        const struct command **c = tfind(&args[0], &sys->commands, cmdcmp);
 
-        if (h != NULL)
-            cb = (*h)->callback;
+        if (c != NULL)
+            cb = (*c)->handler.callback;
 
         ret = cb(intf, args, count);
     }
@@ -806,11 +818,6 @@ error:
     return VLC_EGENERIC;
 }
 
-static void dummy_free(void *p)
-{
-    (void) p;
-}
-
 /*****************************************************************************
  * Deactivate: uninitialize and cleanup
  *****************************************************************************/
@@ -823,7 +830,7 @@ static void Deactivate( vlc_object_t *p_this )
     vlc_join( p_sys->thread, NULL );
 
     DeregisterPlayer(p_intf, p_sys->player_cli);
-    tdestroy(p_sys->commands, dummy_free);
+    tdestroy(p_sys->commands, free);
 
     if (p_sys->pi_socket_listen != NULL)
     {
