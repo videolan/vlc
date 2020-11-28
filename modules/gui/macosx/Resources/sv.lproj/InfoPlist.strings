@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC vill ha åtkomst till kameran vilket begärs av användaren.";
+"NSMicrophoneUsageDescription" = "VLC vill ha åtkomst till mikrofonen vilket begärs av användaren.";
+"NSAppleEventsUsageDescription" = "VLC vill pausa och återuppta externa mediaspelare.";
+"NSDesktopFolderUsageDescription" = "VLC vill ha åtkomst till skrivbordsmappen vilket begärs av användare.";
+"NSDocumentsFolderUsageDescription" = "VLC vill ha åtkomst till dokumentmappen vilket begärs av användaren.";
+"NSDownloadsFolderUsageDescription" = "VLC vill ha åtkomst till nedladdningsmappen vilket begärs av användaren.";
+"NSNetworkVolumesUsageDescription" = "VLC vill ha åtkomst till en nätverksvolym vilket begärs av användaren.";
+"NSRemovableVolumesUsageDescription" = "VLC vill ha åtkomst till en borttagningsbar volym vilket begärs av användaren.";
