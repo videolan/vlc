@@ -115,6 +115,16 @@ void msg_print(intf_thread_t *intf, const char *fmt, ...)
     va_end(ap);
 }
 
+int cli_printf(struct cli_client *cl, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    msg_vprint(cl->intf, fmt, ap);
+    va_end(ap);
+    return VLC_SUCCESS;
+}
+
 struct command {
     union {
         const char *name;
@@ -156,11 +166,7 @@ void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,
     }
 }
 
-#if defined (_WIN32) && !VLC_WINSTORE_APP
-# include "../intromsg.h"
-#endif
-
-static int Help(intf_thread_t *p_intf, const char *const *args, size_t count,
+static int Help(struct cli_client *cl, const char *const *args, size_t count,
                 void *data)
 {
     msg_rc("%s", _("+----[ Remote control commands ]"));
@@ -225,23 +231,30 @@ static int Help(intf_thread_t *p_intf, const char *const *args, size_t count,
     return 0;
 }
 
-static int Intf(intf_thread_t *intf, const char *const *args, size_t count,
+static int Intf(struct cli_client *cl, const char *const *args, size_t count,
                 void *data)
 {
+    intf_thread_t *intf = data;
+
+    (void) cl;
+
     return intf_Create(vlc_object_instance(intf), count == 1 ? "" : args[1]);
 }
 
-static int Quit(intf_thread_t *intf, const char *const *args, size_t count,
+static int Quit(struct cli_client *cl, const char *const *args, size_t count,
                 void *data)
 {
+    intf_thread_t *intf = data;
+
     libvlc_Quit(vlc_object_instance(intf));
-    (void) args; (void) count;
+    (void) cl; (void) args; (void) count;
     return 0;
 }
 
-static int LogOut(intf_thread_t *intf, const char *const *args, size_t count,
+static int LogOut(struct cli_client *cl, const char *const *args, size_t count,
                   void *data)
 {
+    intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
 
     /* Close connection */
@@ -278,15 +291,17 @@ static int LogOut(intf_thread_t *intf, const char *const *args, size_t count,
     return 0;
 }
 
-static int KeyAction(intf_thread_t *intf, const char *const *args, size_t n,
+static int KeyAction(struct cli_client *cl, const char *const *args, size_t n,
                      void *data)
 {
+    intf_thread_t *intf = data;
     vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(intf));
 
     if (n != 2)
         return VLC_EGENERIC; /* EINVAL */
 
     var_SetInteger(vlc, "key-action", vlc_actions_get_id(args[1]));
+    (void) cl;
     return 0;
 }
 
@@ -305,7 +320,7 @@ static const struct cli_handler cmds[] =
     { "hotkey", KeyAction },
 };
 
-static int Process(intf_thread_t *intf, const char *line)
+static int Process(intf_thread_t *intf, struct cli_client *cl, const char *line)
 {
     intf_sys_t *sys = intf->p_sys;
     /* Skip heading spaces */
@@ -329,7 +344,7 @@ error:      wordfree(&we);
         else
             ret = VLC_EGENERIC;
 
-        msg_print(intf, N_("parse error"));
+        cli_printf(cl, N_("parse error"));
         return ret;
     }
 
@@ -368,12 +383,11 @@ error:      wordfree(&we);
         {
             const struct command *c = *pp;;
 
-            ret = c->handler.callback(intf, args, count, c->data);
+            ret = c->handler.callback(cl, args, count, c->data);
         }
         else
         {
-            msg_print(intf,
-                      _("Unknown command `%s'. Type `help' for help."),
+            cli_printf(cl, _("Unknown command `%s'. Type `help' for help."),
                       args[0]);
             ret = VLC_EGENERIC;
         }
@@ -395,6 +409,7 @@ static void *Run(void *data)
     for (;;)
     {
         char buf[MAX_LINE_LENGTH + 1];
+        struct cli_client cl = { intf };
 
         while (sys->stream == NULL)
         {
@@ -425,13 +440,13 @@ static void *Run(void *data)
             int canc = vlc_savecancel();
             if (cmd[0] != '\0')
                 cmd[strlen(cmd) - 1] = '\0'; /* remove trailing LF */
-            Process(intf, cmd);
+            Process(intf, &cl, cmd);
             vlc_restorecancel(canc);
         }
         else if (sys->pi_socket_listen == NULL)
             break;
         else
-            LogOut(intf, NULL, 0, intf);
+            LogOut(&cl, NULL, 0, intf);
     }
 
     int canc = vlc_savecancel();
@@ -625,7 +640,9 @@ static void *Run( void *data )
         /* Is there something to do? */
         if( !b_complete ) continue;
 
-        Process(p_intf, p_buffer);
+        struct cli_client cl = { p_intf };
+
+        Process(p_intf, &cl, p_buffer);
 
         /* Command processed */
         i_size = 0; p_buffer[0] = 0;
@@ -633,6 +650,10 @@ static void *Run( void *data )
 
     vlc_assert_unreachable();
 }
+
+#undef msg_rc
+#define msg_rc(...)  msg_print(p_intf, __VA_ARGS__)
+#include "../intromsg.h"
 #endif
 
 /*****************************************************************************
@@ -810,7 +831,8 @@ static int Activate( vlc_object_t *p_this )
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
         goto error;
 
-    msg_rc( "%s", _("Remote control interface initialized. Type `help' for help.") );
+    msg_print(p_intf, "%s",
+             _("Remote control interface initialized. Type `help' for help."));
 
     return VLC_SUCCESS;
 

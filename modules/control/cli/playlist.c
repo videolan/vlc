@@ -139,7 +139,7 @@ static input_item_t *parse_MRL(const char *mrl)
 }
 #endif
 
-static void print_playlist(intf_thread_t *p_intf, vlc_playlist_t *playlist)
+static void print_playlist(struct cli_client *cl, vlc_playlist_t *playlist)
 {
     size_t count = vlc_playlist_Count(playlist);
     size_t current = vlc_playlist_GetCurrentIndex(playlist);
@@ -155,14 +155,14 @@ static void print_playlist(intf_thread_t *p_intf, vlc_playlist_t *playlist)
         {
             char buf[MSTRTIME_MAX_SIZE];
             secstotimestr(buf, SEC_FROM_VLC_TICK(len));
-            msg_rc("| %c%zu %s (%s)", selected, i, item->psz_name, buf);
+            cli_printf(cl, "| %c%zu %s (%s)", selected, i, item->psz_name, buf);
         }
         else
-            msg_rc("| %c%zu %s", selected, i, item->psz_name);
+            cli_printf(cl, "| %c%zu %s", selected, i, item->psz_name);
     }
 }
 
-static int PlaylistDoVoid(intf_thread_t *intf, void *data,
+static int PlaylistDoVoid(struct cli_client *cl, void *data,
                           int (*cb)(vlc_playlist_t *))
 {
     vlc_playlist_t *playlist = data;
@@ -171,29 +171,29 @@ static int PlaylistDoVoid(intf_thread_t *intf, void *data,
     vlc_playlist_Lock(playlist);
     ret = cb(playlist);
     vlc_playlist_Unlock(playlist);
-    (void) intf;
+    (void) cl;
     return ret;
 }
 
-static int PlaylistPrev(intf_thread_t *intf, const char *const *args,
+static int PlaylistPrev(struct cli_client *cl, const char *const *args,
                         size_t count, void *data)
 {
     (void) args; (void) count;
-    return PlaylistDoVoid(intf, data, vlc_playlist_Prev);
+    return PlaylistDoVoid(cl, data, vlc_playlist_Prev);
 }
 
-static int PlaylistNext(intf_thread_t *intf, const char *const *args,
+static int PlaylistNext(struct cli_client *cl, const char *const *args,
                         size_t count, void *data)
 {
     (void) args; (void) count;
-    return PlaylistDoVoid(intf, data, vlc_playlist_Next);
+    return PlaylistDoVoid(cl, data, vlc_playlist_Next);
 }
 
-static int PlaylistPlay(intf_thread_t *intf, const char *const *args,
+static int PlaylistPlay(struct cli_client *cl, const char *const *args,
                         size_t count, void *data)
 {
     (void) args; (void) count;
-    return PlaylistDoVoid(intf, data, vlc_playlist_Start);
+    return PlaylistDoVoid(cl, data, vlc_playlist_Start);
 }
 
 static int PlaylistDoStop(vlc_playlist_t *playlist)
@@ -202,11 +202,11 @@ static int PlaylistDoStop(vlc_playlist_t *playlist)
     return 0;
 }
 
-static int PlaylistStop(intf_thread_t *intf, const char *const *args,
+static int PlaylistStop(struct cli_client *cl, const char *const *args,
                         size_t count, void *data)
 {
     (void) args; (void) count;
-    return PlaylistDoVoid(intf, data, PlaylistDoStop);
+    return PlaylistDoVoid(cl, data, PlaylistDoStop);
 }
 
 static int PlaylistDoClear(vlc_playlist_t *playlist)
@@ -216,11 +216,11 @@ static int PlaylistDoClear(vlc_playlist_t *playlist)
     return 0;
 }
 
-static int PlaylistClear(intf_thread_t *intf, const char *const *args,
+static int PlaylistClear(struct cli_client *cl, const char *const *args,
                          size_t count, void *data)
 {
     (void) args; (void) count;
-    return PlaylistDoVoid(intf, data, PlaylistDoClear);
+    return PlaylistDoVoid(cl, data, PlaylistDoClear);
 }
 
 static int PlaylistDoSort(vlc_playlist_t *playlist)
@@ -234,28 +234,28 @@ static int PlaylistDoSort(vlc_playlist_t *playlist)
     return vlc_playlist_Sort(playlist, &criteria, 1);
 }
 
-static int PlaylistSort(intf_thread_t *intf, const char *const *args,
+static int PlaylistSort(struct cli_client *cl, const char *const *args,
                         size_t count, void *data)
 {
     (void) args; (void) count;
-    return PlaylistDoVoid(intf, data, PlaylistDoSort);
+    return PlaylistDoVoid(cl, data, PlaylistDoSort);
 }
 
-static int PlaylistList(intf_thread_t *intf, const char *const *args,
+static int PlaylistList(struct cli_client *cl, const char *const *args,
                         size_t count, void *data)
 {
     vlc_playlist_t *playlist = data;
 
-    msg_print(intf, "+----[ Playlist ]");
+    cli_printf(cl, "+----[ Playlist ]");
     vlc_playlist_Lock(playlist);
-    print_playlist(intf, playlist);
+    print_playlist(cl, playlist);
     vlc_playlist_Unlock(playlist);
-    msg_print(intf, "+----[ End of playlist ]");
+    cli_printf(cl, "+----[ End of playlist ]");
     (void) args; (void) count;
     return 0;
 }
 
-static int PlaylistRepeatCommon(intf_thread_t *intf, const char *const *args,
+static int PlaylistRepeatCommon(struct cli_client *cl, const char *const *args,
                                 size_t count, void *data,
                                 enum vlc_playlist_playback_repeat on_mode)
 
@@ -285,25 +285,25 @@ static int PlaylistRepeatCommon(intf_thread_t *intf, const char *const *args,
         vlc_playlist_SetPlaybackRepeat(playlist, new_mode);
 
     vlc_playlist_Unlock(playlist);
-    (void) intf;
+    (void) cl;
     return 0;
 }
 
-static int PlaylistRepeat(intf_thread_t *intf, const char *const *args,
+static int PlaylistRepeat(struct cli_client *cl, const char *const *args,
                           size_t count, void *data)
 {
-    return PlaylistRepeatCommon(intf, args, count, data,
+    return PlaylistRepeatCommon(cl, args, count, data,
                                 VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT);
 }
 
-static int PlaylistLoop(intf_thread_t *intf, const char *const *args,
+static int PlaylistLoop(struct cli_client *cl, const char *const *args,
                         size_t count, void *data)
 {
-    return PlaylistRepeatCommon(intf, args, count, data,
+    return PlaylistRepeatCommon(cl, args, count, data,
                                 VLC_PLAYLIST_PLAYBACK_REPEAT_ALL);
 }
 
-static int PlaylistRandom(intf_thread_t *intf, const char *const *args,
+static int PlaylistRandom(struct cli_client *cl, const char *const *args,
                           size_t count, void *data)
 {
     vlc_playlist_t *playlist = data;
@@ -331,11 +331,11 @@ static int PlaylistRandom(intf_thread_t *intf, const char *const *args,
         vlc_playlist_SetPlaybackOrder(playlist, new_mode);
 
     vlc_playlist_Unlock(playlist);
-    (void) intf;
+    (void) cl;
     return 0;
 }
 
-static int PlaylistGoto(intf_thread_t *intf, const char *const *args,
+static int PlaylistGoto(struct cli_client *cl, const char *const *args,
                         size_t n_args, void *data)
 {
     vlc_playlist_t *playlist = data;
@@ -348,17 +348,17 @@ static int PlaylistGoto(intf_thread_t *intf, const char *const *args,
     if (ret) {
         size_t count = vlc_playlist_Count(playlist);
 
-        msg_print(intf,
-                  vlc_ngettext("Playlist has only %zu element",
-                               "Playlist has only %zu elements", count),
-                  count);
+        cli_printf(cl,
+                   vlc_ngettext("Playlist has only %zu element",
+                                "Playlist has only %zu elements", count),
+                   count);
     }
 
     vlc_playlist_Unlock(playlist);
     return ret;
 }
 
-static int PlaylistAddCommon(intf_thread_t *intf, const char *const *args,
+static int PlaylistAddCommon(struct cli_client *cl, const char *const *args,
                              size_t n_args, void *data, bool play)
 {
     vlc_playlist_t *playlist = data;
@@ -421,7 +421,7 @@ static int PlaylistAddCommon(intf_thread_t *intf, const char *const *args,
 
         input_item_Release(item);
     }
-    (void) intf;
+    (void) cl;
 #else
     const char *arg = n_args > 1 ? args[1] : "";
 
@@ -429,8 +429,8 @@ static int PlaylistAddCommon(intf_thread_t *intf, const char *const *args,
 
     if (item != NULL)
     {
-        msg_print(intf, "Trying to %s %s to playlist.",
-                  play ? "add" : "enqueue", arg);
+        cli_printf(cl, "Trying to %s %s to playlist.",
+                   play ? "add" : "enqueue", arg);
 
         if (vlc_playlist_InsertOne(playlist, count, item) == VLC_SUCCESS
          && play)
@@ -443,19 +443,19 @@ static int PlaylistAddCommon(intf_thread_t *intf, const char *const *args,
     return ret;
 }
 
-static int PlaylistAdd(intf_thread_t *intf, const char *const *args,
+static int PlaylistAdd(struct cli_client *cl, const char *const *args,
                        size_t count, void *data)
 {
-    return PlaylistAddCommon(intf, args, count, data, true);
+    return PlaylistAddCommon(cl, args, count, data, true);
 }
 
-static int PlaylistEnqueue(intf_thread_t *intf, const char *const *args,
+static int PlaylistEnqueue(struct cli_client *cl, const char *const *args,
                            size_t count, void *data)
 {
-    return PlaylistAddCommon(intf, args, count, data, false);
+    return PlaylistAddCommon(cl, args, count, data, false);
 }
 
-static int PlaylistMove(intf_thread_t *intf, const char *const *args,
+static int PlaylistMove(struct cli_client *cl, const char *const *args,
                         size_t count, void *data)
 {
     vlc_playlist_t *playlist = data;
@@ -463,7 +463,7 @@ static int PlaylistMove(intf_thread_t *intf, const char *const *args,
 
     if (count != 3)
     {
-        msg_print(intf, "%s expects two parameters", args[0]);
+        cli_printf(cl, "%s expects two parameters", args[0]);
         return VLC_EGENERIC /*EINVAL*/;
     }
 
@@ -480,8 +480,8 @@ static int PlaylistMove(intf_thread_t *intf, const char *const *args,
     }
     else
     {
-        msg_print(intf, vlc_ngettext("Playlist has only %zu element",
-                                     "Playlist has only %zu elements", size),
+        cli_printf(cl, vlc_ngettext("Playlist has only %zu element",
+                                    "Playlist has only %zu elements", size),
                   size);
         ret = VLC_ENOITEM;
     }

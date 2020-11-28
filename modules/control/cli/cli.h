@@ -24,6 +24,11 @@
 #include <stdio.h>
 #include <vlc_common.h>
 
+struct cli_client
+{
+    intf_thread_t *intf;
+};
+
 struct intf_sys_t
 {
     vlc_thread_t thread;
@@ -44,12 +49,15 @@ struct intf_sys_t
 };
 
 VLC_FORMAT(2, 3)
+int cli_printf(struct cli_client *cl, const char *fmt, ...);
+
+VLC_FORMAT(2, 3)
 void msg_print(intf_thread_t *p_intf, const char *psz_fmt, ...);
 
-#define msg_rc(...) msg_print(p_intf, __VA_ARGS__)
+#define msg_rc(...) cli_printf(cl, __VA_ARGS__)
 #define STATUS_CHANGE "status change: "
 
-typedef int (*cli_callback)(intf_thread_t *, const char *const *, size_t,
+typedef int (*cli_callback)(struct cli_client *, const char *const *, size_t,
                             void *);
 
 struct cli_handler
