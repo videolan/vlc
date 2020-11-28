@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC иска достъп до камерата, по заявка на потребителя.";
+"NSMicrophoneUsageDescription" = "VLC иска достъп до микрофона, по заявка на потребителя.";
+"NSAppleEventsUsageDescription" = "VLC иска да може спира на пауза и продължава възпроизвеждането на външни медийни плеъри.";
+"NSDesktopFolderUsageDescription" = "VLC иска достъп до папката на работния плот, по заявка на потребителя.";
+"NSDocumentsFolderUsageDescription" = "VLC иска достъп до папката с документите, по заявка на потребителя.";
+"NSDownloadsFolderUsageDescription" = "VLC иска достъп до папката за свалени файлове, по заявка на потребителя.";
+"NSNetworkVolumesUsageDescription" = "VLC иска достъп до мрежово устройство за съхранение, по заявка на потребителя.";
+"NSRemovableVolumesUsageDescription" = "VLC иска достъп до преносимо устройство за съхранение, по заявка на потребителя.";
