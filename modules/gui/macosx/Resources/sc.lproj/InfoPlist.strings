@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC cheret atzèdere a sa fotocàmera, comente pedidu dae s'impreadore.";
+"NSMicrophoneUsageDescription" = "VLC cheret atzèdere a su micròfonu, comente pedidu dae s'impreadore.";
+"NSAppleEventsUsageDescription" = "VLC cheret pònnere in pàusa e fàghere sighire cun sa riprodutzione sos riproduidores esternos de cuntenutos multimediales.";
+"NSDesktopFolderUsageDescription" = "VLC cheret atzèdere a sa cartella \"Iscrivania\", comente pedidu dae s'impreadore.";
+"NSDocumentsFolderUsageDescription" = "VLC cheret atzèdere a sa cartella de sos documentos, comente pedidu dae s'impreadore.";
+"NSDownloadsFolderUsageDescription" = "VLC cheret atzèdere a sa cartella de sos iscarrigamentos, comente pedidu dae s'impreadore.";
+"NSNetworkVolumesUsageDescription" = "VLC cheret atzèdere a unu volume de retza, comente pedidu dae s'impreadore.";
+"NSRemovableVolumesUsageDescription" = "VLC cheret atzèdere a unu volume rimovìbile, comente pedidu dae s'impreadore.";
