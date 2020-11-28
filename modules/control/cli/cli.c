@@ -264,7 +264,7 @@ static int KeyAction(intf_thread_t *intf, const char *const *args, size_t n)
 {
     vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(intf));
 
-    if (n != 1)
+    if (n != 2)
         return VLC_EGENERIC; /* EINVAL */
 
     var_SetInteger(vlc, "key-action", vlc_actions_get_id(args[1]));
