@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC хоче доступ до камери за запитом користувача.";
+"NSMicrophoneUsageDescription" = "VLC хоче доступ до мікрофону за запитом користувача.";
+"NSAppleEventsUsageDescription" = "VLC хоче призупиняти та відновлювати зовнішні медіа програвачі.";
+"NSDesktopFolderUsageDescription" = "VLC хоче доступ до теки стільниці за запитом користувача.";
+"NSDocumentsFolderUsageDescription" = "VLC хоче доступ до теки документів за запитом користувача.";
+"NSDownloadsFolderUsageDescription" = "VLC хоче доступ до теки завантажень за запитом користувача.";
+"NSNetworkVolumesUsageDescription" = "VLC хоче доступ до мережевого диску за запитом користувача.";
+"NSRemovableVolumesUsageDescription" = "VLC хоче доступ до змінного носія за запитом користувача.";
