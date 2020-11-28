@@ -23,16 +23,12 @@
 
 #include <stdio.h>
 #include <vlc_common.h>
-#include <vlc_playlist.h>
 
 struct intf_sys_t
 {
     vlc_thread_t thread;
     void *commands;
     void *player_cli;
-
-    /* playlist */
-    vlc_playlist_t              *playlist;
 
     vlc_mutex_t output_lock;
 #ifndef _WIN32

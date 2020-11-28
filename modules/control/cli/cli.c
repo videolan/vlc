@@ -772,7 +772,6 @@ static int Activate( vlc_object_t *p_this )
     p_sys->commands = NULL;
     vlc_mutex_init(&p_sys->output_lock);
     p_sys->pi_socket_listen = pi_socket;
-    p_sys->playlist = vlc_intf_GetMainPlaylist(p_intf);;
 
     RegisterHandlers(p_intf, cmds, ARRAY_SIZE(cmds), p_intf);
 
