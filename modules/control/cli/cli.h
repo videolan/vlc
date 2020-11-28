@@ -53,7 +53,8 @@ void msg_print(intf_thread_t *p_intf, const char *psz_fmt, ...);
 #define msg_rc(...) msg_print(p_intf, __VA_ARGS__)
 #define STATUS_CHANGE "status change: "
 
-typedef int (*cli_callback)(intf_thread_t *, const char *const *, size_t);
+typedef int (*cli_callback)(intf_thread_t *, const char *const *, size_t,
+                            void *);
 
 struct cli_handler
 {

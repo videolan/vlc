@@ -174,21 +174,21 @@ static int PlaylistDoVoid(intf_thread_t *intf, int (*cb)(vlc_playlist_t *))
 }
 
 static int PlaylistPrev(intf_thread_t *intf, const char *const *args,
-                        size_t count)
+                        size_t count, void *data)
 {
     (void) args; (void) count;
     return PlaylistDoVoid(intf, vlc_playlist_Prev);
 }
 
 static int PlaylistNext(intf_thread_t *intf, const char *const *args,
-                        size_t count)
+                        size_t count, void *data)
 {
     (void) args; (void) count;
     return PlaylistDoVoid(intf, vlc_playlist_Next);
 }
 
 static int PlaylistPlay(intf_thread_t *intf, const char *const *args,
-                        size_t count)
+                        size_t count, void *data)
 {
     (void) args; (void) count;
     return PlaylistDoVoid(intf, vlc_playlist_Start);
@@ -201,7 +201,7 @@ static int PlaylistDoStop(vlc_playlist_t *playlist)
 }
 
 static int PlaylistStop(intf_thread_t *intf, const char *const *args,
-                        size_t count)
+                        size_t count, void *data)
 {
     (void) args; (void) count;
     return PlaylistDoVoid(intf, PlaylistDoStop);
@@ -215,7 +215,7 @@ static int PlaylistDoClear(vlc_playlist_t *playlist)
 }
 
 static int PlaylistClear(intf_thread_t *intf, const char *const *args,
-                         size_t count)
+                         size_t count, void *data)
 {
     (void) args; (void) count;
     return PlaylistDoVoid(intf, PlaylistDoClear);
@@ -233,14 +233,14 @@ static int PlaylistDoSort(vlc_playlist_t *playlist)
 }
 
 static int PlaylistSort(intf_thread_t *intf, const char *const *args,
-                        size_t count)
+                        size_t count, void *data)
 {
     (void) args; (void) count;
     return PlaylistDoVoid(intf, PlaylistDoSort);
 }
 
 static int PlaylistList(intf_thread_t *intf, const char *const *args,
-                        size_t count)
+                        size_t count, void *data)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
 
@@ -287,21 +287,21 @@ static int PlaylistRepeatCommon(intf_thread_t *intf, const char *const *args,
 }
 
 static int PlaylistRepeat(intf_thread_t *intf, const char *const *args,
-                          size_t count)
+                          size_t count, void *data)
 {
     return PlaylistRepeatCommon(intf, args, count,
                                 VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT);
 }
 
 static int PlaylistLoop(intf_thread_t *intf, const char *const *args,
-                        size_t count)
+                        size_t count, void *data)
 {
     return PlaylistRepeatCommon(intf, args, count,
                                 VLC_PLAYLIST_PLAYBACK_REPEAT_ALL);
 }
 
 static int PlaylistRandom(intf_thread_t *intf, const char *const *args,
-                          size_t count)
+                          size_t count, void *data)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
 
@@ -332,7 +332,7 @@ static int PlaylistRandom(intf_thread_t *intf, const char *const *args,
 }
 
 static int PlaylistGoto(intf_thread_t *intf, const char *const *args,
-                        size_t n_args)
+                        size_t n_args, void *data)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
     const char *arg = n_args > 1 ? args[1] : "";
@@ -439,19 +439,19 @@ static int PlaylistAddCommon(intf_thread_t *intf, const char *const *args,
 }
 
 static int PlaylistAdd(intf_thread_t *intf, const char *const *args,
-                       size_t count)
+                       size_t count, void *data)
 {
     return PlaylistAddCommon(intf, args, count, true);
 }
 
 static int PlaylistEnqueue(intf_thread_t *intf, const char *const *args,
-                           size_t count)
+                           size_t count, void *data)
 {
     return PlaylistAddCommon(intf, args, count, false);
 }
 
 static int PlaylistMove(intf_thread_t *intf, const char *const *args,
-                        size_t count)
+                        size_t count, void *data)
 {
     vlc_playlist_t *playlist = intf->p_sys->playlist;
     int ret;

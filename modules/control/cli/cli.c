@@ -160,7 +160,8 @@ void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,
 # include "../intromsg.h"
 #endif
 
-static int Help( intf_thread_t *p_intf, const char *const *args, size_t count)
+static int Help(intf_thread_t *p_intf, const char *const *args, size_t count,
+                void *data)
 {
     msg_rc("%s", _("+----[ Remote control commands ]"));
     msg_rc(  "| ");
@@ -220,23 +221,26 @@ static int Help( intf_thread_t *p_intf, const char *const *args, size_t count)
     msg_rc("%s", _("| quit . . . . . . . . . . . . . . . . . . .  quit vlc"));
     msg_rc(  "| ");
     msg_rc("%s", _("+----[ end of help ]"));
-    (void) args; (void) count;
+    (void) args; (void) count; (void) data;
     return 0;
 }
 
-static int Intf(intf_thread_t *intf, const char *const *args, size_t count)
+static int Intf(intf_thread_t *intf, const char *const *args, size_t count,
+                void *data)
 {
     return intf_Create(vlc_object_instance(intf), count == 1 ? "" : args[1]);
 }
 
-static int Quit(intf_thread_t *intf, const char *const *args, size_t count)
+static int Quit(intf_thread_t *intf, const char *const *args, size_t count,
+                void *data)
 {
     libvlc_Quit(vlc_object_instance(intf));
     (void) args; (void) count;
     return 0;
 }
 
-static int LogOut(intf_thread_t *intf, const char *const *args, size_t count)
+static int LogOut(intf_thread_t *intf, const char *const *args, size_t count,
+                  void *data)
 {
     intf_sys_t *sys = intf->p_sys;
 
@@ -274,7 +278,8 @@ static int LogOut(intf_thread_t *intf, const char *const *args, size_t count)
     return 0;
 }
 
-static int KeyAction(intf_thread_t *intf, const char *const *args, size_t n)
+static int KeyAction(intf_thread_t *intf, const char *const *args, size_t n,
+                     void *data)
 {
     vlc_object_t *vlc = VLC_OBJECT(vlc_object_instance(intf));
 
@@ -363,7 +368,7 @@ error:      wordfree(&we);
         {
             const struct command *c = *pp;;
 
-            ret = c->handler.callback(intf, args, count);
+            ret = c->handler.callback(intf, args, count, c->data);
         }
         else
         {
@@ -426,7 +431,7 @@ static void *Run(void *data)
         else if (sys->pi_socket_listen == NULL)
             break;
         else
-            LogOut(intf, NULL, 0);
+            LogOut(intf, NULL, 0, intf);
     }
 
     int canc = vlc_savecancel();
