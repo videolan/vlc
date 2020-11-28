@@ -60,7 +60,7 @@ struct cli_handler
 };
 
 void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,
-                      size_t count);
+                      size_t count, void *opaque);
 
 void *RegisterPlayer(intf_thread_t *intf);
 void DeregisterPlayer(intf_thread_t *intf, void *);

@@ -1072,7 +1072,7 @@ void *RegisterPlayer(intf_thread_t *intf)
     pc->input_buffering = false;
     pc->show_position = var_InheritBool(intf, "rc-show-pos");
 
-    RegisterHandlers(intf, cmds, ARRAY_SIZE(cmds));
+    RegisterHandlers(intf, cmds, ARRAY_SIZE(cmds), player);
 
     vlc_player_Lock(player);
     pc->player_listener = vlc_player_AddListener(player, &player_cbs, pc);

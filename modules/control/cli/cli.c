@@ -120,6 +120,7 @@ struct command {
         const char *name;
         struct cli_handler handler;
     };
+    void *data;
 };
 
 static int cmdcmp(const void *a, const void *b)
@@ -131,7 +132,7 @@ static int cmdcmp(const void *a, const void *b)
 }
 
 void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,
-                      size_t count)
+                      size_t count, void *opaque)
 {
     intf_sys_t *sys = intf->p_sys;
 
@@ -142,6 +143,7 @@ void RegisterHandlers(intf_thread_t *intf, const struct cli_handler *handlers,
             break;
 
         cmd->handler = handlers[i];
+        cmd->data = opaque;
 
         struct command **pp = tsearch(&cmd->name, &sys->commands, cmdcmp);
         if (unlikely(pp == NULL))
@@ -767,7 +769,7 @@ static int Activate( vlc_object_t *p_this )
     p_sys->pi_socket_listen = pi_socket;
     p_sys->playlist = vlc_intf_GetMainPlaylist(p_intf);;
 
-    RegisterHandlers(p_intf, cmds, ARRAY_SIZE(cmds));
+    RegisterHandlers(p_intf, cmds, ARRAY_SIZE(cmds), p_intf);
 
     /* Line-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );

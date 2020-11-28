@@ -504,5 +504,6 @@ static const struct cli_handler cmds[] =
 
 void RegisterPlaylist(intf_thread_t *intf)
 {
-    RegisterHandlers(intf, cmds, ARRAY_SIZE(cmds));
+    RegisterHandlers(intf, cmds, ARRAY_SIZE(cmds),
+                     vlc_intf_GetMainPlaylist(intf));
 }
