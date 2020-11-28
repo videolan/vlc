@@ -84,66 +84,6 @@ struct intf_sys_t
 
 #define MAX_LINE_LENGTH 1024
 
-static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
-{
-#ifndef _WIN32
-    intf_sys_t *sys = p_intf->p_sys;
-    int fd;
-
-    vlc_mutex_lock(&sys->output_lock);
-    fd = sys->fd;
-    if (fd != -1)
-    {
-        char *msg;
-        int len = vasprintf(&msg, psz_fmt, args);
-
-        if (unlikely(len < 0))
-            return;
-
-        struct iovec iov[2] = { { msg, len }, { (char *)"\n", 1 } };
-
-        vlc_writev(sys->fd, iov, ARRAY_SIZE(iov));
-        free(msg);
-    }
-    vlc_mutex_unlock(&sys->output_lock);
-#else
-    char fmt_eol[strlen (psz_fmt) + 3], *msg;
-    int len;
-
-    snprintf (fmt_eol, sizeof (fmt_eol), "%s\r\n", psz_fmt);
-    len = vasprintf( &msg, fmt_eol, args );
-
-    if( len < 0 )
-        return;
-
-    if( p_intf->p_sys->i_socket == -1 )
-        utf8_fprintf( stdout, "%s", msg );
-    else
-        net_Write( p_intf, p_intf->p_sys->i_socket, msg, len );
-
-    free( msg );
-#endif
-}
-
-void msg_print(intf_thread_t *intf, const char *fmt, ...)
-{
-    va_list ap;
-
-    va_start(ap, fmt);
-    msg_vprint(intf, fmt, ap);
-    va_end(ap);
-}
-
-int cli_printf(struct cli_client *cl, const char *fmt, ...)
-{
-    va_list ap;
-
-    va_start(ap, fmt);
-    msg_vprint(cl->intf, fmt, ap);
-    va_end(ap);
-    return VLC_SUCCESS;
-}
-
 struct command {
     union {
         const char *name;
@@ -420,6 +360,48 @@ error:      wordfree(&we);
 }
 
 #ifndef _WIN32
+static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
+{
+    intf_sys_t *sys = p_intf->p_sys;
+    int fd;
+
+    vlc_mutex_lock(&sys->output_lock);
+    fd = sys->fd;
+    if (fd != -1)
+    {
+        char *msg;
+        int len = vasprintf(&msg, psz_fmt, args);
+
+        if (unlikely(len < 0))
+            return;
+
+        struct iovec iov[2] = { { msg, len }, { (char *)"\n", 1 } };
+
+        vlc_writev(sys->fd, iov, ARRAY_SIZE(iov));
+        free(msg);
+    }
+    vlc_mutex_unlock(&sys->output_lock);
+}
+
+void msg_print(intf_thread_t *intf, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    msg_vprint(intf, fmt, ap);
+    va_end(ap);
+}
+
+int cli_printf(struct cli_client *cl, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    msg_vprint(cl->intf, fmt, ap);
+    va_end(ap);
+    return VLC_SUCCESS;
+}
+
 static void *Run(void *data)
 {
     intf_thread_t *intf = data;
@@ -475,6 +457,44 @@ static void *Run(void *data)
 }
 
 #else
+static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
+{
+    char fmt_eol[strlen (psz_fmt) + 3], *msg;
+    int len;
+
+    snprintf (fmt_eol, sizeof (fmt_eol), "%s\r\n", psz_fmt);
+    len = vasprintf( &msg, fmt_eol, args );
+
+    if( len < 0 )
+        return;
+
+    if( p_intf->p_sys->i_socket == -1 )
+        utf8_fprintf( stdout, "%s", msg );
+    else
+        net_Write( p_intf, p_intf->p_sys->i_socket, msg, len );
+
+    free( msg );
+}
+
+void msg_print(intf_thread_t *intf, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    msg_vprint(intf, fmt, ap);
+    va_end(ap);
+}
+
+int cli_printf(struct cli_client *cl, const char *fmt, ...)
+{
+    va_list ap;
+
+    va_start(ap, fmt);
+    msg_vprint(cl->intf, fmt, ap);
+    va_end(ap);
+    return VLC_SUCCESS;
+}
+
 #if !VLC_WINSTORE_APP
 static bool ReadWin32( intf_thread_t *p_intf, unsigned char *p_buffer, int *pi_size )
 {
