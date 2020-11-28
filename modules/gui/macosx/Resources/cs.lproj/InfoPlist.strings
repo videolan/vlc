@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "Na základě žádosti uživatele chce VLC přístup ke kameře.";
+"NSMicrophoneUsageDescription" = "Na základě žádosti uživatele chce VLC přístup k mikrofonu.";
+"NSAppleEventsUsageDescription" = "VLC chce zastavovat a znovu spouštět externí přehrávače médií.";
+"NSDesktopFolderUsageDescription" = "Na základě žádosti uživatele chce VLC přístup k ploše.";
+"NSDocumentsFolderUsageDescription" = "Na základě žádosti uživatele chce VLC přístup k dokumentům.";
+"NSDownloadsFolderUsageDescription" = "Na základě žádosti uživatele chce VLC přístup ke staženým souborům.";
+"NSNetworkVolumesUsageDescription" = "Na základě žádosti uživatele chce VLC přístup k síťovému disku.";
+"NSRemovableVolumesUsageDescription" = "Na základě žádosti uživatele chce VLC přístup k odnímatelný disku.";
