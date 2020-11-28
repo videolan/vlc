@@ -365,7 +365,7 @@ error:      wordfree(&we);
 
     if (count > 0)
     {
-        int (*cb)(intf_thread_t *, const char *const *, size_t) = UnknownCmd;
+        cli_callback cb = UnknownCmd;
         const struct command **c = tfind(&args[0], &sys->commands, cmdcmp);
 
         if (c != NULL)
