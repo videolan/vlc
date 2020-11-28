@@ -10,7 +10,7 @@
 # Giovanni Alfredo Garciliano Diaz <xivanni@hotmail.com>, 2016
 # Jorge Arturo <jorgeartware@gmail.com>, 2014
 # Jose lopez <rlockc@gmail.com>, 2013
-# Lesther Lopez <ll33ee@hotmail.com>, 2019
+# Lesther Lopez <ll33ee@hotmail.com>, 2019-2020
 # Luis Jaramillo <luizja+tf@gmail.com>, 2013
 # Naresu Tenshi <naresutenshi@gmail.com>, 2014
 # Raquel Gonzalez Orea <r4k3ll3@gmail.com>, 2014
@@ -23,8 +23,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2019-11-08 21:45+0100\n"
-"Last-Translator: Lesther Lopez <ll33ee@hotmail.com>, 2019\n"
+"PO-Revision-Date: 2020-11-28 02:47+0100\n"
+"Last-Translator: Lesther Lopez <ll33ee@hotmail.com>, 2020\n"
 "Language-Team: Spanish (Mexico) (https://www.transifex.com/yaron/teams/16553/"
 "es_MX/)\n"
 "Language: es_MX\n"
@@ -6219,25 +6219,24 @@ msgstr ""
 
 #: modules/access/avaudiocapture.m:236 modules/access/avcapture.m:350
 #: modules/access/dvdnav.c:368 modules/access/dvdread.c:203
-#, fuzzy
 msgid "Problem accessing a system resource"
-msgstr "Detalles de fallas y sistema de configuración"
+msgstr "Problemas al acceder a recursos del sistema"
 
 #: modules/access/avaudiocapture.m:237
 msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your microphone."
 msgstr ""
+"Por favor, abrir Configuración del sistema -> \"Privacidad\" y permitir el "
+"acceso a tu micrófono."
 
 #: modules/access/avaudiocapture.m:341
-#, fuzzy
 msgid "AVFoundation Audio Capture"
-msgstr "Captura de vídeo AVFoundation"
+msgstr "Captura de Audio AVFoundation"
 
 #: modules/access/avaudiocapture.m:342
-#, fuzzy
 msgid "AVFoundation audio capture module."
-msgstr "Módulo de captura de vídeo AVFoundation."
+msgstr "Modulo de captura de audio AVFoundation"
 
 #: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
@@ -6272,6 +6271,8 @@ msgid ""
 "Please open \"System Preferences\" -> \"Security & Privacy\" and allow VLC "
 "to access your camera."
 msgstr ""
+"Por favor, abrir Configuración del sistema -> \"Privacidad\" y permitir el "
+"acceso a tu cámara."
 
 #: modules/access/avio.h:33
 msgid "AVIO"
@@ -16998,7 +16999,7 @@ msgstr "Guardar como archivo"
 #: modules/gui/macosx/VLCOutput.m:65 modules/gui/macosx/VLCOutput.m:194
 #: modules/gui/macosx/VLCOutput.m:313 modules/gui/qt/dialogs/sout.cpp:94
 msgid "Stream"
-msgstr "Emitisión"
+msgstr "Emisión"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:152
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:181
