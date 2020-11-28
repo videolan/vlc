@@ -415,6 +415,35 @@ void msg_print(intf_thread_t *intf, const char *fmt, ...)
     va_end(ap);
 }
 
+static void *cli_client_thread(void *data)
+{
+    struct cli_client *cl = data;
+    intf_thread_t *intf = cl->intf;
+
+    while (cl->stream != NULL)
+    {
+        char cmd[MAX_LINE_LENGTH + 1];
+
+        if (fgets(cmd, sizeof (cmd), cl->stream) == NULL)
+            break;
+
+        int canc = vlc_savecancel();
+        if (cmd[0] != '\0')
+            cmd[strlen(cmd) - 1] = '\0'; /* remove trailing LF */
+        Process(intf, cl, cmd);
+        vlc_restorecancel(canc);
+    }
+
+    if (cl->stream == stdin)
+    {
+        int canc = vlc_savecancel();
+        libvlc_Quit(vlc_object_instance(intf));
+        vlc_restorecancel(canc);
+    }
+
+    return NULL;
+}
+
 static void *Run(void *data)
 {
     intf_thread_t *intf = data;
@@ -422,7 +451,6 @@ static void *Run(void *data)
 
     for (;;)
     {
-        char buf[MAX_LINE_LENGTH + 1];
         struct cli_client *cl = &sys->client;
 
         while (cl->stream == NULL)
@@ -449,24 +477,12 @@ static void *Run(void *data)
             vlc_restorecancel(canc);
         }
 
-        char *cmd = fgets(buf, sizeof (buf), cl->stream);
-        if (cmd != NULL)
-        {
-            int canc = vlc_savecancel();
-            if (cmd[0] != '\0')
-                cmd[strlen(cmd) - 1] = '\0'; /* remove trailing LF */
-            Process(intf, cl, cmd);
-            vlc_restorecancel(canc);
-        }
-        else if (sys->pi_socket_listen == NULL)
+        cli_client_thread(cl);
+
+        if (sys->pi_socket_listen == NULL)
             break;
-        else
-            LogOut(cl, NULL, 0, intf);
     }
 
-    int canc = vlc_savecancel();
-    libvlc_Quit(vlc_object_instance(intf));
-    vlc_restorecancel(canc);
     return NULL;
 }
 
