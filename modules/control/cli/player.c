@@ -959,7 +959,7 @@ static int PlayerStatus(intf_thread_t *intf, const char *const *args,
     vlc_playlist_t *playlist = intf->p_sys->playlist;
     vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
 
-    vlc_playlist_Lock(playlist);
+    vlc_player_Lock(player);
 
     input_item_t *item = vlc_player_GetCurrentMedia(player);
     if (item != NULL)
@@ -979,7 +979,7 @@ static int PlayerStatus(intf_thread_t *intf, const char *const *args,
 
     enum vlc_player_state state = vlc_player_GetState(player);
 
-    vlc_playlist_Unlock(playlist);
+    vlc_player_Unlock(player);
 
     int stnum = -1;
     const char *stname = "unknown";
