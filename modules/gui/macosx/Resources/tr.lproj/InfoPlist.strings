@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC, kullanıcının isteği üzerine kameraya erişmek istiyor.";
+"NSMicrophoneUsageDescription" = "VLC, kullanıcının isteği üzerine mikrofona erişmek istiyor.";
+"NSAppleEventsUsageDescription" = "VLC, dış ortam oynatıcıları duraklatmak ve oynatma istiyor.";
+"NSDesktopFolderUsageDescription" = "VLC, kullanıcının isteği üzerine masaüstü klasörüne erişmek istiyor.";
+"NSDocumentsFolderUsageDescription" = "VLC, kullanıcının isteği üzerine belgeler klasörüne erişmek istiyor.";
+"NSDownloadsFolderUsageDescription" = "VLC, kullanıcının isteği üzerine indirmeler klasörüne erişmek istiyor.";
+"NSNetworkVolumesUsageDescription" = "VLC, kullanıcının isteği üzerine ağ birimine erişmek istiyor.";
+"NSRemovableVolumesUsageDescription" = "VLC, kullanıcının isteği üzerine çıkarılabilir bir birime erişmek istiyor.";
