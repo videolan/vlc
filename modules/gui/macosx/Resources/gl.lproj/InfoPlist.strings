@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "O VLC quere acceder á camara por solicitude do usuario.";
+"NSMicrophoneUsageDescription" = "O VLC quere acceder ao micrófono por solicitude do usuario.";
+"NSAppleEventsUsageDescription" = "O VLC quere deterse e continuar con reprodutores externos.";
+"NSDesktopFolderUsageDescription" = "O VLC quere acceder ao cartafol do escritorio por solicitude do usuario.";
+"NSDocumentsFolderUsageDescription" = "O VLC quere acceder ao cartafol de documentos por solicitude do usuario.";
+"NSDownloadsFolderUsageDescription" = "O VLC quere acceder ao cartafol e descargas por solicitude do usuario.";
+"NSNetworkVolumesUsageDescription" = "O VLC quere acceder ao volume de rede por solicitude do usuario.";
+"NSRemovableVolumesUsageDescription" = "O VLC quere acceder ao volume extraíbel por solicitude do usuario.";
