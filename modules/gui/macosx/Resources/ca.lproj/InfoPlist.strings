@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "El VLC vol accedir a la càmera tal com ha demanat l'usuari.";
+"NSMicrophoneUsageDescription" = "El VLC vol accedir al micròfon tal com ha demanat l'usuari.";
+"NSAppleEventsUsageDescription" = "El VLC vol fer una pausa i reprendre els reproductors multimèdia externs.";
+"NSDesktopFolderUsageDescription" = "El VLC vol accedir a la carpeta d'escriptori tal com l'ha sol·licitat l'usuari.";
+"NSDocumentsFolderUsageDescription" = "El VLC vol accedir a la carpeta de documents tal com ha demanat l'usuari.";
+"NSDownloadsFolderUsageDescription" = "El VLC vol accedir a la carpeta de baixades tal com ha demanat l'usuari.";
+"NSNetworkVolumesUsageDescription" = "El VLC vol accedir a un volum de xarxa tal com ha demanat l'usuari.";
+"NSRemovableVolumesUsageDescription" = "El VLC vol accedir a un volum extraïble tal com l'ha sol·licitat l'usuari.";
