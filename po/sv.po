@@ -34,7 +34,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.9\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2020-03-24 21:54+0100\n"
-"PO-Revision-Date: 2020-03-25 11:31+0100\n"
+"PO-Revision-Date: 2020-11-28 10:49+0100\n"
 "Last-Translator: Anton Regnander <anton_r_3@hotmail.com>, 2020\n"
 "Language-Team: Swedish (https://www.transifex.com/yaron/teams/16553/sv/)\n"
 "Language: sv\n"
@@ -1166,7 +1166,7 @@ msgstr "ITU-R BT.601 (625 linjer, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
-msgstr "Färgpremier"
+msgstr "Färgprimärer"
 
 #: src/input/es_out.c:3229 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1175,11 +1175,11 @@ msgstr "Linjär"
 
 #: src/input/es_out.c:3236
 msgid "Hybrid Log-Gamma"
-msgstr "Hybrid Logg-Gamma"
+msgstr "Hybrid Log-Gamma"
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
-msgstr "Färgöverföring funktion"
+msgstr "Färgöverföringsfunktion"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
@@ -7750,7 +7750,7 @@ msgstr "Minnesström"
 
 #: modules/access/imem-access.c:160
 msgid "In-memory stream input"
-msgstr "In-minne ströminmatning"
+msgstr "Minnesintern ströminmatning"
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -28242,7 +28242,7 @@ msgstr "Spårsynkronisering"
 
 #: share/lua/http/index.html:220
 msgid "VLM Batch Commands"
-msgstr "VLM kommandon"
+msgstr "VLM-batchkommandon"
 
 #: share/lua/http/index.html:240 modules/gui/qt/ui/vlm.h:295
 msgid "Loop"
