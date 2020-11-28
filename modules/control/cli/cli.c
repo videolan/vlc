@@ -63,6 +63,25 @@
 
 #include "cli.h"
 
+struct intf_sys_t
+{
+    vlc_thread_t thread;
+    void *commands;
+    void *player_cli;
+
+    vlc_mutex_t output_lock;
+#ifndef _WIN32
+    FILE *stream;
+    int fd;
+    char *psz_unix_path;
+#else
+    HANDLE hConsoleIn;
+    bool b_quiet;
+    int i_socket;
+#endif
+    int *pi_socket_listen;
+};
+
 #define MAX_LINE_LENGTH 1024
 
 static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
