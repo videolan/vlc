@@ -300,14 +300,6 @@ static const struct cli_handler cmds[] =
     { "hotkey", KeyAction },
 };
 
-static int UnknownCmd(intf_thread_t *intf, const char *const *args,
-                       size_t count)
-{
-    msg_print(intf, _("Unknown command `%s'. Type `help' for help."), args[0]);
-    (void) count;
-    return VLC_EGENERIC;
-}
-
 static int Process(intf_thread_t *intf, const char *line)
 {
     intf_sys_t *sys = intf->p_sys;
@@ -365,13 +357,21 @@ error:      wordfree(&we);
 
     if (count > 0)
     {
-        cli_callback cb = UnknownCmd;
-        const struct command **c = tfind(&args[0], &sys->commands, cmdcmp);
+        const struct command **pp = tfind(&args[0], &sys->commands, cmdcmp);
 
-        if (c != NULL)
-            cb = (*c)->handler.callback;
+        if (pp != NULL)
+        {
+            const struct command *c = *pp;;
 
-        ret = cb(intf, args, count);
+            ret = c->handler.callback(intf, args, count);
+        }
+        else
+        {
+            msg_print(intf,
+                      _("Unknown command `%s'. Type `help' for help."),
+                      args[0]);
+            ret = VLC_EGENERIC;
+        }
     }
 
 #ifdef HAVE_WORDEXP
