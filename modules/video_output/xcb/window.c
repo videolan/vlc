@@ -295,6 +295,7 @@ static int ProcessEvent(vout_window_t *wnd, xcb_generic_event_t *ev)
             break;
 
         case XCB_MAP_NOTIFY:
+            ret = 1;
             break;
 
         case XCB_REPARENT_NOTIFY:
