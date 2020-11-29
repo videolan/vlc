@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC pēc lietotāja pieprasījuma vēlas piekļūt kamerai.";
+"NSMicrophoneUsageDescription" = "VLC pēc lietotāja pieprasījuma vēlas piekļūt mikrofonam.";
+"NSAppleEventsUsageDescription" = "VLC vēlas pauzēt un atsākt ārējos mediju atskaņotājus.";
+"NSDesktopFolderUsageDescription" = "VLC pēc lietotāja pieprasījuma vēlas piekļūt darbvirsmas mapei.";
+"NSDocumentsFolderUsageDescription" = "VLC pēc lietotāja pieprasījuma vēlas piekļūt dokumentu mapei.";
+"NSDownloadsFolderUsageDescription" = "VLC pēc lietotāja pieprasījuma vēlas piekļūt lejupielāžu mapei.";
+"NSNetworkVolumesUsageDescription" = "VLC pēc lietotāja pieprasījuma vēlas piekļūt tīkla sējumam.";
+"NSRemovableVolumesUsageDescription" = "VLC pēc lietotāja pieprasījuma vēlas piekļūt noņemamam sējumam.";
