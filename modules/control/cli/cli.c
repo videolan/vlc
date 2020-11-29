@@ -70,6 +70,8 @@ struct intf_sys_t
     void *player_cli;
 
 #ifndef _WIN32
+    vlc_mutex_t clients_lock;
+    struct vlc_list clients;
     struct cli_client client;
     char *psz_unix_path;
 #else
@@ -399,11 +401,15 @@ int cli_printf(struct cli_client *cl, const char *fmt, ...)
     return len;
 }
 
-static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
+static void msg_vprint(intf_thread_t *p_intf, const char *fmt, va_list args)
 {
     intf_sys_t *sys = p_intf->p_sys;
+    struct cli_client *cl;
 
-    cli_vprintf(&sys->client, psz_fmt, args);
+    vlc_mutex_lock(&sys->clients_lock);
+    vlc_list_foreach (cl, &sys->clients, node)
+        cli_vprintf(cl, fmt, args);
+    vlc_mutex_unlock(&sys->clients_lock);
 }
 
 void msg_print(intf_thread_t *intf, const char *fmt, ...)
@@ -453,7 +459,7 @@ static void *Run(void *data)
     {
         struct cli_client *cl = &sys->client;
 
-        while (cl->stream == NULL)
+        while (vlc_list_is_empty(&sys->clients))
         {
             assert(sys->pi_socket_listen != NULL);
 
@@ -467,10 +473,12 @@ static void *Run(void *data)
             cl->stream = fdopen(fd, "r");
             if (cl->stream != NULL)
             {
-                vlc_mutex_lock(&cl->output_lock);
                 cl->fd = fd;
-                vlc_mutex_unlock(&cl->output_lock);
                 cl->intf = intf;
+                vlc_mutex_init(&cl->output_lock);
+                vlc_mutex_lock(&sys->clients_lock);
+                vlc_list_append(&cl->node, &sys->clients);
+                vlc_mutex_unlock(&sys->clients_lock);
             }
             else
                 vlc_close(fd);
@@ -478,6 +486,9 @@ static void *Run(void *data)
         }
 
         cli_client_thread(cl);
+        vlc_mutex_lock(&sys->clients_lock);
+        vlc_list_remove(&cl->node);
+        vlc_mutex_unlock(&sys->clients_lock);
 
         if (sys->pi_socket_listen == NULL)
             break;
@@ -868,21 +879,8 @@ static int Activate( vlc_object_t *p_this )
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
 #ifndef _WIN32
-    struct cli_client *cl = &p_sys->client;
-
-    vlc_mutex_init(&cl->output_lock);
-
-    if (pi_socket == NULL)
-    {
-        cl->stream = stdin;
-        cl->fd = 1;
-        cl->intf = p_intf;
-    }
-    else
-    {
-        cl->stream = NULL;
-        cl->fd = -1;
-    }
+    vlc_mutex_init(&p_sys->clients_lock);
+    vlc_list_init(&p_sys->clients);
     p_sys->psz_unix_path = psz_unix_path;
 #else
     p_sys->i_socket = -1;
@@ -900,6 +898,24 @@ static int Activate( vlc_object_t *p_this )
         goto error;
 
     RegisterPlaylist(p_intf);
+
+#ifndef _WIN32
+    struct cli_client *cl = &p_sys->client;
+
+    if (pi_socket == NULL)
+    {
+        cl->stream = stdin;
+        cl->fd = 1;
+        cl->intf = p_intf;
+        vlc_mutex_init(&cl->output_lock);
+        vlc_list_append(&cl->node, &p_sys->clients);
+    }
+    else
+    {
+        cl->stream = NULL;
+        cl->fd = -1;
+    }
+#endif
 
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
         goto error;

@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <vlc_common.h>
+#include <vlc_list.h>
 
 struct cli_client
 {
@@ -31,6 +32,7 @@ struct cli_client
     FILE *stream;
     int fd;
     vlc_mutex_t output_lock;
+    struct vlc_list node;
 #endif
 };
 
