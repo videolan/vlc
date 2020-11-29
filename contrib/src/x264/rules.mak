@@ -45,7 +45,9 @@ X264_AS = AS="$(CC)"
 endif
 endif
 ifdef HAVE_CROSS_COMPILE
+ifndef HAVE_DARWIN_OS
 X264CONF += --cross-prefix="$(HOST)-"
+endif
 ifdef HAVE_ANDROID
 # broken text relocations
 ifeq ($(ANDROID_ABI), x86)
@@ -54,6 +56,11 @@ endif
 ifeq ($(ANDROID_ABI), x86_64)
 X264CONF += --disable-asm
 endif
+endif
+endif
+ifdef HAVE_DARWIN_OS
+ifeq ($(ARCH),aarch64)
+X264CONF += --extra-asflags="-arch $(PLATFORM_SHORT_ARCH)"
 endif
 endif
 
