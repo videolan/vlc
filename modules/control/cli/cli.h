@@ -27,6 +27,11 @@
 struct cli_client
 {
     intf_thread_t *intf;
+#ifndef _WIN32
+    FILE *stream;
+    int fd;
+    vlc_mutex_t output_lock;
+#endif
 };
 
 VLC_FORMAT(2, 3)

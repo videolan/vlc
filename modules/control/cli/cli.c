@@ -69,10 +69,8 @@ struct intf_sys_t
     void *commands;
     void *player_cli;
 
-    vlc_mutex_t output_lock;
 #ifndef _WIN32
-    FILE *stream;
-    int fd;
+    struct cli_client client;
     char *psz_unix_path;
 #else
     HANDLE hConsoleIn;
@@ -220,11 +218,11 @@ static int LogOut(struct cli_client *cl, const char *const *args, size_t count,
 #ifndef _WIN32
     if (sys->pi_socket_listen != NULL)
     {
-        vlc_mutex_lock(&sys->output_lock);
-        sys->fd = -1;
-        vlc_mutex_unlock(&sys->output_lock);
-        fclose(sys->stream);
-        sys->stream = NULL;
+        vlc_mutex_lock(&cl->output_lock);
+        cl->fd = -1;
+        vlc_mutex_unlock(&cl->output_lock);
+        fclose(cl->stream);
+        cl->stream = NULL;
     }
     else
     {   /* Force end-of-file on the standard input. */
@@ -233,9 +231,9 @@ static int LogOut(struct cli_client *cl, const char *const *args, size_t count,
         {   /* POSIX requires flushing before, and seeking after, replacing a
              * file descriptor underneath an I/O stream.
              */
-            fflush(sys->stream);
+            fflush(cl->stream);
             dup2(fd, 0 /* fileno(sys->stream) */);
-            fseek(sys->stream, 0, SEEK_SET);
+            fseek(cl->stream, 0, SEEK_SET);
             vlc_close(fd);
         }
     }
@@ -360,27 +358,52 @@ error:      wordfree(&we);
 }
 
 #ifndef _WIN32
+static ssize_t cli_writev(struct cli_client *cl,
+                          const struct iovec *iov, unsigned iovlen)
+{
+    ssize_t val;
+
+    vlc_mutex_lock(&cl->output_lock);
+    if (cl->fd != -1)
+        val = vlc_writev(cl->fd, iov, iovlen);
+    else
+        errno = EPIPE, val = -1;
+    vlc_mutex_unlock(&cl->output_lock);
+    return val;
+}
+
+static int cli_vprintf(struct cli_client *cl, const char *fmt, va_list args)
+{
+    char *msg;
+    int len = vasprintf(&msg, fmt, args);
+
+    if (likely(len >= 0))
+    {
+        struct iovec iov[2] = { { msg, len }, { (char *)"\n", 1 } };
+
+        cli_writev(cl, iov, ARRAY_SIZE(iov));
+        len++;
+        free(msg);
+    }
+    return len;
+}
+
+int cli_printf(struct cli_client *cl, const char *fmt, ...)
+{
+    va_list ap;
+    int len;
+
+    va_start(ap, fmt);
+    len = cli_vprintf(cl, fmt, ap);
+    va_end(ap);
+    return len;
+}
+
 static void msg_vprint(intf_thread_t *p_intf, const char *psz_fmt, va_list args)
 {
     intf_sys_t *sys = p_intf->p_sys;
-    int fd;
 
-    vlc_mutex_lock(&sys->output_lock);
-    fd = sys->fd;
-    if (fd != -1)
-    {
-        char *msg;
-        int len = vasprintf(&msg, psz_fmt, args);
-
-        if (unlikely(len < 0))
-            return;
-
-        struct iovec iov[2] = { { msg, len }, { (char *)"\n", 1 } };
-
-        vlc_writev(sys->fd, iov, ARRAY_SIZE(iov));
-        free(msg);
-    }
-    vlc_mutex_unlock(&sys->output_lock);
+    cli_vprintf(&sys->client, psz_fmt, args);
 }
 
 void msg_print(intf_thread_t *intf, const char *fmt, ...)
@@ -392,16 +415,6 @@ void msg_print(intf_thread_t *intf, const char *fmt, ...)
     va_end(ap);
 }
 
-int cli_printf(struct cli_client *cl, const char *fmt, ...)
-{
-    va_list ap;
-
-    va_start(ap, fmt);
-    msg_vprint(cl->intf, fmt, ap);
-    va_end(ap);
-    return VLC_SUCCESS;
-}
-
 static void *Run(void *data)
 {
     intf_thread_t *intf = data;
@@ -410,9 +423,9 @@ static void *Run(void *data)
     for (;;)
     {
         char buf[MAX_LINE_LENGTH + 1];
-        struct cli_client cl = { intf };
+        struct cli_client *cl = &sys->client;
 
-        while (sys->stream == NULL)
+        while (cl->stream == NULL)
         {
             assert(sys->pi_socket_listen != NULL);
 
@@ -423,31 +436,32 @@ static void *Run(void *data)
             int canc = vlc_savecancel();
 
             fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
-            sys->stream = fdopen(fd, "r");
-            if (sys->stream != NULL)
+            cl->stream = fdopen(fd, "r");
+            if (cl->stream != NULL)
             {
-                vlc_mutex_lock(&sys->output_lock);
-                sys->fd = fd;
-                vlc_mutex_unlock(&sys->output_lock);
+                vlc_mutex_lock(&cl->output_lock);
+                cl->fd = fd;
+                vlc_mutex_unlock(&cl->output_lock);
+                cl->intf = intf;
             }
             else
                 vlc_close(fd);
             vlc_restorecancel(canc);
         }
 
-        char *cmd = fgets(buf, sizeof (buf), sys->stream);
+        char *cmd = fgets(buf, sizeof (buf), cl->stream);
         if (cmd != NULL)
         {
             int canc = vlc_savecancel();
             if (cmd[0] != '\0')
                 cmd[strlen(cmd) - 1] = '\0'; /* remove trailing LF */
-            Process(intf, &cl, cmd);
+            Process(intf, cl, cmd);
             vlc_restorecancel(canc);
         }
         else if (sys->pi_socket_listen == NULL)
             break;
         else
-            LogOut(&cl, NULL, 0, intf);
+            LogOut(cl, NULL, 0, intf);
     }
 
     int canc = vlc_savecancel();
@@ -830,7 +844,6 @@ static int Activate( vlc_object_t *p_this )
 
     p_intf->p_sys = p_sys;
     p_sys->commands = NULL;
-    vlc_mutex_init(&p_sys->output_lock);
     p_sys->pi_socket_listen = pi_socket;
 
     RegisterHandlers(p_intf, cmds, ARRAY_SIZE(cmds), p_intf);
@@ -839,15 +852,20 @@ static int Activate( vlc_object_t *p_this )
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
 #ifndef _WIN32
+    struct cli_client *cl = &p_sys->client;
+
+    vlc_mutex_init(&cl->output_lock);
+
     if (pi_socket == NULL)
     {
-        p_sys->stream = stdin;
-        p_sys->fd = 1;
+        cl->stream = stdin;
+        cl->fd = 1;
+        cl->intf = p_intf;
     }
     else
     {
-        p_sys->stream = NULL;
-        p_sys->fd = -1;
+        cl->stream = NULL;
+        cl->fd = -1;
     }
     p_sys->psz_unix_path = psz_unix_path;
 #else
@@ -903,8 +921,10 @@ static void Deactivate( vlc_object_t *p_this )
     {
         net_ListenClose(p_sys->pi_socket_listen);
 #ifndef _WIN32
-        if (p_sys->stream != NULL)
-            fclose(p_sys->stream);
+        struct cli_client *cl = &p_sys->client;
+
+        if (cl->stream != NULL)
+            fclose(cl->stream);
         if (p_sys->psz_unix_path != NULL)
         {
             unlink(p_sys->psz_unix_path);
