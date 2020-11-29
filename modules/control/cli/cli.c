@@ -896,7 +896,7 @@ static int Activate( vlc_object_t *p_this )
         free( psz_host );
     }
 
-    intf_sys_t *p_sys = malloc( sizeof( *p_sys ) );
+    intf_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
     if( unlikely(p_sys == NULL) )
     {
         net_ListenClose( pi_socket );
@@ -962,7 +962,6 @@ error:
     tdestroy(p_sys->commands, free);
     net_ListenClose( pi_socket );
     free( psz_unix_path );
-    free( p_sys );
     return VLC_EGENERIC;
 }
 
@@ -1006,7 +1005,6 @@ static void Deactivate( vlc_object_t *p_this )
             net_Close(p_sys->i_socket);
 #endif
     }
-    free( p_sys );
 }
 
 /*****************************************************************************
