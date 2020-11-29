@@ -1086,7 +1086,6 @@ void *RegisterPlayer(intf_thread_t *intf)
         goto error;
     }
 
-    player_on_state_changed(player, vlc_player_GetState(player), pc);
     vlc_player_Unlock(player);
     return pc;
 
