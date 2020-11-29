@@ -510,10 +510,10 @@ static void *Run(void *data)
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
 
-    while (sys->pi_socket_listen != NULL)
-    {
-        assert(sys->pi_socket_listen != NULL);
+    assert(sys->pi_socket_listen != NULL);
 
+    for (;;)
+    {
         int fd = net_Accept(intf, sys->pi_socket_listen);
         if (fd == -1)
             continue;
@@ -529,8 +529,6 @@ static void *Run(void *data)
             vlc_mutex_unlock(&sys->clients_lock);
         }
     }
-
-    return NULL;
 }
 
 #else
@@ -944,8 +942,8 @@ static int Activate( vlc_object_t *p_this )
             goto error;
         vlc_list_append(&cl->node, &p_sys->clients);
     }
+    else
 #endif
-
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
         goto error;
 
@@ -976,8 +974,14 @@ static void Deactivate( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    vlc_cancel( p_sys->thread );
-    vlc_join( p_sys->thread, NULL );
+#ifndef _WIN32
+    if (p_sys->pi_socket_listen != NULL)
+#endif
+    {
+        vlc_cancel(p_sys->thread);
+        vlc_join(p_sys->thread, NULL);
+    }
+
     DeregisterPlayer(p_intf, p_sys->player_cli);
 
 #ifndef _WIN32
