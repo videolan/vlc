@@ -448,6 +448,7 @@ vlc_unlink
 vlc_rename
 vlc_getcwd
 vlc_dup
+vlc_dup2
 vlc_pipe
 vlc_write
 vlc_writev

@@ -304,6 +304,14 @@ int vlc_dup (int oldfd)
     return fd;
 }
 
+int vlc_dup2(int oldfd, int newfd)
+{
+    int fd = dup2(oldfd, newfd);
+    if (fd != -1)
+        setmode(fd, O_BINARY);
+    return fd;
+}
+
 int vlc_pipe (int fds[2])
 {
 #if VLC_WINSTORE_APP

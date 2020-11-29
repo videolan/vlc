@@ -178,6 +178,18 @@ int vlc_dup (int oldfd)
     return fcntl (oldfd, F_DUPFD_CLOEXEC, 0);
 }
 
+int vlc_dup2(int oldfd, int newfd)
+{
+#ifdef HAVE_DUP3
+    return dup3(oldfd, newfd, O_CLOEXEC);
+#else
+    int ret = dup2(oldfd, newfd);
+    if (ret >= 0)
+        vlc_cloexec(newfd);
+    return ret;
+#endif
+}
+
 int vlc_pipe (int fds[2])
 {
 #ifdef HAVE_PIPE2

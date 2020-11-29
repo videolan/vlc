@@ -111,6 +111,23 @@ VLC_API int vlc_mkstemp( char * );
 VLC_API int vlc_dup(int oldfd) VLC_USED;
 
 /**
+ * Replaces a file descriptor.
+ *
+ * This function duplicates a file descriptor to a specified file descriptor.
+ * This is primarily used to atomically replace a described file.
+ *
+ * @param oldfd source file descriptor to copy
+ * @param newfd destination file descriptor to replace
+ *
+ * @note Contrary to standard dup2(), the new file descriptor has the
+ * close-on-exec descriptor flag preset.
+ *
+ * @retval newfd success
+ * @retval -1 failure (see @c errno)
+ */
+VLC_API int vlc_dup2(int oldfd, int newfd);
+
+/**
  * Creates a pipe (see "man pipe" for further reference). The new file
  * descriptors have the close-on-exec flag preset.
  * @return 0 on success, -1 on error (see errno)
