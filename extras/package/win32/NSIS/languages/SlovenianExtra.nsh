@@ -1,5 +1,5 @@
 !insertmacro LANGFILE_EXT Slovenian
-${LangFileString} Name_Section01 "Predvajalnik datotek (obvezno)"
+${LangFileString} Name_Section01 "Predvajalnik predstavnih vsebin (obvezno)"
 ${LangFileString} Name_Section02a "Bližnjica v meniju Start"
 ${LangFileString} Name_Section02b "Bližnjica na namizju"
 ${LangFileString} Name_Section34 "Spletni vstavki"
@@ -14,7 +14,7 @@ ${LangFileString} Name_Section07 "Vsebinski meniji"
 ${LangFileString} Name_Section08 "Izbriši nastavitve in predpomnilnik"
 
 ${LangFileString} Desc_Section01 \
-    "Sam predvajalnik datotek"
+    "Sam predvajalnik vsebin"
 ${LangFileString} Desc_Section02a \
     "Za lažji dostop v začetni meni postavi ikone"
 ${LangFileString} Desc_Section02b \
@@ -30,7 +30,7 @@ ${LangFileString} Desc_Section06 \
 ${LangFileString} Desc_Section07 \
     "Dodaj ukaze v vsebinski meni (»Predvajaj z VLC« in »Dodaj v predvajalni seznam VLC«)"
 ${LangFileString} Desc_Section08 \
-    "Izbriše nastavitve predvajalnika VLC in datoteke v predpomnilniku, ki so tam ostale od prejšnjih namestitev"
+    "Izbriše nastavitve predvajalnika VLC in datoteke predpomnilnika, ki so tam ostale od prejšnjih namestitev"
 
 ${LangFileString} Name_Section91 "Odstrani namestitev"
 ${LangFileString} Name_Section92 "Izbriši nastavitve in predpomnilnik"
@@ -42,7 +42,7 @@ ${LangFileString} Desc_Section92 \
 
 ${LangFileString} ShellAssociation_Play "Predvajaj"
 ${LangFileString} ContextMenuEntry_PlayWith "Predvajaj s predvajalnikom VLC"
-${LangFileString} ContextMenuEntry_AddToPlaylist "Dodaj na seznam predvajanja programa VLC"
+${LangFileString} ContextMenuEntry_AddToPlaylist "Dodaj na VLC seznam predvajanja"
 
 ${LangFileString} Link_VisitWebsite "Obišči spletišče predvajalnika VideoLAN VLC"
 
