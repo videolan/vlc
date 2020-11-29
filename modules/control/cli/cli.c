@@ -456,6 +456,12 @@ static struct cli_client *cli_client_new(intf_thread_t *intf, int fd,
     cl->fd = fd;
     cl->intf = intf;
     vlc_mutex_init(&cl->output_lock);
+
+    if (vlc_clone(&cl->thread, cli_client_thread, cl, VLC_THREAD_PRIORITY_LOW))
+    {
+        free(cl);
+        cl = NULL;
+    }
     return cl;
 }
 
@@ -491,6 +497,9 @@ static struct cli_client *cli_client_new_std(intf_thread_t *intf)
 
 static void cli_client_delete(struct cli_client *cl)
 {
+    vlc_cancel(cl->thread);
+    vlc_join(cl->thread, NULL);
+
     if (cl->stream != stdin)
         fclose(cl->stream);
     free(cl);
@@ -501,10 +510,8 @@ static void *Run(void *data)
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
 
-    for (;;)
+    while (sys->pi_socket_listen != NULL)
     {
-        while (vlc_list_is_empty(&sys->clients))
-        {
             assert(sys->pi_socket_listen != NULL);
 
             int fd = net_Accept(intf, sys->pi_socket_listen);
@@ -521,20 +528,6 @@ static void *Run(void *data)
                 vlc_list_append(&cl->node, &sys->clients);
                 vlc_mutex_unlock(&sys->clients_lock);
             }
-        }
-
-        struct cli_client *cl = vlc_list_first_entry_or_null(&sys->clients,
-                                                             struct cli_client,
-                                                             node);
-
-        cli_client_thread(cl);
-        vlc_mutex_lock(&sys->clients_lock);
-        vlc_list_remove(&cl->node);
-        vlc_mutex_unlock(&sys->clients_lock);
-        cli_client_delete(cl);
-
-        if (sys->pi_socket_listen == NULL)
-            break;
     }
 
     return NULL;

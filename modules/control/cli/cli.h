@@ -33,6 +33,7 @@ struct cli_client
     int fd;
     vlc_mutex_t output_lock;
     struct vlc_list node;
+    vlc_thread_t thread;
 #endif
 };
 
