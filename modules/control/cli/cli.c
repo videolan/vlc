@@ -33,6 +33,7 @@
 #include <assert.h>
 #include <math.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #ifdef HAVE_WORDEXP_H
@@ -72,7 +73,6 @@ struct intf_sys_t
 #ifndef _WIN32
     vlc_mutex_t clients_lock;
     struct vlc_list clients;
-    char *psz_unix_path;
 #else
     HANDLE hConsoleIn;
     bool b_quiet;
@@ -813,6 +813,7 @@ static int Activate( vlc_object_t *p_this )
     {
         int i_socket;
         struct sockaddr_un addr = { .sun_family = AF_LOCAL };
+        struct stat st;
 
         msg_Dbg( p_intf, "trying UNIX socket" );
 
@@ -825,6 +826,7 @@ static int Activate( vlc_object_t *p_this )
             goto error;
         }
         memcpy(addr.sun_path, psz_unix_path, len + 1);
+        free(psz_unix_path);
 
         if( (i_socket = vlc_socket( PF_LOCAL, SOCK_STREAM, 0, false ) ) < 0 )
         {
@@ -832,24 +834,14 @@ static int Activate( vlc_object_t *p_this )
             goto error;
         }
 
-        if (bind (i_socket, (struct sockaddr *)&addr, sizeof (addr))
-         && (errno == EADDRINUSE)
-         && connect (i_socket, (struct sockaddr *)&addr, sizeof (addr))
-         && (errno == ECONNREFUSED))
+        if (vlc_stat(addr.sun_path, &st) == 0 && S_ISSOCK(st.st_mode))
         {
-            msg_Info (p_intf, "Removing dead UNIX socket: %s", psz_unix_path);
-            unlink (psz_unix_path);
-
-            if (bind (i_socket, (struct sockaddr *)&addr, sizeof (addr)))
-            {
-                msg_Err (p_intf, "cannot bind UNIX socket at %s: %s",
-                         psz_unix_path, vlc_strerror_c(errno));
-                net_Close (i_socket);
-                goto error;
-            }
+            msg_Dbg(p_intf, "unlinking old %s socket", addr.sun_path);
+            unlink(addr.sun_path);
         }
 
-        if( listen( i_socket, 1 ) )
+        if (bind(i_socket, (struct sockaddr *)&addr, sizeof (addr))
+         || listen(i_socket, 1))
         {
             msg_Warn (p_intf, "can't listen on socket: %s",
                       vlc_strerror_c(errno));
@@ -861,13 +853,11 @@ static int Activate( vlc_object_t *p_this )
         pi_socket = calloc( 2, sizeof( int ) );
         if( pi_socket == NULL )
         {
-            free( psz_unix_path );
             net_Close( i_socket );
             goto error;
         }
         pi_socket[0] = i_socket;
         pi_socket[1] = -1;
-        p_sys->psz_unix_path = psz_unix_path;
     }
 #endif /* AF_LOCAL */
 #endif /* !_WIN32 */
@@ -952,7 +942,6 @@ error:
 #endif
     tdestroy(p_sys->commands, free);
     net_ListenClose( pi_socket );
-    free( psz_unix_path );
     return VLC_EGENERIC;
 }
 
@@ -985,13 +974,7 @@ static void Deactivate( vlc_object_t *p_this )
     if (p_sys->pi_socket_listen != NULL)
     {
         net_ListenClose(p_sys->pi_socket_listen);
-#ifndef _WIN32
-        if (p_sys->psz_unix_path != NULL)
-        {
-            unlink(p_sys->psz_unix_path);
-            free(p_sys->psz_unix_path);
-        }
-#else
+#ifdef _WIN32
         if (p_sys->i_socket != -1)
             net_Close(p_sys->i_socket);
 #endif
