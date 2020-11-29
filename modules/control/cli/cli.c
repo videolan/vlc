@@ -442,6 +442,7 @@ static void *cli_client_thread(void *data)
         vlc_restorecancel(canc);
     }
 
+    atomic_store_explicit(&cl->zombie, true, memory_order_release);
     return NULL;
 }
 
@@ -454,6 +455,7 @@ static struct cli_client *cli_client_new(intf_thread_t *intf, int fd,
 
     cl->stream = stream;
     cl->fd = fd;
+    atomic_init(&cl->zombie, false);
     cl->intf = intf;
     vlc_mutex_init(&cl->output_lock);
 
@@ -520,7 +522,6 @@ static void *Run(void *data)
 
         int canc = vlc_savecancel();
         struct cli_client *cl = cli_client_new_fd(intf, fd);
-        vlc_restorecancel(canc);
 
         if (cl != NULL)
         {
@@ -528,6 +529,18 @@ static void *Run(void *data)
             vlc_list_append(&cl->node, &sys->clients);
             vlc_mutex_unlock(&sys->clients_lock);
         }
+
+        /* Reap any dead client */
+        vlc_list_foreach (cl, &sys->clients, node)
+            if (atomic_load_explicit(&cl->zombie, memory_order_acquire))
+            {
+                vlc_mutex_lock(&sys->clients_lock);
+                vlc_list_remove(&cl->node);
+                vlc_mutex_unlock(&sys->clients_lock);
+                cli_client_delete(cl);
+            }
+
+        vlc_restorecancel(canc);
     }
 }
 

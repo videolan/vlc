@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <stdatomic.h>
 #include <stdio.h>
 #include <vlc_common.h>
 #include <vlc_list.h>
@@ -31,6 +32,7 @@ struct cli_client
 #ifndef _WIN32
     FILE *stream;
     int fd;
+    atomic_bool zombie;
     vlc_mutex_t output_lock;
     struct vlc_list node;
     vlc_thread_t thread;
