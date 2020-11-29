@@ -100,11 +100,15 @@ VLC_API int vlc_openat(int fd, const char *filename, int flags, ...) VLC_USED;
 VLC_API int vlc_mkstemp( char * );
 
 /**
- * Duplicates a file descriptor. The new file descriptor has the close-on-exec
- * descriptor flag preset.
- * @return a new file descriptor, -1 (see errno)
+ * Duplicates a file descriptor.
+ *
+ * @param oldfd file descriptor to duplicate
+ *
+ * @note Contrary to standard dup(), the new file descriptor has the
+ * close-on-exec descriptor flag preset.
+ * @return a new file descriptor, -1 (see @c errno)
  */
-VLC_API int vlc_dup(int) VLC_USED;
+VLC_API int vlc_dup(int oldfd) VLC_USED;
 
 /**
  * Creates a pipe (see "man pipe" for further reference). The new file
