@@ -812,29 +812,25 @@ static int Activate( vlc_object_t *p_this )
     if( psz_unix_path )
     {
         int i_socket;
-        struct sockaddr_un addr;
-
-        memset( &addr, 0, sizeof(struct sockaddr_un) );
+        struct sockaddr_un addr = { .sun_family = AF_LOCAL };
 
         msg_Dbg( p_intf, "trying UNIX socket" );
 
         /* The given unix path cannot be longer than sun_path - 1 to take into
          * account the terminated null character. */
-        if ( strlen(psz_unix_path) + 1 >= sizeof( addr.sun_path ) )
+        size_t len = strlen(psz_unix_path);
+        if (len >= sizeof (addr.sun_path))
         {
             msg_Err( p_intf, "rc-unix value is longer than expected" );
             goto error;
         }
+        memcpy(addr.sun_path, psz_unix_path, len + 1);
 
         if( (i_socket = vlc_socket( PF_LOCAL, SOCK_STREAM, 0, false ) ) < 0 )
         {
             msg_Warn( p_intf, "can't open socket: %s", vlc_strerror_c(errno) );
             goto error;
         }
-
-        addr.sun_family = AF_LOCAL;
-        strncpy( addr.sun_path, psz_unix_path, sizeof( addr.sun_path ) - 1 );
-        addr.sun_path[sizeof( addr.sun_path ) - 1] = '\0';
 
         if (bind (i_socket, (struct sockaddr *)&addr, sizeof (addr))
          && (errno == EADDRINUSE)
