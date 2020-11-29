@@ -799,14 +799,18 @@ static int Activate( vlc_object_t *p_this )
     RegisterPlaylist(p_intf);
 
 #ifndef _WIN32
-#if defined(HAVE_ISATTY)
-    /* Check that stdin is a TTY */
-    if( !var_InheritBool( p_intf, "rc-fake-tty" ) && !isatty( 0 ) )
+# ifndef HAVE_ISATTY
+#  define isatty(fd) (fd, 0)
+# endif
+    /* Start CLI on the standard input if it is an actual console */
+    if (isatty(fileno(stdin)) || var_InheritBool(p_intf, "rc-fake-tty"))
     {
-        msg_Warn( p_intf, "fd 0 is not a TTY" );
-        goto error;
+        cl = cli_client_new_std(p_intf);
+        if (cl == NULL)
+            goto error;
+        vlc_list_append(&cl->node, &p_sys->clients);
     }
-#endif
+
 #ifdef AF_LOCAL
     char *psz_unix_path = var_InheritString(p_intf, "rc-unix");
     if( psz_unix_path )
@@ -904,6 +908,7 @@ static int Activate( vlc_object_t *p_this )
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
 #ifndef _WIN32
+    if (pi_socket != NULL)
 #else
     p_sys->i_socket = -1;
 #if VLC_WINSTORE_APP
@@ -913,17 +918,6 @@ static int Activate( vlc_object_t *p_this )
     if( !p_sys->b_quiet )
         intf_consoleIntroMsg( p_intf );
 #endif
-#endif
-
-#ifndef _WIN32
-    if (pi_socket == NULL)
-    {
-        cl = cli_client_new_std(p_intf);
-        if (cl == NULL)
-            goto error;
-        vlc_list_append(&cl->node, &p_sys->clients);
-    }
-    else
 #endif
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
         goto error;
