@@ -512,22 +512,22 @@ static void *Run(void *data)
 
     while (sys->pi_socket_listen != NULL)
     {
-            assert(sys->pi_socket_listen != NULL);
+        assert(sys->pi_socket_listen != NULL);
 
-            int fd = net_Accept(intf, sys->pi_socket_listen);
-            if (fd == -1)
-                continue;
+        int fd = net_Accept(intf, sys->pi_socket_listen);
+        if (fd == -1)
+            continue;
 
-            int canc = vlc_savecancel();
-            struct cli_client *cl = cli_client_new_fd(intf, fd);
-            vlc_restorecancel(canc);
+        int canc = vlc_savecancel();
+        struct cli_client *cl = cli_client_new_fd(intf, fd);
+        vlc_restorecancel(canc);
 
-            if (cl != NULL)
-            {
-                vlc_mutex_lock(&sys->clients_lock);
-                vlc_list_append(&cl->node, &sys->clients);
-                vlc_mutex_unlock(&sys->clients_lock);
-            }
+        if (cl != NULL)
+        {
+            vlc_mutex_lock(&sys->clients_lock);
+            vlc_list_append(&cl->node, &sys->clients);
+            vlc_mutex_unlock(&sys->clients_lock);
+        }
     }
 
     return NULL;
