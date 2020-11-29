@@ -72,7 +72,6 @@ struct intf_sys_t
 #ifndef _WIN32
     vlc_mutex_t clients_lock;
     struct vlc_list clients;
-    struct cli_client client;
     char *psz_unix_path;
 #else
     HANDLE hConsoleIn;
@@ -446,6 +445,57 @@ static void *cli_client_thread(void *data)
     return NULL;
 }
 
+static struct cli_client *cli_client_new(intf_thread_t *intf, int fd,
+                                         FILE *stream)
+{
+    struct cli_client *cl = malloc(sizeof (*cl));
+    if (unlikely(cl == NULL))
+        return NULL;
+
+    cl->stream = stream;
+    cl->fd = fd;
+    cl->intf = intf;
+    vlc_mutex_init(&cl->output_lock);
+    return cl;
+}
+
+/**
+ * Creates a client from a file descriptor.
+ *
+ * This works with (pseudo-)terminals, stream sockets, serial ports, etc.
+ */
+static struct cli_client *cli_client_new_fd(intf_thread_t *intf, int fd)
+{
+    fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
+
+    FILE *stream = fdopen(fd, "r");
+    if (stream == NULL)
+    {
+        vlc_close(fd);
+        return NULL;
+    }
+
+    struct cli_client *cl = cli_client_new(intf, fd, stream);
+    if (unlikely(cl == NULL))
+        fclose(stream);
+    return cl;
+}
+
+/**
+ * Creates a client from the standard input and output.
+ */
+static struct cli_client *cli_client_new_std(intf_thread_t *intf)
+{
+    return cli_client_new(intf, 1, stdin);
+}
+
+static void cli_client_delete(struct cli_client *cl)
+{
+    if (cl->stream != stdin)
+        fclose(cl->stream);
+    free(cl);
+}
+
 static void *Run(void *data)
 {
     intf_thread_t *intf = data;
@@ -453,8 +503,6 @@ static void *Run(void *data)
 
     for (;;)
     {
-        struct cli_client *cl = &sys->client;
-
         while (vlc_list_is_empty(&sys->clients))
         {
             assert(sys->pi_socket_listen != NULL);
@@ -464,27 +512,26 @@ static void *Run(void *data)
                 continue;
 
             int canc = vlc_savecancel();
+            struct cli_client *cl = cli_client_new_fd(intf, fd);
+            vlc_restorecancel(canc);
 
-            fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) & ~O_NONBLOCK);
-            cl->stream = fdopen(fd, "r");
-            if (cl->stream != NULL)
+            if (cl != NULL)
             {
-                cl->fd = fd;
-                cl->intf = intf;
-                vlc_mutex_init(&cl->output_lock);
                 vlc_mutex_lock(&sys->clients_lock);
                 vlc_list_append(&cl->node, &sys->clients);
                 vlc_mutex_unlock(&sys->clients_lock);
             }
-            else
-                vlc_close(fd);
-            vlc_restorecancel(canc);
         }
+
+        struct cli_client *cl = vlc_list_first_entry_or_null(&sys->clients,
+                                                             struct cli_client,
+                                                             node);
 
         cli_client_thread(cl);
         vlc_mutex_lock(&sys->clients_lock);
         vlc_list_remove(&cl->node);
         vlc_mutex_unlock(&sys->clients_lock);
+        cli_client_delete(cl);
 
         if (sys->pi_socket_listen == NULL)
             break;
@@ -738,6 +785,7 @@ static void *Run( void *data )
 static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    struct cli_client *cl;
     char *psz_host, *psz_unix_path = NULL;
     int  *pi_socket = NULL;
 
@@ -896,20 +944,12 @@ static int Activate( vlc_object_t *p_this )
     RegisterPlaylist(p_intf);
 
 #ifndef _WIN32
-    struct cli_client *cl = &p_sys->client;
-
     if (pi_socket == NULL)
     {
-        cl->stream = stdin;
-        cl->fd = 1;
-        cl->intf = p_intf;
-        vlc_mutex_init(&cl->output_lock);
+        cl = cli_client_new_std(p_intf);
+        if (cl == NULL)
+            goto error;
         vlc_list_append(&cl->node, &p_sys->clients);
-    }
-    else
-    {
-        cl->stream = NULL;
-        cl->fd = -1;
     }
 #endif
 
@@ -924,6 +964,10 @@ static int Activate( vlc_object_t *p_this )
 error:
     if (p_sys->player_cli != NULL)
         DeregisterPlayer(p_intf, p_sys->player_cli);
+#ifndef _WIN32
+    vlc_list_foreach (cl, &p_sys->clients, node)
+        cli_client_delete(cl);
+#endif
     tdestroy(p_sys->commands, free);
     net_ListenClose( pi_socket );
     free( psz_unix_path );
@@ -941,18 +985,20 @@ static void Deactivate( vlc_object_t *p_this )
 
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
-
     DeregisterPlayer(p_intf, p_sys->player_cli);
+
+#ifndef _WIN32
+    struct cli_client *cl;
+
+    vlc_list_foreach (cl, &p_sys->clients, node)
+        cli_client_delete(cl);
+#endif
     tdestroy(p_sys->commands, free);
 
     if (p_sys->pi_socket_listen != NULL)
     {
         net_ListenClose(p_sys->pi_socket_listen);
 #ifndef _WIN32
-        struct cli_client *cl = &p_sys->client;
-
-        if (cl->stream != NULL)
-            fclose(cl->stream);
         if (p_sys->psz_unix_path != NULL)
         {
             unlink(p_sys->psz_unix_path);
