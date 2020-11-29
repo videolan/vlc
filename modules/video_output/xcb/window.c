@@ -557,7 +557,20 @@ static int Enable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
 
     /* Make the window visible */
     xcb_map_window(conn, window);
-    xcb_flush(conn);
+
+    /* Report initial pointer position.
+     * This will implicitly flush the XCB connection so that the window gets
+     * mapped by the display server shortly.
+     */
+    xcb_query_pointer_cookie_t qpc = xcb_query_pointer(conn, window);
+    xcb_query_pointer_reply_t *pr = xcb_query_pointer_reply(conn, qpc, NULL);
+
+    if (pr != NULL)
+    {
+        vout_window_ReportMouseMoved(wnd, pr->win_x, pr->win_y);
+        free(pr);
+    }
+
     return VLC_SUCCESS;
 }
 
