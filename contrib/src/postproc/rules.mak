@@ -21,7 +21,7 @@ endif
 
 ifdef HAVE_CROSS_COMPILE
 POSTPROCCONF += --enable-cross-compile
-ifndef HAVE_IOS
+ifndef HAVE_DARWIN_OS
 POSTPROCCONF += --cross-prefix=$(HOST)-
 endif
 endif
