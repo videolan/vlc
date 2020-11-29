@@ -904,10 +904,10 @@ static int Activate( vlc_object_t *p_this )
 
     p_sys->pi_socket_listen = pi_socket;
 
-    /* Line-buffered stdout */
-    setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
-
 #ifndef _WIN32
+    /* Line-buffered stdout */
+    setvbuf(stdout, NULL, _IOLBF, 0);
+
     if (pi_socket != NULL)
 #else
     p_sys->i_socket = -1;
