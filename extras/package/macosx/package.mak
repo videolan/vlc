@@ -61,7 +61,11 @@ endif
 	## Install binary
 	cp $(prefix)/bin/vlc $@/Contents/MacOS/VLC
 	## Generate plugin cache
-	bin/vlc-cache-gen $@/Contents/MacOS/plugins
+	if test "$(build)" = "$(host)"; then \
+		bin/vlc-cache-gen $@/Contents/MacOS/plugins ; \
+	else \
+		echo "Cross-compilation: cache generation skipped!" ; \
+	fi
 	find $@ -type d -exec chmod ugo+rx '{}' \;
 	find $@ -type f -exec chmod ugo+r '{}' \;
 
