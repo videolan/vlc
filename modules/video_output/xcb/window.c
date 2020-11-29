@@ -291,6 +291,15 @@ static int ProcessEvent(vout_window_t *wnd, xcb_generic_event_t *ev)
             vout_window_ReportClose (wnd);
             break;
 
+        case XCB_UNMAP_NOTIFY:
+            break;
+
+        case XCB_MAP_NOTIFY:
+            break;
+
+        case XCB_REPARENT_NOTIFY:
+            break;
+
         case XCB_MAPPING_NOTIFY:
             break;
 
