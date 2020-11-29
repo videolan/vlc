@@ -213,33 +213,33 @@ static int Quit(struct cli_client *cl, const char *const *args, size_t count,
 static int LogOut(struct cli_client *cl, const char *const *args, size_t count,
                   void *data)
 {
+    /* Close connection */
+#ifndef _WIN32
+    /* Force end-of-file on the file descriptor. */
+    int fd = vlc_open("/dev/null", O_RDONLY);
+    if (fd != -1)
+    {   /* POSIX requires flushing before, and seeking after, replacing a
+         * file descriptor underneath an I/O stream.
+         */
+        int fd2 = fileno(cl->stream);
+
+        fflush(cl->stream);
+        if (fd2 != 1)
+#ifdef HAVE_DUP3
+            dup3(fd, fd2, O_CLOEXEC);
+#else
+            dup2(fd, fd2), fcntl(fd2, F_SETFD, FD_CLOEXEC);
+#endif
+        else
+            dup2(fd, fd2);
+        fseek(cl->stream, 0, SEEK_SET);
+        vlc_close(fd);
+    }
+    (void) data;
+#else
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
 
-    /* Close connection */
-#ifndef _WIN32
-    if (sys->pi_socket_listen != NULL)
-    {
-        vlc_mutex_lock(&cl->output_lock);
-        cl->fd = -1;
-        vlc_mutex_unlock(&cl->output_lock);
-        fclose(cl->stream);
-        cl->stream = NULL;
-    }
-    else
-    {   /* Force end-of-file on the standard input. */
-        int fd = vlc_open("/dev/null", O_RDONLY);
-        if (fd != -1)
-        {   /* POSIX requires flushing before, and seeking after, replacing a
-             * file descriptor underneath an I/O stream.
-             */
-            fflush(cl->stream);
-            dup2(fd, 0 /* fileno(sys->stream) */);
-            fseek(cl->stream, 0, SEEK_SET);
-            vlc_close(fd);
-        }
-    }
-#else
     if (sys->i_socket != -1)
     {
         net_Close(sys->i_socket);
@@ -425,14 +425,10 @@ static void *cli_client_thread(void *data)
 {
     struct cli_client *cl = data;
     intf_thread_t *intf = cl->intf;
+    char cmd[MAX_LINE_LENGTH + 1];
 
-    while (cl->stream != NULL)
+    while (fgets(cmd, sizeof (cmd), cl->stream) != NULL)
     {
-        char cmd[MAX_LINE_LENGTH + 1];
-
-        if (fgets(cmd, sizeof (cmd), cl->stream) == NULL)
-            break;
-
         int canc = vlc_savecancel();
         if (cmd[0] != '\0')
             cmd[strlen(cmd) - 1] = '\0'; /* remove trailing LF */
