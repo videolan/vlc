@@ -621,7 +621,6 @@ static void *Run( void *data )
  *****************************************************************************/
 static int Activate( vlc_object_t *p_this )
 {
-    /* FIXME: This function is full of memory leaks and bugs in error paths. */
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     char *psz_host, *psz_unix_path = NULL;
     int  *pi_socket = NULL;
@@ -798,6 +797,9 @@ static int Activate( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
+    if (p_sys->player_cli != NULL)
+        DeregisterPlayer(p_intf, p_sys->player_cli);
+    tdestroy(p_sys->commands, free);
     net_ListenClose( pi_socket );
     free( psz_unix_path );
     free( p_sys );
