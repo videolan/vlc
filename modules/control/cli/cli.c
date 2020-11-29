@@ -777,8 +777,26 @@ static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     struct cli_client *cl;
-    char *psz_host, *psz_unix_path = NULL;
+    char *psz_host;
     int  *pi_socket = NULL;
+
+    intf_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
+    if (unlikely(p_sys == NULL))
+        return VLC_ENOMEM;
+
+    p_intf->p_sys = p_sys;
+    p_sys->commands = NULL;
+#ifndef _WIN32
+    vlc_mutex_init(&p_sys->clients_lock);
+    vlc_list_init(&p_sys->clients);
+#endif
+    RegisterHandlers(p_intf, cmds, ARRAY_SIZE(cmds), p_intf);
+
+    p_sys->player_cli = RegisterPlayer(p_intf);
+    if (unlikely(p_sys->player_cli == NULL))
+        goto error;
+
+    RegisterPlaylist(p_intf);
 
 #ifndef _WIN32
 #if defined(HAVE_ISATTY)
@@ -786,11 +804,11 @@ static int Activate( vlc_object_t *p_this )
     if( !var_InheritBool( p_intf, "rc-fake-tty" ) && !isatty( 0 ) )
     {
         msg_Warn( p_intf, "fd 0 is not a TTY" );
-        return VLC_EGENERIC;
+        goto error;
     }
 #endif
 #ifdef AF_LOCAL
-    psz_unix_path = var_InheritString( p_intf, "rc-unix" );
+    char *psz_unix_path = var_InheritString(p_intf, "rc-unix");
     if( psz_unix_path )
     {
         int i_socket;
@@ -805,14 +823,13 @@ static int Activate( vlc_object_t *p_this )
         if ( strlen(psz_unix_path) + 1 >= sizeof( addr.sun_path ) )
         {
             msg_Err( p_intf, "rc-unix value is longer than expected" );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         if( (i_socket = vlc_socket( PF_LOCAL, SOCK_STREAM, 0, false ) ) < 0 )
         {
             msg_Warn( p_intf, "can't open socket: %s", vlc_strerror_c(errno) );
-            free( psz_unix_path );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         addr.sun_family = AF_LOCAL;
@@ -831,9 +848,8 @@ static int Activate( vlc_object_t *p_this )
             {
                 msg_Err (p_intf, "cannot bind UNIX socket at %s: %s",
                          psz_unix_path, vlc_strerror_c(errno));
-                free (psz_unix_path);
                 net_Close (i_socket);
-                return VLC_EGENERIC;
+                goto error;
             }
         }
 
@@ -841,9 +857,8 @@ static int Activate( vlc_object_t *p_this )
         {
             msg_Warn (p_intf, "can't listen on socket: %s",
                       vlc_strerror_c(errno));
-            free( psz_unix_path );
             net_Close( i_socket );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         /* FIXME: we need a core function to merge listening sockets sets */
@@ -852,10 +867,11 @@ static int Activate( vlc_object_t *p_this )
         {
             free( psz_unix_path );
             net_Close( i_socket );
-            return VLC_ENOMEM;
+            goto error;
         }
         pi_socket[0] = i_socket;
         pi_socket[1] = -1;
+        p_sys->psz_unix_path = psz_unix_path;
     }
 #endif /* AF_LOCAL */
 #endif /* !_WIN32 */
@@ -873,7 +889,7 @@ static int Activate( vlc_object_t *p_this )
             if( asprintf( &psz_backward_compat_host, "//%s", psz_host ) < 0 )
             {
                 free( psz_host );
-                return VLC_EGENERIC;
+                goto error;
             }
             free( psz_host );
             psz_host = psz_backward_compat_host;
@@ -889,34 +905,19 @@ static int Activate( vlc_object_t *p_this )
                       url.psz_host, url.i_port );
             vlc_UrlClean( &url );
             free( psz_host );
-            return VLC_EGENERIC;
+            goto error;
         }
 
         vlc_UrlClean( &url );
         free( psz_host );
     }
 
-    intf_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
-    if( unlikely(p_sys == NULL) )
-    {
-        net_ListenClose( pi_socket );
-        free( psz_unix_path );
-        return VLC_ENOMEM;
-    }
-
-    p_intf->p_sys = p_sys;
-    p_sys->commands = NULL;
     p_sys->pi_socket_listen = pi_socket;
-
-    RegisterHandlers(p_intf, cmds, ARRAY_SIZE(cmds), p_intf);
 
     /* Line-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
 
 #ifndef _WIN32
-    vlc_mutex_init(&p_sys->clients_lock);
-    vlc_list_init(&p_sys->clients);
-    p_sys->psz_unix_path = psz_unix_path;
 #else
     p_sys->i_socket = -1;
 #if VLC_WINSTORE_APP
@@ -927,12 +928,6 @@ static int Activate( vlc_object_t *p_this )
         intf_consoleIntroMsg( p_intf );
 #endif
 #endif
-
-    p_sys->player_cli = RegisterPlayer(p_intf);
-    if (unlikely(p_sys->player_cli == NULL))
-        goto error;
-
-    RegisterPlaylist(p_intf);
 
 #ifndef _WIN32
     if (pi_socket == NULL)
