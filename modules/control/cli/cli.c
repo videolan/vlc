@@ -224,11 +224,7 @@ static int LogOut(struct cli_client *cl, const char *const *args, size_t count,
 
         fflush(cl->stream);
         if (fd2 != 1)
-#ifdef HAVE_DUP3
-            dup3(fd, fd2, O_CLOEXEC);
-#else
-            dup2(fd, fd2), fcntl(fd2, F_SETFD, FD_CLOEXEC);
-#endif
+            vlc_dup2(fd, fd2);
         else
             dup2(fd, fd2);
         fseek(cl->stream, 0, SEEK_SET);
