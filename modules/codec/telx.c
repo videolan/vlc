@@ -699,7 +699,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
             memcpy( pt, p_sys->ppsz_lines[i], l );
             total += l;
             pt += l;
-            if ( sizeof(psz_text) - total - 1 > 0 )
+            if ( sizeof(psz_text) > total + 1 )
             {
                 *pt++ = '\n';
                 total++;
