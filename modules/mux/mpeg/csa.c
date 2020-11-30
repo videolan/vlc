@@ -78,11 +78,8 @@ void csa_Delete( csa_t *c )
  *****************************************************************************/
 int csa_SetCW( vlc_object_t *p_caller, csa_t *c, char *psz_ck, bool set_odd )
 {
-    if ( !c )
-    {
-        msg_Dbg( p_caller, "no CSA found" );
-        return VLC_ENOOBJ;
-    }
+    assert(c != NULL);
+
     /* skip 0x */
     if( psz_ck[0] == '0' && ( psz_ck[1] == 'x' || psz_ck[1] == 'X' ) )
     {
