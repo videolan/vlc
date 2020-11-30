@@ -71,6 +71,7 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
     b_thread = false;
     b_buffering = false;
     b_canceled = false;
+    b_preparsing = false;
     nextPlaylistupdate = 0;
     demux.i_nzpcr = VLC_TICK_INVALID;
     demux.i_firstpcr = VLC_TICK_INVALID;
@@ -147,8 +148,10 @@ bool PlaylistManager::setupPeriod()
     return true;
 }
 
-bool PlaylistManager::init()
+bool PlaylistManager::init(bool b_preparsing)
 {
+    this->b_preparsing = b_preparsing;
+
     if(!setupPeriod())
         return false;
 
@@ -162,7 +165,7 @@ bool PlaylistManager::init()
 
 bool PlaylistManager::start()
 {
-    if(b_thread)
+    if(b_thread || b_preparsing)
         return false;
 
     b_thread = !vlc_clone(&thread, managerThread,
