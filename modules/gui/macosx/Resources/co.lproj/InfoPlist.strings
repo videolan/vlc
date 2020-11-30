@@ -1,0 +1,10 @@
+/* Localized versions of Info.plist keys */
+
+"NSCameraUsageDescription" = "VLC vole accede à l’apparechju-fotò cum’è dumandatu da l’utilizatore.";
+"NSMicrophoneUsageDescription" = "VLC vole accede à u microfonu cum’è dumandatu da l’utilizatore.";
+"NSAppleEventsUsageDescription" = "VLC vole mette in pausa è ridimarrà i lettori esterni di media.";
+"NSDesktopFolderUsageDescription" = "VLC vole accede à u cartulare di scagnu cum’è dumandatu da l’utilizatore.";
+"NSDocumentsFolderUsageDescription" = "VLC vole accede à u cartulare di ducumenti cum’è dumandatu da l’utilizatore.";
+"NSDownloadsFolderUsageDescription" = "VLC vole accede à u cartulare di scaricamenti cum’è dumandatu da l’utilizatore.";
+"NSNetworkVolumesUsageDescription" = "VLC vole accede à un discu di a reta cum’è dumandatu da l’utilizatore.";
+"NSRemovableVolumesUsageDescription" = "VLC vole accede à un discu amuvibile cum’è dumandatu da l’utilizatore.";
