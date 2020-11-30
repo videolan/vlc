@@ -127,24 +127,17 @@ VPX_CONF += --enable-pic
 else
 VPX_CONF += --extra-cflags="-mstackrealign"
 endif
-ifdef HAVE_MACOSX
-VPX_CONF += --extra-cflags="$(CFLAGS) $(EXTRA_CFLAGS)"
-endif
-ifdef HAVE_IOS
+ifdef HAVE_DARWIN_OS
 VPX_CONF += --enable-vp8-decoder --disable-tools
 VPX_CONF += --extra-cflags="$(CFLAGS) $(EXTRA_CFLAGS)"
+ifdef HAVE_IOS
 ifdef HAVE_TVOS
 VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) -mtvos-version-min=9.0
 else
 VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) -miphoneos-version-min=8.4
 endif
-ifeq ($(ARCH),aarch64)
-VPX_LDFLAGS += -arch arm64
-else
-ifndef HAVE_IOS
-VPX_LDFLAGS += -arch $(ARCH)
 endif
-endif
+VPX_LDFLAGS += -arch $(PLATFORM_SHORT_ARCH)
 endif
 
 ifneq ($(filter i386 x86_64,$(ARCH)),)

@@ -1,6 +1,6 @@
-diff -ruw libvpx-1.9.0.orig/build/make/configure.sh libvpx-1.9.0/build/make/configure.sh
---- libvpx-1.9.0.orig/build/make/configure.sh	2020-07-30 15:59:15.000000000 -0400
-+++ libvpx-1.9.0/build/make/configure.sh	2020-09-01 09:32:08.722717206 -0400
+diff -ru libvpx-1.9.0/build/make/configure.sh libvpx-1.9.0/build/make/configure.sh
+--- libvpx-1.9.0/build/make/configure.sh	2020-07-30 21:59:15.000000000 +0200
++++ libvpx-1.9.0/build/make/configure.sh	2020-11-29 18:05:12.000000000 +0100
 @@ -832,96 +832,6 @@
    # PIC is probably what we want when building shared libs
    enabled shared && soft_enable pic
@@ -111,3 +111,16 @@ diff -ruw libvpx-1.9.0.orig/build/make/configure.sh libvpx-1.9.0/build/make/conf
              for d in lib usr/lib usr/lib/system; do
                try_dir="${alt_libc}/${d}"
                [ -d "${try_dir}" ] && add_ldflags -L"${try_dir}"
+@@ -1133,12 +1037,6 @@
+                 fi
+                 ;;
+             esac
+-
+-            if [ "$(show_darwin_sdk_major_version iphoneos)" -gt 8 ]; then
+-              check_add_cflags -fembed-bitcode
+-              check_add_asflags -fembed-bitcode
+-              check_add_ldflags -fembed-bitcode
+-            fi
+           fi
+ 
+           asm_conversion_cmd="${source_path}/build/make/ads2gas_apple.pl"
