@@ -1,0 +1,34 @@
+From 91df68136ad1562cf9217599254706d8cfa970ea Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Adrien=20B=C3=A9raud?= <adrien.beraud@savoirfairelinux.com>
+Date: Sun, 20 Sep 2020 19:35:54 +0200
+Subject: [PATCH] m4: follow GMP changes for GMP_PROG_CC_FOR_BUILD
+
+---
+ aclocal.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index 513b2df4..e81e0351 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -369,7 +369,7 @@ cat >conftest.c <<EOF
+ int
+ main ()
+ {
+-  exit(0);
++  return 0;
+ }
+ EOF
+ gmp_compile="$1 conftest.c"
+@@ -410,7 +410,7 @@ else
+ int
+ main ()
+ {
+-  exit (0);
++  return 0;
+ }
+ EOF
+   for i in .exe ,ff8 ""; do
+-- 
+GitLab
+
