@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCMain.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2016 VLC authors and VideoLAN
+ * Copyright (C) 2002-2020 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
@@ -384,6 +384,33 @@ static VLCMain *sharedInstance = nil;
         return NO;
 
     return YES;
+}
+
+/* use the correct feed depending on the hardware architecture */
+- (nullable NSString *)feedURLStringForUpdater:(SUUpdater *)updater
+{
+#ifdef __x86_64__
+    return @"https://update.videolan.org/vlc/sparkle/vlc-intel64.xml";
+#elif __arm64__
+    return @"https://update.videolan.org/vlc/sparkle/vlc-arm64.xml";
+#else
+    #warning unsupported architecture
+#endif
+}
+
+- (void)updaterDidNotFindUpdate:(SUUpdater *)updater
+{
+    msg_Dbg(p_intf, "No update found");
+}
+
+- (void)updater:(SUUpdater *)updater failedToDownloadUpdate:(SUAppcastItem *)item error:(NSError *)error
+{
+    msg_Warn(p_intf, "Failed to download update with error %li", error.code);
+}
+
+- (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error
+{
+    msg_Err(p_intf, "Updater aborted with error %li", error.code);
 }
 #endif
 
