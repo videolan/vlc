@@ -493,6 +493,9 @@ static csa_t *csaSetup( vlc_object_t *p_this )
 
     csa_t *csa = csa_New();
 
+    if( unlikely(csa == NULL) )
+        return NULL;
+
     if( csa_SetCW( p_this, csa, csack, true ) )
     {
         free(csack);
