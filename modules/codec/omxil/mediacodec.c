@@ -1647,8 +1647,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_in_block)
             case VLC_SUCCESS:
                 msg_Warn(p_dec, "Restarted from DecodeBlock");
                 break;
-            case VLC_ENOOBJ:
-                break;
             default:
                 msg_Err(p_dec, "StartMediaCodec failed");
                 AbortDecoderLocked(p_dec);
