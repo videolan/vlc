@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_picture_pool.h>
+#include <vlc_atomic.h>
 #include "picture.h"
 
 #define POOL_MAX (CHAR_BIT * sizeof (unsigned long long))
@@ -44,17 +45,16 @@ struct picture_pool_t {
 
     bool               canceled;
     unsigned long long available;
-    atomic_ushort      refs;
+    vlc_atomic_rc_t    refs;
     unsigned short     picture_count;
     picture_t  *picture[];
 };
 
 static void picture_pool_Destroy(picture_pool_t *pool)
 {
-    if (atomic_fetch_sub_explicit(&pool->refs, 1, memory_order_release) != 1)
+    if (!vlc_atomic_rc_dec(&pool->refs))
         return;
 
-    atomic_thread_fence(memory_order_acquire);
     aligned_free(pool);
 }
 
@@ -94,7 +94,7 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
                                  (void*)sys);
     if (clone != NULL) {
         assert(!picture_HasChainedPics(clone));
-        atomic_fetch_add_explicit(&pool->refs, 1, memory_order_relaxed);
+        vlc_atomic_rc_inc(&pool->refs);
     }
     return clone;
 }
@@ -118,7 +118,7 @@ picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
         pool->available = ~0ULL;
     else
         pool->available = (1ULL << count) - 1;
-    atomic_init(&pool->refs,  1);
+    vlc_atomic_rc_init(&pool->refs);
     pool->picture_count = count;
     memcpy(pool->picture, tab, count * sizeof (picture_t *));
     pool->canceled = false;
@@ -177,7 +177,7 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
     unsigned long long available;
 
     vlc_mutex_lock(&pool->lock);
-    assert(pool->refs > 0);
+    assert(vlc_atomic_rc_get(&pool->refs) > 0);
     available = pool->available;
 
     while (available != 0)
@@ -201,7 +201,7 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
 picture_t *picture_pool_Wait(picture_pool_t *pool)
 {
     vlc_mutex_lock(&pool->lock);
-    assert(pool->refs > 0);
+    assert(vlc_atomic_rc_get(&pool->refs) > 0);
 
     while (pool->available == 0)
     {
@@ -223,7 +223,7 @@ picture_t *picture_pool_Wait(picture_pool_t *pool)
 void picture_pool_Cancel(picture_pool_t *pool, bool canceled)
 {
     vlc_mutex_lock(&pool->lock);
-    assert(pool->refs > 0);
+    assert(vlc_atomic_rc_get(&pool->refs) > 0);
 
     pool->canceled = canceled;
     if (canceled)
