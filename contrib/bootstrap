@@ -272,6 +272,16 @@ case "${OS}" in
 		then
 			check_macosx_sdk
 			add_make_enabled "HAVE_MACOSX" "HAVE_DARWIN_OS" "HAVE_BSD"
+
+			case "${HOST}" in
+			    *arm64*|*aarch64*)
+			    add_make "PLATFORM_SHORT_ARCH := arm64"
+			    add_make_enabled "HAVE_NEON"
+			    ;;
+			    *x86_64*)
+			    add_make "PLATFORM_SHORT_ARCH := x86_64"
+			    ;;
+			esac;
 		else
 			check_ios_sdk
 			add_make_enabled "HAVE_IOS" "HAVE_DARWIN_OS" "HAVE_BSD" "HAVE_FPU"
